@@ -483,6 +483,11 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 
 	if (oRedoObjectParam.bIsOn)
 		this.TurnOn();
+		
+	if(!window["Asc"]["editor"].wb.clipboard.pasteStart)
+	{
+		this.workbook.handlers.trigger("hideSpecialPasteOptions");
+	}
 };
 CHistory.prototype.Redo = function()
 {
@@ -734,6 +739,12 @@ CHistory.prototype._sendCanUndoRedo = function()
 	this.workbook.handlers.trigger("setCanUndo", this.Can_Undo());
 	this.workbook.handlers.trigger("setCanRedo", this.Can_Redo());
 	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
+	//скрываю кнопку специальной вставки при каждом действии/undoredo
+	//при выполнении специальной вставки и при сохранении(-1 !== this.Index) не скрываю кнопку 
+	if(!window["Asc"]["editor"].wb.clipboard.pasteStart && -1 !== this.Index && !(this.workbook.bUndoChanges || this.workbook.bRedoChanges))
+	{
+		this.workbook.handlers.trigger("hideSpecialPasteOptions");
+	}
 };
 CHistory.prototype.SetSelection = function(range)
 {

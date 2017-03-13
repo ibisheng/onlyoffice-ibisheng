@@ -463,6 +463,11 @@
 				  } else {
 					  self.model.recalcWB(false);
 				  }
+			  },
+			  
+			  //special paste
+			  "hideSpecialPasteOptions": function () {
+				  self.handlers.trigger("hideSpecialPasteOptions");
 			  }
 		  });
 
@@ -709,6 +714,13 @@
 				if (_canvas)
 					self.MobileTouchManager.CheckSelect(_canvas.trackOverlay, color);
 			}
+		},
+		"showSpecialPasteOptions": function(val) {
+			self.handlers.trigger("asc_onShowSpecialPasteOptions", val);
+			if(!window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
+			{
+				window['AscCommon'].g_clipboardBase.showSpecialPasteButton = true;
+			}
 		}
     });
 
@@ -821,6 +833,13 @@
     });
     this.handlers.add('hiddenComments', function () {
       return !self.isShowComments;
+    });
+	this.model.handlers.add("hideSpecialPasteOptions", function() {
+      if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
+	  {
+		self.handlers.trigger("asc_onHideSpecialPasteOptions");
+		window['AscCommon'].g_clipboardBase.showSpecialPasteButton = false;
+	  }
     });
 
     this.cellCommentator = new AscCommonExcel.CCellCommentator({
@@ -1167,6 +1186,7 @@
       }
 
       ws.cellCommentator.updateCommentPosition();
+      ws.updateSpecialPasteOptionsPosition();
       this._onDocumentPlaceChanged();
     }
     ws.draw();
@@ -1665,6 +1685,7 @@
 
     // Нужно очистить поиск
     this._cleanFindResults();
+	this.handlers.trigger("hideSpecialPasteOptions");
     return this;
   };
 
@@ -2060,6 +2081,12 @@
     var t = this, ws;
     ws = t.getWorksheet();
     t.clipboard.pasteData(ws, _format, data1, data2, text_data);
+  };
+  
+  WorkbookView.prototype.specialPasteData = function(props) {
+    if (!this.getCellEditMode()) {
+		this.getWorksheet().specialPaste(props);
+	}
   };
 
   WorkbookView.prototype.selectionCut = function() {

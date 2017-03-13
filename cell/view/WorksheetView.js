@@ -655,6 +655,7 @@
             this._prepareCellTextMetricsCache();
             this._shiftVisibleRange();
             this.cellCommentator.updateCommentPosition();
+            this.updateSpecialPasteOptionsPosition();
             this.handlers.trigger("onDocumentPlaceChanged");
             this.objectRender.drawingArea.reinitRanges();
             this.updateZoom = false;
@@ -673,6 +674,7 @@
         this._prepareCellTextMetricsCache();
         this._shiftVisibleRange();
         this.cellCommentator.updateCommentPosition();
+        this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.objectRender.drawingArea.reinitRanges();
 
@@ -5605,6 +5607,7 @@
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
+        this.updateSpecialPasteOptionsPosition();
         return this;
     };
 
@@ -5758,6 +5761,7 @@
         //ToDo this.drawDepCells();
         this.cellCommentator.updateCommentPosition();
         this.cellCommentator.drawCommentCells();
+        this.updateSpecialPasteOptionsPosition();
         return this;
     };
 
@@ -7069,7 +7073,7 @@
 		}
 
         return cell_info;
-    };
+	};
 
     WorksheetView.prototype._getSelectionInfoObject = function () {
         var objectInfo = new asc_CCellInfo();
@@ -7254,6 +7258,7 @@
         if (this.isSelectOnShape) {
             this.isSelectOnShape = false;
             this.objectRender.unselectDrawingObjects();
+			this.updateSpecialPasteOptionsPosition();
         }
         return isSelectOnShape;
     };
@@ -7272,6 +7277,8 @@
         // отправляем евент для получения свойств картинки, шейпа или группы
         this.model.workbook.handlers.trigger( "asc_onHideComment" );
         this._updateSelectionNameAndInfo();
+		
+		this.updateSpecialPasteOptionsPosition();
     };
     WorksheetView.prototype.setSelection = function (range, validRange) {
         // Проверка на валидность range.
@@ -8691,9 +8698,10 @@
                         break;
                         break;
                     case "paste":
-                        // Вставляем текст из локального буфера или нет
-                        fromBinary ? t._pasteData(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) :
-                          t._loadDataBeforePaste(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth);
+						var clipboardBase = window['AscCommon'].g_clipboardBase;
+						clipboardBase.specialPasteProps = clipboardBase.specialPasteProps ? clipboardBase.specialPasteProps : new Asc.SpecialPasteProps();
+					
+                        t._loadDataBeforePaste(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth);
                         bIsUpdate = false;
                         break;
                     case "hyperlink":
@@ -8742,19 +8750,39 @@
                 t.handlers.trigger("slowOperation", false);
             }
 
-            //в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
-            if (prop !== "paste" || (prop === "paste" && fromBinary)) {
-                History.EndTransaction();
-            }
+			//в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
+			if (prop !== "paste" || (prop === "paste" && fromBinary)) {
+				History.EndTransaction();
+				window["Asc"]["editor"].wb.clipboard.end_paste();
+			}
         };
+		
+		//получаем диапазон вставки
         if ("paste" === prop && val.onlyImages !== true) {
-            // Для past свой диапазон
             var newRange;
             if (fromBinary) {
                 newRange = this._pasteFromBinary(val, true);
             } else {
                 newRange = this._pasteFromHTML(val, true);
             }
+			
+			var g_clipboardBase = window['AscCommon'].g_clipboardBase;
+			if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+			{
+				var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this, newRange);
+				g_clipboardBase.specialPasteUndoData.data = sBinary;
+				
+				var specialPasteSelectionRange = new AscCommonExcel.SelectionRange();
+				specialPasteSelectionRange.ranges[0] = newRange.clone();
+				g_clipboardBase.specialPasteData.activeRange = specialPasteSelectionRange;
+				
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.transpose = null;
+			}
+			else if(g_clipboardBase.specialPasteProps && g_clipboardBase.specialPasteProps.transpose)
+			{
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.transpose = true;
+			}
+			
             checkRange = [newRange];
         }
         if ("paste" === prop && val.onlyImages === true) {
@@ -8763,9 +8791,135 @@
             this._isLockedCells(checkRange, /*subType*/null, onSelectionCallback);
         }
     };
-
+	
+	WorksheetView.prototype.specialPaste = function (props) {
+		var api = window["Asc"]["editor"];
+		var t = this;
+		
+		var clipboard_base = window['AscCommon'].g_clipboardBase;
+		var specialPasteUndoData = clipboard_base.specialPasteUndoData;
+		var specialPasteData = clipboard_base.specialPasteData;
+		
+		if(!specialPasteData)
+		{
+			return;
+		}
+		
+		var isIntoShape = t.objectRender.controller.getTargetDocContent(true);
+		var onSelectionCallback = function(isSuccess)
+		{
+			if(!isSuccess)
+			{
+				return false;
+			}
+			
+			//не вызываю для отката api.wb.clipboard.pasteData, потому что внутри асинхронные методы - isLockedCells 
+			var undoPreviousPaste = function()
+			{
+				//откатываем данные в ячейках
+				var sBase64 = specialPasteUndoData.data.split('xslData;')[1];
+				var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
+				var tempWorkbook = new AscCommonExcel.Workbook();
+				pptx_content_loader.Start_UseFullUrl();
+				oBinaryFileReader.Read(sBase64, tempWorkbook);
+				window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
+				var pasteData = null;
+				if (tempWorkbook)
+					pasteData = tempWorkbook.aWorksheets[0];
+				if(pasteData)
+				{
+					t._pasteFromBinary(pasteData, null, null);
+				}
+				
+				//удаляем вставленные изображения
+				if(specialPasteUndoData.images)
+				{
+					var images = specialPasteUndoData.images;
+					for(var i = 0; i < images.length; i++)
+					{
+						var id = images[i];
+						var oObject = AscCommon.g_oTableId.Get_ById(id);
+						oObject.deleteDrawingBase(true);
+						oObject.setBDeleted(true);
+					}
+				}
+			};
+			
+			//транзакция закроется в end_paste
+			History.Create_NewPoint();
+			History.StartTransaction();
+			
+			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
+			window["Asc"]["editor"].wb.clipboard.start_paste();
+			
+			//откатываемся до того, что было до вставки
+			//курсор и специальная вставка не в шейпе + курсор в шейпе, специальная вставка на листе
+			if(specialPasteUndoData && specialPasteUndoData.data && !clipboard_base.specialPasteButtonProps.shapeId)
+			{
+				var tempProps = new Asc.SpecialPasteProps();
+				tempProps.width = true;
+				if(specialPasteUndoData.transpose)
+				{
+					tempProps.transpose = true;
+					specialPasteUndoData.transpose = null;
+				}
+				clipboard_base.specialPasteProps = tempProps;
+				
+				//переводим фокус из шейпа на лист
+				if(isIntoShape)
+				{
+					t.objectRender.controller.resetSelection();
+				}
+				
+				//меняем activeRange
+				if(specialPasteData.activeRange)
+				{
+					t.model.selectionRange = specialPasteData.activeRange.clone(t.model);
+				}
+				
+				//нужно удалить данные предыдущей вставки(нужно для удаления ф/т)
+				t.model.autoFilters.isEmptyAutoFilters(t.model.selectionRange.getLast());
+				
+				undoPreviousPaste();
+			}
+			else if(isIntoShape && specialPasteUndoData && specialPasteUndoData.shapeSelectionState)//курсор и специальная вставка в шейпе
+			{
+				//таким образом удаляю вставляенный фрагмент до специальной вставки
+				var State = specialPasteUndoData.shapeSelectionState;
+				isIntoShape.Set_SelectionState(State, State.length - 1);
+				isIntoShape.Remove(1, true, true);
+			}
+			
+			//далее специальная вставка
+			clipboard_base.specialPasteProps = props;
+			//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
+			window["Asc"]["editor"].wb.clipboard.bIsEndTransaction = true;
+			api.wb.clipboard.pasteData(t, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
+		};
+		
+		if(specialPasteData.activeRange && !isIntoShape)
+		{
+			this._isLockedCells(specialPasteData.activeRange.ranges, /*subType*/null, onSelectionCallback);
+		}
+		else
+		{
+			onSelectionCallback(true);
+		}
+	};
+	
     WorksheetView.prototype._pasteData = function (isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth) {
         var t = this;
+		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
+		var specialPasteProps = g_clipboardBase.specialPasteProps;
+		
+		if ( val.props && val.props.onlyImages === true ) {
+			if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+			{
+				this.handlers.trigger("showSpecialPasteOptions", [Asc.c_oSpecialPasteProps.picture]);
+			}
+			return;
+		}
+		
         var callTrigger = false;
         if (isLargeRange) {
             callTrigger = true;
@@ -8775,7 +8929,7 @@
 		//добавляем форматированные таблицы
         var arnToRange = t.model.selectionRange.getLast();
         var tablesMap = null;
-        if (fromBinary && val.TableParts && val.TableParts.length) {
+        if (fromBinary && val.TableParts && val.TableParts.length && specialPasteProps.formatTable) {
             var range, tablePartRange, tables = val.TableParts, diffRow, diffCol, curTable, bIsAddTable;
             var activeRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
             var refInsertBinary = AscCommonExcel.g_oRangeCache.getAscRange(activeRange);
@@ -8843,7 +8997,7 @@
         if (fromBinary) {
             selectData = t._pasteFromBinary(val, null, tablesMap);
         } else {
-            selectData = t._pasteFromHTML(val);
+            selectData = t._pasteFromHTML(val, null, specialPasteProps);
         }
 
         t.model.autoFilters.renameTableColumn(t.model.selectionRange.getLast());
@@ -8891,102 +9045,138 @@
             History.SetSelection(oSelection);
             History.SetSelectionRedo(oSelection);
         }
+		
+		//for special paste
+		if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+		{
+			//var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+			var allowedSpecialPasteProps;
+			var sProps = Asc.c_oSpecialPasteProps;
+			if(fromBinary)
+			{
+				allowedSpecialPasteProps = [sProps.paste, sProps.pasteOnlyFormula, sProps.formulaNumberFormat, sProps.formulaAllFormatting, sProps.formulaWithoutBorders, sProps.formulaColumnWidth,  sProps.pasteOnlyValues, sProps.valueNumberFormat, sProps.valueAllFormating, sProps.pasteOnlyFormating/*, sProps.link*/];
+				if(!(val.TableParts && val.TableParts.length))
+				{
+					//add transpose property
+					allowedSpecialPasteProps.push(sProps.transpose);
+				}
+			}
+			else
+			{
+				//matchDestinationFormatting - пока не добавляю, так как работает как и values
+				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
+			}
+			this.showSpecialPasteOptions(allowedSpecialPasteProps, selectData[0]);
+		}
+		else
+		{
+			this.updateSpecialPasteOptionsPosition(selectData[0]);
+		}
     };
 
     WorksheetView.prototype._loadDataBeforePaste = function ( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth ) {
         var t = this;
-
-        //загрузка шрифтов, в случае удачи на callback вставляем текст
-        t._loadFonts( pasteContent.props.fontsNew, function () {
-
-            var api = asc["editor"];
-            var isEndTransaction = false;
-
-			if ( pasteContent.props.addImagesFromWord && pasteContent.props.addImagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) )
+		var clipboardBase = window['AscCommon'].g_clipboardBase;
+		var specialPasteProps = clipboardBase.specialPasteProps;
+		
+		//paste from excel binary
+		if(fromBinary)
+		{
+			t._pasteData(isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth);
+		}
+		else
+		{
+			var callbackLoadFonts = function()
 			{
-                var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( pasteContent.props._aPastedImages );
-
-                //if already load images on server
-                if ( api.wb.clipboard.pasteProcessor.alreadyLoadImagesOnServer === true )
+				var api = asc["editor"];
+				var isEndTransaction = false;
+				
+				var imagesFromWord = pasteContent.props.addImagesFromWord;
+				if ( imagesFromWord && imagesFromWord.length != 0 && !(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor) && specialPasteProps.images) 
 				{
-                    var oImageMap = {};
-                    for ( var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i )
-					{
-                        var url = oObjectsForDownload.aUrls[i];
+					var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( pasteContent.props._aPastedImages );
 
-                        //get name from array already load on server urls
-                        var name = api.wb.clipboard.pasteProcessor.oImages[url];
-                        var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
-                        if ( name ) {
-                            if ( Array.isArray( aImageElem ) ) {
-                                for ( var j = 0; j < aImageElem.length; ++j ) {
-                                    var imageElem = aImageElem[j];
-                                    if ( null != imageElem ) {
-                                        imageElem.SetUrl( name );
-                                    }
-                                }
-                            }
-                            oImageMap[i] = name;
-                        }
-                        else {
-                            oImageMap[i] = url;
-                        }
-                    }
-
-                    if ( pasteContent.props.onlyImages !== true )
-					{
-                        t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-                    }
-                    api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-                    isEndTransaction = true;
-                }
-                else
-				{
-					if(window["NATIVE_EDITOR_ENJINE"])
+					//if already load images on server
+					if ( api.wb.clipboard.pasteProcessor.alreadyLoadImagesOnServer === true ) 
 					{
 						var oImageMap = {};
-						AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
-
-						if ( pasteContent.props.onlyImages !== true )
+						for ( var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i ) 
 						{
-							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-						}
-						api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+							var url = oObjectsForDownload.aUrls[i];
 
+							//get name from array already load on server urls
+							var name = api.wb.clipboard.pasteProcessor.oImages[url];
+							var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
+							if ( name ) {
+								if ( Array.isArray( aImageElem ) ) {
+									for ( var j = 0; j < aImageElem.length; ++j ) {
+										var imageElem = aImageElem[j];
+										if ( null != imageElem ) {
+											imageElem.SetUrl( name );
+										}
+									}
+								}
+								oImageMap[i] = name;
+							}
+							else {
+								oImageMap[i] = url;
+							}
+						}
+						
+						t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
+						api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+						
 						isEndTransaction = true;
 					}
-					else
+					else 
 					{
-						AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+						if(window["NATIVE_EDITOR_ENJINE"])
+						{
 							var oImageMap = {};
+							
 							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
-
-							if ( pasteContent.props.onlyImages !== true ) {
-								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-							}
+							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
 							api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
-							//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-							History.EndTransaction();
-						}, true );
+							
+							isEndTransaction = true;
+						}
+						else
+						{
+							AscCommon.sendImgUrls( api, oObjectsForDownload.aUrls, function ( data ) {
+								var oImageMap = {};
+								
+								AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
+								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
+								api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+								
+								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
+								History.EndTransaction();
+								window["Asc"]["editor"].wb.clipboard.end_paste();
+							}, true );
+						}
+						
 					}
+				}
+				else
+				{
+					t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
+					isEndTransaction = true;
+				}
 
-                }
-            }
-            else if ( pasteContent.props.onlyImages !== true )
-			{
-                t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-                isEndTransaction = true;
-            }
-
-            //закрываем транзакцию, поскольку в setSelectionInfo она не закроется
-            if ( isEndTransaction )
-			{
-                History.EndTransaction();
-            }
-        } );
+				//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
+				if ( isEndTransaction ) 
+				{
+					History.EndTransaction();
+					window["Asc"]["editor"].wb.clipboard.end_paste();
+				}
+			};
+			
+			//загрузка шрифтов, в случае удачи на callback вставляем текст
+			t._loadFonts( pasteContent.props.fontsNew, callbackLoadFonts);
+		}
     };
 
-    WorksheetView.prototype._pasteFromHTML = function (pasteContent, isCheckSelection) {
+    WorksheetView.prototype._pasteFromHTML = function (pasteContent, isCheckSelection, specialPasteProps) {
         var t = this;
         var wb = window["Asc"]["editor"].wb;
         var lastSelection = this.model.selectionRange.getLast();
@@ -8995,11 +9185,7 @@
 
         var arrFormula = [];
         var numFor = 0;
-        var rMax = pasteContent.content.length + pasteContent.props.rowSpanSpCount;
-        if (pasteContent.props.rowCount && pasteContent.props.rowCount !== 0 && pasteContent.props.isOneTable) {
-            rMax = pasteContent.props.rowCount + arn.r1;
-        }
-
+        var rMax = pasteContent.content.length + pasteContent.props.rowSpanSpCount + arn.r1;
         var cMax = pasteContent.props.cellCount + arn.c1;
 
         var isMultiple = false;
@@ -9008,40 +9194,20 @@
         var rangeUnMerge = t.model.getRange3(arn.r1, arn.c1, rMax - 1, cMax - 1);
         var isOneMerge = false;
 
-
         //если вставляем в мерженную ячейку, диапазон которой больше или равен
-        if (arn.c2 >= cMax - 1 && arn.r2 >= rMax - 1 && isMergedFirstCell && isMergedFirstCell.c1 === arn.c1 &&
-          isMergedFirstCell.c2 === arn.c2 && isMergedFirstCell.r1 === arn.r1 && isMergedFirstCell.r2 === arn.r2 &&
-          cMax - arn.c1 === pasteContent.content[arn.r1][arn.c1].colSpan &&
-          rMax - arn.r1 === pasteContent.content[arn.r1][arn.c1].rowSpan) {
+		var fPasteCell = pasteContent.content[0][0];
+        if (arn.c2 >= cMax - 1 && arn.r2 >= rMax - 1 && isMergedFirstCell && isMergedFirstCell.isEqual(arn) &&  cMax - arn.c1 === fPasteCell.colSpan && rMax - arn.r1 === fPasteCell.rowSpan) {
             if (!isCheckSelection) {
-                pasteContent.content[arn.r1][arn.c1].colSpan = isMergedFirstCell.c2 - isMergedFirstCell.c1 + 1;
-                pasteContent.content[arn.r1][arn.c1].rowSpan = isMergedFirstCell.r2 - isMergedFirstCell.r1 + 1;
+                pasteContent.content[0][0].colSpan = isMergedFirstCell.c2 - isMergedFirstCell.c1 + 1;
+                pasteContent.content[0][0].rowSpan = isMergedFirstCell.r2 - isMergedFirstCell.r1 + 1;
             }
             isOneMerge = true;
-        } else if (arn.c2 >= cMax - 1 && arn.r2 >= rMax - 1 && pasteContent.props.isOneTable) {
-            //если область кратная куску вставки
-            var widthArea = arn.c2 - arn.c1 + 1;
-            var heightArea = arn.r2 - arn.r1 + 1;
-            var widthPasteFr = cMax - arn.c1;
-            var heightPasteFr = rMax - arn.r1;
-            //если кратны, то обрабатываем
-            if (widthArea % widthPasteFr === 0 && heightArea % heightPasteFr === 0) {
-                isMultiple = true;
-            } else if (firstCell.hasMerged() !== null)//в противном случае ошибка
-            {
-                if (isCheckSelection) {
-                    return arn;
-                } else {
-                    this.handlers.trigger("onError", c_oAscError.ID.PastInMergeAreaError, c_oAscError.Level.NoCritical);
-                    return;
-                }
-            }
-        } else {
+        }
+		else {
             //проверка на наличие части объединённой ячейки в области куда осуществляем вставку
             for (var rFirst = arn.r1; rFirst < rMax; ++rFirst) {
                 for (var cFirst = arn.c1; cFirst < cMax; ++cFirst) {
-                    range = t.model.getRange3(rFirst, cFirst, rFirst, cFirst);
+                    var range = t.model.getRange3(rFirst, cFirst, rFirst, cFirst);
                     var merged = range.hasMerged();
                     if (merged) {
                         if (merged.r1 < arn.r1 || merged.r2 > rMax - 1 || merged.c1 < arn.c1 || merged.c2 > cMax - 1) {
@@ -9074,17 +9240,24 @@
         }
 
         //если не возникает конфликт, делаем unmerge
-        rangeUnMerge.unmerge();
+		if(specialPasteProps.format)
+		{
+			rangeUnMerge.unmerge();
+			//this.cellCommentator.deleteCommentsRange(rangeUnMerge.bbox);
+		}
 
         if (!isOneMerge) {
             arn.r2 = (rMax2 - 1 > 0) ? (rMax2 - 1) : 0;
             arn.c2 = (cMax2 - 1 > 0) ? (cMax2 - 1) : 0;
         }
 
-        var n = 0;
         if (isMultiple)//случай автозаполнения сложных форм
         {
-            t.model.getRange3(lastSelection.r1, lastSelection.c1, lastSelection.r2, lastSelection.c2).unmerge();
+			if(specialPasteProps.format)
+			{
+				t.model.getRange3(lastSelection.r1, lastSelection.c1, lastSelection.r2, lastSelection.c2).unmerge();
+			}
+
             var maxARow = heightArea / heightPasteFr;
             var maxACol = widthArea / widthPasteFr;
             var plRow = (rMax2 - arn.r1);
@@ -9095,113 +9268,97 @@
             var plRow = 0;
             var plCol = 0;
         }
+		
+		var mergeArr = [];
+		var putInsertedCellIntoRange = function(row, col, currentObj)
+		{
+			var pastedRangeProps = {};
+			var contentCurrentObj = currentObj.content;
+			var range = t.model.getRange3(row, col, row, col);
+							
+			//value
+			if (contentCurrentObj.length === 1) {
+				var onlyOneChild = contentCurrentObj[0];
+				var valFormat = onlyOneChild.text;
+				pastedRangeProps.val = valFormat;
+				pastedRangeProps.font = onlyOneChild.format;
+			} else {
+				pastedRangeProps.value2 = contentCurrentObj;
+				pastedRangeProps.alignVertical = currentObj.va;
+				pastedRangeProps.val = currentObj.textVal;
+			}
 
-        if (isMultiple) {
-            if (pasteContent.content[arn.r1] && pasteContent.content[arn.r1][arn.c1]) {
-                var currentObj = pasteContent.content[arn.r1][arn.c1].content[0];
-                var valFormat = '';
-                if (currentObj[0] !== undefined) {
-                    valFormat = currentObj[0].text;
-                }
-            }
-        }
-
-        var mergeArr = [];
+			if (contentCurrentObj.length === 1 && contentCurrentObj[0].format) {
+				var fs = contentCurrentObj[0].format.getSize();
+				if (fs !== '' && fs !== null && fs !== undefined) {
+				   pastedRangeProps.fontSize = fs;
+				}
+			}
+			
+			//AlignHorizontal
+			if (!isOneMerge) {
+				pastedRangeProps.alignHorizontal = currentObj.a;
+			}
+			
+			//for merge
+			var isMerged = false;
+			for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
+				if (mergeArr[mergeCheck].contains(col, row)) {
+					isMerged = true;
+				}
+			}
+			if ((currentObj.colSpan > 1 || currentObj.rowSpan > 1) && !isMerged) {
+				var offsetCol  = currentObj.colSpan - 1;
+				var offsetRow = currentObj.rowSpan - 1;
+				pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
+				
+				mergeArr.push(new Asc.Range(range.bbox.c1, range.bbox.r1, range.bbox.c2 + offsetCol, range.bbox.r2 + offsetRow));
+				if (contentCurrentObj[0] == undefined) {
+					pastedRangeProps.val = '';
+				}
+				pastedRangeProps.merge = c_oAscMergeOptions.Merge;
+			}
+			
+			//borders
+			if (!isOneMerge) {
+				pastedRangeProps.borders = currentObj.borders;
+			}
+			
+			//wrap
+			pastedRangeProps.wrap = currentObj.wrap;
+			
+			//fill
+			if (currentObj.bc && currentObj.bc.rgb) {
+				pastedRangeProps.fill = currentObj.bc;
+			}
+			
+			//hyperlink
+			var link = currentObj.hyperLink;
+			if (link) {
+				pastedRangeProps.hyperLink = currentObj;
+			}
+			
+			//apply props by cell
+			t._setPastedDataByCurrentRange(range, pastedRangeProps, null, specialPasteProps);
+		};
+		
         for (var autoR = 0; autoR < maxARow; ++autoR) {
             for (var autoC = 0; autoC < maxACol; ++autoC) {
-                for (var r = arn.r1; r < rMax; ++r) {
-                    for (var c = arn.c1; c < pasteContent.content[r].length; ++c) {
+                for (var r = 0; r < rMax; ++r) {
+                    for (var c = 0; c < pasteContent.content[r].length; ++c) {
                         if (undefined !== pasteContent.content[r][c]) {
-                            var range = t.model.getRange3(r + autoR * plRow, c + autoC * plCol, r + autoR * plRow,
-                              c + autoC * plCol);
-
+							var pasteIntoRow = r + autoR * plRow + arn.r1;
+							var pasteIntoCol = c + autoC * plCol + arn.c1;
+							
                             var currentObj = pasteContent.content[r][c];
-                            var contentCurrentObj = currentObj.content;
-                            if (contentCurrentObj.length === 1) {
-                                var onlyChild = contentCurrentObj[0];
-                                var valFormat = onlyChild.text;
-                                var nameFormat = false;
-
-                                if (onlyChild.cellFrom) {
-                                    var offset = range.getCells()[0].getOffset2(
-                                      onlyChild.cellFrom), assemb, _p_ = new AscCommonExcel.parserFormula(onlyChild.text.substring(
-                                      1), null, range.worksheet);
-
-                                    if (_p_.parse()) {
-                                        assemb = _p_.changeOffset(offset).assemble(true);
-                                        //range.setValue("="+assemb);
-                                        arrFormula[numFor] = {};
-                                        arrFormula[numFor].range = range;
-                                        arrFormula[numFor].val = "=" + assemb;
-                                        numFor++;
-                                    }
-                                } else {
-                                    range.setValue(valFormat);
-                                }
-
-                                if (nameFormat) {
-                                    range.setNumFormat(nameFormat);
-                                }
-                                range.setFont(onlyChild.format);
-                            } else {
-                                range.setValue2(contentCurrentObj);
-                                range.setAlignVertical(currentObj.va);
-                            }
-
-                            if (contentCurrentObj.length === 1 && contentCurrentObj[0].format) {
-                                var fs = contentCurrentObj[0].format.getSize();
-                                if (fs !== '' && fs !== null && fs !== undefined) {
-                                    range.setFontsize(fs);
-                            }
-                            }
-                            if (!isOneMerge) {
-                                range.setAlignHorizontal(currentObj.a);
-                            }
-                            var isMerged = false;
-                            for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-                                if (mergeArr[mergeCheck].contains(c + autoC * plCol, r + autoR * plRow)) {
-                                    isMerged = true;
-                                }
-                            }
-
-                            //обработка для мерженных ячеек
-                            if ((currentObj.colSpan > 1 || currentObj.rowSpan > 1) && !isMerged) {
-                                range.setOffsetLast(
-                                  {offsetCol: currentObj.colSpan - 1, offsetRow: currentObj.rowSpan - 1});
-                                mergeArr[n] = range.getBBox0();
-                                n++;
-                                if (contentCurrentObj[0] == undefined) {
-                                    range.setValue('');
-                                }
-                                range.merge(c_oAscMergeOptions.Merge);
-                            }
-
-                            if (!isOneMerge) {
-                                range.setBorderSrc(currentObj.borders);
-                            }
-                            range.setWrap(currentObj.wrap);
-                            if (currentObj.bc && currentObj.bc.rgb) {
-                                range.setFill(currentObj.bc);
-                            }
-
-                            var link = pasteContent.content[r][c].hyperLink;
-                            if (link) {
-                                var newHyperlink = new AscCommonExcel.Hyperlink();
-                                if (pasteContent.content[r][c].hyperLink.search('#') === 0) {
-                                    newHyperlink.setLocation(link.replace('#', ''));
-                                } else {
-                                    newHyperlink.Hyperlink = link;
-                                }
-                                newHyperlink.Ref = range;
-                                newHyperlink.Tooltip = pasteContent.content[r][c].toolTip;
-                                range.setHyperlink(newHyperlink);
-                            }
+                            
+							putInsertedCellIntoRange(pasteIntoRow, pasteIntoCol, currentObj);
                         }
                     }
                 }
             }
         }
-
+		
         if (isMultiple) {
             arn.r2 = lastSelection.r2;
             arn.c2 = lastSelection.c2;
@@ -9210,22 +9367,33 @@
         t.isChanged = true;
         lastSelection.c2 = arn.c2;
         lastSelection.r2 = arn.r2;
-        var arnFor = [];
-        arnFor[0] = arn;
-        arnFor[1] = arrFormula;
+        var arnFor = [arn, arrFormula];
+		
         return arnFor;
     };
 
     WorksheetView.prototype._pasteFromBinary = function (val, isCheckSelection, tablesMap) {
         var t = this;
-        var arn = t.model.selectionRange.getLast();
+		var trueActiveRange = t.model.selectionRange.getLast().clone();
+		var lastSelection = this.model.selectionRange.getLast();
+        var arn = t.model.selectionRange.getLast().clone();
         var arrFormula = [];
-        var numFor = 0;
 
         var pasteRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
-        var activeCellsPasteFragment = AscCommonExcel.g_oRangeCache.getAscRange(pasteRange);
-        var rMax = (activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1) + arn.r1 + 1;
-        var cMax = (activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1) + arn.c1 + 1;
+        var activeCellsPasteFragment = typeof pasteRange === "string" ? AscCommonExcel.g_oRangeCache.getAscRange(pasteRange) : pasteRange;
+		
+		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
+		var specialPasteProps = g_clipboardBase.specialPasteProps;
+		
+		var countPasteRow = activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1 + 1;
+		var countPasteCol = activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1 + 1;
+		if(specialPasteProps && specialPasteProps.transpose)
+		{
+			countPasteRow = activeCellsPasteFragment.c2 - activeCellsPasteFragment.c1 + 1;
+			countPasteCol = activeCellsPasteFragment.r2 - activeCellsPasteFragment.r1 + 1;
+		}
+        var rMax = countPasteRow + arn.r1;
+        var cMax = countPasteCol + arn.c1;
 
         if (cMax > gc_nMaxCol0) {
             cMax = gc_nMaxCol0;
@@ -9284,7 +9452,7 @@
             //проверка на наличие части объединённой ячейки в области куда осуществляем вставку
             for (var rFirst = arn.r1; rFirst < rMax; ++rFirst) {
                 for (var cFirst = arn.c1; cFirst < cMax; ++cFirst) {
-                    range = t.model.getRange3(rFirst, cFirst, rFirst, cFirst);
+                    var range = t.model.getRange3(rFirst, cFirst, rFirst, cFirst);
                     var merged = range.hasMerged();
                     if (merged) {
                         if (merged.r1 < arn.r1 || merged.r2 > rMax - 1 || merged.c1 < arn.c1 || merged.c2 > cMax - 1) {
@@ -9318,18 +9486,23 @@
             return newArr;
         }
         //если не возникает конфликт, делаем unmerge
-        rangeUnMerge.unmerge();
+		if(specialPasteProps.format)
+		{
+			rangeUnMerge.unmerge();
+			//this.cellCommentator.deleteCommentsRange(rangeUnMerge.bbox);
+		}
         if (!isOneMerge) {
             arn.r2 = rMax2 - 1;
             arn.c2 = cMax2 - 1;
         }
 
-        var mergeArr = [];
-
-        var n = 0;
+       
         if (isMultiple)//случай автозаполнения сложных форм
         {
-            t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2).unmerge();
+            if(specialPasteProps.format)
+			{
+				t.model.getRange3(trueActiveRange.r1, trueActiveRange.c1, trueActiveRange.r2, trueActiveRange.c2).unmerge();
+			}
             var maxARow = heightArea / heightPasteFr;
             var maxACol = widthArea / widthPasteFr;
             var plRow = (rMax2 - arn.r1);
@@ -9339,241 +9512,219 @@
             var maxACol = 1;
             var plRow = 0;
             var plCol = 0;
+			
+			trueActiveRange.r2 = arn.r2;
+			trueActiveRange.c2 = arn.c2;
         }
+		
+		
+		var addComments = function(pasteRow, pasteCol, comments)
+		{
+			var comment;
+			for (var i = 0; i < comments.length; i++) {
+				comment = comments[i];
+				if (comment.nCol == pasteCol && comment.nRow == pasteRow) {
+					var commentData = new Asc.asc_CCommentData(comment);
+					//change nRow, nCol
+					commentData.asc_putCol(nCol);
+					commentData.asc_putRow(nRow);
+					t.cellCommentator.addComment(commentData, true);
+				}
+			}
+		};
+		
+		var mergeArr = [];
+		var checkMerge = function(range, curMerge, nRow, nCol, rowDiff, colDiff, pastedRangeProps)
+		{
+			var isMerged = false;
+			
+			for (var mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
+				if (mergeArr[mergeCheck].contains(nCol, nRow)) {
+					isMerged = true;
+				}
+			}
+			 
+			if (!isOneMerge) {
+				if (curMerge != null && !isMerged) {
+					var offsetCol = curMerge.c2 - curMerge.c1;
+					if (offsetCol + nCol >= gc_nMaxCol0) {
+						offsetCol = gc_nMaxCol0 - nCol;
+					}
 
-        var newVal;
-        var curMerge;
-        var nRow, nCol;
+					var offsetRow = curMerge.r2 - curMerge.r1;
+					if (offsetRow + nRow >= gc_nMaxRow0) {
+						offsetRow = gc_nMaxRow0 - nRow;
+					}
+					
+					pastedRangeProps.offsetLast = {offsetCol: offsetCol, offsetRow: offsetRow};
+					if(specialPasteProps.transpose)
+					{
+						mergeArr.push(new Asc.Range(
+							curMerge.c1 + arn.c1 - activeCellsPasteFragment.r1 + colDiff,
+							curMerge.r1 + arn.r1 - activeCellsPasteFragment.c1 + rowDiff,
+							curMerge.c2 + arn.c1 - activeCellsPasteFragment.r1 + colDiff,
+							curMerge.r2 + arn.r1 - activeCellsPasteFragment.c1 + rowDiff
+						));
+					}
+					else
+					{
+						mergeArr.push(new Asc.Range(
+							curMerge.c1 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
+							curMerge.r1 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff,
+							curMerge.c2 + arn.c1 - activeCellsPasteFragment.c1 + colDiff,
+							curMerge.r2 + arn.r1 - activeCellsPasteFragment.r1 + rowDiff
+						));
+					}
+				}
+			} 
+			else {
+				if (!isMerged) {
+					pastedRangeProps.offsetLast = {offsetCol: isMergedFirstCell.c2 - isMergedFirstCell.c1, offsetRow: isMergedFirstCell.r2 - isMergedFirstCell.r1};
+					mergeArr.push({r1: isMergedFirstCell.r1, r2: isMergedFirstCell.r2, 	c1: isMergedFirstCell.c1, c2: isMergedFirstCell.c2});
+				}
+			}
+		};
+		
+		var getTableDxf = function(pasteRow, pasteCol, newVal)
+		{
+			var dxf = null;
+			var tables = val.autoFilters._intersectionRangeWithTableParts(newVal.bbox);
+			
+			if(tables && tables[0])
+			{
+				var table = tables[0];
+				var styleInfo = table.TableStyleInfo;
+				var styleForCurTable = t.model.workbook.TableStyles.AllStyles[styleInfo.Name];
+				
+				var headerRowCount = !!(null === table.HeaderRowCount || table.HeaderRowCount > 0);
+				var bbox = {r1: 0, c1: 0, r2: table.Ref.r2 - table.Ref.r1, c2: table.Ref.c2 - table.Ref.c1};
+				pasteRow = pasteRow - table.Ref.r1;
+				pasteCol = pasteCol - table.Ref.c1;
+				dxf = styleForCurTable.getStyle(bbox, pasteRow, pasteCol, styleInfo, headerRowCount, table.TotalsRowCount);
+			}
+			
+			return dxf;
+		};
+		
+		var colsWidth = {};
+		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal, curMerge)
+		{
+			var pastedRangeProps = {};
+			//range может далее изменится в связи с наличием мерженных ячеек, firstRange - не меняется(ему делаем setValue, как первой ячейке в диапазоне мерженных)
+			var firstRange = range.clone();
+			
+			//****paste comments****
+			if (val.aComments && val.aComments.length) {
+				addComments(pasteRow, pasteCol, val.aComments);
+			}
+			
+			//merge
+			checkMerge(range, curMerge, nRow, nCol, rowDiff, colDiff, pastedRangeProps);
+
+			//set style
+			if (!isOneMerge) {
+				pastedRangeProps.cellStyle = newVal.getStyleName();
+			}
+
+			if (!isOneMerge)//settings for cell(format)
+			{
+				//format
+				var numFormat = newVal.getNumFormat();
+				var nameFormat;
+				if (numFormat && numFormat.sFormat) {
+					nameFormat = numFormat.sFormat;
+				}
+				
+				pastedRangeProps.numFormat = nameFormat;
+			}
+			
+			if (!isOneMerge)//settings for cell
+			{
+				//vertical align
+				pastedRangeProps.alignVertical = newVal.getAlignVertical();
+				//horizontal align
+				pastedRangeProps.alignHorizontal = newVal.getAlignHorizontal();
+				//borders
+				var fullBorders = newVal.getBorderFull();
+				if (pastedRangeProps.offsetLast && pastedRangeProps.offsetLast.offsetCol > 0 && curMerge && fullBorders) {
+					//для мерженных ячеек, правая границу
+					var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
+					var fullBordersEndMergeCell = endMergeCell.getBorderFull();
+					if (fullBordersEndMergeCell && fullBordersEndMergeCell.r) {
+						fullBorders.r = fullBordersEndMergeCell.r;
+					}
+				}
+				pastedRangeProps.bordersFull = fullBorders;
+				//fill
+				pastedRangeProps.fill = newVal.getFill();
+				//wrap
+				//range.setWrap(newVal.getWrap());
+				pastedRangeProps.wrap = newVal.getWrap();
+				//angle
+				pastedRangeProps.angle = newVal.getAngle();
+				//hyperlink
+				pastedRangeProps.hyperlinkObj = newVal.getHyperlink();
+			}
+			
+			pastedRangeProps.tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
+			if(undefined === colsWidth[nCol])
+			{
+				colsWidth[nCol] = val._getCol(pasteCol);
+			}
+			pastedRangeProps.colsWidth = colsWidth;
+			
+			//apply props by cell
+			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge, val: val};
+			t._setPastedDataByCurrentRange(range, pastedRangeProps, formulaProps, specialPasteProps);
+		};
+		
         for (var autoR = 0; autoR < maxARow; ++autoR) {
             for (var autoC = 0; autoC < maxACol; ++autoC) {
-                for (var r = arn.r1; r < rMax; ++r) {
-                    for (var c = arn.c1; c < cMax; ++c) {
-                        var pasteRow = r - arn.r1 + activeCellsPasteFragment.r1;
-                        var pasteCol = c - arn.c1 + activeCellsPasteFragment.c1;
-                        newVal = val.getCell3(pasteRow, pasteCol);
-
-                        curMerge = newVal.hasMerged();
-
+                for (var r = 0; r < rMax - arn.r1; ++r) {
+                    for (var c = 0; c < cMax - arn.c1; ++c) {
+                        var pasteRow = r + activeCellsPasteFragment.r1;
+                        var pasteCol = c + activeCellsPasteFragment.c1;
+						if(specialPasteProps.transpose)
+						{
+							pasteRow = c + activeCellsPasteFragment.r1;
+							pasteCol = r + activeCellsPasteFragment.c1;
+						}
+						
+                        var newVal = val.getCell3(pasteRow, pasteCol);
                         if (undefined !== newVal) {
-                            var isMerged = false, mergeCheck;
-
-                            nRow = r + autoR * plRow;
-                            if (nRow > gc_nMaxRow0) {
-                                nRow = gc_nMaxRow0;
-                            }
-                            nCol = c + autoC * plCol;
-                            if (nCol > gc_nMaxCol0) {
-                                nCol = gc_nMaxCol0;
-                            }
-
-                            var range = t.model.getRange3(nRow, nCol, nRow, nCol);
-                            //range может далее изменится в связи с наличием мерженных ячеек, firstRange  - не меняется(ему делаем setValue, как первой ячейке в диапазоне мерженных)
-                            var firstRange = range.clone();
-
-                            //****paste comments****
-                            if (val.aComments && val.aComments.length) {
-                                var comment;
-                                for (var i = 0; i < val.aComments.length; i++) {
-                                    comment = val.aComments[i];
-                                    if (comment.nCol == pasteCol && comment.nRow == pasteRow) {
-                                        var commentData = new Asc.asc_CCommentData(comment);
-                                        //change nRow, nCol
-                                        commentData.asc_putCol(c + autoC * plCol);
-                                        commentData.asc_putRow(r + autoR * plRow);
-                                        t.cellCommentator.addComment(commentData, true);
-                                    }
-                                }
-                            }
-
-                            if (!isOneMerge) {
-                                for (mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-                                    if (r + autoR * plRow <= mergeArr[mergeCheck].r2 &&
-                                      r + autoR * plRow >= mergeArr[mergeCheck].r1 &&
-                                      c + autoC * plCol <= mergeArr[mergeCheck].c2 &&
-                                      c + autoC * plCol >= mergeArr[mergeCheck].c1) {
-                                        isMerged = true;
-                                    }
-                                }
-                                if (curMerge != null && !isMerged) {
-                                    var offsetCol = curMerge.c2 - curMerge.c1;
-                                    if (offsetCol + c + autoC * plCol >= gc_nMaxCol0) {
-                                        offsetCol = gc_nMaxCol0 - (c + autoC * plCol);
-                                    }
-
-                                    var offsetRow = curMerge.r2 - curMerge.r1;
-                                    if (offsetRow + r + autoR * plRow >= gc_nMaxRow0) {
-                                        offsetRow = gc_nMaxRow0 - (r + autoR * plRow);
-                                    }
-
-                                    range.setOffsetLast({offsetCol: offsetCol, offsetRow: offsetRow});
-                                    range.merge(c_oAscMergeOptions.Merge);
-                                    mergeArr[n] = {
-                                        r1: curMerge.r1 + arn.r1 - activeCellsPasteFragment.r1 + autoR * plRow,
-                                        r2: curMerge.r2 + arn.r1 - activeCellsPasteFragment.r1 + autoR * plRow,
-                                        c1: curMerge.c1 + arn.c1 - activeCellsPasteFragment.c1 + autoC * plCol,
-                                        c2: curMerge.c2 + arn.c1 - activeCellsPasteFragment.c1 + autoC * plCol
-                                    };
-                                    n++;
-                                }
-                            } else {
-                                for (mergeCheck = 0; mergeCheck < mergeArr.length; ++mergeCheck) {
-                                    if (r + autoR * plRow <= mergeArr[mergeCheck].r2 &&
-                                      r + autoR * plRow >= mergeArr[mergeCheck].r1 &&
-                                      c + autoC * plCol <= mergeArr[mergeCheck].c2 &&
-                                      c + autoC * plCol >= mergeArr[mergeCheck].c1) {
-                                        isMerged = true;
-                                    }
-                                }
-                                if (!isMerged) {
-                                    range.setOffsetLast({
-                                        offsetCol: (isMergedFirstCell.c2 - isMergedFirstCell.c1),
-                                        offsetRow: (isMergedFirstCell.r2 - isMergedFirstCell.r1)
-                                    });
-                                    range.merge(c_oAscMergeOptions.Merge);
-                                    mergeArr[n] = {
-                                        r1: isMergedFirstCell.r1,
-                                        r2: isMergedFirstCell.r2,
-                                        c1: isMergedFirstCell.c1,
-                                        c2: isMergedFirstCell.c2
-                                    };
-                                    n++;
-                                }
-                            }
-
-                            //set style
-                            var cellStyle = newVal.getStyleName();
-                            if (cellStyle && !isOneMerge) {
-                                range.setCellStyle(cellStyle);
-                            }
-
-                            //add formula
-                            var numFormula = null;
-                            var skipFormat = null;
-                            var noSkipVal = null;
-                            var value2 = newVal.getValue2();
-                            for (var nF = 0; nF < value2.length; nF++) {
-                                if (value2[nF] && value2[nF].sId) {
-                                    numFormula = nF;
-                                    break;
-                                } else if (value2[nF] && value2[nF].format && value2[nF].format.getSkip()) {
-                                    skipFormat = true;
-                                } else if (value2[nF] && value2[nF].format && !value2[nF].format.getSkip()) {
-                                    noSkipVal = nF;
-                                }
-                            }
-
-
-                            if (!isOneMerge)//settings for cell(format)
-                            {
-                                //format
-                                var numFormat = newVal.getNumFormat();
-                                var nameFormat;
-                                if (numFormat && numFormat.sFormat) {
-                                    nameFormat = numFormat.sFormat;
-                                }
-                                if (nameFormat) {
-                                    range.setNumFormat(nameFormat);
-                                }
-                            }
-
-                            //TODO вместо range где возможно использовать cell
-                            var cellFrom, cellTo;
-                            if (value2.length == 1 || numFormula != null || (skipFormat != null && noSkipVal != null)) {
-                                if (numFormula == null) {
-                                    numFormula = 0;
-                                }
-                                var numStyle = 0;
-                                if (skipFormat != null && noSkipVal != null) {
-                                    numStyle = noSkipVal;
-                                }
-
-                                //formula
-                                if (newVal.getFormula() && !isOneMerge) {
-                                    var offset = range.getCells()[numFormula].getOffset2(
-                                      value2[numFormula].sId), assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, val);
-
-                                    if (_p_.parse()) {
-										if(null !== tablesMap)
-										{
-											var renameParams = {};
-											renameParams.offset = offset;
-											renameParams.tableNameMap = tablesMap;
-											_p_.renameSheetCopy(renameParams);
-											assemb = _p_.assemble(true)
-										}
-										else
-										{
-											assemb = _p_.changeOffset(offset).assemble(true);
-										}
-
-                                        arrFormula[numFor] = {};
-                                        arrFormula[numFor].range = range;
-                                        arrFormula[numFor].val = "=" + assemb;
-                                        numFor++;
-                                    }
-                                } else {
-                                    cellFrom = newVal.getCells();
-                                    if (isOneMerge && range && range.bbox) {
-                                        cellTo = this._getCell(range.bbox.c1, range.bbox.r1).getCells();
-                                    } else {
-                                        cellTo = firstRange.getCells();
-                                    }
-
-                                    if (cellFrom && cellTo && cellFrom[0] && cellTo[0]) {
-                                        cellTo[0].setValueData(cellFrom[0].getValueData());
-                                    }
-                                }
-
-                                if (!isOneMerge)//settings for text
-                                {
-                                    range.setFont(value2[numStyle].format);
-                                    }
-                            } else {
-                                firstRange.setValue2(value2);
-                            }
-
-
-                            if (!isOneMerge)//settings for cell
-                            {
-                                //vertical align
-                                range.setAlignVertical(newVal.getAlignVertical());
-
-                                //horizontal align
-                                range.setAlignHorizontal(newVal.getAlignHorizontal());
-
-                                //borders
-                                var fullBorders = newVal.getBorderFull();
-                                if (range.bbox.c2 !== range.bbox.c1 && curMerge && fullBorders) {
-                                    //для мерженных ячеек, правая границу
-                                    var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
-                                    var fullBordersEndMergeCell = endMergeCell.getBorderFull();
-                                    if (fullBordersEndMergeCell && fullBordersEndMergeCell.r) {
-                                        fullBorders.r = fullBordersEndMergeCell.r;
-                                    }
-                                }
-                                range.setBorder(fullBorders);
-
-
-                                //fill
-                                range.setFill(newVal.getFill());
-
-                                //wrap
-                                range.setWrap(newVal.getWrap());
-
-                                //angle
-                                range.setAngle(newVal.getAngle());
-
-                                //hyperLink
-                                var hyperLink = newVal.getHyperlink();
-                                if (hyperLink != null) {
-                                    hyperLink.Ref = range;
-                                    range.setHyperlink(hyperLink, true);
-                                }
-                            }
+							
+							var nRow = r + autoR * plRow + arn.r1;
+							var nCol = c + autoC * plCol + arn.c1;
+							
+							if (nRow > gc_nMaxRow0) {
+								nRow = gc_nMaxRow0;
+							}
+							if (nCol > gc_nMaxCol0) {
+								nCol = gc_nMaxCol0;
+							}
+							
+							var curMerge = newVal.hasMerged();
+							if(curMerge && specialPasteProps.transpose)
+							{
+								curMerge = curMerge.clone();
+								var r1 = curMerge.r1;
+								var r2 = curMerge.r2;
+								var c1 = curMerge.c1;
+								var c2 = curMerge.c2;
+								
+								curMerge.r1 = c1;
+								curMerge.r2 = c2;
+								curMerge.c1 = r1;
+								curMerge.c2 = r2;
+							}
+							
+							var range = t.model.getRange3(nRow, nCol, nRow, nCol);
+							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal, curMerge);
+							
                             //если замержили range
-                            c = range.bbox.c2 - autoC * plCol;
+                            c = range.bbox.c2 - autoC * plCol - arn.c1;
                             if (c === cMax) {
-                                r = range.bbox.r2 - autoC * plCol;
+                                r = range.bbox.r2 - autoC * plCol - arn.r1;
                             }
                         }
                     }
@@ -9582,11 +9733,368 @@
         }
 
         t.isChanged = true;
-        var arnFor = [];
-        arnFor[0] = arn;
-        arnFor[1] = arrFormula;
+        var arnFor = [trueActiveRange, arrFormula];
+		
+		//TODO переделать на setSelection. закомментировал в связи с падением, когда вставляем ниже видимой зоны таблицы
+		//this.setSelection(trueActiveRange);
+		lastSelection.c2 = trueActiveRange.c2;
+        lastSelection.r2 = trueActiveRange.r2;
+		
         return arnFor;
     };
+	
+	WorksheetView.prototype._setPastedDataByCurrentRange = function(range, rangeStyle, formulaProps, specialPasteProps)
+	{
+		var t = this;
+		
+		var firstRange, arrFormula, tablesMap, newVal, isOneMerge, val;
+		if(formulaProps)
+		{
+			//TODO firstRange возможно стоит убрать(добавлено было для правки бага 27745)
+			firstRange = formulaProps.firstRange;
+			arrFormula = formulaProps.arrFormula;
+			tablesMap = formulaProps.tablesMap;
+			newVal = formulaProps.newVal;
+			isOneMerge = formulaProps.isOneMerge;
+			val = formulaProps.val;
+		}
+		
+		//set formula - for paste from binary
+		var calculateValueAndBinaryFormula = function(newVal, firstRange, range)
+		{
+			var numFormula = null;
+			var skipFormat = null;
+			var noSkipVal = null;
+			
+			rangeStyle.val = newVal.getValue();
+			var value2 = newVal.getValue2();
+			for (var nF = 0; nF < value2.length; nF++) {
+				if (value2[nF] && value2[nF].sId) {
+					numFormula = nF;
+					break;
+				} else if (value2[nF] && value2[nF].format && value2[nF].format.getSkip()) {
+					skipFormat = true;
+				} else if (value2[nF] && value2[nF].format && !value2[nF].format.getSkip()) {
+					noSkipVal = nF;
+				}
+			}
+			
+			//TODO вместо range где возможно использовать cell
+			var cellFrom, cellTo;
+			if (value2.length == 1 || numFormula != null || (skipFormat != null && noSkipVal != null)) {
+				if (numFormula == null) {
+					numFormula = 0;
+				}
+				var numStyle = 0;
+				if (skipFormat != null && noSkipVal != null) {
+					numStyle = noSkipVal;
+				}
+
+				//formula
+				if (newVal.getFormula() && !isOneMerge) {
+					var offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, val);
+
+					if (_p_.parse()) {
+						if(null !== tablesMap)
+						{
+							var renameParams = {};
+							renameParams.offset = offset;
+							renameParams.tableNameMap = tablesMap;
+							_p_.renameSheetCopy(renameParams);
+							assemb = _p_.assemble(true)
+						}
+						else
+						{
+							assemb = _p_.changeOffset(offset).assemble(true);
+						}
+						
+						rangeStyle.formula = {range: range, val: "=" + assemb};
+						
+						//arrFormula.push({range: range, val: "=" + assemb});
+					}
+				} else {
+					cellFrom = newVal.getCells();
+					if (isOneMerge && range && range.bbox) {
+						cellTo = t._getCell(range.bbox.c1, range.bbox.r1).getCells();
+					} else {
+						cellTo = firstRange.getCells();
+					}
+
+					if (cellFrom && cellTo && cellFrom[0] && cellTo[0]) {
+						//cellTo[0].setValueData(cellFrom[0].getValueData());
+						rangeStyle.cellValueData = {valueData: cellFrom[0].getValueData(), cell: cellTo[0]};
+					}
+				}
+				
+				if (!isOneMerge)//settings for text
+				{
+					rangeStyle.font = value2[numStyle].format;
+					//range.setFont(value2[numStyle].format);
+				}
+			} else {
+				rangeStyle.value2 = value2;
+				//firstRange.setValue2(value2);
+			}
+		};
+		
+		
+		//column width
+		var col = range.bbox.c1;
+		if(specialPasteProps.width && rangeStyle.colsWidth[col])
+		{
+			var widthProp = rangeStyle.colsWidth[col];
+			
+			t.model.setColWidth(widthProp.width, col, col);
+			t.model.setColHidden(widthProp.hd, col, col);
+			t.model.setColBestFit(widthProp.BestFit, widthProp.width, col, col);
+			
+			rangeStyle.colsWidth[col] = null;
+		}
+		
+		//offsetLast
+		if(rangeStyle.offsetLast && specialPasteProps.merge)
+		{
+			range.setOffsetLast(rangeStyle.offsetLast);
+			range.merge(rangeStyle.merge);
+		
+		}
+		
+		//for formula
+		if(formulaProps)
+		{
+			calculateValueAndBinaryFormula(newVal, firstRange, range);
+		}
+		
+		//cellStyle
+		if(rangeStyle.cellStyle && specialPasteProps.cellStyle)
+		{
+			range.setCellStyle(rangeStyle.cellStyle);
+		}
+		
+		//если не вставляем форматированную таблицу, но формат необходимо вставить
+		if(specialPasteProps.format && !specialPasteProps.formatTable && rangeStyle.tableDxf)
+		{
+			var cells = range.getCells();
+			if(cells && cells[0])
+			{
+				cells[0].setStyle(rangeStyle.tableDxf);
+			}
+		}
+		
+		//numFormat
+		if(rangeStyle.numFormat && specialPasteProps.numFormat)
+		{
+			range.setNumFormat(rangeStyle.numFormat);
+		}
+		//font
+		if(rangeStyle.font && specialPasteProps.font)
+		{
+			range.setFont(rangeStyle.font);
+		}
+		
+		
+		//***value***
+		if(rangeStyle.formula && specialPasteProps.formula)
+		{
+			arrFormula.push(rangeStyle.formula);
+		}
+		else if(rangeStyle.cellValueData && specialPasteProps.font && specialPasteProps.val)
+		{	
+			rangeStyle.cellValueData.cell.setValueData(rangeStyle.cellValueData.valueData);
+		}
+		else if(rangeStyle.value2 && specialPasteProps.font && specialPasteProps.val)
+		{
+			if(formulaProps)
+			{
+				firstRange.setValue2(rangeStyle.value2);
+			}
+			else
+			{
+				range.setValue2(rangeStyle.value2);
+			}
+		}
+		else if(rangeStyle.val && specialPasteProps.val)
+		{
+			range.setValue(rangeStyle.val);
+		}
+		
+		//alignVertical
+		if(rangeStyle.alignVertical && specialPasteProps.alignVertical)
+		{
+			range.setAlignVertical(rangeStyle.alignVertical);
+		}
+		//alignHorizontal
+		if(rangeStyle.alignHorizontal && specialPasteProps.alignHorizontal)
+		{
+			range.setAlignHorizontal(rangeStyle.alignHorizontal);
+		}
+		//fontSize
+		if(rangeStyle.fontSize && specialPasteProps.fontSize)
+		{
+			range.setFontsize(rangeStyle.fontSize);
+		}
+		//borders
+		if(rangeStyle.borders && specialPasteProps.borders)
+		{
+			range.setBorderSrc(rangeStyle.borders);
+		}
+		//bordersFull
+		if(rangeStyle.bordersFull && specialPasteProps.borders)
+		{
+			range.setBorder(rangeStyle.bordersFull);
+		}
+		//wrap
+		if(rangeStyle.wrap && specialPasteProps.wrap)
+		{
+			range.setWrap(rangeStyle.wrap);
+		}
+		//fill
+		if(specialPasteProps.fill && rangeStyle.fill)
+		{
+			range.setFill(rangeStyle.fill);
+		}
+		//angle
+		if(rangeStyle.angle && specialPasteProps.angle)
+		{
+			range.setAngle(rangeStyle.angle);
+		}
+		
+		//hyperLink
+		if (rangeStyle.hyperLink && specialPasteProps.hyperlink)
+		{
+			var _link = rangeStyle.hyperLink.hyperLink;
+			var newHyperlink = new AscCommonExcel.Hyperlink();
+			if (_link.search('#') === 0) 
+			{
+				newHyperlink.setLocation(_link.replace('#', ''));
+			}
+			else 
+			{
+				newHyperlink.Hyperlink = _link;
+			}
+			newHyperlink.Ref = range;
+			newHyperlink.Tooltip = rangeStyle.hyperLink.toolTip;
+			range.setHyperlink(newHyperlink);
+		}
+		else if (rangeStyle.hyperlinkObj && specialPasteProps.hyperlink) 
+		{
+			rangeStyle.hyperlinkObj.Ref = range;
+			range.setHyperlink(rangeStyle.hyperlinkObj, true);
+		}
+	};
+
+	WorksheetView.prototype.showSpecialPasteOptions = function(props, range, positionShapeContent)
+	{
+		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+		
+		var cellCoord;
+		if(!positionShapeContent)
+		{
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = range;
+			
+			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
+			cellCoord = this.getSpecialPasteCoords(range, isVisible);
+		}
+		else
+		{
+			//var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
+			cellCoord = new AscCommon.asc_CRect( positionShapeContent.x, positionShapeContent.y, 0, 0 );
+		}
+		
+		
+		specialPasteShowOptions.asc_setOptions(props);
+		specialPasteShowOptions.asc_setCellCoord(cellCoord);
+		this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
+	},
+
+	WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
+	{
+		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
+		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton && isIntoShape)
+		{
+			if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId === isIntoShape.Id)
+			{
+				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+				var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
+				
+				/*var trueShapeSelection = isIntoShape.Get_SelectionState();
+				isIntoShape.Set_SelectionState(range, range.length - 1);*/
+				
+				var sProps = Asc.c_oSpecialPasteProps;
+				var curShape = isIntoShape.Parent.parent;
+				
+				var asc_getcvt = Asc.getCvtRatio;
+				var mmToPx = asc_getcvt(3/*px*/, 0/*pt*/, this._getPPIX());
+				var ptToPx = asc_getcvt(1/*px*/, 0/*pt*/, this._getPPIX());
+				
+				var cellsLeft = this.cellsLeft * ptToPx;
+				var cellsTop = this.cellsTop * ptToPx;
+				
+				var cursorPos = range//isIntoShape.Cursor_GetPos();
+				var offsetX = this.cols[this.visibleRange.c1].left * ptToPx - cellsLeft;
+				var offsetY = this.rows[this.visibleRange.r1].top * ptToPx - cellsTop;
+				var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;
+				var posY = curShape.transformText.TransformPointY(cursorPos.X, cursorPos.Y) * mmToPx - offsetY + cellsTop;
+				
+				
+				cellCoord = new AscCommon.asc_CRect( posX, posY, 0, 0 );
+				
+				specialPasteShowOptions.asc_setCellCoord(cellCoord);
+				this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
+				
+				//isIntoShape.Set_SelectionState(trueShapeSelection, trueShapeSelection.length - 1);
+			}
+		}
+		else if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
+		{
+			var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+			if(changeActiveRange)
+			{
+				window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = changeActiveRange;
+			}
+			
+			var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
+			var isVisible = null !== this.getCellVisibleRange(range.c2, range.r2);
+			var cellCoord = this.getSpecialPasteCoords(range, isVisible);
+			
+			specialPasteShowOptions.asc_setCellCoord(cellCoord);
+			this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
+		}
+	};
+	
+	WorksheetView.prototype.getSpecialPasteCoords = function(range, isVisible)
+	{	
+		var disableCoords = function()
+		{
+			cellCoord._x = -1;
+			cellCoord._y = -1;
+		};
+		
+		//TODO пересмотреть когда иконка вылезает за пределы области видимости
+		var cellCoord = this.getCellCoord(range.c2, range.r2);
+		if(!isVisible || window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId)
+		{
+			disableCoords();
+		}
+		else
+		{
+			var visibleCellCoord = this.getCellCoord(this.visibleRange.c2, this.visibleRange.r2);
+			var offset = 3;
+			var widthIcon = 30 + offset;
+			var heightIcon = 22 + offset;
+			
+			if(cellCoord._x + widthIcon > visibleCellCoord._x || cellCoord._y + heightIcon > visibleCellCoord._y)
+			{
+				disableCoords();
+			}
+		}
+		
+		return cellCoord;
+	};
 
     // Залочена ли панель для закрепления
     WorksheetView.prototype._isLockedFrozenPane = function ( callback ) {
@@ -11245,6 +11753,7 @@
         this.model.onUpdateRanges(arrChanged);
         this.objectRender.rebuildChartGraphicObjects(arrChanged);
         this.cellCommentator.updateCommentPosition();
+        //this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
         this.draw(lockDraw);
     };
@@ -12223,7 +12732,7 @@
 
 		_drawButton(x1 + diffX, y1 + diffY);
 	};
-
+	
     WorksheetView.prototype.af_checkCursor = function (x, y, offsetX, offsetY, frozenObj, r, c) {
         var ws = this;
         var aWs = this.model;

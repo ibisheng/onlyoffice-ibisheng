@@ -93,6 +93,16 @@
 		this.PasteImagesCount = 0;
 		this.PasteImagesCounter = 0;
 		this.PasteImagesBody = "";
+		
+		//special paste
+		this.specialPasteData = {};//данные последней вставки перед специальной вставкой
+		this.specialPasteUndoData = {};//для того, чтобы сделать повторную вставку с помощью special paste нужно сначала откатиться до того состояния, которое было до первой вставки
+		
+		//параметры специальной вставки из меню.используется класс для EXCEL СSpecialPasteProps. чтобы не протаскивать через все вызываемые функции, добавил это свойство
+		this.specialPasteProps = null;
+		
+		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
+		this.specialPasteButtonProps = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
 	}
 
 	CClipboardBase.prototype =
@@ -921,6 +931,18 @@
 					this.Api.asc_PasteData(this.LastCopyBinary[0].type, this.LastCopyBinary[0].data);
 			}
 			return _ret;
+		},
+		
+		Special_Paste : function(props)
+		{
+			this.Api.asc_SpecialPasteData(props);
+			return true;
+		},
+		
+		Clean_SpecialPasteObj : function()
+		{
+			this.specialPasteData = {};
+			this.specialPasteUndoData = {};
 		}
 	};
 

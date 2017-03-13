@@ -1776,10 +1776,17 @@ function CopyPasteCorrectString(str)
     return res;
 }
 
-function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary)
+function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteProps)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
-    oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
+	if(!specialPasteProps)
+	{
+		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
+	}
+    else
+	{
+		
+	}
 }
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;

@@ -1780,7 +1780,18 @@ background-repeat: no-repeat;\
 			}
 		}
 	};
-
+	
+	asc_docs_api.prototype.asc_SpecialPaste = function(props) 
+	{
+		return AscCommon.g_clipboardBase.Special_Paste(props);
+	};
+	
+	asc_docs_api.prototype.asc_SpecialPasteData = function(props) 
+	{
+		AscCommon.Editor_Paste_Exec(this, null, null, null, props);
+		//this.wb.specialPasteData(props);
+	};
+	
 	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
 	{
 		var t = this;
