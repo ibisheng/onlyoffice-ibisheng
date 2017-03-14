@@ -38,7 +38,6 @@
 	function (window, undefined) {
 	var g_oFormatParser = AscCommon.g_oFormatParser;
 
-	var cElementType = AscCommonExcel.cElementType;
 	var cErrorType = AscCommonExcel.cErrorType;
 	var c_sPerDay = AscCommonExcel.c_sPerDay;
 	var c_msPerDay = AscCommonExcel.c_msPerDay;
@@ -301,13 +300,13 @@
 	function cDATE() {
 		this.name = "DATE";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cDATE.prototype = Object.create(cBaseFunction.prototype);
 	cDATE.prototype.constructor = cDATE;
+	cDATE.prototype.argumentsMin = 3;
+	cDATE.prototype.argumentsMax = 3;
 	cDATE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], year, month, day;
 
@@ -374,13 +373,13 @@
 	function cDATEDIF() {
 		this.name = "DATEDIF";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cDATEDIF.prototype = Object.create(cBaseFunction.prototype);
 	cDATEDIF.prototype.constructor = cDATEDIF;
+	cDATEDIF.prototype.argumentsMin = 3;
+	cDATEDIF.prototype.argumentsMax = 3;
 	cDATEDIF.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDATEDIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -495,13 +494,13 @@
 	function cDATEVALUE() {
 		this.name = "DATEVALUE";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cDATEVALUE.prototype = Object.create(cBaseFunction.prototype);
 	cDATEVALUE.prototype.constructor = cDATEVALUE;
+	cDATEVALUE.prototype.argumentsMin = 1;
+	cDATEVALUE.prototype.argumentsMax = 1;
 	cDATEVALUE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDATEVALUE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -538,13 +537,13 @@
 	function cDAY() {
 		this.name = "DAY";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cDAY.prototype = Object.create(cBaseFunction.prototype);
 	cDAY.prototype.constructor = cDAY;
+	cDAY.prototype.argumentsMin = 1;
+	cDAY.prototype.argumentsMax = 1;
 	cDAY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDAY.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -614,13 +613,13 @@
 	function cDAYS360() {
 		this.name = "DAYS360";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cDAYS360.prototype = Object.create(cBaseFunction.prototype);
 	cDAYS360.prototype.constructor = cDAYS360;
+	cDAYS360.prototype.argumentsMin = 2;
+	cDAYS360.prototype.argumentsMax = 3;
 	cDAYS360.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cDAYS360.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cBool(false);
@@ -683,13 +682,13 @@
 	function cEDATE() {
 		this.name = "EDATE";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cEDATE.prototype = Object.create(cBaseFunction.prototype);
 	cEDATE.prototype.constructor = cEDATE;
+	cEDATE.prototype.argumentsMin = 2;
+	cEDATE.prototype.argumentsMax = 2;
 	cEDATE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cEDATE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
@@ -761,13 +760,13 @@
 	function cEOMONTH() {
 		this.name = "EOMONTH";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cEOMONTH.prototype = Object.create(cBaseFunction.prototype);
 	cEOMONTH.prototype.constructor = cEOMONTH;
+	cEOMONTH.prototype.argumentsMin = 2;
+	cEOMONTH.prototype.argumentsMax = 2;
 	cEOMONTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cEOMONTH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
@@ -830,13 +829,13 @@
 	function cHOUR() {
 		this.name = "HOUR";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cHOUR.prototype = Object.create(cBaseFunction.prototype);
 	cHOUR.prototype.constructor = cHOUR;
+	cHOUR.prototype.argumentsMin = 1;
+	cHOUR.prototype.argumentsMax = 1;
 	cHOUR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cHOUR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -898,13 +897,13 @@
 	function cMINUTE() {
 		this.name = "MINUTE";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cMINUTE.prototype = Object.create(cBaseFunction.prototype);
 	cMINUTE.prototype.constructor = cMINUTE;
+	cMINUTE.prototype.argumentsMin = 1;
+	cMINUTE.prototype.argumentsMax = 1;
 	cMINUTE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMINUTE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -965,13 +964,13 @@
 	function cMONTH() {
 		this.name = "MONTH";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cMONTH.prototype = Object.create(cBaseFunction.prototype);
 	cMONTH.prototype.constructor = cMONTH;
+	cMONTH.prototype.argumentsMin = 1;
+	cMONTH.prototype.argumentsMax = 1;
 	cMONTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cMONTH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -1037,13 +1036,13 @@
 	function cNETWORKDAYS() {
 		this.name = "NETWORKDAYS";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cNETWORKDAYS.prototype = Object.create(cBaseFunction.prototype);
 	cNETWORKDAYS.prototype.constructor = cNETWORKDAYS;
+	cNETWORKDAYS.prototype.argumentsMin = 2;
+	cNETWORKDAYS.prototype.argumentsMax = 3;
 	cNETWORKDAYS.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cNETWORKDAYS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -1177,13 +1176,12 @@
 	function cNOW() {
 		this.name = "NOW";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 0;
 	}
 
 	cNOW.prototype = Object.create(cBaseFunction.prototype);
 	cNOW.prototype.constructor = cNOW;
+	cNOW.prototype.argumentsMax = 0;
 	cNOW.prototype.Calculate = function () {
 		var d = new Date();
 		this.value = new cNumber(d.getExcelDate() +
@@ -1204,13 +1202,13 @@
 	function cSECOND() {
 		this.name = "SECOND";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cSECOND.prototype = Object.create(cBaseFunction.prototype);
 	cSECOND.prototype.constructor = cSECOND;
+	cSECOND.prototype.argumentsMin = 1;
+	cSECOND.prototype.argumentsMax = 1;
 	cSECOND.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cSECOND.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -1271,13 +1269,13 @@
 	function cTIME() {
 		this.name = "TIME";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cTIME.prototype = Object.create(cBaseFunction.prototype);
 	cTIME.prototype.constructor = cTIME;
+	cTIME.prototype.argumentsMin = 3;
+	cTIME.prototype.argumentsMax = 3;
 	cTIME.prototype.Calculate = function (arg) {
 		var hour = arg[0], minute = arg[1], second = arg[2];
 
@@ -1335,13 +1333,13 @@
 	function cTIMEVALUE() {
 		this.name = "TIMEVALUE";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cTIMEVALUE.prototype = Object.create(cBaseFunction.prototype);
 	cTIMEVALUE.prototype.constructor = cTIMEVALUE;
+	cTIMEVALUE.prototype.argumentsMin = 1;
+	cTIMEVALUE.prototype.argumentsMax = 1;
 	cTIMEVALUE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTIMEVALUE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -1379,13 +1377,12 @@
 	function cTODAY() {
 		this.name = "TODAY";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 0;
 	}
 
 	cTODAY.prototype = Object.create(cBaseFunction.prototype);
 	cTODAY.prototype.constructor = cTODAY;
+	cTODAY.prototype.argumentsMax = 0;
 	cTODAY.prototype.Calculate = function () {
 		this.setCA(new cNumber(new Date().getExcelDate()), true);
 		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
@@ -1406,13 +1403,13 @@
 	function cWEEKDAY() {
 		this.name = "WEEKDAY";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cWEEKDAY.prototype = Object.create(cBaseFunction.prototype);
 	cWEEKDAY.prototype.constructor = cWEEKDAY;
+	cWEEKDAY.prototype.argumentsMin = 1;
+	cWEEKDAY.prototype.argumentsMax = 2;
 	cWEEKDAY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cWEEKDAY.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(1);
@@ -1492,13 +1489,13 @@
 	function cWEEKNUM() {
 		this.name = "WEEKNUM";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
 	cWEEKNUM.prototype.constructor = cWEEKNUM;
+	cWEEKNUM.prototype.argumentsMin = 1;
+	cWEEKNUM.prototype.argumentsMax = 2;
 	cWEEKNUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cWEEKNUM.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(1), type = 0;
@@ -1611,13 +1608,13 @@
 	function cWORKDAY() {
 		this.name = "WORKDAY";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cWORKDAY.prototype = Object.create(cBaseFunction.prototype);
 	cWORKDAY.prototype.constructor = cWORKDAY;
+	cWORKDAY.prototype.argumentsMin = 2;
+	cWORKDAY.prototype.argumentsMax = 3;
 	cWORKDAY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cWORKDAY.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -1752,13 +1749,13 @@
 	function cYEAR() {
 		this.name = "YEAR";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cYEAR.prototype = Object.create(cBaseFunction.prototype);
 	cYEAR.prototype.constructor = cYEAR;
+	cYEAR.prototype.argumentsMin = 1;
+	cYEAR.prototype.argumentsMax = 1;
 	cYEAR.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cYEAR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], val;
@@ -1818,13 +1815,13 @@
 	function cYEARFRAC() {
 		this.name = "YEARFRAC";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cYEARFRAC.prototype = Object.create(cBaseFunction.prototype);
 	cYEARFRAC.prototype.constructor = cYEARFRAC;
+	cYEARFRAC.prototype.argumentsMin = 2;
+	cYEARFRAC.prototype.argumentsMax = 3;
 	cYEARFRAC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cYEARFRAC.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(0);

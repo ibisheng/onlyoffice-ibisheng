@@ -37,7 +37,6 @@
  * @param {undefined} undefined
  */
 	function (window, undefined) {
-	var cElementType = AscCommonExcel.cElementType;
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
@@ -52,9 +51,7 @@
 	function cCUBEKPIMEMBER() {
 		this.name = "CUBEKPIMEMBER";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cCUBEKPIMEMBER.prototype = Object.create(cBaseFunction.prototype);
@@ -67,9 +64,7 @@
 	function cCUBEMEMBER() {
 		this.name = "CUBEMEMBER";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cCUBEMEMBER.prototype = Object.create(cBaseFunction.prototype);
@@ -82,9 +77,7 @@
 	function cCUBEMEMBERPROPERTY() {
 		this.name = "CUBEMEMBERPROPERTY";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cCUBEMEMBERPROPERTY.prototype = Object.create(cBaseFunction.prototype);
@@ -97,9 +90,7 @@
 	function cCUBERANKEDMEMBER() {
 		this.name = "CUBERANKEDMEMBER";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cCUBERANKEDMEMBER.prototype = Object.create(cBaseFunction.prototype);
@@ -112,9 +103,7 @@
 	function cCUBESET() {
 		this.name = "CUBESET";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cCUBESET.prototype = Object.create(cBaseFunction.prototype);
@@ -127,9 +116,7 @@
 	function cCUBESETCOUNT() {
 		this.name = "CUBESETCOUNT";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cCUBESETCOUNT.prototype = Object.create(cBaseFunction.prototype);
@@ -142,9 +129,7 @@
 	function cCUBEVALUE() {
 		this.name = "CUBEVALUE";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cCUBEVALUE.prototype = Object.create(cBaseFunction.prototype);

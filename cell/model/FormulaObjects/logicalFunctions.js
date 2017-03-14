@@ -37,7 +37,6 @@
  * @param {undefined} undefined
  */
 	function (window, undefined) {
-	var cElementType = AscCommonExcel.cElementType;
 	var cErrorType = AscCommonExcel.cErrorType;
 	var cNumber = AscCommonExcel.cNumber;
 	var cString = AscCommonExcel.cString;
@@ -60,13 +59,12 @@
 	function cAND() {
 		this.name = "AND";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cAND.prototype = Object.create(cBaseFunction.prototype);
 	cAND.prototype.constructor = cAND;
+	cAND.prototype.argumentsMin = 1;
 	cAND.prototype.Calculate = function (arg) {
 		var argResult = null;
 		for (var i = 0; i < arg.length; i++) {
@@ -139,13 +137,12 @@
 	function cFALSE() {
 		this.name = "FALSE";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 0;
 	}
 
 	cFALSE.prototype = Object.create(cBaseFunction.prototype);
 	cFALSE.prototype.constructor = cFALSE;
+	cFALSE.prototype.argumentsMax = 0;
 	cFALSE.prototype.Calculate = function () {
 		return this.value = new cBool(false);
 	};
@@ -162,13 +159,13 @@
 	function cIF() {
 		this.name = "IF";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cIF.prototype = Object.create(cBaseFunction.prototype);
 	cIF.prototype.constructor = cIF;
+	cIF.prototype.argumentsMin = 1;
+	cIF.prototype.argumentsMax = 3;
 	cIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
@@ -208,13 +205,13 @@
 	function cIFERROR() {
 		this.name = "IFERROR";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cIFERROR.prototype = Object.create(cBaseFunction.prototype);
 	cIFERROR.prototype.constructor = cIFERROR;
+	cIFERROR.prototype.argumentsMin = 2;
+	cIFERROR.prototype.argumentsMax = 2;
 	cIFERROR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -246,13 +243,13 @@
 	function cNOT() {
 		this.name = "NOT";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cNOT.prototype = Object.create(cBaseFunction.prototype);
 	cNOT.prototype.constructor = cNOT;
+	cNOT.prototype.argumentsMin = 1;
+	cNOT.prototype.argumentsMax = 1;
 	cNOT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArray) {
@@ -289,13 +286,12 @@
 	function cOR() {
 		this.name = "OR";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cOR.prototype = Object.create(cBaseFunction.prototype);
 	cOR.prototype.constructor = cOR;
+	cOR.prototype.argumentsMin = 1;
 	cOR.prototype.Calculate = function (arg) {
 		var argResult = null;
 		for (var i = 0; i < arg.length; i++) {
@@ -365,13 +361,12 @@
 	function cTRUE() {
 		this.name = "TRUE";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 0;
 	}
 
 	cTRUE.prototype = Object.create(cBaseFunction.prototype);
 	cTRUE.prototype.constructor = cTRUE;
+	cTRUE.prototype.argumentsMax = 0;
 	cTRUE.prototype.Calculate = function () {
 		return this.value = new cBool(true);
 	};

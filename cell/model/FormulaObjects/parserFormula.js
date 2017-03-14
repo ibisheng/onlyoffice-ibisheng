@@ -2278,16 +2278,16 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 
 	/** @constructor */
-	function cBaseFunction(name, argMin, argMax) {
+	function cBaseFunction(name) {
 		this.name = name;
 		this.value = null;
-		this.argumentsMin = argMin ? argMin : 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = argMax ? argMax : 255;
 //    this.isXLFN = rx_sFuncPref.test(this.name);
 	}
 
 	cBaseFunction.prototype.type = cElementType.func;
+	cBaseFunction.prototype.argumentsMin = 0;
+	cBaseFunction.prototype.argumentsMax = 255;
 	cBaseFunction.prototype.numFormat = AscCommonExcel.cNumFormatFirstCell;
 	cBaseFunction.prototype.Calculate = function () {
 		this.value = new cError(cErrorType.wrong_name);

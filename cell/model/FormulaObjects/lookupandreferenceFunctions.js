@@ -101,13 +101,13 @@
 	function cADDRESS() {
 		this.name = "ADDRESS";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 5;
 	}
 
 	cADDRESS.prototype = Object.create(cBaseFunction.prototype);
 	cADDRESS.prototype.constructor = cADDRESS;
+	cADDRESS.prototype.argumentsMin = 2;
+	cADDRESS.prototype.argumentsMax = 5;
 	cADDRESS.prototype.Calculate = function (arg) {
 		var rowNumber = arg[0], colNumber = arg[1], refType = arg[2] ? arg[2] : new cNumber(1), A1RefType = arg[3] ?
 			arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : new cEmpty();
@@ -232,13 +232,13 @@
 	function cCHOOSE() {
 		this.name = "CHOOSE";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 30;
 	}
 
 	cCHOOSE.prototype = Object.create(cBaseFunction.prototype);
 	cCHOOSE.prototype.constructor = cCHOOSE;
+	cCHOOSE.prototype.argumentsMin = 2;
+	cCHOOSE.prototype.argumentsMax = 30;
 	cCHOOSE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -274,13 +274,12 @@
 	function cCOLUMN() {
 		this.name = "COLUMN";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cCOLUMN.prototype = Object.create(cBaseFunction.prototype);
 	cCOLUMN.prototype.constructor = cCOLUMN;
+	cCOLUMN.prototype.argumentsMax = 1;
 	cCOLUMN.prototype.Calculate = function (arg) {
 		var arg0;
 		if (this.argumentsCurrent == 0) {
@@ -308,13 +307,13 @@
 	function cCOLUMNS() {
 		this.name = "COLUMNS";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cCOLUMNS.prototype = Object.create(cBaseFunction.prototype);
 	cCOLUMNS.prototype.constructor = cCOLUMNS;
+	cCOLUMNS.prototype.argumentsMin = 1;
+	cCOLUMNS.prototype.argumentsMax = 1;
 	cCOLUMNS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		var range;
@@ -351,13 +350,13 @@
 	function cHLOOKUP() {
 		this.name = "HLOOKUP";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
 	}
 
 	cHLOOKUP.prototype = Object.create(cBaseFunction.prototype);
 	cHLOOKUP.prototype.constructor = cHLOOKUP;
+	cHLOOKUP.prototype.argumentsMin = 3;
+	cHLOOKUP.prototype.argumentsMax = 4;
 	cHLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;
@@ -474,13 +473,13 @@
 	function cINDEX() {
 		this.name = "INDEX";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
 	}
 
 	cINDEX.prototype = Object.create(cBaseFunction.prototype);
 	cINDEX.prototype.constructor = cINDEX;
+	cINDEX.prototype.argumentsMin = 2;
+	cINDEX.prototype.argumentsMax = 4;
 	cINDEX.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] && (cElementType.empty !== arg[1].type) ? arg[1] :
 			new cNumber(1), arg2 = arg[2] && (cElementType.empty !== arg[2].type) ? arg[2] :
@@ -561,13 +560,13 @@
 	function cINDIRECT() {
 		this.name = "INDIRECT";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cINDIRECT.prototype = Object.create(cBaseFunction.prototype);
 	cINDIRECT.prototype.constructor = cINDIRECT;
+	cINDIRECT.prototype.argumentsMin = 1;
+	cINDIRECT.prototype.argumentsMax = 2;
 	cINDIRECT.prototype.Calculate = function (arg) {
 		var t = this, arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] :
 			new cBool(true), r1 = arguments[1], wb = r1.worksheet.workbook, o = {
@@ -639,13 +638,13 @@
 	function cLOOKUP() {
 		this.name = "LOOKUP";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cLOOKUP.prototype = Object.create(cBaseFunction.prototype);
 	cLOOKUP.prototype.constructor = cLOOKUP;
+	cLOOKUP.prototype.argumentsMin = 2;
+	cLOOKUP.prototype.argumentsMax = 3;
 	cLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = this.argumentsCurrent == 2 ? arg1 : arg[2], resC = -1, resR = -1;
 
@@ -789,13 +788,13 @@
 	function cMATCH() {
 		this.name = "MATCH";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cMATCH.prototype = Object.create(cBaseFunction.prototype);
 	cMATCH.prototype.constructor = cMATCH;
+	cMATCH.prototype.argumentsMin = 2;
+	cMATCH.prototype.argumentsMax = 3;
 	cMATCH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
 
@@ -899,13 +898,13 @@
 	function cOFFSET() {
 		this.name = "OFFSET";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 5;
 	}
 
 	cOFFSET.prototype = Object.create(cBaseFunction.prototype);
 	cOFFSET.prototype.constructor = cOFFSET;
+	cOFFSET.prototype.argumentsMin = 3;
+	cOFFSET.prototype.argumentsMax = 5;
 	cOFFSET.prototype.Calculate = function (arg) {
 
 		function validBBOX(bbox) {
@@ -1003,13 +1002,12 @@
 	function cROW() {
 		this.name = "ROW";
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cROW.prototype = Object.create(cBaseFunction.prototype);
 	cROW.prototype.constructor = cROW;
+	cROW.prototype.argumentsMax = 1;
 	cROW.prototype.Calculate = function (arg) {
 		var arg0;
 		if (this.argumentsCurrent == 0) {
@@ -1037,13 +1035,13 @@
 	function cROWS() {
 		this.name = "ROWS";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cROWS.prototype = Object.create(cBaseFunction.prototype);
 	cROWS.prototype.constructor = cROWS;
+	cROWS.prototype.argumentsMin = 1;
+	cROWS.prototype.argumentsMax = 1;
 	cROWS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		var range;
@@ -1080,13 +1078,13 @@
 	function cTRANSPOSE() {
 		this.name = "TRANSPOSE";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cTRANSPOSE.prototype = Object.create(cBaseFunction.prototype);
 	cTRANSPOSE.prototype.constructor = cTRANSPOSE;
+	cTRANSPOSE.prototype.argumentsMin = 1;
+	cTRANSPOSE.prototype.argumentsMax = 1;
 	cTRANSPOSE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTRANSPOSE.prototype.Calculate = function (arg) {
 
@@ -1220,13 +1218,13 @@
 	function cVLOOKUP() {
 		this.name = "VLOOKUP";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
 	}
 
 	cVLOOKUP.prototype = Object.create(cBaseFunction.prototype);
 	cVLOOKUP.prototype.constructor = cVLOOKUP;
+	cVLOOKUP.prototype.argumentsMin = 3;
+	cVLOOKUP.prototype.argumentsMax = 4;
 	cVLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;

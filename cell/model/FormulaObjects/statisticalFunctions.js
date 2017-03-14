@@ -329,13 +329,12 @@
 	function cAVEDEV() {
 		this.name = "AVEDEV";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cAVEDEV.prototype = Object.create(cBaseFunction.prototype);
 	cAVEDEV.prototype.constructor = cAVEDEV;
+	cAVEDEV.prototype.argumentsMin = 1;
 	cAVEDEV.prototype.Calculate = function (arg) {
 		var count = 0, sum = new cNumber(0), arrX = [], i;
 		for (i = 0; i < arg.length; i++) {
@@ -396,13 +395,12 @@
 	function cAVERAGE() {
 		this.name = "AVERAGE";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cAVERAGE.prototype = Object.create(cBaseFunction.prototype);
 	cAVERAGE.prototype.constructor = cAVERAGE;
+	cAVERAGE.prototype.argumentsMin = 1;
 	cAVERAGE.prototype.Calculate = function (arg) {
 		var count = 0, sum = new cNumber(0);
 		for (var i = 0; i < arg.length; i++) {
@@ -470,13 +468,12 @@
 	function cAVERAGEA() {
 		this.name = "AVERAGEA";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cAVERAGEA.prototype = Object.create(cBaseFunction.prototype);
 	cAVERAGEA.prototype.constructor = cAVERAGEA;
+	cAVERAGEA.prototype.argumentsMin = 1;
 	cAVERAGEA.prototype.Calculate = function (arg) {
 		var count = 0, sum = new cNumber(0);
 		for (var i = 0; i < arg.length; i++) {
@@ -537,13 +534,13 @@
 	function cAVERAGEIF() {
 		this.name = "AVERAGEIF";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cAVERAGEIF.prototype = Object.create(cBaseFunction.prototype);
 	cAVERAGEIF.prototype.constructor = cAVERAGEIF;
+	cAVERAGEIF.prototype.argumentsMin = 2;
+	cAVERAGEIF.prototype.argumentsMax = 3;
 	cAVERAGEIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : arg[0], _sum = 0, _count = 0, matchingInfo, ws;
 		if ((cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
@@ -623,13 +620,12 @@
 	function cAVERAGEIFS() {
 		this.name = "AVERAGEIFS";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cAVERAGEIFS.prototype = Object.create(cBaseFunction.prototype);
 	cAVERAGEIFS.prototype.constructor = cAVERAGEIFS;
+	cAVERAGEIFS.prototype.argumentsMin = 3;
 	cAVERAGEIFS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
@@ -733,13 +729,13 @@
 	function cBINOMDIST() {
 		this.name = "BINOMDIST";
 		this.value = null;
-		this.argumentsMin = 4;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
 	}
 
 	cBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
 	cBINOMDIST.prototype.constructor = cBINOMDIST;
+	cBINOMDIST.prototype.argumentsMin = 4;
+	cBINOMDIST.prototype.argumentsMax = 4;
 	cBINOMDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -852,13 +848,13 @@
 	function cCONFIDENCE() {
 		this.name = "CONFIDENCE";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cCONFIDENCE.prototype = Object.create(cBaseFunction.prototype);
 	cCONFIDENCE.prototype.constructor = cCONFIDENCE;
+	cCONFIDENCE.prototype.argumentsMin = 3;
+	cCONFIDENCE.prototype.argumentsMax = 3;
 	cCONFIDENCE.prototype.Calculate = function (arg) {
 
 		var alpha = arg[0], stdev_sigma = arg[1], size = arg[2];
@@ -915,13 +911,13 @@
 	function cCORREL() {
 		this.name = "CORREL";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cCORREL.prototype = Object.create(cBaseFunction.prototype);
 	cCORREL.prototype.constructor = cCORREL;
+	cCORREL.prototype.argumentsMin = 2;
+	cCORREL.prototype.argumentsMax = 2;
 	cCORREL.prototype.Calculate = function (arg) {
 
 		function correl(x, y) {
@@ -1001,13 +997,12 @@
 	function cCOUNT() {
 		this.name = "COUNT";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cCOUNT.prototype = Object.create(cBaseFunction.prototype);
 	cCOUNT.prototype.constructor = cCOUNT;
+	cCOUNT.prototype.argumentsMin = 1;
 	cCOUNT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUNT.prototype.Calculate = function (arg) {
 		var count = 0;
@@ -1057,13 +1052,12 @@
 	function cCOUNTA() {
 		this.name = "COUNTA";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cCOUNTA.prototype = Object.create(cBaseFunction.prototype);
 	cCOUNTA.prototype.constructor = cCOUNTA;
+	cCOUNTA.prototype.argumentsMin = 1;
 	cCOUNTA.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUNTA.prototype.Calculate = function (arg) {
 		var element, count = 0;
@@ -1108,13 +1102,13 @@
 	function cCOUNTBLANK() {
 		this.name = "COUNTBLANK";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cCOUNTBLANK.prototype = Object.create(cBaseFunction.prototype);
 	cCOUNTBLANK.prototype.constructor = cCOUNTBLANK;
+	cCOUNTBLANK.prototype.argumentsMin = 1;
+	cCOUNTBLANK.prototype.argumentsMax = 1;
 	cCOUNTBLANK.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUNTBLANK.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -1139,13 +1133,13 @@
 	function cCOUNTIF() {
 		this.name = "COUNTIF";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cCOUNTIF.prototype = Object.create(cBaseFunction.prototype);
 	cCOUNTIF.prototype.constructor = cCOUNTIF;
+	cCOUNTIF.prototype.argumentsMin = 2;
+	cCOUNTIF.prototype.argumentsMax = 2;
 	cCOUNTIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], _count = 0, matchingInfo;
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
@@ -1196,13 +1190,13 @@
 	function cCOUNTIFS() {
 		this.name = "COUNTIFS";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 256;
 	}
 
 	cCOUNTIFS.prototype = Object.create(cBaseFunction.prototype);
 	cCOUNTIFS.prototype.constructor = cCOUNTIFS;
+	cCOUNTIFS.prototype.argumentsMin = 2;
+	cCOUNTIFS.prototype.argumentsMax = 254;
 	cCOUNTIFS.prototype.Calculate = function (arg) {
 		var i, j, arg0, arg1, matchingInfo, arg0Matrix, arg1Matrix, _count = 0;
 		for (var k = 0; k < arg.length; k += 2) {
@@ -1269,13 +1263,13 @@
 	function cCOVAR() {
 		this.name = "COVAR";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cCOVAR.prototype = Object.create(cBaseFunction.prototype);
 	cCOVAR.prototype.constructor = cCOVAR;
+	cCOVAR.prototype.argumentsMin = 2;
+	cCOVAR.prototype.argumentsMax = 2;
 	cCOVAR.prototype.Calculate = function (arg) {
 
 		function covar(x, y) {
@@ -1349,13 +1343,13 @@
 	function cCRITBINOM() {
 		this.name = "CRITBINOM";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cCRITBINOM.prototype = Object.create(cBaseFunction.prototype);
 	cCRITBINOM.prototype.constructor = cCRITBINOM;
+	cCRITBINOM.prototype.argumentsMin = 3;
+	cCRITBINOM.prototype.argumentsMax = 3;
 	cCRITBINOM.prototype.Calculate = function (arg) {
 		var n = arg[0], p = arg[1], alpha = arg[2];                    // alpha
 
@@ -1439,13 +1433,12 @@
 	function cDEVSQ() {
 		this.name = "DEVSQ";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cDEVSQ.prototype = Object.create(cBaseFunction.prototype);
 	cDEVSQ.prototype.constructor = cDEVSQ;
+	cDEVSQ.prototype.argumentsMin = 1;
 	cDEVSQ.prototype.Calculate = function (arg) {
 
 		function devsq(x) {
@@ -1519,13 +1512,13 @@
 	function cEXPONDIST() {
 		this.name = "EXPONDIST";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cEXPONDIST.prototype = Object.create(cBaseFunction.prototype);
 	cEXPONDIST.prototype.constructor = cEXPONDIST;
+	cEXPONDIST.prototype.argumentsMin = 3;
+	cEXPONDIST.prototype.argumentsMax = 3;
 	cEXPONDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -1606,13 +1599,13 @@
 	function cFISHER() {
 		this.name = "FISHER";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cFISHER.prototype = Object.create(cBaseFunction.prototype);
 	cFISHER.prototype.constructor = cFISHER;
+	cFISHER.prototype.argumentsMin = 1;
+	cFISHER.prototype.argumentsMax = 1;
 	cFISHER.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -1655,13 +1648,13 @@
 	function cFISHERINV() {
 		this.name = "FISHERINV";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cFISHERINV.prototype = Object.create(cBaseFunction.prototype);
 	cFISHERINV.prototype.constructor = cFISHERINV;
+	cFISHERINV.prototype.argumentsMin = 1;
+	cFISHERINV.prototype.argumentsMax = 1;
 	cFISHERINV.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
@@ -1704,13 +1697,13 @@
 	function cFORECAST() {
 		this.name = "FORECAST";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cFORECAST.prototype = Object.create(cBaseFunction.prototype);
 	cFORECAST.prototype.constructor = cFORECAST;
+	cFORECAST.prototype.argumentsMin = 3;
+	cFORECAST.prototype.argumentsMax = 3;
 	cFORECAST.prototype.Calculate = function (arg) {
 
 		function forecast(fx, y, x) {
@@ -1802,13 +1795,13 @@
 	function cFREQUENCY() {
 		this.name = "FREQUENCY";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cFREQUENCY.prototype = Object.create(cBaseFunction.prototype);
 	cFREQUENCY.prototype.constructor = cFREQUENCY;
+	cFREQUENCY.prototype.argumentsMin = 2;
+	cFREQUENCY.prototype.argumentsMax = 2;
 	cFREQUENCY.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cFREQUENCY.prototype.Calculate = function (arg) {
 
@@ -1924,13 +1917,13 @@
 	function cGAMMALN() {
 		this.name = "GAMMALN";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cGAMMALN.prototype = Object.create(cBaseFunction.prototype);
 	cGAMMALN.prototype.constructor = cGAMMALN;
+	cGAMMALN.prototype.argumentsMin = 1;
+	cGAMMALN.prototype.argumentsMax = 1;
 	cGAMMALN.prototype.Calculate = function (arg) {
 
 
@@ -1973,13 +1966,12 @@
 	function cGEOMEAN() {
 		this.name = "GEOMEAN";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cGEOMEAN.prototype = Object.create(cBaseFunction.prototype);
 	cGEOMEAN.prototype.constructor = cGEOMEAN;
+	cGEOMEAN.prototype.argumentsMin = 1;
 	cGEOMEAN.prototype.Calculate = function (arg) {
 
 		function geommean(x) {
@@ -2062,13 +2054,12 @@
 	function cHARMEAN() {
 		this.name = "HARMEAN";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cHARMEAN.prototype = Object.create(cBaseFunction.prototype);
 	cHARMEAN.prototype.constructor = cHARMEAN;
+	cHARMEAN.prototype.argumentsMin = 1;
 	cHARMEAN.prototype.Calculate = function (arg) {
 
 		function harmmean(x) {
@@ -2146,13 +2137,13 @@
 	function cHYPGEOMDIST() {
 		this.name = "HYPGEOMDIST";
 		this.value = null;
-		this.argumentsMin = 4;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
 	}
 
 	cHYPGEOMDIST.prototype = Object.create(cBaseFunction.prototype);
 	cHYPGEOMDIST.prototype.constructor = cHYPGEOMDIST;
+	cHYPGEOMDIST.prototype.argumentsMin = 4;
+	cHYPGEOMDIST.prototype.argumentsMax = 4;
 	cHYPGEOMDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
@@ -2224,13 +2215,13 @@
 	function cINTERCEPT() {
 		this.name = "INTERCEPT";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cINTERCEPT.prototype = Object.create(cBaseFunction.prototype);
 	cINTERCEPT.prototype.constructor = cINTERCEPT;
+	cINTERCEPT.prototype.argumentsMin = 2;
+	cINTERCEPT.prototype.argumentsMax = 2;
 	cINTERCEPT.prototype.Calculate = function (arg) {
 
 		function intercept(y, x) {
@@ -2310,13 +2301,12 @@
 	function cKURT() {
 		this.name = "KURT";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cKURT.prototype = Object.create(cBaseFunction.prototype);
 	cKURT.prototype.constructor = cKURT;
+	cKURT.prototype.argumentsMin = 1;
 	cKURT.prototype.Calculate = function (arg) {
 
 		function kurt(x) {
@@ -2402,13 +2392,13 @@
 	function cLARGE() {
 		this.name = "LARGE";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cLARGE.prototype = Object.create(cBaseFunction.prototype);
 	cLARGE.prototype.constructor = cLARGE;
+	cLARGE.prototype.argumentsMin = 2;
+	cLARGE.prototype.argumentsMax = 2;
 	cLARGE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cLARGE.prototype._getValue = function (arg0, arg1) {
 		if (cElementType.error === arg1.type) {
@@ -2499,13 +2489,13 @@
 	function cLOGINV() {
 		this.name = "LOGINV";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cLOGINV.prototype = Object.create(cBaseFunction.prototype);
 	cLOGINV.prototype.constructor = cLOGINV;
+	cLOGINV.prototype.argumentsMin = 3;
+	cLOGINV.prototype.argumentsMax = 3;
 	cLOGINV.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -2565,13 +2555,13 @@
 	function cLOGNORMDIST() {
 		this.name = "LOGNORMDIST";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cLOGNORMDIST.prototype = Object.create(cBaseFunction.prototype);
 	cLOGNORMDIST.prototype.constructor = cLOGNORMDIST;
+	cLOGNORMDIST.prototype.argumentsMin = 3;
+	cLOGNORMDIST.prototype.argumentsMax = 3;
 	cLOGNORMDIST.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -2631,13 +2621,12 @@
 	function cMAX() {
 		this.name = "MAX";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cMAX.prototype = Object.create(cBaseFunction.prototype);
 	cMAX.prototype.constructor = cMAX;
+	cMAX.prototype.argumentsMin = 1;
 	cMAX.prototype.Calculate = function (arg) {
 		var v, element, argIVal, max = Number.NEGATIVE_INFINITY;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
@@ -2716,13 +2705,12 @@
 	function cMAXA() {
 		this.name = "MAXA";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cMAXA.prototype = Object.create(cBaseFunction.prototype);
 	cMAXA.prototype.constructor = cMAXA;
+	cMAXA.prototype.argumentsMin = 1;
 	cMAXA.prototype.Calculate = function (arg) {
 		var argI, argIVal, max = Number.NEGATIVE_INFINITY, v;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
@@ -2803,13 +2791,12 @@
 	function cMEDIAN() {
 		this.name = "MEDIAN";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cMEDIAN.prototype = Object.create(cBaseFunction.prototype);
 	cMEDIAN.prototype.constructor = cMEDIAN;
+	cMEDIAN.prototype.argumentsMin = 1;
 	cMEDIAN.prototype.Calculate = function (arg) {
 
 		function median(x) {
@@ -2882,13 +2869,12 @@
 	function cMIN() {
 		this.name = "MIN";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cMIN.prototype = Object.create(cBaseFunction.prototype);
 	cMIN.prototype.constructor = cMIN;
+	cMIN.prototype.argumentsMin = 1;
 	cMIN.prototype.Calculate = function (arg) {
 		var v, element, argIVal, min = Number.POSITIVE_INFINITY;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
@@ -2968,13 +2954,12 @@
 	function cMINA() {
 		this.name = "MINA";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cMINA.prototype = Object.create(cBaseFunction.prototype);
 	cMINA.prototype.constructor = cMINA;
+	cMINA.prototype.argumentsMin = 1;
 	cMINA.prototype.Calculate = function (arg) {
 		var argI, argIVal, min = Number.POSITIVE_INFINITY, v;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
@@ -3056,13 +3041,12 @@
 	function cMODE() {
 		this.name = "MODE";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cMODE.prototype = Object.create(cBaseFunction.prototype);
 	cMODE.prototype.constructor = cMODE;
+	cMODE.prototype.argumentsMin = 1;
 	cMODE.prototype.Calculate = function (arg) {
 
 		function mode(x) {
@@ -3155,13 +3139,13 @@
 	function cNEGBINOMDIST() {
 		this.name = "NEGBINOMDIST";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cNEGBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
 	cNEGBINOMDIST.prototype.constructor = cNEGBINOMDIST;
+	cNEGBINOMDIST.prototype.argumentsMin = 3;
+	cNEGBINOMDIST.prototype.argumentsMax = 3;
 	cNEGBINOMDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
@@ -3224,13 +3208,13 @@
 	function cNORMDIST() {
 		this.name = "NORMDIST";
 		this.value = null;
-		this.argumentsMin = 4;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
 	}
 
 	cNORMDIST.prototype = Object.create(cBaseFunction.prototype);
 	cNORMDIST.prototype.constructor = cNORMDIST;
+	cNORMDIST.prototype.argumentsMin = 4;
+	cNORMDIST.prototype.argumentsMax = 4;
 	cNORMDIST.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
@@ -3306,13 +3290,13 @@
 	function cNORMINV() {
 		this.name = "NORMINV";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cNORMINV.prototype = Object.create(cBaseFunction.prototype);
 	cNORMINV.prototype.constructor = cNORMINV;
+	cNORMINV.prototype.argumentsMin = 3;
+	cNORMINV.prototype.argumentsMax = 3;
 	cNORMINV.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -3372,13 +3356,13 @@
 	function cNORMSDIST() {
 		this.name = "NORMSDIST";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cNORMSDIST.prototype = Object.create(cBaseFunction.prototype);
 	cNORMSDIST.prototype.constructor = cNORMSDIST;
+	cNORMSDIST.prototype.argumentsMin = 1;
+	cNORMSDIST.prototype.argumentsMax = 1;
 	cNORMSDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -3415,13 +3399,13 @@
 	function cNORMSINV() {
 		this.name = "NORMSINV";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
 	}
 
 	cNORMSINV.prototype = Object.create(cBaseFunction.prototype);
 	cNORMSINV.prototype.constructor = cNORMSINV;
+	cNORMSINV.prototype.argumentsMin = 1;
+	cNORMSINV.prototype.argumentsMax = 1;
 	cNORMSINV.prototype.Calculate = function (arg) {
 
 		function normsinv(x) {
@@ -3467,13 +3451,13 @@
 	function cPEARSON() {
 		this.name = "PEARSON";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cPEARSON.prototype = Object.create(cBaseFunction.prototype);
 	cPEARSON.prototype.constructor = cPEARSON;
+	cPEARSON.prototype.argumentsMin = 2;
+	cPEARSON.prototype.argumentsMax = 2;
 	cPEARSON.prototype.Calculate = function (arg) {
 
 		function pearson(x, y) {
@@ -3554,13 +3538,13 @@
 	function cPERCENTILE() {
 		this.name = "PERCENTILE";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cPERCENTILE.prototype = Object.create(cBaseFunction.prototype);
 	cPERCENTILE.prototype.constructor = cPERCENTILE;
+	cPERCENTILE.prototype.argumentsMin = 2;
+	cPERCENTILE.prototype.argumentsMax = 2;
 	cPERCENTILE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPERCENTILE.prototype.Calculate = function (arg) {
 
@@ -3621,13 +3605,13 @@
 	function cPERCENTRANK() {
 		this.name = "PERCENTRANK";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cPERCENTRANK.prototype = Object.create(cBaseFunction.prototype);
 	cPERCENTRANK.prototype.constructor = cPERCENTRANK;
+	cPERCENTRANK.prototype.argumentsMin = 2;
+	cPERCENTRANK.prototype.argumentsMax = 3;
 	cPERCENTRANK.prototype.Calculate = function (arg) {
 
 		function percentrank(A, x, k) {
@@ -3737,13 +3721,13 @@
 	function cPERMUT() {
 		this.name = "PERMUT";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cPERMUT.prototype = Object.create(cBaseFunction.prototype);
 	cPERMUT.prototype.constructor = cPERMUT;
+	cPERMUT.prototype.argumentsMin = 2;
+	cPERMUT.prototype.argumentsMax = 2;
 	cPERMUT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
@@ -3828,13 +3812,13 @@
 	function cPOISSON() {
 		this.name = "POISSON";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cPOISSON.prototype = Object.create(cBaseFunction.prototype);
 	cPOISSON.prototype.constructor = cPOISSON;
+	cPOISSON.prototype.argumentsMin = 3;
+	cPOISSON.prototype.argumentsMax = 3;
 	cPOISSON.prototype.Calculate = function (arg) {
 
 		function poisson(x, l, cumulativeFlag) {
@@ -3907,13 +3891,13 @@
 	function cPROB() {
 		this.name = "PROB";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
 	}
 
 	cPROB.prototype = Object.create(cBaseFunction.prototype);
 	cPROB.prototype.constructor = cPROB;
+	cPROB.prototype.argumentsMin = 3;
+	cPROB.prototype.argumentsMax = 4;
 	cPROB.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cPROB.prototype.Calculate = function (arg) {
 
@@ -4022,13 +4006,13 @@
 	function cQUARTILE() {
 		this.name = "QUARTILE";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cQUARTILE.prototype = Object.create(cBaseFunction.prototype);
 	cQUARTILE.prototype.constructor = cQUARTILE;
+	cQUARTILE.prototype.argumentsMin = 2;
+	cQUARTILE.prototype.argumentsMax = 2;
 	cQUARTILE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cQUARTILE.prototype.Calculate = function (arg) {
 
@@ -4142,13 +4126,13 @@
 	function cRSQ() {
 		this.name = "RSQ";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cRSQ.prototype = Object.create(cBaseFunction.prototype);
 	cRSQ.prototype.constructor = cRSQ;
+	cRSQ.prototype.argumentsMin = 2;
+	cRSQ.prototype.argumentsMax = 2;
 	cRSQ.prototype.Calculate = function (arg) {
 
 		function rsq(x, y) {
@@ -4230,13 +4214,12 @@
 	function cSKEW() {
 		this.name = "SKEW";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cSKEW.prototype = Object.create(cBaseFunction.prototype);
 	cSKEW.prototype.constructor = cSKEW;
+	cSKEW.prototype.argumentsMin = 1;
 	cSKEW.prototype.Calculate = function (arg) {
 
 		function skew(x) {
@@ -4324,13 +4307,13 @@
 	function cSLOPE() {
 		this.name = "SLOPE";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cSLOPE.prototype = Object.create(cBaseFunction.prototype);
 	cSLOPE.prototype.constructor = cSLOPE;
+	cSLOPE.prototype.argumentsMin = 2;
+	cSLOPE.prototype.argumentsMax = 2;
 	cSLOPE.prototype.Calculate = function (arg) {
 
 		function slope(y, x) {
@@ -4411,13 +4394,13 @@
 	function cSMALL() {
 		this.name = "SMALL";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cSMALL.prototype = Object.create(cBaseFunction.prototype);
 	cSMALL.prototype.constructor = cSMALL;
+	cSMALL.prototype.argumentsMin = 2;
+	cSMALL.prototype.argumentsMax = 2;
 	cSMALL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cSMALL.prototype.Calculate = function (arg) {
 
@@ -4492,13 +4475,13 @@
 	function cSTANDARDIZE() {
 		this.name = "STANDARDIZE";
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
 	}
 
 	cSTANDARDIZE.prototype = Object.create(cBaseFunction.prototype);
 	cSTANDARDIZE.prototype.constructor = cSTANDARDIZE;
+	cSTANDARDIZE.prototype.argumentsMin = 3;
+	cSTANDARDIZE.prototype.argumentsMax = 3;
 	cSTANDARDIZE.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
@@ -4558,13 +4541,12 @@
 	function cSTDEV() {
 		this.name = "STDEV";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cSTDEV.prototype = Object.create(cBaseFunction.prototype);
 	cSTDEV.prototype.constructor = cSTDEV;
+	cSTDEV.prototype.argumentsMin = 1;
 	cSTDEV.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cSTDEV.prototype.Calculate = function (arg) {
 		var i, element, count = 0, sum = new cNumber(0), member = [];
@@ -4627,13 +4609,12 @@
 	function cSTDEVA() {
 		this.name = "STDEVA";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cSTDEVA.prototype = Object.create(cBaseFunction.prototype);
 	cSTDEVA.prototype.constructor = cSTDEVA;
+	cSTDEVA.prototype.argumentsMin = 1;
 	cSTDEVA.prototype.Calculate = function (arg) {
 		var count = 0, sum = new cNumber(0), member = [], i;
 		for (i = 0; i < arg.length; i++) {
@@ -4693,13 +4674,12 @@
 	function cSTDEVP() {
 		this.name = "STDEVP";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cSTDEVP.prototype = Object.create(cBaseFunction.prototype);
 	cSTDEVP.prototype.constructor = cSTDEVP;
+	cSTDEVP.prototype.argumentsMin = 1;
 	cSTDEVP.prototype.Calculate = function (arg) {
 		function _var(x) {
 			var i, tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
@@ -4772,13 +4752,12 @@
 	function cSTDEVPA() {
 		this.name = "STDEVPA";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cSTDEVPA.prototype = Object.create(cBaseFunction.prototype);
 	cSTDEVPA.prototype.constructor = cSTDEVPA;
+	cSTDEVPA.prototype.argumentsMin = 1;
 	cSTDEVPA.prototype.Calculate = function (arg) {
 
 		function _var(x) {
@@ -4865,13 +4844,13 @@
 	function cSTEYX() {
 		this.name = "STEYX";
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
 	}
 
 	cSTEYX.prototype = Object.create(cBaseFunction.prototype);
 	cSTEYX.prototype.constructor = cSTEYX;
+	cSTEYX.prototype.argumentsMin = 2;
+	cSTEYX.prototype.argumentsMax = 2;
 	cSTEYX.prototype.Calculate = function (arg) {
 
 		function steyx(y, x) {
@@ -5010,13 +4989,12 @@
 	function cVAR() {
 		this.name = "VAR";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cVAR.prototype = Object.create(cBaseFunction.prototype);
 	cVAR.prototype.constructor = cVAR;
+	cVAR.prototype.argumentsMin = 1;
 	cVAR.prototype.Calculate = function (arg) {
 		function _var(x) {
 			if (x.length < 1) {
@@ -5095,13 +5073,12 @@
 	function cVARA() {
 		this.name = "VARA";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cVARA.prototype = Object.create(cBaseFunction.prototype);
 	cVARA.prototype.constructor = cVARA;
+	cVARA.prototype.argumentsMin = 1;
 	cVARA.prototype.Calculate = function (arg) {
 
 		function _var(x) {
@@ -5192,13 +5169,12 @@
 	function cVARP() {
 		this.name = "VARP";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cVARP.prototype = Object.create(cBaseFunction.prototype);
 	cVARP.prototype.constructor = cVARP;
+	cVARP.prototype.argumentsMin = 1;
 	cVARP.prototype.Calculate = function (arg) {
 		function _var(x) {
 			if (x.length < 1) {
@@ -5276,13 +5252,12 @@
 	function cVARdotP() {
 		this.name = "VAR.P";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cVARdotP.prototype = Object.create(cBaseFunction.prototype);
 	cVARdotP.prototype.constructor = cVARdotP;
+	cVARdotP.prototype.argumentsMin = 1;
 	cVARdotP.prototype.Calculate = cVARP.prototype.Calculate;
 	cVARdotP.prototype.getInfo = function () {
 		return {
@@ -5297,13 +5272,12 @@
 	function cVARPA() {
 		this.name = "VARPA";
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 255;
 	}
 
 	cVARPA.prototype = Object.create(cBaseFunction.prototype);
 	cVARPA.prototype.constructor = cVARPA;
+	cVARPA.prototype.argumentsMin = 1;
 	cVARPA.prototype.Calculate = function (arg) {
 
 		function _var(x) {
