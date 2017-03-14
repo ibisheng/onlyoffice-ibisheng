@@ -1318,6 +1318,9 @@
 		if (this.pluginsManager && this.pluginsManager.current != null)
 			return false;
 
+		if (this.isEmbedVersion)
+			return false;
+
 		var _currentTime = new Date().getTime();
 		return ((_currentTime - this.lastWorkTime) > time) ? true : false;
 	};
@@ -1325,8 +1328,6 @@
 	baseEditorsApi.prototype.checkLastWork = function()
 	{
 		this.lastWorkTime = new Date().getTime();
-
-		console.log(this.lastWorkTime);
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------
