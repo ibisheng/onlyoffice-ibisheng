@@ -4928,7 +4928,7 @@ function BinaryPPTYLoader()
         if(!oGroup || !oGroup.spPr){
             return;
         }
-        if(!oGroup.spPr.xfrm){
+        if(!oGroup.spPr.xfrm && oGroup.spTree.length > 0){
             var oXfrm = new AscFormat.CXfrm();
             oXfrm.setOffX(0);
             oXfrm.setOffY(0);
@@ -4998,7 +4998,7 @@ function BinaryPPTYLoader()
                             case 1:
                             {
                                 _object = this.ReadShape();
-                                if (!IsHiddenObj(_object))
+                                if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
                                     shape.spTree[shape.spTree.length-1].setGroup(shape);
@@ -5009,7 +5009,7 @@ function BinaryPPTYLoader()
                             case 2:
                             {
                                 _object = this.ReadPic(6 === _type);
-                                if (!IsHiddenObj(_object))
+                                if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
                                     shape.spTree[shape.spTree.length-1].setGroup(shape);
@@ -5019,7 +5019,7 @@ function BinaryPPTYLoader()
                             case 3:
                             {
                                 _object = this.ReadCxn();
-                                if (!IsHiddenObj(_object))
+                                if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
                                     shape.spTree[shape.spTree.length-1].setGroup(shape);
@@ -5029,7 +5029,7 @@ function BinaryPPTYLoader()
                             case 4:
                             {
                                 _object = this.ReadGroupShape();
-                                if (!IsHiddenObj(_object))
+                                if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm && _object.spTree.length > 0)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
                                     shape.spTree[shape.spTree.length-1].setGroup(shape);
@@ -9153,30 +9153,38 @@ function CPres()
                                 case 1:
                                 {
                                     sp = this.ReadShape();
-                                    sp.setGroup(shape);
-                                    shape.addToSpTree(shape.spTree.length, sp);
+                                    if(sp.spPr && sp.spPr.xfrm){
+                                        sp.setGroup(shape);
+                                        shape.addToSpTree(shape.spTree.length, sp);
+                                    }
                                     break;
                                 }
                                 case 6:
                                 case 2:
                                 {
                                     sp = this.ReadPic(6 == _type);
-                                    sp.setGroup(shape);
-                                    shape.addToSpTree(shape.spTree.length, sp);
+                                    if(sp.spPr && sp.spPr.xfrm){
+                                        sp.setGroup(shape);
+                                        shape.addToSpTree(shape.spTree.length, sp);
+                                    }
                                     break;
                                 }
                                 case 3:
                                 {
                                     sp = this.ReadCxn();
-                                    sp.setGroup(shape);
-                                    shape.addToSpTree(shape.spTree.length, sp);
+                                    if(sp.spPr && sp.spPr.xfrm) {
+                                        sp.setGroup(shape);
+                                        shape.addToSpTree(shape.spTree.length, sp);
+                                    }
                                     break;
                                 }
                                 case 4:
                                 {
                                     sp = this.ReadGroupShape();
-                                    sp.setGroup(shape);
-                                    shape.addToSpTree(shape.spTree.length, sp);
+                                    if(sp.spPr && sp.spPr.xfrm && sp.spTree.length > 0) {
+                                        sp.setGroup(shape);
+                                        shape.addToSpTree(shape.spTree.length, sp);
+                                    }
                                     break;
                                 }
                                 case 5:
@@ -9206,6 +9214,9 @@ function CPres()
             this.ParaDrawing = oldParaDrawing;
             s.Seek2(_end_rec);
             this.TempGroupObject = null;
+            if(shape.spTree.length === 0){
+                return null;
+            }
             return shape;
         }
 
