@@ -704,6 +704,22 @@ Slide.prototype =
             if(this.cSld.spTree[i].bDeleted){
                 this.removeFromSpTreeById(this.cSld.spTree[i].Get_Id());
             }
+            else{
+                for(var j = i - 1; j > -1; --j){
+                    if(this.cSld.spTree[i] === this.cSld.spTree[j]){
+                        this.removeFromSpTreeByPos(i);
+                        break;
+                    }
+                }
+            }
+        }
+    },
+
+
+    removeFromSpTreeByPos: function(pos){
+        if(pos > -1 && pos < this.cSld.spTree.length){
+            History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_SlideRemoveFromSpTree, pos, [this.cSld.spTree[pos]], false));
+            this.cSld.spTree.splice(pos, 1);
         }
     },
 
