@@ -1007,6 +1007,8 @@ function CDrawingDocument()
 
 	this.OnStartRecalculate = function(pageCount)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
 	}
 
 	this.SetTargetColor = function(r, g, b)
@@ -1083,6 +1085,9 @@ function CDrawingDocument()
 
 	this.OnEndRecalculate = function()
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		this.m_oWordControl.Thumbnails.LockMainObjType = true;
 		this.SlidesCount                               = this.m_oLogicDocument.Slides.length;
 		this.m_oWordControl.CalculateDocumentSize();
@@ -1870,6 +1875,9 @@ function CDrawingDocument()
 
 	this.UpdateTarget = function(x, y, pageIndex)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		this.m_oWordControl.m_oLogicDocument.Set_TargetPos(x, y, pageIndex);
 		if (pageIndex != this.SlideCurrent)
 		{
@@ -3378,6 +3386,9 @@ function CThumbnailsManager()
 
 	this.onMouseDown = function(e)
 	{
+		if (oThis.m_oWordControl)
+			oThis.m_oWordControl.m_oApi.checkLastWork();
+
 		if (e.preventDefault)
 			e.preventDefault();
 		else
@@ -3619,6 +3630,9 @@ function CThumbnailsManager()
 
 	this.onMouseMove = function(e)
 	{
+		if (oThis.m_oWordControl)
+			oThis.m_oWordControl.m_oApi.checkLastWork();
+
 		var control = oThis.m_oWordControl.m_oThumbnails.HtmlElement;
 		if (global_mouseEvent.IsLocked == true && global_mouseEvent.Sender != control)
 		{
@@ -3773,6 +3787,9 @@ function CThumbnailsManager()
 
 	this.onMouseUp = function(e)
 	{
+		if (oThis.m_oWordControl)
+			oThis.m_oWordControl.m_oApi.checkLastWork();
+
 		AscCommon.check_MouseUpEvent(e);
 		global_mouseEvent.UnLockMouse();
 
@@ -4277,6 +4294,9 @@ function CThumbnailsManager()
 		var canvas = this.m_oWordControl.m_oThumbnailsBack.HtmlElement;
 		if (null == canvas)
 			return;
+
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
 
 		var context = canvas.getContext("2d");
 		var _width  = canvas.width;

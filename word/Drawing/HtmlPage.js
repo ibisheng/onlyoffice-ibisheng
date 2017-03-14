@@ -1514,6 +1514,8 @@ function CEditorPage(api)
 
 	this.onMouseDown = function(e, isTouch)
 	{
+		oThis.m_oApi.checkLastWork();
+
 		//console.log("down: " + isTouch + ", " + AscCommon.isTouch);
 		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
@@ -1617,6 +1619,8 @@ function CEditorPage(api)
 
 	this.onMouseMove  = function(e, isTouch)
 	{
+		oThis.m_oApi.checkLastWork();
+
 		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
 
@@ -1703,6 +1707,8 @@ function CEditorPage(api)
 	};
 	this.onMouseUp    = function(e, bIsWindow, isTouch)
 	{
+		oThis.m_oApi.checkLastWork();
+
 		//console.log("up: " + isTouch + ", " + AscCommon.isTouch);
 		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
 			return;
@@ -2277,6 +2283,8 @@ function CEditorPage(api)
 
 	this.onKeyDown = function(e)
 	{
+		oThis.m_oApi.checkLastWork();
+
 		if (oThis.m_oApi.isLongAction())
 		{
 			e.preventDefault();
@@ -2825,6 +2833,9 @@ function CEditorPage(api)
 			this.IsUpdateOverlayOnEndCheck = true;
 			return false;
 		}
+
+		this.m_oApi.checkLastWork();
+
 		//console.log("update_overlay");
 		var overlay = this.m_oOverlayApi;
 		//if (!overlay.m_bIsShow)
@@ -3151,12 +3162,18 @@ function CEditorPage(api)
 	this.OnPaint = function()
 	{
 		if (this.DrawingFreeze || true === window["DisableVisibleComponents"])
+		{
+			this.m_oApi.checkLastWork();
 			return;
+		}
 		//console.log("paint");
 
 		var canvas = this.m_oEditor.HtmlElement;
 		if (null == canvas)
+		{
+			this.m_oApi.checkLastWork();
 			return;
+		}
 
 		var context       = canvas.getContext("2d");
 		context.fillStyle = GlobalSkin.BackgroundColor;

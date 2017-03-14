@@ -169,6 +169,8 @@
 
 		this.isLockTargetUpdate = false;
 
+		this.lastWorkTime = 0;
+
 		return this;
 	}
 
@@ -1304,6 +1306,27 @@
 	};
 	baseEditorsApi.prototype.asc_OnShowContextMenu = function()
 	{
+	};
+
+	baseEditorsApi.prototype.isIdle = function(time)
+	{
+		// пока не стартовали - считаем работаем
+		if (0 == this.lastWorkTime)
+			return false;
+
+		// если плагин работает - то и мы тоже
+		if (this.pluginsManager && this.pluginsManager.current != null)
+			return false;
+
+		var _currentTime = new Date().getTime();
+		return ((_currentTime - this.lastWorkTime) > time) ? true : false;
+	};
+
+	baseEditorsApi.prototype.checkLastWork = function()
+	{
+		this.lastWorkTime = new Date().getTime();
+
+		console.log(this.lastWorkTime);
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

@@ -1633,6 +1633,8 @@ function CEditorPage(api)
 
 	this.onMouseDown = function(e)
 	{
+		oThis.m_oApi.checkLastWork();
+
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
 
@@ -1713,6 +1715,8 @@ function CEditorPage(api)
 
 	this.onMouseMove  = function(e)
 	{
+		oThis.m_oApi.checkLastWork();
+
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
 
@@ -1760,6 +1764,8 @@ function CEditorPage(api)
 	};
 	this.onMouseUp    = function(e, bIsWindow)
 	{
+		oThis.m_oApi.checkLastWork();
+
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
 		//if (true == global_mouseEvent.IsLocked)
@@ -1975,6 +1981,8 @@ function CEditorPage(api)
 
 	this.onKeyDown = function(e)
 	{
+		oThis.m_oApi.checkLastWork();
+
 		if (oThis.m_oApi.isLongAction())
 		{
 			e.preventDefault();
@@ -2629,6 +2637,8 @@ function CEditorPage(api)
 			this.IsUpdateOverlayOnEndCheck = true;
 			return false;
 		}
+
+		this.m_oApi.checkLastWork();
 
 		var overlay = this.m_oOverlayApi;
 

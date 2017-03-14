@@ -2177,6 +2177,9 @@ function CDrawingDocument()
 
 	this.OnStartRecalculate = function (pageCount)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		this.m_lCountCalculatePages = pageCount;
 		//console.log("start " + this.m_lCountCalculatePages);
 
@@ -2186,6 +2189,9 @@ function CDrawingDocument()
 
 	this.OnRepaintPage = function (index)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		var page = this.m_arrPages[index];
 		if (!page)
 			return;
@@ -2256,6 +2262,9 @@ function CDrawingDocument()
 
 	this.OnEndRecalculate = function (isFull, isBreak)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		if (undefined != isBreak)
 		{
 			this.m_lCountCalculatePages = this.m_lPagesCount;
@@ -3219,6 +3228,9 @@ function CDrawingDocument()
 
 	this.UpdateTarget = function (x, y, pageIndex)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		this.m_oWordControl.m_oLogicDocument.Set_TargetPos(x, y, pageIndex);
 
 		if (this.UpdateTargetFromPaint === false)
