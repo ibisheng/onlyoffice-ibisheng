@@ -180,9 +180,9 @@
     }
   };
 
-  CDocsCoApi.prototype.auth = function(isViewer, opt_openCmd) {
+  CDocsCoApi.prototype.auth = function(isViewer, opt_openCmd, opt_isIdle) {
     if (this._CoAuthoringApi && this._onlineWork) {
-      this._CoAuthoringApi.auth(isViewer, opt_openCmd);
+      this._CoAuthoringApi.auth(isViewer, opt_openCmd, opt_isIdle);
     } else {
       // Фиктивные вызовы
       this.callback_OnSpellCheckInit('');
@@ -1450,7 +1450,7 @@
     this.sockjs_url = AscCommon.getBaseUrl() + '../../../../doc/' + docid + '/c';
   };
   // Авторизация (ее нужно делать после выставления состояния редактора view-mode)
-  DocsCoApi.prototype.auth = function(isViewer, opt_openCmd) {
+  DocsCoApi.prototype.auth = function(isViewer, opt_openCmd, opt_isIdle) {
     this._isViewer = isViewer;
     if (this._locks) {
       this.ownedLockBlocks = [];
@@ -1481,7 +1481,7 @@
       'block': this.ownedLockBlocks,
       'sessionId': this._id,
 	  'sessionTimeConnect': this._sessionTimeConnect,
-      'sessionTimeIdle': 0,
+      'sessionTimeIdle': opt_isIdle >= 0 ? opt_isIdle : 0,
       'documentFormatSave': this._documentFormatSave,
       'view': this._isViewer,
       'isCloseCoAuthoring': this.isCloseCoAuthoring,

@@ -586,7 +586,7 @@
 			if (t.isOnFirstConnectEnd)
 			{
 				if (t.CoAuthoringApi.get_isAuth()) {
-					t.CoAuthoringApi.auth(t.getViewMode());
+					t.CoAuthoringApi.auth(t.getViewMode(), undefined, t.isIdle());
 				} else {
 					//первый запрос или ответ не дошел надо повторить открытие
 					t.asc_LoadDocument(undefined, true);
@@ -625,12 +625,11 @@
 			var interval = data["interval"];
 			var extendSession = true;
 			if (c_oCloseCode.sessionIdle == code) {
-				var lastTime = new Date().getTime();
-				var idleTime = new Date().getTime() - lastTime;
-				if (idleTime < interval) {
-					t.CoAuthoringApi.extendSession(idleTime);
-				} else {
+				var idleTime = t.isIdle();
+				if (idleTime > interval) {
 					extendSession = false;
+				} else {
+					t.CoAuthoringApi.extendSession(idleTime);
 				}
 			} else if (c_oCloseCode.sessionAbsolute == code) {
 				extendSession = false;
@@ -1308,21 +1307,20 @@
 	{
 	};
 
-	baseEditorsApi.prototype.isIdle = function(time)
+	baseEditorsApi.prototype.isIdle = function()
 	{
 		// пока не стартовали - считаем работаем
 		if (0 == this.lastWorkTime)
-			return false;
+			return 0;
 
 		// если плагин работает - то и мы тоже
 		if (this.pluginsManager && this.pluginsManager.current != null)
-			return false;
+			return 0;
 
 		if (this.isEmbedVersion)
-			return false;
+			return 0;
 
-		var _currentTime = new Date().getTime();
-		return ((_currentTime - this.lastWorkTime) > time) ? true : false;
+		return new Date().getTime() - this.lastWorkTime;
 	};
 
 	baseEditorsApi.prototype.checkLastWork = function()
