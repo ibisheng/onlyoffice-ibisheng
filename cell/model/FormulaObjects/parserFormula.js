@@ -1016,9 +1016,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cArea.prototype.getWS = function () {
 		return this.ws;
 	};
-	cArea.prototype.getBBox = function () {
-		return this.getRange().getBBox();
-	};
 	cArea.prototype.getBBox0 = function () {
 		return this.getRange().getBBox0();
 	};
@@ -1029,10 +1026,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		cross = r.cross(arg);
 		if (cross) {
-			if (cross.r != undefined) {
-				return this.getValue2(cross.r - this.getBBox().r1, 0);
-			} else if (cross.c != undefined) {
-				return this.getValue2(0, cross.c - this.getBBox().c1);
+			if (undefined !== cross.r) {
+				return this.getValue2(cross.r - this.getBBox0().r1, 0);
+			} else if (undefined !== cross.c) {
+				return this.getValue2(0, cross.c - this.getBBox0().c1);
 			}
 		}
 		return new cError(cErrorType.wrong_value_type);
@@ -1270,20 +1267,13 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		var cross = r.cross(arg);
 		if (cross) {
-			if (cross.r != undefined) {
-				return this.getValue2(new CellAddress(cross.r, this.getBBox().c1));
-			} else if (cross.c != undefined) {
-				return this.getValue2(new CellAddress(this.getBBox().r1, cross.c));
-			} else {
-				return new cError(cErrorType.wrong_value_type);
+			if (undefined !== cross.r) {
+				return this.getValue2(new CellAddress(cross.r, this.getBBox0().c1));
+			} else if (undefined !== cross.c) {
+				return this.getValue2(new CellAddress(this.getBBox0().r1, cross.c));
 			}
-		} else {
-			return new cError(cErrorType.wrong_value_type);
 		}
-	};
-	cArea3D.prototype.getBBox = function () {
-		var range = this.getRange();
-		return range ? range.getBBox() : range;
+		return new cError(cErrorType.wrong_value_type);
 	};
 	cArea3D.prototype.getBBox0 = function () {
 		var range = this.getRange();

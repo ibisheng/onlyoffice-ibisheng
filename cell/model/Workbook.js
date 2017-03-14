@@ -5746,11 +5746,10 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 			cell.nRow <= this.bbox.r2 && cell.nCol <= this.bbox.c2;
 	};
 	Range.prototype.cross = function(bbox){
-
 		if( bbox.r1 >= this.bbox.r1 && bbox.r1 <= this.bbox.r2 && this.bbox.c1 == this.bbox.c2)
-			return {r:bbox.r1 + 1};
+			return {r:bbox.r1};
 		if( bbox.c1 >= this.bbox.c1 && bbox.c1 <= this.bbox.c2 && this.bbox.r1 == this.bbox.r2)
-			return {c:bbox.c1 + 1};
+			return {c:bbox.c1};
 
 		return undefined;
 	};
@@ -5766,10 +5765,6 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 	Range.prototype.isOneCell=function(){
 		var oBBox = this.bbox;
 		return oBBox.r1 == oBBox.r2 && oBBox.c1 == oBBox.c2;
-	};
-	Range.prototype.getBBox=function(){
-		//1 - based
-		return {r1: this.bbox.r1 + 1, r2: this.bbox.r2 + 1, c1: this.bbox.c1 + 1, c2: this.bbox.c2 + 1};
 	};
 	Range.prototype.getBBox0=function(){
 		//0 - based

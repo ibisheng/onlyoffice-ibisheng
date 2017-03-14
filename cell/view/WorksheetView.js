@@ -5050,8 +5050,8 @@
                         apl: _t1.left + _t1.width / 4
                     };
                 } else {
-                    var _t1 = gCM(_wsV, me[id].getBBox().c1, me[id].getBBox().r1), _t2 = gCM(_wsV, me[id].getBBox().c2,
-                      me[id].getBBox().r2);
+                    var _t1 = gCM(_wsV, me[id].getBBox0().c1, me[id].getBBox0().r1), _t2 = gCM(_wsV, me[id].getBBox0().c2,
+                      me[id].getBBox0().r2);
 
                     nodeCellMetrics = {
                         t: _t1.top,
