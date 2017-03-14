@@ -8753,7 +8753,7 @@
 			//в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
 			if (prop !== "paste" || (prop === "paste" && fromBinary)) {
 				History.EndTransaction();
-				window["Asc"]["editor"].wb.clipboard.end_paste();
+				AscCommonExcel.g_clipboardExcel.end_paste();
 			}
         };
 		
@@ -8767,9 +8767,9 @@
             }
 			
 			var g_clipboardBase = window['AscCommon'].g_clipboardBase;
-			if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+			if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
 			{
-				var sBinary = window["Asc"]["editor"].wb.clipboard.copyProcessor.getBinaryForCopy(this, newRange);
+				var sBinary = AscCommonExcel.g_clipboardExcel.copyProcessor.getBinaryForCopy(this, newRange);
 				g_clipboardBase.specialPasteUndoData.data = sBinary;
 				
 				var specialPasteSelectionRange = new AscCommonExcel.SelectionRange();
@@ -8813,7 +8813,7 @@
 				return false;
 			}
 			
-			//не вызываю для отката api.wb.clipboard.pasteData, потому что внутри асинхронные методы - isLockedCells 
+			//не вызываю для отката AscCommonExcel.g_clipboardExcel.pasteData, потому что внутри асинхронные методы - isLockedCells 
 			var undoPreviousPaste = function()
 			{
 				//откатываем данные в ячейках
@@ -8822,7 +8822,7 @@
 				var tempWorkbook = new AscCommonExcel.Workbook();
 				pptx_content_loader.Start_UseFullUrl();
 				oBinaryFileReader.Read(sBase64, tempWorkbook);
-				window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
+				AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
 				var pasteData = null;
 				if (tempWorkbook)
 					pasteData = tempWorkbook.aWorksheets[0];
@@ -8849,8 +8849,8 @@
 			History.Create_NewPoint();
 			History.StartTransaction();
 			
-			window["Asc"]["editor"].wb.clipboard.start_specialpaste();
-			window["Asc"]["editor"].wb.clipboard.start_paste();
+			AscCommonExcel.g_clipboardExcel.start_specialpaste();
+			AscCommonExcel.g_clipboardExcel.start_paste();
 			
 			//откатываемся до того, что было до вставки
 			//курсор и специальная вставка не в шейпе + курсор в шейпе, специальная вставка на листе
@@ -8893,8 +8893,8 @@
 			//далее специальная вставка
 			clipboard_base.specialPasteProps = props;
 			//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
-			window["Asc"]["editor"].wb.clipboard.bIsEndTransaction = true;
-			api.wb.clipboard.pasteData(t, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
+			AscCommonExcel.g_clipboardExcel.bIsEndTransaction = true;
+			AscCommonExcel.g_clipboardExcel.pasteData(t, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		};
 		
 		if(specialPasteData.activeRange && !isIntoShape)
@@ -8913,7 +8913,7 @@
 		var specialPasteProps = g_clipboardBase.specialPasteProps;
 		
 		if ( val.props && val.props.onlyImages === true ) {
-			if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+			if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
 			{
 				this.handlers.trigger("showSpecialPasteOptions", [Asc.c_oSpecialPasteProps.picture]);
 			}
@@ -8931,7 +8931,7 @@
         var tablesMap = null;
         if (fromBinary && val.TableParts && val.TableParts.length && specialPasteProps.formatTable) {
             var range, tablePartRange, tables = val.TableParts, diffRow, diffCol, curTable, bIsAddTable;
-            var activeRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
+            var activeRange = AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange;
             var refInsertBinary = AscCommonExcel.g_oRangeCache.getAscRange(activeRange);
             for (var i = 0; i < tables.length; i++) {
                 curTable = tables[i];
@@ -9047,7 +9047,7 @@
         }
 		
 		//for special paste
-		if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+		if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
 		{
 			//var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			var allowedSpecialPasteProps;
@@ -9097,7 +9097,7 @@
 					var oObjectsForDownload = AscCommon.GetObjectsForImageDownload( pasteContent.props._aPastedImages );
 
 					//if already load images on server
-					if ( api.wb.clipboard.pasteProcessor.alreadyLoadImagesOnServer === true ) 
+					if ( AscCommonExcel.g_clipboardExcel.pasteProcessor.alreadyLoadImagesOnServer === true ) 
 					{
 						var oImageMap = {};
 						for ( var i = 0, length = oObjectsForDownload.aBuilderImagesByUrl.length; i < length; ++i ) 
@@ -9105,7 +9105,7 @@
 							var url = oObjectsForDownload.aUrls[i];
 
 							//get name from array already load on server urls
-							var name = api.wb.clipboard.pasteProcessor.oImages[url];
+							var name = AscCommonExcel.g_clipboardExcel.pasteProcessor.oImages[url];
 							var aImageElem = oObjectsForDownload.aBuilderImagesByUrl[i];
 							if ( name ) {
 								if ( Array.isArray( aImageElem ) ) {
@@ -9124,7 +9124,7 @@
 						}
 						
 						t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-						api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+						AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
 						
 						isEndTransaction = true;
 					}
@@ -9136,7 +9136,7 @@
 							
 							AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 							t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-							api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+							AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
 							
 							isEndTransaction = true;
 						}
@@ -9147,11 +9147,11 @@
 								
 								AscCommon.ResetNewUrls( data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap );
 								t._pasteData( isLargeRange, fromBinary, pasteContent, bIsUpdate, canChangeColWidth );
-								api.wb.clipboard.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
+								AscCommonExcel.g_clipboardExcel.pasteProcessor._insertImagesFromBinaryWord( t, pasteContent, oImageMap );
 								
 								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
 								History.EndTransaction();
-								window["Asc"]["editor"].wb.clipboard.end_paste();
+								AscCommonExcel.g_clipboardExcel.end_paste();
 							}, true );
 						}
 						
@@ -9167,7 +9167,7 @@
 				if ( isEndTransaction ) 
 				{
 					History.EndTransaction();
-					window["Asc"]["editor"].wb.clipboard.end_paste();
+					AscCommonExcel.g_clipboardExcel.end_paste();
 				}
 			};
 			
@@ -9180,8 +9180,8 @@
         var t = this;
         var wb = window["Asc"]["editor"].wb;
         var lastSelection = this.model.selectionRange.getLast();
-        var arn = wb && wb.clipboard && wb.clipboard.pasteProcessor && wb.clipboard.pasteProcessor.activeRange ?
-          wb.clipboard.pasteProcessor.activeRange : lastSelection;
+        var arn = AscCommonExcel.g_clipboardExcel.pasteProcessor && AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange ? 
+         AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange : lastSelection;
 
         var arrFormula = [];
         var numFor = 0;
@@ -9379,7 +9379,7 @@
         var arn = t.model.selectionRange.getLast().clone();
         var arrFormula = [];
 
-        var pasteRange = window["Asc"]["editor"].wb.clipboard.pasteProcessor.activeRange;
+        var pasteRange = AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange;
         var activeCellsPasteFragment = typeof pasteRange === "string" ? AscCommonExcel.g_oRangeCache.getAscRange(pasteRange) : pasteRange;
 		
 		var g_clipboardBase = window['AscCommon'].g_clipboardBase;
@@ -9986,7 +9986,7 @@
 
 	WorksheetView.prototype.showSpecialPasteOptions = function(props, range, positionShapeContent)
 	{
-		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		var _clipboard = AscCommonExcel.g_clipboardExcel;
 		var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 		
 		var cellCoord;
@@ -10012,7 +10012,7 @@
 
 	WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
 	{
-		var _clipboard = window["Asc"]["editor"].wb.clipboard;
+		var _clipboard = AscCommonExcel.g_clipboardExcel;
 		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
 		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton && isIntoShape)
 		{

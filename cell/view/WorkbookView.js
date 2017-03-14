@@ -67,6 +67,8 @@
   var c_oAscAsyncAction = asc.c_oAscAsyncAction;
   var c_oAscFontRenderingModeType = asc.c_oAscFontRenderingModeType;
   var c_oAscAsyncActionType = asc.c_oAscAsyncActionType;
+  
+  var g_clipboardExcel = AscCommonExcel.g_clipboardExcel;
 
 
   function WorkbookCommentsModel(handlers, aComments) {
@@ -154,7 +156,6 @@
     this.wsViewHandlers = null;
     this.element = elem;
     this.input = inputElem;
-    this.clipboard = new AscCommonExcel.Clipboard();
     this.Api = Api;
     this.collaborativeEditing = collaborativeEditing;
     this.lastSendInfoRange = null;
@@ -856,8 +857,6 @@
     if (0 < this.model.aComments.length) {
       this.handlers.trigger("asc_onAddComments", this.model.aComments);
     }
-
-    this.clipboard.Api = this.Api;
 
     this.initFormulasList();
 
@@ -2068,19 +2067,19 @@
   };
 
   WorkbookView.prototype.bIsEmptyClipboard = function() {
-    return this.clipboard.bIsEmptyClipboard(this.getCellEditMode());
+    return g_clipboardExcel.bIsEmptyClipboard(this.getCellEditMode());
   };
 
    WorkbookView.prototype.checkCopyToClipboard = function(_clipboard, _formats) {
     var t = this, ws;
     ws = t.getWorksheet();
-    t.clipboard.checkCopyToClipboard(ws, _clipboard, _formats);
+    g_clipboardExcel.checkCopyToClipboard(ws, _clipboard, _formats);
   };
 
   WorkbookView.prototype.pasteData = function(_format, data1, data2, text_data) {
     var t = this, ws;
     ws = t.getWorksheet();
-    t.clipboard.pasteData(ws, _format, data1, data2, text_data);
+    g_clipboardExcel.pasteData(ws, _format, data1, data2, text_data);
   };
   
   WorkbookView.prototype.specialPasteData = function(props) {

@@ -359,7 +359,7 @@
 				var t = this;
 				t.pasteProcessor.clean();
 				
-				window["Asc"]["editor"].wb.clipboard.start_paste();
+				this.start_paste();
 				
 				if(!bIsSpecialPaste)
 				{
@@ -377,7 +377,7 @@
 							if(text)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
-								window["Asc"]["editor"].wb.clipboard.end_paste();
+								this.end_paste();
 							}
 						}
 						else
@@ -402,7 +402,7 @@
 							if(text)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
-								window["Asc"]["editor"].wb.clipboard.end_paste();
+								this.end_paste();
 							}
 						}
 						else
@@ -419,7 +419,7 @@
 							if(data1)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
-								window["Asc"]["editor"].wb.clipboard.end_paste();
+								this.end_paste();
 							}
 						}
 						else
@@ -472,7 +472,7 @@
 		
 		function CopyProcessorExcel()
 		{
-			this.Api = window["Asc"]["editor"];
+			
 		}
 		
 		CopyProcessorExcel.prototype = {
@@ -739,7 +739,7 @@
 				}
 				else if(isSelectedImages && isSelectedImages != -1)//графические объекты
 				{
-					if(this.Api && this.Api.isChartEditor)
+					if(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor)
 						return false;
 					objectRender.preCopy();
 					var table = document.createElement('span');
@@ -1011,8 +1011,6 @@
 			
 			this.oSpecialPaste = {};
 			
-			this.Api = window["Asc"]["editor"];
-			
 			this.fontsNew = {};
 			this.oImages = {};
 		}
@@ -1144,7 +1142,7 @@
 								{
 									t._insertBinaryIntoShapeContent(worksheet, [docContent]);
 								}
-								window["Asc"]["editor"].wb.clipboard.end_paste();
+								AscCommonExcel.g_clipboardExcel.end_paste();
 							};
 							
 							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1184,7 +1182,7 @@
 						{
 							t._insertBinaryIntoShapeContent(worksheet, pasteData.content, true);
 						}
-						window["Asc"]["editor"].wb.clipboard.end_paste();
+						AscCommonExcel.g_clipboardExcel.end_paste();
 					};
 							
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1221,7 +1219,7 @@
 						if(isCellEditMode)
 						{
 							var text = this._getTextFromWord(docContent);
-							window["Asc"]["editor"].wb.clipboard.end_paste();
+							AscCommonExcel.g_clipboardExcel.end_paste();
 							return text;
 						}
 						else if(isIntoShape)
@@ -1232,7 +1230,7 @@
 								{
 									t._insertBinaryIntoShapeContent(worksheet, docContent);
 								}
-								window["Asc"]["editor"].wb.clipboard.end_paste();
+								AscCommonExcel.g_clipboardExcel.end_paste();
 							};
 									
 							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1246,7 +1244,7 @@
 							var oTempDrawingDocument = worksheet.model.DrawingDocument;
 							var newCDocument = new CDocument(oTempDrawingDocument, false);
 							newCDocument.bFromDocument = true;
-							newCDocument.theme = this.Api.wbModel.theme;
+							newCDocument.theme = window["Asc"]["editor"].wbModel.theme;
 							
 							var newContent = [];
 							for(var i = 0; i < docContent.length; i++)
@@ -1394,7 +1392,7 @@
 				var oInfo = new CSelectedElementsInfo();
 				var selectedElementsInfo = isIntoShape.Get_SelectedElementsInfo(oInfo);
 				var mathObj = oInfo.Get_Math();
-				if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart && null === mathObj)
+				if(!AscCommonExcel.g_clipboardExcel.specialPasteStart && null === mathObj)
 				{
 					var sProps = Asc.c_oSpecialPasteProps;
 					var curShape = isIntoShape.Parent.parent;
@@ -1500,7 +1498,7 @@
 					target_doc_content.Insert_Content(selectedContent, NearPos);
 					
 					//TODO записываю активную область после каждой вставки. пересомтреть! не записывать при специальной вставке.
-					//if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+					//if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
 					//{
 						window['AscCommon'].g_clipboardBase.specialPasteUndoData.shapeSelectionState = target_doc_content.Get_SelectionState();
 					//}
@@ -1681,7 +1679,7 @@
                     });
                 }
 				
-				window["Asc"]["editor"].wb.clipboard.end_paste();
+				AscCommonExcel.g_clipboardExcel.end_paste();
 				
 			},
 			
@@ -1863,7 +1861,7 @@
 				
 				var newCDocument = new CDocument(oTempDrawingDocument, false);
 				newCDocument.bFromDocument = true;
-				newCDocument.theme = this.Api.wbModel.theme;
+				newCDocument.theme = window["Asc"]["editor"].wbModel.theme;
 				
 				drawingObject.graphicObject.setBDeleted(true);
 				drawingObject.graphicObject.setWordFlag(false, newCDocument);
@@ -1896,7 +1894,7 @@
 						if(isSuccess)
 							t._pasteInShape(worksheet, node, isIntoShape);
 							
-						window["Asc"]["editor"].wb.clipboard.end_paste();
+						AscCommonExcel.g_clipboardExcel.end_paste();
 					};
 					
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -2283,7 +2281,7 @@
 				
 			    var newCDocument = new CDocument(oTempDrawingDocument, false);
 				newCDocument.bFromDocument = true;
-				newCDocument.theme = this.Api.wbModel.theme;
+				newCDocument.theme = window["Asc"]["editor"].wbModel.theme;
 				
 				var old_m_oLogicDocument = oTempDrawingDocument.m_oLogicDocument;
 			    oTempDrawingDocument.m_oLogicDocument = newCDocument;
@@ -2345,7 +2343,7 @@
 				targetDocContent.DrawingDocument.m_oLogicDocument = null;
 				
 				var oPasteProcessor = new AscCommon.PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
-				oPasteProcessor.map_font_index = this.Api.FontLoader.map_font_index;
+				oPasteProcessor.map_font_index = window["Asc"]["editor"].FontLoader.map_font_index;
 				oPasteProcessor.bIsDoublePx = false;
 				
 				var newFonts;
@@ -2602,10 +2600,10 @@
 								isIntoShape.Paragraph_Add(new ParaText(_char));
 						}
 						
-						window["Asc"]["editor"].wb.clipboard.end_paste();
+						AscCommonExcel.g_clipboardExcel.end_paste();
 						
 						//for special paste
-						if(!window["Asc"]["editor"].wb.clipboard.specialPasteStart)
+						if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
 						{
 							var sProps = Asc.c_oSpecialPasteProps;
 							var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
@@ -4382,8 +4380,9 @@
 		};
 
 		//---------------------------------------------------------export---------------------------------------------------
+		var g_clipboardExcel = new Clipboard();
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-		window["AscCommonExcel"].Clipboard = Clipboard;
+		window['AscCommonExcel'].g_clipboardExcel = g_clipboardExcel;
 		
 		window["Asc"]["SpecialPasteProps"]       = window["Asc"].SpecialPasteProps = СSpecialPasteProps;
 		prot									 = СSpecialPasteProps.prototype;
