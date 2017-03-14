@@ -10072,7 +10072,8 @@ function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills, bCreate){
         }
         return;
     }
-    if(!bCreate) {
+    //if(!bCreate)
+    {
         if(!oObj.dLbls){
             oObj.setDLbls(new AscFormat.CDLbls());
         }
