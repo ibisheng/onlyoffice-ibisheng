@@ -9920,12 +9920,12 @@
 		}
 		
 		//alignVertical
-		if(rangeStyle.alignVertical && specialPasteProps.alignVertical)
+		if(undefined !== rangeStyle.alignVertical && specialPasteProps.alignVertical)
 		{
 			range.setAlignVertical(rangeStyle.alignVertical);
 		}
 		//alignHorizontal
-		if(rangeStyle.alignHorizontal && specialPasteProps.alignHorizontal)
+		if(undefined !== rangeStyle.alignHorizontal && specialPasteProps.alignHorizontal)
 		{
 			range.setAlignHorizontal(rangeStyle.alignHorizontal);
 		}
@@ -9955,7 +9955,7 @@
 			range.setFill(rangeStyle.fill);
 		}
 		//angle
-		if(rangeStyle.angle && specialPasteProps.angle)
+		if(undefined !== rangeStyle.angle && specialPasteProps.angle)
 		{
 			range.setAngle(rangeStyle.angle);
 		}
