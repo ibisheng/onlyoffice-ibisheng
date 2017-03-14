@@ -498,7 +498,6 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         if(this.presetGeom === "textRect")
         {
             shape.spPr.setGeometry(AscFormat.CreateGeometry("rect"));
-            shape.spPr.geometry.setParent(shape.spPr);
             var fill, ln;
             if(!drawingObjects || !drawingObjects.cSld)
             {
@@ -550,7 +549,6 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         else
         {
             shape.spPr.setGeometry(AscFormat.CreateGeometry(this.presetGeom));
-            shape.spPr.geometry.setParent(shape.spPr);
             shape.setStyle(AscFormat.CreateDefaultShapeStyle(this.presetGeom));
             if(this.arrowsCount > 0)
             {

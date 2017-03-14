@@ -4057,8 +4057,6 @@ function BinaryPPTYLoader()
                     var oGeometry = this.ReadGeometry(spPr.xfrm);
                     if(oGeometry && oGeometry.pathLst.length > 0)
                         spPr.setGeometry(oGeometry);
-                    if(spPr.geometry)
-                        spPr.geometry.setParent(spPr);
                     break;
                 }
                 case 2:
@@ -9249,8 +9247,6 @@ function CPres()
                         var oGeometry = this.Reader.ReadGeometry(spPr.xfrm);
                         if(oGeometry && oGeometry.pathLst.length > 0)
                             spPr.setGeometry(oGeometry);
-                        if(spPr.geometry)
-                            spPr.geometry.setParent(spPr);
                         break;
                     }
                     case 2:

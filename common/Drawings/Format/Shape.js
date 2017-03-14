@@ -4554,7 +4554,6 @@ CShape.prototype.changePresetGeom = function (sPreset) {
     if(sPreset === "textRect")
     {
         this.spPr.setGeometry(AscFormat.CreateGeometry("rect"));
-        this.spPr.geometry.setParent(this.spPr);
         this.setStyle(AscFormat.CreateDefaultTextRectStyle());
         var fill = new AscFormat.CUniFill();
         fill.setFill(new AscFormat.CSolidFill());
@@ -4733,10 +4732,6 @@ CShape.prototype.changePresetGeom = function (sPreset) {
     }
     if (_final_preset != null) {
         this.spPr.setGeometry(AscFormat.CreateGeometry(_final_preset));
-        if(this.spPr.geometry)
-        {
-            this.spPr.geometry.setParent(this.spPr);
-        }
     }
     else {
         this.spPr.geometry = null;

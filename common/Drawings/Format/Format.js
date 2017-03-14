@@ -5611,7 +5611,6 @@ CSpPr.prototype =
         if(this.geometry!=null)
         {
             duplicate.setGeometry(this.geometry.createDuplicate());
-            duplicate.geometry.setParent(duplicate);
         }
         if(this.Fill!=null)
         {
@@ -5714,6 +5713,9 @@ CSpPr.prototype =
     {
         History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_SpPr_SetGeometry, this.geometry,  pr));
         this.geometry = pr;
+        if(this.geometry){
+            this.geometry.setParent(this);
+        }
         this.handleUpdateGeometry();
     },
 

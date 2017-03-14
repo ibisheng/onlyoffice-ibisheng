@@ -5017,7 +5017,6 @@
         oSpPr.setFill(AscFormat.CreateNoFillUniFill());
         oSpPr.setLn(AscFormat.CreateNoFillLine());
         oSpPr.setGeometry(AscFormat.CreateGeometry("rect"));
-        oSpPr.geometry.setParent(oSpPr);
         oShape.setSpPr(oSpPr);
         oSpPr.setParent(oShape);
         var oContent = oShape.getDocContent();
