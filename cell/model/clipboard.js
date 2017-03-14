@@ -90,6 +90,7 @@
 			this.wrap = true;
 			this.fill = true;
 			this.angle = true;
+			this.hyperlink = true;
 			
 			this.format = true;
 			this.formatTable = true;
@@ -121,6 +122,7 @@
 				this.wrap = true;
 				this.fill = true;
 				this.angle = true;
+				this.hyperlink = true;
 				
 				this.format = true;
 				this.formatTable = true;
@@ -147,6 +149,7 @@
 				this.wrap = null;
 				this.fill = null;
 				this.angle = null;
+				this.hyperlink = null;
 				
 				this.format = null;
 				this.formatTable = null;
