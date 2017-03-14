@@ -61,7 +61,7 @@
 		res.pivot = this.pivot;
 		if (this.ranges) {
 			res.ranges = [];
-			for (var i = 0; i < this.ranges; ++i) {
+			for (i = 0; i < this.ranges.length; ++i) {
 				res.ranges.push(this.ranges[i].clone());
 			}
 		}
