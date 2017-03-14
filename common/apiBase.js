@@ -141,6 +141,7 @@
 		this.IsUserSave = false;    // Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
 		this.isForceSaveOnUserSave = false;
         this.forceSaveButtonTimeout = null;
+        this.forceSaveButtonContinue = false;
         this.forceSaveTimeoutTimeout = null;
 
 		// Version History
@@ -488,7 +489,7 @@
 	};
 	baseEditorsApi.prototype.forceSave = function()
 	{
-		this.CoAuthoringApi.forceSave()
+		return this.CoAuthoringApi.forceSave();
 	};
 	baseEditorsApi.prototype.asc_setIsForceSaveOnUserSave = function(val)
 	{
@@ -658,20 +659,35 @@
         this.CoAuthoringApi.onForceSave = function(data) {
             if (AscCommon.c_oAscForceSaveTypes.Button === data.type) {
                 if (data.start) {
-                    if (null === t.forceSaveButtonTimeout) {
+                    if (null === t.forceSaveButtonTimeout && !t.forceSaveButtonContinue) {
                         t.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
                     } else {
                         clearInterval(t.forceSaveButtonTimeout);
                     }
                     t.forceSaveButtonTimeout = setInterval(function() {
                         t.forceSaveButtonTimeout = null;
-                        t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                        if (t.forceSaveButtonContinue) {
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+                        } else {
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                        }
+                        t.forceSaveButtonContinue = false;
                     }, Asc.c_nMaxConversionTime);
+                } else if (data.refuse) {
+                    if (t.forceSaveButtonContinue) {
+                        t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+                    }
+                    t.forceSaveButtonContinue = false;
                 } else {
                     if (null !== t.forceSaveButtonTimeout) {
                         clearInterval(t.forceSaveButtonTimeout);
                         t.forceSaveButtonTimeout = null;
-                        t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                        if (t.forceSaveButtonContinue) {
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+                        } else {
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                        }
+                        t.forceSaveButtonContinue = false;
                     }
                 }
             } else {

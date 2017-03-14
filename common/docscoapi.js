@@ -364,8 +364,9 @@
 
 	CDocsCoApi.prototype.forceSave = function() {
 		if (this._CoAuthoringApi && this._onlineWork) {
-			this._CoAuthoringApi.forceSave();
+			return this._CoAuthoringApi.forceSave();
 		}
+		return false;
 	};
 
   CDocsCoApi.prototype.callback_OnAuthParticipantsChanged = function(e, count) {
@@ -876,11 +877,14 @@
   };
 
 	DocsCoApi.prototype.forceSave = function() {
+        var res = false;
 		var newForceSaveButtonTime = Math.max(this.lastOtherSaveTime, this.lastOwnSaveTime);
 		if (this._lastForceSaveButtonTime < newForceSaveButtonTime) {
 			this._lastForceSaveButtonTime = newForceSaveButtonTime;
 			this._send({'type': 'forceSaveStart'});
+            res = true;
 		}
+		return res;
 	};
 
   DocsCoApi.prototype.openDocument = function(data) {
@@ -994,10 +998,13 @@
   };
 
 	DocsCoApi.prototype._onForceSaveStart = function(data) {
-		if (data['code'] === c_oAscServerCommandErrors.NoError) {
+	    var code = data['code'];
+		if (code === c_oAscServerCommandErrors.NoError) {
 			this._lastForceSaveButtonTime = data['time'];
             this.onForceSave({type: c_oAscForceSaveTypes.Button, start: true});
-		} else if (data['code'] !== c_oAscServerCommandErrors.NotModified) {
+        } else if (code === c_oAscServerCommandErrors.NotModified) {
+            this.onForceSave({type: c_oAscForceSaveTypes.Button, refuse: true});
+		} else {
 			this.onWarning(Asc.c_oAscError.ID.Unknown);
 		}
 	};

@@ -1464,9 +1464,9 @@ var editor;
 
       this.CoAuthoringApi.onUnSaveLock = function() {
         t.CoAuthoringApi.onUnSaveLock = null;
-		if (t.isForceSaveOnUserSave && t.IsUserSave) {
-			t.forceSave();
-		}
+        if (t.isForceSaveOnUserSave && t.IsUserSave) {
+          t.forceSaveButtonContinue = t.forceSave();
+        }
 
         if (t.collaborativeEditing.getCollaborativeEditing()) {
           // Шлем update для toolbar-а, т.к. когда select в lock ячейке нужно заблокировать toolbar
@@ -1477,7 +1477,9 @@ var editor;
         t.IsUserSave = false;
         t.lastSaveTime = null;
 
-        t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+        if (!t.forceSaveButtonContinue) {
+          t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+        }
         // Обновляем состояние возможности сохранения документа
         t.onUpdateDocumentModified(History.Have_Changes());
 

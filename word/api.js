@@ -1831,14 +1831,16 @@ background-repeat: no-repeat;\
 			{
 				t.CoAuthoringApi.onUnSaveLock = null;
 				if (t.isForceSaveOnUserSave && t.IsUserSave) {
-					t.forceSave();
+					t.forceSaveButtonContinue = t.forceSave();
 				}
 
 				// Выставляем, что документ не модифицирован
 				t.CheckChangedDocument();
 				t.canSave    = true;
 				t.IsUserSave = false;
-				t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+				if (!t.forceSaveButtonContinue) {
+					t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+				}
 
 				// Обновляем состояние возможности сохранения документа
 				t._onUpdateDocumentCanSave();
