@@ -906,8 +906,7 @@ CGraphicObjects.prototype =
 
     editChart: function(chart)
     {
-        var bin_object = {"binary":chart};
-        var chart_space = this.getChartSpace2(bin_object, null), select_start_page, parent_paragraph, nearest_pos;
+        var chart_space = this.getChartSpace2(chart, null), select_start_page, parent_paragraph, nearest_pos;
 
 
         var by_types;
@@ -958,6 +957,8 @@ CGraphicObjects.prototype =
                 select_start_page = aSelectedCharts[0].selectStartPage;
                 chart_space.setParent(aSelectedCharts[0].parent);
                 aSelectedCharts[0].parent.Set_GraphicObject(chart_space);
+                aSelectedCharts[0].parent.docPr.setTitle(chart["cTitle"]);
+                aSelectedCharts[0].parent.docPr.setDescr(chart["cDescription"]);
                 this.resetSelection();
                 this.selectObject(chart_space, select_start_page);
                 aSelectedCharts[0].parent.CheckWH();

@@ -5883,7 +5883,7 @@ background-repeat: no-repeat;\
 		// Находим выделенную диаграмму и накатываем бинарник
 		if (AscCommon.isRealObject(chartBinary))
 		{
-			this.WordControl.m_oLogicDocument.Edit_Chart(chartBinary["binary"]);
+			this.WordControl.m_oLogicDocument.Edit_Chart(chartBinary);
 		}
 	};
 

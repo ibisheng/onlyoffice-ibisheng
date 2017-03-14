@@ -239,8 +239,7 @@ DrawingObjectsController.prototype.getColorMapOverride  =  function()
 };
 DrawingObjectsController.prototype.editChart = function(binary)
 {
-    var bin_object = {"binary":binary};
-    var chart_space = this.getChartSpace2(bin_object, null);
+    var chart_space = this.getChartSpace2(binary, null);
     chart_space.setParent(this.drawingObjects);
     var by_types, i;
     by_types = AscFormat.getObjectsByTypesFromArr(this.selectedObjects, true);
@@ -286,6 +285,8 @@ DrawingObjectsController.prototype.editChart = function(binary)
             chart_space.spPr.xfrm.setOffY(aSelectedCharts[0].y);
             var pos = aSelectedCharts[0].deleteDrawingBase();
             chart_space.addToDrawingObjects(pos);
+            chart_space.setTitle(binary["cTitle"]);
+            chart_space.setDescription(binary["cDescription"]);
             this.resetSelection();
             this.selectObject(chart_space, this.drawingObjects.num);
             this.startRecalculate();

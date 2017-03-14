@@ -6645,11 +6645,10 @@ background-repeat: no-repeat;\
 		// Находим выделенную диаграмму и накатываем бинарник
 		if (AscFormat.isObject(chartBinary))
 		{
-			var binary = chartBinary["binary"];
 			if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 			{
 				History.Create_NewPoint(AscDFH.historydescription_Document_EditChart);
-				this.WordControl.m_oLogicDocument.Edit_Chart(binary);
+				this.WordControl.m_oLogicDocument.Edit_Chart(chartBinary);
 			}
 		}
 	};

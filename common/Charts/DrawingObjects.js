@@ -458,6 +458,14 @@ function asc_CChartBinary(chart) {
             this["colorMapBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
         }
         this["urls"] = JSON.stringify(AscCommon.g_oDocumentUrls.getUrls());
+        if(chart.parent && chart.parent.docPr){
+            this["cTitle"] = chart.parent.docPr.title;
+            this["cDescription"] = chart.parent.docPr.descr;
+        }
+        else{
+            this["cTitle"] = chart.getTitle();
+            this["cDescription"] = chart.getDescription();
+        }
     }
 }
 
@@ -507,7 +515,6 @@ asc_CChartBinary.prototype = {
         {
             var stream = AscFormat.CreateBinaryReader(binary, 0, binary.length);
             var oBinaryReader = new AscCommon.BinaryPPTYLoader();
-
             oBinaryReader.stream = new AscCommon.FileStream();
             oBinaryReader.stream.obj    = stream.obj;
             oBinaryReader.stream.data   = stream.data;
@@ -2687,6 +2694,15 @@ function DrawingObjects() {
             if(theme)
             {
                 worksheet.model.workbook.theme = theme;
+            }
+            if(chart["cTitle"] || chart["cDescription"]){
+                if(!oNewChartSpace.nvGraphicFramePr){
+                    var nv_sp_pr = new AscFormat.UniNvPr();
+                    nv_sp_pr.cNvPr.setId(1024);
+                    oNewChartSpace.setNvSpPr(nv_sp_pr);
+                }
+                oNewChartSpace.setTitle(chart["cTitle"]);
+                oNewChartSpace.setDescription(chart["cDescription"]);
             }
             var colorMapOverride = asc_chart_binary.getColorMap();
             if(colorMapOverride)
