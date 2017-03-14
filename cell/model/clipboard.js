@@ -98,6 +98,8 @@
 			
 			this.width = null;
 			this.transpose = null;
+			
+			this.comment = true;
 		}
 		
 		СSpecialPasteProps.prototype = {
@@ -127,6 +129,8 @@
 				
 				this.width = null;
 				this.transpose = null;
+				
+				this.comment = true;
 			},
 			revert: function()
 			{
@@ -151,6 +155,8 @@
 				
 				this.width = null;
 				this.transpose = null;
+				
+				this.comment = null;
 			},
 			asc_setProps: function(props)
 			{
@@ -1927,7 +1933,7 @@
 					newCDocument.bFromDocument = true;
 					//TODo!!!!!!
 					newCDocument.Content[0].bFromDocument = true;
-					newCDocument.theme = t.Api.wbModel.theme;
+					newCDocument.theme = window["Asc"]["editor"].wbModel.theme;
 					
 					oTempDrawingDocument.m_oLogicDocument = newCDocument;
 					var oOldEditor = undefined;

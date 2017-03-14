@@ -9489,7 +9489,7 @@
 		if(specialPasteProps.format)
 		{
 			rangeUnMerge.unmerge();
-			//this.cellCommentator.deleteCommentsRange(rangeUnMerge.bbox);
+			this.cellCommentator.deleteCommentsRange(rangeUnMerge.bbox);
 		}
         if (!isOneMerge) {
             arn.r2 = rMax2 - 1;
@@ -9614,7 +9614,7 @@
 			var firstRange = range.clone();
 			
 			//****paste comments****
-			if (val.aComments && val.aComments.length) {
+			if (specialPasteProps.comment && val.aComments && val.aComments.length) {
 				addComments(pasteRow, pasteCol, val.aComments);
 			}
 			
