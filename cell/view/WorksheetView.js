@@ -9869,7 +9869,22 @@
 		//cellStyle
 		if(rangeStyle.cellStyle && specialPasteProps.cellStyle)
 		{
+			//сделал для того, чтобы не перетерались старые бордеры бордерами стиля в случае, если специальная вставка без бордеров
+			var oldBorders = null;
+			if(!specialPasteProps.borders)
+			{
+				oldBorders = range.getBorderFull();
+				if(oldBorders)
+				{
+					oldBorders = oldBorders.clone();
+				}
+			}
 			range.setCellStyle(rangeStyle.cellStyle);
+			if(oldBorders)
+			{
+				range.setBorder(null);
+				range.setBorder(oldBorders);
+			}
 		}
 		
 		//если не вставляем форматированную таблицу, но формат необходимо вставить
