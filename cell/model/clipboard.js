@@ -474,6 +474,7 @@
 			
 			start_specialpaste: function()
 			{
+				//TODO переделать на методы, которые в clipboardBase specialPasteStart/specialPasteEnd
 				this.specialPasteStart = true;
 			}
 		};

@@ -103,6 +103,9 @@
 		
 		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
 		this.specialPasteButtonProps = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
+		
+		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
+		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
 	}
 
 	CClipboardBase.prototype =
@@ -943,6 +946,47 @@
 		{
 			this.specialPasteData = {};
 			this.specialPasteUndoData = {};
+		},
+		
+		Special_Paste_Start : function()
+		{
+			this.specialPasteStart = true;
+		},
+		
+		Special_Paste_End : function()
+		{
+			this.specialPasteStart = false;
+		},
+		
+		Paste_Process_Start : function()
+		{
+			this.pasteStart = true;
+		},
+		
+		Paste_Process_End : function()
+		{
+			this.pasteEnd = false;
+			//процесс специальной вставки заканчивается вместе с общей вставкой
+			if(this.specialPasteStart)
+			{
+				this.Special_Paste_End();
+			}
+			else//если не было специальной вставки, необходимо показать кнопку специальной вставки
+			{
+				this.SpecialPasteButton_Show();
+			}
+		},
+		
+		SpecialPasteButton_Show : function(props)
+		{
+			this.showSpecialPasteButton = true;
+			this.Api.asc_ShowSpecialPasteButton(props);
+		},
+		
+		SpecialPasteButton_Hide : function()
+		{
+			this.showSpecialPasteButton = false;
+			this.Api.asc_HideSpecialPasteButton();
 		}
 	};
 

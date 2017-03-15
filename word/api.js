@@ -1792,6 +1792,16 @@ background-repeat: no-repeat;\
 		//this.wb.specialPasteData(props);
 	};
 	
+	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props) 
+	{
+		this.sendEvent("asc_onShowSpecialPasteOptions", props);
+	};
+	
+	asc_docs_api.prototype.asc_HideSpecialPasteButton = function() 
+	{
+		this.sendEvent("asc_onHideSpecialPasteOptions");
+	};
+	
 	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
 	{
 		var t = this;

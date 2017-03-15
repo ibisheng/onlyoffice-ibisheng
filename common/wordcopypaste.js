@@ -62,6 +62,8 @@ var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscShdNil = Asc.c_oAscShdNil;
 var c_oAscXAlign = Asc.c_oAscXAlign;
 
+var g_clipboardBase = window['AscCommon'].g_clipboardBase;
+
 function CDocumentReaderMode()
 {
     this.DefaultFontSize = 12;
@@ -1785,7 +1787,8 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 	}
     else
 	{
-		
+		g_clipboardBase.Special_Paste_Start();
+		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, specialPasteProps);
 	}
 }
 function trimString( str ){
@@ -2321,6 +2324,8 @@ PasteProcessor.prototype =
 					oThis.InsertInDocument();
 					if(oThis.aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
+						
+					g_clipboardBase.Paste_Process_End();
 				}
 			};
 			
@@ -2380,6 +2385,8 @@ PasteProcessor.prototype =
 
 						presentation.Check_CursorMoveRight();
 						presentation.Document_UpdateInterfaceState();
+						
+						g_clipboardBase.Paste_Process_End();
 					}
 				};
 				
@@ -2524,6 +2531,8 @@ PasteProcessor.prototype =
 					if(aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
 					oThis.api.continueInsertDocumentUrls();
+					
+					g_clipboardBase.Paste_Process_End();
 				}
 			}
 			
@@ -2657,6 +2666,8 @@ PasteProcessor.prototype =
 					presentation.Recalculate();
 					presentation.Check_CursorMoveRight();
 					presentation.Document_UpdateInterfaceState();
+					
+					g_clipboardBase.Paste_Process_End();
 				}
 			}
 			
@@ -2728,6 +2739,8 @@ PasteProcessor.prototype =
 					oThis.InsertInDocument();
 					if(aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
+						
+					g_clipboardBase.Paste_Process_End();
 				}
 			}
 			
@@ -2990,6 +3003,8 @@ PasteProcessor.prototype =
 							presentation.Recalculate();
 							presentation.Check_CursorMoveRight();
 							presentation.Document_UpdateInterfaceState();
+							
+							g_clipboardBase.Paste_Process_End();
 						}
 					};
 
@@ -3022,9 +3037,10 @@ PasteProcessor.prototype =
 					
 							presentation.Insert_Content(presentationSelectedContent);
 							
-							
 							presentation.Recalculate();
 							presentation.Document_UpdateInterfaceState();
+							
+							g_clipboardBase.Paste_Process_End();
 						}
 					};
 
@@ -3258,6 +3274,8 @@ PasteProcessor.prototype =
 						presentation.Insert_Content(presentationSelectedContent);
 						presentation.Recalculate();
 						presentation.Document_UpdateInterfaceState();
+						
+						g_clipboardBase.Paste_Process_End();
 					};
 
 					var image_objects = loader.End_UseFullUrl();
