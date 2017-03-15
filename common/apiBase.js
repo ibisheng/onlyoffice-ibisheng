@@ -636,7 +636,7 @@
 				extendSession = false;
 			}
 			if (!extendSession) {
-				if (History.Have_Changes()) {
+				if (AscCommon.History.Have_Changes()) {
 					//enter view mode because save async
 					t.sendEvent('asc_onCoAuthoringDisconnect');
 					t.asc_setViewMode(true);
@@ -646,7 +646,7 @@
 
 						t.CoAuthoringApi.disconnect(code, reason);
 					};
-					if (t.collaborativeEditing.applyChanges) {
+					if (t.collaborativeEditing && t.collaborativeEditing.applyChanges) {
 						t.collaborativeEditing.applyChanges();
 						t.collaborativeEditing.sendChanges();
 					} else {
