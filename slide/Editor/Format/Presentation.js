@@ -4344,10 +4344,12 @@ CPresentation.prototype =
         {
             case AscDFH.historyitem_Presentation_AddSlide:
             {
+                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, All: true});
                 break;
             }
             case AscDFH.historyitem_Presentation_RemoveSlide:
             {
+                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, All: true});
                 break;
             }
             case AscDFH.historyitem_Presentation_SlideSize:
