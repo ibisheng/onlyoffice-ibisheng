@@ -418,6 +418,7 @@
 			};
 			if (versionHistory)
 			{
+                rData["closeonerror"] = versionHistory.isRequested;
 				rData["jwt"] = versionHistory.token;
 				//чтобы результат пришел только этому соединению, а не всем кто в документе
 				rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();

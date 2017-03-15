@@ -46,6 +46,7 @@
     this.colors = null;
     this.changes = null;
 	this.token = null;
+	this.isRequested = null;
 
     if (newObj) {
       this.update(newObj);
@@ -64,6 +65,7 @@
     }
     this.colors = newObj.colors;
     this.newChangeId = newObj.currentChangeId;
+	this.isRequested = newObj.isRequested;
     return bUpdate;
   };
   asc_CVersionHistory.prototype.applyChanges = function(editor) {
@@ -92,6 +94,9 @@
   };
   asc_CVersionHistory.prototype.asc_setToken = function(val) {
     this.token = val;
+  };
+  asc_CVersionHistory.prototype.asc_setIsRequested = function(val) {
+    this.isRequested = val;
   };
 
   window["Asc"].asc_CVersionHistory = window["Asc"]["asc_CVersionHistory"] = asc_CVersionHistory;
