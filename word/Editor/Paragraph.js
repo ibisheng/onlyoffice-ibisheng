@@ -9322,7 +9322,7 @@ Paragraph.prototype =
             MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
             MMData.Hyperlink = new Asc.CHyperlinkProperty( Hyperlink );
         }
-        else if (null !== Footnote)
+        else if (null !== Footnote && this.Parent instanceof CDocument)
 		{
 			MMData.Type   = AscCommon.c_oAscMouseMoveDataTypes.Footnote;
 			MMData.Text   = Footnote.GetHint();
