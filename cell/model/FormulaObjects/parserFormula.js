@@ -2776,6 +2776,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cConcatSTROperator.prototype = Object.create(cBaseOperator.prototype);
+	cConcatSTROperator.prototype.numFormat = c_numFormatNone;
 	cConcatSTROperator.prototype.constructor = cConcatSTROperator;
 	cConcatSTROperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
