@@ -2231,6 +2231,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cBaseOperator.prototype.type = cElementType.operator;
+	cBaseOperator.prototype.numFormat = c_numFormatFirstCell;
 	cBaseOperator.prototype.getArguments = function () {
 		return this.argumentsCurrent;
 	};
