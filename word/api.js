@@ -1762,7 +1762,7 @@ background-repeat: no-repeat;\
 		if (!_logicDoc)
 			return;
 
-		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
 		{
 			if (!useCurrentPoint) {
 				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
