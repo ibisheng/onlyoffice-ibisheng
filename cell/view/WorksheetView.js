@@ -6849,7 +6849,7 @@
         });
 
         // Показываем только данные для 2-х или более ячеек (http://bugzilla.onlyoffice.com/show_bug.cgi?id=24115)
-        if (1 < oSelectionMathInfo.countNumbers) {
+        if (1 < oSelectionMathInfo.count) {
             // Мы должны отдавать в формате активной ячейки
 			var activeCell = this.model.selectionRange.activeCell;
             var numFormat = this.model.getRange3(activeCell.row, activeCell.col,
