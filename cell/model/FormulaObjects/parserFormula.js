@@ -439,6 +439,8 @@ var c_Date1900Const = 25568; //разница в днях между 01.01.1970 
 var c_sPerDay = 86400;
 var c_msPerDay = c_sPerDay * 1000;
   var rx_sFuncPref = /_xlfn\./i;
+	var c_numFormatFirstCell = -1;
+	var c_numFormatNone = -1;
 
 Date.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
 Date.prototype.excelNullDate1904 = Date.UTC( 1904, 0, 1, 0, 0, 0 );
@@ -2278,7 +2280,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.type = cElementType.func;
 	cBaseFunction.prototype.argumentsMin = 0;
 	cBaseFunction.prototype.argumentsMax = 255;
-	cBaseFunction.prototype.numFormat = AscCommonExcel.cNumFormatFirstCell;
+	cBaseFunction.prototype.numFormat = c_numFormatFirstCell;
 	cBaseFunction.prototype.Calculate = function () {
 		this.value = new cError(cErrorType.wrong_name);
 		return this.value;
@@ -4892,7 +4894,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 					_tmp = currentElement.Calculate(arg, rangeCell, opt_defName, this.ws.getId());
 					if (null != _tmp.numFormat) {
 						numFormat = _tmp.numFormat;
-					} else if (0 > numFormat || AscCommonExcel.cNumFormatNone === currentElement.numFormat) {
+					} else if (0 > numFormat || c_numFormatNone === currentElement.numFormat) {
 						numFormat = currentElement.numFormat;
 					}
 					elemArr.push(_tmp);
@@ -5693,8 +5695,8 @@ function rtl_math_erfc( x ) {
 	window['AscCommonExcel'].c_DateCorrectConst = c_Date1900Const;
 	window['AscCommonExcel'].c_sPerDay = c_sPerDay;
 	window['AscCommonExcel'].c_msPerDay = c_msPerDay;
-	window['AscCommonExcel'].cNumFormatFirstCell = -1;
-	window['AscCommonExcel'].cNumFormatNone = -2;
+	window['AscCommonExcel'].cNumFormatFirstCell = c_numFormatFirstCell;
+	window['AscCommonExcel'].cNumFormatNone = c_numFormatNone;
 
 	window['AscCommonExcel'].cNumber = cNumber;
 	window['AscCommonExcel'].cString = cString;
