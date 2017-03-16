@@ -715,6 +715,8 @@
             }
         };
 		this.CoAuthoringApi.onExpiredToken = function() {
+			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+			t.VersionHistory = null;
 			t.sendEvent('asc_onExpiredToken');
 		};
 		/**
