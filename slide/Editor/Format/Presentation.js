@@ -802,7 +802,11 @@ CPresentation.prototype =
     },
     Continue_FastCollaborativeEditing: function()
     {
-        if (true !== AscCommon.CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())
+        if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+            return;
+        if (this.Api.isLongAction())
+            return;
+        if (true !== AscCommon.CollaborativeEditing.Is_Fast() || true === AscCommon.CollaborativeEditing.Is_SingleUser())
             return;
 
         if(this.Slides[this.CurPage]){
