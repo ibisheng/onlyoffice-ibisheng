@@ -44,6 +44,7 @@ window.location.pathname = "";
 
 window.NATIVE_EDITOR_ENJINE = true;
 window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
+window.IS_NATIVE_EDITOR = true;
 
 var document = {};
 window.document = document;
@@ -484,13 +485,12 @@ function NativeOpenFile()
 	Api = _api;
 }
 
-function NativeOpenFile2(_params)
+function NativeOpenFile2(_params, documentInfo)
 {
 	window["CreateMainTextMeasurerWrapper"]();
 
 	window.g_file_path = "native_open_file";
 	window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
-	var doc_bin = window.native.GetFileString(window.g_file_path);
 	if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
 	{
 		_api = new window["Asc"]["asc_docs_api"]("");
@@ -500,10 +500,71 @@ function NativeOpenFile2(_params)
 			_api.Native_Editor_Initialize_Settings(_params);
 		}
 
-		_api.asc_nativeOpenFile(doc_bin);
+		window.documentInfo = documentInfo;
 
-		if (_api.NativeAfterLoad)
-			_api.NativeAfterLoad();
+		var userInfo = new Asc.asc_CUserInfo();
+		userInfo.asc_putId(window.documentInfo["docUserId"]);
+		userInfo.asc_putFullName(window.documentInfo["docUserName"]);
+		userInfo.asc_putFirstName(window.documentInfo["docUserFirstName"]);
+		userInfo.asc_putLastName(window.documentInfo["docUserLastName"]);
+
+		var docInfo = new Asc.asc_CDocInfo();
+		docInfo.put_Id(window.documentInfo["docKey"]);
+		docInfo.put_UserInfo(userInfo);
+
+		_api.asc_setDocInfo(docInfo);
+
+		if (window.documentInfo["iscoauthoring"]) {
+
+   			_api.isSpellCheckEnable = false;
+
+				_api.asc_setAutoSaveGap(1);
+				_api._coAuthoringInit();
+				_api.asc_SetFastCollaborative(true);
+
+				_api.asc_registerCallback("asc_onAuthParticipantsChanged", function(users) {
+						var stream = global_memory_stream_menu;
+						stream["ClearNoAttack"]();
+						asc_WriteUsers(users, stream);
+						window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
+				});
+
+				_api.asc_registerCallback("asc_onParticipantsChanged", function(users) {
+																	var stream = global_memory_stream_menu;
+																	stream["ClearNoAttack"]();
+																	asc_WriteUsers(users, stream);
+																	window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
+																	});
+
+				_api.asc_registerCallback("asc_onGetEditorPermissions", function(state) {
+
+						var rData = {
+												 "c"             : "open",
+												 "id"            : window.documentInfo["docKey"],
+												 "userid"        : window.documentInfo["docUserId"],
+												 "format"        : "docx",
+												 "vkey"          : undefined,
+												 "url"           : window.documentInfo["docURL"],
+												 "title"         : this.documentTitle,
+												 "embeddedfonts" : false};
+
+												 _api.CoAuthoringApi.auth(window.documentInfo["viewmode"], rData);
+				});
+
+				_api.asc_registerCallback("asc_onDocumentUpdateVersion", function(callback) {
+																	var me = this;
+																	me.needToUpdateVersion = true;
+																	if (callback) callback.call(me);
+																	});
+
+
+		} else {
+				var doc_bin = window.native.GetFileString(window.g_file_path);
+				_api.asc_nativeOpenFile(doc_bin);
+
+				if (_api.NativeAfterLoad)
+					_api.NativeAfterLoad();
+		}
 
 		// ToDo get_PropertyThemeColorSchemes method removed, now the only Event!!!!
 		/*if (_api.__SendThemeColorScheme)
@@ -521,13 +582,8 @@ function NativeOpenFile2(_params)
 			}
 		}*/
 	}
-	else
-	{
-		_api = new window["Asc"]["spreadsheet_api"]();
-		_api.asc_nativeOpenFile(doc_bin);
-	}
 
-	Api = _api;
+	 Api = _api;
 }
 
 function NativeCalculateFile()
@@ -855,3 +911,4 @@ window.native.Call_Menu_Event = function (type, _params)
 	return _api.Call_Menu_Event(type, _params);
 };
 
+window['SockJS'] = createSockJS();

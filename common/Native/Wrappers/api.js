@@ -1755,20 +1755,20 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 21:
                     {
                         var bIsNeed = _params[_current.pos++];
-                        
+
                         if (bIsNeed)
                         {
                             var currImage = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
                             if (currImage && currImage.length) {
-                               
+
                                 var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](currImage[0].ImageUrl);
-                                
+
                                 var _w = _originSize[0];
                                 var _h = _originSize[1];
-                                
+
                                 // сбрасываем урл
                                 _imagePr.ImageUrl = undefined;
-                                
+
                                 var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
                                 var _page_width = AscCommon.Page_Width;
                                 var _page_height = AscCommon.Page_Height;
@@ -1776,25 +1776,25 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                                 var _page_y_top_margin = AscCommon.Y_Top_Margin;
                                 var _page_x_right_margin = AscCommon.X_Right_Margin;
                                 var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
-                                
+
                                 if (_section_select)
                                 {
                                     if (_section_select.W)
                                         _page_width = _section_select.W;
-                                    
+
                                     if (_section_select.H)
                                         _page_height = _section_select.H;
                                 }
-                                
+
                                 var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
                                 var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
-                                
+
                                 var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
                                 var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-                                
+
                                 wI = Math.max(5, Math.min(wI, __w));
                                 hI = Math.max(5, Math.min(hI, __h));
-                                
+
                                 _imagePr.Width = wI;
                                 _imagePr.Height = hI;
                             }
@@ -2171,6 +2171,121 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             }
             break;
         }
+
+
+    case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
+    {
+        var t = _api.CoAuthoringApi._CoAuthoringApi;
+
+        t._state = AscCommon.ConnectionState.WaitAuth;
+        t.onFirstConnect();
+
+        break;
+    }
+
+    case 10010: // ASC_SOCKET_EVENT_TYPE_ON_CLOSE
+    {
+
+        break;
+    }
+
+    case 10020: // ASC_SOCKET_EVENT_TYPE_MESSAGE
+    {
+        var t = _api.CoAuthoringApi._CoAuthoringApi;
+
+        var dataObject = JSON.parse(_params);
+
+        // console.log("JS - " + dataObject['type']);
+
+        switch (dataObject['type']) {
+            case 'auth'        :
+                t._onAuth(dataObject);
+                break;
+            case 'message'      :
+                t._onMessages(dataObject, false);
+                break;
+            case 'cursor'       :
+                t._onCursor(dataObject);
+                break;
+            case 'meta' :
+                t._onMeta(dataObject);
+                break;
+            case 'getLock'      :
+                t._onGetLock(dataObject);
+                break;
+            case 'releaseLock'    :
+                t._onReleaseLock(dataObject);
+                break;
+            case 'connectState'    :
+                t._onConnectionStateChanged(dataObject);
+                break;
+            case 'saveChanges'    :
+                t._onSaveChanges(dataObject);
+                break;
+            case 'saveLock'      :
+                t._onSaveLock(dataObject);
+                break;
+            case 'unSaveLock'    :
+                t._onUnSaveLock(dataObject);
+                break;
+            case 'savePartChanges'  :
+                t._onSavePartChanges(dataObject);
+                break;
+            case 'drop'        :
+                t._onDrop(dataObject);
+                break;
+            case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
+                break;
+            case 'error'      : /*Старая версия sdk*/
+                t._onDrop(dataObject);
+                break;
+            case 'documentOpen'    :
+                t._documentOpen(dataObject);
+                break;
+            case 'warning':
+                t._onWarning(dataObject);
+                break;
+            case 'license':
+                t._onLicense(dataObject);
+                break;
+            case 'session' :
+                t._onSession(dataObject);
+                break;
+        }
+
+        break;
+    }
+
+    case 11010: // ASC_SOCKET_EVENT_TYPE_ON_DISCONNECT
+    {
+        break;
+    }
+
+    case 11020: // ASC_SOCKET_EVENT_TYPE_TRY_RECONNECT
+    {
+        var t = _api.CoAuthoringApi._CoAuthoringApi;
+        delete t.sockjs;
+        t._initSocksJs();
+        break;
+    }
+
+    case 21000: // ASC_COAUTH_EVENT_TYPE_INSERT_URL_IMAGE
+    {
+        var urls = JSON.parse(_params[0]);
+        AscCommon.g_oDocumentUrls.addUrls(urls);
+        var firstUrl;
+        for (var i in urls) {
+            if (urls.hasOwnProperty(i)) {
+                firstUrl = urls[i];
+                break;
+            }
+        }
+
+        params[0] = firstUrl;
+      //  _return = _s.offline_addImageDrawingObject(params);
+
+        break;
+    }
 
         default:
             break;
@@ -4213,6 +4328,41 @@ AscCommon.asc_WriteColorSchemes = asc_WriteColorSchemes;
 
 ///////////////////////////////////////////////////////////////////////
 
+function asc_WriteUsers(c, s) {
+    if (!c) return;
+
+    var len = 0, name, user;
+    for (name in c) {
+        if (undefined !== name) {
+            len++;
+        }
+    }
+
+    s["WriteLong"](len);
+
+    for (name in c) {
+        if (undefined !== name) {
+            user = c[name];
+            if (user) {
+                s['WriteString2'](user.asc_getId());
+                s['WriteString2'](user.asc_getFirstName() === undefined ? "" : user.asc_getFirstName());
+                s['WriteString2'](user.asc_getLastName() === undefined ? "" : user.asc_getLastName());
+                s['WriteString2'](user.asc_getUserName() === undefined ? "" : user.asc_getUserName());
+                s['WriteBool'](user.asc_getView());
+
+                var color = new Asc.asc_CColor();
+
+                color.r = (user.color >> 16) & 255;
+                color.g = (user.color >> 8 ) & 255;
+                color.b = (user.color      ) & 255;
+
+                asc_menu_WriteColor(0, color, s);
+            }
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////
 
 Asc['asc_docs_api'].prototype.UpdateTextPr = function(TextPr)
 {
@@ -5359,61 +5509,61 @@ Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_p
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Copy = function()
 {
     var dataBuffer = {};
-    
+
     var clipboard = {};
     clipboard.pushData = function(type, data) {
-        
+
         if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
-            
+
             dataBuffer.text = data;
-            
+
         } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
-            
+
             if (null != data.drawingUrls && data.drawingUrls.length > 0) {
                 dataBuffer.drawingUrls = data.drawingUrls[0];
             }
-            
+
             dataBuffer.sBase64 = data.sBase64;
         }
     }
-    
+
     this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
-    
+
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-    
+
     if (dataBuffer.text) {
         _stream["WriteByte"](0);
         _stream["WriteString2"](dataBuffer.text);
     }
-    
+
     if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
         _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-    
+
     if (dataBuffer.sBase64) {
         _stream["WriteByte"](2);
         _stream["WriteStringA"](dataBuffer.sBase64);
     }
-    
+
     _stream["WriteByte"](255);
-    
+
     return _stream;
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
 {
     var dataBuffer = {};
-    
+
     var clipboard = {};
     clipboard.pushData = function(type, data) {
-        
+
         if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
-            
+
             dataBuffer.text = data;
-            
+
         } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
-            
+
             if (null != data.drawingUrls && data.drawingUrls.length > 0) {
                  dataBuffer.drawingUrls = data.drawingUrls[0];
             }
@@ -5421,31 +5571,31 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
             dataBuffer.sBase64 = data.sBase64;
         }
     }
-    
+
     this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
-    
+
     this.asc_SelectionCut();
-    
+
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-    
+
     if (dataBuffer.text) {
         _stream["WriteByte"](0);
         _stream["WriteString2"](dataBuffer.text);
     }
-   
+
     if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
         _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-   
+
     if (dataBuffer.sBase64) {
         _stream["WriteByte"](2);
         _stream["WriteStringA"](dataBuffer.sBase64);
     }
-    
+
     _stream["WriteByte"](255);
-    
+
     return _stream;
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Paste = function(type, param)
@@ -5487,6 +5637,185 @@ Asc['asc_docs_api'].prototype.pre_Paste = function(_fonts, _images, callback)
     callback();
 };
 /************************************************************************/
+var EPageSize =
+{
+    pagesizeLetterPaper:  1,
+    pagesizeLetterSmall:  2,
+    pagesizeTabloidPaper:  3,
+    pagesizeLedgerPaper:  4,
+    pagesizeLegalPaper:  5,
+    pagesizeStatementPaper:  6,
+    pagesizeExecutivePaper:  7,
+    pagesizeA3Paper:  8,
+    pagesizeA4Paper:  9,
+    pagesizeA4SmallPaper:  10,
+    pagesizeA5Paper:  11,
+    pagesizeB4Paper:  12,
+    pagesizeB5Paper:  13,
+    pagesizeFolioPaper:  14,
+    pagesizeQuartoPaper:  15,
+    pagesizeStandardPaper1:  16,
+    pagesizeStandardPaper2:  17,
+    pagesizeNotePaper:  18,
+    pagesize9Envelope:  19,
+    pagesize10Envelope:  20,
+    pagesize11Envelope:  21,
+    pagesize12Envelope:  22,
+    pagesize14Envelope:  23,
+    pagesizeCPaper:  24,
+    pagesizeDPaper:  25,
+    pagesizeEPaper:  26,
+    pagesizeDLEnvelope:  27,
+    pagesizeC5Envelope:  28,
+    pagesizeC3Envelope:  29,
+    pagesizeC4Envelope:  30,
+    pagesizeC6Envelope:  31,
+    pagesizeC65Envelope:  32,
+    pagesizeB4Envelope:  33,
+    pagesizeB5Envelope:  34,
+    pagesizeB6Envelope:  35,
+    pagesizeItalyEnvelope:  36,
+    pagesizeMonarchEnvelope:  37,
+    pagesize6_3_4Envelope:  38,
+    pagesizeUSStandardFanfold:  39,
+    pagesizeGermanStandardFanfold:  40,
+    pagesizeGermanLegalFanfold:  41,
+    pagesizeISOB4:  42,
+    pagesizeJapaneseDoublePostcard:  43,
+    pagesizeStandardPaper3:  44,
+    pagesizeStandardPaper4:  45,
+    pagesizeStandardPaper5:  46,
+    pagesizeInviteEnvelope:  47,
+    pagesizeLetterExtraPaper:  50,
+    pagesizeLegalExtraPaper:  51,
+    pagesizeTabloidExtraPaper:  52,
+    pagesizeA4ExtraPaper:  53,
+    pagesizeLetterTransversePaper:  54,
+    pagesizeA4TransversePaper:  55,
+    pagesizeLetterExtraTransversePaper:  56,
+    pagesizeSuperA_SuperA_A4Paper:  57,
+    pagesizeSuperB_SuperB_A3Paper:  58,
+    pagesizeLetterPlusPaper:  59,
+    pagesizeA4PlusPaper:  60,
+    pagesizeA5TransversePaper:  61,
+    pagesizeJISB5TransversePaper:  62,
+    pagesizeA3ExtraPaper:  63,
+    pagesizeA5ExtraPaper:  64,
+    pagesizeISOB5ExtraPaper:  65,
+    pagesizeA2Paper:  66,
+    pagesizeA3TransversePaper:  67,
+    pagesizeA3ExtraTransversePaper:  68
+};
+var DocumentPageSize = new function() {
+    this.oSizes = [
+        {id:EPageSize.pagesizeLetterPaper, w_mm: 215.9, h_mm: 279.4},
+        {id:EPageSize.pagesizeLetterSmall, w_mm: 215.9, h_mm: 279.4},
+        {id:EPageSize.pagesizeTabloidPaper, w_mm: 279.4, h_mm: 431.7},
+        {id:EPageSize.pagesizeLedgerPaper, w_mm: 431.8, h_mm: 279.4},
+        {id:EPageSize.pagesizeLegalPaper, w_mm: 215.9, h_mm: 355.6},
+        {id:EPageSize.pagesizeStatementPaper, w_mm: 495.3, h_mm: 215.9},
+        {id:EPageSize.pagesizeExecutivePaper, w_mm: 184.2, h_mm: 266.7},
+        {id:EPageSize.pagesizeA3Paper, w_mm: 297, h_mm: 420.1},
+        {id:EPageSize.pagesizeA4Paper, w_mm: 210, h_mm: 297},
+        {id:EPageSize.pagesizeA4SmallPaper, w_mm: 210, h_mm: 297},
+        {id:EPageSize.pagesizeA5Paper, w_mm: 148.1, h_mm: 209.9},
+        {id:EPageSize.pagesizeB4Paper, w_mm: 250, h_mm: 353},
+        {id:EPageSize.pagesizeB5Paper, w_mm: 176, h_mm: 250.1},
+        {id:EPageSize.pagesizeFolioPaper, w_mm: 215.9, h_mm: 330.2},
+        {id:EPageSize.pagesizeQuartoPaper, w_mm: 215, h_mm: 275},
+        {id:EPageSize.pagesizeStandardPaper1, w_mm: 254, h_mm: 355.6},
+        {id:EPageSize.pagesizeStandardPaper2, w_mm: 279.4, h_mm: 431.8},
+        {id:EPageSize.pagesizeNotePaper, w_mm: 215.9, h_mm: 279.4},
+        {id:EPageSize.pagesize9Envelope, w_mm: 98.4, h_mm: 225.4},
+        {id:EPageSize.pagesize10Envelope, w_mm: 104.8, h_mm: 241.3},
+        {id:EPageSize.pagesize11Envelope, w_mm: 114.3, h_mm: 263.5},
+        {id:EPageSize.pagesize12Envelope, w_mm: 120.7, h_mm: 279.4},
+        {id:EPageSize.pagesize14Envelope, w_mm: 127, h_mm: 292.1},
+        {id:EPageSize.pagesizeCPaper, w_mm: 431.8, h_mm: 558.8},
+        {id:EPageSize.pagesizeDPaper, w_mm: 558.8, h_mm: 863.6},
+        {id:EPageSize.pagesizeEPaper, w_mm: 863.6, h_mm: 1117.6},
+        {id:EPageSize.pagesizeDLEnvelope, w_mm: 110.1, h_mm: 220.1},
+        {id:EPageSize.pagesizeC5Envelope, w_mm: 162, h_mm: 229},
+        {id:EPageSize.pagesizeC3Envelope, w_mm: 324, h_mm: 458},
+        {id:EPageSize.pagesizeC4Envelope, w_mm: 229, h_mm: 324},
+        {id:EPageSize.pagesizeC6Envelope, w_mm: 114, h_mm: 162},
+        {id:EPageSize.pagesizeC65Envelope, w_mm: 114, h_mm: 229},
+        {id:EPageSize.pagesizeB4Envelope, w_mm: 250, h_mm: 353},
+        {id:EPageSize.pagesizeB5Envelope, w_mm: 176, h_mm: 250},
+        {id:EPageSize.pagesizeB6Envelope, w_mm: 176, h_mm: 125},
+        {id:EPageSize.pagesizeItalyEnvelope, w_mm: 110, h_mm: 230},
+        {id:EPageSize.pagesizeMonarchEnvelope, w_mm: 98.4, h_mm: 190.5},
+        {id:EPageSize.pagesize6_3_4Envelope, w_mm: 92.1, h_mm: 165.1},
+        {id:EPageSize.pagesizeUSStandardFanfold, w_mm: 377.8, h_mm: 279.4},
+        {id:EPageSize.pagesizeGermanStandardFanfold, w_mm: 215.9, h_mm: 304.8},
+        {id:EPageSize.pagesizeGermanLegalFanfold, w_mm: 215.9, h_mm: 330.2},
+        {id:EPageSize.pagesizeISOB4, w_mm: 250, h_mm: 353},
+        {id:EPageSize.pagesizeJapaneseDoublePostcard, w_mm: 200, h_mm: 148},
+        {id:EPageSize.pagesizeStandardPaper3, w_mm: 228.6, h_mm: 279.4},
+        {id:EPageSize.pagesizeStandardPaper4, w_mm: 254, h_mm: 279.4},
+        {id:EPageSize.pagesizeStandardPaper5, w_mm: 381, h_mm: 279.4},
+        {id:EPageSize.pagesizeInviteEnvelope, w_mm: 220, h_mm: 220},
+        {id:EPageSize.pagesizeLetterExtraPaper, w_mm: 235.6, h_mm: 304.8},
+        {id:EPageSize.pagesizeLegalExtraPaper, w_mm: 235.6, h_mm: 381},
+        {id:EPageSize.pagesizeTabloidExtraPaper, w_mm: 296.9, h_mm: 457.2},
+        {id:EPageSize.pagesizeA4ExtraPaper, w_mm: 236, h_mm: 322},
+        {id:EPageSize.pagesizeLetterTransversePaper, w_mm: 210.2, h_mm: 279.4},
+        {id:EPageSize.pagesizeA4TransversePaper, w_mm: 210, h_mm: 297},
+        {id:EPageSize.pagesizeLetterExtraTransversePaper, w_mm: 235.6, h_mm: 304.8},
+        {id:EPageSize.pagesizeSuperA_SuperA_A4Paper, w_mm: 227, h_mm: 356},
+        {id:EPageSize.pagesizeSuperB_SuperB_A3Paper, w_mm: 305, h_mm: 487},
+        {id:EPageSize.pagesizeLetterPlusPaper, w_mm: 215.9, h_mm: 12.69},
+        {id:EPageSize.pagesizeA4PlusPaper, w_mm: 210, h_mm: 330},
+        {id:EPageSize.pagesizeA5TransversePaper, w_mm: 148, h_mm: 210},
+        {id:EPageSize.pagesizeJISB5TransversePaper, w_mm: 182, h_mm: 257},
+        {id:EPageSize.pagesizeA3ExtraPaper, w_mm: 322, h_mm: 445},
+        {id:EPageSize.pagesizeA5ExtraPaper, w_mm: 174, h_mm: 235},
+        {id:EPageSize.pagesizeISOB5ExtraPaper, w_mm: 201, h_mm: 276},
+        {id:EPageSize.pagesizeA2Paper, w_mm: 420, h_mm: 594},
+        {id:EPageSize.pagesizeA3TransversePaper, w_mm: 297, h_mm: 420},
+        {id:EPageSize.pagesizeA3ExtraTransversePaper, w_mm: 322, h_mm: 445}
+    ];
+    this.getSizeByWH = function(widthMm, heightMm)
+    {
+        for( var index in this.oSizes)
+        {
+            var item = this.oSizes[index];
+            if(widthMm == item.w_mm && heightMm == item.h_mm)
+                return item;
+        }
+        return this.oSizes[8];//A4
+    };
+    this.getSizeById = function(id)
+    {
+        for( var index in this.oSizes)
+        {
+            var item = this.oSizes[index];
+            if(id == item.id)
+                return item;
+        }
+        return this.oSizes[8];//A4
+    };
+};
+
+Asc['asc_docs_api'].prototype.openDocument = function(sData)
+{
+  // var version;
+  //
+  // if (sData.changes && this.VersionHistory)
+  // {
+  //   this.VersionHistory.changes = sData.changes;
+  //   this.VersionHistory.applyChanges(this);
+  // }
+
+  _api.asc_nativeOpenFile(sData.data);
+
+  window["native"]["onEndLoadingFile"]();
+
+  if (_api.NativeAfterLoad)
+    _api.NativeAfterLoad();
+
+  window["native"]["onEndLoadingFile"]();
+};
 
 // chat styles
 AscCommon.ChartPreviewManager.prototype.clearPreviews = function()
