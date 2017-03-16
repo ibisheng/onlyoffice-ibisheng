@@ -2806,11 +2806,8 @@ CDocumentContent.prototype.Remove                             = function(Count, 
 {
     if (true === this.ApplyToAll)
     {
-    	var oNewPara = new Paragraph(this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true);
-    	oNewPara.Correct_Content();
-
         this.Internal_Content_RemoveAll();
-        this.Internal_Content_Add(0, oNewPara);
+        this.Internal_Content_Add(0, this.private_CreateNewParagraph());
 
         this.CurPos =
         {
@@ -2953,7 +2950,7 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                         {
                             if (true === bOnTextAdd && type_Table === this.Content[StartPos + 1].Get_Type() && type_Table === this.Content[StartPos].Get_Type())
                             {
-                                this.Internal_Content_Add(StartPos + 1, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+                                this.Internal_Content_Add(StartPos + 1, this.private_CreateNewParagraph());
                                 this.CurPos.ContentPos = StartPos + 1;
                                 this.Content[StartPos + 1].Cursor_MoveToStartPos();
                             }
@@ -2981,7 +2978,7 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                                 this.Internal_Content_Remove(StartPos + 1, EndPos - StartPos - 1);
 
                             if (type_Table === this.Content[StartPos + 1].Get_Type() && true === bOnTextAdd)
-                                this.Internal_Content_Add(StartPos + 1, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+                                this.Internal_Content_Add(StartPos + 1, this.private_CreateNewParagraph());
 
                             // Встаем в начало параграфа
                             this.CurPos.ContentPos = StartPos + 1;
@@ -3013,7 +3010,7 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                         this.Internal_Content_Remove(StartPos, EndPos - StartPos);
 
                         if (type_Table === this.Content[StartPos].Get_Type() && true === bOnTextAdd)
-                            this.Internal_Content_Add(StartPos, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+                            this.Internal_Content_Add(StartPos, this.private_CreateNewParagraph());
 
                         // Встаем в начало параграфа
                         this.CurPos.ContentPos = StartPos;
@@ -3031,7 +3028,7 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                                 this.Internal_Content_Remove(StartPos, EndPos - StartPos);
 
                             if (type_Table === this.Content[StartPos].Get_Type() && true === bOnTextAdd)
-                                this.Internal_Content_Add(StartPos, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+                                this.Internal_Content_Add(StartPos, this.private_CreateNewParagraph());
 
                             this.CurPos.ContentPos = StartPos;
                             this.Content[StartPos].Cursor_MoveToStartPos();
@@ -3042,8 +3039,7 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                             // При таком удалении надо убедиться, что в документе останется хотя бы один элемент
                             if (0 === StartPos && (EndPos - StartPos + 1) >= this.Content.length)
                             {
-                                var NewPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, this.XLimit, this.YLimit, this.bPresentation === true);
-                                this.Internal_Content_Add(0, NewPara);
+                                this.Internal_Content_Add(0, this.private_CreateNewParagraph());
                                 this.Internal_Content_Remove(1, this.Content.length - 1);
                             }
                             else
@@ -3109,8 +3105,7 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                             }
                             else if (this.Content.length === 1 && true === this.Content[0].IsEmpty() && Count > 0)
                             {
-                                var NewPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
-                                this.Internal_Content_Add(0, NewPara);
+                                this.Internal_Content_Add(0, this.private_CreateNewParagraph());
                                 this.Internal_Content_Remove(1, this.Content.length - 1);
                             }
                         }

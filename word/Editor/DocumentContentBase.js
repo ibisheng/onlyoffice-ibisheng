@@ -286,3 +286,10 @@ CDocumentContentBase.prototype.MoveCursorToNearestPos = function(oNearestPos)
 	oPara.Set_ParaContentPos(oNearestPos.ContentPos, true, -1, -1);
 	oPara.Document_SetThisElementCurrent(true);
 };
+CDocumentContentBase.prototype.private_CreateNewParagraph = function()
+{
+	var oPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+	oPara.Correct_Content();
+	oPara.Cursor_MoveToStartPos(false);
+	return oPara;
+};
