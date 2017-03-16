@@ -363,9 +363,14 @@ CImageShape.prototype.recalculateBrush = CShape.prototype.recalculateBrush;
 CImageShape.prototype.recalculatePen = function()
 {
     CShape.prototype.recalculatePen.call(this);
-    if(this.pen && AscFormat.isRealNumber(this.pen.w))
+    if(this.pen)
     {
-        this.pen.w *= 2;
+        if(AscFormat.isRealNumber(this.pen.w)){
+            this.pen.w *= 2;
+        }
+       // if(!this.pen.Fill){
+       //     this.pen = null;
+       // }
     }
 };
 
