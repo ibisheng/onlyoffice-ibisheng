@@ -979,8 +979,15 @@
 		
 		SpecialPasteButton_Show : function(props)
 		{
-			this.showSpecialPasteButton = true;
-			this.Api.asc_ShowSpecialPasteButton(props);
+			if(!props)
+			{
+				props = this.specialPasteButtonProps.props;
+			}
+			if(props)
+			{
+				this.showSpecialPasteButton = true;
+				this.Api.asc_ShowSpecialPasteButton(props);
+			}
 		},
 		
 		SpecialPasteButton_Hide : function()

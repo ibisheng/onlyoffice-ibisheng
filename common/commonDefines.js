@@ -1073,7 +1073,28 @@
 
 
 	var offlineMode = '_offline_';
+	
+	var c_oSpecialPasteProps = {
+		paste: 0,
+		pasteOnlyFormula: 1,
+		formulaNumberFormat: 2,
+		formulaAllFormatting: 3,
+		formulaWithoutBorders: 4, 
+		formulaColumnWidth: 5,
+		mergeConditionalFormating: 6, 
+		pasteOnlyValues: 7,
+		valueNumberFormat: 8,
+		valueAllFormating: 9,
+		pasteOnlyFormating: 10,
+		transpose: 11,
+		link: 12,
+		picture: 13,
+		linkedPicture: 14,
 
+		sourceformatting: 15,
+		destinationFormatting: 16
+	};
+	
 	//------------------------------------------------------------export--------------------------------------------------
 	var prot;
 	window['Asc']                          = window['Asc'] || {};
@@ -1725,7 +1746,27 @@
 	window["AscCommon"].contentchanges_Remove                = contentchanges_Remove;
 
 	window["AscCommon"].offlineMode = offlineMode;
-
+	
+	window['Asc']['c_oSpecialPasteProps'] = window['Asc'].c_oSpecialPasteProps = c_oSpecialPasteProps;
+	prot = c_oSpecialPasteProps;
+	prot['paste'] = prot.paste;
+	prot['pasteOnlyFormula'] = prot.pasteOnlyFormula;
+	prot['formulaNumberFormat'] = prot.formulaNumberFormat;
+	prot['formulaAllFormatting'] = prot.formulaAllFormatting;
+	prot['formulaWithoutBorders'] = prot.formulaWithoutBorders;
+	prot['formulaColumnWidth'] = prot.formulaColumnWidth;
+	prot['mergeConditionalFormating'] = prot.mergeConditionalFormating;
+	prot['pasteOnlyValues'] = prot.pasteOnlyValues;
+	prot['valueNumberFormat'] = prot.valueNumberFormat;
+	prot['valueAllFormating'] = prot.valueAllFormating;
+	prot['pasteOnlyFormating'] = prot.pasteOnlyFormating;
+	prot['transpose'] = prot.transpose;
+	prot['link'] = prot.link;
+	prot['picture'] = prot.picture;
+	prot['linkedPicture'] = prot.linkedPicture;
+	prot['sourceformatting'] = prot.sourceformatting;
+	prot['destinationFormatting'] = prot.destinationFormatting;
+	
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =
 		{

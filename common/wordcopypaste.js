@@ -1787,6 +1787,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
     else
 	{
 		window['AscCommon'].g_clipboardBase.Special_Paste_Start();
+		this.oDocument.Set_SelectionState(window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState);
 		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, specialPasteProps);
 	}
 }
@@ -1994,6 +1995,11 @@ PasteProcessor.prototype =
         if(nInsertLength > 0)
         {
             this.InsertInPlace(oDocument, this.aContent);
+			if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+			{
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState = this.oDocument.Get_SelectionState();
+			}
+			
             if(false == PasteElementsId.g_bIsDocumentCopyPaste)
             {
                 oDocument.Recalculate();
@@ -2017,6 +2023,20 @@ PasteProcessor.prototype =
             this.oLogicDocument.Document_UpdateInterfaceState();
             this.oLogicDocument.Document_UpdateSelectionState();
         }
+		
+		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+		{
+			var specialPasteShowOptions = new SpecialPasteShowOptions();
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
+			
+			var cellCoord = new AscCommon.asc_CRect( 0, 0, 0, 0 );
+			var sProps = Asc.c_oSpecialPasteProps;
+			var props = [sProps.paste, sProps.valueAllFormating];
+			specialPasteShowOptions.asc_setOptions(props);
+			specialPasteShowOptions.asc_setCellCoord(cellCoord);
+		}
+		
+		window['AscCommon'].g_clipboardBase.Paste_Process_End();
     },
     InsertInPlace : function(oDoc, aNewContent)
     {
@@ -2323,8 +2343,6 @@ PasteProcessor.prototype =
 					oThis.InsertInDocument();
 					if(oThis.aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
-						
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
 			};
 			
@@ -2530,8 +2548,6 @@ PasteProcessor.prototype =
 					if(aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
 					oThis.api.continueInsertDocumentUrls();
-					
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
 			}
 			
@@ -2738,8 +2754,6 @@ PasteProcessor.prototype =
 					oThis.InsertInDocument();
 					if(aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
-						
-					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
 			}
 			
