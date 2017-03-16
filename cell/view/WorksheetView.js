@@ -8882,7 +8882,7 @@
 				}
 				
 				//нужно удалить данные предыдущей вставки(нужно для удаления ф/т)
-				t.model.autoFilters.isEmptyAutoFilters(t.model.selectionRange.getLast());
+				t.model.autoFilters.isEmptyAutoFilters(t.model.selectionRange.getLast(), null, null, null, true);
 				
 				undoPreviousPaste();
 			}

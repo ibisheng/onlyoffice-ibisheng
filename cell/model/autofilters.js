@@ -1229,7 +1229,7 @@
 				}
 			},
 			
-			isEmptyAutoFilters: function(ar, insertType, exceptionArray, bConvertTableFormulaToRef)
+			isEmptyAutoFilters: function(ar, insertType, exceptionArray, bConvertTableFormulaToRef, bNotDeleteAutoFilter)
 			{
 				var worksheet = this.worksheet;
 				var activeCells = ar.clone();
@@ -1283,7 +1283,7 @@
 					return bRes;
 				};
 				
-				if(worksheet.AutoFilter)
+				if(worksheet.AutoFilter && !bNotDeleteAutoFilter)
 				{
 					changeFilter(worksheet.AutoFilter);
 				}
