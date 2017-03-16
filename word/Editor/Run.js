@@ -9106,7 +9106,7 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 	}
 	else
 	{
-		for (var nIndex = nPos; nIndex >= 0; --nIndex)
+		for (var nIndex = Math.min(nPos, this.Content.length - 1); nIndex >= 0; --nIndex)
 		{
 			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
 			{

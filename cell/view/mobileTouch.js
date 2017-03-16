@@ -145,6 +145,17 @@ function (window, undefined)
 	};
 	CMobileDelegateEditorCell.prototype.GetObjectTrack = function(x, y, page, bSelected, bText)
 	{
+		if (this.WB.getCellEditMode())
+		{
+			var _coords = this.WB.ConvertLogicToXY(x, y);
+
+			AscCommon.global_mouseEvent.KoefPixToMM = 5;
+			var _cursor = this.WB.getWorksheet().getCursorTypeFromXY(_coords.X, _coords.Y, this.Api.isViewMode);
+			AscCommon.global_mouseEvent.KoefPixToMM = 1;
+			if (_cursor.target == AscCommonExcel.c_oTargetType.MoveResizeRange)
+				return true;
+		}
+
 		return this.WB.getWorksheet().objectRender.controller.isPointInDrawingObjects3(x, y, page, bSelected, bText);
 	};
 	CMobileDelegateEditorCell.prototype.GetSelectionRectsBounds = function()

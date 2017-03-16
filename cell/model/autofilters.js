@@ -973,6 +973,7 @@
 						break;
 					case AscCH.historyitem_AutoFilter_ApplyMF:
 						this.applyAutoFilter(data.autoFiltersObject, data.activeCells);
+						this.worksheet.handlers.trigger('onFilterInfo');
 						break;
 					case AscCH.historyitem_AutoFilter_Move:
 						this._moveAutoFilters(data.moveTo, data.moveFrom);
@@ -1180,6 +1181,9 @@
 							}
 						}
 					}
+					if (AscCH.historyitem_AutoFilter_ApplyMF === type) {
+						this.worksheet.handlers.trigger('onFilterInfo');
+					}
 				}
 				else if(cloneData.Ref) //удаление таблиц / автофильтров
 				{
@@ -1229,7 +1233,7 @@
 				}
 			},
 			
-			isEmptyAutoFilters: function(ar, insertType, exceptionArray, bConvertTableFormulaToRef)
+			isEmptyAutoFilters: function(ar, insertType, exceptionArray, bConvertTableFormulaToRef, bNotDeleteAutoFilter)
 			{
 				var worksheet = this.worksheet;
 				var activeCells = ar.clone();
@@ -1283,7 +1287,7 @@
 					return bRes;
 				};
 				
-				if(worksheet.AutoFilter)
+				if(worksheet.AutoFilter && !bNotDeleteAutoFilter)
 				{
 					changeFilter(worksheet.AutoFilter);
 				}

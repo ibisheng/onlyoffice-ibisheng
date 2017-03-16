@@ -1966,6 +1966,7 @@
         if (lockDraw || this.model.workbook.bCollaborativeChanges || window['IS_NATIVE_EDITOR']) {
             return this;
         }
+		this.handlers.trigger("checkLastWork");
         this._clean();
         this._drawCorner();
         this._drawColumnHeaders(/*drawingCtx*/ undefined);
@@ -3735,6 +3736,8 @@
         if (window['IS_NATIVE_EDITOR']) {
             return;
         }
+
+		this.handlers.trigger("checkLastWork");
 
         // set clipping rect to cells area
         var ctx = this.overlayCtx;
@@ -6031,6 +6034,7 @@
     };
 
     WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
+		this.handlers.trigger("checkLastWork");
         var res, c, r, f, i, offsetX, offsetY, cellCursor;
         var sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink;
         var widthDiff = 0, heightDiff = 0, isLocked = false, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
@@ -6845,7 +6849,7 @@
         });
 
         // Показываем только данные для 2-х или более ячеек (http://bugzilla.onlyoffice.com/show_bug.cgi?id=24115)
-        if (1 < oSelectionMathInfo.countNumbers) {
+        if (1 < oSelectionMathInfo.count && 0 < oSelectionMathInfo.countNumbers) {
             // Мы должны отдавать в формате активной ячейки
 			var activeCell = this.model.selectionRange.activeCell;
             var numFormat = this.model.getRange3(activeCell.row, activeCell.col,
@@ -8878,7 +8882,7 @@
 				}
 				
 				//нужно удалить данные предыдущей вставки(нужно для удаления ф/т)
-				t.model.autoFilters.isEmptyAutoFilters(t.model.selectionRange.getLast());
+				t.model.autoFilters.isEmptyAutoFilters(t.model.selectionRange.getLast(), null, null, null, true);
 				
 				undoPreviousPaste();
 			}

@@ -1379,6 +1379,8 @@
 			},
 			"deleteColumnTablePart": function(tableName, deleted) {
 				self.dependencyFormulas.delColumnTable(tableName, deleted);
+			}, 'onFilterInfo' : function () {
+				self.handlers.trigger("asc_onFilterInfo");
 			}
 		} );
 		for(var i = 0, length = tableCustomFunc.length; i < length; ++i) {

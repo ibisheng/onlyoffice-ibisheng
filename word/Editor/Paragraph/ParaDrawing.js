@@ -865,7 +865,7 @@ ParaDrawing.prototype.CheckWH = function()
 	var yc          = this.GraphicObj.localTransform.TransformPointY(this.GraphicObj.extX / 2, this.GraphicObj.extY / 2);
 	var oBounds     = this.GraphicObj.bounds;
 	var LineCorrect = 0;
-	if (this.GraphicObj.pen)
+	if (this.GraphicObj.pen && this.GraphicObj.pen.Fill && this.GraphicObj.pen.Fill.fill)
 	{
 		LineCorrect = (this.GraphicObj.pen.w == null) ? 12700 : parseInt(this.GraphicObj.pen.w);
 		LineCorrect /= 72000.0;

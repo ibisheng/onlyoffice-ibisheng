@@ -595,135 +595,135 @@
       AscCommon.InitBrowserInputContext(this.Api, "id_target_cursor");
     }
 
-    this.cellEditor =
-      new AscCommonExcel.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont, /*handlers*/{
-        "closed": function () {
-          self._onCloseCellEditor.apply(self, arguments);
-        }, "updated": function () {
-          self._onUpdateCellEditor.apply(self, arguments);
-        }, "gotFocus": function (hasFocus) {
-          self.controller.setFocus(!hasFocus);
-        }, "updateFormulaEditMod": function () {
-          self.controller.setFormulaEditMode.apply(self.controller, arguments);
-          var ws = self.getWorksheet();
-          if (ws) {
-            if (!self.lockDraw) {
-              ws.cleanSelection();
-            }
-            for (var i in self.wsViews) {
-              self.wsViews[i].cleanFormulaRanges();
-            }
+	  this.cellEditor =
+		  new AscCommonExcel.CellEditor(this.element, this.input, this.fmgrGraphics, this.m_oFont, /*handlers*/{
+			  "closed": function () {
+				  self._onCloseCellEditor.apply(self, arguments);
+			  }, "updated": function () {
+				  self.Api.checkLastWork();
+				  self._onUpdateCellEditor.apply(self, arguments);
+			  }, "gotFocus": function (hasFocus) {
+				  self.controller.setFocus(!hasFocus);
+			  }, "updateFormulaEditMod": function () {
+				  self.controller.setFormulaEditMode.apply(self.controller, arguments);
+				  var ws = self.getWorksheet();
+				  if (ws) {
+					  if (!self.lockDraw) {
+						  ws.cleanSelection();
+					  }
+					  for (var i in self.wsViews) {
+						  self.wsViews[i].cleanFormulaRanges();
+					  }
 //            ws.cleanFormulaRanges();
-            ws.setFormulaEditMode.apply(ws, arguments);
-          }
-        }, "updateEditorState": function (state) {
-          self.handlers.trigger("asc_onEditCell", state);
-        }, "isGlobalLockEditCell": function () {
-          return self.collaborativeEditing.getGlobalLockEditCell();
-        }, "updateFormulaEditModEnd": function () {
-          if (!self.lockDraw) {
-            self.getWorksheet().updateSelection();
-          }
-        }, "newRange": function (range, ws) {
-          if (!ws) {
-            self.getWorksheet().addFormulaRange(range);
-          } else {
-            self.getWorksheet(self.model.getWorksheetIndexByName(ws)).addFormulaRange(range);
-          }
-        }, "existedRange": function (range, ws) {
-          var editRangeSheet = ws ? self.model.getWorksheetIndexByName(ws) : self.copyActiveSheet;
-          if (-1 === editRangeSheet || editRangeSheet === self.wsActive) {
-            self.getWorksheet().activeFormulaRange(range);
-          } else {
-            self.getWorksheet(editRangeSheet).removeFormulaRange(range);
-            self.getWorksheet().addFormulaRange(range);
-          }
-        }, "updateUndoRedoChanged": function (bCanUndo, bCanRedo) {
-          self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
-          self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
-        }, "applyCloseEvent": function () {
-          self.controller._onWindowKeyDown.apply(self.controller, arguments);
-        }, "isViewerMode": function () {
-          return self.controller.settings.isViewerMode;
-        }, "getFormulaRanges": function () {
-          return self.cellFormulaEnterWSOpen ? self.cellFormulaEnterWSOpen.getFormulaRanges() :
-            self.getWorksheet().getFormulaRanges();
-        }, "getCellFormulaEnterWSOpen": function () {
-          return self.cellFormulaEnterWSOpen;
-        }, "getActiveWS": function () {
-          return self.getWorksheet().model;
-        }, "setStrictClose": function (val) {
-          self.controller.setStrictClose(val);
-        }, "updateEditorSelectionInfo": function (info) {
-          self.handlers.trigger("asc_onEditorSelectionChanged", info);
-        }, "onContextMenu": function (event) {
-          self.handlers.trigger("asc_onContextMenu", event);
-        }
-      }, /*settings*/{
-        font: this.defaultFont, padding: this.defaults.worksheetView.cells.padding
-      });
+					  ws.setFormulaEditMode.apply(ws, arguments);
+				  }
+			  }, "updateEditorState": function (state) {
+				  self.handlers.trigger("asc_onEditCell", state);
+			  }, "isGlobalLockEditCell": function () {
+				  return self.collaborativeEditing.getGlobalLockEditCell();
+			  }, "updateFormulaEditModEnd": function () {
+				  if (!self.lockDraw) {
+					  self.getWorksheet().updateSelection();
+				  }
+			  }, "newRange": function (range, ws) {
+				  if (!ws) {
+					  self.getWorksheet().addFormulaRange(range);
+				  } else {
+					  self.getWorksheet(self.model.getWorksheetIndexByName(ws)).addFormulaRange(range);
+				  }
+			  }, "existedRange": function (range, ws) {
+				  var editRangeSheet = ws ? self.model.getWorksheetIndexByName(ws) : self.copyActiveSheet;
+				  if (-1 === editRangeSheet || editRangeSheet === self.wsActive) {
+					  self.getWorksheet().activeFormulaRange(range);
+				  } else {
+					  self.getWorksheet(editRangeSheet).removeFormulaRange(range);
+					  self.getWorksheet().addFormulaRange(range);
+				  }
+			  }, "updateUndoRedoChanged": function (bCanUndo, bCanRedo) {
+				  self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
+				  self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
+			  }, "applyCloseEvent": function () {
+				  self.controller._onWindowKeyDown.apply(self.controller, arguments);
+			  }, "isViewerMode": function () {
+				  return self.controller.settings.isViewerMode;
+			  }, "getFormulaRanges": function () {
+				  return self.cellFormulaEnterWSOpen ? self.cellFormulaEnterWSOpen.getFormulaRanges() :
+					  self.getWorksheet().getFormulaRanges();
+			  }, "getCellFormulaEnterWSOpen": function () {
+				  return self.cellFormulaEnterWSOpen;
+			  }, "getActiveWS": function () {
+				  return self.getWorksheet().model;
+			  }, "setStrictClose": function (val) {
+				  self.controller.setStrictClose(val);
+			  }, "updateEditorSelectionInfo": function (info) {
+				  self.handlers.trigger("asc_onEditorSelectionChanged", info);
+			  }, "onContextMenu": function (event) {
+				  self.handlers.trigger("asc_onContextMenu", event);
+			  }
+		  }, /*settings*/{
+			  font: this.defaultFont, padding: this.defaults.worksheetView.cells.padding
+		  });
 
-    this.wsViewHandlers = new AscCommonExcel.asc_CHandlersList(/*handlers*/{
-      "getViewerMode": function() {
-        return self.controller.getViewerMode ? self.controller.getViewerMode() : true;
-      }, "reinitializeScroll": function() {
-        self.controller.reinitializeScroll(/*All*/);
-      }, "reinitializeScrollY": function() {
-        self.controller.reinitializeScroll(/*vertical*/1);
-      }, "reinitializeScrollX": function() {
-        self.controller.reinitializeScroll(/*horizontal*/2);
-      }, "selectionChanged": function() {
-        self._onWSSelectionChanged();
-      }, "selectionNameChanged": function() {
-        self._onSelectionNameChanged.apply(self, arguments);
-      }, "selectionMathInfoChanged": function() {
-        self._onSelectionMathInfoChanged.apply(self, arguments);
-      },'onFilterInfo': function(countFilter, countRecords) {
-        self.handlers.trigger("asc_onFilterInfo", countFilter, countRecords);
-      }, "onErrorEvent": function(errorId, level) {
-        self.handlers.trigger("asc_onError", errorId, level);
-      }, "slowOperation": function(isStart) {
-        (isStart ? self.Api.sync_StartAction : self.Api.sync_EndAction).call(self.Api, c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);
-      }, "setAutoFiltersDialog": function(arrVal) {
-        self.handlers.trigger("asc_onSetAFDialog", arrVal);
-      }, "selectionRangeChanged": function(val) {
-        self.handlers.trigger("asc_onSelectionRangeChanged", val);
-      }, "onRenameCellTextEnd": function(countFind, countReplace) {
-        self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);
-      }, 'onStopFormatPainter': function() {
-        self._onStopFormatPainter();
-      }, 'getRangeFormatPainter': function() {
-        return self.rangeFormatPainter;
-      },"onDocumentPlaceChanged": function() {
-        self._onDocumentPlaceChanged();
-      }, "updateSheetViewSettings": function() {
-        self.handlers.trigger("asc_onUpdateSheetViewSettings");
-      }, "onScroll": function(d) {
-        self.controller.scroll(d);
-      }, "getLockDefNameManagerStatus": function() {
-        return self.defNameAllowCreate;
-      }, 'isActive': function() {
-        return (-1 === self.copyActiveSheet || self.wsActive === self.copyActiveSheet);
-      },
-		"getCellEditMode": function() {
-			return self.isCellEditMode;
-		},
-		"drawMobileSelection" : function(color) {
-      		if (self.MobileTouchManager)
-			{
-				var _canvas = self.getWorksheet().objectRender.getDrawingCanvas();
-				if (_canvas)
-					self.MobileTouchManager.CheckSelect(_canvas.trackOverlay, color);
-			}
-		},
-		"showSpecialPasteOptions": function(val) {
-			self.handlers.trigger("asc_onShowSpecialPasteOptions", val);
-			if(!window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
-			{
-				window['AscCommon'].g_clipboardBase.showSpecialPasteButton = true;
-			}
-		}
-    });
+	  this.wsViewHandlers = new AscCommonExcel.asc_CHandlersList(/*handlers*/{
+		  "getViewerMode": function () {
+			  return self.controller.getViewerMode ? self.controller.getViewerMode() : true;
+		  }, "reinitializeScroll": function () {
+			  self.controller.reinitializeScroll(/*All*/);
+		  }, "reinitializeScrollY": function () {
+			  self.controller.reinitializeScroll(/*vertical*/1);
+		  }, "reinitializeScrollX": function () {
+			  self.controller.reinitializeScroll(/*horizontal*/2);
+		  }, "selectionChanged": function () {
+			  self._onWSSelectionChanged();
+		  }, "selectionNameChanged": function () {
+			  self._onSelectionNameChanged.apply(self, arguments);
+		  }, "selectionMathInfoChanged": function () {
+			  self._onSelectionMathInfoChanged.apply(self, arguments);
+		  }, 'onFilterInfo': function (countFilter, countRecords) {
+			  self.handlers.trigger("asc_onFilterInfo", countFilter, countRecords);
+		  }, "onErrorEvent": function (errorId, level) {
+			  self.handlers.trigger("asc_onError", errorId, level);
+		  }, "slowOperation": function (isStart) {
+			  (isStart ? self.Api.sync_StartAction : self.Api.sync_EndAction).call(self.Api,
+				  c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);
+		  }, "setAutoFiltersDialog": function (arrVal) {
+			  self.handlers.trigger("asc_onSetAFDialog", arrVal);
+		  }, "selectionRangeChanged": function (val) {
+			  self.handlers.trigger("asc_onSelectionRangeChanged", val);
+		  }, "onRenameCellTextEnd": function (countFind, countReplace) {
+			  self.handlers.trigger("asc_onRenameCellTextEnd", countFind, countReplace);
+		  }, 'onStopFormatPainter': function () {
+			  self._onStopFormatPainter();
+		  }, 'getRangeFormatPainter': function () {
+			  return self.rangeFormatPainter;
+		  }, "onDocumentPlaceChanged": function () {
+			  self._onDocumentPlaceChanged();
+		  }, "updateSheetViewSettings": function () {
+			  self.handlers.trigger("asc_onUpdateSheetViewSettings");
+		  }, "onScroll": function (d) {
+			  self.controller.scroll(d);
+		  }, "getLockDefNameManagerStatus": function () {
+			  return self.defNameAllowCreate;
+		  }, 'isActive': function () {
+			  return (-1 === self.copyActiveSheet || self.wsActive === self.copyActiveSheet);
+		  }, "getCellEditMode": function () {
+			  return self.isCellEditMode;
+		  }, "drawMobileSelection": function (color) {
+			  if (self.MobileTouchManager) {
+				  var _canvas = self.getWorksheet().objectRender.getDrawingCanvas();
+				  if (_canvas) {
+					  self.MobileTouchManager.CheckSelect(_canvas.trackOverlay, color);
+				  }
+			  }
+		  }, "showSpecialPasteOptions": function (val) {
+			  self.handlers.trigger("asc_onShowSpecialPasteOptions", val);
+			  if (!window['AscCommon'].g_clipboardBase.showSpecialPasteButton) {
+				  window['AscCommon'].g_clipboardBase.showSpecialPasteButton = true;
+			  }
+		  }, 'checkLastWork': function () {
+			  self.Api.checkLastWork();
+		  }
+	  });
 
     this.model.handlers.add("cleanCellCache", function(wsId, oRanges, bLockDraw, updateHeight) {
       var ws = self.getWorksheetById(wsId, true);

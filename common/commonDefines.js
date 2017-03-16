@@ -1216,6 +1216,8 @@
 	prot['MailMergeLoadFile']                = prot.MailMergeLoadFile;
 	prot['DownloadMerge']                    = prot.DownloadMerge;
 	prot['SendMailMerge']                    = prot.SendMailMerge;
+	prot['ForceSaveButton']                  = prot.ForceSaveButton;
+	prot['ForceSaveTimeout']                 = prot.ForceSaveTimeout;
 	window['Asc']['c_oAscAdvancedOptionsID'] = window['Asc'].c_oAscAdvancedOptionsID = c_oAscAdvancedOptionsID;
 	prot                                         = c_oAscAdvancedOptionsID;
 	prot['CSV']                                  = prot.CSV;

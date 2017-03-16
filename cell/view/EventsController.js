@@ -1023,9 +1023,11 @@
 					}
 
 					if (event.altKey) {
-						t.handlers.trigger('addFunction', 'SUM', Asc.c_oAscPopUpSelectorType.Func, true);
+						this.handlers.trigger('addFunction',
+							AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale['SUM'] :
+								'SUM', Asc.c_oAscPopUpSelectorType.Func, true);
 					} else {
-						t.skipKeyPress = false;
+						this.skipKeyPress = false;
 					}
 					return true;
 
@@ -1035,7 +1037,7 @@
 					return result;
 
 				default:
-					t.skipKeyPress = false;
+					this.skipKeyPress = false;
 					return true;
 
 			} // end of switch
