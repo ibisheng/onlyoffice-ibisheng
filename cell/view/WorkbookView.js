@@ -1393,8 +1393,8 @@
     }
   };
 
-  WorkbookView.prototype._onStopCellEditing = function() {
-    return this.cellEditor.close(true);
+  WorkbookView.prototype._onStopCellEditing = function(cancel) {
+    return this.cellEditor.close(!cancel);
   };
 
   WorkbookView.prototype._onCloseCellEditor = function() {
@@ -1914,11 +1914,11 @@
   };
 
   // Останавливаем ввод данных в редакторе ввода
-  WorkbookView.prototype.closeCellEditor = function() {
+  WorkbookView.prototype.closeCellEditor = function(cancel) {
     var ws = this.getWorksheet();
     // Останавливаем ввод данных в редакторе ввода
     if (ws.getCellEditMode() && !this.cellEditor.formulaIsOperator() /*&& !this.cellFormulaEnterWSOpen*/) {
-      this._onStopCellEditing();
+      this._onStopCellEditing(cancel);
     }
   };
 
