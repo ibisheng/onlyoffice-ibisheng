@@ -973,6 +973,7 @@
 						break;
 					case AscCH.historyitem_AutoFilter_ApplyMF:
 						this.applyAutoFilter(data.autoFiltersObject, data.activeCells);
+						this.worksheet.handlers.trigger('onFilterInfo');
 						break;
 					case AscCH.historyitem_AutoFilter_Move:
 						this._moveAutoFilters(data.moveTo, data.moveFrom);
@@ -1179,6 +1180,9 @@
 								worksheet.AutoFilter = cloneData;
 							}
 						}
+					}
+					if (AscCH.historyitem_AutoFilter_ApplyMF === type) {
+						this.worksheet.handlers.trigger('onFilterInfo');
 					}
 				}
 				else if(cloneData.Ref) //удаление таблиц / автофильтров
