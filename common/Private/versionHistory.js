@@ -107,6 +107,7 @@
   prot["asc_setCurrentChangeId"] = prot.asc_setCurrentChangeId;
   prot["asc_setArrColors"] = prot.asc_setArrColors;
   prot["asc_setToken"] = prot.asc_setToken;
+  prot["asc_setIsRequested"] = prot.asc_setIsRequested;
 })(window);
 
 AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
