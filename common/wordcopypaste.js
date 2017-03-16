@@ -39,6 +39,7 @@
 function(window, undefined) {
 
 // Import
+var prot;
 var g_fontApplication = AscFonts.g_fontApplication;
 var CFont = AscFonts.CFont;
   
@@ -61,8 +62,6 @@ var c_oAscError = Asc.c_oAscError;
 var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscShdNil = Asc.c_oAscShdNil;
 var c_oAscXAlign = Asc.c_oAscXAlign;
-
-var g_clipboardBase = window['AscCommon'].g_clipboardBase;
 
 function CDocumentReaderMode()
 {
@@ -1787,7 +1786,7 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 	}
     else
 	{
-		g_clipboardBase.Special_Paste_Start();
+		window['AscCommon'].g_clipboardBase.Special_Paste_Start();
 		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, specialPasteProps);
 	}
 }
@@ -2325,7 +2324,7 @@ PasteProcessor.prototype =
 					if(oThis.aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
 						
-					g_clipboardBase.Paste_Process_End();
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
 			};
 			
@@ -2386,7 +2385,7 @@ PasteProcessor.prototype =
 						presentation.Check_CursorMoveRight();
 						presentation.Document_UpdateInterfaceState();
 						
-						g_clipboardBase.Paste_Process_End();
+						window['AscCommon'].g_clipboardBase.Paste_Process_End();
 					}
 				};
 				
@@ -2532,7 +2531,7 @@ PasteProcessor.prototype =
 						oThis.api.GenerateStyles();
 					oThis.api.continueInsertDocumentUrls();
 					
-					g_clipboardBase.Paste_Process_End();
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
 			}
 			
@@ -2667,7 +2666,7 @@ PasteProcessor.prototype =
 					presentation.Check_CursorMoveRight();
 					presentation.Document_UpdateInterfaceState();
 					
-					g_clipboardBase.Paste_Process_End();
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
 			}
 			
@@ -2740,7 +2739,7 @@ PasteProcessor.prototype =
 					if(aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
 						
-					g_clipboardBase.Paste_Process_End();
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
 			}
 			
@@ -3004,7 +3003,7 @@ PasteProcessor.prototype =
 							presentation.Check_CursorMoveRight();
 							presentation.Document_UpdateInterfaceState();
 							
-							g_clipboardBase.Paste_Process_End();
+							window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						}
 					};
 
@@ -3040,7 +3039,7 @@ PasteProcessor.prototype =
 							presentation.Recalculate();
 							presentation.Document_UpdateInterfaceState();
 							
-							g_clipboardBase.Paste_Process_End();
+							window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						}
 					};
 
@@ -3275,7 +3274,7 @@ PasteProcessor.prototype =
 						presentation.Recalculate();
 						presentation.Document_UpdateInterfaceState();
 						
-						g_clipboardBase.Paste_Process_End();
+						window['AscCommon'].g_clipboardBase.Paste_Process_End();
 					};
 
 					var image_objects = loader.End_UseFullUrl();
@@ -7677,6 +7676,21 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
         _api.pre_Paste(aPrepeareFonts, _images, _callback);
 }
 
+function SpecialPasteShowOptions()
+{
+	this.options = [];
+	this.cellCoord = null;
+}
+
+SpecialPasteShowOptions.prototype = {
+	constructor: SpecialPasteShowOptions,
+	
+	asc_setCellCoord : function(val) { this.cellCoord = val; },
+	asc_setOptions : function(val) { this.options = val; },
+	
+	asc_getCellCoord : function() { return this.cellCoord; },
+	asc_getOptions : function(val) { return this.options; }
+};
 
   //---------------------------------------------------------export---------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
@@ -7689,6 +7703,11 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
   window["AscCommon"].Editor_Paste_Exec = Editor_Paste_Exec;
   window["AscCommon"].sendImgUrls = sendImgUrls;
   window["AscCommon"].PasteProcessor = PasteProcessor;
-
+  
   window["AscCommon"].PasteElementsId = PasteElementsId;
+  
+  window["Asc"]["SpecialPasteShowOptions"] = window["Asc"].SpecialPasteShowOptions = SpecialPasteShowOptions;
+  prot									 = SpecialPasteShowOptions.prototype;
+  prot["asc_getCellCoord"]				 	= prot.asc_getCellCoord;
+  prot["asc_getOptions"]					= prot.asc_getOptions;
 })(window);

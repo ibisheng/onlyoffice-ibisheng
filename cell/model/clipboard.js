@@ -58,7 +58,7 @@
 				return n;
 			return "rgb(" + (n >> 16 & 0xFF) + "," + (n >> 8 & 0xFF) + "," + (n & 0xFF) + ")";
 		}
-		
+		//TODO убрать дубликат!!!
 		function SpecialPasteShowOptions()
 		{
 			this.options = [];
@@ -4398,6 +4398,7 @@
 		prot									 = СSpecialPasteProps.prototype;
 		prot["asc_setProps"]				     = prot.asc_setProps;
 		
+		//TODO убрать дубликат(в wordcopypaste такая же функция)
 		window["Asc"]["SpecialPasteShowOptions"] = window["Asc"].SpecialPasteShowOptions = SpecialPasteShowOptions;
 		prot									 = SpecialPasteShowOptions.prototype;
 		prot["asc_getCellCoord"]				 = prot.asc_getCellCoord;

@@ -965,7 +965,7 @@
 		
 		Paste_Process_End : function()
 		{
-			this.pasteEnd = false;
+			this.pasteStart = false;
 			//процесс специальной вставки заканчивается вместе с общей вставкой
 			if(this.specialPasteStart)
 			{
