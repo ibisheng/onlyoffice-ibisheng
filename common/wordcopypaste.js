@@ -1782,12 +1782,23 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
 	if(!specialPasteProps)
 	{
+		window['AscCommon'].g_clipboardBase.specialPasteData.pastebin = pastebin;
+		window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay = nodeDisplay;
+		window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary = onlyBinary;
+		//window['AscCommon'].g_clipboardBase.specialPasteData.text_data = text_data;
+		
 		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
 	}
     else
-	{
+	{	
 		window['AscCommon'].g_clipboardBase.Special_Paste_Start();
 		this.oDocument.Set_SelectionState(window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState);
+		
+		this.props = specialPasteProps;
+		
+		pastebin = window['AscCommon'].g_clipboardBase.specialPasteData.pastebin;
+		nodeDisplay = window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay;
+		onlyBinary = window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary;
 		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary, specialPasteProps);
 	}
 }
@@ -2031,8 +2042,15 @@ PasteProcessor.prototype =
 			
 			var cellCoord = new AscCommon.asc_CRect( 0, 0, 0, 0 );
 			var sProps = Asc.c_oSpecialPasteProps;
-			var props = [sProps.paste, sProps.valueAllFormating];
+			var props = [sProps.paste, sProps.pasteOnlyValues];
 			specialPasteShowOptions.asc_setOptions(props);
+			
+			var cursorPos = this.oLogicDocument.Cursor_GetPos();
+			var _Y = cursorPos.Y;
+			var _X = cursorPos.X;
+			var _PageNum = this.oLogicDocument.CurPage;
+
+			var Coords = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum)
 			specialPasteShowOptions.asc_setCellCoord(cellCoord);
 		}
 		
