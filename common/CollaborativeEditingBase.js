@@ -950,7 +950,9 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         var mapGrObjects        = {};
         var mapSlides           = {};
         var mapLayouts          = {};
-        var bChangedLayout   = false;
+        var bChangedLayout      = false;
+        var bAddSlides          = false;
+        var mapAddedSlides      = {};
         for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
         {
             var oChange = arrReverseChanges[nIndex];
@@ -981,6 +983,14 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                     mapLayouts[oClass.Get_Id()] = oClass;
                     bChangedLayout = true;
                 }
+                else if(typeof CPresentation !== "undefined" && oClass instanceof CPresentation){
+                    if(oChange.Type === AscDFH.historyitem_Presentation_RemoveSlide || oChange.Type === AscDFH.historyitem_Presentation_AddSlide){
+                        bAddSlides = true;
+                        for(var i = 0; i < oChange.Items.length; ++i){
+                            mapAddedSlides[oChange.Items[i].Get_Id()] = oChange.Items[i];
+                        }
+                    }
+                }
             }
         }
 
@@ -988,6 +998,20 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         // историю. Сохраняем список изменений в новой точке, удаляем данную точку.
         var oHistory = AscCommon.History;
         oHistory.CreateNewPointForCollectChanges();
+        if(bAddSlides){
+            for(var i = oLogicDocument.Slides.length - 1; i > -1; --i){
+                if(mapAddedSlides[oLogicDocument.Slides[i].Get_Id()] && !oLogicDocument.Slides[i].Layout){
+                    oLogicDocument.removeSlide(i);
+                }
+            }
+        }
+
+        for(var sId in mapSlides){
+            if(mapSlides.hasOwnProperty(sId)){
+                mapSlides[sId].correctContent();
+            }
+        }
+
         for(var sId in mapSlides){
             if(mapSlides.hasOwnProperty(sId)){
                 mapSlides[sId].correctContent();
@@ -1004,6 +1028,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                 }
             }
         }
+
 
         for(var sId in mapGrObjects){
             var oShape = mapGrObjects[sId];
