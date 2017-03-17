@@ -2130,8 +2130,9 @@ PasteProcessor.prototype =
 				
 				for(var j = 0; j < paragraph.Content.length; j++)
 				{
-					paragraph.Content[j].Clear_TextFormatting()
-					paragraph.Content[j].Clear_TextPr();
+					paragraph.Content[j].Clear_TextFormatting();
+					var NewTextPr = new CTextPr();
+					paragraph.Content[j].Set_Pr( NewTextPr );
 				}
 				
 				break;

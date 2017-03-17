@@ -1797,7 +1797,7 @@ background-repeat: no-repeat;\
 		if (!_logicDoc)
 			return;
 		
-		//TODO пересмотреть проверку лока и добавление новой тчоки(AscDFH.historydescription_Document_PasteHotKey)
+		//TODO пересмотреть проверку лока и добавление новой точки(AscDFH.historydescription_Document_PasteHotKey)
 		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
 		{
 			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
