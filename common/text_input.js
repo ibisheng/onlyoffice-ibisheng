@@ -1778,7 +1778,9 @@
 				var _input = window['AscCommon'].g_inputContext;
 				if (_input.compositionState == c_oCompositionState.process)
 				{
-					//_input.apiCompositeEnd();
+					if (_input.UseValueInComposition)
+						_input.apiCompositeEnd();
+
 					_input.clear();
 				}
 
