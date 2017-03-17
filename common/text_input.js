@@ -167,6 +167,10 @@
 		this.virtualKeyboardClickPrevent = false;
 
 		this.AndroidKeyboardDetectBackspace = false;
+
+		// если этот флаг включен - то мы не следим за датой в onCompositionUpdate
+		// а смотрим .value на старте и энде. а промежуток - разница между этим
+		this.UseValueInComposition = AscCommon.AscBrowser.isAndroid;
 	}
 
 	CTextInput.prototype =
@@ -647,6 +651,20 @@
 			}
 
 			var _value = this.getAreaValue();
+			if (this.UseValueInComposition)
+			{
+				if (c_oCompositionState.process == this.compositionState)
+				{
+					var _data = _value.substring(this.ieNonCompositionPrefix.length);
+					this.onCompositionUpdate(e, false, _data, false);
+
+					if (this.TextInputAfterComposition)
+					{
+						this.onCompositionEnd(e, _data);
+					}
+				}
+			}
+
 			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "" && _value != this.ieNonCompositionPrefixConfirm)
 			{
 				ti_console_log("ti: external input");
@@ -1240,6 +1258,9 @@
 			//console.log("[apiCompositeStart]");
 			this.Api.Begin_CompositeInput();
 			this.compositionStateApi = c_oCompositionState.process;
+
+			if (this.UseValueInComposition)
+				this.ieNonCompositionPrefix = this.getAreaValue();
 		},
 
 		apiCompositeReplace : function(_value)
@@ -1283,6 +1304,12 @@
 			if (this.isSystem)
 			{
 				this.isChromeKeysNoKeyPressPresent = false;
+				return;
+			}
+
+			if (this.UseValueInComposition)
+			{
+				this.apiCompositeStart();
 				return;
 			}
 
@@ -1339,6 +1366,12 @@
 			if (this.isSystem)
 			{
 				this.isChromeKeysNoKeyPressPresent = false;
+				return;
+			}
+
+			if (this.UseValueInComposition && undefined === _data)
+			{
+				this.compositionState = c_oCompositionState.process;
 				return;
 			}
 
@@ -1614,6 +1647,13 @@
 				return;
 			}
 
+			var isUseData = (_data !== undefined);
+			if (this.UseValueInComposition)
+			{
+				var _dataNew = this.getAreaValue();
+				_data = _dataNew.substring(this.ieNonCompositionPrefix.length);
+			}
+
 			ti_console_log("ti: onCompositionEnd");
 
 			if (!this.IsUseFirstTextInputAfterComposition && this.isWaitFirstTextInputEvent(e))
@@ -1651,7 +1691,30 @@
 			}
 			else
 			{
-				this.apiCompositeEnd();
+				if (this.UseValueInComposition)
+				{
+					if (isUseData)
+						this.apiCompositeEnd();
+					else
+					{
+						setTimeout(function() {
+							var _context = AscCommon.g_inputContext;
+
+							if (_context.TextInputAfterComposition)
+							{
+								var _value = _context.getAreaValue();
+								var _data = _value.substring(_context.ieNonCompositionPrefix.length);
+								_context.onCompositionEnd({ data : "nonWait" }, _data);
+
+								_context.clear();
+							}
+						}, 50);
+					}
+				}
+				else
+				{
+					this.apiCompositeEnd();
+				}
 			}
 
 			this.unlockTarget();
@@ -1722,6 +1785,11 @@
 			}, 10);
 
 			return true;
+		},
+
+		isCompositionProcess : function()
+		{
+			return this.compositionState == c_oCompositionState.process;
 		},
 
 		preventVirtualKeyboard : function(e)
