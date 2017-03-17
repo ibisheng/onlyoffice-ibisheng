@@ -2826,33 +2826,39 @@ CStyle.prototype =
         }
     },
 
-    Refresh_RecalcData2 : function()
-    {
-        // TODO: Надо сделать механизм, чтобы данное действие не вызывалось много раз подряд, а только 1.
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var Styles = LogicDocument.Get_Styles();
+	Refresh_RecalcData2 : function()
+	{
+		var oHistory = History;
+		if (!oHistory)
+			return;
 
-        var AllParagraphs = [];
+		if (!oHistory.AddChangedStyleToRecalculateData(this.Get_Id(), this))
+			return;
 
-        if (this.Id != Styles.Default.Paragraph)
-        {
-            var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
-            AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
-            LogicDocument.Add_ChangedStyle(AllStylesId);
-        }
-        else
-        {
-            AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
-            LogicDocument.Add_ChangedStyle([this.Id]);
-        }
+		var LogicDocument = editor.WordControl.m_oLogicDocument;
+		var Styles        = LogicDocument.Get_Styles();
 
-        var Count = AllParagraphs.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Para = AllParagraphs[Index];
-            Para.Refresh_RecalcData( { Type : AscDFH.historyitem_Paragraph_PStyle } );
-        }
-    },
+		var AllParagraphs = [];
+
+		if (this.Id != Styles.Default.Paragraph)
+		{
+			var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
+			AllParagraphs   = oHistory.GetAllParagraphsForRecalcData({Style : true, StylesId : AllStylesId});
+			LogicDocument.Add_ChangedStyle(AllStylesId);
+		}
+		else
+		{
+			AllParagraphs = oHistory.GetAllParagraphsForRecalcData({All : true});
+			LogicDocument.Add_ChangedStyle([this.Id]);
+		}
+
+		var Count = AllParagraphs.length;
+		for (var Index = 0; Index < Count; Index++)
+		{
+			var Para = AllParagraphs[Index];
+			Para.Refresh_RecalcData({Type : AscDFH.historyitem_Paragraph_PStyle});
+		}
+	},
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------

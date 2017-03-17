@@ -1605,12 +1605,18 @@ CAbstractNum.prototype =
 
     Refresh_RecalcData : function(Data)
     {
+		var oHistory = History;
+		if (!oHistory)
+			return;
+
+		if (!oHistory.AddChangedNumberingToRecalculateData(this.Get_Id(), Data.Index, this))
+			return;
+
         var NumPr = new CNumPr();
         NumPr.NumId = this.Id;
         NumPr.Lvl   = Data.Index;
 
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering( NumPr );
+        var AllParagraphs = oHistory.GetAllParagraphsForRecalcData({Numbering : true, NumPr : NumPr});
 
         var Count = AllParagraphs.length;
         for ( var Index = 0; Index < Count; Index++ )
