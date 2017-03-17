@@ -919,6 +919,8 @@ function CDocumentRecalcInfo()
     this.FootnoteColumn            = 0;
 
     this.AdditionalInfo            = null;
+
+    this.NeedRecalculateFromStart  = false;
 }
 
 CDocumentRecalcInfo.prototype =
@@ -1074,7 +1076,18 @@ CDocumentRecalcInfo.prototype =
 		this.FootnotePage              = 0;
 		this.FootnoteColumn            = 0;
 		this.FlowObjectPageBreakBefore = false;
-    }
+    },
+
+	Set_NeedRecalculateFromStart : function(isNeedRecalculate)
+	{
+		this.NeedRecalculateFromStart = isNeedRecalculate;
+	},
+
+	Is_NeedRecalculateFromStart : function()
+	{
+		return this.NeedRecalculateFromStart;
+	}
+
 };
 
 function CDocumentFieldsManager()
@@ -1817,6 +1830,13 @@ CDocument.prototype.Is_OnRecalculate = function()
  */
 CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _RecalcData)
 {
+	if (this.RecalcInfo.Is_NeedRecalculateFromStart())
+	{
+		this.RecalcInfo.Set_NeedRecalculateFromStart(false);
+		this.Recalculate_FromStart();
+		return;
+	}
+
     this.StartTime = new Date().getTime();
 
     if (true !== this.Is_OnRecalculate())
@@ -9039,6 +9059,9 @@ CDocument.prototype.Update_SectionsInfo = function()
 	}
 
 	this.SectionsInfo.Add(this.SectPr, Count);
+
+	// Когда полностью обновляются секции надо пересчитывать с самого начала
+	this.RecalcInfo.Set_NeedRecalculateFromStart(true);
 };
 CDocument.prototype.Check_SectionLastParagraph = function()
 {
