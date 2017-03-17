@@ -1264,13 +1264,18 @@ ParaDrawing.prototype.Set_XYForAdd = function(X, Y, NearPos, PageNum)
 		var Layout = NearPos.Paragraph.Get_Layout(NearPos.ContentPos, this);
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, true, true);
 
+		var nRecalcIndex   = -1;
 		var oLogicDocument = this.document;
 		if (oLogicDocument)
 		{
+			nRecalcIndex = oLogicDocument.Get_History().GetRecalculateIndex();
 			this.SetSkipOnRecalculate(true);
 			oLogicDocument.Recalculate();
 			this.SetSkipOnRecalculate(false);
 		}
+
+		if (-1 !== nRecalcIndex)
+			oLogicDocument.Get_History().SetRecalculateIndex(nRecalcIndex);
 
 		Layout = NearPos.Paragraph.Get_Layout(NearPos.ContentPos, this);
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, true, true);
@@ -1295,13 +1300,18 @@ ParaDrawing.prototype.Set_XY = function(X, Y, Paragraph, PageNum, bResetAlign)
 		var Layout = Paragraph.Get_Layout(ContentPos, this);
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, (bResetAlign || true !== this.PositionH.Align ? true : false), (bResetAlign || true !== this.PositionV.Align ? true : false));
 
+		var nRecalcIndex   = -1;
 		var oLogicDocument = this.document;
 		if (oLogicDocument)
 		{
+			nRecalcIndex = oLogicDocument.Get_History().GetRecalculateIndex();
 			this.SetSkipOnRecalculate(true);
 			oLogicDocument.Recalculate();
 			this.SetSkipOnRecalculate(false);
 		}
+
+		if (-1 !== nRecalcIndex)
+			oLogicDocument.Get_History().SetRecalculateIndex(nRecalcIndex);
 
 		Layout = Paragraph.Get_Layout(ContentPos, this);
 		this.private_SetXYByLayout(X, Y, PageNum, Layout, (bResetAlign || true !== this.PositionH.Align ? true : false), (bResetAlign || true !== this.PositionV.Align ? true : false));

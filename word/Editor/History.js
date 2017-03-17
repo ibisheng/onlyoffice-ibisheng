@@ -1194,6 +1194,14 @@ CHistory.prototype.GetAllParagraphsForRecalcData = function(Props)
 	}
 	return arrParagraphs;
 };
+CHistory.prototype.GetRecalculateIndex = function()
+{
+	return this.RecIndex;
+};
+CHistory.prototype.SetRecalculateIndex = function(nIndex)
+{
+	this.RecIndex = Math.min(this.Index, nIndex);
+};
 
 function CRC32()
 {
