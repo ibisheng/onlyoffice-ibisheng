@@ -2034,11 +2034,11 @@ var editor;
     }
   };
 
-  spreadsheet_api.prototype.asc_closeCellEditor = function() {
-    if(this.wb){
-        this.wb.closeCellEditor();
-    }
-  };
+	spreadsheet_api.prototype.asc_closeCellEditor = function (cancel) {
+		if (this.wb) {
+			this.wb.closeCellEditor(cancel);
+		}
+	};
 
 
   // Spreadsheet interface

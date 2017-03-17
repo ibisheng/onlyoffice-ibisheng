@@ -997,6 +997,9 @@ function CEditorPage(api)
 
 
 		oWordControl.OnScroll();
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.Resize_After();
 	};
 
 	this.zoom_Out = function()
@@ -2648,6 +2651,9 @@ function CEditorPage(api)
 		if (!isNewSize && false === isAttack)
 			return;
 
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.Resize_Before();
+
 		this.CheckRetinaDisplay();
 		this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm, this);
 		this.onButtonTabsDraw();
@@ -2705,6 +2711,9 @@ function CEditorPage(api)
 
 		this.OnScroll();
 		this.onTimerScroll2_sync();
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.Resize_After();
 	};
 
 	this.checkNeedRules     = function()

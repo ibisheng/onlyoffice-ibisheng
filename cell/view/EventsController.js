@@ -173,10 +173,17 @@
 				// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 				// detect available wheel event
 				var nameWheelEvent = "onwheel" in document.createElement("div") ? "wheel" :	// Modern browsers support "wheel"
-						document.onmousewheel !== undefined ? "mousewheel" : 				// Webkit and IE support at least "mousewheel"
-							"DOMMouseScroll";												// let's assume that remaining browsers are older Firefox
+					document.onmousewheel !== undefined ? "mousewheel" : 				// Webkit and IE support at least "mousewheel"
+						"DOMMouseScroll";												// let's assume that remaining browsers are older Firefox
 
-				this.widget.addEventListener(nameWheelEvent, function () {return self._onMouseWheel.apply(self, arguments);} , false);
+				this.widget.addEventListener(nameWheelEvent, function () {
+					return self._onMouseWheel.apply(self, arguments);
+				}, false);
+				this.widget.addEventListener('contextmenu', function (e) {
+					e.stopPropagation();
+					e.preventDefault();
+					return false;
+				}, false)
 			}
 
 			// Курсор для графических объектов. Определяем mousedown и mouseup для выделения текста.

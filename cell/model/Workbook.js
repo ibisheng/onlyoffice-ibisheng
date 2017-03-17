@@ -5328,20 +5328,23 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			this._updateCellValue();
 		}
 	};
-	Cell.prototype._calculateRefType = function(cell) {
-		var val = this.formulaParsed.value;
-		if (val.type == cElementType.cell || val.type == cElementType.cell3D) {
-			var nF = val.numFormat;
+	Cell.prototype._calculateRefType = function () {
+		var nF, val = this.formulaParsed.value;
+		if (cElementType.cell === val.type || cElementType.cell3D === val.type) {
+			nF = val.numFormat;
 			val = val.getValue();
 			val.numFormat = nF;
-		}
-		else if (val.type == cElementType.array) {
-			var nF = val.numFormat;
+			if (cElementType.empty === val.type) {
+				// Bug http://bugzilla.onlyoffice.com/show_bug.cgi?id=33941
+				val.value = 0;
+				val.type = cElementType.number;
+			}
+		} else if (cElementType.array === val.type) {
+			nF = val.numFormat;
 			val = val.getElement(0);
 			val.numFormat = nF;
-		}
-		else if (val.type == cElementType.cellsRange || val.type == cElementType.cellsRange3D) {
-			var nF = val.numFormat;
+		} else if (cElementType.cellsRange === val.type || cElementType.cellsRange3D === val.type) {
+			nF = val.numFormat;
 			val = val.cross(new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), this.ws.getId());
 			val.numFormat = nF;
 		}

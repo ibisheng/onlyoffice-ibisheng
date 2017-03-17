@@ -11142,6 +11142,27 @@ CDocument.prototype.Check_CompositeInputRun = function()
 	if (true !== oRun.Is_UseInDocument())
 		AscCommon.g_inputContext.externalEndCompositeInput();
 };
+CDocument.prototype.Is_CursorInsideCompositeText = function()
+{
+	if (null === this.CompositeInput)
+		return false;
+
+	var oCurrentParagraph = this.Get_CurrentParagraph();
+	if (!oCurrentParagraph)
+		return false;
+
+	var oParaPos   = oCurrentParagraph.Get_ParaContentPos(false, false, false);
+	var arrClasses = oCurrentParagraph.Get_ClassesByPos(oParaPos);
+
+	if (arrClasses.length <= 0 || arrClasses[arrClasses.length - 1] !== this.CompositeInput.Run)
+		return false;
+
+	var nInRunPos = oParaPos.Get(oParaPos.Get_Depth());
+	if (nInRunPos >= this.CompositeInput.Pos && nInRunPos <= this.CompositeInput.Pos + this.CompositeInput.Length)
+		return true;
+
+	return false;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы со сносками
 //----------------------------------------------------------------------------------------------------------------------

@@ -1012,12 +1012,6 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
             }
         }
 
-        for(var sId in mapSlides){
-            if(mapSlides.hasOwnProperty(sId)){
-                mapSlides[sId].correctContent();
-            }
-        }
-
         if(bChangedLayout){
             for(var i = oLogicDocument.Slides.length - 1; i > -1 ; --i){
                 var Layout = oLogicDocument.Slides[i].Layout;
