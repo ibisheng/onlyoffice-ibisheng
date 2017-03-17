@@ -2040,7 +2040,7 @@ PasteProcessor.prototype =
 			var specialPasteShowOptions = new SpecialPasteShowOptions();
 			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
 			
-			var cellCoord = new AscCommon.asc_CRect( 0, 0, 0, 0 );
+			//var cellCoord = new AscCommon.asc_CRect( 0, 0, 0, 0 );
 			var sProps = Asc.c_oSpecialPasteProps;
 			var props = [sProps.paste, sProps.pasteOnlyValues];
 			specialPasteShowOptions.asc_setOptions(props);
@@ -2050,7 +2050,7 @@ PasteProcessor.prototype =
 			var _X = cursorPos.X;
 			var _PageNum = this.oLogicDocument.CurPage;
 
-			var Coords = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum)
+			var cellCoord = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
 			specialPasteShowOptions.asc_setCellCoord(cellCoord);
 		}
 		
