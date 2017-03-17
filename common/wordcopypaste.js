@@ -1780,7 +1780,7 @@ function CopyPasteCorrectString(str)
 function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteProps)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
-	if(!specialPasteProps)
+	if(undefined === specialPasteProps)
 	{
 		window['AscCommon'].g_clipboardBase.specialPasteData.pastebin = pastebin;
 		window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay = nodeDisplay;
@@ -1792,9 +1792,9 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
     else
 	{	
 		window['AscCommon'].g_clipboardBase.Special_Paste_Start();
-		this.oDocument.Set_SelectionState(window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState);
+		api.WordControl.m_oLogicDocument.Set_SelectionState(window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState);
 		
-		this.props = specialPasteProps;
+		window['AscCommon'].g_clipboardBase.specialPasteProps = specialPasteProps;
 		
 		pastebin = window['AscCommon'].g_clipboardBase.specialPasteData.pastebin;
 		nodeDisplay = window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay;
@@ -2006,10 +2006,10 @@ PasteProcessor.prototype =
         if(nInsertLength > 0)
         {
             this.InsertInPlace(oDocument, this.aContent);
-			if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
-			{
+			//if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+			//{
 				window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState = this.oDocument.Get_SelectionState();
-			}
+			//}
 			
             if(false == PasteElementsId.g_bIsDocumentCopyPaste)
             {
@@ -2040,7 +2040,6 @@ PasteProcessor.prototype =
 			var specialPasteShowOptions = new SpecialPasteShowOptions();
 			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
 			
-			//var cellCoord = new AscCommon.asc_CRect( 0, 0, 0, 0 );
 			var sProps = Asc.c_oSpecialPasteProps;
 			var props = [sProps.paste, sProps.pasteOnlyValues];
 			specialPasteShowOptions.asc_setOptions(props);
@@ -2050,8 +2049,9 @@ PasteProcessor.prototype =
 			var _X = cursorPos.X;
 			var _PageNum = this.oLogicDocument.CurPage;
 
-			var cellCoord = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
-			specialPasteShowOptions.asc_setCellCoord(cellCoord);
+			var _сoord = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
+			var curCoord = new AscCommon.asc_CRect( _сoord.X, _сoord.Y, 0, 0 );
+			specialPasteShowOptions.asc_setCellCoord(curCoord);
 		}
 		
 		window['AscCommon'].g_clipboardBase.Paste_Process_End();
@@ -2070,6 +2070,12 @@ PasteProcessor.prototype =
             for (var i = 0, length = aNewContent.length; i < length; ++i) {
                 var oSelectedElement = new CSelectedElement();
                 oSelectedElement.Element = aNewContent[i];
+				
+				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
+				{
+					aNewContent[i] = this._specialPasteParagraphConvert(aNewContent[i]);
+				}
+				
                 if (i == length - 1 && true != this.bInBlock && type_Paragraph == oSelectedElement.Element.GetType())
                     oSelectedElement.SelectedAll = false;
                 else
@@ -2102,6 +2108,37 @@ PasteProcessor.prototype =
             paragraph.Clear_NearestPosArray(aNewContent);
         }
     },
+	
+	_specialPasteParagraphConvert: function(paragraph)
+	{
+		var res = paragraph;
+		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+		
+		switch(props)
+		{
+			case Asc.c_oSpecialPasteProps.paste:
+			{
+				break;
+			}
+			case Asc.c_oSpecialPasteProps.pasteOnlyValues:
+			{
+				paragraph.Clear_TextFormatting();
+				paragraph.Clear_Formatting();
+				paragraph.Pr = new CParaPr();
+				paragraph.CompiledPr.Pr.ParaPr = paragraph.Pr;
+				
+				for(var j = 0; j < paragraph.Content.length; j++)
+				{
+					paragraph.Content[j].Clear_TextFormatting()
+					paragraph.Content[j].Clear_TextPr();
+				}
+				
+				break;
+			}
+		}
+		
+		return res;
+	},
 	
 	InsertInPlacePresentation: function(aNewContent)
 	{
