@@ -700,6 +700,8 @@ Slide.prototype =
     },
 
     correctContent: function(){
+
+
         for(var i = this.cSld.spTree.length - 1;  i > -1 ; --i){
             if(this.cSld.spTree[i].CheckCorrect && !this.cSld.spTree[i].CheckCorrect() || this.cSld.spTree[i].bDeleted){
                 if(this.cSld.spTree[i].setBDeleted){
@@ -707,13 +709,12 @@ Slide.prototype =
                 }
                 this.removeFromSpTreeById(this.cSld.spTree[i].Get_Id());
             }
-            else{
-                for(var j = i - 1; j > -1; --j){
-                    if(this.cSld.spTree[i] === this.cSld.spTree[j]){
-                        this.cSld.spTree[i].setBDeleted(true);
-                        this.removeFromSpTreeByPos(i);
-                        break;
-                    }
+        }
+        for(var i = this.cSld.spTree.length - 1;  i > -1 ; --i){
+            for(var j = i - 1; j > -1; --j){
+                if(this.cSld.spTree[i] === this.cSld.spTree[j]){
+                    this.removeFromSpTreeByPos(i);
+                    break;
                 }
             }
         }
