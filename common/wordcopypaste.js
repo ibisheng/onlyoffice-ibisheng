@@ -1791,7 +1791,6 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 	}
     else
 	{	
-		window['AscCommon'].g_clipboardBase.Special_Paste_Start();
 		api.WordControl.m_oLogicDocument.Set_SelectionState(window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState);
 		
 		window['AscCommon'].g_clipboardBase.specialPasteProps = specialPasteProps;
@@ -2048,6 +2047,8 @@ PasteProcessor.prototype =
 			var _Y = cursorPos.Y;
 			var _X = cursorPos.X;
 			var _PageNum = this.oLogicDocument.CurPage;
+			
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum:_PageNum};
 
 			var _сoord = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
 			var curCoord = new AscCommon.asc_CRect( _сoord.X, _сoord.Y, 0, 0 );

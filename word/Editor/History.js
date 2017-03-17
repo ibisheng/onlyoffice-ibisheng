@@ -271,7 +271,12 @@ CHistory.prototype =
 
         if (null != Point)
             this.Document.Set_SelectionState( Point.State );
-
+		
+		if(!window['AscCommon'].g_clipboardBase.pasteStart)
+		{
+			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+		}
+		
         return this.RecalculateData;
     },
 
@@ -308,7 +313,12 @@ CHistory.prototype =
             State = this.Points[this.Index + 1].State;
 
         this.Document.Set_SelectionState( State );
-
+		
+		if(!window['AscCommon'].g_clipboardBase.pasteStart)
+		{
+			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+		}
+		
         return this.RecalculateData;
     },
 
@@ -342,6 +352,11 @@ CHistory.prototype =
 
         // Удаляем ненужные точки
         this.Points.length = this.Index + 1;
+		
+		if(!window['AscCommon'].g_clipboardBase.pasteStart)
+		{
+			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+		}
     },
 
 	/**

@@ -992,8 +992,30 @@
 		
 		SpecialPasteButton_Hide : function()
 		{
-			this.showSpecialPasteButton = false;
-			this.Api.asc_HideSpecialPasteButton();
+			if(this.showSpecialPasteButton)
+			{
+				this.showSpecialPasteButton = false;
+				this.Api.asc_HideSpecialPasteButton();
+			}
+		},
+		
+		SpecialPasteButton_Update_Position : function(props)
+		{
+			//TODO метод должен быть общий для всех редакторов
+			if(this.showSpecialPasteButton && this.specialPasteButtonProps.fixPosition)
+			{
+				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+				
+				var _Y = this.specialPasteButtonProps.fixPosition.y;
+				var _X = this.specialPasteButtonProps.fixPosition.x;
+				var _PageNum = this.specialPasteButtonProps.fixPosition.pageNum;
+				
+				var _сoord = this.Api.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
+				var curCoord = new AscCommon.asc_CRect( _сoord.X, _сoord.Y, 0, 0 );
+				specialPasteShowOptions.asc_setCellCoord(curCoord);
+				
+				this.Api.asc_ShowSpecialPasteButton(specialPasteShowOptions);
+			}
 		}
 	};
 

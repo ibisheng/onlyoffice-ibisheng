@@ -1764,6 +1764,8 @@ background-repeat: no-repeat;\
 
 		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
 		{
+			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
+			
 			if (!useCurrentPoint) {
 				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 			}
@@ -1788,8 +1790,25 @@ background-repeat: no-repeat;\
 	
 	asc_docs_api.prototype.asc_SpecialPasteData = function(props) 
 	{
-		AscCommon.Editor_Paste_Exec(this, null, null, null, props);
-		//this.wb.specialPasteData(props);
+		if (AscCommon.CollaborativeEditing.Get_GlobalLock())
+	        return;
+
+		var _logicDoc = this.WordControl.m_oLogicDocument;
+		if (!_logicDoc)
+			return;
+		
+		//TODO пересмотреть проверку лока и добавление новой тчоки(AscDFH.historydescription_Document_PasteHotKey)
+		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
+		{
+			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
+			window['AscCommon'].g_clipboardBase.Special_Paste_Start();
+			
+			//if (!useCurrentPoint) {
+				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
+			//}
+			
+			AscCommon.Editor_Paste_Exec(this, null, null, null, props);
+		}
 	};
 	
 	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props) 
@@ -1800,6 +1819,11 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_HideSpecialPasteButton = function() 
 	{
 		this.sendEvent("asc_onHideSpecialPasteOptions");
+	};
+	
+	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function() 
+	{
+		this.sendEvent("asc_onShowSpecialPasteOptions", props);
 	};
 	
 	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
