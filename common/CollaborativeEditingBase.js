@@ -983,7 +983,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                     mapLayouts[oClass.Get_Id()] = oClass;
                     bChangedLayout = true;
                 }
-                else if(typeof CPresentation !== "undefined" && oClass instanceof CPresentation){
+                else if(AscCommonSlide.CPresentation && oClass instanceof AscCommonSlide.CPresentation){
                     if(oChange.Type === AscDFH.historyitem_Presentation_RemoveSlide || oChange.Type === AscDFH.historyitem_Presentation_AddSlide){
                         bAddSlides = true;
                         for(var i = 0; i < oChange.Items.length; ++i){
