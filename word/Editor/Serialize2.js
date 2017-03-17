@@ -7690,8 +7690,12 @@ function Binary_rPrReader(doc, oReadResult, stream)
 			case c_oSerProp_rPrType.TextFill:
 				if(length > 0){
 					var TextFill = pptx_content_loader.ReadShapeProperty(this.stream, 1);
-					if(null != TextFill)
-						rPr.TextFill = TextFill;
+					if(null != TextFill){
+                        rPr.TextFill = TextFill;
+                        if(null != TextFill.transparent){
+                            TextFill.transparent = 255 - TextFill.transparent;
+                        }
+                    }
 				}
 				else
 					res = c_oSerConstants.ReadUnknown;
