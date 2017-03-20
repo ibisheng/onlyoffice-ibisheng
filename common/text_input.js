@@ -1265,15 +1265,7 @@
 				// если ввести, войти в
 				// композицию, стереть до начала и начать снова ввод. Тогда, после последнего onCompositionEnd
 				// не придет onInput - и флаг не сбросится
-
-				if (this.TextInputAfterComposition)
-				{
-					var _value = this.getAreaValue();
-					var _data = _value.substring(this.ieNonCompositionPrefix.length);
-					this.onCompositionEnd({ data : "nonWait" }, _data);
-
-					this.TextInputAfterComposition = false;
-				}
+				this.TextInputAfterComposition = false;
 
 				// запоминаем, с чего все началось
 				this.ieNonCompositionPrefix = this.getAreaValue();
