@@ -653,15 +653,16 @@
 			var _value = this.getAreaValue();
 			if (this.UseValueInComposition)
 			{
+				var _data = _value.substring(this.ieNonCompositionPrefix.length);
+
 				if (c_oCompositionState.process == this.compositionState)
 				{
-					var _data = _value.substring(this.ieNonCompositionPrefix.length);
 					this.onCompositionUpdate(e, false, _data, false);
+				}
 
-					if (this.TextInputAfterComposition)
-					{
-						this.onCompositionEnd(e, _data);
-					}
+				if (this.TextInputAfterComposition)
+				{
+					this.onCompositionEnd({ data : "nonWait" }, _data);
 				}
 			}
 
@@ -1260,7 +1261,23 @@
 			this.compositionStateApi = c_oCompositionState.process;
 
 			if (this.UseValueInComposition)
+			{
+				// если ввести, войти в
+				// композицию, стереть до начала и начать снова ввод. Тогда, после последнего onCompositionEnd
+				// не придет onInput - и флаг не сбросится
+
+				if (this.TextInputAfterComposition)
+				{
+					var _value = this.getAreaValue();
+					var _data = _value.substring(this.ieNonCompositionPrefix.length);
+					this.onCompositionEnd({ data : "nonWait" }, _data);
+
+					this.TextInputAfterComposition = false;
+				}
+
+				// запоминаем, с чего все началось
 				this.ieNonCompositionPrefix = this.getAreaValue();
+			}
 		},
 
 		apiCompositeReplace : function(_value)
