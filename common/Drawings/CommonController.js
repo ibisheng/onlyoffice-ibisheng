@@ -10084,7 +10084,8 @@ function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills, bCreate){
 
         ApplyTxPr(aPr[0], lbls, oDrawingDocument, i, baseFills);
         ApplySpPr(aPr[1], lbls, i, baseFills);
-        if(!bCreate){
+        //if(!bCreate)
+        {
             lbls.setDLblPos(aPr[2]);
             lbls.setSeparator(aPr[3]);
             lbls.setShowBubbleSize(aPr[4]);
