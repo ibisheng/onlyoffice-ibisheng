@@ -8832,7 +8832,8 @@
 					pasteData = tempWorkbook.aWorksheets[0];
 				if(pasteData)
 				{
-					t._pasteFromBinary(pasteData, null, null);
+					//undoSpecialPasteRange - нужен для того, чтобы включить undo в диапазон обновления(_updateCellsRange)
+					specialPasteUndoData.undoSpecialPasteRange = t._pasteFromBinary(pasteData, null, null);
 				}
 				
 				//удаляем вставленные изображения
@@ -9039,7 +9040,19 @@
                 t.handlers.trigger("slowOperation", false);
             }
             t.isChanged = true;
-            t._updateCellsRange(arn, canChangeColWidth);
+			
+			var specialPasteUndoData = g_clipboardBase.specialPasteUndoData;
+			if(specialPasteUndoData && specialPasteUndoData.undoSpecialPasteRange && specialPasteUndoData.undoSpecialPasteRange[0] && AscCommonExcel.g_clipboardExcel.specialPasteStart)
+			{
+				var unionRange = arn.union(specialPasteUndoData.undoSpecialPasteRange[0]);
+				t._updateCellsRange(unionRange, canChangeColWidth);
+				
+				specialPasteUndoData.undoSpecialPasteRange = null;
+			}
+			else
+			{
+				t._updateCellsRange(arn, canChangeColWidth);
+			}
         }
 
         var oSelection = History.GetSelection();
