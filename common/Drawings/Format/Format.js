@@ -7442,7 +7442,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteDouble(this.rot);
+            w.WriteLong(this.rot);
         }
 
         flag = this.rtlCol != null;
@@ -7594,7 +7594,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.rot = r.GetDouble();
+            this.rot = r.GetLong();
         }
 
 
@@ -7911,7 +7911,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteDouble(this.rot);
+            w.WriteLong(this.rot);
         }
 
         flag = this.rtlCol != null;
@@ -8061,7 +8061,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.rot = r.GetDouble();
+            this.rot = r.GetLong();
         }
 
 
