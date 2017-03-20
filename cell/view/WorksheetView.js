@@ -12535,7 +12535,7 @@
 						{
 							if(colId === sortCondition.Ref.c1 - range.c1)
 							{
-								isSortState = !sortCondition.ConditionDescending;
+								isSortState = sortCondition.ConditionDescending;
 							}
 						}
 
