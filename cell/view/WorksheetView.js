@@ -13282,11 +13282,11 @@
             }
             case c_oAscChangeSelectionFormatTable.data:
             {
-                //TODO проверить есть ли строка заголовков
-                startCol = refTablePart.c1;
-                endCol = refTablePart.c2;
-                startRow = refTablePart.r1 + 1;
-                endRow = refTablePart.r2;
+				var rangeWithoutHeaderFooter = tablePart.getRangeWithoutHeaderFooter();
+                startCol = lastSelection.c1 < refTablePart.c1 ? refTablePart.c1 : lastSelection.c1;
+                endCol = lastSelection.c2 > refTablePart.c2 ? refTablePart.c2 : lastSelection.c2;
+                startRow = rangeWithoutHeaderFooter.r1;
+                endRow = rangeWithoutHeaderFooter.r2;
 
                 break;
             }
