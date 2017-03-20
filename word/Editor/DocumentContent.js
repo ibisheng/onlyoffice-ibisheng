@@ -522,11 +522,22 @@ CDocumentContent.prototype.Is_UseInDocument                = function(Id)
 };
 CDocumentContent.prototype.Is_HdrFtr                       = function(bReturnHdrFtr)
 {
-    return this.Parent.Is_HdrFtr(bReturnHdrFtr);
+    if(this.Parent){
+        return this.Parent.Is_HdrFtr(bReturnHdrFtr);
+    }
+    else{
+        return (bReturnHdrFtr ? null : false);
+    }
+
 };
 CDocumentContent.prototype.Is_DrawingShape                 = function(bRetShape)
 {
-    return this.Parent.Is_DrawingShape(bRetShape);
+    if(this.Parent){
+        return this.Parent.Is_DrawingShape(bRetShape);
+    }
+    else{
+        return (bRetShape ? null : false);
+    }
 };
 // Данный запрос может прийти из внутреннего элемента(параграф, таблица), чтобы узнать
 // происходил ли выделение в пределах одного элеменета.
