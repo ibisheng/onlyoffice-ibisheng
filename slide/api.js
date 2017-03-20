@@ -961,6 +961,9 @@
 		};
 		this.CoAuthoringApi.onStartCoAuthoring       = function(isStartEvent)
 		{
+			if (t.isViewMode) {
+				return;
+			}
 			if (t.ParcedDocument) {
 				if (isStartEvent) {
 					AscCommon.CollaborativeEditing.Start_CollaborationEditing();

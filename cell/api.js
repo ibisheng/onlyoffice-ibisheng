@@ -1196,6 +1196,9 @@ var editor;
       }
     };
 	  this.CoAuthoringApi.onStartCoAuthoring = function (isStartEvent) {
+		  if (t.isViewMode) {
+			  return;
+		  }
 		  // На старте не нужно ничего делать
 		  if (isStartEvent) {
 			  t.startCollaborationEditing();
