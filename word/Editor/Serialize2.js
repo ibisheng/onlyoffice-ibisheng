@@ -7271,7 +7271,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
         {
             oAdditional.EvenAndOddHeaders = this.stream.GetBool();
         }
-		else if( c_oSerProp_secPrSettingsType.SectionType === type )
+		else if( c_oSerProp_secPrSettingsType.SectionType === type && typeof c_oAscSectionBreakType != "undefined" )
         {
 			var nEditorType = null;
 			switch(this.stream.GetByte())
