@@ -1696,11 +1696,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 
 		if (this.oneColumnIndex) {
-			var columns_1 = this.oneColumnIndex.name.replace(/#/g, "'#")
+			columns_1 = this.oneColumnIndex.name.replace(/([#[\]])/g, "'$1");
 			tblStr += "[" + columns_1 + "]";
 		} else if (this.colStartIndex && this.colEndIndex) {
-			columns_1 = this.colStartIndex.name.replace(/#/g, "'#");
-			columns_2 = this.colEndIndex.name.replace(/#/g, "'#");
+			columns_1 = this.colStartIndex.name.replace(/([#[\]])/g, "'$1");
+			columns_2 = this.colEndIndex.name.replace(/([#[\]])/g, "'$1");
 			tblStr += "[[" + columns_1 + "]:[" + columns_2 + "]]";
 		} else if (null != this.reservedColumnIndex) {
 			tblStr += "[" + this._buildLocalTableString(this.reservedColumnIndex, isLocal) + "]";
@@ -1725,10 +1725,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 						tblStr += FormulaSeparators.functionArgumentSeparatorDef;
 					}
 				}
-				var hdtcstart = this.hdtcstartIndex.name.replace(/#/g, "'#");
+				var hdtcstart = this.hdtcstartIndex.name.replace(/([#[\]])/g, "'$1");
 				tblStr += "[" + hdtcstart + "]";
 				if (this.hdtcendIndex) {
-					var hdtcend = this.hdtcendIndex.name.replace(/#/g, "'#");
+					var hdtcend = this.hdtcendIndex.name.replace(/([#[\]])/g, "'$1");
 					tblStr += ":[" + hdtcend + "]";
 				}
 			}
@@ -1739,15 +1739,15 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return tblStr;
 	};
 	cStrucTable.prototype._parseVal = function (val) {
-		var bRes = true;
+		var bRes = true, startCol, endCol;
 		this.tableName = val['tableName'];
 		if (val['oneColumn']) {
-			var startCol = val['oneColumn'].replace(/'#/g, "#");
+			startCol = val['oneColumn'].replace(/'([#[\]])/g, '$1');
 			this.oneColumnIndex = this.wb.getTableIndexColumnByName(this.tableName, startCol);
 			bRes = !!this.oneColumnIndex;
 		} else if (val['columnRange']) {
-			var startCol = val['colStart'].replace(/'#/g, "#");
-			var endCol = val['colEnd'].replace(/'#/g, "#");
+			startCol = val['colStart'].replace(/'([#[\]])/g, '$1');
+			endCol = val['colEnd'].replace(/'([#[\]])/g, '$1');
 			if (!endCol) {
 				endCol = startCol;
 			}
@@ -1765,7 +1765,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			this.hdtIndexes = [];
 			var hdtcstart = val['hdtcstart'];
 			var hdtcend = val['hdtcend'];
-			var re = /\[(.*?)\]/ig, m, data, range;
+			var re = /\[(.*?)\]/ig, m;
 			while (null !== (m = re.exec(val['hdt']))) {
 				var param = parserHelp.getColumnTypeByName(m[1]);
 				if (AscCommon.FormulaTablePartInfo.thisRow == param ||
@@ -1776,11 +1776,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			}
 
 			if (hdtcstart) {
-				var startCol = hdtcstart.replace(/'#/g, "#");
+				startCol = hdtcstart.replace(/'([#[\]])/g, '$1');
 				this.hdtcstartIndex = this.wb.getTableIndexColumnByName(this.tableName, startCol);
 				bRes = !!this.hdtcstartIndex;
 				if (bRes && hdtcend) {
-					var endCol = hdtcend.replace(/'#/g, "#");
+					endCol = hdtcend.replace(/'([#[\]])/g, '$1');
 					this.hdtcendIndex = this.wb.getTableIndexColumnByName(this.tableName, endCol);
 					bRes = !!this.hdtcendIndex;
 				}

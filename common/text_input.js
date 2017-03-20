@@ -1707,6 +1707,7 @@
 								_context.onCompositionEnd({ data : "nonWait" }, _data);
 
 								_context.clear();
+								_context.TextInputAfterComposition = false;
 							}
 						}, 50);
 					}

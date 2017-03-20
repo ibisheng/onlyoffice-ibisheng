@@ -442,7 +442,7 @@
 								worksheet._moveRange(rangeWithoutDiff,  new Asc.Range(filterRange.c1, filterRange.r1 + 1, filterRange.c2, filterRange.r2));
 							}
 						}
-						else if(!addNameColumn)
+						else if(!addNameColumn && styleName)
 						{
 							if(filterRange.r1 === filterRange.r2)
 							{

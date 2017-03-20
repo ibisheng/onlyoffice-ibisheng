@@ -200,7 +200,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetFlipV] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetRot] = CChangesDrawingsDouble;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetParent] = CChangesDrawingsObject;
-    AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetBwMode] = CChangesDrawingsBool;
+    AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetBwMode] = CChangesDrawingsLong;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetXfrm] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetGeometry] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetFill] = CChangesDrawingsObjectNoId;
@@ -5699,7 +5699,7 @@ CSpPr.prototype =
 
     setBwMode: function(pr)
     {
-        History.Add(new CChangesDrawingsBool(this, AscDFH.historyitem_SpPr_SetBwMode, this.bwMode,  pr));
+        History.Add(new CChangesDrawingsLong(this, AscDFH.historyitem_SpPr_SetBwMode, this.bwMode,  pr));
         this.bwMode = pr;
     },
 
@@ -7442,7 +7442,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteDouble(this.rot);
+            w.WriteLong(this.rot);
         }
 
         flag = this.rtlCol != null;
@@ -7594,7 +7594,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.rot = r.GetDouble();
+            this.rot = r.GetLong();
         }
 
 
@@ -7911,7 +7911,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteDouble(this.rot);
+            w.WriteLong(this.rot);
         }
 
         flag = this.rtlCol != null;
@@ -8061,7 +8061,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.rot = r.GetDouble();
+            this.rot = r.GetLong();
         }
 
 

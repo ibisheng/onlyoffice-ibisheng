@@ -1755,7 +1755,8 @@ UndoRedoData_AutoFilter.prototype = {
 				if(tablePart)
 				{
 					var memory = new AscCommon.CMemory();
-					var oBinaryTableWriter = new AscCommonExcel.BinaryTableWriter(memory);
+					var aDxfs = [];
+					var oBinaryTableWriter = new AscCommonExcel.BinaryTableWriter(memory, aDxfs);
 					oBinaryTableWriter.WriteTable(tablePart);
 					tablePart = memory.GetBase64Memory();
 				}
@@ -1808,7 +1809,8 @@ UndoRedoData_AutoFilter.prototype = {
 					var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
 					nCurOffset = oBinaryFileReader.getbase64DecodedData2(value, 0, stream, nCurOffset);
 
-					var oBinaryTableReader = new AscCommonExcel.Binary_TableReader(stream);
+					var dxfs = [];
+					var oBinaryTableReader = new AscCommonExcel.Binary_TableReader(stream, null, null, dxfs);
 					oBinaryTableReader.stream = stream;
 					oBinaryTableReader.oReadResult = {
 						tableCustomFunc: []
