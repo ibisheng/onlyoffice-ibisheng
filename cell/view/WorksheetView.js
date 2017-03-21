@@ -9626,7 +9626,7 @@
 		};
 		
 		var colsWidth = {};
-		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal, curMerge)
+		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal, curMerge, transposeRange)
 		{
 			var pastedRangeProps = {};
 			//range может далее изменится в связи с наличием мерженных ячеек, firstRange - не меняется(ему делаем setValue, как первой ячейке в диапазоне мерженных)
@@ -9693,7 +9693,7 @@
 			pastedRangeProps.colsWidth = colsWidth;
 			
 			//apply props by cell
-			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge, val: val};
+			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge, val: val, activeCellsPasteFragment: activeCellsPasteFragment, transposeRange: transposeRange};
 			t._setPastedDataByCurrentRange(range, pastedRangeProps, formulaProps, specialPasteProps);
 		};
 		
@@ -9738,7 +9738,13 @@
 							}
 							
 							var range = t.model.getRange3(nRow, nCol, nRow, nCol);
-							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal, curMerge);
+							var transposeRange = null;
+							if(specialPasteProps.transpose)
+							{
+								transposeRange = t.model.getRange3(c + autoR * plRow + arn.r1, r + autoC * plCol + arn.c1, c + autoR * plRow + arn.r1, r + autoC * plCol + arn.c1);
+							}
+							
+							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal, curMerge, transposeRange);
 							
                             //если замержили range
                             c = range.bbox.c2 - autoC * plCol - arn.c1;
@@ -9766,7 +9772,7 @@
 	{
 		var t = this;
 		
-		var firstRange, arrFormula, tablesMap, newVal, isOneMerge, val;
+		var firstRange, arrFormula, tablesMap, newVal, isOneMerge, val, activeCellsPasteFragment, transposeRange;
 		if(formulaProps)
 		{
 			//TODO firstRange возможно стоит убрать(добавлено было для правки бага 27745)
@@ -9776,7 +9782,29 @@
 			newVal = formulaProps.newVal;
 			isOneMerge = formulaProps.isOneMerge;
 			val = formulaProps.val;
+			activeCellsPasteFragment = formulaProps.activeCellsPasteFragment;
+			transposeRange = formulaProps.transposeRange;
 		}
+		
+		var transposeOutStack = function(outStack)
+		{
+			for(var i = 0; i < outStack.length; i++)
+			{
+				if(outStack[i].range /*&& activeCellsPasteFragment && activeCellsPasteFragment.containsRange(outStack[i].range.bbox)*/)
+				{
+					var diffCol1 = outStack[i].range.bbox.c1 - activeCellsPasteFragment.c1;
+					var diffRow1 = outStack[i].range.bbox.r1 - activeCellsPasteFragment.r1;
+					var diffCol2 = outStack[i].range.bbox.c2 - activeCellsPasteFragment.c1;
+					var diffRow2 = outStack[i].range.bbox.r2 - activeCellsPasteFragment.r1;
+					
+					outStack[i].range.bbox.c1 = activeCellsPasteFragment.c1 + diffRow1;
+					outStack[i].range.bbox.r1 = activeCellsPasteFragment.r1 + diffCol1;
+					outStack[i].range.bbox.c2 = activeCellsPasteFragment.c1 + diffRow2;
+					outStack[i].range.bbox.r2 = activeCellsPasteFragment.r1 + diffCol2;
+				}
+				
+			}
+		};
 		
 		//set formula - for paste from binary
 		var calculateValueAndBinaryFormula = function(newVal, firstRange, range)
@@ -9811,10 +9839,26 @@
 
 				//formula
 				if (newVal.getFormula() && !isOneMerge) {
-					var offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+					var offset;
+					if(specialPasteProps.transpose && transposeRange)
+					{
+						//для transpose необходимо брать offset перевернутого range
+						offset = transposeRange.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+					}
+					else
+					{
+						offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+					}
 					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, val);
 
 					if (_p_.parse()) {
+						
+						if(specialPasteProps.transpose)
+						{
+							//для transpose необходимо перевернуть все дипазоны в формулах
+							transposeOutStack(_p_.outStack);
+						}
+						
 						if(null !== tablesMap)
 						{
 							var renameParams = {};
