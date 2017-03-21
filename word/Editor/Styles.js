@@ -9610,6 +9610,9 @@ CParaPr.prototype =
         if(undefined != this.DefaultTabSize && undefined != ParaPr.DefaultTabSize && ParaPr.DefaultTabSize === this.DefaultTabSize)
             Result_ParaPr.DefaultTabSize = this.DefaultTabSize;
 
+        if (undefined !== this.Tabs && undefined !== ParaPr.Tabs && this.Tabs.Is_Equal(ParaPr.Tabs))
+        	Result_ParaPr.Tabs = this.Tabs.Copy();
+
 
         return Result_ParaPr;
     },
