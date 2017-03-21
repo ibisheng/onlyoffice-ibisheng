@@ -5863,6 +5863,11 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asyncImageEndLoadedBackground = function(_image)
 	{
 		this.WordControl.m_oDrawingDocument.CheckRasterImageOnScreen(_image.src);
+		if (this.WordControl.m_oDrawingDocument.LastDrawingUrl == _image.src)
+		{
+			this.WordControl.m_oDrawingDocument.LastDrawingUrl = "";
+			this.UpdateInterfaceState();
+		}
 	};
 	asc_docs_api.prototype.IsAsyncOpenDocumentImages     = function()
 	{

@@ -5495,7 +5495,7 @@ function CDrawingDocument()
 
 			this.GuiCanvasFillTextureCtx.drawImage(_img.Image, _x, _y, _w, _h);
 		}
-		else
+		else if (!_img || !_img.Image)
 		{
 			this.GuiCanvasFillTextureCtx.lineWidth = 1;
 
