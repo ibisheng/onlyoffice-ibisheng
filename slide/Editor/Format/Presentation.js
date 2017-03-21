@@ -810,13 +810,13 @@ CPresentation.prototype =
             return;
 
         if(this.Slides[this.CurPage]){
-            if(this.Slides[this.CurPage].graphicObjects.checkTrackDrawings()){
+            if(this.Slides[this.CurPage].graphicObjects.checkTrackDrawings() || this.Api.isOpenedChartFrame){
                 return;
             }
         }
 
         var bHaveChanges = History.Have_Changes(true);
-        if (true !== bHaveChanges && true === AscCommon.CollaborativeEditing.Have_OtherChanges())
+        if (true !== bHaveChanges && true === AscCommon.CollaborativeEditing.Have_OtherChanges() || 0 !== AscCommon.CollaborativeEditing.getOwnLocksLength())
         {
             // Принимаем чужие изменение. Своих нет, но функцию отсылки надо вызвать, чтобы снялить локи.
             AscCommon.CollaborativeEditing.Apply_Changes();

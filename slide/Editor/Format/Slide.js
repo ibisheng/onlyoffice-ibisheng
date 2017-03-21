@@ -1138,6 +1138,7 @@ Slide.prototype =
 
     showChartSettings:  function()
     {
+        editor.asc_onOpenChartFrame();
         editor.sendEvent("asc_doubleClickOnChart", this.graphicObjects.getChartObject());
         this.graphicObjects.changeCurrentState(new AscFormat.NullState(this.graphicObjects));
     },

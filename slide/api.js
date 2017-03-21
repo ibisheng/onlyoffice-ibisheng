@@ -5862,6 +5862,11 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_getChartObject = function(type)
 	{
 		this.isChartEditor = true;		// Для совместного редактирования
+        if (!AscFormat.isRealNumber(type))
+        {
+            this.asc_onOpenChartFrame();
+            this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props);
+        }
 		return this.WordControl.m_oLogicDocument.Get_ChartObject(type);
 	};
 
