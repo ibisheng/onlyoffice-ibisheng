@@ -2049,6 +2049,7 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
                 var series = new AscFormat.CScatterSeries();
                 series.setIdx(i - minus);
                 series.setOrder(i - minus);
+                AscFormat.ApplySpPr(oFirstSpPrPreset, series, i, base_fills, bAccent1Background);
                 if(oXVal)
                 {
                     series.setXVal(oXVal.createDuplicate());
