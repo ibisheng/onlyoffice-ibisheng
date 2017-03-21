@@ -11221,6 +11221,12 @@ CDocument.prototype.AddFootnote = function(sText)
 			var oFootnote = this.Footnotes.CreateFootnote();
 			oFootnote.AddDefaultFootnoteContent(sText);
 
+			if (true === this.Is_SelectionUse())
+			{
+				this.Cursor_MoveRight(false, false, false);
+				this.Selection_Remove();
+			}
+
 			if (sText)
 				this.Paragraph_Add(new ParaFootnoteReference(oFootnote, sText));
 			else
