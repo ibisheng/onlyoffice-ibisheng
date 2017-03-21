@@ -4433,7 +4433,7 @@ CDocument.prototype.Set_ParagraphTabs = function(Tabs)
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
-	this.Api.Update_ParaTab(Default_Tab_Stop, Tabs);
+	this.Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
 };
 CDocument.prototype.Set_ParagraphIndent = function(Ind)
 {
@@ -4695,8 +4695,8 @@ CDocument.prototype.Get_DocumentOrientation = function()
 };
 CDocument.prototype.Set_DocumentDefaultTab = function(DTab)
 {
-	this.History.Add(new CChangesDocumentDefaultTab(this, Default_Tab_Stop, DTab));
-	Default_Tab_Stop = DTab;
+	this.History.Add(new CChangesDocumentDefaultTab(this, AscCommonWord.Default_Tab_Stop, DTab));
+	AscCommonWord.Default_Tab_Stop = DTab;
 };
 CDocument.prototype.Set_DocumentEvenAndOddHeaders = function(Value)
 {
@@ -4747,7 +4747,7 @@ CDocument.prototype.Interface_Update_ParaPr = function()
 			ParaPr.CanAddImage = true;
 
 		if (undefined != ParaPr.Tabs)
-			this.Api.Update_ParaTab(Default_Tab_Stop, ParaPr.Tabs);
+			this.Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, ParaPr.Tabs);
 
 		if (ParaPr.Shd && ParaPr.Shd.Unifill)
 		{

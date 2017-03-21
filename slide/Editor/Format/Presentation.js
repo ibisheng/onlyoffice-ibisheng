@@ -2310,7 +2310,7 @@ CPresentation.prototype =
         if ( null != ParaPr )
         {
             if ( undefined != ParaPr.Tabs )
-                editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
+                editor.Update_ParaTab( AscCommonWord.Default_Tab_Stop, ParaPr.Tabs );
 
             editor.UpdateParagraphProp( ParaPr );
         }
@@ -3087,7 +3087,7 @@ CPresentation.prototype =
     Set_DocumentDefaultTab: function(DTab)
     {
        //History.Add( this, { Type : AscDFH.historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
-        Default_Tab_Stop = DTab;
+		AscCommonWord.Default_Tab_Stop = DTab;
     },
 
     Set_DocumentMargin: function()

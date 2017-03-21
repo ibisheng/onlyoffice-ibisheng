@@ -3467,10 +3467,10 @@ Paragraph.prototype =
                 {
                     var NewX = ParaPr.Ind.Left;
                     if ( true != bShift )
-                        NewX += Default_Tab_Stop;
+                        NewX += AscCommonWord.Default_Tab_Stop;
                     else
                     {
-                        NewX -= Default_Tab_Stop;
+                        NewX -= AscCommonWord.Default_Tab_Stop;
 
                         if ( NewX < 0 )
                             NewX = 0;
@@ -7281,7 +7281,7 @@ Paragraph.prototype =
             {
                 var NewX = 0;
                 while ( X >= NewX )
-                    NewX += Default_Tab_Stop;
+                    NewX += AscCommonWord.Default_Tab_Stop;
 
                 X = NewX;
             }

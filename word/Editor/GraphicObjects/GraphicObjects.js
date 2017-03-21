@@ -1857,7 +1857,7 @@ CGraphicObjects.prototype =
        //     }
        // );
        // editor.UpdateTextPr(oTextPr);
-        editor.Update_ParaTab(Default_Tab_Stop, new CParaTabs());
+		editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, new CParaTabs());
         editor.sync_ParaSpacingLine( new CParaSpacing() );
         editor.Update_ParaInd(new CParaInd());
         editor.sync_PrAlignCallBack(null);
