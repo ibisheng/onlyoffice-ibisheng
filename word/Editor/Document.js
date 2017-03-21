@@ -12289,7 +12289,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 						if ((undefined === CurrFramePr && undefined === PrevFramePr) || ( undefined !== CurrFramePr && undefined !== PrevFramePr && true === CurrFramePr.Compare(PrevFramePr) ))
 						{
-							if (true === this.Is_TrackRevisions())
+							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos - 1].Get_ReviewType())
 							{
 								this.Content[this.CurPos.ContentPos - 1].Set_ReviewType(reviewtype_Remove);
 								this.CurPos.ContentPos--;
@@ -12331,7 +12331,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 						if ((undefined === CurrFramePr && undefined === NextFramePr) || ( undefined !== CurrFramePr && undefined !== NextFramePr && true === CurrFramePr.Compare(NextFramePr) ))
 						{
-							if (true === this.Is_TrackRevisions())
+							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos].Get_ReviewType())
 							{
 								this.Content[this.CurPos.ContentPos].Set_ReviewType(reviewtype_Remove);
 								this.CurPos.ContentPos++;
