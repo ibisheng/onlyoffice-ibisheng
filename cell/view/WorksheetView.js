@@ -8809,7 +8809,7 @@
 			return;
 		}
 		
-		var isIntoShape = t.objectRender.controller.getTargetDocContent(true);
+		var isIntoShape = t.objectRender.controller.getTargetDocContent();
 		var onSelectionCallback = function(isSuccess)
 		{
 			if(!isSuccess)
@@ -8890,6 +8890,8 @@
 			else if(isIntoShape && specialPasteUndoData && specialPasteUndoData.shapeSelectionState)//курсор и специальная вставка в шейпе
 			{
 				//таким образом удаляю вставляенный фрагмент до специальной вставки
+				isIntoShape = t.objectRender.controller.getTargetDocContent(true);
+				
 				var State = specialPasteUndoData.shapeSelectionState;
 				isIntoShape.Set_SelectionState(State, State.length - 1);
 				isIntoShape.Remove(1, true, true);
@@ -10045,7 +10047,7 @@
 	WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
 	{
 		var _clipboard = AscCommonExcel.g_clipboardExcel;
-		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
+		var isIntoShape = this.objectRender.controller.getTargetDocContent();
 		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton && isIntoShape)
 		{
 			if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId === isIntoShape.Id)
