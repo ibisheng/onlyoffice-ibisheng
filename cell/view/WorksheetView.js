@@ -9968,7 +9968,13 @@
 		//font
 		if(rangeStyle.font && specialPasteProps.font)
 		{
-			range.setFont(rangeStyle.font);
+			var font = rangeStyle.font;
+			//если вставляем форматированную таблицу с параметров values + all formating
+			if(specialPasteProps.format && !specialPasteProps.formatTable && rangeStyle.tableDxf && rangeStyle.tableDxf.font)
+			{
+				font = rangeStyle.tableDxf.font.merge(rangeStyle.font);
+			}
+			range.setFont(font);
 		}
 		
 		
