@@ -11035,7 +11035,7 @@ drawSurfaceChart.prototype =
 			}
 			
 			dataSeries = numCache.pts;
-			for(var n = 0; n < numCache.ptCount; n++)
+			for(var n = 0; n < this.chartProp.ptCount; n++)
 			{	
 				//рассчитываем значения
 				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;
