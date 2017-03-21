@@ -938,7 +938,7 @@ DrawingObjectsController.prototype =
 
     handleDblClickEmptyShape: function(oShape){
         this.checkSelectedObjectsAndCallback(function () {
-            if(!oShape.getDocContent() && !CheckLinePresetForParagraphAdd(oShape)){
+            if(!oShape.getDocContent() && !CheckLinePresetForParagraphAdd(oShape.getPresetGeom())){
                 if(!oShape.bWordShape){
                     oShape.createTextBody();
                 }

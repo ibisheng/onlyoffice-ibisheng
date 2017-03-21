@@ -2349,7 +2349,7 @@ CGraphicObjects.prototype =
     },
 
     handleDblClickEmptyShape: function(oShape){
-        if(!oShape.getDocContent() && !AscFormat.CheckLinePresetForParagraphAdd(oShape)){
+        if(!oShape.getDocContent() && !AscFormat.CheckLinePresetForParagraphAdd(oShape.getPresetGeom())){
 
             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
             {
