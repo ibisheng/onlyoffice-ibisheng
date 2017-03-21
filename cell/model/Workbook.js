@@ -5329,25 +5329,23 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		}
 	};
 	Cell.prototype._calculateRefType = function () {
-		var nF, val = this.formulaParsed.value;
+		var val = this.formulaParsed.value;
+		var nF = val.numFormat;
+		var ca = val.ca;
 		if (cElementType.cell === val.type || cElementType.cell3D === val.type) {
-			nF = val.numFormat;
 			val = val.getValue();
-			val.numFormat = nF;
 			if (cElementType.empty === val.type) {
 				// Bug http://bugzilla.onlyoffice.com/show_bug.cgi?id=33941
 				val.value = 0;
 				val.type = cElementType.number;
 			}
 		} else if (cElementType.array === val.type) {
-			nF = val.numFormat;
 			val = val.getElement(0);
-			val.numFormat = nF;
 		} else if (cElementType.cellsRange === val.type || cElementType.cellsRange3D === val.type) {
-			nF = val.numFormat;
 			val = val.cross(new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), this.ws.getId());
-			val.numFormat = nF;
 		}
+		val.numFormat = nF;
+		val.ca = ca;
 		this.formulaParsed.value = val;
 	};
 	Cell.prototype._updateCellValue = function() {
