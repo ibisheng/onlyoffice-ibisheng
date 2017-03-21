@@ -1945,7 +1945,19 @@
 					editor = {WordControl: oTempDrawingDocument, isDocumentEditor: true};
 					var oPasteProcessor = new AscCommon.PasteProcessor({WordControl:{m_oLogicDocument: newCDocument}, FontLoader: {}}, false, false);
 					oPasteProcessor._Prepeare_recursive(node, true, true);
-					oPasteProcessor._Execute(node, {}, true, true, false);
+					
+					//при специальной вставке в firefox _getComputedStyle возвращает null
+					//TODO пересмотреть функцию _getComputedStyle
+					if(AscCommonExcel.g_clipboardExcel.specialPasteStart && window['AscCommon'].g_clipboardBase.specialPasteData.aContent)
+					{
+						oPasteProcessor.aContent = window['AscCommon'].g_clipboardBase.specialPasteData.aContent;
+					}
+					else
+					{
+						oPasteProcessor._Execute(node, {}, true, true, false);
+						window['AscCommon'].g_clipboardBase.specialPasteData.aContent = oPasteProcessor.aContent;
+					}
+					
 					editor = oOldEditor;
 					
 					History.TurnOn();
