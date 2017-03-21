@@ -170,7 +170,7 @@
 
 		// если этот флаг включен - то мы не следим за датой в onCompositionUpdate
 		// а смотрим .value на старте и энде. а промежуток - разница между этим
-		this.UseValueInComposition = AscCommon.AscBrowser.isAndroid;
+		this.UseValueInComposition = AscCommon.AscBrowser.isAndroid && AscCommon.AscBrowser.isChrome;
 	}
 
 	CTextInput.prototype =
@@ -783,7 +783,7 @@
 					ti_console_log("ti: ea space");
 				}
 
-				if (!AscCommon.AscBrowser.isMozilla/* && !this.IsUseInputEventOnlyWithCtx*/)
+				if (!AscCommon.AscBrowser.isMozilla/* && !this.IsUseInputEventOnlyWithCtx*/ || AscCommon.AscBrowser.isAndroid)
 				{
 					// у мозиллы есть проблемы, если делать тут clear
 					// например на корейском языке - слетает композиция в некоторых случаях
