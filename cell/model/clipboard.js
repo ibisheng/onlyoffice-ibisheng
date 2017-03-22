@@ -263,8 +263,14 @@
 						//только значения(вместо формул также вставляются значения)
 						this.revert();
 						this.val = true;
+						//картинки из word сохраняем в данной ситуации
+						if(window['AscCommon'].g_clipboardBase.specialPasteData.pasteFromWord)
+						{
+							this.images = true;
+						}
+						
 						break;
-					}							
+					}
 				}
 			},
 			
@@ -373,6 +379,7 @@
 				if(!bIsSpecialPaste)
 				{
 					window['AscCommon'].g_clipboardBase.specialPasteData.activeRange = ws.model.selectionRange.clone(ws.model);
+					window['AscCommon'].g_clipboardBase.specialPasteData.pasteFromWord = false;
 					window['AscCommon'].g_clipboardBase.specialPasteUndoData.images = [];
 				}
 				
@@ -1064,6 +1071,7 @@
 				{
 					this.activeRange = worksheet.model.selectionRange.getLast().clone(true);
 					result = this._pasteFromBinaryWord(worksheet, base64FromWord, isIntoShape, isCellEditMode);
+					window['AscCommon'].g_clipboardBase.specialPasteData.pasteFromWord = true;
 				}
 				else if(base64FromPresentation)
 				{
