@@ -861,10 +861,14 @@ function GetFileExtension (sName) {
 		return sName.substring(nIndex + 1).toLowerCase();
 	return null;
 }
-function changeFileExtention (sName, sNewExt) {
+function changeFileExtention (sName, sNewExt, opt_lengthLimit) {
   var sOldExt = GetFileExtension(sName);
-  if(sOldExt) {
-    return sName.substring(0, sName.length - sOldExt.length) + sNewExt;
+  var nIndexEnd = sOldExt ? sName.length - sOldExt.length - 1 : sName.length;
+  if (opt_lengthLimit && nIndexEnd + sNewExt.length + 1 > opt_lengthLimit) {
+	  nIndexEnd = opt_lengthLimit - sNewExt.length - 1;
+  }
+  if(nIndexEnd < sName.length) {
+    return sName.substring(0, nIndexEnd) + '.' + sNewExt;
   } else {
     return sName + '.' + sNewExt;
   }

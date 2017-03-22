@@ -726,7 +726,7 @@ var editor;
     oAdditionalData["userid"] = this.documentUserId;
     oAdditionalData["jwt"] = this.CoAuthoringApi.get_jwt();
     oAdditionalData["outputformat"] = sFormat;
-    oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(sFormat));
+    oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(sFormat), Asc.c_nMaxDownloadTitleLen);
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
     }

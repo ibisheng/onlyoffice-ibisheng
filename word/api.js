@@ -6464,7 +6464,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["userid"]       = this.documentUserId;
 		oAdditionalData["jwt"]         = this.CoAuthoringApi.get_jwt();
 		oAdditionalData["outputformat"] = filetype;
-		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
+		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
 		if ('savefromorigin' === command)
 		{
