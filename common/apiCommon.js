@@ -827,6 +827,87 @@
 			return this.vertAxisProps;
 		},
 
+
+
+		checkSwapAxisProps: function(bHBar){
+            var hor_axis_settings = this.getHorAxisProps();
+            var vert_axis_settings = this.getVertAxisProps();
+			if(!bHBar){
+                if(hor_axis_settings){
+                    if(hor_axis_settings.getAxisType() !== c_oAscAxisType.cat){
+                        if(vert_axis_settings &&  vert_axis_settings.getAxisType() === c_oAscAxisType.cat){
+                            this.putHorAxisProps(vert_axis_settings);
+                        }
+                        else{
+                            var new_hor_axis_settings = new asc_CatAxisSettings();
+                            new_hor_axis_settings.setDefault();
+                            this.putHorAxisProps(new_hor_axis_settings);
+                        }
+                    }
+                }
+                else{
+                    var new_hor_axis_settings = new asc_CatAxisSettings();
+                    new_hor_axis_settings.setDefault();
+                    this.putHorAxisProps(new_hor_axis_settings);
+                }
+
+                if(vert_axis_settings){
+                    if(vert_axis_settings.getAxisType() !== c_oAscAxisType.val){
+                        if(hor_axis_settings && hor_axis_settings.getAxisType() === c_oAscAxisType.val){
+                            this.putVertAxisProps(hor_axis_settings);
+                        }
+                        else{
+                            var new_vert_axis_settings = new asc_ValAxisSettings();
+                            new_vert_axis_settings.setDefault();
+                            this.putVertAxisProps(new_vert_axis_settings);
+                        }
+                    }
+                }
+                else{
+                    var new_vert_axis_settings = new asc_ValAxisSettings();
+                    new_vert_axis_settings.setDefault();
+                    this.putVertAxisProps(new_vert_axis_settings);
+                }
+            }
+            else{
+                if(hor_axis_settings){
+                    if(hor_axis_settings.getAxisType() !== c_oAscAxisType.val){
+                        if(vert_axis_settings &&  vert_axis_settings.getAxisType() === c_oAscAxisType.val){
+                            this.putHorAxisProps(vert_axis_settings);
+                        }
+                        else{
+                            var new_hor_axis_settings = new asc_ValAxisSettings();
+                            new_hor_axis_settings.setDefault();
+                            this.putHorAxisProps(new_hor_axis_settings);
+                        }
+                    }
+                }
+                else{
+                    var new_hor_axis_settings = new asc_ValAxisSettings();
+                    new_hor_axis_settings.setDefault();
+                    this.putHorAxisProps(new_hor_axis_settings);
+                }
+
+                if(vert_axis_settings){
+                    if(vert_axis_settings.getAxisType() !== c_oAscAxisType.cat){
+                        if(hor_axis_settings && hor_axis_settings.getAxisType() === c_oAscAxisType.cat){
+                            this.putVertAxisProps(hor_axis_settings);
+                        }
+                        else{
+                            var new_vert_axis_settings = new asc_CatAxisSettings();
+                            new_vert_axis_settings.setDefault();
+                            this.putVertAxisProps(new_vert_axis_settings);
+                        }
+                    }
+                }
+                else{
+                    var new_vert_axis_settings = new asc_CatAxisSettings();
+                    new_vert_axis_settings.setDefault();
+                    this.putVertAxisProps(new_vert_axis_settings);
+                }
+			}
+		},
+
 		changeType: function (type) {
         if (this.type === type) {
             return;
@@ -909,17 +990,10 @@
                 case c_oAscChartTypeSettings.contourNormal       :
                 case c_oAscChartTypeSettings.contourWireframe    :
 					{
-					if (!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.cat) {
-						new_hor_axis_settings = new asc_CatAxisSettings();
-						new_hor_axis_settings.setDefault();
-						this.putHorAxisProps(new_hor_axis_settings);
-					}
-					if (!vert_axis_settings || vert_axis_settings.getAxisType() !== c_oAscAxisType.val) {
-						new_vert_axis_settings = new asc_ValAxisSettings();
-						new_vert_axis_settings.setDefault();
-						this.putVertAxisProps(new_vert_axis_settings);
-					}
 
+
+
+                        this.checkSwapAxisProps(false);
 					if (bSwapLines) {
 						this.putShowMarker(false);
 						this.putSmooth(null);
@@ -944,16 +1018,7 @@
                 case c_oAscChartTypeSettings.hBarStacked3d       :
                 case c_oAscChartTypeSettings.hBarStackedPer3d    :
 					{
-					if (!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.val) {
-						new_hor_axis_settings = new asc_ValAxisSettings();
-						new_hor_axis_settings.setDefault();
-						this.putHorAxisProps(new_hor_axis_settings);
-					}
-					if (!vert_axis_settings || vert_axis_settings.getAxisType() !== c_oAscAxisType.cat) {
-						new_vert_axis_settings = new asc_CatAxisSettings();
-						new_vert_axis_settings.setDefault();
-						this.putVertAxisProps(new_vert_axis_settings);
-					}
+                        this.checkSwapAxisProps(true);
 					if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.pie3d || nOldType === c_oAscChartTypeSettings.doughnut) {
 						this.putShowHorAxis(true);
 						this.putShowVerAxis(true);
