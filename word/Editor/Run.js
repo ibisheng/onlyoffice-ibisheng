@@ -2176,7 +2176,7 @@ ParaRun.prototype.Get_TextForDropCap = function(DropCapText, UseContentPos, Cont
 
         if ( true === DropCapText.Check )
         {
-            if ( para_Space === ItemType || para_Tab === ItemType || para_PageNum === ItemType || para_PageCount === ItemType || para_Drawing === ItemType )
+			if (para_Space === ItemType || para_Tab === ItemType || para_PageNum === ItemType || para_PageCount === ItemType || para_Drawing === ItemType || para_End === ItemType)
             {
                 DropCapText.Mixed = true;
                 return;
