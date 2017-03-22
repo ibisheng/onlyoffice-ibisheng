@@ -8964,139 +8964,148 @@ CFramePr.prototype =
         this.YAlign  = FramePr.YAlign;
     },
 
-    Write_ToBinary : function(Writer)
-    {
-        var StartPos = Writer.GetCurPosition();
-        Writer.Skip(4);
-        var Flags = 0;
+	Write_ToBinary : function(Writer)
+	{
+		var StartPos = Writer.GetCurPosition();
+		Writer.Skip(4);
+		var Flags = 0;
 
-        if ( undefined != this.DropCap )
-        {
-            Writer.WriteLong( this.DropCap );
-            Flags |= 1;
-        }
+		if (undefined != this.DropCap)
+		{
+			Writer.WriteLong(this.DropCap);
+			Flags |= 1;
+		}
 
-        if ( undefined != this.H )
-        {
-            Writer.WriteDouble( this.H );
-            Flags |= 2;
-        }
+		if (undefined != this.H)
+		{
+			Writer.WriteDouble(this.H);
+			Flags |= 2;
+		}
 
-        if ( undefined != this.HAnchor )
-        {
-            Writer.WriteLong( this.HAnchor );
-            Flags |= 4;
-        }
+		if (undefined != this.HAnchor)
+		{
+			Writer.WriteLong(this.HAnchor);
+			Flags |= 4;
+		}
 
-        if ( undefined != this.HRule )
-        {
-            Writer.WriteLong( this.HRule );
-            Flags |= 8;
-        }
+		if (undefined != this.HRule)
+		{
+			Writer.WriteLong(this.HRule);
+			Flags |= 8;
+		}
 
-        if ( undefined != this.HSpace )
-        {
-            Writer.WriteDouble( this.HSpace );
-            Flags |= 16;
-        }
+		if (undefined != this.HSpace)
+		{
+			Writer.WriteDouble(this.HSpace);
+			Flags |= 16;
+		}
 
-        if ( undefined != this.Lines )
-        {
-            Writer.WriteLong( this.Lines );
-            Flags |= 32;
-        }
+		if (undefined != this.Lines)
+		{
+			Writer.WriteLong(this.Lines);
+			Flags |= 32;
+		}
 
-        if ( undefined != this.VAnchor )
-        {
-            Writer.WriteLong( this.VAnchor );
-            Flags |= 64;
-        }
+		if (undefined != this.VAnchor)
+		{
+			Writer.WriteLong(this.VAnchor);
+			Flags |= 64;
+		}
 
-        if ( undefined != this.VSpace )
-        {
-            Writer.WriteDouble( this.VSpace );
-            Flags |= 128;
-        }
+		if (undefined != this.VSpace)
+		{
+			Writer.WriteDouble(this.VSpace);
+			Flags |= 128;
+		}
 
-        if ( undefined != this.W )
-        {
-            Writer.WriteDouble( this.W );
-            Flags |= 256;
-        }
+		if (undefined != this.W)
+		{
+			Writer.WriteDouble(this.W);
+			Flags |= 256;
+		}
 
-        if ( undefined != this.X )
-        {
-            Writer.WriteDouble( this.X );
-            Flags |= 512;
-        }
+		if (undefined != this.X)
+		{
+			Writer.WriteDouble(this.X);
+			Flags |= 512;
+		}
 
-        if ( undefined != this.XAlign )
-        {
-            Writer.WriteLong( this.XAlign );
-            Flags |= 1024;
-        }
+		if (undefined != this.XAlign)
+		{
+			Writer.WriteLong(this.XAlign);
+			Flags |= 1024;
+		}
 
-        if ( undefined != this.Y )
-        {
-            Writer.WriteDouble( this.Y );
-            Flags |= 2048;
-        }
+		if (undefined != this.Y)
+		{
+			Writer.WriteDouble(this.Y);
+			Flags |= 2048;
+		}
 
-        if ( undefined != this.YAlign )
-        {
-            Writer.WriteLong( this.YAlign );
-            Flags |= 4096;
-        }
+		if (undefined != this.YAlign)
+		{
+			Writer.WriteLong(this.YAlign);
+			Flags |= 4096;
+		}
 
-        var EndPos = Writer.GetCurPosition();
-        Writer.Seek( StartPos );
-        Writer.WriteLong( Flags );
-        Writer.Seek( EndPos );
-    },
+		if (undefined !== this.Wrap)
+		{
+			Writer.WriteLong(this.Wrap);
+			Flags |= 8192;
+		}
 
-    Read_FromBinary : function(Reader)
-    {
-        var Flags = Reader.GetLong();
+		var EndPos = Writer.GetCurPosition();
+		Writer.Seek(StartPos);
+		Writer.WriteLong(Flags);
+		Writer.Seek(EndPos);
+	},
 
-        if ( Flags & 1 )
-            this.DropCap = Reader.GetLong();
+	Read_FromBinary : function(Reader)
+	{
+		var Flags = Reader.GetLong();
 
-        if ( Flags & 2 )
-            this.H = Reader.GetDouble();
+		if (Flags & 1)
+			this.DropCap = Reader.GetLong();
 
-        if ( Flags & 4 )
-            this.HAnchor = Reader.GetLong();
+		if (Flags & 2)
+			this.H = Reader.GetDouble();
 
-        if ( Flags & 8 )
-            this.HRule = Reader.GetLong();
+		if (Flags & 4)
+			this.HAnchor = Reader.GetLong();
 
-        if ( Flags & 16 )
-            this.HSpace = Reader.GetDouble();
+		if (Flags & 8)
+			this.HRule = Reader.GetLong();
 
-        if ( Flags & 32 )
-            this.Lines = Reader.GetLong();
+		if (Flags & 16)
+			this.HSpace = Reader.GetDouble();
 
-        if ( Flags & 64 )
-            this.VAnchor = Reader.GetLong();
+		if (Flags & 32)
+			this.Lines = Reader.GetLong();
 
-        if ( Flags & 128 )
-            this.VSpace = Reader.GetDouble();
+		if (Flags & 64)
+			this.VAnchor = Reader.GetLong();
 
-        if ( Flags & 256 )
-            this.W = Reader.GetDouble();
+		if (Flags & 128)
+			this.VSpace = Reader.GetDouble();
 
-        if ( Flags & 512 )
-            this.X = Reader.GetDouble();
+		if (Flags & 256)
+			this.W = Reader.GetDouble();
 
-        if ( Flags & 1024 )
-            this.XAlign = Reader.GetLong();
+		if (Flags & 512)
+			this.X = Reader.GetDouble();
 
-        if ( Flags & 2048 )
-            this.Y = Reader.GetDouble();
+		if (Flags & 1024)
+			this.XAlign = Reader.GetLong();
 
-        if ( Flags & 4096 )
-            this.YAlign = Reader.GetLong();
-    },
+		if (Flags & 2048)
+			this.Y = Reader.GetDouble();
+
+		if (Flags & 4096)
+			this.YAlign = Reader.GetLong();
+
+		if (Flags & 8192)
+			this.Wrap = Reader.GetLong();
+	},
 
     Init_Default_DropCap : function(bInside)
     {
