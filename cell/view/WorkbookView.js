@@ -897,7 +897,7 @@
   WorkbookView.prototype._updateSelectionInfo = function () {
     var ws = this.cellFormulaEnterWSOpen ? this.cellFormulaEnterWSOpen : this.getWorksheet();
     this.oSelectionInfo = ws.getSelectionInfo();
-    this.lastSendInfoRange = ws.model.selectionRange.getLast().clone(true);
+    this.lastSendInfoRange = ws.model.selectionRange.clone();
     this.lastSendInfoRangeIsSelectOnShape = ws.getSelectionShape();
   };
   WorkbookView.prototype._onWSSelectionChanged = function() {
@@ -1006,7 +1006,7 @@
     // Проверим, нужно ли отсылать информацию о ячейке
     var ar = ws.model.selectionRange.getLast();
     var isSelectOnShape = ws.getSelectionShape();
-    if (!this._isEqualRange(ar, isSelectOnShape)) {
+    if (!this._isEqualRange(ws.model.selectionRange, isSelectOnShape)) {
       this._onWSSelectionChanged();
       this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
     }

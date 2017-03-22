@@ -873,10 +873,6 @@
 			return res;
 		};
 		SelectionRange.prototype.isEqual = function (range) {
-			return false;
-			// todo return this.activeCell.isEqual(range.cell);
-		};
-		SelectionRange.prototype.isEqual2 = function(range) {
 			if (this.activeCellId !== range.activeCellId || !this.activeCell.isEqual(range.activeCell) ||
 				this.ranges.length !== range.ranges.length) {
 				return false;
