@@ -6160,8 +6160,8 @@ TableColumn.prototype.generateTotalsRowFunction = function(ws, tablePart){
 	//TODO добавить в перевод
 	if(null === this.TotalsRowFunction && null === this.TotalsRowLabel)
 	{	
-		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
-		this.setTotalsRowFormula("SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])", ws);
+		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionSum;
+		//this.setTotalsRowFormula("SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])", ws);
 	}
 };
 

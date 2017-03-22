@@ -2662,7 +2662,7 @@
 				this.sheetViews[j].pane = null;
 			}
 		}
-		this.setTableFormulaAfterOpen();
+		//this.setTableFormulaAfterOpen();
 		this._updateConditionalFormatting(null);
 
 		this.handlers = handlers;
