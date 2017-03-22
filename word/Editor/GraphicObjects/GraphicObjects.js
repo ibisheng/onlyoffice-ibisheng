@@ -1522,8 +1522,19 @@ CGraphicObjects.prototype =
                         }
                         drawing.Set_BehindDoc(selectedObjects[i].parent.behindDoc);
                         drawing.Set_RelativeHeight(selectedObjects[i].parent.RelativeHeight);
-                        drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value + selectedObjects[i].bounds.x, selectedObjects[i].parent.PositionH.Percent);
-                        drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value + selectedObjects[i].bounds.y, selectedObjects[i].parent.PositionV.Percent);
+                        if(selectedObjects[i].parent.PositionH.Align){
+                            drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value, selectedObjects[i].parent.PositionH.Percent);
+                        }
+                        else{
+                            drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value + selectedObjects[i].bounds.x, selectedObjects[i].parent.PositionH.Percent);
+                        }
+
+                        if(selectedObjects[i].parent.PositionV.Align){
+                            drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value, selectedObjects[i].parent.PositionV.Percent);
+                        }
+                        else{
+                            drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value + selectedObjects[i].bounds.y, selectedObjects[i].parent.PositionV.Percent);
+                        }
                     }
                     run.Add_ToContent(run.State.ContentPos, drawing, true, false);
                     para.Internal_Content_Add(para.CurPos.ContentPos, run, true);
