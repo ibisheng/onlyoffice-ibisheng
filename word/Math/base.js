@@ -1560,6 +1560,12 @@ CMathBase.prototype.Correct_Content = function(bInnerCorrection)
     {
         this.Content[nIndex].Correct_Content(bInnerCorrection);
     }
+
+    if (this.CurPos >= this.Content.length)
+    	this.CurPos = this.Content.length - 1;
+
+    if (this.CurPos < 0)
+    	this.CurPos = 0;
 };
 CMathBase.prototype.Undo = function(Data)
 {
