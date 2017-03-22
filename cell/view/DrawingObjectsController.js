@@ -544,6 +544,43 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
 };
 
 
+    DrawingObjectsController.prototype.checkMobileCursorPosition = function () {
+        if(!this.drawingObjects){
+            return;
+        }
+        var oWorksheet = this.drawingObjects.getWorksheet();
+        if(!oWorksheet){
+            return;
+        }
+        if(window["Asc"]["editor"].isMobileVersion){
+            var oTargetDocContent = this.getTargetDocContent(false, false);
+            if(oTargetDocContent){
+                var oPos = oTargetDocContent.Cursor_GetPos();
+                var oParentTextTransform = oTargetDocContent.Get_ParentTextTransform();
+                var _x, _y;
+                if(oParentTextTransform){
+                    _x = oParentTextTransform.TransformPointX(oPos.X, oPos.Y);
+                    _y = oParentTextTransform.TransformPointY(oPos.X, oPos.Y);
+                }
+                else{
+                    _x = oPos.X;
+                    _y = oPos.Y;
+                }
+                _x = this.drawingObjects.convertMetric(_x, 3, 1);
+                _y = this.drawingObjects.convertMetric(_y, 3, 1);
+                var oCell = oWorksheet.findCellByXY(_x, _y, true, false, false);
+                if(oCell && oCell.col !== null && oCell.row !== null){
+                    var oRange = new Asc.Range(oCell.col, oCell.row, oCell.col, oCell.row, false);
+                    var oVisibleRange = oWorksheet.getVisibleRange();
+                    if(!oRange.isIntersect(oVisibleRange)){
+                        var oOffset = oWorksheet._calcActiveCellOffset(oRange);
+                        //window["Asc"]["editor"].wb.controller.scroll(oOffset);
+                    }
+                }
+            }
+        }
+    };
+
 DrawingObjectsController.prototype.onKeyPress = function(e)
 {
     if ( true === this.isViewMode())
@@ -565,11 +602,13 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
         if( window["Asc"]["editor"].collaborativeEditing.getFast()){
             this.checkSelectedObjectsAndCallbackNoCheckLock(function(){
                 this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
+                this.checkMobileCursorPosition();
             }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
         }
         else{
             this.checkSelectedObjectsAndCallback(function(){
                 this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
+                this.checkMobileCursorPosition();
             }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
         }
         bRetValue = true;
