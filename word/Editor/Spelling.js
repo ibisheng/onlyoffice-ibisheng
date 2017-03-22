@@ -648,28 +648,28 @@ CParaSpellChecker.prototype =
             }
         }        
     },
-    
-    Remove_RightWords : function()
-    {
-        var Count = this.Elements.length;
-        for (var Index = Count - 1; Index >= 0; Index--)
-        {
-            var Element = this.Elements[Index];
 
-            if ( true === Element.Checked )
-            {
-                if (Element.StartRun !== Element.EndRun)
-                {
-                    Element.StartRun.Remove_SpellCheckerElement(Element);
-                    Element.EndRun.Remove_SpellCheckerElement(Element);
-                }
-                else
-                    Element.EndRun.Remove_SpellCheckerElement(Element);               
+	Remove_RightWords : function()
+	{
+		var Count = this.Elements.length;
+		for (var Index = Count - 1; Index >= 0; Index--)
+		{
+			var Element = this.Elements[Index];
 
-                this.Elements.splice(Index, 1);
-            }
-        }        
-    }
+			if (true === Element.Checked && true !== Element.CurPos)
+			{
+				if (Element.StartRun !== Element.EndRun)
+				{
+					Element.StartRun.Remove_SpellCheckerElement(Element);
+					Element.EndRun.Remove_SpellCheckerElement(Element);
+				}
+				else
+					Element.EndRun.Remove_SpellCheckerElement(Element);
+
+				this.Elements.splice(Index, 1);
+			}
+		}
+	}
 };
 
 //----------------------------------------------------------------------------------------------------------------------
