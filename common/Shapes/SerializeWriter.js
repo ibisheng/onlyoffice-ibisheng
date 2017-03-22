@@ -4631,7 +4631,14 @@ function CBinaryFileWriter()
                 case AscDFH.historyitem_type_OleObject:
                 case AscDFH.historyitem_type_ImageShape:
                 {
-                    this.WriteImage(grObject);
+					if(grObject.bWordShape)
+					{
+						this.WriteImage(grObject);
+					}
+					else
+					{
+						this.WriteImage2(grObject);
+					}
                     break;
                 }
                 case AscDFH.historyitem_type_GroupShape:
@@ -4728,6 +4735,12 @@ function CBinaryFileWriter()
             _writer.EndRecord();
         }
 
+		this.WriteImage2 = function(image)
+		{
+			var _writer = this.BinaryFileWriter;
+			_writer.WriteImage(image);
+		}
+		
         this.WriteImage = function(image)
         {
             var _writer = this.BinaryFileWriter;
@@ -4827,7 +4840,14 @@ function CBinaryFileWriter()
                         case AscDFH.historyitem_type_OleObject:
                         case AscDFH.historyitem_type_ImageShape:
                         {
-                            this.WriteImage(elem);
+							if(elem.bWordShape)
+							{
+								this.WriteImage(elem);
+							}
+							else
+							{
+								this.WriteImage2(elem);
+							}
                             break;
                         }
                         case AscDFH.historyitem_type_GroupShape:

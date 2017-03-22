@@ -8809,7 +8809,7 @@
 			return;
 		}
 		
-		var isIntoShape = t.objectRender.controller.getTargetDocContent(true);
+		var isIntoShape = t.objectRender.controller.getTargetDocContent();
 		var onSelectionCallback = function(isSuccess)
 		{
 			if(!isSuccess)
@@ -8832,7 +8832,8 @@
 					pasteData = tempWorkbook.aWorksheets[0];
 				if(pasteData)
 				{
-					t._pasteFromBinary(pasteData, null, null);
+					//undoSpecialPasteRange - нужен для того, чтобы включить undo в диапазон обновления(_updateCellsRange)
+					specialPasteUndoData.undoSpecialPasteRange = t._pasteFromBinary(pasteData, null, null);
 				}
 				
 				//удаляем вставленные изображения
@@ -8889,6 +8890,8 @@
 			else if(isIntoShape && specialPasteUndoData && specialPasteUndoData.shapeSelectionState)//курсор и специальная вставка в шейпе
 			{
 				//таким образом удаляю вставляенный фрагмент до специальной вставки
+				isIntoShape = t.objectRender.controller.getTargetDocContent(true);
+				
 				var State = specialPasteUndoData.shapeSelectionState;
 				isIntoShape.Set_SelectionState(State, State.length - 1);
 				isIntoShape.Remove(1, true, true);
@@ -9039,7 +9042,19 @@
                 t.handlers.trigger("slowOperation", false);
             }
             t.isChanged = true;
-            t._updateCellsRange(arn, canChangeColWidth);
+			
+			var specialPasteUndoData = g_clipboardBase.specialPasteUndoData;
+			if(specialPasteUndoData && specialPasteUndoData.undoSpecialPasteRange && specialPasteUndoData.undoSpecialPasteRange[0] && AscCommonExcel.g_clipboardExcel.specialPasteStart)
+			{
+				var unionRange = arn.union(specialPasteUndoData.undoSpecialPasteRange[0]);
+				t._updateCellsRange(unionRange, canChangeColWidth);
+				
+				specialPasteUndoData.undoSpecialPasteRange = null;
+			}
+			else
+			{
+				t._updateCellsRange(arn, canChangeColWidth);
+			}
         }
 
         var oSelection = History.GetSelection();
@@ -9611,7 +9626,7 @@
 		};
 		
 		var colsWidth = {};
-		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal, curMerge)
+		var putInsertedCellIntoRange = function(nRow, nCol, pasteRow, pasteCol, rowDiff, colDiff, range, newVal, curMerge, transposeRange)
 		{
 			var pastedRangeProps = {};
 			//range может далее изменится в связи с наличием мерженных ячеек, firstRange - не меняется(ему делаем setValue, как первой ячейке в диапазоне мерженных)
@@ -9678,7 +9693,7 @@
 			pastedRangeProps.colsWidth = colsWidth;
 			
 			//apply props by cell
-			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge, val: val};
+			var formulaProps = {firstRange: firstRange, arrFormula: arrFormula, tablesMap: tablesMap, newVal: newVal, isOneMerge: isOneMerge, val: val, activeCellsPasteFragment: activeCellsPasteFragment, transposeRange: transposeRange};
 			t._setPastedDataByCurrentRange(range, pastedRangeProps, formulaProps, specialPasteProps);
 		};
 		
@@ -9723,7 +9738,13 @@
 							}
 							
 							var range = t.model.getRange3(nRow, nCol, nRow, nCol);
-							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal, curMerge);
+							var transposeRange = null;
+							if(specialPasteProps.transpose)
+							{
+								transposeRange = t.model.getRange3(c + autoR * plRow + arn.r1, r + autoC * plCol + arn.c1, c + autoR * plRow + arn.r1, r + autoC * plCol + arn.c1);
+							}
+							
+							putInsertedCellIntoRange(nRow, nCol, pasteRow, pasteCol, autoR * plRow, autoC * plCol, range, newVal, curMerge, transposeRange);
 							
                             //если замержили range
                             c = range.bbox.c2 - autoC * plCol - arn.c1;
@@ -9751,7 +9772,7 @@
 	{
 		var t = this;
 		
-		var firstRange, arrFormula, tablesMap, newVal, isOneMerge, val;
+		var firstRange, arrFormula, tablesMap, newVal, isOneMerge, val, activeCellsPasteFragment, transposeRange;
 		if(formulaProps)
 		{
 			//TODO firstRange возможно стоит убрать(добавлено было для правки бага 27745)
@@ -9761,7 +9782,29 @@
 			newVal = formulaProps.newVal;
 			isOneMerge = formulaProps.isOneMerge;
 			val = formulaProps.val;
+			activeCellsPasteFragment = formulaProps.activeCellsPasteFragment;
+			transposeRange = formulaProps.transposeRange;
 		}
+		
+		var transposeOutStack = function(outStack)
+		{
+			for(var i = 0; i < outStack.length; i++)
+			{
+				if(outStack[i].range /*&& activeCellsPasteFragment && activeCellsPasteFragment.containsRange(outStack[i].range.bbox)*/)
+				{
+					var diffCol1 = outStack[i].range.bbox.c1 - activeCellsPasteFragment.c1;
+					var diffRow1 = outStack[i].range.bbox.r1 - activeCellsPasteFragment.r1;
+					var diffCol2 = outStack[i].range.bbox.c2 - activeCellsPasteFragment.c1;
+					var diffRow2 = outStack[i].range.bbox.r2 - activeCellsPasteFragment.r1;
+					
+					outStack[i].range.bbox.c1 = activeCellsPasteFragment.c1 + diffRow1;
+					outStack[i].range.bbox.r1 = activeCellsPasteFragment.r1 + diffCol1;
+					outStack[i].range.bbox.c2 = activeCellsPasteFragment.c1 + diffRow2;
+					outStack[i].range.bbox.r2 = activeCellsPasteFragment.r1 + diffCol2;
+				}
+				
+			}
+		};
 		
 		//set formula - for paste from binary
 		var calculateValueAndBinaryFormula = function(newVal, firstRange, range)
@@ -9796,10 +9839,26 @@
 
 				//formula
 				if (newVal.getFormula() && !isOneMerge) {
-					var offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+					var offset;
+					if(specialPasteProps.transpose && transposeRange)
+					{
+						//для transpose необходимо брать offset перевернутого range
+						offset = transposeRange.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+					}
+					else
+					{
+						offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+					}
 					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, val);
 
 					if (_p_.parse()) {
+						
+						if(specialPasteProps.transpose)
+						{
+							//для transpose необходимо перевернуть все дипазоны в формулах
+							transposeOutStack(_p_.outStack);
+						}
+						
 						if(null !== tablesMap)
 						{
 							var renameParams = {};
@@ -9909,7 +9968,13 @@
 		//font
 		if(rangeStyle.font && specialPasteProps.font)
 		{
-			range.setFont(rangeStyle.font);
+			var font = rangeStyle.font;
+			//если вставляем форматированную таблицу с параметров values + all formating
+			if(specialPasteProps.format && !specialPasteProps.formatTable && rangeStyle.tableDxf && rangeStyle.tableDxf.font)
+			{
+				font = rangeStyle.tableDxf.font.merge(rangeStyle.font);
+			}
+			range.setFont(font);
 		}
 		
 		
@@ -10032,7 +10097,7 @@
 	WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
 	{
 		var _clipboard = AscCommonExcel.g_clipboardExcel;
-		var isIntoShape = this.objectRender.controller.getTargetDocContent(true);
+		var isIntoShape = this.objectRender.controller.getTargetDocContent();
 		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton && isIntoShape)
 		{
 			if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId === isIntoShape.Id)
@@ -12522,7 +12587,7 @@
 						{
 							if(colId === sortCondition.Ref.c1 - range.c1)
 							{
-								isSortState = !sortCondition.ConditionDescending;
+								isSortState = sortCondition.ConditionDescending;
 							}
 						}
 
@@ -13269,11 +13334,11 @@
             }
             case c_oAscChangeSelectionFormatTable.data:
             {
-                //TODO проверить есть ли строка заголовков
-                startCol = refTablePart.c1;
-                endCol = refTablePart.c2;
-                startRow = refTablePart.r1 + 1;
-                endRow = refTablePart.r2;
+				var rangeWithoutHeaderFooter = tablePart.getRangeWithoutHeaderFooter();
+                startCol = lastSelection.c1 < refTablePart.c1 ? refTablePart.c1 : lastSelection.c1;
+                endCol = lastSelection.c2 > refTablePart.c2 ? refTablePart.c2 : lastSelection.c2;
+                startRow = rangeWithoutHeaderFooter.r1;
+                endRow = rangeWithoutHeaderFooter.r2;
 
                 break;
             }

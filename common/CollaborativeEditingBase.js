@@ -983,7 +983,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                     mapLayouts[oClass.Get_Id()] = oClass;
                     bChangedLayout = true;
                 }
-                else if(typeof CPresentation !== "undefined" && oClass instanceof CPresentation){
+                else if(AscCommonSlide.CPresentation && oClass instanceof AscCommonSlide.CPresentation){
                     if(oChange.Type === AscDFH.historyitem_Presentation_RemoveSlide || oChange.Type === AscDFH.historyitem_Presentation_AddSlide){
                         bAddSlides = true;
                         for(var i = 0; i < oChange.Items.length; ++i){
@@ -1003,12 +1003,6 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                 if(mapAddedSlides[oLogicDocument.Slides[i].Get_Id()] && !oLogicDocument.Slides[i].Layout){
                     oLogicDocument.removeSlide(i);
                 }
-            }
-        }
-
-        for(var sId in mapSlides){
-            if(mapSlides.hasOwnProperty(sId)){
-                mapSlides[sId].correctContent();
             }
         }
 
@@ -1119,11 +1113,9 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         for (var sId in mapParagraphs)
         {
             var oParagraph = mapParagraphs[sId];
+			oParagraph.CheckParaEnd();
             oParagraph.Correct_Content();
-            oParagraph.CheckParaEnd();
         }
-
-
 
 		var oBinaryWriter = AscCommon.History.BinaryWriter;
 		var aSendingChanges = [];

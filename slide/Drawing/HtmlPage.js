@@ -945,6 +945,9 @@ function CEditorPage(api)
 		oWordControl.m_bIsRePaintOnScroll      = true;
 
 		oWordControl.OnScroll();
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.Resize_After();
 	};
 
 	this.zoom_Out = function()
@@ -2438,6 +2441,9 @@ function CEditorPage(api)
 			return;
 		}
 
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.Resize_Before();
+
 		//console.log("resize");
 		this.CheckRetinaDisplay();
 		this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm, this);
@@ -2489,6 +2495,9 @@ function CEditorPage(api)
 		this.onTimerScroll_sync(true);
 
 		this.DemonstrationManager.Resize();
+
+		if (this.MobileTouchManager)
+			this.MobileTouchManager.Resize_After();
 	};
 
 	this.OnResize2 = function(isAttack)

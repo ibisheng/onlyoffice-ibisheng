@@ -2525,8 +2525,8 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
 	History.TurnOff();
 
-    var oldDefTabStop = Default_Tab_Stop;
-    Default_Tab_Stop = 1;
+    var oldDefTabStop = AscCommonWord.Default_Tab_Stop;
+	AscCommonWord.Default_Tab_Stop = 1;
 
     var oApi = Asc['editor'] || editor;
     if(!oApi || !oApi.textArtPreviewManager){
@@ -2572,7 +2572,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     _dc.Reset(0, 0, par.Lines[0].Ranges[0].W + 0.001, 10000);
     _dc.Recalculate_Page(0, true);
 
-    Default_Tab_Stop = oldDefTabStop;
+	AscCommonWord.Default_Tab_Stop = oldDefTabStop;
 
     if (true === bTurnOnId)
         g_oTableId.m_bTurnOff = false;

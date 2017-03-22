@@ -30,6 +30,10 @@
  *
  */
 
+ window.IS_NATIVE_EDITOR = true;
+
+ window['SockJS'] = createSockJS();
+
 Asc['asc_docs_api'].prototype.Update_ParaInd = function( Ind )
 {
     this.WordControl.m_oDrawingDocument.Update_ParaInd(Ind);
@@ -1755,20 +1759,20 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 21:
                     {
                         var bIsNeed = _params[_current.pos++];
-                        
+
                         if (bIsNeed)
                         {
                             var currImage = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
                             if (currImage && currImage.length) {
-                               
+
                                 var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](currImage[0].ImageUrl);
-                                
+
                                 var _w = _originSize[0];
                                 var _h = _originSize[1];
-                                
+
                                 // сбрасываем урл
                                 _imagePr.ImageUrl = undefined;
-                                
+
                                 var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
                                 var _page_width = AscCommon.Page_Width;
                                 var _page_height = AscCommon.Page_Height;
@@ -1776,25 +1780,25 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                                 var _page_y_top_margin = AscCommon.Y_Top_Margin;
                                 var _page_x_right_margin = AscCommon.X_Right_Margin;
                                 var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
-                                
+
                                 if (_section_select)
                                 {
                                     if (_section_select.W)
                                         _page_width = _section_select.W;
-                                    
+
                                     if (_section_select.H)
                                         _page_height = _section_select.H;
                                 }
-                                
+
                                 var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
                                 var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
-                                
+
                                 var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
                                 var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-                                
+
                                 wI = Math.max(5, Math.min(wI, __w));
                                 hI = Math.max(5, Math.min(hI, __h));
-                                
+
                                 _imagePr.Width = wI;
                                 _imagePr.Height = hI;
                             }
@@ -2171,6 +2175,121 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             }
             break;
         }
+
+
+    case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
+    {
+        var t = _api.CoAuthoringApi._CoAuthoringApi;
+
+        t._state = AscCommon.ConnectionState.WaitAuth;
+        t.onFirstConnect();
+
+        break;
+    }
+
+    case 10010: // ASC_SOCKET_EVENT_TYPE_ON_CLOSE
+    {
+
+        break;
+    }
+
+    case 10020: // ASC_SOCKET_EVENT_TYPE_MESSAGE
+    {
+        var t = _api.CoAuthoringApi._CoAuthoringApi;
+
+        var dataObject = JSON.parse(_params);
+
+        // console.log("JS - " + dataObject['type']);
+
+        switch (dataObject['type']) {
+            case 'auth'        :
+                t._onAuth(dataObject);
+                break;
+            case 'message'      :
+                t._onMessages(dataObject, false);
+                break;
+            case 'cursor'       :
+                t._onCursor(dataObject);
+                break;
+            case 'meta' :
+                t._onMeta(dataObject);
+                break;
+            case 'getLock'      :
+                t._onGetLock(dataObject);
+                break;
+            case 'releaseLock'    :
+                t._onReleaseLock(dataObject);
+                break;
+            case 'connectState'    :
+                t._onConnectionStateChanged(dataObject);
+                break;
+            case 'saveChanges'    :
+                t._onSaveChanges(dataObject);
+                break;
+            case 'saveLock'      :
+                t._onSaveLock(dataObject);
+                break;
+            case 'unSaveLock'    :
+                t._onUnSaveLock(dataObject);
+                break;
+            case 'savePartChanges'  :
+                t._onSavePartChanges(dataObject);
+                break;
+            case 'drop'        :
+                t._onDrop(dataObject);
+                break;
+            case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
+                break;
+            case 'error'      : /*Старая версия sdk*/
+                t._onDrop(dataObject);
+                break;
+            case 'documentOpen'    :
+                t._documentOpen(dataObject);
+                break;
+            case 'warning':
+                t._onWarning(dataObject);
+                break;
+            case 'license':
+                t._onLicense(dataObject);
+                break;
+            case 'session' :
+                t._onSession(dataObject);
+                break;
+        }
+
+        break;
+    }
+
+    case 11010: // ASC_SOCKET_EVENT_TYPE_ON_DISCONNECT
+    {
+        break;
+    }
+
+    case 11020: // ASC_SOCKET_EVENT_TYPE_TRY_RECONNECT
+    {
+        var t = _api.CoAuthoringApi._CoAuthoringApi;
+        delete t.sockjs;
+        t._initSocksJs();
+        break;
+    }
+
+    case 21000: // ASC_COAUTH_EVENT_TYPE_INSERT_URL_IMAGE
+    {
+        var urls = JSON.parse(_params[0]);
+        AscCommon.g_oDocumentUrls.addUrls(urls);
+        var firstUrl;
+        for (var i in urls) {
+            if (urls.hasOwnProperty(i)) {
+                firstUrl = urls[i];
+                break;
+            }
+        }
+
+        params[0] = firstUrl;
+      //  _return = _s.offline_addImageDrawingObject(params);
+
+        break;
+    }
 
         default:
             break;
@@ -4213,6 +4332,41 @@ AscCommon.asc_WriteColorSchemes = asc_WriteColorSchemes;
 
 ///////////////////////////////////////////////////////////////////////
 
+function asc_WriteUsers(c, s) {
+    if (!c) return;
+
+    var len = 0, name, user;
+    for (name in c) {
+        if (undefined !== name) {
+            len++;
+        }
+    }
+
+    s["WriteLong"](len);
+
+    for (name in c) {
+        if (undefined !== name) {
+            user = c[name];
+            if (user) {
+                s['WriteString2'](user.asc_getId());
+                s['WriteString2'](user.asc_getFirstName() === undefined ? "" : user.asc_getFirstName());
+                s['WriteString2'](user.asc_getLastName() === undefined ? "" : user.asc_getLastName());
+                s['WriteString2'](user.asc_getUserName() === undefined ? "" : user.asc_getUserName());
+                s['WriteBool'](user.asc_getView());
+
+                var color = new Asc.asc_CColor();
+
+                color.r = (user.color >> 16) & 255;
+                color.g = (user.color >> 8 ) & 255;
+                color.b = (user.color      ) & 255;
+
+                asc_menu_WriteColor(0, color, s);
+            }
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////
 
 Asc['asc_docs_api'].prototype.UpdateTextPr = function(TextPr)
 {
@@ -5151,8 +5305,8 @@ CStylesPainter.prototype =
         AscCommon.g_oTableId.m_bTurnOff = true;
         AscCommon.History.TurnOff();
 
-        var oldDefTabStop = Default_Tab_Stop;
-        Default_Tab_Stop = 1;
+        var oldDefTabStop = AscCommonWord.Default_Tab_Stop;
+		AscCommonWord.Default_Tab_Stop = 1;
 
         var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
         var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
@@ -5251,7 +5405,7 @@ CStylesPainter.prototype =
 
         graphics.restore();
 
-        Default_Tab_Stop = oldDefTabStop;
+		AscCommonWord.Default_Tab_Stop = oldDefTabStop;
 
         AscCommon.g_oTableId.m_bTurnOff = false;
         AscCommon.History.TurnOn();
@@ -5359,61 +5513,61 @@ Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_p
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Copy = function()
 {
     var dataBuffer = {};
-    
+
     var clipboard = {};
     clipboard.pushData = function(type, data) {
-        
+
         if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
-            
+
             dataBuffer.text = data;
-            
+
         } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
-            
+
             if (null != data.drawingUrls && data.drawingUrls.length > 0) {
                 dataBuffer.drawingUrls = data.drawingUrls[0];
             }
-            
+
             dataBuffer.sBase64 = data.sBase64;
         }
     }
-    
+
     this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
-    
+
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-    
+
     if (dataBuffer.text) {
         _stream["WriteByte"](0);
         _stream["WriteString2"](dataBuffer.text);
     }
-    
+
     if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
         _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-    
+
     if (dataBuffer.sBase64) {
         _stream["WriteByte"](2);
         _stream["WriteStringA"](dataBuffer.sBase64);
     }
-    
+
     _stream["WriteByte"](255);
-    
+
     return _stream;
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
 {
     var dataBuffer = {};
-    
+
     var clipboard = {};
     clipboard.pushData = function(type, data) {
-        
+
         if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
-            
+
             dataBuffer.text = data;
-            
+
         } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
-            
+
             if (null != data.drawingUrls && data.drawingUrls.length > 0) {
                  dataBuffer.drawingUrls = data.drawingUrls[0];
             }
@@ -5421,31 +5575,31 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
             dataBuffer.sBase64 = data.sBase64;
         }
     }
-    
+
     this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
-    
+
     this.asc_SelectionCut();
-    
+
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-    
+
     if (dataBuffer.text) {
         _stream["WriteByte"](0);
         _stream["WriteString2"](dataBuffer.text);
     }
-   
+
     if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
         _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-   
+
     if (dataBuffer.sBase64) {
         _stream["WriteByte"](2);
         _stream["WriteStringA"](dataBuffer.sBase64);
     }
-    
+
     _stream["WriteByte"](255);
-    
+
     return _stream;
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Paste = function(type, param)
@@ -5487,6 +5641,26 @@ Asc['asc_docs_api'].prototype.pre_Paste = function(_fonts, _images, callback)
     callback();
 };
 /************************************************************************/
+
+Asc['asc_docs_api'].prototype.openDocument = function(sData)
+{
+  // var version;
+  //
+  // if (sData.changes && this.VersionHistory)
+  // {
+  //   this.VersionHistory.changes = sData.changes;
+  //   this.VersionHistory.applyChanges(this);
+  // }
+
+  _api.asc_nativeOpenFile(sData.data);
+
+  window["native"]["onEndLoadingFile"]();
+
+  if (_api.NativeAfterLoad)
+    _api.NativeAfterLoad();
+
+  window["native"]["onEndLoadingFile"]();
+};
 
 // chat styles
 AscCommon.ChartPreviewManager.prototype.clearPreviews = function()
@@ -5685,3 +5859,88 @@ Asc['asc_docs_api'].prototype.__SendThemeColorScheme = function()
     this.WordControl.m_oApi.sync_SendThemeColorSchemes(infos);
 };
 */
+
+function NativeOpenFile3(_params, documentInfo)
+{
+  window["CreateMainTextMeasurerWrapper"]();
+
+	window.g_file_path = "native_open_file";
+	window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
+	var doc_bin = window.native.GetFileString(window.g_file_path);
+	if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
+	{
+		_api = new window["Asc"]["asc_docs_api"]("");
+
+		if (undefined !== _api.Native_Editor_Initialize_Settings)
+		{
+			_api.Native_Editor_Initialize_Settings(_params);
+		}
+
+    window.documentInfo = documentInfo;
+
+    var userInfo = new Asc.asc_CUserInfo();
+    userInfo.asc_putId(window.documentInfo["docUserId"]);
+    userInfo.asc_putFullName(window.documentInfo["docUserName"]);
+    userInfo.asc_putFirstName(window.documentInfo["docUserFirstName"]);
+    userInfo.asc_putLastName(window.documentInfo["docUserLastName"]);
+
+    var docInfo = new Asc.asc_CDocInfo();
+    docInfo.put_Id(window.documentInfo["docKey"]);
+    docInfo.put_UserInfo(userInfo);
+
+    _api.asc_setDocInfo(docInfo);
+
+    if (window.documentInfo["iscoauthoring"]) {
+
+      _api.isSpellCheckEnable = false;
+
+      _api.asc_setAutoSaveGap(1);
+      _api._coAuthoringInit();
+      _api.asc_SetFastCollaborative(true);
+
+      _api.asc_registerCallback("asc_onAuthParticipantsChanged", function(users) {
+          var stream = global_memory_stream_menu;
+          stream["ClearNoAttack"]();
+          asc_WriteUsers(users, stream);
+          window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
+        });
+
+      _api.asc_registerCallback("asc_onParticipantsChanged", function(users) {
+																	var stream = global_memory_stream_menu;
+																	stream["ClearNoAttack"]();
+																	asc_WriteUsers(users, stream);
+																	window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
+																	});
+
+			_api.asc_registerCallback("asc_onGetEditorPermissions", function(state) {
+
+			     var rData = {
+												 "c"             : "open",
+												 "id"            : window.documentInfo["docKey"],
+												 "userid"        : window.documentInfo["docUserId"],
+												 "format"        : "docx",
+												 "vkey"          : undefined,
+												 "url"           : window.documentInfo["docURL"],
+												 "title"         : this.documentTitle,
+												 "embeddedfonts" : false};
+
+												 _api.CoAuthoringApi.auth(window.documentInfo["viewmode"], rData);
+				});
+
+				_api.asc_registerCallback("asc_onDocumentUpdateVersion", function(callback) {
+																	var me = this;
+																	me.needToUpdateVersion = true;
+																	if (callback) callback.call(me);
+																	});
+
+
+		} else {
+      var doc_bin = window.native.GetFileString(window.g_file_path);
+      _api.asc_nativeOpenFile(doc_bin);
+
+      if (_api.NativeAfterLoad)
+        _api.NativeAfterLoad();
+    }
+	}
+	Api = _api;
+}

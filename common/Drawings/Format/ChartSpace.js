@@ -2049,6 +2049,7 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
                 var series = new AscFormat.CScatterSeries();
                 series.setIdx(i - minus);
                 series.setOrder(i - minus);
+                AscFormat.ApplySpPr(oFirstSpPrPreset, series, i, base_fills, bAccent1Background);
                 if(oXVal)
                 {
                     series.setXVal(oXVal.createDuplicate());
@@ -12424,9 +12425,9 @@ function CreateScatterChart(chartSeries, bUseCache, oOptions)
         first_series = asc_series.length > 1 ? asc_series[0] : null;
         start_index = asc_series.length > 1 ? 1 : 0;
         minus = start_index === 1 ? 1 : 0;
-        oXVal = new AscFormat.CXVal();
         if(first_series)
         {
+            oXVal = new AscFormat.CXVal();
             FillValNum(oXVal, first_series.Val, bUseCache);
         }
     }

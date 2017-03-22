@@ -938,7 +938,7 @@ DrawingObjectsController.prototype =
 
     handleDblClickEmptyShape: function(oShape){
         this.checkSelectedObjectsAndCallback(function () {
-            if(!oShape.getDocContent() && !CheckLinePresetForParagraphAdd(oShape)){
+            if(!oShape.getDocContent() && !CheckLinePresetForParagraphAdd(oShape.getPresetGeom())){
                 if(!oShape.bWordShape){
                     oShape.createTextBody();
                 }
@@ -10084,7 +10084,8 @@ function ApplyDLblsProps(aPr, oObj, oDrawingDocument, i, baseFills, bCreate){
 
         ApplyTxPr(aPr[0], lbls, oDrawingDocument, i, baseFills);
         ApplySpPr(aPr[1], lbls, i, baseFills);
-        if(!bCreate){
+        //if(!bCreate)
+        {
             lbls.setDLblPos(aPr[2]);
             lbls.setSeparator(aPr[3]);
             lbls.setShowBubbleSize(aPr[4]);

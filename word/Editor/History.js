@@ -482,12 +482,11 @@ CHistory.prototype =
 		}
 	},
 
-    Internal_RecalcData_Clear : function()
-    {
-        // NumPr здесь не обнуляем
-        var NumPr = this.RecalculateData.NumPr;
-		this.RecalculateData =
-		{
+	Internal_RecalcData_Clear : function()
+	{
+		// NumPr здесь не обнуляем
+		var NumPr            = this.RecalculateData.NumPr;
+		this.RecalculateData = {
 			Inline   : {
 				Pos     : -1,
 				PageNum : 0
@@ -500,11 +499,14 @@ CHistory.prototype =
 				ThemeInfo : null
 			},
 
-			Tables       : [],
-			NumPr        : NumPr,
-			NotesEnd     : false,
-			NotesEndPage : 0,
-			Update       : true
+			Tables        : [],
+			NumPr         : NumPr,
+			NotesEnd      : false,
+			NotesEndPage  : 0,
+			Update        : true,
+			ChangedStyles : {},
+			ChangedNums   : {},
+			AllParagraphs : null
 		};
 	},
 
@@ -610,6 +612,33 @@ CHistory.prototype =
 			}
         }
     },
+
+	AddChangedStyleToRecalculateData : function(sId, oStyle)
+	{
+		if (!this.RecalculateData.ChangedStyles)
+			this.RecalculateData.ChangedStyles = {};
+
+		if (this.RecalculateData.ChangedStyles[sId] === oStyle)
+			return false;
+
+		this.RecalculateData.ChangedStyles[sId] = oStyle;
+		return true;
+	},
+
+	AddChangedNumberingToRecalculateData : function(NumId, Lvl, oNum)
+	{
+		if (!this.RecalculateData.ChangedNums)
+			this.RecalculateData.ChangedNums = {};
+
+		if (!this.RecalculateData.ChangedNums[NumId])
+			this.RecalculateData.ChangedNums[NumId] = {};
+
+		if (this.RecalculateData.ChangedNums[NumId][Lvl] === oNum)
+			return false;
+
+		this.RecalculateData.ChangedNums[NumId][Lvl] = oNum;
+		return true;
+	},
 
     Add_RecalcNumPr : function(NumPr)
     {
@@ -1133,6 +1162,60 @@ CHistory.prototype.private_GetItemsCountInContentChange = function(Class, Data)
 		return Data.Items.length;
 
 	return 1;
+};
+CHistory.prototype.GetAllParagraphsForRecalcData = function(Props)
+{
+	if (!this.RecalculateData.AllParagraphs)
+	{
+		if (this.Document)
+			this.RecalculateData.AllParagraphs = this.Document.Get_AllParagraphs({All : true});
+		else
+			this.RecalculateData.AllParagraphs = [];
+	}
+
+	var arrParagraphs = [];
+	if (!Props || true === Props.All)
+	{
+		return this.RecalculateData.AllParagraphs;
+	}
+	else if (true === Props.Style)
+	{
+		var arrStylesId = Props.StylesId;
+		for (var nParaIndex = 0, nParasCount = this.RecalculateData.AllParagraphs.length; nParaIndex < nParasCount; ++nParaIndex)
+		{
+			var oPara = this.RecalculateData.AllParagraphs[nParaIndex];
+			for (var nStyleIndex = 0, nStylesCount = arrStylesId.length; nStyleIndex < nStylesCount; ++nStyleIndex)
+			{
+				if (oPara.Pr.PStyle === arrStylesId[nStyleIndex])
+				{
+					arrParagraphs.push(oPara);
+					break;
+				}
+			}
+		}
+	}
+	else if (true === Props.Numbering)
+	{
+		for (var nParaIndex = 0, nParasCount = this.RecalculateData.AllParagraphs.length; nParaIndex < nParasCount; ++nParaIndex)
+		{
+			var oPara = this.RecalculateData.AllParagraphs[nParaIndex];
+
+			var NumPr  = Props.NumPr;
+			var _NumPr = oPara.Numbering_Get();
+
+			if (undefined != _NumPr && _NumPr.NumId === NumPr.NumId && (_NumPr.Lvl === NumPr.Lvl || undefined === NumPr.Lvl))
+				arrParagraphs.push(oPara);
+		}
+	}
+	return arrParagraphs;
+};
+CHistory.prototype.GetRecalculateIndex = function()
+{
+	return this.RecIndex;
+};
+CHistory.prototype.SetRecalculateIndex = function(nIndex)
+{
+	this.RecIndex = Math.min(this.Index, nIndex);
 };
 
 function CRC32()

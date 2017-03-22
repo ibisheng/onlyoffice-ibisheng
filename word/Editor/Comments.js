@@ -411,29 +411,52 @@ function CComment(Parent, Data)
             this.m_oTypeInfo.Data = g_oTableId.Get_ById( Reader.GetString2() );
     };
 
-    this.Check_MergeData = function()
+    this.Check_MergeData = function(arrAllParagraphs)
     {
         // Проверяем, не удалили ли мы параграф, к которому был сделан данный комментарий
         // Делаем это в самом конце, а не сразу, чтобы заполнились данные о начальном и
         // конечном параграфах.
 
-        var bUse = true;
+		this.Set_StartId(null);
+		this.Set_EndId(null);
 
-        if ( null != this.StartId )
-        {
-            var ObjStart = g_oTableId.Get_ById( this.StartId );
+		var bStartSet = false, bEndSet = false;
+        for (var nIndex = 0, nCount = arrAllParagraphs.length; nIndex < nCount; ++nIndex)
+		{
+			var oPara   = arrAllParagraphs[nIndex];
+			var oResult = oPara.CheckCommentStartEnd(this.Id);
+			if (true === oResult.Start)
+			{
+				this.Set_StartId(oPara.Get_Id());
+				bStartSet = true;
+			}
 
-            if ( true != ObjStart.Is_UseInDocument() )
-                bUse = false;
-        }
+			if (true === oResult.End)
+			{
+				this.Set_EndId(oPara.Get_Id());
+				bEndSet = true;
+			}
 
-        if ( true === bUse && null != this.EndId )
-        {
-            var ObjEnd = g_oTableId.Get_ById( this.EndId );
+			if (bStartSet && bEndSet)
+				break;
+		}
 
-            if ( true != ObjEnd.Is_UseInDocument() )
-                bUse = false;
-        }
+		var bUse = true;
+		if (null != this.StartId)
+		{
+			var ObjStart = g_oTableId.Get_ById(this.StartId);
+
+			if (true != ObjStart.Is_UseInDocument())
+				bUse = false;
+		}
+
+		if (true === bUse && null != this.EndId)
+		{
+			var ObjEnd = g_oTableId.Get_ById(this.EndId);
+
+			if (true != ObjEnd.Is_UseInDocument())
+				bUse = false;
+		}
 
         if ( false === bUse )
             editor.WordControl.m_oLogicDocument.Remove_Comment( this.Id, true, false );
@@ -580,9 +603,14 @@ function CComments()
 
     this.Check_MergeData = function()
     {
+    	var arrAllParagraphs = null;
+
         for (var Id in this.m_aComments)
         {
-            this.m_aComments[Id].Check_MergeData();
+        	if (!arrAllParagraphs && editor && editor.WordControl.m_oLogicDocument)
+        		arrAllParagraphs = editor.WordControl.m_oLogicDocument.Get_AllParagraphs({All : true});
+
+            this.m_aComments[Id].Check_MergeData(arrAllParagraphs);
         }
     };
 
@@ -1131,6 +1159,18 @@ ParaComment.prototype.Get_TextPr = function(ContentPos, Depth)
 ParaComment.prototype.CanSplit = function()
 {
 	return false;
+};
+ParaComment.prototype.SetCommentId = function(sCommentId)
+{
+	this.Set_CommentId(sCommentId);
+};
+ParaComment.prototype.GetCommentId = function()
+{
+	return this.CommentId;
+};
+ParaComment.prototype.IsCommentStart = function()
+{
+	return this.Start;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Разное

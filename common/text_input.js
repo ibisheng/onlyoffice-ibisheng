@@ -167,6 +167,10 @@
 		this.virtualKeyboardClickPrevent = false;
 
 		this.AndroidKeyboardDetectBackspace = false;
+
+		// если этот флаг включен - то мы не следим за датой в onCompositionUpdate
+		// а смотрим .value на старте и энде. а промежуток - разница между этим
+		this.UseValueInComposition = AscCommon.AscBrowser.isAndroid && AscCommon.AscBrowser.isChrome;
 	}
 
 	CTextInput.prototype =
@@ -647,6 +651,21 @@
 			}
 
 			var _value = this.getAreaValue();
+			if (this.UseValueInComposition)
+			{
+				var _data = _value.substring(this.ieNonCompositionPrefix.length);
+
+				if (c_oCompositionState.process == this.compositionState)
+				{
+					this.onCompositionUpdate(e, false, _data, false);
+				}
+
+				if (this.TextInputAfterComposition)
+				{
+					this.onCompositionEnd({ data : "nonWait" }, _data);
+				}
+			}
+
 			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "" && _value != this.ieNonCompositionPrefixConfirm)
 			{
 				ti_console_log("ti: external input");
@@ -764,7 +783,7 @@
 					ti_console_log("ti: ea space");
 				}
 
-				if (!AscCommon.AscBrowser.isMozilla/* && !this.IsUseInputEventOnlyWithCtx*/)
+				if (!AscCommon.AscBrowser.isMozilla/* && !this.IsUseInputEventOnlyWithCtx*/ || AscCommon.AscBrowser.isAndroid)
 				{
 					// у мозиллы есть проблемы, если делать тут clear
 					// например на корейском языке - слетает композиция в некоторых случаях
@@ -1240,6 +1259,17 @@
 			//console.log("[apiCompositeStart]");
 			this.Api.Begin_CompositeInput();
 			this.compositionStateApi = c_oCompositionState.process;
+
+			if (this.UseValueInComposition)
+			{
+				// если ввести, войти в
+				// композицию, стереть до начала и начать снова ввод. Тогда, после последнего onCompositionEnd
+				// не придет onInput - и флаг не сбросится
+				this.TextInputAfterComposition = false;
+
+				// запоминаем, с чего все началось
+				this.ieNonCompositionPrefix = this.getAreaValue();
+			}
 		},
 
 		apiCompositeReplace : function(_value)
@@ -1283,6 +1313,12 @@
 			if (this.isSystem)
 			{
 				this.isChromeKeysNoKeyPressPresent = false;
+				return;
+			}
+
+			if (this.UseValueInComposition)
+			{
+				this.apiCompositeStart();
 				return;
 			}
 
@@ -1339,6 +1375,12 @@
 			if (this.isSystem)
 			{
 				this.isChromeKeysNoKeyPressPresent = false;
+				return;
+			}
+
+			if (this.UseValueInComposition && undefined === _data)
+			{
+				this.compositionState = c_oCompositionState.process;
 				return;
 			}
 
@@ -1614,6 +1656,13 @@
 				return;
 			}
 
+			var isUseData = (_data !== undefined);
+			if (this.UseValueInComposition)
+			{
+				var _dataNew = this.getAreaValue();
+				_data = _dataNew.substring(this.ieNonCompositionPrefix.length);
+			}
+
 			ti_console_log("ti: onCompositionEnd");
 
 			if (!this.IsUseFirstTextInputAfterComposition && this.isWaitFirstTextInputEvent(e))
@@ -1651,7 +1700,31 @@
 			}
 			else
 			{
-				this.apiCompositeEnd();
+				if (this.UseValueInComposition)
+				{
+					if (isUseData)
+						this.apiCompositeEnd();
+					else
+					{
+						setTimeout(function() {
+							var _context = AscCommon.g_inputContext;
+
+							if (_context.TextInputAfterComposition)
+							{
+								var _value = _context.getAreaValue();
+								var _data = _value.substring(_context.ieNonCompositionPrefix.length);
+								_context.onCompositionEnd({ data : "nonWait" }, _data);
+
+								_context.clear();
+								_context.TextInputAfterComposition = false;
+							}
+						}, 50);
+					}
+				}
+				else
+				{
+					this.apiCompositeEnd();
+				}
 			}
 
 			this.unlockTarget();
@@ -1715,13 +1788,20 @@
 				var _input = window['AscCommon'].g_inputContext;
 				if (_input.compositionState == c_oCompositionState.process)
 				{
-					//_input.apiCompositeEnd();
+					if (_input.UseValueInComposition)
+						_input.apiCompositeEnd();
+
 					_input.clear();
 				}
 
 			}, 10);
 
 			return true;
+		},
+
+		isCompositionProcess : function()
+		{
+			return this.compositionState == c_oCompositionState.process;
 		},
 
 		preventVirtualKeyboard : function(e)

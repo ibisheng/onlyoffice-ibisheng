@@ -6445,7 +6445,12 @@ PasteProcessor.prototype =
 
             if("ul" == sNodeName || "ol" == sNodeName || "li" == sNodeName)
             {
-                pPr.bNum = true;
+                //в данном случае если нет тега li, то списоком не считаем
+				if("li" == sNodeName)
+				{
+					pPr.bNum = true;
+				}
+				
                 if(PasteElementsId.g_bIsDocumentCopyPaste)
                 {
                     if("ul" == sNodeName)

@@ -1196,6 +1196,9 @@ var editor;
       }
     };
 	  this.CoAuthoringApi.onStartCoAuthoring = function (isStartEvent) {
+		  if (t.isViewMode) {
+			  return;
+		  }
 		  // На старте не нужно ничего делать
 		  if (isStartEvent) {
 			  t.startCollaborationEditing();
@@ -2034,11 +2037,11 @@ var editor;
     }
   };
 
-  spreadsheet_api.prototype.asc_closeCellEditor = function() {
-    if(this.wb){
-        this.wb.closeCellEditor();
-    }
-  };
+	spreadsheet_api.prototype.asc_closeCellEditor = function (cancel) {
+		if (this.wb) {
+			this.wb.closeCellEditor(cancel);
+		}
+	};
 
 
   // Spreadsheet interface

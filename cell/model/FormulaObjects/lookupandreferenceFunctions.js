@@ -571,7 +571,7 @@
 		var t = this, arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] :
 			new cBool(true), r1 = arguments[1], wb = r1.worksheet.workbook, o = {
 			Formula: "", pCurrPos: 0
-		}, r2 = arguments[2], ref, found_operand;
+		}, ref, found_operand, ret;
 
 		function parseReference() {
 			if ((ref = parserHelp.is3DRef.call(o, o.Formula, o.pCurrPos))[0]) {
@@ -599,7 +599,7 @@
 		}
 
 		if (cElementType.array === arg0.type) {
-			var ret = new cArray();
+			ret = new cArray();
 			arg0.foreach(function (elem, r) {
 				o = {Formula: elem.toString(), pCurrPos: 0};
 				parseReference();
@@ -608,21 +608,22 @@
 				}
 				ret.addElement(found_operand)
 			});
-			return this.value = ret;
+			return this.setCA(ret, true);
 		} else {
 			o.Formula = arg0.toString();
 			parseReference();
-		}
+			if (found_operand) {
+				if (cElementType.name === found_operand.type) {
+					found_operand = found_operand.toRef();
+				}
 
-		if (found_operand) {
-			if (cElementType.name === found_operand.type) {
-				found_operand = found_operand.toRef();
+				ret  = found_operand;
+			} else {
+				ret = new cError(cErrorType.bad_reference);
 			}
-
-			return this.value = found_operand;
 		}
 
-		return this.value = new cError(cErrorType.bad_reference);
+		return this.setCA(ret, true);
 
 	};
 	cINDIRECT.prototype.getInfo = function () {

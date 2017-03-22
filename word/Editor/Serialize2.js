@@ -5213,7 +5213,7 @@ function BinarySettingsTableWriter(memory, doc, saveParams)
     {
         var oThis = this;
 		this.bs.WriteItem(c_oSer_SettingsType.ClrSchemeMapping, function(){oThis.WriteColorSchemeMapping();});
-		this.bs.WriteItem(c_oSer_SettingsType.DefaultTabStop, function(){oThis.memory.WriteDouble(Default_Tab_Stop);});
+		this.bs.WriteItem(c_oSer_SettingsType.DefaultTabStop, function(){oThis.memory.WriteDouble(AscCommonWord.Default_Tab_Stop);});
 		this.bs.WriteItem(c_oSer_SettingsType.MathPr, function(){oThis.WriteMathPr();});
 		this.bs.WriteItem(c_oSer_SettingsType.TrackRevisions, function(){oThis.memory.WriteBool(oThis.Document.Is_TrackRevisions());});
 		this.bs.WriteItem(c_oSer_SettingsType.FootnotePr, function(){oThis.WriteFootnotePr();});
@@ -7271,7 +7271,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
         {
             oAdditional.EvenAndOddHeaders = this.stream.GetBool();
         }
-		else if( c_oSerProp_secPrSettingsType.SectionType === type )
+		else if( c_oSerProp_secPrSettingsType.SectionType === type && typeof c_oAscSectionBreakType != "undefined" )
         {
 			var nEditorType = null;
 			switch(this.stream.GetByte())
@@ -7690,8 +7690,12 @@ function Binary_rPrReader(doc, oReadResult, stream)
 			case c_oSerProp_rPrType.TextFill:
 				if(length > 0){
 					var TextFill = pptx_content_loader.ReadShapeProperty(this.stream, 1);
-					if(null != TextFill)
-						rPr.TextFill = TextFill;
+					if(null != TextFill){
+                        rPr.TextFill = TextFill;
+                        if(null != TextFill.transparent){
+                            TextFill.transparent = 255 - TextFill.transparent;
+                        }
+                    }
 				}
 				else
 					res = c_oSerConstants.ReadUnknown;
@@ -12835,7 +12839,7 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 			var dNewTab_Stop = this.bcr.ReadDouble();
 			//word поддерживает 0, но наш редактор к такому не готов.
 			if(dNewTab_Stop > 0)
-				Default_Tab_Stop = dNewTab_Stop;
+				AscCommonWord.Default_Tab_Stop = dNewTab_Stop;
         }
 		else if ( c_oSer_SettingsType.MathPr === type )
         {			

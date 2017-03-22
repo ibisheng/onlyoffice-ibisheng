@@ -567,6 +567,7 @@
     this.isLicenseInit = false;
     this._locks = {};
     this._msgBuffer = [];
+    this._msgInputBuffer = [];
     this._lockCallbacks = {};
     this._lockCallbacksErrorTimerId = {};
     this._saveCallback = [];
@@ -917,6 +918,12 @@
     }
   };
 
+  DocsCoApi.prototype._applyPrebuffered = function () {
+    for (var i = 0; i < this._msgInputBuffer.length; ++i) {
+      this._msgInputBuffer[i]();
+    }
+    this._msgInputBuffer = [];
+  };
   DocsCoApi.prototype._sendPrebuffered = function() {
     for (var i = 0; i < this._msgBuffer.length; i++) {
       this._sendRaw(this._msgBuffer[i]);
@@ -1290,7 +1297,11 @@
   };
 
   DocsCoApi.prototype._onConnectionStateChanged = function(data) {
+    var t = this;
     if (!this.check_state()) {
+      this._msgInputBuffer.push(function () {
+        t._onConnectionStateChanged(data);
+      });
       return;
     }
     var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
@@ -1367,6 +1378,9 @@
       this._onMessages(data, true);
       this._onGetLock(data);
 
+      //Apply prebuffered
+      this._applyPrebuffered();
+
       if (this._isReSaveAfterAuth) {
         var callbackAskSaveChanges = function(e) {
           if (false === e["saveLock"]) {
@@ -1414,6 +1428,9 @@
       if (this.onFirstLoadChangesEnd) {
         this.onFirstLoadChangesEnd();
       }
+
+      //Apply prebuffered
+      this._applyPrebuffered();
 
       //Send prebuffered
       this._sendPrebuffered();

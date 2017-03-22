@@ -618,6 +618,9 @@
 		this.pointerTouchesCoords = {};
 
 		this.IsZoomCheckFit = false;
+
+		this.isShowingContextMenu = false;
+		this.isMobileContextMenuShowResize = false;
 	}
 
 	CMobileTouchManagerBase.prototype.initEvents = function(_id)
@@ -768,6 +771,11 @@
 			var _Transform = _table_outline_dr.TableMatrix;
 			var _PageNum   = _table_outline_dr.CurrentPageIndex;
 
+			var _PageNumOrigin = _PageNum;
+
+			if (_table_outline_dr.TableOutline)
+				_PageNumOrigin = _table_outline_dr.TableOutline.PageNum;
+
 			if (!_Transform || global_MatrixTransformer.IsIdentity(_Transform))
 			{
 				var _x = global_mouseEvent.X;
@@ -777,7 +785,7 @@
 				var _offset = this.TableRulersRectSize + this.TableRulersRectOffset;
 
 				if (_x > (posLT.X - _offset - _eps) && _x < (posLT.X - this.TableRulersRectOffset + _eps) &&
-					_y > (posLT.Y - _offset - _eps) && _y < (posLT.Y - this.TableRulersRectOffset + _eps))
+					_y > (posLT.Y - _offset - _eps) && _y < (posLT.Y - this.TableRulersRectOffset + _eps) && (_PageNumOrigin == _PageNum))
 				{
 					this.Mode = AscCommon.MobileTouchMode.TableMove;
 					bIsTable  = true;
@@ -1084,6 +1092,20 @@
 			var _position = this.delegate.GetScrollPosition();
 			this.iScroll.refresh(_position);
 		}
+
+		if (this.isMobileContextMenuShowResize)
+			this.SendShowContextMenu();
+	};
+
+	CMobileTouchManagerBase.prototype.Resize_Before = function()
+	{
+		this.isMobileContextMenuShowResize = this.isShowingContextMenu;
+	};
+	CMobileTouchManagerBase.prototype.Resize_After = function()
+	{
+		if (this.isMobileContextMenuShowResize)
+			this.SendShowContextMenu();
+		this.isMobileContextMenuShowResize = false;
 	};
 
 	// есть ли тач или анимационный скролл/зум
@@ -1113,6 +1135,8 @@
 	{
 		if (-1 != this.ContextMenuShowTimerId)
 			clearTimeout(this.ContextMenuShowTimerId);
+
+		this.isShowingContextMenu = true;
 
 		var that             = this;
 		this.ContextMenuShowTimerId = setTimeout(function()
@@ -1373,6 +1397,7 @@
 		if (this.ContextMenuShowTimerId != -1)
 			clearTimeout(this.ContextMenuShowTimerId);
 
+		this.isShowingContextMenu = false;
 		this.Api.sendEvent("asc_onHidePopMenu");
 	};
 

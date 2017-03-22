@@ -802,17 +802,21 @@ CPresentation.prototype =
     },
     Continue_FastCollaborativeEditing: function()
     {
-        if (true !== AscCommon.CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())
+        if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+            return;
+        if (this.Api.isLongAction())
+            return;
+        if (true !== AscCommon.CollaborativeEditing.Is_Fast() || true === AscCommon.CollaborativeEditing.Is_SingleUser())
             return;
 
         if(this.Slides[this.CurPage]){
-            if(this.Slides[this.CurPage].graphicObjects.checkTrackDrawings()){
+            if(this.Slides[this.CurPage].graphicObjects.checkTrackDrawings() || this.Api.isOpenedChartFrame){
                 return;
             }
         }
 
         var bHaveChanges = History.Have_Changes(true);
-        if (true !== bHaveChanges && true === AscCommon.CollaborativeEditing.Have_OtherChanges())
+        if (true !== bHaveChanges && true === AscCommon.CollaborativeEditing.Have_OtherChanges() || 0 !== AscCommon.CollaborativeEditing.getOwnLocksLength())
         {
             // Принимаем чужие изменение. Своих нет, но функцию отсылки надо вызвать, чтобы снялить локи.
             AscCommon.CollaborativeEditing.Apply_Changes();
@@ -2306,7 +2310,7 @@ CPresentation.prototype =
         if ( null != ParaPr )
         {
             if ( undefined != ParaPr.Tabs )
-                editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
+                editor.Update_ParaTab( AscCommonWord.Default_Tab_Stop, ParaPr.Tabs );
 
             editor.UpdateParagraphProp( ParaPr );
         }
@@ -3083,7 +3087,7 @@ CPresentation.prototype =
     Set_DocumentDefaultTab: function(DTab)
     {
        //History.Add( this, { Type : AscDFH.historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
-        Default_Tab_Stop = DTab;
+		AscCommonWord.Default_Tab_Stop = DTab;
     },
 
     Set_DocumentMargin: function()

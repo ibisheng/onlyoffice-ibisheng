@@ -854,4 +854,3 @@ window.native.Call_Menu_Event = function (type, _params)
 {
 	return _api.Call_Menu_Event(type, _params);
 };
-

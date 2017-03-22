@@ -5495,7 +5495,7 @@ function CDrawingDocument()
 
 			this.GuiCanvasFillTextureCtx.drawImage(_img.Image, _x, _y, _w, _h);
 		}
-		else
+		else if (!_img || !_img.Image)
 		{
 			this.GuiCanvasFillTextureCtx.lineWidth = 1;
 
@@ -6916,8 +6916,8 @@ CStylesPainter.prototype =
 			g_oTableId.m_bTurnOff = true;
 			History.TurnOff();
 
-			var oldDefTabStop = Default_Tab_Stop;
-			Default_Tab_Stop = 1;
+			var oldDefTabStop = AscCommonWord.Default_Tab_Stop;
+			AscCommonWord.Default_Tab_Stop = 1;
 
 			var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
 			var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
@@ -7019,7 +7019,7 @@ CStylesPainter.prototype =
 
 			graphics.restore();
 
-			Default_Tab_Stop = oldDefTabStop;
+			AscCommonWord.Default_Tab_Stop = oldDefTabStop;
 
 			g_oTableId.m_bTurnOff = false;
 			History.TurnOn();

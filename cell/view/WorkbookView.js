@@ -897,7 +897,7 @@
   WorkbookView.prototype._updateSelectionInfo = function () {
     var ws = this.cellFormulaEnterWSOpen ? this.cellFormulaEnterWSOpen : this.getWorksheet();
     this.oSelectionInfo = ws.getSelectionInfo();
-    this.lastSendInfoRange = ws.model.selectionRange.getLast().clone(true);
+    this.lastSendInfoRange = ws.model.selectionRange.clone();
     this.lastSendInfoRangeIsSelectOnShape = ws.getSelectionShape();
   };
   WorkbookView.prototype._onWSSelectionChanged = function() {
@@ -1006,7 +1006,7 @@
     // Проверим, нужно ли отсылать информацию о ячейке
     var ar = ws.model.selectionRange.getLast();
     var isSelectOnShape = ws.getSelectionShape();
-    if (!this._isEqualRange(ar, isSelectOnShape)) {
+    if (!this._isEqualRange(ws.model.selectionRange, isSelectOnShape)) {
       this._onWSSelectionChanged();
       this._onSelectionMathInfoChanged(ws.getSelectionMathInfo());
     }
@@ -1393,8 +1393,8 @@
     }
   };
 
-  WorkbookView.prototype._onStopCellEditing = function() {
-    return this.cellEditor.close(true);
+  WorkbookView.prototype._onStopCellEditing = function(cancel) {
+    return this.cellEditor.close(!cancel);
   };
 
   WorkbookView.prototype._onCloseCellEditor = function() {
@@ -1914,11 +1914,11 @@
   };
 
   // Останавливаем ввод данных в редакторе ввода
-  WorkbookView.prototype.closeCellEditor = function() {
+  WorkbookView.prototype.closeCellEditor = function(cancel) {
     var ws = this.getWorksheet();
     // Останавливаем ввод данных в редакторе ввода
     if (ws.getCellEditMode() && !this.cellEditor.formulaIsOperator() /*&& !this.cellFormulaEnterWSOpen*/) {
-      this._onStopCellEditing();
+      this._onStopCellEditing(cancel);
     }
   };
 

@@ -200,7 +200,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetFlipV] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_Xfrm_SetRot] = CChangesDrawingsDouble;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetParent] = CChangesDrawingsObject;
-    AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetBwMode] = CChangesDrawingsBool;
+    AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetBwMode] = CChangesDrawingsLong;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetXfrm] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetGeometry] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_SpPr_SetFill] = CChangesDrawingsObjectNoId;
@@ -5699,7 +5699,7 @@ CSpPr.prototype =
 
     setBwMode: function(pr)
     {
-        History.Add(new CChangesDrawingsBool(this, AscDFH.historyitem_SpPr_SetBwMode, this.bwMode,  pr));
+        History.Add(new CChangesDrawingsLong(this, AscDFH.historyitem_SpPr_SetBwMode, this.bwMode,  pr));
         this.bwMode = pr;
     },
 
@@ -7442,7 +7442,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteDouble(this.rot);
+            w.WriteLong(this.rot);
         }
 
         flag = this.rtlCol != null;
@@ -7594,7 +7594,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.rot = r.GetDouble();
+            this.rot = r.GetLong();
         }
 
 
@@ -7911,7 +7911,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteDouble(this.rot);
+            w.WriteLong(this.rot);
         }
 
         flag = this.rtlCol != null;
@@ -8061,7 +8061,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.rot = r.GetDouble();
+            this.rot = r.GetLong();
         }
 
 
@@ -8831,8 +8831,8 @@ function GenerateDefaultSlide(layout)
 function CreateDefaultTextRectStyle()
 {
     var style = new CShapeStyle();
-    style.setLnRef(new StyleRef());
-    style.lnRef.setIdx(0);
+    var lnRef = new StyleRef();
+    lnRef.setIdx(0);
     var unicolor = new CUniColor();
 
     unicolor.setColor(new CSchemeColor());
@@ -8842,29 +8842,35 @@ function CreateDefaultTextRectStyle()
     mod.setVal(50000);
     unicolor.setMods(new CColorModifiers());
     unicolor.Mods.addMod(mod);
-    style.lnRef.setColor(unicolor);
+    lnRef.setColor(unicolor);
+    style.setLnRef(lnRef);
 
-    style.setFillRef(new StyleRef());
-    style.fillRef.setIdx(0);
 
+    var fillRef = new StyleRef();
+    fillRef.setIdx(0);
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(g_clr_accent1);
-    style.fillRef.setColor(unicolor);
+    fillRef.setColor(unicolor);
+    style.setFillRef(fillRef);
 
-    style.setEffectRef(new StyleRef());
 
-    style.effectRef.setIdx(0);
+    var effectRef = new StyleRef();
+    effectRef.setIdx(0);
     unicolor = new  CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(g_clr_accent1);
+    effectRef.setColor(unicolor);
+    style.setEffectRef(effectRef);
 
-    style.setFontRef(new FontRef());
-    style.fontRef.setIdx(AscFormat.fntStyleInd_minor);
+    var fontRef = new FontRef();
+    fontRef.setIdx(AscFormat.fntStyleInd_minor);
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(8);
-    style.fontRef.setColor(unicolor);
+    fontRef.setColor(unicolor);
+    style.setFontRef(fontRef);
+
     return style;
 }
 

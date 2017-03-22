@@ -919,6 +919,8 @@ function CDocumentRecalcInfo()
     this.FootnoteColumn            = 0;
 
     this.AdditionalInfo            = null;
+
+    this.NeedRecalculateFromStart  = false;
 }
 
 CDocumentRecalcInfo.prototype =
@@ -1074,7 +1076,18 @@ CDocumentRecalcInfo.prototype =
 		this.FootnotePage              = 0;
 		this.FootnoteColumn            = 0;
 		this.FlowObjectPageBreakBefore = false;
-    }
+    },
+
+	Set_NeedRecalculateFromStart : function(isNeedRecalculate)
+	{
+		this.NeedRecalculateFromStart = isNeedRecalculate;
+	},
+
+	Is_NeedRecalculateFromStart : function()
+	{
+		return this.NeedRecalculateFromStart;
+	}
+
 };
 
 function CDocumentFieldsManager()
@@ -1817,6 +1830,13 @@ CDocument.prototype.Is_OnRecalculate = function()
  */
 CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _RecalcData)
 {
+	if (this.RecalcInfo.Is_NeedRecalculateFromStart())
+	{
+		this.RecalcInfo.Set_NeedRecalculateFromStart(false);
+		this.Recalculate_FromStart();
+		return;
+	}
+
     this.StartTime = new Date().getTime();
 
     if (true !== this.Is_OnRecalculate())
@@ -4413,7 +4433,7 @@ CDocument.prototype.Set_ParagraphTabs = function(Tabs)
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
-	this.Api.Update_ParaTab(Default_Tab_Stop, Tabs);
+	this.Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
 };
 CDocument.prototype.Set_ParagraphIndent = function(Ind)
 {
@@ -4675,8 +4695,8 @@ CDocument.prototype.Get_DocumentOrientation = function()
 };
 CDocument.prototype.Set_DocumentDefaultTab = function(DTab)
 {
-	this.History.Add(new CChangesDocumentDefaultTab(this, Default_Tab_Stop, DTab));
-	Default_Tab_Stop = DTab;
+	this.History.Add(new CChangesDocumentDefaultTab(this, AscCommonWord.Default_Tab_Stop, DTab));
+	AscCommonWord.Default_Tab_Stop = DTab;
 };
 CDocument.prototype.Set_DocumentEvenAndOddHeaders = function(Value)
 {
@@ -4727,7 +4747,7 @@ CDocument.prototype.Interface_Update_ParaPr = function()
 			ParaPr.CanAddImage = true;
 
 		if (undefined != ParaPr.Tabs)
-			this.Api.Update_ParaTab(Default_Tab_Stop, ParaPr.Tabs);
+			this.Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, ParaPr.Tabs);
 
 		if (ParaPr.Shd && ParaPr.Shd.Unifill)
 		{
@@ -9045,6 +9065,9 @@ CDocument.prototype.Update_SectionsInfo = function()
 	}
 
 	this.SectionsInfo.Add(this.SectPr, Count);
+
+	// Когда полностью обновляются секции надо пересчитывать с самого начала
+	this.RecalcInfo.Set_NeedRecalculateFromStart(true);
 };
 CDocument.prototype.Check_SectionLastParagraph = function()
 {
@@ -10026,11 +10049,11 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
 	if (true !== this.CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())
 		return;
 
-	if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape || this.DrawingObjects.checkTrackDrawings())
+	if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape || this.DrawingObjects.checkTrackDrawings() || this.Api.isOpenedChartFrame)
 		return;
 
 	var HaveChanges = this.History.Have_Changes(true);
-	if (true !== HaveChanges && true === this.CollaborativeEditing.Have_OtherChanges())
+	if (true !== HaveChanges && true === this.CollaborativeEditing.Have_OtherChanges() || 0 !== this.CollaborativeEditing.getOwnLocksLength())
 	{
 		// Принимаем чужие изменения. Своих нет, но функцию отсылки надо вызвать, чтобы снять локи.
 		this.CollaborativeEditing.Apply_Changes();
@@ -11148,6 +11171,27 @@ CDocument.prototype.Check_CompositeInputRun = function()
 	if (true !== oRun.Is_UseInDocument())
 		AscCommon.g_inputContext.externalEndCompositeInput();
 };
+CDocument.prototype.Is_CursorInsideCompositeText = function()
+{
+	if (null === this.CompositeInput)
+		return false;
+
+	var oCurrentParagraph = this.Get_CurrentParagraph();
+	if (!oCurrentParagraph)
+		return false;
+
+	var oParaPos   = oCurrentParagraph.Get_ParaContentPos(false, false, false);
+	var arrClasses = oCurrentParagraph.Get_ClassesByPos(oParaPos);
+
+	if (arrClasses.length <= 0 || arrClasses[arrClasses.length - 1] !== this.CompositeInput.Run)
+		return false;
+
+	var nInRunPos = oParaPos.Get(oParaPos.Get_Depth());
+	if (nInRunPos >= this.CompositeInput.Pos && nInRunPos <= this.CompositeInput.Pos + this.CompositeInput.Length)
+		return true;
+
+	return false;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы со сносками
 //----------------------------------------------------------------------------------------------------------------------
@@ -11182,6 +11226,12 @@ CDocument.prototype.AddFootnote = function(sText)
 		{
 			var oFootnote = this.Footnotes.CreateFootnote();
 			oFootnote.AddDefaultFootnoteContent(sText);
+
+			if (true === this.Is_SelectionUse())
+			{
+				this.Cursor_MoveRight(false, false, false);
+				this.Selection_Remove();
+			}
 
 			if (sText)
 				this.Paragraph_Add(new ParaFootnoteReference(oFootnote, sText));
@@ -12245,7 +12295,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 						if ((undefined === CurrFramePr && undefined === PrevFramePr) || ( undefined !== CurrFramePr && undefined !== PrevFramePr && true === CurrFramePr.Compare(PrevFramePr) ))
 						{
-							if (true === this.Is_TrackRevisions())
+							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos - 1].Get_ReviewType())
 							{
 								this.Content[this.CurPos.ContentPos - 1].Set_ReviewType(reviewtype_Remove);
 								this.CurPos.ContentPos--;
@@ -12287,7 +12337,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 						if ((undefined === CurrFramePr && undefined === NextFramePr) || ( undefined !== CurrFramePr && undefined !== NextFramePr && true === CurrFramePr.Compare(NextFramePr) ))
 						{
-							if (true === this.Is_TrackRevisions())
+							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos].Get_ReviewType())
 							{
 								this.Content[this.CurPos.ContentPos].Set_ReviewType(reviewtype_Remove);
 								this.CurPos.ContentPos++;

@@ -1857,7 +1857,7 @@ CGraphicObjects.prototype =
        //     }
        // );
        // editor.UpdateTextPr(oTextPr);
-        editor.Update_ParaTab(Default_Tab_Stop, new CParaTabs());
+		editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, new CParaTabs());
         editor.sync_ParaSpacingLine( new CParaSpacing() );
         editor.Update_ParaInd(new CParaInd());
         editor.sync_PrAlignCallBack(null);
@@ -2349,7 +2349,7 @@ CGraphicObjects.prototype =
     },
 
     handleDblClickEmptyShape: function(oShape){
-        if(!oShape.getDocContent() && !AscFormat.CheckLinePresetForParagraphAdd(oShape)){
+        if(!oShape.getDocContent() && !AscFormat.CheckLinePresetForParagraphAdd(oShape.getPresetGeom())){
 
             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
             {

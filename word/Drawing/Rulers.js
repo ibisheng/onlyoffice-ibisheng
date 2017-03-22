@@ -1191,7 +1191,7 @@ function CHorRuler()
                     min = this.m_dIndentLeft - this.m_dIndentLeftFirst;
 
                 if (newVal < min)
-                    newVal = this.m_dIndentLeft_old;
+                    newVal = min;
 
                 if (_presentations)
                 {
