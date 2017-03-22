@@ -12309,6 +12309,23 @@ Paragraph.prototype.GetLineEndPos = function(CurLine)
 
 	return this.Get_EndRangePos2(CurLine, oLine.Ranges.length - 1);
 };
+Paragraph.prototype.CheckCommentStartEnd = function(sCommentId)
+{
+	var oResult = {Start : false, End : false};
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oElement = this.Content[nIndex];
+		if (para_Comment === oElement.Type && sCommentId === oElement.GetCommentId())
+		{
+			if (oElement.IsCommentStart())
+				oResult.Start = true;
+			else
+				oResult.End = true;
+		}
+	}
+
+	return oResult;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
