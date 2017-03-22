@@ -3581,11 +3581,20 @@ background-repeat: no-repeat;\
 	{
 		this.WordControl.m_oLogicDocument.GotoFootnote(isNext);
 	};
+	asc_docs_api.prototype.asc_IsCursorInFootnote = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (oLogicDocument && docpostype_Footnotes === oLogicDocument.Get_DocPosType())
+			return true;
+
+		return false;
+	};
 	asc_docs_api.prototype["asc_AddFootnote"]        = asc_docs_api.prototype.asc_AddFootnote;
 	asc_docs_api.prototype["asc_RemoveAllFootnotes"] = asc_docs_api.prototype.asc_RemoveAllFootnotes;
 	asc_docs_api.prototype["asc_GetFootnoteProps"]   = asc_docs_api.prototype.asc_GetFootnoteProps;
 	asc_docs_api.prototype["asc_SetFootnoteProps"]   = asc_docs_api.prototype.asc_SetFootnoteProps;
 	asc_docs_api.prototype["asc_GotoFootnote"]       = asc_docs_api.prototype.asc_GotoFootnote;
+	asc_docs_api.prototype["asc_IsCursorInFootnote"] = asc_docs_api.prototype.asc_IsCursorInFootnote;
 
 	asc_docs_api.prototype.put_AddPageBreak              = function()
 	{
