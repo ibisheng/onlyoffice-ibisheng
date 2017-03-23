@@ -7296,8 +7296,8 @@
         }
         var oRes = null;
         var type = range.type;
-        if (type == c_oAscSelectionType.RangeCells || type == c_oAscSelectionType.RangeCol ||
-          type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax) {
+        if (type === c_oAscSelectionType.RangeCells || type === c_oAscSelectionType.RangeCol ||
+          type === c_oAscSelectionType.RangeRow || type === c_oAscSelectionType.RangeMax) {
             this.cleanSelection();
             this.model.selectionRange.assign2(range);
 			this._fixSelectionOfMergedCells();
@@ -11236,33 +11236,32 @@
             this._isLockedCells(aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
       };
 
-    WorksheetView.prototype.findCell = function (reference, isViewMode) {
-        var mc, ranges = AscCommonExcel.getRangeByRef(reference, this.model, true);
+	WorksheetView.prototype.findCell = function (reference, isViewMode) {
+		var mc, ranges = AscCommonExcel.getRangeByRef(reference, this.model, true);
 
-        if (0 === ranges.length && !isViewMode) {
+		if (0 === ranges.length && !isViewMode) {
             /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
-            if (this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger("getLockDefNameManagerStatus")) {
-                this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
-                    this._updateSelectionNameAndInfo();
-                    return true;
-                }
+			if (this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger("getLockDefNameManagerStatus")) {
+				this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
+				this._updateSelectionNameAndInfo();
+				return true;
+			}
 
-                // ToDo multiselect defined names
-                var selectionLast = this.model.selectionRange.getLast();
-                mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
-            var defName = this.model.workbook.editDefinesNames(null,
-                  new Asc.asc_CDefName(reference, parserHelp.get3DRef(this.model.getName(),
-                    (mc || selectionLast).getAbsName())));
+			// ToDo multiselect defined names
+			var selectionLast = this.model.selectionRange.getLast();
+			mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
+			var defName = this.model.workbook.editDefinesNames(null, new Asc.asc_CDefName(reference,
+				parserHelp.get3DRef(this.model.getName(), (mc || selectionLast).getAbsName())));
 
-            if (defName) {
-                this._isLockedDefNames(null, defName.getNodeId());
-            } else {
-                this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName,
-                    c_oAscError.Level.NoCritical);
-                    }
-                    }
-        return ranges;
-    };
+			if (defName) {
+				this._isLockedDefNames(null, defName.getNodeId());
+			} else {
+				this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName,
+					c_oAscError.Level.NoCritical);
+			}
+		}
+		return ranges;
+	};
 
     /* Ищет дополнение для ячейки */
     WorksheetView.prototype.getCellAutoCompleteValues = function (cell, maxCount) {

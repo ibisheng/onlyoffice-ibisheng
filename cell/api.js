@@ -1355,84 +1355,101 @@ var editor;
     this.collaborativeEditing.endCollaborationEditing();
   };
 
-  // End Load document
-  spreadsheet_api.prototype._openDocumentEndCallback = function() {
-    // Не инициализируем дважды
-    if (this.DocumentLoadComplete) {
-      return;
-    }
+	// End Load document
+	spreadsheet_api.prototype._openDocumentEndCallback = function () {
+		// Не инициализируем дважды
+		if (this.DocumentLoadComplete) {
+			return;
+		}
 
-    this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
+		this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement,
+			this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
 
-    if (this.isMobileVersion) {
-		this.wb.defaults.worksheetView.halfSelection = true;
-		this.wb.defaults.worksheetView.activeCellBorderColor = new CColor(79, 158, 79);
-        var _container = document.getElementById(this.HtmlElementName);
-        if (_container)
-          _container.style.overflow = "hidden";
-        this.wb.MobileTouchManager = new AscCommonExcel.CMobileTouchManager({ eventsElement : "cell_mobile_element" });
-        this.wb.MobileTouchManager.Init(this);
+		if (this.isMobileVersion) {
+			this.wb.defaults.worksheetView.halfSelection = true;
+			this.wb.defaults.worksheetView.activeCellBorderColor = new CColor(79, 158, 79);
+			var _container = document.getElementById(this.HtmlElementName);
+			if (_container) {
+				_container.style.overflow = "hidden";
+			}
+			this.wb.MobileTouchManager = new AscCommonExcel.CMobileTouchManager({eventsElement: "cell_mobile_element"});
+			this.wb.MobileTouchManager.Init(this);
 
-        // input context must be created!!!
-        var _areaId = AscCommon.g_inputContext.HtmlArea.id;
-        var _element = document.getElementById(_areaId);
-        _element.parentNode.parentNode.style.zIndex = 10;
+			// input context must be created!!!
+			var _areaId = AscCommon.g_inputContext.HtmlArea.id;
+			var _element = document.getElementById(_areaId);
+			_element.parentNode.parentNode.style.zIndex = 10;
 
-        this.wb.MobileTouchManager.initEvents(AscCommon.g_inputContext.HtmlArea.id);
-    }
+			this.wb.MobileTouchManager.initEvents(AscCommon.g_inputContext.HtmlArea.id);
+		}
 
-    this.DocumentLoadComplete = true;
+		this.DocumentLoadComplete = true;
 
-    this.asc_CheckGuiControlColors();
-    this.sendColorThemes(this.wbModel.theme);
-    this.asc_ApplyColorScheme(false);
+		this.asc_CheckGuiControlColors();
+		this.sendColorThemes(this.wbModel.theme);
+		this.asc_ApplyColorScheme(false);
 
-    this.sendStandartTextures();
-    this.sendMathToMenu();
+		this.sendStandartTextures();
+		this.sendMathToMenu();
 
-    // Применяем пришедшие при открытии изменения
-    this._applyFirstLoadChanges();
-    // Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
-    for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i) {
-      this.arrPreOpenLocksObjects[i]();
-    }
-    this.arrPreOpenLocksObjects = [];
+		// Применяем пришедшие при открытии изменения
+		this._applyFirstLoadChanges();
+		// Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
+		for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i) {
+			this.arrPreOpenLocksObjects[i]();
+		}
+		this.arrPreOpenLocksObjects = [];
 
-    // Меняем тип состояния (на никакое)
-    this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+		// Меняем тип состояния (на никакое)
+		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
 
-    // Были ошибки при открытии, посылаем предупреждение
-    if (0 < this.wbModel.openErrors.length) {
-      this.sendEvent('asc_onError', c_oAscError.ID.OpenWarning, c_oAscError.Level.NoCritical);
-    }
+		// Были ошибки при открытии, посылаем предупреждение
+		if (0 < this.wbModel.openErrors.length) {
+			this.sendEvent('asc_onError', c_oAscError.ID.OpenWarning, c_oAscError.Level.NoCritical);
+		}
 
-    //this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzilla.onlyoffice.com/show_bug.cgi?id=14680)
-  };
+		//this.asc_Resize(); // Убрал, т.к. сверху приходит resize (http://bugzilla.onlyoffice.com/show_bug.cgi?id=14680)
+	};
 
-  // Переход на диапазон в листе
-  spreadsheet_api.prototype._asc_setWorksheetRange = function(val) {
-    // Получаем sheet по имени
-    var ws = this.wbModel.getWorksheetByName(val.asc_getSheet());
-    if (!ws) {
-      this.handlers.trigger("asc_onHyperlinkClick", null);
-      return;
-    } else if (ws.getHidden()) {
-      return;
-    }
-    // Индекс листа
-    var sheetIndex = ws.getIndex();
-    // Если не совпали индекс листа и индекс текущего, то нужно сменить
-    if (this.asc_getActiveWorksheetIndex() !== sheetIndex) {
-      // Меняем активный лист
-      this.asc_showWorksheet(sheetIndex);
-      // Посылаем эвент о смене активного листа
-      this.handlers.trigger("asc_onActiveSheetChanged", sheetIndex);
-    }
-    var range = ws.getRange2(val.asc_getRange());
-    if (null !== range) {
-      this.wb._onSetSelection(range.getBBox0(), /*validRange*/ true);
-    }
-  };
+	// Переход на диапазон в листе
+	spreadsheet_api.prototype._asc_setWorksheetRange = function (val) {
+		// Получаем sheet по имени
+		var ranges = null, ws;
+        var sheet = val.asc_getSheet();
+        if (!sheet) {
+			ranges = AscCommonExcel.getRangeByRef(val.asc_getLocation(), this.wbModel.getActiveWs(), true);
+			if (ranges = ranges[0]) {
+				ws = ranges.worksheet;
+            }
+        } else {
+			ws = this.wbModel.getWorksheetByName(sheet);
+        }
+		if (!ws) {
+			this.handlers.trigger("asc_onHyperlinkClick", null);
+			return;
+		} else if (ws.getHidden()) {
+			return;
+		}
+		// Индекс листа
+		var sheetIndex = ws.getIndex();
+		// Если не совпали индекс листа и индекс текущего, то нужно сменить
+		if (this.asc_getActiveWorksheetIndex() !== sheetIndex) {
+			// Меняем активный лист
+			this.asc_showWorksheet(sheetIndex);
+			// Посылаем эвент о смене активного листа
+			this.handlers.trigger("asc_onActiveSheetChanged", sheetIndex);
+		}
+		var range;
+		if (ranges) {
+			range = ranges.bbox;
+        } else {
+			range = ws.getRange2(val.asc_getRange());
+			if (range) {
+				range = range.getBBox0();
+            }
+        }
+		this.wb._onSetSelection(range, /*validRange*/ true);
+	};
 
   spreadsheet_api.prototype.onSaveCallback = function(e) {
     var t = this;

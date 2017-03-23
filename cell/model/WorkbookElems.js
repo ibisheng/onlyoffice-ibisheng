@@ -2356,7 +2356,7 @@ Hyperlink.prototype = {
 		this.Location = Location;
 		this.LocationSheet = this.LocationRange = null;
 
-		if (null != this.Location) {
+		if (null !== this.Location) {
 			var result = parserHelp.parse3DRef(this.Location);
 			if (null !== result) {
 				this.LocationSheet = result.sheet;
