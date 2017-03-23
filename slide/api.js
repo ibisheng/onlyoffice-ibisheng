@@ -6811,6 +6811,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['remove_Hyperlink']                    = asc_docs_api.prototype.remove_Hyperlink;
 	asc_docs_api.prototype['sync_HyperlinkPropCallback']          = asc_docs_api.prototype.sync_HyperlinkPropCallback;
 	asc_docs_api.prototype['sync_HyperlinkClickCallback']         = asc_docs_api.prototype.sync_HyperlinkClickCallback;
+	asc_docs_api.prototype['asc_GoToInternalHyperlink']           = asc_docs_api.prototype.asc_GoToInternalHyperlink;
 	asc_docs_api.prototype['sync_CanAddHyperlinkCallback']        = asc_docs_api.prototype.sync_CanAddHyperlinkCallback;
 	asc_docs_api.prototype['sync_DialogAddHyperlink']             = asc_docs_api.prototype.sync_DialogAddHyperlink;
 	asc_docs_api.prototype['GoToFooter']                          = asc_docs_api.prototype.GoToFooter;
