@@ -9500,7 +9500,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		else if( c_oSerImageType2.Locked === type )
             oParaDrawing.Set_Locked(this.stream.GetBool());
 		else if( c_oSerImageType2.RelativeHeight === type )
-			oParaDrawing.Set_RelativeHeight(this.stream.GetULongLE());
+			oParaDrawing.Set_RelativeHeight(AscFonts.FT_Common.IntToUInt(this.stream.GetULongLE()));
 		else if( c_oSerImageType2.BSimplePos === type )
 			oParaDrawing.SimplePos.Use = this.stream.GetBool();
 		else if( c_oSerImageType2.EffectExtent === type )
