@@ -213,7 +213,8 @@
           ],
 		  "common": []
 	  },
-      "mobile": [    
+      "mobile": [
+        "../common/Native/Wrappers/HtmlPage.js",
         "../common/Native/Wrappers/TextMeasurerWrapper.js",
         "../common/Native/Wrappers/DrawingStream.js",
         "../common/Native/Wrappers/ShapeDrawer.js",
@@ -231,7 +232,8 @@
         "../common/FontsFreeType/TextMeasurer.js",       
         "../common/Scrolls/iscroll.js",
 		"../common/Scrolls/mobileTouchManagerBase.js",
-		"../word/Drawing/mobileTouchManager.js"
+		"../word/Drawing/mobileTouchManager.js",
+        "../word/Drawing/HtmlPage.js"
       ],
       "dst": "../word",
       "externs": [
