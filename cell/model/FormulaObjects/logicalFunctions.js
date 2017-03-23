@@ -166,6 +166,7 @@
 	cIF.prototype.constructor = cIF;
 	cIF.prototype.argumentsMin = 1;
 	cIF.prototype.argumentsMax = 3;
+	cIF.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 

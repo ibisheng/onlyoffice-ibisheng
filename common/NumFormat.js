@@ -3740,7 +3740,7 @@ function setCurrentCultureInfo(val) {
 				case '4':
 				case '5':
 					if (year > 0) {
-						dateElems.push('y'.repeat(month));
+						dateElems.push('y'.repeat(year));
 					}
 					break;
 			}
