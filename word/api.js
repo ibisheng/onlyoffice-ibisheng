@@ -3584,7 +3584,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_IsCursorInFootnote = function()
 	{
 		var oLogicDocument = this.WordControl.m_oLogicDocument;
-		if (oLogicDocument && docpostype_Footnotes === oLogicDocument.Get_DocPosType())
+		if (oLogicDocument && true === oLogicDocument.IsCursorInFootnote())
 			return true;
 
 		return false;

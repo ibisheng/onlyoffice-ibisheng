@@ -11380,6 +11380,10 @@ CDocument.prototype.GetFootnotePr = function()
 	oFootnotePr.put_NumFormat(oSectPr.GetFootnoteNumFormat());
 	return oFootnotePr;
 };
+CDocument.prototype.IsCursorInFootnote = function()
+{
+	return (docpostype_Footnotes === this.Get_DocPosType() ? true : false);
+};
 
 
 CDocument.prototype.TurnOffCheckChartSelection = function(){

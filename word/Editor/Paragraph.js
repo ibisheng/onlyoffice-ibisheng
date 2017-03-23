@@ -607,6 +607,7 @@ Paragraph.prototype =
         // Кроме случая, когда параграф меняет свое местоположение на страницах и колонках
         if (true === this.Parent.RecalcInfo.Can_RecalcObject() || ColumnNumOld !== this.ColumnNum || PageNumOld !== this.PageNum)
         {
+			// Эти значения нужны для правильного рассчета положения картинок, смотри баг #34392
             var Ranges = this.Parent.CheckRange(X, Y, XLimit, Y, Y, Y, X, XLimit, this.PageNum, true);
             if (Ranges.length > 0)
             {
