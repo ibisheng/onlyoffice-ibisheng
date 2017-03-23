@@ -6462,6 +6462,7 @@ DrawingObjectsController.prototype =
                     sp.checkDrawingBaseCoords();
                     this.selectObject(sp, 0);
                 }
+                cur_group.setBDeleted(true);
                 cur_group.deleteDrawingBase();
             }
         }

@@ -2627,6 +2627,7 @@ CGraphicObjects.prototype =
                     this.selectObject(sp, page_num);
                 }
                 cur_group.parent.Remove_FromDocument(false);
+                cur_group.setBDeleted(true);
             }
             for(i = 0; i < a_objects.length; ++i)
             {
