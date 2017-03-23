@@ -574,7 +574,14 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
                     var oVisibleRange = oWorksheet.getVisibleRange();
                     if(!oRange.isIntersect(oVisibleRange)){
                         var oOffset = oWorksheet._calcActiveCellOffset(oRange);
-                        //window["Asc"]["editor"].wb.controller.scroll(oOffset);
+                        var _api = window["Asc"]["editor"];
+                        if (_api.wb.MobileTouchManager)
+						{
+							var offX = this.drawingObjects.convertMetric(oOffset.deltaX, 1, 0);
+							var offY = this.drawingObjects.convertMetric(oOffset.deltaY, 1, 0);
+
+							_api.wb.MobileTouchManager.scrollBy(offX, offY);
+						}
                     }
                 }
             }
