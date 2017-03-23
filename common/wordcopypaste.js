@@ -2074,7 +2074,7 @@ PasteProcessor.prototype =
 				
 				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
 				{
-					aNewContent[i] = this._specialPasteParagraphConvert(aNewContent[i]);
+					aNewContent[i] = this._specialPasteParagraphConvert(aNewContent[i], paragraph);
 				}
 				
                 if (i == length - 1 && true != this.bInBlock && type_Paragraph == oSelectedElement.Element.GetType())
@@ -2110,7 +2110,7 @@ PasteProcessor.prototype =
         }
     },
 	
-	_specialPasteParagraphConvert: function(paragraph)
+	_specialPasteParagraphConvert: function(paragraph, pasteIntoParagraph)
 	{
 		var res = paragraph;
 		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
@@ -2123,6 +2123,9 @@ PasteProcessor.prototype =
 			}
 			case Asc.c_oSpecialPasteProps.pasteOnlyValues:
 			{
+				//в данному случае мы должны применить к вставленному фрагменту стиль paraRun, в который вставляем
+				var pasteIntoParaRun = pasteIntoParagraph.Content[pasteIntoParagraph.CurPos.ContentPos];
+				
 				paragraph.Clear_TextFormatting();
 				paragraph.Clear_Formatting();
 				paragraph.Pr = new CParaPr();
@@ -2131,7 +2134,7 @@ PasteProcessor.prototype =
 				for(var j = 0; j < paragraph.Content.length; j++)
 				{
 					paragraph.Content[j].Clear_TextFormatting();
-					var NewTextPr = new CTextPr();
+					var NewTextPr = new CTextPr()/*pasteIntoParaRun.Pr*/;
 					paragraph.Content[j].Set_Pr( NewTextPr );
 				}
 				
