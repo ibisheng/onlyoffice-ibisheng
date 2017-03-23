@@ -5567,8 +5567,8 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onHyperlinkClick", Url);
 	};
 
-	asc_docs_api.prototype.asc_GoToInternalHyperlink = function(){
-
+	asc_docs_api.prototype.asc_GoToInternalHyperlink = function(url)
+	{
 		for(var i = 0; i < this.SelectedObjectsStack.length; ++i){
 			if(this.SelectedObjectsStack[i].Type === c_oAscTypeSelectElement.Hyperlink){
 				var oHyperProp = this.SelectedObjectsStack[i].Value;
