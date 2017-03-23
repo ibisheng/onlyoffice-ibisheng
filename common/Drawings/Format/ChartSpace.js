@@ -11667,6 +11667,28 @@ function GetNumFormatFromSeries(aAscSeries){
     return "General";
 }
 
+
+function FillCatAxNumFormat(oCatAxis, aAscSeries){
+    if(!oCatAxis){
+        return;
+    }
+    var sFormatCode = null;
+    if(aAscSeries &&
+        aAscSeries[0] &&
+        aAscSeries[0].Cat &&
+        aAscSeries[0].Cat.NumCache &&
+        aAscSeries[0].Cat.NumCache[0]){
+        if(typeof (aAscSeries[0].Cat.NumCache[0].numFormatStr) === "string" && aAscSeries[0].Cat.NumCache[0].numFormatStr.length > 0){
+            sFormatCode = aAscSeries[0].Cat.NumCache[0].numFormatStr;
+        }
+    }
+    if(sFormatCode){
+        oCatAxis.setNumFmt(new AscFormat.CNumFmt());
+        oCatAxis.numFmt.setFormatCode(sFormatCode ? sFormatCode : "General");
+        oCatAxis.numFmt.setSourceLinked(true);
+    }
+}
+
 function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
 {
     var asc_series = chartSeries.series;
@@ -11762,6 +11784,7 @@ function CreateLineChart(chartSeries, type, bUseCache, oOptions, b3D)
     cat_ax.setNoMultiLvlLbl(false);
     var scaling = cat_ax.scaling;
     scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
+    FillCatAxNumFormat(cat_ax, asc_series);
     val_ax.setScaling(new AscFormat.CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AscFormat.AX_POS_L);
@@ -11906,6 +11929,7 @@ function CreateBarChart(chartSeries, type, bUseCache, oOptions, b3D, bDepth)
     cat_ax.setNoMultiLvlLbl(false);
     var scaling = cat_ax.scaling;
     scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
+    FillCatAxNumFormat(cat_ax, asc_series);
     val_ax.setScaling(new AscFormat.CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AscFormat.AX_POS_L);
@@ -12048,6 +12072,7 @@ function CreateHBarChart(chartSeries, type, bUseCache, oOptions, b3D)
     cat_ax.setNoMultiLvlLbl(false);
     var scaling = cat_ax.scaling;
     scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
+    FillCatAxNumFormat(cat_ax, asc_series);
     val_ax.setScaling(new AscFormat.CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AscFormat.AX_POS_B);
@@ -12175,6 +12200,7 @@ function CreateAreaChart(chartSeries, type, bUseCache, oOptions)
     cat_ax.setLblOffset(100);
     cat_ax.setNoMultiLvlLbl(false);
     cat_ax.scaling.setOrientation(AscFormat.ORIENTATION_MIN_MAX);
+    FillCatAxNumFormat(cat_ax, asc_series);
     val_ax.setScaling(new AscFormat.CScaling());
     val_ax.setDelete(false);
     val_ax.setAxPos(AscFormat.AX_POS_L);
