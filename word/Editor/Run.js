@@ -3680,8 +3680,8 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
 				if (0 !== PageAbs && CurPage > ColumnAbs)
 					_CurPage = CurPage - ColumnAbs;
 
-				var ColumnStartX = Para.Pages[_CurPage].X;
-				var ColumnEndX   = Para.Pages[_CurPage].XLimit;
+				var ColumnStartX = (0 === CurPage ? Para.X_ColumnStart : Para.Pages[_CurPage].X     );
+				var ColumnEndX   = (0 === CurPage ? Para.X_ColumnEnd   : Para.Pages[_CurPage].XLimit);
 
                 var Top_Margin    = Y_Top_Margin;
                 var Bottom_Margin = Y_Bottom_Margin;

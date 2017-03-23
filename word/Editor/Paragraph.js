@@ -9181,8 +9181,8 @@ Paragraph.prototype =
                 if (0 !== PageAbs && CurPage > ColumnAbs)
 					_CurPage = CurPage - ColumnAbs;
 
-				var ColumnStartX = this.Pages[_CurPage].X;
-				var ColumnEndX   = this.Pages[_CurPage].XLimit;
+				var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[_CurPage].X     );
+				var ColumnEndX   = (0 === CurPage ? this.X_ColumnEnd   : this.Pages[_CurPage].XLimit);
 
                 var Top_Margin    = Y_Top_Margin;
                 var Bottom_Margin = Y_Bottom_Margin;
