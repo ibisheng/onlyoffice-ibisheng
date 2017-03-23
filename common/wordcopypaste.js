@@ -2004,11 +2004,13 @@ PasteProcessor.prototype =
         var nInsertLength = this.aContent.length;
         if(nInsertLength > 0)
         {
-            this.InsertInPlace(oDocument, this.aContent);
-			//if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
-			//{
-				window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState = this.oDocument.Get_SelectionState();
-			//}
+            if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+			{
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionStateBeforeInsert = this.oDocument.Get_SelectionState();
+			}
+			this.InsertInPlace(oDocument, this.aContent);
+			
+			window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState = this.oDocument.Get_SelectionState();
 			
             if(false == PasteElementsId.g_bIsDocumentCopyPaste)
             {
@@ -2074,7 +2076,7 @@ PasteProcessor.prototype =
 				
 				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
 				{
-					aNewContent[i] = this._specialPasteParagraphConvert(aNewContent[i], paragraph);
+					aNewContent[i] = this._specialPasteParagraphConvert(aNewContent[i]);
 				}
 				
                 if (i == length - 1 && true != this.bInBlock && type_Paragraph == oSelectedElement.Element.GetType())
@@ -2110,10 +2112,17 @@ PasteProcessor.prototype =
         }
     },
 	
-	_specialPasteParagraphConvert: function(paragraph, pasteIntoParagraph)
+	_specialPasteParagraphConvert: function(paragraph)
 	{
 		var res = paragraph;
 		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+		
+		var selection = window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionStateBeforeInsert;
+		if(selection && selection[1])
+		{
+			var pasteIntoParagraph = this.oDocument.Content[selection[1].CurPos.ContentPos];
+			var pasteIntoParaRun = pasteIntoParagraph.Content[selection[0].CurPos.ContentPos.Data[0]];
+		}
 		
 		switch(props)
 		{
@@ -2124,7 +2133,7 @@ PasteProcessor.prototype =
 			case Asc.c_oSpecialPasteProps.pasteOnlyValues:
 			{
 				//в данному случае мы должны применить к вставленному фрагменту стиль paraRun, в который вставляем
-				var pasteIntoParaRun = pasteIntoParagraph.Content[pasteIntoParagraph.CurPos.ContentPos];
+				//var pasteIntoParaRun = pasteIntoParagraph.Content[pasteIntoParagraph.CurPos.ContentPos];
 				
 				paragraph.Clear_TextFormatting();
 				paragraph.Clear_Formatting();
@@ -2134,7 +2143,7 @@ PasteProcessor.prototype =
 				for(var j = 0; j < paragraph.Content.length; j++)
 				{
 					paragraph.Content[j].Clear_TextFormatting();
-					var NewTextPr = new CTextPr()/*pasteIntoParaRun.Pr*/;
+					var NewTextPr = pasteIntoParaRun.Pr;
 					paragraph.Content[j].Set_Pr( NewTextPr );
 				}
 				
