@@ -1237,7 +1237,7 @@
 						var curNodesElemX = curNodes[curCellX];
 						for (var id in curNodesElemX) {
 							var elem = curNodesElemX[id];
-							if (!elem.dataWrap.isOutput) {
+							if (!elem.dataWrap.isOutput && elem.dataWrap.bbox.r1 <= curCellY) {
 								elem.dataWrap.isOutput = true;
 								res.push(elem.dataWrap);
 								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
