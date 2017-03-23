@@ -573,14 +573,24 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
                     var oRange = new Asc.Range(oCell.col, oCell.row, oCell.col, oCell.row, false);
                     var oVisibleRange = oWorksheet.getVisibleRange();
                     if(!oRange.isIntersect(oVisibleRange)){
-                        var oOffset = oWorksheet._calcActiveCellOffset(oRange);
+                        var oOffset = oWorksheet._calcFillHandleOffset(oRange);
                         var _api = window["Asc"]["editor"];
                         if (_api.wb.MobileTouchManager)
 						{
-							var offX = this.drawingObjects.convertMetric(oOffset.deltaX, 1, 0);
-							var offY = this.drawingObjects.convertMetric(oOffset.deltaY, 1, 0);
+						    if(oOffset.deltaX < 0){
+                                --oOffset.deltaX;
+                            }
+                            if(oOffset.deltaX > 0){
+						        ++oOffset.deltaX;
+                            }
 
-							_api.wb.MobileTouchManager.scrollBy(offX, offY);
+                            if(oOffset.deltaY < 0){
+                                --oOffset.deltaY;
+                            }
+                            if(oOffset.deltaY > 0){
+                                ++oOffset.deltaY;
+                            }
+							_api.wb.MobileTouchManager.scrollBy((oOffset.deltaX) * _api.controller.settings.hscrollStep, (oOffset.deltaY)* _api.controller.settings.vscrollStep);
 						}
                     }
                 }
