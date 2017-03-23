@@ -2625,9 +2625,13 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
 			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		if (arg1 instanceof cArea) {
 			arg1 = arg1.cross(arguments[1].bbox);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
