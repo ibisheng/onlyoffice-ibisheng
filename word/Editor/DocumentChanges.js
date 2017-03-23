@@ -358,11 +358,11 @@ CChangesDocumentDefaultTab.prototype.constructor = CChangesDocumentDefaultTab;
 CChangesDocumentDefaultTab.prototype.Type = AscDFH.historyitem_Document_DefaultTab;
 CChangesDocumentDefaultTab.prototype.Undo = function()
 {
-	Default_Tab_Stop = this.Old;
+	AscCommonWord.Default_Tab_Stop = this.Old;
 };
 CChangesDocumentDefaultTab.prototype.Redo = function()
 {
-	Default_Tab_Stop = this.New;
+	AscCommonWord.Default_Tab_Stop = this.New;
 };
 CChangesDocumentDefaultTab.prototype.WriteToBinary = function(Writer)
 {

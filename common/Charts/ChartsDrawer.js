@@ -2148,6 +2148,11 @@ CChartsDrawer.prototype =
 				result = yPoints[0].pos - Math.abs((diffVal / resVal) * resPos);
 			else
 				result = yPoints[0].pos + Math.abs((diffVal / resVal) * resPos);
+			
+			if(result > yPoints[yPoints.length - 1].pos || result < yPoints[0].pos)
+			{
+				result = yPoints[0].pos;
+			}
 		}
 		else if(val > yPoints[yPoints.length - 1].val)
 		{	
@@ -2169,6 +2174,11 @@ CChartsDrawer.prototype =
 					result = yPoints[yPoints.length - 1].pos - (diffVal / resVal) * resPos;
 				else
 					result = yPoints[yPoints.length - 1].pos + (diffVal / resVal) * resPos;
+			}
+			
+			if(result > yPoints[yPoints.length - 1].pos || result < yPoints[0].pos)
+			{
+				result = yPoints[yPoints.length - 1].pos;
 			}
 		}
 		else
@@ -11035,7 +11045,7 @@ drawSurfaceChart.prototype =
 			}
 			
 			dataSeries = numCache.pts;
-			for(var n = 0; n < numCache.ptCount; n++)
+			for(var n = 0; n < this.chartProp.ptCount; n++)
 			{	
 				//рассчитываем значения
 				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;

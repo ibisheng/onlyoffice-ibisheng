@@ -1270,9 +1270,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		var cross = r.cross(arg);
 		if (cross) {
 			if (undefined !== cross.r) {
-				return this.getValue2(new CellAddress(cross.r, this.getBBox0().c1));
+				return this.getValue2(new CellAddress(cross.r, this.getBBox0().c1, 0));
 			} else if (undefined !== cross.c) {
-				return this.getValue2(new CellAddress(this.getBBox0().r1, cross.c));
+				return this.getValue2(new CellAddress(this.getBBox0().r1, cross.c, 0));
 			}
 		}
 		return new cError(cErrorType.wrong_value_type);
@@ -2625,9 +2625,13 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
 			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		if (arg1 instanceof cArea) {
 			arg1 = arg1.cross(arguments[1].bbox);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();

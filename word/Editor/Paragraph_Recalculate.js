@@ -2019,7 +2019,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
     var NewX = 0;
 
     // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
-    var DefTab = ParaPr.DefaultTabSize != null ? ParaPr.DefaultTabSize : Default_Tab_Stop;
+    var DefTab = ParaPr.DefaultTabSize != null ? ParaPr.DefaultTabSize : AscCommonWord.Default_Tab_Stop;
     if ( null === Tab )
     {
         if ( X < PageStart.X + ParaPr.Ind.Left )

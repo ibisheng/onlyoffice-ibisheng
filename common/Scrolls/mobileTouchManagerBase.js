@@ -2172,6 +2172,23 @@
 		}
 	};
 
+	CMobileTouchManagerBase.prototype.scrollTo = function(x, y)
+	{
+		if (this.iScroll)
+		{
+			this.iScroll.scrollTo(-x, -y);
+			this.iScroll._execEvent('scroll');
+		}
+	};
+	CMobileTouchManagerBase.prototype.scrollBy = function(x, y)
+	{
+		if (this.iScroll)
+		{
+			this.iScroll.scrollBy(-x, -y);
+			this.iScroll._execEvent('scroll');
+		}
+	};
+
 	//--------------------------------------------------------export----------------------------------------------------
 	AscCommon.CMobileDelegateSimple = CMobileDelegateSimple;
 	AscCommon.CMobileTouchManagerBase = CMobileTouchManagerBase;

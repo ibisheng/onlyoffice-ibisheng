@@ -2599,7 +2599,7 @@ CFootnotesController.prototype.GetSelectedText = function(bClearText, oPr)
 	if (true === bClearText)
 	{
 		if (true !== this.Selection.Use || 0 !== this.Selection.Direction)
-			return null;
+			return "";
 
 		return this.CurFootnote.Get_SelectedText(true, oPr);
 	}

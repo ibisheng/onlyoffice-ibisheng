@@ -3581,11 +3581,20 @@ background-repeat: no-repeat;\
 	{
 		this.WordControl.m_oLogicDocument.GotoFootnote(isNext);
 	};
+	asc_docs_api.prototype.asc_IsCursorInFootnote = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (oLogicDocument && true === oLogicDocument.IsCursorInFootnote())
+			return true;
+
+		return false;
+	};
 	asc_docs_api.prototype["asc_AddFootnote"]        = asc_docs_api.prototype.asc_AddFootnote;
 	asc_docs_api.prototype["asc_RemoveAllFootnotes"] = asc_docs_api.prototype.asc_RemoveAllFootnotes;
 	asc_docs_api.prototype["asc_GetFootnoteProps"]   = asc_docs_api.prototype.asc_GetFootnoteProps;
 	asc_docs_api.prototype["asc_SetFootnoteProps"]   = asc_docs_api.prototype.asc_SetFootnoteProps;
 	asc_docs_api.prototype["asc_GotoFootnote"]       = asc_docs_api.prototype.asc_GotoFootnote;
+	asc_docs_api.prototype["asc_IsCursorInFootnote"] = asc_docs_api.prototype.asc_IsCursorInFootnote;
 
 	asc_docs_api.prototype.put_AddPageBreak              = function()
 	{
@@ -5863,6 +5872,11 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asyncImageEndLoadedBackground = function(_image)
 	{
 		this.WordControl.m_oDrawingDocument.CheckRasterImageOnScreen(_image.src);
+		if (this.WordControl.m_oDrawingDocument.LastDrawingUrl == _image.src)
+		{
+			this.WordControl.m_oDrawingDocument.LastDrawingUrl = "";
+			this.UpdateInterfaceState();
+		}
 	};
 	asc_docs_api.prototype.IsAsyncOpenDocumentImages     = function()
 	{
@@ -6459,7 +6473,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["userid"]       = this.documentUserId;
 		oAdditionalData["jwt"]         = this.CoAuthoringApi.get_jwt();
 		oAdditionalData["outputformat"] = filetype;
-		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
+		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
 		if ('savefromorigin' === command)
 		{

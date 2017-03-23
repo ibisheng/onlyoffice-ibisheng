@@ -4433,7 +4433,7 @@ CDocument.prototype.Set_ParagraphTabs = function(Tabs)
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
-	this.Api.Update_ParaTab(Default_Tab_Stop, Tabs);
+	this.Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
 };
 CDocument.prototype.Set_ParagraphIndent = function(Ind)
 {
@@ -4695,8 +4695,8 @@ CDocument.prototype.Get_DocumentOrientation = function()
 };
 CDocument.prototype.Set_DocumentDefaultTab = function(DTab)
 {
-	this.History.Add(new CChangesDocumentDefaultTab(this, Default_Tab_Stop, DTab));
-	Default_Tab_Stop = DTab;
+	this.History.Add(new CChangesDocumentDefaultTab(this, AscCommonWord.Default_Tab_Stop, DTab));
+	AscCommonWord.Default_Tab_Stop = DTab;
 };
 CDocument.prototype.Set_DocumentEvenAndOddHeaders = function(Value)
 {
@@ -4747,7 +4747,7 @@ CDocument.prototype.Interface_Update_ParaPr = function()
 			ParaPr.CanAddImage = true;
 
 		if (undefined != ParaPr.Tabs)
-			this.Api.Update_ParaTab(Default_Tab_Stop, ParaPr.Tabs);
+			this.Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, ParaPr.Tabs);
 
 		if (ParaPr.Shd && ParaPr.Shd.Unifill)
 		{
@@ -10043,11 +10043,11 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
 	if (true !== this.CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())
 		return;
 
-	if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape || this.DrawingObjects.checkTrackDrawings())
+	if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape || this.DrawingObjects.checkTrackDrawings() || this.Api.isOpenedChartFrame)
 		return;
 
 	var HaveChanges = this.History.Have_Changes(true);
-	if (true !== HaveChanges && true === this.CollaborativeEditing.Have_OtherChanges())
+	if (true !== HaveChanges && true === this.CollaborativeEditing.Have_OtherChanges() || 0 !== this.CollaborativeEditing.getOwnLocksLength())
 	{
 		// Принимаем чужие изменения. Своих нет, но функцию отсылки надо вызвать, чтобы снять локи.
 		this.CollaborativeEditing.Apply_Changes();
@@ -11221,6 +11221,12 @@ CDocument.prototype.AddFootnote = function(sText)
 			var oFootnote = this.Footnotes.CreateFootnote();
 			oFootnote.AddDefaultFootnoteContent(sText);
 
+			if (true === this.Is_SelectionUse())
+			{
+				this.Cursor_MoveRight(false, false, false);
+				this.Selection_Remove();
+			}
+
 			if (sText)
 				this.Paragraph_Add(new ParaFootnoteReference(oFootnote, sText));
 			else
@@ -11373,6 +11379,10 @@ CDocument.prototype.GetFootnotePr = function()
 	oFootnotePr.put_NumRestart(oSectPr.GetFootnoteNumRestart());
 	oFootnotePr.put_NumFormat(oSectPr.GetFootnoteNumFormat());
 	return oFootnotePr;
+};
+CDocument.prototype.IsCursorInFootnote = function()
+{
+	return (docpostype_Footnotes === this.Get_DocPosType() ? true : false);
 };
 
 
@@ -12283,7 +12293,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 						if ((undefined === CurrFramePr && undefined === PrevFramePr) || ( undefined !== CurrFramePr && undefined !== PrevFramePr && true === CurrFramePr.Compare(PrevFramePr) ))
 						{
-							if (true === this.Is_TrackRevisions())
+							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos - 1].Get_ReviewType())
 							{
 								this.Content[this.CurPos.ContentPos - 1].Set_ReviewType(reviewtype_Remove);
 								this.CurPos.ContentPos--;
@@ -12325,7 +12335,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 						if ((undefined === CurrFramePr && undefined === NextFramePr) || ( undefined !== CurrFramePr && undefined !== NextFramePr && true === CurrFramePr.Compare(NextFramePr) ))
 						{
-							if (true === this.Is_TrackRevisions())
+							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos].Get_ReviewType())
 							{
 								this.Content[this.CurPos.ContentPos].Set_ReviewType(reviewtype_Remove);
 								this.CurPos.ContentPos++;

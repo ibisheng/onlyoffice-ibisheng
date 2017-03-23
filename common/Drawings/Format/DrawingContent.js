@@ -607,6 +607,13 @@
         return DC;
     };
 
+    CDrawingDocContent.prototype.Recalculate                    = function()
+    {
+        if(this.XLimit > 0){
+            this.Recalculate_PageDrawing();
+        }
+    };
+
     // TODO: сделать по-нормальному!!!
     function CDocument_prototype_private_GetElementPageIndexByXY(ElementPos, X, Y, PageIndex)
     {

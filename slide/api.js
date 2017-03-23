@@ -5567,6 +5567,19 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onHyperlinkClick", Url);
 	};
 
+	asc_docs_api.prototype.asc_GoToInternalHyperlink = function(url)
+	{
+		for(var i = 0; i < this.SelectedObjectsStack.length; ++i){
+			if(this.SelectedObjectsStack[i].Type === c_oAscTypeSelectElement.Hyperlink){
+				var oHyperProp = this.SelectedObjectsStack[i].Value;
+				if(typeof oHyperProp.Value === "string" && oHyperProp.Value.indexOf("ppaction://hlink") === 0){
+					this.sync_HyperlinkClickCallback(oHyperProp.Value);
+				}
+				return;
+			}
+		}
+	};
+
 	asc_docs_api.prototype.UpdateInterfaceState = function()
 	{
 		if (this.WordControl.m_oLogicDocument != null)
@@ -5862,6 +5875,11 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.asc_getChartObject = function(type)
 	{
 		this.isChartEditor = true;		// Для совместного редактирования
+        if (!AscFormat.isRealNumber(type))
+        {
+            this.asc_onOpenChartFrame();
+            this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props);
+        }
 		return this.WordControl.m_oLogicDocument.Get_ChartObject(type);
 	};
 
@@ -6045,7 +6063,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["userid"]       = this.documentUserId;
 		oAdditionalData["jwt"]         = this.CoAuthoringApi.get_jwt();
 		oAdditionalData["outputformat"] = filetype;
-		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
+		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
 		if (DownloadType.Print === options.downloadType)
 		{
@@ -6793,6 +6811,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['remove_Hyperlink']                    = asc_docs_api.prototype.remove_Hyperlink;
 	asc_docs_api.prototype['sync_HyperlinkPropCallback']          = asc_docs_api.prototype.sync_HyperlinkPropCallback;
 	asc_docs_api.prototype['sync_HyperlinkClickCallback']         = asc_docs_api.prototype.sync_HyperlinkClickCallback;
+	asc_docs_api.prototype['asc_GoToInternalHyperlink']           = asc_docs_api.prototype.asc_GoToInternalHyperlink;
 	asc_docs_api.prototype['sync_CanAddHyperlinkCallback']        = asc_docs_api.prototype.sync_CanAddHyperlinkCallback;
 	asc_docs_api.prototype['sync_DialogAddHyperlink']             = asc_docs_api.prototype.sync_DialogAddHyperlink;
 	asc_docs_api.prototype['GoToFooter']                          = asc_docs_api.prototype.GoToFooter;

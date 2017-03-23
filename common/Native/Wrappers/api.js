@@ -5305,8 +5305,8 @@ CStylesPainter.prototype =
         AscCommon.g_oTableId.m_bTurnOff = true;
         AscCommon.History.TurnOff();
 
-        var oldDefTabStop = Default_Tab_Stop;
-        Default_Tab_Stop = 1;
+        var oldDefTabStop = AscCommonWord.Default_Tab_Stop;
+		AscCommonWord.Default_Tab_Stop = 1;
 
         var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
         var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
@@ -5405,7 +5405,7 @@ CStylesPainter.prototype =
 
         graphics.restore();
 
-        Default_Tab_Stop = oldDefTabStop;
+		AscCommonWord.Default_Tab_Stop = oldDefTabStop;
 
         AscCommon.g_oTableId.m_bTurnOff = false;
         AscCommon.History.TurnOn();

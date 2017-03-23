@@ -1113,11 +1113,9 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         for (var sId in mapParagraphs)
         {
             var oParagraph = mapParagraphs[sId];
+			oParagraph.CheckParaEnd();
             oParagraph.Correct_Content();
-            oParagraph.CheckParaEnd();
         }
-
-
 
 		var oBinaryWriter = AscCommon.History.BinaryWriter;
 		var aSendingChanges = [];

@@ -8831,8 +8831,8 @@ function GenerateDefaultSlide(layout)
 function CreateDefaultTextRectStyle()
 {
     var style = new CShapeStyle();
-    style.setLnRef(new StyleRef());
-    style.lnRef.setIdx(0);
+    var lnRef = new StyleRef();
+    lnRef.setIdx(0);
     var unicolor = new CUniColor();
 
     unicolor.setColor(new CSchemeColor());
@@ -8842,29 +8842,35 @@ function CreateDefaultTextRectStyle()
     mod.setVal(50000);
     unicolor.setMods(new CColorModifiers());
     unicolor.Mods.addMod(mod);
-    style.lnRef.setColor(unicolor);
+    lnRef.setColor(unicolor);
+    style.setLnRef(lnRef);
 
-    style.setFillRef(new StyleRef());
-    style.fillRef.setIdx(0);
 
+    var fillRef = new StyleRef();
+    fillRef.setIdx(0);
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(g_clr_accent1);
-    style.fillRef.setColor(unicolor);
+    fillRef.setColor(unicolor);
+    style.setFillRef(fillRef);
 
-    style.setEffectRef(new StyleRef());
 
-    style.effectRef.setIdx(0);
+    var effectRef = new StyleRef();
+    effectRef.setIdx(0);
     unicolor = new  CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(g_clr_accent1);
+    effectRef.setColor(unicolor);
+    style.setEffectRef(effectRef);
 
-    style.setFontRef(new FontRef());
-    style.fontRef.setIdx(AscFormat.fntStyleInd_minor);
+    var fontRef = new FontRef();
+    fontRef.setIdx(AscFormat.fntStyleInd_minor);
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(8);
-    style.fontRef.setColor(unicolor);
+    fontRef.setColor(unicolor);
+    style.setFontRef(fontRef);
+
     return style;
 }
 

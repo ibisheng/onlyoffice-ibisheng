@@ -290,7 +290,8 @@ CChangesDocumentContentRemoveItem.prototype.Load = function(Color)
 			}
 			else
 			{
-				oDocument.Content[Pos - 1].Next = null;
+				if (oDocument.Content[Pos - 1])
+					oDocument.Content[Pos - 1].Next = null;
 			}
 		}
 		else if (Pos <= oDocument.Content.length - 1)

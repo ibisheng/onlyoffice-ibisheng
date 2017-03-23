@@ -607,6 +607,7 @@ Paragraph.prototype =
         // Кроме случая, когда параграф меняет свое местоположение на страницах и колонках
         if (true === this.Parent.RecalcInfo.Can_RecalcObject() || ColumnNumOld !== this.ColumnNum || PageNumOld !== this.PageNum)
         {
+			// Эти значения нужны для правильного рассчета положения картинок, смотри баг #34392
             var Ranges = this.Parent.CheckRange(X, Y, XLimit, Y, Y, Y, X, XLimit, this.PageNum, true);
             if (Ranges.length > 0)
             {
@@ -3261,56 +3262,118 @@ Paragraph.prototype =
         {
             var ParaPr = this.Get_CompiledPr2(false).ParaPr;
 
-            var LD_PageFields = this.LogicDocument.Get_PageFields(this.Get_AbsolutePage(0));
+			var nDefaultTabStop = AscCommonWord.Default_Tab_Stop;
+			if (nDefaultTabStop < 0.001)
+				return;
 
-            if ( true != bShift )
-            {
-                if ( ParaPr.Ind.FirstLine < 0 )
-                {
-                    this.Set_Ind( { FirstLine : 0 }, false );
-                    this.CompiledPr.NeedRecalc = true;
-                }
-                else if ( ParaPr.Ind.FirstLine < 12.5 )
-                {
-                    this.Set_Ind( { FirstLine : 12.5 }, false );
-                    this.CompiledPr.NeedRecalc = true;
-                }
-                else if ( LD_PageFields.XLimit - LD_PageFields.X > ParaPr.Ind.Left + 25 )
-                {
-                    this.Set_Ind( { Left : ParaPr.Ind.Left + 12.5 }, false );
-                    this.CompiledPr.NeedRecalc = true;
-                }
-            }
+			var LD_PageFields = this.LogicDocument.Get_PageFields(this.Get_AbsolutePage(0));
+
+			var nLeft  = ParaPr.Ind.Left;
+			var nFirst = ParaPr.Ind.FirstLine;
+			if (true != bShift)
+			{
+				if (nFirst < -0.001)
+				{
+					if (nLeft < -0.001)
+					{
+						this.Set_Ind({FirstLine : 0}, false);
+					}
+					else if (nLeft + nFirst < -0.001)
+					{
+						this.Set_Ind({FirstLine : -nLeft}, false);
+					}
+					else
+					{
+						var nNewPos = ((((nFirst + nLeft) / nDefaultTabStop + 0.5) | 0) + 1) * nDefaultTabStop;
+						if (nNewPos < nLeft)
+							this.Set_Ind({FirstLine : nNewPos - nLeft}, false);
+						else
+							this.Set_Ind({FirstLine : 0}, false);
+					}
+				}
+				else
+				{
+					var nCurTabPos = (((nFirst + nLeft) / nDefaultTabStop + 0.001) | 0) * nDefaultTabStop;
+
+					if (LD_PageFields.XLimit - LD_PageFields.X - ParaPr.Ind.Right < nLeft + nFirst + 1.5 * nDefaultTabStop )
+						return;
+
+					if (nLeft + nFirst < nCurTabPos - 0.001)
+					{
+						this.Set_Ind({FirstLine : (((nFirst + nLeft) / nDefaultTabStop + 0.001) | 0) * nDefaultTabStop - nLeft}, false);
+					}
+					else
+					{
+						if (Math.abs((((nFirst + nLeft) / nDefaultTabStop + 0.001) | 0) * nDefaultTabStop - (((nLeft) / nDefaultTabStop + 0.001) | 0) * nDefaultTabStop) < 0.001 && nFirst < nDefaultTabStop)
+							this.Set_Ind({FirstLine : ((((nFirst + nLeft) / nDefaultTabStop + 0.001) | 0) + 1) * nDefaultTabStop - nLeft}, false);
+						else
+							this.Set_Ind({Left : ((((nFirst + nLeft) / nDefaultTabStop + 0.001) | 0) + 1) * nDefaultTabStop - nFirst}, false);
+					}
+				}
+			}
             else
             {
-                if ( ParaPr.Ind.FirstLine > 0 )
-                {
-                    if ( ParaPr.Ind.FirstLine > 12.5 )
-                        this.Set_Ind( { FirstLine : ParaPr.Ind.FirstLine - 12.5 }, false );
-                    else
-                        this.Set_Ind( { FirstLine : 0 }, false );
+            	if (Math.abs(nFirst) < 0.001)
+				{
+					if (Math.abs(nLeft) < 0.001)
+						return;
+					else if (nLeft > 0)
+					{
+						var nCurTabPos = ((nLeft / nDefaultTabStop + 0.001) | 0) * nDefaultTabStop;
+						if (Math.abs(nCurTabPos - nLeft) < 0.001)
+							this.Set_Ind({Left : (((nLeft / nDefaultTabStop + 0.001) | 0) - 1) * nDefaultTabStop}, false);
+						else
+							this.Set_Ind({Left : nCurTabPos}, false);
+					}
+					else
+					{
+						this.Set_Ind({Left : 0}, false);
+					}
+				}
+				else if (nFirst > 0)
+				{
+					var nCurTabPos = (((nFirst + nLeft) / nDefaultTabStop + 0.001) | 0) * nDefaultTabStop;
+					if (Math.abs(nLeft + nFirst - nCurTabPos) < 0.001)
+					{
+						var nPrevTabPos = Math.max(0, ((((nFirst + nLeft) / nDefaultTabStop + 0.001) | 0) - 1) * nDefaultTabStop);
+						if (nPrevTabPos > nLeft)
+							this.Set_Ind({FirstLine : nPrevTabPos - nLeft}, false);
+						else
+							this.Set_Ind({FirstLine : 0}, false);
 
-                    this.CompiledPr.NeedRecalc = true;
-                }
-                else
-                {
-                    var Left = ParaPr.Ind.Left + ParaPr.Ind.FirstLine;
-                    if ( Left < 0 )
-                    {
-                        this.Set_Ind( { Left : -ParaPr.Ind.FirstLine }, false );
-                        this.CompiledPr.NeedRecalc = true;
-                    }
-                    else
-                    {
-                        if ( Left > 12.5 )
-                            this.Set_Ind( { Left : ParaPr.Ind.Left - 12.5 }, false );
-                        else
-                            this.Set_Ind( { Left : -ParaPr.Ind.FirstLine }, false );
-
-                        this.CompiledPr.NeedRecalc = true;
-                    }
-                }
+					}
+					else
+					{
+						this.Set_Ind({FirstLine : nCurTabPos - nLeft}, false);
+					}
+				}
+				else
+				{
+					if (Math.abs(nFirst + nLeft) < 0.001)
+					{
+						return;
+					}
+					else if (nFirst + nLeft < 0)
+					{
+						this.Set_Ind({Left : -nFirst}, false);
+					}
+					else
+					{
+						var nCurTabPos = (((nFirst + nLeft) / nDefaultTabStop + 0.001) | 0) * nDefaultTabStop;
+						if (Math.abs(nLeft + nFirst - nCurTabPos) < 0.001)
+						{
+							var nPrevTabPos = Math.max(0, ((((nFirst + nLeft) / nDefaultTabStop + 0.001) | 0) - 1) * nDefaultTabStop);
+							this.Set_Ind({Left : nPrevTabPos - nFirst}, false);
+						}
+						else
+						{
+							this.Set_Ind({Left : nCurTabPos - nFirst}, false);
+						}
+					}
+				}
             }
+
+			this.CompiledPr.NeedRecalc = true;
         }
     },
 
@@ -3467,10 +3530,10 @@ Paragraph.prototype =
                 {
                     var NewX = ParaPr.Ind.Left;
                     if ( true != bShift )
-                        NewX += Default_Tab_Stop;
+                        NewX += AscCommonWord.Default_Tab_Stop;
                     else
                     {
-                        NewX -= Default_Tab_Stop;
+                        NewX -= AscCommonWord.Default_Tab_Stop;
 
                         if ( NewX < 0 )
                             NewX = 0;
@@ -7281,7 +7344,7 @@ Paragraph.prototype =
             {
                 var NewX = 0;
                 while ( X >= NewX )
-                    NewX += Default_Tab_Stop;
+                    NewX += AscCommonWord.Default_Tab_Stop;
 
                 X = NewX;
             }
@@ -9119,8 +9182,8 @@ Paragraph.prototype =
                 if (0 !== PageAbs && CurPage > ColumnAbs)
 					_CurPage = CurPage - ColumnAbs;
 
-				var ColumnStartX = this.Pages[_CurPage].X;
-				var ColumnEndX   = this.Pages[_CurPage].XLimit;
+				var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[_CurPage].X     );
+				var ColumnEndX   = (0 === CurPage ? this.X_ColumnEnd   : this.Pages[_CurPage].XLimit);
 
                 var Top_Margin    = Y_Top_Margin;
                 var Bottom_Margin = Y_Bottom_Margin;
@@ -12246,6 +12309,23 @@ Paragraph.prototype.GetLineEndPos = function(CurLine)
 		return new CParagraphContentPos();
 
 	return this.Get_EndRangePos2(CurLine, oLine.Ranges.length - 1);
+};
+Paragraph.prototype.CheckCommentStartEnd = function(sCommentId)
+{
+	var oResult = {Start : false, End : false};
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oElement = this.Content[nIndex];
+		if (para_Comment === oElement.Type && sCommentId === oElement.GetCommentId())
+		{
+			if (oElement.IsCommentStart())
+				oResult.Start = true;
+			else
+				oResult.End = true;
+		}
+	}
+
+	return oResult;
 };
 
 var pararecalc_0_All  = 0;

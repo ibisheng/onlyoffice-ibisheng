@@ -1522,8 +1522,19 @@ CGraphicObjects.prototype =
                         }
                         drawing.Set_BehindDoc(selectedObjects[i].parent.behindDoc);
                         drawing.Set_RelativeHeight(selectedObjects[i].parent.RelativeHeight);
-                        drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value + selectedObjects[i].bounds.x, selectedObjects[i].parent.PositionH.Percent);
-                        drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value + selectedObjects[i].bounds.y, selectedObjects[i].parent.PositionV.Percent);
+                        if(selectedObjects[i].parent.PositionH.Align){
+                            drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value, selectedObjects[i].parent.PositionH.Percent);
+                        }
+                        else{
+                            drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value + selectedObjects[i].bounds.x, selectedObjects[i].parent.PositionH.Percent);
+                        }
+
+                        if(selectedObjects[i].parent.PositionV.Align){
+                            drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value, selectedObjects[i].parent.PositionV.Percent);
+                        }
+                        else{
+                            drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value + selectedObjects[i].bounds.y, selectedObjects[i].parent.PositionV.Percent);
+                        }
                     }
                     run.Add_ToContent(run.State.ContentPos, drawing, true, false);
                     para.Internal_Content_Add(para.CurPos.ContentPos, run, true);
@@ -1857,7 +1868,7 @@ CGraphicObjects.prototype =
        //     }
        // );
        // editor.UpdateTextPr(oTextPr);
-        editor.Update_ParaTab(Default_Tab_Stop, new CParaTabs());
+		editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, new CParaTabs());
         editor.sync_ParaSpacingLine( new CParaSpacing() );
         editor.Update_ParaInd(new CParaInd());
         editor.sync_PrAlignCallBack(null);
@@ -2349,7 +2360,7 @@ CGraphicObjects.prototype =
     },
 
     handleDblClickEmptyShape: function(oShape){
-        if(!oShape.getDocContent() && !AscFormat.CheckLinePresetForParagraphAdd(oShape)){
+        if(!oShape.getDocContent() && !AscFormat.CheckLinePresetForParagraphAdd(oShape.getPresetGeom())){
 
             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
             {
@@ -2616,6 +2627,7 @@ CGraphicObjects.prototype =
                     this.selectObject(sp, page_num);
                 }
                 cur_group.parent.Remove_FromDocument(false);
+                cur_group.setBDeleted(true);
             }
             for(i = 0; i < a_objects.length; ++i)
             {

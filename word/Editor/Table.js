@@ -2593,6 +2593,7 @@ CTable.prototype =
         this.Document_SetThisElementCurrent(false);
         this.Cursor_MoveToStartPos();
 
+        var oTargetTable = this;
         if ( true != this.Is_Inline() )
         {
             if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, null, true) )
@@ -2667,7 +2668,7 @@ CTable.prototype =
 
                     }
 
-					var oTargetTable = AscCommon.CollaborativeEditing.Is_SingleUser() ? this : this.Copy(NewDocContent);
+					oTargetTable = AscCommon.CollaborativeEditing.Is_SingleUser() ? this : this.Copy(NewDocContent);
 					if (NewDocContent != OldDocContent)
 					{
 						// Сначала добавляем таблицу в новый класс
@@ -2694,8 +2695,7 @@ CTable.prototype =
                 }
 
                 editor.WordControl.m_oLogicDocument.Recalculate();
-                
-                this.Start_TrackTable();
+				oTargetTable.Start_TrackTable();
             }
         }
         else
@@ -2762,13 +2762,12 @@ CTable.prototype =
 
                     editor.WordControl.m_oLogicDocument.Recalculate();
                 }
-
-                this.Start_TrackTable();
+				oTargetTable.Start_TrackTable();
             }
         }
         editor.WordControl.m_oLogicDocument.Selection_Remove();
-        this.Document_SetThisElementCurrent(true);
-        this.Cursor_MoveToStartPos();
+		oTargetTable.Document_SetThisElementCurrent(true);
+		oTargetTable.Cursor_MoveToStartPos();
         editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     },
 

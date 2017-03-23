@@ -3145,7 +3145,7 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                     {
                         if (this.CurPos.ContentPos > 0 && type_Paragraph == this.Content[this.CurPos.ContentPos - 1].GetType())
                         {
-                            if (true === this.Is_TrackRevisions())
+                            if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos - 1].Get_ReviewType())
                             {
                                 this.Content[this.CurPos.ContentPos - 1].Set_ReviewType(reviewtype_Remove);
                                 this.CurPos.ContentPos--;
@@ -3180,7 +3180,7 @@ CDocumentContent.prototype.Remove                             = function(Count, 
                     {
                         if (this.CurPos.ContentPos < this.Content.length - 1 && type_Paragraph == this.Content[this.CurPos.ContentPos + 1].GetType())
                         {
-                            if (true === this.Is_TrackRevisions())
+                            if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos].Get_ReviewType())
                             {
                                 this.Content[this.CurPos.ContentPos].Set_ReviewType(reviewtype_Remove);
                                 this.CurPos.ContentPos++;
@@ -6079,7 +6079,7 @@ CDocumentContent.prototype.Set_ParagraphTabs                  = function(Tabs)
             this.Recalculate();
 
             if (editor)
-                editor.Update_ParaTab(Default_Tab_Stop, Tabs);
+                editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
 
             return;
         }
@@ -6090,13 +6090,13 @@ CDocumentContent.prototype.Set_ParagraphTabs                  = function(Tabs)
             Item.Set_Tabs(Tabs);
             this.Recalculate();
             if (editor)
-                editor.Update_ParaTab(Default_Tab_Stop, Tabs);
+                editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
         }
         else if (type_Table == Item.GetType())
         {
             Item.Set_ParagraphTabs(Tabs);
             if (editor)
-                editor.Update_ParaTab(Default_Tab_Stop, Tabs);
+                editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
         }
     }
 };
@@ -7089,7 +7089,7 @@ CDocumentContent.prototype.Interface_Update_ParaPr    = function()
         }
 
         if (undefined != ParaPr.Tabs && editor)
-            editor.Update_ParaTab(Default_Tab_Stop, ParaPr.Tabs);
+            editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, ParaPr.Tabs);
 
         if (this.LogicDocument)
         {

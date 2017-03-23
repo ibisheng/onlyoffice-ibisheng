@@ -478,6 +478,9 @@
 				if (undefined != global_mouseEvent.Sender.onmouseup && null != global_mouseEvent.Sender.onmouseup)
 				{
 					global_mouseEvent.Sender.onmouseup(e, true);
+
+					if (global_mouseEvent.IsLocked) // не все хотят пользоваться локами
+						global_mouseEvent.UnLockMouse();
 				}
 			}
 		}

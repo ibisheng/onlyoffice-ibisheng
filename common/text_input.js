@@ -170,7 +170,7 @@
 
 		// если этот флаг включен - то мы не следим за датой в onCompositionUpdate
 		// а смотрим .value на старте и энде. а промежуток - разница между этим
-		this.UseValueInComposition = AscCommon.AscBrowser.isAndroid;
+		this.UseValueInComposition = AscCommon.AscBrowser.isAndroid && AscCommon.AscBrowser.isChrome;
 	}
 
 	CTextInput.prototype =
@@ -653,15 +653,16 @@
 			var _value = this.getAreaValue();
 			if (this.UseValueInComposition)
 			{
+				var _data = _value.substring(this.ieNonCompositionPrefix.length);
+
 				if (c_oCompositionState.process == this.compositionState)
 				{
-					var _data = _value.substring(this.ieNonCompositionPrefix.length);
 					this.onCompositionUpdate(e, false, _data, false);
+				}
 
-					if (this.TextInputAfterComposition)
-					{
-						this.onCompositionEnd(e, _data);
-					}
+				if (this.TextInputAfterComposition)
+				{
+					this.onCompositionEnd({ data : "nonWait" }, _data);
 				}
 			}
 
@@ -782,7 +783,7 @@
 					ti_console_log("ti: ea space");
 				}
 
-				if (!AscCommon.AscBrowser.isMozilla/* && !this.IsUseInputEventOnlyWithCtx*/)
+				if (!AscCommon.AscBrowser.isMozilla/* && !this.IsUseInputEventOnlyWithCtx*/ || AscCommon.AscBrowser.isAndroid)
 				{
 					// у мозиллы есть проблемы, если делать тут clear
 					// например на корейском языке - слетает композиция в некоторых случаях
@@ -1260,7 +1261,15 @@
 			this.compositionStateApi = c_oCompositionState.process;
 
 			if (this.UseValueInComposition)
+			{
+				// если ввести, войти в
+				// композицию, стереть до начала и начать снова ввод. Тогда, после последнего onCompositionEnd
+				// не придет onInput - и флаг не сбросится
+				this.TextInputAfterComposition = false;
+
+				// запоминаем, с чего все началось
 				this.ieNonCompositionPrefix = this.getAreaValue();
+			}
 		},
 
 		apiCompositeReplace : function(_value)

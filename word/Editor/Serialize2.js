@@ -5213,7 +5213,7 @@ function BinarySettingsTableWriter(memory, doc, saveParams)
     {
         var oThis = this;
 		this.bs.WriteItem(c_oSer_SettingsType.ClrSchemeMapping, function(){oThis.WriteColorSchemeMapping();});
-		this.bs.WriteItem(c_oSer_SettingsType.DefaultTabStop, function(){oThis.memory.WriteDouble(Default_Tab_Stop);});
+		this.bs.WriteItem(c_oSer_SettingsType.DefaultTabStop, function(){oThis.memory.WriteDouble(AscCommonWord.Default_Tab_Stop);});
 		this.bs.WriteItem(c_oSer_SettingsType.MathPr, function(){oThis.WriteMathPr();});
 		this.bs.WriteItem(c_oSer_SettingsType.TrackRevisions, function(){oThis.memory.WriteBool(oThis.Document.Is_TrackRevisions());});
 		this.bs.WriteItem(c_oSer_SettingsType.FootnotePr, function(){oThis.WriteFootnotePr();});
@@ -12839,7 +12839,7 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 			var dNewTab_Stop = this.bcr.ReadDouble();
 			//word поддерживает 0, но наш редактор к такому не готов.
 			if(dNewTab_Stop > 0)
-				Default_Tab_Stop = dNewTab_Stop;
+				AscCommonWord.Default_Tab_Stop = dNewTab_Stop;
         }
 		else if ( c_oSer_SettingsType.MathPr === type )
         {			

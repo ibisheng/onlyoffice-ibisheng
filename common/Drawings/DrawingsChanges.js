@@ -413,14 +413,26 @@
                 return;
             for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex){
                 var Pos     = this.Class.m_oContentChanges.Check(AscCommon.contentchanges_Add, true !== this.UseArray ? this.Pos + nIndex : this.PosArray[nIndex]);
+                if(Pos === false){
+                    continue;
+                }
                 var Element = this.Items[nIndex];
                 Pos = Math.min(Pos, aContent.length);
                 aContent.splice(Pos, 0, Element);
             }
         }
         else{
+
             for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex) {
-                for(var j = 0; j < aContent.length; ++j){
+                var Pos = this.Class.m_oContentChanges.Check(AscCommon.contentchanges_Remove,  true !== this.UseArray ? this.Pos + nIndex : this.PosArray[nIndex]);
+                if (false === Pos){
+                    continue;
+                }
+                if(aContent[Pos] === this.Items[nIndex]){
+                    aContent.splice(Pos, 1);
+                    break;
+                }
+                for(var j = aContent.length - 1; j > -1 ; --j){
                     if(aContent[j] === this.Items[nIndex]){
                         aContent.splice(j, 1);
                         break;
