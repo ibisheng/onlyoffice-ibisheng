@@ -671,7 +671,7 @@ var g_oFontProperties = {
 		return val ? this.i = true : this.i = null;
 	};
 	Font.prototype.getUnderline = function () {
-		return this.u || Asc.EUnderline.underlineNone;
+		return null != this.u ? this.u : Asc.EUnderline.underlineNone;
 	};
 	Font.prototype.setUnderline = function(val) {
 		return (null != val && Asc.EUnderline.underlineNone != val) ? this.u = val : this.u = null;
@@ -689,7 +689,7 @@ var g_oFontProperties = {
 		return this.c = val;
 	};
 	Font.prototype.getVerticalAlign = function () {
-		return this.va || AscCommon.vertalign_Baseline;
+		return null != this.va ? this.va : AscCommon.vertalign_Baseline;
 	};
 	Font.prototype.setVerticalAlign = function(val) {
 		return (null != val && AscCommon.vertalign_Baseline != val) ? this.va = val : this.va = null;
