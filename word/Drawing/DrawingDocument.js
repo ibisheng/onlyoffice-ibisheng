@@ -2489,6 +2489,8 @@ function CDrawingDocument()
 			{
 				if (pageIndex >= this.m_oLogicDocument.Pages.length)
 					return true;
+				else if (!this.m_oLogicDocument.CanDrawPage(pageIndex))
+					return true;
 			}
 			return false;
 		}
