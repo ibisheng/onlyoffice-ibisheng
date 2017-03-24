@@ -6242,7 +6242,9 @@
                             lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
                             // Пересчитываем X и Y относительно видимой области
                             lockRangePosLeft -= offsetX;
-                            lockRangePosTop -= offsetY;
+							lockRangePosTop -= offsetY;
+							lockRangePosLeft = this.cellsLeft > lockRangePosLeft ? this.cellsLeft : lockRangePosLeft;
+							lockRangePosTop = this.cellsTop > lockRangePosTop ? this.cellsTop : lockRangePosTop;
                             // Пересчитываем в px
                             lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
                             lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
