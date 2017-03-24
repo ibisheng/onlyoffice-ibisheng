@@ -207,6 +207,18 @@
 			t._onEndLoadSdk();
 			t.onEndLoadFile(null);
 		});
+
+		var oldOnError = window.onerror;
+		window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
+			var msg = 'Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber
+				+ ' Column: ' + column + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
+			t.CoAuthoringApi.sendChangesError(msg);
+			if (oldOnError) {
+				return oldOnError.apply(this, arguments);
+			} else {
+				return false;
+			}
+		}
 	};
 	baseEditorsApi.prototype._editorNameById                 = function()
 	{
