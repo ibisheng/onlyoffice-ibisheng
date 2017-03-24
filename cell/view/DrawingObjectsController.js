@@ -227,6 +227,9 @@ DrawingObjectsController.prototype.checkSelectedObjectsForMove = function(group)
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = function(callback, args)
 {
+    if(this.drawingObjects.isViewerMode()){
+        return;
+    }
     var selection_state = this.getSelectionState();
     this.drawingObjects.objectLocker.reset();
     for(var i = 0; i < this.selectedObjects.length; ++i)
