@@ -3490,6 +3490,9 @@ CPresentation.prototype =
     Document_Get_AllFontNames : function()
     {
         var AllFonts = {}, i;
+        if(this.defaultTextStyle && this.defaultTextStyle.Document_Get_AllFontNames){
+            this.defaultTextStyle.Document_Get_AllFontNames(AllFonts);
+        }
         for(i =0 ; i < this.Slides.length; ++i)
         {
             this.Slides[i].getAllFonts(AllFonts)
