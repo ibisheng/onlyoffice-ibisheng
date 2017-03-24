@@ -74,6 +74,12 @@ var c_oAscBorderOptions = {
   InnerH: 7
 };
 
+	var c_oAscMergeOptions = {
+		Disabled: -1,
+		None: 0,
+		Merged: 1
+	};
+
 var c_oAscCleanOptions = {
   All: 0,
   Text: 1,
@@ -445,6 +451,11 @@ var c_oAscPopUpSelectorType = {
   prot['DiagU'] = prot.DiagU;
   prot['InnerV'] = prot.InnerV;
   prot['InnerH'] = prot.InnerH;
+	window['Asc']['c_oAscMergeOptions'] = window['Asc'].c_oAscMergeOptions = c_oAscMergeOptions;
+	prot = c_oAscMergeOptions;
+	prot['Disabled'] = prot.Disabled;
+	prot['None'] = prot.None;
+	prot['Merged'] = prot.Merged;
   window['Asc']['c_oAscCleanOptions'] = window['Asc'].c_oAscCleanOptions = c_oAscCleanOptions;
   prot = c_oAscCleanOptions;
   prot['All'] = prot.All;
