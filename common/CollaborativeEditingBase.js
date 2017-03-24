@@ -1098,7 +1098,6 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 				if ((AscCommonWord.type_Paragraph === oElement.GetType() || AscCommonWord.type_Table === oElement.GetType()) && oElement.Content.length <= 0)
 				{
 					oDocumentContent.Remove_FromContent(nIndex, 1);
-					console.log("Deleted " + ( AscCommonWord.type_Table === oElement.GetType() ? "Table" : "Paragraph"));
 				}
 			}
 

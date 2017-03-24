@@ -3612,6 +3612,13 @@ CDocument.prototype.DrawPage                                 = function(nPageInd
 {
     this.Draw(nPageIndex, pGraphics);
 };
+CDocument.prototype.CanDrawPage = function(nPageAbs)
+{
+	if (null !== this.FullRecalc.Id && nPageAbs >= this.FullRecalc.PageIndex - 1)
+		return false;
+
+	return true;
+};
 /**
  * Перерисовка заданной страницы документа.
  * @param nPageIndex
