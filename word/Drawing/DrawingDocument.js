@@ -2405,8 +2405,9 @@ function CDrawingDocument()
 		{
 			if (this.IsFreezePage(pageIndex))
 			{
-				if ((Math.abs(_drawingPage.RecalculateTime - (new Date().getTime())) > 500 /*0.5 sec*/))
-					isUnlock = true;
+				// убрал выкидывание страницы. лишнее это. пусть всегда рисуется старая, пока не перерисуем
+				//if ((Math.abs(_drawingPage.RecalculateTime - (new Date().getTime())) > 500 /*0.5 sec*/))
+				//	isUnlock = true;
 			}
 			else
 			{
