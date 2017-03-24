@@ -9813,7 +9813,21 @@
 			var skipFormat = null;
 			var noSkipVal = null;
 			
-			rangeStyle.val = newVal.getValue();
+			var cellValueData = newVal.getValueData();
+			if(cellValueData && cellValueData.value)
+			{
+				rangeStyle.cellValueData = cellValueData;
+			}
+			else if(cellValueData && cellValueData.formula && !specialPasteProps.formula)
+			{
+				cellValueData.formula = null;
+				rangeStyle.cellValueData = cellValueData;
+			}
+			else
+			{
+				rangeStyle.val = newVal.getValue();
+			}
+			
 			var value2 = newVal.getValue2();
 			for (var nF = 0; nF < value2.length; nF++) {
 				if (value2[nF] && value2[nF].sId) {
@@ -9886,7 +9900,7 @@
 
 					if (cellFrom && cellTo && cellFrom[0] && cellTo[0]) {
 						//cellTo[0].setValueData(cellFrom[0].getValueData());
-						rangeStyle.cellValueData = {valueData: cellFrom[0].getValueData(), cell: cellTo[0]};
+						rangeStyle.cellValueData2 = {valueData: cellFrom[0].getValueData(), cell: cellTo[0]};
 					}
 				}
 				
@@ -9983,9 +9997,9 @@
 		{
 			arrFormula.push(rangeStyle.formula);
 		}
-		else if(rangeStyle.cellValueData && specialPasteProps.font && specialPasteProps.val)
+		else if(rangeStyle.cellValueData2 && specialPasteProps.font && specialPasteProps.val)
 		{	
-			rangeStyle.cellValueData.cell.setValueData(rangeStyle.cellValueData.valueData);
+			rangeStyle.cellValueData2.cell.setValueData(rangeStyle.cellValueData2.valueData);
 		}
 		else if(rangeStyle.value2 && specialPasteProps.font && specialPasteProps.val)
 		{
@@ -9997,6 +10011,10 @@
 			{
 				range.setValue2(rangeStyle.value2);
 			}
+		}
+		else if(rangeStyle.cellValueData && specialPasteProps.val)
+		{
+			range.setValueData(rangeStyle.cellValueData);
 		}
 		else if(rangeStyle.val && specialPasteProps.val)
 		{
