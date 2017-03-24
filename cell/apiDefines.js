@@ -543,6 +543,7 @@ var c_oAscPopUpSelectorType = {
   prot['rowTotal'] = prot.rowTotal;
   prot['rowBanded'] = prot.rowBanded;
   prot['filterButton'] = prot.filterButton;
+  prot['advancedSettings'] = prot.advancedSettings;
   window['Asc']['c_oAscAutoFilterTypes'] = window['Asc'].c_oAscAutoFilterTypes = c_oAscAutoFilterTypes;
   prot = c_oAscAutoFilterTypes;
   prot['ColorFilter'] = prot.ColorFilter;
