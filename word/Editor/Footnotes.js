@@ -931,7 +931,11 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 	// Новый селект
 	if (this.Selection.Start.Footnote !== this.Selection.End.Footnote)
 	{
-		if (this.Selection.Start.Page > this.Selection.End.Page || this.Selection.Start.Index > this.Selection.End.Index)
+		if (this.Selection.Start.Page > this.Selection.End.Page
+			|| (this.Selection.Start.Page === this.Selection.End.Page
+			&& (this.Selection.Start.Column > this.Selection.End.Column
+			|| (this.Selection.Start.Column === this.Selection.End.Column
+			&& this.Selection.Start.Index > this.Selection.End.Index))))
 		{
 			this.Selection.Start.Footnote.Selection_SetEnd(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
 			this.Selection.End.Footnote.Selection_SetStart(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, this.Selection.End.Footnote.Pages.length - 1, MouseEvent);
@@ -1107,12 +1111,45 @@ CFootnotesController.prototype.private_GetFootnoteOnPageByXY = function(X, Y, nP
 	if (!oColumn)
 		return null;
 
+	if (oColumn.Elements.length <= 0)
+	{
+		var nCurColumnIndex = nColumnIndex - 1;
+		while (nCurColumnIndex >= 0)
+		{
+			if (oPage.Columns[nCurColumnIndex].Elements.length > 0)
+			{
+				oColumn      = oPage.Columns[nCurColumnIndex];
+				nColumnIndex = nCurColumnIndex;
+				break;
+			}
+			nCurColumnIndex--;
+		}
+
+		if (nCurColumnIndex < 0)
+		{
+			nCurColumnIndex = nColumnIndex + 1;
+			while (nCurColumnIndex <= oPage.Columns.length - 1)
+			{
+				if (oPage.Columns[nCurColumnIndex].Elements.length > 0)
+				{
+					oColumn      = oPage.Columns[nCurColumnIndex];
+					nColumnIndex = nCurColumnIndex;
+					break;
+				}
+				nCurColumnIndex++;
+			}
+		}
+	}
+
+	if (!oColumn)
+		return null;
+
 	for (var nIndex = oColumn.Elements.length - 1; nIndex >= 0; --nIndex)
 	{
 		var oFootnote = oColumn.Elements[nIndex];
 
 		var nElementPageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnIndex);
-		var oBounds = oFootnote.Get_PageBounds(nElementPageIndex);
+		var oBounds           = oFootnote.Get_PageBounds(nElementPageIndex);
 
 		if (oBounds.Top <= Y || 0 === nIndex)
 			return {
