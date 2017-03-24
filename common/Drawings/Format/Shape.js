@@ -4954,10 +4954,12 @@ CShape.prototype.Refresh_RecalcData = function (data)
         }
         case AscDFH.historyitem_ShapeSetTxBody:
         {
+            this.Refresh_RecalcData2();
             break;
         }
         case AscDFH.historyitem_ShapeSetTextBoxContent:
         {
+            this.Refresh_RecalcData2();
             break;
         }
         case AscDFH.historyitem_ShapeSetParent:
@@ -4970,6 +4972,7 @@ CShape.prototype.Refresh_RecalcData = function (data)
         }
         case AscDFH.historyitem_ShapeSetBodyPr:
         {
+            this.Refresh_RecalcData2();
             break;
         }
         case AscDFH.historyitem_ShapeSetWordShape:
