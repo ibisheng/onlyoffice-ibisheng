@@ -5373,7 +5373,7 @@ Paragraph.prototype =
         return 0;
     },
 
-    Correct_Content : function(_StartPos, _EndPos)
+    Correct_Content : function(_StartPos, _EndPos, bDoNotDeleteEmptyRuns)
     {
         // Если у нас сейчас в данном параграфе используется ссылка на позицию, тогда мы не корректируем контент, чтобы
         // не удалить место, на которое идет ссылка.
@@ -5386,8 +5386,8 @@ Paragraph.prototype =
         // 3. Добавляем пустой ран в место, где нет рана (например, между двумя идущими подряд гиперссылками)
         // 4. Удаляем пустые комментарии
 
-        var StartPos = ( undefined === _StartPos ? 0 : Math.max( _StartPos - 1, 0 ) );
-        var EndPos   = ( undefined === _EndPos ? this.Content.length - 1 : Math.min( _EndPos + 1, this.Content.length - 1 ) );
+        var StartPos = ( undefined === _StartPos || null === _StartPos ? 0 : Math.max( _StartPos - 1, 0 ) );
+        var EndPos   = ( undefined === _EndPos || null === _EndPos ? this.Content.length - 1 : Math.min( _EndPos + 1, this.Content.length - 1 ) );
 
         var CommentsToDelete = [];
         for ( var CurPos = EndPos; CurPos >= StartPos; CurPos-- )
@@ -5432,9 +5432,12 @@ Paragraph.prototype =
             }
             else
             {
-                // TODO (Para_End): Предпоследний элемент мы не проверяем, т.к. на ран с Para_End мы не ориентируемся
-                if (true === CurElement.Is_Empty() && (0 < CurPos || para_Run !== this.Content[CurPos].Type) && CurPos < this.Content.length - 2 && para_Run === this.Content[CurPos + 1].Type)
-                    this.Internal_Content_Remove(CurPos);
+            	if (true !== bDoNotDeleteEmptyRuns)
+				{
+					// TODO (Para_End): Предпоследний элемент мы не проверяем, т.к. на ран с Para_End мы не ориентируемся
+					if (true === CurElement.Is_Empty() && (0 < CurPos || para_Run !== this.Content[CurPos].Type) && CurPos < this.Content.length - 2 && para_Run === this.Content[CurPos + 1].Type)
+						this.Internal_Content_Remove(CurPos);
+				}
             }
         }
 
