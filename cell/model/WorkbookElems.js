@@ -3217,11 +3217,13 @@ CCellValue.prototype =
 		var bNeedMeasure = true;
 		var sText = null;
 		var aText = null;
+		var isMultyText = false;
 		if (CellValueType.Number == this.type || CellValueType.String == this.type) {
 			if (null != this.text) {
 				sText = this.text;
 			} else if (null != this.multiText) {
 				aText = this.multiText;
+				isMultyText = true;
 			}
 
 			if (CellValueType.String == this.type) {
@@ -3242,16 +3244,19 @@ CCellValue.prototype =
 			if (false == oNumFormat.isGeneralFormat()) {
 				if (null != this.number) {
 					aText = oNumFormat.format(this.number, this.type, dDigitsCount, false, opt_cultureInfo);
+					isMultyText = false;
 					sText = null;
 				} else if (CellValueType.String == this.type) {
 					var oTextFormat = oNumFormat.getTextFormat();
 					if (null != oTextFormat && "@" != oTextFormat.formatString) {
 						if (null != this.text) {
 							aText = oNumFormat.format(this.text, this.type, dDigitsCount, false, opt_cultureInfo);
+							isMultyText = false;
 							sText = null;
 						} else if (null != this.multiText) {
 							var sSimpleString = this.getStringFromMultiText();
 							aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, false, opt_cultureInfo);
+							isMultyText = false;
 							sText = null;
 						}
 					}
@@ -3271,11 +3276,12 @@ CCellValue.prototype =
 
 					if (null != oNumFormat) {
 						sText = null;
+						isMultyText = false;
 						aText = oNumFormat.format(sOriginText, this.type, dDigitsCount, false, opt_cultureInfo);
 						if (true == oNumFormat.isTextFormat()) {
 							break;
 						} else {
-							aRes = this._getValue2Result(cell, sText, aText);
+							aRes = this._getValue2Result(cell, sText, aText, isMultyText);
 							//Проверяем влезает ли текст
 							if (true == fIsFitMeasurer(aRes)) {
 								bFindResult = true;
@@ -3289,6 +3295,7 @@ CCellValue.prototype =
 				if (false == bFindResult) {
 					aRes = null;
 					sText = null;
+					isMultyText = false;
 					var font = new AscCommonExcel.Font();
 					if (dDigitsCount > 1) {
 						font.setRepeat(true);
@@ -3308,18 +3315,19 @@ CCellValue.prototype =
 			}
 		}
 		if (bNeedMeasure) {
-			aRes = this._getValue2Result(cell, sText, aText);
+			aRes = this._getValue2Result(cell, sText, aText, isMultyText);
 			//Проверяем влезает ли текст
 			if (false == fIsFitMeasurer(aRes)) {
 				aRes = null;
 				sText = null;
+				isMultyText = false;
 				var font = new AscCommonExcel.Font();
 				font.setRepeat(true);
 				aText = [{text: "#", format: font}];
 			}
 		}
 		if (null == aRes) {
-			aRes = this._getValue2Result(cell, sText, aText);
+			aRes = this._getValue2Result(cell, sText, aText, isMultyText);
 		}
 		return aRes;
 	},
@@ -3415,11 +3423,11 @@ CCellValue.prototype =
 				else if(null != oValueArray)
 					oValueArray = [{text:"'"}].concat(oValueArray);
 			}
-			this.textValueForEdit2 = this._getValue2Result(cell, oValueText, oValueArray);
+			this.textValueForEdit2 = this._getValue2Result(cell, oValueText, oValueArray, true);
 		}
 		return this.textValueForEdit2;
 	},
-	_getValue2Result : function(cell, sText, aText)
+	_getValue2Result : function(cell, sText, aText, isMultyText)
 	{
 		var aResult = [];
 		if(null == sText && null == aText)
@@ -3459,9 +3467,18 @@ CCellValue.prototype =
 				{
 					oNewItem.text = oCurtext.text;
 					var oCurFormat = new Font();
-					oCurFormat.assign(cellfont);
-					if(null != oCurtext.format)
-						oCurFormat.assignFromObject(oCurtext.format);
+					if (isMultyText) {
+						if (null != oCurtext.format) {
+							oCurFormat.assign(oCurtext.format);
+						} else {
+							oCurFormat.assign(cellfont);
+						}
+					} else {
+						oCurFormat.assign(cellfont);
+						if (null != oCurtext.format) {
+							oCurFormat.assignFromObject(oCurtext.format);
+						}
+					}
 					oNewItem.format = oCurFormat;
 					color = oNewItem.format.getColor();
 					if(color instanceof ThemeColor)
