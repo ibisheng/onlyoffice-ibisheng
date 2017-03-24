@@ -717,7 +717,7 @@ function build_rx_table_local(local){
 	rx_table_local = build_rx_table(local);
 }
 function build_rx_table(local) {
-	cStrucTableLocalColumns = ( local ? local : {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"} );
+	cStrucTableLocalColumns = ( local ? local : {"h": "Headers", "d": "Data", "a": "All", "tr": "This Row", "t": "Totals"} );
 	return build_rx_table_cur();
 }
 function build_rx_table_cur(){
@@ -733,7 +733,7 @@ function build_rx_table_cur(){
 
 	return XRegExp.build( '^(?<tableName>{{tableName}})\\[(?<columnName>{{columnName}})?\\]', {
         "tableName" : new XRegExp( "^(:?[" + str_namedRanges + "][" + str_namedRanges + "\\d.]*)" ),
-        "columnName": XRegExp.build( '(?<oneColumn>{{userColumn}})|(?<columnRange>{{userColumnRange}})|(?<hdtcc>{{hdtcc}})', {
+		"columnName": XRegExp.build( '(?<reservedColumn>{{reservedColumn}})|(?<oneColumn>{{userColumn}})|(?<columnRange>{{userColumnRange}})|(?<hdtcc>{{hdtcc}})', {
             "userColumn"     : structured_tables_userColumn,
             "reservedColumn" : structured_tables_reservedColumn,
             "userColumnRange": XRegExp.build( '\\[(?<colStart>{{uc}})\\]\\:\\[(?<colEnd>{{uc}})\\]', {
