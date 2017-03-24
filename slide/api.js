@@ -5478,6 +5478,7 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oDrawingDocument.ClearCachePages();
 			this.WordControl.HideRulers();
 
+            AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			if (null != this.WordControl.m_oLogicDocument)
 			{
 				this.WordControl.m_oLogicDocument.viewMode = true;
