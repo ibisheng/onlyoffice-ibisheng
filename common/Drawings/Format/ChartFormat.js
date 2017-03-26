@@ -1063,6 +1063,10 @@ CDLbl.prototype =
         return AscDFH.historyitem_type_DLbl;
     },
 
+    Check_AutoFit: function(){
+        return true;
+    },
+
     createDuplicate: function()
     {
 
@@ -12309,6 +12313,11 @@ CTitle.prototype =
             return this.chart.Is_UseInDocument();
         }
         return false;
+    },
+
+
+    Check_AutoFit: function(){
+        return true;
     },
     getBodyPr: CDLbl.prototype.getBodyPr,
 
