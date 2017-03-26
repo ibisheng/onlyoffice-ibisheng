@@ -5538,6 +5538,11 @@ function BinaryPPTYLoader()
             }
             _chart.spPr.setXfrm(_xfrm);
             _xfrm.setParent(_chart.spPr);
+            _chart.setNvSpPr(_nvGraphicFramePr);
+            if(AscCommon.isRealObject(_nvGraphicFramePr) && AscFormat.isRealNumber(_nvGraphicFramePr.locks))
+            {
+                _chart.setLocks(_nvGraphicFramePr.locks);
+            }
             return _chart;
         }
 
