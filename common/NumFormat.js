@@ -938,7 +938,8 @@ NumFormat.prototype =
             res.bDigit = (number == number - 0);
         if(res.bDigit)
         {
-			res.fraction = number - Math.floor(number);
+			var numberAbs = Math.abs(number);
+			res.fraction = numberAbs - Math.floor(numberAbs);
 			//Округляем
 			var parts = getNumberParts(number);
 			res.sign = parts.sign;
