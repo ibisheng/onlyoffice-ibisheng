@@ -5471,10 +5471,7 @@ function BinaryPPTYLoader()
                         AscCommon.pptx_content_loader.Reader.ImageMapChecker = this.ImageMapChecker;
                         var oBinaryChartReader = new AscCommon.BinaryChartReader(_stream);
                         oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
-                        if(AscCommon.isRealObject(_nvGraphicFramePr) && AscFormat.isRealNumber(_nvGraphicFramePr.locks))
-                        {
-                            _chart.setLocks(_nvGraphicFramePr.locks);
-                        }
+
                     }
 
                     s.Seek2(_pos + _length);
@@ -5531,6 +5528,13 @@ function BinaryPPTYLoader()
                 _xfrm.setOffY(0);
                 _xfrm.setExtX(0);
                 _xfrm.setExtY(0);
+            }
+            if(AscCommon.isRealObject(_nvGraphicFramePr) )
+            {
+                _chart.setNvSpPr(_nvGraphicFramePr);
+                if(AscFormat.isRealNumber(_nvGraphicFramePr.locks)){
+                    _chart.setLocks(_nvGraphicFramePr.locks);
+                }
             }
             _chart.spPr.setXfrm(_xfrm);
             _xfrm.setParent(_chart.spPr);
