@@ -607,8 +607,20 @@
         return DC;
     };
 
-    CDrawingDocContent.prototype.Recalculate                    = function()
+    CDrawingDocContent.prototype.Recalculate = function()
     {
+        if(this.Parent){
+            if(this.Parent instanceof AscFormat.CShape){
+                this.Parent.recalculateContent();
+                return;
+            }
+            else if(this.Parent && this.Parent.parent){
+                if(this.Parent.parent instanceof AscFormat.CShape){
+                    this.Parent.parent.recalculateContent();
+                    return;
+                }
+            }
+        }
         if(this.XLimit > 0){
             this.Recalculate_PageDrawing();
         }
