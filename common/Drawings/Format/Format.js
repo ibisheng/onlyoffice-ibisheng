@@ -4642,6 +4642,21 @@ CNvPr.prototype =
         this.title = title;
     },
 
+    setFromOther: function(oOther){
+        if(!oOther){
+            return;
+        }
+        if(oOther.name){
+            this.setName(oOther.name);
+        }
+        if(oOther.descr){
+            this.setDescr(oOther.descr);
+        }
+        if(oOther.title){
+            this.setTitle(oOther.title);
+        }
+    },
+
     Write_ToBinary2: function (w)
     {
         w.WriteLong(this.getObjectType());

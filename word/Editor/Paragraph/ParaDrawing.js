@@ -1063,6 +1063,7 @@ ParaDrawing.prototype.Copy = function()
 	{
 		c.setEffectExtent(EE.L, EE.T, EE.R, EE.B);
 	}
+	c.docPr.setFromOther(this.docPr);
 	if (this.ParaMath)
 		c.Set_ParaMath(this.ParaMath.Copy());
 	return c;

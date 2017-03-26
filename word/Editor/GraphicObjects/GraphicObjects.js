@@ -1511,7 +1511,7 @@ CGraphicObjects.prototype =
                     drawing.GraphicObj.setParent(drawing);
                     drawing.CheckWH();
 					drawing.Set_ParaMath(selectedObjects[i].parent.ParaMath);
-
+                    drawing.docPr.setFromOther(selectedObjects[i].parent.docPr);
                     if(selectedObjects[i].parent.DrawingType === drawing_Anchor)
                     {
                         drawing.Set_Distance(selectedObjects[i].parent.Distance.L, selectedObjects[i].parent.Distance.T, selectedObjects[i].parent.Distance.R, selectedObjects[i].parent.Distance.B);
