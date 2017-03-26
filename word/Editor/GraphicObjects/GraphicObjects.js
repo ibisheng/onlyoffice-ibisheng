@@ -2541,6 +2541,7 @@ CGraphicObjects.prototype =
         for(i = 0; i < objects_for_grouping.length; ++i)
         {
             objects_for_grouping[i].parent.Remove_FromDocument(false);
+            objects_for_grouping[i].parent.Set_GraphicObject(null);//for Bug 34548
         }
         para_drawing.Set_XYForAdd( common_bounds.minX,  common_bounds.minY, nearest_pos, objects_for_grouping[0].parent.pageIndex);
         para_drawing.Set_Props(new asc_CImgProperty(
@@ -2593,6 +2594,8 @@ CGraphicObjects.prototype =
                 parent_paragraph = cur_group.parent.Get_ParentParagraph();
                 page_num = cur_group.selectStartPage;
                 cur_group.normalize();
+                cur_group.parent.Remove_FromDocument(false);
+                cur_group.setBDeleted(true);
                 sp_tree = cur_group.spTree;
                 for(j = 0; j < sp_tree.length; ++j)
                 {
@@ -2626,8 +2629,6 @@ CGraphicObjects.prototype =
                     a_objects.push({drawing: drawing, par: parent_paragraph, posX: xc - hc, posY: yc - vc});
                     this.selectObject(sp, page_num);
                 }
-                cur_group.parent.Remove_FromDocument(false);
-                cur_group.setBDeleted(true);
             }
             for(i = 0; i < a_objects.length; ++i)
             {

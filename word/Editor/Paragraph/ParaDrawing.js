@@ -223,6 +223,9 @@ ParaDrawing.prototype.CheckCorrect = function(){
 	if(!this.GraphicObj){
 		return false;
 	}
+	if(this.GraphicObj.parent !== this){
+		return false;
+	}
 	if(this.GraphicObj && this.GraphicObj.checkCorrect){
 		return this.GraphicObj.checkCorrect();
 	}
@@ -579,7 +582,7 @@ ParaDrawing.prototype.Set_GraphicObject = function(graphicObject)
 
 	History.Add(new CChangesParaDrawingGraphicObject(this, oldId, newId));
 
-	if (graphicObject.handleUpdateExtents)
+	if (graphicObject && graphicObject.handleUpdateExtents)
 		graphicObject.handleUpdateExtents();
 
 	this.GraphicObj = graphicObject;
