@@ -3369,6 +3369,10 @@ DrawingObjectsController.prototype =
                         if(chart.view3D)
                         {
                             chart.setView3D(null);
+                            chartSettings.bLine = true;
+                            new_chart_type = new AscFormat.CLineChart();
+                            replaceChart(plot_area, chart_type, new_chart_type);
+                            checkSwapAxis(plot_area, chart_type, new_chart_type);
                         }
                         if(chart.floor)
                         {
