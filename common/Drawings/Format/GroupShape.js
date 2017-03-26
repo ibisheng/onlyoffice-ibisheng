@@ -1789,6 +1789,13 @@ function CGroupShape()
                     }
                     break;
                 }
+                case AscDFH.historyitem_GroupShapeAddToSpTree:
+                case AscDFH.historyitem_GroupShapeRemoveFromSpTree:{
+                    if(!this.bDeleted){
+                        this.handleUpdateSpTree();
+                    }
+                    break;
+                }
             }
         }
     };
