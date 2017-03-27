@@ -303,16 +303,25 @@ CHeaderFooter.prototype =
         return { X : this.Content.X, Y : 0, XLimit : this.Content.XLimit, YLimit : 0 };
     },
 
-    Set_CurrentElement : function(bUpdateStates)
+    Set_CurrentElement : function(bUpdateStates, PageAbs)
     {
         var PageIndex = -1;
 
-        for (var Key in this.Parent.Pages)
-        {
-            var PIndex = Key | 0;
-            if ((this === this.Parent.Pages[PIndex].Header || this === this.Parent.Pages[PIndex].Footer) && (-1 === PageIndex || PageIndex > PIndex))
-                PageIndex = PIndex;
-        }
+        if (undefined !== PageAbs && null !== PageAbs && this.Parent.Pages[PageAbs])
+		{
+			if ((this === this.Parent.Pages[PageAbs].Header || this === this.Parent.Pages[PageAbs].Footer))
+				PageIndex = PageAbs;
+		}
+
+		if (-1 === PageIndex)
+		{
+			for (var Key in this.Parent.Pages)
+			{
+				var PIndex = Key | 0;
+				if ((this === this.Parent.Pages[PIndex].Header || this === this.Parent.Pages[PIndex].Footer) && (-1 === PageIndex || PageIndex > PIndex))
+					PageIndex = PIndex;
+			}
+		}
 
         this.Parent.CurHdrFtr = this;
         this.Parent.WaitMouseDown = true;
