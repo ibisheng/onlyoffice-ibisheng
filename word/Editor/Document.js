@@ -6313,7 +6313,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         else if (docpostype_HdrFtr == this.CurPos.Type)
         {
-            this.Document_End_HdrFtrEditing();
+            this.EndHdrFtrEditing(true);
         }
         bRetValue = keydownresult_PreventAll;
     }
@@ -7876,13 +7876,13 @@ CDocument.prototype.Document_Format_Copy = function()
 	this.CopyTextPr = this.Get_Paragraph_TextPr_Copy();
 	this.CopyParaPr = this.Get_Paragraph_ParaPr_Copy();
 };
-CDocument.prototype.Document_End_HdrFtrEditing = function()
+CDocument.prototype.EndHdrFtrEditing = function(bCanStayOnPage)
 {
 	if (docpostype_HdrFtr === this.Get_DocPosType())
 	{
 		this.Set_DocPosType(docpostype_Content);
 		var CurHdrFtr = this.HdrFtr.Get_CurHdrFtr();
-		if (null === CurHdrFtr || undefined === CurHdrFtr)
+		if (null === CurHdrFtr || undefined === CurHdrFtr || true !== bCanStayOnPage)
 		{
 			this.Cursor_MoveToStartPos(false);
 		}
@@ -7893,7 +7893,7 @@ CDocument.prototype.Document_End_HdrFtrEditing = function()
 			if (hdrftr_Header == CurHdrFtr.Type)
 				this.Cursor_MoveAt(0, 0, false);
 			else
-				this.Cursor_MoveAt(0, 100000, false); // TODO: Переделать здесь по нормальному
+				this.Cursor_MoveAt(0, 100000, false); // TODO: Переделать здесь по-нормальному
 		}
 
 		this.DrawingDocument.ClearCachePages();
@@ -11311,7 +11311,7 @@ CDocument.prototype.GotoFootnote = function(isNext)
 
 	if (docpostype_HdrFtr == this.CurPos.Type)
 	{
-		this.Document_End_HdrFtrEditing();
+		this.EndHdrFtrEditing(true);
 	}
 	else if (docpostype_DrawingObjects === nDocPosType)
 	{
