@@ -12664,6 +12664,7 @@
 		var colWidth = ws.cols[props.col].width;
 
 		var scaleIndex = 1;
+		var scaleFactor = ws.drawingCtx.scaleFactor;
 
 		var _drawButtonBorder = function(startX, startY, width, height)
 		{
@@ -12677,7 +12678,7 @@
 
 		var _drawSortArrow = function(startX, startY, isDescending, heightArrow)
 		{
-			heightArrow = heightArrow * height_1px * scaleIndex;
+			heightArrow = Math.round(heightArrow * height_1px * scaleIndex);
 			var widthArrow = 3 * width_1px * scaleIndex;
 			var widthLine = 1 * width_1px * scaleIndex;
 			var heightEndArrow = 3 * height_1px * scaleIndex;
@@ -12687,24 +12688,44 @@
 			var ctx = ws.drawingCtx;
 			ctx.beginPath();
 			ctx.lineVer(startX, startY, startY + heightArrow);
-
+			
 			if(isDescending)
 			{
-				ctx.moveTo(startX, startY + heightArrow);
-				ctx.lineTo(startX - (widthArrow - widthLine), startY + heightArrow - heightEndArrow);
-				ctx.moveTo(startX + widthArrow, startY + heightArrow - heightEndArrow);
-				ctx.lineTo(startX, startY + heightArrow);
-				//ctx.lineHor(startX - 2 * width_1px, startY + heightArrow - 1 * height_1px, startX  + 3 * width_1px);
+				var r = ws.drawingCtx._calcRect(startX, startY);
+				var x = Math.round(r.x);
+				var y = Math.round(r.y);
+				
+				var heightArrow1 = Math.round(heightArrow * scaleFactor);
+				var height = Math.round(3 * scaleIndex * scaleFactor);
+				var diffY = 0;
+				for(var i = 0; i < height; i++)
+				{
+					ws.drawingCtx.ctx.moveTo(x - (i), y + 0.5 - (i) + heightArrow1 + height - 1);
+					ws.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
+					
+					ws.drawingCtx.ctx.moveTo(x + i, y + 0.5 - (i) + heightArrow1 + height - 1);
+					ws.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
+				}
 			}
 			else
 			{
-				ctx.moveTo(startX, startY);
-				ctx.lineTo(startX - (widthArrow - widthLine), startY + heightEndArrow);
-				ctx.moveTo(startX + widthArrow, startY + heightEndArrow);
-				ctx.lineTo(startX, startY);
-				//ctx.lineHor(startX - widthLine, startY + 1 * height_1px * scaleIndex, startX - widthLine + widthArrow);
+				var r = ws.drawingCtx._calcRect(startX, startY);
+				var x = Math.round(r.x);
+				var y = Math.round(r.y);
+				
+				var height = Math.round(3 * scaleIndex * scaleFactor);
+				var diffY = 0;
+				for(var i = 0; i < height; i++)
+				{
+					ws.drawingCtx.ctx.moveTo(x - (i), y + 0.5 + (i) - diffY);
+					ws.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 + (i) - diffY);
+					
+					ws.drawingCtx.ctx.moveTo(x + i, y + 0.5 + (i) - diffY);
+					ws.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 + (i) - diffY);
+				}
 			}
-
+			
+			
 			ctx.setLineWidth(t.width_1px);
 			ctx.setStrokeStyle(m_oColor);
 			ctx.stroke();
@@ -12712,53 +12733,61 @@
 
         var _drawFilterMark = function (x, y, height)
 		{
-            var size = 5.25 * scaleIndex;
+            /*var size = 5.25 * scaleIndex;
             var halfSize = Math.round((size / 2) / height_1px) * height_1px;
-            var meanLine = Math.round((size * Math.sqrt(3) / 3) / height_1px) * height_1px;//длина биссектрисы равностороннего треугольника
+            var meanLine = Math.round((size * Math.sqrt(3) / 3) / height_1px) * height_1px;//длина биссектрисы равностороннего треугольника*/
             //округляем + смещаем
             x = Math.round((x) / width_1px) * width_1px;
             y = Math.round((y) / height_1px) * height_1px;
-            var y1 = y - height;
-
+            var heightLine = Math.round(height);
+			
+			ws.drawingCtx.beginPath();
+			
             ws.drawingCtx
               .beginPath()
               .moveTo(x, y)
-              .lineTo(x, y1)
+              .lineTo(x, y - heightLine)
+			  .setLineWidth(t.width_2px)
               .setStrokeStyle(m_oColor)
               .stroke();
-
-            ws.drawingCtx
-              .beginPath()
-              .moveTo(x + halfSize, y1)
-              .lineTo(x + halfSize, y1)
-              .lineTo(x, y1 + meanLine)
-              .lineTo(x - halfSize, y1)
-              .lineTo(x, y1)
-              .setFillStyle(m_oColor)
-              .fill();
+			
+			
+			var scaleFactor = ws.drawingCtx.scaleFactor;
+			var r = ws.drawingCtx._calcRect(x, y - heightLine);
+			x = Math.round(r.x) + 1;
+			y = Math.round(r.y) - 1;
+			
+			var height = Math.round(4 * scaleIndex * scaleFactor);
+			var diffY = 0;
+			for(var i = 0; i < height; i++)
+			{
+				ws.drawingCtx.ctx.moveTo(x - (i) - 2, y + 0.5 + (height - i) - diffY);
+				ws.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
+			}
+			
+			ws.drawingCtx.setLineWidth(t.width_1px)
+            ws.drawingCtx.setStrokeStyle(m_oColor);
+			ws.drawingCtx.stroke();
         };
 
-        var _drawFilterDreieck = function (x, y, index)
+        var _drawFilterDreieck = function (x, y)
 		{
-            var size = 5.25 * index;
-            //сюда приходят координаты центра кнопки
-            //чтобы кнопка была в центре, необходимо сместить
-            var leftDiff = size / 2;
-            var upDiff = Math.round(((size * Math.sqrt(3)) / 6) / height_1px) * height_1px;//радиус вписанной окружности в треугольник
-            //округляем + смещаем
-            x = Math.round((x - leftDiff) / width_1px) * width_1px;
-            y = Math.round((y - upDiff) / height_1px) * height_1px;
-            var meanLine = Math.round((size * Math.sqrt(3) / 3) / width_1px) * width_1px;//длина биссектрисы равностороннего треугольника
-            var halfSize = Math.round((size / 2) / height_1px) * height_1px;
-            //рисуем
-            ws.drawingCtx
-              .beginPath()
-              .moveTo(x, y)
-              .lineTo(x + size, y)
-              .lineTo(x + halfSize, y + meanLine)
-              .lineTo(x, y)
-              .setFillStyle(m_oColor)
-              .fill();
+			var r = ws.drawingCtx._calcRect(x, y);
+			x = Math.round(r.x) + 1;
+			y = Math.round(r.y);
+			
+			ws.drawingCtx.beginPath();
+			
+			var height = Math.round(4 * scaleIndex * scaleFactor);
+			var diffY = Math.round(height / 2);
+			for(var i = 0; i < height; i++)
+			{
+				ws.drawingCtx.ctx.moveTo(x - (i + 1), y + 0.5 + (height - i) - diffY);
+				ws.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
+			}
+			
+            ws.drawingCtx.setStrokeStyle(m_oColor);
+			ws.drawingCtx.stroke();
         };
 
 		//TODO пересмотреть отрисовку кнопок + отрисовку при масштабировании
