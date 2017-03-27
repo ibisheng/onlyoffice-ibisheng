@@ -7037,7 +7037,7 @@
 
         cell_info.comments = this.cellCommentator.getComments(ar.c1, ar.r1);
 		cell_info.flags.merge = range.isOneCell() ? Asc.c_oAscMergeOptions.Disabled :
-			null !== range.hasMerged() ? Asc.c_oAscMergeOptions.Merged : Asc.c_oAscMergeOptions.None;
+			null !== range.hasMerged() ? Asc.c_oAscMergeOptions.Merge : Asc.c_oAscMergeOptions.None;
 
         var sheetId = this.model.getId();
 		var lockInfo;
@@ -8606,7 +8606,7 @@
                                 range.merge(val);
                                 t.cellCommentator.mergeComments(range.getBBox0());
                                 break;
-                            case c_oAscMergeOptions.Unmerge:
+                            case c_oAscMergeOptions.None:
                                 range.unmerge();
                                 break;
                             case c_oAscMergeOptions.MergeAcross:

@@ -50,7 +50,8 @@ var c_oAscConfirm = {
 };
 
 var c_oAscMergeOptions = {
-  Unmerge: 0,
+  Disabled: -1,
+  None: 0,
   Merge: 1,
   MergeCenter: 2,
   MergeAcross: 3
@@ -73,12 +74,6 @@ var c_oAscBorderOptions = {
   InnerV: 6,
   InnerH: 7
 };
-
-	var c_oAscMergeOptions = {
-		Disabled: -1,
-		None: 0,
-		Merged: 1
-	};
 
 var c_oAscCleanOptions = {
   All: 0,
@@ -437,7 +432,8 @@ var c_oAscPopUpSelectorType = {
   prot['ConfirmPutMergeRange'] = prot.ConfirmPutMergeRange;
   window['Asc']['c_oAscMergeOptions'] = window['Asc'].c_oAscMergeOptions = c_oAscMergeOptions;
   prot = c_oAscMergeOptions;
-  prot['Unmerge'] = prot.Unmerge;
+  prot['Disabled'] = prot.Disabled;
+  prot['None'] = prot.None;
   prot['Merge'] = prot.Merge;
   prot['MergeCenter'] = prot.MergeCenter;
   prot['MergeAcross'] = prot.MergeAcross;
@@ -451,11 +447,6 @@ var c_oAscPopUpSelectorType = {
   prot['DiagU'] = prot.DiagU;
   prot['InnerV'] = prot.InnerV;
   prot['InnerH'] = prot.InnerH;
-	window['Asc']['c_oAscMergeOptions'] = window['Asc'].c_oAscMergeOptions = c_oAscMergeOptions;
-	prot = c_oAscMergeOptions;
-	prot['Disabled'] = prot.Disabled;
-	prot['None'] = prot.None;
-	prot['Merged'] = prot.Merged;
   window['Asc']['c_oAscCleanOptions'] = window['Asc'].c_oAscCleanOptions = c_oAscCleanOptions;
   prot = c_oAscCleanOptions;
   prot['All'] = prot.All;

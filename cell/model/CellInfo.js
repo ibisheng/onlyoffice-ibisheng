@@ -42,7 +42,7 @@
 
   /** @constructor */
   function asc_CCellFlag() {
-    this.merge = false;
+    this.merge = Asc.c_oAscMergeOptions.None;
     this.shrinkToFit = false;
     this.wrapText = false;
     this.selectionType = null;
