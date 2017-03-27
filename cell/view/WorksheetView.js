@@ -13887,8 +13887,18 @@
         //если внутри находится вся активная область(кроме строки заголовков) или если выходит активная область за границу снизу
         formatTableInfo.isInsertRowAbove = (refTableContainsActiveRange && ((lastRange.r1 > refTable.r1 && tablePart.HeaderRowCount === null) ||
         (lastRange.r1 >= refTable.r1 && tablePart.HeaderRowCount !== null)));
-
-        formatTableInfo.isDeleteRow = refTableContainsActiveRange && !(lastRange.r1 <= refTable.r1 && lastRange.r2 >= refTable.r1 && null === tablePart.HeaderRowCount);
+		
+		//если есть заголовок, и в данных всего одна строка
+		//todo пределать все проверки HeaderRowCount на вызов функции isHeaderRow
+		var dataRange = tablePart.getRangeWithoutHeaderFooter();
+		if((tablePart.isHeaderRow() || tablePart.isTotalsRow()) && dataRange.r1 === dataRange.r2 && lastRange.r1 === lastRange.r2 && dataRange.r1 === lastRange.r1)
+		{
+			formatTableInfo.isDeleteRow = false;
+		}
+		else
+		{
+			formatTableInfo.isDeleteRow = refTableContainsActiveRange && !(lastRange.r1 <= refTable.r1 && lastRange.r2 >= refTable.r1 && null === tablePart.HeaderRowCount);
+		}
 
         formatTableInfo.isDeleteColumn = true;
         formatTableInfo.isDeleteTable = true;
