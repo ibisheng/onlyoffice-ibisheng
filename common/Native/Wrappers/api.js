@@ -6054,6 +6054,13 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
 
     this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
 
+    this.ParcedDocument = true;
+    if (this.isStartCoAuthoringOnEndLoad)
+    {
+      this.CoAuthoringApi.onStartCoAuthoring(true);
+      this.isStartCoAuthoringOnEndLoad = false;
+    }
+
     window["native"]["onEndLoadingFile"]();
 
     var t = this;
