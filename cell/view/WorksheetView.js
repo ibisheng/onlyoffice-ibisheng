@@ -12607,7 +12607,7 @@
 						{
 							if(colId === sortCondition.Ref.c1 - range.c1)
 							{
-								isSortState = sortCondition.ConditionDescending;
+								isSortState = !!(sortCondition.ConditionDescending);
 							}
 						}
 
@@ -12678,10 +12678,7 @@
 
 		var _drawSortArrow = function(startX, startY, isDescending, heightArrow)
 		{
-			heightArrow = Math.round(heightArrow * height_1px * scaleIndex);
-			var widthArrow = 3 * width_1px * scaleIndex;
-			var widthLine = 1 * width_1px * scaleIndex;
-			var heightEndArrow = 3 * height_1px * scaleIndex;
+			heightArrow = heightArrow * height_1px * scaleIndex;
 
 			//isDescending = true - стрелочка смотрит вниз
 			//рисуем сверху вниз
@@ -12689,13 +12686,15 @@
 			ctx.beginPath();
 			ctx.lineVer(startX, startY, startY + heightArrow);
 			
+			heightArrow = Math.round(heightArrow);
+			
 			if(isDescending)
 			{
 				var r = ws.drawingCtx._calcRect(startX, startY);
 				var x = Math.round(r.x);
 				var y = Math.round(r.y);
 				
-				var heightArrow1 = Math.round(heightArrow * scaleFactor);
+				var heightArrow1 = Math.round(heightArrow * scaleFactor - 1);
 				var height = Math.round(3 * scaleIndex * scaleFactor);
 				var diffY = 0;
 				for(var i = 0; i < height; i++)
@@ -12740,29 +12739,28 @@
             x = Math.round((x) / width_1px) * width_1px;
             y = Math.round((y) / height_1px) * height_1px;
             var heightLine = Math.round(height);
+			var heightCleanLine = heightLine - 4 + 1;
 			
 			ws.drawingCtx.beginPath();
 			
-            ws.drawingCtx
-              .beginPath()
-              .moveTo(x, y)
-              .lineTo(x, y - heightLine)
-			  .setLineWidth(t.width_2px)
-              .setStrokeStyle(m_oColor)
-              .stroke();
+            ws.drawingCtx.moveTo(x, y);
+			ws.drawingCtx.lineTo(x, y - heightCleanLine);
+            ws.drawingCtx.setLineWidth(t.width_2px);
+			ws.drawingCtx.setStrokeStyle(m_oColor);
+			ws.drawingCtx.setStrokeStyle(m_oColor);
+			ws.drawingCtx.stroke();
 			
 			
-			var scaleFactor = ws.drawingCtx.scaleFactor;
 			var r = ws.drawingCtx._calcRect(x, y - heightLine);
 			x = Math.round(r.x) + 1;
 			y = Math.round(r.y) - 1;
 			
-			var height = Math.round(4 * scaleIndex * scaleFactor);
+			var heightTriangle = Math.round(4 * scaleIndex * scaleFactor);
 			var diffY = 0;
-			for(var i = 0; i < height; i++)
+			for(var i = 0; i < heightTriangle; i++)
 			{
-				ws.drawingCtx.ctx.moveTo(x - (i) - 2, y + 0.5 + (height - i) - diffY);
-				ws.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
+				ws.drawingCtx.ctx.moveTo(x - (i) - 2, y + 0.5 + (heightTriangle - i) - diffY);
+				ws.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (heightTriangle - i) - diffY);
 			}
 			
 			ws.drawingCtx.setLineWidth(t.width_1px)
@@ -12770,7 +12768,7 @@
 			ws.drawingCtx.stroke();
         };
 
-        var _drawFilterDreieck = function (x, y)
+        var _drawFilterDreieck = function (x, y, height)
 		{
 			var r = ws.drawingCtx._calcRect(x, y);
 			x = Math.round(r.x) + 1;
@@ -12778,7 +12776,7 @@
 			
 			ws.drawingCtx.beginPath();
 			
-			var height = Math.round(4 * scaleIndex * scaleFactor);
+			height = Math.round(height * scaleIndex * scaleFactor);
 			var diffY = Math.round(height / 2);
 			for(var i = 0; i < height; i++)
 			{
@@ -12812,7 +12810,7 @@
 			else if(null !== isApplySortState)
 			{
 				_drawSortArrow(upLeftXButton + width - 5 * width_1px * scaleIndex, upLeftYButton + 3 * height_1px * scaleIndex, isApplySortState, 10);
-				_drawFilterDreieck(centerX - 3 * width_1px, centerY + 2 * height_1px, scaleIndex * 0.75);
+				_drawFilterDreieck(centerX - 4 * width_1px, centerY + 1 * height_1px, 3);
 			}
 			else if (isApplyAutoFilter)
 			{
@@ -12824,7 +12822,7 @@
 			}
 			else
 			{
-				_drawFilterDreieck(centerX, centerY, scaleIndex);
+				_drawFilterDreieck(centerX, centerY, 4);
 			}
 		};
 
