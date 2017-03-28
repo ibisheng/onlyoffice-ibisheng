@@ -5818,12 +5818,12 @@ TablePart.prototype.addAutoFilter = function()
 
 TablePart.prototype.isHeaderRow = function()
 {
-	return !!(null === this.HeaderRowCount || this.HeaderRowCount > 0); 
+	return null === this.HeaderRowCount || this.HeaderRowCount > 0; 
 };
 
 TablePart.prototype.isTotalsRow = function()
 {
-	return !!(this.TotalsRowCount > 0); 
+	return this.TotalsRowCount > 0; 
 };
 
 
