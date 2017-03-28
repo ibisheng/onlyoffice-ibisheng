@@ -816,7 +816,7 @@ CPresentation.prototype =
         }
 
         var bHaveChanges = History.Have_Changes(true);
-        if (true !== bHaveChanges && true === AscCommon.CollaborativeEditing.Have_OtherChanges() || 0 !== AscCommon.CollaborativeEditing.getOwnLocksLength())
+        if (true !== bHaveChanges && (true === AscCommon.CollaborativeEditing.Have_OtherChanges() || 0 !== AscCommon.CollaborativeEditing.getOwnLocksLength()))
         {
             // Принимаем чужие изменение. Своих нет, но функцию отсылки надо вызвать, чтобы снялить локи.
             AscCommon.CollaborativeEditing.Apply_Changes();

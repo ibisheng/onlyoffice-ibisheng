@@ -10054,7 +10054,7 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
 		return;
 
 	var HaveChanges = this.History.Have_Changes(true);
-	if (true !== HaveChanges && true === this.CollaborativeEditing.Have_OtherChanges() || 0 !== this.CollaborativeEditing.getOwnLocksLength())
+	if (true !== HaveChanges && (true === this.CollaborativeEditing.Have_OtherChanges() || 0 !== this.CollaborativeEditing.getOwnLocksLength()))
 	{
 		// Принимаем чужие изменения. Своих нет, но функцию отсылки надо вызвать, чтобы снять локи.
 		this.CollaborativeEditing.Apply_Changes();
