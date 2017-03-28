@@ -1785,6 +1785,17 @@ CChartsDrawer.prototype =
 						result =  valPoints[i].pos * this.calcProp.pxToMM;
 						break;
 					}
+					else if(i !== 0 && valPoints[i - 1].val < 0 && valPoints[i].val > 0)
+					{
+						var val1 = valPoints[i - 1].val;
+						var val2 = valPoints[i].val;
+						var pos1 = valPoints[i - 1].pos * this.calcProp.pxToMM;
+						var pos2 = valPoints[i].pos * this.calcProp.pxToMM;
+						
+						result = pos2 - val2 * (pos2 - pos1) / (val2 - val1);
+						
+						break;
+					}
 				}
 			}
 			
