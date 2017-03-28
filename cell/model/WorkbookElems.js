@@ -6413,8 +6413,13 @@ FilterColumn.prototype.createFilter = function(obj) {
 		case c_oAscAutoFilterTypes.Filters:
 		{
 			newFilter = new Filters();
-			this.Filters = newFilter;
 			allFilterOpenElements = newFilter.init(obj);
+			
+			if(!allFilterOpenElements)
+			{
+				this.Filters = newFilter;
+			}
+			
 			break;
 		}	
 	}	
