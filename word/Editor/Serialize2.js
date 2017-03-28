@@ -9188,6 +9188,9 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			if (this.curFootnote) {
 				oNewElem = new ParaFootnoteRef(this.curFootnote);
 			}
+			else if(this.openParams && this.openParams.bCopyPaste && this.openParams.oDocument){
+				oNewElem = new ParaFootnoteRef(this.openParams.oDocument);
+			}
 		}
 		else if (c_oSerRunType.footnoteReference === type)
 		{

@@ -12913,6 +12913,10 @@ function CreateScatterAxis()
 }
 
 
+function fCheckNumFormatType(numFormatType){
+        return (numFormatType === c_oAscNumFormatType.Time || numFormatType === c_oAscNumFormatType.Date || numFormatType === c_oAscNumFormatType.Percent)
+}
+
 function parseSeriesHeaders (ws, rangeBBox) {
 	var cntLeft = 0, cntTop = 0;
 	var headers = { bLeft: false, bTop: false };
@@ -12931,7 +12935,7 @@ function parseSeriesHeaders (ws, rangeBBox) {
                     bLeftOnlyDateTime = false;
                     headers.bLeft = true;
                 }
-                else if(numFormatType === c_oAscNumFormatType.Time || numFormatType === c_oAscNumFormatType.Date )
+                else if(fCheckNumFormatType(numFormatType))
                 {
                     headers.bLeft = true;
                 }
@@ -12949,7 +12953,7 @@ function parseSeriesHeaders (ws, rangeBBox) {
                     bTopOnlyDateTime = false;
                     headers.bTop = true;
                 }
-                else if(numFormatType === c_oAscNumFormatType.Time || numFormatType === c_oAscNumFormatType.Date )
+                else if(fCheckNumFormatType(numFormatType) )
                 {
                     headers.bTop = true;
                 }
@@ -12965,7 +12969,7 @@ function parseSeriesHeaders (ws, rangeBBox) {
                     cell = ws.getCell3(i, j);
                     value = cell.getValue();
                     numFormatType= cell.getNumFormatType();
-                    if (numFormatType !== c_oAscNumFormatType.Time && numFormatType !== c_oAscNumFormatType.Date && value !== "")
+                    if (!fCheckNumFormatType(numFormatType) && value !== "")
                     {
                         break;
                     }

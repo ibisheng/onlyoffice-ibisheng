@@ -9199,6 +9199,15 @@ Paragraph.prototype =
                     Page_H        = 0;
                 }
 
+				var PageLimitsOrigin = this.Parent.Get_PageLimits(PageRel);
+				if (true === this.Parent.Is_TableCellContent() && false === Drawing.Is_LayoutInCell())
+				{
+					PageLimitsOrigin = LogicDocument.Get_PageLimits(PageAbs);
+					var PageFieldsOrigin = LogicDocument.Get_PageFields(PageAbs);
+					ColumnStartX = PageFieldsOrigin.X;
+					ColumnEndX   = PageFieldsOrigin.XLimit;
+				}
+
                 if ( undefined != Drawing && true != Drawing.Use_TextWrap() )
                 {
                     PageFields = LD_PageFields;
@@ -9207,7 +9216,7 @@ Paragraph.prototype =
 
                 var ParagraphTop = (true != Drawing.Use_TextWrap() ? this.Lines[this.Pages[_CurPage].StartLine].Top + this.Pages[_CurPage].Y : this.Pages[_CurPage].Y);
                 var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_AbsolutePage(CurPage), DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, ParagraphTop);
-                return {ParagraphLayout : Layout, PageLimits : PageLimits};
+                return {ParagraphLayout : Layout, PageLimits : PageLimits, PageLimitsOrigin : PageLimitsOrigin};
             }
         }
 

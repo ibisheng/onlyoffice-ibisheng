@@ -12607,7 +12607,7 @@
 						{
 							if(colId === sortCondition.Ref.c1 - range.c1)
 							{
-								isSortState = sortCondition.ConditionDescending;
+								isSortState = !!(sortCondition.ConditionDescending);
 							}
 						}
 
@@ -12647,11 +12647,10 @@
     };
 
 	WorksheetView.prototype.af_drawCurrentButton = function (x1, y1, props) {
+		//TODO пересмотреть масштабирование!!!
 		var isApplyAutoFilter = props.isSetFilter;
 		var isApplySortState = props.isSortState;
 
-		var ws = this;
-        var aWs = this.model;
         var t = this;
 
 		var width_1px = t.width_1px;
@@ -12660,56 +12659,54 @@
 		var width = 15 * height_1px;
         var m_oColor = new CColor(120, 120, 120);
 
-		var rowHeight = ws.rows[props.row].height;
-		var colWidth = ws.cols[props.col].width;
+		var rowHeight = t.rows[props.row].height;
+		var colWidth = t.cols[props.col].width;
 
 		var scaleIndex = 1;
-		var scaleFactor = ws.drawingCtx.scaleFactor;
+		var scaleFactor = t.drawingCtx.scaleFactor;
 
-		var _drawButtonBorder = function(startX, startY, width, height)
+		var _drawButtonFrame = function(startX, startY, width, height)
 		{
-			ws.drawingCtx
-              .setFillStyle(ws.settings.cells.defaultState.background)
-              .setLineWidth(1)
-              .setStrokeStyle(ws.settings.cells.defaultState.border)
-              .fillRect(startX, startY, width, height)
-              .strokeRect(startX, startY, width, height);
+			t.drawingCtx.setFillStyle(t.settings.cells.defaultState.background);
+			t.drawingCtx.setLineWidth(1);
+			t.drawingCtx.setStrokeStyle(t.settings.cells.defaultState.border);
+			t.drawingCtx.fillRect(startX, startY, width, height);
+			t.drawingCtx .strokeRect(startX, startY, width, height);
 		};
 
 		var _drawSortArrow = function(startX, startY, isDescending, heightArrow)
 		{
-			heightArrow = Math.round(heightArrow * height_1px * scaleIndex);
-			var widthArrow = 3 * width_1px * scaleIndex;
-			var widthLine = 1 * width_1px * scaleIndex;
-			var heightEndArrow = 3 * height_1px * scaleIndex;
+			heightArrow = heightArrow * height_1px * scaleIndex;
 
 			//isDescending = true - стрелочка смотрит вниз
 			//рисуем сверху вниз
-			var ctx = ws.drawingCtx;
+			var ctx = t.drawingCtx;
 			ctx.beginPath();
 			ctx.lineVer(startX, startY, startY + heightArrow);
 			
+			heightArrow = Math.round(heightArrow);
+			
 			if(isDescending)
 			{
-				var r = ws.drawingCtx._calcRect(startX, startY);
+				var r = t.drawingCtx._calcRect(startX, startY);
 				var x = Math.round(r.x);
 				var y = Math.round(r.y);
 				
-				var heightArrow1 = Math.round(heightArrow * scaleFactor);
+				var heightArrow1 = Math.round(heightArrow * scaleFactor - 1);
 				var height = Math.round(3 * scaleIndex * scaleFactor);
 				var diffY = 0;
 				for(var i = 0; i < height; i++)
 				{
-					ws.drawingCtx.ctx.moveTo(x - (i), y + 0.5 - (i) + heightArrow1 + height - 1);
-					ws.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
+					t.drawingCtx.ctx.moveTo(x - (i), y + 0.5 - (i) + heightArrow1 + height - 1);
+					t.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
 					
-					ws.drawingCtx.ctx.moveTo(x + i, y + 0.5 - (i) + heightArrow1 + height - 1);
-					ws.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
+					t.drawingCtx.ctx.moveTo(x + i, y + 0.5 - (i) + heightArrow1 + height - 1);
+					t.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
 				}
 			}
 			else
 			{
-				var r = ws.drawingCtx._calcRect(startX, startY);
+				var r = t.drawingCtx._calcRect(startX, startY);
 				var x = Math.round(r.x);
 				var y = Math.round(r.y);
 				
@@ -12717,14 +12714,13 @@
 				var diffY = 0;
 				for(var i = 0; i < height; i++)
 				{
-					ws.drawingCtx.ctx.moveTo(x - (i), y + 0.5 + (i) - diffY);
-					ws.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 + (i) - diffY);
+					t.drawingCtx.ctx.moveTo(x - (i), y + 0.5 + (i) - diffY);
+					t.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 + (i) - diffY);
 					
-					ws.drawingCtx.ctx.moveTo(x + i, y + 0.5 + (i) - diffY);
-					ws.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 + (i) - diffY);
+					t.drawingCtx.ctx.moveTo(x + i, y + 0.5 + (i) - diffY);
+					t.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 + (i) - diffY);
 				}
 			}
-			
 			
 			ctx.setLineWidth(t.width_1px);
 			ctx.setStrokeStyle(m_oColor);
@@ -12733,68 +12729,63 @@
 
         var _drawFilterMark = function (x, y, height)
 		{
-            /*var size = 5.25 * scaleIndex;
-            var halfSize = Math.round((size / 2) / height_1px) * height_1px;
-            var meanLine = Math.round((size * Math.sqrt(3) / 3) / height_1px) * height_1px;//длина биссектрисы равностороннего треугольника*/
-            //округляем + смещаем
             x = Math.round((x) / width_1px) * width_1px;
             y = Math.round((y) / height_1px) * height_1px;
             var heightLine = Math.round(height);
+			var heightCleanLine = heightLine - 4 + 2;
 			
-			ws.drawingCtx.beginPath();
+			t.drawingCtx.beginPath();
 			
-            ws.drawingCtx
-              .beginPath()
-              .moveTo(x, y)
-              .lineTo(x, y - heightLine)
-			  .setLineWidth(t.width_2px)
-              .setStrokeStyle(m_oColor)
-              .stroke();
+            t.drawingCtx.moveTo(x, y);
+			t.drawingCtx.lineTo(x, y - heightCleanLine);
+            t.drawingCtx.setLineWidth(t.width_2px);
+			t.drawingCtx.setStrokeStyle(m_oColor);
+			t.drawingCtx.setStrokeStyle(m_oColor);
+			t.drawingCtx.stroke();
 			
 			
-			var scaleFactor = ws.drawingCtx.scaleFactor;
-			var r = ws.drawingCtx._calcRect(x, y - heightLine);
+			var r = t.drawingCtx._calcRect(x, y - heightLine);
 			x = Math.round(r.x) + 1;
 			y = Math.round(r.y) - 1;
 			
-			var height = Math.round(4 * scaleIndex * scaleFactor);
+			var heightTriangle = Math.round(4 * scaleIndex * scaleFactor);
 			var diffY = 0;
-			for(var i = 0; i < height; i++)
+			for(var i = 0; i < heightTriangle; i++)
 			{
-				ws.drawingCtx.ctx.moveTo(x - (i) - 2, y + 0.5 + (height - i) - diffY);
-				ws.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
+				t.drawingCtx.ctx.moveTo(x - (i) - 2, y + 0.5 + (heightTriangle - i) - diffY);
+				t.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (heightTriangle - i) - diffY);
 			}
 			
-			ws.drawingCtx.setLineWidth(t.width_1px)
-            ws.drawingCtx.setStrokeStyle(m_oColor);
-			ws.drawingCtx.stroke();
+			t.drawingCtx.setLineWidth(t.width_1px)
+            t.drawingCtx.setStrokeStyle(m_oColor);
+			t.drawingCtx.stroke();
         };
 
-        var _drawFilterDreieck = function (x, y)
+        var _drawFilterDreieck = function (x, y, height)
 		{
-			var r = ws.drawingCtx._calcRect(x, y);
+			var r = t.drawingCtx._calcRect(x, y);
 			x = Math.round(r.x) + 1;
 			y = Math.round(r.y);
 			
-			ws.drawingCtx.beginPath();
+			t.drawingCtx.beginPath();
 			
-			var height = Math.round(4 * scaleIndex * scaleFactor);
+			height = Math.round(height * scaleIndex * scaleFactor);
 			var diffY = Math.round(height / 2);
 			for(var i = 0; i < height; i++)
 			{
-				ws.drawingCtx.ctx.moveTo(x - (i + 1), y + 0.5 + (height - i) - diffY);
-				ws.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
+				t.drawingCtx.ctx.moveTo(x - (i + 1), y + 0.5 + (height - i) - diffY);
+				t.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
 			}
 			
-            ws.drawingCtx.setStrokeStyle(m_oColor);
-			ws.drawingCtx.stroke();
+            t.drawingCtx.setStrokeStyle(m_oColor);
+			t.drawingCtx.stroke();
         };
 
 		//TODO пересмотреть отрисовку кнопок + отрисовку при масштабировании
 		var _drawButton = function(upLeftXButton, upLeftYButton)
 		{
 			//квадрат кнопки рисуем
-			_drawButtonBorder(upLeftXButton, upLeftYButton, width, height);
+			_drawButtonFrame(upLeftXButton, upLeftYButton, width, height);
 
 			//координаты центра
 			var centerX = upLeftXButton + (width / 2);
@@ -12812,7 +12803,7 @@
 			else if(null !== isApplySortState)
 			{
 				_drawSortArrow(upLeftXButton + width - 5 * width_1px * scaleIndex, upLeftYButton + 3 * height_1px * scaleIndex, isApplySortState, 10);
-				_drawFilterDreieck(centerX - 3 * width_1px, centerY + 2 * height_1px, scaleIndex * 0.75);
+				_drawFilterDreieck(centerX - 4 * width_1px, centerY + 1 * height_1px, 3);
 			}
 			else if (isApplyAutoFilter)
 			{
@@ -12824,7 +12815,7 @@
 			}
 			else
 			{
-				_drawFilterDreieck(centerX, centerY, scaleIndex);
+				_drawFilterDreieck(centerX, centerY, 4);
 			}
 		};
 

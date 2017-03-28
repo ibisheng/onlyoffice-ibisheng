@@ -311,17 +311,18 @@ var editor;
     }
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
   };
-
+	spreadsheet_api.prototype.saveCheck = function() {
+		return !(!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction || this.isLongAction());
+	};
 	spreadsheet_api.prototype.asc_Save = function (isAutoSave) {
 		this.IsUserSave = !isAutoSave;
-		if (!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction ||
-			this.isLongAction()) {
-			return;
+		if (!this.saveCheck()) {
+			return false;
 		} else if (!(this.asc_isDocumentCanSave() || this.collaborativeEditing.haveOtherChanges() || this.canUnlockDocument)) {
 			if (this.isForceSaveOnUserSave && this.IsUserSave) {
 				this.forceSave();
 			}
-			return;
+			return false;
 		}
 
 		if (this.IsUserSave) {
@@ -338,6 +339,7 @@ var editor;
 		this.CoAuthoringApi.askSaveChanges(function (e) {
 			t.onSaveCallback(e);
 		});
+		return true;
 	};
 
   spreadsheet_api.prototype.asc_Print = function(adjustPrint, bIsDownloadEvent) {
@@ -1505,6 +1507,10 @@ var editor;
 
         if (undefined !== window["AscDesktopEditor"]) {
           window["AscDesktopEditor"]["OnSave"]();
+        }
+        if (t.disconnectOnSave) {
+          t.CoAuthoringApi.disconnect(t.disconnectOnSave.code, t.disconnectOnSave.reason);
+          t.disconnectOnSave = null;
         }
       };
       // Пересылаем свои изменения

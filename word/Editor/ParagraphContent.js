@@ -1109,6 +1109,19 @@ ParaNewLine.prototype =
         return false;
     }
 };
+ParaNewLine.prototype.IsPageOrColumnBreak = function()
+{
+	return (break_Page === this.BreakType || break_Column === this.BreakType);
+};
+ParaNewLine.prototype.IsPageBreak = function()
+{
+	return (break_Page === this.BreakType);
+};
+ParaNewLine.prototype.IsColumnBreak = function()
+{
+	return (break_Column === this.BreakType);
+};
+
 
 // Класс ParaNumbering
 function ParaNumbering()
