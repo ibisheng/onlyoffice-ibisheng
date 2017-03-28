@@ -2215,7 +2215,8 @@ PasteProcessor.prototype =
 	},
     ReadFromBinary : function(sBase64, oDocument)
 	{
-        var openParams = { checkFileSize: false, charCount: 0, parCount: 0, bCopyPaste: true };
+        var oDocumentParams = PasteElementsId.g_bIsDocumentCopyPaste ? this.oDocument : null;
+		var openParams = { checkFileSize: false, charCount: 0, parCount: 0, bCopyPaste: true, oDocument: oDocumentParams };
 		var doc = oDocument ? oDocument : this.oLogicDocument;
         var oBinaryFileReader = new AscCommonWord.BinaryFileReader(doc, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
