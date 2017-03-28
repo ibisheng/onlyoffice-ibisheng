@@ -4455,15 +4455,9 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				}
 				this.bs.WriteItem(c_oSerParType.FldSimple, function(){oThis.WriteFldSimple(Instr, function(){
                     oThis.WriteRun2(function () {
-                        //всегда что-то пишем, потому что если ничего нет в w:t, то и не применяются настройки
                         //todo не писать через fldsimple
-                        var numText = '1';
-                        if (null != elem.pageNum.String && "string" == typeof(elem.pageNum.String)) {
-                            numText = elem.pageNum.String;
-						} else if (elem.pageNum.Type == para_PageCount && null != elem.pageNum.PageCount) {
-							numText = elem.pageNum.PageCount.toString();
-						}
-                        oThis.WriteText(numText, delText);
+						var num = elem.pageNum.Type == para_PageCount ? elem.pageNum.GetPageCountValue() : elem.pageNum.GetPageNumValue();
+                        oThis.WriteText(num.toString(), delText);
                     }, oRun);
 				});});
             }
