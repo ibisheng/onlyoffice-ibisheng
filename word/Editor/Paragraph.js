@@ -7158,6 +7158,10 @@ Paragraph.prototype =
             else
             {
                 TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
+
+                var oRun = this.Get_ElementByPos(this.Get_ParaContentPos(false, false, false));
+                if (para_Run === oRun.Type && oRun.private_IsCurPosNearFootnoteReference())
+					TextPr.VertAlign = AscCommon.vertalign_Baseline;
             }
         }
         
