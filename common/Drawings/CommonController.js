@@ -6439,15 +6439,29 @@ DrawingObjectsController.prototype =
 
     unGroupCallback: function()
     {
-        var ungroup_arr = this.canUnGroup(true);
+        var ungroup_arr = this.canUnGroup(true), aGraphicObjects;
         if(ungroup_arr.length > 0)
         {
             this.resetSelection();
-            var i, j,   cur_group, sp_tree, sp;
+            var i, j,   cur_group, sp_tree, sp, nInsertPos;
             for(i = 0; i < ungroup_arr.length; ++i)
             {
                 cur_group = ungroup_arr[i];
                 cur_group.normalize();
+
+                aGraphicObjects = this.getDrawingObjects();
+                nInsertPos = undefined;
+                for(j = 0; j < aGraphicObjects.length; ++j)
+                {
+                    if(aGraphicObjects[j] === cur_group)
+                    {
+                        nInsertPos = j;
+                        break;
+                    }
+                }
+
+
+
                 sp_tree = cur_group.spTree;
                 for(j = 0; j < sp_tree.length; ++j)
                 {
@@ -6462,7 +6476,12 @@ DrawingObjectsController.prototype =
                     {
                         sp.spPr.setFill(cur_group.spPr.Fill.createDuplicate());
                     }
-                    sp.addToDrawingObjects();
+                    if(AscFormat.isRealNumber(nInsertPos)){
+                        sp.addToDrawingObjects(nInsertPos + j);
+                    }
+                    else {
+                        sp.addToDrawingObjects();
+                    }
                     sp.checkDrawingBaseCoords();
                     this.selectObject(sp, 0);
                 }
