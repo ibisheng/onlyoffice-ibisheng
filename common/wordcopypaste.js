@@ -2306,7 +2306,8 @@ PasteProcessor.prototype =
 	},
     ReadFromBinary : function(sBase64, oDocument)
 	{
-        var openParams = { checkFileSize: false, charCount: 0, parCount: 0, bCopyPaste: true };
+        var oDocumentParams = PasteElementsId.g_bIsDocumentCopyPaste ? this.oDocument : null;
+		var openParams = { checkFileSize: false, charCount: 0, parCount: 0, bCopyPaste: true, oDocument: oDocumentParams };
 		var doc = oDocument ? oDocument : this.oLogicDocument;
         var oBinaryFileReader = new AscCommonWord.BinaryFileReader(doc, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
@@ -4217,6 +4218,7 @@ PasteProcessor.prototype =
         var arr_shapes = [];
         var arr_transforms = [];
 		var cStyle;
+		var foundTableStylesIdMap = {};
 		
         for(var i = 0; i < count; ++i)
         {
@@ -4228,17 +4230,9 @@ PasteProcessor.prototype =
             {
                 if(loader.stream.GetBool())
                 {
-					//в случае если вставляем в презентации, пропускаем
-					if(!PasteElementsId.g_bIsDocumentCopyPaste)
-					{
-						loader.stream.Skip2(1);
-						loader.stream.SkipRecord();
-					}
-					else
-					{
-						loader.stream.Skip2(1);
-						cStyle = loader.ReadTableStyle();
-					}
+					loader.stream.Skip2(1);
+					cStyle = loader.ReadTableStyle(true);
+					
 					loader.stream.GetBool();
 					style_index = stream.GetString2();
                 }
@@ -4285,7 +4279,24 @@ PasteProcessor.prototype =
 				if(!PasteElementsId.g_bIsDocumentCopyPaste)
 				{
 					//TODO продумать добавления нового стиля(ReadTableStyle->получуть id нового стиля, сравнить новый стиль со всеми присутвующими.если нет - добавить и сделать Set_TableStyle(id))
-					if(presentation.TableStylesIdMap[style_index])
+					if(foundTableStylesIdMap[style_index])
+					{
+						arr_shapes[i].Drawing.graphicObject.Set_TableStyle(foundTableStylesIdMap[style_index], true);
+					}
+					else if(cStyle && presentation.globalTableStyles && presentation.globalTableStyles.Style)
+					{
+						for(var j in presentation.globalTableStyles.Style)
+						{
+							//TODO isEqual - сравнивает ещё и имя стиля. для случая, когда одинаковый контент, но имя стиля разное, не подойдет это сравнение
+							if(presentation.globalTableStyles.Style[j].isEqual(cStyle))
+							{
+								arr_shapes[i].Drawing.graphicObject.Set_TableStyle(j, true);
+								foundTableStylesIdMap[style_index] = j;
+								break;
+							}
+						}
+					}
+					else if(presentation.TableStylesIdMap[style_index])
 					{
 						arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index, true);
 					}

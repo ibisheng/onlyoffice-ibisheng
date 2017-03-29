@@ -1869,6 +1869,10 @@ background-repeat: no-repeat;\
 				{
 					window["AscDesktopEditor"]["OnSave"]();
 				}
+				if (t.disconnectOnSave) {
+					t.CoAuthoringApi.disconnect(t.disconnectOnSave.code, t.disconnectOnSave.reason);
+					t.disconnectOnSave = null;
+				}
 			};
 			var CursorInfo                   = null;
 			if (true === AscCommon.CollaborativeEditing.Is_Fast())
@@ -1952,10 +1956,14 @@ background-repeat: no-repeat;\
 			}
 		}
 	};
+	asc_docs_api.prototype.saveCheck = function() {
+		return true === this.canSave && !this.isLongAction();
+	}
 	asc_docs_api.prototype.asc_Save                     = function(isAutoSave, isUndoRequest)
 	{
+		var res = false;
 		this.IsUserSave = !isAutoSave;
-		if (true === this.canSave && !this.isLongAction())
+		if (this.saveCheck())
 		{
 			if (this.asc_isDocumentCanSave() || History.Have_Changes() ||
 				AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument)
@@ -1967,12 +1975,14 @@ background-repeat: no-repeat;\
 				{
 					t.onSaveCallback(e, isUndoRequest);
 				});
+				res = true;
 			}
 			else if (this.isForceSaveOnUserSave && this.IsUserSave)
 			{
 				this.forceSave();
 			}
 		}
+		return res;
 	};
 	asc_docs_api.prototype.asc_DownloadAs               = function(typeFile, bIsDownloadEvent)
 	{//передаем число соответствующее своему формату.
@@ -5478,6 +5488,7 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oDrawingDocument.ClearCachePages();
 			this.WordControl.HideRulers();
 
+            AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			if (null != this.WordControl.m_oLogicDocument)
 			{
 				this.WordControl.m_oLogicDocument.viewMode = true;
@@ -5565,6 +5576,19 @@ background-repeat: no-repeat;\
 		}
 
 		this.sendEvent("asc_onHyperlinkClick", Url);
+	};
+
+	asc_docs_api.prototype.asc_GoToInternalHyperlink = function(url)
+	{
+		for(var i = 0; i < this.SelectedObjectsStack.length; ++i){
+			if(this.SelectedObjectsStack[i].Type === c_oAscTypeSelectElement.Hyperlink){
+				var oHyperProp = this.SelectedObjectsStack[i].Value;
+				if(typeof oHyperProp.Value === "string" && oHyperProp.Value.indexOf("ppaction://hlink") === 0){
+					this.sync_HyperlinkClickCallback(oHyperProp.Value);
+				}
+				return;
+			}
+		}
 	};
 
 	asc_docs_api.prototype.UpdateInterfaceState = function()
@@ -6050,7 +6074,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["userid"]       = this.documentUserId;
 		oAdditionalData["jwt"]         = this.CoAuthoringApi.get_jwt();
 		oAdditionalData["outputformat"] = filetype;
-		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
+		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
 		if (DownloadType.Print === options.downloadType)
 		{
@@ -6798,6 +6822,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['remove_Hyperlink']                    = asc_docs_api.prototype.remove_Hyperlink;
 	asc_docs_api.prototype['sync_HyperlinkPropCallback']          = asc_docs_api.prototype.sync_HyperlinkPropCallback;
 	asc_docs_api.prototype['sync_HyperlinkClickCallback']         = asc_docs_api.prototype.sync_HyperlinkClickCallback;
+	asc_docs_api.prototype['asc_GoToInternalHyperlink']           = asc_docs_api.prototype.asc_GoToInternalHyperlink;
 	asc_docs_api.prototype['sync_CanAddHyperlinkCallback']        = asc_docs_api.prototype.sync_CanAddHyperlinkCallback;
 	asc_docs_api.prototype['sync_DialogAddHyperlink']             = asc_docs_api.prototype.sync_DialogAddHyperlink;
 	asc_docs_api.prototype['GoToFooter']                          = asc_docs_api.prototype.GoToFooter;

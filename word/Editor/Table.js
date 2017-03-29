@@ -2593,41 +2593,12 @@ CTable.prototype =
         this.Document_SetThisElementCurrent(false);
         this.Cursor_MoveToStartPos();
 
+        var oTargetTable = this;
         if ( true != this.Is_Inline() )
         {
             if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, null, true) )
             {
                 oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_MoveInlineTable);
-
-                // Обновляем координаты
-
-                // Здесь мы должны для первого рассчета оставить привязку относительно страницы, а после рассчета
-                // изменить привязку на старую, при этом пересчитав координаты так, чтобы картинка не изменила
-                // своего положения.
-
-                this.PositionH_Old =
-                {
-                    RelativeFrom : this.PositionH.RelativeFrom,
-                    Align        : this.PositionH.Align,
-                    Value        : this.PositionH.Value
-                };
-
-                this.PositionV_Old =
-                {
-                    RelativeFrom : this.PositionV.RelativeFrom,
-                    Align        : this.PositionV.Align,
-                    Value        : this.PositionV.Value
-                };
-
-                this.PositionH.RelativeFrom = c_oAscHAnchor.PageInternal;
-                this.PositionH.Align        = false;
-                this.PositionH.Value        = X;
-
-                this.PositionV.RelativeFrom = c_oAscVAnchor.Page;
-                this.PositionV.Align        = false;
-                this.PositionV.Value        = Y;
-
-                this.PageNum = PageNum;
 
                 // Переносим привязку (если получается, что заносим таблицу саму в себя, тогда привязку не меняем)
                 var NewDocContent = NearestPos.Paragraph.Parent;
@@ -2667,7 +2638,7 @@ CTable.prototype =
 
                     }
 
-					var oTargetTable = AscCommon.CollaborativeEditing.Is_SingleUser() ? this : this.Copy(NewDocContent);
+					oTargetTable = AscCommon.CollaborativeEditing.Is_SingleUser() ? this : this.Copy(NewDocContent);
 					if (NewDocContent != OldDocContent)
 					{
 						// Сначала добавляем таблицу в новый класс
@@ -2693,9 +2664,36 @@ CTable.prototype =
 					}
                 }
 
-                editor.WordControl.m_oLogicDocument.Recalculate();
-                
-                this.Start_TrackTable();
+				// Обновляем координаты
+
+				// Здесь мы должны для первого рассчета оставить привязку относительно страницы, а после рассчета
+				// изменить привязку на старую, при этом пересчитав координаты так, чтобы картинка не изменила
+				// своего положения.
+
+				oTargetTable.PositionH_Old = {
+					RelativeFrom : oTargetTable.PositionH.RelativeFrom,
+					Align        : oTargetTable.PositionH.Align,
+					Value        : oTargetTable.PositionH.Value
+				};
+
+				oTargetTable.PositionV_Old = {
+					RelativeFrom : oTargetTable.PositionV.RelativeFrom,
+					Align        : oTargetTable.PositionV.Align,
+					Value        : oTargetTable.PositionV.Value
+				};
+
+				oTargetTable.PositionH.RelativeFrom = c_oAscHAnchor.PageInternal;
+				oTargetTable.PositionH.Align        = false;
+				oTargetTable.PositionH.Value        = X;
+
+				oTargetTable.PositionV.RelativeFrom = c_oAscVAnchor.Page;
+				oTargetTable.PositionV.Align        = false;
+				oTargetTable.PositionV.Value        = Y;
+
+				oTargetTable.PageNum = PageNum;
+
+				editor.WordControl.m_oLogicDocument.Recalculate();
+				oTargetTable.Start_TrackTable();
             }
         }
         else
@@ -2762,13 +2760,12 @@ CTable.prototype =
 
                     editor.WordControl.m_oLogicDocument.Recalculate();
                 }
-
-                this.Start_TrackTable();
+				oTargetTable.Start_TrackTable();
             }
         }
         editor.WordControl.m_oLogicDocument.Selection_Remove();
-        this.Document_SetThisElementCurrent(true);
-        this.Cursor_MoveToStartPos();
+		oTargetTable.Document_SetThisElementCurrent(true);
+		oTargetTable.Cursor_MoveToStartPos();
         editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
     },
 

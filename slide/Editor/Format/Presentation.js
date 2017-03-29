@@ -816,7 +816,7 @@ CPresentation.prototype =
         }
 
         var bHaveChanges = History.Have_Changes(true);
-        if (true !== bHaveChanges && true === AscCommon.CollaborativeEditing.Have_OtherChanges() || 0 !== AscCommon.CollaborativeEditing.getOwnLocksLength())
+        if (true !== bHaveChanges && (true === AscCommon.CollaborativeEditing.Have_OtherChanges() || 0 !== AscCommon.CollaborativeEditing.getOwnLocksLength()))
         {
             // Принимаем чужие изменение. Своих нет, но функцию отсылки надо вызвать, чтобы снялить локи.
             AscCommon.CollaborativeEditing.Apply_Changes();
@@ -1891,16 +1891,16 @@ CPresentation.prototype =
         return true;
     },
 
-    Cursor_MoveUp : function(AddToSelect)
+    Cursor_MoveUp : function(AddToSelect, CtrlKey)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveUp(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveUp(AddToSelect, CtrlKey);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveDown : function(AddToSelect)
+    Cursor_MoveDown : function(AddToSelect, CtrlKey)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveDown(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveDown(AddToSelect, CtrlKey);
         this.Document_UpdateInterfaceState();
         return true;
     },
@@ -2701,7 +2701,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 38 ) // Top Arrow
         {
-            this.Cursor_MoveUp( true === e.ShiftKey );
+            this.Cursor_MoveUp( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 39 ) // Right Arrow
@@ -2719,7 +2719,7 @@ CPresentation.prototype =
             //if ( true != e.ShiftKey )
             //    this.DrawingDocument.TargetStart();
 
-            this.Cursor_MoveDown( true === e.ShiftKey );
+            this.Cursor_MoveDown( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 46 && false === editor.isViewMode ) // Delete
@@ -3490,6 +3490,9 @@ CPresentation.prototype =
     Document_Get_AllFontNames : function()
     {
         var AllFonts = {}, i;
+        if(this.defaultTextStyle && this.defaultTextStyle.Document_Get_AllFontNames){
+            this.defaultTextStyle.Document_Get_AllFontNames(AllFonts);
+        }
         for(i =0 ; i < this.Slides.length; ++i)
         {
             this.Slides[i].getAllFonts(AllFonts)

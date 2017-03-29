@@ -1063,6 +1063,10 @@ CDLbl.prototype =
         return AscDFH.historyitem_type_DLbl;
     },
 
+    Check_AutoFit: function(){
+        return true;
+    },
+
     createDuplicate: function()
     {
 
@@ -8475,6 +8479,9 @@ CLineSeries.prototype =
             if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && this.spPr.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
                 this.spPr.setFill(null);
             }
+            if(this.spPr && this.spPr.ln && this.spPr.ln && this.spPr.ln.Fill && this.spPr.ln.Fill.fill && this.spPr.ln.Fill.fill.type ===  window['Asc'].c_oAscFill.FILL_TYPE_NOFILL){
+                this.spPr.setLn(null);
+            }
         }
         if(other.trendline)
             this.setTrendline(other.trendline);
@@ -12309,6 +12316,11 @@ CTitle.prototype =
             return this.chart.Is_UseInDocument();
         }
         return false;
+    },
+
+
+    Check_AutoFit: function(){
+        return true;
     },
     getBodyPr: CDLbl.prototype.getBodyPr,
 

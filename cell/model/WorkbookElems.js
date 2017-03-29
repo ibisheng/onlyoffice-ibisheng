@@ -671,7 +671,7 @@ var g_oFontProperties = {
 		return val ? this.i = true : this.i = null;
 	};
 	Font.prototype.getUnderline = function () {
-		return this.u || Asc.EUnderline.underlineNone;
+		return null != this.u ? this.u : Asc.EUnderline.underlineNone;
 	};
 	Font.prototype.setUnderline = function(val) {
 		return (null != val && Asc.EUnderline.underlineNone != val) ? this.u = val : this.u = null;
@@ -689,7 +689,7 @@ var g_oFontProperties = {
 		return this.c = val;
 	};
 	Font.prototype.getVerticalAlign = function () {
-		return this.va || AscCommon.vertalign_Baseline;
+		return null != this.va ? this.va : AscCommon.vertalign_Baseline;
 	};
 	Font.prototype.setVerticalAlign = function(val) {
 		return (null != val && AscCommon.vertalign_Baseline != val) ? this.va = val : this.va = null;
@@ -2356,7 +2356,7 @@ Hyperlink.prototype = {
 		this.Location = Location;
 		this.LocationSheet = this.LocationRange = null;
 
-		if (null != this.Location) {
+		if (null !== this.Location) {
 			var result = parserHelp.parse3DRef(this.Location);
 			if (null !== result) {
 				this.LocationSheet = result.sheet;
@@ -3217,11 +3217,13 @@ CCellValue.prototype =
 		var bNeedMeasure = true;
 		var sText = null;
 		var aText = null;
+		var isMultyText = false;
 		if (CellValueType.Number == this.type || CellValueType.String == this.type) {
 			if (null != this.text) {
 				sText = this.text;
 			} else if (null != this.multiText) {
 				aText = this.multiText;
+				isMultyText = true;
 			}
 
 			if (CellValueType.String == this.type) {
@@ -3242,16 +3244,19 @@ CCellValue.prototype =
 			if (false == oNumFormat.isGeneralFormat()) {
 				if (null != this.number) {
 					aText = oNumFormat.format(this.number, this.type, dDigitsCount, false, opt_cultureInfo);
+					isMultyText = false;
 					sText = null;
 				} else if (CellValueType.String == this.type) {
 					var oTextFormat = oNumFormat.getTextFormat();
 					if (null != oTextFormat && "@" != oTextFormat.formatString) {
 						if (null != this.text) {
 							aText = oNumFormat.format(this.text, this.type, dDigitsCount, false, opt_cultureInfo);
+							isMultyText = false;
 							sText = null;
 						} else if (null != this.multiText) {
 							var sSimpleString = this.getStringFromMultiText();
 							aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, false, opt_cultureInfo);
+							isMultyText = false;
 							sText = null;
 						}
 					}
@@ -3271,11 +3276,12 @@ CCellValue.prototype =
 
 					if (null != oNumFormat) {
 						sText = null;
+						isMultyText = false;
 						aText = oNumFormat.format(sOriginText, this.type, dDigitsCount, false, opt_cultureInfo);
 						if (true == oNumFormat.isTextFormat()) {
 							break;
 						} else {
-							aRes = this._getValue2Result(cell, sText, aText);
+							aRes = this._getValue2Result(cell, sText, aText, isMultyText);
 							//Проверяем влезает ли текст
 							if (true == fIsFitMeasurer(aRes)) {
 								bFindResult = true;
@@ -3289,6 +3295,7 @@ CCellValue.prototype =
 				if (false == bFindResult) {
 					aRes = null;
 					sText = null;
+					isMultyText = false;
 					var font = new AscCommonExcel.Font();
 					if (dDigitsCount > 1) {
 						font.setRepeat(true);
@@ -3308,18 +3315,19 @@ CCellValue.prototype =
 			}
 		}
 		if (bNeedMeasure) {
-			aRes = this._getValue2Result(cell, sText, aText);
+			aRes = this._getValue2Result(cell, sText, aText, isMultyText);
 			//Проверяем влезает ли текст
 			if (false == fIsFitMeasurer(aRes)) {
 				aRes = null;
 				sText = null;
+				isMultyText = false;
 				var font = new AscCommonExcel.Font();
 				font.setRepeat(true);
 				aText = [{text: "#", format: font}];
 			}
 		}
 		if (null == aRes) {
-			aRes = this._getValue2Result(cell, sText, aText);
+			aRes = this._getValue2Result(cell, sText, aText, isMultyText);
 		}
 		return aRes;
 	},
@@ -3415,11 +3423,11 @@ CCellValue.prototype =
 				else if(null != oValueArray)
 					oValueArray = [{text:"'"}].concat(oValueArray);
 			}
-			this.textValueForEdit2 = this._getValue2Result(cell, oValueText, oValueArray);
+			this.textValueForEdit2 = this._getValue2Result(cell, oValueText, oValueArray, true);
 		}
 		return this.textValueForEdit2;
 	},
-	_getValue2Result : function(cell, sText, aText)
+	_getValue2Result : function(cell, sText, aText, isMultyText)
 	{
 		var aResult = [];
 		if(null == sText && null == aText)
@@ -3459,9 +3467,18 @@ CCellValue.prototype =
 				{
 					oNewItem.text = oCurtext.text;
 					var oCurFormat = new Font();
-					oCurFormat.assign(cellfont);
-					if(null != oCurtext.format)
-						oCurFormat.assignFromObject(oCurtext.format);
+					if (isMultyText) {
+						if (null != oCurtext.format) {
+							oCurFormat.assign(oCurtext.format);
+						} else {
+							oCurFormat.assign(cellfont);
+						}
+					} else {
+						oCurFormat.assign(cellfont);
+						if (null != oCurtext.format) {
+							oCurFormat.assignFromObject(oCurtext.format);
+						}
+					}
 					oNewItem.format = oCurFormat;
 					color = oNewItem.format.getColor();
 					if(color instanceof ThemeColor)
@@ -5799,6 +5816,16 @@ TablePart.prototype.addAutoFilter = function()
 	return autoFilter;
 };
 
+TablePart.prototype.isHeaderRow = function()
+{
+	return null === this.HeaderRowCount || this.HeaderRowCount > 0; 
+};
+
+TablePart.prototype.isTotalsRow = function()
+{
+	return this.TotalsRowCount > 0; 
+};
+
 
 /** @constructor */
 function AutoFilter() {
@@ -6160,8 +6187,8 @@ TableColumn.prototype.generateTotalsRowFunction = function(ws, tablePart){
 	//TODO добавить в перевод
 	if(null === this.TotalsRowFunction && null === this.TotalsRowLabel)
 	{	
-		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionCustom;
-		this.setTotalsRowFormula("SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])", ws);
+		this.TotalsRowFunction = Asc.ETotalsRowFunction.totalrowfunctionSum;
+		//this.setTotalsRowFormula("SUBTOTAL(109," + tablePart.DisplayName + "[" + this.Name + "])", ws);
 	}
 };
 
@@ -6386,8 +6413,13 @@ FilterColumn.prototype.createFilter = function(obj) {
 		case c_oAscAutoFilterTypes.Filters:
 		{
 			newFilter = new Filters();
-			this.Filters = newFilter;
 			allFilterOpenElements = newFilter.init(obj);
+			
+			if(!allFilterOpenElements)
+			{
+				this.Filters = newFilter;
+			}
+			
 			break;
 		}	
 	}	

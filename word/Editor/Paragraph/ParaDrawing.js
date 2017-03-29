@@ -223,6 +223,9 @@ ParaDrawing.prototype.CheckCorrect = function(){
 	if(!this.GraphicObj){
 		return false;
 	}
+	if(this.GraphicObj.parent !== this){
+		return false;
+	}
 	if(this.GraphicObj && this.GraphicObj.checkCorrect){
 		return this.GraphicObj.checkCorrect();
 	}
@@ -579,7 +582,7 @@ ParaDrawing.prototype.Set_GraphicObject = function(graphicObject)
 
 	History.Add(new CChangesParaDrawingGraphicObject(this, oldId, newId));
 
-	if (graphicObject.handleUpdateExtents)
+	if (graphicObject && graphicObject.handleUpdateExtents)
 		graphicObject.handleUpdateExtents();
 
 	this.GraphicObj = graphicObject;
@@ -1060,6 +1063,7 @@ ParaDrawing.prototype.Copy = function()
 	{
 		c.setEffectExtent(EE.L, EE.T, EE.R, EE.B);
 	}
+	c.docPr.setFromOther(this.docPr);
 	if (this.ParaMath)
 		c.Set_ParaMath(this.ParaMath.Copy());
 	return c;
@@ -1270,7 +1274,9 @@ ParaDrawing.prototype.Set_XYForAdd = function(X, Y, NearPos, PageNum)
 		{
 			nRecalcIndex = oLogicDocument.Get_History().GetRecalculateIndex();
 			this.SetSkipOnRecalculate(true);
-			oLogicDocument.Recalculate();
+            oLogicDocument.TurnOff_InterfaceEvents();
+            oLogicDocument.Recalculate();
+            oLogicDocument.TurnOn_InterfaceEvents(false)
 			this.SetSkipOnRecalculate(false);
 		}
 
@@ -1324,9 +1330,9 @@ ParaDrawing.prototype.private_SetXYByLayout = function(X, Y, PageNum, Layout, bC
 	var _W = (this.PositionH.Align ? this.Extent.W : this.getXfrmExtX() );
 	var _H = (this.PositionV.Align ? this.Extent.H : this.getXfrmExtY() );
 
-	this.Internal_Position.Set(_W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimits);
-	this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimits.X, false);
-	this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimits.Y, false);
+	this.Internal_Position.Set(_W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimitsOrigin);
+	this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimitsOrigin.X, false);
+	this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimitsOrigin.Y, false);
 	this.Internal_Position.Correct_Values(false, Layout.PageLimits, this.AllowOverlap, this.Use_TextWrap(), []);
 
 	if (true === bChangeX)

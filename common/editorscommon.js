@@ -416,6 +416,9 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
 			case c_oAscServerError.UploadCountFiles :
 				nRes = Asc.c_oAscError.ID.UplImageFileCount;
 				break;
+			case c_oAscServerError.UploadURL :
+				nRes = Asc.c_oAscError.ID.UplImageUrl;
+				break;
 			case c_oAscServerError.VKey :
 				nRes = Asc.c_oAscError.ID.FileVKey;
 				break;
@@ -717,7 +720,7 @@ function build_rx_table_local(local){
 	rx_table_local = build_rx_table(local);
 }
 function build_rx_table(local) {
-	cStrucTableLocalColumns = ( local ? local : {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"} );
+	cStrucTableLocalColumns = ( local ? local : {"h": "Headers", "d": "Data", "a": "All", "tr": "This Row", "t": "Totals"} );
 	return build_rx_table_cur();
 }
 function build_rx_table_cur(){
@@ -733,7 +736,7 @@ function build_rx_table_cur(){
 
 	return XRegExp.build( '^(?<tableName>{{tableName}})\\[(?<columnName>{{columnName}})?\\]', {
         "tableName" : new XRegExp( "^(:?[" + str_namedRanges + "][" + str_namedRanges + "\\d.]*)" ),
-        "columnName": XRegExp.build( '(?<oneColumn>{{userColumn}})|(?<columnRange>{{userColumnRange}})|(?<hdtcc>{{hdtcc}})', {
+		"columnName": XRegExp.build( '(?<reservedColumn>{{reservedColumn}})|(?<oneColumn>{{userColumn}})|(?<columnRange>{{userColumnRange}})|(?<hdtcc>{{hdtcc}})', {
             "userColumn"     : structured_tables_userColumn,
             "reservedColumn" : structured_tables_reservedColumn,
             "userColumnRange": XRegExp.build( '\\[(?<colStart>{{uc}})\\]\\:\\[(?<colEnd>{{uc}})\\]', {
@@ -837,6 +840,7 @@ var c_oAscServerError = {
     UploadContentLength:-101,
     UploadExtension:-102,
     UploadCountFiles:-103,
+	UploadURL:-104,
 
     VKey:-120,
     VKeyEncrypt:-121,
@@ -861,10 +865,14 @@ function GetFileExtension (sName) {
 		return sName.substring(nIndex + 1).toLowerCase();
 	return null;
 }
-function changeFileExtention (sName, sNewExt) {
+function changeFileExtention (sName, sNewExt, opt_lengthLimit) {
   var sOldExt = GetFileExtension(sName);
-  if(sOldExt) {
-    return sName.substring(0, sName.length - sOldExt.length) + sNewExt;
+  var nIndexEnd = sOldExt ? sName.length - sOldExt.length - 1 : sName.length;
+  if (opt_lengthLimit && nIndexEnd + sNewExt.length + 1 > opt_lengthLimit) {
+	  nIndexEnd = opt_lengthLimit - sNewExt.length - 1;
+  }
+  if(nIndexEnd < sName.length) {
+    return sName.substring(0, nIndexEnd) + '.' + sNewExt;
   } else {
     return sName + '.' + sNewExt;
   }

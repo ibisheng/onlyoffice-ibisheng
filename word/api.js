@@ -1886,6 +1886,10 @@ background-repeat: no-repeat;\
 				{
 					window["AscDesktopEditor"]["OnSave"]();
 				}
+				if (t.disconnectOnSave) {
+					t.CoAuthoringApi.disconnect(t.disconnectOnSave.code, t.disconnectOnSave.reason);
+					t.disconnectOnSave = null;
+				}
 			};
 
 			var CursorInfo = null;
@@ -1967,10 +1971,14 @@ background-repeat: no-repeat;\
 			}
 		}
 	};
+	asc_docs_api.prototype.saveCheck = function() {
+		return true === this.canSave && !this.isLongAction();
+	}
 	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest)
 	{
+		var res = false;
 		this.IsUserSave = !isAutoSave;
-		if (true === this.canSave && !this.isLongAction())
+		if (this.saveCheck())
 		{
 			if (this.asc_isDocumentCanSave() || History.Have_Changes() ||
 				AscCommon.CollaborativeEditing.Have_OtherChanges() || true === isUndoRequest || this.canUnlockDocument)
@@ -1982,12 +1990,14 @@ background-repeat: no-repeat;\
 				{
 					t.onSaveCallback(e, isUndoRequest);
 				});
+				res = true;
 			}
 			else if (this.isForceSaveOnUserSave && this.IsUserSave)
 			{
 				this.forceSave();
 			}
 		}
+		return res;
 	};
 	asc_docs_api.prototype.asc_DownloadOrigin = function(bIsDownloadEvent)
 	{
@@ -3615,11 +3625,20 @@ background-repeat: no-repeat;\
 	{
 		this.WordControl.m_oLogicDocument.GotoFootnote(isNext);
 	};
+	asc_docs_api.prototype.asc_IsCursorInFootnote = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (oLogicDocument && true === oLogicDocument.IsCursorInFootnote())
+			return true;
+
+		return false;
+	};
 	asc_docs_api.prototype["asc_AddFootnote"]        = asc_docs_api.prototype.asc_AddFootnote;
 	asc_docs_api.prototype["asc_RemoveAllFootnotes"] = asc_docs_api.prototype.asc_RemoveAllFootnotes;
 	asc_docs_api.prototype["asc_GetFootnoteProps"]   = asc_docs_api.prototype.asc_GetFootnoteProps;
 	asc_docs_api.prototype["asc_SetFootnoteProps"]   = asc_docs_api.prototype.asc_SetFootnoteProps;
 	asc_docs_api.prototype["asc_GotoFootnote"]       = asc_docs_api.prototype.asc_GotoFootnote;
+	asc_docs_api.prototype["asc_IsCursorInFootnote"] = asc_docs_api.prototype.asc_IsCursorInFootnote;
 
 	asc_docs_api.prototype.put_AddPageBreak              = function()
 	{
@@ -6498,7 +6517,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["userid"]       = this.documentUserId;
 		oAdditionalData["jwt"]         = this.CoAuthoringApi.get_jwt();
 		oAdditionalData["outputformat"] = filetype;
-		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
+		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
 		if ('savefromorigin' === command)
 		{

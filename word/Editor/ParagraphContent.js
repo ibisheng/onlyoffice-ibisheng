@@ -219,6 +219,10 @@ CRunElementBase.prototype.Write_ToBinary   = function(Writer)
 CRunElementBase.prototype.Read_FromBinary  = function(Reader)
 {
 };
+CRunElementBase.prototype.GetType = function()
+{
+	return this.Type;
+};
 
 // Класс ParaText
 function ParaText(value)
@@ -1105,6 +1109,19 @@ ParaNewLine.prototype =
         return false;
     }
 };
+ParaNewLine.prototype.IsPageOrColumnBreak = function()
+{
+	return (break_Page === this.BreakType || break_Column === this.BreakType);
+};
+ParaNewLine.prototype.IsPageBreak = function()
+{
+	return (break_Page === this.BreakType);
+};
+ParaNewLine.prototype.IsColumnBreak = function()
+{
+	return (break_Column === this.BreakType);
+};
+
 
 // Класс ParaNumbering
 function ParaNumbering()
@@ -1424,6 +1441,18 @@ ParaPageNum.prototype =
     Read_FromBinary : function(Reader)
     {
     }
+};
+ParaPageNum.prototype.GetPageNumValue = function()
+{
+	var nPageNum = parseInt(this.String);
+	if (isNaN(nPageNum))
+		return 1;
+
+	return nPageNum;
+};
+ParaPageNum.prototype.GetType = function()
+{
+	return this.Type;
 };
 
 function CPageNumRecalculateObject(Type, Widths, String, Width, Copy)
@@ -1941,6 +1970,10 @@ ParaPageCount.prototype.Write_ToBinary = function(Writer)
 ParaPageCount.prototype.Read_FromBinary = function(Reader)
 {
 	this.PageCount = Reader.GetLong();
+};
+ParaPageCount.prototype.GetPageCountValue = function()
+{
+	return this.PageCount;
 };
 
 function ParagraphContent_Read_FromBinary(Reader)

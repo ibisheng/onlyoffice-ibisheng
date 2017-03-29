@@ -3612,6 +3612,13 @@ CDocument.prototype.DrawPage                                 = function(nPageInd
 {
     this.Draw(nPageIndex, pGraphics);
 };
+CDocument.prototype.CanDrawPage = function(nPageAbs)
+{
+	if (null !== this.FullRecalc.Id && nPageAbs >= this.FullRecalc.PageIndex - 1)
+		return false;
+
+	return true;
+};
 /**
  * Перерисовка заданной страницы документа.
  * @param nPageIndex
@@ -4351,7 +4358,7 @@ CDocument.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
 	this.Document_UpdateSelectionState();
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.Cursor_MoveUp = function(AddToSelect)
+CDocument.prototype.Cursor_MoveUp = function(AddToSelect, CtrlKey)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4359,9 +4366,9 @@ CDocument.prototype.Cursor_MoveUp = function(AddToSelect)
 	if (true === this.IsFillingFormMode())
 		this.MoveToFillingForm(false);
 	else
-		this.Controller.MoveCursorUp(AddToSelect);
+		this.Controller.MoveCursorUp(AddToSelect, CtrlKey);
 };
-CDocument.prototype.Cursor_MoveDown = function(AddToSelect)
+CDocument.prototype.Cursor_MoveDown = function(AddToSelect, CtrlKey)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4369,7 +4376,7 @@ CDocument.prototype.Cursor_MoveDown = function(AddToSelect)
 	if (true === this.IsFillingFormMode())
 		this.MoveToFillingForm(true);
 	else
-		this.Controller.MoveCursorDown(AddToSelect);
+		this.Controller.MoveCursorDown(AddToSelect, CtrlKey);
 };
 CDocument.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
 {
@@ -6306,7 +6313,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         else if (docpostype_HdrFtr == this.CurPos.Type)
         {
-            this.Document_End_HdrFtrEditing();
+            this.EndHdrFtrEditing(true);
         }
 		
 		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
@@ -6627,7 +6634,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Cursor_MoveUp(true === e.ShiftKey);
+        this.Cursor_MoveUp(true === e.ShiftKey, true === e.CtrlKey);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 39) // Right Arrow
@@ -6648,7 +6655,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Cursor_MoveDown(true === e.ShiftKey);
+        this.Cursor_MoveDown(true === e.ShiftKey, true === e.CtrlKey);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 46 && false === editor.isViewMode) // Delete
@@ -7875,13 +7882,13 @@ CDocument.prototype.Document_Format_Copy = function()
 	this.CopyTextPr = this.Get_Paragraph_TextPr_Copy();
 	this.CopyParaPr = this.Get_Paragraph_ParaPr_Copy();
 };
-CDocument.prototype.Document_End_HdrFtrEditing = function()
+CDocument.prototype.EndHdrFtrEditing = function(bCanStayOnPage)
 {
 	if (docpostype_HdrFtr === this.Get_DocPosType())
 	{
 		this.Set_DocPosType(docpostype_Content);
 		var CurHdrFtr = this.HdrFtr.Get_CurHdrFtr();
-		if (null === CurHdrFtr || undefined === CurHdrFtr)
+		if (null === CurHdrFtr || undefined === CurHdrFtr || true !== bCanStayOnPage)
 		{
 			this.Cursor_MoveToStartPos(false);
 		}
@@ -7892,7 +7899,7 @@ CDocument.prototype.Document_End_HdrFtrEditing = function()
 			if (hdrftr_Header == CurHdrFtr.Type)
 				this.Cursor_MoveAt(0, 0, false);
 			else
-				this.Cursor_MoveAt(0, 100000, false); // TODO: Переделать здесь по нормальному
+				this.Cursor_MoveAt(0, 100000, false); // TODO: Переделать здесь по-нормальному
 		}
 
 		this.DrawingDocument.ClearCachePages();
@@ -10053,7 +10060,7 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
 		return;
 
 	var HaveChanges = this.History.Have_Changes(true);
-	if (true !== HaveChanges && true === this.CollaborativeEditing.Have_OtherChanges() || 0 !== this.CollaborativeEditing.getOwnLocksLength())
+	if (true !== HaveChanges && (true === this.CollaborativeEditing.Have_OtherChanges() || 0 !== this.CollaborativeEditing.getOwnLocksLength()))
 	{
 		// Принимаем чужие изменения. Своих нет, но функцию отсылки надо вызвать, чтобы снять локи.
 		this.CollaborativeEditing.Apply_Changes();
@@ -11310,7 +11317,7 @@ CDocument.prototype.GotoFootnote = function(isNext)
 
 	if (docpostype_HdrFtr == this.CurPos.Type)
 	{
-		this.Document_End_HdrFtrEditing();
+		this.EndHdrFtrEditing(true);
 	}
 	else if (docpostype_DrawingObjects === nDocPosType)
 	{
@@ -11385,6 +11392,10 @@ CDocument.prototype.GetFootnotePr = function()
 	oFootnotePr.put_NumRestart(oSectPr.GetFootnoteNumRestart());
 	oFootnotePr.put_NumFormat(oSectPr.GetFootnoteNumFormat());
 	return oFootnotePr;
+};
+CDocument.prototype.IsCursorInFootnote = function()
+{
+	return (docpostype_Footnotes === this.Get_DocPosType() ? true : false);
 };
 
 
@@ -11909,26 +11920,43 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 	var Item     = this.Content[this.CurPos.ContentPos];
 	var ItemType = Item.GetType();
 
-	if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
+	if (para_NewLine === ParaItem.Type && true === ParaItem.IsPageOrColumnBreak())
 	{
 		if (type_Paragraph === ItemType)
 		{
 			if (true === Item.Cursor_IsStart())
 			{
-				this.Add_NewParagraph(undefined, true);
-				var CurPos = this.CurPos.ContentPos - 1;
-				this.Content[CurPos].Cursor_MoveToStartPos();
-				this.Content[CurPos].Add(ParaItem);
-				this.Content[CurPos].Clear_Formatting();
+				if (ParaItem.IsColumnBreak())
+				{
+					this.Content[this.CurPos.ContentPos].Add(ParaItem);
+				}
+				else
+				{
+					this.Add_NewParagraph(undefined, true);
+					var CurPos = this.CurPos.ContentPos - 1;
+					this.Content[CurPos].Cursor_MoveToStartPos();
+					this.Content[CurPos].Add(ParaItem);
+					this.Content[CurPos].Clear_Formatting();
+				}
 			}
 			else
 			{
-				this.Add_NewParagraph(undefined, true);
-				this.Add_NewParagraph(undefined, true);
-				var CurPos = this.CurPos.ContentPos - 1;
-				this.Content[CurPos].Cursor_MoveToStartPos();
-				this.Content[CurPos].Add(ParaItem);
-				this.Content[CurPos].Clear_Formatting();
+				if (ParaItem.IsColumnBreak())
+				{
+					this.Add_NewParagraph(undefined, true);
+					var CurPos = this.CurPos.ContentPos;
+					this.Content[CurPos].Cursor_MoveToStartPos();
+					this.Content[CurPos].Add(ParaItem);
+				}
+				else
+				{
+					this.Add_NewParagraph(undefined, true);
+					this.Add_NewParagraph(undefined, true);
+					var CurPos = this.CurPos.ContentPos - 1;
+					this.Content[CurPos].Cursor_MoveToStartPos();
+					this.Content[CurPos].Add(ParaItem);
+					this.Content[CurPos].Clear_Formatting();
+				}
 			}
 
 			if (false != bRecalculate)

@@ -1237,7 +1237,7 @@
 						var curNodesElemX = curNodes[curCellX];
 						for (var id in curNodesElemX) {
 							var elem = curNodesElemX[id];
-							if (!elem.dataWrap.isOutput) {
+							if (!elem.dataWrap.isOutput && elem.dataWrap.bbox.r1 <= curCellY) {
 								elem.dataWrap.isOutput = true;
 								res.push(elem.dataWrap);
 								for (var i = elem.dataWrap.bbox.c1; i <= elem.dataWrap.bbox.c2; ++i) {
@@ -2662,7 +2662,7 @@
 				this.sheetViews[j].pane = null;
 			}
 		}
-		this.setTableFormulaAfterOpen();
+		//this.setTableFormulaAfterOpen();
 		this._updateConditionalFormatting(null);
 
 		this.handlers = handlers;
@@ -5443,7 +5443,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			}
 		}
 	};
-Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
+	Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 		if(null != action)
 		{
 			var oBBox = this.bbox, minC = Math.min( this.worksheet.getColsCount(), oBBox.c2 ), minR = Math.min( this.worksheet.getRowsCount(), oBBox.r2 );
@@ -5810,6 +5810,15 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 			cell.setValue2(array);
 			// if(cell.isEmpty())
 			// cell.Remove();
+		});
+		History.EndTransaction();
+	};
+	Range.prototype.setValueData = function(val){
+		History.Create_NewPoint();
+		History.StartTransaction();
+		
+		this._foreach(function(cell){
+			cell.setValueData(val);
 		});
 		History.EndTransaction();
 	};
@@ -6534,6 +6543,13 @@ Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
 			oTempCell.create(xfs, this.bbox.r1, this.bbox.c1);
 			return oTempCell.getValue2(dDigitsCount, fIsFitMeasurer);
 		}
+	};
+	Range.prototype.getValueData=function(){
+		var res = null;
+		var cell = this.worksheet._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
+		if(null != cell)
+			res = cell.getValueData();
+		return res;
 	};
 	Range.prototype.getXfId=function(){
 		var nRow = this.bbox.r1;

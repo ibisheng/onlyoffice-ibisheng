@@ -117,7 +117,7 @@
 		this.TextArea_Not_ContentEditableDiv = true;//AscCommon.AscBrowser.isIeEdge ? false : true;
 		this.HtmlArea = null;
 
-		this.HtmlAreaOffset = 40;
+		this.HtmlAreaOffset = 50; // height in pix
 
 		this.LockerTargetTimer = -1;
 

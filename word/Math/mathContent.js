@@ -1765,6 +1765,11 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
 		if (isEmptyContent)
 			this.SetPlaceholder();
 	}
+
+	if (this.CurPos >= this.Content.length)
+		this.CurPos = this.Content.length - 1;
+    if (this.CurPos < 0)
+    	this.CurPos = 0;
 };
 CMathContent.prototype.Correct_ContentPos = function(nDirection)
 {

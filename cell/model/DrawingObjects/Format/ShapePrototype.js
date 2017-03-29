@@ -167,7 +167,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     if(!worksheet)
         return;
     var ret, aObjects = worksheet.Drawings;
-    if (AscFormat.isRealNumber(position)) {
+    if (AscFormat.isRealNumber(position) && position > -1 && position <= aObjects.length) {
         aObjects.splice(position, 0, drawingObject);
         ret = position;
     }

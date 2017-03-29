@@ -1370,65 +1370,69 @@ CDocumentContent.prototype.RecalculateCurPos              = function()
 
     return null;
 };
-CDocumentContent.prototype.Get_PageBounds                 = function(PageNum, Height, bForceCheckDrawings)
+CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceCheckDrawings)
 {
-    if (this.Pages.length <= 0)
-        return {Top : 0, Left : 0, Right : 0, Bottom : 0};
+	if (this.Pages.length <= 0)
+		return {Top : 0, Left : 0, Right : 0, Bottom : 0};
 
-    if (PageNum < 0 || PageNum > this.Pages.length)
-        return this.Pages[0].Bounds;
+	if (CurPage < 0)
+		CurPage = 0;
 
-    var Bounds     = this.Pages[PageNum].Bounds;
-    var PageNumAbs = PageNum + this.Get_StartPage_Absolute();
+	if (CurPage >= this.Pages.length)
+		CurPage = this.Pages.length - 1;
 
-    // В колонтитуле не учитывается.
-    if (true != this.Is_HdrFtr(false) || true === bForceCheckDrawings)
-    {
-        // Учитываем все Drawing-объекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в
-        // случае, когда начальная точка (левый верхний угол) попадает в this.Y + Height
+	var Bounds  = this.Pages[CurPage].Bounds;
+	var PageAbs = this.Get_AbsolutePage(CurPage);
 
-        var AllDrawingObjects = this.Get_AllDrawingObjects();
-        var Count             = AllDrawingObjects.length;
-        for (var Index = 0; Index < Count; Index++)
-        {
-            var Obj = AllDrawingObjects[Index];
-            if (PageNumAbs === Obj.Get_PageNum())
-            {
-                var ObjBounds = Obj.Get_Bounds();
-                if (true === Obj.Use_TextWrap())
-                {
-                    if (ObjBounds.Bottom > Bounds.Bottom)
-                        Bounds.Bottom = ObjBounds.Bottom;
-                }
-                else if (undefined !== Height && ObjBounds.Top < this.Y + Height)
-                {
-                    if (ObjBounds.Bottom >= this.Y + Height)
-                        Bounds.Bottom = this.Y + Height;
-                    else if (ObjBounds.Bottom > Bounds.Bottom)
-                        Bounds.Bottom = ObjBounds.Bottom;
-                }
-            }
-        }
+	// В колонтитуле не учитывается.
+	if (true != this.Is_HdrFtr(false) || true === bForceCheckDrawings)
+	{
+		// Учитываем все Drawing-объекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в
+		// случае, когда начальная точка (левый верхний угол) попадает в this.Y + Height
 
-        // Кроме этого пробежимся по всем Flow-таблицам и учтем их границы
-        var Count = this.Content.length;
-        for (var Index = 0; Index < Count; Index++)
-        {
-            var Element = this.Content[Index];
-            if (type_Table === Element.GetType() && true != Element.Is_Inline() && Element.Pages.length > PageNum - Element.PageNum && PageNum - Element.PageNum >= 0)
-            {
-                var TableBounds = Element.Get_PageBounds(PageNum - Element.PageNum);
-                if (TableBounds.Bottom > Bounds.Bottom)
-                    Bounds.Bottom = TableBounds.Bottom;
-            }
-        }
-    }
+		var AllDrawingObjects = this.Get_AllDrawingObjects();
+		var Count             = AllDrawingObjects.length;
+		for (var Index = 0; Index < Count; Index++)
+		{
+			var Obj = AllDrawingObjects[Index];
+			if (PageAbs === Obj.Get_PageNum())
+			{
+				var ObjBounds = Obj.Get_Bounds();
+				if (true === Obj.Use_TextWrap())
+				{
+					if (ObjBounds.Bottom > Bounds.Bottom)
+						Bounds.Bottom = ObjBounds.Bottom;
+				}
+				else if (undefined !== Height && ObjBounds.Top < this.Y + Height)
+				{
+					if (ObjBounds.Bottom >= this.Y + Height)
+						Bounds.Bottom = this.Y + Height;
+					else if (ObjBounds.Bottom > Bounds.Bottom)
+						Bounds.Bottom = ObjBounds.Bottom;
+				}
+			}
+		}
 
-    return Bounds;
+		// Кроме этого пробежимся по всем Flow-таблицам и учтем их границы
+		var Count = this.Content.length;
+		for (var Index = 0; Index < Count; Index++)
+		{
+			var Element          = this.Content[Index];
+			var ElementPageIndex = this.private_GetElementPageIndex(Index, CurPage, 0, 1);
+			if (type_Table === Element.GetType() && true != Element.Is_Inline() && 0 <= ElementPageIndex && ElementPageIndex < Element.Get_PagesCount())
+			{
+				var TableBounds = Element.Get_PageBounds(ElementPageIndex);
+				if (TableBounds.Bottom > Bounds.Bottom)
+					Bounds.Bottom = TableBounds.Bottom;
+			}
+		}
+	}
+
+	return Bounds;
 };
-CDocumentContent.prototype.Get_PagesCount                 = function()
+CDocumentContent.prototype.Get_PagesCount = function()
 {
-    return this.Pages.length;
+	return this.Pages.length;
 };
 CDocumentContent.prototype.Get_SummaryHeight              = function()
 {

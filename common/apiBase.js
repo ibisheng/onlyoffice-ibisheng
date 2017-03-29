@@ -143,6 +143,7 @@
         this.forceSaveButtonTimeout = null;
         this.forceSaveButtonContinue = false;
         this.forceSaveTimeoutTimeout = null;
+		this.disconnectOnSave = null;
 
 		// Version History
 		this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
@@ -207,6 +208,18 @@
 			t._onEndLoadSdk();
 			t.onEndLoadFile(null);
 		});
+
+		var oldOnError = window.onerror;
+		window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
+			var msg = 'Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber
+				+ ' Column: ' + column + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
+			t.CoAuthoringApi.sendChangesError(msg);
+			if (oldOnError) {
+				return oldOnError.apply(this, arguments);
+			} else {
+				return false;
+			}
+		}
 	};
 	baseEditorsApi.prototype._editorNameById                 = function()
 	{
@@ -636,23 +649,10 @@
 				extendSession = false;
 			}
 			if (!extendSession) {
-				if (AscCommon.History.Have_Changes()) {
+				if (t.asc_Save()) {
 					//enter view mode because save async
-					t.sendEvent('asc_onCoAuthoringDisconnect');
-					t.asc_setViewMode(true);
-
-					t.CoAuthoringApi.onUnSaveLock = function() {
-						t.CoAuthoringApi.onUnSaveLock = null;
-
-						t.CoAuthoringApi.disconnect(code, reason);
-					};
-					if (t.collaborativeEditing && t.collaborativeEditing.applyChanges) {
-						t.collaborativeEditing.applyChanges();
-						t.collaborativeEditing.sendChanges();
-					} else {
-						AscCommon.CollaborativeEditing.Apply_Changes();
-						AscCommon.CollaborativeEditing.Send_Changes();
-					}
+					t.setViewModeDisconnect();
+					t.disconnectOnSave = {code: code, reason: reason};
 				} else {
 					t.CoAuthoringApi.disconnect(code, reason);
 				}
@@ -733,10 +733,7 @@
 			}
 			if (null != errorCode)
 			{
-				// Посылаем наверх эвент об отключении от сервера
-				t.sendEvent('asc_onCoAuthoringDisconnect');
-				// И переходим в режим просмотра т.к. мы не можем сохранить файл
-				t.asc_setViewMode(true);
+				t.setViewModeDisconnect();
 				t.sendEvent('asc_onError', errorCode, c_oAscError.Level.NoCritical);
 			}
 		};
@@ -1323,12 +1320,28 @@
 		if (this.isEmbedVersion)
 			return 0;
 
+		if (!this.saveCheck())
+			return 0;
+
 		return new Date().getTime() - this.lastWorkTime;
 	};
 
 	baseEditorsApi.prototype.checkLastWork = function()
 	{
 		this.lastWorkTime = new Date().getTime();
+	};
+
+	baseEditorsApi.prototype.setViewModeDisconnect = function()
+	{
+		// Посылаем наверх эвент об отключении от сервера
+		this.sendEvent('asc_onCoAuthoringDisconnect');
+		// И переходим в режим просмотра т.к. мы не можем сохранить файл
+		this.asc_setViewMode(true);
+	};
+
+	baseEditorsApi.prototype.saveCheck = function()
+	{
+		return false;
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

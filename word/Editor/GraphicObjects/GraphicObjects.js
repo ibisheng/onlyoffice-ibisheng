@@ -1511,7 +1511,7 @@ CGraphicObjects.prototype =
                     drawing.GraphicObj.setParent(drawing);
                     drawing.CheckWH();
 					drawing.Set_ParaMath(selectedObjects[i].parent.ParaMath);
-
+                    drawing.docPr.setFromOther(selectedObjects[i].parent.docPr);
                     if(selectedObjects[i].parent.DrawingType === drawing_Anchor)
                     {
                         drawing.Set_Distance(selectedObjects[i].parent.Distance.L, selectedObjects[i].parent.Distance.T, selectedObjects[i].parent.Distance.R, selectedObjects[i].parent.Distance.B);
@@ -1522,8 +1522,19 @@ CGraphicObjects.prototype =
                         }
                         drawing.Set_BehindDoc(selectedObjects[i].parent.behindDoc);
                         drawing.Set_RelativeHeight(selectedObjects[i].parent.RelativeHeight);
-                        drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value + selectedObjects[i].bounds.x, selectedObjects[i].parent.PositionH.Percent);
-                        drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value + selectedObjects[i].bounds.y, selectedObjects[i].parent.PositionV.Percent);
+                        if(selectedObjects[i].parent.PositionH.Align){
+                            drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value, selectedObjects[i].parent.PositionH.Percent);
+                        }
+                        else{
+                            drawing.Set_PositionH(selectedObjects[i].parent.PositionH.RelativeFrom, selectedObjects[i].parent.PositionH.Align, selectedObjects[i].parent.PositionH.Value + selectedObjects[i].bounds.x, selectedObjects[i].parent.PositionH.Percent);
+                        }
+
+                        if(selectedObjects[i].parent.PositionV.Align){
+                            drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value, selectedObjects[i].parent.PositionV.Percent);
+                        }
+                        else{
+                            drawing.Set_PositionV(selectedObjects[i].parent.PositionV.RelativeFrom, selectedObjects[i].parent.PositionV.Align, selectedObjects[i].parent.PositionV.Value + selectedObjects[i].bounds.y, selectedObjects[i].parent.PositionV.Percent);
+                        }
                     }
                     run.Add_ToContent(run.State.ContentPos, drawing, true, false);
                     para.Internal_Content_Add(para.CurPos.ContentPos, run, true);
@@ -2530,6 +2541,7 @@ CGraphicObjects.prototype =
         for(i = 0; i < objects_for_grouping.length; ++i)
         {
             objects_for_grouping[i].parent.Remove_FromDocument(false);
+            objects_for_grouping[i].parent.Set_GraphicObject(null);//for Bug 34548
         }
         para_drawing.Set_XYForAdd( common_bounds.minX,  common_bounds.minY, nearest_pos, objects_for_grouping[0].parent.pageIndex);
         para_drawing.Set_Props(new asc_CImgProperty(
@@ -2582,6 +2594,8 @@ CGraphicObjects.prototype =
                 parent_paragraph = cur_group.parent.Get_ParentParagraph();
                 page_num = cur_group.selectStartPage;
                 cur_group.normalize();
+                cur_group.parent.Remove_FromDocument(false);
+                cur_group.setBDeleted(true);
                 sp_tree = cur_group.spTree;
                 for(j = 0; j < sp_tree.length; ++j)
                 {
@@ -2615,7 +2629,6 @@ CGraphicObjects.prototype =
                     a_objects.push({drawing: drawing, par: parent_paragraph, posX: xc - hc, posY: yc - vc});
                     this.selectObject(sp, page_num);
                 }
-                cur_group.parent.Remove_FromDocument(false);
             }
             for(i = 0; i < a_objects.length; ++i)
             {
@@ -2683,6 +2696,7 @@ CGraphicObjects.prototype =
     cursorMoveDown: DrawingObjectsController.prototype.cursorMoveDown,
 
     cursorMoveEndOfLine: DrawingObjectsController.prototype.cursorMoveEndOfLine,
+    getMoveDist: DrawingObjectsController.prototype.getMoveDist,
 
 
     cursorMoveStartOfLine: DrawingObjectsController.prototype.cursorMoveStartOfLine,

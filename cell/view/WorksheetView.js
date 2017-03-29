@@ -6242,7 +6242,9 @@
                             lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
                             // Пересчитываем X и Y относительно видимой области
                             lockRangePosLeft -= offsetX;
-                            lockRangePosTop -= offsetY;
+							lockRangePosTop -= offsetY;
+							lockRangePosLeft = this.cellsLeft > lockRangePosLeft ? this.cellsLeft : lockRangePosLeft;
+							lockRangePosTop = this.cellsTop > lockRangePosTop ? this.cellsTop : lockRangePosTop;
                             // Пересчитываем в px
                             lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
                             lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
@@ -7034,7 +7036,8 @@
         }
 
         cell_info.comments = this.cellCommentator.getComments(ar.c1, ar.r1);
-        cell_info.flags.merge = null !== range.hasMerged();
+		cell_info.flags.merge = range.isOneCell() ? Asc.c_oAscMergeOptions.Disabled :
+			null !== range.hasMerged() ? Asc.c_oAscMergeOptions.Merge : Asc.c_oAscMergeOptions.None;
 
         var sheetId = this.model.getId();
 		var lockInfo;
@@ -7296,8 +7299,8 @@
         }
         var oRes = null;
         var type = range.type;
-        if (type == c_oAscSelectionType.RangeCells || type == c_oAscSelectionType.RangeCol ||
-          type == c_oAscSelectionType.RangeRow || type == c_oAscSelectionType.RangeMax) {
+        if (type === c_oAscSelectionType.RangeCells || type === c_oAscSelectionType.RangeCol ||
+          type === c_oAscSelectionType.RangeRow || type === c_oAscSelectionType.RangeMax) {
             this.cleanSelection();
             this.model.selectionRange.assign2(range);
 			this._fixSelectionOfMergedCells();
@@ -8603,7 +8606,7 @@
                                 range.merge(val);
                                 t.cellCommentator.mergeComments(range.getBBox0());
                                 break;
-                            case c_oAscMergeOptions.Unmerge:
+                            case c_oAscMergeOptions.None:
                                 range.unmerge();
                                 break;
                             case c_oAscMergeOptions.MergeAcross:
@@ -9663,8 +9666,18 @@
 				pastedRangeProps.alignVertical = newVal.getAlignVertical();
 				//horizontal align
 				pastedRangeProps.alignHorizontal = newVal.getAlignHorizontal();
+				
 				//borders
-				var fullBorders = newVal.getBorderFull();
+				var fullBorders;
+				if(specialPasteProps.transpose)
+				{
+					//TODO сделано для правильного отображения бордеров при транспонирования. возможно стоит использовать эту функцию во всех ситуациях. проверить!
+					fullBorders = newVal.getBorder(newVal.bbox.r1, newVal.bbox.c1).clone();
+				}
+				else
+				{
+					fullBorders = newVal.getBorderFull();
+				}
 				if (pastedRangeProps.offsetLast && pastedRangeProps.offsetLast.offsetCol > 0 && curMerge && fullBorders) {
 					//для мерженных ячеек, правая границу
 					var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
@@ -9673,6 +9686,7 @@
 						fullBorders.r = fullBordersEndMergeCell.r;
 					}
 				}
+				
 				pastedRangeProps.bordersFull = fullBorders;
 				//fill
 				pastedRangeProps.fill = newVal.getFill();
@@ -9813,7 +9827,21 @@
 			var skipFormat = null;
 			var noSkipVal = null;
 			
-			rangeStyle.val = newVal.getValue();
+			var cellValueData = newVal.getValueData();
+			if(cellValueData && cellValueData.value)
+			{
+				rangeStyle.cellValueData = cellValueData;
+			}
+			else if(cellValueData && cellValueData.formula && !specialPasteProps.formula)
+			{
+				cellValueData.formula = null;
+				rangeStyle.cellValueData = cellValueData;
+			}
+			else
+			{
+				rangeStyle.val = newVal.getValue();
+			}
+			
 			var value2 = newVal.getValue2();
 			for (var nF = 0; nF < value2.length; nF++) {
 				if (value2[nF] && value2[nF].sId) {
@@ -9886,7 +9914,7 @@
 
 					if (cellFrom && cellTo && cellFrom[0] && cellTo[0]) {
 						//cellTo[0].setValueData(cellFrom[0].getValueData());
-						rangeStyle.cellValueData = {valueData: cellFrom[0].getValueData(), cell: cellTo[0]};
+						rangeStyle.cellValueData2 = {valueData: cellFrom[0].getValueData(), cell: cellTo[0]};
 					}
 				}
 				
@@ -9983,9 +10011,9 @@
 		{
 			arrFormula.push(rangeStyle.formula);
 		}
-		else if(rangeStyle.cellValueData && specialPasteProps.font && specialPasteProps.val)
+		else if(rangeStyle.cellValueData2 && specialPasteProps.font && specialPasteProps.val)
 		{	
-			rangeStyle.cellValueData.cell.setValueData(rangeStyle.cellValueData.valueData);
+			rangeStyle.cellValueData2.cell.setValueData(rangeStyle.cellValueData2.valueData);
 		}
 		else if(rangeStyle.value2 && specialPasteProps.font && specialPasteProps.val)
 		{
@@ -9997,6 +10025,10 @@
 			{
 				range.setValue2(rangeStyle.value2);
 			}
+		}
+		else if(rangeStyle.cellValueData && specialPasteProps.val)
+		{
+			range.setValueData(rangeStyle.cellValueData);
 		}
 		else if(rangeStyle.val && specialPasteProps.val)
 		{
@@ -11236,33 +11268,32 @@
             this._isLockedCells(aReplaceCells[options.indexInArray], /*subType*/null, onReplaceCallback);
       };
 
-    WorksheetView.prototype.findCell = function (reference, isViewMode) {
-        var mc, ranges = AscCommonExcel.getRangeByRef(reference, this.model, true);
+	WorksheetView.prototype.findCell = function (reference, isViewMode) {
+		var mc, ranges = AscCommonExcel.getRangeByRef(reference, this.model, true);
 
-        if (0 === ranges.length && !isViewMode) {
+		if (0 === ranges.length && !isViewMode) {
             /*TODO: сделать поиск по названиям автофигур, должен искать до того как вызвать поиск по именованным диапазонам*/
-            if (this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger("getLockDefNameManagerStatus")) {
-                this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
-                    this._updateSelectionNameAndInfo();
-                    return true;
-                }
+			if (this.collaborativeEditing.getGlobalLock() || !this.handlers.trigger("getLockDefNameManagerStatus")) {
+				this.handlers.trigger("onErrorEvent", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
+				this._updateSelectionNameAndInfo();
+				return true;
+			}
 
-                // ToDo multiselect defined names
-                var selectionLast = this.model.selectionRange.getLast();
-                mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
-            var defName = this.model.workbook.editDefinesNames(null,
-                  new Asc.asc_CDefName(reference, parserHelp.get3DRef(this.model.getName(),
-                    (mc || selectionLast).getAbsName())));
+			// ToDo multiselect defined names
+			var selectionLast = this.model.selectionRange.getLast();
+			mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
+			var defName = this.model.workbook.editDefinesNames(null, new Asc.asc_CDefName(reference,
+				parserHelp.get3DRef(this.model.getName(), (mc || selectionLast).getAbsName())));
 
-            if (defName) {
-                this._isLockedDefNames(null, defName.getNodeId());
-            } else {
-                this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName,
-                    c_oAscError.Level.NoCritical);
-                    }
-                    }
-        return ranges;
-    };
+			if (defName) {
+				this._isLockedDefNames(null, defName.getNodeId());
+			} else {
+				this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName,
+					c_oAscError.Level.NoCritical);
+			}
+		}
+		return ranges;
+	};
 
     /* Ищет дополнение для ячейки */
     WorksheetView.prototype.getCellAutoCompleteValues = function (cell, maxCount) {
@@ -12587,7 +12618,7 @@
 						{
 							if(colId === sortCondition.Ref.c1 - range.c1)
 							{
-								isSortState = sortCondition.ConditionDescending;
+								isSortState = !!(sortCondition.ConditionDescending);
 							}
 						}
 
@@ -12627,11 +12658,10 @@
     };
 
 	WorksheetView.prototype.af_drawCurrentButton = function (x1, y1, props) {
+		//TODO пересмотреть масштабирование!!!
 		var isApplyAutoFilter = props.isSetFilter;
 		var isApplySortState = props.isSortState;
 
-		var ws = this;
-        var aWs = this.model;
         var t = this;
 
 		var width_1px = t.width_1px;
@@ -12640,51 +12670,69 @@
 		var width = 15 * height_1px;
         var m_oColor = new CColor(120, 120, 120);
 
-		var rowHeight = ws.rows[props.row].height;
-		var colWidth = ws.cols[props.col].width;
+		var rowHeight = t.rows[props.row].height;
+		var colWidth = t.cols[props.col].width;
 
 		var scaleIndex = 1;
+		var scaleFactor = t.drawingCtx.scaleFactor;
 
-		var _drawButtonBorder = function(startX, startY, width, height)
+		var _drawButtonFrame = function(startX, startY, width, height)
 		{
-			ws.drawingCtx
-              .setFillStyle(ws.settings.cells.defaultState.background)
-              .setLineWidth(1)
-              .setStrokeStyle(ws.settings.cells.defaultState.border)
-              .fillRect(startX, startY, width, height)
-              .strokeRect(startX, startY, width, height);
+			t.drawingCtx.setFillStyle(t.settings.cells.defaultState.background);
+			t.drawingCtx.setLineWidth(1);
+			t.drawingCtx.setStrokeStyle(t.settings.cells.defaultState.border);
+			t.drawingCtx.fillRect(startX, startY, width, height);
+			t.drawingCtx .strokeRect(startX, startY, width, height);
 		};
 
 		var _drawSortArrow = function(startX, startY, isDescending, heightArrow)
 		{
 			heightArrow = heightArrow * height_1px * scaleIndex;
-			var widthArrow = 3 * width_1px * scaleIndex;
-			var widthLine = 1 * width_1px * scaleIndex;
-			var heightEndArrow = 3 * height_1px * scaleIndex;
 
 			//isDescending = true - стрелочка смотрит вниз
 			//рисуем сверху вниз
-			var ctx = ws.drawingCtx;
+			var ctx = t.drawingCtx;
 			ctx.beginPath();
 			ctx.lineVer(startX, startY, startY + heightArrow);
-
+			
+			heightArrow = Math.round(heightArrow);
+			
 			if(isDescending)
 			{
-				ctx.moveTo(startX, startY + heightArrow);
-				ctx.lineTo(startX - (widthArrow - widthLine), startY + heightArrow - heightEndArrow);
-				ctx.moveTo(startX + widthArrow, startY + heightArrow - heightEndArrow);
-				ctx.lineTo(startX, startY + heightArrow);
-				//ctx.lineHor(startX - 2 * width_1px, startY + heightArrow - 1 * height_1px, startX  + 3 * width_1px);
+				var r = t.drawingCtx._calcRect(startX, startY);
+				var x = Math.round(r.x);
+				var y = Math.round(r.y);
+				
+				var heightArrow1 = Math.round(heightArrow * scaleFactor - 1);
+				var height = Math.round(3 * scaleIndex * scaleFactor);
+				var diffY = 0;
+				for(var i = 0; i < height; i++)
+				{
+					t.drawingCtx.ctx.moveTo(x - (i), y + 0.5 - (i) + heightArrow1 + height - 1);
+					t.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
+					
+					t.drawingCtx.ctx.moveTo(x + i, y + 0.5 - (i) + heightArrow1 + height - 1);
+					t.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
+				}
 			}
 			else
 			{
-				ctx.moveTo(startX, startY);
-				ctx.lineTo(startX - (widthArrow - widthLine), startY + heightEndArrow);
-				ctx.moveTo(startX + widthArrow, startY + heightEndArrow);
-				ctx.lineTo(startX, startY);
-				//ctx.lineHor(startX - widthLine, startY + 1 * height_1px * scaleIndex, startX - widthLine + widthArrow);
+				var r = t.drawingCtx._calcRect(startX, startY);
+				var x = Math.round(r.x);
+				var y = Math.round(r.y);
+				
+				var height = Math.round(3 * scaleIndex * scaleFactor);
+				var diffY = 0;
+				for(var i = 0; i < height; i++)
+				{
+					t.drawingCtx.ctx.moveTo(x - (i), y + 0.5 + (i) - diffY);
+					t.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 + (i) - diffY);
+					
+					t.drawingCtx.ctx.moveTo(x + i, y + 0.5 + (i) - diffY);
+					t.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 + (i) - diffY);
+				}
 			}
-
+			
 			ctx.setLineWidth(t.width_1px);
 			ctx.setStrokeStyle(m_oColor);
 			ctx.stroke();
@@ -12692,60 +12740,63 @@
 
         var _drawFilterMark = function (x, y, height)
 		{
-            var size = 5.25 * scaleIndex;
-            var halfSize = Math.round((size / 2) / height_1px) * height_1px;
-            var meanLine = Math.round((size * Math.sqrt(3) / 3) / height_1px) * height_1px;//длина биссектрисы равностороннего треугольника
-            //округляем + смещаем
             x = Math.round((x) / width_1px) * width_1px;
             y = Math.round((y) / height_1px) * height_1px;
-            var y1 = y - height;
-
-            ws.drawingCtx
-              .beginPath()
-              .moveTo(x, y)
-              .lineTo(x, y1)
-              .setStrokeStyle(m_oColor)
-              .stroke();
-
-            ws.drawingCtx
-              .beginPath()
-              .moveTo(x + halfSize, y1)
-              .lineTo(x + halfSize, y1)
-              .lineTo(x, y1 + meanLine)
-              .lineTo(x - halfSize, y1)
-              .lineTo(x, y1)
-              .setFillStyle(m_oColor)
-              .fill();
+            var heightLine = Math.round(height);
+			var heightCleanLine = heightLine - 4 + 2;
+			
+			t.drawingCtx.beginPath();
+			
+            t.drawingCtx.moveTo(x, y);
+			t.drawingCtx.lineTo(x, y - heightCleanLine);
+            t.drawingCtx.setLineWidth(t.width_2px);
+			t.drawingCtx.setStrokeStyle(m_oColor);
+			t.drawingCtx.setStrokeStyle(m_oColor);
+			t.drawingCtx.stroke();
+			
+			
+			var r = t.drawingCtx._calcRect(x, y - heightLine);
+			x = Math.round(r.x) + 1;
+			y = Math.round(r.y) - 1;
+			
+			var heightTriangle = Math.round(4 * scaleIndex * scaleFactor);
+			var diffY = 0;
+			for(var i = 0; i < heightTriangle; i++)
+			{
+				t.drawingCtx.ctx.moveTo(x - (i) - 2, y + 0.5 + (heightTriangle - i) - diffY);
+				t.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (heightTriangle - i) - diffY);
+			}
+			
+			t.drawingCtx.setLineWidth(t.width_1px)
+            t.drawingCtx.setStrokeStyle(m_oColor);
+			t.drawingCtx.stroke();
         };
 
-        var _drawFilterDreieck = function (x, y, index)
+        var _drawFilterDreieck = function (x, y, height)
 		{
-            var size = 5.25 * index;
-            //сюда приходят координаты центра кнопки
-            //чтобы кнопка была в центре, необходимо сместить
-            var leftDiff = size / 2;
-            var upDiff = Math.round(((size * Math.sqrt(3)) / 6) / height_1px) * height_1px;//радиус вписанной окружности в треугольник
-            //округляем + смещаем
-            x = Math.round((x - leftDiff) / width_1px) * width_1px;
-            y = Math.round((y - upDiff) / height_1px) * height_1px;
-            var meanLine = Math.round((size * Math.sqrt(3) / 3) / width_1px) * width_1px;//длина биссектрисы равностороннего треугольника
-            var halfSize = Math.round((size / 2) / height_1px) * height_1px;
-            //рисуем
-            ws.drawingCtx
-              .beginPath()
-              .moveTo(x, y)
-              .lineTo(x + size, y)
-              .lineTo(x + halfSize, y + meanLine)
-              .lineTo(x, y)
-              .setFillStyle(m_oColor)
-              .fill();
+			var r = t.drawingCtx._calcRect(x, y);
+			x = Math.round(r.x) + 1;
+			y = Math.round(r.y);
+			
+			t.drawingCtx.beginPath();
+			
+			height = Math.round(height * scaleIndex * scaleFactor);
+			var diffY = Math.round(height / 2);
+			for(var i = 0; i < height; i++)
+			{
+				t.drawingCtx.ctx.moveTo(x - (i + 1), y + 0.5 + (height - i) - diffY);
+				t.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
+			}
+			
+            t.drawingCtx.setStrokeStyle(m_oColor);
+			t.drawingCtx.stroke();
         };
 
 		//TODO пересмотреть отрисовку кнопок + отрисовку при масштабировании
 		var _drawButton = function(upLeftXButton, upLeftYButton)
 		{
 			//квадрат кнопки рисуем
-			_drawButtonBorder(upLeftXButton, upLeftYButton, width, height);
+			_drawButtonFrame(upLeftXButton, upLeftYButton, width, height);
 
 			//координаты центра
 			var centerX = upLeftXButton + (width / 2);
@@ -12763,7 +12814,7 @@
 			else if(null !== isApplySortState)
 			{
 				_drawSortArrow(upLeftXButton + width - 5 * width_1px * scaleIndex, upLeftYButton + 3 * height_1px * scaleIndex, isApplySortState, 10);
-				_drawFilterDreieck(centerX - 3 * width_1px, centerY + 2 * height_1px, scaleIndex * 0.75);
+				_drawFilterDreieck(centerX - 4 * width_1px, centerY + 1 * height_1px, 3);
 			}
 			else if (isApplyAutoFilter)
 			{
@@ -12775,7 +12826,7 @@
 			}
 			else
 			{
-				_drawFilterDreieck(centerX, centerY, scaleIndex);
+				_drawFilterDreieck(centerX, centerY, 4);
 			}
 		};
 
@@ -13838,8 +13889,18 @@
         //если внутри находится вся активная область(кроме строки заголовков) или если выходит активная область за границу снизу
         formatTableInfo.isInsertRowAbove = (refTableContainsActiveRange && ((lastRange.r1 > refTable.r1 && tablePart.HeaderRowCount === null) ||
         (lastRange.r1 >= refTable.r1 && tablePart.HeaderRowCount !== null)));
-
-        formatTableInfo.isDeleteRow = refTableContainsActiveRange && !(lastRange.r1 <= refTable.r1 && lastRange.r2 >= refTable.r1 && null === tablePart.HeaderRowCount);
+		
+		//если есть заголовок, и в данных всего одна строка
+		//todo пределать все проверки HeaderRowCount на вызов функции isHeaderRow
+		var dataRange = tablePart.getRangeWithoutHeaderFooter();
+		if((tablePart.isHeaderRow() || tablePart.isTotalsRow()) && dataRange.r1 === dataRange.r2 && lastRange.r1 === lastRange.r2 && dataRange.r1 === lastRange.r1)
+		{
+			formatTableInfo.isDeleteRow = false;
+		}
+		else
+		{
+			formatTableInfo.isDeleteRow = refTableContainsActiveRange && !(lastRange.r1 <= refTable.r1 && lastRange.r2 >= refTable.r1 && null === tablePart.HeaderRowCount);
+		}
 
         formatTableInfo.isDeleteColumn = true;
         formatTableInfo.isDeleteTable = true;

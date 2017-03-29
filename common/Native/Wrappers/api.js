@@ -5642,26 +5642,6 @@ Asc['asc_docs_api'].prototype.pre_Paste = function(_fonts, _images, callback)
 };
 /************************************************************************/
 
-Asc['asc_docs_api'].prototype.openDocument = function(sData)
-{
-  // var version;
-  //
-  // if (sData.changes && this.VersionHistory)
-  // {
-  //   this.VersionHistory.changes = sData.changes;
-  //   this.VersionHistory.applyChanges(this);
-  // }
-
-  _api.asc_nativeOpenFile(sData.data);
-
-  window["native"]["onEndLoadingFile"]();
-
-  if (_api.NativeAfterLoad)
-    _api.NativeAfterLoad();
-
-  window["native"]["onEndLoadingFile"]();
-};
-
 // chat styles
 AscCommon.ChartPreviewManager.prototype.clearPreviews = function()
 {
@@ -5943,4 +5923,168 @@ function NativeOpenFile3(_params, documentInfo)
     }
 	}
 	Api = _api;
+}
+
+
+	var DocumentPageSize = new function()
+	{
+		this.oSizes    = [{name : "US Letter", w_mm : 215.9, h_mm : 279.4, w_tw : 12240, h_tw : 15840},
+			{name : "US Legal", w_mm : 215.9, h_mm : 355.6, w_tw : 12240, h_tw : 20160},
+			{name : "A4", w_mm : 210, h_mm : 297, w_tw : 11907, h_tw : 16839},
+			{name : "A5", w_mm : 148.1, h_mm : 209.9, w_tw : 8391, h_tw : 11907},
+			{name : "B5", w_mm : 176, h_mm : 250.1, w_tw : 9979, h_tw : 14175},
+			{name : "Envelope #10", w_mm : 104.8, h_mm : 241.3, w_tw : 5940, h_tw : 13680},
+			{name : "Envelope DL", w_mm : 110.1, h_mm : 220.1, w_tw : 6237, h_tw : 12474},
+			{name : "Tabloid", w_mm : 279.4, h_mm : 431.7, w_tw : 15842, h_tw : 24477},
+			{name : "A3", w_mm : 297, h_mm : 420.1, w_tw : 16840, h_tw : 23820},
+			{name : "Tabloid Oversize", w_mm : 304.8, h_mm : 457.1, w_tw : 17282, h_tw : 25918},
+			{name : "ROC 16K", w_mm : 196.8, h_mm : 273, w_tw : 11164, h_tw : 15485},
+			{name : "Envelope Coukei 3", w_mm : 119.9, h_mm : 234.9, w_tw : 6798, h_tw : 13319},
+			{name : "Super B/A3", w_mm : 330.2, h_mm : 482.5, w_tw : 18722, h_tw : 27358}
+		];
+		this.sizeEpsMM = 0.5;
+		this.getSize   = function(widthMm, heightMm)
+		{
+			for (var index in this.oSizes)
+			{
+				var item = this.oSizes[index];
+				if (Math.abs(widthMm - item.w_mm) < this.sizeEpsMM && Math.abs(heightMm - item.h_mm) < this.sizeEpsMM)
+					return item;
+			}
+			return {w_mm : widthMm, h_mm : heightMm};
+		};
+	};
+
+window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, version)
+{
+  this.SpellCheckUrl = '';
+
+  this.WordControl.m_bIsRuler = false;
+  this.WordControl.Init();
+
+  this.InitEditor();
+  this.DocumentType   = 2;
+  this.LoadedObjectDS = this.WordControl.m_oLogicDocument.CopyStyle();
+
+  AscCommon.g_oIdCounter.Set_Load(true);
+
+  var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
+  var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
+
+  if (undefined === version)
+  {
+    if (oBinaryFileReader.Read(base64File))
+    {
+      AscCommon.g_oIdCounter.Set_Load(false);
+      this.LoadedObject = 1;
+
+      this.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Open);
+    }
+    else
+      this.sendEvent("asc_onError", Asc.c_oAscError.ID.MobileUnexpectedCharCount, Asc.c_oAscError.Level.Critical);
+  }
+  else
+  {
+    AscCommon.CurFileVersion = version;
+    if (oBinaryFileReader.ReadData(base64File))
+    {
+      AscCommon.g_oIdCounter.Set_Load(false);
+      this.LoadedObject = 1;
+
+      this.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Open);
+    }
+    else
+      this.sendEvent("asc_onError", Asc.c_oAscError.ID.MobileUnexpectedCharCount, Asc.c_oAscError.Level.Critical);
+  }
+
+/*
+  if (window["NATIVE_EDITOR_ENJINE"] === true && undefined != window["native"])
+  {
+    AscCommon.CDocsCoApi.prototype.askSaveChanges = function(callback)
+    {
+      callback({"saveLock" : false});
+    };
+    AscCommon.CDocsCoApi.prototype.saveChanges    = function(arrayChanges, deleteIndex, excelAdditionalInfo)
+    {
+      if (window["native"]["SaveChanges"])
+        window["native"]["SaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);
+    };
+  }
+*/
+
+  if (undefined != window["Native"])
+    return;
+
+  //callback
+  this.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
+  var sizeMM;
+  if (this.DocumentOrientation)
+    sizeMM = DocumentPageSize.getSize(AscCommon.Page_Width, AscCommon.Page_Height);
+  else
+    sizeMM = DocumentPageSize.getSize(AscCommon.Page_Height, AscCommon.Page_Width);
+  this.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
+  this.sync_PageOrientCallback(editor.get_DocumentOrientation());
+
+  if (this.GenerateNativeStyles !== undefined)
+  {
+    this.GenerateNativeStyles();
+
+    if (this.WordControl.m_oDrawingDocument.CheckTableStylesOne !== undefined)
+      this.WordControl.m_oDrawingDocument.CheckTableStylesOne();
+  }
+};
+
+
+Asc['asc_docs_api'].prototype.openDocument = function(sData)
+{
+   _api.asc_nativeOpenFile2(sData.data);
+
+   var version;
+   if (sData.changes && this.VersionHistory)
+   {
+     this.VersionHistory.changes = sData.changes;
+     this.VersionHistory.applyChanges(this);
+   }
+
+   if (_api.NativeAfterLoad)
+      _api.NativeAfterLoad();
+
+    this.ImageLoader.bIsLoadDocumentFirst = true;
+    this.ImageLoader.LoadDocumentImages(this.WordControl.m_oLogicDocument.ImageMap, true);
+
+    this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
+
+    this.ParcedDocument = true;
+    if (this.isStartCoAuthoringOnEndLoad)
+    {
+      this.CoAuthoringApi.onStartCoAuthoring(true);
+      this.isStartCoAuthoringOnEndLoad = false;
+    }
+
+    window["native"]["onEndLoadingFile"]();
+
+    var t = this;
+    setInterval(function() {
+        t._autoSave();
+    }, 40);
+};
+
+window["AscCommon"].getFullImageSrc2 = function (src) {
+
+    console.log("getFullImageSrc2 : " + src);
+
+    var start = src.slice(0, 6);
+    if (0 === start.indexOf('theme') && editor.ThemeLoader){
+        return  editor.ThemeLoader.ThemesUrlAbs + src;
+    }
+
+    if (0 !== start.indexOf('http:') && 0 !== start.indexOf('data:') && 0 !== start.indexOf('https:') &&
+        0 !== start.indexOf('file:') && 0 !== start.indexOf('ftp:')){
+        var srcFull = AscCommon.g_oDocumentUrls.getImageUrl(src);
+        if(srcFull){
+            window["native"]["loadUrlImage"](srcFull, src);
+            return srcFull;
+        }
+    }
+    return src;
 }

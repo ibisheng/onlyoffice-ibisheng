@@ -154,7 +154,7 @@
 		//-----------------
 
 		this.objAutoComplete = {};
-		this.isAutoComplete = false;
+		this.sAutoComplete = null;
 
 		/** @type RegExp */
 		this.reReplaceNL = /\r?\n|\r/g;
@@ -188,7 +188,7 @@
 		var t = this;
 		var z = t.defaults.canvasZIndex;
 		this.defaults.padding = settings.padding;
-		this.isAutoComplete = false;
+		this.sAutoComplete = null;
 
 		if (null != this.element) {
 			t.canvasOuter = document.createElement('div');
@@ -330,19 +330,12 @@
 			// Иначе F2 по ячейке с '\n', у которой выключен wrap, не станет снова wrap. http://bugzilla.onlyoffice.com/show_bug.cgi?id=17590
 			if (0 < this.undoList.length || isFormula || this.textFlags.wrapOnlyNL) {
 				// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
-				if (this.isAutoComplete && !isFormula) {
-					var s = this._getFragmentsText(this.options.fragments);
-					if (!AscCommon.isNumber(s)) {
-						var arrAutoComplete = this._getAutoComplete(s.toLowerCase());
-						if (1 === arrAutoComplete.length) {
-							var newValue = arrAutoComplete[0];
-							this.selectionBegin = this.textRender.getBeginOfText();
-							this.cursorPos = this.selectionEnd = this.textRender.getEndOfText();
-							this.noUpdateMode = true;
-							this._addChars(newValue);
-							this.noUpdateMode = false;
-						}
-					}
+				if (this.sAutoComplete && !isFormula) {
+					this.selectionBegin = this.textRender.getBeginOfText();
+					this.cursorPos = this.selectionEnd = this.textRender.getEndOfText();
+					this.noUpdateMode = true;
+					this._addChars(this.sAutoComplete);
+					this.noUpdateMode = false;
 				}
 
 				ret = opt.saveValueCallback(opt.fragments, this.textFlags, /*skip NL check*/ret);
@@ -1501,7 +1494,7 @@
 
 	CellEditor.prototype._moveCursor = function (kind, pos) {
 		var t = this;
-		this.isAutoComplete = false;
+		this.sAutoComplete = null;
 		switch (kind) {
 			case kPrevChar:
 				t.cursorPos = t.textRender.getPrevChar(t.cursorPos);
@@ -1673,7 +1666,7 @@
 			return false;
 		}
 
-		this.isAutoComplete = false;
+		this.sAutoComplete = null;
 		this.dontUpdateText = true;
 
 		if (this.selectionBegin !== this.selectionEnd) {
@@ -1800,7 +1793,7 @@
 		var t = this;
 		var begPos, endPos;
 
-		this.isAutoComplete = false;
+		this.sAutoComplete = null;
 		begPos = t.selectionBegin === t.selectionEnd ? t.cursorPos : t.selectionBegin;
 		t._moveCursor(kind, pos);
 		endPos = t.cursorPos;
@@ -2102,19 +2095,19 @@
 		}
 	};
 
-	CellEditor.prototype._getAutoComplete = function ( str ) {
+	CellEditor.prototype._getAutoComplete = function (str) {
 		// ToDo можно ускорить делая поиск каждый раз не в большом массиве, а в уменьшенном (по предыдущим символам)
 		var oLastResult = this.objAutoComplete[str];
-		if ( oLastResult ) {
+		if (oLastResult) {
 			return oLastResult;
 		}
 
 		var arrAutoComplete = this.options.autoComplete;
 		var arrAutoCompleteLC = this.options.autoCompleteLC;
 		var i, length, arrResult = [];
-		for ( i = 0, length = arrAutoCompleteLC.length; i < length; ++i ) {
-			if ( 0 === arrAutoCompleteLC[i].indexOf( str ) ) {
-				arrResult.push( arrAutoComplete[i] );
+		for (i = 0, length = arrAutoCompleteLC.length; i < length; ++i) {
+			if (arrAutoCompleteLC[i].length !== str.length && 0 === arrAutoCompleteLC[i].indexOf(str)) {
+				arrResult.push(arrAutoComplete[i]);
 			}
 		}
 		return this.objAutoComplete[str] = arrResult;
@@ -2573,7 +2566,7 @@
 					t._addChars(newValue.substring(lengthInput));
 					t.selectionBegin = tmpCursorPos;
 					t._selectChars(kEndOfText);
-					this.isAutoComplete = true;
+					this.sAutoComplete = newValue;
 				}
 			}
 		}

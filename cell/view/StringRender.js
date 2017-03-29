@@ -654,7 +654,7 @@
 				if (-1 !== b)
 					l.tw += self._calcLineWidth(b, e);
 				l.beg = b;
-				l.end = e;
+				l.end = e < b ? b : e;
 				self.lines.push(l);
 				if (TW < l.tw) {TW = l.tw;}
 				BL = TH + l.bl;

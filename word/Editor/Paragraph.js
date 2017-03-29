@@ -607,6 +607,7 @@ Paragraph.prototype =
         // Кроме случая, когда параграф меняет свое местоположение на страницах и колонках
         if (true === this.Parent.RecalcInfo.Can_RecalcObject() || ColumnNumOld !== this.ColumnNum || PageNumOld !== this.PageNum)
         {
+			// Эти значения нужны для правильного рассчета положения картинок, смотри баг #34392
             var Ranges = this.Parent.CheckRange(X, Y, XLimit, Y, Y, Y, X, XLimit, this.PageNum, true);
             if (Ranges.length > 0)
             {
@@ -3812,7 +3813,7 @@ Paragraph.prototype =
 		return ContentPos;
 	},
 
-    Set_ParaContentPos : function(ContentPos, CorrectEndLinePos, Line, Range)
+    Set_ParaContentPos : function(ContentPos, CorrectEndLinePos, Line, Range, bCorrectPos)
     {
         var Pos = ContentPos.Get(0);
 
@@ -3824,9 +3825,12 @@ Paragraph.prototype =
 
         this.CurPos.ContentPos = Pos;
         this.Content[Pos].Set_ParaContentPos( ContentPos, 1 );
-        this.Correct_ContentPos(CorrectEndLinePos);
 
-        this.Correct_ContentPos2();
+        if (false !== bCorrectPos)
+		{
+			this.Correct_ContentPos(CorrectEndLinePos);
+			this.Correct_ContentPos2();
+		}
 
         this.CurPos.Line  = Line;
         this.CurPos.Range = Range;
@@ -5372,7 +5376,7 @@ Paragraph.prototype =
         return 0;
     },
 
-    Correct_Content : function(_StartPos, _EndPos)
+    Correct_Content : function(_StartPos, _EndPos, bDoNotDeleteEmptyRuns)
     {
         // Если у нас сейчас в данном параграфе используется ссылка на позицию, тогда мы не корректируем контент, чтобы
         // не удалить место, на которое идет ссылка.
@@ -5385,8 +5389,8 @@ Paragraph.prototype =
         // 3. Добавляем пустой ран в место, где нет рана (например, между двумя идущими подряд гиперссылками)
         // 4. Удаляем пустые комментарии
 
-        var StartPos = ( undefined === _StartPos ? 0 : Math.max( _StartPos - 1, 0 ) );
-        var EndPos   = ( undefined === _EndPos ? this.Content.length - 1 : Math.min( _EndPos + 1, this.Content.length - 1 ) );
+        var StartPos = ( undefined === _StartPos || null === _StartPos ? 0 : Math.max( _StartPos - 1, 0 ) );
+        var EndPos   = ( undefined === _EndPos || null === _EndPos ? this.Content.length - 1 : Math.min( _EndPos + 1, this.Content.length - 1 ) );
 
         var CommentsToDelete = [];
         for ( var CurPos = EndPos; CurPos >= StartPos; CurPos-- )
@@ -5431,9 +5435,12 @@ Paragraph.prototype =
             }
             else
             {
-                // TODO (Para_End): Предпоследний элемент мы не проверяем, т.к. на ран с Para_End мы не ориентируемся
-                if (true === CurElement.Is_Empty() && (0 < CurPos || para_Run !== this.Content[CurPos].Type) && CurPos < this.Content.length - 2 && para_Run === this.Content[CurPos + 1].Type)
-                    this.Internal_Content_Remove(CurPos);
+            	if (true !== bDoNotDeleteEmptyRuns)
+				{
+					// TODO (Para_End): Предпоследний элемент мы не проверяем, т.к. на ран с Para_End мы не ориентируемся
+					if (true === CurElement.Is_Empty() && (0 < CurPos || para_Run !== this.Content[CurPos].Type) && CurPos < this.Content.length - 2 && para_Run === this.Content[CurPos + 1].Type)
+						this.Internal_Content_Remove(CurPos);
+				}
             }
         }
 
@@ -9181,8 +9188,8 @@ Paragraph.prototype =
                 if (0 !== PageAbs && CurPage > ColumnAbs)
 					_CurPage = CurPage - ColumnAbs;
 
-				var ColumnStartX = this.Pages[_CurPage].X;
-				var ColumnEndX   = this.Pages[_CurPage].XLimit;
+				var ColumnStartX = (0 === CurPage ? this.X_ColumnStart : this.Pages[_CurPage].X     );
+				var ColumnEndX   = (0 === CurPage ? this.X_ColumnEnd   : this.Pages[_CurPage].XLimit);
 
                 var Top_Margin    = Y_Top_Margin;
                 var Bottom_Margin = Y_Bottom_Margin;
@@ -9195,6 +9202,15 @@ Paragraph.prototype =
                     Page_H        = 0;
                 }
 
+				var PageLimitsOrigin = this.Parent.Get_PageLimits(PageRel);
+				if (true === this.Parent.Is_TableCellContent() && false === Drawing.Is_LayoutInCell())
+				{
+					PageLimitsOrigin = LogicDocument.Get_PageLimits(PageAbs);
+					var PageFieldsOrigin = LogicDocument.Get_PageFields(PageAbs);
+					ColumnStartX = PageFieldsOrigin.X;
+					ColumnEndX   = PageFieldsOrigin.XLimit;
+				}
+
                 if ( undefined != Drawing && true != Drawing.Use_TextWrap() )
                 {
                     PageFields = LD_PageFields;
@@ -9203,7 +9219,7 @@ Paragraph.prototype =
 
                 var ParagraphTop = (true != Drawing.Use_TextWrap() ? this.Lines[this.Pages[_CurPage].StartLine].Top + this.Pages[_CurPage].Y : this.Pages[_CurPage].Y);
                 var Layout = new CParagraphLayout(DrawingLayout.X, DrawingLayout.Y , this.Get_AbsolutePage(CurPage), DrawingLayout.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent, ParagraphTop);
-                return {ParagraphLayout : Layout, PageLimits : PageLimits};
+                return {ParagraphLayout : Layout, PageLimits : PageLimits, PageLimitsOrigin : PageLimitsOrigin};
             }
         }
 
@@ -11956,50 +11972,11 @@ Paragraph.prototype.Get_DocumentPositionFromObject = function(PosArray)
 };
 Paragraph.prototype.Get_XYByContentPos = function(ContentPos)
 {
-    var ParaContentPos = this.Get_ParaContentPos(false, false);
-
-    this.Set_ParaContentPos(ContentPos, true, -1, -1);
-    var Result = this.Internal_Recalculate_CurPos(-1, false, false, true);
-    this.Set_ParaContentPos(ParaContentPos, true, this.CurPos.Line, this.CurPos.Range);
-    return Result;
-
-
-    if (this.Lines.length <= 0)
-        return {X : 0, Y : 0, PageNum : 0, Height : 0};
-
-    var ParaPos = this.Get_ParaPosByContentPos(ContentPos);
-    if (ParaPos.Line < 0 || ParaPos >= this.Lines.length || ParaPos.Page < 0 || ParaPos.Page >= this.Pages.length || ParaPos.Range < 0 || ParaPos.Range >= this.Lines[ParaPos.Line].Ranges.length)
-        return {X : 0, Y : 0, PageNum : 0, Height : 0};
-
-    var CurLine  = ParaPos.Line;
-    var CurRange = ParaPos.Range;
-    var CurPage  = ParaPos.Page;
-
-    var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
-    var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
-
-    var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-    var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-    if (true === this.Numbering.Check_Range(CurRange, CurLine))
-        X += this.Numbering.WidthVisible;
-
-    var CurPos = ContentPos.Get(0);
-    for (var Pos = StartPos; Pos <= EndPos; ++Pos)
-    {
-        var Item = this.Content[Pos];
-
-        if (CurPos === Pos)
-        {
-            return Item.Get_XYByContentPos(ContentPos, 1, X, Y, true, CurRange, CurLine, CurPage);
-        }
-        else
-        {
-            X = Item.Get_XYByContentPos(ContentPos, 1, X, Y, false, CurRange, CurLine, CurPage).X;
-        }
-    }
-
-    return {X : X, Y : Y, PageNum : this.Get_AbsolutePage(CurPage), Height : this.Lines[CurLine].Bottom - this.Lines[CurLine].Top};
+	var ParaContentPos = this.Get_ParaContentPos(false, false);
+	this.Set_ParaContentPos(ContentPos, true, -1, -1);
+	var Result = this.Internal_Recalculate_CurPos(-1, false, false, true);
+	this.Set_ParaContentPos(ParaContentPos, true, this.CurPos.Line, this.CurPos.Range, false);
+	return Result;
 };
 Paragraph.prototype.Get_Lock = function()
 {

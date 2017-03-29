@@ -448,7 +448,7 @@ CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(Stat
 	}
 	else
 	{
-		this.LogicDocument.Document_End_HdrFtrEditing();
+		this.LogicDocument.EndHdrFtrEditing(false);
 	}
 };
 CHdrFtrController.prototype.GetColumnSize = function()

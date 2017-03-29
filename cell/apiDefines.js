@@ -50,7 +50,8 @@ var c_oAscConfirm = {
 };
 
 var c_oAscMergeOptions = {
-  Unmerge: 0,
+  Disabled: -1,
+  None: 0,
   Merge: 1,
   MergeCenter: 2,
   MergeAcross: 3
@@ -410,7 +411,8 @@ var c_oAscPopUpSelectorType = {
   prot['ConfirmPutMergeRange'] = prot.ConfirmPutMergeRange;
   window['Asc']['c_oAscMergeOptions'] = window['Asc'].c_oAscMergeOptions = c_oAscMergeOptions;
   prot = c_oAscMergeOptions;
-  prot['Unmerge'] = prot.Unmerge;
+  prot['Disabled'] = prot.Disabled;
+  prot['None'] = prot.None;
   prot['Merge'] = prot.Merge;
   prot['MergeCenter'] = prot.MergeCenter;
   prot['MergeAcross'] = prot.MergeAcross;
@@ -511,6 +513,7 @@ var c_oAscPopUpSelectorType = {
   prot['rowTotal'] = prot.rowTotal;
   prot['rowBanded'] = prot.rowBanded;
   prot['filterButton'] = prot.filterButton;
+  prot['advancedSettings'] = prot.advancedSettings;
   window['Asc']['c_oAscAutoFilterTypes'] = window['Asc'].c_oAscAutoFilterTypes = c_oAscAutoFilterTypes;
   prot = c_oAscAutoFilterTypes;
   prot['ColorFilter'] = prot.ColorFilter;

@@ -227,6 +227,9 @@ DrawingObjectsController.prototype.checkSelectedObjectsForMove = function(group)
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = function(callback, args)
 {
+    if(this.drawingObjects.isViewerMode()){
+        return;
+    }
     var selection_state = this.getSelectionState();
     this.drawingObjects.objectLocker.reset();
     for(var i = 0; i < this.selectedObjects.length; ++i)
@@ -573,8 +576,25 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
                     var oRange = new Asc.Range(oCell.col, oCell.row, oCell.col, oCell.row, false);
                     var oVisibleRange = oWorksheet.getVisibleRange();
                     if(!oRange.isIntersect(oVisibleRange)){
-                        var oOffset = oWorksheet._calcActiveCellOffset(oRange);
-                        //window["Asc"]["editor"].wb.controller.scroll(oOffset);
+                        var oOffset = oWorksheet._calcFillHandleOffset(oRange);
+                        var _api = window["Asc"]["editor"];
+                        if (_api.wb.MobileTouchManager)
+						{
+						    if(oOffset.deltaX < 0){
+                                --oOffset.deltaX;
+                            }
+                            if(oOffset.deltaX > 0){
+						        ++oOffset.deltaX;
+                            }
+
+                            if(oOffset.deltaY < 0){
+                                --oOffset.deltaY;
+                            }
+                            if(oOffset.deltaY > 0){
+                                ++oOffset.deltaY;
+                            }
+							_api.wb.MobileTouchManager.scrollBy((oOffset.deltaX) * _api.controller.settings.hscrollStep, (oOffset.deltaY)* _api.controller.settings.vscrollStep);
+						}
                     }
                 }
             }

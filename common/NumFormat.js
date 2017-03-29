@@ -938,7 +938,8 @@ NumFormat.prototype =
             res.bDigit = (number == number - 0);
         if(res.bDigit)
         {
-			res.fraction = number - Math.floor(number);
+			var numberAbs = Math.abs(number);
+			res.fraction = numberAbs - Math.floor(numberAbs);
 			//Округляем
 			var parts = getNumberParts(number);
 			res.sign = parts.sign;
@@ -3740,7 +3741,7 @@ function setCurrentCultureInfo(val) {
 				case '4':
 				case '5':
 					if (year > 0) {
-						dateElems.push('y'.repeat(month));
+						dateElems.push('y'.repeat(year));
 					}
 					break;
 			}

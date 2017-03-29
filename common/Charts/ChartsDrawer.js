@@ -1785,6 +1785,17 @@ CChartsDrawer.prototype =
 						result =  valPoints[i].pos * this.calcProp.pxToMM;
 						break;
 					}
+					else if(i !== 0 && valPoints[i - 1].val < 0 && valPoints[i].val > 0)
+					{
+						var val1 = valPoints[i - 1].val;
+						var val2 = valPoints[i].val;
+						var pos1 = valPoints[i - 1].pos * this.calcProp.pxToMM;
+						var pos2 = valPoints[i].pos * this.calcProp.pxToMM;
+						
+						result = pos2 - val2 * (pos2 - pos1) / (val2 - val1);
+						
+						break;
+					}
 				}
 			}
 			
@@ -3376,7 +3387,7 @@ drawBarChart.prototype =
 	_DrawBars: function()
 	{
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
-		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect((this.chartProp.chartGutter._left - 1) / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		var brush, pen, seria, numCache;
 		for (var i = 0; i < this.paths.series.length; i++) {
 		
@@ -6807,7 +6818,7 @@ drawHBarChart.prototype =
 		var seria;
 		
 		this.cChartDrawer.cShapeDrawer.Graphics.SaveGrState();
-		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect(this.chartProp.chartGutter._left / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
+		this.cChartDrawer.cShapeDrawer.Graphics.AddClipRect((this.chartProp.chartGutter._left - 1) / this.chartProp.pxToMM, (this.chartProp.chartGutter._top - 1) / this.chartProp.pxToMM, this.chartProp.trueWidth / this.chartProp.pxToMM, this.chartProp.trueHeight / this.chartProp.pxToMM);
 		for (var i = 0; i < this.paths.series.length; i++) {
 			
 			if(!this.paths.series[i])

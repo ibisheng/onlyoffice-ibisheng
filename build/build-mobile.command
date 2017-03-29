@@ -14,7 +14,7 @@ echo grunt --level=ADVANCED --mobile=true  --noclosure=true
 
 echo -n $'\r' > temp.txt
 
-cat "../../web-apps/vendor/xregexp/xregexp-all-min.js" "temp.txt" "../../web-apps/vendor/underscore/underscore-min.js" "temp.txt" "../common/native/native.js" "temp.txt" "../common/native/jquery_native.js" "temp.txt" > "banners.js"
+cat "../../web-apps/vendor/xregexp/xregexp-all-min.js" "temp.txt" "../../web-apps/vendor/underscore/underscore-min.js" "temp.txt" "../common/native/wrappers/common.js" "temp.txt" "../common/native/jquery_native.js" "temp.txt" > "banners.js"
 
 cat "banners.js" "../word/sdk-all-min.js" "../word/sdk-all.js" > "../../mobile-apps/ios/Vendor/ONLYOFFICE/SDKData/documents/script.bin"
 

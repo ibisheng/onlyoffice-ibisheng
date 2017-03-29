@@ -931,9 +931,13 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         oLogicDocument.TurnOffCheckChartSelection();
 
         var DocState = this.private_SaveDocumentState();
-
+        var mapDrawings         = {};
         for (var nIndex = 0, nCount = arrReverseChanges.length; nIndex < nCount; ++nIndex)
         {
+            var oClass = arrReverseChanges[nIndex].GetClass();
+            if(oClass && oClass.parent && oClass.parent instanceof AscCommonWord.ParaDrawing){
+                mapDrawings[oClass.parent.Get_Id()] = oClass.parent;
+            }
             arrReverseChanges[nIndex].Load();
             this.m_aAllChanges.push(arrReverseChanges[nIndex]);
         }
@@ -944,7 +948,6 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 
         var mapDocumentContents = {};
         var mapParagraphs       = {};
-        var mapDrawings         = {};
         var mapRuns             = {};
         var mapTables           = {};
         var mapGrObjects        = {};
@@ -1098,7 +1101,6 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 				if ((AscCommonWord.type_Paragraph === oElement.GetType() || AscCommonWord.type_Table === oElement.GetType()) && oElement.Content.length <= 0)
 				{
 					oDocumentContent.Remove_FromContent(nIndex, 1);
-					console.log("Deleted " + ( AscCommonWord.type_Table === oElement.GetType() ? "Table" : "Paragraph"));
 				}
 			}
 
@@ -1114,7 +1116,7 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
         {
             var oParagraph = mapParagraphs[sId];
 			oParagraph.CheckParaEnd();
-            oParagraph.Correct_Content();
+            oParagraph.Correct_Content(null, null, true);
         }
 
 		var oBinaryWriter = AscCommon.History.BinaryWriter;

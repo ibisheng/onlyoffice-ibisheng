@@ -496,7 +496,10 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
         }
         case AscCommon.changestype_Remove:
         {
-            this.Lock.Check( this.Get_Id() );
+			if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type))
+				this.Lock.Check(this.Get_Id());
+			else
+				this.CurCell.Content.Document_Is_SelectionLocked(CheckType);
 
             break;
         }

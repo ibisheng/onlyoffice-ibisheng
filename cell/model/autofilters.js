@@ -2254,7 +2254,9 @@
 						var isPart = false;
 						for(var i = 0; i < tableParts.length; i++ )
 						{
-							tableRange = tableParts[i].Ref;
+							var tablePart = tableParts[i];
+							var dataRange = tablePart.getRangeWithoutHeaderFooter();
+							tableRange = tablePart.Ref;
 							//если хотя бы одна ячейка активной области попадает внутрь форматированной таблицы
 							if(newActiveRange.isIntersect(tableRange))
 							{
@@ -2262,7 +2264,13 @@
 								{
 									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
 									return false;
-								}	
+								}
+								else if((tablePart.isHeaderRow() || tablePart.isTotalsRow()) && dataRange.r1 === dataRange.r2 && activeCells.r1 === activeCells.r2 && dataRange.r1 === activeCells.r1)
+								{
+									//если выделена одинственная строчка внутри таблицы
+									worksheet.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+									return false;
+								}
 								if(newActiveRange.c1 <= tableRange.c1 && newActiveRange.c2 >= tableRange.c2 && newActiveRange.r1 <= tableRange.r1 && newActiveRange.r2 >= tableRange.r2)
 								{
 									isExp = true;

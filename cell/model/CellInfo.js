@@ -41,12 +41,12 @@
   var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 
   /** @constructor */
-  function asc_CCellFlag(m, s, w, t, l) {
-    this.merge = !!m;
-    this.shrinkToFit = !!s;
-    this.wrapText = !!w;
-    this.selectionType = t;
-    this.lockText = !!l;
+  function asc_CCellFlag() {
+    this.merge = Asc.c_oAscMergeOptions.None;
+    this.shrinkToFit = false;
+    this.wrapText = false;
+    this.selectionType = null;
+    this.lockText = false;
     this.multiselect = false;
   }
 

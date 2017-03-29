@@ -607,6 +607,25 @@
         return DC;
     };
 
+    CDrawingDocContent.prototype.Recalculate = function()
+    {
+        if(this.Parent){
+            if(this.Parent instanceof AscFormat.CShape){
+                this.Parent.recalculateContent();
+                return;
+            }
+            else if(this.Parent && this.Parent.parent){
+                if(this.Parent.parent instanceof AscFormat.CShape){
+                    this.Parent.parent.recalculateContent();
+                    return;
+                }
+            }
+        }
+        if(this.XLimit > 0){
+            this.Recalculate_PageDrawing();
+        }
+    };
+
     // TODO: сделать по-нормальному!!!
     function CDocument_prototype_private_GetElementPageIndexByXY(ElementPos, X, Y, PageIndex)
     {
