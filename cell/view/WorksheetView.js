@@ -9666,8 +9666,18 @@
 				pastedRangeProps.alignVertical = newVal.getAlignVertical();
 				//horizontal align
 				pastedRangeProps.alignHorizontal = newVal.getAlignHorizontal();
+				
 				//borders
-				var fullBorders = newVal.getBorderFull();
+				var fullBorders;
+				if(specialPasteProps.transpose)
+				{
+					//TODO сделано для правильного отображения бордеров при транспонирования. возможно стоит использовать эту функцию во всех ситуациях. проверить!
+					fullBorders = newVal.getBorder(newVal.bbox.r1, newVal.bbox.c1).clone();
+				}
+				else
+				{
+					fullBorders = newVal.getBorderFull();
+				}
 				if (pastedRangeProps.offsetLast && pastedRangeProps.offsetLast.offsetCol > 0 && curMerge && fullBorders) {
 					//для мерженных ячеек, правая границу
 					var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
@@ -9676,6 +9686,7 @@
 						fullBorders.r = fullBordersEndMergeCell.r;
 					}
 				}
+				
 				pastedRangeProps.bordersFull = fullBorders;
 				//fill
 				pastedRangeProps.fill = newVal.getFill();
