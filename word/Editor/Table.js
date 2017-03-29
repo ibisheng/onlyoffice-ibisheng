@@ -2600,36 +2600,6 @@ CTable.prototype =
             {
                 oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_MoveInlineTable);
 
-                // Обновляем координаты
-
-                // Здесь мы должны для первого рассчета оставить привязку относительно страницы, а после рассчета
-                // изменить привязку на старую, при этом пересчитав координаты так, чтобы картинка не изменила
-                // своего положения.
-
-                this.PositionH_Old =
-                {
-                    RelativeFrom : this.PositionH.RelativeFrom,
-                    Align        : this.PositionH.Align,
-                    Value        : this.PositionH.Value
-                };
-
-                this.PositionV_Old =
-                {
-                    RelativeFrom : this.PositionV.RelativeFrom,
-                    Align        : this.PositionV.Align,
-                    Value        : this.PositionV.Value
-                };
-
-                this.PositionH.RelativeFrom = c_oAscHAnchor.PageInternal;
-                this.PositionH.Align        = false;
-                this.PositionH.Value        = X;
-
-                this.PositionV.RelativeFrom = c_oAscVAnchor.Page;
-                this.PositionV.Align        = false;
-                this.PositionV.Value        = Y;
-
-                this.PageNum = PageNum;
-
                 // Переносим привязку (если получается, что заносим таблицу саму в себя, тогда привязку не меняем)
                 var NewDocContent = NearestPos.Paragraph.Parent;
                 var OldDocContent = this.Parent;
@@ -2694,7 +2664,35 @@ CTable.prototype =
 					}
                 }
 
-                editor.WordControl.m_oLogicDocument.Recalculate();
+				// Обновляем координаты
+
+				// Здесь мы должны для первого рассчета оставить привязку относительно страницы, а после рассчета
+				// изменить привязку на старую, при этом пересчитав координаты так, чтобы картинка не изменила
+				// своего положения.
+
+				oTargetTable.PositionH_Old = {
+					RelativeFrom : oTargetTable.PositionH.RelativeFrom,
+					Align        : oTargetTable.PositionH.Align,
+					Value        : oTargetTable.PositionH.Value
+				};
+
+				oTargetTable.PositionV_Old = {
+					RelativeFrom : oTargetTable.PositionV.RelativeFrom,
+					Align        : oTargetTable.PositionV.Align,
+					Value        : oTargetTable.PositionV.Value
+				};
+
+				oTargetTable.PositionH.RelativeFrom = c_oAscHAnchor.PageInternal;
+				oTargetTable.PositionH.Align        = false;
+				oTargetTable.PositionH.Value        = X;
+
+				oTargetTable.PositionV.RelativeFrom = c_oAscVAnchor.Page;
+				oTargetTable.PositionV.Align        = false;
+				oTargetTable.PositionV.Value        = Y;
+
+				oTargetTable.PageNum = PageNum;
+
+				editor.WordControl.m_oLogicDocument.Recalculate();
 				oTargetTable.Start_TrackTable();
             }
         }
