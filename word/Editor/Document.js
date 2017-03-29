@@ -4358,7 +4358,7 @@ CDocument.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
 	this.Document_UpdateSelectionState();
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.Cursor_MoveUp = function(AddToSelect)
+CDocument.prototype.Cursor_MoveUp = function(AddToSelect, CtrlKey)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4366,9 +4366,9 @@ CDocument.prototype.Cursor_MoveUp = function(AddToSelect)
 	if (true === this.IsFillingFormMode())
 		this.MoveToFillingForm(false);
 	else
-		this.Controller.MoveCursorUp(AddToSelect);
+		this.Controller.MoveCursorUp(AddToSelect, CtrlKey);
 };
-CDocument.prototype.Cursor_MoveDown = function(AddToSelect)
+CDocument.prototype.Cursor_MoveDown = function(AddToSelect, CtrlKey)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4376,7 +4376,7 @@ CDocument.prototype.Cursor_MoveDown = function(AddToSelect)
 	if (true === this.IsFillingFormMode())
 		this.MoveToFillingForm(true);
 	else
-		this.Controller.MoveCursorDown(AddToSelect);
+		this.Controller.MoveCursorDown(AddToSelect, CtrlKey);
 };
 CDocument.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
 {
@@ -6628,7 +6628,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Cursor_MoveUp(true === e.ShiftKey);
+        this.Cursor_MoveUp(true === e.ShiftKey, true === e.CtrlKey);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 39) // Right Arrow
@@ -6649,7 +6649,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Cursor_MoveDown(true === e.ShiftKey);
+        this.Cursor_MoveDown(true === e.ShiftKey, true === e.CtrlKey);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 46 && false === editor.isViewMode) // Delete

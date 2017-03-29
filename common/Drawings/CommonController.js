@@ -5205,6 +5205,14 @@ DrawingObjectsController.prototype =
         }
     },
 
+    getMoveDist: function(bWord){
+        if(bWord){
+            return this.convertPixToMM(1);
+        }
+        else{
+            return this.convertPixToMM(5);
+        }
+    },
 
     cursorMoveLeft: function(AddToSelect/*Shift*/, Word/*Ctrl*/)
     {
@@ -5229,7 +5237,8 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(-this.convertPixToMM(5), 0);
+
+            this.moveSelectedObjects(-this.getMoveDist(Word), 0);
         }
     },
 
@@ -5256,12 +5265,12 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(this.convertPixToMM(5), 0);
+            this.moveSelectedObjects(this.getMoveDist(Word), 0);
         }
     },
 
 
-    cursorMoveUp: function(AddToSelect)
+    cursorMoveUp: function(AddToSelect, Word)
     {
         var target_text_object = getTargetTextObject(this);
         if(target_text_object)
@@ -5284,11 +5293,11 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(0, -this.convertPixToMM(5));
+            this.moveSelectedObjects(0, -this.getMoveDist(Word));
         }
     },
 
-    cursorMoveDown: function(AddToSelect)
+    cursorMoveDown: function(AddToSelect, Word)
     {
         var target_text_object = getTargetTextObject(this);
         if(target_text_object)
@@ -5311,7 +5320,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(0, this.convertPixToMM(5));
+            this.moveSelectedObjects(0, this.getMoveDist(Word));
         }
     },
 
@@ -5672,7 +5681,7 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 38 ) // Top Arrow
         {
-            this.cursorMoveUp(e.shiftKey);
+            this.cursorMoveUp(e.shiftKey, ctrlKey);
 
             drawingObjectsController.updateSelectionState();
             drawingObjectsController.updateOverlay();
@@ -5690,7 +5699,7 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 40 ) // Bottom Arrow
         {
-            this.cursorMoveDown(e.shiftKey);
+            this.cursorMoveDown(e.shiftKey, ctrlKey);
 
             drawingObjectsController.updateSelectionState();
             drawingObjectsController.updateOverlay();

@@ -1891,16 +1891,16 @@ CPresentation.prototype =
         return true;
     },
 
-    Cursor_MoveUp : function(AddToSelect)
+    Cursor_MoveUp : function(AddToSelect, CtrlKey)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveUp(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveUp(AddToSelect, CtrlKey);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveDown : function(AddToSelect)
+    Cursor_MoveDown : function(AddToSelect, CtrlKey)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveDown(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveDown(AddToSelect, CtrlKey);
         this.Document_UpdateInterfaceState();
         return true;
     },
@@ -2701,7 +2701,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 38 ) // Top Arrow
         {
-            this.Cursor_MoveUp( true === e.ShiftKey );
+            this.Cursor_MoveUp( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 39 ) // Right Arrow
@@ -2719,7 +2719,7 @@ CPresentation.prototype =
             //if ( true != e.ShiftKey )
             //    this.DrawingDocument.TargetStart();
 
-            this.Cursor_MoveDown( true === e.ShiftKey );
+            this.Cursor_MoveDown( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 46 && false === editor.isViewMode ) // Delete

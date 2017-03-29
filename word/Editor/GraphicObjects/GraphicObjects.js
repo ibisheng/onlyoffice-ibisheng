@@ -2696,6 +2696,7 @@ CGraphicObjects.prototype =
     cursorMoveDown: DrawingObjectsController.prototype.cursorMoveDown,
 
     cursorMoveEndOfLine: DrawingObjectsController.prototype.cursorMoveEndOfLine,
+    getMoveDist: DrawingObjectsController.prototype.getMoveDist,
 
 
     cursorMoveStartOfLine: DrawingObjectsController.prototype.cursorMoveStartOfLine,
