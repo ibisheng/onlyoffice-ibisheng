@@ -440,7 +440,7 @@ var c_sPerDay = 86400;
 var c_msPerDay = c_sPerDay * 1000;
   var rx_sFuncPref = /_xlfn\./i;
 	var c_numFormatFirstCell = -1;
-	var c_numFormatNone = -2;
+	var cNumFormatNone = -2;
 
 Date.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
 Date.prototype.excelNullDate1904 = Date.UTC( 1904, 0, 1, 0, 0, 0 );
@@ -2780,8 +2780,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cConcatSTROperator.prototype = Object.create(cBaseOperator.prototype);
-	cConcatSTROperator.prototype.numFormat = c_numFormatNone;
 	cConcatSTROperator.prototype.constructor = cConcatSTROperator;
+	cConcatSTROperator.prototype.numFormat = cNumFormatNone;
 	cConcatSTROperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
@@ -4793,26 +4793,16 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         continue;
       }
 
-      if (null !== found_operand) {
-        this.outStack.push(found_operand);
-        this.f.push(found_operand);
-        this.operand_expected = false;
-        found_operand = null
-        } else {
-        if (this.operand_str == null || this.operand_str === "'" || this.operand_str === '"') {
-          this.outStack.push(new cError(cErrorType.wrong_name));
-          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-          return this.isParsed = false;
-        }
-        if (parserHelp.isName.call(this, this.Formula, this.pCurrPos, this.wb, this.ws)[0]) {
-          this.outStack.push(new cName(this.operand_str, this.ws));
-        }
-
-        this.operand_expected = false;
-        if (this.operand_str != null) {
-          this.pCurrPos += this.operand_str.length;
-        }
-      }
+		if (null !== found_operand) {
+			this.outStack.push(found_operand);
+			this.f.push(found_operand);
+			this.operand_expected = false;
+			found_operand = null;
+		} else {
+			this.outStack.push(new cError(cErrorType.wrong_name));
+			this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+			return this.isParsed = false;
+		}
       if (wasRigthParentheses) {
         this.elemArr.push(new cMultOperator());
       }
@@ -4900,7 +4890,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 					_tmp = currentElement.Calculate(arg, rangeCell, opt_defName, this.ws.getId());
 					if (null != _tmp.numFormat) {
 						numFormat = _tmp.numFormat;
-					} else if (0 > numFormat || c_numFormatNone === currentElement.numFormat) {
+					} else if (0 > numFormat || cNumFormatNone === currentElement.numFormat) {
 						numFormat = currentElement.numFormat;
 					}
 					elemArr.push(_tmp);
@@ -5702,7 +5692,7 @@ function rtl_math_erfc( x ) {
 	window['AscCommonExcel'].c_sPerDay = c_sPerDay;
 	window['AscCommonExcel'].c_msPerDay = c_msPerDay;
 	window['AscCommonExcel'].cNumFormatFirstCell = c_numFormatFirstCell;
-	window['AscCommonExcel'].cNumFormatNone = c_numFormatNone;
+	window['AscCommonExcel'].cNumFormatNone = cNumFormatNone;
 
 	window['AscCommonExcel'].cNumber = cNumber;
 	window['AscCommonExcel'].cString = cString;

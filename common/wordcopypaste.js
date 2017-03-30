@@ -4285,6 +4285,7 @@ PasteProcessor.prototype =
 					}
 					else if(cStyle && presentation.globalTableStyles && presentation.globalTableStyles.Style)
 					{
+						var isFoundStyle = false;
 						for(var j in presentation.globalTableStyles.Style)
 						{
 							//TODO isEqual - сравнивает ещё и имя стиля. для случая, когда одинаковый контент, но имя стиля разное, не подойдет это сравнение
@@ -4292,8 +4293,19 @@ PasteProcessor.prototype =
 							{
 								arr_shapes[i].Drawing.graphicObject.Set_TableStyle(j, true);
 								foundTableStylesIdMap[style_index] = j;
+								isFoundStyle = true;
 								break;
 							}
+						}
+						
+						//в данном случае добавляем новый стиль
+						if(!isFoundStyle)
+						{
+							//TODO при добавлении нового стиля - падение. пересмотреть!
+							/*var newIndexStyle = presentation.globalTableStyles.Add(cStyle);
+							presentation.TableStylesIdMap[newIndexStyle] = true;
+							arr_shapes[i].Drawing.graphicObject.Set_TableStyle(newIndexStyle, true);
+							foundTableStylesIdMap[style_index] = newIndexStyle;*/
 						}
 					}
 					else if(presentation.TableStylesIdMap[style_index])

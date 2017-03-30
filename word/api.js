@@ -1973,8 +1973,8 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.saveCheck = function() {
 		return true === this.canSave && !this.isLongAction();
-	}
-	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest)
+	};
+	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest, isIdle)
 	{
 		var res = false;
 		this.IsUserSave = !isAutoSave;

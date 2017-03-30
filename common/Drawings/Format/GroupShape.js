@@ -1811,6 +1811,19 @@ function CGroupShape()
         return true;
     };
 
+    CGroupShape.prototype.resetGroups = function()
+    {
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].resetGroups){
+                this.spTree[i].resetGroups();
+            }
+            if(this.spTree[i].group !== this){
+                this.spTree[i].setGroup(this);
+            }
+        }
+    };
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGroupShape = CGroupShape;

@@ -357,7 +357,6 @@
 			this.value = new cNumber(Math.round(new Date(Date.UTC(year, month - 1, day)).getExcelDate()));
 		}
 		this.value.numFormat = 14;
-		this.value.ca = true;
 		return this.value;
 	};
 	cDATE.prototype.getInfo = function () {
@@ -584,19 +583,19 @@
 			if (val < 60) {
 				return this.setCA(
 					new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay) ).getUTCDate()),
-					true, 0);
+					false, 0);
 			} else if (val == 60) {
 				return this.setCA(
 					new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay) ).getUTCDate() +
-						1), true, 0);
+						1), false, 0);
 			} else {
 				return this.setCA(
 					new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay) ).getUTCDate()),
-					true, 0);
+					false, 0);
 			}
 		} else {
 			return this.setCA(
-				new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay) ).getUTCDate()), true,
+				new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay) ).getUTCDate()), false,
 				0);
 		}
 	};
@@ -881,7 +880,7 @@
 		} else                             //1		 2 3 4					   4	3		 	 					2 1
 		{
 			return this.setCA(new cNumber(parseInt(( ( val - Math.floor(val) ) * 24 ).toFixed(cExcelDateTimeDigits))),
-				true, 0);
+				false, 0);
 		}
 	};
 	cHOUR.prototype.getInfo = function () {
@@ -948,7 +947,7 @@
 			return this.setCA(new cError(cErrorType.not_numeric), true);
 		} else {
 			val = parseInt(( ( val * 24 - Math.floor(val * 24) ) * 60 ).toFixed(cExcelDateTimeDigits)) % 60;
-			return this.setCA(new cNumber(val), true, 0);
+			return this.setCA(new cNumber(val), false, 0);
 		}
 	};
 	cMINUTE.prototype.getInfo = function () {
@@ -1012,15 +1011,15 @@
 		}
 		if (!AscCommon.bDate1904) {
 			if (val == 60) {
-				return this.setCA(new cNumber(2), true, 0);
+				return this.setCA(new cNumber(2), false, 0);
 			} else {
 				return this.setCA(
 					new cNumber(( new Date(( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst - 1 ) *
-							c_msPerDay) ).getUTCMonth() + 1), true, 0);
+							c_msPerDay) ).getUTCMonth() + 1), false, 0);
 			}
 		} else {
 			return this.setCA(new cNumber(( new Date(( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst ) *
-					c_msPerDay) ).getUTCMonth() + 1), true, 0);
+					c_msPerDay) ).getUTCMonth() + 1), false, 0);
 		}
 	};
 	cMONTH.prototype.getInfo = function () {
@@ -1253,7 +1252,7 @@
 			return this.setCA(new cError(cErrorType.not_numeric), true);
 		} else {
 			val = parseInt((( val * 24 * 60 - Math.floor(val * 24 * 60) ) * 60).toFixed(cExcelDateTimeDigits)) % 60;
-			return this.setCA(new cNumber(val), true, 0);
+			return this.setCA(new cNumber(val), false, 0);
 		}
 	};
 	cSECOND.prototype.getInfo = function () {
@@ -1314,7 +1313,7 @@
 		second = second.getValue();
 
 		var v = (hour * 60 * 60 + minute * 60 + second) / c_sPerDay;
-		this.setCA(new cNumber(v - Math.floor(v)), true);
+		this.setCA(new cNumber(v - Math.floor(v)), false);
 		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
 			this.value.numFormat = 18;
 		}
@@ -1720,9 +1719,9 @@
 		}
 
 		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
-			return this.setCA(new cNumber(val), true, 14);
+			return this.setCA(new cNumber(val), false, 14);
 		} else {
-			return this.setCA(new cNumber(val), true);
+			return this.setCA(new cNumber(val), false);
 		}
 	};
 	cWORKDAY.prototype.getInfo = function () {
@@ -1799,7 +1798,7 @@
 		} else {
 			return this.setCA(
 				new cNumber((new Date((val - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay)).getUTCFullYear()),
-				true, 0);
+				false, 0);
 		}
 	};
 	cYEAR.prototype.getInfo = function () {

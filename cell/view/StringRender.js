@@ -648,7 +648,7 @@
 		 */
 		StringRender.prototype._calcTextMetrics = function (dontCalcRepeatChars) {
 			var self = this, i = 0, p, p_, lm, beg = 0;
-			var l = new LineInfo(), TW = 0, TH = 0, BL = 0;
+			var l = new LineInfo(), TW = 0, TH = 0, BL = 0, CL = 0;
 
 			function addLine(b, e) {
 				if (-1 !== b)
@@ -706,7 +706,11 @@
 					addLine(beg, i - 1);
 				}
 			}
-			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0, (this.lines[0].bl - this.lines[0].a + BL + l.d) / 2);
+
+			if (this.lines.length > 0) {
+				CL = (this.lines[0].bl - this.lines[0].a + BL + l.d) / 2;
+			}
+			return new asc.TextMetrics(TW, TH, 0, BL, 0, 0, CL);
 		};
 
 		StringRender.prototype._getRepeatCharPos = function () {
