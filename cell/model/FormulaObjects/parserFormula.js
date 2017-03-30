@@ -4793,26 +4793,16 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         continue;
       }
 
-      if (null !== found_operand) {
-        this.outStack.push(found_operand);
-        this.f.push(found_operand);
-        this.operand_expected = false;
-        found_operand = null
-        } else {
-        if (this.operand_str == null || this.operand_str === "'" || this.operand_str === '"') {
-          this.outStack.push(new cError(cErrorType.wrong_name));
-          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-          return this.isParsed = false;
-        }
-        if (parserHelp.isName.call(this, this.Formula, this.pCurrPos, this.wb, this.ws)[0]) {
-          this.outStack.push(new cName(this.operand_str, this.ws));
-        }
-
-        this.operand_expected = false;
-        if (this.operand_str != null) {
-          this.pCurrPos += this.operand_str.length;
-        }
-      }
+		if (null !== found_operand) {
+			this.outStack.push(found_operand);
+			this.f.push(found_operand);
+			this.operand_expected = false;
+			found_operand = null;
+		} else {
+			this.outStack.push(new cError(cErrorType.wrong_name));
+			this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+			return this.isParsed = false;
+		}
       if (wasRigthParentheses) {
         this.elemArr.push(new cMultOperator());
       }
