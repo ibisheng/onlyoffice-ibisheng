@@ -8796,6 +8796,13 @@ drawPieChart.prototype =
 						}
 						else if(side === sides.inside)
 						{
+							//выставляю закругленные соединения
+							if(pen.Join)
+							{
+								pen = pen.createDuplicate();
+								pen.Join.type = Asc.c_oAscLineJoinType.Round;
+							}
+							
 							drawPath(path[j].insidePath, pen, brush, null, true);
 						}
 						else if(side === sides.up)
