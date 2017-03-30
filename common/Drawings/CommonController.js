@@ -3436,7 +3436,7 @@ DrawingObjectsController.prototype =
                             chart.setBackWall(null);
                         }
                     }
-                    new_chart_type.setMarker(b_marker);
+                    //new_chart_type.setMarker(b_marker);
                     new_chart_type.setGrouping(need_groupping);
                 }
                 break;
