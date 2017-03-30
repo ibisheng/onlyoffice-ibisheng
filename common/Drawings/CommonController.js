@@ -6814,7 +6814,7 @@ DrawingObjectsController.prototype =
                 for(var i = 0; i < oDrawingSelectionState.selection.length; ++i)
                 {
                     var oSp = oDrawingSelectionState.selection[i].object;
-                    if(oSp.Is_UseInDocument())
+                    if(oSp.Is_UseInDocument() && !oSp.group)
                     {
                         this.selectObject(oSp, bDocument ? (oSp.parent ? oSp.parent.PageNum : nPageIndex) : nPageIndex);
                     }
