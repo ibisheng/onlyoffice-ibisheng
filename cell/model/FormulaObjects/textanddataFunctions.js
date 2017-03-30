@@ -237,6 +237,7 @@
 	cCONCATENATE.prototype = Object.create(cBaseFunction.prototype);
 	cCONCATENATE.prototype.constructor = cCONCATENATE;
 	cCONCATENATE.prototype.argumentsMin = 1;
+	cCONCATENATE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCONCATENATE.prototype.Calculate = function (arg) {
 		var arg0 = new cString(""), argI;
 		for (var i = 0; i < this.argumentsCurrent; i++) {
