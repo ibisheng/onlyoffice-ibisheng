@@ -987,7 +987,7 @@
 			this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.value;
+		return this.setCA(this.value, true);
 
 	};
 	cOFFSET.prototype.getInfo = function () {
