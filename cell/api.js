@@ -314,23 +314,42 @@ var editor;
 	spreadsheet_api.prototype.saveCheck = function() {
 		return !(!this.canSave || this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction || this.isLongAction());
 	};
-	spreadsheet_api.prototype.asc_Save = function (isAutoSave) {
+	spreadsheet_api.prototype.asc_Save = function (isAutoSave, isUndoRequest, isIdle) {
 		this.IsUserSave = !isAutoSave;
 		if (!this.saveCheck()) {
 			return false;
-		} else if (!(this.asc_isDocumentCanSave() || this.collaborativeEditing.haveOtherChanges() || this.canUnlockDocument)) {
+		}
+
+		if (!(this.asc_isDocumentCanSave() || this.collaborativeEditing.haveOtherChanges() || this.canUnlockDocument)) {
 			if (this.isForceSaveOnUserSave && this.IsUserSave) {
 				this.forceSave();
 			}
 			return false;
 		}
 
+		var tmpHandlers;
+		if (isIdle) {
+			tmpHandlers = this.wbModel.handlers.handlers['asc_onError'];
+			this.wbModel.handlers.handlers['asc_onError'] = null;
+		}
+
+      /* Нужно закрыть редактор (до выставления флага canSave, т.к. мы должны успеть отправить
+       asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzilla.onlyoffice.com/show_bug.cgi?id=28331 */
+		if (!this.asc_closeCellEditor()) {
+			if (isIdle) {
+				this.asc_closeCellEditor(true);
+			} else {
+				return false;
+			}
+		}
+
+		if (isIdle) {
+			this.wbModel.handlers.handlers['asc_onError'] = tmpHandlers;
+		}
+
 		if (this.IsUserSave) {
 			this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 		}
-      /* Нужно закрыть редактор (до выставления флага canSave, т.к. мы должны успеть отправить
-       asc_onDocumentModifiedChanged для подписки на сборку) Баг http://bugzilla.onlyoffice.com/show_bug.cgi?id=28331 */
-		this.asc_closeCellEditor();
 
 		// Не даем пользователю сохранять, пока не закончится сохранение
 		this.canSave = false;
@@ -2061,9 +2080,11 @@ var editor;
   };
 
 	spreadsheet_api.prototype.asc_closeCellEditor = function (cancel) {
+		var result = true;
 		if (this.wb) {
-			this.wb.closeCellEditor(cancel);
+			result = this.wb.closeCellEditor(cancel);
 		}
+		return result;
 	};
 
 
@@ -3054,14 +3075,15 @@ var editor;
 		}
 	};
 
-  spreadsheet_api.prototype._onUpdateDocumentCanSave = function() {
-    // Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
-    var tmp = History.Have_Changes() || (this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength());
-    if (tmp !== this.isDocumentCanSave) {
-      this.isDocumentCanSave = tmp;
-      this.handlers.trigger('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
-    }
-  };
+	spreadsheet_api.prototype._onUpdateDocumentCanSave = function () {
+		// Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
+		var tmp = History.Have_Changes() || (this.collaborativeEditing.getCollaborativeEditing() &&
+			0 !== this.collaborativeEditing.getOwnLocksLength()) || this.asc_getCellEditMode();
+		if (tmp !== this.isDocumentCanSave) {
+			this.isDocumentCanSave = tmp;
+			this.handlers.trigger('asc_onDocumentCanSaveChanged', this.isDocumentCanSave);
+		}
+	};
 
   spreadsheet_api.prototype._onCheckCommentRemoveLock = function(lockElem) {
     var res = false;

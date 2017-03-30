@@ -1913,14 +1913,16 @@
     }
   };
 
-  // Останавливаем ввод данных в редакторе ввода
-  WorkbookView.prototype.closeCellEditor = function(cancel) {
-    var ws = this.getWorksheet();
-    // Останавливаем ввод данных в редакторе ввода
-    if (ws.getCellEditMode() && !this.cellEditor.formulaIsOperator() /*&& !this.cellFormulaEnterWSOpen*/) {
-      this._onStopCellEditing(cancel);
-    }
-  };
+	// Останавливаем ввод данных в редакторе ввода
+	WorkbookView.prototype.closeCellEditor = function (cancel) {
+		var result = true;
+		var ws = this.getWorksheet();
+		// Останавливаем ввод данных в редакторе ввода
+		if (ws.getCellEditMode()) {
+			result = this._onStopCellEditing(cancel);
+		}
+		return result;
+	};
 
   WorkbookView.prototype.restoreFocus = function() {
     if (window["NATIVE_EDITOR_ENJINE"]) {
@@ -2548,8 +2550,6 @@
         ws.objectRender.controller.insertHyperlink(options);
       }
     } else {
-      // На всякий случай проверка (вдруг кто собирается вызвать...)
-      this.closeCellEditor();
       ws.setSelectionInfo("hyperlink", options);
       this.restoreFocus();
     }
