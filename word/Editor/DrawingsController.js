@@ -117,16 +117,16 @@ CDrawingsController.prototype.MoveCursorRight = function(AddToSelect, Word, From
 {
 	return this.DrawingObjects.cursorMoveRight(AddToSelect, Word, FromPaste);
 };
-CDrawingsController.prototype.MoveCursorUp = function(AddToSelect)
+CDrawingsController.prototype.MoveCursorUp = function(AddToSelect, CtrlKey)
 {
-	var RetValue = this.DrawingObjects.cursorMoveUp(AddToSelect);
+	var RetValue = this.DrawingObjects.cursorMoveUp(AddToSelect, CtrlKey);
 	this.LogicDocument.Document_UpdateInterfaceState();
 	this.LogicDocument.Document_UpdateSelectionState();
 	return RetValue;
 };
-CDrawingsController.prototype.MoveCursorDown = function(AddToSelect)
+CDrawingsController.prototype.MoveCursorDown = function(AddToSelect, CtrlKey)
 {
-	var RetValue = this.DrawingObjects.cursorMoveDown(AddToSelect);
+	var RetValue = this.DrawingObjects.cursorMoveDown(AddToSelect, CtrlKey);
 	this.LogicDocument.Document_UpdateInterfaceState();
 	this.LogicDocument.Document_UpdateSelectionState();
 	return RetValue;

@@ -3813,7 +3813,7 @@ Paragraph.prototype =
 		return ContentPos;
 	},
 
-    Set_ParaContentPos : function(ContentPos, CorrectEndLinePos, Line, Range)
+    Set_ParaContentPos : function(ContentPos, CorrectEndLinePos, Line, Range, bCorrectPos)
     {
         var Pos = ContentPos.Get(0);
 
@@ -3825,9 +3825,12 @@ Paragraph.prototype =
 
         this.CurPos.ContentPos = Pos;
         this.Content[Pos].Set_ParaContentPos( ContentPos, 1 );
-        this.Correct_ContentPos(CorrectEndLinePos);
 
-        this.Correct_ContentPos2();
+        if (false !== bCorrectPos)
+		{
+			this.Correct_ContentPos(CorrectEndLinePos);
+			this.Correct_ContentPos2();
+		}
 
         this.CurPos.Line  = Line;
         this.CurPos.Range = Range;
@@ -7155,6 +7158,10 @@ Paragraph.prototype =
             else
             {
                 TextPr = this.Content[this.CurPos.ContentPos].Get_CompiledTextPr(true);
+
+                var oRun = this.Get_ElementByPos(this.Get_ParaContentPos(false, false, false));
+                if (para_Run === oRun.Type && oRun.private_IsCurPosNearFootnoteReference())
+					TextPr.VertAlign = AscCommon.vertalign_Baseline;
             }
         }
         
@@ -11969,50 +11976,11 @@ Paragraph.prototype.Get_DocumentPositionFromObject = function(PosArray)
 };
 Paragraph.prototype.Get_XYByContentPos = function(ContentPos)
 {
-    var ParaContentPos = this.Get_ParaContentPos(false, false);
-
-    this.Set_ParaContentPos(ContentPos, true, -1, -1);
-    var Result = this.Internal_Recalculate_CurPos(-1, false, false, true);
-    this.Set_ParaContentPos(ParaContentPos, true, this.CurPos.Line, this.CurPos.Range);
-    return Result;
-
-
-    if (this.Lines.length <= 0)
-        return {X : 0, Y : 0, PageNum : 0, Height : 0};
-
-    var ParaPos = this.Get_ParaPosByContentPos(ContentPos);
-    if (ParaPos.Line < 0 || ParaPos >= this.Lines.length || ParaPos.Page < 0 || ParaPos.Page >= this.Pages.length || ParaPos.Range < 0 || ParaPos.Range >= this.Lines[ParaPos.Line].Ranges.length)
-        return {X : 0, Y : 0, PageNum : 0, Height : 0};
-
-    var CurLine  = ParaPos.Line;
-    var CurRange = ParaPos.Range;
-    var CurPage  = ParaPos.Page;
-
-    var X = this.Lines[CurLine].Ranges[CurRange].XVisible;
-    var Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y;
-
-    var StartPos = this.Lines[CurLine].Ranges[CurRange].StartPos;
-    var EndPos   = this.Lines[CurLine].Ranges[CurRange].EndPos;
-
-    if (true === this.Numbering.Check_Range(CurRange, CurLine))
-        X += this.Numbering.WidthVisible;
-
-    var CurPos = ContentPos.Get(0);
-    for (var Pos = StartPos; Pos <= EndPos; ++Pos)
-    {
-        var Item = this.Content[Pos];
-
-        if (CurPos === Pos)
-        {
-            return Item.Get_XYByContentPos(ContentPos, 1, X, Y, true, CurRange, CurLine, CurPage);
-        }
-        else
-        {
-            X = Item.Get_XYByContentPos(ContentPos, 1, X, Y, false, CurRange, CurLine, CurPage).X;
-        }
-    }
-
-    return {X : X, Y : Y, PageNum : this.Get_AbsolutePage(CurPage), Height : this.Lines[CurLine].Bottom - this.Lines[CurLine].Top};
+	var ParaContentPos = this.Get_ParaContentPos(false, false);
+	this.Set_ParaContentPos(ContentPos, true, -1, -1);
+	var Result = this.Internal_Recalculate_CurPos(-1, false, false, true);
+	this.Set_ParaContentPos(ParaContentPos, true, this.CurPos.Line, this.CurPos.Range, false);
+	return Result;
 };
 Paragraph.prototype.Get_Lock = function()
 {

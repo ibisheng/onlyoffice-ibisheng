@@ -8830,8 +8830,9 @@ function GenerateDefaultMasterSlide(theme)
 
 function GenerateDefaultSlideLayout(master)
 {
-    var layout = new SlideLayout(master);
+    var layout = new SlideLayout();
     layout.Theme = master.Theme;
+    layout.Master = master;
     return layout;
 }
 
@@ -10444,6 +10445,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].TextListStyle = TextListStyle;
     window['AscFormat'].GenerateDefaultTheme = GenerateDefaultTheme;
     window['AscFormat'].GenerateDefaultMasterSlide = GenerateDefaultMasterSlide;
+    window['AscFormat'].GenerateDefaultSlideLayout = GenerateDefaultSlideLayout;
     window['AscFormat'].GenerateDefaultSlide = GenerateDefaultSlide;
     window['AscFormat'].CreateDefaultTextRectStyle = CreateDefaultTextRectStyle;
     window['AscFormat'].GenerateDefaultColorMap = GenerateDefaultColorMap;

@@ -2538,12 +2538,17 @@ CGraphicObjects.prototype =
         var nearest_pos = this.document.Get_NearestPos(objects_for_grouping[0].parent.pageIndex, common_bounds.minX, common_bounds.minY, true, para_drawing);
 
         nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
+
+        var nPageIndex = objects_for_grouping[0].parent.pageIndex;
         for(i = 0; i < objects_for_grouping.length; ++i)
         {
             objects_for_grouping[i].parent.Remove_FromDocument(false);
             objects_for_grouping[i].parent.Set_GraphicObject(null);//for Bug 34548
+            if(objects_for_grouping[i].setParent){
+                objects_for_grouping[i].setParent(null);
+            }
         }
-        para_drawing.Set_XYForAdd( common_bounds.minX,  common_bounds.minY, nearest_pos, objects_for_grouping[0].parent.pageIndex);
+        para_drawing.Set_XYForAdd( common_bounds.minX,  common_bounds.minY, nearest_pos, nPageIndex);
         para_drawing.Set_Props(new asc_CImgProperty(
             {
                 PositionH:
@@ -2696,6 +2701,7 @@ CGraphicObjects.prototype =
     cursorMoveDown: DrawingObjectsController.prototype.cursorMoveDown,
 
     cursorMoveEndOfLine: DrawingObjectsController.prototype.cursorMoveEndOfLine,
+    getMoveDist: DrawingObjectsController.prototype.getMoveDist,
 
 
     cursorMoveStartOfLine: DrawingObjectsController.prototype.cursorMoveStartOfLine,

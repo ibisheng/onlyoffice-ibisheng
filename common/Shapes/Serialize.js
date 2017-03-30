@@ -684,6 +684,11 @@ function BinaryPPTYLoader()
                 this.presentation.slideMasters[0] = AscFormat.GenerateDefaultMasterSlide(this.presentation.themes[0]);
                 this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
             }
+            if(this.presentation.slideMasters[0].sldLayoutLst.length === 0){
+
+                this.presentation.slideMasters[0].sldLayoutLst[0] = AscFormat.GenerateDefaultSlideLayout(this.presentation.slideMasters[0]);
+                this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
+            }
             if (this.presentation.Slides.length == 0)
             {
                 this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.presentation.slideLayouts[0]);
@@ -1072,7 +1077,7 @@ function BinaryPPTYLoader()
         s.Seek2(_end_rec);
     }
 
-    this.ReadTableStyle = function()
+    this.ReadTableStyle = function(bNotAddStyle)
     {
         var s = this.stream;
 
@@ -1095,7 +1100,7 @@ function BinaryPPTYLoader()
                 {
                     var _id = s.GetString2();
                    // _style.Id = _id;
-					if(AscCommon.isRealObject(this.presentation.TableStylesIdMap))
+					if(AscCommon.isRealObject(this.presentation.TableStylesIdMap) && !bNotAddStyle)
 						this.presentation.TableStylesIdMap[_style.Id] = true;
                     this.map_table_styles[_id] = _style;
                     break;
@@ -1271,8 +1276,15 @@ function BinaryPPTYLoader()
             _style.TablePr.TableBorders.Right = _style.TableWholeTable.TableCellPr.TableCellBorders.Right;
             delete _style.TableWholeTable.TableCellPr.TableCellBorders.Right;
         }
-		if(this.presentation.globalTableStyles)
-			this.presentation.globalTableStyles.Add(_style);
+		if(bNotAddStyle)
+		{
+			return _style;
+		}
+		else
+		{
+			if(this.presentation.globalTableStyles)
+				this.presentation.globalTableStyles.Add(_style);
+		}
     };
 
     this.ReadTableStylePart = function()

@@ -2664,6 +2664,9 @@ CBarChart.prototype =
         c.setGapWidth(this.gapWidth);
         c.setGrouping(this.grouping);
         c.setOverlap(this.overlap);
+        c.setGapDepth(this.gapDepth);
+        c.setShape(this.shape);
+
         for(var i = 0; i < this.series.length; ++i)
         {
             c.addSer(this.series[i].createDuplicate());

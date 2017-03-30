@@ -6039,78 +6039,84 @@
         var sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink;
         var widthDiff = 0, heightDiff = 0, isLocked = false, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
 
-        var frozenCursor = this._isFrozenAnchor(x, y);
-        if (!isViewerMode && frozenCursor.result) {
-            lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId,
-              AscCommonExcel.c_oAscLockNameFrozenPane);
-            isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
-            if (false !== isLocked) {
-                // Кто-то сделал lock
-                var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new AscCommon.CellAddress(0, 0, 0);
-                userId = isLocked.UserId;
-                lockRangePosLeft = this.getCellLeft(frozenCell.getCol0(), 0);
-                lockRangePosTop = this.getCellTop(frozenCell.getRow0(), 0);
-            }
-            return {
-                cursor: frozenCursor.cursor,
-                target: frozenCursor.name,
-                col: -1,
-                row: -1,
-                userId: userId,
-                lockRangePosLeft: lockRangePosLeft,
-                lockRangePosTop: lockRangePosTop
-            };
-        }
+        if (c_oAscSelectionDialogType.None === this.selectionDialogType) {
+			var frozenCursor = this._isFrozenAnchor(x, y);
+			if (!isViewerMode && frozenCursor.result) {
+				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId,
+					AscCommonExcel.c_oAscLockNameFrozenPane);
+				isLocked =
+					this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
+				if (false !== isLocked) {
+					// Кто-то сделал lock
+					var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell :
+						new AscCommon.CellAddress(0, 0, 0);
+					userId = isLocked.UserId;
+					lockRangePosLeft = this.getCellLeft(frozenCell.getCol0(), 0);
+					lockRangePosTop = this.getCellTop(frozenCell.getRow0(), 0);
+				}
+				return {
+					cursor: frozenCursor.cursor,
+					target: frozenCursor.name,
+					col: -1,
+					row: -1,
+					userId: userId,
+					lockRangePosLeft: lockRangePosLeft,
+					lockRangePosTop: lockRangePosTop
+				};
+			}
 
-        var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
-        if (asc["editor"].isStartAddShape &&
-          AscCommonExcel.CheckIdSatetShapeAdd(this.objectRender.controller.curState)) {
-            return {cursor: kCurFillHandle, target: c_oTargetType.Shape, col: -1, row: -1};
-        }
+			var drawingInfo = this.objectRender.checkCursorDrawingObject(x, y);
+			if (asc["editor"].isStartAddShape &&
+				AscCommonExcel.CheckIdSatetShapeAdd(this.objectRender.controller.curState)) {
+				return {cursor: kCurFillHandle, target: c_oTargetType.Shape, col: -1, row: -1};
+			}
 
-        if (drawingInfo && drawingInfo.id) {
-            // Возможно картинка с lock
-            lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.id);
-            isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
-            if (false !== isLocked) {
-                // Кто-то сделал lock
-                userId = isLocked.UserId;
-                lockRangePosLeft = drawingInfo.object.getVisibleLeftOffset(true);
-                lockRangePosTop = drawingInfo.object.getVisibleTopOffset(true);
-            }
+			if (drawingInfo && drawingInfo.id) {
+				// Возможно картинка с lock
+				lockInfo =
+					this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId, drawingInfo.id);
+				isLocked =
+					this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
+				if (false !== isLocked) {
+					// Кто-то сделал lock
+					userId = isLocked.UserId;
+					lockRangePosLeft = drawingInfo.object.getVisibleLeftOffset(true);
+					lockRangePosTop = drawingInfo.object.getVisibleTopOffset(true);
+				}
 
-            if (drawingInfo.hyperlink instanceof ParaHyperlink) {
-                oHyperlink = new AscCommonExcel.Hyperlink();
-                oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
-                var spl = drawingInfo.hyperlink.Value.split("!");
-                if (spl.length === 2) {
-                    oHyperlink.setLocation(drawingInfo.hyperlink.Value);
-                } else {
-                    oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
-                }
+				if (drawingInfo.hyperlink instanceof ParaHyperlink) {
+					oHyperlink = new AscCommonExcel.Hyperlink();
+					oHyperlink.Tooltip = drawingInfo.hyperlink.ToolTip;
+					var spl = drawingInfo.hyperlink.Value.split("!");
+					if (spl.length === 2) {
+						oHyperlink.setLocation(drawingInfo.hyperlink.Value);
+					} else {
+						oHyperlink.Hyperlink = drawingInfo.hyperlink.Value;
+					}
 
-                cellCursor =
-                {cursor: drawingInfo.cursor, target: c_oTargetType.Cells, col: -1, row: -1, userId: userId};
-                return {
-                    cursor: kCurHyperlink,
-                    target: c_oTargetType.Hyperlink,
-                    hyperlink: new asc_CHyperlink(oHyperlink),
-                    cellCursor: cellCursor,
-                    userId: userId
-                };
-            }
+					cellCursor =
+						{cursor: drawingInfo.cursor, target: c_oTargetType.Cells, col: -1, row: -1, userId: userId};
+					return {
+						cursor: kCurHyperlink,
+						target: c_oTargetType.Hyperlink,
+						hyperlink: new asc_CHyperlink(oHyperlink),
+						cellCursor: cellCursor,
+						userId: userId
+					};
+				}
 
-            return {
-                cursor: drawingInfo.cursor,
-                target: c_oTargetType.Shape,
-                drawingId: drawingInfo.id,
-                col: -1,
-                row: -1,
-                userId: userId,
-                lockRangePosLeft: lockRangePosLeft,
-                lockRangePosTop: lockRangePosTop
-            };
-        }
+				return {
+					cursor: drawingInfo.cursor,
+					target: c_oTargetType.Shape,
+					drawingId: drawingInfo.id,
+					col: -1,
+					row: -1,
+					userId: userId,
+					lockRangePosLeft: lockRangePosLeft,
+					lockRangePosTop: lockRangePosTop
+				};
+			}
+		}
 
         x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
         y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
@@ -6195,7 +6201,8 @@
         }
 
         isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
-        if (!isViewerMode && !isSelGraphicObject && this.model.selectionRange.isSingleRange()) {
+		if (!isViewerMode && !isSelGraphicObject && this.model.selectionRange.isSingleRange() &&
+			c_oAscSelectionDialogType.None === this.selectionDialogType) {
             this._drawElements(function (_vr, _offsetX, _offsetY) {
                 return (null === (res = this._hitCursorSelectionRange(_vr, x, y, _offsetX, _offsetY)));
             });
@@ -9666,8 +9673,18 @@
 				pastedRangeProps.alignVertical = newVal.getAlignVertical();
 				//horizontal align
 				pastedRangeProps.alignHorizontal = newVal.getAlignHorizontal();
+				
 				//borders
-				var fullBorders = newVal.getBorderFull();
+				var fullBorders;
+				if(specialPasteProps.transpose)
+				{
+					//TODO сделано для правильного отображения бордеров при транспонирования. возможно стоит использовать эту функцию во всех ситуациях. проверить!
+					fullBorders = newVal.getBorder(newVal.bbox.r1, newVal.bbox.c1).clone();
+				}
+				else
+				{
+					fullBorders = newVal.getBorderFull();
+				}
 				if (pastedRangeProps.offsetLast && pastedRangeProps.offsetLast.offsetCol > 0 && curMerge && fullBorders) {
 					//для мерженных ячеек, правая границу
 					var endMergeCell = val.getCell3(pasteRow, curMerge.c2);
@@ -9676,6 +9693,7 @@
 						fullBorders.r = fullBordersEndMergeCell.r;
 					}
 				}
+				
 				pastedRangeProps.bordersFull = fullBorders;
 				//fill
 				pastedRangeProps.fill = newVal.getFill();

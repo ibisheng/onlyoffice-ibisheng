@@ -6082,7 +6082,9 @@ ParaRun.prototype.Get_CompiledTextPr = function(Copy)
         return ThisTextPr;
     }
     else
-        return this.Get_CompiledPr(Copy);
+	{
+		return this.Get_CompiledPr(Copy);
+	}
 };
 
 ParaRun.prototype.Recalc_CompiledPr = function(RecalcMeasure)

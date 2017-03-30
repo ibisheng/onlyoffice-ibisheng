@@ -649,7 +649,7 @@
 				extendSession = false;
 			}
 			if (!extendSession) {
-				if (t.asc_Save()) {
+				if (t.asc_Save(false, false, true)) {
 					//enter view mode because save async
 					t.setViewModeDisconnect();
 					t.disconnectOnSave = {code: code, reason: reason};

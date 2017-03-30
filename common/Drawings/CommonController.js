@@ -3436,7 +3436,7 @@ DrawingObjectsController.prototype =
                             chart.setBackWall(null);
                         }
                     }
-                    new_chart_type.setMarker(b_marker);
+                    //new_chart_type.setMarker(b_marker);
                     new_chart_type.setGrouping(need_groupping);
                 }
                 break;
@@ -5205,6 +5205,14 @@ DrawingObjectsController.prototype =
         }
     },
 
+    getMoveDist: function(bWord){
+        if(bWord){
+            return this.convertPixToMM(1);
+        }
+        else{
+            return this.convertPixToMM(5);
+        }
+    },
 
     cursorMoveLeft: function(AddToSelect/*Shift*/, Word/*Ctrl*/)
     {
@@ -5229,7 +5237,8 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(-this.convertPixToMM(5), 0);
+
+            this.moveSelectedObjects(-this.getMoveDist(Word), 0);
         }
     },
 
@@ -5256,12 +5265,12 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(this.convertPixToMM(5), 0);
+            this.moveSelectedObjects(this.getMoveDist(Word), 0);
         }
     },
 
 
-    cursorMoveUp: function(AddToSelect)
+    cursorMoveUp: function(AddToSelect, Word)
     {
         var target_text_object = getTargetTextObject(this);
         if(target_text_object)
@@ -5284,11 +5293,11 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(0, -this.convertPixToMM(5));
+            this.moveSelectedObjects(0, -this.getMoveDist(Word));
         }
     },
 
-    cursorMoveDown: function(AddToSelect)
+    cursorMoveDown: function(AddToSelect, Word)
     {
         var target_text_object = getTargetTextObject(this);
         if(target_text_object)
@@ -5311,7 +5320,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selectedObjects.length === 0)
                 return;
-            this.moveSelectedObjects(0, this.convertPixToMM(5));
+            this.moveSelectedObjects(0, this.getMoveDist(Word));
         }
     },
 
@@ -5672,7 +5681,7 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 38 ) // Top Arrow
         {
-            this.cursorMoveUp(e.shiftKey);
+            this.cursorMoveUp(e.shiftKey, ctrlKey);
 
             drawingObjectsController.updateSelectionState();
             drawingObjectsController.updateOverlay();
@@ -5690,7 +5699,7 @@ DrawingObjectsController.prototype =
         }
         else if ( e.keyCode == 40 ) // Bottom Arrow
         {
-            this.cursorMoveDown(e.shiftKey);
+            this.cursorMoveDown(e.shiftKey, ctrlKey);
 
             drawingObjectsController.updateSelectionState();
             drawingObjectsController.updateOverlay();
@@ -6439,15 +6448,29 @@ DrawingObjectsController.prototype =
 
     unGroupCallback: function()
     {
-        var ungroup_arr = this.canUnGroup(true);
+        var ungroup_arr = this.canUnGroup(true), aGraphicObjects;
         if(ungroup_arr.length > 0)
         {
             this.resetSelection();
-            var i, j,   cur_group, sp_tree, sp;
+            var i, j,   cur_group, sp_tree, sp, nInsertPos;
             for(i = 0; i < ungroup_arr.length; ++i)
             {
                 cur_group = ungroup_arr[i];
                 cur_group.normalize();
+
+                aGraphicObjects = this.getDrawingObjects();
+                nInsertPos = undefined;
+                for(j = 0; j < aGraphicObjects.length; ++j)
+                {
+                    if(aGraphicObjects[j] === cur_group)
+                    {
+                        nInsertPos = j;
+                        break;
+                    }
+                }
+
+
+
                 sp_tree = cur_group.spTree;
                 for(j = 0; j < sp_tree.length; ++j)
                 {
@@ -6462,7 +6485,12 @@ DrawingObjectsController.prototype =
                     {
                         sp.spPr.setFill(cur_group.spPr.Fill.createDuplicate());
                     }
-                    sp.addToDrawingObjects();
+                    if(AscFormat.isRealNumber(nInsertPos)){
+                        sp.addToDrawingObjects(nInsertPos + j);
+                    }
+                    else {
+                        sp.addToDrawingObjects();
+                    }
                     sp.checkDrawingBaseCoords();
                     this.selectObject(sp, 0);
                 }
@@ -6786,7 +6814,7 @@ DrawingObjectsController.prototype =
                 for(var i = 0; i < oDrawingSelectionState.selection.length; ++i)
                 {
                     var oSp = oDrawingSelectionState.selection[i].object;
-                    if(oSp.Is_UseInDocument())
+                    if(oSp.Is_UseInDocument() && !oSp.group)
                     {
                         this.selectObject(oSp, bDocument ? (oSp.parent ? oSp.parent.PageNum : nPageIndex) : nPageIndex);
                     }

@@ -2496,7 +2496,7 @@
 		}
 
 
-		return this.setCA(quotient(arg0, arg1), true);
+		return this.value = quotient(arg0, arg1);
 	};
 	cQUOTIENT.prototype.getInfo = function () {
 		return {

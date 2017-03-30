@@ -416,6 +416,9 @@ function openFileCommand(binUrl, changesUrl, Signature, callback) {
 			case c_oAscServerError.UploadCountFiles :
 				nRes = Asc.c_oAscError.ID.UplImageFileCount;
 				break;
+			case c_oAscServerError.UploadURL :
+				nRes = Asc.c_oAscError.ID.UplImageUrl;
+				break;
 			case c_oAscServerError.VKey :
 				nRes = Asc.c_oAscError.ID.FileVKey;
 				break;
@@ -837,6 +840,7 @@ var c_oAscServerError = {
     UploadContentLength:-101,
     UploadExtension:-102,
     UploadCountFiles:-103,
+	UploadURL:-104,
 
     VKey:-120,
     VKeyEncrypt:-121,
