@@ -1041,6 +1041,11 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
                     mapDrawings[oShape.parent.Get_Id()] = oShape.parent;
                 }
             }
+            else{
+                if(oShape.resetGroups){
+                    oShape.resetGroups();
+                }
+            }
         }
         var oDrawing;
         for (var sId in mapDrawings)

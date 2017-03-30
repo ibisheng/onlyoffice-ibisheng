@@ -3744,16 +3744,16 @@ BinaryChartWriter.prototype.WriteCT_Bar3DChart = function (oVal) {
             oThis.WriteCT_GapAmount(oVal.gapWidth);
         });
     }
-    // if (null != oVal.gapDepth) {
-    // this.bs.WriteItem(c_oserct_bar3dchartGAPDEPTH, function () {
-    // oThis.WriteCT_GapAmount(oVal.gapDepth);
-    // });
-    // }
-    // if (null != oVal.shape) {
-    // this.bs.WriteItem(c_oserct_bar3dchartSHAPE, function () {
-    // oThis.WriteCT_Shape(oVal.shape);
-    // });
-    // }
+    if (null != oVal.gapDepth) {
+        this.bs.WriteItem(c_oserct_bar3dchartGAPDEPTH, function () {
+            oThis.WriteCT_GapAmount(oVal.gapDepth);
+    });
+    }
+    if (null != oVal.shape) {
+        this.bs.WriteItem(c_oserct_bar3dchartSHAPE, function () {
+            oThis.WriteCT_Shape(oVal.shape);
+        });
+    }
     if (null != oVal.axId) {
         for (var i = 0, length = oVal.axId.length; i < length; ++i) {
             var oCurVal = oVal.axId[i];
