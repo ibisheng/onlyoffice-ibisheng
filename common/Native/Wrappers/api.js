@@ -2285,9 +2285,12 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                 }
             }
 
-            params[0] = firstUrl;
-            //  _return = _s.offline_addImageDrawingObject(params);
+            var _src = firstUrl;
+            var _w = _params[1];
+            var _h = _params[2];
+            var _pageNum = _params[3];
 
+            this.AddImageUrlActionNative(_src, _w, _h, _pageNum);
             break;
         }
 
@@ -4801,6 +4804,48 @@ Asc['asc_docs_api'].prototype.AddImageUrlNative = function(url, _w, _h, _pageNum
         var _sectionPr = this.WordControl.m_oLogicDocument.Get_PageLimits(_pageNum);
         this.AddImageToPage(url, _pageNum, (_sectionPr.XLimit - wI) / 2, (_sectionPr.YLimit - hI) / 2, wI, hI);
     }
+};
+Asc['asc_docs_api'].prototype.AddImageUrlActionNative = function(src, _w, _h, _pageNum)
+{
+  var ColumnSize = this.WordControl.m_oLogicDocument.GetColumnSize();
+  var __w = Math.max((_w * AscCommon.g_dKoef_pix_to_mm), 1);
+  var __h = Math.max((_h * AscCommon.g_dKoef_pix_to_mm), 1);
+  _w = Math.max(5, Math.min(_w, __w));
+  _h = Math.max(5, Math.min((_w * __h / __w)));
+
+  if (this.isShapeImageChangeUrl)
+  {
+    var AscShapeProp       = new Asc.asc_CShapeProperty();
+    AscShapeProp.fill      = new Asc.asc_CShapeFill();
+    AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
+    AscShapeProp.fill.fill = new Asc.asc_CFillBlip();
+    AscShapeProp.fill.fill.asc_putUrl(src);
+    this.ImgApply(new Asc.asc_CImgProperty({ShapeProperties : AscShapeProp}));
+    this.isShapeImageChangeUrl = false;
+  }
+  else if (this.isImageChangeUrl)
+  {
+    var AscImageProp      = new Asc.asc_CImgProperty();
+    AscImageProp.ImageUrl = src;
+    this.ImgApply(AscImageProp);
+    this.isImageChangeUrl = false;
+  }
+  else
+  {
+    if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+    {
+      var imageLocal = AscCommon.g_oDocumentUrls.getImageLocal(src);
+      if (imageLocal)
+      {
+        src = imageLocal;
+      }
+      this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddImageUrlLong);
+      //if (undefined === imgProp || undefined === imgProp.WrappingStyle || 0 == imgProp.WrappingStyle)
+        this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src);
+      //else
+      //  this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src, null, true);
+    }
+  }
 };
 
 Asc['asc_docs_api'].prototype.Send_Menu_Event = function(type)
