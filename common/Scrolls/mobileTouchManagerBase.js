@@ -1928,10 +1928,8 @@
 			}
 		}
 
-		if (e.preventDefault)
-			e.preventDefault();
-		else
-			e.returnValue = false;
+		AscCommon.stopEvent(e);
+		return false;
 	};
 	CMobileTouchManagerBase.prototype.onTouchMove_renderer  = function(e)
 	{
@@ -1987,10 +1985,8 @@
 				break;
 		}
 
-		if (e.preventDefault)
-			e.preventDefault();
-		else
-			e.returnValue = false;
+		AscCommon.stopEvent(e);
+		return false;
 	};
 	CMobileTouchManagerBase.prototype.onTouchEnd_renderer   = function(e)
 	{
@@ -2023,10 +2019,9 @@
 				break;
 		}
 
-		if (e.preventDefault)
-			e.preventDefault();
-		else
-			e.returnValue = false;
+		if (!AscCommon.AscBrowser.isAndroid)
+			AscCommon.stopEvent(e);
+		return false;
 	};
 
 	/* перемещение курсора (именно курсора!) до ближайщей позиции. заточка на делегата */
