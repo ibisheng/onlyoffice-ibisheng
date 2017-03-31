@@ -738,7 +738,7 @@ ParaDrawing.prototype.Set_Props = function(Props)
 		{
 			if (isRealObject(this.GraphicObj.bounds) && AscFormat.isRealNumber(this.GraphicObj.bounds.w) && AscFormat.isRealNumber(this.GraphicObj.bounds.h))
 			{
-				this.setExtent(this.GraphicObj.bounds.w, this.GraphicObj.bounds.h);
+				this.CheckWH();
 			}
 		}
 		if (c_oAscWrapStyle2.Behind === Props.WrappingStyle || c_oAscWrapStyle2.InFront === Props.WrappingStyle)
@@ -1125,7 +1125,7 @@ ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimi
 		else
 			H = this.getXfrmExtY();
 	}
-	this.Internal_Position.Set(W, H, this.YOffset, ParaLayout, PageLimitsOrigin);
+	this.Internal_Position.Set(W, H, this.YOffset, ParaLayout, PageLimitsOrigin, this.GraphicObj.bounds.l, this.GraphicObj.bounds.t, this.GraphicObj.bounds.w, this.GraphicObj.bounds.h);
 	this.Internal_Position.Calculate_X(bInline, this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value, this.PositionH.Percent);
 	this.Internal_Position.Calculate_Y(bInline, this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
 	this.Internal_Position.Correct_Values(bInline, PageLimits, this.AllowOverlap, this.Use_TextWrap(), OtherFlowObjects);
@@ -1330,7 +1330,7 @@ ParaDrawing.prototype.private_SetXYByLayout = function(X, Y, PageNum, Layout, bC
 	var _W = (this.PositionH.Align ? this.Extent.W : this.getXfrmExtX() );
 	var _H = (this.PositionV.Align ? this.Extent.H : this.getXfrmExtY() );
 
-	this.Internal_Position.Set(_W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimitsOrigin);
+	this.Internal_Position.Set(_W, _H, this.YOffset, Layout.ParagraphLayout, Layout.PageLimitsOrigin, this.GraphicObj.bounds.l, this.GraphicObj.bounds.t, this.GraphicObj.bounds.w, this.GraphicObj.bounds.h);
 	this.Internal_Position.Calculate_X(false, c_oAscRelativeFromH.Page, false, X - Layout.PageLimitsOrigin.X, false);
 	this.Internal_Position.Calculate_Y(false, c_oAscRelativeFromV.Page, false, Y - Layout.PageLimitsOrigin.Y, false);
 	this.Internal_Position.Correct_Values(false, Layout.PageLimits, this.AllowOverlap, this.Use_TextWrap(), []);
@@ -2507,6 +2507,10 @@ function CAnchorPosition()
 	// Данные для Flow-объектов
 	this.W             = 0;
 	this.H             = 0;
+	this.BoundsL       = 0;
+	this.BoundsT       = 0;
+	this.BoundsW       = 0;
+	this.BoundsH       = 0;
 	this.X             = 0;
 	this.Y             = 0;
 	this.PageNum       = 0;
@@ -2526,10 +2530,14 @@ function CAnchorPosition()
 	this.Page_X        = 0;
 	this.Page_Y        = 0;
 }
-CAnchorPosition.prototype.Set = function(W, H, YOffset, ParaLayout, PageLimits)
+CAnchorPosition.prototype.Set = function(W, H, YOffset, ParaLayout, PageLimits, BoundsL, BoundsT, BoundsW, BoundsH)
 {
 	this.W = W;
 	this.H = H;
+	this.BoundsL = BoundsL;
+	this.BoundsT = BoundsT;
+	this.BoundsW = BoundsW;
+	this.BoundsH = BoundsH;
 
 	this.YOffset = YOffset;
 
@@ -3088,18 +3096,18 @@ CAnchorPosition.prototype.Correct_Values = function(bInline, PageLimits, AllowOv
 		if (true === UseTextWrap)
 		{
 			// Скорректируем рассчитанную позицию, так чтобы объект не выходил за заданные пределы
-			if (CurX + W > X_max)
-				CurX = X_max - W;
+			if (CurX + this.BoundsL + this.BoundsW > X_max)
+				CurX = X_max - this.BoundsL - this.BoundsW;
 
-			if (CurX < X_min)
-				CurX = X_min;
+			if (CurX + this.BoundsL < X_min)
+				CurX = X_min - this.BoundsL;
 
 			// Скорректируем рассчитанную позицию, так чтобы объект не выходил за заданные пределы
-			if (CurY + H > Y_max)
-				CurY = Y_max - H;
+			if (CurY + this.BoundsT + this.BoundsH > Y_max)
+				CurY = Y_max - this.BoundsT - this.BoundsH;
 
-			if (CurY < Y_min)
-				CurY = Y_min;
+			if (CurY + this.BoundsT < Y_min)
+				CurY = Y_min - this.BoundsT;
 		}
 
 		this.CalcX = CurX;

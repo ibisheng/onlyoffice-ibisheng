@@ -2686,6 +2686,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cPowOperator.prototype = Object.create(cBaseOperator.prototype);
+	cPowOperator.prototype.numFormat = cNumFormatNone;
 	cPowOperator.prototype.constructor = cPowOperator;
 	cPowOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
@@ -2726,6 +2727,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cMultOperator.prototype = Object.create(cBaseOperator.prototype);
+	cMultOperator.prototype.numFormat = cNumFormatNone;
 	cMultOperator.prototype.constructor = cMultOperator;
 	cMultOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
@@ -2753,6 +2755,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	}
 
 	cDivOperator.prototype = Object.create(cBaseOperator.prototype);
+	cDivOperator.prototype.numFormat = cNumFormatNone;
 	cDivOperator.prototype.constructor = cDivOperator;
 	cDivOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];

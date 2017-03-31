@@ -419,6 +419,9 @@ function CDocMeta()
 
     this.pagestreams = [];
     this.waitSelectAll = false;
+
+    this.CachedImagesCount = 5;
+    this.CachedImages = [];
 }
 
 CDocMeta.prototype =
@@ -584,6 +587,8 @@ CDocMeta.prototype =
         if (obj.CheckOnScroll() && 0 == bIsFromPaint)
             editor.WordControl.OnScroll();
 
+        var _cachedImage = null;
+
         while (s.pos < page.end)
         {
             var command = s.GetUChar();
@@ -735,11 +740,18 @@ CDocMeta.prototype =
                     if (2 == _type)
                     {
                         var _src = AscCommon.g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".svg");
-
                         obj.StreamPos = s.pos;
+
+                        _cachedImage = this.GetCachedImage(_src);
+                        if (null != _cachedImage)
+                        {
+							g.drawImage2(_cachedImage, 0, 0, page.width_mm, page.height_mm);
+							return obj.MetaDoc.OnImageLoad(obj);
+                        }
 
                         var img = new Image();
                         img.onload = function(){
+							obj.MetaDoc.SetCachedImage(_src, img);
                             if (1 != obj.BreakDrawing)
                             {
                                 g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
@@ -761,8 +773,16 @@ CDocMeta.prototype =
 
                         obj.StreamPos = s.pos;
 
+						_cachedImage = this.GetCachedImage(_src);
+						if (null != _cachedImage)
+						{
+							g.drawImage2(_cachedImage, 0, 0, page.width_mm, page.height_mm);
+							return obj.MetaDoc.OnImageLoad(obj);
+						}
+
                         var img = new Image();
                         img.onload = function(){
+                            obj.MetaDoc.SetCachedImage(_src, img);
                             if (1 != obj.BreakDrawing)
                             {
                                 g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
@@ -799,8 +819,37 @@ CDocMeta.prototype =
 
                     obj.StreamPos = s.pos;
 
+					_cachedImage = this.GetCachedImage(_src);
+					if (null != _cachedImage)
+					{
+						if (1 != obj.BreakDrawing)
+						{
+							var _ctx = g.m_oContext;
+
+							if (_tr)
+							{
+								var _dX = g.m_oCoordTransform.sx;
+								var _dY = g.m_oCoordTransform.sy;
+
+								_ctx.save();
+								_ctx.setTransform(_tr.sx * _dX, _tr.shy * _dY, _tr.shx * _dX, _tr.sy * _dY, _tr.tx * _dX, _tr.ty * _dY);
+							}
+
+							g.drawImage2(_cachedImage,__x,__y,__w,__h);
+							//editor.WordControl.OnScroll();
+
+							if (_tr)
+							{
+								_ctx.restore();
+							}
+						}
+
+						return obj.MetaDoc.OnImageLoad(obj);
+					}
+
                     var img = new Image();
                     img.onload = function(){
+						obj.MetaDoc.SetCachedImage(_src, img);
                         if (1 != obj.BreakDrawing)
                         {
                             var _ctx = g.m_oContext;
@@ -3424,6 +3473,31 @@ CDocMeta.prototype =
             this.SearchResults.Pages[this.SearchResults.CurrentPage][this.SearchResults.Current];
 
         editor.WordControl.ToSearchResult();
+    },
+
+    GetCachedImage : function(_src)
+    {
+        if (0 == this.CachedImagesCount)
+            return null;
+
+        var _len = this.CachedImages.length;
+        for (var i = 0; i < _len; i++)
+        {
+            if (this.CachedImages[i].src == _src)
+                return this.CachedImages[i].image;
+        }
+        return  null;
+    },
+
+    SetCachedImage : function(_src, _image)
+    {
+        if (0 == this.CachedImagesCount)
+            return;
+
+        if (this.CachedImages.length == this.CachedImagesCount)
+            this.CachedImages.shift();
+
+		this.CachedImages.push({ src: _src, image: _image });
     }
 };
 
