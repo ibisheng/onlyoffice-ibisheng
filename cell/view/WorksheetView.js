@@ -11621,52 +11621,61 @@
                     /*lockDraw*/false);
               },
               getSides: function () {
-                  var _col = !isMerged ? col : mc.c1;
-                  var _row = !isMerged ? row : mc.r2;
+                  var _c1, _r1, _c2, _r2, ri = 0, bi = 0;
+                  if (isMerged) {
+					  _c1 = mc.c1;
+					  _c2 = mc.c2;
+					  _r1 = mc.r1;
+					  _r2 = mc.r2;
+                  } else {
+                      _c1 = _c2 = col;
+					  _r1 = _r2 = row;
+                  }
                   var vro = getVisibleRangeObject();
                   var i, w, h, arrLeftS = [], arrRightS = [], arrBottomS = [];
                   var offsX = tc[vro.vr.c1].left - tc[0].left - vro.offsetX;
                   var offsY = tr[vro.vr.r1].top - tr[0].top - vro.offsetY;
-                  var cellX = tc[_col].left - offsX, cellY = tr[!isMerged ? row : mc.r1].top - offsY;
-                  for (i = _col; i >= vro.vr.c1; --i) {
+                  var cellX = tc[_c1].left - offsX, cellY = tr[_r1].top - offsY;
+                  for (i = _c1; i >= vro.vr.c1; --i) {
                       if (t.width_1px < tc[i].width) {
                           arrLeftS.push(tc[i].left - offsX);
                       }
                   }
-                  arrLeftS.sort(AscCommon.fSortDescending);
 
-                  // Для замерженных ячеек, можем уйти за границу
-                  if (isMerged && _col > vro.vr.c2) {
-                      _col = vro.vr.c2;
-                  }
-                  for (i = _col; i <= vro.vr.c2; ++i) {
+				  if (_c2 > vro.vr.c2) {
+					  _c2 = vro.vr.c2;
+				  }
+                  for (i = _c1; i <= vro.vr.c2; ++i) {
                       w = tc[i].width;
                       if (t.width_1px < w) {
                           arrRightS.push(tc[i].left + w - offsX);
+                      }
+                      if (_c2 === i) {
+						  ri = arrRightS.length - 1;
                       }
                   }
                   w = t.drawingCtx.getWidth();
                   if (arrRightS[arrRightS.length - 1] > w) {
                       arrRightS[arrRightS.length - 1] = w;
                   }
-                  arrRightS.sort(fSortAscending);
 
-                  // Для замерженных ячеек, можем уйти за границу
-                  if (isMerged && _row > vro.vr.r2) {
-                      _row = vro.vr.r2;
+                  if (_r2 > vro.vr.r2) {
+					  _r2 = vro.vr.r2;
                   }
-                  for (i = _row; i <= vro.vr.r2; ++i) {
+                  for (i = _r1; i <= vro.vr.r2; ++i) {
                       h = tr[i].height;
                       if (t.height_1px < h) {
                           arrBottomS.push(tr[i].top + h - offsY);
                       }
+					  if (_r2 === i) {
+						  bi = arrBottomS.length - 1;
+					  }
                   }
                   h = t.drawingCtx.getHeight();
                   if (arrBottomS[arrBottomS.length - 1] > h) {
                       arrBottomS[arrBottomS.length - 1] = h;
                   }
-                  arrBottomS.sort(fSortAscending);
-                  return {l: arrLeftS, r: arrRightS, b: arrBottomS, cellX: cellX, cellY: cellY};
+				  return {l: arrLeftS, r: arrRightS, b: arrBottomS, cellX: cellX, cellY: cellY, ri: ri, bi: bi};
               }
           });
           return true;
