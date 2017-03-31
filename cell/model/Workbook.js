@@ -2666,7 +2666,6 @@
 			}
 		}
 		//this.setTableFormulaAfterOpen();
-		this._updateConditionalFormatting(null);
 
 		this.handlers = handlers;
 		this._setHandlersTablePart();
@@ -4532,6 +4531,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	};
 	Woorksheet.prototype.onUpdateRanges = function(ranges) {
 		this.workbook.updateSparklineCache(this.sName, ranges);
+		// ToDo do not update conditional formatting on hidden sheet
 		this._updateConditionalFormatting(new AscCommonExcel.MultiplyRange(ranges));
 	};
 	Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {

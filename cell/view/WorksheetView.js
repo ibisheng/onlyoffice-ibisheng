@@ -1151,6 +1151,7 @@
         this._initPane();
         this._initCellsArea(AscCommonExcel.recalcType.full);
         this.model.setTableStyleAfterOpen();
+		this.model._updateConditionalFormatting(null);
         this._cleanCellsTextMetricsCache();
         this._prepareCellTextMetricsCache();
 
