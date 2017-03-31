@@ -331,13 +331,13 @@
 		arg2 = arg2.tocNumber();
 
 		if (arg0 instanceof cError) {
-			return this.setCA(arg0, true);
+			return this.value = arg0;
 		}
 		if (arg1 instanceof cError) {
-			return this.setCA(arg1, true);
+			return this.value = arg1;
 		}
 		if (arg2 instanceof cError) {
-			return this.setCA(arg2, true);
+			return this.value = arg2;
 		}
 
 		year = arg0.getValue();
@@ -348,7 +348,7 @@
 			year += 1900;
 		}
 		if (month == 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		}
 
 		if (year == 1900 && month == 2 && day == 29) {
@@ -417,7 +417,7 @@
 		var val0 = arg0.getValue(), val1 = arg1.getValue();
 
 		if (val0 < 0 || val1 < 0 || val0 >= val1) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		}
 
 		val0 = Date.prototype.getDateFromExcel(val0);
@@ -553,7 +553,7 @@
 			val = arg0.tocNumber().getValue();
 		}
 		if (arg0 instanceof cError) {
-			return this.setCA(arg0, true);
+			return this.value = arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
@@ -561,14 +561,14 @@
 			if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.setCA(new cError(cErrorType.wrong_value_type), true);
+				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
 			if (val instanceof cError || val instanceof cEmpty) {
 				var d = new Date(arg0.getValue());
 				if (isNaN(d)) {
-					return this.setCA(new cError(cErrorType.wrong_value_type), true);
+					return this.value = new cError(cErrorType.wrong_value_type);
 				} else {
 					val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay +
 						( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
@@ -578,7 +578,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		} else if (!AscCommon.bDate1904) {
 			if (val < 60) {
 				return this.setCA(
@@ -717,7 +717,7 @@
 		var val = arg0.getValue(), date, _date;
 
 		if (val < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		} else if (!AscCommon.bDate1904) {
 			if (val < 60) {
 				val = new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
@@ -795,7 +795,7 @@
 		var val = arg0.getValue();
 
 		if (val < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		} else if (!AscCommon.bDate1904) {
 			if (val < 60) {
 				val = new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
@@ -845,17 +845,17 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.setCA(arg0, true);
+			return this.value = arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.setCA(val, true);
+				return this.value = val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.setCA(new cError(cErrorType.wrong_value_type), true);
+				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
@@ -864,7 +864,7 @@
 				if (isNaN(d)) {
 					d = g_oFormatParser.parseDate(arg0.getValue());
 					if (d == null) {
-						return this.setCA(new cError(cErrorType.wrong_value_type), true);
+						return this.value = new cError(cErrorType.wrong_value_type);
 					}
 					val = d.value;
 				} else {
@@ -876,7 +876,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		} else                             //1		 2 3 4					   4	3		 	 					2 1
 		{
 			return this.setCA(new cNumber(parseInt(( ( val - Math.floor(val) ) * 24 ).toFixed(cExcelDateTimeDigits))),
@@ -913,17 +913,17 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.setCA(arg0, true);
+			return this.value = arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.setCA(val, true);
+				return this.value = val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.setCA(new cError(cErrorType.wrong_value_type), true);
+				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
@@ -932,7 +932,7 @@
 				if (isNaN(d)) {
 					d = g_oFormatParser.parseDate(arg0.getValue());
 					if (d == null) {
-						return this.setCA(new cError(cErrorType.wrong_value_type), true);
+						return this.value = new cError(cErrorType.wrong_value_type);
 					}
 					val = d.value;
 				} else {
@@ -944,7 +944,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		} else {
 			val = parseInt(( ( val * 24 - Math.floor(val * 24) ) * 60 ).toFixed(cExcelDateTimeDigits)) % 60;
 			return this.setCA(new cNumber(val), false, 0);
@@ -980,24 +980,24 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.setCA(arg0, true);
+			return this.value = arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.setCA(val, true);
+				return this.value = val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.setCA(new cError(cErrorType.wrong_value_type), true);
+				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
 			if (val instanceof cError || val instanceof cEmpty) {
 				var d = new Date(arg0.getValue());
 				if (isNaN(d)) {
-					return this.setCA(new cError(cErrorType.wrong_value_type), true);
+					return this.value = new cError(cErrorType.wrong_value_type);
 				} else {
 					val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay +
 						( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
@@ -1007,7 +1007,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		}
 		if (!AscCommon.bDate1904) {
 			if (val == 60) {
@@ -1071,7 +1071,7 @@
 		var val0 = arg0.getValue(), val1 = arg1.getValue(), dif, count = 0;
 
 		if (val0 < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		} else if (!AscCommon.bDate1904) {
 			if (val0 < 60) {
 				val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
@@ -1085,7 +1085,7 @@
 		}
 
 		if (val1 < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		} else if (!AscCommon.bDate1904) {
 			if (val1 < 60) {
 				val1 = new Date((val1 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
@@ -1218,17 +1218,17 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.setCA(arg0, true);
+			return this.value = arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.setCA(val, true);
+				return this.value = val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.setCA(new cError(cErrorType.wrong_value_type), true);
+				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
@@ -1237,7 +1237,7 @@
 				if (isNaN(d)) {
 					d = g_oFormatParser.parseDate(arg0.getValue());
 					if (d == null) {
-						return this.setCA(new cError(cErrorType.wrong_value_type), true);
+						return this.value = new cError(cErrorType.wrong_value_type);
 					}
 					val = d.value;
 				} else {
@@ -1249,7 +1249,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		} else {
 			val = parseInt((( val * 24 * 60 - Math.floor(val * 24 * 60) ) * 60).toFixed(cExcelDateTimeDigits)) % 60;
 			return this.setCA(new cNumber(val), false, 0);
@@ -1299,13 +1299,13 @@
 		second = second.tocNumber();
 
 		if (hour instanceof cError) {
-			return this.setCA(hour, true);
+			return this.value = hour;
 		}
 		if (minute instanceof cError) {
-			return this.setCA(minute, true);
+			return this.value = minute;
 		}
 		if (second instanceof cError) {
-			return this.setCA(second, true);
+			return this.value = second;
 		}
 
 		hour = hour.getValue();
@@ -1643,7 +1643,7 @@
 		var val0 = arg0.getValue(), holidays = [], i;
 
 		if (val0 < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		} else if (!AscCommon.bDate1904) {
 			if (val0 < 60) {
 				val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
@@ -1715,7 +1715,7 @@
 		val = date.getExcelDate();
 
 		if (val < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		}
 
 		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
@@ -1765,26 +1765,26 @@
 		}
 
 		if (arg0 instanceof cError) {
-			return this.setCA(arg0, true);
+			return this.value = arg0;
 		} else if (arg0 instanceof cNumber || arg0 instanceof cBool) {
 			val = arg0.tocNumber().getValue();
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			return this.setCA(new cError(cErrorType.wrong_value_type), true);
+			return this.value = new cError(cErrorType.wrong_value_type);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			val = arg0.getValue();
 			if (val instanceof cError) {
-				return this.setCA(val, true);
+				return this.value = val;
 			} else if (val instanceof cNumber || val instanceof cBool) {
 				val = arg0.tocNumber().getValue();
 			} else {
-				return this.setCA(new cError(cErrorType.wrong_value_type), true);
+				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg0 instanceof cString) {
 			val = arg0.tocNumber();
 			if (val instanceof cError || val instanceof cEmpty) {
 				var d = new Date(arg0.getValue());
 				if (isNaN(d)) {
-					return this.setCA(new cError(cErrorType.wrong_value_type), true);
+					return this.value = new cError(cErrorType.wrong_value_type);
 				} else {
 					val = Math.floor(( d.getTime() / 1000 - d.getTimezoneOffset() * 60 ) / c_sPerDay +
 						( AscCommonExcel.c_DateCorrectConst + (AscCommon.bDate1904 ? 0 : 1) ));
@@ -1794,7 +1794,7 @@
 			}
 		}
 		if (val < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true, 0);
+			return this.setCA(new cError(cErrorType.not_numeric), false, 0);
 		} else {
 			return this.setCA(
 				new cNumber((new Date((val - (AscCommonExcel.c_DateCorrectConst + 1)) * c_msPerDay)).getUTCFullYear()),
@@ -1859,7 +1859,7 @@
 		var val0 = arg0.getValue(), val1 = arg1.getValue();
 
 		if (val0 < 0 || val1 < 0) {
-			return this.setCA(new cError(cErrorType.not_numeric), true);
+			return this.value = new cError(cErrorType.not_numeric);
 		}
 
 		val0 = Date.prototype.getDateFromExcel(val0);
