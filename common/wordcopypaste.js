@@ -1793,6 +1793,8 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 	{	
 		api.WordControl.m_oLogicDocument.Set_SelectionState(window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState);
 		
+		api.WordControl.m_oLogicDocument.Selection_Clear();
+		
 		window['AscCommon'].g_clipboardBase.specialPasteProps = specialPasteProps;
 		
 		pastebin = window['AscCommon'].g_clipboardBase.specialPasteData.pastebin;
@@ -2006,11 +2008,23 @@ PasteProcessor.prototype =
         {
             if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
 			{
-				window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionStateBeforeInsert = this.oDocument.Get_SelectionState();
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.pasteIntoParagraph = null;
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.pasteIntoParaRun = null;
+				
+				var selection = this.oDocument.Get_SelectionState();
+				if(selection && selection[1])
+				{
+					var pasteIntoParagraphPr = this.oDocument.Content[selection[1].CurPos.ContentPos].Pr;
+					var pasteIntoParaRunPr =  this.oDocument.Content[selection[1].CurPos.ContentPos].Content[selection[0].CurPos.ContentPos.Data[0]].Pr;
+					window['AscCommon'].g_clipboardBase.specialPasteUndoData.pasteIntoParagraphPr = pasteIntoParagraphPr.Copy();
+					window['AscCommon'].g_clipboardBase.specialPasteUndoData.pasteIntoParaRunPr = pasteIntoParaRunPr.Copy();
+				}
 			}
 			this.InsertInPlace(oDocument, this.aContent);
-			
-			window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState = this.oDocument.Get_SelectionState();
+			//if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+			//{
+				window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState = this.oDocument.Get_SelectionState();
+			//}
 			
             if(false == PasteElementsId.g_bIsDocumentCopyPaste)
             {
@@ -2117,13 +2131,6 @@ PasteProcessor.prototype =
 		var res = paragraph;
 		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
 		
-		var selection = window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionStateBeforeInsert;
-		if(selection && selection[1])
-		{
-			var pasteIntoParagraph = this.oDocument.Content[selection[1].CurPos.ContentPos];
-			var pasteIntoParaRun = pasteIntoParagraph.Content[selection[0].CurPos.ContentPos.Data[0]];
-		}
-		
 		switch(props)
 		{
 			case Asc.c_oSpecialPasteProps.paste:
@@ -2143,7 +2150,8 @@ PasteProcessor.prototype =
 				for(var j = 0; j < paragraph.Content.length; j++)
 				{
 					paragraph.Content[j].Clear_TextFormatting();
-					var NewTextPr = pasteIntoParaRun.Pr;
+					
+					var NewTextPr = window['AscCommon'].g_clipboardBase.specialPasteUndoData.pasteIntoParaRunPr;
 					paragraph.Content[j].Set_Pr( NewTextPr );
 				}
 				
