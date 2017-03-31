@@ -870,7 +870,10 @@
 			}
 			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
 			this.buildDependency();
-			this._broadscastVolatile(notifyData);
+			//broadscast Volatile only if something changed
+			if (this.changedCell || this.changedDefName) {
+				this._broadscastVolatile(notifyData);
+			}
 			var calcTrack = [];
 			var noCalcTrack = [];
 			while (this.changedCell || this.changedDefName) {
