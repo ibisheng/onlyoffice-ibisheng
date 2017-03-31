@@ -1184,7 +1184,7 @@
 	cNOW.prototype.Calculate = function () {
 		var d = new Date();
 		this.value = new cNumber(d.getExcelDate() +
-			(d.getUTCHours() * 60 * 60 + d.getUTCMinutes() * 60 + d.getUTCSeconds()) / c_sPerDay);
+			(d.getHours() * 60 * 60 + d.getMinutes() * 60 + d.getSeconds()) / c_sPerDay);
 		this.value.numFormat = 22;
 		return this.setCA(this.value, true);
 	};
