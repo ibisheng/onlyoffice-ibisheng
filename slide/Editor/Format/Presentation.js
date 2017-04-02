@@ -1618,10 +1618,10 @@ CPresentation.prototype =
         }, [], false, AscDFH.historydescription_Presentation_AddChart);
     },
 
-    Selection_Remove: function()
+    Selection_Remove: function(bNoResetChartSelection)
     {
         if(this.Slides[this.CurPage]){
-            this.Slides[this.CurPage].graphicObjects.resetSelection();
+            this.Slides[this.CurPage].graphicObjects.resetSelection(undefined, bNoResetChartSelection);
         }
     },
 
