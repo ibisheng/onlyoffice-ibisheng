@@ -517,7 +517,10 @@
 				if(copyPasteUseBinary)
 				{
 					sBase64 = this.getBinaryForCopy(worksheet);
-					$(container.children[0]).addClass(sBase64);
+					if(container.children[0])
+					{
+						container.children[0].setAttribute("class", sBase64)
+					}
 				}
 				History.TurnOn();
 				
