@@ -1717,6 +1717,8 @@
 	CellEditor.prototype._removeChars = function (pos, length, isRange) {
 		var t = this, opt = t.options, b, e, l, first, last;
 
+		this.sAutoComplete = null;
+
 		if (t.selectionBegin !== t.selectionEnd) {
 			b = Math.min(t.selectionBegin, t.selectionEnd);
 			e = Math.max(t.selectionBegin, t.selectionEnd);
