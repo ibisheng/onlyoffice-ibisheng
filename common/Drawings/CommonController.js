@@ -2909,17 +2909,21 @@ DrawingObjectsController.prototype =
             }
             chart_space.setStyle(style_index);
         }*/
+
+        var chart = chart_space.chart;
+        var plot_area = chart.plotArea;
         var type = chartSettings.getType();
         if(AscFormat.isRealNumber(style_index)){
             --style_index;
             var oCurChartSettings = this.getPropsFromChart(chartSpace);
             var _cur_type = oCurChartSettings.type;
             if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][style_index]){
+
+                plot_area.removeCharts(1, plot_area.charts.length - 1);
                 AscFormat.ApplyPresetToChartSpace(chartSpace, AscCommon.g_oChartPresets[_cur_type][style_index], chartSettings.bCreate);
                 return;
             }
         }
-        var chart = chart_space.chart;
         var title_show_settings = chartSettings.getTitle();
         if(title_show_settings === c_oAscChartTitleShowSettings.none)
         {
@@ -2940,7 +2944,6 @@ DrawingObjectsController.prototype =
                 chart.title.setOverlay(title_show_settings === c_oAscChartTitleShowSettings.overlay);
             }
         }
-        var plot_area = chart.plotArea;
         //horAxisLabel
 
 
