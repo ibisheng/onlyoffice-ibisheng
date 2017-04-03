@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -70,38 +70,42 @@
      * @constructor
      */
     function ApiShape(oShape){
-        ApiShape.superclass.constructor.call(this, oShape);
+		ApiDrawing.call(this, oShape);
         this.Shape = oShape;
     }
-    AscCommon.extendClass(ApiShape, ApiDrawing);
+	ApiShape.prototype = Object.create(ApiDrawing.prototype);
+	ApiShape.prototype.constructor = ApiShape;
 
     /**
      * Class representing a image.
      * @constructor
      */
     function ApiImage(oImage){
-        ApiImage.superclass.constructor.call(this, oImage);
+		ApiDrawing.call(this, oImage);
     }
-    AscCommon.extendClass(ApiImage, ApiDrawing);
+	ApiImage.prototype = Object.create(ApiDrawing.prototype);
+	ApiImage.prototype.constructor = ApiImage;
 
     /**
      * Class representing a chart.
      * @constructor
      */
     function ApiChart(oChart){
-        ApiChart.superclass.constructor.call(this, oChart);
+		ApiDrawing.call(this, oChart);
         this.Chart = oChart;
     }
-    AscCommon.extendClass(ApiChart, ApiDrawing);
+	ApiChart.prototype = Object.create(ApiDrawing.prototype);
+	ApiChart.prototype.constructor = ApiChart;
 
     /**
      * Class representing a group of drawings.
      * @constructor
      */
     function ApiGroup(oGroup){
-        ApiGroup.superclass.constructor.call(this, oGroup);
+		ApiDrawing.call(this, oGroup);
     }
-    AscCommon.extendClass(ApiGroup, ApiDrawing);
+	ApiGroup.prototype = Object.create(ApiDrawing.prototype);
+	ApiGroup.prototype.constructor = ApiGroup;
 
 
     /**
@@ -183,6 +187,12 @@
      * @typedef {("aliceBlue" | "antiqueWhite" | "aqua" | "aquamarine" | "azure" | "beige" | "bisque" | "black" | "blanchedAlmond" | "blue" | "blueViolet" | "brown" | "burlyWood" | "cadetBlue" | "chartreuse" | "chocolate" | "coral" | "cornflowerBlue" | "cornsilk" | "crimson" | "cyan" | "darkBlue" | "darkCyan" | "darkGoldenrod" | "darkGray" | "darkGreen" | "darkGrey" | "darkKhaki" | "darkMagenta" | "darkOliveGreen" | "darkOrange" | "darkOrchid" | "darkRed" | "darkSalmon" | "darkSeaGreen" | "darkSlateBlue" | "darkSlateGray" | "darkSlateGrey" | "darkTurquoise" | "darkViolet" | "deepPink" | "deepSkyBlue" | "dimGray" | "dimGrey" | "dkBlue" | "dkCyan" | "dkGoldenrod" | "dkGray" | "dkGreen" | "dkGrey" | "dkKhaki" | "dkMagenta" | "dkOliveGreen" | "dkOrange" | "dkOrchid" | "dkRed" | "dkSalmon" | "dkSeaGreen" | "dkSlateBlue" | "dkSlateGray" | "dkSlateGrey" | "dkTurquoise" | "dkViolet" | "dodgerBlue" | "firebrick" | "floralWhite" | "forestGreen" | "fuchsia" | "gainsboro" | "ghostWhite" | "gold" | "goldenrod" | "gray" | "green" | "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" | "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" | "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" | "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" | "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" | "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey" | "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" | "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" | "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" | "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" | "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" | "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip" | "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" | "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" | "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" | "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" | "yellowGreen")} PresetColor
      * */
 
+
+    /**
+     *
+     * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
+     * **/
+
     /**
      * @typedef {"tile" | "stretch"} BlipFillType
      * */
@@ -190,6 +200,13 @@
     /**
      * @typedef {"cross" | "dashDnDiag" | "dashHorz" | "dashUpDiag" | "dashVert" | "diagBrick" | "diagCross" | "divot" | "dkDnDiag" | "dkHorz" | "dkUpDiag" | "dkVert" | "dnDiag" | "dotDmnd" | "dotGrid" | "horz" | "horzBrick" | "lgCheck" | "lgConfetti" | "lgGrid" | "ltDnDiag" | "ltHorz" | "ltUpDiag" | "ltVert" | "narHorz" | "narVert" | "openDmnd" | "pct10" | "pct20" | "pct25" | "pct30" | "pct40" | "pct5" | "pct50" | "pct60" | "pct70" | "pct75" | "pct80" | "pct90" | "plaid" | "shingle" | "smCheck" | "smConfetti" | "smGrid" | "solidDmnd" | "sphere" | "trellis" | "upDiag" | "vert" | "wave" | "wdDnDiag" | "wdUpDiag" | "weave" | "zigZag"} PatternType
      * */
+
+
+
+    /**
+     * @typedef {("cross" | "in" | "none" | "out")} TickMark
+     * */
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -385,7 +402,7 @@
         if(this.Presentation){
             var width = nWidth/36000.0;
             var height = nHeight/36000.0;
-            History.Add(this, {Type: AscDFH.historyitem_Presentation_SlideSize, oldW: this.Presentation.Width, newW: width, oldH: this.Presentation.Height, newH:  height});
+            History.Add(new AscDFH.CChangesDrawingsObjectNoId(this.Presentation, AscDFH.historyitem_Presentation_SlideSize, new AscFormat.CDrawingBaseCoordsWritable(this.Presentation.Width,  this.Presentation.Height), new AscFormat.CDrawingBaseCoordsWritable(width,  height)));
             this.Presentation.Width = width;
             this.Presentation.Height = height;
             this.Presentation.changeSlideSizeFunction(this.Presentation.Width, this.Presentation.Height);
@@ -621,30 +638,33 @@
      *  Specifies a chart title
      *  @param {string} sTitle
      *  @param {hps} nFontSize
+     *  @param {?bool} bIsBold
      */
-    ApiChart.prototype.SetTitle = function (sTitle, nFontSize)
+    ApiChart.prototype.SetTitle = function (sTitle, nFontSize, bIsBold)
     {
-        AscFormat.builder_SetChartTitle(this.Chart, sTitle, nFontSize);
+        AscFormat.builder_SetChartTitle(this.Chart, sTitle, nFontSize, bIsBold);
     };
 
     /**
      *  Specifies a horizontal axis title
      *  @param {string} sTitle
      *  @param {hps} nFontSize
+     *  @param {?bool} bIsBold
      * */
-    ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize)
+    ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize, bIsBold)
     {
-        AscFormat.builder_SetChartHorAxisTitle(this.Chart, sTitle, nFontSize);
+        AscFormat.builder_SetChartHorAxisTitle(this.Chart, sTitle, nFontSize, bIsBold);
     };
 
     /**
      *  Specifies a vertical axis title
      *  @param {string} sTitle
      *  @param {hps} nFontSize
+     *  @param {?bool} bIsBold
      * */
-    ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize)
+    ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize, bIsBold)
     {
-        AscFormat.builder_SetChartVertAxisTitle(this.Chart, sTitle, nFontSize);
+        AscFormat.builder_SetChartVertAxisTitle(this.Chart, sTitle, nFontSize, bIsBold);
     };
 
     /**
@@ -657,14 +677,151 @@
     };
 
     /**
+     * Specifies a legend position
+     * @number nFontSize
+     * */
+    ApiChart.prototype.SetLegendFontSize = function(nFontSize)
+    {
+        AscFormat.builder_SetLegendFontSize(this.Chart, nFontSize);
+    };
+
+    /**
+     * Specifies a  vertical axis orientation
+     * @param {bool} bIsMinMax
+     * */
+    ApiChart.prototype.SetVerAxisOrientation = function(bIsMinMax){
+        AscFormat.builder_SetChartVertAxisOrientation(this.Chart, bIsMinMax);
+    };
+
+    /**
+     * Specifies a  horizontal axis orientation
+     * @param {bool} bIsMinMax
+     * */
+    ApiChart.prototype.SetHorAxisOrientation = function(bIsMinMax){
+        AscFormat.builder_SetChartHorAxisOrientation(this.Chart, bIsMinMax);
+    };
+
+    /**
      * Spicifies a show options for data labels
      * @param {boolean} bShowSerName
      * @param {boolean} bShowCatName
      * @param {boolean} bShowVal
+     * @param {boolean} bShowPercent
      * */
-    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal)
+    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal, bShowPercent)
     {
-        AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal);
+        AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
+    };
+
+    /**
+     * Spicifies tick labels position vertical axis
+     * @param {TickLabelPosition} sTickLabelPosition
+     * */
+    ApiChart.prototype.SetVertAxisTickLabelPosition = function(sTickLabelPosition)
+    {
+        AscFormat.builder_SetChartVertAxisTickLablePosition(this.Chart, sTickLabelPosition);
+    };
+    /**
+     * Spicifies tick labels position horizontal axis
+     * @param {TickLabelPosition} sTickLabelPosition
+     * */
+    ApiChart.prototype.SetHorAxisTickLabelPosition = function(sTickLabelPosition)
+    {
+        AscFormat.builder_SetChartHorAxisTickLablePosition(this.Chart, sTickLabelPosition);
+    };
+
+
+
+
+    /**
+     * Specifies major tick mark for horizontal axis
+     * @param {TickMark} sTickMark
+     * */
+
+    ApiChart.prototype.SetHorAxisMajorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartHorAxisMajorTickMark(this.Chart, sTickMark);
+    };
+    /**
+     * Specifies minor tick mark for horizontal axis
+     * @param {TickMark} sTickMark
+     * */
+
+    ApiChart.prototype.SetHorAxisMinorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartHorAxisMinorTickMark(this.Chart, sTickMark);
+    };
+
+    /**
+     * Specifies major tick mark for vertical axis
+     * @param {TickMark} sTickMark
+     * */
+
+    ApiChart.prototype.SetVertAxisMajorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartVerAxisMajorTickMark(this.Chart, sTickMark);
+    };
+
+    /**
+     * Specifies minor tick mark for vertical axis
+     * @param {TickMark} sTickMark
+     * */
+    ApiChart.prototype.SetVertAxisMinorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartVerAxisMinorTickMark(this.Chart, sTickMark);
+    };
+
+
+
+
+    /**
+     * Specifies major vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMajorVerticalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetVerAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+    /**
+     * Specifies minor vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMinorVerticalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetVerAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+
+    /**
+     * Specifies major horizontal gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMajorHorizontalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetHorAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+    /**
+     * Specifies minor vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMinorHorizontalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetHorAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+
+    /**
+     * Specifies font size for labels of horizontal axis
+     * @param {number} nFontSize
+     */
+    ApiChart.prototype.SetHorAxisLablesFontSize = function(nFontSize){
+        AscFormat.builder_SetHorAxisFontSize(this.Chart, nFontSize);
+    };
+
+    /**
+     * Specifies font size for labels of vertical axis
+     * @param {number} nFontSize
+     */
+    ApiChart.prototype.SetVertAxisLablesFontSize = function(nFontSize){
+        AscFormat.builder_SetVerAxisFontSize(this.Chart, nFontSize);
     };
 
 
@@ -704,12 +861,28 @@
     ApiShape.prototype["GetDocContent"]              =  ApiShape.prototype.GetDocContent;
     ApiShape.prototype["SetVerticalTextAlign"]       =  ApiShape.prototype.SetVerticalTextAlign;
 
-    ApiChart.prototype["GetClassType"]               =  ApiChart.prototype.GetClassType;
-    ApiChart.prototype["SetTitle"]                   =  ApiChart.prototype.SetTitle;
-    ApiChart.prototype["SetHorAxisTitle"]            =  ApiChart.prototype.SetHorAxisTitle;
-    ApiChart.prototype["SetVerAxisTitle"]            =  ApiChart.prototype.SetVerAxisTitle;
-    ApiChart.prototype["SetLegendPos"]               =  ApiChart.prototype.SetLegendPos;
-    ApiChart.prototype["SetShowDataLabels"]          =  ApiChart.prototype.SetShowDataLabels;
+    ApiChart.prototype["GetClassType"]                 = ApiChart.prototype.GetClassType;
+    ApiChart.prototype["SetTitle"]                     = ApiChart.prototype.SetTitle;
+    ApiChart.prototype["SetHorAxisTitle"]              = ApiChart.prototype.SetHorAxisTitle;
+    ApiChart.prototype["SetVerAxisTitle"]              = ApiChart.prototype.SetVerAxisTitle;
+    ApiChart.prototype["SetVerAxisOrientation"]        = ApiChart.prototype.SetVerAxisOrientation;
+    ApiChart.prototype["SetHorAxisOrientation"]        = ApiChart.prototype.SetHorAxisOrientation;
+    ApiChart.prototype["SetLegendPos"]                 = ApiChart.prototype.SetLegendPos;
+    ApiChart.prototype["SetLegendFontSize"]            = ApiChart.prototype.SetLegendFontSize;
+    ApiChart.prototype["SetShowDataLabels"]            = ApiChart.prototype.SetShowDataLabels;
+    ApiChart.prototype["SetVertAxisTickLabelPosition"] = ApiChart.prototype.SetVertAxisTickLabelPosition;
+    ApiChart.prototype["SetHorAxisTickLabelPosition"]  = ApiChart.prototype.SetHorAxisTickLabelPosition;
+
+    ApiChart.prototype["SetHorAxisMajorTickMark"]      =  ApiChart.prototype.SetHorAxisMajorTickMark;
+    ApiChart.prototype["SetHorAxisMinorTickMark"]      =  ApiChart.prototype.SetHorAxisMinorTickMark;
+    ApiChart.prototype["SetVertAxisMajorTickMark"]     =  ApiChart.prototype.SetVertAxisMajorTickMark;
+    ApiChart.prototype["SetVertAxisMinorTickMark"]     =  ApiChart.prototype.SetVertAxisMinorTickMark;
+    ApiChart.prototype["SetMajorVerticalGridlines"]  =  ApiChart.prototype.SetMajorVerticalGridlines;
+    ApiChart.prototype["SetMinorVerticalGridlines"]  =  ApiChart.prototype.SetMinorVerticalGridlines;
+    ApiChart.prototype["SetMajorHorizontalGridlines"]  =  ApiChart.prototype.SetMajorHorizontalGridlines;
+    ApiChart.prototype["SetMinorHorizontalGridlines"]  =  ApiChart.prototype.SetMinorHorizontalGridlines;
+    ApiChart.prototype["SetHorAxisLablesFontSize"]  =  ApiChart.prototype.SetHorAxisLablesFontSize;
+    ApiChart.prototype["SetVertAxisLablesFontSize"]  =  ApiChart.prototype.SetVertAxisLablesFontSize;
 
     function private_GetCurrentSlide(){
         var oApiPresentation = editor.GetPresentation();

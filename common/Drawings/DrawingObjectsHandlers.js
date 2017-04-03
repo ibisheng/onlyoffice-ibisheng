@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -86,6 +86,14 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
             tx = x;
             ty = y;
         }
+
+        if(selected_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
+        {
+            var oRet = handleInternalChart(selected_objects[i], drawingObjectsController, e, x, y, group, pageIndex, bWord);
+            if(oRet){
+                return oRet;
+            }
+        }
         var hit_to_handles = selected_objects[i].hitToHandles(tx, ty);
         if(hit_to_handles > -1)
         {
@@ -105,6 +113,13 @@ function handleSelectedObjects(drawingObjectsController, e, x, y, group, pageInd
         {
             tx = x;
             ty = y;
+        }
+        if(selected_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
+        {
+            var oRet = handleInternalChart(selected_objects[i], drawingObjectsController, e, x, y, group, pageIndex, bWord);
+            if(oRet){
+                return oRet;
+            }
         }
         if(selected_objects[i].hitInBoundingRect(tx, ty) && (!selected_objects[i].hitInTextRect || !selected_objects[i].hitInTextRect(tx, ty)))
         {
@@ -471,13 +486,14 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         }
 
         var chart_titles = drawing.getAllTitles();
+        var bIsMobileVersion = AscCommon.AscBrowser.isMobileVersion;
         for(i = 0; i < chart_titles.length; ++i)
         {
             title = chart_titles[i];
             var hit_in_inner_area = title.hitInInnerArea(x, y);
             var hit_in_path = title.hitInPath(x, y);
             var hit_in_text_rect = title.hitInTextRect(x, y);
-            if((hit_in_inner_area && (!hit_in_text_rect || drawing.selection.title !== title) || hit_in_path) && !window["NATIVE_EDITOR_ENJINE"])
+            if((hit_in_inner_area && (!hit_in_text_rect || drawing.selection.title !== title) || (hit_in_path && bIsMobileVersion !== true)) && !window["NATIVE_EDITOR_ENJINE"])
             {
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -46,7 +46,6 @@ function (window, undefined) {
   var FormulaSeparators = AscCommon.FormulaSeparators;
   var parserHelp = AscCommon.parserHelp;
   var g_oFormatParser = AscCommon.g_oFormatParser;
-  var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
   var CellAddress = AscCommon.CellAddress;
 
   var c_oAscError = Asc.c_oAscError;
@@ -440,6 +439,8 @@ var c_Date1900Const = 25568; //разница в днях между 01.01.1970 
 var c_sPerDay = 86400;
 var c_msPerDay = c_sPerDay * 1000;
   var rx_sFuncPref = /_xlfn\./i;
+	var c_numFormatFirstCell = -1;
+	var cNumFormatNone = -2;
 
 Date.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
 Date.prototype.excelNullDate1904 = Date.UTC( 1904, 0, 1, 0, 0, 0 );
@@ -472,7 +473,7 @@ Date.prototype.getExcelDate = function () {
     return Math.floor( this.getExcelDateWithTime() );
 };
 
-Date.prototype.getExcelDateWithTime = function () {
+Date.prototype['getExcelDateWithTime'] = Date.prototype.getExcelDateWithTime = function () {
 //    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( AscCommonExcel.c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
     var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
@@ -629,348 +630,345 @@ RegExp.escape = function ( text ) {
 
 parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
 
-/** @constructor */
-function cBaseType( val, type ) {
-    this.needRecalc = false;
-    this.numFormat = null;
-    this.ca = false;
-    this.node = undefined;
-    this.type = type;
-    this.value = val;
-}
-
-cBaseType.prototype.cloneTo = function(oRes) {
-  oRes.needRecalc = this.needRecalc;
-  oRes.numFormat = this.numFormat;
-  oRes.type = this.type;
-  oRes.value = this.value;
-  oRes.ca = this.ca;
-  oRes.node = this.node;
-};
-cBaseType.prototype.getValue = function() {
-  return this.value;
-};
-cBaseType.prototype.toString = function() {
-  return this.value.toString();
-};
-cBaseType.prototype.toLocaleString = function() {
-  return this.toString();
-};
-cBaseType.prototype.setNode = function(node) {
-  this.node = node;
-};
-
-/*Basic types of an elements used into formulas*/
-/** @constructor */
-function cNumber( val ) {
-    this.constructor.call( this, parseFloat( val ), cElementType.number );
-    var res;
-
-    if ( !isNaN( this.value ) && Math.abs( this.value ) !== Infinity ) {
-        res = this;
-  } else if (val instanceof cError) {
-        res = val;
-  } else {
-        res = new cError( cErrorType.not_numeric );
-    }
-    return res;
-}
-
-cNumber.prototype = Object.create( cBaseType.prototype );
-cNumber.prototype.tocString = function () {
-  return new cString(("" + this.value).replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator));
-};
-cNumber.prototype.tocNumber = function () {
-    return this;
-};
-cNumber.prototype.tocBool = function () {
-    return new cBool( this.value !== 0 );
-};
-cNumber.prototype.toLocaleString = function ( digitDelim ) {
-    var res = this.value.toString();
-  if (digitDelim) {
-    return res.replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator);
-  } else {
-        return res;
-  }
-};
-
-/** @constructor */
-function cString( val ) {
-    this.constructor.call( this, val, cElementType.string );
-}
-
-cString.prototype = Object.create( cBaseType.prototype );
-cString.prototype.tocNumber = function () {
-    var res, m = this.value;
-    if ( this.value === "" ) {
-        res = new cNumber( 0 );
-    }
-
-    /*if ( this.value[0] === '"' && this.value[this.value.length - 1] === '"' ) {
-     m = this.value.substring( 1, this.value.length - 1 );
-     }*/
-
-    if ( g_oFormatParser.isLocaleNumber( this.value ) ) {
-        var numberValue = g_oFormatParser.parseLocaleNumber( this.value );
-        if ( !isNaN( numberValue ) ) {
-            res = new cNumber( numberValue );
-        }
-    } else {
-        var parseRes = AscCommon.g_oFormatParser.parse(this.value);
-        if(null != parseRes) {
-            res = new cNumber( parseRes.value );
-        } else {
-            res = new cError( cErrorType.wrong_value_type );
-        }
-    }
-
-    return res;
-};
-cString.prototype.tocBool = function () {
-    var res;
-    if ( parserHelp.isBoolean( this.value, 0 ) ) {
-        res = new cBool( parserHelp.operand_str.toUpperCase() === cBoolLocal["t"].toUpperCase() );
-  } else {
-        res = this;
-    }
-    return res;
-};
-cString.prototype.tocString = function () {
-    return this;
-};
-
-/** @constructor */
-function cBool( val ) {
-	var v = false;
-	switch(val.toString().toUpperCase()){
-		case "TRUE":
-    case cBoolLocal["t"].toUpperCase():
-      v = true;
+	/** @constructor */
+	function cBaseType(val) {
+		this.needRecalc = false;
+		this.numFormat = null;
+		this.ca = false;
+		this.value = val;
 	}
-    this.constructor.call( this, v, cElementType.bool );
-}
 
-cBool.prototype = Object.create( cBaseType.prototype );
-cBool.prototype.toString = function () {
-    return this.value.toString().toUpperCase();
-};
-cBool.prototype.getValue = function () {
-    return this.toString();
-};
-cBool.prototype.tocNumber = function () {
-    return new cNumber( this.value ? 1.0 : 0.0 );
-};
-cBool.prototype.tocString = function () {
-    return new cString( this.value ? "TRUE" : "FALSE" );
-};
-cBool.prototype.toLocaleString = function () {
-    return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
-};
-cBool.prototype.tocBool = function () {
-    return this;
-};
-cBool.prototype.toBool = function () {
-    return this.value;
-};
+	cBaseType.prototype.cloneTo = function (oRes) {
+		oRes.needRecalc = this.needRecalc;
+		oRes.numFormat = this.numFormat;
+		oRes.value = this.value;
+		oRes.ca = this.ca;
+	};
+	cBaseType.prototype.getValue = function () {
+		return this.value;
+	};
+	cBaseType.prototype.toString = function () {
+		return this.value.toString();
+	};
+	cBaseType.prototype.toLocaleString = function () {
+		return this.toString();
+	};
 
-/** @constructor */
-function cError( val ) {
-    this.constructor.call( this, val, cElementType.error );
+	/*Basic types of an elements used into formulas*/
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cNumber(val) {
+		cBaseType.call(this, parseFloat(val));
+		var res;
 
-    this.errorType = -1;
-
-    switch ( val ) {
-		case cErrorLocal["value"]:
-		case cErrorOrigin["value"]:
-        case cErrorType.wrong_value_type:
-        {
-            this.value = "#VALUE!";
-            this.errorType = cErrorType.wrong_value_type;
-            break;
-        }
-		case cErrorLocal["nil"]:
-		case cErrorOrigin["nil"]:
-        case cErrorType.null_value:
-        {
-            this.value = "#NULL!";
-            this.errorType = cErrorType.null_value;
-            break;
-        }
-		case cErrorLocal["div"]:
-		case cErrorOrigin["div"]:
-        case cErrorType.division_by_zero:
-        {
-            this.value = "#DIV/0!";
-            this.errorType = cErrorType.division_by_zero;
-            break;
-        }
-		case cErrorLocal["ref"]:
-		case cErrorOrigin["ref"]:
-        case cErrorType.bad_reference:
-        {
-            this.value = "#REF!";
-            this.errorType = cErrorType.bad_reference;
-            break;
-        }
-		case cErrorLocal["name"]:
-		case cErrorOrigin["name"]:
-        case cErrorType.wrong_name:
-        {
-            this.value = "#NAME?";
-            this.errorType = cErrorType.wrong_name;
-            break;
-        }
-		case cErrorLocal["num"]:
-		case cErrorOrigin["num"]:
-        case cErrorType.not_numeric:
-        {
-            this.value = "#NUM!";
-            this.errorType = cErrorType.not_numeric;
-            break;
-        }
-		case cErrorLocal["na"]:
-		case cErrorOrigin["na"]:
-        case cErrorType.not_available:
-        {
-            this.value = "#N/A";
-            this.errorType = cErrorType.not_available;
-            break;
-        }
-		case cErrorLocal["getdata"]:
-		case cErrorOrigin["getdata"]:
-        case cErrorType.getting_data:
-        {
-            this.value = "#GETTING_DATA";
-            this.errorType = cErrorType.getting_data;
-            break;
-        }
-		case cErrorLocal["uf"]:
-		case cErrorOrigin["uf"]:
-        case cErrorType.unsupported_function:
-        {
-            this.value = "#UNSUPPORTED_FUNCTION!";
-            this.errorType = cErrorType.unsupported_function;
-            break;
-        }
-    }
-
-    return this;
-}
-
-cError.prototype = Object.create( cBaseType.prototype );
-cError.prototype.tocNumber =
-  cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function() {
-    return this;
-};
-cError.prototype.toLocaleString = function () {
-	switch ( this.value ) {
-		case cErrorOrigin["value"]:
-		case cErrorType.wrong_value_type:
-		{
-			return cErrorLocal["value"];
-			break;
+		if (!isNaN(this.value) && Math.abs(this.value) !== Infinity) {
+			res = this;
+		} else if (val instanceof cError) {
+			res = val;
+		} else {
+			res = new cError(cErrorType.not_numeric);
 		}
-		case cErrorOrigin["nil"]:
-		case cErrorType.null_value:
-		{
-			return cErrorLocal["nil"];
-			break;
+		return res;
+	}
+
+	cNumber.prototype = Object.create(cBaseType.prototype);
+	cNumber.prototype.constructor = cNumber;
+	cNumber.prototype.type = cElementType.number;
+	cNumber.prototype.tocString = function () {
+		return new cString(("" + this.value).replace(FormulaSeparators.digitSeparatorDef,
+			FormulaSeparators.digitSeparator));
+	};
+	cNumber.prototype.tocNumber = function () {
+		return this;
+	};
+	cNumber.prototype.tocBool = function () {
+		return new cBool(this.value !== 0);
+	};
+	cNumber.prototype.toLocaleString = function (digitDelim) {
+		var res = this.value.toString();
+		if (digitDelim) {
+			return res.replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator);
+		} else {
+			return res;
 		}
-		case cErrorOrigin["div"]:
-		case cErrorType.division_by_zero:
-		{
-			return cErrorLocal["div"];
-			break;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cString(val) {
+		cBaseType.call(this, val);
+	}
+
+	cString.prototype = Object.create(cBaseType.prototype);
+	cString.prototype.constructor = cString;
+	cString.prototype.type = cElementType.string;
+	cString.prototype.tocNumber = function () {
+		var res, m = this.value;
+		if (this.value === "") {
+			res = new cNumber(0);
 		}
 
-		case cErrorOrigin["ref"]:
-		case cErrorType.bad_reference:
-		{
-			return cErrorLocal["ref"];
-			break;
+		/*if ( this.value[0] === '"' && this.value[this.value.length - 1] === '"' ) {
+		 m = this.value.substring( 1, this.value.length - 1 );
+		 }*/
+
+		if (g_oFormatParser.isLocaleNumber(this.value)) {
+			var numberValue = g_oFormatParser.parseLocaleNumber(this.value);
+			if (!isNaN(numberValue)) {
+				res = new cNumber(numberValue);
+			}
+		} else {
+			var parseRes = AscCommon.g_oFormatParser.parse(this.value);
+			if (null != parseRes) {
+				res = new cNumber(parseRes.value);
+			} else {
+				res = new cError(cErrorType.wrong_value_type);
+			}
 		}
 
-		case cErrorOrigin["name"]:
-		case cErrorType.wrong_name:
-		{
-			return cErrorLocal["name"];
-			break;
+		return res;
+	};
+	cString.prototype.tocBool = function () {
+		var res;
+		if (parserHelp.isBoolean(this.value, 0)) {
+			res = new cBool(parserHelp.operand_str.toUpperCase() === cBoolLocal["t"].toUpperCase());
+		} else {
+			res = this;
+		}
+		return res;
+	};
+	cString.prototype.tocString = function () {
+		return this;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cBool(val) {
+		var v = false;
+		switch (val.toString().toUpperCase()) {
+			case "TRUE":
+			case cBoolLocal["t"].toUpperCase():
+				v = true;
+		}
+		cBaseType.call(this, v);
+	}
+
+	cBool.prototype = Object.create(cBaseType.prototype);
+	cBool.prototype.constructor = cBool;
+	cBool.prototype.type = cElementType.bool;
+	cBool.prototype.toString = function () {
+		return this.value.toString().toUpperCase();
+	};
+	cBool.prototype.getValue = function () {
+		return this.toString();
+	};
+	cBool.prototype.tocNumber = function () {
+		return new cNumber(this.value ? 1.0 : 0.0);
+	};
+	cBool.prototype.tocString = function () {
+		return new cString(this.value ? "TRUE" : "FALSE");
+	};
+	cBool.prototype.toLocaleString = function () {
+		return new cString(this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase());
+	};
+	cBool.prototype.tocBool = function () {
+		return this;
+	};
+	cBool.prototype.toBool = function () {
+		return this.value;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cError(val) {
+		cBaseType.call(this, val);
+
+		this.errorType = -1;
+
+		switch (val) {
+			case cErrorLocal["value"]:
+			case cErrorOrigin["value"]:
+			case cErrorType.wrong_value_type: {
+				this.value = "#VALUE!";
+				this.errorType = cErrorType.wrong_value_type;
+				break;
+			}
+			case cErrorLocal["nil"]:
+			case cErrorOrigin["nil"]:
+			case cErrorType.null_value: {
+				this.value = "#NULL!";
+				this.errorType = cErrorType.null_value;
+				break;
+			}
+			case cErrorLocal["div"]:
+			case cErrorOrigin["div"]:
+			case cErrorType.division_by_zero: {
+				this.value = "#DIV/0!";
+				this.errorType = cErrorType.division_by_zero;
+				break;
+			}
+			case cErrorLocal["ref"]:
+			case cErrorOrigin["ref"]:
+			case cErrorType.bad_reference: {
+				this.value = "#REF!";
+				this.errorType = cErrorType.bad_reference;
+				break;
+			}
+			case cErrorLocal["name"]:
+			case cErrorOrigin["name"]:
+			case cErrorType.wrong_name: {
+				this.value = "#NAME?";
+				this.errorType = cErrorType.wrong_name;
+				break;
+			}
+			case cErrorLocal["num"]:
+			case cErrorOrigin["num"]:
+			case cErrorType.not_numeric: {
+				this.value = "#NUM!";
+				this.errorType = cErrorType.not_numeric;
+				break;
+			}
+			case cErrorLocal["na"]:
+			case cErrorOrigin["na"]:
+			case cErrorType.not_available: {
+				this.value = "#N/A";
+				this.errorType = cErrorType.not_available;
+				break;
+			}
+			case cErrorLocal["getdata"]:
+			case cErrorOrigin["getdata"]:
+			case cErrorType.getting_data: {
+				this.value = "#GETTING_DATA";
+				this.errorType = cErrorType.getting_data;
+				break;
+			}
+			case cErrorLocal["uf"]:
+			case cErrorOrigin["uf"]:
+			case cErrorType.unsupported_function: {
+				this.value = "#UNSUPPORTED_FUNCTION!";
+				this.errorType = cErrorType.unsupported_function;
+				break;
+			}
 		}
 
-		case cErrorOrigin["num"]:
-		case cErrorType.not_numeric:
-		{
-			return cErrorLocal["num"];
-			break;
-		}
+		return this;
+	}
 
-		case cErrorOrigin["na"]:
-		case cErrorType.not_available:
-		{
-			return cErrorLocal["na"];
-			break;
-		}
+	cError.prototype = Object.create(cBaseType.prototype);
+	cError.prototype.constructor = cError;
+	cError.prototype.type = cElementType.error;
+	cError.prototype.tocNumber =
+		cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function () {
+			return this;
+		};
+	cError.prototype.toLocaleString = function () {
+		switch (this.value) {
+			case cErrorOrigin["value"]:
+			case cErrorType.wrong_value_type: {
+				return cErrorLocal["value"];
+				break;
+			}
+			case cErrorOrigin["nil"]:
+			case cErrorType.null_value: {
+				return cErrorLocal["nil"];
+				break;
+			}
+			case cErrorOrigin["div"]:
+			case cErrorType.division_by_zero: {
+				return cErrorLocal["div"];
+				break;
+			}
 
-		case cErrorOrigin["getdata"]:
-		case cErrorType.getting_data:
-		{
-			return cErrorLocal["getdata"];
-			break;
-		}
+			case cErrorOrigin["ref"]:
+			case cErrorType.bad_reference: {
+				return cErrorLocal["ref"];
+				break;
+			}
 
-		case cErrorOrigin["uf"]:
-		case cErrorType.unsupported_function:
-		{
-			return cErrorLocal["uf"];
-			break;
+			case cErrorOrigin["name"]:
+			case cErrorType.wrong_name: {
+				return cErrorLocal["name"];
+				break;
+			}
+
+			case cErrorOrigin["num"]:
+			case cErrorType.not_numeric: {
+				return cErrorLocal["num"];
+				break;
+			}
+
+			case cErrorOrigin["na"]:
+			case cErrorType.not_available: {
+				return cErrorLocal["na"];
+				break;
+			}
+
+			case cErrorOrigin["getdata"]:
+			case cErrorType.getting_data: {
+				return cErrorLocal["getdata"];
+				break;
+			}
+
+			case cErrorOrigin["uf"]:
+			case cErrorType.unsupported_function: {
+				return cErrorLocal["uf"];
+				break;
+			}
+		}
+		return cErrorLocal["na"];
+	};
+	/*cError.prototype.toString = function () {
+	 return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
+	 };*/
+
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cArea(val, ws) {/*Area means "A1:E5" for example*/
+		cBaseType.call(this, val);
+
+		this.ws = ws;
+		this.range = null;
+		if (val) {
+			this.range = ws.getRange2(val);
 		}
 	}
-	return cErrorLocal["na"];
-};
-/*cError.prototype.toString = function () {
-	return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
-};*/
 
-/** @constructor */
-function cArea( val, ws ) {/*Area means "A1:E5" for example*/
-    this.constructor.call( this, val, cElementType.cellsRange );
-
-    this.ws = ws;
-    this.wb = ws.workbook;
-    this._cells = val;
-    this.isAbsolute = false;
-    this.isAbsoluteCol1 = false;
-    this.isAbsoluteRow1 = false;
-    this.isAbsoluteCol2 = false;
-    this.isAbsoluteRow2 = false;
-    this.range = null;
-//    this._valid = this.range ? true : false;
-}
-
-cArea.prototype = Object.create( cBaseType.prototype );
-cArea.prototype.clone = function () {
-    var oRes = new cArea( this._cells, this.ws );
-//	cBaseType.prototype.cloneTo.call( this, oRes );
-    this.constructor.prototype.cloneTo.call( this, oRes );
-    oRes.isAbsolute = this.isAbsolute;
-    oRes.isAbsoluteCol1 = this.isAbsoluteCol1;
-    oRes.isAbsoluteRow1 = this.isAbsoluteRow1;
-    oRes.isAbsoluteCol2 = this.isAbsoluteCol2;
-    oRes.isAbsoluteRow2 = this.isAbsoluteRow2;
-    return oRes;
-};
-cArea.prototype.getWsId = function () {
-    return this.ws.Id;
-};
-	cArea.prototype.getValue = function () {
+	cArea.prototype = Object.create(cBaseType.prototype);
+	cArea.prototype.constructor = cArea;
+	cArea.prototype.type = cElementType.cellsRange;
+	cArea.prototype.clone = function (opt_ws) {
+		var ws = opt_ws ? opt_ws : this.ws;
+		var oRes = new cArea(null, ws);
+		this.cloneTo(oRes);
+		if (this.range) {
+			oRes.range = this.range.clone(ws);
+		}
+		return oRes;
+	};
+	cArea.prototype.getWsId = function () {
+		return this.ws.Id;
+	};
+	cArea.prototype.getValue = function (checkExclude, excludeHiddenRows) {
 		var val = [], r = this.getRange();
 		if (!r) {
 			val.push(new cError(cErrorType.bad_reference));
 		} else {
+			if (checkExclude && !excludeHiddenRows) {
+				excludeHiddenRows = this.ws.isApplyFilterBySheet();
+			}
 			r._foreachNoEmpty(function (cell) {
 				val.push(checkTypeCell(cell));
-			});
+			}, excludeHiddenRows);
 		}
 		return val;
 	};
@@ -983,73 +981,64 @@ cArea.prototype.getWsId = function () {
 		}
 		return res;
 	};
-cArea.prototype.getRange = function () {
-    if ( !this.range ) {
-        this.range = this.ws.getRange2( this._cells )
-    }
-    return this.range;
-};
-cArea.prototype.tocNumber = function () {
-    var v = this.getValue()[0];
-    if ( !v ) {
-        v = new cNumber( 0 );
-  } else {
-        v = v.tocNumber();
-    }
-    return v;
-};
-cArea.prototype.tocString = function () {
-    return this.getValue()[0].tocString();
-};
-cArea.prototype.tocBool = function () {
-    return this.getValue()[0].tocBool();
-};
-cArea.prototype.toString = function () {
-    var _c;
+	cArea.prototype.getRange = function () {
+		if (!this.range) {
+			this.range = this.ws.getRange2(this._cells);
+		}
+		return this.range;
+	};
+	cArea.prototype.tocNumber = function () {
+		var v = this.getValue()[0];
+		if (!v) {
+			v = new cNumber(0);
+		} else {
+			v = v.tocNumber();
+		}
+		return v;
+	};
+	cArea.prototype.tocString = function () {
+		return this.getValue()[0].tocString();
+	};
+	cArea.prototype.tocBool = function () {
+		return this.getValue()[0].tocBool();
+	};
+	cArea.prototype.toString = function () {
+		var _c;
 
-    if ( this.getRange() ) {
-        _c = this.getRange().getName();
-  } else {
-        _c = this._cells;
-    }
-    if ( _c.indexOf( ":" ) < 0 ) {
-        _c = _c + ":" + _c;
-    }
-    return _c;
-};
-cArea.prototype.setRange = function ( cell ) {
-    this._cells = this.value = cell;
-    this.range = this.ws.getRange2( cell );
-    this._valid = this.range ? true : false;
-};
-cArea.prototype.getWS = function () {
-    return this.ws;
-};
-cArea.prototype.getBBox = function () {
-    return this.getRange().getBBox();
-};
-cArea.prototype.getBBox0 = function () {
-    return this.getRange().getBBox0();
-};
-cArea.prototype.cross = function ( arg ) {
-    var r = this.getRange(), cross;
-    if ( !r ) {
-        return new cError( cErrorType.wrong_name );
-    }
-    cross = r.cross( arg );
-    if ( cross ) {
-        if ( cross.r != undefined ) {
-            return this.getValue2( cross.r - this.getBBox().r1, 0 );
-    } else if (cross.c != undefined) {
-            return this.getValue2( 0, cross.c - this.getBBox().c1 );
-        }
-    }
-    return new cError( cErrorType.wrong_value_type );
-};
-cArea.prototype.isValid = function () {
-    var r = this.getRange();
-    return !!r;
-};
+		if (this.range) {
+			_c = this.range.getName();
+		} else {
+			_c = this.value;
+		}
+		if (_c.indexOf(":") < 0) {
+			_c = _c + ":" + _c;
+		}
+		return _c;
+	};
+	cArea.prototype.getWS = function () {
+		return this.ws;
+	};
+	cArea.prototype.getBBox0 = function () {
+		return this.getRange().getBBox0();
+	};
+	cArea.prototype.cross = function (arg) {
+		var r = this.getRange(), cross;
+		if (!r) {
+			return new cError(cErrorType.wrong_name);
+		}
+		cross = r.cross(arg);
+		if (cross) {
+			if (undefined !== cross.r) {
+				return this.getValue2(cross.r - this.getBBox0().r1, 0);
+			} else if (undefined !== cross.c) {
+				return this.getValue2(0, cross.c - this.getBBox0().c1);
+			}
+		}
+		return new cError(cErrorType.wrong_value_type);
+	};
+	cArea.prototype.isValid = function () {
+		return !!this.getRange();
+	};
 	cArea.prototype.countCells = function () {
 		var r = this.getRange(), bbox = r.bbox, count = (Math.abs(bbox.c1 - bbox.c2) + 1) *
 			(Math.abs(bbox.r1 - bbox.r2) + 1);
@@ -1060,12 +1049,12 @@ cArea.prototype.isValid = function () {
 		});
 		return new cNumber(count);
 	};
-cArea.prototype.foreach = function ( action ) {
-    var r = this.getRange();
-    if ( r ) {
-        r._foreach2( action );
-    }
-};
+	cArea.prototype.foreach = function (action) {
+		var r = this.getRange();
+		if (r) {
+			r._foreach2(action);
+		}
+	};
 	cArea.prototype.foreach2 = function (action) {
 		var r = this.getRange();
 		if (r) {
@@ -1091,69 +1080,70 @@ cArea.prototype.foreach = function ( action ) {
 		});
 		return [arr];
 	};
-cArea.prototype.getRefMatrix = function () {
-    var t = this, arr = [], r = this.getRange();
-    r._foreach2( function ( cell, i, j, r1, c1 ) {
-    if (!arr[i - r1]) {
-            arr[i - r1] = [];
-    }
-    if (cell) {
-        arr[i - r1][j - c1] = new cRef( cell.getName(), t.ws );
-    } else {
-            arr[i - r1][j - c1] = new cRef( t.ws._getCell( i, j ).getName(), t.ws );
-    }
-    } );
-    return arr;
-};
-cArea.prototype.index = function ( r, c ) {
-    var bbox = this.getBBox0();
-    bbox.normalize();
-    var box = {c1: 1, c2: bbox.c2 - bbox.c1 + 1, r1: 1, r2: bbox.r2 - bbox.r1 + 1};
+	cArea.prototype.getRefMatrix = function () {
+		var t = this, arr = [], r = this.getRange();
+		r._foreach2(function (cell, i, j, r1, c1) {
+			if (!arr[i - r1]) {
+				arr[i - r1] = [];
+			}
+			if (cell) {
+				arr[i - r1][j - c1] = new cRef(cell.getName(), t.ws);
+			} else {
+				arr[i - r1][j - c1] = new cRef(t.ws._getCell(i, j).getName(), t.ws);
+			}
+		});
+		return arr;
+	};
+	cArea.prototype.index = function (r, c) {
+		var bbox = this.getBBox0();
+		bbox.normalize();
+		var box = {c1: 1, c2: bbox.c2 - bbox.c1 + 1, r1: 1, r2: bbox.r2 - bbox.r1 + 1};
 
-    if ( r < box.r1 || r > box.r2 || c < box.c1 || c > box.c2 ) {
-        return new cError( cErrorType.bad_reference );
-    }
-};
+		if (r < box.r1 || r > box.r2 || c < box.c1 || c > box.c2) {
+			return new cError(cErrorType.bad_reference);
+		}
+	};
 
-/** @constructor */
-function cArea3D( val, wsFrom, wsTo, wb ) {/*Area3D means "Sheat1!A1:E5" for example*/
-    this.constructor.call( this, val, cElementType.cellsRange3D );
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cArea3D(val, wsFrom, wsTo) {/*Area3D means "Sheat1!A1:E5" for example*/
+		cBaseType.call(this, val);
 
-    this._wb = wb;
-    this._cells = val;
-    this.isAbsolute = false;
-    this.isAbsoluteCol1 = false;
-    this.isAbsoluteRow1 = false;
-    this.isAbsoluteCol2 = false;
-    this.isAbsoluteRow2 = false;
-    this.wsFrom = this._wb.getWorksheetByName( wsFrom ).getId();
-    this.wsTo = this._wb.getWorksheetByName( wsTo ).getId();
-}
+		this.bbox = null;
+		if (val) {
+			var bbox = AscCommonExcel.g_oRangeCache.getAscRange(val);
+			if (null != bbox) {
+				this.bbox = bbox.clone();
+			}
+		}
+		this.wsFrom = wsFrom;
+		this.wsTo = wsTo || this.wsFrom;
 
-cArea3D.prototype = Object.create( cBaseType.prototype );
-cArea3D.prototype.clone = function () {
-  var wsFrom = this._wb.getWorksheetById(this.wsFrom).getName(), wsTo = this._wb.getWorksheetById(this.wsTo)
-    .getName(), oRes = new cArea3D(this._cells, wsFrom, wsTo, this._wb);
-//	cBaseType.prototype.cloneTo.call( this, oRes );
-    this.constructor.prototype.cloneTo.call( this, oRes );
-    oRes.isAbsolute = this.isAbsolute;
-    oRes.isAbsoluteCol1 = this.isAbsoluteCol1;
-    oRes.isAbsoluteRow1 = this.isAbsoluteRow1;
-    oRes.isAbsoluteCol2 = this.isAbsoluteCol2;
-    oRes.isAbsoluteRow2 = this.isAbsoluteRow2;
-    return oRes;
-};
-cArea3D.prototype.wsRange = function () {
-    if ( !this.wsTo ) {
-        this.wsTo = this.wsFrom;
-    }
-  var wsF = this._wb.getWorksheetById(this.wsFrom).getIndex(), wsL = this._wb.getWorksheetById(this.wsTo)
-    .getIndex(), r = [];
-    for ( var i = wsF; i <= wsL; i++ ) {
-        r.push( this._wb.getWorksheet( i ) );
-    }
-    return r;
-};
+		//dependenceRange allow change sheets and then independently removeDependencies
+		this.dependenceRange = null;
+	}
+
+	cArea3D.prototype = Object.create(cBaseType.prototype);
+	cArea3D.prototype.constructor = cArea3D;
+	cArea3D.prototype.type = cElementType.cellsRange3D;
+	cArea3D.prototype.clone = function () {
+		var oRes = new cArea3D(null, this.wsFrom, this.wsTo);
+		this.cloneTo(oRes);
+		if (this.bbox) {
+			oRes.bbox = this.bbox.clone();
+		}
+		return oRes;
+	};
+	cArea3D.prototype.wsRange = function () {
+		var wb = this.wsFrom.workbook;
+		var wsF = this.wsFrom.getIndex(), wsL = this.wsTo.getIndex(), r = [];
+		for (var i = wsF; i <= wsL; i++) {
+			r.push(wb.getWorksheet(i));
+		}
+		return r;
+	};
 	cArea3D.prototype.range = function (wsRange) {
 		if (!wsRange) {
 			return [null];
@@ -1163,7 +1153,7 @@ cArea3D.prototype.wsRange = function () {
 			if (!wsRange[i]) {
 				r.push(null);
 			} else {
-				r.push(wsRange[i].getRange2(this._cells));
+				r.push(AscCommonExcel.Range.prototype.createFromBBox(wsRange[i], this.bbox));
 			}
 		}
 		return r;
@@ -1177,7 +1167,7 @@ cArea3D.prototype.wsRange = function () {
 	cArea3D.prototype.getRanges = function () {
 		return (this.range(this.wsRange()));
 	};
-	cArea3D.prototype.getValue = function () {
+	cArea3D.prototype.getValue = function (checkExclude, excludeHiddenRows) {
 		var i, _wsA = this.wsRange();
 		var _val = [];
 		if (_wsA.length < 1) {
@@ -1191,15 +1181,19 @@ cArea3D.prototype.wsRange = function () {
 			}
 
 		}
+		var _exclude;
 		var _r = this.range(_wsA);
 		for (i = 0; i < _r.length; i++) {
 			if (!_r[i]) {
 				_val.push(new cError(cErrorType.bad_reference));
 				return _val;
 			}
+			if (checkExclude && !(_exclude = excludeHiddenRows)) {
+				_exclude = _wsA[i].isApplyFilterBySheet();
+			}
 			_r[i]._foreachNoEmpty(function (cell) {
 				_val.push(checkTypeCell(cell));
-			});
+			}, _exclude);
 		}
 		return _val;
 	};
@@ -1229,42 +1223,39 @@ cArea3D.prototype.wsRange = function () {
 
 		return (null == _val[0]) ? new cEmpty() : _val[0];
 	};
-	cArea3D.prototype.changeSheet = function (lastName, newName) {
-		if (this.wsFrom === this._wb.getWorksheetByName(lastName).getId() &&
-			this.wsTo === this._wb.getWorksheetByName(lastName).getId()) {
-			this.wsFrom = this.wsTo = this._wb.getWorksheetByName(newName).getId();
-		} else if (this.wsFrom === this._wb.getWorksheetByName(lastName).getId()) {
-			this.wsFrom = this._wb.getWorksheetByName(newName).getId();
-		} else if (this.wsTo === this._wb.getWorksheetByName(lastName).getId()) {
-			this.wsTo = this._wb.getWorksheetByName(newName).getId();
+	cArea3D.prototype.changeSheet = function (wsLast, wsNew) {
+		if (this.wsFrom === wsLast) {
+			this.wsFrom = wsNew;
+		}
+		if (this.wsTo === wsLast) {
+			this.wsTo = wsNew;
 		}
 	};
-cArea3D.prototype.toString = function () {
-  var wsFrom = this._wb.getWorksheetById(this.wsFrom).getName(), wsTo = this._wb.getWorksheetById(this.wsTo)
-    .getName(), name = AscCommonExcel.g_oRangeCache.getActiveRange(this._cells);
-    name = name && name.getName ? name.getName() : this._cells;
-
-    return parserHelp.get3DRef( wsFrom !== wsTo ? wsFrom + ':' + wsTo : wsFrom, name );
-};
-cArea3D.prototype.tocNumber = function () {
-    return this.getValue()[0].tocNumber();
-};
-cArea3D.prototype.tocString = function () {
-    return this.getValue()[0].tocString();
-};
-cArea3D.prototype.tocBool = function () {
-    return this.getValue()[0].tocBool();
-};
-cArea3D.prototype.tocArea = function () {
-    var wsR = this.wsRange();
-    if ( wsR.length == 1 ) {
-        return new cArea( this._cells, wsR[0] );
-    }
-    return false;
-};
-cArea3D.prototype.getWS = function () {
-    return this.wsRange()[0];
-};
+	cArea3D.prototype.toString = function () {
+		var wsFrom = this.wsFrom.getName();
+		var wsTo = this.wsTo.getName();
+		var name = this.bbox ? this.bbox.getName() : this.value;
+		return parserHelp.get3DRef(wsFrom !== wsTo ? wsFrom + ':' + wsTo : wsFrom, name);
+	};
+	cArea3D.prototype.tocNumber = function () {
+		return this.getValue()[0].tocNumber();
+	};
+	cArea3D.prototype.tocString = function () {
+		return this.getValue()[0].tocString();
+	};
+	cArea3D.prototype.tocBool = function () {
+		return this.getValue()[0].tocBool();
+	};
+	cArea3D.prototype.tocArea = function () {
+		var wsR = this.wsRange();
+		if (wsR.length == 1) {
+			return new cArea(this.value, wsR[0]);
+		}
+		return false;
+	};
+	cArea3D.prototype.getWS = function () {
+		return this.wsFrom;
+	};
 	cArea3D.prototype.cross = function (arg, wsID) {
 		if (!this.isSingleSheet()) {
 			return new cError(cErrorType.wrong_value_type);
@@ -1278,20 +1269,13 @@ cArea3D.prototype.getWS = function () {
 		}
 		var cross = r.cross(arg);
 		if (cross) {
-			if (cross.r != undefined) {
-				return this.getValue2(new CellAddress(cross.r, this.getBBox().c1));
-			} else if (cross.c != undefined) {
-				return this.getValue2(new CellAddress(this.getBBox().r1, cross.c));
-			} else {
-				return new cError(cErrorType.wrong_value_type);
+			if (undefined !== cross.r) {
+				return this.getValue2(new CellAddress(cross.r, this.getBBox0().c1, 0));
+			} else if (undefined !== cross.c) {
+				return this.getValue2(new CellAddress(this.getBBox0().r1, cross.c, 0));
 			}
-		} else {
-			return new cError(cErrorType.wrong_value_type);
 		}
-	};
-	cArea3D.prototype.getBBox = function () {
-		var range = this.getRange();
-		return range ? range.getBBox() : range;
+		return new cError(cErrorType.wrong_value_type);
 	};
 	cArea3D.prototype.getBBox0 = function () {
 		var range = this.getRange();
@@ -1365,112 +1349,123 @@ cArea3D.prototype.getWS = function () {
 		return this.wsFrom === this.wsTo;
 	};
 
-/** @constructor */
-function cRef( val, ws ) {/*Ref means A1 for example*/
-    this.constructor.call( this, val, cElementType.cell );
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cRef(val, ws) {/*Ref means A1 for example*/
+		cBaseType.call(this, val);
 
-    this._cells = val;
-    this.ws = ws;
-    this.wb = this._wb = ws.workbook;
-    this.isAbsolute = false;
-    this.isAbsoluteCol1 = false;
-    this.isAbsoluteRow1 = false;
-  var ca = g_oCellAddressUtils.getCellAddress(val.replace(AscCommon.rx_space_g, ""));
-    this.range = null;
-    this._valid = ca.isValid();
-    if ( this._valid ) {
-        this.range = this.ws.getRange3( ca.getRow0(), ca.getCol0(), ca.getRow0(), ca.getCol0() );
-  } else {
-        this.range = this.ws.getRange3( 0, 0, 0, 0 );
-    }
-}
+		this.ws = ws;
+		this.range = null;
+		if (val) {
+			this.range = ws.getRange2(val.replace(AscCommon.rx_space_g, ""));
+		}
+	}
 
-cRef.prototype = Object.create( cBaseType.prototype );
-cRef.prototype.clone = function () {
-    var oRes = new cRef( this._cells, this.ws );
-//	cBaseType.prototype.cloneTo.call( this, oRes );
-    this.constructor.prototype.cloneTo.call( this, oRes );
-    oRes.isAbsolute = this.isAbsolute;
-    oRes.isAbsoluteCol1 = this.isAbsoluteCol1;
-    oRes.isAbsoluteRow1 = this.isAbsoluteRow1;
-    return oRes;
-};
-cRef.prototype.getWsId = function () {
-    return this.ws.Id;
-};
+	cRef.prototype = Object.create(cBaseType.prototype);
+	cRef.prototype.constructor = cRef;
+	cRef.prototype.type = cElementType.cell;
+	cRef.prototype.clone = function (opt_ws) {
+		var ws = opt_ws ? opt_ws : this.ws;
+		var oRes = new cRef(null, ws);
+		this.cloneTo(oRes);
+		if (this.range) {
+			oRes.range = this.range.clone(ws);
+		}
+		return oRes;
+	};
+	cRef.prototype.getWsId = function () {
+		return this.ws.Id;
+	};
 	cRef.prototype.getValue = function () {
-		if (!this._valid) {
+		if (!this.isValid()) {
 			return new cError(cErrorType.bad_reference);
 		}
 		return checkTypeCell(this.range);
 	};
-cRef.prototype.tocNumber = function () {
-    return this.getValue().tocNumber();
-};
-cRef.prototype.tocString = function () {
-    return this.getValue().tocString();
-    /* new cString(""+this.range.getValueWithFormat()); */
-};
-cRef.prototype.tocBool = function () {
-    return this.getValue().tocBool();
-};
-cRef.prototype.toString = function () {
-    return this._cells;
-};
-cRef.prototype.getRange = function () {
-    return this.range;
-};
-cRef.prototype.getWS = function () {
-    return this.ws;
-};
-cRef.prototype.isValid = function () {
-    return this._valid;
-};
-cRef.prototype.getMatrix = function () {
-  return [[this.getValue()]];
-};
-cRef.prototype.getBBox0 = function () {
-    return this.getRange().getBBox0();
-};
+	cRef.prototype.tocNumber = function () {
+		return this.getValue().tocNumber();
+	};
+	cRef.prototype.tocString = function () {
+		return this.getValue().tocString();
+		/* new cString(""+this.range.getValueWithFormat()); */
+	};
+	cRef.prototype.tocBool = function () {
+		return this.getValue().tocBool();
+	};
+	cRef.prototype.toString = function () {
+		return this.value;
+	};
+	cRef.prototype.getRange = function () {
+		return this.range;
+	};
+	cRef.prototype.getWS = function () {
+		return this.ws;
+	};
+	cRef.prototype.isValid = function () {
+		return !!this.getRange();
+	};
+	cRef.prototype.getMatrix = function () {
+		return [[this.getValue()]];
+	};
+	cRef.prototype.getBBox0 = function () {
+		return this.getRange().getBBox0();
+	};
+	cRef.prototype.isHidden = function (excludeHiddenRows) {
+		if (!excludeHiddenRows) {
+			excludeHiddenRows = this.ws.isApplyFilterBySheet();
+		}
+		return excludeHiddenRows && this._valid && this.ws.getRowHidden(this.getRange().r1);
+	};
 
-/** @constructor */
-function cRef3D( val, _wsFrom, wb ) {/*Ref means Sheat1!A1 for example*/
-    this.constructor.call( this, val, cElementType.cell3D );
-    this.wb = this._wb = wb;
-    this._cells = val;
-    this.isAbsolute = false;
-    this.isAbsoluteCol1 = false;
-    this.isAbsoluteRow1 = false;
-    this.ws = this._wb.getWorksheetByName( _wsFrom );
-    this.range = null;
-}
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cRef3D(val, ws) {/*Ref means Sheat1!A1 for example*/
+		cBaseType.call(this, val);
 
-cRef3D.prototype = Object.create( cBaseType.prototype );
-cRef3D.prototype.clone = function () {
-    var oRes = new cRef3D( this._cells, this.ws.getName(), this._wb );
-//	cBaseType.prototype.cloneTo.call( this, oRes );
-    this.constructor.prototype.cloneTo.call( this, oRes );
-    oRes.isAbsolute = this.isAbsolute;
-    oRes.isAbsoluteCol1 = this.isAbsoluteCol1;
-    oRes.isAbsoluteRow1 = this.isAbsoluteRow1;
-    return oRes;
-};
-cRef3D.prototype.getWsId = function () {
-    return this.ws.Id;
-};
-cRef3D.prototype.getRange = function () {
-    if ( this.ws ) {
-        if ( this.range ) {
-            return this.range;
-        }
-        return this.range = this.ws.getRange2( this._cells );
-  } else {
-        return this.range = null;
-    }
-};
-cRef3D.prototype.isValid = function () {
-    return !!this.getRange();
-};
+		this.ws = ws;
+		this.range = null;
+		if (val && this.ws) {
+			this.range = this.ws.getRange2(val);
+		}
+	}
+
+	cRef3D.prototype = Object.create(cBaseType.prototype);
+	cRef3D.prototype.constructor = cRef3D;
+	cRef3D.prototype.type = cElementType.cell3D;
+	cRef3D.prototype.clone = function (opt_ws) {
+		var ws = opt_ws ? opt_ws : this.ws;
+		var oRes = new cRef3D(null, null);
+		this.cloneTo(oRes);
+		if (opt_ws && this.ws.getName() == opt_ws.getName()) {
+			oRes.ws = opt_ws;
+		} else {
+			oRes.ws = this.ws;
+		}
+		if (this.range) {
+			oRes.range = this.range.clone(ws);
+		}
+		return oRes;
+	};
+	cRef3D.prototype.getWsId = function () {
+		return this.ws.Id;
+	};
+	cRef3D.prototype.getRange = function () {
+		if (this.ws) {
+			if (this.range) {
+				return this.range;
+			}
+			return this.range = this.ws.getRange2(this._cells);
+		} else {
+			return this.range = null;
+		}
+	};
+	cRef3D.prototype.isValid = function () {
+		return !!this.getRange();
+	};
 	cRef3D.prototype.getValue = function () {
 		var _r = this.getRange();
 		if (!_r) {
@@ -1478,618 +1473,733 @@ cRef3D.prototype.isValid = function () {
 		}
 		return checkTypeCell(_r);
 	};
-cRef3D.prototype.tocBool = function () {
-    return this.getValue().tocBool();
-};
-cRef3D.prototype.tocNumber = function () {
-    return this.getValue().tocNumber();
-};
-cRef3D.prototype.tocString = function () {
-    return this.getValue().tocString();
-};
-cRef3D.prototype.changeSheet = function ( lastName, newName ) {
-    if ( this.ws.getName() === lastName ) {
-        this.ws = this._wb.getWorksheetByName( newName );
-    }
-};
-cRef3D.prototype.toString = function () {
-    return parserHelp.get3DRef( this.ws.getName(), this._cells );
-};
-cRef3D.prototype.getWS = function () {
-    return this.ws;
-};
-cRef3D.prototype.getBBox0 = function () {
-    var range = this.getRange();
-    if ( range ) {
-        return range.getBBox0();
-    }
-    return null;
-};
+	cRef3D.prototype.tocBool = function () {
+		return this.getValue().tocBool();
+	};
+	cRef3D.prototype.tocNumber = function () {
+		return this.getValue().tocNumber();
+	};
+	cRef3D.prototype.tocString = function () {
+		return this.getValue().tocString();
+	};
+	cRef3D.prototype.changeSheet = function (wsLast, wsNew) {
+		if (this.ws === wsLast) {
+			this.ws = wsNew;
+		}
+	};
+	cRef3D.prototype.toString = function () {
+		return parserHelp.get3DRef(this.ws.getName(), this.value);
+	};
+	cRef3D.prototype.getWS = function () {
+		return this.ws;
+	};
+	cRef3D.prototype.getBBox0 = function () {
+		var range = this.getRange();
+		if (range) {
+			return range.getBBox0();
+		}
+		return null;
+	};
+	cRef3D.prototype.isHidden = function (excludeHiddenRows) {
+		if (!excludeHiddenRows) {
+			excludeHiddenRows = this.ws.isApplyFilterBySheet();
+		}
+		var _r = this.getRange();
+		return excludeHiddenRows && _r && this.ws.getRowHidden(_r.r1);
+	};
 
-/** @constructor */
-function cEmpty() {
-    this.constructor.call( this, "", cElementType.empty );
-}
-
-cEmpty.prototype = Object.create( cBaseType.prototype );
-cEmpty.prototype.tocNumber = function () {
-    return new cNumber( 0 );
-};
-cEmpty.prototype.tocBool = function () {
-    return new cBool( false );
-};
-cEmpty.prototype.tocString = function () {
-    return new cString( "" );
-};
-cEmpty.prototype.toString = function () {
-    return "";
-};
-
-/** @constructor */
-function cName( val, wb, ws ) {
-    this.constructor.call( this, val, cElementType.name );
-    this.regSpace = /\$/g;
-    this.wb = wb;
-    this.ws = ws;
-    this.defName = this.wb.getDefinesNames( this.value, this.ws ? this.ws.getId() : null );
-    /*if ( this.defName && this.defName.Ref ) {
-     this.ref = new parserFormula( this.defName.Ref, "", this.ws );
-     this.ref.parse();
-     }*/
-}
-
-cName.prototype = Object.create( cBaseType.prototype );
-cName.prototype.reInit = function () {
-    this.defName = this.wb.getDefinesNames( this.value, this.ws.getId() );
-    this.defName.parsedRef = new parserFormula( this.defName.Ref, "", this.ws );
-    this.defName.parsedRef.parse();
-};
-cName.prototype.toRef = function () {
-
-    if ( !this.defName || !this.defName.Ref ) {
-        return new cError( cErrorType.wrong_name );
-    }
-    return this.Calculate();
-};
-cName.prototype.toString = function () {
-    if ( this.defName ) {
-        return this.defName.Name;
-  } else {
-        return this.value;
-    }
-};
-cName.prototype.getValue = function () {
-
-    if ( !this.defName ) {
-        return new cError( cErrorType.wrong_name );
-    }
-
-    return this.defName.parsedRef.calculate( this );
-};
-cName.prototype.getRef = function () {
-
-};
-cName.prototype.reParse = function () {
-    var dN = this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
-    if ( dN ) {
-        this.defName.parsedRef = new parserFormula( dN.Ref, "", this.ws );
-        this.defName.parsedRef.parse();
-  } else {
-        this.defName.parsedRef = null;
-    }
-};
-cName.prototype.addDefinedNameNode = function ( nameReParse ) {
-    if ( !this.defName || !this.defName.Ref ) {
-        return this.wb.dependencyFormulas.addDefinedNameNode( this.value, null );
-    }
-    return this.wb.getDefinesNames( this.defName.Name, this.ws.getId() );
-};
-cName.prototype.Calculate = function () {
-    if ( !this.defName || !this.defName.Ref ) {
-        return new cError( cErrorType.wrong_name );
-    }
-
-    if ( !this.defName.parsedRef ) {
-        return new cError( cErrorType.wrong_name );
-    }
-
-    return this.defName.parsedRef.calculate( this );
-
-};
-
-/** @constructor */
-function cStrucTable( val, wb, ws, cell ) {
-    this.constructor.call( this, val[0].replace("[]",""), cElementType.table );
-    this.wb = wb;
-    this.ws = ws;
-    this.tableName = val['tableName'];
-	this.table = this.wb.getDefinesNames( this.tableName, this.ws ? this.ws.getId() : null );
-    this.reservedColumn = null;
-    this.tableData = null;
-
-    var ret = this.createArea( val, cell );
-	return (ret && ret.type != cElementType.error) ? this : ret;
-
-}
-
-cStrucTable.prototype = Object.create( cBaseType.prototype );
-cStrucTable.prototype.addDefinedNameNode = function ( nameReParse ) {
-	if ( !this.table || !this.table.Ref ) {
-		return this.wb.dependencyFormulas.addDefinedNameNode( this.value, null );
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cEmpty() {
+		cBaseType.call(this, "");
 	}
-	return this.wb.getDefinesNames( this.table.Name, this.ws.getId() );
-};
-cStrucTable.prototype.toRef = function () {
-	if ( !this.table || !this.table.Ref ) {
-		return new cError( cErrorType.wrong_name );
+
+	cEmpty.prototype = Object.create(cBaseType.prototype);
+	cEmpty.prototype.constructor = cEmpty;
+	cEmpty.prototype.type = cElementType.empty;
+	cEmpty.prototype.tocNumber = function () {
+		return new cNumber(0);
+	};
+	cEmpty.prototype.tocBool = function () {
+		return new cBool(false);
+	};
+	cEmpty.prototype.tocString = function () {
+		return new cString("");
+	};
+	cEmpty.prototype.toString = function () {
+		return "";
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cName(val, ws) {
+		cBaseType.call(this, val);
+		this.ws = ws;
 	}
-    return this.area ? this.area : new cError( cErrorType.bad_reference );
-};
-cStrucTable.prototype.toString = function () {
-	var tblStr, columns_1, columns_2;
-	if( !this.table ){
-		return this.value;
-	}
-	tblStr = this.table.Name;
-	this.columnName ? tblStr += "[%1]" : null;
-	if ( this.oneColumn ) {
 
-		columns_1= this.wb.getTableNameColumnByIndex( this.tableName, this.oneColumnIndex.index );
-		if( columns_1 ){
-			this.oneColumn = columns_1.columnName;
+	cName.prototype = Object.create(cBaseType.prototype);
+	cName.prototype.constructor = cName;
+	cName.prototype.type = cElementType.name;
+	cName.prototype.clone = function (opt_ws) {
+		var ws = opt_ws ? opt_ws : this.ws;
+		var oRes = new cName(this.value, ws);
+		this.cloneTo(oRes);
+		return oRes;
+	};
+	cName.prototype.toRef = function () {
+		var defName = this.getDefName();
+		if (!defName || !defName.ref) {
+			return new cError(cErrorType.wrong_name);
+		}
+		return this.Calculate();
+	};
+	cName.prototype.toString = function () {
+		var defName = this.getDefName();
+		if (defName) {
+			return defName.name;
+		} else {
+			return this.value;
+		}
+	};
+	cName.prototype.getValue = function () {
+		return this.Calculate();
+	};
+	cName.prototype.Calculate = function () {
+		var defName = this.getDefName();
+		if (!defName || !defName.ref) {
+			return new cError(cErrorType.wrong_name);
 		}
 
-		return tblStr.replace( "%1", this.oneColumn.replace(/#/g,"'#")  );
-	}
-	if ( this.columnRange ) {
-		columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
-		columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colEndIndex.index );
-		if(columns_1){
-			this.colStart = columns_1.columnName
+		if (!defName.parsedRef) {
+			return new cError(cErrorType.wrong_name);
 		}
-		if(columns_2){
-			this.colEnd = columns_2.columnName
-		}
-    return tblStr.replace("%1",
-      "[" + this.colStart.replace(/#/g, "'#") + "]:[" + this.colEnd.replace(/#/g, "'#") + "]");
-	}
-	if ( this.reservedColumn ) {
-		return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,false) );
-	}
-	if ( this.hdt ) {
-		var re = /\[(.*?)\]/ig, m, data = "",i=0;
-		while ( null !== (m = re.exec( this.hdt )) ) {
+		//defName not linked to cell, use inherit range
+		var r1 = arguments[1];
+		return defName.parsedRef.calculate(this, r1);
 
-      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], false) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
-		}
-		data = data.substr( 0, data.length - 1 );
-		if ( this.hdtcstart ) {
-
-			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcstartIndex.index );
-			if( columns_1 ){
-				this.hdtcstart = columns_1.columnName;
-			}
-
-      data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
-		}
-		if ( this.hdtcend ) {
-
-			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcendIndex.index );
-			if( columns_2 ){
-				this.hdtcend = columns_2.columnName;
-			}
-
-			data += ":[" + this.hdtcend.replace(/#/g,"'#") + "]"
-		}
-		return tblStr.replace( "%1", data );
-	}
-	return tblStr.replace( "%1", "" ).replace("[]","");
-};
-cStrucTable.prototype.toLocaleString = function () {
-	var tblStr, columns_1, columns_2;
-	if( !this.table ){
-		return this.value;
-	}
-	tblStr = this.table.Name;
-	this.columnName ? tblStr += "[%1]" : null;
-	if ( this.oneColumn ) {
-
-		columns_1= this.wb.getTableNameColumnByIndex( this.tableName, this.oneColumnIndex.index );
-		if( columns_1 ){
-			this.oneColumn = columns_1.columnName;
-		}
-
-		return tblStr.replace( "%1", this.oneColumn.replace(/#/g,"'#")  );
-	}
-	if ( this.columnRange ) {
-		columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.colStartIndex.index );
-		columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.colEndIndex.index );
-		if(columns_1){
-			this.colStart = columns_1.columnName
-		}
-		if(columns_2){
-			this.colEnd = columns_2.columnName
-		}
-    return tblStr.replace("%1",
-      "[" + this.colStart.replace(/#/g, "'#") + "]:[" + this.colEnd.replace(/#/g, "'#") + "]");
-	}
-	if ( this.reservedColumn ) {
-		return tblStr.replace( "%1", this.buildLocalTableString(this.reservedColumnIndex,true) );
-	}
-	if ( this.hdt ) {
-		var re = /\[(.*?)\]/ig, m, data = "",i=0;
-		while ( null !== (m = re.exec( this.hdt )) ) {
-
-      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], true) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
-		}
-		data = data.substr( 0, data.length - 1 );
-		if ( this.hdtcstart ) {
-
-			columns_1 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcstartIndex.index );
-			if( columns_1 ){
-				this.hdtcstart = columns_1.columnName;
-			}
-
-      data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
-		}
-		if ( this.hdtcend ) {
-
-			columns_2 = this.wb.getTableNameColumnByIndex( this.tableName, this.hdtcendIndex.index );
-			if( columns_2 ){
-				this.hdtcend = columns_2.columnName;
-			}
-
-			data += ":[" + this.hdtcend.replace(/#/g,"'#") + "]"
-		}
-		return tblStr.replace( "%1", data );
-	}
-	return tblStr.replace( "%1", "" ).replace("[]","");
-};
-cStrucTable.prototype.changeArea = function ( offset ) {
-    return this.area;
-};
-cStrucTable.prototype.createArea = function ( val, cell ) {
-    this.columnName  = val['columnName'];
-
-    var paramObj = {param: null, startCol: null, endCol: null, cell: cell.bbox, includeColumnHeader:false};
-
-    if ( val['oneColumn'] || val['columnRange'] ) {
-
-        this.oneColumn = val['oneColumn'];
-        this.columnRange = val['columnRange'];
-
-    paramObj.param = AscCommon.FormulaTablePartInfo.columns;
-        if ( val['columnRange'] ) {
-            this.columnRange = val['columnRange'];
-            paramObj.startCol = this.colStart = val['colStart'].replace(/'#/g,"#");
-            paramObj.endCol = this.colEnd = val['colEnd'].replace(/'#/g,"#");
-      if (!this.colEnd) {
-				this.colEnd = this.colStart;
-      }
-
-			this.colStartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colStart );
-			this.colEndIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colEnd );
-			if( !this.colStartIndex && !this.colEndIndex ){
-				return this.area =  new cError( cErrorType.bad_reference );
-			}
-    } else {
-            paramObj.startCol = this.oneColumn = val['oneColumn'].replace(/'#/g,"#");
-			this.oneColumnIndex = this.wb.getTableIndexColumnByName( this.tableName, this.oneColumn );
-			if( !this.oneColumnIndex ){
-				return this.area = new cError( cErrorType.bad_reference );
-			}
-        }
-
-        this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
-
-        if ( !this.tableData ) {
-            return this.area = new cError( cErrorType.bad_reference );
-        }
-		if( this.tableData.range ){
-			this.area = this.tableData.range.isOneCell() ?
-        new cRef3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
-          .getName(), this.wb) :
-        new cArea3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
-          .getName(), this.wb.getWorksheetById(this.tableData.wsID).getName(), this.wb);
-		}
-  } else if (val['reservedColumn'] || !val['columnName']) {
-		this.reservedColumn = val['reservedColumn'] || "";
-    this.reservedColumnIndex = paramObj.param = parserHelp.getColumnTypeByName(this.reservedColumn);
-
-        this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
-        if ( !this.tableData ) {
-			return this.area = new cError( cErrorType.bad_reference );
-        }
-		if( this.tableData.range ){
-			this.area = this.tableData.range.isOneCell() ?
-        new cRef3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
-          .getName(), this.wb) :
-        new cArea3D(this.tableData.range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
-          .getName(), this.wb.getWorksheetById(this.tableData.wsID).getName(), this.wb);
-		}
-  } else if (val['hdtcc']) {
-        this.hdt = val['hdt'];
-		this.hdtIndexes = [];
-		this.hdtcstart = val['hdtcstart'];
-        this.hdtcend = val['hdtcend'];
-        var re = /\[(.*?)\]/ig, m, data, range;
-        while ( null !== (m = re.exec( this.hdt )) ) {
-      paramObj.param = parserHelp.getColumnTypeByName(m[1]);
-			this.hdtIndexes.push(paramObj.param);
-            data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
-
-            if ( !data ) {
-				return this.area = new cError( cErrorType.bad_reference );
-            }
-
-            if ( range ) {
-                range.union2( data.range );
-      } else {
-                range = data.range;
-            }
-        }
-
-        if ( this.hdtcstart ) {
-			this.hdtcstart = this.hdtcstart.replace(/'#/g,"#");
-      paramObj.param = AscCommon.FormulaTablePartInfo.columns;
-            paramObj.startCol = this.hdtcstart;
-            paramObj.endCol = null;
-			this.hdtcstartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcstart );
-
-			if( !this.hdtcstartIndex ){
-				return this.area =  new cError( cErrorType.bad_reference );
-			}
-
-            if ( this.hdtcend ) {
-				this.hdtcend = this.hdtcend.replace(/'#/g,"#");
-                paramObj.endCol = this.hdtcend;
-				this.hdtcendIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcend );
-
-				if( !this.hdtcendIndex ){
-					return this.area =  new cError( cErrorType.bad_reference );
+	};
+	cName.prototype.getDefName = function () {
+		return this.ws ? this.ws.workbook.getDefinesNames(this.value, this.ws.getId()) : null;
+	};
+	cName.prototype.changeDefName = function (from, to) {
+		var sheetId = this.ws ? this.ws.getId() : null;
+		if (AscCommonExcel.getDefNameIndex(this.value) == AscCommonExcel.getDefNameIndex(from.name)) {
+			if (null == from.sheetId) {
+				//in case of changes in workbook defname should not be sheet defname
+				var defName = this.getDefName();
+				if (!(defName && null != defName.sheetId)) {
+					this.value = to.name;
 				}
-
-            }
-
-          if (range) {
-            var _c1 = range.c1 + (this.hdtcstartIndex ? this.hdtcstartIndex.index : 0);
-            range = new Asc.Range(_c1, range.r1, this.hdtcendIndex ? range.c1 + this.hdtcendIndex.index : _c1, range.r2);
-          } else {
-            paramObj.includeColumnHeader = true;
-            data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
-
-            if ( !data ) {
-              return this.area = new cError( cErrorType.bad_reference );
-            }
-            range = data.range;
-          }
-        }
-
-        this.tableData = data;
-        this.tableData.range = range;
-		if( range ){
-			this.area = range.isOneCell() ?
-				new cRef3D( range.getAbsName(), this.wb.getWorksheetById( this.tableData.wsID ).getName(), this.wb ):
-        new cArea3D(range.getAbsName(), this.wb.getWorksheetById(this.tableData.wsID)
-          .getName(), this.wb.getWorksheetById(this.tableData.wsID).getName(), this.wb);
+			} else if (sheetId == from.sheetId) {
+				this.value = to.name;
+			}
 		}
-    }
+	};
+	cName.prototype.getWS = function () {
+		return this.ws;
+	};
 
-    !this.area ? this.area = new cError( cErrorType.bad_reference ) : null;
-	return this.area;
-};
-cStrucTable.prototype.buildLocalTableString = function (reservedColumn,local) {
-  return parserHelp.getColumnNameByType(reservedColumn, local);
-};
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cStrucTable(val, wb, ws) {
+		cBaseType.call(this, val);
+		this.wb = wb;
+		this.ws = ws;
 
-/** @constructor */
-function cName3D( val, wsFrom, wb, ws ) {
-	cName.call( this, val, wb, ws );
-	this.type = cElementType.name3D;
-	this.wsFrom = wsFrom;
-}
-cName3D.prototype = Object.create( cName.prototype );
-cName3D.prototype.toString = function () {
-	if ( this.defName ) {
-		return parserHelp.getEscapeSheetName( this.ws.getName() ) + "!" + this.defName.Name;
-  } else {
-		return parserHelp.getEscapeSheetName( this.wsFrom ) + "!" + this.value;
+		this.tableName = null;
+		this.oneColumnIndex = null;
+		this.colStartIndex = null;
+		this.colEndIndex = null;
+		this.reservedColumnIndex = null;
+		this.hdtIndexes = null;
+		this.hdtcstartIndex = null;
+		this.hdtcendIndex = null;
+
+		this.isDynamic = false;//#This row
+		this.area = null;
 	}
-};
 
-/** @constructor */
-function cArray() {
-    this.constructor.call( this, undefined, cElementType.array );
-    this.array = [];
-    this.rowCount = 0;
-    this.countElementInRow = [];
-    this.countElement = 0;
-}
+	cStrucTable.prototype = Object.create(cBaseType.prototype);
+	cStrucTable.prototype.constructor = cStrucTable;
+	cStrucTable.prototype.type = cElementType.table;
+	cStrucTable.prototype.createFromVal = function (val, wb, ws) {
+		var res = new cStrucTable(val[0], wb, ws);
+		if (res._parseVal(val)) {
+			res._updateArea(null, false);
+		}
+		return (res.area && res.area.type != cElementType.error) ? res : new cError(cErrorType.bad_reference);
+	};
+	cStrucTable.prototype.clone = function (opt_ws) {
+		var ws = opt_ws ? opt_ws : this.ws;
+		var wb = ws.workbook;
+		var oRes = new cStrucTable(this.value, wb, ws);
+		oRes.tableName = this.tableName;
+		oRes.oneColumnIndex = this._cloneIndex(this.oneColumnIndex);
+		oRes.colStartIndex = this._cloneIndex(this.colStartIndex);
+		oRes.colEndIndex = this._cloneIndex(this.colEndIndex);
+		oRes.reservedColumnIndex = this.reservedColumnIndex;
+		if (this.hdtIndexes) {
+			oRes.hdtIndexes = this.hdtIndexes.slice(0);
+		}
+		oRes.hdtcstartIndex = this._cloneIndex(this.hdtcstartIndex);
+		oRes.hdtcendIndex = this._cloneIndex(this.hdtcendIndex);
 
-cArray.prototype = Object.create( cBaseType.prototype );
-cArray.prototype.addRow = function () {
-    this.array[this.array.length] = [];
-    this.countElementInRow[this.rowCount++] = 0;
-};
-cArray.prototype.addElement = function ( element ) {
-    if ( this.array.length === 0 ) {
-        this.addRow();
-    }
-  var arr = this.array, subArr = arr[this.rowCount - 1];
-    subArr[subArr.length] = element;
-    this.countElementInRow[this.rowCount - 1]++;
-    this.countElement++;
-};
-cArray.prototype.getRow = function ( rowIndex ) {
-    if ( rowIndex < 0 || rowIndex > this.array.length - 1 ) {
-        return null;
-    }
-    return this.array[rowIndex];
-};
-cArray.prototype.getCol = function ( colIndex ) {
-    var col = [];
-    for ( var i = 0; i < this.rowCount; i++ ) {
-        col.push( this.array[i][colIndex] );
-    }
-    return col;
-};
-cArray.prototype.getElementRowCol = function ( row, col ) {
-    if ( row > this.rowCount || col > this.getCountElementInRow() ) {
-        return new cError( cErrorType.not_available );
-    }
-    return this.array[row][col];
-};
-cArray.prototype.getElement = function ( index ) {
-    for ( var i = 0; i < this.rowCount; i++ ) {
-        if ( index > this.countElementInRow[i].length ) {
-            index -= this.countElementInRow[i].length;
-    } else {
-            return this.array[i][index];
-        }
-    }
-    return null;
-};
-cArray.prototype.foreach = function ( action ) {
-    if ( typeof (action) !== 'function' ) {
-        return true;
-    }
-    for ( var ir = 0; ir < this.rowCount; ir++ ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++ ) {
-            if ( action.call( this, this.array[ir][ic], ir, ic ) ) {
-                return true;
-            }
-        }
-    }
-    return undefined;
-};
-cArray.prototype.getCountElement = function () {
-    return this.countElement;
-};
-cArray.prototype.getCountElementInRow = function () {
-    return this.countElementInRow[0];
-};
-cArray.prototype.getRowCount = function () {
-    return this.rowCount;
-};
-cArray.prototype.tocNumber = function () {
-    var retArr = new cArray();
-    for ( var ir = 0; ir < this.rowCount; ir++, retArr.addRow() ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++ ) {
-            retArr.addElement( this.array[ir][ic].tocNumber() );
-        }
-        if ( ir === this.rowCount - 1 ) {
-            break;
-        }
-    }
-    return retArr;
-};
-cArray.prototype.tocString = function () {
-    var retArr = new cArray();
-    for ( var ir = 0; ir < this.rowCount; ir++, retArr.addRow() ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++ ) {
-            retArr.addElement( this.array[ir][ic].tocString() );
-        }
-        if ( ir === this.rowCount - 1 ) {
-            break;
-        }
-    }
-    return retArr;
-};
-cArray.prototype.tocBool = function () {
-    var retArr = new cArray();
-    for ( var ir = 0; ir < this.rowCount; ir++, retArr.addRow() ) {
-        for ( var ic = 0; ic < this.countElementInRow[ir]; ic++ ) {
-            retArr.addElement( this.array[ir][ic].tocBool() );
-        }
-        if ( ir === this.rowCount - 1 ) {
-            break;
-        }
-    }
-    return retArr;
-};
-cArray.prototype.toString = function () {
-    var ret = "";
-  for (var ir = 0; ir < this.rowCount; ir++, ret += FormulaSeparators.arrayRowSeparatorDef) {
-    for (var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += FormulaSeparators.arrayColSeparatorDef) {
-            if ( this.array[ir][ic] instanceof cString ) {
-                ret += '"' + this.array[ir][ic].toString() + '"';
-      } else {
-                ret += this.array[ir][ic].toString() + "";
-            }
-        }
-    if (ret[ret.length - 1] === FormulaSeparators.arrayColSeparatorDef) {
-            ret = ret.substring( 0, ret.length - 1 );
-        }
-    }
-  if (ret[ret.length - 1] === FormulaSeparators.arrayRowSeparatorDef) {
-        ret = ret.substring( 0, ret.length - 1 );
-    }
-    return "{" + ret + "}";
-};
-cArray.prototype.toLocaleString = function ( digitDelim ) {
-    var ret = "";
-  for (var ir = 0; ir < this.rowCount; ir++, ret += digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
-    for (var ic = 0; ic < this.countElementInRow[ir];
-         ic++, ret += digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
-            if ( this.array[ir][ic] instanceof cString ) {
-                ret += '"' + this.array[ir][ic].toLocaleString( digitDelim ) + '"';
-      } else {
-                ret += this.array[ir][ic].toLocaleString( digitDelim ) + "";
-            }
-        }
-    if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
-            ret = ret.substring( 0, ret.length - 1 );
-        }
-    }
-  if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
-        ret = ret.substring( 0, ret.length - 1 );
-    }
-    return "{" + ret + "}";
-};
-cArray.prototype.isValidArray = function () {
-    if ( this.countElement < 1 ) {
-        return false;
-    }
-    for ( var i = 0; i < this.rowCount - 1; i++ ) {
-        if ( this.countElementInRow[i] - this.countElementInRow[i + 1] !== 0 ) {
-            return false;
-        }
-    }
-    return true;
-};
-cArray.prototype.getValue2 = function ( i, j ) {
-    var result = this.array[i];
-    return result ? result[j] : result;
-};
-cArray.prototype.getMatrix = function () {
-    return this.array;
-};
-cArray.prototype.fillFromArray = function ( arr ) {
-    this.array = arr;
-    this.rowCount = arr.length;
-    for ( var i = 0; i < arr.length; i++ ) {
-        this.countElementInRow[i] = arr[i].length;
-        this.countElement += arr[i].length;
-    }
-};
-cArray.prototype.getElementByCell = function ( cellAddress ) {
-    if ( this.cellAddress ){
-        if( this.countElementInRow == 1 ){
-            this.getElementRowCol( cellAddress.getRow0(), 0 );
-        }
-        if( this.rowCount == 1 ){
-            this.getElementRowCol( 0, cellAddress.getCol0() );
-        }
-  } else {
-        return this.getElement( 0 );
-    }
-};
+		oRes.isDynamic = this.isDynamic;
+		if (this.area) {
+			if (this.area.clone) {
+				oRes.area = this.area.clone(opt_ws);
+			} else {
+				oRes.area = this.area;
+			}
+		}
+		this.cloneTo(oRes);
+		return oRes;
+	};
+	cStrucTable.prototype._cloneIndex = function (val) {
+		if (val) {
+			return {wsID: val.wsID, index: val.index, name: val.name};
+		} else {
+			return val;
+		}
+	};
+	cStrucTable.prototype.toRef = function (opt_bbox) {
+		//opt_bbox usefull only for #This row
+		//case null == opt_bbox works like FormulaTablePartInfo.data
+		var table = this.wb.getDefinesNames(this.tableName, this.ws ? this.ws.getId() : null);
+		if (!table || !table.ref) {
+			return new cError(cErrorType.wrong_name);
+		}
+		if (!this.area || this.isDynamic) {
+			this._updateArea(opt_bbox, true);
+		}
+		return this.area;
+	};
+	cStrucTable.prototype.toString = function () {
+		return this._toString(false);
+	};
+	cStrucTable.prototype.toLocaleString = function () {
+		return this._toString(true);
+	};
+	cStrucTable.prototype._toString = function (isLocal) {
+		var tblStr, columns_1, columns_2;
+		var table = this.wb.getDefinesNames(this.tableName, null);
+		if (!table) {
+			tblStr = this.tableName;
+		} else {
+			tblStr = table.name;
+		}
 
-/** @constructor */
-function cUndefined() {
-    this.value = undefined;
-}
-cUndefined.prototype = Object.create( cBaseType.prototype );
+		if (this.oneColumnIndex) {
+			columns_1 = this.oneColumnIndex.name.replace(/([#[\]])/g, "'$1");
+			tblStr += "[" + columns_1 + "]";
+		} else if (this.colStartIndex && this.colEndIndex) {
+			columns_1 = this.colStartIndex.name.replace(/([#[\]])/g, "'$1");
+			columns_2 = this.colEndIndex.name.replace(/([#[\]])/g, "'$1");
+			tblStr += "[[" + columns_1 + "]:[" + columns_2 + "]]";
+		} else if (null != this.reservedColumnIndex) {
+			tblStr += "[" + this._buildLocalTableString(this.reservedColumnIndex, isLocal) + "]";
+		} else if (this.hdtIndexes || this.hdtcstartIndex || this.hdtcendIndex) {
+			tblStr += '[';
+			var i;
+			for (i = 0; i < this.hdtIndexes.length; ++i) {
+				if (0 != i) {
+					if (isLocal) {
+						tblStr += FormulaSeparators.functionArgumentSeparator;
+					} else {
+						tblStr += FormulaSeparators.functionArgumentSeparatorDef;
+					}
+				}
+				tblStr += "[" + this._buildLocalTableString(this.hdtIndexes[i], isLocal) + "]";
+			}
+			if (this.hdtcstartIndex) {
+				if (this.hdtIndexes.length > 0) {
+					if (isLocal) {
+						tblStr += FormulaSeparators.functionArgumentSeparator;
+					} else {
+						tblStr += FormulaSeparators.functionArgumentSeparatorDef;
+					}
+				}
+				var hdtcstart = this.hdtcstartIndex.name.replace(/([#[\]])/g, "'$1");
+				tblStr += "[" + hdtcstart + "]";
+				if (this.hdtcendIndex) {
+					var hdtcend = this.hdtcendIndex.name.replace(/([#[\]])/g, "'$1");
+					tblStr += ":[" + hdtcend + "]";
+				}
+			}
+			tblStr += ']';
+		} else if (!isLocal) {
+			tblStr += '[]';
+		}
+		return tblStr;
+	};
+	cStrucTable.prototype._parseVal = function (val) {
+		var bRes = true, startCol, endCol;
+		this.tableName = val['tableName'];
+		if (val['oneColumn']) {
+			startCol = val['oneColumn'].replace(/'([#[\]])/g, '$1');
+			this.oneColumnIndex = this.wb.getTableIndexColumnByName(this.tableName, startCol);
+			bRes = !!this.oneColumnIndex;
+		} else if (val['columnRange']) {
+			startCol = val['colStart'].replace(/'([#[\]])/g, '$1');
+			endCol = val['colEnd'].replace(/'([#[\]])/g, '$1');
+			if (!endCol) {
+				endCol = startCol;
+			}
+			this.colStartIndex = this.wb.getTableIndexColumnByName(this.tableName, startCol);
+			this.colEndIndex = this.wb.getTableIndexColumnByName(this.tableName, endCol);
+			bRes = !!this.colStartIndex && !!this.colEndIndex;
+		} else if (val['reservedColumn']) {
+			this.reservedColumnIndex = parserHelp.getColumnTypeByName(val['reservedColumn']);
+			if (AscCommon.FormulaTablePartInfo.thisRow == this.reservedColumnIndex ||
+				AscCommon.FormulaTablePartInfo.headers == this.reservedColumnIndex ||
+				AscCommon.FormulaTablePartInfo.totals == this.reservedColumnIndex) {
+				this.isDynamic = true;
+			}
+		} else if (val['hdtcc']) {
+			this.hdtIndexes = [];
+			var hdtcstart = val['hdtcstart'];
+			var hdtcend = val['hdtcend'];
+			var re = /\[(.*?)\]/ig, m;
+			while (null !== (m = re.exec(val['hdt']))) {
+				var param = parserHelp.getColumnTypeByName(m[1]);
+				if (AscCommon.FormulaTablePartInfo.thisRow == param ||
+					AscCommon.FormulaTablePartInfo.headers == param || AscCommon.FormulaTablePartInfo.totals == param) {
+					this.isDynamic = true;
+				}
+				this.hdtIndexes.push(param);
+			}
+
+			if (hdtcstart) {
+				startCol = hdtcstart.replace(/'([#[\]])/g, '$1');
+				this.hdtcstartIndex = this.wb.getTableIndexColumnByName(this.tableName, startCol);
+				bRes = !!this.hdtcstartIndex;
+				if (bRes && hdtcend) {
+					endCol = hdtcend.replace(/'([#[\]])/g, '$1');
+					this.hdtcendIndex = this.wb.getTableIndexColumnByName(this.tableName, endCol);
+					bRes = !!this.hdtcendIndex;
+				}
+			}
+		}
+		return bRes;
+	};
+	cStrucTable.prototype._updateArea = function (opt_bbox, opt_toRef) {
+		var paramObj = {param: null, startCol: null, endCol: null, cell: opt_bbox, toRef: opt_toRef};
+		var isThisRow = false;
+		var tableData;
+		if (this.oneColumnIndex) {
+			paramObj.param = AscCommon.FormulaTablePartInfo.columns;
+			paramObj.startCol = this.oneColumnIndex.name;
+		} else if (this.colStartIndex && this.colEndIndex) {
+			paramObj.param = AscCommon.FormulaTablePartInfo.columns;
+			paramObj.startCol = this.colStartIndex.name;
+			paramObj.endCol = this.colEndIndex.name;
+		} else if (null != this.reservedColumnIndex) {
+			paramObj.param = this.reservedColumnIndex;
+			isThisRow = AscCommon.FormulaTablePartInfo.thisRow == paramObj.param;
+		} else if (this.hdtIndexes || this.hdtcstartIndex) {
+			var data, range;
+			if (this.hdtIndexes) {
+				for (var i = 0; i < this.hdtIndexes.length; ++i) {
+					paramObj.param = this.hdtIndexes[i];
+					isThisRow = AscCommon.FormulaTablePartInfo.thisRow == paramObj.param;
+					data = this.wb.getTableRangeForFormula(this.tableName, paramObj);
+					if (!data) {
+						return this._createAreaError(isThisRow);
+					}
+
+					if (range) {
+						range.union2(data.range);
+					} else {
+						range = data.range;
+					}
+				}
+			}
+
+			if (this.hdtcstartIndex) {
+				paramObj.param = AscCommon.FormulaTablePartInfo.columns;
+				paramObj.startCol = this.hdtcstartIndex.name;
+				paramObj.endCol = null;
+
+				if (this.hdtcendIndex) {
+					paramObj.endCol = this.hdtcendIndex.name;
+				}
+				data = this.wb.getTableRangeForFormula(this.tableName, paramObj);
+				if (!data) {
+					return this._createAreaError(isThisRow);
+				}
+				if (range) {
+					range = new Asc.Range(data.range.c1, range.r1, data.range.c2, range.r2);
+				} else {
+					range = data.range;
+				}
+			}
+
+			tableData = data;
+			tableData.range = range;
+		} else {
+			paramObj.param = AscCommon.FormulaTablePartInfo.data;
+		}
+		if (!tableData) {
+			tableData = this.wb.getTableRangeForFormula(this.tableName, paramObj);
+			if (!tableData) {
+				return this._createAreaError(isThisRow);
+			}
+		}
+		if (tableData.range) {
+			var refName = tableData.range.getAbsName();
+			var wsFrom = this.wb.getWorksheetById(tableData.wsID);
+			if (tableData.range.isOneCell()) {
+				this.area = new cRef3D(refName, wsFrom);
+			} else {
+				this.area = new cArea3D(refName, wsFrom, wsFrom);
+			}
+		} else {
+			this.area = new cError(cErrorType.bad_reference);
+		}
+
+		return this.area;
+	};
+	cStrucTable.prototype._createAreaError = function (isThisRow) {
+		if (isThisRow) {
+			return this.area = new cError(cErrorType.wrong_value_type);
+		} else {
+			return this.area = new cError(cErrorType.bad_reference);
+		}
+	};
+	cStrucTable.prototype._buildLocalTableString = function (reservedColumn, local) {
+		return parserHelp.getColumnNameByType(reservedColumn, local);
+	};
+	cStrucTable.prototype.changeDefName = function (from, to) {
+		if (this.tableName == from.name) {
+			this.tableName = to.name;
+		}
+	};
+	cStrucTable.prototype.removeTableColumn = function (deleted) {
+		if (this.oneColumnIndex) {
+			if (deleted[this.oneColumnIndex.name]) {
+				return true;
+			} else {
+				this.oneColumnIndex = this.wb.getTableIndexColumnByName(this.tableName, this.oneColumnIndex.name);
+				if (!this.oneColumnIndex) {
+					return true;
+				}
+			}
+		}
+		if (this.colStartIndex && this.colEndIndex) {
+			if (deleted[this.colStartIndex.name]) {
+				return true;
+			} else {
+				this.colStartIndex = this.wb.getTableIndexColumnByName(this.tableName, this.colStartIndex.name);
+				if (!this.colStartIndex) {
+					return true;
+				}
+			}
+			if (deleted[this.colEndIndex.name]) {
+				return true;
+			} else {
+				this.colEndIndex = this.wb.getTableIndexColumnByName(this.tableName, this.colEndIndex.name);
+				if (!this.colEndIndex) {
+					return true;
+				}
+			}
+		}
+		if (this.hdtcstartIndex) {
+			if (deleted[this.hdtcstartIndex.name]) {
+				return true;
+			} else {
+				this.hdtcstartIndex = this.wb.getTableIndexColumnByName(this.tableName, this.hdtcstartIndex.name);
+				if (!this.hdtcstartIndex) {
+					return true;
+				}
+			}
+		}
+		if (this.hdtcendIndex) {
+			if (deleted[this.hdtcendIndex.name]) {
+				return true;
+			} else {
+				this.hdtcendIndex = this.wb.getTableIndexColumnByName(this.tableName, this.hdtcendIndex.name);
+				if (!this.hdtcendIndex) {
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+	cStrucTable.prototype.changeTableRef = function () {
+		if (!this.isDynamic) {
+			this._updateArea(null, false);
+		}
+	};
+	cStrucTable.prototype.renameTableColumn = function () {
+		var bRes = true;
+		var columns1, columns2;
+		if (this.oneColumnIndex) {
+			columns1 = this.wb.getTableNameColumnByIndex(this.tableName, this.oneColumnIndex.index);
+			if (columns1) {
+				this.oneColumnIndex.name = columns1.columnName;
+			} else {
+				bRes = false;
+			}
+		} else if (this.colStartIndex && this.colEndIndex) {
+			columns1 = this.wb.getTableNameColumnByIndex(this.tableName, this.colStartIndex.index);
+			columns2 = this.wb.getTableNameColumnByIndex(this.tableName, this.colEndIndex.index);
+			if (columns1 && columns2) {
+				this.colStartIndex.name = columns1.columnName;
+				this.colEndIndex.name = columns2.columnName;
+			} else {
+				bRes = false;
+			}
+		}
+		if (this.hdtcstartIndex) {
+			columns1 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcstartIndex.index);
+			if (columns1) {
+				this.hdtcstartIndex.name = columns1.columnName;
+			} else {
+				bRes = false;
+			}
+		}
+		if (this.hdtcendIndex) {
+			columns1 = this.wb.getTableNameColumnByIndex(this.tableName, this.hdtcendIndex.index);
+			if (columns1) {
+				this.hdtcendIndex.name = columns1.columnName;
+			} else {
+				bRes = false;
+			}
+		}
+		return bRes;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cName}
+	 */
+	function cName3D(val, ws) {
+		cName.call(this, val, ws);
+	}
+
+	cName3D.prototype = Object.create(cName.prototype);
+	cName3D.prototype.constructor = cName3D;
+	cName3D.prototype.type = cElementType.name3D;
+	cName3D.prototype.clone = function (opt_ws) {
+		var ws;
+		if (opt_ws && opt_ws.getName() === this.ws.getName()) {
+			ws = opt_ws;
+		} else {
+			ws = this.ws;
+		}
+		var oRes = new cName3D(this.value, ws);
+		this.cloneTo(oRes);
+		return oRes;
+	};
+	cName3D.prototype.changeSheet = function (wsLast, wsNew) {
+		if (this.ws === wsLast) {
+			this.ws = wsNew;
+		}
+	};
+	cName3D.prototype.toString = function () {
+		return parserHelp.getEscapeSheetName(this.ws.getName()) + "!" + cName.prototype.toString.call(this);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cArray() {
+		cBaseType.call(this, undefined);
+		this.array = [];
+		this.rowCount = 0;
+		this.countElementInRow = [];
+		this.countElement = 0;
+	}
+
+	cArray.prototype = Object.create(cBaseType.prototype);
+	cArray.prototype.constructor = cArray;
+	cArray.prototype.type = cElementType.array;
+	cArray.prototype.addRow = function () {
+		this.array[this.array.length] = [];
+		this.countElementInRow[this.rowCount++] = 0;
+	};
+	cArray.prototype.addElement = function (element) {
+		if (this.array.length === 0) {
+			this.addRow();
+		}
+		var arr = this.array, subArr = arr[this.rowCount - 1];
+		subArr[subArr.length] = element;
+		this.countElementInRow[this.rowCount - 1]++;
+		this.countElement++;
+	};
+	cArray.prototype.getRow = function (rowIndex) {
+		if (rowIndex < 0 || rowIndex > this.array.length - 1) {
+			return null;
+		}
+		return this.array[rowIndex];
+	};
+	cArray.prototype.getCol = function (colIndex) {
+		var col = [];
+		for (var i = 0; i < this.rowCount; i++) {
+			col.push(this.array[i][colIndex]);
+		}
+		return col;
+	};
+	cArray.prototype.getElementRowCol = function (row, col) {
+		if (row > this.rowCount || col > this.getCountElementInRow()) {
+			return new cError(cErrorType.not_available);
+		}
+		return this.array[row][col];
+	};
+	cArray.prototype.getElement = function (index) {
+		for (var i = 0; i < this.rowCount; i++) {
+			if (index > this.countElementInRow[i].length) {
+				index -= this.countElementInRow[i].length;
+			} else {
+				return this.array[i][index];
+			}
+		}
+		return null;
+	};
+	cArray.prototype.foreach = function (action) {
+		if (typeof (action) !== 'function') {
+			return true;
+		}
+		for (var ir = 0; ir < this.rowCount; ir++) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++) {
+				if (action.call(this, this.array[ir][ic], ir, ic)) {
+					return true;
+				}
+			}
+		}
+		return undefined;
+	};
+	cArray.prototype.getCountElement = function () {
+		return this.countElement;
+	};
+	cArray.prototype.getCountElementInRow = function () {
+		return this.countElementInRow[0];
+	};
+	cArray.prototype.getRowCount = function () {
+		return this.rowCount;
+	};
+	cArray.prototype.tocNumber = function () {
+		var retArr = new cArray();
+		for (var ir = 0; ir < this.rowCount; ir++, retArr.addRow()) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++) {
+				retArr.addElement(this.array[ir][ic].tocNumber());
+			}
+			if (ir === this.rowCount - 1) {
+				break;
+			}
+		}
+		return retArr;
+	};
+	cArray.prototype.tocString = function () {
+		var retArr = new cArray();
+		for (var ir = 0; ir < this.rowCount; ir++, retArr.addRow()) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++) {
+				retArr.addElement(this.array[ir][ic].tocString());
+			}
+			if (ir === this.rowCount - 1) {
+				break;
+			}
+		}
+		return retArr;
+	};
+	cArray.prototype.tocBool = function () {
+		var retArr = new cArray();
+		for (var ir = 0; ir < this.rowCount; ir++, retArr.addRow()) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++) {
+				retArr.addElement(this.array[ir][ic].tocBool());
+			}
+			if (ir === this.rowCount - 1) {
+				break;
+			}
+		}
+		return retArr;
+	};
+	cArray.prototype.toString = function () {
+		var ret = "";
+		for (var ir = 0; ir < this.rowCount; ir++, ret += FormulaSeparators.arrayRowSeparatorDef) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += FormulaSeparators.arrayColSeparatorDef) {
+				if (this.array[ir][ic] instanceof cString) {
+					ret += '"' + this.array[ir][ic].toString() + '"';
+				} else {
+					ret += this.array[ir][ic].toString() + "";
+				}
+			}
+			if (ret[ret.length - 1] === FormulaSeparators.arrayColSeparatorDef) {
+				ret = ret.substring(0, ret.length - 1);
+			}
+		}
+		if (ret[ret.length - 1] === FormulaSeparators.arrayRowSeparatorDef) {
+			ret = ret.substring(0, ret.length - 1);
+		}
+		return "{" + ret + "}";
+	};
+	cArray.prototype.toLocaleString = function (digitDelim) {
+		var ret = "";
+		for (var ir = 0; ir < this.rowCount;
+			 ir++, ret += digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
+			for (var ic = 0; ic < this.countElementInRow[ir]; ic++, ret +=
+				digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
+				if (this.array[ir][ic] instanceof cString) {
+					ret += '"' + this.array[ir][ic].toLocaleString(digitDelim) + '"';
+				} else {
+					ret += this.array[ir][ic].toLocaleString(digitDelim) + "";
+				}
+			}
+			if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayColSeparator :
+					FormulaSeparators.arrayColSeparatorDef) {
+				ret = ret.substring(0, ret.length - 1);
+			}
+		}
+		if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayRowSeparator :
+				FormulaSeparators.arrayRowSeparatorDef) {
+			ret = ret.substring(0, ret.length - 1);
+		}
+		return "{" + ret + "}";
+	};
+	cArray.prototype.isValidArray = function () {
+		if (this.countElement < 1) {
+			return false;
+		}
+		for (var i = 0; i < this.rowCount - 1; i++) {
+			if (this.countElementInRow[i] - this.countElementInRow[i + 1] !== 0) {
+				return false;
+			}
+		}
+		return true;
+	};
+	cArray.prototype.getValue2 = function (i, j) {
+		var result = this.array[i];
+		return result ? result[j] : result;
+	};
+	cArray.prototype.getMatrix = function () {
+		return this.array;
+	};
+	cArray.prototype.fillFromArray = function (arr) {
+		this.array = arr;
+		this.rowCount = arr.length;
+		for (var i = 0; i < arr.length; i++) {
+			this.countElementInRow[i] = arr[i].length;
+			this.countElement += arr[i].length;
+		}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cBaseType}
+	 */
+	function cUndefined() {
+		this.value = undefined;
+	}
+
+	cUndefined.prototype = Object.create(cBaseType.prototype);
+	cUndefined.prototype.constructor = cUndefined;
 
 	function checkTypeCell(cell) {
 		if (cell && !cell.isEmptyText()) {
@@ -2110,396 +2220,312 @@ cUndefined.prototype = Object.create( cBaseType.prototype );
 	}
 
   /*--------------------------------------------------------------------------*/
-  /*Base classes for operators & functions */
-  /** @constructor */
-  function cBaseOperator(name, priority, argumentCount) {
-    this.name = name ? name : '';
-    this.priority = (priority !== undefined) ? priority : 10;
-    this.type = cElementType.operator;
-    this.isRightAssociative = false;
-    this.argumentsCurrent = (argumentCount !== undefined) ? argumentCount : 2;
-    this.value = null;
-    this.formatType = {
-      def: -1, //подразумевается формат первой ячейки входящей в формулу.
-      noneFormat: -2
-    };
-    this.numFormat = this.formatType.def;
-  }
+	/*Base classes for operators & functions */
+	/** @constructor */
+	function cBaseOperator(name, priority, argumentCount) {
+		this.name = name ? name : '';
+		this.priority = (priority !== undefined) ? priority : 10;
+		this.isRightAssociative = false;
+		this.argumentsCurrent = (argumentCount !== undefined) ? argumentCount : 2;
+		this.value = null;
+	}
 
-  cBaseOperator.prototype.getArguments = function () {
-    return this.argumentsCurrent;
-  };
-  cBaseOperator.prototype.toString = function () {
-    return this.name;
-  };
-  cBaseOperator.prototype.Calculate = function () {
-    return null;
-  };
-  cBaseOperator.prototype.Assemble = function (arg) {
-    var str = "";
-    if (this.argumentsCurrent === 2) {
-      str = arg[0] + "" + this.name + "" + arg[1];
-    } else {
-      str = this.name + "" + arg[0];
-    }
-    return new cString(str);
-  };
-  cBaseOperator.prototype.Assemble2 = function (arg, start, count) {
-    var str = "";
-    if (this.argumentsCurrent === 2) {
-      str += arg[start + count - 2] + this.name + arg[start + count - 1];
-    } else {
-      str += this.name + arg[start];
-    }
-    return new cString(str);
-  };
-  cBaseOperator.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
-    var str = "";
-    if (this.argumentsCurrent === 2) {
-      str += arg[start + count - 2].toLocaleString(digitDelim) + this.name +
-        arg[start + count - 1].toLocaleString(digitDelim);
-    } else {
-      str += this.name + arg[start];
-    }
-    return new cString(str);
-  };
-
-  /** @constructor */
-  function cBaseFunction(name, argMin, argMax) {
-    this.name = name;
-    this.type = cElementType.func;
-    this.value = null;
-    this.argumentsMin = argMin ? argMin : 0;
-    this.argumentsCurrent = 0;
-    this.argumentsMax = argMax ? argMax : 255;
-    this.formatType = {
-      def: -1, //подразумевается формат первой ячейки входящей в формулу.
-      noneFormat: -2
-    };
-    this.numFormat = this.formatType.def;
-//    this.isXLFN = rx_sFuncPref.test(this.name);
-  }
-  cBaseFunction.prototype.Calculate = function () {
-    this.value = new cError(cErrorType.wrong_name);
-    return this.value;
-  };
-  cBaseFunction.prototype.setArgumentsMin = function (count) {
-    this.argumentsMin = count;
-  };
-  cBaseFunction.prototype.setArgumentsMax = function (count) {
-    this.argumentsMax = count;
-  };
-  cBaseFunction.prototype.DecrementArguments = function () {
-    --this.argumentsCurrent;
-  };
-  cBaseFunction.prototype.IncrementArguments = function () {
-    ++this.argumentsCurrent;
-  };
-  cBaseFunction.prototype.setName = function (name) {
-    this.name = name;
-  };
-  cBaseFunction.prototype.setArgumentsCount = function (count) {
-    this.argumentsCurrent = count;
-  };
-  cBaseFunction.prototype.getArguments = function () {
-    return this.argumentsCurrent;
-  };
-  cBaseFunction.prototype.getMaxArguments = function () {
-    return this.argumentsMax;
-  };
-  cBaseFunction.prototype.getMinArguments = function () {
-    return this.argumentsMin;
-  };
-  cBaseFunction.prototype.Assemble = function (arg) {
-    var str = "";
-    for (var i = 0; i < arg.length; i++) {
-      str += arg[i].toString();
-      if (i !== arg.length - 1) {
-        str += ",";
-      }
-    }
-    if (this.isXLFN) {
-      return new cString("_xlfn." + this.name + "(" + str + ")");
-    }
-    return new cString(this.toString() + "(" + str + ")");
-  };
-  cBaseFunction.prototype.Assemble2 = function (arg, start, count) {
-
-    var str = "", c = start + count - 1;
-    for (var i = start; i <= c; i++) {
-      str += arg[i].toString();
-      if (i !== c) {
-        str += ",";
-      }
-    }
-    if (this.isXLFN) {
-      return new cString("_xlfn." + this.name + "(" + str + ")");
-    }
-    return new cString(this.toString() + "(" + str + ")");
-  };
-  cBaseFunction.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
-
-    var name = this.toString(), str = "", c = start + count - 1, localeName = locale ? locale[name] : name;
-
-    localeName = localeName || this.toString();
-    for (var i = start; i <= c; i++) {
-      str += arg[i].toLocaleString(digitDelim);
-      if (i !== c) {
-        str += FormulaSeparators.functionArgumentSeparator;
-      }
-    }
-    return new cString(localeName + "(" + str + ")");
-  };
-  cBaseFunction.prototype.toString = function () {
-    return this.name.replace(rx_sFuncPref, "_xlfn.");
-  };
-  cBaseFunction.prototype.setCA = function (arg, ca, numFormat) {
-    this.value = arg;
-    if (ca) {
-      this.value.ca = true;
-    }
-    if (numFormat !== null && numFormat !== undefined) {
-      this.value.numFormat = numFormat;
-    }
-    return this.value;
-  };
-  cBaseFunction.prototype.setFormat = function (f) {
-    this.numFormat = f;
-  };
-  cBaseFunction.prototype.checkArguments = function () {
-    return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
-  };
-
-/** @constructor */
-function parentLeft() {
-    this.name = "(";
-    this.type = cElementType.operator;
-    this.argumentsCurrent = 1;
-}
-
-parentLeft.prototype.constructor = parentLeft;
-parentLeft.prototype.DecrementArguments = function () {
-    --this.argumentsCurrent;
-};
-parentLeft.prototype.IncrementArguments = function () {
-    ++this.argumentsCurrent;
-};
-parentLeft.prototype.toString = function () {
-    return this.name;
-};
-parentLeft.prototype.getArguments = function () {
-    return this.argumentsCurrent;
-};
-parentLeft.prototype.Assemble = function ( arg ) {
-    return new cString( "(" + arg + ")" );
-};
-parentLeft.prototype.Assemble2 = function ( arg, start, count ) {
-    return new cString( "(" + arg[start + count - 1] + ")" );
-};
-parentLeft.prototype.Assemble2Locale = function ( arg, start, count ) {
-    return this.Assemble2( arg, start, count );
-};
-
-/** @constructor */
-function parentRight() {
-    this.name = ")";
-    this.type = cElementType.operator;
-}
-
-parentRight.prototype.constructor = parentRight;
-parentRight.prototype.toString = function () {
-    return this.name;
-};
-
-/** @constructor */
-function cRangeUnionOperator() {
-    cBaseOperator.apply( this, [':', 50, 2] );
-}
-
-cRangeUnionOperator.prototype = Object.create( cBaseOperator.prototype );
-cRangeUnionOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], wsId0, wsId1, wb, ws;
-  if (( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D ||
-    arg0 instanceof cArea3D && (wsId0 = arg0.wsFrom) == arg0.wsTo ) &&
-    ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D ||
-    arg1 instanceof cArea3D && (wsId1 = arg1.wsFrom) == arg1.wsTo )) {
-
-        if ( arg0 instanceof cArea3D ) {
-            wsId0 = arg0.wsFrom;
-            ws = arg0.getWS();
-    } else {
-            wsId0 = arg0.ws.getId();
-            ws = arg0.getWS();
-        }
-
-        if ( arg1 instanceof cArea3D ) {
-            wsId1 = arg1.wsFrom;
-            ws = arg1.getWS();
-    } else {
-            wsId1 = arg1.ws.getId();
-            ws = arg1.getWS();
-        }
-
-        if ( wsId0 != wsId1 ) {
-            return this.value = new cError( cErrorType.wrong_value_type );
-        }
-
-        arg0 = arg0.getBBox0();
-        arg1 = arg1.getBBox0();
-        if ( !arg0 || !arg1 ) {
-            return this.value = new cError( cErrorType.wrong_value_type );
-        }
-        arg0 = arg0.union( arg1 );
-        arg0.normalize( true );
-
-    if (arg0.isOneCell()) {
-			this.value = new cRef( arg0.getName(), ws );
-    } else {
-			this.value = new cArea( arg0.getName(), ws );
-    }
-
-        this.value = new cArea( arg0.getName(), ws );
-
-  } else {
-        return this.value = new cError( cErrorType.wrong_value_type );
-    }
-
-  if (this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D ||
-    this.value instanceof cArea3D) {
-    var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst()
-      .getID(), wsId = r1.worksheet.getId();
-
-        if ( this.value instanceof cArea && this.value.isValid() ) {
-            var nFrom, nTo;
-
-            if ( r2 ) {
-                nFrom = r2.defName;
-      } else {
-                nFrom = wb.dependencyFormulas.addNode( wsId, cellName );
-            }
-
-            nTo = wb.dependencyFormulas.addNode( this.value.getWsId(), this.value._cells.replace( /\$/g, "" ) );
-            this.value.setNode( nTo );
-            wb.dependencyFormulas.addEdge2( nFrom, nTo );
-    } else if (this.value instanceof cArea3D && this.value.isValid()) {
-      var wsR = this.value.wsRange(), nTo, nFrom, _cell = this.value._cells.replace(/\$/g, "");
-
-            for ( var j = 0; j < wsR.length; j++ ) {
-                if ( r2 ) {
-                    nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell );
-                    wb.dependencyFormulas.addEdge2( r2.defName, nTo );
-        } else {
-                    wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, _cell );
-            }
-        }
-    }
-  }
-
-    return this.value;
-};
-
-/** @constructor */
-function cRangeIntersectionOperator() {
-    cBaseOperator.apply( this, [' ', 50, 2] );
-}
-
-cRangeIntersectionOperator.prototype = Object.create( cBaseOperator.prototype );
-cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
-    var arg0 = arg[0], arg1 = arg[1], wsId0, wsId1, wb, ws;
-  if (( arg0 instanceof cRef || arg0 instanceof cArea || arg0 instanceof cRef3D ||
-    arg0 instanceof cArea3D && (wsId0 = arg0.wsFrom) == arg0.wsTo ) &&
-    ( arg1 instanceof cRef || arg1 instanceof cArea || arg1 instanceof cRef3D ||
-    arg1 instanceof cArea3D && (wsId1 = arg1.wsFrom) == arg1.wsTo )) {
-
-        if ( arg0 instanceof cArea3D ) {
-            wsId0 = arg0.wsFrom;
-            ws = arg0.getWS();
-    } else {
-            wsId0 = arg0.ws.getId();
-            ws = arg0.getWS();
-        }
-
-        if ( arg1 instanceof cArea3D ) {
-            wsId1 = arg1.wsFrom;
-            ws = arg1.getWS();
-    } else {
-            wsId1 = arg1.ws.getId();
-            ws = arg1.getWS();
-        }
-
-        if ( wsId0 != wsId1 ) {
-            return this.value = new cError( cErrorType.wrong_value_type );
-        }
-
-        arg0 = arg0.getBBox0();
-        arg1 = arg1.getBBox0();
-        if ( !arg0 || !arg1 ) {
-            return this.value = new cError( cErrorType.wrong_value_type );
-        }
-        arg0 = arg0.intersection( arg1 );
-		if( arg0 ){
-        	arg0.normalize( true );
-      if (arg0.isOneCell()) {
-				this.value = new cRef( arg0.getName(), ws );
-      } else {
-				this.value = new cArea( arg0.getName(), ws );
+	cBaseOperator.prototype.type = cElementType.operator;
+	cBaseOperator.prototype.numFormat = c_numFormatFirstCell;
+	cBaseOperator.prototype.getArguments = function () {
+		return this.argumentsCurrent;
+	};
+	cBaseOperator.prototype.toString = function () {
+		return this.name;
+	};
+	cBaseOperator.prototype.Calculate = function () {
+		return null;
+	};
+	cBaseOperator.prototype.Assemble = function (arg) {
+		var str = "";
+		if (this.argumentsCurrent === 2) {
+			str = arg[0] + "" + this.name + "" + arg[1];
+		} else {
+			str = this.name + "" + arg[0];
 		}
-    } else {
-			return this.value = new cError( cErrorType.null_value );
-    }
-
-  } else {
-        return this.value = new cError( cErrorType.wrong_value_type );
-    }
-
-  if (this.value instanceof cArea || this.value instanceof cRef || this.value instanceof cRef3D ||
-    this.value instanceof cArea3D) {
-    var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst()
-      .getID(), wsId = r1.worksheet.getId();
-
-        if ( this.value instanceof cArea && this.value.isValid() ) {
-            var nFrom, nTo;
-
-            if ( r2 ) {
-                nFrom = r2.defName;
-      } else {
-                nFrom = wb.dependencyFormulas.addNode( wsId, cellName );
-            }
-
-            nTo = wb.dependencyFormulas.addNode( this.value.getWsId(), this.value._cells.replace( /\$/g, "" ) );
-            this.value.setNode( nTo );
-            wb.dependencyFormulas.addEdge2( nFrom, nTo );
-    } else if (this.value instanceof cArea3D && this.value.isValid()) {
-      var wsR = this.value.wsRange(), nTo, nFrom, _cell = this.value._cells.replace(/\$/g, "");
-
-            for ( var j = 0; j < wsR.length; j++ ) {
-                if ( r2 ) {
-                    nTo = wb.dependencyFormulas.addNode( wsR[j].Id, _cell );
-                    wb.dependencyFormulas.addEdge2( r2.defName, nTo );
-        } else {
-                    wb.dependencyFormulas.addEdge( wsId, cellName.replace( /\$/g, "" ), wsR[j].Id, _cell );
-            }
-        }
-    }
-  }
-
-    return this.value;
-};
-
+		return new cString(str);
+	};
+	cBaseOperator.prototype.Assemble2 = function (arg, start, count) {
+		var str = "";
+		if (this.argumentsCurrent === 2) {
+			str += arg[start + count - 2] + this.name + arg[start + count - 1];
+		} else {
+			str += this.name + arg[start];
+		}
+		return new cString(str);
+	};
+	cBaseOperator.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
+		var str = "";
+		if (this.argumentsCurrent === 2) {
+			str += arg[start + count - 2].toLocaleString(digitDelim) + this.name +
+				arg[start + count - 1].toLocaleString(digitDelim);
+		} else {
+			str += this.name + arg[start];
+		}
+		return new cString(str);
+	};
 
 	/** @constructor */
+	function cBaseFunction(name) {
+		this.name = name;
+		this.value = null;
+		this.argumentsCurrent = 0;
+//    this.isXLFN = rx_sFuncPref.test(this.name);
+	}
+
+	cBaseFunction.prototype.type = cElementType.func;
+	cBaseFunction.prototype.argumentsMin = 0;
+	cBaseFunction.prototype.argumentsMax = 255;
+	cBaseFunction.prototype.numFormat = c_numFormatFirstCell;
+	cBaseFunction.prototype.Calculate = function () {
+		this.value = new cError(cErrorType.wrong_name);
+		return this.value;
+	};
+	cBaseFunction.prototype.DecrementArguments = function () {
+		--this.argumentsCurrent;
+	};
+	cBaseFunction.prototype.IncrementArguments = function () {
+		++this.argumentsCurrent;
+	};
+	cBaseFunction.prototype.setArgumentsCount = function (count) {
+		this.argumentsCurrent = count;
+	};
+	cBaseFunction.prototype.getArguments = function () {
+		return this.argumentsCurrent;
+	};
+	cBaseFunction.prototype.Assemble = function (arg) {
+		var str = "";
+		for (var i = 0; i < arg.length; i++) {
+			str += arg[i].toString();
+			if (i !== arg.length - 1) {
+				str += ",";
+			}
+		}
+		if (this.isXLFN) {
+			return new cString("_xlfn." + this.name + "(" + str + ")");
+		}
+		return new cString(this.toString() + "(" + str + ")");
+	};
+	cBaseFunction.prototype.Assemble2 = function (arg, start, count) {
+
+		var str = "", c = start + count - 1;
+		for (var i = start; i <= c; i++) {
+			str += arg[i].toString();
+			if (i !== c) {
+				str += ",";
+			}
+		}
+		if (this.isXLFN) {
+			return new cString("_xlfn." + this.name + "(" + str + ")");
+		}
+		return new cString(this.toString() + "(" + str + ")");
+	};
+	cBaseFunction.prototype.Assemble2Locale = function (arg, start, count, locale, digitDelim) {
+
+		var name = this.toString(), str = "", c = start + count - 1, localeName = locale ? locale[name] : name;
+
+		localeName = localeName || this.toString();
+		for (var i = start; i <= c; i++) {
+			str += arg[i].toLocaleString(digitDelim);
+			if (i !== c) {
+				str += FormulaSeparators.functionArgumentSeparator;
+			}
+		}
+		return new cString(localeName + "(" + str + ")");
+	};
+	cBaseFunction.prototype.toString = function () {
+		return this.name.replace(rx_sFuncPref, "_xlfn.");
+	};
+	cBaseFunction.prototype.setCA = function (arg, ca, numFormat) {
+		this.value = arg;
+		if (ca) {
+			this.value.ca = true;
+		}
+		if (numFormat !== null && numFormat !== undefined) {
+			this.value.numFormat = numFormat;
+		}
+		return this.value;
+	};
+	cBaseFunction.prototype.checkArguments = function () {
+		return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
+	};
+
+	/** @constructor */
+	function parentLeft() {
+		this.name = "(";
+		this.argumentsCurrent = 1;
+	}
+
+	parentLeft.prototype.type = cElementType.operator;
+	parentLeft.prototype.DecrementArguments = function () {
+		--this.argumentsCurrent;
+	};
+	parentLeft.prototype.IncrementArguments = function () {
+		++this.argumentsCurrent;
+	};
+	parentLeft.prototype.toString = function () {
+		return this.name;
+	};
+	parentLeft.prototype.getArguments = function () {
+		return this.argumentsCurrent;
+	};
+	parentLeft.prototype.Assemble = function (arg) {
+		return new cString("(" + arg + ")");
+	};
+	parentLeft.prototype.Assemble2 = function (arg, start, count) {
+		return new cString("(" + arg[start + count - 1] + ")");
+	};
+	parentLeft.prototype.Assemble2Locale = function (arg, start, count) {
+		return this.Assemble2(arg, start, count);
+	};
+
+	/** @constructor */
+	function parentRight() {
+		this.name = ")";
+	}
+
+	parentRight.prototype.type = cElementType.operator;
+	parentRight.prototype.toString = function () {
+		return this.name;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
+	function cRangeUnionOperator() {
+		cBaseOperator.apply(this, [':', 50, 2]);
+	}
+
+	cRangeUnionOperator.prototype = Object.create(cBaseOperator.prototype);
+	cRangeUnionOperator.prototype.constructor = cRangeUnionOperator;
+	cRangeUnionOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1], ws0, ws1, ws;
+		if (( cElementType.cell === arg0.type || cElementType.cellsRange === arg0.type ||
+			cElementType.cell3D === arg0.type ||
+			cElementType.cellsRange3D === arg0.type && (ws0 = arg0.wsFrom) === arg0.wsTo ) &&
+			( cElementType.cell === arg1.type || cElementType.cellsRange === arg1.type ||
+			cElementType.cell3D === arg1.type ||
+			cElementType.cellsRange3D === arg1.type && (ws1 = arg1.wsFrom) === arg1.wsTo )) {
+
+			if (cElementType.cellsRange3D === arg0.type) {
+				ws0 = ws = arg0.wsFrom;
+			} else {
+				ws0 = ws = arg0.getWS();
+			}
+
+			if (cElementType.cellsRange3D === arg1.type) {
+				ws1 = ws = arg1.wsFrom;
+			} else {
+				ws1 = ws = arg1.getWS();
+			}
+
+			if (ws0 !== ws1) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			arg0 = arg0.getBBox0();
+			arg1 = arg1.getBBox0();
+			if (!arg0 || !arg1) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+			arg0 = arg0.union(arg1);
+			arg0.normalize(true);
+
+			if (arg0.isOneCell()) {
+				this.value = new cRef(arg0.getName(), ws);
+			} else {
+				this.value = new cArea(arg0.getName(), ws);
+			}
+		} else {
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		return this.value;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
+	function cRangeIntersectionOperator() {
+		cBaseOperator.apply(this, [' ', 50, 2]);
+	}
+
+	cRangeIntersectionOperator.prototype = Object.create(cBaseOperator.prototype);
+	cRangeIntersectionOperator.prototype.constructor = cRangeIntersectionOperator;
+	cRangeIntersectionOperator.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1], ws0, ws1, ws;
+		if (( cElementType.cell === arg0.type || cElementType.cellsRange === arg0.type ||
+			cElementType.cell3D === arg0.type ||
+			cElementType.cellsRange3D === arg0.type && (ws0 = arg0.wsFrom) == arg0.wsTo ) &&
+			( cElementType.cell === arg1.type || cElementType.cellsRange === arg1.type ||
+			cElementType.cell3D === arg1.type ||
+			cElementType.cellsRange3D === arg1.type && (ws1 = arg1.wsFrom) == arg1.wsTo )) {
+
+			if (cElementType.cellsRange3D === arg0.type) {
+				ws0 = ws = arg0.wsFrom;
+			} else {
+				ws0 = ws = arg0.getWS();
+			}
+
+			if (cElementType.cellsRange3D === arg1.type) {
+				ws1 = ws = arg1.wsFrom;
+			} else {
+				ws1 = ws = arg1.getWS();
+			}
+
+			if (ws0 !== ws1) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			arg0 = arg0.getBBox0();
+			arg1 = arg1.getBBox0();
+			if (!arg0 || !arg1) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+			arg0 = arg0.intersection(arg1);
+			if (arg0) {
+				arg0.normalize(true);
+				if (arg0.isOneCell()) {
+					this.value = new cRef(arg0.getName(), ws);
+				} else {
+					this.value = new cArea(arg0.getName(), ws);
+				}
+			} else {
+				return this.value = new cError(cErrorType.null_value);
+			}
+
+		} else {
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		return this.value;
+	};
+
+
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cUnarMinusOperator() {
 		cBaseOperator.apply(this, ['un_minus'/**name operator*/, 49/**priority of operator*/, 1/**count arguments*/]);
 		this.isRightAssociative = true;
 	}
 
 	cUnarMinusOperator.prototype = Object.create(cBaseOperator.prototype);
+	cUnarMinusOperator.prototype.constructor = cUnarMinusOperator;
 	cUnarMinusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (arrElem, r, c) {
 				arrElem = arrElem.tocNumber();
@@ -2523,19 +2549,23 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 		return new cString("-" + arg[start + count - 1]);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cUnarPlusOperator() {
 		cBaseOperator.apply(this, ['un_plus', 49, 1]);
 		this.isRightAssociative = true;
 	}
 
 	cUnarPlusOperator.prototype = Object.create(cBaseOperator.prototype);
+	cUnarPlusOperator.prototype.constructor = cUnarPlusOperator;
 	cUnarPlusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
@@ -2554,61 +2584,77 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 		return new cString("+" + arg[start + count - 1]);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cAddOperator() {
 		cBaseOperator.apply(this, ['+', 20]);
 	}
 
 	cAddOperator.prototype = Object.create(cBaseOperator.prototype);
+	cAddOperator.prototype.constructor = cAddOperator;
 	cAddOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "+", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "+", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cMinusOperator() {
 		cBaseOperator.apply(this, ['-', 20]);
 	}
 
 	cMinusOperator.prototype = Object.create(cBaseOperator.prototype);
+	cMinusOperator.prototype.constructor = cMinusOperator;
 	cMinusOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
+		} else if (arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
+		} else if (arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "-", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "-", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cPercentOperator() {
 		cBaseOperator.apply(this, ['%', 45, 1]);
 		this.isRightAssociative = true;
 	}
 
 	cPercentOperator.prototype = Object.create(cBaseOperator.prototype);
+	cPercentOperator.prototype.constructor = cPercentOperator;
 	cPercentOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (arg0 instanceof cArray) {
 			arg0.foreach(function (arrElem, r, c) {
 				arrElem = arrElem.tocNumber();
@@ -2631,24 +2677,29 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 		return new cString(arg[start + count - 1] + this.name);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cPowOperator() {
 		cBaseOperator.apply(this, ['^', 40]);
 	}
 
 	cPowOperator.prototype = Object.create(cBaseOperator.prototype);
+	cPowOperator.prototype.numFormat = cNumFormatNone;
+	cPowOperator.prototype.constructor = cPowOperator;
 	cPowOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg1 = arg1.tocNumber();
 		if (arg0 instanceof cError) {
@@ -2667,70 +2718,85 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 		return this.value = new cNumber(_v);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cMultOperator() {
 		cBaseOperator.apply(this, ['*', 30]);
 	}
 
 	cMultOperator.prototype = Object.create(cBaseOperator.prototype);
+	cMultOperator.prototype.numFormat = cNumFormatNone;
+	cMultOperator.prototype.constructor = cMultOperator;
 	cMultOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "*", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "*", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cDivOperator() {
 		cBaseOperator.apply(this, ['/', 30]);
 	}
 
 	cDivOperator.prototype = Object.create(cBaseOperator.prototype);
+	cDivOperator.prototype.numFormat = cNumFormatNone;
+	cDivOperator.prototype.constructor = cDivOperator;
 	cDivOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "/", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "/", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cConcatSTROperator() {
 		cBaseOperator.apply(this, ['&', 15]);
 	}
 
 	cConcatSTROperator.prototype = Object.create(cBaseOperator.prototype);
+	cConcatSTROperator.prototype.constructor = cConcatSTROperator;
+	cConcatSTROperator.prototype.numFormat = cNumFormatNone;
 	cConcatSTROperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg0 = arg0.tocString();
 		if (arg1 instanceof cArea) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		}
 		arg1 = arg1.tocString();
 
@@ -2738,156 +2804,180 @@ cRangeIntersectionOperator.prototype.Calculate = function ( arg ) {
 			arg1 instanceof cError ? arg1 : new cString(arg0.toString().concat(arg1.toString()));
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cEqualsOperator() {
 		cBaseOperator.apply(this, ['=', 10]);
 	}
 
 	cEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
+	cEqualsOperator.prototype.constructor = cEqualsOperator;
 	cEqualsOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "=", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "=", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cNotEqualsOperator() {
 		cBaseOperator.apply(this, ['<>', 10]);
 	}
 
 	cNotEqualsOperator.prototype = Object.create(cBaseOperator.prototype);
+	cNotEqualsOperator.prototype.constructor = cNotEqualsOperator;
 	cNotEqualsOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<>", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<>", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cLessOperator() {
 		cBaseOperator.apply(this, ['<', 10]);
 	}
 
 	cLessOperator.prototype = Object.create(cBaseOperator.prototype);
+	cLessOperator.prototype.constructor = cLessOperator;
 	cLessOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cLessOrEqualOperator() {
 		cBaseOperator.apply(this, ['<=', 10]);
 	}
 
 	cLessOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
+	cLessOrEqualOperator.prototype.constructor = cLessOrEqualOperator;
 	cLessOrEqualOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<=", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, "<=", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cGreaterOperator() {
 		cBaseOperator.apply(this, ['>', 10]);
 	}
 
 	cGreaterOperator.prototype = Object.create(cBaseOperator.prototype);
+	cGreaterOperator.prototype.constructor = cGreaterOperator;
 	cGreaterOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">", arguments[1].bbox);
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {cBaseOperator}
+	 */
 	function cGreaterOrEqualOperator() {
 		cBaseOperator.apply(this, ['>=', 10]);
 	}
 
 	cGreaterOrEqualOperator.prototype = Object.create(cBaseOperator.prototype);
+	cGreaterOrEqualOperator.prototype.constructor = cGreaterOrEqualOperator;
 	cGreaterOrEqualOperator.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first, arguments[3]);
+			arg0 = arg0.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			arg0 = arg0.getValue();
 		}
 		if (cElementType.cellsRange === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first);
+			arg1 = arg1.cross(arguments[1].bbox);
 		} else if (cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].first, arguments[3]);
+			arg1 = arg1.cross(arguments[1].bbox, arguments[3]);
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getValue();
 		}
-		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">=", arguments[1].first);
+		return this.value = _func[arg0.type][arg1.type](arg0, arg1, ">=", arguments[1].bbox);
 	};
 
 /* cFormulaOperators is container for holding all ECMA-376 operators, see chapter $18.17.2.2 in "ECMA-376, Second Edition, Part 1 - Fundamentals And Markup Language Reference" */
@@ -3559,8 +3649,8 @@ _func[cElementType.empty][cElementType.empty] = function ( arg0, arg1, what ) {
 _func[cElementType.cellsRange][cElementType.number] = _func[cElementType.cellsRange][cElementType.string] =
     _func[cElementType.cellsRange][cElementType.bool] = _func[cElementType.cellsRange][cElementType.error] =
     _func[cElementType.cellsRange][cElementType.array] =
-      _func[cElementType.cellsRange][cElementType.empty] = function(arg0, arg1, what, cellAddress) {
-            var cross = arg0.cross( cellAddress );
+      _func[cElementType.cellsRange][cElementType.empty] = function(arg0, arg1, what, bbox) {
+            var cross = arg0.cross( bbox );
             return _func[cross.type][arg1.type]( cross, arg1, what );
         };
 
@@ -3568,14 +3658,14 @@ _func[cElementType.cellsRange][cElementType.number] = _func[cElementType.cellsRa
 _func[cElementType.number][cElementType.cellsRange] = _func[cElementType.string][cElementType.cellsRange] =
     _func[cElementType.bool][cElementType.cellsRange] = _func[cElementType.error][cElementType.cellsRange] =
     _func[cElementType.array][cElementType.cellsRange] =
-      _func[cElementType.empty][cElementType.cellsRange] = function(arg0, arg1, what, cellAddress) {
-            var cross = arg1.cross( cellAddress );
+      _func[cElementType.empty][cElementType.cellsRange] = function(arg0, arg1, what, bbox) {
+            var cross = arg1.cross( bbox );
             return _func[arg0.type][cross.type]( arg0, cross, what );
         };
 
 
-_func[cElementType.cellsRange][cElementType.cellsRange] = function ( arg0, arg1, what, cellAddress ) {
-  var cross1 = arg0.cross(cellAddress), cross2 = arg1.cross(cellAddress);
+_func[cElementType.cellsRange][cElementType.cellsRange] = function ( arg0, arg1, what, bbox ) {
+  var cross1 = arg0.cross(bbox), cross2 = arg1.cross(bbox);
     return _func[cross1.type][cross2.type]( cross1, cross2, what );
 };
 
@@ -3672,7 +3762,7 @@ _func.binarySearch = function ( sElem, arrTagert, regExp ) {
 
 };
 
-_func[cElementType.number][cElementType.cell] = function ( arg0, arg1, what, cellAddress ) {
+_func[cElementType.number][cElementType.cell] = function ( arg0, arg1, what, bbox ) {
     var ar1 = arg1.tocNumber();
     switch ( what ) {
         case ">":
@@ -3726,7 +3816,7 @@ _func[cElementType.number][cElementType.cell] = function ( arg0, arg1, what, cel
     }
 
 };
-_func[cElementType.cell][cElementType.number] = function ( arg0, arg1, what, cellAddress ) {
+_func[cElementType.cell][cElementType.number] = function ( arg0, arg1, what, bbox ) {
     var ar0 = arg0.tocNumber();
     switch ( what ) {
         case ">":
@@ -3779,7 +3869,7 @@ _func[cElementType.cell][cElementType.number] = function ( arg0, arg1, what, cel
         }
     }
 };
-_func[cElementType.cell][cElementType.cell] = function ( arg0, arg1, what, cellAddress ) {
+_func[cElementType.cell][cElementType.cell] = function ( arg0, arg1, what, bbox ) {
     var ar0 = arg0.tocNumber();
     switch ( what ) {
         case ">":
@@ -3836,13 +3926,11 @@ _func[cElementType.cell][cElementType.cell] = function ( arg0, arg1, what, cellA
 _func[cElementType.cellsRange3D] = _func[cElementType.cellsRange];
 _func[cElementType.cell3D] = _func[cElementType.cell];
 
-
+	var lastListenerId = 0;
 /** класс отвечающий за парсинг строки с формулой, подсчета формулы, перестройки формулы при манипуляции с ячейкой*/
 /** @constructor */
-function parserFormula( formula, _cellId, _ws ) {
+function parserFormula( formula, parent, _ws ) {
     this.is3D = false;
-    this.cellId = _cellId;
-    this.cellAddress = g_oCellAddressUtils.getCellAddress( this.cellId );
     this.ws = _ws;
     this.wb = this.ws.workbook;
     this.value = null;
@@ -3858,22 +3946,111 @@ function parserFormula( formula, _cellId, _ws ) {
     this.operand_str = null;
     this.parenthesesNotEnough = false;
     this.f = [];
-    this.reRowCol = new RegExp( "^(ROW|ROWS|COLUMN|COLUMNS)$", "gi" );
-    this.regSpace = /\$/g;
     this.countRef = 0;
-}
 
-parserFormula.prototype.clone = function(formula, cellId, ws) {
+	this.listenerId = lastListenerId++;
+	this.ca = false;
+	this.isDirty = false;
+	this.isCalculate = false;
+	this.isTable = false;
+	this.isInDependencies = false;
+	this.parent = parent;
+}
+  parserFormula.prototype.getWs = function() {
+    return this.ws;
+  };
+  parserFormula.prototype.getListenerId = function() {
+    return this.listenerId;
+  };
+  parserFormula.prototype.getIsDirty = function() {
+    return this.isDirty;
+  };
+  parserFormula.prototype.setIsDirty = function(isDirty) {
+    this.isDirty = isDirty;
+  };
+	parserFormula.prototype.setIsTable = function(isTable){
+		this.isTable = isTable;
+	};
+	parserFormula.prototype.notify = function(data) {
+		var eventData = {notifyData: data, assemble: null, formula: this};
+		if (this.parent && this.parent.onFormulaEvent) {
+			var checkCanDo = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.CanDo, eventData);
+			if(!checkCanDo){
+				return;
+			}
+		}
+		if (AscCommon.c_oNotifyType.Dirty === data.type) {
+			if (!this.isDirty) {
+				this.isDirty = true;
+				if (this.parent && this.parent.onFormulaEvent) {
+					this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change, eventData);
+				}
+			}
+		} else if (AscCommon.c_oNotifyType.Changed === data.type) {
+			if (this.parent && this.parent.onFormulaEvent) {
+				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.Change, eventData);
+			}
+		} else {
+			var needAssemble = true;
+			this.removeDependencies();
+			if (AscCommon.c_oNotifyType.Shift === data.type || AscCommon.c_oNotifyType.Move === data.type ||
+				AscCommon.c_oNotifyType.Delete === data.type) {
+				this.shiftCells(data.type, data.sheetId, data.bbox, data.offset);
+			} else if (AscCommon.c_oNotifyType.ChangeDefName === data.type) {
+				if (!data.to) {
+					this.removeTableName(data.from, data.bConvertTableFormulaToRef);
+				} else if (data.from.name != data.to.name) {
+					this.changeDefName(data.from, data.to);
+				} else if (data.from.isTable) {
+					needAssemble = false;
+					this.changeTableRef(data.from.name);
+				}
+			} else if (AscCommon.c_oNotifyType.DelColumnTable === data.type) {
+				this.removeTableColumn(data.tableName, data.deleted);
+			} else if (AscCommon.c_oNotifyType.RenameTableColumn === data.type) {
+				this.renameTableColumn(data.tableName);
+			} else if (AscCommon.c_oNotifyType.ChangeSheet === data.type) {
+				needAssemble = false;
+				var changeData = data.data;
+				if (this.is3D || changeData.remove) {
+					if (changeData.replace || changeData.remove) {
+						if (changeData.remove) {
+							needAssemble = this.removeSheet(changeData.remove, changeData.tableNamesMap, changeData.wsPrevName, changeData.wsNextName);
+						} else {
+							needAssemble = this.moveSheet(changeData.replace);
+						}
+					} else if (changeData.rename) {
+						needAssemble = true;
+					}
+				}
+			}
+			if (needAssemble) {
+				eventData.assemble = this.assemble(true);
+			} else {
+				eventData.assemble = this.Formula;
+			}
+			if (this.parent && this.parent.onFormulaEvent) {
+				this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.ChangeFormula, eventData);
+			}
+			this.Formula = eventData.assemble;
+			if (data.collectDependencies) {
+				data.collectDependencies.push(this);
+			} else {
+				this.buildDependencies();
+			}
+		}
+	};
+parserFormula.prototype.clone = function(formula, parent, ws) {
     if (null == formula) {
     formula = this.Formula;
     }
-    if (null == cellId) {
-    cellId = this.cellId;
+    if (null == parent) {
+		parent = this.parent;
     }
     if (null == ws) {
     ws = this.ws;
     }
-  var oRes = new parserFormula(formula, cellId, ws);
+  var oRes = new parserFormula(formula, parent, ws);
   oRes.is3D = this.is3D;
   oRes.value = this.value;
   oRes.pCurrPos = this.pCurrPos;
@@ -3892,7 +4069,9 @@ parserFormula.prototype.clone = function(formula, cellId, ws) {
   oRes.isParsed = this.isParsed;
   return oRes;
 };
-
+	parserFormula.prototype.getFormula = function() {
+		return this.Formula;
+	};
 parserFormula.prototype.setFormula = function(formula) {
   this.Formula = formula;
   this.is3D = false;
@@ -3901,7 +4080,7 @@ parserFormula.prototype.setFormula = function(formula) {
   this.error = [];
   this.FormulaLocale = null;
   this.isParsed = false;
-  //для функции parse и parseDiagramRef
+  //для функции parse
   this.pCurrPos = 0;
   this.elemArr = [];
   this.RefPos = [];
@@ -3909,73 +4088,16 @@ parserFormula.prototype.setFormula = function(formula) {
   this.parenthesesNotEnough = false;
   this.f = [];
   this.countRef = 0;
-};
-
-parserFormula.prototype.setCellId = function(cellId) {
-  this.cellId = cellId;
-  this.cellAddress = g_oCellAddressUtils.getCellAddress(cellId);
+  this.ca = false;
+  this.isDirty = false;
+  this.isCalculate = false;
+  //this.isTable = false;
+  this.isInDependencies = false;
 };
 
 parserFormula.prototype.parse = function(local, digitDelim) {
-
-  function checkAbsRef(operand_str, found_operand) {
-
-    var splitOpStr0 = operand_str.match(/\$/g) || [];
-
-    found_operand.isAbsolute = true;
-
-    switch (splitOpStr0.length) {
-      case 1:
-        if (operand_str.indexOf("$") > 0) {
-          found_operand.isAbsoluteRow1 = true;
-          } else {
-          found_operand.isAbsoluteCol1 = true;
-        }
-        break;
-      case 2:
-        found_operand.isAbsoluteCol1 = true;
-        found_operand.isAbsoluteRow1 = true;
-        break;
-    }
-
-  }
-
-  function checkAbsArea(operand_str, found_operand) {
-      var splitOpStr = operand_str.split(":"), splitOpStr0 = splitOpStr[0].match(/\$/g) ||
-        [], splitOpStr1 = splitOpStr[1].match(/\$/g) || [];
-
-    found_operand.isAbsolute = true;
-
-    switch (splitOpStr0.length) {
-      case 1:
-        if (splitOpStr[0].indexOf("$") > 0) {
-          found_operand.isAbsoluteRow1 = true;
-          } else {
-          found_operand.isAbsoluteCol1 = true;
-        }
-        break;
-      case 2:
-        found_operand.isAbsoluteCol1 = true;
-        found_operand.isAbsoluteRow1 = true;
-        break;
-    }
-
-    switch (splitOpStr1.length) {
-      case 1:
-        if (splitOpStr[1].indexOf("$") > 0) {
-          found_operand.isAbsoluteRow2 = true;
-        } else {
-          found_operand.isAbsoluteCol2 = true;
-        }
-        break;
-      case 2:
-        found_operand.isAbsoluteCol2 = true;
-        found_operand.isAbsoluteRow2 = true;
-        break;
-    }
-  }
-
   this.pCurrPos = 0;
+  var needAssemble = false;
 
   if (this.isParsed) {
     return this.isParsed;
@@ -3997,7 +4119,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 			return false;
 		}
 
-		var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null, bArrElemSign = false;
+		var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null, bArrElemSign = false, wsF, wsT;
 		for (var i = 0, nLength = aTokens.length; i < nLength; ++i) {
 			found_operand = null;
 			val = aTokens[i].value;
@@ -4017,9 +4139,9 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 									tmp = AscCommonExcel.g_oRangeCache.getRange3D(val);
 									if (tmp) {
 										this.is3D = true;
-										elem = (tmp.isOneCell() && (null === tmp.sheet2 || tmp.sheet === tmp.sheet2)) ?
-											new cRef3D(tmp.getName(), tmp.sheet, this.wb) :
-											new cArea3D(tmp.getName(), tmp.sheet, null !== tmp.sheet2 ? tmp.sheet2 : tmp.sheet, this.wb);
+										wsF = this.wb.getWorksheetByName(tmp.sheet);
+										wsT = (null !== tmp.sheet2 && tmp.sheet !== tmp.sheet2) ? this.wb.getWorksheetByName(tmp.sheet2) : wsF;
+										elem = (tmp.isOneCell()) ? new cRef3D(tmp.getName(), wsF) : new cArea3D(tmp.getName(), wsF, wsT);
 									} else {
 										this.error.push(c_oAscError.ID.FrmlWrongOperator);
 										this.outStack = [];
@@ -4030,7 +4152,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 									if (tmp) {
 										elem = tmp.isOneCell() ? new cRef(valUp, this.ws) : new cArea(valUp, this.ws);
 									} else {
-										elem = new cName(aTokens[i].value, this.wb, this.ws);
+										elem = new cName(aTokens[i].value, this.ws);
 									}
 								}
 							}
@@ -4370,24 +4492,31 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         return false;
       }
 
-      var p = top_elem, func;
+      var p = top_elem, func, bError = false;
       this.elemArr.pop();
       if (this.elemArr.length != 0 && ( func = this.elemArr[this.elemArr.length - 1] ).type == cElementType.func) {
         p = this.elemArr.pop();
-        if (top_elem.getArguments() > func.getMaxArguments()) {
+        if (top_elem.getArguments() > func.argumentsMax) {
           this.outStack = [];
           this.elemArr = [];
           this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
           return false;
         } else {
-          if (top_elem.getArguments() >= func.getMinArguments()) {
+          if (top_elem.getArguments() >= func.argumentsMin) {
             func.setArgumentsCount(top_elem.getArguments());
+            if (!func.checkArguments()) {
+            	bError = true;
+			}
           } else {
-            this.outStack = [];
-            this.elemArr = [];
-            this.error.push(c_oAscError.ID.FrmlWrongCountArgument);
-            return false;
+          	bError = true;
           }
+
+          if (bError) {
+          	this.outStack = [];
+          	this.elemArr = [];
+          	this.error.push(c_oAscError.ID.FrmlWrongCountArgument);
+          	return false;
+		  }
         }
         } else {
           if (wasLeftParentheses &&
@@ -4529,10 +4658,11 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           parserHelp.is3DRef.call(this, this.Formula, this.pCurrPos))[0]) {
 
         this.is3D = true;
-        var _wsFrom = _3DRefTmp[1], _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] :
-          _wsFrom, wsF = this.wb.getWorksheetByName(_wsFrom), wsT = this.wb.getWorksheetByName(_wsTo), pos = {
+        var pos = {
           start: this.pCurrPos - this.operand_str.length - 1, end: this.pCurrPos, index: this.outStack.length
         };
+        var wsF = this.wb.getWorksheetByName(_3DRefTmp[1]);
+        var wsT = (null !== _3DRefTmp[2]) ? this.wb.getWorksheetByName(_3DRefTmp[2]) : wsF;
 
         if (!(wsF && wsT)) {
           this.error.push(c_oAscError.ID.FrmlWrongReferences);
@@ -4542,25 +4672,21 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         }
         if (parserHelp.isArea.call(this, this.Formula, this.pCurrPos)) {
           pos.end = this.pCurrPos;
-          found_operand = new cArea3D(this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb);
+          found_operand = new cArea3D(this.operand_str.toUpperCase(), wsF, wsT);
           pos.oper = found_operand;
           this.RefPos.push(pos);
-          checkAbsArea(this.operand_str, found_operand);
         } else if (parserHelp.isRef.call(this, this.Formula, this.pCurrPos)) {
           pos.end = this.pCurrPos;
-          if (_wsTo != _wsFrom) {
-            found_operand = new cArea3D(this.operand_str.toUpperCase(), _wsFrom, _wsTo, this.wb);
+          if (wsT !== wsF) {
+            found_operand = new cArea3D(this.operand_str.toUpperCase(), wsF, wsT);
             pos.oper = found_operand;
           } else {
-            found_operand = new cRef3D(this.operand_str.toUpperCase(), _wsFrom, this.wb);
+            found_operand = new cRef3D(this.operand_str.toUpperCase(), wsF);
             pos.oper = found_operand;
           }
           this.RefPos.push(pos);
-          if (this.operand_str.indexOf("$") > -1) {
-            checkAbsRef(this.operand_str, found_operand);
-          }
         } else if (parserHelp.isName.call(this, this.Formula, this.pCurrPos)) {
-          found_operand = new cName3D(this.operand_str, _wsFrom, this.wb, wsF);
+          found_operand = new cName3D(this.operand_str, wsF);
         }
         this.countRef++;
       }
@@ -4573,9 +4699,6 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           index: this.outStack.length,
           oper: found_operand
         });
-        if (this.operand_str.indexOf("$") > -1) {
-          checkAbsArea(this.operand_str, found_operand);
-        }
         this.countRef++;
       }
       /* Referens to cell A4 */ else if (parserHelp.isRef.call(this, this.Formula, this.pCurrPos)) {
@@ -4586,14 +4709,20 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           index: this.outStack.length,
           oper: found_operand
         });
-        if (this.operand_str.indexOf("$") > -1) {
-          checkAbsRef(this.operand_str, found_operand)
-        }
         this.countRef++;
       }
 
       else if (_tableTMP = parserHelp.isTable.call(this, this.Formula, this.pCurrPos, local)) {
-        found_operand = new cStrucTable(_tableTMP, this.wb, this.ws, this.ws.getCell(this.cellAddress));
+        found_operand = cStrucTable.prototype.createFromVal(_tableTMP, this.wb, this.ws);
+
+		//todo undo delete column
+		if (found_operand.type == cElementType.error) {
+			/*используется неверный именованный диапазон или таблица*/
+			this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+			this.outStack = [];
+			this.elemArr = [];
+			return false;
+		}
 
         if (found_operand.type != cElementType.error) {
           this.RefPos.push({
@@ -4605,25 +4734,16 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           });
           this.countRef++;
         }
-
-//					if(found_operand.type==cElementType.error) {
-//						/*используется неверный именованный диапазон или таблица*/
-//						this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
-//						this.outStack = [];
-//						this.elemArr = [];
-//						return false;
-//					}
-
-
-      }
+	  }
 
       /* Referens to DefinedNames */ else if (parserHelp.isName.call(this, this.Formula, this.pCurrPos, this.wb,
           this.ws)[0]) {
-        found_operand = new cName(this.operand_str, this.wb, this.ws);
-        if (found_operand.defName && found_operand.defName.isTable) {
-          found_operand =
-            new cStrucTable(parserHelp.isTable(this.operand_str + "[]", 0), this.wb, this.ws, this.ws.getCell(
-              this.cellAddress));
+		  found_operand = new cName(this.operand_str, this.ws);
+        var defName = found_operand.getDefName();
+        if (defName && defName.isTable && (_tableTMP = parserHelp.isTable(this.operand_str + "[]", 0))) {
+			found_operand = cStrucTable.prototype.createFromVal(_tableTMP, this.wb, this.ws);
+        	//need assemble becase source formula wrong
+			needAssemble = true;
         }
         this.RefPos.push({
             start: this.pCurrPos - this.operand_str.length,
@@ -4676,26 +4796,16 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         continue;
       }
 
-      if (null !== found_operand) {
-        this.outStack.push(found_operand);
-        this.f.push(found_operand);
-        this.operand_expected = false;
-        found_operand = null
-        } else {
-        if (this.operand_str == null || this.operand_str === "'" || this.operand_str === '"') {
-          this.outStack.push(new cError(cErrorType.wrong_name));
-          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
-          return this.isParsed = false;
-        }
-        if (parserHelp.isName.call(this, this.Formula, this.pCurrPos, this.wb, this.ws)[0]) {
-          this.outStack.push(new cName(this.operand_str, this.wb));
-        }
-
-        this.operand_expected = false;
-        if (this.operand_str != null) {
-          this.pCurrPos += this.operand_str.length;
-        }
-      }
+		if (null !== found_operand) {
+			this.outStack.push(found_operand);
+			this.f.push(found_operand);
+			this.operand_expected = false;
+			found_operand = null;
+		} else {
+			this.outStack.push(new cError(cErrorType.wrong_name));
+			this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
+			return this.isParsed = false;
+		}
       if (wasRigthParentheses) {
         this.elemArr.push(new cMultOperator());
       }
@@ -4732,244 +4842,383 @@ parserFormula.prototype.parse = function(local, digitDelim) {
   }
 
   if (this.outStack.length != 0) {
+    if(needAssemble){
+      this.Formula = this.assemble();
+    }
     return this.isParsed = true;
   } else {
     return this.isParsed = false;
   }
 };
 
-parserFormula.prototype.calculate = function(isDefName) {
-  if (this.outStack.length < 1) {
-    return this.value = new cError(cErrorType.wrong_name);
-  }
-  var elemArr = [], _tmp, numFormat = -1, currentElement = null;
-  for (var i = 0; i < this.outStack.length; i++) {
-    currentElement = this.outStack[i];
-    if (currentElement.name == "(") {
-      continue;
-    }
-    if (currentElement.type == cElementType.operator || currentElement.type == cElementType.func) {
-      if (elemArr.length < currentElement.getArguments()) {
-        elemArr = [];
-        return this.value = new cError(cErrorType.unsupported_function);
-        } else {
-        var arg = [];
-        for (var ind = 0; ind < currentElement.getArguments(); ind++) {
-          arg.unshift(elemArr.pop());
-        }
-          _tmp = currentElement.Calculate(arg, this.ws.getCell(this.cellAddress), isDefName,
-            this.ws ? this.ws.getId() : undefined);
-        if (_tmp.numFormat !== undefined && _tmp.numFormat !== null) {
-          numFormat = _tmp.numFormat; //> numFormat ? _tmp.numFormat : numFormat;
-          } else if (numFormat < 0 || currentElement.numFormat < currentElement.formatType.def) {
-          numFormat = currentElement.numFormat;
-        }
-        elemArr.push(_tmp);
-      }
-      } else if (currentElement.type == cElementType.name || currentElement.type == cElementType.name3D) {
-      elemArr.push(currentElement.Calculate());
-      } else if (currentElement.type == cElementType.table) {
-      elemArr.push(currentElement.toRef());
-      } else {
-      elemArr.push(currentElement);
-    }
-  }
-  this.value = elemArr.pop();
-  this.value.numFormat = numFormat;
-  return this.value;
-};
+	parserFormula.prototype.calculate = function (opt_defName, opt_range) {
+		if (this.isCalculate) {
+			this.value = new cError(cErrorType.bad_reference);
+			this._endCalculate();
+			return this.value;
+		}
+		this.isCalculate = true;
+		if (this.outStack.length < 1) {
+			this.value = new cError(cErrorType.wrong_name);
+			this._endCalculate();
+			return this.value;
+		}
+		var rangeCell = null;
+		if (opt_range) {
+			rangeCell = opt_range;
+		} else if (this.parent && this.parent.onFormulaEvent) {
+			rangeCell = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
+		}
+		if (!rangeCell) {
+			rangeCell = this.ws.getCell3(0, 0);
+		}
 
-/* Метод возвращает все ссылки на ячейки которые участвуют в формуле*/
-parserFormula.prototype.getRef = function() {
-  var aOutRef = [];
-  for (var i = 0; i < this.outStack.length; i++) {
-    var ref = this.outStack[i];
-    if (ref instanceof cName || ref instanceof cName3D) {
-      ref = ref.toRef(this.ws.getId());
-        if (ref instanceof cError) {
-        continue;
-      }
-      }
-
-    if (ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) {
-      aOutRef.push({wsId: ref.getWsId(), cell: ref._cells});
-      } else if (ref instanceof cArea3D) {
-      var wsR = ref.wsRange();
-      for (var j = 0; j < wsR.length; j++)
-        aOutRef.push({wsId: wsR[j].Id, cell: ref._cells});
-    }
-  }
-  return aOutRef;
-};
-
-	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
-	parserFormula.prototype.changeOffset = function (offset) {//offset = AscCommonExcel.CRangeOffset
-		var elem, r, a, b;
+		var elemArr = [], _tmp, numFormat = -1, currentElement = null;
 		for (var i = 0; i < this.outStack.length; i++) {
-			elem = this.outStack[i];
-			if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
-				cElementType.cellsRange === elem.type) {
-
-				r = elem.getRange();
-				if (!r) {
-					break;
-				}
-
-				if (elem.isAbsolute) {
-					this._changeOffsetHelper(elem, offset);
-				} else {
-					if (cElementType.cellsRange === elem.type && (r.isColumn() && offset.offsetRow != 0 || r.isRow() && offset.offsetCol != 0)) {
-						continue;
-					}
-					r.setOffset(offset);
-					if (r.isColumn()) {
-						a = r.first.getColLetter();
-						b = r.last.getColLetter();
-					} else if (r.isRow()) {
-						a = r.first.getRow();
-						b = r.last.getRow();
-					} else {
-						a = r.first.getID();
-						b = r.last.getID();
-					}
-
-
-					if (a != b || cElementType.cellsRange === elem.type) {
-						elem.value = elem._cells = a + ":" + b;
-					} else {
-						elem.value = elem._cells = a;
-					}
-				}
+			currentElement = this.outStack[i];
+			if (currentElement.name == "(") {
 				continue;
 			}
-			if (cElementType.cellsRange3D === elem.type) {
-				r = elem._cells.indexOf(":") > -1 ? (new cArea(elem._cells, this.ws)) : (new cRef(elem._cells, this.ws));
-				var _r = r.getRange();
-
-				if (!_r) {
-					break;
-				}
-
-				if (elem.isAbsolute) {
-					this._changeOffsetHelper(r, offset);
+			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
+				if (elemArr.length < currentElement.getArguments()) {
+					elemArr = [];
+					this.value = new cError(cErrorType.unsupported_function);
+					this._endCalculate();
+					return this.value;
 				} else {
-					_r.setOffset(offset);
-					a = _r.first.getID();
-					b = _r.last.getID();
-					if (a != b) {
-						r.value = r._cells = a + ":" + b;
-					} else {
-						r.value = r._cells = a;
+					var arg = [];
+					for (var ind = 0; ind < currentElement.getArguments(); ind++) {
+						arg.unshift(elemArr.pop());
 					}
+					_tmp = currentElement.Calculate(arg, rangeCell, opt_defName, this.ws.getId());
+					if (null != _tmp.numFormat) {
+						numFormat = _tmp.numFormat;
+					} else if (0 > numFormat || cNumFormatNone === currentElement.numFormat) {
+						numFormat = currentElement.numFormat;
+					}
+					elemArr.push(_tmp);
 				}
-				elem._cells = r._cells;
+			} else if (currentElement.type === cElementType.name || currentElement.type === cElementType.name3D) {
+				elemArr.push(currentElement.Calculate(arg, rangeCell));
+			} else if (currentElement.type === cElementType.table) {
+				elemArr.push(currentElement.toRef(rangeCell.getBBox0()));
+			} else {
+				elemArr.push(currentElement);
 			}
+		}
+		this.value = elemArr.pop();
+		this.value.numFormat = numFormat;
+
+		this._endCalculate();
+		return this.value;
+	};
+	parserFormula.prototype._endCalculate = function() {
+		if (this.parent && this.parent.onFormulaEvent) {
+			this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.EndCalculate);
+		}
+		this.isCalculate = false;
+		this.isDirty = false;
+		if(!!this.ca != this.value.ca){
+			if (this.value.ca) {
+				this.wb.dependencyFormulas.startListeningVolatile(this);
+			} else {
+				this.wb.dependencyFormulas.endListeningVolatile(this);
+			}
+			this.ca = this.value.ca;
+		}
+	};
+
+	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
+	parserFormula.prototype.changeOffset = function (offset, canResize) {//offset = AscCommonExcel.CRangeOffset
+		for (var i = 0; i < this.outStack.length; i++) {
+			this.changeOffsetElem(this.outStack[i], this.outStack, i, offset, canResize);
 		}
 		return this;
 	};
+	parserFormula.prototype.changeOffsetElem = function(elem, container, index, offset, canResize) {//offset =
+		// AscCommonExcel.CRangeOffset
+		var range, bbox = null, isErr = false;
+		if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
+			cElementType.cellsRange === elem.type) {
+			isErr = true;
+			range = elem.getRange();
+			if (range) {
+				bbox = range.getBBox0();
+			}
+		} else if (cElementType.cellsRange3D === elem.type) {
+			isErr = true;
+			bbox = elem.getBBox0();
+		}
+		if (bbox) {
+			if (bbox.setOffsetWithAbs(offset, canResize)) {
+				isErr = false;
+				if (cElementType.cellsRange3D === elem.type) {
+					elem.bbox = bbox;
+				} else {
+					elem.range = AscCommonExcel.Range.prototype.createFromBBox(range.getWorksheet(), bbox);
+				}
+				elem.value = bbox.getName();
+			}
+		}
+		if (isErr) {
+			container[index] = new cError(cErrorType.bad_reference);
+		}
+		return elem;
+	};
+	parserFormula.prototype.changeDefName = function(from, to) {
+		var i, elem;
+		for (i = 0; i < this.outStack.length; i++) {
+			elem = this.outStack[i];
+			if (elem.type == cElementType.name || elem.type == cElementType.name3D || elem.type == cElementType.table) {
+				elem.changeDefName(from, to);
+			}
+		}
+	};
+	parserFormula.prototype.removeTableName = function(defName, bConvertTableFormulaToRef) {
+		var i, elem;
+		for (i = 0; i < this.outStack.length; i++) {
+			elem = this.outStack[i];
+			if (elem.type == cElementType.table && elem.tableName == defName.name) {
+				if(bConvertTableFormulaToRef)
+				{
+					this.outStack[i] = this.outStack[i].toRef();
+				}
+				else
+				{
+					this.outStack[i] = new cError(cErrorType.bad_reference);
+				}
+			}
+		}
+	};
+	parserFormula.prototype.removeTableColumn = function(tableName, deleted) {
+		var i, elem;
+		for (i = 0; i < this.outStack.length; i++) {
+			elem = this.outStack[i];
+			if (elem.type == cElementType.table && elem.tableName == tableName) {
+				if (elem.removeTableColumn(deleted)) {
+					this.outStack[i] = new cError(cErrorType.bad_reference);
+				}
+			}
+		}
+	};
+	parserFormula.prototype.renameTableColumn = function(tableName) {
+		var i, elem;
+		for (i = 0; i < this.outStack.length; i++) {
+			elem = this.outStack[i];
+			if (elem.type == cElementType.table && elem.tableName == tableName) {
+				if (!elem.renameTableColumn()) {
+					this.outStack[i] = new cError(cErrorType.bad_reference);
+				}
+			}
+		}
+	};
+	parserFormula.prototype.changeTableRef = function(tableName) {
+		var i, elem;
+		for (i = 0; i < this.outStack.length; i++) {
+			elem = this.outStack[i];
+			if (elem.type == cElementType.table && elem.tableName == tableName) {
+				elem.changeTableRef();
+			}
+		}
+	};
+	parserFormula.prototype.shiftCells = function(notifyType, sheetId, bbox, offset) {
+		var elem;
+		for (var i = 0; i < this.outStack.length; i++) {
+			elem = this.outStack[i];
+			var _cellsRange = null;
+			var _cellsBbox = null;
+			if (elem.type === cElementType.cell || elem.type === cElementType.cellsRange) {
+				if (sheetId == elem.ws.getId() && elem.isValid()) {
+					_cellsRange = elem.getRange();
+					if (_cellsRange) {
+						_cellsBbox = _cellsRange.getBBox0();
+					}
+				}
+			} else if (elem.type === cElementType.cell3D) {
+				if (sheetId == elem.ws.getId() && elem.isValid()) {
+					_cellsRange = elem.getRange();
+					if (_cellsRange) {
+						_cellsBbox = _cellsRange.getBBox0();
+					}
+				}
+			} else if (elem.type === cElementType.cellsRange3D) {
+				if (elem.isSingleSheet() && sheetId == elem.wsFrom.getId() && elem.isValid()) {
+					_cellsBbox = elem.getBBox0();
+				}
+			}
+			if (_cellsRange || _cellsBbox) {
+				var isIntersect;
+				if (AscCommon.c_oNotifyType.Shift == notifyType) {
+					isIntersect = bbox.isIntersectForShift(_cellsBbox, offset);
+				} else if (AscCommon.c_oNotifyType.Move == notifyType) {
+					isIntersect = bbox.containsRange(_cellsBbox);
+				} else if (AscCommon.c_oNotifyType.Delete == notifyType) {
+					isIntersect = bbox.isIntersect(_cellsBbox);
+				}
+				if (isIntersect) {
+					var isNoDelete;
+					if (AscCommon.c_oNotifyType.Shift == notifyType) {
+						isNoDelete = _cellsBbox.forShift(bbox, offset, this.wb.bUndoChanges);
+					} else if (AscCommon.c_oNotifyType.Move == notifyType) {
+						_cellsBbox.setOffset(offset);
+						isNoDelete = true;
+					} else if (AscCommon.c_oNotifyType.Delete == notifyType) {
+						if (bbox.containsRange(_cellsBbox)) {
+							isNoDelete = false;
+						} else {
+							isNoDelete = true;
+							if (!this.wb.bUndoChanges) {
+								var ltIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r1);
+								var rtIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r1);
+								var lbIn = bbox.contains(_cellsBbox.c1, _cellsBbox.r2);
+								var rbIn = bbox.contains(_cellsBbox.c2, _cellsBbox.r2);
+								if (ltIn && rtIn && bbox.r1 != _cellsBbox.r1) {
+									_cellsBbox.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - _cellsBbox.r1 + 1});
+								} else if (rtIn && rbIn && bbox.c2 != _cellsBbox.c2) {
+									_cellsBbox.setOffsetLast({offsetCol: bbox.c1 - _cellsBbox.c2 - 1, offsetRow: 0});
+								} else if (rbIn && lbIn && bbox.r2 != _cellsBbox.r2) {
+									_cellsBbox.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - _cellsBbox.r2 - 1});
+								} else if (lbIn && ltIn && bbox.c1 != _cellsBbox.c1) {
+									_cellsBbox.setOffsetFirst({offsetCol: bbox.c2 - _cellsBbox.c1 + 1, offsetRow: 0});
+								}
+							}
+						}
+					}
+					if (isNoDelete) {
+						if (elem.type === cElementType.cellsRange3D) {
+							elem.bbox = _cellsBbox;
+						} else {
+							elem.range = _cellsRange.createFromBBox(_cellsRange.getWorksheet(), _cellsBbox);
+						}
+						elem.value = _cellsBbox.getName();
+					} else {
+						this.outStack[i] = new cError(cErrorType.bad_reference);
+					}
+				}
+			}
+		}
+	};
+	parserFormula.prototype.renameSheetCopy = function (params) {
+		var wsLast = params.lastName ? this.wb.getWorksheetByName(params.lastName) : null;
+		var wsNew = params.newName ? this.wb.getWorksheetByName(params.newName) : null;
+		var isInDependencies = this.isInDependencies;
+		if (isInDependencies) {
+			//before change outStack necessary to removeDependencies
+			this.removeDependencies();
+		}
 
-parserFormula.prototype.setRefError = function(node) {
-  //когда выставляется setRefError node не сдвигаются, поэтому node.cellId совпадает с elem._cells
-  for (var i = 0; i < this.outStack.length; i++) {
-    var elem = this.outStack[i];
-    if (elem instanceof cRef || elem instanceof cArea || elem instanceof cRef3D) {
-        if (node.sheetId == elem.ws.getId() && node.cellId == elem._cells) {
-        this.outStack[i] = new cError(cErrorType.bad_reference);
-      }
-      } else if (elem instanceof cArea3D) {
-        if (elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && node.cellId == elem._cells) {
-        this.outStack[i] = new cError(cErrorType.bad_reference);
-      }
-    }
-    }
-};
-/*
- Для изменения ссылок на конкретную ячейку.
- offset - на сколько сдвигаем ячейку (offset = {offsetCol:intNumber, offsetRow:intNumber})
- cellId - какую ячейку сдвигаем
- */
-parserFormula.prototype.shiftCells = function(node, from, to) {
-  //node.cellId содержит уже сдвинутое значение
-  var sFromName = from.getName(), elem;
-  for (var i = 0; i < this.outStack.length; i++) {
-    elem = this.outStack[i];
-    if (elem instanceof cRef || elem instanceof cArea) {
-      sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-
-      if (node.sheetId == elem.ws.getId() && sFromName == elem._cells) {
-          elem.value = elem._cells =
-            node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-        elem.range = elem.ws.getRange3(to.r1, to.c1, to.r2, to.c2);
-      }
-      } else if (elem instanceof cRef3D) {
-      sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-
-      if (node.sheetId == elem.ws.getId() && sFromName == elem._cells) {
-          elem.value = elem._cells =
-            node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-      }
-      } else if (elem instanceof cArea3D) {
-
-      sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-
-      if (elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells) {
-          elem.value = elem._cells =
-            node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-      }
-    }
-  }
-};
-
-parserFormula.prototype.stretchArea = function(node, from, to) {
-  //node.cellId содержит уже сдвинутое значение
-  var sFromName = from.getName(), elem;
-  for (var i = 0; i < this.outStack.length; i++) {
-    elem = this.outStack[i];
-    if (elem.type == cElementType.table) {
-
-      sFromName = from.getAbsName();
-
-      if (elem.area.wsFrom == elem.area.wsTo && node.sheetId == elem.area.wsFrom && sFromName == elem.area._cells) {
-        elem.area.value = elem.area._cells = node.bbox.getAbsName();
-//                    elem.area.range = elem.area.ws.getRange3( to.r1, to.c1, to.r2, to.c2 );
-      }
-
-      } else if (elem.type == cElementType.cellsRange) {
-
-      sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-
-      if (node.sheetId == elem.ws.getId() && sFromName == elem._cells) {
-        elem.value = elem._cells =
-          node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-        elem.range = elem.ws.getRange3(to.r1, to.c1, to.r2, to.c2);
-      }
-      } else if (elem.type == cElementType.cellsRange3D) {
-
-      sFromName = from.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-
-      //node.cellId содержит уже сдвинутое значение
-      if (elem.wsFrom == elem.wsTo && node.sheetId == elem.wsFrom && sFromName == elem._cells) {
-          elem.value = elem._cells =
-            node.bbox.getAbsName2(elem.isAbsoluteCol1, elem.isAbsoluteRow1, elem.isAbsoluteCol2, elem.isAbsoluteRow2);
-      }
-    }
-  }
-};
-
-/* При переименовывании листа необходимо поменять название листа в соответствующих ссылках */
-parserFormula.prototype.changeSheet = function(lastName, newName) {
-    if (this.is3D) {
-    for (var i = 0; i < this.outStack.length; i++) {
-      if (this.outStack[i] instanceof cRef3D && this.outStack[i].ws.getName() == lastName) {
-        this.outStack[i].changeSheet(lastName, newName);
-      }
-      if (this.outStack[i] instanceof cArea3D) {
-        this.outStack[i].changeSheet(lastName, newName);
-      }
-    }
-    }
-  return this;
-};
+		for (var i = 0; i < this.outStack.length; i++) {
+			var elem = this.outStack[i];
+			if (cElementType.cell3D === elem.type) {
+				if (params.offset) {
+					elem = this.changeOffsetElem(elem, this.outStack, i, params.offset);
+				}
+				if (wsLast && wsNew) {
+					elem.changeSheet(wsLast, wsNew);
+				}
+			} else if (cElementType.cellsRange3D === elem.type) {
+				if (params.offset) {
+					elem = this.changeOffsetElem(elem, this.outStack, i, params.offset);
+				}
+				if (wsLast && wsNew) {
+					if (elem.isSingleSheet()) {
+						elem.changeSheet(wsLast, wsNew);
+					} else {
+						if (elem.wsFrom === wsLast || elem.wsTo === wsLast) {
+							this.outStack[i] = new cError(cErrorType.bad_reference);
+						}
+					}
+				}
+			} else if (params.offset && (cElementType.cellsRange === elem.type || cElementType.cell === elem.type)) {
+				elem = this.changeOffsetElem(elem, this.outStack, i, params.offset);
+			} else if (wsLast && wsNew && cElementType.name3D === elem.type) {
+				elem.changeSheet(wsLast, wsNew);
+			} else if (params.tableNameMap && cElementType.table === elem.type) {
+				var newTableName = params.tableNameMap[elem.tableName];
+				if (newTableName) {
+					elem.tableName = newTableName;
+				}
+			}
+		}
+		if (isInDependencies) {
+			this.buildDependencies();
+		}
+		return this;
+	};
+	parserFormula.prototype.removeSheet = function (sheetId, tableNamesMap) {
+		var bRes = false;
+		var ws = this.wb.getWorksheetById(sheetId);
+		if (ws) {
+			var wsIndex = ws.getIndex();
+			var wsPrev = this.wb.getWorksheet(wsIndex - 1);
+			var wsNext = this.wb.getWorksheet(wsIndex + 1);
+			for (var i = 0; i < this.outStack.length; i++) {
+				var elem = this.outStack[i];
+				if (cElementType.cellsRange3D === elem.type) {
+					if (elem.wsFrom === ws) {
+						if (!elem.isSingleSheet() && null !== wsNext) {
+							elem.changeSheet(ws, wsNext);
+						} else {
+							this.outStack[i] = new cError(cErrorType.bad_reference);
+						}
+						bRes = true;
+					} else if (elem.wsTo === ws) {
+						if (null !== wsPrev) {
+							elem.changeSheet(ws, wsPrev);
+						} else {
+							this.outStack[i] = new cError(cErrorType.bad_reference);
+						}
+						bRes = true;
+					}
+				} else if (cElementType.cell3D === elem.type || cElementType.name3D === elem.type) {
+					if (elem.getWS() === ws) {
+						this.outStack[i] = new cError(cErrorType.bad_reference);
+						bRes = true;
+					}
+				} else if (cElementType.table === elem.type) {
+					if (tableNamesMap[elem.tableName]) {
+						this.outStack[i] = new cError(cErrorType.bad_reference);
+						bRes = true;
+					}
+				}
+			}
+		}
+		return bRes;
+	};
+	parserFormula.prototype.moveSheet = function(tempW) {
+		var bRes = false;
+		for (var i = 0; i < this.outStack.length; i++) {
+			var elem = this.outStack[i];
+			if (cElementType.cellsRange3D === elem.type) {
+				var wsToIndex = elem.wsTo.getIndex();
+				var wsFromIndex = elem.wsFrom.getIndex();
+				if (!elem.isSingleSheet()) {
+					if (elem.wsFrom === tempW.wF) {
+						if (tempW.wTI > wsToIndex) {
+							bRes = true;
+							var wsNext = this.wb.getWorksheet(wsFromIndex + 1);
+							if (wsNext) {
+								elem.changeSheet(tempW.wF, wsNext);
+							} else {
+								this.outStack[i] = new cError(cErrorType.bad_reference);
+							}
+						}
+					} else if (elem.wsTo === tempW.wF) {
+						if (tempW.wTI <= wsFromIndex) {
+							bRes = true;
+							var wsPrev = this.wb.getWorksheet(wsToIndex - 1);
+							if (wsPrev) {
+								elem.changeSheet(tempW.wF, wsPrev);
+							} else {
+								this.outStack[i] = new cError(cErrorType.bad_reference);
+							}
+						}
+					}
+				}
+			}
+		}
+		return bRes;
+	};
 
 	/* Сборка функции в инфиксную форму */
 	parserFormula.prototype.assemble = function (rFormula) {
@@ -5027,280 +5276,108 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
     return this.Formula;
   }
 };
+	parserFormula.prototype.buildDependencies = function() {
+		if (this.isInDependencies) {
+			return;
+		}
+		this.isInDependencies = true;
+		var ref, wsR;
+		var isTable = this.isTable;
+		var bbox;
+		if (this.ca) {
+			this.wb.dependencyFormulas.startListeningVolatile(this);
+		}
 
-parserFormula.prototype._changeOffsetHelper = function(ref, offset) {
-  var m = ref._cells.match(/\$/g);
-    if (!m) {
-      return;
-    }
-  if (m.length == 1) {//для cRef, cRef3D, cArea. $A2, A$2, Sheet1!$A2, Sheet1!A$2, $A2:C4, A$2:C4, A2:$C4, A2:C$4.
-    if (!(ref instanceof cArea)) {
-      if (ref._cells.indexOf("$") == 0) {
-        r = ref.getRange();
-        r.setOffset({offsetCol: 0, offsetRow: offset.offsetRow});
-        ref.value = ref._cells = "$" + r.first.getID();
-        } else {
-        r = ref.getRange();
-        r.setOffset({offsetCol: offset.offsetCol, offsetRow: 0});
-        ref.value = ref._cells = r.first.getColLetter() + "$" + r.first.getRow();
-      }
-      } else {
-        var r = ref.getRange(), c = ref._cells.split(":");// так как ссылка вида A1:A4, делим на первую и последнюю ячейку.
-      // проверяем в какой ячеейке находится абсолютная ссылка.
-      if (c[0].indexOf("$") > -1) {// если в первой ячейке
-        if (c[0].indexOf("$") == 0) {// абсолютна ли ссылка на столбец...
-          r.first.moveRow(offset.offsetRow);
-          r.last.moveCol(offset.offsetCol);
-          r.last.moveRow(offset.offsetRow);
-          ref.setRange("$" + r.first.getColLetter() + r.first.getRow() + ":" + r.last.getColLetter() + r.last.getRow());
-          } else {// ... или абсолютна ссылка на строку
-          r.first.moveCol(offset.offsetCol);
-          r.last.moveCol(offset.offsetCol);
-          r.last.moveRow(offset.offsetRow);
-          ref.setRange(r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + r.last.getRow());
-        }
-        } else {// если в последней ячейке
-        if (c[1].indexOf("$") == 0) {// абсолютна ли ссылка на столбец...
-          r.first.moveCol(offset.offsetCol);
-          r.first.moveRow(offset.offsetRow);
-          r.last.moveRow(offset.offsetRow);
-          ref.setRange(r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow());
-          } else {// ... или абсолютна ссылка на строку
-          r.first.moveCol(offset.offsetCol);
-          r.first.moveRow(offset.offsetRow);
-          r.last.moveCol(offset.offsetCol);
-          ref.setRange(r.first.getColLetter() + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow());
-        }
-      }
-    }
-    } else if (m.length == 2) {//для cArea. $A$2:C4, A2:$C$4, $A2:$C4, $A2:C$4, A$2:$C4, A$2:C$4.
-    if (ref instanceof cArea) {
-      var r = ref.getRange();
-      var c = ref._cells.split(":");
-      if (c[1].indexOf("$") < 0) {
-        r.last.moveCol(offset.offsetCol);
-        r.last.moveRow(offset.offsetRow);
-          ref.setRange(
-            "$" + r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + r.last.getRow());
-        } else if (c[0].indexOf("$") < 0) {
-        r.first.moveCol(offset.offsetCol);
-        r.first.moveRow(offset.offsetRow);
-        ref.setRange(
-          r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + "$" + r.last.getRow());
-      } else {
-        if (c[0].indexOf("$") == 0 && c[1].indexOf("$") == 0) {
-          r.first.moveRow(offset.offsetRow);
-          r.last.moveRow(offset.offsetRow);
-          ref.setRange(
-            "$" + r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow());
-        } else if (c[0].indexOf("$") == 0 && c[1].indexOf("$") > 0) {
-          r.first.moveRow(offset.offsetRow);
-          r.last.moveCol(offset.offsetCol);
-          ref.setRange(
-            "$" + r.first.getColLetter() + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow());
-        } else if (c[0].indexOf("$") > 0 && c[1].indexOf("$") == 0) {
-          r.first.moveCol(offset.offsetCol);
-          r.last.moveRow(offset.offsetRow);
-          ref.setRange(
-            r.first.getColLetter() + "$" + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow());
-        } else {
-          r.first.moveCol(offset.offsetCol);
-          r.last.moveCol(offset.offsetCol);
-          ref.setRange(
-            r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow());
-        }
-      }
-    }
-    } else if (m.length == 3) {//для cArea. $A$2:$C4, $A$2:C$4, $A2:$C$4, A$2:$C$4,
-    if (ref instanceof cArea) {
-      var r = ref.getRange();
-      var c = ref._cells.split(":");
-      if (c[0].match(/\$/g).length == 2 && c[1].indexOf("$") == 0) {
-        r.last.moveRow(offset.offsetRow);
-        ref.setRange(
-          "$" + r.first.getColLetter() + "$" + r.first.getRow() + ":" + "$" + r.last.getColLetter() + r.last.getRow());
-        } else if (c[0].match(/\$/g).length == 2 && c[1].indexOf("$") > 0) {
-        r.last.moveCol(offset.offsetCol);
-        ref.setRange(
-          "$" + r.first.getColLetter() + "$" + r.first.getRow() + ":" + r.last.getColLetter() + "$" + r.last.getRow());
-        } else if (c[1].match(/\$/g).length == 2 && c[0].indexOf("$") == 0) {
-        r.first.moveRow(offset.offsetRow);
-        ref.setRange(
-          "$" + r.first.getColLetter() + r.first.getRow() + ":" + "$" + r.last.getColLetter() + "$" + r.last.getRow());
-        } else if (c[1].match(/\$/g).length == 2 && c[0].indexOf("$") > 0) {
-        r.first.moveCol(offset.offsetCol);
-        ref.setRange(
-          r.first.getColLetter() + "$" + r.first.getRow() + ":" + "$" + r.last.getColLetter() + "$" + r.last.getRow());
-      }
-    }
-  }
-};
+		for (var i = 0; i < this.outStack.length; i++) {
+			ref = this.outStack[i];
 
-parserFormula.prototype.insertSheet = function(index) {
-  var bRes = false;
-  for (var i = 0; i < this.outStack.length; i++) {
-    var elem = this.outStack[i];
-    if (elem instanceof cArea3D) {
-      var wsTo = this.wb.getWorksheetById(elem.wsTo);
-      var wsToIndex = wsTo.getIndex();
-      var wsFrom = this.wb.getWorksheetById(elem.wsFrom);
-      var wsFromIndex = wsFrom.getIndex();
-      if (wsFromIndex <= index && index <= wsToIndex) {
-        bRes = true;
-      }
-    }
-  }
-  return bRes;
-};
+			if (ref.type == cElementType.table) {
+				this.wb.dependencyFormulas.startListeningDefName(ref.tableName, this);
+			} else if (ref.type == cElementType.name) {
+				this.wb.dependencyFormulas.startListeningDefName(ref.value, this);
+			} else if (ref.type == cElementType.name3D) {
+				this.wb.dependencyFormulas.startListeningDefName(ref.value, this, ref.ws.getId());
+			} else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type ||
+				cElementType.cellsRange === ref.type) && ref.isValid()) {
+				bbox = ref.getRange().getBBox0();
+				if(isTable){
+					//extend table formula with header/total. This allows us not to follow their change,
+					//but sometimes leads to recalculate of the table although changed cells near table (it's not a problem)
+					bbox = bbox.clone();
+					bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
+					bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+				}
+				this.wb.dependencyFormulas.startListeningRange(ref.getWsId(), bbox, this);
+			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
+				wsR = ref.range(ref.wsRange());
+				ref.dependenceRange = wsR;
+				for (var j = 0; j < wsR.length; j++) {
+					var range = wsR[j];
+					if (range) {
+						var wsId = range.getWorksheet().getId();
+						bbox = range.getBBox0();
+						if(isTable){
+							//extend table formula with header/total. This allows us not to follow their change,
+							//but sometimes leads to recalculate of the table although changed cells near table (it's not a problem)
+							bbox = bbox.clone();
+							bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
+							bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+						}
+						this.wb.dependencyFormulas.startListeningRange(wsId, bbox, this);
+					}
+				}
+			}
+		}
+	};
+	parserFormula.prototype.removeDependencies = function() {
+		if (!this.isInDependencies) {
+			return;
+		}
+		this.isInDependencies = false;
+		var ref;
+		var wsR;
+		var isTable = this.isTable;
+		var bbox;
+		if (this.ca) {
+			this.wb.dependencyFormulas.endListeningVolatile(this);
+		}
 
-parserFormula.prototype.moveSheet = function(tempW) {
-  var nRes = 0;
-  for (var i = 0; i < this.outStack.length; i++) {
-    var elem = this.outStack[i];
-    if (elem instanceof cArea3D) {
-      var wsTo = this.wb.getWorksheetById(elem.wsTo);
-      var wsToIndex = wsTo.getIndex();
-      var wsFrom = this.wb.getWorksheetById(elem.wsFrom);
-      var wsFromIndex = wsFrom.getIndex();
-        if (wsFromIndex <= tempW.wFI && tempW.wFI <= wsToIndex && 0 == nRes) {
-        nRes = 1;
-      }
-      if (elem.wsFrom == tempW.wFId) {
-        if (tempW.wTI > wsToIndex) {
-          nRes = 2;
-          var wsNext = this.wb.getWorksheet(wsFromIndex + 1);
-          if (wsNext) {
-            this.outStack[i].changeSheet(tempW.wFN, wsNext.getName());
-            } else {
-            this.outStack[i] = new cError(cErrorType.bad_reference);
-          }
-        }
-        } else if (elem.wsTo == tempW.wFId) {
-        if (tempW.wTI <= wsFromIndex) {
-          nRes = 2;
-          var wsPrev = this.wb.getWorksheet(wsToIndex - 1);
-          if (wsPrev) {
-            this.outStack[i].changeSheet(tempW.wFN, wsPrev.getName());
-          } else {
-            this.outStack[i] = new cError(cErrorType.bad_reference);
-          }
-        }
-      }
-    }
-  }
-  return nRes;
-};
+		for (var i = 0; i < this.outStack.length; i++) {
+			ref = this.outStack[i];
 
-parserFormula.prototype.removeSheet = function(sheetId) {
-  var bRes = false;
-  var ws = this.wb.getWorksheetById(sheetId);
-  if (ws) {
-    var wsIndex = ws.getIndex();
-    var wsPrev = null;
-    if (wsIndex > 0) {
-      wsPrev = this.wb.getWorksheet(wsIndex - 1);
-    }
-    var wsNext = null;
-    if (wsIndex < this.wb.getWorksheetCount() - 1) {
-      wsNext = this.wb.getWorksheet(wsIndex + 1);
-    }
-    for (var i = 0; i < this.outStack.length; i++) {
-      var elem = this.outStack[i];
-      if (elem instanceof cArea3D) {
-        if (elem.wsFrom == sheetId) {
-          bRes = true;
-          if (elem.wsTo != sheetId && null != wsNext) {
-            this.outStack[i].changeSheet(ws.getName(), wsNext.getName());
-          } else {
-            this.outStack[i] = new cError(cErrorType.bad_reference);
-          }
-        } else if (elem.wsTo == sheetId && null != wsPrev) {
-          this.outStack[i].changeSheet(ws.getName(), wsPrev.getName());
-          bRes = true;
-        }
-      } else if (elem instanceof cRef3D) {
-        if (elem.ws.getId() == sheetId) {
-          this.outStack[i] = new cError(cErrorType.bad_reference);
-          bRes = true;
-        }
-      }
-    }
-  }
-  return bRes;
-};
-
-parserFormula.prototype.buildDependencies = function(nameReParse, defName) {
-
-  var node, ref, nTo, wsR;
-
-  if (!defName) {
-    node = this.wb.dependencyFormulas.addNode(this.ws.Id, this.cellId)
-  } else {
-    node = defName;
-  }
-
-  for (var i = 0; i < this.outStack.length; i++) {
-    ref = this.outStack[i];
-
-    if (ref.type == cElementType.table) {
-      //nTo = ref.addDefinedNameNode(/*nameReParse*/);
-      //this.wb.dependencyFormulas.addEdge2(node, nTo);
-      // ToDo нет зависимости от имени таблицы. Проблемы будут, если сменить диапазон у таблицы. На ссылку в зависимостях это не повлияет..
-      ref = ref.toRef();
-    }
-
-    if ((ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea || ref instanceof cArea3D) &&
-      ref.isValid() && this.outStack[i + 1] && this.outStack[i + 1] instanceof cBaseFunction &&
-      this.reRowCol.test(this.outStack[i + 1].name)) {
-      this.reRowCol.lastIndex = 0;
-      continue;
-    }
-
-    if (ref.type == cElementType.name || ref.type == cElementType.name3D) {
-      nTo = ref.addDefinedNameNode(/*nameReParse*/);
-      this.wb.dependencyFormulas.addEdge2(node, nTo);
-    } else if ((ref instanceof cRef || ref instanceof cRef3D || ref instanceof cArea) && ref.isValid()) {
-      nTo = this.wb.dependencyFormulas.addNode(ref.getWsId(), ref._cells.replace(this.regSpace, ""));
-      this.wb.dependencyFormulas.addEdge2(node, nTo);
-    } else if (ref instanceof cArea3D && ref.isValid()) {
-      wsR = ref.wsRange();
-      for (var j = 0; j < wsR.length; j++) {
-        this.wb.dependencyFormulas.addEdge2(node,
-          this.wb.dependencyFormulas.addNode(wsR[j].Id, ref._cells.replace(this.regSpace, "")));
-      }
-    }
-  }
-};
-
-parserFormula.prototype.parseDiagramRef = function() {
-    var res = [[]];
-  while (this.pCurrPos < this.Formula.length) {
-    if (parserHelp.isComma.call(this, this.Formula, this.pCurrPos)) {
-
-      if (this.operand_str == ";") {
-        res.push([])
-      }
-
-    } else {
-      var _3DRefTmp = null;
-
-      if ((_3DRefTmp = parserHelp.is3DRef.call(this, this.Formula, this.pCurrPos))[0]) {
-        this.is3D = true;
-        var _wsFrom = _3DRefTmp[1], _wsTo = ( (_3DRefTmp[2] !== null) && (_3DRefTmp[2] !== undefined) ) ? _3DRefTmp[2] :
-          _wsFrom;
-
-        if (parserHelp.isArea.call(this, this.Formula, this.pCurrPos)) {
-          res[res.length - 1].push({sheetNameFrom: _wsFrom, sheetNameTo: _wsTo, ref: this.operand_str.toUpperCase()})
-
-          } else if (parserHelp.isRef.call(this, this.Formula, this.pCurrPos)) {
-          res[res.length - 1].push({sheetNameFrom: _wsFrom, sheetNameTo: _wsTo, ref: this.operand_str.toUpperCase()})
-        }
-      }
-    }
-
-  }
-  return res;
-};
+			if (ref.type == cElementType.table) {
+				this.wb.dependencyFormulas.endListeningDefName(ref.tableName, this);
+			} else if (ref.type == cElementType.name) {
+				this.wb.dependencyFormulas.endListeningDefName(ref.value, this);
+			} else if (ref.type == cElementType.name3D) {
+				this.wb.dependencyFormulas.endListeningDefName(ref.value, this, ref.ws.getId());
+			} else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type ||
+				cElementType.cellsRange === ref.type) && ref.isValid()) {
+				bbox = ref.getRange().getBBox0();
+				if(isTable){
+					bbox = bbox.clone();
+					bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
+					bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+				}
+				this.wb.dependencyFormulas.endListeningRange(ref.getWsId(), bbox, this);
+			} else if (cElementType.cellsRange3D === ref.type && ref.dependenceRange) {
+				wsR = ref.dependenceRange;
+				for (var j = 0; j < wsR.length; j++) {
+					var range = wsR[j];
+					if (range) {
+						var wsId = range.getWorksheet().getId();
+						bbox = range.getBBox0();
+						if(isTable){
+							bbox = bbox.clone();
+							bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
+							bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
+						}
+						this.wb.dependencyFormulas.endListeningRange(wsId, bbox, this);
+					}
+				}
+			}
+		}
+	};
 
 parserFormula.prototype.getElementByPos = function(pos) {
   var curPos = 0;
@@ -5321,9 +5398,31 @@ function parseNum( str ) {
     return !isNaN( str );
 }
 
-	function matching(x, y, operator) {
+	var matchingOperators = new RegExp("^ *[<=> ]+ *");
+
+	function matchingValue(val) {
+		var search, op;
+		var match = val.match(matchingOperators);
+		if (match) {
+			search = val.substr(match[0].length);
+			op = match[0].replace(/\s/g, "");
+		} else {
+			search = val;
+			op = null;
+		}
+
+		var parseRes = AscCommon.g_oFormatParser.parse(search);
+		return {val: parseRes ? new cNumber(parseRes.value) : new cString(search), op: op};
+	}
+	function matching(x, matchingInfo) {
+		var y = matchingInfo.val;
+		var operator = matchingInfo.op;
 		var res = false, rS;
 		if (cElementType.string === y.type) {
+			if ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator) {
+				return _func[x.type][y.type](x, y, operator).toBool();
+			}
+
 			y = y.toString();
 			if ('' === y) {
 				// Empty compare string
@@ -5583,51 +5682,54 @@ function rtl_math_erfc( x ) {
     return fErfc;
 }
 
-  //----------------------------------------------------------export----------------------------------------------------
-  window['AscCommonExcel'] = window['AscCommonExcel'] || {};
-  window['AscCommonExcel'].cElementType = cElementType;
-  window['AscCommonExcel'].cErrorType = cErrorType;
-  window['AscCommonExcel'].cExcelSignificantDigits = cExcelSignificantDigits;
-  window['AscCommonExcel'].cExcelMaxExponent = cExcelMaxExponent;
-  window['AscCommonExcel'].cExcelMinExponent = cExcelMinExponent;
-  window['AscCommonExcel'].c_Date1904Const = c_Date1904Const;
-  window['AscCommonExcel'].c_Date1900Const = c_Date1900Const;
-  window['AscCommonExcel'].c_DateCorrectConst = c_Date1900Const;
-  window['AscCommonExcel'].c_sPerDay = c_sPerDay;
-  window['AscCommonExcel'].c_msPerDay = c_msPerDay;
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].cElementType = cElementType;
+	window['AscCommonExcel'].cErrorType = cErrorType;
+	window['AscCommonExcel'].cExcelSignificantDigits = cExcelSignificantDigits;
+	window['AscCommonExcel'].cExcelMaxExponent = cExcelMaxExponent;
+	window['AscCommonExcel'].cExcelMinExponent = cExcelMinExponent;
+	window['AscCommonExcel'].c_Date1904Const = c_Date1904Const;
+	window['AscCommonExcel'].c_Date1900Const = c_Date1900Const;
+	window['AscCommonExcel'].c_DateCorrectConst = c_Date1900Const;
+	window['AscCommonExcel'].c_sPerDay = c_sPerDay;
+	window['AscCommonExcel'].c_msPerDay = c_msPerDay;
+	window['AscCommonExcel'].cNumFormatFirstCell = c_numFormatFirstCell;
+	window['AscCommonExcel'].cNumFormatNone = cNumFormatNone;
 
-  window['AscCommonExcel'].cNumber = cNumber;
-  window['AscCommonExcel'].cString = cString;
-  window['AscCommonExcel'].cBool = cBool;
-  window['AscCommonExcel'].cError = cError;
-  window['AscCommonExcel'].cArea = cArea;
-  window['AscCommonExcel'].cArea3D = cArea3D;
-  window['AscCommonExcel'].cRef = cRef;
-  window['AscCommonExcel'].cRef3D = cRef3D;
-  window['AscCommonExcel'].cEmpty = cEmpty;
-  window['AscCommonExcel'].cName = cName;
-  window['AscCommonExcel'].cArray = cArray;
-  window['AscCommonExcel'].cUndefined = cUndefined;
-  window['AscCommonExcel'].cBaseFunction = cBaseFunction;
+	window['AscCommonExcel'].cNumber = cNumber;
+	window['AscCommonExcel'].cString = cString;
+	window['AscCommonExcel'].cBool = cBool;
+	window['AscCommonExcel'].cError = cError;
+	window['AscCommonExcel'].cArea = cArea;
+	window['AscCommonExcel'].cArea3D = cArea3D;
+	window['AscCommonExcel'].cRef = cRef;
+	window['AscCommonExcel'].cRef3D = cRef3D;
+	window['AscCommonExcel'].cEmpty = cEmpty;
+	window['AscCommonExcel'].cName = cName;
+	window['AscCommonExcel'].cArray = cArray;
+	window['AscCommonExcel'].cUndefined = cUndefined;
+	window['AscCommonExcel'].cBaseFunction = cBaseFunction;
 
 	window['AscCommonExcel'].checkTypeCell = checkTypeCell;
-  window['AscCommonExcel'].cFormulaFunctionGroup = cFormulaFunctionGroup;
-  window['AscCommonExcel'].cFormulaFunction = cFormulaFunction;
+	window['AscCommonExcel'].cFormulaFunctionGroup = cFormulaFunctionGroup;
+	window['AscCommonExcel'].cFormulaFunction = cFormulaFunction;
 
-  window['AscCommonExcel'].cFormulaFunctionLocalized = null;
-  window['AscCommonExcel'].cFormulaFunctionToLocale = null;
+	window['AscCommonExcel'].cFormulaFunctionLocalized = null;
+	window['AscCommonExcel'].cFormulaFunctionToLocale = null;
 
-  window['AscCommonExcel'].getFormulasInfo = getFormulasInfo;
+	window['AscCommonExcel'].getFormulasInfo = getFormulasInfo;
 	window['AscCommonExcel'].getRangeByRef = getRangeByRef;
 
-  window['AscCommonExcel']._func = _func;
+	window['AscCommonExcel']._func = _func;
 
-  window['AscCommonExcel'].parserFormula = parserFormula;
+	window['AscCommonExcel'].parserFormula = parserFormula;
 
-  window['AscCommonExcel'].parseNum = parseNum;
-  window['AscCommonExcel'].matching = matching;
-  window['AscCommonExcel'].GetDiffDate360 = GetDiffDate360;
-  window['AscCommonExcel'].searchRegExp2 = searchRegExp2;
-  window['AscCommonExcel'].rtl_math_erf = rtl_math_erf;
-  window['AscCommonExcel'].rtl_math_erfc = rtl_math_erfc;
+	window['AscCommonExcel'].parseNum = parseNum;
+	window['AscCommonExcel'].matching = matching;
+	window['AscCommonExcel'].matchingValue = matchingValue;
+	window['AscCommonExcel'].GetDiffDate360 = GetDiffDate360;
+	window['AscCommonExcel'].searchRegExp2 = searchRegExp2;
+	window['AscCommonExcel'].rtl_math_erf = rtl_math_erf;
+	window['AscCommonExcel'].rtl_math_erfc = rtl_math_erfc;
 })(window);

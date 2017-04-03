@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -64,6 +64,7 @@ function CDocumentSearch()
     this.Direction     = true; // направление true - вперед, false - назад
     this.ClearOnRecalc = true; // Флаг, говорящий о том, запустился ли пересчет из-за Replace
     this.Selection     = false;
+    this.Footnotes     = [];
 }
 
 CDocumentSearch.prototype =
@@ -217,13 +218,28 @@ CDocumentSearch.prototype =
         this.Direction = bDirection;
     }
 };
-
+CDocumentSearch.prototype.SetFootnotes = function(arrFootnotes)
+{
+	this.Footnotes = arrFootnotes;
+};
+CDocumentSearch.prototype.GetFootnotes = function()
+{
+	return this.Footnotes;
+};
+CDocumentSearch.prototype.GetDirection = function()
+{
+	return this.Direction;
+};
+CDocumentSearch.prototype.SetDirection = function(bDirection)
+{
+	this.Direction = bDirection;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------
 CDocument.prototype.Search = function(Str, Props, bDraw)
 {
-    var StartTime = new Date().getTime();
+    //var StartTime = new Date().getTime();
 
     if ( true === this.SearchEngine.Compare( Str, Props ) )
         return this.SearchEngine;
@@ -241,6 +257,15 @@ CDocument.prototype.Search = function(Str, Props, bDraw)
     // Поиск в колонтитулах
     this.SectionsInfo.Search( Str, Props, this.SearchEngine );
 
+    // Ищем в сносках
+	var arrFootnotes = this.Get_FootnotesList(null, null);
+	this.SearchEngine.SetFootnotes(arrFootnotes);
+	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
+	{
+		var oFootnote = arrFootnotes[nIndex];
+		oFootnote.Search(Str, Props, this.SearchEngine, search_Footnote);
+	}
+
     if (false !== bDraw)
     {
         this.DrawingDocument.ClearCachePages();
@@ -251,7 +276,6 @@ CDocument.prototype.Search = function(Str, Props, bDraw)
 
     return this.SearchEngine;
 };
-
 CDocument.prototype.Search_Select = function(Id)
 {
     this.Selection_Remove();
@@ -262,7 +286,6 @@ CDocument.prototype.Search_Select = function(Id)
     this.Document_UpdateSelectionState();
     this.Document_UpdateRulersState();
 };
-
 CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
 {
     var bResult = false;
@@ -332,108 +355,66 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
 
     return bResult;
 };
-
 CDocument.prototype.Search_GetId = function(bNext)
 {
-    this.SearchEngine.Set_Direction( bNext );
+	var Id = null;
 
-    // Получим Id найденного элемента
-    if ( docpostype_DrawingObjects === this.CurPos.Type )
-    {
-        var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
+	this.SearchEngine.SetDirection(bNext);
 
-        var Id = ParaDrawing.Search_GetId( bNext, true );
-        if ( null != Id )
-            return Id;
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
 
-        this.DrawingObjects.resetSelection();
-        ParaDrawing.GoTo_Text( true === bNext ? false : true, false );
-    }
+		Id = ParaDrawing.Search_GetId(bNext, true);
+		if (null != Id)
+			return Id;
 
-    if ( docpostype_Content === this.CurPos.Type )
-    {
-        var Id = null;
+		this.DrawingObjects.resetSelection();
+		ParaDrawing.GoTo_Text(true === bNext ? false : true, false);
+	}
 
-        var Pos = this.CurPos.ContentPos;
-        if ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag )
-            Pos = ( true === bNext ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : Math.min(this.Selection.StartPos, this.Selection.EndPos) );
+	if (docpostype_Content === this.CurPos.Type)
+	{
+		Id = this.private_GetSearchIdInMainDocument(true);
 
-        var StartPos = Pos;
+		if (null === Id)
+			Id = this.private_GetSearchIdInFootnotes(false);
 
-        if ( true === bNext )
-        {
-            Id = this.Content[Pos].Search_GetId(true, true);
+		if (null === Id)
+			Id = this.private_GetSearchIdInHdrFtr(false);
 
-            if ( null != Id )
-                return Id;
+		if (null === Id)
+			Id = this.private_GetSearchIdInMainDocument(false);
+	}
+	else if (docpostype_HdrFtr === this.CurPos.Type)
+	{
+		Id = this.private_GetSearchIdInHdrFtr(true);
 
-            Pos++;
+		if (null === Id)
+			Id = this.private_GetSearchIdInMainDocument(false);
 
-            var Count = this.Content.length;
-            while ( Pos < Count )
-            {
-                Id = this.Content[Pos].Search_GetId(true, false);
+		if (null === Id)
+			Id = this.private_GetSearchIdInFootnotes(false);
 
-                if ( null != Id )
-                    return Id;
+		if (null === Id)
+			Id = this.private_GetSearchIdInHdrFtr(false);
+	}
+	else if (docpostype_Footnotes === this.CurPos.Type)
+	{
+		Id = this.private_GetSearchIdInFootnotes(true);
 
-                Pos++;
-            }
+		if (null === Id)
+			Id = this.private_GetSearchIdInHdrFtr(false);
 
-            Pos = 0;
-            while ( Pos <= StartPos )
-            {
-                Id = this.Content[Pos].Search_GetId(true, false);
+		if (null === Id)
+			Id = this.private_GetSearchIdInMainDocument(false);
 
-                if ( null != Id )
-                    return Id;
+		if (null === Id)
+			Id = this.private_GetSearchIdInFootnotes(false);
+	}
 
-                Pos++;
-            }
-
-            return null;
-        }
-        else
-        {
-            Id = this.Content[Pos].Search_GetId(false, true);
-
-            if ( null != Id )
-                return Id;
-
-            Pos--;
-
-            while ( Pos >= 0 )
-            {
-                Id = this.Content[Pos].Search_GetId(false, false);
-
-                if ( null != Id )
-                    return Id;
-
-                Pos--;
-            }
-
-            Pos = this.Content.length - 1;
-            while ( Pos >= StartPos )
-            {
-                Id = this.Content[Pos].Search_GetId(false, false);
-
-                if ( null != Id )
-                    return Id;
-
-                Pos--;
-            }
-
-            return null;
-        }
-    }
-    else if ( docpostype_HdrFtr === this.CurPos.Type )
-    {
-        return this.SectionsInfo.Search_GetId( bNext, this.HdrFtr.CurHdrFtr );
-    }
-
-    return null;
+	return Id;
 };
-
 CDocument.prototype.Search_Set_Selection = function(bSelection)
 {
     var OldValue = this.SearchEngine.Selection;
@@ -444,12 +425,123 @@ CDocument.prototype.Search_Set_Selection = function(bSelection)
     this.DrawingDocument.ClearCachePages();
     this.DrawingDocument.FirePaint();
 };
-
 CDocument.prototype.Search_Get_Selection = function()
 {
     return this.SearchEngine.Selection;
 };
+CDocument.prototype.private_GetSearchIdInMainDocument = function(isCurrent)
+{
+	var Id    = null;
+	var bNext = this.SearchEngine.GetDirection();
+	var Pos   = this.CurPos.ContentPos;
+	if (true === this.Selection.Use && selectionflag_Common === this.Selection.Flag)
+		Pos = bNext ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : Math.min(this.Selection.StartPos, this.Selection.EndPos);
 
+	if (true !== isCurrent)
+		Pos = bNext ? 0 : this.Content.length - 1;
+
+	if (true === bNext)
+	{
+		Id = this.Content[Pos].Search_GetId(true, isCurrent);
+
+		if (null != Id)
+			return Id;
+
+		Pos++;
+
+		var Count = this.Content.length;
+		while (Pos < Count)
+		{
+			Id = this.Content[Pos].Search_GetId(true, false);
+
+			if (null != Id)
+				return Id;
+
+			Pos++;
+		}
+	}
+	else
+	{
+		Id = this.Content[Pos].Search_GetId(false, isCurrent);
+
+		if (null != Id)
+			return Id;
+
+		Pos--;
+
+		while (Pos >= 0)
+		{
+			Id = this.Content[Pos].Search_GetId(false, false);
+
+			if (null != Id)
+				return Id;
+
+			Pos--;
+		}
+	}
+
+	return Id;
+};
+CDocument.prototype.private_GetSearchIdInHdrFtr = function(isCurrent)
+{
+	return this.SectionsInfo.Search_GetId(this.SearchEngine.GetDirection(), isCurrent ? this.HdrFtr.CurHdrFtr : null);
+};
+CDocument.prototype.private_GetSearchIdInFootnotes = function(isCurrent)
+{
+	var bNext        = this.SearchEngine.GetDirection();
+	var oCurFootnote = this.Footnotes.CurFootnote;
+
+	var arrFootnotes = this.SearchEngine.GetFootnotes();
+	var nCurPos      = -1;
+	var nCount       = arrFootnotes.length;
+
+	if (nCount <= 0)
+		return null;
+
+	if (isCurrent)
+	{
+		for (var nIndex = 0; nIndex < nCount; ++nIndex)
+		{
+			if (arrFootnotes[nIndex] === oCurFootnote)
+			{
+				nCurPos = nIndex;
+				break;
+			}
+		}
+	}
+
+	if (-1 == nCurPos)
+	{
+		nCurPos      = bNext ? 0 : nCount - 1;
+		oCurFootnote = arrFootnotes[nCurPos];
+		isCurrent    = false;
+	}
+
+	var Id = oCurFootnote.Search_GetId(bNext, isCurrent);
+	if (null !== Id)
+		return Id;
+
+	if (true === bNext)
+	{
+		for (var nIndex = nCurPos + 1; nIndex < nCount; ++nIndex)
+		{
+			Id = arrFootnotes[nIndex].Search_GetId(bNext, false);
+			if (null != Id)
+				return Id;
+		}
+	}
+	else
+	{
+		for (var nIndex = nCurPos - 1; nIndex >= 0; --nIndex)
+		{
+			Id = arrFootnotes[nIndex].Search_GetId(bNext, false);
+			if (null != Id)
+				return Id;
+		}
+	}
+
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // CDocumentContent
 //----------------------------------------------------------------------------------------------------------------------
@@ -601,97 +693,106 @@ CDocumentSectionsInfo.prototype.Search = function(Str, Props, SearchEngine)
 };
 
 CDocumentSectionsInfo.prototype.Search_GetId = function(bNext, CurHdrFtr)
-{       
-    var HdrFtrs = [];
-    var CurPos  = -1;
+{
+	var HdrFtrs = [];
+	var CurPos  = -1;
 
-    var bEvenOdd = EvenAndOddHeaders;
-    var Count = this.Elements.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        var SectPr = this.Elements[Index].SectPr;
-        var bFirst = SectPr.Get_TitlePage();
+	var bEvenOdd = EvenAndOddHeaders;
+	var Count    = this.Elements.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var SectPr = this.Elements[Index].SectPr;
+		var bFirst = SectPr.Get_TitlePage();
 
-        if ( null != SectPr.HeaderFirst && true === bFirst )
-        {
-            HdrFtrs.push( SectPr.HeaderFirst );
+		if (null != SectPr.HeaderFirst && true === bFirst)
+		{
+			HdrFtrs.push(SectPr.HeaderFirst);
 
-            if ( CurHdrFtr === SectPr.HeaderFirst )
-                CurPos = HdrFtrs.length - 1;
-        }
+			if (CurHdrFtr === SectPr.HeaderFirst)
+				CurPos = HdrFtrs.length - 1;
+		}
 
-        if ( null != SectPr.HeaderEven && true === bEvenOdd )
-        {
-            HdrFtrs.push( SectPr.HeaderEven );
+		if (null != SectPr.HeaderEven && true === bEvenOdd)
+		{
+			HdrFtrs.push(SectPr.HeaderEven);
 
-            if ( CurHdrFtr === SectPr.HeaderEven )
-                CurPos = HdrFtrs.length - 1;
-        }
+			if (CurHdrFtr === SectPr.HeaderEven)
+				CurPos = HdrFtrs.length - 1;
+		}
 
-        if ( null != SectPr.HeaderDefault )
-        {
-            HdrFtrs.push( SectPr.HeaderDefault );
+		if (null != SectPr.HeaderDefault)
+		{
+			HdrFtrs.push(SectPr.HeaderDefault);
 
-            if ( CurHdrFtr === SectPr.HeaderDefault )
-                CurPos = HdrFtrs.length - 1;
-        }
+			if (CurHdrFtr === SectPr.HeaderDefault)
+				CurPos = HdrFtrs.length - 1;
+		}
 
-        if ( null != SectPr.FooterFirst && true === bFirst )
-        {
-            HdrFtrs.push( SectPr.FooterFirst );
+		if (null != SectPr.FooterFirst && true === bFirst)
+		{
+			HdrFtrs.push(SectPr.FooterFirst);
 
-            if ( CurHdrFtr === SectPr.FooterFirst )
-                CurPos = HdrFtrs.length - 1;
-        }
+			if (CurHdrFtr === SectPr.FooterFirst)
+				CurPos = HdrFtrs.length - 1;
+		}
 
-        if ( null != SectPr.FooterEven && true === bEvenOdd )
-        {
-            HdrFtrs.push( SectPr.FooterEven );
+		if (null != SectPr.FooterEven && true === bEvenOdd)
+		{
+			HdrFtrs.push(SectPr.FooterEven);
 
-            if ( CurHdrFtr === SectPr.FooterEven )
-                CurPos = HdrFtrs.length - 1;
-        }
+			if (CurHdrFtr === SectPr.FooterEven)
+				CurPos = HdrFtrs.length - 1;
+		}
 
-        if ( null != SectPr.FooterDefault )
-        {
-            HdrFtrs.push( SectPr.FooterDefault );
+		if (null != SectPr.FooterDefault)
+		{
+			HdrFtrs.push(SectPr.FooterDefault);
 
-            if ( CurHdrFtr === SectPr.FooterDefault )
-                CurPos = HdrFtrs.length - 1;
-        }
-    }
-    
-    var Count = HdrFtrs.length;
+			if (CurHdrFtr === SectPr.FooterDefault)
+				CurPos = HdrFtrs.length - 1;
+		}
+	}
 
-    if ( -1 != CurPos )
-    {
-        var Id = CurHdrFtr.Search_GetId( bNext, true );
-        if ( null != Id )
-            return Id;
+	var Count = HdrFtrs.length;
 
-        if ( true === bNext )
-        {
-            for ( var Index = CurPos + 1; Index < Count; Index++ )
-            {
-                Id = HdrFtrs[Index].Search_GetId( bNext, false );
+	var isCurrent = true;
+	if (-1 === CurPos)
+	{
+		isCurrent = false;
+		CurPos    = bNext ? 0 : HdrFtrs.length - 1;
+		if (HdrFtrs[CurPos])
+			CurHdrFtr = HdrFtrs[CurPos];
+	}
 
-                if ( null != Id )
-                    return Id;
-            }
-        }
-        else
-        {
-            for ( var Index = CurPos - 1; Index >= 0; Index-- )
-            {
-                Id = HdrFtrs[Index].Search_GetId( bNext, false );
+	if (CurPos >= 0 && CurPos <= HdrFtrs.length - 1)
+	{
+		var Id = CurHdrFtr.Search_GetId(bNext, isCurrent);
+		if (null != Id)
+			return Id;
 
-                if ( null != Id )
-                    return Id;
-            }
-        }
-    }
+		if (true === bNext)
+		{
+			for (var Index = CurPos + 1; Index < Count; Index++)
+			{
+				Id = HdrFtrs[Index].Search_GetId(bNext, false);
 
-    return null;
+				if (null != Id)
+					return Id;
+			}
+		}
+		else
+		{
+			for (var Index = CurPos - 1; Index >= 0; Index--)
+			{
+				Id = HdrFtrs[Index].Search_GetId(bNext, false);
+
+				if (null != Id)
+					return Id;
+			}
+		}
+	}
+
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // CTable

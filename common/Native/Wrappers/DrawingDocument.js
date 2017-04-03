@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -142,8 +142,8 @@ function CTableOutlineDr()
 
     // TABLE_STYLES
     this.TableStylesLastLook = null;
-    this.TableStylesSheckLook = null;
-    this.TableStylesSheckLookFlag = false;
+    this.TableStylesСheckLook = null;
+    this.TableStylesСheckLookFlag = false;
 
     this.TableStylesSendOne = false;
 
@@ -538,6 +538,205 @@ function CTableOutlineDr()
     }
 }
 
+function CDrawingCollaborativeTarget()
+{
+	this.Id = "";
+	this.ShortId = "";
+
+	this.X = 0;
+	this.Y = 0;
+	this.Size = 0;
+	this.Page = -1;
+
+	this.Color = null;
+	this.Transform = null;
+
+	this.HtmlElement = null;
+	this.HtmlElementX = 0;
+	this.HtmlElementY = 0;
+
+	this.Color = null;
+
+	this.Style = "";
+}
+CDrawingCollaborativeTarget.prototype =
+{
+	CheckPosition: function (_drawing_doc, _x, _y, _size, _page, _transform)
+	{
+		// 1) создаем новый элемент, если еще его не было
+		// var bIsHtmlElementCreate = false;
+		// if (this.HtmlElement == null)
+		// {
+		// 	bIsHtmlElementCreate = true;
+		// 	this.HtmlElement = document.createElement('canvas');
+		// 	this.HtmlElement.style.cssText = "pointer-events: none;position:absolute;padding:0;margin:0;-webkit-user-select:none;width:1px;height:1px;display:block;z-index:3;";
+		// 	this.HtmlElement.width = 1;
+		// 	this.HtmlElement.height = 1;
+    //
+		// 	this.Color = AscCommon.getUserColorById(this.ShortId, null, true);
+		// 	this.Style = "rgb(" + this.Color.r + "," + this.Color.g + "," + this.Color.b + ")";
+		// }
+    //
+		 // 2) определяем размер
+		 this.Transform = _transform;
+		 this.Size = _size;
+
+		 var _old_x = this.X;
+		 var _old_y = this.Y;
+		 var _old_page = this.Page;
+
+		 this.X = _x;
+		 this.Y = _y;
+		 this.Page = _page;
+
+		// var _oldW = this.HtmlElement.width;
+		// var _oldH = this.HtmlElement.height;
+    //
+		// var _newW = 2;
+		// var _newH = (this.Size * _drawing_doc.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100) >> 0;
+    //
+		// if (null != this.Transform && !global_MatrixTransformer.IsIdentity2(this.Transform))
+		// {
+		// 	var _x1 = this.Transform.TransformPointX(_x, _y);
+		// 	var _y1 = this.Transform.TransformPointY(_x, _y);
+    //
+		// 	var _x2 = this.Transform.TransformPointX(_x, _y + this.Size);
+		// 	var _y2 = this.Transform.TransformPointY(_x, _y + this.Size);
+    //
+		// 	var pos1 = _drawing_doc.ConvertCoordsToCursor2(_x1, _y1, this.Page);
+		// 	var pos2 = _drawing_doc.ConvertCoordsToCursor2(_x2, _y2, this.Page);
+    //
+		// 	_newW = (Math.abs(pos1.X - pos2.X) >> 0) + 1;
+		// 	_newH = (Math.abs(pos1.Y - pos2.Y) >> 0) + 1;
+    //
+		// 	if (2 > _newW)
+		// 		_newW = 2;
+		// 	if (2 > _newH)
+		// 		_newH = 2;
+    //
+		// 	if (_oldW == _newW && _oldH == _newH)
+		// 	{
+		// 		if (_newW != 2 && _newH != 2)
+		// 		{
+		// 			// просто очищаем
+		// 			this.HtmlElement.width = _newW;
+		// 		}
+		// 	}
+		// 	else
+		// 	{
+		// 		this.HtmlElement.style.width = _newW + "px";
+		// 		this.HtmlElement.style.height = _newH + "px";
+    //
+		// 		this.HtmlElement.width = _newW;
+		// 		this.HtmlElement.height = _newH;
+		// 	}
+		// 	var ctx = this.HtmlElement.getContext('2d');
+    //
+		// 	if (_newW == 2 || _newH == 2)
+		// 	{
+		// 		ctx.fillStyle = this.Style;
+		// 		ctx.fillRect(0, 0, _newW, _newH);
+		// 	}
+		// 	else
+		// 	{
+		// 		ctx.beginPath();
+		// 		ctx.strokeStyle = this.Style;
+		// 		ctx.lineWidth = 2;
+    //
+		// 		if (((pos1.X - pos2.X) * (pos1.Y - pos2.Y)) >= 0)
+		// 		{
+		// 			ctx.moveTo(0, 0);
+		// 			ctx.lineTo(_newW, _newH);
+		// 		}
+		// 		else
+		// 		{
+		// 			ctx.moveTo(0, _newH);
+		// 			ctx.lineTo(_newW, 0);
+		// 		}
+    //
+		// 		ctx.stroke();
+		// 	}
+    //
+		// 	this.HtmlElementX = Math.min(pos1.X, pos2.X) >> 0;
+		// 	this.HtmlElementY = Math.min(pos1.Y, pos2.Y) >> 0;
+		// 	if ((!_drawing_doc.m_oWordControl.MobileTouchManager && !AscCommon.AscBrowser.isSafariMacOs) || !AscCommon.AscBrowser.isWebkit)
+		// 	{
+		// 		this.HtmlElement.style.left = this.HtmlElementX + "px";
+		// 		this.HtmlElement.style.top = this.HtmlElementY + "px";
+		// 	}
+		// 	else
+		// 	{
+		// 		this.HtmlElement.style.left = "0px";
+		// 		this.HtmlElement.style.top = "0px";
+		// 		this.HtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + this.HtmlElementX + "," + this.HtmlElementY + ")";
+		// 	}
+		// }
+		// else
+		// {
+		// 	if (_oldW == _newW && _oldH == _newH)
+		// 	{
+		// 		// просто очищаем
+		// 		this.HtmlElement.width = _newW;
+		// 	}
+		// 	else
+		// 	{
+		// 		this.HtmlElement.style.width = _newW + "px";
+		// 		this.HtmlElement.style.height = _newH + "px";
+    //
+		// 		this.HtmlElement.width = _newW;
+		// 		this.HtmlElement.height = _newH;
+		// 	}
+    //
+		// 	var ctx = this.HtmlElement.getContext('2d');
+    //
+		// 	ctx.fillStyle = this.Style;
+		// 	ctx.fillRect(0, 0, _newW, _newH);
+    //
+		// 	if (null != this.Transform)
+		// 	{
+		// 		_x += this.Transform.tx;
+		// 		_y += this.Transform.ty;
+		// 	}
+    //
+		// 	var pos = _drawing_doc.ConvertCoordsToCursor2(_x, _y, this.Page);
+    //
+		// 	this.HtmlElementX = pos.X >> 0;
+		// 	this.HtmlElementY = pos.Y >> 0;
+    //
+		// 	if ((!_drawing_doc.m_oWordControl.MobileTouchManager && !AscCommon.AscBrowser.isSafariMacOs) || !AscCommon.AscBrowser.isWebkit)
+		// 	{
+		// 		this.HtmlElement.style.left = this.HtmlElementX + "px";
+		// 		this.HtmlElement.style.top = this.HtmlElementY + "px";
+		// 	}
+		// 	else
+		// 	{
+		// 		this.HtmlElement.style.left = "0px";
+		// 		this.HtmlElement.style.top = "0px";
+		// 		this.HtmlElement.style["webkitTransform"] = "matrix(1, 0, 0, 1, " + this.HtmlElementX + "," + this.HtmlElementY + ")";
+		// 	}
+		// }
+    //
+		// if (AscCommon.CollaborativeEditing)
+		// 	AscCommon.CollaborativeEditing.Update_ForeignCursorLabelPosition(this.Id, this.HtmlElementX, this.HtmlElementY, this.Color);
+    //
+		// // 3) добавить, если нужно
+		// if (bIsHtmlElementCreate)
+		// {
+		// 	_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.HtmlElement);
+		// }
+	},
+
+	Remove: function (_drawing_doc)
+	{
+		//_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
+	},
+
+	Update: function (_drawing_doc)
+	{
+		//this.CheckPosition(_drawing_doc, this.X, this.Y, this.Size, this.Page, this.Transform);
+	}
+};
+
 function CDrawingDocument()
 {
     this.Native = window["native"];
@@ -547,7 +746,7 @@ function CDrawingDocument()
     this.IsLockObjectsEnable    = false;
     this.LogicDocument          = null;
     this.m_bIsMouseLock         = false;
-    
+
     this.CanvasHitContext       = CreateHitControl();
 
     this.m_dTargetSize          = 0;
@@ -556,7 +755,7 @@ function CDrawingDocument()
     this.Frame = null;
     this.Table = null;
     this.AutoShapesTrack        = new AscCommon.CAutoshapeTrack();
-    
+
     this.m_oWordControl = this;
 
     this.IsUpdateOverlayOnlyEnd         = false;
@@ -576,9 +775,9 @@ function CDrawingDocument()
 
     this.IsKeyDownButNoPress    = false;
     this.bIsUseKeyPress         = false;
-    
+
     this.m_sLockedCursorType    = "";
-    
+
     this.AutoShapesTrackLockPageNum = -1;
 
     // inline text track
@@ -589,9 +788,9 @@ function CDrawingDocument()
     // frame rect
     this.FrameRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0 }, Frame : null,
         Track : { X : 0, Y : 0, L : 0, T : 0, R : 0, B : 0, PageIndex : 0, Type : -1 }, IsTracked : false, PageIndex : 0 };
-	
-	// math rect
-	this.MathRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0, PageIndex : 0 } };
+
+	  // math rect
+	  this.MathRect = { IsActive : false, Rect : { X : 0, Y : 0, R : 0, B : 0, PageIndex : 0 } };
 
     // table track
     this.TableOutlineDr = new CTableOutlineDr();
@@ -612,6 +811,9 @@ function CDrawingDocument()
 
     this.UpdateRulerStateFlag = false;
     this.UpdateRulerStateParams = [];
+
+    this.CollaborativeTargets = [];
+    this.CollaborativeTargetsUpdateTasks = [];
 }
 
 var _table_styles = null;
@@ -626,7 +828,7 @@ CDrawingDocument.prototype =
         this.m_oApi.DocumentUrl = "";
         this.LogicDocument = window.editor.WordControl.m_oLogicDocument;
         this.LogicDocument.DrawingDocument = this;
-       
+
         this.selectionMatrix = null;
         this.isSelectionMatrix = false;
     },
@@ -781,7 +983,7 @@ CDrawingDocument.prototype =
             this.TextMatrix.sy = matrix.sy;
             this.TextMatrix.tx = matrix.tx;
             this.TextMatrix.ty = matrix.ty;
-            
+
             this.Native["DD_UpdateTargetTransform"](matrix.sx, matrix.shy, matrix.shx, matrix.sy, matrix.tx, matrix.ty);
         }
         else
@@ -904,6 +1106,7 @@ CDrawingDocument.prototype =
     AddPageSelection : function(pageIndex, x, y, w, h)
     {
         this.selectionMatrix = this.TextMatrix;
+
         this.Native["DD_AddPageSelection"](pageIndex, x, y, w, h);
     },
     OnSelectEnd : function()
@@ -957,10 +1160,10 @@ CDrawingDocument.prototype =
     {
         this.Native["DD_EndSearch"](bIsChange);
     },
-    
+
     SetTextSelectionOutline : function(isSelectionOutline)
     {
-        
+
     },
 
     // ruler states
@@ -1248,8 +1451,8 @@ CDrawingDocument.prototype =
     CheckFontNeeds : function()
     {
     },
-	
-	BeginDrawTracking: function()
+
+	  BeginDrawTracking: function()
     {
         if (this.AutoShapesTrack.BeginDrawTracking) {
             this.AutoShapesTrack.BeginDrawTracking();
@@ -1339,7 +1542,7 @@ CDrawingDocument.prototype =
     OnUpdateOverlay : function()
     {
         isSelectionMatrix = false;
-        
+
         if (this.IsUpdateOverlayOnlyEnd)
         {
             this.IsUpdateOverlayOnEndCheck = true;
@@ -1465,7 +1668,7 @@ CDrawingDocument.prototype =
         // 0 - none
         // 1 - select markers
         // 2 - drawing track
-        
+
         var matrixCheck = this.selectionMatrix; // this.TextMatrix
 
         check_MouseDownEvent(e, false);
@@ -1610,8 +1813,7 @@ CDrawingDocument.prototype =
 
                 var _isDrawings = this.LogicDocument.DrawingObjects.isPointInDrawingObjects2(pos.X, pos.Y, pos.Page, true);
 
-                if (_isDrawings)
-                {
+                if (_isDrawings) {
                     this.OnMouseDown(e);
                 }
 
@@ -1662,8 +1864,9 @@ CDrawingDocument.prototype =
              return;
              */
             var is_drawing = this.checkMouseDown_Drawing(pos);
-            if (is_drawing === true)
+            if (is_drawing === true) {
                 return;
+            }
 
             this.Native["DD_NeedScrollToTargetFlag"](true);
             this.LogicDocumentOnMouseDown(global_mouseEvent, pos.X, pos.Y, pos.Page);
@@ -1791,8 +1994,8 @@ CDrawingDocument.prototype =
     {
         if (this.SelectDrag == 1 || this.SelectDrag == 2)
         {
-            global_mouseEvent.X += this.SelectMobileXOffset;
-            global_mouseEvent.Y += this.SelectMobileYOffset;
+            //  global_mouseEvent.X += this.SelectMobileXOffset;
+            //  global_mouseEvent.Y += this.SelectMobileYOffset;
         }
 
         var pos = null;
@@ -2033,23 +2236,23 @@ CDrawingDocument.prototype =
 
     __DD_ConvetToPageCoords : function(x, y, page)
     {
-        var pos = this.Native["DD_ConvetToPageCoords"](x, y, page);
+        var pos = window["native"]["DD_ConvetToPageCoords"](x, y, page);
         return { X : pos["X"], Y : pos["Y"], Page : pos["Page"] };
     },
 
     ///////////////////////////////////////////
     StartTableStylesCheck : function()
     {
-        this.TableStylesSheckLookFlag = true;
+        this.TableStylesСheckLookFlag = true;
     },
 
     EndTableStylesCheck : function()
     {
-        this.TableStylesSheckLookFlag = false;
-        if (this.TableStylesSheckLook != null)
+        this.TableStylesСheckLookFlag = false;
+        if (this.TableStylesСheckLook != null)
         {
-            this.CheckTableStyles(this.TableStylesSheckLook);
-            this.TableStylesSheckLook = null;
+            this.CheckTableStyles(this.TableStylesСheckLook);
+            this.TableStylesСheckLook = null;
         }
     },
 
@@ -2071,9 +2274,9 @@ CDrawingDocument.prototype =
         if (true === this.TableStylesSendOne)
             return;
 
-        if (this.TableStylesSheckLookFlag)
+        if (this.TableStylesСheckLookFlag)
         {
-            this.TableStylesSheckLook = tableLook;
+            this.TableStylesСheckLook = tableLook;
             return;
         }
 
@@ -2232,15 +2435,12 @@ CDrawingDocument.prototype =
 
         this.Native["DD_EndNativeDraw"](_stream);
     },
-    
+
     CheckGuiControlColors : function ()
     {
-        
+
     },
     SendControlColors : function()
-    {
-    },
-    SendThemeColorScheme : function()
     {
     },
     DrawImageTextureFillShape : function()
@@ -2828,7 +3028,72 @@ CDrawingDocument.prototype =
         var ret = Renderer.Memory.GetBase64Memory();
         //console.log(ret);
         return ret;
-    }
+    },
+
+    // collaborative targets
+  	Collaborative_UpdateTarget : function (_id, _shortId, _x, _y, _size, _page, _transform, is_from_paint)
+  	{
+  		if (is_from_paint !== true)
+  		{
+  			this.CollaborativeTargetsUpdateTasks.push([_id, _shortId, _x, _y, _size, _page, _transform]);
+  			return;
+  		}
+
+  		for (var i = 0; i < this.CollaborativeTargets.length; i++)
+  		{
+  			if (_id == this.CollaborativeTargets[i].Id)
+  			{
+  				this.CollaborativeTargets[i].CheckPosition(this, _x, _y, _size, _page, _transform);
+  				return;
+  			}
+  		}
+  		var _target = new CDrawingCollaborativeTarget();
+  		_target.Id = _id;
+  		_target.ShortId = _shortId;
+  		_target.CheckPosition(this, _x, _y, _size, _page, _transform);
+  		this.CollaborativeTargets[this.CollaborativeTargets.length] = _target;
+  	},
+  	Collaborative_RemoveTarget : function (_id)
+  	{
+  		for (var i = 0; i < this.CollaborativeTargets.length; i++)
+  		{
+  			if (_id == this.CollaborativeTargets[i].Id)
+  			{
+  				this.CollaborativeTargets[i].Remove(this);
+  				this.CollaborativeTargets.splice(i, 1);
+  			}
+  		}
+  	},
+  	Collaborative_TargetsUpdate : function (bIsChangePosition)
+  	{
+  		var _len_tasks = this.CollaborativeTargetsUpdateTasks.length;
+  		var i = 0;
+  		for (i = 0; i < _len_tasks; i++)
+  		{
+  			var _tmp = this.CollaborativeTargetsUpdateTasks[i];
+  			this.Collaborative_UpdateTarget(_tmp[0], _tmp[1], _tmp[2], _tmp[3], _tmp[4], _tmp[5], _tmp[6], true);
+  		}
+  		if (_len_tasks != 0)
+  			this.CollaborativeTargetsUpdateTasks.splice(0, _len_tasks);
+
+  		if (bIsChangePosition)
+  		{
+  			for (i = 0; i < this.CollaborativeTargets.length; i++)
+  			{
+  				this.CollaborativeTargets[i].Update(this);
+  			}
+  		}
+  	},
+  	Collaborative_GetTargetPosition : function (UserId)
+  	{
+  		for (var i = 0; i < this.CollaborativeTargets.length; i++)
+  		{
+  			if (UserId == this.CollaborativeTargets[i].Id)
+  				return {X: this.CollaborativeTargets[i].HtmlElementX, Y: this.CollaborativeTargets[i].HtmlElementY};
+  		}
+
+  		return null;
+  	}
 };
 
 function check_KeyboardEvent(e)
@@ -2878,7 +3143,7 @@ function check_MouseDownEvent(e, isClicks)
     {
         global_mouseEvent.ClickCount     = 1;
     }
-    
+
     global_mouseEvent.IsLocked = true;
 }
 
@@ -2908,7 +3173,7 @@ function check_MouseUpEvent(e)
     global_mouseEvent.Button    = e["Button"];
 
     global_mouseEvent.Sender    = null;
-    
+
     global_mouseEvent.IsLocked  = false;
 }
 

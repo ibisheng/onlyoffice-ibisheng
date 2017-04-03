@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -39,10 +39,12 @@
      * @extends {CDocumentContent}
      */
     function CDrawingDocContent(Parent, DrawingDocument, X, Y, XLimit, YLimit) {
-        CDrawingDocContent.superclass.constructor.call(this, Parent, DrawingDocument, X, Y, XLimit, YLimit, false, false, true);
+		CDocumentContent.call(this, Parent, DrawingDocument, X, Y, XLimit, YLimit, false, false, true);
         this.FullRecalc = new CDocumentRecalculateState();
     }
-    AscCommon.extendClass(CDrawingDocContent, CDocumentContent);
+
+	CDrawingDocContent.prototype = Object.create(CDocumentContent.prototype);
+	CDrawingDocContent.prototype.constructor = CDrawingDocContent;
 
     CDrawingDocContent.prototype.Get_SummaryHeight = function(){
         var fSummHeight = 0;
@@ -425,6 +427,14 @@
         return false;
     };
 
+    CDrawingDocContent.prototype.Is_ChartTitleContent = function(){
+        if(this.Parent instanceof AscFormat.CTextBody &&
+        this.Parent.parent instanceof AscFormat.CTitle){
+            return true;
+        }
+        return false;
+    };
+
     CDrawingDocContent.prototype.Selection_Draw_Page = function(PageIndex){
         var CurPage = PageIndex;
         if (CurPage < 0 || CurPage >= this.Pages.length)
@@ -595,6 +605,34 @@
             DC.Internal_Content_Add(Index, this.Content[Index].Copy2(DC), false);
         }
         return DC;
+    };
+
+    CDrawingDocContent.prototype.Recalculate = function()
+    {
+
+        if(typeof editor !== "undefined" && editor &&
+            (editor.isPresentationEditor || editor.isDocumentEditor)){
+               if(editor.WordControl && editor.WordControl.m_oLogicDocument){
+                   editor.WordControl.m_oLogicDocument.Recalculate();
+               }
+        }
+        else{
+            if(this.Parent){
+                if(this.Parent instanceof AscFormat.CShape){
+                    this.Parent.recalculateContent();
+                    return;
+                }
+                else if(this.Parent && this.Parent.parent){
+                    if(this.Parent.parent instanceof AscFormat.CShape){
+                        this.Parent.parent.recalculateContent();
+                        return;
+                    }
+                }
+            }
+            if(this.XLimit > 0){
+                this.Recalculate_PageDrawing();
+            }
+        }
     };
 
     // TODO: сделать по-нормальному!!!

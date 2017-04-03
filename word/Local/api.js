@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -101,9 +101,9 @@ Asc['asc_docs_api'].prototype["asc_setAdvancedOptions"] = Asc['asc_docs_api'].pr
 /////////////////////////////////////////////////////////
 AscCommon.CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 {
+	this.SavedIndex = (null === this.SavedIndex && -1 === this.Index ? null : this.Index);
 	if (true === this.Is_UserSaveMode())
 	{
-		this.SavedIndex = this.Index;
 		if (true === IsUserSave)
 		{
 			this.UserSavedIndex = this.Index;
@@ -112,7 +112,6 @@ AscCommon.CHistory.prototype.Reset_SavedIndex = function(IsUserSave)
 	}
 	else
 	{
-		this.SavedIndex = this.Index;
 		this.ForceSave  = false;
 	}
 };

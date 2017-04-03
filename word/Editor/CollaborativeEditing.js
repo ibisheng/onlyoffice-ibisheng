@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -39,7 +39,7 @@
  */
 function CWordCollaborativeEditing()
 {
-    CWordCollaborativeEditing.superclass.constructor.call(this);
+	AscCommon.CCollaborativeEditingBase.call(this);
 
     this.m_oLogicDocument        = null;
     this.m_aDocumentPositions    = new AscCommon.CDocumentPositionsManager();
@@ -49,7 +49,8 @@ function CWordCollaborativeEditing()
     this.m_aForeignCursorsToShow = {};
 }
 
-AscCommon.extendClass(CWordCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
+CWordCollaborativeEditing.prototype = Object.create(AscCommon.CCollaborativeEditingBase.prototype);
+CWordCollaborativeEditing.prototype.constructor = CWordCollaborativeEditing;
 
 CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo, IsUpdateInterface)
 {
@@ -81,7 +82,7 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     }
     var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
 
-    var aChanges = [];
+    var aChanges = [], aChanges2 = [];
     for (var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++)
     {
         var Point = AscCommon.History.Points[PointIndex];
@@ -92,6 +93,9 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
             var Item = Point.Items[Index];
             var oChanges = new AscCommon.CCollaborativeChanges();
             oChanges.Set_FromUndoRedo(Item.Class, Item.Data, Item.Binary);
+
+            aChanges2.push(Item.Data);
+
             aChanges.push(oChanges.m_pData);
         }
     }
@@ -110,12 +114,18 @@ CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, Addition
     this.m_aNeedUnlock.length = 0;
     this.m_aNeedUnlock2.length = 0;
 
-    var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
-    if (0 < aChanges.length || null !== deleteIndex) {
-        editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
-        AscCommon.History.CanNotAddChanges = true;
-    } else
-        editor.CoAuthoringApi.unLockDocument(true);
+	var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
+	if (0 < aChanges.length || null !== deleteIndex)
+	{
+		this.private_OnSendOwnChanges(aChanges2, deleteIndex);
+		editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2);
+		AscCommon.History.CanNotAddChanges = true;
+	}
+	else
+	{
+		editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2);
+	}
+	editor.canUnlockDocument2 = false;
 
     if (-1 === this.m_nUseType)
     {
@@ -186,8 +196,8 @@ CWordCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     // Данная функция вызывается, когда загрузились внешние объекты (картинки и шрифты)
 
     // Снимаем лок
-    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
-    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = false;
+    AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+    AscCommon.CollaborativeEditing.Set_GlobalLockSelection(false);
 
     // Запускаем полный пересчет документа
     var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -249,7 +259,9 @@ CWordCollaborativeEditing.prototype.OnEnd_CheckLock = function(DontLockInFastMod
 
         // Ставим глобальный лок, только во время совместного редактирования
         if (-1 === this.m_nUseType)
-            this.m_bGlobalLock = true;
+		{
+			this.Set_GlobalLock(true);
+		}
         else
         {
             // Пробегаемся по массиву и проставляем, что залочено нами
@@ -280,7 +292,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
     var oThis   = AscCommon.CollaborativeEditing;
     var oEditor = editor;
 
-    if (true === oThis.m_bGlobalLock)
+    if (true === oThis.Get_GlobalLock())
     {
         // Здесь проверяем есть ли длинная операция, если она есть, то до ее окончания нельзя делать
         // Undo, иначе точка истории уберется, а изменения допишутся в предыдущую.
@@ -288,7 +300,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
             return;
 
         // Снимаем глобальный лок
-        oThis.m_bGlobalLock = false;
+        oThis.Set_GlobalLock(false);
 
         if (result["lock"])
         {
@@ -577,6 +589,12 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function
     var Api = this.m_oLogicDocument.Get_Api();
     Api.sync_ShowForeignCursorLabel(UserId, X, Y, Color);
 };
+
+
+CWordCollaborativeEditing.prototype.private_RecalculateDocument = function(oRecalcData){
+    this.m_oLogicDocument.Recalculate(false, false, oRecalcData);
+};
+
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};

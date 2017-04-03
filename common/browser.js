@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -54,7 +54,8 @@ var AscBrowser = {
     isArm : false,
     isMozilla : false,
 	isRetina : false,
-    isLinuxOS : false
+    isLinuxOS : false,
+	retinaPixelRatio : 1
 };
 
 // user agent lower case
@@ -114,12 +115,17 @@ AscBrowser.zoom = 1;
 AscBrowser.checkZoom = function()
 {
     if (AscBrowser.isAndroid)
-        return;
+	{
+		AscBrowser.isRetina = (window.devicePixelRatio >= 1.9);
+		AscBrowser.retinaPixelRatio = window.devicePixelRatio;
+		return;
+	}
 
 	AscBrowser.zoom = 1.0;
 	AscBrowser.isRetina = false;
+	AscBrowser.retinaPixelRatio = 1;
 
-    if (AscBrowser.isChrome && !AscBrowser.isOpera && document && document.firstElementChild && document.body)
+    if (AscBrowser.isChrome && !AscBrowser.isOpera && !AscBrowser.isMobile && document && document.firstElementChild && document.body)
     {
         if (false)
 		{
@@ -171,14 +177,33 @@ AscBrowser.checkZoom = function()
 			else
 				document.firstElementChild.style.zoom = "normal";
         }
+
+        if (AscBrowser.isRetina)
+        	AscBrowser.retinaPixelRatio = 2;
     }
     else
     {
 		AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+		if (AscBrowser.isRetina)
+			AscBrowser.retinaPixelRatio = 2;
+
+		if (AscBrowser.isMobile)
+		{
+			AscBrowser.isRetina = (window.devicePixelRatio >= 1.9);
+			AscBrowser.retinaPixelRatio = window.devicePixelRatio;
+		}
     }
 };
 
 AscBrowser.checkZoom();
+
+AscBrowser.convertToRetinaValue = function(value, isScale)
+{
+	if (isScale === true)
+		return ((value * AscBrowser.retinaPixelRatio) + 0.5) >> 0;
+	else
+		return ((value / AscBrowser.retinaPixelRatio) + 0.5) >> 0;
+};
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};

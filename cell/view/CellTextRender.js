@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -63,7 +63,7 @@
 		 * @extends {AscCommonExcel.StringRender}
 		 */
 		function CellTextRender(drawingCtx) {
-			CellTextRender.superclass.constructor.call(this, drawingCtx);
+			AscCommonExcel.StringRender.apply(this, arguments);
 
 			/** @type RegExp */
 			this.reWordBegining = new XRegExp("[^\\p{L}\\p{N}][\\p{L}\\p{N}]", "i");
@@ -71,8 +71,8 @@
 			return this;
 		}
 
-		AscCommon.extendClass(CellTextRender, AscCommonExcel.StringRender);
-
+		CellTextRender.prototype = Object.create(AscCommonExcel.StringRender.prototype);
+		CellTextRender.prototype.constructor = CellTextRender;
 		CellTextRender.prototype.getLinesCount = function () {
 			return this.lines.length;
 		};
@@ -208,14 +208,6 @@
 			}
 
 			co = this.charOffset(pos, i - 1, h);
-
-			// если самый последний символ - это новая строка, то надо сместить еще на одну линию
-			if (t.charWidths[t.chars.length - 1] === 0) {
-				co.left = null;
-				co.top += l[i - 1].th;
-				co.lineIndex++;
-			}
-
 			return co;
 		};
 
@@ -238,10 +230,6 @@
 
 		CellTextRender.prototype.getCharWidth = function (pos) {
 			return this.charWidths[pos];
-		};
-
-		CellTextRender.prototype.isLastCharNL = function () {
-			return this.charWidths[this.chars.length - 1] === 0;
 		};
 
 

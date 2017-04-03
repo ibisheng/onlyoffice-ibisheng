@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -34,6 +34,52 @@
 
 // Import
 var History = AscCommon.History;
+
+
+ AscDFH.changesFactory[AscDFH.historyitem_SlideMasterSetThemeIndex]     = AscDFH.CChangesDrawingsLong            ;
+ AscDFH.changesFactory[AscDFH.historyitem_SlideMasterSetSize]           = AscDFH.CChangesDrawingsObjectNoId      ;
+ AscDFH.changesFactory[AscDFH.historyitem_SlideMasterSetTheme]          = AscDFH.CChangesDrawingsObject          ;
+ AscDFH.changesFactory[AscDFH.historyitem_SlideMasterAddToSpTree]       = AscDFH.CChangesDrawingsContent         ;
+ AscDFH.changesFactory[AscDFH.historyitem_SlideMasterSetBg]             = AscDFH.CChangesDrawingsObjectNoId      ;
+ AscDFH.changesFactory[AscDFH.historyitem_SlideMasterSetTxStyles]       = AscDFH.CChangesDrawingsObjectNoId      ;
+ AscDFH.changesFactory[AscDFH.historyitem_SlideMasterSetCSldName]       = AscDFH.CChangesDrawingsString          ;
+ AscDFH.changesFactory[AscDFH.historyitem_SlideMasterSetClrMapOverride] = AscDFH.CChangesDrawingsObject          ;
+ AscDFH.changesFactory[AscDFH.historyitem_SlideMasterAddLayout]         = AscDFH.CChangesDrawingsContent         ;
+
+ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideMasterSetThemeIndex]     = function(oClass, value){oClass.ThemeIndex = value;};
+ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideMasterSetSize]           = function(oClass, value){oClass.Width = value.a; oClass.Height = value.b;};
+ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideMasterSetTheme]          = function(oClass, value){oClass.Theme = value;};
+
+ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideMasterSetBg]             = function(oClass, value, FromLoad){
+     oClass.cSld.Bg = value;
+     if(FromLoad){
+         var Fill;
+         if(oClass.cSld.Bg && oClass.cSld.Bg.bgPr && oClass.cSld.Bg.bgPr.Fill)
+         {
+             Fill = oClass.cSld.Bg.bgPr.Fill;
+         }
+         if(typeof AscCommon.CollaborativeEditing !== "undefined")
+         {
+             if(Fill && Fill.fill && Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
+             {
+                 AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Fill.fill.RasterImageId));
+             }
+         }
+     }
+ };
+ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideMasterSetTxStyles]       = function(oClass, value){oClass.txStyles = value;};
+ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideMasterSetCSldName]       = function(oClass, value){oClass.cSld.name = value;};
+ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideMasterSetClrMapOverride] = function(oClass, value){oClass.clrMap = value;};
+
+
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideMasterSetSize]      = AscFormat.CDrawingBaseCoordsWritable;
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideMasterSetBg]        = AscFormat.CBg;
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_SlideMasterSetTxStyles]  = AscFormat.CTextStyles;
+
+
+AscDFH.drawingContentChanges[AscDFH.historyitem_SlideMasterAddToSpTree]       = function(oClass){return oClass.cSld.spTree;};
+AscDFH.drawingContentChanges[AscDFH.historyitem_SlideMasterAddLayout]         = function(oClass){return oClass.sldLayoutLst;};
+
 
 function MasterSlide(presentation, theme)
 {
@@ -95,114 +141,8 @@ MasterSlide.prototype =
 
     setThemeIndex: function(index)
     {
-        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetThemeIndex, oldPr: this.ThemeIndex, newPr: index});
+        History.Add(new AscDFH.CChangesDrawingsLong(this, AscDFH.historyitem_SlideMasterSetThemeIndex, this.ThemeIndex, index));
         this.ThemeIndex = index;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_SlideMasterSetSize:
-            {
-                this.Width  = data.oldW;
-                this.Height = data.oldH;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetThemeIndex:
-            {
-                this.ThemeIndex = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterAddToSpTree:
-            {
-                this.cSld.spTree.splice(data.Pos, 1);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetTheme :
-            {
-                this.Theme = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetBg               :
-            {
-                this.cSld.Bg = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetTxStyles         :
-            {
-                this.txStyles = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetCSldName         :
-            {
-                this.cSld.name = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
-            {
-                this.clrMap = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterAddLayout           :
-            {
-                this.sldLayoutLst.splice(data.Pos, 1);
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_SlideMasterSetSize:
-            {
-                this.Width  = data.newW;
-                this.Height = data.newH;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetThemeIndex:
-            {
-                this.ThemeIndex = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterAddToSpTree:
-            {
-                this.cSld.spTree.splice(data.Pos, 0, data.Item);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetTheme :
-            {
-                this.Theme = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetBg               :
-            {
-                this.cSld.Bg = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetTxStyles         :
-            {
-                this.txStyles = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetCSldName         :
-            {
-                this.cSld.name = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
-            {
-                this.clrMap = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterAddLayout           :
-            {
-                this.sldLayoutLst.splice(data.Pos, 0, data.Item);
-                break;
-            }
-        }
     },
 
     Write_ToBinary2: function(w)
@@ -217,137 +157,6 @@ MasterSlide.prototype =
         this.Id = r.GetString2();
         this.theme = AscFormat.readObject(r);
     },
-
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_SlideMasterSetSize:
-            {
-                AscFormat.writeDouble(w, data.newW);
-                AscFormat.writeDouble(w, data.newH);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterAddToSpTree:
-            case AscDFH.historyitem_SlideMasterAddLayout           :
-            {
-                AscFormat.writeLong(w, data.Pos);
-                AscFormat.writeObject(w, data.Item);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetBg :
-            case AscDFH.historyitem_SlideMasterSetTxStyles         :
-            {
-                data.newPr.Write_ToBinary(w);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetCSldName         :
-            {
-                AscFormat.writeString(w, data.newPr);
-                break;
-            }
-
-            case AscDFH.historyitem_SlideMasterSetTheme :
-            case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
-            {
-                AscFormat.writeObject(w, data.newPr);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetThemeIndex:
-            {
-                AscFormat.writeLong(w, data.newPr);
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        var type = r.GetLong();
-        switch(type)
-        {
-            case AscDFH.historyitem_SlideMasterSetSize:
-            {
-                this.Width  = AscFormat.readDouble(r);
-                this.Height = AscFormat.readDouble(r);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterAddToSpTree:
-            {
-                var Pos = AscFormat.readLong(r);
-                var Item = AscFormat.readObject(r);
-                this.cSld.spTree.splice(Pos, 0, Item);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetTheme :
-            {
-                this.Theme = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetBg               :
-            {
-                this.cSld.Bg = new AscFormat.CBg();
-                this.cSld.Bg.Read_FromBinary(r);
-                var Fill;
-                if(this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill)
-                {
-                    Fill = this.cSld.Bg.bgPr.Fill;
-                }
-                if(typeof AscCommon.CollaborativeEditing !== "undefined")
-                {
-                    if(Fill && Fill.fill && Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
-                    {
-                        AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Fill.fill.RasterImageId));
-                    }
-                }
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetTxStyles         :
-            {
-                this.txStyles = new AscFormat.CTextStyles();
-                this.txStyles.Read_FromBinary(r);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetCSldName         :
-            {
-                this.cSld.name = AscFormat.readString(r);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetClrMapOverride   :
-            {
-                this.clrMap = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterAddLayout           :
-            {
-                var Pos = AscFormat.readLong(r);
-                var Item = AscFormat.readObject(r);
-                this.sldLayoutLst.splice(Pos, 0, Item);
-                break;
-            }
-            case AscDFH.historyitem_SlideMasterSetThemeIndex:
-            {
-                this.ThemeIndex = AscFormat.readLong(r);
-                if (AscFormat.isRealNumber(this.ThemeIndex) && editor && editor.ThemeLoader)
-                {
-                    var theme_loader = editor.ThemeLoader;
-
-                    var theme_load_info = new CThemeLoadInfo();
-                    theme_load_info.Master = this;
-                    theme_load_info.Theme = this.Theme;
-
-                    var _lay_cnt = this.sldLayoutLst.length;
-                    for (var i = 0; i < _lay_cnt; i++)
-                        theme_load_info.Layouts[i] = this.sldLayoutLst[i];
-
-                    theme_loader.themes_info_editor[this.ThemeIndex] = theme_load_info;
-                }
-                break;
-            }
-        }
-    },
-
     draw: function(graphics)
     {
         for(var i=0; i < this.cSld.spTree.length; ++i)
@@ -610,7 +419,7 @@ MasterSlide.prototype =
 
     setSlideSize: function(w, h)
     {
-        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetSize, oldW: this.Width, oldH: this.Height, newW: w, newH: h});
+        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideMasterSetSize, new AscFormat.CDrawingBaseCoordsWritable(this.Width, this.Height), new AscFormat.CDrawingBaseCoordsWritable(w, h)));
         this.Width = w;
         this.Height = h;
     },
@@ -619,45 +428,44 @@ MasterSlide.prototype =
 
     setTheme: function(theme)
     {
-        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetTheme, oldPr: this.Theme, newPr: theme});
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideMasterSetTheme, this.Theme, theme));
         this.Theme = theme;
     },
 
     shapeAdd: function(pos, item)
     {
         this.checkDrawingUniNvPr(item);
-        History.Add(this, {Type: AscDFH.historyitem_SlideMasterAddToSpTree, Pos: pos, Item: item});
+        History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideMasterAddToSpTree, pos, [item], true));
         this.cSld.spTree.splice(pos, 0, item);
     },
 
     changeBackground: function(bg)
     {
-        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetBg, oldPr: this.cSld.Bg , newPr: bg});
+        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideMasterSetBg, this.cSld.Bg , bg));
         this.cSld.Bg = bg;
     },
 
     setTxStyles: function(txStyles)
     {
-        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetTxStyles, oldPr: this.txStyles, newPr: txStyles});
+        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_SlideMasterSetTxStyles, this.txStyles, txStyles));
         this.txStyles = txStyles;
     },
 
     setCSldName: function(name)
     {
-        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetCSldName,oldPr: this.cSld.name, newPr: name});
+        History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_SlideMasterSetCSldName, this.cSld.name, name));
         this.cSld.name = name;
     },
     setClMapOverride: function(clrMap)
     {
-        History.Add(this, {Type: AscDFH.historyitem_SlideMasterSetClrMapOverride, oldPr: this.clrMap, newPr: clrMap});
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideMasterSetClrMapOverride, this.clrMap, clrMap));
         this.clrMap = clrMap;
     },
 
     addToSldLayoutLstToPos: function(pos, obj)
     {
-        History.Add(this, {Type: AscDFH.historyitem_SlideMasterAddLayout, Item: obj, Pos:pos});
+        History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_SlideMasterAddLayout, pos, [obj], true));
         this.sldLayoutLst.splice(pos, 0, obj);
-
     },
 
     getAllImages: function(images)
@@ -687,7 +495,20 @@ MasterSlide.prototype =
 
     getAllFonts: function(fonts)
     {
-        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        var i;
+        if(this.Theme){
+            this.Theme.Document_Get_AllFontNames(fonts);
+        }
+
+        if(this.txStyles){
+            this.txStyles.Document_Get_AllFontNames(fonts);
+        }
+
+        for(i = 0; i < this.sldLayoutLst.length; ++i){
+            this.sldLayoutLst[i].getAllFonts(fonts);
+        }
+
+        for(i = 0; i < this.cSld.spTree.length; ++i)
         {
             if(typeof  this.cSld.spTree[i].getAllFonts === "function")
                 this.cSld.spTree[i].getAllFonts(fonts);

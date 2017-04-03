@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -37,9 +37,9 @@ var changestype_Paragraph_Content = AscCommon.changestype_Paragraph_Content;
 
 if(typeof CDocument !== "undefined")
 {
-	CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode)
+	CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode, isFillingForm)
 	{
-		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && true !== isFillingForm)
 			return true;
 
 		AscCommon.CollaborativeEditing.OnStart_CheckLock();
@@ -496,7 +496,10 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
         }
         case AscCommon.changestype_Remove:
         {
-            this.Lock.Check( this.Get_Id() );
+			if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type))
+				this.Lock.Check(this.Get_Id());
+			else
+				this.CurCell.Content.Document_Is_SelectionLocked(CheckType);
 
             break;
         }

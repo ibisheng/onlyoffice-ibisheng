@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -73,7 +73,7 @@ CMathLimitPr.prototype.Read_FromBinary = function(Reader)
  */
 function CLimitPrimary(bInside, Type, FName, Iterator)
 {
-    CLimitPrimary.superclass.constructor.call(this, bInside);
+	CMathBase.call(this, bInside);
 
     this.Type = Type;
     this.FName = null;
@@ -81,7 +81,8 @@ function CLimitPrimary(bInside, Type, FName, Iterator)
 
     this.init(FName, Iterator);
 }
-AscCommon.extendClass(CLimitPrimary, CMathBase);
+CLimitPrimary.prototype = Object.create(CMathBase.prototype);
+CLimitPrimary.prototype.constructor = CLimitPrimary;
 CLimitPrimary.prototype.kind      = MATH_PRIMARY_LIMIT;
 CLimitPrimary.prototype.init = function(FName, Iterator)
 {
@@ -205,7 +206,7 @@ CLimitPrimary.prototype.setPosition = function(pos, PosInfo)
  */
 function CLimit(props)
 {
-    CLimit.superclass.constructor.call(this);
+	CMathBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -216,7 +217,8 @@ function CLimit(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CLimit, CMathBase);
+CLimit.prototype = Object.create(CMathBase.prototype);
+CLimit.prototype.constructor = CLimit;
 
 CLimit.prototype.ClassType = AscDFH.historyitem_type_lim;
 CLimit.prototype.kind      = MATH_LIMIT;
@@ -285,16 +287,16 @@ CLimit.prototype.ApplyProperties = function(RPI)
 };
 CLimit.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == Asc.c_oAscMathInterfaceType.Limit && Props.Pos !== undefined)
-    {
-        var Type = Props.Pos == Asc.c_oAscMathInterfaceLimitPos.Bottom ? LIMIT_LOW : LIMIT_UP;
+	if (Props.Type == Asc.c_oAscMathInterfaceType.Limit && Props.Pos !== undefined)
+	{
+		var Type = Props.Pos == Asc.c_oAscMathInterfaceLimitPos.Bottom ? LIMIT_LOW : LIMIT_UP;
 
-        if(this.Pr.type !== Type)
-        {
-            AscCommon.History.Add(this, new CChangesMathLimitType(Type, this.Pr.type));
-            this.raw_SetType(Type);
-        }
-    }
+		if (this.Pr.type !== Type)
+		{
+			AscCommon.History.Add(new CChangesMathLimitType(this, this.Pr.type, Type));
+			this.raw_SetType(Type);
+		}
+	}
 };
 CLimit.prototype.Get_InterfaceProps = function()
 {
@@ -322,7 +324,7 @@ CLimit.prototype.Can_ModifyArgSize = function()
  */
 function CMathMenuLimit(Limit)
 {
-    CMathMenuLimit.superclass.constructor.call(this, Limit);
+	CMathMenuBase.call(this, Limit);
 
     this.Type = Asc.c_oAscMathInterfaceType.Limit;
 
@@ -335,7 +337,8 @@ function CMathMenuLimit(Limit)
         this.Pos = undefined;
     }
 }
-AscCommon.extendClass(CMathMenuLimit, CMathMenuBase);
+CMathMenuLimit.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuLimit.prototype.constructor = CMathMenuLimit;
 
 CMathMenuLimit.prototype.get_Pos = function(){return this.Pos;};
 CMathMenuLimit.prototype.put_Pos = function(Pos){this.Pos = Pos;};
@@ -352,7 +355,7 @@ CMathMenuLimit.prototype["put_Pos"] = CMathMenuLimit.prototype.put_Pos;
  */
 function CMathFunc(props)
 {
-    CMathFunc.superclass.constructor.call(this);
+	CMathBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -363,7 +366,8 @@ function CMathFunc(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CMathFunc, CMathBase);
+CMathFunc.prototype = Object.create(CMathBase.prototype);
+CMathFunc.prototype.constructor = CMathFunc;
 
 CMathFunc.prototype.ClassType = AscDFH.historyitem_type_mathFunc;
 CMathFunc.prototype.kind      = MATH_FUNCTION;
@@ -380,7 +384,7 @@ CMathFunc.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
     var bMathFunc = RPI.bMathFunc;
     RPI.bMathFunc = true;
 
-    CMathFunc.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+	CMathBase.prototype.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
 
     RPI.bMathFunc = bMathFunc;
 };

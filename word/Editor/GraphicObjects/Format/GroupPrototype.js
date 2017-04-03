@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -372,15 +372,15 @@ CGroupShape.prototype.recalculateBounds = function()
     for(var i = 0; i < sp_tree.length; ++i)
     {
         sp_tree[i].recalculate();
-        //var bounds = sp_tree[i].bounds;
-        //var l = bounds.l;
-        //var r = bounds.r;
-        //var t = bounds.t;
-        //var b = bounds.b;
-        //x_arr_max.push(r);
-        //x_arr_min.push(l);
-        //y_arr_max.push(b);
-        //y_arr_min.push(t);
+        var bounds = sp_tree[i].bounds;
+        var l = bounds.l;
+        var r = bounds.r;
+        var t = bounds.t;
+        var b = bounds.b;
+        x_arr_max.push(r);
+        x_arr_min.push(l);
+        y_arr_max.push(b);
+        y_arr_min.push(t);
     }
 
 

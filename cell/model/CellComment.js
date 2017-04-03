@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -933,11 +933,11 @@ CCellCommentator.prototype.getCommentsCoords = function(comments) {
 		coords.dHeightMM = this.pxToMm(coords.dHeightPX);
 
     if (AscCommon.AscBrowser.isRetina) {
-      coords.dWidthPX >>= 1;
-      coords.dHeightPX >>= 1;
-      coords.dLeftPX >>= 1;
-      coords.dTopPX >>= 1;
-      coords.dReverseLeftPX >>= 1;
+      coords.dWidthPX 		= AscCommon.AscBrowser.convertToRetinaValue(coords.dWidthPX);
+      coords.dHeightPX 		= AscCommon.AscBrowser.convertToRetinaValue(coords.dHeightPX);
+      coords.dLeftPX 		= AscCommon.AscBrowser.convertToRetinaValue(coords.dLeftPX);
+      coords.dTopPX 		= AscCommon.AscBrowser.convertToRetinaValue(coords.dTopPX);
+      coords.dReverseLeftPX = AscCommon.AscBrowser.convertToRetinaValue(coords.dReverseLeftPX);
     }
 	}
 

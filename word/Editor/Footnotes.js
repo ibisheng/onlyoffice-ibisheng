@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -40,7 +40,7 @@
  */
 function CFootnotesController(LogicDocument)
 {
-	CFootnotesController.superclass.constructor.call(this, LogicDocument);
+	CDocumentControllerBase.call(this, LogicDocument);
 
 	this.Id = LogicDocument.Get_IdCounter().Get_NewId();
 
@@ -79,7 +79,8 @@ function CFootnotesController(LogicDocument)
 	LogicDocument.Get_TableId().Add(this, this.Id);
 }
 
-AscCommon.extendClass(CFootnotesController, CDocumentControllerBase);
+CFootnotesController.prototype = Object.create(CDocumentControllerBase.prototype);
+CFootnotesController.prototype.constructor = CFootnotesController;
 
 /**
  * Получаем Id данного класса.
@@ -117,11 +118,7 @@ CFootnotesController.prototype.CreateFootnote = function()
 	this.Footnote[NewFootnote.Get_Id()] = NewFootnote;
 
 	var oHistory = this.LogicDocument.Get_History();
-	oHistory.Add(this, {
-		Type : AscDFH.historyitem_Footnotes_AddFootnote,
-		Id   : NewFootnote.Get_Id()
-	});
-
+	oHistory.Add(new CChangesFootnotesAddFootnote(this, NewFootnote.Get_Id()));
 	return NewFootnote;
 };
 /**
@@ -132,10 +129,7 @@ CFootnotesController.prototype.AddFootnote = function(oFootnote)
 {
 	this.Footnote[oFootnote.Get_Id()] = oFootnote;
 	var oHistory                      = this.LogicDocument.Get_History();
-	oHistory.Add(this, {
-		Type : AscDFH.historyitem_Footnotes_AddFootnote,
-		Id   : oFootnote.Get_Id()
-	});
+	oHistory.Add(new CChangesFootnotesAddFootnote(this, oFootnote.Get_Id()));
 };
 CFootnotesController.prototype.SetSeparator = function(oFootnote)
 {
@@ -143,12 +137,7 @@ CFootnotesController.prototype.SetSeparator = function(oFootnote)
 	var oOldValue = this.SeparatorFootnote ? this.SeparatorFootnote : null;
 
 	var oHistory = this.LogicDocument.Get_History();
-	oHistory.Add(this, {
-		Type : AscDFH.historyitem_Footnotes_SetSeparator,
-		New  : oNewValue,
-		Old  : oOldValue
-	});
-
+	oHistory.Add(new CChangesFootnotesSetSeparator(this, oOldValue, oNewValue));
 	this.SeparatorFootnote = oNewValue;
 };
 CFootnotesController.prototype.SetContinuationSeparator = function(oFootnote)
@@ -157,12 +146,7 @@ CFootnotesController.prototype.SetContinuationSeparator = function(oFootnote)
 	var oOldValue = this.ContinuationSeparatorFootnote ? this.ContinuationSeparatorFootnote : null;
 
 	var oHistory = this.LogicDocument.Get_History();
-	oHistory.Add(this, {
-		Type : AscDFH.historyitem_Footnotes_SetContinuationSeparator,
-		New  : oNewValue,
-		Old  : oOldValue
-	});
-
+	oHistory.Add(new CChangesFootnotesSetContinuationSeparator(this, oOldValue, oNewValue));
 	this.ContinuationSeparatorFootnote = oNewValue;
 };
 CFootnotesController.prototype.SetContinuationNotice = function(oFootnote)
@@ -171,12 +155,7 @@ CFootnotesController.prototype.SetContinuationNotice = function(oFootnote)
 	var oOldValue = this.ContinuationNoticeFootnote ? this.ContinuationNoticeFootnote : null;
 
 	var oHistory = this.LogicDocument.Get_History();
-	oHistory.Add(this, {
-		Type : AscDFH.historyitem_Footnotes_SetContinuationNotice,
-		New  : oNewValue,
-		Old  : oOldValue
-	});
-
+	oHistory.Add(new CChangesFootnotesSetContinuationNotice(this, oOldValue, oNewValue));
 	this.ContinuationNoticeFootnote = oNewValue;
 };
 CFootnotesController.prototype.SetFootnotePrNumFormat = function(nFormatType)
@@ -184,11 +163,7 @@ CFootnotesController.prototype.SetFootnotePrNumFormat = function(nFormatType)
 	if (undefined !== nFormatType && this.FootnotePr.NumFormat !== nFormatType)
 	{
 		var oHistory = this.LogicDocument.Get_History();
-		oHistory.Add(this, {
-			Type : AscDFH.historyitem_Footnotes_SetFootnotePrNumFormat,
-			New  : nFormatType,
-			Old  : this.FootnotePr.NumFormat
-		});
+		oHistory.Add(new CChangesFootnotesSetFootnotePrNumFormat(this, this.FootnotePr.NumFormat, nFormatType));
 		this.FootnotePr.NumFormat = nFormatType;
 	}
 };
@@ -197,11 +172,7 @@ CFootnotesController.prototype.SetFootnotePrPos = function(nPos)
 	if (undefined !== nPos && this.FootnotePr.Pos !== nPos)
 	{
 		var oHistory = this.LogicDocument.Get_History();
-		oHistory.Add(this, {
-			Type : AscDFH.historyitem_Footnotes_SetFootnotePrPos,
-			New  : nPos,
-			Old  : this.FootnotePr.Pos
-		});
+		oHistory.Add(new CChangesFootnotesSetFootnotePrPos(this, this.FootnotePr.Pos, nPos));
 		this.FootnotePr.Pos = nPos;
 	}
 };
@@ -210,11 +181,7 @@ CFootnotesController.prototype.SetFootnotePrNumStart = function(nStart)
 	if (undefined !== nStart && this.FootnotePr.NumStart !== nStart)
 	{
 		var oHistory = this.LogicDocument.Get_History();
-		oHistory.Add(this, {
-			Type : AscDFH.historyitem_Footnotes_SetFootnotePrNumStart,
-			New  : nStart,
-			Old  : this.FootnotePr.NumStart
-		});
+		oHistory.Add(new CChangesFootnotesSetFootnotePrNumStart(this, this.FootnotePr.NumStart, nStart));
 		this.FootnotePr.NumStart = nStart;
 	}
 };
@@ -223,11 +190,7 @@ CFootnotesController.prototype.SetFootnotePrNumRestart = function(nRestartType)
 	if (undefined !== nRestartType && this.FootnotePr.NumRestart !== nRestartType)
 	{
 		var oHistory = this.LogicDocument.Get_History();
-		oHistory.Add(this, {
-			Type : AscDFH.historyitem_Footnotes_SetFootnotePrNumRestart,
-			New  : nRestartType,
-			Old  : this.FootnotePr.NumRestart
-		});
+		oHistory.Add(new CChangesFootnotesSetFootnotePrNumRestart(this, this.FootnotePr.NumRestart, nRestartType));
 		this.FootnotePr.NumRestart = nRestartType;
 	}
 };
@@ -257,7 +220,7 @@ CFootnotesController.prototype.Reset = function(nPageIndex, oSectPr)
 			_X += oSectPr.Get_ColumnSpace(nTempColumnIndex);
 		}
 
-		var _XLimit = (nColumnsCount - 1 !== nColumnIndex ? X + oSectPr.Get_ColumnWidth(nColumnIndex) : XLimit);
+		var _XLimit = (nColumnsCount - 1 !== nColumnIndex ? _X + oSectPr.Get_ColumnWidth(nColumnIndex) : XLimit);
 
 		var oColumn    = new CFootEndnotePageColumn();
 		oColumn.X      = _X;
@@ -968,7 +931,11 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 	// Новый селект
 	if (this.Selection.Start.Footnote !== this.Selection.End.Footnote)
 	{
-		if (this.Selection.Start.Page > this.Selection.End.Page || this.Selection.Start.Index > this.Selection.End.Index)
+		if (this.Selection.Start.Page > this.Selection.End.Page
+			|| (this.Selection.Start.Page === this.Selection.End.Page
+			&& (this.Selection.Start.Column > this.Selection.End.Column
+			|| (this.Selection.Start.Column === this.Selection.End.Column
+			&& this.Selection.Start.Index > this.Selection.End.Index))))
 		{
 			this.Selection.Start.Footnote.Selection_SetEnd(-MEASUREMENT_MAX_MM_VALUE, -MEASUREMENT_MAX_MM_VALUE, 0, MouseEvent);
 			this.Selection.End.Footnote.Selection_SetStart(MEASUREMENT_MAX_MM_VALUE, MEASUREMENT_MAX_MM_VALUE, this.Selection.End.Footnote.Pages.length - 1, MouseEvent);
@@ -1001,244 +968,6 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 		this.Selection.Direction = 0;
 	}
 };
-CFootnotesController.prototype.Undo = function(Data)
-{
-	var Type = Data.Type;
-
-	switch (Type)
-	{
-		case AscDFH.historyitem_Footnotes_AddFootnote:
-		{
-			this.Footnote[Data.Id] = g_oTableId.Get_ById(Data.Id);
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetSeparator:
-		{
-			this.SeparatorFootnote = Data.Old;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetContinuationSeparator:
-		{
-			this.ContinuationSeparatorFootnote = Data.Old;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetContinuationNotice:
-		{
-			this.ContinuationNoticeFootnote = Data.Old;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrPos:
-		{
-			this.FootnotePr.Pos = Data.Old;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumStart:
-		{
-			this.FootnotePr.NumStart = Data.Old;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumRestart:
-		{
-			this.FootnotePr.NumRestart = Data.Old;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumFormat:
-		{
-			this.FootnotePr.NumFormat = Data.Old;
-			break;
-		}
-	}
-};
-CFootnotesController.prototype.Redo = function(Data)
-{
-	var Type = Data.Type;
-
-	switch (Type)
-	{
-		case AscDFH.historyitem_Footnotes_AddFootnote:
-		{
-			delete this.Footnote[Data.Id];
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetSeparator:
-		{
-			this.SeparatorFootnote = Data.New;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetContinuationSeparator:
-		{
-			this.ContinuationSeparatorFootnote = Data.New;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetContinuationNotice:
-		{
-			this.ContinuationNoticeFootnote = Data.New;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrPos:
-		{
-			this.FootnotePr.Pos = Data.New;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumStart:
-		{
-			this.FootnotePr.NumStart = Data.New;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumRestart:
-		{
-			this.FootnotePr.NumRestart = Data.New;
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumFormat:
-		{
-			this.FootnotePr.NumFormat = Data.New;
-			break;
-		}
-	}
-};
-CFootnotesController.prototype.Save_Changes = function(Data, Writer)
-{
-	// Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-	// Long : тип класса
-	// Long : тип изменений
-
-	Writer.WriteLong(AscDFH.historyitem_type_Footnotes);
-
-	var Type = Data.Type;
-
-	// Пишем тип
-	Writer.WriteLong(Type);
-
-	switch (Type)
-	{
-		case  AscDFH.historyitem_Footnotes_AddFootnote:
-		{
-			// String : Id
-			Writer.WriteString2(Data.Id);
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetSeparator:
-		case AscDFH.historyitem_Footnotes_SetContinuationSeparator:
-		case AscDFH.historyitem_Footnotes_SetContinuationNotice:
-		{
-			if (Data.New)
-			{
-				Writer.WriteBool(false);
-				Writer.WriteString2(Data.New.Get_Id());
-			}
-			else
-			{
-				Writer.WriteBool(true);
-			}
-			break;
-		}
-
-		case AscDFH.historyitem_Footnotes_SetFootnotePrPos:
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumStart:
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumRestart:
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumFormat:
-		{
-			// Long : value
-			Writer.WriteLong(Data.New);
-			break;
-		}
-	}
-
-	return Writer;
-};
-CFootnotesController.prototype.Save_Changes2 = function(Data, Writer)
-{
-};
-CFootnotesController.prototype.Load_Changes = function(Reader, Reader2)
-{
-	// Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-	// Long : тип класса
-	// Long : тип изменений
-
-	var ClassType = Reader.GetLong();
-	if (AscDFH.historyitem_type_Footnotes != ClassType)
-		return;
-
-	var Type = Reader.GetLong();
-
-	switch (Type)
-	{
-		case  AscDFH.historyitem_Footnotes_AddFootnote:
-		{
-			// String : Id
-			var Id            = Reader.GetString2();
-			this.Footnote[Id] = g_oTableId.Get_ById(Id);
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetSeparator:
-		{
-			if (false === Reader.GetBool())
-			{
-				var Id                 = Reader.GetString2();
-				this.SeparatorFootnote = g_oTableId.Get_ById(Id);
-			}
-			else
-			{
-				this.SeparatorFootnote = null;
-			}
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetContinuationSeparator:
-		{
-			if (false === Reader.GetBool())
-			{
-				var Id                             = Reader.GetString2();
-				this.ContinuationSeparatorFootnote = g_oTableId.Get_ById(Id);
-			}
-			else
-			{
-				this.ContinuationSeparatorFootnote = null;
-			}
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetContinuationNotice:
-		{
-			if (false === Reader.GetBool())
-			{
-				var Id                          = Reader.GetString2();
-				this.ContinuationNoticeFootnote = g_oTableId.Get_ById(Id);
-			}
-			else
-			{
-				this.ContinuationNoticeFootnote = null;
-			}
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrPos:
-		{
-			// Long : value
-			this.FootnotePr.Pos = Reader.GetLong();
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumStart:
-		{
-			// Long : value
-			this.FootnotePr.NumStart = Reader.GetLong();
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumRestart:
-		{
-			// Long : value
-			this.FootnotePr.NumRestart = Reader.GetLong();
-			break;
-		}
-		case AscDFH.historyitem_Footnotes_SetFootnotePrNumFormat:
-		{
-			// Long : value
-			this.FootnotePr.NumFormat = Reader.GetLong();
-			break;
-		}
-
-	}
-
-	return true;
-};
 CFootnotesController.prototype.Set_CurrentElement = function(bUpdateStates, PageAbs, oFootnote)
 {
 	if (oFootnote instanceof CFootEndnote)
@@ -1263,6 +992,7 @@ CFootnotesController.prototype.Set_CurrentElement = function(bUpdateStates, Page
 			this.LogicDocument.Selection.Start = false;
 		}
 
+		var bNeedRedraw = this.LogicDocument.Get_DocPosType() === docpostype_HdrFtr;
 		this.LogicDocument.Set_DocPosType(docpostype_Footnotes);
 
 		if (false != bUpdateStates)
@@ -1270,6 +1000,12 @@ CFootnotesController.prototype.Set_CurrentElement = function(bUpdateStates, Page
 			this.LogicDocument.Document_UpdateInterfaceState();
 			this.LogicDocument.Document_UpdateRulersState();
 			this.LogicDocument.Document_UpdateSelectionState();
+		}
+
+		if (bNeedRedraw)
+		{
+			this.LogicDocument.DrawingDocument.ClearCachePages();
+			this.LogicDocument.DrawingDocument.FirePaint();
 		}
 	}
 };
@@ -1303,6 +1039,34 @@ CFootnotesController.prototype.GotoPage = function(nPageAbs)
 CFootnotesController.prototype.Check_TableCoincidence = function(oTable)
 {
 	return false;
+};
+CFootnotesController.prototype.GotoNextFootnote = function()
+{
+	var oNextFootnote = this.private_GetNextFootnote(this.CurFootnote);
+	if (oNextFootnote)
+	{
+		oNextFootnote.Cursor_MoveToStartPos(false);
+		this.private_SetCurrentFootnoteNoSelection(oNextFootnote);
+	}
+};
+CFootnotesController.prototype.GotoPrevFootnote = function()
+{
+	var oPrevFootnote = this.private_GetPrevFootnote(this.CurFootnote);
+	if (oPrevFootnote)
+	{
+		oPrevFootnote.Cursor_MoveToStartPos(false);
+		this.private_SetCurrentFootnoteNoSelection(oPrevFootnote);
+	}
+};
+CFootnotesController.prototype.GetNumberingInfo = function(ParaId, NumPr, oFootnote)
+{
+	var arrFootnotes     = this.LogicDocument.Get_FootnotesList(null, oFootnote);
+	var oNumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
+	{
+		arrFootnotes[nIndex].Get_NumberingInfo(oNumberingEngine, ParaId, NumPr);
+	}
+	return oNumberingEngine.Get_NumInfo();
 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Private area
@@ -1347,12 +1111,45 @@ CFootnotesController.prototype.private_GetFootnoteOnPageByXY = function(X, Y, nP
 	if (!oColumn)
 		return null;
 
+	if (oColumn.Elements.length <= 0)
+	{
+		var nCurColumnIndex = nColumnIndex - 1;
+		while (nCurColumnIndex >= 0)
+		{
+			if (oPage.Columns[nCurColumnIndex].Elements.length > 0)
+			{
+				oColumn      = oPage.Columns[nCurColumnIndex];
+				nColumnIndex = nCurColumnIndex;
+				break;
+			}
+			nCurColumnIndex--;
+		}
+
+		if (nCurColumnIndex < 0)
+		{
+			nCurColumnIndex = nColumnIndex + 1;
+			while (nCurColumnIndex <= oPage.Columns.length - 1)
+			{
+				if (oPage.Columns[nCurColumnIndex].Elements.length > 0)
+				{
+					oColumn      = oPage.Columns[nCurColumnIndex];
+					nColumnIndex = nCurColumnIndex;
+					break;
+				}
+				nCurColumnIndex++;
+			}
+		}
+	}
+
+	if (!oColumn)
+		return null;
+
 	for (var nIndex = oColumn.Elements.length - 1; nIndex >= 0; --nIndex)
 	{
 		var oFootnote = oColumn.Elements[nIndex];
 
 		var nElementPageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnIndex);
-		var oBounds = oFootnote.Get_PageBounds(nElementPageIndex);
+		var oBounds           = oFootnote.Get_PageBounds(nElementPageIndex);
 
 		if (oBounds.Top <= Y || 0 === nIndex)
 			return {
@@ -1612,6 +1409,9 @@ CFootnotesController.prototype.ClearParagraphFormatting = function()
 };
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
+	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+		return;
+
 	if (oItem instanceof ParaTextPr)
 	{
 		for (var sId in this.Selection.Footnotes)
@@ -2678,17 +2478,29 @@ CFootnotesController.prototype.GetSelectionBounds = function()
 		}
 		else if (1 === this.Selection.Direction)
 		{
+			var StartBounds = this.Selection.Start.Footnote.Get_SelectionBounds();
+			var EndBounds   = this.Selection.End.Footnote.Get_SelectionBounds();
+
+			if (!StartBounds && !EndBounds)
+				return null;
+
 			var Result       = {};
-			Result.Start     = this.Selection.Start.Footnote.Get_SelectionBounds().Start;
-			Result.End       = this.Selection.End.Footnote.Get_SelectionBounds().End;
+			Result.Start     = StartBounds ? StartBounds.Start : EndBounds.Start;
+			Result.End       = EndBounds ? EndBounds.End : StartBounds.End;
 			Result.Direction = 1;
 			return Result;
 		}
 		else
 		{
+			var StartBounds = this.Selection.End.Footnote.Get_SelectionBounds();
+			var EndBounds   = this.Selection.Start.Footnote.Get_SelectionBounds();
+
+			if (!StartBounds && !EndBounds)
+				return null;
+
 			var Result       = {};
-			Result.Start     = this.Selection.End.Footnote.Get_SelectionBounds().Start;
-			Result.End       = this.Selection.Start.Footnote.Get_SelectionBounds().End;
+			Result.Start     = StartBounds ? StartBounds.Start : EndBounds.Start;
+			Result.End       = EndBounds ? EndBounds.End : StartBounds.End;
 			Result.Direction = -1;
 			return Result;
 		}
@@ -2824,7 +2636,7 @@ CFootnotesController.prototype.GetSelectedText = function(bClearText, oPr)
 	if (true === bClearText)
 	{
 		if (true !== this.Selection.Use || 0 !== this.Selection.Direction)
-			return null;
+			return "";
 
 		return this.CurFootnote.Get_SelectedText(true, oPr);
 	}
@@ -3370,6 +3182,41 @@ CFootnotesController.prototype.GetColumnSize = function()
 CFootnotesController.prototype.GetCurrentSectionPr = function()
 {
 	return null;
+};
+CFootnotesController.prototype.GetColumnFields = function(nPageAbs, nColumnAbs)
+{
+	var oColumn = this.private_GetPageColumn(nPageAbs, nColumnAbs);
+	if (!oColumn)
+		return {X : 0, XLimit : 297};
+
+	return {X : oColumn.X, XLimit : oColumn.XLimit};
+};
+CFootnotesController.prototype.RemoveTextSelection = function()
+{
+	if (true === this.Selection.Use)
+	{
+		for (var sId in this.Selection.Footnotes)
+		{
+			if (this.Selection.Footnotes[sId] !== this.CurFootnote)
+				this.Selection.Footnotes[sId].Selection_Remove();
+		}
+
+		this.Selection.Use = false;
+	}
+
+	this.Selection.Footnotes = {};
+	if (this.CurFootnote)
+	{
+		this.Selection.Footnotes[this.CurFootnote.Get_Id()] = this.CurFootnote;
+		this.CurFootnote.RemoveTextSelection();
+	}
+};
+CFootnotesController.prototype.ResetRecalculateCache = function()
+{
+	for (var Id in this.Footnote)
+	{
+		this.Footnote[Id].Reset_RecalculateCache();
+	}
 };
 
 

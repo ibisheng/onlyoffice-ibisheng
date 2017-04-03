@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -278,6 +278,8 @@
 			return normalize ? this.normalize() : this;
 		};
 		Range.prototype.assign2 = function (range) {
+			this.refType1 = range.refType1;
+			this.refType2 = range.refType2;
 			return this.assign(range.c1, range.r1, range.c2, range.r2);
 		};
 
@@ -362,6 +364,120 @@
 			return bRes;
 		};
 
+		Range.prototype.isIntersectForShift = function(range, offset) {
+			var isHor = offset && 0 != offset.offsetCol;
+			var toDelete = offset && (offset.offsetCol < 0 || offset.offsetRow < 0);
+			if (isHor) {
+				if (this.r1 <= range.r1 && range.r2 <= this.r2 && this.c1 <= range.c2) {
+					return true;
+				} else if (toDelete && this.c1 <= range.c1 && range.c2 <= this.c2) {
+					var topIn = this.r1 <= range.r1 && range.r1 <= this.r2;
+					var bottomIn = this.r1 <= range.r2 && range.r2 <= this.r2;
+					return topIn || bottomIn;
+				} else {
+					return false;
+				}
+			} else {
+				if (this.c1 <= range.c1 && range.c2 <= this.c2 && this.r1 <= range.r2) {
+					return true;
+				} else if (toDelete && this.r1 <= range.r1 && range.r2 <= this.r2) {
+					var leftIn = this.c1 <= range.c1 && range.c1 <= this.c2;
+					var rightIn = this.c1 <= range.c2 && range.c2 <= this.c2;
+					return leftIn || rightIn;
+				} else {
+					return false;
+				}
+			}
+		};
+
+		Range.prototype.isIntersectForShiftCell = function(col, row, offset) {
+			var isHor = offset && 0 != offset.offsetCol;
+			if (isHor) {
+				return this.r1 <= row && row <= this.r2 && this.c1 <= col;
+			} else {
+				return this.c1 <= col && col <= this.c2 && this.r1 <= row;
+			}
+		};
+
+		Range.prototype.forShift = function(bbox, offset, bUndo) {
+			var isNoDelete = true;
+			var isHor = 0 != offset.offsetCol;
+			var toDelete = offset.offsetCol < 0 || offset.offsetRow < 0;
+
+			if (isHor) {
+				if (toDelete) {
+					if (this.c1 < bbox.c1) {
+						if (this.c2 <= bbox.c2) {
+							this.setOffsetLast({offsetCol: -(this.c2 - bbox.c1 + 1), offsetRow: 0});
+						} else {
+							this.setOffsetLast(offset);
+						}
+					} else if (this.c1 <= bbox.c2) {
+						if (this.c2 <= bbox.c2) {
+							if(!bUndo){
+								var topIn = bbox.r1 <= this.r1 && this.r1 <= bbox.r2;
+								var bottomIn = bbox.r1 <= this.r2 && this.r2 <= bbox.r2;
+								if (topIn && bottomIn) {
+									isNoDelete = false;
+								} else if (topIn) {
+									this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r2 - this.r1 + 1});
+								} else if (bottomIn) {
+									this.setOffsetLast({offsetCol: 0, offsetRow: bbox.r1 - this.r2 - 1});
+								}
+							}
+						} else {
+							this.setOffsetFirst({offsetCol: bbox.c1 - this.c1, offsetRow: 0});
+							this.setOffsetLast(offset);
+						}
+					} else {
+						this.setOffset(offset);
+					}
+				} else {
+					if (this.c1 < bbox.c1) {
+						this.setOffsetLast(offset);
+					} else {
+						this.setOffset(offset);
+					}
+				}
+			} else {
+				if (toDelete) {
+					if (this.r1 < bbox.r1) {
+						if (this.r2 <= bbox.r2) {
+							this.setOffsetLast({offsetCol: 0, offsetRow: -(this.r2 - bbox.r1 + 1)});
+						} else {
+							this.setOffsetLast(offset);
+						}
+					} else if (this.r1 <= bbox.r2) {
+						if (this.r2 <= bbox.r2) {
+							if(!bUndo) {
+								var leftIn = bbox.c1 <= this.c1 && this.c1 <= bbox.c2;
+								var rightIn = bbox.c1 <= this.c2 && this.c2 <= bbox.c2;
+								if (leftIn && rightIn) {
+									isNoDelete = false;
+								} else if (leftIn) {
+									this.setOffsetFirst({offsetCol: bbox.c2 - this.c1 + 1, offsetRow: 0});
+								} else if (rightIn) {
+									this.setOffsetLast({offsetCol: bbox.c1 - this.c2 - 1, offsetRow: 0});
+								}
+							}
+						} else {
+							this.setOffsetFirst({offsetCol: 0, offsetRow: bbox.r1 - this.r1});
+							this.setOffsetLast(offset);
+						}
+					} else {
+						this.setOffset(offset);
+					}
+				} else {
+					if (this.r1 < bbox.r1) {
+						this.setOffsetLast(offset);
+					} else {
+						this.setOffset(offset);
+					}
+				}
+			}
+			return isNoDelete;
+		};
+
 		Range.prototype.isOneCell = function () {
 			return this.r1 === this.r2 && this.c1 === this.c2;
 		};
@@ -380,6 +496,101 @@
 			this.r2 = Math.max(this.r2, range.r2);
 		};
 
+		Range.prototype.union3 = function (c, r) {
+			this.c1 = Math.min(this.c1, c);
+			this.c2 = Math.max(this.c2, c);
+			this.r1 = Math.min(this.r1, r);
+			this.r2 = Math.max(this.r2, r);
+		};
+		Range.prototype.setOffsetWithAbs = function(offset, canResize) {
+			var temp;
+			var offsetRow = offset.offsetRow;
+			var offsetCol = offset.offsetCol;
+			if (0 === this.r1 && gc_nMaxRow0 === this.r2) {
+				//full sheet is 1:1048576 but offsetRow is valid for it
+				offsetRow = 0;
+			} else if (0 === this.c1 && gc_nMaxCol0 === this.c2) {
+				offsetCol = 0;
+			}
+			var isAbsRow1 = this.isAbsRow(this.refType1);
+			var isAbsCol1 = this.isAbsCol(this.refType1);
+			var isAbsRow2 = this.isAbsRow(this.refType2);
+			var isAbsCol2 = this.isAbsCol(this.refType2);
+			if (!isAbsRow1) {
+				this.r1 += offsetRow;
+				if (this.r1 < 0) {
+					this.r1 = 0;
+					if (!canResize) {
+						return false;
+					}
+				}
+				if (this.r1 > gc_nMaxRow0) {
+					this.r1 = gc_nMaxRow0;
+					return false;
+				}
+			}
+			if (!isAbsCol1) {
+				this.c1 += offsetCol;
+				if (this.c1 < 0) {
+					this.c1 = 0;
+					if (!canResize) {
+						return false;
+					}
+				}
+				if (this.c1 > gc_nMaxCol0) {
+					this.c1 = gc_nMaxCol0;
+					return false;
+				}
+			}
+			if (!isAbsRow2) {
+				this.r2 += offsetRow;
+				if (this.r2 < 0) {
+					this.r2 = 0;
+					return false;
+				}
+				if (this.r2 > gc_nMaxRow0) {
+					this.r2 = gc_nMaxRow0;
+					if (!canResize) {
+						return false;
+					}
+				}
+			}
+			if (!isAbsCol2) {
+				this.c2 += offsetCol;
+				if (this.c2 < 0) {
+					this.c2 = 0;
+					return false;
+				}
+				if (this.c2 > gc_nMaxCol0) {
+					this.c2 = gc_nMaxCol0;
+					if (!canResize) {
+						return false;
+					}
+				}
+			}
+			//switch abs flag
+			if (this.r1 > this.r2) {
+				temp = this.r1;
+				this.r1 = this.r2;
+				this.r2 = temp;
+				if (!isAbsRow1 && isAbsRow2) {
+					isAbsRow1 = !isAbsRow1;
+					isAbsRow2 = !isAbsRow2;
+					this.setAbs(isAbsRow1, isAbsCol1, isAbsRow2, isAbsCol2);
+				}
+			}
+			if (this.c1 > this.c2) {
+				temp = this.c1;
+				this.c1 = this.c2;
+				this.c2 = temp;
+				if (!isAbsCol1 && isAbsCol2) {
+					isAbsCol1 = !isAbsCol1;
+					isAbsCol2 = !isAbsCol2;
+					this.setAbs(isAbsRow1, isAbsCol1, isAbsRow2, isAbsCol2);
+				}
+			}
+			return true;
+		};
 		Range.prototype.setOffset = function (offset) {
 			if (this.r1 == 0 && this.r2 == gc_nMaxRow0 && offset.offsetRow != 0 ||
 				this.c1 == 0 && this.c2 == gc_nMaxCol0 && offset.offsetCol != 0) {
@@ -455,7 +666,7 @@
 					sRes += "$";
 				}
 				sRes += (this.r1 + 1);
-				if (!this.isOneCell()) {
+				if (!this.isOneCell() || r1Abs !== r2Abs || c1Abs !== c2Abs) {
 					sRes += ":";
 					if (c2Abs) {
 						sRes += "$";
@@ -589,7 +800,7 @@
 
 			if (3 == arguments.length) {
 				var range = arguments[0];
-				Range3D.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+				Range.call(this, range.c1, range.r1, range.c2, range.r2);
 				// ToDo стоит пересмотреть конструкторы.
 				this.refType1 = range.refType1;
 				this.refType2 = range.refType2;
@@ -597,29 +808,30 @@
 				this.sheet = arguments[1];
 				this.sheet2 = arguments[2];
 			} else if (arguments.length > 1) {
-				ActiveRange.superclass.constructor.apply(this, arguments);
+				Range.apply(this, arguments);
 			} else {
-				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
+				Range.call(this, 0, 0, 0, 0);
       }
 		}
-		AscCommon.extendClass(Range3D, Range);
+		Range3D.prototype = Object.create(Range.prototype);
+		Range3D.prototype.constructor = Range3D;
 		Range3D.prototype.isIntersect = function () {
 			var oRes = true;
 			
 			if (2 == arguments.length) {
 				oRes = this.sheet === arguments[1];
 			}
-			return oRes && Range3D.superclass.isIntersect.apply(this, arguments);
+			return oRes && Range.prototype.isIntersect.apply(this, arguments);
 		};
 		Range3D.prototype.clone = function () {
-			return new Range3D(ActiveRange.superclass.clone.apply(this, arguments), this.sheet, this.sheet2);
+			return new Range3D(Range.prototype.clone.apply(this, arguments), this.sheet, this.sheet2);
 		};
 		Range3D.prototype.setSheet = function (sheet, sheet2) {
 			this.sheet = sheet;
 			this.sheet2 = sheet2 ? sheet2 : sheet;
 		};
 		Range3D.prototype.getName = function () {
-			return AscCommon.parserHelp.get3DRef(this.sheet, Range3D.superclass.getName.apply(this));
+			return AscCommon.parserHelp.get3DRef(this.sheet, Range.prototype.getName.apply(this));
 		};
 
 		/**
@@ -661,8 +873,16 @@
 			return res;
 		};
 		SelectionRange.prototype.isEqual = function (range) {
-			return false;
-			// todo return this.activeCell.isEqual(range.cell);
+			if (this.activeCellId !== range.activeCellId || !this.activeCell.isEqual(range.activeCell) ||
+				this.ranges.length !== range.ranges.length) {
+				return false;
+			}
+			for (var i = 0; i < this.ranges.length; ++i) {
+				if (!this.ranges[i].isEqual(range.ranges[i])) {
+					return false;
+				}
+			}
+			return true;
 		};
 		SelectionRange.prototype.addRange = function () {
 			this.ranges.push(new Range(0, 0, 0, 0));
@@ -673,6 +893,55 @@
 			this.clean();
 			this.getLast().assign2(range);
 			this.update();
+		};
+		SelectionRange.prototype.union = function (range) {
+			var res = this.ranges.some(function (item) {
+				var success = false;
+				if (item.c1 === range.c1 && item.c2 === range.c2) {
+					if (range.r1 === item.r2 + 1) {
+						item.r2 = range.r2;
+						success = true;
+					} else if (range.r2 === item.r1 - 1) {
+						item.r1 = range.r1;
+						success = true;
+					}
+				} else if (item.r1 === range.r1 && item.r2 === range.r2) {
+					if (range.c1 === item.c2 + 1) {
+						item.c2 = range.c2;
+						success = true;
+					} else if (range.c2 === item.c1 - 1) {
+						item.c1 = range.c1;
+						success = true;
+					}
+				}
+				return success;
+			});
+			if (!res) {
+				this.addRange();
+				this.getLast().assign2(range);
+			}
+		};
+		SelectionRange.prototype.getUnion = function () {
+			var result = new SelectionRange();
+			var unionRanges = function (ranges, res) {
+				ranges.forEach(function (item, i) {
+					if (0 === i) {
+						res.assign2(item);
+					} else {
+						res.union(item);
+					}
+				});
+			};
+			unionRanges(this.ranges, result);
+
+			var isUnion = true, resultTmp;
+			while (isUnion && !result.isSingleRange()) {
+				resultTmp = new SelectionRange();
+				unionRanges(result.ranges, resultTmp);
+				isUnion = result.ranges.length !== resultTmp.ranges.length;
+				result = resultTmp;
+			}
+			return result;
 		};
 		SelectionRange.prototype.offsetCell = function (dr, dc, fCheckSize) {
 			var done, curRange, mc;
@@ -749,7 +1018,7 @@
 					continue;
 				}
 
-				while (this.activeCell.col >= curRange.c1 && this.activeCell.col <= curRange.c2 && fCheckSize(0, this.activeCell.col)) {
+				while (this.activeCell.col >= curRange.c1 && this.activeCell.col <= curRange.c2 && fCheckSize(-1, this.activeCell.col)) {
 					this.activeCell.col += dc || (dr > 0 ? +1 : -1);
 					done = false;
 				}
@@ -757,7 +1026,7 @@
 					continue;
 				}
 
-				while (this.activeCell.row >= curRange.r1 && this.activeCell.row <= curRange.r2 && fCheckSize(this.activeCell.row, 0)) {
+				while (this.activeCell.row >= curRange.r1 && this.activeCell.row <= curRange.r2 && fCheckSize(this.activeCell.row, -1)) {
 					this.activeCell.row += dr || (dc > 0 ? +1 : -1);
 					done = false;
 				}
@@ -788,6 +1057,35 @@
 				this.activeCellId = this.ranges.length - 1;
 			}
 		};
+		SelectionRange.prototype.WriteToBinary = function(w) {
+			w.WriteLong(this.ranges.length);
+			for (var i = 0; i < this.ranges.length; ++i) {
+				var range = this.ranges[i];
+				w.WriteLong(range.c1);
+				w.WriteLong(range.r1);
+				w.WriteLong(range.c2);
+				w.WriteLong(range.r2);
+			}
+			w.WriteLong(this.activeCell.row);
+			w.WriteLong(this.activeCell.col);
+			w.WriteLong(this.activeCellId);
+		};
+		SelectionRange.prototype.ReadFromBinary = function(r) {
+			this.clean();
+			var count = r.GetLong();
+			var rangesNew = [];
+			for (var i = 0; i < count; ++i) {
+				var range = new Asc.Range(r.GetLong(), r.GetLong(), r.GetLong(), r.GetLong());
+				rangesNew.push(range);
+			}
+			if (rangesNew.length > 0) {
+				this.ranges = rangesNew;
+			}
+			this.activeCell.row = r.GetLong();
+			this.activeCell.col = r.GetLong();
+			this.activeCellId = r.GetLong();
+			this.update();
+		};
 
     /**
      *
@@ -798,46 +1096,47 @@
 			if(1 == arguments.length)
 			{
 				var range = arguments[0];
-				ActiveRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+				Range.call(this, range.c1, range.r1, range.c2, range.r2);
 				// ToDo стоит пересмотреть конструкторы.
 				this.refType1 = range.refType1;
 				this.refType2 = range.refType2;
 			}
 			else if(arguments.length > 1)
-				ActiveRange.superclass.constructor.apply(this, arguments);
+				Range.apply(this, arguments);
 			else
-				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
+				Range.call(this, 0, 0, 0, 0);
 			this.type = c_oAscSelectionType.RangeCells;
 			this.startCol = 0; // Активная ячейка в выделении
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
 		}
-		AscCommon.extendClass(ActiveRange, Range);
-		
+
+		ActiveRange.prototype = Object.create(Range.prototype);
+		ActiveRange.prototype.constructor = ActiveRange;
 		ActiveRange.prototype.assign = function () {
-			ActiveRange.superclass.assign.apply(this, arguments);
+			Range.prototype.assign.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
 		ActiveRange.prototype.assign2 = function () {
-			ActiveRange.superclass.assign2.apply(this, arguments);
+			Range.prototype.assign2.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
 		ActiveRange.prototype.clone = function(){
-			var oRes = new ActiveRange(ActiveRange.superclass.clone.apply(this, arguments));
+			var oRes = new ActiveRange(Range.prototype.clone.apply(this, arguments));
 			oRes.type = this.type;
 			oRes.startCol = this.startCol;
 			oRes.startRow = this.startRow;
 			return oRes;
 		};
 		ActiveRange.prototype.normalize = function () {
-			ActiveRange.superclass.normalize.apply(this, arguments);
+			Range.prototype.normalize.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
 		ActiveRange.prototype.isEqualAll = function () {
-			var bRes = ActiveRange.superclass.isEqual.apply(this, arguments);
+			var bRes = Range.prototype.isEqual.apply(this, arguments);
 			if(bRes && arguments.length > 0)
 			{
 				var range = arguments[0];
@@ -846,16 +1145,16 @@
 			return bRes;
 		};
 		ActiveRange.prototype.contains = function () {
-			return ActiveRange.superclass.contains.apply(this, arguments);
+			return Range.prototype.contains.apply(this, arguments);
 		};
 		ActiveRange.prototype.containsRange = function () {
-			return ActiveRange.superclass.containsRange.apply(this, arguments);
+			return Range.prototype.containsRange.apply(this, arguments);
 		};
 		ActiveRange.prototype.containsFirstLineRange = function () {
-			return ActiveRange.superclass.containsFirstLineRange.apply(this, arguments);
+			return Range.prototype.containsFirstLineRange.apply(this, arguments);
 		};
 		ActiveRange.prototype.intersection = function () {
-			var oRes = ActiveRange.superclass.intersection.apply(this, arguments);
+			var oRes = Range.prototype.intersection.apply(this, arguments);
 			if(null != oRes)
 			{
 				oRes = new ActiveRange(oRes);
@@ -864,7 +1163,7 @@
 			return oRes;
 		};
 		ActiveRange.prototype.intersectionSimple = function () {
-			var oRes = ActiveRange.superclass.intersectionSimple.apply(this, arguments);
+			var oRes = Range.prototype.intersectionSimple.apply(this, arguments);
 			if(null != oRes)
 			{
 				oRes = new ActiveRange(oRes);
@@ -873,12 +1172,17 @@
 			return oRes;
 		};
 		ActiveRange.prototype.union = function () {
-			var oRes = new ActiveRange(ActiveRange.superclass.union.apply(this, arguments));
+			var oRes = new ActiveRange(Range.prototype.union.apply(this, arguments));
 			oRes._updateAdditionalData();
 			return oRes;
 		};
 		ActiveRange.prototype.union2 = function () {
-			ActiveRange.superclass.union2.apply(this, arguments);
+			Range.prototype.union2.apply(this, arguments);
+			this._updateAdditionalData();
+			return this;
+		};
+		ActiveRange.prototype.union3 = function () {
+			Range.prototype.union3.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
@@ -887,12 +1191,12 @@
 			this.setOffsetLast(offset);
 		};
 		ActiveRange.prototype.setOffsetFirst = function(offset){
-			ActiveRange.superclass.setOffsetFirst.apply(this, arguments);
+			Range.prototype.setOffsetFirst.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
 		ActiveRange.prototype.setOffsetLast = function(offset){
-			ActiveRange.superclass.setOffsetLast.apply(this, arguments);
+			Range.prototype.setOffsetLast.apply(this, arguments);
 			this._updateAdditionalData();
 			return this;
 		};
@@ -928,37 +1232,39 @@
 			if(1 == arguments.length)
 			{
 				var range = arguments[0];
-				FormulaRange.superclass.constructor.call(this, range.c1, range.r1, range.c2, range.r2);
+				Range.call(this, range.c1, range.r1, range.c2, range.r2);
 			}
 			else if(arguments.length > 1)
-				FormulaRange.superclass.constructor.apply(this, arguments);
+				Range.apply(this, arguments);
 			else
-				FormulaRange.superclass.constructor.call(this, 0, 0, 0, 0);
+				Range.call(this, 0, 0, 0, 0);
 
 			this.refType1 = referenceType.R;
 			this.refType2 = referenceType.R;
 		}
-		AscCommon.extendClass(FormulaRange, Range);
+
+		FormulaRange.prototype = Object.create(Range.prototype);
+		FormulaRange.prototype.constructor = FormulaRange;
 		FormulaRange.prototype.clone = function () {
-			var oRes = new FormulaRange(FormulaRange.superclass.clone.apply(this, arguments));
+			var oRes = new FormulaRange(Range.prototype.clone.apply(this, arguments));
 			oRes.refType1 = this.refType1;
 			oRes.refType2 = this.refType2;
 			return oRes;
 		};
 		FormulaRange.prototype.intersection = function () {
-			var oRes = FormulaRange.superclass.intersection.apply(this, arguments);
+			var oRes = Range.prototype.intersection.apply(this, arguments);
 			if(null != oRes)
 				oRes = new FormulaRange(oRes);
 			return oRes;
 		};
 		FormulaRange.prototype.intersectionSimple = function () {
-			var oRes = FormulaRange.superclass.intersectionSimple.apply(this, arguments);
+			var oRes = Range.prototype.intersectionSimple.apply(this, arguments);
 			if(null != oRes)
 				oRes = new FormulaRange(oRes);
 			return oRes;
 		};
 		FormulaRange.prototype.union = function () {
-			return new FormulaRange(FormulaRange.superclass.union.apply(this, arguments));
+			return new FormulaRange(Range.prototype.union.apply(this, arguments));
 		};
 		FormulaRange.prototype.getName = function () {
 			var sRes = "";
@@ -1040,6 +1346,17 @@
 		};
 		RangeCache.prototype.getActiveRange = function (sRange) {
 			return this._getRange(sRange, 2);
+		};
+		RangeCache.prototype.getActiveRangesFromSqRef = function (sqRef) {
+			var res = [];
+			var refs = sqRef.split(' ');
+			for (var i = 0; i < refs.length; ++i) {
+				var ref = AscCommonExcel.g_oRangeCache.getAscRange(refs[i]);
+				if (ref) {
+					res.push(ref.clone());
+				}
+			}
+			return res;
 		};
 		RangeCache.prototype.getFormulaRange = function (sRange) {
 			return this._getRange(sRange, 3);
@@ -1235,7 +1552,7 @@
 		function isFixedWidthCell(frag) {
 			for (var i = 0; i < frag.length; ++i) {
 				var f = frag[i].format;
-				if (f && f.repeat) {return true;}
+				if (f && f.getRepeat()) {return true;}
 			}
 			return false;
 		}
@@ -1519,14 +1836,8 @@
 			this["r2"] = r2;
 		}
 
-		var g_oCSheetViewSettingsProperties = {
-				showGridLines		: 0,
-				showRowColHeaders	: 1
-			};
 		/** @constructor */
 		function asc_CSheetViewSettings () {
-			this.Properties = g_oCSheetViewSettingsProperties;
-
 			// Показывать ли сетку
 			this.showGridLines = null;
 			// Показывать обозначения строк и столбцов
@@ -1534,6 +1845,9 @@
 
 			// Закрепление области
 			this.pane = null;
+
+			//current view zoom
+			this.zoomScale = 100;
 
 			return this;
 		}
@@ -1544,6 +1858,7 @@
 				var result = new asc_CSheetViewSettings();
 				result.showGridLines = this.showGridLines;
 				result.showRowColHeaders = this.showRowColHeaders;
+				result.zoom = this.zoom;
 				if (this.pane)
 					result.pane = this.pane.clone();
 				return result;
@@ -1552,33 +1867,13 @@
 				return this.asc_getShowGridLines() === settings.asc_getShowGridLines() &&
 					this.asc_getShowRowColHeaders() === settings.asc_getShowRowColHeaders();
 			},
-			setSettings: function (settings) {
-				this.showGridLines = settings.showGridLines;
-				this.showRowColHeaders = settings.showRowColHeaders;
-			},
 			asc_getShowGridLines: function () { return false !== this.showGridLines; },
 			asc_getShowRowColHeaders: function () { return false !== this.showRowColHeaders; },
+			asc_getZoomScale: function () { return this.zoomScale; },
 			asc_getIsFreezePane: function () { return null !== this.pane && this.pane.isInit(); },
 			asc_setShowGridLines: function (val) { this.showGridLines = val; },
 			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; },
-			getType : function () {
-				return AscCommonExcel.UndoRedoDataTypes.SheetViewSettings;
-			},
-			getProperties : function () {
-				return this.Properties;
-			},
-			getProperty : function (nType) {
-				switch (nType) {
-					case this.Properties.showGridLines: return this.showGridLines;break;
-					case this.Properties.showRowColHeaders: return this.showRowColHeaders;break;
-				}
-			},
-			setProperty : function (nType, value) {
-				switch (nType) {
-					case this.Properties.showGridLines: this.showGridLines = value;break;
-					case this.Properties.showRowColHeaders: this.showRowColHeaders = value;break;
-				}
-			}
+			asc_setZoomScale: function (val) { this.zoomScale = val; }
 		};
 
 		/** @constructor */
@@ -1624,24 +1919,26 @@
 			this.oOnUpdateTabColor = {};
 			this.oOnUpdateSheetViewSettings = {};
 			this.bAddRemoveRowCol = false;
+			this.bChangeActive = false;
+			this.activeSheet = null;
 		}
 
 
     /** @constructor */
-    function asc_CStylesPainter() {
+    function asc_CStylesPainter(width, height) {
       this.defaultStyles = null;
       this.docStyles = null;
 
-      this.styleThumbnailWidth = 112;
-      this.styleThumbnailHeight = 38;
+      this.styleThumbnailWidth = width;
+      this.styleThumbnailHeight = height;
       this.styleThumbnailWidthPt = this.styleThumbnailWidth * 72 / 96;
       this.styleThumbnailHeightPt = this.styleThumbnailHeight * 72 / 96;
 
       this.styleThumbnailWidthWithRetina = this.styleThumbnailWidth;
       this.styleThumbnailHeightWithRetina = this.styleThumbnailHeight;
       if (AscCommon.AscBrowser.isRetina) {
-        this.styleThumbnailWidthWithRetina <<= 1;
-        this.styleThumbnailHeightWithRetina <<= 1;
+        this.styleThumbnailWidthWithRetina = AscCommon.AscBrowser.convertToRetinaValue(this.styleThumbnailWidthWithRetina, true);
+        this.styleThumbnailHeightWithRetina = AscCommon.AscBrowser.convertToRetinaValue(this.styleThumbnailHeightWithRetina, true);
       }
     }
 
@@ -1734,8 +2031,10 @@
         var fc = oStyle.getFontColor();
         var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
         var format = oStyle.getFont();
+        var fs = format.getSize();
         // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-        var oFont = new Asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
+		var oFont = new Asc.FontProperties(format.getName(), (16 < fs) ? 16 : fs,
+			format.getBold(), format.getItalic(), format.getUnderline(), format.getStrikeout());
 
         var width_padding = 3; // 4 * 72 / 96
 
@@ -1828,6 +2127,7 @@
 			this.countFindAll = 0;
 			this.countReplaceAll = 0;
 			this.sheetIndex = -1;
+			this.error = false;
 		}
 		asc_CFindOptions.prototype.clone = function () {
 			var result = new asc_CFindOptions();
@@ -1849,6 +2149,7 @@
 			result.countFindAll = this.countFindAll;
 			result.countReplaceAll = this.countReplaceAll;
 			result.sheetIndex = this.sheetIndex;
+			result.error = this.error;
 			return result;
 		};
 		asc_CFindOptions.prototype.isEqual = function (obj) {
@@ -1860,6 +2161,7 @@
 		asc_CFindOptions.prototype.clearFindAll = function () {
 			this.countFindAll = 0;
 			this.countReplaceAll = 0;
+			this.error = false;
 		};
 		asc_CFindOptions.prototype.updateFindAll = function () {
 			this.countFindAll += this.countFind;
@@ -1888,14 +2190,31 @@
 			this.cache = {};
 		}
 		CCacheMeasureEmpty.prototype.add = function (elem, val) {
-			var font = (this.cache[elem.fn] || (this.cache[elem.fn] = {}));
-			font[elem.fs] = val;
+			var fn = elem.getName();
+			var font = (this.cache[fn] || (this.cache[fn] = {}));
+			font[elem.getSize()] = val;
 		};
 		CCacheMeasureEmpty.prototype.get = function (elem) {
-			var font = this.cache[elem.fn];
-			return font ? font[elem.fs] : null;
+			var font = this.cache[elem.getName()];
+			return font ? font[elem.getSize()] : null;
 		};
 		var g_oCacheMeasureEmpty = new CCacheMeasureEmpty();
+
+		/** @constructor */
+		function asc_CFormatCellsInfo() {
+			this.type = Asc.c_oAscNumFormatType.General;
+			this.decimalPlaces = 2;
+			this.separator = false;
+			this.symbol = null;
+		}
+		asc_CFormatCellsInfo.prototype.asc_setType = function (val) {this.type = val;};
+		asc_CFormatCellsInfo.prototype.asc_setDecimalPlaces = function (val) {this.decimalPlaces = val;};
+		asc_CFormatCellsInfo.prototype.asc_setSeparator = function (val) {this.separator = val;};
+		asc_CFormatCellsInfo.prototype.asc_setSymbol = function (val) {this.symbol = val;};
+		asc_CFormatCellsInfo.prototype.asc_getType = function () {return this.type;};
+		asc_CFormatCellsInfo.prototype.asc_getDecimalPlaces = function () {return this.decimalPlaces;};
+		asc_CFormatCellsInfo.prototype.asc_getSeparator = function () {return this.separator;};
+		asc_CFormatCellsInfo.prototype.asc_getSymbol = function () {return this.symbol;};
 
 		/*
 		 * Export
@@ -2066,4 +2385,15 @@
 		prot["asc_getType"] = prot.asc_getType;
 
 		window["AscCommonExcel"].g_oCacheMeasureEmpty = g_oCacheMeasureEmpty;
+
+		window["Asc"]["asc_CFormatCellsInfo"] = window["Asc"].asc_CFormatCellsInfo = asc_CFormatCellsInfo;
+		prot = asc_CFormatCellsInfo.prototype;
+		prot["asc_setType"] = prot.asc_setType;
+		prot["asc_setDecimalPlaces"] = prot.asc_setDecimalPlaces;
+		prot["asc_setSeparator"] = prot.asc_setSeparator;
+		prot["asc_setSymbol"] = prot.asc_setSymbol;
+		prot["asc_getType"] = prot.asc_getType;
+		prot["asc_getDecimalPlaces"] = prot.asc_getDecimalPlaces;
+		prot["asc_getSeparator"] = prot.asc_getSeparator;
+		prot["asc_getSymbol"] = prot.asc_getSymbol;
 })(window);

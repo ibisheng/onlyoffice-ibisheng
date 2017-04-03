@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -269,7 +269,8 @@ function COperatorBracket()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(COperatorBracket, CGlyphOperator);
+COperatorBracket.prototype = Object.create(CGlyphOperator.prototype);
+COperatorBracket.prototype.constructor = COperatorBracket;
 COperatorBracket.prototype.calcSize = function( stretch )
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -807,7 +808,8 @@ function COperatorParenthesis()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(COperatorParenthesis, CGlyphOperator);
+COperatorParenthesis.prototype = Object.create(CGlyphOperator.prototype);
+COperatorParenthesis.prototype.constructor = COperatorParenthesis;
 COperatorParenthesis.prototype.calcSize = function(stretch)
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -958,7 +960,8 @@ function COperatorAngleBracket()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(COperatorAngleBracket, CGlyphOperator);
+COperatorAngleBracket.prototype = Object.create(CGlyphOperator.prototype);
+COperatorAngleBracket.prototype.constructor = COperatorAngleBracket;
 COperatorAngleBracket.prototype.calcSize = function(stretch)
 {
     //скобка перевернутая
@@ -1074,7 +1077,8 @@ function CSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CSquareBracket, CGlyphOperator);
+CSquareBracket.prototype = Object.create(CGlyphOperator.prototype);
+CSquareBracket.prototype.constructor = CSquareBracket;
 CSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1150,7 +1154,8 @@ function CHalfSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CHalfSquareBracket, CGlyphOperator);
+CHalfSquareBracket.prototype = Object.create(CGlyphOperator.prototype);
+CHalfSquareBracket.prototype.constructor = CHalfSquareBracket;
 CHalfSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1222,7 +1227,8 @@ function COperatorLine()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(COperatorLine, CGlyphOperator);
+COperatorLine.prototype = Object.create(CGlyphOperator.prototype);
+COperatorLine.prototype.constructor = COperatorLine;
 COperatorLine.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1290,7 +1296,8 @@ function CWhiteSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CWhiteSquareBracket, CGlyphOperator);
+CWhiteSquareBracket.prototype = Object.create(CGlyphOperator.prototype);
+CWhiteSquareBracket.prototype.constructor = CWhiteSquareBracket;
 CWhiteSquareBracket.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1396,7 +1403,8 @@ function COperatorDoubleLine()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(COperatorDoubleLine, CGlyphOperator);
+COperatorDoubleLine.prototype = Object.create(CGlyphOperator.prototype);
+COperatorDoubleLine.prototype.constructor = COperatorDoubleLine;
 COperatorDoubleLine.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1477,7 +1485,8 @@ function CSingleArrow()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CSingleArrow, CGlyphOperator);
+CSingleArrow.prototype = Object.create(CGlyphOperator.prototype);
+CSingleArrow.prototype.constructor = CSingleArrow;
 CSingleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1554,7 +1563,8 @@ function CLeftRightArrow()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CLeftRightArrow, CGlyphOperator);
+CLeftRightArrow.prototype = Object.create(CGlyphOperator.prototype);
+CLeftRightArrow.prototype.constructor = CLeftRightArrow;
 CLeftRightArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1644,7 +1654,8 @@ function CDoubleArrow()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CDoubleArrow, CGlyphOperator);
+CDoubleArrow.prototype = Object.create(CGlyphOperator.prototype);
+CDoubleArrow.prototype.constructor = CDoubleArrow;
 CDoubleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1744,7 +1755,8 @@ function CLR_DoubleArrow()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CLR_DoubleArrow, CGlyphOperator);
+CLR_DoubleArrow.prototype = Object.create(CGlyphOperator.prototype);
+CLR_DoubleArrow.prototype.constructor = CLR_DoubleArrow;
 CLR_DoubleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1857,7 +1869,8 @@ function CCombiningArrow()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CCombiningArrow, CGlyphOperator);
+CCombiningArrow.prototype = Object.create(CGlyphOperator.prototype);
+CCombiningArrow.prototype.constructor = CCombiningArrow;
 CCombiningArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1932,7 +1945,8 @@ function CCombiningHalfArrow()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CCombiningHalfArrow, CGlyphOperator);
+CCombiningHalfArrow.prototype = Object.create(CGlyphOperator.prototype);
+CCombiningHalfArrow.prototype.constructor = CCombiningHalfArrow;
 CCombiningHalfArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -2003,7 +2017,8 @@ function CCombining_LR_Arrow()
 {
     CGlyphOperator.call(this);
 }
-AscCommon.extendClass(CCombining_LR_Arrow, CGlyphOperator);
+CCombining_LR_Arrow.prototype = Object.create(CGlyphOperator.prototype);
+CCombining_LR_Arrow.prototype.constructor = CCombining_LR_Arrow;
 CCombining_LR_Arrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -3267,7 +3282,7 @@ CMathDelimiterPr.prototype.Read_FromBinary = function(Reader)
  */
 function CDelimiter(props)
 {
-    CDelimiter.superclass.constructor.call(this);
+	CMathBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -3285,7 +3300,8 @@ function CDelimiter(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CDelimiter, CMathBase);
+CDelimiter.prototype = Object.create(CMathBase.prototype);
+CDelimiter.prototype.constructor = CDelimiter;
 
 CDelimiter.prototype.ClassType = AscDFH.historyitem_type_delimiter;
 CDelimiter.prototype.kind      = MATH_DELIMITER;
@@ -3375,7 +3391,7 @@ CDelimiter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsIn
     this.endOper.PreRecalc(this, ParaMath);
     this.sepOper.PreRecalc(this, ParaMath);
 
-    CDelimiter.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+    CMathBase.prototype.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
 };
 CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 {
@@ -3434,7 +3450,7 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         PRS.bMath_OneLine = true;
         this.NumBreakContent = -1;
 
-        CDelimiter.superclass.Recalculate_Range.call(this, PRS, ParaPr, Depth);
+        CMathBase.prototype.Recalculate_Range.call(this, PRS, ParaPr, Depth);
 
         this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
         this.BrGapRight = this.GapRight + this.endOper.size.width;
@@ -3445,7 +3461,7 @@ CDelimiter.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
     this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
     this.BrGapRight = this.GapRight + this.endOper.size.width;
 
-    CDelimiter.superclass.Recalculate_MinMaxContentWidth.call(this, MinMax);
+    CMathBase.prototype.Recalculate_MinMaxContentWidth.call(this, MinMax);
 };
 CDelimiter.prototype.Is_EmptyGaps = function()
 {
@@ -3459,7 +3475,7 @@ CDelimiter.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _
     var CurLine = _CurLine - this.StartLine;
     var CurRange = (0 === CurLine ? _CurRange - this.StartRange : _CurRange);
 
-    CDelimiter.superclass.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
+    CMathBase.prototype.Recalculate_LineMetrics.call(this, PRS, ParaPr, _CurLine, _CurRange, ContentMetrics);
 
     if(CurLine == 0 && CurRange == 0)
     {
@@ -3769,76 +3785,76 @@ CDelimiter.prototype.getElementMathContent = function(Index)
 };
 CDelimiter.prototype.Apply_MenuProps = function(Props)
 {
-    var NewContent;
+	var NewContent;
 
-    if(Props.Type == Asc.c_oAscMathInterfaceType.Delimiter)
-    {
-        if(Props.HideBegOper !== undefined && Props.HideBegOper !== this.begOper.Is_Empty())
-        {
-            var BegOper = this.private_GetLeftOperator(Props.HideBegOper);
+	if (Props.Type == Asc.c_oAscMathInterfaceType.Delimiter)
+	{
+		if (Props.HideBegOper !== undefined && Props.HideBegOper !== this.begOper.Is_Empty())
+		{
+			var BegOper = this.private_GetLeftOperator(Props.HideBegOper);
 
-            History.Add(this, new CChangesMathDelimBegOper(BegOper, this.Pr.begChr));
-            this.raw_HideBegOperator(BegOper);
-        }
+			History.Add(new CChangesMathDelimBegOper(this, this.Pr.begChr, BegOper));
+			this.raw_HideBegOperator(BegOper);
+		}
 
-        if(Props.HideEndOper !== undefined && Props.HideEndOper !== this.endOper.Is_Empty())
-        {
-            var EndOper = this.private_GetRightOperator(Props.HideEndOper);
+		if (Props.HideEndOper !== undefined && Props.HideEndOper !== this.endOper.Is_Empty())
+		{
+			var EndOper = this.private_GetRightOperator(Props.HideEndOper);
 
-            History.Add(this, new CChangesMathDelimEndOper(EndOper, this.Pr.endChr));
-            this.raw_HideEndOperator(EndOper);
-        }
+			History.Add(new CChangesMathDelimEndOper(this, this.Pr.endChr, EndOper));
+			this.raw_HideEndOperator(EndOper);
+		}
 
-        if(Props.Grow !== undefined && Props.Grow !== this.Pr.grow)
-        {
-            History.Add(this, new CChangesMathDelimiterGrow(Props.Grow, this.Pr.grow));
-            this.raw_SetGrow(Props.Grow);
-        }
+		if (Props.Grow !== undefined && Props.Grow !== this.Pr.grow)
+		{
+			History.Add(new CChangesMathDelimiterGrow(this, this.Pr.grow, Props.Grow));
+			this.raw_SetGrow(Props.Grow);
+		}
 
-        if(Props.MatchBrackets !== undefined && this.Pr.grow == true)
-        {
-            var Shp = Props.MatchBrackets == true ? DELIMITER_SHAPE_MATCH : DELIMITER_SHAPE_CENTERED ;
+		if (Props.MatchBrackets !== undefined && this.Pr.grow == true)
+		{
+			var Shp = Props.MatchBrackets == true ? DELIMITER_SHAPE_MATCH : DELIMITER_SHAPE_CENTERED;
 
-            if(Shp !== this.Pr.shp)
-            {
-                History.Add(this, new CChangesMathDelimiterShape(Shp, this.Pr.shp));
-                this.raw_SetShape(Shp);
-            }
-        }
+			if (Shp !== this.Pr.shp)
+			{
+				History.Add(new CChangesMathDelimiterShape(this, this.Pr.shp, Shp));
+				this.raw_SetShape(Shp);
+			}
+		}
 
-        if(Props.Action & c_oMathMenuAction.DeleteDelimiterArgument)
-        {
-            if(this.Pr.column > 1)
-            {
-                History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column - 1, this.Pr.column));
-                this.raw_SetColumn(this.Pr.column - 1);
+		if (Props.Action & c_oMathMenuAction.DeleteDelimiterArgument)
+		{
+			if (this.Pr.column > 1)
+			{
+				History.Add(new CChangesMathDelimiterSetColumn(this, this.Pr.column, this.Pr.column - 1));
+				this.raw_SetColumn(this.Pr.column - 1);
 
-                this.protected_RemoveItems(this.CurPos, [ this.Content[this.CurPos] ], true);
-            }
-        }
+				this.protected_RemoveItems(this.CurPos, [this.Content[this.CurPos]], true);
+			}
+		}
 
-        if(Props.Action & c_oMathMenuAction.InsertDelimiterArgument)
-        {
-            if(Props.Action & c_oMathMenuAction.InsertBefore)
-            {
-                History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column + 1, this.Pr.column));
-                this.raw_SetColumn(this.Pr.column + 1);
+		if (Props.Action & c_oMathMenuAction.InsertDelimiterArgument)
+		{
+			if (Props.Action & c_oMathMenuAction.InsertBefore)
+			{
+				History.Add(new CChangesMathDelimiterSetColumn(this, this.Pr.column, this.Pr.column + 1));
+				this.raw_SetColumn(this.Pr.column + 1);
 
-                NewContent = new CMathContent();
-                NewContent.Correct_Content(true);
-                this.protected_AddToContent(this.CurPos, [NewContent], true);
-            }
-            else
-            {
-                History.Add(this, new CChangesMathBaseSetColumn(this.Pr.column + 1, this.Pr.column));
-                this.raw_SetColumn(this.Pr.column + 1);
+				NewContent = new CMathContent();
+				NewContent.Correct_Content(true);
+				this.protected_AddToContent(this.CurPos, [NewContent], true);
+			}
+			else
+			{
+				History.Add(new CChangesMathDelimiterSetColumn(this, this.Pr.column, this.Pr.column + 1));
+				this.raw_SetColumn(this.Pr.column + 1);
 
-                NewContent = new CMathContent();
-                NewContent.Correct_Content(true);
-                this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
-            }
-        }
-    }
+				NewContent = new CMathContent();
+				NewContent.Correct_Content(true);
+				this.protected_AddToContent(this.CurPos + 1, [NewContent], true);
+			}
+		}
+	}
 };
 CDelimiter.prototype.Get_InterfaceProps = function()
 {
@@ -4031,7 +4047,7 @@ CDelimiter.prototype.private_GetRightOperator = function(bHide)
  */
 function CMathMenuDelimiter(Delimiter)
 {
-    CMathMenuDelimiter.superclass.constructor.call(this, Delimiter);
+	CMathMenuBase.call(this, Delimiter);
 
     this.Type         = Asc.c_oAscMathInterfaceType.Delimiter;
 
@@ -4052,7 +4068,8 @@ function CMathMenuDelimiter(Delimiter)
         this.bSingleArgument    = true;
     }
 }
-AscCommon.extendClass(CMathMenuDelimiter, CMathMenuBase);
+CMathMenuDelimiter.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuDelimiter.prototype.constructor = CMathMenuDelimiter;
 CMathMenuDelimiter.prototype.get_HideOpeningBracket = function(){return this.HideBegOper;};
 CMathMenuDelimiter.prototype.put_HideOpeningBracket = function(Hide){this.HideBegOper = Hide;};
 CMathMenuDelimiter.prototype.get_HideClosingBracket = function(){return this.HideEndOper;};
@@ -4086,7 +4103,8 @@ function CCharacter()
     this.operator = new COperator(OPER_GROUP_CHAR);
     CMathBase.call(this);
 }
-AscCommon.extendClass(CCharacter, CMathBase);
+CCharacter.prototype = Object.create(CMathBase.prototype);
+CCharacter.prototype.constructor = CCharacter;
 CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
     this.operator.mergeProperties(props, defaultProps);
@@ -4290,7 +4308,7 @@ CMathGroupChrPr.prototype.Read_FromBinary = function(Reader)
  */
 function CGroupCharacter(props)
 {
-    CGroupCharacter.superclass.constructor.call(this);
+	CCharacter.call(this);
 
 	this.Id   = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -4302,7 +4320,8 @@ function CGroupCharacter(props)
     /// вызов этой функции обязательно в конце
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CGroupCharacter, CCharacter);
+CGroupCharacter.prototype = Object.create(CCharacter.prototype);
+CGroupCharacter.prototype.constructor = CGroupCharacter;
 CGroupCharacter.prototype.ClassType = AscDFH.historyitem_type_groupChr;
 CGroupCharacter.prototype.kind      = MATH_GROUP_CHARACTER;
 CGroupCharacter.prototype.init = function(props)
@@ -4360,7 +4379,7 @@ CGroupCharacter.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, G
     if(this.Pr.pos == this.Pr.vertJc)
         ArgSz.Decrease();
 
-    CGroupCharacter.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSz, RPI, GapsInfo);
+	CCharacter.prototype.PreRecalc.call(this, Parent, ParaMath, ArgSz, RPI, GapsInfo);
 };
 CGroupCharacter.prototype.getBase = function()
 {
@@ -4448,7 +4467,7 @@ CGroupCharacter.prototype.private_InversePr = function()
 {
     var NewPr = this.private_GetInversePr(this.Pr);
     var OldPr = this.Pr.Copy();
-    History.Add(this, new CChangesMathGroupCharPr(NewPr, OldPr));
+    History.Add(new CChangesMathGroupCharPr(this, OldPr, NewPr));
     this.raw_SetPr(NewPr);
 };
 CGroupCharacter.prototype.raw_SetPr = function(Pr)
@@ -4479,7 +4498,7 @@ CGroupCharacter.prototype.Can_ChangePos = function()
  */
 function CMathMenuGroupCharacter(GroupChr)
 {
-    CMathMenuGroupCharacter.superclass.constructor.call(this, GroupChr);
+	CMathMenuBase.call(this, GroupChr);
 
     this.Type          = Asc.c_oAscMathInterfaceType.GroupChar;
 
@@ -4494,7 +4513,8 @@ function CMathMenuGroupCharacter(GroupChr)
         this.bCanChangePos = undefined;
     }
 }
-AscCommon.extendClass(CMathMenuGroupCharacter, CMathMenuBase);
+CMathMenuGroupCharacter.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuGroupCharacter.prototype.constructor = CMathMenuGroupCharacter;
 CMathMenuGroupCharacter.prototype.get_Pos         = function(){return this.Pos;};
 CMathMenuGroupCharacter.prototype.put_Pos         = function(Pos){this.Pos = Pos;};
 CMathMenuGroupCharacter.prototype.can_ChangePos   = function(){return this.bCanChangePos;};

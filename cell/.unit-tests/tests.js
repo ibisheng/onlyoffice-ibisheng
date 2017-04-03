@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -130,64 +130,6 @@ $(function () {
 		strictEqual(Asc.round(-.1-.2+.3), 0, "Asc.round(-.1-.2+.3)"); // -5.5e-17
 		strictEqual(Asc.round(.1+.2+.9-.2), 1, "Asc.round(.1+.2+.9-.2)"); // 1.0000...2
 		strictEqual(Asc.round(-.1-.2-.9+.2), -1, "Asc.round(.1+.2+.9-.2)"); // -1.0000...2
-	});
-
-	test("AscCommon.extendClass", function test_extendClass() {
-		function Base(b1) {
-			this.b1 = b1;
-		}
-		Base.prototype.mb1 = function (b1) {this.b1=b1;};
-
-		function Child(b1, c1) {
-			Child.superclass.constructor.call(this, b1);
-			this.c1 = c1;
-		}
-		AscCommon.extendClass(Child, Base);
-		Child.prototype.mc1 = function (c1) {this.c1=c1;};
-
-		var x = new Child(1, 2);
-		ok(x !== undefined, "x = new Child(1, 2)");
-		ok(x.mb1 !== undefined, "x.mb1");
-		ok(x.mc1 !== undefined, "x.mc1");
-		equal(x.b1, 1, "x.b1");
-		equal(x.c1, 2, "x.c1");
-		x.mb1(3);
-		equal(x.b1, 3, "x.b1");
-		equal(x.c1, 2, "x.c1");
-		x.mc1(4);
-		equal(x.b1, 3, "x.b1");
-		equal(x.c1, 4, "x.c1");
-	});
-
-	test("AscCommon.extendClass with fabric method", function test_extendClass2() {
-		function Base(b1) {
-			if ( !(this instanceof Base) ) {return new Base(b1);}
-			this.b1 = b1;
-			return this;
-		}
-		Base.prototype.mb1 = function (b1) {this.b1=b1;};
-
-		function Child(b1, c1) {
-			if ( !(this instanceof Child) ) {return new Child(b1, c1);}
-			Child.superclass.constructor.call(this, b1);
-			this.c1 = c1;
-			return this;
-		}
-		AscCommon.extendClass(Child, Base);
-		Child.prototype.mc1 = function (c1) {this.c1=c1;};
-
-		var x = Child(1, 2);
-		ok(x !== undefined, "x = Child(1, 2)");
-		ok(x.mb1 !== undefined, "x.mb1");
-		ok(x.mc1 !== undefined, "x.mc1");
-		equal(x.b1, 1, "x.b1");
-		equal(x.c1, 2, "x.c1");
-		x.mb1(3);
-		equal(x.b1, 3, "x.b1");
-		equal(x.c1, 2, "x.c1");
-		x.mc1(4);
-		equal(x.b1, 3, "x.b1");
-		equal(x.c1, 4, "x.c1");
 	});
 
 	function check_range(range, c1, r1, c2, r2, msg) {
@@ -342,4 +284,122 @@ $(function () {
 		l3.trigger("onEvent1", "trigger event with all handlers removed by 'remove()'");              //-
 	});
 
+	test("RangeTree", function test_HandlersList() {
+		function getRandomArbitary(min, max)
+		{
+			return Math.round(Math.random() * (max - min) + min);
+		}
+		function getCellIndex(row, col) {
+			return row * AscCommon.gc_nMaxCol + col;
+		}
+		function testCells(cells, tree, standart)
+		{
+			var starndartRes = {};
+			var treeCells = {};
+			for(var i = 0; i < cells.length; ++i){
+				var cell = cells[i];
+				treeCells[cell.index] = cell.index;
+				for(var id in standart){
+					var data = standart[id];
+					if(data.bbox.contains(cell.col, cell.row)){
+						starndartRes[data.id] = data;
+					}
+				}
+			}
+			var starndartResArr = [];
+			for(var i in starndartRes){
+				starndartResArr.push(starndartRes[i].id);
+			}
+			var treeRes = [];
+			var areas = tree.getByCells(treeCells);
+			for(var i = 0 ; i < areas.length; ++i){
+				treeRes.push(areas[i].data.id);
+			}
+			tree.getByCellsEnd(areas);
+			treeRes.sort();
+			starndartResArr.sort();
+			var res = JSON.stringify(starndartResArr)==JSON.stringify(treeRes);
+			return res;
+		}
+		function test(row, col, tree, standart)
+		{
+			var cells = [];
+			var cellsCount = 10;
+			while (cellsCount-- > 0) {
+				var r1 = getRandomArbitary(0, row);
+				var c1 = getRandomArbitary(0, col);
+				cells.push({row: r1, col: c1, index: getCellIndex(r1, c1)});
+			}
+			return testCells(cells, tree, standart);
+		}
+		var bboxCount = 1000;
+		var colMax = 100;
+		var rowMax = 100;
+
+		var tree = new AscCommonExcel.RangeTree();
+		var standard = {};
+		var count = 0;
+		for(var i = 0 ; i < bboxCount; ++i){
+			var r1 = getRandomArbitary(0, rowMax);
+			var r2 = getRandomArbitary(0, rowMax);
+			var c1 = getRandomArbitary(0, colMax);
+			var c2 = getRandomArbitary(0, colMax);
+			var bbox = new Asc.Range(c1, c2, r1, r2, true);
+			var name = bbox.getName();
+			if (!standard[name]) {
+				var data = {bbox: bbox, id: i};
+				standard[name] = data;
+				tree.add(bbox, data);
+				var res = test(rowMax, colMax, tree, standard);
+				count += res ? 0 : 1;
+			}
+		}
+		strictEqual(count, 0, "RangeTree missmatch");
+		count = 0;
+		for(var i in standard){
+			var data = standard[i];
+			delete standard[i];
+			tree.remove(data.bbox, data);
+			var res = test(rowMax, colMax, tree, standard);
+			count += res ? 0 : 1;
+		}
+		strictEqual(count, 0, "RangeTree no empty");
+	});
+	test("DependencyGraph.startListeningRange", function test_HandlersList() {
+		function getRandomArbitary(min, max)
+		{
+			return Math.round(Math.random() * (max - min) + min);
+		}
+		var bboxCount = 100;
+		var colMax = 100;
+		var rowMax = 100;
+		var sheetId = 0;
+
+		var graph = new AscCommonExcel.DependencyGraph(null);
+		var standard = {};
+		for(var i = 0 ; i < bboxCount; ++i){
+			var r1 = getRandomArbitary(0, rowMax);
+			var r2 = getRandomArbitary(0, rowMax);
+			var c1 = getRandomArbitary(0, colMax);
+			var c2 = getRandomArbitary(0, colMax);
+			var bbox = new Asc.Range(c1, c2, r1, r2, true);
+			var listener = {bbox: bbox, getListenerId: function(){return i;}};
+			standard[listener.getListenerId()] = listener;
+			graph.startListeningRange(sheetId, bbox, listener);
+		}
+		for(var i in standard){
+			var data = standard[i];
+			delete standard[i];
+			graph.endListeningRange(sheetId, data.bbox, data);
+		}
+		var res = "";
+		var sheetContainer = graph.sheetListeners[sheetId];
+		for(var i in sheetContainer.cellMap){
+			res += i;
+		}
+		for(var i in sheetContainer.areaMap){
+			res += i;
+		}
+		strictEqual(res, "", "DependencyGraph no empty");
+	});
 });

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -96,6 +96,15 @@
 
 		// AutoSave
 		this.autoSaveGap = 0;					// Интервал автосохранения (0 - означает, что автосохранения нет) в милесекундах
+		this.lastSaveTime = null;				// Время последнего сохранения
+		this.autoSaveGapFast = 2000;			// Интервал быстрого автосохранения (когда человек один) - 2 сек.
+		this.autoSaveGapSlow = 10 * 60 * 1000;	// Интервал медленного автосохранения (когда совместно) - 10 минут
+		this.intervalWaitAutoSave = 1000;
+
+		// Unlock document
+		this.canUnlockDocument = false;
+		this.canUnlockDocument2 = false;		// Дублирующий флаг, только для saveChanges или unLockDocument
+		this.canStartCoAuthoring = false;
 
 		this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
@@ -130,6 +139,11 @@
 
 		this.canSave    = true;        // Флаг нужен чтобы не происходило сохранение пока не завершится предыдущее сохранение
 		this.IsUserSave = false;    // Флаг, контролирующий сохранение было сделано пользователем или нет (по умолчанию - нет)
+		this.isForceSaveOnUserSave = false;
+        this.forceSaveButtonTimeout = null;
+        this.forceSaveButtonContinue = false;
+        this.forceSaveTimeoutTimeout = null;
+		this.disconnectOnSave = null;
 
 		// Version History
 		this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
@@ -155,6 +169,8 @@
 		this.pluginsManager = null;
 
 		this.isLockTargetUpdate = false;
+
+		this.lastWorkTime = 0;
 
 		return this;
 	}
@@ -192,6 +208,18 @@
 			t._onEndLoadSdk();
 			t.onEndLoadFile(null);
 		});
+
+		var oldOnError = window.onerror;
+		window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
+			var msg = 'Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber
+				+ ' Column: ' + column + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
+			t.CoAuthoringApi.sendChangesError(msg);
+			if (oldOnError) {
+				return oldOnError.apply(this, arguments);
+			} else {
+				return false;
+			}
+		}
 	};
 	baseEditorsApi.prototype._editorNameById                 = function()
 	{
@@ -385,7 +413,7 @@
 		this.sendEvent("asc_onPrint");
 	};
 	// Open
-	baseEditorsApi.prototype.asc_LoadDocument                    = function(isVersionHistory, isRepeat)
+	baseEditorsApi.prototype.asc_LoadDocument                    = function(versionHistory, isRepeat)
 	{
 		// Меняем тип состояния (на открытие)
 		this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
@@ -401,13 +429,15 @@
 				"title"         : this.documentTitle,
 				"embeddedfonts" : this.isUseEmbeddedCutFonts
 			};
-			if (isVersionHistory)
+			if (versionHistory)
 			{
+                rData["closeonerror"] = versionHistory.isRequested;
+				rData["jwt"] = versionHistory.token;
 				//чтобы результат пришел только этому соединению, а не всем кто в документе
 				rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
 			}
 		}
-		if (isVersionHistory) {
+		if (versionHistory) {
 			this.CoAuthoringApi.versionHistory(rData);
 		} else {
 			this.CoAuthoringApi.auth(this.getViewMode(), rData);
@@ -473,6 +503,17 @@
 			AscCommon.getFile(url);
 		}
 	};
+	baseEditorsApi.prototype.forceSave = function()
+	{
+		return this.CoAuthoringApi.forceSave();
+	};
+	baseEditorsApi.prototype.asc_setIsForceSaveOnUserSave = function(val)
+	{
+		this.isForceSaveOnUserSave = val;
+	};
+	// Функция автосохранения. Переопределяется во всех редакторах
+	baseEditorsApi.prototype._autoSave = function () {
+	};
 	// Выставление интервала автосохранения (0 - означает, что автосохранения нет)
 	baseEditorsApi.prototype.asc_setAutoSaveGap                  = function(autoSaveGap)
 	{
@@ -530,6 +571,9 @@
 		{
 			t.sendEvent('asc_onCoAuthoringChatReceiveMessage', e, clear);
 		};
+		this.CoAuthoringApi.onServerVersion = function (buildVersion, buildNumber) {
+			t.sendEvent('asc_onServerVersion', buildVersion, buildNumber);
+		};
 		this.CoAuthoringApi.onAuthParticipantsChanged = function(e, count)
 		{
 			t.sendEvent("asc_onAuthParticipantsChanged", e, count);
@@ -556,10 +600,10 @@
 			if (t.isOnFirstConnectEnd)
 			{
 				if (t.CoAuthoringApi.get_isAuth()) {
-					t.CoAuthoringApi.auth(t.getViewMode());
+					t.CoAuthoringApi.auth(t.getViewMode(), undefined, t.isIdle());
 				} else {
 					//первый запрос или ответ не дошел надо повторить открытие
-					t.asc_LoadDocument(false, true);
+					t.asc_LoadDocument(undefined, true);
 				}
 			}
 			else
@@ -574,9 +618,9 @@
 			t.isOnLoadLicense = true;
 			t._onEndPermissions();
 		};
-		this.CoAuthoringApi.onWarning                 = function(e)
+		this.CoAuthoringApi.onWarning                 = function(code)
 		{
-			t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
+			t.sendEvent('asc_onError', code || c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
 		};
 		this.CoAuthoringApi.onMeta                    = function(data)
 		{
@@ -595,38 +639,85 @@
 			var interval = data["interval"];
 			var extendSession = true;
 			if (c_oCloseCode.sessionIdle == code) {
-				var lastTime = new Date().getTime();
-				var idleTime = new Date().getTime() - lastTime;
-				if (idleTime < interval) {
-					t.CoAuthoringApi.extendSession(idleTime);
-				} else {
+				var idleTime = t.isIdle();
+				if (idleTime > interval) {
 					extendSession = false;
+				} else {
+					t.CoAuthoringApi.extendSession(idleTime);
 				}
 			} else if (c_oCloseCode.sessionAbsolute == code) {
 				extendSession = false;
 			}
 			if (!extendSession) {
-				if (History.Have_Changes()) {
+				if (t.asc_Save(false, false, true)) {
 					//enter view mode because save async
-					t.sendEvent('asc_onCoAuthoringDisconnect');
-					t.asc_setViewMode(true);
-
-					t.CoAuthoringApi.onUnSaveLock = function() {
-						t.CoAuthoringApi.onUnSaveLock = null;
-
-						t.CoAuthoringApi.disconnect(code, reason);
-					};
-					if (t.collaborativeEditing.applyChanges) {
-						t.collaborativeEditing.applyChanges();
-						t.collaborativeEditing.sendChanges();
-					} else {
-						AscCommon.CollaborativeEditing.Apply_Changes();
-						AscCommon.CollaborativeEditing.Send_Changes();
-					}
+					t.setViewModeDisconnect();
+					t.disconnectOnSave = {code: code, reason: reason};
 				} else {
 					t.CoAuthoringApi.disconnect(code, reason);
 				}
 			}
+		};
+        this.CoAuthoringApi.onForceSave = function(data) {
+            if (AscCommon.c_oAscForceSaveTypes.Button === data.type) {
+                if (data.start) {
+                    if (null === t.forceSaveButtonTimeout && !t.forceSaveButtonContinue) {
+                        t.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                    } else {
+                        clearInterval(t.forceSaveButtonTimeout);
+                    }
+                    t.forceSaveButtonTimeout = setInterval(function() {
+                        t.forceSaveButtonTimeout = null;
+                        if (t.forceSaveButtonContinue) {
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+                        } else {
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                        }
+                        t.forceSaveButtonContinue = false;
+                    }, Asc.c_nMaxConversionTime);
+                } else if (data.refuse) {
+                    if (t.forceSaveButtonContinue) {
+                        t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+                    }
+                    t.forceSaveButtonContinue = false;
+                } else {
+                    if (null !== t.forceSaveButtonTimeout) {
+                        clearInterval(t.forceSaveButtonTimeout);
+                        t.forceSaveButtonTimeout = null;
+                        if (t.forceSaveButtonContinue) {
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
+                        } else {
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveButton);
+                        }
+                        t.forceSaveButtonContinue = false;
+                    }
+                }
+            } else {
+                if (AscCommon.CollaborativeEditing.Is_Fast() || null !== t.forceSaveTimeoutTimeout) {
+                    if (data.start) {
+                        if (null === t.forceSaveTimeoutTimeout) {
+                            t.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                        } else {
+                            clearInterval(t.forceSaveTimeoutTimeout);
+                        }
+                        t.forceSaveTimeoutTimeout = setInterval(function() {
+                            t.forceSaveTimeoutTimeout = null;
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                        }, Asc.c_nMaxConversionTime);
+                    } else {
+                        if (null !== t.forceSaveTimeoutTimeout) {
+                            clearInterval(t.forceSaveTimeoutTimeout);
+                            t.forceSaveTimeoutTimeout = null;
+                            t.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.ForceSaveTimeout);
+                        }
+                    }
+                }
+            }
+        };
+		this.CoAuthoringApi.onExpiredToken = function() {
+			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+			t.VersionHistory = null;
+			t.sendEvent('asc_onExpiredToken');
 		};
 		/**
 		 * Event об отсоединении от сервера
@@ -642,10 +733,7 @@
 			}
 			if (null != errorCode)
 			{
-				// Посылаем наверх эвент об отключении от сервера
-				t.sendEvent('asc_onCoAuthoringDisconnect');
-				// И переходим в режим просмотра т.к. мы не можем сохранить файл
-				t.asc_setViewMode(true);
+				t.setViewModeDisconnect();
 				t.sendEvent('asc_onError', errorCode, c_oAscError.Level.NoCritical);
 			}
 		};
@@ -978,6 +1066,10 @@
 		}
 
 		this.pluginsManager     = Asc.createPluginsManager(this);
+
+		if (!window['IS_NATIVE_EDITOR']) {
+			setInterval(function() {t._autoSave();}, 40);
+		}
 	};
 
 	baseEditorsApi.prototype.sendStandartTextures = function()
@@ -1022,6 +1114,75 @@
 	{
 		this.sync_EndAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.LoadFont);
 		Obj.Generate2();
+	};
+
+	baseEditorsApi.prototype.sendColorThemes = function (theme) {
+		var result = AscCommon.g_oUserColorScheme.slice();
+
+		// theme colors
+		var elem, _c;
+		var _extra = theme.extraClrSchemeLst;
+		var _count = _extra.length;
+		var _rgba = {R: 0, G: 0, B: 0, A: 255};
+		for (var i = 0; i < _count; ++i) {
+			var _scheme = _extra[i].clrScheme;
+
+			elem = new AscCommon.CAscColorScheme();
+			elem.name = _scheme.name;
+
+			_scheme.colors[8].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[8].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[12].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[12].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[9].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[9].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[13].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[13].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[0].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[0].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[1].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[1].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[2].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[2].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[3].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[3].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[4].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[4].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[5].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[5].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[11].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[11].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+			_scheme.colors[10].Calculate(theme, null, null, null, _rgba);
+			_c = _scheme.colors[10].RGBA;
+			elem.colors.push(new AscCommon.CColor(_c.R, _c.G, _c.B));
+
+            result.push(elem)
+		}
+
+		this.sendEvent("asc_onSendThemeColorSchemes", result);
+		return result;
 	};
 
 	// plugins
@@ -1137,6 +1298,50 @@
 	baseEditorsApi.prototype.GetTextBoxInputMode = function()
 	{
 		return AscCommon.TextBoxInputMode;
+	};
+
+	baseEditorsApi.prototype.asc_OnHideContextMenu = function()
+	{
+	};
+	baseEditorsApi.prototype.asc_OnShowContextMenu = function()
+	{
+	};
+
+	baseEditorsApi.prototype.isIdle = function()
+	{
+		// пока не стартовали - считаем работаем
+		if (0 == this.lastWorkTime)
+			return 0;
+
+		// если плагин работает - то и мы тоже
+		if (this.pluginsManager && this.pluginsManager.current != null)
+			return 0;
+
+		if (this.isEmbedVersion)
+			return 0;
+
+		if (!this.saveCheck())
+			return 0;
+
+		return new Date().getTime() - this.lastWorkTime;
+	};
+
+	baseEditorsApi.prototype.checkLastWork = function()
+	{
+		this.lastWorkTime = new Date().getTime();
+	};
+
+	baseEditorsApi.prototype.setViewModeDisconnect = function()
+	{
+		// Посылаем наверх эвент об отключении от сервера
+		this.sendEvent('asc_onCoAuthoringDisconnect');
+		// И переходим в режим просмотра т.к. мы не можем сохранить файл
+		this.asc_setViewMode(true);
+	};
+
+	baseEditorsApi.prototype.saveCheck = function()
+	{
+		return false;
 	};
 
 	//----------------------------------------------------------export----------------------------------------------------

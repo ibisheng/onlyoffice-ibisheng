@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -95,37 +95,31 @@ function CTableRow(Table, Cols, TableGrid)
 
 CTableRow.prototype =
 {
-    Set_Id : function(newId)
-    {
-        AscCommon.g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.Id;
     },
 
-    // Создаем копию данного объекта
-    Copy : function(Table)
-    {
-        var Row = new CTableRow(Table, 0);
+	// Создаем копию данного объекта
+	Copy : function(Table)
+	{
+		var Row = new CTableRow(Table, 0);
 
-        // Копируем настройки строки
-        Row.Set_Pr( this.Pr.Copy() );
+		// Копируем настройки строки
+		Row.Set_Pr(this.Pr.Copy());
 
-        // Копируем ячейки
-        var CellsCount = this.Content.length;
-        for ( var Index = 0; Index < CellsCount; Index++ )
-        {
-            Row.Content[Index] = this.Content[Index].Copy(Row);
-            History.Add( Row, { Type : AscDFH.historyitem_TableRow_AddCell, Pos : Index, Item : { Cell : Row.Content[Index], CellInfo : {}  } } );
-        }
+		// Копируем ячейки
+		var CellsCount = this.Content.length;
+		for (var Index = 0; Index < CellsCount; Index++)
+		{
+			Row.Content[Index] = this.Content[Index].Copy(Row);
+			History.Add(new CChangesTableRowAddCell(Row, Index, [Row.Content[Index]]));
+		}
 
-        Row.Internal_ReIndexing();
+		Row.Internal_ReIndexing();
 
-        return Row;
-    },
+		return Row;
+	},
 
     Is_UseInDocument : function(Id)
     {
@@ -316,12 +310,12 @@ CTableRow.prototype =
         }
     },
 
-    Set_Pr : function(RowPr)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_TableRow_Pr, Old : this.Pr, New : RowPr } );
-        this.Pr = RowPr;
-        this.Recalc_CompiledPr();
-    },
+	Set_Pr : function(RowPr)
+	{
+		History.Add(new CChangesTableRowPr(this, this.Pr, RowPr));
+		this.Pr = RowPr;
+		this.Recalc_CompiledPr();
+	},
 
     Get_Before : function()
     {
@@ -336,46 +330,38 @@ CTableRow.prototype =
         return Before;
     },
 
-    Set_Before : function(GridBefore, WBefore)
-    {
-        // Если парметр WBefore === false, значит значение WBefore мы не меняем
-        if ( this.Pr.GridBefore !== GridBefore || this.Pr.WBefore !== WBefore )
-        {
-            var OldBefore =
-                {
-                    GridBefore : ( undefined != this.Pr.GridBefore ? this.Pr.GridBefore : undefined ),
-                    WBefore    : ( undefined != this.Pr.WBefore    ? this.Pr.WBefore    : undefined )
-                };
+	Set_Before : function(GridBefore, WBefore)
+	{
+		// Если парметр WBefore === false, значит значение WBefore мы не меняем
+		if (this.Pr.GridBefore !== GridBefore || this.Pr.WBefore !== WBefore)
+		{
+			var OldBefore = {
+				GridBefore : this.Pr.GridBefore,
+				WBefore    : this.Pr.WBefore
+			};
 
-            var NewBefore =
-                {
-                    GridBefore : ( undefined != GridBefore ? GridBefore : undefined ),
-                    WBefore    : ( undefined != WBefore    ? WBefore    : undefined )
-                };
+			var NewBefore = {
+				GridBefore : GridBefore,
+				WBefore    : WBefore
+			};
 
-            if ( false === WBefore )
-                NewBefore.WBefore = OldBefore.WBefore;
-            else if ( undefined != WBefore )
-            {
-                NewBefore.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
-                NewBefore.WBefore.Set_FromObject(WBefore);
-            }
+			if (false === WBefore)
+			{
+				NewBefore.WBefore = OldBefore.WBefore;
+			}
+			else if (undefined != WBefore)
+			{
+				NewBefore.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
+				NewBefore.WBefore.Set_FromObject(WBefore);
+			}
 
-            History.Add( this, { Type : AscDFH.historyitem_TableRow_Before, Old : OldBefore, New : NewBefore } );
+			History.Add(new CChangesTableRowBefore(this, OldBefore, NewBefore));
 
-            if ( undefined != NewBefore.GridBefore )
-                this.Pr.GridBefore = GridBefore;
-            else
-                this.Pr.GridBefore = undefined;
-
-            if ( undefined != NewBefore.WBefore )
-                this.Pr.WBefore = NewBefore.WBefore;
-            else
-                this.Pr.WBefore = undefined;
-
-            this.Recalc_CompiledPr();
-        }
-    },
+			this.Pr.GridBefore = GridBefore;
+			this.Pr.WBefore    = NewBefore.WBefore;
+			this.Recalc_CompiledPr();
+		}
+	},
 
     Get_After : function()
     {
@@ -390,79 +376,54 @@ CTableRow.prototype =
         return After;
     },
 
-    Set_After : function(GridAfter, WAfter)
-    {
-        // Если парметр WAfter === false, значит значение WAfter мы не меняем
-        if ( this.Pr.GridAfter !== GridAfter || this.Pr.WAfter !== WAfter )
-        {
-            var OldAfter =
-                {
-                    GridAfter : ( undefined != this.Pr.GridAfter ? this.Pr.GridAfter : undefined ),
-                    WAfter    : ( undefined != this.Pr.WAfter    ? this.Pr.WAfter    : undefined )
-                };
+	Set_After : function(GridAfter, WAfter)
+	{
+		// Если парметр WAfter === false, значит значение WAfter мы не меняем
+		if (this.Pr.GridAfter !== GridAfter || this.Pr.WAfter !== WAfter)
+		{
+			var OldAfter = {
+				GridAfter : this.Pr.GridAfter,
+				WAfter    : this.Pr.WAfter
+			};
 
-            var NewAfter =
-                {
-                    GridAfter : ( undefined != GridAfter ? GridAfter : undefined ),
-                    WAfter    : ( undefined != WAfter    ? WAfter    : undefined )
-                };
+			var NewAfter = {
+				GridAfter : GridAfter,
+				WAfter    : WAfter
+			};
 
-            if ( false === WAfter )
-                NewAfter.WAfter = OldAfter.WAfter;
-            else if ( undefined != WAfter )
-            {
-                NewAfter.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
-                NewAfter.WAfter.Set_FromObject(WAfter);
-            }
+			if (false === WAfter)
+			{
+				NewAfter.WAfter = OldAfter.WAfter;
+			}
+			else if (undefined != WAfter)
+			{
+				NewAfter.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
+				NewAfter.WAfter.Set_FromObject(WAfter);
+			}
 
-            History.Add( this, { Type : AscDFH.historyitem_TableRow_After, Old : OldAfter, New : NewAfter } );
+			History.Add(new CChangesTableRowAfter(this, OldAfter, NewAfter));
 
-            if ( undefined != NewAfter.GridAfter )
-                this.Pr.GridAfter = GridAfter;
-            else
-                this.Pr.GridAfter = undefined;
-
-            if ( undefined != NewAfter.WAfter )
-                this.Pr.WAfter = NewAfter.WAfter;
-            else
-                this.Pr.WAfter = undefined;
-
-            this.Recalc_CompiledPr();
-        }
-    },
+			this.Pr.GridAfter = GridAfter;
+			this.Pr.WAfter    = NewAfter.WAfter;
+			this.Recalc_CompiledPr();
+		}
+	},
 
     Get_CellSpacing : function()
     {
         return this.Get_CompiledPr(false).TableCellSpacing;
     },
 
-    Set_CellSpacing : function(Value)
-    {
-        if ( undefined === Value )
-        {
-            if ( undefined === this.Pr.TableCellSpacing )
-                return;
+	Set_CellSpacing : function(Value)
+	{
+		if (this.Pr.TableCellSpacing === Value)
+			return;
 
-            History.Add( this, { Type : AscDFH.historyitem_TableRow_CellSpacing, Old : this.Pr.TableCellSpacing, New : undefined } );
-            this.Pr.TableCellSpacing = undefined;
+		History.Add(new CChangesTableRowCellSpacing(this, this.Pr.TableCellSpacing, Value));
+		this.Pr.TableCellSpacing = Value;
 
-            this.Recalc_CompiledPr();
-        }
-        else if ( undefined === this.Pr.TableCellSpacing )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableRow_CellSpacing, Old : undefined, New : Value } );
-            this.Pr.TableCellSpacing = Value;
-
-            this.Recalc_CompiledPr();
-        }
-        else if ( Value != this.Pr.TableCellSpacing )
-        {
-            History.Add( this, { Type : AscDFH.historyitem_TableRow_CellSpacing, Old : this.Pr.TableCellSpacing, New : Value } );
-            this.Pr.TableCellSpacing = Value;
-
-            this.Recalc_CompiledPr();
-        }
-    },
+		this.Recalc_CompiledPr();
+	},
 
     Get_Height : function()
     {
@@ -470,23 +431,18 @@ CTableRow.prototype =
         return RowPr.Height;
     },
 
-    Set_Height : function( Value, HRule )
-    {
-        if ( (undefined === this.Pr.Height && undefined === Value) || (undefined != this.Pr.Height && HRule === this.Pr.Height.HRule && Math.abs(Value - this.Pr.Height.Value) < 0.001 ) )
-            return;
+	Set_Height : function(Value, HRule)
+	{
+		if ((undefined === this.Pr.Height && undefined === Value) || (undefined != this.Pr.Height && HRule === this.Pr.Height.HRule && Math.abs(Value - this.Pr.Height.Value) < 0.001))
+			return;
 
-        var OldHeight = undefined != this.Pr.Height ? this.Pr.Height : undefined;
-        var NewHeight = undefined != Value  ? new CTableRowHeight( Value, HRule ): undefined;
+		var OldHeight = this.Pr.Height;
+		var NewHeight = undefined != Value ? new CTableRowHeight(Value, HRule) : undefined;
 
-        History.Add( this, { Type : AscDFH.historyitem_TableRow_Height, Old : OldHeight, New : NewHeight } );
-
-        if ( undefined === NewHeight )
-            this.Pr.Height = undefined;
-        else
-            this.Pr.Height = NewHeight;
-
-        this.Recalc_CompiledPr();
-    },
+		History.Add(new CChangesTableRowHeight(this, OldHeight, NewHeight));
+		this.Pr.Height = NewHeight;
+		this.Recalc_CompiledPr();
+	},
 
     Is_Header : function()
     {
@@ -494,23 +450,15 @@ CTableRow.prototype =
         return RowPr.TableHeader;
     },
 
-    Set_Header : function(Value)
-    {
-        if ( (undefined === this.Pr.TableHeader && undefined === Value) || (undefined != this.Pr.TableHeader && Value === this.Pr.TableHeader ) )
-            return;
+	Set_Header : function(Value)
+	{
+		if (Value === this.Pr.TableHeader)
+			return;
 
-        var OldHeader = undefined != this.Pr.TableHeader ? this.Pr.TableHeader : undefined;
-        var NewHeader = undefined != Value  ? Value : undefined;
-
-        History.Add( this, { Type : AscDFH.historyitem_TableRow_TableHeader, Old : OldHeader, New : NewHeader } );
-
-        if ( undefined === Value )
-            this.Pr.TableHeader = undefined;
-        else
-            this.Pr.TableHeader = Value;
-
-        this.Recalc_CompiledPr();
-    },
+		History.Add(new CChangesTableRowTableHeader(this, this.Pr.TableHeader, Value));
+		this.Pr.TableHeader = Value;
+		this.Recalc_CompiledPr();
+	},
 
     Copy_Pr : function(OtherPr)
     {
@@ -624,51 +572,51 @@ CTableRow.prototype =
         return CurGridCol;
     },
 
-    Remove_Cell : function(Index)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_TableRow_RemoveCell, Pos : Index, Item : { Cell : this.Content[Index], CellInfo : this.CellsInfo[Index] } } );
+	Remove_Cell : function(Index)
+	{
+		History.Add(new CChangesTableRowRemoveCell(this, Index, [this.Content[Index]]));
 
-        this.Content.splice( Index, 1 );
-        this.CellsInfo.splice( Index, 1 );
+		this.Content.splice(Index, 1);
+		this.CellsInfo.splice(Index, 1);
 
-        this.Internal_ReIndexing( Index );
-    },
+		this.Internal_ReIndexing(Index);
+	},
 
-    Add_Cell : function(Index, Row, Cell, bReIndexing)
-    {
-        if ( "undefined" === typeof(Cell) || null === Cell )
-            Cell = new CTableCell( Row );
+	Add_Cell : function(Index, Row, Cell, bReIndexing)
+	{
+		if ("undefined" === typeof(Cell) || null === Cell)
+			Cell = new CTableCell(Row);
 
-        History.Add( this, { Type : AscDFH.historyitem_TableRow_AddCell, Pos : Index, Item : { Cell : Cell, CellInfo : {}  } } );
+		History.Add(new CChangesTableRowAddCell(this, Index, [Cell]));
 
-        this.Content.splice( Index, 0, Cell );
-        this.CellsInfo.splice( Index, 0, {} );
+		this.Content.splice(Index, 0, Cell);
+		this.CellsInfo.splice(Index, 0, {});
 
-        if ( true === bReIndexing )
-        {
-            this.Internal_ReIndexing(Index);
-        }
-        else
-        {
-            if ( Index > 0 )
-            {
-                this.Content[Index - 1].Next = Cell;
-                Cell.Prev = this.Content[Index - 1];
-            }
-            else
-                Cell.Prev = null;
+		if (true === bReIndexing)
+		{
+			this.Internal_ReIndexing(Index);
+		}
+		else
+		{
+			if (Index > 0)
+			{
+				this.Content[Index - 1].Next = Cell;
+				Cell.Prev                    = this.Content[Index - 1];
+			}
+			else
+				Cell.Prev = null;
 
-            if ( Index < this.Content.length - 1 )
-            {
-                this.Content[Index + 1].Prev = Cell;
-                Cell.Next = this.Content[Index + 1];
-            }
-            else
-                Cell.Next = null;
-        }
+			if (Index < this.Content.length - 1)
+			{
+				this.Content[Index + 1].Prev = Cell;
+				Cell.Next                    = this.Content[Index + 1];
+			}
+			else
+				Cell.Next = null;
+		}
 
-        return Cell;
-    },
+		return Cell;
+	},
 
     Clear_ContentChanges : function()
     {
@@ -704,208 +652,6 @@ CTableRow.prototype =
     //-----------------------------------------------------------------------------------
     // Undo/Redo функции
     //-----------------------------------------------------------------------------------
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableRow_Before:
-            {
-                if ( undefined != Data.Old.GridBefore )
-                    this.Pr.GridBefore = Data.Old.GridBefore;
-                else
-                    this.Pr.GridBefore = undefined;
-
-                if ( undefined != Data.Old.WBefore )
-                    this.Pr.WBefore = Data.Old.WBefore;
-                else
-                    this.Pr.WBefore = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_After:
-            {
-                if ( undefined != Data.Old.GridAfter )
-                    this.Pr.GridAfter = Data.Old.GridAfter;
-                else
-                    this.Pr.GridAfter = undefined;
-
-                if ( undefined != Data.Old.WAfter )
-                    this.Pr.WAfter = Data.Old.WAfter;
-                else
-                    this.Pr.WAfter = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_CellSpacing:
-            {
-                if ( undefined != Data.Old )
-                    this.Pr.TableCellSpacing = Data.Old;
-                else
-                    this.Pr.TableCellSpacing = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_Height:
-            {
-                if ( undefined != Data.Old )
-                    this.Pr.Height = Data.Old;
-                else
-                    this.Pr.Height = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_AddCell:
-            {
-                this.Content.splice( Data.Pos, 1 );
-                this.CellsInfo.splice( Data.Pos, 1 );
-
-                this.Internal_ReIndexing( Data.Pos );
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_RemoveCell:
-            {
-                this.Content.splice( Data.Pos, 0, Data.Item.Cell );
-                this.CellsInfo.splice( Data.Pos, 0, Data.Item.CellInfo );
-
-                this.Internal_ReIndexing( Data.Pos );
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_TableHeader:
-            {
-                if ( undefined != Data.Old )
-                    this.Pr.TableHeader = Data.Old;
-                else
-                    this.Pr.TableHeader = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_Pr:
-            {
-                this.Pr = Data.Old;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableRow_Before:
-            {
-                if ( undefined != Data.New.GridBefore )
-                    this.Pr.GridBefore = Data.New.GridBefore;
-                else
-                    this.Pr.GridBefore = undefined;
-
-                if ( undefined != Data.New.WBefore )
-                    this.Pr.WBefore = Data.New.WBefore;
-                else
-                    this.Pr.WBefore = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_After:
-            {
-                if ( undefined != Data.New.GridAfter )
-                    this.Pr.GridAfter = Data.New.GridAfter;
-                else
-                    this.Pr.GridAfter = undefined;
-
-                if ( undefined != Data.New.WAfter )
-                    this.Pr.WAfter = Data.New.WAfter;
-                else
-                    this.Pr.WAfter = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_CellSpacing:
-            {
-                if ( undefined != Data.New )
-                    this.Pr.TableCellSpacing = Data.New;
-                else
-                    this.Pr.TableCellSpacing = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_Height:
-            {
-                if ( undefined != Data.New )
-                    this.Pr.Height = Data.New;
-                else
-                    this.Pr.Height = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_AddCell:
-            {
-                this.Content.splice( Data.Pos, 0, Data.Item.Cell );
-                this.CellsInfo.splice( Data.Pos, 0, Data.Item.CellInfo );
-
-                this.Internal_ReIndexing( Data.Pos );
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_RemoveCell:
-            {
-                this.Content.splice( Data.Pos, 1 );
-                this.CellsInfo.splice( Data.Pos, 1 );
-
-                this.Internal_ReIndexing( Data.Pos );
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_TableHeader:
-            {
-                if ( undefined != Data.New )
-                    this.Pr.TableHeader = Data.New;
-                else
-                    this.Pr.TableHeader = undefined;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_Pr:
-            {
-                this.Pr = Data.New;
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-        }
-    },
-
     Get_ParentObject_or_DocumentPos : function()
     {
         return this.Table.Get_ParentObject_or_DocumentPos(this.Table.Index);
@@ -953,431 +699,6 @@ CTableRow.prototype =
     //-----------------------------------------------------------------------------------
     // Функции для работы с совместным редактирования
     //-----------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( AscDFH.historyitem_type_TableRow );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableRow_Before:
-            {
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Long   : GridBefore
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Variable : WBefore (CTableMeasurement)
-
-                if ( undefined === Data.New.GridBefore )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New.GridBefore );
-                }
-
-                if ( undefined === Data.New.WBefore )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.WBefore.Write_ToBinary( Writer );
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_After:
-            {
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Long   : GridAfter
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Variable : WAfter (CTableMeasurement)
-
-                if ( undefined === Data.New.GridAfter )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteLong( Data.New.GridAfter );
-                }
-
-                if ( undefined === Data.New.WAfter )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.WAfter.Write_ToBinary( Writer );
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_CellSpacing:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Double : значение
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-
-                    if ( null === Data.New )
-                        Writer.WriteBool( true );
-                    else
-                    {
-                        Writer.WriteBool( false );
-                        Writer.WriteDouble( Data.New );
-                    }
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_Height:
-            {
-                // Bool   : IsUndefined
-                // Если предыдущее значение false
-                //   Variable : Height (CTableRowHeight)
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Data.New.Write_ToBinary( Writer );
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_AddCell:
-            {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long   : Позиция
-                //    String : Id элемента
-                //  }
-
-                var bArray = Data.UseArray;
-                var Count  = 1;
-
-                Writer.WriteLong( Count );
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                        Writer.WriteLong( Data.PosArray[Index] );
-                    else
-                        Writer.WriteLong( Data.Pos + Index );
-
-                    Writer.WriteString2( Data.Item.Cell.Get_Id() );
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_RemoveCell:
-            {
-                // Long          : Количество удаляемых элементов
-                // Array of Long : позиции удаляемых элементов
-
-                var bArray = Data.UseArray;
-                var Count  = 1;
-
-                var StartPos = Writer.GetCurPosition();
-                Writer.Skip(4);
-                var RealCount = Count;
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    if ( true === bArray )
-                    {
-                        if ( false === Data.PosArray[Index] )
-                            RealCount--;
-                        else
-                            Writer.WriteLong( Data.PosArray[Index] );
-                    }
-                    else
-                        Writer.WriteLong( Data.Pos );
-                }
-
-                var EndPos = Writer.GetCurPosition();
-                Writer.Seek( StartPos );
-                Writer.WriteLong( RealCount );
-                Writer.Seek( EndPos );
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_TableHeader:
-            {
-                // Bool   : IsUndefined
-                // Если предыдущее значение false
-                //   Bool : TableHeader
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    Writer.WriteBool( Data.New )
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_Pr:
-            {
-                // CTableRowPr
-                Data.New.Write_ToBinary( Writer );
-
-                break;
-            }
-        }
-
-        return Writer;
-    },
-
-    Save_Changes2 : function(Data, Writer)
-    {
-        var bRetValue = false;
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableRow_Before:
-            case AscDFH.historyitem_TableRow_After:
-            case AscDFH.historyitem_TableRow_CellSpacing:
-            case AscDFH.historyitem_TableRow_Height:
-            {
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_AddCell:
-            {
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_RemoveCell:
-            {
-                break;
-            }
-        }
-
-        return bRetValue;
-    },
-
-    Load_Changes : function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( AscDFH.historyitem_type_TableRow != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_TableRow_Before:
-            {
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Long   : GridBefore
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Variable : WBefore (CTableMeasurement)
-
-                var bUndefinedGB = Reader.GetBool();
-                if ( true === bUndefinedGB )
-                    this.Pr.GridBefore = undefined;
-                else
-                    this.Pr.GridBefore = Reader.GetLong();
-
-                var bUndefinedWB = Reader.GetBool();
-                if ( true === bUndefinedWB )
-                    this.Pr.WBefore = undefined;
-                else
-                {
-                    this.Pr.WBefore = new CTableMeasurement(tblwidth_Auto, 0);
-                    this.Pr.WBefore.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_After:
-            {
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Long   : GridAfter
-                // Bool : IsUndefined
-                //   Если предыдущее значение false
-                //   Variable : WAfter (CTableMeasurement)
-
-                var bUndefinedGA = Reader.GetBool();
-                if ( true === bUndefinedGA )
-                    this.Pr.GridAfter = undefined;
-                else
-                    this.Pr.GridAfter = Reader.GetLong();
-
-                var bUndefinedWA = Reader.GetBool();
-                if ( true === bUndefinedWA )
-                    this.Pr.WAfter = undefined;
-                else
-                {
-                    this.Pr.WAfter = new CTableMeasurement(tblwidth_Auto, 0);
-                    this.Pr.WAfter.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_CellSpacing:
-            {
-                // Bool : IsUndefined
-                // Если false
-                //   Bool : IsNull
-                //   Если false
-                //     Double : значение
-
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableCellSpacing = undefined;
-                else
-                {
-                    var bNull = Reader.GetBool();
-                    if ( true === bNull )
-                        this.Pr.TableCellSpacing = null;
-                    else
-                        this.Pr.TableCellSpacing = Reader.GetDouble();;
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_Height:
-            {
-                // Bool : IsUndefined
-                // Если предыдущее значение false
-                //   Variable : Height (CTableRowHeight)
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.Height = undefined;
-                else
-                {
-                    this.Pr.Height = new CTableRowHeight(0, Asc.linerule_Auto);
-                    this.Pr.Height.Read_FromBinary( Reader );
-                }
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_AddCell:
-            {
-                // Long     : Количество элементов
-                // Array of :
-                //  {
-                //    Long   : Позиция
-                //    String : Id элемента
-                //  }
-
-                var Count = Reader.GetLong();
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Pos     = this.m_oContentChanges.Check(AscCommon.contentchanges_Add, Reader.GetLong());
-                    var Element = AscCommon.g_oTableId.Get_ById(Reader.GetString2());
-
-                    if (null != Element)
-                    {
-                        this.Content.splice(Pos, 0, Element);
-                        AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                    }
-                }
-
-                this.Internal_ReIndexing();
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_RemoveCell:
-            {
-                // Long          : Количество удаляемых элементов
-                // Array of Long : позиции удаляемых элементов
-
-                var Count = Reader.GetLong();
-
-                for ( var Index = 0; Index < Count; Index++ )
-                {
-                    var Pos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
-
-                    // действие совпало, не делаем его
-                    if (false === Pos)
-                        continue;
-
-                    this.Content.splice(Pos, 1);
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
-                }
-
-                this.Internal_ReIndexing();
-
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_TableHeader:
-            {
-                // Bool : IsUndefined
-                // Если предыдущее значение false
-                //   Bool : Height (TableHeader)
-                var bUndefined = Reader.GetBool();
-                if ( true === bUndefined )
-                    this.Pr.TableHeader = undefined;
-                else
-                    this.Pr.TableHeader = Reader.GetBool();
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-
-            case AscDFH.historyitem_TableRow_Pr:
-            {
-                // CTableRowPr
-                this.Pr = new CTableRowPr();
-                this.Pr.Read_FromBinary( Reader );
-
-                this.Recalc_CompiledPr();
-                break;
-            }
-        }
-
-        return true;
-    },
-
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong( AscDFH.historyitem_type_TableRow );

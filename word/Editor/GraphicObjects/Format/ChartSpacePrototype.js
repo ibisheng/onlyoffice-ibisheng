@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -474,9 +474,9 @@ CChartSpace.prototype.checkShapeChildTransform = function(transform_text)
             {
                 if(this.chart.plotArea)
                 {
-                    if(this.chart.plotArea.chart && this.chart.plotArea.chart.series)
+                    if(this.chart.plotArea.charts[0] && this.chart.plotArea.charts[0].series)
                     {
-                        var series = this.chart.plotArea.chart.series;
+                        var series = this.chart.plotArea.charts[0].series;
                         for(var i = 0; i < series.length; ++i)
                         {
                             var ser = series[i];

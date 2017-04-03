@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -243,8 +243,7 @@
 
 			var bCheckRedraw = false,
                 bRedrawGraphicObjects = false,
-                bUnlockDefName = false,
-                dN;
+                bUnlockDefName = false;
 			if (bIsCollaborative && (0 < this.m_arrNeedUnlock.length ||
 				0 < this.m_arrNeedUnlock2.length)) {
 				bCheckRedraw = true;

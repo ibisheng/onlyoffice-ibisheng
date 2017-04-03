@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -33,17 +33,18 @@
 "use strict";
 
 AscCommon.baseEditorsApi.prototype._onEndPermissions = function () {
-  if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
-    var oResult = new AscCommon.asc_CAscEditorPermissions();
-    if (null !== this.licenseResult) {
-      var type = this.licenseResult['type'];
-      oResult.setLicenseType(type);
-      oResult.setCanBranding(this.licenseResult['branding']);
-      oResult.setIsLight(this.licenseResult['light']);
-      oResult.setTrial(this.licenseResult['trial']);
-      oResult.setRights(this.licenseResult['rights']);
-      oResult.setBuildVersion(this.licenseResult['buildVersion']);
-    }
-    this.sendEvent('asc_onGetEditorPermissions', oResult);
-  }
+	if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
+		var oResult = new AscCommon.asc_CAscEditorPermissions();
+		if (null !== this.licenseResult) {
+			var type = this.licenseResult['type'];
+			oResult.setLicenseType(type);
+			oResult.setCanBranding(this.licenseResult['branding']);
+			oResult.setIsLight(this.licenseResult['light']);
+			oResult.setTrial(this.licenseResult['trial']);
+			oResult.setRights(this.licenseResult['rights']);
+			oResult.setBuildVersion(this.licenseResult['buildVersion']);
+			oResult.setBuildNumber(this.licenseResult['buildNumber']);
+		}
+		this.sendEvent('asc_onGetEditorPermissions', oResult);
+	}
 };

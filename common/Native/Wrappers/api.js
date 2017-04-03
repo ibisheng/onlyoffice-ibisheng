@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -29,6 +29,10 @@
  * terms at http://creativecommons.org/licenses/by-sa/4.0/legalcode
  *
  */
+
+window.IS_NATIVE_EDITOR = true;
+
+window['SockJS'] = createSockJS();
 
 Asc['asc_docs_api'].prototype.Update_ParaInd = function( Ind )
 {
@@ -125,7 +129,7 @@ Asc['asc_docs_api'].prototype["Call_Common"] = function(type, param)
         case 1:
         {
             this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
-			break;
+            break;
         }
         case 67:
         {
@@ -237,148 +241,6 @@ Asc['asc_docs_api'].prototype.GenerateNativeStyles = function()
     var StylesPainter = new CStylesPainter();
     StylesPainter.GenerateStyles(this, this.LoadedObjectDS);
 };
-
-window['AscFormat'].Path.prototype.drawSmart = function(shape_drawer) {
-
-    var _graphics   = shape_drawer.Graphics;
-    var _full_trans = _graphics.m_oFullTransform;
-
-    if (!_graphics || !_full_trans || undefined == _graphics.m_bIntegerGrid || true === shape_drawer.bIsNoSmartAttack)
-        return this.draw(shape_drawer);
-
-    var bIsTransformed = (_full_trans.shx == 0 && _full_trans.shy == 0) ? false : true;
-
-    if (bIsTransformed)
-        return this.draw(shape_drawer);
-
-    var isLine = this.isSmartLine();
-    var isRect = false;
-    if (!isLine)
-        isRect = this.isSmartRect();
-
-    //if (!isLine && !isRect)   // IOS убрать
-    return this.draw(shape_drawer);
-
-    var _old_int = _graphics.m_bIntegerGrid;
-
-    if (false == _old_int)
-        _graphics.SetIntegerGrid(true);
-
-    var dKoefMMToPx = Math.max(_graphics.m_oCoordTransform.sx, 0.001);
-
-    var _ctx = _graphics.m_oContext;
-    var bIsStroke = (shape_drawer.bIsNoStrokeAttack || (this.stroke !== true)) ? false : true;
-    var bIsEven = false;
-    if (bIsStroke)
-    {
-        var _lineWidth = Math.max((shape_drawer.StrokeWidth * dKoefMMToPx + 0.5) >> 0, 1);
-        _ctx.lineWidth = _lineWidth;
-
-        if (_lineWidth & 0x01 == 0x01)
-            bIsEven = true;
-    }
-
-    var bIsDrawLast = false;
-    var path = this.ArrPathCommand;
-    shape_drawer._s();
-
-    if (!isRect)
-    {
-        for(var j = 0, l = path.length; j < l; ++j)
-        {
-            var cmd=path[j];
-            switch(cmd.id)
-            {
-                case AscFormat.moveTo:
-                {
-                    bIsDrawLast = true;
-
-                    var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
-                    var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
-                    if (bIsEven)
-                    {
-                        _x -= 0.5;
-                        _y -= 0.5;
-                    }
-                    _ctx.moveTo(_x, _y);
-                    break;
-                }
-                case AscFormat.lineTo:
-                {
-                    bIsDrawLast = true;
-
-                    var _x = (_full_trans.TransformPointX(cmd.X, cmd.Y)) >> 0;
-                    var _y = (_full_trans.TransformPointY(cmd.X, cmd.Y)) >> 0;
-                    if (bIsEven)
-                    {
-                        _x -= 0.5;
-                        _y -= 0.5;
-                    }
-                    _ctx.lineTo(_x, _y);
-                    break;
-                }
-                case AscFormat.close:
-                {
-                    _ctx.closePath();
-                    break;
-                }
-            }
-        }
-    }
-    else
-    {
-        var minX = 100000;
-        var minY = 100000;
-        var maxX = -100000;
-        var maxY = -100000;
-        bIsDrawLast = true;
-        for(var j = 0, l = path.length; j < l; ++j)
-        {
-            var cmd=path[j];
-            switch(cmd.id)
-            {
-                case AscFormat.moveTo:
-                case AscFormat.lineTo:
-                {
-                    if (minX > cmd.X)
-                        minX = cmd.X;
-                    if (minY > cmd.Y)
-                        minY = cmd.Y;
-
-                    if (maxX < cmd.X)
-                        maxX = cmd.X;
-                    if (maxY < cmd.Y)
-                        maxY = cmd.Y;
-
-                    break;
-                }
-                default:
-                    break;
-            }
-        }
-
-        var _x1 = (_full_trans.TransformPointX(minX, minY)) >> 0;
-        var _y1 = (_full_trans.TransformPointY(minX, minY)) >> 0;
-        var _x2 = (_full_trans.TransformPointX(maxX, maxY)) >> 0;
-        var _y2 = (_full_trans.TransformPointY(maxX, maxY)) >> 0;
-
-        if (bIsEven)
-            _ctx.rect(_x1 + 0.5, _y1 + 0.5, _x2 - _x1, _y2 - _y1);
-        else
-            _ctx.rect(_x1, _y1, _x2 - _x1, _y2 - _y1);
-    }
-
-    if (bIsDrawLast)
-    {
-        shape_drawer.drawFillStroke(true, this.fill, bIsStroke);
-    }
-
-    shape_drawer._e();
-
-    if (false == _old_int)
-        _graphics.SetIntegerGrid(false);
-};
-
 
 // TEXTFONTFAMILY
 function asc_menu_ReadFontFamily(_params, _cursor)
@@ -1897,20 +1759,20 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 21:
                     {
                         var bIsNeed = _params[_current.pos++];
-                        
+
                         if (bIsNeed)
                         {
                             var currImage = this.WordControl.m_oLogicDocument.DrawingObjects.Get_Props();
                             if (currImage && currImage.length) {
-                               
+
                                 var _originSize = this.WordControl.m_oDrawingDocument.Native["DD_GetOriginalImageSize"](currImage[0].ImageUrl);
-                                
+
                                 var _w = _originSize[0];
                                 var _h = _originSize[1];
-                                
+
                                 // сбрасываем урл
                                 _imagePr.ImageUrl = undefined;
-                                
+
                                 var _section_select = this.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
                                 var _page_width = AscCommon.Page_Width;
                                 var _page_height = AscCommon.Page_Height;
@@ -1918,25 +1780,25 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                                 var _page_y_top_margin = AscCommon.Y_Top_Margin;
                                 var _page_x_right_margin = AscCommon.X_Right_Margin;
                                 var _page_y_bottom_margin = AscCommon.Y_Bottom_Margin;
-                                
+
                                 if (_section_select)
                                 {
                                     if (_section_select.W)
                                         _page_width = _section_select.W;
-                                    
+
                                     if (_section_select.H)
                                         _page_height = _section_select.H;
                                 }
-                                
+
                                 var __w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
                                 var __h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
-                                
+
                                 var wI = (undefined !== _w) ? Math.max(_w * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
                                 var hI = (undefined !== _h) ? Math.max(_h * AscCommon.g_dKoef_pix_to_mm, 1) : 1;
-                                
+
                                 wI = Math.max(5, Math.min(wI, __w));
                                 hI = Math.max(5, Math.min(hI, __h));
-                                
+
                                 _imagePr.Width = wI;
                                 _imagePr.Height = hI;
                             }
@@ -2034,10 +1896,10 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             var _min = Math.min(_sectionPr.XLimit / 2, _sectionPr.YLimit / 2);
 
             this.WordControl.m_oLogicDocument.DrawingObjects.addShapeOnPage(_shapeProp.type, _pageNum,
-                    _sectionPr.X + _sectionPr.XLimit / 4,
-                    _sectionPr.Y + _sectionPr.YLimit / 4,
-                    _min,
-                    _min);
+                                                                            _sectionPr.X + _sectionPr.XLimit / 4,
+                                                                            _sectionPr.Y + _sectionPr.YLimit / 4,
+                                                                            _min,
+                                                                            _min);
             //this.StartAddShape(_shapeProp.type, true);
             break;
         }
@@ -2150,7 +2012,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 2:
                     {
                         // margin_left
-                       _current.pos++;
+                        _current.pos++;
                         break;
                     }
                     case 3:
@@ -2311,6 +2173,124 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                 var indexScheme = parseInt(_params);
                 this.ChangeColorScheme(indexScheme);
             }
+            break;
+        }
+
+
+        case 10000: // ASC_SOCKET_EVENT_TYPE_OPEN
+        {
+            var t = _api.CoAuthoringApi._CoAuthoringApi;
+
+            t._state = AscCommon.ConnectionState.WaitAuth;
+            t.onFirstConnect();
+
+            break;
+        }
+
+        case 10010: // ASC_SOCKET_EVENT_TYPE_ON_CLOSE
+        {
+
+            break;
+        }
+
+        case 10020: // ASC_SOCKET_EVENT_TYPE_MESSAGE
+        {
+            var t = _api.CoAuthoringApi._CoAuthoringApi;
+
+            var dataObject = JSON.parse(_params);
+
+            // console.log("JS - " + dataObject['type']);
+
+            switch (dataObject['type']) {
+                case 'auth'        :
+                    t._onAuth(dataObject);
+                    break;
+                case 'message'      :
+                    t._onMessages(dataObject, false);
+                    break;
+                case 'cursor'       :
+                    t._onCursor(dataObject);
+                    break;
+                case 'meta' :
+                    t._onMeta(dataObject);
+                    break;
+                case 'getLock'      :
+                    t._onGetLock(dataObject);
+                    break;
+                case 'releaseLock'    :
+                    t._onReleaseLock(dataObject);
+                    break;
+                case 'connectState'    :
+                    t._onConnectionStateChanged(dataObject);
+                    break;
+                case 'saveChanges'    :
+                    t._onSaveChanges(dataObject);
+                    break;
+                case 'saveLock'      :
+                    t._onSaveLock(dataObject);
+                    break;
+                case 'unSaveLock'    :
+                    t._onUnSaveLock(dataObject);
+                    break;
+                case 'savePartChanges'  :
+                    t._onSavePartChanges(dataObject);
+                    break;
+                case 'drop'        :
+                    t._onDrop(dataObject);
+                    break;
+                case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
+                    break;
+                case 'error'      : /*Старая версия sdk*/
+                    t._onDrop(dataObject);
+                    break;
+                case 'documentOpen'    :
+                    t._documentOpen(dataObject);
+                    break;
+                case 'warning':
+                    t._onWarning(dataObject);
+                    break;
+                case 'license':
+                    t._onLicense(dataObject);
+                    break;
+                case 'session' :
+                    t._onSession(dataObject);
+                    break;
+            }
+
+            break;
+        }
+
+        case 11010: // ASC_SOCKET_EVENT_TYPE_ON_DISCONNECT
+        {
+            break;
+        }
+
+        case 11020: // ASC_SOCKET_EVENT_TYPE_TRY_RECONNECT
+        {
+            var t = _api.CoAuthoringApi._CoAuthoringApi;
+            delete t.sockjs;
+            t._initSocksJs();
+            break;
+        }
+
+        case 21000: // ASC_COAUTH_EVENT_TYPE_INSERT_URL_IMAGE
+        {
+            var urls = JSON.parse(_params[0]);
+            AscCommon.g_oDocumentUrls.addUrls(urls);
+            var firstUrl;
+            for (var i in urls) {
+                if (urls.hasOwnProperty(i)) {
+                    firstUrl = urls[i];
+                    break;
+                }
+            }
+
+            var _src = firstUrl;
+            var _w = _params[1];
+            var _h = _params[2];
+            var _pageNum = _params[3];
+
+            this.AddImageUrlActionNative(_src, _w, _h, _pageNum);
             break;
         }
 
@@ -4355,6 +4335,41 @@ AscCommon.asc_WriteColorSchemes = asc_WriteColorSchemes;
 
 ///////////////////////////////////////////////////////////////////////
 
+function asc_WriteUsers(c, s) {
+    if (!c) return;
+
+    var len = 0, name, user;
+    for (name in c) {
+        if (undefined !== name) {
+            len++;
+        }
+    }
+
+    s["WriteLong"](len);
+
+    for (name in c) {
+        if (undefined !== name) {
+            user = c[name];
+            if (user) {
+                s['WriteString2'](user.asc_getId());
+                s['WriteString2'](user.asc_getFirstName() === undefined ? "" : user.asc_getFirstName());
+                s['WriteString2'](user.asc_getLastName() === undefined ? "" : user.asc_getLastName());
+                s['WriteString2'](user.asc_getUserName() === undefined ? "" : user.asc_getUserName());
+                s['WriteBool'](user.asc_getView());
+
+                var color = new Asc.asc_CColor();
+
+                color.r = (user.color >> 16) & 255;
+                color.g = (user.color >> 8 ) & 255;
+                color.b = (user.color      ) & 255;
+
+                asc_menu_WriteColor(0, color, s);
+            }
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////////////
 
 Asc['asc_docs_api'].prototype.UpdateTextPr = function(TextPr)
 {
@@ -4670,7 +4685,7 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
             this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
         }
         else if (ImagePr.ShapeProperties && ImagePr.ShapeProperties.fill && ImagePr.ShapeProperties.fill.fill &&
-            ImagePr.ShapeProperties.fill.fill.url !== undefined && ImagePr.ShapeProperties.fill.fill.url != null && ImagePr.ShapeProperties.fill.fill.url != "")
+                 ImagePr.ShapeProperties.fill.fill.url !== undefined && ImagePr.ShapeProperties.fill.fill.url != null && ImagePr.ShapeProperties.fill.fill.url != "")
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
             this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
@@ -4700,8 +4715,8 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
             else
             {
                 AscFormat.ExecuteNoHistory(function(){
-                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
-                }, this, []);
+                                           this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                                           }, this, []);
             }
 
             this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
@@ -4790,6 +4805,48 @@ Asc['asc_docs_api'].prototype.AddImageUrlNative = function(url, _w, _h, _pageNum
         this.AddImageToPage(url, _pageNum, (_sectionPr.XLimit - wI) / 2, (_sectionPr.YLimit - hI) / 2, wI, hI);
     }
 };
+Asc['asc_docs_api'].prototype.AddImageUrlActionNative = function(src, _w, _h, _pageNum)
+{
+  var ColumnSize = this.WordControl.m_oLogicDocument.GetColumnSize();
+  var __w = Math.max((_w * AscCommon.g_dKoef_pix_to_mm), 1);
+  var __h = Math.max((_h * AscCommon.g_dKoef_pix_to_mm), 1);
+  _w = Math.max(5, Math.min(_w, __w));
+  _h = Math.max(5, Math.min((_w * __h / __w)));
+
+  if (this.isShapeImageChangeUrl)
+  {
+    var AscShapeProp       = new Asc.asc_CShapeProperty();
+    AscShapeProp.fill      = new Asc.asc_CShapeFill();
+    AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
+    AscShapeProp.fill.fill = new Asc.asc_CFillBlip();
+    AscShapeProp.fill.fill.asc_putUrl(src);
+    this.ImgApply(new Asc.asc_CImgProperty({ShapeProperties : AscShapeProp}));
+    this.isShapeImageChangeUrl = false;
+  }
+  else if (this.isImageChangeUrl)
+  {
+    var AscImageProp      = new Asc.asc_CImgProperty();
+    AscImageProp.ImageUrl = src;
+    this.ImgApply(AscImageProp);
+    this.isImageChangeUrl = false;
+  }
+  else
+  {
+    if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+    {
+      var imageLocal = AscCommon.g_oDocumentUrls.getImageLocal(src);
+      if (imageLocal)
+      {
+        src = imageLocal;
+      }
+      this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddImageUrlLong);
+      //if (undefined === imgProp || undefined === imgProp.WrappingStyle || 0 == imgProp.WrappingStyle)
+        this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src);
+      //else
+      //  this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src, null, true);
+    }
+  }
+};
 
 Asc['asc_docs_api'].prototype.Send_Menu_Event = function(type)
 {
@@ -4831,7 +4888,7 @@ Asc['asc_docs_api'].prototype.sync_EndCatchSelectedElements = function()
     {
         switch (this.SelectedObjectsStack[i].Type)
         {
-            //console.log(JSON.stringify(this.SelectedObjectsStack[i].Value));
+                //console.log(JSON.stringify(this.SelectedObjectsStack[i].Value));
             case Asc.c_oAscTypeSelectElement.Paragraph:
             {
                 _stream["WriteLong"](Asc.c_oAscTypeSelectElement.Paragraph);
@@ -5095,12 +5152,12 @@ Asc['asc_docs_api'].prototype.sync_DocSizeCallback = function(width,height)
 // font engine -------------------------------------
 var FontStyle =
 {
-    FontStyleRegular:    0,
-    FontStyleBold:       1,
-    FontStyleItalic:     2,
-    FontStyleBoldItalic: 3,
-    FontStyleUnderline:  4,
-    FontStyleStrikeout:  8
+FontStyleRegular:    0,
+FontStyleBold:       1,
+FontStyleItalic:     2,
+FontStyleBoldItalic: 3,
+FontStyleUnderline:  4,
+FontStyleStrikeout:  8
 };
 
 function CFontManager()
@@ -5123,7 +5180,7 @@ function CStylesPainter()
 }
 CStylesPainter.prototype =
 {
-    GenerateStyles: function(_api, ds)
+GenerateStyles: function(_api, ds)
     {
         if (_api.WordControl.bIsRetinaSupport)
         {
@@ -5182,13 +5239,13 @@ CStylesPainter.prototype =
         {
             var aSubArray = aPriorityStyles[index];
             aSubArray.sort(function(a, b){
-                if(a.Name < b.Name)
-                    return -1;
-                else if(a.Name > b.Name)
-                    return 1;
-                else
-                    return 0;
-            });
+                           if(a.Name < b.Name)
+                           return -1;
+                           else if(a.Name > b.Name)
+                           return 1;
+                           else
+                           return 0;
+                           });
             for(var i = 0, length = aSubArray.length; i < length; ++i)
             {
                 this.mergedStyles.push(aSubArray[i]);
@@ -5207,7 +5264,7 @@ CStylesPainter.prototype =
 
         _api.WordControl.m_oDrawingDocument.Native["DD_EndNativeDraw"](_stream);
     },
-    GenerateDefaultStyles: function(_api, ds, _graphics)
+GenerateDefaultStyles: function(_api, ds, _graphics)
     {
         var styles = ds;
 
@@ -5222,7 +5279,7 @@ CStylesPainter.prototype =
         }
     },
 
-    GenerateDocumentStyles: function(_api, _graphics)
+GenerateDocumentStyles: function(_api, _graphics)
     {
         if (_api.WordControl.m_oLogicDocument == null)
             return;
@@ -5279,7 +5336,7 @@ CStylesPainter.prototype =
         }
     },
 
-    drawStyle: function(graphics, style, _api)
+drawStyle: function(graphics, style, _api)
     {
         var _w_px = this.STYLE_THUMBNAIL_WIDTH;
         var _h_px = this.STYLE_THUMBNAIL_HEIGHT;
@@ -5293,8 +5350,8 @@ CStylesPainter.prototype =
         AscCommon.g_oTableId.m_bTurnOff = true;
         AscCommon.History.TurnOff();
 
-        var oldDefTabStop = Default_Tab_Stop;
-        Default_Tab_Stop = 1;
+        var oldDefTabStop = AscCommonWord.Default_Tab_Stop;
+        AscCommonWord.Default_Tab_Stop = 1;
 
         var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
         var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
@@ -5393,7 +5450,7 @@ CStylesPainter.prototype =
 
         graphics.restore();
 
-        Default_Tab_Stop = oldDefTabStop;
+        AscCommonWord.Default_Tab_Stop = oldDefTabStop;
 
         AscCommon.g_oTableId.m_bTurnOff = false;
         AscCommon.History.TurnOn();
@@ -5466,7 +5523,7 @@ Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_p
                 if (_val === true)
                 {
                     this.ShowParaMarks = false;
-                    AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+                    AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 
                     this.isViewMode = true;
                     this.WordControl.m_oDrawingDocument.IsViewMode = true;
@@ -5501,93 +5558,93 @@ Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_p
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Copy = function()
 {
     var dataBuffer = {};
-    
+
     var clipboard = {};
     clipboard.pushData = function(type, data) {
-        
+
         if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
-            
+
             dataBuffer.text = data;
-            
+
         } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
-            
+
             if (null != data.drawingUrls && data.drawingUrls.length > 0) {
                 dataBuffer.drawingUrls = data.drawingUrls[0];
-            }
-            
-            dataBuffer.sBase64 = data.sBase64;
-        }
-    }
-    
-    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
-    
-    var _stream = global_memory_stream_menu;
-    _stream["ClearNoAttack"]();
-    
-    if (dataBuffer.text) {
-        _stream["WriteByte"](0);
-        _stream["WriteString2"](dataBuffer.text);
-    }
-    
-    if (dataBuffer.drawingUrls) {
-        _stream["WriteByte"](1);
-        _stream["WriteStringA"](dataBuffer.drawingUrls);
-    }
-    
-    if (dataBuffer.sBase64) {
-        _stream["WriteByte"](2);
-        _stream["WriteStringA"](dataBuffer.sBase64);
-    }
-    
-    _stream["WriteByte"](255);
-    
-    return _stream;
-};
-Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
-{
-    var dataBuffer = {};
-    
-    var clipboard = {};
-    clipboard.pushData = function(type, data) {
-        
-        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
-            
-            dataBuffer.text = data;
-            
-        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
-            
-            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
-                 dataBuffer.drawingUrls = data.drawingUrls[0];
             }
 
             dataBuffer.sBase64 = data.sBase64;
         }
     }
-    
+
     this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
-    
-    this.asc_SelectionCut();
-    
+
     var _stream = global_memory_stream_menu;
     _stream["ClearNoAttack"]();
-    
+
     if (dataBuffer.text) {
         _stream["WriteByte"](0);
         _stream["WriteString2"](dataBuffer.text);
     }
-   
+
     if (dataBuffer.drawingUrls) {
         _stream["WriteByte"](1);
         _stream["WriteStringA"](dataBuffer.drawingUrls);
     }
-   
+
     if (dataBuffer.sBase64) {
         _stream["WriteByte"](2);
         _stream["WriteStringA"](dataBuffer.sBase64);
     }
-    
+
     _stream["WriteByte"](255);
-    
+
+    return _stream;
+};
+Asc['asc_docs_api'].prototype.Call_Menu_Context_Cut = function()
+{
+    var dataBuffer = {};
+
+    var clipboard = {};
+    clipboard.pushData = function(type, data) {
+
+        if (AscCommon.c_oAscClipboardDataFormat.Text === type) {
+
+            dataBuffer.text = data;
+
+        } else if (AscCommon.c_oAscClipboardDataFormat.Internal === type) {
+
+            if (null != data.drawingUrls && data.drawingUrls.length > 0) {
+                dataBuffer.drawingUrls = data.drawingUrls[0];
+            }
+
+            dataBuffer.sBase64 = data.sBase64;
+        }
+    }
+
+    this.asc_CheckCopy(clipboard, AscCommon.c_oAscClipboardDataFormat.Internal|AscCommon.c_oAscClipboardDataFormat.Text);
+
+    this.asc_SelectionCut();
+
+    var _stream = global_memory_stream_menu;
+    _stream["ClearNoAttack"]();
+
+    if (dataBuffer.text) {
+        _stream["WriteByte"](0);
+        _stream["WriteString2"](dataBuffer.text);
+    }
+
+    if (dataBuffer.drawingUrls) {
+        _stream["WriteByte"](1);
+        _stream["WriteStringA"](dataBuffer.drawingUrls);
+    }
+
+    if (dataBuffer.sBase64) {
+        _stream["WriteByte"](2);
+        _stream["WriteStringA"](dataBuffer.sBase64);
+    }
+
+    _stream["WriteByte"](255);
+
     return _stream;
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Paste = function(type, param)
@@ -5638,47 +5695,47 @@ AscCommon.ChartPreviewManager.prototype.clearPreviews = function()
 AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex)
 {
     return AscFormat.ExecuteNoHistory(function(){
-        if(!this.chartsByTypes[type])
-            this.chartsByTypes[type] = this.getChartByType(type);
-        var chart_space = this.chartsByTypes[type];
-        if(chart_space.style !== styleIndex)
-        {
-            chart_space.style = styleIndex;
-            chart_space.recalculateMarkers();
-            chart_space.recalculateSeriesColors();
-            chart_space.recalculatePlotAreaChartBrush();
-            chart_space.recalculatePlotAreaChartPen();
-            chart_space.recalculateChartBrush();
-            chart_space.recalculateChartPen();
-            chart_space.recalculateUpDownBars();
-        }
-        chart_space.recalculatePenBrush();
+                                      if(!this.chartsByTypes[type])
+                                      this.chartsByTypes[type] = this.getChartByType(type);
+                                      var chart_space = this.chartsByTypes[type];
+                                      if(chart_space.style !== styleIndex)
+                                      {
+                                      chart_space.style = styleIndex;
+                                      chart_space.recalculateMarkers();
+                                      chart_space.recalculateSeriesColors();
+                                      chart_space.recalculatePlotAreaChartBrush();
+                                      chart_space.recalculatePlotAreaChartPen();
+                                      chart_space.recalculateChartBrush();
+                                      chart_space.recalculateChartPen();
+                                      chart_space.recalculateUpDownBars();
+                                      }
+                                      chart_space.recalculatePenBrush();
 
-        var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
-        var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
-        if (AscCommon.AscBrowser.isRetina)
-        {
-            _width_px <<= 1;
-            _height_px <<= 1;
-        }
+                                      var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
+                                      var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
+                                      if (AscCommon.AscBrowser.isRetina)
+                                      {
+                                      _width_px <<= 1;
+                                      _height_px <<= 1;
+                                      }
 
-        window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
+                                      window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
 
-        var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
-        if (this.IsRetinaEnabled)
-            dKoefToMM /= 2;
+                                      var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
+                                      if (this.IsRetinaEnabled)
+                                      dKoefToMM /= 2;
 
-        chart_space.draw(_graphics);
-        _graphics.ClearParams();
+                                      chart_space.draw(_graphics);
+                                      _graphics.ClearParams();
 
-        var _stream = global_memory_stream_menu;
-        _stream["ClearNoAttack"]();
-        _stream["WriteByte"](4);
-        _stream["WriteLong"](type);
-        _stream["WriteLong"](styleIndex);
-        window["native"]["DD_EndNativeDraw"](_stream);
+                                      var _stream = global_memory_stream_menu;
+                                      _stream["ClearNoAttack"]();
+                                      _stream["WriteByte"](4);
+                                      _stream["WriteLong"](type);
+                                      _stream["WriteLong"](styleIndex);
+                                      window["native"]["DD_EndNativeDraw"](_stream);
 
-    }, this, []);
+                                      }, this, []);
 
 };
 
@@ -5704,126 +5761,258 @@ AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
     }
 };
 
-// additional
-
-Asc['asc_docs_api'].prototype.__SendThemeColorScheme = function()
+function NativeOpenFile3(_params, documentInfo)
 {
-    var infos = [];
-    var _index = 0;
+    window["CreateMainTextMeasurerWrapper"]();
 
-    var _c = null;
-
-    // user scheme
-    var oColorScheme = AscCommon.g_oUserColorScheme;
-    var _count_defaults = oColorScheme.length;
-    for (var i = 0; i < _count_defaults; ++i)
+    window.g_file_path = "native_open_file";
+    window.NATIVE_DOCUMENT_TYPE = window.native.GetEditorType();
+    var doc_bin = window.native.GetFileString(window.g_file_path);
+    if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        var _obj = oColorScheme[i];
-        infos[_index] = new AscCommon.CAscColorScheme();
-        infos[_index].Name = _obj.name;
+        _api = new window["Asc"]["asc_docs_api"]("");
 
-        _c = _obj.dk1;
-        infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
+        if (undefined !== _api.Native_Editor_Initialize_Settings)
+        {
+            _api.Native_Editor_Initialize_Settings(_params);
+        }
 
-        _c = _obj.lt1;
-        infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
+        window.documentInfo = documentInfo;
 
-        _c = _obj.dk2;
-        infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
+        var userInfo = new Asc.asc_CUserInfo();
+        userInfo.asc_putId(window.documentInfo["docUserId"]);
+        userInfo.asc_putFullName(window.documentInfo["docUserName"]);
+        userInfo.asc_putFirstName(window.documentInfo["docUserFirstName"]);
+        userInfo.asc_putLastName(window.documentInfo["docUserLastName"]);
 
-        _c = _obj.lt2;
-        infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
+        var docInfo = new Asc.asc_CDocInfo();
+        docInfo.put_Id(window.documentInfo["docKey"]);
+        docInfo.put_UserInfo(userInfo);
 
-        _c = _obj.accent1;
-        infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
+        _api.asc_setDocInfo(docInfo);
 
-        _c = _obj.accent2;
-        infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
+        if (window.documentInfo["iscoauthoring"]) {
 
-        _c = _obj.accent3;
-        infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
+            _api.isSpellCheckEnable = false;
 
-        _c = _obj.accent4;
-        infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
+            _api.asc_setAutoSaveGap(1);
+            _api._coAuthoringInit();
+            _api.asc_SetFastCollaborative(true);
 
-        _c = _obj.accent5;
-        infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
+            _api.asc_registerCallback("asc_onAuthParticipantsChanged", function(users) {
+                                      var stream = global_memory_stream_menu;
+                                      stream["ClearNoAttack"]();
+                                      asc_WriteUsers(users, stream);
+                                      window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
+                                      });
 
-        _c = _obj.accent6;
-        infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
+            _api.asc_registerCallback("asc_onParticipantsChanged", function(users) {
+                                      var stream = global_memory_stream_menu;
+                                      stream["ClearNoAttack"]();
+                                      asc_WriteUsers(users, stream);
+                                      window["native"]["OnCallMenuEvent"](20101, stream); // ASC_COAUTH_EVENT_TYPE_PARTICIPANTS_CHANGED
+                                      });
 
-        _c = _obj.hlink;
-        infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
+            _api.asc_registerCallback("asc_onGetEditorPermissions", function(state) {
 
-        _c = _obj.folHlink;
-        infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
+                                      var rData = {
+                                      "c"             : "open",
+                                      "id"            : window.documentInfo["docKey"],
+                                      "userid"        : window.documentInfo["docUserId"],
+                                      "format"        : "docx",
+                                      "vkey"          : undefined,
+                                      "url"           : window.documentInfo["docURL"],
+                                      "title"         : this.documentTitle,
+                                      "embeddedfonts" : false};
 
-        ++_index;
+                                      _api.CoAuthoringApi.auth(window.documentInfo["viewmode"], rData);
+                                      });
+
+            _api.asc_registerCallback("asc_onDocumentUpdateVersion", function(callback) {
+                                      var me = this;
+                                      me.needToUpdateVersion = true;
+                                      if (callback) callback.call(me);
+                                      });
+
+
+        } else {
+            var doc_bin = window.native.GetFileString(window.g_file_path);
+            _api.asc_nativeOpenFile(doc_bin);
+
+            if (_api.NativeAfterLoad)
+                _api.NativeAfterLoad();
+        }
     }
+    Api = _api;
+}
 
-    // theme colors
-    var _theme = this.WordControl.m_oLogicDocument.theme;
-    var _extra = _theme.extraClrSchemeLst;
-    var _count = _extra.length;
-    var _rgba = {R:0, G: 0, B: 0, A: 255};
-    for (var i = 0; i < _count; ++i)
+var DocumentPageSize = new function()
+{
+    this.oSizes    = [{name : "US Letter", w_mm : 215.9, h_mm : 279.4, w_tw : 12240, h_tw : 15840},
+                      {name : "US Legal", w_mm : 215.9, h_mm : 355.6, w_tw : 12240, h_tw : 20160},
+                      {name : "A4", w_mm : 210, h_mm : 297, w_tw : 11907, h_tw : 16839},
+                      {name : "A5", w_mm : 148.1, h_mm : 209.9, w_tw : 8391, h_tw : 11907},
+                      {name : "B5", w_mm : 176, h_mm : 250.1, w_tw : 9979, h_tw : 14175},
+                      {name : "Envelope #10", w_mm : 104.8, h_mm : 241.3, w_tw : 5940, h_tw : 13680},
+                      {name : "Envelope DL", w_mm : 110.1, h_mm : 220.1, w_tw : 6237, h_tw : 12474},
+                      {name : "Tabloid", w_mm : 279.4, h_mm : 431.7, w_tw : 15842, h_tw : 24477},
+                      {name : "A3", w_mm : 297, h_mm : 420.1, w_tw : 16840, h_tw : 23820},
+                      {name : "Tabloid Oversize", w_mm : 304.8, h_mm : 457.1, w_tw : 17282, h_tw : 25918},
+                      {name : "ROC 16K", w_mm : 196.8, h_mm : 273, w_tw : 11164, h_tw : 15485},
+                      {name : "Envelope Coukei 3", w_mm : 119.9, h_mm : 234.9, w_tw : 6798, h_tw : 13319},
+                      {name : "Super B/A3", w_mm : 330.2, h_mm : 482.5, w_tw : 18722, h_tw : 27358}
+                      ];
+    this.sizeEpsMM = 0.5;
+    this.getSize   = function(widthMm, heightMm)
     {
-        var _scheme = _extra[i].clrScheme;
-
-        infos[_index] = new AscCommon.CAscColorScheme();
-        infos[_index].Name = _scheme.name;
-
-        _scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[8].RGBA;
-        infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[12].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[12].RGBA;
-        infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[9].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[9].RGBA;
-        infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[13].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[13].RGBA;
-        infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[0].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[0].RGBA;
-        infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[1].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[1].RGBA;
-        infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[2].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[2].RGBA;
-        infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[3].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[3].RGBA;
-        infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[4].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[4].RGBA;
-        infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[5].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[5].RGBA;
-        infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[11].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[11].RGBA;
-        infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
-
-        _scheme.colors[10].Calculate(_theme, null, null, null, _rgba);
-        _c = _scheme.colors[10].RGBA;
-        infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
-
-        _index++;
-    }
-
-    this.WordControl.m_oApi.sync_SendThemeColorSchemes(infos);
+        for (var index in this.oSizes)
+        {
+            var item = this.oSizes[index];
+            if (Math.abs(widthMm - item.w_mm) < this.sizeEpsMM && Math.abs(heightMm - item.h_mm) < this.sizeEpsMM)
+                return item;
+        }
+        return {w_mm : widthMm, h_mm : heightMm};
+    };
 };
 
+window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, version)
+{
+    this.SpellCheckUrl = '';
+
+    this.WordControl.m_bIsRuler = false;
+    this.WordControl.Init();
+
+    this.InitEditor();
+    this.DocumentType   = 2;
+    this.LoadedObjectDS = this.WordControl.m_oLogicDocument.CopyStyle();
+
+    AscCommon.g_oIdCounter.Set_Load(true);
+
+    var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
+    var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
+
+    if (undefined === version)
+    {
+        if (oBinaryFileReader.Read(base64File))
+        {
+            AscCommon.g_oIdCounter.Set_Load(false);
+            this.LoadedObject = 1;
+
+            this.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Open);
+
+            // проверяем какие шрифты нужны
+            //this.WordControl.m_oDrawingDocument.CheckFontNeeds();
+            AscCommon.pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
+
+            //this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
+            //this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
+        }
+        else
+            this.sendEvent("asc_onError", Asc.c_oAscError.ID.MobileUnexpectedCharCount, Asc.c_oAscError.Level.Critical);
+    }
+    else
+    {
+        AscCommon.CurFileVersion = version;
+        if (oBinaryFileReader.ReadData(base64File))
+        {
+            AscCommon.g_oIdCounter.Set_Load(false);
+            this.LoadedObject = 1;
+
+            this.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Open);
+        }
+        else
+            this.sendEvent("asc_onError", Asc.c_oAscError.ID.MobileUnexpectedCharCount, Asc.c_oAscError.Level.Critical);
+    }
+
+    /*
+     if (window["NATIVE_EDITOR_ENJINE"] === true && undefined != window["native"])
+     {
+     AscCommon.CDocsCoApi.prototype.askSaveChanges = function(callback)
+     {
+     callback({"saveLock" : false});
+     };
+     AscCommon.CDocsCoApi.prototype.saveChanges    = function(arrayChanges, deleteIndex, excelAdditionalInfo)
+     {
+     if (window["native"]["SaveChanges"])
+     window["native"]["SaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);
+     };
+     }
+     */
+
+    if (undefined != window["Native"])
+        return;
+
+    //callback
+    this.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
+    var sizeMM;
+    if (this.DocumentOrientation)
+        sizeMM = DocumentPageSize.getSize(AscCommon.Page_Width, AscCommon.Page_Height);
+    else
+        sizeMM = DocumentPageSize.getSize(AscCommon.Page_Height, AscCommon.Page_Width);
+    this.sync_DocSizeCallback(sizeMM.w_mm, sizeMM.h_mm);
+    this.sync_PageOrientCallback(editor.get_DocumentOrientation());
+
+    if (this.GenerateNativeStyles !== undefined)
+    {
+        this.GenerateNativeStyles();
+
+        if (this.WordControl.m_oDrawingDocument.CheckTableStylesOne !== undefined)
+            this.WordControl.m_oDrawingDocument.CheckTableStylesOne();
+    }
+};
+
+Asc['asc_docs_api'].prototype.openDocument = function(sData)
+{
+    _api.asc_nativeOpenFile2(sData.data);
+
+    var version;
+    if (sData.changes && this.VersionHistory)
+    {
+        this.VersionHistory.changes = sData.changes;
+        this.VersionHistory.applyChanges(this);
+    }
+
+    if (_api.NativeAfterLoad)
+        _api.NativeAfterLoad();
+
+    //console.log("ImageMap : " + JSON.stringify(this.WordControl.m_oLogicDocument));
+
+    this.ImageLoader.bIsLoadDocumentFirst = true;
+    this.ImageLoader.LoadDocumentImages(this.WordControl.m_oLogicDocument.ImageMap, true);
+
+    this.WordControl.m_oLogicDocument.Continue_FastCollaborativeEditing();
+
+    //this.asyncFontsDocumentEndLoaded();
+
+    this.ParcedDocument = true;
+    if (this.isStartCoAuthoringOnEndLoad)
+    {
+        this.CoAuthoringApi.onStartCoAuthoring(true);
+        this.isStartCoAuthoringOnEndLoad = false;
+    }
+
+    window["native"]["onEndLoadingFile"]();
+
+    var t = this;
+    setInterval(function() {
+                t._autoSave();
+                }, 40);
+};
+
+window["AscCommon"].getFullImageSrc2 = function (src) {
+
+    var start = src.slice(0, 6);
+    if (0 === start.indexOf('theme') && editor.ThemeLoader){
+        return  editor.ThemeLoader.ThemesUrlAbs + src;
+    }
+
+    if (0 !== start.indexOf('http:') && 0 !== start.indexOf('data:') && 0 !== start.indexOf('https:') &&
+        0 !== start.indexOf('file:') && 0 !== start.indexOf('ftp:')){
+        var srcFull = AscCommon.g_oDocumentUrls.getImageUrl(src);
+        if(srcFull){
+            window["native"]["loadUrlImage"](srcFull, src);
+            return srcFull;
+        }
+    }
+    return src;
+};

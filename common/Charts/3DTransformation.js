@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -88,16 +88,21 @@ function Processor3D(width, height, left, right, bottom, top, chartSpace, charts
 	
 	this.angleOx = this.view3D && this.view3D.rotX ? (- this.view3D.rotX / 360) * (Math.PI * 2) : 0;
 	this.angleOy = this.view3D && this.view3D.rotY ? (- this.view3D.rotY / 360) * (Math.PI * 2) : 0;
-	this.angleOz = this.view3D && this.view3D.rotZ ? (- this.view3D.rotZ / 360) * (Math.PI * 2) : 0;
+	//this.angleOz = this.view3D && this.view3D.rotZ ? (- this.view3D.rotZ / 360) * (Math.PI * 2) : 0;
 	
-	/*if(this.view3D.rAngAx && this.view3D.rotX < 0)
+	if(!this.view3D.getRAngAx() && AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
 	{	
-		this.angleOx = - this.angleOx;
-		this.angleOy = - this.angleOy;
-	}*/
+		this.angleOy = 0;
+	}
 	
 	this.orientationCatAx = null;
 	this.orientationValAx = null;
+	
+	this.matrixRotateOx = null;
+	this.matrixRotateOy = null;
+	this.matrixRotateAllAxis = null;
+	this.matrixShearXY = null;
+	this.projectMatrix = null;
 }
 
 Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIsCheck)
@@ -114,13 +119,13 @@ Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIs
 	//this._calcSpecialStandardScaleX();
 	
 	//глубина
-	this.depthPerspective = this.view3D.rAngAx ? this._calculateDepth() : this._calculateDepthPerspective();
+	this.depthPerspective = this.view3D.getRAngAx() ? this._calculateDepth() : this._calculateDepthPerspective();
 	
 	//угол перспективы
 	this._calculatePerspective(this.view3D);
 	
 	//после рассчета глубины меняются пропорции ширины и высоты
-	if(this.view3D.rAngAx)
+	if(this.view3D.getRAngAx())
 		this._calculateScaleFromDepth();
 	
 	//сдвиг камеры для того, чтобы попали все линии
@@ -128,11 +133,60 @@ Processor3D.prototype.calaculate3DProperties = function(baseDepth, gapDepth, bIs
 	{
 		this._calculateCameraDiff();
 		
-		if(this.view3D.rAngAx)
+		if(this.view3D.getRAngAx())
 		{
 			this._recalculateScaleWithMaxWidth();
 		}
 	}
+	
+	if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type && !this.view3D.getRAngAx())
+	{
+		//TODO пересмотреть функцию
+		this.tempChangeAspectRatioForPie();
+	}
+};
+
+Processor3D.prototype.tempChangeAspectRatioForPie = function()
+{
+	var perspectiveDepth = this.depthPerspective;
+	
+	var widthCanvas = this.widthCanvas;
+	var originalWidthChart = widthCanvas - this.left - this.right;
+	
+	var heightCanvas = this.heightCanvas;
+	var heightChart = heightCanvas - this.top - this.bottom;
+	
+	var points = [], faces = [];
+	
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top, perspectiveDepth, this));
+	points.push(new Point3D(this.left, this.top, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart, this.top, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top, 0, this));
+	
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, perspectiveDepth, this));
+	points.push(new Point3D(this.left, this.top + heightChart, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart, this.top + heightChart, perspectiveDepth / 2, this));
+	points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, 0, this));
+	
+	faces.push([0,1,2,3]);
+	faces.push([2,5,4,3]);
+	faces.push([1,6,7,0]);
+	faces.push([6,5,4,7]);
+	faces.push([7,4,3,0]);
+	faces.push([1,6,2,5]);
+	
+	var minMaxOx = this._getMinMaxOx(points, faces);
+	var minMaxOy = this._getMinMaxOy(points, faces);
+	
+	var kF = ((minMaxOx.right - minMaxOx.left) / originalWidthChart);
+	if((minMaxOy.bottom - minMaxOy.top) / kF > heightChart)
+	{
+		kF =  ((minMaxOy.bottom - minMaxOy.top) / heightChart);
+	}
+	
+	this.aspectRatioX = this.aspectRatioX * kF;
+	this.aspectRatioY = this.aspectRatioY * kF;
+	this.aspectRatioZ = this.aspectRatioZ * kF;
 };
 
 Processor3D.prototype.calculateCommonOptions = function()
@@ -149,8 +203,15 @@ Processor3D.prototype._calculateAutoHPercent = function()
 	if(this.hPercent == null)
 	{
 		this.hPercent = this.view3D.hPercent === null ? (heightLine / widthLine) : this.view3D.hPercent / 100;
-		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && ((this.view3D.hPercent === null && this.view3D.rAngAx) || (this.view3D.hPercent !== null && !this.view3D.rAngAx)))
+		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar && ((this.view3D.hPercent === null && this.view3D.getRAngAx()) || (this.view3D.hPercent !== null && !this.view3D.getRAngAx())))
 			this.hPercent = 1 / this.hPercent;
+			
+		if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
+		{
+			this.hPercent = 0.12;
+			//this.view3D.depthPercent = 180;
+		}
+		
 	}
 };
 
@@ -165,7 +226,7 @@ Processor3D.prototype._recalculateScaleWithMaxWidth = function()
 	
 	var subType = this.chartsDrawer.calcProp.subType;
 	var type = this.chartsDrawer.calcProp.type;
-	var isStandardType = !!(subType === "standard" || type === AscFormat.c_oChartTypes.Line || type === AscFormat.c_oChartTypes.Area && subType === "normal");
+	var isStandardType = !!(subType === "standard" || type === AscFormat.c_oChartTypes.Line || (type === AscFormat.c_oChartTypes.Area && subType === "normal") || type === AscFormat.c_oChartTypes.Surface);
 
     var optimalWidthLine, kF;
 	if(!isStandardType)
@@ -325,7 +386,7 @@ Processor3D.prototype._recalculateCameraDiff = function()
 Processor3D.prototype.calculateZPositionValAxis = function()
 {
 	var result = 0;
-	if(!this.view3D.rAngAx)
+	if(!this.view3D.getRAngAx())
 	{
 		var angleOyAbs = Math.abs(this.angleOy);
 		if((angleOyAbs >= Math.PI / 2 && angleOyAbs < Math.PI) ||  (angleOyAbs >= 3 * Math.PI / 2 && angleOyAbs < 2 * Math.PI))
@@ -348,7 +409,7 @@ Processor3D.prototype.calculateZPositionValAxis = function()
 Processor3D.prototype.calculateZPositionCatAxis = function()
 {
 	var result = 0;
-	if(!this.view3D.rAngAx)
+	if(!this.view3D.getRAngAx())
 	{
 		result = Math.cos(this.angleOy) > 0 ? 0 : this.depthPerspective;
 	}
@@ -369,7 +430,7 @@ Processor3D.prototype.calculateFloorPosition = function()
 {
 	var res;
 	
-	if(this.view3D.rAngAx)
+	if(this.view3D.getRAngAx())
 	{
 		if(this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.HBar)
 		{	
@@ -419,7 +480,7 @@ Processor3D.prototype.convertAndTurnPoint = function(x, y, z, isNScale, isNRotat
 {
 	var res = null;
 	
-	if(this.view3D.rAngAx)
+	if(this.view3D.getRAngAx())
 	{
 		res = this.convertAndTurnPointRAngAx(x, y, z);
 	}
@@ -626,7 +687,7 @@ Processor3D.prototype.convertAndTurnPointForPie = function(x, y, z, cameraDiffZ)
 	
 	//rotate
 	var matrixRotateAllAxis;
-	if(!this.view3D.rAngAx)
+	if(!this.view3D.getRAngAx())
 		matrixRotateAllAxis = this._getMatrixRotateAllAxis();
 	else
 		matrixRotateAllAxis = this._shearXY();
@@ -638,7 +699,7 @@ Processor3D.prototype.convertAndTurnPointForPie = function(x, y, z, cameraDiffZ)
 	
 	//project
 	var projectionPoint = point3D;
-	if(!this.view3D.rAngAx)
+	if(!this.view3D.getRAngAx())
 	{
 		var projectiveMatrix = this._getPerspectiveProjectionMatrix(1 / (this.rPerspective));
 		projectionPoint = point3D.project(projectiveMatrix);
@@ -686,8 +747,25 @@ Processor3D.prototype.calculatePropertiesForPieCharts = function()
 //***functions for matrix transformation***
 Processor3D.prototype._shearXY = function()
 {
-	//TODO матрица перевёрнута
-	return [[1, 0, 0, 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), Math.sin(this.angleOx), 0, 0], [0, 0, 0, 0]];
+	if(null === this.matrixShearXY)
+	{
+		this.matrixShearXY = new Matrix4D();
+		
+		this.matrixShearXY.a31 =  Math.sin(-this.angleOy);
+		this.matrixShearXY.a32 =  Math.sin(this.angleOx);
+		this.matrixShearXY.a33 =  0;
+		this.matrixShearXY.a44 =  0;
+	}
+	
+	return this.matrixShearXY;
+};
+Processor3D.prototype._shearXY2 = function()
+{
+	if(null === this.matrixShearXY)
+	{
+		this.matrixShearXY = [[1, 0, 0, 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), Math.sin(this.angleOx), 0, 0], [0, 0, 0, 0]];
+	}
+	return this.matrixShearXY;
 };
 
 Processor3D.prototype._getMatrixRotateAllAxis = function()
@@ -702,18 +780,51 @@ Processor3D.prototype._getMatrixRotateAllAxis = function()
 	|-sinOy * cosOx     sinOx     cosOy * cosOx  0|
 	|-sinOy              0        (cosOy + 1)   1|*/
 	
+	if(null === this.matrixRotateAllAxis)
+	{
+		this.matrixRotateAllAxis = matrixRotateOY.multiply(matrixRotateOX);
+	}
 	
-	return Point3D.prototype.multiplyMatrix(matrixRotateOY, matrixRotateOX);
+	return this.matrixRotateAllAxis;
 };
 
 Processor3D.prototype._getMatrixRotateOx = function()
 {
-	return [[1, 0, 0, 0], [0, Math.cos(-this.angleOx), Math.sin(-this.angleOx), 0], [0, - Math.sin(-this.angleOx), Math.cos(-this.angleOx), 1], [0, 0, 0, 1]];
+	//todo посмотреть возможность заменить массивы на Float32Array
+	if(null === this.matrixRotateOx)
+	{
+		this.matrixRotateOx = new Matrix4D()/*[[1, 0, 0, 0], [0, Math.cos(-this.angleOx), Math.sin(-this.angleOx), 0], [0, - Math.sin(-this.angleOx), Math.cos(-this.angleOx), 1], [0, 0, 0, 1]]*/;
+		
+		var cos = Math.cos(-this.angleOx);
+		var sin = Math.sin(-this.angleOx);
+		
+		this.matrixRotateOx.a22 =  cos;
+		this.matrixRotateOx.a23 =  sin;
+		this.matrixRotateOx.a32 = -sin;
+		this.matrixRotateOx.a33 = cos;
+		this.matrixRotateOx.a34 = 1;
+	}
+	
+	return this.matrixRotateOx;
 };
 
 Processor3D.prototype._getMatrixRotateOy = function()
 {
-	return [[Math.cos(-this.angleOy), 0, -Math.sin(-this.angleOy), 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), 0, Math.cos(-this.angleOy), 1], [0, 0, 0, 1]];
+	if(null === this.matrixRotateOy)
+	{
+		this.matrixRotateOy = new Matrix4D()/*[[Math.cos(-this.angleOy), 0, -Math.sin(-this.angleOy), 0], [0, 1, 0, 0], [Math.sin(-this.angleOy), 0, Math.cos(-this.angleOy), 1], [0, 0, 0, 1]]*/;
+		
+		var cos = Math.cos(-this.angleOy);
+		var sin = Math.sin(-this.angleOy);
+		
+		this.matrixRotateOy.a11 =  cos;
+		this.matrixRotateOy.a13 = -sin;
+		this.matrixRotateOy.a31 =  sin;
+		this.matrixRotateOy.a33 =  cos;
+		this.matrixRotateOy.a34 =  1;
+	}
+	
+	return this.matrixRotateOy;
 };
 
 Processor3D.prototype._getMatrixRotateOz = function()
@@ -727,11 +838,16 @@ Processor3D.prototype._getPerspectiveProjectionMatrix = function(fov)
 	var zn = this.rPerspective;
 	var q = zf / (zf - zn);
 	return [[1 / Math.tan(this.rPerspective / 2), 0, 0, 0], [0, 1 / Math.tan(this.rPerspective / 2), 0, 0], [0, 0, q, 1], [0, 0, -q * zn, 0]];*/
+	//[[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1 / fov], [0, 0, 0, 1]]
+	if(null === this.projectMatrix)
+	{
+		this.projectMatrix = new Matrix4D();
+		this.projectMatrix.a33 = 0;
+		this.projectMatrix.a34 = 1 / fov;
+	}
 	
-	return [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 1 / fov], [0, 0, 0, 1]];
+	return this.projectMatrix;
 };
-
-
 
 Processor3D.prototype.correctPointsPosition = function(chartSpace)
 {
@@ -819,7 +935,7 @@ Processor3D.prototype.correctPointsPosition = function(chartSpace)
 			
 			var diffXText = 0;
 			var angleOyAbs = Math.abs(t.angleOy);
-			if(!t.view3D.rAngAx && (angleOyAbs >= Math.PI / 2 && angleOyAbs < 3 * Math.PI/2))
+			if(!t.view3D.getRAngAx() && (angleOyAbs >= Math.PI / 2 && angleOyAbs < 3 * Math.PI/2))
 				diffXText = - diffXText;	
 			
 			valCatAx.transformYPoints[i] = {x: (point.x - (diffXText + widthText)) / pxToMM, y: point.y / pxToMM};
@@ -878,6 +994,11 @@ Processor3D.prototype._calculatePerspective = function(view3D)
 	var heightLine = this.heightCanvas - (this.top + this.bottom);
 	
 	var perspective = view3D && view3D.perspective ? view3D.perspective : global3DPersperctive;
+	if(view3D && 0 === view3D.perspective && this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface)
+	{
+		perspective = 1;
+	}
+	
 	var alpha = perspective / 4;//в xml проиходит двойной угол(в параметрах ms стоит 40, приходит в xml 80)
 	//TODO this.top - this.bottom пересмотреть
 	var catt = ((heightLine / 2 + (Math.abs(this.top - this.bottom)))) / Math.tan((alpha / 360) * (Math.PI * 2));
@@ -896,7 +1017,7 @@ Processor3D.prototype._calculateDepth = function()
 	var heightOriginalChart = this.heightCanvas - (this.top + this.bottom);
 	var subType = this.chartsDrawer.calcProp.subType;
 	var type = this.chartsDrawer.calcProp.type;
-	var defaultOverlap = (subType == "stacked" || subType == "stackedPer" || subType == "standard" || type == AscFormat.c_oChartTypes.Line || type == AscFormat.c_oChartTypes.Area) ? 100 : 0;
+	var defaultOverlap = (subType == "stacked" || subType == "stackedPer" || subType == "standard" || type == AscFormat.c_oChartTypes.Line || type == AscFormat.c_oChartTypes.Area || type == AscFormat.c_oChartTypes.Surface) ? 100 : 0;
 	var overlap       = this.chartSpace.chart.plotArea.chart.overlap ? (this.chartSpace.chart.plotArea.chart.overlap / 100) : (defaultOverlap / 100);
 	var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth != null ? (this.chartSpace.chart.plotArea.chart.gapWidth / 100) : (150 / 100);
 	var gapDepth = this.chartSpace.chart.plotArea.chart.gapDepth != null ? (this.chartSpace.chart.plotArea.chart.gapDepth / 100) : type === AscFormat.c_oChartTypes.Area && subType !== "normal" ? 1 : (150 / 100);
@@ -909,13 +1030,13 @@ Processor3D.prototype._calculateDepth = function()
 	var depthPercent = this.view3D.depthPercent !== null ? this.view3D.depthPercent / 100 : 1;
 	var t = this;
 	
-	var areaStackedKf = type === AscFormat.c_oChartTypes.Area && subType !== "normal" ?  (ptCount / (2 * (ptCount - 1))) : 1;
+	var areaStackedKf = (type === AscFormat.c_oChartTypes.Area && subType !== "normal") || type === AscFormat.c_oChartTypes.Surface ?  (ptCount / (2 * (ptCount - 1))) : 1;
 	
 	var depth = 0;
 	var chartWidth = 0;
 	
 	var standardType = false;
-	if(subType == "standard" || type == AscFormat.c_oChartTypes.Line || (type == AscFormat.c_oChartTypes.Area && subType == "normal"))
+	if(subType == "standard" || type == AscFormat.c_oChartTypes.Line || (type == AscFormat.c_oChartTypes.Area && subType == "normal") || (type === AscFormat.c_oChartTypes.Surface))
 		standardType = true;
 	
 	var heightHPercent = heightOriginalChart / hPercent;
@@ -946,7 +1067,7 @@ Processor3D.prototype._calculateDepth = function()
 			var widthChart = (widthOriginalChart / t.aspectRatioX) / t.specialStandardScaleX;
 
 			b = (seriesCount - (seriesCount - 1) * overlap + gapWidth);
-			if(subType == "standard" || type == AscFormat.c_oChartTypes.Line || type == AscFormat.c_oChartTypes.Area)
+			if(subType == "standard" || type == AscFormat.c_oChartTypes.Line || type == AscFormat.c_oChartTypes.Area || type === AscFormat.c_oChartTypes.Surface)
 				b = b / seriesCount;
 			
 			angleOxKf = sinOx === 0 ? 1 : sinOx;
@@ -985,13 +1106,19 @@ Processor3D.prototype._calculateDepthPerspective = function()
 	
 	var width = widthChart / this.chartsDrawer.calcProp.ptCount;
 	
-	var isNormalArea = !!(this.chartsDrawer.calcProp.subType == "normal" && this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Area);
+	var isNormalArea = !!((this.chartsDrawer.calcProp.subType == "normal" && this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Area) || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface);
 	
 	var defaultOverlap = (this.chartsDrawer.calcProp.subType == "stacked" || this.chartsDrawer.calcProp.subType == "stackedPer" || this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || isNormalArea) ? 100 : 0;
 	var overlap       = this.chartSpace.chart.plotArea.chart.overlap ? (this.chartSpace.chart.plotArea.chart.overlap / 100) : (defaultOverlap / 100);
 	
 	var gapWidth = this.chartSpace.chart.plotArea.chart.gapWidth != null ? (this.chartSpace.chart.plotArea.chart.gapWidth / 100) : (150 / 100);
 	var gapDepth = this.chartSpace.chart.plotArea.chart.gapDepth != null ? (this.chartSpace.chart.plotArea.chart.gapDepth / 100) : (150 / 100);
+	
+	if(AscFormat.c_oChartTypes.Area === this.chartsDrawer.calcProp.type || AscFormat.c_oChartTypes.Surface === this.chartsDrawer.calcProp.type)
+	{
+		gapWidth = 0;
+		gapDepth = 0;
+	}
 	
 	var baseDepth = width / (seriesCount - (seriesCount - 1) * overlap + gapWidth);
 	if(this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || isNormalArea)
@@ -1025,7 +1152,7 @@ Processor3D.prototype._calculateDepthPerspective = function()
 
 Processor3D.prototype._calcSpecialStandardScaleX = function()
 {
-	if(!(this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && this.chartsDrawer.calcProp.subType == "normal")))
+	if(!(this.chartsDrawer.calcProp.subType == "standard" || this.chartsDrawer.calcProp.type == AscFormat.c_oChartTypes.Line || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && this.chartsDrawer.calcProp.subType == "normal") || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface))
 		return;
 	
 	//calculate width in 3d standard charts with rAngAx
@@ -1038,7 +1165,7 @@ Processor3D.prototype._calcSpecialStandardScaleX = function()
 Processor3D.prototype._calculateScaleFromDepth = function (/*isSkip*/)
 {
 	//***Calculate scaleY***
-	if(this.view3D.rAngAx && this.aspectRatioY === 1)
+	if(this.view3D.getRAngAx() && this.aspectRatioY === 1)
 	{
 		var heightCanvas = this.heightCanvas;
 		var heightChart = heightCanvas - this.top - this.bottom;
@@ -1050,7 +1177,7 @@ Processor3D.prototype._calculateScaleFromDepth = function (/*isSkip*/)
 		
 		var subType = this.chartsDrawer.calcProp.subType;
         var newDepth, newWidth;
-		if(!(subType == "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && subType == "normal")))
+		if(!(subType == "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && subType == "normal")))
 		{
             newDepth = this.depthPerspective * Math.sin(-this.angleOx);
             newWidth = heightChart - newDepth;
@@ -1073,14 +1200,30 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 	//add test points for parallelepiped rect
 	var points = [];
 	var faces = [];
-	points.push(new Point3D(this.left, this.top, perspectiveDepth, this));
-	points.push(new Point3D(this.left, heightChart + this.top, perspectiveDepth, this));
-	points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, perspectiveDepth, this));
-	points.push(new Point3D(originalWidthChart + this.left, this.top, perspectiveDepth, this));
-	points.push(new Point3D(originalWidthChart + this.left, this.top, 0, this));
-	points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, 0, this));
-	points.push(new Point3D(this.left, heightChart + this.top, 0, this));
-	points.push(new Point3D(this.left, this.top, 0, this));
+	
+	/*if(AscFormat.c_oChartTypes.Pie === this.chartsDrawer.calcProp.type)
+	{
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top, perspectiveDepth, this));
+		points.push(new Point3D(this.left, this.top, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart, this.top, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top, 0, this));
+		
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, perspectiveDepth, this));
+		points.push(new Point3D(this.left, this.top + heightChart, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart, this.top + heightChart, perspectiveDepth / 2, this));
+		points.push(new Point3D(this.left + originalWidthChart / 2, this.top + heightChart, 0, this));
+	}
+	else
+	{*/
+		points.push(new Point3D(this.left, this.top, perspectiveDepth, this));
+		points.push(new Point3D(this.left, heightChart + this.top, perspectiveDepth, this));
+		points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, perspectiveDepth, this));
+		points.push(new Point3D(originalWidthChart + this.left, this.top, perspectiveDepth, this));
+		points.push(new Point3D(originalWidthChart + this.left, this.top, 0, this));
+		points.push(new Point3D(originalWidthChart + this.left, heightChart + this.top, 0, this));
+		points.push(new Point3D(this.left, heightChart + this.top, 0, this));
+		points.push(new Point3D(this.left, this.top, 0, this));
+	//}
 	
 	faces.push([0,1,2,3]);
 	faces.push([2,5,4,3]);
@@ -1091,11 +1234,8 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 	
 	
 	//***Calculate cameraDiffZ***
-	if(!this.view3D.rAngAx)
+	if(!this.view3D.getRAngAx())
 	{
-		//медленная функция поиска сдвигов камеры(все сдвиги корректны)
-		//this._calculateCameraDiffZ(points, faces);
-	
 		//быстрая функция поиска сдвигов камеры
 		//console.time("sdf");
 		this._calculateCameraDiffZX(points, faces);
@@ -1103,7 +1243,7 @@ Processor3D.prototype._calculateCameraDiff = function (/*isSkip*/)
 	}
 	
 	//***Calculate cameraDiffX***
-	if(this.view3D.rAngAx)
+	if(this.view3D.getRAngAx())
 	{
 		var minMaxOx = this._getMinMaxOx(points, faces);
 		this._calculateCameraDiffX(minMaxOx);
@@ -1262,7 +1402,8 @@ Processor3D.prototype._calculateCameraDiffZX = function (newPoints)
 	
 };
 
-Processor3D.prototype.checkOutSideArea = function(newPoints)
+//TODO если будут проблемы при маштабировании, вернуть функцию checkOutSideArea2 вместо checkOutSideArea
+Processor3D.prototype.checkOutSideArea2 = function(newPoints)
 {
 	var i = 0;
 	var maxI = 1000;
@@ -1335,11 +1476,122 @@ Processor3D.prototype.checkOutSideArea = function(newPoints)
 		}
 	};
 	
+	calculateZ(100);
 	calculateZ(10);
 	calculateZ(1);
 	
 };
 
+Processor3D.prototype.checkOutSideArea = function(newPoints)
+{
+	var t = this;
+	
+	var heightChart = this.heightCanvas - this.top - this.bottom;
+	var widthChart = this.widthCanvas - this.left - this.right;	
+	var DELTA = 3;
+	var maxCount = 1000;
+	var calculateZ = function()
+	{
+		var minMaxOx = t._getMinMaxOxPoints(newPoints, -t.cameraDiffZ);
+		t.cameraDiffX = -minMaxOx.diffX;
+		var x111 = t.convertAndTurnPoint(minMaxOx.tempX1, minMaxOx.tempY1, minMaxOx.tempZ1);
+		var x222 = t.convertAndTurnPoint(minMaxOx.tempX2, minMaxOx.tempY2, minMaxOx.tempZ2);
+		
+		var diffX = Math.abs(x222.x - x111.x);
+		
+		var minMaxOy = t._getMinMaxOyPoints(newPoints, t.cameraDiffZ);
+		t.cameraDiffY = -minMaxOy.diffY;
+		var y111 = t.convertAndTurnPoint(minMaxOy.tempX1, minMaxOy.tempY1, minMaxOy.tempZ1);
+		var y222 = t.convertAndTurnPoint(minMaxOy.tempX2, minMaxOy.tempY2, minMaxOy.tempZ2);
+		
+		var diffY = Math.abs(y222.y - y111.y);
+
+		if(diffX <= widthChart && diffY <= heightChart && ((widthChart - diffX) < DELTA ||  (heightChart - diffY) < DELTA))
+		{
+			return;
+        }
+
+        var count = 0;
+        var fStart = t.cameraDiffZ ? t.cameraDiffZ : 1;
+        var fLeftDiffZ, fRightDiffZ;
+        if(diffX < widthChart && diffY < heightChart)
+		{
+            fLeftDiffZ = 0;
+            fRightDiffZ = t.cameraDiffZ;
+		}
+		else
+		{
+            fLeftDiffZ = t.cameraDiffZ;
+            while (diffX >= widthChart || diffY >= heightChart)
+			{
+                count++;
+                t.cameraDiffZ += fStart/2;
+                minMaxOx = t._getMinMaxOxPoints(newPoints, -t.cameraDiffZ);
+                t.cameraDiffX = -minMaxOx.diffX;
+                x111 = t.convertAndTurnPoint(minMaxOx.tempX1, minMaxOx.tempY1, minMaxOx.tempZ1);
+                x222 = t.convertAndTurnPoint(minMaxOx.tempX2, minMaxOx.tempY2, minMaxOx.tempZ2);
+                diffX = Math.abs(x222.x - x111.x);
+                minMaxOy = t._getMinMaxOyPoints(newPoints, t.cameraDiffZ);
+                t.cameraDiffY = -minMaxOy.diffY;
+                y111 = t.convertAndTurnPoint(minMaxOy.tempX1, minMaxOy.tempY1, minMaxOy.tempZ1);
+                y222 = t.convertAndTurnPoint(minMaxOy.tempX2, minMaxOy.tempY2, minMaxOy.tempZ2);
+                diffY = Math.abs(y222.y - y111.y);
+				
+				if(count > maxCount)
+				{
+					return;
+				}
+            }
+            if(diffX <= widthChart && diffY <= heightChart && ((widthChart - diffX) < DELTA ||  (heightChart - diffY) < DELTA))
+			{
+                return;
+            }
+            fRightDiffZ = t.cameraDiffZ;
+        }
+		
+		
+		while((diffX > widthChart || diffY > heightChart) || (fRightDiffZ - fLeftDiffZ) > DELTA)
+		{
+            t.cameraDiffZ = fLeftDiffZ + ((fRightDiffZ - fLeftDiffZ)/2);
+
+            count++;
+            minMaxOx = t._getMinMaxOxPoints(newPoints, -t.cameraDiffZ);
+            t.cameraDiffX = -minMaxOx.diffX;
+            var x111 = t.convertAndTurnPoint(minMaxOx.tempX1, minMaxOx.tempY1, minMaxOx.tempZ1);
+            var x222 = t.convertAndTurnPoint(minMaxOx.tempX2, minMaxOx.tempY2, minMaxOx.tempZ2);
+
+
+            var diffX = Math.abs(x222.x - x111.x);
+
+            var minMaxOy = t._getMinMaxOyPoints(newPoints, t.cameraDiffZ);
+            t.cameraDiffY = -minMaxOy.diffY;
+            var y111 = t.convertAndTurnPoint(minMaxOy.tempX1, minMaxOy.tempY1, minMaxOy.tempZ1);
+            var y222 = t.convertAndTurnPoint(minMaxOy.tempX2, minMaxOy.tempY2, minMaxOy.tempZ2);
+
+            var diffY = Math.abs(y222.y - y111.y);
+			if(diffX < widthChart && diffY < heightChart)
+			{
+				if(((widthChart - diffX) < DELTA) || ((heightChart - diffY) < DELTA))
+				{
+					break;
+				}
+                fRightDiffZ = t.cameraDiffZ;
+			}
+			else 
+			{
+                fLeftDiffZ = t.cameraDiffZ;
+			}
+			
+			if(count > maxCount)
+			{
+				return;
+			}
+        }
+	};
+	
+	calculateZ();
+	
+};
 
 Processor3D.prototype._getMinMaxOxPoints = function(points, minZ)
 {
@@ -1980,160 +2232,11 @@ Processor3D.prototype._correctZPositionOY = function(x1, x2, z1, z2, minZ, y1, y
 	return {minZ: diffXZ3.minZ, diffY: diffXZ3.diffY};
 };
 
-Processor3D.prototype._calculateCameraDiffZ = function (points, faces)
-{
-	var widthCanvas = this.widthCanvas;
-	var originalWidthChart = widthCanvas - this.left - this.right;
-	
-	var heightCanvas = this.heightCanvas;
-	var heightChart = heightCanvas - this.top - this.bottom;
-
-	var widthChart = originalWidthChart;
-	var depthChart = this.depthPerspective;
-	
-	var minMaxOx = this._getMinMaxOx(points, faces);
-	var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
-	var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
-	var x1 = point1.x;
-	var x2 = point2.x;
-	var y1 = point1.y;
-	var y2 = point2.y;
-	var diffX = Math.abs(x1 - x2);
-	var diffY = Math.abs(y1 - y2);
-	
-	//TODO медленная функция, рассчитать сдвиги!
-	while(diffX > widthChart || diffY > heightChart)
-	{
-		var minMaxOx = this._getMinMaxOx(points, faces);
-		var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
-		var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
-
-		var x1 = point1.x;
-		var x2 = point2.x;
-		var y1 = point1.y;
-		var y2 = point2.y;
-		
-		var leftMargin = this.left - x1;
-		var rightMargin = x2 - (this.left + originalWidthChart);
-		
-		var topMargin = this.top - y1;
-		var bottomMargin = y2 - (this.top + heightChart);
-		
-		if(leftMargin > rightMargin)
-		{
-			this.cameraDiffX++;
-		}
-		else
-		{
-			this.cameraDiffX--;
-		}
-		
-		var diffX = Math.abs(x1 - x2);
-		var diffY = Math.abs(y1 - y2);
-
-		this.cameraDiffZ++;
-	}
-	
-	var minMaxOy = this._getMinMaxOy(points, faces);
-	var point1 = this.convertAndTurnPoint(minMaxOy.mostTopPointY.x, minMaxOy.mostTopPointY.y, minMaxOy.mostTopPointY.z);
-	var point2 = this.convertAndTurnPoint(minMaxOy.mostBottomPointY.x, minMaxOy.mostBottomPointY.y, minMaxOy.mostBottomPointY.z);
-	var y1 = point1.y;
-	var y2 = point2.y;
-	
-	var minMaxOx = this._getMinMaxOx(points, faces);
-	var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
-	var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
-	var x1 = point1.x;
-	var x2 = point2.x;
-	
-	var diffY = Math.abs(y1 - y2);
-	
-	//TODO медленная функция, рассчитать сдвиги!
-	while(diffY > heightChart)
-	{
-		var minMaxOy = this._getMinMaxOy(points, faces);
-		var point1 = this.convertAndTurnPoint(minMaxOy.mostTopPointY.x, minMaxOy.mostTopPointY.y, minMaxOy.mostTopPointY.z);
-		var point2 = this.convertAndTurnPoint(minMaxOy.mostBottomPointY.x, minMaxOy.mostBottomPointY.y, minMaxOy.mostBottomPointY.z);
-
-		var y1 = point1.y;
-		var y2 = point2.y;
-		
-		var minMaxOx = this._getMinMaxOx(points, faces);
-		var point1 = this.convertAndTurnPoint(minMaxOx.mostLeftPointX.x, minMaxOx.mostLeftPointX.y, minMaxOx.mostLeftPointX.z);
-		var point2 = this.convertAndTurnPoint(minMaxOx.mostRightPointX.x, minMaxOx.mostRightPointX.y, minMaxOx.mostRightPointX.z);
-		var x1 = point1.x;
-		var x2 = point2.x;
-		
-		var leftMargin = this.left - x1;
-		var rightMargin = x2 - (this.left + originalWidthChart);
-		
-		var topMargin = this.top - y1;
-		var bottomMargin = y2 - (this.top + heightChart);
-		
-		if(leftMargin > rightMargin)
-		{
-			this.cameraDiffX++;
-		}
-		else
-		{
-			this.cameraDiffX--;
-		}
-		
-		var diffY = Math.abs(y1 - y2);
-
-		this.cameraDiffZ++;
-	}
-
-},
-
 Processor3D.prototype._calculateCameraDiffX = function (minMaxOx)
 {
 	//test ровно по центру, но циклом
 	var maxLeftPoint = minMaxOx.left;
 	var maxRightPoint = minMaxOx.right;
-	/*var mostLeftPointX = minMaxOx.mostLeftPointX;
-	var mostRightPointX = minMaxOx.mostRightPointX;
-	
-	var top = this.top;
-	var bottom = this.bottom;
-	
-	var left = this.left;
-	var right = this.right;
-	var widthCanvas = this.widthCanvas;
-	var originalWidthChart = widthCanvas - left - right;
-	
-	var heightCanvas = this.heightCanvas;
-	var heightChart = heightCanvas - top - bottom;
-
-	var widthChart = originalWidthChart;
-	var depthChart = this.depthPerspective;
-	
-	var reverseDiff = false;
-	var diffLeft = maxLeftPoint - left;
-	var diffRight = (widthChart + right) - maxRightPoint;
-	if(diffLeft > 0 && diffRight > 0 && diffRight < diffLeft)
-		reverseDiff = true;
-	else if(diffLeft > 0 && diffRight < 0)
-		reverseDiff = true;
-	else if(diffLeft < 0 && diffRight < 0 && diffRight < diffLeft)
-		reverseDiff = true;
-	
-	while(true)
-	{
-		var point1 = this.convertAndTurnPoint(mostLeftPointX.x, mostLeftPointX.y, mostLeftPointX.z, true);
-		var point2 = this.convertAndTurnPoint(mostRightPointX.x, mostRightPointX.y, mostRightPointX.z, true);
-		maxLeftPoint = point1.x;
-		maxRightPoint = point2.x;
-		
-		if(((Math.abs(maxLeftPoint - left) + 2) >= Math.abs(maxRightPoint - (widthChart + right)) && Math.abs(maxLeftPoint - left) - 2 <= Math.abs(maxRightPoint - (widthChart + right))) ||  Math.abs(this.cameraDiffX) > 1000)
-			break;
-		
-		if(reverseDiff)
-			this.cameraDiffX--;
-		else
-			this.cameraDiffX++;
-	}*/
-	
 	
 	//так ближе к тому, как смещает excel
 	var widthCanvas = this.widthCanvas;
@@ -2143,55 +2246,6 @@ Processor3D.prototype._calculateCameraDiffX = function (minMaxOx)
 	var diffRight  = (this.left + originalWidthChart) - maxRightPoint;
 	
 	this.cameraDiffX = (((diffRight - diffLeft) / 2) * ( 1 / (this.rPerspective) + this.cameraDiffZ)) / ( 1 / (this.rPerspective));
-	
-	
-	//***Calculate cameraDiffX***
-	/*var aspectRatio = (originalWidthChart) / (heightChart);
-	var minMaxOx = this._getMinMaxOx(points, faces);
-	var x = minMaxOx.mostLeftPointX.x / aspectRatio;
-	var y = minMaxOx.mostLeftPointX.y;
-	var z = minMaxOx.mostLeftPointX.z;
-	
-	var x1 = minMaxOx.mostRightPointX.x / aspectRatio;
-	var y1 = minMaxOx.mostRightPointX.y;
-	var z1 = minMaxOx.mostRightPointX.z;
-	
-	
-	var centerXDiff = heightChart / 2 + this.left / 2;
-	var centerYDiff = heightChart / 2 + this.top;
-	var centerZDiff = this.depthPerspective / 2;
-	
-	var cosy  = Math.cos(this.angleOy);
-	var siny  = Math.sin(this.angleOy);
-	var cosx  = Math.cos(this.angleOx);
-	var sinx  = Math.sin(this.angleOx);
-	var cosz  = Math.cos(this.angleOz);
-	var sinz  = Math.sin(this.angleOz);
-	
-	var right1 = heightChart + left;*/
-	
-	/*x = x - centerXDiff;
-	y = y - centerYDiff;
-	z = z - centerZDiff;
-	
-	x1 = x1 - centerXDiff;
-	y1 = y1 - centerYDiff;
-	z1 = z1 - centerZDiff;*/
-	
-	//(cosy * x - siny * z + this.cameraDiffX) / (1 + (cosx * (cosy * z + siny * cosz * x) - sinx * y + this.cameraDiffZ) * (this.rPerspective)) -left = 
-	//right - (cosy * x - siny * z + this.cameraDiffX) / (1 + (cosx * (cosy * z + siny * cosz * x) - sinx * y + this.cameraDiffZ) * (this.rPerspective))
-
-	/*var c = cosy * x - siny * z;
-	var c1 = cosy * x1 - siny * z1;
-	var b = (1 + (cosx * (cosy * z + siny * cosz * x) - sinx * y + this.cameraDiffZ) * (this.rPerspective));
-	var b1 = (1 + (cosx * (cosy * z1 + siny * cosz * x1) - sinx * y1 + this.cameraDiffZ) * (this.rPerspective));*/
-
-	//(c + this.cameraDiffX) / b - left = right - (c1 + this.cameraDiffX) / b1;
-
-	//с / b +  this.cameraDiffX / b + c1 / b1 + this.cameraDiffX / b1 = right + left
-	//this.cameraDiffX / b + this.cameraDiffX / b1 = right + left - c1 / b1 - c / b
-
-	//this.cameraDiffX = (-c1 / b1 - c / b + left + right1) * ((b * b1) / (b1 + b));
 };
 
 Processor3D.prototype._calculateCameraDiffY = function (maxTopPoint, maxBottomPoint)
@@ -2310,18 +2364,18 @@ Processor3D.prototype._calcAspectRatio = function()
 	var aspectRatioY = 1;
 	
 	var subType = this.chartsDrawer.calcProp.subType;
-	if((subType === "standard"  || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line  || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && subType == "normal")) && !this.view3D.rAngAx)
+	if((subType === "standard"  || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line  || (this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Area && subType == "normal") || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface) && !this.view3D.getRAngAx())
 	{
 		this._calcSpecialStandardScaleX();
 		
 		aspectRatioX = (widthOriginalChart / (heightOriginalChart / hPercent)) * this.specialStandardScaleX;
 	}
-	else if(subType === "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line)
+	else if(subType === "standard" || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Line || this.chartsDrawer.calcProp.type === AscFormat.c_oChartTypes.Surface)
 	{
 		var seriesCount = this.chartsDrawer.calcProp.seriesCount;
 		var ptCount = this.chartsDrawer.calcProp.ptCount;
 		
-		var depth = this.view3D.rAngAx ? this._calculateDepth() : this._calculateDepthPerspective();
+		var depth = this.view3D.getRAngAx() ? this._calculateDepth() : this._calculateDepthPerspective();
 		var width = (depth / depthPercent) * (ptCount / seriesCount);
 		
 		aspectRatioX = (widthOriginalChart) / width;
@@ -2329,7 +2383,7 @@ Processor3D.prototype._calcAspectRatio = function()
 	else if(hPercent !== null)//auto scale height
 		aspectRatioX = widthOriginalChart / (heightOriginalChart / hPercent);
 	
-	if(aspectRatioX < 1 && this.view3D.rAngAx)
+	if(aspectRatioX < 1 && this.view3D.getRAngAx())
 	{
 		aspectRatioY = 1 / aspectRatioX;
 		aspectRatioX = 1;
@@ -2345,6 +2399,8 @@ function Point3D(x, y, z, chartsDrawer)
 	this.x = x;
 	this.y = y;
 	this.z = z;
+	this.t = 1;
+	
 	if(chartsDrawer)
 	{
 		this.chartProp = chartsDrawer.calcProp;
@@ -2384,11 +2440,11 @@ Point3D.prototype =
 	project: function(matrix)
 	{
 		//умножаем
-		var projectPoint = this.multiplyPointOnMatrix(matrix);
+		var projectPoint = matrix.multiplyPoint(this);
 		
 		//делим на 4 коэффициэнт
-		var newX = projectPoint[0][0] / projectPoint[0][3];
-		var newY = projectPoint[0][1] / projectPoint[0][3];
+		var newX = projectPoint.x / projectPoint.t;
+		var newY = projectPoint.y / projectPoint.t;
 		
 		this.x = newX;
 		this.y = newY;
@@ -2414,50 +2470,99 @@ Point3D.prototype =
 		return this;
 	},
 	
-	multiplyPointOnMatrix: function(matrix)
-	{
-		var pointMatrix = [[this.x, this.y, this.z, 1]];
-		
-		return this.multiplyMatrix(pointMatrix , matrix);
-	},
-	
 	multiplyPointOnMatrix1: function(matrix)
 	{
-		var pointMatrix = [[this.x, this.y, this.z, 1]];
-		
-		var multiplyMatrix = this.multiplyMatrix(pointMatrix , matrix);
-		this.x = multiplyMatrix[0][0];
-		this.y = multiplyMatrix[0][1];
-		this.z = multiplyMatrix[0][2];
-	},
-	
-	multiplyMatrix: function(A, B)
-	{
-		var rowsA = A.length, colsA = A[0].length,
-			rowsB = B.length, colsB = B[0].length,
-			C = [];
-
-		if (colsA != rowsB) return false;
-
-		for (var i = 0; i < rowsA; i++) C[i] = [];
-
-		for (var k = 0; k < colsB; k++)
-		{ 
-			for (var i = 0; i < rowsA; i++)
-			{ 
-				var temp = 0;
-				for (var j = 0; j < rowsB; j++) 
-				{
-					temp += A[i][j]*B[j][k];
-				}
-				
-			  C[i][k] = temp;
-			}
-		 }
-
-		return C;
+		var multiplyMatrix = matrix.multiplyPoint(this);
+		this.x = multiplyMatrix.x;
+		this.y = multiplyMatrix.y;
+		this.z = multiplyMatrix.z;
 	}
 };
+
+function Matrix4D() 
+{
+	this.a11 = 1.0;
+	this.a12 = 0.0;
+	this.a13 = 0.0;
+	this.a14 = 0.0;
+	
+	this.a21 = 0.0;
+	this.a22 = 1.0;
+	this.a23 = 0.0;
+	this.a24 = 0.0;
+	
+	this.a31 = 0.0;
+	this.a32 = 0.0;
+	this.a33 = 1.0;
+	this.a34 = 0.0;
+	
+	this.a41 = 0.0;
+	this.a42 = 0.0;
+	this.a43 = 0.0;
+	this.a44 = 1.0;
+
+	return this;
+}
+Matrix4D.prototype.reset = function () 
+{
+	this.a11 = 1.0;
+	this.a12 = 0.0;
+	this.a13 = 0.0;
+	this.a14 = 0.0;
+	
+	this.a21 = 0.0;
+	this.a22 = 1.0;
+	this.a23 = 0.0;
+	this.a24 = 0.0;
+	
+	this.a31 = 0.0;
+	this.a32 = 0.0;
+	this.a33 = 1.0;
+	this.a34 = 0.0;
+	
+	this.a41 = 0.0;
+	this.a42 = 0.0;
+	this.a43 = 0.0;
+	this.a44 = 1.0;
+};
+Matrix4D.prototype.multiply = function (m) 
+{
+	var res = new Matrix4D();
+	
+	res.a11 = this.a11 * m.a11 + this.a12 * m.a21 + this.a13 * m.a31 + this.a14 * m.a41;
+	res.a12 = this.a11 * m.a12 + this.a12 * m.a22 + this.a13 * m.a32 + this.a14 * m.a42;
+	res.a13 = this.a11 * m.a13 + this.a12 * m.a23 + this.a13 * m.a33 + this.a14 * m.a43;
+	res.a14 = this.a11 * m.a14 + this.a12 * m.a24 + this.a13 * m.a34 + this.a14 * m.a44;
+	
+	res.a21 = this.a21 * m.a11 + this.a22 * m.a21 + this.a23 * m.a31 + this.a24 * m.a41;
+	res.a22 = this.a21 * m.a12 + this.a22 * m.a22 + this.a23 * m.a32 + this.a24 * m.a42;
+	res.a23 = this.a21 * m.a13 + this.a22 * m.a23 + this.a23 * m.a33 + this.a24 * m.a43;
+	res.a24 = this.a21 * m.a14 + this.a22 * m.a24 + this.a23 * m.a34 + this.a24 * m.a44;
+	
+	res.a31 = this.a31 * m.a11 + this.a32 * m.a21 + this.a33 * m.a31 + this.a34 * m.a41;
+	res.a32 = this.a31 * m.a12 + this.a32 * m.a22 + this.a33 * m.a32 + this.a34 * m.a42;
+	res.a33 = this.a31 * m.a13 + this.a32 * m.a23 + this.a33 * m.a33 + this.a34 * m.a43;
+	res.a34 = this.a31 * m.a14 + this.a32 * m.a24 + this.a33 * m.a34 + this.a34 * m.a44;
+	
+	res.a41 = this.a41 * m.a11 + this.a42 * m.a21 + this.a43 * m.a31 + this.a44 * m.a41;
+	res.a42 = this.a41 * m.a12 + this.a42 * m.a22 + this.a43 * m.a32 + this.a44 * m.a42;
+	res.a43 = this.a41 * m.a13 + this.a42 * m.a23 + this.a43 * m.a33 + this.a44 * m.a43;
+	res.a44 = this.a41 * m.a14 + this.a42 * m.a24 + this.a43 * m.a34 + this.a44 * m.a44;
+	
+	return res;
+};
+Matrix4D.prototype.multiplyPoint = function (p) 
+{
+	var res = new Point3D();
+	
+	res.x = p.x * this.a11 + p.y * this.a21 + p.z * this.a31 + this.a41;
+	res.y = p.x * this.a12 + p.y * this.a22 + p.z * this.a32 + this.a42;
+	res.z = p.x * this.a13 + p.y * this.a23 + p.z * this.a33 + this.a43;
+	res.t = p.x * this.a14 + p.y * this.a24 + p.z * this.a34 + this.a44;
+	
+	return res;
+};
+
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscFormat'] = window['AscFormat'] || {};

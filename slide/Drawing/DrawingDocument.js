@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -82,114 +82,265 @@ function CTableOutlineDr()
 {
 	var image_64 = "u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u//6+vr/+vr6//r6+v/6+vr/+vr6//r6+v/6+vr/+vr6//r6+v/6+vr/+vr6/4+Pj/+7u7v/9vb2//b29v/39/f/9/f3//f39/83aMT/9/f3//f39//39/f/9/f3//f39/+Pj4//u7u7//Ly8v/y8vL/8vLy//Pz8/83aMT/N2jE/zdoxP/z8/P/8/Pz//Pz8//z8/P/j4+P/7u7u//u7u7/7u7u/+7u7v/u7u7/7u7u/zdoxP/u7u7/7u7u/+7u7v/u7u7/7u7u/4+Pj/+7u7v/6Ojo/+jo6P83aMT/6enp/+np6f83aMT/6enp/+np6f83aMT/6enp/+np6f+Pj4//u7u7/+Pj4/83aMT/N2jE/zdoxP83aMT/N2jE/zdoxP83aMT/N2jE/zdoxP/k5OT/j4+P/7u7u//o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/4+Pj/+7u7v/7e3t/+3t7f/t7e3/7e3t/+3t7f83aMT/7e3t/+zs7P/s7Oz/7Ozs/+zs7P+Pj4//u7u7//Ly8v/y8vL/8vLy//Ly8v83aMT/N2jE/zdoxP/x8fH/8fHx//Hx8f/x8fH/j4+P/7u7u//19fX/9fX1//X19f/19fX/9fX1/zdoxP/19fX/9fX1//X19f/19fX/9fX1/4+Pj/+7u7v/+fn5//n5+f/5+fn/+fn5//n5+f/5+fn/+fn5//n5+f/5+fn/+fn5//j4+P+Pj4//u7u7/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/w==";
 
-	this.image        = document.createElement('canvas');
-	this.image.width  = 13;
+	this.image = document.createElement('canvas');
+	this.image.width = 13;
 	this.image.height = 13;
 
-	var ctx   = this.image.getContext('2d');
+	var ctx = this.image.getContext('2d');
 	var _data = ctx.createImageData(13, 13);
 
 	AscFonts.DecodeBase64(_data, image_64);
 	ctx.putImageData(_data, 0, 0);
 
-	_data    = null;
+	_data = null;
 	image_64 = null;
 
 	this.TableOutline = null;
-	this.Counter      = 0;
-	this.bIsNoTable   = true;
-	this.bIsTracked   = false;
+	this.Counter = 0;
+	this.bIsNoTable = true;
+	this.bIsTracked = false;
 
-	this.CurPos        = null;
+	this.CurPos = null;
 	this.TrackTablePos = 0; // 0 - left_top, 1 - right_top, 2 - right_bottom, 3 - left_bottom
-	this.TrackOffsetX  = 0;
-	this.TrackOffsetY  = 0;
+	this.TrackOffsetX = 0;
+	this.TrackOffsetY = 0;
 
 	this.InlinePos = null;
 
-	this.IsChangeSmall    = true;
+	this.IsChangeSmall = true;
 	this.ChangeSmallPoint = null;
 
-	this.checkMouseDown = function(pos, word_control)
+	this.TableMatrix = null;
+	this.CurrentPageIndex = null;
+
+	this.checkMouseDown = function (pos, word_control)
 	{
 		if (null == this.TableOutline)
 			return false;
 
 		var _table_track = this.TableOutline;
-		var _d           = 13 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
+		var _d = 13 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
-		this.IsChangeSmall    = true;
+		this.IsChangeSmall = true;
 		this.ChangeSmallPoint = pos;
 
-		switch (this.TrackTablePos)
+		this.CurPos = {X: this.ChangeSmallPoint.X, Y: this.ChangeSmallPoint.Y, Page: this.ChangeSmallPoint.Page};
+		this.TrackOffsetX = 0;
+		this.TrackOffsetY = 0;
+
+		if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
 		{
-			case 1:
+			if (word_control.MobileTouchManager)
 			{
-				var _x = _table_track.X + _table_track.W;
-				var _b = _table_track.Y;
-				var _y = _b - _d;
-				var _r = _x + _d;
+				var _move_point = word_control.MobileTouchManager.TableMovePoint;
 
-				if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+				if (_move_point == null || pos.Page != _table_track.PageNum)
+					return false;
+
+				var _pos1 = word_control.m_oDrawingDocument.ConvertCoordsToCursorWR(pos.X, pos.Y, pos.Page);
+				var _pos2 = word_control.m_oDrawingDocument.ConvertCoordsToCursorWR(_move_point.X, _move_point.Y, pos.Page);
+
+				var _eps = word_control.MobileTouchManager.TrackTargetEps;
+
+				var _offset1 = word_control.MobileTouchManager.TableRulersRectOffset;
+				var _offset2 = _offset1 + word_control.MobileTouchManager.TableRulersRectSize;
+				if ((_pos1.X >= (_pos2.X - _offset2 - _eps)) && (_pos1.X <= (_pos2.X - _offset1 + _eps)) &&
+					(_pos1.Y >= (_pos2.Y - _offset2 - _eps)) && (_pos1.Y <= (_pos2.Y - _offset1 + _eps)))
 				{
-					this.TrackOffsetX = pos.X - _x;
-					this.TrackOffsetY = pos.Y - _b;
+					this.TrackTablePos = 0;
 					return true;
 				}
+
 				return false;
 			}
-			case 2:
-			{
-				var _x = _table_track.X + _table_track.W;
-				var _y = _table_track.Y + _table_track.H;
-				var _r = _x + _d;
-				var _b = _y + _d;
 
-				if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+			switch (this.TrackTablePos)
+			{
+				case 1:
 				{
-					this.TrackOffsetX = pos.X - _x;
-					this.TrackOffsetY = pos.Y - _y;
+					var _x = _table_track.X + _table_track.W;
+					var _b = _table_track.Y;
+					var _y = _b - _d;
+					var _r = _x + _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+					{
+						this.TrackOffsetX = pos.X - _x;
+						this.TrackOffsetY = pos.Y - _b;
+
+						this.CurPos.X -= this.TrackOffsetX;
+						this.CurPos.Y -= this.TrackOffsetY;
+						return true;
+					}
+					return false;
+				}
+				case 2:
+				{
+					var _x = _table_track.X + _table_track.W;
+					var _y = _table_track.Y + _table_track.H;
+					var _r = _x + _d;
+					var _b = _y + _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+					{
+						this.TrackOffsetX = pos.X - _x;
+						this.TrackOffsetY = pos.Y - _y;
+						return true;
+					}
+					return false;
+				}
+				case 3:
+				{
+					var _r = _table_track.X;
+					var _x = _r - _d;
+					var _y = _table_track.Y + _table_track.H;
+					var _b = _y + _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+					{
+						this.TrackOffsetX = pos.X - _r;
+						this.TrackOffsetY = pos.Y - _y;
+
+						this.CurPos.X -= this.TrackOffsetX;
+						this.CurPos.Y -= this.TrackOffsetY;
+						return true;
+					}
+					return false;
+				}
+				case 0:
+				default:
+				{
+					var _r = _table_track.X;
+					var _b = _table_track.Y;
+					var _x = _r - _d;
+					var _y = _b - _d;
+
+					if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+					{
+						this.TrackOffsetX = pos.X - _r;
+						this.TrackOffsetY = pos.Y - _b;
+
+						this.CurPos.X -= this.TrackOffsetX;
+						this.CurPos.Y -= this.TrackOffsetY;
+						return true;
+					}
+					return false;
+				}
+			}
+		}
+		else
+		{
+			if (word_control.MobileTouchManager)
+			{
+				var _invert = global_MatrixTransformer.Invert(this.TableMatrix);
+				var _posx = _invert.TransformPointX(pos.X, pos.Y);
+				var _posy = _invert.TransformPointY(pos.X, pos.Y);
+
+				var _move_point = word_control.MobileTouchManager.TableMovePoint;
+
+				if (_move_point == null || pos.Page != _table_track.PageNum)
+					return false;
+
+				var _koef = g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
+				var _eps = word_control.MobileTouchManager.TrackTargetEps * _koef;
+
+				var _offset1 = word_control.MobileTouchManager.TableRulersRectOffset * _koef;
+				var _offset2 = _offset1 + word_control.MobileTouchManager.TableRulersRectSize * _koef;
+				if ((_posx >= (_move_point.X - _offset2 - _eps)) && (_posx <= (_move_point.X - _offset1 + _eps)) &&
+					(_posy >= (_move_point.Y - _offset2 - _eps)) && (_posy <= (_move_point.Y - _offset1 + _eps)))
+				{
+					this.TrackTablePos = 0;
 					return true;
 				}
+
 				return false;
 			}
-			case 3:
-			{
-				var _r = _table_track.X;
-				var _x = _r - _d;
-				var _y = _table_track.Y + _table_track.H;
-				var _b = _y + _d;
 
-				if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
-				{
-					this.TrackOffsetX = pos.X - _r;
-					this.TrackOffsetY = pos.Y - _y;
-					return true;
-				}
-				return false;
-			}
-			case 0:
-			default:
+			var _invert = global_MatrixTransformer.Invert(this.TableMatrix);
+			var _posx = _invert.TransformPointX(pos.X, pos.Y);
+			var _posy = _invert.TransformPointY(pos.X, pos.Y);
+			switch (this.TrackTablePos)
 			{
-				var _r = _table_track.X;
-				var _b = _table_track.Y;
-				var _x = _r - _d;
-				var _y = _b - _d;
-
-				if ((pos.X > _x) && (pos.X < _r) && (pos.Y > _y) && (pos.Y < _b))
+				case 1:
 				{
-					this.TrackOffsetX = pos.X - _r;
-					this.TrackOffsetY = pos.Y - _b;
-					return true;
+					var _x = _table_track.X + _table_track.W;
+					var _b = _table_track.Y;
+					var _y = _b - _d;
+					var _r = _x + _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+					{
+						this.TrackOffsetX = _posx - _x;
+						this.TrackOffsetY = _posy - _b;
+
+						this.CurPos.X -= this.TrackOffsetX;
+						this.CurPos.Y -= this.TrackOffsetY;
+						return true;
+					}
+					return false;
 				}
-				return false;
+				case 2:
+				{
+					var _x = _table_track.X + _table_track.W;
+					var _y = _table_track.Y + _table_track.H;
+					var _r = _x + _d;
+					var _b = _y + _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+					{
+						this.TrackOffsetX = _posx - _x;
+						this.TrackOffsetY = _posy - _y;
+
+						this.CurPos.X -= this.TrackOffsetX;
+						this.CurPos.Y -= this.TrackOffsetY;
+						return true;
+					}
+					return false;
+				}
+				case 3:
+				{
+					var _r = _table_track.X;
+					var _x = _r - _d;
+					var _y = _table_track.Y + _table_track.H;
+					var _b = _y + _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+					{
+						this.TrackOffsetX = _posx - _r;
+						this.TrackOffsetY = _posy - _y;
+
+						this.CurPos.X -= this.TrackOffsetX;
+						this.CurPos.Y -= this.TrackOffsetY;
+						return true;
+					}
+					return false;
+				}
+				case 0:
+				default:
+				{
+					var _r = _table_track.X;
+					var _b = _table_track.Y;
+					var _x = _r - _d;
+					var _y = _b - _d;
+
+					if ((_posx > _x) && (_posx < _r) && (_posy > _y) && (_posy < _b))
+					{
+						this.TrackOffsetX = _posx - _r;
+						this.TrackOffsetY = _posy - _b;
+
+						this.CurPos.X -= this.TrackOffsetX;
+						this.CurPos.Y -= this.TrackOffsetY;
+						return true;
+					}
+					return false;
+				}
 			}
 		}
 
 		return false;
 	}
 
-	this.checkMouseUp = function(X, Y, word_control)
+	this.checkMouseUp = function (X, Y, word_control)
 	{
 		this.bIsTracked = false;
 
@@ -199,81 +350,75 @@ function CTableOutlineDr()
 		var _d = 13 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 
 		var _outline = this.TableOutline;
-		var _table   = _outline.Table;
+		var _table = _outline.Table;
+
+		_table.Cursor_MoveToStartPos();
+		_table.Document_SetThisElementCurrent(true);
 
 		if (!_table.Is_Inline())
 		{
-			word_control.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_TableMoveFromRulers);
+			var pos;
 			switch (this.TrackTablePos)
 			{
 				case 1:
 				{
 					var _w_pix = this.TableOutline.W * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
-					var pos    = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X - _w_pix, Y);
-					_table.Move(pos.X - this.TrackOffsetX, pos.Y - this.TrackOffsetY, pos.Page);
-					_outline.X       = pos.X - this.TrackOffsetX;
-					_outline.Y       = pos.Y - this.TrackOffsetY;
-					_outline.PageNum = pos.Page;
+					pos = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X - _w_pix, Y);
 					break;
 				}
 				case 2:
 				{
 					var _w_pix = this.TableOutline.W * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
 					var _h_pix = this.TableOutline.H * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
-					var pos    = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X - _w_pix, Y - _h_pix);
-					_table.Move(pos.X - this.TrackOffsetX, pos.Y - this.TrackOffsetY, pos.Page);
-					_outline.X       = pos.X - this.TrackOffsetX;
-					_outline.Y       = pos.Y - this.TrackOffsetY;
-					_outline.PageNum = pos.Page;
+					pos = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X - _w_pix, Y - _h_pix);
 					break;
 				}
 				case 3:
 				{
 					var _h_pix = this.TableOutline.H * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
-					var pos    = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X, Y - _h_pix);
-					_table.Move(pos.X - this.TrackOffsetX, pos.Y - this.TrackOffsetY, pos.Page);
-					_outline.X       = pos.X - this.TrackOffsetX;
-					_outline.Y       = pos.Y - this.TrackOffsetY;
-					_outline.PageNum = pos.Page;
+					pos = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X, Y - _h_pix);
 					break;
 				}
 				case 0:
 				default:
 				{
-					var pos = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X, Y);
-					_table.Move(pos.X - this.TrackOffsetX, pos.Y - this.TrackOffsetY, pos.Page);
-					_outline.X       = pos.X - this.TrackOffsetX;
-					_outline.Y       = pos.Y - this.TrackOffsetY;
-					_outline.PageNum = pos.Page;
+					pos = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X, Y);
 					break;
 				}
 			}
+
+			var NearestPos = word_control.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X - this.TrackOffsetX, pos.Y - this.TrackOffsetY);
+			_table.Move(pos.X - this.TrackOffsetX, pos.Y - this.TrackOffsetY, pos.Page, NearestPos);
+			_outline.X = pos.X - this.TrackOffsetX;
+			_outline.Y = pos.Y - this.TrackOffsetY;
+			_outline.PageNum = pos.Page;
 		}
 		else
 		{
 			if (null != this.InlinePos)
 			{
 				// inline move
-				word_control.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_TableMoveFromRulersInline);
-				_table.Move(this.InlinePos.X, this.InlinePos.Y, this.InlinePos.Page);
+				_table.Move(this.InlinePos.X, this.InlinePos.Y, this.InlinePos.Page, this.InlinePos);
 			}
 		}
-		_table.Cursor_MoveToStartPos();
-		_table.Document_SetThisElementCurrent();
 	}
 
-	this.checkMouseMove = function(X, Y, word_control)
+	this.checkMouseMove = function (X, Y, word_control)
 	{
 		if (null == this.TableOutline)
 			return false;
 
 		if (true === this.IsChangeSmall)
 		{
-			var _pos  = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X, Y);
+			var _pos = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X, Y);
 			var _dist = 15 * g_dKoef_pix_to_mm * 100 / word_control.m_nZoomValue;
 			if ((Math.abs(_pos.X - this.ChangeSmallPoint.X) < _dist) && (Math.abs(_pos.Y - this.ChangeSmallPoint.Y) < _dist) && (_pos.Page == this.ChangeSmallPoint.Page))
 			{
-				this.CurPos = {X : this.ChangeSmallPoint.X, Y : this.ChangeSmallPoint.Y, Page : this.ChangeSmallPoint.Page};
+				this.CurPos = {
+					X: this.ChangeSmallPoint.X,
+					Y: this.ChangeSmallPoint.Y,
+					Page: this.ChangeSmallPoint.Page
+				};
 
 				switch (this.TrackTablePos)
 				{
@@ -307,6 +452,7 @@ function CTableOutlineDr()
 			this.IsChangeSmall = false;
 
 			this.TableOutline.Table.Selection_Remove();
+			this.TableOutline.Table.Cursor_MoveToStartPos();
 			editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		}
 
@@ -315,20 +461,20 @@ function CTableOutlineDr()
 		{
 			case 1:
 			{
-				var _w_pix  = this.TableOutline.W * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
+				var _w_pix = this.TableOutline.W * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
 				this.CurPos = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X - _w_pix, Y);
 				break;
 			}
 			case 2:
 			{
-				var _w_pix  = this.TableOutline.W * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
-				var _h_pix  = this.TableOutline.H * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
+				var _w_pix = this.TableOutline.W * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
+				var _h_pix = this.TableOutline.H * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
 				this.CurPos = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X - _w_pix, Y - _h_pix);
 				break;
 			}
 			case 3:
 			{
-				var _h_pix  = this.TableOutline.H * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
+				var _h_pix = this.TableOutline.H * g_dKoef_mm_to_pix * word_control.m_nZoomValue / 100;
 				this.CurPos = word_control.m_oDrawingDocument.ConvertCoordsFromCursor2(X, Y - _h_pix);
 				break;
 			}
@@ -344,27 +490,88 @@ function CTableOutlineDr()
 		this.CurPos.Y -= this.TrackOffsetY;
 	}
 
-	this.CheckStartTrack = function(word_control)
+	this.CheckStartTrack = function (word_control, transform)
 	{
-		var pos = word_control.m_oDrawingDocument.ConvertCoordsToCursor(this.TableOutline.X, this.TableOutline.Y, this.TableOutline.PageNum, true);
+		this.TableMatrix = null;
+		if (transform)
+			this.TableMatrix = transform.CreateDublicate();
 
-		var _x0 = word_control.m_oEditor.AbsolutePosition.L;
-		var _y0 = word_control.m_oEditor.AbsolutePosition.T;
+		if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
+		{
+			var pos = word_control.m_oDrawingDocument.ConvertCoordsToCursor(this.TableOutline.X, this.TableOutline.Y, this.TableOutline.PageNum, true);
 
-		if (pos.X < _x0 && pos.Y < _y0)
-		{
-			this.TrackTablePos = 2;
-		}
-		else if (pos.X < _x0)
-		{
-			this.TrackTablePos = 1;
-		}
-		else if (pos.Y < _y0)
-		{
-			this.TrackTablePos = 3;
+			var _x0 = word_control.m_oEditor.AbsolutePosition.L;
+			var _y0 = word_control.m_oEditor.AbsolutePosition.T;
+
+			if (pos.X < _x0 && pos.Y < _y0)
+			{
+				this.TrackTablePos = 2;
+			}
+			else if (pos.X < _x0)
+			{
+				this.TrackTablePos = 1;
+			}
+			else if (pos.Y < _y0)
+			{
+				this.TrackTablePos = 3;
+			}
+			else
+			{
+				this.TrackTablePos = 0;
+			}
 		}
 		else
 		{
+			var _x = this.TableOutline.X;
+			var _y = this.TableOutline.Y;
+			var _r = _x + this.TableOutline.W;
+			var _b = _y + this.TableOutline.H;
+
+			var x0 = transform.TransformPointX(_x, _y);
+			var y0 = transform.TransformPointY(_x, _y);
+
+			var x1 = transform.TransformPointX(_r, _y);
+			var y1 = transform.TransformPointY(_r, _y);
+
+			var x2 = transform.TransformPointX(_r, _b);
+			var y2 = transform.TransformPointY(_r, _b);
+
+			var x3 = transform.TransformPointX(_x, _b);
+			var y3 = transform.TransformPointY(_x, _b);
+
+			var _x0 = word_control.m_oEditor.AbsolutePosition.L * g_dKoef_mm_to_pix;
+			var _y0 = word_control.m_oEditor.AbsolutePosition.T * g_dKoef_mm_to_pix;
+			var _x1 = word_control.m_oEditor.AbsolutePosition.R * g_dKoef_mm_to_pix;
+			var _y1 = word_control.m_oEditor.AbsolutePosition.B * g_dKoef_mm_to_pix;
+
+			var pos0 = word_control.m_oDrawingDocument.ConvertCoordsToCursor(x0, y0, this.TableOutline.PageNum, true);
+			if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
+			{
+				this.TrackTablePos = 0;
+				return;
+			}
+
+			pos0 = word_control.m_oDrawingDocument.ConvertCoordsToCursor(x1, y1, this.TableOutline.PageNum, true);
+			if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
+			{
+				this.TrackTablePos = 1;
+				return;
+			}
+
+			pos0 = word_control.m_oDrawingDocument.ConvertCoordsToCursor(x3, y3, this.TableOutline.PageNum, true);
+			if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
+			{
+				this.TrackTablePos = 3;
+				return;
+			}
+
+			pos0 = word_control.m_oDrawingDocument.ConvertCoordsToCursor(x2, y2, this.TableOutline.PageNum, true);
+			if (pos0.X > _x0 && pos0.X < _x1 && pos0.Y > _y0 && pos0.Y < _y1)
+			{
+				this.TrackTablePos = 2;
+				return;
+			}
+
 			this.TrackTablePos = 0;
 		}
 	}
@@ -708,6 +915,8 @@ function CDrawingDocument()
 	this.TargetShowFlag        = false;
 	this.TargetShowNeedFlag    = false;
 
+	this.SelectionMatrix = null;
+
 	this.CanvasHit        = document.createElement('canvas');
 	this.CanvasHit.width  = 10;
 	this.CanvasHit.height = 10;
@@ -798,6 +1007,8 @@ function CDrawingDocument()
 
 	this.OnStartRecalculate = function(pageCount)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
 	}
 
 	this.SetTargetColor = function(r, g, b)
@@ -807,12 +1018,41 @@ function CDrawingDocument()
 		this.TargetCursorColor.B = b;
 	}
 
-	this.StartTrackTable = function()
+	this.StartTrackTable = function (obj, transform)
 	{
+		if (this.m_oWordControl.MobileTouchManager)
+		{
+			if (!this.m_oWordControl.MobileTouchManager.TableStartTrack_Check)
+				return;
+		}
+
+		this.TableOutlineDr.TableOutline = obj;
+		this.TableOutlineDr.Counter = 0;
+		this.TableOutlineDr.bIsNoTable = false;
+		this.TableOutlineDr.CheckStartTrack(this.m_oWordControl, transform);
+
+		if (this.m_oWordControl.MobileTouchManager)
+			this.m_oWordControl.OnUpdateOverlay();
+	};
+	this.EndTrackTable = function (pointer, bIsAttack)
+	{
+		if (this.TableOutlineDr.TableOutline != null)
+		{
+			if (pointer == this.TableOutlineDr.TableOutline.Table || bIsAttack)
+			{
+				this.TableOutlineDr.TableOutline = null;
+				this.TableOutlineDr.Counter = 0;
+			}
+		}
 	};
 
 	this.OnRecalculatePage = function(index, pageObject)
 	{
+		if (this.m_oWordControl && this.m_oWordControl.MobileTouchManager)
+		{
+			this.m_oWordControl.MobileTouchManager.ClearContextMenu();
+		}
+
 		editor.sendEvent("asc_onDocumentChanged");
 
 		if (true === this.m_bIsSearching)
@@ -845,6 +1085,9 @@ function CDrawingDocument()
 
 	this.OnEndRecalculate = function()
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		this.m_oWordControl.Thumbnails.LockMainObjType = true;
 		this.SlidesCount                               = this.m_oLogicDocument.Slides.length;
 		this.m_oWordControl.CalculateDocumentSize();
@@ -1432,6 +1675,27 @@ function CDrawingDocument()
 		return {X : x_pix, Y : y_pix, Error : false};
 	}
 
+	this.ConvertCoordsToCursor3 = function (x, y, isGlobal)
+	{
+		var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
+		var _x = 0;
+		var _y = 0;
+		if (isGlobal)
+		{
+			_x = this.m_oWordControl.X;
+			_y = this.m_oWordControl.Y;
+
+			_x += (this.m_oWordControl.m_oMainContent.AbsolutePosition.L + this.m_oWordControl.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix;
+			_y += (this.m_oWordControl.m_oMainContent.AbsolutePosition.T + this.m_oWordControl.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix;
+		}
+
+		var x_pix = (this.SlideCurrectRect.left + x * dKoef + _x) >> 0;
+		var y_pix = (this.SlideCurrectRect.top + y * dKoef + _y) >> 0;
+
+		return {X: x_pix, Y: y_pix, Error: false};
+	}
+
 	this.ConvertCoordsToCursorWR_2 = function(x, y)
 	{
 		var _word_control = this.m_oWordControl;
@@ -1611,6 +1875,9 @@ function CDrawingDocument()
 
 	this.UpdateTarget = function(x, y, pageIndex)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		this.m_oWordControl.m_oLogicDocument.Set_TargetPos(x, y, pageIndex);
 		if (pageIndex != this.SlideCurrent)
 		{
@@ -1645,8 +1912,8 @@ function CDrawingDocument()
 		var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			_ww >>= 1;
-			_hh >>= 1;
+			_ww /= AscCommon.AscBrowser.retinaPixelRatio;
+			_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		var boxX = 0;
@@ -1850,6 +2117,9 @@ function CDrawingDocument()
 	}
 	this.AddPageSelection = function(pageIndex, x, y, width, height)
 	{
+		if (null == this.SelectionMatrix)
+			this.SelectionMatrix = this.TextMatrix;
+
 		if (pageIndex < 0 || pageIndex != this.SlideCurrent || Math.abs(width) < 0.001 || Math.abs(height) < 0.001)
 			return;
 
@@ -1966,6 +2236,7 @@ function CDrawingDocument()
 		}
 
 		hor_ruler.CalculateMargins();
+		this.TableOutlineDr.CurrentPageIndex = this.m_lCurrentPage;
 
 		if (0 <= this.SlideCurrent && this.SlideCurrent < this.SlidesCount)
 		{
@@ -1982,13 +2253,17 @@ function CDrawingDocument()
 			this.m_oWordControl.UpdateHorRuler();
 		}
 		this.m_oWordControl.UpdateVerRuler();
+
+		if (this.m_oWordControl.MobileTouchManager)
+		{
+			this.m_oWordControl.MobileTouchManager.TableStartTrack_Check = true;
+			markup.Table.Start_TrackTable();
+			this.m_oWordControl.MobileTouchManager.TableStartTrack_Check = false;
+		}
 	}
 
 	this.Set_RulerState_Paragraph = function(obj, margins)
 	{
-		if (!this.m_oWordControl.m_bIsRuler)
-			return;
-
 		var hor_ruler = this.m_oWordControl.m_oHorRuler;
 		var ver_ruler = this.m_oWordControl.m_oVerRuler;
 
@@ -2167,7 +2442,7 @@ function CDrawingDocument()
 	{
 		var pixHeigth = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
-			pixHeigth >>= 1;
+			pixHeigth /= AscCommon.AscBrowser.retinaPixelRatio;
 		var pixBetweenPages = 20 * (this.m_lDrawingEnd - this.m_lDrawingFirst);
 
 		return (pixHeigth - pixBetweenPages) * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
@@ -2398,127 +2673,6 @@ function CDrawingDocument()
 		}
 
 		this.m_oWordControl.m_oApi.sync_SendThemeColors(_ret_array, standart_colors);
-	}
-
-	this.SendThemeColorScheme = function()
-	{
-		var infos  = [];
-		var _index = 0;
-
-		var _c = null;
-
-		// user scheme
-		var oColorScheme    = AscCommon.g_oUserColorScheme;
-		var _count_defaults = oColorScheme.length;
-		for (var i = 0; i < _count_defaults; ++i)
-		{
-			var _obj           = oColorScheme[i];
-			infos[_index]      = new AscCommon.CAscColorScheme();
-			infos[_index].Name = _obj.name;
-
-			_c                      = _obj.dk1;
-			infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.lt1;
-			infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.dk2;
-			infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.lt2;
-			infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent1;
-			infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent2;
-			infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent3;
-			infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent4;
-			infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent5;
-			infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                      = _obj.accent6;
-			infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                       = _obj.hlink;
-			infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
-
-			_c                       = _obj.folHlink;
-			infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
-
-			++_index;
-		}
-
-		// theme colors
-		var _theme = this.m_oWordControl.MasterLayouts.Theme;
-		var _extra = _theme.extraClrSchemeLst;
-		var _count = _extra.length;
-		var _rgba  = {R : 0, G : 0, B : 0, A : 255};
-		for (var i = 0; i < _count; ++i)
-		{
-			var _scheme = _extra[i].clrScheme;
-
-			infos[_index]      = new AscCommon.CAscColorScheme();
-			infos[_index].Name = _scheme.name;
-
-			_scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[8].RGBA;
-			infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[12].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[12].RGBA;
-			infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[9].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[9].RGBA;
-			infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[13].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[13].RGBA;
-			infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[0].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[0].RGBA;
-			infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[1].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[1].RGBA;
-			infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[2].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[2].RGBA;
-			infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[3].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[3].RGBA;
-			infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[4].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[4].RGBA;
-			infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[5].Calculate(_theme, null, null, null, _rgba);
-			_c                      = _scheme.colors[5].RGBA;
-			infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[11].Calculate(_theme, null, null, null, _rgba);
-			_c                       = _scheme.colors[11].RGBA;
-			infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[10].Calculate(_theme, null, null, null, _rgba);
-			_c                       = _scheme.colors[10].RGBA;
-			infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
-
-			_index++;
-		}
-
-		this.m_oWordControl.m_oApi.sync_SendThemeColorSchemes(infos);
 	}
 
 	this.DrawImageTextureFillShape = function(url)
@@ -2840,7 +2994,7 @@ function CDrawingDocument()
 			graphics.transform(1, 0, 0, 1, 0, 0);
 			logicDoc.TablesForInterface[i].graphicObject.Draw(0, graphics);
 
-			var _styleD   = new CAscTableStyle();
+			var _styleD   = new Asc.CAscTableStyle();
 			_styleD.Type  = 0;
 			_styleD.Image = _canvas.toDataURL("image/png");
 			_styleD.Id    = logicDoc.TablesForInterface[i].graphicObject.TableStyle;
@@ -3081,6 +3235,8 @@ function CThumbnailsManager()
 	this.MouseThumbnailsAnimateScrollTopTimer    = -1;
 	this.MouseThumbnailsAnimateScrollBottomTimer = -1;
 
+	this.ScrollerHeight = 0;
+
 	this.m_oWordControl = null;
 	var oThis           = this;
 
@@ -3103,22 +3259,25 @@ function CThumbnailsManager()
 
 	this.initEvents2MobileAdvances = function()
 	{
+		if (this.m_oWordControl.m_oApi.isMobileVersion)
+			return;
+
 		var control             = this.m_oWordControl.m_oThumbnails.HtmlElement;
 		control["ontouchstart"] = function(e)
 		{
 			oThis.onMouseDown(e.touches[0]);
 			return false;
-		}
+		};
 		control["ontouchmove"]  = function(e)
 		{
 			oThis.onMouseMove(e.touches[0]);
 			return false;
-		}
+		};
 		control["ontouchend"]   = function(e)
 		{
 			oThis.onMouseUp(e.changedTouches[0]);
 			return false;
-		}
+		};
 	}
 
 	this.GetThumbnailPagePosition = function(pageIndex)
@@ -3227,6 +3386,9 @@ function CThumbnailsManager()
 
 	this.onMouseDown = function(e)
 	{
+		if (oThis.m_oWordControl)
+			oThis.m_oWordControl.m_oApi.checkLastWork();
+
 		if (e.preventDefault)
 			e.preventDefault();
 		else
@@ -3468,6 +3630,9 @@ function CThumbnailsManager()
 
 	this.onMouseMove = function(e)
 	{
+		if (oThis.m_oWordControl)
+			oThis.m_oWordControl.m_oApi.checkLastWork();
+
 		var control = oThis.m_oWordControl.m_oThumbnails.HtmlElement;
 		if (global_mouseEvent.IsLocked == true && global_mouseEvent.Sender != control)
 		{
@@ -3622,6 +3787,9 @@ function CThumbnailsManager()
 
 	this.onMouseUp = function(e)
 	{
+		if (oThis.m_oWordControl)
+			oThis.m_oWordControl.m_oApi.checkLastWork();
+
 		AscCommon.check_MouseUpEvent(e);
 		global_mouseEvent.UnLockMouse();
 
@@ -3943,6 +4111,12 @@ function CThumbnailsManager()
 			word_control.m_oScrollThumbApi.scrollToY(lPosition);
 		}
 
+		this.ScrollerHeight = nHeightPix;
+		if (word_control.MobileTouchManagerThumbnails)
+		{
+			word_control.MobileTouchManagerThumbnails.Resize();
+		}
+
 		this.CalculatePlaces();
 		this.m_bIsUpdate = true;
 	}
@@ -3958,7 +4132,8 @@ function CThumbnailsManager()
 		this.CalculatePlaces();
 		this.m_bIsUpdate = true;
 
-		this.SetFocusElement(FOCUS_OBJECT_THUMBNAILS);
+		if (!this.m_oWordControl.m_oApi.isMobileVersion)
+			this.SetFocusElement(FOCUS_OBJECT_THUMBNAILS);
 	}
 
 	this.CalculatePlaces = function()
@@ -3967,6 +4142,9 @@ function CThumbnailsManager()
 			return;
 
 		var word_control = this.m_oWordControl;
+
+		if (word_control && word_control.MobileTouchManagerThumbnails)
+			word_control.MobileTouchManagerThumbnails.ClearContextMenu();
 
 		var canvas = word_control.m_oThumbnails.HtmlElement;
 		if (null == canvas)
@@ -4116,6 +4294,9 @@ function CThumbnailsManager()
 		var canvas = this.m_oWordControl.m_oThumbnailsBack.HtmlElement;
 		if (null == canvas)
 			return;
+
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
 
 		var context = canvas.getContext("2d");
 		var _width  = canvas.width;
@@ -4939,6 +5120,9 @@ function CSlideDrawer()
 
 	this.BoundsChecker = new AscFormat.CSlideBoundsChecker();
 
+	this.CacheSlidePixW = 1;
+	this.CacheSlidePixH = 1;
+
 	this.bIsEmptyPresentation = false;
 	this.IsRecalculateSlide   = false;
 
@@ -4969,7 +5153,7 @@ function CSlideDrawer()
 
 		var dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
 		if (this.m_oWordControl.bIsRetinaSupport)
-			dKoef *= 2;
+			dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
 
 		var w_mm = this.m_oWordControl.m_oLogicDocument.Width;
 		var h_mm = this.m_oWordControl.m_oLogicDocument.Height;
@@ -5000,7 +5184,7 @@ function CSlideDrawer()
 			// поидее если был ресайз только
 			dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
 			if (this.m_oWordControl.bIsRetinaSupport)
-				dKoef *= 2;
+				dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
 
 			w_mm = this.m_oWordControl.m_oLogicDocument.Width;
 			h_mm = this.m_oWordControl.m_oLogicDocument.Height;
@@ -5011,6 +5195,12 @@ function CSlideDrawer()
 		// теперь смотрим, используем ли кэш для скролла
 		var _need_pix_width  = this.BoundsChecker.Bounds.max_x - this.BoundsChecker.Bounds.min_x + 1 + 2 * this.SlideEps;
 		var _need_pix_height = this.BoundsChecker.Bounds.max_y - this.BoundsChecker.Bounds.min_y + 1 + 2 * this.SlideEps;
+
+		if (this.m_oWordControl.NoneRepaintPages)
+			return;
+
+		this.CacheSlidePixW = _need_pix_width;
+		this.CacheSlidePixH = _need_pix_height;
 
 		this.IsCached = false;
 		if (4 * _need_pix_width * _need_pix_height < this.CONST_MAX_SLIDE_CACHE_SIZE)
@@ -5083,8 +5273,8 @@ function CSlideDrawer()
 
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			_x = (_rect.left << 1) + _bounds.min_x;
-			_y = (_rect.top << 1) + _bounds.min_y;
+			_x = ((_rect.left * AscCommon.AscBrowser.retinaPixelRatio) >> 0) + _bounds.min_x;
+			_y = ((_rect.top * AscCommon.AscBrowser.retinaPixelRatio) >> 0) + _bounds.min_y;
 		}
 
 		if (this.bIsEmptyPresentation)
@@ -5104,21 +5294,38 @@ function CSlideDrawer()
 
 		if (this.IsCached)
 		{
-			var w_px = (_bounds.max_x - _bounds.min_x + 1 + 2 * this.SlideEps) >> 0;
-			var h_px = (_bounds.max_y - _bounds.min_y + 1 + 2 * this.SlideEps) >> 0;
+			if (!this.m_oWordControl.NoneRepaintPages)
+			{
+				var w_px = (_bounds.max_x - _bounds.min_x + 1 + 2 * this.SlideEps) >> 0;
+				var h_px = (_bounds.max_y - _bounds.min_y + 1 + 2 * this.SlideEps) >> 0;
 
-			if (w_px > this.CachedCanvas.width)
-				w_px = this.CachedCanvas.width;
-			if (h_px > this.CachedCanvas.height)
-				h_px = this.CachedCanvas.height;
+				if (w_px > this.CachedCanvas.width)
+					w_px = this.CachedCanvas.width;
+				if (h_px > this.CachedCanvas.height)
+					h_px = this.CachedCanvas.height;
 
-			outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px, h_px, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
+				outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px, h_px, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
+			}
+			else
+			{
+				var w_px = (_bounds.max_x - _bounds.min_x + 1 + 2 * this.SlideEps) >> 0;
+				var h_px = (_bounds.max_y - _bounds.min_y + 1 + 2 * this.SlideEps) >> 0;
+
+				var w_px_src = this.CacheSlidePixW;
+				var h_px_src = this.CacheSlidePixH;
+				if (w_px_src > this.CachedCanvas.width)
+					w_px_src = this.CachedCanvas.width;
+				if (h_px_src > this.CachedCanvas.height)
+					h_px_src = this.CachedCanvas.height;
+
+				outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px_src, h_px_src, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
+			}
 		}
 		else
 		{
 			var dKoef = this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
 			if (this.m_oWordControl.bIsRetinaSupport)
-				dKoef *= 2;
+				dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
 
 			var w_mm = this.m_oWordControl.m_oLogicDocument.Width;
 			var h_mm = this.m_oWordControl.m_oLogicDocument.Height;

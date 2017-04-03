@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -43,6 +43,8 @@
 	var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 	var c_oAscMaxColumnWidth  = 255;
 	var c_oAscMaxRowHeight    = 409;
+	var c_nMaxConversionTime  = 900000;//depends on config
+	var c_nMaxDownloadTitleLen= 255;
 
 	//files type for Saving & DownloadAs
 	var c_oAscFileType = {
@@ -61,6 +63,7 @@
 		FB2  : 0x0049,
 		MOBI : 0x004a,
 		DOCY : 0x1001,
+		CANVAS_WORD : 0x2001,
 		JSON : 0x0808,	// Для mail-merge
 
 		// Excel
@@ -186,7 +189,9 @@
 		LoadTheme         : 12, // загрузка темы
 		MailMergeLoadFile : 13, // загрузка файла для mail merge
 		DownloadMerge     : 14, // cкачать файл с mail merge
-		SendMailMerge     : 15  // рассылка mail merge по почте
+		SendMailMerge     : 15,  // рассылка mail merge по почте
+		ForceSaveButton   : 16,
+		ForceSaveTimeout  : 17
 	};
 
 	var c_oAscAdvancedOptionsID = {
@@ -227,20 +232,23 @@
 		Error  : 3
 	};
 
-	//NumFormat defines
+	/**
+	 * NumFormat defines
+	 * @enum {number}
+	 */
 	var c_oAscNumFormatType = {
+		None       : -1,
 		General    : 0,
-		Custom     : 1,
-		Text       : 2,
-		Number     : 3,
-		Integer    : 4,
-		Scientific : 5,
-		Currency   : 6,
-		Date       : 7,
-		Time       : 8,
-		Percent    : 9,
-		Fraction   : 10,
-		Accounting : 11
+		Number     : 1,
+		Scientific : 2,
+		Accounting : 3,
+		Currency   : 4,
+		Date       : 5,
+		Time       : 6,
+		Percent    : 7,
+		Fraction   : 8,
+		Text       : 9,
+		Custom     : 10
 	};
 
 	var c_oAscDrawingLayerType = {
@@ -421,7 +429,11 @@
 		scatterNone            : 31,
 		scatterSmooth          : 32,
 		scatterSmoothMarker    : 33,
-		unknown                : 34
+		surfaceNormal          : 34,
+		surfaceWireframe       : 35,
+		contourNormal          : 36,
+		contourWireframe       : 37,
+		unknown                : 38
 	};
 
 
@@ -574,7 +586,10 @@
 		Medium : 2,	// 2px
 		Thick  : 3		// 3px
 	};
-	// Располагаются в порядке значимости для отрисовки
+	/**
+	 * Располагаются в порядке значимости для отрисовки
+	 * @enum {number}
+	 */
 	var c_oAscBorderStyles    = {
 		None             : 0,
 		Double           : 1,
@@ -720,7 +735,7 @@
 		None      : 0,
 		Tab       : 1,
 		Semicolon : 2,
-		Сolon     : 3,
+		Colon     : 3,
 		Comma     : 4,
 		Space     : 5
 	};
@@ -745,7 +760,8 @@
 	var c_oAscMouseMoveDataTypes = {
 		Common       : 0,
 		Hyperlink    : 1,
-		LockedObject : 2
+		LockedObject : 2,
+		Footnote     : 3
 	};
 
 	// selection type
@@ -793,6 +809,10 @@
 		PageRightField  : 17.8,
 		PageTopField    : 19.1,
 		PageBottomField : 19.1,
+		MinPageLeftField	: 0.17,
+		MinPageRightField	: 0.17,
+		MinPageTopField		: 0.17,
+		MinPageBottomField	: 0.17,
 
 		PageGridLines : 0,
 		PageHeadings  : 0
@@ -802,6 +822,26 @@
 		FitToPage  : 1,
 		FitToWidth : 2,
 		CustomMode : 3
+	};
+
+	var c_oNotifyType = {
+		Dirty: 0,
+		Shift: 1,
+		Move: 2,
+		Delete: 3,
+		RenameTableColumn: 4,
+		Changed: 5,
+		ChangeDefName: 6,
+		ChangeSheet: 7,
+		DelColumnTable: 8
+	};
+
+	var c_oNotifyParentType = {
+		CanDo: 0,
+		Change: 1,
+		ChangeFormula: 2,
+		EndCalculate: 3,
+		GetRangeCell: 4
 	};
 
 	var c_oDashType = {
@@ -838,9 +878,6 @@
         EqArray       : 0x0e,
         Phantom       : 0x0f
     };
-
-
-
 
 
 	/** @enum {number} */
@@ -887,15 +924,12 @@
 		Right  : 2
 	};
 
-
-
 	/** @enum {number} */
 	var c_oAscMathInterfaceEqArrayAlign = {
 		Top    : 0,
 		Center : 1,
 		Bottom : 2
 	};
-
 
 	/** @enum {number} */
 	var c_oAscMathInterfaceNaryLimitLocation = {
@@ -909,7 +943,6 @@
 		Top    : 0,
 		Bottom : 1
 	};
-
 
 	var c_oAscEncodings    = [
 		[0, 28596, "ISO-8859-6", "Arabic (ISO 8859-6)"],
@@ -1039,6 +1072,7 @@
 	var contentchanges_Add    = 1;
 	var contentchanges_Remove = 2;
 
+
 	var offlineMode = '_offline_';
 
 	//------------------------------------------------------------export--------------------------------------------------
@@ -1047,6 +1081,8 @@
 	window['Asc']['FONT_THUMBNAIL_HEIGHT'] = FONT_THUMBNAIL_HEIGHT;
 	window['Asc']['c_oAscMaxColumnWidth']  = window['Asc'].c_oAscMaxColumnWidth = c_oAscMaxColumnWidth;
 	window['Asc']['c_oAscMaxRowHeight'] = window['Asc'].c_oAscMaxRowHeight = c_oAscMaxRowHeight;
+    window['Asc']['c_nMaxConversionTime'] = window['Asc'].c_nMaxConversionTime = c_nMaxConversionTime;
+	window['Asc']['c_nMaxDownloadTitleLen'] = window['Asc'].c_nMaxDownloadTitleLen = c_nMaxDownloadTitleLen;
 	window['Asc']['c_oAscFileType'] = window['Asc'].c_oAscFileType = c_oAscFileType;
 	prot                         = c_oAscFileType;
 	prot['UNKNOWN']              = prot.UNKNOWN;
@@ -1161,6 +1197,8 @@
 	prot['MailMergeLoadFile']                = prot.MailMergeLoadFile;
 	prot['DownloadMerge']                    = prot.DownloadMerge;
 	prot['SendMailMerge']                    = prot.SendMailMerge;
+	prot['ForceSaveButton']                  = prot.ForceSaveButton;
+	prot['ForceSaveTimeout']                 = prot.ForceSaveTimeout;
 	window['Asc']['c_oAscAdvancedOptionsID'] = window['Asc'].c_oAscAdvancedOptionsID = c_oAscAdvancedOptionsID;
 	prot                                         = c_oAscAdvancedOptionsID;
 	prot['CSV']                                  = prot.CSV;
@@ -1177,18 +1215,18 @@
 	prot['BlockInteraction']             = prot.BlockInteraction;
 	window['Asc']['c_oAscNumFormatType'] = window['Asc'].c_oAscNumFormatType = c_oAscNumFormatType;
 	prot                                     = c_oAscNumFormatType;
+	prot['None']                             = prot.None;
 	prot['General']                          = prot.General;
-	prot['Custom']                           = prot.Custom;
-	prot['Text']                             = prot.Text;
 	prot['Number']                           = prot.Number;
-	prot['Integer']                          = prot.Integer;
 	prot['Scientific']                       = prot.Scientific;
+	prot['Accounting']                       = prot.Accounting;
 	prot['Currency']                         = prot.Currency;
 	prot['Date']                             = prot.Date;
 	prot['Time']                             = prot.Time;
 	prot['Percent']                          = prot.Percent;
 	prot['Fraction']                         = prot.Fraction;
-	prot['Accounting']                       = prot.Accounting;
+	prot['Text']                             = prot.Text;
+	prot['Custom']                           = prot.Custom;
 	window['Asc']['c_oAscDrawingLayerType']  = c_oAscDrawingLayerType;
 	prot                                     = c_oAscDrawingLayerType;
 	prot['BringToFront']                     = prot.BringToFront;
@@ -1394,6 +1432,22 @@
 	prot['Page']                           = prot.Page;
 	prot['Paragraph']                      = prot.Paragraph;
 	prot['TopMargin']                      = prot.TopMargin;
+	window['Asc']['c_oAscBorderStyles'] = window['AscCommon'].c_oAscBorderStyles = c_oAscBorderStyles;
+	prot                         = c_oAscBorderStyles;
+	prot['None']                 = prot.None;
+	prot['Double']               = prot.Double;
+	prot['Hair']                 = prot.Hair;
+	prot['DashDotDot']           = prot.DashDotDot;
+	prot['DashDot']              = prot.DashDot;
+	prot['Dotted']               = prot.Dotted;
+	prot['Dashed']               = prot.Dashed;
+	prot['Thin']                 = prot.Thin;
+	prot['MediumDashDotDot']     = prot.MediumDashDotDot;
+	prot['SlantDashDot']         = prot.SlantDashDot;
+	prot['MediumDashDot']        = prot.MediumDashDot;
+	prot['MediumDashed']         = prot.MediumDashed;
+	prot['Medium']               = prot.Medium;
+	prot['Thick']                = prot.Thick;
 	window['Asc']['c_oAscPageOrientation'] = window['Asc'].c_oAscPageOrientation = c_oAscPageOrientation;
 	prot                         = c_oAscPageOrientation;
 	prot['PagePortrait']         = prot.PagePortrait;
@@ -1615,7 +1669,6 @@
 	window["AscCommon"].c_oAscSizeRelFromV          = c_oAscSizeRelFromV;
 	window["AscCommon"].c_oAscWrapStyle             = c_oAscWrapStyle;
 	window["AscCommon"].c_oAscBorderWidth           = c_oAscBorderWidth;
-	window["AscCommon"].c_oAscBorderStyles          = c_oAscBorderStyles;
 	window["AscCommon"].c_oAscBorderType            = c_oAscBorderType;
 	window["AscCommon"].c_oAscLockTypes             = c_oAscLockTypes;
 	window["AscCommon"].c_oAscFormatPainterState    = c_oAscFormatPainterState;
@@ -1627,6 +1680,8 @@
 	window["AscCommon"].c_oAscMouseMoveDataTypes    = c_oAscMouseMoveDataTypes;
 	window["AscCommon"].c_oAscPrintDefaultSettings  = c_oAscPrintDefaultSettings;
 	window["AscCommon"].c_oZoomType                 = c_oZoomType;
+	window["AscCommon"].c_oNotifyType               = c_oNotifyType;
+	window["AscCommon"].c_oNotifyParentType         = c_oNotifyParentType;
 	window["AscCommon"].c_oAscEncodings             = c_oAscEncodings;
 	window["AscCommon"].c_oAscEncodingsMap          = c_oAscEncodingsMap;
 	window["AscCommon"].c_oAscCodePageUtf8          = c_oAscCodePageUtf8;
@@ -1943,7 +1998,7 @@
 			_object["variations"].push(this.variations[i].serialize());
 		}
 		return _object;
-	}
+	};
 	CPlugin.prototype["deserialize"] = function(_object)
 	{
 		this.name       = (_object["name"] != null) ? _object["name"] : this.name;
@@ -1956,7 +2011,7 @@
 			_variation["deserialize"](_object["variations"][i]);
 			this.variations.push(_variation);
 		}
-	}
+	};
 
 	window["Asc"]["CPluginVariation"] = window["Asc"].CPluginVariation = CPluginVariation;
 	window["Asc"]["CPlugin"] = window["Asc"].CPlugin = CPlugin;

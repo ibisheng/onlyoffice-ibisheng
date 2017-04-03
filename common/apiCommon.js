@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -140,6 +140,7 @@
 		this.AutosaveMinInterval = 300;
 		this.isAnalyticsEnable = false;
 		this.buildVersion = null;
+		this.buildNumber = null;
 		return this;
 	}
 
@@ -176,6 +177,9 @@
 	asc_CAscEditorPermissions.prototype.asc_getBuildVersion = function () {
 		return this.buildVersion;
 	};
+	asc_CAscEditorPermissions.prototype.asc_getBuildNumber = function () {
+		return this.buildNumber;
+	};
 
 	asc_CAscEditorPermissions.prototype.setLicenseType = function (v) {
 		this.licenseType = v;
@@ -194,6 +198,9 @@
 	};
 	asc_CAscEditorPermissions.prototype.setBuildVersion = function (v) {
 		this.buildVersion = v;
+	};
+	asc_CAscEditorPermissions.prototype.setBuildNumber = function (v) {
+		this.buildNumber = v;
 	};
 
 	/** @constructor */
@@ -220,6 +227,63 @@
 	}
 
 	asc_ValAxisSettings.prototype = {
+
+
+		isEqual: function(oPr){
+			if(!oPr){
+				return false;
+			}
+            if(this.minValRule !== oPr.minValRule){
+				return false;
+			}
+            if(this.minVal !== oPr.minVal){
+            	return false;
+			}
+            if(this.maxValRule !== oPr.maxValRule){
+            	return false;
+			}
+            if(this.maxVal !== oPr.maxVal){
+            	return false;
+			}
+            if(this.invertValOrder !== oPr.invertValOrder){
+            	return false;
+			}
+            if(this.logScale !== oPr.logScale){
+            	return false;
+			}
+            if(this.logBase !== oPr.logBase){
+            	return false;
+			}
+            if(this.dispUnitsRule !== oPr.dispUnitsRule){
+            	return false;
+			}
+            if(this.units !== oPr.units){
+            	return false;
+			}
+            if(this.showUnitsOnChart !== oPr.showUnitsOnChart){
+            	return false;
+			}
+            if(this.majorTickMark !== oPr.majorTickMark){
+            	return false;
+			}
+            if(this.minorTickMark !== oPr.minorTickMark){
+            	return false;
+			}
+            if(this.tickLabelsPos !== oPr.tickLabelsPos){
+            	return false;
+			}
+            if(this.crossesRule !== oPr.crossesRule){
+            	return false;
+			}
+            if(this.crosses !== oPr.crosses){
+            	return false;
+			}
+            if(this.axisType !== oPr.axisType){
+            	return false;
+			}
+
+			return true;
+		},
 
 		putAxisType: function (v) {
 			this.axisType = v;
@@ -328,6 +392,54 @@
 
 	asc_CatAxisSettings.prototype = {
 
+		isEqual: function(oPr){
+			if(!oPr){
+				return false;
+			}
+            if(this.intervalBetweenTick !== oPr.intervalBetweenTick){
+            	return false;
+			}
+            if(this.intervalBetweenLabelsRule !== oPr.intervalBetweenLabelsRule){
+            	return false;
+			}
+            if(this.intervalBetweenLabels !== oPr.intervalBetweenLabels){
+            	return false;
+			}
+            if(this.invertCatOrder !== oPr.invertCatOrder){
+            	return false;
+			}
+            if(this.labelsAxisDistance !== oPr.labelsAxisDistance){
+            	return false;
+			}
+            if(this.majorTickMark !== oPr.majorTickMark){
+            	return false;
+			}
+            if(this.minorTickMark !== oPr.minorTickMark){
+            	return false;
+			}
+            if(this.tickLabelsPos !== oPr.tickLabelsPos){
+            	return false;
+			}
+            if(this.crossesRule !== oPr.crossesRule){
+            	return false;
+			}
+            if(this.crosses !== oPr.crosses){
+            	return false;
+			}
+            if(this.labelsPosition !== oPr.labelsPosition){
+            	return false;
+			}
+            if(this.axisType !==  oPr.axisType){
+            	return false;
+			}
+            if(this.crossMinVal !== oPr.crossMinVal){
+            	return false;
+			}
+            if(this.crossMaxVal !== oPr.crossMaxVal){
+            	return false;
+			}
+			return true;
+		},
 		putIntervalBetweenTick: function (v) {
 			this.intervalBetweenTick = v;
 		}, putIntervalBetweenLabelsRule: function (v) {
@@ -450,6 +562,112 @@
 	}
 
 	asc_ChartSettings.prototype = {
+
+		equalBool: function(a, b){
+			return ((!!a) === (!!b));
+		},
+
+		isEqual: function(oPr){
+			if(!oPr){
+				return false;
+			}
+			if(this.style !== oPr.style){
+				return false;
+			}
+            if(this.title !== oPr.title){
+				return false;
+			}
+			if(this.rowCols !== oPr.rowCols){
+            	return false;
+			}
+			if(this.horAxisLabel !== oPr.horAxisLabel){
+				return false;
+			}
+            if(this.vertAxisLabel !== oPr.vertAxisLabel){
+				return false;
+			}
+			if(this.legendPos !== oPr.legendPos){
+           		return false;
+			}
+			if(this.dataLabelsPos !== oPr.dataLabelsPos){
+				return false;
+			}
+			if(this.vertAx !== oPr.vertAx){
+				return false;
+			}
+			if(this.horAx !== oPr.horAx){
+				return false;
+			}
+            if(this.horGridLines !== oPr.horGridLines){
+            	return false;
+			}
+            if(this.vertGridLines !== oPr.vertGridLines){
+            	return false;
+			}
+            if(this.type !== oPr.type){
+            	return false;
+			}
+            if(!this.equalBool(this.showSerName, oPr.showSerName)){
+            	return false;
+			}
+
+            if(!this.equalBool(this.showCatName, oPr.showCatName)){
+            	return false;
+			}
+            if(!this.equalBool(this.showVal, oPr.showVal)){
+            	return false;
+			}
+
+            if(this.separator !== oPr.separator &&
+			!(this.separator === ' ' && oPr.separator == null || oPr.separator === ' ' && this.separator == null)){
+            	return false;
+			}
+			if(!this.horAxisProps){
+            	if(oPr.horAxisProps){
+            		return false;
+				}
+			}
+			else{
+				if(!this.horAxisProps.isEqual(oPr.horAxisProps)){
+					return false;
+				}
+			}
+            if(!this.vertAxisProps){
+                if(oPr.vertAxisProps){
+                    return false;
+                }
+            }
+            else{
+                if(!this.vertAxisProps.isEqual(oPr.vertAxisProps)){
+                    return false;
+                }
+            }
+            if(this.range !== oPr.range){
+                return false;
+            }
+            if(!this.equalBool(this.inColumns, oPr.inColumns)){
+                return false;
+            }
+
+            if(!this.equalBool(this.showMarker, oPr.showMarker)){
+                return false;
+            }
+            if(!this.equalBool(this.bLine, oPr.bLine)){
+                return false;
+            }
+            if(!this.equalBool(this.smooth, oPr.smooth)){
+                return false;
+            }
+            if(!this.equalBool(this.showHorAxis, oPr.showHorAxis)){
+                return false;
+            }
+
+            if(!this.equalBool(this.showVerAxis, oPr.showVerAxis)){
+                return false;
+            }
+            return true;
+		},
+
 		putShowMarker: function (v) {
 			this.showMarker = v;
 		},
@@ -609,19 +827,103 @@
 			return this.vertAxisProps;
 		},
 
+
+
+		checkSwapAxisProps: function(bHBar){
+            var hor_axis_settings = this.getHorAxisProps();
+            var vert_axis_settings = this.getVertAxisProps();
+			if(!bHBar){
+                if(hor_axis_settings){
+                    if(hor_axis_settings.getAxisType() !== c_oAscAxisType.cat){
+                        if(vert_axis_settings &&  vert_axis_settings.getAxisType() === c_oAscAxisType.cat){
+                            this.putHorAxisProps(vert_axis_settings);
+                        }
+                        else{
+                            var new_hor_axis_settings = new asc_CatAxisSettings();
+                            new_hor_axis_settings.setDefault();
+                            this.putHorAxisProps(new_hor_axis_settings);
+                        }
+                    }
+                }
+                else{
+                    var new_hor_axis_settings = new asc_CatAxisSettings();
+                    new_hor_axis_settings.setDefault();
+                    this.putHorAxisProps(new_hor_axis_settings);
+                }
+
+                if(vert_axis_settings){
+                    if(vert_axis_settings.getAxisType() !== c_oAscAxisType.val){
+                        if(hor_axis_settings && hor_axis_settings.getAxisType() === c_oAscAxisType.val){
+                            this.putVertAxisProps(hor_axis_settings);
+                        }
+                        else{
+                            var new_vert_axis_settings = new asc_ValAxisSettings();
+                            new_vert_axis_settings.setDefault();
+                            this.putVertAxisProps(new_vert_axis_settings);
+                        }
+                    }
+                }
+                else{
+                    var new_vert_axis_settings = new asc_ValAxisSettings();
+                    new_vert_axis_settings.setDefault();
+                    this.putVertAxisProps(new_vert_axis_settings);
+                }
+            }
+            else{
+                if(hor_axis_settings){
+                    if(hor_axis_settings.getAxisType() !== c_oAscAxisType.val){
+                        if(vert_axis_settings &&  vert_axis_settings.getAxisType() === c_oAscAxisType.val){
+                            this.putHorAxisProps(vert_axis_settings);
+                        }
+                        else{
+                            var new_hor_axis_settings = new asc_ValAxisSettings();
+                            new_hor_axis_settings.setDefault();
+                            this.putHorAxisProps(new_hor_axis_settings);
+                        }
+                    }
+                }
+                else{
+                    var new_hor_axis_settings = new asc_ValAxisSettings();
+                    new_hor_axis_settings.setDefault();
+                    this.putHorAxisProps(new_hor_axis_settings);
+                }
+
+                if(vert_axis_settings){
+                    if(vert_axis_settings.getAxisType() !== c_oAscAxisType.cat){
+                        if(hor_axis_settings && hor_axis_settings.getAxisType() === c_oAscAxisType.cat){
+                            this.putVertAxisProps(hor_axis_settings);
+                        }
+                        else{
+                            var new_vert_axis_settings = new asc_CatAxisSettings();
+                            new_vert_axis_settings.setDefault();
+                            this.putVertAxisProps(new_vert_axis_settings);
+                        }
+                    }
+                }
+                else{
+                    var new_vert_axis_settings = new asc_CatAxisSettings();
+                    new_vert_axis_settings.setDefault();
+                    this.putVertAxisProps(new_vert_axis_settings);
+                }
+			}
+		},
+
 		changeType: function (type) {
         if (this.type === type) {
             return;
         }
 
 			var bSwapGridLines = ((this.type === c_oAscChartTypeSettings.hBarNormal ||
-			this.type === c_oAscChartTypeSettings.hBarStacked || this.type === c_oAscChartTypeSettings.hBarStackedPer) !==
+			this.type === c_oAscChartTypeSettings.hBarStacked || this.type === c_oAscChartTypeSettings.hBarStackedPer
+			|| this.type === c_oAscChartTypeSettings.hBarNormal3d || this.type === c_oAscChartTypeSettings.hBarStacked3d
+			|| this.type === c_oAscChartTypeSettings.hBarStackedPer3d) !==
 			(type === c_oAscChartTypeSettings.hBarNormal || type === c_oAscChartTypeSettings.hBarStacked ||
-			type === c_oAscChartTypeSettings.hBarStackedPer)   );
+			type === c_oAscChartTypeSettings.hBarStackedPer || this.type === c_oAscChartTypeSettings.hBarNormal3d
+			|| this.type === c_oAscChartTypeSettings.hBarStacked3d || this.type === c_oAscChartTypeSettings.hBarStackedPer3d)   );
 			var bSwapLines = ((
 				type === c_oAscChartTypeSettings.lineNormal || type === c_oAscChartTypeSettings.lineStacked ||
 				type === c_oAscChartTypeSettings.lineStackedPer || type === c_oAscChartTypeSettings.lineNormalMarker ||
-				type === c_oAscChartTypeSettings.lineStackedMarker || type === c_oAscChartTypeSettings.lineStackedPerMarker
+				type === c_oAscChartTypeSettings.lineStackedMarker || type === c_oAscChartTypeSettings.lineStackedPerMarker || type === c_oAscChartTypeSettings.line3d
 
 			) !== (
 
@@ -629,7 +931,8 @@
 				this.type === c_oAscChartTypeSettings.lineStackedPer ||
 				this.type === c_oAscChartTypeSettings.lineNormalMarker ||
 				this.type === c_oAscChartTypeSettings.lineStackedMarker ||
-				this.type === c_oAscChartTypeSettings.lineStackedPerMarker
+				this.type === c_oAscChartTypeSettings.lineStackedPerMarker ||
+				this.type === c_oAscChartTypeSettings.line3d
 			));
 			var bSwapScatter = ((this.type === c_oAscChartTypeSettings.scatter) !==
 			(type === c_oAscChartTypeSettings.scatter));
@@ -654,6 +957,7 @@
 			}
 			switch (type) {
 				case c_oAscChartTypeSettings.pie                 :
+				case c_oAscChartTypeSettings.pie3d                 :
 				case c_oAscChartTypeSettings.doughnut            : {
 					this.putHorAxisProps(null);
 					this.putVertAxisProps(null);
@@ -666,38 +970,42 @@
 				case c_oAscChartTypeSettings.barNormal           :
 				case c_oAscChartTypeSettings.barStacked          :
 				case c_oAscChartTypeSettings.barStackedPer       :
+				case c_oAscChartTypeSettings.barNormal3d         :
+				case c_oAscChartTypeSettings.barStacked3d        :
+				case c_oAscChartTypeSettings.barStackedPer3d     :
+				case c_oAscChartTypeSettings.barNormal3dPerspective     :
 				case c_oAscChartTypeSettings.lineNormal          :
 				case c_oAscChartTypeSettings.lineStacked         :
 				case c_oAscChartTypeSettings.lineStackedPer      :
 				case c_oAscChartTypeSettings.lineNormalMarker    :
 				case c_oAscChartTypeSettings.lineStackedMarker   :
 				case c_oAscChartTypeSettings.lineStackedPerMarker:
+				case c_oAscChartTypeSettings.line3d:
 				case c_oAscChartTypeSettings.areaNormal          :
 				case c_oAscChartTypeSettings.areaStacked         :
 				case c_oAscChartTypeSettings.areaStackedPer      :
-				case c_oAscChartTypeSettings.stock               : {
-					if (!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.cat) {
-						new_hor_axis_settings = new asc_CatAxisSettings();
-						new_hor_axis_settings.setDefault();
-						this.putHorAxisProps(new_hor_axis_settings);
-					}
-					if (!vert_axis_settings || vert_axis_settings.getAxisType() !== c_oAscAxisType.val) {
-						new_vert_axis_settings = new asc_ValAxisSettings();
-						new_vert_axis_settings.setDefault();
-						this.putVertAxisProps(new_vert_axis_settings);
-					}
+				case c_oAscChartTypeSettings.stock               :
+                case c_oAscChartTypeSettings.surfaceNormal       :
+                case c_oAscChartTypeSettings.surfaceWireframe    :
+                case c_oAscChartTypeSettings.contourNormal       :
+                case c_oAscChartTypeSettings.contourWireframe    :
+					{
 
+
+
+                        this.checkSwapAxisProps(false);
 					if (bSwapLines) {
 						this.putShowMarker(false);
 						this.putSmooth(null);
 						this.putLine(true);
 					}
 					if (nOldType === c_oAscChartTypeSettings.hBarNormal || nOldType === c_oAscChartTypeSettings.hBarStacked ||
-						nOldType === c_oAscChartTypeSettings.hBarStackedPer) {
+						nOldType === c_oAscChartTypeSettings.hBarStackedPer || nOldType === c_oAscChartTypeSettings.hBarNormal3d ||
+						nOldType === c_oAscChartTypeSettings.hBarStacked3d || nOldType === c_oAscChartTypeSettings.hBarStackedPer3d) {
 						var bTemp = this.showHorAxis;
-						this.putShowHorAxis(this.showVerAxis)
+						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
-					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut) {
+					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.pie3d || nOldType === c_oAscChartTypeSettings.doughnut) {
 						this.putShowHorAxis(true);
 						this.putShowVerAxis(true);
 					}
@@ -705,24 +1013,20 @@
 				}
 				case c_oAscChartTypeSettings.hBarNormal          :
 				case c_oAscChartTypeSettings.hBarStacked         :
-				case c_oAscChartTypeSettings.hBarStackedPer      : {
-					if (!hor_axis_settings || hor_axis_settings.getAxisType() !== c_oAscAxisType.val) {
-						new_hor_axis_settings = new asc_ValAxisSettings();
-						new_hor_axis_settings.setDefault();
-						this.putHorAxisProps(new_hor_axis_settings);
-					}
-					if (!vert_axis_settings || vert_axis_settings.getAxisType() !== c_oAscAxisType.cat) {
-						new_vert_axis_settings = new asc_CatAxisSettings();
-						new_vert_axis_settings.setDefault();
-						this.putVertAxisProps(new_vert_axis_settings);
-					}
-					if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut) {
+				case c_oAscChartTypeSettings.hBarStackedPer      :
+                case c_oAscChartTypeSettings.hBarNormal3d        :
+                case c_oAscChartTypeSettings.hBarStacked3d       :
+                case c_oAscChartTypeSettings.hBarStackedPer3d    :
+					{
+                        this.checkSwapAxisProps(true);
+					if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.pie3d || nOldType === c_oAscChartTypeSettings.doughnut) {
 						this.putShowHorAxis(true);
 						this.putShowVerAxis(true);
 					} else if (nOldType !== c_oAscChartTypeSettings.hBarNormal &&
-						nOldType !== c_oAscChartTypeSettings.hBarStacked && nOldType !== c_oAscChartTypeSettings.hBarStackedPer) {
+						nOldType !== c_oAscChartTypeSettings.hBarStacked && nOldType !== c_oAscChartTypeSettings.hBarStackedPer || nOldType !== c_oAscChartTypeSettings.hBarNormal3d ||
+                        nOldType !== c_oAscChartTypeSettings.hBarStacked3d || nOldType !== c_oAscChartTypeSettings.hBarStackedPer3d) {
 						var bTemp = this.showHorAxis;
-						this.putShowHorAxis(this.showVerAxis)
+						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
 					}
 					//this.putHorGridLines(c_oAscGridLinesSettings.none);
@@ -754,11 +1058,12 @@
 						this.putLine(false);
 					}
 					if (nOldType === c_oAscChartTypeSettings.hBarNormal || nOldType === c_oAscChartTypeSettings.hBarStacked ||
-						nOldType === c_oAscChartTypeSettings.hBarStackedPer) {
+						nOldType === c_oAscChartTypeSettings.hBarStackedPer || nOldType === c_oAscChartTypeSettings.hBarNormal3d ||
+                        nOldType === c_oAscChartTypeSettings.hBarStacked3d || nOldType === c_oAscChartTypeSettings.hBarStackedPer3d) {
 						var bTemp = this.showHorAxis;
-						this.putShowHorAxis(this.showVerAxis)
+						this.putShowHorAxis(this.showVerAxis);
 						this.putShowVerAxis(bTemp);
-					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.doughnut) {
+					} else if (nOldType === c_oAscChartTypeSettings.pie || nOldType === c_oAscChartTypeSettings.pie3d || nOldType === c_oAscChartTypeSettings.doughnut) {
 						this.putShowHorAxis(true);
 						this.putShowVerAxis(true);
 					}
@@ -857,6 +1162,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CColor() {
 		this.type = c_oAscColor.COLOR_TYPE_SRGB;
 		this.value = null;
@@ -887,7 +1193,7 @@
 	}
 
 	asc_CColor.prototype = {
-		asc_getR: function () {
+		constructor: asc_CColor, asc_getR: function () {
 			return this.r
 		}, asc_putR: function (v) {
 			this.r = v;
@@ -926,8 +1232,7 @@
 			}
 			return this.hex;
 		}, asc_getColor: function () {
-			var ret = new CColor(this.r, this.g, this.b);
-			return ret;
+			return new CColor(this.r, this.g, this.b);
 		}, asc_putAuto: function (v) {
 			this.Auto = v;
 		}, asc_getAuto: function () {
@@ -1595,6 +1900,8 @@
 		this.verticalTextAlign = null;
 		this.textArtProperties = null;
 		this.lockAspect = null;
+		this.title = null;
+		this.description = null;
 	}
 
 	asc_CShapeProperty.prototype = {
@@ -1633,29 +1940,37 @@
 		},
 
 		asc_getWidth: function () {
-			return this.w
+			return this.w;
 		}, asc_putWidth: function (v) {
 			this.w = v;
 		}, asc_getHeight: function () {
-			return this.h
+			return this.h;
 		}, asc_putHeight: function (v) {
 			this.h = v;
 		}, asc_getVerticalTextAlign: function () {
-			return this.verticalTextAlign
+			return this.verticalTextAlign;
 		}, asc_putVerticalTextAlign: function (v) {
 			this.verticalTextAlign = v;
 		}, asc_getVert: function () {
-			return this.vert
+			return this.vert;
 		}, asc_putVert: function (v) {
 			this.vert = v;
 		}, asc_getTextArtProperties: function () {
-			return this.textArtProperties
+			return this.textArtProperties;
 		}, asc_putTextArtProperties: function (v) {
 			this.textArtProperties = v;
 		}, asc_getLockAspect: function () {
 			return this.lockAspect
 		}, asc_putLockAspect: function (v) {
 			this.lockAspect = v;
+		}, asc_getTitle: function () {
+			return this.title;
+		}, asc_putTitle: function (v) {
+			this.title = v;
+		}, asc_getDescription: function () {
+			return this.description;
+		}, asc_putDescription: function (v) {
+			this.description = v;
 		}
 	};
 
@@ -1900,6 +2215,10 @@
 			this.pluginData = obj.pluginData !== undefined ? obj.pluginData : undefined;
 			this.oleWidth = obj.oleWidth != undefined ? obj.oleWidth : undefined;
 			this.oleHeight = obj.oleHeight != undefined ? obj.oleHeight : undefined;
+
+			this.title = obj.title != undefined ? obj.title : undefined;
+			this.description = obj.description != undefined ? obj.description : undefined;
+
 		} else {
 			this.CanBeFlow = true;
 			this.Width = undefined;
@@ -1936,6 +2255,8 @@
 
 			this.oleWidth = undefined;
 			this.oleHeight = undefined;
+            this.title = undefined;
+            this.description = undefined;
 		}
 	}
 
@@ -2142,6 +2463,22 @@
 
 		asc_putPluginData: function (v) {
 			this.pluginData = v;
+		},
+
+		asc_getTitle: function(){
+			return this.title;
+		},
+
+		asc_putTitle: function(v){
+			this.title = v;
+		},
+
+		asc_getDescription: function(){
+			return this.description;
+		},
+
+		asc_putDescription: function(v){
+			this.description = v;
 		}
 	};
 
@@ -2362,42 +2699,91 @@
 	// c_oAscColor.COLOR_TYPE_SCHEME	: value - тип цвета в схеме
 	// c_oAscColor.COLOR_TYPE_SYS		: конвертируется в srgb
 	function CAscColorScheme() {
-		this.Colors = [];
-		this.Name = "";
+		this.colors = [];
+		this.name = "";
 	}
 
 	CAscColorScheme.prototype.get_colors = function () {
-		return this.Colors;
+		return this.colors;
 	};
 	CAscColorScheme.prototype.get_name = function () {
-		return this.Name;
+		return this.name;
+	};
+	CAscColorScheme.prototype.get_dk1 = function () {
+		return this.colors[0];
+	};
+	CAscColorScheme.prototype.get_lt1 = function () {
+		return this.colors[1];
+	};
+	CAscColorScheme.prototype.get_dk2 = function () {
+		return this.colors[2];
+	};
+	CAscColorScheme.prototype.get_lt2 = function () {
+		return this.colors[3];
+	};
+	CAscColorScheme.prototype.get_accent1 = function () {
+		return this.colors[4];
+	};
+	CAscColorScheme.prototype.get_accent2 = function () {
+		return this.colors[5];
+	};
+	CAscColorScheme.prototype.get_accent3 = function () {
+		return this.colors[6];
+	};
+	CAscColorScheme.prototype.get_accent4 = function () {
+		return this.colors[7];
+	};
+	CAscColorScheme.prototype.get_accent5 = function () {
+		return this.colors[8];
+	};
+	CAscColorScheme.prototype.get_accent6 = function () {
+		return this.colors[9];
+	};
+	CAscColorScheme.prototype.get_hlink = function () {
+		return this.colors[10];
+	};
+	CAscColorScheme.prototype.get_folHlink = function () {
+		return this.colors[11];
 	};
 
 	//-----------------------------------------------------------------
 	// События движения мыши
 	//-----------------------------------------------------------------
-	function CMouseMoveData(obj) {
-		if (obj) {
-			this.Type = ( undefined != obj.Type ) ? obj.Type : c_oAscMouseMoveDataTypes.Common;
+	function CMouseMoveData(obj)
+	{
+		if (obj)
+		{
+			this.Type  = ( undefined != obj.Type ) ? obj.Type : c_oAscMouseMoveDataTypes.Common;
 			this.X_abs = ( undefined != obj.X_abs ) ? obj.X_abs : 0;
 			this.Y_abs = ( undefined != obj.Y_abs ) ? obj.Y_abs : 0;
 
-			switch (this.Type) {
-				case c_oAscMouseMoveDataTypes.Hyperlink : {
+			switch (this.Type)
+			{
+				case c_oAscMouseMoveDataTypes.Hyperlink :
+				{
 					this.Hyperlink = ( undefined != obj.PageNum ) ? obj.PageNum : 0;
 					break;
 				}
 
-				case c_oAscMouseMoveDataTypes.LockedObject : {
-					this.UserId = ( undefined != obj.UserId ) ? obj.UserId : "";
-					this.HaveChanges = ( undefined != obj.HaveChanges ) ? obj.HaveChanges : false;
+				case c_oAscMouseMoveDataTypes.LockedObject :
+				{
+					this.UserId           = ( undefined != obj.UserId ) ? obj.UserId : "";
+					this.HaveChanges      = ( undefined != obj.HaveChanges ) ? obj.HaveChanges : false;
 					this.LockedObjectType =
 						( undefined != obj.LockedObjectType ) ? obj.LockedObjectType : Asc.c_oAscMouseMoveLockedObjectType.Common;
 					break;
 				}
+				case c_oAscMouseMoveDataTypes.Footnote:
+				{
+					this.Text   = "";
+					this.Number = 1;
+					break;
+				}
 			}
-		} else {
-			this.Type = c_oAscMouseMoveDataTypes.Common;
+		}
+		else
+		{
+			this.Type  = c_oAscMouseMoveDataTypes.Common;
 			this.X_abs = 0;
 			this.Y_abs = 0;
 		}
@@ -2423,6 +2809,14 @@
 	};
 	CMouseMoveData.prototype.get_LockedObjectType = function () {
 		return this.LockedObjectType;
+	};
+	CMouseMoveData.prototype.get_FootnoteText = function()
+	{
+		return this.Text;
+	};
+	CMouseMoveData.prototype.get_FootnoteNumber = function()
+	{
+		return this.Number;
 	};
 
 	function asc_CUserInfo(obj) {
@@ -2775,6 +3169,7 @@
 	prot["asc_getTrial"] = prot.asc_getTrial;
 	prot["asc_getRights"] = prot.asc_getRights;
 	prot["asc_getBuildVersion"] = prot.asc_getBuildVersion;
+	prot["asc_getBuildNumber"] = prot.asc_getBuildNumber;
 
 	window["AscCommon"].asc_ValAxisSettings = asc_ValAxisSettings;
 	prot = asc_ValAxisSettings.prototype;
@@ -3149,6 +3544,10 @@
 	prot["put_TextArtProperties"] = prot["asc_putTextArtProperties"] = prot.asc_putTextArtProperties;
 	prot["get_LockAspect"] = prot["asc_getLockAspect"] = prot.asc_getLockAspect;
 	prot["put_LockAspect"] = prot["asc_putLockAspect"] = prot.asc_putLockAspect;
+	prot["get_Title"] = prot["asc_getTitle"] = prot.asc_getTitle;
+	prot["put_Title"] = prot["asc_putTitle"] = prot.asc_putTitle;
+	prot["get_Description"] = prot["asc_getDescription"] = prot.asc_getDescription;
+	prot["put_Description"] = prot["asc_putDescription"] = prot.asc_putDescription;
 
 	window["Asc"]["asc_TextArtProperties"] = window["Asc"].asc_TextArtProperties = asc_TextArtProperties;
 	prot = asc_TextArtProperties.prototype;
@@ -3267,6 +3666,14 @@
 	prot["get_PluginData"] = prot["asc_getPluginData"] = prot.asc_getPluginData;
 	prot["put_PluginData"] = prot["asc_putPluginData"] = prot.asc_putPluginData;
 
+	prot["get_Title"] = prot["asc_getTitle"] = prot.asc_getTitle;
+	prot["put_Title"] = prot["asc_putTitle"] = prot.asc_putTitle;
+	prot["get_Description"] = prot["asc_getDescription"] = prot.asc_getDescription;
+	prot["put_Description"] = prot["asc_putDescription"] = prot.asc_putDescription;
+
+
+
+
 	window["AscCommon"].asc_CSelectedObject = asc_CSelectedObject;
 	prot = asc_CSelectedObject.prototype;
 	prot["get_ObjectType"] = prot["asc_getObjectType"] = prot.asc_getObjectType;
@@ -3358,6 +3765,8 @@
 	prot["get_UserId"] = prot.get_UserId;
 	prot["get_HaveChanges"] = prot.get_HaveChanges;
 	prot["get_LockedObjectType"] = prot.get_LockedObjectType;
+	prot["get_FootnoteText"] =  prot.get_FootnoteText;
+	prot["get_FootnoteNumber"] = prot.get_FootnoteNumber;
 
 	window["Asc"]["asc_CUserInfo"] = window["Asc"].asc_CUserInfo = asc_CUserInfo;
 	prot = asc_CUserInfo.prototype;

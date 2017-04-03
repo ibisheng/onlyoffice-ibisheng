@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -46,4 +46,18 @@ function twttr(){};
 function _gaq(){};
 
 function constructor(){};
-function superclass(){};
+
+function touchstart(){};
+function touchmove(){};
+function touchend(){};
+function mousedown(){};
+function mousemove(){};
+function mouseup(){};
+function pointerdown(){};
+function pointermove(){};
+function pointerup(){};
+function MSPointerDown(){};
+function MSPointerMove(){};
+function MSPointerUp(){};
+
+function PointerEvent(){};

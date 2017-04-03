@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -419,11 +419,6 @@ function CDrawingDocument()
 
     this.SendControlColors = function(bIsAttack)
     {
-    }
-
-    this.SendThemeColorScheme = function()
-    {
-
     }
 
     this.DrawImageTextureFillShape = function(url)

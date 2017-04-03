@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -535,7 +535,7 @@ MoveInlineObject.prototype =
             var new_check_paragraph = this.majorObject.parent.checkShapeChildAndGetTopParagraph(this.InlinePos.Paragraph);
             if(parent_paragraph !== new_check_paragraph)
                 check_paragraphs.push(new_check_paragraph);
-            if(false === editor.isViewMode &&  false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
+            if(false === editor.isViewMode &&  false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}, true))
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_MoveInlineObject);
                 this.majorObject.parent.OnEnd_MoveInline(this.InlinePos);
@@ -544,7 +544,7 @@ MoveInlineObject.prototype =
         else
         {
             check_paragraphs.push(this.majorObject.parent.checkShapeChildAndGetTopParagraph(this.InlinePos.Paragraph));
-            if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
+            if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}, true))
             {
                 History.Create_NewPoint(AscDFH.historydescription_Document_CopyAndMoveInlineObject);
                 var new_para_drawing = new ParaDrawing(this.majorObject.parent.Extent.W, this.majorObject.parent.Extent.H, null, this.drawingObjects.drawingDocument, null, null);
@@ -700,6 +700,7 @@ RotateState.prototype =
                 }
                 else
                 {
+                    var bNoNeedCheck = true;
                     if(bMoveState)
                     {
                         for(i = 0; i < aNearestPos.length; ++i)
@@ -709,11 +710,17 @@ RotateState.prototype =
                                 AscFormat.checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
                                 AscFormat.checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
                             }
+                            else{
+                                bNoNeedCheck = false;
+                            }
                         }
                     }
-                    if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
+                    if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content}, bNoNeedCheck))
                     {
                         History.Create_NewPoint(AscDFH.historydescription_Document_RotateFlowDrawingNoCtrl);
+                        if(bMoveState){
+                            this.drawingObjects.resetSelection();
+                        }
                         for(i = 0; i < aDrawings.length; ++i)
                         {
                             bounds = aBounds[i];
@@ -728,26 +735,35 @@ RotateState.prototype =
                                 // На удалении включаем пересчет из-за бага (28015), чтобы во время добавления автофигуры на эту же страницу
                                 // расположение всех элементов было рассчитано с уже удаленной автофигурой.
 
-                                var bTrackRevisions = false;
-                                if(this.drawingObjects.document.TrackRevisions){
-                                    bTrackRevisions = true;
-                                    this.drawingObjects.document.TrackRevisions = false;
-                                }
+								// Автофигуры мы переносим так, как будто это происходит не в режиме рецензирования, но
+								// при этом мы должны сохранить их начальные настройки рецензирования.
+								var bTrackRevisions = this.drawingObjects.document.Is_TrackRevisions();
+								if (bTrackRevisions)
+									this.drawingObjects.document.Set_TrackRevisions(false);
+
+								var oOriginalRun = original.Parent.Get_DrawingObjectRun(original.Id);
 
                                 original.Remove_FromDocument(false);
                                 aNearestPos[i].Paragraph.Check_NearestPos(aNearestPos[i]);
-                                original.Set_XYForAdd(bounds.posX, bounds.posY, aNearestPos[i], pageIndex);
-                                aDrawings[i].Add_ToDocument(aNearestPos[i], false);
 
-                                if(bTrackRevisions){
-                                    this.drawingObjects.document.TrackRevisions = true;
-                                }
+                                // Всегда создаем копию при переносе, чтобы не было проблем при совместном редактировании
+                                var originalCopy = original.Copy();
+								originalCopy.Set_XYForAdd(bounds.posX, bounds.posY, aNearestPos[i], pageIndex);
+								originalCopy.Add_ToDocument(aNearestPos[i], false, null, oOriginalRun);
+
+								if (bTrackRevisions)
+									this.drawingObjects.document.Set_TrackRevisions(true);
+
+                                this.drawingObjects.selectObject(originalCopy.GraphicObj, pageIndex);
                             }
                             else
                             {
                                 if(true !== this.drawingObjects.arrTrackObjects[i].bTextWarp)
                                 {
                                     original.Set_XY(bounds.posX, bounds.posY, aParentParagraphs[i], original.GraphicObj.selectStartPage, bMoveState)
+                                }
+                                if(bMoveState){
+                                    this.drawingObjects.selectObject(original.GraphicObj, pageIndex);
                                 }
                             }
                             this.drawingObjects.document.Recalculate();

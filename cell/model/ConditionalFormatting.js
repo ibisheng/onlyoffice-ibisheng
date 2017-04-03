@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -48,23 +48,32 @@
 	 */
 	function CConditionalFormatting () {
 		this.pivot = false;
-		this.sqref = null;
+		this.ranges = null;
 		this.aRules = [];
 
 		return this;
 	}
 	CConditionalFormatting.prototype.setSqref = function(sqref) {
-		this.sqref = AscCommonExcel.g_oRangeCache.getAscRange(sqref);
+		this.ranges = AscCommonExcel.g_oRangeCache.getActiveRangesFromSqRef(sqref);
 	};
 	CConditionalFormatting.prototype.clone = function() {
 		var i, res = new CConditionalFormatting();
 		res.pivot = this.pivot;
-		res.sqref = this.sqref ? this.sqref.clone() : null;
+		if (this.ranges) {
+			res.ranges = [];
+			for (i = 0; i < this.ranges.length; ++i) {
+				res.ranges.push(this.ranges[i].clone());
+			}
+		}
 		for (i = 0; i < this.aRules.length; ++i)
 			res.aRules.push(this.aRules[i].clone());
 
 		return res;
 	};
+	CConditionalFormatting.prototype.isValid = function() {
+		//todo more checks
+		return this.ranges && this.ranges.length > 0;
+	}
 
 	function CConditionalFormattingRule () {
 		this.aboveAverage = true;
@@ -320,13 +329,14 @@
 	};
 	CFormulaCF.prototype.init = function(ws) {
 		if (!this._f) {
-			this._f = new AscCommonExcel.parserFormula(this.Text, '', ws);
+			this._f = new AscCommonExcel.parserFormula(this.Text, null, ws);
 			this._f.parse();
 		}
 	};
 	CFormulaCF.prototype.getValue = function(ws) {
 		this.init(ws);
-		return this._f.calculate().getValue();
+		//todo bbox
+		return this._f.calculate(null, null).getValue();
 	};
 
 	function CIconSet () {

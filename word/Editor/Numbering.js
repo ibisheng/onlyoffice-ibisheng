@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -284,59 +284,52 @@ function CAbstractNum(Type)
 
 CAbstractNum.prototype =
 {
-    Set_Id : function(newId)
-    {
-        AscCommon.g_oTableId.Reset_Id(this, newId, this.Id);
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.Id;
     },
 
     // Копируем информацию из другой нумерации
-    Copy : function(AbstractNum)
-    {
-        //TODO: Сделать функциями для совместного редактирования
-        this.StyleLink    = AbstractNum.StyleLink;
-        this.NumStyleLink = AbstractNum.NumStyleLink;
+	Copy : function(AbstractNum)
+	{
+		//TODO: Сделать функциями для совместного редактирования
+		this.StyleLink    = AbstractNum.StyleLink;
+		this.NumStyleLink = AbstractNum.NumStyleLink;
 
-        for (var Index = 0; Index < 9; Index++)
-        {
-            var Lvl_new = this.Internal_CopyLvl(AbstractNum.Lvl[Index]);
-            var Lvl_old = this.Lvl[Index];
-            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
-
-            this.Lvl[Index] = Lvl_new;
-        }
-    },
+		for (var Index = 0; Index < 9; Index++)
+		{
+			var Lvl_new = this.Internal_CopyLvl(AbstractNum.Lvl[Index]);
+			var Lvl_old = this.Lvl[Index];
+			History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
+			this.Lvl[Index] = Lvl_new;
+		}
+	},
 
     // Сдвигаем все уровни на заданное значение
-    Change_LeftInd : function(NewLeft)
-    {
-        var OldLeft = this.Lvl[0].ParaPr.Ind.Left;
-        for (var Index = 0; Index < 9; Index++)
-        {
-            var Lvl_new             = this.Internal_CopyLvl(this.Lvl[Index]);
-            var Lvl_old             = this.Internal_CopyLvl(this.Lvl[Index]);
-            Lvl_new.ParaPr.Ind.Left = Lvl_old.ParaPr.Ind.Left - OldLeft + NewLeft;
+	Change_LeftInd : function(NewLeft)
+	{
+		var OldLeft = this.Lvl[0].ParaPr.Ind.Left;
+		for (var Index = 0; Index < 9; Index++)
+		{
+			var Lvl_new             = this.Internal_CopyLvl(this.Lvl[Index]);
+			var Lvl_old             = this.Internal_CopyLvl(this.Lvl[Index]);
+			Lvl_new.ParaPr.Ind.Left = Lvl_old.ParaPr.Ind.Left - OldLeft + NewLeft;
 
-            this.Internal_SetLvl(Index, Lvl_new);
+			this.Internal_SetLvl(Index, Lvl_new);
 
-            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
-        }
+			History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
+		}
 
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering({NumId : this.Id, Lvl : undefined});
+		var LogicDocument = editor.WordControl.m_oLogicDocument;
+		var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering({NumId : this.Id, Lvl : undefined});
 
-        var Count = AllParagraphs.length;
-        for (var Index = 0; Index < Count; Index++)
-        {
-            var Para                   = AllParagraphs[Index];
-            Para.CompiledPr.NeedRecalc = true;
-        }
-    },
+		var Count = AllParagraphs.length;
+		for (var Index = 0; Index < Count; Index++)
+		{
+			var Para                   = AllParagraphs[Index];
+			Para.CompiledPr.NeedRecalc = true;
+		}
+	},
 
     Get_LvlByStyle : function(StyleId)
     {
@@ -359,111 +352,111 @@ CAbstractNum.prototype =
         return this.Lvl[Lvl];
     },
 
-    Set_Lvl : function(iLvl, Lvl_new)
-    {
-        if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
-            return;
+	Set_Lvl : function(iLvl, Lvl_new)
+	{
+		if ("number" != typeof(iLvl) || iLvl < 0 || iLvl >= 9)
+			return;
 
-        var Lvl_old    = this.Lvl[iLvl];
-        this.Lvl[iLvl] = Lvl_new;
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
-    },
+		var Lvl_old    = this.Lvl[iLvl];
+		this.Lvl[iLvl] = Lvl_new;
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
+	},
 
     // Определяем многоуровненый список по умолчанию
-    Create_Default_Numbered : function()
-    {
-        for (var Index = 0; Index < 9; Index++)
-        {
-            var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
+	Create_Default_Numbered : function()
+	{
+		for (var Index = 0; Index < 9; Index++)
+		{
+			var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
 
-            this.Lvl[Index] = {};
-            var Lvl         = this.Lvl[Index];
+			this.Lvl[Index] = {};
+			var Lvl         = this.Lvl[Index];
 
-            Lvl.Start   = 1;
-            Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
-            Lvl.Suff    = numbering_suff_Tab;
+			Lvl.Start   = 1;
+			Lvl.Restart = -1;        // -1 - делаем нумерацию сначала всегда, 0 - никогда не начинаем нумерацию заново
+			Lvl.Suff    = numbering_suff_Tab;
 
-            var Left      = 36 * (Index + 1) * g_dKoef_pt_to_mm;
-            var FirstLine = -18 * g_dKoef_pt_to_mm;
+			var Left      = 36 * (Index + 1) * g_dKoef_pt_to_mm;
+			var FirstLine = -18 * g_dKoef_pt_to_mm;
 
-            if (0 == Index % 3)
-            {
-                Lvl.Jc     = align_Left;
-                Lvl.Format = numbering_numfmt_Decimal;
-            }
-            else if (1 == Index % 3)
-            {
-                Lvl.Jc     = align_Left;
-                Lvl.Format = numbering_numfmt_LowerLetter;
-            }
-            else
-            {
-                Lvl.Jc     = align_Right;
-                Lvl.Format = numbering_numfmt_LowerRoman;
-                FirstLine  = -9 * g_dKoef_pt_to_mm;
-            }
+			if (0 == Index % 3)
+			{
+				Lvl.Jc     = align_Left;
+				Lvl.Format = numbering_numfmt_Decimal;
+			}
+			else if (1 == Index % 3)
+			{
+				Lvl.Jc     = align_Left;
+				Lvl.Format = numbering_numfmt_LowerLetter;
+			}
+			else
+			{
+				Lvl.Jc     = align_Right;
+				Lvl.Format = numbering_numfmt_LowerRoman;
+				FirstLine  = -9 * g_dKoef_pt_to_mm;
+			}
 
-            Lvl.LvlText = [];
-            Lvl.LvlText.push(new CLvlText_Num(Index));
-            Lvl.LvlText.push(new CLvlText_Text("."));
+			Lvl.LvlText = [];
+			Lvl.LvlText.push(new CLvlText_Num(Index));
+			Lvl.LvlText.push(new CLvlText_Text("."));
 
-            Lvl.ParaPr               = new CParaPr();
-            Lvl.ParaPr.Ind.Left      = Left;
-            Lvl.ParaPr.Ind.FirstLine = FirstLine;
+			Lvl.ParaPr               = new CParaPr();
+			Lvl.ParaPr.Ind.Left      = Left;
+			Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
-            Lvl.TextPr = new CTextPr();
+			Lvl.TextPr = new CTextPr();
 
-            var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
-        }
-    },
+			var Lvl_new = this.Internal_CopyLvl(Lvl);
+			History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
+		}
+	},
 
-    Create_Default_Multilevel_1 : function()
-    {
-        for (var Index = 0; Index < 9; Index++)
-        {
-            var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
+	Create_Default_Multilevel_1 : function()
+	{
+		for (var Index = 0; Index < 9; Index++)
+		{
+			var Lvl_old = this.Internal_CopyLvl(this.Lvl[Index]);
 
-            this.Lvl[Index] = {};
-            var Lvl         = this.Lvl[Index];
+			this.Lvl[Index] = {};
+			var Lvl         = this.Lvl[Index];
 
-            Lvl.Start   = 1;
-            Lvl.Restart = -1;
-            Lvl.Suff    = numbering_suff_Tab;
+			Lvl.Start   = 1;
+			Lvl.Restart = -1;
+			Lvl.Suff    = numbering_suff_Tab;
 
-            var Left      = 18 * (Index + 1) * g_dKoef_pt_to_mm;
-            var FirstLine = -18 * g_dKoef_pt_to_mm;
+			var Left      = 18 * (Index + 1) * g_dKoef_pt_to_mm;
+			var FirstLine = -18 * g_dKoef_pt_to_mm;
 
-            Lvl.Jc = align_Left;
+			Lvl.Jc = align_Left;
 
-            if (0 == Index % 3)
-            {
-                Lvl.Format = numbering_numfmt_Decimal;
-            }
-            else if (1 == Index % 3)
-            {
-                Lvl.Format = numbering_numfmt_LowerLetter;
-            }
-            else
-            {
-                Lvl.Format = numbering_numfmt_LowerRoman;
-            }
+			if (0 == Index % 3)
+			{
+				Lvl.Format = numbering_numfmt_Decimal;
+			}
+			else if (1 == Index % 3)
+			{
+				Lvl.Format = numbering_numfmt_LowerLetter;
+			}
+			else
+			{
+				Lvl.Format = numbering_numfmt_LowerRoman;
+			}
 
-            Lvl.LvlText = [];
-            Lvl.LvlText.push(new CLvlText_Num(Index));
-            Lvl.LvlText.push(new CLvlText_Text(")"));
+			Lvl.LvlText = [];
+			Lvl.LvlText.push(new CLvlText_Num(Index));
+			Lvl.LvlText.push(new CLvlText_Text(")"));
 
-            Lvl.ParaPr               = new CParaPr();
-            Lvl.ParaPr.Ind.Left      = Left;
-            Lvl.ParaPr.Ind.FirstLine = FirstLine;
+			Lvl.ParaPr               = new CParaPr();
+			Lvl.ParaPr.Ind.Left      = Left;
+			Lvl.ParaPr.Ind.FirstLine = FirstLine;
 
-            var TextPr = new CTextPr();
-            Lvl.TextPr = TextPr;
+			var TextPr = new CTextPr();
+			Lvl.TextPr = TextPr;
 
-            var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
-        }
-    },
+			var Lvl_new = this.Internal_CopyLvl(Lvl);
+			History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
+		}
+	},
 
     Create_Default_Multilevel_2 : function()
     {
@@ -539,7 +532,7 @@ CAbstractNum.prototype =
             Lvl.TextPr = TextPr;
 
             var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+			History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
         }
     },
 
@@ -606,7 +599,7 @@ CAbstractNum.prototype =
             Lvl.TextPr = TextPr;
 
             var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+			History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
         }
     },
 
@@ -655,7 +648,7 @@ CAbstractNum.prototype =
             Lvl.TextPr = TextPr;
 
             var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+			History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, Index));
         }
     },
 
@@ -671,7 +664,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.TextPr  = new CTextPr();
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     Set_Lvl_Bullet : function(iLvl, LvlText, TextPr)
@@ -689,7 +682,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = TextPr;
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // 1) right
@@ -710,7 +703,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // 1. right
@@ -731,7 +724,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // 1. left
@@ -752,7 +745,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // 1) left
@@ -773,7 +766,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // I. right
@@ -794,7 +787,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // A. left
@@ -815,7 +808,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // a) left
@@ -836,7 +829,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // a. left
@@ -857,7 +850,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // i. left
@@ -878,7 +871,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     Set_Lvl_ByFormat : function(iLvl, nType, sFormatText, nAlign)
@@ -926,7 +919,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     Set_Lvl_Restart : function(iLvl, isRestart)
@@ -938,7 +931,7 @@ CAbstractNum.prototype =
         var Lvl_old = this.Internal_CopyLvl(Lvl);
         Lvl.Restart = (isRestart ? -1 : 0);
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     Set_Lvl_Start : function(iLvl, nStart)
@@ -950,7 +943,7 @@ CAbstractNum.prototype =
         var Lvl_old = this.Internal_CopyLvl(Lvl);
         Lvl.Start = nStart;
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     Set_Lvl_Suff : function(iLvl, nSuff)
@@ -962,7 +955,7 @@ CAbstractNum.prototype =
         var Lvl_old = this.Internal_CopyLvl(Lvl);
         Lvl.Suff = nSuff;
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+		History.Add(new CChangesAbstractNumLvlChange(this, Lvl_old, Lvl_new, iLvl));
     },
 
     // X, Y, Context - параметры для рисование
@@ -1490,28 +1483,28 @@ CAbstractNum.prototype =
     },
 
     // Применяем новые тектовые настройки к данной нумерации на заданном уровне
-    Apply_TextPr : function(Lvl, TextPr)
-    {
-        var CurTextPr = this.Lvl[Lvl].TextPr;
+	Apply_TextPr : function(Lvl, TextPr)
+	{
+		var CurTextPr = this.Lvl[Lvl].TextPr;
 
-        var TextPr_old = CurTextPr.Copy();
-        CurTextPr.Merge(TextPr);
-        var TextPr_new = CurTextPr.Copy();
+		var TextPr_old = CurTextPr.Copy();
+		CurTextPr.Merge(TextPr);
+		var TextPr_new = CurTextPr.Copy();
 
-        History.Add( this, { Type : AscDFH.historyitem_AbstractNum_TextPrChange, Index : Lvl, Old : TextPr_old, New : TextPr_new } );
-    },
+		History.Add(new CChangesAbstractNumTextPrChange(this, TextPr_old, TextPr_new, Lvl));
+	},
 
-    Set_TextPr : function(Lvl, TextPr)
-    {
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_TextPrChange, Index : Lvl, Old : this.Lvl[Lvl].TextPr, New : TextPr});
-        this.Lvl[Lvl].TextPr = TextPr;
-    },
-    
-    Set_ParaPr : function(Lvl, ParaPr)
-    {
-        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_ParaPrChange, Index : Lvl, Old : this.Lvl[Lvl].ParaPr, New : ParaPr});
-        this.Lvl[Lvl].ParaPr = ParaPr;
-    },
+	Set_TextPr : function(Lvl, TextPr)
+	{
+		History.Add(new CChangesAbstractNumTextPrChange(this, this.Lvl[Lvl].TextPr, TextPr, Lvl));
+		this.Lvl[Lvl].TextPr = TextPr;
+	},
+
+	Set_ParaPr : function(Lvl, ParaPr)
+	{
+		History.Add(new CChangesAbstractNumParaPrChange(this, this.Lvl[Lvl].ParaPr, ParaPr, Lvl));
+		this.Lvl[Lvl].ParaPr = ParaPr;
+	},
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
@@ -1610,85 +1603,20 @@ CAbstractNum.prototype =
         }
     },
 
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_AbstractNum_LvlChange:
-            {
-                this.Internal_SetLvl( Data.Index, Data.Old );
-
-                // Пересчитываем стили у все параграфов с данной нумерацией
-                this.Recalc_CompiledPr(Data.Index);
-                break;
-            }
-
-            case AscDFH.historyitem_AbstractNum_TextPrChange:
-            {
-                this.Lvl[Data.Index].TextPr = Data.Old;
-
-                // Пересчитываем стили у все параграфов с данной нумерацией
-                this.Recalc_CompiledPr(Data.Index);
-                break;
-            }
-
-
-            case AscDFH.historyitem_AbstractNum_ParaPrChange:
-            {
-                this.Lvl[Data.Index].ParaPr = Data.Old;
-
-                // Пересчитываем стили у все параграфов с данной нумерацией
-                this.Recalc_CompiledPr(Data.Index);
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_AbstractNum_LvlChange:
-            {
-                this.Internal_SetLvl( Data.Index, Data.New );
-
-                // Пересчитываем стили у все параграфов с данной нумерацией
-                this.Recalc_CompiledPr(Data.Index);
-                break;
-            }
-
-            case AscDFH.historyitem_AbstractNum_TextPrChange:
-            {
-                this.Lvl[Data.Index].TextPr = Data.New;
-
-                // Пересчитываем стили у все параграфов с данной нумерацией
-                this.Recalc_CompiledPr(Data.Index);
-                break;
-            }
-
-            case AscDFH.historyitem_AbstractNum_ParaPrChange:
-            {
-                this.Lvl[Data.Index].ParaPr = Data.New;
-
-                // Пересчитываем стили у все параграфов с данной нумерацией
-                this.Recalc_CompiledPr(Data.Index);
-                break;
-            }
-        }
-    },
-
     Refresh_RecalcData : function(Data)
     {
+		var oHistory = History;
+		if (!oHistory)
+			return;
+
+		if (!oHistory.AddChangedNumberingToRecalculateData(this.Get_Id(), Data.Index, this))
+			return;
+
         var NumPr = new CNumPr();
         NumPr.NumId = this.Id;
         NumPr.Lvl   = Data.Index;
 
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering( NumPr );
+        var AllParagraphs = oHistory.GetAllParagraphsForRecalcData({Numbering : true, NumPr : NumPr});
 
         var Count = AllParagraphs.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -1700,120 +1628,6 @@ CAbstractNum.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //-----------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( AscDFH.historyitem_type_AbstractNum );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_AbstractNum_LvlChange:
-            {
-                // Long     : iLvl
-                // Variable : Lvl
-
-                Writer.WriteLong(Data.Index);
-                this.Write_Lvl_ToBinary( Data.New, Writer );
-
-                break;
-            }
-
-            case AscDFH.historyitem_AbstractNum_TextPrChange:
-            {
-                // Long     : iLvl
-                // Vairable : TextPr
-
-                Writer.WriteLong(Data.Index);
-                Data.New.Write_ToBinary(Writer);
-
-                break;
-            }
-
-            case AscDFH.historyitem_AbstractNum_ParaPrChange:
-            {
-                // Long     : iLvl
-                // Vairable : ParaPr
-
-                Writer.WriteLong(Data.Index);
-                Data.New.Write_ToBinary(Writer);
-
-                break;
-            }
-        }
-        
-        
-
-        return Writer;
-    },
-
-    Save_Changes2 : function(Data, Writer)
-    {
-        return false;
-    },
-
-    Load_Changes : function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( AscDFH.historyitem_type_AbstractNum != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        var iLvl = 0;
-        switch ( Type )
-        {
-            case AscDFH.historyitem_AbstractNum_LvlChange:
-            {
-                // Long     : iLvl
-                // Variable : Lvl
-
-                iLvl = Reader.GetLong();
-                this.Read_Lvl_FromBinary( this.Lvl[iLvl], Reader );
-
-                break;
-            }
-
-            case AscDFH.historyitem_AbstractNum_TextPrChange:
-            {
-                // Long     : iLvl
-                // Vairable : TextPr
-
-                iLvl = Reader.GetLong();
-                this.Lvl[iLvl].TextPr = new CTextPr();
-                this.Lvl[iLvl].TextPr.Read_FromBinary(Reader);
-
-                break;
-            }
-
-            case AscDFH.historyitem_AbstractNum_ParaPrChange:
-            {
-                // Long     : iLvl
-                // Vairable : ParaPr
-
-                iLvl = Reader.GetLong();
-                this.Lvl[iLvl].ParaPr = new CParaPr();
-                this.Lvl[iLvl].ParaPr.Read_FromBinary(Reader);
-
-                break;
-            }
-        }
-
-        // Сразу нельзя запускать пересчет, т.к. возможно еще не все ссылки проставлены
-        AscCommon.CollaborativeEditing.Add_EndActions(this, {iLvl : iLvl});
-    },
-
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong( AscDFH.historyitem_type_AbstractNum );

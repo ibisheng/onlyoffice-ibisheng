@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -84,18 +84,6 @@ CShape.prototype.Is_UseInDocument = function(drawingObjects)
         }
     }
     return false;
-};
-CShape.prototype.setWorksheet = function(worksheet)
-{
-    AscCommon.History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
-    this.worksheet = worksheet;
-    if(this.spTree)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            this.spTree[i].setWorksheet(worksheet);
-        }
-    }
 };
 CShape.prototype.setDrawingBase = function(drawingBase)
 {
@@ -522,6 +510,10 @@ CShape.prototype.recalculateBounds = function()
     this.bounds.w = boundsChecker.Bounds.max_x - boundsChecker.Bounds.min_x;
     this.bounds.h = boundsChecker.Bounds.max_y - boundsChecker.Bounds.min_y;
 };
+    CShape.prototype.getEditorType = function()
+    {
+        return 0;
+    };
 
 CShape.prototype.recalculateContent = function()
 {
@@ -557,6 +549,15 @@ CShape.prototype.recalculateContent = function()
             this.txWarpStructNoTransform = oTextWarpContent.oTxWarpStructNoTransform;
         }
         return oRecalcObject;
+    }
+    else{
+        this.txWarpStructParamarks = null;
+        this.txWarpStruct = null;
+
+        this.txWarpStructParamarksNoTransform = null;
+        this.txWarpStructNoTransform = null;
+
+        this.recalcInfo.warpGeometry = null;
     }
     return null;
 };
@@ -690,7 +691,10 @@ CShape.prototype.recalculateContent2 = function()
             this.txWarpStruct2 = null;
         }
     }
-
+    else{
+        this.txWarpStructParamarks2 = null;
+        this.txWarpStruct2 = null;
+    }
 };
 
 CShape.prototype.Get_ColorMap = function()

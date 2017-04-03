@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -728,3 +728,7 @@ CDocumentControllerBase.prototype.GetColumnSize = function(){return {W : 0, H : 
  * @returns {CSectionPr?}
  */
 CDocumentControllerBase.prototype.GetCurrentSectionPr = function(){return null;};
+/**
+ * Отличие от RemoveSelection в том, что сбрасываем селект с текста, но не сбрасываем с автофигур
+ */
+CDocumentControllerBase.prototype.RemoveTextSelection = function(){};

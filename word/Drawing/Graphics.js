@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -123,8 +123,8 @@ CGraphics.prototype =
     init : function(context,width_px,height_px,width_mm,height_mm)
     {
         this.m_oContext     = context;
-        this.m_lHeightPix   = height_px;
-        this.m_lWidthPix    = width_px;
+        this.m_lHeightPix   = height_px >> 0;
+        this.m_lWidthPix    = width_px >> 0;
         this.m_dWidthMM     = width_mm;
         this.m_dHeightMM    = height_mm;
         this.m_dDpiX        = 25.4 * this.m_lWidthPix / this.m_dWidthMM;
@@ -1320,8 +1320,8 @@ CGraphics.prototype =
         var _yPxOffset = 5;
         if (AscBrowser.isRetina)
         {
-            _xPxOffset <<= 1;
-            _yPxOffset <<= 1;
+            _xPxOffset = (_xPxOffset * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+            _yPxOffset = (_yPxOffset * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
         }
 
         var __x = this.m_oFullTransform.TransformPointX(x, y) >> 0;
@@ -1378,8 +1378,8 @@ CGraphics.prototype =
         var _yPxOffset = 5;
         if (AscBrowser.isRetina)
         {
-            _xPxOffset <<= 1;
-            _yPxOffset <<= 1;
+			_xPxOffset = (_xPxOffset * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			_yPxOffset = (_yPxOffset * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
         }
 
         var __x = this.m_oFullTransform.TransformPointX(this.m_dWidthMM - x, y) >> 0;
@@ -1468,8 +1468,8 @@ CGraphics.prototype =
 
         if (_isRetina)
         {
-            _w1 <<= 1;
-            _w2 <<= 1;
+			_w1 = (_w1 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			_w2 = (_w2 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
         }
 
         var bIsNoIntGrid = this.m_bIntegerGrid;
@@ -1506,10 +1506,11 @@ CGraphics.prototype =
             }
         }
 
-        this.DrawStringASCII("Courier New", _isRetina ? 18 : 9, false, false, _header_text, 2, yPos, true);
+        var _fontSize = _isRetina ? ((9 * AscCommon.AscBrowser.retinaPixelRatio) >> 0) : 9;
+        this.DrawStringASCII("Courier New", _fontSize, false, false, _header_text, 2, yPos, true);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", _isRetina ? 18 : 9, false, false, "Same as Previous", 2, yPos, true);
+            this.DrawStringASCII2("Courier New", _fontSize, false, false, "Same as Previous", 2, yPos, true);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);
@@ -1568,8 +1569,8 @@ CGraphics.prototype =
 
         if (_isRetina)
         {
-            _w1 <<= 1;
-            _w2 <<= 1;
+			_w1 = (_w1 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+			_w2 = (_w2 * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
         }
 
         var _wmax = this.m_lWidthPix;
@@ -1608,10 +1609,11 @@ CGraphics.prototype =
             }
         }
 
-        this.DrawStringASCII("Courier New", _isRetina ? 18 : 9, false, false, _header_text, 2, yPos, false);
+        var _fontSize = _isRetina ? ((9 * AscCommon.AscBrowser.retinaPixelRatio) >> 0) : 9;
+        this.DrawStringASCII("Courier New", _fontSize, false, false, _header_text, 2, yPos, false);
 
         if (bIsRepeat)
-            this.DrawStringASCII2("Courier New", _isRetina ? 18 : 9, false, false, "Same as Previous", 2, yPos, false);
+            this.DrawStringASCII2("Courier New", _fontSize, false, false, "Same as Previous", 2, yPos, false);
 
         if (false == bIsNoIntGrid)
             this.SetIntegerGrid(false);

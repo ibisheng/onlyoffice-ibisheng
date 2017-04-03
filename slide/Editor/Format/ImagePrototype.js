@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -58,7 +58,10 @@ CImageShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
 CImageShape.prototype.getIsSingleBody = CShape.prototype.getIsSingleBody;
 CImageShape.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 CImageShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
-
+CImageShape.prototype.getEditorType = function()
+{
+    return 0;
+};
 CImageShape.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =

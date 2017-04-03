@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -42,7 +42,7 @@ var History = AscCommon.History;
  */
 function ParaHyperlink()
 {
-    ParaHyperlink.superclass.constructor.call(this);
+	CParagraphContentWithParagraphLikeContent.call(this);
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -55,7 +55,8 @@ function ParaHyperlink()
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 
-AscCommon.extendClass(ParaHyperlink, CParagraphContentWithParagraphLikeContent);
+ParaHyperlink.prototype = Object.create(CParagraphContentWithParagraphLikeContent.prototype);
+ParaHyperlink.prototype.constructor = ParaHyperlink;
 
 ParaHyperlink.prototype.Get_Id = function()
 {
@@ -64,7 +65,7 @@ ParaHyperlink.prototype.Get_Id = function()
 
 ParaHyperlink.prototype.Copy = function(Selected)
 {
-    var NewHyperlink = ParaHyperlink.superclass.Copy.apply(this, arguments);
+    var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
     NewHyperlink.Set_Value(this.Value);
     NewHyperlink.Set_ToolTip(this.ToolTip);
     NewHyperlink.Visited = this.Visited;
@@ -75,7 +76,7 @@ ParaHyperlink.prototype.Get_SelectedElementsInfo = function(Info)
 {
     Info.Set_Hyperlink(this);
 
-    ParaHyperlink.superclass.Get_SelectedElementsInfo.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo.apply(this, arguments);
 };
 
 ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
@@ -91,18 +92,18 @@ ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
         return;
     }
 
-    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+	History.Add(new CChangesHyperlinkAddItem(this, Pos, [Item]));
 
-    ParaHyperlink.superclass.Add_ToContent.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent.apply(this, arguments);
 };
 
 ParaHyperlink.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
     // Получим массив удаляемых элементов
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
-    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+    History.Add(new CChangesHyperlinkRemoveItem(this, Pos, DeletedItems));
 
-    ParaHyperlink.superclass.Remove_FromContent.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent.apply(this, arguments);
 };
 
 ParaHyperlink.prototype.Add = function(Item)
@@ -246,7 +247,7 @@ ParaHyperlink.prototype.Clear_TextFormatting = function( DefHyper )
 
 ParaHyperlink.prototype.Split = function (ContentPos, Depth)
 {
-    var NewHyperlink = ParaHyperlink.superclass.Split.apply(this, arguments);
+    var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Split.apply(this, arguments);
     NewHyperlink.Set_Value(this.Value);
     NewHyperlink.Set_ToolTip(this.ToolTip);
     return NewHyperlink;
@@ -254,7 +255,7 @@ ParaHyperlink.prototype.Split = function (ContentPos, Depth)
 
 ParaHyperlink.prototype.CopyContent = function(Selected)
 {
-    var Content = ParaHyperlink.superclass.CopyContent.apply(this, arguments);
+    var Content = CParagraphContentWithParagraphLikeContent.prototype.CopyContent.apply(this, arguments);
 
     for (var CurPos = 0, Count = Content.length; CurPos < Count; CurPos++)
     {
@@ -271,14 +272,14 @@ ParaHyperlink.prototype.CopyContent = function(Selected)
 ParaHyperlink.prototype.Draw_Elements = function(PDSE)
 {
     PDSE.VisitedHyperlink = this.Visited;
-    ParaHyperlink.superclass.Draw_Elements.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Draw_Elements.apply(this, arguments);
     PDSE.VisitedHyperlink = false;
 };
 
 ParaHyperlink.prototype.Draw_Lines = function(PDSL)
 {
     PDSL.VisitedHyperlink = this.Visited;
-    ParaHyperlink.superclass.Draw_Lines.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Draw_Lines.apply(this, arguments);
     PDSL.VisitedHyperlink = false;
 };
 //-----------------------------------------------------------------------------------
@@ -296,7 +297,7 @@ ParaHyperlink.prototype.Get_Visited = function()
 
 ParaHyperlink.prototype.Set_ToolTip = function(ToolTip)
 {
-    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
+    History.Add(new CChangesHyperlinkToolTip(this, this.ToolTip, ToolTip));
     this.ToolTip = ToolTip;
 };
 
@@ -320,268 +321,12 @@ ParaHyperlink.prototype.Get_Value = function()
 
 ParaHyperlink.prototype.Set_Value = function(Value)
 {
-    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
+    History.Add(new CChangesHyperlinkValue(this, this.Value, Value));
     this.Value = Value;
-};
-
-//-----------------------------------------------------------------------------------
-// Undo/Redo функции
-//-----------------------------------------------------------------------------------
-ParaHyperlink.prototype.Undo = function(Data)
-{
-    var Type = Data.Type;
-    switch(Type)
-    {
-        case AscDFH.historyitem_Hyperlink_AddItem :
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_RemoveItem :
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
-
-            this.Content = Array_start.concat( Data.Items, Array_end );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_Value :
-        {
-            this.Value = Data.Old;
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_ToolTip :
-        {
-            this.ToolTip = Data.Old;
-            break;
-        }
-    }
-};
-
-ParaHyperlink.prototype.Redo = function(Data)
-{
-    var Type = Data.Type;
-    switch(Type)
-    {
-        case AscDFH.historyitem_Hyperlink_AddItem :
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
-
-            this.Content = Array_start.concat( Data.Items, Array_end );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_RemoveItem :
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_Value :
-        {
-            this.Value = Data.New;
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_ToolTip :
-        {
-            this.ToolTip = Data.New;
-            break;
-        }
-    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-ParaHyperlink.prototype.Save_Changes = function(Data, Writer)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    Writer.WriteLong( AscDFH.historyitem_type_Hyperlink );
-
-    var Type = Data.Type;
-
-    // Пишем тип
-    Writer.WriteLong( Type );
-
-    switch(Type)
-    {
-        case AscDFH.historyitem_Hyperlink_AddItem :
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id элемента
-            //  }
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            Writer.WriteLong( Count );
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                    Writer.WriteLong( Data.PosArray[Index] );
-                else
-                    Writer.WriteLong( Data.Pos + Index );
-
-                Writer.WriteString2( Data.Items[Index].Get_Id() );
-            }
-
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_RemoveItem :
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            var StartPos = Writer.GetCurPosition();
-            Writer.Skip(4);
-            var RealCount = Count;
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                {
-                    if ( false === Data.PosArray[Index] )
-                        RealCount--;
-                    else
-                        Writer.WriteLong( Data.PosArray[Index] );
-                }
-                else
-                    Writer.WriteLong( Data.Pos );
-            }
-
-            var EndPos = Writer.GetCurPosition();
-            Writer.Seek( StartPos );
-            Writer.WriteLong( RealCount );
-            Writer.Seek( EndPos );
-
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_Value :
-        {
-            // String : Value
-            Writer.WriteString2( Data.New );
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_ToolTip :
-        {
-            // String : ToolTip
-            Writer.WriteString2( Data.New );
-
-            break;
-        }
-    }
-};
-
-ParaHyperlink.prototype.Load_Changes = function(Reader)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    var ClassType = Reader.GetLong();
-    if ( AscDFH.historyitem_type_Hyperlink != ClassType )
-        return;
-
-    var Type = Reader.GetLong();
-
-    switch ( Type )
-    {
-        case AscDFH.historyitem_Hyperlink_AddItem :
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id Элемента
-            //  }
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
-                var Element = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
-
-                if ( null != Element )
-                {
-                    this.Content.splice( Pos, 0, Element );
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                }
-            }
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, Reader.GetLong() );
-
-                // действие совпало, не делаем его
-                if ( false === ChangesPos )
-                    continue;
-
-                this.Content.splice( ChangesPos, 1 );
-                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
-            }
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_Value:
-        {
-            // String : Value
-            this.Value = Reader.GetString2();
-            break;
-        }
-
-        case AscDFH.historyitem_Hyperlink_ToolTip :
-        {
-            // String : ToolTip
-            this.ToolTip = Reader.GetString2();
-
-            break;
-        }
-    }
-};
-
 ParaHyperlink.prototype.Write_ToBinary2 = function(Writer)
 {
     Writer.WriteLong( AscDFH.historyitem_type_Hyperlink );
@@ -651,7 +396,7 @@ ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 
     editor.sync_HyperlinkPropCallback(HyperProps);
 
-    ParaHyperlink.superclass.Document_UpdateInterfaceState.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceState.apply(this, arguments);
 };
 
 function CParaHyperLinkStartState(HyperLink)

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -39,6 +39,7 @@ var fieldtype_UNKNOWN    = 0x0000;
 var fieldtype_MERGEFIELD = 0x0001;
 var fieldtype_PAGENUM    = 0x0002;
 var fieldtype_PAGECOUNT  = 0x0003;
+var fieldtype_FORMTEXT   = 0x0004;
 
 /**
  *
@@ -50,7 +51,7 @@ var fieldtype_PAGECOUNT  = 0x0003;
  */
 function ParaField(FieldType, Arguments, Switches)
 {
-    ParaField.superclass.constructor.call(this);
+	CParagraphContentWithParagraphLikeContent.call(this);
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -64,11 +65,15 @@ function ParaField(FieldType, Arguments, Switches)
 
     this.Bounds = {};
 
+	this.FormFieldName        = "";
+	this.FormFieldDefaultText = "";
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 
-AscCommon.extendClass(ParaField, CParagraphContentWithParagraphLikeContent);
+ParaField.prototype = Object.create(CParagraphContentWithParagraphLikeContent.prototype);
+ParaField.prototype.constructor = ParaField;
 
 ParaField.prototype.Get_Id = function()
 {
@@ -76,7 +81,7 @@ ParaField.prototype.Get_Id = function()
 };
 ParaField.prototype.Copy = function(Selected)
 {
-    var NewField = ParaField.superclass.Copy.apply(this, arguments);
+    var NewField = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
 
     // TODO: Сделать функциями с иторией
     NewField.FieldType = this.FieldType;
@@ -91,7 +96,7 @@ ParaField.prototype.Copy = function(Selected)
 ParaField.prototype.Get_SelectedElementsInfo = function(Info)
 {
     Info.Set_Field(this);
-    ParaField.superclass.Get_SelectedElementsInfo.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo.apply(this, arguments);
 };
 ParaField.prototype.Get_Bounds = function()
 {
@@ -105,16 +110,16 @@ ParaField.prototype.Get_Bounds = function()
 };
 ParaField.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
-    History.Add( this, { Type : AscDFH.historyitem_Field_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
-    ParaField.superclass.Add_ToContent.apply(this, arguments);
+	History.Add(new CChangesParaFieldAddItem(this, Pos, [Item]));
+	CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent.apply(this, arguments);
 };
 ParaField.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
-    // Получим массив удаляемых элементов
-    var DeletedItems = this.Content.slice( Pos, Pos + Count );
-    History.Add( this, { Type : AscDFH.historyitem_Field_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+	// Получим массив удаляемых элементов
+	var DeletedItems = this.Content.slice(Pos, Pos + Count);
+	History.Add(new CChangesParaFieldRemoveItem(this, Pos, DeletedItems));
 
-    ParaField.superclass.Remove_FromContent.apply(this, arguments);
+	CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent.apply(this, arguments);
 };
 ParaField.prototype.Add = function(Item)
 {
@@ -226,10 +231,17 @@ ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
     var Y0 = PRSA.Y0;
     var Y1 = PRSA.Y1;
 
-    ParaField.superclass.Recalculate_Range_Spaces.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Recalculate_Range_Spaces.apply(this, arguments);
 
-    var X1 = PRSA.X;
-    this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)] = {X0 : X0, X1 : X1, Y0: Y0, Y1 : Y1, PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()};
+	var X1 = PRSA.X;
+
+	this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)] = {
+		X0        : X0,
+		X1        : X1,
+		Y0        : Y0,
+		Y1        : Y1,
+		PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()
+	};
 };
 ParaField.prototype.Draw_HighLights = function(PDSH)
 {
@@ -237,14 +249,134 @@ ParaField.prototype.Draw_HighLights = function(PDSH)
     var Y0 = PDSH.Y0;
     var Y1 = PDSH.Y1;
 
-    ParaField.superclass.Draw_HighLights.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Draw_HighLights.apply(this, arguments);
 
     var X1 = PDSH.X;
 
-    if (Math.abs(X0 - X1) > 0.001 && true === PDSH.DrawMMFields)
+    if (Math.abs(X0 - X1) > 0.001 && (true === PDSH.DrawMMFields || fieldtype_FORMTEXT === this.Get_FieldType()))
     {
         PDSH.MMFields.Add(Y0, Y1, X0, X1, 0, 0, 0, 0  );
     }
+};
+ParaField.prototype.Is_UseInDocument = function()
+{
+	return (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph() ? true : false);
+};
+ParaField.prototype.Is_UseInParagraph = function()
+{
+	if (!this.Paragraph)
+		return false;
+
+	var ContentPos = this.Paragraph.Get_PosByElement(this);
+	if (!ContentPos)
+		return false;
+
+	return true;
+};
+ParaField.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	if (false === UseContentPos && this.Content.length > 0)
+	{
+		// При переходе в новый контент встаем в его конец
+		var CurPos = this.Content.length - 1;
+		this.Content[CurPos].Get_EndPos(false, SearchPos.Pos, Depth + 1);
+		SearchPos.Pos.Update(CurPos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+};
+ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	if (false === UseContentPos && this.Content.length > 0)
+	{
+		// При переходе в новый контент встаем в его начало
+		this.Content[0].Get_StartPos(SearchPos.Pos, Depth + 1);
+		SearchPos.Pos.Update(0, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+};
+ParaField.prototype.Remove = function(nDirection, bOnAddText)
+{
+	CParagraphContentWithParagraphLikeContent.prototype.Remove.call(this, nDirection, bOnAddText);
+
+	if (this.Is_Empty() && !bOnAddText && fieldtype_FORMTEXT === this.Get_FieldType() && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		var sDefaultText = this.FormFieldDefaultText == "" ? "     " : this.FormFieldDefaultText;
+		this.SetValue(sDefaultText);
+	}
+};
+ParaField.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
+{
+	CParagraphContentWithParagraphLikeContent.prototype.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
+
+	var CurLine = _CurLine - this.StartLine;
+	var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+	var oRangeBounds = this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)];
+	if (oRangeBounds)
+	{
+		oRangeBounds.X0 += Dx;
+		oRangeBounds.X1 += Dx;
+		oRangeBounds.Y0 += Dy;
+		oRangeBounds.Y1 += Dy;
+	}
+};
+ParaField.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_StartPos(SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
+ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_EndPos(false, SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
+ParaField.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
+{
+	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_StartPos(SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
+};
+ParaField.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
+{
+	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_WordEndPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_EndPos(false, SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Работа с данными поля
@@ -375,207 +507,48 @@ ParaField.prototype.private_GetMappedRun = function(Value)
 
     return oRun;
 };
-//----------------------------------------------------------------------------------------------------------------------
-// Undo/Redo функции
-//----------------------------------------------------------------------------------------------------------------------
-ParaField.prototype.Undo = function(Data)
+ParaField.prototype.SetFormFieldName = function(sName)
 {
-    var Type = Data.Type;
-    switch(Type)
-    {
-        case AscDFH.historyitem_Field_AddItem :
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisions();
-            break;
-        }
-
-        case AscDFH.historyitem_Field_RemoveItem :
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
-
-            this.Content = Array_start.concat( Data.Items, Array_end );
-            this.protected_UpdateSpellChecking();
-            this.private_UpdateTrackRevisions();
-            break;
-        }
-    }
+	History.Add(new CChangesParaFieldFormFieldName(this, this.FormFieldName, sName));
+	this.FormFieldName = sName;
 };
-ParaField.prototype.Redo = function(Data)
+ParaField.prototype.GetFormFieldName = function()
 {
-    var Type = Data.Type;
-    switch(Type)
-    {
-        case AscDFH.historyitem_Field_AddItem :
-        {
-            var Pos = Data.Pos;
+	return this.FormFieldName;
+};
+ParaField.prototype.SetFormFieldDefaultText = function(sText)
+{
+	History.Add(new CChangesParaFieldFormFieldDefaultText(this, this.FormFieldDefaultText, sText));
+	this.FormFieldDefaultText = sText;
+};
+ParaField.prototype.GetValue = function()
+{
+	var oText = new CParagraphGetText();
+	oText.SetBreakOnNonText(false);
+	oText.SetParaEndToSpace(true);
 
-            var Array_start = this.Content.slice( 0, Pos );
-            var Array_end   = this.Content.slice( Pos );
+	this.Get_Text(oText);
 
-            this.Content = Array_start.concat( Data.Items, Array_end );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
+	return oText.Text;
+};
+ParaField.prototype.SetValue = function(sValue)
+{
+	var oRun = this.private_GetMappedRun(sValue);
+	oRun.Apply_TextPr(this.Get_TextPr(), undefined, true);
+	this.Remove_FromContent(0, this.Content.length);
+	this.Add_ToContent(0, oRun);
+	this.Cursor_MoveToStartPos();
+};
+ParaField.prototype.IsFillingForm = function()
+{
+	if (fieldtype_FORMTEXT === this.Get_FieldType())
+		return true;
 
-        case AscDFH.historyitem_Field_RemoveItem :
-        {
-            this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-    }
+	return false;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
-ParaField.prototype.Save_Changes = function(Data, Writer)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    Writer.WriteLong(AscDFH.historyitem_type_Field);
-
-    var Type = Data.Type;
-
-    // Пишем тип
-    Writer.WriteLong( Type );
-
-    switch(Type)
-    {
-        case AscDFH.historyitem_Field_AddItem :
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id элемента
-            //  }
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            Writer.WriteLong( Count );
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                    Writer.WriteLong( Data.PosArray[Index] );
-                else
-                    Writer.WriteLong( Data.Pos + Index );
-
-                Writer.WriteString2( Data.Items[Index].Get_Id() );
-            }
-
-            break;
-        }
-
-        case AscDFH.historyitem_Field_RemoveItem :
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var bArray = Data.UseArray;
-            var Count  = Data.Items.length;
-
-            var StartPos = Writer.GetCurPosition();
-            Writer.Skip(4);
-            var RealCount = Count;
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                if ( true === bArray )
-                {
-                    if ( false === Data.PosArray[Index] )
-                        RealCount--;
-                    else
-                        Writer.WriteLong( Data.PosArray[Index] );
-                }
-                else
-                    Writer.WriteLong( Data.Pos );
-            }
-
-            var EndPos = Writer.GetCurPosition();
-            Writer.Seek( StartPos );
-            Writer.WriteLong( RealCount );
-            Writer.Seek( EndPos );
-
-            break;
-        }
-    }
-};
-ParaField.prototype.Load_Changes = function(Reader)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    var ClassType = Reader.GetLong();
-    if ( AscDFH.historyitem_type_Field != ClassType )
-        return;
-
-    var Type = Reader.GetLong();
-
-    switch ( Type )
-    {
-        case AscDFH.historyitem_Field_AddItem :
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id Элемента
-            //  }
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
-                var Element = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
-
-                if ( null != Element )
-                {
-                    this.Content.splice( Pos, 0, Element );
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                }
-            }
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-
-        case AscDFH.historyitem_Field_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, Reader.GetLong() );
-
-                // действие совпало, не делаем его
-                if ( false === ChangesPos )
-                    continue;
-
-                this.Content.splice( ChangesPos, 1 );
-                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
-            }
-            this.private_UpdateTrackRevisions();
-            this.protected_UpdateSpellChecking();
-            break;
-        }
-    }
-};
 ParaField.prototype.Write_ToBinary2 = function(Writer)
 {
     Writer.WriteLong(AscDFH.historyitem_type_Field);

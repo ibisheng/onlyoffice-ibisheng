@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -50,7 +50,8 @@ var c_oAscConfirm = {
 };
 
 var c_oAscMergeOptions = {
-  Unmerge: 0,
+  Disabled: -1,
+  None: 0,
   Merge: 1,
   MergeCenter: 2,
   MergeAcross: 3
@@ -95,7 +96,6 @@ var c_oAscSelectionDialogType = {
   None: 0,
   FormatTable: 1,
   Chart: 2,
-  DefinedName: 3,
   FormatTableChangeRange: 4
 };
 
@@ -230,7 +230,8 @@ var c_oAscChangeTableStyleInfo = {
 	rowHeader: 4,
 	rowTotal: 5,
 	rowBanded: 6,
-	filterButton: 7
+	filterButton: 7,
+	advancedSettings: 8
 };
 
 // Состояние редактора ячейки
@@ -366,7 +367,28 @@ var c_oAscPopUpSelectorType = {
     Group: 1,
     Custom: 2
   };
-
+  
+  var c_oSpecialPasteProps = {
+    paste: 0,
+    pasteOnlyFormula: 1,
+	formulaNumberFormat: 2,
+	formulaAllFormatting: 3,
+	formulaWithoutBorders: 4, 
+	formulaColumnWidth: 5,
+	mergeConditionalFormating: 6, 
+	pasteOnlyValues: 7,
+	valueNumberFormat: 8,
+	valueAllFormating: 9,
+	pasteOnlyFormating: 10,
+	transpose: 11,
+	link: 12,
+	picture: 13,
+	linkedPicture: 14,
+	
+	sourceformatting: 15,
+	destinationFormatting: 16
+  };
+  
   var c_kMaxPrintPages = 1500;
 
   //----------------------------------------------------------export----------------------------------------------------
@@ -410,7 +432,8 @@ var c_oAscPopUpSelectorType = {
   prot['ConfirmPutMergeRange'] = prot.ConfirmPutMergeRange;
   window['Asc']['c_oAscMergeOptions'] = window['Asc'].c_oAscMergeOptions = c_oAscMergeOptions;
   prot = c_oAscMergeOptions;
-  prot['Unmerge'] = prot.Unmerge;
+  prot['Disabled'] = prot.Disabled;
+  prot['None'] = prot.None;
   prot['Merge'] = prot.Merge;
   prot['MergeCenter'] = prot.MergeCenter;
   prot['MergeAcross'] = prot.MergeAcross;
@@ -439,7 +462,6 @@ var c_oAscPopUpSelectorType = {
   prot['None'] = prot.None;
   prot['FormatTable'] = prot.FormatTable;
   prot['Chart'] = prot.Chart;
-  prot['DefinedName'] = prot.DefinedName;
   prot['FormatTableChangeRange'] = prot.FormatTableChangeRange;
   window['Asc']['c_oAscHyperlinkType'] = window['Asc'].c_oAscHyperlinkType = c_oAscHyperlinkType;
   prot = c_oAscHyperlinkType;
@@ -512,6 +534,7 @@ var c_oAscPopUpSelectorType = {
   prot['rowTotal'] = prot.rowTotal;
   prot['rowBanded'] = prot.rowBanded;
   prot['filterButton'] = prot.filterButton;
+  prot['advancedSettings'] = prot.advancedSettings;
   window['Asc']['c_oAscAutoFilterTypes'] = window['Asc'].c_oAscAutoFilterTypes = c_oAscAutoFilterTypes;
   prot = c_oAscAutoFilterTypes;
   prot['ColorFilter'] = prot.ColorFilter;
@@ -558,4 +581,23 @@ var c_oAscPopUpSelectorType = {
   prot['Individual'] = prot.Individual;
   prot['Group'] = prot.Group;
   prot['Custom'] = prot.Custom;
+  window['Asc']['c_oSpecialPasteProps'] = window['Asc'].c_oSpecialPasteProps = c_oSpecialPasteProps;
+  prot = c_oSpecialPasteProps;
+  prot['paste'] = prot.paste;
+  prot['pasteOnlyFormula'] = prot.pasteOnlyFormula;
+  prot['formulaNumberFormat'] = prot.formulaNumberFormat;
+  prot['formulaAllFormatting'] = prot.formulaAllFormatting;
+  prot['formulaWithoutBorders'] = prot.formulaWithoutBorders;
+  prot['formulaColumnWidth'] = prot.formulaColumnWidth;
+  prot['mergeConditionalFormating'] = prot.mergeConditionalFormating;
+  prot['pasteOnlyValues'] = prot.pasteOnlyValues;
+  prot['valueNumberFormat'] = prot.valueNumberFormat;
+  prot['valueAllFormating'] = prot.valueAllFormating;
+  prot['pasteOnlyFormating'] = prot.pasteOnlyFormating;
+  prot['transpose'] = prot.transpose;
+  prot['link'] = prot.link;
+  prot['picture'] = prot.picture;
+  prot['linkedPicture'] = prot.linkedPicture;
+  prot['sourceformatting'] = prot.sourceformatting;
+  prot['destinationFormatting'] = prot.destinationFormatting;
 })(window);

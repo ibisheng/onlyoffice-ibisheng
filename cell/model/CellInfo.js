@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -41,12 +41,12 @@
   var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 
   /** @constructor */
-  function asc_CCellFlag(m, s, w, t, l) {
-    this.merge = !!m;
-    this.shrinkToFit = !!s;
-    this.wrapText = !!w;
-    this.selectionType = t;
-    this.lockText = !!l;
+  function asc_CCellFlag() {
+    this.merge = Asc.c_oAscMergeOptions.None;
+    this.shrinkToFit = false;
+    this.wrapText = false;
+    this.selectionType = null;
+    this.lockText = false;
     this.multiselect = false;
   }
 
@@ -196,7 +196,16 @@
       this.tableName = null;
 
       this.tableRange = null;
-
+      
+	  this.firstRow = null;
+      this.lastRow = null;
+      this.bandHor = null;
+      this.firstCol = null;
+      this.lastCol = null;
+      this.bandVer = null;
+      this.filterButton = null;
+	  
+	  //info send in menu - what you can do with row/col into table
       this.isInsertRowAbove = null;
       this.isInsertRowBelow = null;
       this.isInsertColumnLeft = null;
@@ -204,6 +213,9 @@
       this.isDeleteRow = null;
       this.isDeleteColumn = null;
       this.isDeleteTable = null;
+	  
+	  this.altText = null;
+	  this.altTextSummary = null;
     }
     asc_CFormatTableInfo.prototype = {
       asc_getTableStyleName: function() {
@@ -244,6 +256,12 @@
         return this.isDeleteColumn;
       }, asc_getIsDeleteTable: function() {
         return this.isDeleteTable;
+      },
+	  
+	  asc_getTitle: function() {
+        return this.altText;
+      }, asc_getDescription: function() {
+        return this.altTextSummary;
       }
     };
 
@@ -266,7 +284,7 @@
     this.isLockedTable = false;
     this.isLockedSparkline = false;
     this.styleName = null;
-    this.numFormatType = null;
+    this.numFormatInfo = null;
     this.angle = null;
     this.autoFilterInfo = null;
     this.formatTableInfo = null;
@@ -324,8 +342,8 @@
   asc_CCellInfo.prototype.asc_getStyleName = function () {
     return this.styleName;
   };
-  asc_CCellInfo.prototype.asc_getNumFormatType = function () {
-    return this.numFormatType;
+  asc_CCellInfo.prototype.asc_getNumFormatInfo = function () {
+    return this.numFormatInfo;
   };
   asc_CCellInfo.prototype.asc_getAngle = function () {
     return this.angle;
@@ -447,6 +465,8 @@
   prot["asc_getIsDeleteRow"] = prot.asc_getIsDeleteRow;
   prot["asc_getIsDeleteColumn"] = prot.asc_getIsDeleteColumn;
   prot["asc_getIsDeleteTable"] = prot.asc_getIsDeleteTable;
+  prot["asc_getTitle"] = prot.asc_getTitle;
+  prot["asc_getDescription"] = prot.asc_getDescription;
 
   window["AscCommonExcel"].asc_CCellInfo = asc_CCellInfo;
   prot = asc_CCellInfo.prototype;
@@ -467,7 +487,7 @@
   prot["asc_getLockedTable"] = prot.asc_getLockedTable;
   prot["asc_getLockedSparkline"] = prot.asc_getLockedSparkline;
   prot["asc_getStyleName"] = prot.asc_getStyleName;
-  prot["asc_getNumFormatType"] = prot.asc_getNumFormatType;
+  prot["asc_getNumFormatInfo"] = prot.asc_getNumFormatInfo;
   prot["asc_getAngle"] = prot.asc_getAngle;
   prot["asc_getAutoFilterInfo"] = prot.asc_getAutoFilterInfo;
   prot["asc_getFormatTableInfo"] = prot.asc_getFormatTableInfo;

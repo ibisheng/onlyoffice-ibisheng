@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -117,7 +117,7 @@
 		this.TextArea_Not_ContentEditableDiv = true;//AscCommon.AscBrowser.isIeEdge ? false : true;
 		this.HtmlArea = null;
 
-		this.HtmlAreaOffset = 40;
+		this.HtmlAreaOffset = 50; // height in pix
 
 		this.LockerTargetTimer = -1;
 
@@ -162,6 +162,15 @@
 		this.IsInitialInputContext = false;
 
 		this.IsDisableKeyPress = false;
+
+		this.virtualKeyboardClickTimeout = -1;
+		this.virtualKeyboardClickPrevent = false;
+
+		this.AndroidKeyboardDetectBackspace = false;
+
+		// если этот флаг включен - то мы не следим за датой в onCompositionUpdate
+		// а смотрим .value на старте и энде. а промежуток - разница между этим
+		this.UseValueInComposition = AscCommon.AscBrowser.isAndroid && AscCommon.AscBrowser.isChrome;
 	}
 
 	CTextInput.prototype =
@@ -253,6 +262,7 @@
 			};
 			this.HtmlArea["onkeypress"] = function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 			    if (oThis.IsDisableKeyPress == true)
 			    {
 			        // macOS Sierra send keypress before copy event
@@ -271,27 +281,33 @@
 
 			this.HtmlArea.addEventListener("input", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onInput(e);
 			}, false);
 			this.HtmlArea.addEventListener("textInput", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onTextInput(e);
 			}, false);
 			this.HtmlArea.addEventListener("text", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onTextInput(e);
 			}, false);
 
 			this.HtmlArea.addEventListener("compositionstart", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onCompositionStart(e);
 			}, false);
 			this.HtmlArea.addEventListener("compositionupdate", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onCompositionUpdate(e);
 			}, false);
 			this.HtmlArea.addEventListener("compositionend", function(e)
 			{
+				oThis.AndroidKeyboardDetectBackspace = false;
 				return oThis.onCompositionEnd(e);
 			}, false);
 
@@ -308,6 +324,33 @@
 			 */
 
 			this.Api.Input_UpdatePos();
+
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				this.HtmlArea.onclick = function (e)
+				{
+					var _this = AscCommon.g_inputContext;
+
+					if (-1 != _this.virtualKeyboardClickTimeout)
+					{
+						clearTimeout(_this.virtualKeyboardClickTimeout);
+						_this.virtualKeyboardClickTimeout = -1;
+					}
+
+					if (!_this.virtualKeyboardClickPrevent)
+						return;
+
+					_this.HtmlArea.readOnly = true;
+					_this.virtualKeyboardClickPrevent = false;
+					AscCommon.stopEvent(e);
+					_this.virtualKeyboardClickTimeout = setTimeout(function ()
+					{
+						_this.HtmlArea.readOnly = false;
+						_this.virtualKeyboardClickTimeout = -1;
+					}, 1);
+					return false;
+				};
+			}
 		},
 
 		onResize : function(_editorContainerId)
@@ -360,6 +403,12 @@
                 _elem2.style.bottom = "0px";
                 _elem2.style.width = "100%";
                 _elem2.style.height = "100%";
+
+                if (AscCommon.AscBrowser.isIE)
+				{
+					document.body.style["msTouchAction"] = "none";
+					document.body.style["touchAction"] = "none";
+				}
 			}
 		},
 
@@ -602,6 +651,21 @@
 			}
 
 			var _value = this.getAreaValue();
+			if (this.UseValueInComposition)
+			{
+				var _data = _value.substring(this.ieNonCompositionPrefix.length);
+
+				if (c_oCompositionState.process == this.compositionState)
+				{
+					this.onCompositionUpdate(e, false, _data, false);
+				}
+
+				if (this.TextInputAfterComposition)
+				{
+					this.onCompositionEnd({ data : "nonWait" }, _data);
+				}
+			}
+
 			if (!this.KeyDownFlag && c_oCompositionState.end == this.compositionState && !this.TextInputAfterComposition && _value != "" && _value != this.ieNonCompositionPrefixConfirm)
 			{
 				ti_console_log("ti: external input");
@@ -719,7 +783,7 @@
 					ti_console_log("ti: ea space");
 				}
 
-				if (!AscCommon.AscBrowser.isMozilla/* && !this.IsUseInputEventOnlyWithCtx*/)
+				if (!AscCommon.AscBrowser.isMozilla/* && !this.IsUseInputEventOnlyWithCtx*/ || AscCommon.AscBrowser.isAndroid)
 				{
 					// у мозиллы есть проблемы, если делать тут clear
 					// например на корейском языке - слетает композиция в некоторых случаях
@@ -965,6 +1029,12 @@
 
 		onKeyDown : function(e)
 		{
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				if (e.keyCode == 229 && e.charCode == 0 && e.key == "Unidentified")
+					this.AndroidKeyboardDetectBackspace = true;
+			}
+
 			this.isChromeKeysNoKeyPressPresent = false;
 			if (this.isSystem && this.isShow)
 			{
@@ -1060,6 +1130,9 @@
 		onKeyUp : function(e)
 		{
 			this.isChromeKeysNoKeyPressPresent = false;
+			var oldAndroidKeyboardDetectBackspace = this.AndroidKeyboardDetectBackspace;
+			this.AndroidKeyboardDetectBackspace = false;
+
 			if (this.isSystem && this.isShow)
 				return;
 
@@ -1078,7 +1151,19 @@
 			}
 
 			if (c_oCompositionState.end == this.compositionState)
+			{
+				if (AscCommon.AscBrowser.isAndroid && oldAndroidKeyboardDetectBackspace)
+				{
+					if (e.keyCode == 229 && e.charCode == 0 && e.key == "Unidentified")
+					{
+						// backspace? по-другому определить не могу
+						this.emulateKeyDownApi(8);
+						return false;
+					}
+				}
+
 				return this.Api.onKeyUp(e);
+			}
 
 			if (AscCommon.AscBrowser.isChrome ||
 				AscCommon.AscBrowser.isSafari ||
@@ -1174,6 +1259,17 @@
 			//console.log("[apiCompositeStart]");
 			this.Api.Begin_CompositeInput();
 			this.compositionStateApi = c_oCompositionState.process;
+
+			if (this.UseValueInComposition)
+			{
+				// если ввести, войти в
+				// композицию, стереть до начала и начать снова ввод. Тогда, после последнего onCompositionEnd
+				// не придет onInput - и флаг не сбросится
+				this.TextInputAfterComposition = false;
+
+				// запоминаем, с чего все началось
+				this.ieNonCompositionPrefix = this.getAreaValue();
+			}
 		},
 
 		apiCompositeReplace : function(_value)
@@ -1217,6 +1313,12 @@
 			if (this.isSystem)
 			{
 				this.isChromeKeysNoKeyPressPresent = false;
+				return;
+			}
+
+			if (this.UseValueInComposition)
+			{
+				this.apiCompositeStart();
 				return;
 			}
 
@@ -1273,6 +1375,12 @@
 			if (this.isSystem)
 			{
 				this.isChromeKeysNoKeyPressPresent = false;
+				return;
+			}
+
+			if (this.UseValueInComposition && undefined === _data)
+			{
+				this.compositionState = c_oCompositionState.process;
 				return;
 			}
 
@@ -1548,6 +1656,13 @@
 				return;
 			}
 
+			var isUseData = (_data !== undefined);
+			if (this.UseValueInComposition)
+			{
+				var _dataNew = this.getAreaValue();
+				_data = _dataNew.substring(this.ieNonCompositionPrefix.length);
+			}
+
 			ti_console_log("ti: onCompositionEnd");
 
 			if (!this.IsUseFirstTextInputAfterComposition && this.isWaitFirstTextInputEvent(e))
@@ -1585,7 +1700,31 @@
 			}
 			else
 			{
-				this.apiCompositeEnd();
+				if (this.UseValueInComposition)
+				{
+					if (isUseData)
+						this.apiCompositeEnd();
+					else
+					{
+						setTimeout(function() {
+							var _context = AscCommon.g_inputContext;
+
+							if (_context.TextInputAfterComposition)
+							{
+								var _value = _context.getAreaValue();
+								var _data = _value.substring(_context.ieNonCompositionPrefix.length);
+								_context.onCompositionEnd({ data : "nonWait" }, _data);
+
+								_context.clear();
+								_context.TextInputAfterComposition = false;
+							}
+						}, 50);
+					}
+				}
+				else
+				{
+					this.apiCompositeEnd();
+				}
 			}
 
 			this.unlockTarget();
@@ -1649,13 +1788,44 @@
 				var _input = window['AscCommon'].g_inputContext;
 				if (_input.compositionState == c_oCompositionState.process)
 				{
-					//_input.apiCompositeEnd();
+					if (_input.UseValueInComposition)
+						_input.apiCompositeEnd();
+
 					_input.clear();
 				}
 
 			}, 10);
 
 			return true;
+		},
+
+		isCompositionProcess : function()
+		{
+			return this.compositionState == c_oCompositionState.process;
+		},
+
+		preventVirtualKeyboard : function(e)
+		{
+			//AscCommon.stopEvent(e);
+
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				this.virtualKeyboardClickPrevent = true;
+			}
+		},
+
+		enableVirtualKeyboard : function()
+		{
+			if (AscCommon.AscBrowser.isAndroid)
+			{
+				if (-1 != this.virtualKeyboardClickTimeout)
+				{
+					clearTimeout(this.virtualKeyboardClickTimeout);
+					this.virtualKeyboardClickTimeout = -1;
+				}
+
+				this.virtualKeyboardClickPrevent = false;
+			}
 		}
 	};
 

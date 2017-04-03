@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -40,13 +40,12 @@
 //todo
 //BinaryCommonWriter
 
-	function extendClass (Child, Parent) {
-		var F = function() { };
-		F.prototype = Parent.prototype;
-		Child.prototype = new F();
-		Child.prototype.constructor = Child;
-		Child.superclass = Parent.prototype;
+	function inherit(proto) {
+		function F() {}
+		F.prototype = proto;
+		return new F;
 	}
+	if (!Object.create || !Object['create']) Object['create'] = Object.create = inherit;
 
 var c_oSerConstants = {
     ErrorFormat: -2,
@@ -824,7 +823,8 @@ function CellAddress(){
 		this._invalidId = true;
 	}
 }
-extendClass(CellAddress, CellBase);
+CellAddress.prototype = Object.create(CellBase.prototype);
+CellAddress.prototype.constructor = CellAddress;
 CellAddress.prototype._isDigit=function(symbol){
 	return '0' <= symbol && symbol <= '9';
 };
@@ -1168,7 +1168,6 @@ function isRealObject(obj)
 
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommon'] = window['AscCommon'] || {};
-	window["AscCommon"].extendClass = extendClass;
   window['AscCommon'].c_oSerConstants = c_oSerConstants;
   window['AscCommon'].c_oSerPropLenType = c_oSerPropLenType;
   window['AscCommon'].c_oSer_ColorType = c_oSer_ColorType;

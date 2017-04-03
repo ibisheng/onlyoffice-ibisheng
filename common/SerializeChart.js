@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1884,9 +1884,9 @@ BinaryChartWriter.prototype.WriteCT_StrData = function (oVal) {
             oThis.WriteCT_UnsignedInt(oVal.ptCount);
         });
     }
-    if (null != oVal.pt) {
-        for (var i = 0, length = oVal.pt.length; i < length; ++i) {
-            var oCurVal = oVal.pt[i];
+    if (null != oVal.pts) {
+        for (var i = 0, length = oVal.pts.length; i < length; ++i) {
+            var oCurVal = oVal.pts[i];
             if (null != oCurVal) {
                 this.bs.WriteItem(c_oserct_strdataPT, function () {
                     oThis.WriteCT_StrVal(oCurVal);
@@ -3744,16 +3744,16 @@ BinaryChartWriter.prototype.WriteCT_Bar3DChart = function (oVal) {
             oThis.WriteCT_GapAmount(oVal.gapWidth);
         });
     }
-    // if (null != oVal.gapDepth) {
-    // this.bs.WriteItem(c_oserct_bar3dchartGAPDEPTH, function () {
-    // oThis.WriteCT_GapAmount(oVal.gapDepth);
-    // });
-    // }
-    // if (null != oVal.shape) {
-    // this.bs.WriteItem(c_oserct_bar3dchartSHAPE, function () {
-    // oThis.WriteCT_Shape(oVal.shape);
-    // });
-    // }
+    if (null != oVal.gapDepth) {
+        this.bs.WriteItem(c_oserct_bar3dchartGAPDEPTH, function () {
+            oThis.WriteCT_GapAmount(oVal.gapDepth);
+    });
+    }
+    if (null != oVal.shape) {
+        this.bs.WriteItem(c_oserct_bar3dchartSHAPE, function () {
+            oThis.WriteCT_Shape(oVal.shape);
+        });
+    }
     if (null != oVal.axId) {
         for (var i = 0, length = oVal.axId.length; i < length; ++i) {
             var oCurVal = oVal.axId[i];
@@ -10512,8 +10512,8 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
             return oThis.ReadCT_Surface3DChart(t, l, oNewVal, aChartWithAxis);
         });
         //surface -> line
-        var line = this.ConvertSurfaceToLine(oNewVal, aChartWithAxis);
-        val.addChart(line);
+        //var line = this.ConvertSurfaceToLine(oNewVal, aChartWithAxis);
+        val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaSURFACECHART === type) {
         var oNewVal = new AscFormat.CSurfaceChart();
@@ -10521,8 +10521,8 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
             return oThis.ReadCT_SurfaceChart(t, l, oNewVal, aChartWithAxis);
         });
         //surface -> line
-        var line = this.ConvertSurfaceToLine(oNewVal, aChartWithAxis);
-        val.addChart(line);
+        //var line = this.ConvertSurfaceToLine(oNewVal, aChartWithAxis);
+        val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaCATAX === type) {
         var oNewVal = new AscFormat.CCatAx();

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -41,9 +41,29 @@ var HitInLine = AscFormat.HitInLine;
 var isRealObject = AscCommon.isRealObject;
 var History = AscCommon.History;
 
+
+    window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetSpPr] = function(oClass, value){oClass.spPr = value;};
+    window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetGraphicObject] = function(oClass, value){
+        oClass.graphicObject = value;
+        if(value)
+        {
+            value.Parent = oClass;
+            oClass.graphicObject.Index = 0;
+        }
+    };
+    window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetSetNvSpPr] = function(oClass, value){oClass.nvGraphicFramePr = value;};
+    window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetSetParent] = function(oClass, value){oClass.parent = value;};
+    window['AscDFH'].drawingsChangesMap[AscDFH.historyitem_GraphicFrameSetSetGroup] = function(oClass, value){oClass.group = value;};
+
+    AscDFH.changesFactory[AscDFH.historyitem_GraphicFrameSetSpPr] = AscDFH.CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_GraphicFrameSetGraphicObject] = AscDFH.CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_GraphicFrameSetSetNvSpPr] = AscDFH.CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_GraphicFrameSetSetParent] = AscDFH.CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_GraphicFrameSetSetGroup] = AscDFH.CChangesDrawingsObject;
+
 function CGraphicFrame()
 {
-    CGraphicFrame.superclass.constructor.call(this);
+	AscFormat.CGraphicObjectBase.call(this);
     this.graphicObject = null;
     this.nvGraphicFramePr = null;
 
@@ -63,8 +83,8 @@ function CGraphicFrame()
     this.RecalcInfo = {};
 }
 
-AscCommon.extendClass(CGraphicFrame, AscFormat.CGraphicObjectBase);
-
+	CGraphicFrame.prototype = Object.create(AscFormat.CGraphicObjectBase.prototype);
+	CGraphicFrame.prototype.constructor = CGraphicFrame;
 
 CGraphicFrame.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 
@@ -169,14 +189,14 @@ CGraphicFrame.prototype.getDocContent= function()
 };
 
 CGraphicFrame.prototype.setSpPr= function(spPr)
-    {
-        History.Add(this, {Type:AscDFH.historyitem_GraphicFrameSetSpPr, oldPr: this.spPr, newPr: spPr});
+{
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_GraphicFrameSetSpPr, this.spPr, spPr));
         this.spPr = spPr;
 };
 
 CGraphicFrame.prototype.setGraphicObject= function(graphicObject)
     {
-        History.Add(this, {Type: AscDFH.historyitem_GraphicFrameSetGraphicObject, oldPr: this.graphicObject, newPr: graphicObject});
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_GraphicFrameSetGraphicObject, this.graphicObject, graphicObject));
         this.graphicObject = graphicObject;
         if(this.graphicObject)
         {
@@ -186,20 +206,20 @@ CGraphicFrame.prototype.setGraphicObject= function(graphicObject)
 };
 
 CGraphicFrame.prototype.setNvSpPr= function(pr)
-    {
-        History.Add(this, {Type: AscDFH.historyitem_GraphicFrameSetSetNvSpPr, oldPr: this.nvGraphicFramePr, newPr: pr});
+{
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_GraphicFrameSetSetNvSpPr, this.nvGraphicFramePr, pr));
         this.nvGraphicFramePr = pr;
 };
 
 CGraphicFrame.prototype.setParent= function(parent)
-    {
-        History.Add(this, {Type:AscDFH.historyitem_GraphicFrameSetSetParent, oldPr: this.parent, newPr: parent});
+{
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_GraphicFrameSetSetParent, this.parent, parent));
         this.parent = parent;
 };
 
 CGraphicFrame.prototype.setGroup= function(group)
     {
-        History.Add(this, {Type: AscDFH.historyitem_GraphicFrameSetSetGroup, oldPr: this.group, newPr: group});
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_GraphicFrameSetSetGroup, this.group, group));
         this.group = group;
 };
 
@@ -979,7 +999,7 @@ CGraphicFrame.prototype.setParagraphIndent = function(val)
 
 CGraphicFrame.prototype.setParent2 = function(parent)
     {
-        History.Add(this, {Type:AscDFH.historyitem_GraphicFrameSetSetParent, oldPr: this.parent, newPr: parent});
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_GraphicFrameSetSetParent, this.parent, parent));
         this.parent = parent;
 };
 
@@ -1072,176 +1092,14 @@ CGraphicFrame.prototype.Refresh_RecalcData2 = function()
         this.recalcInfo.recalculateTable = true;
         this.recalcInfo.recalculateSizes = true;
         this.addToRecalculate();
-};
-
-CGraphicFrame.prototype.Undo = function(data)
+    };
+CGraphicFrame.prototype.checkTypeCorrect = function()
     {
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_AutoShapes_SetLocks:
-            {
-                this.locks = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetBDeleted:
-            {
-                this.bDeleted = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSpPr         :
-            {
-                this.spPr = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetGraphicObject:
-            {
-                this.graphicObject = data.oldPr;
-                if(this.graphicObject)
-                {
-                    this.graphicObject.Index = 0;
-                    this.graphicObject.Parent = this;
-                }
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSetNvSpPr    :
-            {
-                this.nvGraphicFramePr = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSetParent    :
-            {
-                this.parent = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSetGroup     :
-            {
-                this.group = data.oldPr;
-                break;
-            }
+        if(!this.graphicObject){
+            return false;
         }
-};
-
-CGraphicFrame.prototype.Redo = function(data)
-    {
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_AutoShapes_SetLocks:
-            {
-                this.locks = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetBDeleted:
-            {
-                this.bDeleted = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSpPr         :
-            {
-                this.spPr = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetGraphicObject:
-            {
-                this.graphicObject = data.newPr;
-                if(this.graphicObject)
-                {
-                    this.graphicObject.Index = 0;
-                    this.graphicObject.Parent = this;
-                }
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSetNvSpPr    :
-            {
-                this.nvGraphicFramePr = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSetParent    :
-            {
-                this.parent = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSetGroup     :
-            {
-                this.group = data.newPr;
-                break;
-            }
-        }
-};
-
-CGraphicFrame.prototype.Save_Changes = function(data, w)
-    {
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_AutoShapes_SetLocks:
-            {
-                w.WriteLong(data.newPr);
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSpPr          :
-            case AscDFH.historyitem_GraphicFrameSetGraphicObject :
-            case AscDFH.historyitem_GraphicFrameSetSetNvSpPr     :
-            case AscDFH.historyitem_GraphicFrameSetSetParent     :
-            case AscDFH.historyitem_GraphicFrameSetSetGroup      :
-            {
-                AscFormat.writeObject(w, data.newPr);
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetBDeleted:
-            {
-                AscFormat.writeBool(w, data.newPr);
-                break;
-            }
-        }
-};
-
-CGraphicFrame.prototype.Load_Changes = function(r)
-    {
-        var  type = r.GetLong();
-        switch(type)
-        {
-            case AscDFH.historyitem_AutoShapes_SetLocks:
-            {
-                this.locks = r.GetLong();
-                break;
-            }
-            case AscDFH.historyitem_ShapeSetBDeleted:
-            {
-                this.bDeleted = AscFormat.readBool(r);
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSpPr         :
-            {
-                this.spPr = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetGraphicObject:
-            {
-                this.graphicObject = AscFormat.readObject(r);
-                if(this.graphicObject)
-                {
-                    this.graphicObject.Index = 0;
-                    this.graphicObject.Parent = this;
-                }
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSetNvSpPr    :
-            {
-                this.nvGraphicFramePr = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSetParent    :
-            {
-                this.parent = AscFormat.readObject(r);
-                break;
-            }
-            case AscDFH.historyitem_GraphicFrameSetSetGroup     :
-            {
-                this.group = AscFormat.readObject(r);
-                break;
-            }
-        }
-};
+        return true;
+    };
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};

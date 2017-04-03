@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -41,10 +41,11 @@
  */
 function CCollaborativeEditing()
 {
-    CCollaborativeEditing.superclass.constructor.call(this);
+	AscCommon.CCollaborativeEditingBase.call(this);
 }
 
-AscCommon.extendClass(CCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
+CCollaborativeEditing.prototype = Object.create(AscCommon.CCollaborativeEditingBase.prototype);
+CCollaborativeEditing.prototype.constructor = CCollaborativeEditing;
 
 CCollaborativeEditing.prototype.Have_OtherChanges = function()
 {
@@ -148,6 +149,19 @@ CCollaborativeEditing.prototype.Check_MergeData = function()
 //-----------------------------------------------------------------------------------
 CCollaborativeEditing.prototype.Get_GlobalLock = function()
 {
+	return false;
+};
+CCollaborativeEditing.prototype.Set_GlobalLock = function(isLock)
+{
+
+};
+CCollaborativeEditing.prototype.Get_GlobalLockSelection = function()
+{
+	return false;
+};
+CCollaborativeEditing.prototype.Set_GlobalLockSelection = function(isLock)
+{
+
 };
 
 CCollaborativeEditing.prototype.OnStart_CheckLock = function()

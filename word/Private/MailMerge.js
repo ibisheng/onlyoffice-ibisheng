@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -279,7 +279,7 @@ CDocument.prototype.Preview_MailMergeResult = function(Index)
     {
         this.MailMergePreview = true;
         this.Selection_Remove();
-        AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+        AscCommon.CollaborativeEditing.Set_GlobalLock(true);
     }
 
     this.FieldsManager.Update_MailMergeFields(this.MailMergeMap[Index]);
@@ -293,7 +293,7 @@ CDocument.prototype.EndPreview_MailMergeResult = function()
         return;
 
     this.MailMergePreview = false;
-    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
+    AscCommon.CollaborativeEditing.Set_GlobalLock(false);
 
     this.FieldsManager.Restore_MailMergeTemplate();
     this.Recalculate_FromStart(true);

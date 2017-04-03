@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -57,9 +57,10 @@
      */
     function ApiDocument(Document)
     {
-        ApiDocument.superclass.constructor.call(this, Document);
+		ApiDocumentContent.call(this, Document);
     }
-    AscCommon.extendClass(ApiDocument, ApiDocumentContent);
+	ApiDocument.prototype = Object.create(ApiDocumentContent.prototype);
+	ApiDocument.prototype.constructor = ApiDocument;
 
     /**
      * Class representing a paragraph properties.
@@ -88,10 +89,11 @@
      */
     function ApiParagraph(Paragraph)
     {
-        ApiParagraph.superclass.constructor.call(this, this, Paragraph.Pr.Copy());
+		ApiParaPr.call(this, this, Paragraph.Pr.Copy());
         this.Paragraph = Paragraph;
     }
-    AscCommon.extendClass(ApiParagraph, ApiParaPr);
+	ApiParagraph.prototype = Object.create(ApiParaPr.prototype);
+	ApiParagraph.prototype.constructor = ApiParagraph;
 
     /**
      * Class representing a table properties.
@@ -110,10 +112,11 @@
      */
     function ApiTable(Table)
     {
-        ApiTable.superclass.constructor.call(this, this, Table.Pr.Copy());
+		ApiTablePr.call(this, this, Table.Pr.Copy());
         this.Table = Table;
     }
-    AscCommon.extendClass(ApiTable, ApiTablePr);
+	ApiTable.prototype = Object.create(ApiTablePr.prototype);
+	ApiTable.prototype.constructor = ApiTable;
 
     /**
      * Class representing a text properties.
@@ -132,10 +135,11 @@
      */
     function ApiRun(Run)
     {
-        ApiRun.superclass.constructor.call(this, this, Run.Pr.Copy());
+		ApiTextPr.call(this, this, Run.Pr.Copy());
         this.Run = Run;
     }
-    AscCommon.extendClass(ApiRun, ApiTextPr);
+	ApiRun.prototype = Object.create(ApiTextPr.prototype);
+	ApiRun.prototype.constructor = ApiRun;
 
     /**
      * Class representing a style.
@@ -172,10 +176,11 @@
      */
     function ApiTableRow(Row)
     {
-        ApiTableRow.superclass.constructor.call(this, this, Row.Pr.Copy());
+		ApiTableRowPr.call(this, this, Row.Pr.Copy());
         this.Row = Row;
     }
-    AscCommon.extendClass(ApiTableRow, ApiTableRowPr);
+	ApiTableRow.prototype = Object.create(ApiTableRowPr.prototype);
+	ApiTableRow.prototype.constructor = ApiTableRow;
 
     /**
      * Class representing a table cell proprties.
@@ -193,10 +198,11 @@
      */
     function ApiTableCell(Cell)
     {
-        ApiTableCell.superclass.constructor.call(this, this, Cell.Pr.Copy());
+		ApiTableCellPr.call(this, this, Cell.Pr.Copy());
         this.Cell = Cell;
     }
-    AscCommon.extendClass(ApiTableCell, ApiTableCellPr);
+	ApiTableCell.prototype = Object.create(ApiTableCellPr.prototype);
+	ApiTableCell.prototype.constructor = ApiTableCell;
 
     /**
      * Class representing a numbering properties.
@@ -252,10 +258,11 @@
      */
     function ApiImage(Image)
     {
-        ApiImage.superclass.constructor.call(this, Image.parent);
+		ApiDrawing.call(this, Image.parent);
         this.Image = Image
     }
-    AscCommon.extendClass(ApiImage, ApiDrawing);
+	ApiImage.prototype = Object.create(ApiDrawing.prototype);
+	ApiImage.prototype.constructor = ApiImage;
 
     /**
      * Class representing a shape.
@@ -263,10 +270,11 @@
      * */
     function ApiShape(Shape)
     {
-        ApiShape.superclass.constructor.call(this, Shape.parent);
+		ApiDrawing.call(this, Shape.parent);
         this.Shape = Shape;
     }
-    AscCommon.extendClass(ApiShape, ApiDrawing);
+	ApiShape.prototype = Object.create(ApiDrawing.prototype);
+	ApiShape.prototype.constructor = ApiShape;
 
     /**
      * Class representing a Chart.
@@ -275,10 +283,11 @@
      */
     function ApiChart(Chart)
     {
-        ApiChart.superclass.constructor.call(this, Chart.parent);
+		ApiDrawing.call(this, Chart.parent);
         this.Chart = Chart;
     }
-    AscCommon.extendClass(ApiChart, ApiDrawing);
+	ApiChart.prototype = Object.create(ApiDrawing.prototype);
+	ApiChart.prototype.constructor = ApiChart;
 
     /**
      * Class representing a base class for color types
@@ -294,9 +303,10 @@
      */
     function ApiRGBColor(r, g, b)
     {
-        ApiRGBColor.superclass.constructor.call(this, AscFormat.CreateUniColorRGB(r, g, b));
+		ApiUniColor.call(this, AscFormat.CreateUniColorRGB(r, g, b));
     }
-    AscCommon.extendClass(ApiRGBColor, ApiUniColor);
+	ApiRGBColor.prototype = Object.create(ApiUniColor.prototype);
+	ApiRGBColor.prototype.constructor = ApiRGBColor;
 
     /**
      * Class representing a Scheme Color
@@ -324,9 +334,10 @@
             case "tx2": {  oUniColor.color.id      = 16; break;}
             default: {  oUniColor.color.id      = 16; break;}
         }
-        ApiSchemeColor.superclass.constructor.call(this, oUniColor);
+		ApiUniColor.call(this, oUniColor);
     }
-    AscCommon.extendClass(ApiSchemeColor, ApiUniColor);
+	ApiSchemeColor.prototype = Object.create(ApiUniColor.prototype);
+	ApiSchemeColor.prototype.constructor = ApiSchemeColor;
 
     /**
      * Class representing a Preset Color
@@ -337,9 +348,10 @@
         var oUniColor = new AscFormat.CUniColor();
         oUniColor.setColor(new AscFormat.CPrstColor());
         oUniColor.color.id = sPresetColor;
-        ApiPresetColor.superclass.constructor.call(this, oUniColor);
+		ApiUniColor.call(this, oUniColor);
     }
-    AscCommon.extendClass(ApiPresetColor, ApiUniColor);
+	ApiPresetColor.prototype = Object.create(ApiUniColor.prototype);
+	ApiPresetColor.prototype.constructor = ApiPresetColor;
 
     /**
      * Class represent a base class fill
@@ -532,6 +544,12 @@
      *     "greenYellow" | "grey" | "honeydew" | "hotPink" | "indianRed" | "indigo" | "ivory" | "khaki" | "lavender" | "lavenderBlush" | "lawnGreen" | "lemonChiffon" | "lightBlue" | "lightCoral" | "lightCyan" | "lightGoldenrodYellow" | "lightGray" | "lightGreen" | "lightGrey" | "lightPink" | "lightSalmon" | "lightSeaGreen" | "lightSkyBlue" | "lightSlateGray" | "lightSlateGrey" | "lightSteelBlue" | "lightYellow" | "lime" | "limeGreen" | "linen" | "ltBlue" | "ltCoral" | "ltCyan" | "ltGoldenrodYellow" | "ltGray" | "ltGreen" | "ltGrey" | "ltPink" | "ltSalmon" | "ltSeaGreen" | "ltSkyBlue" | "ltSlateGray" | "ltSlateGrey" | "ltSteelBlue" | "ltYellow" | "magenta" | "maroon" | "medAquamarine" | "medBlue" | "mediumAquamarine" | "mediumBlue" | "mediumOrchid" | "mediumPurple" | "mediumSeaGreen" | "mediumSlateBlue" | "mediumSpringGreen" | "mediumTurquoise" | "mediumVioletRed" | "medOrchid" | "medPurple" | "medSeaGreen" | "medSlateBlue" | "medSpringGreen" | "medTurquoise" | "medVioletRed" | "midnightBlue" | "mintCream" | "mistyRose" | "moccasin" | "navajoWhite" | "navy" | "oldLace" | "olive" | "oliveDrab" | "orange" | "orangeRed" | "orchid" | "paleGoldenrod" | "paleGreen" | "paleTurquoise" | "paleVioletRed" | "papayaWhip" | "peachPuff" | "peru" | "pink" | "plum" | "powderBlue" | "purple" | "red" | "rosyBrown" | "royalBlue" | "saddleBrown" | "salmon" | "sandyBrown" | "seaGreen" | "seaShell" | "sienna" | "silver" | "skyBlue" | "slateBlue" | "slateGray" | "slateGrey" | "snow" | "springGreen" | "steelBlue" | "tan" | "teal" | "thistle" | "tomato" | "turquoise" | "violet" | "wheat" | "white" | "whiteSmoke" | "yellow" | "yellowGreen")} PresetColor
      * */
 
+
+    /**
+     *
+     * @typedef {("none" | "nextTo" | "low" | "high")} TickLabelPosition
+     * **/
+
     /**
      * @typedef {"tile" | "stretch"} BlipFillType
      * */
@@ -560,6 +578,12 @@
      * @memberof Api
      * @returns {ApiDocument}
      */
+
+
+    /**
+     * @typedef {("cross" | "in" | "none" | "out")} TickMark
+     * */
+
     Api.prototype.GetDocument = function()
     {
         return new ApiDocument(this.WordControl.m_oLogicDocument);
@@ -1219,7 +1243,7 @@
         if (null != sOldId && oOldStyle)
         {
             oStyles.Remove(sOldId);
-            oStyle.Set_Id(sOldId);
+            oStyles.RemapIdReferences(sOldId, oStyle.Get_Id());
         }
 
         oStyles.Add(oStyle);
@@ -1359,12 +1383,169 @@
         return true;
     };
 
+    /**
+     * Receive a report about all comments collected in the document.
+	 * @returns {object}
+     */
+    ApiDocument.prototype.GetCommentsReport = function()
+    {
+		var oResult = {};
+		var oReport = this.Document.Api.asc_GetCommentsReportByAuthors();
+		for (var sUserName in oReport)
+		{
+			var arrUserComments = oReport[sUserName];
+			oResult[sUserName] = [];
+
+			for (var nIndex = 0, nCount = arrUserComments.length; nIndex < nCount; ++nIndex)
+			{
+				var isAnswer     = oReport[sUserName][nIndex].Top ? false : true;
+				var oCommentData = oReport[sUserName][nIndex].Data;
+
+				if (isAnswer)
+				{
+					oResult[sUserName].push({
+						"IsAnswer"       : true,
+						"CommentMessage" : oCommentData.GetText(),
+						"Date"           : oCommentData.GetDateTime()
+					});
+				}
+				else
+				{
+					var sQuoteText = oCommentData.GetQuoteText();
+					oResult[sUserName].push({
+						"IsAnswer"       : false,
+						"CommentMessage" : oCommentData.GetText(),
+						"Date"           : oCommentData.GetDateTime(),
+						"QuoteText"      : sQuoteText,
+						"IsSolved"       : oCommentData.IsSolved()
+					});
+				}
+			}
+		}
+
+		return oResult;
+    };
+
+	/**
+	 * Receive a report about every change which was made in review mode in the document.
+	 * @returns {object}
+	 */
+	ApiDocument.prototype.GetReviewReport = function()
+	{
+		var oResult = {};
+		var oReport = this.Document.Api.asc_GetTrackRevisionsReportByAuthors();
+		for (var sUserName in oReport)
+		{
+			var arrUsersChanges = oReport[sUserName];
+			oResult[sUserName] = [];
+
+			for (var nIndex = 0, nCount = arrUsersChanges.length; nIndex < nCount; ++nIndex)
+			{
+				var oChange = oReport[sUserName][nIndex];
+
+				var nType = oChange.get_Type();
+				var oElement = {};
+				// TODO: Посмотреть почем Value приходит массивом.
+				if (c_oAscRevisionsChangeType.TextAdd === nType)
+				{
+					oElement = {
+						"Type" : "TextAdd",
+						"Value" : oChange.get_Value().length ? oChange.get_Value()[0] : ""
+					};
+				}
+				else if (c_oAscRevisionsChangeType.TextRem == nType)
+				{
+					oElement = {
+						"Type" : "TextRem",
+						"Value" : oChange.get_Value().length ? oChange.get_Value()[0] : ""
+					};
+				}
+				else if (c_oAscRevisionsChangeType.ParaAdd === nType)
+				{
+					oElement = {
+						"Type" : "ParaAdd"
+					};
+				}
+				else if (c_oAscRevisionsChangeType.ParaRem === nType)
+				{
+					oElement = {
+						"Type" : "ParaRem"
+					};
+				}
+				else if (c_oAscRevisionsChangeType.TextPr === nType)
+				{
+					oElement = {
+						"Type" : "TextPr"
+					};
+				}
+				else if (c_oAscRevisionsChangeType.ParaPr === nType)
+				{
+					oElement = {
+						"Type" : "ParaPr"
+					};
+				}
+				else
+				{
+					oElement = {
+						"Type" : "Unknown"
+					};
+				}
+				oElement["Date"] = oChange.get_DateTime();
+				oResult[sUserName].push(oElement);
+			}
+		}
+		return oResult;
+	};
     //------------------------------------------------------------------------------------------------------------------
     //
     // ApiParagraph
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Insert watermark on each page of document
+     * @param {?string} } [sText="WATERMARK"]
+     * @param {?boolean} [bIsDiagonal=true]
+     */
+    ApiDocument.prototype.InsertWatermark = function(sText, bIsDiagonal){
+        var oSectPrMap = {};
+        if(this.Document.SectPr){
+            oSectPrMap[this.Document.SectPr.Get_Id()] = this.Document.SectPr;
+        }
+        var oElement;
+        for(var i = 0; i < this.Document.Content.length; ++i){
+            oElement = this.Document.Content[i];
+            if(oElement instanceof Paragraph){
+                if(oElement.SectPr){
+                    oSectPrMap[oElement.SectPr.Get_Id()] = oElement.SectPr;
+                }
+            }
+        }
+        var oHeadersMap = {};
+        var oApiSection, oHeader;
+        for(var sId in oSectPrMap){
+            if(oSectPrMap.hasOwnProperty(sId)){
+                oApiSection = new ApiSection(oSectPrMap[sId]);
+                oHeader = oApiSection.GetHeader("title", false);
+                if(oHeader){
+                    oHeadersMap[oHeader.Document.Get_Id()] = oHeader;
+                }
+                oHeader = oApiSection.GetHeader("even", false);
+                if(oHeader){
+                    oHeadersMap[oHeader.Document.Get_Id()] = oHeader;
+                }
+                oHeader = oApiSection.GetHeader("default", true);
+                if(oHeader){
+                    oHeadersMap[oHeader.Document.Get_Id()] = oHeader;
+                }
+            }
+        }
+        for(var sId in oHeadersMap){
+            if(oHeadersMap.hasOwnProperty(sId)){
+                privateInsertWatermarkToContent(this.Document.Api, oHeadersMap[sId], sText, bIsDiagonal);
+            }
+        }
+    };
     /**
      * Get the type of this class.
      * @returns {"document"}
@@ -1834,7 +2015,9 @@
             else if ("default" === sType)
                 this.Section.Set_Header_Default(oHeader);
         }
-
+        if(!oHeader){
+            return null;
+        }
         return new ApiDocumentContent(oHeader.Get_DocumentContent());
     };
     /**
@@ -3937,65 +4120,49 @@
      *  Specifies a chart title
      *  @param {string} sTitle
      *  @param {hps} nFontSize
+     *  @param {?bool} bIsBold
      */
-    ApiChart.prototype.SetTitle = function (sTitle, nFontSize)
+    ApiChart.prototype.SetTitle = function (sTitle, nFontSize, bIsBold)
     {
-        if(this.Chart)
-        {
-            this.Chart.chart.setTitle(this.CreateTitle(sTitle, nFontSize));
-        }
+        AscFormat.builder_SetChartTitle(this.Chart, sTitle, nFontSize, bIsBold);
     };
 
     /**
      *  Specifies a horizontal axis title
      *  @param {string} sTitle
      *  @param {hps} nFontSize
+     *  @param {?bool} bIsBold
      * */
-    ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize)
+    ApiChart.prototype.SetHorAxisTitle = function (sTitle, nFontSize, bIsBold)
     {
-        if(this.Chart)
-        {
-            var horAxis = this.Chart.chart.plotArea.getHorizontalAxis();
-            if(horAxis)
-            {
-                horAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
-            }
-        }
+        AscFormat.builder_SetChartHorAxisTitle(this.Chart, sTitle, nFontSize, bIsBold);
     };
 
     /**
      *  Specifies a vertical axis title
      *  @param {string} sTitle
      *  @param {hps} nFontSize
+     *  @param {?bool} bIsBold
      * */
-    ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize)
+    ApiChart.prototype.SetVerAxisTitle = function (sTitle, nFontSize, bIsBold)
     {
-        if(this.Chart)
-        {
-            var verAxis = this.Chart.chart.plotArea.getVerticalAxis();
-            if(verAxis)
-            {
-                if(typeof sTitle === "string" && sTitle.length > 0)
-                {
-                    verAxis.setTitle(this.CreateTitle(sTitle, nFontSize));
-                    if(verAxis.title){
-                        var _body_pr = new AscFormat.CBodyPr();
-                        _body_pr.reset();
-                        if(!verAxis.title.txPr)
-                        {
-                            verAxis.title.setTxPr(AscFormat.CreateTextBodyFromString("", this.Chart.getDrawingDocument(), verAxis.title));
-                        }
-                        var _text_body =  verAxis.title.txPr;
-                        _text_body.setBodyPr(_body_pr);
-                        verAxis.title.setOverlay(false);
-                    }
-                }
-                else
-                {
-                    verAxis.setTitle(null);
-                }
-            }
-        }
+        AscFormat.builder_SetChartVertAxisTitle(this.Chart, sTitle, nFontSize, bIsBold);
+    };
+
+    /**
+     * Specifies a  vertical axis orientation
+     * @param {bool} bIsMinMax
+     * */
+    ApiChart.prototype.SetVerAxisOrientation = function(bIsMinMax){
+        AscFormat.builder_SetChartVertAxisOrientation(this.Chart, bIsMinMax);
+    };
+
+    /**
+     * Specifies a  horizontal axis orientation
+     * @param {bool} bIsMinMax
+     * */
+    ApiChart.prototype.SetHorAxisOrientation = function(bIsMinMax){
+        AscFormat.builder_SetChartHorAxisOrientation(this.Chart, bIsMinMax);
     };
 
     /**
@@ -4057,36 +4224,135 @@
     };
 
     /**
+     * Specifies a legend position
+     * @number nFontSize
+     * */
+    ApiChart.prototype.SetLegendFontSize = function(nFontSize)
+    {
+        AscFormat.builder_SetLegendFontSize(this.Chart, nFontSize);
+    };
+
+    /**
      * Spicifies a show options for data labels
      * @param {boolean} bShowSerName
      * @param {boolean} bShowCatName
      * @param {boolean} bShowVal
+     * @param {boolean} bShowPercent
      * */
-    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal)
+    ApiChart.prototype.SetShowDataLabels = function(bShowSerName, bShowCatName, bShowVal, bShowPercent)
     {
-        if(this.Chart && this.Chart.chart && this.Chart.chart.plotArea && this.Chart.chart.plotArea.charts[0])
-        {
-            var oChart = this.Chart.chart.plotArea.charts[0];
-            if(false == bShowSerName && false == bShowCatName && false == bShowVal)
-            {
-                if(oChart.dLbls)
-                {
-                    oChart.setDLbls(null);
-                }
-            }
-            if(!oChart.dLbls)
-            {
-                oChart.setDLbls(new AscFormat.CDLbls());
-            }
-            oChart.dLbls.setSeparator(",");
-            oChart.dLbls.setShowSerName(true == bShowSerName);
-            oChart.dLbls.setShowCatName(true == bShowCatName);
-            oChart.dLbls.setShowVal(true == bShowVal);
-            oChart.dLbls.setShowLegendKey(false);
-            //oChart.dLbls.setShowPercent(false);
-            oChart.dLbls.setShowBubbleSize(false);
-        }
+        AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
     };
+
+
+    /**
+     * Spicifies tick labels position vertical axis
+     * @param {TickLabelPosition} sTickLabelPosition
+     * */
+    ApiChart.prototype.SetVertAxisTickLabelPosition = function(sTickLabelPosition)
+    {
+        AscFormat.builder_SetChartVertAxisTickLablePosition(this.Chart, sTickLabelPosition);
+    };
+    /**
+     * Spicifies tick labels position horizontal axis
+     * @param {TickLabelPosition} sTickLabelPosition
+     * */
+    ApiChart.prototype.SetHorAxisTickLabelPosition = function(sTickLabelPosition)
+    {
+        AscFormat.builder_SetChartHorAxisTickLablePosition(this.Chart, sTickLabelPosition);
+    };
+
+
+    /**
+     * Specifies major tick mark for horizontal axis
+     * @param {TickMark} sTickMark
+     * */
+
+    ApiChart.prototype.SetHorAxisMajorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartHorAxisMajorTickMark(this.Chart, sTickMark);
+    };
+    /**
+     * Specifies minor tick mark for horizontal axis
+     * @param {TickMark} sTickMark
+     * */
+
+    ApiChart.prototype.SetHorAxisMinorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartHorAxisMinorTickMark(this.Chart, sTickMark);
+    };
+
+    /**
+     * Specifies major tick mark for vertical axis
+     * @param {TickMark} sTickMark
+     * */
+
+    ApiChart.prototype.SetVertAxisMajorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartVerAxisMajorTickMark(this.Chart, sTickMark);
+    };
+
+    /**
+     * Specifies minor tick mark for vertical axis
+     * @param {TickMark} sTickMark
+     * */
+    ApiChart.prototype.SetVertAxisMinorTickMark = function(sTickMark){
+        AscFormat.builder_SetChartVerAxisMinorTickMark(this.Chart, sTickMark);
+    };
+
+
+
+    /**
+     * Specifies major vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMajorVerticalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetVerAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+    /**
+     * Specifies minor vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMinorVerticalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetVerAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+
+    /**
+     * Specifies major horizontal gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMajorHorizontalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetHorAxisMajorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+    /**
+     * Specifies minor vertical gridline's visual properties
+     * @param {?ApiStroke} oStroke
+     * */
+    ApiChart.prototype.SetMinorHorizontalGridlines = function(oStroke)
+    {
+        AscFormat.builder_SetHorAxisMinorGridlines(this.Chart, oStroke ?  oStroke.Ln : null);
+    };
+
+
+    /**
+     * Specifies font size for labels of horizontal axis
+     * @param {number} nFontSize
+     */
+    ApiChart.prototype.SetHorAxisLablesFontSize = function(nFontSize){
+        AscFormat.builder_SetHorAxisFontSize(this.Chart, nFontSize);
+    };
+
+    /**
+     * Specifies font size for labels of vertical axis
+     * @param {number} nFontSize
+     */
+    ApiChart.prototype.SetVertAxisLablesFontSize = function(nFontSize){
+        AscFormat.builder_SetVerAxisFontSize(this.Chart, nFontSize);
+    };
+
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -4240,6 +4506,9 @@
     ApiDocument.prototype["SetEvenAndOddHdrFtr"]     = ApiDocument.prototype.SetEvenAndOddHdrFtr;
     ApiDocument.prototype["CreateNumbering"]         = ApiDocument.prototype.CreateNumbering;
     ApiDocument.prototype["InsertContent"]           = ApiDocument.prototype.InsertContent;
+	ApiDocument.prototype["GetCommentsReport"]       = ApiDocument.prototype.GetCommentsReport;
+	ApiDocument.prototype["GetReviewReport"]         = ApiDocument.prototype.GetReviewReport;
+	ApiDocument.prototype["InsertWatermark"]         = ApiDocument.prototype.InsertWatermark;
 
     ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
@@ -4436,12 +4705,28 @@
     ApiShape.prototype["SetVerticalTextAlign"]       = ApiShape.prototype.SetVerticalTextAlign;
     ApiShape.prototype["SetPaddings"]                = ApiShape.prototype.SetPaddings;
 
-    ApiChart.prototype["GetClassType"]               = ApiChart.prototype.GetClassType;
-    ApiChart.prototype["SetTitle"]                   = ApiChart.prototype.SetTitle;
-    ApiChart.prototype["SetHorAxisTitle"]            = ApiChart.prototype.SetHorAxisTitle;
-    ApiChart.prototype["SetVerAxisTitle"]            = ApiChart.prototype.SetVerAxisTitle;
-    ApiChart.prototype["SetLegendPos"]               = ApiChart.prototype.SetLegendPos;
-    ApiChart.prototype["SetShowDataLabels"]          = ApiChart.prototype.SetShowDataLabels;
+    ApiChart.prototype["GetClassType"]                 = ApiChart.prototype.GetClassType;
+    ApiChart.prototype["SetTitle"]                     = ApiChart.prototype.SetTitle;
+    ApiChart.prototype["SetHorAxisTitle"]              = ApiChart.prototype.SetHorAxisTitle;
+    ApiChart.prototype["SetVerAxisTitle"]              = ApiChart.prototype.SetVerAxisTitle;
+    ApiChart.prototype["SetVerAxisOrientation"]        = ApiChart.prototype.SetVerAxisOrientation;
+    ApiChart.prototype["SetHorAxisOrientation"]        = ApiChart.prototype.SetHorAxisOrientation;
+    ApiChart.prototype["SetLegendPos"]                 = ApiChart.prototype.SetLegendPos;
+    ApiChart.prototype["SetLegendFontSize"]            = ApiChart.prototype.SetLegendFontSize;
+    ApiChart.prototype["SetShowDataLabels"]            = ApiChart.prototype.SetShowDataLabels;
+    ApiChart.prototype["SetVertAxisTickLabelPosition"] = ApiChart.prototype.SetVertAxisTickLabelPosition;
+    ApiChart.prototype["SetHorAxisTickLabelPosition"]  = ApiChart.prototype.SetHorAxisTickLabelPosition;
+
+    ApiChart.prototype["SetHorAxisMajorTickMark"]  =  ApiChart.prototype.SetHorAxisMajorTickMark;
+    ApiChart.prototype["SetHorAxisMinorTickMark"]  =  ApiChart.prototype.SetHorAxisMinorTickMark;
+    ApiChart.prototype["SetVertAxisMajorTickMark"]  =  ApiChart.prototype.SetVertAxisMajorTickMark;
+    ApiChart.prototype["SetVertAxisMinorTickMark"]  =  ApiChart.prototype.SetVertAxisMinorTickMark;
+    ApiChart.prototype["SetMajorVerticalGridlines"]  =  ApiChart.prototype.SetMajorVerticalGridlines;
+    ApiChart.prototype["SetMinorVerticalGridlines"]  =  ApiChart.prototype.SetMinorVerticalGridlines;
+    ApiChart.prototype["SetMajorHorizontalGridlines"]  =  ApiChart.prototype.SetMajorHorizontalGridlines;
+    ApiChart.prototype["SetMinorHorizontalGridlines"]  =  ApiChart.prototype.SetMinorHorizontalGridlines;
+    ApiChart.prototype["SetHorAxisLablesFontSize"]  =  ApiChart.prototype.SetHorAxisLablesFontSize;
+    ApiChart.prototype["SetVertAxisLablesFontSize"]  =  ApiChart.prototype.SetVertAxisLablesFontSize;
 
     ApiFill.prototype["GetClassType"]                = ApiFill.prototype.GetClassType;
 
@@ -4690,6 +4975,110 @@
             return Asc.c_oAscRelativeFromV.Paragraph;
 
         return Asc.c_oAscRelativeFromV.Page;
+    }
+
+    function private_CreateWatermark(sText, bDiagonal){
+        var sText2 = ((typeof (sText) === "string") && (sText.length > 0)) ? sText : "WATERMARK";
+        var sFontName2 = undefined;
+        var nFontSize2 = 2;
+        var oTextFill2 = AscFormat.CreateUnfilFromRGB(127, 127, 127);
+        oTextFill2.transparent = 127;
+
+        var MainLogicDocument = (editor && editor.WordControl && editor.WordControl.m_oLogicDocument ? editor && editor.WordControl && editor.WordControl.m_oLogicDocument : null);
+        var TrackRevisions = (MainLogicDocument ? MainLogicDocument.Is_TrackRevisions() : false);
+
+        if (MainLogicDocument && true === TrackRevisions)
+            MainLogicDocument.Set_TrackRevisions(false);
+
+        var oShape = new AscFormat.CShape();
+        oShape.setWordShape(true);
+        oShape.setBDeleted(false);
+        oShape.createTextBoxContent();
+        var oSpPr = new AscFormat.CSpPr();
+        var oXfrm = new AscFormat.CXfrm();
+        oXfrm.setOffX(0);
+        oXfrm.setOffY(0);
+
+
+        var fHeight = 45;
+        var fWidth;
+        if(bDiagonal !== false){
+            fWidth = 175;
+            oXfrm.setRot(7*Math.PI/4);
+        }
+        else{
+            fWidth = 165;
+        }
+
+        oXfrm.setExtX(fWidth);
+        oXfrm.setExtY(fHeight);
+        oSpPr.setXfrm(oXfrm);
+        oXfrm.setParent(oSpPr);
+        oSpPr.setFill(AscFormat.CreateNoFillUniFill());
+        oSpPr.setLn(AscFormat.CreateNoFillLine());
+        oSpPr.setGeometry(AscFormat.CreateGeometry("rect"));
+        oShape.setSpPr(oSpPr);
+        oSpPr.setParent(oShape);
+        var oContent = oShape.getDocContent();
+        AscFormat.AddToContentFromString(oContent, sText2);
+        var oTextPr = new CTextPr();
+        oTextPr.FontSize = nFontSize2;
+        oTextPr.RFonts.Ascii = sFontName2;
+        oTextPr.TextFill = oTextFill2;
+        oContent.Set_ApplyToAll(true);
+        oContent.Paragraph_Add(new ParaTextPr(oTextPr));
+        oContent.Set_ParagraphAlign(AscCommon.align_Center);
+        oContent.Set_ApplyToAll(false);
+        var oBodyPr = oShape.getBodyPr().createDuplicate();
+        oBodyPr.rot = 0;
+        oBodyPr.spcFirstLastPara = false;
+        oBodyPr.vertOverflow = AscFormat.nOTOwerflow;
+        oBodyPr.horzOverflow = AscFormat.nOTOwerflow;
+        oBodyPr.vert = AscFormat.nVertTThorz;
+        oBodyPr.lIns = 2.54;
+        oBodyPr.tIns = 1.27;
+        oBodyPr.rIns = 2.54;
+        oBodyPr.bIns = 1.27;
+        oBodyPr.numCol = 1;
+        oBodyPr.spcCol = 0;
+        oBodyPr.rtlCol = 0;
+        oBodyPr.fromWordArt = false;
+        oBodyPr.anchor = 4;
+        oBodyPr.anchorCtr = false;
+        oBodyPr.forceAA = false;
+        oBodyPr.compatLnSpc = true;
+        oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreatePrstTxWarpGeometry("textPlain");}, this, []);
+        oShape.setBodyPr(oBodyPr);
+        
+        var oLogicDocument = private_GetLogicDocument();
+        var oDrawingDocuemnt = private_GetDrawingDocument();
+        var oDrawing = new ParaDrawing(fWidth, fHeight, null, oDrawingDocuemnt, oLogicDocument, null);
+        oShape.setParent(oDrawing);
+        oDrawing.Set_GraphicObject(oShape);
+        var oApiShape = new ApiShape(oShape);
+        oApiShape.SetWrappingStyle("inFront");
+        oApiShape.SetHorAlign("margin", "center");
+        oApiShape.SetVerAlign("margin", "center");
+        return oApiShape;
+    }
+
+
+    function privateInsertWatermarkToContent(oApi, oContent, sText, bIsDiagonal){
+        if(oContent){
+            var nElementsCount = oContent.GetElementsCount();
+            for(var i = 0; i < nElementsCount; ++i){
+                var oElement = oContent.GetElement(i);
+                if(oElement.GetClassType() === "paragraph"){
+                    oElement.AddDrawing(private_CreateWatermark(sText, bIsDiagonal));
+                    break;
+                }
+            }
+            if(i === nElementsCount){
+                oElement = oApi.CreateParagraph();
+                oElement.AddDrawing(private_CreateWatermark(sText, bIsDiagonal));
+                oContent.Push(oElement);
+            }
+        }
     }
 
     ApiDocument.prototype.OnChangeParaPr = function(oApiParaPr)

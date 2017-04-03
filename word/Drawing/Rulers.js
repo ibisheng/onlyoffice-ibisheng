@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1191,7 +1191,7 @@ function CHorRuler()
                     min = this.m_dIndentLeft - this.m_dIndentLeftFirst;
 
                 if (newVal < min)
-                    newVal = this.m_dIndentLeft_old;
+                    newVal = min;
 
                 if (_presentations)
                 {

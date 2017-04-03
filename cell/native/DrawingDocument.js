@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -3448,11 +3448,6 @@ function CDrawingDocument(drawingObjects)
 
     }
 
-    this.SendThemeColorScheme = function()
-    {
-
-    }
-
     this.DrawImageTextureFillShape = function(url)
     {
 
@@ -3597,7 +3592,7 @@ function CDrawingDocument(drawingObjects)
             table.Recalculate_Page(0);
             table.Draw(0, graphics);
 
-            var _styleD = new CAscTableStyle();
+            var _styleD = new Asc.CAscTableStyle();
             _styleD.Type = 0;
             _styleD.Image = _canvas.toDataURL("image/png");
             _styleD.Id = i;

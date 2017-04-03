@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -156,15 +156,17 @@ function BinaryPPTYLoader()
 
     this.ImageMapChecker = null;
 
-    this.IsUseFullSrc = false;
+    this.IsUseFullUrl = false;
+	this.insertDocumentUrlsData = null;
     this.RebuildImages = [];
 
     this.textBodyTextFit = [];
 	this.DocReadResult = null;
 
-    this.Start_UseFullUrl = function()
+    this.Start_UseFullUrl = function(insertDocumentUrlsData)
     {
         this.IsUseFullUrl = true;
+		this.insertDocumentUrlsData = insertDocumentUrlsData;
     };
 
     this.End_UseFullUrl = function()
@@ -682,6 +684,11 @@ function BinaryPPTYLoader()
                 this.presentation.slideMasters[0] = AscFormat.GenerateDefaultMasterSlide(this.presentation.themes[0]);
                 this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
             }
+            if(this.presentation.slideMasters[0].sldLayoutLst.length === 0){
+
+                this.presentation.slideMasters[0].sldLayoutLst[0] = AscFormat.GenerateDefaultSlideLayout(this.presentation.slideMasters[0]);
+                this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
+            }
             if (this.presentation.Slides.length == 0)
             {
                 this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.presentation.slideLayouts[0]);
@@ -1070,7 +1077,7 @@ function BinaryPPTYLoader()
         s.Seek2(_end_rec);
     }
 
-    this.ReadTableStyle = function()
+    this.ReadTableStyle = function(bNotAddStyle)
     {
         var s = this.stream;
 
@@ -1093,7 +1100,7 @@ function BinaryPPTYLoader()
                 {
                     var _id = s.GetString2();
                    // _style.Id = _id;
-					if(AscCommon.isRealObject(this.presentation.TableStylesIdMap))
+					if(AscCommon.isRealObject(this.presentation.TableStylesIdMap) && !bNotAddStyle)
 						this.presentation.TableStylesIdMap[_style.Id] = true;
                     this.map_table_styles[_id] = _style;
                     break;
@@ -1269,8 +1276,15 @@ function BinaryPPTYLoader()
             _style.TablePr.TableBorders.Right = _style.TableWholeTable.TableCellPr.TableCellBorders.Right;
             delete _style.TableWholeTable.TableCellPr.TableCellBorders.Right;
         }
-		if(this.presentation.globalTableStyles)
-			this.presentation.globalTableStyles.Add(_style);
+		if(bNotAddStyle)
+		{
+			return _style;
+		}
+		else
+		{
+			if(this.presentation.globalTableStyles)
+				this.presentation.globalTableStyles.Add(_style);
+		}
     };
 
     this.ReadTableStylePart = function()
@@ -2021,6 +2035,12 @@ function BinaryPPTYLoader()
                                             s.Skip2(6); // len + start attributes + type
 
                                             var sReadPath = s.GetString2();
+											if (this.IsUseFullUrl && this.insertDocumentUrlsData && this.insertDocumentUrlsData.imageMap) {
+												var sReadPathNew = this.insertDocumentUrlsData.imageMap[AscCommon.g_oDocumentUrls.mediaPrefix + sReadPath];
+												if(sReadPathNew){
+													sReadPath = sReadPathNew;
+												}
+											}
                                             uni_fill.fill.setRasterImageId(sReadPath);
 
                                             // TEST version ---------------
@@ -3383,13 +3403,13 @@ function BinaryPPTYLoader()
                 break;
 
             if (0 == _at)
-                hf.dt = s.GetBool();
+                hf.setDt(s.GetBool());
             else if (1 == _at)
-                hf.ftr = s.GetBool();
+                hf.setFtr(s.GetBool());
             else if (2 == _at)
-                hf.hdr = s.GetBool();
+                hf.setHdr(s.GetBool());
             else if (3 == _at)
-                hf.sldNum = s.GetBool();
+                hf.setSldNum(s.GetBool());
         }
 
         s.Seek2(_e);
@@ -4049,8 +4069,6 @@ function BinaryPPTYLoader()
                     var oGeometry = this.ReadGeometry(spPr.xfrm);
                     if(oGeometry && oGeometry.pathLst.length > 0)
                         spPr.setGeometry(oGeometry);
-                    if(spPr.geometry)
-                        spPr.geometry.setParent(spPr);
                     break;
                 }
                 case 2:
@@ -4916,7 +4934,27 @@ function BinaryPPTYLoader()
 
         s.Seek2(_end_rec);
         return shape;
-    }
+    };
+
+    this.CheckGroupXfrm = function(oGroup){
+        if(!oGroup || !oGroup.spPr){
+            return;
+        }
+        if(!oGroup.spPr.xfrm && oGroup.spTree.length > 0){
+            var oXfrm = new AscFormat.CXfrm();
+            oXfrm.setOffX(0);
+            oXfrm.setOffY(0);
+            oXfrm.setChOffX(0);
+            oXfrm.setChOffY(0);
+            oXfrm.setExtX(50);
+            oXfrm.setExtY(50);
+            oXfrm.setChExtX(50);
+            oXfrm.setChExtY(50);
+            oGroup.spPr.setXfrm(oXfrm);
+            oGroup.updateCoordinatesAfterInternalResize();
+            oGroup.spPr.xfrm.setParent(oGroup.spPr);
+        }
+    };
 
     this.ReadGroupShape = function()
     {
@@ -4972,7 +5010,7 @@ function BinaryPPTYLoader()
                             case 1:
                             {
                                 _object = this.ReadShape();
-                                if (!IsHiddenObj(_object))
+                                if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
                                     shape.spTree[shape.spTree.length-1].setGroup(shape);
@@ -4983,7 +5021,7 @@ function BinaryPPTYLoader()
                             case 2:
                             {
                                 _object = this.ReadPic(6 === _type);
-                                if (!IsHiddenObj(_object))
+                                if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
                                     shape.spTree[shape.spTree.length-1].setGroup(shape);
@@ -4993,7 +5031,7 @@ function BinaryPPTYLoader()
                             case 3:
                             {
                                 _object = this.ReadCxn();
-                                if (!IsHiddenObj(_object))
+                                if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
                                     shape.spTree[shape.spTree.length-1].setGroup(shape);
@@ -5003,7 +5041,7 @@ function BinaryPPTYLoader()
                             case 4:
                             {
                                 _object = this.ReadGroupShape();
-                                if (!IsHiddenObj(_object))
+                                if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm && _object.spTree.length > 0)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
                                     shape.spTree[shape.spTree.length-1].setGroup(shape);
@@ -5037,7 +5075,7 @@ function BinaryPPTYLoader()
                 }
             }
         }
-
+        this.CheckGroupXfrm(shape);
         s.Seek2(_end_rec);
         this.TempGroupObject = null;
         return shape;
@@ -5445,10 +5483,7 @@ function BinaryPPTYLoader()
                         AscCommon.pptx_content_loader.Reader.ImageMapChecker = this.ImageMapChecker;
                         var oBinaryChartReader = new AscCommon.BinaryChartReader(_stream);
                         oBinaryChartReader.ExternalReadCT_ChartSpace(_length, _chart, this.presentation);
-                        if(AscCommon.isRealObject(_nvGraphicFramePr) && AscFormat.isRealNumber(_nvGraphicFramePr.locks))
-                        {
-                            _chart.setLocks(_nvGraphicFramePr.locks);
-                        }
+
                     }
 
                     s.Seek2(_pos + _length);
@@ -5474,6 +5509,13 @@ function BinaryPPTYLoader()
                 _graphic_frame.setSpPr(new AscFormat.CSpPr());
                 _graphic_frame.spPr.setParent(_graphic_frame);
             }
+            if(!_xfrm){
+                _xfrm = new AscFormat.CXfrm();
+                _xfrm.setOffX(0);
+                _xfrm.setOffY(0);
+                _xfrm.setExtX(0);
+                _xfrm.setExtY(0);
+            }
             _graphic_frame.spPr.setXfrm(_xfrm);
             _xfrm.setParent(_graphic_frame.spPr);
             _graphic_frame.setSpPr(_graphic_frame.spPr);
@@ -5492,8 +5534,27 @@ function BinaryPPTYLoader()
                 _chart.setSpPr(new AscFormat.CSpPr());
                 _chart.spPr.setParent(_chart);
             }
+            if(!_xfrm){
+                _xfrm = new AscFormat.CXfrm();
+                _xfrm.setOffX(0);
+                _xfrm.setOffY(0);
+                _xfrm.setExtX(0);
+                _xfrm.setExtY(0);
+            }
+            if(AscCommon.isRealObject(_nvGraphicFramePr) )
+            {
+                _chart.setNvSpPr(_nvGraphicFramePr);
+                if(AscFormat.isRealNumber(_nvGraphicFramePr.locks)){
+                    _chart.setLocks(_nvGraphicFramePr.locks);
+                }
+            }
             _chart.spPr.setXfrm(_xfrm);
             _xfrm.setParent(_chart.spPr);
+            _chart.setNvSpPr(_nvGraphicFramePr);
+            if(AscCommon.isRealObject(_nvGraphicFramePr) && AscFormat.isRealNumber(_nvGraphicFramePr.locks))
+            {
+                _chart.setLocks(_nvGraphicFramePr.locks);
+            }
             return _chart;
         }
 
@@ -5840,12 +5901,12 @@ function BinaryPPTYLoader()
                 }
                 case 3:
                 {
-                    s.GetString2();
+                    cNvPr.title = s.GetString2();
                     break;
                 }
                 case 4:
                 {
-                    s.GetString2();
+                    cNvPr.descr = s.GetString2();
                     break;
                 }
                 default:
@@ -5971,7 +6032,7 @@ function BinaryPPTYLoader()
 
         s.Skip2(5); // type + len
         var _count = s.GetULong();
-
+        _count = Math.min(_count, row.Content.length);
 		for (var i = 0; i < _count; i++)
 		{
 			s.Skip2(1);
@@ -8419,9 +8480,9 @@ function CPres()
 
         this.ImageMapChecker = {};
 
-        this.Start_UseFullUrl = function()
+        this.Start_UseFullUrl = function(insertDocumentUrlsData)
         {
-            this.Reader.Start_UseFullUrl();
+            this.Reader.Start_UseFullUrl(insertDocumentUrlsData);
         }
         this.End_UseFullUrl = function()
         {
@@ -9113,30 +9174,38 @@ function CPres()
                                 case 1:
                                 {
                                     sp = this.ReadShape();
-                                    sp.setGroup(shape);
-                                    shape.addToSpTree(shape.spTree.length, sp);
+                                    if(sp.spPr && sp.spPr.xfrm){
+                                        sp.setGroup(shape);
+                                        shape.addToSpTree(shape.spTree.length, sp);
+                                    }
                                     break;
                                 }
                                 case 6:
                                 case 2:
                                 {
                                     sp = this.ReadPic(6 == _type);
-                                    sp.setGroup(shape);
-                                    shape.addToSpTree(shape.spTree.length, sp);
+                                    if(sp.spPr && sp.spPr.xfrm){
+                                        sp.setGroup(shape);
+                                        shape.addToSpTree(shape.spTree.length, sp);
+                                    }
                                     break;
                                 }
                                 case 3:
                                 {
                                     sp = this.ReadCxn();
-                                    sp.setGroup(shape);
-                                    shape.addToSpTree(shape.spTree.length, sp);
+                                    if(sp.spPr && sp.spPr.xfrm) {
+                                        sp.setGroup(shape);
+                                        shape.addToSpTree(shape.spTree.length, sp);
+                                    }
                                     break;
                                 }
                                 case 4:
                                 {
                                     sp = this.ReadGroupShape();
-                                    sp.setGroup(shape);
-                                    shape.addToSpTree(shape.spTree.length, sp);
+                                    if(sp.spPr && sp.spPr.xfrm && sp.spTree.length > 0) {
+                                        sp.setGroup(shape);
+                                        shape.addToSpTree(shape.spTree.length, sp);
+                                    }
                                     break;
                                 }
                                 case 5:
@@ -9161,10 +9230,14 @@ function CPres()
                     }
                 }
             }
-
+            
+            this.Reader.CheckGroupXfrm(shape);
             this.ParaDrawing = oldParaDrawing;
             s.Seek2(_end_rec);
             this.TempGroupObject = null;
+            if(shape.spTree.length === 0){
+                return null;
+            }
             return shape;
         }
 
@@ -9206,8 +9279,6 @@ function CPres()
                         var oGeometry = this.Reader.ReadGeometry(spPr.xfrm);
                         if(oGeometry && oGeometry.pathLst.length > 0)
                             spPr.setGeometry(oGeometry);
-                        if(spPr.geometry)
-                            spPr.geometry.setParent(spPr);
                         break;
                     }
                     case 2:

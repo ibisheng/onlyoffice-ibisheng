@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -38,8 +38,8 @@ var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 // TODO: В колонтитулах быстрые пересчеты отключены. Надо реализовать.
 
 /**
- * Здесь мы пытаемся быстро пересчитать текущий параграф. Если быстрый пересчет срабатывает, тогда возвращаются страницы,
- * которые нужно перерисовать, в противном случае возвращается пустой массив.
+ * Здесь мы пытаемся быстро пересчитать текущий параграф. Если быстрый пересчет срабатывает, тогда возвращаются
+ * страницы, которые нужно перерисовать, в противном случае возвращается пустой массив.
  * @returns {*}
  */
 Paragraph.prototype.Recalculate_FastWholeParagraph = function()
@@ -908,7 +908,7 @@ Paragraph.prototype.private_RecalculateLine            = function(CurLine, CurPa
     //-------------------------------------------------------------------------------------------------------------
     // 2. Проверяем, является ли данная строка висячей
     //-------------------------------------------------------------------------------------------------------------
-    if(false === this.private_RecalculateLineWidow(CurLine, CurPage, PRS, ParaPr))
+    if (false === this.private_RecalculateLineWidow(CurLine, CurPage, PRS, ParaPr))
         return;
 
     //-------------------------------------------------------------------------------------------------------------
@@ -1108,6 +1108,9 @@ Paragraph.prototype.private_RecalculateLineInfo        = function(CurLine, CurPa
 
     if (true === PRS.BadLeftTab)
         this.Lines[CurLine].Info |= paralineinfo_BadLeftTab;
+
+    if (PRS.GetFootnoteReferencesCount(null, true) > 0)
+    	this.Lines[CurLine].Info |= paralineinfo_Notes;
 };
 
 Paragraph.prototype.private_RecalculateLineMetrics     = function(CurLine, CurPage, PRS, ParaPr)
@@ -1197,9 +1200,9 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 
         if (0 === CurLine)
         {
-            // Добавляем расстояние до параграфа (Pr.Spacing.Before)
-            if (0 === CurPage || true === this.Parent.Is_TableCellContent() || true === ParaPr.PageBreakBefore)
-                BaseLineOffset += ParaPr.Spacing.Before;
+			// Добавляем расстояние до параграфа (Pr.Spacing.Before)
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
+				BaseLineOffset += ParaPr.Spacing.Before;
 
             // Добавляем толщину границы параграфа (если граница задана)
             if ((true === ParaPr.Brd.First || 1 === CurPage) && border_Single === ParaPr.Brd.Top.Value)
@@ -1211,7 +1214,12 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
         PRS.BaseLineOffset = BaseLineOffset;
     }
     else
-        BaseLineOffset = PRS.BaseLineOffset;
+	{
+		if (this.Lines[CurLine].Info & paralineinfo_RangeY)
+			PRS.BaseLineOffset = this.Lines[CurLine].Metrics.Ascent;
+		else
+			BaseLineOffset = PRS.BaseLineOffset;
+	}
 
     var Top, Bottom;
     var Top2, Bottom2; // верх и низ без Pr.Spacing
@@ -1225,7 +1233,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 
         if ( 0 === CurLine )
         {
-            if ( 0 === CurPage || true === this.Parent.Is_TableCellContent() )
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -1280,7 +1288,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
             Top  = PRS.Y;
             Top2 = PRS.Y;
 
-            if ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === ParaPr.PageBreakBefore )
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -1455,7 +1463,6 @@ Paragraph.prototype.private_RecalculateLineBaseLine    = function(CurLine, CurPa
     if (this.Lines[CurLine].Info & paralineinfo_RangeY)
     {
         this.Lines[CurLine].Y = PRS.Y - this.Pages[CurPage].Y;
-        PRS.BaseLineOffset = this.Lines[CurLine].Metrics.Ascent;
     }
     else
     {
@@ -1828,15 +1835,16 @@ Paragraph.prototype.private_RecalculateLineCheckFootnotes = function(CurLine, Cu
 	if (PRS.Fast)
 		return true;
 
-	var oTopDocument = PRS.TopDocument;
-	var arrFootnotes = [];
+	var oTopDocument  = PRS.TopDocument;
+	var arrFootnotes  = [];
+	var oLineBreakPos = this.GetLineEndPos(CurLine);
 	for (var nIndex = 0, nCount = PRS.Footnotes.length; nIndex < nCount; ++nIndex)
 	{
 		var oFootnote = PRS.Footnotes[nIndex].FootnoteReference.Get_Footnote();
 		var oPos      = PRS.Footnotes[nIndex].Pos;
 
 		// Проверим позицию
-		if (true === PRS.MoveToLBP && PRS.LineBreakPos.Compare(oPos) <= 0)
+		if (oLineBreakPos.Compare(oPos) <= 0)
 			continue;
 
 		arrFootnotes.push(oFootnote);
@@ -2011,7 +2019,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, 
     var NewX = 0;
 
     // Если табов нет, либо их позиции левее текущей позиции ставим таб по умолчанию
-    var DefTab = ParaPr.DefaultTabSize != null ? ParaPr.DefaultTabSize : Default_Tab_Stop;
+    var DefTab = ParaPr.DefaultTabSize != null ? ParaPr.DefaultTabSize : AscCommonWord.Default_Tab_Stop;
     if ( null === Tab )
     {
         if ( X < PageStart.X + ParaPr.Ind.Left )
@@ -2142,6 +2150,31 @@ Paragraph.prototype.private_RecalculateMoveLineToNextPage = function(CurLine, Cu
 	}
 };
 
+Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS)
+{
+	if (CurPage <= 0)
+		return true;
+
+	if (!this.Check_FirstPage(CurPage))
+		return false;
+
+	if (!(PRS.Parent instanceof CDocument))
+		return true;
+
+	// Если дошли до этого места, то тут все зависит от того на какой мы странице. Если на первой странице данной секции
+	// тогда добавляем расстояние, а если нет - нет. Но подсчет первой страницы здесь не совпадает с тем, как она
+	// считается для нумерации. Если разрыв секции идет на текущей странице, то первой считается сразу данная страница.
+
+	var LogicDocument = PRS.Parent;
+	var SectionIndex = LogicDocument.GetSectionIndexByElementIndex(this.Get_Index());
+	var FirstElement = LogicDocument.GetFirstElementInSection(SectionIndex);
+
+	if (!FirstElement || FirstElement.Get_AbsolutePage(0) === PRS.GetPageAbs())
+		return true;
+
+	return false;
+};
+
 var ERecalcPageType =
 {
     START   : 0x00, // начать заново пересчет, с начала страницы
@@ -2179,6 +2212,7 @@ var paralineinfo_End           = 0x0004; // Последняя строка па
 var paralineinfo_RangeY        = 0x0008; // Строка начинается после какого-либо объекта с обтеканием
 var paralineinfo_BreakRealPage = 0x0010; // В строке есть PageBreak
 var paralineinfo_BadLeftTab    = 0x0020; // В строке есть левый таб, который правее правой границы
+var paralineinfo_Notes         = 0x0040; // В строке есть сноски
 
 function CParaLine()
 {
@@ -2988,8 +3022,10 @@ CParagraphRecalculateStateWrap.prototype.AddFootnoteReference = function(oFootno
 
 	this.Footnotes.push({FootnoteReference : oFootnoteReference, Pos : oPos});
 };
-CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference)
+CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(oFootnoteReference, isAllowCustom)
 {
+	var _isAllowCustom = (true === isAllowCustom ? true : false);
+
 	// Если данную ссылку мы добавляли уже в строке, тогда ищем сколько было элементов до нее, если не добавляли,
 	// тогда возвращаем просто количество ссылок. Ссылки с флагом CustomMarkFollows не учитываются
 
@@ -2999,7 +3035,7 @@ CParagraphRecalculateStateWrap.prototype.GetFootnoteReferencesCount = function(o
 		if (this.Footnotes[nIndex].FootnoteReference === oFootnoteReference)
 			return nRefsCount;
 
-		if (true !== this.Footnotes[nIndex].FootnoteReference.IsCustomMarkFollows())
+		if (true === _isAllowCustom || true !== this.Footnotes[nIndex].FootnoteReference.IsCustomMarkFollows())
 			nRefsCount++;
 	}
 

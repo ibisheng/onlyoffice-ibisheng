@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -188,7 +188,7 @@ CMathBaseText.prototype.IsNeedUpdateGaps = function()
  */
 function CMathText(bJDraw)
 {
-    CMathText.superclass.constructor.call(this);
+	CMathBaseText.call(this);
 
     this.Type           = para_Math_Text;
     this.bJDraw         = (undefined === bJDraw ? false : bJDraw);
@@ -220,7 +220,8 @@ function CMathText(bJDraw)
     };*/
 
 }
-AscCommon.extendClass(CMathText, CMathBaseText);
+CMathText.prototype = Object.create(CMathBaseText.prototype);
+CMathText.prototype.constructor = CMathText;
 CMathText.prototype.add = function(code)
 {
     this.value = code;
@@ -684,7 +685,7 @@ CMathText.prototype.private_getCode = function()
 
     return code;
 };
-CMathText.prototype.fillPlaceholders = function()
+CMathText.prototype.SetPlaceholder = function()
 {
     this.Type = para_Math_Placeholder;
     this.value = StartTextElement;
@@ -1021,7 +1022,7 @@ CMathText.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
  */
 function CMathAmp()
 {
-    CMathAmp.superclass.constructor.call(this);
+	CMathBaseText.call(this);
 
     this.bAlignPoint = false;
     this.Type = para_Math_Ampersand;
@@ -1031,7 +1032,8 @@ function CMathAmp()
     this.AmpText = new CMathText(false);
     this.AmpText.add(this.value);
 }
-AscCommon.extendClass(CMathAmp, CMathBaseText);
+CMathAmp.prototype = Object.create(CMathBaseText.prototype);
+CMathAmp.prototype.constructor = CMathAmp;
 CMathAmp.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
 {
     this.bAlignPoint = InfoMathText.bEqArray == true && InfoMathText.bNormalText == false;

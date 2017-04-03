@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -259,22 +259,10 @@ CStyle.prototype =
         return this.Id;
     },
 
-    SetId : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.GetId();
     },
-
-    Set_Id : function(newId)
-    {
-        return this.SetId( newId );
-    },
-
 //-----------------------------------------------------------------------------------
 // Базовые функции для работы со стилем
 //-----------------------------------------------------------------------------------
@@ -319,82 +307,94 @@ CStyle.prototype =
         return Style;
     },
 
-    Set_TextPr : function(Value)
-    {
-        var Old = this.TextPr;
-        var New = new CTextPr();
-        New.Set_FromObject(Value);
+	RemapIdReferences : function(OldId, NewId)
+	{
+		if (OldId === this.BasedOn)
+			this.Set_BasedOn(NewId);
 
-        this.TextPr = New;
+		if (OldId === this.Link)
+			this.Set_Link(NewId);
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TextPr, Old : Old, New : New } );
-    },
+		if (OldId === this.Next)
+			this.Set_Next(NewId);
+	},
 
-    Set_ParaPr : function(Value)
-    {
-        var Old = this.ParaPr;
-        var New = new CParaPr();
-        New.Set_FromObject(Value);
+	Set_TextPr : function(Value)
+	{
+		var Old = this.TextPr;
+		var New = new CTextPr();
+		New.Set_FromObject(Value);
 
-        this.ParaPr = New;
+		this.TextPr = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_ParaPr, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTextPr(this, Old, New));
+	},
 
-    Set_TablePr : function(Value)
-    {
-        var Old = this.TablePr;
-        var New = new CTablePr();
-        New.Set_FromObject(Value);
+	Set_ParaPr : function(Value)
+	{
+		var Old = this.ParaPr;
+		var New = new CParaPr();
+		New.Set_FromObject(Value);
 
-        this.TablePr = New;
+		this.ParaPr = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TablePr, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleParaPr(this, Old, New));
+	},
 
-    Set_TableRowPr : function(Value)
-    {
-        var Old = this.TableRowPr;
-        var New = new CTableRowPr();
-        New.Set_FromObject(Value);
+	Set_TablePr : function(Value)
+	{
+		var Old = this.TablePr;
+		var New = new CTablePr();
+		New.Set_FromObject(Value);
 
-        this.TableRowPr = New;
+		this.TablePr = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableRowPr, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTablePr(this, Old, New));
+	},
 
-    Set_TableCellPr : function(Value)
-    {
-        var Old = this.TableCellPr;
-        var New = new CTableCellPr();
-        New.Set_FromObject(Value);
+	Set_TableRowPr : function(Value)
+	{
+		var Old = this.TableRowPr;
+		var New = new CTableRowPr();
+		New.Set_FromObject(Value);
 
-        this.TableCellPr = New;
+		this.TableRowPr = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableCellPr, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableRowPr(this, Old, New));
+	},
 
-    Set_TableBand1Horz : function(Value)
-    {
-        var Old = this.TableBand1Horz;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableCellPr : function(Value)
+	{
+		var Old = this.TableCellPr;
+		var New = new CTableCellPr();
+		New.Set_FromObject(Value);
 
-        this.TableBand1Horz = New;
+		this.TableCellPr = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableBand1Horz, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableCellPr(this, Old, New));
+	},
 
-    Set_TableBand1Vert : function(Value)
-    {
-        var Old = this.TableBand1Vert;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableBand1Horz : function(Value)
+	{
+		var Old = this.TableBand1Horz;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableBand1Vert = New;
+		this.TableBand1Horz = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableBand1Vert, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableBand1Horz(this, Old, New));
+	},
+
+	Set_TableBand1Vert : function(Value)
+	{
+		var Old = this.TableBand1Vert;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
+
+		this.TableBand1Vert = New;
+
+		History.Add(new CChangesStyleTableBand1Vert(this, Old, New));
+	},
 
     Set_TableBand2Horz : function(Value)
     {
@@ -404,218 +404,218 @@ CStyle.prototype =
 
         this.TableBand2Horz = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableBand2Horz, Old : Old, New : New } );
+        History.Add(new CChangesStyleTableBand2Horz(this, Old, New));
     },
 
-    Set_TableBand2Vert : function(Value)
-    {
-        var Old = this.TableBand2Vert;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableBand2Vert : function(Value)
+	{
+		var Old = this.TableBand2Vert;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableBand2Vert = New;
+		this.TableBand2Vert = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableBand2Vert, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableBand2Vert(this, Old, New));
+	},
 
-    Set_TableFirstCol : function(Value)
-    {
-        var Old = this.TableFirstCol;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableFirstCol : function(Value)
+	{
+		var Old = this.TableFirstCol;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableFirstCol = New;
+		this.TableFirstCol = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableFirstCol, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableFirstCol(this, Old, New));
+	},
 
-    Set_TableFirstRow : function(Value)
-    {
-        var Old = this.TableFirstRow;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableFirstRow : function(Value)
+	{
+		var Old = this.TableFirstRow;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableFirstRow = New;
+		this.TableFirstRow = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableFirstRow, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableFirstRow(this, Old, New));
+	},
 
-    Set_TableLastCol : function(Value)
-    {
-        var Old = this.TableLastCol;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableLastCol : function(Value)
+	{
+		var Old = this.TableLastCol;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableLastCol = New;
+		this.TableLastCol = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableLastCol, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableLastCol(this, Old, New));
+	},
 
-    Set_TableLastRow : function(Value)
-    {
-        var Old = this.TableLastRow;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableLastRow : function(Value)
+	{
+		var Old = this.TableLastRow;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableLastRow = New;
+		this.TableLastRow = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableLastRow, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableLastRow(this, Old, New));
+	},
 
-    Set_TableTLCell : function(Value)
-    {
-        var Old = this.TableTLCell;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableTLCell : function(Value)
+	{
+		var Old = this.TableTLCell;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableTLCell = New;
+		this.TableTLCell = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableTLCell, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableTLCell(this, Old, New));
+	},
 
-    Set_TableTRCell : function(Value)
-    {
-        var Old = this.TableTRCell;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableTRCell : function(Value)
+	{
+		var Old = this.TableTRCell;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableTRCell = New;
+		this.TableTRCell = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableTRCell, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableTRCell(this, Old, New));
+	},
 
-    Set_TableBLCell : function(Value)
-    {
-        var Old = this.TableBLCell;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableBLCell : function(Value)
+	{
+		var Old = this.TableBLCell;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableBLCell = New;
+		this.TableBLCell = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableBLCell, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableBLCell(this, Old, New));
+	},
 
-    Set_TableBRCell : function(Value)
-    {
-        var Old = this.TableBRCell;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableBRCell : function(Value)
+	{
+		var Old = this.TableBRCell;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableBRCell = New;
+		this.TableBRCell = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableBRCell, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableBRCell(this, Old, New));
+	},
 
-    Set_TableWholeTable : function(Value)
-    {
-        var Old = this.TableWholeTable;
-        var New = new CTableStylePr();
-        New.Set_FromObject(Value);
+	Set_TableWholeTable : function(Value)
+	{
+		var Old = this.TableWholeTable;
+		var New = new CTableStylePr();
+		New.Set_FromObject(Value);
 
-        this.TableWholeTable = New;
+		this.TableWholeTable = New;
 
-        History.Add( this, { Type : AscDFH.historyitem_Style_TableWholeTable, Old : Old, New : New } );
-    },
+		History.Add(new CChangesStyleTableWholeTable(this, Old, New));
+	},
 
-    Set_Name : function(Value)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Style_Name, Old : this.Name, New : Value } );
-        this.Name = Value;
-    },
+	Set_Name : function(Value)
+	{
+		History.Add(new CChangesStyleName(this, this.Name, Value));
+		this.Name = Value;
+	},
 
     Get_Name : function()
     {
         return this.Name;
     },
 
-    Set_BasedOn : function(Value)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Style_BasedOn, Old : this.BasedOn, New : Value } );
-        this.BasedOn = Value;
-    },
+	Set_BasedOn : function(Value)
+	{
+		History.Add(new CChangesStyleBasedOn(this, this.BasedOn, Value));
+		this.BasedOn = Value;
+	},
 
     Get_BasedOn : function()
     {
         return this.BasedOn;
     },
 
-    Set_Next : function(Value)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Style_Next, Old : this.Next, New : Value } );
-        this.Next = Value;
-    },
+	Set_Next : function(Value)
+	{
+		History.Add(new CChangesStyleNext(this, this.Next, Value));
+		this.Next = Value;
+	},
 
     Get_Next : function()
     {
         return this.Next;
     },
 
-    Set_Link : function(Value)
-    {
-        History.Add(this, { Type : AscDFH.historyitem_Style_Link, Old : this.Link, New : Value });
-        this.Link = Value;
-    },
+	Set_Link : function(Value)
+	{
+		History.Add(new CChangesStyleLink(this, this.Link, Value));
+		this.Link = Value;
+	},
 
-    Set_Type : function(Value)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Style_Type, Old : this.Type, New : Value } );
-        this.Type = Value;
-    },
+	Set_Type : function(Value)
+	{
+		History.Add(new CChangesStyleType(this, this.Type, Value));
+		this.Type = Value;
+	},
 
     Get_Type : function()
     {
         return this.Type;
     },
 
-    Set_QFormat : function(Value)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Style_QFormat, Old : this.qFormat, New : Value } );
-        this.qFormat = Value;
-    },
+	Set_QFormat : function(Value)
+	{
+		History.Add(new CChangesStyleQFormat(this, this.qFormat, Value));
+		this.qFormat = Value;
+	},
 
     Get_QFormat : function()
     {
         return this.qFormat;
     },
 
-    Set_UiPriority : function(Value)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Style_UiPriority, Old : this.uiPriority, New : Value } );
-        this.uiPriority = Value;
-    },
+	Set_UiPriority : function(Value)
+	{
+		History.Add(new CChangesStyleUiPriority(this, this.uiPriority, Value));
+		this.uiPriority = Value;
+	},
 
     Get_UiPriority : function()
     {
         return this.uiPriority;
     },
 
-    Set_Hidden : function(Value)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Style_Hidden, Old : this.hidden, New : Value } );
-        this.hidden = Value;
-    },
+	Set_Hidden : function(Value)
+	{
+		History.Add(new CChangesStyleHidden(this, this.hidden, Value));
+		this.hidden = Value;
+	},
 
     Get_Hidden : function()
     {
         return this.hidden;
     },
 
-    Set_SemiHidden : function(Value)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Style_SemiHidden, Old : this.semiHidden, New : Value } );
-        this.semiHidden = Value;
-    },
+	Set_SemiHidden : function(Value)
+	{
+		History.Add(new CChangesStyleSemiHidden(this, this.semiHidden, Value));
+		this.semiHidden = Value;
+	},
 
     Get_SemiHidden : function()
     {
         return this.semiHidden;
     },
 
-    Set_UnhideWhenUsed : function(Value)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Style_UnhideWhenUsed, Old : this.unhideWhenUsed, New : Value } );
-        this.unhideWhenUsed = Value;
-    },
+	Set_UnhideWhenUsed : function(Value)
+	{
+		History.Add(new CChangesStyleUnhideWhenUsed(this, this.unhideWhenUsed, Value));
+		this.unhideWhenUsed = Value;
+	},
 
     Get_UnhideWhenUsed : function()
     {
@@ -2764,358 +2764,6 @@ CStyle.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Style_TextPr:
-            {
-                this.TextPr = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_ParaPr:
-            {
-                this.ParaPr = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TablePr:
-            {
-                this.TablePr = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableRowPr:
-            {
-                this.TableRowPr = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableCellPr:
-            {
-                this.TableCellPr = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBand1Horz:
-            {
-                this.TableBand1Horz = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBand1Vert:
-            {
-                this.TableBand1Vert = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBand2Horz:
-            {
-                this.TableBand2Horz = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBand2Vert:
-            {
-                this.TableBand2Vert = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableFirstCol:
-            {
-                this.TableFirstCol = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableFirstRow:
-            {
-                this.TableFirstRow = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableLastCol:
-            {
-                this.TableLastCol = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableLastRow:
-            {
-                this.TableLastRow = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableTLCell:
-            {
-                this.TableTLCell = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableTRCell:
-            {
-                this.TableTRCell = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBLCell:
-            {
-                this.TableBLCell = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBRCell:
-            {
-                this.TableBRCell = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableWholeTable:
-            {
-                this.TableWholeTable = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Name:
-            {
-                this.Name = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_BasedOn:
-            {
-                this.BasedOn = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Next:
-            {
-                this.Next = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Type:
-            {
-                this.Type = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_QFormat:
-            {
-                this.qFormat = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_UiPriority:
-            {
-                this.uiPriority = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Hidden:
-            {
-                this.hidden = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_SemiHidden:
-            {
-                this.semiHidden = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_UnhideWhenUsed:
-            {
-                this.unhideWhenUsed = Data.Old;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Link:
-            {
-                this.Link = Data.Old;
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Style_TextPr:
-            {
-                this.TextPr = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_ParaPr:
-            {
-                this.ParaPr = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TablePr:
-            {
-                this.TablePr = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableRowPr:
-            {
-                this.TableRowPr = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableCellPr:
-            {
-                this.TableCellPr = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBand1Horz:
-            {
-                this.TableBand1Horz = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBand1Vert:
-            {
-                this.TableBand1Vert = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBand2Horz:
-            {
-                this.TableBand2Horz = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBand2Vert:
-            {
-                this.TableBand2Vert = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableFirstCol:
-            {
-                this.TableFirstCol = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableFirstRow:
-            {
-                this.TableFirstRow = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableLastCol:
-            {
-                this.TableLastCol = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableLastRow:
-            {
-                this.TableLastRow = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableTLCell:
-            {
-                this.TableTLCell = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableTRCell:
-            {
-                this.TableTRCell = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBLCell:
-            {
-                this.TableBLCell = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableBRCell:
-            {
-                this.TableBRCell = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_TableWholeTable:
-            {
-                this.TableWholeTable = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Name:
-            {
-                this.Name = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_BasedOn:
-            {
-                this.BasedOn = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Next:
-            {
-                this.Next = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Type:
-            {
-                this.Type = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_QFormat:
-            {
-                this.qFormat = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_UiPriority:
-            {
-                this.uiPriority = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Hidden:
-            {
-                this.hidden = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_SemiHidden:
-            {
-                this.semiHidden = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_UnhideWhenUsed:
-            {
-                this.unhideWhenUsed = Data.New;
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Link:
-            {
-                this.Link = Data.New;
-                break;
-            }
-        }
-    },
-
     Get_SelectionState : function()
     {
     },
@@ -3178,484 +2826,42 @@ CStyle.prototype =
         }
     },
 
-    Refresh_RecalcData2 : function()
-    {
-        // TODO: Надо сделать механизм, чтобы данное действие не вызывалось много раз подряд, а только 1.
-        var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var Styles = LogicDocument.Get_Styles();
+	Refresh_RecalcData2 : function()
+	{
+		var oHistory = History;
+		if (!oHistory)
+			return;
 
-        var AllParagraphs = [];
+		if (!oHistory.AddChangedStyleToRecalculateData(this.Get_Id(), this))
+			return;
 
-        if (this.Id != Styles.Default.Paragraph)
-        {
-            var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
-            AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
-            LogicDocument.Add_ChangedStyle(AllStylesId);
-        }
-        else
-        {
-            AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
-            LogicDocument.Add_ChangedStyle([this.Id]);
-        }
+		var LogicDocument = editor.WordControl.m_oLogicDocument;
+		var Styles        = LogicDocument.Get_Styles();
 
-        var Count = AllParagraphs.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            var Para = AllParagraphs[Index];
-            Para.Refresh_RecalcData( { Type : AscDFH.historyitem_Paragraph_PStyle } );
-        }
-    },
+		var AllParagraphs = [];
+
+		if (this.Id != Styles.Default.Paragraph)
+		{
+			var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
+			AllParagraphs   = oHistory.GetAllParagraphsForRecalcData({Style : true, StylesId : AllStylesId});
+			LogicDocument.Add_ChangedStyle(AllStylesId);
+		}
+		else
+		{
+			AllParagraphs = oHistory.GetAllParagraphsForRecalcData({All : true});
+			LogicDocument.Add_ChangedStyle([this.Id]);
+		}
+
+		var Count = AllParagraphs.length;
+		for (var Index = 0; Index < Count; Index++)
+		{
+			var Para = AllParagraphs[Index];
+			Para.Refresh_RecalcData({Type : AscDFH.historyitem_Paragraph_PStyle});
+		}
+	},
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( AscDFH.historyitem_type_Style );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Style_TextPr:
-            case AscDFH.historyitem_Style_ParaPr:
-            case AscDFH.historyitem_Style_TablePr:
-            case AscDFH.historyitem_Style_TableRowPr:
-            case AscDFH.historyitem_Style_TableCellPr:
-            case AscDFH.historyitem_Style_TableBand1Horz:
-            case AscDFH.historyitem_Style_TableBand1Vert:
-            case AscDFH.historyitem_Style_TableBand2Horz:
-            case AscDFH.historyitem_Style_TableBand2Vert:
-            case AscDFH.historyitem_Style_TableFirstCol:
-            case AscDFH.historyitem_Style_TableFirstRow:
-            case AscDFH.historyitem_Style_TableLastCol:
-            case AscDFH.historyitem_Style_TableLastRow:
-            case AscDFH.historyitem_Style_TableTLCell:
-            case AscDFH.historyitem_Style_TableTRCell:
-            case AscDFH.historyitem_Style_TableBLCell:
-            case AscDFH.historyitem_Style_TableBRCell:
-            case AscDFH.historyitem_Style_TableWholeTable:
-            {
-                // Variable
-                Data.New.Write_ToBinary( Writer );
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Name:
-            case AscDFH.historyitem_Style_BasedOn:
-            case AscDFH.historyitem_Style_Next:
-            case AscDFH.historyitem_Style_Link:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     String : value
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    if ( null === Data.New )
-                        Writer.WriteBool( true );
-                    else
-                    {
-                        Writer.WriteBool( false );
-                        Writer.WriteString2( Data.New );
-                    }
-                }
-
-                break;
-            }
-
-
-            case AscDFH.historyitem_Style_Type:
-            {
-                // Long : value
-                Writer.WriteLong( Data.New );
-
-                break;
-            }
-
-            case AscDFH.historyitem_Style_QFormat:
-            case AscDFH.historyitem_Style_Hidden:
-            case AscDFH.historyitem_Style_SemiHidden:
-            case AscDFH.historyitem_Style_UnhideWhenUsed:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     Bool : value
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    if ( null === Data.New )
-                        Writer.WriteBool( true );
-                    else
-                    {
-                        Writer.WriteBool( false );
-                        Writer.WriteBool( Data.New );
-                    }
-                }
-
-                break;
-            }
-
-            case AscDFH.historyitem_Style_UiPriority:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     Long : value
-
-                if ( undefined === Data.New )
-                    Writer.WriteBool( true );
-                else
-                {
-                    Writer.WriteBool( false );
-                    if ( null === Data.New )
-                        Writer.WriteBool( true );
-                    else
-                    {
-                        Writer.WriteBool( false );
-                        Writer.WriteLong( Data.New );
-                    }
-                }
-
-                break;
-            }
-        }
-
-        return Writer;
-    },
-
-    Load_Changes : function(Reader)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( AscDFH.historyitem_type_Style != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Style_TextPr:
-            {
-                // Variable
-                this.TextPr = new CTextPr();
-                this.TextPr.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_ParaPr:
-            {
-                // Variable
-                this.ParaPr = new CParaPr();
-                this.ParaPr.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TablePr:
-            {
-                // Variable
-                this.TablePr = new CTablePr();
-                this.TablePr.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableRowPr:
-            {
-                // Variable
-                this.TableRowPr = new CTableRowPr();
-                this.TableRowPr.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableCellPr:
-            {
-                // Variable
-                this.TableCellPr = new CTableCellPr();
-                this.TableCellPr.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableBand1Horz:
-            {
-                // Variable
-                this.TableBand1Horz = new CTableStylePr();
-                this.TableBand1Horz.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableBand1Vert:
-            {
-                // Variable
-                this.TableBand1Vert = new CTableStylePr();
-                this.TableBand1Vert.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableBand2Horz:
-            {
-                // Variable
-                this.TableBand2Horz = new CTableStylePr();
-                this.TableBand2Horz.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableBand2Vert:
-            {
-                // Variable
-                this.TableBand2Vert = new CTableStylePr();
-                this.TableBand2Vert.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableFirstCol:
-            {
-                // Variable
-                this.TableFirstCol = new CTableStylePr();
-                this.TableFirstCol.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableFirstRow:
-            {
-                // Variable
-                this.TableFirstRow = new CTableStylePr();
-                this.TableFirstRow.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableLastCol:
-            {
-                // Variable
-                this.TableLastCol = new CTableStylePr();
-                this.TableLastCol.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableLastRow:
-            {
-                // Variable
-                this.TableLastRow = new CTableStylePr();
-                this.TableLastRow.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableTLCell:
-            {
-                // Variable
-                this.TableTLCell = new CTableStylePr();
-                this.TableTLCell.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableTRCell:
-            {
-                // Variable
-                this.TableTRCell = new CTableStylePr();
-                this.TableTRCell.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableBLCell:
-            {
-                // Variable
-                this.TableBLCell = new CTableStylePr();
-                this.TableBLCell.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableBRCell:
-            {
-                // Variable
-                this.TableBRCell = new CTableStylePr();
-                this.TableBRCell.Read_FromBinary( Reader );
-                break;
-            }
-            case AscDFH.historyitem_Style_TableWholeTable:
-            {
-                // Variable
-                this.TableWholeTable = new CTableStylePr();
-                this.TableWholeTable.Read_FromBinary( Reader );
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Name:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     String : value
-
-                if ( true === Reader.GetBool() )
-                    this.Name = undefined;
-                else if ( true === Reader.GetBool() )
-                    this.Name = null;
-                else
-                    this.Name = Reader.GetString2();
-
-                break;
-            }
-
-            case AscDFH.historyitem_Style_BasedOn:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     String : value
-
-                if ( true === Reader.GetBool() )
-                    this.BasedOn = undefined;
-                else if ( true === Reader.GetBool() )
-                    this.BasedOn = null;
-                else
-                    this.BasedOn = Reader.GetString2();
-
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Next:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     String : value
-
-                if ( true === Reader.GetBool() )
-                    this.Next = undefined;
-                else if ( true === Reader.GetBool() )
-                    this.Next = null;
-                else
-                    this.Next = Reader.GetString2();
-
-                break;
-            }
-
-
-            case AscDFH.historyitem_Style_Type:
-            {
-                // Long : value
-                this.Type = Reader.GetLong();
-
-                break;
-            }
-
-            case AscDFH.historyitem_Style_QFormat:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     Bool : value
-
-                if ( true === Reader.GetBool() )
-                    this.qFormat = undefined;
-                else if ( true === Reader.GetBool() )
-                    this.qFormat = null;
-                else
-                    this.qFormat = Reader.GetBool();
-
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Hidden:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     Bool : value
-
-                if ( true === Reader.GetBool() )
-                    this.hidden = undefined;
-                else if ( true === Reader.GetBool() )
-                    this.hidden = null;
-                else
-                    this.hidden = Reader.GetBool();
-
-                break;
-            }
-
-            case AscDFH.historyitem_Style_SemiHidden:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     Bool : value
-
-                if ( true === Reader.GetBool() )
-                    this.semiHidden = undefined;
-                else if ( true === Reader.GetBool() )
-                    this.semiHidden = null;
-                else
-                    this.semiHidden = Reader.GetBool();
-
-                break;
-            }
-
-            case AscDFH.historyitem_Style_UnhideWhenUsed:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     Bool : value
-
-                if ( true === Reader.GetBool() )
-                    this.unhideWhenUsed = undefined;
-                else if ( true === Reader.GetBool() )
-                    this.unhideWhenUsed = null;
-                else
-                    this.unhideWhenUsed = Reader.GetBool();
-
-                break;
-            }
-            case AscDFH.historyitem_Style_UiPriority:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     Long : value
-
-                if ( true === Reader.GetBool() )
-                    this.uiPriority = undefined;
-                else if ( true === Reader.GetBool() )
-                    this.uiPriority = null;
-                else
-                    this.uiPriority = Reader.GetLong();
-
-                break;
-            }
-
-            case AscDFH.historyitem_Style_Link:
-            {
-                // Bool : is undefined
-                // (false)
-                //   Bool : is null
-                //   (false)
-                //     String : value
-
-                if ( true === Reader.GetBool() )
-                    this.Link = undefined;
-                else if ( true === Reader.GetBool() )
-                    this.Link = null;
-                else
-                    this.Link = Reader.GetString2();
-
-                break;
-            }
-        }
-
-        AscCommon.CollaborativeEditing.Add_LinkData(this, {StyleUpdate : true});
-    },
-
     Write_ToBinary2 : function(Writer)
     {
         Writer.WriteLong(AscDFH.historyitem_type_Style);
@@ -4280,40 +3486,195 @@ CStyles.prototype =
         return this.Id;
     },
 
-    SetId : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.GetId();
     },
-
-    Set_Id : function(newId)
-    {
-        return this.SetId( newId );
-    },
-
 //-----------------------------------------------------------------------------------
 // Базовые функции для работы со стилем
 //-----------------------------------------------------------------------------------
-    Add : function(Style)
-    {
-        var Id = Style.Get_Id();
-        History.Add( this, { Type : AscDFH.historyitem_Styles_Add, Id : Id, Style : Style } );
-        this.Style[Id] = Style;
-        this.Update_Interface(Id);
-        return Id;
-    },
+	Add : function(Style)
+	{
+		var Id = Style.Get_Id();
+		History.Add(new CChangesStylesAdd(this, Id, Style));
+		this.Style[Id] = Style;
+		this.Update_Interface(Id);
+		return Id;
+	},
 
-    Remove : function(Id)
-    {
-        History.Add( this, { Type : AscDFH.historyitem_Styles_Remove, Id : Id, Style : this.Style[Id] } );
-        delete this.Style[Id];
-        this.Update_Interface(Id);
-    },
+	Remove : function(Id)
+	{
+		History.Add(new CChangesStylesRemove(this, Id, this.Style[Id]));
+		delete this.Style[Id];
+		this.Update_Interface(Id);
+	},
+
+	SetDefaultParagraph : function(Id)
+	{
+		if (Id !== this.Default.Paragraph)
+		{
+			History.Add(new CChangesStylesChangeDefaultParagraphId(this, this.Default.Paragraph, Id));
+			this.Default.Paragraph = Id;
+		}
+	},
+
+	SetDefaultCharacter : function(Id)
+	{
+		if (Id !== this.Default.Character)
+		{
+			History.Add(new CChangesStylesChangeDefaultCharacterId(this, this.Default.Character, Id));
+			this.Default.Character = Id;
+		}
+	},
+
+	SetDefaultNumbering : function(Id)
+	{
+		if (Id !== this.Default.Numbering)
+		{
+			History.Add(new CChangesStylesChangeDefaultNumberingId(this, this.Default.Numbering, Id));
+			this.Default.Numbering = Id;
+		}
+	},
+
+	SetDefaultTable : function(Id)
+	{
+		if (Id !== this.Default.Table)
+		{
+			History.Add(new CChangesStylesChangeDefaultTableId(this, this.Default.Table, Id));
+			this.Default.Table = Id;
+		}
+	},
+
+	SetDefaultTableGrid : function(Id)
+	{
+		if (Id !== this.Default.TableGrid)
+		{
+			History.Add(new CChangesStylesChangeDefaultTableGridId(this, this.Default.TableGrid, Id));
+			this.Default.TableGrid = Id;
+		}
+	},
+
+	SetDefaultParaList : function(Id)
+	{
+		if (Id !== this.Default.ParaList)
+		{
+			History.Add(new CChangesStylesChangeDefaultParaListId(this, this.Default.ParaList, Id));
+			this.Default.ParaList = Id;
+		}
+	},
+
+	SetDefaultHeader : function(Id)
+	{
+		if (Id !== this.Default.Header)
+		{
+			History.Add(new CChangesStylesChangeDefaultHeaderId(this, this.Default.Header, Id));
+			this.Default.Header = Id;
+		}
+	},
+
+	SetDefaultFooter : function(Id)
+	{
+		if (Id !== this.Default.Footer)
+		{
+			History.Add(new CChangesStylesChangeDefaultFooterId(this, this.Default.Footer, Id));
+			this.Default.Footer = Id;
+		}
+	},
+	
+	SetDefaultHyperlink : function(Id)
+	{
+		if (Id !== this.Default.Hyperlink)
+		{
+			History.Add(new CChangesStylesChangeDefaultHyperlinkId(this, this.Default.Hyperlink, Id));
+			this.Default.Hyperlink = Id;
+		}
+	},
+
+	SetDefaultFootnoteText : function(Id)
+	{
+		if (Id !== this.Default.FootnoteText)
+		{
+			History.Add(new CChangesStylesChangeDefaultFootnoteTextId(this, this.Default.FootnoteText, Id));
+			this.Default.FootnoteText = Id;
+		}
+	},
+
+	SetDefaultFootnoteTextChar : function(Id)
+	{
+		if (Id !== this.Default.FootnoteTextChar)
+		{
+			History.Add(new CChangesStylesChangeDefaultFootnoteTextCharId(this, this.Default.FootnoteTextChar, Id));
+			this.Default.FootnoteTextChar = Id;
+		}
+	},
+
+	SetDefaultFootnoteReference : function(Id)
+	{
+		if (Id !== this.Default.FootnoteReference)
+		{
+			History.Add(new CChangesStylesChangeDefaultFootnoteReferenceId(this, this.Default.FootnoteReference, Id));
+			this.Default.FootnoteReference = Id;
+		}
+	},
+
+	SetDefaultHeading : function(Id, Lvl)
+	{
+		if (Id !== this.Default.Headings[Lvl])
+		{
+			History.Add(new CChangesStylesChangeDefaultHeadingsId(this, this.Default.Headings[Lvl], Id, Lvl));
+			this.Default.Headings[Lvl] = Id;
+		}
+	},
+
+	RemapIdReferences : function(OldId, NewId)
+	{
+		if (OldId === this.Default.Paragraph)
+			this.SetDefaultParagraph(NewId);
+
+		if (OldId === this.Default.Character)
+			this.SetDefaultCharacter(NewId);
+
+		if (OldId === this.Default.Numbering)
+			this.SetDefaultNumbering(NewId);
+
+		if (OldId === this.Default.Table)
+			this.SetDefaultTable(NewId);
+
+		if (OldId === this.Default.TableGrid)
+			this.SetDefaultTableGrid(NewId);
+
+		if (OldId === this.Default.ParaList)
+			this.SetDefaultParaList(NewId);
+
+		if (OldId === this.Default.Header)
+			this.SetDefaultHeader(NewId);
+
+		if (OldId === this.Default.Footer)
+			this.SetDefaultFooter(NewId);
+
+		if (OldId === this.Default.Hyperlink)
+			this.SetDefaultHyperlink(NewId);
+
+		if (OldId === this.Default.FootnoteText)
+			this.SetDefaultFootnoteText(NewId);
+
+		if (OldId === this.Default.FootnoteTextChar)
+			this.SetDefaultFootnoteTextChar(NewId);
+
+		if (OldId === this.Default.FootnoteReference)
+			this.SetDefaultFootnoteReference(NewId);
+
+		for (var nIndex = 0, nCount = this.Default.Headings.length; nIndex < nCount; ++nIndex)
+		{
+			if (OldId === this.Default.Headings[nIndex])
+				this.SetDefaultHeading(NewId, nIndex);
+		}
+
+		for (var Id in this.Style)
+		{
+			this.Style[Id].RemapIdReferences(OldId, NewId);
+		}
+	},
 
     Copy : function()
     {
@@ -4364,30 +3725,30 @@ CStyles.prototype =
         return this.Default.ParaPr;
     },
 
-    Set_DefaultParaPr : function(ParaPr)
-    {
-        History.Add(this, {Type : AscDFH.historyitem_Styles_ChangeDefaultParaPr, Old : this.Default.ParaPr, New : ParaPr});
+	Set_DefaultParaPr : function(ParaPr)
+	{
+		History.Add(new CChangesStylesChangeDefaultParaPr(this, this.Default.ParaPr, ParaPr));
 		this.Default.ParaPr.Init_Default();
 		this.Default.ParaPr.Merge(ParaPr);
 
-        // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
-        //       надо будет сделать, чтобы происходил пересчет всех стилей.
-    },
+		// TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
+		//       надо будет сделать, чтобы происходил пересчет всех стилей.
+	},
 
     Get_DefaultTextPr : function()
     {
         return this.Default.TextPr;
     },
 
-    Set_DefaultTextPr : function(TextPr)
-    {
-        History.Add(this, {Type : AscDFH.historyitem_Styles_ChangeDefaultTextPr, Old : this.Default.TextPr, New : TextPr});
+	Set_DefaultTextPr : function(TextPr)
+	{
+		History.Add(new CChangesStylesChangeDefaultTextPr(this, this.Default.TextPr, TextPr));
         this.Default.TextPr.Init_Default();
 		this.Default.TextPr.Merge(TextPr);
 
-        // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
-        //       надо будет сделать, чтобы происходил пересчет всех стилей.
-    },
+		// TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
+		//       надо будет сделать, чтобы происходил пересчет всех стилей.
+	},
 //-----------------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------------
@@ -4938,78 +4299,6 @@ CStyles.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Styles_Add:
-            {
-                delete this.Style[Data.Id];
-                this.Update_Interface(Data.Id);
-                break;
-            }
-
-            case AscDFH.historyitem_Styles_Remove:
-            {
-                this.Style[Data.Id] = Data.Style;
-                this.Update_Interface(Data.Id);
-                break;
-            }
-
-            case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
-            {
-				this.Default.ParaPr.Init_Default();
-				this.Default.ParaPr.Merge(Data.Old);
-                break;
-            }
-
-            case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
-            {
-				this.Default.TextPr.Init_Default();
-				this.Default.TextPr.Merge(Data.Old);
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Styles_Add:
-            {
-                this.Style[Data.Id] = Data.Style;
-                this.Update_Interface(Data.Id);
-                break;
-            }
-
-            case AscDFH.historyitem_Styles_Remove:
-            {
-                delete this.Style[Data.Id];
-                this.Update_Interface(Data.Id);
-                break;
-            }
-
-            case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
-            {
-				this.Default.ParaPr.Init_Default();
-				this.Default.ParaPr.Merge(Data.New);
-                break;
-            }
-
-            case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
-            {
-				this.Default.TextPr.Init_Default();
-				this.Default.TextPr.Merge(Data.New);
-                break;
-            }
-        }
-    },
-
     Get_SelectionState : function()
     {
     },
@@ -5076,100 +4365,6 @@ CStyles.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для совместного редактирования
 //-----------------------------------------------------------------------------------
-    Save_Changes : function(Data, Writer)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        Writer.WriteLong( AscDFH.historyitem_type_Styles );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Styles_Add:
-            case AscDFH.historyitem_Styles_Remove:
-            {
-                // String : Id стиля
-
-                Writer.WriteString2( Data.Id );
-
-                break;
-            }
-
-            case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
-            case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
-            {
-                // Variable : ParaPr | TextPr
-                Data.New.Write_ToBinary(Writer);
-                break;
-            }
-        }
-
-        return Writer;
-    },
-
-    Load_Changes : function(Reader)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( AscDFH.historyitem_type_Styles != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Styles_Add:
-            {
-                // String : Id стиля
-                // Спокойно добавляем стиль по Id, т.к. сначала стиль создается и только
-                // потом он добавляется в список стилей.
-
-                var Id = Reader.GetString2();
-                this.Style[Id] = g_oTableId.Get_ById( Id );
-                this.Update_Interface(Id);
-                AscCommon.CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
-                break;
-            }
-            case AscDFH.historyitem_Styles_Remove:
-            {
-                // String : Id стиля
-
-                var Id = Reader.GetString2();
-                delete this.Style[Id];
-                this.Update_Interface(Id);
-                AscCommon.CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
-                break;
-            }
-            case AscDFH.historyitem_Styles_ChangeDefaultParaPr:
-            {
-                // Variable : ParaPr
-                var oParaPr = new CParaPr();
-                oParaPr.Read_FromBinary(Reader);
-                this.Default.ParaPr.Init_Default();
-				this.Default.ParaPr.Merge(oParaPr);
-                break;
-            }
-            case AscDFH.historyitem_Styles_ChangeDefaultTextPr:
-            {
-                // Variable : TextPr
-                var oTextPr = new CTextPr();
-                oTextPr.Read_FromBinary(Reader);
-				this.Default.TextPr.Init_Default();
-                this.Default.TextPr.Merge(oTextPr);
-                break;
-            }
-        }
-    },
-
     Load_LinkData : function(LinkData)
     {
         if (undefined !== LinkData.UpdateStyleId)
@@ -5794,6 +4989,8 @@ function CTablePr()
     this.TableInd              = undefined;
     this.TableW                = undefined;
     this.TableLayout           = undefined;
+    this.TableDescription      = undefined;
+    this.TableCaption          = undefined;
 }
 
 CTablePr.prototype =
@@ -5848,6 +5045,9 @@ CTablePr.prototype =
             TablePr.TableW = this.TableW.Copy();
 
         TablePr.TableLayout = this.TableLayout;
+
+        TablePr.TableDescription = this.TableDescription;
+        TablePr.TableCaption     = this.TableCaption;
 
         return TablePr;
     },
@@ -5909,6 +5109,12 @@ CTablePr.prototype =
 
         if ( undefined != TablePr.TableLayout )
             this.TableLayout = TablePr.TableLayout;
+
+        if (undefined !== TablePr.TableDescription)
+        	this.TableDescription = TablePr.TableDescription;
+
+        if (undefined !== TablePr.TableCaption)
+        	this.TableCaption = TablePr.TableCaption;
     },
 
     Is_Equal : function(TablePr)
@@ -5955,6 +5161,8 @@ CTablePr.prototype =
         this.TableInd              = 0;
         this.TableW                = new CTableMeasurement(tblwidth_Auto, 0);
         this.TableLayout           = tbllayout_AutoFit;
+        this.TableDescription      = "";
+        this.TableCaption          = "";
     },
 
     Set_FromObject : function(TablePr)
@@ -6070,6 +5278,9 @@ CTablePr.prototype =
             this.TableW = undefined;
 
         this.TableLayout = TablePr.TableLayout;
+
+        this.TableDescription = TablePr.TableDescription;
+        this.TableCaption     = TablePr.TableCaption;
     },
 
     Check_PresentationPr : function(Theme)
@@ -6226,6 +5437,18 @@ CTablePr.prototype =
             Flags |= 131072;
         }
 
+        if (undefined !== this.TableDescription)
+		{
+			Writer.WriteString2(this.TableDescription);
+			Flags |= 262144;
+		}
+
+		if (undefined !== this.TableCaption)
+		{
+			Writer.WriteString2(this.TableCaption);
+			Flags |= 524288;
+		}
+
         var EndPos = Writer.GetCurPosition();
         Writer.Seek( StartPos );
         Writer.WriteLong( Flags );
@@ -6330,6 +5553,12 @@ CTablePr.prototype =
 
         if ( 131072 & Flags )
             this.TableLayout = Reader.GetLong();
+
+		if (262144 & Flags)
+			this.TableDescription = Reader.GetString2();
+
+		if (524288 & Flags)
+			this.TableCaption = Reader.GetString2();
     }
 };
 
@@ -7752,10 +6981,10 @@ CTextPr.prototype =
             this.Unifill = TextPr.Unifill.createDuplicate();
         else
         {
-            if(undefined != TextPr.Color)
-            {
-                this.Unifill = undefined;
-            }
+            //if(undefined != TextPr.Color)
+            //{
+            //    this.Unifill = undefined;
+            //}
         }
         if(undefined != TextPr.FontRef)
         {
@@ -8638,6 +7867,9 @@ CTextPr.prototype =
         if (this.Underline !== TextPr.Underline)
             return false;
 
+		if ((undefined === this.FontFamily && undefined !== TextPr.FontFamily) || (undefined !== this.FontFamily && (undefined === TextPr.FontFamily || this.FontFamily.Name !== TextPr.FontFamily.Name)))
+			return false;
+
         if (false
             || (undefined === this.FontSize
                 && undefined !== TextPr.FontSize)
@@ -8710,6 +7942,18 @@ CTextPr.prototype =
 
         if (this.Vanish !== TextPr.Vanish)
             return false;
+
+		if (!IsEqualStyleObjects(this.Shd, TextPr.Shd))
+			return false;
+		if(undefined != TextPr.AscLine){
+		    return false;
+        }
+        if(undefined != TextPr.AscUnifill){
+            return false;
+        }
+        if(undefined != TextPr.AscFill){
+            return false;
+        }
 
         return true;
     },
@@ -9720,139 +8964,148 @@ CFramePr.prototype =
         this.YAlign  = FramePr.YAlign;
     },
 
-    Write_ToBinary : function(Writer)
-    {
-        var StartPos = Writer.GetCurPosition();
-        Writer.Skip(4);
-        var Flags = 0;
+	Write_ToBinary : function(Writer)
+	{
+		var StartPos = Writer.GetCurPosition();
+		Writer.Skip(4);
+		var Flags = 0;
 
-        if ( undefined != this.DropCap )
-        {
-            Writer.WriteLong( this.DropCap );
-            Flags |= 1;
-        }
+		if (undefined != this.DropCap)
+		{
+			Writer.WriteLong(this.DropCap);
+			Flags |= 1;
+		}
 
-        if ( undefined != this.H )
-        {
-            Writer.WriteDouble( this.H );
-            Flags |= 2;
-        }
+		if (undefined != this.H)
+		{
+			Writer.WriteDouble(this.H);
+			Flags |= 2;
+		}
 
-        if ( undefined != this.HAnchor )
-        {
-            Writer.WriteLong( this.HAnchor );
-            Flags |= 4;
-        }
+		if (undefined != this.HAnchor)
+		{
+			Writer.WriteLong(this.HAnchor);
+			Flags |= 4;
+		}
 
-        if ( undefined != this.HRule )
-        {
-            Writer.WriteLong( this.HRule );
-            Flags |= 8;
-        }
+		if (undefined != this.HRule)
+		{
+			Writer.WriteLong(this.HRule);
+			Flags |= 8;
+		}
 
-        if ( undefined != this.HSpace )
-        {
-            Writer.WriteDouble( this.HSpace );
-            Flags |= 16;
-        }
+		if (undefined != this.HSpace)
+		{
+			Writer.WriteDouble(this.HSpace);
+			Flags |= 16;
+		}
 
-        if ( undefined != this.Lines )
-        {
-            Writer.WriteLong( this.Lines );
-            Flags |= 32;
-        }
+		if (undefined != this.Lines)
+		{
+			Writer.WriteLong(this.Lines);
+			Flags |= 32;
+		}
 
-        if ( undefined != this.VAnchor )
-        {
-            Writer.WriteLong( this.VAnchor );
-            Flags |= 64;
-        }
+		if (undefined != this.VAnchor)
+		{
+			Writer.WriteLong(this.VAnchor);
+			Flags |= 64;
+		}
 
-        if ( undefined != this.VSpace )
-        {
-            Writer.WriteDouble( this.VSpace );
-            Flags |= 128;
-        }
+		if (undefined != this.VSpace)
+		{
+			Writer.WriteDouble(this.VSpace);
+			Flags |= 128;
+		}
 
-        if ( undefined != this.W )
-        {
-            Writer.WriteDouble( this.W );
-            Flags |= 256;
-        }
+		if (undefined != this.W)
+		{
+			Writer.WriteDouble(this.W);
+			Flags |= 256;
+		}
 
-        if ( undefined != this.X )
-        {
-            Writer.WriteDouble( this.X );
-            Flags |= 512;
-        }
+		if (undefined != this.X)
+		{
+			Writer.WriteDouble(this.X);
+			Flags |= 512;
+		}
 
-        if ( undefined != this.XAlign )
-        {
-            Writer.WriteLong( this.XAlign );
-            Flags |= 1024;
-        }
+		if (undefined != this.XAlign)
+		{
+			Writer.WriteLong(this.XAlign);
+			Flags |= 1024;
+		}
 
-        if ( undefined != this.Y )
-        {
-            Writer.WriteDouble( this.Y );
-            Flags |= 2048;
-        }
+		if (undefined != this.Y)
+		{
+			Writer.WriteDouble(this.Y);
+			Flags |= 2048;
+		}
 
-        if ( undefined != this.YAlign )
-        {
-            Writer.WriteLong( this.YAlign );
-            Flags |= 4096;
-        }
+		if (undefined != this.YAlign)
+		{
+			Writer.WriteLong(this.YAlign);
+			Flags |= 4096;
+		}
 
-        var EndPos = Writer.GetCurPosition();
-        Writer.Seek( StartPos );
-        Writer.WriteLong( Flags );
-        Writer.Seek( EndPos );
-    },
+		if (undefined !== this.Wrap)
+		{
+			Writer.WriteLong(this.Wrap);
+			Flags |= 8192;
+		}
 
-    Read_FromBinary : function(Reader)
-    {
-        var Flags = Reader.GetLong();
+		var EndPos = Writer.GetCurPosition();
+		Writer.Seek(StartPos);
+		Writer.WriteLong(Flags);
+		Writer.Seek(EndPos);
+	},
 
-        if ( Flags & 1 )
-            this.DropCap = Reader.GetLong();
+	Read_FromBinary : function(Reader)
+	{
+		var Flags = Reader.GetLong();
 
-        if ( Flags & 2 )
-            this.H = Reader.GetDouble();
+		if (Flags & 1)
+			this.DropCap = Reader.GetLong();
 
-        if ( Flags & 4 )
-            this.HAnchor = Reader.GetLong();
+		if (Flags & 2)
+			this.H = Reader.GetDouble();
 
-        if ( Flags & 8 )
-            this.HRule = Reader.GetLong();
+		if (Flags & 4)
+			this.HAnchor = Reader.GetLong();
 
-        if ( Flags & 16 )
-            this.HSpace = Reader.GetDouble();
+		if (Flags & 8)
+			this.HRule = Reader.GetLong();
 
-        if ( Flags & 32 )
-            this.Lines = Reader.GetLong();
+		if (Flags & 16)
+			this.HSpace = Reader.GetDouble();
 
-        if ( Flags & 64 )
-            this.VAnchor = Reader.GetLong();
+		if (Flags & 32)
+			this.Lines = Reader.GetLong();
 
-        if ( Flags & 128 )
-            this.VSpace = Reader.GetDouble();
+		if (Flags & 64)
+			this.VAnchor = Reader.GetLong();
 
-        if ( Flags & 256 )
-            this.W = Reader.GetDouble();
+		if (Flags & 128)
+			this.VSpace = Reader.GetDouble();
 
-        if ( Flags & 512 )
-            this.X = Reader.GetDouble();
+		if (Flags & 256)
+			this.W = Reader.GetDouble();
 
-        if ( Flags & 1024 )
-            this.XAlign = Reader.GetLong();
+		if (Flags & 512)
+			this.X = Reader.GetDouble();
 
-        if ( Flags & 2048 )
-            this.Y = Reader.GetDouble();
+		if (Flags & 1024)
+			this.XAlign = Reader.GetLong();
 
-        if ( Flags & 4096 )
-            this.YAlign = Reader.GetLong();
-    },
+		if (Flags & 2048)
+			this.Y = Reader.GetDouble();
+
+		if (Flags & 4096)
+			this.YAlign = Reader.GetLong();
+
+		if (Flags & 8192)
+			this.Wrap = Reader.GetLong();
+	},
 
     Init_Default_DropCap : function(bInside)
     {
@@ -10365,6 +9618,9 @@ CParaPr.prototype =
 
         if(undefined != this.DefaultTabSize && undefined != ParaPr.DefaultTabSize && ParaPr.DefaultTabSize === this.DefaultTabSize)
             Result_ParaPr.DefaultTabSize = this.DefaultTabSize;
+
+        if (undefined !== this.Tabs && undefined !== ParaPr.Tabs && this.Tabs.Is_Equal(ParaPr.Tabs))
+        	Result_ParaPr.Tabs = this.Tabs.Copy();
 
 
         return Result_ParaPr;
@@ -11029,3 +10285,19 @@ window["AscCommonWord"].highlight_None = highlight_None;
 window["AscCommonWord"].spacing_Auto = spacing_Auto;
 window["AscCommonWord"].wrap_NotBeside = wrap_NotBeside;
 window["AscCommonWord"].wrap_Around = wrap_Around;
+
+// Создаем глобальные дефолтовые стили, чтобы быстро можно было отдать дефолтовые настройки
+var g_oDocumentDefaultTextPr = new CTextPr();
+var g_oDocumentDefaultParaPr = new CParaPr();
+var g_oDocumentDefaultTablePr = new CTablePr();
+var g_oDocumentDefaultTableCellPr = new CTableCellPr();
+var g_oDocumentDefaultTableRowPr = new CTableRowPr();
+var g_oDocumentDefaultTableStylePr = new CTableStylePr();
+g_oDocumentDefaultTextPr.Init_Default();
+g_oDocumentDefaultParaPr.Init_Default();
+g_oDocumentDefaultTablePr.Init_Default();
+g_oDocumentDefaultTableCellPr.Init_Default();
+g_oDocumentDefaultTableRowPr.Init_Default();
+g_oDocumentDefaultTableStylePr.Init_Default();
+
+// ----------------------------------------------------------------

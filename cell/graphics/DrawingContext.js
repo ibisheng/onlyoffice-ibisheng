@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -416,8 +416,8 @@
 		this.ppiY = 96;
 
 		if (AscCommon.AscBrowser.isRetina) {
-			this.ppiX <<= 1;
-			this.ppiY <<= 1;
+			this.ppiX = AscCommon.AscBrowser.convertToRetinaValue(this.ppiX, true);
+			this.ppiY = AscCommon.AscBrowser.convertToRetinaValue(this.ppiY, true);
 		}
 
 		this._mct  = new Matrix();  // units transform
@@ -776,6 +776,11 @@
 		return this;
 	};
 
+	DrawingContext.prototype.setLineDash = function (segments) {
+		this.ctx.setLineDash(segments);
+		return this;
+	};
+
 	DrawingContext.prototype.fillRect = function (x, y, w, h) {
 		var r = this._calcRect(x, y, w, h);
 		this.ctx.fillRect(r.x, r.y, r.w, r.h);
@@ -903,10 +908,13 @@
 	 * @return {TextMetrics}  Returns the dimension of string {width: w, height: h}
 	 */
 	DrawingContext.prototype.measureText = function (text, units) {
-		var fm = this.fmgrGraphics[3],
-			r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
+		var code;
+		var fm = this.fmgrGraphics[3];
+		var r  = getCvtRatio(0/*px*/, units >= 0 && units <=3 ? units : this.units, this.ppiX);
 		for (var tmp, w = 0, w2 = 0, i = 0; i < text.length; ++i) {
-			tmp = fm.MeasureChar(text.charCodeAt(i));
+			code = text.charCodeAt(i);
+			// Replace Non-breaking space(0xA0) with White-space(0x20)
+			tmp = fm.MeasureChar(0xA0 === code ? 0x20 : code);
 			w += asc_round(tmp.fAdvanceX); // ToDo скачет при wrap в ячейке и zoom
 		}
 		w2 = w - tmp.fAdvanceX + tmp.oBBox.fMaxX - tmp.oBBox.fMinX + 1;
@@ -926,38 +934,12 @@
 		var _g = this.fillColor.g;
 		var _b = this.fillColor.b;
 
-		if (AscCommon.AscBrowser.isMobileVersion) {
-			// Special for iPad (5.1)
-
-			if (!_r && !_g && !_b) {
-				this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
-			} else {
-				var canvD = document.createElement('canvas');
-				canvD.width = nW;
-				canvD.height = nH;
-				var ctxD = canvD.getContext("2d");
-				var pixDst = ctxD.getImageData(0, 0, nW, nH);
-				var dstP = pixDst.data;
-				var data = pGlyph.oBitmap.oGlyphData.m_oContext.getImageData(0, 0, nW, nH);
-				var dataPx = data.data;
-				var cur = 0;
-				var cnt = 4 * nW * nH;
-				for (var i = 3; i < cnt; i += 4) {
-					dstP[cur++] = _r;
-					dstP[cur++] = _g;
-					dstP[cur++] = _b;
-					dstP[cur++] = dataPx[i];
-				}
-				ctxD.putImageData(pixDst, 0, 0, 0, 0, nW, nH);
-				this.ctx.drawImage(canvD, 0, 0, nW, nH, nX, nY, nW, nH);
-			}
-		} else {
-			pGlyph.oBitmap.oGlyphData.checkColor(_r, _g, _b, nW, nH);
-			pGlyph.oBitmap.draw(this.ctx, nX, nY);
-		}
+		pGlyph.oBitmap.oGlyphData.checkColor(_r, _g, _b, nW, nH);
+		pGlyph.oBitmap.draw(this.ctx, nX, nY);
 	};
 
 	DrawingContext.prototype.fillText = function (text, x, y, maxWidth, charWidths, angle) {
+		var code;
 		var manager = angle ? this.fmgrGraphics[1] : this.fmgrGraphics[0];
 
 		var _x = this._mift.transformPointX(x, y);
@@ -966,7 +948,9 @@
 		var length = text.length;
 		for (var i = 0; i < length; ++i) {
 			try {
-				_x = asc_round(manager.LoadString4C(text.charCodeAt(i), _x, _y));
+				code = text.charCodeAt(i);
+				// Replace Non-breaking space(0xA0) with White-space(0x20)
+				_x = asc_round(manager.LoadString4C(0xA0 === code ? 0x20: code, _x, _y));
 			} catch(err) {
 				// do nothing
 			}

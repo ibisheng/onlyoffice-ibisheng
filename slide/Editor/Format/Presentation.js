@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -374,6 +374,27 @@ CShowPr.prototype.Copy = function(){
 }
 
 
+
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_SetShowPr] = AscDFH.CChangesDrawingsObjectNoId      ;
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_AddSlideMaster] = AscDFH.CChangesDrawingsContent         ;
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_ChangeTheme] = AscDFH.CChangesDrawingChangeTheme      ;
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_SlideSize] = AscDFH.CChangesDrawingsObjectNoId      ;
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_ChangeColorScheme] = AscDFH.CChangesDrawingChangeTheme      ;
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_RemoveSlide] = AscDFH.CChangesDrawingsContentPresentation         ;
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_AddSlide] = AscDFH.CChangesDrawingsContentPresentation         ;
+
+
+AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SetShowPr] = function(oClass, value){oClass.showPr  = value;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SlideSize] = function(oClass, value){oClass.Width = value.a; oClass.Height = value.b; oClass.changeSlideSizeFunction(oClass.Width, oClass.Height);};
+
+
+AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_AddSlide] = function(oClass){return oClass.Slides;};
+AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_RemoveSlide] = function(oClass){return oClass.Slides;};
+AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_AddSlideMaster] = function(oClass){return oClass.slideMasters;};
+
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SetShowPr] = CShowPr;
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SlideSize] = AscFormat.CDrawingBaseCoordsWritable;
+
 function CPresentation(DrawingDocument)
 {
     this.History              = History;
@@ -475,6 +496,7 @@ function CPresentation(DrawingDocument)
     this.NeedUpdateTargetForCollaboration = false;
     this.oLastCheckContent = null;
     this.CompositeInput    = null;
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -501,6 +523,17 @@ CPresentation.prototype =
      * Сообщаем о начале составного ввода текста.
      * @returns {boolean} Начался или нет составной ввод.
      */
+
+
+    TurnOffCheckChartSelection: function(){
+    },
+
+    TurnOnCheckChartSelection: function(){
+    },
+
+    Get_DrawingDocument: function(){
+        return this.DrawingDocument;
+    },
 
     Get_TargetDocContent: function(){
         if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects){
@@ -700,7 +733,7 @@ CPresentation.prototype =
 
 
     setShowPr: function(oShowPr){
-        History.Add(this, {Type: AscDFH.historyitem_Presentation_SetShowPr, oldPr: this.showPr, newPr: oShowPr});
+        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_Presentation_SetShowPr, this.showPr, oShowPr));
         this.showPr = oShowPr;
     },
 
@@ -727,19 +760,13 @@ CPresentation.prototype =
 
     addSlideMaster: function(pos, master)
     {
-        History.Add(this, {Type: AscDFH.historyitem_Presentation_AddSlideMaster, pos: pos, master: master});
+        History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_Presentation_AddSlideMaster, pos, [master], true));
         this.slideMasters.splice(pos, 0, master);
     },
 
     Get_Id : function()
     {
         return this.Id;
-    },
-
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
     },
 
     LoadEmptyDocument : function()
@@ -775,17 +802,21 @@ CPresentation.prototype =
     },
     Continue_FastCollaborativeEditing: function()
     {
-        if (true !== AscCommon.CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())
+        if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
+            return;
+        if (this.Api.isLongAction())
+            return;
+        if (true !== AscCommon.CollaborativeEditing.Is_Fast() || true === AscCommon.CollaborativeEditing.Is_SingleUser())
             return;
 
         if(this.Slides[this.CurPage]){
-            if(this.Slides[this.CurPage].graphicObjects.checkTrackDrawings()){
+            if(this.Slides[this.CurPage].graphicObjects.checkTrackDrawings() || this.Api.isOpenedChartFrame){
                 return;
             }
         }
 
         var bHaveChanges = History.Have_Changes(true);
-        if (true !== bHaveChanges && true === AscCommon.CollaborativeEditing.Have_OtherChanges())
+        if (true !== bHaveChanges && (true === AscCommon.CollaborativeEditing.Have_OtherChanges() || 0 !== AscCommon.CollaborativeEditing.getOwnLocksLength()))
         {
             // Принимаем чужие изменение. Своих нет, но функцию отсылки надо вызвать, чтобы снялить локи.
             AscCommon.CollaborativeEditing.Apply_Changes();
@@ -916,6 +947,32 @@ CPresentation.prototype =
             if(_RecalcData.Drawings.ThemeInfo)
             {
                 this.clearThemeTimeouts();
+
+                if(_RecalcData.Drawings && _RecalcData.Drawings.Map)
+                {
+                    for(key in _RecalcData.Drawings.Map)
+                    {
+                        if(_RecalcData.Drawings.Map.hasOwnProperty(key))
+                        {
+                            var oSlide = _RecalcData.Drawings.Map[key];
+                            if(oSlide instanceof AscCommonSlide.Slide && AscFormat.isRealNumber(oSlide.num))
+                            {
+                                var ArrInd = _RecalcData.Drawings.ThemeInfo.ArrInd;
+                                for(i = 0; i < ArrInd.length; ++i)
+                                {
+                                    if(oSlide.num === ArrInd[i])
+                                    {
+                                        break;
+                                    }
+                                }
+                                if(i === ArrInd.length)
+                                {
+                                    _RecalcData.Drawings.ThemeInfo.ArrInd.push(oSlide.num);
+                                }
+                            }
+                        }
+                    }
+                }
                 var startRecalcIndex = _RecalcData.Drawings.ThemeInfo.ArrInd.indexOf(this.CurPage);
                 if(startRecalcIndex === -1)
                 {
@@ -1121,7 +1178,7 @@ CPresentation.prototype =
         }
 
         var Changes = new AscCommon.CCollaborativeChanges();
-        var Reader = Changes.Internal_Load_Data2(CursorInfo, 0, CursorInfo.length);
+        var Reader = Changes.GetStream(CursorInfo, 0, CursorInfo.length);
 
         var RunId    = Reader.GetString2();
         var InRunPos = Reader.GetLong();
@@ -1561,8 +1618,12 @@ CPresentation.prototype =
         }, [], false, AscDFH.historydescription_Presentation_AddChart);
     },
 
-    Selection_Remove: function()
-    {},
+    Selection_Remove: function(bNoResetChartSelection)
+    {
+        if(this.Slides[this.CurPage]){
+            this.Slides[this.CurPage].graphicObjects.resetSelection(undefined, bNoResetChartSelection);
+        }
+    },
 
     Edit_Chart : function(binary)
     {
@@ -1830,16 +1891,16 @@ CPresentation.prototype =
         return true;
     },
 
-    Cursor_MoveUp : function(AddToSelect)
+    Cursor_MoveUp : function(AddToSelect, CtrlKey)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveUp(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveUp(AddToSelect, CtrlKey);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveDown : function(AddToSelect)
+    Cursor_MoveDown : function(AddToSelect, CtrlKey)
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveDown(AddToSelect);
+        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveDown(AddToSelect, CtrlKey);
         this.Document_UpdateInterfaceState();
         return true;
     },
@@ -2249,7 +2310,7 @@ CPresentation.prototype =
         if ( null != ParaPr )
         {
             if ( undefined != ParaPr.Tabs )
-                editor.Update_ParaTab( Default_Tab_Stop, ParaPr.Tabs );
+                editor.Update_ParaTab( AscCommonWord.Default_Tab_Stop, ParaPr.Tabs );
 
             editor.UpdateParagraphProp( ParaPr );
         }
@@ -2328,8 +2389,22 @@ CPresentation.prototype =
                     else
                     {
                         if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
-                            History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.Paragraph_Add(new ParaTab());
+
+                            if(target_content.Selection.StartPos === target_content.Selection.EndPos &&
+                                target_content.Content[target_content.CurPos.ContentPos].IsEmpty() &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.isBullet() &&
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.bulletType.type !== AscFormat.BULLET_TYPE_BULLET_NONE &&
+                                this.Can_IncreaseParagraphLevel(!e.ShiftKey)){
+                                this.Paragraph_IncDecIndent(!e.ShiftKey);
+                            }
+                            else{
+                                History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                                this.Paragraph_Add(new ParaTab());
+                            }
+
+
                         }
                     }
                 }
@@ -2626,7 +2701,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 38 ) // Top Arrow
         {
-            this.Cursor_MoveUp( true === e.ShiftKey );
+            this.Cursor_MoveUp( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 39 ) // Right Arrow
@@ -2644,7 +2719,7 @@ CPresentation.prototype =
             //if ( true != e.ShiftKey )
             //    this.DrawingDocument.TargetStart();
 
-            this.Cursor_MoveDown( true === e.ShiftKey );
+            this.Cursor_MoveDown( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 46 && false === editor.isViewMode ) // Delete
@@ -3012,7 +3087,7 @@ CPresentation.prototype =
     Set_DocumentDefaultTab: function(DTab)
     {
        //History.Add( this, { Type : AscDFH.historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
-        Default_Tab_Stop = DTab;
+		AscCommonWord.Default_Tab_Stop = DTab;
     },
 
     Set_DocumentMargin: function()
@@ -3414,11 +3489,28 @@ CPresentation.prototype =
 
     Document_Get_AllFontNames : function()
     {
-        var AllFonts = {};
-        for(var i =0 ; i < this.Slides.length; ++i)
+        var AllFonts = {}, i;
+        if(this.defaultTextStyle && this.defaultTextStyle.Document_Get_AllFontNames){
+            this.defaultTextStyle.Document_Get_AllFontNames(AllFonts);
+        }
+        for(i =0 ; i < this.Slides.length; ++i)
         {
             this.Slides[i].getAllFonts(AllFonts)
         }
+        for(i = 0; i < this.slideMasters.length; ++i)
+        {
+            this.slideMasters[i].getAllFonts(AllFonts);
+        }
+        if(this.globalTableStyles)
+        {
+            this.globalTableStyles.Document_Get_AllFontNames(AllFonts);
+        }
+        delete AllFonts["+mj-lt"];
+        delete AllFonts["+mn-lt"];
+        delete AllFonts["+mj-ea"];
+        delete AllFonts["+mn-ea"];
+        delete AllFonts["+mj-cs"];
+        delete AllFonts["+mn-cs"];
         return AllFonts;
     },
 
@@ -3612,6 +3704,12 @@ CPresentation.prototype =
         }
     },
 
+	CheckTableStylesDefault: function(Slide)
+    {
+		var tableLook = new CTableLook(true, true, false, false, true, false);
+		return this.CheckTableStyles(Slide, tableLook);
+    },
+
     CheckTableStyles: function(Slide, TableLook)
     {
         if(!this.TablesForInterface)
@@ -3731,22 +3829,25 @@ CPresentation.prototype =
 
     Document_UpdateUndoRedoState : function()
     {
+        if (true === this.TurnOffInterfaceEvents)
+            return;
+
+        if (true === AscCommon.CollaborativeEditing.Get_GlobalLockSelection())
+            return;
+
+        // TODO: Возможно стоит перенсти эту проверку в класс CHistory и присылать
+        //       данные события при изменении значения History.Index
 
         // Проверяем состояние Undo/Redo
-        editor.sync_CanUndoCallback( this.History.Can_Undo() );
-        editor.sync_CanRedoCallback( this.History.Can_Redo() );
 
-        if ( true === History.Have_Changes() )
-        {
-            // дублирование евента. когда будет undo-redo - тогда
-            // эти евенты начнут отличаться
-            editor.SetDocumentModified(true);
-			editor._onUpdateDocumentCanSave();
-        }
-        else
-        {
-            editor.SetUnchangedDocument();
-        }
+        var bCanUndo = this.History.Can_Undo();
+        if (true !== bCanUndo && editor && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+            bCanUndo = this.CollaborativeEditing.CanUndo();
+
+        editor.sync_CanUndoCallback(bCanUndo);
+        editor.sync_CanRedoCallback(this.History.Can_Redo());
+        editor.CheckChangedDocument();
+
     },
 
     Document_UpdateCanAddHyperlinkState : function()
@@ -3795,15 +3896,27 @@ CPresentation.prototype =
 
     Document_Undo : function()
     {
-        if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
+
+        if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
             return;
 
-        this.clearThemeTimeouts();
-        this.History.Undo();
-        this.Recalculate(this.History.RecalculateData);
+        if (true !== this.History.Can_Undo() && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+        {
+            if (this.CollaborativeEditing.CanUndo() && true === this.Api.canSave)
+            {
+                this.CollaborativeEditing.Set_GlobalLock(true);
+                this.Api.asc_Save(true, true);
+            }
+        }
+        else
+        {
+            this.clearThemeTimeouts();
+            this.History.Undo();
+            this.Recalculate(this.History.RecalculateData);
 
-        this.Document_UpdateSelectionState();
-        this.Document_UpdateInterfaceState();
+            this.Document_UpdateSelectionState();
+            this.Document_UpdateInterfaceState();
+        }
     },
 
     Document_Redo : function()
@@ -3846,7 +3959,7 @@ CPresentation.prototype =
         oDocState.Pos = [];
         oDocState.StartPos = [];
         oDocState.EndPos = [];
-
+        oDocState.CurPage = this.CurPage;
         if(this.Slides[this.CurPage]){
             oDocState.Slide = this.Slides[this.CurPage];
             this.Slides[this.CurPage].graphicObjects.Save_DocumentStateBeforeLoadChanges(oDocState);
@@ -3866,20 +3979,49 @@ CPresentation.prototype =
                         this.CurPage = i;
                         this.bGoToPage = true;
                         bFind = true;
+                        if(this.Slides[this.CurPage]){
+                            var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+                            oDrawingObjects.clearPreTrackObjects();
+                            oDrawingObjects.clearTrackObjects();
+                            oDrawingObjects.resetSelection(undefined, true);
+                            oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
+                        }
                     }
                 }
                 if(!bFind){
                     this.CurPage = this.Slides.length - 1;
                     this.bGoToPage = true;
+                    if(this.Slides[this.CurPage]){
+                        var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+                        oDrawingObjects.clearPreTrackObjects();
+                        oDrawingObjects.clearTrackObjects();
+                        oDrawingObjects.resetSelection(undefined, true);
+                        oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
+                    }
                     return;
                 }
             }
             var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
             oDrawingObjects.clearPreTrackObjects();
             oDrawingObjects.clearTrackObjects();
-            oDrawingObjects.resetSelection();
+            oDrawingObjects.resetSelection(undefined, true);
             oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
             oDrawingObjects.loadDocumentStateAfterLoadChanges(oState);
+        }
+        else{
+            if(oState.CurPage === -1){
+                if(this.Slides.length > 0){
+                    this.CurPage = 0;
+                    this.bGoToPage = true;
+                }
+            }
+            if(this.Slides[this.CurPage]){
+                var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+                oDrawingObjects.clearPreTrackObjects();
+                oDrawingObjects.clearTrackObjects();
+                oDrawingObjects.resetSelection(undefined, true);
+                oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
+            }
         }
     },
 
@@ -4123,118 +4265,6 @@ CPresentation.prototype =
 
     },
 
-    Undo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Presentation_SetShowPr:
-            {
-                this.showPr = Data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_Document_DefaultTab:
-            {
-                Default_Tab_Stop = Data.Old;
-
-                break;
-            }
-            case AscDFH.historyitem_Presentation_AddSlide:
-            {
-                this.Slides.splice(Data.Pos, 1);
-                for(var i = 0; i < this.Slides.length; ++i)
-                {
-                    this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
-                }
-                this.DrawingDocument.OnEndRecalculate();
-                break;
-            }
-            case AscDFH.historyitem_Presentation_RemoveSlide:
-            {
-                this.Slides.splice(Data.Pos, 0, g_oTableId.Get_ById(Data.Id));
-                if(this.Slides[Data.Pos])
-                {
-                    this.Slides[Data.Pos].addAllCommentsToInterface();
-                }
-                for(var i = 0; i < this.Slides.length; ++i)
-                {
-                    this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
-                }
-                this.DrawingDocument.OnEndRecalculate();
-                break;
-            }
-            case AscDFH.historyitem_Presentation_SlideSize:
-            {
-
-                this.Width = Data.oldW;
-                this.Height = Data.oldH;
-                this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
-
-                break;
-            }
-            case AscDFH.historyitem_Presentation_AddSlideMaster:
-            {
-                this.slideMasters.splice(Data.pos, 1);
-                break;
-            }
-        }
-    },
-
-    Redo : function(Data)
-    {
-        var Type = Data.Type;
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Presentation_SetShowPr:
-            {
-                this.showPr = Data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_Presentation_AddSlide:
-            {
-                this.Slides.splice(Data.Pos, 0, g_oTableId.Get_ById(Data.Id));
-                for(var i = 0; i < this.Slides.length; ++i)
-                {
-                    this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
-                }
-                this.DrawingDocument.OnEndRecalculate();
-                break;
-            }
-            case AscDFH.historyitem_Presentation_RemoveSlide:
-            {
-                if(this.Slides[Data.Pos])
-                {
-                    this.Slides[Data.Pos].removeAllCommentsToInterface();
-                }
-                this.Slides.splice(Data.Pos, 1);
-                for(var i = 0; i < this.Slides.length; ++i)
-                {
-                    this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
-                }
-                this.DrawingDocument.OnEndRecalculate();
-                break;
-            }
-            case AscDFH.historyitem_Presentation_SlideSize:
-            {
-                var kw = Data.newW/this.Width;
-                var kh = Data.newH/this.Height;
-                this.Width = Data.newW;
-                this.Height = Data.newH;
-                this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
-                break;
-            }
-            case AscDFH.historyitem_Presentation_AddSlideMaster:
-            {
-                this.slideMasters.splice(Data.pos, 0, Data.master);
-                break;
-            }
-        }
-    },
-
     Get_ParentObject_or_DocumentPos : function(Index)
     {
         return { Type : AscDFH.historyitem_recalctype_Inline, Data : Index };
@@ -4282,9 +4312,9 @@ CPresentation.prototype =
             }
             case AscDFH.historyitem_Presentation_ChangeTheme:
             {
-                for(var i = 0; i < Data.arrIndex.length; ++i)
+                for(var i = 0; i < Data.aIndexes.length; ++i)
                 {
-                    this.Slides[Data.arrIndex[i]] && this.Slides[Data.arrIndex[i]].checkSlideTheme();
+                    this.Slides[Data.aIndexes[i]] && this.Slides[Data.aIndexes[i]].checkSlideTheme();
                 }
                 break;
             }
@@ -4305,9 +4335,9 @@ CPresentation.prototype =
                         recalculateMaps.layouts[key].checkSlideColorScheme();
                     }
                 }
-                for(var i = 0; i < Data.arrIndex.length; ++i)
+                for(var i = 0; i < Data.aIndexes.length; ++i)
                 {
-                    this.Slides[Data.arrIndex[i]] && this.Slides[Data.arrIndex[i]].checkSlideTheme();
+                    this.Slides[Data.aIndexes[i]] && this.Slides[Data.aIndexes[i]].checkSlideTheme();
                 }
                 break;
             }
@@ -4321,10 +4351,12 @@ CPresentation.prototype =
         {
             case AscDFH.historyitem_Presentation_AddSlide:
             {
+                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, All: true});
                 break;
             }
             case AscDFH.historyitem_Presentation_RemoveSlide:
             {
+                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, All: true});
                 break;
             }
             case AscDFH.historyitem_Presentation_SlideSize:
@@ -4338,12 +4370,12 @@ CPresentation.prototype =
             }
             case AscDFH.historyitem_Presentation_ChangeTheme:
             {
-                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, Theme: true, ArrInd: Data.arrIndex});
+                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, Theme: true, ArrInd: Data.aIndexes});
                 break;
             }
             case AscDFH.historyitem_Presentation_ChangeColorScheme:
             {
-                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, ColorScheme: true, ArrInd: Data.arrIndex});
+                History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, ColorScheme: true, ArrInd: Data.aIndexes});
                 break;
             }
         }
@@ -4774,7 +4806,7 @@ CPresentation.prototype =
             slides_array[i].setLayout(new_layout);
             slides_array[i].checkNoTransformPlaceholder();
         }
-        History.Add(this, {Type: AscDFH.historyitem_Presentation_ChangeTheme, arrIndex: arr_ind});
+        History.Add(new AscDFH.CChangesDrawingChangeTheme(this, AscDFH.historyitem_Presentation_ChangeTheme, arr_ind));
         this.resetStateCurSlide();
         this.Recalculate();
         this.Document_UpdateInterfaceState();
@@ -4805,7 +4837,7 @@ CPresentation.prototype =
         if(this.Document_Is_SelectionLocked(AscCommon.changestype_SlideSize) === false)
         {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_ChangeSlideSize);
-            History.Add(this, {Type: AscDFH.historyitem_Presentation_SlideSize, oldW: this.Width, newW: width, oldH: this.Height, newH:  height});
+            History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_Presentation_SlideSize, new AscFormat.CDrawingBaseCoordsWritable(this.Width, this.Height), new AscFormat.CDrawingBaseCoordsWritable(width, height)));
             this.Width = width;
             this.Height = height;
             this.changeSlideSizeFunction(this.Width, this.Height);
@@ -4839,7 +4871,7 @@ CPresentation.prototype =
             }
             arrInd.push(i);
         }
-        History.Add(this, {Type: AscDFH.historyitem_Presentation_ChangeColorScheme, arrIndex: arrInd});
+        History.Add(new AscDFH.CChangesDrawingChangeTheme(this, AscDFH.historyitem_Presentation_ChangeColorScheme, arrInd));
         this.Recalculate();
         this.Document_UpdateInterfaceState();
     },
@@ -4849,7 +4881,7 @@ CPresentation.prototype =
     {
         if(AscFormat.isRealNumber(pos) && pos > -1 && pos < this.Slides.length)
         {
-            History.Add(this, {Type: AscDFH.historyitem_Presentation_RemoveSlide, Pos: pos, Id: this.Slides[pos].Get_Id()});
+            History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_Presentation_RemoveSlide, pos, [this.Slides[pos]], false));
             this.Slides[pos].removeAllCommentsToInterface();
             return this.Slides.splice(pos, 1)[0];
         }
@@ -4858,7 +4890,7 @@ CPresentation.prototype =
 
     insertSlide: function(pos, slide)
     {
-        History.Add(this, {Type: AscDFH.historyitem_Presentation_AddSlide, Pos: pos, Id: slide.Get_Id()});
+        History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_Presentation_AddSlide, pos, [slide], true));
         this.Slides.splice(pos, 0, slide);
     },
 	
@@ -4890,196 +4922,6 @@ CPresentation.prototype =
     {
         return false;
     },
-
-
-    Save_Changes : function(Data, Writer)
-    {
-        Writer.WriteLong( AscDFH.historyitem_type_Document );
-
-        var Type = Data.Type;
-
-        // Пишем тип
-        Writer.WriteLong( Type );
-
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Presentation_SetShowPr:
-            {
-                if(Data.newPr){
-                    Writer.WriteBool(true);
-                    Data.newPr.Write_ToBinary(Writer);
-                }
-                else{
-                    Writer.WriteBool(false);
-                }
-                break;
-            }
-            case AscDFH.historyitem_Document_DefaultTab:
-            {
-                // Double : Default Tab
-
-                Writer.WriteDouble( Data.New );
-
-                break;
-            }
-            case AscDFH.historyitem_Presentation_RemoveSlide:
-            case AscDFH.historyitem_Presentation_AddSlide:
-            {
-                var Pos = Data.UseArray ? Data.PosArray[0] : Data.Pos;
-                Writer.WriteLong(Pos);
-                Writer.WriteString2(Data.Id);
-                break;
-            }
-            case AscDFH.historyitem_Presentation_SlideSize:
-            {
-                Writer.WriteDouble(Data.newW);
-                Writer.WriteDouble(Data.newH);
-                break;
-            }
-            case AscDFH.historyitem_Presentation_AddSlideMaster:
-            {
-                Writer.WriteLong(Data.pos);
-                Writer.WriteString2(Data.master.Get_Id());
-                break;
-            }
-
-            case AscDFH.historyitem_Presentation_ChangeTheme:
-            case AscDFH.historyitem_Presentation_ChangeColorScheme:
-            {
-                //TODO: массив индексов возможно нужно перезаписать после принятия чужих изменений с изменением порядка слайдов
-                Writer.WriteLong(Data.arrIndex.length);
-                for(var i = 0; i < Data.arrIndex.length; ++i)
-                {
-                    Writer.WriteLong(Data.arrIndex[i]);
-                }
-                break;
-            }
-
-        }
-
-        return Writer;
-    },
-
-
-    Load_Changes : function(Reader, Reader2)
-    {
-        // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-        // Long : тип класса
-        // Long : тип изменений
-
-        var ClassType = Reader.GetLong();
-        if ( AscDFH.historyitem_type_Document != ClassType )
-            return;
-
-        var Type = Reader.GetLong();
-
-
-        switch ( Type )
-        {
-            case AscDFH.historyitem_Presentation_SetShowPr:
-            {
-                if(Reader.GetBool()){
-                    this.showPr = new CShowPr();
-                    this.showPr.Read_FromBinary(Reader);
-                }
-                else{
-                    this.showPr = null;
-                }
-                break;
-            }
-            case AscDFH.historyitem_Presentation_AddSlide:
-            {
-                var pos = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong());
-                var Id = Reader.GetString2();
-                var oSlide = g_oTableId.Get_ById(Id);
-                if(oSlide)
-                {
-                    this.Slides.splice(pos, 0, oSlide);
-                    AscCommon.CollaborativeEditing.Add_ChangedClass(this);
-                }
-                break;
-            }
-            case AscDFH.historyitem_Presentation_RemoveSlide:
-            {
-                var pos = Reader.GetLong();
-                Reader.GetString2();
-
-                var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, pos);
-
-                // действие совпало, не делаем его
-                if ( false === ChangesPos )
-                    break;
-                this.slidesToUnlock.push(ChangesPos);
-                if(this.Slides[ChangesPos])
-                {
-                    this.Slides[ChangesPos].removeAllCommentsToInterface();
-                }
-                this.Slides.splice(ChangesPos, 1);
-                break;
-            }
-
-            case AscDFH.historyitem_Presentation_SlideSize:
-            {
-                var w = Reader.GetDouble();
-                var h = Reader.GetDouble();
-                var kw = w/this.Width;
-                var kh = h/this.Height;
-                this.Width = w;
-                this.Height = h;
-                AscCommon.CollaborativeEditing.ScaleX = kw;
-                AscCommon.CollaborativeEditing.ScaleY = kh;
-                this.changeSlideSizeFunction(this.Width, this.Height);
-                editor.sendEvent("asc_onPresentationSize", this.Width, this.Height);
-                break;
-            }
-            case AscDFH.historyitem_Presentation_AddSlideMaster:
-            {
-                var pos = Reader.GetLong();
-                var id = Reader.GetString2();
-                this.slideMasters.splice(pos, 0, g_oTableId.Get_ById(id));
-                this.bGoToPage = true;
-                break;
-            }
-            case AscDFH.historyitem_Presentation_ChangeTheme:
-            {
-                var _len = Reader.GetLong(), index;
-                for(var i = 0; i < _len; ++i)
-                {
-                    index = Reader.GetLong();
-                    this.Slides[index] && this.Slides[index].checkSlideTheme();
-                }
-                break;
-            }
-            case AscDFH.historyitem_Presentation_ChangeColorScheme:
-            {
-                var recalculateMaps = this.GetRecalculateMaps(), key;
-                for(key in recalculateMaps.masters)
-                {
-                    if(recalculateMaps.masters.hasOwnProperty(key))
-                    {
-                        recalculateMaps.masters[key].checkSlideColorScheme();
-                    }
-                }
-                for(key in recalculateMaps.layouts)
-                {
-                    if(recalculateMaps.layouts.hasOwnProperty(key))
-                    {
-                        recalculateMaps.layouts[key].checkSlideColorScheme();
-                    }
-                }
-                var _len = Reader.GetLong(), index;
-                for(var i = 0; i < _len; ++i)
-                {
-                    index = Reader.GetLong();
-                    this.Slides[index] && this.Slides[index].checkSlideTheme();
-                }
-                break;
-            }
-        }
-        return true;
-    },
-
 
     Clear_CollaborativeMarks: function()
     {},
@@ -5321,6 +5163,46 @@ CPresentation.prototype =
             }
         }
         this.Document_UpdateUndoRedoState();
+    },
+
+
+    AddShapeOnCurrentPage: function (sPreset) {
+
+        if(!this.Slides[this.CurPage]){
+            return;
+        }
+        var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+        oDrawingObjects.changeCurrentState(new AscFormat.StartAddNewShape(oDrawingObjects, sPreset));
+        this.OnMouseDown({}, this.Width/4, this.Height/4, this.CurPage);
+        this.OnMouseUp({}, this.Width/4, this.Height/4, this.CurPage);
+        this.Document_UpdateInterfaceState();
+        this.Document_UpdateRulersState();
+        this.Document_UpdateSelectionState();
+    },
+
+    Can_CopyCut: function()
+    {
+        if(!this.Slides[this.CurPage]){
+            return false;
+        }
+        var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+        var oTargetContent = oDrawingObjects.getTargetDocContent();
+
+
+        if (oTargetContent)
+        {
+            if (true === oTargetContent.Is_SelectionUse() && true !== oTargetContent.Selection_IsEmpty(true))
+            {
+                 if (oTargetContent.Selection.StartPos !== oTargetContent.Selection.EndPos || type_Paragraph === oTargetContent.Content[oTargetContent.Selection.StartPos].Get_Type())
+                    return true;
+                else
+                    return oTargetContent.Content[oTargetContent.Selection.StartPos].Can_CopyCut();
+            }
+            return false;
+        }
+        else{
+            return oDrawingObjects.selectedObjects.length > 0;
+        }
     },
 
     StartAddShape: function(preset, _is_apply)

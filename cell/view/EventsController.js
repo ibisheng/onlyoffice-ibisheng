@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -125,9 +125,6 @@
             this.vsbApiLockMouse = false;
             this.hsbApiLockMouse = false;
 
-			this.__handlers = null; // ToDo избавиться от этой переменной!
-
-
             return this;
 		}
 
@@ -146,16 +143,6 @@
 			this.handlers = new AscCommonExcel.asc_CHandlersList(handlers);
             this._createScrollBars();
             if( this.view.Api.isMobileVersion ){
-                var __hasTouch = 'ontouchstart' in window;
-                if (__hasTouch) {
-                    this.widget.addEventListener("touchstart"	, function (e) {self._onTouchStart(e); return false;}			, false);
-                    this.widget.addEventListener("touchmove"	, function (e) {self._onTouchMove(e); return false;}			, false);
-                    this.widget.addEventListener("touchend"		, function (e) {self._onTouchEnd(e); return false;}	, false);
-                } else {
-                    this.widget.addEventListener("touchstart"	, function (e) {self._onMouseDown(e.touches[0]); return false;}			, false);
-                    this.widget.addEventListener("touchmove"	, function (e) {self._onMouseMove(e.touches[0]); return false;}			, false);
-                    this.widget.addEventListener("touchend"		, function (e) {self._onMouseUp(e.changedTouches[0]); return false;}	, false);
-                }
                 /*раньше события на ресайз вызывался из меню через контроллер. теперь контроллер в меню не доступен, для ресайза подписываемся на глобальный ресайз от window.*/
                 window.addEventListener("resize", function () {self._onWindowResize.apply(self, arguments);}, false);
                 return this;
@@ -186,10 +173,17 @@
 				// https://developer.mozilla.org/en-US/docs/Web/Reference/Events/wheel
 				// detect available wheel event
 				var nameWheelEvent = "onwheel" in document.createElement("div") ? "wheel" :	// Modern browsers support "wheel"
-						document.onmousewheel !== undefined ? "mousewheel" : 				// Webkit and IE support at least "mousewheel"
-							"DOMMouseScroll";												// let's assume that remaining browsers are older Firefox
+					document.onmousewheel !== undefined ? "mousewheel" : 				// Webkit and IE support at least "mousewheel"
+						"DOMMouseScroll";												// let's assume that remaining browsers are older Firefox
 
-				this.widget.addEventListener(nameWheelEvent, function () {return self._onMouseWheel.apply(self, arguments);} , false);
+				this.widget.addEventListener(nameWheelEvent, function () {
+					return self._onMouseWheel.apply(self, arguments);
+				}, false);
+				this.widget.addEventListener('contextmenu', function (e) {
+					e.stopPropagation();
+					e.preventDefault();
+					return false;
+				}, false)
 			}
 
 			// Курсор для графических объектов. Определяем mousedown и mouseup для выделения текста.
@@ -680,7 +674,7 @@
 
 		/** @param event {KeyboardEvent} */
 		asc_CEventsController.prototype._onWindowKeyDown = function (event) {
-			var t = this, dc = 0, dr = 0, isViewerMode = t.settings.isViewerMode;
+			var t = this, dc = 0, dr = 0, isViewerMode = t.settings.isViewerMode, action = false;
 			var ctrlKey = !AscCommon.getAltGr(event) && (event.metaKey || event.ctrlKey);
 			var shiftKey = event.shiftKey;
 
@@ -731,6 +725,9 @@
 			t.skipKeyPress = true;
 
 			switch (event.which) {
+				case 120: // F9
+					t.handlers.trigger("calcAll", ctrlKey, event.altKey, shiftKey);
+					return result;
 
 				case 113: // F2
 					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
@@ -799,6 +796,7 @@
 				case 27: // Esc
 					t.handlers.trigger("stopFormatPainter");
 					t.handlers.trigger("stopAddShape");
+					t.handlers.trigger("hideSpecialPasteOptions");
 					return result;
 
 				case 144: //Num Lock
@@ -907,13 +905,19 @@
 					}
 					break;
 
-				case 53: // make strikethrough	Ctrl + 5
-				case 66: // make bold			Ctrl + b
-				case 73: // make italic			Ctrl + i
-				//case 83: // save				Ctrl + s
-				case 85: // make underline		Ctrl + u
-				case 89: // redo				Ctrl + y
-				case 90: // undo				Ctrl + z
+				case 49:  // set number format		Ctrl + Shift + !
+				case 50:  // set time format		Ctrl + Shift + @
+				case 51:  // set date format		Ctrl + Shift + #
+				case 52:  // set currency format	Ctrl + Shift + $
+				case 53:  // make strikethrough		Ctrl + 5
+				case 54:  // set exponential format Ctrl + Shift + ^
+				case 66:  // make bold				Ctrl + b
+				case 73:  // make italic			Ctrl + i
+				//case 83: // save					Ctrl + s
+				case 85:  // make underline			Ctrl + u
+				case 89:  // redo					Ctrl + y
+				case 90:  // undo					Ctrl + z
+				case 192: // set general format 	Ctrl + Shift + ~
 					if (isViewerMode || t.isSelectionDialogMode) {
 						stop();
 						return result;
@@ -924,8 +928,7 @@
 
 				case 80: // print           Ctrl + p
 					if (t.handlers.trigger("getCellEditMode")) {
-						stop();
-						return result;
+						return true;
 					}
 
 					if (!ctrlKey) {
@@ -933,33 +936,91 @@
 						return true;
 					}
 
-					stop();
-
-					// Вызовем обработчик
-					if (!t.__handlers) {
-						t.__handlers = {
-							53: function () {
-								t.handlers.trigger("setFontAttributes", "s");
-							}, 65: function () {
-								t.handlers.trigger("changeSelection", /*isStartPoint*/true, -1, -1, /*isCoord*/true, /*isSelectMode*/
-									false, false);
-							}, 66: function () {
-								t.handlers.trigger("setFontAttributes", "b");
-							}, 73: function () {
-								t.handlers.trigger("setFontAttributes", "i");
-							}, 85: function () {
-								t.handlers.trigger("setFontAttributes", "u");
-							}, 80: function () {
-								t.handlers.trigger("print");
-							}, //83: function () {t.handlers.trigger("save");},
-							89: function () {
-								t.handlers.trigger("redo");
-							}, 90: function () {
-								t.handlers.trigger("undo");
+					switch (event.which) {
+						case 49:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Number);
+								action = true;
 							}
-						};
+							break;
+						case 50:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Time);
+								action = true;
+							}
+							break;
+						case 51:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Date);
+								action = true;
+							}
+							break;
+						case 52:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Currency);
+								action = true;
+							}
+							break;
+						case 53:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Percent);
+							} else {
+								t.handlers.trigger("setFontAttributes", "s");
+							}
+							action = true;
+							break;
+						case 54:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.Scientific);
+								action = true;
+							}
+							break;
+						case 65:
+							t.handlers.trigger("changeSelection", /*isStartPoint*/true, -1, -1, /*isCoord*/true, /*isSelectMode*/
+								false, false);
+							action = true;
+							break;
+						case 66:
+							t.handlers.trigger("setFontAttributes", "b");
+							action = true;
+							break;
+						case 73:
+							t.handlers.trigger("setFontAttributes", "i");
+							action = true;
+							break;
+						case 80:
+							t.handlers.trigger("print");
+							action = true;
+							break;
+						/*case 83:
+							t.handlers.trigger("save");
+						 	action = true;
+							break;*/
+						case 85:
+							t.handlers.trigger("setFontAttributes", "u");
+							action = true;
+							break;
+						case 89:
+							t.handlers.trigger("redo");
+							action = true;
+							break;
+						case 90:
+							t.handlers.trigger("undo");
+							action = true;
+							break;
+						case 192:
+							if (shiftKey) {
+								t.handlers.trigger("setCellFormat", Asc.c_oAscNumFormatType.General);
+								action = true;
+							}
+							break;
 					}
-					t.__handlers[event.which]();
+
+					if (!action) {
+						t.skipKeyPress = false;
+						return true;
+					}
+					stop();
 					return result;
 
 				case 61:  // Firefox, Opera (+/=)
@@ -969,9 +1030,11 @@
 					}
 
 					if (event.altKey) {
-						t.handlers.trigger('addFunction', 'SUM', Asc.c_oAscPopUpSelectorType.Func, true);
+						this.handlers.trigger('addFunction',
+							AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale['SUM'] :
+								'SUM', Asc.c_oAscPopUpSelectorType.Func, true);
 					} else {
-						t.skipKeyPress = false;
+						this.skipKeyPress = false;
 					}
 					return true;
 
@@ -981,7 +1044,7 @@
 					return result;
 
 				default:
-					t.skipKeyPress = false;
+					this.skipKeyPress = false;
 					return true;
 
 			} // end of switch
@@ -1487,7 +1550,8 @@
 
 			// Режим перемещения диапазона
 			if (t.isMoveRangeMode) {
-				event.currentTarget.style.cursor = ctrlKey ? "copy" : "move";
+				if (event.currentTarget && event.currentTarget.style)
+					event.currentTarget.style.cursor = ctrlKey ? "copy" : "move";
 				t._moveRangeHandle(event);
 				return true;
 			}
@@ -1554,6 +1618,9 @@
 			} else if (undefined !== event.detail && 0 !== event.detail) {
 				// FF
 				deltaY = event.detail;
+			} else if (undefined !== event.deltaY && 0 !== event.deltaY) {
+				// FF
+				deltaY = event.deltaY;
 			}
 			if (event.axis !== undefined && event.axis === event.HORIZONTAL_AXIS) {
 				deltaX = deltaY;
@@ -1618,21 +1685,11 @@
 			var y = ((event.pageY * AscBrowser.zoom) >> 0) - offs.top;
 
 			if (AscBrowser.isRetina) {
-				x <<= 1;
-				y <<= 1;
+				x *= AscCommon.AscBrowser.retinaPixelRatio;
+				y *= AscCommon.AscBrowser.retinaPixelRatio;
 			}
 
 			return {x: x, y: y};
-		};
-
-		asc_CEventsController.prototype._onTouchStart = function (event) {
-			this.view.MobileTouchManager.onTouchStart(event);
-		};
-		asc_CEventsController.prototype._onTouchMove = function (event) {
-			this.view.MobileTouchManager.onTouchMove(event);
-		};
-		asc_CEventsController.prototype._onTouchEnd = function (event) {
-			this.view.MobileTouchManager.onTouchEnd(event);
 		};
 
 		//------------------------------------------------------------export---------------------------------------------------

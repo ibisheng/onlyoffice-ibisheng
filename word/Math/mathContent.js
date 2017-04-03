@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1110,6 +1110,73 @@ CMPrp.prototype =
         this.brk = undefined;
     }
 };
+CMPrp.prototype.Write_ToBinary = function(Writer)
+{
+	var StartPos = Writer.GetCurPosition();
+	Writer.Skip(4);
+
+	var Flags = 0;
+	if (undefined != this.aln)
+	{
+		Writer.WriteBool(this.aln);
+		Flags |= 1;
+	}
+	if (undefined != this.brk)
+	{
+		this.brk.Write_ToBinary(Writer);
+		Flags |= 2;
+	}
+	if (undefined != this.lit)
+	{
+		Writer.WriteBool(this.lit);
+		Flags |= 4;
+	}
+	if (undefined != this.nor)
+	{
+		Writer.WriteBool(this.nor);
+		Flags |= 8;
+	}
+	if (undefined != this.scr)
+	{
+		Writer.WriteLong(this.scr);
+		Flags |= 16;
+	}
+	if (undefined != this.sty)
+	{
+		Writer.WriteLong(this.sty);
+		Flags |= 32;
+	}
+
+	var EndPos = Writer.GetCurPosition();
+	Writer.Seek(StartPos);
+	Writer.WriteLong(Flags);
+	Writer.Seek(EndPos);
+};
+CMPrp.prototype.Read_FromBinary = function(Reader)
+{
+	var Flags = Reader.GetLong();
+
+	if (Flags & 1)
+		this.aln = Reader.GetBool();
+
+	if (Flags & 2)
+	{
+		this.brk = new CMathBreak();
+		this.brk.Read_FromBinary(Reader);
+	}
+
+	if (Flags & 4)
+		this.lit = Reader.GetBool();
+
+	if (Flags & 8)
+		this.nor = Reader.GetBool();
+
+	if (Flags & 16)
+		this.scr = Reader.GetLong();
+
+	if (Flags & 32)
+		this.sty = Reader.GetLong();
+};
 
 /**
  *
@@ -1118,7 +1185,7 @@ CMPrp.prototype =
  */
 function CMathContent()
 {
-    CMathContent.superclass.constructor.call(this);
+	CParagraphContentWithParagraphLikeContent.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();		
 
@@ -1164,11 +1231,14 @@ function CMathContent()
     this.ParentElement = null;
 
     this.size = new CMathSize();
+
+	this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 	
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CMathContent, CParagraphContentWithParagraphLikeContent);
+CMathContent.prototype = Object.create(CParagraphContentWithParagraphLikeContent.prototype);
+CMathContent.prototype.constructor = CMathContent;
 CMathContent.prototype.init = function()
 {
 
@@ -1178,14 +1248,17 @@ CMathContent.prototype.addElementToContent = function(obj)
     this.Internal_Content_Add(this.Content.length, obj, false);
     this.CurPos = this.Content.length-1;
 };
-CMathContent.prototype.fillPlaceholders = function()
+CMathContent.prototype.SetPlaceholder = function()
 {
-    this.Content.length = 0;
+	this.Remove_FromContent(0, this.Content.length);
 
-    var oMRun = new ParaRun(null, true);
-    oMRun.fillPlaceholders();
-    this.addElementToContent(oMRun);
+    var oRun = new ParaRun(null, true);
+    oRun.AddMathPlaceholder();
 
+    this.addElementToContent(oRun);
+
+    this.Selection_Remove();
+    this.Cursor_MoveToEndPos();
 };
 //////////////////////////////////////
 CMathContent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
@@ -1387,7 +1460,7 @@ CMathContent.prototype.Is_InclineLetter = function()
 CMathContent.prototype.IsPlaceholder = function()
 {
     var bPlh = false;
-    if(!this.bRoot && this.Content.length == 1)
+    if(this.Content.length == 1)
         bPlh  = this.Content[0].IsPlaceholder();
 
     return bPlh;
@@ -1486,7 +1559,7 @@ CMathContent.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 
     this.Bounds.ShiftPos(CurLine, CurRange, Dx, Dy);
 
-    CMathContent.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
+	CParagraphContentWithParagraphLikeContent.prototype.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
 };
 CMathContent.prototype.SetParent = function(Parent, ParaMath)
 {
@@ -1533,8 +1606,8 @@ CMathContent.prototype.GetParent = function()
 };
 CMathContent.prototype.SetArgSize = function(val)
 {
-    History.Add( this, { Type : AscDFH.historyitem_Math_ArgSize, New: val, Old: this.ArgSize.GetValue()});
-    this.ArgSize.SetValue(val);
+	History.Add(new CChangesMathContentArgSize(this, this.ArgSize.GetValue(), val));
+	this.ArgSize.SetValue(val);
 };
 CMathContent.prototype.GetArgSize = function()
 {
@@ -1644,7 +1717,6 @@ CMathContent.prototype.private_CorrectContent = function()
     }
 
 };
-
 CMathContent.prototype.Correct_Content = function(bInnerCorrection)
 {
     if (true === bInnerCorrection)
@@ -1666,46 +1738,39 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
         this.Add_ToContent(0, NewMathRun);
     }
 
-    // Если единственный элемент данного контента ран и он пустой, заполняем его плейсхолдером.
-    if (1 === this.Content.length && para_Math_Run === this.Content[0].Type && true === this.Content[0].Is_Empty())
-    {
-        var oPlaceHolder = new CMathText();
-        oPlaceHolder.fillPlaceholders();
-        this.Content[0].Add_ToContent(0, oPlaceHolder);
-    }
+	// Если единственный элемент данного контента ран и он пустой, заполняем его плейсхолдером
+	if (1 === this.Content.length && para_Math_Run === this.Content[0].Type && true === this.Content[0].Is_Empty())
+	{
+		this.Content[0].AddMathPlaceholder();
+	}
 
-    // не корректируем, если в контенте только один плейсхолдер
+	// Возможна ситуация, когда у нас остались лишние плейсхолдеры (либо их слишком много, либо они вообще не нужны)
+	if (true !== this.IsPlaceholder())
+	{
+		var isEmptyContent = true;
+		for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+		{
+			if (para_Math_Run === this.Content[nPos].Type)
+			{
+				this.Content[nPos].RemoveMathPlaceholder();
+				if (false === this.Content[nPos].Is_Empty())
+					isEmptyContent = false;
+			}
+			else
+			{
+				isEmptyContent = false;
+			}
+		}
 
-    var bOnlyPlh = this.Content.length == 1 && this.Content[0].OnlyOnePlaceholder();
+		if (isEmptyContent)
+			this.SetPlaceholder();
+	}
 
-    if(bOnlyPlh == false)
-    {
-        var bEmptyContent = true;
-
-        for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
-        {
-            if(para_Math_Run === this.Content[nPos].Type)
-            {
-                this.Content[nPos].Math_Correct_Content();
-
-                if(false === this.Content[nPos].Is_Empty())
-                    bEmptyContent = false;
-            }
-            else
-            {
-                bEmptyContent = false;
-            }
-        }
-
-        if(bEmptyContent == true && this.bRoot == false)
-        {
-            this.Content[0].fillPlaceholders();
-            this.Content[0].Recalc_CompiledPr(true);
-        }
-    }
-
+	if (this.CurPos >= this.Content.length)
+		this.CurPos = this.Content.length - 1;
+    if (this.CurPos < 0)
+    	this.CurPos = 0;
 };
-
 CMathContent.prototype.Correct_ContentPos = function(nDirection)
 {
     var nCurPos = this.CurPos;
@@ -1775,7 +1840,7 @@ CMathContent.prototype.Get_TextPr = function(ContentPos, Depth)
 
     var TextPr;
 
-    if(this.IsPlaceholder())
+    if(true !== this.bRoot && this.IsPlaceholder())
         TextPr = this.Parent.Get_CtrPrp(true);
     else
         TextPr = this.Content[pos].Get_TextPr(ContentPos, Depth + 1);
@@ -1790,7 +1855,7 @@ CMathContent.prototype.Get_CompiledTextPr = function(Copy, bAll)
 {
     var TextPr = null;
 
-    if(this.IsPlaceholder())
+    if(true !== this.bRoot && this.IsPlaceholder())
     {
         TextPr = this.Parent.Get_CompiledCtrPrp_2();
     }
@@ -2050,14 +2115,14 @@ CMathContent.prototype.IsNormalTextInRuns = function()
 };
 CMathContent.prototype.Internal_Content_Add = function(Pos, Item, bUpdatePosition)
 {
-    Item.Set_ParaMath(this.ParaMath);
-    Item.Parent = this;
-    Item.Recalc_RunsCompiledPr();
+	Item.Set_ParaMath(this.ParaMath);
+	Item.Parent = this;
+	Item.Recalc_RunsCompiledPr();
 
-    History.Add( this, { Type : AscDFH.historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
-    this.Content.splice( Pos, 0, Item );
+	History.Add(new CChangesMathContentAddItem(this, Pos, [Item]));
+	this.Content.splice(Pos, 0, Item);
 
-    this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
+	this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
 };
 CMathContent.prototype.private_UpdatePosOnAdd = function(Pos, bUpdatePosition)
 {
@@ -2162,38 +2227,38 @@ CMathContent.prototype.Concat_ToEnd = function(NewItems)
 };
 CMathContent.prototype.Concat_ToContent = function(Pos, NewItems)
 {
-    if(NewItems != undefined && NewItems.length > 0)
-    {
-        var Count = NewItems.length;
+	if (NewItems != undefined && NewItems.length > 0)
+	{
+		var Count = NewItems.length;
 
-        for(var i = 0; i < Count; i++)
-        {
-            NewItems[i].Set_ParaMath(this.ParaMath);
-            NewItems[i].Parent = this;
-            NewItems[i].Recalc_RunsCompiledPr();
-        }
+		for (var i = 0; i < Count; i++)
+		{
+			NewItems[i].Set_ParaMath(this.ParaMath);
+			NewItems[i].Parent = this;
+			NewItems[i].Recalc_RunsCompiledPr();
+		}
 
-        History.Add( this, { Type : AscDFH.historyitem_Math_AddItem, Pos : Pos, EndPos : Pos + Count - 1, Items : NewItems } );
+		History.Add(new CChangesMathContentAddItem(this, Pos, NewItems));
 
-        var Array_start = this.Content.slice(0, Pos);
-        var Array_end   = this.Content.slice(Pos);
+		var Array_start = this.Content.slice(0, Pos);
+		var Array_end   = this.Content.slice(Pos);
 
-        this.Content = Array_start.concat(NewItems, Array_end);
-    }
+		this.Content = Array_start.concat(NewItems, Array_end);
+	}
 };
 CMathContent.prototype.Remove_FromContent = function(Pos, Count)
 {
-    var DeletedItems = this.Content.splice(Pos, Count);
-    History.Add( this, { Type : AscDFH.historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+	var DeletedItems = this.Content.splice(Pos, Count);
+	History.Add(new CChangesMathContentRemoveItem(this, Pos, DeletedItems));
 
-    // Обновим текущую позицию
-    if (this.CurPos > Pos + Count)
-        this.CurPos -= Count;
-    else if (this.CurPos > Pos )
-        this.CurPos = Pos;
+	// Обновим текущую позицию
+	if (this.CurPos > Pos + Count)
+		this.CurPos -= Count;
+	else if (this.CurPos > Pos)
+		this.CurPos = Pos;
 
-    this.private_CorrectCurPos();
-    this.private_UpdatePosOnRemove(Pos, Count);
+	this.private_CorrectCurPos();
+	this.private_UpdatePosOnRemove(Pos, Count);
 };
 CMathContent.prototype.private_UpdatePosOnRemove = function(Pos, Count)
 {
@@ -2325,212 +2390,7 @@ CMathContent.prototype.GetFirstElement = function()
 
     return first;
 };
-
 ////////////////////////////////////////////////////////////////
-
-CMathContent.prototype.Undo = function(Data)
-{
-    var type = Data.Type;
-
-    switch(type)
-    {
-        case AscDFH.historyitem_Math_AddItem:
-        {
-            this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
-
-            break;
-        }
-        case AscDFH.historyitem_Math_RemoveItem:
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice(0, Pos);
-            var Array_end   = this.Content.slice(Pos);
-
-            this.Content = Array_start.concat(Data.Items, Array_end);
-
-            for(var i = 0; i < Data.Items.length; i++)
-                Data.Items[i].Recalc_RunsCompiledPr();
-
-            break;
-        }
-        case AscDFH.historyitem_Math_ArgSize:
-        {
-            this.ArgSize.SetValue(Data.Old);
-            this.Recalc_RunsCompiledPr();
-            break;
-        }
-    }
-};
-CMathContent.prototype.Redo = function(Data)
-{
-    var type = Data.Type;
-
-    switch(type)
-    {
-        case AscDFH.historyitem_Math_AddItem:
-        {
-            var Pos = Data.Pos;
-
-            var Array_start = this.Content.slice(0, Pos);
-            var Array_end   = this.Content.slice(Pos);
-
-            this.Content = Array_start.concat(Data.Items, Array_end);
-
-            for(var i = 0; i < Data.Items.length; i++)
-                Data.Items[i].Recalc_RunsCompiledPr();
-
-            break;
-        }
-        case AscDFH.historyitem_Math_RemoveItem:
-        {
-            this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
-
-            break;
-        }
-        case AscDFH.historyitem_Math_ArgSize:
-        {
-            this.ArgSize.SetValue(Data.New);
-            this.Recalc_RunsCompiledPr();
-            break;
-        }
-    }
-};
-CMathContent.prototype.Save_Changes = function(Data, Writer)
-{
-    Writer.WriteLong(AscDFH.historyitem_type_MathContent);
-
-    var Type = Data.Type;
-    // Пишем тип
-    Writer.WriteLong(Type);
-
-    switch (Type)
-    {
-        case AscDFH.historyitem_Math_AddItem:
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id элемента
-            //  }
-
-            var Count = Data.Items.length;
-
-            Writer.WriteLong(Count);
-
-            for (var Index = 0; Index < Count; Index++)
-            {
-                Writer.WriteLong(Data.Pos + Index);
-                Writer.WriteString2(Data.Items[Index].Get_Id());
-            }
-
-            break;
-        }
-        case AscDFH.historyitem_Math_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Data.Items.length;
-
-            Writer.WriteLong(Count);
-            for (var Index = 0; Index < Count; Index++)
-            {
-                Writer.WriteLong(Data.Pos);
-            }
-
-            break;
-        }
-        case AscDFH.historyitem_Math_ArgSize:
-        {
-            if(undefined !== Data.New)
-            {
-                Writer.WriteBool( false );
-                Writer.WriteLong( Data.New );
-            }
-            else
-            {
-                Writer.WriteBool( true );
-            }
-
-            break;
-        }
-    }
-};
-CMathContent.prototype.Load_Changes = function(Reader)
-{
-    // Сохраняем изменения из тех, которые используются для Undo/Redo в бинарный файл.
-    // Long : тип класса
-    // Long : тип изменений
-
-    var ClassType = Reader.GetLong();
-    if ( AscDFH.historyitem_type_MathContent != ClassType )
-        return;
-
-    var Type = Reader.GetLong();
-
-    switch ( Type )
-    {
-        case  AscDFH.historyitem_Math_AddItem:
-        {
-            // Long     : Количество элементов
-            // Array of :
-            //  {
-            //    Long     : Позиция
-            //    Variable : Id Элемента
-            //  }
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var Pos     = Reader.GetLong();
-                var Element = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
-
-                if ( null != Element )
-                {
-                    this.Content.splice(Pos, 0, Element);
-                    Element.Recalc_RunsCompiledPr();
-                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
-                }
-            }
-
-            break;
-        }
-        case AscDFH.historyitem_Math_RemoveItem:
-        {
-            // Long          : Количество удаляемых элементов
-            // Array of Long : позиции удаляемых элементов
-
-            var Count = Reader.GetLong();
-
-            for ( var Index = 0; Index < Count; Index++ )
-            {
-                var ChangesPos = Reader.GetLong();
-                this.Content.splice(ChangesPos, 1);
-                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
-            }
-
-            break;
-        }
-        case AscDFH.historyitem_Math_ArgSize:
-        {
-            if(false === Reader.GetBool())
-            {
-                this.ArgSize.SetValue(Reader.GetLong())
-            }
-            else
-            {
-                this.ArgSize.SetValue(undefined);
-            }
-
-            this.Recalc_RunsCompiledPr();
-
-            break;
-        }
-    }
-};
 CMathContent.prototype.Write_ToBinary2 = function(Writer)
 {
     Writer.WriteLong(AscDFH.historyitem_type_MathContent);
@@ -2601,6 +2461,8 @@ CMathContent.prototype.Load_FromMenu = function(Type, Paragraph)
     this.Paragraph = Paragraph;
 
     var Pr = {ctrPrp: new CTextPr()};
+    Pr.ctrPrp.Italic = true;
+    Pr.ctrPrp.RFonts.Set_All("Cambria Math", -1);
 
     var MainType = Type >> 24;
 
@@ -2752,6 +2614,9 @@ CMathContent.prototype.private_LoadFromMenuSymbol = function(Type, Pr)
     if (-1 !== Code)
     {
         var TextPr, MathPr;
+
+        if (this.Content.length <= 0)
+			this.Correct_Content();
 
         if(this.Content.length > 0 && this.Content[this.CurPos].Type == para_Math_Run && this.Selection_IsEmpty() == true) // находимся в Run, селект отсутствует
         {
@@ -3660,13 +3525,45 @@ CMathContent.prototype.Get_CurrentParaPos = function()
 
     return new CParaPos( this.StartRange, this.StartLine, 0, 0 );
 };
-CMathContent.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
+CMathContent.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos, bUseCorrection)
 {
-    var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
-    ContentPos.Add(nPos);
+    if (true === bUseCorrection && true === bSelection)
+	{
+		var nPos = false !== bStart ? this.Selection.StartPos : this.Selection.EndPos;
 
-    if (undefined !== this.Content[nPos])
-        this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos);
+		if (para_Math_Run !== this.Content[nPos].Type
+			&& (this.Selection.StartPos !== this.Selection.EndPos || true !== this.Content[nPos].Is_InnerSelection())
+			&& ((true === bStart && nPos > 0) || (true !== bStart && nPos < this.Content.length - 1)))
+		{
+			if (true === bStart && nPos > 0)
+			{
+				ContentPos.Add(nPos - 1);
+				this.Content[nPos - 1].Get_EndPos(false, ContentPos, ContentPos.Get_Depth() + 1);
+			}
+			else
+			{
+				ContentPos.Add(nPos + 1);
+				this.Content[nPos + 1].Get_StartPos(ContentPos, ContentPos.Get_Depth() + 1);
+			}
+		}
+		else
+		{
+			ContentPos.Add(nPos);
+
+			if (undefined !== this.Content[nPos])
+				this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
+		}
+	}
+	else
+	{
+		var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
+		nPos = Math.max(0, Math.min(nPos, this.Content.length - 1));
+
+		ContentPos.Add(nPos);
+
+		if (undefined !== this.Content[nPos])
+			this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
+	}
 };
 CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 {
@@ -3677,17 +3574,20 @@ CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
     if (undefined === CurPos || CurPos < 0)
     {
         this.CurPos = 0;
-        this.Content[this.CurPos].Cursor_MoveToStartPos();
+        if (this.Content[this.CurPos])
+        	this.Content[this.CurPos].Cursor_MoveToStartPos();
     }
     else if (CurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+        if (this.Content[this.CurPos])
+        	this.Content[this.CurPos].Cursor_MoveToEndPos(false);
     }
     else
     {
         this.CurPos = CurPos;
-        this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
+        if (this.Content[this.CurPos])
+        	this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
     }
 };
 CMathContent.prototype.Selection_IsEmpty = function()
@@ -4038,6 +3938,9 @@ CMathContent.prototype.Get_EndPos = function(BehindEnd, ContentPos, Depth)
 };
 CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
 {
+	if (!this.bRoot && this.Parent && true !== this.ParentElement.Is_ContentUse(this))
+		return;
+
     var Bound = this.Get_LineBound(PDSH.Line, PDSH.Range);
     PDSH.X    = Bound.X;
 
@@ -5241,46 +5144,44 @@ CMathContent.prototype.Set_MenuProps = function(Props)
 };
 CMathContent.prototype.Apply_MenuProps = function(Props, Pos)
 {
-    var ArgSize, NewArgSize;
+	var ArgSize, NewArgSize;
 
-    if(Props.Action & c_oMathMenuAction.IncreaseArgumentSize)
-    {
-        if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Increase() && true == this.ArgSize.Can_SimpleIncrease())
-        {
-            ArgSize = this.ArgSize.GetValue();
-            NewArgSize = this.ArgSize.Increase();
+	if (Props.Action & c_oMathMenuAction.IncreaseArgumentSize)
+	{
+		if (true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Increase() && true == this.ArgSize.Can_SimpleIncrease())
+		{
+			ArgSize    = this.ArgSize.GetValue();
+			NewArgSize = this.ArgSize.Increase();
 
-            History.Add( this, { Type : AscDFH.historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
-            this.Recalc_RunsCompiledPr();
-        }
-    }
-    else if(Props.Action & c_oMathMenuAction.DecreaseArgumentSize)
-    {
-        if(true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Decrease() && true == this.ArgSize.Can_Decrease())
-        {
-            ArgSize = this.ArgSize.GetValue();
-            NewArgSize = this.ArgSize.Decrease();
+			History.Add(new CChangesMathContentArgSize(this, ArgSize, NewArgSize));
+			this.Recalc_RunsCompiledPr();
+		}
+	}
+	else if (Props.Action & c_oMathMenuAction.DecreaseArgumentSize)
+	{
+		if (true === this.Parent.Can_ModifyArgSize() && true == this.Compiled_ArgSz.Can_Decrease() && true == this.ArgSize.Can_Decrease())
+		{
+			ArgSize    = this.ArgSize.GetValue();
+			NewArgSize = this.ArgSize.Decrease();
 
-            History.Add( this, { Type : AscDFH.historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
-            this.Recalc_RunsCompiledPr();
+			History.Add(new CChangesMathContentArgSize(this, ArgSize, NewArgSize));
+			this.Recalc_RunsCompiledPr();
+		}
+	}
 
-        }
-    }
+	var Run;
 
-    var Run;
+	if (Pos !== null && Props.Action & c_oMathMenuAction.InsertForcedBreak)
+	{
+		Run = this.private_Get_RunForForcedBreak(Pos);
+		Run.Set_MathForcedBreak(true);
 
-    if(Pos !== null && Props.Action & c_oMathMenuAction.InsertForcedBreak)
-    {
-        Run = this.private_Get_RunForForcedBreak(Pos);
-        Run.Set_MathForcedBreak(true);
-
-    }
-    else if(Pos !== null && Props.Action & c_oMathMenuAction.DeleteForcedBreak)
-    {
-        Run = this.private_Get_RunForForcedBreak(Pos);
-        Run.Set_MathForcedBreak(false);
-    }
-
+	}
+	else if (Pos !== null && Props.Action & c_oMathMenuAction.DeleteForcedBreak)
+	{
+		Run = this.private_Get_RunForForcedBreak(Pos);
+		Run.Set_MathForcedBreak(false);
+	}
 };
 CMathContent.prototype.private_Get_RunForForcedBreak = function(Pos)
 {
@@ -5783,6 +5684,18 @@ CMathContent.prototype.private_CanAutoCorrectTextFunc = function( AutoCorrection
     }
 
     return Result;
+};
+CMathContent.prototype.Clear_ContentChanges = function()
+{
+	this.m_oContentChanges.Clear();
+};
+CMathContent.prototype.Add_ContentChanges = function(Changes)
+{
+	this.m_oContentChanges.Add(Changes);
+};
+CMathContent.prototype.Refresh_ContentChanges = function()
+{
+	this.m_oContentChanges.Refresh();
 };
 
 function AutoCorrectionControl (AutoCorrectionEngine, ParaMath)

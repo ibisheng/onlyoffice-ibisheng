@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -59,11 +59,12 @@ AscCommon.CContentChangesElement.prototype.Refresh_BinaryData = function()
 		var Binary_Writer = History.BinaryWriter;
 		var Binary_Pos = Binary_Writer.GetCurPosition();
 
-		this.m_pData.Data.UseArray = true;
-		this.m_pData.Data.PosArray = this.m_aPositions;
-		Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
-		this.m_pData.Class.Save_Changes( this.m_pData.Data, Binary_Writer );
+        this.m_pData.Data.UseArray = true;
+        this.m_pData.Data.PosArray = this.m_aPositions;
 
+        Binary_Writer.WriteString2(this.m_pData.Class.Get_Id());
+        Binary_Writer.WriteLong(this.m_pData.Data.Type);
+        this.m_pData.Data.WriteToBinary(Binary_Writer);
 		var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
 
 		this.m_pData.Binary.Pos = Binary_Pos;
@@ -96,6 +97,12 @@ DrawingObjectsController.prototype.setTableProps = function(props)
     var by_type = this.getSelectedObjectsByTypes();
     if(by_type.tables.length === 1)
     {
+        var sCaption = props.TableCaption;
+        var sDescription = props.TableDescription;
+        by_type.tables[0].setTitle(sCaption);
+        by_type.tables[0].setDescription(sDescription);
+        props.TableCaption = undefined;
+        props.TableDescription = undefined;
         var target_text_object = AscFormat.getTargetTextObject(this);
         if(target_text_object === by_type.tables[0])
         {
@@ -107,6 +114,8 @@ DrawingObjectsController.prototype.setTableProps = function(props)
             by_type.tables[0].graphicObject.Set_Props(props);
             by_type.tables[0].graphicObject.Selection_Remove();
         }
+        props.TableCaption = sCaption;
+        props.TableDescription = sDescription;
         editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(by_type.tables[0]);
     }
 };
@@ -218,6 +227,9 @@ DrawingObjectsController.prototype.checkSelectedObjectsForMove = function(group)
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = function(callback, args)
 {
+    if(this.drawingObjects.isViewerMode()){
+        return;
+    }
     var selection_state = this.getSelectionState();
     this.drawingObjects.objectLocker.reset();
     for(var i = 0; i < this.selectedObjects.length; ++i)
@@ -394,6 +406,9 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
             var old_range = options.getRange();
             options.putRange(null);
             options.style = null;
+            options.horAxisProps = null;
+            options.vertAxisProps = null;
+            options.showMarker = null;
             this.editChartCallback(options);
             options.style = 1;
             options.bCreate = true;
@@ -532,6 +547,60 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
 };
 
 
+    DrawingObjectsController.prototype.checkMobileCursorPosition = function () {
+        if(!this.drawingObjects){
+            return;
+        }
+        var oWorksheet = this.drawingObjects.getWorksheet();
+        if(!oWorksheet){
+            return;
+        }
+        if(window["Asc"]["editor"].isMobileVersion){
+            var oTargetDocContent = this.getTargetDocContent(false, false);
+            if(oTargetDocContent){
+                var oPos = oTargetDocContent.Cursor_GetPos();
+                var oParentTextTransform = oTargetDocContent.Get_ParentTextTransform();
+                var _x, _y;
+                if(oParentTextTransform){
+                    _x = oParentTextTransform.TransformPointX(oPos.X, oPos.Y);
+                    _y = oParentTextTransform.TransformPointY(oPos.X, oPos.Y);
+                }
+                else{
+                    _x = oPos.X;
+                    _y = oPos.Y;
+                }
+                _x = this.drawingObjects.convertMetric(_x, 3, 1);
+                _y = this.drawingObjects.convertMetric(_y, 3, 1);
+                var oCell = oWorksheet.findCellByXY(_x, _y, true, false, false);
+                if(oCell && oCell.col !== null && oCell.row !== null){
+                    var oRange = new Asc.Range(oCell.col, oCell.row, oCell.col, oCell.row, false);
+                    var oVisibleRange = oWorksheet.getVisibleRange();
+                    if(!oRange.isIntersect(oVisibleRange)){
+                        var oOffset = oWorksheet._calcFillHandleOffset(oRange);
+                        var _api = window["Asc"]["editor"];
+                        if (_api.wb.MobileTouchManager)
+						{
+						    if(oOffset.deltaX < 0){
+                                --oOffset.deltaX;
+                            }
+                            if(oOffset.deltaX > 0){
+						        ++oOffset.deltaX;
+                            }
+
+                            if(oOffset.deltaY < 0){
+                                --oOffset.deltaY;
+                            }
+                            if(oOffset.deltaY > 0){
+                                ++oOffset.deltaY;
+                            }
+							_api.wb.MobileTouchManager.scrollBy((oOffset.deltaX) * _api.controller.settings.hscrollStep, (oOffset.deltaY)* _api.controller.settings.vscrollStep);
+						}
+                    }
+                }
+            }
+        }
+    };
+
 DrawingObjectsController.prototype.onKeyPress = function(e)
 {
     if ( true === this.isViewMode())
@@ -553,11 +622,13 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
         if( window["Asc"]["editor"].collaborativeEditing.getFast()){
             this.checkSelectedObjectsAndCallbackNoCheckLock(function(){
                 this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
+                this.checkMobileCursorPosition();
             }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
         }
         else{
             this.checkSelectedObjectsAndCallback(function(){
                 this.paragraphAdd( new ParaText( String.fromCharCode( Code ) ) );
+                this.checkMobileCursorPosition();
             }, [], false, AscDFH.historydescription_Spreadsheet_ParagraphAdd);
         }
         bRetValue = true;

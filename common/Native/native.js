@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -505,7 +505,8 @@ function NativeOpenFile2(_params)
 		if (_api.NativeAfterLoad)
 			_api.NativeAfterLoad();
 
-		if (_api.__SendThemeColorScheme)
+		// ToDo get_PropertyThemeColorSchemes method removed, now the only Event!!!!
+		/*if (_api.__SendThemeColorScheme)
 			_api.__SendThemeColorScheme();
 
 		if (_api.get_PropertyThemeColorSchemes)
@@ -518,7 +519,7 @@ function NativeOpenFile2(_params)
 				AscCommon.asc_WriteColorSchemes(schemes, st);
 				window["native"]["OnCallMenuEvent"](2404, st); // ASC_MENU_EVENT_TYPE_COLOR_SCHEMES
 			}
-		}
+		}*/
 	}
 	else
 	{
@@ -853,4 +854,3 @@ window.native.Call_Menu_Event = function (type, _params)
 {
 	return _api.Call_Menu_Event(type, _params);
 };
-

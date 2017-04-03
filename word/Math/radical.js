@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -406,7 +406,7 @@ CMathRadicalPr.prototype.Read_FromBinary = function(Reader)
  */
 function CRadical(props)
 {
-    CRadical.superclass.constructor.call(this);
+	CMathBase.call(this);
 
 	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
@@ -428,7 +428,8 @@ function CRadical(props)
 
     AscCommon.g_oTableId.Add( this, this.Id );
 }
-AscCommon.extendClass(CRadical, CMathBase);
+CRadical.prototype = Object.create(CMathBase.prototype);
+CRadical.prototype.constructor = CRadical;
 
 CRadical.prototype.ClassType = AscDFH.historyitem_type_rad;
 CRadical.prototype.kind      = MATH_RADICAL;
@@ -666,7 +667,7 @@ CRadical.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine,
 
     if(this.Pr.type == DEGREE_RADICAL)
     {
-        bResult = CRadical.superclass.Get_ParaContentPosByXY.call(this, SearchPos, Depth, _CurLine, _CurRange, StepEnd);
+        bResult = CMathBase.prototype.Get_ParaContentPosByXY.call(this, SearchPos, Depth, _CurLine, _CurRange, StepEnd);
     }
     else
     {
@@ -698,7 +699,7 @@ CRadical.prototype.Draw_Elements = function(PDSE)
     var PosLine = this.ParaMath.GetLinePosition(PDSE.Line, PDSE.Range);
 
     this.signRadical.draw(PosLine.x, PosLine.y, PDSE.Graphics, PDSE);
-    CRadical.superclass.Draw_Elements.call(this, PDSE);
+    CMathBase.prototype.Draw_Elements.call(this, PDSE);
 
     PDSE.X = X + this.size.width;
 };
@@ -719,14 +720,14 @@ CRadical.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 };
 CRadical.prototype.Apply_MenuProps = function(Props)
 {
-    if(Props.Type == Asc.c_oAscMathInterfaceType.Radical && Props.HideDegree !== undefined)
-    {
-        if(true == this.Iterator.IsPlaceholder() && Props.HideDegree !== this.Pr.degHide)
-        {
-            AscCommon.History.Add(this, new CChangesMathRadicalHideDegree( Props.HideDegree, this.Pr.degHide ));
-            this.raw_SetHideDegree(Props.HideDegree);
-        }
-    }
+	if (Props.Type == Asc.c_oAscMathInterfaceType.Radical && Props.HideDegree !== undefined)
+	{
+		if (true == this.Iterator.IsPlaceholder() && Props.HideDegree !== this.Pr.degHide)
+		{
+			AscCommon.History.Add(new CChangesMathRadicalHideDegree(this, this.Pr.degHide, Props.HideDegree));
+			this.raw_SetHideDegree(Props.HideDegree);
+		}
+	}
 };
 CRadical.prototype.Get_InterfaceProps = function()
 {
@@ -770,7 +771,7 @@ CRadical.prototype.Is_ContentUse = function(MathContent)
  */
 function CMathMenuRadical(Radical)
 {
-    CMathMenuRadical.superclass.constructor.call(this, Radical);
+	CMathMenuBase.call(this, Radical);
 
     if (undefined !== Radical)
     {
@@ -787,7 +788,8 @@ function CMathMenuRadical(Radical)
         this.HideDegree = undefined;
     }
 }
-AscCommon.extendClass(CMathMenuRadical, CMathMenuBase);
+CMathMenuRadical.prototype = Object.create(CMathMenuBase.prototype);
+CMathMenuRadical.prototype.constructor = CMathMenuRadical;
 CMathMenuRadical.prototype.get_HideDegree = function(){return this.HideDegree;};
 CMathMenuRadical.prototype.put_HideDegree = function(Hide){this.HideDegree = Hide;};
 

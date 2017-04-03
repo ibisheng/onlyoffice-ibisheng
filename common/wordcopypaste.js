@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1424,7 +1424,7 @@ CopyProcessor.prototype =
                 this.oPresentationWriter.WriteBool(table_styles_ids[i] !== null);
                 if(table_styles_ids[i] !== null)
                 {
-                    this.oPresentationWriter.WriteULong(table_styles_ids[i]);
+                    this.oPresentationWriter.WriteString2(table_styles_ids[i]);
                 }
             }
 
@@ -1776,10 +1776,17 @@ function CopyPasteCorrectString(str)
     return res;
 }
 
-function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary)
+function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteProps)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
-    oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
+	if(!specialPasteProps)
+	{
+		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
+	}
+    else
+	{
+		
+	}
 }
 function trimString( str ){
     return str.replace(/^\s+|\s+$/g, '') ;
@@ -1888,8 +1895,10 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
     this.MsoStyles = {"mso-style-type": 1, "mso-pagination": 1, "mso-line-height-rule": 1, "mso-style-textfill-fill-color": 1, "mso-tab-count": 1,
         "tab-stops": 1, "list-style-type": 1, "mso-special-character": 1, "mso-column-break-before": 1, "mso-break-type": 1, "mso-padding-alt": 1, "mso-border-insidev": 1,
         "mso-border-insideh": 1, "mso-row-margin-left": 1, "mso-row-margin-right": 1, "mso-cellspacing": 1, "mso-border-alt": 1,
-        "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1};
+        "mso-border-left-alt": 1, "mso-border-top-alt": 1, "mso-border-right-alt": 1, "mso-border-bottom-alt": 1, "mso-border-between": 1, "mso-list": 1};
     this.oBorderCache = {};
+	
+	this.msoListMap = [];
 }
 PasteProcessor.prototype =
 {
@@ -2114,7 +2123,6 @@ PasteProcessor.prototype =
                 }
                 Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
-                this.oRecalcDocument.ContentLastChangePos = this.oRecalcDocument.CurPos.ContentPos;
             }
             else
             {
@@ -2192,7 +2200,6 @@ PasteProcessor.prototype =
                     oDoc.Internal_Content_Remove(LastPosCurDoc, 1);
                     LastPosCurDoc--;
                 }
-                this.oRecalcDocument.ContentLastChangePos = LastPos;
                 Item.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 Item.RecalcInfo.Set_Type_0_Spell(pararecalc_0_Spell_All);
                 oDoc.CurPos.ContentPos = LastPosCurDoc;
@@ -2208,7 +2215,8 @@ PasteProcessor.prototype =
 	},
     ReadFromBinary : function(sBase64, oDocument)
 	{
-        var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
+        var oDocumentParams = PasteElementsId.g_bIsDocumentCopyPaste ? this.oDocument : null;
+		var openParams = { checkFileSize: false, charCount: 0, parCount: 0, bCopyPaste: true, oDocument: oDocumentParams };
 		var doc = oDocument ? oDocument : this.oLogicDocument;
         var oBinaryFileReader = new AscCommonWord.BinaryFileReader(doc, openParams);
         var oRes = oBinaryFileReader.ReadFromString(sBase64, true);
@@ -2256,7 +2264,7 @@ PasteProcessor.prototype =
 				var oThis = this;
 				//удаляем в начале, иначе может получиться что будем вставлять в элементы, которое потом удалим.
 				//todo с удалением в начале есть проблема, что удаляем элементы даже при пустом буфере
-				this.oLogicDocument.Remove(1, true, true, true);
+				this.oLogicDocument.RemoveBeforePaste();
 				this.oDocument = this._GetTargetDocument(this.oDocument);
 				
 				if(this.oDocument && this.oDocument.bPresentation){
@@ -2503,7 +2511,7 @@ PasteProcessor.prototype =
 				{
 					if(type_Paragraph === aContent.content[i].Get_Type())
 					{
-						newContent.push(AscFormat.ConvertParagraphToPPTX(aContent.content[i], this.oDocument.DrawingDocument, this.oDocument));
+						newContent.push(AscFormat.ConvertParagraphToPPTX(aContent.content[i], this.oDocument.DrawingDocument, this.oDocument, false, true));
 					}
 				}
 				
@@ -2516,6 +2524,7 @@ PasteProcessor.prototype =
 					oThis.InsertInDocument();
 					if(aContent.bAddNewStyles)
 						oThis.api.GenerateStyles();
+					oThis.api.continueInsertDocumentUrls();
 				}
 			}
 			
@@ -2589,7 +2598,7 @@ PasteProcessor.prototype =
 				element.Get_AllDrawingObjects(drawings);
 				if(type_Paragraph == element.GetType())//paragraph
 				{
-					selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, null, null, true);
+					selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, null, null, true, false);
 					elements.push(selectedElement);
 				}
 				else if(type_Table == element.GetType())//table
@@ -3061,14 +3070,14 @@ PasteProcessor.prototype =
 					for(var i = 0; i < slide_count; ++i)
 					{
 						arr_layouts_id[i] = stream.GetString2();
-						var table_style_ids_len = stream.GetULong();
-						var table_style_ids = [];
-						for(var j = 0; j < table_style_ids_len; ++j)
+						var table_styles_ids_len = stream.GetULong();
+						var table_styles_ids = [];
+						for(var j = 0; j < table_styles_ids_len; ++j)
 						{
 							if(stream.GetBool())
-								table_style_ids.push(stream.GetULong());
+								table_styles_ids.push(stream.GetString2());
 							else
-								table_style_ids.push(-1);
+								table_styles_ids.push(-1);
 						}
 						arr_slides[i] = loader.ReadSlide(0);
 						var sp_tree = arr_slides[i].cSld.spTree;
@@ -3077,7 +3086,7 @@ PasteProcessor.prototype =
 						{
 							if(sp_tree[s] instanceof CGraphicFrame)
 							{
-								sp_tree[s].graphicObject.Set_TableStyle(table_style_ids[t], true);
+								sp_tree[s].graphicObject.Set_TableStyle(table_styles_ids[t], true);
 								++t;
 							}
 						}
@@ -3643,7 +3652,6 @@ PasteProcessor.prototype =
 	_convertTableFromExcel: function(aContentExcel)
 	{
 		var worksheet = aContentExcel.workbook.aWorksheets[0];
-		var pasteRange = AscCommonExcel.g_oRangeCache.getAscRange(aContentExcel.activeRange);
 		var rows = worksheet._getRows(), range;
 		var tempActiveRef = aContentExcel.activeRange;
 		var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(tempActiveRef);
@@ -3783,14 +3791,16 @@ PasteProcessor.prototype =
 				for(var n = 0; n < value2.length; n++)
 				{
 					var oCurRun = new ParaRun(oCurPar);
+					var format = value2[n].format;
 					
 					//***text property***
-					oCurRun.Pr.Bold = value2[n].format.b;
-					if(value2[n].format.c)
-						oCurRun.Pr.Color = new CDocumentColor(value2[n].format.c.getR(), value2[n].format.c.getG(), value2[n].format.c.getB());
+					oCurRun.Pr.Bold = format.getBold();
+					var fc = format.getColor();
+					if(fc)
+						oCurRun.Pr.Color = new CDocumentColor(fc.getR(), fc.getG(), fc.getB());
 					
 					//font					
-					var font_family = value2[n].format.fn;
+					var font_family = format.getName();
 					addFont(font_family);
 					oCurRun.Pr.FontFamily = font_family;
 					var oFontItem = this.oFonts[font_family];
@@ -3802,10 +3812,10 @@ PasteProcessor.prototype =
 						oCurRun.Pr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
 					}
 					
-					oCurRun.Pr.FontSize = value2[n].format.fs;
-					oCurRun.Pr.Italic = value2[n].format.i;
-					oCurRun.Pr.Strikeout = value2[n].format.s;
-					oCurRun.Pr.Underline = value2[n].format.u === 3 ? true : false;
+					oCurRun.Pr.FontSize = format.getSize();
+					oCurRun.Pr.Italic = format.getItalic();
+					oCurRun.Pr.Strikeout = format.getStrikeout();
+					oCurRun.Pr.Underline = format.getUnderline() !== 2 ? true : false;
 					
 					//text
 					var value = value2[n].text;
@@ -3880,7 +3890,7 @@ PasteProcessor.prototype =
                     {
                         if(cDocumentContent.Content[n] instanceof Paragraph)
                         {
-                            cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex]);
+                            cDocumentContent.Content[nIndex] = AscFormat.ConvertParagraphToPPTX(cDocumentContent.Content[nIndex], null, null, true, false);
                             ++nIndex;
                         }
 
@@ -4049,7 +4059,7 @@ PasteProcessor.prototype =
         tempWorkbook.theme = this.oDocument.theme ? this.oDocument.theme : this.oLogicDocument.theme;
 		if(!tempWorkbook.theme && this.oLogicDocument.themes && this.oLogicDocument.themes[0])
 			tempWorkbook.theme = this.oLogicDocument.themes[0];
-		
+
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
 		
 		pptx_content_loader.Start_UseFullUrl();
@@ -4108,6 +4118,7 @@ PasteProcessor.prototype =
         var arr_shapes = [];
         var arr_transforms = [];
 		var cStyle;
+		var foundTableStylesIdMap = {};
 		
         for(var i = 0; i < count; ++i)
         {
@@ -4119,17 +4130,9 @@ PasteProcessor.prototype =
             {
                 if(loader.stream.GetBool())
                 {
-					//в случае если вставляем в презентации, пропускаем
-					if(!PasteElementsId.g_bIsDocumentCopyPaste)
-					{
-						loader.stream.Skip2(1);
-						loader.stream.SkipRecord();
-					}
-					else
-					{
-						loader.stream.Skip2(1);
-						cStyle = loader.ReadTableStyle();
-					}
+					loader.stream.Skip2(1);
+					cStyle = loader.ReadTableStyle(true);
+					
 					loader.stream.GetBool();
 					style_index = stream.GetString2();
                 }
@@ -4174,7 +4177,42 @@ PasteProcessor.prototype =
 			if(style_index != null && arr_shapes[i].Drawing.graphicObject && arr_shapes[i].Drawing.graphicObject.Set_TableStyle)
 			{
 				if(!PasteElementsId.g_bIsDocumentCopyPaste)
-					arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index, true);
+				{
+					//TODO продумать добавления нового стиля(ReadTableStyle->получуть id нового стиля, сравнить новый стиль со всеми присутвующими.если нет - добавить и сделать Set_TableStyle(id))
+					if(foundTableStylesIdMap[style_index])
+					{
+						arr_shapes[i].Drawing.graphicObject.Set_TableStyle(foundTableStylesIdMap[style_index], true);
+					}
+					else if(cStyle && presentation.globalTableStyles && presentation.globalTableStyles.Style)
+					{
+						var isFoundStyle = false;
+						for(var j in presentation.globalTableStyles.Style)
+						{
+							//TODO isEqual - сравнивает ещё и имя стиля. для случая, когда одинаковый контент, но имя стиля разное, не подойдет это сравнение
+							if(presentation.globalTableStyles.Style[j].isEqual(cStyle))
+							{
+								arr_shapes[i].Drawing.graphicObject.Set_TableStyle(j, true);
+								foundTableStylesIdMap[style_index] = j;
+								isFoundStyle = true;
+								break;
+							}
+						}
+						
+						//в данном случае добавляем новый стиль
+						if(!isFoundStyle)
+						{
+							//TODO при добавлении нового стиля - падение. пересмотреть!
+							/*var newIndexStyle = presentation.globalTableStyles.Add(cStyle);
+							presentation.TableStylesIdMap[newIndexStyle] = true;
+							arr_shapes[i].Drawing.graphicObject.Set_TableStyle(newIndexStyle, true);
+							foundTableStylesIdMap[style_index] = newIndexStyle;*/
+						}
+					}
+					else if(presentation.TableStylesIdMap[style_index])
+					{
+						arr_shapes[i].Drawing.graphicObject.Set_TableStyle(style_index, true);
+					}
+				}	
 				else if(cStyle)
 				{
 					//пока не применяем стили, посольку они отличаются
@@ -4529,6 +4567,7 @@ PasteProcessor.prototype =
     _set_pPr : function(node, Para,  pNoHtmlPr)
     {
         //����������� ����� �� ������ � ������� �������� ��������
+		var t = this;
 		var sNodeName = node.nodeName.toLowerCase();
         if(node != this.oRootNode)
         {
@@ -4606,7 +4645,45 @@ PasteProcessor.prototype =
         var computedStyle = this._getComputedStyle(node);
         if (computedStyle)
         {
-            //Ind
+			var font_family = computedStyle.getPropertyValue( "font-family" );
+			if(font_family && "" != font_family)
+			{
+				var oFontItem = this.oFonts[font_family];
+				if(null != oFontItem && null != oFontItem.Name && Para.TextPr && Para.TextPr.Value && Para.TextPr.Value.RFonts)
+				{
+					Para.TextPr.Value.RFonts.Ascii = {Name: oFontItem.Name, Index: oFontItem.Index};
+					Para.TextPr.Value.RFonts.HAnsi = {Name: oFontItem.Name, Index: oFontItem.Index};
+					Para.TextPr.Value.RFonts.CS = {Name: oFontItem.Name, Index: oFontItem.Index};
+					Para.TextPr.Value.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
+				}
+			}
+
+			var font_size = node.style ? node.style.fontSize : null;
+			if(!font_size)
+				font_size = computedStyle.getPropertyValue( "font-size" );
+			if(font_size && Para.TextPr && Para.TextPr.Value)
+			{
+				var obj = this._ValueToMmType(font_size);
+				if(obj && "%" != obj.type && "none" != obj.type)
+				{
+					font_size = obj.val;
+					//���� ������� �� ������������ ������� ������� �������� ���������� ������, ��� ���������� ��� ������� 8, 11, 14, 20, 26pt
+					if("px" == obj.type && false == this.bIsDoublePx)
+						font_size = Math.round(font_size * g_dKoef_mm_to_pt);
+					else
+						font_size = Math.round(2 * font_size * g_dKoef_mm_to_pt) / 2;//���������� �������� ���������.
+					
+					//TODO use constant
+					if(font_size > 300)
+						font_size = 300;
+					else if(font_size === 0)
+						font_size = 1;
+						
+					Para.TextPr.Value.FontSize = font_size;
+				}
+			}
+			
+			//Ind
             var Ind = new CParaInd();
             var margin_left = computedStyle.getPropertyValue( "margin-left" );
 			
@@ -4649,7 +4726,7 @@ PasteProcessor.prototype =
                 Ind.FirstLine = text_indent;
             // if(null != pPr.Ind.FirstLine && true == this.bUseScaleKoef)
             // pPr.Ind.FirstLine = pPr.Ind.FirstLine * this.dScaleKoef;
-            if(false == this._isEmptyProperty(Ind))
+            if(false == this._isEmptyProperty(Ind) && !pNoHtmlPr['mso-list'])
                 Para.Set_Ind(Ind);
             //Jc
             var text_align = computedStyle.getPropertyValue( "text-align" );
@@ -4674,9 +4751,22 @@ PasteProcessor.prototype =
             var margin_bottom = computedStyle.getPropertyValue( "margin-bottom" );
             if(margin_bottom && null != (margin_bottom = this._ValueToMm(margin_bottom)) && margin_bottom >= 0)
                 Spacing.After = margin_bottom;
-			var line_height = computedStyle.getPropertyValue( "line-height" );
-			if(line_height && null != (line_height = this._ValueToMm(line_height)) && line_height >= 0)
-                Spacing.After = line_height;
+			//line height
+			//computedStyle возвращает значение в px. мне нужны %(ms записывает именно % в html)
+			var line_height = node.style && node.style.lineHeight ? node.style.lineHeight : computedStyle.getPropertyValue( "line-height" );
+			if(line_height)
+			{
+				var oLineHeight = this._ValueToMmType(line_height);
+				if(oLineHeight && "%" === oLineHeight.type)
+				{
+					Spacing.Line = oLineHeight.val;
+				}
+				else if(line_height && null != (line_height = this._ValueToMm(line_height)) && line_height >= 0)
+				{
+					Spacing.Line = line_height;
+					Spacing.LineRule = Asc.linerule_Exact;
+				}
+			}
             if(false == this._isEmptyProperty(Spacing))
                 Para.Set_Spacing(Spacing);
             //Shd
@@ -4758,130 +4848,51 @@ PasteProcessor.prototype =
             }
         }
 
-        //num
+        //*****num*****
         if(PasteElementsId.g_bIsDocumentCopyPaste)
         {
             if(true == pNoHtmlPr.bNum)
             {
-                var num = numbering_numfmt_Bullet;
-                if(null != pNoHtmlPr.numType)
-                    num = pNoHtmlPr.numType;
-                var type = pNoHtmlPr["list-style-type"];
-                if(type)
-                {
-                    switch(type)
-                    {
-                        case "disc"       : num = numbering_numfmt_Bullet;break;
-                        case "decimal"    : num = numbering_numfmt_Decimal;break;
-                        case "lower-roman": num = numbering_numfmt_LowerRoman;break;
-                        case "upper-roman": num = numbering_numfmt_UpperRoman;break;
-                        case "lower-alpha": num = numbering_numfmt_LowerLetter;break;
-                        case "upper-alpha": num = numbering_numfmt_UpperLetter;break;
-                    }
-                }
-                //����� ���� ����������� �� Document.Set_ParagraphNumbering
-                
-                //������� ����������� ��������, ���� ��� ������ ���������, �� ����� ��� ������ �� ����������� ���������
-                var NumId = null;
-                if(this.aContent.length > 1)
-                {
-                    var prevElem = this.aContent[this.aContent.length - 2];
-                    if(null != prevElem && type_Paragraph === prevElem.GetType())
-                    {
-                        var PrevNumPr = prevElem.Numbering_Get();
-                        if ( null != PrevNumPr && true === this.oLogicDocument.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, num ) )
-                            NumId  = PrevNumPr.NumId;
-                    }
-                }
-                if(null == NumId && this.pasteInExcel !== true)
-                {
-                    // Создаем нумерацию
-                    NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
-                    var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
-                    if (numbering_numfmt_Bullet === num)
-                    {
-                        AbstractNum.Create_Default_Bullet();
-                        var LvlText = String.fromCharCode(0x00B7);
-                        var NumTextPr = new CTextPr();
-                        NumTextPr.RFonts.Set_All("Symbol", -1);
+                var setListTextPr = function(AbstractNum)
+				{
+					//��������� ��������� ������ ����� �� ���������� ������� ���������� ��������
+					var oFirstTextChild = node;
+					while(true)
+					{
+						var bContinue = false;
+						for(var i = 0, length = oFirstTextChild.childNodes.length; i < length; i++)
+						{
+							var child = oFirstTextChild.childNodes[i];
+							var nodeType = child.nodeType;
 
-                        switch(type)
-                        {
-                            case "disc":
-                            {
-                                NumTextPr.RFonts.Set_All("Symbol", -1);
-                                LvlText = String.fromCharCode(0x00B7);
-                                break;
-                            }
-                            case "circle":
-                            {
-                                NumTextPr.RFonts.Set_All("Courier New", -1);
-                                LvlText = "o";
-                                break;
-                            }
-                            case "square":
-                            {
-                                NumTextPr.RFonts.Set_All("Wingdings", -1);
-                                LvlText = String.fromCharCode(0x00A7);
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        AbstractNum.Create_Default_Numbered();
-                    }
-
-                    for (var iLvl = 0; iLvl <= 8; iLvl++)
-                    {
-                        switch(num)
-                        {
-                            case numbering_numfmt_Bullet     : AbstractNum.Set_Lvl_Bullet(iLvl, LvlText, NumTextPr); break;
-                            case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_2(iLvl);break;
-                            case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_5(iLvl);break;
-                            case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_9(iLvl);break;
-                            case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(iLvl);break;
-                            case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(iLvl);break;
-                        }
-                    }
-                    //��������� ��������� ������ ����� �� ���������� ������� ���������� ��������
-                    var oFirstTextChild = node;
-                    while(true)
-                    {
-                        var bContinue = false;
-                        for(var i = 0, length = oFirstTextChild.childNodes.length; i < length; i++)
-                        {
-                            var child = oFirstTextChild.childNodes[i];
-                            var nodeType = child.nodeType;
-
-                            if(!(Node.ELEMENT_NODE == nodeType || Node.TEXT_NODE == nodeType))
-                                continue;
-                            //�������� ������� ��������� ������ �� \t,\n,\r
-                            if( Node.TEXT_NODE == child.nodeType)
-                            {
-                                var value = child.nodeValue;
-                                if(!value)
-                                    continue;
-                                value = value.replace(/(\r|\t|\n)/g, '');
-                                if("" == value)
-                                    continue;
-                            }
-                            if(Node.ELEMENT_NODE == nodeType)
-                            {
-                                oFirstTextChild = child;
-                                bContinue = true;
-                                break;
-                            }
-                        }
-                        if(false == bContinue)
-                            break;
-                    }
-                    if(node != oFirstTextChild)
-                    {
-						if(!this.bIsPlainText)
+							if(!(Node.ELEMENT_NODE == nodeType || Node.TEXT_NODE == nodeType))
+								continue;
+							//�������� ������� ��������� ������ �� \t,\n,\r
+							if( Node.TEXT_NODE == child.nodeType)
+							{
+								var value = child.nodeValue;
+								if(!value)
+									continue;
+								value = value.replace(/(\r|\t|\n)/g, '');
+								if("" == value)
+									continue;
+							}
+							if(Node.ELEMENT_NODE == nodeType)
+							{
+								oFirstTextChild = child;
+								bContinue = true;
+								break;
+							}
+						}
+						if(false == bContinue)
+							break;
+					}
+					if(node != oFirstTextChild)
+					{
+						if(!t.bIsPlainText)
 						{
 							var oLvl = AbstractNum.Lvl[0];
-							var oTextPr = this._read_rPr(oFirstTextChild);
+							var oTextPr = t._read_rPr(oFirstTextChild);
 							if(numbering_numfmt_Bullet == num)
 								oTextPr.RFonts = oLvl.TextPr.RFonts.Copy();
 								
@@ -4893,10 +4904,211 @@ PasteProcessor.prototype =
 							//�������� ��������� �� node
 							AbstractNum.Apply_TextPr(0, oTextPr);
 						}
-                    }
-                }
-				if(this.pasteInExcel !== true && Para.bFromDocument === true)
-					Para.Numbering_Add( NumId, 0 );
+					}
+				};
+				
+				
+				if(pNoHtmlPr['mso-list'])
+				{	
+					var level = 0;
+					var listId = null;
+					var startIndex;
+					if(-1 != (startIndex = pNoHtmlPr['mso-list'].indexOf("level")))
+					{
+						level = parseInt(pNoHtmlPr['mso-list'].substr(startIndex + 5, 1)) - 1;
+					}
+					if(-1 != (startIndex = pNoHtmlPr['mso-list'].indexOf("lfo")))
+					{
+						listId = pNoHtmlPr['mso-list'].substr(startIndex, 4);
+					}
+					
+					var NumId = null;
+					if(listId && this.msoListMap[listId])//find list id into map
+					{
+						NumId = this.msoListMap[listId];
+					}
+					
+					//get listId and level from mso-list property
+					var msoListIgnoreSymbol = this._getMsoListSymbol(node);
+					var listObj = this._getTypeMsoListSymbol(msoListIgnoreSymbol, (null === NumId));
+					var num = listObj.type;
+					var startPos = listObj.startPos;
+					
+					if(null == NumId && this.pasteInExcel !== true)//create new NumId
+					{
+						// Создаем нумерацию
+						NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
+						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
+						if (numbering_numfmt_Bullet === num)
+						{
+							AbstractNum.Create_Default_Bullet();
+							var LvlText = String.fromCharCode(0x00B7);
+							var NumTextPr = new CTextPr();
+							NumTextPr.RFonts.Set_All("Symbol", -1);
+
+							switch(type)
+							{
+								case "disc":
+								{
+									NumTextPr.RFonts.Set_All("Symbol", -1);
+									LvlText = String.fromCharCode(0x00B7);
+									break;
+								}
+								case "circle":
+								{
+									NumTextPr.RFonts.Set_All("Courier New", -1);
+									LvlText = "o";
+									break;
+								}
+								case "square":
+								{
+									NumTextPr.RFonts.Set_All("Wingdings", -1);
+									LvlText = String.fromCharCode(0x00A7);
+									break;
+								}
+							}
+						}
+						else
+						{
+							AbstractNum.Create_Default_Numbered();
+						}
+						
+						switch(num)
+						{
+							case numbering_numfmt_Bullet     : AbstractNum.Set_Lvl_Bullet(level, LvlText, NumTextPr); break;
+							case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_3(level);break;
+							case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_9(level);break;
+							case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_5(level);break;
+							case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(level);break;
+							case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(level);break;
+						}
+						
+						//проставляем начальную позицию
+						if(null !== startPos)
+						{
+							AbstractNum.Set_Lvl_Start(level, startPos);
+						}
+						
+						//setListTextPr(AbstractNum);
+					}
+					/*else
+					{
+						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
+						
+						switch(num)
+						{
+							case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_3(level);break;
+							case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_9(level);break;
+							case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_5(level);break;
+							case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(level);break;
+							case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(level);break;
+						}
+					}*/
+					
+					
+					//put into map listId
+					if(!this.msoListMap[listId])
+					{
+						this.msoListMap[listId] = NumId;
+					}
+					
+					if(this.pasteInExcel !== true && Para.bFromDocument === true)
+					{
+						Para.Numbering_Set( NumId, level );
+					}
+				}
+				else
+				{
+					var num = numbering_numfmt_Bullet;
+					if(null != pNoHtmlPr.numType)
+						num = pNoHtmlPr.numType;
+					var type = pNoHtmlPr["list-style-type"];
+					
+					if(type)
+					{
+						switch(type)
+						{
+							case "disc"       : num = numbering_numfmt_Bullet;break;
+							case "decimal"    : num = numbering_numfmt_Decimal;break;
+							case "lower-roman": num = numbering_numfmt_LowerRoman;break;
+							case "upper-roman": num = numbering_numfmt_UpperRoman;break;
+							case "lower-alpha": num = numbering_numfmt_LowerLetter;break;
+							case "upper-alpha": num = numbering_numfmt_UpperLetter;break;
+						}
+					}
+					//����� ���� ����������� �� Document.Set_ParagraphNumbering
+					
+					//������� ����������� ��������, ���� ��� ������ ���������, �� ����� ��� ������ �� ����������� ���������
+					if(this.aContent.length > 1)
+					{
+						var prevElem = this.aContent[this.aContent.length - 2];
+						if(null != prevElem && type_Paragraph === prevElem.GetType())
+						{
+							var PrevNumPr = prevElem.Numbering_Get();
+							if ( null != PrevNumPr && true === this.oLogicDocument.Numbering.Check_Format( PrevNumPr.NumId, PrevNumPr.Lvl, num ) )
+								NumId  = PrevNumPr.NumId;
+						}
+					}
+					if(null == NumId && this.pasteInExcel !== true)
+					{
+						// Создаем нумерацию
+						NumId  = this.oLogicDocument.Numbering.Create_AbstractNum();
+						var AbstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(NumId);
+						if (numbering_numfmt_Bullet === num)
+						{
+							AbstractNum.Create_Default_Bullet();
+							var LvlText = String.fromCharCode(0x00B7);
+							var NumTextPr = new CTextPr();
+							NumTextPr.RFonts.Set_All("Symbol", -1);
+
+							switch(type)
+							{
+								case "disc":
+								{
+									NumTextPr.RFonts.Set_All("Symbol", -1);
+									LvlText = String.fromCharCode(0x00B7);
+									break;
+								}
+								case "circle":
+								{
+									NumTextPr.RFonts.Set_All("Courier New", -1);
+									LvlText = "o";
+									break;
+								}
+								case "square":
+								{
+									NumTextPr.RFonts.Set_All("Wingdings", -1);
+									LvlText = String.fromCharCode(0x00A7);
+									break;
+								}
+							}
+						}
+						else
+						{
+							AbstractNum.Create_Default_Numbered();
+						}
+						
+						for (var iLvl = 0; iLvl <= 8; iLvl++)
+						{
+							switch(num)
+							{
+								case numbering_numfmt_Bullet     : AbstractNum.Set_Lvl_Bullet(iLvl, LvlText, NumTextPr); break;
+								case numbering_numfmt_Decimal    : AbstractNum.Set_Lvl_Numbered_2(iLvl);break;
+								case numbering_numfmt_LowerRoman : AbstractNum.Set_Lvl_Numbered_5(iLvl);break;
+								case numbering_numfmt_UpperRoman : AbstractNum.Set_Lvl_Numbered_9(iLvl);break;
+								case numbering_numfmt_LowerLetter: AbstractNum.Set_Lvl_Numbered_8(iLvl);break;
+								case numbering_numfmt_UpperLetter: AbstractNum.Set_Lvl_Numbered_6(iLvl);break;
+							}
+						}
+						
+						setListTextPr(AbstractNum);
+					}
+					
+					if(this.pasteInExcel !== true && Para.bFromDocument === true)
+					{
+						Para.Numbering_Add( NumId, 0 );
+					}
+				}
             }
             else
             {
@@ -5027,7 +5239,7 @@ PasteProcessor.prototype =
 					rPr.RFonts.EastAsia = {Name: oFontItem.Name, Index: oFontItem.Index};
 				}
             }
-            var font_size = node.style.fontSize;
+            var font_size = node.style ? node.style.fontSize : null;
             if(!font_size)
                 font_size = computedStyle.getPropertyValue( "font-size" );
             if(font_size)
@@ -5165,6 +5377,200 @@ PasteProcessor.prototype =
             }
         }
     },
+	_getMsoListSymbol: function(node)
+	{
+		var res = null;
+		var nodeList  = this._getMsoListIgnore(node);
+		if(nodeList)
+		{
+			var value = nodeList.innerText;
+			if(value)
+			{
+				for(var k = 0, length = value.length; k < length; k++)
+				{
+					var nUnicode = null;
+					var nCharCode = value.charCodeAt(k);
+					if (AscCommon.isLeadingSurrogateChar(nCharCode)) 
+					{
+						if (k + 1 < length) 
+						{
+							k++;
+							var nTrailingChar = value.charCodeAt(k);
+							nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+						}
+					}
+					else
+						nUnicode = nCharCode;
+					
+					if (null != nUnicode) {
+						var Item;
+						if (0x20 != nUnicode && 0xA0 != nUnicode && 0x2009 != nUnicode) 
+						{
+							if(!res)
+							{
+								res = "";
+							}
+							res += value.charAt(k);
+						}
+					}
+				}
+			}
+		}
+		return res;
+	},
+	_getMsoListIgnore: function(node)
+	{
+		if(!node || (node && !node.children))
+		{
+			return null;
+		}
+		
+		for(var i = 0; i < node.children.length; i++)
+		{
+			var child = node.children[i];
+			var style = child.getAttribute("style");
+			if(style)
+			{
+				var pNoHtml = {};
+				this._parseCss(style, pNoHtml);
+				if("Ignore" === pNoHtml["mso-list"])
+				{
+					return child;
+				}
+			}
+			
+			if(child.children && child.children.length)
+			{
+				return this._getMsoListIgnore(child);
+			}
+		}
+	},
+	_getTypeMsoListSymbol: function(str, getStartPosition)
+	{
+		var symbolsArr = [
+			"ivxlcdm",
+			"IVXLCDM",
+			"abcdefghijklmnopqrstuvwxyz", 
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		];
+		
+		//TODO пересмотреть функцию перевода из римских чисел
+		var romanToIndex = function(text) 
+		{
+			var arab_number = [1,4,5,9,10,40,50,90,100,400,500,900,1000,4000,5000,9000,10000];
+			var rom_number = ["I","IV","V","IX","X","XL","L","XC","C","CD","D","CM","M", "M&#8577;","&#8577;","&#8577;&#8578;","&#8578;"];
+			
+			var text = text.toUpperCase();
+			var result = 0;
+			var pos = 0;
+			var i = arab_number.length - 1;
+			while (i >= 0 && pos < text.length) 
+			{
+				if (text.substr(pos, rom_number[i].length) == rom_number[i]) 
+				{
+					result += arab_number[i];
+					pos += rom_number[i].length;
+				}
+				else
+				{
+					i--;
+				}
+			}
+			return result;
+		};
+		
+		var latinToIndex = function(text) 
+		{
+			var text = text.toUpperCase();
+			var index = 0;
+			for(var i = 0; i < text.length; i++)
+			{
+				index += symbolsArr[3].indexOf(text[i]) + 1;
+			}
+			return index;
+		};
+		
+		var getFullListIndex = function(indexStr, str)
+		{
+			var fullListIndex = "";
+			for(var i = 0; i < str.length; i++)
+			{
+				var symbol = str[i];
+				if(-1 !== indexStr.indexOf(symbol))
+				{
+					fullListIndex += symbol;
+				}
+				else
+				{
+					break;
+				}
+			}
+			return fullListIndex;
+		};
+		
+		//TODO пока делаю так, пересмотреть регулярные выражения
+		var resType = numbering_numfmt_Bullet;
+		var number = parseInt(str);
+		var startPos = null, fullListIndex;
+		if(!isNaN(number))
+		{
+			resType = numbering_numfmt_Decimal;
+			startPos = number;
+		}
+		else if(1 === str.length && -1 !== str.indexOf("o"))
+		{
+			resType = numbering_numfmt_Bullet;
+		}
+		else
+		{
+			//1)смотрим на первый символ в строке
+			//2)ищем все символы, соответсвующие данному типу
+			//3)находим порядковый номер этих символов
+			var firstSymbol = str[0];
+			if(-1 !== symbolsArr[0].indexOf(firstSymbol))
+			{
+				if(getStartPosition)
+				{
+					fullListIndex = getFullListIndex(symbolsArr[0], str);
+					startPos = romanToIndex(fullListIndex);
+				}
+				
+				resType = numbering_numfmt_LowerRoman;
+			}
+			else if(-1 !== symbolsArr[1].indexOf(firstSymbol))
+			{
+				if(getStartPosition)
+				{
+					fullListIndex = getFullListIndex(symbolsArr[1], str);
+					startPos = romanToIndex(fullListIndex);
+				}
+				
+				resType = numbering_numfmt_UpperRoman;
+			}
+			else if(-1 !== symbolsArr[2].indexOf(firstSymbol))
+			{
+				if(getStartPosition)
+				{
+					fullListIndex = getFullListIndex(symbolsArr[2], str);
+					startPos = latinToIndex(fullListIndex);
+				}
+				
+				resType = numbering_numfmt_LowerLetter;
+			}
+			else if(-1 !== symbolsArr[3].indexOf(firstSymbol))
+			{
+				if(getStartPosition)
+				{
+					fullListIndex = getFullListIndex(symbolsArr[3], str);
+					startPos = latinToIndex(fullListIndex);
+				}
+				
+				resType = numbering_numfmt_UpperLetter;
+			}
+		}
+		
+		return {type: resType, startPos: startPos};
+	},
     _AddNextPrevToContent : function(oDoc)
     {
         var prev = null;
@@ -5929,7 +6335,7 @@ PasteProcessor.prototype =
                                 nUnicode = nCharCode;
                             if (null != nUnicode) {
                                 var Item;
-                                if (0x20 != nUnicode && 0xA0 != nUnicode && 0x2009 != nUnicode) {
+                                if (0x20 != nUnicode && 0x2009 != nUnicode) {
                                     Item = new ParaText();
                                     Item.Set_CharCode(nUnicode);
                                 }
@@ -5974,7 +6380,12 @@ PasteProcessor.prototype =
 
             if("ul" == sNodeName || "ol" == sNodeName || "li" == sNodeName)
             {
-                pPr.bNum = true;
+                //в данном случае если нет тега li, то списоком не считаем
+				if("li" == sNodeName)
+				{
+					pPr.bNum = true;
+				}
+				
                 if(PasteElementsId.g_bIsDocumentCopyPaste)
                 {
                     if("ul" == sNodeName)
@@ -5990,7 +6401,14 @@ PasteProcessor.prototype =
                         pPr.numType = numbering_presentationnumfrmt_ArabicPeriod;
                 }
             }
-
+			else if(pPr["mso-list"])
+			{
+				if("p" == sNodeName)
+				{
+					pPr.bNum = true;
+				}
+			}
+			
             if("img" == sNodeName && this.pasteInExcel !== true)
             {
                 if(PasteElementsId.g_bIsDocumentCopyPaste)
@@ -6012,7 +6430,7 @@ PasteProcessor.prototype =
 					//TODO пересмотреть! node.getAttribute("width") в FF возврашает "auto" -> изображения в FF не всталяются
 					if((!nWidth || !nHeight))
 					{
-						if(AscBrowser.isMozilla)
+						if(AscBrowser.isMozilla || AscBrowser.isIE)
 						{
 							nWidth = parseInt(node.width);
 							nHeight = parseInt(node.height);

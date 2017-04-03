@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -101,7 +101,7 @@ Asc['asc_docs_api'].prototype["Native_Editor_Initialize_Settings"] = function(_p
                 if (_val === true)
                 {
                     this.ShowParaMarks = false;
-                    AscCommon.CollaborativeEditing.m_bGlobalLock = true;
+                    AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 
                     this.isViewMode = true;
                     this.WordControl.m_oDrawingDocument.IsViewMode = true;

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -452,8 +452,8 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
             this._canvas_charts.height = this.CHART_PREVIEW_HEIGHT_PIX;
 
             if (AscCommon.AscBrowser.isRetina) {
-                this._canvas_charts.width <<= 1;
-                this._canvas_charts.height <<= 1;
+                this._canvas_charts.width = AscCommon.AscBrowser.convertToRetinaValue(this._canvas_charts.width, true);
+                this._canvas_charts.height = AscCommon.AscBrowser.convertToRetinaValue(this._canvas_charts.height, true);
             }
         }
 

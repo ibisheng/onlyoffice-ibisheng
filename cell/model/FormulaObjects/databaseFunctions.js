@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -32,100 +32,147 @@
 
 "use strict";
 
-(
-/**
-* @param {Window} window
-* @param {undefined} undefined
-*/
-function (window, undefined) {
-    var cBaseFunction = AscCommonExcel.cBaseFunction;
-    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+(/**
+ * @param {Window} window
+ * @param {undefined} undefined
+ */
+	function (window, undefined) {
+	var cBaseFunction = AscCommonExcel.cBaseFunction;
+	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
-    cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
-    cFormulaFunctionGroup['Database'].push(
-        cDAVERAGE,
-        cDCOUNT,
-        cDCOUNTA,
-        cDGET,
-        cDMAX,
-        cDMIN,
-        cDPRODUCT,
-        cDSTDEV,
-        cDSTDEVP,
-        cDSUM,
-        cDVAR,
-        cDVARP
-    );
+	cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
+	cFormulaFunctionGroup['Database'].push(cDAVERAGE, cDCOUNT, cDCOUNTA, cDGET, cDMAX, cDMIN, cDPRODUCT, cDSTDEV,
+		cDSTDEVP, cDSUM, cDVAR, cDVARP);
 
-function cDAVERAGE() {
-    cBaseFunction.call( this, "DAVERAGE" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDAVERAGE() {
+		cBaseFunction.call(this, "DAVERAGE");
+	}
 
-cDAVERAGE.prototype = Object.create( cBaseFunction.prototype );
+	cDAVERAGE.prototype = Object.create(cBaseFunction.prototype);
+	cDAVERAGE.prototype.constructor = cDAVERAGE;
 
-function cDCOUNT() {
-    cBaseFunction.call( this, "DCOUNT" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDCOUNT() {
+		cBaseFunction.call(this, "DCOUNT");
+	}
 
-cDCOUNT.prototype = Object.create( cBaseFunction.prototype );
+	cDCOUNT.prototype = Object.create(cBaseFunction.prototype);
+	cDCOUNT.prototype.constructor = cDCOUNT;
 
-function cDCOUNTA() {
-    cBaseFunction.call( this, "DCOUNTA" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDCOUNTA() {
+		cBaseFunction.call(this, "DCOUNTA");
+	}
 
-cDCOUNTA.prototype = Object.create( cBaseFunction.prototype );
+	cDCOUNTA.prototype = Object.create(cBaseFunction.prototype);
+	cDCOUNTA.prototype.constructor = cDCOUNTA;
 
-function cDGET() {
-    cBaseFunction.call( this, "DGET" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDGET() {
+		cBaseFunction.call(this, "DGET");
+	}
 
-cDGET.prototype = Object.create( cBaseFunction.prototype );
+	cDGET.prototype = Object.create(cBaseFunction.prototype);
+	cDGET.prototype.constructor = cDGET;
 
-function cDMAX() {
-    cBaseFunction.call( this, "DMAX" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDMAX() {
+		cBaseFunction.call(this, "DMAX");
+	}
 
-cDMAX.prototype = Object.create( cBaseFunction.prototype );
+	cDMAX.prototype = Object.create(cBaseFunction.prototype);
+	cDMAX.prototype.constructor = cDMAX;
 
-function cDMIN() {
-    cBaseFunction.call( this, "DMIN" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDMIN() {
+		cBaseFunction.call(this, "DMIN");
+	}
 
-cDMIN.prototype = Object.create( cBaseFunction.prototype );
+	cDMIN.prototype = Object.create(cBaseFunction.prototype);
+	cDMIN.prototype.constructor = cDMIN;
 
-function cDPRODUCT() {
-    cBaseFunction.call( this, "DPRODUCT" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDPRODUCT() {
+		cBaseFunction.call(this, "DPRODUCT");
+	}
 
-cDPRODUCT.prototype = Object.create( cBaseFunction.prototype );
+	cDPRODUCT.prototype = Object.create(cBaseFunction.prototype);
+	cDPRODUCT.prototype.constructor = cDPRODUCT;
 
-function cDSTDEV() {
-    cBaseFunction.call( this, "DSTDEV" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDSTDEV() {
+		cBaseFunction.call(this, "DSTDEV");
+	}
 
-cDSTDEV.prototype = Object.create( cBaseFunction.prototype );
+	cDSTDEV.prototype = Object.create(cBaseFunction.prototype);
+	cDSTDEV.prototype.constructor = cDSTDEV;
 
-function cDSTDEVP() {
-    cBaseFunction.call( this, "DSTDEVP" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDSTDEVP() {
+		cBaseFunction.call(this, "DSTDEVP");
+	}
 
-cDSTDEVP.prototype = Object.create( cBaseFunction.prototype );
+	cDSTDEVP.prototype = Object.create(cBaseFunction.prototype);
+	cDSTDEVP.prototype.constructor = cDSTDEVP;
 
-function cDSUM() {
-    cBaseFunction.call( this, "DSUM" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDSUM() {
+		cBaseFunction.call(this, "DSUM");
+	}
 
-cDSUM.prototype = Object.create( cBaseFunction.prototype );
+	cDSUM.prototype = Object.create(cBaseFunction.prototype);
+	cDSUM.prototype.constructor = cDSUM;
 
-function cDVAR() {
-    cBaseFunction.call( this, "DVAR" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDVAR() {
+		cBaseFunction.call(this, "DVAR");
+	}
 
-cDVAR.prototype = Object.create( cBaseFunction.prototype );
+	cDVAR.prototype = Object.create(cBaseFunction.prototype);
+	cDVAR.prototype.constructor = cDVAR;
 
-function cDVARP() {
-    cBaseFunction.call( this, "DVARP" );
-}
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDVARP() {
+		cBaseFunction.call(this, "DVARP");
+	}
 
-cDVARP.prototype = Object.create( cBaseFunction.prototype );
+	cDVARP.prototype = Object.create(cBaseFunction.prototype);
+	cDVARP.prototype.constructor = cDVARP;
 })(window);

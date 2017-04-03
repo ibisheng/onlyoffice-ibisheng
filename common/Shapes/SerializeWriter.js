@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2333,7 +2333,22 @@ function CBinaryFileWriter()
 
                 oThis.image_map[_src] = true;
 
-                if (oThis.IsUseFullUrl)
+                if (window["IsEmbedImagesInInternalFormat"] === true)
+                {
+                    var _image = editor.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(_src)];
+                    if (undefined !== _image)
+                    {
+                        var imgNatural = _image.Image;
+
+                        var _canvas = document.createElement("canvas");
+                        _canvas.width = imgNatural.width;
+                        _canvas.height = imgNatural.height;
+
+                        _canvas.getContext("2d").drawImage(imgNatural, 0, 0, _canvas.width, _canvas.height);
+                        _src = _canvas.toDataURL("image/png");
+                    }
+                }
+                else if (oThis.IsUseFullUrl)
                 {
                     if ((0 == _src.indexOf("theme")) && window.editor)
                     {
@@ -3710,6 +3725,9 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis._WriteInt1(0, cNvPr.id);
         oThis._WriteString1(1, cNvPr.name);
+		oThis._WriteBool1(2, cNvPr.isHidden);
+		oThis._WriteString2(3, cNvPr.title);
+		oThis._WriteString2(4, cNvPr.descr);
         oThis.WriteUChar(g_nodeAttributeEnd);
     }
 
@@ -4613,7 +4631,14 @@ function CBinaryFileWriter()
                 case AscDFH.historyitem_type_OleObject:
                 case AscDFH.historyitem_type_ImageShape:
                 {
-                    this.WriteImage(grObject);
+					if(grObject.bWordShape)
+					{
+						this.WriteImage(grObject);
+					}
+					else
+					{
+						this.WriteImage2(grObject);
+					}
                     break;
                 }
                 case AscDFH.historyitem_type_GroupShape:
@@ -4710,6 +4735,12 @@ function CBinaryFileWriter()
             _writer.EndRecord();
         }
 
+		this.WriteImage2 = function(image)
+		{
+			var _writer = this.BinaryFileWriter;
+			_writer.WriteImage(image);
+		}
+		
         this.WriteImage = function(image)
         {
             var _writer = this.BinaryFileWriter;
@@ -4809,7 +4840,14 @@ function CBinaryFileWriter()
                         case AscDFH.historyitem_type_OleObject:
                         case AscDFH.historyitem_type_ImageShape:
                         {
-                            this.WriteImage(elem);
+							if(elem.bWordShape)
+							{
+								this.WriteImage(elem);
+							}
+							else
+							{
+								this.WriteImage2(elem);
+							}
                             break;
                         }
                         case AscDFH.historyitem_type_GroupShape:
@@ -4835,11 +4873,38 @@ function CBinaryFileWriter()
 
         this.WriteTheme = function(memory, theme)
         {
-            this.BinaryFileWriter.pos = 0;
+			if (this.BinaryFileWriter.UseContinueWriter)
+			{
+				this.BinaryFileWriter.ImData = memory.ImData;
+				this.BinaryFileWriter.data = memory.data;
+				this.BinaryFileWriter.len = memory.len;
+				this.BinaryFileWriter.pos = memory.pos;
+			}
+			else
+			{
+				this.TreeDrawingIndex++;
+				this.arrayStackStarts.push(this.BinaryFileWriter.pos);
+			}
+
             this.BinaryFileWriter.WriteTheme(theme);
 
-            memory.WriteBuffer(this.BinaryFileWriter.data, 0, this.BinaryFileWriter.pos);
-            this.BinaryFileWriter.pos = 0;
+			if (this.BinaryFileWriter.UseContinueWriter)
+			{
+				memory.ImData = this.BinaryFileWriter.ImData;
+				memory.data = this.BinaryFileWriter.data;
+				memory.len = this.BinaryFileWriter.len;
+				memory.pos = this.BinaryFileWriter.pos;
+			}
+			else
+			{
+				this.TreeDrawingIndex--;
+
+				var oldPos = this.arrayStackStarts[this.arrayStackStarts.length - 1];
+				memory.WriteBuffer(this.BinaryFileWriter.data, oldPos, this.BinaryFileWriter.pos - oldPos);
+				this.BinaryFileWriter.pos = oldPos;
+
+				this.arrayStackStarts.splice(this.arrayStackStarts.length - 1, 1);
+			}
         }
     }
 

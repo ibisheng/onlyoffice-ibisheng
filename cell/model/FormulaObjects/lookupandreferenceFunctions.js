@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -94,52 +94,50 @@
 		return new RegExp(vFS + "$", flags ? flags : "i");
 	}
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cADDRESS() {
 		this.name = "ADDRESS";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 5;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cADDRESS.prototype = Object.create(cBaseFunction.prototype);
+	cADDRESS.prototype.constructor = cADDRESS;
+	cADDRESS.prototype.argumentsMin = 2;
+	cADDRESS.prototype.argumentsMax = 5;
 	cADDRESS.prototype.Calculate = function (arg) {
 		var rowNumber = arg[0], colNumber = arg[1], refType = arg[2] ? arg[2] : new cNumber(1), A1RefType = arg[3] ?
 			arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : new cEmpty();
 
 		if (cElementType.cellsRange === rowNumber.type || cElementType.cellsRange3D === rowNumber.type) {
-			rowNumber = rowNumber.cross(arguments[1].first);
+			rowNumber = rowNumber.cross(arguments[1].bbox);
 		} else if (cElementType.array === rowNumber.type) {
 			rowNumber = rowNumber.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === colNumber.type || cElementType.cellsRange3D === colNumber.type) {
-			colNumber = colNumber.cross(arguments[1].first);
+			colNumber = colNumber.cross(arguments[1].bbox);
 		} else if (cElementType.array === colNumber.type) {
 			colNumber = colNumber.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === refType.type || cElementType.cellsRange3D === refType.type) {
-			refType = refType.cross(arguments[1].first);
+			refType = refType.cross(arguments[1].bbox);
 		} else if (cElementType.array === refType.type) {
 			refType = refType.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === A1RefType.type || cElementType.cellsRange3D === A1RefType.type) {
-			A1RefType = A1RefType.cross(arguments[1].first);
+			A1RefType = A1RefType.cross(arguments[1].bbox);
 		} else if (cElementType.array === A1RefType.type) {
 			A1RefType = A1RefType.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === sheetName.type || cElementType.cellsRange3D === sheetName.type) {
-			sheetName = sheetName.cross(arguments[1].first);
+			sheetName = sheetName.cross(arguments[1].bbox);
 		} else if (cElementType.array === sheetName.type) {
 			sheetName = sheetName.getElementRowCol(0, 0);
 		}
@@ -196,11 +194,11 @@
 		}
 
 		strRef = this._getRef(this._absolute(absR, rowNumber, A1RefType),
-			this._absolute(absC, A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber, A1RefType),
-			A1RefType);
+			this._absolute(absC, A1RefType ? g_oCellAddressUtils.colnumToColstrFromWsView(colNumber) : colNumber,
+				A1RefType), A1RefType);
 
-		return this.value =
-			new cString((cElementType.empty === sheetName.type) ? strRef : parserHelp.get3DRef(sheetName.toString(), strRef));
+		return this.value = new cString((cElementType.empty === sheetName.type) ? strRef :
+			parserHelp.get3DRef(sheetName.toString(), strRef));
 	};
 	cADDRESS.prototype._getRef = function (row, col, A1RefType) {
 		return A1RefType ? col + row : 'R' + row + 'C' + col;
@@ -216,34 +214,36 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cAREAS() {
 		cBaseFunction.call(this, "AREAS");
 	}
 
 	cAREAS.prototype = Object.create(cBaseFunction.prototype);
+	cAREAS.prototype.constructor = cAREAS;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCHOOSE() {
 		this.name = "CHOOSE";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 30;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cCHOOSE.prototype = Object.create(cBaseFunction.prototype);
+	cCHOOSE.prototype.constructor = cCHOOSE;
+	cCHOOSE.prototype.argumentsMin = 2;
+	cCHOOSE.prototype.argumentsMax = 30;
 	cCHOOSE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 
 		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].first);
+			arg0 = arg0.cross(arguments[1].bbox);
 		}
 		arg0 = arg0.tocNumber();
 
@@ -267,27 +267,24 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOLUMN() {
 		this.name = "COLUMN";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cCOLUMN.prototype = Object.create(cBaseFunction.prototype);
+	cCOLUMN.prototype.constructor = cCOLUMN;
+	cCOLUMN.prototype.argumentsMax = 1;
 	cCOLUMN.prototype.Calculate = function (arg) {
 		var arg0;
 		if (this.argumentsCurrent == 0) {
 			arg0 = arguments[1];
-			return this.value = new cNumber(arg0.getFirst().getCol());
+			return this.value = new cNumber(arg0.bbox.c1 + 1);
 		}
 		arg0 = arg[0];
 		var range;
@@ -295,7 +292,7 @@
 			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
 			range = arg0.getRange();
 		}
-		return this.value = (range ? new cNumber(range.getFirst().getCol()) : new cError(cErrorType.bad_reference));
+		return this.value = (range ? new cNumber(range.bbox.c1 + 1) : new cError(cErrorType.bad_reference));
 	};
 	cCOLUMN.prototype.getInfo = function () {
 		return {
@@ -303,22 +300,20 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOLUMNS() {
 		this.name = "COLUMNS";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cCOLUMNS.prototype = Object.create(cBaseFunction.prototype);
+	cCOLUMNS.prototype.constructor = cCOLUMNS;
+	cCOLUMNS.prototype.argumentsMin = 1;
+	cCOLUMNS.prototype.argumentsMax = 1;
 	cCOLUMNS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		var range;
@@ -337,29 +332,31 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGETPIVOTDATA() {
 		cBaseFunction.call(this, "GETPIVOTDATA");
 	}
 
 	cGETPIVOTDATA.prototype = Object.create(cBaseFunction.prototype);
+	cGETPIVOTDATA.prototype.constructor = cGETPIVOTDATA;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHLOOKUP() {
 		this.name = "HLOOKUP";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cHLOOKUP.prototype = Object.create(cBaseFunction.prototype);
+	cHLOOKUP.prototype.constructor = cHLOOKUP;
+	cHLOOKUP.prototype.argumentsMin = 3;
+	cHLOOKUP.prototype.argumentsMax = 4;
 	cHLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;
@@ -458,33 +455,35 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cHYPERLINK() {
 		cBaseFunction.call(this, "HYPERLINK");
 	}
 
 	cHYPERLINK.prototype = Object.create(cBaseFunction.prototype);
+	cHYPERLINK.prototype.constructor = cHYPERLINK;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cINDEX() {
 		this.name = "INDEX";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cINDEX.prototype = Object.create(cBaseFunction.prototype);
+	cINDEX.prototype.constructor = cINDEX;
+	cINDEX.prototype.argumentsMin = 2;
+	cINDEX.prototype.argumentsMax = 4;
 	cINDEX.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1] && (cElementType.empty !== arg[1].type) ? arg[1] : new cNumber(1), arg2 = arg[2] &&
-		(cElementType.empty !== arg[2].type) ? arg[2] : new cNumber(1), arg3 = arg[3] &&
-		(cElementType.empty !== arg[3].type) ? arg[3] : new cNumber(1), res;
+		var arg0 = arg[0], arg1 = arg[1] && (cElementType.empty !== arg[1].type) ? arg[1] :
+			new cNumber(1), arg2 = arg[2] && (cElementType.empty !== arg[2].type) ? arg[2] :
+			new cNumber(1), arg3 = arg[3] && (cElementType.empty !== arg[3].type) ? arg[3] : new cNumber(1), res;
 
 		if (cElementType.cellsRange3D === arg0.type) {
 			arg0 = arg0.tocArea();
@@ -522,14 +521,16 @@
 			} else {
 				if (arg1 == 0 && arg2 > 0) {
 					var _a1 = ws.getRange3(bbox.r1, bbox.c1 + arg2 - 1, bbox.r1, bbox.c2 + arg2 - 1)
-						.getCells()[0].getName(), _a2 = ws.getRange3(bbox.r2, bbox.c1 + arg2 - 1, bbox.r2, bbox.c2 + arg2 - 1)
+						.getCells()[0].getName(), _a2 = ws.getRange3(bbox.r2, bbox.c1 + arg2 - 1, bbox.r2,
+						bbox.c2 + arg2 - 1)
 						.getCells()[0].getName();
 					res = new cArea(_a1.toString() + ":" + _a2.toString(), ws);
 				} else {
 					if (arg1 > Math.abs(bbox.r1 - bbox.r2) + 1 || arg2 > Math.abs(bbox.c1 - bbox.c2) + 1) {
 						res = new cError(cErrorType.bad_reference);
 					} else {
-						res = new cRef(ws.getRange3(bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1)
+						res = new cRef(ws.getRange3(bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1,
+							bbox.c1 + arg2 - 1)
 							.getCells()[0].getName(), ws);
 					}
 				}
@@ -552,66 +553,53 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cINDIRECT() {
 		this.name = "INDIRECT";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 2;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cINDIRECT.prototype = Object.create(cBaseFunction.prototype);
+	cINDIRECT.prototype.constructor = cINDIRECT;
+	cINDIRECT.prototype.argumentsMin = 1;
+	cINDIRECT.prototype.argumentsMax = 2;
 	cINDIRECT.prototype.Calculate = function (arg) {
 		var t = this, arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] :
 			new cBool(true), r1 = arguments[1], wb = r1.worksheet.workbook, o = {
 			Formula: "", pCurrPos: 0
-		}, r2 = arguments[2], ref, found_operand;
+		}, ref, found_operand, ret;
 
 		function parseReference() {
 			if ((ref = parserHelp.is3DRef.call(o, o.Formula, o.pCurrPos))[0]) {
-				var _wsFrom = ref[1], _wsTo = ( (ref[2] !== null) && (ref[2] !== undefined) ) ? ref[2] : _wsFrom;
-				if (!(wb.getWorksheetByName(_wsFrom) && wb.getWorksheetByName(_wsTo))) {
+				var wsFrom = wb.getWorksheetByName(ref[1]);
+				var wsTo = (null !== ref[2]) ? wb.getWorksheetByName(ref[2]) : wsFrom;
+				if (!(wsFrom && wsTo)) {
 					return t.value = new cError(cErrorType.bad_reference);
 				}
 				if (parserHelp.isArea.call(o, o.Formula, o.pCurrPos)) {
-					found_operand = new cArea3D(o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb);
-					if (o.operand_str.indexOf("$") > -1) {
-						found_operand.isAbsolute = true;
-					}
+					found_operand = new cArea3D(o.operand_str.toUpperCase(), wsFrom, wsTo);
 				} else if (parserHelp.isRef.call(o, o.Formula, o.pCurrPos)) {
-					if (_wsTo != _wsFrom) {
-						found_operand = new cArea3D(o.operand_str.toUpperCase(), _wsFrom, _wsTo, wb);
+					if (wsTo !== wsFrom) {
+						found_operand = new cArea3D(o.operand_str.toUpperCase(), wsFrom, wsTo);
 					} else {
-						found_operand = new cRef3D(o.operand_str.toUpperCase(), _wsFrom, wb);
-					}
-					if (o.operand_str.indexOf("$") > -1) {
-						found_operand.isAbsolute = true;
+						found_operand = new cRef3D(o.operand_str.toUpperCase(), wsFrom);
 					}
 				}
 			} else if (parserHelp.isArea.call(o, o.Formula, o.pCurrPos)) {
 				found_operand = new cArea(o.operand_str.toUpperCase(), r1.worksheet);
-				if (o.operand_str.indexOf("$") > -1) {
-					found_operand.isAbsolute = true;
-				}
 			} else if (parserHelp.isRef.call(o, o.Formula, o.pCurrPos, true)) {
 				found_operand = new cRef(o.operand_str.toUpperCase(), r1.worksheet);
-				if (o.operand_str.indexOf("$") > -1) {
-					found_operand.isAbsolute = true;
-				}
 			} else if (parserHelp.isName.call(o, o.Formula, o.pCurrPos, wb)[0]) {
-				found_operand = new AscCommonExcel.cName(o.operand_str, wb, r1.worksheet);
+				found_operand = new AscCommonExcel.cName(o.operand_str, r1.worksheet);
 			}
 		}
 
 		if (cElementType.array === arg0.type) {
-			var ret = new cArray();
+			ret = new cArray();
 			arg0.foreach(function (elem, r) {
 				o = {Formula: elem.toString(), pCurrPos: 0};
 				parseReference();
@@ -620,52 +608,22 @@
 				}
 				ret.addElement(found_operand)
 			});
-			return this.value = ret;
+			return this.setCA(ret, true);
 		} else {
 			o.Formula = arg0.toString();
 			parseReference();
-		}
-
-		if (found_operand) {
-			if (cElementType.name === found_operand.type) {
-				found_operand = found_operand.toRef();
-			}
-
-			var cellName = r1.getFirst().getID(), wsId = r1.worksheet.getId();
-
-			if ((cElementType.cell === found_operand.type || cElementType.cell3D === found_operand.type ||
-				cElementType.cellsRange === found_operand.type) && found_operand.isValid()) {
-				var nFrom, nTo;
-
-				if (r2) {
-					nFrom = r2.defName;
-				} else {
-					nFrom = wb.dependencyFormulas.addNode(wsId, cellName);
+			if (found_operand) {
+				if (cElementType.name === found_operand.type) {
+					found_operand = found_operand.toRef();
 				}
 
-				nTo = wb.dependencyFormulas.addNode(found_operand.getWsId(), found_operand._cells);
-
-				found_operand.setNode(nTo);
-
-				wb.dependencyFormulas.addEdge2(nFrom, nTo);
-			} else if (cElementType.cellsRange3D === found_operand.type && found_operand.isValid()) {
-				var wsR = found_operand.wsRange(), nTo, _cell = found_operand._cells.replace(/\$/g, "");
-
-				for (var j = 0; j < wsR.length; j++) {
-					if (r2) {
-						nTo = wb.dependencyFormulas.addNode(wsR[j].Id, _cell);
-						wb.dependencyFormulas.addEdge2(r2.defName, nTo);
-					} else {
-						wb.dependencyFormulas.addEdge(wsId, cellName.replace(/\$/g, ""), wsR[j].Id, _cell);
-					}
-				}
-
+				ret  = found_operand;
+			} else {
+				ret = new cError(cErrorType.bad_reference);
 			}
-
-			return this.value = found_operand;
 		}
 
-		return this.value = new cError(cErrorType.bad_reference);
+		return this.setCA(ret, true);
 
 	};
 	cINDIRECT.prototype.getInfo = function () {
@@ -674,22 +632,20 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cLOOKUP() {
 		this.name = "LOOKUP";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cLOOKUP.prototype = Object.create(cBaseFunction.prototype);
+	cLOOKUP.prototype.constructor = cLOOKUP;
+	cLOOKUP.prototype.argumentsMin = 2;
+	cLOOKUP.prototype.argumentsMax = 3;
 	cLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = this.argumentsCurrent == 2 ? arg1 : arg[2], resC = -1, resR = -1;
 
@@ -722,7 +678,8 @@
 		}
 
 		if (cElementType.array === arg1.type && cElementType.array === arg2.type) {
-			if (arg1.getRowCount() != arg2.getRowCount() && arg1.getCountElementInRow() != arg2.getCountElementInRow()) {
+			if (arg1.getRowCount() != arg2.getRowCount() &&
+				arg1.getCountElementInRow() != arg2.getCountElementInRow()) {
 				return this.value = new cError(cErrorType.not_available);
 			}
 
@@ -825,22 +782,20 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMATCH() {
 		this.name = "MATCH";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 2;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 3;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cMATCH.prototype = Object.create(cBaseFunction.prototype);
+	cMATCH.prototype.constructor = cMATCH;
+	cMATCH.prototype.argumentsMin = 2;
+	cMATCH.prototype.argumentsMax = 3;
 	cMATCH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(1);
 
@@ -848,7 +803,8 @@
 			var i, item, a1RowCount = a1.length, a1ColumnCount = a1[0].length, a2Value = a2.getValue(), arr, index = -1;
 			var a0Type = a0.type;
 			var a0Value = a0.getValue();
-			if(!(cElementType.number === a0Type || cElementType.string === a0Type || cElementType.bool === a0Type || cElementType.error === a0Type || cElementType.empty === a0Type)) {
+			if (!(cElementType.number === a0Type || cElementType.string === a0Type || cElementType.bool === a0Type ||
+				cElementType.error === a0Type || cElementType.empty === a0Type)) {
 				a0Type = a0Value.type;
 				a0Value = a0Value.getValue();
 			}
@@ -912,7 +868,7 @@
 
 		if (cElementType.array === arg1.type || cElementType.cellsRange === arg1.type) {
 			arg1 = arg1.getMatrix();
-		} else if (cElementType.cellsRange3D === arg1.type && arg1.wsFrom == arg1.wsTo) {
+		} else if (cElementType.cellsRange3D === arg1.type && arg1.isSingleSheet()) {
 			arg1 = arg1.getMatrix()[0];
 		} else if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type) {
 			arg1 = arg1.getMatrix();
@@ -936,22 +892,20 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cOFFSET() {
 		this.name = "OFFSET";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 5;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cOFFSET.prototype = Object.create(cBaseFunction.prototype);
+	cOFFSET.prototype.constructor = cOFFSET;
+	cOFFSET.prototype.argumentsMin = 3;
+	cOFFSET.prototype.argumentsMax = 5;
 	cOFFSET.prototype.Calculate = function (arg) {
 
 		function validBBOX(bbox) {
@@ -999,15 +953,14 @@
 				return this.value = new cError(cErrorType.bad_reference);
 			}
 
-			var wsName = arg0.ws.getName();
 			if (box.r1 == box.r2 && box.c1 == box.c2) {
 				ref = g_oCellAddressUtils.colnumToColstrFromWsView(box.c1 + 1) + _getRowTitle(box.r1);
-				this.value = (cElementType.cell === arg0.type) ? new cRef(ref, arg0.ws) : new cRef3D(ref, wsName, arg0.wb);
+				this.value = (cElementType.cell === arg0.type) ? new cRef(ref, arg0.ws) : new cRef3D(ref, arg0.ws);
 			} else {
 				ref = g_oCellAddressUtils.colnumToColstrFromWsView(box.c1 + 1) + _getRowTitle(box.r1) + ":" +
 					g_oCellAddressUtils.colnumToColstrFromWsView(box.c2 + 1) + _getRowTitle(box.r2);
 				this.value =
-					(cElementType.cell === arg0.type) ? new cArea(ref, arg0.ws) : new cArea3D(ref, wsName, wsName, arg0.wb);
+					(cElementType.cell === arg0.type) ? new cArea(ref, arg0.ws) : new cArea3D(ref, arg0.ws, arg0.ws);
 			}
 
 		} else if (cElementType.cellsRange === arg0.type) {
@@ -1034,39 +987,7 @@
 			this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-		if (cElementType.cellsRange === this.value.type || cElementType.cell === this.value.type ||
-			cElementType.cell3D === this.value.type || cElementType.cellsRange3D === this.value.type) {
-			var r1 = arguments[1], r2 = arguments[2], wb = r1.worksheet.workbook, cellName = r1.getFirst()
-				.getID(), wsId = r1.worksheet.getId();
-
-			if ((cElementType.cell === this.value.type || cElementType.cell3D === this.value.type ||
-				cElementType.cellsRange === this.value.type) && this.value.isValid()) {
-				var nFrom, nTo;
-
-				if (r2) {
-					nFrom = r2.defName;
-				} else {
-					nFrom = wb.dependencyFormulas.addNode(wsId, cellName);
-				}
-
-				nTo = wb.dependencyFormulas.addNode(this.value.getWsId(), this.value._cells.replace(/\$/g, ""));
-				this.value.setNode(nTo);
-				wb.dependencyFormulas.addEdge2(nFrom, nTo);
-			} else if (cElementType.cellsRange3D === this.value.type && this.value.isValid()) {
-				var wsR = this.value.wsRange(), nTo, _cell = this.value._cells.replace(/\$/g, "");
-
-				for (var j = 0; j < wsR.length; j++) {
-					if (r2) {
-						nTo = wb.dependencyFormulas.addNode(wsR[j].Id, _cell);
-						wb.dependencyFormulas.addEdge2(r2.defName, nTo);
-					} else {
-						wb.dependencyFormulas.addEdge(wsId, cellName.replace(/\$/g, ""), wsR[j].Id, _cell);
-					}
-				}
-			}
-		}
-
-		return this.value;
+		return this.setCA(this.value, true);
 
 	};
 	cOFFSET.prototype.getInfo = function () {
@@ -1075,27 +996,24 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cROW() {
 		this.name = "ROW";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 0;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cROW.prototype = Object.create(cBaseFunction.prototype);
+	cROW.prototype.constructor = cROW;
+	cROW.prototype.argumentsMax = 1;
 	cROW.prototype.Calculate = function (arg) {
 		var arg0;
 		if (this.argumentsCurrent == 0) {
 			arg0 = arguments[1];
-			return this.value = new cNumber(arg0.getFirst().getRow());
+			return this.value = new cNumber(arg0.bbox.r1 + 1);
 		}
 		arg0 = arg[0];
 		var range;
@@ -1103,7 +1021,7 @@
 			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
 			range = arg0.getRange();
 		}
-		return this.value = (range ? new cNumber(range.getFirst().getRow()) : new cError(cErrorType.bad_reference));
+		return this.value = (range ? new cNumber(range.bbox.r1 + 1) : new cError(cErrorType.bad_reference));
 	};
 	cROW.prototype.getInfo = function () {
 		return {
@@ -1111,22 +1029,20 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cROWS() {
 		this.name = "ROWS";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cROWS.prototype = Object.create(cBaseFunction.prototype);
+	cROWS.prototype.constructor = cROWS;
+	cROWS.prototype.argumentsMin = 1;
+	cROWS.prototype.argumentsMax = 1;
 	cROWS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		var range;
@@ -1145,29 +1061,32 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cRTD() {
 		cBaseFunction.call(this, "RTD");
 	}
 
 	cRTD.prototype = Object.create(cBaseFunction.prototype);
+	cRTD.prototype.constructor = cRTD;
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cTRANSPOSE() {
 		this.name = "TRANSPOSE";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 1;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 1;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.noneFormat;
 	}
 
 	cTRANSPOSE.prototype = Object.create(cBaseFunction.prototype);
+	cTRANSPOSE.prototype.constructor = cTRANSPOSE;
+	cTRANSPOSE.prototype.argumentsMin = 1;
+	cTRANSPOSE.prototype.argumentsMax = 1;
+	cTRANSPOSE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTRANSPOSE.prototype.Calculate = function (arg) {
 
 		function TransposeMatrix(A) {
@@ -1193,7 +1112,8 @@
 			arg0 = arg0.getMatrix();
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
 			return this.value = arg0.getValue();
-		} else if (cElementType.number === arg0.type || cElementType.string === arg0.type || cElementType.bool === arg0.type || cElementType.error === arg0.type) {
+		} else if (cElementType.number === arg0.type || cElementType.string === arg0.type ||
+			cElementType.bool === arg0.type || cElementType.error === arg0.type) {
 			return this.value = arg0;
 		} else {
 			return this.value = new cError(cErrorType.not_available);
@@ -1208,7 +1128,9 @@
 		};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 */
 	function VHLOOKUPCache(bHor) {
 		this.cacheId = {};
 		this.cacheRanges = {};
@@ -1290,22 +1212,20 @@
 		this.cacheRanges = {};
 	};
 
-	/** @constructor */
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cVLOOKUP() {
 		this.name = "VLOOKUP";
-		this.type = cElementType.func;
 		this.value = null;
-		this.argumentsMin = 3;
 		this.argumentsCurrent = 0;
-		this.argumentsMax = 4;
-		this.formatType = {
-			def: -1, //подразумевается формат первой ячейки входящей в формулу.
-			noneFormat: -2
-		};
-		this.numFormat = this.formatType.def;
 	}
 
 	cVLOOKUP.prototype = Object.create(cBaseFunction.prototype);
+	cVLOOKUP.prototype.constructor = cVLOOKUP;
+	cVLOOKUP.prototype.argumentsMin = 3;
+	cVLOOKUP.prototype.argumentsMax = 4;
 	cVLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;

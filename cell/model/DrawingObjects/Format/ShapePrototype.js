@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -44,18 +44,12 @@ var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
 };
-CShape.prototype.setWorksheet = function(worksheet)
-{
-    History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
-    this.worksheet = worksheet;
-    if(this.spTree)
+
+
+    CShape.prototype.getEditorType = function()
     {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            this.spTree[i].setWorksheet(worksheet);
-        }
-    }
-};
+        return 0;
+    };
 CShape.prototype.setDrawingBase = function(drawingBase)
 {
     this.drawingBase = drawingBase;
@@ -173,7 +167,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     if(!worksheet)
         return;
     var ret, aObjects = worksheet.Drawings;
-    if (AscFormat.isRealNumber(position)) {
+    if (AscFormat.isRealNumber(position) && position > -1 && position <= aObjects.length) {
         aObjects.splice(position, 0, drawingObject);
         ret = position;
     }
@@ -213,13 +207,95 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     return ret;
 }
 
+function CChangesDrawingObjectsAddToDrawingObjects(Class, Pos){
+    this.Pos = Pos;
+    this.Type = AscDFH.historyitem_AutoShapes_AddToDrawingObjects;
+	AscDFH.CChangesBase.call(this, Class);
+}
+	CChangesDrawingObjectsAddToDrawingObjects.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesDrawingObjectsAddToDrawingObjects.prototype.constructor = CChangesDrawingObjectsAddToDrawingObjects;
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.Undo = function(){
+        AscFormat.deleteDrawingBase(this.Class.worksheet.Drawings, this.Class.Get_Id());
+    };
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.Redo = function(){
+        AscFormat.addToDrawings(this.Class.worksheet, this.Class, this.Pos);
+    };
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.WriteToBinary = function(Writer){
+        Writer.WriteLong(this.Pos);
+    };
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.ReadFromBinary = function(Reader){
+        this.Pos = Reader.GetLong();
+    };
+
+    CChangesDrawingObjectsAddToDrawingObjects.prototype.CreateReverseChange = function(){
+        return new CChangesDrawingObjectsRemoveFromDrawingObjects(this.Class, this.Pos);
+    };
+
+    AscDFH.changesFactory[AscDFH.historyitem_AutoShapes_AddToDrawingObjects] = CChangesDrawingObjectsAddToDrawingObjects;
+function CChangesDrawingObjectsRemoveFromDrawingObjects(Class, Pos){
+    this.Type = AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects;
+    this.Pos = Pos;
+	AscDFH.CChangesBase.call(this, Class);
+}
+	CChangesDrawingObjectsRemoveFromDrawingObjects.prototype = Object.create(AscDFH.CChangesBase.prototype);
+	CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.constructor = CChangesDrawingObjectsRemoveFromDrawingObjects;
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.Undo = function(){
+        AscFormat.addToDrawings(this.Class.worksheet, this.Class, this.Pos);
+    };
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.Redo = function(){
+        AscFormat.deleteDrawingBase(this.Class.worksheet.Drawings, this.Class.Get_Id());
+    };
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.WriteToBinary = function(Writer){
+        Writer.WriteLong(this.Pos);
+    };
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.ReadFromBinary = function(Reader){
+        this.Pos = Reader.GetLong();
+    };
+
+    CChangesDrawingObjectsRemoveFromDrawingObjects.prototype.CreateReverseChange = function(){
+        return new CChangesDrawingObjectsAddToDrawingObjects(this.Class, this.Pos);
+    };
+
+    AscDFH.changesFactory[AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects] = CChangesDrawingObjectsRemoveFromDrawingObjects;
+
 CShape.prototype.addToDrawingObjects =  function(pos)
 {
-    var controller = this.getDrawingObjectsController();
     var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
-    var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
-    History.Add(this, data);
-    this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
+    //var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
+    History.Add(new CChangesDrawingObjectsAddToDrawingObjects(this, position));
+    //this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
+    var nv_sp_pr, bNeedSet = false;
+    switch(this.getObjectType()){
+        case AscDFH.historyitem_type_Shape:{
+            if(!this.nvSpPr){
+                bNeedSet = true;
+            }
+            break;
+        }
+        case AscDFH.historyitem_type_ChartSpace:{
+            if(!this.nvGraphicFramePr){
+                bNeedSet = true;
+            }
+            break;
+        }
+        case AscDFH.historyitem_type_ImageShape:{
+            if(!this.nvPicPr){
+                bNeedSet = true;
+            }
+            break;
+        }
+        case AscDFH.historyitem_type_GroupShape:{
+            if(!this.nvGrpSpPr){
+                bNeedSet = true;
+            }
+            break;
+        }
+    }
+    if(bNeedSet){
+        nv_sp_pr = new AscFormat.UniNvPr();
+        nv_sp_pr.cNvPr.setId(++AscFormat.Ax_Counter.GLOBAL_AX_ID_COUNTER);
+        this.setNvSpPr(nv_sp_pr);
+    }
 };
 
 
@@ -228,9 +304,9 @@ CShape.prototype.deleteDrawingBase = function()
     var position = AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
     if(AscFormat.isRealNumber(position))
     {
-        var data = {Type: AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
-        History.Add(this, data);
-        this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Remove, data.Pos, 1, data));
+        //var data = {Type: AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
+        History.Add(new CChangesDrawingObjectsRemoveFromDrawingObjects(this, position));
+        //this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Remove, data.Pos, 1, data));
     }
     return position;
 };
@@ -484,8 +560,7 @@ CShape.prototype.recalculateBounds = function()
 CShape.prototype.recalculateContent = function()
 {
     var content = this.getDocContent();
-    if(content)
-    {
+    if(content){
         var body_pr = this.getBodyPr();
 
         var oRecalcObj = this.recalculateDocContent(content, body_pr);
@@ -521,6 +596,15 @@ CShape.prototype.recalculateContent = function()
         }
         return oRecalcObj;
     }
+    else{
+        this.txWarpStructParamarks = null;
+        this.txWarpStruct = null;
+
+        this.txWarpStructParamarksNoTransform = null;
+        this.txWarpStructNoTransform = null;
+
+        this.recalcInfo.warpGeometry = null;
+    }
     return null;
 };
 
@@ -538,6 +622,31 @@ CShape.prototype.Get_Worksheet = function()
 {
     return this.worksheet;
 };
+
+
+
+    CShape.prototype.Set_CurrentElement = function()
+    {
+
+        var drawing_objects = this.getDrawingObjectsController();
+        if(drawing_objects)
+        {
+            drawing_objects.resetSelection(true);
+            if(this.group)
+            {
+                var main_group = this.group.getMainGroup();
+                drawing_objects.selectObject(main_group, 0);
+                main_group.selectObject(this, 0);
+                main_group.selection.textSelection = this;
+                drawing_objects.selection.groupSelection = main_group;
+            }
+            else
+            {
+                drawing_objects.selectObject(this, 0);
+                drawing_objects.selection.textSelection = this;
+            }
+        }
+    };
 
 AscFormat.CTextBody.prototype.Get_Worksheet = function()
 {

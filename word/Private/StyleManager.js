@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -162,71 +162,82 @@ CDocument.prototype.Is_DefaultStyleChanged = function(sName)
 //----------------------------------------------------------------------------------------------------------------------
 CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
 {
-    var oStyle = new CStyle();
+	var sStyleName = oAscStyle.get_Name();
+	var sStyleId   = this.Get_StyleIdByName(sStyleName, false);
+	if (null !== sStyleId)
+	{
+		var oStyle = this.Style[sStyleId];
 
-    var BasedOnId = this.Get_StyleIdByName(oAscStyle.get_BasedOn(), false);
-    oStyle.Set_BasedOn(BasedOnId);
-    oStyle.Set_Next(this.Get_StyleIdByName(oAscStyle.get_Next(), false));
-    oStyle.Set_Type(oAscStyle.get_Type());
+		var NewStyleParaPr = oAscStyle.get_ParaPr();
+		var NewStyleTextPr = oAscStyle.get_TextPr();
 
-    var NewStyleParaPr = oAscStyle.get_ParaPr();
-    var NewStyleTextPr = oAscStyle.get_TextPr();
+		var BasedOnId = this.Get_StyleIdByName(oAscStyle.get_BasedOn(), false);
+		var NextId    = this.Get_StyleIdByName(oAscStyle.get_Next(), false);
 
-    // Если у нас есть стиль с данным именем, тогда мы старый стиль удаляем, а новый добавляем со старым Id,
-    // чтобы если были ссылки на старый стиль - теперь они стали на новый.
-    var sStyleName = oAscStyle.get_Name();
-    var OldId = this.Get_StyleIdByName(sStyleName, false);
-    if (null != OldId)
-    {
-        var oOldStyle = this.Style[OldId];
+		oStyle.Set_Type(oAscStyle.get_Type());
 
-        oStyle.Set_QFormat(oOldStyle.Get_QFormat());
-        oStyle.Set_UiPriority(oOldStyle.Get_UiPriority());
-        oStyle.Set_Hidden(oOldStyle.Get_Hidden());
-        oStyle.Set_SemiHidden(oOldStyle.Get_SemiHidden());
-        oStyle.Set_UnhideWhenUsed(oOldStyle.Get_UnhideWhenUsed());
+		if (BasedOnId === sStyleId || sStyleId === this.Default.Paragraph)
+		{
+			oStyle.Set_BasedOn(null);
+			var OldStyleParaPr = oStyle.ParaPr.Copy();
+			var OldStyleTextPr = oStyle.TextPr.Copy();
+			OldStyleParaPr.Merge(NewStyleParaPr);
+			OldStyleTextPr.Merge(NewStyleTextPr);
+			NewStyleParaPr = OldStyleParaPr;
+			NewStyleTextPr = OldStyleTextPr;
+		}
+		else
+		{
+			oStyle.Set_BasedOn(BasedOnId);
+		}
 
-        // Если удаляемый стиль - стиль, который стоит в BasedOn, либо это вообще дефолтовый стиль, тогда мы должны
-        // его смержить с заданным.
-        if (BasedOnId === OldId || OldId === this.Default.Paragraph)
-        {
-            oStyle.Set_BasedOn(null);
-            var OldStyleParaPr = oOldStyle.ParaPr.Copy();
-            var OldStyleTextPr = oOldStyle.TextPr.Copy();
-            OldStyleParaPr.Merge(NewStyleParaPr);
-            OldStyleTextPr.Merge(NewStyleTextPr);
-            NewStyleParaPr = OldStyleParaPr;
-            NewStyleTextPr = OldStyleTextPr;
-        }
+		if (null === oStyle.Get_Next() || (null !== NextId && NextId !== sStyleId))
+		{
+			if (NextId === sStyleId)
+				oStyle.Set_Next(null);
+			else
+				oStyle.Set_Next(NextId);
+		}
 
-        if (oStyle.Get_Next() === OldId)
-            oStyle.Set_Next(null);
+		var oAscLink = oAscStyle.get_Link();
+		if (false != bCheckLink && null != oAscLink && undefined !== oAscLink)
+		{
+			var oLinkedStyle = this.Create_StyleFromInterface(oAscLink, false);
+			oStyle.Set_Link(oLinkedStyle.Get_Id());
+			oLinkedStyle.Set_Link(oStyle.Get_Id());
+		}
 
-        if (null != oOldStyle.Get_Next() && null == oStyle.Get_Next())
-            oStyle.Set_Next(oOldStyle.Get_Next());
+		oStyle.Set_TextPr(NewStyleTextPr);
+		oStyle.Set_ParaPr(NewStyleParaPr);
 
-        this.Remove(OldId);
-        oStyle.Set_Id(OldId);
-    }
+		return oStyle;
+	}
+	else
+	{
+		var oStyle = new CStyle();
 
-    oStyle.Set_Name(sStyleName);
+		var BasedOnId = this.Get_StyleIdByName(oAscStyle.get_BasedOn(), false);
+		oStyle.Set_BasedOn(BasedOnId);
+		oStyle.Set_Next(this.Get_StyleIdByName(oAscStyle.get_Next(), false));
+		oStyle.Set_Type(oAscStyle.get_Type());
+		oStyle.Set_TextPr(oAscStyle.get_TextPr());
+		oStyle.Set_ParaPr(oAscStyle.get_ParaPr());
+		oStyle.Set_Name(sStyleName);
 
-    if (styletype_Paragraph === oStyle.Get_Type())
-        oStyle.Set_QFormat(true);
+		if (styletype_Paragraph === oStyle.Get_Type())
+			oStyle.Set_QFormat(true);
 
-    var oAscLink = oAscStyle.get_Link();
-    if (false != bCheckLink && null != oAscLink && undefined !== oAscLink)
-    {
-        var oLinkedStyle = this.Create_StyleFromInterface(oAscLink, false);
-        oStyle.Set_Link(oLinkedStyle.Get_Id());
-        oLinkedStyle.Set_Link(oStyle.Get_Id());
-    }
+		var oAscLink = oAscStyle.get_Link();
+		if (false != bCheckLink && null != oAscLink && undefined !== oAscLink)
+		{
+			var oLinkedStyle = this.Create_StyleFromInterface(oAscLink, false);
+			oStyle.Set_Link(oLinkedStyle.Get_Id());
+			oLinkedStyle.Set_Link(oStyle.Get_Id());
+		}
 
-    oStyle.Set_TextPr(NewStyleTextPr);
-    oStyle.Set_ParaPr(NewStyleParaPr);
-
-    this.Add(oStyle);
-    return oStyle;
+		this.Add(oStyle);
+		return oStyle;
+	}
 };
 CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
 {

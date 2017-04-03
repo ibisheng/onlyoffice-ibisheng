@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -76,6 +76,22 @@ field_months[0][11] = "декабря";
 
 //-----------------------------
 
+   AscDFH.changesFactory[AscDFH.historyitem_TextBodySetParent] = AscDFH.CChangesDrawingsObject;
+   AscDFH.changesFactory[AscDFH.historyitem_TextBodySetBodyPr] = AscDFH.CChangesDrawingsObjectNoId;
+   AscDFH.changesFactory[AscDFH.historyitem_TextBodySetContent] = AscDFH.CChangesDrawingsObject;
+   AscDFH.changesFactory[AscDFH.historyitem_TextBodySetLstStyle] = AscDFH.CChangesDrawingsObjectNoId;
+
+
+AscDFH.drawingsChangesMap[AscDFH.historyitem_TextBodySetParent] =   function(oClass, value){oClass.parent = value;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_TextBodySetBodyPr] =   function(oClass, value){oClass.bodyPr = value;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_TextBodySetContent] =  function(oClass, value){oClass.content = value;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_TextBodySetLstStyle] = function(oClass, value){oClass.lstStyle = value;};
+
+    AscDFH.drawingsConstructorsMap[AscDFH.historyitem_TextBodySetBodyPr] = AscFormat.CBodyPr;
+    AscDFH.drawingsConstructorsMap[AscDFH.historyitem_TextBodySetLstStyle] = AscFormat.TextListStyle;
+
+
+
 function CTextBody()
 {
     this.bodyPr = null;
@@ -91,8 +107,6 @@ function CTextBody()
         recalculateBodyPr: true,
         recalculateContent2: true
     };
-    this.textPropsForRecalc = [];
-    this.bRecalculateNumbering = true;
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
     AscCommon.g_oTableId.Add(this, this.Id);
 }
@@ -163,13 +177,13 @@ CTextBody.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_TextBodySetParent, oldPr: this.parent, newPr: pr});
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_TextBodySetParent, this.parent, pr));
         this.parent = pr;
     },
 
     setBodyPr: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_TextBodySetBodyPr, oldPr: this.bodyPr, newPr: pr});
+        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_TextBodySetBodyPr, this.bodyPr, pr));
         this.bodyPr = pr;
         if(this.parent && this.parent.recalcInfo)
         {
@@ -192,164 +206,19 @@ CTextBody.prototype =
 
     setContent: function(pr)
     {
-        History.Add(this, {Type: AscDFH.historyitem_TextBodySetContent, oldPr: this.content, newPr: pr});
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_TextBodySetContent, this.content, pr));
         this.content = pr;
     },
 
     setLstStyle: function(lstStyle)
     {
-        History.Add(this, {Type:AscDFH.historyitem_TextBodySetLstStyle, oldPr: this.lstStyle, newPr: lstStyle});
+        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_TextBodySetLstStyle, this.lstStyle, lstStyle));
         this.lstStyle = lstStyle;
     },
 
     getObjectType: function()
     {
         return AscDFH.historyitem_type_TextBody;
-    },
-
-    Undo: function(data)
-    {
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_TextBodySetParent:
-            {
-                this.parent = data.oldPr;
-                break;
-            }
-
-            case AscDFH.historyitem_TextBodySetBodyPr:
-            {
-                this.bodyPr = data.oldPr;
-
-
-                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateInternalChart)
-                {
-                    this.parent.parent.parent.parent.parent.handleUpdateInternalChart();
-                }
-                break;
-            }
-            case AscDFH.historyitem_TextBodySetContent:
-            {
-                this.content = data.oldPr;
-                break;
-            }
-            case AscDFH.historyitem_TextBodySetLstStyle:
-            {
-                this.lstStyle = data.oldPr;
-                break;
-            }
-        }
-    },
-
-    Redo: function(data)
-    {
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_TextBodySetParent:
-            {
-                this.parent = data.newPr;
-                break;
-            }
-
-            case AscDFH.historyitem_TextBodySetBodyPr:
-            {
-                this.bodyPr = data.newPr;
-
-                if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateInternalChart)
-                {
-                    this.parent.parent.parent.parent.parent.handleUpdateInternalChart();
-                }
-                break;
-            }
-            case AscDFH.historyitem_TextBodySetContent:
-            {
-                this.content = data.newPr;
-                break;
-            }
-            case AscDFH.historyitem_TextBodySetLstStyle:
-            {
-                this.lstStyle = data.newPr;
-                break;
-            }
-        }
-    },
-    Save_Changes: function(data, w)
-    {
-        w.WriteLong(AscDFH.historyitem_type_TextBody);
-        w.WriteLong(data.Type);
-        switch(data.Type)
-        {
-            case AscDFH.historyitem_TextBodySetParent:
-            case AscDFH.historyitem_TextBodySetContent:
-            {
-                AscFormat.writeObject(w, data.newPr);
-                break;
-            }
-            case AscDFH.historyitem_TextBodySetBodyPr:
-            case AscDFH.historyitem_TextBodySetLstStyle:
-            {
-                w.WriteBool(isRealObject(data.newPr));
-                if(isRealObject(data.newPr))
-                {
-                    data.newPr.Write_ToBinary(w);
-                }
-                break;
-            }
-        }
-    },
-
-    Load_Changes: function(r)
-    {
-        if(r.GetLong() === AscDFH.historyitem_type_TextBody)
-        {
-            var type = r.GetLong();
-            switch(type)
-            {
-                case AscDFH.historyitem_TextBodySetParent:
-                {
-                    this.parent = AscFormat.readObject(r);
-                    break;
-                }
-
-                case AscDFH.historyitem_TextBodySetBodyPr:
-                {
-                    if(r.GetBool())
-                    {
-                        this.bodyPr = new AscFormat.CBodyPr();
-                        this.bodyPr.Read_FromBinary(r);
-                    }
-                    else
-                    {
-                        this.bodyPr = null;
-                    }
-
-                    if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateInternalChart)
-                    {
-                        this.parent.parent.parent.parent.parent.handleUpdateInternalChart();
-                    }
-                    break;
-                }
-                case AscDFH.historyitem_TextBodySetContent:
-                {
-                    this.content = AscFormat.readObject(r);
-                    break;
-                }
-                case AscDFH.historyitem_TextBodySetLstStyle:
-                {
-                    if(r.GetBool())
-                    {
-                        this.lstStyle = new AscFormat.TextListStyle();
-                        this.lstStyle.Read_FromBinary(r);
-                    }
-                    else
-                    {
-                        this.lstStyle = null;
-                    }
-
-                    break;
-                }
-            }
-        }
     },
 
     Write_ToBinary2: function(w)

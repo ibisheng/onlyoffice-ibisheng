@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -96,8 +96,8 @@ function CTransitionAnimation(htmlpage)
         var _px_h = _page.m_oEditor.HtmlElement.height;
         if (this.HtmlPage.bIsRetinaSupport)
         {
-            w >>= 1;
-            _px_h >>= 1;
+            w /= AscCommon.AscBrowser.retinaPixelRatio;
+            _px_h /= AscCommon.AscBrowser.retinaPixelRatio;
         }
 
         var h = (((_page.m_oBody.AbsolutePosition.B - _page.m_oBody.AbsolutePosition.T) -
@@ -183,7 +183,7 @@ function CTransitionAnimation(htmlpage)
         {
             var ctx1 = this.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
             if (this.HtmlPage.bIsRetinaSupport)
-                ctx1.setTransform(2, 0, 0, 2, 0, 0);
+                ctx1.setTransform(AscCommon.AscBrowser.retinaPixelRatio, 0, 0, AscCommon.AscBrowser.retinaPixelRatio, 0, 0);
             else
                 ctx1.setTransform(1, 0, 0, 1, 0, 0);
 
@@ -322,7 +322,7 @@ function CTransitionAnimation(htmlpage)
         if (this.HtmlPage.bIsRetinaSupport)
         {
             var ctx1 = oThis.HtmlPage.m_oEditor.HtmlElement.getContext('2d');
-            ctx1.setTransform(2, 0, 0, 2, 0, 0);
+            ctx1.setTransform(AscCommon.AscBrowser.retinaPixelRatio, 0, 0, AscCommon.AscBrowser.retinaPixelRatio, 0, 0);
         }
 
         switch (this.Type)

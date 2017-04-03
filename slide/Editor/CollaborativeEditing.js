@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -39,7 +39,7 @@
  */
 function CCollaborativeEditing()
 {
-    CCollaborativeEditing.superclass.constructor.call(this);
+	AscCommon.CCollaborativeEditingBase.call(this);
 
     this.m_oLogicDocument     = null;
     this.m_aDocumentPositions = new AscCommon.CDocumentPositionsManager();
@@ -54,15 +54,14 @@ function CCollaborativeEditing()
     this.m_aForeignCursorsToShow = {};
 }
 
-AscCommon.extendClass(CCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
-
+CCollaborativeEditing.prototype = Object.create(AscCommon.CCollaborativeEditingBase.prototype);
+CCollaborativeEditing.prototype.constructor = CCollaborativeEditing;
 
 CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo)
 {
     // Пересчитываем позиции
     this.Refresh_DCChanges();
     this.RefreshPosExtChanges();
-
     // Генерируем свои изменения
     var StartPoint = ( null === AscCommon.History.SavedIndex ? 0 : AscCommon.History.SavedIndex + 1 );
     var LastPoint  = -1;
@@ -86,7 +85,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     }
     var deleteIndex = ( null === AscCommon.History.SavedIndex ? null : SumIndex );
 
-    var aChanges = [];
+    var aChanges = [], aChanges2 = [];
     for ( var PointIndex = StartPoint; PointIndex <= LastPoint; PointIndex++ )
     {
         var Point = AscCommon.History.Points[PointIndex];
@@ -97,6 +96,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
             var Item = Point.Items[Index];
             var oChanges = new AscCommon.CCollaborativeChanges();
             oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
+            aChanges2.push(Item.Data);
             aChanges.push( oChanges.m_pData );
         }
     }
@@ -176,10 +176,12 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     this.m_aNeedUnlock2.length = 0;
 
     if (0 < aChanges.length || null !== deleteIndex) {
-        editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo);
+        this.private_OnSendOwnChanges(aChanges2, deleteIndex);
+        editor.CoAuthoringApi.saveChanges(aChanges, deleteIndex, AdditionalInfo, editor.canUnlockDocument2);
         AscCommon.History.CanNotAddChanges = true;
     } else
-        editor.CoAuthoringApi.unLockDocument(true);
+        editor.CoAuthoringApi.unLockDocument(true, editor.canUnlockDocument2);
+	editor.canUnlockDocument2 = false;
 
     if ( -1 === this.m_nUseType )
     {
@@ -290,8 +292,8 @@ CCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     // Данная функция вызывается, когда загрузились внешние объекты (картинки и шрифты)
 
     // Снимаем лок
-    AscCommon.CollaborativeEditing.m_bGlobalLock = false;
-    AscCommon.CollaborativeEditing.m_bGlobalLockSelection = false;
+    AscCommon.CollaborativeEditing.Set_GlobalLock(false);
+    AscCommon.CollaborativeEditing.Set_GlobalLockSelection(false);
 
     // Запускаем полный пересчет документа
     var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -335,7 +337,9 @@ CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
 
         // Ставим глобальный лок, только во время совместного редактирования
         if ( true === this.m_bUse )
-            this.m_bGlobalLock = true;
+		{
+			this.Set_GlobalLock(true);
+		}
         else
         {
             // Пробегаемся по массиву и проставляем, что залочено нами
@@ -389,13 +393,13 @@ CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
 
 CCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
 {
-    if (true === AscCommon.CollaborativeEditing.m_bGlobalLock)
+    if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
     {
         if (false == editor.checkLongActionCallback(AscCommon.CollaborativeEditing.OnCallback_AskLock, result))
             return;
 
         // Снимаем глобальный лок
-        AscCommon.CollaborativeEditing.m_bGlobalLock = false;
+        AscCommon.CollaborativeEditing.Set_GlobalLock(false);
 
         if (result["lock"])
         {
@@ -452,9 +456,9 @@ CCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
     editor.isChartEditor = false;
 };
 
-CCollaborativeEditing.prototype.AddPosExtChanges = function(Item, bHor)
+CCollaborativeEditing.prototype.AddPosExtChanges = function(Item, ChangeObject)
 {
-    if(bHor)
+    if(ChangeObject.IsHorizontal())
     {
         this.PosExtChangesX.push(Item);
     }
@@ -465,16 +469,22 @@ CCollaborativeEditing.prototype.AddPosExtChanges = function(Item, bHor)
 };
 
 
-CCollaborativeEditing.prototype.RewriteChanges = function(changesArr, scale, Binary_Writer)
+CCollaborativeEditing.prototype.RewritePosExtChanges = function(changesArr, scale)
 {
     for(var i = 0; i < changesArr.length; ++i)
     {
         var changes = changesArr[i];
         var data = changes.Data;
-        data.newPr *= scale;
-        var Binary_Pos = Binary_Writer.GetCurPosition();
-        changes.Class.Save_Changes(data, Binary_Writer);
+        data.New *= scale;
+        data.Old *= scale;
+        var Binary_Writer = AscCommon.History.BinaryWriter;
+        var Binary_Pos    = Binary_Writer.GetCurPosition();
+        Binary_Writer.WriteString2(changes.Class.Get_Id());
+        Binary_Writer.WriteLong(changes.Data.Type);
+        changes.Data.WriteToBinary(Binary_Writer);
+
         var Binary_Len = Binary_Writer.GetCurPosition() - Binary_Pos;
+
         changes.Binary.Pos = Binary_Pos;
         changes.Binary.Len = Binary_Len;
     }
@@ -484,8 +494,8 @@ CCollaborativeEditing.prototype.RefreshPosExtChanges = function()
 {
     if(this.ScaleX != null && this.ScaleY != null)
     {
-        this.RewriteChanges(this.PosExtChangesX, this.ScaleX, AscCommon.History.BinaryWriter);
-        this.RewriteChanges(this.PosExtChangesY, this.ScaleY, AscCommon.History.BinaryWriter);
+        this.RewritePosExtChanges(this.PosExtChangesX, this.ScaleX);
+        this.RewritePosExtChanges(this.PosExtChangesY, this.ScaleY);
     }
     this.PosExtChangesX.length = 0;
     this.PosExtChangesY.length = 0;
@@ -692,6 +702,12 @@ CCollaborativeEditing.prototype.Update_ForeignCursorLabelPosition = function(Use
 
     editor.sync_ShowForeignCursorLabel(UserId, X, Y, Color);
 };
+
+
+CCollaborativeEditing.prototype.private_RecalculateDocument = function(oRecalcData){
+    this.m_oLogicDocument.Recalculate(oRecalcData);
+};
+
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -232,8 +232,8 @@ function CControl()
             var _W = ((_r - _x) * g_dKoef_mm_to_pix + 0.5) >> 0;
             var _H = ((_b - _y) * g_dKoef_mm_to_pix + 0.5) >> 0;
 
-            this.HtmlElement.width 	= _W << 1;
-            this.HtmlElement.height = _H << 1;
+            this.HtmlElement.width 	= AscCommon.AscBrowser.convertToRetinaValue(_W, true);
+            this.HtmlElement.height = AscCommon.AscBrowser.convertToRetinaValue(_H, true);
         }
         else
         {

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -88,6 +88,7 @@ function COverlay()
     this.ClearAll = false;
 
     this.IsRetina = false;
+    this.IsCellEditor = false;
 }
 
 COverlay.prototype =
@@ -150,7 +151,7 @@ COverlay.prototype =
     SetBaseTransform : function()
     {
         if (this.IsRetina)
-            this.m_oContext.setTransform(2, 0, 0, 2, 0, 0);
+            this.m_oContext.setTransform(AscCommon.AscBrowser.retinaPixelRatio, 0, 0, AscCommon.AscBrowser.retinaPixelRatio, 0, 0);
         else
             this.m_oContext.setTransform(1, 0, 0, 1, 0, 0);
     },
@@ -589,7 +590,7 @@ CAutoshapeTrack.prototype =
 
         this.Graphics = new AscCommon.CGraphics();
 
-        var _scale = this.m_oOverlay.IsRetina? 2 : 1;
+        var _scale = this.m_oOverlay.IsRetina? AscCommon.AscBrowser.retinaPixelRatio : 1;
 
         this.Graphics.init(this.m_oContext, _scale * (r - x), _scale * (b - y), w_mm, h_mm);
 
@@ -778,7 +779,7 @@ CAutoshapeTrack.prototype =
 
         this.Graphics = new AscCommon.CGraphics();
 
-        var _scale = this.m_oOverlay.IsRetina? 2 : 1;
+        var _scale = this.m_oOverlay.IsRetina? AscCommon.AscBrowser.retinaPixelRatio : 1;
 
         this.Graphics.init(this.m_oContext, _scale * (drawPage.right - drawPage.left), _scale * (drawPage.bottom - drawPage.top), oPage.width_mm, oPage.height_mm);
 
@@ -857,6 +858,29 @@ CAutoshapeTrack.prototype =
     {
 		if (true === isNoMove)
 			return;
+
+		var _retina = this.m_oOverlay.IsRetina;
+
+		if (!_retina && this.m_oOverlay.IsCellEditor && AscCommon.AscBrowser.isRetina)
+        {
+			this.m_oOverlay.IsRetina = true;
+            this.m_oOverlay.m_oContext.setTransform(1, 0, 0, 1, 0, 0);
+
+            left    /= AscCommon.AscBrowser.retinaPixelRatio;
+            top     /= AscCommon.AscBrowser.retinaPixelRatio;
+            width   /= AscCommon.AscBrowser.retinaPixelRatio;
+            height  /= AscCommon.AscBrowser.retinaPixelRatio;
+
+            if (matrix)
+			{
+				matrix.tx /= AscCommon.AscBrowser.retinaPixelRatio;
+				matrix.ty /= AscCommon.AscBrowser.retinaPixelRatio;
+			}
+
+			this.m_oOverlay.m_oContext.translate(this.Graphics.m_oCoordTransform.tx, this.Graphics.m_oCoordTransform.ty);
+            this.m_oOverlay.m_oContext.scale(AscCommon.AscBrowser.retinaPixelRatio, AscCommon.AscBrowser.retinaPixelRatio);
+			this.m_oOverlay.m_oContext.translate(-this.Graphics.m_oCoordTransform.tx, -this.Graphics.m_oCoordTransform.ty);
+        }
 
         // с самого начала нужно понять, есть ли поворот. Потому что если его нет, то можно
         // (и нужно!) рисовать все по-умному
@@ -1261,11 +1285,13 @@ CAutoshapeTrack.prototype =
 								var _px = Math.cos(_angle);
 								var _py = Math.sin(_angle);
 
+								ctx.save();
+
 								ctx.translate(_xI, _yI);
 								ctx.transform(_px, _py, -_py, _px, 0, 0);
                                 ctx.drawImage(_image_track_rotate, -_w2, -_w2, _w, _w);
 
-                                overlay.SetBaseTransform();
+                                ctx.restore();
 
                                 overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                             }
@@ -1620,11 +1646,13 @@ CAutoshapeTrack.prototype =
 								var _px = Math.cos(_angle);
 								var _py = Math.sin(_angle);
 
+								ctx.save();
+
 								ctx.translate(_xI, _yI);
 								ctx.transform(_px, _py, -_py, _px, 0, 0);
 								ctx.drawImage(_image_track_rotate, -_w2, -_w2, _w, _w);
 
-                                overlay.SetBaseTransform();
+                                ctx.restore();
 
                                 overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                             }
@@ -1894,9 +1922,13 @@ CAutoshapeTrack.prototype =
                             var _w = IMAGE_ROTATE_TRACK_W;
                             var _w2 = IMAGE_ROTATE_TRACK_W / 2;
 
-                            overlay.SetTransform(ex1, ey1, -ey1, ex1, _xI, _yI);
+                            ctx.save();
+
+                            overlay.transform(ex1, ey1, -ey1, ex1, _xI, _yI);
                             ctx.drawImage(_image_track_rotate, -_w2, -_w2, _w, _w);
                             overlay.SetBaseTransform();
+
+                            ctx.restore();
 
                             overlay.CheckRect(_xI - _w2, _yI - _w2, _w, _w);
                         }
@@ -1948,6 +1980,18 @@ CAutoshapeTrack.prototype =
         }
 
         ctx.globalAlpha = _oldGlobalAlpha;
+
+		if (!_retina && this.m_oOverlay.IsCellEditor && AscCommon.AscBrowser.isRetina)
+		{
+			this.m_oOverlay.IsRetina = false;
+			this.m_oOverlay.SetBaseTransform();
+
+			if (matrix)
+			{
+				matrix.tx *= AscCommon.AscBrowser.retinaPixelRatio;
+				matrix.ty *= AscCommon.AscBrowser.retinaPixelRatio;
+			}
+		}
     },
 
     DrawTrackSelectShapes : function(x, y, w, h)
@@ -2229,6 +2273,10 @@ CAutoshapeTrack.prototype =
         var ctx = overlay.m_oContext;
 
         var dist = TRACK_ADJUSTMENT_SIZE / 2;
+
+        if (!overlay.IsRetina && overlay.IsCellEditor && AscCommon.AscBrowser.isRetina)
+            dist *= AscCommon.AscBrowser.retinaPixelRatio;
+
         ctx.moveTo(cx - dist, cy);
         ctx.lineTo(cx, cy - dist);
         ctx.lineTo(cx + dist, cy);

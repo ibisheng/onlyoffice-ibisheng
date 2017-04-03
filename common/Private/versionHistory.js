@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -45,6 +45,8 @@
     this.newChangeId = -1;
     this.colors = null;
     this.changes = null;
+	this.token = null;
+	this.isRequested = null;
 
     if (newObj) {
       this.update(newObj);
@@ -59,9 +61,11 @@
       this.urlChanges = newObj.urlChanges;
       this.currentChangeId = -1;
       this.changes = null;
+	  this.token = newObj.token;
     }
     this.colors = newObj.colors;
     this.newChangeId = newObj.currentChangeId;
+	this.isRequested = newObj.isRequested;
     return bUpdate;
   };
   asc_CVersionHistory.prototype.applyChanges = function(editor) {
@@ -88,6 +92,12 @@
   asc_CVersionHistory.prototype.asc_setArrColors = function(val) {
     this.colors = val;
   };
+  asc_CVersionHistory.prototype.asc_setToken = function(val) {
+    this.token = val;
+  };
+  asc_CVersionHistory.prototype.asc_setIsRequested = function(val) {
+    this.isRequested = val;
+  };
 
   window["Asc"].asc_CVersionHistory = window["Asc"]["asc_CVersionHistory"] = asc_CVersionHistory;
   prot = asc_CVersionHistory.prototype;
@@ -96,6 +106,8 @@
   prot["asc_setUrlChanges"] = prot.asc_setUrlChanges;
   prot["asc_setCurrentChangeId"] = prot.asc_setCurrentChangeId;
   prot["asc_setArrColors"] = prot.asc_setArrColors;
+  prot["asc_setToken"] = prot.asc_setToken;
+  prot["asc_setIsRequested"] = prot.asc_setIsRequested;
 })(window);
 
 AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
@@ -120,7 +132,7 @@ AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
     this.DocInfo.put_Url(this.VersionHistory.url);
     this.documentUrlChanges = this.VersionHistory.urlChanges;
     this.asc_setDocInfo(this.DocInfo);
-    this.asc_LoadDocument(true);
+    this.asc_LoadDocument(this.VersionHistory);
   } else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
     // Нужно только добавить некоторые изменения
     AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();

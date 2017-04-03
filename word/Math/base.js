@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -109,7 +109,7 @@ var c_oAscMathMainType = {
  */
 function CMathBase(bInside)
 {
-    CMathBase.superclass.constructor.call(this);
+	CParagraphContentWithParagraphLikeContent.call(this);
 
     this.Type = para_Math_Composition;
 
@@ -183,9 +183,12 @@ function CMathBase(bInside)
         this.ReviewInfo.Update();
     }
 
+	this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
+
     return this;
 }
-AscCommon.extendClass(CMathBase, CParagraphContentWithParagraphLikeContent);
+CMathBase.prototype = Object.create(CParagraphContentWithParagraphLikeContent.prototype);
+CMathBase.prototype.constructor = CMathBase;
 CMathBase.prototype.setContent = function()
 {
     for(var i=0; i < this.nRow; i++)
@@ -284,12 +287,16 @@ CMathBase.prototype.Get_TxtPrControlLetter = function(RPI) // TextPrControlLette
 
     return this.TextPrControlLetter;
 };
-CMathBase.prototype.fillPlaceholders = function()
+CMathBase.prototype.SetPlaceholder = function()
 {
-    for(var i=0; i < this.nRow; i++)
-        for(var j = 0; j < this.nCol; j++)
-            if(!this.elements[i][j].IsJustDraw())
-                this.elements[i][j].fillPlaceholders();
+	for (var i = 0; i < this.nRow; i++)
+	{
+		for (var j = 0; j < this.nCol; j++)
+		{
+			if (!this.elements[i][j].IsJustDraw())
+				this.elements[i][j].SetPlaceholder();
+		}
+	}
 };
 CMathBase.prototype.addMCToContent = function(elements)
 {
@@ -512,7 +519,7 @@ CMathBase.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
     {
         this.Bounds.ShiftPos(CurLine, CurRange, Dx, Dy);
 
-        CMathBase.superclass.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
+		CParagraphContentWithParagraphLikeContent.prototype.Shift_Range.call(this, Dx, Dy, _CurLine, _CurRange);
     }
 };
 CMathBase.prototype.IsStartRange = function(_CurLine, _CurRange)
@@ -639,7 +646,7 @@ CMathBase.prototype.Draw_Elements = function(PDSE)
 
         for (var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
-            this.Content[CurPos].Draw_Elements(PDSE);
+			this.Content[CurPos].Draw_Elements(PDSE);
         }
     }
 };
@@ -934,17 +941,27 @@ CMathBase.prototype.Get_TextPr = function(ContentPos, Depth)
 };
 CMathBase.prototype.Get_CompiledTextPr  = function(Copy)
 {
-    var  TextPr = this.Content[0].Get_CompiledTextPr(true, true);
+	var TextPr = null;
 
-    for(var i = 1; i < this.Content.length; i++)
-    {
-        var CurTextPr = this.Content[i].Get_CompiledTextPr(false, true);
+	var nStartPos = 0;
+	var nCount = this.Content.length;
+	while (null === TextPr && nStartPos < nCount)
+	{
+		if (this.Is_ContentUse(this.Content[nStartPos]))
+			TextPr = this.Content[nStartPos].Get_CompiledTextPr(true, true);
 
-        if ( null !== CurTextPr )
-            TextPr = TextPr.Compare( CurTextPr );
-    }
+		nStartPos++;
+	}
 
-    return TextPr;
+	for (var nPos = nStartPos; nPos < nCount; ++nPos)
+	{
+		var CurTextPr = this.Content[nPos].Get_CompiledTextPr(false, true);
+
+		if (null !== CurTextPr)
+			TextPr = TextPr.Compare(CurTextPr);
+	}
+
+	return TextPr;
 };
 CMathBase.prototype.Get_CompiledPr = function(Copy)
 {
@@ -952,26 +969,12 @@ CMathBase.prototype.Get_CompiledPr = function(Copy)
 };
 CMathBase.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
-    this.Apply_TextPrToCtrPr(TextPr, IncFontSize, ApplyToAll);
+	this.Apply_TextPrToCtrPr(TextPr, IncFontSize, ApplyToAll);
 
-    // нужно пройтись по всем элементам  и вложенным формулам в том числе, чтобы пересчитать ctrPrp у всех мат объектов
-    // для некоторых формул (например, для итератора в Limit) важно учесть собственные настройки (ArgSize), а не только родительские, поэтому и нужно профтись по всем inline-формулам
-
-    for(var i=0; i < this.nRow; i++)
-        for(var j = 0; j < this.nCol; j++)
-            if(!this.elements[i][j].IsJustDraw())
-                this.elements[i][j].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-
-    // такая ситуация может возникнуть при добавлении элементов из меню, и чтобы применились текстовые настройки при вставке нужно пройтись по контентам
-    // a Resize произойдет позже, после вставки = > массив this.elements заполнится позднее
-    if(this.nRow == 0 && this.nCol == 0)
-    {
-        for(var i = 0 ; i < this.Content.length; i++)
-        {
-            this.Content[i].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
-        }
-    }
-
+	for (var nIndex = 0; nIndex < this.Content.length; ++nIndex)
+	{
+		this.Content[nIndex].Apply_TextPr(TextPr, IncFontSize, ApplyToAll);
+	}
 };
 CMathBase.prototype.Apply_TextPrToCtrPr = function(TextPr, IncFontSize, ApplyToAll)
 {
@@ -990,7 +993,7 @@ CMathBase.prototype.Apply_TextPrToCtrPr = function(TextPr, IncFontSize, ApplyToA
             var oCompiledPr = this.Get_CompiledCtrPrp();
             if(TextPr.AscFill)
             {
-                this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oCompiledPr.TextFill, 0));
+                this.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, oCompiledPr.TextFill, 1));
             }
             if(TextPr.AscUnifill)
             {
@@ -1079,140 +1082,140 @@ CMathBase.prototype.Set_MathTextPr2 = function(TextPr, MathPr, bAll)
 };
 CMathBase.prototype.Set_FontSizeCtrPrp = function(Value)
 {
-    if ( Value !== this.CtrPrp.FontSize )
-    {
-        History.Add(this, new CChangesMathFontSize(Value, this.CtrPrp.FontSize));
-        this.raw_SetFontSize(Value);
-    }
+	if (Value !== this.CtrPrp.FontSize)
+	{
+		History.Add(new CChangesMathBaseFontSize(this, this.CtrPrp.FontSize, Value));
+		this.raw_SetFontSize(Value);
+	}
 };
 CMathBase.prototype.Set_Color = function(Value)
 {
-    if ( ( undefined === Value && undefined !== this.CtrPrp.Color ) || ( Value instanceof CDocumentColor && ( undefined === this.CtrPrp.Color || false === Value.Compare(this.CtrPrp.Color) ) ) )
-    {
-        History.Add( this,  new CChangesMathColor(Value, this.CtrPrp.Color));
-        this.raw_SetColor(Value);
-    }
+	if ((undefined === Value && undefined !== this.CtrPrp.Color) || (Value instanceof CDocumentColor && (undefined === this.CtrPrp.Color || false === Value.Compare(this.CtrPrp.Color))))
+	{
+		History.Add(new CChangesMathBaseColor(this, this.CtrPrp.Color, Value));
+		this.raw_SetColor(Value);
+	}
 };
 CMathBase.prototype.Set_Unifill = function(Value)
 {
-    if ( ( undefined === Value && undefined !== this.CtrPrp.Unifill ) || ( Value instanceof AscFormat.CUniFill && ( undefined === this.CtrPrp.Unifill || false === AscFormat.CompareUnifillBool(this.CtrPrp.Unifill, Value) ) ) )
-    {
-        History.Add(this, new CChangesMathUnifill(Value, this.CtrPrp.Unifill));
-        this.raw_SetUnifill(Value);
-    }
+	if (( undefined === Value && undefined !== this.CtrPrp.Unifill ) || ( Value instanceof AscFormat.CUniFill && ( undefined === this.CtrPrp.Unifill || false === AscFormat.CompareUnifillBool(this.CtrPrp.Unifill, Value) ) ))
+	{
+		History.Add(new CChangesMathBaseUnifill(this, this.CtrPrp.Unifill, Value));
+		this.raw_SetUnifill(Value);
+	}
 };
 CMathBase.prototype.Set_TextFill = function(Value)
 {
-    if ( ( undefined === Value && undefined !== this.CtrPrp.TextFill ) || ( Value instanceof AscFormat.CUniFill && ( undefined === this.CtrPrp.TextFill || false === AscFormat.CompareUnifillBool(this.CtrPrp.TextFill, Value) ) ) )
-    {
-        History.Add(this, new CChangesMathTextFill(Value, this.CtrPrp.TextFill));
-        this.raw_SetTextFill(Value);
-    }
+	if (( undefined === Value && undefined !== this.CtrPrp.TextFill ) || ( Value instanceof AscFormat.CUniFill && ( undefined === this.CtrPrp.TextFill || false === AscFormat.CompareUnifillBool(this.CtrPrp.TextFill, Value) ) ))
+	{
+		History.Add(new CChangesMathBaseTextFill(this, this.CtrPrp.TextFill, Value));
+		this.raw_SetTextFill(Value);
+	}
 };
 CMathBase.prototype.Set_TextOutline = function(Value)
 {
-    if ( ( undefined === Value && undefined !== this.CtrPrp.TextOutline ) || ( Value instanceof AscFormat.CLn && ( undefined === this.CtrPrp.TextOutline || false === Value.IsIdentical(this.CtrPrp.TextOutline) ) ) )
-    {
-        History.Add(this, new CChangesMathTextOutline(Value, this.CtrPrp.TextOutline));
-        this.raw_SetTextOutline(Value);
-    }
+	if (( undefined === Value && undefined !== this.CtrPrp.TextOutline ) || ( Value instanceof AscFormat.CLn && ( undefined === this.CtrPrp.TextOutline || false === Value.IsIdentical(this.CtrPrp.TextOutline) ) ))
+	{
+		History.Add(new CChangesMathBaseTextOutline(this, this.CtrPrp.TextOutline, Value));
+		this.raw_SetTextOutline(Value);
+	}
 };
 CMathBase.prototype.Set_HighLight = function(Value)
 {
-    var OldValue = this.CtrPrp.HighLight;
-    if ( (undefined === Value && undefined !== OldValue) || ( highlight_None === Value && highlight_None !== OldValue ) || ( Value instanceof CDocumentColor && ( undefined === OldValue || highlight_None === OldValue || false === Value.Compare(OldValue) ) ) )
-    {
-        History.Add(this, new CChangesMathHighLight(Value, this.CtrPrp.HighLight));
-        this.raw_SetHighLight(Value);
-    }
+	var OldValue = this.CtrPrp.HighLight;
+	if ((undefined === Value && undefined !== OldValue) || ( highlight_None === Value && highlight_None !== OldValue ) || ( Value instanceof CDocumentColor && ( undefined === OldValue || highlight_None === OldValue || false === Value.Compare(OldValue) ) ))
+	{
+		History.Add(new CChangesMathBaseHighLight(this, this.CtrPrp.HighLight, Value));
+		this.raw_SetHighLight(Value);
+	}
 };
 CMathBase.prototype.Set_Shd = function(Shd)
 {
-    if ( !(undefined === this.CtrPrp.Shd && undefined === Shd) && !(undefined !== this.CtrPrp.Shd && undefined !== Shd && true === this.CtrPrp.Shd.Compare( Shd ) ) )
-    {
-        History.Add(this, new CChangesMathShd(Shd, this.CtrPrp.Shd));
-        this.raw_SetShd(Shd);
-    }
+	if (!(undefined === this.CtrPrp.Shd && undefined === Shd) && !(undefined !== this.CtrPrp.Shd && undefined !== Shd && true === this.CtrPrp.Shd.Compare(Shd)))
+	{
+		History.Add(new CChangesMathBaseShd(this, this.CtrPrp.Shd, Shd));
+		this.raw_SetShd(Shd);
+	}
 };
 CMathBase.prototype.Set_Underline = function(Value)
 {
-    if ( Value !== this.CtrPrp.Underline )
-    {
-        History.Add(this, new CChangesMathUnderline(Value, this.CtrPrp.Underline));
-        this.raw_SetUnderline(Value);
-    }
+	if (Value !== this.CtrPrp.Underline)
+	{
+		History.Add(new CChangesMathBaseUnderline(this, this.CtrPrp.Underline, Value));
+		this.raw_SetUnderline(Value);
+	}
 };
 CMathBase.prototype.Set_Strikeout = function(Value)
 {
-    if ( Value !== this.CtrPrp.Strikeout )
-    {
-        History.Add(this, new CChangesMathStrikeout(Value, this.CtrPrp.Strikeout));
-        this.raw_SetStrikeout(Value);
-    }
+	if (Value !== this.CtrPrp.Strikeout)
+	{
+		History.Add(new CChangesMathBaseStrikeout(this, this.CtrPrp.Strikeout, Value));
+		this.raw_SetStrikeout(Value);
+	}
 };
 CMathBase.prototype.Set_DoubleStrikeout = function(Value)
 {
-    if(Value !== this.CtrPrp.DStrikeout)
-    {
-        History.Add(this, new CChangesMath_DoubleStrikeout(Value, this.CtrPrp.DStrikeout));
-        this.raw_Set_DoubleStrikeout(Value);
-    }
+	if (Value !== this.CtrPrp.DStrikeout)
+	{
+		History.Add(new CChangesMathBaseDoubleStrikeout(this, this.CtrPrp.DStrikeout, Value));
+		this.raw_Set_DoubleStrikeout(Value);
+	}
 };
 CMathBase.prototype.Set_Bold = function(Value)
 {
-    if(Value !== this.CtrPrp.Bold)
-    {
-        History.Add(this, new CChangesMathBold(Value, this.CtrPrp.Bold));
-        this.raw_SetBold(Value);
-    }
+	if (Value !== this.CtrPrp.Bold)
+	{
+		History.Add(new CChangesMathBaseBold(this, this.CtrPrp.Bold, Value));
+		this.raw_SetBold(Value);
+	}
 };
 CMathBase.prototype.Set_Italic = function(Value)
 {
-    if(Value !== this.CtrPrp.Italic)
-    {
-        History.Add(this, new CChangesMathItalic(Value, this.CtrPrp.Italic));
-        this.raw_SetItalic(Value);
-    }
+	if (Value !== this.CtrPrp.Italic)
+	{
+		History.Add(new CChangesMathBaseItalic(this, this.CtrPrp.Italic, Value));
+		this.raw_SetItalic(Value);
+	}
 };
 CMathBase.prototype.Set_RFonts_Ascii = function(Value)
 {
-    if(this.CtrPrp.RFonts.Ascii !== Value)
-    {
-        History.Add(this, new CChangesMath_RFontsAscii(Value, this.CtrPrp.RFonts.Ascii));
-        this.raw_SetRFontsAscii(Value);
-    }
+	if (this.CtrPrp.RFonts.Ascii !== Value)
+	{
+		History.Add(new CChangesMathBaseRFontsAscii(this, this.CtrPrp.RFonts.Ascii, Value));
+		this.raw_SetRFontsAscii(Value);
+	}
 };
 CMathBase.prototype.Set_RFonts_HAnsi = function(Value)
 {
-    if(this.CtrPrp.RFonts.HAnsi !== Value)
-    {
-        History.Add(this, new CChangesMath_RFontsHAnsi(Value, this.CtrPrp.RFonts.HAnsi));
-        this.raw_SetRFontsHAnsi(Value);
-    }
+	if (this.CtrPrp.RFonts.HAnsi !== Value)
+	{
+		History.Add(new CChangesMathBaseRFontsHAnsi(this, this.CtrPrp.RFonts.HAnsi, Value));
+		this.raw_SetRFontsHAnsi(Value);
+	}
 };
 CMathBase.prototype.Set_RFonts_CS = function(Value)
 {
-    if(this.CtrPrp.RFonts.CS !== Value)
-    {
-        History.Add(this, new CChangesMath_RFontsCS(Value, this.CtrPrp.RFonts.CS));
-        this.raw_SetRFontsCS(Value);
-    }
+	if (this.CtrPrp.RFonts.CS !== Value)
+	{
+		History.Add(new CChangesMathBaseRFontsCS(this, this.CtrPrp.RFonts.CS, Value));
+		this.raw_SetRFontsCS(Value);
+	}
 };
 CMathBase.prototype.Set_RFonts_EastAsia = function(Value)
 {
-    if(this.CtrPrp.RFonts.EastAsia !== Value)
-    {
-        History.Add(this, new CChangesMath_RFontsEastAsia(Value, this.CtrPrp.RFonts.EastAsia));
-        this.raw_SetRFontsEastAsia(Value);
-    }
+	if (this.CtrPrp.RFonts.EastAsia !== Value)
+	{
+		History.Add(new CChangesMathBaseRFontsEastAsia(this, this.CtrPrp.RFonts.EastAsia, Value));
+		this.raw_SetRFontsEastAsia(Value);
+	}
 };
 CMathBase.prototype.Set_RFonts_Hint = function(Value)
 {
-    if(this.CtrPrp.RFonts.Hint !== Value)
-    {
-        History.Add(this, new CChangesMath_RFontsHint(Value, this.CtrPrp.RFonts.Hint));
-        this.raw_SetRFontsHint(Value);
-    }
+	if (this.CtrPrp.RFonts.Hint !== Value)
+	{
+		History.Add(new CChangesMathBaseRFontsHint(this, this.CtrPrp.RFonts.Hint, Value));
+		this.raw_SetRFontsHint(Value);
+	}
 };
 CMathBase.prototype.raw_SetBold = function(Value)
 {
@@ -1429,7 +1432,7 @@ CMathBase.prototype.Save_RecalculateObject = function(Copy)
 CMathBase.prototype.Load_RecalculateObject = function(RecalcObj)
 {
     if(this.bOneLine == false)
-        CMathBase.superclass.Load_RecalculateObject.call(this, RecalcObj);
+        CParagraphContentWithParagraphLikeContent.prototype.Load_RecalculateObject.call(this, RecalcObj);
 
 };
 CMathBase.prototype.Fill_LogicalContent = function(nCount)
@@ -1557,6 +1560,12 @@ CMathBase.prototype.Correct_Content = function(bInnerCorrection)
     {
         this.Content[nIndex].Correct_Content(bInnerCorrection);
     }
+
+    if (this.CurPos >= this.Content.length)
+    	this.CurPos = this.Content.length - 1;
+
+    if (this.CurPos < 0)
+    	this.CurPos = 0;
 };
 CMathBase.prototype.Undo = function(Data)
 {
@@ -1565,20 +1574,6 @@ CMathBase.prototype.Undo = function(Data)
 CMathBase.prototype.Redo = function(Data)
 {
     Data.Redo(this);
-};
-CMathBase.prototype.Save_Changes = function(Data, Writer)
-{
-    Writer.WriteLong(this.ClassType);
-    WriteChanges_ToBinary(Data, Writer);
-};
-CMathBase.prototype.Load_Changes = function(Reader)
-{
-    var ClassType = Reader.GetLong();
-
-    if (this.ClassType !== ClassType)
-        return;
-
-    ReadChanges_FromBinary(Reader, this);
 };
 CMathBase.prototype.Get_AllFontNames = function(AllFonts)
 {
@@ -1705,13 +1700,13 @@ CMathBase.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine
 
     return bResult;
 };
-CMathBase.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos)
+CMathBase.prototype.Get_ParaContentPos = function(bSelection, bStart, ContentPos, bUseCorrection)
 {
     var nPos = (true !== bSelection ? this.CurPos : (false !== bStart ? this.Selection.StartPos : this.Selection.EndPos));
     ContentPos.Add(nPos);
 
     if (undefined !== this.Content[nPos])
-        this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos);
+        this.Content[nPos].Get_ParaContentPos(bSelection, bStart, ContentPos, bUseCorrection);
 };
 CMathBase.prototype.Set_ParaContentPos = function(ContentPos, Depth)
 {
@@ -1852,7 +1847,7 @@ CMathBase.prototype.Draw_HighLights = function(PDSH, bAll)
     var bAllCont = this.Selection.StartPos !== this.Selection.EndPos;
 
     for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
-        this.Content[CurPos].Draw_HighLights(PDSH, bAllCont);
+		this.Content[CurPos].Draw_HighLights(PDSH, bAllCont);
 
     var Bound = this.Get_LineBound(PDSH.Line, PDSH.Range);
 
@@ -2019,25 +2014,25 @@ CMathBase.prototype.Make_ShdColor = function(PDSE, CurTextPr)
 };
 CMathBase.prototype.protected_AddToContent = function(Pos, Items, bUpdatePosition)
 {
-    History.Add(this, new CChangesMathAddItems(Pos, Items));
-    this.raw_AddToContent(Pos, Items, bUpdatePosition);
-    this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
+	History.Add(new CChangesMathBaseAddItems(this, Pos, Items));
+	this.raw_AddToContent(Pos, Items, bUpdatePosition);
+	this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
 };
 CMathBase.prototype.protected_RemoveItems = function(Pos, Items, bUpdatePosition)
 {
-    History.Add(this, new CChangesMathRemoveItems(Pos, Items));
+	History.Add(new CChangesMathBaseRemoveItems(this, Pos, Items));
 
-    var Count = Items.length;
-    this.raw_RemoveFromContent(Pos, Count);
+	var Count = Items.length;
+	this.raw_RemoveFromContent(Pos, Count);
 
-    // Обновим текущую позицию
-    if (this.CurPos > Pos + Count)
-        this.CurPos -= Count;
-    else if (this.CurPos > Pos )
-        this.CurPos = Pos;
+	// Обновим текущую позицию
+	if (this.CurPos > Pos + Count)
+		this.CurPos -= Count;
+	else if (this.CurPos > Pos)
+		this.CurPos = Pos;
 
-    this.private_CorrectCurPos();
-    this.private_UpdatePosOnRemove(Pos, Count);
+	this.private_CorrectCurPos();
+	this.private_UpdatePosOnRemove(Pos, Count);
 };
 CMathBase.prototype.raw_AddToContent = function(Pos, Items, bUpdatePosition)
 {
@@ -2547,30 +2542,30 @@ CMathBase.prototype.Get_ReviewColor = function()
 };
 CMathBase.prototype.Set_ReviewType = function(Type, isSetToContent)
 {
-    if (!this.Id)
-        return;
+	if (!this.Id)
+		return;
 
-    if (false !== isSetToContent)
-        CMathBase.superclass.Set_ReviewType.apply(this, arguments);
+	if (false !== isSetToContent)
+		CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewType.apply(this, arguments);
 
-    if (Type !== this.ReviewType)
-    {
-        var NewInfo = new CReviewInfo();
-        NewInfo.Update();
+	if (Type !== this.ReviewType)
+	{
+		var NewInfo = new CReviewInfo();
+		NewInfo.Update();
 
-        History.Add(this, new CChangesMathBaseReviewType(Type, NewInfo, this.ReviewType, this.ReviewInfo));
-        this.raw_SetReviewType(Type, NewInfo);
-    }
+		History.Add(new CChangesMathBaseReviewType(this, {Type : this.ReviewType, Info : this.ReviewInfo}, {Type : Type, Info : NewInfo}));
+		this.raw_SetReviewType(Type, NewInfo);
+	}
 };
 CMathBase.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo)
 {
-    if (!this.Id)
-        return;
+	if (!this.Id)
+		return;
 
-    CMathBase.superclass.Set_ReviewTypeWithInfo.apply(this, arguments);
+	CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewTypeWithInfo.apply(this, arguments);
 
-    History.Add(this, new CChangesMathBaseReviewType(ReviewType, ReviewInfo, this.ReviewType, this.ReviewInfo));
-    this.raw_SetReviewType(ReviewType, ReviewInfo);
+	History.Add(new CChangesMathBaseReviewType(this, {Type : this.ReviewType, Info : this.ReviewInfo}, {Type : ReviewType, Info : ReviewInfo}));
+	this.raw_SetReviewType(ReviewType, ReviewInfo);
 };
 CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
 {
@@ -2620,7 +2615,7 @@ CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth
     if (reviewtype_Common !== ReviewType)
         Checker.Begin_CheckOnlyTextPr();
 
-    CMathBase.superclass.Check_RevisionsChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Check_RevisionsChanges.apply(this, arguments);
 
     if (reviewtype_Common !== ReviewType)
         Checker.End_CheckOnlyTextPr();
@@ -2648,7 +2643,7 @@ CMathBase.prototype.Accept_RevisionChanges = function(Type, bAll)
         }
     }
 
-    CMathBase.superclass.Accept_RevisionChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges.apply(this, arguments);
 };
 CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
 {
@@ -2673,7 +2668,7 @@ CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
         }
     }
 
-    CMathBase.superclass.Reject_RevisionChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges.apply(this, arguments);
 };
 CMathBase.prototype.Set_MenuProps = function(Props)
 {
@@ -2857,6 +2852,18 @@ CMathBase.prototype.Is_ContentUse = function(MathContent)
 CMathBase.prototype.Is_FromDocument = function(MathContent)
 {
 	return this.Paragraph && this.Paragraph.bFromDocument
+};
+CMathBase.prototype.Clear_ContentChanges = function()
+{
+	this.m_oContentChanges.Clear();
+};
+CMathBase.prototype.Add_ContentChanges = function(Changes)
+{
+	this.m_oContentChanges.Add(Changes);
+};
+CMathBase.prototype.Refresh_ContentChanges = function()
+{
+	this.m_oContentChanges.Refresh();
 };
 
 function CMathBasePr()

@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -1050,6 +1050,10 @@
 
 		put_brushTexture : function(src, mode)
 		{
+			var isLocalUse = true;
+			if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsLocalFile"] && window["AscDesktopEditor"]["IsFilePrinting"])
+				isLocalUse = ((!window["AscDesktopEditor"]["IsLocalFile"]()) && window["AscDesktopEditor"]["IsFilePrinting"]()) ? false : true;
+
 			if (this.BrushType != MetaBrushType.Texture)
 			{
 				this.Memory.WriteByte(CommandType.ctBrushType);
@@ -1066,7 +1070,7 @@
 			var _src = src;
 
 			var srcLocal = AscCommon.g_oDocumentUrls.getLocal(_src);
-			if (srcLocal)
+			if (srcLocal && isLocalUse)
 			{
 				_src = srcLocal;
 			}
@@ -1287,13 +1291,17 @@
 		// images
 		drawImage : function(img, x, y, w, h)
 		{
+			var isLocalUse = true;
+			if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsLocalFile"] && window["AscDesktopEditor"]["IsFilePrinting"])
+				isLocalUse = ((!window["AscDesktopEditor"]["IsLocalFile"]()) && window["AscDesktopEditor"]["IsFilePrinting"]()) ? false : true;
+
 			if (!window.editor)
 			{
 				// excel
 				this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
 
 				var imgLocal = AscCommon.g_oDocumentUrls.getLocal(img);
-				if (imgLocal)
+				if (imgLocal && isLocalUse)
 				{
 					this.Memory.WriteString2(imgLocal);
 				}
@@ -1324,7 +1332,7 @@
 			}
 
 			var srcLocal = AscCommon.g_oDocumentUrls.getLocal(_src);
-			if (srcLocal)
+			if (srcLocal && isLocalUse)
 			{
 				_src = srcLocal;
 			}

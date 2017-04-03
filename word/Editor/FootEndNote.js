@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -40,14 +40,26 @@
  */
 function CFootEndnote(DocumentController)
 {
-	CFootEndnote.superclass.constructor.call(this, DocumentController, DocumentController ? DocumentController.Get_DrawingDocument() : undefined, 0, 0, 0, 0, true, false, false);
+	CDocumentContent.call(this, DocumentController, DocumentController ? DocumentController.Get_DrawingDocument() : undefined, 0, 0, 0, 0, true, false, false);
 
 	this.Number            = 1;
 	this.SectPr            = null;
 	this.CurtomMarkFollows = false;
+	this.NeedUpdateHint    = true;
+	this.Hint              = "";
+
+	this.PositionInfo     = {
+		Paragraph : null,
+		Run       : null,
+		Line      : 0,
+		Range     : 0,
+		X         : 0,
+		W         : 0
+	};
 }
 
-AscCommon.extendClass(CFootEndnote, CDocumentContent);
+CFootEndnote.prototype = Object.create(CDocumentContent.prototype);
+CFootEndnote.prototype.constructor = CFootEndnote;
 
 CFootEndnote.prototype.GetElementPageIndex = function(nPageAbs, nColumnAbs)
 {
@@ -71,12 +83,12 @@ CFootEndnote.prototype.Refresh_RecalcData2 = function(nIndex, nCurPage)
 CFootEndnote.prototype.Write_ToBinary2 = function(Writer)
 {
 	Writer.WriteLong(AscDFH.historyitem_type_FootEndNote);
-	CFootEndnote.superclass.Write_ToBinary2.call(this, Writer);
+	CDocumentContent.prototype.Write_ToBinary2.call(this, Writer);
 };
 CFootEndnote.prototype.Read_FromBinary2 = function(Reader)
 {
 	Reader.GetLong(); // Должен вернуть historyitem_type_DocumentContent
-	CFootEndnote.superclass.Read_FromBinary2.call(this, Reader);
+	CDocumentContent.prototype.Read_FromBinary2.call(this, Reader);
 };
 CFootEndnote.prototype.SetNumber = function(nNumber, oSectPr, bCustomMarkFollows)
 {
@@ -127,6 +139,49 @@ CFootEndnote.prototype.AddDefaultFootnoteContent = function(sText)
 	oParagraph.Add_ToContent(1, oRun);
 
 	this.Cursor_MoveToEndPos(false);
+};
+CFootEndnote.prototype.Recalculate_Page = function(PageIndex, bStart)
+{
+	this.NeedUpdateHint = true;
+	return CDocumentContent.prototype.Recalculate_Page.call(this, PageIndex, bStart);
+};
+CFootEndnote.prototype.GetHint = function()
+{
+	if (true === this.NeedUpdateHint)
+	{
+		var arrParagraphs = this.Get_AllParagraphs({All : true});
+		this.Hint         = "";
+		for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+		{
+			this.Hint += arrParagraphs[nIndex].GetText();
+		}
+
+		this.NeedUpdateHint = false;
+	}
+
+	return this.Hint;
+};
+CFootEndnote.prototype.UpdatePositionInfo = function(Paragraph, Run, Line, Range, X, W)
+{
+	this.PositionInfo.Paragraph = Paragraph;
+	this.PositionInfo.Run       = Run;
+	this.PositionInfo.Line      = Line;
+	this.PositionInfo.Range     = Range;
+	this.PositionInfo.X         = X;
+	this.PositionInfo.W         = W;
+};
+CFootEndnote.prototype.GetPositionInfo = function()
+{
+	return this.PositionInfo;
+};
+CFootEndnote.prototype.OnFastRecalculate = function()
+{
+	this.NeedUpdateHint = true;
+};
+CFootEndnote.prototype.Get_ColumnFields = function(ElementIndex, ColumnIndex)
+{
+	var PageAbs = this.Get_StartPage_Absolute();
+	return this.Parent.GetColumnFields(PageAbs, ColumnIndex);
 };
 
 //--------------------------------------------------------export----------------------------------------------------

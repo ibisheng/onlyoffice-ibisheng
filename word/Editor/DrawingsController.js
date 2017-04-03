@@ -14,11 +14,12 @@
  */
 function CDrawingsController(LogicDocument, DrawingsObjects)
 {
-	CDrawingsController.superclass.constructor.call(this, LogicDocument);
+	CDocumentControllerBase.call(this, LogicDocument);
 
 	this.DrawingObjects = DrawingsObjects;
 }
-AscCommon.extendClass(CDrawingsController, CDocumentControllerBase);
+CDrawingsController.prototype = Object.create(CDocumentControllerBase.prototype);
+CDrawingsController.prototype.constructor = CDrawingsController;
 
 CDrawingsController.prototype.CanTargetUpdate = function()
 {
@@ -116,16 +117,16 @@ CDrawingsController.prototype.MoveCursorRight = function(AddToSelect, Word, From
 {
 	return this.DrawingObjects.cursorMoveRight(AddToSelect, Word, FromPaste);
 };
-CDrawingsController.prototype.MoveCursorUp = function(AddToSelect)
+CDrawingsController.prototype.MoveCursorUp = function(AddToSelect, CtrlKey)
 {
-	var RetValue = this.DrawingObjects.cursorMoveUp(AddToSelect);
+	var RetValue = this.DrawingObjects.cursorMoveUp(AddToSelect, CtrlKey);
 	this.LogicDocument.Document_UpdateInterfaceState();
 	this.LogicDocument.Document_UpdateSelectionState();
 	return RetValue;
 };
-CDrawingsController.prototype.MoveCursorDown = function(AddToSelect)
+CDrawingsController.prototype.MoveCursorDown = function(AddToSelect, CtrlKey)
 {
-	var RetValue = this.DrawingObjects.cursorMoveDown(AddToSelect);
+	var RetValue = this.DrawingObjects.cursorMoveDown(AddToSelect, CtrlKey);
 	this.LogicDocument.Document_UpdateInterfaceState();
 	this.LogicDocument.Document_UpdateSelectionState();
 	return RetValue;
@@ -171,7 +172,7 @@ CDrawingsController.prototype.SetParagraphSpacing = function (Spacing)
 		{
 			var Paragraph = ParaDrawing.Parent;
 			Paragraph.Set_Spacing(Spacing, false);
-			this.Recalculate();
+			this.LogicDocument.Recalculate();
 		}
 	}
 	else
@@ -511,5 +512,9 @@ CDrawingsController.prototype.GetColumnSize = function()
 CDrawingsController.prototype.GetCurrentSectionPr = function()
 {
 	return null;
+};
+CDrawingsController.prototype.RemoveTextSelection = function()
+{
+	this.DrawingObjects.removeTextSelection();
 };
 

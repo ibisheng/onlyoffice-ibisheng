@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -41,7 +41,10 @@ CGroupShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
 CGroupShape.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 
 CGroupShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
-
+CGroupShape.prototype.getEditorType = function()
+{
+    return 0;
+};
 CGroupShape.prototype.handleUpdateFill = function()
 {
     for(var i = 0; i < this.spTree.length; ++i)
@@ -119,15 +122,7 @@ CGroupShape.prototype.setDrawingObjects = function(drawingObjects)
     }
 };
 
-CGroupShape.prototype.setWorksheet = function(worksheet)
-{
-    AscCommon.History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
-    this.worksheet = worksheet;
-    for(var i = 0; i < this.spTree.length; ++i)
-    {
-        this.spTree[i].setWorksheet(worksheet);
-    }
-};
+
 
 CGroupShape.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
 CGroupShape.prototype.deleteDrawingBase = CShape.prototype.deleteDrawingBase;

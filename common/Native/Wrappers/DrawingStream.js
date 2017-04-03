@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -462,7 +462,7 @@ CDrawingStreamSerializer.prototype["PD_EndShapeDraw"] = function()
 {
     this.Memory.push(71);
 };
-CDrawingStreamSerializer.prototype["PD_put_BrushTextute"] = function(id, l, t, r, b)
+CDrawingStreamSerializer.prototype["PD_put_BrushTexture"] = function(id, l, t, r, b)
 {
     if (l === undefined)
     {

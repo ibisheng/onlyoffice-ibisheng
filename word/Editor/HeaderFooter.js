@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -84,12 +84,6 @@ function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type)
 
 CHeaderFooter.prototype =
 {
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.Id;
@@ -309,16 +303,25 @@ CHeaderFooter.prototype =
         return { X : this.Content.X, Y : 0, XLimit : this.Content.XLimit, YLimit : 0 };
     },
 
-    Set_CurrentElement : function(bUpdateStates)
+    Set_CurrentElement : function(bUpdateStates, PageAbs)
     {
         var PageIndex = -1;
 
-        for (var Key in this.Parent.Pages)
-        {
-            var PIndex = Key | 0;
-            if ((this === this.Parent.Pages[PIndex].Header || this === this.Parent.Pages[PIndex].Footer) && (-1 === PageIndex || PageIndex > PIndex))
-                PageIndex = PIndex;
-        }
+        if (undefined !== PageAbs && null !== PageAbs && this.Parent.Pages[PageAbs])
+		{
+			if ((this === this.Parent.Pages[PageAbs].Header || this === this.Parent.Pages[PageAbs].Footer))
+				PageIndex = PageAbs;
+		}
+
+		if (-1 === PageIndex)
+		{
+			for (var Key in this.Parent.Pages)
+			{
+				var PIndex = Key | 0;
+				if ((this === this.Parent.Pages[PIndex].Header || this === this.Parent.Pages[PIndex].Footer) && (-1 === PageIndex || PageIndex > PIndex))
+					PageIndex = PIndex;
+			}
+		}
 
         this.Parent.CurHdrFtr = this;
         this.Parent.WaitMouseDown = true;
@@ -420,6 +423,11 @@ CHeaderFooter.prototype =
     {
         return this.Content.Is_PointInDrawingObjects( X, Y, this.Content.Get_StartPage_Absolute() );
     },
+
+	Is_PointInFlowTable : function(X, Y)
+	{
+		return this.Content.Is_PointInFlowTable(X, Y, this.Content.Get_StartPage_Absolute());
+	},
 
     CheckRange : function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, bMathWrap)
     {
@@ -946,13 +954,15 @@ CHeaderFooter.prototype =
             this.LogicDocument.DrawingObjects.OnMouseDown(MouseEvent, X, Y, PageIndex);
         }
         else
-            return this.Content.Selection_SetStart( X, Y, PageIndex, MouseEvent );
+		{
+			return this.Content.Selection_SetStart(X, Y, 0, MouseEvent);
+		}
     },
 
     Selection_SetEnd : function(X, Y, PageIndex, MouseEvent)
     {
         this.Set_Page( PageIndex );
-        return this.Content.Selection_SetEnd(X, Y, PageIndex, MouseEvent);
+        return this.Content.Selection_SetEnd(X, Y, 0, MouseEvent);
     },
 
     Selection_Is_TableBorderMove : function()
@@ -960,17 +970,17 @@ CHeaderFooter.prototype =
         return this.Content.Selection_Is_TableBorderMove();
     },
 
-    Selection_Check : function(X, Y, Page_Abs, NearPos)
-    {
-        if (-1 === this.RecalcInfo.CurPage)
-            return false;
+	Selection_Check : function(X, Y, PageAbs, NearPos)
+	{
+		if (-1 === this.RecalcInfo.CurPage)
+			return false;
 
-        var HdrFtrPage = this.Content.Get_StartPage_Absolute();
-        if ( undefined !== NearPos || HdrFtrPage === Page_Abs )
-            return this.Content.Selection_Check( X, Y, Page_Abs, NearPos );
+		var HdrFtrPage = this.Content.Get_StartPage_Absolute();
+		if (undefined !== NearPos || HdrFtrPage === PageAbs)
+			return this.Content.Selection_Check(X, Y, 0, NearPos);
 
-        return false;
-    },
+		return false;
+	},
 
     // Селектим весь параграф
     Select_All : function()
@@ -1291,12 +1301,6 @@ function CHeaderFooterController(LogicDocument, DrawingDocument)
 
 CHeaderFooterController.prototype =
 {
-    Set_Id : function(newId)
-    {
-        g_oTableId.Reset_Id( this, newId, this.Id );
-        this.Id = newId;
-    },
-
     Get_Id : function()
     {
         return this.Id;
@@ -2103,13 +2107,20 @@ CHeaderFooterController.prototype =
 
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent, bActivate)
     {
-        // Если мы попадаем в заселекченную автофигуру, пусть она даже выходит за пределы
-        if ( true === this.LogicDocument.DrawingObjects.pointInSelectedObject(X, Y, PageIndex) )
-        {
-            var NewPos = this.DrawingDocument.ConvertCoordsToAnotherPage(X, Y, PageIndex, this.CurPage);
-            var _X = NewPos.X;
-            var _Y = NewPos.Y;
-            this.CurHdrFtr.Selection_SetStart( _X, _Y, this.CurPage, MouseEvent );
+		var TempHdrFtr = null;
+		// Если мы попадаем в заселекченную автофигуру, пусть она даже выходит за пределы
+		if (true === this.LogicDocument.DrawingObjects.pointInSelectedObject(X, Y, PageIndex)
+			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Header) && true === TempHdrFtr.Is_PointInFlowTable(X, Y))
+			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Footer) && true === TempHdrFtr.Is_PointInFlowTable(X, Y)))
+		{
+			if (this.CurHdrFtr && ((null !== TempHdrFtr && TempHdrFtr !== this.CurHdrFtr) || this.CurPage !== PageIndex))
+				this.CurHdrFtr.Selection_Remove();
+
+			if (null !== TempHdrFtr)
+				this.CurHdrFtr = TempHdrFtr;
+
+			this.CurPage = PageIndex;
+			this.CurHdrFtr.Selection_SetStart(X, Y, PageIndex, MouseEvent);
             this.ChangeCurPageOnEnd = false;
 
             this.WaitMouseDown = false;
@@ -2124,7 +2135,6 @@ CHeaderFooterController.prototype =
         // Сначала проверяем, не попали ли мы в контент документа. Если да, тогда надо
         // активировать работу с самим документом (просто вернуть false здесь)
 
-        var TempHdrFtr = null;
         var PageMetrics = this.LogicDocument.Get_PageContentStartPos( PageIndex );
         
         if ( MouseEvent.ClickCount >= 2 && true != editor.isStartAddShape &&
@@ -2158,6 +2168,12 @@ CHeaderFooterController.prototype =
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddHeader);
                     this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
+
+                    if (this.CurHdrFtr)
+                    	this.CurHdrFtr.Selection_Remove();
+
+                    this.CurHdrFtr = HdrFtr;
+
                     this.LogicDocument.Recalculate();
                 }
                 else
@@ -2177,6 +2193,12 @@ CHeaderFooterController.prototype =
                     History.Create_NewPoint(AscDFH.historydescription_Document_AddFooter);
                     this.LogicDocument.Set_DocPosType(docpostype_HdrFtr);
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
+
+					if (this.CurHdrFtr)
+						this.CurHdrFtr.Selection_Remove();
+
+					this.CurHdrFtr = HdrFtr;
+
                     this.LogicDocument.Recalculate();
                 }
                 else
@@ -2264,10 +2286,10 @@ CHeaderFooterController.prototype =
         return false;
     },
 
-    Selection_Check : function(X, Y, Page_Abs, NearPos)
+    Selection_Check : function(X, Y, PageAbs, NearPos)
     {
         if (null != this.CurHdrFtr)
-            return this.CurHdrFtr.Selection_Check(X, Y, 0, NearPos);
+            return this.CurHdrFtr.Selection_Check(X, Y, PageAbs, NearPos);
     },
 
     Selection_IsEmpty : function(bCheckHidden)

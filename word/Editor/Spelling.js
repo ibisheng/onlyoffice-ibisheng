@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -309,6 +309,14 @@ CParaSpellChecker.prototype =
 
     Add : function(StartPos, EndPos, Word, Lang)
     {
+    	if (Word.length > 0)
+		{
+			if (Word.charAt(Word.length - 1) == '\'')
+				Word = Word.substr(0, Word.length - 1);
+			if (Word.charAt(0) == '\'')
+				Word = Word.substr(1);
+		}
+
         var SpellCheckerEl = new CParaSpellCheckerElement( StartPos, EndPos, Word, Lang );
         this.Paragraph.Add_SpellCheckerElement( SpellCheckerEl );
         this.Elements.push( SpellCheckerEl );
@@ -640,28 +648,28 @@ CParaSpellChecker.prototype =
             }
         }        
     },
-    
-    Remove_RightWords : function()
-    {
-        var Count = this.Elements.length;
-        for (var Index = Count - 1; Index >= 0; Index--)
-        {
-            var Element = this.Elements[Index];
 
-            if ( true === Element.Checked )
-            {
-                if (Element.StartRun !== Element.EndRun)
-                {
-                    Element.StartRun.Remove_SpellCheckerElement(Element);
-                    Element.EndRun.Remove_SpellCheckerElement(Element);
-                }
-                else
-                    Element.EndRun.Remove_SpellCheckerElement(Element);               
+	Remove_RightWords : function()
+	{
+		var Count = this.Elements.length;
+		for (var Index = Count - 1; Index >= 0; Index--)
+		{
+			var Element = this.Elements[Index];
 
-                this.Elements.splice(Index, 1);
-            }
-        }        
-    }
+			if (true === Element.Checked && true !== Element.CurPos)
+			{
+				if (Element.StartRun !== Element.EndRun)
+				{
+					Element.StartRun.Remove_SpellCheckerElement(Element);
+					Element.EndRun.Remove_SpellCheckerElement(Element);
+				}
+				else
+					Element.EndRun.Remove_SpellCheckerElement(Element);
+
+				this.Elements.splice(Index, 1);
+			}
+		}
+	}
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -691,7 +699,7 @@ CDocument.prototype.Set_DefaultLanguage = function(NewLangId)
     // Устанавливаем словарь по умолчанию
     var Styles = this.Styles;    
     var OldLangId = Styles.Default.TextPr.Lang.Val;
-    this.History.Add( this, { Type : AscDFH.historyitem_Document_DefaultLanguage, Old : OldLangId, New : NewLangId } );
+    this.History.Add(new CChangesDocumentDefaultLanguage(this, OldLangId, NewLangId));
     Styles.Default.TextPr.Lang.Val = NewLangId;
 
     // Нужно заново запустить проверку орфографии

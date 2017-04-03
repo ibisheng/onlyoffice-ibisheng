@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -2093,8 +2093,8 @@ function CDrawingDocument()
 	this.TableStylesLastLook = null;
 	this.LastParagraphMargins = null;
 
-	this.TableStylesSheckLook = null;
-	this.TableStylesSheckLookFlag = false;
+	this.TableStylesСheckLook = null;
+	this.TableStylesСheckLookFlag = false;
 
 	this.InlineTextTrackEnabled = false;
 	this.InlineTextTrack = null;
@@ -2177,6 +2177,9 @@ function CDrawingDocument()
 
 	this.OnStartRecalculate = function (pageCount)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		this.m_lCountCalculatePages = pageCount;
 		//console.log("start " + this.m_lCountCalculatePages);
 
@@ -2186,6 +2189,9 @@ function CDrawingDocument()
 
 	this.OnRepaintPage = function (index)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		var page = this.m_arrPages[index];
 		if (!page)
 			return;
@@ -2256,6 +2262,9 @@ function CDrawingDocument()
 
 	this.OnEndRecalculate = function (isFull, isBreak)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		if (undefined != isBreak)
 		{
 			this.m_lCountCalculatePages = this.m_lPagesCount;
@@ -2383,8 +2392,7 @@ function CDrawingDocument()
 	{
 		var _drawingPage = this.m_arrPages[pageIndex].drawingPage;
 		var isUnlock = false;
-		if (_drawingPage.cachedImage != null && _drawingPage.cachedImage.image != null && (width != _drawingPage.cachedImage.image.width || height != _drawingPage.cachedImage.image.height))
-			isUnlock = true;
+
 		if (_drawingPage.cachedImage != null && _drawingPage.cachedImage.image != null)
 		{
 			var _check = this.CheckPagesSizeMaximum(width, height);
@@ -2396,8 +2404,9 @@ function CDrawingDocument()
 		{
 			if (this.IsFreezePage(pageIndex))
 			{
-				if ((Math.abs(_drawingPage.RecalculateTime - (new Date().getTime())) > 500 /*0.5 sec*/))
-					isUnlock = true;
+				// убрал выкидывание страницы. лишнее это. пусть всегда рисуется старая, пока не перерисуем
+				//if ((Math.abs(_drawingPage.RecalculateTime - (new Date().getTime())) > 500 /*0.5 sec*/))
+				//	isUnlock = true;
 			}
 			else
 			{
@@ -2425,8 +2434,8 @@ function CDrawingDocument()
 
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			w *= 2;
-			h *= 2;
+			w = AscCommon.AscBrowser.convertToRetinaValue(w, true);
+			h = AscCommon.AscBrowser.convertToRetinaValue(h, true);
 		}
 
 		var _check = this.CheckPagesSizeMaximum(w, h);
@@ -2479,6 +2488,8 @@ function CDrawingDocument()
 			if (this.m_oLogicDocument)
 			{
 				if (pageIndex >= this.m_oLogicDocument.Pages.length)
+					return true;
+				else if (!this.m_oLogicDocument.CanDrawPage(pageIndex))
 					return true;
 			}
 			return false;
@@ -2972,7 +2983,7 @@ function CDrawingDocument()
 
 		return {X: x_pix, Y: y_pix, Error: false};
 	}
-	this.ConvertCoordsToCursor3 = function (x, y, pageIndex)
+	this.ConvertCoordsToCursor3 = function (x, y, pageIndex, isGlobal)
 	{
 		// теперь крутить всякие циклы нет смысла
 		if (pageIndex < 0 || pageIndex >= this.m_lPagesCount)
@@ -2982,8 +2993,19 @@ function CDrawingDocument()
 
 		var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-		var _x = this.m_oWordControl.X;
-		var _y = this.m_oWordControl.Y;
+		var _x = 0;
+		var _y = 0;
+		if (isGlobal)
+		{
+			_x = this.m_oWordControl.X;
+			_y = this.m_oWordControl.Y;
+
+			if (true == this.m_oWordControl.m_bIsRuler)
+			{
+				_x += 5 * g_dKoef_mm_to_pix;
+				_y += 7 * g_dKoef_mm_to_pix;
+			}
+		}
 
 		var x_pix = (this.m_arrPages[pageIndex].drawingPage.left + x * dKoef + _x + 0.5) >> 0;
 		var y_pix = (this.m_arrPages[pageIndex].drawingPage.top + y * dKoef + _y + 0.5) >> 0;
@@ -3208,6 +3230,9 @@ function CDrawingDocument()
 
 	this.UpdateTarget = function (x, y, pageIndex)
 	{
+		if (this.m_oWordControl)
+			this.m_oWordControl.m_oApi.checkLastWork();
+
 		this.m_oWordControl.m_oLogicDocument.Set_TargetPos(x, y, pageIndex);
 
 		if (this.UpdateTargetFromPaint === false)
@@ -3266,8 +3291,8 @@ function CDrawingDocument()
 		var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			_ww >>= 1;
-			_hh >>= 1;
+			_ww /= AscCommon.AscBrowser.retinaPixelRatio;
+			_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		var boxX = 0;
@@ -3383,8 +3408,8 @@ function CDrawingDocument()
 		var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
 		{
-			_ww >>= 1;
-			_hh >>= 1;
+			_ww /= AscCommon.AscBrowser.retinaPixelRatio;
+			_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 		}
 
 		// �������, ����� �� ������ �� ������
@@ -5163,7 +5188,7 @@ function CDrawingDocument()
 	{
 		var pixHeigth = this.m_oWordControl.m_oEditor.HtmlElement.height;
 		if (this.m_oWordControl.bIsRetinaSupport)
-			pixHeigth >>= 1;
+			pixHeigth /= AscCommon.AscBrowser.retinaPixelRatio;
 		var pixBetweenPages = 20 * (this.m_lDrawingEnd - this.m_lDrawingFirst);
 
 		return (pixHeigth - pixBetweenPages) * g_dKoef_pix_to_mm * 100 / this.m_oWordControl.m_nZoomValue;
@@ -5427,127 +5452,6 @@ function CDrawingDocument()
 		}
 	}
 
-	this.SendThemeColorScheme = function ()
-	{
-		var infos = [];
-		var _index = 0;
-
-		var _c = null;
-
-		// user scheme
-		var oColorScheme = AscCommon.g_oUserColorScheme;
-		var _count_defaults = oColorScheme.length;
-		for (var i = 0; i < _count_defaults; ++i)
-		{
-			var _obj = oColorScheme[i];
-			infos[_index] = new AscCommon.CAscColorScheme();
-			infos[_index].Name = _obj.name;
-
-			_c = _obj.dk1;
-			infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.lt1;
-			infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.dk2;
-			infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.lt2;
-			infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.accent1;
-			infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.accent2;
-			infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.accent3;
-			infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.accent4;
-			infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.accent5;
-			infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.accent6;
-			infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.hlink;
-			infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
-
-			_c = _obj.folHlink;
-			infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
-
-			++_index;
-		}
-
-		// theme colors
-		var _theme = this.m_oWordControl.m_oLogicDocument.theme;
-		var _extra = _theme.extraClrSchemeLst;
-		var _count = _extra.length;
-		var _rgba = {R: 0, G: 0, B: 0, A: 255};
-		for (var i = 0; i < _count; ++i)
-		{
-			var _scheme = _extra[i].clrScheme;
-
-			infos[_index] = new AscCommon.CAscColorScheme();
-			infos[_index].Name = _scheme.name;
-
-			_scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[8].RGBA;
-			infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[12].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[12].RGBA;
-			infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[9].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[9].RGBA;
-			infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[13].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[13].RGBA;
-			infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[0].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[0].RGBA;
-			infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[1].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[1].RGBA;
-			infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[2].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[2].RGBA;
-			infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[3].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[3].RGBA;
-			infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[4].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[4].RGBA;
-			infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[5].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[5].RGBA;
-			infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[11].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[11].RGBA;
-			infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
-
-			_scheme.colors[10].Calculate(_theme, null, null, null, _rgba);
-			_c = _scheme.colors[10].RGBA;
-			infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
-
-			_index++;
-		}
-
-		this.m_oWordControl.m_oApi.sync_SendThemeColorSchemes(infos);
-	}
-
 	this.DrawImageTextureFillShape = function (url)
 	{
 		if (this.GuiCanvasFillTexture == null)
@@ -5593,7 +5497,7 @@ function CDrawingDocument()
 
 			this.GuiCanvasFillTextureCtx.drawImage(_img.Image, _x, _y, _w, _h);
 		}
-		else
+		else if (!_img || !_img.Image)
 		{
 			this.GuiCanvasFillTextureCtx.lineWidth = 1;
 
@@ -5875,24 +5779,24 @@ function CDrawingDocument()
 
 	this.StartTableStylesCheck = function ()
 	{
-		this.TableStylesSheckLookFlag = true;
+		this.TableStylesСheckLookFlag = true;
 	}
 
 	this.EndTableStylesCheck = function ()
 	{
-		this.TableStylesSheckLookFlag = false;
-		if (this.TableStylesSheckLook != null)
+		this.TableStylesСheckLookFlag = false;
+		if (this.TableStylesСheckLook != null)
 		{
-			this.CheckTableStyles(this.TableStylesSheckLook);
-			this.TableStylesSheckLook = null;
+			this.CheckTableStyles(this.TableStylesСheckLook);
+			this.TableStylesСheckLook = null;
 		}
 	}
 
 	this.CheckTableStyles = function (tableLook)
 	{
-		if (this.TableStylesSheckLookFlag)
+		if (this.TableStylesСheckLookFlag)
 		{
-			this.TableStylesSheckLook = tableLook;
+			this.TableStylesСheckLook = tableLook;
 			return;
 		}
 
@@ -5981,8 +5885,8 @@ function CDrawingDocument()
 			}
 			else
 			{
-				_canvas_tables.width = (TABLE_STYLE_WIDTH_PIX << 1);
-				_canvas_tables.height = (TABLE_STYLE_HEIGHT_PIX << 1);
+				_canvas_tables.width = (TABLE_STYLE_WIDTH_PIX * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
+				_canvas_tables.height = (TABLE_STYLE_HEIGHT_PIX * AscCommon.AscBrowser.retinaPixelRatio) >> 0;
 			}
 		}
 
@@ -6011,7 +5915,14 @@ function CDrawingDocument()
 
 				_table_styles = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
 
-				_table_styles.Set_Props({TableStyle: i, TableLook: tableLook, TableLayout: c_oAscTableLayout.Fixed});
+				_table_styles.Set_Props({
+					TableStyle: i,
+					TableLook: tableLook,
+					TableLayout: c_oAscTableLayout.Fixed
+				});
+				_table_styles.Set_Props({
+					TableDefaultMargins : {Top : 0, Bottom : 0}
+				});
 
 				for (var j = 0; j < Rows; j++)
 					_table_styles.Content[j].Set_Height(H / Rows, Asc.linerule_AtLeast);
@@ -6023,6 +5934,9 @@ function CDrawingDocument()
 					TableLook: tableLook,
 					TableLayout: c_oAscTableLayout.Fixed,
 					CellSelect: false
+				});
+				_table_styles.Set_Props({
+					TableDefaultMargins : {Top : 0, Bottom : 0}
 				});
 				_table_styles.Recalc_CompiledPr2();
 
@@ -6048,7 +5962,7 @@ function CDrawingDocument()
 			editor.isShowTableEmptyLineAttack = false;
 			editor.isViewMode = _old_mode;
 
-			var _styleD = new CAscTableStyle();
+			var _styleD = new Asc.CAscTableStyle();
 			_styleD.Type = 0;
 			_styleD.Image = _canvas.toDataURL("image/png");
 			_styleD.Id = i;
@@ -6709,10 +6623,12 @@ CStylesPainter.prototype =
 {
 	GenerateStyles: function (_api, ds)
 	{
+		var _oldX = this.STYLE_THUMBNAIL_WIDTH;
+		var _oldY = this.STYLE_THUMBNAIL_HEIGHT;
 		if (_api.WordControl.bIsRetinaSupport)
 		{
-			this.STYLE_THUMBNAIL_WIDTH <<= 1;
-			this.STYLE_THUMBNAIL_HEIGHT <<= 1;
+			this.STYLE_THUMBNAIL_WIDTH 	= AscCommon.AscBrowser.convertToRetinaValue(this.STYLE_THUMBNAIL_WIDTH, true);
+			this.STYLE_THUMBNAIL_HEIGHT = AscCommon.AscBrowser.convertToRetinaValue(this.STYLE_THUMBNAIL_HEIGHT, true);
 			this.IsRetinaEnabled = true;
 		}
 
@@ -6776,6 +6692,16 @@ CStylesPainter.prototype =
 			}
 		}
 
+		if (_api.WordControl.bIsRetinaSupport)
+		{
+			this.STYLE_THUMBNAIL_WIDTH = _oldX;
+			this.STYLE_THUMBNAIL_HEIGHT = _oldY;
+		}
+
+		// export
+		this["STYLE_THUMBNAIL_WIDTH"] = this.STYLE_THUMBNAIL_WIDTH;
+		this["STYLE_THUMBNAIL_HEIGHT"] = this.STYLE_THUMBNAIL_HEIGHT;
+
 		// теперь просто отдаем евент наверх
 		_api.sync_InitEditorStyles(this);
 	},
@@ -6799,7 +6725,9 @@ CStylesPainter.prototype =
 		}
 		else
 		{
-			graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
+			graphics.init(ctx, _canvas.width, _canvas.height,
+				_canvas.width * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio,
+				_canvas.height * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio);
 		}
 		graphics.m_oFontManager = AscCommon.g_fontManager;
 
@@ -6851,7 +6779,9 @@ CStylesPainter.prototype =
 		}
 		else
 		{
-			graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
+			graphics.init(ctx, _canvas.width, _canvas.height,
+				_canvas.width * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio,
+				_canvas.height * g_dKoef_pix_to_mm / AscCommon.AscBrowser.retinaPixelRatio);
 		}
 		graphics.m_oFontManager = AscCommon.g_fontManager;
 
@@ -6939,7 +6869,7 @@ CStylesPainter.prototype =
 
 		var dKoefToMM = g_dKoef_pix_to_mm;
 		if (this.IsRetinaEnabled)
-			dKoefToMM /= 2;
+			dKoefToMM /= AscCommon.AscBrowser.retinaPixelRatio;
 
 		if (window["flat_desine"] !== true)
 		{
@@ -6988,8 +6918,8 @@ CStylesPainter.prototype =
 			g_oTableId.m_bTurnOff = true;
 			History.TurnOff();
 
-			var oldDefTabStop = Default_Tab_Stop;
-			Default_Tab_Stop = 1;
+			var oldDefTabStop = AscCommonWord.Default_Tab_Stop;
+			AscCommonWord.Default_Tab_Stop = 1;
 
 			var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
 			var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
@@ -7091,7 +7021,7 @@ CStylesPainter.prototype =
 
 			graphics.restore();
 
-			Default_Tab_Stop = oldDefTabStop;
+			AscCommonWord.Default_Tab_Stop = oldDefTabStop;
 
 			g_oTableId.m_bTurnOff = false;
 			History.TurnOn();

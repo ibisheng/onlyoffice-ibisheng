@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -184,6 +184,8 @@
         // embedded_cut_fonts
         this.embedded_cut_manager = new CEmbeddedCutFontsLoader();
 
+        this.IsLoadDocumentFonts2 = false;
+
         this.put_Api = function(_api)
         {
             this.Api = _api;
@@ -276,6 +278,9 @@
 
         this.LoadDocumentFonts = function(_fonts, is_default)
         {
+            if (this.IsLoadDocumentFonts2)
+                return this.LoadDocumentFonts2(_fonts);
+
             if (this.embedded_cut_manager.bIsCutFontsUse)
                 return this.embedded_cut_manager.load_cut_fonts();
 

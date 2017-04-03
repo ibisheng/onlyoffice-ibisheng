@@ -1,5 +1,5 @@
 /*
- * (c) Copyright Ascensio System SIA 2010-2016
+ * (c) Copyright Ascensio System SIA 2010-2017
  *
  * This program is a free software product. You can redistribute it and/or
  * modify it under the terms of the GNU Affero General Public License (AGPL)
@@ -472,6 +472,21 @@ $( function () {
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 6 );
     } );
+	
+	test( "Test: \"Cross\"", function () {
+
+		ws.getRange2( "A7" ).setValue( "1" );
+		ws.getRange2( "A8" ).setValue( "2" );
+		ws.getRange2( "A9" ).setValue( "3" );
+		oParser = new parserFormula( 'A7:A9', null, ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().cross(new Asc.Range(0, 5, 0, 5), ws.getId()).getValue(), "#VALUE!" );
+		strictEqual( oParser.calculate().cross(new Asc.Range(0, 6, 0, 6), ws.getId()).getValue(), 1 );
+		strictEqual( oParser.calculate().cross(new Asc.Range(0, 7, 0, 7), ws.getId()).getValue(), 2 );
+		strictEqual( oParser.calculate().cross(new Asc.Range(0, 8, 0, 8), ws.getId()).getValue(), 3 );
+		strictEqual( oParser.calculate().cross(new Asc.Range(0, 9, 0, 9), ws.getId()).getValue(), "#VALUE!" );
+
+	} );
 
 	test( "Test: \"Parse intersection\"", function () {
 
@@ -967,19 +982,6 @@ $( function () {
     } );
 
     test( "Test: rename sheet #1", function () {
-        oParser = new parserFormula( "Лист2!A2", "A1", ws );
-        ok( oParser.parse() );
-        // strictEqual( oParser.parse(), true)
-        strictEqual( oParser.changeSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2" );
-
-        oParser = new parserFormula( "Лист2:Лист3!A2", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.changeSheet( "Лист2", "Лист1" ).assemble(), "Лист1:Лист3!A2" );
-
-        oParser = new parserFormula( "Лист2!A2:A5", "A1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.changeSheet( "Лист2", "Лист3" ).assemble(), "Лист3!A2:A5" );
-
         ws = wb.getWorksheet( 0 );
         ws.getRange2( "S95" ).setValue( "2" );
         ws = wb.getWorksheet( 1 );
@@ -1415,8 +1417,6 @@ $( function () {
 
     test( "Test: \"TEXT\"", function () {
 
-        wb.dependencyFormulas = new AscCommonExcel.DependencyGraph( wb );
-
         oParser = new parserFormula( "TEXT(1234.567,\"$0.00\")", "A2", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), "$1234.57" );
@@ -1428,8 +1428,6 @@ $( function () {
     } );
 
     test( "Test: \"WORKDAY\"", function () {
-
-        wb.dependencyFormulas = new AscCommonExcel.DependencyGraph( wb );
 
         oParser = new parserFormula( "WORKDAY(DATE(2006,1,1),0)", "A2", ws );
         ok( oParser.parse() );
@@ -2052,6 +2050,13 @@ $( function () {
         ws.getRange2( "E2" ).setValue( "TRUE" );
         ws.getRange2( "E3" ).setValue( "FALSE" );
 
+		ws.getRange2( "F2" ).setValue( "10" );
+		ws.getRange2( "F3" ).setValue( "7" );
+		ws.getRange2( "F4" ).setValue( "9" );
+		ws.getRange2( "F5" ).setValue( "2" );
+		ws.getRange2( "F6" ).setValue( "Not available" );
+		ws.getRange2( "F7" ).setValue( "" );
+
         oParser = new parserFormula( "AVERAGEA(10,E1)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 10 );
@@ -2063,6 +2068,14 @@ $( function () {
         oParser = new parserFormula( "AVERAGEA(10,E3)", "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 5 );
+
+		oParser = new parserFormula( "AVERAGEA(F2:F6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 5.6 );
+
+		oParser = new parserFormula( "AVERAGEA(F2:F5,F7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 7 );
 
     } );
 
@@ -2078,6 +2091,37 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), 26 );
 
     } );
+
+	test( "Test: \"AVERAGEIFS\"", function () {
+
+		ws.getRange2( "E2" ).setValue( "Quiz" );
+		ws.getRange2( "E3" ).setValue( "Grade" );
+		ws.getRange2( "E4" ).setValue( "75" );
+		ws.getRange2( "E5" ).setValue( "94" );
+
+		ws.getRange2( "F2" ).setValue( "Quiz" );
+		ws.getRange2( "F3" ).setValue( "Grade" );
+		ws.getRange2( "F4" ).setValue( "85" );
+		ws.getRange2( "F5" ).setValue( "80" );
+
+		ws.getRange2( "G2" ).setValue( "Exam" );
+		ws.getRange2( "G3" ).setValue( "Grade" );
+		ws.getRange2( "G4" ).setValue( "87" );
+		ws.getRange2( "G5" ).setValue( "88" );
+
+		oParser = new parserFormula( "AVERAGEIFS(E2:E5,E2:E5,\">70\",E2:E5,\"<90\")", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 75 );
+
+		oParser = new parserFormula( "AVERAGEIFS(F2:F5,F2:F5,\">95\")", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+
+		oParser = new parserFormula( "AVERAGEIFS(G2:G5,G2:G5,\"<>Incomplete\",G2:G5,\">80\")", "A3", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 87.5 );
+
+	} );
 
     test( "Test: \"BINOMDIST\"", function () {
 
@@ -2233,44 +2277,101 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), 3 );
     } );
 
-    test( "Test: \"COUNTIF\"", function () {
+    test( "Test: \"COUNTIFS\"", function () {
 
-        ws.getRange2( "A7" ).setValue( "3" );
-        ws.getRange2( "B7" ).setValue( "10" );
-        ws.getRange2( "C7" ).setValue( "7" );
-        ws.getRange2( "D7" ).setValue( "10" );
+        ws.getRange2( "A15" ).setValue( "Yes" );
+        ws.getRange2( "A16" ).setValue( "Yes" );
+        ws.getRange2( "A17" ).setValue( "Yes" );
+        ws.getRange2( "A18" ).setValue( "No" );
 
-        ws.getRange2( "A8" ).setValue( "apples" );
-        ws.getRange2( "B8" ).setValue( "oranges" );
-        ws.getRange2( "C8" ).setValue( "grapes" );
-        ws.getRange2( "D8" ).setValue( "melons" );
+        ws.getRange2( "B15" ).setValue( "No" );
+        ws.getRange2( "B16" ).setValue( "Yes" );
+        ws.getRange2( "B17" ).setValue( "Yes" );
+        ws.getRange2( "B18" ).setValue( "Yes" );
 
+		ws.getRange2( "C15" ).setValue( "No" );
+		ws.getRange2( "C16" ).setValue( "No" );
+		ws.getRange2( "C17" ).setValue( "Yes" );
+		ws.getRange2( "C18" ).setValue( "Yes" );
 
-        oParser = new parserFormula( "COUNTIF(A7:D7,\"=10\")", "A1", ws );
+        oParser = new parserFormula( "COUNTIFS(A15:C15,\"=Yes\")", "A1", ws );
+        ok( oParser.parse() );
+        strictEqual( oParser.calculate().getValue(), 1 );
+
+        oParser = new parserFormula( "COUNTIFS(A15:A18,\"=Yes\",B15:B18,\"=Yes\")", "B1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 2 );
 
-        oParser = new parserFormula( "COUNTIF(A7:D7,\">5\")", "B1", ws );
+		oParser = new parserFormula( "COUNTIFS(A18:C18,\"=Yes\",A16:C16,\"=Yes\")", "C1", ws );
         ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3 );
+        strictEqual( oParser.calculate().getValue(), 1 );
 
-        oParser = new parserFormula( "COUNTIF(A7:D7,\"<>10\")", "C1", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
+		ws.getRange2( "D15" ).setValue( "1" );
+		ws.getRange2( "D16" ).setValue( "2" );
+		ws.getRange2( "D17" ).setValue( "3" );
+		ws.getRange2( "D18" ).setValue( "4" );
+		ws.getRange2( "D19" ).setValue( "5" );
+		ws.getRange2( "D20" ).setValue( "6" );
 
-        oParser = new parserFormula( "COUNTIF(A8:D8,\"*es\")", "A2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 3 );
+		ws.getRange2( "E15" ).setValue( "5/1/2011" );
+		ws.getRange2( "E16" ).setValue( "5/2/2011" );
+		ws.getRange2( "E17" ).setValue( "5/3/2011" );
+		ws.getRange2( "E18" ).setValue( "5/4/2011" );
+		ws.getRange2( "E19" ).setValue( "5/5/2011" );
+		ws.getRange2( "E20" ).setValue( "5/6/2011" );
 
-        oParser = new parserFormula( "COUNTIF(A8:D8,\"??a*\")", "B2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
+		oParser = new parserFormula( "COUNTIFS(D15:D20,\"<6\",D15:D20,\">1\")", "D1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 4 );
 
-        oParser = new parserFormula( "COUNTIF(A8:D8,\"*l*\")", "C2", ws );
-        ok( oParser.parse() );
-        strictEqual( oParser.calculate().getValue(), 2 );
+		oParser = new parserFormula( "COUNTIFS(D15:D20,\"<5\",E15:E20,\"<5/3/2011\")", "E1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIFS(D15:D20,\"<\" & D19,E15:E20,\"<\" & E17)", "E1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
 
     } );
+
+	test( "Test: \"COUNTIFS\"", function () {
+
+		ws.getRange2( "A7" ).setValue( "3" );
+		ws.getRange2( "B7" ).setValue( "10" );
+		ws.getRange2( "C7" ).setValue( "7" );
+		ws.getRange2( "D7" ).setValue( "10" );
+
+		ws.getRange2( "A8" ).setValue( "apples" );
+		ws.getRange2( "B8" ).setValue( "oranges" );
+		ws.getRange2( "C8" ).setValue( "grapes" );
+		ws.getRange2( "D8" ).setValue( "melons" );
+
+
+		oParser = new parserFormula( "COUNTIF(A7:D7,\"=10\")", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIF(A7:D7,\">5\")", "B1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "COUNTIF(A7:D7,\"<>10\")", "C1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIF(A8:D8,\"*es\")", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+		oParser = new parserFormula( "COUNTIF(A8:D8,\"??a*\")", "B2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+		oParser = new parserFormula( "COUNTIF(A8:D8,\"*l*\")", "C2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2 );
+
+	} );
 
     test( "Test: \"COVAR\"", function () {
 

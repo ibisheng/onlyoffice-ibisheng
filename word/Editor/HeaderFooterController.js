@@ -18,10 +18,11 @@
  */
 function CHdrFtrController(LogicDocument, HdrFtr)
 {
-	CHdrFtrController.superclass.constructor.call(this, LogicDocument);
+	CDocumentControllerBase.call(this, LogicDocument);
 	this.HdrFtr = HdrFtr;
 }
-AscCommon.extendClass(CHdrFtrController, CDocumentControllerBase);
+CHdrFtrController.prototype = Object.create(CDocumentControllerBase.prototype);
+CHdrFtrController.prototype.constructor = CHdrFtrController;
 
 CHdrFtrController.prototype.CanTargetUpdate = function()
 {
@@ -441,13 +442,13 @@ CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(Stat
 			if (true !== this.LogicDocument.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
 			{
 				HdrFtrContent.Set_DocPosType(docpostype_Content);
-				this.LogicDocument.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+				HdrFtrContent.Cursor_MoveToStartPos();
 			}
 		}
 	}
 	else
 	{
-		this.LogicDocument.Document_End_HdrFtrEditing();
+		this.LogicDocument.EndHdrFtrEditing(false);
 	}
 };
 CHdrFtrController.prototype.GetColumnSize = function()
@@ -474,4 +475,10 @@ CHdrFtrController.prototype.GetColumnSize = function()
 CHdrFtrController.prototype.GetCurrentSectionPr = function()
 {
 	return null;
+};
+CHdrFtrController.prototype.RemoveTextSelection = function()
+{
+	var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+	if (null != CurHdrFtr)
+		return CurHdrFtr.Content.RemoveTextSelection();
 };
