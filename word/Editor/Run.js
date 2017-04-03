@@ -1934,9 +1934,8 @@ ParaRun.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Dep
     for ( var CurPos = StartPos; CurPos < ContentLen; CurPos++ )
     {
         var Item = this.Content[CurPos];
-        var ItemType = Item.Type;
 
-        if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType)
+        if (RunElements.CheckType(Item.Type))
         {
             RunElements.Elements.push( Item );
             RunElements.Count--;
@@ -1957,7 +1956,7 @@ ParaRun.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Dep
         var Item = this.Content[CurPos];
         var ItemType = Item.Type;
 
-        if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType )
+		if (RunElements.CheckType(Item.Type))
         {
             RunElements.Elements.push( Item );
             RunElements.Count--;

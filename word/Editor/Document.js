@@ -11937,10 +11937,20 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 			{
 				if (ParaItem.IsColumnBreak())
 				{
-					this.Add_NewParagraph(undefined, true);
+					var oCurElement = this.Content[this.CurPos.ContentPos];
 					var CurPos = this.CurPos.ContentPos;
-					this.Content[CurPos].Cursor_MoveToStartPos();
-					this.Content[CurPos].Add(ParaItem);
+					if (oCurElement && type_Paragraph === oCurElement.Get_Type() && oCurElement.IsColumnBreakOnLeft())
+					{
+						oCurElement.Add(ParaItem);
+					}
+					else
+					{
+						this.Add_NewParagraph(undefined, true);
+						CurPos = this.CurPos.ContentPos;
+
+						this.Content[CurPos].Cursor_MoveToStartPos();
+						this.Content[CurPos].Add(ParaItem);
+					}
 				}
 				else
 				{

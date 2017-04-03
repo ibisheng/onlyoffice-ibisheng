@@ -12314,6 +12314,20 @@ Paragraph.prototype.CheckCommentStartEnd = function(sCommentId)
 
 	return oResult;
 };
+Paragraph.prototype.IsColumnBreakOnLeft = function()
+{
+	var oRunElementsBefore = new CParagraphRunElements(this.Get_ParaContentPos(this.Selection.Use, false, false), 1, null);
+	this.Get_PrevRunElements(oRunElementsBefore);
+
+	var arrElements = oRunElementsBefore.Elements;
+	if (arrElements
+		&& 1 === arrElements.length
+		&& para_NewLine === arrElements[0].Type
+		&& true === arrElements[0].IsColumnBreak())
+		return true;
+
+	return false;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
@@ -13362,12 +13376,26 @@ CRunRecalculateObject.prototype =
     }    
 };
 
-function CParagraphRunElements(ContentPos, Count)
+function CParagraphRunElements(ContentPos, Count, arrTypes)
 {
     this.ContentPos = ContentPos;
     this.Elements   = [];
     this.Count      = Count;
+    this.Types      = arrTypes ? arrTypes : [];
 }
+CParagraphRunElements.prototype.CheckType = function(nType)
+{
+	if (this.Types.length <= 0)
+		return true;
+
+	for (var nIndex = 0, nCount = this.Types.length; nIndex < nCount; ++nIndex)
+	{
+		if (nType === this.Types[nIndex])
+			return true;
+	}
+
+	return false;
+};
 
 function CParagraphStatistics(Stats)
 {
