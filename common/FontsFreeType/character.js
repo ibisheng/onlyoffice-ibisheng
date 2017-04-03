@@ -802,4 +802,57 @@
 		new CRange(0x100000, 0x10FFFF, c_oUnicodeRangesLID.Supplementary_Private_Use_Area_B, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Private_Use_plane_15), 0, 0, 0])
 	];
 
+	window.getSupportedFonts = function(_char)
+	{
+		var _range = null;
+		var _ranges = c_oUnicodeRanges;
+
+		// TODO: fast find
+		for (var i = 0; i < _ranges.length; i++)
+		{
+			if (_ranges[i].Start <= _char && _ranges[i].End >= _char)
+			{
+				_range = _ranges[i];
+				break;
+			}
+		}
+
+		if (null == _ranges)
+			return [];
+
+		var _system_fonts = AscFonts.g_fontApplication.g_fontSelections.List;
+		var _count = _system_fonts.length;
+
+		var _retArray = [];
+
+		for (var j = 0; j < _count; j++)
+		{
+			var _select = _system_fonts[j];
+
+			var _param = _range.Param;
+
+			if (_param[0] != (_select.m_ulUnicodeRange1 & _param[0]))
+				continue;
+
+			if (_param[1] != (_select.m_ulUnicodeRange2 & _param[1]))
+				continue;
+
+			if (_param[2] != (_select.m_ulUnicodeRange3 & _param[2]))
+				continue;
+
+			if (_param[3] != (_select.m_ulUnicodeRange4 & _param[3]))
+				continue;
+
+			if (_param[4] != (_select.m_ulCodePageRange1 & _param[4]))
+				continue;
+
+			if (_param[5] != (_select.m_ulCodePageRange2 & _param[5]))
+				continue;
+
+			_retArray.push(_select.m_wsFontName);
+		}
+
+		return _retArray;
+	};
+
 })(window);
