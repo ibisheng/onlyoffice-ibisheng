@@ -1785,16 +1785,11 @@ function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteP
 		window['AscCommon'].g_clipboardBase.specialPasteData.pastebin = pastebin;
 		window['AscCommon'].g_clipboardBase.specialPasteData.nodeDisplay = nodeDisplay;
 		window['AscCommon'].g_clipboardBase.specialPasteData.onlyBinary = onlyBinary;
-		//window['AscCommon'].g_clipboardBase.specialPasteData.text_data = text_data;
 		
 		oPasteProcessor.Start(pastebin, nodeDisplay, null, onlyBinary);
 	}
     else
-	{	
-		api.WordControl.m_oLogicDocument.Set_SelectionState(window['AscCommon'].g_clipboardBase.specialPasteUndoData.selectionState);
-		
-		api.WordControl.m_oLogicDocument.Selection_Clear();
-		
+	{
 		window['AscCommon'].g_clipboardBase.specialPasteProps = specialPasteProps;
 		
 		pastebin = window['AscCommon'].g_clipboardBase.specialPasteData.pastebin;

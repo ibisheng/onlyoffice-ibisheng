@@ -1806,6 +1806,9 @@ background-repeat: no-repeat;\
 			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
 			window['AscCommon'].g_clipboardBase.Special_Paste_Start();
 			
+			//undo previous action
+			this.WordControl.m_oLogicDocument.Document_Undo();
+			
 			//if (!useCurrentPoint) {
 				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 			//}
