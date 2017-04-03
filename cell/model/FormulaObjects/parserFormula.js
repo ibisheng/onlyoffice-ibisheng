@@ -4098,6 +4098,7 @@ parserFormula.prototype.setFormula = function(formula) {
 parserFormula.prototype.parse = function(local, digitDelim) {
   this.pCurrPos = 0;
   var needAssemble = false;
+  var cFormulaList;
 
   if (this.isParsed) {
     return this.isParsed;
@@ -4110,7 +4111,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 
 	if (false) {
 		//console.log(this.Formula);
-		var cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized :
+		cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized :
 			cFormulaFunction;
 		var aTokens = getTokens(this.Formula);
 		if (null === aTokens) {
@@ -4380,7 +4381,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 
   this.operand_expected = true;
   var wasLeftParentheses = false, wasRigthParentheses = false, found_operand = null, _3DRefTmp = null, _tableTMP = null;
-  var cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized : cFormulaFunction;
+  cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized : cFormulaFunction;
   while (this.pCurrPos < this.Formula.length) {
     this.operand_str = this.Formula[this.pCurrPos];
     /*if ( parserHelp.isControlSymbols.call( this, this.Formula, this.pCurrPos )){
@@ -4396,13 +4397,13 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       found_operator = null;
 
       if (this.operand_expected) {
-        if (this.operand_str == "-") {
+        if ('-' === this.operand_str) {
           this.operand_expected = true;
           found_operator = new cFormulaOperators['un_minus']();
-        } else if (this.operand_str == "+") {
+        } else if ('+' === this.operand_str) {
           this.operand_expected = true;
           found_operator = new cFormulaOperators['un_plus']();
-        } else if (this.operand_str == " ") {
+        } else if (' ' === this.operand_str) {
           continue;
         } else {
           this.error.push(c_oAscError.ID.FrmlWrongOperator);
@@ -4411,19 +4412,19 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           return false;
         }
       } else if (!this.operand_expected) {
-        if (this.operand_str == "-") {
+        if ('-' === this.operand_str) {
           this.operand_expected = true;
           found_operator = new cFormulaOperators['-']();
-        } else if (this.operand_str == "+") {
+        } else if ('+' === this.operand_str) {
           this.operand_expected = true;
           found_operator = new cFormulaOperators['+']();
-        } else if (this.operand_str == ":") {
+        } else if (':' === this.operand_str) {
           this.operand_expected = true;
           found_operator = new cFormulaOperators[':']();
-        } else if (this.operand_str == "%") {
+        } else if ('%' === this.operand_str) {
           this.operand_expected = false;
           found_operator = new cFormulaOperators['%']();
-        } else if (this.operand_str == " " && this.pCurrPos == this.Formula.length) {
+        } else if (' ' === this.operand_str && this.pCurrPos === this.Formula.length) {
           continue;
         } else {
           if (this.operand_str in cFormulaOperators) {
@@ -4438,7 +4439,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         }
       }
 
-      while (this.elemArr.length != 0 && (
+      while (0 !== this.elemArr.length && (
         found_operator.isRightAssociative ?
           ( found_operator.priority < this.elemArr[this.elemArr.length - 1].priority ) :
           ( found_operator.priority <= this.elemArr[this.elemArr.length - 1].priority )
@@ -4466,7 +4467,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       this.f.push(new cFormulaOperators[this.operand_str]());
       wasRigthParentheses = true;
       var top_elem = null;
-      if (this.elemArr.length != 0 && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" ) &&
+      if (0 !== this.elemArr.length && ( (top_elem = this.elemArr[this.elemArr.length - 1]).name === '(' ) &&
         this.operand_expected) {
         if (top_elem.getArguments() > 1) {
           this.outStack.push(new cEmpty());
@@ -4474,7 +4475,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           top_elem.DecrementArguments();
         }
       } else {
-        while (this.elemArr.length != 0 && !((top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" )) {
+        while (0 !== this.elemArr.length && !((top_elem = this.elemArr[this.elemArr.length - 1]).name === '(' )) {
           if (top_elem.name in cFormulaOperators && this.operand_expected) {
             this.error.push(c_oAscError.ID.FrmlOperandExpected);
             this.outStack = [];
@@ -4485,7 +4486,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         }
       }
 
-      if (this.elemArr.length == 0 || top_elem == null/* && !wasLeftParentheses */) {
+      if (0 === this.elemArr.length || null === top_elem/* && !wasLeftParentheses */) {
         this.outStack = [];
         this.elemArr = [];
         this.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
@@ -4494,7 +4495,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 
       var p = top_elem, func, bError = false;
       this.elemArr.pop();
-      if (this.elemArr.length != 0 && ( func = this.elemArr[this.elemArr.length - 1] ).type == cElementType.func) {
+      if (0 !== this.elemArr.length && ( func = this.elemArr[this.elemArr.length - 1] ).type === cElementType.func) {
         p = this.elemArr.pop();
         if (top_elem.getArguments() > func.argumentsMax) {
           this.outStack = [];
@@ -4520,7 +4521,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         }
         } else {
           if (wasLeftParentheses &&
-            (!this.elemArr[this.elemArr.length - 1] || this.elemArr[this.elemArr.length - 1].name == "(" )) {
+            (!this.elemArr[this.elemArr.length - 1] || '(' === this.elemArr[this.elemArr.length - 1].name)) {
           this.outStack = [];
           this.elemArr = [];
           this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
@@ -4716,7 +4717,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         found_operand = cStrucTable.prototype.createFromVal(_tableTMP, this.wb, this.ws);
 
 		//todo undo delete column
-		if (found_operand.type == cElementType.error) {
+		if (found_operand.type === cElementType.error) {
 			/*используется неверный именованный диапазон или таблица*/
 			this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
 			this.outStack = [];
@@ -4724,7 +4725,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 			return false;
 		}
 
-        if (found_operand.type != cElementType.error) {
+        if (found_operand.type !== cElementType.error) {
           this.RefPos.push({
             start: this.pCurrPos - this.operand_str.length,
             end: this.pCurrPos,
@@ -4756,7 +4757,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       }
 
         /* Numbers*/ else if (parserHelp.isNumber.call(this, this.Formula, this.pCurrPos, digitDelim)) {
-        if (this.operand_str != ".") {
+        if (this.operand_str !== ".") {
           found_operand = new cNumber(parseFloat(this.operand_str));
           } else {
           this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
@@ -4821,12 +4822,12 @@ parserFormula.prototype.parse = function(local, digitDelim) {
     return false;
   }
   var operand, parenthesesNotEnough = false;
-  while (this.elemArr.length != 0) {
+  while (0 !== this.elemArr.length) {
     operand = this.elemArr.pop();
-    if (operand.name == "(" && !this.parenthesesNotEnough) {
+    if ('(' === operand.name && !this.parenthesesNotEnough) {
       this.Formula += ")";
       parenthesesNotEnough = true;
-      } else if (operand.name == "(" || operand.name == ")") {
+      } else if ('(' === operand.name || ')' === operand.name) {
       this.outStack = [];
       this.elemArr = [];
       this.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
@@ -4841,7 +4842,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
     return this.isParsed = false;
   }
 
-  if (this.outStack.length != 0) {
+  if (0 !== this.outStack.length) {
     if(needAssemble){
       this.Formula = this.assemble();
     }
