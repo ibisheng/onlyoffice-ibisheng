@@ -1812,7 +1812,8 @@ function sendImgUrls(api, images, callback, bExcel) {
     var data;
     if (null != input && "imgurls" == input["type"]) {
       if ("ok" == input["status"]) {
-        data = input["data"];
+        data = input["data"]["urls"];
+        nError = AscCommon.mapAscServerErrorToAscError(input["data"]["error"]);
         var urls = {};
         for (var i = 0, length = data.length; i < length; ++i) {
           var elem = data[i];
