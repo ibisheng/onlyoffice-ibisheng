@@ -746,25 +746,29 @@ CDocMeta.prototype =
                         if (null != _cachedImage)
                         {
 							g.drawImage2(_cachedImage, 0, 0, page.width_mm, page.height_mm);
-							return obj.MetaDoc.OnImageLoad(obj);
+							break;
                         }
+                        else
+						{
+							var img = new Image();
+							img.onload = function ()
+							{
+								obj.MetaDoc.SetCachedImage(_src, img);
+								if (1 != obj.BreakDrawing)
+								{
+									g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
+								}
 
-                        var img = new Image();
-                        img.onload = function(){
-							obj.MetaDoc.SetCachedImage(_src, img);
-                            if (1 != obj.BreakDrawing)
-                            {
-                                g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
-                            }
+								obj.MetaDoc.OnImageLoad(obj);
+							};
+							img.onerror = function ()
+							{
+								obj.MetaDoc.OnImageLoad(obj);
+							};
+							img.src = _src;
 
-                            obj.MetaDoc.OnImageLoad(obj);
-                        };
-                        img.onerror = function(){
-                            obj.MetaDoc.OnImageLoad(obj);
-                        };
-                        img.src = _src;
-
-                        return;
+							return;
+						}
                     }
                     else if (3 == _type)
                     {
@@ -777,25 +781,29 @@ CDocMeta.prototype =
 						if (null != _cachedImage)
 						{
 							g.drawImage2(_cachedImage, 0, 0, page.width_mm, page.height_mm);
-							return obj.MetaDoc.OnImageLoad(obj);
+							break;
 						}
+						else
+						{
+							var img = new Image();
+							img.onload = function ()
+							{
+								obj.MetaDoc.SetCachedImage(_src, img);
+								if (1 != obj.BreakDrawing)
+								{
+									g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
+								}
 
-                        var img = new Image();
-                        img.onload = function(){
-                            obj.MetaDoc.SetCachedImage(_src, img);
-                            if (1 != obj.BreakDrawing)
-                            {
-                                g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
-                            }
+								obj.MetaDoc.OnImageLoad(obj);
+							};
+							img.onerror = function ()
+							{
+								obj.MetaDoc.OnImageLoad(obj);
+							};
+							img.src = _src;
 
-                            obj.MetaDoc.OnImageLoad(obj);
-                        };
-                        img.onerror = function(){
-                            obj.MetaDoc.OnImageLoad(obj);
-                        };
-                        img.src = _src;
-
-                        return;
+							return;
+						}
                     }
 
                     var _src = (0 == _type || 10 == _type) ? AscCommon.g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".jpg") : AscCommon.g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".png");
@@ -843,43 +851,47 @@ CDocMeta.prototype =
 								_ctx.restore();
 							}
 						}
-
-						return obj.MetaDoc.OnImageLoad(obj);
+						break;
 					}
+					else
+					{
+						var img = new Image();
+						img.onload = function ()
+						{
+							obj.MetaDoc.SetCachedImage(_src, img);
+							if (1 != obj.BreakDrawing)
+							{
+								var _ctx = g.m_oContext;
 
-                    var img = new Image();
-                    img.onload = function(){
-						obj.MetaDoc.SetCachedImage(_src, img);
-                        if (1 != obj.BreakDrawing)
-                        {
-                            var _ctx = g.m_oContext;
+								if (_tr)
+								{
+									var _dX = g.m_oCoordTransform.sx;
+									var _dY = g.m_oCoordTransform.sy;
 
-                            if (_tr)
-                            {
-                                var _dX = g.m_oCoordTransform.sx;
-                                var _dY = g.m_oCoordTransform.sy;
+									_ctx.save();
+									_ctx.setTransform(_tr.sx * _dX, _tr.shy * _dY, _tr.shx * _dX, _tr.sy * _dY, _tr.tx * _dX, _tr.ty * _dY);
+								}
 
-                                _ctx.save();
-                                _ctx.setTransform(_tr.sx * _dX, _tr.shy * _dY, _tr.shx * _dX, _tr.sy * _dY, _tr.tx * _dX, _tr.ty * _dY);
-                            }
+								g.drawImage2(img, __x, __y, __w, __h);
+								//editor.WordControl.OnScroll();
 
-                            g.drawImage2(img,__x,__y,__w,__h);
-							//editor.WordControl.OnScroll();
+								if (_tr)
+								{
+									_ctx.restore();
+								}
+							}
 
-                            if (_tr)
-                            {
-                                _ctx.restore();
-                            }
-                        }
+							obj.MetaDoc.OnImageLoad(obj);
+						};
+						img.onerror = function ()
+						{
+							obj.MetaDoc.OnImageLoad(obj);
+						};
+						img.src = _src;
 
-                        obj.MetaDoc.OnImageLoad(obj);
-                    };
-                    img.onerror = function(){
-                        obj.MetaDoc.OnImageLoad(obj);
-                    };
-                    img.src = _src;
-
-                    return;
+						return;
+					}
+					break;
                 }
                 case 160:
                 {
