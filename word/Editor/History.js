@@ -44,7 +44,8 @@ function CHistory(Document)
     this.Document   = Document;
     this.Api                  = null;
     this.CollaborativeEditing = null;
-    this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
+    this.CanNotAddChanges = false; // флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
+	this.CollectChanges   = false;
 
 	this.RecalculateData =
 	{
@@ -318,8 +319,9 @@ CHistory.prototype =
 			return;
 
         this.CanNotAddChanges = false;
+		this.CollectChanges   = false;
 
-        if (null !== this.SavedIndex && this.Index < this.SavedIndex)
+		if (null !== this.SavedIndex && this.Index < this.SavedIndex)
             this.Set_SavedIndex(this.Index);
 
         this.Clear_Additional();
@@ -358,11 +360,13 @@ CHistory.prototype =
 			Description : -1
 		};
 
-		this.Points.length = this.Index + 1;
+		this.Points.length  = this.Index + 1;
+		this.CollectChanges = true;
 	},
     
     Remove_LastPoint : function()
     {
+		this.CollectChanges = false;
         this.Index--;
         this.Points.length = this.Index + 1;
     },
@@ -1077,7 +1081,7 @@ CHistory.prototype =
 
     _CheckCanNotAddChanges : function() {
         try {
-            if (this.CanNotAddChanges && this.Api) {
+            if (this.CanNotAddChanges && this.Api && !this.CollectChanges) {
                 var tmpErr = new Error();
                 if (tmpErr.stack) {
                     this.Api.CoAuthoringApi.sendChangesError(tmpErr.stack);
