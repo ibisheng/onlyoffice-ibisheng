@@ -50,15 +50,16 @@ var CellAddress = AscCommon.CellAddress;
 var c_oUndoRedoSerializeType =
 {
     Null:0,
-    Byte:1,
-	Bool:2,
-    Short:3,
-    Three:4,
-    Long:5,
-    Double:6,
-    String:7,
-	Object:8,
-	Array:9
+	Undefined:1,
+	SByte:2,
+	Byte:3,
+	Bool:4,
+	Long:5,
+	ULong:6,
+	Double:7,
+	String:8,
+	Object:9,
+	Array:10
 };
 
 function DrawingCollaborativeData()
@@ -184,7 +185,7 @@ UndoRedoItemSerializable.prototype = {
 	SerializeDataInner: function(oBinaryWriter, nItemType, oItem, nSheetId, collaborativeEditing) {
 		var oThis = this;
 		var sTypeOf;
-		if(null == oItem)
+		if(null === oItem)
 			sTypeOf = "null";
 		else if(oItem instanceof Array)
 			sTypeOf = "array";
@@ -208,18 +209,23 @@ UndoRedoItemSerializable.prototype = {
 				var nFlorItem = Math.floor(oItem);
 				if(nFlorItem == oItem)
 				{
-					if(oItem >= 0 && oItem <= 255)
-					{
+					if (-128 <= oItem && oItem <= 127) {
+						oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.SByte);
+						oBinaryWriter.WriteSByte(oItem);
+					}
+					else if (127 < oItem && oItem <= 255) {
 						oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Byte);
 						oBinaryWriter.WriteByte(oItem);
 					}
-					else if(oItem <= 0xffffffff)
-					{
+					else if (-0x80000000 <= oItem && oItem <= 0x7FFFFFFF) {
 						oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Long);
 						oBinaryWriter.WriteLong(oItem);
 					}
-					else
-					{
+					else if (0x7FFFFFFF < oItem && oItem <= 0xFFFFFFFF) {
+						oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.ULong);
+						oBinaryWriter.WriteLong(oItem);
+					}
+					else {
 						oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Double);
 						oBinaryWriter.WriteDouble2(oItem);
 					}
@@ -241,9 +247,13 @@ UndoRedoItemSerializable.prototype = {
 				oBinaryWriter.WriteString2(oItem);
 			break;
 			case "null":
-			case "undefined":
 				oBinaryWriter.WriteByte(nItemType);
 				oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Null);
+				break;
+			case "undefined":
+				oBinaryWriter.WriteByte(nItemType);
+				oBinaryWriter.WriteByte(c_oUndoRedoSerializeType.Undefined);
+				break;
 			default:
 				break;
 		}
@@ -324,14 +334,23 @@ UndoRedoItemSerializable.prototype = {
 				case c_oUndoRedoSerializeType.Null:
 					oNewValue = null;
 					break;
+				case c_oUndoRedoSerializeType.Undefined:
+					oNewValue = undefined;
+					break;
 				case c_oUndoRedoSerializeType.Bool:
 					oNewValue = oBinaryReader.GetBool();
+					break;
+				case c_oUndoRedoSerializeType.SByte:
+					oNewValue = oBinaryReader.GetChar();
 					break;
 				case c_oUndoRedoSerializeType.Byte:
 					oNewValue = oBinaryReader.GetUChar();
 					break;
 				case c_oUndoRedoSerializeType.Long:
-					oNewValue = oBinaryReader.GetULongLE();
+					oNewValue = oBinaryReader.GetLongLE();
+					break;
+				case c_oUndoRedoSerializeType.ULong:
+					oNewValue = AscFonts.FT_Common.IntToUInt(oBinaryReader.GetULongLE());
 					break;
 				case c_oUndoRedoSerializeType.Double:
 					oNewValue = oBinaryReader.GetDoubleLE();

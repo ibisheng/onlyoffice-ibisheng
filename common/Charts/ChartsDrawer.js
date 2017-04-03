@@ -8797,10 +8797,10 @@ drawPieChart.prototype =
 						else if(side === sides.inside)
 						{
 							//выставляю закругленные соединения
-							if(pen.Join)
+							if(pen && pen.Join)
 							{
 								pen = pen.createDuplicate();
-								pen.Join.type = Asc.c_oAscLineJoinType.Round;
+								pen.Join.type = Asc['c_oAscLineJoinType'].Round;
 							}
 							
 							drawPath(path[j].insidePath, pen, brush, null, true);

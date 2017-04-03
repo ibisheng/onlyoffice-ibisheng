@@ -2252,7 +2252,9 @@ CChartSpace.prototype.Refresh_RecalcData2 = function(pageIndex, object)
     }
     else
     {
+        var bOldRecalculateRef = this.recalcInfo.recalculateReferences;
         this.setRecalculateInfo();
+        this.recalcInfo.recalculateReferences = bOldRecalculateRef;
     }
     this.addToRecalculate();
 };
@@ -2333,6 +2335,10 @@ CChartSpace.prototype.getAllContents = function()
 {
 
 };
+
+    CChartSpace.prototype.getAllFonts = function (allFonts) {
+        this.documentGetAllFontNames(allFonts);
+    };
 CChartSpace.prototype.documentGetAllFontNames = function(allFonts)
 {
     allFonts["+mn-lt"] = 1;

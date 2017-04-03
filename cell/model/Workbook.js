@@ -870,7 +870,10 @@
 			}
 			var notifyData = {type: AscCommon.c_oNotifyType.Dirty};
 			this.buildDependency();
-			this._broadscastVolatile(notifyData);
+			//broadscast Volatile only if something changed
+			if (this.changedCell || this.changedDefName) {
+				this._broadscastVolatile(notifyData);
+			}
 			var calcTrack = [];
 			var noCalcTrack = [];
 			while (this.changedCell || this.changedDefName) {
@@ -2663,7 +2666,6 @@
 			}
 		}
 		//this.setTableFormulaAfterOpen();
-		this._updateConditionalFormatting(null);
 
 		this.handlers = handlers;
 		this._setHandlersTablePart();
@@ -2693,7 +2695,7 @@
 		var o;
 		var i, j, l, cf, cell, ranges, values, value, v, tmp, min, mid, max, dxf, compareFunction, nc, sum;
 		for (i = 0; i < aCFs.length; ++i) {
-			cf = aCFs[i]
+			cf = aCFs[i];
 			ranges = cf.ranges;
 			// ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
 			if (!cf.isValid()) {
@@ -2703,7 +2705,8 @@
 				aRules = cf.aRules.sort(function(v1, v2) {
 					return v1.priority - v2.priority;
 				});
-				if (oRule = aRules[0]) {
+				for (j = 0; j < aRules.length; ++j) {
+					oRule = aRules[j];
 					// ToDo dataBar, expression, iconSet (page 2679)
 					if (AscCommonExcel.ECfType.colorScale === oRule.type) {
 						if (1 !== oRule.aRuleElements.length) {
@@ -4528,6 +4531,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	};
 	Woorksheet.prototype.onUpdateRanges = function(ranges) {
 		this.workbook.updateSparklineCache(this.sName, ranges);
+		// ToDo do not update conditional formatting on hidden sheet
 		this._updateConditionalFormatting(new AscCommonExcel.MultiplyRange(ranges));
 	};
 	Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
@@ -5137,7 +5141,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		this.oValue.cleanCache();
 	};
 	Cell.prototype.setConditionalFormattingStyle=function(xfs){
-		this.conditionalFormattingXfs = xfs;
+		this.conditionalFormattingXfs = xfs || this.conditionalFormattingXfs;
 		this.compiledXfs = null;
 		this.oValue.cleanCache();
 	};

@@ -499,8 +499,8 @@
 		this.sides = this.options.getSides();
 		this.left = this.sides.cellX;
 		this.top = this.sides.cellY;
-		this.right = this.sides.r[0];
-		this.bottom = this.sides.b[0];
+		this.right = this.sides.r[this.sides.ri];
+		this.bottom = this.sides.b[this.sides.bi];
 		// ToDo вынести в отдельную функцию
 		var canExpW = true, canExpH = true, tm, expW, expH, fragments = this._getRenderFragments();
 		if (0 < fragments.length) {
@@ -760,8 +760,8 @@
 
 		this.left = this.sides.cellX;
 		this.top = this.sides.cellY;
-		this.right = this.sides.r[0];
-		this.bottom = this.sides.b[0];
+		this.right = this.sides.r[this.sides.ri];
+		this.bottom = this.sides.b[this.sides.bi];
 
 		this.cursorPos = opt.cursorPos !== undefined ? opt.cursorPos : 0;
 		this.topLineIndex = 0;
@@ -1716,6 +1716,8 @@
 
 	CellEditor.prototype._removeChars = function (pos, length, isRange) {
 		var t = this, opt = t.options, b, e, l, first, last;
+
+		this.sAutoComplete = null;
 
 		if (t.selectionBegin !== t.selectionEnd) {
 			b = Math.min(t.selectionBegin, t.selectionEnd);

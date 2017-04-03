@@ -446,6 +446,7 @@
 		if (this.delegate.IsReader())
 		{
 			this.checkPointerMultiTouchRemove(e);
+			AscCommon.g_inputContext.preventVirtualKeyboard(e);
 			return this.onTouchEnd_renderer(e);
 		}
 

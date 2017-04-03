@@ -2392,8 +2392,7 @@ function CDrawingDocument()
 	{
 		var _drawingPage = this.m_arrPages[pageIndex].drawingPage;
 		var isUnlock = false;
-		if (_drawingPage.cachedImage != null && _drawingPage.cachedImage.image != null && (width != _drawingPage.cachedImage.image.width || height != _drawingPage.cachedImage.image.height))
-			isUnlock = true;
+
 		if (_drawingPage.cachedImage != null && _drawingPage.cachedImage.image != null)
 		{
 			var _check = this.CheckPagesSizeMaximum(width, height);

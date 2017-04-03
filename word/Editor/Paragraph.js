@@ -8632,6 +8632,13 @@ Paragraph.prototype =
             // Надо пересчитать конечный стиль
             this.CompiledPr.NeedRecalc = true;
             this.private_UpdateTrackRevisionOnChangeParaPr(true);
+
+            for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+			{
+				var oElement = this.Content[nIndex];
+				if (para_Math === oElement.Type && true !== oElement.Is_Inline())
+					oElement.Set_Align(Align);
+			}
         }
     },
 
