@@ -39,7 +39,7 @@
 	 * @enum {number}
 	 */
 	var c_oUnicodeRangesLID = {
-		Unknown:										0,
+		Unknown:                                        0,
 		Basic_Latin:                                    1,
 		Latin_1_Supplement:                             2,
 		Latin_Extended_A:                               3,
@@ -313,6 +313,201 @@
 		Variation_Selectors_Supplement:                 271,
 		Supplementary_Private_Use_Area_A:               272,
 		Supplementary_Private_Use_Area_B:               273
+	};
+
+	/**
+	 * @enum {number}
+	 */
+	var c_oCodePagesOS2_1 = {
+		Latin_1:        0,
+		Latin_2:        1,
+		Cyrillic:       2,
+		Greek:          3,
+		Turkish:        4,
+		Hebrew:         5,
+		Arabic:         6,
+		Windows_Baltic: 7,
+		Vietnamese:     8,
+
+		Thai:                16,
+		JIS_Japan:           17,
+		Chinese_Simplified:  18,
+		Korean_Wansung:      19,
+		Chinese_Traditional: 20,
+		Korean_Johab:        21,
+
+		Macintosh_Character_Set_US_Roman: 29,
+		OEM_Character_Set:                30,
+		Symbol_Character_Set:             31
+	};
+
+	/**
+	 * @enum {number}
+	 */
+	var c_oCodePagesOS2_2 = {
+		IBM_Greek:              48 - 32,
+		MS_DOS_Russian:         49 - 32,
+		MS_DOS_Nordic:          50 - 32,
+		Arabic:                 51 - 32,
+		MS_DOS_Canadian_French: 52 - 32,
+		Hebrew:                 53 - 32,
+		MS_DOS_Icelandic:       54 - 32,
+		MS_DOS_Portuguese:      55 - 32,
+		IBM_Turkish:            56 - 32,
+		IBM_Cyrillic:           57 - 32,
+		Latin_2:                58 - 32,
+		MS_DOS_Baltic:          59 - 32,
+		Greek_437:              60 - 32,
+		Arabic_708:             61 - 32,
+		WE_Latin_1:             62 - 32,
+		US:                     63 - 32
+	};
+
+	/**
+	 * @enum {number}
+	 */
+	var c_oUnicodeRangeOS2_1 = {
+		Basic_Latin:                 0,
+		Latin_1_Supplement:          1,
+		Latin_Extended_A:            2,
+		Latin_Extended_B:            3,
+		IPA_Extensions:              4,
+		Spacing_Modifier_Letters:    5,
+		Combining_Diacritical_Marks: 6,
+		Greek_and_Coptic:            7,
+		Coptic:                      8,
+		Cyrillic:                    9,
+		Armenian:                    10,
+		Hebrew:                      11,
+		Vai:                         12,
+		Arabic:                      13,
+		NKo:                         14,
+		Devanagari:                  15,
+		Bengali:                     16,
+		Gurmukhi:                    17,
+		Gujarati:                    18,
+		Oriya:                       19,
+		Tamil:                       20,
+		Telugu:                      21,
+		Kannada:                     22,
+		Malayalam:                   23,
+		Thai:                        24,
+		Lao:                         25,
+		Georgian:                    26,
+		Balinese:                    27,
+		Hangul_Jamo:                 28,
+		Latin_Extended_Additional:   29,
+		Greek_Extended:              30,
+		General_Punctuation:         31
+	}
+
+	/**
+	 * @enum {number}
+	 */
+	var c_oUnicodeRangeOS2_2 = {
+		Superscripts_And_Subscripts:             32 - 32,
+		Currency_Symbols:                        33 - 32,
+		Combining_Diacritical_Marks_For_Symbols: 34 - 32,
+		Letterlike_Symbols:                      35 - 32,
+		Number_Forms:                            36 - 32,
+		Arrows:                                  37 - 32,
+		Mathematical_Operators:                  38 - 32,
+		Miscellaneous_Technical:                 39 - 32,
+		Control_Pictures:                        40 - 32,
+		Optical_Character_Recognition:           41 - 32,
+		Enclosed_Alphanumerics:                  42 - 32,
+		Box_Drawing:                             43 - 32,
+		Block_Elements:                          44 - 32,
+		Geometric_Shapes:                        45 - 32,
+		Miscellaneous_Symbols:                   46 - 32,
+		Dingbats:                                47 - 32,
+		CJK_Symbols_And_Punctuation:             48 - 32,
+		Hiragana:                                49 - 32,
+		Katakana:                                50 - 32,
+		Bopomofo:                                51 - 32,
+		Hangul_Compatibility_Jamo:               52 - 32,
+		Phags_pa:                                53 - 32,
+		Enclosed_CJK_Letters_And_Months:         54 - 32,
+		CJK_Compatibility:                       55 - 32,
+		Hangul_Syllables:                        56 - 32,
+		Non_Plane:                               57 - 32,
+		Phoenician:                              58 - 32,
+		CJK_Unified_Ideographs:                  59 - 32,
+		Private_Use_Area_plane_0:                60 - 32,
+		CJK_Strokes:                             61 - 32,
+		Alphabetic_Presentation_Forms:           62 - 32,
+		Arabic_Presentation_Forms_A:             63 - 32
+	}
+
+	/**
+	 * @enum {number}
+	 */
+	var c_oUnicodeRangeOS2_3 = {
+		Combining_Half_Marks:                  64 - 64,
+		Vertical_Forms:                        65 - 64,
+		Small_Form_Variants:                   66 - 64,
+		Arabic_Presentation_Forms_B:           67 - 64,
+		Halfwidth_And_Fullwidth_Forms:         68 - 64,
+		Specials:                              69 - 64,
+		Tibetan:                               70 - 64,
+		Syriac:                                71 - 64,
+		Thaana:                                72 - 64,
+		Sinhala:                               73 - 64,
+		Myanmar:                               74 - 64,
+		Ethiopic:                              75 - 64,
+		Cherokee:                              76 - 64,
+		Unified_Canadian_Aboriginal_Syllabics: 77 - 64,
+		Ogham:                                 78 - 64,
+		Runic:                                 79 - 64,
+		Khmer:                                 80 - 64,
+		Mongolian:                             81 - 64,
+		Braille_Patterns:                      82 - 64,
+		Yi_Syllables:                          83 - 64,
+		Tagalog:                               84 - 64,
+		Old_Italic:                            85 - 64,
+		Gothic:                                86 - 64,
+		Deseret:                               87 - 64,
+		Byzantine_Musical_Symbols:             88 - 64,
+		Mathematical_Alphanumeric_Symbols:     89 - 64,
+		Private_Use_plane_15:                  90 - 64,
+		Variation_Selectors:                   91 - 64,
+		Tags:                                  92 - 64,
+		Limbu:                                 93 - 64,
+		Tai_Le:                                94 - 64,
+		New_Tai_Lue:                           95 - 64
+	}
+
+	/**
+	 * @enum {number}
+	 */
+	var c_oUnicodeRangeOS2_4 = {
+		Buginese:                96 - 96,
+		Glagolitic:              97 - 96,
+		Tifinagh:                98 - 96,
+		Yijing_Hexagram_Symbols: 99 - 96,
+		Syloti_Nagri:            100 - 96,
+		Linear_B_Syllabary:      101 - 96,
+		Ancient_Greek_Numbers:   102 - 96,
+		Ugaritic:                103 - 96,
+		Old_Persian:             104 - 96,
+		Shavian:                 105 - 96,
+		Osmanya:                 106 - 96,
+		Cypriot_Syllabary:       107 - 96,
+		Kharoshthi:              108 - 96,
+		Tai_Xuan_Jing_Symbols:   109 - 96,
+		Cuneiform:               110 - 96,
+		Counting_Rod_Numerals:   111 - 96,
+		Sundanese:               112 - 96,
+		Lepcha:                  113 - 96,
+		Ol_Chiki:                114 - 96,
+		Saurashtra:              115 - 96,
+		Kayah_Li:                116 - 96,
+		Rejang:                  117 - 96,
+		Cham:                    118 - 96,
+		Ancient_Symbols:         119 - 96,
+		Phaistos_Disc:           120 - 96,
+		Carian:                  121 - 96,
+		Domino_Tiles:            122 - 96
 	};
 
 	/**
