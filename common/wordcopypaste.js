@@ -2066,14 +2066,17 @@ PasteProcessor.prototype =
             paragraph.Check_NearestPos(NearPos);
             //делаем небольшой сдвиг по y, потому что сама точка TargetPos для двухстрочного параграфа определяется как верхняя
             //var NearPos = oDoc.Get_NearestPos(this.oLogicDocument.TargetPos.PageNum, this.oLogicDocument.TargetPos.X, this.oLogicDocument.TargetPos.Y + 0.05);//0.05 == 2pix
-            var oSelectedContent = new CSelectedContent();
+            
+			//TODO ориентируюсь при специальной вставке на SelectionState. возможно стоит пересмотреть.
+			var curDocSelection = window['AscCommon'].g_clipboardBase.specialPasteStart ? this.oDocument.Get_SelectionState() : null;
+			var oSelectedContent = new CSelectedContent();
             for (var i = 0, length = aNewContent.length; i < length; ++i) {
                 var oSelectedElement = new CSelectedElement();
                 oSelectedElement.Element = aNewContent[i];
 				
 				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
 				{
-					aNewContent[i] = this._specialPasteParagraphConvert(aNewContent[i]);
+					aNewContent[i] = this._specialPasteParagraphConvert(aNewContent[i], curDocSelection);
 				}
 				
                 if (i == length - 1 && true != this.bInBlock && type_Paragraph == oSelectedElement.Element.GetType())
@@ -2109,10 +2112,18 @@ PasteProcessor.prototype =
         }
     },
 	
-	_specialPasteParagraphConvert: function(paragraph)
+	_specialPasteParagraphConvert: function(paragraph, curDocSelection)
 	{
 		var res = paragraph;
 		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+		
+		//стиль текущего параграфа/рана, в который вставляем
+		var pasteIntoParagraphPr, pasteIntoParaRunPr;
+		if(curDocSelection && curDocSelection[1])
+		{
+			pasteIntoParagraphPr = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Pr;
+			pasteIntoParaRunPr =  this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Content[curDocSelection[0].CurPos.ContentPos.Data[0]].Pr;
+		}
 		
 		switch(props)
 		{
@@ -2123,26 +2134,19 @@ PasteProcessor.prototype =
 			case Asc.c_oSpecialPasteProps.pasteOnlyValues:
 			{	
 				//в данному случае мы должны применить к вставленному фрагменту стиль paraRun, в который вставляем
-				var selection = this.oDocument.Get_SelectionState();
-				if(selection && selection[1])
+				if(pasteIntoParagraphPr)
 				{
-					var pasteIntoParagraphPr = this.oDocument.Content[selection[1].CurPos.ContentPos].Pr;
-					var pasteIntoParaRunPr =  this.oDocument.Content[selection[1].CurPos.ContentPos].Content[selection[0].CurPos.ContentPos.Data[0]].Pr;
+					paragraph.Set_Pr(pasteIntoParagraphPr);
 				}
 				
-				paragraph.Clear_TextFormatting();
-				paragraph.Clear_Formatting();
-				paragraph.Pr = new CParaPr();
-				paragraph.Set_Pr(pasteIntoParagraphPr);
-				paragraph.CompiledPr.Pr.ParaPr = pasteIntoParagraphPr;
-				
-				for(var j = 0; j < paragraph.Content.length; j++)
+				if(pasteIntoParaRunPr)
 				{
-					paragraph.Content[j].Clear_TextFormatting();
-					
-					if(pasteIntoParaRunPr)
+					for(var j = 0; j < paragraph.Content.length; j++)
 					{
-						paragraph.Content[j].Set_Pr( pasteIntoParaRunPr );
+						if(pasteIntoParaRunPr)
+						{
+							paragraph.Content[j].Set_Pr( pasteIntoParaRunPr );
+						}
 					}
 				}
 				
@@ -2150,6 +2154,21 @@ PasteProcessor.prototype =
 			}
 			case Asc.c_oSpecialPasteProps.mergeFormatting:
 			{
+				if(pasteIntoParagraphPr)
+				{
+					paragraph.Pr.Merge(pasteIntoParagraphPr);
+				}
+				
+				if(pasteIntoParaRunPr)
+				{
+					for(var j = 0; j < paragraph.Content.length; j++)
+					{
+						if(pasteIntoParaRunPr)
+						{
+							paragraph.Content[j].Pr.Merge(pasteIntoParaRunPr);
+						}
+					}
+				}
 				
 				break;
 			}
