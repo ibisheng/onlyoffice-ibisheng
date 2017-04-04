@@ -1588,10 +1588,11 @@ ParaFootnoteReference.prototype.Draw = function(X, Y, Context, PDSE)
 		_X += this.Widths[nPos];
 	}
 
-	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect)
+	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect && this.Run)
 	{
-	    Context.p_color(0, 0, 0, 255);
-	    Context.DrawFootnoteRect(X, PDSE.LineTop, this.Get_Width(), PDSE.BaseLine - PDSE.LineTop);
+		var TextAscent = this.Run.TextAscent;
+		Context.p_color(0, 0, 0, 255);
+		Context.DrawFootnoteRect(X, PDSE.BaseLine - TextAscent, this.Get_Width(), TextAscent);
 	}
 };
 ParaFootnoteReference.prototype.Measure = function(Context, TextPr, MathInfo, Run)
