@@ -1934,9 +1934,8 @@ ParaRun.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Dep
     for ( var CurPos = StartPos; CurPos < ContentLen; CurPos++ )
     {
         var Item = this.Content[CurPos];
-        var ItemType = Item.Type;
 
-        if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType)
+        if (RunElements.CheckType(Item.Type))
         {
             RunElements.Elements.push( Item );
             RunElements.Count--;
@@ -1957,7 +1956,7 @@ ParaRun.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Dep
         var Item = this.Content[CurPos];
         var ItemType = Item.Type;
 
-        if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType )
+		if (RunElements.CheckType(Item.Type))
         {
             RunElements.Elements.push( Item );
             RunElements.Count--;
@@ -3137,20 +3136,20 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         if (break_Page === Item.BreakType)
                             PRS.BreakRealPageLine = true;
 
-                        if (break_Page === Item.BreakType && true === Para.Check_BreakPageEnd(Item))
+						// PageBreak вне самого верхнего документа не надо учитывать
+						if (!(Para.Parent instanceof CDocument) || true !== Para.Is_Inline())
+						{
+							// TODO: Продумать, как избавиться от данного элемента, т.к. удалять его при пересчете нельзя,
+							//       иначе будут проблемы с совместным редактированием.
+
+							Item.Flags.Use = false;
+							continue;
+						}
+
+						if (break_Page === Item.BreakType && true === Para.Check_BreakPageEnd(Item))
                             continue;
 
                         Item.Flags.NewLine = true;
-
-                        // PageBreak вне самого верхнего документа не надо учитывать
-                        if (!(Para.Parent instanceof CDocument) || true !== Para.Is_Inline())
-                        {
-                            // TODO: Продумать, как избавиться от данного элемента, т.к. удалять его при пересчете нельзя,
-                            //       иначе будут проблемы с совместным редактированием.
-
-                            Item.Flags.Use = false;
-                            continue;
-                        }
 
                         NewPage       = true;
                         NewRange      = true;
@@ -3868,8 +3867,8 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             }
             case para_NewLine:
             {
-                if (break_Page === Item.BreakType || break_Column === Item.BreakType)
-                    Item.Update_String( PRSA.XEnd - PRSA.X );
+				if (break_Page === Item.BreakType || break_Column === Item.BreakType)
+					Item.Update_String(PRSA.XEnd - PRSA.X);
 
                 PRSA.X += Item.WidthVisible;
 

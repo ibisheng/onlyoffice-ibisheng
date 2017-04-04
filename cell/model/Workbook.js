@@ -5335,7 +5335,6 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	Cell.prototype._calculateRefType = function () {
 		var val = this.formulaParsed.value;
 		var nF = val.numFormat;
-		var ca = val.ca;
 		if (cElementType.cell === val.type || cElementType.cell3D === val.type) {
 			val = val.getValue();
 			if (cElementType.empty === val.type) {
@@ -5349,7 +5348,6 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			val = val.cross(new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), this.ws.getId());
 		}
 		val.numFormat = nF;
-		val.ca = ca;
 		this.formulaParsed.value = val;
 	};
 	Cell.prototype._updateCellValue = function() {
