@@ -2564,8 +2564,9 @@
 	cRAND.prototype = Object.create(cBaseFunction.prototype);
 	cRAND.prototype.constructor = cRAND;
 	cRAND.prototype.argumentsMax = 0;
+	cRAND.prototype.ca = true;
 	cRAND.prototype.Calculate = function () {
-		return this.setCA(new cNumber(Math.random()), true);
+		return this.value = new cNumber(Math.random());
 	};
 	cRAND.prototype.getInfo = function () {
 		return {
@@ -2587,6 +2588,7 @@
 	cRANDBETWEEN.prototype.constructor = cRANDBETWEEN;
 	cRANDBETWEEN.prototype.argumentsMin = 2;
 	cRANDBETWEEN.prototype.argumentsMax = 2;
+	cRANDBETWEEN.prototype.ca = true;
 	cRANDBETWEEN.prototype.Calculate = function (arg) {
 
 		function randBetween(a, b) {
@@ -2644,7 +2646,7 @@
 		}
 
 
-		return this.setCA(new cNumber(randBetween(arg0.getValue(), arg1.getValue())), true);
+		return this.value = new cNumber(randBetween(arg0.getValue(), arg1.getValue()));
 	};
 	cRANDBETWEEN.prototype.getInfo = function () {
 		return {

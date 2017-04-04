@@ -634,7 +634,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	function cBaseType(val) {
 		this.needRecalc = false;
 		this.numFormat = null;
-		this.ca = false;
 		this.value = val;
 	}
 
@@ -642,7 +641,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		oRes.needRecalc = this.needRecalc;
 		oRes.numFormat = this.numFormat;
 		oRes.value = this.value;
-		oRes.ca = this.ca;
 	};
 	cBaseType.prototype.getValue = function () {
 		return this.value;
@@ -2282,6 +2280,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.argumentsMin = 0;
 	cBaseFunction.prototype.argumentsMax = 255;
 	cBaseFunction.prototype.numFormat = c_numFormatFirstCell;
+	cBaseFunction.prototype.ca = false;
 	cBaseFunction.prototype.Calculate = function () {
 		this.value = new cError(cErrorType.wrong_name);
 		return this.value;
@@ -2341,11 +2340,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.toString = function () {
 		return this.name.replace(rx_sFuncPref, "_xlfn.");
 	};
-	cBaseFunction.prototype.setCA = function (arg, ca, numFormat) {
+	cBaseFunction.prototype.setCalcValue = function (arg, numFormat) {
 		this.value = arg;
-		if (ca) {
-			this.value.ca = true;
-		}
 		if (numFormat !== null && numFormat !== undefined) {
 			this.value.numFormat = numFormat;
 		}
@@ -4258,6 +4254,9 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 							elem = new cBaseFunction(val);
 							elem.isXLFN = (0 === val.indexOf("_xlfn."));
 						}
+						if (elem && elem.ca) {
+							this.ca = elem.ca;
+						}
 						stack.push(elem);
 						args[++indentCount] = 1;
 					} else {
@@ -4783,15 +4782,18 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           found_operator.isXLFN = ( this.operand_str.indexOf("_xlfn.") === 0 );
         }
 
-        if (found_operator != null) {
-          this.elemArr.push(found_operator);
-          this.f.push(found_operator);
-          } else {
-          this.error.push(c_oAscError.ID.FrmlWrongFunctionName);
-          this.outStack = [];
-          this.elemArr = [];
-          return false;
-        }
+		if (found_operator != null) {
+			if (found_operator.ca) {
+				this.ca = found_operator.ca;
+			}
+			this.elemArr.push(found_operator);
+			this.f.push(found_operator);
+		} else {
+			this.error.push(c_oAscError.ID.FrmlWrongFunctionName);
+			this.outStack = [];
+			this.elemArr = [];
+			return false;
+		}
         this.operand_expected = false;
         wasRigthParentheses = false;
         continue;
@@ -4919,14 +4921,6 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 		}
 		this.isCalculate = false;
 		this.isDirty = false;
-		if(!!this.ca != this.value.ca){
-			if (this.value.ca) {
-				this.wb.dependencyFormulas.startListeningVolatile(this);
-			} else {
-				this.wb.dependencyFormulas.endListeningVolatile(this);
-			}
-			this.ca = this.value.ca;
-		}
 	};
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
