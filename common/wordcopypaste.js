@@ -2035,7 +2035,7 @@ PasteProcessor.prototype =
 			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
 			
 			var sProps = Asc.c_oSpecialPasteProps;
-			var props = [sProps.paste, sProps.pasteOnlyValues];
+			var props = [sProps.paste, sProps.mergeFormatting, sProps.pasteOnlyValues];
 			specialPasteShowOptions.asc_setOptions(props);
 		}
 		
@@ -2121,6 +2121,7 @@ PasteProcessor.prototype =
 			}
 			case Asc.c_oSpecialPasteProps.pasteOnlyValues:
 			{	
+				//в данному случае мы должны применить к вставленному фрагменту стиль paraRun, в который вставляем
 				var selection = this.oDocument.Get_SelectionState();
 				if(selection && selection[1])
 				{
@@ -2128,11 +2129,11 @@ PasteProcessor.prototype =
 					var pasteIntoParaRunPr =  this.oDocument.Content[selection[1].CurPos.ContentPos].Content[selection[0].CurPos.ContentPos.Data[0]].Pr;
 				}
 				
-				//в данному случае мы должны применить к вставленному фрагменту стиль paraRun, в который вставляем
 				paragraph.Clear_TextFormatting();
 				paragraph.Clear_Formatting();
 				paragraph.Pr = new CParaPr();
-				paragraph.CompiledPr.Pr.ParaPr = paragraph.Pr;
+				paragraph.Set_Pr(pasteIntoParagraphPr);
+				paragraph.CompiledPr.Pr.ParaPr = pasteIntoParagraphPr;
 				
 				for(var j = 0; j < paragraph.Content.length; j++)
 				{
@@ -2143,6 +2144,11 @@ PasteProcessor.prototype =
 						paragraph.Content[j].Set_Pr( pasteIntoParaRunPr );
 					}
 				}
+				
+				break;
+			}
+			case Asc.c_oSpecialPasteProps.mergeFormatting:
+			{
 				
 				break;
 			}

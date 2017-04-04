@@ -1093,7 +1093,9 @@
 		linkedPicture: 14,
 
 		sourceformatting: 15,
-		destinationFormatting: 16
+		destinationFormatting: 16,
+		
+		mergeFormatting: 17
 	};
 	
 	//------------------------------------------------------------export--------------------------------------------------
@@ -1770,6 +1772,7 @@
 	prot['linkedPicture'] = prot.linkedPicture;
 	prot['sourceformatting'] = prot.sourceformatting;
 	prot['destinationFormatting'] = prot.destinationFormatting;
+	prot['mergeFormatting'] = prot.mergeFormatting;
 	
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =
