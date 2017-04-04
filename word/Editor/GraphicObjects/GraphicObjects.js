@@ -535,6 +535,7 @@ CGraphicObjects.prototype =
                 chart_props.severalCharts = props_by_types.chartProps.severalCharts;
                 chart_props.severalChartStyles = props_by_types.chartProps.severalChartStyles;
                 chart_props.severalChartTypes = props_by_types.chartProps.severalChartTypes;
+                chart_props.lockAspect = props_by_types.chartProps.lockAspect;
                 if(this.selection.group){
                     chart_props.description = props_by_types.chartProps.description;
                     chart_props.title = props_by_types.chartProps.title;
