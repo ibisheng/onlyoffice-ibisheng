@@ -8491,7 +8491,9 @@ function CPres()
 
         this.ReadDrawing = function(reader, stream, logicDocument, paraDrawing)
         {
-            this.BaseReader = reader;
+            if(reader){
+                this.BaseReader = reader;
+            }
             if (this.Reader == null)
                 this.Reader = new AscCommon.BinaryPPTYLoader();
 
@@ -8615,7 +8617,9 @@ function CPres()
 
         this.ReadTextBody = function(reader, stream, shape, presentation)
         {
-            this.BaseReader = reader;
+            if(reader){
+                this.BaseReader = reader;
+            }
             if (this.Reader == null)
                 this.Reader = new AscCommon.BinaryPPTYLoader();
             if(presentation)
@@ -8652,7 +8656,9 @@ function CPres()
 
         this.ReadTextBodyTxPr = function(reader, stream, shape)
         {
-            this.BaseReader = reader;
+            if(reader){
+                this.BaseReader = reader;
+            }
             if (this.Reader == null)
                 this.Reader = new AscCommon.BinaryPPTYLoader();
 
@@ -9354,7 +9360,10 @@ function CPres()
 
         this.ReadTheme = function(reader, stream)
         {
-            this.BaseReader = reader;
+            if(reader)
+            {
+                this.BaseReader = reader;
+            }
             if (this.Reader == null)
                 this.Reader = new AscCommon.BinaryPPTYLoader();
 

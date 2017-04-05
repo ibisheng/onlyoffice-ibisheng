@@ -2277,6 +2277,7 @@ CShape.prototype.copy = function () {
     {
         copy.setBFromSerialize(true);
     }
+    copy.setLocks(this.locks);
     copy.cachedImage = this.getBase64Img();
     copy.cachedPixH = this.cachedPixH;
     copy.cachedPixW = this.cachedPixW;

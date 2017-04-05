@@ -284,6 +284,7 @@ function CGroupShape()
         copy.cachedImage = this.getBase64Img();
         copy.cachedPixH = this.cachedPixH;
         copy.cachedPixW = this.cachedPixW;
+        copy.setLocks(this.locks);
         if(this.fromSerialize)
         {
             copy.setBFromSerialize(true);

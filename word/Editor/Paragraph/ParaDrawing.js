@@ -1394,8 +1394,9 @@ ParaDrawing.prototype.OnEnd_MoveInline = function(NearPos)
 
 	// При переносе всегда создаем копию, чтобы в совместном редактировании не было проблем
 	var NewParaDrawing = this.Copy();
+    this.DocumentContent.Select_DrawingObject(NewParaDrawing.Get_Id());
 	NewParaDrawing.Add_ToDocument(NearPos, true, RunPr);
-	this.DocumentContent.Select_DrawingObject(NewParaDrawing.Get_Id());
+
 };
 ParaDrawing.prototype.Get_ParentTextTransform = function()
 {

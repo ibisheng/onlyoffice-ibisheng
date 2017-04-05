@@ -9364,6 +9364,12 @@ CChartSpace.prototype.getChartSizes = function()
             }
         }
     }
+    if(oChartSize.w <= 0){
+        oChartSize.w = 1;
+    }
+    if(oChartSize.h <= 0){
+        oChartSize.h = 1;
+    }
     return oChartSize;
 };
 
