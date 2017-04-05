@@ -2448,7 +2448,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                     };
 
                 if (type_Table === Element.GetType())
-                    this.private_RecalculateFlowTable(RecalcInfo)
+                    this.private_RecalculateFlowTable(RecalcInfo);
                 else if (type_Paragraph === Element.Get_Type())
                     this.private_RecalculateFlowParagraph(RecalcInfo);
 
