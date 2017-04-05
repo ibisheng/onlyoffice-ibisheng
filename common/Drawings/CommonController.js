@@ -2857,6 +2857,32 @@ DrawingObjectsController.prototype =
         }
         //Title Settings
         chart_space.setChart(chart_space.chart.createDuplicate());
+
+        /*if(AscFormat.isRealNumber(style_index) && style_index > 0 && style_index < 49 && chart_space.style !== style_index)
+        {
+            if(!b_clear_formatting)
+            {
+                chart_space.clearFormatting();
+            }
+            chart_space.setStyle(style_index);
+        }*/
+
+        var chart = chart_space.chart;
+        var plot_area = chart.plotArea;
+        var type = chartSettings.getType();
+        if(AscFormat.isRealNumber(style_index)){
+            --style_index;
+            var oCurChartSettings = this.getPropsFromChart(chartSpace);
+            var _cur_type = oCurChartSettings.type;
+            if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][style_index]){
+
+                plot_area.removeCharts(1, plot_area.charts.length - 1);
+                AscFormat.ApplyPresetToChartSpace(chartSpace, AscCommon.g_oChartPresets[_cur_type][style_index], chartSettings.bCreate);
+                return;
+            }
+        }
+
+
         chart_space.setStyle(chart_space.style);
         if(this.drawingObjects && this.drawingObjects.getWorksheet && typeof sRange === "string" && sRange.length > 0)
         {
@@ -2883,17 +2909,17 @@ DrawingObjectsController.prototype =
                 if(!(chart_space.bbox && chart_space.bbox.seriesBBox && b_equal_ws
                     && b_equal_bbox && b_equal_vert ) && !bLimit)
                 {
-					var catHeadersBBox, serHeadersBBox;
+                    var catHeadersBBox, serHeadersBBox;
                     if(chart_space.bbox && b_equal_bbox && b_equal_ws && !b_equal_vert)
                     {
                         if(chart_space.bbox.catBBox)
                             serHeadersBBox = {r1: chart_space.bbox.catBBox.r1, r2: chart_space.bbox.catBBox.r2,
-								c1: chart_space.bbox.catBBox.c1, c2: chart_space.bbox.catBBox.c2};
+                                c1: chart_space.bbox.catBBox.c1, c2: chart_space.bbox.catBBox.c2};
                         if(chart_space.bbox.serBBox)
                             catHeadersBBox = {r1: chart_space.bbox.serBBox.r1, r2: chart_space.bbox.serBBox.r2,
-								c1: chart_space.bbox.serBBox.c1, c2: chart_space.bbox.serBBox.c2};
+                                c1: chart_space.bbox.serBBox.c1, c2: chart_space.bbox.serBBox.c2};
                     }
-					var chartSeries = AscFormat.getChartSeries(ws_view.model, chartSettings, catHeadersBBox, serHeadersBBox);
+                    var chartSeries = AscFormat.getChartSeries(ws_view.model, chartSettings, catHeadersBBox, serHeadersBBox);
                     //chart_space.clearFormatting(true);
                     b_clear_formatting = true;
                     chart_space.rebuildSeriesFromAsc(chartSeries);
@@ -2901,25 +2927,7 @@ DrawingObjectsController.prototype =
             }
         }
 
-        /*if(AscFormat.isRealNumber(style_index) && style_index > 0 && style_index < 49 && chart_space.style !== style_index)
-        {
-            if(!b_clear_formatting)
-            {
-                chart_space.clearFormatting();
-            }
-            chart_space.setStyle(style_index);
-        }*/
-        var type = chartSettings.getType();
-        if(AscFormat.isRealNumber(style_index)){
-            --style_index;
-            var oCurChartSettings = this.getPropsFromChart(chartSpace);
-            var _cur_type = oCurChartSettings.type;
-            if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][style_index]){
-                AscFormat.ApplyPresetToChartSpace(chartSpace, AscCommon.g_oChartPresets[_cur_type][style_index], chartSettings.bCreate);
-                return;
-            }
-        }
-        var chart = chart_space.chart;
+
         var title_show_settings = chartSettings.getTitle();
         if(title_show_settings === c_oAscChartTitleShowSettings.none)
         {
@@ -2940,7 +2948,6 @@ DrawingObjectsController.prototype =
                 chart.title.setOverlay(title_show_settings === c_oAscChartTitleShowSettings.overlay);
             }
         }
-        var plot_area = chart.plotArea;
         //horAxisLabel
 
 

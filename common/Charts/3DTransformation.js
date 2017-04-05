@@ -1398,7 +1398,7 @@ Processor3D.prototype._calculateCameraDiffZX = function (newPoints)
 	
 	//TODO пока включаю для ВСЕГО checkOutSideArea(медленная функция), затем нужно переделать, используя закомментированный код сверху
 	this.cameraDiffZ = -minZ;
-	this.checkOutSideArea(newPoints);
+	this.checkOutSideArea2(newPoints);
 	
 };
 
