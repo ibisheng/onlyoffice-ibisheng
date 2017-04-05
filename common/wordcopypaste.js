@@ -2076,7 +2076,7 @@ PasteProcessor.prototype =
 				
 				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
 				{
-					aNewContent[i] = this._specialPasteParagraphConvert(aNewContent[i], curDocSelection);
+					this._specialPasteItemConvert(aNewContent[i], curDocSelection);
 				}
 				
                 if (i == length - 1 && true != this.bInBlock && type_Paragraph == oSelectedElement.Element.GetType())
@@ -2111,7 +2111,54 @@ PasteProcessor.prototype =
             paragraph.Clear_NearestPosArray(aNewContent);
         }
     },
-	
+
+	_specialPasteItemConvert: function(item, curDocSelection)
+	{
+		var res = item;
+		var type = item.GetType();
+		switch(type)
+		{
+			case type_Paragraph:
+			{
+				res = this._specialPasteParagraphConvert(item, curDocSelection);
+				break;
+			}
+			case type_Table:
+			{
+				res = this._specialPasteTableConvert(item, curDocSelection);
+				break;
+			}
+		}
+		return res;
+	},
+
+	_specialPasteTableConvert: function(table, curDocSelection)
+	{
+		//TODO временная функция
+		var res = table;
+
+		for(var i = 0; i < table.Content.length; i++)
+		{
+			for(var j = 0; j < table.Content[i].Content.length; j++)
+			{
+				var cDocumentContent = table.Content[i].Content[j].Content;
+				for(var n = 0; n < cDocumentContent.Content.length; n++)
+				{
+					if(cDocumentContent.Content[n] instanceof Paragraph)
+					{
+						this._specialPasteParagraphConvert(cDocumentContent.Content[n], curDocSelection);
+					}
+					else if(cDocumentContent.Content[n] instanceof CTable)
+					{
+						this._specialPasteTableConvert(cDocumentContent.Content[n], curDocSelection);
+					}
+				}
+			}
+		}
+
+		return res;
+	},
+
 	_specialPasteParagraphConvert: function(paragraph, curDocSelection)
 	{
 		var res = paragraph;
@@ -2137,6 +2184,10 @@ PasteProcessor.prototype =
 				if(pasteIntoParagraphPr)
 				{
 					paragraph.Set_Pr(pasteIntoParagraphPr);
+					if(paragraph.TextPr)
+					{
+						paragraph.TextPr.Value = pasteIntoParaRunPr;
+					}
 				}
 				
 				if(pasteIntoParaRunPr)
@@ -2154,9 +2205,14 @@ PasteProcessor.prototype =
 			}
 			case Asc.c_oSpecialPasteProps.mergeFormatting:
 			{
+				//ms почему-то при merge игнорирует заливку текста
 				if(pasteIntoParagraphPr)
 				{
 					paragraph.Pr.Merge(pasteIntoParagraphPr);
+					if(paragraph.TextPr)
+					{
+						paragraph.TextPr.Value.Merge(pasteIntoParaRunPr);
+					}
 				}
 				
 				if(pasteIntoParaRunPr)
