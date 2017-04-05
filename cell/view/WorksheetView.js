@@ -6923,13 +6923,19 @@
         return this._getColumnTitle(c1) + this._getRowTitle(r1);
     };
 
-    WorksheetView.prototype.getSelectionRangeValue = function () {
-        // ToDo проблема с выбором целого столбца/строки
-        var ar = this.model.selectionRange.getLast().clone(true);
-        var sName = ar.getAbsName();
-        return (c_oAscSelectionDialogType.FormatTable === this.selectionDialogType) ? sName :
-          parserHelp.get3DRef(this.model.getName(), sName);
-    };
+	WorksheetView.prototype.getSelectionRangeValue = function () {
+		// ToDo проблема с выбором целого столбца/строки
+		var ar = this.model.selectionRange.getLast().clone(true);
+		var sAbsName = ar.getAbsName();
+		var sName = (c_oAscSelectionDialogType.FormatTable === this.selectionDialogType) ? sAbsName :
+			parserHelp.get3DRef(this.model.getName(), sAbsName);
+		var type = ar.type;
+		var selectionRangeValueObj = new AscCommonExcel.asc_CSelectionRangeValue();
+		selectionRangeValueObj.asc_setName(sName);
+		selectionRangeValueObj.asc_setType(type);
+
+		return selectionRangeValueObj;
+	};
 
     WorksheetView.prototype.getSelectionInfo = function () {
         return this.objectRender.selectedGraphicObjectsExists() ? this._getSelectionInfoObject() :
