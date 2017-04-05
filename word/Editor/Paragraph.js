@@ -62,7 +62,7 @@ var UnknownValue  = null;
 var REVIEW_COLOR = new AscCommon.CColor(255, 0, 0, 255);
 
 /**
- *
+ * Класс Paragraph
  * @constructor
  * @extends {CDocumentContentElementBase}
  */
