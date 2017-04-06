@@ -95,6 +95,10 @@ CBlockLevelSdt.prototype.Is_EmptyPage = function(CurPage)
 	// TODO: Реализовать
 	return false;
 };
+CBlockLevelSdt.prototype.Get_PagesCount = function()
+{
+	return this.Content.Get_PagesCount();
+};
 CBlockLevelSdt.prototype.Reset_RecalculateCache = function()
 {
 	this.Content.Reset_RecalculateCache();
@@ -110,8 +114,54 @@ CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 	// String : Content id
 	this.Content = this.LogicDocument.Get_TableId().Get_ById(Reader.GetString2());
 };
+//----------------------------------------------------------------------------------------------------------------------
+CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
+{
+	return this.Parent.Is_HdrFtr(bReturnHdrFtr);
+};
+CBlockLevelSdt.prototype.Is_TopDocument = function(bReturnTopDocument)
+{
+	return this.Parent.Is_TopDocument(bReturnTopDocument);
+};
+CBlockLevelSdt.prototype.Is_Cell = function()
+{
+	return this.Parent.Is_TableCellContent();
+};
+CBlockLevelSdt.prototype.Get_Numbering = function()
+{
+	return this.LogicDocument.Get_Numbering();
+};
+CBlockLevelSdt.prototype.Get_Styles = function()
+{
+	return this.LogicDocument.Get_Styles();
+};
+CBlockLevelSdt.prototype.Get_TableStyleForPara = function()
+{
+	return this.Parent.Get_TableStyleForPara();
+};
+CBlockLevelSdt.prototype.Get_ShapeStyleForPara = function()
+{
+	return this.Parent.Get_ShapeStyleForPara();
+};
+CBlockLevelSdt.prototype.Get_Theme = function()
+{
+	return this.Parent.Get_Theme();
+};
+CBlockLevelSdt.prototype.Get_PrevElementEndInfo = function()
+{
+	return this.Parent.Get_PrevElementEndInfo(this);
+};
+CBlockLevelSdt.prototype.Get_EndInfo = function()
+{
+	return this.Content.Get_EndInfo();
+};
+CBlockLevelSdt.prototype.Is_UseInDocument = function(Id)
+{
+	if (Id === this.Content.GetId())
+		return this.Parent.Is_UseInDocument(this.GetId());
 
-
+	return false;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;

@@ -142,6 +142,10 @@ CDocumentContentElementBase.prototype.Write_ToBinary2 = function(Writer)
 CDocumentContentElementBase.prototype.Read_FromBinary2 = function(Reader)
 {
 };
+CDocumentContentElementBase.prototype.Get_PagesCount = function()
+{
+	return 0;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
@@ -188,7 +192,10 @@ CDocumentContentElementBase.prototype.private_GetColumnIndex = function(CurPage)
 	return (this.ColumnNum + CurPage) - (((this.ColumnNum + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
 };
 //----------------------------------------------------------------------------------------------------------------------
-
+CDocumentContentElementBase.prototype.GetPagesCount = function()
+{
+	return this.Get_PagesCount();
+};
 
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

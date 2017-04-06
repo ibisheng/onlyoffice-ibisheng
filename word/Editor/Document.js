@@ -4972,7 +4972,7 @@ CDocument.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum, Columns
         if (Y < PageBounds.Top)
             return InlineElements[Pos];
 
-        if (Item.Pages.length > 1)
+        if (Item.GetPagesCount() > 1)
         {
             if (true !== Item.Is_StartFromNewPage())
                 return InlineElements[Pos + 1];
