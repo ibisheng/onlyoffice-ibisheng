@@ -2131,7 +2131,7 @@ PasteProcessor.prototype =
                 var LastPosCurDoc = oDoc.CurPos.ContentPos;
                 //����� ��������� ��������
                 var oSourceFirstPar = Item;
-                var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+                var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc);
                 if(true !== oSourceFirstPar.Cursor_IsEnd() || oSourceFirstPar.IsEmpty())
                     oSourceFirstPar.Split(oSourceLastPar);
                 var oInsFirstPar = aNewContent[0];
@@ -2920,7 +2920,7 @@ PasteProcessor.prototype =
 						} 
 						
 						//create paragraph, pararun and paradrawing
-						var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument, 0, 0, 0, 0, 0);
+						var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument);
 						var graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);	
 						
 						var tempParaRun = new ParaRun();
@@ -3574,7 +3574,7 @@ PasteProcessor.prototype =
 				if(isGraphicFrame && drawings.length > 1 && drawings[i].base64)//если кроме таблички(при вставке из презентаций) содержатся ещё данные, вставляем в виде base64
 				{
 					if(!tempParagraph)
-						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
+						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
 					
 					extX = drawings[i].ExtX;
 					extY = drawings[i].ExtY;
@@ -3606,7 +3606,7 @@ PasteProcessor.prototype =
 				else
 				{
 					if(!tempParagraph)
-						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
+						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
 					
 					extX = drawings[i].ExtX;
 					extY = drawings[i].ExtY;
@@ -5628,7 +5628,7 @@ PasteProcessor.prototype =
 		if(this.pasteInPresentationShape)
 			bFromPresentation = true;
 			
-		this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field, this.oDocument.bPresentation === true );
+		this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, this.oDocument.bPresentation === true );
         this.oCurParContentPos = this.oCurPar.CurPos.ContentPos;
         this.oCurRun = new ParaRun(this.oCurPar);
         this.oCurRunContentPos = 0;
@@ -6228,7 +6228,7 @@ PasteProcessor.prototype =
         if(0 == oPasteProcessor.aContent.length)
         {
             var oDocContent = cell.Content;
-            var oNewPar = new Paragraph(oDocContent.DrawingDocument, oDocContent, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+            var oNewPar = new Paragraph(oDocContent.DrawingDocument, oDocContent);
             //���������� ��������� ��������� - ����� ��� ����������� �� ������ � ������ ���� ��� ����������� ������ ������
 			var oNewSpacing = new CParaSpacing();
 			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: Asc.linerule_Auto});

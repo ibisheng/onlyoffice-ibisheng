@@ -77,9 +77,6 @@ var type_Table = 0x0002;
  * @constructor
  * @extends {CDocumentContentElementBase}
  */
-//----------------------------------------------------------------------------------------------------------------------
-// Класс  CTable
-//----------------------------------------------------------------------------------------------------------------------
 function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, Rows, Cols, TableGrid, bPresentation)
 {
 	CDocumentContentElementBase.call(this, Parent);
@@ -2573,7 +2570,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 						// Параграф начинается до заданной страницы и заканчивается после. Нам нужно разделить его на
 						// 2 параграфа в заданной точке.
 
-						var NewParagraph = new Paragraph(NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0);
+						var NewParagraph = new Paragraph(NewDocContent.DrawingDocument, NewDocContent);
 						NearestPos.Paragraph.Split(NewParagraph, NearestPos.ContentPos);
 						NewDocContent.Internal_Content_Add(NewIndex + 1, NewParagraph);
 
@@ -2589,7 +2586,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 						// в конец добавляем новый пустой параграф
 						NewIndex++;
 						if (NewIndex >= NewDocContent.Content.length - 1)
-							NewDocContent.Internal_Content_Add(NewDocContent.Content.length, new Paragraph(NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0));
+							NewDocContent.Internal_Content_Add(NewDocContent.Content.length, new Paragraph(NewDocContent.DrawingDocument, NewDocContent));
 					}
 
 				}
@@ -2683,7 +2680,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 				}
 				else if (true != TarParagraph.Cursor_IsStart(ParaContentPos))
 				{
-					var NewParagraph = new Paragraph(NewDocContent.DrawingDocument, NewDocContent, 0, 0, 0, 0, 0);
+					var NewParagraph = new Paragraph(NewDocContent.DrawingDocument, NewDocContent);
 					NearestPos.Paragraph.Split(NewParagraph, NearestPos.ContentPos);
 					NewDocContent.Internal_Content_Add(NewIndex + 1, NewParagraph);
 

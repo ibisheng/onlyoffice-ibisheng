@@ -105,7 +105,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
     this.Split = Split; // Разделяем ли на страницы
     this.bPresentation = bPresentation; // Разделяем ли на страницы
 
-    this.Content[0] = new Paragraph( DrawingDocument, this, 0, X, Y, XLimit, YLimit, bPresentation );
+    this.Content[0] = new Paragraph( DrawingDocument, this, bPresentation );
     this.Content[0].Correct_Content();
     this.Content[0].Set_DocumentNext( null );
     this.Content[0].Set_DocumentPrev( null );
@@ -1489,8 +1489,8 @@ CDocumentContent.prototype.HdrFtr_AddPageNum             = function(Align, Style
     this.Internal_Content_RemoveAll();
 
     // Добавляем 2 новых параграфа
-    var Para1 = new Paragraph(this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true);
-    var Para2 = new Paragraph(this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true);
+    var Para1 = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
+    var Para2 = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
 
     this.Internal_Content_Add(0, Para1);
     this.Internal_Content_Add(1, Para2);
@@ -1530,7 +1530,7 @@ CDocumentContent.prototype.Clear_Content                 = function()
     this.Internal_Content_RemoveAll();
 
     // Добавляем новый параграф
-    var Para = new Paragraph(this.DrawingDocument, this, 0, this.X, this.Y, this.XLimit, this.YLimit, this.bPresentation === true);
+    var Para = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
     this.Internal_Content_Add(0, Para);
 };
 CDocumentContent.prototype.Add_Content                   = function(OtherContent)
@@ -2194,7 +2194,7 @@ CDocumentContent.prototype.Add_NewParagraph = function()
             {
                 var ItemReviewType = Item.Get_ReviewType();
                 // Создаем новый параграф
-                var NewParagraph   = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+                var NewParagraph   = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
 
                 // Проверим позицию в текущем параграфе
                 if (true === Item.Cursor_IsEnd())
@@ -2262,7 +2262,7 @@ CDocumentContent.prototype.Add_NewParagraph = function()
             if (0 === this.CurPos.ContentPos && Item.Cursor_IsStart(true))
             {
                 // Создаем новый параграф
-                var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+                var NewParagraph = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
                 this.Internal_Content_Add(0, NewParagraph);
 
                 this.CurPos.ContentPos = 0;
@@ -2285,7 +2285,7 @@ CDocumentContent.prototype.Extend_ToPos                       = function(X, Y)
 
     while (true)
     {
-        var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+        var NewParagraph = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
 		var NewRun       = new ParaRun(NewParagraph, false);
 		NewParagraph.Add_ToContent(0, NewRun);
 
@@ -2533,7 +2533,7 @@ CDocumentContent.prototype.Add_InlineTable                    = function(Cols, R
                 else
                 {
                     // Создаем новый параграф
-                    var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+                    var NewParagraph = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
                     Item.Split(NewParagraph);
 
                     // Добавляем новый параграф
@@ -4414,7 +4414,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
             else
             {
                 // Создаем новый параграф
-                var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+                var NewParagraph = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
                 Para.Split(NewParagraph);
                 this.Internal_Content_Add(DstIndex + 1, NewParagraph);
 
@@ -4426,7 +4426,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
             if (true === bAddEmptyPara)
             {
                 // Создаем новый параграф
-				NewEmptyPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0, this.bPresentation === true);
+				NewEmptyPara = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
 				NewEmptyPara.Set_Pr(ParaS.Pr);
 				NewEmptyPara.TextPr.Apply_TextPr(ParaS.TextPr.Value);
                 this.Internal_Content_Add(DstIndex + 1, NewEmptyPara);
@@ -8300,7 +8300,7 @@ CDocumentContent.prototype.Internal_Content_Add       = function(Position, NewOb
 
     // Проверим, что последний элемент не таблица
     if (false != bCheckTable && type_Table == this.Content[this.Content.length - 1].GetType())
-        this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit, this.bPresentation === true));
+        this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
 
     this.private_ReindexContent(Position);
 };
@@ -8333,7 +8333,7 @@ CDocumentContent.prototype.Internal_Content_Remove    = function(Position, Count
 
     // Проверим, что последний элемент не таблица
     if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Table == this.Content[this.Content.length - 1].GetType()))
-        this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 50, 50, this.XLimit, this.YLimit, this.bPresentation === true));
+        this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
 
     this.private_ReindexContent(Position);
 };

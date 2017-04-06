@@ -2430,7 +2430,7 @@
 			
 			_convertTableFromExcelToDocument: function(worksheet, aContentExcel, documentContent)
 			{
-				var oCurPar = new Paragraph(worksheet.model.DrawingDocument, documentContent, 0, 0, 0, 0, 0);
+				var oCurPar = new Paragraph(worksheet.model.DrawingDocument, documentContent);
 				
 				var getElem = function(text, format, isAddSpace, isHyperLink)
 				{

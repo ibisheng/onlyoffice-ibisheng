@@ -1463,7 +1463,7 @@ CGraphicObjects.prototype =
         }
         else
         {
-            var para = new Paragraph(this.document.DrawingDocument, this.document, 0, 0, 0, 0, 0);
+            var para = new Paragraph(this.document.DrawingDocument, this.document);
             var selectedObjects, run, drawing, i;
             if(this.selection.groupSelection)
             {

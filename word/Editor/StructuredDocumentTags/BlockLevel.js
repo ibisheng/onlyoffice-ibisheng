@@ -50,14 +50,6 @@ function CBlockLevelSdt(oLogicDocument, oParent)
 	this.LogicDocument = oLogicDocument;
 	this.Content       = new CDocumentContent(this, oLogicDocument.Get_DrawingDocument(), 0, 0, 0, 0, true, false, false);
 
-	this.X            = 0;
-	this.Y            = 0;
-	this.XLimit       = 0;
-	this.YLimit       = 0;
-	this.PageNum      = 0;
-	this.ColumnNum    = 0;
-	this.ColumnsCount = 0;
-
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);
 }

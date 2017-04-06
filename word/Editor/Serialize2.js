@@ -6137,7 +6137,7 @@ function BinaryFileReader(doc, openParams)
 		this.Document.Content = this.oReadResult.DocumentContent;
 		if(this.Document.Content.length == 0)
         {
-            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
+            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document);
             this.Document.Content.push(oNewParagraph);
         }
 		// for(var i = 0, length = this.oReadResult.aPostOpenStyleNumCallbacks.length; i < length; ++i)
@@ -6354,7 +6354,7 @@ function BinaryFileReader(doc, openParams)
 			
 			if(this.Document.Content.length == 0)
 			{
-				var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
+				var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document);
 				this.Document.Content.push(oNewParagraph);
 			};
 			
@@ -8641,7 +8641,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 				if(this.openParams.parCount >= g_nErrorParagraphCount)
 					throw new Error(g_sErrorCharCountMessage);
 			}
-            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document, 0, 0, 0, 0, 0 );
+            var oNewParagraph = new Paragraph(this.Document.DrawingDocument, this.Document);
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadParagraph(t,l, oNewParagraph, Content);
             });

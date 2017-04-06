@@ -66,18 +66,9 @@ var REVIEW_COLOR = new AscCommon.CColor(255, 0, 0, 255);
  * @constructor
  * @extends {CDocumentContentElementBase}
  */
-function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
+function Paragraph(DrawingDocument, Parent, bFromPresentation)
 {
 	CDocumentContentElementBase.call(this, Parent);
-
-    this.PageNum      = PageNum;
-    this.ColumnNum    = 0;
-    this.ColumnsCount = 1;
-
-    this.X      = X;
-    this.Y      = Y;
-    this.XLimit = XLimit;
-    this.YLimit = YLimit;
 
     this.CompiledPr =
     {
@@ -107,7 +98,7 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     // Настройки секции
     this.SectPr = undefined; // undefined или CSectionPr
 
-    this.Bounds = new CDocumentBounds( X, Y, XLimit, Y );
+    this.Bounds = new CDocumentBounds(0, 0, 0, 0);
 
     this.RecalcInfo = new CParaRecalcInfo();
 
@@ -258,7 +249,7 @@ Paragraph.prototype.Set_Pr = function(oNewPr)
 };
 Paragraph.prototype.Copy = function(Parent, DrawingDocument)
 {
-	var Para = new Paragraph(DrawingDocument ? DrawingDocument : this.DrawingDocument, Parent, 0, 0, 0, 0, 0, !this.bFromDocument);
+	var Para = new Paragraph(DrawingDocument ? DrawingDocument : this.DrawingDocument, Parent, !this.bFromDocument);
 
 	// Копируем настройки
 	Para.Set_Pr(this.Pr.Copy());
@@ -306,7 +297,7 @@ Paragraph.prototype.Copy = function(Parent, DrawingDocument)
 };
 Paragraph.prototype.Copy2 = function(Parent)
 {
-	var Para = new Paragraph(this.DrawingDocument, Parent, 0, 0, 0, 0, 0, true);
+	var Para = new Paragraph(this.DrawingDocument, Parent, true);
 
 	// Копируем настройки
 	Para.Set_Pr(this.Pr.Copy());
@@ -6871,7 +6862,7 @@ Paragraph.prototype.Get_SelectedContent = function(DocContent)
 	}
 	else
 	{
-		Para = new Paragraph(this.DrawingDocument, this.Parent, 0, 0, 0, 0, 0, !this.bFromDocument);
+		Para = new Paragraph(this.DrawingDocument, this.Parent, !this.bFromDocument);
 
 		// Копируем настройки
 		Para.Set_Pr(this.Pr.Copy());

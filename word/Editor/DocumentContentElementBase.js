@@ -40,6 +40,7 @@
 
 /**
  * Базовый класс для элементов содержимого документа (Paragraph, CTable, CBlockLevelSdt)
+ * @param oParent - ссылка на базовый класс
  * @constructor
  */
 function CDocumentContentElementBase(oParent)
@@ -50,6 +51,14 @@ function CDocumentContentElementBase(oParent)
 	this.Prev   = null;
 	this.Next   = null;
 	this.Index  = -1; // перед тем как пользоваться этим параметром нужно у родительского класса вызывать this.Parent.Update_ContentIndexing();
+
+	this.X            = 0;
+	this.Y            = 0;
+	this.XLimit       = 0;
+	this.YLimit       = 0;
+	this.PageNum      = 0;
+	this.ColumnNum    = 0;
+	this.ColumnsCount = 0;
 }
 
 CDocumentContentElementBase.prototype.Is_Inline = function()
@@ -91,4 +100,14 @@ CDocumentContentElementBase.prototype.GetId = function()
 CDocumentContentElementBase.prototype.Get_Id = function()
 {
 	return this.GetId();
+};
+CDocumentContentElementBase.prototype.Reset = function(X, Y, XLimit, YLimit, PageAbs, ColumnAbs, ColumnsCount)
+{
+	this.X            = X;
+	this.Y            = Y;
+	this.XLimit       = XLimit;
+	this.YLimit       = YLimit;
+	this.PageNum      = PageAbs;
+	this.ColumnNum    = ColumnAbs ? ColumnAbs : 0;
+	this.ColumnsCount = ColumnsCount ? ColumnsCount : 1;
 };
