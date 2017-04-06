@@ -37,6 +37,7 @@
  * Time: 11:42
  */
 
+var type_Unknown = 0x00;
 
 /**
  * Базовый класс для элементов содержимого документа (Paragraph, CTable, CBlockLevelSdt)
@@ -61,6 +62,14 @@ function CDocumentContentElementBase(oParent)
 	this.ColumnsCount = 0;
 }
 
+CDocumentContentElementBase.prototype.Get_Type = function()
+{
+	return this.GetType();
+};
+CDocumentContentElementBase.prototype.GetType = function()
+{
+	return type_Unknown;
+};
 CDocumentContentElementBase.prototype.Is_Inline = function()
 {
 	return true;
@@ -111,3 +120,23 @@ CDocumentContentElementBase.prototype.Reset = function(X, Y, XLimit, YLimit, Pag
 	this.ColumnNum    = ColumnAbs ? ColumnAbs : 0;
 	this.ColumnsCount = ColumnsCount ? ColumnsCount : 1;
 };
+CDocumentContentElementBase.prototype.Recalculate_Page = function(CurPage)
+{
+	return recalcresult_NextElement;
+};
+CDocumentContentElementBase.prototype.Get_PageBounds = function(CurPage)
+{
+	return new CDocumentBounds(this.X, this.Y, this.XLimit, this.YLimit);
+};
+CDocumentContentElementBase.prototype.Is_EmptyPage = function(CurPage)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.Reset_RecalculateCache = function()
+{
+};
+
+//--------------------------------------------------------export--------------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;
+window['AscCommonWord'].type_Unknown = type_Unknown;

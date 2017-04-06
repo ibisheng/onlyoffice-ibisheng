@@ -37,6 +37,8 @@
  * Time: 17:00
  */
 
+var type_BlockLevelSdt = 0x0003;
+
 /**
  * @param oParent - родительский класс
  * @param oLogicDocument - главный класс документа
@@ -57,6 +59,10 @@ function CBlockLevelSdt(oLogicDocument, oParent)
 CBlockLevelSdt.prototype = Object.create(CDocumentContentElementBase.prototype);
 CBlockLevelSdt.prototype.constructor = CBlockLevelSdt;
 
+CBlockLevelSdt.prototype.GetType = function()
+{
+	return type_BlockLevelSdt;
+};
 CBlockLevelSdt.prototype.Is_Inline = function()
 {
 	return true;
@@ -93,3 +99,18 @@ CBlockLevelSdt.prototype.Reset_RecalculateCache = function()
 {
 	this.Content.Reset_RecalculateCache();
 };
+
+//--------------------------------------------------------export--------------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;
+window['AscCommonWord'].type_BlockLevelSdt = type_BlockLevelSdt;
+
+
+function TEST_ADD_SDT()
+{
+	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+	var oSdt = new CBlockLevelSdt(oLogicDocument, oLogicDocument);
+
+	oLogicDocument.Internal_Content_Add(1, oSdt);
+	oLogicDocument.Recalculate_FromStart();
+}

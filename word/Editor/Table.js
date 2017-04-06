@@ -226,7 +226,6 @@ function CTable(DrawingDocument, Parent, Inline, Rows, Cols, TableGrid, bPresent
         this.CurCell = null;
 
     this.TurnOffRecalc = false;
-    this.TurnOffRecalcEvent = false;
 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
                              // True, если ячейка попадает в выделение по ячейкам.
@@ -239,6 +238,10 @@ function CTable(DrawingDocument, Parent, Inline, Rows, Cols, TableGrid, bPresent
 CTable.prototype = Object.create(CDocumentContentElementBase.prototype);
 CTable.prototype.constructor = CTable;
 
+CTable.prototype.GetType = function()
+{
+	return type_Table;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Общие функции
 //----------------------------------------------------------------------------------------------------------------------
@@ -2434,14 +2437,6 @@ CTable.prototype.private_GetColumnIndex = function(CurPage)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции к которым идет обращение из родительского класса
 //----------------------------------------------------------------------------------------------------------------------
-CTable.prototype.GetType = function()
-{
-	return type_Table;
-};
-CTable.prototype.Get_Type = function()
-{
-	return type_Table;
-};
 CTable.prototype.Copy = function(Parent)
 {
 	var TableGrid = this.private_CopyTableGrid();
@@ -3371,14 +3366,6 @@ CTable.prototype.Is_Inline = function()
 		return true;
 
 	return this.Inline;
-};
-CTable.prototype.TurnOff_RecalcEvent = function()
-{
-	this.TurnOffRecalcEvent = true;
-};
-CTable.prototype.TurnOn_RecalcEvent = function()
-{
-	this.TurnOffRecalcEvent = false;
 };
 CTable.prototype.Set_ApplyToAll = function(bValue)
 {
@@ -10700,13 +10687,6 @@ CTable.prototype.Internal_CheckBorders = function(X, Y, PageNum)
 	}
 
 	return {Pos : CellPos, Border : -1};
-};
-CTable.prototype.Internal_OnContentRecalculate = function(bNeedDocumentRecalc, PageNum, DocumentIndex)
-{
-	if (false === this.TurnOffRecalcEvent)
-	{
-		this.Parent.OnContentRecalculate(bNeedDocumentRecalc, PageNum, DocumentIndex);
-	}
 };
 CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
 {

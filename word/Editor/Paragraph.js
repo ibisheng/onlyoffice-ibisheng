@@ -214,10 +214,6 @@ Paragraph.prototype.GetType = function()
 {
 	return type_Paragraph;
 };
-Paragraph.prototype.Get_Type = function()
-{
-	return type_Paragraph;
-};
 Paragraph.prototype.Save_StartState = function()
 {
 	this.StartState = new CParagraphStartState(this);
@@ -9114,14 +9110,6 @@ Paragraph.prototype.DocumentStatistics = function(Stats)
 
 	if (false === ParaStats.EmptyParagraph)
 		Stats.Add_Paragraph();
-};
-Paragraph.prototype.TurnOff_RecalcEvent = function()
-{
-	this.TurnOffRecalcEvent = true;
-};
-Paragraph.prototype.TurnOn_RecalcEvent = function()
-{
-	this.TurnOffRecalcEvent = false;
 };
 Paragraph.prototype.Set_ApplyToAll = function(bValue)
 {
