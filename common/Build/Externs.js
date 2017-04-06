@@ -59,5 +59,3 @@ function pointerup(){};
 function MSPointerDown(){};
 function MSPointerMove(){};
 function MSPointerUp(){};
-
-function PointerEvent(){};
