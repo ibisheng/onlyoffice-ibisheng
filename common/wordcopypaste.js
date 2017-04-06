@@ -2104,7 +2104,7 @@ PasteProcessor.prototype =
 
 		if(specialPasteShowOptions)
 		{
-			var cursorPos = this.oDocument.Cursor_GetPos();
+			var cursorPos = this.oLogicDocument.Cursor_GetPos();
 			var _Y = cursorPos.Y;
 			var _X = cursorPos.X;
 			var _PageNum = this.oLogicDocument.CurPage;
