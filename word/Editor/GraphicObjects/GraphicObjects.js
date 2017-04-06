@@ -2458,18 +2458,17 @@ CGraphicObjects.prototype =
 
     cursorGetPos: function()
     {
-        var text_object;
-        if(this.selection.textObject)
-        {
-            text_object = this.selection.textObject;
+        var oTargetDocContent = this.getTargetDocContent();
+        if(oTargetDocContent){
+            var oPos = oTargetDocContent.Cursor_GetPos();
+            var oTransform = oTargetDocContent.Get_ParentTextTransform();
+            if(oTransform){
+                var _x = oTransform.TransformPointX(oPos.X, oPos.Y);
+                var _y = oTransform.TransformPointY(oPos.X, oPos.Y);
+                return {X: _x, Y: _y};
+            }
+            return oPos;
         }
-        else if(this.selection.groupSelection && this.selection.groupSelection.textObject)
-        {
-            text_object = this.selection.groupSelection.textObject;
-        }
-        if(text_object)
-            return text_object.cursorGetPos();
-
         return {X: 0, Y: 0};
     },
 
