@@ -9838,6 +9838,10 @@
 			var cellValueData = newVal.getValueData();
 			if(cellValueData && cellValueData.value)
 			{
+				if(!specialPasteProps.formula)
+				{
+					cellValueData.formula = null;
+				}
 				rangeStyle.cellValueData = cellValueData;
 			}
 			else if(cellValueData && cellValueData.formula && !specialPasteProps.formula)
