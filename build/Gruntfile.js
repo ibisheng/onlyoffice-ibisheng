@@ -229,10 +229,14 @@ module.exports = function(grunt) {
 			replace: {
 				version: {
 					options: {
-						variables: {
-							Version: process.env['PRODUCT_VERSION'],
-							Build: process.env['BUILD_NUMBER']
-						}
+						patterns: [
+							{
+								json: {
+									Version: process.env['PRODUCT_VERSION'] || '0.0.0',
+									Build: process.env['BUILD_NUMBER'] || '0'
+								}
+							}
+						]
 					},
 					files: [
 						{ src: [sdkAllMinDst, sdkAllDst], dest: sdkDstFolder + '/' }

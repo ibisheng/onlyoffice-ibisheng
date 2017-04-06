@@ -260,6 +260,7 @@
 		this.m_oFactoryClass[AscDFH.historyitem_type_rad]                    = AscCommonWord.CRadical;
 		this.m_oFactoryClass[AscDFH.historyitem_type_deg_subsup]             = AscCommonWord.CDegreeSubSup;
 		this.m_oFactoryClass[AscDFH.historyitem_type_deg]                    = AscCommonWord.CDegree;
+		this.m_oFactoryClass[AscDFH.historyitem_type_BlockLevelSdt]          = AscCommonWord.CBlockLevelSdt;
 
 		if (window['AscCommonSlide'])
 		{

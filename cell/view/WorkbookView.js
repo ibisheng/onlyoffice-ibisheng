@@ -1137,7 +1137,7 @@
       // Отсылаем эвент с объектами
       this.handlers.trigger("asc_onMouseMove", arrMouseMoveObjects);
 
-      if (ct.target === c_oTargetType.MoveRange && ctrlKey && ct.cursor == "move") {
+      if (ct.target === c_oTargetType.MoveRange && ctrlKey && ct.cursor === "move") {
         ct.cursor = "copy";
       }
 

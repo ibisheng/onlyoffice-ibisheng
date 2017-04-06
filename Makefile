@@ -4,6 +4,12 @@ GRUNT_FLAGS = --no-color -v
 OUTPUT_DIR = deploy
 OUTPUT = $(OUTPUT_DIR)
 
+PRODUCT_VERSION ?= 0.0.0
+BUILD_NUMBER ?= 0
+
+GRUNT_ENV += PRODUCT_VERSION=$(PRODUCT_VERSION)
+GRUNT_ENV += BUILD_NUMBER=$(BUILD_NUMBER)
+
 WEBAPPS_DIR = web-apps
 WEBAPPS = $(OUTPUT)/$(WEBAPPS_DIR)
 NODE_MODULES = build/node_modules ../web-apps/build/node_modules
@@ -15,6 +21,8 @@ SDKJS_FILES += word/sdk-all.js
 SDKJS_FILES += cell/sdk-all.js
 SDKJS_FILES += slide/sdk-all.js
 
+.PHONY: all
+
 all: $(WEBAPPS)
 
 $(WEBAPPS): $(WEBAPPS_FILES)
@@ -23,7 +31,7 @@ $(WEBAPPS): $(WEBAPPS_FILES)
 
 $(WEBAPPS_FILES): $(NODE_MODULES) $(SDKJS_FILES)
 	cd ../$(WEBAPPS_DIR)/build  && \
-		$(GRUNT) deploy-$(filter %editor documents,$(subst /, ,$(@D)))-component $(GRUNT_FLAGS)
+		$(GRUNT_ENV) $(GRUNT) deploy-$(filter %editor documents,$(subst /, ,$(@D)))-component $(GRUNT_FLAGS)
 
 $(NODE_MODULES):
 	cd $(@D) && \
@@ -31,7 +39,7 @@ $(NODE_MODULES):
 
 $(SDKJS_FILES): $(NODE_MODULES)
 	cd build && \
-		$(GRUNT) build_$(@D) $(GRUNT_FLAGS)
+		$(GRUNT_ENV) $(GRUNT) build_$(@D) $(GRUNT_FLAGS)
 	
 clean:
 	rm -f $(WEBAPPS_FILES) $(SDKJS_FILES)

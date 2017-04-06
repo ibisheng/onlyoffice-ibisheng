@@ -399,7 +399,7 @@
 		Latin_Extended_Additional:   29,
 		Greek_Extended:              30,
 		General_Punctuation:         31
-	}
+	};
 
 	/**
 	 * @enum {number}
@@ -437,7 +437,7 @@
 		CJK_Strokes:                             61 - 32,
 		Alphabetic_Presentation_Forms:           62 - 32,
 		Arabic_Presentation_Forms_A:             63 - 32
-	}
+	};
 
 	/**
 	 * @enum {number}
@@ -475,7 +475,7 @@
 		Limbu:                                 93 - 64,
 		Tai_Le:                                94 - 64,
 		New_Tai_Lue:                           95 - 64
-	}
+	};
 
 	/**
 	 * @enum {number}
@@ -529,8 +529,8 @@
 	var c_oUnicodeRanges = [
 		new CRange(0x0000, 0x007F, c_oUnicodeRangesLID.Basic_Latin, lcid_enUS, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1), 0]),
 		new CRange(0x0080, 0x00FF, c_oUnicodeRangesLID.Latin_1_Supplement, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_1_Supplement), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1), 0]),
-		new CRange(0x0100, 0x017F, c_oUnicodeRangesLID.Latin_Extended_A, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_Extended_A), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1), 0]),
-		new CRange(0x0180, 0x024F, c_oUnicodeRangesLID.Latin_Extended_B, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_Extended_B), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1), 0]),
+		new CRange(0x0100, 0x017F, c_oUnicodeRangesLID.Latin_Extended_A, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_Extended_A), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1) | (1 << c_oCodePagesOS2_1.Latin_2) | (1 << c_oCodePagesOS2_1.Turkish) | (1 << c_oCodePagesOS2_1.Windows_Baltic), 0]),
+		new CRange(0x0180, 0x024F, c_oUnicodeRangesLID.Latin_Extended_B, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_Extended_B), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1) | (1 << c_oCodePagesOS2_1.Latin_2) | (1 << c_oCodePagesOS2_1.Turkish) | (1 << c_oCodePagesOS2_1.Windows_Baltic), 0]),
 		new CRange(0x0250, 0x02AF, c_oUnicodeRangesLID.IPA_Extensions, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.IPA_Extensions), 0, 0, 0, 0, 0]),
 		new CRange(0x02B0, 0x02FF, c_oUnicodeRangesLID.Spacing_Modifier_Letters, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Spacing_Modifier_Letters), 0, 0, 0, 0, 0]),
 		new CRange(0x0300, 0x036F, c_oUnicodeRangesLID.Combining_Diacritical_Marks, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Combining_Diacritical_Marks), 0, 0, 0, 0, 0]),
@@ -594,7 +594,7 @@
 		new CRange(0x1D00, 0x1D7F, c_oUnicodeRangesLID.Phonetic_Extensions, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.IPA_Extensions), 0, 0, 0, 0, 0]),
 		new CRange(0x1D80, 0x1DBF, c_oUnicodeRangesLID.Phonetic_Extensions_Supplement, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.IPA_Extensions), 0, 0, 0, 0, 0]),
 		new CRange(0x1DC0, 0x1DFF, c_oUnicodeRangesLID.Combining_Diacritical_Marks_Supplement, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Combining_Diacritical_Marks), 0, 0, 0, 0, 0]),
-		new CRange(0x1E00, 0x1EFF, c_oUnicodeRangesLID.Latin_Extended_Additional, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Latin_Extended_Additional), 0, 0, 0, 0, 0]),
+		new CRange(0x1E00, 0x1EFF, c_oUnicodeRangesLID.Latin_Extended_Additional, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Latin_Extended_Additional), 0, 0, 0, (1 << c_oCodePagesOS2_1.Vietnamese), 0]),
 		new CRange(0x1F00, 0x1FFF, c_oUnicodeRangesLID.Greek_Extended, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Greek_Extended), 0, 0, 0, 0, 0]),
 		new CRange(0x2000, 0x206F, c_oUnicodeRangesLID.General_Punctuation, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Punctuation), 0, 0, 0, 0, 0]),
 		new CRange(0x2070, 0x209F, c_oUnicodeRangesLID.Superscripts_and_Subscripts, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Superscripts_And_Subscripts), 0, 0, 0, 0]),
@@ -802,22 +802,50 @@
 		new CRange(0x100000, 0x10FFFF, c_oUnicodeRangesLID.Supplementary_Private_Use_Area_B, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Private_Use_plane_15), 0, 0, 0])
 	];
 
-	window.getSupportedFonts = function(_char)
+	function getRangeBySymbol(_char, _array)
 	{
-		var _range = null;
-		var _ranges = c_oUnicodeRanges;
+		// search range by symbol
+		var _start = 0;
+		var _end = _array.length - 1;
 
-		// TODO: fast find
-		for (var i = 0; i < _ranges.length; i++)
+		var _center = 0;
+		var _range = null;
+
+		if (_start >= _end)
+			return null;
+
+		while (_start < _end)
 		{
-			if (_ranges[i].Start <= _char && _ranges[i].End >= _char)
-			{
-				_range = _ranges[i];
-				break;
-			}
+			var _center = (_start + _end) >> 1;
+			var _range = _array[_center];
+
+			if (_range.Start > _char)
+				_end = _center - 1;
+			else if (_range.End < _char)
+				_start = _center + 1;
+			else
+				return _array[_center];
 		}
 
-		if (null == _ranges)
+		if (_start > _end)
+			return null;
+
+		_range = _array[_start];
+		if (_range.Start > _char || _range.End < _char)
+			return null;
+
+		return _array[_start];
+	}
+
+	window.getSupportedFonts = function(_char)
+	{
+		var _range = getRangeBySymbol(_char, c_oUnicodeRanges);
+		return window.getSupportedFontsByRange(_range);
+	};
+
+	window.getSupportedFontsByRange = function(_range)
+	{
+		if (null == _range)
 			return [];
 
 		var _system_fonts = AscFonts.g_fontApplication.g_fontSelections.List;
@@ -862,5 +890,142 @@
 
 		return _retArray;
 	};
+
+	/*
+	DEBUG FUNCTIONS
+
+	window.getSystemFontsInfo = function()
+	{
+		var _system_fonts = AscFonts.g_fontApplication.g_fontSelections.List;
+		var _count = _system_fonts.length;
+
+		var _log = "";
+		for (var j = 0; j < _count; j++)
+		{
+			var _select = _system_fonts[j];
+
+			_log = _select.m_wsFontName;
+
+			_log += " (";
+
+			if (_select.m_bBold && _select.m_bItalic)
+				_log += "bold italic";
+			else if (_select.m_bBold)
+				_log += "bold";
+			else if (_select.m_bItalic)
+				_log += "italic";
+			else
+				_log += "regular";
+
+			_log += "): ";
+
+			_log += (_select.m_ulUnicodeRange1 + ", ");
+			_log += (_select.m_ulUnicodeRange2 + ", ");
+			_log += (_select.m_ulUnicodeRange3 + ", ");
+			_log += (_select.m_ulUnicodeRange4 + ", ");
+			_log += (_select.m_ulCodePageRange1 + ", ");
+			_log += (_select.m_ulCodePageRange2);
+
+			console.log(_log);
+		}
+	};
+
+	window.getGlyphsByRange = function(_start, _end)
+	{
+		var _log = "";
+		var _tmp = "";
+		for (var i = _start; i <= _end; i++)
+		{
+			var _tmp = i.toString(16);
+			while (_tmp.length < 4)
+				_tmp = "0" + _tmp;
+			_log += ("uni" + _tmp + " ");
+		}
+		console.log(_log);
+	};
+	
+	*/
+
+	function CFontByCharacter()
+	{
+		this.UsedRanges = [];
+		this.FontsByRange = [];
+	}
+
+	CFontByCharacter.prototype =
+	{
+		getFontBySymbol : function(_char)
+		{
+			// ищем среди уже найденных
+			var _range = getRangeBySymbol(_char, this.UsedRanges);
+			if (_range != null)
+				return this.FontsByRange[_range.Name];
+
+			_range = getRangeBySymbol(_char, c_oUnicodeRanges);
+			if (!_range)
+				return "";
+
+			this.UsedRanges.push(_range);
+			var _fonts = window.getSupportedFontsByRange(_range);
+
+			var _length = _fonts.length;
+			if (0 == _length)
+				return "";
+
+			var _priority_fonts = {
+				"Arial" : 0,
+				"Times New Roman" : 1,
+				"Tahoma" : 2,
+				"Cambria" : 3,
+				"Calibri" : 4,
+				"Verdana" : 5,
+				"Georgia" : 6,
+				"Open Sans" : 7,
+				"Liberation Sans" : 8,
+				"Helvetica" : 9,
+				"Nimbus Sans L" : 10,
+				"DejaVu Sans" : 11,
+				"Liberation Serif" : 12,
+				"Trebuchet MS" : 13,
+				"Courier New" : 14,
+				"Carlito" : 15,
+				"Segoe UI" : 16,
+				"MS Gothic" : 17,
+				"SimSun" : 18,
+				"Nirmala UI" : 19,
+				"Batang" : 20,
+				"MS Mincho" : 21
+			};
+
+			var _fontName = "";
+			var _weight = 100;
+			var _test = undefined;
+			for (var i = 0; i < _length; i++)
+			{
+				_test = _priority_fonts[_fonts[i]];
+				if (undefined !== _test)
+				{
+					if (_test < _weight)
+					{
+						_weight = _test;
+						_fontName = _fonts[i];
+					}
+				}
+			}
+
+			if ("" == _fontName)
+			{
+				if (1 < _length && _fonts[0] == "Arial Unicode MS") // remove universal font
+					_fontName = _fonts[1];
+				else
+					_fontName = _fonts[0];
+			}
+
+			this.FontsByRange[_range.Name] = _fontName;
+			return _fontName;
+		}
+	};
+
+	window.FontPickerByCharacter = new CFontByCharacter();
 
 })(window);

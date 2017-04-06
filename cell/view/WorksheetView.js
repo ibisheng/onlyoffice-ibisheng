@@ -6923,13 +6923,19 @@
         return this._getColumnTitle(c1) + this._getRowTitle(r1);
     };
 
-    WorksheetView.prototype.getSelectionRangeValue = function () {
-        // ToDo проблема с выбором целого столбца/строки
-        var ar = this.model.selectionRange.getLast().clone(true);
-        var sName = ar.getAbsName();
-        return (c_oAscSelectionDialogType.FormatTable === this.selectionDialogType) ? sName :
-          parserHelp.get3DRef(this.model.getName(), sName);
-    };
+	WorksheetView.prototype.getSelectionRangeValue = function () {
+		// ToDo проблема с выбором целого столбца/строки
+		var ar = this.model.selectionRange.getLast().clone(true);
+		var sAbsName = ar.getAbsName();
+		var sName = (c_oAscSelectionDialogType.FormatTable === this.selectionDialogType) ? sAbsName :
+			parserHelp.get3DRef(this.model.getName(), sAbsName);
+		var type = ar.type;
+		var selectionRangeValueObj = new AscCommonExcel.asc_CSelectionRangeValue();
+		selectionRangeValueObj.asc_setName(sName);
+		selectionRangeValueObj.asc_setType(type);
+
+		return selectionRangeValueObj;
+	};
 
     WorksheetView.prototype.getSelectionInfo = function () {
         return this.objectRender.selectedGraphicObjectsExists() ? this._getSelectionInfoObject() :
@@ -11989,6 +11995,7 @@
         }
 
         var t = this;
+		var api = window["Asc"]["editor"];
         var ar = this.model.selectionRange.getLast().clone();
 
         var isChangeAutoFilterToTablePart = function (addFormatTableOptionsObj) {
@@ -12039,21 +12046,28 @@
 
                 t._isLockedCells(filterRange, /*subType*/null, addFilterCallBack);
             } else//ADD
-            {
-                var addFilterCallBack = function () {
-                    History.Create_NewPoint();
-                    History.StartTransaction();
+			{
+				var addFilterCallBack = function () {
+					History.Create_NewPoint();
+					History.StartTransaction();
 
-                    t.model.autoFilters.addAutoFilter(styleName, ar, addFormatTableOptionsObj);
+					if(null !== styleName)
+						api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
 
-                    //updates
-                    if (styleName && addNameColumn) {
-                        t.setSelection(filterRange);
-                    }
-                    t._onUpdateFormatTable(filterRange, !!(styleName), true);
+					//add to model
+					t.model.autoFilters.addAutoFilter(styleName, ar, addFormatTableOptionsObj);
 
-                    History.EndTransaction();
-                };
+					//updates
+					if (styleName && addNameColumn) {
+						t.setSelection(filterRange);
+					}
+					t._onUpdateFormatTable(filterRange, !!(styleName), true);
+
+					if(null !== styleName)
+						api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.SlowOperation);
+
+					History.EndTransaction();
+				};
 
                 if (styleName === null) {
                     addFilterCallBack();

@@ -609,7 +609,7 @@
         if (!nRows || nRows <= 0 || !nCols || nCols <= 0)
             return null;
 
-        var oTable = new CTable(private_GetDrawingDocument(), private_GetLogicDocument(), true, 0, 0, 0, 0, 0, nRows, nCols, [], false);
+        var oTable = new CTable(private_GetDrawingDocument(), private_GetLogicDocument(), true, nRows, nCols, [], false);
         oTable.CorrectBadGrid();
 		oTable.Set_TableW(undefined);
         oTable.Set_TableStyle2(undefined);

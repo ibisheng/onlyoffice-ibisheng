@@ -1385,7 +1385,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.SectPr = new CSectionPr(this);
     this.SectionsInfo = new CDocumentSectionsInfo();
 
-    this.Content[0] = new Paragraph(DrawingDocument, this, 0, 0, 0, 0, 0);
+    this.Content[0] = new Paragraph(DrawingDocument, this);
     this.Content[0].Set_DocumentNext(null);
     this.Content[0].Set_DocumentPrev(null);
 
@@ -1545,10 +1545,6 @@ CDocument.prototype.Init                           = function()
 {
 
 };
-CDocument.prototype.Get_Id                         = function()
-{
-    return this.Id;
-};
 CDocument.prototype.On_EndLoad                     = function()
 {
     // Обновляем информацию о секциях
@@ -1585,7 +1581,7 @@ CDocument.prototype.Add_TestDocument               = function()
     var RunsCount  = Text.length;
     for (var ParaIndex = 0; ParaIndex < ParasCount; ParaIndex++)
     {
-        var Para = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+        var Para = new Paragraph(this.DrawingDocument, this);
         //var Run = new ParaRun(Para);
         for (var RunIndex = 0; RunIndex < RunsCount; RunIndex++)
         {
@@ -2383,8 +2379,6 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
         // Пересчитываем элемент документа
         var Element = this.Content[Index];
 
-        Element.TurnOff_RecalcEvent();
-
         var RecalcResult = recalcresult_NextElement;
         var bFlow        = false;
 
@@ -2448,7 +2442,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                     };
 
                 if (type_Table === Element.GetType())
-                    this.private_RecalculateFlowTable(RecalcInfo)
+                    this.private_RecalculateFlowTable(RecalcInfo);
                 else if (type_Paragraph === Element.Get_Type())
                     this.private_RecalculateFlowParagraph(RecalcInfo);
 
@@ -2488,8 +2482,6 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                 RecalcResult         = Element.Recalculate_Page(ElementPageIndex);
             }
         }
-
-        Element.TurnOn_RecalcEvent();
 
         if (true != bFlow && (RecalcResult & recalcresult_NextElement || RecalcResult & recalcresult_NextPage))
         {
@@ -3913,7 +3905,7 @@ CDocument.prototype.Extend_ToPos = function(X, Y)
 
     while (true)
     {
-        var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+        var NewParagraph = new Paragraph(this.DrawingDocument, this);
         var NewRun       = new ParaRun(NewParagraph, false);
         NewParagraph.Add_ToContent(0, NewRun);
 
@@ -4091,7 +4083,7 @@ CDocument.prototype.Add_DropCap                = function(bInText)
     {
         this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddDropCap);
 
-        var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+        var NewParagraph = new Paragraph(this.DrawingDocument, this);
 
         var TextPr = OldParagraph.Split_DropCap(NewParagraph);
         var Before = OldParagraph.Get_CompiledPr().ParaPr.Spacing.Before;
@@ -4980,7 +4972,7 @@ CDocument.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum, Columns
         if (Y < PageBounds.Top)
             return InlineElements[Pos];
 
-        if (Item.Pages.length > 1)
+        if (Item.GetPagesCount() > 1)
         {
             if (true !== Item.Is_StartFromNewPage())
                 return InlineElements[Pos + 1];
@@ -5849,7 +5841,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			else
 			{
 				// Создаем новый параграф
-				var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+				var NewParagraph = new Paragraph(this.DrawingDocument, this);
 				Para.Split(NewParagraph);
 				this.Internal_Content_Add(DstIndex + 1, NewParagraph);
 
@@ -5861,7 +5853,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			if (true === bAddEmptyPara)
 			{
 				// Создаем новый параграф
-				NewEmptyPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+				NewEmptyPara = new Paragraph(this.DrawingDocument, this);
 				NewEmptyPara.Set_Pr(ParaS.Pr);
 				NewEmptyPara.TextPr.Apply_TextPr(ParaS.TextPr.Value);
 				this.Internal_Content_Add(DstIndex + 1, NewEmptyPara);
@@ -7546,7 +7538,7 @@ CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckT
 
 	// Проверим, что последний элемент не таблица
 	if (false != bCheckTable && type_Table == this.Content[this.Content.length - 1].GetType())
-		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this));
 
 	// Запоминаем, что нам нужно произвести переиндексацию элементов
 	this.private_ReindexContent(Position);
@@ -7584,7 +7576,7 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCorrect
 
 	// Проверим, что последний элемент не таблица
 	if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Table == this.Content[this.Content.length - 1].GetType()))
-		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this));
 
 	// Обновим информацию о секциях
 	this.SectionsInfo.Update_OnRemove(Position, Count, true);
@@ -9084,7 +9076,7 @@ CDocument.prototype.Check_SectionLastParagraph = function()
 
 	var Element = this.Content[Count - 1];
 	if (type_Paragraph === Element.GetType() && undefined !== Element.Get_SectionPr())
-		this.Internal_Content_Add(Count, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+		this.Internal_Content_Add(Count, new Paragraph(this.DrawingDocument, this));
 };
 CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 {
@@ -9106,7 +9098,7 @@ CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 		// Если мы стоим в параграфе, тогда делим данный параграф на 2 в текущей точке(даже если мы стоим в начале
 		// или в конце параграфа) и к первому параграфу приписываем конец секкции.
 
-		var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+		var NewParagraph = new Paragraph(this.DrawingDocument, this);
 
 		Element.Split(NewParagraph);
 
@@ -9125,7 +9117,7 @@ CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 		// секции. Если мы стоим в первой строке таблицы, таблицу делить не надо, достаточно добавить новый
 		// параграф перед ней.
 
-		var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+		var NewParagraph = new Paragraph(this.DrawingDocument, this);
 		var NewTable     = Element.Split_Table();
 
 		if (null === NewTable)
@@ -11477,7 +11469,7 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 		{
 			var ItemReviewType = Item.Get_ReviewType();
 			// Создаем новый параграф
-			var NewParagraph   = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+			var NewParagraph   = new Paragraph(this.DrawingDocument, this);
 
 			// Проверим позицию в текущем параграфе
 			if (true === Item.Cursor_IsEnd())
@@ -11560,7 +11552,7 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 		if (0 === this.CurPos.ContentPos && Item.Cursor_IsStart(true))
 		{
 			// Создаем новый параграф
-			var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+			var NewParagraph = new Paragraph(this.DrawingDocument, this);
 			this.Internal_Content_Add(0, NewParagraph);
 			this.CurPos.ContentPos    = 0;
 
@@ -11726,7 +11718,7 @@ CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
 			for (var Index = 0; Index < Cols; Index++)
 				Grid[Index] = W / Cols;
 
-			var NewTable = new CTable(this.DrawingDocument, this, true, 0, 0, 0, 0, 0, Rows, Cols, Grid);
+			var NewTable = new CTable(this.DrawingDocument, this, true, Rows, Cols, Grid);
 			NewTable.Set_ParagraphPrOnAdd(Item);
 
 			// Проверим позицию в текущем параграфе
@@ -11742,7 +11734,7 @@ CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
 			else
 			{
 				// Создаем новый параграф
-				var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+				var NewParagraph = new Paragraph(this.DrawingDocument, this);
 				Item.Split(NewParagraph);
 
 				// Добавляем новый параграф
@@ -13122,11 +13114,7 @@ CDocument.prototype.controller_SetParagraphAlign = function(Align)
 			if (type_Paragraph == Item.GetType())
 				Item.Set_Align(Align, true);
 			else if (type_Table == Item.GetType())
-			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphAlign(Align);
-				Item.TurnOn_RecalcEvent();
-			}
 		}
 	}
 	else
@@ -13164,11 +13152,7 @@ CDocument.prototype.controller_SetParagraphSpacing = function(Spacing)
 			if (type_Paragraph == Item.GetType())
 				Item.Set_Spacing(Spacing, false);
 			else if (type_Table == Item.GetType())
-			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphSpacing(Spacing);
-				Item.TurnOn_RecalcEvent();
-			}
 		}
 	}
 	else
@@ -13206,11 +13190,7 @@ CDocument.prototype.controller_SetParagraphTabs = function(Tabs)
 			if (type_Paragraph == Item.GetType())
 				Item.Set_Tabs(Tabs);
 			else if (type_Table == Item.GetType())
-			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphTabs(Tabs);
-				Item.TurnOn_RecalcEvent();
-			}
 		}
 	}
 	else
@@ -13263,9 +13243,7 @@ CDocument.prototype.controller_SetParagraphIndent = function(Ind)
 			}
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphIndent(Ind);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -13324,9 +13302,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 					this.Content[Index].Numbering_Remove();
 				else if (type_Table == this.Content[Index].GetType())
 				{
-					this.Content[Index].TurnOff_RecalcEvent();
 					this.Content[Index].Set_ParagraphNumbering(NumInfo);
-					this.Content[Index].TurnOn_RecalcEvent();
 				}
 			}
 		}
@@ -13382,9 +13358,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 							else if (type_Table == this.Content[Index].GetType())
 							{
-								this.Content[Index].TurnOff_RecalcEvent();
 								this.Content[Index].Set_ParagraphNumbering(NumInfo);
-								this.Content[Index].TurnOn_RecalcEvent();
 							}
 						}
 					}
@@ -13523,9 +13497,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 							else if (type_Table == this.Content[Index].GetType())
 							{
-								this.Content[Index].TurnOff_RecalcEvent();
 								this.Content[Index].Set_ParagraphNumbering(NumInfo);
-								this.Content[Index].TurnOn_RecalcEvent();
 							}
 						}
 					}
@@ -13594,9 +13566,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 							else if (type_Table === this.Content[Index].GetType())
 							{
-								this.Content[Index].TurnOff_RecalcEvent();
 								this.Content[Index].Set_ParagraphNumbering(NumInfo);
-								this.Content[Index].TurnOn_RecalcEvent();
 							}
 						}
 					}
@@ -13727,9 +13697,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 							else if (type_Table === this.Content[Index].GetType())
 							{
-								this.Content[Index].TurnOff_RecalcEvent();
 								this.Content[Index].Set_ParagraphNumbering(NumInfo);
-								this.Content[Index].TurnOn_RecalcEvent();
 							}
 						}
 					}
@@ -13776,9 +13744,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 						}
 						else if (type_Table === this.Content[Index].GetType())
 						{
-							this.Content[Index].TurnOff_RecalcEvent();
 							this.Content[Index].Set_ParagraphNumbering(NumInfo);
-							this.Content[Index].TurnOn_RecalcEvent();
 						}
 					}
 
@@ -14298,11 +14264,7 @@ CDocument.prototype.controller_SetParagraphShd = function(Shd)
 				if (type_Paragraph == Item.GetType())
 					Item.Set_Shd(Shd);
 				else if (type_Table == Item.GetType())
-				{
-					Item.TurnOff_RecalcEvent();
 					Item.Set_ParagraphShd(Shd);
-					Item.TurnOn_RecalcEvent();
-				}
 			}
 		}
 	}
@@ -14348,9 +14310,7 @@ CDocument.prototype.controller_SetParagraphStyle = function(Name)
 			}
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphStyle(Name);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14363,9 +14323,7 @@ CDocument.prototype.controller_SetParagraphStyle = function(Name)
 		}
 		else if (type_Table == Item.GetType())
 		{
-			Item.TurnOff_RecalcEvent();
 			Item.Set_ParagraphStyle(Name);
-			Item.TurnOn_RecalcEvent();
 		}
 	}
 };
@@ -14393,9 +14351,7 @@ CDocument.prototype.controller_SetParagraphContextualSpacing = function(Value)
 				Item.Set_ContextualSpacing(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphContextualSpacing(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14434,9 +14390,7 @@ CDocument.prototype.controller_SetParagraphPageBreakBefore = function(Value)
 				Item.Set_PageBreakBefore(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphPageBreakBefore(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14476,9 +14430,7 @@ CDocument.prototype.controller_SetParagraphKeepLines = function(Value)
 				Item.Set_KeepLines(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphKeepLines(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14518,9 +14470,7 @@ CDocument.prototype.controller_SetParagraphKeepNext = function(Value)
 				Item.Set_KeepNext(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphKeepNext(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14560,9 +14510,7 @@ CDocument.prototype.controller_SetParagraphWidowControl = function(Value)
 				Item.Set_WidowControl(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphWidowControl(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14602,9 +14550,7 @@ CDocument.prototype.controller_SetParagraphBorders = function(Borders)
 				Item.Set_Borders(Borders);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphBorders(Borders);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14763,9 +14709,7 @@ CDocument.prototype.controller_IncreaseOrDecreaseParagraphFontSize = function(bI
 						Item.IncDec_FontSize(bIncrease);
 					else if (type_Table == Item.GetType())
 					{
-						Item.TurnOff_RecalcEvent();
 						Item.Paragraph_IncDecFontSize(bIncrease);
-						Item.TurnOn_RecalcEvent();
 					}
 				}
 				break;

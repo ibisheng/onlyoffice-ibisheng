@@ -4107,7 +4107,11 @@ function DrawingObjects() {
                 var box = selectedRange.getBBox0();
                 settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
             }
-            settings.putRange(worksheet.getSelectionRangeValue());
+            var oRangeValue = worksheet.getSelectionRangeValue();
+            if(oRangeValue){
+                settings.putRange(oRangeValue.asc_getName());
+            }
+
             settings.putStyle(2);
             settings.putType(Asc.c_oAscChartTypeSettings.lineNormal);
             settings.putTitle(Asc.c_oAscChartTitleShowSettings.noOverlay);
@@ -4390,7 +4394,7 @@ function DrawingObjects() {
         {
             _this.addCompositeText(arrCharCodes[nIndex]);
         }
-        _this.controller.recalculate();
+		_this.controller.startRecalculate();
         _this.controller.updateSelectionState();
     };
     _this.Set_CursorPosInCompositeText = function(nPos)

@@ -3887,6 +3887,8 @@ function OfflineEditor () {
 
         var docInfo = new Asc.asc_CDocInfo();
         docInfo.put_Id(this.initSettings["docKey"]);
+        docInfo.put_Url(this.initSettings["docURL"]);
+        docInfo.put_Format("xlsx");
         docInfo.put_UserInfo(userInfo);
 
         _api.asc_setDocInfo(docInfo);
@@ -3904,7 +3906,7 @@ function OfflineEditor () {
 
             this.asc_WriteAllWorksheets(true);
 
-			_api.sendColorThemes(_api.wbModel.theme);
+			      _api.sendColorThemes(_api.wbModel.theme);
             _api.asc_ApplyColorScheme(false);
             _api._applyFirstLoadChanges();
 
@@ -3914,8 +3916,8 @@ function OfflineEditor () {
             ws._fixSelectionOfMergedCells();
 
             if (ws.topLeftFrozenCell) {
-                this.row0 = ws.topLeftFrozenCell.getRow0();
-                this.col0 = ws.topLeftFrozenCell.getCol0();
+              this.row0 = ws.topLeftFrozenCell.getRow0();
+              this.col0 = ws.topLeftFrozenCell.getCol0();
             }
 
             // TODO: Implement frozen places
@@ -4076,6 +4078,13 @@ function OfflineEditor () {
                                   var me = this;
                                   me.needToUpdateVersion = true;
                                   if (callback) callback.call(me);
+                                  });
+
+        _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {
+                                  var stream = global_memory_stream_menu;
+                                  stream["ClearNoAttack"]();
+                                  stream["WriteLong"](options.asc_getOptionId());
+                                  window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
                                   });
     };
     this.updateFrozen = function () {
@@ -7362,60 +7371,66 @@ window["native"]["offline_apply_event"] = function(type,params) {
             // console.log("JS - " + dataObject['type']);
 
             switch (dataObject['type']) {
-                case 'auth'        :
-                    t._onAuth(dataObject);
-                    break;
-                case 'message'      :
-                    t._onMessages(dataObject, false);
-                    break;
-                case 'cursor'       :
-                    t._onCursor(dataObject);
-                    break;
-                case 'meta' :
-                    t._onMeta(dataObject);
-                    break;
-                case 'getLock'      :
-                    t._onGetLock(dataObject);
-                    break;
-                case 'releaseLock'    :
-                    t._onReleaseLock(dataObject);
-                    break;
-                case 'connectState'    :
-                    t._onConnectionStateChanged(dataObject);
-                    break;
-                case 'saveChanges'    :
-                    t._onSaveChanges(dataObject);
-                    break;
-                case 'saveLock'      :
-                    t._onSaveLock(dataObject);
-                    break;
-                case 'unSaveLock'    :
-                    t._onUnSaveLock(dataObject);
-                    break;
-                case 'savePartChanges'  :
-                    t._onSavePartChanges(dataObject);
-                    break;
-                case 'drop'        :
-                    t._onDrop(dataObject);
-                    break;
-                case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
-                    break;
-                case 'error'      : /*Старая версия sdk*/
-                    t._onDrop(dataObject);
-                    break;
-                case 'documentOpen'    :
-                    t._documentOpen(dataObject);
-                    break;
-                case 'warning':
-                    t._onWarning(dataObject);
-                    break;
-                case 'license':
-                    t._onLicense(dataObject);
-                    break;
-                case 'session' :
-                    t._onSession(dataObject);
-                    break;
-            }
+              case 'auth'        :
+                t._onAuth(dataObject);
+                break;
+              case 'message'      :
+                t._onMessages(dataObject, false);
+                break;
+              case 'cursor'       :
+                t._onCursor(dataObject);
+                break;
+              case 'meta' :
+                t._onMeta(dataObject);
+                break;
+              case 'getLock'      :
+                t._onGetLock(dataObject);
+                break;
+              case 'releaseLock'    :
+                t._onReleaseLock(dataObject);
+                break;
+              case 'connectState'    :
+                t._onConnectionStateChanged(dataObject);
+                break;
+              case 'saveChanges'    :
+                t._onSaveChanges(dataObject);
+                break;
+              case 'saveLock'      :
+                t._onSaveLock(dataObject);
+                break;
+              case 'unSaveLock'    :
+                t._onUnSaveLock(dataObject);
+                break;
+              case 'savePartChanges'  :
+                t._onSavePartChanges(dataObject);
+                break;
+              case 'drop'        :
+                t._onDrop(dataObject);
+                break;
+              case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
+                break;
+              case 'error'      : /*Старая версия sdk*/
+                t._onDrop(dataObject);
+                break;
+              case 'documentOpen'    :
+                t._documentOpen(dataObject);
+                break;
+              case 'warning':
+                t._onWarning(dataObject);
+                break;
+              case 'license':
+                t._onLicense(dataObject);
+                break;
+              case 'session' :
+                t._onSession(dataObject);
+                break;
+              case 'refreshToken' :
+                t._onRefreshToken(dataObject["messages"]);
+                break;
+              case 'expiredToken' :
+                t._onExpiredToken();
+                break;
+              }
 
             break;
         }
@@ -7451,12 +7466,34 @@ window["native"]["offline_apply_event"] = function(type,params) {
             break;
         }
 
+        case 22001: // ASC_MENU_EVENT_TYPE_SET_PASSWORD
+        {
+          _api.asc_setDocumentPassword(params[0]);
+          break;
+        }
+
         default:
             break;
     }
 
     return _return;
 }
+
+window["Asc"]["spreadsheet_api"].prototype.asc_setDocumentPassword = function(password)
+{
+    var v = {
+      "id": this.documentId,
+      "userid": this.documentUserId,
+      "format": this.documentFormat,
+      "c": "reopen",
+      "url": this.documentUrl,
+      "title": this.documentTitle,
+      "embeddedfonts": this.isUseEmbeddedCutFonts,
+      "password": password
+    };
+
+    AscCommon.sendCommand(this, null, v);
+};
 
 function testLockedObjects () {
 

@@ -2216,6 +2216,15 @@
 		asc_CFormatCellsInfo.prototype.asc_getSeparator = function () {return this.separator;};
 		asc_CFormatCellsInfo.prototype.asc_getSymbol = function () {return this.symbol;};
 
+		function asc_CSelectionRangeValue(){
+			this.name =  null;
+			this.type = null;
+		}
+		asc_CSelectionRangeValue.prototype.asc_setType = function (val) {this.type = val;};
+		asc_CSelectionRangeValue.prototype.asc_setName = function (val) {this.name = val;};
+		asc_CSelectionRangeValue.prototype.asc_getType = function () {return this.type;};
+		asc_CSelectionRangeValue.prototype.asc_getName = function () {return this.name;};
+
 		/*
 		 * Export
 		 * -----------------------------------------------------------------------------
@@ -2396,4 +2405,10 @@
 		prot["asc_getDecimalPlaces"] = prot.asc_getDecimalPlaces;
 		prot["asc_getSeparator"] = prot.asc_getSeparator;
 		prot["asc_getSymbol"] = prot.asc_getSymbol;
+
+		window["AscCommonExcel"]["asc_CSelectionRangeValue"] = window["AscCommonExcel"].asc_CSelectionRangeValue = asc_CSelectionRangeValue;
+		prot = asc_CSelectionRangeValue.prototype;
+		prot["asc_getType"] = prot.asc_getType;
+		prot["asc_getName"] = prot.asc_getName;
+
 })(window);
