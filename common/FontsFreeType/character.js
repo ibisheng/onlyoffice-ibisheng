@@ -891,6 +891,9 @@
 		return _retArray;
 	};
 
+	/*
+	DEBUG FUNCTIONS
+
 	window.getSystemFontsInfo = function()
 	{
 		var _system_fonts = AscFonts.g_fontApplication.g_fontSelections.List;
@@ -940,6 +943,8 @@
 		}
 		console.log(_log);
 	};
+	
+	*/
 
 	function CFontByCharacter()
 	{
