@@ -2029,30 +2029,7 @@ PasteProcessor.prototype =
         }
 		
 		//for special paste
-		var specialPasteShowOptions = window['AscCommon'].g_clipboardBase.specialPasteButtonProps ? window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props : null;
-		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
-		{
-			specialPasteShowOptions = new SpecialPasteShowOptions();
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
-			
-			var sProps = Asc.c_oSpecialPasteProps;
-			var props = [sProps.paste, sProps.mergeFormatting, sProps.pasteOnlyValues];
-			specialPasteShowOptions.asc_setOptions(props);
-		}
-		
-		if(specialPasteShowOptions)
-		{
-			var cursorPos = this.oLogicDocument.Cursor_GetPos();
-			var _Y = cursorPos.Y;
-			var _X = cursorPos.X;
-			var _PageNum = this.oLogicDocument.CurPage;
-			
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum:_PageNum};
-
-			var _сoord = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
-			var curCoord = new AscCommon.asc_CRect( _сoord.X, _сoord.Y, 0, 0 );
-			specialPasteShowOptions.asc_setCellCoord(curCoord);
-		}
+		this._specialPasteSetShowOptions();
 		
 		window['AscCommon'].g_clipboardBase.Paste_Process_End();
     },
@@ -2111,6 +2088,34 @@ PasteProcessor.prototype =
             paragraph.Clear_NearestPosArray(aNewContent);
         }
     },
+
+	_specialPasteSetShowOptions: function()
+	{
+		var specialPasteShowOptions = window['AscCommon'].g_clipboardBase.specialPasteButtonProps ? window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props : null;
+		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+		{
+			specialPasteShowOptions = new SpecialPasteShowOptions();
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
+
+			var sProps = Asc.c_oSpecialPasteProps;
+			var props = [sProps.paste, sProps.mergeFormatting, sProps.pasteOnlyValues];
+			specialPasteShowOptions.asc_setOptions(props);
+		}
+
+		if(specialPasteShowOptions)
+		{
+			var cursorPos = this.oDocument.Cursor_GetPos();
+			var _Y = cursorPos.Y;
+			var _X = cursorPos.X;
+			var _PageNum = this.oLogicDocument.CurPage;
+
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum:_PageNum};
+
+			var _сoord = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
+			var curCoord = new AscCommon.asc_CRect( _сoord.X, _сoord.Y, 0, 0 );
+			specialPasteShowOptions.asc_setCellCoord(curCoord);
+		}
+	},
 
 	_specialPasteItemConvert: function(item, curDocSelection)
 	{
