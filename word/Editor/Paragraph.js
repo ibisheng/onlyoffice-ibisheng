@@ -68,16 +68,8 @@ var REVIEW_COLOR = new AscCommon.CColor(255, 0, 0, 255);
  */
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
 {
-	CDocumentContentElementBase.call(this);
+	CDocumentContentElementBase.call(this, Parent);
 
-    this.Id = AscCommon.g_oIdCounter.Get_NewId();
-
-    this.Prev = null;
-    this.Next = null;
-
-    this.Index = -1; // перед тем как пользоваться этим параметром нужно у родительского класса вызывать this.Parent.Update_ContentIndexing();
-
-    this.Parent       = Parent;
     this.PageNum      = PageNum;
     this.ColumnNum    = 0;
     this.ColumnsCount = 1;
@@ -238,14 +230,6 @@ Paragraph.prototype.Get_Type = function()
 Paragraph.prototype.Save_StartState = function()
 {
 	this.StartState = new CParagraphStartState(this);
-};
-Paragraph.prototype.GetId = function()
-{
-	return this.Id;
-};
-Paragraph.prototype.Get_Id = function()
-{
-	return this.GetId();
 };
 Paragraph.prototype.Use_Wrap = function()
 {
@@ -9095,34 +9079,6 @@ Paragraph.prototype.Get_AnchorPos = function(Drawing)
 	this.Internal_CorrectAnchorPos(Result, Drawing);
 
 	return Result;
-};
-Paragraph.prototype.Set_DocumentNext = function(Object)
-{
-	this.Next = Object;
-};
-Paragraph.prototype.Set_DocumentPrev = function(Object)
-{
-	this.Prev = Object;
-};
-Paragraph.prototype.Get_DocumentNext = function()
-{
-	return this.Next;
-};
-Paragraph.prototype.Get_DocumentPrev = function()
-{
-	return this.Prev;
-};
-Paragraph.prototype.Set_DocumentIndex = function(Index)
-{
-	this.Index = Index;
-};
-Paragraph.prototype.Set_Parent = function(ParentObject)
-{
-	this.Parent = ParentObject;
-};
-Paragraph.prototype.Get_Parent = function()
-{
-	return this.Parent;
 };
 Paragraph.prototype.Is_ContentOnFirstPage = function()
 {

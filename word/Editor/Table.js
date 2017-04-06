@@ -82,16 +82,10 @@ var type_Table = 0x0002;
 //----------------------------------------------------------------------------------------------------------------------
 function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, Rows, Cols, TableGrid, bPresentation)
 {
-	CDocumentContentElementBase.call(this);
-
-    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+	CDocumentContentElementBase.call(this, Parent);
 
     this.Markup = new AscCommon.CTableMarkup(this);
 
-    this.Prev = null;
-    this.Next = null;
-
-    this.Index  = -1; // перед тем как пользоваться этим параметром нужно у родительского класса вызывать this.Parent.Update_ContentIndexing();
     this.Inline = Inline;
 
     this.Lock = new AscCommon.CLock();
@@ -112,7 +106,6 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
         this.LogicDocument   = this.DrawingDocument.m_oLogicDocument;
     }
     
-    this.Parent       = Parent;
     this.PageNum      = PageNum;
     this.ColumnNum    = 0;
     this.ColumnsCount = 1;
@@ -2284,26 +2277,6 @@ CTable.prototype.Get_MaxTopBorder = function(RowIndex)
 
 	return MaxTopBorder;
 };
-CTable.prototype.Set_DocumentNext = function(Object)
-{
-	this.Next = Object;
-};
-CTable.prototype.Set_DocumentPrev = function(Object)
-{
-	this.Prev = Object;
-};
-CTable.prototype.Get_DocumentNext = function()
-{
-	return this.Next;
-};
-CTable.prototype.Get_DocumentPrev = function()
-{
-	return this.Prev;
-};
-CTable.prototype.Set_DocumentIndex = function(Index)
-{
-	this.Index = Index;
-};
 /**
  * Вычисляем небольшое смещение по X, необходимое для совместимости с Word разных версий
  */
@@ -2476,10 +2449,6 @@ CTable.prototype.private_GetColumnIndex = function(CurPage)
 CTable.prototype.GetType = function()
 {
 	return type_Table;
-};
-CTable.prototype.GetId = function()
-{
-	return this.Get_Id();
 };
 CTable.prototype.Get_Type = function()
 {
@@ -3063,18 +3032,6 @@ CTable.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawing)
 	var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
 
 	return Cell.Content_Get_NearestPos(CurPage - Cell.Content.Get_StartPage_Relative(), X, Y, bAnchor, Drawing);
-};
-CTable.prototype.Set_Parent = function(ParentObject)
-{
-	this.Parent = ParentObject;
-};
-CTable.prototype.Get_Parent = function()
-{
-	return this.Parent;
-};
-CTable.prototype.Get_Id = function()
-{
-	return this.Id;
 };
 CTable.prototype.Get_ParentTextTransform = function()
 {

@@ -42,6 +42,53 @@
  * Базовый класс для элементов содержимого документа (Paragraph, CTable, CBlockLevelSdt)
  * @constructor
  */
-function CDocumentContentElementBase()
+function CDocumentContentElementBase(oParent)
 {
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
+
+	this.Parent = oParent;
+	this.Prev   = null;
+	this.Next   = null;
+	this.Index  = -1; // перед тем как пользоваться этим параметром нужно у родительского класса вызывать this.Parent.Update_ContentIndexing();
 }
+
+CDocumentContentElementBase.prototype.Is_Inline = function()
+{
+	return true;
+};
+CDocumentContentElementBase.prototype.Set_DocumentIndex = function(nIndex)
+{
+	this.Index = nIndex;
+};
+CDocumentContentElementBase.prototype.Set_DocumentNext = function(oElement)
+{
+	this.Next = oElement;
+};
+CDocumentContentElementBase.prototype.Set_DocumentPrev = function(oElement)
+{
+	this.Prev = oElement;
+};
+CDocumentContentElementBase.prototype.Get_DocumentNext = function()
+{
+	return this.Next;
+};
+CDocumentContentElementBase.prototype.Get_DocumentPrev = function()
+{
+	return this.Prev;
+};
+CDocumentContentElementBase.prototype.Set_Parent = function(oParent)
+{
+	this.Parent = oParent;
+};
+CDocumentContentElementBase.prototype.Get_Parent = function()
+{
+	return this.Parent;
+};
+CDocumentContentElementBase.prototype.GetId = function()
+{
+	return this.Id;
+};
+CDocumentContentElementBase.prototype.Get_Id = function()
+{
+	return this.GetId();
+};

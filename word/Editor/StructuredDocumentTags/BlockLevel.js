@@ -38,18 +38,17 @@
  */
 
 /**
- *
- * @param oLogicDocument
+ * @param oParent - родительский класс
+ * @param oLogicDocument - главный класс документа
  * @constructor
  * @extends {CDocumentContentElementBase}
  */
-function CBlockLevelSdt(oLogicDocument)
+function CBlockLevelSdt(oLogicDocument, oParent)
 {
-	CDocumentContentElementBase.call(this);
+	CDocumentContentElementBase.call(this, oParent);
 
 	this.LogicDocument = oLogicDocument;
 	this.Content       = new CDocumentContent(this, oLogicDocument.Get_DrawingDocument(), 0, 0, 0, 0, true, false, false);
-	this.Index         = -1;
 
 	this.X            = 0;
 	this.Y            = 0;
@@ -58,6 +57,9 @@ function CBlockLevelSdt(oLogicDocument)
 	this.PageNum      = 0;
 	this.ColumnNum    = 0;
 	this.ColumnsCount = 0;
+
+	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
+	g_oTableId.Add(this, this.Id);
 }
 
 CBlockLevelSdt.prototype = Object.create(CDocumentContentElementBase.prototype);
@@ -66,10 +68,6 @@ CBlockLevelSdt.prototype.constructor = CBlockLevelSdt;
 CBlockLevelSdt.prototype.Is_Inline = function()
 {
 	return true;
-};
-CBlockLevelSdt.prototype.Set_DocumentIndex = function(nIndex)
-{
-	this.Index = nIndex;
 };
 CBlockLevelSdt.prototype.Reset = function(X, Y, XLimit, YLimit, PageAbs, ColumnAbs, ColumnsCount)
 {
