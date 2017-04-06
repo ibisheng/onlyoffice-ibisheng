@@ -2202,60 +2202,66 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             // console.log("JS - " + dataObject['type']);
 
             switch (dataObject['type']) {
-                case 'auth'        :
-                    t._onAuth(dataObject);
-                    break;
-                case 'message'      :
-                    t._onMessages(dataObject, false);
-                    break;
-                case 'cursor'       :
-                    t._onCursor(dataObject);
-                    break;
-                case 'meta' :
-                    t._onMeta(dataObject);
-                    break;
-                case 'getLock'      :
-                    t._onGetLock(dataObject);
-                    break;
-                case 'releaseLock'    :
-                    t._onReleaseLock(dataObject);
-                    break;
-                case 'connectState'    :
-                    t._onConnectionStateChanged(dataObject);
-                    break;
-                case 'saveChanges'    :
-                    t._onSaveChanges(dataObject);
-                    break;
-                case 'saveLock'      :
-                    t._onSaveLock(dataObject);
-                    break;
-                case 'unSaveLock'    :
-                    t._onUnSaveLock(dataObject);
-                    break;
-                case 'savePartChanges'  :
-                    t._onSavePartChanges(dataObject);
-                    break;
-                case 'drop'        :
-                    t._onDrop(dataObject);
-                    break;
-                case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
-                    break;
-                case 'error'      : /*Старая версия sdk*/
-                    t._onDrop(dataObject);
-                    break;
-                case 'documentOpen'    :
-                    t._documentOpen(dataObject);
-                    break;
-                case 'warning':
-                    t._onWarning(dataObject);
-                    break;
-                case 'license':
-                    t._onLicense(dataObject);
-                    break;
-                case 'session' :
-                    t._onSession(dataObject);
-                    break;
-            }
+              case 'auth'        :
+                t._onAuth(dataObject);
+                break;
+              case 'message'      :
+                t._onMessages(dataObject, false);
+                break;
+              case 'cursor'       :
+                t._onCursor(dataObject);
+                break;
+              case 'meta' :
+                t._onMeta(dataObject);
+                break;
+              case 'getLock'      :
+                t._onGetLock(dataObject);
+                break;
+              case 'releaseLock'    :
+                t._onReleaseLock(dataObject);
+                break;
+              case 'connectState'    :
+                t._onConnectionStateChanged(dataObject);
+                break;
+              case 'saveChanges'    :
+                t._onSaveChanges(dataObject);
+                break;
+              case 'saveLock'      :
+                t._onSaveLock(dataObject);
+                break;
+              case 'unSaveLock'    :
+                t._onUnSaveLock(dataObject);
+                break;
+              case 'savePartChanges'  :
+                t._onSavePartChanges(dataObject);
+                break;
+              case 'drop'        :
+                t._onDrop(dataObject);
+                break;
+              case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
+                break;
+              case 'error'      : /*Старая версия sdk*/
+                t._onDrop(dataObject);
+                break;
+              case 'documentOpen'    :
+                t._documentOpen(dataObject);
+                break;
+              case 'warning':
+                t._onWarning(dataObject);
+                break;
+              case 'license':
+                t._onLicense(dataObject);
+                break;
+              case 'session' :
+                t._onSession(dataObject);
+                break;
+              case 'refreshToken' :
+                t._onRefreshToken(dataObject["messages"]);
+                break;
+              case 'expiredToken' :
+                t._onExpiredToken();
+                break;
+              }
 
             break;
         }
@@ -2294,10 +2300,40 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             break;
         }
 
+        case 21001: // ASC_COAUTH_EVENT_TYPE_LOAD_URL_IMAGE
+        {
+          _api.WordControl.m_oDrawingDocument.ClearCachePages();
+          _api.WordControl.m_oDrawingDocument.FirePaint();
+
+          break;
+        }
+
+        case 22001: // ASC_MENU_EVENT_TYPE_SET_PASSWORD
+        {
+          _api.asc_setDocumentPassword(_params[0]);
+          break;
+        }
+
         default:
             break;
     }
     return _return;
+};
+
+Asc['asc_docs_api'].prototype.asc_setDocumentPassword = function(password)
+{
+    var v = {
+      "id": this.documentId,
+      "userid": this.documentUserId,
+      "format": this.documentFormat,
+      "c": "reopen",
+      "url": this.documentUrl,
+      "title": this.documentTitle,
+      "embeddedfonts": this.isUseEmbeddedCutFonts,
+      "password": password
+    };
+
+    AscCommon.sendCommand(this, null, v);
 };
 
 function asc_menu_WriteHeaderFooterPr(_hdrftrPr, _stream)
@@ -5787,9 +5823,18 @@ function NativeOpenFile3(_params, documentInfo)
 
         var docInfo = new Asc.asc_CDocInfo();
         docInfo.put_Id(window.documentInfo["docKey"]);
+        docInfo.put_Url(window.documentInfo["docURL"]);
+        docInfo.put_Format("docx");
         docInfo.put_UserInfo(userInfo);
 
         _api.asc_setDocInfo(docInfo);
+
+        _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {
+                                  var stream = global_memory_stream_menu;
+                                  stream["ClearNoAttack"]();
+                                  stream["WriteLong"](options.asc_getOptionId());
+                                  window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
+                                  });
 
         if (window.documentInfo["iscoauthoring"]) {
 
@@ -6000,7 +6045,6 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
 };
 
 window["AscCommon"].getFullImageSrc2 = function (src) {
-
     var start = src.slice(0, 6);
     if (0 === start.indexOf('theme') && editor.ThemeLoader){
         return  editor.ThemeLoader.ThemesUrlAbs + src;
