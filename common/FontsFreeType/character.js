@@ -802,22 +802,50 @@
 		new CRange(0x100000, 0x10FFFF, c_oUnicodeRangesLID.Supplementary_Private_Use_Area_B, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Private_Use_plane_15), 0, 0, 0])
 	];
 
-	window.getSupportedFonts = function(_char)
+	function getRangeBySymbol(_char, _array)
 	{
-		var _range = null;
-		var _ranges = c_oUnicodeRanges;
+		// search range by symbol
+		var _start = 0;
+		var _end = _array.length - 1;
 
-		// TODO: fast find
-		for (var i = 0; i < _ranges.length; i++)
+		var _center = 0;
+		var _range = null;
+
+		if (_start >= _end)
+			return null;
+
+		while (_start < _end)
 		{
-			if (_ranges[i].Start <= _char && _ranges[i].End >= _char)
-			{
-				_range = _ranges[i];
-				break;
-			}
+			var _center = (_start + _end) >> 1;
+			var _range = _array[_center];
+
+			if (_range.Start > _char)
+				_end = _center - 1;
+			else if (_range.End < _char)
+				_start = _center + 1;
+			else
+				return _array[_center];
 		}
 
-		if (null == _ranges)
+		if (_start > _end)
+			return null;
+
+		_range = _array[_start];
+		if (_range.Start > _char || _range.End < _char)
+			return null;
+
+		return _array[_start];
+	}
+
+	window.getSupportedFonts = function(_char)
+	{
+		var _range = getRangeBySymbol(_char, c_oUnicodeRanges);
+		return window.getSupportedFontsByRange(_range);
+	};
+
+	window.getSupportedFontsByRange = function(_range)
+	{
+		if (null == _range)
 			return [];
 
 		var _system_fonts = AscFonts.g_fontApplication.g_fontSelections.List;
@@ -912,5 +940,87 @@
 		}
 		console.log(_log);
 	};
+
+	function CFontByCharacter()
+	{
+		this.UsedRanges = [];
+		this.FontsByRange = [];
+	}
+
+	CFontByCharacter.prototype =
+	{
+		getFontBySymbol : function(_char)
+		{
+			// ищем среди уже найденных
+			var _range = getRangeBySymbol(_char, this.UsedRanges);
+			if (_range != null)
+				return this.FontsByRange[_range.Name];
+
+			_range = getRangeBySymbol(_char, c_oUnicodeRanges);
+			if (!_range)
+				return "";
+
+			this.UsedRanges.push(_range);
+			var _fonts = window.getSupportedFontsByRange(_range);
+
+			var _length = _fonts.length;
+			if (0 == _length)
+				return "";
+
+			var _priority_fonts = {
+				"Arial" : 0,
+				"Times New Roman" : 1,
+				"Tahoma" : 2,
+				"Cambria" : 3,
+				"Calibri" : 4,
+				"Verdana" : 5,
+				"Georgia" : 6,
+				"Open Sans" : 7,
+				"Liberation Sans" : 8,
+				"Helvetica" : 9,
+				"Nimbus Sans L" : 10,
+				"DejaVu Sans" : 11,
+				"Liberation Serif" : 12,
+				"Trebuchet MS" : 13,
+				"Courier New" : 14,
+				"Carlito" : 15,
+				"Segoe UI" : 16,
+				"MS Gothic" : 17,
+				"SimSun" : 18,
+				"Nirmala UI" : 19,
+				"Batang" : 20,
+				"MS Mincho" : 21
+			};
+
+			var _fontName = "";
+			var _weight = 100;
+			var _test = undefined;
+			for (var i = 0; i < _length; i++)
+			{
+				_test = _priority_fonts[_fonts[i]];
+				if (undefined !== _test)
+				{
+					if (_test < _weight)
+					{
+						_weight = _test;
+						_fontName = _fonts[i];
+					}
+				}
+			}
+
+			if ("" == _fontName)
+			{
+				if (1 < _length && _fonts[0] == "Arial Unicode MS") // remove universal font
+					_fontName = _fonts[1];
+				else
+					_fontName = _fonts[0];
+			}
+
+			this.FontsByRange[_range.Name] = _fontName;
+			return _fontName;
+		}
+	};
+
+	window.FontPickerByCharacter = new CFontByCharacter();
 
 })(window);
