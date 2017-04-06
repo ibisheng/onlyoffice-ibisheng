@@ -142,8 +142,8 @@ function CTableOutlineDr()
 
     // TABLE_STYLES
     this.TableStylesLastLook = null;
-    this.TableStylesСheckLook = null;
-    this.TableStylesСheckLookFlag = false;
+    this.TableStylesCheckLook = null;
+    this.TableStylesCheckLookFlag = false;
 
     this.TableStylesSendOne = false;
 
@@ -2243,16 +2243,16 @@ CDrawingDocument.prototype =
     ///////////////////////////////////////////
     StartTableStylesCheck : function()
     {
-        this.TableStylesСheckLookFlag = true;
+        this.TableStylesCheckLookFlag = true;
     },
 
     EndTableStylesCheck : function()
     {
-        this.TableStylesСheckLookFlag = false;
-        if (this.TableStylesСheckLook != null)
+        this.TableStylesCheckLookFlag = false;
+        if (this.TableStylesCheckLook != null)
         {
-            this.CheckTableStyles(this.TableStylesСheckLook);
-            this.TableStylesСheckLook = null;
+            this.CheckTableStyles(this.TableStylesCheckLook);
+            this.TableStylesCheckLook = null;
         }
     },
 
@@ -2274,9 +2274,9 @@ CDrawingDocument.prototype =
         if (true === this.TableStylesSendOne)
             return;
 
-        if (this.TableStylesСheckLookFlag)
+        if (this.TableStylesCheckLookFlag)
         {
-            this.TableStylesСheckLook = tableLook;
+            this.TableStylesCheckLook = tableLook;
             return;
         }
 
