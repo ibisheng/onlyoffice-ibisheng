@@ -5914,8 +5914,8 @@ function CDrawingDocument()
 				for (var ii = 0; ii < Cols; ii++)
 					Grid[ii] = W / Cols;
 
-				_table_styles = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
-
+				_table_styles = new CTable(this, logicDoc, true, Rows, Cols, Grid);
+				_table_styles.Reset(_x_mar, _y_mar, 1000, 1000, 0, 0, 1);
 				_table_styles.Set_Props({
 					TableStyle: i,
 					TableLook: tableLook,

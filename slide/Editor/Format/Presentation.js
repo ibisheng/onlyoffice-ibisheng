@@ -1746,7 +1746,8 @@ CPresentation.prototype =
         graphic_frame.spPr.xfrm.setExtY(7.478268771701388 * Rows);
         graphic_frame.setNvSpPr(new AscFormat.UniNvPr());
 
-        var table = new CTable(this.DrawingDocument, graphic_frame, Inline, 0, X, Y, W, 100000, Rows, Cols, Grid, true);
+        var table = new CTable(this.DrawingDocument, graphic_frame, Inline, Rows, Cols, Grid, true);
+        table.Reset(X, Y, W, 100000, 0, 0, 1);
         if(!Inline)
         {
             table.Set_PositionH(Asc.c_oAscHAnchor.Page, false, 0);

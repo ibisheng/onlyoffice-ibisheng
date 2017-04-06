@@ -77,7 +77,7 @@ var type_Table = 0x0002;
  * @constructor
  * @extends {CDocumentContentElementBase}
  */
-function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, Rows, Cols, TableGrid, bPresentation)
+function CTable(DrawingDocument, Parent, Inline, Rows, Cols, TableGrid, bPresentation)
 {
 	CDocumentContentElementBase.call(this, Parent);
 
@@ -103,10 +103,6 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
         this.LogicDocument   = this.DrawingDocument.m_oLogicDocument;
     }
     
-    this.PageNum      = PageNum;
-    this.ColumnNum    = 0;
-    this.ColumnsCount = 1;
-
     this.CompiledPr =
     {
         Pr         : null,  // Скомпилированный (окончательный стиль)
@@ -181,12 +177,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
 
     // this.X_origin - точка, которую нам задали как начальную для рисования таблицы
     // this.X        - фактическая начальная точка для рисования и обсчета таблицы
-
-    this.X_origin = X;
-    this.X        = X;
-    this.Y        = Y;
-    this.XLimit   = XLimit;
-    this.YLimit   = YLimit;
+    this.X_origin = 0;
 
     this.AllowOverlap = true;
 
@@ -222,7 +213,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.AnchorPosition = new CTableAnchorPosition();
     
     this.Pages    = [];
-    this.Pages[0] = new CTablePage(X, Y, XLimit, YLimit, 0, 0 );
+    this.Pages[0] = new CTablePage(0, 0, 0, 0, 0, 0);
 
     this.MaxTopBorder = [];
     this.MaxBotBorder = [];
@@ -2454,7 +2445,7 @@ CTable.prototype.Get_Type = function()
 CTable.prototype.Copy = function(Parent)
 {
 	var TableGrid = this.private_CopyTableGrid();
-	var Table     = new CTable(this.DrawingDocument, Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, TableGrid, this.bPresentation);
+	var Table     = new CTable(this.DrawingDocument, Parent, this.Inline, 0, 0, TableGrid, this.bPresentation);
 
 	Table.Set_Distance(this.Distance.L, this.Distance.T, this.Distance.R, this.Distance.B);
 	Table.Set_PositionH(this.PositionH.RelativeFrom, this.PositionH.Align, this.PositionH.Value);
@@ -6616,7 +6607,7 @@ CTable.prototype.Get_SelectedContent = function(SelectedContent)
 			TableGrid.splice(0, MinBefore);
 
 		// Формируем новую таблицу, по выделенно части.
-		var Table = new CTable(this.DrawingDocument, this.Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, TableGrid);
+		var Table = new CTable(this.DrawingDocument, this.Parent, this.Inline, 0, 0, TableGrid);
 
 		// Копируем настройки
 		Table.Set_TableStyle(this.TableStyle);
@@ -8048,7 +8039,7 @@ CTable.prototype.Split_Table = function()
 	if (0 === CurRow)
 		return null;
 
-	var NewTable = new CTable(this.DrawingDocument, this.Parent, this.Inline, 0, 0, 0, 0, 0, 0, 0, this.private_CopyTableGrid());
+	var NewTable = new CTable(this.DrawingDocument, this.Parent, this.Inline, 0, 0, this.private_CopyTableGrid());
 
 	var Len = this.Content.length;
 	for (var RowIndex = CurRow; RowIndex < Len; RowIndex++)
