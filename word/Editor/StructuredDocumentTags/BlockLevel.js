@@ -114,6 +114,10 @@ CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 	// String : Content id
 	this.Content = this.LogicDocument.Get_TableId().Get_ById(Reader.GetString2());
 };
+CBlockLevelSdt.prototype.Draw = function(CurPage, oGraphics)
+{
+	this.Content.Draw(CurPage, oGraphics);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -161,6 +165,29 @@ CBlockLevelSdt.prototype.Is_UseInDocument = function(Id)
 		return this.Parent.Is_UseInDocument(this.GetId());
 
 	return false;
+};
+CBlockLevelSdt.prototype.Get_ColorMap = function()
+{
+	return this.Parent.Get_ColorMap();
+};
+CBlockLevelSdt.prototype.Get_TextBackGroundColor = function()
+{
+	return this.Parent.Get_TextBackGroundColor();
+};
+CBlockLevelSdt.prototype.Is_ThisElementCurrent = function(oElement)
+{
+	if (oElement === this.Content)
+		return this.Parent.Is_ThisElementCurrent();
+
+	return false;
+};
+CBlockLevelSdt.prototype.OnContentReDraw = function(StartPageAbs, EndPageAbs)
+{
+	this.Parent.OnContentReDraw(StartPageAbs, EndPageAbs);
+};
+CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
+{
+	this.Content.Document_CreateFontMap(FontMap);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

@@ -11712,7 +11712,7 @@ CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
 			for (var Index = 0; Index < Cols; Index++)
 				Grid[Index] = W / Cols;
 
-			var NewTable = new CTable(this.DrawingDocument, this, true, 0, 0, 0, 0, Rows, Cols, Grid);
+			var NewTable = new CTable(this.DrawingDocument, this, true, Rows, Cols, Grid);
 			NewTable.Set_ParagraphPrOnAdd(Item);
 
 			// Проверим позицию в текущем параграфе

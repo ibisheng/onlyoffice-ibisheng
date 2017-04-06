@@ -146,6 +146,9 @@ CDocumentContentElementBase.prototype.Get_PagesCount = function()
 {
 	return 0;
 };
+CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
