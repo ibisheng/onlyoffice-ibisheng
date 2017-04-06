@@ -7096,9 +7096,6 @@ Paragraph.prototype.Selection_IsEmpty = function(bCheckHidden)
 
 	return true;
 };
-//-----------------------------------------------------------------------------------
-// Функции для работы с нумерацией параграфов в документах
-//-----------------------------------------------------------------------------------
 Paragraph.prototype.Get_StartTabsCount = function(TabsCounter)
 {
 	var ContentLen = this.Content.length;
@@ -9441,25 +9438,6 @@ Paragraph.prototype.PreDelete = function()
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------
-// Функции для работы с номерами страниц
-//----------------------------------------------------------------------------------------------------------------------
-Paragraph.prototype.Get_StartPage_Absolute = function()
-{
-	return this.Get_AbsolutePage(0);
-};
-Paragraph.prototype.Get_StartPage_Relative = function()
-{
-	return this.PageNum;
-};
-Paragraph.prototype.Get_StartColumn = function()
-{
-	return this.ColumnNum;
-};
-Paragraph.prototype.Get_ColumnsCount = function()
-{
-	return this.ColumnsCount;
-};
-//----------------------------------------------------------------------------------------------------------------------
 // Дополнительные функции
 //----------------------------------------------------------------------------------------------------------------------
 Paragraph.prototype.Document_SetThisElementCurrent = function(bUpdateStates)
@@ -11734,36 +11712,6 @@ Paragraph.prototype.Get_ContentLength = function()
 Paragraph.prototype.Get_PagesCount = function()
 {
     return this.Pages.length;
-};
-Paragraph.prototype.private_GetRelativePageIndex = function(CurPage)
-{
-    if (!this.ColumnsCount || 0 === this.ColumnsCount)
-        return this.PageNum + CurPage;
-
-    return this.PageNum + ((this.ColumnNum + CurPage) / this.ColumnsCount | 0);
-};
-Paragraph.prototype.private_GetAbsolutePageIndex = function(CurPage)
-{
-    return this.Parent.Get_AbsolutePage(this.private_GetRelativePageIndex(CurPage));
-};
-Paragraph.prototype.Get_StartColumn = function()
-{
-    return this.ColumnNum;
-};
-Paragraph.prototype.Get_AbsolutePage = function(CurPage)
-{
-    return this.private_GetAbsolutePageIndex(CurPage);
-};
-Paragraph.prototype.Get_AbsoluteColumn = function(CurPage)
-{
-    if (this.Parent instanceof CDocument)
-        return this.private_GetColumnIndex(CurPage);
-
-    return this.Parent.Get_AbsoluteColumn(this.private_GetRelativePageIndex(CurPage));
-};
-Paragraph.prototype.private_GetColumnIndex = function(CurPage)
-{
-    return (this.ColumnNum + CurPage) - (((this.ColumnNum + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
 };
 Paragraph.prototype.Is_EmptyPage = function(CurPage)
 {

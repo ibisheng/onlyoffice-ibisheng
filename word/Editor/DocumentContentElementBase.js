@@ -142,6 +142,53 @@ CDocumentContentElementBase.prototype.Write_ToBinary2 = function(Writer)
 CDocumentContentElementBase.prototype.Read_FromBinary2 = function(Reader)
 {
 };
+//----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с номерами страниц
+//----------------------------------------------------------------------------------------------------------------------
+CDocumentContentElementBase.prototype.Get_StartPage_Absolute = function()
+{
+	return this.Get_AbsolutePage(0);
+};
+CDocumentContentElementBase.prototype.Get_StartPage_Relative = function()
+{
+	return this.PageNum;
+};
+CDocumentContentElementBase.prototype.Get_StartColumn = function()
+{
+	return this.ColumnNum;
+};
+CDocumentContentElementBase.prototype.Get_ColumnsCount = function()
+{
+	return this.ColumnsCount;
+};
+CDocumentContentElementBase.prototype.private_GetRelativePageIndex = function(CurPage)
+{
+	if (!this.ColumnsCount || 0 === this.ColumnsCount)
+		return this.PageNum + CurPage;
+
+	return this.PageNum + ((this.ColumnNum + CurPage) / this.ColumnsCount | 0);
+};
+CDocumentContentElementBase.prototype.private_GetAbsolutePageIndex = function(CurPage)
+{
+	return this.Parent.Get_AbsolutePage(this.private_GetRelativePageIndex(CurPage));
+};
+CDocumentContentElementBase.prototype.Get_AbsolutePage = function(CurPage)
+{
+	return this.private_GetAbsolutePageIndex(CurPage);
+};
+CDocumentContentElementBase.prototype.Get_AbsoluteColumn = function(CurPage)
+{
+	if (this.Parent instanceof CDocument)
+		return this.private_GetColumnIndex(CurPage);
+
+	return this.Parent.Get_AbsoluteColumn(this.private_GetRelativePageIndex(CurPage));
+};
+CDocumentContentElementBase.prototype.private_GetColumnIndex = function(CurPage)
+{
+	return (this.ColumnNum + CurPage) - (((this.ColumnNum + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
+};
+//----------------------------------------------------------------------------------------------------------------------
+
 
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

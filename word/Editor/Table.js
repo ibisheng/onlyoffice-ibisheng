@@ -2390,51 +2390,6 @@ CTable.prototype.Get_PrevElementEndInfo = function(RowIndex)
 		return this.Content[RowIndex - 1].Get_EndInfo();
 };
 //----------------------------------------------------------------------------------------------------------------------
-// Функции для работы с номерами страниц
-//----------------------------------------------------------------------------------------------------------------------
-CTable.prototype.Get_StartPage_Absolute = function()
-{
-	return this.Get_AbsolutePage(0);
-};
-CTable.prototype.Get_StartPage_Relative = function()
-{
-	return this.PageNum;
-};
-CTable.prototype.Get_StartColumn = function()
-{
-	return this.ColumnNum;
-};
-CTable.prototype.Get_ColumnsCount = function()
-{
-	return this.ColumnsCount;
-};
-CTable.prototype.private_GetRelativePageIndex = function(CurPage)
-{
-	if (!this.ColumnsCount || 0 === this.ColumnsCount)
-		return this.PageNum + CurPage;
-
-	return this.PageNum + ((this.ColumnNum + CurPage) / this.ColumnsCount | 0);
-};
-CTable.prototype.private_GetAbsolutePageIndex = function(CurPage)
-{
-	return this.Parent.Get_AbsolutePage(this.private_GetRelativePageIndex(CurPage));
-};
-CTable.prototype.Get_AbsolutePage = function(CurPage)
-{
-	return this.private_GetAbsolutePageIndex(CurPage);
-};
-CTable.prototype.Get_AbsoluteColumn = function(CurPage)
-{
-	if (this.Parent instanceof CDocument)
-		return this.private_GetColumnIndex(CurPage);
-
-	return this.Parent.Get_AbsoluteColumn(this.private_GetRelativePageIndex(CurPage));
-};
-CTable.prototype.private_GetColumnIndex = function(CurPage)
-{
-	return (this.ColumnNum + CurPage) - (((this.ColumnNum + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
-};
-//----------------------------------------------------------------------------------------------------------------------
 // Функции к которым идет обращение из родительского класса
 //----------------------------------------------------------------------------------------------------------------------
 CTable.prototype.Copy = function(Parent)
