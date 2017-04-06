@@ -135,6 +135,13 @@ CDocumentContentElementBase.prototype.Is_EmptyPage = function(CurPage)
 CDocumentContentElementBase.prototype.Reset_RecalculateCache = function()
 {
 };
+CDocumentContentElementBase.prototype.Write_ToBinary2 = function(Writer)
+{
+	Writer.WriteLong(AscDFH.historyitem_type_Unknown);
+};
+CDocumentContentElementBase.prototype.Read_FromBinary2 = function(Reader)
+{
+};
 
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

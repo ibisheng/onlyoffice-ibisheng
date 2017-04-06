@@ -1545,10 +1545,6 @@ CDocument.prototype.Init                           = function()
 {
 
 };
-CDocument.prototype.Get_Id                         = function()
-{
-    return this.Id;
-};
 CDocument.prototype.On_EndLoad                     = function()
 {
     // Обновляем информацию о секциях

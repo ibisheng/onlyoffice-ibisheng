@@ -99,6 +99,18 @@ CBlockLevelSdt.prototype.Reset_RecalculateCache = function()
 {
 	this.Content.Reset_RecalculateCache();
 };
+CBlockLevelSdt.prototype.Write_ToBinary2 = function(Writer)
+{
+	Writer.WriteLong(AscDFH.historyitem_type_BlockLevelSdt);
+	// String : Content id
+	Writer.WriteString(this.Content.GetId());
+};
+CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
+{
+	// String : Content id
+	this.Content = this.LogicDocument.Get_TableId().Get_ById(Reader.GetString2());
+};
+
 
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

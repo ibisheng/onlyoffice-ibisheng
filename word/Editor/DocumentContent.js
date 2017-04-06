@@ -154,10 +154,6 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 CDocumentContent.prototype = Object.create(CDocumentContentBase.prototype);
 CDocumentContent.prototype.constructor = CDocumentContent;
 
-CDocumentContent.prototype.Get_Id          = function()
-{
-    return this.Id;
-};
 CDocumentContent.prototype.Save_StartState = function()
 {
     this.StartState = new CDocumentContentStartState(this);
