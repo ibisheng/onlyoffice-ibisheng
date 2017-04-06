@@ -266,7 +266,7 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent, bIsAddMat
     var _drawing_document = isRealObject(drawingDocument) ? drawingDocument : paragraph.DrawingDocument;
     var _new_parent = isRealObject(newParent) ? newParent : paragraph.Parent;
 
-    var new_paragraph = new Paragraph(_drawing_document, _new_parent, 0, 0, 0, 0, 0, true);
+    var new_paragraph = new Paragraph(_drawing_document, _new_parent, true);
     if(!(paragraph instanceof Paragraph))
         return new_paragraph;
     var oCopyPr = paragraph.Pr.Copy();
@@ -497,7 +497,8 @@ function ConvertGraphicFrameToWordTable(oGraphicFrame, oDocument){
 }
 function ConvertTableToGraphicFrame(oTable, oPresentation){
     var oGraphicFrame = new AscFormat.CGraphicFrame();
-    var oTable2 = new CTable(oPresentation.DrawingDocument, oGraphicFrame, true, 0, 0, 0, 50, 100000, 0, [].concat(oTable.TableGrid), oTable.TableGrid.length, true);
+    var oTable2 = new CTable(oPresentation.DrawingDocument, oGraphicFrame, true, 0, [].concat(oTable.TableGrid), oTable.TableGrid.length, true);
+    oTable2.Reset(0, 0, 50, 100000, 0, 0, 1);
     oTable2.Set_TableLayout(tbllayout_Fixed);
     oTable2.Set_Pr(oTable.Pr.Copy());
     oTable2.Set_TableLook(oTable.TableLook.Copy());
@@ -2277,6 +2278,7 @@ CShape.prototype.copy = function () {
     {
         copy.setBFromSerialize(true);
     }
+    copy.setLocks(this.locks);
     copy.cachedImage = this.getBase64Img();
     copy.cachedPixH = this.cachedPixH;
     copy.cachedPixW = this.cachedPixW;

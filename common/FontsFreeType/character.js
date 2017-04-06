@@ -399,7 +399,7 @@
 		Latin_Extended_Additional:   29,
 		Greek_Extended:              30,
 		General_Punctuation:         31
-	}
+	};
 
 	/**
 	 * @enum {number}
@@ -437,7 +437,7 @@
 		CJK_Strokes:                             61 - 32,
 		Alphabetic_Presentation_Forms:           62 - 32,
 		Arabic_Presentation_Forms_A:             63 - 32
-	}
+	};
 
 	/**
 	 * @enum {number}
@@ -475,7 +475,7 @@
 		Limbu:                                 93 - 64,
 		Tai_Le:                                94 - 64,
 		New_Tai_Lue:                           95 - 64
-	}
+	};
 
 	/**
 	 * @enum {number}
@@ -529,8 +529,8 @@
 	var c_oUnicodeRanges = [
 		new CRange(0x0000, 0x007F, c_oUnicodeRangesLID.Basic_Latin, lcid_enUS, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1), 0]),
 		new CRange(0x0080, 0x00FF, c_oUnicodeRangesLID.Latin_1_Supplement, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_1_Supplement), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1), 0]),
-		new CRange(0x0100, 0x017F, c_oUnicodeRangesLID.Latin_Extended_A, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_Extended_A), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1), 0]),
-		new CRange(0x0180, 0x024F, c_oUnicodeRangesLID.Latin_Extended_B, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_Extended_B), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1), 0]),
+		new CRange(0x0100, 0x017F, c_oUnicodeRangesLID.Latin_Extended_A, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_Extended_A), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1) | (1 << c_oCodePagesOS2_1.Latin_2) | (1 << c_oCodePagesOS2_1.Turkish) | (1 << c_oCodePagesOS2_1.Windows_Baltic), 0]),
+		new CRange(0x0180, 0x024F, c_oUnicodeRangesLID.Latin_Extended_B, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Basic_Latin) | (1 << c_oUnicodeRangeOS2_1.Latin_Extended_B), 0, 0, 0, (1 << c_oCodePagesOS2_1.Latin_1) | (1 << c_oCodePagesOS2_1.Latin_2) | (1 << c_oCodePagesOS2_1.Turkish) | (1 << c_oCodePagesOS2_1.Windows_Baltic), 0]),
 		new CRange(0x0250, 0x02AF, c_oUnicodeRangesLID.IPA_Extensions, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.IPA_Extensions), 0, 0, 0, 0, 0]),
 		new CRange(0x02B0, 0x02FF, c_oUnicodeRangesLID.Spacing_Modifier_Letters, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Spacing_Modifier_Letters), 0, 0, 0, 0, 0]),
 		new CRange(0x0300, 0x036F, c_oUnicodeRangesLID.Combining_Diacritical_Marks, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Combining_Diacritical_Marks), 0, 0, 0, 0, 0]),
@@ -562,7 +562,7 @@
 		new CRange(0x0F00, 0x0FFF, c_oUnicodeRangesLID.Tibetan, lcid_boBT, [0, 0, (1 << c_oUnicodeRangeOS2_3.Tibetan), 0, 0, 0]),
 		new CRange(0x1000, 0x109F, c_oUnicodeRangesLID.Myanmar, lcid_myMM, [0, 0, (1 << c_oUnicodeRangeOS2_3.Myanmar), 0, 0, 0]),
 		new CRange(0x10A0, 0x10FF, c_oUnicodeRangesLID.Georgian, lcid_kaGE, [(1 << c_oUnicodeRangeOS2_1.Georgian), 0, 0, 0, 0, 0]),
-		new CRange(0x1100, 0x11FF, c_oUnicodeRangesLID.Hangul_Jamo, lcid_koKR, [(1 << c_oUnicodeRangeOS2_1.Hangul_Jamo), 0, 0, 0, 0, 0]),
+		new CRange(0x1100, 0x11FF, c_oUnicodeRangesLID.Hangul_Jamo, lcid_koKR, [(1 << c_oUnicodeRangeOS2_1.Hangul_Jamo), 0, 0, 0, (1 << c_oCodePagesOS2_1.Korean_Wansung), 0]),
 		new CRange(0x1200, 0x137F, c_oUnicodeRangesLID.Ethiopic, lcid_gazET, [0, 0, (1 << c_oUnicodeRangeOS2_3.Ethiopic), 0, 0, 0]),
 		new CRange(0x1380, 0x139F, c_oUnicodeRangesLID.Ethiopic_Supplement, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Ethiopic), 0, 0, 0]),
 		new CRange(0x13A0, 0x13FF, c_oUnicodeRangesLID.Cherokee, lcid_chrUS, [0, 0, (1 << c_oUnicodeRangeOS2_3.Cherokee), 0, 0, 0]),
@@ -582,143 +582,143 @@
 		new CRange(0x19E0, 0x19FF, c_oUnicodeRangesLID.Khmer_Symbols, lcid_kmKH, [0, 0, (1 << c_oUnicodeRangeOS2_3.Khmer), 0, 0, 0]),
 		new CRange(0x1A00, 0x1A1F, c_oUnicodeRangesLID.Buginese, lcid_unknown,  [0, 0, (1 << c_oUnicodeRangeOS2_3.Buginese), 0, 0, 0]),
 		new CRange(0x1A20, 0x1AAF, c_oUnicodeRangesLID.Tai_Tham, lcid_thTH, [0, 0, (1 << c_oUnicodeRangeOS2_3.Tai_Le), 0, 0, 0]),
-		new CRange(0x1AB0, 0x1AFF, c_oUnicodeRangesLID.Combining_Diacritical_Marks_Extended, lcid_unknown, []),
-		new CRange(0x1B00, 0x1B7F, c_oUnicodeRangesLID.Balinese, lcid_idID, []),
-		new CRange(0x1B80, 0x1BBF, c_oUnicodeRangesLID.Sundanese, lcid_idID, []),
+		new CRange(0x1AB0, 0x1AFF, c_oUnicodeRangesLID.Combining_Diacritical_Marks_Extended, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Combining_Diacritical_Marks), 0, 0, 0, 0, 0]),
+		new CRange(0x1B00, 0x1B7F, c_oUnicodeRangesLID.Balinese, lcid_idID, [(1 << c_oUnicodeRangeOS2_1.Balinese), 0, 0, 0, 0, 0]),
+		new CRange(0x1B80, 0x1BBF, c_oUnicodeRangesLID.Sundanese, lcid_idID, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Sundanese), 0, 0]),
 		new CRange(0x1BC0, 0x1BFF, c_oUnicodeRangesLID.Batak, lcid_idID, []),
-		new CRange(0x1C00, 0x1C4F, c_oUnicodeRangesLID.Lepcha, lcid_unknown, []),
-		new CRange(0x1C50, 0x1C7F, c_oUnicodeRangesLID.Ol_Chiki, lcid_unknown, []),
-		new CRange(0x1C80, 0x1C8F, c_oUnicodeRangesLID.Cyrillic_Extended_C, lcid_unknown, []),
-		new CRange(0x1CC0, 0x1CCF, c_oUnicodeRangesLID.Sundanese_Supplement, lcid_unknown, []),
+		new CRange(0x1C00, 0x1C4F, c_oUnicodeRangesLID.Lepcha, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Lepcha), 0, 0]),
+		new CRange(0x1C50, 0x1C7F, c_oUnicodeRangesLID.Ol_Chiki, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Ol_Chiki), 0, 0]),
+		new CRange(0x1C80, 0x1C8F, c_oUnicodeRangesLID.Cyrillic_Extended_C, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Cyrillic), 0, 0, 0, 0, 0]),
+		new CRange(0x1CC0, 0x1CCF, c_oUnicodeRangesLID.Sundanese_Supplement, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Sundanese), 0, 0]),
 		new CRange(0x1CD0, 0x1CFF, c_oUnicodeRangesLID.Vedic_Extensions, lcid_unknown, []),
 		new CRange(0x1D00, 0x1D7F, c_oUnicodeRangesLID.Phonetic_Extensions, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.IPA_Extensions), 0, 0, 0, 0, 0]),
 		new CRange(0x1D80, 0x1DBF, c_oUnicodeRangesLID.Phonetic_Extensions_Supplement, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.IPA_Extensions), 0, 0, 0, 0, 0]),
 		new CRange(0x1DC0, 0x1DFF, c_oUnicodeRangesLID.Combining_Diacritical_Marks_Supplement, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Combining_Diacritical_Marks), 0, 0, 0, 0, 0]),
-		new CRange(0x1E00, 0x1EFF, c_oUnicodeRangesLID.Latin_Extended_Additional, lcid_unknown, []),
-		new CRange(0x1F00, 0x1FFF, c_oUnicodeRangesLID.Greek_Extended, lcid_unknown, []),
-		new CRange(0x2000, 0x206F, c_oUnicodeRangesLID.General_Punctuation, lcid_unknown, []),
-		new CRange(0x2070, 0x209F, c_oUnicodeRangesLID.Superscripts_and_Subscripts, lcid_unknown, []),
-		new CRange(0x20A0, 0x20CF, c_oUnicodeRangesLID.Currency_Symbols, lcid_unknown, []),
-		new CRange(0x20D0, 0x20FF, c_oUnicodeRangesLID.Combining_Diacritical_Marks_for_Symbols, lcid_unknown, []),
-		new CRange(0x2100, 0x214F, c_oUnicodeRangesLID.Letterlike_Symbols, lcid_unknown, []),
-		new CRange(0x2150, 0x218F, c_oUnicodeRangesLID.Number_Forms, lcid_unknown, []),
-		new CRange(0x2190, 0x21FF, c_oUnicodeRangesLID.Arrows, lcid_unknown, []),
-		new CRange(0x2200, 0x22FF, c_oUnicodeRangesLID.Mathematical_Operators, lcid_unknown, []),
-		new CRange(0x2300, 0x23FF, c_oUnicodeRangesLID.Miscellaneous_Technical, lcid_unknown, []),
-		new CRange(0x2400, 0x243F, c_oUnicodeRangesLID.Control_Pictures, lcid_unknown, []),
-		new CRange(0x2440, 0x245F, c_oUnicodeRangesLID.Optical_Character_Recognition, lcid_unknown, []),
-		new CRange(0x2460, 0x24FF, c_oUnicodeRangesLID.Enclosed_Alphanumerics, lcid_unknown, []),
-		new CRange(0x2500, 0x257F, c_oUnicodeRangesLID.Box_Drawing, lcid_unknown, []),
-		new CRange(0x2580, 0x259F, c_oUnicodeRangesLID.Block_Elements, lcid_unknown, []),
-		new CRange(0x25A0, 0x25FF, c_oUnicodeRangesLID.Geometric_Shapes, lcid_unknown, []),
-		new CRange(0x2600, 0x26FF, c_oUnicodeRangesLID.Miscellaneous_Symbols, lcid_unknown, []),
-		new CRange(0x2700, 0x27BF, c_oUnicodeRangesLID.Dingbats, lcid_unknown, []),
-		new CRange(0x27C0, 0x27EF, c_oUnicodeRangesLID.Miscellaneous_Mathematical_Symbols_A, lcid_unknown, []),
-		new CRange(0x27F0, 0x27FF, c_oUnicodeRangesLID.Supplemental_Arrows_A, lcid_unknown, []),
-		new CRange(0x2800, 0x28FF, c_oUnicodeRangesLID.Braille_Patterns, lcid_unknown, []),
-		new CRange(0x2900, 0x297F, c_oUnicodeRangesLID.Supplemental_Arrows_B, lcid_unknown, []),
-		new CRange(0x2980, 0x29FF, c_oUnicodeRangesLID.Miscellaneous_Mathematical_Symbols_B, lcid_unknown, []),
-		new CRange(0x2A00, 0x2AFF, c_oUnicodeRangesLID.Supplemental_Mathematical_Operators, lcid_unknown, []),
-		new CRange(0x2B00, 0x2BFF, c_oUnicodeRangesLID.Miscellaneous_Symbols_and_Arrows, lcid_unknown, []),
-		new CRange(0x2C00, 0x2C5F, c_oUnicodeRangesLID.Glagolitic, lcid_unknown, []),
-		new CRange(0x2C60, 0x2C7F, c_oUnicodeRangesLID.Latin_Extended_C, lcid_unknown, []),
+		new CRange(0x1E00, 0x1EFF, c_oUnicodeRangesLID.Latin_Extended_Additional, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Latin_Extended_Additional), 0, 0, 0, (1 << c_oCodePagesOS2_1.Vietnamese), 0]),
+		new CRange(0x1F00, 0x1FFF, c_oUnicodeRangesLID.Greek_Extended, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Greek_Extended), 0, 0, 0, 0, 0]),
+		new CRange(0x2000, 0x206F, c_oUnicodeRangesLID.General_Punctuation, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Punctuation), 0, 0, 0, 0, 0]),
+		new CRange(0x2070, 0x209F, c_oUnicodeRangesLID.Superscripts_and_Subscripts, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Superscripts_And_Subscripts), 0, 0, 0, 0]),
+		new CRange(0x20A0, 0x20CF, c_oUnicodeRangesLID.Currency_Symbols, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Currency_Symbols), 0, 0, 0, 0]),
+		new CRange(0x20D0, 0x20FF, c_oUnicodeRangesLID.Combining_Diacritical_Marks_for_Symbols, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Combining_Diacritical_Marks_For_Symbols), 0, 0, 0, 0]),
+		new CRange(0x2100, 0x214F, c_oUnicodeRangesLID.Letterlike_Symbols, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Letterlike_Symbols), 0, 0, 0, 0]),
+		new CRange(0x2150, 0x218F, c_oUnicodeRangesLID.Number_Forms, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Number_Forms), 0, 0, 0, 0]),
+		new CRange(0x2190, 0x21FF, c_oUnicodeRangesLID.Arrows, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Arrows), 0, 0, 0, 0]),
+		new CRange(0x2200, 0x22FF, c_oUnicodeRangesLID.Mathematical_Operators, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Mathematical_Operators), 0, 0, 0, 0]),
+		new CRange(0x2300, 0x23FF, c_oUnicodeRangesLID.Miscellaneous_Technical, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Miscellaneous_Technical), 0, 0, 0, 0]),
+		new CRange(0x2400, 0x243F, c_oUnicodeRangesLID.Control_Pictures, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Control_Pictures), 0, 0, 0, 0]),
+		new CRange(0x2440, 0x245F, c_oUnicodeRangesLID.Optical_Character_Recognition, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Optical_Character_Recognition), 0, 0, 0, 0]),
+		new CRange(0x2460, 0x24FF, c_oUnicodeRangesLID.Enclosed_Alphanumerics, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Enclosed_Alphanumerics), 0, 0, 0, 0]),
+		new CRange(0x2500, 0x257F, c_oUnicodeRangesLID.Box_Drawing, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Box_Drawing), 0, 0, 0, 0]),
+		new CRange(0x2580, 0x259F, c_oUnicodeRangesLID.Block_Elements, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Block_Elements), 0, 0, 0, 0]),
+		new CRange(0x25A0, 0x25FF, c_oUnicodeRangesLID.Geometric_Shapes, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Geometric_Shapes), 0, 0, 0, 0]),
+		new CRange(0x2600, 0x26FF, c_oUnicodeRangesLID.Miscellaneous_Symbols, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Miscellaneous_Symbols), 0, 0, 0, 0]),
+		new CRange(0x2700, 0x27BF, c_oUnicodeRangesLID.Dingbats, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Dingbats), 0, 0, 0, 0]),
+		new CRange(0x27C0, 0x27EF, c_oUnicodeRangesLID.Miscellaneous_Mathematical_Symbols_A, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Mathematical_Operators), 0, 0, 0, 0]),
+		new CRange(0x27F0, 0x27FF, c_oUnicodeRangesLID.Supplemental_Arrows_A, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Arrows), 0, 0, 0, 0]),
+		new CRange(0x2800, 0x28FF, c_oUnicodeRangesLID.Braille_Patterns, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Braille_Patterns), 0, 0, 0]),
+		new CRange(0x2900, 0x297F, c_oUnicodeRangesLID.Supplemental_Arrows_B, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Arrows), 0, 0, 0, 0]),
+		new CRange(0x2980, 0x29FF, c_oUnicodeRangesLID.Miscellaneous_Mathematical_Symbols_B, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Mathematical_Operators), 0, 0, 0, 0]),
+		new CRange(0x2A00, 0x2AFF, c_oUnicodeRangesLID.Supplemental_Mathematical_Operators, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Mathematical_Operators), 0, 0, 0, 0]),
+		new CRange(0x2B00, 0x2BFF, c_oUnicodeRangesLID.Miscellaneous_Symbols_and_Arrows, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Arrows), 0, 0, 0, 0]),
+		new CRange(0x2C00, 0x2C5F, c_oUnicodeRangesLID.Glagolitic, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_2.Glagolitic), 0, 0]),
+		new CRange(0x2C60, 0x2C7F, c_oUnicodeRangesLID.Latin_Extended_C, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Latin_Extended_Additional), 0, 0, 0, 0, 0]),
 		new CRange(0x2C80, 0x2CFF, c_oUnicodeRangesLID.Coptic, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Coptic), 0, 0, 0, 0, 0]),
-		new CRange(0x2D00, 0x2D2F, c_oUnicodeRangesLID.Georgian_Supplement, lcid_unknown, []),
-		new CRange(0x2D30, 0x2D7F, c_oUnicodeRangesLID.Tifinagh, lcid_unknown, []),
+		new CRange(0x2D00, 0x2D2F, c_oUnicodeRangesLID.Georgian_Supplement, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Georgian), 0, 0, 0, 0, 0]),
+		new CRange(0x2D30, 0x2D7F, c_oUnicodeRangesLID.Tifinagh, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Tifinagh), 0, 0]),
 		new CRange(0x2D80, 0x2DDF, c_oUnicodeRangesLID.Ethiopic_Extended, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Ethiopic), 0, 0, 0]),
 		new CRange(0x2DE0, 0x2DFF, c_oUnicodeRangesLID.Cyrillic_Extended_A, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Cyrillic), 0, 0, 0, (1 << c_oCodePagesOS2_1.Cyrillic), 0]),
-		new CRange(0x2E00, 0x2E7F, c_oUnicodeRangesLID.Supplemental_Punctuation, lcid_unknown, []),
-		new CRange(0x2E80, 0x2EFF, c_oUnicodeRangesLID.CJK_Radicals_Supplement, lcid_unknown, []),
-		new CRange(0x2F00, 0x2FDF, c_oUnicodeRangesLID.Kangxi_Radicals, lcid_unknown, []),
-		new CRange(0x2FF0, 0x2FFF, c_oUnicodeRangesLID.Ideographic_Description_Characters, lcid_unknown, []),
-		new CRange(0x3000, 0x303F, c_oUnicodeRangesLID.CJK_Symbols_and_Punctuation, lcid_unknown, []),
-		new CRange(0x3040, 0x309F, c_oUnicodeRangesLID.Hiragana, lcid_jaJP, []),
-		new CRange(0x30A0, 0x30FF, c_oUnicodeRangesLID.Katakana, lcid_jaJP, []),
-		new CRange(0x3100, 0x312F, c_oUnicodeRangesLID.Bopomofo, lcid_unknown, []),
-		new CRange(0x3130, 0x318F, c_oUnicodeRangesLID.Hangul_Compatibility_Jamo, lcid_unknown, []),
-		new CRange(0x3190, 0x319F, c_oUnicodeRangesLID.Kanbun, lcid_zhCN, []),
-		new CRange(0x31A0, 0x31BF, c_oUnicodeRangesLID.Bopomofo_Extended, lcid_unknown, []),
-		new CRange(0x31C0, 0x31EF, c_oUnicodeRangesLID.CJK_Strokes, lcid_unknown, []),
-		new CRange(0x31F0, 0x31FF, c_oUnicodeRangesLID.Katakana_Phonetic_Extensions, lcid_unknown, []),
-		new CRange(0x3200, 0x32FF, c_oUnicodeRangesLID.Enclosed_CJK_Letters_and_Months, lcid_unknown, []),
-		new CRange(0x3300, 0x33FF, c_oUnicodeRangesLID.CJK_Compatibility, lcid_unknown, []),
-		new CRange(0x3400, 0x4DBF, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension, lcid_unknown, []),
-		new CRange(0x4DC0, 0x4DFF, c_oUnicodeRangesLID.Yijing_Hexagram_Symbols, lcid_unknown, []),
-		new CRange(0x4E00, 0x9FFF, c_oUnicodeRangesLID.CJK_Unified_Ideographs, lcid_unknown, []),
-		new CRange(0xA000, 0xA48F, c_oUnicodeRangesLID.Yi_Syllables, lcid_unknown, []),
-		new CRange(0xA490, 0xA4CF, c_oUnicodeRangesLID.Yi_Radicals, lcid_unknown, []),
+		new CRange(0x2E00, 0x2E7F, c_oUnicodeRangesLID.Supplemental_Punctuation, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.General_Punctuation), 0, 0, 0, 0, 0]),
+		new CRange(0x2E80, 0x2EFF, c_oUnicodeRangesLID.CJK_Radicals_Supplement, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Unified_Ideographs), 0, 0, 0, 0]),
+		new CRange(0x2F00, 0x2FDF, c_oUnicodeRangesLID.Kangxi_Radicals, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Unified_Ideographs), 0, 0, 0, 0]),
+		new CRange(0x2FF0, 0x2FFF, c_oUnicodeRangesLID.Ideographic_Description_Characters, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Unified_Ideographs), 0, 0, 0, 0]),
+		new CRange(0x3000, 0x303F, c_oUnicodeRangesLID.CJK_Symbols_and_Punctuation, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Symbols_And_Punctuation), 0, 0, (1 << c_oCodePagesOS2_1.JIS_Japan) | (1 << c_oCodePagesOS2_1.OEM_Character_Set), 0]),
+		new CRange(0x3040, 0x309F, c_oUnicodeRangesLID.Hiragana, lcid_jaJP, [0, (1 << c_oUnicodeRangeOS2_2.Hiragana), 0, 0, 0, 0]),
+		new CRange(0x30A0, 0x30FF, c_oUnicodeRangesLID.Katakana, lcid_jaJP, [0, (1 << c_oUnicodeRangeOS2_2.Katakana), 0, 0, 0, 0]),
+		new CRange(0x3100, 0x312F, c_oUnicodeRangesLID.Bopomofo, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Bopomofo), 0, 0, 0, 0]),
+		new CRange(0x3130, 0x318F, c_oUnicodeRangesLID.Hangul_Compatibility_Jamo, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Hangul_Compatibility_Jamo), 0, 0, (1 << c_oCodePagesOS2_1.Korean_Wansung), 0]),
+		new CRange(0x3190, 0x319F, c_oUnicodeRangesLID.Kanbun, lcid_zhCN, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Unified_Ideographs), 0, 0, 0, 0]),
+		new CRange(0x31A0, 0x31BF, c_oUnicodeRangesLID.Bopomofo_Extended, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Bopomofo), 0, 0, 0, 0]),
+		new CRange(0x31C0, 0x31EF, c_oUnicodeRangesLID.CJK_Strokes, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Strokes), 0, 0, 0, 0]),
+		new CRange(0x31F0, 0x31FF, c_oUnicodeRangesLID.Katakana_Phonetic_Extensions, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Katakana), 0, 0, 0, 0]),
+		new CRange(0x3200, 0x32FF, c_oUnicodeRangesLID.Enclosed_CJK_Letters_and_Months, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Enclosed_CJK_Letters_And_Months), 0, 0, 0, 0]),
+		new CRange(0x3300, 0x33FF, c_oUnicodeRangesLID.CJK_Compatibility, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Compatibility), 0, 0, 0, 0]),
+		new CRange(0x3400, 0x4DBF, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Unified_Ideographs), 0, 0, (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional), 0]),
+		new CRange(0x4DC0, 0x4DFF, c_oUnicodeRangesLID.Yijing_Hexagram_Symbols, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Yijing_Hexagram_Symbols), (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional), 0]),
+		new CRange(0x4E00, 0x9FFF, c_oUnicodeRangesLID.CJK_Unified_Ideographs, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Unified_Ideographs), 0, 0, (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional) | (1 << c_oCodePagesOS2_1.JIS_Japan) | (1 << c_oCodePagesOS2_1.OEM_Character_Set), 0]),
+		new CRange(0xA000, 0xA48F, c_oUnicodeRangesLID.Yi_Syllables, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Yi_Syllables), 0, 0, 0]),
+		new CRange(0xA490, 0xA4CF, c_oUnicodeRangesLID.Yi_Radicals, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Yi_Radicals), 0, 0, 0]),
 		new CRange(0xA4D0, 0xA4FF, c_oUnicodeRangesLID.Lisu, lcid_unknown, []),
-		new CRange(0xA500, 0xA63F, c_oUnicodeRangesLID.Vai, lcid_unknown, []),
+		new CRange(0xA500, 0xA63F, c_oUnicodeRangesLID.Vai, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Vai), 0, 0, 0, 0, 0]),
 		new CRange(0xA640, 0xA69F, c_oUnicodeRangesLID.Cyrillic_Extended_B, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Cyrillic), 0, 0, 0, (1 << c_oCodePagesOS2_1.Cyrillic), 0]),
 		new CRange(0xA6A0, 0xA6FF, c_oUnicodeRangesLID.Bamum, lcid_unknown, []),
 		new CRange(0xA700, 0xA71F, c_oUnicodeRangesLID.Modifier_Tone_Letters, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Spacing_Modifier_Letters), 0, 0, 0, 0, 0]),
-		new CRange(0xA720, 0xA7FF, c_oUnicodeRangesLID.Latin_Extended_D, lcid_unknown, []),
-		new CRange(0xA800, 0xA82F, c_oUnicodeRangesLID.Syloti_Nagri, lcid_unknown, []),
+		new CRange(0xA720, 0xA7FF, c_oUnicodeRangesLID.Latin_Extended_D, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Latin_Extended_Additional), 0, 0, 0, 0, 0]),
+		new CRange(0xA800, 0xA82F, c_oUnicodeRangesLID.Syloti_Nagri, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Syloti_Nagri), 0, 0]),
 		new CRange(0xA830, 0xA83F, c_oUnicodeRangesLID.Common_Indic_Number_Forms, lcid_unknown, []),
-		new CRange(0xA840, 0xA87F, c_oUnicodeRangesLID.Phags_pa, lcid_unknown, []),
-		new CRange(0xA880, 0xA8DF, c_oUnicodeRangesLID.Saurashtra, lcid_unknown, []),
-		new CRange(0xA8E0, 0xA8FF, c_oUnicodeRangesLID.Devanagari_Extended, lcid_unknown, []),
-		new CRange(0xA900, 0xA92F, c_oUnicodeRangesLID.Kayah_Li, lcid_unknown, []),
-		new CRange(0xA930, 0xA95F, c_oUnicodeRangesLID.Rejang, lcid_unknown, []),
-		new CRange(0xA960, 0xA97F, c_oUnicodeRangesLID.Hangul_Jamo_Extended_A, lcid_unknown, []),
+		new CRange(0xA840, 0xA87F, c_oUnicodeRangesLID.Phags_pa, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Phags_pa), 0, 0, 0, 0]),
+		new CRange(0xA880, 0xA8DF, c_oUnicodeRangesLID.Saurashtra, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Saurashtra), 0, 0]),
+		new CRange(0xA8E0, 0xA8FF, c_oUnicodeRangesLID.Devanagari_Extended, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Devanagari), 0, 0, 0, 0, 0]),
+		new CRange(0xA900, 0xA92F, c_oUnicodeRangesLID.Kayah_Li, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Kayah_Li), 0, 0]),
+		new CRange(0xA930, 0xA95F, c_oUnicodeRangesLID.Rejang, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Rejang), 0, 0]),
+		new CRange(0xA960, 0xA97F, c_oUnicodeRangesLID.Hangul_Jamo_Extended_A, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Hangul_Jamo), 0, 0, 0, 0, 0]),
 		new CRange(0xA980, 0xA9DF, c_oUnicodeRangesLID.Javanese, lcid_idID, []),
-		new CRange(0xA9E0, 0xA9FF, c_oUnicodeRangesLID.Myanmar_Extended_B, lcid_unknown, []),
-		new CRange(0xAA00, 0xAA5F, c_oUnicodeRangesLID.Cham, lcid_unknown, []),
-		new CRange(0xAA60, 0xAA7F, c_oUnicodeRangesLID.Myanmar_Extended_A, lcid_unknown, []),
+		new CRange(0xA9E0, 0xA9FF, c_oUnicodeRangesLID.Myanmar_Extended_B, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Myanmar), 0, 0, 0]),
+		new CRange(0xAA00, 0xAA5F, c_oUnicodeRangesLID.Cham, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Cham), 0, 0]),
+		new CRange(0xAA60, 0xAA7F, c_oUnicodeRangesLID.Myanmar_Extended_A, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Myanmar), 0, 0, 0]),
 		new CRange(0xAA80, 0xAADF, c_oUnicodeRangesLID.Tai_Viet, lcid_unknown, []),
 		new CRange(0xAAE0, 0xAAFF, c_oUnicodeRangesLID.Meetei_Mayek_Extensions, lcid_unknown, []),
 		new CRange(0xAB00, 0xAB2F, c_oUnicodeRangesLID.Ethiopic_Extended_A, lcid_unknown, []),
-		new CRange(0xAB30, 0xAB6F, c_oUnicodeRangesLID.Latin_Extended_E, lcid_unknown, []),
+		new CRange(0xAB30, 0xAB6F, c_oUnicodeRangesLID.Latin_Extended_E, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Latin_Extended_Additional), 0, 0, 0, 0, 0]),
 		new CRange(0xAB70, 0xABBF, c_oUnicodeRangesLID.Cherokee_Supplement, lcid_unknown, []),
 		new CRange(0xABC0, 0xABFF, c_oUnicodeRangesLID.Meetei_Mayek, lcid_unknown, []),
-		new CRange(0xAC00, 0xD7AF, c_oUnicodeRangesLID.Hangul_Syllables, lcid_unknown, []),
-		new CRange(0xD7B0, 0xD7FF, c_oUnicodeRangesLID.Hangul_Jamo_Extended_B, lcid_unknown, []),
+		new CRange(0xAC00, 0xD7AF, c_oUnicodeRangesLID.Hangul_Syllables, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Hangul_Syllables), 0, 0, (1 << c_oCodePagesOS2_1.Korean_Wansung), 0]),
+		new CRange(0xD7B0, 0xD7FF, c_oUnicodeRangesLID.Hangul_Jamo_Extended_B, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Hangul_Jamo), 0, 0, 0, 0, 0]),
 		new CRange(0xD800, 0xDB7F, c_oUnicodeRangesLID.High_Surrogates, lcid_unknown, []),
 		new CRange(0xDB80, 0xDBFF, c_oUnicodeRangesLID.High_Private_Use_Surrogates, lcid_unknown, []),
 		new CRange(0xDC00, 0xDFFF, c_oUnicodeRangesLID.Low_Surrogates, lcid_unknown, []),
-		new CRange(0xE000, 0xF8FF, c_oUnicodeRangesLID.Private_Use_Area, lcid_unknown, []),
-		new CRange(0xF900, 0xFAFF, c_oUnicodeRangesLID.CJK_Compatibility_Ideographs, lcid_unknown, []),
-		new CRange(0xFB00, 0xFB4F, c_oUnicodeRangesLID.Alphabetic_Presentation_Forms, lcid_unknown, []),
-		new CRange(0xFB50, 0xFDFF, c_oUnicodeRangesLID.Arabic_Presentation_Forms_A, lcid_unknown, []),
-		new CRange(0xFE00, 0xFE0F, c_oUnicodeRangesLID.Variation_Selectors, lcid_unknown, []),
-		new CRange(0xFE10, 0xFE1F, c_oUnicodeRangesLID.Vertical_Forms, lcid_unknown, []),
-		new CRange(0xFE20, 0xFE2F, c_oUnicodeRangesLID.Combining_Half_Marks, lcid_unknown, []),
-		new CRange(0xFE30, 0xFE4F, c_oUnicodeRangesLID.CJK_Compatibility_Forms, lcid_unknown, []),
-		new CRange(0xFE50, 0xFE6F, c_oUnicodeRangesLID.Small_Form_Variants, lcid_unknown, []),
-		new CRange(0xFE70, 0xFEFF, c_oUnicodeRangesLID.Arabic_Presentation_Forms_B, lcid_unknown, []),
-		new CRange(0xFF00, 0xFFEF, c_oUnicodeRangesLID.Halfwidth_and_Fullwidth_Forms, lcid_unknown, []),
-		new CRange(0xFFF0, 0xFFFF, c_oUnicodeRangesLID.Specials, lcid_unknown, []),
-		new CRange(0x10000, 0x1007F, c_oUnicodeRangesLID.Linear_B_Syllabary, lcid_unknown, []),
-		new CRange(0x10080, 0x100FF, c_oUnicodeRangesLID.Linear_B_Ideograms, lcid_unknown, []),
-		new CRange(0x10100, 0x1013F, c_oUnicodeRangesLID.Aegean_Numbers, lcid_unknown, []),
-		new CRange(0x10140, 0x1018F, c_oUnicodeRangesLID.Ancient_Greek_Numbers, lcid_unknown, []),
-		new CRange(0x10190, 0x101CF, c_oUnicodeRangesLID.Ancient_Symbols, lcid_unknown, []),
-		new CRange(0x101D0, 0x101FF, c_oUnicodeRangesLID.Phaistos_Disc, lcid_unknown, []),
-		new CRange(0x10280, 0x1029F, c_oUnicodeRangesLID.Lycian, lcid_unknown, []),
-		new CRange(0x102A0, 0x102DF, c_oUnicodeRangesLID.Carian, lcid_unknown, []),
-		new CRange(0x102E0, 0x102FF, c_oUnicodeRangesLID.Coptic_Epact_Numbers, lcid_unknown, []),
-		new CRange(0x10300, 0x1032F, c_oUnicodeRangesLID.Old_Italic, lcid_unknown, []),
-		new CRange(0x10330, 0x1034F, c_oUnicodeRangesLID.Gothic, lcid_unknown, []),
+		new CRange(0xE000, 0xF8FF, c_oUnicodeRangesLID.Private_Use_Area, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Private_Use_Area_plane_0), 0, 0, 0, 0]),
+		new CRange(0xF900, 0xFAFF, c_oUnicodeRangesLID.CJK_Compatibility_Ideographs, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.CJK_Compatibility_Ideographs), 0, 0, (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional), 0]),
+		new CRange(0xFB00, 0xFB4F, c_oUnicodeRangesLID.Alphabetic_Presentation_Forms, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Alphabetic_Presentation_Forms), 0, 0, 0, 0]),
+		new CRange(0xFB50, 0xFDFF, c_oUnicodeRangesLID.Arabic_Presentation_Forms_A, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Arabic_Presentation_Forms_A), 0, 0, (1 << c_oCodePagesOS2_1.Arabic), (1 << c_oCodePagesOS2_2.Arabic) | (1 << c_oCodePagesOS2_2.Arabic_708)]),
+		new CRange(0xFE00, 0xFE0F, c_oUnicodeRangesLID.Variation_Selectors, lcid_unknown,  [0, 0, (1 << c_oUnicodeRangeOS2_3.Variation_Selectors), 0, 0, 0]),
+		new CRange(0xFE10, 0xFE1F, c_oUnicodeRangesLID.Vertical_Forms, lcid_unknown,  [0, 0, (1 << c_oUnicodeRangeOS2_3.Vertical_Forms), 0, 0, 0]),
+		new CRange(0xFE20, 0xFE2F, c_oUnicodeRangesLID.Combining_Half_Marks, lcid_unknown,  [0, 0, (1 << c_oUnicodeRangeOS2_3.Combining_Half_Marks), 0, 0, 0]),
+		new CRange(0xFE30, 0xFE4F, c_oUnicodeRangesLID.CJK_Compatibility_Forms, lcid_unknown,  [0, 0, (1 << c_oUnicodeRangeOS2_3.Vertical_Forms), 0, 0, 0]),
+		new CRange(0xFE50, 0xFE6F, c_oUnicodeRangesLID.Small_Form_Variants, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Small_Form_Variants), 0, 0, 0]),
+		new CRange(0xFE70, 0xFEFF, c_oUnicodeRangesLID.Arabic_Presentation_Forms_B, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Arabic_Presentation_Forms_B), 0, (1 << c_oCodePagesOS2_1.Arabic), (1 << c_oCodePagesOS2_2.Arabic) | (1 << c_oCodePagesOS2_2.Arabic_708)]),
+		new CRange(0xFF00, 0xFFEF, c_oUnicodeRangesLID.Halfwidth_and_Fullwidth_Forms, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Halfwidth_And_Fullwidth_Forms), 0, (1 << c_oCodePagesOS2_1.Korean_Wansung) | (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional) | (1 << c_oCodePagesOS2_1.JIS_Japan) | (1 << c_oCodePagesOS2_1.OEM_Character_Set), 0]),
+		new CRange(0xFFF0, 0xFFFF, c_oUnicodeRangesLID.Specials, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Specials), 0, 0, 0]),
+		new CRange(0x10000, 0x1007F, c_oUnicodeRangesLID.Linear_B_Syllabary, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Linear_B_Syllabary), 0, 0]),
+		new CRange(0x10080, 0x100FF, c_oUnicodeRangesLID.Linear_B_Ideograms, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Linear_B_Syllabary), 0, 0]),
+		new CRange(0x10100, 0x1013F, c_oUnicodeRangesLID.Aegean_Numbers, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Linear_B_Syllabary), 0, 0]),
+		new CRange(0x10140, 0x1018F, c_oUnicodeRangesLID.Ancient_Greek_Numbers, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Ancient_Greek_Numbers), 0, 0]),
+		new CRange(0x10190, 0x101CF, c_oUnicodeRangesLID.Ancient_Symbols, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Ancient_Symbols), 0, 0]),
+		new CRange(0x101D0, 0x101FF, c_oUnicodeRangesLID.Phaistos_Disc, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Phaistos_Disc), 0, 0]),
+		new CRange(0x10280, 0x1029F, c_oUnicodeRangesLID.Lycian, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Carian), 0, 0]),
+		new CRange(0x102A0, 0x102DF, c_oUnicodeRangesLID.Carian, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Carian), 0, 0]),
+		new CRange(0x102E0, 0x102FF, c_oUnicodeRangesLID.Coptic_Epact_Numbers, lcid_unknown, [(1 << c_oUnicodeRangeOS2_1.Coptic), 0, 0, 0, 0, 0]),
+		new CRange(0x10300, 0x1032F, c_oUnicodeRangesLID.Old_Italic, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Old_Italic), 0, 0, 0]),
+		new CRange(0x10330, 0x1034F, c_oUnicodeRangesLID.Gothic, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Gothic), 0, 0, 0]),
 		new CRange(0x10350, 0x1037F, c_oUnicodeRangesLID.Old_Permic, lcid_unknown, []),
-		new CRange(0x10380, 0x1039F, c_oUnicodeRangesLID.Ugaritic, lcid_unknown, []),
-		new CRange(0x103A0, 0x103DF, c_oUnicodeRangesLID.Old_Persian, lcid_unknown, []),
-		new CRange(0x10400, 0x1044F, c_oUnicodeRangesLID.Deseret, lcid_unknown, []),
-		new CRange(0x10450, 0x1047F, c_oUnicodeRangesLID.Shavian, lcid_unknown, []),
-		new CRange(0x10480, 0x104AF, c_oUnicodeRangesLID.Osmanya, lcid_unknown, []),
+		new CRange(0x10380, 0x1039F, c_oUnicodeRangesLID.Ugaritic, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Ugaritic), 0, 0]),
+		new CRange(0x103A0, 0x103DF, c_oUnicodeRangesLID.Old_Persian, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Old_Persian), 0, 0]),
+		new CRange(0x10400, 0x1044F, c_oUnicodeRangesLID.Deseret, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Deseret), 0, 0, 0]),
+		new CRange(0x10450, 0x1047F, c_oUnicodeRangesLID.Shavian, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Shavian), 0, 0]),
+		new CRange(0x10480, 0x104AF, c_oUnicodeRangesLID.Osmanya, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Osmanya), 0, 0]),
 		new CRange(0x104B0, 0x104FF, c_oUnicodeRangesLID.Osage, lcid_unknown, []),
 		new CRange(0x10500, 0x1052F, c_oUnicodeRangesLID.Elbasan, lcid_unknown, []),
 		new CRange(0x10530, 0x1056F, c_oUnicodeRangesLID.Caucasian_Albanian, lcid_unknown, []),
 		new CRange(0x10600, 0x1077F, c_oUnicodeRangesLID.Linear_A, lcid_unknown, []),
-		new CRange(0x10800, 0x1083F, c_oUnicodeRangesLID.Cypriot_Syllabary, lcid_unknown, []),
+		new CRange(0x10800, 0x1083F, c_oUnicodeRangesLID.Cypriot_Syllabary, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Cypriot_Syllabary), 0, 0]),
 		new CRange(0x10840, 0x1085F, c_oUnicodeRangesLID.Imperial_Aramaic, lcid_unknown, []),
 		new CRange(0x10860, 0x1087F, c_oUnicodeRangesLID.Palmyrene, lcid_unknown, []),
 		new CRange(0x10880, 0x108AF, c_oUnicodeRangesLID.Nabataean, lcid_unknown, []),
 		new CRange(0x108E0, 0x108FF, c_oUnicodeRangesLID.Hatran, lcid_unknown, []),
-		new CRange(0x10900, 0x1091F, c_oUnicodeRangesLID.Phoenician, lcid_unknown, []),
-		new CRange(0x10920, 0x1093F, c_oUnicodeRangesLID.Lydian, lcid_unknown, []),
+		new CRange(0x10900, 0x1091F, c_oUnicodeRangesLID.Phoenician, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Phoenician), 0, 0, 0, 0]),
+		new CRange(0x10920, 0x1093F, c_oUnicodeRangesLID.Lydian, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Carian), 0, 0]),
 		new CRange(0x10980, 0x1099F, c_oUnicodeRangesLID.Meroitic_Hieroglyphs, lcid_unknown, []),
 		new CRange(0x109A0, 0x109FF, c_oUnicodeRangesLID.Meroitic_Cursive, lcid_unknown, []),
-		new CRange(0x10A00, 0x10A5F, c_oUnicodeRangesLID.Kharoshthi, lcid_unknown, []),
+		new CRange(0x10A00, 0x10A5F, c_oUnicodeRangesLID.Kharoshthi, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Kharoshthi), 0, 0]),
 		new CRange(0x10A60, 0x10A7F, c_oUnicodeRangesLID.Old_South_Arabian, lcid_unknown, []),
 		new CRange(0x10A80, 0x10A9F, c_oUnicodeRangesLID.Old_North_Arabian, lcid_unknown, []),
 		new CRange(0x10AC0, 0x10AFF, c_oUnicodeRangesLID.Manichaean, lcid_unknown, []),
@@ -735,7 +735,7 @@
 		new CRange(0x11100, 0x1114F, c_oUnicodeRangesLID.Chakma, lcid_unknown, []),
 		new CRange(0x11150, 0x1117F, c_oUnicodeRangesLID.Mahajani, lcid_unknown, []),
 		new CRange(0x11180, 0x111DF, c_oUnicodeRangesLID.Sharada, lcid_unknown, []),
-		new CRange(0x111E0, 0x111FF, c_oUnicodeRangesLID.Sinhala_Archaic_Numbers, lcid_unknown, []),
+		new CRange(0x111E0, 0x111FF, c_oUnicodeRangesLID.Sinhala_Archaic_Numbers, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Sinhala), 0, 0, 0]),
 		new CRange(0x11200, 0x1124F, c_oUnicodeRangesLID.Khojki, lcid_unknown, []),
 		new CRange(0x11280, 0x112AF, c_oUnicodeRangesLID.Multani, lcid_unknown, []),
 		new CRange(0x112B0, 0x112FF, c_oUnicodeRangesLID.Khudawadi, lcid_unknown, []),
@@ -744,15 +744,15 @@
 		new CRange(0x11480, 0x114DF, c_oUnicodeRangesLID.Tirhuta, lcid_unknown, []),
 		new CRange(0x11580, 0x115FF, c_oUnicodeRangesLID.Siddham, lcid_unknown, []),
 		new CRange(0x11600, 0x1165F, c_oUnicodeRangesLID.Modi, lcid_unknown, []),
-		new CRange(0x11660, 0x1167F, c_oUnicodeRangesLID.Mongolian_Supplement, lcid_unknown, []),
+		new CRange(0x11660, 0x1167F, c_oUnicodeRangesLID.Mongolian_Supplement, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Mongolian), 0, 0, 0]),
 		new CRange(0x11680, 0x116CF, c_oUnicodeRangesLID.Takri, lcid_unknown, []),
 		new CRange(0x11700, 0x1173F, c_oUnicodeRangesLID.Ahom, lcid_unknown, []),
 		new CRange(0x118A0, 0x118FF, c_oUnicodeRangesLID.Warang_Citi, lcid_unknown, []),
 		new CRange(0x11AC0, 0x11AFF, c_oUnicodeRangesLID.Pau_Cin_Hau, lcid_unknown, []),
 		new CRange(0x11C00, 0x11C6F, c_oUnicodeRangesLID.Bhaiksuki, lcid_unknown, []),
 		new CRange(0x11C70, 0x11CBF, c_oUnicodeRangesLID.Marchen, lcid_unknown, []),
-		new CRange(0x12000, 0x123FF, c_oUnicodeRangesLID.Cuneiform, lcid_unknown, []),
-		new CRange(0x12400, 0x1247F, c_oUnicodeRangesLID.Cuneiform_Numbers_and_Punctuation, lcid_unknown, []),
+		new CRange(0x12000, 0x123FF, c_oUnicodeRangesLID.Cuneiform, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Cuneiform), 0, 0]),
+		new CRange(0x12400, 0x1247F, c_oUnicodeRangesLID.Cuneiform_Numbers_and_Punctuation, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Cuneiform), 0, 0]),
 		new CRange(0x12480, 0x1254F, c_oUnicodeRangesLID.Early_Dynastic_Cuneiform, lcid_unknown, []),
 		new CRange(0x13000, 0x1342F, c_oUnicodeRangesLID.Egyptian_Hieroglyphs, lcid_unknown, []),
 		new CRange(0x14400, 0x1467F, c_oUnicodeRangesLID.Anatolian_Hieroglyphs, lcid_unknown, []),
@@ -767,19 +767,19 @@
 		new CRange(0x1B000, 0x1B0FF, c_oUnicodeRangesLID.Kana_Supplement, lcid_unknown, []),
 		new CRange(0x1BC00, 0x1BC9F, c_oUnicodeRangesLID.Duployan, lcid_unknown, []),
 		new CRange(0x1BCA0, 0x1BCAF, c_oUnicodeRangesLID.Shorthand_Format_Controls, lcid_unknown, []),
-		new CRange(0x1D000, 0x1D0FF, c_oUnicodeRangesLID.Byzantine_Musical_Symbols, lcid_unknown, []),
-		new CRange(0x1D100, 0x1D1FF, c_oUnicodeRangesLID.Musical_Symbols, lcid_unknown, []),
-		new CRange(0x1D200, 0x1D24F, c_oUnicodeRangesLID.Ancient_Greek_Musical_Notation, lcid_unknown, []),
+		new CRange(0x1D000, 0x1D0FF, c_oUnicodeRangesLID.Byzantine_Musical_Symbols, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Byzantine_Musical_Symbols), 0, 0, 0]),
+		new CRange(0x1D100, 0x1D1FF, c_oUnicodeRangesLID.Musical_Symbols, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Byzantine_Musical_Symbols), 0, 0, 0]),
+		new CRange(0x1D200, 0x1D24F, c_oUnicodeRangesLID.Ancient_Greek_Musical_Notation, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Byzantine_Musical_Symbols), 0, 0, 0]),
 		new CRange(0x1D300, 0x1D35F, c_oUnicodeRangesLID.Tai_Xuan_Jing_Symbols, lcid_unknown, []),
 		new CRange(0x1D360, 0x1D37F, c_oUnicodeRangesLID.Counting_Rod_Numerals, lcid_unknown, []),
-		new CRange(0x1D400, 0x1D7FF, c_oUnicodeRangesLID.Mathematical_Alphanumeric_Symbols, lcid_unknown, []),
+		new CRange(0x1D400, 0x1D7FF, c_oUnicodeRangesLID.Mathematical_Alphanumeric_Symbols, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Mathematical_Alphanumeric_Symbols), 0, 0, 0]),
 		new CRange(0x1D800, 0x1DAAF, c_oUnicodeRangesLID.Sutton_SignWriting, lcid_unknown, []),
-		new CRange(0x1E000, 0x1E02F, c_oUnicodeRangesLID.Glagolitic_Supplement, lcid_unknown, []),
+		new CRange(0x1E000, 0x1E02F, c_oUnicodeRangesLID.Glagolitic_Supplement, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Glagolitic), 0, 0]),
 		new CRange(0x1E800, 0x1E8DF, c_oUnicodeRangesLID.Mende_Kikakui, lcid_unknown, []),
 		new CRange(0x1E900, 0x1E95F, c_oUnicodeRangesLID.Adlam, lcid_unknown, []),
 		new CRange(0x1EE00, 0x1EEFF, c_oUnicodeRangesLID.Arabic_Mathematical_Alphabetic_Symbols, lcid_unknown, []),
-		new CRange(0x1F000, 0x1F02F, c_oUnicodeRangesLID.Mahjong_Tiles, lcid_unknown, []),
-		new CRange(0x1F030, 0x1F09F, c_oUnicodeRangesLID.Domino_Tiles, lcid_unknown, []),
+		new CRange(0x1F000, 0x1F02F, c_oUnicodeRangesLID.Mahjong_Tiles, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Domino_Tiles), 0, 0]),
+		new CRange(0x1F030, 0x1F09F, c_oUnicodeRangesLID.Domino_Tiles, lcid_unknown, [0, 0, 0, (1 << c_oUnicodeRangeOS2_4.Domino_Tiles), 0, 0]),
 		new CRange(0x1F0A0, 0x1F0FF, c_oUnicodeRangesLID.Playing_Cards, lcid_unknown, []),
 		new CRange(0x1F100, 0x1F1FF, c_oUnicodeRangesLID.Enclosed_Alphanumeric_Supplement, lcid_unknown, []),
 		new CRange(0x1F200, 0x1F2FF, c_oUnicodeRangesLID.Enclosed_Ideographic_Supplement, lcid_unknown, []),
@@ -788,18 +788,129 @@
 		new CRange(0x1F650, 0x1F67F, c_oUnicodeRangesLID.Ornamental_Dingbats, lcid_unknown, []),
 		new CRange(0x1F680, 0x1F6FF, c_oUnicodeRangesLID.Transport_and_Map_Symbols, lcid_unknown, []),
 		new CRange(0x1F700, 0x1F77F, c_oUnicodeRangesLID.Alchemical_Symbols, lcid_unknown, []),
-		new CRange(0x1F780, 0x1F7FF, c_oUnicodeRangesLID.Geometric_Shapes_Extended, lcid_unknown, []),
-		new CRange(0x1F800, 0x1F8FF, c_oUnicodeRangesLID.Supplemental_Arrows_C, lcid_unknown, []),
+		new CRange(0x1F780, 0x1F7FF, c_oUnicodeRangesLID.Geometric_Shapes_Extended, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Geometric_Shapes), 0, 0, 0, 0]),
+		new CRange(0x1F800, 0x1F8FF, c_oUnicodeRangesLID.Supplemental_Arrows_C, lcid_unknown, [0, (1 << c_oUnicodeRangeOS2_2.Arrows), 0, 0, 0, 0]),
 		new CRange(0x1F900, 0x1F9FF, c_oUnicodeRangesLID.Supplemental_Symbols_and_Pictographs, lcid_unknown, []),
-		new CRange(0x20000, 0x2A6DF, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension_B, lcid_unknown, []),
-		new CRange(0x2A700, 0x2B73F, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension_C, lcid_unknown, []),
-		new CRange(0x2B740, 0x2B81F, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension_D, lcid_unknown, []),
-		new CRange(0x2B820, 0x2CEAF, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension_E, lcid_unknown, []),
-		new CRange(0x2F800, 0x2FA1F, c_oUnicodeRangesLID.CJK_Compatibility_Ideographs_Supplement, lcid_unknown, []),
-		new CRange(0xE0000, 0xE007F, c_oUnicodeRangesLID.Tags, lcid_unknown, []),
-		new CRange(0xE0100, 0xE01EF, c_oUnicodeRangesLID.Variation_Selectors_Supplement, lcid_unknown, []),
-		new CRange(0xF0000, 0xFFFFF, c_oUnicodeRangesLID.Supplementary_Private_Use_Area_A, lcid_unknown, []),
-		new CRange(0x100000, 0x10FFFF, c_oUnicodeRangesLID.Supplementary_Private_Use_Area_B, lcid_unknown, [])
+		new CRange(0x20000, 0x2A6DF, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension_B, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.CJK_Unified_Ideographs), 0, (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional), 0]),
+		new CRange(0x2A700, 0x2B73F, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension_C, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.CJK_Unified_Ideographs), 0, (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional), 0]),
+		new CRange(0x2B740, 0x2B81F, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension_D, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.CJK_Unified_Ideographs), 0, (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional), 0]),
+		new CRange(0x2B820, 0x2CEAF, c_oUnicodeRangesLID.CJK_Unified_Ideographs_Extension_E, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.CJK_Unified_Ideographs), 0, (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional), 0]),
+		new CRange(0x2F800, 0x2FA1F, c_oUnicodeRangesLID.CJK_Compatibility_Ideographs_Supplement, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.CJK_Strokes), 0, (1 << c_oCodePagesOS2_1.Chinese_Simplified) | (1 << c_oCodePagesOS2_1.Chinese_Traditional), 0]),
+		new CRange(0xE0000, 0xE007F, c_oUnicodeRangesLID.Tags, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Tags), 0, 0, 0]),
+		new CRange(0xE0100, 0xE01EF, c_oUnicodeRangesLID.Variation_Selectors_Supplement, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Variation_Selectors), 0, 0, 0]),
+		new CRange(0xF0000, 0xFFFFF, c_oUnicodeRangesLID.Supplementary_Private_Use_Area_A, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Private_Use_plane_15), 0, 0, 0]),
+		new CRange(0x100000, 0x10FFFF, c_oUnicodeRangesLID.Supplementary_Private_Use_Area_B, lcid_unknown, [0, 0, (1 << c_oUnicodeRangeOS2_3.Private_Use_plane_15), 0, 0, 0])
 	];
+
+	window.getSupportedFonts = function(_char)
+	{
+		var _range = null;
+		var _ranges = c_oUnicodeRanges;
+
+		// TODO: fast find
+		for (var i = 0; i < _ranges.length; i++)
+		{
+			if (_ranges[i].Start <= _char && _ranges[i].End >= _char)
+			{
+				_range = _ranges[i];
+				break;
+			}
+		}
+
+		if (null == _ranges)
+			return [];
+
+		var _system_fonts = AscFonts.g_fontApplication.g_fontSelections.List;
+		var _count = _system_fonts.length;
+
+		var _retArray = [];
+
+		for (var j = 0; j < _count; j++)
+		{
+			var _select = _system_fonts[j];
+
+			var _param = _range.Param;
+
+			if (_param[0] != (_select.m_ulUnicodeRange1 & _param[0]))
+				continue;
+
+			if (_param[1] != (_select.m_ulUnicodeRange2 & _param[1]))
+				continue;
+
+			if (_param[2] != (_select.m_ulUnicodeRange3 & _param[2]))
+				continue;
+
+			if (_param[3] != (_select.m_ulUnicodeRange4 & _param[3]))
+				continue;
+
+			if (_range.Name == c_oUnicodeRangesLID.CJK_Unified_Ideographs)
+			{
+				if (0 == (_select.m_ulCodePageRange1 & _param[4]))
+					continue;
+			}
+			else
+			{
+				if (_param[4] != (_select.m_ulCodePageRange1 & _param[4]))
+					continue;
+			}
+
+			if (_param[5] != (_select.m_ulCodePageRange2 & _param[5]))
+				continue;
+
+			_retArray.push(_select.m_wsFontName);
+		}
+
+		return _retArray;
+	};
+
+	window.getSystemFontsInfo = function()
+	{
+		var _system_fonts = AscFonts.g_fontApplication.g_fontSelections.List;
+		var _count = _system_fonts.length;
+
+		var _log = "";
+		for (var j = 0; j < _count; j++)
+		{
+			var _select = _system_fonts[j];
+
+			_log = _select.m_wsFontName;
+
+			_log += " (";
+
+			if (_select.m_bBold && _select.m_bItalic)
+				_log += "bold italic";
+			else if (_select.m_bBold)
+				_log += "bold";
+			else if (_select.m_bItalic)
+				_log += "italic";
+			else
+				_log += "regular";
+
+			_log += "): ";
+
+			_log += (_select.m_ulUnicodeRange1 + ", ");
+			_log += (_select.m_ulUnicodeRange2 + ", ");
+			_log += (_select.m_ulUnicodeRange3 + ", ");
+			_log += (_select.m_ulUnicodeRange4 + ", ");
+			_log += (_select.m_ulCodePageRange1 + ", ");
+			_log += (_select.m_ulCodePageRange2);
+
+			console.log(_log);
+		}
+	};
+
+	window.getGlyphsByRange = function(_start, _end)
+	{
+		var _log = "";
+		var _tmp = "";
+		for (var i = _start; i <= _end; i++)
+		{
+			var _tmp = i.toString(16);
+			while (_tmp.length < 4)
+				_tmp = "0" + _tmp;
+			_log += ("uni" + _tmp + " ");
+		}
+		console.log(_log);
+	};
 
 })(window);

@@ -567,6 +567,7 @@
 	cINDIRECT.prototype.constructor = cINDIRECT;
 	cINDIRECT.prototype.argumentsMin = 1;
 	cINDIRECT.prototype.argumentsMax = 2;
+	cINDIRECT.prototype.ca = true;
 	cINDIRECT.prototype.Calculate = function (arg) {
 		var t = this, arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] :
 			new cBool(true), r1 = arguments[1], wb = r1.worksheet.workbook, o = {
@@ -608,7 +609,7 @@
 				}
 				ret.addElement(found_operand)
 			});
-			return this.setCA(ret, true);
+			return this.value = ret;
 		} else {
 			o.Formula = arg0.toString();
 			parseReference();
@@ -623,7 +624,7 @@
 			}
 		}
 
-		return this.setCA(ret, true);
+		return this.value = ret;
 
 	};
 	cINDIRECT.prototype.getInfo = function () {
@@ -906,6 +907,7 @@
 	cOFFSET.prototype.constructor = cOFFSET;
 	cOFFSET.prototype.argumentsMin = 3;
 	cOFFSET.prototype.argumentsMax = 5;
+	cOFFSET.prototype.ca = true;
 	cOFFSET.prototype.Calculate = function (arg) {
 
 		function validBBOX(bbox) {
@@ -987,7 +989,7 @@
 			this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-		return this.setCA(this.value, true);
+		return this.value;
 
 	};
 	cOFFSET.prototype.getInfo = function () {

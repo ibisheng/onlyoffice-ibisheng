@@ -517,7 +517,10 @@
 				if(copyPasteUseBinary)
 				{
 					sBase64 = this.getBinaryForCopy(worksheet);
-					$(container.children[0]).addClass(sBase64);
+					if(container.children[0])
+					{
+						container.children[0].setAttribute("class", sBase64)
+					}
 				}
 				History.TurnOn();
 				
@@ -2427,7 +2430,7 @@
 			
 			_convertTableFromExcelToDocument: function(worksheet, aContentExcel, documentContent)
 			{
-				var oCurPar = new Paragraph(worksheet.model.DrawingDocument, documentContent, 0, 0, 0, 0, 0);
+				var oCurPar = new Paragraph(worksheet.model.DrawingDocument, documentContent);
 				
 				var getElem = function(text, format, isAddSpace, isHyperLink)
 				{

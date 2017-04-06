@@ -1571,7 +1571,7 @@ CopyProcessor.prototype =
         {
             grid.push(graphicFrame.graphicObject.TableGrid[i]);
         }
-        var table = new CTable(editor.WordControl.m_oDrawingDocument, graphicFrame, false, 0, 0, 0, 0, 0, aSelectedRows.length, nMaxGrid - nMinGrid+1, grid);
+        var table = new CTable(editor.WordControl.m_oDrawingDocument, graphicFrame, false, aSelectedRows.length, nMaxGrid - nMinGrid+1, grid);
         table.setStyleIndex(graphicFrame.graphicObject.styleIndex);
         graphic_frame.setGraphicObject(table);
         graphic_frame.setXfrm(0, 0, 20, 30, 0, false, false);
@@ -1812,7 +1812,8 @@ function sendImgUrls(api, images, callback, bExcel) {
     var data;
     if (null != input && "imgurls" == input["type"]) {
       if ("ok" == input["status"]) {
-        data = input["data"];
+        data = input["data"]["urls"];
+        nError = AscCommon.mapAscServerErrorToAscError(input["data"]["error"]);
         var urls = {};
         for (var i = 0, length = data.length; i < length; ++i) {
           var elem = data[i];
@@ -2130,7 +2131,7 @@ PasteProcessor.prototype =
                 var LastPosCurDoc = oDoc.CurPos.ContentPos;
                 //����� ��������� ��������
                 var oSourceFirstPar = Item;
-                var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+                var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc);
                 if(true !== oSourceFirstPar.Cursor_IsEnd() || oSourceFirstPar.IsEmpty())
                     oSourceFirstPar.Split(oSourceLastPar);
                 var oInsFirstPar = aNewContent[0];
@@ -2919,7 +2920,7 @@ PasteProcessor.prototype =
 						} 
 						
 						//create paragraph, pararun and paradrawing
-						var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument, 0, 0, 0, 0, 0);
+						var tempParagraph = new Paragraph(oThis.oDocument.DrawingDocument, oThis.oDocument);
 						var graphicObj = AscFormat.DrawingObjectsController.prototype.createImage(imageUrl, 0, 0, p_width, p_height);	
 						
 						var tempParaRun = new ParaRun();
@@ -3573,7 +3574,7 @@ PasteProcessor.prototype =
 				if(isGraphicFrame && drawings.length > 1 && drawings[i].base64)//если кроме таблички(при вставке из презентаций) содержатся ещё данные, вставляем в виде base64
 				{
 					if(!tempParagraph)
-						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
+						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
 					
 					extX = drawings[i].ExtX;
 					extY = drawings[i].ExtY;
@@ -3605,7 +3606,7 @@ PasteProcessor.prototype =
 				else
 				{
 					if(!tempParagraph)
-						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 0, 0, 0, 0);
+						tempParagraph = new Paragraph(this.oDocument.DrawingDocument, this.oDocument);
 					
 					extX = drawings[i].ExtX;
 					extY = drawings[i].ExtY;
@@ -3693,7 +3694,7 @@ PasteProcessor.prototype =
 			else
 				grid[i - activeRange.c1] = standartWidth;
 		}
-		var table = new CTable(this.oDocument.DrawingDocument, this.oDocument, true, 0, 0, 0, X_Right_Field, Y_Bottom_Field, 0, 0, grid);
+		var table = new CTable(this.oDocument.DrawingDocument, this.oDocument, true, 0, 0, grid);
 		this.aContent.push(table);
 		
 		var diffRow = activeRange.r2 - activeRange.r1;
@@ -5627,7 +5628,7 @@ PasteProcessor.prototype =
 		if(this.pasteInPresentationShape)
 			bFromPresentation = true;
 			
-		this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, 0, 50, 50, X_Right_Field, Y_Bottom_Field, this.oDocument.bPresentation === true );
+		this.oCurPar = new Paragraph(this.oDocument.DrawingDocument, this.oDocument, this.oDocument.bPresentation === true );
         this.oCurParContentPos = this.oCurPar.CurPos.ContentPos;
         this.oCurRun = new ParaRun(this.oCurPar);
         this.oCurRunContentPos = 0;
@@ -5861,7 +5862,7 @@ PasteProcessor.prototype =
                 nPrevIndex = nCurIndex;
             }
 			var CurPage = 0;
-            var table = new CTable(oDocument.DrawingDocument, oDocument, true, 0, 0, 0, X_Right_Field, Y_Bottom_Field, 0, 0, aGrid);
+            var table = new CTable(oDocument.DrawingDocument, oDocument, true, 0, 0, aGrid);
 			//считаем aSumGrid
 			var aSumGrid = [];
 			aSumGrid[-1] = 0;
@@ -6227,7 +6228,7 @@ PasteProcessor.prototype =
         if(0 == oPasteProcessor.aContent.length)
         {
             var oDocContent = cell.Content;
-            var oNewPar = new Paragraph(oDocContent.DrawingDocument, oDocContent, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
+            var oNewPar = new Paragraph(oDocContent.DrawingDocument, oDocContent);
             //���������� ��������� ��������� - ����� ��� ����������� �� ������ � ������ ���� ��� ����������� ������ ������
 			var oNewSpacing = new CParaSpacing();
 			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: Asc.linerule_Auto});
@@ -7193,7 +7194,7 @@ PasteProcessor.prototype =
             var presentation = editor.WordControl.m_oLogicDocument;
             var graphicFrame = new CGraphicFrame(presentation.Slides[presentation.CurPage]);
 
-            var table = new CTable(presentation.DrawingDocument, graphicFrame, true, 0, 0, 0, X_Right_Field, Y_Bottom_Field, 0, 0, aGrid, true);
+            var table = new CTable(presentation.DrawingDocument, graphicFrame, true, 0, 0, aGrid, true);
             table.Set_TableStyle(0);
             var dd = editor.WordControl.m_oDrawingDocument;
             graphicFrame.setGraphicObject(table);

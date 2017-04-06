@@ -947,8 +947,8 @@ Paragraph.prototype.Search = function(Str, Props, SearchEngine, Type)
             ResultStr = "\<b\>" + _Str + "\</b\>";
 
             var LeaveCount = MaxShowValue - _Str.length;
-            var RunElementsAfter  = new CParagraphRunElements(EndPos, LeaveCount);
-            var RunElementsBefore = new CParagraphRunElements(StartPos, LeaveCount);
+            var RunElementsAfter  = new CParagraphRunElements(EndPos, LeaveCount, [para_Text, para_Space, para_Tab]);
+            var RunElementsBefore = new CParagraphRunElements(StartPos, LeaveCount, [para_Text, para_Space, para_Tab]);
 
             this.Get_NextRunElements(RunElementsAfter);
             this.Get_PrevRunElements(RunElementsBefore);

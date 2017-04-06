@@ -5973,7 +5973,8 @@ function BinaryPPTYLoader()
             }
         }
 
-        var _table = new CTable(this.presentation.DrawingDocument, _graphic_frame, true, 0, 0, 0, _xfrm.extX, 100000, rows, cols.length, cols, true);
+        var _table = new CTable(this.presentation.DrawingDocument, _graphic_frame, true, rows, cols.length, cols, true);
+        _table.Reset(0, 0, _xfrm.extX, 100000, 0, 0, 1);
         if (null != props)
         {
             var style;
@@ -7687,7 +7688,7 @@ function BinaryPPTYLoader()
                         if(str_field.length > 0)
                         {
                             txbody.content.Internal_Content_RemoveAll();
-                            txbody.content.Internal_Content_Add(txbody.content.Content.length,  new Paragraph(txbody.content.DrawingDocument, txbody.content, 0, 0, 0, 0, 0, true));
+                            txbody.content.Internal_Content_Add(txbody.content.Content.length,  new Paragraph(txbody.content.DrawingDocument, txbody.content, true));
                             AscFormat.AddToContentFromString(txbody.content, str_field);
 
                             if(_paragraph.f_runPr || _paragraph.f_paraPr)
@@ -7854,7 +7855,7 @@ function BinaryPPTYLoader()
 
     this.ReadParagraph = function(DocumentContent)
     {
-        var par = new Paragraph(DocumentContent.DrawingDocument, DocumentContent, 0, 0, 0, 0, 0, true);
+        var par = new Paragraph(DocumentContent.DrawingDocument, DocumentContent, true);
 
         var EndPos = 0;
 
@@ -8491,7 +8492,9 @@ function CPres()
 
         this.ReadDrawing = function(reader, stream, logicDocument, paraDrawing)
         {
-            this.BaseReader = reader;
+            if(reader){
+                this.BaseReader = reader;
+            }
             if (this.Reader == null)
                 this.Reader = new AscCommon.BinaryPPTYLoader();
 
@@ -8615,7 +8618,9 @@ function CPres()
 
         this.ReadTextBody = function(reader, stream, shape, presentation)
         {
-            this.BaseReader = reader;
+            if(reader){
+                this.BaseReader = reader;
+            }
             if (this.Reader == null)
                 this.Reader = new AscCommon.BinaryPPTYLoader();
             if(presentation)
@@ -8652,7 +8657,9 @@ function CPres()
 
         this.ReadTextBodyTxPr = function(reader, stream, shape)
         {
-            this.BaseReader = reader;
+            if(reader){
+                this.BaseReader = reader;
+            }
             if (this.Reader == null)
                 this.Reader = new AscCommon.BinaryPPTYLoader();
 
@@ -9354,7 +9361,10 @@ function CPres()
 
         this.ReadTheme = function(reader, stream)
         {
-            this.BaseReader = reader;
+            if(reader)
+            {
+                this.BaseReader = reader;
+            }
             if (this.Reader == null)
                 this.Reader = new AscCommon.BinaryPPTYLoader();
 

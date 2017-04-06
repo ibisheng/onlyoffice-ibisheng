@@ -323,7 +323,7 @@
         else{
             oDrawingDocument = private_GetDrawingDocument();
         }
-        return this.private_CreateApiParagraph(new Paragraph(oDrawingDocument, null, 0, 0, 0, 0, 0, true));
+        return this.private_CreateApiParagraph(new Paragraph(oDrawingDocument, null, true));
     };
 
 

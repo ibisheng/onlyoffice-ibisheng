@@ -6500,7 +6500,7 @@ drawHBarChart.prototype =
 				continue;
 			}
 			
-			seria = this.chartProp.series[i].val.numRef.numCache.pts;
+			seria = numCache.pts;
 			seriesHeight[i] = [];
 			
 			

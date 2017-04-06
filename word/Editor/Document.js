@@ -1385,7 +1385,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.SectPr = new CSectionPr(this);
     this.SectionsInfo = new CDocumentSectionsInfo();
 
-    this.Content[0] = new Paragraph(DrawingDocument, this, 0, 0, 0, 0, 0);
+    this.Content[0] = new Paragraph(DrawingDocument, this);
     this.Content[0].Set_DocumentNext(null);
     this.Content[0].Set_DocumentPrev(null);
 
@@ -1585,7 +1585,7 @@ CDocument.prototype.Add_TestDocument               = function()
     var RunsCount  = Text.length;
     for (var ParaIndex = 0; ParaIndex < ParasCount; ParaIndex++)
     {
-        var Para = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+        var Para = new Paragraph(this.DrawingDocument, this);
         //var Run = new ParaRun(Para);
         for (var RunIndex = 0; RunIndex < RunsCount; RunIndex++)
         {
@@ -2448,7 +2448,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                     };
 
                 if (type_Table === Element.GetType())
-                    this.private_RecalculateFlowTable(RecalcInfo)
+                    this.private_RecalculateFlowTable(RecalcInfo);
                 else if (type_Paragraph === Element.Get_Type())
                     this.private_RecalculateFlowParagraph(RecalcInfo);
 
@@ -3913,7 +3913,7 @@ CDocument.prototype.Extend_ToPos = function(X, Y)
 
     while (true)
     {
-        var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+        var NewParagraph = new Paragraph(this.DrawingDocument, this);
         var NewRun       = new ParaRun(NewParagraph, false);
         NewParagraph.Add_ToContent(0, NewRun);
 
@@ -4091,7 +4091,7 @@ CDocument.prototype.Add_DropCap                = function(bInText)
     {
         this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddDropCap);
 
-        var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+        var NewParagraph = new Paragraph(this.DrawingDocument, this);
 
         var TextPr = OldParagraph.Split_DropCap(NewParagraph);
         var Before = OldParagraph.Get_CompiledPr().ParaPr.Spacing.Before;
@@ -5849,7 +5849,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			else
 			{
 				// Создаем новый параграф
-				var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+				var NewParagraph = new Paragraph(this.DrawingDocument, this);
 				Para.Split(NewParagraph);
 				this.Internal_Content_Add(DstIndex + 1, NewParagraph);
 
@@ -5861,7 +5861,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			if (true === bAddEmptyPara)
 			{
 				// Создаем новый параграф
-				NewEmptyPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+				NewEmptyPara = new Paragraph(this.DrawingDocument, this);
 				NewEmptyPara.Set_Pr(ParaS.Pr);
 				NewEmptyPara.TextPr.Apply_TextPr(ParaS.TextPr.Value);
 				this.Internal_Content_Add(DstIndex + 1, NewEmptyPara);
@@ -7540,7 +7540,7 @@ CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckT
 
 	// Проверим, что последний элемент не таблица
 	if (false != bCheckTable && type_Table == this.Content[this.Content.length - 1].GetType())
-		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this));
 
 	// Запоминаем, что нам нужно произвести переиндексацию элементов
 	this.private_ReindexContent(Position);
@@ -7578,7 +7578,7 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCorrect
 
 	// Проверим, что последний элемент не таблица
 	if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Table == this.Content[this.Content.length - 1].GetType()))
-		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this));
 
 	// Обновим информацию о секциях
 	this.SectionsInfo.Update_OnRemove(Position, Count, true);
@@ -9078,7 +9078,7 @@ CDocument.prototype.Check_SectionLastParagraph = function()
 
 	var Element = this.Content[Count - 1];
 	if (type_Paragraph === Element.GetType() && undefined !== Element.Get_SectionPr())
-		this.Internal_Content_Add(Count, new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0));
+		this.Internal_Content_Add(Count, new Paragraph(this.DrawingDocument, this));
 };
 CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 {
@@ -9100,7 +9100,7 @@ CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 		// Если мы стоим в параграфе, тогда делим данный параграф на 2 в текущей точке(даже если мы стоим в начале
 		// или в конце параграфа) и к первому параграфу приписываем конец секкции.
 
-		var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+		var NewParagraph = new Paragraph(this.DrawingDocument, this);
 
 		Element.Split(NewParagraph);
 
@@ -9119,7 +9119,7 @@ CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 		// секции. Если мы стоим в первой строке таблицы, таблицу делить не надо, достаточно добавить новый
 		// параграф перед ней.
 
-		var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+		var NewParagraph = new Paragraph(this.DrawingDocument, this);
 		var NewTable     = Element.Split_Table();
 
 		if (null === NewTable)
@@ -11471,7 +11471,7 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 		{
 			var ItemReviewType = Item.Get_ReviewType();
 			// Создаем новый параграф
-			var NewParagraph   = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+			var NewParagraph   = new Paragraph(this.DrawingDocument, this);
 
 			// Проверим позицию в текущем параграфе
 			if (true === Item.Cursor_IsEnd())
@@ -11554,7 +11554,7 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 		if (0 === this.CurPos.ContentPos && Item.Cursor_IsStart(true))
 		{
 			// Создаем новый параграф
-			var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+			var NewParagraph = new Paragraph(this.DrawingDocument, this);
 			this.Internal_Content_Add(0, NewParagraph);
 			this.CurPos.ContentPos    = 0;
 
@@ -11720,7 +11720,7 @@ CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
 			for (var Index = 0; Index < Cols; Index++)
 				Grid[Index] = W / Cols;
 
-			var NewTable = new CTable(this.DrawingDocument, this, true, 0, 0, 0, 0, 0, Rows, Cols, Grid);
+			var NewTable = new CTable(this.DrawingDocument, this, true, Rows, Cols, Grid);
 			NewTable.Set_ParagraphPrOnAdd(Item);
 
 			// Проверим позицию в текущем параграфе
@@ -11736,7 +11736,7 @@ CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
 			else
 			{
 				// Создаем новый параграф
-				var NewParagraph = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+				var NewParagraph = new Paragraph(this.DrawingDocument, this);
 				Item.Split(NewParagraph);
 
 				// Добавляем новый параграф
@@ -11937,10 +11937,20 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 			{
 				if (ParaItem.IsColumnBreak())
 				{
-					this.Add_NewParagraph(undefined, true);
+					var oCurElement = this.Content[this.CurPos.ContentPos];
 					var CurPos = this.CurPos.ContentPos;
-					this.Content[CurPos].Cursor_MoveToStartPos();
-					this.Content[CurPos].Add(ParaItem);
+					if (oCurElement && type_Paragraph === oCurElement.Get_Type() && oCurElement.IsColumnBreakOnLeft())
+					{
+						oCurElement.Add(ParaItem);
+					}
+					else
+					{
+						this.Add_NewParagraph(undefined, true);
+						CurPos = this.CurPos.ContentPos;
+
+						this.Content[CurPos].Cursor_MoveToStartPos();
+						this.Content[CurPos].Add(ParaItem);
+					}
 				}
 				else
 				{

@@ -2380,10 +2380,10 @@ background-repeat: no-repeat;\
 
 
 		this.WordControl.m_oDrawingDocument.StartTableStylesCheck();
-		this.WordControl.m_oDrawingDocument.TableStylesСheckLook = new Asc.CTablePropLook();
-		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.FirstCol = true;
-		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.FirstRow = true;
-		this.WordControl.m_oDrawingDocument.TableStylesСheckLook.BandHor  = true;
+		this.WordControl.m_oDrawingDocument.TableStylesCheckLook = new Asc.CTablePropLook();
+		this.WordControl.m_oDrawingDocument.TableStylesCheckLook.FirstCol = true;
+		this.WordControl.m_oDrawingDocument.TableStylesCheckLook.FirstRow = true;
+		this.WordControl.m_oDrawingDocument.TableStylesCheckLook.BandHor  = true;
 		this.WordControl.m_oDrawingDocument.EndTableStylesCheck();
 	};
 
