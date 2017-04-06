@@ -551,6 +551,7 @@
 	CChangesDrawingChangeTheme.prototype.constructor = CChangesDrawingChangeTheme;
 
     CChangesDrawingChangeTheme.prototype.WriteToBinary = function(Writer){
+        Writer.WriteLong(this.Type);
         Writer.WriteLong(this.aIndexes.length);
         for(var i = 0; i < this.aIndexes.length; ++i){
             Writer.WriteLong(this.aIndexes[i]);
@@ -558,6 +559,7 @@
     };
 
     CChangesDrawingChangeTheme.prototype.ReadFromBinary = function(Reader){
+        this.Type = Reader.GetLong();
         this.aIndexes = [];
         var nLength = Reader.GetLong();
         for(var i = 0; i < nLength; ++i){

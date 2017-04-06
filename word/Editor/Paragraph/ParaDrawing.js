@@ -1219,14 +1219,15 @@ ParaDrawing.prototype.updatePosition3 = function(pageIndex, x, y, oldPageNum)
 		this.bNoNeedToAdd = true;
 	}
 
-	this.selectX = x;
-	this.selectY = y;
 
 
 	if (this.GraphicObj.bNeedUpdatePosition || !(AscFormat.isRealNumber(this.GraphicObj.posX) && AscFormat.isRealNumber(this.GraphicObj.posY)) || !(Math.abs(this.GraphicObj.posX - _x) < MOVE_DELTA && Math.abs(this.GraphicObj.posY - _y) < MOVE_DELTA))
 		this.GraphicObj.updatePosition(_x, _y);
 	if (this.GraphicObj.bNeedUpdatePosition || !(AscFormat.isRealNumber(this.wrappingPolygon.posX) && AscFormat.isRealNumber(this.wrappingPolygon.posY)) || !(Math.abs(this.wrappingPolygon.posX - _x) < MOVE_DELTA && Math.abs(this.wrappingPolygon.posY - _y) < MOVE_DELTA))
 		this.wrappingPolygon.updatePosition(_x, _y);
+
+    this.selectX = this.GraphicObj.bounds.l + _x;
+    this.selectY = this.GraphicObj.bounds.t + _y;
 	this.calculateSnapArrays();
 };
 ParaDrawing.prototype.calculateAfterChangeTheme = function()
@@ -1393,8 +1394,9 @@ ParaDrawing.prototype.OnEnd_MoveInline = function(NearPos)
 
 	// При переносе всегда создаем копию, чтобы в совместном редактировании не было проблем
 	var NewParaDrawing = this.Copy();
+    this.DocumentContent.Select_DrawingObject(NewParaDrawing.Get_Id());
 	NewParaDrawing.Add_ToDocument(NearPos, true, RunPr);
-	this.DocumentContent.Select_DrawingObject(NewParaDrawing.Get_Id());
+
 };
 ParaDrawing.prototype.Get_ParentTextTransform = function()
 {
