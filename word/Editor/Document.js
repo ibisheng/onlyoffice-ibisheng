@@ -8082,20 +8082,12 @@ CDocument.prototype.Document_CreateFontMap = function()
 	var FontMap = {};
 	this.SectionsInfo.Document_CreateFontMap(FontMap);
 
-	var CurPage = 0;
-	this.DrawingObjects.documentCreateFontMap(CurPage, FontMap);
 
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)
 	{
 		var Element = this.Content[Index];
 		Element.Document_CreateFontMap(FontMap);
-
-		if (Element.Pages.length > 1)
-		{
-			for (var TempIndex = 1; TempIndex < Element.Pages.length - 1; TempIndex++)
-				this.DrawingObjects.documentCreateFontMap(++CurPage, FontMap);
-		}
 	}
 	AscFormat.checkThemeFonts(FontMap, this.theme.themeElements.fontScheme);
 	return FontMap;
