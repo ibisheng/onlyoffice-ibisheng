@@ -223,9 +223,6 @@ ParaDrawing.prototype.CheckCorrect = function(){
 	if(!this.GraphicObj){
 		return false;
 	}
-	if(this.GraphicObj.parent !== this){
-		return false;
-	}
 	if(this.GraphicObj && this.GraphicObj.checkCorrect){
 		return this.GraphicObj.checkCorrect();
 	}
