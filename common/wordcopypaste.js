@@ -2047,6 +2047,9 @@ PasteProcessor.prototype =
             //делаем небольшой сдвиг по y, потому что сама точка TargetPos для двухстрочного параграфа определяется как верхняя
             //var NearPos = oDoc.Get_NearestPos(this.oLogicDocument.TargetPos.PageNum, this.oLogicDocument.TargetPos.X, this.oLogicDocument.TargetPos.Y + 0.05);//0.05 == 2pix
 
+			//typeContent - если все содержимое одного типа
+			//TODO пересмотреть typeContent
+			this.typeContent = null;
 			var oSelectedContent = new CSelectedContent();
             for (var i = 0, length = aNewContent.length; i < length; ++i) {
                 var oSelectedElement = new CSelectedElement();
@@ -2056,7 +2059,17 @@ PasteProcessor.prototype =
 				{
 					this._specialPasteItemConvert(aNewContent[i]);
 				}
-				
+
+				var type = this._specialPasteGetElemType(aNewContent[i]);
+				if(0 === i)
+				{
+					this.typeContent = type;
+				}
+				else if(type !== this.typeContent)
+				{
+					this.typeContent = null;
+				}
+
                 if (i == length - 1 && true != this.bInBlock && type_Paragraph == oSelectedElement.Element.GetType())
                     oSelectedElement.SelectedAll = false;
                 else
@@ -2089,6 +2102,49 @@ PasteProcessor.prototype =
             paragraph.Clear_NearestPosArray(aNewContent);
         }
     },
+
+	_specialPasteGetElemType: function(elem)
+	{
+		var type = elem.GetType();
+
+		if(type_Paragraph === type)
+		{
+			//проверяем, возможно это графический объект
+			for(var i = 0; i < elem.Content.length; i++)
+			{
+				if(elem.Content[i] && elem.Content[i].Content)
+				{
+					for(var j = 0; j < elem.Content[i].Content.length; j++)
+					{
+						var contentElem = elem.Content[i].Content[j];
+						if(!(contentElem instanceof ParaEnd))
+						{
+							var typeElem = contentElem.GetType ? contentElem.GetType() : null;
+							if(para_Drawing === typeElem)
+							{
+								type = para_Drawing;
+							}
+							else
+							{
+								if(para_Drawing !== type)
+								{
+									type = type_Paragraph;
+								}
+								else
+								{
+									type = null;
+								}
+
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return type;
+	},
 
 	_specialPasteSetShowOptions: function()
 	{
