@@ -1545,10 +1545,6 @@ CDocument.prototype.Init                           = function()
 {
 
 };
-CDocument.prototype.Get_Id                         = function()
-{
-    return this.Id;
-};
 CDocument.prototype.On_EndLoad                     = function()
 {
     // Обновляем информацию о секциях
@@ -2383,8 +2379,6 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
         // Пересчитываем элемент документа
         var Element = this.Content[Index];
 
-        Element.TurnOff_RecalcEvent();
-
         var RecalcResult = recalcresult_NextElement;
         var bFlow        = false;
 
@@ -2488,8 +2482,6 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
                 RecalcResult         = Element.Recalculate_Page(ElementPageIndex);
             }
         }
-
-        Element.TurnOn_RecalcEvent();
 
         if (true != bFlow && (RecalcResult & recalcresult_NextElement || RecalcResult & recalcresult_NextPage))
         {
@@ -4980,7 +4972,7 @@ CDocument.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum, Columns
         if (Y < PageBounds.Top)
             return InlineElements[Pos];
 
-        if (Item.Pages.length > 1)
+        if (Item.GetPagesCount() > 1)
         {
             if (true !== Item.Is_StartFromNewPage())
                 return InlineElements[Pos + 1];
@@ -8090,20 +8082,12 @@ CDocument.prototype.Document_CreateFontMap = function()
 	var FontMap = {};
 	this.SectionsInfo.Document_CreateFontMap(FontMap);
 
-	var CurPage = 0;
-	this.DrawingObjects.documentCreateFontMap(CurPage, FontMap);
 
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)
 	{
 		var Element = this.Content[Index];
 		Element.Document_CreateFontMap(FontMap);
-
-		if (Element.Pages.length > 1)
-		{
-			for (var TempIndex = 1; TempIndex < Element.Pages.length - 1; TempIndex++)
-				this.DrawingObjects.documentCreateFontMap(++CurPage, FontMap);
-		}
 	}
 	AscFormat.checkThemeFonts(FontMap, this.theme.themeElements.fontScheme);
 	return FontMap;
@@ -13116,11 +13100,7 @@ CDocument.prototype.controller_SetParagraphAlign = function(Align)
 			if (type_Paragraph == Item.GetType())
 				Item.Set_Align(Align, true);
 			else if (type_Table == Item.GetType())
-			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphAlign(Align);
-				Item.TurnOn_RecalcEvent();
-			}
 		}
 	}
 	else
@@ -13158,11 +13138,7 @@ CDocument.prototype.controller_SetParagraphSpacing = function(Spacing)
 			if (type_Paragraph == Item.GetType())
 				Item.Set_Spacing(Spacing, false);
 			else if (type_Table == Item.GetType())
-			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphSpacing(Spacing);
-				Item.TurnOn_RecalcEvent();
-			}
 		}
 	}
 	else
@@ -13200,11 +13176,7 @@ CDocument.prototype.controller_SetParagraphTabs = function(Tabs)
 			if (type_Paragraph == Item.GetType())
 				Item.Set_Tabs(Tabs);
 			else if (type_Table == Item.GetType())
-			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphTabs(Tabs);
-				Item.TurnOn_RecalcEvent();
-			}
 		}
 	}
 	else
@@ -13257,9 +13229,7 @@ CDocument.prototype.controller_SetParagraphIndent = function(Ind)
 			}
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphIndent(Ind);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -13318,9 +13288,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 					this.Content[Index].Numbering_Remove();
 				else if (type_Table == this.Content[Index].GetType())
 				{
-					this.Content[Index].TurnOff_RecalcEvent();
 					this.Content[Index].Set_ParagraphNumbering(NumInfo);
-					this.Content[Index].TurnOn_RecalcEvent();
 				}
 			}
 		}
@@ -13376,9 +13344,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 							else if (type_Table == this.Content[Index].GetType())
 							{
-								this.Content[Index].TurnOff_RecalcEvent();
 								this.Content[Index].Set_ParagraphNumbering(NumInfo);
-								this.Content[Index].TurnOn_RecalcEvent();
 							}
 						}
 					}
@@ -13517,9 +13483,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 							else if (type_Table == this.Content[Index].GetType())
 							{
-								this.Content[Index].TurnOff_RecalcEvent();
 								this.Content[Index].Set_ParagraphNumbering(NumInfo);
-								this.Content[Index].TurnOn_RecalcEvent();
 							}
 						}
 					}
@@ -13588,9 +13552,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 							else if (type_Table === this.Content[Index].GetType())
 							{
-								this.Content[Index].TurnOff_RecalcEvent();
 								this.Content[Index].Set_ParagraphNumbering(NumInfo);
-								this.Content[Index].TurnOn_RecalcEvent();
 							}
 						}
 					}
@@ -13721,9 +13683,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 							else if (type_Table === this.Content[Index].GetType())
 							{
-								this.Content[Index].TurnOff_RecalcEvent();
 								this.Content[Index].Set_ParagraphNumbering(NumInfo);
-								this.Content[Index].TurnOn_RecalcEvent();
 							}
 						}
 					}
@@ -13770,9 +13730,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 						}
 						else if (type_Table === this.Content[Index].GetType())
 						{
-							this.Content[Index].TurnOff_RecalcEvent();
 							this.Content[Index].Set_ParagraphNumbering(NumInfo);
-							this.Content[Index].TurnOn_RecalcEvent();
 						}
 					}
 
@@ -14292,11 +14250,7 @@ CDocument.prototype.controller_SetParagraphShd = function(Shd)
 				if (type_Paragraph == Item.GetType())
 					Item.Set_Shd(Shd);
 				else if (type_Table == Item.GetType())
-				{
-					Item.TurnOff_RecalcEvent();
 					Item.Set_ParagraphShd(Shd);
-					Item.TurnOn_RecalcEvent();
-				}
 			}
 		}
 	}
@@ -14342,9 +14296,7 @@ CDocument.prototype.controller_SetParagraphStyle = function(Name)
 			}
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphStyle(Name);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14357,9 +14309,7 @@ CDocument.prototype.controller_SetParagraphStyle = function(Name)
 		}
 		else if (type_Table == Item.GetType())
 		{
-			Item.TurnOff_RecalcEvent();
 			Item.Set_ParagraphStyle(Name);
-			Item.TurnOn_RecalcEvent();
 		}
 	}
 };
@@ -14387,9 +14337,7 @@ CDocument.prototype.controller_SetParagraphContextualSpacing = function(Value)
 				Item.Set_ContextualSpacing(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphContextualSpacing(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14428,9 +14376,7 @@ CDocument.prototype.controller_SetParagraphPageBreakBefore = function(Value)
 				Item.Set_PageBreakBefore(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphPageBreakBefore(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14470,9 +14416,7 @@ CDocument.prototype.controller_SetParagraphKeepLines = function(Value)
 				Item.Set_KeepLines(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphKeepLines(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14512,9 +14456,7 @@ CDocument.prototype.controller_SetParagraphKeepNext = function(Value)
 				Item.Set_KeepNext(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphKeepNext(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14554,9 +14496,7 @@ CDocument.prototype.controller_SetParagraphWidowControl = function(Value)
 				Item.Set_WidowControl(Value);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphWidowControl(Value);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14596,9 +14536,7 @@ CDocument.prototype.controller_SetParagraphBorders = function(Borders)
 				Item.Set_Borders(Borders);
 			else if (type_Table == Item.GetType())
 			{
-				Item.TurnOff_RecalcEvent();
 				Item.Set_ParagraphBorders(Borders);
-				Item.TurnOn_RecalcEvent();
 			}
 		}
 	}
@@ -14757,9 +14695,7 @@ CDocument.prototype.controller_IncreaseOrDecreaseParagraphFontSize = function(bI
 						Item.IncDec_FontSize(bIncrease);
 					else if (type_Table == Item.GetType())
 					{
-						Item.TurnOff_RecalcEvent();
 						Item.Paragraph_IncDecFontSize(bIncrease);
-						Item.TurnOn_RecalcEvent();
 					}
 				}
 				break;

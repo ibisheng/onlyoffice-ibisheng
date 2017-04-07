@@ -37,6 +37,7 @@
  * Time: 11:42
  */
 
+var type_Unknown = 0x00;
 
 /**
  * Базовый класс для элементов содержимого документа (Paragraph, CTable, CBlockLevelSdt)
@@ -61,6 +62,14 @@ function CDocumentContentElementBase(oParent)
 	this.ColumnsCount = 0;
 }
 
+CDocumentContentElementBase.prototype.Get_Type = function()
+{
+	return this.GetType();
+};
+CDocumentContentElementBase.prototype.GetType = function()
+{
+	return type_Unknown;
+};
 CDocumentContentElementBase.prototype.Is_Inline = function()
 {
 	return true;
@@ -111,3 +120,87 @@ CDocumentContentElementBase.prototype.Reset = function(X, Y, XLimit, YLimit, Pag
 	this.ColumnNum    = ColumnAbs ? ColumnAbs : 0;
 	this.ColumnsCount = ColumnsCount ? ColumnsCount : 1;
 };
+CDocumentContentElementBase.prototype.Recalculate_Page = function(CurPage)
+{
+	return recalcresult_NextElement;
+};
+CDocumentContentElementBase.prototype.Get_PageBounds = function(CurPage)
+{
+	return new CDocumentBounds(this.X, this.Y, this.XLimit, this.YLimit);
+};
+CDocumentContentElementBase.prototype.Is_EmptyPage = function(CurPage)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.Reset_RecalculateCache = function()
+{
+};
+CDocumentContentElementBase.prototype.Write_ToBinary2 = function(Writer)
+{
+	Writer.WriteLong(AscDFH.historyitem_type_Unknown);
+};
+CDocumentContentElementBase.prototype.Read_FromBinary2 = function(Reader)
+{
+};
+CDocumentContentElementBase.prototype.Get_PagesCount = function()
+{
+	return 0;
+};
+CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
+{
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Функции для работы с номерами страниц
+//----------------------------------------------------------------------------------------------------------------------
+CDocumentContentElementBase.prototype.Get_StartPage_Absolute = function()
+{
+	return this.Get_AbsolutePage(0);
+};
+CDocumentContentElementBase.prototype.Get_StartPage_Relative = function()
+{
+	return this.PageNum;
+};
+CDocumentContentElementBase.prototype.Get_StartColumn = function()
+{
+	return this.ColumnNum;
+};
+CDocumentContentElementBase.prototype.Get_ColumnsCount = function()
+{
+	return this.ColumnsCount;
+};
+CDocumentContentElementBase.prototype.private_GetRelativePageIndex = function(CurPage)
+{
+	if (!this.ColumnsCount || 0 === this.ColumnsCount)
+		return this.PageNum + CurPage;
+
+	return this.PageNum + ((this.ColumnNum + CurPage) / this.ColumnsCount | 0);
+};
+CDocumentContentElementBase.prototype.private_GetAbsolutePageIndex = function(CurPage)
+{
+	return this.Parent.Get_AbsolutePage(this.private_GetRelativePageIndex(CurPage));
+};
+CDocumentContentElementBase.prototype.Get_AbsolutePage = function(CurPage)
+{
+	return this.private_GetAbsolutePageIndex(CurPage);
+};
+CDocumentContentElementBase.prototype.Get_AbsoluteColumn = function(CurPage)
+{
+	if (this.Parent instanceof CDocument)
+		return this.private_GetColumnIndex(CurPage);
+
+	return this.Parent.Get_AbsoluteColumn(this.private_GetRelativePageIndex(CurPage));
+};
+CDocumentContentElementBase.prototype.private_GetColumnIndex = function(CurPage)
+{
+	return (this.ColumnNum + CurPage) - (((this.ColumnNum + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
+};
+//----------------------------------------------------------------------------------------------------------------------
+CDocumentContentElementBase.prototype.GetPagesCount = function()
+{
+	return this.Get_PagesCount();
+};
+
+//--------------------------------------------------------export--------------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;
+window['AscCommonWord'].type_Unknown = type_Unknown;

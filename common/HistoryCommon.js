@@ -1102,6 +1102,7 @@
 	window['AscDFH'].historyitem_type_Footnotes        = 56 << 16;
 	window['AscDFH'].historyitem_type_FootEndNote      = 57 << 16;
 	window['AscDFH'].historyitem_type_Presentation     = 58 << 16;
+	window['AscDFH'].historyitem_type_BlockLevelSdt    = 59 << 16;
 
 	window['AscDFH'].historyitem_type_CommonShape            = 1000 << 16; // Этот класс добавлен для элементов, у которых нет конкретного класса
 

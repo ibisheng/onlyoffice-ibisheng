@@ -37,6 +37,8 @@
  * Time: 17:00
  */
 
+var type_BlockLevelSdt = 0x0003;
+
 /**
  * @param oParent - родительский класс
  * @param oLogicDocument - главный класс документа
@@ -57,6 +59,10 @@ function CBlockLevelSdt(oLogicDocument, oParent)
 CBlockLevelSdt.prototype = Object.create(CDocumentContentElementBase.prototype);
 CBlockLevelSdt.prototype.constructor = CBlockLevelSdt;
 
+CBlockLevelSdt.prototype.GetType = function()
+{
+	return type_BlockLevelSdt;
+};
 CBlockLevelSdt.prototype.Is_Inline = function()
 {
 	return true;
@@ -89,7 +95,111 @@ CBlockLevelSdt.prototype.Is_EmptyPage = function(CurPage)
 	// TODO: Реализовать
 	return false;
 };
+CBlockLevelSdt.prototype.Get_PagesCount = function()
+{
+	return this.Content.Get_PagesCount();
+};
 CBlockLevelSdt.prototype.Reset_RecalculateCache = function()
 {
 	this.Content.Reset_RecalculateCache();
 };
+CBlockLevelSdt.prototype.Write_ToBinary2 = function(Writer)
+{
+	Writer.WriteLong(AscDFH.historyitem_type_BlockLevelSdt);
+	// String : Content id
+	Writer.WriteString(this.Content.GetId());
+};
+CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
+{
+	// String : Content id
+	this.Content = this.LogicDocument.Get_TableId().Get_ById(Reader.GetString2());
+};
+CBlockLevelSdt.prototype.Draw = function(CurPage, oGraphics)
+{
+	this.Content.Draw(CurPage, oGraphics);
+};
+//----------------------------------------------------------------------------------------------------------------------
+CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
+{
+	return this.Parent.Is_HdrFtr(bReturnHdrFtr);
+};
+CBlockLevelSdt.prototype.Is_TopDocument = function(bReturnTopDocument)
+{
+	return this.Parent.Is_TopDocument(bReturnTopDocument);
+};
+CBlockLevelSdt.prototype.Is_Cell = function()
+{
+	return this.Parent.Is_TableCellContent();
+};
+CBlockLevelSdt.prototype.Get_Numbering = function()
+{
+	return this.LogicDocument.Get_Numbering();
+};
+CBlockLevelSdt.prototype.Get_Styles = function()
+{
+	return this.LogicDocument.Get_Styles();
+};
+CBlockLevelSdt.prototype.Get_TableStyleForPara = function()
+{
+	return this.Parent.Get_TableStyleForPara();
+};
+CBlockLevelSdt.prototype.Get_ShapeStyleForPara = function()
+{
+	return this.Parent.Get_ShapeStyleForPara();
+};
+CBlockLevelSdt.prototype.Get_Theme = function()
+{
+	return this.Parent.Get_Theme();
+};
+CBlockLevelSdt.prototype.Get_PrevElementEndInfo = function()
+{
+	return this.Parent.Get_PrevElementEndInfo(this);
+};
+CBlockLevelSdt.prototype.Get_EndInfo = function()
+{
+	return this.Content.Get_EndInfo();
+};
+CBlockLevelSdt.prototype.Is_UseInDocument = function(Id)
+{
+	if (Id === this.Content.GetId())
+		return this.Parent.Is_UseInDocument(this.GetId());
+
+	return false;
+};
+CBlockLevelSdt.prototype.Get_ColorMap = function()
+{
+	return this.Parent.Get_ColorMap();
+};
+CBlockLevelSdt.prototype.Get_TextBackGroundColor = function()
+{
+	return this.Parent.Get_TextBackGroundColor();
+};
+CBlockLevelSdt.prototype.Is_ThisElementCurrent = function(oElement)
+{
+	if (oElement === this.Content)
+		return this.Parent.Is_ThisElementCurrent();
+
+	return false;
+};
+CBlockLevelSdt.prototype.OnContentReDraw = function(StartPageAbs, EndPageAbs)
+{
+	this.Parent.OnContentReDraw(StartPageAbs, EndPageAbs);
+};
+CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
+{
+	this.Content.Document_CreateFontMap(FontMap);
+};
+//--------------------------------------------------------export--------------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;
+window['AscCommonWord'].type_BlockLevelSdt = type_BlockLevelSdt;
+
+
+function TEST_ADD_SDT()
+{
+	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+	var oSdt = new CBlockLevelSdt(oLogicDocument, oLogicDocument);
+
+	oLogicDocument.Internal_Content_Add(1, oSdt);
+	oLogicDocument.Recalculate_FromStart();
+}

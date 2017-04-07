@@ -2093,8 +2093,8 @@ function CDrawingDocument()
 	this.TableStylesLastLook = null;
 	this.LastParagraphMargins = null;
 
-	this.TableStylesСheckLook = null;
-	this.TableStylesСheckLookFlag = false;
+	this.TableStylesCheckLook = null;
+	this.TableStylesCheckLookFlag = false;
 
 	this.InlineTextTrackEnabled = false;
 	this.InlineTextTrack = null;
@@ -5780,24 +5780,24 @@ function CDrawingDocument()
 
 	this.StartTableStylesCheck = function ()
 	{
-		this.TableStylesСheckLookFlag = true;
+		this.TableStylesCheckLookFlag = true;
 	}
 
 	this.EndTableStylesCheck = function ()
 	{
-		this.TableStylesСheckLookFlag = false;
-		if (this.TableStylesСheckLook != null)
+		this.TableStylesCheckLookFlag = false;
+		if (this.TableStylesCheckLook != null)
 		{
-			this.CheckTableStyles(this.TableStylesСheckLook);
-			this.TableStylesСheckLook = null;
+			this.CheckTableStyles(this.TableStylesCheckLook);
+			this.TableStylesCheckLook = null;
 		}
 	}
 
 	this.CheckTableStyles = function (tableLook)
 	{
-		if (this.TableStylesСheckLookFlag)
+		if (this.TableStylesCheckLookFlag)
 		{
-			this.TableStylesСheckLook = tableLook;
+			this.TableStylesCheckLook = tableLook;
 			return;
 		}
 

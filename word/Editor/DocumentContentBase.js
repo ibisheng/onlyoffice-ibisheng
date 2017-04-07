@@ -38,6 +38,8 @@
  */
 function CDocumentContentBase()
 {
+	this.Id = null;
+
 	this.StartPage = 0; // Номер стартовой страницы в родительском классе
 	this.CurPage   = 0; // Номер текущей страницы
 
@@ -45,7 +47,14 @@ function CDocumentContentBase()
 
 	this.ReindexStartPos = 0;
 }
-
+CDocumentContentBase.prototype.Get_Id = function()
+{
+	return this.GetId();
+};
+CDocumentContentBase.prototype.GetId = function()
+{
+	return this.Id;
+};
 /**
  * Получаем тип активной части документа.
  * @returns {(docpostype_Content | docpostype_HdrFtr | docpostype_DrawingObjects | docpostype_Footnotes)}

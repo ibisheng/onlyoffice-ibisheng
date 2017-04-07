@@ -1732,6 +1732,11 @@ ParaFootnoteReference.prototype.GetCustomText = function()
 {
 	return this.CustomMark;
 };
+ParaFootnoteReference.prototype.CreateDocumentFontMap = function(FontMap)
+{
+	if (this.Footnote)
+		this.Footnote.Document_CreateFontMap(FontMap);
+};
 
 /**
  * Класс представляющий номер сноски внутри сноски.
