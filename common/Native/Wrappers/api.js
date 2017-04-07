@@ -1988,6 +1988,16 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             _return = _stream;
             break;
         }
+        case 67: // ASC_MENU_EVENT_TYPE_STATISTIC_START
+        {
+            _api.startGetDocInfo();
+            break;
+        }
+        case 68: // ASC_MENU_EVENT_TYPE_STATISTIC_STOP
+        {
+            _api.stopGetDocInfo();
+            break;
+        }
         case 17:
         {
             var _sect_width = undefined;
