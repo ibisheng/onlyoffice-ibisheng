@@ -1999,6 +1999,9 @@ PasteProcessor.prototype =
     {
         var oDocument = this.oDocument;
 
+		//TODO ориентируюсь при специальной вставке на SelectionState. возможно стоит пересмотреть.
+		this.curDocSelection = this.oDocument.Get_SelectionState();
+
         var nInsertLength = this.aContent.length;
         if(nInsertLength > 0)
         {
@@ -2043,9 +2046,7 @@ PasteProcessor.prototype =
             paragraph.Check_NearestPos(NearPos);
             //делаем небольшой сдвиг по y, потому что сама точка TargetPos для двухстрочного параграфа определяется как верхняя
             //var NearPos = oDoc.Get_NearestPos(this.oLogicDocument.TargetPos.PageNum, this.oLogicDocument.TargetPos.X, this.oLogicDocument.TargetPos.Y + 0.05);//0.05 == 2pix
-            
-			//TODO ориентируюсь при специальной вставке на SelectionState. возможно стоит пересмотреть.
-			var curDocSelection = window['AscCommon'].g_clipboardBase.specialPasteStart ? this.oDocument.Get_SelectionState() : null;
+
 			var oSelectedContent = new CSelectedContent();
             for (var i = 0, length = aNewContent.length; i < length; ++i) {
                 var oSelectedElement = new CSelectedElement();
@@ -2053,7 +2054,7 @@ PasteProcessor.prototype =
 				
 				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
 				{
-					this._specialPasteItemConvert(aNewContent[i], curDocSelection);
+					this._specialPasteItemConvert(aNewContent[i]);
 				}
 				
                 if (i == length - 1 && true != this.bInBlock && type_Paragraph == oSelectedElement.Element.GetType())
@@ -2091,6 +2092,18 @@ PasteProcessor.prototype =
 
 	_specialPasteSetShowOptions: function()
 	{
+		//специальная вставка:
+		//выдаем стандартные параметры всавки(paste, merge, value) во всех ситуация, за исключением:
+		//если вставляем единственную таблицу в таблицу - особые параметры вставки(как извне, так и внутри)
+		//если вставляем список - должны совпадать типы с уже существующими(как извне, так и внутри)
+		//изображения / шейпы
+
+		//отдельно диаграммы - для них есть отдельный пункт. посмотреть, нужно ли это добавлять
+
+		//для формул параметры как и при обычной вставке. но нужно уметь их преобразовывать в текст при вставке только текста
+		//особые параметры при вставке таблиц из EXCEL
+
+
 		var specialPasteShowOptions = window['AscCommon'].g_clipboardBase.specialPasteButtonProps ? window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props : null;
 		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
 		{
@@ -2098,7 +2111,26 @@ PasteProcessor.prototype =
 			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
 
 			var sProps = Asc.c_oSpecialPasteProps;
-			var props = [sProps.paste, sProps.mergeFormatting, sProps.pasteOnlyValues];
+
+			var curDocSelection = this.curDocSelection;
+			var aContent = this.aContent;
+			var document = this.oDocument;
+			var insertToElem;
+			if(curDocSelection)
+			{
+				insertToElem = document.Content[curDocSelection[1].CurPos.ContentPos];
+			}
+
+			var props;
+			if(insertToElem && 1 === aContent.length && type_Table === this.aContent[0].GetType() && type_Table === insertToElem.GetType())//table into table
+			{
+				props = [sProps.paste, sProps.pasteOnlyValues];
+			}
+			else
+			{
+				props = [sProps.paste, sProps.mergeFormatting, sProps.pasteOnlyValues];
+			}
+			
 			specialPasteShowOptions.asc_setOptions(props);
 		}
 
@@ -2117,7 +2149,7 @@ PasteProcessor.prototype =
 		}
 	},
 
-	_specialPasteItemConvert: function(item, curDocSelection)
+	_specialPasteItemConvert: function(item)
 	{
 		var res = item;
 		var type = item.GetType();
@@ -2125,19 +2157,19 @@ PasteProcessor.prototype =
 		{
 			case type_Paragraph:
 			{
-				res = this._specialPasteParagraphConvert(item, curDocSelection);
+				res = this._specialPasteParagraphConvert(item);
 				break;
 			}
 			case type_Table:
 			{
-				res = this._specialPasteTableConvert(item, curDocSelection);
+				res = this._specialPasteTableConvert(item);
 				break;
 			}
 		}
 		return res;
 	},
 
-	_specialPasteTableConvert: function(table, curDocSelection)
+	_specialPasteTableConvert: function(table)
 	{
 		//TODO временная функция
 		var res = table;
@@ -2151,11 +2183,11 @@ PasteProcessor.prototype =
 				{
 					if(cDocumentContent.Content[n] instanceof Paragraph)
 					{
-						this._specialPasteParagraphConvert(cDocumentContent.Content[n], curDocSelection);
+						this._specialPasteParagraphConvert(cDocumentContent.Content[n]);
 					}
 					else if(cDocumentContent.Content[n] instanceof CTable)
 					{
-						this._specialPasteTableConvert(cDocumentContent.Content[n], curDocSelection);
+						this._specialPasteTableConvert(cDocumentContent.Content[n]);
 					}
 				}
 			}
@@ -2164,11 +2196,13 @@ PasteProcessor.prototype =
 		return res;
 	},
 
-	_specialPasteParagraphConvert: function(paragraph, curDocSelection)
+	_specialPasteParagraphConvert: function(paragraph)
 	{
 		var res = paragraph;
 		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
-		
+
+		var curDocSelection = this.curDocSelection;
+
 		//стиль текущего параграфа/рана, в который вставляем
 		var pasteIntoParagraphPr, pasteIntoParaRunPr;
 		if(curDocSelection && curDocSelection[1])
