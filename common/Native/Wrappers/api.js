@@ -1988,6 +1988,16 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             _return = _stream;
             break;
         }
+        case 67: // ASC_MENU_EVENT_TYPE_STATISTIC_START
+        {
+            _api.startGetDocInfo();
+            break;
+        }
+        case 68: // ASC_MENU_EVENT_TYPE_STATISTIC_STOP
+        {
+            _api.stopGetDocInfo();
+            break;
+        }
         case 17:
         {
             var _sect_width = undefined;
@@ -5836,6 +5846,13 @@ function NativeOpenFile3(_params, documentInfo)
                                   window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
                                   });
 
+        _api.asc_registerCallback("asc_onSendThemeColorSchemes", function(schemes) {
+                                  var stream = global_memory_stream_menu;
+                                  stream["ClearNoAttack"]();
+                                  asc_WriteColorSchemes(schemes, stream);
+                                  window["native"]["OnCallMenuEvent"](2404, stream); // ASC_SPREADSHEETS_EVENT_TYPE_COLOR_SCHEMES
+                                  });
+
         if (window.documentInfo["iscoauthoring"]) {
 
             _api.isSpellCheckEnable = false;
@@ -5884,8 +5901,15 @@ function NativeOpenFile3(_params, documentInfo)
             var doc_bin = window.native.GetFileString(window.g_file_path);
             _api.asc_nativeOpenFile(doc_bin);
 
+            if (null != _api.WordControl.m_oLogicDocument)
+            {
+			           _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
+            }
+
             if (_api.NativeAfterLoad)
+            {
                 _api.NativeAfterLoad();
+            }
         }
     }
     Api = _api;
@@ -6034,6 +6058,11 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
     {
         this.CoAuthoringApi.onStartCoAuthoring(true);
         this.isStartCoAuthoringOnEndLoad = false;
+    }
+
+    if (null != _api.WordControl.m_oLogicDocument)
+    {
+         _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
     }
 
     window["native"]["onEndLoadingFile"]();

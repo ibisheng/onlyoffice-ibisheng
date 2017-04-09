@@ -2035,8 +2035,10 @@ ParaRun.prototype.Create_FontMap = function(Map)
         {
             var Item = this.Content[Index];
 
-            if ( para_Drawing === Item.Type )
-                Item.documentCreateFontMap( Map );
+			if (para_Drawing === Item.Type)
+				Item.documentCreateFontMap(Map);
+			else if (para_FootnoteReference === Item.Type)
+				Item.CreateDocumentFontMap(Map);
         }
 
         if(this.Type === para_Math_Run)

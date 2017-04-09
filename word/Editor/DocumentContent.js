@@ -1667,18 +1667,24 @@ CDocumentContent.prototype.Is_InDrawing                  = function(X, Y, CurPag
         return false;
     }
 };
-CDocumentContent.prototype.Get_CurrentPage_Absolute      = function()
+CDocumentContent.prototype.Get_CurrentPage_Absolute = function()
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.getCurrentPageAbsolute();
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos );
-        if (Pos >= 0 && Pos < this.Content.length)
-            return this.Content[Pos].Get_CurrentPage_Absolute();
-    }
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.getCurrentPageAbsolute();
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		var Pos = ( true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos );
+		if (Pos >= 0 && Pos < this.Content.length)
+			return this.Content[Pos].Get_CurrentPage_Absolute();
+	}
 
-    return 0;
+	return 0;
+};
+CDocumentContent.prototype.Get_CurrentPage_Relative = function()
+{
+	return this.CurPage;
 };
 CDocumentContent.prototype.DocumentStatistics            = function(Stats)
 {

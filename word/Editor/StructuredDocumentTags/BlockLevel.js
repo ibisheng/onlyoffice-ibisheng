@@ -84,7 +84,12 @@ CBlockLevelSdt.prototype.Recalculate_Page = function(CurPage)
 {
 	var RecalcResult = this.Content.Recalculate_Page(CurPage, true);
 
-	return RecalcResult;
+	if (recalcresult2_End === RecalcResult)
+		return recalcresult_NextElement;
+	else if (recalcresult2_NextPage === RecalcResult)
+		return recalcresult_NextPage;
+	else if (recalcresult2_CurPage === RecalcResult)
+		return recalcresult_CurPage;
 };
 CBlockLevelSdt.prototype.Get_PageBounds = function(CurPage)
 {
@@ -117,6 +122,42 @@ CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 CBlockLevelSdt.prototype.Draw = function(CurPage, oGraphics)
 {
 	this.Content.Draw(CurPage, oGraphics);
+};
+CBlockLevelSdt.prototype.Get_CurrentPage_Absolute = function()
+{
+	return this.Content.Get_CurrentPage_Absolute();
+};
+CBlockLevelSdt.prototype.Get_CurrentPage_Relative = function()
+{
+	return this.Content.Get_CurrentPage_Relative();
+};
+CBlockLevelSdt.prototype.Is_InText = function(X, Y, CurPage)
+{
+	return this.Content.Is_InText(X, Y, CurPage);
+};
+CBlockLevelSdt.prototype.Update_CursorType = function(X, Y, CurPage)
+{
+	return this.Content.Update_CursorType(X, Y, CurPage);
+};
+CBlockLevelSdt.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent, isTableBorder)
+{
+	this.Content.Selection_SetStart(X, Y, CurPage, MouseEvent, isTableBorder);
+};
+CBlockLevelSdt.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, isTableBorder)
+{
+	this.Content.Selection_SetEnd(X, Y, CurPage, MouseEvent, isTableBorder);
+};
+CBlockLevelSdt.prototype.Selection_IsEmpty = function(isCheckHidden)
+{
+	return this.Content.Selection_IsEmpty(isCheckHidden);
+};
+CBlockLevelSdt.prototype.Get_SelectedElementsInfo = function(oInfo)
+{
+	this.Content.Get_SelectedElementsInfo(oInfo);
+};
+CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)
+{
+	this.Content.Document_UpdateRulersState(CurPage);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
@@ -185,9 +226,13 @@ CBlockLevelSdt.prototype.OnContentReDraw = function(StartPageAbs, EndPageAbs)
 {
 	this.Parent.OnContentReDraw(StartPageAbs, EndPageAbs);
 };
-CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
+CBlockLevelSdt.prototype.Document_CreateFontMap = function(FontMap)
 {
 	this.Content.Document_CreateFontMap(FontMap);
+};
+CBlockLevelSdt.prototype.Get_ParentTextTransform = function()
+{
+	return this.Parent.Get_ParentTextTransform();
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
@@ -199,6 +244,9 @@ function TEST_ADD_SDT()
 {
 	var oLogicDocument = editor.WordControl.m_oLogicDocument;
 	var oSdt = new CBlockLevelSdt(oLogicDocument, oLogicDocument);
+	oSdt.Content.Paragraph_Add(new ParaText("S"));
+	oSdt.Content.Paragraph_Add(new ParaText("d"));
+	oSdt.Content.Paragraph_Add(new ParaText("t"));
 
 	oLogicDocument.Internal_Content_Add(1, oSdt);
 	oLogicDocument.Recalculate_FromStart();

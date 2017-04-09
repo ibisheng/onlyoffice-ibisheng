@@ -149,6 +149,30 @@ CDocumentContentElementBase.prototype.Get_PagesCount = function()
 CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
 {
 };
+CDocumentContentElementBase.prototype.Is_InText = function(X, Y, CurPage)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.Update_CursorType = function(X, Y, CurPage)
+{
+};
+CDocumentContentElementBase.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent, isTableBorder)
+{
+};
+CDocumentContentElementBase.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, isTableBorder)
+{
+};
+CDocumentContentElementBase.prototype.Selection_IsEmpty = function(isCheckHidden)
+{
+	return true;
+};
+CDocumentContentElementBase.prototype.Get_SelectedElementsInfo = function(oInfo)
+{
+};
+CDocumentContentElementBase.prototype.Document_UpdateRulersState = function(CurPage)
+{
+	this.Content.Document_UpdateRulersState(CurPage);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
@@ -193,6 +217,14 @@ CDocumentContentElementBase.prototype.Get_AbsoluteColumn = function(CurPage)
 CDocumentContentElementBase.prototype.private_GetColumnIndex = function(CurPage)
 {
 	return (this.ColumnNum + CurPage) - (((this.ColumnNum + CurPage) / this.ColumnsCount | 0) * this.ColumnsCount);
+};
+CDocumentContentElementBase.prototype.Get_CurrentPage_Absolute = function()
+{
+	return this.private_GetAbsolutePageIndex(0);
+};
+CDocumentContentElementBase.prototype.Get_CurrentPage_Relative = function()
+{
+	return this.private_GetRelativePageIndex(0);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CDocumentContentElementBase.prototype.GetPagesCount = function()
