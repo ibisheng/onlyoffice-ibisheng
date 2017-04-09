@@ -312,8 +312,11 @@
 					{
 						_data = wb.cellEditor._getFragmentsText(fragments);
 					}
-					
-					_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
+
+					if(null !== _data)
+					{
+						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data);
+					}
 				}
 				else
 				{	
@@ -332,15 +335,18 @@
 					if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
 					{
 						_data = this.copyProcessor.getText(activeRange, ws);
-						
-						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data)
+
+						if(null !== _data)
+						{
+							_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Text, _data);
+						}
 					}
 					//HTML
 					if(AscCommon.c_oAscClipboardDataFormat.Html & _formats)
 					{	
 						_data = this.copyProcessor.getHtml(activeRange, ws);
 						
-						if(_data !== null)
+						if(null !== _data)
 						{
 							_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Html, _data.html)
 						}
@@ -364,7 +370,10 @@
 							}
 						}
 
-						_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data);
+						if(null !== _data)
+						{
+							_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data);
+						}
 					}
 				}
 			},
