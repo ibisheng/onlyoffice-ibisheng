@@ -2608,6 +2608,12 @@
 			
 			pasteTextOnSheet: function(worksheet, text)
 			{
+				if(!text || (text && !text.length))
+				{
+					AscCommonExcel.g_clipboardExcel.end_paste();
+					return;
+				}
+
 				//TODO сделать вставку текста всегда через эту функцию
 				this.activeRange = worksheet.model.selectionRange.getLast().clone(true);
 				
