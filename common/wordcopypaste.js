@@ -2047,9 +2047,9 @@ PasteProcessor.prototype =
             //делаем небольшой сдвиг по y, потому что сама точка TargetPos для двухстрочного параграфа определяется как верхняя
             //var NearPos = oDoc.Get_NearestPos(this.oLogicDocument.TargetPos.PageNum, this.oLogicDocument.TargetPos.X, this.oLogicDocument.TargetPos.Y + 0.05);//0.05 == 2pix
 
-			//typeContent - если все содержимое одного типа
-			//TODO пересмотреть typeContent
-			this.typeContent = null;
+			//pasteTypeContent - если все содержимое одного типа
+			//TODO пересмотреть pasteTypeContent
+			this.pasteTypeContent = null;
 			var oSelectedContent = new CSelectedContent();
             for (var i = 0, length = aNewContent.length; i < length; ++i) {
                 var oSelectedElement = new CSelectedElement();
@@ -2063,11 +2063,11 @@ PasteProcessor.prototype =
 				var type = this._specialPasteGetElemType(aNewContent[i]);
 				if(0 === i)
 				{
-					this.typeContent = type;
+					this.pasteTypeContent = type;
 				}
-				else if(type !== this.typeContent)
+				else if(type !== this.pasteTypeContent)
 				{
-					this.typeContent = null;
+					this.pasteTypeContent = null;
 				}
 
                 if (i == length - 1 && true != this.bInBlock && type_Paragraph == oSelectedElement.Element.GetType())
@@ -2140,6 +2140,21 @@ PasteProcessor.prototype =
 						}
 					}
 				}
+
+				if(type_Paragraph === type)
+				{
+					if(elem.Pr && elem.Pr.NumPr)
+					{
+						if(undefined === this.pasteList)
+						{
+							this.pasteList = elem.Pr.NumPr;
+						}
+						else if(this.pasteList && !elem.Pr.NumPr.Is_Equal(this.pasteList))
+						{
+							this.pasteList = null;
+						}
+					}
+				}
 			}
 		}
 
@@ -2182,12 +2197,20 @@ PasteProcessor.prototype =
 			{
 				props = [sProps.paste, sProps.pasteOnlyValues];
 			}
+			else if(this.pasteList && insertToElem && type_Paragraph === insertToElem.GetType() && insertToElem.Pr && insertToElem.Pr.NumPr && insertToElem.Pr.NumPr.Is_Equal(this.pasteList))
+			{
+				//вставка нумерованного списка в нумерованный список
+				props = [sProps.paste, sProps.uniteList, sProps.doNotUniteList];
+			}
 			else
 			{
 				props = [sProps.paste, sProps.mergeFormatting, sProps.pasteOnlyValues];
 			}
 			
 			specialPasteShowOptions.asc_setOptions(props);
+
+			console.log(this.pasteTypeContent);
+			console.log(this.pasteList);
 		}
 
 		if(specialPasteShowOptions)

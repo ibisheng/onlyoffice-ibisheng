@@ -1095,7 +1095,10 @@
 		sourceformatting: 15,
 		destinationFormatting: 16,
 		
-		mergeFormatting: 17
+		mergeFormatting: 17,
+
+		uniteList: 18,
+		doNotUniteList: 19
 	};
 	
 	//------------------------------------------------------------export--------------------------------------------------
@@ -1773,6 +1776,8 @@
 	prot['sourceformatting'] = prot.sourceformatting;
 	prot['destinationFormatting'] = prot.destinationFormatting;
 	prot['mergeFormatting'] = prot.mergeFormatting;
+	prot['uniteList'] = prot.uniteList;
+	prot['doNotUniteList'] = prot.doNotUniteList;
 	
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =
