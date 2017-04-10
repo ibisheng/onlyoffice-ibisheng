@@ -2557,7 +2557,7 @@ ScrollObject.prototype = {
 
                     piperImgIndex = 0;
 
-                    var r, g, b, ctx_piperImg, _data, px, _len
+                    var r, g, b, ctx_piperImg, _data, px, _len;
                     r = _HEXTORGB_( this.settings.piperColor );
                     g = r.G;
                     b = r.B;
