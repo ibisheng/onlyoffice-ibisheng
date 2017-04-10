@@ -6034,13 +6034,14 @@
         } : null;
     };
 
-    WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
+	WorksheetView.prototype.getCursorTypeFromXY = function (x, y, isViewerMode) {
 		this.handlers.trigger("checkLastWork");
-        var res, c, r, f, i, offsetX, offsetY, cellCursor;
-        var sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink;
-        var widthDiff = 0, heightDiff = 0, isLocked = false, target = c_oTargetType.Cells, row = -1, col = -1, isSelGraphicObject, isNotFirst;
+		var res, c, r, f, i, offsetX, offsetY, cellCursor;
+		var sheetId = this.model.getId(), userId, lockRangePosLeft, lockRangePosTop, lockInfo, oHyperlink;
+		var widthDiff = 0, heightDiff = 0, isLocked = false, target = c_oTargetType.Cells, row = -1, col = -1,
+			isSelGraphicObject, isNotFirst;
 
-        if (c_oAscSelectionDialogType.None === this.selectionDialogType) {
+		if (c_oAscSelectionDialogType.None === this.selectionDialogType) {
 			var frozenCursor = this._isFrozenAnchor(x, y);
 			if (!isViewerMode && frozenCursor.result) {
 				lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, sheetId,
@@ -6119,241 +6120,242 @@
 			}
 		}
 
-        x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
-        y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
+		x *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIX());
+		y *= asc_getcvt(0/*px*/, 1/*pt*/, this._getPPIY());
 
-        var oResDefault = {cursor: kCurDefault, target: c_oTargetType.None, col: -1, row: -1};
-        if (x < this.cellsLeft && y < this.cellsTop) {
-            return {cursor: kCurCorner, target: c_oTargetType.Corner, col: -1, row: -1};
-        }
+		var oResDefault = {cursor: kCurDefault, target: c_oTargetType.None, col: -1, row: -1};
+		if (x < this.cellsLeft && y < this.cellsTop) {
+			return {cursor: kCurCorner, target: c_oTargetType.Corner, col: -1, row: -1};
+		}
 
-        var cFrozen = -1, rFrozen = -1;
-        offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
-        offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
-        if (this.topLeftFrozenCell) {
-            cFrozen = this.topLeftFrozenCell.getCol0();
-            rFrozen = this.topLeftFrozenCell.getRow0();
-            widthDiff = this.cols[cFrozen].left - this.cols[0].left;
-            heightDiff = this.rows[rFrozen].top - this.rows[0].top;
+		var cFrozen = -1, rFrozen = -1;
+		offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft;
+		offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop;
+		if (this.topLeftFrozenCell) {
+			cFrozen = this.topLeftFrozenCell.getCol0();
+			rFrozen = this.topLeftFrozenCell.getRow0();
+			widthDiff = this.cols[cFrozen].left - this.cols[0].left;
+			heightDiff = this.rows[rFrozen].top - this.rows[0].top;
 
-            offsetX = (x < this.cellsLeft + widthDiff) ? 0 : offsetX - widthDiff;
-            offsetY = (y < this.cellsTop + heightDiff) ? 0 : offsetY - heightDiff;
-        }
+			offsetX = (x < this.cellsLeft + widthDiff) ? 0 : offsetX - widthDiff;
+			offsetY = (y < this.cellsTop + heightDiff) ? 0 : offsetY - heightDiff;
+		}
 
-        var epsChangeSize = 3 * AscCommon.global_mouseEvent.KoefPixToMM;
-        if (x <= this.cellsLeft && y >= this.cellsTop) {
-            r = this._findRowUnderCursor(y, true);
-            if (r === null) {
-                return oResDefault;
-            }
-            isNotFirst = (r.row !== (-1 !== rFrozen ? 0 : this.visibleRange.r1));
-            f = !isViewerMode && (isNotFirst && y < r.top + epsChangeSize || y >= r.bottom - epsChangeSize);
-            // ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
-            return {
-                cursor: f ? kCurRowResize : kCurRowSelect,
-                target: f ? c_oTargetType.RowResize : c_oTargetType.RowHeader,
-                col: -1,
-                row: r.row + (isNotFirst && f && y < r.top + 3 ? -1 : 0),
-                mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px) : (r.bottom - y - this.height_1px)) : null
-            };
-        }
-        if (y <= this.cellsTop && x >= this.cellsLeft) {
-            c = this._findColUnderCursor(x, true);
-            if (c === null) {
-                return oResDefault;
-            }
-            isNotFirst = c.col !== (-1 !== cFrozen ? 0 : this.visibleRange.c1);
-            f = !isViewerMode && (isNotFirst && x < c.left + epsChangeSize || x >= c.right - epsChangeSize);
-            // ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
-            return {
-                cursor: f ? kCurColResize : kCurColSelect,
-                target: f ? c_oTargetType.ColumnResize : c_oTargetType.ColumnHeader,
-                col: c.col + (isNotFirst && f && x < c.left + 3 ? -1 : 0),
-                row: -1,
-                mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px) : (c.right - x - this.width_1px)) : null
-            };
-        }
+		var epsChangeSize = 3 * AscCommon.global_mouseEvent.KoefPixToMM;
+		if (x <= this.cellsLeft && y >= this.cellsTop) {
+			r = this._findRowUnderCursor(y, true);
+			if (r === null) {
+				return oResDefault;
+			}
+			isNotFirst = (r.row !== (-1 !== rFrozen ? 0 : this.visibleRange.r1));
+			f = !isViewerMode && (isNotFirst && y < r.top + epsChangeSize || y >= r.bottom - epsChangeSize);
+			// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
+			return {
+				cursor: f ? kCurRowResize : kCurRowSelect,
+				target: f ? c_oTargetType.RowResize : c_oTargetType.RowHeader,
+				col: -1,
+				row: r.row + (isNotFirst && f && y < r.top + 3 ? -1 : 0),
+				mouseY: f ? ((y < r.top + 3) ? (r.top - y - this.height_1px) : (r.bottom - y - this.height_1px)) : null
+			};
+		}
+		if (y <= this.cellsTop && x >= this.cellsLeft) {
+			c = this._findColUnderCursor(x, true);
+			if (c === null) {
+				return oResDefault;
+			}
+			isNotFirst = c.col !== (-1 !== cFrozen ? 0 : this.visibleRange.c1);
+			f = !isViewerMode && (isNotFirst && x < c.left + epsChangeSize || x >= c.right - epsChangeSize);
+			// ToDo В Excel зависимость epsilon от размера ячейки (у нас фиксированный 3)
+			return {
+				cursor: f ? kCurColResize : kCurColSelect,
+				target: f ? c_oTargetType.ColumnResize : c_oTargetType.ColumnHeader,
+				col: c.col + (isNotFirst && f && x < c.left + 3 ? -1 : 0),
+				row: -1,
+				mouseX: f ? ((x < c.left + 3) ? (c.left - x - this.width_1px) : (c.right - x - this.width_1px)) : null
+			};
+		}
 
-        if (this.stateFormatPainter) {
-            if (x <= this.cellsLeft && y >= this.cellsTop) {
-                r = this._findRowUnderCursor(y, true);
-                if (r !== null) {
-                    target = c_oTargetType.RowHeader;
-                    row = r.row;
-                }
-            }
-            if (y <= this.cellsTop && x >= this.cellsLeft) {
-                c = this._findColUnderCursor(x, true);
-                if (c !== null) {
-                    target = c_oTargetType.ColumnHeader;
-                    col = c.col;
-                }
-            }
-            return {cursor: kCurFormatPainterExcel, target: target, col: col, row: row};
-        }
+		if (this.stateFormatPainter) {
+			if (x <= this.cellsLeft && y >= this.cellsTop) {
+				r = this._findRowUnderCursor(y, true);
+				if (r !== null) {
+					target = c_oTargetType.RowHeader;
+					row = r.row;
+				}
+			}
+			if (y <= this.cellsTop && x >= this.cellsLeft) {
+				c = this._findColUnderCursor(x, true);
+				if (c !== null) {
+					target = c_oTargetType.ColumnHeader;
+					col = c.col;
+				}
+			}
+			return {cursor: kCurFormatPainterExcel, target: target, col: col, row: row};
+		}
 
-        if (this.isFormulaEditMode || this.isChartAreaEditMode) {
-            this._drawElements(function (_vr, _offsetX, _offsetY) {
-                return (null === (res = this._hitCursorFormulaOrChart(_vr, x, y, _offsetX, _offsetY)));
-            });
-            if (res) {
-                return res;
-            }
-        }
+		if (this.isFormulaEditMode || this.isChartAreaEditMode) {
+			this._drawElements(function (_vr, _offsetX, _offsetY) {
+				return (null === (res = this._hitCursorFormulaOrChart(_vr, x, y, _offsetX, _offsetY)));
+			});
+			if (res) {
+				return res;
+			}
+		}
 
-        isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
+		isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
 		if (!isViewerMode && !isSelGraphicObject && this.model.selectionRange.isSingleRange() &&
 			c_oAscSelectionDialogType.None === this.selectionDialogType) {
-            this._drawElements(function (_vr, _offsetX, _offsetY) {
-                return (null === (res = this._hitCursorSelectionRange(_vr, x, y, _offsetX, _offsetY)));
-            });
-            if (res) {
-                return res;
-            }
-        }
+			this._drawElements(function (_vr, _offsetX, _offsetY) {
+				return (null === (res = this._hitCursorSelectionRange(_vr, x, y, _offsetX, _offsetY)));
+			});
+			if (res) {
+				return res;
+			}
+		}
 
-        if (x > this.cellsLeft && y > this.cellsTop) {
-            c = this._findColUnderCursor(x, true);
-            r = this._findRowUnderCursor(y, true);
-            if (c === null || r === null) {
-                return oResDefault;
-            }
+		if (x > this.cellsLeft && y > this.cellsTop) {
+			c = this._findColUnderCursor(x, true);
+			r = this._findRowUnderCursor(y, true);
+			if (c === null || r === null) {
+				return oResDefault;
+			}
 
-            // Проверка на совместное редактирование
-            var lockRange = undefined;
-            var lockAllPosLeft = undefined;
-            var lockAllPosTop = undefined;
-            var userIdAllProps = undefined;
-            var userIdAllSheet = undefined;
-            if (!isViewerMode && this.collaborativeEditing.getCollaborativeEditing()) {
-                var c1Recalc = null, r1Recalc = null;
-                var selectRangeRecalc = new asc_Range(c.col, r.row, c.col, r.row);
-                // Пересчет для входящих ячеек в добавленные строки/столбцы
-                var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, selectRangeRecalc);
-                if (false === isIntersection) {
-                    lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
-                      new AscCommonExcel.asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1, selectRangeRecalc.c2, selectRangeRecalc.r2));
-                    isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
-                      /*bCheckOnlyLockAll*/false);
-                    if (false !== isLocked) {
-                        // Кто-то сделал lock
-                        userId = isLocked.UserId;
-                        lockRange = isLocked.Element["rangeOrObjectId"];
+			// Проверка на совместное редактирование
+			var lockRange = undefined;
+			var lockAllPosLeft = undefined;
+			var lockAllPosTop = undefined;
+			var userIdAllProps = undefined;
+			var userIdAllSheet = undefined;
+			if (!isViewerMode && this.collaborativeEditing.getCollaborativeEditing()) {
+				var c1Recalc = null, r1Recalc = null;
+				var selectRangeRecalc = new asc_Range(c.col, r.row, c.col, r.row);
+				// Пересчет для входящих ячеек в добавленные строки/столбцы
+				var isIntersection = this._recalcRangeByInsertRowsAndColumns(sheetId, selectRangeRecalc);
+				if (false === isIntersection) {
+					lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId,
+						new AscCommonExcel.asc_CCollaborativeRange(selectRangeRecalc.c1, selectRangeRecalc.r1,
+							selectRangeRecalc.c2, selectRangeRecalc.r2));
+					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                        /*bCheckOnlyLockAll*/false);
+					if (false !== isLocked) {
+						// Кто-то сделал lock
+						userId = isLocked.UserId;
+						lockRange = isLocked.Element["rangeOrObjectId"];
 
-                        c1Recalc =
-                          this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther(lockRange["c1"],
-                            c_oAscLockTypes.kLockTypeOther);
-                        r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther(lockRange["r1"],
-                          c_oAscLockTypes.kLockTypeOther);
-                        if (null !== c1Recalc && null !== r1Recalc) {
-                            lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
-                            lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
-                            // Пересчитываем X и Y относительно видимой области
-                            lockRangePosLeft -= offsetX;
+						c1Recalc =
+							this.collaborativeEditing.m_oRecalcIndexColumns[sheetId].getLockOther(lockRange["c1"],
+								c_oAscLockTypes.kLockTypeOther);
+						r1Recalc = this.collaborativeEditing.m_oRecalcIndexRows[sheetId].getLockOther(lockRange["r1"],
+							c_oAscLockTypes.kLockTypeOther);
+						if (null !== c1Recalc && null !== r1Recalc) {
+							lockRangePosLeft = this.getCellLeft(c1Recalc, /*pt*/1);
+							lockRangePosTop = this.getCellTop(r1Recalc, /*pt*/1);
+							// Пересчитываем X и Y относительно видимой области
+							lockRangePosLeft -= offsetX;
 							lockRangePosTop -= offsetY;
 							lockRangePosLeft = this.cellsLeft > lockRangePosLeft ? this.cellsLeft : lockRangePosLeft;
 							lockRangePosTop = this.cellsTop > lockRangePosTop ? this.cellsTop : lockRangePosTop;
-                            // Пересчитываем в px
-                            lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
-                            lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
-                        }
-                    }
-                } else {
-                    lockInfo =
-                      this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, null);
-                }
-                // Проверим не удален ли весь лист (именно удален, т.к. если просто залочен, то не рисуем рамку вокруг)
-                lockInfo["type"] = c_oAscLockTypeElem.Sheet;
-                isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
-                  /*bCheckOnlyLockAll*/true);
-                if (false !== isLocked) {
-                    // Кто-то сделал lock
-                    userIdAllSheet = isLocked.UserId;
-                    lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
-                    lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
-                }
+							// Пересчитываем в px
+							lockRangePosLeft *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+							lockRangePosTop *= asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
+						}
+					}
+				} else {
+					lockInfo =
+						this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Range, /*subType*/null, sheetId, null);
+				}
+				// Проверим не удален ли весь лист (именно удален, т.к. если просто залочен, то не рисуем рамку вокруг)
+				lockInfo["type"] = c_oAscLockTypeElem.Sheet;
+				isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                    /*bCheckOnlyLockAll*/true);
+				if (false !== isLocked) {
+					// Кто-то сделал lock
+					userIdAllSheet = isLocked.UserId;
+					lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+					lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
+				}
 
-                // Проверим не залочены ли все свойства листа (только если не удален весь лист)
-                if (undefined === userIdAllSheet) {
-                    lockInfo["type"] = c_oAscLockTypeElem.Range;
-                    lockInfo["subType"] = c_oAscLockTypeElemSubType.InsertRows;
-                    isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
-                      /*bCheckOnlyLockAll*/true);
-                    if (false !== isLocked) {
-                        // Кто-то сделал lock
-                        userIdAllProps = isLocked.UserId;
+				// Проверим не залочены ли все свойства листа (только если не удален весь лист)
+				if (undefined === userIdAllSheet) {
+					lockInfo["type"] = c_oAscLockTypeElem.Range;
+					lockInfo["subType"] = c_oAscLockTypeElemSubType.InsertRows;
+					isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther,
+                        /*bCheckOnlyLockAll*/true);
+					if (false !== isLocked) {
+						// Кто-то сделал lock
+						userIdAllProps = isLocked.UserId;
 
-                        lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
-                        lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
-                    }
-                }
-            }
+						lockAllPosLeft = this.cellsLeft * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIX());
+						lockAllPosTop = this.cellsTop * asc_getcvt(1/*pt*/, 0/*px*/, this._getPPIY());
+					}
+				}
+			}
 
-            var autoFilterInfo = this.af_checkCursor(x, y, offsetX, offsetY, {
-                cFrozen: cFrozen, rFrozen: rFrozen
-            }, r, c);
-            if (autoFilterInfo && !isViewerMode) {
-                return {
-                    cursor: kCurAutoFilter,
-                    target: c_oTargetType.FilterObject,
-                    col: -1,
-                    row: -1,
-                    idFilter: autoFilterInfo.id
-                };
-            }
+			var autoFilterInfo = this.af_checkCursor(x, y, offsetX, offsetY, {
+				cFrozen: cFrozen, rFrozen: rFrozen
+			}, r, c);
+			if (autoFilterInfo && !isViewerMode) {
+				return {
+					cursor: kCurAutoFilter,
+					target: c_oTargetType.FilterObject,
+					col: -1,
+					row: -1,
+					idFilter: autoFilterInfo.id
+				};
+			}
 
-            // Проверим есть ли комменты
-            var comments = this.cellCommentator.getComments(c.col, r.row);
-            var coords = undefined;
-            var indexes = undefined;
+			// Проверим есть ли комменты
+			var comments = this.cellCommentator.getComments(c.col, r.row);
+			var coords = undefined;
+			var indexes = undefined;
 
-            if (0 < comments.length) {
-                indexes = [];
-                for (i = 0; i < comments.length; ++i) {
-                    indexes.push(comments[i].asc_getId());
-                }
-                coords = this.cellCommentator.getCommentsCoords(comments);
-            }
+			if (0 < comments.length) {
+				indexes = [];
+				for (i = 0; i < comments.length; ++i) {
+					indexes.push(comments[i].asc_getId());
+				}
+				coords = this.cellCommentator.getCommentsCoords(comments);
+			}
 
-            // Проверим, может мы в гиперлинке
-            oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
-            cellCursor = {
-                cursor: kCurCells,
-                target: c_oTargetType.Cells,
-                col: (c ? c.col : -1),
-                row: (r ? r.row : -1),
-                userId: userId,
-                lockRangePosLeft: lockRangePosLeft,
-                lockRangePosTop: lockRangePosTop,
-                userIdAllProps: userIdAllProps,
-                lockAllPosLeft: lockAllPosLeft,
-                lockAllPosTop: lockAllPosTop,
-                userIdAllSheet: userIdAllSheet,
-                commentIndexes: indexes,
-                commentCoords: coords
-            };
-            if (null !== oHyperlink) {
-                return {
-                    cursor: kCurHyperlink,
-                    target: c_oTargetType.Hyperlink,
-                    hyperlink: new asc_CHyperlink(oHyperlink),
-                    cellCursor: cellCursor,
-                    userId: userId,
-                    lockRangePosLeft: lockRangePosLeft,
-                    lockRangePosTop: lockRangePosTop,
-                    userIdAllProps: userIdAllProps,
-                    userIdAllSheet: userIdAllSheet,
-                    lockAllPosLeft: lockAllPosLeft,
-                    lockAllPosTop: lockAllPosTop,
-                    commentIndexes: indexes,
-                    commentCoords: coords
-                };
-            }
-            return cellCursor;
-        }
+			// Проверим, может мы в гиперлинке
+			oHyperlink = this.model.getHyperlinkByCell(r.row, c.col);
+			cellCursor = {
+				cursor: kCurCells,
+				target: c_oTargetType.Cells,
+				col: (c ? c.col : -1),
+				row: (r ? r.row : -1),
+				userId: userId,
+				lockRangePosLeft: lockRangePosLeft,
+				lockRangePosTop: lockRangePosTop,
+				userIdAllProps: userIdAllProps,
+				lockAllPosLeft: lockAllPosLeft,
+				lockAllPosTop: lockAllPosTop,
+				userIdAllSheet: userIdAllSheet,
+				commentIndexes: indexes,
+				commentCoords: coords
+			};
+			if (null !== oHyperlink) {
+				return {
+					cursor: kCurHyperlink,
+					target: c_oTargetType.Hyperlink,
+					hyperlink: new asc_CHyperlink(oHyperlink),
+					cellCursor: cellCursor,
+					userId: userId,
+					lockRangePosLeft: lockRangePosLeft,
+					lockRangePosTop: lockRangePosTop,
+					userIdAllProps: userIdAllProps,
+					userIdAllSheet: userIdAllSheet,
+					lockAllPosLeft: lockAllPosLeft,
+					lockAllPosTop: lockAllPosTop,
+					commentIndexes: indexes,
+					commentCoords: coords
+				};
+			}
+			return cellCursor;
+		}
 
-        return oResDefault;
-    };
+		return oResDefault;
+	};
 
     WorksheetView.prototype._fixSelectionOfMergedCells = function (fixedRange) {
         var tmpSelection = this._getSelection();
