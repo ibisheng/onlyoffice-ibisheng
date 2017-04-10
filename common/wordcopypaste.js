@@ -1910,6 +1910,11 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
     this.oBorderCache = {};
 	
 	this.msoListMap = [];
+
+	//пока ввожу эти параметры для специальной вставки. возможно, нужно будет пересмотреть и убрать их
+	this.pasteTypeContent = undefined;
+	this.pasteList = undefined;
+
 }
 PasteProcessor.prototype =
 {

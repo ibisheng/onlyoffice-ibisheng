@@ -96,7 +96,6 @@
 		
 		//special paste
 		this.specialPasteData = {};//данные последней вставки перед специальной вставкой
-		this.specialPasteUndoData = {};//для того, чтобы сделать повторную вставку с помощью special paste нужно сначала откатиться до того состояния, которое было до первой вставки
 		
 		//параметры специальной вставки из меню.используется класс для EXCEL СSpecialPasteProps. чтобы не протаскивать через все вызываемые функции, добавил это свойство
 		this.specialPasteProps = null;
@@ -945,7 +944,6 @@
 		Clean_SpecialPasteObj : function()
 		{
 			this.specialPasteData = {};
-			this.specialPasteUndoData = {};
 		},
 		
 		Special_Paste_Start : function()

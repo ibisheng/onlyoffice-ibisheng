@@ -389,7 +389,6 @@
 				{
 					window['AscCommon'].g_clipboardBase.specialPasteData.activeRange = ws.model.selectionRange.clone(ws.model);
 					window['AscCommon'].g_clipboardBase.specialPasteData.pasteFromWord = false;
-					window['AscCommon'].g_clipboardBase.specialPasteUndoData.images = [];
 				}
 				
 				switch (_format)
@@ -1527,12 +1526,6 @@
                     paragraph.Check_NearestPos(NearPos);
 					target_doc_content.Insert_Content(selectedContent, NearPos);
 					
-					//TODO записываю активную область после каждой вставки. пересомтреть! не записывать при специальной вставке.
-					//if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
-					//{
-						window['AscCommon'].g_clipboardBase.specialPasteUndoData.shapeSelectionState = target_doc_content.Get_SelectionState();
-					//}
-					
 					worksheet.objectRender.controller.cursorMoveRight(false, false);
 					
 					var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
@@ -1670,11 +1663,6 @@
                     drawingObject.graphicObject.checkRemoveCache &&  drawingObject.graphicObject.checkRemoveCache();
 
 					drawingObject.graphicObject.addToDrawingObjects();
-					if(i === 0)
-					{
-						window['AscCommon'].g_clipboardBase.specialPasteUndoData.images = [];
-					}
-					window['AscCommon'].g_clipboardBase.specialPasteUndoData.images.push(drawingObject.graphicObject.Id);
 					
                     if(drawingObject.graphicObject.checkDrawingBaseCoords)
                     {
@@ -1832,12 +1820,7 @@
                     drawingObject.graphicObject.checkRemoveCache &&  drawingObject.graphicObject.checkRemoveCache();
                     //drawingObject.graphicObject.setDrawingDocument(ws.objectRender.drawingDocument);
 					drawingObject.graphicObject.addToDrawingObjects();
-					
-					if(i === 0)
-					{
-						window['AscCommon'].g_clipboardBase.specialPasteUndoData.images = [];
-					}
-					window['AscCommon'].g_clipboardBase.specialPasteUndoData.images.push(drawingObject.graphicObject.Id);
+
 					
                     if(drawingObject.graphicObject.checkDrawingBaseCoords)
                     {

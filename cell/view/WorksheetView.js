@@ -8787,23 +8787,6 @@
                 newRange = this._pasteFromHTML(val, true);
             }
 			
-			var g_clipboardBase = window['AscCommon'].g_clipboardBase;
-			if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
-			{
-				var sBinary = AscCommonExcel.g_clipboardExcel.copyProcessor.getBinaryForCopy(this, newRange);
-				g_clipboardBase.specialPasteUndoData.data = sBinary;
-				
-				var specialPasteSelectionRange = new AscCommonExcel.SelectionRange();
-				specialPasteSelectionRange.ranges[0] = newRange.clone();
-				g_clipboardBase.specialPasteData.activeRange = specialPasteSelectionRange;
-				
-				window['AscCommon'].g_clipboardBase.specialPasteUndoData.transpose = null;
-			}
-			else if(g_clipboardBase.specialPasteProps && g_clipboardBase.specialPasteProps.transpose)
-			{
-				window['AscCommon'].g_clipboardBase.specialPasteUndoData.transpose = true;
-			}
-			
             checkRange = [newRange];
         }
         if ("paste" === prop && val.onlyImages === true) {
@@ -8818,7 +8801,6 @@
 		var t = this;
 		
 		var clipboard_base = window['AscCommon'].g_clipboardBase;
-		var specialPasteUndoData = clipboard_base.specialPasteUndoData;
 		var specialPasteData = clipboard_base.specialPasteData;
 		
 		if(!specialPasteData)
@@ -8833,86 +8815,15 @@
 			{
 				return false;
 			}
-			
-			//не вызываю для отката AscCommonExcel.g_clipboardExcel.pasteData, потому что внутри асинхронные методы - isLockedCells 
-			var undoPreviousPaste = function()
-			{
-				//откатываем данные в ячейках
-				var sBase64 = specialPasteUndoData.data.split('xslData;')[1];
-				var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
-				var tempWorkbook = new AscCommonExcel.Workbook();
-				pptx_content_loader.Start_UseFullUrl();
-				oBinaryFileReader.Read(sBase64, tempWorkbook);
-				AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
-				var pasteData = null;
-				if (tempWorkbook)
-					pasteData = tempWorkbook.aWorksheets[0];
-				if(pasteData)
-				{
-					//undoSpecialPasteRange - нужен для того, чтобы включить undo в диапазон обновления(_updateCellsRange)
-					specialPasteUndoData.undoSpecialPasteRange = t._pasteFromBinary(pasteData, null, null);
-				}
-				
-				//удаляем вставленные изображения
-				if(specialPasteUndoData.images)
-				{
-					var images = specialPasteUndoData.images;
-					for(var i = 0; i < images.length; i++)
-					{
-						var id = images[i];
-						var oObject = AscCommon.g_oTableId.Get_ById(id);
-						oObject.deleteDrawingBase(true);
-						oObject.setBDeleted(true);
-					}
-				}
-			};
-			
+
+			AscCommonExcel.g_clipboardExcel.start_specialpaste();
+			AscCommonExcel.g_clipboardExcel.start_paste();
+
+			api.asc_Undo();
+
 			//транзакция закроется в end_paste
 			History.Create_NewPoint();
 			History.StartTransaction();
-			
-			AscCommonExcel.g_clipboardExcel.start_specialpaste();
-			AscCommonExcel.g_clipboardExcel.start_paste();
-			
-			//откатываемся до того, что было до вставки
-			//курсор и специальная вставка не в шейпе + курсор в шейпе, специальная вставка на листе
-			if(specialPasteUndoData && specialPasteUndoData.data && !clipboard_base.specialPasteButtonProps.shapeId)
-			{
-				var tempProps = new Asc.SpecialPasteProps();
-				tempProps.width = true;
-				if(specialPasteUndoData.transpose)
-				{
-					tempProps.transpose = true;
-					specialPasteUndoData.transpose = null;
-				}
-				clipboard_base.specialPasteProps = tempProps;
-				
-				//переводим фокус из шейпа на лист
-				if(isIntoShape)
-				{
-					t.objectRender.controller.resetSelection();
-				}
-				
-				//меняем activeRange
-				if(specialPasteData.activeRange)
-				{
-					t.model.selectionRange = specialPasteData.activeRange.clone(t.model);
-				}
-				
-				//нужно удалить данные предыдущей вставки(нужно для удаления ф/т)
-				t.model.autoFilters.isEmptyAutoFilters(t.model.selectionRange.getLast(), null, null, null, true);
-				
-				undoPreviousPaste();
-			}
-			else if(isIntoShape && specialPasteUndoData && specialPasteUndoData.shapeSelectionState)//курсор и специальная вставка в шейпе
-			{
-				//таким образом удаляю вставляенный фрагмент до специальной вставки
-				isIntoShape = t.objectRender.controller.getTargetDocContent(true);
-				
-				var State = specialPasteUndoData.shapeSelectionState;
-				isIntoShape.Set_SelectionState(State, State.length - 1);
-				isIntoShape.Remove(1, true, true);
-			}
 			
 			//далее специальная вставка
 			clipboard_base.specialPasteProps = props;
@@ -9059,19 +8970,7 @@
                 t.handlers.trigger("slowOperation", false);
             }
             t.isChanged = true;
-			
-			var specialPasteUndoData = g_clipboardBase.specialPasteUndoData;
-			if(specialPasteUndoData && specialPasteUndoData.undoSpecialPasteRange && specialPasteUndoData.undoSpecialPasteRange[0] && AscCommonExcel.g_clipboardExcel.specialPasteStart)
-			{
-				var unionRange = arn.union(specialPasteUndoData.undoSpecialPasteRange[0]);
-				t._updateCellsRange(unionRange, canChangeColWidth);
-				
-				specialPasteUndoData.undoSpecialPasteRange = null;
-			}
-			else
-			{
-				t._updateCellsRange(arn, canChangeColWidth);
-			}
+            t._updateCellsRange(arn, canChangeColWidth);
         }
 
         var oSelection = History.GetSelection();
