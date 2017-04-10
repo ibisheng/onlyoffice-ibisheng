@@ -9208,7 +9208,7 @@ function CPres()
                                 case 4:
                                 {
                                     sp = this.ReadGroupShape();
-                                    if(sp.spPr && sp.spPr.xfrm && sp.spTree.length > 0) {
+                                    if(sp && sp.spPr && sp.spPr.xfrm && sp.spTree.length > 0) {
                                         sp.setGroup(shape);
                                         shape.addToSpTree(shape.spTree.length, sp);
                                     }
