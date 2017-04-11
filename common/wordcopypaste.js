@@ -2317,7 +2317,7 @@ PasteProcessor.prototype =
 				{
 					for(var j = 0; j < paragraph.Content.length; j++)
 					{
-						if(pasteIntoParaRunPr)
+						if(pasteIntoParaRunPr && paragraph.Content[j].Set_Pr)
 						{
 							paragraph.Content[j].Set_Pr( pasteIntoParaRunPr );
 						}
@@ -2342,7 +2342,7 @@ PasteProcessor.prototype =
 				{
 					for(var j = 0; j < paragraph.Content.length; j++)
 					{
-						if(pasteIntoParaRunPr)
+						if(pasteIntoParaRunPr && paragraph.Content[j].Pr)
 						{
 							paragraph.Content[j].Pr.Merge(pasteIntoParaRunPr);
 						}
