@@ -751,18 +751,9 @@ CTableCell.prototype =
         this.Content.Selection_SetEnd(_X, _Y, CurPage, MouseEvent);
     },
 
-    Content_Selection_Stop : function(X, Y, CurPage, MouseEvent)
+    Content_Selection_Stop : function()
     {
-        var _X = X, _Y = Y;
-        var Transform = this.private_GetTextDirectionTransform();
-        if (null !== Transform)
-        {
-            Transform = global_MatrixTransformer.Invert(Transform);
-            _X = Transform.TransformPointX(X, Y);
-            _Y = Transform.TransformPointY(X, Y);
-        }
-
-        return this.Content.Selection_Stop(_X, _Y, CurPage, MouseEvent);
+        return this.Content.Selection_Stop();
     },
 
     Content_Selection_Check : function(X, Y, CurPage, NearPos)

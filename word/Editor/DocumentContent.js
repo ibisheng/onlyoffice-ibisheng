@@ -7444,15 +7444,7 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
     var Direction = ( ContentPos > this.Selection.StartPos ? 1 : ( ContentPos < this.Selection.StartPos ? -1 : 0 )  );
 
     if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
-    {
-        // Останаливаем селект в глобальном классе. Кроме этого мы должны остановить селект в
-        // стартовом элементе селекта.
-        this.Selection.Start = false;
-
-        // Если 0 === Direction, в функции Selection_SetEnd все что нужно обработается
-        if (0 != Direction)
-            this.Content[this.Selection.StartPos].Selection_Stop(X, Y, this.CurPage, MouseEvent);
-    }
+    	this.StopSelection();
 
     var Start, End;
     if (0 == Direction)
@@ -7536,36 +7528,6 @@ CDocumentContent.prototype.Selection_SetEnd          = function(X, Y, CurPage, M
 				break;
 		}
 	}
-};
-CDocumentContent.prototype.Selection_Stop            = function(X, Y, CurPage, MouseEvent)
-{
-    if (true != this.Selection.Use)
-        return;
-
-    var _Y = Y;
-    var _X = X;
-    if (CurPage < 0)
-    {
-        CurPage = 0;
-        _Y      = -1; // -1, чтобы избежать погрешностей
-        _X      = -1; // -1, чтобы избежать погрешностей
-    }
-    else if (CurPage >= this.Pages.length)
-    {
-        CurPage = this.Pages.length - 1;
-        _Y      = this.Pages[CurPage].YLimit + 1; // +1, чтобы избежать погрешностей
-        _X      = this.Pages[CurPage].XLimit + 1; // +1, чтобы избежать погрешностей
-    }
-    else
-    {
-        if (0 === CurPage && Y < this.Pages[0].Bounds.Top)
-            _X = -1;
-        else if (this.Pages.length - 1 === CurPage && Y > this.Pages[this.Pages.length - 1].Bounds.Bottom)
-            _X = this.Pages[this.Pages.length - 1].XLimit + 1;
-    }
-
-    var _MouseEvent = {ClickCount : 1, Type : AscCommon.g_mouse_event_type_up};
-    this.Selection_SetEnd(_X, _Y, CurPage, _MouseEvent);
 };
 CDocumentContent.prototype.Selection_Check           = function(X, Y, CurPage, NearPos)
 {
@@ -7711,6 +7673,7 @@ CDocumentContent.prototype.SetSelectionToBeginEnd = function(isSelectionStart, i
 
 	if (true === isElementStart)
 	{
+		this.Content[0].SetSelectionUse(true);
 		this.Content[0].SetSelectionToBeginEnd(isSelectionStart, true);
 		if (isSelectionStart)
 			this.Selection.StartPos = 0;
@@ -7719,6 +7682,7 @@ CDocumentContent.prototype.SetSelectionToBeginEnd = function(isSelectionStart, i
 	}
 	else
 	{
+		this.Content[this.Content.length - 1].SetSelectionUse(true);
 		this.Content[this.Content.length - 1].SetSelectionToBeginEnd(isSelectionStart, false);
 
 		if (isSelectionStart)

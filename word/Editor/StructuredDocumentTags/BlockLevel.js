@@ -187,6 +187,10 @@ CBlockLevelSdt.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
 {
 	return this.Content.Hyperlink_CanAdd(bCheckInHyperlink);
 };
+CBlockLevelSdt.prototype.Selection_Draw_Page = function(CurPage)
+{
+	this.Content.Selection_Draw_Page(CurPage);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

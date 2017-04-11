@@ -2141,9 +2141,6 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_IsUse = function()
 {
     return this.State.Selection.Use;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Selection_Stop = function()
-{
-};
 CParagraphContentWithParagraphLikeContent.prototype.Selection_Remove = function()
 {
     var Selection = this.Selection;

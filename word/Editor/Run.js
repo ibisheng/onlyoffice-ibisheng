@@ -5853,10 +5853,6 @@ ParaRun.prototype.Selection_CorrectLeftPos = function(Direction)
     return true;
 };
 
-ParaRun.prototype.Selection_Stop = function()
-{
-};
-
 ParaRun.prototype.Selection_Remove = function()
 {
     var Selection = this.State.Selection;

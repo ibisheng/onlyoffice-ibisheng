@@ -4905,14 +4905,14 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 		this.Internal_Selection_UpdateCells();
 	}
 };
-CTable.prototype.Selection_Stop = function(X, Y, CurPage, MouseEvent)
+CTable.prototype.Selection_Stop = function()
 {
 	if (true != this.Selection.Use)
 		return;
 
 	this.Selection.Start = false;
 	var Cell             = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
-	Cell.Content_Selection_Stop(X, Y, CurPage - Cell.Content.Get_StartPage_Relative(), MouseEvent);
+	Cell.Content_Selection_Stop();
 };
 CTable.prototype.Selection_Draw_Page = function(CurPage)
 {

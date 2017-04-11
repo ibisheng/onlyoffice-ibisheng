@@ -302,3 +302,13 @@ CDocumentContentBase.prototype.private_CreateNewParagraph = function()
 	oPara.Cursor_MoveToStartPos(false);
 	return oPara;
 };
+CDocumentContentBase.prototype.StopSelection = function()
+{
+	if (true !== this.Selection.Use)
+		return;
+
+	this.Selection.Start = false;
+
+	if (this.Content[this.Selection.StartPos])
+		this.Content[this.Selection.StartPos].StopSelection();
+};

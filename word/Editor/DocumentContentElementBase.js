@@ -217,6 +217,12 @@ CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperli
 {
 	return this.Hyperlink_CanAdd(bCheckInHyperlink);
 };
+CDocumentContentElementBase.prototype.Selection_Draw_Page = function(CurPage)
+{
+};
+CDocumentContentElementBase.prototype.StopSelection = function()
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

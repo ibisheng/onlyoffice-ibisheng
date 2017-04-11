@@ -5312,15 +5312,7 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
     var Direction = ( ContentPos > this.Selection.StartPos ? 1 : ( ContentPos < this.Selection.StartPos ? -1 : 0 )  );
 
     if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
-    {
-        // Останаливаем селект в глобальном классе. Кроме этого мы должны остановить селект в
-        // стартовом элементе селекта.
-        this.Selection.Start = false;
-
-        // Если 0 === Direction, в функции Selection_SetEnd все что нужно обработается
-        if (0 != Direction)
-            this.Content[this.Selection.StartPos].Selection_Stop(X, Y, this.CurPage, MouseEvent);
-    }
+    	this.StopSelection();
 
     var Start, End;
     if (0 == Direction)

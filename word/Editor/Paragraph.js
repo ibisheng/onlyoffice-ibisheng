@@ -6158,23 +6158,9 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 		}
 	}
 };
-Paragraph.prototype.Selection_Stop = function(X, Y, CurPage, MouseEvent)
+Paragraph.prototype.StopSelection = function()
 {
 	this.Selection.Start = false;
-
-	var StartPos = this.Selection.StartPos;
-	var EndPos   = this.Selection.EndPos;
-
-	if (StartPos > EndPos)
-	{
-		StartPos = this.Selection.EndPos;
-		EndPos   = this.Selection.StartPos;
-	}
-
-	for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
-	{
-		this.Content[CurPos].Selection_Stop();
-	}
 };
 Paragraph.prototype.Selection_Remove = function()
 {

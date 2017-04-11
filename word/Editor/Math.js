@@ -2982,10 +2982,6 @@ ParaMath.prototype.Selection_IsUse = function()
     return this.bSelectionUse;
 };
 
-ParaMath.prototype.Selection_Stop = function()
-{
-};
-
 ParaMath.prototype.Selection_Remove = function()
 {
     this.bSelectionUse = false;
