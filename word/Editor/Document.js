@@ -5296,8 +5296,7 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
         var TempLimit = Math.min(this.Selection.StartPos, this.Selection.EndPos);
         for (var Index = OldEndPos; Index < TempLimit; Index++)
         {
-            this.Content[Index].Selection.Use   = false;
-            this.Content[Index].Selection.Start = false;
+        	this.Content[Index].RemoveSelection();
         }
     }
     else if (OldEndPos > this.Selection.StartPos && OldEndPos > this.Selection.EndPos)
@@ -5305,8 +5304,7 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
         var TempLimit = Math.max(this.Selection.StartPos, this.Selection.EndPos);
         for (var Index = TempLimit + 1; Index <= OldEndPos; Index++)
         {
-            this.Content[Index].Selection.Use   = false;
-            this.Content[Index].Selection.Start = false;
+        	this.Content[Index].RemoveSelection();
         }
     }
 
@@ -5331,7 +5329,7 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
         var ElementPageIndex = this.private_GetElementPageIndexByXY(this.Selection.StartPos, X, Y, this.CurPage);
         Item.Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
 
-        if (false === Item.Selection.Use)
+        if (false === Item.IsSelectionUse())
         {
             this.Selection.Use = false;
 
@@ -5367,86 +5365,29 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
     // TODO: Разрулить пустой селект
     // Чтобы не было эффекта, когда ничего не поселекчено, а при удалении соединяются параграфы
 
-    for (var Index = Start; Index <= End; Index++)
-    {
-        var Item           = this.Content[Index];
-        Item.Selection.Use = true;
-        var ItemType       = Item.GetType();
+	for (var Index = Start; Index <= End; Index++)
+	{
+		var Item = this.Content[Index];
+		Item.SetSelectionUse(true);
 
-        switch (Index)
-        {
-            case Start:
+		switch (Index)
+		{
+			case Start:
 
-                if (type_Paragraph === ItemType)
-                {
-                    Item.Selection_SetBegEnd(( Direction > 0 ? false : true ), false);
-                }
-                else //if ( type_Table === ItemType )
-                {
-                    var Row  = Item.Content.length - 1;
-                    var Cell = Item.Content[Row].Get_CellsCount() - 1;
-                    var Pos  = {Row : Row, Cell : Cell};
+				Item.SetSelectionToBeginEnd(Direction > 0 ? false : true, false);
+				break;
 
-                    if (Direction > 0)
-                        Item.Selection.EndPos.Pos = Pos;
-                    else
-                        Item.Selection.StartPos.Pos = Pos;
+			case End:
 
-                    Item.Internal_Selection_UpdateCells();
-                }
+				Item.SetSelectionToBeginEnd(Direction > 0 ? true : false, true);
+				break;
 
-                break;
+			default:
 
-            case End:
-
-                if (type_Paragraph === ItemType)
-                {
-                    Item.Selection_SetBegEnd(( Direction > 0 ? true : false ), true);
-                }
-                else //if ( type_Table === ItemType )
-                {
-                    var Pos = {Row : 0, Cell : 0};
-
-                    if (Direction > 0)
-                        Item.Selection.StartPos.Pos = Pos;
-                    else
-                        Item.Selection.EndPos.Pos = Pos;
-
-                    Item.Internal_Selection_UpdateCells();
-                }
-
-                break;
-
-            default:
-
-                if (type_Paragraph === ItemType)
-                {
-                    Item.Select_All(Direction);
-                }
-                else //if ( type_Table === ItemType )
-                {
-                    var Row  = Item.Content.length - 1;
-                    var Cell = Item.Content[Row].Get_CellsCount() - 1;
-                    var Pos0 = {Row : 0, Cell : 0};
-                    var Pos1 = {Row : Row, Cell : Cell};
-
-                    if (Direction > 0)
-                    {
-                        Item.Selection.StartPos.Pos = Pos0;
-                        Item.Selection.EndPos.Pos   = Pos1;
-                    }
-                    else
-                    {
-                        Item.Selection.EndPos.Pos   = Pos0;
-                        Item.Selection.StartPos.Pos = Pos1;
-                    }
-
-                    Item.Internal_Selection_UpdateCells();
-                }
-
-                break;
-        }
-    }
+				Item.SelectAll(Direction);
+				break;
+		}
+	}
 
     var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
     this.Content[ContentPos].Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
@@ -5454,13 +5395,13 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
     // Проверяем, чтобы у нас в селект не попали элементы, в которых не выделено ничего
     if (true === this.Content[End].Selection_IsEmpty() && true === this.CheckEmptyElementsOnSelection)
     {
-        this.Content[End].Selection_Remove();
+        this.Content[End].RemoveSelection();
         End--;
     }
 
     if (Start != End && true === this.Content[Start].Selection_IsEmpty() && true === this.CheckEmptyElementsOnSelection)
     {
-        this.Content[Start].Selection_Remove();
+        this.Content[Start].RemoveSelection();
         Start++;
     }
 
@@ -14910,11 +14851,11 @@ CDocument.prototype.controller_GetCurrentTextPr = function()
 					EndPos   = Temp;
 				}
 
-				VisTextPr = this.Content[StartPos].Get_Paragraph_TextPr();
+				VisTextPr = this.Content[StartPos].GetParagraphTextPr();
 
 				for (var Index = StartPos + 1; Index <= EndPos; Index++)
 				{
-					var CurPr = this.Content[Index].Get_Paragraph_TextPr();
+					var CurPr = this.Content[Index].GetParagraphTextPr();
 					VisTextPr = VisTextPr.Compare(CurPr);
 				}
 
@@ -14943,7 +14884,7 @@ CDocument.prototype.controller_GetCurrentTextPr = function()
 	}
 	else
 	{
-		Result_TextPr = this.Content[this.CurPos.ContentPos].Get_Paragraph_TextPr();
+		Result_TextPr = this.Content[this.CurPos.ContentPos].GetParagraphTextPr();
 	}
 
 	return Result_TextPr;
@@ -15906,12 +15847,12 @@ CDocument.prototype.controller_CanAddHyperlink = function(bCheckInHyperlink)
 			if (this.Selection.StartPos != this.Selection.EndPos)
 				return false;
 
-			return this.Content[this.Selection.StartPos].Hyperlink_CanAdd(bCheckInHyperlink);
+			return this.Content[this.Selection.StartPos].CanAddHyperlink(bCheckInHyperlink);
 		}
 	}
 	else
 	{
-		return this.Content[this.CurPos.ContentPos].Hyperlink_CanAdd(bCheckInHyperlink);
+		return this.Content[this.CurPos.ContentPos].CanAddHyperlink(bCheckInHyperlink);
 	}
 
 	return false;

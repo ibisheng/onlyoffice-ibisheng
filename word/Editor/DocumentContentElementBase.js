@@ -173,6 +173,50 @@ CDocumentContentElementBase.prototype.Document_UpdateRulersState = function(CurP
 {
 	this.Content.Document_UpdateRulersState(CurPage);
 };
+CDocumentContentElementBase.prototype.IsSelectionUse = function()
+{
+	return this.Is_SelectionUse();
+};
+CDocumentContentElementBase.prototype.Is_SelectionUse = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.Selection_Remove = function()
+{
+};
+CDocumentContentElementBase.prototype.RemoveSelection = function()
+{
+	this.Selection_Remove();
+};
+CDocumentContentElementBase.prototype.SetSelectionUse = function(isUse)
+{
+};
+CDocumentContentElementBase.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElementStart)
+{
+};
+CDocumentContentElementBase.prototype.Select_All = function(nDirection)
+{
+};
+CDocumentContentElementBase.prototype.SelectAll = function(nDirection)
+{
+	this.Select_All(nDirection);
+};
+CDocumentContentElementBase.prototype.Get_Paragraph_TextPr = function()
+{
+	return new CTextPr();
+};
+CDocumentContentElementBase.prototype.GetParagraphTextPr = function()
+{
+	return this.Get_Paragraph_TextPr();
+};
+CDocumentContentElementBase.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	return this.Hyperlink_CanAdd(bCheckInHyperlink);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

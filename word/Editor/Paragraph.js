@@ -6493,6 +6493,17 @@ Paragraph.prototype.Selection_SetBegEnd = function(StartSelection, StartPara)
 		this.Set_SelectionContentPos(this.Get_ParaContentPos(true, true), ContentPos);
 	}
 };
+Paragraph.prototype.SetSelectionUse = function(isUse)
+{
+	if (true === isUse)
+		this.Selection.Use = true;
+	else
+		this.RemoveSelection();
+};
+Paragraph.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElementStart)
+{
+	this.Selection_SetBegEnd(isSelectionStart, isElementStart);
+};
 Paragraph.prototype.Select_All = function(Direction)
 {
 	var Count = this.Content.length;

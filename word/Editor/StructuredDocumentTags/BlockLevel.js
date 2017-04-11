@@ -159,6 +159,34 @@ CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)
 {
 	this.Content.Document_UpdateRulersState(CurPage);
 };
+CBlockLevelSdt.prototype.Is_SelectionUse = function()
+{
+	return this.Content.Is_SelectionUse();
+};
+CBlockLevelSdt.prototype.Selection_Remove = function()
+{
+	this.Content.Selection_Remove();
+};
+CBlockLevelSdt.prototype.SetSelectionUse = function(isUse)
+{
+	this.Content.SetSelectionUse(isUse);
+};
+CBlockLevelSdt.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElementStart)
+{
+	this.Content.SetSelectionToBeginEnd(isSelectionStart, isElementStart);
+};
+CBlockLevelSdt.prototype.Select_All = function(nDirection)
+{
+	this.Content.Select_All(nDirection);
+};
+CBlockLevelSdt.prototype.Get_Paragraph_TextPr = function()
+{
+	return this.Content.Get_Paragraph_TextPr();
+};
+CBlockLevelSdt.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
+{
+	return this.Content.Hyperlink_CanAdd(bCheckInHyperlink);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
