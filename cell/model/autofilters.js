@@ -2523,6 +2523,21 @@
 					{	
 						if(val === false)//снимаем галку - удаляем строку итогов
 						{
+							//TODO раскомментировать и протестить(для бага 34740)
+							/*var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
+							this._clearRange(clearRange, true);
+
+							if(!this._isPartTablePartsUnderRange(tablePart.Ref))
+							{
+								worksheet.getRange3(tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).deleteCellsShiftUp();
+								bAddHistoryPoint = false;
+							}
+							else
+							{
+								tablePart.changeRef(null, -1, null, true);
+								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+							}*/
+
 							var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
 							this._clearRange(clearRange, true);
 							
@@ -2531,9 +2546,36 @@
 						}
 						else
 						{
-							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
-							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1); 
-							if(this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1)
+							//TODO раскомментировать и протестить(для бага 34740)
+							/*var partTableUnderRange = this._isPartTablePartsUnderRange(tablePart.Ref);
+							var rangeUnderTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+							if(!partTableUnderRange)
+							{
+								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
+
+								isSetValue = true;
+								isSetType = true;
+
+								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+								tablePart.changeRef(null, 1, null, true);
+							}
+							else if(partTableUnderRange && this._isEmptyRange(rangeUnderTable, 0))
+							{
+								isSetValue = true;
+								isSetType = true;
+
+								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+								tablePart.changeRef(null, 1, null, true);
+							}
+							else
+							{
+								alert("error");
+							}*/
+
+
+							//если снизу пустая строка, то просто увеличиваем диапазон и меняем флаг
+							var rangeUnderTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+							if(this._isEmptyRange(rangeUnderTable, 0) && this.searchRangeInTableParts(rangeUnderTable) === -1)
 							{
 								isSetValue = true;
 								isSetType = true;
