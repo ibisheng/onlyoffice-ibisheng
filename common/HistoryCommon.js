@@ -1233,6 +1233,8 @@
 	window['AscDFH'].historyitem_type_OleObject              = 1125 << 16;
 	window['AscDFH'].historyitem_type_DrawingContent         = 1126 << 16;
 	window['AscDFH'].historyitem_type_Sparkline              = 1127 << 16;
+	window['AscDFH'].historyitem_type_NotesMaster            = 1128 << 16;
+	window['AscDFH'].historyitem_type_Notes                  = 1129 << 16;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -2527,6 +2529,25 @@
     window['AscDFH'].historyitem_Sparkline_ChangeData = window['AscDFH'].historyitem_type_Sparkline | 27;
     window['AscDFH'].historyitem_Sparkline_RemoveData = window['AscDFH'].historyitem_type_Sparkline | 28;
     window['AscDFH'].historyitem_Sparkline_RemoveSparkline = window['AscDFH'].historyitem_type_Sparkline | 29;
+
+
+    window['AscDFH'].historyitem_NotesMasterSetHF          = window['AscDFH'].historyitem_type_NotesMaster | 1;
+    window['AscDFH'].historyitem_NotesMasterSetNotesStyle  = window['AscDFH'].historyitem_type_NotesMaster | 2;
+    window['AscDFH'].historyitem_NotesMasterSetNotesTheme  = window['AscDFH'].historyitem_type_NotesMaster | 3;
+    window['AscDFH'].historyitem_NotesMasterAddToSpTree    = window['AscDFH'].historyitem_type_NotesMaster | 4;
+    window['AscDFH'].historyitem_NotesMasterRemoveFromTree = window['AscDFH'].historyitem_type_NotesMaster | 5;
+    window['AscDFH'].historyitem_NotesMasterSetBg          = window['AscDFH'].historyitem_type_NotesMaster | 6;
+    window['AscDFH'].historyitem_NotesMasterAddToNotesLst  = window['AscDFH'].historyitem_type_NotesMaster | 7;
+    window['AscDFH'].historyitem_NotesMasterSetName        = window['AscDFH'].historyitem_type_NotesMaster | 8;
+
+
+    window['AscDFH'].historyitem_NotesSetClrMap           = window['AscDFH'].historyitem_type_Notes | 1;
+    window['AscDFH'].historyitem_NotesSetShowMasterPhAnim = window['AscDFH'].historyitem_type_Notes | 2;
+    window['AscDFH'].historyitem_NotesSetShowMasterSp     = window['AscDFH'].historyitem_type_Notes | 3;
+    window['AscDFH'].historyitem_NotesAddToSpTree         = window['AscDFH'].historyitem_type_Notes | 4;
+    window['AscDFH'].historyitem_NotesRemoveFromTree      = window['AscDFH'].historyitem_type_Notes | 5;
+    window['AscDFH'].historyitem_NotesSetBg               = window['AscDFH'].historyitem_type_Notes | 6;
+    window['AscDFH'].historyitem_NotesSetName             = window['AscDFH'].historyitem_type_Notes | 7;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

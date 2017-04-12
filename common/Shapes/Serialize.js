@@ -3420,12 +3420,106 @@ function BinaryPPTYLoader()
 
     this.ReadNoteMaster = function()
     {
-        return null;
+
+        var oNotesMaster = new AscFormat.CNotesMaster();
+        this.stream.Skip2(1); // type
+        var end = this.stream.cur + this.stream.GetLong() + 4;
+        while(this.stream.cur < end){
+            var at = this.stream.GetUChar();
+            switch (at)
+            {
+                case 0:
+                {
+                    var cSld = new AscFormat.CSld();
+                    this.ReadCSld(cSld);
+                    for(var i = 0; i < cSld.spTree.length; ++i){
+                        oNotesMaster.addToSpTreeToPos(i, cSld.spTree[i]);
+                    }
+                    if(cSld.Bg)
+                    {
+                        oNotesMaster.changeBackground(cSld.Bg);
+                    }
+                    oNotesMaster.setCSldName(cSld.name);
+                    break;
+                }
+                case 1:
+                {
+                    this.ReadClrMap(oNotesMaster.clrMap);
+                    break;
+                }
+                case 2:
+                {
+                    oNotesMaster.setHF(this.ReadHF());
+                    break;
+                }
+                case 3:
+                {
+
+                    oNotesMaster.setNotesStyle(this.ReadTxStyles());
+                    break;
+                }
+                default:
+                {
+                    this.stream.SkipRecord();
+                    break;
+                }
+            }
+        }
+
+        this.stream.Seek2(end);
+        return oNotesMaster;
     }
 
     this.ReadNote = function()
     {
-        return null;
+        var oNotes = new AscCommonSlide.CNotes();
+        var _s = this.stream;
+        _s.Skip2(1); // type
+        var _end = _s.GetPos() + _s.GetLong() + 4;
+
+        _s.Skip2(1); // attribute start
+        while (true)
+        {
+            var _at = _s.GetUChar();
+            if (_at == g_nodeAttributeEnd)
+                break;
+
+            if (0 == _at)
+                oNotes.setShowMasterPhAnim(_s.GetBool());
+            else if (1 == _at)
+                oNotes.setShowMasterSp(_s.GetBool());
+        }
+
+        while (_s.cur < _end)
+        {
+            var _rec = _s.GetUChar();
+
+            switch (_rec)
+            {
+                case 0:
+                {
+                    var cSld = new AscFormat.CSld();
+                    this.ReadCSld(cSld);
+                    for(var i = 0; i < cSld.spTree.length; ++i){
+                        oNotes.addToSpTreeToPos(i, cSld.spTree[i]);
+                    }
+                    break;
+                }
+                case 1:
+                {
+                    oNotes.setClMapOverride(this.ReadClrOverride());
+                    break;
+                }
+                default:
+                {
+                    _s.SkipRecord();
+                    break;
+                }
+            }
+        }
+
+        _s.Seek2(_end);
+        return oNotes;
     }
 
     this.ReadCSld = function(csld)

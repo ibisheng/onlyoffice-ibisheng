@@ -131,6 +131,8 @@
         "../slide/Editor/Format/SlideMaster.js",
         "../slide/Editor/Format/Layout.js",
         "../slide/Editor/Format/Comments.js",
+		"../slide/Editor/Format/NotesMaster.js",
+		"../slide/Editor/Format/Notes.js",
 		"../word/Editor/DocumentContentElementBase.js",
 		"../word/Editor/StructuredDocumentTags/BlockLevel.js",
         "../word/Editor/Styles.js",
