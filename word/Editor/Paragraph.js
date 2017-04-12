@@ -6352,7 +6352,7 @@ Paragraph.prototype.Selection_CheckParaEnd = function()
 
 	return this.Content[EndPos].Selection_CheckParaEnd();
 };
-Paragraph.prototype.Selection_Check = function(X, Y, PageIndex, NearPos)
+Paragraph.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
 {
 	if (undefined !== NearPos)
 	{
@@ -6363,10 +6363,10 @@ Paragraph.prototype.Selection_Check = function(X, Y, PageIndex, NearPos)
 	}
 	else
 	{
-		if (PageIndex < 0 || PageIndex >= this.Pages.length || true != this.Selection.Use)
+		if (CurPage < 0 || CurPage >= this.Pages.length || true != this.Selection.Use)
 			return false;
 
-		var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, PageIndex, false, false, false);
+		var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, false, false, false);
 
 		if (true === SearchPosXY.InText)
 		{
@@ -6998,6 +6998,12 @@ Paragraph.prototype.Get_Paragraph_TextPr = function()
 		TextPr.FontFamily = TextPr.RFonts.Ascii;
 
 	return TextPr;
+};
+Paragraph.prototype.Get_Paragraph_ParaPr = function()
+{
+	var ParaPr = this.Get_CompiledPr2(false).ParaPr;
+	ParaPr.Locked = this.Lock.Is_Locked();
+	return ParaPr;
 };
 /**
  * Проверяем пустой ли параграф
@@ -8838,9 +8844,9 @@ Paragraph.prototype.Internal_CorrectAnchorPos = function(Result, Drawing)
 /**
  * Получем ближающую возможную позицию курсора
  */
-Paragraph.prototype.Get_NearestPos = function(PageIndex, X, Y, bAnchor, Drawing)
+Paragraph.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawing)
 {
-	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, PageIndex, false, false);
+	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, false, false);
 
 	this.Set_ParaContentPos(SearchPosXY.Pos, true, SearchPosXY.Line, SearchPosXY.Range);
 	var ContentPos = this.Get_ParaContentPos(false, false);
@@ -12006,6 +12012,10 @@ Paragraph.prototype.IsColumnBreakOnLeft = function()
 		return true;
 
 	return false;
+};
+Paragraph.prototype.Can_CopyCut = function()
+{
+	return true;
 };
 
 var pararecalc_0_All  = 0;

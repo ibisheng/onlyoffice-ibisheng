@@ -183,6 +183,10 @@ CBlockLevelSdt.prototype.Get_Paragraph_TextPr = function()
 {
 	return this.Content.Get_Paragraph_TextPr();
 };
+CBlockLevelSdt.prototype.Get_Paragraph_ParaPr = function()
+{
+	return this.Content.Get_Paragraph_ParaPr();
+};
 CBlockLevelSdt.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
 {
 	return this.Content.Hyperlink_CanAdd(bCheckInHyperlink);
@@ -190,6 +194,26 @@ CBlockLevelSdt.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
 CBlockLevelSdt.prototype.Selection_Draw_Page = function(CurPage)
 {
 	this.Content.Selection_Draw_Page(CurPage);
+};
+CBlockLevelSdt.prototype.Get_SelectionBounds = function()
+{
+	return this.Content.Get_SelectionBounds();
+};
+CBlockLevelSdt.prototype.RecalculateCurPos = function()
+{
+	return this.Content.RecalculateCurPos();
+};
+CBlockLevelSdt.prototype.Can_CopyCut = function()
+{
+	return this.Content.Can_CopyCut();
+};
+CBlockLevelSdt.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
+{
+	return this.Content.Selection_Check(X, Y, CurPage, NearPos);
+};
+CBlockLevelSdt.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawing)
+{
+	return this.Content.Get_NearestPos(CurPage, X, Y, bAnchor, Drawing);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)

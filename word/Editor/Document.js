@@ -8357,7 +8357,7 @@ CDocument.prototype.Can_CopyCut = function()
 		{
 			if (selectionflag_Numbering === LogicDocument.Selection.Flag)
 				bCanCopyCut = false;
-			else if (LogicDocument.Selection.StartPos !== LogicDocument.Selection.EndPos || type_Paragraph === LogicDocument.Content[LogicDocument.Selection.StartPos].Get_Type())
+			else if (LogicDocument.Selection.StartPos !== LogicDocument.Selection.EndPos)
 				bCanCopyCut = true;
 			else
 				bCanCopyCut = LogicDocument.Content[LogicDocument.Selection.StartPos].Can_CopyCut();
@@ -14729,36 +14729,15 @@ CDocument.prototype.controller_GetCurrentParaPr = function()
 			EndPos   = Temp;
 		}
 
-		var StartPr, Pr;
-		if (type_Paragraph == this.Content[StartPos].GetType())
-		{
-			StartPr   = this.Content[StartPos].Get_CompiledPr2(false).ParaPr;
-			Pr        = StartPr.Copy();
-			Pr.Locked = this.Content[StartPos].Lock.Is_Locked();
-		}
-		else if (type_Table == this.Content[StartPos].GetType())
-		{
-			StartPr   = this.Content[StartPos].Get_Paragraph_ParaPr();
-			Pr        = StartPr.Copy();
-			Pr.Locked = StartPr.Locked;
-		}
+		var StartPr = this.Content[StartPos].GetParagraphParaPr();
+		var Pr      = StartPr.Copy();
+		Pr.Locked   = StartPr.Locked;
 
 		for (var Index = StartPos + 1; Index <= EndPos; Index++)
 		{
-			var Item = this.Content[Index];
-
-			var TempPr;
-			if (type_Paragraph == Item.GetType())
-			{
-				TempPr        = Item.Get_CompiledPr2(false).ParaPr;
-				TempPr.Locked = Item.Lock.Is_Locked();
-			}
-			else if (type_Table == Item.GetType())
-			{
-				TempPr = Item.Get_Paragraph_ParaPr();
-			}
-
-			Pr = Pr.Compare(TempPr);
+			var Item   = this.Content[Index];
+			var TempPr = Item.GetParagraphParaPr();
+			Pr         = Pr.Compare(TempPr);
 		}
 
 		if (undefined === Pr.Ind.Left)
@@ -14775,7 +14754,9 @@ CDocument.prototype.controller_GetCurrentParaPr = function()
 
 		// Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
 		if (undefined != Result_ParaPr.FramePr && type_Paragraph === this.Content[StartPos].GetType())
+		{
 			this.Content[StartPos].Supplement_FramePr(Result_ParaPr.FramePr);
+		}
 		else if (StartPos === EndPos && StartPos > 0 && type_Paragraph === this.Content[StartPos - 1].GetType())
 		{
 			var PrevFrame = this.Content[StartPos - 1].Get_FramePr();
@@ -14801,7 +14782,9 @@ CDocument.prototype.controller_GetCurrentParaPr = function()
 
 			// Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
 			if (undefined != Result_ParaPr.FramePr)
+			{
 				Item.Supplement_FramePr(Result_ParaPr.FramePr);
+			}
 			else if (this.CurPos.ContentPos > 0 && type_Paragraph === this.Content[this.CurPos.ContentPos - 1].GetType())
 			{
 				var PrevFrame = this.Content[this.CurPos.ContentPos - 1].Get_FramePr();
@@ -14811,17 +14794,18 @@ CDocument.prototype.controller_GetCurrentParaPr = function()
 					this.Content[this.CurPos.ContentPos - 1].Supplement_FramePr(Result_ParaPr.FramePr);
 				}
 			}
-
 		}
-		else if (type_Table == Item.GetType())
+		else
 		{
-			Result_ParaPr = Item.Get_Paragraph_ParaPr();
+			Result_ParaPr = Item.GetParagraphParaPr();
 		}
 	}
+
 	if (Result_ParaPr.Shd && Result_ParaPr.Shd.Unifill)
 	{
 		Result_ParaPr.Shd.Unifill.check(this.theme, this.Get_ColorMap());
 	}
+
 	return Result_ParaPr;
 };
 CDocument.prototype.controller_GetCurrentTextPr = function()
@@ -15176,7 +15160,7 @@ CDocument.prototype.controller_CheckPosInSelection = function(X, Y, PageAbs, Nea
 				{
 					for (var Index = Start; Index <= End; Index++)
 					{
-						if (true === this.Content[Index].Selection_Check(0, 0, 0, NearPos))
+						if (true === this.Content[Index].CheckPosInSelection(0, 0, 0, NearPos))
 							return true;
 					}
 
@@ -15196,7 +15180,7 @@ CDocument.prototype.controller_CheckPosInSelection = function(X, Y, PageAbs, Nea
 					else
 					{
 						var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageAbs);
-						return this.Content[ContentPos].Selection_Check(X, Y, ElementPageIndex, undefined);
+						return this.Content[ContentPos].CheckPosInSelection(X, Y, ElementPageIndex, undefined);
 					}
 				}
 			}
