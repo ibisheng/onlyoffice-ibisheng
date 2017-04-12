@@ -266,8 +266,7 @@
         "../../web-apps/vendor/sockjs/sockjs.min.js",
         "../../web-apps/vendor/xregexp/xregexp-all-min.js",
         "../../web-apps/vendor/jszip/jszip.min.js",
-        "../../web-apps/vendor/jszip-utils/jszip-utils.min.js",
-        "../../web-apps/vendor/jsrsasign/jsrsasign-latest-all-min.js"
+        "../../web-apps/vendor/jszip-utils/jszip-utils.min.js"
       ],
       "map": "sdk-all.js.map",
       "log": "../cell/Build/Log"
