@@ -671,6 +671,38 @@ function BinaryPPTYLoader()
                     _slideNum++;
                 }
             }
+			if (undefined != _main_tables["45"])
+			{
+				s.Seek2(_main_tables["45"]);
+				s.Skip2(6); // type + len + start attr
+
+				var _noteNum = 0;
+				while (true)
+				{
+					var _at = s.GetUChar();
+					if (_at == g_nodeAttributeEnd)
+						break;
+
+					var indexL = s.GetLong();
+					var note = this.presentation.notes[indexL];
+				}
+			}
+			if (undefined != _main_tables["46"])
+			{
+				s.Seek2(_main_tables["46"]);
+				s.Skip2(6); // type + len + start attr
+
+				var _noteNum = 0;
+				while (true)
+				{
+					var _at = s.GetUChar();
+					if (_at == g_nodeAttributeEnd)
+						break;
+
+					var indexL = s.GetLong();
+					_noteNum++;
+				}
+			}
         }
 
         if (this.Api != null && !this.IsThemeLoader)
@@ -3421,7 +3453,7 @@ function BinaryPPTYLoader()
     this.ReadNoteMaster = function()
     {
 
-        var oNotesMaster = new AscFormat.CNotesMaster();
+        var oNotesMaster = new AscCommonSlide.CNotesMaster();
         this.stream.Skip2(1); // type
         var end = this.stream.cur + this.stream.GetLong() + 4;
         while(this.stream.cur < end){
@@ -3455,7 +3487,7 @@ function BinaryPPTYLoader()
                 case 3:
                 {
 
-                    oNotesMaster.setNotesStyle(this.ReadTxStyles());
+                    oNotesMaster.setNotesStyle(this.ReadTextListStyle());
                     break;
                 }
                 default:
@@ -3475,7 +3507,7 @@ function BinaryPPTYLoader()
         var oNotes = new AscCommonSlide.CNotes();
         var _s = this.stream;
         _s.Skip2(1); // type
-        var _end = _s.GetPos() + _s.GetLong() + 4;
+        var _end = _s.cur + _s.GetLong() + 4;
 
         _s.Skip2(1); // attribute start
         while (true)
