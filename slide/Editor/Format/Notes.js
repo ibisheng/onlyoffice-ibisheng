@@ -89,9 +89,23 @@
     };
 
 
-    CNotesMaster.prototype.setCSldName = function(pr){
+    CNotes.prototype.setCSldName = function(pr){
         History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_NotesSetName, this.cSld.name , pr));
         this.cSld.name = pr;
+    };
+
+
+    CNotes.prototype.recalculate = function(){
+        var aSpTree = this.cSld.spTree;
+        for(var i = 0; i < aSpTree.length; ++i){
+            var sp = aSpTree[i];
+            if(sp.isPlaceholder()){
+                if(sp.getPlaceholderType() === AscFormat.phType_body){
+
+                    return;
+                }
+            }
+        }
     };
 
 
