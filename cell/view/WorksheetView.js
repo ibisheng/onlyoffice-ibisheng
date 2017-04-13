@@ -4866,7 +4866,7 @@
         var fl = new CellFlags();
         if (null !== c) {
             fl.wrapText = c.getWrap();
-            fl.shrinkToFit = c.getShrinkToFit();
+            fl.shrinkToFit = fl.wrapText ? false : c.getShrinkToFit();
             fl.merged = c.hasMerged();
             fl.textAlign = c.getAlignHorizontalByValue();
         }
