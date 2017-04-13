@@ -115,13 +115,15 @@ String.prototype.strongMatch = function(regExp){
     return false;
 };
 
-if (typeof require =="function" && !window["XRegExp"]){window["XRegExp"] = require("xregexp");}
+	if (typeof require === "function" && !window["XRegExp"]) {
+		window["XRegExp"] = require("xregexp");
+	}
 
-var oZipChanges = null;
-var sDownloadServiceLocalUrl = "../../../../downloadas";
-var sUploadServiceLocalUrl = "../../../../upload";
-var sUploadServiceLocalUrlOld = "../../../../uploadold";
-var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
+	var oZipImages = null;
+	var sDownloadServiceLocalUrl = "../../../../downloadas";
+	var sUploadServiceLocalUrl = "../../../../upload";
+	var sUploadServiceLocalUrlOld = "../../../../uploadold";
+	var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 
 function getBaseUrl() {
 var index_html = window["location"]["href"];
@@ -259,11 +261,10 @@ function loadFileContent(url, callback) {
 	}
 
 	function getImageFromChanges(name) {
-		var file;
+		var content;
 		var ext = GetFileExtension(name);
-		if (null !== ext && oZipChanges && (file = oZipChanges.files[name])) {
-			var oFileArray = file.asUint8Array();
-			return 'data:image/' + ext + ';base64,' + AscCommon.Base64Encode(oFileArray, oFileArray.length, 0);
+		if (null !== ext && oZipImages && (content = oZipImages[name])) {
+			return 'data:image/' + ext + ';base64,' + AscCommon.Base64Encode(content, content.length, 0);
 		}
 		return null;
 	}
@@ -305,6 +306,7 @@ function loadFileContent(url, callback) {
 		}
 
 		if (changesUrl) {
+			oZipImages = {};
 			getJSZipUtils().getBinaryContent(changesUrl, function (err, data) {
 				if (err) {
 					bEndLoadChanges = true;
@@ -315,15 +317,20 @@ function loadFileContent(url, callback) {
 
 				oResult.changes = [];
 				require('jszip').loadAsync(data).then(function (zipChanges) {
+					var relativePaths = [];
 					var promises = [];
 					zipChanges.forEach(function (relativePath, file) {
-						if (relativePath.endsWith('.json')) {
-							promises[parseInt(relativePath.slice('changes'.length))] = file.async('string');
-						}
+						relativePaths.push(relativePath);
+						promises.push(file.async(relativePath.endsWith('.json') ? 'string' : 'uint8array'));
 					});
 					Promise.all(promises).then(function (values) {
+						var relativePath;
 						for (var i = 0; i < values.length; ++i) {
-							oResult.changes[i] = JSON.parse(values[i]);
+							if ((relativePath = relativePaths[i]).endsWith('.json')) {
+								oResult.changes[parseInt(relativePath.slice('changes'.length))] = JSON.parse(values[i]);
+							} else {
+								oZipImages[relativePath] = values[i];
+							}
 						}
 						bEndLoadChanges = true;
 						onEndOpen();
@@ -331,6 +338,7 @@ function loadFileContent(url, callback) {
 				});
 			});
 		} else {
+			oZipImages = null;
 			bEndLoadChanges = true;
 		}
 
