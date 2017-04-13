@@ -703,6 +703,27 @@ function BinaryPPTYLoader()
 					_noteNum++;
 				}
 			}
+			if (undefined != _main_tables["47"])
+			{
+				s.Seek2(_main_tables["47"]);
+				s.Skip2(6); // type + len + start attr
+
+				var _noteMasterNum = 0;
+				while (true)
+				{
+					var _at = s.GetUChar();
+					if (_at == g_nodeAttributeEnd)
+						break;
+
+					var indexL = s.GetLong();
+					var notesMaster = this.presentation.notesMasters[_noteMasterNum];
+					var notesMasterTheme = this.presentation.themes[indexL];
+					if (notesMaster && notesMasterTheme) {
+						notesMaster.setTheme(notesMasterTheme);
+					}
+					_noteMasterNum++;
+				}
+			}
         }
 
         if (this.Api != null && !this.IsThemeLoader)

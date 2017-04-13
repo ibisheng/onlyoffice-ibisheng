@@ -68,7 +68,8 @@ var c_oMainTables = {
     ImageMap		: 42,
     FontMap			: 43,
 	SlideNotesRels	: 45,
-	NotesRels		: 46
+	NotesRels		: 46,
+	NotesMastersRels: 47
 };
 
 function CSeekTableEntry()
