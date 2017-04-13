@@ -444,7 +444,7 @@ CDocumentContent.prototype.Get_NearestPos                  = function(CurPage, X
 
     if (this.Parent && this.Parent instanceof CHeaderFooter)
     {
-        var bInText    = (null === this.Is_InText(X, Y, CurPage) ? false : true);
+        var bInText    = (null === this.IsInText(X, Y, CurPage) ? false : true);
         var nInDrawing = this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, PageAbs, this);
 
         if (true != bAnchor)
@@ -1634,38 +1634,37 @@ CDocumentContent.prototype.Is_TableBorder                = function(X, Y, CurPag
 
     return null;
 };
-CDocumentContent.prototype.Is_InText                     = function(X, Y, CurPage)
+CDocumentContent.prototype.IsInText = function(X, Y, CurPage)
 {
-    if (CurPage < 0 || CurPage >= this.Pages.length)
-        CurPage = 0;
+	if (CurPage < 0 || CurPage >= this.Pages.length)
+		CurPage = 0;
 
-    var ContentPos       = this.Internal_GetContentPosByXY(X, Y, CurPage);
-    var Item             = this.Content[ContentPos];
-    var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
-    return Item.Is_InText(X, Y, ElementPageIndex);
+	var ContentPos       = this.Internal_GetContentPosByXY(X, Y, CurPage);
+	var Item             = this.Content[ContentPos];
+	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
+	return Item.IsInText(X, Y, ElementPageIndex);
 };
-// Проверяем, попали ли мы в автофигуру данного DocumentContent
-CDocumentContent.prototype.Is_InDrawing                  = function(X, Y, CurPage)
+CDocumentContent.prototype.IsInDrawing = function(X, Y, CurPage)
 {
-    if (-1 != this.DrawingObjects.isPointInDrawingObjects(X, Y, this.Get_AbsolutePage(CurPage), this))
-    {
-        return true;
-    }
-    else
-    {
-        if (CurPage < 0 || CurPage >= this.Pages.length)
-            CurPage = 0;
+	if (-1 != this.DrawingObjects.isPointInDrawingObjects(X, Y, this.Get_AbsolutePage(CurPage), this))
+	{
+		return true;
+	}
+	else
+	{
+		if (CurPage < 0 || CurPage >= this.Pages.length)
+			CurPage = 0;
 
-        var ContentPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
-        var Item       = this.Content[ContentPos];
-        if (type_Table == Item.GetType())
-        {
-            var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
-            return Item.Is_InDrawing(X, Y, ElementPageIndex);
-        }
+		var ContentPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
+		var Item       = this.Content[ContentPos];
+		if (type_Table == Item.GetType())
+		{
+			var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
+			return Item.IsInDrawing(X, Y, ElementPageIndex);
+		}
 
-        return false;
-    }
+		return false;
+	}
 };
 CDocumentContent.prototype.Get_CurrentPage_Absolute = function()
 {
@@ -2135,7 +2134,7 @@ CDocumentContent.prototype.Update_CursorType             = function(X, Y, CurPag
     if (CurPage < 0 || CurPage >= this.Pages.length)
         return this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
 
-    var bInText      = (null === this.Is_InText(X, Y, CurPage) ? false : true);
+    var bInText      = (null === this.IsInText(X, Y, CurPage) ? false : true);
     var bTableBorder = (null === this.Is_TableBorder(X, Y, CurPage) ? false : true);
 
     // Ничего не делаем
@@ -7106,7 +7105,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
     var AbsPage  = this.Get_AbsolutePage(this.CurPage);
 
     // Сначала проверим, не попали ли мы в один из "плавающих" объектов
-    var bInText      = (null === this.Is_InText(X, Y, AbsPage) ? false : true);
+    var bInText      = (null === this.IsInText(X, Y, AbsPage) ? false : true);
     var bTableBorder = (null === this.Is_TableBorder(X, Y, AbsPage) ? false : true);
     var nInDrawing   = this.LogicDocument && this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, AbsPage, this);
 
@@ -7141,7 +7140,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
     {
         var bOldSelectionIsCommon = true;
 
-        if (docpostype_DrawingObjects === this.CurPos.Type && true != this.Is_InDrawing(X, Y, AbsPage))
+        if (docpostype_DrawingObjects === this.CurPos.Type && true != this.IsInDrawing(X, Y, AbsPage))
         {
             this.LogicDocument.DrawingObjects.resetSelection();
             bOldSelectionIsCommon = false;

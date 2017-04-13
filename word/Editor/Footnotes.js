@@ -780,7 +780,7 @@ CFootnotesController.prototype.IsInDrawing = function(X, Y, PageAbs)
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		return oFootnote.Is_InDrawing(X, Y, oResult.FootnotePageIndex);
+		return oFootnote.IsInDrawing(X, Y, oResult.FootnotePageIndex);
 	}
 
 	return false;
@@ -802,7 +802,7 @@ CFootnotesController.prototype.IsInText = function(X, Y, PageAbs)
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		return oFootnote.Is_InText(X, Y, oResult.FootnotePageIndex);
+		return oFootnote.IsInText(X, Y, oResult.FootnotePageIndex);
 	}
 
 	return null;

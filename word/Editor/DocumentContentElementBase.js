@@ -149,7 +149,11 @@ CDocumentContentElementBase.prototype.Get_PagesCount = function()
 CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
 {
 };
-CDocumentContentElementBase.prototype.Is_InText = function(X, Y, CurPage)
+CDocumentContentElementBase.prototype.IsInText = function(X, Y, CurPage)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.IsInDrawing = function(X, Y, CurPage)
 {
 	return false;
 };

@@ -3013,7 +3013,7 @@ CTable.prototype.Is_TableBorder = function(X, Y, CurPage)
 		return Cell.Content_Is_TableBorder(X, Y, CurPage - Cell.Content.Get_StartPage_Relative());
 	}
 };
-CTable.prototype.Is_InText = function(X, Y, CurPage)
+CTable.prototype.IsInText = function(X, Y, CurPage)
 {
 	if (CurPage < 0 || CurPage >= this.Pages.length)
 		CurPage = 0;
@@ -3029,7 +3029,7 @@ CTable.prototype.Is_InText = function(X, Y, CurPage)
 		return Cell.Content_Is_InText(X, Y, CurPage - Cell.Content.Get_StartPage_Relative());
 	}
 };
-CTable.prototype.Is_InDrawing  = function(X, Y, CurPage)
+CTable.prototype.IsInDrawing  = function(X, Y, CurPage)
 {
 	if (CurPage < 0 || CurPage >= this.Pages.length)
 		CurPage = 0;

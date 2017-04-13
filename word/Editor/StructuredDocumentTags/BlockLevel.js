@@ -131,9 +131,13 @@ CBlockLevelSdt.prototype.Get_CurrentPage_Relative = function()
 {
 	return this.Content.Get_CurrentPage_Relative();
 };
-CBlockLevelSdt.prototype.Is_InText = function(X, Y, CurPage)
+CBlockLevelSdt.prototype.IsInText = function(X, Y, CurPage)
 {
-	return this.Content.Is_InText(X, Y, CurPage);
+	return this.Content.IsInText(X, Y, CurPage);
+};
+CBlockLevelSdt.prototype.IsInDrawing = function(X, Y, CurPage)
+{
+	return this.Content.IsInDrawing(X, Y, CurPage);
 };
 CBlockLevelSdt.prototype.Update_CursorType = function(X, Y, CurPage)
 {

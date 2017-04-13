@@ -854,7 +854,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Is_InText(_X, _Y, CurPage);
+        return this.Content.IsInText(_X, _Y, CurPage);
     },
 
     Content_Is_InDrawing : function(X, Y, CurPage)
@@ -867,7 +867,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Is_InDrawing(_X, _Y, CurPage);
+        return this.Content.IsInDrawing(_X, _Y, CurPage);
     },
 
     Content_Get_CurPosXY : function()

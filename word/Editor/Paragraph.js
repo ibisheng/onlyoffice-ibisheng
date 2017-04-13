@@ -7042,7 +7042,7 @@ Paragraph.prototype.Is_Empty = function()
 /**
  * Проверяем, попали ли мы в текст
  */
-Paragraph.prototype.Is_InText = function(X, Y, CurPage)
+Paragraph.prototype.IsInText = function(X, Y, CurPage)
 {
 	if (CurPage < 0 || CurPage >= this.Pages.length)
 		return null;
@@ -12044,6 +12044,10 @@ Paragraph.prototype.CanUpdateTarget = function(CurPage)
 	if (oLastRange.EndPos > nPos)
 		return true;
 
+	return false;
+};
+Paragraph.prototype.IsInDrawing = function(X, Y, CurPage)
+{
 	return false;
 };
 

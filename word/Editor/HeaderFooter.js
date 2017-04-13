@@ -550,16 +550,16 @@ CHeaderFooter.prototype =
         return this.Content.Is_TableBorder(X, Y, 0);
     },
 
-    Is_InText : function(X, Y, PageAbs)
+	IsInText : function(X, Y, PageAbs)
     {
         this.Set_Page(PageAbs);
-        return this.Content.Is_InText(X, Y, 0);
+        return this.Content.IsInText(X, Y, 0);
     },
 
-    Is_InDrawing : function(X, Y, PageAbs)
+	IsInDrawing : function(X, Y, PageAbs)
     {
         this.Set_Page(PageAbs);
-        return this.Content.Is_InDrawing(X, Y, 0);
+        return this.Content.IsInDrawing(X, Y, 0);
     },
 
     Document_UpdateInterfaceState : function()
@@ -1729,20 +1729,20 @@ CHeaderFooterController.prototype =
         return null;
     },
 
-    Is_InText : function(X,Y, PageNum_Abs)
+	IsInText : function(X,Y, PageNum_Abs)
     {
         var HdrFtr = this.Internal_GetContentByXY( X, Y, PageNum_Abs );
         if ( null != HdrFtr )
-            return HdrFtr.Is_InText( X, Y, PageNum_Abs );
+            return HdrFtr.IsInText( X, Y, PageNum_Abs );
 
         return null;
     },
 
-    Is_InDrawing : function(X,Y, PageNum_Abs)
+	IsInDrawing : function(X,Y, PageNum_Abs)
     {
         var HdrFtr = this.Internal_GetContentByXY( X, Y, PageNum_Abs );
         if ( null != HdrFtr )
-            return HdrFtr.Is_InDrawing( X, Y, PageNum_Abs );
+            return HdrFtr.IsInDrawing( X, Y, PageNum_Abs );
 
         return null;
     },
