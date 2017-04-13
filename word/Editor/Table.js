@@ -11995,6 +11995,42 @@ CTable.prototype.GotoFootnoteRef = function(isNext, isCurrent)
 
 	return false;
 };
+CTable.prototype.CanUpdateTarget = function(CurPage)
+{
+	if (this.Pages.length <= 0)
+		return false;
+
+	if (this.Pages.length <= CurPage)
+		return true;
+
+	if (!this.Pages[CurPage])
+		return false;
+
+	var oRow, oCell;
+	if (this.IsSelectionUse())
+	{
+		oCell = this.CurCell;
+		oRow  = this.CurCell.Row;
+	}
+	else
+	{
+		var CurCell = this.Selection.EndPos.Pos.Cell;
+		var CurRow  = this.Selection.EndPos.Pos.Row;
+
+		oRow  = this.Content[CurRow];
+		oCell = oRow.Get_Cell(CurCell);
+	}
+
+	if (!oRow || !oCell)
+		return false;
+
+	if (this.Pages[CurPage].LastRow > oRow.Index)
+		return true;
+	else if (this.Pages[CurPage].LastRow < oRow.Index)
+		return false;
+
+	return oCell.Content.CanUpdateTarget(CurPage - oCell.Content.Get_StartPage_Relative());
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

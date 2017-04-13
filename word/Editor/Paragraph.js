@@ -12017,6 +12017,27 @@ Paragraph.prototype.Can_CopyCut = function()
 {
 	return true;
 };
+Paragraph.prototype.CanUpdateTarget = function(CurPage)
+{
+	if (this.Pages.length <= 0)
+		return false;
+
+	if (this.Pages.length <= CurPage)
+		return true;
+
+	if (!this.Pages[CurPage] || !this.Lines[this.Pages[CurPage].EndLine] || !this.Lines[this.Pages[CurPage].EndLine].Ranges.length <= 0)
+		return false;
+
+	var nPos = (this.IsSelectionUse() ? this.Selection.EndPos : this.CurPos.ContentPos);
+
+	var oLastLine  = this.Lines[this.Pages[CurPage]];
+	var oLastRange = oLastLine.Ranges[oLastLine.Ranges.length - 1];
+
+	if (oLastRange.EndPos > nPos)
+		return true;
+
+	return false;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

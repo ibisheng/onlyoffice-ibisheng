@@ -215,6 +215,10 @@ CBlockLevelSdt.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawi
 {
 	return this.Content.Get_NearestPos(CurPage, X, Y, bAnchor, Drawing);
 };
+CBlockLevelSdt.prototype.CanUpdateTarget = function(CurPage)
+{
+	return this.Content.CanUpdateTatget(CurPage);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

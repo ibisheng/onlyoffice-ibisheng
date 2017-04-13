@@ -1344,7 +1344,7 @@ CDocumentContent.prototype.RecalculateCurPos              = function()
     {
         if (this.CurPos.ContentPos >= 0 && undefined != this.Content[this.CurPos.ContentPos])
         {
-            this.Internal_CheckCurPage();
+            this.private_CheckCurPage();
 
             if (this.CurPage > 0 && true === this.Parent.Is_HdrFtr(false))
             {
@@ -8042,24 +8042,24 @@ CDocumentContent.prototype.Internal_Content_Find      = function(Id)
 
     return -1;
 };
-CDocumentContent.prototype.Internal_CheckCurPage      = function()
+CDocumentContent.prototype.private_CheckCurPage = function()
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        // TODO: переделать
-        this.CurPage = 0;
-    }
-    else if (docpostype_Content === this.CurPos.Type)
-    {
-        if (true === this.Selection.Use)
-        {
-            this.CurPage = this.Content[this.Selection.EndPos].Get_CurrentPage_Relative();
-        }
-        else if (this.CurPos.ContentPos >= 0)
-        {
-            this.CurPage = this.Content[this.CurPos.ContentPos].Get_CurrentPage_Relative();
-        }
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		// TODO: переделать
+		this.CurPage = 0;
+	}
+	else if (docpostype_Content === this.CurPos.Type)
+	{
+		if (true === this.Selection.Use)
+		{
+			this.CurPage = this.Content[this.Selection.EndPos].Get_CurrentPage_Relative();
+		}
+		else if (this.CurPos.ContentPos >= 0)
+		{
+			this.CurPage = this.Content[this.CurPos.ContentPos].Get_CurrentPage_Relative();
+		}
+	}
 };
 CDocumentContent.prototype.Internal_Content_Add       = function(Position, NewObject, bCheckTable)
 {
@@ -9318,6 +9318,25 @@ CDocumentContent.prototype.RemoveTextSelection = function()
 	{
 		this.Selection_Remove();
 	}
+};
+CDocumentContent.prototype.CanUpdateTatget = function(CurPage)
+{
+	if (this.Pages.length <= 0)
+		return false;
+
+	if (this.Pages.length <= CurPage)
+		return true;
+
+	var nPos = (this.Selection.Use ? this.Selection.EndPos : this.CurPos.ContentPos);
+
+
+	if (this.Pages[CurPage].EndPos > nPos)
+		return true;
+	else if (this.Pages[CurPage].EndPos < nPos)
+		return false;
+
+	var nElementPageIndex = this.private_GetElementPageIndex(nPos, CurPage, 0, 1);
+	return this.Content[nPos].CanUpdateTarget(nElementPageIndex);
 };
 
 function CDocumentContentStartState(DocContent)

@@ -2230,7 +2230,7 @@ CDocument.prototype.Recalculate_Page = function()
                 this.Pages[PageIndex] = OldPage;
                 this.DrawingDocument.OnRecalculatePage(PageIndex, this.Pages[PageIndex]);
 
-                this.Internal_CheckCurPage();
+                this.private_CheckCurPage();
                 this.DrawingDocument.OnEndRecalculate(true);
                 this.DrawingObjects.onEndRecalculateDocument(this.Pages.length);
 
@@ -2832,7 +2832,7 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 		}
 		else
 		{
-			this.Internal_CheckCurPage();
+			this.private_CheckCurPage();
 			this.DrawingDocument.OnEndRecalculate(true);
 			this.DrawingObjects.onEndRecalculateDocument(this.Pages.length);
 
@@ -3532,7 +3532,7 @@ CDocument.prototype.OnContentReDraw                          = function(StartPag
 {
     this.ReDraw(StartPage, EndPage);
 };
-CDocument.prototype.CheckTargetUpdate                        = function()
+CDocument.prototype.CheckTargetUpdate = function()
 {
 	// Проверим можно ли вообще пересчитывать текущее положение.
 	if (this.DrawingDocument.UpdateTargetFromPaint === true)
@@ -3542,7 +3542,7 @@ CDocument.prototype.CheckTargetUpdate                        = function()
 		this.DrawingDocument.UpdateTargetCheck = false;
 	}
 
-	var bFlag = this.Controller.CanTargetUpdate();
+	var bFlag = this.Controller.CanUpdateTarget();
 
 	if (true === this.NeedUpdateTarget && true === bFlag && false === this.Selection_Is_TableBorderMove())
 	{
@@ -3567,7 +3567,7 @@ CDocument.prototype.RecalculateCurPos = function()
 	//       обновлялись поля колонтитулов при наборе текста.
 	this.Document_UpdateRulersState();
 };
-CDocument.prototype.Internal_CheckCurPage = function()
+CDocument.prototype.private_CheckCurPage = function()
 {
 	if (true === this.TurnOffRecalcCurPos)
 		return;
@@ -7904,7 +7904,7 @@ CDocument.prototype.Is_TextSelectionUse = function()
 CDocument.prototype.Get_CurPosXY = function()
 {
 	var TempXY = this.Controller.GetCurPosXY();
-	this.Internal_CheckCurPage();
+	this.private_CheckCurPage();
 	return {X : TempXY.X, Y : TempXY.Y, PageNum : this.CurPage};
 };
 /**
@@ -9529,7 +9529,7 @@ CDocument.prototype.private_UpdateCurPage = function()
 	if (true === this.TurnOffRecalcCurPos)
 		return;
 
-	this.Internal_CheckCurPage();
+	this.private_CheckCurPage();
 };
 CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 {
@@ -11325,21 +11325,28 @@ CDocument.prototype.TurnOnCheckChartSelection = function(){
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые вызываются из CLogicDocumentController
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.controller_CanTargetUpdate = function()
+CDocument.prototype.controller_CanUpdateTarget = function()
 {
-	if (null != this.FullRecalc.Id && this.FullRecalc.StartIndex <= this.CurPos.ContentPos)
+	if (null != this.FullRecalc.Id && this.FullRecalc.StartIndex < this.CurPos.ContentPos)
+	{
 		return false;
+	}
+	else if (null !== this.FullRecalc.Id && this.FullRecalc.StartIndex === this.CurPos.ContentPos)
+	{
+		var nPos         = (true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos)
+		var oElement     = this.Content[nPos];
+		var nElementPage = this.private_GetElementPageIndex(nPos, this.FullRecalc.PageIndex, this.FullRecalc.ColumnIndex, oElement.Get_ColumnsCount());
+		return oElement.CanUpdateTarget(nElementPage);
+	}
 
 	return true;
 };
 CDocument.prototype.controller_RecalculateCurPos = function()
 {
-	// TODO: Если пересчет идет в большой таблице, разбитой на несколько страниц, то в ней обновление курсора не
-	// проиходит, это надо поправить!!!!
-	var nPos = (true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos);
-	if (nPos >= 0 && undefined !== this.Content[nPos].RecalculateCurPos && (null === this.FullRecalc.Id || this.FullRecalc.StartIndex > nPos))
+	if (this.controller_CanUpdateTarget())
 	{
-		this.Internal_CheckCurPage();
+		var nPos = (true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag ? this.Selection.EndPos : this.CurPos.ContentPos)
+		this.private_CheckCurPage();
 		return this.Content[nPos].RecalculateCurPos();
 	}
 
@@ -15639,7 +15646,7 @@ CDocument.prototype.controller_UpdateRulersState = function()
 	}
 	else
 	{
-		this.Internal_CheckCurPage();
+		this.private_CheckCurPage();
 
 		if (this.CurPos.ContentPos >= 0 && (null === this.FullRecalc.Id || this.FullRecalc.StartIndex > this.CurPos.ContentPos))
 		{
@@ -15679,7 +15686,7 @@ CDocument.prototype.controller_UpdateSelectionState = function()
 			{
 				if (true !== this.Selection.Start)
 				{
-					this.Internal_CheckCurPage();
+					this.private_CheckCurPage();
 					this.RecalculateCurPos();
 				}
 				this.private_UpdateTracks(true, false);
@@ -15695,7 +15702,7 @@ CDocument.prototype.controller_UpdateSelectionState = function()
 					this.Selection_Remove();
 				}
 
-				this.Internal_CheckCurPage();
+				this.private_CheckCurPage();
 				this.RecalculateCurPos();
 				this.private_UpdateTracks(true, true);
 
@@ -15708,7 +15715,7 @@ CDocument.prototype.controller_UpdateSelectionState = function()
 	else
 	{
 		this.Selection_Remove();
-		this.Internal_CheckCurPage();
+		this.private_CheckCurPage();
 		this.RecalculateCurPos();
 		this.private_UpdateTracks(false, false);
 

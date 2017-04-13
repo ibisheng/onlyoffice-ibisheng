@@ -281,6 +281,10 @@ CDocumentContentElementBase.prototype.GetNearestPos = function(CurPage, X, Y, bA
 {
 	return this.Get_NearestPos(CurPage, X, Y, bAnchor, Drawing);
 };
+CDocumentContentElementBase.prototype.CanUpdateTarget = function(CurPage)
+{
+	return false;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

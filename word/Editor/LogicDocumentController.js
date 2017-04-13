@@ -18,9 +18,9 @@ function CLogicDocumentController(LogicDocument)
 CLogicDocumentController.prototype = Object.create(CDocumentControllerBase.prototype);
 CLogicDocumentController.prototype.constructor = CLogicDocumentController;
 
-CLogicDocumentController.prototype.CanTargetUpdate = function()
+CLogicDocumentController.prototype.CanUpdateTarget = function()
 {
-	return this.LogicDocument.controller_CanTargetUpdate();
+	return this.LogicDocument.controller_CanUpdateTarget();
 };
 CLogicDocumentController.prototype.RecalculateCurPos = function()
 {

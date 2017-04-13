@@ -24,7 +24,7 @@ function CHdrFtrController(LogicDocument, HdrFtr)
 CHdrFtrController.prototype = Object.create(CDocumentControllerBase.prototype);
 CHdrFtrController.prototype.constructor = CHdrFtrController;
 
-CHdrFtrController.prototype.CanTargetUpdate = function()
+CHdrFtrController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };

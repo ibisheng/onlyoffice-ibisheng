@@ -264,7 +264,7 @@ CDocumentControllerBase.prototype.Set_CurrentElement = function(bUpdateStates, P
  * Можно ли обновлять позицию курсора.
  * @returns {boolean}
  */
-CDocumentControllerBase.prototype.CanTargetUpdate = function(){return true;};
+CDocumentControllerBase.prototype.CanUpdateTarget = function(){return true;};
 /**
  * Пересчитываем текущую позицию.
  * @returns {{X: number, Y: number, Height: number, PageNum: number, Internal: {Line: number, Page: number, Range: number}, Transform: null}}

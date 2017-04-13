@@ -1338,7 +1338,7 @@ CFootnotesController.prototype.private_GetSelectionArray = function()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Controller area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CFootnotesController.prototype.CanTargetUpdate = function()
+CFootnotesController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
@@ -2801,7 +2801,7 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 		{
 			if (true !== this.LogicDocument.Selection.Start)
 			{
-				this.LogicDocument.Internal_CheckCurPage();
+				this.LogicDocument.private_CheckCurPage();
 				this.RecalculateCurPos();
 			}
 
@@ -2816,7 +2816,7 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 			if (true !== this.LogicDocument.Selection.Start)
 				this.LogicDocument.Selection_Remove();
 
-			this.LogicDocument.Internal_CheckCurPage();
+			this.LogicDocument.private_CheckCurPage();
 			this.RecalculateCurPos();
 			this.LogicDocument.private_UpdateTracks(true, true);
 
@@ -2828,7 +2828,7 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 	else
 	{
 		this.LogicDocument.Selection_Remove();
-		this.LogicDocument.Internal_CheckCurPage();
+		this.LogicDocument.private_CheckCurPage();
 		this.RecalculateCurPos();
 		this.LogicDocument.private_UpdateTracks(false, false);
 
