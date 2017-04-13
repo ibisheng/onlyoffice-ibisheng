@@ -2150,7 +2150,6 @@ CDocumentContent.prototype.Update_CursorType             = function(X, Y, CurPag
 //-----------------------------------------------------------------------------------
 // Функции для работы с контентом
 //-----------------------------------------------------------------------------------
-// Аналог функции Document.Add_NewParagraph
 CDocumentContent.prototype.Add_NewParagraph = function()
 {
     if (docpostype_DrawingObjects === this.CurPos.Type)
@@ -2183,7 +2182,7 @@ CDocumentContent.prototype.Add_NewParagraph = function()
         if (type_Paragraph == Item.GetType())
         {
             // Если текущий параграф пустой и с нумерацией, тогда удаляем нумерацию и отступы левый и первой строки
-            if (undefined != Item.Numbering_Get() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.Cursor_IsStart())
+            if (undefined != Item.Numbering_Get() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.IsCursorAtBegin())
             {
                 Item.Numbering_Remove();
                 Item.Set_Ind({FirstLine : undefined, Left : undefined, Right : Item.Pr.Ind.Right}, true);
@@ -2250,24 +2249,23 @@ CDocumentContent.prototype.Add_NewParagraph = function()
                     Item.Set_ReviewType(reviewtype_Common);
                 }
             }
-            this.Recalculate();
         }
         else if (type_Table == Item.GetType())
         {
             // Если мы находимся в начале первого параграфа первой ячейки, и
             // данная таблица - первый элемент, тогда добавляем параграф до таблицы.
 
-            if (0 === this.CurPos.ContentPos && Item.Cursor_IsStart(true))
+            if (0 === this.CurPos.ContentPos && Item.IsCursorAtBegin(true))
             {
                 // Создаем новый параграф
                 var NewParagraph = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
                 this.Internal_Content_Add(0, NewParagraph);
-
                 this.CurPos.ContentPos = 0;
-                this.Recalculate();
             }
             else
-                Item.Add_NewParagraph();
+			{
+				Item.AddNewParagraph();
+			}
         }
     }
 };
@@ -2694,7 +2692,7 @@ CDocumentContent.prototype.Paragraph_Add                      = function(ParaIte
         {
             if (type_Paragraph === ItemType)
             {
-                if (true === Item.Cursor_IsStart())
+                if (true === Item.IsCursorAtBegin())
                 {
                     this.Add_NewParagraph();
                     this.Content[this.CurPos.ContentPos - 1].Add(ParaItem);
@@ -4010,21 +4008,21 @@ CDocumentContent.prototype.Cursor_MoveAt = function(X, Y, AddToSelect, bRemoveOl
         }
     }
 };
-CDocumentContent.prototype.Cursor_IsStart                     = function(bOnlyPara)
+CDocumentContent.prototype.IsCursorAtBegin = function(bOnlyPara)
 {
-    if (undefined === bOnlyPara)
-        bOnlyPara = false;
+	if (undefined === bOnlyPara)
+		bOnlyPara = false;
 
-    if (true === bOnlyPara && true != this.Is_CurrentElementParagraph())
-        return false;
+	if (true === bOnlyPara && true != this.Is_CurrentElementParagraph())
+		return false;
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return false;
-    else if (false != this.Selection.Use || 0 != this.CurPos.ContentPos)
-        return false;
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+		return false;
+	else if (false != this.Selection.Use || 0 != this.CurPos.ContentPos)
+		return false;
 
-    var Item = this.Content[0];
-    return Item.Cursor_IsStart();
+	var Item = this.Content[0];
+	return Item.IsCursorAtBegin();
 };
 CDocumentContent.prototype.Get_CurPosXY                       = function()
 {
@@ -4324,7 +4322,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
                 else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
                     bAddEmptyPara = true;
             }
-            else if (true === Para.Cursor_IsStart())
+            else if (true === Para.IsCursorAtBegin())
             {
                 bConcatS = false;
             }

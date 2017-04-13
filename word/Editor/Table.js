@@ -2619,7 +2619,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 				{
 					NewIndex++;
 				}
-				else if (true != TarParagraph.Cursor_IsStart(ParaContentPos))
+				else if (true != TarParagraph.IsCursorAtBegin(ParaContentPos))
 				{
 					var NewParagraph = new Paragraph(NewDocContent.DrawingDocument, NewDocContent);
 					NearestPos.Paragraph.Split(NewParagraph, NearestPos.ContentPos);
@@ -5258,13 +5258,13 @@ CTable.prototype.Cursor_MoveToEndPos = function(AddToSelect)
 		this.CurCell.Content_Cursor_MoveToEndPos();
 	}
 };
-CTable.prototype.Cursor_IsStart = function(bOnlyPara)
+CTable.prototype.IsCursorAtBegin = function(bOnlyPara)
 {
 	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
 	{
 		if (0 === this.CurCell.Index && 0 === this.CurCell.Row.Index)
 		{
-			return this.CurCell.Content.Cursor_IsStart(bOnlyPara);
+			return this.CurCell.Content.IsCursorAtBegin(bOnlyPara);
 		}
 	}
 

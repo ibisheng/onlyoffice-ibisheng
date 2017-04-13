@@ -2091,11 +2091,8 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 			if (type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Get_CompiledPr2(false).ParaPr.KeepNext)
 			{
 				ChangeIndex--;
-				RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1); // считаем,
-																												   // что
-																												   // изменилась
-																												   // последняя
-																												   // страница
+				RecalcData.Inline.PageNum = PrevElement.Get_StartPage_Absolute() + (PrevElement.Pages.length - 1);
+				// считаем, что изменилась последняя страница
 			}
 			else
 			{
@@ -2104,7 +2101,7 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
 		}
 
 		var ChangedElement = this.Content[ChangeIndex];
-		if (ChangedElement.Pages.length > 0 && -1 !== ChangedElement.Index && ChangedElement.Get_StartPage_Absolute() < RecalcData.Inline.PageNum - 1)
+		if (ChangedElement.GetPagesCount() > 0 && -1 !== ChangedElement.GetIndex() && ChangedElement.Get_StartPage_Absolute() < RecalcData.Inline.PageNum - 1)
 		{
 			StartIndex = ChangeIndex;
 			StartPage  = RecalcData.Inline.PageNum - 1;
@@ -5767,7 +5764,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				else if (true === Elements[ElementsCount - 1].SelectedAll && true === bConcatS)
 					bAddEmptyPara = true;
 			}
-			else if (true === Para.Cursor_IsStart())
+			else if (true === Para.IsCursorAtBegin())
 			{
 				bConcatS = false;
 			}
@@ -5812,7 +5809,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				ParaS.Selection.StartPos = ParaS.Content.length - _ParaSContentLen;
 				ParaS.Selection.EndPos   = ParaS.Content.length - 1;
 			}
-			else if (true !== Para.Cursor_IsStart() && true !== bDoNotIncreaseDstIndex)
+			else if (true !== Para.IsCursorAtBegin() && true !== bDoNotIncreaseDstIndex)
 			{
 				DstIndex++;
 			}
@@ -6120,7 +6117,7 @@ CDocument.prototype.OnKeyDown = function(e)
             {
                 var Paragraph = SelectedInfo.Get_Paragraph();
                 var ParaPr    = Paragraph.Get_CompiledPr2(false).ParaPr;
-                if (null != Paragraph && ( true === Paragraph.Cursor_IsStart() || true === Paragraph.Selection_IsFromStart() ) && ( undefined != Paragraph.Numbering_Get() || ( true != Paragraph.IsEmpty() && ParaPr.Tabs.Tabs.length <= 0 ) ))
+                if (null != Paragraph && ( true === Paragraph.IsCursorAtBegin() || true === Paragraph.Selection_IsFromStart() ) && ( undefined != Paragraph.Numbering_Get() || ( true != Paragraph.IsEmpty() && ParaPr.Tabs.Tabs.length <= 0 ) ))
                 {
                     if (false === this.Document_Is_SelectionLocked(changestype_None, {
                             Type      : changestype_2_Element_and_Type,
@@ -11383,10 +11380,10 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 	//    в том числе если стиля нет у обоих, тогда копируем еще все прямые настройки.
 	//    (Т.е. если стили разные, а у исходный параграф был параграфом со списком, тогда
 	//    новый параграф будет без списка).
-	if (type_Paragraph == Item.GetType())
+	if (type_Paragraph === Item.GetType())
 	{
 		// Если текущий параграф пустой и с нумерацией, тогда удаляем нумерацию и отступы левый и первой строки
-		if (true !== bForceAdd && undefined != Item.Numbering_Get() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.Cursor_IsStart())
+		if (true !== bForceAdd && undefined != Item.Numbering_Get() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.IsCursorAtBegin())
 		{
 			Item.Numbering_Remove();
 			Item.Set_Ind({FirstLine : undefined, Left : undefined, Right : Item.Pr.Ind.Right}, true);
@@ -11460,35 +11457,18 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				Item.Set_ReviewType(reviewtype_Common);
 			}
 		}
-
-		if (false != bRecalculate)
-		{
-			this.Recalculate();
-
-			this.Document_UpdateInterfaceState();
-			//this.Document_UpdateRulersState()
-			this.Document_UpdateSelectionState();
-		}
 	}
-	else if (type_Table == Item.GetType())
+	else if (type_Table === Item.GetType() || type_BlockLevelSdt === Item.GetType())
 	{
 		// Если мы находимся в начале первого параграфа первой ячейки, и
 		// данная таблица - первый элемент, тогда добавляем параграф до таблицы.
 
-		if (0 === this.CurPos.ContentPos && Item.Cursor_IsStart(true))
+		if (0 === this.CurPos.ContentPos && Item.IsCursorAtBegin(true))
 		{
 			// Создаем новый параграф
 			var NewParagraph = new Paragraph(this.DrawingDocument, this);
 			this.Internal_Content_Add(0, NewParagraph);
-			this.CurPos.ContentPos    = 0;
-
-			if (false != bRecalculate)
-			{
-				this.Recalculate();
-				this.Document_UpdateInterfaceState();
-				//this.Document_UpdateRulersState()
-				this.Document_UpdateSelectionState();
-			}
+			this.CurPos.ContentPos = 0;
 
 			if (true === this.Is_TrackRevisions())
 			{
@@ -11497,7 +11477,18 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 			}
 		}
 		else
-			Item.Add_NewParagraph(bRecalculate);
+		{
+			Item.AddNewParagraph();
+		}
+	}
+
+	if (false !== bRecalculate)
+	{
+		this.Recalculate();
+
+		this.Document_UpdateInterfaceState();
+		//this.Document_UpdateRulersState()
+		this.Document_UpdateSelectionState();
 	}
 };
 CDocument.prototype.controller_AddInlineImage = function(W, H, Img, Chart, bFlow)
@@ -11842,7 +11833,7 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 	{
 		if (type_Paragraph === ItemType)
 		{
-			if (true === Item.Cursor_IsStart())
+			if (true === Item.IsCursorAtBegin())
 			{
 				if (ParaItem.IsColumnBreak())
 				{
@@ -15712,12 +15703,12 @@ CDocument.prototype.controller_IsCursorInHyperlink = function(bCheckEnd)
 			if (this.Selection.StartPos != this.Selection.EndPos)
 				return null;
 
-			return this.Content[this.Selection.StartPos].Hyperlink_Check(bCheckEnd);
+			return this.Content[this.Selection.StartPos].IsCursorInHyperlink(bCheckEnd);
 		}
 	}
 	else
 	{
-		return this.Content[this.CurPos.ContentPos].Hyperlink_Check(bCheckEnd);
+		return this.Content[this.CurPos.ContentPos].IsCursorInHyperlink(bCheckEnd);
 	}
 
 	return null;

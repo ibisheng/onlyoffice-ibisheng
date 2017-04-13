@@ -32,12 +32,6 @@
 
 "use strict";
 
-// При добавлении нового элемента ParagraphContent, добавить его обработку в
-// следующие функции:
-// Internal_Recalculate1, Internal_Recalculate2, Draw, Add,
-// Selection_SetEnd, Selection_CalculateTextPr, IsEmpty, Selection_IsEmpty,
-// Cursor_IsStart, Cursor_IsEnd, Is_ContentOnFirstPage
-
 // TODO: Надо избавиться от ParaEnd внутри ParaRun, а сам ParaEnd держать также как и ParaNumbering, как параметр
 //       внутри самого класса Paragraph
 
@@ -8267,7 +8261,7 @@ Paragraph.prototype.Cursor_IsEnd = function(_ContentPos)
 /**
  * Проверяем находится ли курсор в начале параграфа
  */
-Paragraph.prototype.Cursor_IsStart = function(_ContentPos, bCheckAnchors)
+Paragraph.prototype.IsCursorAtBegin = function(_ContentPos, bCheckAnchors)
 {
 	// Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
 	// мы стоим в конце параграфа.
@@ -8297,7 +8291,7 @@ Paragraph.prototype.Selection_IsFromStart = function(bCheckAnchors)
 		if (StartPos.Compare(EndPos) > 0)
 			StartPos = EndPos;
 
-		if (true != this.Cursor_IsStart(StartPos, bCheckAnchors))
+		if (true != this.IsCursorAtBegin(StartPos, bCheckAnchors))
 			return false;
 
 		return true;

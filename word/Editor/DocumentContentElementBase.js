@@ -326,6 +326,10 @@ CDocumentContentElementBase.prototype.MoveCursorToEndPos = function(AddToSelect,
 {
 	return this.Cursor_MoveToEndPos(AddToSelect, StartSelectFromEnd);
 };
+CDocumentContentElementBase.prototype.IsCursorAtBegin = function()
+{
+	return true;
+};
 CDocumentContentElementBase.prototype.Get_SelectionState = function()
 {
 	return [];
@@ -333,6 +337,22 @@ CDocumentContentElementBase.prototype.Get_SelectionState = function()
 CDocumentContentElementBase.prototype.Set_SelectionState = function(State, StateIndex)
 {
 
+};
+CDocumentContentElementBase.prototype.Add_NewParagraph = function()
+{
+
+};
+CDocumentContentElementBase.prototype.AddNewParagraph = function()
+{
+	return this.Add_NewParagraph();
+};
+CDocumentContentElementBase.prototype.Hyperlink_Check = function(bCheckEnd)
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	return this.Hyperlink_Check(bCheckEnd);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
@@ -391,6 +411,10 @@ CDocumentContentElementBase.prototype.Get_CurrentPage_Relative = function()
 CDocumentContentElementBase.prototype.GetPagesCount = function()
 {
 	return this.Get_PagesCount();
+};
+CDocumentContentElementBase.prototype.GetIndex = function()
+{
+	return this.Index;
 };
 
 //--------------------------------------------------------export--------------------------------------------------------

@@ -255,6 +255,18 @@ CBlockLevelSdt.prototype.Set_SelectionState = function(State, StateIndex)
 {
 	return this.Content.Set_SelectionState(State, StateIndex);
 };
+CBlockLevelSdt.prototype.IsCursorAtBegin = function(bOnlyPara)
+{
+	return this.Content.IsCursorAtBegin(bOnlyPara);
+};
+CBlockLevelSdt.prototype.Add_NewParagraph = function()
+{
+	return this.Content.Add_NewParagraph();
+};
+CBlockLevelSdt.prototype.Hyperlink_Check = function(bCheckEnd)
+{
+	return this.Content.Hyperlink_Check(bCheckEnd);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -337,6 +349,10 @@ CBlockLevelSdt.prototype.Set_CurrentElement = function(bUpdateStates, PageAbs, o
 		this.Parent.Update_ContentIndexing();
 		this.Parent.Set_CurrentElement(this.Index, bUpdateStates);
 	}
+};
+CBlockLevelSdt.prototype.Refresh_RecalcData2 = function(CurPage)
+{
+	this.Parent.Refresh_RecalcData2(this.Index, CurPage);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
