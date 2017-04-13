@@ -82,9 +82,9 @@ CLogicDocumentController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
 	return this.LogicDocument.controller_MoveCursorLeft(AddToSelect, Word);
 };
-CLogicDocumentController.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
+CLogicDocumentController.prototype.MoveCursorRight = function(AddToSelect, Word)
 {
-	return this.LogicDocument.controller_MoveCursorRight(AddToSelect, Word, FromPaste);
+	return this.LogicDocument.controller_MoveCursorRight(AddToSelect, Word);
 };
 CLogicDocumentController.prototype.MoveCursorUp = function(AddToSelect)
 {

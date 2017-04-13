@@ -4106,6 +4106,11 @@ Paragraph.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
 
 	return true;
 };
+Paragraph.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
+{
+	this.MoveCursorToEndPos(true, true);
+	this.MoveCursorLeft(true, Word);
+};
 Paragraph.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
 {
 	if (true === this.Selection.Use)
@@ -4209,6 +4214,11 @@ Paragraph.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
 	this.CurPos.RealY = this.CurPos.Y;
 
 	return true;
+};
+Paragraph.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
+{
+	this.MoveCursorToStartPos(false);
+	this.MoveCursorRight(true, Word);
 };
 Paragraph.prototype.Cursor_MoveAt = function(X, Y, bLine, bDontChangeRealPos, CurPage)
 {
@@ -5187,6 +5197,10 @@ Paragraph.prototype.Get_CurPosXY = function()
 Paragraph.prototype.Is_SelectionUse = function()
 {
 	return this.Selection.Use;
+};
+Paragraph.prototype.IsSelectionToEnd = function()
+{
+	return this.Selection_CheckParaEnd();
 };
 /**
  * Функция определяет начальную позицию курсора в параграфе

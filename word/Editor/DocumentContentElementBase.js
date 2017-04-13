@@ -181,6 +181,10 @@ CDocumentContentElementBase.prototype.Is_SelectionUse = function()
 {
 	return false;
 };
+CDocumentContentElementBase.prototype.IsSelectionToEnd = function()
+{
+	return false;
+};
 CDocumentContentElementBase.prototype.Selection_Remove = function()
 {
 };
@@ -284,6 +288,51 @@ CDocumentContentElementBase.prototype.GetNearestPos = function(CurPage, X, Y, bA
 CDocumentContentElementBase.prototype.CanUpdateTarget = function(CurPage)
 {
 	return false;
+};
+CDocumentContentElementBase.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
+{
+};
+CDocumentContentElementBase.prototype.MoveCursorLeft = function(AddToSelect, Word)
+{
+	return this.Cursor_MoveLeft(1, AddToSelect, Word);
+};
+CDocumentContentElementBase.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorRight = function(AddToSelect, Word)
+{
+	return this.Cursor_MoveRight(1, AddToSelect, Word);
+};
+CDocumentContentElementBase.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
+{
+
+};
+CDocumentContentElementBase.prototype.Cursor_MoveToStartPos = function(AddToSelect)
+{
+};
+CDocumentContentElementBase.prototype.MoveCursorToStartPos = function(AddToSelect)
+{
+	return this.Cursor_MoveToStartPos(AddToSelect);
+};
+CDocumentContentElementBase.prototype.Cursor_MoveToEndPos = function(AddToSelect, StartSelectFromEnd)
+{
+};
+CDocumentContentElementBase.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelectFromEnd)
+{
+	return this.Cursor_MoveToEndPos(AddToSelect, StartSelectFromEnd);
+};
+CDocumentContentElementBase.prototype.Get_SelectionState = function()
+{
+	return [];
+};
+CDocumentContentElementBase.prototype.Set_SelectionState = function(State, StateIndex)
+{
+
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц

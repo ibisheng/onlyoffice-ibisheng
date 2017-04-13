@@ -163,6 +163,10 @@ CBlockLevelSdt.prototype.Is_SelectionUse = function()
 {
 	return this.Content.Is_SelectionUse();
 };
+CBlockLevelSdt.prototype.IsSelectionToEnd = function()
+{
+	return this.Content.IsSelectionToEnd();
+};
 CBlockLevelSdt.prototype.Selection_Remove = function()
 {
 	this.Content.Selection_Remove();
@@ -218,6 +222,38 @@ CBlockLevelSdt.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawi
 CBlockLevelSdt.prototype.CanUpdateTarget = function(CurPage)
 {
 	return this.Content.CanUpdateTatget(CurPage);
+};
+CBlockLevelSdt.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
+{
+	return this.Content.Cursor_MoveLeft(AddToSelect, Word);
+};
+CBlockLevelSdt.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
+{
+	return this.Content.MoveCursorLeftWithSelectionFromEnd(Word);
+};
+CBlockLevelSdt.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
+{
+	return this.Content.Cursor_MoveRight(AddToSelect, Word, false);
+};
+CBlockLevelSdt.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
+{
+	return this.Content.MoveCursorRightWithSelectionFromStart(Word);
+};
+CBlockLevelSdt.prototype.Cursor_MoveToStartPos = function(AddToSelect)
+{
+	return this.Content.Cursor_MoveToStartPos(AddToSelect);
+};
+CBlockLevelSdt.prototype.Cursor_MoveToEndPos = function(AddToSelect, StartSelectFromEnd)
+{
+	return this.Content.Cursor_MoveToEndPos(AddToSelect, StartSelectFromEnd);
+};
+CBlockLevelSdt.prototype.Get_SelectionState = function()
+{
+	return this.Content.Get_SelectionState();
+};
+CBlockLevelSdt.prototype.Set_SelectionState = function(State, StateIndex)
+{
+	return this.Content.Set_SelectionState(State, StateIndex);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
@@ -293,6 +329,14 @@ CBlockLevelSdt.prototype.Document_CreateFontMap = function(FontMap)
 CBlockLevelSdt.prototype.Get_ParentTextTransform = function()
 {
 	return this.Parent.Get_ParentTextTransform();
+};
+CBlockLevelSdt.prototype.Set_CurrentElement = function(bUpdateStates, PageAbs, oDocContent)
+{
+	if (oDocContent === this.Content)
+	{
+		this.Parent.Update_ContentIndexing();
+		this.Parent.Set_CurrentElement(this.Index, bUpdateStates);
+	}
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

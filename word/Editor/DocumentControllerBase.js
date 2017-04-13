@@ -364,7 +364,7 @@ CDocumentControllerBase.prototype.MoveCursorLeft = function(AddToSelect, Word){r
  * @param {boolean} FromPaste Пришла ли данная комнда после "вставки"
  * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
  */
-CDocumentControllerBase.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste){return false;};
+CDocumentControllerBase.prototype.MoveCursorRight = function(AddToSelect, Word){return false;};
 /**
  * Смещаем курсор вверх.
  * @param AddToSelect Добавлять ли к селекту смещение

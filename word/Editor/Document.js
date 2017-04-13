@@ -12476,53 +12476,21 @@ CDocument.prototype.controller_MoveCursorLeft = function(AddToSelect, Word)
 	{
 		if (true === AddToSelect)
 		{
-			// Добавляем к селекту
-			if (false === this.Content[this.Selection.EndPos].Cursor_MoveLeft(1, true, Word))
+			if (false === this.Content[this.Selection.EndPos].MoveCursorLeft(true, Word))
 			{
-				// Нужно перейти в конец предыдущего элемента
-				if (0 != this.Selection.EndPos)
+				if (0 !== this.Selection.EndPos)
 				{
 					this.Selection.EndPos--;
 					this.CurPos.ContentPos = this.Selection.EndPos;
 
 					var Item = this.Content[this.Selection.EndPos];
-
-					if (type_Paragraph == Item.GetType())
-					{
-						Item.Cursor_MoveToEndPos(true, true);
-						Item.Cursor_MoveLeft(1, true, Word);
-					}
-					else if (type_Table == Item.GetType())
-					{
-						if (false === Item.Is_SelectionUse())
-						{
-							var LastRow = Item.Content[Item.Content.length - 1];
-
-							// Нам нужно выделить последний ряд таблицы
-							Item.Selection.Use          = true;
-							Item.Selection.Type         = table_Selection_Cell;
-							Item.Selection.StartPos.Pos = {
-								Row  : LastRow.Index,
-								Cell : LastRow.Get_CellsCount() - 1
-							};
-							Item.Selection.EndPos.Pos   = {Row : LastRow.Index, Cell : 0};
-							Item.CurCell                = LastRow.Get_Cell(0);
-							Item.Selection.Data         = [];
-
-							for (var CellIndex = 0; CellIndex < LastRow.Get_CellsCount(); CellIndex++)
-							{
-								Item.Selection.Data.push({Cell : CellIndex, Row : LastRow.Index});
-							}
-						}
-						else
-							Item.Cursor_MoveLeft(1, true, Word);
-					}
+					Item.MoveCursorLeftWithSelectionFromEnd(Word);
 				}
 			}
 
 			// Проверяем не обнулился ли селект в последнем элементе. Такое могло быть, если была
 			// заселекчена одна буква в последнем параграфе, а мы убрали селект последним действием.
-			if (this.Selection.EndPos != this.Selection.StartPos && false === this.Content[this.Selection.EndPos].Is_SelectionUse())
+			if (this.Selection.EndPos != this.Selection.StartPos && false === this.Content[this.Selection.EndPos].IsSelectionUse())
 			{
 				// Такая ситуация возможна только при прямом селекте (сверху вниз), поэтому вычитаем
 				this.Selection.EndPos--;
@@ -12530,7 +12498,7 @@ CDocument.prototype.controller_MoveCursorLeft = function(AddToSelect, Word)
 			}
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -12544,8 +12512,7 @@ CDocument.prototype.controller_MoveCursorLeft = function(AddToSelect, Word)
 				Start = this.Selection.EndPos;
 
 			this.CurPos.ContentPos = Start;
-			this.Content[this.CurPos.ContentPos].Cursor_MoveLeft(1, false, Word);
-
+			this.Content[this.CurPos.ContentPos].MoveCursorLeft(false, Word);
 			this.Selection_Remove();
 		}
 	}
@@ -12557,50 +12524,21 @@ CDocument.prototype.controller_MoveCursorLeft = function(AddToSelect, Word)
 			this.Selection.StartPos = this.CurPos.ContentPos;
 			this.Selection.EndPos   = this.CurPos.ContentPos;
 
-			if (false === this.Content[this.CurPos.ContentPos].Cursor_MoveLeft(1, true, Word))
+			if (false === this.Content[this.CurPos.ContentPos].MoveCursorLeft(true, Word))
 			{
 				// Нужно перейти в конец предыдущего элемент
 				if (0 != this.CurPos.ContentPos)
 				{
 					this.CurPos.ContentPos--;
-					var Item              = this.Content[this.CurPos.ContentPos];
 					this.Selection.EndPos = this.CurPos.ContentPos;
 
-					if (type_Paragraph == Item.GetType())
-					{
-						Item.Cursor_MoveToEndPos(false, true);
-						Item.Cursor_MoveLeft(1, true, Word);
-					}
-					else if (type_Table == Item.GetType())
-					{
-						if (false === Item.Is_SelectionUse())
-						{
-							var LastRow = Item.Content[Item.Content.length - 1];
-
-							// Нам нужно выделить последний ряд таблицы
-							Item.Selection.Use          = true;
-							Item.Selection.Type         = table_Selection_Cell;
-							Item.Selection.StartPos.Pos = {
-								Row  : LastRow.Index,
-								Cell : LastRow.Get_CellsCount() - 1
-							};
-							Item.Selection.EndPos.Pos   = {Row : LastRow.Index, Cell : 0};
-							Item.CurCell                = LastRow.Get_Cell(0);
-							Item.Selection.Data         = [];
-
-							for (var CellIndex = 0; CellIndex < LastRow.Get_CellsCount(); CellIndex++)
-							{
-								Item.Selection.Data.push({Cell : CellIndex, Row : LastRow.Index});
-							}
-						}
-						else
-							Item.Cursor_MoveLeft(1, true, Word);
-					}
+					var Item = this.Content[this.CurPos.ContentPos];
+					Item.MoveCursorLeftWithSelectionFromEnd(Word);
 				}
 			}
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -12608,19 +12546,19 @@ CDocument.prototype.controller_MoveCursorLeft = function(AddToSelect, Word)
 		}
 		else
 		{
-			if (false === this.Content[this.CurPos.ContentPos].Cursor_MoveLeft(1, false, Word))
+			if (false === this.Content[this.CurPos.ContentPos].MoveCursorLeft(false, Word))
 			{
 				// Нужно перейти в конец предыдущего элемент
 				if (0 != this.CurPos.ContentPos)
 				{
 					this.CurPos.ContentPos--;
-					this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
+					this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
 				}
 			}
 		}
 	}
 };
-CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word, FromPaste)
+CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word)
 {
 	if (this.CurPos.ContentPos < 0)
 		return false;
@@ -12631,7 +12569,7 @@ CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word, Fro
 		if (true === AddToSelect)
 		{
 			// Добавляем к селекту
-			if (false === this.Content[this.Selection.EndPos].Cursor_MoveRight(1, true, Word))
+			if (false === this.Content[this.Selection.EndPos].MoveCursorRight(true, Word))
 			{
 				// Нужно перейти в начало следующего элемента
 				if (this.Content.length - 1 != this.Selection.EndPos)
@@ -12640,47 +12578,13 @@ CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word, Fro
 					this.CurPos.ContentPos = this.Selection.EndPos;
 
 					var Item = this.Content[this.Selection.EndPos];
-					if (type_Paragraph === Item.GetType())
-					{
-						if (false === Item.Is_SelectionUse())
-						{
-							var StartPos            = Item.Internal_GetStartPos();
-							Item.CurPos.ContentPos  = StartPos;
-							Item.Selection.Use      = true;
-							Item.Selection.StartPos = StartPos;
-							Item.Selection.EndPos   = StartPos;
-						}
-
-						Item.Cursor_MoveRight(1, true, Word);
-					}
-					else if (type_Table === Item.GetType())
-					{
-						if (false === Item.Is_SelectionUse())
-						{
-							var FirstRow = Item.Content[0];
-
-							// Нам нужно выделить первый ряд таблицы
-							Item.Selection.Use          = true;
-							Item.Selection.Type         = table_Selection_Cell;
-							Item.Selection.StartPos.Pos = {Row : 0, Cell : 0};
-							Item.Selection.EndPos.Pos   = {Row : 0, Cell : FirstRow.Get_CellsCount() - 1};
-							Item.CurCell                = FirstRow.Get_Cell(FirstRow.Get_CellsCount() - 1);
-							Item.Selection.Data         = [];
-
-							for (var CellIndex = 0; CellIndex < FirstRow.Get_CellsCount(); CellIndex++)
-							{
-								Item.Selection.Data.push({Cell : CellIndex, Row : 0});
-							}
-						}
-						else
-							Item.Cursor_MoveRight(1, true, Word);
-					}
+					Item.MoveCursorRightWithSelectionFromStart(Word);
 				}
 			}
 
 			// Проверяем не обнулился ли селект в последнем параграфе. Такое могло быть, если была
 			// заселекчена одна буква в последнем параграфе, а мы убрали селект последним действием.
-			if (this.Selection.EndPos != this.Selection.StartPos && false === this.Content[this.Selection.EndPos].Is_SelectionUse())
+			if (this.Selection.EndPos != this.Selection.StartPos && false === this.Content[this.Selection.EndPos].IsSelectionUse())
 			{
 				// Такая ситуация возможна только при обратном селекте (снизу вверх), поэтому вычитаем
 				this.Selection.EndPos++;
@@ -12688,7 +12592,7 @@ CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word, Fro
 			}
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -12703,21 +12607,14 @@ CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word, Fro
 
 			this.CurPos.ContentPos = End;
 
-			if (true === FromPaste && type_Table === this.Content[this.CurPos.ContentPos].Get_Type() && true === this.Content[this.CurPos.ContentPos].Selection_IsToEnd() && this.Content.length - 1 !== this.CurPos.ContentPos)
+			if (true === this.Content[this.CurPos.ContentPos].IsSelectionToEnd() && this.CurPos.ContentPos < this.Content.length - 1)
 			{
 				this.CurPos.ContentPos = End + 1;
-				this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos(false);
+				this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 			}
 			else
 			{
-				if (false === this.Content[this.CurPos.ContentPos].Cursor_MoveRight(1, false, Word, FromPaste))
-				{
-					if (this.Content.length - 1 === this.CurPos.ContentPos)
-					{
-						var Item = this.Content[this.CurPos.ContentPos];
-						Item.Cursor_MoveToEndPos(false);
-					}
-				}
+				this.Content[this.CurPos.ContentPos].MoveCursorRight(false, Word);
 			}
 
 			this.Selection_Remove();
@@ -12731,55 +12628,21 @@ CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word, Fro
 			this.Selection.StartPos = this.CurPos.ContentPos;
 			this.Selection.EndPos   = this.CurPos.ContentPos;
 
-			if (false === this.Content[this.CurPos.ContentPos].Cursor_MoveRight(1, true, Word))
+			if (false === this.Content[this.CurPos.ContentPos].MoveCursorRight(true, Word))
 			{
 				// Нужно перейти в конец предыдущего элемента
 				if (this.Content.length - 1 != this.CurPos.ContentPos)
 				{
 					this.CurPos.ContentPos++;
-					var Item              = this.Content[this.CurPos.ContentPos];
 					this.Selection.EndPos = this.CurPos.ContentPos;
 
-					if (type_Paragraph === Item.GetType())
-					{
-						if (false === Item.Is_SelectionUse())
-						{
-							var StartPos            = Item.Internal_GetStartPos();
-							Item.CurPos.ContentPos  = StartPos;
-							Item.Selection.Use      = true;
-							Item.Selection.StartPos = StartPos;
-							Item.Selection.EndPos   = StartPos;
-						}
-
-						Item.Cursor_MoveRight(1, true, Word);
-					}
-					else if (type_Table === Item.GetType())
-					{
-						if (false === Item.Is_SelectionUse())
-						{
-							var FirstRow = Item.Content[0];
-
-							// Нам нужно выделить первый ряд таблицы
-							Item.Selection.Use          = true;
-							Item.Selection.Type         = table_Selection_Cell;
-							Item.Selection.StartPos.Pos = {Row : 0, Cell : 0};
-							Item.Selection.EndPos.Pos   = {Row : 0, Cell : FirstRow.Get_CellsCount() - 1};
-							Item.CurCell                = FirstRow.Get_Cell(FirstRow.Get_CellsCount() - 1);
-							Item.Selection.Data         = [];
-
-							for (var CellIndex = 0; CellIndex < FirstRow.Get_CellsCount(); CellIndex++)
-							{
-								Item.Selection.Data.push({Cell : CellIndex, Row : 0});
-							}
-						}
-						else
-							Item.Cursor_MoveRight(1, true, Word);
-					}
+					var Item = this.Content[this.CurPos.ContentPos];
+					Item.MoveCursorRightWithSelectionFromStart(Word);
 				}
 			}
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -12787,13 +12650,13 @@ CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word, Fro
 		}
 		else
 		{
-			if (false === this.Content[this.CurPos.ContentPos].Cursor_MoveRight(1, false, Word))
+			if (false === this.Content[this.CurPos.ContentPos].MoveCursorRight(false, Word))
 			{
 				// Нужно перейти в начало следующего элемента
 				if (this.Content.length - 1 != this.CurPos.ContentPos)
 				{
 					this.CurPos.ContentPos++;
-					this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+					this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 				}
 			}
 		}

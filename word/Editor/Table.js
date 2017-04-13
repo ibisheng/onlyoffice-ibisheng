@@ -5146,7 +5146,7 @@ CTable.prototype.Select_All = function(nDirection)
 /**
  * В данной функции проверяется идет ли выделение таблицы до конца таблицы.
  */
-CTable.prototype.Selection_IsToEnd = function()
+CTable.prototype.IsSelectionToEnd = function()
 {
 	if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
 	{
@@ -5615,6 +5615,36 @@ CTable.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
 		}
 	}
 };
+CTable.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
+{
+	if (true === this.IsSelectionUse())
+		this.RemoveSelection();
+
+	if (this.Content.length <= 0)
+		return;
+
+	var LastRow = this.Content[this.Content.length - 1];
+
+	// Нам нужно выделить последний ряд таблицы
+
+	this.Selection.Use          = true;
+	this.Selection.Type         = table_Selection_Cell;
+	this.Selection.StartPos.Pos = {
+		Row  : LastRow.Index,
+		Cell : LastRow.Get_CellsCount() - 1
+	};
+	this.Selection.EndPos.Pos   = {
+		Row  : LastRow.Index,
+		Cell : 0
+	};
+	this.CurCell                = LastRow.Get_Cell(0);
+	this.Selection.Data         = [];
+
+	for (var CellIndex = 0; CellIndex < LastRow.Get_CellsCount(); CellIndex++)
+	{
+		this.Selection.Data.push({Cell : CellIndex, Row : LastRow.Index});
+	}
+};
 CTable.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word, FromPaste)
 {
 	if (true === this.Selection.Use && this.Selection.Type === table_Selection_Cell)
@@ -5744,6 +5774,35 @@ CTable.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word, FromPaste
 
 			return true;
 		}
+	}
+};
+CTable.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
+{
+	if (true === this.IsSelectionUse())
+		this.RemoveSelection();
+
+	if (this.Content.length <= 0)
+		return;
+
+	var FirstRow = this.Content[0];
+
+	// Нам нужно выделить первый ряд таблицы
+	this.Selection.Use          = true;
+	this.Selection.Type         = table_Selection_Cell;
+	this.Selection.StartPos.Pos = {
+		Row  : 0,
+		Cell : 0
+	};
+	this.Selection.EndPos.Pos   = {
+		Row  : 0,
+		Cell : FirstRow.Get_CellsCount() - 1
+	};
+	this.CurCell                = FirstRow.Get_Cell(FirstRow.Get_CellsCount() - 1);
+	this.Selection.Data         = [];
+
+	for (var CellIndex = 0; CellIndex < FirstRow.Get_CellsCount(); CellIndex++)
+	{
+		this.Selection.Data.push({Cell : CellIndex, Row : 0});
 	}
 };
 CTable.prototype.Cursor_MoveUp = function(Count, AddToSelect)
