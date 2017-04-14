@@ -8939,7 +8939,7 @@ CDocumentContent.prototype.Get_ElementByIndex = function(Index)
 {
     return this.Content[Index];
 };
-CDocumentContent.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
+CDocumentContent.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
 {
     if (undefined === PosArray)
         PosArray = [];
@@ -8947,8 +8947,8 @@ CDocumentContent.prototype.Get_ContentPosition = function(bSelection, bStart, Po
     var Pos = (true === bSelection ? (true === bStart ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
     PosArray.push({Class : this, Position : Pos});
 
-    if (undefined !== this.Content[Pos] && this.Content[Pos].Get_ContentPosition)
-        this.Content[Pos].Get_ContentPosition(bSelection, bStart, PosArray);
+    if (undefined !== this.Content[Pos] && this.Content[Pos].GetContentPosition)
+        this.Content[Pos].GetContentPosition(bSelection, bStart, PosArray);
 
     return PosArray;
 };
@@ -8962,7 +8962,7 @@ CDocumentContent.prototype.Get_DocumentPositionFromObject = function(PosArray)
 
     return PosArray;
 };
-CDocumentContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+CDocumentContent.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
     if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
         return;
@@ -9036,8 +9036,8 @@ CDocumentContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPo
 
     if (StartPos !== EndPos)
     {
-        this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
-        this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
+        this.Content[StartPos].SetContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
+        this.Content[EndPos].SetContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
 
         var _StartPos = StartPos;
         var _EndPos = EndPos;
@@ -9057,10 +9057,10 @@ CDocumentContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPo
     }
     else
     {
-        this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
+        this.Content[StartPos].SetContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
     }
 };
-CDocumentContent.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+CDocumentContent.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
     if (0 === Flag && (!DocPos[Depth] || this !== DocPos[Depth].Class))
         return;
@@ -9099,7 +9099,7 @@ CDocumentContent.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 
     Pos = Math.min(this.Content.length - 1, Math.max(0, Pos));
     this.CurPos.ContentPos = Pos;
-    this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+    this.Content[Pos].SetContentPosition(_DocPos, Depth + 1, _Flag);
 };
 CDocumentContent.prototype.private_GetElementPageIndex = function(ElementPos, PageIndex, ColumnIndex, ColumnsCount)
 {

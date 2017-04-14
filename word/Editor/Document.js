@@ -10024,7 +10024,7 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
 		}
 	}
 };
-CDocument.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+CDocument.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
 	if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
 		return;
@@ -10103,8 +10103,8 @@ CDocument.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Dept
 
 	if (StartPos !== EndPos)
 	{
-		this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
-		this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
+		this.Content[StartPos].SetContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
+		this.Content[EndPos].SetContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
 
 		var _StartPos = StartPos;
 		var _EndPos   = EndPos;
@@ -10124,10 +10124,10 @@ CDocument.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Dept
 	}
 	else
 	{
-		this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
+		this.Content[StartPos].SetContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
 	}
 };
-CDocument.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
+CDocument.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
 {
 	if (undefined === PosArray)
 		PosArray = [];
@@ -10135,12 +10135,12 @@ CDocument.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
 	var Pos = (true === bSelection ? (true === bStart ? this.Selection.StartPos : this.Selection.EndPos) : this.CurPos.ContentPos);
 	PosArray.push({Class : this, Position : Pos});
 
-	if (undefined !== this.Content[Pos] && this.Content[Pos].Get_ContentPosition)
-		this.Content[Pos].Get_ContentPosition(bSelection, bStart, PosArray);
+	if (undefined !== this.Content[Pos] && this.Content[Pos].GetContentPosition)
+		this.Content[Pos].GetContentPosition(bSelection, bStart, PosArray);
 
 	return PosArray;
 };
-CDocument.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+CDocument.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
 	if (0 === Flag && (!DocPos[Depth] || this !== DocPos[Depth].Class))
 		return;
@@ -10183,7 +10183,7 @@ CDocument.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 	this.CurPos.ContentPos = Pos;
 
 	if (this.Content[Pos])
-		this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+		this.Content[Pos].SetContentPosition(_DocPos, Depth + 1, _Flag);
 };
 CDocument.prototype.Get_DocumentPositionFromObject = function(PosArray)
 {
@@ -10230,7 +10230,7 @@ CDocument.prototype.private_GetLogicDocumentPosition = function(LogicDocument)
 
 		if (DrawingContent)
 		{
-			return DrawingContent.Get_ContentPosition(DrawingContent.Is_SelectionUse(), false);
+			return DrawingContent.GetContentPosition(DrawingContent.Is_SelectionUse(), false);
 		}
 		else
 		{
@@ -10249,7 +10249,7 @@ CDocument.prototype.private_GetLogicDocumentPosition = function(LogicDocument)
 	}
 	else
 	{
-		return LogicDocument.Get_ContentPosition(LogicDocument.Is_SelectionUse(), false);
+		return LogicDocument.GetContentPosition(LogicDocument.Is_SelectionUse(), false);
 	}
 };
 CDocument.prototype.Get_DocumentPositionInfoForCollaborative = function()
@@ -15404,7 +15404,7 @@ CDocument.prototype.controller_UpdateRulersState = function()
 	{
 		if (this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType())
 		{
-			var PagePos = this.Get_DocumentPagePositionByContentPosition(this.Get_ContentPosition(true, true));
+			var PagePos = this.Get_DocumentPagePositionByContentPosition(this.GetContentPosition(true, true));
 
 			var Page   = PagePos ? PagePos.Page : this.CurPage;
 			var Column = PagePos ? PagePos.Column : 0;
@@ -15459,7 +15459,7 @@ CDocument.prototype.controller_UpdateRulersState = function()
 
 		if (this.CurPos.ContentPos >= 0 && (null === this.FullRecalc.Id || this.FullRecalc.StartIndex > this.CurPos.ContentPos))
 		{
-			var PagePos = this.Get_DocumentPagePositionByContentPosition(this.Get_ContentPosition(false));
+			var PagePos = this.Get_DocumentPagePositionByContentPosition(this.GetContentPosition(false));
 
 			var Page   = PagePos ? PagePos.Page : this.CurPage;
 			var Column = PagePos ? PagePos.Column : 0;
@@ -15731,20 +15731,20 @@ CDocument.prototype.controller_StartSelectionFromCurPos = function()
 };
 CDocument.prototype.controller_SaveDocumentStateBeforeLoadChanges = function(State)
 {
-	State.Pos      = this.Get_ContentPosition(false, false);
-	State.StartPos = this.Get_ContentPosition(true, true);
-	State.EndPos   = this.Get_ContentPosition(true, false);
+	State.Pos      = this.GetContentPosition(false, false);
+	State.StartPos = this.GetContentPosition(true, true);
+	State.EndPos   = this.GetContentPosition(true, false);
 };
 CDocument.prototype.controller_RestoreDocumentStateAfterLoadChanges = function(State)
 {
 	if (true === this.Selection.Use)
 	{
-		this.Set_ContentPosition(State.StartPos, 0, 0);
-		this.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+		this.SetContentPosition(State.StartPos, 0, 0);
+		this.SetContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
 	}
 	else
 	{
-		this.Set_ContentPosition(State.Pos, 0, 0);
+		this.SetContentPosition(State.Pos, 0, 0);
 		this.NeedUpdateTarget = true;
 	}
 };
@@ -15752,7 +15752,7 @@ CDocument.prototype.controller_GetColumnSize = function()
 {
 	var ContentPos = true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) : this.CurPos.ContentPos;
 
-	var PagePos   = this.Get_DocumentPagePositionByContentPosition(this.Get_ContentPosition(this.Selection.Use, false));
+	var PagePos   = this.Get_DocumentPagePositionByContentPosition(this.GetContentPosition(this.Selection.Use, false));
 	var ColumnAbs = PagePos ? PagePos.Column : 0;
 
 	var SectPr = this.Get_SectPr(ContentPos);

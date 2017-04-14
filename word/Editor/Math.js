@@ -3353,13 +3353,13 @@ ParaMath.prototype.Handle_Tab = function(isForward)
         this.Root.Displace_BreakOperator(isForward, bBrkBefore, CountOperators);
     }
 };
-ParaMath.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+ParaMath.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
-    return this.Root.Set_ContentSelection(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag);
+    return this.Root.SetContentSelection(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag);
 };
-ParaMath.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+ParaMath.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
-    return this.Root.Set_ContentPosition(DocPos, Depth, Flag);
+    return this.Root.SetContentPosition(DocPos, Depth, Flag);
 };
 
 function MatGetKoeffArgSize(FontSize, ArgSize)

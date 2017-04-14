@@ -403,9 +403,9 @@ CHdrFtrController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
 
 		if (docpostype_Content === HdrFtrContent.Get_DocPosType())
 		{
-			State.Pos      = HdrFtrContent.Get_ContentPosition(false, false, undefined);
-			State.StartPos = HdrFtrContent.Get_ContentPosition(true, true, undefined);
-			State.EndPos   = HdrFtrContent.Get_ContentPosition(true, false, undefined);
+			State.Pos      = HdrFtrContent.GetContentPosition(false, false, undefined);
+			State.StartPos = HdrFtrContent.GetContentPosition(true, true, undefined);
+			State.EndPos   = HdrFtrContent.GetContentPosition(true, false, undefined);
 		}
 		else if (docpostype_DrawingObjects === HdrFtrContent.Get_DocPosType())
 		{
@@ -426,12 +426,12 @@ CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(Stat
 			HdrFtrContent.Selection.Use = State.HdrFtrSelection;
 			if (true === HdrFtrContent.Selection.Use)
 			{
-				HdrFtrContent.Set_ContentPosition(State.StartPos, 0, 0);
-				HdrFtrContent.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+				HdrFtrContent.SetContentPosition(State.StartPos, 0, 0);
+				HdrFtrContent.SetContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
 			}
 			else
 			{
-				HdrFtrContent.Set_ContentPosition(State.Pos, 0, 0);
+				HdrFtrContent.SetContentPosition(State.Pos, 0, 0);
 				this.LogicDocument.NeedUpdateTarget = true;
 			}
 		}

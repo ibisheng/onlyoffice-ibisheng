@@ -5721,7 +5721,7 @@ ParaRun.prototype.Set_SelectionContentPos = function(StartContentPos, EndContent
     Selection.EndPos   = EndPos;
     Selection.Use      = true;
 };
-ParaRun.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+ParaRun.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
     var StartPos = 0;
     switch (StartFlag)
@@ -5744,7 +5744,7 @@ ParaRun.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth,
     Selection.EndPos   = EndPos;
     Selection.Use      = true;
 };
-ParaRun.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+ParaRun.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
     var Pos = 0;
     switch (Flag)

@@ -382,6 +382,15 @@ CDocumentContentElementBase.prototype.IsStartFromNewPage = function()
 CDocumentContentElementBase.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
 };
+CDocumentContentElementBase.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+};
+CDocumentContentElementBase.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
+{
+};
+CDocumentContentElementBase.prototype.SetContentPosition = function(DocPos, Depth, Flag)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

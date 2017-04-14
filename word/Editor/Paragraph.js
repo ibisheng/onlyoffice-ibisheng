@@ -11524,7 +11524,7 @@ Paragraph.prototype.Get_HdrFtr = function()
 
     return null;
 };
-Paragraph.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
+Paragraph.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -11547,7 +11547,7 @@ Paragraph.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
     PosArray.splice(Index, 0, {Class : this, Position : ParaContentPos.Get(0)});
     return PosArray;
 };
-Paragraph.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+Paragraph.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
     if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
         return;
@@ -11615,11 +11615,11 @@ Paragraph.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Dept
 
     if (StartPos !== EndPos)
     {
-        if (this.Content[StartPos] && this.Content[StartPos].Set_ContentSelection)
-        this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
+        if (this.Content[StartPos] && this.Content[StartPos].SetContentSelection)
+        this.Content[StartPos].SetContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
 
-        if (this.Content[EndPos] && this.Content[EndPos].Set_ContentSelection)
-        this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
+        if (this.Content[EndPos] && this.Content[EndPos].SetContentSelection)
+        this.Content[EndPos].SetContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
 
         var _StartPos = StartPos;
         var _EndPos = EndPos;
@@ -11639,11 +11639,11 @@ Paragraph.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Dept
     }
     else
     {
-        if (this.Content[StartPos] && this.Content[StartPos].Set_ContentSelection)
-        this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
+        if (this.Content[StartPos] && this.Content[StartPos].SetContentSelection)
+        this.Content[StartPos].SetContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
     }
 };
-Paragraph.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+Paragraph.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
     if (0 === Flag && (!DocPos[Depth] || this !== DocPos[Depth].Class))
         return;
@@ -11686,8 +11686,8 @@ Paragraph.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 	}
 
     this.CurPos.ContentPos = Pos;
-    if (this.Content[Pos] && this.Content[Pos].Set_ContentPosition)
-    	this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+    if (this.Content[Pos] && this.Content[Pos].SetContentPosition)
+    	this.Content[Pos].SetContentPosition(_DocPos, Depth + 1, _Flag);
     else
         this.Correct_ContentPos2();
 };

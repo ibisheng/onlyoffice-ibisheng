@@ -291,6 +291,18 @@ CBlockLevelSdt.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
 	return this.Content.GetAllParagraphs(Props, ParaArray);
 };
+CBlockLevelSdt.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+	this.Content.SetContentSelection(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag);
+};
+CBlockLevelSdt.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
+{
+	return this.Content.GetContentPosition(bSelection, bStart, PosArray);
+};
+CBlockLevelSdt.prototype.SetContentPosition = function(DocPos, Depth, Flag)
+{
+	this.Content.SetContentPosition(DocPos, Depth, Flag);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

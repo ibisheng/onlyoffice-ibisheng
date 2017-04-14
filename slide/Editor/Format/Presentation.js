@@ -851,7 +851,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage]){
             var oTargetDocContent = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(undefined, true);
             if(oTargetDocContent){
-                var DocPos = oTargetDocContent.Get_ContentPosition(oTargetDocContent.Is_SelectionUse(), false);
+                var DocPos = oTargetDocContent.GetContentPosition(oTargetDocContent.Is_SelectionUse(), false);
                 if (!DocPos || DocPos.length <= 0)
                     return null;
 

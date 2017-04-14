@@ -11416,7 +11416,7 @@ CTable.prototype.Check_ChangedTableGrid = function()
 
     return false;
 };
-CTable.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
+CTable.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -11431,7 +11431,7 @@ CTable.prototype.Get_ContentPosition = function(bSelection, bStart, PosArray)
     if (Row && CurCell >= 0 && CurCell < Row.Get_CellsCount())
     {
         var Cell = Row.Get_Cell(CurCell);
-        Cell.Content.Get_ContentPosition(bSelection, bStart, PosArray);
+        Cell.Content.GetContentPosition(bSelection, bStart, PosArray);
     }
 
     return PosArray;
@@ -11457,7 +11457,7 @@ CTable.prototype.Get_DocumentPositionFromObject = function(PosArray)
 
     return PosArray;
 };
-CTable.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+CTable.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
     if ((0 === StartFlag && (!StartDocPos[Depth] || this !== StartDocPos[Depth].Class)) || (0 === EndFlag && (!EndDocPos[Depth] || this !== EndDocPos[Depth].Class)))
         return;
@@ -11591,7 +11591,7 @@ CTable.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, 
     {
         this.CurCell = this.Get_Row(StartRow).Get_Cell(StartCell);
         this.Selection.Type = table_Selection_Text;
-        this.CurCell.Content.Set_ContentSelection(__StartDocPos, __EndDocPos, Depth + 2, __StartFlag, __EndFlag);
+        this.CurCell.Content.SetContentSelection(__StartDocPos, __EndDocPos, Depth + 2, __StartFlag, __EndFlag);
     }
     else
     {
@@ -11599,7 +11599,7 @@ CTable.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, 
         this.Internal_Selection_UpdateCells(IsOneElement ? false : true);
     }
 };
-CTable.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+CTable.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
     if (0 === Flag && (!DocPos[Depth] || this !== DocPos[Depth].Class))
         return;
@@ -11671,7 +11671,7 @@ CTable.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
         return;
 
     this.CurCell = Cell;
-    this.CurCell.Content.Set_ContentPosition(__DocPos, Depth + 2, __Flag);
+    this.CurCell.Content.SetContentPosition(__DocPos, Depth + 2, __Flag);
 };
 CTable.prototype.Set_CurCell = function(Cell)
 {
