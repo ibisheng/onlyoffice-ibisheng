@@ -438,7 +438,7 @@ CDocument.prototype.Accept_RevisionChangesBySelection = function()
         this.Accept_RevisionChange(CurrentChange);
     else
     {
-        var SelectedParagraphs = this.Get_AllParagraphs({Selected : true});
+        var SelectedParagraphs = this.GetAllParagraphs({Selected : true});
         var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphsBySelectedParagraphs(SelectedParagraphs, true);
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
@@ -459,7 +459,7 @@ CDocument.prototype.Reject_RevisionChangesBySelection = function()
         this.Reject_RevisionChange(CurrentChange);
     else
     {
-        var SelectedParagraphs = this.Get_AllParagraphs({Selected : true});
+        var SelectedParagraphs = this.GetAllParagraphs({Selected : true});
         var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphsBySelectedParagraphs(SelectedParagraphs, false);
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {

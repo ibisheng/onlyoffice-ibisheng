@@ -456,10 +456,10 @@ CShape.prototype.checkShapeChild = function()
 CShape.prototype.checkShapeChildTransform = function()
 {
 };
-CShape.prototype.Get_AllParagraphs = function(Props, ParaArray)
+CShape.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
     var oContent = this.getDocContent();
-    oContent && oContent.Get_AllParagraphs(Props, ParaArray);
+    oContent && oContent.GetAllParagraphs(Props, ParaArray);
 };
 
 

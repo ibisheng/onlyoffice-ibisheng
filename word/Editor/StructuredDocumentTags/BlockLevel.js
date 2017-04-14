@@ -275,6 +275,22 @@ CBlockLevelSdt.prototype.Hyperlink_Check = function(bCheckEnd)
 {
 	return this.Content.Hyperlink_Check(bCheckEnd);
 };
+CBlockLevelSdt.prototype.Get_SelectionState2 = function()
+{
+	return this.Content.Get_SelectionState2();
+};
+CBlockLevelSdt.prototype.Set_SelectionState2 = function(State)
+{
+	this.Content.Set_SelectionState2(State);
+};
+CBlockLevelSdt.prototype.IsStartFromNewPage = function()
+{
+	this.Content.IsStartFromNewPage();
+};
+CBlockLevelSdt.prototype.GetAllParagraphs = function(Props, ParaArray)
+{
+	return this.Content.GetAllParagraphs(Props, ParaArray);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -345,6 +361,14 @@ CBlockLevelSdt.prototype.OnContentReDraw = function(StartPageAbs, EndPageAbs)
 CBlockLevelSdt.prototype.Document_CreateFontMap = function(FontMap)
 {
 	this.Content.Document_CreateFontMap(FontMap);
+};
+CBlockLevelSdt.prototype.Document_CreateFontCharMap = function(FontCharMap)
+{
+	this.Content.Document_CreateFontCharMap(FontCharMap);
+};
+CBlockLevelSdt.prototype.Document_Get_AllFontNames = function(AllFonts)
+{
+	this.Content.Document_Get_AllFontNames(AllFonts);
 };
 CBlockLevelSdt.prototype.Get_ParentTextTransform = function()
 {

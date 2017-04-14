@@ -3107,12 +3107,12 @@ CStyle.prototype =
             if (this.Id != Styles.Default.Paragraph)
             {
                 var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
                 LogicDocument.Add_ChangedStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
                 LogicDocument.Add_ChangedStyle([this.Id]);
             }
 
@@ -4347,11 +4347,11 @@ CStyles.prototype =
             if (StyleId != this.Default.Paragraph)
             {
                 var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
             }
 
             var Count = AllParagraphs.length;
@@ -4380,11 +4380,11 @@ CStyles.prototype =
             if (StyleId != this.Default.Paragraph)
             {
                 var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
             }
 
             var Count = AllParagraphs.length;

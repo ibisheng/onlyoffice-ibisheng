@@ -172,7 +172,7 @@ CDocumentContentBase.prototype.Get_FootnotesList = function(oFirstFootnote, oLas
 
 	var arrFootnotes = [];
 
-	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
+	var arrParagraphs = this.GetAllParagraphs({OnlyMainDocument : true, All : true});
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
 		var oParagraph = arrParagraphs[nIndex];

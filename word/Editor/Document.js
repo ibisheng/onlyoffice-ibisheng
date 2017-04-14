@@ -4971,7 +4971,7 @@ CDocument.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum, Columns
 
         if (Item.GetPagesCount() > 1)
         {
-            if (true !== Item.Is_StartFromNewPage())
+            if (true !== Item.IsStartFromNewPage())
                 return InlineElements[Pos + 1];
 
             return InlineElements[Pos];
@@ -5606,7 +5606,7 @@ CDocument.prototype.Can_InsertContent = function(SelectedContent, NearPos)
 	{
 		// Проверяем, что вставляемый контент тоже формула
 		var Element = SelectedContent.Elements[0].Element;
-		if (1 !== SelectedContent.Elements.length || type_Paragraph !== Element.Get_Type() || null === LastClass.Parent)
+		if (1 !== SelectedContent.Elements.length || type_Paragraph !== Element.GetType() || null === LastClass.Parent)
 			return false;
 
 		var Math  = null;
@@ -5732,8 +5732,8 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 		}
 		else
 		{
-			var bConcatS   = ( type_Table === Elements[0].Element.GetType() ? false : true );
-			var bConcatE   = ( type_Table === Elements[ElementsCount - 1].Element.GetType() || true === Elements[ElementsCount - 1].SelectedAll ? false : true );
+			var bConcatS   = ( type_Paragraph !== Elements[0].Element.GetType() ? false : true );
+			var bConcatE   = ( type_Paragraph !== Elements[ElementsCount - 1].Element.GetType() || true === Elements[ElementsCount - 1].SelectedAll ? false : true );
 			var ParaS      = Para;
 			var ParaE      = Para;
 			var ParaEIndex = DstIndex;
@@ -6038,7 +6038,7 @@ CDocument.prototype.Is_UseInDocument = function(Id)
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)
 	{
-		if (Id === this.Content[Index].Get_Id())
+		if (Id === this.Content[Index].GetId())
 			return true;
 	}
 
@@ -6332,7 +6332,8 @@ CDocument.prototype.OnKeyDown = function(e)
                     if (this.CurPage < 0)
                     {
                         this.CurPage = 0;
-                        Dy           = PageH - this.Content[0].Pages[this.Content[0].Pages.length - 1].Bounds.Top;
+                        var oElement = this.Content[0];
+                        Dy           = PageH - oElement.GetPageBounds(oElement.GetPagesCount() - 1).Top;
                     }
                 }
 
@@ -6440,7 +6441,7 @@ CDocument.prototype.OnKeyDown = function(e)
                         {
                             this.CurPage    = this.Pages.length - 1;
                             var LastElement = this.Content[this.Pages[this.CurPage].EndPos];
-                            Dy              = LastElement.Pages[LastElement.Pages.length - 1].Bounds.Bottom;
+                            Dy              = LastElement.GetPageBounds(LastElement.GetPagesCount() - 1).Bottom;
                         }
                     }
 
@@ -6467,7 +6468,7 @@ CDocument.prototype.OnKeyDown = function(e)
                             {
                                 this.CurPage    = this.Pages.length - 1;
                                 var LastElement = this.Content[this.Pages[this.CurPage].EndPos];
-                                CurY            = LastElement.Pages[LastElement.Pages.length - 1].Bounds.Bottom;
+                                CurY            = LastElement.GetPageBounds(LastElement.GetPagesCount() - 1).Bottom;
                             }
 
                             // Поскольку мы перешли на другую страницу, то можно из цикла выходить
@@ -7328,38 +7329,6 @@ CDocument.prototype.Get_TextBackGroundColor = function()
 {
 	return undefined;
 };
-CDocument.prototype.Content_GetPrev = function(Id)
-{
-	var Index = this.Internal_Content_Find(Id);
-	if (Index > 0)
-	{
-		return this.Content[Index - 1];
-	}
-
-	return null;
-};
-CDocument.prototype.Content_GetNext = function(Id)
-{
-	var Index = this.Internal_Content_Find(Id);
-	if (-1 != Index && Index < this.Content.length - 1)
-	{
-		return this.Content[Index + 1];
-	}
-
-	return null;
-};
-CDocument.prototype.Internal_Content_Find = function(Id)
-{
-	return 0;
-
-	for (var Index = 0; Index < this.Content.length; Index++)
-	{
-		if (this.Content[Index].GetId() === Id)
-			return Index;
-	}
-
-	return -1;
-};
 CDocument.prototype.Select_DrawingObject = function(Id)
 {
 	this.Selection_Remove();
@@ -7415,7 +7384,7 @@ CDocument.prototype.Get_NearestPos = function(PageNum, X, Y, bAnchor, Drawing)
 		ContentPos++;
 
 	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageNum);
-	return this.Content[ContentPos].Get_NearestPos(ElementPageIndex, X, Y, bAnchor, Drawing);
+	return this.Content[ContentPos].GetNearestPos(ElementPageIndex, X, Y, bAnchor, Drawing);
 };
 CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckTable)
 {
@@ -7489,8 +7458,8 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCorrect
 	if (null != NextObj)
 		NextObj.Set_DocumentPrev(PrevObj);
 
-	// Проверим, что последний элемент не таблица
-	if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Table == this.Content[this.Content.length - 1].GetType()))
+	// Проверим, что последний параграф
+	if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Paragraph !== this.Content[this.Content.length - 1].GetType()))
 		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this));
 
 	// Обновим информацию о секциях
@@ -7998,17 +7967,13 @@ CDocument.prototype.Check_TableCoincidence = function(Table)
 //----------------------------------------------------------------------------------------------------------------------
 CDocument.prototype.Document_CreateFontMap = function()
 {
-	var StartTime = new Date().getTime();
-
 	var FontMap = {};
 	this.SectionsInfo.Document_CreateFontMap(FontMap);
-
 
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)
 	{
-		var Element = this.Content[Index];
-		Element.Document_CreateFontMap(FontMap);
+		this.Content[Index].CreateFontMap(FontMap);
 	}
 	AscFormat.checkThemeFonts(FontMap, this.theme.themeElements.fontScheme);
 	return FontMap;
@@ -8021,8 +7986,7 @@ CDocument.prototype.Document_CreateFontCharMap = function(FontCharMap)
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)
 	{
-		var Element = this.Content[Index];
-		Element.Document_CreateFontCharMap(FontCharMap);
+		this.Content[Index].CreateFontCharMap(FontCharMap);
 	}
 };
 CDocument.prototype.Document_Get_AllFontNames = function()
@@ -8034,11 +7998,9 @@ CDocument.prototype.Document_Get_AllFontNames = function()
 	this.Styles.Document_Get_AllFontNames(AllFonts);
 	this.theme.Document_Get_AllFontNames(AllFonts);
 
-	var Count = this.Content.length;
-	for (var Index = 0; Index < Count; Index++)
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		var Element = this.Content[Index];
-		Element.Document_Get_AllFontNames(AllFonts);
+		this.Content[nIndex].GetAllFontNames(AllFonts);
 	}
 	AscFormat.checkThemeFonts(AllFonts, this.theme.themeElements.fontScheme);
 	return AllFonts;
@@ -8640,7 +8602,7 @@ CDocument.prototype.Get_SelectionState2 = function()
 		var ContentPos = this.Internal_GetContentPosByXY(X, Y, PageNum);
 
 		State.Type = docpostype_Content;
-		State.Id   = this.Content[ContentPos].Get_Id();
+		State.Id   = this.Content[ContentPos].GetId();
 	}
 	else if (docpostype_Footnotes === nDocPosType)
 	{
@@ -8672,7 +8634,7 @@ CDocument.prototype.Set_SelectionState2 = function(State)
 			this.Set_DocPosType(docpostype_Content);
 			this.CurPos.ContentPos = 0;
 
-			this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+			this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 		}
 	}
 	else if (docpostype_Footnotes === State.Type)
@@ -8701,7 +8663,7 @@ CDocument.prototype.Set_SelectionState2 = function(State)
 		var Count = this.Content.length;
 		for (Pos = 0; Pos < Count; Pos++)
 		{
-			if (this.Content[Pos].Get_Id() == CurId)
+			if (this.Content[Pos].GetId() == CurId)
 			{
 				bFlag = true;
 				break;
@@ -8725,11 +8687,9 @@ CDocument.prototype.Set_SelectionState2 = function(State)
 		this.CurPos.ContentPos = Pos;
 
 		if (true !== bFlag)
-			this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+			this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 		else
-		{
-			this.Content[this.CurPos.ContentPos].Set_SelectionState2(State.Data);
-		}
+			this.Content[this.CurPos.ContentPos].SetSelectionState2(State.Data);
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -9017,7 +8977,7 @@ CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 		// Заметим, что после функции Split, у параграфа Element не может быть окончания секции, т.к. если она
 		// была в нем изначально, тогда после функции Split, окончание секции перенеслось в новый параграф.
 	}
-	else
+	else if (type_Table === Element.GetType())
 	{
 		// Если мы стоим в таблице, тогда делим данную таблицу на 2 по текущему ряду(текущий ряд попадает во
 		// вторую таблицу). Вставляем между таблицами параграф, и к этому параграфу приписываем окончание
@@ -9039,9 +8999,13 @@ CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 			this.CurPos.ContentPos += 2;
 		}
 
-		this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos(false);
+		this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 
 		Element = NewParagraph;
+	}
+	else
+	{
+		return false;
 	}
 
 	var SectPr = new CSectionPr(this);
@@ -9105,7 +9069,7 @@ CDocument.prototype.Get_SectionPageNumInfo = function(Page_abs)
 		if (CurSectInfo !== PrevSectInfo && c_oAscSectionBreakType.Continuous === CurSectInfo.SectPr.Get_Type() && true === CurSectInfo.SectPr.Compare_PageSize(PrevSectInfo.SectPr))
 		{
 			var ElementIndex = PrevSectInfo.Index;
-			if (ElementIndex < this.Content.length - 1 && true !== this.Content[ElementIndex + 1].Is_StartFromNewPage())
+			if (ElementIndex < this.Content.length - 1 && true !== this.Content[ElementIndex + 1].IsStartFromNewPage())
 				bCheckFP = false;
 		}
 	}
@@ -9846,7 +9810,7 @@ CDocument.prototype.UnlockPanelStyles = function(isUpdate)
 	if (true === isUpdate)
 		this.Document_UpdateStylesPanel();
 };
-CDocument.prototype.Get_AllParagraphs = function(Props)
+CDocument.prototype.GetAllParagraphs = function(Props)
 {
 	var ParaArray = [];
 
@@ -9856,18 +9820,18 @@ CDocument.prototype.Get_AllParagraphs = function(Props)
 		for (var Index = 0; Index < Count; Index++)
 		{
 			var Element = this.Content[Index];
-			Element.Get_AllParagraphs(Props, ParaArray);
+			Element.GetAllParagraphs(Props, ParaArray);
 		}
 	}
 	else
 	{
-		this.SectionsInfo.Get_AllParagraphs(Props, ParaArray);
+		this.SectionsInfo.GetAllParagraphs(Props, ParaArray);
 
 		var Count = this.Content.length;
 		for (var Index = 0; Index < Count; Index++)
 		{
 			var Element = this.Content[Index];
-			Element.Get_AllParagraphs(Props, ParaArray);
+			Element.GetAllParagraphs(Props, ParaArray);
 		}
 
 		this.Footnotes.GetAllParagraphs(Props, ParaArray);
@@ -9875,13 +9839,13 @@ CDocument.prototype.Get_AllParagraphs = function(Props)
 
 	return ParaArray;
 };
-CDocument.prototype.Get_AllParagraphsByNumbering = function(NumPr)
+CDocument.prototype.GetAllParagraphsByNumbering = function(NumPr)
 {
-	return this.Get_AllParagraphs({Numbering : true, NumPr : NumPr});
+	return this.GetAllParagraphs({Numbering : true, NumPr : NumPr});
 };
-CDocument.prototype.Get_AllParagraphsByStyle = function(StylesId)
+CDocument.prototype.GetAllParagraphsByStyle = function(StylesId)
 {
-	return this.Get_AllParagraphs({Style : true, StylesId : StylesId});
+	return this.GetAllParagraphs({Style : true, StylesId : StylesId});
 };
 CDocument.prototype.TurnOffHistory = function()
 {
@@ -10702,7 +10666,7 @@ CDocument.prototype.private_RecalculateNumbering = function(Elements)
 		else if (type_Paragraph === Element.Get_Type())
 		{
 			var ParaArray = [];
-			Element.Get_AllParagraphs({All : true}, ParaArray);
+			Element.GetAllParagraphs({All : true}, ParaArray);
 
 			for (var ParaIndex = 0, ParasCount = ParaArray.length; ParaIndex < ParasCount; ++ParaIndex)
 			{
@@ -11161,7 +11125,7 @@ CDocument.prototype.RemoveAllFootnotes = function()
 	var oEngine = new CDocumentFootnotesRangeEngine(true);
 	oEngine.Init(null, null);
 
-	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
+	var arrParagraphs = this.GetAllParagraphs({OnlyMainDocument : true, All : true});
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
 		arrParagraphs[nIndex].Get_FootnotesList(oEngine);
@@ -16016,7 +15980,7 @@ CDocumentSectionsInfo.prototype =
         }
     },
 
-    Get_AllParagraphs : function(Props, ParaArray)
+    GetAllParagraphs : function(Props, ParaArray)
     {
         var Count = this.Elements.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -16024,22 +15988,22 @@ CDocumentSectionsInfo.prototype =
             var SectPr = this.Elements[Index].SectPr;
 
             if ( null != SectPr.HeaderFirst )
-                SectPr.HeaderFirst.Get_AllParagraphs(Props, ParaArray);
+                SectPr.HeaderFirst.GetAllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.HeaderDefault )
-                SectPr.HeaderDefault.Get_AllParagraphs(Props, ParaArray);
+                SectPr.HeaderDefault.GetAllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.HeaderEven )
-                SectPr.HeaderEven.Get_AllParagraphs(Props, ParaArray);
+                SectPr.HeaderEven.GetAllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.FooterFirst )
-                SectPr.FooterFirst.Get_AllParagraphs(Props, ParaArray);
+                SectPr.FooterFirst.GetAllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.FooterDefault )
-                SectPr.FooterDefault.Get_AllParagraphs(Props, ParaArray);
+                SectPr.FooterDefault.GetAllParagraphs(Props, ParaArray);
 
             if ( null != SectPr.FooterEven )
-                SectPr.FooterEven.Get_AllParagraphs(Props, ParaArray);
+                SectPr.FooterEven.GetAllParagraphs(Props, ParaArray);
         }
     },
 

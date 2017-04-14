@@ -1150,13 +1150,13 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_Text = function(Text)
         this.Content[CurPos].Get_Text( Text );
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_AllParagraphs = function(Props, ParaArray)
+CParagraphContentWithParagraphLikeContent.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
     var ContentLen = this.Content.length;
     for (var CurPos = 0; CurPos < ContentLen; CurPos++)
     {
-        if (this.Content[CurPos].Get_AllParagraphs)
-            this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
+        if (this.Content[CurPos].GetAllParagraphs)
+            this.Content[CurPos].GetAllParagraphs(Props, ParaArray);
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_ClassesByPos = function(Classes, ContentPos, Depth)

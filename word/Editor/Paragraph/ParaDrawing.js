@@ -1975,10 +1975,10 @@ ParaDrawing.prototype.Get_PageNum = function()
 {
 	return this.PageNum;
 };
-ParaDrawing.prototype.Get_AllParagraphs = function(Props, ParaArray)
+ParaDrawing.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
-	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.Get_AllParagraphs === "function")
-		this.GraphicObj.Get_AllParagraphs(Props, ParaArray);
+	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.GetAllParagraphs === "function")
+		this.GraphicObj.GetAllParagraphs(Props, ParaArray);
 };
 ParaDrawing.prototype.getTableProps = function()
 {

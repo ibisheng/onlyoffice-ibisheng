@@ -149,6 +149,12 @@ CDocumentContentElementBase.prototype.Get_PagesCount = function()
 CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
 {
 };
+CDocumentContentElementBase.prototype.Document_CreateFontCharMap = function(FontCharMap)
+{
+};
+CDocumentContentElementBase.prototype.Document_Get_AllFontNames = function(AllFonts)
+{
+};
 CDocumentContentElementBase.prototype.IsInText = function(X, Y, CurPage)
 {
 	return null;
@@ -362,6 +368,20 @@ CDocumentContentElementBase.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	return this.Hyperlink_Check(bCheckEnd);
 };
+CDocumentContentElementBase.prototype.Get_SelectionState2 = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.Set_SelectionState2 = function(State)
+{
+};
+CDocumentContentElementBase.prototype.IsStartFromNewPage = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.GetAllParagraphs = function(Props, ParaArray)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
@@ -423,6 +443,34 @@ CDocumentContentElementBase.prototype.GetPagesCount = function()
 CDocumentContentElementBase.prototype.GetIndex = function()
 {
 	return this.Index;
+};
+CDocumentContentElementBase.prototype.GetPageBounds = function(CurPage)
+{
+	return this.Get_PageBounds(CurPage);
+};
+CDocumentContentElementBase.prototype.GetNearestPos = function(CurPage, X, Y, bAnchor, Drawing)
+{
+	return this.Get_NearestPos(CurPage, X, Y, bAnchor, Drawing);
+};
+CDocumentContentElementBase.prototype.CreateFontMap = function(oFontMap)
+{
+	return this.Document_CreateFontMap(oFontMap);
+};
+CDocumentContentElementBase.prototype.CreateFontCharMap = function(oFontCharMap)
+{
+	return this.Document_CreateFontCharMap(oFontCharMap);
+};
+CDocumentContentElementBase.prototype.GetAllFontNames = function(FontNames)
+{
+	return this.Document_Get_AllFontNames(FontNames);
+};
+CDocumentContentElementBase.prototype.GetSelectionState2 = function()
+{
+	return this.Get_SelectionState2();
+};
+CDocumentContentElementBase.prototype.SetSelectionState2 = function(State)
+{
+	return this.Set_SelectionState2(State);
 };
 
 //--------------------------------------------------------export--------------------------------------------------------

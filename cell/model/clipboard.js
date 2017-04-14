@@ -1470,7 +1470,7 @@
 					{
 						//excel (извне и из word) вставляет в шейпы аналогично, а вот из excel в excel вставляет в одну строку(?). мы сделаем для всех случаев одинаково. 
 						var paragraphs = [];
-						element.Get_AllParagraphs({All: true}, paragraphs);
+						element.GetAllParagraphs({All: true}, paragraphs);
 						for(var j = 0; j < paragraphs.length; j++)
 						{
 							selectedElement = new CSelectedElement();

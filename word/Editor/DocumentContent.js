@@ -405,26 +405,6 @@ CDocumentContent.prototype.Is_ThisElementCurrent           = function()
 {
     return this.Parent.Is_ThisElementCurrent(this);
 };
-CDocumentContent.prototype.Content_GetPrev                 = function(Id)
-{
-    var Index = this.Internal_Content_Find(Id);
-    if (Index > 0)
-    {
-        return this.Content[Index - 1];
-    }
-
-    return null;
-};
-CDocumentContent.prototype.Content_GetNext                 = function(Id)
-{
-    var Index = this.Internal_Content_Find(Id);
-    if (-1 != Index && Index < this.Content.length - 1)
-    {
-        return this.Content[Index + 1];
-    }
-
-    return null;
-};
 // Получем ближающую возможную позицию курсора
 CDocumentContent.prototype.Get_NearestPos                  = function(CurPage, X, Y, bAnchor, Drawing)
 {
@@ -1448,7 +1428,7 @@ CDocumentContent.prototype.Get_FirstParagraph             = function()
 
     return null;
 };
-CDocumentContent.prototype.Get_AllParagraphs = function(Props, ParaArray)
+CDocumentContent.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
 	var arrParagraphs = (ParaArray ? ParaArray : []);
 
@@ -1456,7 +1436,7 @@ CDocumentContent.prototype.Get_AllParagraphs = function(Props, ParaArray)
 	for (var Index = 0; Index < Count; Index++)
 	{
 		var Element = this.Content[Index];
-		Element.Get_AllParagraphs(Props, arrParagraphs);
+		Element.GetAllParagraphs(Props, arrParagraphs);
 	}
 
 	return arrParagraphs;
@@ -7930,7 +7910,7 @@ CDocumentContent.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum)
 
         if (Item.GetPagesCount() > 1)
         {
-            if (true !== Item.Is_StartFromNewPage())
+            if (true !== Item.IsStartFromNewPage())
                 return InlineElements[Pos + 1];
 
             return InlineElements[Pos];
@@ -7944,16 +7924,6 @@ CDocumentContent.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum)
     }
 
     return InlineElements[0];
-};
-CDocumentContent.prototype.Internal_Content_Find      = function(Id)
-{
-    for (var Index = 0; Index < this.Content.length; Index++)
-    {
-        if (this.Content[Index].GetId() === Id)
-            return Index;
-    }
-
-    return -1;
 };
 CDocumentContent.prototype.private_CheckCurPage = function()
 {
@@ -9191,7 +9161,7 @@ CDocumentContent.prototype.private_RecalculateNumbering = function(Elements)
         else if (type_Paragraph === Element.Get_Type())
         {
             var ParaArray = [];
-            Element.Get_AllParagraphs({All : true}, ParaArray);
+            Element.GetAllParagraphs({All : true}, ParaArray);
 
             for (var ParaIndex = 0, ParasCount = ParaArray.length; ParaIndex < ParasCount; ++ParaIndex)
             {
@@ -9250,6 +9220,13 @@ CDocumentContent.prototype.CanUpdateTatget = function(CurPage)
 
 	var nElementPageIndex = this.private_GetElementPageIndex(nPos, CurPage, 0, 1);
 	return this.Content[nPos].CanUpdateTarget(nElementPageIndex);
+};
+CDocumentContent.prototype.IsStartFromNewPage = function()
+{
+	if (this.Content.length <= 0)
+		return false;
+
+	return this.Content[0].IsStartFromNewPage();
 };
 
 function CDocumentContentStartState(DocContent)

@@ -911,9 +911,9 @@ CHeaderFooter.prototype =
         return this.Content.Get_Paragraph_ParaPr_Copy();
     },
 
-    Get_AllParagraphs : function(Props, ParaArray)
+    GetAllParagraphs : function(Props, ParaArray)
     {
-        return this.Content.Get_AllParagraphs(Props, ParaArray);
+        return this.Content.GetAllParagraphs(Props, ParaArray);
     },
 
     Get_AllDrawingObjects  : function(arrDrawings)

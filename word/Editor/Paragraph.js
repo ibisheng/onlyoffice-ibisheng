@@ -371,13 +371,13 @@ Paragraph.prototype.Get_AllMaths = function(List)
 
 	return List;
 };
-Paragraph.prototype.Get_AllParagraphs = function(Props, ParaArray)
+Paragraph.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
 	var ContentLen = this.Content.length;
 	for (var CurPos = 0; CurPos < ContentLen; CurPos++)
 	{
-		if (this.Content[CurPos].Get_AllParagraphs)
-			this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
+		if (this.Content[CurPos].GetAllParagraphs)
+			this.Content[CurPos].GetAllParagraphs(Props, ParaArray);
 	}
 
 	if (true === Props.All)
@@ -1317,7 +1317,7 @@ Paragraph.prototype.Internal_Draw_1 = function(CurPage, pGraphics, Pr)
 		// Если данный параграф зажат другим пользователем, рисуем соответствующий знак
 		if (AscCommon.locktype_None != this.Lock.Get_Type())
 		{
-			if (( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ))
+			if (( CurPage > 0 || false === this.IsStartFromNewPage() || null === this.Get_DocumentPrev() ))
 			{
 				var X_min    = -1 + Math.min(this.Pages[CurPage].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine);
 				var Y_top    = this.Pages[CurPage].Bounds.Top;
@@ -1332,7 +1332,7 @@ Paragraph.prototype.Internal_Draw_1 = function(CurPage, pGraphics, Pr)
 		var oColor = this.private_GetCollPrChange();
 		if (false !== oColor)
 		{
-			if (( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ))
+			if (( CurPage > 0 || false === this.IsStartFromNewPage() || null === this.Get_DocumentPrev() ))
 			{
 				var X_min    = -3 + Math.min(this.Pages[CurPage].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine);
 				var Y_top    = this.Pages[CurPage].Bounds.Top;
@@ -1346,7 +1346,7 @@ Paragraph.prototype.Internal_Draw_1 = function(CurPage, pGraphics, Pr)
 		// Если данный параграф был изменен в режиме рецензирования, тогда рисуем специальный знак
 		if (true === this.Pr.Have_PrChange())
 		{
-			if (( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ))
+			if (( CurPage > 0 || false === this.IsStartFromNewPage() || null === this.Get_DocumentPrev() ))
 			{
 				var X_min    = -3 + Math.min(this.Pages[CurPage].X, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left, this.Pages[CurPage].X + Pr.ParaPr.Ind.Left + Pr.ParaPr.Ind.FirstLine);
 				var Y_top    = this.Pages[CurPage].Bounds.Top;
@@ -1518,9 +1518,9 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 					if (true === Pr.ParaPr.Brd.First)
 					{
 						// Если следующий элемент таблица, тогда PrevPr = null
-						if (null === PrevEl || true === this.Is_StartFromNewPage() || null === PrevPr || Asc.c_oAscShdNil === PrevPr.ParaPr.Shd.Value || PrevLeft != CurLeft || CurRight != PrevRight || false === this.Internal_Is_NullBorders(PrevPr.ParaPr.Brd) || false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd))
+						if (null === PrevEl || true === this.IsStartFromNewPage() || null === PrevPr || Asc.c_oAscShdNil === PrevPr.ParaPr.Shd.Value || PrevLeft != CurLeft || CurRight != PrevRight || false === this.Internal_Is_NullBorders(PrevPr.ParaPr.Brd) || false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd))
 						{
-							if (false === this.Is_StartFromNewPage() || null === PrevEl)
+							if (false === this.IsStartFromNewPage() || null === PrevEl)
 								TempTop += Pr.ParaPr.Spacing.Before;
 						}
 					}
@@ -1546,7 +1546,7 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 						NextRight = NextPr.ParaPr.Ind.Right;
 					}
 
-					if (null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.Is_StartFromNewPage())
+					if (null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.IsStartFromNewPage())
 					{
 						TempBottom = this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
 					}
@@ -1555,7 +1555,7 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 					else if (true === Pr.ParaPr.Brd.Last)
 					{
 						// Если следующий элемент таблица, тогда NextPr = null
-						if (null === NextEl || true === NextEl.Is_StartFromNewPage() || null === NextPr || Asc.c_oAscShdNil === NextPr.ParaPr.Shd.Value || NextLeft != CurLeft || CurRight != NextRight || false === this.Internal_Is_NullBorders(NextPr.ParaPr.Brd) || false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd))
+						if (null === NextEl || true === NextEl.IsStartFromNewPage() || null === NextPr || Asc.c_oAscShdNil === NextPr.ParaPr.Shd.Value || NextLeft != CurLeft || CurRight != NextRight || false === this.Internal_Is_NullBorders(NextPr.ParaPr.Brd) || false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd))
 							TempBottom -= Pr.ParaPr.Spacing.After;
 					}
 				}
@@ -1734,7 +1734,7 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 				if (Pr.ParaPr.Brd.Top.Value === border_Single || Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value)
 				{
 					if (( true === Pr.ParaPr.Brd.First && ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === Pr.ParaPr.PageBreakBefore ) ) ||
-						( true !== Pr.ParaPr.Brd.First && ( ( 0 === CurPage && null === this.Get_DocumentPrev() ) || ( 1 === CurPage && true === this.Is_StartFromNewPage() )  ) ))
+						( true !== Pr.ParaPr.Brd.First && ( ( 0 === CurPage && null === this.Get_DocumentPrev() ) || ( 1 === CurPage && true === this.IsStartFromNewPage() )  ) ))
 						TempTop += Pr.ParaPr.Spacing.Before;
 				}
 			}
@@ -1742,7 +1742,7 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 			if (this.Lines.length - 1 === CurLine)
 			{
 				var NextEl = this.Get_DocumentNext();
-				if (null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.Is_StartFromNewPage())
+				if (null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.IsStartFromNewPage())
 					TempBottom = this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
 				else if ((true === Pr.ParaPr.Brd.Last || (null !== NextEl && (type_Table === NextEl.Get_Type() || true === NextEl.private_IsEmptyPageWithBreak(0)))) && ( Pr.ParaPr.Brd.Bottom.Value === border_Single || Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value ))
 					TempBottom -= Pr.ParaPr.Spacing.After;
@@ -2323,7 +2323,7 @@ Paragraph.prototype.Internal_Draw_6 = function(CurPage, pGraphics, Pr)
 		var TempY        = this.Pages[CurPage].Y;
 		var NextEl       = this.Get_DocumentNext();
 		var DrawLineRule = c_oAscLineDrawingRule.Bottom;
-		if (null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.Is_StartFromNewPage())
+		if (null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.IsStartFromNewPage())
 		{
 			TempY        = this.Pages[CurPage].Y + this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
 			DrawLineRule = c_oAscLineDrawingRule.Top;
@@ -8761,7 +8761,7 @@ Paragraph.prototype.Set_Bullet = function(Bullet)
 /**
  * Проверяем начинается ли текущий параграф с новой страницы.
  */
-Paragraph.prototype.Is_StartFromNewPage = function()
+Paragraph.prototype.IsStartFromNewPage = function()
 {
 	// TODO: пока здесь стоит простая проверка. В будущем надо будет данную проверку улучшить.
 	//       Например, сейчас не учитывается случай, когда в начале параграфа стоит PageBreak.

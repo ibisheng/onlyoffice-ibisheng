@@ -2360,7 +2360,7 @@ CTable.prototype.Get_FirstParagraph = function()
 
 	return this.Content[0].Content[0].Content.Get_FirstParagraph();
 };
-CTable.prototype.Get_AllParagraphs = function(Props, ParaArray)
+CTable.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
 	var Count = this.Content.length;
 	for (var CurRow = 0; CurRow < Count; CurRow++)
@@ -2370,7 +2370,7 @@ CTable.prototype.Get_AllParagraphs = function(Props, ParaArray)
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Get_AllParagraphs(Props, ParaArray);
+			Cell.Content.GetAllParagraphs(Props, ParaArray);
 		}
 	}
 };
@@ -2978,7 +2978,7 @@ CTable.prototype.Get_ParentTextTransform = function()
 /**
  * Проверяем начинается ли текущий параграф с новой страницы.
  */
-CTable.prototype.Is_StartFromNewPage = function()
+CTable.prototype.IsStartFromNewPage = function()
 {
 	if ((this.Pages.length > 1 && true === this.Is_EmptyPage(0)) || (null === this.Get_DocumentPrev() && true === this.Parent.Is_TopDocument()))
 		return true;

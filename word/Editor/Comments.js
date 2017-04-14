@@ -608,7 +608,7 @@ function CComments()
         for (var Id in this.m_aComments)
         {
         	if (!arrAllParagraphs && editor && editor.WordControl.m_oLogicDocument)
-        		arrAllParagraphs = editor.WordControl.m_oLogicDocument.Get_AllParagraphs({All : true});
+        		arrAllParagraphs = editor.WordControl.m_oLogicDocument.GetAllParagraphs({All : true});
 
             this.m_aComments[Id].Check_MergeData(arrAllParagraphs);
         }

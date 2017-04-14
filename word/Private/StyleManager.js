@@ -341,7 +341,7 @@ CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
 
         if (this.LogicDocument)
         {
-            var AllParagraphs = this.LogicDocument.Get_AllParagraphsByStyle([StyleId]);
+            var AllParagraphs = this.LogicDocument.GetAllParagraphsByStyle([StyleId]);
             var Count = AllParagraphs.length;
             for (var Index = 0; Index < Count; Index++)
             {
