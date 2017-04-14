@@ -104,6 +104,7 @@ AscDFH.changesFactory[AscDFH.historyitem_SlideSetClrMapOverride    ] = AscDFH.CC
 AscDFH.changesFactory[AscDFH.historyitem_PropLockerSetId           ] = AscDFH.CChangesDrawingsString    ;
 AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsAddComment   ] = AscDFH.CChangesDrawingsContentComments   ;
 AscDFH.changesFactory[AscDFH.historyitem_SlideCommentsRemoveComment] = AscDFH.CChangesDrawingsContentComments   ;
+AscDFH.changesFactory[AscDFH.historyitem_SlideSetNotes      ] = AscDFH.CChangesDrawingsObject   ;
 
 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideSetComments          ] = function(oClass, value){oClass.slideComments = value;};
@@ -134,6 +135,7 @@ AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideSetBg                ] = funct
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideSetCSldName          ] = function(oClass, value){oClass.cSld.name = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideSetClrMapOverride    ] = function(oClass, value){oClass.clrMap = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_PropLockerSetId           ] = function(oClass, value){oClass.objectId = value;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_SlideSetNotes             ] = function(oClass, value){oClass.notes = value;};
 
 
 
@@ -161,6 +163,7 @@ function Slide(presentation, slideLayout, slideNum)
 
     this.backgroundFill = null;
 
+    this.notes = null;
 
     this.timing = new CAscSlideTiming();
     this.timing.setDefaultParams();
@@ -540,6 +543,11 @@ Slide.prototype =
     Read_FromBinary2: function(r)
     {
         this.Id = r.GetString2();
+    },
+
+    setNotes: function(pr){
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_SlideSetNotes, this.notes, pr));
+        this.notes = pr;
     },
 
     setSlideComments: function(comments)
@@ -924,6 +932,9 @@ Slide.prototype =
             this.recalculateSpTree();
             this.recalcInfo.recalculateSpTree = false;
         }
+        if(this.notes){
+            this.notes.recalculate();
+        }
         this.cachedImage = null;
     },
 
@@ -1020,6 +1031,9 @@ Slide.prototype =
             {
                 comments[i].draw(graphics);
             }
+        }
+        if(this.notes){
+            this.notes.draw(graphics);
         }
     },
 

@@ -493,8 +493,10 @@ function BinaryPPTYLoader()
                 s.Seek2(_main_tables["25"]);
 
                 var _nm_count = s.GetULong();
-                for (var i = 0; i < _nm_count; i++)
+                for (var i = 0; i < _nm_count; i++){
                     this.presentation.notesMasters[i] = this.ReadNoteMaster();
+                    this.presentation.notesMasters[i].setTheme(this.presentation.themes[0]);//TODO: убрать после того как будут сделаны рельсы
+                }
             }
 
             if (undefined != _main_tables["26"])
@@ -676,7 +678,7 @@ function BinaryPPTYLoader()
 				s.Seek2(_main_tables["45"]);
 				s.Skip2(6); // type + len + start attr
 
-				var _noteNum = 0;
+				var _slideNum = 0;
 				while (true)
 				{
 					var _at = s.GetUChar();
@@ -684,7 +686,8 @@ function BinaryPPTYLoader()
 						break;
 
 					var indexL = s.GetLong();
-					var note = this.presentation.notes[indexL];
+					this.presentation.Slides[_slideNum].setNotes(this.presentation.notes[indexL]);
+                    ++_slideNum;
 				}
 			}
 			if (undefined != _main_tables["46"])
@@ -700,6 +703,7 @@ function BinaryPPTYLoader()
 						break;
 
 					var indexL = s.GetLong();
+                    this.presentation.notes[_noteNum].setNotesMaster(this.presentation.notesMasters[indexL]);
 					_noteNum++;
 				}
 			}
@@ -3475,6 +3479,7 @@ function BinaryPPTYLoader()
     {
 
         var oNotesMaster = new AscCommonSlide.CNotesMaster();
+        this.TempMainObject = oNotesMaster;
         this.stream.Skip2(1); // type
         var end = this.stream.cur + this.stream.GetLong() + 4;
         while(this.stream.cur < end){
@@ -3520,12 +3525,14 @@ function BinaryPPTYLoader()
         }
 
         this.stream.Seek2(end);
+        this.TempMainObject = null;
         return oNotesMaster;
     }
 
     this.ReadNote = function()
     {
         var oNotes = new AscCommonSlide.CNotes();
+        this.TempMainObject = oNotes;
         var _s = this.stream;
         _s.Skip2(1); // type
         var _end = _s.cur + _s.GetLong() + 4;
@@ -3556,6 +3563,11 @@ function BinaryPPTYLoader()
                     for(var i = 0; i < cSld.spTree.length; ++i){
                         oNotes.addToSpTreeToPos(i, cSld.spTree[i]);
                     }
+                    if(cSld.Bg)
+                    {
+                        oNotes.changeBackground(cSld.Bg);
+                    }
+                    oNotes.setCSldName(cSld.name);
                     break;
                 }
                 case 1:
@@ -3570,7 +3582,7 @@ function BinaryPPTYLoader()
                 }
             }
         }
-
+        this.TempMainObject = null;
         _s.Seek2(_end);
         return oNotes;
     }
@@ -4490,8 +4502,15 @@ function BinaryPPTYLoader()
                     s.GetUChar();
                     break;
                 }
-                default:
+                case 7:
+                {
+                    s.GetString2();
                     break;
+                }
+                default:
+                {
+                    break;
+                }
             }
         }
 		if (dxaOrig > 0 && dyaOrig > 0) {
@@ -5617,7 +5636,7 @@ function BinaryPPTYLoader()
                     var _length = s.GetLong();
                     var _pos = s.cur;
 
-                    if(typeof AscFormat.CChartSpace !== "undefined")
+                    if(typeof AscFormat.CChartSpace !== "undefined" && _length)
                     {
                         var _stream = new AscCommon.FT_Stream2();
                         _stream.data = s.data;
@@ -9263,6 +9282,11 @@ function CPres()
                     case 6:
                     {
                         s.GetUChar();
+                        break;
+                    }
+                    case 7:
+                    {
+                        var sFileName = s.GetString2();
                         break;
                     }
                     default:

@@ -1177,6 +1177,7 @@ CShape.prototype.getHierarchy = function () {
                 }
 
                 case AscFormat.TYPE_KIND.LAYOUT:
+                case AscFormat.TYPE_KIND.NOTES:
                 {
                     hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
                     break;
@@ -2627,6 +2628,7 @@ CShape.prototype.checkExtentsByAutofit = function(oShape)
 
 CShape.prototype.recalculateLocalTransform = function(transform)
 {
+    var bNotesShape = false;
     if (!isRealObject(this.group))
     {
         if(this.drawingBase  && this.fromSerialize)
@@ -2685,7 +2687,17 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                 this.y = metrics.y + metricExtY/2 - metricExtX/2;
             }
         }
-
+        else if(typeof AscCommonSlide !== "undefined" && AscCommonSlide
+            && AscCommonSlide.CNotes && this.parent && this.parent instanceof AscCommonSlide.CNotes){
+            bNotesShape = true;
+            this.x = 0;
+            this.y = 0;
+            this.extX = this.parent.getWidth();
+            this.extY = 2000;
+            this.rot = 0;
+            this.flipH = false;
+            this.flipV = false;
+        }
         else if (this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNull())
         {
             var xfrm = this.spPr.xfrm;
@@ -2901,7 +2913,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
     }
 
 
-    if(this.checkAutofit && this.checkAutofit() && (!this.bWordShape || !this.group || this.bCheckAutoFitFlag)) {
+    if(this.checkAutofit && this.checkAutofit() && (!this.bWordShape || !this.group || this.bCheckAutoFitFlag) && !bNotesShape) {
         var oBodyPr = this.getBodyPr();
         if (this.bWordShape) {
             if (this.recalcInfo.recalculateTxBoxContent) {

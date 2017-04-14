@@ -497,6 +497,9 @@ function CPresentation(DrawingDocument)
     this.oLastCheckContent = null;
     this.CompositeInput    = null;
 
+
+    this.Spelling = new CDocumentSpelling();
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //

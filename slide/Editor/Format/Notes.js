@@ -9,12 +9,16 @@
     AscDFH.changesFactory[AscDFH.historyitem_NotesRemoveFromTree]  = AscDFH.CChangesDrawingsContentPresentation;
     AscDFH.changesFactory[AscDFH.historyitem_NotesSetBg]  = AscDFH.CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_NotesSetName]        = AscDFH.CChangesDrawingsString;
+    AscDFH.changesFactory[AscDFH.historyitem_NotesSetSlide]        = AscDFH.CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_NotesSetNotesMaster]        = AscDFH.CChangesDrawingsObject;
 
 
     AscDFH.drawingsChangesMap[AscDFH.historyitem_NotesSetClrMap]  = function(oClass, value){oClass.clrMap = value;};
     AscDFH.drawingsChangesMap[AscDFH.historyitem_NotesSetShowMasterPhAnim]  = function(oClass, value){oClass.showMasterPhAnim = value;};
     AscDFH.drawingsChangesMap[AscDFH.historyitem_NotesSetShowMasterSp]  = function(oClass, value){oClass.showMasterSp = value;};
     AscDFH.drawingsChangesMap[AscDFH.historyitem_NotesSetName]        = function(oClass, value){oClass.cSld.name = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_NotesSetSlide]        = function(oClass, value){oClass.slide = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_NotesSetNotesMaster]        = function(oClass, value){oClass.Master = value;};
     AscDFH.drawingsChangesMap[AscDFH.historyitem_NotesSetBg]  = function(oClass, value, FromLoad){
         oClass.cSld.Bg = value;
         if(FromLoad){
@@ -38,15 +42,37 @@
     AscDFH.drawingContentChanges[AscDFH.historyitem_NotesAddToSpTree]    = function(oClass){return oClass.cSld.spTree;};
     AscDFH.drawingContentChanges[AscDFH.historyitem_NotesRemoveFromTree] = function(oClass){return oClass.cSld.spTree;};
 
+    //Temporary function
+    function GetNotesWidth(){
+        return editor.WordControl.m_oNotes.HtmlElement.width/g_dKoef_mm_to_pix;
+    }
+
     function CNotes(){
         this.clrMap = null;
         this.cSld = new AscFormat.CSld();
         this.showMasterPhAnim = null;
         this.showMasterSp     = null;
+        this.slide            = null;
 
+        this.Master      = null;
+
+        this.kind = AscFormat.TYPE_KIND.NOTES;
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
         AscCommon.g_oTableId.Add(this, this.Id);
     }
+
+    CNotes.prototype.getObjectType = function(){
+        return AscDFH.historyitem_type_Notes;
+    };
+
+    CNotes.prototype.Write_ToBinary2 = function(w){
+        w.WriteLong(this.getObjectType());
+        w.WriteString2(this.Id);
+    };
+
+    CNotes.prototype.Read_FromBinary2 = function(r){
+        this.Id = r.GetString();
+    };
 
     CNotes.prototype.setClMapOverride = function(pr){
         History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_NotesSetClrMap, this.clrMap, pr));
@@ -93,7 +119,21 @@
         History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_NotesSetName, this.cSld.name , pr));
         this.cSld.name = pr;
     };
+    CNotes.prototype.setSlide = function(pr){
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_NotesSetSlide, this.slide , pr));
+        this.slide = pr;
+    };
 
+    CNotes.prototype.setNotesMaster = function(pr){
+        History.Add(new AscDFH.CChangesDrawingsObject(this, AscDFH.historyitem_NotesSetNotesMaster, this.Master , pr));
+        this.Master = pr;
+    };
+
+    CNotes.prototype.getMatchingShape = Slide.prototype.getMatchingShape;
+
+    CNotes.prototype.getWidth = function(){
+        return GetNotesWidth();
+    };
 
     CNotes.prototype.recalculate = function(){
         var aSpTree = this.cSld.spTree;
@@ -101,7 +141,21 @@
             var sp = aSpTree[i];
             if(sp.isPlaceholder()){
                 if(sp.getPlaceholderType() === AscFormat.phType_body){
+                    sp.recalculate();
+                    return;
+                }
+            }
+        }
+    };
 
+    CNotes.prototype.draw = function(graphics){
+        return;
+        var aSpTree = this.cSld.spTree;
+        for(var i = 0; i < aSpTree.length; ++i){
+            var sp = aSpTree[i];
+            if(sp.isPlaceholder()){
+                if(sp.getPlaceholderType() === AscFormat.phType_body){
+                    sp.draw(graphics);
                     return;
                 }
             }
