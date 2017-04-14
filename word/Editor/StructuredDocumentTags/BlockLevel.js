@@ -139,6 +139,10 @@ CBlockLevelSdt.prototype.IsInDrawing = function(X, Y, CurPage)
 {
 	return this.Content.IsInDrawing(X, Y, CurPage);
 };
+CBlockLevelSdt.prototype.IsTableBorder = function(X, Y, CurPage)
+{
+	return this.Content.IsTableBorder(X, Y, CurPage);
+};
 CBlockLevelSdt.prototype.Update_CursorType = function(X, Y, CurPage)
 {
 	return this.Content.Update_CursorType(X, Y, CurPage);

@@ -544,10 +544,10 @@ CHeaderFooter.prototype =
             return this.Content.Update_CursorType(X, Y, 0);
     },
 
-    Is_TableBorder : function(X, Y, PageAbs)
+	IsTableBorder : function(X, Y, PageAbs)
     {
         this.Set_Page(PageAbs);
-        return this.Content.Is_TableBorder(X, Y, 0);
+        return this.Content.IsTableBorder(X, Y, 0);
     },
 
 	IsInText : function(X, Y, PageAbs)
@@ -965,9 +965,9 @@ CHeaderFooter.prototype =
         return this.Content.Selection_SetEnd(X, Y, 0, MouseEvent);
     },
 
-    Selection_Is_TableBorderMove : function()
+	IsMovingTableBorder : function()
     {
-        return this.Content.Selection_Is_TableBorderMove();
+        return this.Content.IsMovingTableBorder();
     },
 
 	Selection_Check : function(X, Y, PageAbs, NearPos)
@@ -1720,11 +1720,11 @@ CHeaderFooterController.prototype =
         }
     },
 
-    Is_TableBorder : function( X, Y, PageNum_Abs )
+	IsTableBorder : function( X, Y, PageNum_Abs )
     {
         var HdrFtr = this.Internal_GetContentByXY( X, Y, PageNum_Abs );
         if ( null != HdrFtr )
-            return HdrFtr.Is_TableBorder( X, Y, PageNum_Abs );
+            return HdrFtr.IsTableBorder( X, Y, PageNum_Abs );
 
         return null;
     },
@@ -2278,10 +2278,10 @@ CHeaderFooterController.prototype =
         }
     },
 
-    Selection_Is_TableBorderMove : function()
+	IsMovingTableBorder : function()
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Is_TableBorderMove();
+            return this.CurHdrFtr.IsMovingTableBorder();
 
         return false;
     },

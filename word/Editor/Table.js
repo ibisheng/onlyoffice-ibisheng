@@ -2992,7 +2992,7 @@ CTable.prototype.Is_ContentOnFirstPage = function()
 
 	return false;
 };
-CTable.prototype.Is_TableBorder = function(X, Y, CurPage)
+CTable.prototype.IsTableBorder = function(X, Y, CurPage)
 {
 	if (true === this.DrawingDocument.IsMobileVersion())
 		return null;
@@ -4266,7 +4266,7 @@ CTable.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 	var Pos = Result.Pos;
 	if (-1 === Result.Border)
 	{
-		var bInnerTableBorder = ( null != this.Is_TableBorder(X, Y, CurPage) ? true : false );
+		var bInnerTableBorder = ( null != this.IsTableBorder(X, Y, CurPage) ? true : false );
 		if (true === bInnerTableBorder)
 		{
 			// Значит двигается граница внутренней таблицы, мы не должны отменять селект

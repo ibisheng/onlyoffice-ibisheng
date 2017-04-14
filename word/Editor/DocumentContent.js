@@ -544,17 +544,19 @@ CDocumentContent.prototype.Selection_Is_OneElement      = function()
 
     return (this.Selection.StartPos < this.Selection.EndPos ? 1 : -1);
 };
-CDocumentContent.prototype.Selection_Is_TableBorderMove = function()
+CDocumentContent.prototype.IsMovingTableBorder = function()
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.selectionIsTableBorder();
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType())
-            return true;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.DrawingObjects.selectionIsTableBorder();
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType())
+			return true;
+	}
 
-    return false;
+	return false;
 };
 CDocumentContent.prototype.Check_TableCoincidence       = function(Table)
 {
@@ -1620,19 +1622,14 @@ CDocumentContent.prototype.Get_ParentTextTransform       = function()
     }
     return null;
 };
-CDocumentContent.prototype.Is_TableBorder                = function(X, Y, CurPage)
+CDocumentContent.prototype.IsTableBorder = function(X, Y, CurPage)
 {
-    CurPage = Math.max(0, Math.min(this.Pages.length - 1, CurPage));
+	CurPage = Math.max(0, Math.min(this.Pages.length - 1, CurPage));
 
-    var ElementPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
-    var Element    = this.Content[ElementPos];
-    if (type_Table === Element.GetType())
-    {
-        var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, CurPage, 0, 1);
-        return Element.Is_TableBorder(X, Y, ElementPageIndex);
-    }
-
-    return null;
+	var ElementPos       = this.Internal_GetContentPosByXY(X, Y, CurPage);
+	var Element          = this.Content[ElementPos];
+	var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, CurPage, 0, 1);
+	return Element.IsTableBorder(X, Y, ElementPageIndex);
 };
 CDocumentContent.prototype.IsInText = function(X, Y, CurPage)
 {
@@ -2135,7 +2132,7 @@ CDocumentContent.prototype.Update_CursorType             = function(X, Y, CurPag
         return this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
 
     var bInText      = (null === this.IsInText(X, Y, CurPage) ? false : true);
-    var bTableBorder = (null === this.Is_TableBorder(X, Y, CurPage) ? false : true);
+    var bTableBorder = (null === this.IsTableBorder(X, Y, CurPage) ? false : true);
 
     // Ничего не делаем
     if (this.Parent instanceof CHeaderFooter && true === this.LogicDocument.DrawingObjects.updateCursorType(this.Get_AbsolutePage(CurPage), X, Y, {}, ( true === bInText || true === bTableBorder ? true : false )))
@@ -7106,7 +7103,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 
     // Сначала проверим, не попали ли мы в один из "плавающих" объектов
     var bInText      = (null === this.IsInText(X, Y, AbsPage) ? false : true);
-    var bTableBorder = (null === this.Is_TableBorder(X, Y, AbsPage) ? false : true);
+    var bTableBorder = (null === this.IsTableBorder(X, Y, AbsPage) ? false : true);
     var nInDrawing   = this.LogicDocument && this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, AbsPage, this);
 
     if (this.Parent instanceof CHeaderFooter && ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ) ))
@@ -7160,7 +7157,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 
         var bTableBorder = false;
         if (type_Table == Item.GetType())
-            bTableBorder = ( null != Item.Is_TableBorder(X, Y, AbsPage) ? true : false );
+            bTableBorder = ( null != Item.IsTableBorder(X, Y, AbsPage) ? true : false );
 
         // Убираем селект, кроме случаев либо текущего параграфа, либо при движении границ внутри таблицы
         if (!(true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon))

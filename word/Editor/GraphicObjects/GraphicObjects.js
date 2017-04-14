@@ -1100,7 +1100,7 @@ CGraphicObjects.prototype =
     {
         var content = this.getTargetDocContent();
         if(content)
-            return content.Selection_Is_TableBorderMove();
+            return content.IsMovingTableBorder();
         return false;
     },
 

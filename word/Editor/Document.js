@@ -3541,7 +3541,7 @@ CDocument.prototype.CheckTargetUpdate = function()
 
 	var bFlag = this.Controller.CanUpdateTarget();
 
-	if (true === this.NeedUpdateTarget && true === bFlag && false === this.Selection_Is_TableBorderMove())
+	if (true === this.NeedUpdateTarget && true === bFlag && false === this.IsMovingTableBorder())
 	{
 		// Обновляем курсор сначала, чтобы обновить текущую страницу
 		this.RecalculateCurPos();
@@ -5014,7 +5014,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 	this.Reset_WordSelection();
 
     var bInText      = (null === this.IsInText(X, Y, this.CurPage) ? false : true);
-    var bTableBorder = (null === this.Is_TableBorder(X, Y, this.CurPage) ? false : true);
+    var bTableBorder = (null === this.IsTableBorder(X, Y, this.CurPage) ? false : true);
     var nInDrawing   = this.DrawingObjects.isPointInDrawingObjects(X, Y, this.CurPage, this);
 	var bFlowTable   = (null === this.DrawingObjects.getTableByXY(X, Y, this.CurPage, this) ? false : true);
 
@@ -5126,7 +5126,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
         if (type_Table == Item.GetType())
         {
             var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
-            bTableBorder         = null === Item.Is_TableBorder(X, Y, ElementPageIndex) ? false : true;
+            bTableBorder         = null === Item.IsTableBorder(X, Y, ElementPageIndex) ? false : true;
         }
 
         // Убираем селект, кроме случаев либо текущего параграфа, либо при движении границ внутри таблицы
@@ -5250,7 +5250,7 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
 	}
 
     // Обрабатываем движение границы у таблиц
-    if (true === this.Selection_Is_TableBorderMove())
+    if (true === this.IsMovingTableBorder())
     {
         var Item             = this.Content[this.Selection.Data.Pos];
         var ElementPageIndex = this.private_GetElementPageIndexByXY(this.Selection.Data.Pos, X, Y, this.CurPage);
@@ -5417,7 +5417,7 @@ CDocument.prototype.Selection_Is_OneElement = function()
 
 	return (this.Selection.StartPos < this.Selection.EndPos ? 1 : -1);
 };
-CDocument.prototype.Selection_Is_TableBorderMove = function()
+CDocument.prototype.IsMovingTableBorder = function()
 {
 	return this.Controller.IsMovingTableBorder();
 };
@@ -5937,14 +5937,14 @@ CDocument.prototype.Update_CursorType = function(X, Y, PageAbs, MouseEvent)
  * @param PageIndex
  * @returns {?CTable} null - не попали, а если попали возвращается указатель на таблицу
  */
-CDocument.prototype.Is_TableBorder = function(X, Y, PageIndex)
+CDocument.prototype.IsTableBorder = function(X, Y, PageIndex)
 {
 	if (PageIndex >= this.Pages.length || PageIndex < 0)
 		return null;
 
 	if (docpostype_HdrFtr === this.Get_DocPosType())
 	{
-		return this.HdrFtr.Is_TableBorder(X, Y, PageIndex);
+		return this.HdrFtr.IsTableBorder(X, Y, PageIndex);
 	}
 	else
 	{
@@ -5962,11 +5962,7 @@ CDocument.prototype.Is_TableBorder = function(X, Y, PageIndex)
 			var ElementPos       = this.Internal_GetContentPosByXY(X, Y, PageIndex, ColumnsInfo);
 			var Element          = this.Content[ElementPos];
 			var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, PageIndex, ColumnsInfo.Column, ColumnsInfo.Column, ColumnsInfo.ColumnsCount);
-
-			if (type_Table === Element.GetType())
-				return Element.Is_TableBorder(X, Y, ElementPageIndex);
-			else
-				return null;
+			return Element.IsTableBorder(X, Y, ElementPageIndex);
 		}
 	}
 };
@@ -9959,7 +9955,7 @@ CDocument.prototype.Continue_FastCollaborativeEditing = function()
 	if (true !== this.CollaborativeEditing.Is_Fast() || true === this.CollaborativeEditing.Is_SingleUser())
 		return;
 
-	if (true === this.Selection_Is_TableBorderMove() || true === this.Api.isStartAddShape || this.DrawingObjects.checkTrackDrawings() || this.Api.isOpenedChartFrame)
+	if (true === this.IsMovingTableBorder() || true === this.Api.isStartAddShape || this.DrawingObjects.checkTrackDrawings() || this.Api.isOpenedChartFrame)
 		return;
 
 	var HaveChanges = this.History.Have_Changes(true);
@@ -14873,7 +14869,7 @@ CDocument.prototype.controller_IsEmptySelection = function(bCheckHidden)
 	{
 		if (selectionflag_Numbering == this.Selection.Flag)
 			return false;
-		else if (true === this.Selection_Is_TableBorderMove())
+		else if (true === this.IsMovingTableBorder())
 			return false;
 		else
 		{
@@ -15094,7 +15090,7 @@ CDocument.prototype.controller_GetSelectedContent = function(SelectedContent)
 CDocument.prototype.controller_UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
 {
 	var bInText      = (null === this.IsInText(X, Y, PageAbs) ? false : true);
-	var bTableBorder = (null === this.Is_TableBorder(X, Y, PageAbs) ? false : true);
+	var bTableBorder = (null === this.IsTableBorder(X, Y, PageAbs) ? false : true);
 
 	// Ничего не делаем
 	if (true === this.DrawingObjects.updateCursorType(PageAbs, X, Y, MouseEvent, ( true === bInText || true === bTableBorder ? true : false )))
@@ -15523,7 +15519,7 @@ CDocument.prototype.controller_UpdateSelectionState = function()
 			this.DrawingDocument.SelectShow();
 		}
 		// Обрабатываем движение границы у таблиц
-		else if (true === this.Selection_Is_TableBorderMove())
+		else if (true === this.IsMovingTableBorder())
 		{
 			// Убираем курсор, если он был
 			this.DrawingDocument.TargetEnd();

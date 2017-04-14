@@ -1077,10 +1077,10 @@ ParaDrawing.prototype.setParagraphTabs = function(tabs)
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.setParagraphTabs === "function")
 		this.GraphicObj.setParagraphTabs(tabs);
 };
-ParaDrawing.prototype.Selection_Is_TableBorderMove = function()
+ParaDrawing.prototype.IsMovingTableBorder = function()
 {
-	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.Selection_Is_TableBorderMove === "function")
-		return this.GraphicObj.Selection_Is_TableBorderMove();
+	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.IsMovingTableBorder === "function")
+		return this.GraphicObj.IsMovingTableBorder();
 	return false;
 };
 ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin, LineNum)

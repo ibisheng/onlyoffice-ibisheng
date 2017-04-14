@@ -791,7 +791,7 @@ CFootnotesController.prototype.IsTableBorder = function(X, Y, PageAbs)
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		return oFootnote.Is_TableBorder(X, Y, oResult.FootnotePageIndex);
+		return oFootnote.IsTableBorder(X, Y, oResult.FootnotePageIndex);
 	}
 
 	return null;
@@ -2513,7 +2513,7 @@ CFootnotesController.prototype.IsMovingTableBorder = function()
 	if (true !== this.private_IsOnFootnoteSelected())
 		return false;
 
-	return this.CurFootnote.Selection_Is_TableBorderMove();
+	return this.CurFootnote.IsMovingTableBorder();
 };
 CFootnotesController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {

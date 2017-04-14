@@ -245,7 +245,7 @@ CHdrFtrController.prototype.GetSelectionBounds = function()
 };
 CHdrFtrController.prototype.IsMovingTableBorder = function()
 {
-	return this.HdrFtr.Selection_Is_TableBorderMove();
+	return this.HdrFtr.IsMovingTableBorder();
 };
 CHdrFtrController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {

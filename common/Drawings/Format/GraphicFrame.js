@@ -691,7 +691,7 @@ CGraphicFrame.prototype.selectionSetStart = function(e, x, y, slideIndex)
             ty = this.invertTransform.TransformPointY(x, y);
             if(AscCommon.g_mouse_event_type_down === e.Type)
             {
-                if(this.graphicObject.Is_TableBorder( tx, ty, 0))
+                if(this.graphicObject.IsTableBorder( tx, ty, 0))
                 {
                     if(!editor.isViewMode && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
                     {

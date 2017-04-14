@@ -841,7 +841,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Is_TableBorder(_X, _Y, CurPage);
+        return this.Content.IsTableBorder(_X, _Y, CurPage);
     },
 
     Content_Is_InText : function(X, Y, CurPage)

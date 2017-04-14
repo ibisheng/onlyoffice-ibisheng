@@ -151,11 +151,15 @@ CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
 };
 CDocumentContentElementBase.prototype.IsInText = function(X, Y, CurPage)
 {
-	return false;
+	return null;
 };
 CDocumentContentElementBase.prototype.IsInDrawing = function(X, Y, CurPage)
 {
 	return false;
+};
+CDocumentContentElementBase.prototype.IsTableBorder = function(X, Y, CurPage)
+{
+	return null;
 };
 CDocumentContentElementBase.prototype.Update_CursorType = function(X, Y, CurPage)
 {

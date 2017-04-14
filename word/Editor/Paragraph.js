@@ -12050,6 +12050,10 @@ Paragraph.prototype.IsInDrawing = function(X, Y, CurPage)
 {
 	return false;
 };
+Paragraph.prototype.IsTableBorder = function(X, Y, CurPage)
+{
+	return null;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
