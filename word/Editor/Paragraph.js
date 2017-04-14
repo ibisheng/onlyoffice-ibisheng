@@ -12054,6 +12054,14 @@ Paragraph.prototype.IsTableBorder = function(X, Y, CurPage)
 {
 	return null;
 };
+Paragraph.prototype.GetNumberingInfo = function(oNumberingEngine)
+{
+	if (!oNumberingEngine || oNumberingEngine.Is_Found())
+		return;
+
+	oNumberingEngine.Check_Paragraph(this);
+};
+
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

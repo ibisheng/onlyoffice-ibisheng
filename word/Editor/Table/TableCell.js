@@ -535,7 +535,7 @@ CTableCell.prototype =
         return false;
     },
 
-    Get_NumberingInfo : function(NumPr)
+	GetNumberingInfo : function(NumPr)
     {
         var Parent = this.Row.Table.Parent;
         if (Parent && Parent.Internal_GetNumInfo)

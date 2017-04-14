@@ -342,7 +342,7 @@ CDocumentContent.prototype.Internal_GetNumInfo             = function(ParaId, Nu
     if (TopDocument instanceof CFootEndnote)
 		return TopDocument.Parent.GetNumberingInfo(ParaId, NumPr, TopDocument);
 
-    return TopDocument.Get_NumberingInfo(null, ParaId, NumPr);
+    return TopDocument.GetNumberingInfo(null, ParaId, NumPr);
 };
 CDocumentContent.prototype.Get_Styles                      = function(lvl)
 {
@@ -9126,27 +9126,6 @@ CDocumentContent.prototype.Get_TopDocumentContent = function()
         return TopDocument;
 
     return this;
-};
-CDocumentContent.prototype.Get_NumberingInfo = function(NumberingEngine, ParaId, NumPr)
-{
-    if (undefined === NumberingEngine || null === NumberingEngine)
-        NumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
-
-    for (var Index = 0; Index < this.Content.length; ++Index)
-    {
-        var Item = this.Content[Index];
-        var ItemType = Item.Get_Type();
-
-        if (type_Paragraph === ItemType)
-            NumberingEngine.Check_Paragraph(Item);
-        else if (type_Table === ItemType)
-            Item.Get_NumberingInfo(NumberingEngine);
-
-        if (true === NumberingEngine.Is_Found())
-            break;
-    }
-
-    return NumberingEngine.Get_NumInfo();
 };
 CDocumentContent.prototype.private_RecalculateNumbering = function(Elements)
 {

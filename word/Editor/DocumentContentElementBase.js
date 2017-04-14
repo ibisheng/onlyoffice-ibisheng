@@ -391,6 +391,9 @@ CDocumentContentElementBase.prototype.GetContentPosition = function(bSelection, 
 CDocumentContentElementBase.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
 };
+CDocumentContentElementBase.prototype.GetNumberingInfo = function(oNumberingEngine)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

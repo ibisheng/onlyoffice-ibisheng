@@ -303,6 +303,10 @@ CBlockLevelSdt.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
 	this.Content.SetContentPosition(DocPos, Depth, Flag);
 };
+CBlockLevelSdt.prototype.GetNumberingInfo = function(oNumberingEngine)
+{
+	return this.Content.GetNumberingInfo(oNumberingEngine);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

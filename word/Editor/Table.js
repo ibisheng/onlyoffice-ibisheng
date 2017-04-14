@@ -11718,7 +11718,7 @@ CTable.prototype.Correct_BadTable = function()
     this.Internal_Check_TableRows(false);
 	this.CorrectBadGrid();
 };
-CTable.prototype.Get_NumberingInfo = function(NumberingEngine)
+CTable.prototype.GetNumberingInfo = function(NumberingEngine)
 {
     if (NumberingEngine.Is_Found())
         return;
@@ -11729,7 +11729,7 @@ CTable.prototype.Get_NumberingInfo = function(NumberingEngine)
         for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; ++CurCell)
         {
             var Cell = Row.Get_Cell(CurCell);
-            Cell.Content.Get_NumberingInfo(NumberingEngine);
+            Cell.Content.GetNumberingInfo(NumberingEngine);
 
             if (NumberingEngine.Is_Found())
                 return;
