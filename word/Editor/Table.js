@@ -4874,7 +4874,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 	this.Selection.CurRow            = Pos.Row;
 
 	// При селекте внутри ячейки мы селектим содержимое ячейки
-	if (0 === this.Parent.Selection_Is_OneElement() && this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell)
+	if (0 === this.Parent.GetSelectDirection() && this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell)
 	{
 		this.CurCell.Content_Selection_SetStart(this.Selection.StartPos.X, this.Selection.StartPos.Y, this.Selection.StartPos.PageIndex - this.CurCell.Content.Get_StartPage_Relative(), this.Selection.StartPos.MouseEvent);
 
@@ -5496,7 +5496,7 @@ CTable.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
 			var StartPos = this.Selection.StartPos.Pos;
 			var EndPos   = this.Selection.EndPos.Pos;
 
-			if (StartPos.Cell == EndPos.Cell && StartPos.Row == EndPos.Row && 0 === this.Parent.Selection_Is_OneElement())
+			if (StartPos.Cell == EndPos.Cell && StartPos.Row == EndPos.Row && 0 === this.Parent.GetSelectDirection())
 			{
 				// Если была выделена одна ячейка, тогда мы убираем выделение по ячейкам
 				this.Selection.Type = table_Selection_Text;
@@ -5513,17 +5513,17 @@ CTable.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
 				// тогда мы выделаяем первую строку
 
 				var bRet = true;
-				if (0 == EndPos.Cell && 0 == EndPos.Row || ( 0 !== this.Parent.Selection_Is_OneElement() && 0 == EndPos.Row && 0 == StartPos.Row ))
+				if (0 == EndPos.Cell && 0 == EndPos.Row || ( 0 !== this.Parent.GetSelectDirection() && 0 == EndPos.Row && 0 == StartPos.Row ))
 				{
 					this.Selection.EndPos.Pos = {Cell : 0, Row : 0};
 					bRet                      = false;
 				}
 				//else if ( EndPos.Cell > 0 && EndPos.Cell > StartPos.Cell && 0 ===
-				// this.Parent.Selection_Is_OneElement() ) this.Selection.EndPos.Pos = { Cell : EndPos.Cell - 1, Row :
+				// this.Parent.GetSelectDirection() ) this.Selection.EndPos.Pos = { Cell : EndPos.Cell - 1, Row :
 				// EndPos.Row }; else if ( EndPos.Row > 0 && EndPos.Row > StartPos.Row && 0 ===
-				// this.Parent.Selection_Is_OneElement() ) this.Selection.EndPos.Pos = { Cell : Math.min( EndPos.Cell,
+				// this.Parent.GetSelectDirection() ) this.Selection.EndPos.Pos = { Cell : Math.min( EndPos.Cell,
 				// this.Content[EndPos.Row - 1].Get_CellsCount() - 1 ), Row : EndPos.Row - 1 };
-				else if (EndPos.Cell > 0 && 0 === this.Parent.Selection_Is_OneElement())
+				else if (EndPos.Cell > 0 && 0 === this.Parent.GetSelectDirection())
 					this.Selection.EndPos.Pos = {Cell : EndPos.Cell - 1, Row : EndPos.Row};
 				else
 					this.Selection.EndPos.Pos = {Cell : 0, Row : EndPos.Row - 1};
@@ -5654,7 +5654,7 @@ CTable.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word, FromPaste
 			var StartPos = this.Selection.StartPos.Pos;
 			var EndPos   = this.Selection.EndPos.Pos;
 
-			if (StartPos.Cell == EndPos.Cell && StartPos.Row == EndPos.Row && 0 === this.Parent.Selection_Is_OneElement())
+			if (StartPos.Cell == EndPos.Cell && StartPos.Row == EndPos.Row && 0 === this.Parent.GetSelectDirection())
 			{
 				// Если была выделена одна ячейка, тогда мы убираем выделение по ячейкам
 				this.Selection.Type = table_Selection_Text;
@@ -5667,17 +5667,17 @@ CTable.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word, FromPaste
 				var EndRow  = this.Content[EndPos.Row];
 
 				var bRet = true;
-				if ((LastRow.Get_CellsCount() - 1 == EndPos.Cell && this.Content.length - 1 == EndPos.Row) || ( 0 !== this.Parent.Selection_Is_OneElement() && this.Content.length - 1 == EndPos.Row && this.Content.length - 1 == StartPos.Row ))
+				if ((LastRow.Get_CellsCount() - 1 == EndPos.Cell && this.Content.length - 1 == EndPos.Row) || ( 0 !== this.Parent.GetSelectDirection() && this.Content.length - 1 == EndPos.Row && this.Content.length - 1 == StartPos.Row ))
 				{
 					this.Selection.EndPos.Pos = {Cell : LastRow.Get_CellsCount() - 1, Row : LastRow.Index};
 					bRet                      = false;
 				}
 				//else if ( EndPos.Cell < EndRow.Get_CellsCount() - 1 && EndPos.Cell < StartPos.Cell && 0 ===
-				// this.Parent.Selection_Is_OneElement() ) this.Selection.EndPos.Pos = { Cell : EndPos.Cell + 1, Row :
+				// this.Parent.GetSelectDirection() ) this.Selection.EndPos.Pos = { Cell : EndPos.Cell + 1, Row :
 				// EndPos.Row }; else if ( EndPos.Row < this.Content.length - 1 && EndPos.Row < StartPos.Row && 0 ===
-				// this.Parent.Selection_Is_OneElement() ) this.Selection.EndPos.Pos = { Cell : Math.min( EndPos.Cell,
+				// this.Parent.GetSelectDirection() ) this.Selection.EndPos.Pos = { Cell : Math.min( EndPos.Cell,
 				// this.Content[EndPos.Row + 1].Get_CellsCount() - 1 ), Row : EndPos.Row + 1 };
-				else if (EndPos.Cell < EndRow.Get_CellsCount() - 1 && 0 === this.Parent.Selection_Is_OneElement())
+				else if (EndPos.Cell < EndRow.Get_CellsCount() - 1 && 0 === this.Parent.GetSelectDirection())
 					this.Selection.EndPos.Pos = {Cell : EndPos.Cell + 1, Row : EndPos.Row};
 				else
 					this.Selection.EndPos.Pos = {
@@ -10742,7 +10742,7 @@ CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
 	this.Selection.Type = table_Selection_Cell;
 	this.Selection.Data = [];
 
-	if (0 === this.Parent.Selection_Is_OneElement() && false == bForceSelectByLines)
+	if (0 === this.Parent.GetSelectDirection() && false == bForceSelectByLines)
 	{
 		// Определяем ячейки, которые попали в наш селект
 		// Алгоритм следующий:

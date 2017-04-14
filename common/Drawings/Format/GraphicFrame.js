@@ -444,7 +444,7 @@ CGraphicFrame.prototype.recalculateSizes = function()
         }
 };
 
-CGraphicFrame.prototype.Selection_Is_OneElement = function()
+CGraphicFrame.prototype.GetSelectDirection = function()
     {
         return 0;
 };

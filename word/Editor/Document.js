@@ -5410,7 +5410,7 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
  * пределах одного элеменета.
  * @returns {number} Возвращается направление селекта. 0 - если выделен 1 элемент.
  */
-CDocument.prototype.Selection_Is_OneElement = function()
+CDocument.prototype.GetSelectDirection = function()
 {
 	if (true === this.Selection.Use && docpostype_Content === this.Get_DocPosType() && this.Selection.Flag === selectionflag_Common && this.Selection.StartPos === this.Selection.EndPos)
 		return 0;
