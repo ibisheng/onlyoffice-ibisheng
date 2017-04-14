@@ -1,10 +1,10 @@
-Этот документ описывает последовательность шагов для сборки SDK.
+This document describes the steps needed to build SDK.
 
-1. Установка необходимого ПО.
-	- Скачать и установить nodejs (https://nodejs.org/en/download/).
-	- Скачать и установить Java (http://java.com/ru/download/index.jsp).
+1. Required software installation:
+	- Download and install nodejs (https://nodejs.org/en/download/).
+	- Download and install Java (http://java.com/en/download/index.jsp).
 	
-2. Сборка.
+2. SDK build:
 	- npm install -g grunt-cli
 	- npm install
 	- grunt
