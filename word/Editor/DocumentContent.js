@@ -2334,53 +2334,53 @@ CDocumentContent.prototype.Extend_ToPos                       = function(X, Y)
 
     this.LogicDocument.Recalculate();
 };
-CDocumentContent.prototype.AddInlineImage                    = function(W, H, Img, Chart, bFlow)
+CDocumentContent.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.DrawingObjects.addInlineImage(W, H, Img, Chart, bFlow);
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true == this.Selection.Use)
-            this.Remove(1, true);
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.DrawingObjects.addInlineImage(W, H, Img, Chart, bFlow);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (true == this.Selection.Use)
+			this.Remove(1, true);
 
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            var Drawing;
-            if (!AscCommon.isRealObject(Chart))
-            {
-                Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
-                var Image = this.DrawingObjects.createImage(Img, 0, 0, W, H);
-                Image.setParent(Drawing);
-                Drawing.Set_GraphicObject(Image);
-            }
-            else
-            {
-                Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
-                var Image = this.DrawingObjects.getChartSpace2(Chart, null);
-                Image.setParent(Drawing);
-                Drawing.Set_GraphicObject(Image);
-                Drawing.setExtent(Image.spPr.xfrm.extX, Image.spPr.xfrm.extY);
-            }
-            if (true === bFlow)
-            {
-                Drawing.Set_DrawingType(drawing_Anchor);
-                Drawing.Set_WrappingType(WRAPPING_TYPE_SQUARE);
-                Drawing.Set_BehindDoc(false);
-                Drawing.Set_Distance(3.2, 0, 3.2, 0);
-                Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
-                Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
-            }
-            this.Paragraph_Add(Drawing);
-            this.Select_DrawingObject(Drawing.Get_Id());
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.AddInlineImage(W, H, Img, Chart, bFlow);
-        }
-    }
+		var Item = this.Content[this.CurPos.ContentPos];
+		if (type_Paragraph == Item.GetType())
+		{
+			var Drawing;
+			if (!AscCommon.isRealObject(Chart))
+			{
+				Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
+				var Image = this.DrawingObjects.createImage(Img, 0, 0, W, H);
+				Image.setParent(Drawing);
+				Drawing.Set_GraphicObject(Image);
+			}
+			else
+			{
+				Drawing   = new ParaDrawing(W, H, null, this.DrawingDocument, this, null);
+				var Image = this.DrawingObjects.getChartSpace2(Chart, null);
+				Image.setParent(Drawing);
+				Drawing.Set_GraphicObject(Image);
+				Drawing.setExtent(Image.spPr.xfrm.extX, Image.spPr.xfrm.extY);
+			}
+			if (true === bFlow)
+			{
+				Drawing.Set_DrawingType(drawing_Anchor);
+				Drawing.Set_WrappingType(WRAPPING_TYPE_SQUARE);
+				Drawing.Set_BehindDoc(false);
+				Drawing.Set_Distance(3.2, 0, 3.2, 0);
+				Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
+				Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
+			}
+			this.Paragraph_Add(Drawing);
+			this.Select_DrawingObject(Drawing.Get_Id());
+		}
+		else
+		{
+			Item.AddInlineImage(W, H, Img, Chart, bFlow);
+		}
+	}
 };
 CDocumentContent.prototype.Add_OleObject                    = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {

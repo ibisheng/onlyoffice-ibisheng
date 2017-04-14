@@ -309,7 +309,7 @@ CBlockLevelSdt.prototype.GetNumberingInfo = function(oNumberingEngine)
 };
 CBlockLevelSdt.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 {
-	this.Content.AddInlineImage(W, H, Img, Char, bFlow);
+	this.Content.AddInlineImage(W, H, Img, Chart, bFlow);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)

@@ -11461,7 +11461,7 @@ CDocument.prototype.controller_AddInlineImage = function(W, H, Img, Chart, bFlow
 		this.Paragraph_Add(Drawing);
 		this.Select_DrawingObject(Drawing.Get_Id());
 	}
-	else if (type_Table == Item.GetType())
+	else
 	{
 		Item.AddInlineImage(W, H, Img, Chart, bFlow);
 	}
