@@ -464,7 +464,6 @@ CShape.prototype.recalculate = function ()
     var check_slide_placeholder = !this.isPlaceholder() || (this.parent && (this.parent.getObjectType() === AscDFH.historyitem_type_Slide || this.parent.getObjectType() === AscDFH.historyitem_type_Notes));
     AscFormat.ExecuteNoHistory(function(){
 
-
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
             this.recalcInfo.recalculateBrush = false;

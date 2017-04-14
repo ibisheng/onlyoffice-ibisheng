@@ -59,6 +59,9 @@
         this.kind = AscFormat.TYPE_KIND.NOTES;
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
         AscCommon.g_oTableId.Add(this, this.Id);
+
+
+        this.graphicObjects = new AscFormat.DrawingObjectsController(this);
     }
 
     CNotes.prototype.getObjectType = function(){
@@ -135,21 +138,23 @@
         return GetNotesWidth();
     };
 
-    CNotes.prototype.recalculate = function(){
+    CNotes.prototype.getBodyShape = function(){
         var aSpTree = this.cSld.spTree;
         for(var i = 0; i < aSpTree.length; ++i){
             var sp = aSpTree[i];
             if(sp.isPlaceholder()){
                 if(sp.getPlaceholderType() === AscFormat.phType_body){
-                    sp.recalculate();
-                    return;
+                    return sp;
                 }
             }
         }
+        return null;
+    };
+
+    CNotes.prototype.recalculate = function(){
     };
 
     CNotes.prototype.draw = function(graphics){
-        return;
         var aSpTree = this.cSld.spTree;
         for(var i = 0; i < aSpTree.length; ++i){
             var sp = aSpTree[i];
@@ -165,4 +170,5 @@
 
     window['AscCommonSlide'] = window['AscCommonSlide'] || {};
     window['AscCommonSlide'].CNotes = CNotes;
+    window['AscCommonSlide'].GetNotesWidth = GetNotesWidth;
 })();

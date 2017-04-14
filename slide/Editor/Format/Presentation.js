@@ -3226,6 +3226,31 @@ CPresentation.prototype =
     },
 
 
+    notes_OnMouseDown : function(e, X, Y)
+    {
+
+    },
+
+    notes_OnMouseUp : function(e, X, Y)
+    {
+
+    },
+
+    notes_OnMouseMove : function(e, X, Y)
+    {
+    },
+
+    notes_OnKeyDown: function(e){
+
+    },
+
+    notes_OnKeyPress: function(e){
+
+    },
+
+    OnUpdateSize: function(){
+
+    },
 
     Get_TableStyleForPara : function()
     {

@@ -2691,7 +2691,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
             && AscCommonSlide.CNotes && this.parent && this.parent instanceof AscCommonSlide.CNotes){
             bNotesShape = true;
             this.x = 0;
-            this.y = 0;
+            this.y = editor.WordControl.m_oLogicDocument.Height;
             this.extX = this.parent.getWidth();
             this.extY = 2000;
             this.rot = 0;

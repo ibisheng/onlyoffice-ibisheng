@@ -200,6 +200,8 @@ function Slide(presentation, slideLayout, slideNum)
     g_oTableId.Add(this, this.Id);
 
 
+    this.notesShape = null;
+
     this.lastLayoutType = null;
     this.lastLayoutMatchingName = null;
     this.lastLayoutName = null;
@@ -932,9 +934,7 @@ Slide.prototype =
             this.recalculateSpTree();
             this.recalcInfo.recalculateSpTree = false;
         }
-        if(this.notes){
-            this.notes.recalculate();
-        }
+        this.recalculateNotesShape();
         this.cachedImage = null;
     },
 
@@ -1009,6 +1009,28 @@ Slide.prototype =
             this.cSld.spTree[i].recalculate();
     },
 
+    recalculateNotesShape: function(){
+        AscFormat.ExecuteNoHistory(function(){
+            if(!this.notes){
+                this.notesShape = null;//ToDo: Create notes body shape
+            }
+            else{
+                this.notesShape = this.notes.getBodyShape();
+            }
+            if(this.notesShape){
+                var oDocContent = this.notesShape.getDocContent();
+                if(oDocContent){
+                    this.notesShape.transformText.tx = 3;
+                    this.notesShape.transformText.ty = 3;
+                    this.notesShape.invertTransformText = AscCommon.global_MatrixTransformer.Invert(this.notesShape.transformText);
+                    var Width = AscCommonSlide.GetNotesWidth();
+                    oDocContent.Reset(0, 0, Width, 2000);
+                    oDocContent.Recalculate_Page(0, true);
+                }
+            }
+        }, this, []);
+    },
+
     draw: function(graphics)
     {
         DrawBackground(graphics, this.backgroundFill, this.Width, this.Height);
@@ -1032,8 +1054,9 @@ Slide.prototype =
                 comments[i].draw(graphics);
             }
         }
-        if(this.notes){
-            this.notes.draw(graphics);
+        return;
+        if(this.notesShape){
+            this.notesShape.draw(graphics);
         }
     },
 
