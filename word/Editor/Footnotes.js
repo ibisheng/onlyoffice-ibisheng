@@ -1375,7 +1375,7 @@ CFootnotesController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightP
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+	return this.CurFootnote.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
 CFootnotesController.prototype.AddTextArt = function(nStyle)
 {

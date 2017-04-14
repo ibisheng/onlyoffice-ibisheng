@@ -5283,11 +5283,11 @@ CTable.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 	this.Selection.Type = table_Selection_Text;
 	this.CurCell.Content.AddInlineImage(W, H, Img, Chart, bFlow);
 };
-CTable.prototype.Add_OleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+CTable.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 	this.Selection.Use  = true;
 	this.Selection.Type = table_Selection_Text;
-	this.CurCell.Content.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+	this.CurCell.Content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
 CTable.prototype.Add_TextArt = function(nStyle)
 {

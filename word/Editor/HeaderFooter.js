@@ -670,9 +670,9 @@ CHeaderFooter.prototype =
         this.Content.AddInlineImage(W,H,Img, Chart, bFlow);
     },
 
-    Add_OleObject : function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+	AddOleObject : function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
     {
-        this.Content.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+        this.Content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
     },
 
     Add_TextArt : function(nStyle)
@@ -1844,10 +1844,10 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.AddInlineImage(W,H,Img, Chart, bFlow);
     },
 
-    Add_OleObject: function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+	AddOleObject: function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+            return this.CurHdrFtr.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
     },
 
     Add_TextArt : function(nStyle)

@@ -50,7 +50,7 @@ CHdrFtrController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bF
 };
 CHdrFtrController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
-	this.HdrFtr.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+	this.HdrFtr.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
 CHdrFtrController.prototype.AddTextArt = function(nStyle)
 {

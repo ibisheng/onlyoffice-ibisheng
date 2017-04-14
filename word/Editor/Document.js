@@ -4016,11 +4016,11 @@ CDocument.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 
 	this.Controller.AddInlineImage(W, H, Img, Chart, bFlow);
 };
-CDocument.prototype.Add_OleObject  = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+CDocument.prototype.AddOleObject  = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 	this.Controller.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
-CDocument.prototype.Edit_OleObject = function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight)
+CDocument.prototype.EditOleObject = function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight)
 {
 	oOleObject.setData(sData);
 	var _blipFill           = new AscFormat.CBlipFill();
@@ -11481,9 +11481,9 @@ CDocument.prototype.controller_AddOleObject = function(W, H, nWidthPix, nHeightP
 		this.Paragraph_Add(Drawing);
 		this.Select_DrawingObject(Drawing.Get_Id());
 	}
-	else if (type_Table == Item.GetType())
+	else
 	{
-		Item.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+		Item.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 	}
 };
 CDocument.prototype.controller_AddTextArt = function(nStyle)

@@ -1381,13 +1381,13 @@ CGraphicObjects.prototype =
         if(content)
         {
             if(!content.bPresentation){
-                content.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
             }
             else{
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                    this.document.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
                 }
             }
         }
@@ -1397,14 +1397,14 @@ CGraphicObjects.prototype =
             {
                 this.resetInternalSelection();
                 this.document.Remove(1, true);
-                this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                this.document.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
             }
             else
             {
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                    this.document.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
                 }
             }
         }

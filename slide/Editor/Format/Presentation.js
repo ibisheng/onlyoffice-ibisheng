@@ -1571,7 +1571,7 @@ CPresentation.prototype =
         }
     },
 
-    Add_OleObject: function(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
+	AddOleObject: function(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
         if(this.Slides[this.CurPage]){
             var fPosX = (this.Width - fWidth)/2;
             var fPosY = (this.Height - fHeight)/2;
@@ -1585,7 +1585,7 @@ CPresentation.prototype =
         }
     },
 
-    Edit_OleObject: function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight){
+	EditOleObject: function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight){
         oOleObject.setData(sData);
         var _blipFill           = new AscFormat.CBlipFill();
         _blipFill.RasterImageId = sImageUrl;

@@ -2382,7 +2382,7 @@ CDocumentContent.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 		}
 	}
 };
-CDocumentContent.prototype.Add_OleObject                    = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+CDocumentContent.prototype.AddOleObject                    = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
@@ -2404,9 +2404,9 @@ CDocumentContent.prototype.Add_OleObject                    = function(W, H, nWi
             this.Paragraph_Add(Drawing);
             this.Select_DrawingObject(Drawing.Get_Id());
         }
-        else if (type_Table == Item.GetType())
+        else
         {
-            Item.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+            Item.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
         }
     }
 };
