@@ -46,7 +46,7 @@ CHdrFtrController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 };
 CHdrFtrController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
-	this.HdrFtr.Add_InlineImage(nW, nH, oImage, oChart, bFlow);
+	this.HdrFtr.AddInlineImage(nW, nH, oImage, oChart, bFlow);
 };
 CHdrFtrController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {

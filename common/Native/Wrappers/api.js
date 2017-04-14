@@ -4843,7 +4843,7 @@ Asc['asc_docs_api'].prototype.AddImageUrlNative = function(url, _w, _h, _pageNum
 
     if (undefined === _pageNum)
     {
-        this.WordControl.m_oLogicDocument.Add_InlineImage(wI, hI, url);
+        this.WordControl.m_oLogicDocument.AddInlineImage(wI, hI, url);
     }
     else
     {
@@ -4887,9 +4887,9 @@ Asc['asc_docs_api'].prototype.AddImageUrlActionNative = function(src, _w, _h, _p
       }
       this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddImageUrlLong);
       //if (undefined === imgProp || undefined === imgProp.WrappingStyle || 0 == imgProp.WrappingStyle)
-        this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src);
+        this.WordControl.m_oLogicDocument.AddInlineImage(_w, _h, src);
       //else
-      //  this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src, null, true);
+      //  this.WordControl.m_oLogicDocument.AddInlineImage(_w, _h, src, null, true);
     }
   }
 };

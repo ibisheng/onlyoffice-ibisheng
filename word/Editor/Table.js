@@ -5277,11 +5277,11 @@ CTable.prototype.Add_NewParagraph = function()
 {
 	this.CurCell.Content.Add_NewParagraph();
 };
-CTable.prototype.Add_InlineImage = function(W, H, Img, Chart, bFlow)
+CTable.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 {
 	this.Selection.Use  = true;
 	this.Selection.Type = table_Selection_Text;
-	this.CurCell.Content.Add_InlineImage(W, H, Img, Chart, bFlow);
+	this.CurCell.Content.AddInlineImage(W, H, Img, Chart, bFlow);
 };
 CTable.prototype.Add_OleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {

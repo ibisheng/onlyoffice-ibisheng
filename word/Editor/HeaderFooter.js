@@ -665,9 +665,9 @@ CHeaderFooter.prototype =
         this.Content.Add_NewParagraph();
     },
 
-    Add_InlineImage : function(W, H, Img, Chart, bFlow)
+	AddInlineImage : function(W, H, Img, Chart, bFlow)
     {
-        this.Content.Add_InlineImage(W,H,Img, Chart, bFlow);
+        this.Content.AddInlineImage(W,H,Img, Chart, bFlow);
     },
 
     Add_OleObject : function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
@@ -1838,10 +1838,10 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Add_NewParagraph();
     },
 
-    Add_InlineImage : function(W, H, Img, Chart, bFlow)
+	AddInlineImage : function(W, H, Img, Chart, bFlow)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Add_InlineImage(W,H,Img, Chart, bFlow);
+            return this.CurHdrFtr.AddInlineImage(W,H,Img, Chart, bFlow);
     },
 
     Add_OleObject: function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)

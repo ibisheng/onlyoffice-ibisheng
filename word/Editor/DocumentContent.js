@@ -2334,7 +2334,7 @@ CDocumentContent.prototype.Extend_ToPos                       = function(X, Y)
 
     this.LogicDocument.Recalculate();
 };
-CDocumentContent.prototype.Add_InlineImage                    = function(W, H, Img, Chart, bFlow)
+CDocumentContent.prototype.AddInlineImage                    = function(W, H, Img, Chart, bFlow)
 {
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
@@ -2378,7 +2378,7 @@ CDocumentContent.prototype.Add_InlineImage                    = function(W, H, I
         }
         else if (type_Table == Item.GetType())
         {
-            Item.Add_InlineImage(W, H, Img, Chart, bFlow);
+            Item.AddInlineImage(W, H, Img, Chart, bFlow);
         }
     }
 };

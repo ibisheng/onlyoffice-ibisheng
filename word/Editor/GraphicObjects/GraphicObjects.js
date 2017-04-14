@@ -1346,13 +1346,13 @@ CGraphicObjects.prototype =
         if(content)
         {
             if(!content.bPresentation){
-                content.Add_InlineImage(W, H, Img, Chart, bFlow );
+                content.AddInlineImage(W, H, Img, Chart, bFlow );
             }
             else{
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                    this.document.AddInlineImage(W, H, Img, Chart, bFlow );
                 }
             }
         }
@@ -1362,14 +1362,14 @@ CGraphicObjects.prototype =
             {
                 this.resetInternalSelection();
                 this.document.Remove(1, true);
-                this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                this.document.AddInlineImage(W, H, Img, Chart, bFlow );
             }
             else
             {
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                    this.document.AddInlineImage(W, H, Img, Chart, bFlow );
                 }
             }
         }

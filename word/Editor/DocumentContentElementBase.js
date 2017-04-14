@@ -394,6 +394,10 @@ CDocumentContentElementBase.prototype.SetContentPosition = function(DocPos, Dept
 CDocumentContentElementBase.prototype.GetNumberingInfo = function(oNumberingEngine)
 {
 };
+CDocumentContentElementBase.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
+{
+
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

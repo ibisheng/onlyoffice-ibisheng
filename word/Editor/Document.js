@@ -4009,7 +4009,7 @@ CDocument.prototype.CanUnGroup = function()
 {
 	return this.DrawingObjects.canUnGroup();
 };
-CDocument.prototype.Add_InlineImage = function(W, H, Img, Chart, bFlow)
+CDocument.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 {
 	if (undefined === bFlow)
 		bFlow = false;
@@ -11463,7 +11463,7 @@ CDocument.prototype.controller_AddInlineImage = function(W, H, Img, Chart, bFlow
 	}
 	else if (type_Table == Item.GetType())
 	{
-		Item.Add_InlineImage(W, H, Img, Chart, bFlow);
+		Item.AddInlineImage(W, H, Img, Chart, bFlow);
 	}
 };
 CDocument.prototype.controller_AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
