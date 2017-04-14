@@ -1635,6 +1635,8 @@ CDrawingDocument.prototype =
                 this.InlineTextTrack.transform);
         }
 
+        this.Collaborative_TargetsUpdate();
+
         this.Native["DD_Overlay_DrawHorVerAnchor"]();
 
         this.Native["DD_Overlay_UpdateEnd"]();
@@ -3036,7 +3038,25 @@ CDrawingDocument.prototype =
   		if (is_from_paint !== true)
   		{
   			this.CollaborativeTargetsUpdateTasks.push([_id, _shortId, _x, _y, _size, _page, _transform]);
+        this.OnUpdateOverlay();
+        this.EndUpdateOverlay();
   			return;
+  		}
+      else
+      {
+        var color = AscCommon.getUserColorById(_shortId, null, true);
+
+        if (null != _transform) {
+          this.Native["collaborativeUpdateTarget"](_id, _shortId, _x, _y, _size, _page,
+            _transform.sx, _transform.shy, _transform.shx, _transform.sy, _transform.tx, _transform.ty,
+            color.r, color.g, color.b
+          );
+        } else {
+          this.Native["collaborativeUpdateTarget"](_id, _shortId, _x, _y, _size, _page,
+             1.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+             color.r, color.g, color.b
+           );
+        }
   		}
 
   		for (var i = 0; i < this.CollaborativeTargets.length; i++)
@@ -3055,7 +3075,9 @@ CDrawingDocument.prototype =
   	},
   	Collaborative_RemoveTarget : function (_id)
   	{
-  		for (var i = 0; i < this.CollaborativeTargets.length; i++)
+      //this.Native["collaborativeRemoveTarget"](_id);
+
+ 		for (var i = 0; i < this.CollaborativeTargets.length; i++)
   		{
   			if (_id == this.CollaborativeTargets[i].Id)
   			{
@@ -3063,6 +3085,9 @@ CDrawingDocument.prototype =
   				this.CollaborativeTargets.splice(i, 1);
   			}
   		}
+
+      this.OnUpdateOverlay();
+      this.EndUpdateOverlay();
   	},
   	Collaborative_TargetsUpdate : function (bIsChangePosition)
   	{

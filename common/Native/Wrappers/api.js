@@ -120,6 +120,8 @@ Asc['asc_docs_api'].prototype["Call_CheckTargetUpdate"] = function()
     this.WordControl.m_oLogicDocument.CheckTargetUpdate();
     this.WordControl.m_oDrawingDocument.CheckTargetShow();
     this.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
+
+    this.WordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(false);
 };
 
 Asc['asc_docs_api'].prototype["Call_Common"] = function(type, param)
@@ -6066,6 +6068,8 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
     }
 
     window["native"]["onEndLoadingFile"]();
+
+    this.WordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(true);
 
     var t = this;
     setInterval(function() {
