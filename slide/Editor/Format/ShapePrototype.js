@@ -434,6 +434,17 @@ CShape.prototype.getParentObjects = function ()
                     theme: this.themeOverride ? this.themeOverride : this.parent.Theme
                 };
             }
+            case AscDFH.historyitem_type_Notes:
+            {
+                return {
+
+                    presentation: editor.WordControl.m_oLogicDocument,
+                    slide: null,
+                    layout: null,
+                    master: this.parent.Master,
+                    theme: this.themeOverride ? this.themeOverride : (this.parent.Master ? this.parent.Master.Theme : null)
+                }
+            }
         }
     }
     return { slide: null, layout: null, master: null, theme: null};
@@ -450,9 +461,8 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted || !this.parent)
         return;
-    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && this.parent.getObjectType() === AscDFH.historyitem_type_Slide);
+    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && (this.parent.getObjectType() === AscDFH.historyitem_type_Slide || this.parent.getObjectType() === AscDFH.historyitem_type_Notes));
     AscFormat.ExecuteNoHistory(function(){
-
 
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();

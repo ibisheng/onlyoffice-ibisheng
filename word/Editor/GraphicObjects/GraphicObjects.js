@@ -1100,7 +1100,7 @@ CGraphicObjects.prototype =
     {
         var content = this.getTargetDocContent();
         if(content)
-            return content.Selection_Is_TableBorderMove();
+            return content.IsMovingTableBorder();
         return false;
     },
 
@@ -1346,13 +1346,13 @@ CGraphicObjects.prototype =
         if(content)
         {
             if(!content.bPresentation){
-                content.Add_InlineImage(W, H, Img, Chart, bFlow );
+                content.AddInlineImage(W, H, Img, Chart, bFlow );
             }
             else{
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                    this.document.AddInlineImage(W, H, Img, Chart, bFlow );
                 }
             }
         }
@@ -1362,14 +1362,14 @@ CGraphicObjects.prototype =
             {
                 this.resetInternalSelection();
                 this.document.Remove(1, true);
-                this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                this.document.AddInlineImage(W, H, Img, Chart, bFlow );
             }
             else
             {
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                    this.document.AddInlineImage(W, H, Img, Chart, bFlow );
                 }
             }
         }
@@ -1381,13 +1381,13 @@ CGraphicObjects.prototype =
         if(content)
         {
             if(!content.bPresentation){
-                content.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
             }
             else{
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                    this.document.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
                 }
             }
         }
@@ -1397,14 +1397,14 @@ CGraphicObjects.prototype =
             {
                 this.resetInternalSelection();
                 this.document.Remove(1, true);
-                this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                this.document.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
             }
             else
             {
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                    this.document.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
                 }
             }
         }
@@ -3044,9 +3044,9 @@ CGraphicObjects.prototype =
         var oTargetDocContent = this.getTargetDocContent(undefined, true);
         if(oTargetDocContent)
         {
-            oState.Pos      = oTargetDocContent.Get_ContentPosition(false, false, undefined);
-            oState.StartPos = oTargetDocContent.Get_ContentPosition(true, true, undefined);
-            oState.EndPos   = oTargetDocContent.Get_ContentPosition(true, false, undefined);
+            oState.Pos      = oTargetDocContent.GetContentPosition(false, false, undefined);
+            oState.StartPos = oTargetDocContent.GetContentPosition(true, true, undefined);
+            oState.EndPos   = oTargetDocContent.GetContentPosition(true, false, undefined);
             oState.DrawingSelection = oTargetDocContent.Selection.Use;
         }
         oState.DrawingsSelectionState = this.getSelectionState()[0];

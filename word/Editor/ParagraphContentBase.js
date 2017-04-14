@@ -1150,13 +1150,13 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_Text = function(Text)
         this.Content[CurPos].Get_Text( Text );
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_AllParagraphs = function(Props, ParaArray)
+CParagraphContentWithParagraphLikeContent.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
     var ContentLen = this.Content.length;
     for (var CurPos = 0; CurPos < ContentLen; CurPos++)
     {
-        if (this.Content[CurPos].Get_AllParagraphs)
-            this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
+        if (this.Content[CurPos].GetAllParagraphs)
+            this.Content[CurPos].GetAllParagraphs(Props, ParaArray);
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_ClassesByPos = function(Classes, ContentPos, Depth)
@@ -1990,7 +1990,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
         this.Content[StartPos].Set_SelectionContentPos( StartContentPos, EndContentPos, Depth + 1, StartFlag, EndFlag );
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+CParagraphContentWithParagraphLikeContent.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
 	if (this.Content.length <= 0)
 		return;
@@ -2061,11 +2061,11 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ContentSelection = funct
 
     if (StartPos !== EndPos)
     {
-        if (this.Content[StartPos] && this.Content[StartPos].Set_ContentSelection)
-            this.Content[StartPos].Set_ContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
+        if (this.Content[StartPos] && this.Content[StartPos].SetContentSelection)
+            this.Content[StartPos].SetContentSelection(_StartDocPos, null, Depth + 1, _StartFlag, StartPos > EndPos ? 1 : -1);
 
-        if (this.Content[EndPos] && this.Content[EndPos].Set_ContentSelection)
-            this.Content[EndPos].Set_ContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
+        if (this.Content[EndPos] && this.Content[EndPos].SetContentSelection)
+            this.Content[EndPos].SetContentSelection(null, _EndDocPos, Depth + 1, StartPos > EndPos ? -1 : 1, _EndFlag);
 
         var _StartPos = StartPos;
         var _EndPos = EndPos;
@@ -2085,11 +2085,11 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ContentSelection = funct
     }
     else
     {
-        if (this.Content[StartPos] && this.Content[StartPos].Set_ContentSelection)
-            this.Content[StartPos].Set_ContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
+        if (this.Content[StartPos] && this.Content[StartPos].SetContentSelection)
+            this.Content[StartPos].SetContentSelection(_StartDocPos, _EndDocPos, Depth + 1, _StartFlag, _EndFlag);
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+CParagraphContentWithParagraphLikeContent.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
 	if (this.Content.length <= 0)
 		return;
@@ -2132,17 +2132,14 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ContentPosition = functi
     if (this.CurPos)
         this.CurPos = this.State.ContentPos;
 
-    if (this.Content[Pos] && this.Content[Pos].Set_ContentPosition)
-        this.Content[Pos].Set_ContentPosition(_DocPos, Depth + 1, _Flag);
+    if (this.Content[Pos] && this.Content[Pos].SetContentPosition)
+        this.Content[Pos].SetContentPosition(_DocPos, Depth + 1, _Flag);
     else
         this.Content[Pos].Cursor_MoveToStartPos();
 };
 CParagraphContentWithParagraphLikeContent.prototype.Selection_IsUse = function()
 {
     return this.State.Selection.Use;
-};
-CParagraphContentWithParagraphLikeContent.prototype.Selection_Stop = function()
-{
 };
 CParagraphContentWithParagraphLikeContent.prototype.Selection_Remove = function()
 {

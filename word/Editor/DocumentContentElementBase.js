@@ -149,9 +149,23 @@ CDocumentContentElementBase.prototype.Get_PagesCount = function()
 CDocumentContentElementBase.prototype.Document_CreateFontMap = function(FontMap)
 {
 };
-CDocumentContentElementBase.prototype.Is_InText = function(X, Y, CurPage)
+CDocumentContentElementBase.prototype.Document_CreateFontCharMap = function(FontCharMap)
+{
+};
+CDocumentContentElementBase.prototype.Document_Get_AllFontNames = function(AllFonts)
+{
+};
+CDocumentContentElementBase.prototype.IsInText = function(X, Y, CurPage)
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.IsInDrawing = function(X, Y, CurPage)
 {
 	return false;
+};
+CDocumentContentElementBase.prototype.IsTableBorder = function(X, Y, CurPage)
+{
+	return null;
 };
 CDocumentContentElementBase.prototype.Update_CursorType = function(X, Y, CurPage)
 {
@@ -172,6 +186,219 @@ CDocumentContentElementBase.prototype.Get_SelectedElementsInfo = function(oInfo)
 CDocumentContentElementBase.prototype.Document_UpdateRulersState = function(CurPage)
 {
 	this.Content.Document_UpdateRulersState(CurPage);
+};
+CDocumentContentElementBase.prototype.IsSelectionUse = function()
+{
+	return this.Is_SelectionUse();
+};
+CDocumentContentElementBase.prototype.Is_SelectionUse = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.IsSelectionToEnd = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.Selection_Remove = function()
+{
+};
+CDocumentContentElementBase.prototype.RemoveSelection = function()
+{
+	this.Selection_Remove();
+};
+CDocumentContentElementBase.prototype.SetSelectionUse = function(isUse)
+{
+};
+CDocumentContentElementBase.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElementStart)
+{
+};
+CDocumentContentElementBase.prototype.Select_All = function(nDirection)
+{
+};
+CDocumentContentElementBase.prototype.SelectAll = function(nDirection)
+{
+	this.Select_All(nDirection);
+};
+CDocumentContentElementBase.prototype.Get_Paragraph_TextPr = function()
+{
+	return new CTextPr();
+};
+CDocumentContentElementBase.prototype.GetParagraphTextPr = function()
+{
+	return this.Get_Paragraph_TextPr();
+};
+CDocumentContentElementBase.prototype.Get_Paragraph_ParaPr = function()
+{
+	return new CParaPr();
+};
+CDocumentContentElementBase.prototype.GetParagraphParaPr = function()
+{
+	return this.Get_Paragraph_ParaPr();
+};
+CDocumentContentElementBase.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	return this.Hyperlink_CanAdd(bCheckInHyperlink);
+};
+CDocumentContentElementBase.prototype.Selection_Draw_Page = function(CurPage)
+{
+};
+CDocumentContentElementBase.prototype.StopSelection = function()
+{
+};
+CDocumentContentElementBase.prototype.Get_SelectionBounds = function()
+{
+	return {
+		Start     : null,
+		End       : null,
+		Direction : 0
+	};
+};
+CDocumentContentElementBase.prototype.GetSelectionBounds = function()
+{
+	return this.Get_SelectionBounds();
+};
+CDocumentContentElementBase.prototype.RecalculateCurPos = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.Can_CopyCut = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.CanCopyCut = function()
+{
+	return this.Can_CopyCut();
+};
+CDocumentContentElementBase.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.CheckPosInSelection = function(X, Y, CurPage, NearPos)
+{
+	return this.Selection_Check(X, Y, CurPage, NearPos);
+};
+CDocumentContentElementBase.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawing)
+{
+	return {
+		X          : 0,
+		Y          : 0,
+		Height     : 0,
+		PageNum    : 0,
+		Internal   : {Line : 0, Page : 0, Range : 0},
+		Transform  : null,
+		Paragraph  : null,
+		ContentPos : null,
+		SearchPos  : null
+	};
+};
+CDocumentContentElementBase.prototype.GetNearestPos = function(CurPage, X, Y, bAnchor, Drawing)
+{
+	return this.Get_NearestPos(CurPage, X, Y, bAnchor, Drawing);
+};
+CDocumentContentElementBase.prototype.CanUpdateTarget = function(CurPage)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
+{
+};
+CDocumentContentElementBase.prototype.MoveCursorLeft = function(AddToSelect, Word)
+{
+	return this.Cursor_MoveLeft(1, AddToSelect, Word);
+};
+CDocumentContentElementBase.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorRight = function(AddToSelect, Word)
+{
+	return this.Cursor_MoveRight(1, AddToSelect, Word);
+};
+CDocumentContentElementBase.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
+{
+
+};
+CDocumentContentElementBase.prototype.Cursor_MoveToStartPos = function(AddToSelect)
+{
+};
+CDocumentContentElementBase.prototype.MoveCursorToStartPos = function(AddToSelect)
+{
+	return this.Cursor_MoveToStartPos(AddToSelect);
+};
+CDocumentContentElementBase.prototype.Cursor_MoveToEndPos = function(AddToSelect, StartSelectFromEnd)
+{
+};
+CDocumentContentElementBase.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelectFromEnd)
+{
+	return this.Cursor_MoveToEndPos(AddToSelect, StartSelectFromEnd);
+};
+CDocumentContentElementBase.prototype.IsCursorAtBegin = function()
+{
+	return true;
+};
+CDocumentContentElementBase.prototype.Get_SelectionState = function()
+{
+	return [];
+};
+CDocumentContentElementBase.prototype.Set_SelectionState = function(State, StateIndex)
+{
+
+};
+CDocumentContentElementBase.prototype.Add_NewParagraph = function()
+{
+
+};
+CDocumentContentElementBase.prototype.AddNewParagraph = function()
+{
+	return this.Add_NewParagraph();
+};
+CDocumentContentElementBase.prototype.Hyperlink_Check = function(bCheckEnd)
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	return this.Hyperlink_Check(bCheckEnd);
+};
+CDocumentContentElementBase.prototype.Get_SelectionState2 = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.Set_SelectionState2 = function(State)
+{
+};
+CDocumentContentElementBase.prototype.IsStartFromNewPage = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.GetAllParagraphs = function(Props, ParaArray)
+{
+};
+CDocumentContentElementBase.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+{
+};
+CDocumentContentElementBase.prototype.GetContentPosition = function(bSelection, bStart, PosArray)
+{
+};
+CDocumentContentElementBase.prototype.SetContentPosition = function(DocPos, Depth, Flag)
+{
+};
+CDocumentContentElementBase.prototype.GetNumberingInfo = function(oNumberingEngine)
+{
+};
+CDocumentContentElementBase.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
+{
+};
+CDocumentContentElementBase.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+{
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
@@ -230,6 +457,38 @@ CDocumentContentElementBase.prototype.Get_CurrentPage_Relative = function()
 CDocumentContentElementBase.prototype.GetPagesCount = function()
 {
 	return this.Get_PagesCount();
+};
+CDocumentContentElementBase.prototype.GetIndex = function()
+{
+	return this.Index;
+};
+CDocumentContentElementBase.prototype.GetPageBounds = function(CurPage)
+{
+	return this.Get_PageBounds(CurPage);
+};
+CDocumentContentElementBase.prototype.GetNearestPos = function(CurPage, X, Y, bAnchor, Drawing)
+{
+	return this.Get_NearestPos(CurPage, X, Y, bAnchor, Drawing);
+};
+CDocumentContentElementBase.prototype.CreateFontMap = function(oFontMap)
+{
+	return this.Document_CreateFontMap(oFontMap);
+};
+CDocumentContentElementBase.prototype.CreateFontCharMap = function(oFontCharMap)
+{
+	return this.Document_CreateFontCharMap(oFontCharMap);
+};
+CDocumentContentElementBase.prototype.GetAllFontNames = function(FontNames)
+{
+	return this.Document_Get_AllFontNames(FontNames);
+};
+CDocumentContentElementBase.prototype.GetSelectionState2 = function()
+{
+	return this.Get_SelectionState2();
+};
+CDocumentContentElementBase.prototype.SetSelectionState2 = function(State)
+{
+	return this.Set_SelectionState2(State);
 };
 
 //--------------------------------------------------------export--------------------------------------------------------

@@ -433,10 +433,6 @@ ParaComment.prototype =
     {
     },
 
-    Selection_Stop : function()
-    {
-    },
-
     Selection_Remove : function()
     {
     },

@@ -546,7 +546,9 @@ var TYPE_TRACK = {
 var TYPE_KIND = {
     SLIDE : 0,
     LAYOUT : 1,
-    MASTER : 2
+    MASTER : 2,
+    NOTES  : 3,
+    NOTES_MASTER: 4
 };
 
 var TYPE_TRACK_SHAPE = 0;

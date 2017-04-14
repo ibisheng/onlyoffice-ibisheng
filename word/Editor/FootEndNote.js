@@ -149,7 +149,7 @@ CFootEndnote.prototype.GetHint = function()
 {
 	if (true === this.NeedUpdateHint)
 	{
-		var arrParagraphs = this.Get_AllParagraphs({All : true});
+		var arrParagraphs = this.GetAllParagraphs({All : true});
 		this.Hint         = "";
 		for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 		{

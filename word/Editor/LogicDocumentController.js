@@ -18,9 +18,9 @@ function CLogicDocumentController(LogicDocument)
 CLogicDocumentController.prototype = Object.create(CDocumentControllerBase.prototype);
 CLogicDocumentController.prototype.constructor = CLogicDocumentController;
 
-CLogicDocumentController.prototype.CanTargetUpdate = function()
+CLogicDocumentController.prototype.CanUpdateTarget = function()
 {
-	return this.LogicDocument.controller_CanTargetUpdate();
+	return this.LogicDocument.controller_CanUpdateTarget();
 };
 CLogicDocumentController.prototype.RecalculateCurPos = function()
 {
@@ -82,9 +82,9 @@ CLogicDocumentController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
 	return this.LogicDocument.controller_MoveCursorLeft(AddToSelect, Word);
 };
-CLogicDocumentController.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
+CLogicDocumentController.prototype.MoveCursorRight = function(AddToSelect, Word)
 {
-	return this.LogicDocument.controller_MoveCursorRight(AddToSelect, Word, FromPaste);
+	return this.LogicDocument.controller_MoveCursorRight(AddToSelect, Word);
 };
 CLogicDocumentController.prototype.MoveCursorUp = function(AddToSelect)
 {

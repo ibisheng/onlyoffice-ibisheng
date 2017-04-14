@@ -380,7 +380,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
         {
             // Если у нас нет выделения, и курсор стоит в начале, мы должны проверить в том же порядке, в каком
             // идут проверки при удалении в команде Internal_Remove_Backward.
-            if ( true != this.Selection.Use && true == this.Cursor_IsStart() )
+            if ( true != this.Selection.Use && true == this.IsCursorAtBegin() )
             {
                 var Pr = this.Get_CompiledPr2(false).ParaPr;
                 if ( undefined != this.Numbering_Get() || Math.abs(Pr.Ind.FirstLine) > 0.001 || Math.abs(Pr.Ind.Left) > 0.001 )
@@ -546,6 +546,10 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             break;
         }
     }
+};
+CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
+{
+	return this.Content.Document_Is_SelectionLocked(CheckType, bCheckInner);
 };
 if(typeof CComments !== "undefined")
 {

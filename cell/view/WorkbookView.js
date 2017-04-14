@@ -2645,9 +2645,7 @@
     // set default worksheet header font for calculations
     this.buffers.main.setFont(this.defaultFont);
     // Измеряем в pt
-    this.stringRender.measureString("0123456789", {
-      wrapText: false, shrinkToFit: false, isMerged: false, textAlign: /*khaLeft*/AscCommon.align_Left
-    });
+    this.stringRender.measureString("0123456789", new AscCommonExcel.CellFlags());
 
     var ppiX = 96; // Мерить только с 96
     var ptConvToPx = asc_getcvt(1/*pt*/, 0/*px*/, ppiX);

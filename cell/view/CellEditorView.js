@@ -743,6 +743,7 @@
 		if ( this.textFlags.textAlign === AscCommon.align_Justify || this.isFormula() ) {
 			this.textFlags.textAlign = AscCommon.align_Left;
 		}
+		this.textFlags.shrinkToFit = false;
 
 		this._cleanFragments( opt.fragments );
 		this.textRender.setString( opt.fragments, this.textFlags );

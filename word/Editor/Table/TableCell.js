@@ -535,7 +535,7 @@ CTableCell.prototype =
         return false;
     },
 
-    Get_NumberingInfo : function(NumPr)
+	GetNumberingInfo : function(NumPr)
     {
         var Parent = this.Row.Table.Parent;
         if (Parent && Parent.Internal_GetNumInfo)
@@ -751,18 +751,9 @@ CTableCell.prototype =
         this.Content.Selection_SetEnd(_X, _Y, CurPage, MouseEvent);
     },
 
-    Content_Selection_Stop : function(X, Y, CurPage, MouseEvent)
+    Content_Selection_Stop : function()
     {
-        var _X = X, _Y = Y;
-        var Transform = this.private_GetTextDirectionTransform();
-        if (null !== Transform)
-        {
-            Transform = global_MatrixTransformer.Invert(Transform);
-            _X = Transform.TransformPointX(X, Y);
-            _Y = Transform.TransformPointY(X, Y);
-        }
-
-        return this.Content.Selection_Stop(_X, _Y, CurPage, MouseEvent);
+        return this.Content.Selection_Stop();
     },
 
     Content_Selection_Check : function(X, Y, CurPage, NearPos)
@@ -850,7 +841,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Is_TableBorder(_X, _Y, CurPage);
+        return this.Content.IsTableBorder(_X, _Y, CurPage);
     },
 
     Content_Is_InText : function(X, Y, CurPage)
@@ -863,7 +854,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Is_InText(_X, _Y, CurPage);
+        return this.Content.IsInText(_X, _Y, CurPage);
     },
 
     Content_Is_InDrawing : function(X, Y, CurPage)
@@ -876,7 +867,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Is_InDrawing(_X, _Y, CurPage);
+        return this.Content.IsInDrawing(_X, _Y, CurPage);
     },
 
     Content_Get_CurPosXY : function()

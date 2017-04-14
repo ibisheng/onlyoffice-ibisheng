@@ -264,7 +264,7 @@ CDocumentControllerBase.prototype.Set_CurrentElement = function(bUpdateStates, P
  * Можно ли обновлять позицию курсора.
  * @returns {boolean}
  */
-CDocumentControllerBase.prototype.CanTargetUpdate = function(){return true;};
+CDocumentControllerBase.prototype.CanUpdateTarget = function(){return true;};
 /**
  * Пересчитываем текущую позицию.
  * @returns {{X: number, Y: number, Height: number, PageNum: number, Internal: {Line: number, Page: number, Range: number}, Transform: null}}
@@ -364,7 +364,7 @@ CDocumentControllerBase.prototype.MoveCursorLeft = function(AddToSelect, Word){r
  * @param {boolean} FromPaste Пришла ли данная комнда после "вставки"
  * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
  */
-CDocumentControllerBase.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste){return false;};
+CDocumentControllerBase.prototype.MoveCursorRight = function(AddToSelect, Word){return false;};
 /**
  * Смещаем курсор вверх.
  * @param AddToSelect Добавлять ли к селекту смещение

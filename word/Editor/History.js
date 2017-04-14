@@ -665,7 +665,7 @@ CHistory.prototype =
             for (var Lvl = 0; Lvl < 9; ++Lvl)
             {
                 NumPr.Lvl = Lvl;
-                var AllParagraphs = this.Document.Get_AllParagraphsByNumbering(NumPr);
+                var AllParagraphs = this.Document.GetAllParagraphsByNumbering(NumPr);
                 var Count = AllParagraphs.length;
                 for (var Index = 0; Index < Count; ++Index)
                 {
@@ -1157,7 +1157,7 @@ CHistory.prototype.GetAllParagraphsForRecalcData = function(Props)
 	if (!this.RecalculateData.AllParagraphs)
 	{
 		if (this.Document)
-			this.RecalculateData.AllParagraphs = this.Document.Get_AllParagraphs({All : true});
+			this.RecalculateData.AllParagraphs = this.Document.GetAllParagraphs({All : true});
 		else
 			this.RecalculateData.AllParagraphs = [];
 	}

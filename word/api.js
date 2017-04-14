@@ -4162,9 +4162,9 @@ background-repeat: no-repeat;\
 
 					this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddImageUrl);
 					if (undefined === imgProp || undefined === imgProp.WrappingStyle || 0 == imgProp.WrappingStyle)
-						this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src);
+						this.WordControl.m_oLogicDocument.AddInlineImage(_w, _h, src);
 					else
-						this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src, null, true);
+						this.WordControl.m_oLogicDocument.AddInlineImage(_w, _h, src, null, true);
 				}
 			}
 		}
@@ -4215,9 +4215,9 @@ background-repeat: no-repeat;\
 						}
 						this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddImageUrlLong);
 						if (undefined === imgProp || undefined === imgProp.WrappingStyle || 0 == imgProp.WrappingStyle)
-							this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src);
+							this.WordControl.m_oLogicDocument.AddInlineImage(_w, _h, src);
 						else
-							this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src, null, true);
+							this.WordControl.m_oLogicDocument.AddInlineImage(_w, _h, src, null, true);
 					}
 				}
 				this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
@@ -4258,7 +4258,7 @@ background-repeat: no-repeat;\
 
 			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddImageToPage);
 			LogicDocument.Start_SilentMode();
-			LogicDocument.Add_InlineImage(dW, dH, sUrl);
+			LogicDocument.AddInlineImage(dW, dH, sUrl);
 			LogicDocument.Set_ImageProps(oImageProps);
 			LogicDocument.End_SilentMode(true);
 		}
@@ -4658,7 +4658,7 @@ background-repeat: no-repeat;\
 		var _image = this.ImageLoader.LoadImage(AscCommon.getFullImageSrc2(sLocalUrl), 1);
 		if (null != _image)//картинка уже должна быть загружена
 		{
-			this.WordControl.m_oLogicDocument.Add_OleObject(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId);
+			this.WordControl.m_oLogicDocument.AddOleObject(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId);
 		}
 	};
 
@@ -4666,7 +4666,7 @@ background-repeat: no-repeat;\
 	{
 		if (oOleObject)
 		{
-			this.WordControl.m_oLogicDocument.Edit_OleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
+			this.WordControl.m_oLogicDocument.EditOleObject(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight);
 			this.WordControl.m_oLogicDocument.Recalculate();
 			this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
 		}
@@ -5860,7 +5860,7 @@ background-repeat: no-repeat;\
 			if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 			{
 				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddImage);
-				this.WordControl.m_oLogicDocument.Add_InlineImage(50, 50, _image.src);
+				this.WordControl.m_oLogicDocument.AddInlineImage(50, 50, _image.src);
 			}
 		}
 	};
@@ -6654,7 +6654,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Document_AddChart);
-			this.WordControl.m_oLogicDocument.Add_InlineImage(null, null, null, options);
+			this.WordControl.m_oLogicDocument.AddInlineImage(null, null, null, options);
 		}
 	};
 	asc_docs_api.prototype.asc_doubleClickOnChart    = function(obj)

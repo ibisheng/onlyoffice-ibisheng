@@ -497,6 +497,9 @@ function CPresentation(DrawingDocument)
     this.oLastCheckContent = null;
     this.CompositeInput    = null;
 
+
+    this.Spelling = new CDocumentSpelling();
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
@@ -851,7 +854,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage]){
             var oTargetDocContent = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(undefined, true);
             if(oTargetDocContent){
-                var DocPos = oTargetDocContent.Get_ContentPosition(oTargetDocContent.Is_SelectionUse(), false);
+                var DocPos = oTargetDocContent.GetContentPosition(oTargetDocContent.Is_SelectionUse(), false);
                 if (!DocPos || DocPos.length <= 0)
                     return null;
 
@@ -1568,7 +1571,7 @@ CPresentation.prototype =
         }
     },
 
-    Add_OleObject: function(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
+	AddOleObject: function(fWidth, fHeight, nWidthPix, nHeightPix, sLocalUrl, sData, sApplicationId){
         if(this.Slides[this.CurPage]){
             var fPosX = (this.Width - fWidth)/2;
             var fPosY = (this.Height - fHeight)/2;
@@ -1582,7 +1585,7 @@ CPresentation.prototype =
         }
     },
 
-    Edit_OleObject: function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight){
+	EditOleObject: function(oOleObject, sData, sImageUrl, nPixWidth, nPixHeight){
         oOleObject.setData(sData);
         var _blipFill           = new AscFormat.CBlipFill();
         _blipFill.RasterImageId = sImageUrl;
@@ -3223,6 +3226,31 @@ CPresentation.prototype =
     },
 
 
+    notes_OnMouseDown : function(e, X, Y)
+    {
+
+    },
+
+    notes_OnMouseUp : function(e, X, Y)
+    {
+
+    },
+
+    notes_OnMouseMove : function(e, X, Y)
+    {
+    },
+
+    notes_OnKeyDown: function(e){
+
+    },
+
+    notes_OnKeyPress: function(e){
+
+    },
+
+    OnUpdateSize: function(){
+
+    },
 
     Get_TableStyleForPara : function()
     {

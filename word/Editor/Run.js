@@ -5721,7 +5721,7 @@ ParaRun.prototype.Set_SelectionContentPos = function(StartContentPos, EndContent
     Selection.EndPos   = EndPos;
     Selection.Use      = true;
 };
-ParaRun.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+ParaRun.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
     var StartPos = 0;
     switch (StartFlag)
@@ -5744,7 +5744,7 @@ ParaRun.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth,
     Selection.EndPos   = EndPos;
     Selection.Use      = true;
 };
-ParaRun.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+ParaRun.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
     var Pos = 0;
     switch (Flag)
@@ -5851,10 +5851,6 @@ ParaRun.prototype.Selection_CorrectLeftPos = function(Direction)
     }
 
     return true;
-};
-
-ParaRun.prototype.Selection_Stop = function()
-{
 };
 
 ParaRun.prototype.Selection_Remove = function()
@@ -8634,13 +8630,13 @@ ParaRun.prototype.Make_ThisElementCurrent = function(bUpdateStates)
         this.Paragraph.Document_SetThisElementCurrent(true === bUpdateStates ? true : false);
     }
 };
-ParaRun.prototype.Get_AllParagraphs = function(Props, ParaArray)
+ParaRun.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
     var ContentLen = this.Content.length;
     for (var CurPos = 0; CurPos < ContentLen; CurPos++)
     {
         if (para_Drawing == this.Content[CurPos].Type)
-            this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
+            this.Content[CurPos].GetAllParagraphs(Props, ParaArray);
     }
 };
 ParaRun.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)

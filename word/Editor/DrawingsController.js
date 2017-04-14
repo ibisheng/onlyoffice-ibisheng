@@ -21,7 +21,7 @@ function CDrawingsController(LogicDocument, DrawingsObjects)
 CDrawingsController.prototype = Object.create(CDocumentControllerBase.prototype);
 CDrawingsController.prototype.constructor = CDrawingsController;
 
-CDrawingsController.prototype.CanTargetUpdate = function()
+CDrawingsController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };

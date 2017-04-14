@@ -131,6 +131,8 @@
         "../slide/Editor/Format/SlideMaster.js",
         "../slide/Editor/Format/Layout.js",
         "../slide/Editor/Format/Comments.js",
+		"../slide/Editor/Format/NotesMaster.js",
+		"../slide/Editor/Format/Notes.js",
 		"../word/Editor/DocumentContentElementBase.js",
 		"../word/Editor/StructuredDocumentTags/BlockLevel.js",
         "../word/Editor/Styles.js",
@@ -251,8 +253,7 @@
         "../../web-apps/vendor/sockjs/sockjs.min.js",
         "../../web-apps/vendor/xregexp/xregexp-all-min.js",
         "../../web-apps/vendor/jszip/jszip.min.js",
-        "../../web-apps/vendor/jszip-utils/jszip-utils.min.js",
-        "../../web-apps/vendor/jsrsasign/jsrsasign-latest-all-min.js"
+        "../../web-apps/vendor/jszip-utils/jszip-utils.min.js"
       ],
       "map": "sdk-all.js.map",
       "log": "../slide/Build/Log"

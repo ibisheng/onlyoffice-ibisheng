@@ -544,22 +544,22 @@ CHeaderFooter.prototype =
             return this.Content.Update_CursorType(X, Y, 0);
     },
 
-    Is_TableBorder : function(X, Y, PageAbs)
+	IsTableBorder : function(X, Y, PageAbs)
     {
         this.Set_Page(PageAbs);
-        return this.Content.Is_TableBorder(X, Y, 0);
+        return this.Content.IsTableBorder(X, Y, 0);
     },
 
-    Is_InText : function(X, Y, PageAbs)
+	IsInText : function(X, Y, PageAbs)
     {
         this.Set_Page(PageAbs);
-        return this.Content.Is_InText(X, Y, 0);
+        return this.Content.IsInText(X, Y, 0);
     },
 
-    Is_InDrawing : function(X, Y, PageAbs)
+	IsInDrawing : function(X, Y, PageAbs)
     {
         this.Set_Page(PageAbs);
-        return this.Content.Is_InDrawing(X, Y, 0);
+        return this.Content.IsInDrawing(X, Y, 0);
     },
 
     Document_UpdateInterfaceState : function()
@@ -665,14 +665,14 @@ CHeaderFooter.prototype =
         this.Content.Add_NewParagraph();
     },
 
-    Add_InlineImage : function(W, H, Img, Chart, bFlow)
+	AddInlineImage : function(W, H, Img, Chart, bFlow)
     {
-        this.Content.Add_InlineImage(W,H,Img, Chart, bFlow);
+        this.Content.AddInlineImage(W,H,Img, Chart, bFlow);
     },
 
-    Add_OleObject : function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+	AddOleObject : function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
     {
-        this.Content.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+        this.Content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
     },
 
     Add_TextArt : function(nStyle)
@@ -911,9 +911,9 @@ CHeaderFooter.prototype =
         return this.Content.Get_Paragraph_ParaPr_Copy();
     },
 
-    Get_AllParagraphs : function(Props, ParaArray)
+    GetAllParagraphs : function(Props, ParaArray)
     {
-        return this.Content.Get_AllParagraphs(Props, ParaArray);
+        return this.Content.GetAllParagraphs(Props, ParaArray);
     },
 
     Get_AllDrawingObjects  : function(arrDrawings)
@@ -965,9 +965,9 @@ CHeaderFooter.prototype =
         return this.Content.Selection_SetEnd(X, Y, 0, MouseEvent);
     },
 
-    Selection_Is_TableBorderMove : function()
+	IsMovingTableBorder : function()
     {
-        return this.Content.Selection_Is_TableBorderMove();
+        return this.Content.IsMovingTableBorder();
     },
 
 	Selection_Check : function(X, Y, PageAbs, NearPos)
@@ -1720,29 +1720,29 @@ CHeaderFooterController.prototype =
         }
     },
 
-    Is_TableBorder : function( X, Y, PageNum_Abs )
+	IsTableBorder : function( X, Y, PageNum_Abs )
     {
         var HdrFtr = this.Internal_GetContentByXY( X, Y, PageNum_Abs );
         if ( null != HdrFtr )
-            return HdrFtr.Is_TableBorder( X, Y, PageNum_Abs );
+            return HdrFtr.IsTableBorder( X, Y, PageNum_Abs );
 
         return null;
     },
 
-    Is_InText : function(X,Y, PageNum_Abs)
+	IsInText : function(X,Y, PageNum_Abs)
     {
         var HdrFtr = this.Internal_GetContentByXY( X, Y, PageNum_Abs );
         if ( null != HdrFtr )
-            return HdrFtr.Is_InText( X, Y, PageNum_Abs );
+            return HdrFtr.IsInText( X, Y, PageNum_Abs );
 
         return null;
     },
 
-    Is_InDrawing : function(X,Y, PageNum_Abs)
+	IsInDrawing : function(X,Y, PageNum_Abs)
     {
         var HdrFtr = this.Internal_GetContentByXY( X, Y, PageNum_Abs );
         if ( null != HdrFtr )
-            return HdrFtr.Is_InDrawing( X, Y, PageNum_Abs );
+            return HdrFtr.IsInDrawing( X, Y, PageNum_Abs );
 
         return null;
     },
@@ -1838,16 +1838,16 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Add_NewParagraph();
     },
 
-    Add_InlineImage : function(W, H, Img, Chart, bFlow)
+	AddInlineImage : function(W, H, Img, Chart, bFlow)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Add_InlineImage(W,H,Img, Chart, bFlow);
+            return this.CurHdrFtr.AddInlineImage(W,H,Img, Chart, bFlow);
     },
 
-    Add_OleObject: function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+	AddOleObject: function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+            return this.CurHdrFtr.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
     },
 
     Add_TextArt : function(nStyle)
@@ -2278,10 +2278,10 @@ CHeaderFooterController.prototype =
         }
     },
 
-    Selection_Is_TableBorderMove : function()
+	IsMovingTableBorder : function()
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Is_TableBorderMove();
+            return this.CurHdrFtr.IsMovingTableBorder();
 
         return false;
     },

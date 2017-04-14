@@ -172,7 +172,7 @@ CDocumentContentBase.prototype.Get_FootnotesList = function(oFirstFootnote, oLas
 
 	var arrFootnotes = [];
 
-	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
+	var arrParagraphs = this.GetAllParagraphs({OnlyMainDocument : true, All : true});
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
 		var oParagraph = arrParagraphs[nIndex];
@@ -301,4 +301,28 @@ CDocumentContentBase.prototype.private_CreateNewParagraph = function()
 	oPara.Correct_Content();
 	oPara.Cursor_MoveToStartPos(false);
 	return oPara;
+};
+CDocumentContentBase.prototype.StopSelection = function()
+{
+	if (true !== this.Selection.Use)
+		return;
+
+	this.Selection.Start = false;
+
+	if (this.Content[this.Selection.StartPos])
+		this.Content[this.Selection.StartPos].StopSelection();
+};
+CDocumentContentBase.prototype.GetNumberingInfo = function(NumberingEngine, ParaId, NumPr)
+{
+	if (undefined === NumberingEngine || null === NumberingEngine)
+		NumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetNumberingInfo(NumberingEngine);
+		if (true === NumberingEngine.Is_Found())
+			break;
+	}
+
+	return NumberingEngine.Get_NumInfo();
 };

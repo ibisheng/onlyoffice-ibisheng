@@ -6511,7 +6511,7 @@ PasteProcessor.prototype =
 								if(this.oCurHyperlink)
 									this.oCurRun = new ParaRun(this.oCurPar);
 
-                                    //oDocument.Add_InlineImage(nWidth, nHeight, img);
+                                    //oDocument.AddInlineImage(nWidth, nHeight, img);
                             }
                         }
                     }

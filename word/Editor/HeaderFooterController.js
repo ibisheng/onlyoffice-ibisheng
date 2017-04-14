@@ -24,7 +24,7 @@ function CHdrFtrController(LogicDocument, HdrFtr)
 CHdrFtrController.prototype = Object.create(CDocumentControllerBase.prototype);
 CHdrFtrController.prototype.constructor = CHdrFtrController;
 
-CHdrFtrController.prototype.CanTargetUpdate = function()
+CHdrFtrController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
@@ -46,11 +46,11 @@ CHdrFtrController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 };
 CHdrFtrController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
-	this.HdrFtr.Add_InlineImage(nW, nH, oImage, oChart, bFlow);
+	this.HdrFtr.AddInlineImage(nW, nH, oImage, oChart, bFlow);
 };
 CHdrFtrController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
-	this.HdrFtr.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+	this.HdrFtr.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
 CHdrFtrController.prototype.AddTextArt = function(nStyle)
 {
@@ -245,7 +245,7 @@ CHdrFtrController.prototype.GetSelectionBounds = function()
 };
 CHdrFtrController.prototype.IsMovingTableBorder = function()
 {
-	return this.HdrFtr.Selection_Is_TableBorderMove();
+	return this.HdrFtr.IsMovingTableBorder();
 };
 CHdrFtrController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {
@@ -403,9 +403,9 @@ CHdrFtrController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
 
 		if (docpostype_Content === HdrFtrContent.Get_DocPosType())
 		{
-			State.Pos      = HdrFtrContent.Get_ContentPosition(false, false, undefined);
-			State.StartPos = HdrFtrContent.Get_ContentPosition(true, true, undefined);
-			State.EndPos   = HdrFtrContent.Get_ContentPosition(true, false, undefined);
+			State.Pos      = HdrFtrContent.GetContentPosition(false, false, undefined);
+			State.StartPos = HdrFtrContent.GetContentPosition(true, true, undefined);
+			State.EndPos   = HdrFtrContent.GetContentPosition(true, false, undefined);
 		}
 		else if (docpostype_DrawingObjects === HdrFtrContent.Get_DocPosType())
 		{
@@ -426,12 +426,12 @@ CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(Stat
 			HdrFtrContent.Selection.Use = State.HdrFtrSelection;
 			if (true === HdrFtrContent.Selection.Use)
 			{
-				HdrFtrContent.Set_ContentPosition(State.StartPos, 0, 0);
-				HdrFtrContent.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+				HdrFtrContent.SetContentPosition(State.StartPos, 0, 0);
+				HdrFtrContent.SetContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
 			}
 			else
 			{
-				HdrFtrContent.Set_ContentPosition(State.Pos, 0, 0);
+				HdrFtrContent.SetContentPosition(State.Pos, 0, 0);
 				this.LogicDocument.NeedUpdateTarget = true;
 			}
 		}
