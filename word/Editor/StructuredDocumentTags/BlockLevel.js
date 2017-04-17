@@ -50,7 +50,7 @@ function CBlockLevelSdt(oLogicDocument, oParent)
 	CDocumentContentElementBase.call(this, oParent);
 
 	this.LogicDocument = oLogicDocument;
-	this.Content       = new CDocumentContent(this, oLogicDocument.Get_DrawingDocument(), 0, 0, 0, 0, true, false, false);
+	this.Content       = new CDocumentContent(this, oLogicDocument ? oLogicDocument.Get_DrawingDocument() : null, 0, 0, 0, 0, true, false, false);
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);
@@ -112,16 +112,26 @@ CBlockLevelSdt.prototype.Write_ToBinary2 = function(Writer)
 {
 	Writer.WriteLong(AscDFH.historyitem_type_BlockLevelSdt);
 	// String : Content id
-	Writer.WriteString(this.Content.GetId());
+	Writer.WriteString2(this.Content.GetId());
 };
 CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 {
+	this.LogicDocument = editor.WordControl.m_oLogicDocument;
+
 	// String : Content id
 	this.Content = this.LogicDocument.Get_TableId().Get_ById(Reader.GetString2());
 };
 CBlockLevelSdt.prototype.Draw = function(CurPage, oGraphics)
 {
 	this.Content.Draw(CurPage, oGraphics);
+
+	var oPageBounds = this.GetPageBounds(CurPage);
+
+	oGraphics.p_color(0, 0, 255, 255);
+	oGraphics.drawVerLine(0, oPageBounds.Left, oPageBounds.Top, oPageBounds.Bottom, 0);
+	oGraphics.drawVerLine(0, oPageBounds.Right, oPageBounds.Top, oPageBounds.Bottom, 0);
+	oGraphics.drawHorLine(0, oPageBounds.Top, oPageBounds.Left, oPageBounds.Right, 0);
+	oGraphics.drawHorLine(0, oPageBounds.Bottom, oPageBounds.Left, oPageBounds.Right, 0);
 };
 CBlockLevelSdt.prototype.Get_CurrentPage_Absolute = function()
 {
@@ -329,7 +339,7 @@ CBlockLevelSdt.prototype.AddInlineTable = function(nCols, nRows)
 };
 CBlockLevelSdt.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, bOnAddText)
 {
-	return this.Content.Remove(nCount, bOnlyText, bRemoveOnlySelection, bOnlyText);
+	return this.Content.Remove(nCount, bOnlyText, bRemoveOnlySelection, bOnAddText);
 };
 CBlockLevelSdt.prototype.Is_Empty = function()
 {
@@ -455,6 +465,9 @@ window['AscCommonWord'].type_BlockLevelSdt = type_BlockLevelSdt;
 function TEST_ADD_SDT()
 {
 	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+
+	oLogicDocument.Create_NewHistoryPoint();
+
 	var oSdt = new CBlockLevelSdt(oLogicDocument, oLogicDocument);
 	oSdt.Content.Paragraph_Add(new ParaText("S"));
 	oSdt.Content.Paragraph_Add(new ParaText("d"));
