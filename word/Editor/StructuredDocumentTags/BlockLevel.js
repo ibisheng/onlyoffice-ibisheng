@@ -349,6 +349,10 @@ CBlockLevelSdt.prototype.Add = function(oParaItem)
 {
 	return this.Content.Paragraph_Add(oParaItem);
 };
+CBlockLevelSdt.prototype.PreDelete = function()
+{
+	this.Content.PreDelete();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

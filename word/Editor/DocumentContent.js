@@ -8826,6 +8826,13 @@ CDocumentContent.prototype.IsStartFromNewPage = function()
 
 	return this.Content[0].IsStartFromNewPage();
 };
+CDocumentContent.prototype.PreDelete = function()
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].PreDelete();
+	}
+};
 
 function CDocumentContentStartState(DocContent)
 {

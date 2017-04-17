@@ -504,7 +504,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 					{
 						// Удаляем весь промежуточный контент, начальный элемент и конечный элемент, если это
 						// таблица, поскольку таблица не может быть последним элементом в документе удаляем без проверок.
-						if (type_Pargraph !== EndType)
+						if (type_Paragraph !== EndType)
 							this.Internal_Content_Remove(StartPos, EndPos - StartPos + 1);
 						else
 							this.Internal_Content_Remove(StartPos, EndPos - StartPos);
