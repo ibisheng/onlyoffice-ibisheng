@@ -1628,7 +1628,7 @@ CPresentation.prototype =
         }
     },
 
-    Edit_Chart : function(binary)
+	EditChart : function(binary)
     {
         var _this = this;
         _this.Slides[_this.CurPage] && _this.Slides[_this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(function()
@@ -1638,7 +1638,7 @@ CPresentation.prototype =
         }, [binary], false, AscDFH.historydescription_Presentation_EditChart);
     },
 
-    Get_ChartObject: function(type)
+	GetChartObject: function(type)
     {
         return this.Slides[this.CurPage].graphicObjects.getChartObject(type);
     },
@@ -5254,7 +5254,7 @@ CPresentation.prototype =
     },
 
 
-    Add_TextArt: function(nStyle)
+	AddTextArt: function(nStyle)
     {
         if(this.Slides[this.CurPage])
         {

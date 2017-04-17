@@ -2170,7 +2170,7 @@ CDocumentContent.prototype.Add_NewParagraph = function()
                 var NewParagraph   = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
 
                 // Проверим позицию в текущем параграфе
-                if (true === Item.Cursor_IsEnd())
+                if (true === Item.IsCursorAtEnd())
                 {
                     var StyleId = Item.Style_Get();
                     var NextId  = undefined;
@@ -2410,126 +2410,117 @@ CDocumentContent.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, 
 		}
 	}
 };
-CDocumentContent.prototype.Add_TextArt                        = function(nStyle)
+CDocumentContent.prototype.AddTextArt = function(nStyle)
 {
-    if (docpostype_DrawingObjects !== this.CurPos.Type)
-    {
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            var Drawing = new ParaDrawing(1828800 / 36000, 1828800 / 36000, null, this.DrawingDocument, this, null);
-            var TextArt = this.DrawingObjects.createTextArt(nStyle, true);
-            TextArt.setParent(Drawing);
-            Drawing.Set_GraphicObject(TextArt);
-            Drawing.Set_DrawingType(drawing_Anchor);
-            Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
-            Drawing.Set_BehindDoc(false);
-            Drawing.Set_Distance(3.2, 0, 3.2, 0);
-            Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
-            Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
-            if (true == this.Selection.Use)
-                this.Remove(1, true);
-            this.Paragraph_Add(Drawing);
-            if (TextArt.bSelectedText)
-            {
-                this.Select_DrawingObject(Drawing.Get_Id());
-            }
-            else
-            {
-                var oContent = Drawing.GraphicObj.getDocContent();
-                oContent.Content[0].Document_SetThisElementCurrent(false);
-                this.LogicDocument.Select_All();
-            }
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Add_TextArt(nStyle);
-        }
-    }
+	if (docpostype_DrawingObjects !== this.CurPos.Type)
+	{
+		var Item = this.Content[this.CurPos.ContentPos];
+		if (type_Paragraph == Item.GetType())
+		{
+			var Drawing = new ParaDrawing(1828800 / 36000, 1828800 / 36000, null, this.DrawingDocument, this, null);
+			var TextArt = this.DrawingObjects.createTextArt(nStyle, true);
+			TextArt.setParent(Drawing);
+			Drawing.Set_GraphicObject(TextArt);
+			Drawing.Set_DrawingType(drawing_Anchor);
+			Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+			Drawing.Set_BehindDoc(false);
+			Drawing.Set_Distance(3.2, 0, 3.2, 0);
+			Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
+			Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
+			if (true == this.Selection.Use)
+				this.Remove(1, true);
+			this.Paragraph_Add(Drawing);
+			if (TextArt.bSelectedText)
+			{
+				this.Select_DrawingObject(Drawing.Get_Id());
+			}
+			else
+			{
+				var oContent = Drawing.GraphicObj.getDocContent();
+				oContent.Content[0].Document_SetThisElementCurrent(false);
+				this.LogicDocument.Select_All();
+			}
+		}
+		else
+		{
+			Item.AddTextArt(nStyle);
+		}
+	}
 };
-CDocumentContent.prototype.Edit_Chart                         = function(Chart)
+CDocumentContent.prototype.EditChart = function(Chart)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.editChart(Chart);
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.editChart(Chart);
+	}
 };
-CDocumentContent.prototype.Add_InlineTable                    = function(Cols, Rows)
+CDocumentContent.prototype.AddInlineTable = function(Cols, Rows)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.addInlineTable(Cols, Rows);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.addInlineTable(Cols, Rows);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-        if (true == this.Selection.Use)
-            this.Remove(1, true);
+		if (true === this.Selection.Use)
+			this.Remove(1, true);
 
-        // Добавляем таблицу
-        var Item = this.Content[this.CurPos.ContentPos];
+		// Добавляем таблицу
+		var Item = this.Content[this.CurPos.ContentPos];
 
-        // Если мы внутри параграфа, тогда разрываем его и на месте разрыва добавляем таблицу.
-        // А если мы внутри таблицы, тогда добавляем таблицу внутрь текущей таблицы.
-        switch (Item.GetType())
-        {
-            case type_Paragraph:
-            {
-                // Создаем новую таблицу
-                var W = 0;
-                if (true === this.Is_TableCellContent())
-                    W = this.XLimit - this.X;
-                else
-                    W = ( this.XLimit - this.X + 2 * 1.9 );
+		// Если мы внутри параграфа, тогда разрываем его и на месте разрыва добавляем таблицу.
+		// А если мы внутри таблицы, тогда добавляем таблицу внутрь текущей таблицы.
+		if (type_Paragraph === Item.GetType())
+		{
+			// Создаем новую таблицу
+			var W = 0;
+			if (true === this.Is_TableCellContent())
+				W = this.XLimit - this.X;
+			else
+				W = ( this.XLimit - this.X + 2 * 1.9 );
 
-                W = Math.max(W, Cols * 2 * 1.9);
+			W = Math.max(W, Cols * 2 * 1.9);
 
-                var Grid = [];
+			var Grid = [];
 
-                for (var Index = 0; Index < Cols; Index++)
-                    Grid[Index] = W / Cols;
+			for (var Index = 0; Index < Cols; Index++)
+				Grid[Index] = W / Cols;
 
-                var NewTable = new CTable(this.DrawingDocument, this, true, Rows, Cols, Grid);
-                NewTable.Set_ParagraphPrOnAdd(Item);
+			var NewTable = new CTable(this.DrawingDocument, this, true, Rows, Cols, Grid);
+			NewTable.Set_ParagraphPrOnAdd(Item);
 
-                // Проверим позицию в текущем параграфе
-                if (true === Item.Cursor_IsEnd())
-                {
-                    // Выставляем курсор в начало таблицы
-                    NewTable.Cursor_MoveToStartPos();
-                    this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
-                    this.CurPos.ContentPos++;
-                    this.Recalculate();
-                }
-                else
-                {
-                    // Создаем новый параграф
-                    var NewParagraph = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
-                    Item.Split(NewParagraph);
+			// Проверим позицию в текущем параграфе
+			if (true === Item.IsCursorAtEnd())
+			{
+				// Выставляем курсор в начало таблицы
+				NewTable.Cursor_MoveToStartPos();
+				this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
+				this.CurPos.ContentPos++;
+			}
+			else
+			{
+				// Создаем новый параграф
+				var NewParagraph = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
+				Item.Split(NewParagraph);
 
-                    // Добавляем новый параграф
-                    this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
+				// Добавляем новый параграф
+				this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
 
-                    // Выставляем курсор в начало таблицы
-                    NewTable.Cursor_MoveToStartPos();
-                    this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
+				// Выставляем курсор в начало таблицы
+				NewTable.Cursor_MoveToStartPos();
+				this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
 
-                    this.CurPos.ContentPos++;
-
-                    this.Recalculate();
-                }
-
-                break;
-            }
-
-            case type_Table:
-            {
-                Item.Add_InlineTable(Cols, Rows);
-                break;
-            }
-        }
-    }
+				this.CurPos.ContentPos++;
+			}
+		}
+		else
+		{
+			Item.AddInlineTable(Cols, Rows);
+		}
+	}
 };
 CDocumentContent.prototype.Paragraph_Add                      = function(ParaItem, bRecalculate)
 {
@@ -3986,19 +3977,23 @@ CDocumentContent.prototype.Cursor_MoveAt = function(X, Y, AddToSelect, bRemoveOl
 };
 CDocumentContent.prototype.IsCursorAtBegin = function(bOnlyPara)
 {
-	if (undefined === bOnlyPara)
-		bOnlyPara = false;
-
-	if (true === bOnlyPara && true != this.Is_CurrentElementParagraph())
-		return false;
-
 	if (docpostype_DrawingObjects === this.CurPos.Type)
 		return false;
 	else if (false != this.Selection.Use || 0 != this.CurPos.ContentPos)
 		return false;
 
 	var Item = this.Content[0];
-	return Item.IsCursorAtBegin();
+	return Item.IsCursorAtBegin(bOnlyPara);
+};
+CDocumentContent.prototype.IsCursorAtEnd = function()
+{
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+		return false;
+	else if (false != this.Selection.Use || 0 != this.CurPos.ContentPos)
+		return false;
+
+	var Item = this.Content[this.Content.length - 1];
+	return Item.IsCursorAtEnd();
 };
 CDocumentContent.prototype.Get_CurPosXY                       = function()
 {
@@ -4284,7 +4279,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
 
             var bAddEmptyPara = false;
 
-            if (true === Para.Cursor_IsEnd())
+            if (true === Para.IsCursorAtEnd())
             {
                 bConcatE = false;
 
@@ -6623,7 +6618,7 @@ CDocumentContent.prototype.Get_Paragraph_ParaPr = function()
 
 				Result_ParaPr             = ParaPr.Copy();
 				Result_ParaPr.Locked      = Locked;
-				Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true ) && !(this.bPresentation === true);
+				Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.IsCursorAtEnd() ) ? true : false ) : true ) && !(this.bPresentation === true);
 			}
 			else
 			{

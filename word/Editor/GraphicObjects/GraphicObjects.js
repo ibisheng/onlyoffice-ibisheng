@@ -1415,7 +1415,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Add_InlineTable(Cols, Rows);
+            content.AddInlineTable(Cols, Rows);
         }
     },
 

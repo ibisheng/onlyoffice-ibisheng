@@ -675,19 +675,19 @@ CHeaderFooter.prototype =
         this.Content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
     },
 
-    Add_TextArt : function(nStyle)
+	AddTextArt : function(nStyle)
     {
-        this.Content.Add_TextArt(nStyle);
+        this.Content.AddTextArt(nStyle);
     },
 
-    Edit_Chart : function(Chart)
+	EditChart : function(Chart)
     {
-        this.Content.Edit_Chart( Chart );
+        this.Content.EditChart( Chart );
     },
 
-    Add_InlineTable : function(Cols, Rows)
+	AddInlineTable : function(Cols, Rows)
     {
-        this.Content.Add_InlineTable( Cols, Rows );
+        this.Content.AddInlineTable( Cols, Rows );
     },
 
     Paragraph_Add : function( ParaItem, bRecalculate )
@@ -1850,22 +1850,22 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
     },
 
-    Add_TextArt : function(nStyle)
+	AddTextArt : function(nStyle)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Add_TextArt(nStyle);
+            return this.CurHdrFtr.AddTextArt(nStyle);
     },
 
-    Edit_Chart : function(Chart)
+	EditChart : function(Chart)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Edit_Chart( Chart );
+            return this.CurHdrFtr.EditChart( Chart );
     },
 
-    Add_InlineTable : function(Cols, Rows)
+	AddInlineTable : function(Cols, Rows)
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Add_InlineTable( Cols, Rows );
+            return this.CurHdrFtr.AddInlineTable( Cols, Rows );
     },
 
     Paragraph_Add : function( ParaItem, bRecalculate )

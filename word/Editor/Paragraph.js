@@ -5370,7 +5370,7 @@ Paragraph.prototype.Apply_TextPr = function(TextPr, IncFontSize)
 			this.Internal_ReplaceRun(Pos, NewElements);
 		}
 
-		if (true === this.Cursor_IsEnd())
+		if (true === this.IsCursorAtEnd())
 		{
 			if (undefined === IncFontSize)
 			{
@@ -8239,7 +8239,7 @@ Paragraph.prototype.Style_Remove = function()
 /**
  * Проверяем находится ли курсор в конце параграфа
  */
-Paragraph.prototype.Cursor_IsEnd = function(_ContentPos)
+Paragraph.prototype.IsCursorAtEnd = function(_ContentPos)
 {
 	// Просто попробуем переместится вправо от текущего положения, если мы не можем, значит
 	// мы стоим в конце параграфа.

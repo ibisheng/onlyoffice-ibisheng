@@ -4028,19 +4028,19 @@ CDocument.prototype.EditOleObject = function(oOleObject, sData, sImageUrl, nPixW
 	oOleObject.setBlipFill(_blipFill);
 	oOleObject.setPixSizes(nPixWidth, nPixHeight);
 };
-CDocument.prototype.Add_TextArt = function(nStyle)
+CDocument.prototype.AddTextArt = function(nStyle)
 {
 	this.Controller.AddTextArt(nStyle);
 };
-CDocument.prototype.Edit_Chart = function(Chart)
+CDocument.prototype.EditChart = function(Chart)
 {
 	this.Controller.EditChart(Chart);
 };
-CDocument.prototype.Get_ChartObject = function(type)
+CDocument.prototype.GetChartObject = function(type)
 {
 	return this.DrawingObjects.getChartObject(type);
 };
-CDocument.prototype.Add_InlineTable = function(Cols, Rows)
+CDocument.prototype.AddInlineTable = function(Cols, Rows)
 {
 	// TODO: Пересчет нужно перенести сюда, и убрать из контроллеров
 	if (Cols <= 0 || Rows <= 0)
@@ -5746,7 +5746,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			var bAddEmptyPara          = false;
 			var bDoNotIncreaseDstIndex = false;
 
-			if (true === Para.Cursor_IsEnd())
+			if (true === Para.IsCursorAtEnd())
 			{
 				bConcatE = false;
 
@@ -11329,7 +11329,7 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 			var NewParagraph   = new Paragraph(this.DrawingDocument, this);
 
 			// Проверим позицию в текущем параграфе
-			if (true === Item.Cursor_IsEnd())
+			if (true === Item.IsCursorAtEnd())
 			{
 				var StyleId = Item.Style_Get();
 				var NextId  = undefined;
@@ -11517,9 +11517,9 @@ CDocument.prototype.controller_AddTextArt = function(nStyle)
 			this.Select_All();
 		}
 	}
-	else if (type_Table == Item.GetType())
+	else
 	{
-		Item.Add_TextArt(nStyle);
+		Item.AddTextArt(nStyle);
 	}
 };
 CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
@@ -11538,76 +11538,70 @@ CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
 
 	// Если мы внутри параграфа, тогда разрываем его и на месте разрыва добавляем таблицу.
 	// А если мы внутри таблицы, тогда добавляем таблицу внутрь текущей таблицы.
-	switch (Item.GetType())
+	if (type_Paragraph === Item.GetType())
 	{
-		case type_Paragraph:
+		// Ширину таблицы делаем по минимальной ширине колонки.
+		var Page   = this.Pages[this.CurPage];
+		var SectPr = this.SectionsInfo.Get_SectPr(this.CurPos.ContentPos).SectPr;
+
+		var PageFields = this.Get_PageFields(this.CurPage);
+
+		// Создаем новую таблицу
+		var W    = (PageFields.XLimit - PageFields.X + 2 * 1.9);
+		var Grid = [];
+
+		if (SectPr.Get_ColumnsCount() > 1)
 		{
-			// Ширину таблицы делаем по минимальной ширине колонки.
-			var Page   = this.Pages[this.CurPage];
-			var SectPr = this.SectionsInfo.Get_SectPr(this.CurPos.ContentPos).SectPr;
-
-			var PageFields = this.Get_PageFields(this.CurPage);
-
-			// Создаем новую таблицу
-			var W    = (PageFields.XLimit - PageFields.X + 2 * 1.9);
-			var Grid = [];
-
-			if (SectPr.Get_ColumnsCount() > 1)
+			for (var CurCol = 0, ColsCount = SectPr.Get_ColumnsCount(); CurCol < ColsCount; ++CurCol)
 			{
-				for (var CurCol = 0, ColsCount = SectPr.Get_ColumnsCount(); CurCol < ColsCount; ++CurCol)
-				{
-					var ColumnWidth = SectPr.Get_ColumnWidth(CurCol);
-					if (W > ColumnWidth)
-						W = ColumnWidth;
-				}
-
-				W += 2 * 1.9;
+				var ColumnWidth = SectPr.Get_ColumnWidth(CurCol);
+				if (W > ColumnWidth)
+					W = ColumnWidth;
 			}
 
-			W = Math.max(W, Cols * 2 * 1.9);
-
-			for (var Index = 0; Index < Cols; Index++)
-				Grid[Index] = W / Cols;
-
-			var NewTable = new CTable(this.DrawingDocument, this, true, Rows, Cols, Grid);
-			NewTable.Set_ParagraphPrOnAdd(Item);
-
-			// Проверим позицию в текущем параграфе
-			if (true === Item.Cursor_IsEnd() && undefined === Item.Get_SectionPr())
-			{
-				// Выставляем курсор в начало таблицы
-				NewTable.Cursor_MoveToStartPos();
-				this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
-
-				this.CurPos.ContentPos++;
-				this.Recalculate();
-			}
-			else
-			{
-				// Создаем новый параграф
-				var NewParagraph = new Paragraph(this.DrawingDocument, this);
-				Item.Split(NewParagraph);
-
-				// Добавляем новый параграф
-				this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
-
-				// Выставляем курсор в начало таблицы
-				NewTable.Cursor_MoveToStartPos();
-				this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
-
-				this.CurPos.ContentPos++;
-				this.Recalculate();
-			}
-
-			break;
+			W += 2 * 1.9;
 		}
 
-		case type_Table:
+		W = Math.max(W, Cols * 2 * 1.9);
+
+		for (var Index = 0; Index < Cols; Index++)
+			Grid[Index] = W / Cols;
+
+		var NewTable = new CTable(this.DrawingDocument, this, true, Rows, Cols, Grid);
+		NewTable.Set_ParagraphPrOnAdd(Item);
+
+		// Проверим позицию в текущем параграфе
+		if (true === Item.IsCursorAtEnd() && undefined === Item.Get_SectionPr())
 		{
-			Item.Add_InlineTable(Cols, Rows);
-			break;
+			// Выставляем курсор в начало таблицы
+			NewTable.MoveCursorToStartPos(false);
+			this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
+
+			this.CurPos.ContentPos++;
 		}
+		else
+		{
+			// Создаем новый параграф
+			var NewParagraph = new Paragraph(this.DrawingDocument, this);
+			Item.Split(NewParagraph);
+
+			// Добавляем новый параграф
+			this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewParagraph);
+
+			// Выставляем курсор в начало таблицы
+			NewTable.MoveCursorToStartPos(false);
+			this.Internal_Content_Add(this.CurPos.ContentPos + 1, NewTable);
+
+			this.CurPos.ContentPos++;
+		}
+
 	}
+	else
+	{
+		Item.AddInlineTable(Cols, Rows);
+	}
+
+	this.Recalculate();
 };
 CDocument.prototype.controller_ClearParagraphFormatting = function()
 {
@@ -14572,7 +14566,7 @@ CDocument.prototype.controller_GetCurrentParaPr = function()
 
 			Result_ParaPr             = ParaPr.Copy();
 			Result_ParaPr.Locked      = Locked;
-			Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.Cursor_IsEnd() ) ? true : false ) : true );
+			Result_ParaPr.CanAddTable = ( ( true === Locked ) ? ( ( true === Item.IsCursorAtEnd() ) ? true : false ) : true );
 
 			// Если мы находимся в рамке, тогда дополняем ее свойства настройками границы и настройкой текста (если это буквица)
 			if (undefined != Result_ParaPr.FramePr)

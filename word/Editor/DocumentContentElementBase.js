@@ -344,6 +344,10 @@ CDocumentContentElementBase.prototype.IsCursorAtBegin = function()
 {
 	return true;
 };
+CDocumentContentElementBase.prototype.IsCursorAtEnd = function()
+{
+	return true;
+};
 CDocumentContentElementBase.prototype.Get_SelectionState = function()
 {
 	return [];
@@ -398,6 +402,12 @@ CDocumentContentElementBase.prototype.AddInlineImage = function(W, H, Img, Chart
 {
 };
 CDocumentContentElementBase.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
+{
+};
+CDocumentContentElementBase.prototype.AddTextArt = function(nStyle)
+{
+};
+CDocumentContentElementBase.prototype.AddInlineTable = function(nCols, nRows)
 {
 };
 CDocumentContentElementBase.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, bOnAddText)

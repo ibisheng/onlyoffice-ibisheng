@@ -1382,14 +1382,14 @@ CFootnotesController.prototype.AddTextArt = function(nStyle)
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Add_TextArt(nStyle);
+	return this.CurFootnote.AddTextArt(nStyle);
 };
 CFootnotesController.prototype.EditChart = function(Chart)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Edit_Chart(Chart);
+	this.CurFootnote.EditChart(Chart);
 };
 CFootnotesController.prototype.AddInlineTable = function(Cols, Rows)
 {
@@ -1397,7 +1397,7 @@ CFootnotesController.prototype.AddInlineTable = function(Cols, Rows)
 		return;
 
 	if (null !== this.CurFootnote)
-		this.CurFootnote.Add_InlineTable(Cols, Rows);
+		this.CurFootnote.AddInlineTable(Cols, Rows);
 };
 CFootnotesController.prototype.ClearParagraphFormatting = function()
 {

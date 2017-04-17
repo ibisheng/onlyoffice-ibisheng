@@ -148,7 +148,7 @@ if(typeof CDocument !== "undefined")
 				{
 					var CurElement = this.Content[this.CurPos.ContentPos];
 
-					if (AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd())
+					if (AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.IsCursorAtEnd())
 						AscCommon.CollaborativeEditing.Add_CheckLock(false);
 					else
 						this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
@@ -338,7 +338,7 @@ CDocumentContent.prototype.Document_Is_SelectionLocked = function(CheckType)
                     {
                         var CurElement = this.Content[this.CurPos.ContentPos];
 
-                        if ( AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd() )
+                        if ( AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.IsCursorAtEnd() )
                             AscCommon.CollaborativeEditing.Add_CheckLock(false);
                         else
                             this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
@@ -422,7 +422,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
         case AscCommon.changestype_Delete:
         {
             // Если у нас нет выделения, и курсор стоит в конце, мы должны проверить следующий элемент
-            if ( true != this.Selection.Use && true === this.Cursor_IsEnd() )
+            if ( true != this.Selection.Use && true === this.IsCursorAtEnd() )
             {
                 var Next = this.Get_DocumentNext();
                 if ( null != Next && type_Paragraph === Next.GetType() )

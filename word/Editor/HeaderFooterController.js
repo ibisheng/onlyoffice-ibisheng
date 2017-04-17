@@ -54,15 +54,15 @@ CHdrFtrController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix,
 };
 CHdrFtrController.prototype.AddTextArt = function(nStyle)
 {
-	this.HdrFtr.Add_TextArt(nStyle);
+	this.HdrFtr.AddTextArt(nStyle);
 };
 CHdrFtrController.prototype.EditChart = function(Chart)
 {
-	this.HdrFtr.Edit_Chart(Chart);
+	this.HdrFtr.EditChart(Chart);
 };
 CHdrFtrController.prototype.AddInlineTable = function(Cols, Rows)
 {
-	this.HdrFtr.Add_InlineTable(Cols, Rows);
+	this.HdrFtr.AddInlineTable(Cols, Rows);
 };
 CHdrFtrController.prototype.ClearParagraphFormatting = function()
 {

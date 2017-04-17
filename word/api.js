@@ -3786,7 +3786,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTable);
-			this.WordControl.m_oLogicDocument.Add_InlineTable(col, row);
+			this.WordControl.m_oLogicDocument.AddInlineTable(col, row);
 		}
 	};
 	asc_docs_api.prototype.addRowAbove             = function(count)
@@ -6244,7 +6244,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			History.Create_NewPoint(AscDFH.historydescription_Document_AddTextArt);
-			this.WordControl.m_oLogicDocument.Add_TextArt(nStyle);
+			this.WordControl.m_oLogicDocument.AddTextArt(nStyle);
 		}
 	};
 
@@ -6646,7 +6646,7 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props);
 		}
 
-		return this.WordControl.m_oLogicDocument.Get_ChartObject(type);
+		return this.WordControl.m_oLogicDocument.GetChartObject(type);
 	};
 
 	asc_docs_api.prototype.asc_addChartDrawingObject = function(options)
@@ -6675,7 +6675,7 @@ background-repeat: no-repeat;\
 			if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 			{
 				History.Create_NewPoint(AscDFH.historydescription_Document_EditChart);
-				this.WordControl.m_oLogicDocument.Edit_Chart(chartBinary);
+				this.WordControl.m_oLogicDocument.EditChart(chartBinary);
 			}
 		}
 	};

@@ -3678,7 +3678,7 @@ background-repeat: no-repeat;\
 	{
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
 		{
-			this.WordControl.m_oLogicDocument.Add_TextArt(nStyle);
+			this.WordControl.m_oLogicDocument.AddTextArt(nStyle);
 		}
 	};
 
@@ -5891,7 +5891,7 @@ background-repeat: no-repeat;\
             this.asc_onOpenChartFrame();
             this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props);
         }
-		return this.WordControl.m_oLogicDocument.Get_ChartObject(type);
+		return this.WordControl.m_oLogicDocument.GetChartObject(type);
 	};
 
 	asc_docs_api.prototype.asc_addChartDrawingObject = function(chartBinary)
@@ -5915,7 +5915,7 @@ background-repeat: no-repeat;\
 		// Находим выделенную диаграмму и накатываем бинарник
 		if (AscCommon.isRealObject(chartBinary))
 		{
-			this.WordControl.m_oLogicDocument.Edit_Chart(chartBinary);
+			this.WordControl.m_oLogicDocument.EditChart(chartBinary);
 		}
 	};
 

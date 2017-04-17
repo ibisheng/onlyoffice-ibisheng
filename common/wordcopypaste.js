@@ -2132,7 +2132,7 @@ PasteProcessor.prototype =
                 //����� ��������� ��������
                 var oSourceFirstPar = Item;
                 var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc);
-                if(true !== oSourceFirstPar.Cursor_IsEnd() || oSourceFirstPar.IsEmpty())
+                if(true !== oSourceFirstPar.IsCursorAtEnd() || oSourceFirstPar.IsEmpty())
                     oSourceFirstPar.Split(oSourceLastPar);
                 var oInsFirstPar = aNewContent[0];
                 var oInsLastPar = null;

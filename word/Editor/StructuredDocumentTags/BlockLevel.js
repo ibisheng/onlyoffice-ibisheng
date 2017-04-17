@@ -267,6 +267,10 @@ CBlockLevelSdt.prototype.IsCursorAtBegin = function(bOnlyPara)
 {
 	return this.Content.IsCursorAtBegin(bOnlyPara);
 };
+CBlockLevelSdt.prototype.IsCursorAtEnd = function()
+{
+	return this.Content.IsCursorAtEnd();
+};
 CBlockLevelSdt.prototype.Add_NewParagraph = function()
 {
 	return this.Content.Add_NewParagraph();
@@ -314,6 +318,14 @@ CBlockLevelSdt.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 CBlockLevelSdt.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 	this.Content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+};
+CBlockLevelSdt.prototype.AddTextArt = function(nStyle)
+{
+	this.Content.AddTextArt(nStyle);
+};
+CBlockLevelSdt.prototype.AddInlineTable = function(nCols, nRows)
+{
+	this.Content.AddInlineTable(nCols, nRows);
 };
 CBlockLevelSdt.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, bOnAddText)
 {

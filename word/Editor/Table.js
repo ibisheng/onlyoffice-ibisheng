@@ -2615,7 +2615,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 
 				// Если позиция в начале параграфа, тогда добавляем таблицу до параграфа, если в конце, тогда
 				// после параграфа, в противном случае разделяем параграф.
-				if (true === TarParagraph.Cursor_IsEnd(ParaContentPos))
+				if (true === TarParagraph.IsCursorAtEnd(ParaContentPos))
 				{
 					NewIndex++;
 				}
@@ -5270,6 +5270,18 @@ CTable.prototype.IsCursorAtBegin = function(bOnlyPara)
 
 	return false;
 };
+CTable.prototype.IsCursorAtEnd = function()
+{
+	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
+	{
+		if (0 === this.CurCell.Index && 0 === this.CurCell.Row.Index)
+		{
+			return this.CurCell.Content.IsCursorAtEnd();
+		}
+	}
+
+	return false;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с содержимым таблицы
 //----------------------------------------------------------------------------------------------------------------------
@@ -5289,18 +5301,18 @@ CTable.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data,
 	this.Selection.Type = table_Selection_Text;
 	this.CurCell.Content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
-CTable.prototype.Add_TextArt = function(nStyle)
+CTable.prototype.AddTextArt = function(nStyle)
 {
 	this.Selection.Use  = true;
 	this.Selection.Type = table_Selection_Text;
-	this.CurCell.Content.Add_TextArt(nStyle);
+	this.CurCell.Content.AddTextArt(nStyle);
 };
-CTable.prototype.Add_InlineTable = function(Cols, Rows)
+CTable.prototype.AddInlineTable = function(Cols, Rows)
 {
 	if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
 		return;
 
-	this.CurCell.Content.Add_InlineTable(Cols, Rows);
+	this.CurCell.Content.AddInlineTable(Cols, Rows);
 };
 CTable.prototype.Add = function(ParaItem, bRecalculate)
 {
