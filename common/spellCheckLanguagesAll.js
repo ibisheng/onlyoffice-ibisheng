@@ -213,7 +213,7 @@ g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("eu-ES", 0x042d));
 //{ "mt-MT", 0x043a },
 //{ "se-NO", 0x043b },
 //{ "ms-MY", 0x043e },
-//{ "kk-KZ", 0x043f },
+g_spellCheckLanguages.push(new AscCommon.asc_CLanguage("kk-KZ", 0x043f));
 //{ "ky-KG", 0x0440 },
 //{ "sw-KE", 0x0441 },
 //{ "tk-TM", 0x0442 },
