@@ -4390,7 +4390,7 @@ function DrawingObjects() {
         {
             _this.addCompositeText(arrCharCodes[nIndex]);
         }
-        _this.controller.recalculate();
+		_this.controller.startRecalculate();
         _this.controller.updateSelectionState();
     };
     _this.Set_CursorPosInCompositeText = function(nPos)

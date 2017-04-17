@@ -757,7 +757,8 @@ function CEditorPage(api)
 				global_mouseEvent.KoefPixToMM = 5;
 				AscCommon.isTouch = false;
 				AscCommon.stopEvent(e);
-				var _ret = this.onmouseup(_check_e(e), undefined, true);
+				var _natE = _check_e(e);
+				var _ret = this.onmouseup(_natE, undefined, true);
 				global_mouseEvent.KoefPixToMM = _old;
 
 				if (!AscCommon.isTouchMove && (-1 != AscCommon.TouchStartTime) && (Math.abs(AscCommon.TouchStartTime - (new Date().getTime())) > 900))

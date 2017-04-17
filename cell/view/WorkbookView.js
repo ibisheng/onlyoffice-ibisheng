@@ -1077,8 +1077,8 @@
       if (undefined !== ct.userIdAllSheet) {
         arrMouseMoveObjects.push(new asc_CMM({
           type: c_oAscMouseMoveType.LockedObject,
-          x: ct.lockAllPosLeft,
-          y: ct.lockAllPosTop,
+          x: AscCommon.AscBrowser.convertToRetinaValue(ct.lockAllPosLeft),
+          y: AscCommon.AscBrowser.convertToRetinaValue(ct.lockAllPosTop),
           userId: ct.userIdAllSheet,
           lockedObjectType: Asc.c_oAscMouseMoveLockedObjectType.Sheet
         }));
@@ -1087,8 +1087,8 @@
         if (undefined !== ct.userIdAllProps) {
           arrMouseMoveObjects.push(new asc_CMM({
             type: c_oAscMouseMoveType.LockedObject,
-            x: ct.lockAllPosLeft,
-            y: ct.lockAllPosTop,
+            x: AscCommon.AscBrowser.convertToRetinaValue(ct.lockAllPosLeft),
+            y: AscCommon.AscBrowser.convertToRetinaValue(ct.lockAllPosTop),
             userId: ct.userIdAllProps,
             lockedObjectType: Asc.c_oAscMouseMoveLockedObjectType.TableProperties
           }));
@@ -1098,8 +1098,8 @@
       if (undefined !== ct.userId) {
         arrMouseMoveObjects.push(new asc_CMM({
           type: c_oAscMouseMoveType.LockedObject,
-          x: ct.lockRangePosLeft,
-          y: ct.lockRangePosTop,
+          x: AscCommon.AscBrowser.convertToRetinaValue(ct.lockRangePosLeft),
+          y: AscCommon.AscBrowser.convertToRetinaValue(ct.lockRangePosTop),
           userId: ct.userId,
           lockedObjectType: Asc.c_oAscMouseMoveLockedObjectType.Range
         }));
@@ -1122,9 +1122,12 @@
         } else {
           ct.cursor = ct.cellCursor.cursor;
         }
-        arrMouseMoveObjects.push(new asc_CMM({
-          type: c_oAscMouseMoveType.Hyperlink, x: x, y: y, hyperlink: ct.hyperlink
-        }));
+		  arrMouseMoveObjects.push(new asc_CMM({
+			  type: c_oAscMouseMoveType.Hyperlink,
+			  x: AscCommon.AscBrowser.convertToRetinaValue(x),
+			  y: AscCommon.AscBrowser.convertToRetinaValue(y),
+			  hyperlink: ct.hyperlink
+		  }));
       }
 
       /* Проверяем, может мы на никаком объекте (такая схема оказалась приемлимой

@@ -535,6 +535,7 @@ CGraphicObjects.prototype =
                 chart_props.severalCharts = props_by_types.chartProps.severalCharts;
                 chart_props.severalChartStyles = props_by_types.chartProps.severalChartStyles;
                 chart_props.severalChartTypes = props_by_types.chartProps.severalChartTypes;
+                chart_props.lockAspect = props_by_types.chartProps.lockAspect;
                 if(this.selection.group){
                     chart_props.description = props_by_types.chartProps.description;
                     chart_props.title = props_by_types.chartProps.title;
@@ -2543,7 +2544,6 @@ CGraphicObjects.prototype =
         for(i = 0; i < objects_for_grouping.length; ++i)
         {
             objects_for_grouping[i].parent.Remove_FromDocument(false);
-            objects_for_grouping[i].parent.Set_GraphicObject(null);//for Bug 34548
             if(objects_for_grouping[i].setParent){
                 objects_for_grouping[i].setParent(null);
             }
@@ -2593,6 +2593,22 @@ CGraphicObjects.prototype =
             this.resetSelection();
             var i, j, nearest_pos, cur_group, sp_tree, sp, parent_paragraph, page_num;
             var a_objects = [];
+            var arrCenterPos = [], aPos;
+            for(i = 0; i < ungroup_arr.length; ++i)
+            {
+                cur_group = ungroup_arr[i];
+                sp_tree = cur_group.spTree;
+                aPos = [];
+                for(j = 0; j < sp_tree.length; ++j)
+                {
+                    sp = sp_tree[j];
+                    xc = sp.transform.TransformPointX(sp.extX/2, sp.extY/2);
+                    yc = sp.transform.TransformPointY(sp.extX/2, sp.extY/2);
+                    aPos.push({xc: xc, yc: yc});
+                }
+                arrCenterPos.push(aPos);
+            }
+
             for(i = 0; i < ungroup_arr.length; ++i)
             {
                 cur_group = ungroup_arr[i];
@@ -2602,14 +2618,21 @@ CGraphicObjects.prototype =
                 cur_group.parent.Remove_FromDocument(false);
                 cur_group.setBDeleted(true);
                 sp_tree = cur_group.spTree;
+                aPos = arrCenterPos[i];
                 for(j = 0; j < sp_tree.length; ++j)
                 {
                     sp = sp_tree[j];
                     var drawing = new ParaDrawing(0, 0, sp_tree[j], this.drawingDocument, null, null);
 
                     var xc, yc, hc = sp.extX/2, vc = sp.extY/2;
-                    xc = sp.transform.TransformPointX(hc, vc);
-                    yc = sp.transform.TransformPointY(hc, vc);
+                    if(aPos && aPos[j]){
+                        xc = aPos[j].xc;
+                        yc = aPos[j].yc;
+                    }
+                    else {
+                        xc = sp.transform.TransformPointX(hc, vc);
+                        yc = sp.transform.TransformPointY(hc, vc);
+                    }
 
                     drawing.Set_GraphicObject(sp);
                     sp.setParent(drawing);
