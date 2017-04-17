@@ -1870,7 +1870,7 @@ CHeaderFooterController.prototype =
 
     Paragraph_Add : function( ParaItem, bRecalculate )
     {
-        if (para_NewLine === ParaItem.Type && true === ParaItem.Is_PageOrColumnBreak())
+        if (para_NewLine === ParaItem.Type && true === ParaItem.IsPageOrColumnBreak())
             return;
 
         if ( null != this.CurHdrFtr )

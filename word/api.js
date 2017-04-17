@@ -1412,12 +1412,12 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_addDropCap = function(bInText)
 	{
-		this.WordControl.m_oLogicDocument.Add_DropCap(bInText);
+		this.WordControl.m_oLogicDocument.AddDropCap(bInText);
 	};
 
 	asc_docs_api.prototype.removeDropcap = function(bDropCap)
 	{
-		this.WordControl.m_oLogicDocument.Remove_DropCap(bDropCap);
+		this.WordControl.m_oLogicDocument.RemoveDropCap(bDropCap);
 	};
 
 	asc_docs_api.prototype.get_TextProps = function()

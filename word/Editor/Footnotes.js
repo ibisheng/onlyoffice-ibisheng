@@ -1409,7 +1409,7 @@ CFootnotesController.prototype.ClearParagraphFormatting = function()
 };
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
-	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+	if (para_NewLine === oItem.Type && true === oItem.IsPageOrColumnBreak())
 		return;
 
 	if (oItem instanceof ParaTextPr)

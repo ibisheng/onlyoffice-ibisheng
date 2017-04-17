@@ -70,7 +70,7 @@ CHdrFtrController.prototype.ClearParagraphFormatting = function()
 };
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
-	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+	if (para_NewLine === oItem.Type && true === oItem.IsPageOrColumnBreak())
 		return;
 
 	this.HdrFtr.Paragraph_Add(oItem, bRecalculate);

@@ -1099,14 +1099,6 @@ ParaNewLine.prototype =
 
         if (break_Page === this.BreakType || break_Column === this.BreakType)
             this.Flags = { NewLine : Reader.GetBool() };
-    },
-
-    Is_PageOrColumnBreak : function()
-    {
-        if (break_Page === this.BreakType || break_Column === this.BreakType)
-            return true;
-
-        return false;
     }
 };
 ParaNewLine.prototype.IsPageOrColumnBreak = function()

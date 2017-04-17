@@ -425,6 +425,10 @@ CDocumentContentElementBase.prototype.Is_Empty = function()
 {
 	return true;
 };
+CDocumentContentElementBase.prototype.Add = function(oParaItem)
+{
+	// TODO: Данную функцию нужно заменить на AddToParagraph
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
@@ -530,6 +534,10 @@ CDocumentContentElementBase.prototype.GetReviewType = function()
 CDocumentContentElementBase.prototype.IsEmpty = function()
 {
 	return this.Is_Empty();
+};
+CDocumentContentElementBase.prototype.AddToParagraph = function(oItem)
+{
+	return this.Add(oItem);
 };
 
 //--------------------------------------------------------export--------------------------------------------------------

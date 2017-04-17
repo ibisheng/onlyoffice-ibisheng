@@ -335,6 +335,10 @@ CBlockLevelSdt.prototype.Is_Empty = function()
 {
 	return this.Content.Is_Empty();
 };
+CBlockLevelSdt.prototype.Add = function(oParaItem)
+{
+	return this.Content.Paragraph_Add(oParaItem);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -433,6 +437,14 @@ CBlockLevelSdt.prototype.Set_CurrentElement = function(bUpdateStates, PageAbs, o
 CBlockLevelSdt.prototype.Refresh_RecalcData2 = function(CurPage)
 {
 	this.Parent.Refresh_RecalcData2(this.Index, CurPage);
+};
+CBlockLevelSdt.prototype.Check_AutoFit = function()
+{
+	return this.Parent.Check_AutoFit();
+};
+CBlockLevelSdt.prototype.Is_InTable = function(bReturnTopTable)
+{
+	return this.Parent.Is_InTable(bReturnTopTable);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

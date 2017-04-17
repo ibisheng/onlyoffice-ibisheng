@@ -4052,7 +4052,7 @@ CDocument.prototype.AddInlineTable = function(Cols, Rows)
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateRulersState();
 };
-CDocument.prototype.Add_DropCap = function(bInText)
+CDocument.prototype.AddDropCap = function(bInText)
 {
 	// Определим параграф, к которому мы будем добавлять буквицу
 	var Pos = -1;
@@ -4106,7 +4106,7 @@ CDocument.prototype.Add_DropCap = function(bInText)
 		this.Document_UpdateRulersState();
 	}
 };
-CDocument.prototype.Remove_DropCap = function(bDropCap)
+CDocument.prototype.RemoveDropCap = function(bDropCap)
 {
 	var Pos = -1;
 
@@ -4247,7 +4247,7 @@ CDocument.prototype.Remove_DropCap = function(bDropCap)
 		}
 	}
 };
-CDocument.prototype.Check_FramePrLastParagraph = function()
+CDocument.prototype.private_CheckFramePrLastParagraph = function()
 {
     var Count = this.Content.length;
     if (Count <= 0)
@@ -7469,7 +7469,7 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCorrect
 	this.Check_SectionLastParagraph();
 
 	// Проверим не является ли рамкой последний параграф
-	this.Check_FramePrLastParagraph();
+	this.private_CheckFramePrLastParagraph();
 
 	// Запоминаем, что нам нужно произвести переиндексацию элементов
 	this.private_ReindexContent(Position);
@@ -11708,7 +11708,7 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 							{
 								// Просто перерисовываем нужные страницы
 								var StartPage = this.Content[StartPos].Get_StartPage_Absolute();
-								var EndPage   = this.Content[EndPos].Get_StartPage_Absolute() + this.Content[EndPos].Pages.length - 1;
+								var EndPage   = this.Content[EndPos].Get_StartPage_Absolute() + this.Content[EndPos].GetPagesCount() - 1;
 								this.ReDraw(StartPage, EndPage);
 							}
 						}
@@ -11771,8 +11771,8 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 				{
 					this.Add_NewParagraph(undefined, true);
 					var CurPos = this.CurPos.ContentPos - 1;
-					this.Content[CurPos].Cursor_MoveToStartPos();
-					this.Content[CurPos].Add(ParaItem);
+					this.Content[CurPos].MoveCursorToStartPos(false);
+					this.Content[CurPos].AddToParagraph(ParaItem);
 					this.Content[CurPos].Clear_Formatting();
 				}
 			}
@@ -11784,15 +11784,15 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 					var CurPos = this.CurPos.ContentPos;
 					if (oCurElement && type_Paragraph === oCurElement.Get_Type() && oCurElement.IsColumnBreakOnLeft())
 					{
-						oCurElement.Add(ParaItem);
+						oCurElement.AddToParagraph(ParaItem);
 					}
 					else
 					{
 						this.Add_NewParagraph(undefined, true);
 						CurPos = this.CurPos.ContentPos;
 
-						this.Content[CurPos].Cursor_MoveToStartPos();
-						this.Content[CurPos].Add(ParaItem);
+						this.Content[CurPos].MoveCursorToStartPos(false);
+						this.Content[CurPos].AddToParagraph(ParaItem);
 					}
 				}
 				else
@@ -11800,8 +11800,8 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 					this.Add_NewParagraph(undefined, true);
 					this.Add_NewParagraph(undefined, true);
 					var CurPos = this.CurPos.ContentPos - 1;
-					this.Content[CurPos].Cursor_MoveToStartPos();
-					this.Content[CurPos].Add(ParaItem);
+					this.Content[CurPos].MoveCursorToStartPos(false);
+					this.Content[CurPos].AddToParagraph(ParaItem);
 					this.Content[CurPos].Clear_Formatting();
 				}
 			}
@@ -11822,7 +11822,7 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 	}
 	else
 	{
-		Item.Add(ParaItem);
+		Item.AddToParagraph(ParaItem);
 
 		if (false != bRecalculate && type_Paragraph == Item.GetType())
 		{
