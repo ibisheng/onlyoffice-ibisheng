@@ -2422,6 +2422,7 @@ window["SetDoctRendererParams"] = function(_params)
   window["AscCommon"].prepareUrl = prepareUrl;
   window["AscCommon"].getUserColorById = getUserColorById;
   window["AscCommon"].isNullOrEmptyString = isNullOrEmptyString;
+  window["AscCommon"].getJSZipUtils = getJSZipUtils;
 
   window["AscCommon"].DocumentUrls = DocumentUrls;
   window["AscCommon"].CLock = CLock;
