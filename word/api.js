@@ -1275,10 +1275,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asc_getSpellCheckLanguages = function()
-	{
-		return AscCommon.g_spellCheckLanguages;
-	};
 	asc_docs_api.prototype.asc_SpellCheckDisconnect   = function()
 	{
 		if (!this.SpellCheckApi)
@@ -7658,7 +7654,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_coAuthoringChatGetMessages']            = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
 	asc_docs_api.prototype['asc_coAuthoringGetUsers']                   = asc_docs_api.prototype.asc_coAuthoringGetUsers;
 	asc_docs_api.prototype['asc_coAuthoringDisconnect']                 = asc_docs_api.prototype.asc_coAuthoringDisconnect;
-	asc_docs_api.prototype['asc_getSpellCheckLanguages']                = asc_docs_api.prototype.asc_getSpellCheckLanguages;
 	asc_docs_api.prototype['asc_SpellCheckDisconnect']                  = asc_docs_api.prototype.asc_SpellCheckDisconnect;
 	asc_docs_api.prototype['_onUpdateDocumentCanSave']                  = asc_docs_api.prototype._onUpdateDocumentCanSave;
 	asc_docs_api.prototype['put_FramePr']                               = asc_docs_api.prototype.put_FramePr;
