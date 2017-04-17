@@ -400,6 +400,21 @@ CDocumentContentElementBase.prototype.AddInlineImage = function(W, H, Img, Chart
 CDocumentContentElementBase.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 };
+CDocumentContentElementBase.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, bOnAddText)
+{
+};
+CDocumentContentElementBase.prototype.Set_ReviewType = function(ReviewType)
+{
+
+};
+CDocumentContentElementBase.prototype.Get_ReviewType = function()
+{
+	return reviewtype_Common;
+};
+CDocumentContentElementBase.prototype.Is_Empty = function()
+{
+	return true;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
@@ -489,6 +504,22 @@ CDocumentContentElementBase.prototype.GetSelectionState2 = function()
 CDocumentContentElementBase.prototype.SetSelectionState2 = function(State)
 {
 	return this.Set_SelectionState2(State);
+};
+CDocumentContentElementBase.prototype.IsSelectionEmpty = function(isCheckHidden)
+{
+	return this.Selection_IsEmpty(isCheckHidden);
+};
+CDocumentContentElementBase.prototype.SetReviewType = function(ReviewType)
+{
+	this.Set_ReviewType(ReviewType);
+};
+CDocumentContentElementBase.prototype.GetReviewType = function()
+{
+	return this.Get_ReviewType();
+};
+CDocumentContentElementBase.prototype.IsEmpty = function()
+{
+	return this.Is_Empty();
 };
 
 //--------------------------------------------------------export--------------------------------------------------------

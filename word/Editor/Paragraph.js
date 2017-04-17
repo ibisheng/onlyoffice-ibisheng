@@ -7016,7 +7016,7 @@ Paragraph.prototype.Get_Paragraph_ParaPr = function()
 /**
  * Проверяем пустой ли параграф
  */
-Paragraph.prototype.IsEmpty = function(Props)
+Paragraph.prototype.Is_Empty = function(Props)
 {
 	var Pr = {SkipEnd : true};
 
@@ -7034,10 +7034,6 @@ Paragraph.prototype.IsEmpty = function(Props)
 	}
 
 	return true;
-};
-Paragraph.prototype.Is_Empty = function()
-{
-	return this.IsEmpty();
 };
 /**
  * Проверяем, попали ли мы в текст

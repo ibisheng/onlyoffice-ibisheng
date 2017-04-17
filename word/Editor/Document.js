@@ -11886,7 +11886,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 		// Проверим, пустой ли селект в конечном элементе (для случая, когда конечный элемент параграф, и в нем
 		// не заселекчен знак конца параграфа)
-		if (StartPos !== EndPos && true === this.Content[EndPos].Selection_IsEmpty(true))
+		if (StartPos !== EndPos && true === this.Content[EndPos].IsSelectionEmpty(true))
 			EndPos--;
 
 		if (true === this.Is_TrackRevisions())
@@ -11904,11 +11904,11 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 			this.Selection_Remove();
 			for (var Index = EndPos - 1; Index >= StartPos; Index--)
 			{
-				if (type_Paragraph === this.Content[Index].GetType() && reviewtype_Add === this.Content[Index].Get_ReviewType())
+				if (type_Paragraph === this.Content[Index].GetType() && reviewtype_Add === this.Content[Index].GetReviewType())
 				{
 					// Если параграф пустой, тогда удаляем параграф, если не пустой, тогда объединяем его со
 					// следующим параграф. Если следующий элемент таблица, тогда ничего не делаем.
-					if (this.Content[Index].Is_Empty())
+					if (this.Content[Index].IsEmpty())
 					{
 						this.Internal_Content_Remove(Index, 1);
 					}
@@ -11921,7 +11921,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 				}
 				else
 				{
-					this.Content[Index].Set_ReviewType(reviewtype_Remove);
+					this.Content[Index].SetReviewType(reviewtype_Remove);
 				}
 			}
 
@@ -11977,18 +11977,18 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 					if (type_Paragraph == StartType && type_Paragraph == EndType && true === bOnTextAdd)
 					{
 						// Встаем в конец параграфа и удаляем 1 элемент (чтобы соединить параграфы)
-						this.Content[StartPos].Cursor_MoveToEndPos(false, false);
+						this.Content[StartPos].MoveCursorToEndPos(false, false);
 						this.Remove(1, true);
 					}
 					else
 					{
-						if (true === bOnTextAdd && type_Table === this.Content[StartPos + 1].Get_Type() && type_Table === this.Content[StartPos].Get_Type())
+						if (true === bOnTextAdd && type_Table === this.Content[StartPos + 1].GetType() && type_Table === this.Content[StartPos].GetType())
 						{
 							this.Internal_Content_Add(StartPos + 1, this.private_CreateNewParagraph());
 							this.CurPos.ContentPos = StartPos + 1;
 							this.Content[StartPos + 1].Cursor_MoveToStartPos();
 						}
-						else if (true === bOnTextAdd && type_Table === this.Content[StartPos + 1].Get_Type())
+						else if (true === bOnTextAdd && type_Table === this.Content[StartPos + 1].GetType())
 						{
 							this.CurPos.ContentPos = StartPos;
 							this.Content[StartPos].Cursor_MoveToEndPos(false, false);
@@ -12016,7 +12016,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 						// Встаем в начало параграфа
 						this.CurPos.ContentPos = StartPos + 1;
-						this.Content[StartPos + 1].Cursor_MoveToStartPos();
+						this.Content[StartPos + 1].MoveCursorToStartPos(false);
 					}
 					else
 					{
@@ -12027,14 +12027,14 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 						{
 							// Встаем в конец параграфа
 							this.CurPos.ContentPos = StartPos;
-							this.Content[StartPos].Cursor_MoveToEndPos(false, false);
+							this.Content[StartPos].MoveCursorToEndPos(false, false);
 						}
 						else if (type_Table == StartType)
 						{
 							// У нас обязательно есть элемент после таблицы (либо снова таблица, либо параграф)
 							// Встаем в начало следующего элемента.
 							this.CurPos.ContentPos = StartPos + 1;
-							this.Content[StartPos + 1].Cursor_MoveToStartPos();
+							this.Content[StartPos + 1].MoveCursorToStartPos(false);
 						}
 					}
 				}
@@ -12043,12 +12043,12 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 					// Удаляем весь промежуточный контент и начальный параграф
 					this.Internal_Content_Remove(StartPos, EndPos - StartPos);
 
-					if (type_Table === this.Content[StartPos].Get_Type() && true === bOnTextAdd)
+					if (type_Table === this.Content[StartPos].GetType() && true === bOnTextAdd)
 						this.Internal_Content_Add(StartPos, this.private_CreateNewParagraph());
 
 					// Встаем в начало параграфа
 					this.CurPos.ContentPos = StartPos;
-					this.Content[StartPos].Cursor_MoveToStartPos();
+					this.Content[StartPos].MoveCursorToStartPos(false);
 				}
 				else
 				{
@@ -12061,11 +12061,11 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 						else
 							this.Internal_Content_Remove(StartPos, EndPos - StartPos);
 
-						if (type_Table === this.Content[StartPos].Get_Type() && true === bOnTextAdd)
+						if (type_Table === this.Content[StartPos].GetType() && true === bOnTextAdd)
 							this.Internal_Content_Add(StartPos, this.private_CreateNewParagraph());
 
 						this.CurPos.ContentPos = StartPos;
-						this.Content[StartPos].Cursor_MoveToStartPos();
+						this.Content[StartPos].MoveCursorToStartPos(false);
 					}
 					else
 					{
@@ -12086,12 +12086,12 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 						{
 							// Документ не должен заканчиваться таблицей, поэтому здесь проверку не делаем
 							this.CurPos.ContentPos = this.Content.length - 1;
-							this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false, false);
+							this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
 						}
 						else
 						{
 							this.CurPos.ContentPos = StartPos;
-							this.Content[StartPos].Cursor_MoveToStartPos();
+							this.Content[StartPos].MoveCursorToStartPos(false);
 						}
 					}
 				}
@@ -12100,7 +12100,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 			{
 				this.CurPos.ContentPos = StartPos;
 
-				if (Count < 0 && type_Table === this.Content[StartPos].GetType() && table_Selection_Cell === this.Content[StartPos].Selection.Type && true != bOnTextAdd)
+				if (Count < 0 && type_Table === this.Content[StartPos].GetType() && true === this.Content[StartPos].IsCellSelection() && true != bOnTextAdd)
 				{
 					return this.Table_RemoveRow();
 				}
@@ -12123,12 +12123,12 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 							{
 								// Документ не должен заканчиваться таблицей, поэтому здесь проверку не делаем
 								this.CurPos.ContentPos = this.Content.length - 1;
-								this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false, false);
+								this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
 							}
 							else
 							{
 								this.CurPos.ContentPos = StartPos;
-								this.Content[StartPos].Cursor_MoveToStartPos();
+								this.Content[StartPos].MoveCursorToStartPos();
 							}
 
 							this.Recalculate();
@@ -12176,11 +12176,11 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 						if ((undefined === CurrFramePr && undefined === PrevFramePr) || ( undefined !== CurrFramePr && undefined !== PrevFramePr && true === CurrFramePr.Compare(PrevFramePr) ))
 						{
-							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos - 1].Get_ReviewType())
+							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos - 1].GetReviewType())
 							{
 								this.Content[this.CurPos.ContentPos - 1].Set_ReviewType(reviewtype_Remove);
 								this.CurPos.ContentPos--;
-								this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
+								this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
 							}
 							else
 							{
@@ -12189,7 +12189,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 									// Просто удаляем предыдущий параграф
 									this.Internal_Content_Remove(this.CurPos.ContentPos - 1, 1);
 									this.CurPos.ContentPos--;
-									this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+									this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 								}
 								else
 								{
@@ -12198,7 +12198,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 
 									// Смещаемся в конец до объединения параграфов, чтобы курсор стоял в месте
 									// соединения.
-									Prev.Cursor_MoveToEndPos();
+									Prev.MoveCursorToEndPos(false, false);
 
 									// Запоминаем новую позицию курсора, после совмещения параграфов
 									Prev.Concat(this.Content[this.CurPos.ContentPos]);
@@ -12220,9 +12220,9 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 						{
 							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos].Get_ReviewType())
 							{
-								this.Content[this.CurPos.ContentPos].Set_ReviewType(reviewtype_Remove);
+								this.Content[this.CurPos.ContentPos].SetReviewType(reviewtype_Remove);
 								this.CurPos.ContentPos++;
-								this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+								this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 							}
 							else
 							{
@@ -12230,7 +12230,7 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 								{
 									// Просто удаляем текущий параграф
 									this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
-									this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos();
+									this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 								}
 								else
 								{
@@ -12267,15 +12267,14 @@ CDocument.prototype.controller_Remove = function(Count, bOnlyText, bRemoveOnlySe
 			}
 
 			var Item = this.Content[this.CurPos.ContentPos];
-			if (type_Paragraph == Item.GetType())
+			if (type_Paragraph === Item.GetType())
 			{
 				Item.CurPos.RealX = Item.CurPos.X;
 				Item.CurPos.RealY = Item.CurPos.Y;
 			}
 		}
-		else if (type_Table == this.Content[this.CurPos.ContentPos].GetType())
+		else
 		{
-			// Remove сам вызывет команду Recalculate
 			this.Content[this.CurPos.ContentPos].Remove(Count, bOnlyText);
 		}
 	}

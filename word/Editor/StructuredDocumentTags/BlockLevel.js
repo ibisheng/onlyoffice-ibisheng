@@ -315,6 +315,14 @@ CBlockLevelSdt.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Im
 {
 	this.Content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
+CBlockLevelSdt.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, bOnAddText)
+{
+	return this.Content.Remove(nCount, bOnlyText, bRemoveOnlySelection, bOnlyText);
+};
+CBlockLevelSdt.prototype.Is_Empty = function()
+{
+	return this.Content.Is_Empty();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -327,6 +335,10 @@ CBlockLevelSdt.prototype.Is_TopDocument = function(bReturnTopDocument)
 CBlockLevelSdt.prototype.Is_Cell = function()
 {
 	return this.Parent.Is_TableCellContent();
+};
+CBlockLevelSdt.prototype.Is_DrawingShape = function()
+{
+	return this.Parent.Is_DrawingShape();
 };
 CBlockLevelSdt.prototype.Get_Numbering = function()
 {

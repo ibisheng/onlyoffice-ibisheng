@@ -12090,6 +12090,13 @@ CTable.prototype.CanUpdateTarget = function(CurPage)
 
 	return oCell.Content.CanUpdateTarget(CurPage - oCell.Content.Get_StartPage_Relative());
 };
+CTable.prototype.IsCellSelection = function()
+{
+	if (true === this.IsSelectionUse() && table_Selection_Cell === this.Selection.Type)
+		return true;
+
+	return false;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------
