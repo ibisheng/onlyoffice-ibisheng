@@ -223,9 +223,6 @@ ParaDrawing.prototype.CheckCorrect = function(){
 	if(!this.GraphicObj){
 		return false;
 	}
-	if(this.GraphicObj.parent !== this){
-		return false;
-	}
 	if(this.GraphicObj && this.GraphicObj.checkCorrect){
 		return this.GraphicObj.checkCorrect();
 	}
@@ -835,7 +832,7 @@ ParaDrawing.prototype.CheckWH = function()
 		return;
 	this.GraphicObj.recalculate();
 	var extX, extY, rot;
-	if (this.GraphicObj.spPr.xfrm )
+	if (this.GraphicObj.spPr && this.GraphicObj.spPr.xfrm )
 	{
 		if(AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extX) && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extY))
 		{

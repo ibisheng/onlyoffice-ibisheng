@@ -7620,6 +7620,15 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
         aPrepeareFonts.push(new CFont(font_family, 0, "", 0));
     };
 
+    var isDesktopEditor = (window["AscDesktopEditor"] !== undefined) ? true : false;
+    var isDesktopEditorLocal = false;
+
+    if (isDesktopEditor)
+	{
+		if (window["AscDesktopEditor"]["IsLocalFile"] && window["AscDesktopEditor"]["IsLocalFile"]())
+			isDesktopEditorLocal = true;
+	}
+
     var aImagesToDownload = [];
     var _mapLocal = {};
     for (var image in _images)
@@ -7654,7 +7663,7 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
             else
                 _images[image] = "local";
         }
-        else if (window["AscDesktopEditor"] !== undefined)
+        else if (isDesktopEditorLocal)
 		{
 			if (!g_oDocumentUrls.getImageLocal(src))
 				aImagesToDownload.push(src);

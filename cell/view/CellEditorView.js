@@ -1598,7 +1598,7 @@
 		var b = this.input.selectionStart;
 		var e = this.input.selectionEnd;
 		if (typeof b !== "undefined") {
-			if (this.cursorPos !== b || this.selectionBegin !== t.selectionEnd) {
+			if (this.cursorPos !== b || this.selectionBegin !== this.selectionEnd) {
 				this._moveCursor(kPosition, b);
 			}
 			if (b !== e) {

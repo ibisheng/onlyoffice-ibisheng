@@ -1645,9 +1645,9 @@ CSchemeColor.prototype =
                 {
                     clrMap = AscFormat.DEFAULT_COLOR_MAP.color_map;
                 }
-                if (clrMap[this.id]!=null && theme.themeElements.clrScheme.colors[clrMap[this.id]] != null)
+                if (clrMap[this.id]!=null && theme.themeElements.clrScheme.colors[clrMap[this.id]] != null && theme.themeElements.clrScheme.colors[clrMap[this.id]].color != null)
                     this.RGBA = theme.themeElements.clrScheme.colors[clrMap[this.id]].color.RGBA;
-                else if (theme.themeElements.clrScheme.colors[this.id] != null)
+                else if (theme.themeElements.clrScheme.colors[this.id] != null && theme.themeElements.clrScheme.colors[this.id].color != null)
                     this.RGBA = theme.themeElements.clrScheme.colors[this.id].color.RGBA;
             }
         }

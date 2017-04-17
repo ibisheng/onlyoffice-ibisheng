@@ -2543,7 +2543,6 @@ CGraphicObjects.prototype =
         for(i = 0; i < objects_for_grouping.length; ++i)
         {
             objects_for_grouping[i].parent.Remove_FromDocument(false);
-            objects_for_grouping[i].parent.Set_GraphicObject(null);//for Bug 34548
             if(objects_for_grouping[i].setParent){
                 objects_for_grouping[i].setParent(null);
             }
