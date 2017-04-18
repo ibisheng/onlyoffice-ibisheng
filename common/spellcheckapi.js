@@ -126,6 +126,7 @@
 		this._state = 0;
 		// Мы сами отключились от совместного редактирования
 		this.isCloseCoAuthoring = false;
+		this.isInit = false;
 
 		// Массив данных, который стоит отправить как только подключимся
 		this.dataNeedSend = [];
@@ -177,8 +178,9 @@
 		}
 	};
 	SpellCheckApi.prototype._onInit = function (data) {
-		if (data["languages"] && this.onInit) {
+		if (!this.isInit && data["languages"] && this.onInit) {
 			this.onInit(data["languages"]);
+			this.isInit = true;
 		}
 	};
 
