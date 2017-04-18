@@ -2460,7 +2460,7 @@ CGraphicObjects.prototype =
     {
         var oTargetDocContent = this.getTargetDocContent();
         if(oTargetDocContent){
-            var oPos = oTargetDocContent.Cursor_GetPos();
+            var oPos = oTargetDocContent.GetCursorPosXY();
             var oTransform = oTargetDocContent.Get_ParentTextTransform();
             if(oTransform){
                 var _x = oTransform.TransformPointX(oPos.X, oPos.Y);
@@ -2735,7 +2735,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Cursor_MoveToCell(bNext);
+            content.MoveCursorToCell(bNext);
         }
     },
 

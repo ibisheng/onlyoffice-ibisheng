@@ -1433,7 +1433,7 @@
 					var cellsLeft = worksheet.cellsLeft * ptToPx;
 					var cellsTop = worksheet.cellsTop * ptToPx;
 					
-					var cursorPos = target_doc_content.Cursor_GetPos();
+					var cursorPos = target_doc_content.GetCursorPosXY();
 					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left * ptToPx - cellsLeft;
 					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top * ptToPx - cellsTop;
 					var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;

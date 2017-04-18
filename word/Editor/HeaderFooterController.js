@@ -66,7 +66,7 @@ CHdrFtrController.prototype.AddInlineTable = function(Cols, Rows)
 };
 CHdrFtrController.prototype.ClearParagraphFormatting = function()
 {
-	this.HdrFtr.Paragraph_ClearFormatting();
+	this.HdrFtr.ClearParagraphFormatting();
 };
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
@@ -91,53 +91,53 @@ CHdrFtrController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelec
 };
 CHdrFtrController.prototype.GetCursorPosXY = function()
 {
-	return this.HdrFtr.Cursor_GetPos();
+	return this.HdrFtr.GetCursorPosXY();
 };
 CHdrFtrController.prototype.MoveCursorToStartPos = function(AddToSelect)
 {
-	this.HdrFtr.Cursor_MoveToStartPos(AddToSelect);
+	this.HdrFtr.MoveCursorToStartPos(AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorToEndPos = function(AddToSelect)
 {
-	this.HdrFtr.Cursor_MoveToEndPos(AddToSelect);
+	this.HdrFtr.MoveCursorToEndPos(AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
-	return this.HdrFtr.Cursor_MoveLeft(AddToSelect, Word);
+	return this.HdrFtr.MoveCursorLeft(AddToSelect, Word);
 };
 CHdrFtrController.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
 {
-	return this.HdrFtr.Cursor_MoveRight(AddToSelect, Word, FromPaste);
+	return this.HdrFtr.MoveCursorRight(AddToSelect, Word, FromPaste);
 };
 CHdrFtrController.prototype.MoveCursorUp = function(AddToSelect)
 {
-	var RetValue = this.HdrFtr.Cursor_MoveUp(AddToSelect);
+	var RetValue = this.HdrFtr.MoveCursorUp(AddToSelect);
 	this.LogicDocument.Document_UpdateInterfaceState();
 	this.LogicDocument.Document_UpdateSelectionState();
 	return RetValue;
 };
 CHdrFtrController.prototype.MoveCursorDown = function(AddToSelect)
 {
-	var RetValue = this.HdrFtr.Cursor_MoveDown(AddToSelect);
+	var RetValue = this.HdrFtr.MoveCursorDown(AddToSelect);
 	this.LogicDocument.Document_UpdateInterfaceState();
 	this.LogicDocument.Document_UpdateSelectionState();
 	return RetValue;
 };
 CHdrFtrController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 {
-	return this.HdrFtr.Cursor_MoveEndOfLine(AddToSelect);
+	return this.HdrFtr.MoveCursorToEndOfLine(AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 {
-	return this.HdrFtr.Cursor_MoveStartOfLine(AddToSelect);
+	return this.HdrFtr.MoveCursorToStartOfLine(AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSelect)
 {
-	return this.HdrFtr.Cursor_MoveAt(X, Y, PageAbs, AddToSelect);
+	return this.HdrFtr.MoveCursorToXY(X, Y, PageAbs, AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorToCell = function(bNext)
 {
-	return this.HdrFtr.Cursor_MoveToCell(bNext);
+	return this.HdrFtr.MoveCursorToCell(bNext);
 };
 CHdrFtrController.prototype.SetParagraphAlign = function(Align)
 {
@@ -442,7 +442,7 @@ CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(Stat
 			if (true !== this.LogicDocument.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
 			{
 				HdrFtrContent.Set_DocPosType(docpostype_Content);
-				HdrFtrContent.Cursor_MoveToStartPos();
+				HdrFtrContent.MoveCursorToStartPos();
 			}
 		}
 	}

@@ -2010,7 +2010,7 @@ PasteProcessor.prototype =
             
             if ((oDocument.Get_DocPosType() !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === bNeedMoveCursor)
             {
-                this.oLogicDocument.Cursor_MoveRight(false, false, true);
+                this.oLogicDocument.MoveCursorRight(false, false, true);
             }
             
             this.oLogicDocument.Document_UpdateInterfaceState();
@@ -3342,7 +3342,7 @@ PasteProcessor.prototype =
 				shape.spPr.xfrm.setExtY(h);
 				shape.spPr.xfrm.setOffX(0);
 				shape.spPr.xfrm.setOffY(0);
-				shape.txBody.content.Cursor_MoveToEndPos();
+				shape.txBody.content.MoveCursorToEndPos();
 				arrShapes[i] = new DrawingCopyObject(shape, 0, 0, w, h);
 			}
 			
@@ -5874,7 +5874,7 @@ PasteProcessor.prototype =
 			}
             //�������� content
             this._ExecuteTable(tableNode, node, table, aSumGrid, nMaxColCount != nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef);
-            table.Cursor_MoveToStartPos();
+            table.MoveCursorToStartPos();
             this.aContent.push(table);
         }
     },
@@ -7215,7 +7215,7 @@ PasteProcessor.prototype =
             }
             //�������� content
              this._ExecuteTablePresentation(tableNode, node, table, aSumGrid, nMaxColCount != nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables);
-            table.Cursor_MoveToStartPos();
+            table.MoveCursorToStartPos();
             return;
         }
     },

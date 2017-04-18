@@ -769,7 +769,7 @@ CTableCell.prototype =
         return this.Content.Selection_Check(_X, _Y, CurPage, NearPos);
     },
 
-    Content_Cursor_MoveAt : function(X, Y, bLine, bDontChangeRealPos, CurPage)
+    Content_MoveCursorToXY : function(X, Y, bLine, bDontChangeRealPos, CurPage)
     {
         var _X = X, _Y = Y;
         var Transform = this.private_GetTextDirectionTransform();
@@ -780,7 +780,7 @@ CTableCell.prototype =
             _Y = Transform.TransformPointY(X, Y);
         }
 
-        this.Content.Cursor_MoveAt(_X, _Y, bLine, bDontChangeRealPos, CurPage);
+        this.Content.MoveCursorToXY(_X, _Y, bLine, bDontChangeRealPos, CurPage);
     },
 
     Content_Update_CursorType : function(X, Y, CurPage)
@@ -888,7 +888,7 @@ CTableCell.prototype =
         return this.Content.Set_CurPosXY(_X, _Y);
     },
 
-    Content_Cursor_MoveUp_To_LastRow : function(X, Y, AddToSelect)
+    Content_MoveCursorUpToLastRow : function(X, Y, AddToSelect)
     {
         var _X = X, _Y = Y;
         var Transform = this.private_GetTextDirectionTransform();
@@ -898,10 +898,10 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Cursor_MoveUp_To_LastRow(_X, _Y, AddToSelect);
+        return this.Content.MoveCursorUpToLastRow(_X, _Y, AddToSelect);
     },
 
-    Content_Cursor_MoveDown_To_FirstRow : function(X, Y, AddToSelect)
+    Content_MoveCursorDownToFirstRow : function(X, Y, AddToSelect)
     {
         var _X = X, _Y = Y;
         var Transform = this.private_GetTextDirectionTransform();
@@ -911,7 +911,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Cursor_MoveDown_To_FirstRow(_X, _Y, AddToSelect);
+        return this.Content.MoveCursorDownToFirstRow(_X, _Y, AddToSelect);
     },
 
     Content_Recalculate_MinMaxContentWidth : function(isRotated)
@@ -998,14 +998,14 @@ CTableCell.prototype =
         this.Content.Document_CreateFontMap( FontMap );
     },
 
-    Content_Cursor_MoveToStartPos : function()
+    Content_MoveCursorToStartPos : function()
     {
-        this.Content.Cursor_MoveToStartPos();
+        this.Content.MoveCursorToStartPos();
     },
 
-    Content_Cursor_MoveToEndPos : function()
+    Content_MoveCursorToEndPos : function()
     {
-        this.Content.Cursor_MoveToEndPos();
+        this.Content.MoveCursorToEndPos();
     },
     //-----------------------------------------------------------------------------------
     // Работаем с настройками ячейки

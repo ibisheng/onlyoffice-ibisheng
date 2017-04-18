@@ -352,7 +352,7 @@ function CTableOutlineDr()
 		var _outline = this.TableOutline;
 		var _table = _outline.Table;
 
-		_table.Cursor_MoveToStartPos();
+		_table.MoveCursorToStartPos();
 		_table.Document_SetThisElementCurrent(true);
 
 		if (!_table.Is_Inline())
@@ -452,7 +452,7 @@ function CTableOutlineDr()
 			this.IsChangeSmall = false;
 
 			this.TableOutline.Table.Selection_Remove();
-			this.TableOutline.Table.Cursor_MoveToStartPos();
+			this.TableOutline.Table.MoveCursorToStartPos();
 			editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		}
 
@@ -1335,7 +1335,7 @@ function CDrawingDocument()
 		var docContent = new CDocumentContent(this.m_oWordControl.m_oLogicDocument, this.m_oWordControl.m_oDrawingDocument, 0, 0, 1000, 1000, false, false, true);
 		var par        = docContent.Content[0];
 
-		par.Cursor_MoveToStartPos();
+		par.MoveCursorToStartPos();
 
 		par.Set_Pr(new CParaPr());
 		var _textPr        = new CTextPr();

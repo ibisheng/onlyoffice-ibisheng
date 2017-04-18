@@ -2560,7 +2560,7 @@ function DrawingObjects() {
 
                 var oContent = oTextArt.getDocContent();
                 if(oContent){
-                    oContent.Cursor_MoveToStartPos(false);
+                    oContent.MoveCursorToStartPos(false);
                     oContent.Paragraph_Add(new AscCommonWord.MathMenu(Type), false);
                 }
                 oTextArt.checkExtentsByDocContent();

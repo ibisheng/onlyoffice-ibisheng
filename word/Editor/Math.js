@@ -1208,7 +1208,7 @@ ParaMath.prototype.Add = function(Item)
         oContent.Internal_Content_Add(StartPos + 1, RightRun, false);
         // Выставляем позицию в начало этого рана
         oContent.CurPos = StartPos + 1;
-        RightRun.Cursor_MoveToStartPos();
+        RightRun.MoveCursorToStartPos();
 
         var lng = oContent.Content.length;
         oContent.Load_FromMenu(Item.Menu, this.Paragraph);
@@ -1372,7 +1372,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     {
                         // Здесь мы не проверяем результат Remove, потому что ран не должен быть пустым после
                         // Correct_Content
-                        oNextElement.Cursor_MoveToStartPos();
+                        oNextElement.MoveCursorToStartPos();
                         oNextElement.Remove(1);
 
                         if (oNextElement.Is_Empty())
@@ -1395,7 +1395,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     {
                         // Здесь мы не проверяем результат Remove, потому что ран не должен быть пустым после
                         // Correct_Content
-                        oPrevElement.Cursor_MoveToEndPos();
+                        oPrevElement.MoveCursorToEndPos();
                         oPrevElement.Remove(-1);
 
                         if (oPrevElement.Is_Empty())
@@ -1442,14 +1442,14 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 {
                     oContent.Remove_FromContent(nStartPos, 1);
                     if (para_Math_Run === oContent.Content[nStartPos].Type)
-                        oContent.Content[nStartPos].Cursor_MoveToStartPos();
+                        oContent.Content[nStartPos].MoveCursorToStartPos();
                 }
             }
             else
             {
                 oContent.Remove_FromContent(nStartPos, 1);
                 if (para_Math_Run === oContent.Content[nStartPos].Type)
-                    oContent.Content[nStartPos].Cursor_MoveToStartPos();
+                    oContent.Content[nStartPos].MoveCursorToStartPos();
             }
             oContent.CurPos = nStartPos;
             oContent.Correct_Content();
@@ -1507,7 +1507,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
             {
                 oContent.CurPos = nEndPos;
                 if (para_Math_Run === oContent.Content[nEndPos].Type)
-                    oContent.Content[nEndPos].Cursor_MoveToStartPos();
+                    oContent.Content[nEndPos].MoveCursorToStartPos();
             }
         }
         else
@@ -2826,18 +2826,14 @@ ParaMath.prototype.Cursor_Is_End = function()
     return this.Root.Cursor_Is_End();
 };
 
-ParaMath.prototype.Cursor_MoveToStartPos = function()
+ParaMath.prototype.MoveCursorToStartPos = function()
 {
-    // TODO: ParaMath.Cursor_MoveToStartPos
-
-    this.Root.Cursor_MoveToStartPos();
+	this.Root.MoveCursorToStartPos();
 };
 
-ParaMath.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
+ParaMath.prototype.MoveCursorToEndPos = function(SelectFromEnd)
 {
-    // TODO: ParaMath.Cursor_MoveToEndPos
-
-    this.Root.Cursor_MoveToEndPos(SelectFromEnd);
+	this.Root.MoveCursorToEndPos(SelectFromEnd);
 };
 
 ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY
@@ -3173,7 +3169,7 @@ ParaMath.prototype.Handle_AddNewLine = function()
         this.Set_ParaContentPos(RightContentPos.Pos, 0);
 
         EqArray.CurPos = 1;
-        SecondContent.Cursor_MoveToStartPos();
+        SecondContent.MoveCursorToStartPos();
 
         NeedRecalculate = true;
     }

@@ -241,29 +241,61 @@ CBlockLevelSdt.prototype.CanUpdateTarget = function(CurPage)
 {
 	return this.Content.CanUpdateTatget(CurPage);
 };
-CBlockLevelSdt.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
+CBlockLevelSdt.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
-	return this.Content.Cursor_MoveLeft(AddToSelect, Word);
+	return this.Content.MoveCursorLeft(AddToSelect, Word);
 };
 CBlockLevelSdt.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
 {
 	return this.Content.MoveCursorLeftWithSelectionFromEnd(Word);
 };
-CBlockLevelSdt.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
+CBlockLevelSdt.prototype.MoveCursorRight = function(AddToSelect, Word)
 {
-	return this.Content.Cursor_MoveRight(AddToSelect, Word, false);
+	return this.Content.MoveCursorRight(AddToSelect, Word, false);
 };
 CBlockLevelSdt.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
 {
 	return this.Content.MoveCursorRightWithSelectionFromStart(Word);
 };
-CBlockLevelSdt.prototype.Cursor_MoveToStartPos = function(AddToSelect)
+CBlockLevelSdt.prototype.MoveCursorToStartPos = function(AddToSelect)
 {
-	return this.Content.Cursor_MoveToStartPos(AddToSelect);
+	return this.Content.MoveCursorToStartPos(AddToSelect);
 };
-CBlockLevelSdt.prototype.Cursor_MoveToEndPos = function(AddToSelect, StartSelectFromEnd)
+CBlockLevelSdt.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelectFromEnd)
 {
-	return this.Content.Cursor_MoveToEndPos(AddToSelect, StartSelectFromEnd);
+	return this.Content.MoveCursorToEndPos(AddToSelect, StartSelectFromEnd);
+};
+CBlockLevelSdt.prototype.MoveCursorUp = function(AddToSelect)
+{
+	return this.Content.MoveCursorUp(AddToSelect);
+};
+CBlockLevelSdt.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
+{
+	return this.Content.MoveCursorUpToLastRow(X, Y, AddToSelect);
+};
+CBlockLevelSdt.prototype.MoveCursorDown = function(AddToSelect)
+{
+	return this.Content.MoveCursorDown(AddToSelect);
+};
+CBlockLevelSdt.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
+{
+	return this.Content.MoveCursorDownToFirstRow(X, Y, AddToSelect);
+};
+CBlockLevelSdt.prototype.MoveCursorToEndOfLine = function(AddToSelect)
+{
+	return this.Content.MoveCursorToEndOfLine(AddToSelect);
+};
+CBlockLevelSdt.prototype.MoveCursorToStartOfLine = function(AddToSelect)
+{
+	return this.Content.MoveCursorToStartOfLine(AddToSelect);
+};
+CBlockLevelSdt.prototype.MoveCursorToXY = function(X, Y, bLine, bDontChangeRealPos, CurPage)
+{
+	return this.Content.MoveCursorToXY(X, Y, bLine, bDontChangeRealPos, CurPage);
+};
+CBlockLevelSdt.prototype.MoveCursorToCell = function(bNext)
+{
+	return this.Content.MoveCursorToCell(bNext);
 };
 CBlockLevelSdt.prototype.Get_SelectionState = function()
 {
@@ -352,6 +384,14 @@ CBlockLevelSdt.prototype.Add = function(oParaItem)
 CBlockLevelSdt.prototype.PreDelete = function()
 {
 	this.Content.PreDelete();
+};
+CBlockLevelSdt.prototype.ClearParagraphFormatting = function()
+{
+	this.Content.ClearParagraphFormatting();
+};
+CBlockLevelSdt.prototype.GetCursorPosXY = function()
+{
+	return this.Content.GetCursorPosXY();
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)

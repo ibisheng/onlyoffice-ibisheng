@@ -748,9 +748,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
                     break;
 
                 if (Direction < 0)
-                    this.Content[ContentPos].Cursor_MoveToEndPos(false);
+                    this.Content[ContentPos].MoveCursorToEndPos(false);
                 else
-                    this.Content[ContentPos].Cursor_MoveToStartPos();
+                    this.Content[ContentPos].MoveCursorToStartPos();
 
             }
 
@@ -1544,23 +1544,23 @@ CParagraphContentWithParagraphLikeContent.prototype.Cursor_Is_End = function()
 
     return this.Content[CurPos].Cursor_Is_End();
 };
-CParagraphContentWithParagraphLikeContent.prototype.Cursor_MoveToStartPos = function()
+CParagraphContentWithParagraphLikeContent.prototype.MoveCursorToStartPos = function()
 {
     this.State.ContentPos = 0;
 
     if ( this.Content.length > 0 )
     {
-        this.Content[0].Cursor_MoveToStartPos();
+        this.Content[0].MoveCursorToStartPos();
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
+CParagraphContentWithParagraphLikeContent.prototype.MoveCursorToEndPos = function(SelectFromEnd)
 {
     var ContentLen = this.Content.length;
 
     if ( ContentLen > 0 )
     {
         this.State.ContentPos = ContentLen - 1;
-        this.Content[ContentLen - 1].Cursor_MoveToEndPos( SelectFromEnd );
+        this.Content[ContentLen - 1].MoveCursorToEndPos( SelectFromEnd );
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
@@ -2135,7 +2135,7 @@ CParagraphContentWithParagraphLikeContent.prototype.SetContentPosition = functio
     if (this.Content[Pos] && this.Content[Pos].SetContentPosition)
         this.Content[Pos].SetContentPosition(_DocPos, Depth + 1, _Flag);
     else
-        this.Content[Pos].Cursor_MoveToStartPos();
+        this.Content[Pos].MoveCursorToStartPos();
 };
 CParagraphContentWithParagraphLikeContent.prototype.Selection_IsUse = function()
 {

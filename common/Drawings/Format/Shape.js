@@ -940,7 +940,7 @@ CShape.prototype.applyTextFunction = function (docContentFunction, tableFunction
             this.createTextBody();
         }
         content_to_add = this.getDocContent();
-        content_to_add.Cursor_MoveToStartPos();
+        content_to_add.MoveCursorToStartPos();
     }
     if (content_to_add)
     {

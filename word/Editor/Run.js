@@ -379,7 +379,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 					if (NewRun)
 					{
 						NewRun.Set_Lang(NewLang);
-						NewRun.Cursor_MoveToStartPos();
+						NewRun.MoveCursorToStartPos();
 						NewRun.Add(Item, bMath);
 						NewRun.Make_ThisElementCurrent();
 						return;
@@ -406,7 +406,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 				{
 					NewRun.Set_VertAlign(undefined);
 					NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
-					NewRun.Cursor_MoveToStartPos();
+					NewRun.MoveCursorToStartPos();
 					NewRun.Add(Item, bMath);
 					NewRun.Make_ThisElementCurrent();
 					return;
@@ -419,7 +419,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 			if (NewRun)
 			{
 				NewRun.Set_VertAlign(AscCommon.vertalign_Baseline);
-				NewRun.Cursor_MoveToStartPos();
+				NewRun.MoveCursorToStartPos();
 				NewRun.Add(Item, bMath);
 				NewRun.Make_ThisElementCurrent();
 				return;
@@ -5123,12 +5123,12 @@ ParaRun.prototype.Cursor_Is_End = function()
     return false;
 };
 
-ParaRun.prototype.Cursor_MoveToStartPos = function()
+ParaRun.prototype.MoveCursorToStartPos = function()
 {
     this.State.ContentPos = 0;
 };
 
-ParaRun.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
+ParaRun.prototype.MoveCursorToEndPos = function(SelectFromEnd)
 {
     if ( true === SelectFromEnd )
     {
@@ -6472,7 +6472,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
                 LRun.Selection_Remove();
 
             CRun.Selection_Remove();
-            CRun.Cursor_MoveToStartPos();
+            CRun.MoveCursorToStartPos();
 
             if (true === bReview && true !== CRun.Have_PrChange())
                 CRun.Add_PrChange();
@@ -8820,7 +8820,7 @@ ParaRun.prototype.Accept_RevisionChanges = function(Type, bAll)
             {
                 Parent.Selection_Remove();
                 Parent.Add_ToContent(0, new ParaRun());
-                Parent.Cursor_MoveToStartPos();
+                Parent.MoveCursorToStartPos();
             }
         }
     }
@@ -8888,7 +8888,7 @@ ParaRun.prototype.Reject_RevisionChanges = function(Type, bAll)
             {
                 Parent.Selection_Remove();
                 Parent.Add_ToContent(0, new ParaRun());
-                Parent.Cursor_MoveToStartPos();
+                Parent.MoveCursorToStartPos();
             }
         }
         else if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type))

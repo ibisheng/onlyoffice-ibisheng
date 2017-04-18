@@ -5435,7 +5435,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.ClearFormating           = function()
 	{
-		this.WordControl.m_oLogicDocument.Paragraph_ClearFormatting();
+		this.WordControl.m_oLogicDocument.ClearParagraphFormatting();
 	};
 
 	window.ID_KEYBOARD_AREA = undefined;

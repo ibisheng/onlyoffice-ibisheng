@@ -299,7 +299,7 @@ CDocumentContentBase.prototype.private_CreateNewParagraph = function()
 {
 	var oPara = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
 	oPara.Correct_Content();
-	oPara.Cursor_MoveToStartPos(false);
+	oPara.MoveCursorToStartPos(false);
 	return oPara;
 };
 CDocumentContentBase.prototype.StopSelection = function()

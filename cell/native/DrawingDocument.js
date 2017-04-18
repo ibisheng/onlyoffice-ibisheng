@@ -521,7 +521,7 @@ function CTableOutlineDr()
         var _outline = this.TableOutline;
         var _table = _outline.Table;
 
-        _table.Cursor_MoveToStartPos();
+        _table.MoveCursorToStartPos();
         _table.Document_SetThisElementCurrent();
 
         if (!_table.Is_Inline())

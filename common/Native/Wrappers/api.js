@@ -130,7 +130,7 @@ Asc['asc_docs_api'].prototype["Call_Common"] = function(type, param)
     {
         case 1:
         {
-            this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
+            this.WordControl.m_oLogicDocument.MoveCursorLeft();
             break;
         }
         case 67:
@@ -5720,8 +5720,8 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Delete = function()
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Select = function()
 {
-    this.WordControl.m_oLogicDocument.Cursor_MoveLeft(false, true);
-    this.WordControl.m_oLogicDocument.Cursor_MoveRight(true, true);
+    this.WordControl.m_oLogicDocument.MoveCursorLeft(false, true);
+    this.WordControl.m_oLogicDocument.MoveCursorRight(true, true);
     this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_SelectAll = function()

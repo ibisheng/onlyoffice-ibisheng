@@ -733,7 +733,7 @@ DrawingObjectsController.prototype =
         {
             oSelector.resetInternalSelection();
             oSelector.selection.textSelection = oShape;
-            oContent.Cursor_MoveToEndPos(false);
+            oContent.MoveCursorToEndPos(false);
             this.updateSelectionState();
             this.updateOverlay();
         }
@@ -745,7 +745,7 @@ DrawingObjectsController.prototype =
                 var oContent = oShape.getDocContent();
                 oSelector.resetInternalSelection();
                 oSelector.selection.textSelection = oShape;
-                oContent.Cursor_MoveToEndPos(false);
+                oContent.MoveCursorToEndPos(false);
                 oThis.updateSelectionState();
             }, [], false, AscDFH.historydescription_Spreadsheet_AddNewParagraph);
         }
@@ -1236,8 +1236,8 @@ DrawingObjectsController.prototype =
     {
         var oTransformText = oTargetTextObject.transformText;
         var oTargetObjectOrTable = this.getTargetDocContent(false, true);
-        if(oTargetTextObject && oTargetObjectOrTable && oTargetObjectOrTable.Cursor_GetPos && oTransformText){
-            var oPos = oTargetObjectOrTable.Cursor_GetPos();
+        if(oTargetTextObject && oTargetObjectOrTable && oTargetObjectOrTable.GetCursorPosXY && oTransformText){
+            var oPos = oTargetObjectOrTable.GetCursorPosXY();
             return {
                 X: oTransformText.TransformPointX(oPos.X, oPos.Y),
                 Y: oTransformText.TransformPointY(oPos.X, oPos.Y),
@@ -1563,7 +1563,7 @@ DrawingObjectsController.prototype =
 
     paragraphClearFormatting: function()
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_ClearFormatting, [], CTable.prototype.Paragraph_ClearFormatting);
+        this.applyDocContentFunction(CDocumentContent.prototype.ClearParagraphFormatting, [], CTable.prototype.ClearParagraphFormatting);
     },
 
     applyDocContentFunction: function(f, args, tableFunction)
@@ -1822,14 +1822,14 @@ DrawingObjectsController.prototype =
                 this.selection.textSelection = this.selectedObjects[0];
                 if(this.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_GraphicFrame)
                 {
-                    this.selectedObjects[0].graphicObject.Cursor_MoveToStartPos(false);
+                    this.selectedObjects[0].graphicObject.MoveCursorToStartPos(false);
                     this.selectedObjects[0].applyTextFunction(docContentFunction, tableFunction, args);
                 }
                 else
                 {
                     var oDocContent = this.selectedObjects[0].getDocContent();
                     if(oDocContent){
-                        oDocContent.Cursor_MoveToEndPos(false);
+                        oDocContent.MoveCursorToEndPos(false);
                     }
                     this.selectedObjects[0].applyTextFunction(docContentFunction, tableFunction, args);
                     this.selection.textSelection.select(this, this.selection.textSelection.selectStartPage);
@@ -5197,7 +5197,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent(undefined, true);
         if(content)
         {
-            content.Cursor_MoveToStartPos();
+            content.MoveCursorToStartPos();
             this.updateSelectionState();
         }
     },
@@ -5207,7 +5207,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent(undefined, true);
         if(content)
         {
-            content.Cursor_MoveToEndPos();
+            content.MoveCursorToEndPos();
             this.updateSelectionState();
         }
     },
@@ -5228,14 +5228,14 @@ DrawingObjectsController.prototype =
         {
             if(target_text_object.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                target_text_object.graphicObject.Cursor_MoveLeft(1, AddToSelect, Word);
+                target_text_object.graphicObject.MoveCursorLeft(AddToSelect, Word);
             }
             else
             {
                 var content = this.getTargetDocContent(undefined, true);
                 if(content)
                 {
-                    content.Cursor_MoveLeft(AddToSelect, Word);
+                    content.MoveCursorLeft(AddToSelect, Word);
                 }
             }
             this.updateSelectionState();
@@ -5256,14 +5256,14 @@ DrawingObjectsController.prototype =
         {
             if(target_text_object.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                target_text_object.graphicObject.Cursor_MoveRight(1, AddToSelect, Word, bFromPaste);
+                target_text_object.graphicObject.MoveCursorRight(AddToSelect, Word, bFromPaste);
             }
             else
             {
                 var content = this.getTargetDocContent(undefined, true);
                 if(content)
                 {
-                    content.Cursor_MoveRight(AddToSelect, Word, bFromPaste);
+                    content.MoveCursorRight(AddToSelect, Word, bFromPaste);
                 }
             }
             this.updateSelectionState();
@@ -5284,14 +5284,14 @@ DrawingObjectsController.prototype =
         {
             if(target_text_object.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                target_text_object.graphicObject.Cursor_MoveUp(1, AddToSelect);
+                target_text_object.graphicObject.MoveCursorUp(AddToSelect);
             }
             else
             {
                 var content = this.getTargetDocContent(undefined, true);
                 if(content)
                 {
-                    content.Cursor_MoveUp(AddToSelect);
+                    content.MoveCursorUp(AddToSelect);
                 }
             }
             this.updateSelectionState();
@@ -5311,14 +5311,14 @@ DrawingObjectsController.prototype =
         {
             if(target_text_object.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                target_text_object.graphicObject.Cursor_MoveDown(1, AddToSelect);
+                target_text_object.graphicObject.MoveCursorDown(AddToSelect);
             }
             else
             {
                 var content = this.getTargetDocContent(undefined, true);
                 if(content)
                 {
-                    content.Cursor_MoveDown(AddToSelect);
+                    content.MoveCursorDown(AddToSelect);
                 }
             }
             this.updateSelectionState();
@@ -5336,7 +5336,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent(undefined, true);
         if(content)
         {
-            content.Cursor_MoveEndOfLine(AddToSelect);
+            content.MoveCursorToEndOfLine(AddToSelect);
             this.updateSelectionState();
         }
     },
@@ -5348,7 +5348,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent(undefined, true);
         if(content)
         {
-            content.Cursor_MoveStartOfLine(AddToSelect);
+            content.MoveCursorToStartOfLine(AddToSelect);
             this.updateSelectionState();
         }
     },
@@ -5639,7 +5639,7 @@ DrawingObjectsController.prototype =
             {
                 if (ctrlKey) // Ctrl + End - переход в конец документа
                 {
-                    content.Cursor_MoveToEndPos();
+                    content.MoveCursorToEndPos();
                     drawingObjectsController.updateSelectionState();
                     drawingObjectsController.updateOverlay();
                     this.drawingObjects.sendGraphicObjectProps();
@@ -5647,7 +5647,7 @@ DrawingObjectsController.prototype =
                 }
                 else // Переходим в конец строки
                 {
-                    content.Cursor_MoveEndOfLine(e.shiftKey);
+                    content.MoveCursorToEndOfLine(e.shiftKey);
                     drawingObjectsController.updateSelectionState();
                     drawingObjectsController.updateOverlay();
                     this.drawingObjects.sendGraphicObjectProps();
@@ -5662,14 +5662,14 @@ DrawingObjectsController.prototype =
             {
                 if (ctrlKey) // Ctrl + End - переход в конец документа
                 {
-                    content.Cursor_MoveToStartPos();
+                    content.MoveCursorToStartPos();
                     drawingObjectsController.updateSelectionState();
                     drawingObjectsController.updateOverlay();
                     this.drawingObjects.sendGraphicObjectProps();
                 }
                 else // Переходим в конец строки
                 {
-                    content.Cursor_MoveStartOfLine(e.shiftKey);
+                    content.MoveCursorToStartOfLine(e.shiftKey);
                     drawingObjectsController.updateSelectionState();
                     drawingObjectsController.updateOverlay();
                     this.drawingObjects.sendGraphicObjectProps();
@@ -7748,7 +7748,7 @@ DrawingObjectsController.prototype =
         {
             oSelectedContent = this.document.Get_SelectedContent(true);
             oContent.Recalculate_Page(0, true);
-            oContent.Cursor_MoveToStartPos(false);
+            oContent.MoveCursorToStartPos(false);
             oNearestPos = oContent.Get_NearestPos(0, 0, 0, false, undefined);
             oNearestPos.Paragraph.Check_NearestPos( oNearestPos );
             if(oSelectedContent && this.document.Can_InsertContent(oSelectedContent, oNearestPos))
@@ -7784,7 +7784,7 @@ DrawingObjectsController.prototype =
                 oSelectedContent.MoveDrawing = true;
 
                 oContent.Recalculate_Page(0, true);
-                oContent.Cursor_MoveToStartPos(false);
+                oContent.MoveCursorToStartPos(false);
                 var paragraph = oContent.Content[oContent.CurPos.ContentPos];
                 if (null != paragraph && type_Paragraph == paragraph.GetType())
                 {

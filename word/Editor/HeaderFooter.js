@@ -695,9 +695,9 @@ CHeaderFooter.prototype =
         this.Content.Paragraph_Add( ParaItem, bRecalculate );
     },
 
-    Paragraph_ClearFormatting : function()
+	ClearParagraphFormatting : function()
     {
-        this.Content.Paragraph_ClearFormatting();
+        this.Content.ClearParagraphFormatting();
     },
 
     Paragraph_Format_Paste : function(TextPr, ParaPr, ApplyPara)
@@ -710,101 +710,101 @@ CHeaderFooter.prototype =
         this.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
     },
 
-    Cursor_GetPos : function()
-    {
-        return this.Content.Cursor_GetPos();
-    },
+	GetCursorPosXY : function()
+	{
+		return this.Content.GetCursorPosXY();
+	},
 
-    Cursor_MoveLeft : function(AddToSelect, Word)
-    {
-        var bRetValue = this.Content.Cursor_MoveLeft( AddToSelect, Word );
+	MoveCursorLeft : function(AddToSelect, Word)
+	{
+		var bRetValue = this.Content.MoveCursorLeft(AddToSelect, Word);
 
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
 
-        return bRetValue;
-    },
+		return bRetValue;
+	},
 
-    Cursor_MoveRight : function(AddToSelect, Word)
-    {
-        var bRetValue = this.Content.Cursor_MoveRight( AddToSelect, Word );
+	MoveCursorRight : function(AddToSelect, Word)
+	{
+		var bRetValue = this.Content.MoveCursorRight(AddToSelect, Word);
 
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
 
-        return bRetValue;
-    },
+		return bRetValue;
+	},
 
-    Cursor_MoveUp : function(AddToSelect)
-    {
-        var bRetValue = this.Content.Cursor_MoveUp( AddToSelect );
+	MoveCursorUp : function(AddToSelect)
+	{
+		var bRetValue = this.Content.MoveCursorUp(AddToSelect);
 
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
 
-        return bRetValue;
-    },
+		return bRetValue;
+	},
 
-    Cursor_MoveDown : function(AddToSelect)
-    {
-        var bRetValue = this.Content.Cursor_MoveDown( AddToSelect );
+	MoveCursorDown : function(AddToSelect)
+	{
+		var bRetValue = this.Content.MoveCursorDown(AddToSelect);
 
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
 
-        return bRetValue;
-    },
+		return bRetValue;
+	},
 
-    Cursor_MoveEndOfLine : function(AddToSelect)
-    {
-        var bRetValue = this.Content.Cursor_MoveEndOfLine( AddToSelect );
+	MoveCursorToEndOfLine : function(AddToSelect)
+	{
+		var bRetValue = this.Content.MoveCursorToEndOfLine(AddToSelect);
 
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
 
-        return bRetValue;
-    },
+		return bRetValue;
+	},
 
-    Cursor_MoveStartOfLine : function(AddToSelect)
-    {
-        var bRetValue = this.Content.Cursor_MoveStartOfLine( AddToSelect );
+	MoveCursorToStartOfLine : function(AddToSelect)
+	{
+		var bRetValue = this.Content.MoveCursorToStartOfLine(AddToSelect);
 
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
 
-        return bRetValue;
-    },
+		return bRetValue;
+	},
 
-    Cursor_MoveToStartPos : function(AddToSelect)
-    {
-        var bRetValue = this.Content.Cursor_MoveToStartPos( AddToSelect );
+	MoveCursorToStartPos : function(AddToSelect)
+	{
+		var bRetValue = this.Content.MoveCursorToStartPos(AddToSelect);
 
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
 
-        return bRetValue;
-    },
+		return bRetValue;
+	},
 
-    Cursor_MoveToEndPos : function(AddToSelect)
-    {
-        var bRetValue = this.Content.Cursor_MoveToEndPos( AddToSelect );
+	MoveCursorToEndPos : function(AddToSelect)
+	{
+		var bRetValue = this.Content.MoveCursorToEndPos(AddToSelect);
 
-        this.Document_UpdateInterfaceState();
-        this.Document_UpdateRulersState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
 
-        return bRetValue;
-    },
+		return bRetValue;
+	},
 
-    Cursor_MoveAt : function(X, Y, PageIndex, AddToSelect, bRemoveOldSelection)
-    {
-        this.Set_Page(PageIndex);
-        return this.Content.Cursor_MoveAt(X, Y, AddToSelect, bRemoveOldSelection, PageIndex);
-    },
+	MoveCursorToXY : function(X, Y, PageIndex, AddToSelect, bRemoveOldSelection)
+	{
+		this.Set_Page(PageIndex);
+		return this.Content.MoveCursorToXY(X, Y, AddToSelect, bRemoveOldSelection, PageIndex);
+	},
 
-    Cursor_MoveToCell : function(bNext)
-    {
-        this.Content.Cursor_MoveToCell(bNext);
-    },
+	MoveCursorToCell : function(bNext)
+	{
+		this.Content.MoveCursorToCell(bNext);
+	},
 
     Set_ParagraphAlign : function(Align)
     {
@@ -1338,7 +1338,7 @@ CHeaderFooterController.prototype =
         {
             this.CurHdrFtr = CurHdrFtr;
             CurHdrFtr.Set_Page(CurPage);
-            CurHdrFtr.Content.Cursor_MoveToStartPos(false);
+            CurHdrFtr.Content.MoveCursorToStartPos(false);
 
             return true;
         }
@@ -1376,7 +1376,7 @@ CHeaderFooterController.prototype =
         {
             this.CurHdrFtr = CurHdrFtr;
             CurHdrFtr.Set_Page(CurPage);
-            CurHdrFtr.Content.Cursor_MoveToStartPos(false);
+            CurHdrFtr.Content.MoveCursorToStartPos(false);
             
             return true;
         }
@@ -1447,7 +1447,7 @@ CHeaderFooterController.prototype =
             return false;
         
         this.CurHdrFtr = HdrFtr;
-        HdrFtr.Content.Cursor_MoveToStartPos();
+        HdrFtr.Content.MoveCursorToStartPos();
               
         return true;
     },
@@ -1877,10 +1877,10 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Paragraph_Add( ParaItem, bRecalculate );
     },
 
-    Paragraph_ClearFormatting : function()
+	ClearParagraphFormatting : function()
     {
         if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Paragraph_ClearFormatting();
+            return this.CurHdrFtr.ClearParagraphFormatting();
     },
 
     Paragraph_Format_Paste : function(TextPr, ParaPr, ApplyPara)
@@ -1895,71 +1895,71 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
     },
 
-    Cursor_GetPos : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_GetPos();
-    },
+	GetCursorPosXY : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.GetCursorPosXY();
+	},
 
-    Cursor_MoveLeft : function(AddToSelect, Word)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveLeft( AddToSelect, Word );
-    },
+	MoveCursorLeft : function(AddToSelect, Word)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.MoveCursorLeft(AddToSelect, Word);
+	},
 
-    Cursor_MoveRight : function(AddToSelect, Word)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveRight( AddToSelect, Word );
-    },
+	MoveCursorRight : function(AddToSelect, Word)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.MoveCursorRight(AddToSelect, Word);
+	},
 
-    Cursor_MoveUp : function(AddToSelect)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveUp( AddToSelect );
-    },
+	MoveCursorUp : function(AddToSelect)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.MoveCursorUp(AddToSelect);
+	},
 
-    Cursor_MoveDown : function(AddToSelect)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveDown( AddToSelect );
-    },
+	MoveCursorDown : function(AddToSelect)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.MoveCursorDown(AddToSelect);
+	},
 
-    Cursor_MoveEndOfLine : function(AddToSelect)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveEndOfLine( AddToSelect );
-    },
+	MoveCursorToEndOfLine : function(AddToSelect)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.MoveCursorToEndOfLine(AddToSelect);
+	},
 
-    Cursor_MoveStartOfLine : function(AddToSelect)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveStartOfLine( AddToSelect );
-    },
+	MoveCursorToStartOfLine : function(AddToSelect)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.MoveCursorToStartOfLine(AddToSelect);
+	},
 
-    Cursor_MoveAt : function( X, Y, PageIndex, AddToSelect )
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveAt( X, Y, PageIndex, AddToSelect );
-    },
+	MoveCursorToXY : function(X, Y, PageIndex, AddToSelect)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.MoveCursorToXY(X, Y, PageIndex, AddToSelect);
+	},
 
-    Cursor_MoveToStartPos : function(AddToSelect)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveToStartPos( AddToSelect );
-    },
+	MoveCursorToStartPos : function(AddToSelect)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.MoveCursorToStartPos(AddToSelect);
+	},
 
-    Cursor_MoveToEndPos : function(AddToSelect)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Cursor_MoveToEndPos( AddToSelect );
-    },
+	MoveCursorToEndPos : function(AddToSelect)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.MoveCursorToEndPos(AddToSelect);
+	},
 
-    Cursor_MoveToCell : function(bNext)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Cursor_MoveToCell(bNext);
-    },
+	MoveCursorToCell : function(bNext)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.MoveCursorToCell(bNext);
+	},
 
     Set_ParagraphAlign : function(Align)
     {
@@ -2241,7 +2241,7 @@ CHeaderFooterController.prototype =
                 NewMouseEvent.Type       = AscCommon.g_mouse_event_type_up;
                 NewMouseEvent.ClickCount = 1;
                 this.CurHdrFtr.Selection_SetEnd( X, Y, PageIndex, NewMouseEvent );
-                this.CurHdrFtr.Content.Cursor_MoveToStartPos(false);
+                this.CurHdrFtr.Content.MoveCursorToStartPos(false);
             }
         }
 

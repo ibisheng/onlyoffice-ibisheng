@@ -558,7 +558,7 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
         if(window["Asc"]["editor"].isMobileVersion){
             var oTargetDocContent = this.getTargetDocContent(false, false);
             if(oTargetDocContent){
-                var oPos = oTargetDocContent.Cursor_GetPos();
+                var oPos = oTargetDocContent.GetCursorPosXY();
                 var oParentTextTransform = oTargetDocContent.Get_ParentTextTransform();
                 var _x, _y;
                 if(oParentTextTransform){

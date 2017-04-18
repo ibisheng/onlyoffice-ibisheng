@@ -281,7 +281,7 @@ Paragraph.prototype.Copy = function(Parent, DrawingDocument)
 	}
 
 	Para.Selection_Remove();
-	Para.Cursor_MoveToStartPos(false);
+	Para.MoveCursorToStartPos(false);
 
 	return Para;
 };
@@ -307,7 +307,7 @@ Paragraph.prototype.Copy2 = function(Parent)
 
 
 	Para.Selection_Remove();
-	Para.Cursor_MoveToStartPos(false);
+	Para.MoveCursorToStartPos(false);
 
 	return Para;
 };
@@ -2477,7 +2477,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 				this.Internal_Content_Remove(StartPos);
 
 				this.CurPos.ContentPos = StartPos;
-				this.Content[StartPos].Cursor_MoveToStartPos();
+				this.Content[StartPos].MoveCursorToStartPos();
 				this.Correct_ContentPos2();
 			}
 		}
@@ -2503,7 +2503,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 				this.Internal_Content_Remove(EndPos);
 
 				this.CurPos.ContentPos = EndPos;
-				this.Content[EndPos].Cursor_MoveToStartPos();
+				this.Content[EndPos].MoveCursorToStartPos();
 			}
 
 			if (this.LogicDocument && true === this.LogicDocument.Is_TrackRevisions())
@@ -2600,9 +2600,9 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 				break;
 
 			if (Direction < 0)
-				this.Content[ContentPos].Cursor_MoveToEndPos(false);
+				this.Content[ContentPos].MoveCursorToEndPos(false);
 			else
-				this.Content[ContentPos].Cursor_MoveToStartPos();
+				this.Content[ContentPos].MoveCursorToStartPos();
 
 		}
 
@@ -2632,7 +2632,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 				this.Internal_Content_Remove(ContentPos);
 
 				this.CurPos.ContentPos = ContentPos;
-				this.Content[ContentPos].Cursor_MoveToStartPos();
+				this.Content[ContentPos].MoveCursorToStartPos();
 				this.Correct_ContentPos2();
 			}
 			else
@@ -3032,7 +3032,7 @@ Paragraph.prototype.Add = function(Item)
 
 				// Перемещаем кусор в конец формулы
 				this.CurPos.ContentPos = CurPos + 1;
-				this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
+				this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
 			}
 			else
 				this.Content[CurPos].Add(Item);
@@ -3057,7 +3057,7 @@ Paragraph.prototype.Add = function(Item)
 
 				// Перемещаем в начало следующейго элемента
 				this.CurPos.ContentPos = CurPos + 2;
-				this.Content[this.CurPos.ContentPos].Cursor_MoveToStartPos(false);
+				this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 			}
 			else
 				this.Content[CurPos].Add(Item);
@@ -3098,7 +3098,7 @@ Paragraph.prototype.Add = function(Item)
 				}
 			}
 
-			Item.Cursor_MoveToEndPos(false);
+			Item.MoveCursorToEndPos(false);
 
 			break;
 		}
@@ -3605,14 +3605,14 @@ Paragraph.prototype.Correct_ContentPos = function(CorrectEndLinePos)
 		if (_CurPos < Count && true === this.Content[_CurPos].Is_StartFromNewLine())
 		{
 			CurPos = _CurPos;
-			this.Content[CurPos].Cursor_MoveToStartPos();
+			this.Content[CurPos].MoveCursorToStartPos();
 		}
 	}
 
 	while (CurPos > 0 && true === this.Content[CurPos].Cursor_Is_NeededCorrectPos() && para_Run === this.Content[CurPos - 1].Type)
 	{
 		CurPos--;
-		this.Content[CurPos].Cursor_MoveToEndPos();
+		this.Content[CurPos].MoveCursorToEndPos();
 	}
 
 	this.CurPos.ContentPos = CurPos;
@@ -3627,13 +3627,13 @@ Paragraph.prototype.Correct_ContentPos2 = function()
 	while (CurPos > 0 && false === this.Content[CurPos].Is_CursorPlaceable())
 	{
 		CurPos--;
-		this.Content[CurPos].Cursor_MoveToEndPos();
+		this.Content[CurPos].MoveCursorToEndPos();
 	}
 
 	while (CurPos < Count && false === this.Content[CurPos].Is_CursorPlaceable())
 	{
 		CurPos++;
-		this.Content[CurPos].Cursor_MoveToStartPos(false);
+		this.Content[CurPos].MoveCursorToStartPos(false);
 	}
 
 	// Если курсор находится в начале или конце гиперссылки, тогда выводим его из гиперссылки
@@ -3643,7 +3643,7 @@ Paragraph.prototype.Correct_ContentPos2 = function()
 			break;
 
 		CurPos--;
-		this.Content[CurPos].Cursor_MoveToEndPos();
+		this.Content[CurPos].MoveCursorToEndPos();
 	}
 
 	while (CurPos < Count && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && para_Field !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_End())
@@ -3652,7 +3652,7 @@ Paragraph.prototype.Correct_ContentPos2 = function()
 			break;
 
 		CurPos++;
-		this.Content[CurPos].Cursor_MoveToStartPos(false);
+		this.Content[CurPos].MoveCursorToStartPos(false);
 	}
 
 	this.private_CorrectCurPosRangeLine();
@@ -4002,11 +4002,11 @@ Paragraph.prototype.Get_ParaContentPosByXY = function(X, Y, PageIndex, bYLine, S
 
 	return SearchPos;
 };
-Paragraph.prototype.Cursor_GetPos = function()
+Paragraph.prototype.GetCursorPosXY = function()
 {
 	return {X : this.CurPos.RealX, Y : this.CurPos.RealY};
 };
-Paragraph.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
+Paragraph.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
 	if (true === this.Selection.Use)
 	{
@@ -4105,7 +4105,7 @@ Paragraph.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
 	this.MoveCursorToEndPos(true, true);
 	this.MoveCursorLeft(true, Word);
 };
-Paragraph.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
+Paragraph.prototype.MoveCursorRight = function(AddToSelect, Word)
 {
 	if (true === this.Selection.Use)
 	{
@@ -4118,7 +4118,7 @@ Paragraph.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
 			if (true === this.Selection_CheckParaEnd())
 			{
 				this.Selection_Remove();
-				this.Cursor_MoveToEndPos(false);
+				this.MoveCursorToEndPos(false);
 				return false;
 			}
 			else
@@ -4214,7 +4214,7 @@ Paragraph.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
 	this.MoveCursorToStartPos(false);
 	this.MoveCursorRight(true, Word);
 };
-Paragraph.prototype.Cursor_MoveAt = function(X, Y, bLine, bDontChangeRealPos, CurPage)
+Paragraph.prototype.MoveCursorToXY = function(X, Y, bLine, bDontChangeRealPos, CurPage)
 {
 	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, bLine, false);
 
@@ -4619,7 +4619,7 @@ Paragraph.prototype.Get_PrevRunElements = function(RunElements)
 		CurPos--;
 	}
 };
-Paragraph.prototype.Cursor_MoveUp = function(Count, AddToSelect)
+Paragraph.prototype.MoveCursorUp = function(AddToSelect)
 {
 	var Result = true;
 	if (true === this.Selection.Use)
@@ -4641,7 +4641,7 @@ Paragraph.prototype.Cursor_MoveUp = function(Count, AddToSelect)
 			}
 			else
 			{
-				this.Cursor_MoveAt(this.CurPos.RealX, CurLine - 1, true, true);
+				this.MoveCursorToXY(this.CurPos.RealX, CurLine - 1, true, true);
 				EndPos = this.Get_ParaContentPos(false, false);
 			}
 
@@ -4673,7 +4673,7 @@ Paragraph.prototype.Cursor_MoveUp = function(Count, AddToSelect)
 			}
 			else
 			{
-				this.Cursor_MoveAt(this.CurPos.RealX, CurLine - 1, true, true);
+				this.MoveCursorToXY(this.CurPos.RealX, CurLine - 1, true, true);
 			}
 		}
 	}
@@ -4696,7 +4696,7 @@ Paragraph.prototype.Cursor_MoveUp = function(Count, AddToSelect)
 			}
 			else
 			{
-				this.Cursor_MoveAt(this.CurPos.RealX, CurLine - 1, true, true);
+				this.MoveCursorToXY(this.CurPos.RealX, CurLine - 1, true, true);
 				EndPos = this.Get_ParaContentPos(false, false);
 			}
 
@@ -4713,14 +4713,14 @@ Paragraph.prototype.Cursor_MoveUp = function(Count, AddToSelect)
 			}
 			else
 			{
-				this.Cursor_MoveAt(this.CurPos.RealX, CurLine - 1, true, true);
+				this.MoveCursorToXY(this.CurPos.RealX, CurLine - 1, true, true);
 			}
 		}
 	}
 
 	return Result;
 };
-Paragraph.prototype.Cursor_MoveDown = function(Count, AddToSelect)
+Paragraph.prototype.MoveCursorDown = function(AddToSelect)
 {
 	var Result = true;
 	if (true === this.Selection.Use)
@@ -4742,7 +4742,7 @@ Paragraph.prototype.Cursor_MoveDown = function(Count, AddToSelect)
 			}
 			else
 			{
-				this.Cursor_MoveAt(this.CurPos.RealX, CurLine + 1, true, true);
+				this.MoveCursorToXY(this.CurPos.RealX, CurLine + 1, true, true);
 				EndPos = this.Get_ParaContentPos(false, false);
 			}
 
@@ -4774,7 +4774,7 @@ Paragraph.prototype.Cursor_MoveDown = function(Count, AddToSelect)
 			}
 			else
 			{
-				this.Cursor_MoveAt(this.CurPos.RealX, CurLine + 1, true, true);
+				this.MoveCursorToXY(this.CurPos.RealX, CurLine + 1, true, true);
 			}
 		}
 	}
@@ -4797,7 +4797,7 @@ Paragraph.prototype.Cursor_MoveDown = function(Count, AddToSelect)
 			}
 			else
 			{
-				this.Cursor_MoveAt(this.CurPos.RealX, CurLine + 1, true, true);
+				this.MoveCursorToXY(this.CurPos.RealX, CurLine + 1, true, true);
 				EndPos = this.Get_ParaContentPos(false, false);
 			}
 
@@ -4814,14 +4814,14 @@ Paragraph.prototype.Cursor_MoveDown = function(Count, AddToSelect)
 			}
 			else
 			{
-				this.Cursor_MoveAt(this.CurPos.RealX, CurLine + 1, true, true);
+				this.MoveCursorToXY(this.CurPos.RealX, CurLine + 1, true, true);
 			}
 		}
 	}
 
 	return Result;
 };
-Paragraph.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
+Paragraph.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 {
 	if (true === this.Selection.Use)
 	{
@@ -4878,7 +4878,7 @@ Paragraph.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
 	this.CurPos.RealX = this.CurPos.X;
 	this.CurPos.RealY = this.CurPos.Y;
 };
-Paragraph.prototype.Cursor_MoveStartOfLine = function(AddToSelect)
+Paragraph.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 {
 	if (true === this.Selection.Use)
 	{
@@ -4936,7 +4936,7 @@ Paragraph.prototype.Cursor_MoveStartOfLine = function(AddToSelect)
 	this.CurPos.RealX = this.CurPos.X;
 	this.CurPos.RealY = this.CurPos.Y;
 };
-Paragraph.prototype.Cursor_MoveToStartPos = function(AddToSelect)
+Paragraph.prototype.MoveCursorToStartPos = function(AddToSelect)
 {
 	if (true === AddToSelect)
 	{
@@ -4959,12 +4959,12 @@ Paragraph.prototype.Cursor_MoveToStartPos = function(AddToSelect)
 		this.Selection_Remove();
 
 		this.CurPos.ContentPos = 0;
-		this.Content[0].Cursor_MoveToStartPos();
+		this.Content[0].MoveCursorToStartPos();
 		this.Correct_ContentPos(false);
 		this.Correct_ContentPos2();
 	}
 };
-Paragraph.prototype.Cursor_MoveToEndPos = function(AddToSelect, StartSelectFromEnd)
+Paragraph.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelectFromEnd)
 {
 	if (true === AddToSelect)
 	{
@@ -4996,14 +4996,14 @@ Paragraph.prototype.Cursor_MoveToEndPos = function(AddToSelect, StartSelectFromE
 
 			this.CurPos.ContentPos = this.Content.length - 1;
 
-			this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(true);
+			this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(true);
 		}
 		else
 		{
 			this.Selection_Remove();
 
 			this.CurPos.ContentPos = this.Content.length - 1;
-			this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos();
+			this.Content[this.CurPos.ContentPos].MoveCursorToEndPos();
 			this.Correct_ContentPos(false);
 			this.Correct_ContentPos2();
 		}
@@ -5022,13 +5022,13 @@ Paragraph.prototype.Cursor_MoveToNearPos = function(NearPos)
 	if (0 === SelectionStartPos.Compare(SelectionEndPos))
 		this.Selection_Remove();
 };
-Paragraph.prototype.Cursor_MoveUp_To_LastRow = function(X, Y, AddToSelect)
+Paragraph.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 {
 	this.CurPos.RealX = X;
 	this.CurPos.RealY = Y;
 
 	// Перемещаем курсор в последнюю строку, с позицией, самой близкой по X
-	this.Cursor_MoveAt(X, this.Lines.length - 1, true, true, this.Pages.length - 1);
+	this.MoveCursorToXY(X, this.Lines.length - 1, true, true, this.Pages.length - 1);
 
 	if (true === AddToSelect)
 	{
@@ -5043,13 +5043,13 @@ Paragraph.prototype.Cursor_MoveUp_To_LastRow = function(X, Y, AddToSelect)
 		}
 	}
 };
-Paragraph.prototype.Cursor_MoveDown_To_FirstRow = function(X, Y, AddToSelect)
+Paragraph.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 {
 	this.CurPos.RealX = X;
 	this.CurPos.RealY = Y;
 
 	// Перемещаем курсор в первую строку, с позицией, самой близкой по X
-	this.Cursor_MoveAt(X, 0, true, true, 0);
+	this.MoveCursorToXY(X, 0, true, true, 0);
 
 	if (true === AddToSelect)
 	{
@@ -5626,7 +5626,7 @@ Paragraph.prototype.Hyperlink_Add = function(HyperProps)
 		this.Selection.StartPos = StartPos + 1;
 		this.Selection.EndPos   = StartPos + 1;
 
-		Hyperlink.Cursor_MoveToStartPos();
+		Hyperlink.MoveCursorToStartPos();
 		Hyperlink.Select_All();
 
 		// Выставляем специальную текстовую настройку
@@ -5710,7 +5710,7 @@ Paragraph.prototype.Hyperlink_Add = function(HyperProps)
 
 		// Перемещаем кусор в конец гиперссылки
 		this.CurPos.ContentPos = CurPos + 1;
-		Hyperlink.Cursor_MoveToEndPos(false);
+		Hyperlink.MoveCursorToEndPos(false);
 	}
 
 	this.Correct_Content();
@@ -5817,7 +5817,7 @@ Paragraph.prototype.Hyperlink_Modify = function(HyperProps)
 			else
 			{
 				this.CurPos.ContentPos = HyperPos;
-				Hyperlink.Cursor_MoveToEndPos(false);
+				Hyperlink.MoveCursorToEndPos(false);
 			}
 
 			return true;
@@ -6091,7 +6091,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 
 				if (true === this.Extend_ToPos(X))
 				{
-					this.Cursor_MoveToEndPos();
+					this.MoveCursorToEndPos();
 					this.Document_SetThisElementCurrent(true);
 					editor.WordControl.m_oLogicDocument.Recalculate();
 					return;
@@ -10187,8 +10187,8 @@ Paragraph.prototype.Split = function(NewParagraph, Pos)
 		NewParagraph.Set_SectionPr(SectPr);
 	}
 
-	this.Cursor_MoveToEndPos(false, false);
-	NewParagraph.Cursor_MoveToStartPos(false);
+	this.MoveCursorToEndPos(false, false);
+	NewParagraph.MoveCursorToStartPos(false);
 
 	NewParagraph.DeleteCommentOnRemove = true;
 	this.DeleteCommentOnRemove         = true;
@@ -10264,7 +10264,7 @@ Paragraph.prototype.Continue = function(NewParagraph)
 
 	NewParagraph.Internal_Content_Add(0, new ParaRun(NewParagraph));
 	NewParagraph.Correct_Content();
-	NewParagraph.Cursor_MoveToStartPos(false);
+	NewParagraph.MoveCursorToStartPos(false);
 
 	// Выставляем настройки у всех ранов
 	// TODO: Вообще рана тут 2, 1 который только что создали, второй с para_End. как избавимся от второго тут
@@ -12056,6 +12056,11 @@ Paragraph.prototype.GetNumberingInfo = function(oNumberingEngine)
 		return;
 
 	oNumberingEngine.Check_Paragraph(this);
+};
+Paragraph.prototype.ClearParagraphFormatting = function()
+{
+	this.Clear_Formatting();
+	this.Clear_TextFormatting();
 };
 
 

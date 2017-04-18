@@ -303,42 +303,58 @@ CDocumentContentElementBase.prototype.CanUpdateTarget = function(CurPage)
 {
 	return false;
 };
-CDocumentContentElementBase.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
-{
-	return false;
-};
 CDocumentContentElementBase.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
 {
 };
 CDocumentContentElementBase.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
-	return this.Cursor_MoveLeft(1, AddToSelect, Word);
-};
-CDocumentContentElementBase.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
-{
 	return false;
 };
 CDocumentContentElementBase.prototype.MoveCursorRight = function(AddToSelect, Word)
 {
-	return this.Cursor_MoveRight(1, AddToSelect, Word);
+	return false;
 };
 CDocumentContentElementBase.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
 {
 
 };
-CDocumentContentElementBase.prototype.Cursor_MoveToStartPos = function(AddToSelect)
-{
-};
 CDocumentContentElementBase.prototype.MoveCursorToStartPos = function(AddToSelect)
-{
-	return this.Cursor_MoveToStartPos(AddToSelect);
-};
-CDocumentContentElementBase.prototype.Cursor_MoveToEndPos = function(AddToSelect, StartSelectFromEnd)
 {
 };
 CDocumentContentElementBase.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelectFromEnd)
 {
-	return this.Cursor_MoveToEndPos(AddToSelect, StartSelectFromEnd);
+};
+CDocumentContentElementBase.prototype.MoveCursorUp = function(AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorDown = function(AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorToEndOfLine = function(AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorToStartOfLine = function(AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorToXY = function(X, Y, bLine, bDontChangeRealPos, CurPage)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorToCell = function(bNext)
+{
+	return false;
 };
 CDocumentContentElementBase.prototype.IsCursorAtBegin = function()
 {
@@ -431,6 +447,13 @@ CDocumentContentElementBase.prototype.Add = function(oParaItem)
 };
 CDocumentContentElementBase.prototype.PreDelete = function()
 {
+};
+CDocumentContentElementBase.prototype.ClearParagraphFormatting = function()
+{
+};
+CDocumentContentElementBase.prototype.GetCursorPosXY = function()
+{
+	return {X : 0, Y : 0};
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц

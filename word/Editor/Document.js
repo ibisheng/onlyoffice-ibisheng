@@ -1558,7 +1558,7 @@ CDocument.prototype.On_EndLoad                     = function()
     this.Styles.Check_StyleNumberingOnLoad(this.Numbering);
 
     // Перемещаем курсор в начало документа
-    this.Cursor_MoveToStartPos(false);
+    this.MoveCursorToStartPos(false);
 
     if (editor.DocInfo)
     {
@@ -3974,7 +3974,7 @@ CDocument.prototype.Extend_ToPos = function(X, Y)
         LastPara.Extend_ToPos(X);
     }
 
-    LastPara.Cursor_MoveToEndPos();
+    LastPara.MoveCursorToEndPos();
     LastPara.Document_SetThisElementCurrent(true);
 
     this.Recalculate();
@@ -4095,7 +4095,7 @@ CDocument.prototype.AddDropCap = function(bInText)
 		NewParagraph.Update_DropCapByLines(TextPr, NewParagraph.Pr.FramePr.Lines, LineH, LineTA, LineTD, Before);
 
 		this.Internal_Content_Add(Pos, NewParagraph);
-		NewParagraph.Cursor_MoveToEndPos();
+		NewParagraph.MoveCursorToEndPos();
 
 		this.Selection_Remove();
 		this.CurPos.ContentPos = Pos;
@@ -4196,7 +4196,7 @@ CDocument.prototype.RemoveDropCap = function(bDropCap)
 				FrameParas.splice(FrameParas.length - 1, 1);
 
 				// Передвинем курсор в начало следующего параграфа, и рассчитаем текстовые настройки и расстояния между строк
-				Next.Cursor_MoveToStartPos();
+				Next.MoveCursorToStartPos();
 				var Spacing = Next.Get_CompiledPr2(false).ParaPr.Spacing.Copy();
 				var TextPr  = Next.Get_FirstRunPr();
 
@@ -4217,7 +4217,7 @@ CDocument.prototype.RemoveDropCap = function(bDropCap)
 
 				this.Internal_Content_Remove(Next.Index, 1);
 
-				Last.Cursor_MoveToStartPos();
+				Last.MoveCursorToStartPos();
 				Last.Document_SetThisElementCurrent(true);
 
 				this.Recalculate();
@@ -4268,7 +4268,7 @@ CDocument.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
 {
 	this.Controller.AddToParagraph(ParaItem, bRecalculate);
 };
-CDocument.prototype.Paragraph_ClearFormatting  = function()
+CDocument.prototype.ClearParagraphFormatting  = function()
 {
 	this.Controller.ClearParagraphFormatting();
 
@@ -4297,11 +4297,11 @@ CDocument.prototype.RemoveBeforePaste = function()
 	else
 		this.Remove(1, true, true, true);
 };
-CDocument.prototype.Cursor_GetPos = function()
+CDocument.prototype.GetCursorPosXY = function()
 {
 	return this.Controller.GetCursorPosXY();
 };
-CDocument.prototype.Cursor_MoveToStartPos = function(AddToSelect)
+CDocument.prototype.MoveCursorToStartPos = function(AddToSelect)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4310,7 +4310,7 @@ CDocument.prototype.Cursor_MoveToStartPos = function(AddToSelect)
 
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.Cursor_MoveToEndPos = function(AddToSelect)
+CDocument.prototype.MoveCursorToEndPos = function(AddToSelect)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4319,7 +4319,7 @@ CDocument.prototype.Cursor_MoveToEndPos = function(AddToSelect)
 
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
+CDocument.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4333,7 +4333,7 @@ CDocument.prototype.Cursor_MoveLeft = function(AddToSelect, Word)
 	this.Document_UpdateRulersState();
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
+CDocument.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4347,7 +4347,7 @@ CDocument.prototype.Cursor_MoveRight = function(AddToSelect, Word, FromPaste)
 	this.Document_UpdateSelectionState();
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.Cursor_MoveUp = function(AddToSelect, CtrlKey)
+CDocument.prototype.MoveCursorUp = function(AddToSelect, CtrlKey)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4357,7 +4357,7 @@ CDocument.prototype.Cursor_MoveUp = function(AddToSelect, CtrlKey)
 	else
 		this.Controller.MoveCursorUp(AddToSelect, CtrlKey);
 };
-CDocument.prototype.Cursor_MoveDown = function(AddToSelect, CtrlKey)
+CDocument.prototype.MoveCursorDown = function(AddToSelect, CtrlKey)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4367,7 +4367,7 @@ CDocument.prototype.Cursor_MoveDown = function(AddToSelect, CtrlKey)
 	else
 		this.Controller.MoveCursorDown(AddToSelect, CtrlKey);
 };
-CDocument.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
+CDocument.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4377,7 +4377,7 @@ CDocument.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
 	this.Document_UpdateInterfaceState();
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.Cursor_MoveStartOfLine = function(AddToSelect)
+CDocument.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -4387,13 +4387,13 @@ CDocument.prototype.Cursor_MoveStartOfLine = function(AddToSelect)
 	this.Document_UpdateInterfaceState();
 	this.private_UpdateCursorXY(true, true);
 };
-CDocument.prototype.Cursor_MoveAt = function(X, Y, AddToSelect)
+CDocument.prototype.MoveCursorToXY = function(X, Y, AddToSelect)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorToXY(X, Y, this.CurPage, AddToSelect);
 };
-CDocument.prototype.Cursor_MoveToCell = function(bNext)
+CDocument.prototype.MoveCursorToCell = function(bNext)
 {
 	this.Reset_WordSelection();
 	this.private_UpdateTargetForCollaboration();
@@ -6089,7 +6089,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         else if (true === SelectedInfo.Is_InTable() && true != e.CtrlKey)
         {
-            this.Cursor_MoveToCell(true === e.ShiftKey ? false : true);
+            this.MoveCursorToCell(true === e.ShiftKey ? false : true);
         }
         else if (true === SelectedInfo.Is_DrawingObjSelected() && true != e.CtrlKey)
         {
@@ -6260,7 +6260,7 @@ CDocument.prototype.OnKeyDown = function(e)
                 }
                 else if (true === e.CtrlKey)
                 {
-                    this.Paragraph_ClearFormatting();
+                    this.ClearParagraphFormatting();
                 }
                 else
                 {
@@ -6310,7 +6310,7 @@ CDocument.prototype.OnKeyDown = function(e)
             else
             {
 
-                var TempXY = this.Cursor_GetPos();
+                var TempXY = this.GetCursorPosXY();
 
                 var X = TempXY.X;
                 var Y = TempXY.Y;
@@ -6367,11 +6367,11 @@ CDocument.prototype.OnKeyDown = function(e)
                         bBreak = true;
                     }
 
-                    this.Cursor_MoveAt(StartX, CurY, false);
+                    this.MoveCursorToXY(StartX, CurY, false);
                     this.CurPos.RealX = StartX;
                     this.CurPos.RealY = CurY;
 
-                    TempXY = this.Cursor_GetPos();
+                    TempXY = this.GetCursorPosXY();
                     X      = TempXY.X;
                     Y      = TempXY.Y;
 
@@ -6419,7 +6419,7 @@ CDocument.prototype.OnKeyDown = function(e)
             {
                 if (this.Pages.length > 0)
                 {
-                    var TempXY = this.Cursor_GetPos();
+                    var TempXY = this.GetCursorPosXY();
 
                     var X = TempXY.X;
                     var Y = TempXY.Y;
@@ -6475,11 +6475,11 @@ CDocument.prototype.OnKeyDown = function(e)
                             bBreak = true;
                         }
 
-                        this.Cursor_MoveAt(StartX, CurY, false);
+                        this.MoveCursorToXY(StartX, CurY, false);
                         this.CurPos.RealX = StartX;
                         this.CurPos.RealY = CurY;
 
-                        TempXY = this.Cursor_GetPos();
+                        TempXY = this.GetCursorPosXY();
                         X      = TempXY.X;
                         Y      = TempXY.Y;
 
@@ -6496,11 +6496,11 @@ CDocument.prototype.OnKeyDown = function(e)
     {
         if (true === e.CtrlKey) // Ctrl + End - переход в конец документа
         {
-            this.Cursor_MoveToEndPos(true === e.ShiftKey);
+            this.MoveCursorToEndPos(true === e.ShiftKey);
         }
         else // Переходим в конец строки
         {
-            this.Cursor_MoveEndOfLine(true === e.ShiftKey);
+            this.MoveCursorToEndOfLine(true === e.ShiftKey);
         }
 
         this.Document_UpdateInterfaceState();
@@ -6512,11 +6512,11 @@ CDocument.prototype.OnKeyDown = function(e)
     {
         if (true === e.CtrlKey) // Ctrl + Home - переход в начало документа
         {
-            this.Cursor_MoveToStartPos(true === e.ShiftKey);
+            this.MoveCursorToStartPos(true === e.ShiftKey);
         }
         else // Переходим в начало строки
         {
-            this.Cursor_MoveStartOfLine(true === e.ShiftKey);
+            this.MoveCursorToStartOfLine(true === e.ShiftKey);
         }
 
         this.Document_UpdateInterfaceState();
@@ -6531,7 +6531,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Cursor_MoveLeft(true === e.ShiftKey, true === e.CtrlKey);
+        this.MoveCursorLeft(true === e.ShiftKey, true === e.CtrlKey);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 38) // Top Arrow
@@ -6542,7 +6542,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Cursor_MoveUp(true === e.ShiftKey, true === e.CtrlKey);
+        this.MoveCursorUp(true === e.ShiftKey, true === e.CtrlKey);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 39) // Right Arrow
@@ -6552,7 +6552,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Cursor_MoveRight(true === e.ShiftKey, true === e.CtrlKey);
+        this.MoveCursorRight(true === e.ShiftKey, true === e.CtrlKey);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 40) // Bottom Arrow
@@ -6563,7 +6563,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetStart();
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
-        this.Cursor_MoveDown(true === e.ShiftKey, true === e.CtrlKey);
+        this.MoveCursorDown(true === e.ShiftKey, true === e.CtrlKey);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 46 && false === editor.isViewMode) // Delete
@@ -7253,7 +7253,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 					ParaItem = new ParaTextPr({HighLight : this.HighlightColor});
 
 				this.Paragraph_Add(ParaItem);
-				this.Cursor_MoveAt(X, Y, false);
+				this.MoveCursorToXY(X, Y, false);
 				this.Document_UpdateSelectionState();
 
 				editor.sync_MarkerFormatCallback(true);
@@ -7565,7 +7565,7 @@ CDocument.prototype.Document_SetHdrFtrFirstPage = function(Value)
 	}
 
 	if (null !== this.HdrFtr.CurHdrFtr)
-		this.HdrFtr.CurHdrFtr.Content.Cursor_MoveToStartPos();
+		this.HdrFtr.CurHdrFtr.Content.MoveCursorToStartPos();
 
 	this.Recalculate();
 
@@ -7608,7 +7608,7 @@ CDocument.prototype.Document_SetHdrFtrEvenAndOddHeaders = function(Value)
 	this.Recalculate();
 
 	if (null !== this.HdrFtr.CurHdrFtr)
-		this.HdrFtr.CurHdrFtr.Content.Cursor_MoveToStartPos();
+		this.HdrFtr.CurHdrFtr.Content.MoveCursorToStartPos();
 
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
@@ -7734,7 +7734,7 @@ CDocument.prototype.Document_SetHdrFtrLink = function(bLinkToPrevious)
 
 
 		this.HdrFtr.Set_CurHdrFtr(CurHdrFtr);
-		this.HdrFtr.CurHdrFtr.Cursor_MoveToStartPos(false);
+		this.HdrFtr.CurHdrFtr.MoveCursorToStartPos(false);
 	}
 	else
 	{
@@ -7745,7 +7745,7 @@ CDocument.prototype.Document_SetHdrFtrLink = function(bLinkToPrevious)
 		var NewHdrFtr = CurHdrFtr.Copy();
 		SectPr.Set_HdrFtr(bHeader, bFirst, bEven, NewHdrFtr);
 		this.HdrFtr.Set_CurHdrFtr(NewHdrFtr);
-		this.HdrFtr.CurHdrFtr.Cursor_MoveToStartPos(false);
+		this.HdrFtr.CurHdrFtr.MoveCursorToStartPos(false);
 	}
 
 	this.Recalculate();
@@ -7766,16 +7766,16 @@ CDocument.prototype.EndHdrFtrEditing = function(bCanStayOnPage)
 		var CurHdrFtr = this.HdrFtr.Get_CurHdrFtr();
 		if (null === CurHdrFtr || undefined === CurHdrFtr || true !== bCanStayOnPage)
 		{
-			this.Cursor_MoveToStartPos(false);
+			this.MoveCursorToStartPos(false);
 		}
 		else
 		{
 			CurHdrFtr.Selection_Remove();
 
 			if (hdrftr_Header == CurHdrFtr.Type)
-				this.Cursor_MoveAt(0, 0, false);
+				this.MoveCursorToXY(0, 0, false);
 			else
-				this.Cursor_MoveAt(0, 100000, false); // TODO: Переделать здесь по-нормальному
+				this.MoveCursorToXY(0, 100000, false); // TODO: Переделать здесь по-нормальному
 		}
 
 		this.DrawingDocument.ClearCachePages();
@@ -7792,11 +7792,11 @@ CDocument.prototype.EndFootnotesEditing = function()
 	{
 		this.Set_DocPosType(docpostype_Content);
 
-		this.Cursor_MoveToStartPos(false);
+		this.MoveCursorToStartPos(false);
 
-		// TODO: Не всегда можно в данной функции использовать Cursor_MoveAt, потому что
+		// TODO: Не всегда можно в данной функции использовать MoveCursorToXY, потому что
 		//       данная страница еще может быть не рассчитана.
-		//this.Cursor_MoveAt(0, 0, false);
+		//this.MoveCursorToXY(0, 0, false);
 
 		this.DrawingDocument.ClearCachePages();
 		this.DrawingDocument.FirePaint();
@@ -8644,7 +8644,7 @@ CDocument.prototype.Set_SelectionState2 = function(State)
 		if (oFootnote && true === this.Footnotes.Is_UseInDocument(State.Id))
 		{
 			this.Footnotes.private_SetCurrentFootnoteNoSelection(oFootnote);
-			oFootnote.Cursor_MoveToStartPos(false);
+			oFootnote.MoveCursorToStartPos(false);
 		}
 		else
 		{
@@ -8953,7 +8953,7 @@ CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 	if (true === this.Selection.Use)
 	{
 		// Если у нас есть селект, тогда ставим курсор в начало селекта
-		this.Cursor_MoveLeft(false, false);
+		this.MoveCursorLeft(false, false);
 	}
 
 	var Element = this.Content[this.CurPos.ContentPos];
@@ -8970,7 +8970,7 @@ CDocument.prototype.Add_SectionBreak = function(SectionBreakType)
 		Element.Split(NewParagraph);
 
 		this.CurPos.ContentPos++;
-		NewParagraph.Cursor_MoveToStartPos(false);
+		NewParagraph.MoveCursorToStartPos(false);
 
 		this.Internal_Content_Add(this.CurPos.ContentPos, NewParagraph);
 
@@ -9586,7 +9586,7 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
 				var bBreak = false;
 				while (true)
 				{
-					this.Cursor_MoveAt(StartX, StartY, AddToSelect);
+					this.MoveCursorToXY(StartX, StartY, AddToSelect);
 					this.private_UpdateCursorXY(false, true);
 
 					if (this.CurPage < NewPage)
@@ -9625,7 +9625,7 @@ CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelec
 		}
 
 
-		this.Cursor_MoveAt(StartX, CurY, AddToSelect);
+		this.MoveCursorToXY(StartX, CurY, AddToSelect);
 		this.private_UpdateCursorXY(false, true);
 
 		if (this.CurPos.RealY > StartY + 0.001)
@@ -9671,7 +9671,7 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 				var bBreak  = false;
 				while (true)
 				{
-					this.Cursor_MoveAt(StartX, StartY, AddToSelect);
+					this.MoveCursorToXY(StartX, StartY, AddToSelect);
 					this.private_UpdateCursorXY(false, true);
 
 					if (this.CurPage > NewPage)
@@ -9694,7 +9694,7 @@ CDocument.prototype.private_MoveCursorUp = function(StartX, StartY, AddToSelect)
 			}
 		}
 
-		this.Cursor_MoveAt(StartX, CurY, AddToSelect);
+		this.MoveCursorToXY(StartX, CurY, AddToSelect);
 		this.private_UpdateCursorXY(false, true);
 
 		if (this.CurPos.RealY < StartY - 0.001)
@@ -11078,7 +11078,7 @@ CDocument.prototype.AddFootnote = function(sText)
 
 			if (true === this.Is_SelectionUse())
 			{
-				this.Cursor_MoveRight(false, false, false);
+				this.MoveCursorRight(false, false, false);
 				this.Selection_Remove();
 			}
 
@@ -11620,27 +11620,13 @@ CDocument.prototype.controller_ClearParagraphFormatting = function()
 
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
-				var Item = this.Content[Index];
-				if (type_Table === Item.GetType())
-					Item.Paragraph_ClearFormatting();
-				else if (type_Paragraph === Item.GetType())
-				{
-					Item.Clear_Formatting();
-					Item.Clear_TextFormatting();
-				}
+				this.Content[Index].ClearParagraphFormatting();
 			}
 		}
 	}
 	else
 	{
-		var Item = this.Content[this.CurPos.ContentPos];
-		if (type_Table === Item.GetType())
-			Item.Paragraph_ClearFormatting();
-		else if (type_Paragraph === Item.GetType())
-		{
-			Item.Clear_Formatting();
-			Item.Clear_TextFormatting();
-		}
+		this.Content[this.CurPos.ContentPos].ClearParagraphFormatting();
 	}
 };
 CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
@@ -11671,7 +11657,7 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 				if (true === bAddSpace)
 				{
 					this.Paragraph_Add(new ParaSpace());
-					this.Cursor_MoveLeft(false, false);
+					this.MoveCursorLeft(false, false);
 				}
 				break;
 			}
@@ -11873,13 +11859,13 @@ CDocument.prototype.controller_GetCursorPosXY = function()
 	if (true === this.Selection.Use)
 	{
 		if (selectionflag_Common === this.Selection.Flag)
-			return this.Content[this.Selection.EndPos].Cursor_GetPos();
+			return this.Content[this.Selection.EndPos].GetCursorPosXY();
 
 		return {X : 0, Y : 0};
 	}
 	else
 	{
-		return this.Content[this.CurPos.ContentPos].Cursor_GetPos();
+		return this.Content[this.CurPos.ContentPos].GetCursorPosXY();
 	}
 };
 CDocument.prototype.controller_MoveCursorToStartPos = function(AddToSelect)
@@ -11903,7 +11889,7 @@ CDocument.prototype.controller_MoveCursorToStartPos = function(AddToSelect)
 			this.Content[Index].Select_All(-1);
 		}
 
-		this.Content[StartPos].Cursor_MoveToStartPos(true);
+		this.Content[StartPos].MoveCursorToStartPos(true);
 	}
 	else
 	{
@@ -11917,7 +11903,7 @@ CDocument.prototype.controller_MoveCursorToStartPos = function(AddToSelect)
 
 		this.CurPos.ContentPos = 0;
 		this.Set_DocPosType(docpostype_Content);
-		this.Content[0].Cursor_MoveToStartPos(false);
+		this.Content[0].MoveCursorToStartPos(false);
 	}
 };
 CDocument.prototype.controller_MoveCursorToEndPos = function(AddToSelect)
@@ -11959,7 +11945,7 @@ CDocument.prototype.controller_MoveCursorToEndPos = function(AddToSelect)
 			}
 		}
 
-		this.Content[StartPos].Cursor_MoveToEndPos(true, false);
+		this.Content[StartPos].MoveCursorToEndPos(true, false);
 	}
 	else
 	{
@@ -11973,7 +11959,7 @@ CDocument.prototype.controller_MoveCursorToEndPos = function(AddToSelect)
 
 		this.CurPos.ContentPos = this.Content.length - 1;
 		this.Set_DocPosType(docpostype_Content);
-		this.Content[this.CurPos.ContentPos].Cursor_MoveToEndPos(false);
+		this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false);
 	}
 };
 CDocument.prototype.controller_MoveCursorLeft = function(AddToSelect, Word)
@@ -12175,7 +12161,7 @@ CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word)
 CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 {
 	if (true === this.Is_SelectionUse() && true !== AddToSelect)
-		this.Cursor_MoveLeft(false, false);
+		this.MoveCursorLeft(false, false);
 
 	var bStopSelection = false;
 	if (true !== this.Is_SelectionUse() && true === AddToSelect)
@@ -12189,7 +12175,7 @@ CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 
 	// TODO: Вообще Word селектит до начала данной колонки в таком случае, а не до начала документа
 	if (true === AddToSelect && true !== Result)
-		this.Cursor_MoveToStartPos(true);
+		this.MoveCursorToStartPos(true);
 
 	if (bStopSelection)
 		this.private_StopSelection();
@@ -12197,7 +12183,7 @@ CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 CDocument.prototype.controller_MoveCursorDown = function(AddToSelect)
 {
 	if (true === this.Is_SelectionUse() && true !== AddToSelect)
-		this.Cursor_MoveRight(false, false);
+		this.MoveCursorRight(false, false);
 
 	var bStopSelection = false;
 	if (true !== this.Is_SelectionUse() && true === AddToSelect)
@@ -12210,7 +12196,7 @@ CDocument.prototype.controller_MoveCursorDown = function(AddToSelect)
 	var Result = this.private_MoveCursorDown(this.CurPos.RealX, this.CurPos.RealY, AddToSelect);
 
 	if (true === AddToSelect && true !== Result)
-		this.Cursor_MoveToEndPos(true);
+		this.MoveCursorToEndPos(true);
 
 	if (bStopSelection)
 		this.private_StopSelection();
@@ -12226,7 +12212,7 @@ CDocument.prototype.controller_MoveCursorToEndOfLine = function(AddToSelect)
 		if (true === AddToSelect)
 		{
 			var Item = this.Content[this.Selection.EndPos];
-			Item.Cursor_MoveEndOfLine(AddToSelect);
+			Item.MoveCursorToEndOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
 			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
@@ -12241,7 +12227,7 @@ CDocument.prototype.controller_MoveCursorToEndOfLine = function(AddToSelect)
 			this.CurPos.ContentPos = Pos;
 
 			var Item = this.Content[Pos];
-			Item.Cursor_MoveEndOfLine(AddToSelect);
+			Item.MoveCursorToEndOfLine(AddToSelect);
 
 			this.Selection_Remove();
 		}
@@ -12255,7 +12241,7 @@ CDocument.prototype.controller_MoveCursorToEndOfLine = function(AddToSelect)
 			this.Selection.EndPos   = this.CurPos.ContentPos;
 
 			var Item = this.Content[this.CurPos.ContentPos];
-			Item.Cursor_MoveEndOfLine(AddToSelect);
+			Item.MoveCursorToEndOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
 			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
@@ -12267,7 +12253,7 @@ CDocument.prototype.controller_MoveCursorToEndOfLine = function(AddToSelect)
 		else
 		{
 			var Item = this.Content[this.CurPos.ContentPos];
-			Item.Cursor_MoveEndOfLine(AddToSelect);
+			Item.MoveCursorToEndOfLine(AddToSelect);
 		}
 	}
 
@@ -12285,7 +12271,7 @@ CDocument.prototype.controller_MoveCursorToStartOfLine = function(AddToSelect)
 		if (true === AddToSelect)
 		{
 			var Item = this.Content[this.Selection.EndPos];
-			Item.Cursor_MoveStartOfLine(AddToSelect);
+			Item.MoveCursorToStartOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
 			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Selection.Use)
@@ -12300,7 +12286,7 @@ CDocument.prototype.controller_MoveCursorToStartOfLine = function(AddToSelect)
 			this.CurPos.ContentPos = Pos;
 
 			var Item = this.Content[Pos];
-			Item.Cursor_MoveStartOfLine(AddToSelect);
+			Item.MoveCursorToStartOfLine(AddToSelect);
 
 			this.Selection_Remove();
 		}
@@ -12314,7 +12300,7 @@ CDocument.prototype.controller_MoveCursorToStartOfLine = function(AddToSelect)
 			this.Selection.EndPos   = this.CurPos.ContentPos;
 
 			var Item = this.Content[this.CurPos.ContentPos];
-			Item.Cursor_MoveStartOfLine(AddToSelect);
+			Item.MoveCursorToStartOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
 			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Selection.Use)
@@ -12326,7 +12312,7 @@ CDocument.prototype.controller_MoveCursorToStartOfLine = function(AddToSelect)
 		else
 		{
 			var Item = this.Content[this.CurPos.ContentPos];
-			Item.Cursor_MoveStartOfLine(AddToSelect);
+			Item.MoveCursorToStartOfLine(AddToSelect);
 		}
 	}
 
@@ -12351,7 +12337,7 @@ CDocument.prototype.controller_MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 			var ContentPos         = this.Internal_GetContentPosByXY(X, Y);
 			this.CurPos.ContentPos = ContentPos;
 			var ElementPageIndex   = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageAbs);
-			this.Content[ContentPos].Cursor_MoveAt(X, Y, false, false, ElementPageIndex);
+			this.Content[ContentPos].MoveCursorToXY(X, Y, false, false, ElementPageIndex);
 
 			this.Document_UpdateInterfaceState();
 		}
@@ -12372,7 +12358,7 @@ CDocument.prototype.controller_MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 			var ContentPos         = this.Internal_GetContentPosByXY(X, Y);
 			this.CurPos.ContentPos = ContentPos;
 			var ElementPageIndex   = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageAbs);
-			this.Content[ContentPos].Cursor_MoveAt(X, Y, false, false, ElementPageIndex);
+			this.Content[ContentPos].MoveCursorToXY(X, Y, false, false, ElementPageIndex);
 
 			this.Document_UpdateInterfaceState();
 		}
@@ -12383,12 +12369,12 @@ CDocument.prototype.controller_MoveCursorToCell = function(bNext)
 	if (true === this.Selection.Use)
 	{
 		if (this.Selection.StartPos === this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType())
-			this.Content[this.Selection.StartPos].Cursor_MoveToCell(bNext);
+			this.Content[this.Selection.StartPos].MoveCursorToCell(bNext);
 	}
 	else
 	{
 		if (type_Table === this.Content[this.CurPos.ContentPos].GetType())
-			this.Content[this.CurPos.ContentPos].Cursor_MoveToCell(bNext);
+			this.Content[this.CurPos.ContentPos].MoveCursorToCell(bNext);
 	}
 };
 CDocument.prototype.controller_SetParagraphAlign = function(Align)
@@ -14879,7 +14865,7 @@ CDocument.prototype.controller_RemoveTable = function()
 
 			this.Set_DocPosType(docpostype_Content);
 			this.CurPos.ContentPos = Pos;
-			this.Content[Pos].Cursor_MoveToStartPos();
+			this.Content[Pos].MoveCursorToStartPos();
 		}
 	}
 };
@@ -15450,7 +15436,7 @@ CDocument.prototype.MoveToFillingForm = function(bNext)
 
 	if (oForm)
 	{
-		oForm.Cursor_MoveToStartPos();
+		oForm.MoveCursorToStartPos();
 		if (oForm.Content.length >= 0 && para_Run === oForm.Content[0].Type)
 			oForm.Content[0].Make_ThisElementCurrent();
 

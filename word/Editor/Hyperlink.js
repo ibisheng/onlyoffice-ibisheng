@@ -136,12 +136,12 @@ ParaHyperlink.prototype.Add = function(Item)
                 if (para_Field === Item.Type)
                 {
                     this.State.ContentPos = CurPos + 2;
-                    this.Content[this.State.ContentPos].Cursor_MoveToStartPos(false);
+                    this.Content[this.State.ContentPos].MoveCursorToStartPos(false);
                 }
                 else
                 {
                     this.State.ContentPos = CurPos + 1;
-                    this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
+                    this.Content[this.State.ContentPos].MoveCursorToEndPos(false);
                 }
             }
             else
@@ -171,7 +171,7 @@ ParaHyperlink.prototype.Add = function(Item)
 
                 // Перемещаем кусор в конец формулы
                 this.State.ContentPos = CurPos + 1;
-                this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
+                this.Content[this.State.ContentPos].MoveCursorToEndPos(false);
             }
             else
                 this.Content[CurPos].Add(Item);
@@ -198,7 +198,7 @@ ParaHyperlink.prototype.Add = function(Item)
                 }
                 this.Add_ToContent(CurPos + Count + 1, NewItem, false);
                 this.State.ContentPos = CurPos + Count;
-                this.Content[this.State.ContentPos].Cursor_MoveToEndPos();
+                this.Content[this.State.ContentPos].MoveCursorToEndPos();
             }
 
             break;

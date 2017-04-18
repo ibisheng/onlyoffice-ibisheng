@@ -138,7 +138,7 @@ CFootEndnote.prototype.AddDefaultFootnoteContent = function(sText)
 	oRun.Add_ToContent(0, new ParaSpace());
 	oParagraph.Add_ToContent(1, oRun);
 
-	this.Cursor_MoveToEndPos(false);
+	this.MoveCursorToEndPos(false);
 };
 CFootEndnote.prototype.Recalculate_Page = function(PageIndex, bStart)
 {

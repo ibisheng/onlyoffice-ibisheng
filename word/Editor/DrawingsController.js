@@ -495,7 +495,7 @@ CDrawingsController.prototype.RestoreDocumentStateAfterLoadChanges = function(St
 
 		ContentPos = Math.max(0, Math.min(LogicDocument.Content.length - 1, ContentPos));
 		LogicDocument.CurPos.ContentPos = ContentPos;
-		LogicDocument.Content[ContentPos].Cursor_MoveToStartPos(false);
+		LogicDocument.Content[ContentPos].MoveCursorToStartPos(false);
 	}
 };
 CDrawingsController.prototype.GetColumnSize = function()

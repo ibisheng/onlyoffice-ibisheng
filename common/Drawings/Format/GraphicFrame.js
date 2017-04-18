@@ -304,21 +304,21 @@ CGraphicFrame.prototype.getAllFonts= function(fonts)
         }
 };
 
-CGraphicFrame.prototype.Cursor_MoveToStartPos = function()
+CGraphicFrame.prototype.MoveCursorToStartPos = function()
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Cursor_MoveToStartPos();
+            this.graphicObject.MoveCursorToStartPos();
             this.graphicObject.RecalculateCurPos();
 
         }
 };
 
-CGraphicFrame.prototype.Cursor_MoveToEndPos = function()
+CGraphicFrame.prototype.MoveCursorToEndPos = function()
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Cursor_MoveToEndPos();
+            this.graphicObject.MoveCursorToEndPos();
             this.graphicObject.RecalculateCurPos();
 
         }
@@ -342,11 +342,11 @@ CGraphicFrame.prototype.paragraphFormatPaste= function(CopyTextPr, CopyParaPr, B
 
 };
 
-CGraphicFrame.prototype.Paragraph_ClearFormatting= function()
+CGraphicFrame.prototype.ClearParagraphFormatting= function()
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Paragraph_ClearFormatting();
+            this.graphicObject.ClearParagraphFormatting();
 
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;

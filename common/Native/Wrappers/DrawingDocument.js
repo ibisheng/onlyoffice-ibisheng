@@ -314,7 +314,7 @@ function CTableOutlineDr()
         var _outline = this.TableOutline;
         var _table = _outline.Table;
 
-        _table.Cursor_MoveToStartPos();
+        _table.MoveCursorToStartPos();
         _table.Document_SetThisElementCurrent(true);
 
         if (!_table.Is_Inline())
@@ -1735,7 +1735,7 @@ CDrawingDocument.prototype =
             {
                 this.SelectClearLock = true;
                 this.SelectDrag = 1;
-                this.LogicDocument.Cursor_MoveRight();
+                this.LogicDocument.MoveCursorRight();
 
                 var _xStamp = this.SelectRect1.X;
                 var _yStamp = this.SelectRect1.Y;
@@ -1767,7 +1767,7 @@ CDrawingDocument.prototype =
             {
                 this.SelectClearLock = true;
                 this.SelectDrag = 2;
-                this.LogicDocument.Cursor_MoveLeft();
+                this.LogicDocument.MoveCursorLeft();
 
                 var _xStamp = this.SelectRect2.X + this.SelectRect2.W;
                 var _yStamp = this.SelectRect2.Y + this.SelectRect2.H;

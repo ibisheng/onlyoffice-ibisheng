@@ -1258,7 +1258,7 @@ CMathContent.prototype.SetPlaceholder = function()
     this.addElementToContent(oRun);
 
     this.Selection_Remove();
-    this.Cursor_MoveToEndPos();
+    this.MoveCursorToEndPos();
 };
 //////////////////////////////////////
 CMathContent.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
@@ -1686,12 +1686,12 @@ CMathContent.prototype.private_CorrectContent = function()
                 if (bLeftRun)
                 {
                     this.CurPos = CurrPos - 1;
-                    this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+                    this.Content[this.CurPos].MoveCursorToEndPos(false);
                 }
                 else
                 {
                     this.CurPos = CurrPos;
-                    this.Content[this.CurPos].Cursor_MoveToStartPos();
+                    this.Content[this.CurPos].MoveCursorToStartPos();
                 }
             }
         }
@@ -1778,24 +1778,24 @@ CMathContent.prototype.Correct_ContentPos = function(nDirection)
     if (nCurPos < 0)
     {
         this.CurPos = 0;
-        this.Content[0].Cursor_MoveToStartPos();
+        this.Content[0].MoveCursorToStartPos();
     }
     else if (nCurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos();
+        this.Content[this.CurPos].MoveCursorToEndPos();
     }
     else if (para_Math_Run !== this.Content[nCurPos].Type)
     {
         if (nDirection > 0)
         {
             this.CurPos = nCurPos + 1;
-            this.Content[this.CurPos].Cursor_MoveToStartPos();
+            this.Content[this.CurPos].MoveCursorToStartPos();
         }
         else
         {
             this.CurPos = nCurPos - 1;
-            this.Content[this.CurPos].Cursor_MoveToEndPos();
+            this.Content[this.CurPos].MoveCursorToEndPos();
         }
     }
 };
@@ -2171,7 +2171,7 @@ CMathContent.prototype.private_CorrectCurPos = function()
         this.CurPos = this.Content.length - 1;
 
         if (para_Math_Run === this.Content[this.CurPos].Type)
-            this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+            this.Content[this.CurPos].MoveCursorToEndPos(false);
     }
 
     if (this.CurPos < 0)
@@ -2179,7 +2179,7 @@ CMathContent.prototype.private_CorrectCurPos = function()
         this.CurPos = this.Content.length - 1;
 
         if (para_Math_Run === this.Content[this.CurPos].Type)
-            this.Content[this.CurPos].Cursor_MoveToStartPos();
+            this.Content[this.CurPos].MoveCursorToStartPos();
     }
 };
 CMathContent.prototype.Correct_ContentCurPos = function()
@@ -3575,13 +3575,13 @@ CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
     {
         this.CurPos = 0;
         if (this.Content[this.CurPos])
-        	this.Content[this.CurPos].Cursor_MoveToStartPos();
+        	this.Content[this.CurPos].MoveCursorToStartPos();
     }
     else if (CurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
         if (this.Content[this.CurPos])
-        	this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+        	this.Content[this.CurPos].MoveCursorToEndPos(false);
     }
     else
     {
@@ -4975,15 +4975,15 @@ CMathContent.prototype.Get_SelectionDirection = function()
 
     return this.Content[this.Selection.StartPos].Get_SelectionDirection();
 };
-CMathContent.prototype.Cursor_MoveToStartPos = function()
+CMathContent.prototype.MoveCursorToStartPos = function()
 {
     this.CurPos = 0;
-    this.Content[0].Cursor_MoveToStartPos();
+    this.Content[0].MoveCursorToStartPos();
 };
-CMathContent.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
+CMathContent.prototype.MoveCursorToEndPos = function(SelectFromEnd)
 {
     this.CurPos = this.Content.length - 1;
-    this.Content[this.CurPos].Cursor_MoveToEndPos(SelectFromEnd);
+    this.Content[this.CurPos].MoveCursorToEndPos(SelectFromEnd);
 };
 CMathContent.prototype.Check_Composition = function()
 {
@@ -5459,15 +5459,15 @@ CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
 
             this.CurPos++;
             oContentElem.CurPos = 2;
-            oContentElem.Content[2].Cursor_MoveToStartPos();
+            oContentElem.Content[2].MoveCursorToStartPos();
         }
         else
         {
             this.CurPos++;
             if (AutoCorrectEngine.Shift == 0)
-                this.Content[this.CurPos].Cursor_MoveToStartPos();
+                this.Content[this.CurPos].MoveCursorToStartPos();
             else
-                this.Content[this.CurPos].Cursor_MoveToEndPos();
+                this.Content[this.CurPos].MoveCursorToEndPos();
 
         }
 
@@ -7229,7 +7229,7 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
     }
 
     this.CurPos = FirstElementPos + NewElementsCount + 1;
-    this.Content[this.CurPos].Cursor_MoveToStartPos();
+    this.Content[this.CurPos].MoveCursorToStartPos();
 
     if (true === bCursorStepRight)
     {

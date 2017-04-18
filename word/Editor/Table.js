@@ -2485,7 +2485,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 	var oLogicDocument = editor.WordControl.m_oLogicDocument;
 
 	this.Document_SetThisElementCurrent(false);
-	this.Cursor_MoveToStartPos();
+	this.MoveCursorToStartPos();
 
 	var oTargetTable = this;
 	if (true != this.Is_Inline())
@@ -2664,7 +2664,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 	}
 	editor.WordControl.m_oLogicDocument.Selection_Remove();
 	oTargetTable.Document_SetThisElementCurrent(true);
-	oTargetTable.Cursor_MoveToStartPos();
+	oTargetTable.MoveCursorToStartPos();
 	editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 };
 CTable.prototype.Reset = function(X, Y, XLimit, YLimit, PageNum, ColumnNum, ColumnsCount)
@@ -3906,7 +3906,7 @@ CTable.prototype.Set_SelectionState2 = function(TableState)
 
 	if (null == CurCell)
 	{
-		this.Cursor_MoveToStartPos(false);
+		this.MoveCursorToStartPos(false);
 	}
 	else
 	{
@@ -4232,7 +4232,7 @@ CTable.prototype.Get_SelectionAnchorPos = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с текущей позицией и селектом таблицы
 //----------------------------------------------------------------------------------------------------------------------
-CTable.prototype.Cursor_MoveAt = function(X, Y, bLine, bDontChangeRealPos, CurPage)
+CTable.prototype.MoveCursorToXY = function(X, Y, bLine, bDontChangeRealPos, CurPage)
 {
 	var Pos  = this.Internal_GetCellByXY(X, Y, CurPage);
 	var Row  = this.Content[Pos.Row];
@@ -4248,7 +4248,7 @@ CTable.prototype.Cursor_MoveAt = function(X, Y, bLine, bDontChangeRealPos, CurPa
 	this.CurCell = Cell;
 	this.DrawingDocument.TargetStart();
 	this.DrawingDocument.TargetShow();
-	this.CurCell.Content_Cursor_MoveAt(X, Y, false, true, CurPage - this.CurCell.Content.Get_StartPage_Relative());
+	this.CurCell.Content_MoveCursorToXY(X, Y, false, true, CurPage - this.CurCell.Content.Get_StartPage_Relative());
 	if (this.LogicDocument)
 	{
 		this.LogicDocument.RecalculateCurPos();
@@ -4889,7 +4889,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 		{
 			this.Selection.Use   = false;
 			this.Selection.Start = false;
-			this.Cursor_MoveAt(X, Y, false, false, CurPage);
+			this.MoveCursorToXY(X, Y, false, false, CurPage);
 			return;
 		}
 	}
@@ -5197,7 +5197,7 @@ CTable.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElementSt
 
 	this.Internal_Selection_UpdateCells();
 };
-CTable.prototype.Cursor_MoveToStartPos = function(AddToSelect)
+CTable.prototype.MoveCursorToStartPos = function(AddToSelect)
 {
 	if (true === AddToSelect)
 	{
@@ -5224,10 +5224,10 @@ CTable.prototype.Cursor_MoveToStartPos = function(AddToSelect)
 		this.Selection.EndPos.Pos   = {Row : 0, Cell : 0};
 		this.Selection.CurRow       = 0;
 
-		this.CurCell.Content_Cursor_MoveToStartPos();
+		this.CurCell.Content_MoveCursorToStartPos();
 	}
 };
-CTable.prototype.Cursor_MoveToEndPos = function(AddToSelect)
+CTable.prototype.MoveCursorToEndPos = function(AddToSelect)
 {
 	if (true === AddToSelect)
 	{
@@ -5255,7 +5255,7 @@ CTable.prototype.Cursor_MoveToEndPos = function(AddToSelect)
 		this.Selection.EndPos.Pos   = {Row : Row.Index, Cell : this.CurCell.Index};
 		this.Selection.CurRow       = Row.Index;
 
-		this.CurCell.Content_Cursor_MoveToEndPos();
+		this.CurCell.Content_MoveCursorToEndPos();
 	}
 };
 CTable.prototype.IsCursorAtBegin = function(bOnlyPara)
@@ -5353,9 +5353,9 @@ CTable.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
 	else
 		this.CurCell.Content.Paragraph_Add(ParaItem, bRecalculate);
 };
-CTable.prototype.Paragraph_ClearFormatting = function()
+CTable.prototype.ClearParagraphFormatting = function()
 {
-	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
+	if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
 	{
 		var Cells_array = this.Internal_Get_SelectionArray();
 		for (var Index = 0; Index < Cells_array.length; Index++)
@@ -5366,19 +5366,14 @@ CTable.prototype.Paragraph_ClearFormatting = function()
 
 			var Cell_Content = Cell.Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.Paragraph_ClearFormatting();
+			Cell.Content.ClearParagraphFormatting();
 			Cell_Content.Set_ApplyToAll(false);
-		}
-
-		if (Cells_array[0].Row - 1 >= 0)
-			this.Internal_RecalculateFrom(Cells_array[0].Row - 1, 0, true, true);
-		else
-		{
-			this.Internal_Recalculate_1();
 		}
 	}
 	else
-		this.CurCell.Content.Paragraph_ClearFormatting();
+	{
+		this.CurCell.Content.ClearParagraphFormatting();
+	}
 };
 CTable.prototype.Paragraph_Format_Paste = function(TextPr, ParaPr, ApplyPara)
 {
@@ -5483,7 +5478,7 @@ CTable.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTe
 		}
 	}
 };
-CTable.prototype.Cursor_GetPos = function()
+CTable.prototype.GetCursorPosXY = function()
 {
 	if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
 	{
@@ -5497,9 +5492,9 @@ CTable.prototype.Cursor_GetPos = function()
 		return {X : Para.X, Y : Para.Y}
 	}
 	else
-		return this.CurCell.Content.Cursor_GetPos();
+		return this.CurCell.Content.GetCursorPosXY();
 };
-CTable.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
+CTable.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
 	if (true === this.Selection.Use && this.Selection.Type === table_Selection_Cell)
 	{
@@ -5555,13 +5550,13 @@ CTable.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
 			this.Selection.Use = false;
 			var Pos            = this.Selection.Data[0];
 			this.CurCell       = this.Content[Pos.Row].Get_Cell(Pos.Cell);
-			this.CurCell.Content_Cursor_MoveToStartPos();
+			this.CurCell.Content_MoveCursorToStartPos();
 			return true;
 		}
 	}
 	else
 	{
-		if (false === this.CurCell.Content.Cursor_MoveLeft(AddToSelect, Word))
+		if (false === this.CurCell.Content.MoveCursorLeft(AddToSelect, Word))
 		{
 			if (false === AddToSelect)
 			{
@@ -5577,7 +5572,7 @@ CTable.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
 						this.CurCell          = this.Internal_Get_StartMergedCell2(this.Content[this.Selection.CurRow].Get_CellsCount() - 1, this.Selection.CurRow);
 					}
 
-					this.CurCell.Content.Cursor_MoveToEndPos();
+					this.CurCell.Content.MoveCursorToEndPos();
 				}
 				else
 					return false;
@@ -5657,7 +5652,7 @@ CTable.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
 		this.Selection.Data.push({Cell : CellIndex, Row : LastRow.Index});
 	}
 };
-CTable.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word, FromPaste)
+CTable.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
 {
 	if (true === this.Selection.Use && this.Selection.Type === table_Selection_Cell)
 	{
@@ -5712,13 +5707,13 @@ CTable.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word, FromPaste
 			this.Selection.Use = false;
 			var Pos            = this.Selection.Data[this.Selection.Data.length - 1];
 			this.CurCell       = this.Content[Pos.Row].Get_Cell(Pos.Cell);
-			this.CurCell.Content_Cursor_MoveToEndPos();
+			this.CurCell.Content_MoveCursorToEndPos();
 			return true;
 		}
 	}
 	else
 	{
-		if (false === this.CurCell.Content.Cursor_MoveRight(AddToSelect, Word, FromPaste))
+		if (false === this.CurCell.Content.MoveCursorRight(AddToSelect, Word, FromPaste))
 		{
 			if (false === AddToSelect)
 			{
@@ -5734,7 +5729,7 @@ CTable.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word, FromPaste
 						this.CurCell          = this.Internal_Get_StartMergedCell2(0, this.Selection.CurRow);
 					}
 
-					this.CurCell.Content.Cursor_MoveToStartPos();
+					this.CurCell.Content.MoveCursorToStartPos();
 				}
 				else
 					return false;
@@ -5817,7 +5812,7 @@ CTable.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
 		this.Selection.Data.push({Cell : CellIndex, Row : 0});
 	}
 };
-CTable.prototype.Cursor_MoveUp = function(Count, AddToSelect)
+CTable.prototype.MoveCursorUp = function(AddToSelect)
 {
 	if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
 	{
@@ -5876,7 +5871,7 @@ CTable.prototype.Cursor_MoveUp = function(Count, AddToSelect)
 			if (0 === Pos.Row)
 			{
 				this.CurCell = Cell;
-				this.CurCell.Content.Cursor_MoveToStartPos();
+				this.CurCell.Content.MoveCursorToStartPos();
 				this.CurCell.Content_Set_CurPosXY(X, Y);
 
 				return false;
@@ -5896,7 +5891,7 @@ CTable.prototype.Cursor_MoveUp = function(Count, AddToSelect)
 				if (null === PrevCell)
 					return true;
 
-				PrevCell.Content_Cursor_MoveUp_To_LastRow(X, Y, false);
+				PrevCell.Content_MoveCursorUpToLastRow(X, Y, false);
 				this.CurCell = PrevCell;
 				return true;
 			}
@@ -5905,7 +5900,7 @@ CTable.prototype.Cursor_MoveUp = function(Count, AddToSelect)
 	}
 	else
 	{
-		if (false === this.CurCell.Content.Cursor_MoveUp(AddToSelect))
+		if (false === this.CurCell.Content.MoveCursorUp(AddToSelect))
 		{
 			// Ничего не делаем, если это "плавающая" таблица или первый элемент документа
 			if (0 === this.CurCell.Row.Index && (false === this.Is_Inline() || ( null === this.Get_DocumentPrev() && true === this.Parent.Is_TopDocument() )))
@@ -5974,7 +5969,7 @@ CTable.prototype.Cursor_MoveUp = function(Count, AddToSelect)
 						return true;
 
 					Cell = this.Internal_Get_StartMergedCell2(Cell.Index, Cell.Row.Index);
-					Cell.Content_Cursor_MoveUp_To_LastRow(X, Y, false);
+					Cell.Content_MoveCursorUpToLastRow(X, Y, false);
 					this.CurCell              = Cell;
 					this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 					this.Selection.CurRow     = Cell.Row.Index;
@@ -5997,7 +5992,7 @@ CTable.prototype.Cursor_MoveUp = function(Count, AddToSelect)
 		}
 	}
 };
-CTable.prototype.Cursor_MoveDown = function(Count, AddToSelect)
+CTable.prototype.MoveCursorDown = function(AddToSelect)
 {
 	if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
 	{
@@ -6056,7 +6051,7 @@ CTable.prototype.Cursor_MoveDown = function(Count, AddToSelect)
 			if (this.Content.length - 1 === Pos.Row)
 			{
 				this.CurCell = Cell;
-				this.CurCell.Content.Cursor_MoveToStartPos();
+				this.CurCell.Content.MoveCursorToStartPos();
 				this.CurCell.Content_Set_CurPosXY(X, Y);
 
 				return false;
@@ -6076,7 +6071,7 @@ CTable.prototype.Cursor_MoveDown = function(Count, AddToSelect)
 				if (null === NextCell)
 					return true;
 
-				NextCell.Content_Cursor_MoveDown_To_FirstRow(X, Y, false);
+				NextCell.Content_MoveCursorDownToFirstRow(X, Y, false);
 				this.CurCell = NextCell;
 				return true;
 			}
@@ -6085,7 +6080,7 @@ CTable.prototype.Cursor_MoveDown = function(Count, AddToSelect)
 	}
 	else
 	{
-		if (false === this.CurCell.Content.Cursor_MoveDown(AddToSelect))
+		if (false === this.CurCell.Content.MoveCursorDown(AddToSelect))
 		{
 			if (true === AddToSelect)
 			{
@@ -6155,7 +6150,7 @@ CTable.prototype.Cursor_MoveDown = function(Count, AddToSelect)
 					if (null === Cell)
 						return true;
 
-					Cell.Content_Cursor_MoveDown_To_FirstRow(X, Y, false);
+					Cell.Content_MoveCursorDownToFirstRow(X, Y, false);
 					this.CurCell              = Cell;
 					this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 					this.Selection.CurRow     = Cell.Row.Index;
@@ -6178,13 +6173,13 @@ CTable.prototype.Cursor_MoveDown = function(Count, AddToSelect)
 		}
 	}
 };
-CTable.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
+CTable.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 {
 	if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
-		return this.Cursor_MoveRight(1, AddToSelect, false);
+		return this.MoveCursorRight(AddToSelect, false);
 	else
 	{
-		var bRetValue = this.CurCell.Content.Cursor_MoveEndOfLine(AddToSelect);
+		var bRetValue = this.CurCell.Content.MoveCursorToEndOfLine(AddToSelect);
 		if (true === this.CurCell.Content.Is_SelectionUse())
 		{
 			this.Selection.Use          = true;
@@ -6200,13 +6195,13 @@ CTable.prototype.Cursor_MoveEndOfLine = function(AddToSelect)
 		return bRetValue;
 	}
 };
-CTable.prototype.Cursor_MoveStartOfLine = function(AddToSelect)
+CTable.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 {
 	if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
-		return this.Cursor_MoveLeft(1, AddToSelect, false);
+		return this.MoveCursorLeft(AddToSelect, false);
 	else
 	{
-		var bRetValue = this.CurCell.Content.Cursor_MoveStartOfLine(AddToSelect);
+		var bRetValue = this.CurCell.Content.MoveCursorToStartOfLine(AddToSelect);
 		if (true === this.CurCell.Content.Is_SelectionUse())
 		{
 			this.Selection.Use          = true;
@@ -6222,7 +6217,7 @@ CTable.prototype.Cursor_MoveStartOfLine = function(AddToSelect)
 		return bRetValue;
 	}
 };
-CTable.prototype.Cursor_MoveUp_To_LastRow = function(X, Y, AddToSelect)
+CTable.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 {
 	if (true === AddToSelect)
 	{
@@ -6279,13 +6274,13 @@ CTable.prototype.Cursor_MoveUp_To_LastRow = function(X, Y, AddToSelect)
 		if (null === Cell)
 			return;
 		Cell = this.Internal_Get_StartMergedCell2(Cell.Index, Cell.Row.Index);
-		Cell.Content_Cursor_MoveUp_To_LastRow(X, Y, false);
+		Cell.Content_MoveCursorUpToLastRow(X, Y, false);
 		this.Selection.CurRow = Cell.Row.Index;
 
 		this.CurCell = Cell;
 	}
 };
-CTable.prototype.Cursor_MoveDown_To_FirstRow = function(X, Y, AddToSelect)
+CTable.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 {
 	if (true === AddToSelect)
 	{
@@ -6339,12 +6334,12 @@ CTable.prototype.Cursor_MoveDown_To_FirstRow = function(X, Y, AddToSelect)
 		if (null === Cell)
 			return;
 
-		Cell.Content_Cursor_MoveDown_To_FirstRow(X, Y, false);
+		Cell.Content_MoveCursorDownToFirstRow(X, Y, false);
 		this.Selection.CurRow = Cell.Row.Index;
 		this.CurCell          = Cell;
 	}
 };
-CTable.prototype.Cursor_MoveToCell = function(bNext)
+CTable.prototype.MoveCursorToCell = function(bNext)
 {
 	if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
 	{
@@ -6356,16 +6351,15 @@ CTable.prototype.Cursor_MoveToCell = function(bNext)
 	else
 	{
 		if (true === this.Is_InnerTable())
-			return this.CurCell.Content.Cursor_MoveToCell(bNext);
+			return this.CurCell.Content.MoveCursorToCell(bNext);
 
 		var CurCell = this.CurCell;
 		var Pos_c   = this.CurCell.Index;
 		var Pos_r   = this.CurCell.Row.Index;
-		var Pos     =
-				{
-					Cell : Pos_c,
-					Row  : Pos_r
-				};
+		var Pos     = {
+			Cell : Pos_c,
+			Row  : Pos_r
+		};
 
 		if (true === bNext)
 		{
@@ -6415,7 +6409,7 @@ CTable.prototype.Cursor_MoveToCell = function(bNext)
 
 		if (true === this.CurCell.Content.Selection_IsEmpty(false))
 		{
-			this.CurCell.Content.Cursor_MoveToStartPos();
+			this.CurCell.Content.MoveCursorToStartPos();
 
 			this.Selection.Use    = false;
 			this.Selection.Type   = table_Selection_Text;
@@ -8101,8 +8095,8 @@ CTable.prototype.Split_Table = function()
 	NewTable.Set_TableLook(this.TableLook.Copy());
 
 	// Сбросим селект и текущую позицию в таблицах
-	this.Cursor_MoveToStartPos(false);
-	NewTable.Cursor_MoveToStartPos(false);
+	this.MoveCursorToStartPos(false);
+	NewTable.MoveCursorToStartPos(false);
 
 	return NewTable;
 };
@@ -9019,7 +9013,7 @@ CTable.prototype.Row_Remove = function(Ind)
 	var CurRow   = Math.min(Rows_to_delete[0], this.Content.length - 1);
 	var Row      = this.Content[CurRow];
 	this.CurCell = Row.Get_Cell(0);
-	this.CurCell.Content.Cursor_MoveToStartPos();
+	this.CurCell.Content.MoveCursorToStartPos();
 
 	var PageNum = 0;
 	for (PageNum = 0; PageNum < this.Pages.length - 1; PageNum++)
@@ -9237,7 +9231,7 @@ CTable.prototype.Col_Remove = function()
 	var CurCell    = Delete_info[0][0] === undefined ? CellsCount - 1 : Math.min(Delete_info[0][0], CellsCount - 1);
 
 	this.CurCell = Row.Get_Cell(CurCell);
-	this.CurCell.Content.Cursor_MoveToStartPos();
+	this.CurCell.Content.MoveCursorToStartPos();
 	var PageNum = 0;
 
 	this.Markup.Internal.RowIndex  = CurRow;

@@ -3472,7 +3472,7 @@ function CEditorPage(api)
 		if (this.m_oApi.isViewMode === false && null != this.m_oLogicDocument)
 		{
 			//this.m_oLogicDocument.Set_CurPage( drDoc.SlideCurrent );
-			//this.m_oLogicDocument.Cursor_MoveAt(0, 0, false);
+			//this.m_oLogicDocument.MoveCursorToXY(0, 0, false);
 			this.m_oLogicDocument.RecalculateCurPos();
 
 			this.m_oApi.sync_currentPageCallback(drDoc.SlideCurrent);

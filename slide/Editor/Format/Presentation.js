@@ -1687,7 +1687,7 @@ CPresentation.prototype =
             this.Check_GraphicFrameRowHeight(graphic_frame);
             this.Slides[this.CurPage].addToSpTreeToPos(this.Slides[this.CurPage].cSld.spTree.length, graphic_frame);
             graphic_frame.Set_CurrentElement();
-            graphic_frame.graphicObject.Cursor_MoveToStartPos();
+            graphic_frame.graphicObject.MoveCursorToStartPos();
             this.Recalculate();
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
@@ -1809,7 +1809,7 @@ CPresentation.prototype =
                     oMathShape.addToDrawingObjects();
                     oMathShape.select(oController, this.CurPage);
 					oController.selection.textSelection = oMathShape;
-                    oMathShape.txBody.content.Cursor_MoveToStartPos(false);
+                    oMathShape.txBody.content.MoveCursorToStartPos(false);
                 }
             }
             this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
@@ -1841,7 +1841,7 @@ CPresentation.prototype =
 
     },
 
-    Paragraph_ClearFormatting : function()
+	ClearParagraphFormatting : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphClearFormatting, [], false, AscDFH.historydescription_Presentation_ParagraphClearFormatting);
         this.Document_UpdateInterfaceState();
@@ -1865,7 +1865,7 @@ CPresentation.prototype =
     },
 
 
-    Cursor_MoveToStartPos : function()
+	MoveCursorToStartPos : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveToStartPos();
         this.Document_UpdateSelectionState();
@@ -1873,7 +1873,7 @@ CPresentation.prototype =
         return true;
     },
 
-    Cursor_MoveToEndPos : function()
+	MoveCursorToEndPos : function()
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveToEndPos();
         this.Document_UpdateSelectionState();
@@ -1881,56 +1881,56 @@ CPresentation.prototype =
         return true;
     },
 
-    Cursor_MoveLeft : function(AddToSelect, Word)
+	MoveCursorLeft : function(AddToSelect, Word)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveLeft(AddToSelect, Word);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveRight : function(AddToSelect, Word)
+	MoveCursorRight : function(AddToSelect, Word)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveRight(AddToSelect, Word);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveUp : function(AddToSelect, CtrlKey)
+	MoveCursorUp : function(AddToSelect, CtrlKey)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveUp(AddToSelect, CtrlKey);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveDown : function(AddToSelect, CtrlKey)
+	MoveCursorDown : function(AddToSelect, CtrlKey)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveDown(AddToSelect, CtrlKey);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveEndOfLine : function(AddToSelect)
+	MoveCursorToEndOfLine : function(AddToSelect)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveEndOfLine(AddToSelect);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveStartOfLine : function(AddToSelect)
+	MoveCursorToStartOfLine : function(AddToSelect)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveStartOfLine(AddToSelect);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveAt : function( X, Y, AddToSelect )
+	MoveCursorToXY : function( X, Y, AddToSelect )
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.cursorMoveAt(X, Y, AddToSelect);
         this.Document_UpdateInterfaceState();
         return true;
     },
 
-    Cursor_MoveToCell : function(bNext)
+	MoveCursorToCell : function(bNext)
     {
 
     },
@@ -2388,7 +2388,7 @@ CPresentation.prototype =
                 {
                     if(target_content instanceof CTable)
                     {
-                        target_content.Cursor_MoveToCell( true === e.ShiftKey ? false : true );
+                        target_content.MoveCursorToCell( true === e.ShiftKey ? false : true );
                     }
                     else
                     {
@@ -2588,7 +2588,7 @@ CPresentation.prototype =
             }
             else if ( true === e.CtrlKey )
             {
-                this.Paragraph_ClearFormatting();
+                this.ClearParagraphFormatting();
             }
             else
             {
@@ -2639,11 +2639,11 @@ CPresentation.prototype =
             {
                 if ( true === e.CtrlKey ) // Ctrl + End - переход в конец документа
                 {
-                    this.Cursor_MoveToEndPos();
+                    this.MoveCursorToEndPos();
                 }
                 else // Переходим в конец строки
                 {
-                    this.Cursor_MoveEndOfLine( true === e.ShiftKey );
+                    this.MoveCursorToEndOfLine( true === e.ShiftKey );
                 }
             }
             else
@@ -2672,11 +2672,11 @@ CPresentation.prototype =
             {
                 if (true === e.CtrlKey) // Ctrl + Home - переход в начало документа
                 {
-                    this.Cursor_MoveToStartPos();
+                    this.MoveCursorToStartPos();
                 }
                 else // Переходим в начало строки
                 {
-                    this.Cursor_MoveStartOfLine(true === e.ShiftKey);
+                    this.MoveCursorToStartOfLine(true === e.ShiftKey);
                 }
             }
             else
@@ -2700,12 +2700,12 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 37 ) // Left Arrow
         {
-            this.Cursor_MoveLeft( true === e.ShiftKey, true === e.CtrlKey );
+            this.MoveCursorLeft( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 38 ) // Top Arrow
         {
-            this.Cursor_MoveUp( true === e.ShiftKey, true === e.CtrlKey );
+            this.MoveCursorUp( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 39 ) // Right Arrow
@@ -2714,7 +2714,7 @@ CPresentation.prototype =
            // if ( true != e.ShiftKey )
            //     this.DrawingDocument.TargetStart();
 
-            this.Cursor_MoveRight( true === e.ShiftKey, true === e.CtrlKey );
+            this.MoveCursorRight( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 40 ) // Bottom Arrow
@@ -2723,7 +2723,7 @@ CPresentation.prototype =
             //if ( true != e.ShiftKey )
             //    this.DrawingDocument.TargetStart();
 
-            this.Cursor_MoveDown( true === e.ShiftKey, true === e.CtrlKey );
+            this.MoveCursorDown( true === e.ShiftKey, true === e.CtrlKey );
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 46 && false === editor.isViewMode ) // Delete
@@ -3372,11 +3372,11 @@ CPresentation.prototype =
                     {
                         if(bBefore)
                         {
-                            by_types.tables[0].graphicObject.Cursor_MoveToStartPos();
+                            by_types.tables[0].graphicObject.MoveCursorToStartPos();
                         }
                         else
                         {
-                            by_types.tables[0].graphicObject.Cursor_MoveToStartPos();
+                            by_types.tables[0].graphicObject.MoveCursorToStartPos();
                         }
                     }
                     else

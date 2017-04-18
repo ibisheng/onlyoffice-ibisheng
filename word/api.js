@@ -6103,7 +6103,7 @@ background-repeat: no-repeat;\
 		LogicDocument.OnMouseDown(global_mouseEvent, 0, 0, pageNumber);
 		LogicDocument.OnMouseUp(global_mouseEvent, 0, 0, pageNumber);
 		LogicDocument.OnMouseMove(global_mouseEvent, 0, 0, pageNumber);
-		LogicDocument.Cursor_MoveLeft();
+		LogicDocument.MoveCursorLeft();
 		LogicDocument.Document_UpdateInterfaceState();
 
 		global_mouseEvent.ClickCount = oldClickCount;
@@ -6135,7 +6135,7 @@ background-repeat: no-repeat;\
 		LogicDocument.OnMouseDown(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
 		LogicDocument.OnMouseUp(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
 		LogicDocument.OnMouseMove(global_mouseEvent, 0, 0, pageNumber);
-		LogicDocument.Cursor_MoveLeft();
+		LogicDocument.MoveCursorLeft();
 		LogicDocument.Document_UpdateInterfaceState();
 
 		global_mouseEvent.ClickCount = oldClickCount;
@@ -6281,7 +6281,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ClearFormatting);
-			this.WordControl.m_oLogicDocument.Paragraph_ClearFormatting();
+			this.WordControl.m_oLogicDocument.ClearParagraphFormatting();
 		}
 	};
 
@@ -7458,19 +7458,19 @@ background-repeat: no-repeat;\
 	};
 	window["asc_docs_api"].prototype["Cursor_MoveLeft"]              = function()
 	{
-		this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
+		this.WordControl.m_oLogicDocument.MoveCursorLeft();
 	};
 	window["asc_docs_api"].prototype["Cursor_MoveRight"]             = function()
 	{
-		this.WordControl.m_oLogicDocument.Cursor_MoveRight();
+		this.WordControl.m_oLogicDocument.MoveCursorRight();
 	};
 	window["asc_docs_api"].prototype["Cursor_MoveUp"]                = function()
 	{
-		this.WordControl.m_oLogicDocument.Cursor_MoveUp();
+		this.WordControl.m_oLogicDocument.MoveCursorUp();
 	};
 	window["asc_docs_api"].prototype["Cursor_MoveDown"]              = function()
 	{
-		this.WordControl.m_oLogicDocument.Cursor_MoveDown();
+		this.WordControl.m_oLogicDocument.MoveCursorDown();
 	};
 	window["asc_docs_api"].prototype["Get_DocumentRecalcId"]         = function()
 	{
