@@ -446,7 +446,7 @@
 		this.tmpZoomType    = null;
 
 		// Spell Checking
-		this.SpellCheckApi      = (window["AscDesktopEditor"] === undefined) ? new AscCommon.CSpellCheckApi() : new CSpellCheckApi_desktop();
+		this.SpellCheckApi      = new AscCommon.CSpellCheckApi();
 		this.isSpellCheckEnable = true;
 
 		// это чтобы сразу показать ридер, без возможности вернуться в редактор/вьюер
@@ -1228,18 +1228,24 @@ background-repeat: no-repeat;\
 		}
 
 		var t = this;
-		if (!window["AscDesktopEditor"])
-		{
-			if (this.SpellCheckUrl && this.isSpellCheckEnable)
-				this.SpellCheckApi.set_url(this.SpellCheckUrl);
-
-			this.SpellCheckApi.onSpellCheck = function(e)
-			{
-				var incomeObject = JSON.parse(e);
-				t.SpellCheck_CallBack(incomeObject);
+		if (window["AscDesktopEditor"]) {
+			this.SpellCheckApi.spellCheck = function (spellData) {
+				window["AscDesktopEditor"]["SpellCheck"](spellData);
 			};
+			this.SpellCheckApi.disconnect = function () {
+			};
+		} else {
+			if (this.SpellCheckUrl && this.isSpellCheckEnable) {
+				this.SpellCheckApi.set_url(this.SpellCheckUrl);
+			}
 		}
 
+		this.SpellCheckApi.onInit = function (e) {
+			t.sendEvent('asc_onSpellCheckInit', e);
+		};
+		this.SpellCheckApi.onSpellCheck = function (e) {
+			t.SpellCheck_CallBack(e);
+		};
 		this.SpellCheckApi.init(this.documentId);
 	};
 	//----------------------------------------------------------------------------------------------------------------------
@@ -1269,10 +1275,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.asc_getSpellCheckLanguages = function()
-	{
-		return AscCommon.g_spellCheckLanguages;
-	};
 	asc_docs_api.prototype.asc_SpellCheckDisconnect   = function()
 	{
 		if (!this.SpellCheckApi)
@@ -7552,36 +7554,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	// desktop editor spellcheck
-	function CSpellCheckApi_desktop()
-	{
-		this.docId = undefined;
-
-		this.init = function(docid)
-		{
-			this.docId = docid;
-		};
-
-		this.set_url = function(url)
-		{
-		};
-
-		this.spellCheck = function(spellData)
-		{
-			window["AscDesktopEditor"]["SpellCheck"](spellData);
-		};
-
-		this.onSpellCheck = function(spellData)
-		{
-			editor.SpellCheck_CallBack(spellData);
-		};
-
-		this.disconnect = function()
-		{
-			// none
-		};
-	}
-
 	window["AscDesktopEditor_Save"] = function()
 	{
 		return editor.asc_Save(false);
@@ -7682,7 +7654,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_coAuthoringChatGetMessages']            = asc_docs_api.prototype.asc_coAuthoringChatGetMessages;
 	asc_docs_api.prototype['asc_coAuthoringGetUsers']                   = asc_docs_api.prototype.asc_coAuthoringGetUsers;
 	asc_docs_api.prototype['asc_coAuthoringDisconnect']                 = asc_docs_api.prototype.asc_coAuthoringDisconnect;
-	asc_docs_api.prototype['asc_getSpellCheckLanguages']                = asc_docs_api.prototype.asc_getSpellCheckLanguages;
 	asc_docs_api.prototype['asc_SpellCheckDisconnect']                  = asc_docs_api.prototype.asc_SpellCheckDisconnect;
 	asc_docs_api.prototype['_onUpdateDocumentCanSave']                  = asc_docs_api.prototype._onUpdateDocumentCanSave;
 	asc_docs_api.prototype['put_FramePr']                               = asc_docs_api.prototype.put_FramePr;

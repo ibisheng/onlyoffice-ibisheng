@@ -444,8 +444,7 @@
   /**
    * Event об отсоединении от сервера
    * @param {jQuery} e  event об отсоединении с причиной
-   * @param {Bool} isDisconnectAtAll  окончательно ли отсоединяемся(true) или будем пробовать сделать reconnect(false) + сами отключились
-   * @param {Bool} isCloseCoAuthoring
+   * @param {Asc.c_oAscError.ID} errorCode
    */
   CDocsCoApi.prototype.callback_OnDisconnect = function(e, errorCode) {
     if (this.onDisconnect) {
