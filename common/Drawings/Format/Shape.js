@@ -906,7 +906,7 @@ CShape.prototype.createTextBoxContent = function () {
     body_pr.setAnchor(1);
     this.setBodyPr(body_pr);
     this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
-    this.textBoxContent.Set_ParagraphAlign(AscCommon.align_Center);
+    this.textBoxContent.SetParagraphAlign(AscCommon.align_Center);
     this.textBoxContent.Content[0].Set_DocumentIndex(0);
 };
 
@@ -5157,7 +5157,7 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
                     }
                 }
                 oContentToDraw.Set_ApplyToAll(true);
-                oContentToDraw.Set_ParagraphSpacing({Before: 0, After: 0});
+                oContentToDraw.SetParagraphSpacing({Before: 0, After: 0});
                 oContentToDraw.Set_ApplyToAll(false);
                 if(bNeedTurnOn)
                 {

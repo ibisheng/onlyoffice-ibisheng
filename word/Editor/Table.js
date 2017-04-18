@@ -6745,7 +6745,7 @@ CTable.prototype.Set_ParagraphPrOnAdd = function(Para)
 
 	this.ApplyToAll = false;
 };
-CTable.prototype.Set_ParagraphAlign = function(Align)
+CTable.prototype.SetParagraphAlign = function(Align)
 {
 	if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
 	{
@@ -6758,21 +6758,16 @@ CTable.prototype.Set_ParagraphAlign = function(Align)
 
 			var Cell_Content = Cell.Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.Set_ParagraphAlign(Align);
+			Cell.Content.SetParagraphAlign(Align);
 			Cell_Content.Set_ApplyToAll(false);
-		}
-
-		if (Cells_array[0].Row - 1 >= 0)
-			this.Internal_RecalculateFrom(Cells_array[0].Row - 1, 0, true, true);
-		else
-		{
-			this.Internal_Recalculate_1();
 		}
 	}
 	else
-		return this.CurCell.Content.Set_ParagraphAlign(Align);
+	{
+		return this.CurCell.Content.SetParagraphAlign(Align);
+	}
 };
-CTable.prototype.Set_ParagraphSpacing = function(Spacing)
+CTable.prototype.SetParagraphSpacing = function(Spacing)
 {
 	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
 	{
@@ -6785,19 +6780,14 @@ CTable.prototype.Set_ParagraphSpacing = function(Spacing)
 
 			var Cell_Content = Cell.Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.Set_ParagraphSpacing(Spacing);
+			Cell.Content.SetParagraphSpacing(Spacing);
 			Cell_Content.Set_ApplyToAll(false);
-		}
-
-		if (Cells_array[0].Row - 1 >= 0)
-			this.Internal_RecalculateFrom(Cells_array[0].Row - 1, 0, true, true);
-		else
-		{
-			this.Internal_Recalculate_1();
 		}
 	}
 	else
-		return this.CurCell.Content.Set_ParagraphSpacing(Spacing);
+	{
+		return this.CurCell.Content.SetParagraphSpacing(Spacing);
+	}
 };
 CTable.prototype.Set_ParagraphIndent = function(Ind)
 {
@@ -6984,7 +6974,7 @@ CTable.prototype.Set_ParagraphStyle = function(Name)
 	else
 		return this.CurCell.Content.Set_ParagraphStyle(Name);
 };
-CTable.prototype.Set_ParagraphTabs = function(Tabs)
+CTable.prototype.SetParagraphTabs = function(Tabs)
 {
 	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
 	{
@@ -6997,19 +6987,14 @@ CTable.prototype.Set_ParagraphTabs = function(Tabs)
 
 			var Cell_Content = Cell.Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.Set_ParagraphTabs(Tabs);
+			Cell.Content.SetParagraphTabs(Tabs);
 			Cell_Content.Set_ApplyToAll(false);
-		}
-
-		if (Cells_array[0].Row - 1 >= 0)
-			this.Internal_RecalculateFrom(Cells_array[0].Row - 1, 0, true, true);
-		else
-		{
-			this.Internal_Recalculate_1();
 		}
 	}
 	else
-		return this.CurCell.Content.Set_ParagraphTabs(Tabs);
+	{
+		return this.CurCell.Content.SetParagraphTabs(Tabs);
+	}
 };
 CTable.prototype.Set_ParagraphContextualSpacing = function(Value)
 {

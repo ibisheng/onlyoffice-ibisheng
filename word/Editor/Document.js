@@ -4399,7 +4399,7 @@ CDocument.prototype.MoveCursorToCell = function(bNext)
 	this.private_UpdateTargetForCollaboration();
 	this.Controller.MoveCursorToCell(bNext);
 };
-CDocument.prototype.Set_ParagraphAlign = function(Align)
+CDocument.prototype.SetParagraphAlign = function(Align)
 {
 	var SelectedInfo = this.Get_SelectedElementsInfo();
 	var Math         = SelectedInfo.Get_Math();
@@ -4416,14 +4416,14 @@ CDocument.prototype.Set_ParagraphAlign = function(Align)
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Set_ParagraphSpacing = function(Spacing)
+CDocument.prototype.SetParagraphSpacing = function(Spacing)
 {
 	this.Controller.SetParagraphSpacing(Spacing);
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Set_ParagraphTabs = function(Tabs)
+CDocument.prototype.SetParagraphTabs = function(Tabs)
 {
 	this.Controller.SetParagraphTabs(Tabs);
 	this.Recalculate();
@@ -10377,7 +10377,7 @@ CDocument.prototype.private_ToggleParagraphAlignByHotkey = function(Align)
 			if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
 			{
 				this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
-				this.Set_ParagraphAlign(ParaPr.Jc === Align ? (Align === align_Left ? AscCommon.align_Justify : align_Left) : Align);
+				this.SetParagraphAlign(ParaPr.Jc === Align ? (Align === align_Left ? AscCommon.align_Justify : align_Left) : Align);
 				this.Document_UpdateInterfaceState();
 			}
 		}
@@ -12394,23 +12394,13 @@ CDocument.prototype.controller_SetParagraphAlign = function(Align)
 		for (var Index = StartPos; Index <= EndPos; Index++)
 		{
 			var Item = this.Content[Index];
-			if (type_Paragraph == Item.GetType())
-				Item.Set_Align(Align, true);
-			else if (type_Table == Item.GetType())
-				Item.Set_ParagraphAlign(Align);
+			Item.SetParagraphAlign(Align);
 		}
 	}
 	else
 	{
 		var Item = this.Content[this.CurPos.ContentPos];
-		if (type_Paragraph == Item.GetType())
-		{
-			Item.Set_Align(Align, true);
-		}
-		else if (type_Table == Item.GetType())
-		{
-			Item.Set_ParagraphAlign(Align);
-		}
+		Item.SetParagraphAlign(Align);
 	}
 };
 CDocument.prototype.controller_SetParagraphSpacing = function(Spacing)
@@ -12432,23 +12422,13 @@ CDocument.prototype.controller_SetParagraphSpacing = function(Spacing)
 		for (var Index = StartPos; Index <= EndPos; Index++)
 		{
 			var Item = this.Content[Index];
-			if (type_Paragraph == Item.GetType())
-				Item.Set_Spacing(Spacing, false);
-			else if (type_Table == Item.GetType())
-				Item.Set_ParagraphSpacing(Spacing);
+			Item.SetParagraphSpacing(Spacing);
 		}
 	}
 	else
 	{
 		var Item = this.Content[this.CurPos.ContentPos];
-		if (type_Paragraph == Item.GetType())
-		{
-			Item.Set_Spacing(Spacing, false);
-		}
-		else if (type_Table == Item.GetType())
-		{
-			Item.Set_ParagraphSpacing(Spacing);
-		}
+		Item.SetParagraphSpacing(Spacing);
 	}
 };
 CDocument.prototype.controller_SetParagraphTabs = function(Tabs)
@@ -12470,24 +12450,13 @@ CDocument.prototype.controller_SetParagraphTabs = function(Tabs)
 		for (var Index = StartPos; Index <= EndPos; Index++)
 		{
 			var Item = this.Content[Index];
-			if (type_Paragraph == Item.GetType())
-				Item.Set_Tabs(Tabs);
-			else if (type_Table == Item.GetType())
-				Item.Set_ParagraphTabs(Tabs);
+			Item.SetParagraphTabs(Tabs);
 		}
 	}
 	else
 	{
 		var Item = this.Content[this.CurPos.ContentPos];
-		if (type_Paragraph == Item.GetType())
-		{
-			Item.Set_Tabs(Tabs);
-
-		}
-		else if (type_Table == Item.GetType())
-		{
-			Item.Set_ParagraphTabs(Tabs);
-		}
+		Item.SetParagraphTabs(Tabs);
 	}
 };
 CDocument.prototype.controller_SetParagraphIndent = function(Ind)

@@ -2676,7 +2676,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphLineSpacing);
-			this.WordControl.m_oLogicDocument.Set_ParagraphSpacing({LineRule : Type, Line : Value});
+			this.WordControl.m_oLogicDocument.SetParagraphSpacing({LineRule : Type, Line : Value});
 
 			var ParaPr = this.get_TextProps().ParaPr;
 			if (null != ParaPr)
@@ -2693,9 +2693,9 @@ background-repeat: no-repeat;\
 				case 0:
 				{
 					if (AscCommonWord.spacing_Auto === value)
-						this.WordControl.m_oLogicDocument.Set_ParagraphSpacing({BeforeAutoSpacing : true});
+						this.WordControl.m_oLogicDocument.SetParagraphSpacing({BeforeAutoSpacing : true});
 					else
-						this.WordControl.m_oLogicDocument.Set_ParagraphSpacing({
+						this.WordControl.m_oLogicDocument.SetParagraphSpacing({
 							Before            : value,
 							BeforeAutoSpacing : false
 						});
@@ -2705,9 +2705,9 @@ background-repeat: no-repeat;\
 				case 1:
 				{
 					if (AscCommonWord.spacing_Auto === value)
-						this.WordControl.m_oLogicDocument.Set_ParagraphSpacing({AfterAutoSpacing : true});
+						this.WordControl.m_oLogicDocument.SetParagraphSpacing({AfterAutoSpacing : true});
 					else
-						this.WordControl.m_oLogicDocument.Set_ParagraphSpacing({
+						this.WordControl.m_oLogicDocument.SetParagraphSpacing({
 							After            : value,
 							AfterAutoSpacing : false
 						});
@@ -2862,7 +2862,7 @@ background-repeat: no-repeat;\
 				this.WordControl.m_oLogicDocument.Set_ParagraphIndent(Props.Ind);
 
 			if ("undefined" != typeof(Props.Jc) && null != Props.Jc)
-				this.WordControl.m_oLogicDocument.Set_ParagraphAlign(Props.Jc);
+				this.WordControl.m_oLogicDocument.SetParagraphAlign(Props.Jc);
 
 			if ("undefined" != typeof(Props.KeepLines) && null != Props.KeepLines)
 				this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines(Props.KeepLines);
@@ -2877,7 +2877,7 @@ background-repeat: no-repeat;\
 				this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore(Props.PageBreakBefore);
 
 			if ("undefined" != typeof(Props.Spacing) && null != Props.Spacing)
-				this.WordControl.m_oLogicDocument.Set_ParagraphSpacing(Props.Spacing);
+				this.WordControl.m_oLogicDocument.SetParagraphSpacing(Props.Spacing);
 
 			if ("undefined" != typeof(Props.Shd) && null != Props.Shd)
 			{
@@ -2930,7 +2930,7 @@ background-repeat: no-repeat;\
 			{
 				var Tabs = new AscCommonWord.CParaTabs();
 				Tabs.Set_FromObject(Props.Tabs.Tabs);
-				this.WordControl.m_oLogicDocument.Set_ParagraphTabs(Tabs);
+				this.WordControl.m_oLogicDocument.SetParagraphTabs(Tabs);
 			}
 
 			if (undefined != Props.DefaultTab)
@@ -2991,7 +2991,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlign);
-			this.WordControl.m_oLogicDocument.Set_ParagraphAlign(value);
+			this.WordControl.m_oLogicDocument.SetParagraphAlign(value);
 		}
 	};
 	// 0- baseline, 2-subscript, 1-superscript

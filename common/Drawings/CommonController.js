@@ -1736,12 +1736,12 @@ DrawingObjectsController.prototype =
 
     setParagraphSpacing: function(Spacing)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphSpacing, [Spacing], CTable.prototype.Set_ParagraphSpacing);
+        this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphSpacing, [Spacing], CTable.prototype.SetParagraphSpacing);
     },
 
     setParagraphTabs: function(Tabs)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphTabs, CTable.prototype.Set_ParagraphTabs, [Tabs]);
+        this.applyTextFunction(CDocumentContent.prototype.SetParagraphTabs, CTable.prototype.SetParagraphTabs, [Tabs]);
     },
 
     setParagraphNumbering: function(NumInfo)
@@ -1905,7 +1905,7 @@ DrawingObjectsController.prototype =
                 }
             }
         }
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphAlign, [align], CTable.prototype.Set_ParagraphAlign);
+        this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphAlign, [align], CTable.prototype.SetParagraphAlign);
     },
 
     setParagraphIndent: function(indent)
@@ -7835,7 +7835,7 @@ DrawingObjectsController.prototype =
         }
         oContent.Set_ApplyToAll(true);
         oContent.Paragraph_Add(new ParaTextPr(oTextPr));
-        oContent.Set_ParagraphAlign(AscCommon.align_Center);
+        oContent.SetParagraphAlign(AscCommon.align_Center);
         oContent.Set_ApplyToAll(false);
         var oBodyPr = oShape.getBodyPr().createDuplicate();
         oBodyPr.rot = 0;

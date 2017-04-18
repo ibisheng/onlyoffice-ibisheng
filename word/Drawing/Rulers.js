@@ -2223,7 +2223,7 @@ function CHorRuler()
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphTabs);
-            this.m_oWordControl.m_oLogicDocument.Set_ParagraphTabs(_arr);
+            this.m_oWordControl.m_oLogicDocument.SetParagraphTabs(_arr);
         }
     }
 

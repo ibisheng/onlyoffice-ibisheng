@@ -5027,7 +5027,7 @@
         oTextPr.TextFill = oTextFill2;
         oContent.Set_ApplyToAll(true);
         oContent.Paragraph_Add(new ParaTextPr(oTextPr));
-        oContent.Set_ParagraphAlign(AscCommon.align_Center);
+        oContent.SetParagraphAlign(AscCommon.align_Center);
         oContent.Set_ApplyToAll(false);
         var oBodyPr = oShape.getBodyPr().createDuplicate();
         oBodyPr.rot = 0;

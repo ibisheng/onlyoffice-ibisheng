@@ -2226,7 +2226,7 @@ CFootnotesController.prototype.SetParagraphAlign = function(Align)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphAlign(Align);
+		oFootnote.SetParagraphAlign(Align);
 	}
 };
 CFootnotesController.prototype.SetParagraphSpacing = function(Spacing)
@@ -2234,7 +2234,7 @@ CFootnotesController.prototype.SetParagraphSpacing = function(Spacing)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphSpacing(Spacing);
+		oFootnote.SetParagraphSpacing(Spacing);
 	}
 };
 CFootnotesController.prototype.SetParagraphTabs = function(Tabs)
@@ -2242,7 +2242,7 @@ CFootnotesController.prototype.SetParagraphTabs = function(Tabs)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphTabs(Tabs);
+		oFootnote.SetParagraphTabs(Tabs);
 	}
 };
 CFootnotesController.prototype.SetParagraphIndent = function(Ind)

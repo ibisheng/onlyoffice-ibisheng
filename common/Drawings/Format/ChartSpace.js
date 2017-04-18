@@ -5738,7 +5738,7 @@ CChartSpace.prototype.recalculateAxis = function()
 
                             var content = dlbl.tx.rich.content;
                             content.Set_ApplyToAll(true);
-                            content.Set_ParagraphAlign(AscCommon.align_Center);
+                            content.SetParagraphAlign(AscCommon.align_Center);
                             content.Set_ApplyToAll(false);
                             dlbl.txBody = dlbl.tx.rich;
                             if(cat_ax.labels.arrLabels.length > 0)
@@ -6535,7 +6535,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
                                     cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(AscCommon.align_Left);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.SetParagraphAlign(AscCommon.align_Left);
                                     cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                                     var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
@@ -6580,7 +6580,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
                                     cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(AscCommon.align_Left);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.SetParagraphAlign(AscCommon.align_Left);
                                     cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                                     var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
@@ -7173,7 +7173,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 dlbl.lastStyleObject = cat_ax.labels.arrLabels[0].lastStyleObject;
                             }
                             dlbl.tx.rich.content.Set_ApplyToAll(true);
-                            dlbl.tx.rich.content.Set_ParagraphAlign(AscCommon.align_Center);
+                            dlbl.tx.rich.content.SetParagraphAlign(AscCommon.align_Center);
                             dlbl.tx.rich.content.Set_ApplyToAll(false);
                             var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
                             var max_min_content_width = min_max.Min;
@@ -7570,7 +7570,7 @@ CChartSpace.prototype.recalculateAxis = function()
                          if(cat_ax.labels.arrLabels[i])
                          {
                          cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                         cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Center);
+                         cat_ax.labels.arrLabels[i].tx.rich.content.SetParagraphAlign(align_Center);
                          cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                          cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 2000);
                          cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);

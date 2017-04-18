@@ -806,15 +806,15 @@ CHeaderFooter.prototype =
 		this.Content.MoveCursorToCell(bNext);
 	},
 
-    Set_ParagraphAlign : function(Align)
-    {
-        return this.Content.Set_ParagraphAlign( Align );
-    },
+	SetParagraphAlign : function(Align)
+	{
+		return this.Content.SetParagraphAlign(Align);
+	},
 
-    Set_ParagraphSpacing : function(Spacing)
-    {
-        return this.Content.Set_ParagraphSpacing( Spacing );
-    },
+	SetParagraphSpacing : function(Spacing)
+	{
+		return this.Content.SetParagraphSpacing(Spacing);
+	},
 
     Set_ParagraphIndent : function(Ind)
     {
@@ -836,10 +836,10 @@ CHeaderFooter.prototype =
         return this.Content.Set_ParagraphStyle( Name );
     },
 
-    Set_ParagraphTabs : function(Tabs)
-    {
-        return this.Content.Set_ParagraphTabs( Tabs );
-    },
+	SetParagraphTabs : function(Tabs)
+	{
+		return this.Content.SetParagraphTabs(Tabs);
+	},
 
     Set_ParagraphContextualSpacing : function(Value)
     {
@@ -1961,17 +1961,17 @@ CHeaderFooterController.prototype =
 			this.CurHdrFtr.MoveCursorToCell(bNext);
 	},
 
-    Set_ParagraphAlign : function(Align)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphAlign( Align );
-    },
+	SetParagraphAlign : function(Align)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphAlign(Align);
+	},
 
-    Set_ParagraphSpacing : function(Spacing)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphSpacing( Spacing );
-    },
+	SetParagraphSpacing : function(Spacing)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphSpacing(Spacing);
+	},
 
     Set_ParagraphIndent : function(Ind)
     {
@@ -1997,11 +1997,11 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Set_ParagraphStyle( Name );
     },
 
-    Set_ParagraphTabs : function(Tabs)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphTabs( Tabs );
-    },
+	SetParagraphTabs : function(Tabs)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphTabs(Tabs);
+	},
 
     Set_ParagraphContextualSpacing : function(Value)
     {

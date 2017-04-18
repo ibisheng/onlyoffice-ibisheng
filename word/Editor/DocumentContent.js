@@ -4010,134 +4010,99 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
         }
     }
 };
-CDocumentContent.prototype.Set_ParagraphAlign                 = function(Align)
+CDocumentContent.prototype.SetParagraphAlign = function(Align)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Set_Align(Align, false);
-            else if (type_Table == Item.GetType())
-                Item.Set_ParagraphAlign(Align);
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphAlign(Align);
+			Item.Set_ApplyToAll(false);
+		}
 
-            Item.Set_ApplyToAll(false);
-        }
+		return;
+	}
 
-        return;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphAlign(Align);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphAlign(Align);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
-
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                // При изменении прилегания параграфа, не надо пересчитывать остальные
-                // параграфы, т.к. переносы строк не меняются
-                var Item = this.Content[Index];
-                if (type_Paragraph == Item.GetType())
-                    Item.Set_Align(Align, true);
-                else if (type_Table == Item.GetType())
-                    Item.Set_ParagraphAlign(Align);
-            }
-
-            this.Parent.OnContentRecalculate(false);
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            // При изменении прилегания параграфа, не надо пересчитывать остальные
-            // параграфы, т.к. переносы строк не меняются
-            Item.Set_Align(Align, true);
-
-            this.Parent.OnContentRecalculate(false);
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Set_ParagraphAlign(Align);
-        }
-    }
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				var Item = this.Content[Index];
+				Item.SetParagraphAlign(Align);
+			}
+		}
+		else
+		{
+			this.Content[this.CurPos.ContentPos].SetParagraphAlign(Align);
+		}
+	}
 };
-CDocumentContent.prototype.Set_ParagraphSpacing               = function(Spacing)
+CDocumentContent.prototype.SetParagraphSpacing = function(Spacing)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Set_Spacing(Spacing, false);
-            else if (type_Table == Item.GetType())
-                Item.Set_ParagraphSpacing(Spacing);
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphSpacing(Spacing);
+			Item.Set_ApplyToAll(false);
+		}
 
-            Item.Set_ApplyToAll(false);
-        }
+		return;
+	}
 
-        return;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphSpacing(Spacing);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphSpacing(Spacing);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
-
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                var Item = this.Content[Index];
-                if (type_Paragraph == Item.GetType())
-                    Item.Set_Spacing(Spacing, false);
-                else if (type_Table == Item.GetType())
-                    Item.Set_ParagraphSpacing(Spacing);
-            }
-
-            this.Recalculate();
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            Item.Set_Spacing(Spacing, false);
-            this.Recalculate();
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Set_ParagraphSpacing(Spacing);
-        }
-    }
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				var Item = this.Content[Index];
+				Item.SetParagraphSpacing(Spacing);
+			}
+		}
+		else
+		{
+			this.Content[this.CurPos.ContentPos].SetParagraphSpacing(Spacing);
+		}
+	}
 };
 CDocumentContent.prototype.Set_ParagraphIndent                = function(Ind)
 {
@@ -5476,75 +5441,53 @@ CDocumentContent.prototype.Set_ParagraphStyle                 = function(Name)
         }
     }
 };
-CDocumentContent.prototype.Set_ParagraphTabs                  = function(Tabs)
+CDocumentContent.prototype.SetParagraphTabs = function(Tabs)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Set_Tabs(Tabs);
-            else if (type_Table == Item.GetType())
-            {
-                Item.Set_ParagraphTabs(Tabs);
-            }
-            Item.Set_ApplyToAll(false);
-        }
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphTabs(Tabs);
+			Item.Set_ApplyToAll(false);
+		}
 
-        return;
-    }
+		return;
+	}
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphTabs(Tabs);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphTabs(Tabs);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
 
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                var Item = this.Content[Index];
-                if (type_Paragraph == Item.GetType())
-                    Item.Set_Tabs(Tabs);
-                else if (type_Table == Item.GetType())
-                    Item.Set_ParagraphTabs(Tabs);
-            }
-            this.Recalculate();
-
-            if (editor)
-                editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
-
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            Item.Set_Tabs(Tabs);
-            this.Recalculate();
-            if (editor)
-                editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Set_ParagraphTabs(Tabs);
-            if (editor)
-                editor.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
-        }
-    }
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				var Item = this.Content[Index];
+				Item.SetParagraphTabs(Tabs);
+			}
+		}
+		else
+		{
+			var Item = this.Content[this.CurPos.ContentPos];
+			Item.SetParagraphTabs(Tabs);
+		}
+	}
 };
 CDocumentContent.prototype.Set_ParagraphContextualSpacing     = function(Value)
 {

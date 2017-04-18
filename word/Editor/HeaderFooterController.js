@@ -141,15 +141,15 @@ CHdrFtrController.prototype.MoveCursorToCell = function(bNext)
 };
 CHdrFtrController.prototype.SetParagraphAlign = function(Align)
 {
-	this.HdrFtr.Set_ParagraphAlign(Align);
+	this.HdrFtr.SetParagraphAlign(Align);
 };
 CHdrFtrController.prototype.SetParagraphSpacing = function (Spacing)
 {
-	this.HdrFtr.Set_ParagraphSpacing(Spacing);
+	this.HdrFtr.SetParagraphSpacing(Spacing);
 };
 CHdrFtrController.prototype.SetParagraphTabs = function(Tabs)
 {
-	this.HdrFtr.Set_ParagraphTabs(Tabs);
+	this.HdrFtr.SetParagraphTabs(Tabs);
 };
 CHdrFtrController.prototype.SetParagraphIndent = function(Ind)
 {

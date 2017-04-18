@@ -397,6 +397,18 @@ CBlockLevelSdt.prototype.StartSelectionFromCurPos = function()
 {
 	this.Content.StartSelectionFromCurPos();
 };
+CBlockLevelSdt.prototype.SetParagraphAlign = function(Align)
+{
+	return this.Content.SetParagraphAlign(Align);
+};
+CBlockLevelSdt.prototype.SetParagraphSpacing = function(Spacing)
+{
+	return this.Content.SetParagraphSpacing(Spacing);
+};
+CBlockLevelSdt.prototype.SetParagraphTabs = function(Tabs)
+{
+	return this.Content.SetParagraphTabs(Tabs);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

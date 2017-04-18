@@ -12063,6 +12063,18 @@ Paragraph.prototype.ClearParagraphFormatting = function()
 	this.Clear_Formatting();
 	this.Clear_TextFormatting();
 };
+Paragraph.prototype.SetParagraphAlign = function(Align)
+{
+	this.Set_Align(Align);
+};
+Paragraph.prototype.SetParagraphSpacing = function(Spacing)
+{
+	this.Set_Spacing(Spacing, false);
+};
+Paragraph.prototype.SetParagraphTabs = function(Tabs)
+{
+	this.Set_Tabs(Tabs);
+};
 
 
 var pararecalc_0_All  = 0;

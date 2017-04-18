@@ -947,7 +947,7 @@ CGraphicFrame.prototype.setParagraphAlign = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphAlign(val);
+            this.graphicObject.SetParagraphAlign(val);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransform = true;
         }
@@ -958,7 +958,7 @@ CGraphicFrame.prototype.applyAllAlign = function(val)
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Set_ParagraphAlign(val);
+            this.graphicObject.SetParagraphAlign(val);
             this.graphicObject.Set_ApplyToAll(false);
         }
 };
@@ -967,7 +967,7 @@ CGraphicFrame.prototype.setParagraphSpacing = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphSpacing(val);
+            this.graphicObject.SetParagraphSpacing(val);
         }
 };
 
@@ -976,7 +976,7 @@ CGraphicFrame.prototype.applyAllSpacing = function(val)
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Set_ParagraphSpacing(val);
+            this.graphicObject.SetParagraphSpacing(val);
             this.graphicObject.Set_ApplyToAll(false);
         }
 };

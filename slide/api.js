@@ -2333,17 +2333,17 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.put_PrLineSpacing          = function(Type, Value)
 	{
-		this.WordControl.m_oLogicDocument.Set_ParagraphSpacing({LineRule : Type, Line : Value});
+		this.WordControl.m_oLogicDocument.SetParagraphSpacing({LineRule : Type, Line : Value});
 	};
 	asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type, value)//"type == 0" means "Before", "type == 1" means "After"
 	{
 		switch (type)
 		{
 			case 0:
-				this.WordControl.m_oLogicDocument.Set_ParagraphSpacing({Before : value});
+				this.WordControl.m_oLogicDocument.SetParagraphSpacing({Before : value});
 				break;
 			case 1:
-				this.WordControl.m_oLogicDocument.Set_ParagraphSpacing({After : value});
+				this.WordControl.m_oLogicDocument.SetParagraphSpacing({After : value});
 				break;
 		}
 	};
@@ -2516,7 +2516,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.put_PrAlign        = function(value)
 	{
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_PutTextPrAlign);
-		this.WordControl.m_oLogicDocument.Set_ParagraphAlign(value);
+		this.WordControl.m_oLogicDocument.SetParagraphAlign(value);
 	};
 	// 0- baseline, 2-subscript, 1-superscript
 	asc_docs_api.prototype.put_TextPrBaseline = function(value)

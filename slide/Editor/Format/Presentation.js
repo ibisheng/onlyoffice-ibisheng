@@ -2070,19 +2070,19 @@ CPresentation.prototype =
         return bullet;
     },
 
-    Set_ParagraphAlign : function(Align)
+	SetParagraphAlign : function(Align)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphAlign, [Align], false, AscDFH.historydescription_Presentation_SetParagraphAlign);
         this.Document_UpdateInterfaceState();
     },
 
-    Set_ParagraphSpacing : function(Spacing)
+	SetParagraphSpacing : function(Spacing)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphSpacing, [Spacing], false, AscDFH.historydescription_Presentation_SetParagraphSpacing);
         this.Document_UpdateInterfaceState();
     },
 
-    Set_ParagraphTabs : function(Tabs)
+	SetParagraphTabs : function(Tabs)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphTabs, [Tabs], false, AscDFH.historydescription_Presentation_SetParagraphTabs);
         this.Document_UpdateInterfaceState();
@@ -2805,7 +2805,7 @@ CPresentation.prototype =
                 if ( null != ParaPr )
                 {
                     this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
-                    this.Set_ParagraphAlign( ParaPr.Jc === AscCommon.align_Center ? align_Left : AscCommon.align_Center );
+                    this.SetParagraphAlign( ParaPr.Jc === AscCommon.align_Center ? align_Left : AscCommon.align_Center );
                     this.Document_UpdateInterfaceState();
                 }
                 bRetValue = keydownresult_PreventAll;
@@ -2851,7 +2851,7 @@ CPresentation.prototype =
                 if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
                 {
                     this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
-                    this.Set_ParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
+                    this.SetParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
                     this.Document_UpdateInterfaceState();
                 }
                 bRetValue = keydownresult_PreventAll;
@@ -2884,7 +2884,7 @@ CPresentation.prototype =
                     if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
                     {
                         this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphNumberingHotKey);
-                        this.Set_ParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
+                        this.SetParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
                         this.Document_UpdateInterfaceState();
                     }
                     bRetValue = keydownresult_PreventAll;
@@ -2932,7 +2932,7 @@ CPresentation.prototype =
                 if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
                 {
                     this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey4);
-                    this.Set_ParagraphAlign( ParaPr.Jc === AscCommon.align_Right ? align_Left : AscCommon.align_Right );
+                    this.SetParagraphAlign( ParaPr.Jc === AscCommon.align_Right ? align_Left : AscCommon.align_Right );
                     this.Document_UpdateInterfaceState();
                 }
                 bRetValue = keydownresult_PreventAll;

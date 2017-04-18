@@ -166,7 +166,7 @@ Asc['asc_docs_api'].prototype["Call_HR_Tabs"] = function(arrT, arrP)
     if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
     {
         _logic.Create_NewHistoryPoint();
-        _logic.Set_ParagraphTabs(_arr);
+        _logic.SetParagraphTabs(_arr);
     }
 };
 Asc['asc_docs_api'].prototype["Call_HR_Pr"] = function(_indent_left, _indent_right, _indent_first)
@@ -1231,7 +1231,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 6:
                     {
                         var _spacing = asc_menu_ReadParaSpacing(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( _spacing );
+                        this.WordControl.m_oLogicDocument.SetParagraphSpacing( _spacing );
                         break;
                     }
                     case 7:
@@ -1282,7 +1282,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     {
                         var _tabs = asc_menu_ReadParaTabs(_params, _current);
                         // TODO:
-                        this.WordControl.m_oLogicDocument.Set_ParagraphTabs( _tabs.Tabs );
+                        this.WordControl.m_oLogicDocument.SetParagraphTabs( _tabs.Tabs );
                         break;
                     }
                     case 14:
@@ -1372,7 +1372,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 25:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphAlign( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphAlign( _params[_current.pos++] );
                         break;
                     }
                     case 255:

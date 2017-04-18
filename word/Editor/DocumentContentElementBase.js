@@ -458,6 +458,15 @@ CDocumentContentElementBase.prototype.GetCursorPosXY = function()
 CDocumentContentElementBase.prototype.StartSelectionFromCurPos = function()
 {
 };
+CDocumentContentElementBase.prototype.SetParagraphAlign = function(Align)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphSpacing = function(Spacing)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphTabs = function(Tabs)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
