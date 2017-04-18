@@ -8,4 +8,4 @@ before_script:
   - cd build
 script:
   - npm install
-  - grunt --level=SIMPLE
+  - grunt --level=WHITESPACE_ONLY
