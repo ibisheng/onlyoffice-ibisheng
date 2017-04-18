@@ -2422,7 +2422,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Start_SelectionFromCurPos();
+            content.StartSelectionFromCurPos();
         }
     },
 

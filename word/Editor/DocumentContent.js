@@ -3565,7 +3565,7 @@ CDocumentContent.prototype.MoveCursorToXY = function(X, Y, AddToSelect, bRemoveO
 	{
 		if (true === AddToSelect)
 		{
-			this.Start_SelectionFromCurPos();
+			this.StartSelectionFromCurPos();
 			var oMouseEvent  = new AscCommon.CMouseEventHandler();
 			oMouseEvent.Type = AscCommon.g_mouse_event_type_up;
 			this.Selection_SetEnd(X, Y, this.CurPage, oMouseEvent);
@@ -8377,7 +8377,7 @@ CDocumentContent.prototype.Compare_DrawingsLogicPositions = function(CompareObje
             return;
     }
 };
-CDocumentContent.prototype.Start_SelectionFromCurPos = function()
+CDocumentContent.prototype.StartSelectionFromCurPos = function()
 {
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
@@ -8389,7 +8389,7 @@ CDocumentContent.prototype.Start_SelectionFromCurPos = function()
         this.Selection.Start    = false;
         this.Selection.StartPos = this.CurPos.ContentPos;
         this.Selection.EndPos   = this.CurPos.ContentPos;
-        this.Content[this.CurPos.ContentPos].Start_SelectionFromCurPos();
+        this.Content[this.CurPos.ContentPos].StartSelectionFromCurPos();
     }
 };
 CDocumentContent.prototype.Get_StyleFromFormatting = function()

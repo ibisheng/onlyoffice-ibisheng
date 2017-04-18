@@ -388,7 +388,7 @@ CHdrFtrController.prototype.GetSelectionAnchorPos = function()
 };
 CHdrFtrController.prototype.StartSelectionFromCurPos = function()
 {
-	this.HdrFtr.Start_SelectionFromCurPos();
+	this.HdrFtr.StartSelectionFromCurPos();
 };
 CHdrFtrController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
 {

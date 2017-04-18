@@ -11073,14 +11073,15 @@ Paragraph.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
         }
     }
 };
-Paragraph.prototype.Start_SelectionFromCurPos = function()
+Paragraph.prototype.StartSelectionFromCurPos = function()
 {
-    var ContentPos = this.Get_ParaContentPos(false, false);
-    this.Selection.Use           = true;
-    this.Selection.Start         = false;
-    this.Selection.StartManually = true;
-    this.Selection.EndManually   = true;
-    this.Set_SelectionContentPos(ContentPos, ContentPos);
+	var ContentPos = this.Get_ParaContentPos(false, false);
+
+	this.Selection.Use           = true;
+	this.Selection.Start         = false;
+	this.Selection.StartManually = true;
+	this.Selection.EndManually   = true;
+	this.Set_SelectionContentPos(ContentPos, ContentPos);
 };
 /**
  *  Возвращается объект CParagraphContentPos по заданому Id ParaDrawing, если объект

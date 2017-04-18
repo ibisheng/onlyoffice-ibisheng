@@ -7060,7 +7060,7 @@ CDocument.prototype.OnMouseDown = function(e, X, Y, PageIndex)
 			if (true === this.Is_SelectionUse())
 				this.Selection.Start = false;
 			else
-				this.Start_SelectionFromCurPos();
+				this.StartSelectionFromCurPos();
 
 			this.Selection_SetEnd(X, Y, e);
 			this.Document_UpdateSelectionState();
@@ -9759,7 +9759,7 @@ CDocument.prototype.End_SilentMode = function(bUpdate)
 /**
  * Начинаем селект с текущей точки. Если селект уже есть, тогда ничего не делаем.
  */
-CDocument.prototype.Start_SelectionFromCurPos = function()
+CDocument.prototype.StartSelectionFromCurPos = function()
 {
 	if (true === this.Is_SelectionUse())
 		return true;
@@ -12346,12 +12346,10 @@ CDocument.prototype.controller_MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 	{
 		if (true === AddToSelect)
 		{
-			this.Selection.Use                                      = true;
-			this.Selection.StartPos                                 = this.CurPos.ContentPos;
-			this.Content[this.CurPos.ContentPos].Selection.Use      = true;
-			this.Content[this.CurPos.ContentPos].Selection.StartPos = this.Content[this.CurPos.ContentPos].CurPos.ContentPos;
-
-			this.Selection_SetEnd(X, Y, true);
+			this.StartSelectionFromCurPos();
+			var oMouseEvent  = new AscCommon.CMouseEventHandler();
+			oMouseEvent.Type = AscCommon.g_mouse_event_type_up;
+			this.Selection_SetEnd(X, Y, oMouseEvent);
 		}
 		else
 		{
@@ -15277,7 +15275,7 @@ CDocument.prototype.controller_StartSelectionFromCurPos = function()
 {
 	this.Selection.StartPos = this.CurPos.ContentPos;
 	this.Selection.EndPos   = this.CurPos.ContentPos;
-	this.Content[this.CurPos.ContentPos].Start_SelectionFromCurPos();
+	this.Content[this.CurPos.ContentPos].StartSelectionFromCurPos();
 };
 CDocument.prototype.controller_SaveDocumentStateBeforeLoadChanges = function(State)
 {

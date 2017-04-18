@@ -11242,17 +11242,17 @@ CTable.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
         }
     }
 };
-CTable.prototype.Start_SelectionFromCurPos = function()
+CTable.prototype.StartSelectionFromCurPos = function()
 {
-    this.Selection.Use    = true;
-    this.Selection.Type   = table_Selection_Text;
-    this.Selection.CurRow = this.CurCell.Row.Index;
+	this.Selection.Use    = true;
+	this.Selection.Type   = table_Selection_Text;
+	this.Selection.CurRow = this.CurCell.Row.Index;
 
-    this.Selection.StartPos.Pos = { Cell : this.CurCell.Index, Row : this.CurCell.Row.Index };
-    this.Selection.EndPos.Pos   = { Cell : this.CurCell.Index, Row : this.CurCell.Row.Index };
-    this.Internal_Selection_UpdateCells();
+	this.Selection.StartPos.Pos = {Cell : this.CurCell.Index, Row : this.CurCell.Row.Index};
+	this.Selection.EndPos.Pos   = {Cell : this.CurCell.Index, Row : this.CurCell.Row.Index};
+	this.Internal_Selection_UpdateCells();
 
-    this.CurCell.Content.Start_SelectionFromCurPos();
+	this.CurCell.Content.StartSelectionFromCurPos();
 };
 CTable.prototype.Get_StyleFromFormatting = function()
 {

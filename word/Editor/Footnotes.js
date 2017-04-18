@@ -1466,7 +1466,7 @@ CFootnotesController.prototype.MoveCursorToStartPos = function(AddToSelect)
 			return;
 
 		if (true !== this.Selection.Use)
-			this.LogicDocument.Start_SelectionFromCurPos();
+			this.LogicDocument.StartSelectionFromCurPos();
 
 		this.Selection.End.Footnote   = arrRange[0];
 		this.Selection.Start.Footnote = oFootnote;
@@ -1508,7 +1508,7 @@ CFootnotesController.prototype.MoveCursorToEndPos = function(AddToSelect)
 			return;
 
 		if (true !== this.Selection.Use)
-			this.LogicDocument.Start_SelectionFromCurPos();
+			this.LogicDocument.StartSelectionFromCurPos();
 
 		this.Selection.End.Footnote   = arrRange[arrRange.length - 1];
 		this.Selection.Start.Footnote = oFootnote;
@@ -2947,7 +2947,7 @@ CFootnotesController.prototype.StartSelectionFromCurPos = function()
 	this.Selection.End.Footnote   = this.CurFootnote;
 	this.Selection.Footnotes = {};
 	this.Selection.Footnotes[this.CurFootnote.Get_Id()] = this.CurFootnote;
-	this.CurFootnote.Start_SelectionFromCurPos();
+	this.CurFootnote.StartSelectionFromCurPos();
 };
 CFootnotesController.prototype.SaveDocumentStateBeforeLoadChanges   = function(State)
 {

@@ -393,6 +393,10 @@ CBlockLevelSdt.prototype.GetCursorPosXY = function()
 {
 	return this.Content.GetCursorPosXY();
 };
+CBlockLevelSdt.prototype.StartSelectionFromCurPos = function()
+{
+	this.Content.StartSelectionFromCurPos();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

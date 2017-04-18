@@ -993,10 +993,10 @@ CHeaderFooter.prototype =
         return this.Content.Get_CurrentParagraph();
     },
 
-    Start_SelectionFromCurPos : function()
-    {
-        this.Content.Start_SelectionFromCurPos();
-    },
+	StartSelectionFromCurPos : function()
+	{
+		this.Content.StartSelectionFromCurPos();
+	},
 //-----------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //-----------------------------------------------------------------------------------
@@ -2322,11 +2322,11 @@ CHeaderFooterController.prototype =
         return this.CurHdrFtr.Get_CurrentParagraph();
     },
 
-    Start_SelectionFromCurPos : function()
-    {
-        if (null !== this.CurHdrFtr)
-            this.CurHdrFtr.Start_SelectionFromCurPos();
-    },
+	StartSelectionFromCurPos : function()
+	{
+		if (null !== this.CurHdrFtr)
+			this.CurHdrFtr.StartSelectionFromCurPos();
+	},
 //-----------------------------------------------------------------------------------
 // Внутренние(вспомогательные) функции
 //-----------------------------------------------------------------------------------
