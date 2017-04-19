@@ -1562,23 +1562,22 @@ CDocumentContent.prototype.Is_CurrentElementParagraph    = function()
 
     return true;
 };
-CDocumentContent.prototype.Get_CurrentParagraph          = function()
+CDocumentContent.prototype.GetCurrentParagraph = function()
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.getCurrentParagraph();
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        var Pos = true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos;
-        if (Pos < 0 || Pos >= this.Content.length)
-            return null;
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.getCurrentParagraph();
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		var Pos = true === this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos;
+		if (Pos < 0 || Pos >= this.Content.length)
+			return null;
 
-        if (type_Paragraph === this.Content[Pos].Get_Type())
-            return this.Content[Pos];
-        else if (type_Table === this.Content[Pos].Get_Type())
-            return this.Content[Pos].Get_CurrentParagraph();
-    }
+		return this.Content[Pos].GetCurrentParagraph();
+	}
 
-    return null;
+	return null;
 };
 // Проверяем есть ли хоть какой-либо контент на первой странице
 CDocumentContent.prototype.Is_ContentOnFirstPage         = function()
@@ -3132,7 +3131,7 @@ CDocumentContent.prototype.MoveCursorUp = function(AddToSelect)
 				{
 					if (0 != this.Selection.EndPos)
 					{
-						var TempXY        = Item.Get_CurPosXY();
+						var TempXY        = Item.GetCurPosXY();
 						this.CurPos.RealX = TempXY.X;
 						this.CurPos.RealY = TempXY.Y;
 
@@ -3170,7 +3169,7 @@ CDocumentContent.prototype.MoveCursorUp = function(AddToSelect)
 				{
 					if (0 != this.CurPos.ContentPos)
 					{
-						var TempXY        = Item.Get_CurPosXY();
+						var TempXY        = Item.GetCurPosXY();
 						this.CurPos.RealX = TempXY.X;
 						this.CurPos.RealY = TempXY.Y;
 
@@ -3201,7 +3200,7 @@ CDocumentContent.prototype.MoveCursorUp = function(AddToSelect)
 				{
 					if (0 != this.CurPos.ContentPos)
 					{
-						var TempXY        = Item.Get_CurPosXY();
+						var TempXY        = Item.GetCurPosXY();
 						this.CurPos.RealX = TempXY.X;
 						this.CurPos.RealY = TempXY.Y;
 
@@ -3230,7 +3229,7 @@ CDocumentContent.prototype.MoveCursorUp = function(AddToSelect)
 				{
 					if (0 != this.CurPos.ContentPos)
 					{
-						var TempXY        = Item.Get_CurPosXY();
+						var TempXY        = Item.GetCurPosXY();
 						this.CurPos.RealX = TempXY.X;
 						this.CurPos.RealY = TempXY.Y;
 
@@ -3273,7 +3272,7 @@ CDocumentContent.prototype.MoveCursorDown = function(AddToSelect)
 				{
 					if (this.Content.length - 1 != this.Selection.EndPos)
 					{
-						var TempXY        = Item.Get_CurPosXY();
+						var TempXY        = Item.GetCurPosXY();
 						this.CurPos.RealX = TempXY.X;
 						this.CurPos.RealY = TempXY.Y;
 
@@ -3311,7 +3310,7 @@ CDocumentContent.prototype.MoveCursorDown = function(AddToSelect)
 				{
 					if (this.Content.length - 1 != this.CurPos.ContentPos)
 					{
-						var TempXY        = Item.Get_CurPosXY();
+						var TempXY        = Item.GetCurPosXY();
 						this.CurPos.RealX = TempXY.X;
 						this.CurPos.RealY = TempXY.Y;
 
@@ -3342,7 +3341,7 @@ CDocumentContent.prototype.MoveCursorDown = function(AddToSelect)
 				{
 					if (this.Content.length - 1 != this.CurPos.ContentPos)
 					{
-						var TempXY        = Item.Get_CurPosXY();
+						var TempXY        = Item.GetCurPosXY();
 						this.CurPos.RealX = TempXY.X;
 						this.CurPos.RealY = TempXY.Y;
 
@@ -3372,7 +3371,7 @@ CDocumentContent.prototype.MoveCursorDown = function(AddToSelect)
 				{
 					if (this.Content.length - 1 != this.CurPos.ContentPos)
 					{
-						var TempXY        = Item.Get_CurPosXY();
+						var TempXY        = Item.GetCurPosXY();
 						this.CurPos.RealX = TempXY.X;
 						this.CurPos.RealY = TempXY.Y;
 
@@ -3602,9 +3601,9 @@ CDocumentContent.prototype.IsCursorAtEnd = function()
 	var Item = this.Content[this.Content.length - 1];
 	return Item.IsCursorAtEnd();
 };
-CDocumentContent.prototype.Get_CurPosXY                       = function()
+CDocumentContent.prototype.GetCurPosXY = function()
 {
-    return {X : this.CurPos.RealX, Y : this.CurPos.RealY};
+	return {X : this.CurPos.RealX, Y : this.CurPos.RealY};
 };
 CDocumentContent.prototype.Set_CurPosXY                       = function(X, Y)
 {
@@ -3628,120 +3627,125 @@ CDocumentContent.prototype.IsSelectionToEnd = function()
 
 	return false;
 };
-CDocumentContent.prototype.Is_TextSelectionUse                = function()
+CDocumentContent.prototype.IsTextSelectionUse = function()
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.isTextSelectionUse();
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+		return this.LogicDocument.DrawingObjects.isTextSelectionUse();
 
-    return this.IsSelectionUse();
+	return this.IsSelectionUse();
 };
-// Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
-CDocumentContent.prototype.Get_SelectedText                   = function(bClearText, oPr)
+/**
+ * Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
+ * @param bClearText
+ * @param oPr
+ * @returns {?string}
+ */
+CDocumentContent.prototype.GetSelectedText = function(bClearText, oPr)
 {
-    if (true === this.ApplyToAll)
-    {
-        if (true === bClearText && this.Content.length <= 1)
-        {
-            this.Content[0].Set_ApplyToAll(true);
-            var ResultText = this.Content[0].Get_SelectedText(true, oPr);
-            this.Content[0].Set_ApplyToAll(false);
-            return ResultText;
-        }
-        else if (true != bClearText)
-        {
-            var ResultText = "";
-            var Count      = this.Content.length;
-            for (var Index = 0; Index < Count; Index++)
-            {
-                this.Content[Index].Set_ApplyToAll(true);
-                ResultText += this.Content[Index].Get_SelectedText(false, oPr);
-                this.Content[Index].Set_ApplyToAll(false);
-            }
+	if (true === this.ApplyToAll)
+	{
+		if (true === bClearText && this.Content.length <= 1)
+		{
+			this.Content[0].Set_ApplyToAll(true);
+			var ResultText = this.Content[0].GetSelectedText(true, oPr);
+			this.Content[0].Set_ApplyToAll(false);
+			return ResultText;
+		}
+		else if (true != bClearText)
+		{
+			var ResultText = "";
+			var Count      = this.Content.length;
+			for (var Index = 0; Index < Count; Index++)
+			{
+				this.Content[Index].Set_ApplyToAll(true);
+				ResultText += this.Content[Index].GetSelectedText(false, oPr);
+				this.Content[Index].Set_ApplyToAll(false);
+			}
 
-            return ResultText;
-        }
-    }
-    else
-    {
-        if (docpostype_DrawingObjects === this.CurPos.Type)
-            return this.LogicDocument.DrawingObjects.getSelectedText(bClearText, oPr);
+			return ResultText;
+		}
+	}
+	else
+	{
+		if (docpostype_DrawingObjects === this.CurPos.Type)
+			return this.LogicDocument.DrawingObjects.getSelectedText(bClearText, oPr);
 
-        // Либо у нас нет выделения, либо выделение внутри одного элемента
-        if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag ) || false === this.Selection.Use ))
-        {
-            if (true === bClearText && (this.Selection.StartPos === this.Selection.EndPos || false === this.Selection.Use ))
-            {
-                var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-                return this.Content[Pos].Get_SelectedText(true, oPr);
-            }
-            else if (false === bClearText)
-            {
-                var StartPos = ( true == this.Selection.Use ? Math.min(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
-                var EndPos   = ( true == this.Selection.Use ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
+		// Либо у нас нет выделения, либо выделение внутри одного элемента
+		if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && selectionflag_Common === this.Selection.Flag ) || false === this.Selection.Use ))
+		{
+			if (true === bClearText && (this.Selection.StartPos === this.Selection.EndPos || false === this.Selection.Use ))
+			{
+				var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
+				return this.Content[Pos].GetSelectedText(true, oPr);
+			}
+			else if (false === bClearText)
+			{
+				var StartPos = ( true == this.Selection.Use ? Math.min(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
+				var EndPos   = ( true == this.Selection.Use ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.CurPos.ContentPos );
 
-                var ResultText = "";
+				var ResultText = "";
 
-                for (var Index = StartPos; Index <= EndPos; Index++)
-                {
-                    ResultText += this.Content[Index].Get_SelectedText(false, oPr);
-                }
+				for (var Index = StartPos; Index <= EndPos; Index++)
+				{
+					ResultText += this.Content[Index].GetSelectedText(false, oPr);
+				}
 
-                return ResultText;
-            }
-        }
-    }
+				return ResultText;
+			}
+		}
+	}
 
-    return null;
+	return null;
 };
-CDocumentContent.prototype.Get_SelectedElementsInfo           = function(Info)
+CDocumentContent.prototype.GetSelectedElementsInfo = function(Info)
 {
-    if (true === this.ApplyToAll)
-    {
-        var Count = this.Content.length;
-        if (Count > 1)
-            Info.Set_MixedSelection();
-        else if (Count === 1)
-            this.Content[0].Get_SelectedElementsInfo(Info);
-    }
-    else
-    {
-        if (docpostype_DrawingObjects === this.CurPos.Type)
-            this.LogicDocument.DrawingObjects.getSelectedElementsInfo(Info);
-        else //if ( docpostype_Content == this.CurPos.Type )
-        {
-            if (selectionflag_Numbering === this.Selection.Flag)
-            {
-                // Текстовые настройки применяем к конкретной нумерации
-                if (!(null == this.Selection.Data || this.Selection.Data.length <= 0))
-                {
-                    var CurPara = this.Content[this.Selection.Data[0]];
-                    for (var Index = 0; Index < this.Selection.Data.length; Index++)
-                    {
-                        if (this.CurPos.ContentPos === this.Selection.Data[Index])
-                            CurPara = this.Content[this.Selection.Data[Index]];
-                    }
+	if (true === this.ApplyToAll)
+	{
+		var Count = this.Content.length;
+		if (Count > 1)
+			Info.Set_MixedSelection();
+		else if (Count === 1)
+			this.Content[0].GetSelectedElementsInfo(Info);
+	}
+	else
+	{
+		if (docpostype_DrawingObjects === this.CurPos.Type)
+			this.LogicDocument.DrawingObjects.getSelectedElementsInfo(Info);
+		else //if ( docpostype_Content == this.CurPos.Type )
+		{
+			if (selectionflag_Numbering === this.Selection.Flag)
+			{
+				// Текстовые настройки применяем к конкретной нумерации
+				if (!(null == this.Selection.Data || this.Selection.Data.length <= 0))
+				{
+					var CurPara = this.Content[this.Selection.Data[0]];
+					for (var Index = 0; Index < this.Selection.Data.length; Index++)
+					{
+						if (this.CurPos.ContentPos === this.Selection.Data[Index])
+							CurPara = this.Content[this.Selection.Data[Index]];
+					}
 
-                    CurPara.Get_SelectedElementsInfo(Info);
-                }
-            }
-            else
-            {
-                if (true === this.Selection.Use)
-                {
-                    if (this.Selection.StartPos != this.Selection.EndPos)
-                        Info.Set_MixedSelection();
-                    else
-                    {
-                        this.Content[this.Selection.StartPos].Get_SelectedElementsInfo(Info);
-                    }
-                }
-                else
-                {
-                    this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo(Info);
-                }
-            }
-        }
-    }
+					CurPara.GetSelectedElementsInfo(Info);
+				}
+			}
+			else
+			{
+				if (true === this.Selection.Use)
+				{
+					if (this.Selection.StartPos != this.Selection.EndPos)
+						Info.Set_MixedSelection();
+					else
+					{
+						this.Content[this.Selection.StartPos].GetSelectedElementsInfo(Info);
+					}
+				}
+				else
+				{
+					this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo(Info);
+				}
+			}
+		}
+	}
 };
 CDocumentContent.prototype.GetSelectedContent = function(SelectedContent)
 {
@@ -6062,7 +6066,7 @@ CDocumentContent.prototype.Interface_Update_ParaPr    = function()
 
         if (this.LogicDocument)
         {
-            var oSelectedInfo = this.LogicDocument.Get_SelectedElementsInfo();
+            var oSelectedInfo = this.LogicDocument.GetSelectedElementsInfo();
             var Math          = oSelectedInfo.Get_Math();
             if (null !== Math)
                 ParaPr.CanAddImage = false;
@@ -6075,7 +6079,7 @@ CDocumentContent.prototype.Interface_Update_ParaPr    = function()
 
         if (this.LogicDocument)
         {
-            var SelectedInfo = this.LogicDocument.Get_SelectedElementsInfo();
+            var SelectedInfo = this.LogicDocument.GetSelectedElementsInfo();
             var Math         = SelectedInfo.Get_Math();
             if (null !== Math && true !== Math.Is_Inline())
                 ParaPr.Jc = Math.Get_Align();

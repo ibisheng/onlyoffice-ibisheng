@@ -1942,7 +1942,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             _stream["ClearNoAttack"]();
             if ( true === bCanAdd )
             {
-                var _text = this.WordControl.m_oLogicDocument.Get_SelectedText(true);
+                var _text = this.WordControl.m_oLogicDocument.GetSelectedText(true);
                 if (null == _text)
                     _stream["WriteByte"](1);
                 else

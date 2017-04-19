@@ -72,11 +72,11 @@ ParaHyperlink.prototype.Copy = function(Selected)
     return NewHyperlink;
 };
 
-ParaHyperlink.prototype.Get_SelectedElementsInfo = function(Info)
+ParaHyperlink.prototype.GetSelectedElementsInfo = function(Info)
 {
     Info.Set_Hyperlink(this);
 
-    CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo.apply(this, arguments);
 };
 
 ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)

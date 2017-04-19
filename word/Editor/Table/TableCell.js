@@ -870,9 +870,9 @@ CTableCell.prototype =
         return this.Content.IsInDrawing(_X, _Y, CurPage);
     },
 
-    Content_Get_CurPosXY : function()
+    Content_GetCurPosXY : function()
     {
-        return this.Content.Get_CurPosXY();
+        return this.Content.GetCurPosXY();
     },
 
     Content_Set_CurPosXY : function(X, Y)

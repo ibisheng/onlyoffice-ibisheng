@@ -976,7 +976,7 @@
 					{
 						if(documentContent.Content[i])
 						{
-							var paraText = documentContent.Content[i].Get_SelectedText();
+							var paraText = documentContent.Content[i].GetSelectedText();
 							if(paraText)
 							{
 								if(i !== 0)
@@ -1419,7 +1419,7 @@
 				//for special paste
 				//TODO пока выключаю специальную ставку внутри math, позже доработать и включить
 				var oInfo = new CSelectedElementsInfo();
-				var selectedElementsInfo = isIntoShape.Get_SelectedElementsInfo(oInfo);
+				var selectedElementsInfo = isIntoShape.GetSelectedElementsInfo(oInfo);
 				var mathObj = oInfo.Get_Math();
 				if(!AscCommonExcel.g_clipboardExcel.specialPasteStart && null === mathObj)
 				{
@@ -2750,7 +2750,7 @@
 				{
 					for(var j = 0; j < paragraph.Content.length; j++)
 					{
-						res += paragraph.Content[j].Get_SelectedText(true)
+						res += paragraph.Content[j].GetSelectedText(true)
 					}
 				};
 				

@@ -1648,22 +1648,22 @@ ParaMath.prototype.Get_AllFontNames = function(AllFonts)
     this.Root.Get_AllFontNames(AllFonts);
 };
 
-ParaMath.prototype.Get_SelectedElementsInfo = function(Info)
+ParaMath.prototype.GetSelectedElementsInfo = function(Info)
 {
     Info.Set_Math(this);
 };
 
-ParaMath.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
+ParaMath.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 {
-    if ( true === bAll || true === this.IsSelectionUse() )
-    {
-        if ( true === bClearText )
-            return null;
+	if (true === bAll || true === this.IsSelectionUse())
+	{
+		if (true === bClearText)
+			return null;
 
-        return "";
-    }
+		return "";
+	}
 
-    return "";
+	return "";
 };
 
 ParaMath.prototype.Get_SelectionDirection = function()

@@ -5823,8 +5823,8 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 			{
 				var EndCell = this.Content[EndPos.Row].Get_Cell(EndPos.Cell);
 
-				var X = EndCell.Content_Get_CurPosXY().X;
-				var Y = EndCell.Content_Get_CurPosXY().Y;
+				var X = EndCell.Content_GetCurPosXY().X;
+				var Y = EndCell.Content_GetCurPosXY().Y;
 
 				var PrevRow = this.Content[EndPos.Row - 1];
 				var Cell    = null;
@@ -5915,8 +5915,8 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 				}
 				else
 				{
-					var X       = this.CurCell.Content_Get_CurPosXY().X;
-					var Y       = this.CurCell.Content_Get_CurPosXY().Y;
+					var X       = this.CurCell.Content_GetCurPosXY().X;
+					var Y       = this.CurCell.Content_GetCurPosXY().Y;
 					var PrevRow = this.Content[this.CurCell.Row.Index - 1];
 					var Cell    = null;
 					for (var CurCell = 0; CurCell < PrevRow.Get_CellsCount(); CurCell++)
@@ -5948,8 +5948,8 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 					return false;
 				else
 				{
-					var X       = this.CurCell.Content_Get_CurPosXY().X;
-					var Y       = this.CurCell.Content_Get_CurPosXY().Y;
+					var X       = this.CurCell.Content_GetCurPosXY().X;
+					var Y       = this.CurCell.Content_GetCurPosXY().Y;
 					var PrevRow = this.Content[this.CurCell.Row.Index - 1];
 					var Cell    = null;
 					for (var CurCell = 0; CurCell < PrevRow.Get_CellsCount(); CurCell++)
@@ -6003,8 +6003,8 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 			{
 				var EndCell = this.Content[EndPos.Row].Get_Cell(EndPos.Cell);
 
-				var X = EndCell.Content_Get_CurPosXY().X;
-				var Y = EndCell.Content_Get_CurPosXY().Y;
+				var X = EndCell.Content_GetCurPosXY().X;
+				var Y = EndCell.Content_GetCurPosXY().Y;
 
 				var NextRow = this.Content[EndPos.Row + 1];
 				var Cell    = null;
@@ -6094,8 +6094,8 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 				}
 				else
 				{
-					var X       = this.CurCell.Content_Get_CurPosXY().X;
-					var Y       = this.CurCell.Content_Get_CurPosXY().Y;
+					var X       = this.CurCell.Content_GetCurPosXY().X;
+					var Y       = this.CurCell.Content_GetCurPosXY().Y;
 					var NextRow = this.Content[this.CurCell.Row.Index + 1];
 					var Cell    = null;
 					for (var CurCell = 0; CurCell < NextRow.Get_CellsCount(); CurCell++)
@@ -6129,8 +6129,8 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 					return false;
 				else
 				{
-					var X = this.CurCell.Content_Get_CurPosXY().X;
-					var Y = this.CurCell.Content_Get_CurPosXY().Y;
+					var X = this.CurCell.Content_GetCurPosXY().X;
+					var Y = this.CurCell.Content_GetCurPosXY().Y;
 
 					var NextRow = this.Content[this.CurCell.Row.Index + VMerge_count];
 					var Cell    = null;
@@ -6422,7 +6422,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 		this.Document_SetThisElementCurrent(true);
 	}
 };
-CTable.prototype.Get_CurPosXY = function()
+CTable.prototype.GetCurPosXY = function()
 {
 	var Cell = null;
 	if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
@@ -6430,7 +6430,7 @@ CTable.prototype.Get_CurPosXY = function()
 	else
 		Cell = this.CurCell;
 
-	return Cell.Content_Get_CurPosXY();
+	return Cell.Content_GetCurPosXY();
 };
 CTable.prototype.IsSelectionUse = function()
 {
@@ -6441,19 +6441,21 @@ CTable.prototype.IsSelectionUse = function()
 
 	return false;
 };
-CTable.prototype.Is_TextSelectionUse = function()
+CTable.prototype.IsTextSelectionUse = function()
 {
 	if ((true == this.Selection.Use && table_Selection_Cell == this.Selection.Type) || table_Selection_Border == this.Selection.Type2 || table_Selection_Border_InnerTable == this.Selection.Type2)
 		return true;
 	else if (true == this.Selection.Use)
-		return this.CurCell.Content.Is_TextSelectionUse();
+		return this.CurCell.Content.IsTextSelectionUse();
 
 	return false;
 };
-CTable.prototype.Get_SelectedText = function(bClearText, oPr)
+CTable.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	if (true === bClearText && ( (true == this.Selection.Use && table_Selection_Text == this.Selection.Type) || false === this.Selection.Use ))
-		return this.CurCell.Content.Get_SelectedText(true, oPr);
+	{
+		return this.CurCell.Content.GetSelectedText(true, oPr);
+	}
 	else if (false === bClearText)
 	{
 		if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type)
@@ -6466,25 +6468,27 @@ CTable.prototype.Get_SelectedText = function(bClearText, oPr)
 				var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
 
 				Cell.Content.Set_ApplyToAll(true);
-				ResultText += Cell.Content.Get_SelectedText(false, oPr);
+				ResultText += Cell.Content.GetSelectedText(false, oPr);
 				Cell.Content.Set_ApplyToAll(false);
 			}
 
 			return ResultText;
 		}
 		else
-			return this.CurCell.Content.Get_SelectedText(false, oPr);
+		{
+			return this.CurCell.Content.GetSelectedText(false, oPr);
+		}
 	}
 
 	return null;
 };
-CTable.prototype.Get_SelectedElementsInfo = function(Info)
+CTable.prototype.GetSelectedElementsInfo = function(Info)
 {
 	Info.Set_Table();
 
 	if (false === this.Selection.Use || (true === this.Selection.Use && table_Selection_Text === this.Selection.Type))
 	{
-		this.CurCell.Content.Get_SelectedElementsInfo(Info);
+		this.CurCell.Content.GetSelectedElementsInfo(Info);
 	}
 	else if (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell)
 	{
@@ -7328,7 +7332,7 @@ CTable.prototype.GetDirectParaPr = function()
 
 	return this.CurCell.Content.GetDirectParaPr();
 };
-CTable.prototype.Get_CurrentParagraph = function()
+CTable.prototype.GetCurrentParagraph = function()
 {
 	var SelectionArray = this.Internal_Get_SelectionArray();
 	if (SelectionArray.length > 0)
@@ -7336,7 +7340,7 @@ CTable.prototype.Get_CurrentParagraph = function()
 		var CurCell = SelectionArray[0].Cell;
 		var CurRow  = SelectionArray[0].Row;
 
-		return this.Get_Row(CurRow).Get_Cell(CurCell).Content.Get_CurrentParagraph();
+		return this.Get_Row(CurRow).Get_Cell(CurCell).Content.GetCurrentParagraph();
 	}
 
 	return null;

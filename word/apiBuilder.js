@@ -1363,7 +1363,7 @@
             this.Document.RemoveSelection(true);
         }
 
-        var oParagraph = this.Document.Get_CurrentParagraph();
+        var oParagraph = this.Document.GetCurrentParagraph();
         if (!oParagraph)
             return;
 

@@ -209,7 +209,7 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
     var SearchEngine = new CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, this.TrackRevisionsManager);
     if (null === CurrentPara)
     {
-        CurrentPara = this.Get_CurrentParagraph();
+        CurrentPara = this.GetCurrentParagraph();
         if (null === CurrentPara)
             return SearchEngine;
 

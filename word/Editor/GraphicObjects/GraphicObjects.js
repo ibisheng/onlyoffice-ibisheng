@@ -1981,7 +1981,7 @@ CGraphicObjects.prototype =
         if(content)
         {
             Info.Set_Drawing(selected_DrawingObjectText);
-            content.Get_SelectedElementsInfo(Info);
+            content.GetSelectedElementsInfo(Info);
         }
         else
         {
@@ -2012,7 +2012,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_CurrentParagraph();
+            return content.GetCurrentParagraph();
         }
         else
         {
@@ -2029,7 +2029,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_SelectedText(bClearText, oPr);
+            return content.GetSelectedText(bClearText, oPr);
         }
         else
         {
@@ -2042,7 +2042,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_CurPosXY();
+            return content.GetCurPosXY();
         }
         else
         {
@@ -2060,7 +2060,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Is_TextSelectionUse();
+            return content.IsTextSelectionUse();
         }
         else
         {
@@ -2074,7 +2074,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Is_TextSelectionUse();
+            return content.IsTextSelectionUse();
         }
         else
         {

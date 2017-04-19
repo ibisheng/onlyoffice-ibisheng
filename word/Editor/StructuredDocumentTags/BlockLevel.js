@@ -169,9 +169,9 @@ CBlockLevelSdt.prototype.IsSelectionEmpty = function(isCheckHidden)
 {
 	return this.Content.IsSelectionEmpty(isCheckHidden);
 };
-CBlockLevelSdt.prototype.Get_SelectedElementsInfo = function(oInfo)
+CBlockLevelSdt.prototype.GetSelectedElementsInfo = function(oInfo)
 {
-	this.Content.Get_SelectedElementsInfo(oInfo);
+	this.Content.GetSelectedElementsInfo(oInfo);
 };
 CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)
 {
@@ -484,6 +484,18 @@ CBlockLevelSdt.prototype.GetSelectedContent = function(oSelectedContent)
 CBlockLevelSdt.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
 {
 	return this.Content.PasteFormatting(TextPr, ParaPr, ApplyPara);
+};
+CBlockLevelSdt.prototype.GetCurPosXY = function()
+{
+	return this.Content.GetCurPosXY();
+};
+CBlockLevelSdt.prototype.GetSelectedText = function(bClearText, oPr)
+{
+	return this.Content.GetSelectedText(bClearText, oPr);
+};
+CBlockLevelSdt.prototype.GetCurrentParagraph = function()
+{
+	return this.Content.GetCurrentParagraph();
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)

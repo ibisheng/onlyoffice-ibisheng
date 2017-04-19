@@ -1224,7 +1224,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Is_TextSelectionUse();
+            return content.IsTextSelectionUse();
         }
         else
         {
@@ -1870,7 +1870,7 @@ DrawingObjectsController.prototype =
                     var oContent2 = this.getTargetDocContent(true);
                     if(oContent2){
                         var SelectedInfo = new CSelectedElementsInfo();
-                        oContent2.Get_SelectedElementsInfo(SelectedInfo);
+                        oContent2.GetSelectedElementsInfo(SelectedInfo);
                         if (null !== SelectedInfo.Get_Math()){
                             var ParaMath = SelectedInfo.Get_Math();
                             ParaMath.Set_MenuProps(oMathProps);
@@ -1896,7 +1896,7 @@ DrawingObjectsController.prototype =
             var oContent = this.getTargetDocContent(true, false);
             if(oContent){
                 var oInfo = new CSelectedElementsInfo();
-                oContent.Get_SelectedElementsInfo(oInfo);
+                oContent.GetSelectedElementsInfo(oInfo);
                 var Math         = oInfo.Get_Math();
                 if (null !== Math && true !== Math.Is_Inline())
                 {
@@ -7874,12 +7874,12 @@ DrawingObjectsController.prototype =
         return oShape;
     },
 
-    Get_SelectedText: function(bCleartText)
+	GetSelectedText: function(bCleartText)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_SelectedText(bCleartText);
+            return content.GetSelectedText(bCleartText);
         }
         else
         {

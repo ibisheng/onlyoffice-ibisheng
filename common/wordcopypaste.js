@@ -1281,8 +1281,8 @@ CopyProcessor.prototype =
 			
 			var sBase64 = this.oBinaryFileWriter.GetResult();
 			var text = "";
-            if (oDocument.Get_SelectedText)
-                text = oDocument.Get_SelectedText();
+            if (oDocument.GetSelectedText)
+                text = oDocument.GetSelectedText();
 			
 			return {sBase64: "docData;" + sBase64, text: text, drawingUrls: drawingUrls};
 		}

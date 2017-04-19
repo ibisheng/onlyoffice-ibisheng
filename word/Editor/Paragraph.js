@@ -5182,10 +5182,8 @@ Paragraph.prototype.Internal_Correct_ContentPos = function()
 		this.CurPos.ContentPos = CurPos;
 	}
 };
-Paragraph.prototype.Get_CurPosXY = function()
+Paragraph.prototype.GetCurPosXY = function()
 {
-
-
 	return {X : this.CurPos.RealX, Y : this.CurPos.RealY};
 };
 Paragraph.prototype.IsSelectionUse = function()
@@ -6112,7 +6110,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 	{
 		var NumPr = this.Numbering_Get();
 		var oInfo = new CSelectedElementsInfo();
-		this.Get_SelectedElementsInfo(oInfo);
+		this.GetSelectedElementsInfo(oInfo);
 		var oField = oInfo.Get_Field();
 
 		if (true === SearchPosXY.Numbering && undefined != NumPr)
@@ -6815,13 +6813,13 @@ Paragraph.prototype.Get_SelectionAnchorPos = function()
 /**
  * Возвращаем выделенный текст
  */
-Paragraph.prototype.Get_SelectedText = function(bClearText, oPr)
+Paragraph.prototype.GetSelectedText = function(bClearText, oPr)
 {
 	var Str   = "";
 	var Count = this.Content.length;
 	for (var Pos = 0; Pos < Count; Pos++)
 	{
-		var _Str = this.Content[Pos].Get_SelectedText(true === this.ApplyToAll, bClearText, oPr);
+		var _Str = this.Content[Pos].GetSelectedText(true === this.ApplyToAll, bClearText, oPr);
 
 		if (null === _Str)
 			return null;
@@ -6831,14 +6829,14 @@ Paragraph.prototype.Get_SelectedText = function(bClearText, oPr)
 
 	return Str;
 };
-Paragraph.prototype.Get_SelectedElementsInfo = function(Info)
+Paragraph.prototype.GetSelectedElementsInfo = function(Info)
 {
 	Info.Set_Paragraph(this);
 
-	if (true === this.Selection.Use && this.Selection.StartPos === this.Selection.EndPos && this.Content[this.Selection.EndPos].Get_SelectedElementsInfo)
-		this.Content[this.Selection.EndPos].Get_SelectedElementsInfo(Info);
-	else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo)
-		this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo(Info);
+	if (true === this.Selection.Use && this.Selection.StartPos === this.Selection.EndPos && this.Content[this.Selection.EndPos].GetSelectedElementsInfo)
+		this.Content[this.Selection.EndPos].GetSelectedElementsInfo(Info);
+	else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo)
+		this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo(Info);
 };
 Paragraph.prototype.GetSelectedContent = function(DocContent)
 {
@@ -11485,7 +11483,7 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
 
     if (true !== SearchEngine.Is_CurrentFound())
     {
-        if (this === SearchEngine.Get_CurrentParagraph())
+        if (this === SearchEngine.GetCurrentParagraph())
             SearchEngine.Set_CurrentFound(this);
     }
     else
@@ -12126,6 +12124,10 @@ Paragraph.prototype.SetParagraphBorders = function(Borders)
 Paragraph.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
 	this.IncDec_FontSize(bIncrease);
+};
+Paragraph.prototype.GetCurrentParagraph = function()
+{
+	return this;
 };
 
 var pararecalc_0_All  = 0;

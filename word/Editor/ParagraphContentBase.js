@@ -377,21 +377,21 @@ CParagraphContentWithParagraphLikeContent.prototype.Is_StartFromNewLine = functi
 
     return this.Content[0].Is_StartFromNewLine();
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo = function(Info)
+CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo = function(Info)
 {
-    var Selection = this.Selection;
+	var Selection = this.Selection;
 
-    if (true === Selection.Use && Selection.StartPos === Selection.EndPos && this.Content[Selection.EndPos].Get_SelectedElementsInfo)
-        this.Content[Selection.EndPos].Get_SelectedElementsInfo(Info);
-    else if (false === Selection.Use && this.Content[this.State.ContentPos].Get_SelectedElementsInfo)
-        this.Content[this.State.ContentPos].Get_SelectedElementsInfo(Info);
+	if (true === Selection.Use && Selection.StartPos === Selection.EndPos && this.Content[Selection.EndPos].GetSelectedElementsInfo)
+		this.Content[Selection.EndPos].GetSelectedElementsInfo(Info);
+	else if (false === Selection.Use && this.Content[this.State.ContentPos].GetSelectedElementsInfo)
+		this.Content[this.State.ContentPos].GetSelectedElementsInfo(Info);
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
+CParagraphContentWithParagraphLikeContent.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 {
     var Str = "";
     for (var Pos = 0, Count = this.Content.length; Pos < Count; Pos++)
     {
-        var _Str = this.Content[Pos].Get_SelectedText(bAll, bClearText, oPr);
+        var _Str = this.Content[Pos].GetSelectedText(bAll, bClearText, oPr);
 
         if (null === _Str)
             return null;

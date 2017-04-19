@@ -7134,7 +7134,7 @@
             paraPr = new CParaPr();
         }
         if (textPr && paraPr) {
-            objectInfo.text = this.objectRender.controller.Get_SelectedText(true);
+            objectInfo.text = this.objectRender.controller.GetSelectedText(true);
 
             var horAlign = paraPr.Jc;
             var vertAlign = Asc.c_oAscVAlign.Center;
@@ -7207,7 +7207,7 @@
                 }
 
                 objectInfo.hyperlink = new asc_CHyperlink(hyperlink);
-                objectInfo.hyperlink.asc_setText(shapeHyperlink.Get_SelectedText(true, true));
+                objectInfo.hyperlink.asc_setText(shapeHyperlink.GetSelectedText(true, true));
             }
         } else {
             // Может быть не задано текста, поэтому выставим по умолчанию

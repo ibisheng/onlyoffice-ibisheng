@@ -180,7 +180,7 @@ CDocumentContentElementBase.prototype.IsSelectionEmpty = function(isCheckHidden)
 {
 	return true;
 };
-CDocumentContentElementBase.prototype.Get_SelectedElementsInfo = function(oInfo)
+CDocumentContentElementBase.prototype.GetSelectedElementsInfo = function(oInfo)
 {
 };
 CDocumentContentElementBase.prototype.Document_UpdateRulersState = function(CurPage)
@@ -501,6 +501,18 @@ CDocumentContentElementBase.prototype.GetSelectedContent = function(oSelectedCon
 };
 CDocumentContentElementBase.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
 {
+};
+CDocumentContentElementBase.prototype.GetCurPosXY = function()
+{
+	return {X : 0, Y : 0};
+};
+CDocumentContentElementBase.prototype.GetSelectedText = function(bClearText, oPr)
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.GetCurrentParagraph = function()
+{
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц

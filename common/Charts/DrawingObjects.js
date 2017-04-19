@@ -4299,7 +4299,7 @@ function DrawingObjects() {
         if (!oContent) {
             return false;
         }
-        var oPara = oContent.Get_CurrentParagraph();
+        var oPara = oContent.GetCurrentParagraph();
         if (!oPara) {
             return false;
         }

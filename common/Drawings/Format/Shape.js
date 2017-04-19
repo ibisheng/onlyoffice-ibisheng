@@ -3780,7 +3780,7 @@ CShape.prototype.selectionSetStart = function (e, x, y, slideIndex)
                 return;
             }
         }
-        if(!(content.Is_TextSelectionUse() && e.ShiftKey))
+        if(!(content.IsTextSelectionUse() && e.ShiftKey))
             content.Selection_SetStart(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
         else
             content.Selection_SetEnd(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);

@@ -498,10 +498,10 @@ CHeaderFooter.prototype =
 		return this.Content.IsSelectionUse();
 	},
 
-    Is_TextSelectionUse : function()
-    {
-        return this.Content.Is_TextSelectionUse();
-    },
+	IsTextSelectionUse : function()
+	{
+		return this.Content.IsTextSelectionUse();
+	},
 
     Is_UseInDocument : function(Id)
     {
@@ -516,20 +516,20 @@ CHeaderFooter.prototype =
         return this.Parent.Check_Page( this, PageIndex );
     },
 
-    Get_CurPosXY : function()
-    {
-        return this.Content.Get_CurPosXY();
-    },
+	GetCurPosXY : function()
+	{
+		return this.Content.GetCurPosXY();
+	},
 
-    Get_SelectedText : function(bClearText, oPr)
-    {
-        return this.Content.Get_SelectedText(bClearText, oPr);
-    },
+	GetSelectedText : function(bClearText, oPr)
+	{
+		return this.Content.GetSelectedText(bClearText, oPr);
+	},
 
-    Get_SelectedElementsInfo : function(Info)
-    {
-        this.Content.Get_SelectedElementsInfo(Info);
-    },
+	GetSelectedElementsInfo : function(Info)
+	{
+		this.Content.GetSelectedElementsInfo(Info);
+	},
 
 	GetSelectedContent : function(SelectedContent)
 	{
@@ -985,10 +985,10 @@ CHeaderFooter.prototype =
 		return this.Content.SelectAll();
 	},
 
-    Get_CurrentParagraph : function()
-    {
-        return this.Content.Get_CurrentParagraph();
-    },
+	GetCurrentParagraph : function()
+	{
+		return this.Content.GetCurrentParagraph();
+	},
 
 	StartSelectionFromCurPos : function()
 	{
@@ -1770,13 +1770,13 @@ CHeaderFooterController.prototype =
 		return false;
 	},
 
-    Is_TextSelectionUse : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Is_TextSelectionUse();
+	IsTextSelectionUse : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.IsTextSelectionUse();
 
-        return false;
-    },
+		return false;
+	},
 
     Is_UseInDocument : function(Id)
     {
@@ -1798,27 +1798,27 @@ CHeaderFooterController.prototype =
         return false;
     },
 
-    Get_CurPosXY : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Get_CurPosXY();
+	GetCurPosXY : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.GetCurPosXY();
 
-        return { X : 0, Y : 0 };
-    },
+		return {X : 0, Y : 0};
+	},
 
-    Get_SelectedText : function(bClearText, oPr)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Get_SelectedText(bClearText, oPr);
+	GetSelectedText : function(bClearText, oPr)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.GetSelectedText(bClearText, oPr);
 
-        return null;
-    },
+		return null;
+	},
 
-    Get_SelectedElementsInfo : function(Info)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Get_SelectedElementsInfo(Info);
-    },
+	GetSelectedElementsInfo : function(Info)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.GetSelectedElementsInfo(Info);
+	},
 
 	GetSelectedContent : function(SelectedContent)
 	{
@@ -2310,10 +2310,10 @@ CHeaderFooterController.prototype =
             return { X : -1, Y : -1, Height : -1 };
     },
 
-    Get_CurrentParagraph : function()
-    {
-        return this.CurHdrFtr.Get_CurrentParagraph();
-    },
+	GetCurrentParagraph : function()
+	{
+		return this.CurHdrFtr.GetCurrentParagraph();
+	},
 
 	StartSelectionFromCurPos : function()
 	{

@@ -273,23 +273,23 @@ CHdrFtrController.prototype.IsSelectionUse = function()
 };
 CHdrFtrController.prototype.IsTextSelectionUse = function()
 {
-	return this.HdrFtr.Is_TextSelectionUse();
+	return this.HdrFtr.IsTextSelectionUse();
 };
 CHdrFtrController.prototype.GetCurPosXY = function()
 {
-	return this.HdrFtr.Get_CurPosXY();
+	return this.HdrFtr.GetCurPosXY();
 };
 CHdrFtrController.prototype.GetSelectedText = function(bClearText, oPr)
 {
-	return this.HdrFtr.Get_SelectedText(bClearText, oPr);
+	return this.HdrFtr.GetSelectedText(bClearText, oPr);
 };
 CHdrFtrController.prototype.GetCurrentParagraph = function()
 {
-	return this.HdrFtr.Get_CurrentParagraph();
+	return this.HdrFtr.GetCurrentParagraph();
 };
 CHdrFtrController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
-	this.HdrFtr.Get_SelectedElementsInfo(oInfo);
+	this.HdrFtr.GetSelectedElementsInfo(oInfo);
 };
 CHdrFtrController.prototype.AddTableRow = function(bBefore)
 {

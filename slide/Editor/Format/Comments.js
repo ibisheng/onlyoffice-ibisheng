@@ -148,7 +148,7 @@ ParaComment.prototype =
     {
     },
 
-    Get_SelectedText : function(bAll, bClearText)
+	GetSelectedText : function(bAll, bClearText)
     {
         return "";
     },

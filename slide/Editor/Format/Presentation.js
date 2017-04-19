@@ -563,7 +563,7 @@ CPresentation.prototype =
                 this.History.Remove_LastPoint();
                 return false;
             }
-            var oPara = oContent.Get_CurrentParagraph();
+            var oPara = oContent.GetCurrentParagraph();
             if (!oPara)
             {
                 this.History.Remove_LastPoint();
@@ -3324,10 +3324,10 @@ CPresentation.prototype =
     },
 
     // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
-    Get_SelectedText : function(bClearText)
+	GetSelectedText : function(bClearText)
     {
         if(this.Slides[this.CurPage]){
-            return this.Slides[this.CurPage].graphicObjects.Get_SelectedText(bClearText);
+            return this.Slides[this.CurPage].graphicObjects.GetSelectedText(bClearText);
         }
         return "";
     },
@@ -5190,7 +5190,7 @@ CPresentation.prototype =
 
                     var oTargetContent = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(true);
                     if(oTargetContent){
-                        var Para = oTargetContent.Get_CurrentParagraph();
+                        var Para = oTargetContent.GetCurrentParagraph();
                         if (null === Para)
                             return;
 
