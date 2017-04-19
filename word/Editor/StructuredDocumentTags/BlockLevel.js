@@ -453,7 +453,7 @@ CBlockLevelSdt.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
 	return this.Content.SetParagraphFramePr(FramePr, bDelete);
 };
-CBlockLevelSdt.protoype.IncreaseDecreaseFontSize = function(bIncrease)
+CBlockLevelSdt.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
 	return this.Content.IncreaseDecreaseFontSize(bIncrease);
 };
