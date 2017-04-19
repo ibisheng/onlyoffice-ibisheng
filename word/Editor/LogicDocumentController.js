@@ -166,13 +166,13 @@ CLogicDocumentController.prototype.SetParagraphFramePr = function(FramePr, bDele
 {
 	this.LogicDocument.controller_SetParagraphFramePr(FramePr, bDelete);
 };
-CLogicDocumentController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+CLogicDocumentController.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
-	this.LogicDocument.controller_IncreaseOrDecreaseParagraphFontSize(bIncrease);
+	this.LogicDocument.controller_IncreaseDecreaseFontSize(bIncrease);
 };
-CLogicDocumentController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+CLogicDocumentController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
-	this.LogicDocument.controller_IncreaseOrDecreaseParagraphIndent(bIncrease);
+	this.LogicDocument.controller_IncreaseDecreaseIndent(bIncrease);
 };
 CLogicDocumentController.prototype.SetImageProps = function(Props)
 {

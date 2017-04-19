@@ -557,7 +557,7 @@ function checkPointInMap(map, worksheet, row, col)
             if(oElement.tx && oElement.tx.rich)
             {
                 oElement.tx.rich.content.Set_ApplyToAll(true);
-                oElement.tx.rich.content.Paragraph_IncDecFontSize(bIncrease);
+                oElement.tx.rich.content.IncreaseDecreaseFontSize(bIncrease);
                 oElement.tx.rich.content.Set_ApplyToAll(false);
 
             }
@@ -1185,7 +1185,7 @@ CChartSpace.prototype.paragraphIncDecFontSize = function(bIncrease)
         var content = this.selection.textSelection.getDocContent();
         if(content)
         {
-            content.Paragraph_IncDecFontSize(bIncrease);
+            content.IncreaseDecreaseFontSize(bIncrease);
         }
         return;
     }

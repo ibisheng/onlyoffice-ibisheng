@@ -2266,7 +2266,7 @@ CFootnotesController.prototype.SetParagraphShd = function(Shd)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphShd(Shd);
+		oFootnote.SetParagraphShd(Shd);
 	}
 };
 CFootnotesController.prototype.SetParagraphStyle = function(Name)
@@ -2274,7 +2274,7 @@ CFootnotesController.prototype.SetParagraphStyle = function(Name)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphStyle(Name);
+		oFootnote.SetParagraphStyle(Name);
 	}
 };
 CFootnotesController.prototype.SetParagraphContextualSpacing = function(Value)
@@ -2282,7 +2282,7 @@ CFootnotesController.prototype.SetParagraphContextualSpacing = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphContextualSpacing(Value);
+		oFootnote.SetParagraphContextualSpacing(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphPageBreakBefore = function(Value)
@@ -2290,7 +2290,7 @@ CFootnotesController.prototype.SetParagraphPageBreakBefore = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphPageBreakBefore(Value);
+		oFootnote.SetParagraphPageBreakBefore(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphKeepLines = function(Value)
@@ -2298,7 +2298,7 @@ CFootnotesController.prototype.SetParagraphKeepLines = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphKeepLines(Value);
+		oFootnote.SetParagraphKeepLines(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphKeepNext = function(Value)
@@ -2306,7 +2306,7 @@ CFootnotesController.prototype.SetParagraphKeepNext = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphKeepNext(Value);
+		oFootnote.SetParagraphKeepNext(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphWidowControl = function(Value)
@@ -2314,7 +2314,7 @@ CFootnotesController.prototype.SetParagraphWidowControl = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphWidowControl(Value);
+		oFootnote.SetParagraphWidowControl(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphBorders = function(Borders)
@@ -2322,27 +2322,27 @@ CFootnotesController.prototype.SetParagraphBorders = function(Borders)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphBorders(Borders);
+		oFootnote.SetParagraphBorders(Borders);
 	}
 };
 CFootnotesController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
 	// Не позволяем делать рамки внутри сносок
 };
-CFootnotesController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+CFootnotesController.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Paragraph_IncDecFontSize(bIncrease);
+		oFootnote.IncreaseDecreaseFontSize(bIncrease);
 	}
 };
-CFootnotesController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+CFootnotesController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Paragraph_IncDecIndent(bIncrease);
+		oFootnote.IncreaseDecreaseIndent(bIncrease);
 	}
 };
 CFootnotesController.prototype.SetImageProps = function(Props)

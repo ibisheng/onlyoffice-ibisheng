@@ -1595,7 +1595,7 @@ DrawingObjectsController.prototype =
                     {
                         AscFormat.CheckObjectTextPr(arr[i], args[0].Value, oThis.getDrawingDocument());
                     }
-                    if(f === CDocumentContent.prototype.Paragraph_IncDecFontSize)
+                    if(f === CDocumentContent.prototype.IncreaseDecreaseFontSize)
                     {
                         arr[i].paragraphIncDecFontSize(args[0]);
                     }
@@ -1692,7 +1692,7 @@ DrawingObjectsController.prototype =
             }
             else if(this.selection.groupSelection.selection.chartSelection)
             {
-                if(f === CDocumentContent.prototype.Paragraph_IncDecFontSize)
+                if(f === CDocumentContent.prototype.IncreaseDecreaseFontSize)
                 {
                     this.selection.groupSelection.selection.chartSelection.paragraphIncDecFontSize(args[0]);
                 }
@@ -1707,7 +1707,7 @@ DrawingObjectsController.prototype =
         }
         else if(this.selection.chartSelection)
         {
-            if(f === CDocumentContent.prototype.Paragraph_IncDecFontSize)
+            if(f === CDocumentContent.prototype.IncreaseDecreaseFontSize)
             {
                 this.selection.chartSelection.paragraphIncDecFontSize(args[0]);
             }
@@ -1751,43 +1751,43 @@ DrawingObjectsController.prototype =
 
     setParagraphShd: function(Shd)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphShd, [Shd], CTable.prototype.Set_ParagraphShd);
+        this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphShd, [Shd], CTable.prototype.SetParagraphShd);
     },
 
 
     setParagraphStyle: function(Style)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphStyle, [Style], CTable.prototype.Set_ParagraphStyle);
+        this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphStyle, [Style], CTable.prototype.SetParagraphStyle);
     },
 
 
     setParagraphContextualSpacing: function(Value)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphContextualSpacing, [Value], CTable.prototype.Set_ParagraphPageBreakBefore);
+        this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphContextualSpacing, [Value], CTable.prototype.SetParagraphContextualSpacing);
     },
 
     setParagraphPageBreakBefore: function(Value)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphPageBreakBefore, CTable.prototype.Set_ParagraphPageBreakBefore, [Value]);
+        this.applyTextFunction(CDocumentContent.prototype.SetParagraphPageBreakBefore, CTable.prototype.SetParagraphPageBreakBefore, [Value]);
     },
     setParagraphKeepLines: function(Value)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphKeepLines, CTable.prototype.Set_ParagraphKeepLines, [Value]);
+        this.applyTextFunction(CDocumentContent.prototype.SetParagraphKeepLines, CTable.prototype.SetParagraphKeepLines, [Value]);
     },
 
     setParagraphKeepNext: function(Value)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphKeepNext, CTable.prototype.Set_ParagraphKeepNext, [Value]);
+        this.applyTextFunction(CDocumentContent.prototype.SetParagraphKeepNext, CTable.prototype.SetParagraphKeepNext, [Value]);
     },
 
     setParagraphWidowControl: function(Value)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphWidowControl, CTable.prototype.Set_ParagraphWidowControl, [Value]);
+        this.applyTextFunction(CDocumentContent.prototype.SetParagraphWidowControl, CTable.prototype.SetParagraphWidowControl, [Value]);
     },
 
     setParagraphBorders: function(Value)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Set_ParagraphBorders, CTable.prototype.Set_ParagraphBorders, [Value]);
+        this.applyTextFunction(CDocumentContent.prototype.SetParagraphBorders, CTable.prototype.SetParagraphBorders, [Value]);
     },
 
     applyTextFunction: function(docContentFunction, tableFunction, args)
@@ -1882,12 +1882,12 @@ DrawingObjectsController.prototype =
 
     paragraphIncDecFontSize: function(bIncrease)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_IncDecFontSize, [bIncrease], CTable.prototype.Paragraph_IncDecFontSize);
+        this.applyDocContentFunction(CDocumentContent.prototype.IncreaseDecreaseFontSize, [bIncrease], CTable.prototype.IncreaseDecreaseFontSize);
     },
 
     paragraphIncDecIndent: function(bIncrease)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Paragraph_IncDecIndent, [bIncrease], CTable.prototype.Paragraph_IncDecIndent);
+        this.applyDocContentFunction(CDocumentContent.prototype.IncreaseDecreaseIndent, [bIncrease], CTable.prototype.IncreaseDecreaseIndent);
     },
 
     setParagraphAlign: function(align)

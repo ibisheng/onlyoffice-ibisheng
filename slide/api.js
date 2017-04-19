@@ -2349,11 +2349,11 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.FontSizeIn                 = function()
 	{
-		this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(true);
+		this.WordControl.m_oLogicDocument.IncreaseDecreaseFontSize(true);
 	};
 	asc_docs_api.prototype.FontSizeOut                = function()
 	{
-		this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(false);
+		this.WordControl.m_oLogicDocument.IncreaseDecreaseFontSize(false);
 	};
 
 	asc_docs_api.prototype.put_AlignBySelect = function(val)
@@ -3021,11 +3021,11 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.IncreaseIndent        = function()
 	{
-		this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent(true);
+		this.WordControl.m_oLogicDocument.IncreaseDecreaseIndent(true);
 	};
 	asc_docs_api.prototype.DecreaseIndent        = function()
 	{
-		this.WordControl.m_oLogicDocument.Paragraph_IncDecIndent(false);
+		this.WordControl.m_oLogicDocument.IncreaseDecreaseIndent(false);
 	};
 	asc_docs_api.prototype.put_PrIndentRight     = function(value)
 	{

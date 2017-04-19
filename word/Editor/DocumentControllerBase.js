@@ -477,12 +477,12 @@ CDocumentControllerBase.prototype.SetParagraphFramePr = function(FramePr, bDelet
  * Уменьшаем или увеличиваем (по специальной таблице) размер шрифта в параграфе.
  * @param {boolean} bIncrease
  */
-CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease){};
+CDocumentControllerBase.prototype.IncreaseDecreaseFontSize = function(bIncrease){};
 /**
  * Уменьшаем или увеличиваем (по специальной таблице) отступы в параграфе.
  * @param {boolean} bIncrease
  */
-CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease){};
+CDocumentControllerBase.prototype.IncreaseDecreaseIndent = function(bIncrease){};
 /**
  * Устанавливаем настройки для изображений.
  * @param Props

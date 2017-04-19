@@ -473,6 +473,39 @@ CDocumentContentElementBase.prototype.SetParagraphIndent = function(Ind)
 CDocumentContentElementBase.prototype.SetParagraphNumbering = function(NumInfo)
 {
 };
+CDocumentContentElementBase.prototype.SetParagraphShd = function(Shd)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphStyle = function(Name)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphContextualSpacing = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphPageBreakBefore = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphKeepLines = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphKeepNext = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphWidowControl = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphBorders = function(Borders)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphFramePr = function(FramePr, bDelete)
+{
+};
+CDocumentContentElementBase.prototype.IncreaseDecreaseFontSize = function(bIncrease)
+{
+};
+CDocumentContentElementBase.prototype.IncreaseDecreaseIndent = function(bIncrease)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

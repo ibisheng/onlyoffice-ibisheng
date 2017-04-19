@@ -228,11 +228,11 @@ CDrawingsController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
 	// Не добавляем и не работаем с рамками в автофигурах
 };
-CDrawingsController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+CDrawingsController.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
 	this.DrawingObjects.paragraphIncDecFontSize(bIncrease);
 };
-CDrawingsController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+CDrawingsController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
 	if (true != this.DrawingObjects.isSelectedText())
 	{
@@ -240,7 +240,7 @@ CDrawingsController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncr
 		if (null != ParaDrawing)
 		{
 			var Paragraph = ParaDrawing.Parent;
-			Paragraph.IncDec_Indent(bIncrease);
+			Paragraph.IncreaseDecreaseIndent(bIncrease);
 		}
 	}
 	else

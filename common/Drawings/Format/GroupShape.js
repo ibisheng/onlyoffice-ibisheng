@@ -836,17 +836,6 @@ function CGroupShape()
         return bRet;
     };
 
-    CGroupShape.prototype.Paragraph_IncDecFontSizeAll = function(val)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            if(typeof this.spTree[i].Paragraph_IncDecFontSizeAll === "function")
-            {
-                this.spTree[i].Paragraph_IncDecFontSizeAll(val);
-            }
-        }
-    };
-
     CGroupShape.prototype.changeSize = function(kw, kh)
     {
         if(this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNullForGroup())

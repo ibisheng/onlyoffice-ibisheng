@@ -2100,13 +2100,13 @@ CPresentation.prototype =
         this.Document_UpdateInterfaceState();   //TODO
     },
 
-    Paragraph_IncDecFontSize : function(bIncrease)
+	IncreaseDecreaseFontSize : function(bIncrease)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecFontSize, [bIncrease], false, AscDFH.historydescription_Presentation_ParagraphIncDecFontSize);
         this.Document_UpdateInterfaceState();
     },
 
-    Paragraph_IncDecIndent : function(bIncrease)
+	IncreaseDecreaseIndent : function(bIncrease)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.paragraphIncDecIndent, [bIncrease], false, AscDFH.historydescription_Presentation_ParagraphIncDecIndent);
         this.Document_UpdateInterfaceState();
@@ -2401,7 +2401,7 @@ CPresentation.prototype =
                                 target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.isBullet() &&
                                 target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.bulletType.type !== AscFormat.BULLET_TYPE_BULLET_NONE &&
                                 this.Can_IncreaseParagraphLevel(!e.ShiftKey)){
-                                this.Paragraph_IncDecIndent(!e.ShiftKey);
+                                this.IncreaseDecreaseIndent(!e.ShiftKey);
                             }
                             else{
                                 History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);

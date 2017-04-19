@@ -826,60 +826,60 @@ CHeaderFooter.prototype =
 		return this.Content.SetParagraphNumbering(NumInfo);
 	},
 
-    Set_ParagraphShd : function(Shd)
-    {
-        return this.Content.Set_ParagraphShd( Shd );
-    },
+	SetParagraphShd : function(Shd)
+	{
+		return this.Content.SetParagraphShd(Shd);
+	},
 
-    Set_ParagraphStyle : function(Name)
-    {
-        return this.Content.Set_ParagraphStyle( Name );
-    },
+	SetParagraphStyle : function(Name)
+	{
+		return this.Content.SetParagraphStyle(Name);
+	},
 
 	SetParagraphTabs : function(Tabs)
 	{
 		return this.Content.SetParagraphTabs(Tabs);
 	},
 
-    Set_ParagraphContextualSpacing : function(Value)
-    {
-        return this.Content.Set_ParagraphContextualSpacing( Value );
-    },
+	SetParagraphContextualSpacing : function(Value)
+	{
+		return this.Content.SetParagraphContextualSpacing(Value);
+	},
 
-    Set_ParagraphPageBreakBefore : function(Value)
-    {
-        return this.Content.Set_ParagraphPageBreakBefore( Value );
-    },
+	SetParagraphPageBreakBefore : function(Value)
+	{
+		return this.Content.SetParagraphPageBreakBefore(Value);
+	},
 
-    Set_ParagraphKeepLines : function(Value)
-    {
-        return this.Content.Set_ParagraphKeepLines( Value );
-    },
+	SetParagraphKeepLines : function(Value)
+	{
+		return this.Content.SetParagraphKeepLines(Value);
+	},
 
-    Set_ParagraphKeepNext : function(Value)
-    {
-        return this.Content.Set_ParagraphKeepNext( Value );
-    },
+	SetParagraphKeepNext : function(Value)
+	{
+		return this.Content.SetParagraphKeepNext(Value);
+	},
 
-    Set_ParagraphWidowControl : function(Value)
-    {
-        return this.Content.Set_ParagraphWidowControl( Value );
-    },
+	SetParagraphWidowControl : function(Value)
+	{
+		return this.Content.SetParagraphWidowControl(Value);
+	},
 
-    Set_ParagraphBorders : function(Value)
-    {
-        return this.Content.Set_ParagraphBorders( Value );
-    },
+	SetParagraphBorders : function(Value)
+	{
+		return this.Content.SetParagraphBorders(Value);
+	},
 
-    Paragraph_IncDecFontSize : function(bIncrease)
-    {
-        return this.Content.Paragraph_IncDecFontSize(bIncrease);
-    },
+	IncreaseDecreaseFontSize : function(bIncrease)
+	{
+		return this.Content.IncreaseDecreaseFontSize(bIncrease);
+	},
 
-    Paragraph_IncDecIndent : function(bIncrease)
-    {
-        return this.Content.Paragraph_IncDecIndent(bIncrease);
-    },
+	IncreaseDecreaseIndent : function(bIncrease)
+	{
+		return this.Content.IncreaseDecreaseIndent(bIncrease);
+	},
 
     Set_ImageProps : function(Props)
     {
@@ -1225,9 +1225,9 @@ CHeaderFooter.prototype.Get_SectPr = function()
 
     return null;
 };
-CHeaderFooter.prototype.Set_ParagraphFramePr = function(FramePr, bDelete)
+CHeaderFooter.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
-    return this.Content.Set_ParagraphFramePr(FramePr, bDelete);
+    return this.Content.SetParagraphFramePr(FramePr, bDelete);
 };
 CHeaderFooter.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
 {
@@ -1985,17 +1985,17 @@ CHeaderFooterController.prototype =
 			return this.CurHdrFtr.SetParagraphNumbering(NumInfo);
 	},
 
-    Set_ParagraphShd : function(Shd)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphShd( Shd );
-    },
+	SetParagraphShd : function(Shd)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphShd(Shd);
+	},
 
-    Set_ParagraphStyle : function(Name)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphStyle( Name );
-    },
+	SetParagraphStyle : function(Name)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphStyle(Name);
+	},
 
 	SetParagraphTabs : function(Tabs)
 	{
@@ -2003,53 +2003,53 @@ CHeaderFooterController.prototype =
 			return this.CurHdrFtr.SetParagraphTabs(Tabs);
 	},
 
-    Set_ParagraphContextualSpacing : function(Value)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphContextualSpacing( Value );
-    },
+	SetParagraphContextualSpacing : function(Value)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphContextualSpacing(Value);
+	},
 
-    Set_ParagraphPageBreakBefore : function(Value)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphPageBreakBefore( Value );
-    },
+	SetParagraphPageBreakBefore : function(Value)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphPageBreakBefore(Value);
+	},
 
-    Set_ParagraphKeepLines : function(Value)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphKeepLines( Value );
-    },
+	SetParagraphKeepLines : function(Value)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphKeepLines(Value);
+	},
 
-    Set_ParagraphKeepNext : function(Value)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphKeepNext( Value );
-    },
+	SetParagraphKeepNext : function(Value)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphKeepNext(Value);
+	},
 
-    Set_ParagraphWidowControl : function(Value)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphWidowControl( Value );
-    },
+	SetParagraphWidowControl : function(Value)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphWidowControl(Value);
+	},
 
-    Set_ParagraphBorders : function(Value)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphBorders( Value );
-    },
+	SetParagraphBorders : function(Value)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphBorders(Value);
+	},
 
-    Paragraph_IncDecFontSize : function(bIncrease)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Paragraph_IncDecFontSize(bIncrease);
-    },
+	IncreaseDecreaseFontSize : function(bIncrease)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.IncreaseDecreaseFontSize(bIncrease);
+	},
 
-    Paragraph_IncDecIndent : function(bIncrease)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Paragraph_IncDecIndent(bIncrease);
-    },
+	IncreaseDecreaseIndent : function(bIncrease)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.IncreaseDecreaseIndent(bIncrease);
+	},
 
     Set_ImageProps : function(Props)
     {
@@ -2521,10 +2521,10 @@ CHeaderFooterController.prototype.Get_StyleFromFormatting = function()
 
     return null;
 };
-CHeaderFooterController.prototype.Set_ParagraphFramePr = function(FramePr, bDelete)
+CHeaderFooterController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
     if (null !== this.CurHdrFtr)
-        this.CurHdrFtr.Set_ParagraphFramePr(FramePr, bDelete);
+        this.CurHdrFtr.SetParagraphFramePr(FramePr, bDelete);
 };
 CHeaderFooterController.prototype.Get_SelectionBounds = function()
 {

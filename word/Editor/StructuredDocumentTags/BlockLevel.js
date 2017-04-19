@@ -417,6 +417,50 @@ CBlockLevelSdt.prototype.SetParagraphNumbering = function(NumInfo)
 {
 	return this.Content.SetParagraphNumbering(NumInfo);
 };
+CBlockLevelSdt.prototype.SetParagraphShd = function(Shd)
+{
+	return this.Content.SetParagraphShd(Shd);
+};
+CBlockLevelSdt.prototype.SetParagraphStyle = function(Name)
+{
+	return this.Content.SetParagraphStyle(Name);
+};
+CBlockLevelSdt.prototype.SetParagraphContextualSpacing = function(Value)
+{
+	return this.Content.SetParagraphContextualSpacing(Value);
+};
+CBlockLevelSdt.prototype.SetParagraphPageBreakBefore = function(Value)
+{
+	return this.Content.SetParagraphPageBreakBefore(Value);
+};
+CBlockLevelSdt.prototype.SetParagraphKeepLines = function(Value)
+{
+	return this.Content.SetParagraphKeepLines(Value);
+};
+CBlockLevelSdt.prototype.SetParagraphKeepNext = function(Value)
+{
+	return this.Content.SetParagraphKeepNext(Value);
+};
+CBlockLevelSdt.prototype.SetParagraphWidowControl = function(Value)
+{
+	return this.Content.SetParagraphWidowControl(Value);
+};
+CBlockLevelSdt.prototype.SetParagraphBorders = function(Borders)
+{
+	return this.Content.SetParagraphBorders(Borders);
+};
+CBlockLevelSdt.prototype.SetParagraphFramePr = function(FramePr, bDelete)
+{
+	return this.Content.SetParagraphFramePr(FramePr, bDelete);
+};
+CBlockLevelSdt.protoype.IncreaseDecreaseFontSize = function(bIncrease)
+{
+	return this.Content.IncreaseDecreaseFontSize(bIncrease);
+};
+CBlockLevelSdt.prototype.IncreaseDecreaseIndent = function(bIncrease)
+{
+	return this.Content.IncreaseDecreaseIndent(bIncrease);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

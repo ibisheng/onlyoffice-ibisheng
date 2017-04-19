@@ -1199,7 +1199,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                 {
                     case 0:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphContextualSpacing( _params[_current.pos++] );
                         break;
                     }
                     case 1:
@@ -1210,22 +1210,22 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 2:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphKeepLines( _params[_current.pos++] );
                         break;
                     }
                     case 3:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphKeepNext( _params[_current.pos++] );
                         break;
                     }
                     case 4:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphWidowControl( _params[_current.pos++] );
                         break;
                     }
                     case 5:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphPageBreakBefore( _params[_current.pos++] );
                         break;
                     }
                     case 6:
@@ -1256,13 +1256,13 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                             _brds.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(_brds.Bottom.Color);
                         }
 
-                        this.WordControl.m_oLogicDocument.Set_ParagraphBorders( _brds );
+                        this.WordControl.m_oLogicDocument.SetParagraphBorders( _brds );
                         break;
                     }
                     case 8:
                     {
                         var _shd = asc_menu_ReadParaShd(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphShd( _shd );
+                        this.WordControl.m_oLogicDocument.SetParagraphShd( _shd );
                         break;
                     }
                     case 9:
@@ -1288,7 +1288,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 14:
                     {
                         var _framePr = asc_menu_ReadParaFrame(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphFramePr( _framePr );
+                        this.WordControl.m_oLogicDocument.SetParagraphFramePr( _framePr );
                         break;
                     }
                     case 15:
@@ -1367,7 +1367,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 24:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphStyle( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphStyle( _params[_current.pos++] );
                         break;
                     }
                     case 25:

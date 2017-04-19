@@ -3119,7 +3119,7 @@ Paragraph.prototype.Add_Tab = function(bShift)
 	}
 	else if (true === this.Is_SelectionUse())
 	{
-		this.IncDec_Indent(!bShift);
+		this.IncreaseDecreaseIndent(!bShift);
 	}
 	else
 	{
@@ -3540,7 +3540,7 @@ Paragraph.prototype.Increase_Level = function(bIncrease)
 		}
 	}
 };
-Paragraph.prototype.IncDec_Indent = function(bIncrease)
+Paragraph.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
 	if (undefined !== this.Numbering_Get())
 	{
@@ -12090,7 +12090,46 @@ Paragraph.prototype.SetParagraphIndent = function(Ind)
 		this.Set_Ind(Ind, false);
 	}
 };
+Paragraph.prototype.SetParagraphShd = function(Shd)
+{
+	return this.Set_Shd(Shd);
+};
+Paragraph.prototype.SetParagraphStyle = function(Name)
+{
+	if (!this.LogicDocument)
+		return;
 
+	var StyleId = this.LogicDocument.Get_Styles().Get_StyleIdByName(Name);
+	this.Style_Add(StyleId);
+};
+Paragraph.prototype.SetParagraphContextualSpacing = function(Value)
+{
+	this.Set_ContextualSpacing(Value);
+};
+Paragraph.prototype.SetParagraphPageBreakBefore = function(Value)
+{
+	this.Set_PageBreakBefore(Value);
+};
+Paragraph.prototype.SetParagraphKeepLines = function(Value)
+{
+	this.Set_KeepLines(Value);
+};
+Paragraph.prototype.SetParagraphKeepNext = function(Value)
+{
+	this.Set_KeepNext(Value);
+};
+Paragraph.prototype.SetParagraphWidowControl = function(Value)
+{
+	this.Set_WidowControl(Value);
+};
+Paragraph.prototype.SetParagraphBorders = function(Borders)
+{
+	this.Set_Borders(Borders);
+};
+Paragraph.prototype.IncreaseDecreaseFontSize = function(bIncrease)
+{
+	this.IncDec_FontSize(bIncrease);
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

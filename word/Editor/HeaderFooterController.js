@@ -161,47 +161,47 @@ CHdrFtrController.prototype.SetParagraphNumbering = function(NumInfo)
 };
 CHdrFtrController.prototype.SetParagraphShd = function(Shd)
 {
-	this.HdrFtr.Set_ParagraphShd(Shd);
+	this.HdrFtr.SetParagraphShd(Shd);
 };
 CHdrFtrController.prototype.SetParagraphStyle = function(Name)
 {
-	this.HdrFtr.Set_ParagraphStyle(Name);
+	this.HdrFtr.SetParagraphStyle(Name);
 };
 CHdrFtrController.prototype.SetParagraphContextualSpacing = function(Value)
 {
-	this.HdrFtr.Set_ParagraphContextualSpacing(Value);
+	this.HdrFtr.SetParagraphContextualSpacing(Value);
 };
 CHdrFtrController.prototype.SetParagraphPageBreakBefore = function(Value)
 {
-	this.HdrFtr.Set_ParagraphPageBreakBefore(Value);
+	this.HdrFtr.SetParagraphPageBreakBefore(Value);
 };
 CHdrFtrController.prototype.SetParagraphKeepLines = function(Value)
 {
-	this.HdrFtr.Set_ParagraphKeepLines(Value);
+	this.HdrFtr.SetParagraphKeepLines(Value);
 };
 CHdrFtrController.prototype.SetParagraphKeepNext = function(Value)
 {
-	this.HdrFtr.Set_ParagraphKeepNext(Value);
+	this.HdrFtr.SetParagraphKeepNext(Value);
 };
 CHdrFtrController.prototype.SetParagraphWidowControl = function(Value)
 {
-	this.HdrFtr.Set_ParagraphWidowControl(Value);
+	this.HdrFtr.SetParagraphWidowControl(Value);
 };
 CHdrFtrController.prototype.SetParagraphBorders = function(Borders)
 {
-	this.HdrFtr.Set_ParagraphBorders(Borders);
+	this.HdrFtr.SetParagraphBorders(Borders);
 };
 CHdrFtrController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
-	this.HdrFtr.Set_ParagraphFramePr(FramePr, bDelete);
+	this.HdrFtr.SetParagraphFramePr(FramePr, bDelete);
 };
-CHdrFtrController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+CHdrFtrController.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
-	this.HdrFtr.Paragraph_IncDecFontSize(bIncrease);
+	this.HdrFtr.IncreaseDecreaseFontSize(bIncrease);
 };
-CHdrFtrController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+CHdrFtrController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
-	this.HdrFtr.Paragraph_IncDecIndent(bIncrease);
+	this.HdrFtr.IncreaseDecreaseIndent(bIncrease);
 };
 CHdrFtrController.prototype.SetImageProps = function(Props)
 {

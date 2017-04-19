@@ -5093,155 +5093,113 @@ CDocumentContent.prototype.Increase_ParagraphLevel            = function(bIncrea
     this.Content[this.CurPos.ContentPos].Increase_Level(bIncrease);
     this.Recalculate();
 };
-CDocumentContent.prototype.Set_ParagraphShd                   = function(Shd)
+CDocumentContent.prototype.SetParagraphShd = function(Shd)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Set_Shd(Shd);
-            else if (type_Table == Item.GetType())
-                Item.Set_ParagraphShd(Shd);
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			// При изменении цвета фона параграфа, не надо ничего пересчитывать
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphShd(Shd);
+			Item.Set_ApplyToAll(false);
+		}
 
-            Item.Set_ApplyToAll(false);
-        }
+		return;
+	}
 
-        return;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphShd(Shd);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphShd(Shd);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
+			if (undefined !== this.LogicDocument && true === this.LogicDocument.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() && selectionflag_Common === this.Selection.Flag)
+			{
+				this.Paragraph_Add(new ParaTextPr({Shd : Shd}));
+			}
+			else
+			{
+				if (EndPos < StartPos)
+				{
+					var Temp = StartPos;
+					StartPos = EndPos;
+					EndPos   = Temp;
+				}
 
-            if (undefined !== this.LogicDocument && true === this.LogicDocument.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() && selectionflag_Common === this.Selection.Flag)
-            {
-                this.Paragraph_Add(new ParaTextPr({Shd : Shd}));
-                this.Parent.OnContentRecalculate(false);
-            }
-            else
-            {
-                if (EndPos < StartPos)
-                {
-                    var Temp = StartPos;
-                    StartPos = EndPos;
-                    EndPos   = Temp;
-                }
-
-                for (var Index = StartPos; Index <= EndPos; Index++)
-                {
-                    // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                    var Item = this.Content[Index];
-                    if (type_Paragraph == Item.GetType())
-                        Item.Set_Shd(Shd);
-                    else if (type_Table == Item.GetType())
-                        Item.Set_ParagraphShd(Shd);
-                }
-
-                this.Parent.OnContentRecalculate(false);
-            }
-
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-            Item.Set_Shd(Shd);
-
-            this.Parent.OnContentRecalculate(false);
-        }
-        else if (type_Table == Item.GetType())
-            Item.Set_ParagraphShd(Shd);
-    }
+				for (var Index = StartPos; Index <= EndPos; Index++)
+				{
+					var Item = this.Content[Index];
+					Item.SetParagraphShd(Shd);
+				}
+			}
+		}
+		else
+		{
+			var Item = this.Content[this.CurPos.ContentPos];
+			Item.SetParagraphShd(Shd);
+		}
+	}
 };
-CDocumentContent.prototype.Set_ParagraphStyle                 = function(Name)
+CDocumentContent.prototype.SetParagraphStyle = function(Name)
 {
-    var Styles  = this.Parent.Get_Styles();
-    var StyleId = Styles.Get_StyleIdByName(Name);
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphStyle(Name);
+			Item.Set_ApplyToAll(false);
+		}
 
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            // При изменении цвета фона параграфа, не надо ничего пересчитывать
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-            {
-                Item.Style_Add(StyleId);
-            }
-            else if (type_Table == Item.GetType())
-            {
-                Item.Set_ParagraphStyle(Name);
-            }
-            Item.Set_ApplyToAll(false);
-        }
+		return;
+	}
 
-        return;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphStyle(Name);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphStyle(Name);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
+			if (selectionflag_Numbering === this.Selection.Flag)
+				this.Remove_NumberingSelection();
 
-            if (selectionflag_Numbering === this.Selection.Flag)
-                this.Remove_NumberingSelection();
-
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                var Item = this.Content[Index];
-                if (type_Paragraph == Item.GetType())
-                {
-                    Item.Style_Add(StyleId);
-                }
-                else if (type_Table == Item.GetType())
-                {
-                    Item.Set_ParagraphStyle(Name);
-                }
-            }
-            this.Recalculate();
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            Item.Style_Add(StyleId);
-            this.Recalculate();
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Set_ParagraphStyle(Name);
-            this.Recalculate();
-        }
-    }
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				var Item = this.Content[Index];
+				Item.SetParagraphStyle(Name);
+			}
+		}
+		else
+		{
+			var Item = this.Content[this.CurPos.ContentPos];
+			Item.SetParagraphStyle(Name);
+		}
+	}
 };
 CDocumentContent.prototype.SetParagraphTabs = function(Tabs)
 {
@@ -5291,509 +5249,422 @@ CDocumentContent.prototype.SetParagraphTabs = function(Tabs)
 		}
 	}
 };
-CDocumentContent.prototype.Set_ParagraphContextualSpacing     = function(Value)
+CDocumentContent.prototype.SetParagraphContextualSpacing = function(Value)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Set_ContextualSpacing(Value);
-            else if (type_Table == Item.GetType())
-            {
-                Item.Set_ParagraphContextualSpacing(Value);
-            }
-            Item.Set_ApplyToAll(false);
-        }
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphContextualSpacing(Value);
+			Item.Set_ApplyToAll(false);
+		}
 
-        return;
-    }
+		return;
+	}
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphContextualSpacing(Value);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphContextualSpacing(Value);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
 
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                var Item = this.Content[Index];
-                if (type_Paragraph == Item.GetType())
-                    Item.Set_ContextualSpacing(Value);
-                else if (type_Table == Item.GetType())
-                {
-                    Item.Set_ParagraphContextualSpacing(Value);
-                }
-            }
-            this.Recalculate();
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            Item.Set_ContextualSpacing(Value);
-            this.Recalculate();
-        }
-        else if (type_Table == Item.GetType())
-            Item.Set_ParagraphContextualSpacing(Value);
-    }
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				var Item = this.Content[Index];
+				Item.SetParagraphContextualSpacing(Value);
+			}
+		}
+		else
+		{
+			var Item = this.Content[this.CurPos.ContentPos];
+			Item.SetParagraphContextualSpacing(Value);
+		}
+	}
 };
-CDocumentContent.prototype.Set_ParagraphPageBreakBefore       = function(Value)
+CDocumentContent.prototype.SetParagraphPageBreakBefore = function(Value)
 {
-    // Ничего не делаем
+	// Ничего не делаем
 };
-CDocumentContent.prototype.Set_ParagraphKeepLines             = function(Value)
+CDocumentContent.prototype.SetParagraphKeepLines = function(Value)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Set_KeepLines(Value);
-            else if (type_Table == Item.GetType())
-                Item.Set_ParagraphKeepLines(Value);
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphKeepLines(Value);
+			Item.Set_ApplyToAll(false);
+		}
 
-            Item.Set_ApplyToAll(false);
-        }
+		return;
+	}
 
-        return;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphKeepLines(Value);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphKeepLines(Value);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
-
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                var Item = this.Content[Index];
-                if (type_Paragraph == Item.GetType())
-                    Item.Set_KeepLines(Value);
-                else if (type_Table == Item.GetType())
-                    Item.Set_ParagraphKeepLines(Value);
-            }
-            this.Recalculate();
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            Item.Set_KeepLines(Value);
-            this.Recalculate();
-        }
-        else if (type_Table == Item.GetType())
-            Item.Set_ParagraphKeepLines(Value);
-    }
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				var Item = this.Content[Index];
+				Item.SetParagraphKeepLines(Value);
+			}
+		}
+		else
+		{
+			var Item = this.Content[this.CurPos.ContentPos];
+			Item.SetParagraphKeepLines(Value);
+		}
+	}
 };
-CDocumentContent.prototype.Set_ParagraphKeepNext              = function(Value)
+CDocumentContent.prototype.SetParagraphKeepNext = function(Value)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Set_KeepNext(Value);
-            else if (type_Table == Item.GetType())
-                Item.Set_ParagraphKeepNext(Value);
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphKeepNext(Value);
+			Item.Set_ApplyToAll(false);
+		}
 
-            Item.Set_ApplyToAll(false);
-        }
+		return;
+	}
 
-        return;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphKeepNext(Value);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphKeepNext(Value);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
-
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                var Item = this.Content[Index];
-                if (type_Paragraph == Item.GetType())
-                    Item.Set_KeepNext(Value);
-                else if (type_Table == Item.GetType())
-                    Item.Set_ParagraphKeepNext(Value);
-            }
-            this.Recalculate();
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            Item.Set_KeepNext(Value);
-            this.Recalculate();
-        }
-        else if (type_Table == Item.GetType())
-            Item.Set_ParagraphKeepNext(Value);
-    }
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				var Item = this.Content[Index];
+				Item.SetParagraphKeepNext(Value);
+			}
+		}
+		else
+		{
+			var Item = this.Content[this.CurPos.ContentPos];
+			Item.SetParagraphKeepNext(Value);
+		}
+	}
 };
-CDocumentContent.prototype.Set_ParagraphWidowControl          = function(Value)
+CDocumentContent.prototype.SetParagraphWidowControl = function(Value)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Set_WidowControl(Value);
-            else if (type_Table == Item.GetType())
-                Item.Set_ParagraphWidowControl(Value);
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphWidowControl(Value);
+			Item.Set_ApplyToAll(false);
+		}
 
-            Item.Set_ApplyToAll(false);
-        }
+		return;
+	}
 
-        return;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphWidowControl(Value);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphWidowControl(Value);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
-
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                var Item = this.Content[Index];
-                if (type_Paragraph == Item.GetType())
-                    Item.Set_WidowControl(Value);
-                else if (type_Table == Item.GetType())
-                    Item.Set_ParagraphWidowControl(Value);
-            }
-            this.Recalculate();
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            Item.Set_WidowControl(Value);
-            this.Recalculate();
-        }
-        else if (type_Table == Item.GetType())
-            Item.Set_ParagraphWidowControl(Value);
-    }
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				var Item = this.Content[Index];
+				Item.SetParagraphWidowControl(Value);
+			}
+		}
+		else
+		{
+			var Item = this.Content[this.CurPos.ContentPos];
+			Item.SetParagraphWidowControl(Value);
+		}
+	}
 };
-CDocumentContent.prototype.Set_ParagraphBorders               = function(Borders)
+CDocumentContent.prototype.SetParagraphBorders = function(Borders)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Set_Borders(Borders);
-            else if (type_Table == Item.GetType())
-                Item.Set_ParagraphBorders(Borders);
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.SetParagraphBorders(Borders);
+			Item.Set_ApplyToAll(false);
+		}
 
-            Item.Set_ApplyToAll(false);
-        }
+		return;
+	}
 
-        return;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.setParagraphBorders(Borders);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.setParagraphBorders(Borders);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
+		if (true === this.Selection.Use)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
 
-        if (true === this.Selection.Use)
-        {
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
-            if (EndPos < StartPos)
-            {
-                var Temp = StartPos;
-                StartPos = EndPos;
-                EndPos   = Temp;
-            }
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				var Item = this.Content[Index];
+				Item.SetParagraphBorders(Borders);
+			}
+		}
+		else
+		{
+			var Item = this.Content[this.CurPos.ContentPos];
+			if (type_Paragraph === Item.GetType())
+			{
+				// Мы должны выставить границу для всех параграфов, входящих в текущую группу параграфов
+				// с одинаковыми границами
 
-            for (var Index = StartPos; Index <= EndPos; Index++)
-            {
-                // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                var Item = this.Content[Index];
+				var StartPos = Item.Index;
+				var EndPos   = Item.Index;
+				var CurBrd   = Item.Get_CompiledPr().ParaPr.Brd;
 
-                if (type_Paragraph == Item.GetType())
-                    Item.Set_Borders(Borders);
-                else if (type_Table == Item.GetType())
-                    Item.Set_ParagraphBorders(Borders);
-            }
-
-            this.Recalculate();
-            return;
-        }
-
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            // Мы должны выставить границу для всех параграфов, входящих в текущую группу параграфов
-            // с одинаковыми границами
-
-            var StartPos = Item.Index;
-            var EndPos   = Item.Index;
-            var CurBrd   = Item.Get_CompiledPr().ParaPr.Brd;
-
-            while (true != CurBrd.First)
-            {
-                StartPos--;
-                if (StartPos < 0)
-                {
-                    StartPos = 0;
-                    break;
-                }
-
-                var TempItem = this.Content[StartPos];
-                if (type_Paragraph != TempItem.GetType())
-                {
-                    StartPos++;
-                    break;
-                }
-
-                CurBrd = TempItem.Get_CompiledPr().ParaPr.Brd;
-            }
-
-            CurBrd = Item.Get_CompiledPr().ParaPr.Brd;
-            while (true != CurBrd.Last)
-            {
-                EndPos++;
-                if (EndPos >= this.Content.length)
-                {
-                    EndPos = this.Content.length - 1;
-                    break;
-                }
-
-                var TempItem = this.Content[EndPos];
-                if (type_Paragraph != TempItem.GetType())
-                {
-                    EndPos--;
-                    break;
-                }
-
-                CurBrd = TempItem.Get_CompiledPr().ParaPr.Brd;
-            }
-
-            for (var Index = StartPos; Index <= EndPos; Index++)
-                this.Content[Index].Set_Borders(Borders);
-
-            this.Recalculate();
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Set_ParagraphBorders(Borders);
-        }
-    }
-};
-CDocumentContent.prototype.Paragraph_IncDecFontSize           = function(bIncrease)
-{
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.IncDec_FontSize(bIncrease);
-            else if (type_Table == Item.GetType())
-                Item.Paragraph_IncDecFontSize(bIncrease);
-
-            Item.Set_ApplyToAll(false);
-        }
-
-        return;
-    }
-
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.paragraphIncDecFontSize(bIncrease);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (this.CurPos.ContentPos < 0)
-            return false;
-
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if (EndPos < StartPos)
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
-                    }
-
-                    for (var Index = StartPos; Index <= EndPos; Index++)
-                    {
-                        // При изменении цвета фона параграфа, не надо ничего пересчитывать
-                        var Item = this.Content[Index];
-
-                        if (type_Paragraph == Item.GetType())
-                            Item.IncDec_FontSize(bIncrease);
-                        else if (type_Table == Item.GetType())
-                            Item.Paragraph_IncDecFontSize(bIncrease);
+				while (true != CurBrd.First)
+				{
+					StartPos--;
+					if (StartPos < 0)
+					{
+						StartPos = 0;
+						break;
 					}
-                    this.Recalculate();
-                    break;
-                }
-                case  selectionflag_Numbering:
-                {
-                    var OldFontSize = this.Get_Paragraph_TextPr().FontSize;
-                    var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
-                    var TextPr      = new CTextPr();
-                    TextPr.FontSize = NewFontSize;
-                    this.Paragraph_Add(new ParaTextPr(TextPr), true);
 
-                    this.Recalculate();
-                    break;
-                }
-            }
+					var TempItem = this.Content[StartPos];
+					if (type_Paragraph !== TempItem.GetType())
+					{
+						StartPos++;
+						break;
+					}
 
-            return;
-        }
+					CurBrd = TempItem.Get_CompiledPr().ParaPr.Brd;
+				}
 
-        var Item = this.Content[this.CurPos.ContentPos];
-        if (type_Paragraph == Item.GetType())
-        {
-            if (true === Item.IncDec_FontSize(bIncrease))
-            {
-                this.Recalculate();
-            }
-        }
-        else if (type_Table == Item.GetType())
-        {
-            Item.Paragraph_IncDecFontSize(bIncrease);
-        }
-    }
+				CurBrd = Item.Get_CompiledPr().ParaPr.Brd;
+				while (true != CurBrd.Last)
+				{
+					EndPos++;
+					if (EndPos >= this.Content.length)
+					{
+						EndPos = this.Content.length - 1;
+						break;
+					}
+
+					var TempItem = this.Content[EndPos];
+					if (type_Paragraph !== TempItem.GetType())
+					{
+						EndPos--;
+						break;
+					}
+
+					CurBrd = TempItem.Get_CompiledPr().ParaPr.Brd;
+				}
+
+				for (var Index = StartPos; Index <= EndPos; Index++)
+					this.Content[Index].SetParagraphBorders(Borders);
+			}
+			else
+			{
+				Item.SetParagraphBorders(Borders);
+			}
+		}
+	}
 };
-CDocumentContent.prototype.Paragraph_IncDecIndent             = function(bIncrease)
+CDocumentContent.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            Item.IncDec_Indent(bIncrease);
-            Item.Set_ApplyToAll(false);
-        }
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.IncreaseDecreaseFontSize(bIncrease);
+			Item.Set_ApplyToAll(false);
+		}
 
-        return;
-    }
+		return;
+	}
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        if (true != this.LogicDocument.DrawingObjects.isSelectedText())
-        {
-            var ParaDrawing = this.LogicDocument.DrawingObjects.getMajorParaDrawing();
-            if (null != ParaDrawing)
-            {
-                var Paragraph = ParaDrawing.Parent;
-                Paragraph.IncDec_Indent(bIncrease);
-            }
-        }
-        else
-        {
-            this.DrawingObjects.paragraphIncDecIndent(bIncrease);
-        }
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Common:
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if (EndPos < StartPos)
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
-                    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.paragraphIncDecFontSize(bIncrease);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (this.CurPos.ContentPos < 0)
+			return false;
 
-                    for (var Index = StartPos; Index <= EndPos; Index++)
-                    {
-                        this.Content[Index].IncDec_Indent(bIncrease);
-                    }
-                }
-                case  selectionflag_Numbering:
-                {
-                    break;
-                }
-            }
-        }
-        else
-        {
-            this.Content[this.CurPos.ContentPos].IncDec_Indent(bIncrease);
-        }
-    }
+		if (true === this.Selection.Use)
+		{
+			switch (this.Selection.Flag)
+			{
+				case selectionflag_Common:
+				{
+					var StartPos = this.Selection.StartPos;
+					var EndPos   = this.Selection.EndPos;
+					if (EndPos < StartPos)
+					{
+						var Temp = StartPos;
+						StartPos = EndPos;
+						EndPos   = Temp;
+					}
+
+					for (var Index = StartPos; Index <= EndPos; Index++)
+					{
+						var Item = this.Content[Index];
+						Item.IncreaseDecreaseFontSize(bIncrease);
+					}
+					break;
+				}
+				case  selectionflag_Numbering:
+				{
+					var OldFontSize = this.Get_Paragraph_TextPr().FontSize;
+					var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
+					var TextPr      = new CTextPr();
+					TextPr.FontSize = NewFontSize;
+					this.Paragraph_Add(new ParaTextPr(TextPr), true);
+					break;
+				}
+			}
+		}
+		else
+		{
+			var Item = this.Content[this.CurPos.ContentPos];
+			Item.IncreaseDecreaseFontSize(bIncrease);
+		}
+	}
+};
+CDocumentContent.prototype.IncreaseDecreaseIndent = function(bIncrease)
+{
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.IncreaseDecreaseIndent(bIncrease);
+			Item.Set_ApplyToAll(false);
+		}
+
+		return;
+	}
+
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		if (true != this.LogicDocument.DrawingObjects.isSelectedText())
+		{
+			var ParaDrawing = this.LogicDocument.DrawingObjects.getMajorParaDrawing();
+			if (null != ParaDrawing)
+			{
+				var Paragraph = ParaDrawing.Parent;
+				Paragraph.IncreaseDecreaseIndent(bIncrease);
+			}
+		}
+		else
+		{
+			this.DrawingObjects.paragraphIncDecIndent(bIncrease);
+		}
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (true === this.Selection.Use && selectionflag_Common === this.Selection.Flag)
+		{
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
+			if (EndPos < StartPos)
+			{
+				var Temp = StartPos;
+				StartPos = EndPos;
+				EndPos   = Temp;
+			}
+
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				this.Content[Index].IncreaseDecreaseIndent(bIncrease);
+			}
+		}
+		else
+		{
+			this.Content[this.CurPos.ContentPos].IncreaseDecreaseIndent(bIncrease);
+		}
+	}
 };
 CDocumentContent.prototype.Paragraph_Format_Paste             = function(TextPr, ParaPr, ApplyPara)
 {
@@ -8172,79 +8043,77 @@ CDocumentContent.prototype.Get_SectPr = function()
 
     return null;
 };
-CDocumentContent.prototype.Set_ParagraphFramePr = function(FramePr, bDelete)
+CDocumentContent.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        // Не добавляем и не работаем с рамками в автофигурах
-        return;
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if ( true === this.Selection.Use )
-        {
-            // Проверим, если у нас все выделенные элементы - параграфы, с одинаковыми настройками
-            // FramePr, тогда мы можем применить новую настройку FramePr
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		// Не добавляем и не работаем с рамками в автофигурах
+		return;
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (true === this.Selection.Use)
+		{
+			// Проверим, если у нас все выделенные элементы - параграфы, с одинаковыми настройками
+			// FramePr, тогда мы можем применить новую настройку FramePr
 
-            var StartPos = this.Selection.StartPos;
-            var EndPos   = this.Selection.EndPos;
+			var StartPos = this.Selection.StartPos;
+			var EndPos   = this.Selection.EndPos;
 
-            if ( StartPos > EndPos )
-            {
-                StartPos = this.Selection.EndPos;
-                EndPos   = this.Selection.StartPos;
-            }
+			if (StartPos > EndPos)
+			{
+				StartPos = this.Selection.EndPos;
+				EndPos   = this.Selection.StartPos;
+			}
 
-            var Element = this.Content[StartPos];
+			var Element = this.Content[StartPos];
 
-            if ( type_Paragraph != Element.GetType() || undefined === Element.Get_FramePr() )
-                return;
+			if (type_Paragraph !== Element.GetType() || undefined === Element.Get_FramePr())
+				return;
 
-            var FramePr = Element.Get_FramePr();
-            for ( var Pos = StartPos + 1; Pos < EndPos; Pos++ )
-            {
-                var TempElement = this.Content[Pos];
+			var FramePr = Element.Get_FramePr();
+			for (var Pos = StartPos + 1; Pos < EndPos; Pos++)
+			{
+				var TempElement = this.Content[Pos];
 
-                if ( type_Paragraph != TempElement.GetType() || undefined === TempElement.Get_FramePr() || true != FramePr.Compare( TempElement.Get_FramePr() ) )
-                    return;
-            }
+				if (type_Paragraph !== TempElement.GetType() || undefined === TempElement.Get_FramePr() || true != FramePr.Compare(TempElement.Get_FramePr()))
+					return;
+			}
 
-            // Раз дошли до сюда, значит можно у всех выделенных параграфов менять настройку рамки
-            var FrameParas = this.Content[StartPos].Internal_Get_FrameParagraphs();
-            var FrameCount = FrameParas.length;
-            for ( var Pos = 0; Pos < FrameCount; Pos++ )
-            {
-                FrameParas[Pos].Set_FramePr(FramePr, bDelete);
-            }
-        }
-        else
-        {
-            var Element = this.Content[this.CurPos.ContentPos];
+			// Раз дошли до сюда, значит можно у всех выделенных параграфов менять настройку рамки
+			var FrameParas = this.Content[StartPos].Internal_Get_FrameParagraphs();
+			var FrameCount = FrameParas.length;
+			for (var Pos = 0; Pos < FrameCount; Pos++)
+			{
+				FrameParas[Pos].Set_FramePr(FramePr, bDelete);
+			}
+		}
+		else
+		{
+			var Element = this.Content[this.CurPos.ContentPos];
 
-            if ( type_Paragraph != Element.GetType() )
-                return;
+			if (type_Paragraph !== Element.GetType())
+				return;
 
-            // Возможно, предыдущий элемент является буквицей
-            if ( undefined === Element.Get_FramePr()  )
-            {
-                var PrevElement = Element.Get_DocumentPrev();
+			// Возможно, предыдущий элемент является буквицей
+			if (undefined === Element.Get_FramePr())
+			{
+				var PrevElement = Element.Get_DocumentPrev();
 
-                if ( type_Paragraph != PrevElement.GetType() || undefined === PrevElement.Get_FramePr() || undefined === PrevElement.Get_FramePr().DropCap )
-                    return;
+				if (type_Paragraph !== PrevElement.GetType() || undefined === PrevElement.Get_FramePr() || undefined === PrevElement.Get_FramePr().DropCap)
+					return;
 
-                Element = PrevElement;
-            }
+				Element = PrevElement;
+			}
 
-
-            var FrameParas = Element.Internal_Get_FrameParagraphs();
-            var FrameCount = FrameParas.length;
-            for ( var Pos = 0; Pos < FrameCount; Pos++ )
-            {
-                FrameParas[Pos].Set_FramePr(FramePr, bDelete);
-            }
-
-        }
-    }
+			var FrameParas = Element.Internal_Get_FrameParagraphs();
+			var FrameCount = FrameParas.length;
+			for (var Pos = 0; Pos < FrameCount; Pos++)
+			{
+				FrameParas[Pos].Set_FramePr(FramePr, bDelete);
+			}
+		}
+	}
 };
 CDocumentContent.prototype.Add_ToContent = function(Pos, Item)
 {

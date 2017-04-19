@@ -1385,7 +1385,7 @@ background-repeat: no-repeat;\
 				if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 				{
 					this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetFramePrWithFontFamily);
-					this.WordControl.m_oLogicDocument.Set_ParagraphFramePr(Obj);
+					this.WordControl.m_oLogicDocument.SetParagraphFramePr(Obj);
 				}
 			}
 		}
@@ -1394,7 +1394,7 @@ background-repeat: no-repeat;\
 			if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 			{
 				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetFramePr);
-				this.WordControl.m_oLogicDocument.Set_ParagraphFramePr(Obj);
+				this.WordControl.m_oLogicDocument.SetParagraphFramePr(Obj);
 			}
 		}
 	};
@@ -1407,7 +1407,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetFramePrWithFontFamilyLong);
-			this.WordControl.m_oLogicDocument.Set_ParagraphFramePr(Obj);
+			this.WordControl.m_oLogicDocument.SetParagraphFramePr(Obj);
 		}
 		// отжать заморозку меню
 	};
@@ -2722,7 +2722,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_IncFontSize);
-			this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(true);
+			this.WordControl.m_oLogicDocument.IncreaseDecreaseFontSize(true);
 		}
 	};
 	asc_docs_api.prototype.FontSizeOut                = function()
@@ -2730,7 +2730,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_DecFontSize);
-			this.WordControl.m_oLogicDocument.Paragraph_IncDecFontSize(false);
+			this.WordControl.m_oLogicDocument.IncreaseDecreaseFontSize(false);
 		}
 	};
 	// Object:
@@ -2767,7 +2767,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphBorders);
-			this.WordControl.m_oLogicDocument.Set_ParagraphBorders(Obj);
+			this.WordControl.m_oLogicDocument.SetParagraphBorders(Obj);
 		}
 	};
 	/*callbacks*/
@@ -2856,7 +2856,7 @@ background-repeat: no-repeat;\
 
 			// TODO: Сделать так, чтобы пересчет был всего 1 здесь
 			if ("undefined" != typeof(Props.ContextualSpacing) && null != Props.ContextualSpacing)
-				this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing(Props.ContextualSpacing);
+				this.WordControl.m_oLogicDocument.SetParagraphContextualSpacing(Props.ContextualSpacing);
 
 			if ("undefined" != typeof(Props.Ind) && null != Props.Ind)
 				this.WordControl.m_oLogicDocument.SetParagraphIndent(Props.Ind);
@@ -2865,16 +2865,16 @@ background-repeat: no-repeat;\
 				this.WordControl.m_oLogicDocument.SetParagraphAlign(Props.Jc);
 
 			if ("undefined" != typeof(Props.KeepLines) && null != Props.KeepLines)
-				this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines(Props.KeepLines);
+				this.WordControl.m_oLogicDocument.SetParagraphKeepLines(Props.KeepLines);
 
 			if (undefined != Props.KeepNext && null != Props.KeepNext)
-				this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext(Props.KeepNext);
+				this.WordControl.m_oLogicDocument.SetParagraphKeepNext(Props.KeepNext);
 
 			if (undefined != Props.WidowControl && null != Props.WidowControl)
-				this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl(Props.WidowControl);
+				this.WordControl.m_oLogicDocument.SetParagraphWidowControl(Props.WidowControl);
 
 			if ("undefined" != typeof(Props.PageBreakBefore) && null != Props.PageBreakBefore)
-				this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore(Props.PageBreakBefore);
+				this.WordControl.m_oLogicDocument.SetParagraphPageBreakBefore(Props.PageBreakBefore);
 
 			if ("undefined" != typeof(Props.Spacing) && null != Props.Spacing)
 				this.WordControl.m_oLogicDocument.SetParagraphSpacing(Props.Spacing);
@@ -2884,7 +2884,7 @@ background-repeat: no-repeat;\
 				var Unifill        = new AscFormat.CUniFill();
 				Unifill.fill       = new AscFormat.CSolidFill();
 				Unifill.fill.color = AscFormat.CorrectUniColor(Props.Shd.Color, Unifill.fill.color, 1);
-				this.WordControl.m_oLogicDocument.Set_ParagraphShd(
+				this.WordControl.m_oLogicDocument.SetParagraphShd(
 					{
 						Value   : Props.Shd.Value,
 						Color   : {
@@ -2923,7 +2923,7 @@ background-repeat: no-repeat;\
 					Props.Brd.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideV.Color, 1);
 				}
 
-				this.WordControl.m_oLogicDocument.Set_ParagraphBorders(Props.Brd);
+				this.WordControl.m_oLogicDocument.SetParagraphBorders(Props.Brd);
 			}
 
 			if (undefined != Props.Tabs)
@@ -3055,7 +3055,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphStyle);
-			this.WordControl.m_oLogicDocument.Set_ParagraphStyle(name);
+			this.WordControl.m_oLogicDocument.SetParagraphStyle(name);
 		}
 	};
 
@@ -3159,7 +3159,7 @@ background-repeat: no-repeat;\
 		{
 			this.isPageBreakBefore = isBreak;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphPageBreakBefore);
-			this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore(isBreak);
+			this.WordControl.m_oLogicDocument.SetParagraphPageBreakBefore(isBreak);
 			this.sync_PageBreakCallback(isBreak);
 		}
 	};
@@ -3169,7 +3169,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphWidowControl);
-			this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl(bValue);
+			this.WordControl.m_oLogicDocument.SetParagraphWidowControl(bValue);
 			this.sync_WidowControlCallback(bValue);
 		}
 	};
@@ -3180,7 +3180,7 @@ background-repeat: no-repeat;\
 		{
 			this.isKeepLinesTogether = isKeepLines;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphKeepLines);
-			this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines(isKeepLines);
+			this.WordControl.m_oLogicDocument.SetParagraphKeepLines(isKeepLines);
 			this.sync_KeepLinesCallback(isKeepLines);
 		}
 	};
@@ -3190,7 +3190,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphKeepNext);
-			this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext(isKeepNext);
+			this.WordControl.m_oLogicDocument.SetParagraphKeepNext(isKeepNext);
 			this.sync_KeepNextCallback(isKeepNext);
 		}
 	};
@@ -3201,7 +3201,7 @@ background-repeat: no-repeat;\
 		{
 			this.isAddSpaceBetweenPrg = isSpacePrg;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphContextualSpacing);
-			this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing(isSpacePrg);
+			this.WordControl.m_oLogicDocument.SetParagraphContextualSpacing(isSpacePrg);
 		}
 	};
 	asc_docs_api.prototype.put_LineHighLight      = function(is_flag, r, g, b)
@@ -3265,13 +3265,13 @@ background-repeat: no-repeat;\
 				this.WordControl.m_oLogicDocument.Set_UseTextShd(false);
 
 			if (false === is_flag)
-				this.WordControl.m_oLogicDocument.Set_ParagraphShd({Value : Asc.c_oAscShdNil});
+				this.WordControl.m_oLogicDocument.SetParagraphShd({Value : Asc.c_oAscShdNil});
 			else
 			{
 				var Unifill        = new AscFormat.CUniFill();
 				Unifill.fill       = new AscFormat.CSolidFill();
 				Unifill.fill.color = AscFormat.CorrectUniColor(color, Unifill.fill.color, 1);
-				this.WordControl.m_oLogicDocument.Set_ParagraphShd({
+				this.WordControl.m_oLogicDocument.SetParagraphShd({
 					Value   : Asc.c_oAscShdClear,
 					Color   : {
 						r : color.asc_getR(),
