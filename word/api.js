@@ -2859,7 +2859,7 @@ background-repeat: no-repeat;\
 				this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing(Props.ContextualSpacing);
 
 			if ("undefined" != typeof(Props.Ind) && null != Props.Ind)
-				this.WordControl.m_oLogicDocument.Set_ParagraphIndent(Props.Ind);
+				this.WordControl.m_oLogicDocument.SetParagraphIndent(Props.Ind);
 
 			if ("undefined" != typeof(Props.Jc) && null != Props.Jc)
 				this.WordControl.m_oLogicDocument.SetParagraphAlign(Props.Jc);
@@ -3047,7 +3047,7 @@ background-repeat: no-repeat;\
 			NumberInfo.Type    = type;
 			NumberInfo.SubType = subtype;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphNumbering);
-			this.WordControl.m_oLogicDocument.Set_ParagraphNumbering(NumberInfo);
+			this.WordControl.m_oLogicDocument.SetParagraphNumbering(NumberInfo);
 		}
 	};
 	asc_docs_api.prototype.put_Style    = function(name)
@@ -3290,7 +3290,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphIndent);
-			this.WordControl.m_oLogicDocument.Set_ParagraphIndent({Left : value, ChangeLevel : levelValue});
+			this.WordControl.m_oLogicDocument.SetParagraphIndent({Left : value, ChangeLevel : levelValue});
 		}
 	};
 	asc_docs_api.prototype.IncreaseIndent         = function()
@@ -3306,7 +3306,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphIndentRight);
-			this.WordControl.m_oLogicDocument.Set_ParagraphIndent({Right : value});
+			this.WordControl.m_oLogicDocument.SetParagraphIndent({Right : value});
 		}
 	};
 	asc_docs_api.prototype.put_PrFirstLineIndent  = function(value)
@@ -3314,7 +3314,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphIndentFirstLine);
-			this.WordControl.m_oLogicDocument.Set_ParagraphIndent({FirstLine : value});
+			this.WordControl.m_oLogicDocument.SetParagraphIndent({FirstLine : value});
 		}
 	};
 	asc_docs_api.prototype.put_Margins            = function(left, top, right, bottom)

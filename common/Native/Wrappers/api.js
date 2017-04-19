@@ -175,7 +175,7 @@ Asc['asc_docs_api'].prototype["Call_HR_Pr"] = function(_indent_left, _indent_rig
     if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
     {
         _logic.Create_NewHistoryPoint();
-        _logic.Set_ParagraphIndent( { Left : _indent_left, Right : _indent_right, FirstLine: _indent_first } );
+        _logic.SetParagraphIndent( { Left : _indent_left, Right : _indent_right, FirstLine: _indent_first } );
         _logic.Document_UpdateInterfaceState();
     }
 };
@@ -1205,7 +1205,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 1:
                     {
                         var _ind = asc_menu_ReadParaInd(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphIndent( _ind );
+                        this.WordControl.m_oLogicDocument.SetParagraphIndent( _ind );
                         break;
                     }
                     case 2:
@@ -1362,7 +1362,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 23:
                     {
                         var _listType = asc_menu_ReadParaListType(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphNumbering( _listType );
+                        this.WordControl.m_oLogicDocument.SetParagraphNumbering( _listType );
                         break;
                     }
                     case 24:

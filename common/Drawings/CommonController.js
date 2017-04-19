@@ -1746,7 +1746,7 @@ DrawingObjectsController.prototype =
 
     setParagraphNumbering: function(NumInfo)
     {
-        this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphNumbering, [NumInfo], CTable.prototype.Set_ParagraphNumbering);
+        this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphNumbering, [NumInfo], CTable.prototype.SetParagraphNumbering);
     },
 
     setParagraphShd: function(Shd)
@@ -1913,7 +1913,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent(true);
         if(content)
         {
-            content.Set_ParagraphIndent(indent);
+            content.SetParagraphIndent(indent);
         }
         else if(this.document)
         {

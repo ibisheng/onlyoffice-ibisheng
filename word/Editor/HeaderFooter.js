@@ -816,15 +816,15 @@ CHeaderFooter.prototype =
 		return this.Content.SetParagraphSpacing(Spacing);
 	},
 
-    Set_ParagraphIndent : function(Ind)
-    {
-        return this.Content.Set_ParagraphIndent( Ind );
-    },
+	SetParagraphIndent : function(Ind)
+	{
+		return this.Content.SetParagraphIndent(Ind);
+	},
 
-    Set_ParagraphNumbering : function(NumInfo)
-    {
-        return this.Content.Set_ParagraphNumbering( NumInfo );
-    },
+	SetParagraphNumbering : function(NumInfo)
+	{
+		return this.Content.SetParagraphNumbering(NumInfo);
+	},
 
     Set_ParagraphShd : function(Shd)
     {
@@ -1973,17 +1973,17 @@ CHeaderFooterController.prototype =
 			return this.CurHdrFtr.SetParagraphSpacing(Spacing);
 	},
 
-    Set_ParagraphIndent : function(Ind)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphIndent( Ind );
-    },
+	SetParagraphIndent : function(Ind)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphIndent(Ind);
+	},
 
-    Set_ParagraphNumbering : function(NumInfo)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ParagraphNumbering( NumInfo );
-    },
+	SetParagraphNumbering : function(NumInfo)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetParagraphNumbering(NumInfo);
+	},
 
     Set_ParagraphShd : function(Shd)
     {

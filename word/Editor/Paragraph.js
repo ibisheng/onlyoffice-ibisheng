@@ -12075,6 +12075,21 @@ Paragraph.prototype.SetParagraphTabs = function(Tabs)
 {
 	this.Set_Tabs(Tabs);
 };
+Paragraph.prototype.SetParagraphIndent = function(Ind)
+{
+	var NumPr = this.Numbering_Get();
+	if (undefined !== Ind.ChangeLevel && 0 !== Ind.ChangeLevel && undefined !== NumPr)
+	{
+		if (Ind.ChangeLevel > 0)
+			this.Numbering_Add(NumPr.NumId, Math.min(8, NumPr.Lvl + 1));
+		else
+			this.Numbering_Add(NumPr.NumId, Math.max(0, NumPr.Lvl - 1));
+	}
+	else
+	{
+		this.Set_Ind(Ind, false);
+	}
+};
 
 
 var pararecalc_0_All  = 0;

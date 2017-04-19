@@ -467,6 +467,12 @@ CDocumentContentElementBase.prototype.SetParagraphSpacing = function(Spacing)
 CDocumentContentElementBase.prototype.SetParagraphTabs = function(Tabs)
 {
 };
+CDocumentContentElementBase.prototype.SetParagraphIndent = function(Ind)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphNumbering = function(NumInfo)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

@@ -985,7 +985,7 @@ CGraphicFrame.prototype.setParagraphNumbering = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphNumbering(val);
+            this.graphicObject.SetParagraphNumbering(val);
         }
 };
 
@@ -993,7 +993,7 @@ CGraphicFrame.prototype.setParagraphIndent = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphIndent(val);
+            this.graphicObject.SetParagraphIndent(val);
         }
 };
 

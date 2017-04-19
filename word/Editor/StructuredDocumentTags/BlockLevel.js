@@ -409,6 +409,14 @@ CBlockLevelSdt.prototype.SetParagraphTabs = function(Tabs)
 {
 	return this.Content.SetParagraphTabs(Tabs);
 };
+CBlockLevelSdt.prototype.SetParagraphIndent = function(Ind)
+{
+	return this.Content.SetParagraphIndent(Ind);
+};
+CBlockLevelSdt.prototype.SetParagraphNumbering = function(NumInfo)
+{
+	return this.Content.SetParagraphNumbering(NumInfo);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -515,6 +523,10 @@ CBlockLevelSdt.prototype.Check_AutoFit = function()
 CBlockLevelSdt.prototype.Is_InTable = function(bReturnTopTable)
 {
 	return this.Parent.Is_InTable(bReturnTopTable);
+};
+CBlockLevelSdt.prototype.Get_PageContentStartPos = function(PageIndex, ElementIndex)
+{
+	return this.Parent.Get_PageContentStartPos(PageIndex, ElementIndex);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

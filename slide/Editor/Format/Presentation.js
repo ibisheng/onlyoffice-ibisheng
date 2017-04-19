@@ -2088,13 +2088,13 @@ CPresentation.prototype =
         this.Document_UpdateInterfaceState();
     },
 
-    Set_ParagraphIndent : function(Ind)
+	SetParagraphIndent : function(Ind)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphIndent, [Ind], false, AscDFH.historydescription_Presentation_SetParagraphIndent);
         this.Document_UpdateInterfaceState();
     },
 
-    Set_ParagraphNumbering : function(NumInfo)
+	SetParagraphNumbering : function(NumInfo)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.setParagraphNumbering, [this.Get_PresentationBulletByNumInfo(NumInfo)], false, AscDFH.historydescription_Presentation_SetParagraphNumbering);
         this.Document_UpdateInterfaceState();   //TODO
@@ -2871,7 +2871,7 @@ CPresentation.prototype =
                 if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
                 {
                     this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphNumberingHotKey);
-                    this.Set_ParagraphNumbering( { Type : 0, SubType : 1 } );
+                    this.SetParagraphNumbering( { Type : 0, SubType : 1 } );
                     this.Document_UpdateInterfaceState();
                 }
                 bRetValue = keydownresult_PreventAll;

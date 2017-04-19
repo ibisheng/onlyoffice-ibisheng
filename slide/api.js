@@ -2564,7 +2564,7 @@ background-repeat: no-repeat;\
 		NumberInfo.Type    = type;
 		NumberInfo.SubType = subtype;
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_PutTextPrListType);
-		this.WordControl.m_oLogicDocument.Set_ParagraphNumbering(NumberInfo);
+		this.WordControl.m_oLogicDocument.SetParagraphNumbering(NumberInfo);
 	};
 
 	asc_docs_api.prototype.put_ShowSnapLines = function(isShow)
@@ -3017,7 +3017,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.put_PrIndent          = function(value, levelValue)
 	{
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_PutPrIndent);
-		this.WordControl.m_oLogicDocument.Set_ParagraphIndent({Left : value, ChangeLevel : levelValue});
+		this.WordControl.m_oLogicDocument.SetParagraphIndent({Left : value, ChangeLevel : levelValue});
 	};
 	asc_docs_api.prototype.IncreaseIndent        = function()
 	{
@@ -3030,12 +3030,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.put_PrIndentRight     = function(value)
 	{
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_PutPrIndentRight);
-		this.WordControl.m_oLogicDocument.Set_ParagraphIndent({Right : value});
+		this.WordControl.m_oLogicDocument.SetParagraphIndent({Right : value});
 	};
 	asc_docs_api.prototype.put_PrFirstLineIndent = function(value)
 	{
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_PutPrFirstLineIndent);
-		this.WordControl.m_oLogicDocument.Set_ParagraphIndent({FirstLine : value});
+		this.WordControl.m_oLogicDocument.SetParagraphIndent({FirstLine : value});
 	};
 	asc_docs_api.prototype.getFocusObject        = function()
 	{//возвратит тип элемента - параграф c_oAscTypeSelectElement.Paragraph, изображение c_oAscTypeSelectElement.Image, таблица c_oAscTypeSelectElement.Table, колонтитул c_oAscTypeSelectElement.Header.

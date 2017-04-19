@@ -4431,14 +4431,14 @@ CDocument.prototype.SetParagraphTabs = function(Tabs)
 	this.Document_UpdateInterfaceState();
 	this.Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, Tabs);
 };
-CDocument.prototype.Set_ParagraphIndent = function(Ind)
+CDocument.prototype.SetParagraphIndent = function(Ind)
 {
 	this.Controller.SetParagraphIndent(Ind);
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Set_ParagraphNumbering = function(NumInfo)
+CDocument.prototype.SetParagraphNumbering = function(NumInfo)
 {
 	this.Controller.SetParagraphNumbering(NumInfo);
 	this.Recalculate();
@@ -6711,7 +6711,7 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphNumberingHotKey);
-                this.Set_ParagraphNumbering({Type : 0, SubType : 1});
+                this.SetParagraphNumbering({Type : 0, SubType : 1});
                 this.Document_UpdateInterfaceState();
             }
             bRetValue = keydownresult_PreventAll;
@@ -11239,20 +11239,20 @@ CDocument.prototype.IsCursorInFootnote = function()
 {
 	return (docpostype_Footnotes === this.Get_DocPosType() ? true : false);
 };
-
-
-CDocument.prototype.TurnOffCheckChartSelection = function(){
-    if(this.DrawingObjects){
-        this.DrawingObjects.TurnOffCheckChartSelection();
-    }
+CDocument.prototype.TurnOffCheckChartSelection = function()
+{
+	if (this.DrawingObjects)
+	{
+		this.DrawingObjects.TurnOffCheckChartSelection();
+	}
 };
-
-CDocument.prototype.TurnOnCheckChartSelection = function(){
-    if(this.DrawingObjects){
-        this.DrawingObjects.TurnOnCheckChartSelection();
-    }
+CDocument.prototype.TurnOnCheckChartSelection = function()
+{
+	if (this.DrawingObjects)
+	{
+		this.DrawingObjects.TurnOnCheckChartSelection();
+	}
 };
-
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые вызываются из CLogicDocumentController
 //----------------------------------------------------------------------------------------------------------------------
@@ -12478,61 +12478,27 @@ CDocument.prototype.controller_SetParagraphIndent = function(Ind)
 		for (var Index = StartPos; Index <= EndPos; Index++)
 		{
 			var Item = this.Content[Index];
-			if (type_Paragraph == Item.GetType())
-			{
-				var NumPr = null;
-				if ("number" == typeof(Ind.ChangeLevel) && 0 != Ind.ChangeLevel && undefined != ( NumPr = Item.Numbering_Get() ))
-				{
-					if (Ind.ChangeLevel > 0)
-						Item.Numbering_Add(NumPr.NumId, Math.min(8, NumPr.Lvl + 1));
-					else
-						Item.Numbering_Add(NumPr.NumId, Math.max(0, NumPr.Lvl - 1));
-				}
-				else
-				{
-					Item.Set_Ind(Ind, false);
-				}
-			}
-			else if (type_Table == Item.GetType())
-			{
-				Item.Set_ParagraphIndent(Ind);
-			}
+			Item.SetParagraphIndent(Ind);
 		}
 	}
 	else
 	{
 		var Item = this.Content[this.CurPos.ContentPos];
-		if (type_Paragraph == Item.GetType())
-		{
-			var NumPr = null;
-			if ("number" == typeof(Ind.ChangeLevel) && 0 != Ind.ChangeLevel && undefined != ( NumPr = Item.Numbering_Get() ))
-			{
-				if (Ind.ChangeLevel > 0)
-					Item.Numbering_Add(NumPr.NumId, Math.min(8, NumPr.Lvl + 1));
-				else
-					Item.Numbering_Add(NumPr.NumId, Math.max(0, NumPr.Lvl - 1));
-			}
-			else
-			{
-				Item.Set_Ind(Ind, false);
-			}
-		}
-		else if (type_Table == Item.GetType())
-		{
-			Item.Set_ParagraphIndent(Ind);
-		}
+		Item.SetParagraphIndent(Ind);
 	}
 };
 CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 {
+	// TODO: Переделать применение нумерации (Обязательно объединить в общую функцию для классов CDocument, CDocumentContent)
+
 	if (this.CurPos.ContentPos < 0)
 		return false;
 
 	if (true === this.Selection.Use && selectionflag_Numbering !== this.Selection.Flag)
 	{
-		if (this.Selection.StartPos === this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType())
+		if (this.Selection.StartPos === this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
 		{
-			this.Content[this.Selection.StartPos].Set_ParagraphNumbering(NumInfo);
+			this.Content[this.Selection.StartPos].SetParagraphNumbering(NumInfo);
 			return true;
 		}
 
@@ -12551,10 +12517,12 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
 				if (type_Paragraph == this.Content[Index].GetType())
-					this.Content[Index].Numbering_Remove();
-				else if (type_Table == this.Content[Index].GetType())
 				{
-					this.Content[Index].Set_ParagraphNumbering(NumInfo);
+					this.Content[Index].Numbering_Remove();
+				}
+				else
+				{
+					this.Content[Index].SetParagraphNumbering(NumInfo);
 				}
 			}
 		}
@@ -12575,7 +12543,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 						var NumId  = null;
 						var NumLvl = 0;
 
-						if ("undefined" != typeof(Prev) && null != Prev && type_Paragraph === Prev.GetType())
+						if (undefined !== Prev && null !== Prev && type_Paragraph === Prev.GetType())
 						{
 							var PrevNumPr = Prev.Numbering_Get();
 							if (undefined != PrevNumPr && true === this.Numbering.Check_Format(PrevNumPr.NumId, PrevNumPr.Lvl, numbering_numfmt_Bullet))
@@ -12608,9 +12576,9 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								else
 									this.Content[Index].Numbering_Add(NumId, NumLvl);
 							}
-							else if (type_Table == this.Content[Index].GetType())
+							else
 							{
-								this.Content[Index].Set_ParagraphNumbering(NumInfo);
+								this.Content[Index].SetParagraphNumbering(NumInfo);
 							}
 						}
 					}
@@ -12642,7 +12610,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 									break;
 								}
 							}
-							else if ((type_Paragraph === this.Content[Index].GetType() && undefined === NumPr) || type_Table === this.Content[Index].GetType())
+							else if ((type_Paragraph === this.Content[Index].GetType() && undefined === NumPr) || type_Paragraph !== this.Content[Index].GetType())
 							{
 								bDiffLvl = true;
 								break;
@@ -12747,9 +12715,9 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								else
 									this.Content[Index].Numbering_Add(NumId, 0);
 							}
-							else if (type_Table == this.Content[Index].GetType())
+							else
 							{
-								this.Content[Index].Set_ParagraphNumbering(NumInfo);
+								this.Content[Index].SetParagraphNumbering(NumInfo);
 							}
 						}
 					}
@@ -12816,9 +12784,9 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								else
 									this.Content[Index].Numbering_Add(NumId, NumLvl);
 							}
-							else if (type_Table === this.Content[Index].GetType())
+							else
 							{
-								this.Content[Index].Set_ParagraphNumbering(NumInfo);
+								this.Content[Index].SetParagraphNumbering(NumInfo);
 							}
 						}
 					}
@@ -12850,7 +12818,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 									break;
 								}
 							}
-							else if (( type_Paragraph === this.Content[Index].GetType() && undefined === NumPr ) || type_Table === this.Content[Index].GetType())
+							else if (( type_Paragraph === this.Content[Index].GetType() && undefined === NumPr ) || type_Paragraph !== this.Content[Index].GetType())
 							{
 								bDiffLvl = true;
 								break;
@@ -12947,9 +12915,9 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								else
 									this.Content[Index].Numbering_Add(NumId, 0);
 							}
-							else if (type_Table === this.Content[Index].GetType())
+							else
 							{
-								this.Content[Index].Set_ParagraphNumbering(NumInfo);
+								this.Content[Index].SetParagraphNumbering(NumInfo);
 							}
 						}
 					}
@@ -12994,9 +12962,9 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							else
 								this.Content[Index].Numbering_Add(NumId, 0);
 						}
-						else if (type_Table === this.Content[Index].GetType())
+						else
 						{
-							this.Content[Index].Set_ParagraphNumbering(NumInfo);
+							this.Content[Index].SetParagraphNumbering(NumInfo);
 						}
 					}
 
@@ -13010,8 +12978,6 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 		var Item = this.Content[this.CurPos.ContentPos];
 		if (type_Paragraph == Item.GetType())
 		{
-			var FirstChange = 0;
-
 			if (NumInfo.SubType < 0)
 			{
 				// Убираем список у параграфа
@@ -13039,33 +13005,10 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							{
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
 								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Bullet))
-								{
 									AbstractNum.Create_Default_Bullet();
-
-									// Добавлять нумерацию к параграфу не надо, т.к. она уже в
-									// нем записана
-
-									// Нам нужно пересчитать все изменения, начиная с первого
-									// элемента, использующего данную нумерацию
-									FirstChange      = 0;
-									var bFirstChange = false;
-									for (var Index = 0; Index < this.Content.length; Index++)
-									{
-										if (true === this.Content[Index].Numbering_IsUse(NumPr.NumId, NumPr.Lvl))
-										{
-											if (false === bFirstChange)
-											{
-												FirstChange  = Index;
-												bFirstChange = true;
-											}
-											this.Content[Index].Recalc_CompileParaPr();
-										}
-									}
-								}
 							}
 							else
 							{
-
 								// Если мы просто нажимаем добавить маркированный список, тогда мы пытаемся
 								// присоединить его к списку предыдушего параграфа (если у предыдущего параграфа
 								// есть список, и этот список маркированный)
@@ -13095,20 +13038,11 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 									this.Numbering.Get_AbstractNum(NumId).Create_Default_Bullet();
 								}
 
-
-								if (type_Paragraph === Item.GetType())
-								{
-									var OldNumPr = Item.Numbering_Get();
-									if (undefined != OldNumPr)
-										Item.Numbering_Add(NumId, OldNumPr.Lvl);
-									else
-										Item.Numbering_Add(NumId, NumLvl);
-								}
+								var OldNumPr = Item.Numbering_Get();
+								if (undefined != OldNumPr)
+									Item.Numbering_Add(NumId, OldNumPr.Lvl);
 								else
 									Item.Numbering_Add(NumId, NumLvl);
-
-								// Нам нужно пересчитать все изменения, начиная с предыдущего элемента
-								FirstChange = this.CurPos.ContentPos - 1;
 							}
 						}
 						else
@@ -13175,26 +13109,6 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							{
 								var AbstractNum = this.Numbering.Get_AbstractNum(NumPr.NumId);
 								AbstractNum.Set_Lvl_Bullet(NumPr.Lvl, LvlText, LvlTextPr);
-
-								// Добавлять нумерацию к параграфу не надо, т.к. она уже в
-								// нем записана
-
-								// Нам нужно пересчитать все изменения, начиная с первого
-								// элемента, использующего данную нумерацию
-								FirstChange      = 0;
-								var bFirstChange = false;
-								for (var Index = 0; Index < this.Content.length; Index++)
-								{
-									if (true === this.Content[Index].Numbering_IsUse(NumPr.NumId, NumPr.Lvl))
-									{
-										if (false === bFirstChange)
-										{
-											FirstChange  = Index;
-											bFirstChange = true;
-										}
-										this.Content[Index].Recalc_CompileParaPr();
-									}
-								}
 							}
 							else
 							{
@@ -13204,9 +13118,6 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								AbstractNum.Set_Lvl_Bullet(0, LvlText, LvlTextPr);
 
 								Item.Numbering_Add(NumId, 0);
-
-								// Нам нужно пересчитать все изменения, начиная с предыдущего элемента
-								FirstChange = this.CurPos.ContentPos - 1;
 							}
 						}
 
@@ -13223,26 +13134,6 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 								if (false === this.Numbering.Check_Format(NumPr.NumId, NumPr.Lvl, numbering_numfmt_Decimal))
 								{
 									AbstractNum.Create_Default_Numbered();
-
-									// Добавлять нумерацию к параграфу не надо, т.к. она уже в
-									// нем записана
-
-									// Нам нужно пересчитать все изменения, начиная с первого
-									// элемента, использующего данную нумерацию
-									FirstChange      = 0;
-									var bFirstChange = false;
-									for (var Index = 0; Index < this.Content.length; Index++)
-									{
-										if (true === this.Content[Index].Numbering_IsUse(NumPr.NumId, NumPr.Lvl))
-										{
-											if (false === bFirstChange)
-											{
-												FirstChange  = Index;
-												bFirstChange = true;
-											}
-											this.Content[Index].Recalc_CompileParaPr();
-										}
-									}
 								}
 							}
 							else
@@ -13291,20 +13182,11 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 									}
 								}
 
-
-								if (type_Paragraph === Item.GetType())
-								{
-									var OldNumPr = Item.Numbering_Get();
-									if (undefined != ( OldNumPr ))
-										Item.Numbering_Add(NumId, OldNumPr.Lvl);
-									else
-										Item.Numbering_Add(NumId, NumLvl);
-								}
+								var OldNumPr = Item.Numbering_Get();
+								if (undefined != ( OldNumPr ))
+									Item.Numbering_Add(NumId, OldNumPr.Lvl);
 								else
 									Item.Numbering_Add(NumId, NumLvl);
-
-								// Нам нужно пересчитать все изменения, начиная с предыдущего элемента
-								FirstChange = this.CurPos.ContentPos - 1;
 							}
 						}
 						else
@@ -13371,35 +13253,8 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 
 
-							if (null != NumPr)
-							{
-								// Добавлять нумерацию к параграфу не надо, т.к. она уже в
-								// нем записана.
-
-								// Нам нужно пересчитать все изменения, начиная с первого
-								// элемента, использующего данную нумерацию
-								FirstChange      = 0;
-								var bFirstChange = false;
-								for (var Index = 0; Index < this.Content.length; Index++)
-								{
-									if (true === this.Content[Index].Numbering_IsUse(NumPr.NumId, NumPr.Lvl))
-									{
-										if (false === bFirstChange)
-										{
-											FirstChange  = Index;
-											bFirstChange = true;
-										}
-										this.Content[Index].Recalc_CompileParaPr();
-									}
-								}
-							}
-							else
-							{
+							if (!NumPr)
 								Item.Numbering_Add(NumId, 0);
-
-								// Нам нужно пересчитать все изменения, начиная с предыдущего элемента
-								FirstChange = this.CurPos.ContentPos - 1;
-							}
 						}
 
 						break;
@@ -13444,35 +13299,8 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 							}
 						}
 
-						if (null != NumPr)
-						{
-							// Добавлять нумерацию к параграфу не надо, т.к. она уже в
-							// нем записана.
-
-							// Нам нужно пересчитать все изменения, начиная с первого
-							// элемента, использующего данную нумерацию
-							FirstChange      = 0;
-							var bFirstChange = false;
-							for (var Index = 0; Index < this.Content.length; Index++)
-							{
-								if (true === this.Content[Index].Numbering_IsUse(NumPr.NumId))
-								{
-									if (false === bFirstChange)
-									{
-										FirstChange  = Index;
-										bFirstChange = true;
-									}
-									this.Content[Index].Recalc_CompileParaPr();
-								}
-							}
-						}
-						else
-						{
+						if (!NumPr)
 							Item.Numbering_Add(NumId, 0);
-
-							// Нам нужно пересчитать все изменения, начиная с предыдущего элемента
-							FirstChange = this.CurPos.ContentPos - 1;
-						}
 
 						break;
 					}
@@ -13480,9 +13308,9 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 
 			}
 		}
-		else if (type_Table == Item.GetType())
+		else
 		{
-			Item.Set_ParagraphNumbering(NumInfo);
+			Item.SetParagraphNumbering(NumInfo);
 		}
 	}
 };

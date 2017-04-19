@@ -931,7 +931,7 @@ TextArtPreviewManager.prototype.getTAShape = function()
 		oContent.Set_ApplyToAll(true);
 		oContent.Paragraph_Add(new ParaTextPr({FontSize: 109, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
 		oContent.SetParagraphAlign(AscCommon.align_Center);
-		oContent.Set_ParagraphIndent({FirstLine: 0, Left: 0, Right: 0});
+		oContent.SetParagraphIndent({FirstLine: 0, Left: 0, Right: 0});
 		oContent.Set_ApplyToAll(false);
 		this.TAShape = oShape;
 	}

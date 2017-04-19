@@ -6789,7 +6789,7 @@ CTable.prototype.SetParagraphSpacing = function(Spacing)
 		return this.CurCell.Content.SetParagraphSpacing(Spacing);
 	}
 };
-CTable.prototype.Set_ParagraphIndent = function(Ind)
+CTable.prototype.SetParagraphIndent = function(Ind)
 {
 	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
 	{
@@ -6802,21 +6802,16 @@ CTable.prototype.Set_ParagraphIndent = function(Ind)
 
 			var Cell_Content = Cell.Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.Set_ParagraphIndent(Ind);
+			Cell.Content.SetParagraphIndent(Ind);
 			Cell_Content.Set_ApplyToAll(false);
-		}
-
-		if (Cells_array[0].Row - 1 >= 0)
-			this.Internal_RecalculateFrom(Cells_array[0].Row - 1, 0, true, true);
-		else
-		{
-			this.Internal_Recalculate_1();
 		}
 	}
 	else
-		return this.CurCell.Content.Set_ParagraphIndent(Ind);
+	{
+		return this.CurCell.Content.SetParagraphIndent(Ind);
+	}
 };
-CTable.prototype.Set_ParagraphNumbering = function(NumInfo)
+CTable.prototype.SetParagraphNumbering = function(NumInfo)
 {
 	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
 	{
@@ -6829,19 +6824,14 @@ CTable.prototype.Set_ParagraphNumbering = function(NumInfo)
 
 			var Cell_Content = Cell.Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.Set_ParagraphNumbering(NumInfo);
+			Cell.Content.SetParagraphNumbering(NumInfo);
 			Cell_Content.Set_ApplyToAll(false);
-		}
-
-		if (Cells_array[0].Row - 1 >= 0)
-			this.Internal_RecalculateFrom(Cells_array[0].Row - 1, 0, true, true);
-		else
-		{
-			this.Internal_Recalculate_1();
 		}
 	}
 	else
-		return this.CurCell.Content.Set_ParagraphNumbering(NumInfo);
+	{
+		return this.CurCell.Content.SetParagraphNumbering(NumInfo);
+	}
 };
 CTable.prototype.Set_ParagraphPresentationNumbering = function(NumInfo)
 {

@@ -153,11 +153,11 @@ CHdrFtrController.prototype.SetParagraphTabs = function(Tabs)
 };
 CHdrFtrController.prototype.SetParagraphIndent = function(Ind)
 {
-	this.HdrFtr.Set_ParagraphIndent(Ind);
+	this.HdrFtr.SetParagraphIndent(Ind);
 };
 CHdrFtrController.prototype.SetParagraphNumbering = function(NumInfo)
 {
-	this.HdrFtr.Set_ParagraphNumbering(NumInfo);
+	this.HdrFtr.SetParagraphNumbering(NumInfo);
 };
 CHdrFtrController.prototype.SetParagraphShd = function(Shd)
 {

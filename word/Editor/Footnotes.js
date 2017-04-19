@@ -2250,7 +2250,7 @@ CFootnotesController.prototype.SetParagraphIndent = function(Ind)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphIndent(Ind);
+		oFootnote.SetParagraphIndent(Ind);
 	}
 };
 CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
@@ -2258,7 +2258,7 @@ CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphNumbering(NumInfo);
+		oFootnote.SetParagraphNumbering(NumInfo);
 	}
 };
 CFootnotesController.prototype.SetParagraphShd = function(Shd)

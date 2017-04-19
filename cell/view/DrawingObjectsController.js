@@ -523,7 +523,7 @@ DrawingObjectsController.prototype.setParagraphIndent = function(Indent)
     {
         Indent.Left = 0;
     }
-    this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphIndent, [Indent], CTable.prototype.Set_ParagraphIndent);
+    this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphIndent, [Indent], CTable.prototype.SetParagraphIndent);
 };
 
 DrawingObjectsController.prototype.paragraphIncDecIndent = function(bIncrease)

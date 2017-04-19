@@ -5037,7 +5037,7 @@ PasteProcessor.prototype =
 							case "upper-alpha": num = numbering_numfmt_UpperLetter;break;
 						}
 					}
-					//����� ���� ����������� �� Document.Set_ParagraphNumbering
+					//����� ���� ����������� �� Document.SetParagraphNumbering
 					
 					//������� ����������� ��������, ���� ��� ������ ���������, �� ����� ��� ������ �� ����������� ���������
 					if(this.aContent.length > 1)
