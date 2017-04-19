@@ -2392,6 +2392,9 @@
 		this.aSparklineGroups = [];
 
 		this.selectionRange = new AscCommonExcel.SelectionRange(this);
+		this.pivotTable = null;
+		this.pivotTableCacheDefinition = null;
+		this.pivotTableCacheRecords = null;
 
 		/*handlers*/
 		this.handlers = null;

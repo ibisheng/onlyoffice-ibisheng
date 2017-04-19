@@ -654,7 +654,7 @@
 		numberingDefinitions: "http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering",
 		pivotTable: "http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotTable",
 		pivotTableCacheDefinition: "http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheDefinition",
-		pivotTableCacheRecords: "http://schemas.openxmlformats.org/officeDocument/2006/relationships/ pivotCacheRecords",
+		pivotTableCacheRecords: "http://schemas.openxmlformats.org/officeDocument/2006/relationships/pivotCacheRecords",
 		presentation: "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument",
 		presentationProperties: "http://schemas.openxmlformats.org/officeDocument/2006/relationships/presProps",
 		queryTable: "http://schemas.openxmlformats.org/officeDocument/2006/relationships/queryTable",

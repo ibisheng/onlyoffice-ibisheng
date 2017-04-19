@@ -948,6 +948,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.openDocument = function(sData) {
+    var t = this;
     if (true === sData) {
       // Empty Document
       sData = AscCommonExcel.getEmptyWorkbook() + "";
@@ -957,18 +958,81 @@ var editor;
         return;
       }
     }
+	this.wbModel = this._openDocument(sData);
+	this.openDocumentFromZip(this.wbModel).then(function() {
+		t.FontLoader.LoadDocumentFonts(t.wbModel.generateFontMap2());
 
-    this.wbModel = this._openDocument(sData);
-
-    this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
-
-    // Какая-то непонятная заглушка, чтобы не падало в ipad
-    if (this.isMobileVersion) {
-      AscCommon.AscBrowser.isSafariMacOs = false;
-      AscCommon.PasteElementsId.PASTE_ELEMENT_ID = "wrd_pastebin";
-      AscCommon.PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
-    }
+		// Какая-то непонятная заглушка, чтобы не падало в ipad
+		if (t.isMobileVersion) {
+			AscCommon.AscBrowser.isSafariMacOs = false;
+			AscCommon.PasteElementsId.PASTE_ELEMENT_ID = "wrd_pastebin";
+			AscCommon.PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
+		}
+	}).catch(function(err) {
+		alert(err)
+	});
   };
+	spreadsheet_api.prototype.openDocumentFromZip = function(wb) {
+		var t = this;
+		return new Promise(function(resolve, reject) {
+			console.time('all');
+			AscCommon.getJSZipUtils().getBinaryContent(t.documentUrl, function(err, data) {
+				if (err) {
+					reject(err); // or handle err
+				} else {
+					var doc = new openXml.OpenXmlPackage();
+					var context = {workbook: null, sharedString: null, sharedStringParsed: null, worksheets: null};
+					require('jszip').loadAsync(data).then(function(zip) {
+						return doc.openFromZip(zip);
+					}).then(function() {
+						var partWorkbook = doc.getPartByRelationshipType(openXml.relationshipTypes.workbook);
+						var partWorksheets = partWorkbook.getPartsByRelationshipType(
+							openXml.relationshipTypes.worksheet);
+						var wsIndex = 0;
+						return partWorksheets.reduce(function(p, partWorksheet) {
+							return p.then(function() {
+								var actions = [];
+								var partPivotTable = partWorksheet.getPartByRelationshipType(
+									openXml.relationshipTypes.pivotTable);
+								if (partPivotTable) {
+									actions.push(partPivotTable.getDocumentContent());
+									var partPivotTableCacheDefinition = partPivotTable.getPartByRelationshipType(
+										openXml.relationshipTypes.pivotTableCacheDefinition);
+									if (partPivotTableCacheDefinition) {
+										actions.push(partPivotTableCacheDefinition.getDocumentContent());
+										var partPivotTableCacheRecords = partPivotTableCacheDefinition.getPartByRelationshipType(
+											openXml.relationshipTypes.pivotTableCacheRecords);
+										if (partPivotTableCacheRecords) {
+											actions.push(partPivotTableCacheRecords.getDocumentContent());
+										}
+									}
+								}
+								return Promise.all(actions);
+							}).then(function(res) {
+								var ws = wb.getWorksheet(wsIndex);
+								if (res.length > 0 && ws) {
+									ws.pivotTable = new CT_pivotTableDefinition();
+									new openXml.SaxParserBase().parse(res[0], ws.pivotTable);
+									if (res.length > 1) {
+										ws.pivotTableCacheDefinition = new CT_PivotCacheDefinition();
+										new openXml.SaxParserBase().parse(res[1], ws.pivotTableCacheDefinition);
+										if (res.length > 2) {
+											ws.pivotTableCacheRecords = new CT_PivotCacheRecords();
+											new openXml.SaxParserBase().parse(res[2], ws.pivotTableCacheRecords);
+										}
+									}
+								}
+								wsIndex++;
+							});
+						}, Promise.resolve());
+					}).then(function() {
+						console.timeEnd('all');
+						resolve();
+					});
+				}
+			});
+		});
+	};
 
   // Соединились с сервером
   spreadsheet_api.prototype.asyncServerIdEndLoaded = function() {

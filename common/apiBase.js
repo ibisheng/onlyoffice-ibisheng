@@ -1025,6 +1025,9 @@
 	baseEditorsApi.prototype.openDocument  = function()
 	{
 	};
+	baseEditorsApi.prototype.openDocumentFromZip  = function()
+	{
+	};
 	baseEditorsApi.prototype.onEndLoadFile = function(result)
 	{
 		if (result)
