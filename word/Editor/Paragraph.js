@@ -9150,7 +9150,7 @@ Paragraph.prototype.Get_ParentTextInvertTransform = function()
 	}
 	return null;
 };
-Paragraph.prototype.Update_CursorType = function(X, Y, CurPage)
+Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
 	CurPage            = Math.max(0, Math.min(CurPage, this.Pages.length - 1));
 	var text_transform = this.Get_ParentTextTransform();

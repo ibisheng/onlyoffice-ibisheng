@@ -3095,7 +3095,7 @@ CTable.prototype.Get_CurrentPage_Relative = function()
 
 	return this.CurCell.Content.Get_CurrentPage_Absolute() - this.Get_StartPage_Absolute();
 };
-CTable.prototype.Update_CursorType = function(X, Y, CurPage)
+CTable.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
 	if (CurPage < 0 || CurPage >= this.Pages.length)
 		CurPage = 0;
@@ -3176,7 +3176,7 @@ CTable.prototype.Update_CursorType = function(X, Y, CurPage)
 
 	var Cell_Pos = this.Internal_GetCellByXY(X, Y, CurPage);
 	var Cell     = this.Content[Cell_Pos.Row].Get_Cell(Cell_Pos.Cell);
-	Cell.Content_Update_CursorType(X, Y, CurPage - Cell.Content.Get_StartPage_Relative());
+	Cell.Content_UpdateCursorType(X, Y, CurPage - Cell.Content.Get_StartPage_Relative());
 };
 CTable.prototype.Start_TrackTable = function()
 {

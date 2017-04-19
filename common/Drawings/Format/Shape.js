@@ -3758,7 +3758,7 @@ CShape.prototype.updateCursorType = function (x, y, e)
     {
         var tx = this.invertTransformText.TransformPointX(x, y);
         var ty = this.invertTransformText.TransformPointY(x, y);
-        this.txBody.content.Update_CursorType(tx, ty, 0);
+        this.txBody.content.UpdateCursorType(tx, ty, 0);
     }
 };
 

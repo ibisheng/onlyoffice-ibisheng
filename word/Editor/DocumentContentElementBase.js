@@ -167,7 +167,7 @@ CDocumentContentElementBase.prototype.IsTableBorder = function(X, Y, CurPage)
 {
 	return null;
 };
-CDocumentContentElementBase.prototype.Update_CursorType = function(X, Y, CurPage)
+CDocumentContentElementBase.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
 };
 CDocumentContentElementBase.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent, isTableBorder)

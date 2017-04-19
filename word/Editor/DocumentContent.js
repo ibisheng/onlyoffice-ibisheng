@@ -2106,22 +2106,22 @@ CDocumentContent.prototype.Get_ApplyToAll                = function()
 {
     return this.ApplyToAll;
 };
-CDocumentContent.prototype.Update_CursorType             = function(X, Y, CurPage)
+CDocumentContent.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
-    if (CurPage < 0 || CurPage >= this.Pages.length)
-        return this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
+	if (CurPage < 0 || CurPage >= this.Pages.length)
+		return this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
 
-    var bInText      = (null === this.IsInText(X, Y, CurPage) ? false : true);
-    var bTableBorder = (null === this.IsTableBorder(X, Y, CurPage) ? false : true);
+	var bInText      = (null === this.IsInText(X, Y, CurPage) ? false : true);
+	var bTableBorder = (null === this.IsTableBorder(X, Y, CurPage) ? false : true);
 
-    // Ничего не делаем
-    if (this.Parent instanceof CHeaderFooter && true === this.LogicDocument.DrawingObjects.updateCursorType(this.Get_AbsolutePage(CurPage), X, Y, {}, ( true === bInText || true === bTableBorder ? true : false )))
-        return;
+	// Ничего не делаем
+	if (this.Parent instanceof CHeaderFooter && true === this.LogicDocument.DrawingObjects.updateCursorType(this.Get_AbsolutePage(CurPage), X, Y, {}, ( true === bInText || true === bTableBorder ? true : false )))
+		return;
 
-    var ContentPos       = this.Internal_GetContentPosByXY(X, Y, CurPage);
-    var Item             = this.Content[ContentPos];
-    var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
-    Item.Update_CursorType(X, Y, ElementPageIndex);
+	var ContentPos       = this.Internal_GetContentPosByXY(X, Y, CurPage);
+	var Item             = this.Content[ContentPos];
+	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
+	Item.UpdateCursorType(X, Y, ElementPageIndex);
 };
 //-----------------------------------------------------------------------------------
 // Функции для работы с контентом

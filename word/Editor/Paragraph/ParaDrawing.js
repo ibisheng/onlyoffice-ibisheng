@@ -1476,7 +1476,7 @@ ParaDrawing.prototype.Add_ToDocument2 = function(Paragraph)
 
 	Paragraph.Add_ToContent(0, DrawingRun);
 };
-ParaDrawing.prototype.Update_CursorType = function(X, Y, PageIndex)
+ParaDrawing.prototype.UpdateCursorType = function(X, Y, PageIndex)
 {
 	this.DrawingDocument.SetCursorType("move", new AscCommon.CMouseMoveData());
 

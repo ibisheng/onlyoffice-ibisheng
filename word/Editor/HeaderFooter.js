@@ -536,12 +536,12 @@ CHeaderFooter.prototype =
         this.Content.Get_SelectedContent( SelectedContent );
     },
 
-    Update_CursorType : function(X, Y, PageAbs)
+	UpdateCursorType : function(X, Y, PageAbs)
     {
         if (PageAbs != this.Content.Get_StartPage_Absolute())
             this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
         else
-            return this.Content.Update_CursorType(X, Y, 0);
+            return this.Content.UpdateCursorType(X, Y, 0);
     },
 
 	IsTableBorder : function(X, Y, PageAbs)
@@ -1675,7 +1675,7 @@ CHeaderFooterController.prototype =
         return { Top : Top, Bottom : Bottom };
     },
 
-    Update_CursorType : function( X, Y, PageNum_Abs )
+	UpdateCursorType : function( X, Y, PageNum_Abs )
     {
         if ( true === this.Lock.Is_Locked() )
         {
@@ -1711,10 +1711,10 @@ CHeaderFooterController.prototype =
                 var NewPos = this.DrawingDocument.ConvertCoordsToAnotherPage(X, Y, PageNum_Abs, this.CurPage);
                 var _X = NewPos.X;
                 var _Y = NewPos.Y;
-                return this.CurHdrFtr.Update_CursorType( _X, _Y, this.CurPage );
+                return this.CurHdrFtr.UpdateCursorType( _X, _Y, this.CurPage );
             }
             else
-                return this.CurHdrFtr.Update_CursorType( X, Y, PageNum_Abs );
+                return this.CurHdrFtr.UpdateCursorType( X, Y, PageNum_Abs );
         }
     },
 

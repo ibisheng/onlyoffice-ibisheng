@@ -783,7 +783,7 @@ CTableCell.prototype =
         this.Content.MoveCursorToXY(_X, _Y, bLine, bDontChangeRealPos, CurPage);
     },
 
-    Content_Update_CursorType : function(X, Y, CurPage)
+    Content_UpdateCursorType : function(X, Y, CurPage)
     {
         var _X = X, _Y = Y;
         var Transform = this.private_GetTextDirectionTransform();
@@ -794,7 +794,7 @@ CTableCell.prototype =
             _Y = Transform.TransformPointY(X, Y);
         }
 
-        this.Content.Update_CursorType(_X, _Y, CurPage);
+        this.Content.UpdateCursorType(_X, _Y, CurPage);
     },
 
 	Content_DrawSelectionOnPage : function(CurPage)

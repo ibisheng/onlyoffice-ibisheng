@@ -2352,7 +2352,7 @@ CPresentation.prototype =
     },
 
 
-    Update_CursorType : function( X, Y, MouseEvent ){
+	UpdateCursorType : function( X, Y, MouseEvent ){
         if(this.Slides[this.CurPage]){
             var graphicObjectInfo = this.Slides[this.CurPage].graphicObjects.isPointInDrawingObjects(X, Y, MouseEvent);
             if(graphicObjectInfo){
@@ -2485,7 +2485,7 @@ CPresentation.prototype =
                         oDrawingObjects.updateOverlay();
                     }
                     editor.sync_EndAddShape();
-                    this.Update_CursorType( 0, 0,  new AscCommon.CMouseEventHandler() );
+                    this.UpdateCursorType( 0, 0,  new AscCommon.CMouseEventHandler() );
                     return;
                 }
                 var oTargetTextObject = AscFormat.getTargetTextObject(oDrawingObjects);
@@ -3221,7 +3221,7 @@ CPresentation.prototype =
         editor.sync_MouseMoveStartCallback();
         this.CurPage = PageIndex;
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.onMouseMove(e, X, Y);
-        this.Update_CursorType(X, Y,  e );
+        this.UpdateCursorType(X, Y,  e );
         editor.sync_MouseMoveEndCallback();
     },
 

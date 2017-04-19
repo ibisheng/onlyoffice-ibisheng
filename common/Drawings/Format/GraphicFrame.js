@@ -374,7 +374,7 @@ CGraphicFrame.prototype.updateCursorType= function(x, y, e)
     {
         var tx = this.invertTransform.TransformPointX(x, y);
         var ty = this.invertTransform.TransformPointY(x, y);
-        this.graphicObject.Update_CursorType(tx, ty, 0)
+        this.graphicObject.UpdateCursorType(tx, ty, 0)
 };
 
 CGraphicFrame.prototype.getIsSingleBody = CShape.prototype.getIsSingleBody;

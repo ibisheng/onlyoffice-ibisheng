@@ -125,7 +125,7 @@ CFlowTable.prototype =
         return false;
     },
 
-    Update_CursorType : function(X, Y, PageIndex)
+	UpdateCursorType : function(X, Y, PageIndex)
     {
 
     },
@@ -254,7 +254,7 @@ CFlowParagraph.prototype =
         return false;
     },
 
-    Update_CursorType : function(X, Y, PageIndex)
+	UpdateCursorType : function(X, Y, PageIndex)
     {
 
     },

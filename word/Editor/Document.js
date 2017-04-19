@@ -5913,7 +5913,7 @@ CDocument.prototype.Remove_NumberingSelection = function()
 	if (true === this.Selection.Use && selectionflag_Numbering == this.Selection.Flag)
 		this.RemoveSelection();
 };
-CDocument.prototype.Update_CursorType = function(X, Y, PageAbs, MouseEvent)
+CDocument.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
 {
 	if (null !== this.FullRecalc.Id && this.FullRecalc.PageIndex <= PageAbs)
 		return;
@@ -6220,18 +6220,18 @@ CDocument.prototype.OnKeyDown = function(e)
         else if (true === editor.isMarkerFormat)
         {
             editor.sync_MarkerFormatCallback(false);
-            this.Update_CursorType(this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new AscCommon.CMouseEventHandler());
+            this.UpdateCursorType(this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new AscCommon.CMouseEventHandler());
         }
         else if (c_oAscFormatPainterState.kOff !== editor.isPaintFormat)
         {
             editor.sync_PaintFormatCallback(c_oAscFormatPainterState.kOff);
-            this.Update_CursorType(this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new AscCommon.CMouseEventHandler());
+            this.UpdateCursorType(this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new AscCommon.CMouseEventHandler());
         }
         else if (editor.isStartAddShape)
         {
             editor.sync_StartAddShapeCallback(false);
             editor.sync_EndAddShape();
-            this.Update_CursorType(this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new AscCommon.CMouseEventHandler());
+            this.UpdateCursorType(this.CurPos.RealX, this.CurPos.RealY, this.CurPage, new AscCommon.CMouseEventHandler());
         }
         else if (docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ))
         {
@@ -7287,7 +7287,7 @@ CDocument.prototype.OnMouseMove = function(e, X, Y, PageIndex)
 	if (true === this.Selection.Start)
 		this.private_UpdateTargetForCollaboration();
 
-	this.Update_CursorType(X, Y, PageIndex, e);
+	this.UpdateCursorType(X, Y, PageIndex, e);
 	this.CollaborativeEditing.Check_ForeignCursorsLabels(X, Y, PageIndex);
 
 	if (1 === this.Selection.DragDrop.Flag)
@@ -14197,7 +14197,9 @@ CDocument.prototype.controller_GetSelectionBounds = function()
 };
 CDocument.prototype.controller_IsMovingTableBorder = function()
 {
-	if (null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType())
+	//console.log((null != this.Selection.Data && true === this.Selection.Data.TableBorder));
+
+	if (null != this.Selection.Data && true === this.Selection.Data.TableBorder)// && type_Table == this.Content[this.Selection.Data.Pos].GetType())
 		return true;
 
 	return false;
@@ -14313,7 +14315,7 @@ CDocument.prototype.controller_UpdateCursorType = function(X, Y, PageAbs, MouseE
 	var ContentPos       = this.Internal_GetContentPosByXY(X, Y, PageAbs);
 	var Item             = this.Content[ContentPos];
 	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageAbs);
-	Item.Update_CursorType(X, Y, ElementPageIndex);
+	Item.UpdateCursorType(X, Y, ElementPageIndex);
 };
 CDocument.prototype.controller_PasteFormatting = function(TextPr, ParaPr)
 {

@@ -3633,13 +3633,13 @@ function CEditorPage(api)
 	};
 	this.onTimerScroll2          = function(is_no_timer)
 	{
-		// try
-		// {
+		try
+		{
 			oThis.onTimerScroll2_internal(is_no_timer);
-		// }
-		// catch (err)
-		// {
-		// }
+		}
+		catch (err)
+		{
+		}
 
 		if (true !== is_no_timer)
 			this.m_nPaintTimerId = setTimeout(oThis.onTimerScroll2, oThis.m_nTimerScrollInterval);

@@ -2600,7 +2600,7 @@ CFootnotesController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseE
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		oFootnote.Update_CursorType(X, Y, oResult.FootnotePageIndex, MouseEvent);
+		oFootnote.UpdateCursorType(X, Y, oResult.FootnotePageIndex, MouseEvent);
 	}
 };
 CFootnotesController.prototype.PasteFormatting = function(TextPr, ParaPr)

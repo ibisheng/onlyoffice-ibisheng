@@ -1148,7 +1148,7 @@ DrawingObjectsController.prototype =
                     {
                         nPageIndex = this.drawingObjects.num;
                     }
-                    content.Update_CursorType(tx, ty, 0);
+                    content.UpdateCursorType(tx, ty, 0);
                     ret.updated = true;
                 }
                 else if(this.drawingObjects)

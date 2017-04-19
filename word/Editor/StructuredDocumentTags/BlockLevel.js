@@ -153,9 +153,9 @@ CBlockLevelSdt.prototype.IsTableBorder = function(X, Y, CurPage)
 {
 	return this.Content.IsTableBorder(X, Y, CurPage);
 };
-CBlockLevelSdt.prototype.Update_CursorType = function(X, Y, CurPage)
+CBlockLevelSdt.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
-	return this.Content.Update_CursorType(X, Y, CurPage);
+	return this.Content.UpdateCursorType(X, Y, CurPage);
 };
 CBlockLevelSdt.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent, isTableBorder)
 {
