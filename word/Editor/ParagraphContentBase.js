@@ -2137,10 +2137,6 @@ CParagraphContentWithParagraphLikeContent.prototype.SetContentPosition = functio
     else
         this.Content[Pos].MoveCursorToStartPos();
 };
-CParagraphContentWithParagraphLikeContent.prototype.Selection_IsUse = function()
-{
-    return this.State.Selection.Use;
-};
 CParagraphContentWithParagraphLikeContent.prototype.RemoveSelection = function()
 {
     var Selection = this.Selection;
@@ -2304,7 +2300,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_CorrectLeftPos = f
 
     return true;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Is_SelectionUse = function()
+CParagraphContentWithParagraphLikeContent.prototype.IsSelectionUse = function()
 {
     return this.State.Selection.Use;
 };

@@ -2857,7 +2857,7 @@
     return canvas.toDataURL("image/png");
   };
 
-	WorkbookView.prototype.Is_SelectionUse = function () {
+	WorkbookView.prototype.IsSelectionUse = function () {
         return !this.getWorksheet().getSelectionShape();
     };
 	WorkbookView.prototype.GetSelectionRectsBounds = function () {

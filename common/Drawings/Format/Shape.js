@@ -3821,7 +3821,7 @@ CShape.prototype.updateSelectionState = function ()
                 oMatrix = this.transformText.CreateDublicate();
             }
             drawing_document.UpdateTargetTransform(oMatrix);
-            if ( true === content.Is_SelectionUse() )
+            if ( true === content.IsSelectionUse() )
             {
                 // Выделение нумерации
                 if ( selectionflag_Numbering == content.Selection.Flag )

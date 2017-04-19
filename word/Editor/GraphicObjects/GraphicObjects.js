@@ -289,7 +289,7 @@ CGraphicObjects.prototype =
 
     removeTextSelection: function(){
         var oTargetDocContent = this.getTargetDocContent();
-        if(oTargetDocContent && oTargetDocContent.Is_SelectionUse()){
+        if(oTargetDocContent && oTargetDocContent.IsSelectionUse()){
             oTargetDocContent.RemoveSelection();
         }
     },
@@ -2085,7 +2085,7 @@ CGraphicObjects.prototype =
     paragraphFormatPaste: function( CopyTextPr, CopyParaPr, Bool )
     {
         var content = this.getTargetDocContent();
-        content && content.Paragraph_Format_Paste(CopyTextPr, CopyParaPr, Bool );
+        content && content.PasteFormatting(CopyTextPr, CopyParaPr, Bool );
     },
 
     getHdrFtrObjectsByPageIndex: function(pageIndex)

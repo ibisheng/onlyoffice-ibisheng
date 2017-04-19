@@ -266,7 +266,7 @@
 	{
 		var _mode = AscCommon.MobileTouchContextMenuType.None;
 
-		if (!this.LogicDocument.Is_SelectionUse())
+		if (!this.LogicDocument.IsSelectionUse())
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
 		if (this.LogicDocument.GetSelectionBounds())
@@ -286,7 +286,7 @@
 		var _x = 0;
 		var _y = 0;
 
-		var _target = this.LogicDocument.Is_SelectionUse();
+		var _target = this.LogicDocument.IsSelectionUse();
 		if (_target === false)
 		{
 			/*
@@ -372,7 +372,7 @@
 
 		var _mode = 0;
 
-		var _target = this.LogicDocument.Is_SelectionUse();
+		var _target = this.LogicDocument.IsSelectionUse();
 		if (_target === false)
 		{
 			_posX = this.DrawingDocument.m_dTargetX;

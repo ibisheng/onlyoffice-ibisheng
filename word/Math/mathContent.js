@@ -4999,7 +4999,7 @@ CMathContent.prototype.Can_ModifyForcedBreak = function(Pr)
     {
         var bBreakOperator      = this.Content[Pos].Check_ForcedBreak();
         var CurrentRun          = this.Content[Pos];
-        var bCanCheckNearsRun   = bBreakOperator == false && false == CurrentRun.Is_SelectionUse();
+        var bCanCheckNearsRun   = bBreakOperator == false && false == CurrentRun.IsSelectionUse();
         var bPrevItem           = bCanCheckNearsRun && Pos > 0 && true == CurrentRun.Cursor_Is_Start(),
             bNextItem           = bCanCheckNearsRun && Pos < this.Content.length - 1 && true == CurrentRun.Cursor_Is_End();
 

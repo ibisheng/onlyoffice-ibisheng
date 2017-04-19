@@ -154,7 +154,7 @@ CDocumentSearch.prototype =
                 if (true === bRestorePos)
                 {
                     // Сохраняем позицию состояние параграфа, чтобы курсор остался в том же месте и после замены.
-                    bSelection = Para.Is_SelectionUse();
+                    bSelection = Para.IsSelectionUse();
                     ContentPos = Para.Get_ParaContentPos(false, false);
                     StartPos   = Para.Get_ParaContentPos(true, true);
                     EndPos     = Para.Get_ParaContentPos(true, false);

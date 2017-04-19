@@ -189,10 +189,6 @@ CDocumentContentElementBase.prototype.Document_UpdateRulersState = function(CurP
 };
 CDocumentContentElementBase.prototype.IsSelectionUse = function()
 {
-	return this.Is_SelectionUse();
-};
-CDocumentContentElementBase.prototype.Is_SelectionUse = function()
-{
 	return false;
 };
 CDocumentContentElementBase.prototype.IsSelectionToEnd = function()
@@ -501,6 +497,9 @@ CDocumentContentElementBase.prototype.SetTableProps = function(oProps)
 {
 };
 CDocumentContentElementBase.prototype.GetSelectedContent = function(oSelectedContent)
+{
+};
+CDocumentContentElementBase.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
 {
 };
 //----------------------------------------------------------------------------------------------------------------------

@@ -140,7 +140,7 @@
 		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
 		var _elementsCount = _controller.selectedObjects.length;
 
-		if (!_controller.Is_SelectionUse() && _elementsCount > 0)
+		if (!_controller.IsSelectionUse() && _elementsCount > 0)
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
 		if (_controller.GetSelectionBounds())
@@ -165,7 +165,7 @@
 
 		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
 
-		var _target = _controller.Is_SelectionUse();
+		var _target = _controller.IsSelectionUse();
 		if (_target === false)
 		{
 			/*
@@ -256,7 +256,7 @@
 
 		var _mode = 0;
 
-		var _target = _controller.Is_SelectionUse();
+		var _target = _controller.IsSelectionUse();
 		if (_target === false)
 		{
 			_posX = this.DrawingDocument.m_dTargetX;

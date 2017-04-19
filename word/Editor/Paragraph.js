@@ -2562,7 +2562,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 			}
 		}
 
-		if (true !== this.Content[this.CurPos.ContentPos].Selection_IsUse())
+		if (true !== this.Content[this.CurPos.ContentPos].IsSelectionUse())
 		{
 			this.RemoveSelection();
 
@@ -2610,7 +2610,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 			Result = false;
 		else
 		{
-			if (true === this.Content[ContentPos].Selection_IsUse())
+			if (true === this.Content[ContentPos].IsSelectionUse())
 			{
 				this.Selection.Use      = true;
 				this.Selection.Start    = false;
@@ -3117,7 +3117,7 @@ Paragraph.prototype.Add_Tab = function(bShift)
 	{
 		this.Shift_NumberingLvl(bShift);
 	}
-	else if (true === this.Is_SelectionUse())
+	else if (true === this.IsSelectionUse())
 	{
 		this.IncreaseDecreaseIndent(!bShift);
 	}
@@ -5188,7 +5188,7 @@ Paragraph.prototype.Get_CurPosXY = function()
 
 	return {X : this.CurPos.RealX, Y : this.CurPos.RealY};
 };
-Paragraph.prototype.Is_SelectionUse = function()
+Paragraph.prototype.IsSelectionUse = function()
 {
 	return this.Selection.Use;
 };
@@ -7133,7 +7133,7 @@ Paragraph.prototype.Numbering_Add = function(NumId, Lvl)
 	var ParaPr    = this.Get_CompiledPr2(false).ParaPr;
 	var NumPr_old = this.Numbering_Get();
 
-	var SelectionUse       = this.Is_SelectionUse();
+	var SelectionUse       = this.IsSelectionUse();
 	var SelectedOneElement = (this.Parent.GetSelectDirection() === 0 ? true : false );
 
 	// Когда выделено больше 1 параграфа, нумерация не добавляется к пустым параграфам.
@@ -8055,7 +8055,7 @@ Paragraph.prototype.GetDirectParaPr = function()
 {
 	return this.Pr.Copy();
 };
-Paragraph.prototype.Paragraph_Format_Paste = function(TextPr, ParaPr, ApplyPara)
+Paragraph.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
 {
 	// Применяем текстовые настройки всегда
 	if (null != TextPr)
@@ -8276,7 +8276,7 @@ Paragraph.prototype.IsCursorAtBegin = function(_ContentPos, bCheckAnchors)
  */
 Paragraph.prototype.Selection_IsFromStart = function(bCheckAnchors)
 {
-	if (true === this.Is_SelectionUse())
+	if (true === this.IsSelectionUse())
 	{
 		var StartPos = this.Get_ParaContentPos(true, true);
 		var EndPos   = this.Get_ParaContentPos(true, false);

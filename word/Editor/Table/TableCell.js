@@ -556,7 +556,7 @@ CTableCell.prototype =
         // Делаем данную ячейку текущей в таблице
         Table.Selection.Start = false;
         Table.Selection.Type  = table_Selection_Text;
-        Table.Selection.Use   = this.Content.Is_SelectionUse();
+        Table.Selection.Use   = this.Content.IsSelectionUse();
 
         Table.Selection.StartPos.Pos = { Row : this.Row.Index, Cell : this.Index };
         Table.Selection.EndPos.Pos   = { Row : this.Row.Index, Cell : this.Index };

@@ -4303,7 +4303,7 @@ function DrawingObjects() {
         if (!oPara) {
             return false;
         }
-        if (true === oContent.Is_SelectionUse())
+        if (true === oContent.IsSelectionUse())
             oContent.Remove(1, true, false, true);
         var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
         if (!oRun || !(oRun instanceof ParaRun)) {

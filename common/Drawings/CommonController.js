@@ -1220,7 +1220,7 @@ DrawingObjectsController.prototype =
     },
 
 
-    Is_SelectionUse: function(){
+	IsSelectionUse: function(){
         var content = this.getTargetDocContent();
         if(content)
         {
@@ -1813,7 +1813,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr || docContentFunction === CDocumentContent.prototype.Paragraph_Format_Paste)
+            if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr || docContentFunction === CDocumentContent.prototype.PasteFormatting)
             {
                 this.applyDocContentFunction(docContentFunction, args, tableFunction);
             }
@@ -2190,7 +2190,7 @@ DrawingObjectsController.prototype =
         {
             if(!this.document)
             {
-                if ( null != HyperProps.Text && "" != HyperProps.Text && true === content.Is_SelectionUse() )
+                if ( null != HyperProps.Text && "" != HyperProps.Text && true === content.IsSelectionUse() )
                 {
                     this.removeCallback(-1, undefined, undefined, true);
                     bCheckExtents = true;

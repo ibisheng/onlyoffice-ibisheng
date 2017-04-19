@@ -2049,7 +2049,7 @@ CDrawingDocument.prototype =
         this.SelectRect1 = null;
         this.SelectRect2 = null;
 
-        var _target = this.LogicDocument.Is_SelectionUse();
+        var _target = this.LogicDocument.IsSelectionUse();
         if (_target === false)
         {
             _ret[0] = 1;

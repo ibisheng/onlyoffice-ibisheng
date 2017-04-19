@@ -972,7 +972,7 @@ CFootnotesController.prototype.Set_CurrentElement = function(bUpdateStates, Page
 {
 	if (oFootnote instanceof CFootEndnote)
 	{
-		if (oFootnote.Is_SelectionUse())
+		if (oFootnote.IsSelectionUse())
 		{
 			this.CurFootnote              = oFootnote;
 			this.Selection.Use            = true;
@@ -2607,7 +2607,7 @@ CFootnotesController.prototype.PasteFormatting = function(TextPr, ParaPr)
 {
 	for (var sId in this.Selection.Footnotes)
 	{
-		this.Selection.Footnotes[sId].Paragraph_Format_Paste(TextPr, ParaPr, true);
+		this.Selection.Footnotes[sId].PasteFormatting(TextPr, ParaPr, true);
 	}
 };
 CFootnotesController.prototype.IsSelectionUse = function()
@@ -2724,7 +2724,7 @@ CFootnotesController.prototype.SelectTable = function(Type)
 	this.RemoveSelection();
 
 	this.CurFootnote.Table_Select(Type);
-	if (true === this.CurFootnote.Is_SelectionUse())
+	if (true === this.CurFootnote.IsSelectionUse())
 	{
 		this.Selection.Use            = true;
 		this.Selection.Start.Footnote = this.CurFootnote;

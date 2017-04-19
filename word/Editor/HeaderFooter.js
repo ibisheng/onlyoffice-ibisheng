@@ -493,10 +493,10 @@ CHeaderFooter.prototype =
         return false;
     },
 
-    Is_SelectionUse : function()
-    {
-        return this.Content.Is_SelectionUse();
-    },
+	IsSelectionUse : function()
+	{
+		return this.Content.IsSelectionUse();
+	},
 
     Is_TextSelectionUse : function()
     {
@@ -608,7 +608,7 @@ CHeaderFooter.prototype =
         {
             // Если у нас есть выделение, тогда убираем курсор и рисуем выделение.
             // Если никакого выделения нет, тогда убираем его и восстанавливаем курсор.
-            if ( true === this.Content.Is_SelectionUse() )
+            if ( true === this.Content.IsSelectionUse() )
             {
                 // Выделение нумерации
                 if ( selectionflag_Numbering == this.Content.Selection.Flag )
@@ -700,10 +700,10 @@ CHeaderFooter.prototype =
         this.Content.ClearParagraphFormatting();
     },
 
-    Paragraph_Format_Paste : function(TextPr, ParaPr, ApplyPara)
-    {
-        this.Content.Paragraph_Format_Paste( TextPr, ParaPr, ApplyPara );
-    },
+	PasteFormatting : function(TextPr, ParaPr, ApplyPara)
+	{
+		this.Content.PasteFormatting(TextPr, ParaPr, ApplyPara);
+	},
 
     Remove : function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {
@@ -1762,13 +1762,13 @@ CHeaderFooterController.prototype =
             this.CurHdrFtr.Document_UpdateSelectionState();
     },
 
-    Is_SelectionUse : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Is_SelectionUse();
+	IsSelectionUse : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.IsSelectionUse();
 
-        return false;
-    },
+		return false;
+	},
 
     Is_TextSelectionUse : function()
     {
@@ -1879,11 +1879,11 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.ClearParagraphFormatting();
     },
 
-    Paragraph_Format_Paste : function(TextPr, ParaPr, ApplyPara)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Paragraph_Format_Paste( TextPr, ParaPr, ApplyPara );
-    },
+	PasteFormatting : function(TextPr, ParaPr, ApplyPara)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.PasteFormatting(TextPr, ParaPr, ApplyPara);
+	},
 
     Remove : function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
     {

@@ -265,11 +265,11 @@ CHdrFtrController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEven
 };
 CHdrFtrController.prototype.PasteFormatting = function(TextPr, ParaPr)
 {
-	this.HdrFtr.Paragraph_Format_Paste(TextPr, ParaPr, false);
+	this.HdrFtr.PasteFormatting(TextPr, ParaPr, false);
 };
 CHdrFtrController.prototype.IsSelectionUse = function()
 {
-	return this.HdrFtr.Is_SelectionUse();
+	return this.HdrFtr.IsSelectionUse();
 };
 CHdrFtrController.prototype.IsTextSelectionUse = function()
 {

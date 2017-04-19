@@ -1655,7 +1655,7 @@ ParaMath.prototype.Get_SelectedElementsInfo = function(Info)
 
 ParaMath.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
 {
-    if ( true === bAll || true === this.Selection_IsUse() )
+    if ( true === bAll || true === this.IsSelectionUse() )
     {
         if ( true === bClearText )
             return null;
@@ -2973,7 +2973,7 @@ ParaMath.prototype.Set_SelectionContentPos = function(StartContentPos, EndConten
     this.bSelectionUse = true;
 };
 
-ParaMath.prototype.Selection_IsUse = function()
+ParaMath.prototype.IsSelectionUse = function()
 {
     return this.bSelectionUse;
 };

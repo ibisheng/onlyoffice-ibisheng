@@ -177,9 +177,9 @@ CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)
 {
 	this.Content.Document_UpdateRulersState(CurPage);
 };
-CBlockLevelSdt.prototype.Is_SelectionUse = function()
+CBlockLevelSdt.prototype.IsSelectionUse = function()
 {
-	return this.Content.Is_SelectionUse();
+	return this.Content.IsSelectionUse();
 };
 CBlockLevelSdt.prototype.IsSelectionToEnd = function()
 {
@@ -480,6 +480,10 @@ CBlockLevelSdt.prototype.SetTableProps = function(oProps)
 CBlockLevelSdt.prototype.GetSelectedContent = function(oSelectedContent)
 {
 	return this.Content.GetSelectedContent(oSelectedContent);
+};
+CBlockLevelSdt.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
+{
+	return this.Content.PasteFormatting(TextPr, ParaPr, ApplyPara);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)

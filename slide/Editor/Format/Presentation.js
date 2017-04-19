@@ -569,7 +569,7 @@ CPresentation.prototype =
                 this.History.Remove_LastPoint();
                 return false;
             }
-            if (true === oContent.Is_SelectionUse())
+            if (true === oContent.IsSelectionUse())
                 oContent.Remove(1, true, false, true);
             var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
             if (!oRun || !(oRun instanceof ParaRun))
@@ -854,7 +854,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage]){
             var oTargetDocContent = this.Slides[this.CurPage].graphicObjects.getTargetDocContent(undefined, true);
             if(oTargetDocContent){
-                var DocPos = oTargetDocContent.GetContentPosition(oTargetDocContent.Is_SelectionUse(), false);
+                var DocPos = oTargetDocContent.GetContentPosition(oTargetDocContent.IsSelectionUse(), false);
                 if (!DocPos || DocPos.length <= 0)
                     return null;
 
@@ -5248,7 +5248,7 @@ CPresentation.prototype =
 
         if (oTargetContent)
         {
-            if (true === oTargetContent.Is_SelectionUse() && true !== oTargetContent.IsSelectionEmpty(true))
+            if (true === oTargetContent.IsSelectionUse() && true !== oTargetContent.IsSelectionEmpty(true))
             {
                  if (oTargetContent.Selection.StartPos !== oTargetContent.Selection.EndPos || type_Paragraph === oTargetContent.Content[oTargetContent.Selection.StartPos].Get_Type())
                     return true;

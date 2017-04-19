@@ -1617,7 +1617,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 
     // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
     var UpdateParent    = (undefined !== Parent && undefined !== ParentPos && this === Parent.Content[ParentPos] ? true : false);
-    var UpdateSelection = (true === UpdateParent && true === Parent.Is_SelectionUse() && true === this.Is_SelectionUse() ? true : false);
+    var UpdateSelection = (true === UpdateParent && true === Parent.IsSelectionUse() && true === this.IsSelectionUse() ? true : false);
 
     // Создаем новый ран
     var bMathRun = this.Type == para_Math_Run;
@@ -5770,12 +5770,7 @@ ParaRun.prototype.Set_SelectionAtStartPos = function()
     this.Set_SelectionContentPos(null, null, 0, 1, 1);
 };
 
-ParaRun.prototype.Selection_IsUse = function()
-{
-    return this.State.Selection.Use;
-};
-
-ParaRun.prototype.Is_SelectionUse = function()
+ParaRun.prototype.IsSelectionUse = function()
 {
     return this.State.Selection.Use;
 };

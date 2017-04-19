@@ -333,7 +333,7 @@ CGraphicFrame.prototype.paragraphFormatPaste= function(CopyTextPr, CopyParaPr, B
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Paragraph_Format_Paste(CopyTextPr, CopyParaPr, Bool);
+            this.graphicObject.PasteFormatting(CopyTextPr, CopyParaPr, Bool);
 
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -738,7 +738,7 @@ CGraphicFrame.prototype.updateSelectionState = function()
         {
             var drawingDocument = this.parent.presentation.DrawingDocument;
             var Doc = this.graphicObject;
-            if ( true === Doc.Is_SelectionUse() && !Doc.IsSelectionEmpty()) {
+            if ( true === Doc.IsSelectionUse() && !Doc.IsSelectionEmpty()) {
                 drawingDocument.UpdateTargetTransform(this.transform);
                 drawingDocument.TargetEnd();
                 drawingDocument.SelectEnabled(true);

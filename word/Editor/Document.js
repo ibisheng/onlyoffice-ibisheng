@@ -1624,7 +1624,7 @@ CDocument.prototype.Set_CurrentElement = function(Index, bUpdateStates)
 	this.CurPos.ContentPos = Math.max(0, Math.min(this.Content.length - 1, Index));
 
 	this.Reset_WordSelection();
-	if (true === this.Content[ContentPos].Is_SelectionUse())
+	if (true === this.Content[ContentPos].IsSelectionUse())
 	{
 		this.Selection.Flag     = selectionflag_Common;
 		this.Selection.Use      = true;
@@ -7066,7 +7066,7 @@ CDocument.prototype.OnMouseDown = function(e, X, Y, PageIndex)
 			( (docpostype_DrawingObjects !== this.CurPos.Type && !(docpostype_HdrFtr === this.CurPos.Type && this.HdrFtr.CurHdrFtr && this.HdrFtr.CurHdrFtr.Content.CurPos.Type === docpostype_DrawingObjects))
 			|| true === this.DrawingObjects.checkTextObject(X, Y, PageIndex) ))
 		{
-			if (true === this.Is_SelectionUse())
+			if (true === this.IsSelectionUse())
 				this.Selection.Start = false;
 			else
 				this.StartSelectionFromCurPos();
@@ -7859,7 +7859,7 @@ CDocument.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 
 	return false;
 };
-CDocument.prototype.Is_SelectionUse = function()
+CDocument.prototype.IsSelectionUse = function()
 {
 	return this.Controller.IsSelectionUse();
 };
@@ -8106,7 +8106,7 @@ CDocument.prototype.Document_UpdateSelectionState = function()
 };
 CDocument.prototype.Document_UpdateTracks = function()
 {
-	this.private_UpdateTracks(this.Is_SelectionUse(), this.IsSelectionEmpty());
+	this.private_UpdateTracks(this.IsSelectionUse(), this.IsSelectionEmpty());
 };
 CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
 {
@@ -8312,7 +8312,7 @@ CDocument.prototype.Can_CopyCut = function()
 
 	if (null !== LogicDocument)
 	{
-		if (true === LogicDocument.Is_SelectionUse() && true !== LogicDocument.IsSelectionEmpty(true))
+		if (true === LogicDocument.IsSelectionUse() && true !== LogicDocument.IsSelectionEmpty(true))
 		{
 			if (selectionflag_Numbering === LogicDocument.Selection.Flag)
 				bCanCopyCut = false;
@@ -8532,7 +8532,7 @@ CDocument.prototype.Refresh_RecalcData2 = function(Index, Page_rel)
 CDocument.prototype.Hyperlink_Add = function(HyperProps)
 {
 	// Проверку, возможно ли добавить гиперссылку, должны были вызвать до этой функции
-	if (null != HyperProps.Text && "" != HyperProps.Text && true === this.Is_SelectionUse())
+	if (null != HyperProps.Text && "" != HyperProps.Text && true === this.IsSelectionUse())
 	{
 		// Корректировка в данном случае пройдет при добавлении гиперссылки.
 		var SelectionInfo = this.Get_SelectedElementsInfo();
@@ -9498,7 +9498,7 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 
 	var NewCursorPos = null;
 
-	if (true !== this.Is_SelectionUse() || true === this.IsSelectionEmpty())
+	if (true !== this.IsSelectionUse() || true === this.IsSelectionEmpty())
 	{
 		NewCursorPos = this.Controller.RecalculateCurPos();
 		if (NewCursorPos && NewCursorPos.Transform)
@@ -9770,7 +9770,7 @@ CDocument.prototype.End_SilentMode = function(bUpdate)
  */
 CDocument.prototype.StartSelectionFromCurPos = function()
 {
-	if (true === this.Is_SelectionUse())
+	if (true === this.IsSelectionUse())
 		return true;
 
 	this.Selection.Use   = true;
@@ -10239,7 +10239,7 @@ CDocument.prototype.private_GetLogicDocumentPosition = function(LogicDocument)
 
 		if (DrawingContent)
 		{
-			return DrawingContent.GetContentPosition(DrawingContent.Is_SelectionUse(), false);
+			return DrawingContent.GetContentPosition(DrawingContent.IsSelectionUse(), false);
 		}
 		else
 		{
@@ -10258,7 +10258,7 @@ CDocument.prototype.private_GetLogicDocumentPosition = function(LogicDocument)
 	}
 	else
 	{
-		return LogicDocument.GetContentPosition(LogicDocument.Is_SelectionUse(), false);
+		return LogicDocument.GetContentPosition(LogicDocument.IsSelectionUse(), false);
 	}
 };
 CDocument.prototype.Get_DocumentPositionInfoForCollaborative = function()
@@ -10875,7 +10875,7 @@ CDocument.prototype.Begin_CompositeInput = function()
 		this.DrawingDocument.TargetStart();
 		this.DrawingDocument.TargetShow();
 
-		if (true === this.Is_SelectionUse())
+		if (true === this.IsSelectionUse())
 			this.Remove(1, true, false, true);
 
 		var oPara = this.Get_CurrentParagraph();
@@ -11085,7 +11085,7 @@ CDocument.prototype.AddFootnote = function(sText)
 			var oFootnote = this.Footnotes.CreateFootnote();
 			oFootnote.AddDefaultFootnoteContent(sText);
 
-			if (true === this.Is_SelectionUse())
+			if (true === this.IsSelectionUse())
 			{
 				this.MoveCursorRight(false, false, false);
 				this.RemoveSelection();
@@ -12151,11 +12151,11 @@ CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word)
 };
 CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 {
-	if (true === this.Is_SelectionUse() && true !== AddToSelect)
+	if (true === this.IsSelectionUse() && true !== AddToSelect)
 		this.MoveCursorLeft(false, false);
 
 	var bStopSelection = false;
-	if (true !== this.Is_SelectionUse() && true === AddToSelect)
+	if (true !== this.IsSelectionUse() && true === AddToSelect)
 	{
 		bStopSelection = true;
 		this.private_StartSelectionFromCurPos();
@@ -12173,11 +12173,11 @@ CDocument.prototype.controller_MoveCursorUp = function(AddToSelect)
 };
 CDocument.prototype.controller_MoveCursorDown = function(AddToSelect)
 {
-	if (true === this.Is_SelectionUse() && true !== AddToSelect)
+	if (true === this.IsSelectionUse() && true !== AddToSelect)
 		this.MoveCursorRight(false, false);
 
 	var bStopSelection = false;
-	if (true !== this.Is_SelectionUse() && true === AddToSelect)
+	if (true !== this.IsSelectionUse() && true === AddToSelect)
 	{
 		bStopSelection = true;
 		this.private_StartSelectionFromCurPos();
@@ -12206,7 +12206,7 @@ CDocument.prototype.controller_MoveCursorToEndOfLine = function(AddToSelect)
 			Item.MoveCursorToEndOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -12235,7 +12235,7 @@ CDocument.prototype.controller_MoveCursorToEndOfLine = function(AddToSelect)
 			Item.MoveCursorToEndOfLine(AddToSelect);
 
 			// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+			if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 			{
 				this.Selection.Use     = false;
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -14306,13 +14306,13 @@ CDocument.prototype.controller_PasteFormatting = function(TextPr, ParaPr)
 
 			for (var Pos = Start; Pos <= End; Pos++)
 			{
-				this.Content[Pos].Paragraph_Format_Paste(TextPr, ParaPr, Start === End ? false : true);
+				this.Content[Pos].PasteFormatting(TextPr, ParaPr, Start === End ? false : true);
 			}
 		}
 	}
 	else
 	{
-		this.Content[this.CurPos.ContentPos].Paragraph_Format_Paste(TextPr, ParaPr, true);
+		this.Content[this.CurPos.ContentPos].PasteFormatting(TextPr, ParaPr, true);
 	}
 };
 CDocument.prototype.controller_IsSelectionUse = function()
@@ -14425,7 +14425,7 @@ CDocument.prototype.controller_AddTableRow = function(bBefore)
 
 		this.Content[Pos].Row_Add(bBefore);
 
-		if (false === this.Selection.Use && true === this.Content[Pos].Is_SelectionUse())
+		if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
 		{
 			this.Selection.Use      = true;
 			this.Selection.StartPos = Pos;
@@ -14446,7 +14446,7 @@ CDocument.prototype.controller_AddTableCol = function(bBefore)
 
 		this.Content[Pos].Col_Add(bBefore);
 
-		if (false === this.Selection.Use && true === this.Content[Pos].Is_SelectionUse())
+		if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
 		{
 			this.Selection.Use      = true;
 			this.Selection.StartPos = Pos;
@@ -14556,7 +14556,7 @@ CDocument.prototype.controller_SelectTable = function(Type)
 			Pos = this.CurPos.ContentPos;
 
 		this.Content[Pos].Table_Select(Type);
-		if (false === this.Selection.Use && true === this.Content[Pos].Is_SelectionUse())
+		if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
 		{
 			this.Selection.Use      = true;
 			this.Selection.StartPos = Pos;
@@ -15565,7 +15565,7 @@ CTrackRevisionsManager.prototype.Get_NextChange = function()
             var NextChangesArray = this.Changes[NextPara.Get_Id()];
             if (undefined !== NextChangesArray && NextChangesArray.length > 0)
             {
-                var ParaContentPos = NextPara.Get_ParaContentPos(NextPara.Is_SelectionUse(), true);
+                var ParaContentPos = NextPara.Get_ParaContentPos(NextPara.IsSelectionUse(), true);
                 for (var ChangeIndex = 0, Count = NextChangesArray.length; ChangeIndex < Count; ChangeIndex++)
                 {
                     var ChangeEndPos = NextChangesArray[ChangeIndex].get_EndPos();
@@ -15639,7 +15639,7 @@ CTrackRevisionsManager.prototype.Get_PrevChange = function()
             var PrevChangesArray = this.Changes[PrevPara.Get_Id()];
             if (undefined !== PrevChangesArray && PrevChangesArray.length > 0)
             {
-                var ParaContentPos = PrevPara.Get_ParaContentPos(PrevPara.Is_SelectionUse(), true);
+                var ParaContentPos = PrevPara.Get_ParaContentPos(PrevPara.IsSelectionUse(), true);
                 for (var ChangeIndex = PrevChangesArray.length - 1; ChangeIndex >= 0; ChangeIndex--)
                 {
                     var ChangeStartPos = PrevChangesArray[ChangeIndex].get_StartPos();

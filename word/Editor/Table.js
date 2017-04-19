@@ -3353,7 +3353,7 @@ CTable.prototype.Table_Select = function(Type)
 	if (true === this.Is_InnerTable())
 	{
 		this.CurCell.Content.Table_Select(Type);
-		if (true === this.CurCell.Content.Is_SelectionUse())
+		if (true === this.CurCell.Content.IsSelectionUse())
 		{
 			this.Selection.Use   = true;
 			this.Selection.Start = false;
@@ -5375,7 +5375,7 @@ CTable.prototype.ClearParagraphFormatting = function()
 		this.CurCell.Content.ClearParagraphFormatting();
 	}
 };
-CTable.prototype.Paragraph_Format_Paste = function(TextPr, ParaPr, ApplyPara)
+CTable.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
 {
 	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
 	{
@@ -5388,19 +5388,14 @@ CTable.prototype.Paragraph_Format_Paste = function(TextPr, ParaPr, ApplyPara)
 
 			var Cell_Content = Cell.Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.Paragraph_Format_Paste(TextPr, ParaPr, true);
+			Cell.Content.PasteFormatting(TextPr, ParaPr, true);
 			Cell_Content.Set_ApplyToAll(false);
-		}
-
-		if (Cells_array[0].Row - 1 >= 0)
-			this.Internal_RecalculateFrom(Cells_array[0].Row - 1, 0, true, true);
-		else
-		{
-			this.Internal_Recalculate_1();
 		}
 	}
 	else
-		this.CurCell.Content.Paragraph_Format_Paste(TextPr, ParaPr, false);
+	{
+		this.CurCell.Content.PasteFormatting(TextPr, ParaPr, false);
+	}
 };
 CTable.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
 {
@@ -5466,7 +5461,7 @@ CTable.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTe
 	{
 		this.CurCell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 
-		if (false === this.CurCell.Content.Is_SelectionUse())
+		if (false === this.CurCell.Content.IsSelectionUse())
 		{
 			var Cell = this.CurCell;
 
@@ -6180,7 +6175,7 @@ CTable.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 	else
 	{
 		var bRetValue = this.CurCell.Content.MoveCursorToEndOfLine(AddToSelect);
-		if (true === this.CurCell.Content.Is_SelectionUse())
+		if (true === this.CurCell.Content.IsSelectionUse())
 		{
 			this.Selection.Use          = true;
 			this.Selection.Type         = table_Selection_Text;
@@ -6202,7 +6197,7 @@ CTable.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 	else
 	{
 		var bRetValue = this.CurCell.Content.MoveCursorToStartOfLine(AddToSelect);
-		if (true === this.CurCell.Content.Is_SelectionUse())
+		if (true === this.CurCell.Content.IsSelectionUse())
 		{
 			this.Selection.Use          = true;
 			this.Selection.Type         = table_Selection_Text;
@@ -6437,12 +6432,12 @@ CTable.prototype.Get_CurPosXY = function()
 
 	return Cell.Content_Get_CurPosXY();
 };
-CTable.prototype.Is_SelectionUse = function()
+CTable.prototype.IsSelectionUse = function()
 {
 	if ((true == this.Selection.Use && table_Selection_Cell == this.Selection.Type) || table_Selection_Border == this.Selection.Type2 || table_Selection_Border_InnerTable == this.Selection.Type2)
 		return true;
 	else if (true == this.Selection.Use)
-		return this.CurCell.Content.Is_SelectionUse();
+		return this.CurCell.Content.IsSelectionUse();
 
 	return false;
 };

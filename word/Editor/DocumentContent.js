@@ -392,7 +392,7 @@ CDocumentContent.prototype.Set_CurrentElement              = function(Index, bUp
     this.Selection.EndPos   = CurPos;
     this.CurPos.ContentPos  = CurPos;
 
-    if (true === this.Content[ContentPos].Is_SelectionUse())
+    if (true === this.Content[ContentPos].IsSelectionUse())
     {
         this.Selection.Use      = true;
         this.Selection.StartPos = ContentPos;
@@ -1829,7 +1829,7 @@ CDocumentContent.prototype.Can_CopyCut = function()
 
 	if (null !== LogicDocument)
 	{
-		if (true === LogicDocument.Is_SelectionUse())
+		if (true === LogicDocument.IsSelectionUse())
 		{
 			if (selectionflag_Numbering === LogicDocument.Selection.Flag)
 				bCanCopyCut = false;
@@ -3151,7 +3151,7 @@ CDocumentContent.prototype.MoveCursorUp = function(AddToSelect)
 				}
 
 				// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 					this.Selection.Use = false;
 
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -3218,7 +3218,7 @@ CDocumentContent.prototype.MoveCursorUp = function(AddToSelect)
 				}
 
 				// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 					this.Selection.Use = false;
 
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -3292,7 +3292,7 @@ CDocumentContent.prototype.MoveCursorDown = function(AddToSelect)
 				}
 
 				// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 					this.Selection.Use = false;
 
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -3359,7 +3359,7 @@ CDocumentContent.prototype.MoveCursorDown = function(AddToSelect)
 				}
 
 				// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 					this.Selection.Use = false;
 
 				this.CurPos.ContentPos = this.Selection.EndPos;
@@ -3410,7 +3410,7 @@ CDocumentContent.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 				Item.MoveCursorToEndOfLine(AddToSelect);
 
 				// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 				{
 					this.Selection.Use     = false;
 					this.CurPos.ContentPos = this.Selection.EndPos;
@@ -3439,7 +3439,7 @@ CDocumentContent.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 				Item.MoveCursorToEndOfLine(AddToSelect);
 
 				// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 				{
 					this.Selection.Use     = false;
 					this.CurPos.ContentPos = this.Selection.EndPos;
@@ -3471,7 +3471,7 @@ CDocumentContent.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 				Item.MoveCursorToStartOfLine(AddToSelect);
 
 				// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 				{
 					this.Selection.Use     = false;
 					this.CurPos.ContentPos = this.Selection.EndPos;
@@ -3500,7 +3500,7 @@ CDocumentContent.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 				Item.MoveCursorToStartOfLine(AddToSelect);
 
 				// Проверяем не обнулился ли селект (т.е. ничего не заселекчено)
-				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].Is_SelectionUse())
+				if (this.Selection.StartPos == this.Selection.EndPos && false === this.Content[this.Selection.StartPos].IsSelectionUse())
 				{
 					this.Selection.Use     = false;
 					this.CurPos.ContentPos = this.Selection.EndPos;
@@ -3611,12 +3611,12 @@ CDocumentContent.prototype.Set_CurPosXY                       = function(X, Y)
     this.CurPos.RealX = X;
     this.CurPos.RealY = Y;
 };
-CDocumentContent.prototype.Is_SelectionUse                    = function()
+CDocumentContent.prototype.IsSelectionUse = function()
 {
-    if (true == this.Selection.Use)
-        return true;
+	if (true == this.Selection.Use)
+		return true;
 
-    return false;
+	return false;
 };
 CDocumentContent.prototype.IsSelectionToEnd = function()
 {
@@ -3633,7 +3633,7 @@ CDocumentContent.prototype.Is_TextSelectionUse                = function()
     if (docpostype_DrawingObjects === this.CurPos.Type)
         return this.LogicDocument.DrawingObjects.isTextSelectionUse();
 
-    return this.Is_SelectionUse();
+    return this.IsSelectionUse();
 };
 // Возвращаем выделенный текст, если в выделении не более 1 параграфа, и там нет картинок, нумерации страниц и т.д.
 CDocumentContent.prototype.Get_SelectedText                   = function(bClearText, oPr)
@@ -5668,58 +5668,56 @@ CDocumentContent.prototype.IncreaseDecreaseIndent = function(bIncrease)
 		}
 	}
 };
-CDocumentContent.prototype.Paragraph_Format_Paste             = function(TextPr, ParaPr, ApplyPara)
+CDocumentContent.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
 {
-    if (true === this.ApplyToAll)
-    {
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            var Item = this.Content[Index];
-            Item.Set_ApplyToAll(true);
-            if (type_Paragraph == Item.GetType())
-                Item.Paragraph_Format_Paste(TextPr, ParaPr, true);
-            else if (type_Table == Item.GetType())
-                Item.Paragraph_Format_Paste(TextPr, ParaPr, true);
+	if (true === this.ApplyToAll)
+	{
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			var Item = this.Content[Index];
+			Item.Set_ApplyToAll(true);
+			Item.PasteFormatting(TextPr, ParaPr, true);
+			Item.Set_ApplyToAll(false);
+		}
 
-            Item.Set_ApplyToAll(false);
-        }
+		return;
+	}
 
-        return;
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.paragraphFormatPaste(TextPr, ParaPr, ApplyPara);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (true === this.Selection.Use)
+		{
+			switch (this.Selection.Flag)
+			{
+				case selectionflag_Numbering    :
+					return;
+				case selectionflag_Common:
+				{
+					var Start = this.Selection.StartPos;
+					var End   = this.Selection.EndPos;
+					if (Start > End)
+					{
+						Start = this.Selection.EndPos;
+						End   = this.Selection.StartPos;
+					}
 
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.LogicDocument.DrawingObjects.paragraphFormatPaste(TextPr, ParaPr, ApplyPara);
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Numbering    :
-                    return;
-                case selectionflag_Common:
-                {
-                    var Start = this.Selection.StartPos;
-                    var End   = this.Selection.EndPos;
-                    if (Start > End)
-                    {
-                        Start = this.Selection.EndPos;
-                        End   = this.Selection.StartPos;
-                    }
-
-                    for (var Pos = Start; Pos <= End; Pos++)
-                    {
-                        this.Content[Pos].Paragraph_Format_Paste(TextPr, ParaPr, ( Start === End ? false : true ));
-                    }
-                    break;
-                }
-            }
-        }
-        else
-        {
-            this.Content[this.CurPos.ContentPos].Paragraph_Format_Paste(TextPr, ParaPr, true);
-        }
-    }
+					for (var Pos = Start; Pos <= End; Pos++)
+					{
+						this.Content[Pos].PasteFormatting(TextPr, ParaPr, ( Start === End ? false : true ));
+					}
+					break;
+				}
+			}
+		}
+		else
+		{
+			this.Content[this.CurPos.ContentPos].PasteFormatting(TextPr, ParaPr, true);
+		}
+	}
 };
 CDocumentContent.prototype.SetImageProps = function(Props)
 {
@@ -6848,7 +6846,7 @@ CDocumentContent.prototype.Table_AddRow      = function(bBefore)
             Pos = this.CurPos.ContentPos;
 
         this.Content[Pos].Row_Add(bBefore);
-        if (false === this.Selection.Use && true === this.Content[Pos].Is_SelectionUse())
+        if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
         {
             this.Selection.Use      = true;
             this.Selection.StartPos = Pos;
@@ -6875,7 +6873,7 @@ CDocumentContent.prototype.Table_AddCol      = function(bBefore)
             Pos = this.CurPos.ContentPos;
 
         this.Content[Pos].Col_Add(bBefore);
-        if (false === this.Selection.Use && true === this.Content[Pos].Is_SelectionUse())
+        if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
         {
             this.Selection.Use      = true;
             this.Selection.StartPos = Pos;
@@ -7025,7 +7023,7 @@ CDocumentContent.prototype.Table_Select      = function(Type)
             Pos = this.CurPos.ContentPos;
 
         this.Content[Pos].Table_Select(Type);
-        if (false === this.Selection.Use && true === this.Content[Pos].Is_SelectionUse())
+        if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
         {
             this.Selection.Use      = true;
             this.Selection.StartPos = Pos;
