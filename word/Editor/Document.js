@@ -5135,15 +5135,10 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
             bOldSelectionIsCommon  = false;
         }
 
-        var SelectionUse_old = this.Selection.Use;
-        var Item             = this.Content[ContentPos];
-
-        var bTableBorder = false;
-        if (type_Table == Item.GetType())
-        {
-            var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
-            bTableBorder         = null === Item.IsTableBorder(X, Y, ElementPageIndex) ? false : true;
-        }
+		var SelectionUse_old = this.Selection.Use;
+		var Item             = this.Content[ContentPos];
+		var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
+		var bTableBorder     = null === Item.IsTableBorder(X, Y, ElementPageIndex) ? false : true;
 
         // Убираем селект, кроме случаев либо текущего параграфа, либо при движении границ внутри таблицы
         if (!(true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon))
@@ -5156,56 +5151,54 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
         this.Selection.Start = true;
         this.Selection.Flag  = selectionflag_Common;
 
-        if (true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon)
-        {
-            this.Selection_SetEnd(X, Y, {Type : AscCommon.g_mouse_event_type_up, ClickCount : 1});
-            this.Selection.Use    = true;
-            this.Selection.Start  = true;
-            this.Selection.EndPos = ContentPos;
-            this.Selection.Data   = null;
-        }
-        else
-        {
-            var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
-            Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent, bTableBorder);
-            Item.Selection_SetEnd(X, Y, ElementPageIndex, {
-                Type       : AscCommon.g_mouse_event_type_move,
-                ClickCount : 1
-            }, bTableBorder);
+		if (true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon)
+		{
+			this.Selection_SetEnd(X, Y, {Type : AscCommon.g_mouse_event_type_up, ClickCount : 1});
+			this.Selection.Use    = true;
+			this.Selection.Start  = true;
+			this.Selection.EndPos = ContentPos;
+			this.Selection.Data   = null;
+		}
+		else
+		{
+			var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
+			Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent, bTableBorder);
+			Item.Selection_SetEnd(X, Y, ElementPageIndex, {
+				Type       : AscCommon.g_mouse_event_type_move,
+				ClickCount : 1
+			}, bTableBorder);
 
-            if (!(type_Table == Item.GetType() && true == bTableBorder))
-            {
-                this.Selection.Use      = true;
-                this.Selection.StartPos = ContentPos;
-                this.Selection.EndPos   = ContentPos;
-                this.Selection.Data     = null;
+			if (true !== bTableBorder)
+			{
+				this.Selection.Use      = true;
+				this.Selection.StartPos = ContentPos;
+				this.Selection.EndPos   = ContentPos;
+				this.Selection.Data     = null;
 
-                this.CurPos.ContentPos = ContentPos;
+				this.CurPos.ContentPos = ContentPos;
 
-                if (type_Paragraph === Item.GetType() && true === MouseEvent.CtrlKey)
-                {
-                    var Hyperlink = Item.Check_Hyperlink(X, Y, ElementPageIndex);
-                    if (null != Hyperlink)
-                    {
-                        this.Selection.Data =
-                        {
-                            Hyperlink : true,
-                            Value     : Hyperlink
-                        };
-                    }
-                }
-            }
-            else
-            {
-                this.Selection.Data =
-                {
-                    TableBorder : true,
-                    Pos         : ContentPos,
-                    Selection   : SelectionUse_old
-                };
-            }
-        }
-    }
+				if (type_Paragraph === Item.GetType() && true === MouseEvent.CtrlKey)
+				{
+					var Hyperlink = Item.Check_Hyperlink(X, Y, ElementPageIndex);
+					if (null != Hyperlink)
+					{
+						this.Selection.Data = {
+							Hyperlink : true,
+							Value     : Hyperlink
+						};
+					}
+				}
+			}
+			else
+			{
+				this.Selection.Data = {
+					TableBorder : true,
+					Pos         : ContentPos,
+					Selection   : SelectionUse_old
+				};
+			}
+		}
+	}
 };
 /**
  * Данная функция может использоваться как при движении, так и при окончательном выставлении селекта.

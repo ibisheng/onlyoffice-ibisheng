@@ -6298,125 +6298,120 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 		Y       = this.Pages[CurPage].YLimit;
 	}
 
-    this.CurPage = CurPage;
-    var AbsPage  = this.Get_AbsolutePage(this.CurPage);
+	this.CurPage = CurPage;
+	var AbsPage  = this.Get_AbsolutePage(this.CurPage);
 
-    // Сначала проверим, не попали ли мы в один из "плавающих" объектов
-    var bInText      = (null === this.IsInText(X, Y, AbsPage) ? false : true);
-    var bTableBorder = (null === this.IsTableBorder(X, Y, AbsPage) ? false : true);
-    var nInDrawing   = this.LogicDocument && this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, AbsPage, this);
+	// Сначала проверим, не попали ли мы в один из "плавающих" объектов
+	var bInText      = (null === this.IsInText(X, Y, AbsPage) ? false : true);
+	var bTableBorder = (null === this.IsTableBorder(X, Y, AbsPage) ? false : true);
+	var nInDrawing   = this.LogicDocument && this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, AbsPage, this);
 
-    if (this.Parent instanceof CHeaderFooter && ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ) ))
-    {
-        if (docpostype_DrawingObjects != this.CurPos.Type)
-            this.RemoveSelection();
+	if (this.Parent instanceof CHeaderFooter && ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ) ))
+	{
+		if (docpostype_DrawingObjects != this.CurPos.Type)
+			this.RemoveSelection();
 
-        // Прячем курсор
-        this.DrawingDocument.TargetEnd();
-        this.DrawingDocument.SetCurrentPage(AbsPage);
+		// Прячем курсор
+		this.DrawingDocument.TargetEnd();
+		this.DrawingDocument.SetCurrentPage(AbsPage);
 
-        var HdrFtr = this.Is_HdrFtr(true);
-        if (null === HdrFtr)
-        {
-            this.LogicDocument.Selection.Use   = true;
-            this.LogicDocument.Selection.Start = true;
-            this.LogicDocument.Selection.Flag  = selectionflag_Common;
-            this.LogicDocument.Set_DocPosType(docpostype_DrawingObjects);
-        }
-        else
-        {
-            HdrFtr.Content.Selection.Use   = true;
-            HdrFtr.Content.Selection.Start = true;
-            HdrFtr.Content.Selection.Flag  = selectionflag_Common;
-            HdrFtr.Content.Set_DocPosType(docpostype_DrawingObjects);
-        }
+		var HdrFtr = this.Is_HdrFtr(true);
+		if (null === HdrFtr)
+		{
+			this.LogicDocument.Selection.Use   = true;
+			this.LogicDocument.Selection.Start = true;
+			this.LogicDocument.Selection.Flag  = selectionflag_Common;
+			this.LogicDocument.Set_DocPosType(docpostype_DrawingObjects);
+		}
+		else
+		{
+			HdrFtr.Content.Selection.Use   = true;
+			HdrFtr.Content.Selection.Start = true;
+			HdrFtr.Content.Selection.Flag  = selectionflag_Common;
+			HdrFtr.Content.Set_DocPosType(docpostype_DrawingObjects);
+		}
 
-        this.LogicDocument.DrawingObjects.OnMouseDown(MouseEvent, X, Y, AbsPage);
-    }
-    else
-    {
-        var bOldSelectionIsCommon = true;
+		this.LogicDocument.DrawingObjects.OnMouseDown(MouseEvent, X, Y, AbsPage);
+	}
+	else
+	{
+		var bOldSelectionIsCommon = true;
 
-        if (docpostype_DrawingObjects === this.CurPos.Type && true != this.IsInDrawing(X, Y, AbsPage))
-        {
-            this.LogicDocument.DrawingObjects.resetSelection();
-            bOldSelectionIsCommon = false;
-        }
+		if (docpostype_DrawingObjects === this.CurPos.Type && true != this.IsInDrawing(X, Y, AbsPage))
+		{
+			this.LogicDocument.DrawingObjects.resetSelection();
+			bOldSelectionIsCommon = false;
+		}
 
-        var ContentPos = this.Internal_GetContentPosByXY(X, Y);
+		var ContentPos = this.Internal_GetContentPosByXY(X, Y);
 
-        if (docpostype_Content != this.CurPos.Type)
-        {
-            this.Set_DocPosType(docpostype_Content);
-            this.CurPos.ContentPos = ContentPos;
-            bOldSelectionIsCommon  = false;
-        }
+		if (docpostype_Content != this.CurPos.Type)
+		{
+			this.Set_DocPosType(docpostype_Content);
+			this.CurPos.ContentPos = ContentPos;
+			bOldSelectionIsCommon  = false;
+		}
 
-        var SelectionUse_old = this.Selection.Use;
-        var Item             = this.Content[ContentPos];
+		var SelectionUse_old = this.Selection.Use;
+		var Item             = this.Content[ContentPos];
+		var bTableBorder     = (null != Item.IsTableBorder(X, Y, AbsPage) ? true : false);
 
-        var bTableBorder = false;
-        if (type_Table == Item.GetType())
-            bTableBorder = ( null != Item.IsTableBorder(X, Y, AbsPage) ? true : false );
+		// Убираем селект, кроме случаев либо текущего параграфа, либо при движении границ внутри таблицы
+		if (!(true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon))
+		{
+			if ((selectionflag_Common != this.Selection.Flag) || ( true === this.Selection.Use && MouseEvent.ClickCount <= 1 && true != bTableBorder ))
+				this.RemoveSelection();
+		}
 
-        // Убираем селект, кроме случаев либо текущего параграфа, либо при движении границ внутри таблицы
-        if (!(true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon))
-        {
-            if ((selectionflag_Common != this.Selection.Flag) || ( true === this.Selection.Use && MouseEvent.ClickCount <= 1 && true != bTableBorder ))
-                this.RemoveSelection();
-        }
+		this.Selection.Use   = true;
+		this.Selection.Start = true;
+		this.Selection.Flag  = selectionflag_Common;
 
-        this.Selection.Use   = true;
-        this.Selection.Start = true;
-        this.Selection.Flag  = selectionflag_Common;
+		if (true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon)
+		{
+			this.Selection_SetEnd(X, Y, this.CurPage, {Type : AscCommon.g_mouse_event_type_up, ClickCount : 1});
+			this.Selection.Use    = true;
+			this.Selection.Start  = true;
+			this.Selection.EndPos = ContentPos;
+			this.Selection.Data   = null;
+		}
+		else
+		{
+			var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
+			Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent);
+			Item.Selection_SetEnd(X, Y, ElementPageIndex, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1});
 
-        if (true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon)
-        {
-            this.Selection_SetEnd(X, Y, this.CurPage, {Type : AscCommon.g_mouse_event_type_up, ClickCount : 1});
-            this.Selection.Use    = true;
-            this.Selection.Start  = true;
-            this.Selection.EndPos = ContentPos;
-            this.Selection.Data   = null;
-        }
-        else
-        {
-            var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, this.CurPage);
-            Item.Selection_SetStart(X, Y, ElementPageIndex, MouseEvent);
-            Item.Selection_SetEnd(X, Y, ElementPageIndex, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1});
+			if (true !== bTableBorder)
+			{
+				this.Selection.Use      = true;
+				this.Selection.StartPos = ContentPos;
+				this.Selection.EndPos   = ContentPos;
+				this.Selection.Data     = null;
 
-            if (!(type_Table == Item.GetType() && true == bTableBorder))
-            {
-                this.Selection.Use      = true;
-                this.Selection.StartPos = ContentPos;
-                this.Selection.EndPos   = ContentPos;
-                this.Selection.Data     = null;
+				this.CurPos.ContentPos = ContentPos;
 
-                this.CurPos.ContentPos = ContentPos;
-
-                if (type_Paragraph === Item.GetType() && true === MouseEvent.CtrlKey)
-                {
-                    var Hyperlink = Item.Check_Hyperlink(X, Y, ElementPageIndex);
-                    if (null != Hyperlink)
-                    {
-                        this.Selection.Data =
-                        {
-                            Hyperlink : true,
-                            Value     : Hyperlink
-                        };
-                    }
-                }
-            }
-            else
-            {
-                this.Selection.Data =
-                {
-                    TableBorder : true,
-                    Pos         : ContentPos,
-                    Selection   : SelectionUse_old
-                };
-            }
-        }
-    }
+				if (type_Paragraph === Item.GetType() && true === MouseEvent.CtrlKey)
+				{
+					var Hyperlink = Item.Check_Hyperlink(X, Y, ElementPageIndex);
+					if (null != Hyperlink)
+					{
+						this.Selection.Data = {
+							Hyperlink : true,
+							Value     : Hyperlink
+						};
+					}
+				}
+			}
+			else
+			{
+				this.Selection.Data = {
+					TableBorder : true,
+					Pos         : ContentPos,
+					Selection   : SelectionUse_old
+				};
+			}
+		}
+	}
 };
 // Данная функция может использоваться как при движении, так и при окончательном выставлении селекта.
 // Если bEnd = true, тогда это конец селекта.
