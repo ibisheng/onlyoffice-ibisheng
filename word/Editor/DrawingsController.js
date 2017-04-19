@@ -308,7 +308,7 @@ CDrawingsController.prototype.SelectAll = function()
 };
 CDrawingsController.prototype.GetSelectedContent = function(SelectedContent)
 {
-	this.DrawingObjects.Get_SelectedContent(SelectedContent);
+	this.DrawingObjects.GetSelectedContent(SelectedContent);
 };
 CDrawingsController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
 {

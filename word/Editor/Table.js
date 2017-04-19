@@ -6504,7 +6504,7 @@ CTable.prototype.Get_SelectedElementsInfo = function(Info)
 		Info.Set_SingleCell(Cell);
 	}
 };
-CTable.prototype.Get_SelectedContent = function(SelectedContent)
+CTable.prototype.GetSelectedContent = function(SelectedContent)
 {
 	if (true !== this.Selection.Use)
 		return;
@@ -6724,7 +6724,7 @@ CTable.prototype.Get_SelectedContent = function(SelectedContent)
 	}
 	else
 	{
-		this.CurCell.Content.Get_SelectedContent(SelectedContent);
+		this.CurCell.Content.GetSelectedContent(SelectedContent);
 	}
 };
 CTable.prototype.Set_ParagraphPrOnAdd = function(Para)

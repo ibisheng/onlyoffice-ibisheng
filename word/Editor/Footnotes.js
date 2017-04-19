@@ -2583,14 +2583,14 @@ CFootnotesController.prototype.GetSelectedContent = function(SelectedContent)
 
 	if (0 === this.Selection.Direction)
 	{
-		this.CurFootnote.Get_SelectedContent(SelectedContent);
+		this.CurFootnote.GetSelectedContent(SelectedContent);
 	}
 	else
 	{
 		var arrFootnotes = this.private_GetSelectionArray();
 		for (var nPos = 0, nCount = arrFootnotes.length; nPos < nCount; ++nPos)
 		{
-			arrFootnotes[nPos].Get_SelectedContent(SelectedContent);
+			arrFootnotes[nPos].GetSelectedContent(SelectedContent);
 		}
 	}
 };

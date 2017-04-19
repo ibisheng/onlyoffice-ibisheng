@@ -500,6 +500,9 @@ CDocumentContentElementBase.prototype.SetImageProps = function(oProps)
 CDocumentContentElementBase.prototype.SetTableProps = function(oProps)
 {
 };
+CDocumentContentElementBase.prototype.GetSelectedContent = function(oSelectedContent)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

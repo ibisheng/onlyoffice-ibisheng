@@ -477,6 +477,10 @@ CBlockLevelSdt.prototype.SetTableProps = function(oProps)
 {
 	return this.Content.SetTableProps(oProps);
 };
+CBlockLevelSdt.prototype.GetSelectedContent = function(oSelectedContent)
+{
+	return this.Content.GetSelectedContent(oSelectedContent);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

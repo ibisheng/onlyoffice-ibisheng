@@ -6500,8 +6500,6 @@ Paragraph.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElemen
 };
 Paragraph.prototype.SelectAll = function(Direction)
 {
-	var Count = this.Content.length;
-
 	this.Selection.Use = true;
 
 	var StartPos = null, EndPos = null;
@@ -6842,7 +6840,7 @@ Paragraph.prototype.Get_SelectedElementsInfo = function(Info)
 	else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo)
 		this.Content[this.CurPos.ContentPos].Get_SelectedElementsInfo(Info);
 };
-Paragraph.prototype.Get_SelectedContent = function(DocContent)
+Paragraph.prototype.GetSelectedContent = function(DocContent)
 {
 	if (true !== this.Selection.Use)
 		return;

@@ -531,10 +531,10 @@ CHeaderFooter.prototype =
         this.Content.Get_SelectedElementsInfo(Info);
     },
 
-    Get_SelectedContent : function(SelectedContent)
-    {
-        this.Content.Get_SelectedContent( SelectedContent );
-    },
+	GetSelectedContent : function(SelectedContent)
+	{
+		this.Content.GetSelectedContent(SelectedContent);
+	},
 
 	UpdateCursorType : function(X, Y, PageAbs)
     {
@@ -1820,12 +1820,11 @@ CHeaderFooterController.prototype =
             this.CurHdrFtr.Get_SelectedElementsInfo(Info);
     },
 
-    Get_SelectedContent : function(SelectedContent)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Get_SelectedContent( SelectedContent );
-    },
-
+	GetSelectedContent : function(SelectedContent)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.GetSelectedContent(SelectedContent);
+	},
 //-----------------------------------------------------------------------------------
 // Функции для работы с контентом
 //-----------------------------------------------------------------------------------

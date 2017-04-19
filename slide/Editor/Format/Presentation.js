@@ -4082,7 +4082,7 @@ CPresentation.prototype =
         }
     },
 
-    Get_SelectedContent : function()
+	GetSelectedContent : function()
     {
         return AscFormat.ExecuteNoHistory(function()
         {
@@ -4103,7 +4103,7 @@ CPresentation.prototype =
                                 {
                                     var GraphicFrame = target_text_object.copy();
                                     var SelectedContent = new CSelectedContent();
-                                    target_text_object.graphicObject.Get_SelectedContent(SelectedContent);
+                                    target_text_object.graphicObject.GetSelectedContent(SelectedContent);
                                     var Table = SelectedContent.Elements[0].Element;
                                     GraphicFrame.setGraphicObject(Table);
                                     Table.Set_Parent(GraphicFrame);
@@ -4115,7 +4115,7 @@ CPresentation.prototype =
                                 if(doc_content)
                                 {
                                     var SelectedContent = new CSelectedContent();
-                                    doc_content.Get_SelectedContent(SelectedContent);
+                                    doc_content.GetSelectedContent(SelectedContent);
                                     ret.DocContent = SelectedContent;
                                 }
                             }
@@ -4132,7 +4132,7 @@ CPresentation.prototype =
 
                                     var SelectedContent = new CSelectedContent();
                                     doc_content.Set_ApplyToAll(true);
-                                    doc_content.Get_SelectedContent(SelectedContent);
+                                    doc_content.GetSelectedContent(SelectedContent);
                                     doc_content.Set_ApplyToAll(false);
                                     ret.DocContent = SelectedContent;
                                 }

@@ -257,7 +257,7 @@ CHdrFtrController.prototype.SelectAll = function()
 };
 CHdrFtrController.prototype.GetSelectedContent = function(SelectedContent)
 {
-	this.HdrFtr.Get_SelectedContent(SelectedContent);
+	this.HdrFtr.GetSelectedContent(SelectedContent);
 };
 CHdrFtrController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
 {

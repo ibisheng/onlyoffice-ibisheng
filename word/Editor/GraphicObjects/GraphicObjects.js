@@ -1454,12 +1454,12 @@ CGraphicObjects.prototype =
     },
 
 
-    Get_SelectedContent: function(SelectedContent)
+	GetSelectedContent : function(SelectedContent)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Get_SelectedContent(SelectedContent);
+            content.GetSelectedContent(SelectedContent);
         }
         else
         {

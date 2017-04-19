@@ -205,11 +205,11 @@ ParaDrawing.prototype.Set_WidthVisible = function(WidthVisible)
 {
 	this.WidthVisible = WidthVisible;
 };
-ParaDrawing.prototype.Get_SelectedContent = function(SelectedContent)
+ParaDrawing.prototype.GetSelectedContent = function(SelectedContent)
 {
-	if (this.GraphicObj && this.GraphicObj.Get_SelectedContent)
+	if (this.GraphicObj && this.GraphicObj.GetSelectedContent)
 	{
-		this.GraphicObj.Get_SelectedContent(SelectedContent);
+		this.GraphicObj.GetSelectedContent(SelectedContent);
 	}
 };
 ParaDrawing.prototype.Search_GetId = function(bNext, bCurrent)

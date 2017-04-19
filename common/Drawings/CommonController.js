@@ -7746,7 +7746,7 @@ DrawingObjectsController.prototype =
         var sText, oSelectedContent, oNearestPos;
         if(this.document)
         {
-            oSelectedContent = this.document.Get_SelectedContent(true);
+            oSelectedContent = this.document.GetSelectedContent(true);
             oContent.Recalculate_Page(0, true);
             oContent.MoveCursorToStartPos(false);
             oNearestPos = oContent.Get_NearestPos(0, 0, 0, false, undefined);
@@ -7780,7 +7780,7 @@ DrawingObjectsController.prototype =
             if(oTargetDocContent && oTargetDocContent.Selection.Use)
             {
                 oSelectedContent = new CSelectedContent();
-                oTargetDocContent.Get_SelectedContent(oSelectedContent);
+                oTargetDocContent.GetSelectedContent(oSelectedContent);
                 oSelectedContent.MoveDrawing = true;
 
                 oContent.Recalculate_Page(0, true);

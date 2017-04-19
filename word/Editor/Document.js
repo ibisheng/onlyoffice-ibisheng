@@ -5489,7 +5489,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
     }
     else
     {
-        // Создаем сразу точку в истории, т.к. при выполнении функции Get_SelectedContent нам надо, чтобы данная
+        // Создаем сразу точку в истории, т.к. при выполнении функции GetSelectedContent нам надо, чтобы данная
         // точка уже набивалась изменениями. Если из-за совместного редактирования действие сделать невозможно будет,
         // тогда последнюю точку удаляем.
         History.Create_NewPoint(AscDFH.historydescription_Document_DragText);
@@ -5499,7 +5499,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
         // Получим копию выделенной части документа, которую надо перенести в новое место, одновременно с этим
         // удаляем эту выделенную часть (если надо).
 
-        var DocContent = this.Get_SelectedContent(true);
+        var DocContent = this.GetSelectedContent(true);
 
         if (false === this.Can_InsertContent(DocContent, NearPos))
         {
@@ -5554,7 +5554,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
  * @param bUseHistory - нужна ли запись в историю созданных классов. (при drag-n-drop нужна, при копировании не нужна)
  * @returns {CSelectedContent}
  */
-CDocument.prototype.Get_SelectedContent = function(bUseHistory)
+CDocument.prototype.GetSelectedContent = function(bUseHistory)
 {
 	// При копировании нам не нужно, чтобы новые классы помечались как созданные в рецензировании, а при перетаскивании
 	// нужно.
@@ -11933,25 +11933,7 @@ CDocument.prototype.controller_MoveCursorToEndPos = function(AddToSelect)
 
 		for (var Index = StartPos + 1; Index <= EndPos; Index++)
 		{
-			var Item           = this.Content[Index];
-			Item.Selection.Use = true;
-			var ItemType       = Item.GetType();
-
-			if (type_Paragraph === ItemType)
-			{
-				Item.SelectAll(1);
-			}
-			else //if ( type_Table === ItemType )
-			{
-				var Row  = Item.Content.length - 1;
-				var Cell = Item.Content[Row].Get_CellsCount() - 1;
-				var Pos0 = {Row : 0, Cell : 0};
-				var Pos1 = {Row : Row, Cell : Cell};
-
-				Item.Selection.StartPos.Pos = Pos0;
-				Item.Selection.EndPos.Pos   = Pos1;
-				Item.Internal_Selection_UpdateCells();
-			}
+			this.Content[Index].SelectAll(1);
 		}
 
 		this.Content[StartPos].MoveCursorToEndPos(true, false);
@@ -14291,7 +14273,7 @@ CDocument.prototype.controller_GetSelectedContent = function(SelectedContent)
 
 	for (var Index = StartPos; Index <= EndPos; Index++)
 	{
-		this.Content[Index].Get_SelectedContent(SelectedContent);
+		this.Content[Index].GetSelectedContent(SelectedContent);
 	}
 };
 CDocument.prototype.controller_UpdateCursorType = function(X, Y, PageAbs, MouseEvent)

@@ -3743,28 +3743,30 @@ CDocumentContent.prototype.Get_SelectedElementsInfo           = function(Info)
         }
     }
 };
-CDocumentContent.prototype.Get_SelectedContent                = function(SelectedContent)
+CDocumentContent.prototype.GetSelectedContent = function(SelectedContent)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        return this.DrawingObjects.Get_SelectedContent(SelectedContent);
-    else
-    {
-        if (true !== this.Selection.Use || this.Selection.Flag !== selectionflag_Common)
-            return;
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.DrawingObjects.GetSelectedContent(SelectedContent);
+	}
+	else
+	{
+		if (true !== this.Selection.Use || this.Selection.Flag !== selectionflag_Common)
+			return;
 
-        var StartPos = this.Selection.StartPos;
-        var EndPos   = this.Selection.EndPos;
-        if (StartPos > EndPos)
-        {
-            StartPos = this.Selection.EndPos;
-            EndPos   = this.Selection.StartPos;
-        }
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (StartPos > EndPos)
+		{
+			StartPos = this.Selection.EndPos;
+			EndPos   = this.Selection.StartPos;
+		}
 
-        for (var Index = StartPos; Index <= EndPos; Index++)
-        {
-            this.Content[Index].Get_SelectedContent(SelectedContent);
-        }
-    }
+		for (var Index = StartPos; Index <= EndPos; Index++)
+		{
+			this.Content[Index].GetSelectedContent(SelectedContent);
+		}
+	}
 };
 CDocumentContent.prototype.Insert_Content                     = function(SelectedContent, NearPos)
 {

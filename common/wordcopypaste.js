@@ -1244,7 +1244,7 @@ CopyProcessor.prototype =
 		
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
-			var selectedContent = oDocument.Get_SelectedContent();
+			var selectedContent = oDocument.GetSelectedContent();
 				
 			var elementsContent;
 			if(selectedContent && selectedContent.Elements && selectedContent.Elements[0] && selectedContent.Elements[0].Element)
@@ -1295,7 +1295,7 @@ CopyProcessor.prototype =
 		
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
-			var selectedContent = oDocument.Get_SelectedContent();
+			var selectedContent = oDocument.GetSelectedContent();
 			
 			var elementsContent;
 			if(selectedContent && selectedContent.Elements && selectedContent.Elements[0] && selectedContent.Elements[0].Element)
@@ -1322,7 +1322,7 @@ CopyProcessor.prototype =
         {
 			var presentation = editor.WordControl.m_oLogicDocument;
 			
-			var selectedContent = oDocument.Get_SelectedContent();			
+			var selectedContent = oDocument.GetSelectedContent();
 			
 			if(!selectedContent.DocContent && (!selectedContent.Drawings || (selectedContent.Drawings && !selectedContent.Drawings.length)) && (!selectedContent.SlideObjects || (selectedContent.SlideObjects && !selectedContent.SlideObjects.length)))
 				return false;
