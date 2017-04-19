@@ -2350,24 +2350,24 @@ CFootnotesController.prototype.SetImageProps = function(Props)
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	return this.CurFootnote.Set_ImageProps(Props);
+	return this.CurFootnote.SetImageProps(Props);
 };
 CFootnotesController.prototype.SetTableProps = function(Props)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	return this.CurFootnote.Set_TableProps(Props);
+	return this.CurFootnote.SetTableProps(Props);
 };
-CFootnotesController.prototype.GetCurrentParaPr = function()
+CFootnotesController.prototype.GetCalculatedParaPr = function()
 {
-	var StartPr = this.CurFootnote.Get_Paragraph_ParaPr();
+	var StartPr = this.CurFootnote.GetCalculatedParaPr();
 	var Pr = StartPr.Copy();
 
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		var TempPr = oFootnote.Get_Paragraph_ParaPr();
+		var TempPr = oFootnote.GetCalculatedParaPr();
 		Pr = Pr.Compare(TempPr);
 	}
 
@@ -2385,15 +2385,15 @@ CFootnotesController.prototype.GetCurrentParaPr = function()
 
 	return Pr;
 };
-CFootnotesController.prototype.GetCurrentTextPr = function()
+CFootnotesController.prototype.GetCalculatedTextPr = function()
 {
-	var StartPr = this.CurFootnote.Get_Paragraph_TextPr();
+	var StartPr = this.CurFootnote.GetCalculatedTextPr();
 	var Pr = StartPr.Copy();
 
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		var TempPr = oFootnote.Get_Paragraph_TextPr();
+		var TempPr = oFootnote.GetCalculatedTextPr();
 		Pr = Pr.Compare(TempPr);
 	}
 
@@ -2402,14 +2402,14 @@ CFootnotesController.prototype.GetCurrentTextPr = function()
 CFootnotesController.prototype.GetDirectParaPr = function()
 {
 	if (null !== this.CurFootnote)
-		return this.CurFootnote.Get_Paragraph_ParaPr_Copy();
+		return this.CurFootnote.GetDirectParaPr();
 
 	return new CParaPr();
 };
 CFootnotesController.prototype.GetDirectTextPr = function()
 {
 	if (null !== this.CurFootnote)
-		return this.CurFootnote.Get_Paragraph_TextPr_Copy();
+		return this.CurFootnote.GetDirectTextPr();
 
 	return new CTextPr();
 };
@@ -2761,13 +2761,13 @@ CFootnotesController.prototype.UpdateInterfaceState = function()
 		if (!Api)
 			return;
 
-		var ParaPr = this.GetCurrentParaPr();
+		var ParaPr = this.GetCalculatedParaPr();
 
 		if (undefined != ParaPr.Tabs)
 			Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, ParaPr.Tabs);
 
 		Api.UpdateParagraphProp(ParaPr);
-		Api.UpdateTextPr(this.GetCurrentTextPr());
+		Api.UpdateTextPr(this.GetCalculatedTextPr());
 	}
 };
 CFootnotesController.prototype.UpdateRulersState = function()

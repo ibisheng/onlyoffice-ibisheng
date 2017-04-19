@@ -816,7 +816,7 @@ CTable.prototype.Set_Props = function(Props)
 
 	if (true != this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
 	{
-		bApplyToInnerTable = this.CurCell.Content.Set_TableProps(Props);
+		bApplyToInnerTable = this.CurCell.Content.SetTableProps(Props);
 	}
 
 	if (true === bApplyToInnerTable)
@@ -3252,12 +3252,12 @@ CTable.prototype.Document_UpdateInterfaceState = function()
 	}
 	else
 	{
-		var ParaPr         = this.Get_Paragraph_ParaPr();
+		var ParaPr         = this.GetCalculatedParaPr();
 		ParaPr.CanAddTable = false;
 		if (null != ParaPr)
 			editor.UpdateParagraphProp(ParaPr);
 
-		var TextPr = this.Get_Paragraph_TextPr();
+		var TextPr = this.GetCalculatedTextPr();
 		if (null != TextPr)
 		{
 			var theme = this.Get_Theme();
@@ -7157,7 +7157,7 @@ CTable.prototype.IncreaseDecreaseIndent = function(bIncrease)
 		this.CurCell.Content.IncreaseDecreaseIndent(bIncrease);
 	}
 };
-CTable.prototype.Get_Paragraph_ParaPr = function()
+CTable.prototype.GetCalculatedParaPr = function()
 {
 	if (true === this.ApplyToAll)
 	{
@@ -7165,7 +7165,7 @@ CTable.prototype.Get_Paragraph_ParaPr = function()
 		var Cell = Row.Get_Cell(0);
 
 		Cell.Content.Set_ApplyToAll(true);
-		var Result_ParaPr = Cell.Content.Get_Paragraph_ParaPr();
+		var Result_ParaPr = Cell.Content.GetCalculatedParaPr();
 		Cell.Content.Set_ApplyToAll(false);
 
 		for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
@@ -7178,7 +7178,7 @@ CTable.prototype.Get_Paragraph_ParaPr = function()
 			{
 				Cell = Row.Get_Cell(CurCell);
 				Cell.Content.Set_ApplyToAll(true);
-				var CurPr = Cell.Content.Get_Paragraph_ParaPr();
+				var CurPr = Cell.Content.GetCalculatedParaPr();
 				Cell.Content.Set_ApplyToAll(false);
 
 				Result_ParaPr = Result_ParaPr.Compare(CurPr);
@@ -7195,7 +7195,7 @@ CTable.prototype.Get_Paragraph_ParaPr = function()
 		var Cell = Row.Get_Cell(Pos.Cell);
 
 		Cell.Content.Set_ApplyToAll(true);
-		var Result_ParaPr = Cell.Content.Get_Paragraph_ParaPr();
+		var Result_ParaPr = Cell.Content.GetCalculatedParaPr();
 		Cell.Content.Set_ApplyToAll(false);
 
 		for (var Index = 1; Index < this.Selection.Data.length; Index++)
@@ -7205,7 +7205,7 @@ CTable.prototype.Get_Paragraph_ParaPr = function()
 			Cell = Row.Get_Cell(Pos.Cell);
 
 			Cell.Content.Set_ApplyToAll(true);
-			var CurPr = Cell.Content.Get_Paragraph_ParaPr();
+			var CurPr = Cell.Content.GetCalculatedParaPr();
 			Cell.Content.Set_ApplyToAll(false);
 
 			Result_ParaPr = Result_ParaPr.Compare(CurPr);
@@ -7214,9 +7214,9 @@ CTable.prototype.Get_Paragraph_ParaPr = function()
 		return Result_ParaPr;
 	}
 
-	return this.CurCell.Content.Get_Paragraph_ParaPr();
+	return this.CurCell.Content.GetCalculatedParaPr();
 };
-CTable.prototype.Get_Paragraph_TextPr = function()
+CTable.prototype.GetCalculatedTextPr = function()
 {
 	if (true === this.ApplyToAll)
 	{
@@ -7224,7 +7224,7 @@ CTable.prototype.Get_Paragraph_TextPr = function()
 		var Cell = Row.Get_Cell(0);
 
 		Cell.Content.Set_ApplyToAll(true);
-		var Result_TextPr = Cell.Content.Get_Paragraph_TextPr();
+		var Result_TextPr = Cell.Content.GetCalculatedTextPr();
 		Cell.Content.Set_ApplyToAll(false);
 
 		for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
@@ -7237,7 +7237,7 @@ CTable.prototype.Get_Paragraph_TextPr = function()
 			{
 				Cell = Row.Get_Cell(CurCell);
 				Cell.Content.Set_ApplyToAll(true);
-				var CurPr = Cell.Content.Get_Paragraph_TextPr();
+				var CurPr = Cell.Content.GetCalculatedTextPr();
 				Cell.Content.Set_ApplyToAll(false);
 
 				Result_TextPr = Result_TextPr.Compare(CurPr);
@@ -7254,7 +7254,7 @@ CTable.prototype.Get_Paragraph_TextPr = function()
 		var Cell = Row.Get_Cell(Pos.Cell);
 
 		Cell.Content.Set_ApplyToAll(true);
-		var Result_TextPr = Cell.Content.Get_Paragraph_TextPr();
+		var Result_TextPr = Cell.Content.GetCalculatedTextPr();
 		Cell.Content.Set_ApplyToAll(false);
 
 		for (var Index = 1; Index < this.Selection.Data.length; Index++)
@@ -7264,7 +7264,7 @@ CTable.prototype.Get_Paragraph_TextPr = function()
 			Cell = Row.Get_Cell(Pos.Cell);
 
 			Cell.Content.Set_ApplyToAll(true);
-			var CurPr = Cell.Content.Get_Paragraph_TextPr();
+			var CurPr = Cell.Content.GetCalculatedTextPr();
 			Cell.Content.Set_ApplyToAll(false);
 
 			Result_TextPr = Result_TextPr.Compare(CurPr);
@@ -7273,9 +7273,9 @@ CTable.prototype.Get_Paragraph_TextPr = function()
 		return Result_TextPr;
 	}
 
-	return this.CurCell.Content.Get_Paragraph_TextPr();
+	return this.CurCell.Content.GetCalculatedTextPr();
 };
-CTable.prototype.Get_Paragraph_TextPr_Copy = function()
+CTable.prototype.GetDirectTextPr = function()
 {
 	if (true === this.ApplyToAll)
 	{
@@ -7283,7 +7283,7 @@ CTable.prototype.Get_Paragraph_TextPr_Copy = function()
 		var Cell = Row.Get_Cell(0);
 
 		Cell.Content.Set_ApplyToAll(true);
-		var Result_TextPr = Cell.Content.Get_Paragraph_TextPr_Copy();
+		var Result_TextPr = Cell.Content.GetDirectTextPr();
 		Cell.Content.Set_ApplyToAll(false);
 
 		return Result_TextPr;
@@ -7296,15 +7296,15 @@ CTable.prototype.Get_Paragraph_TextPr_Copy = function()
 		var Cell = Row.Get_Cell(Pos.Cell);
 
 		Cell.Content.Set_ApplyToAll(true);
-		var Result_TextPr = Cell.Content.Get_Paragraph_TextPr_Copy();
+		var Result_TextPr = Cell.Content.GetDirectTextPr();
 		Cell.Content.Set_ApplyToAll(false);
 
 		return Result_TextPr;
 	}
 
-	return this.CurCell.Content.Get_Paragraph_TextPr_Copy();
+	return this.CurCell.Content.GetDirectTextPr();
 };
-CTable.prototype.Get_Paragraph_ParaPr_Copy = function()
+CTable.prototype.GetDirectParaPr = function()
 {
 	if (true === this.ApplyToAll)
 	{
@@ -7312,7 +7312,7 @@ CTable.prototype.Get_Paragraph_ParaPr_Copy = function()
 		var Cell = Row.Get_Cell(0);
 
 		Cell.Content.Set_ApplyToAll(true);
-		var Result_TextPr = Cell.Content.Get_Paragraph_ParaPr_Copy();
+		var Result_TextPr = Cell.Content.GetDirectParaPr();
 		Cell.Content.Set_ApplyToAll(false);
 
 		return Result_TextPr;
@@ -7325,13 +7325,13 @@ CTable.prototype.Get_Paragraph_ParaPr_Copy = function()
 		var Cell = Row.Get_Cell(Pos.Cell);
 
 		Cell.Content.Set_ApplyToAll(true);
-		var Result_TextPr = Cell.Content.Get_Paragraph_ParaPr_Copy();
+		var Result_TextPr = Cell.Content.GetDirectParaPr();
 		Cell.Content.Set_ApplyToAll(false);
 
 		return Result_TextPr;
 	}
 
-	return this.CurCell.Content.Get_Paragraph_ParaPr_Copy();
+	return this.CurCell.Content.GetDirectParaPr();
 };
 CTable.prototype.Get_CurrentParagraph = function()
 {
@@ -7346,11 +7346,11 @@ CTable.prototype.Get_CurrentParagraph = function()
 
 	return null;
 };
-CTable.prototype.Set_ImageProps = function(Props)
+CTable.prototype.SetImageProps = function(Props)
 {
 	if ((true === this.Selection.Use && table_Selection_Text === this.Selection.Type) || false === this.Selection.Use)
 	{
-		return this.CurCell.Content.Set_ImageProps(Props);
+		return this.CurCell.Content.SetImageProps(Props);
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -10816,11 +10816,11 @@ CTable.prototype.Internal_Selection_UpdateCells = function(bForceSelectByLines)
 	// В "flow" таблице обновляем значения настроек для параграфа и текста
 	if (true != this.Is_Inline() && true === this.Selection.Use && false === this.Selection.Start)
 	{
-		var ParaPr = this.Get_Paragraph_ParaPr();
+		var ParaPr = this.GetCalculatedParaPr();
 		if (null != ParaPr)
 			editor.UpdateParagraphProp(ParaPr);
 
-		var TextPr = this.Get_Paragraph_TextPr();
+		var TextPr = this.GetCalculatedTextPr();
 		if (null != TextPr)
 			editor.UpdateTextPr(TextPr);
 	}
@@ -11989,6 +11989,10 @@ CTable.prototype.IsCellSelection = function()
 		return true;
 
 	return false;
+};
+CTable.prototype.SetTableProps = function(oProps)
+{
+	this.Set_Props(oProps);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

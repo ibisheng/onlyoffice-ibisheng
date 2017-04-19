@@ -4545,7 +4545,7 @@ CDocument.prototype.Paragraph_SetHighlight = function(IsColor, r, g, b)
 			this.HighlightColor = new CDocumentColor(r, g, b);
 	}
 };
-CDocument.prototype.Set_ImageProps = function(Props)
+CDocument.prototype.SetImageProps = function(Props)
 {
 	this.Controller.SetImageProps(Props);
 	this.Recalculate();
@@ -4577,7 +4577,7 @@ CDocument.prototype.Select_Drawings = function(DrawingArray, TargetContent)
 		this.DrawingObjects.selectObject(DrawingArray[i].GraphicObj, 0);
 	}
 };
-CDocument.prototype.Set_TableProps = function(Props)
+CDocument.prototype.SetTableProps = function(Props)
 {
 	this.Controller.SetTableProps(Props);
 	this.Recalculate();
@@ -4585,19 +4585,35 @@ CDocument.prototype.Set_TableProps = function(Props)
 	this.Document_UpdateRulersState();
 	this.Document_UpdateSelectionState();
 };
-CDocument.prototype.Get_Paragraph_ParaPr = function()
+/**
+ * Получаем рассчитанные настройки параграфа (полностью заполненные)
+ * @returns {CParaPr}
+ */
+CDocument.prototype.GetCalculatedParaPr = function()
 {
-	return this.Controller.GetCurrentParaPr();
+	return this.Controller.GetCalculatedParaPr();
 };
-CDocument.prototype.Get_Paragraph_TextPr = function()
+/**
+ * Получаем рассчитанные настройки текста (полностью заполненные)
+ * @returns {CTextPr}
+ */
+CDocument.prototype.GetCalculatedTextPr = function()
 {
-	return this.Controller.GetCurrentTextPr();
+	return this.Controller.GetCalculatedTextPr();
 };
-CDocument.prototype.Get_Paragraph_TextPr_Copy = function()
+/**
+ * Получаем прямые настройки параграфа, т.е. которые выставлены непосредственно у параграфа, без учета стилей
+ * @returns {CParaPr}
+ */
+CDocument.prototype.GetDirectTextPr = function()
 {
 	return this.Controller.GetDirectTextPr();
 };
-CDocument.prototype.Get_Paragraph_ParaPr_Copy = function()
+/**
+ * Получаем прямые настройки текста, т.е. которые выставлены непосредственно у рана, без учета стилей
+ * @returns {CTextPr}
+ */
+CDocument.prototype.GetDirectParaPr = function()
 {
 	return this.Controller.GetDirectParaPr();
 };
@@ -4710,7 +4726,7 @@ CDocument.prototype.Interface_Update_ParaPr = function()
 	if (!this.Api)
 		return;
 
-	var ParaPr = this.Get_Paragraph_ParaPr();
+	var ParaPr = this.GetCalculatedParaPr();
 
 	if (null != ParaPr)
 	{
@@ -4766,7 +4782,7 @@ CDocument.prototype.Interface_Update_TextPr = function()
 	if (!this.Api)
 		return;
 
-	var TextPr = this.Get_Paragraph_TextPr();
+	var TextPr = this.GetCalculatedTextPr();
 
 	if (null != TextPr)
 	{
@@ -6610,7 +6626,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode === 53 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + Num5 - зачеркиваем текст
     {
-        var TextPr = this.Get_Paragraph_TextPr();
+        var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
@@ -6630,7 +6646,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 66 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + B - делаем текст жирным
     {
-        var TextPr = this.Get_Paragraph_TextPr();
+        var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
@@ -6680,7 +6696,7 @@ CDocument.prototype.OnKeyDown = function(e)
 	}
     else if (e.KeyCode == 73 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + I - делаем текст наклонным
     {
-        var TextPr = this.Get_Paragraph_TextPr();
+        var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
@@ -6760,7 +6776,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 85 && false === editor.isViewMode && true === e.CtrlKey) // Ctrl + U - делаем текст подчеркнутым
     {
-        var TextPr = this.Get_Paragraph_TextPr();
+        var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
@@ -6850,7 +6866,7 @@ CDocument.prototype.OnKeyDown = function(e)
     {
         if (true === e.CtrlKey) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
         {
-            var TextPr = this.Get_Paragraph_TextPr();
+            var TextPr = this.GetCalculatedTextPr();
             if (null != TextPr)
             {
                 if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
@@ -6882,7 +6898,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 188 && true === e.CtrlKey) // Ctrl + ,
     {
-        var TextPr = this.Get_Paragraph_TextPr();
+        var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
@@ -6912,7 +6928,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 190 && true === e.CtrlKey) // Ctrl + .
     {
-        var TextPr = this.Get_Paragraph_TextPr();
+        var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
@@ -7242,7 +7258,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 				var ParaItem = null;
 				if (this.HighlightColor != highlight_None)
 				{
-					var TextPr = this.Get_Paragraph_TextPr();
+					var TextPr = this.GetCalculatedTextPr();
 					if ("undefined" === typeof( TextPr.HighLight ) || null === TextPr.HighLight || highlight_None === TextPr.HighLight ||
 						this.HighlightColor.r != TextPr.HighLight.r || this.HighlightColor.g != TextPr.HighLight.g || this.HighlightColor.b != TextPr.HighLight.b)
 						ParaItem = new ParaTextPr({HighLight : this.HighlightColor});
@@ -7755,8 +7771,8 @@ CDocument.prototype.Document_SetHdrFtrLink = function(bLinkToPrevious)
 };
 CDocument.prototype.Document_Format_Copy = function()
 {
-	this.CopyTextPr = this.Get_Paragraph_TextPr_Copy();
-	this.CopyParaPr = this.Get_Paragraph_ParaPr_Copy();
+	this.CopyTextPr = this.GetDirectTextPr();
+	this.CopyParaPr = this.GetDirectParaPr();
 };
 CDocument.prototype.EndHdrFtrEditing = function(bCanStayOnPage)
 {
@@ -10371,7 +10387,7 @@ CDocument.prototype.private_ToggleParagraphAlignByHotkey = function(Align)
 	}
 	else
 	{
-		var ParaPr = this.Get_Paragraph_ParaPr();
+		var ParaPr = this.GetCalculatedParaPr();
 		if (null != ParaPr)
 		{
 			if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
@@ -13705,7 +13721,7 @@ CDocument.prototype.controller_IncreaseDecreaseFontSize = function(bIncrease)
 			}
 			case  selectionflag_Numbering:
 			{
-				var OldFontSize = this.Get_Paragraph_TextPr().FontSize;
+				var OldFontSize = this.GetCalculatedTextPr().FontSize;
 				var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
 				var TextPr      = new CTextPr();
 				TextPr.FontSize = NewFontSize;
@@ -13749,26 +13765,23 @@ CDocument.prototype.controller_SetImageProps = function(Props)
 		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		if (true == this.Selection.Use)
-			this.Content[this.Selection.StartPos].Set_ImageProps(Props);
+			this.Content[this.Selection.StartPos].SetImageProps(Props);
 		else
-			this.Content[this.CurPos.ContentPos].Set_ImageProps(Props);
+			this.Content[this.CurPos.ContentPos].SetImageProps(Props);
 	}
 };
 CDocument.prototype.controller_SetTableProps = function(Props)
 {
 	var Pos = -1;
-	if (true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
+	if (true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos)
 		Pos = this.Selection.StartPos;
-	else if (false === this.Selection.Use && type_Table === this.Content[this.CurPos.ContentPos].GetType())
+	else if (false === this.Selection.Use)
 		Pos = this.CurPos.ContentPos;
 
-	if (-1 != Pos)
-	{
-		var Table = this.Content[Pos];
-		Table.Set_Props(Props);
-	}
+	if (-1 !== Pos)
+		this.Content[Pos].SetTableProps(Props);
 };
-CDocument.prototype.controller_GetCurrentParaPr = function()
+CDocument.prototype.controller_GetCalculatedParaPr = function()
 {
 	var Result_ParaPr = new CParaPr();
 	if (true === this.Selection.Use && selectionflag_Common === this.Selection.Flag)
@@ -13782,14 +13795,14 @@ CDocument.prototype.controller_GetCurrentParaPr = function()
 			EndPos   = Temp;
 		}
 
-		var StartPr = this.Content[StartPos].GetParagraphParaPr();
+		var StartPr = this.Content[StartPos].GetCalculatedParaPr();
 		var Pr      = StartPr.Copy();
 		Pr.Locked   = StartPr.Locked;
 
 		for (var Index = StartPos + 1; Index <= EndPos; Index++)
 		{
 			var Item   = this.Content[Index];
-			var TempPr = Item.GetParagraphParaPr();
+			var TempPr = Item.GetCalculatedParaPr();
 			Pr         = Pr.Compare(TempPr);
 		}
 
@@ -13850,7 +13863,7 @@ CDocument.prototype.controller_GetCurrentParaPr = function()
 		}
 		else
 		{
-			Result_ParaPr = Item.GetParagraphParaPr();
+			Result_ParaPr = Item.GetCalculatedParaPr();
 		}
 	}
 
@@ -13861,7 +13874,7 @@ CDocument.prototype.controller_GetCurrentParaPr = function()
 
 	return Result_ParaPr;
 };
-CDocument.prototype.controller_GetCurrentTextPr = function()
+CDocument.prototype.controller_GetCalculatedTextPr = function()
 {
 	var Result_TextPr = null;
 	if (true === this.Selection.Use)
@@ -13880,11 +13893,11 @@ CDocument.prototype.controller_GetCurrentTextPr = function()
 					EndPos   = Temp;
 				}
 
-				VisTextPr = this.Content[StartPos].GetParagraphTextPr();
+				VisTextPr = this.Content[StartPos].GetCalculatedTextPr();
 
 				for (var Index = StartPos + 1; Index <= EndPos; Index++)
 				{
-					var CurPr = this.Content[Index].GetParagraphTextPr();
+					var CurPr = this.Content[Index].GetCalculatedTextPr();
 					VisTextPr = VisTextPr.Compare(CurPr);
 				}
 
@@ -13913,7 +13926,7 @@ CDocument.prototype.controller_GetCurrentTextPr = function()
 	}
 	else
 	{
-		Result_TextPr = this.Content[this.CurPos.ContentPos].GetParagraphTextPr();
+		Result_TextPr = this.Content[this.CurPos.ContentPos].GetCalculatedTextPr();
 	}
 
 	return Result_TextPr;
@@ -13933,7 +13946,7 @@ CDocument.prototype.controller_GetDirectParaPr = function()
 					StartPos = this.Selection.EndPos;
 
 				var Item      = this.Content[StartPos];
-				Result_ParaPr = Item.Get_Paragraph_ParaPr_Copy();
+				Result_ParaPr = Item.GetDirectParaPr();
 
 				break;
 			}
@@ -13953,7 +13966,7 @@ CDocument.prototype.controller_GetDirectParaPr = function()
 	else
 	{
 		var Item      = this.Content[this.CurPos.ContentPos];
-		Result_ParaPr = Item.Get_Paragraph_ParaPr_Copy();
+		Result_ParaPr = Item.GetDirectParaPr();
 	}
 
 	return Result_ParaPr;
@@ -13974,7 +13987,7 @@ CDocument.prototype.controller_GetDirectTextPr = function()
 					StartPos = this.Selection.EndPos;
 
 				var Item  = this.Content[StartPos];
-				VisTextPr = Item.Get_Paragraph_TextPr_Copy();
+				VisTextPr = Item.GetDirectTextPr();
 
 				break;
 			}
@@ -13996,7 +14009,7 @@ CDocument.prototype.controller_GetDirectTextPr = function()
 	else
 	{
 		var Item      = this.Content[this.CurPos.ContentPos];
-		Result_TextPr = Item.Get_Paragraph_TextPr_Copy();
+		Result_TextPr = Item.GetDirectTextPr();
 	}
 
 	return Result_TextPr;

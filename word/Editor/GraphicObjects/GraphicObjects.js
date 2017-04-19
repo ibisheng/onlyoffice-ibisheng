@@ -2691,7 +2691,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Set_TableProps(Props);
+            content.SetTableProps(Props);
         }
     },
 

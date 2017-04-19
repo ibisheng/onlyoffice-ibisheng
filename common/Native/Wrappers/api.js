@@ -1872,7 +1872,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
                 if (_style != null)
                 {
-                    this.WordControl.m_oLogicDocument.Set_TableProps({TableStyle : _style});
+                    this.WordControl.m_oLogicDocument.SetTableProps({TableStyle : _style});
                 }
             }
             break;
@@ -4513,7 +4513,7 @@ Asc['asc_docs_api'].prototype.UpdateTextPr = function(TextPr)
 Asc['asc_docs_api'].prototype.UpdateParagraphProp = function(ParaPr)
 {
     // TODO: как только разъединят настройки параграфа и текста переделать тут
-    var TextPr = this.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
+    var TextPr = this.WordControl.m_oLogicDocument.GetCalculatedTextPr();
     ParaPr.Subscript   = ( TextPr.VertAlign === AscCommon.vertalign_SubScript   ? true : false );
     ParaPr.Superscript = ( TextPr.VertAlign === AscCommon.vertalign_SuperScript ? true : false );
     ParaPr.Strikeout   = TextPr.Strikeout;
@@ -4730,13 +4730,13 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
         if(ImagePr.ImageUrl != undefined && ImagePr.ImageUrl != null && ImagePr.ImageUrl != "")
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+            this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
         }
         else if (ImagePr.ShapeProperties && ImagePr.ShapeProperties.fill && ImagePr.ShapeProperties.fill.fill &&
                  ImagePr.ShapeProperties.fill.fill.url !== undefined && ImagePr.ShapeProperties.fill.fill.url != null && ImagePr.ShapeProperties.fill.fill.url != "")
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+            this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
         }
         else
         {
@@ -4747,13 +4747,13 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
             {
                 if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
                 {
-                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                    this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
                     this.exucuteHistoryEnd = false;
                 }
                 else
                 {
                     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                    this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
                 }
                 if(this.exucuteHistory)
                 {
@@ -4763,11 +4763,11 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
             else
             {
                 AscFormat.ExecuteNoHistory(function(){
-                                           this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                                           this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
                                            }, this, []);
             }
 
-            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+            this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
         }
     }
 };

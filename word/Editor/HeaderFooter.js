@@ -881,35 +881,35 @@ CHeaderFooter.prototype =
 		return this.Content.IncreaseDecreaseIndent(bIncrease);
 	},
 
-    Set_ImageProps : function(Props)
-    {
-        return this.Content.Set_ImageProps( Props );
-    },
+	SetImageProps : function(Props)
+	{
+		return this.Content.SetImageProps(Props);
+	},
 
-    Set_TableProps : function(Props)
-    {
-        return this.Content.Set_TableProps( Props );
-    },
+	SetTableProps : function(Props)
+	{
+		return this.Content.SetTableProps(Props);
+	},
 
-    Get_Paragraph_ParaPr : function()
-    {
-        return this.Content.Get_Paragraph_ParaPr();
-    },
+	GetCalculatedParaPr : function()
+	{
+		return this.Content.GetCalculatedParaPr();
+	},
 
-    Get_Paragraph_TextPr : function()
-    {
-        return this.Content.Get_Paragraph_TextPr();
-    },
+	GetCalculatedTextPr : function()
+	{
+		return this.Content.GetCalculatedTextPr();
+	},
 
-    Get_Paragraph_TextPr_Copy : function()
-    {
-        return this.Content.Get_Paragraph_TextPr_Copy();
-    },
+	GetDirectTextPr : function()
+	{
+		return this.Content.GetDirectTextPr();
+	},
 
-    Get_Paragraph_ParaPr_Copy : function()
-    {
-        return this.Content.Get_Paragraph_ParaPr_Copy();
-    },
+	GetDirectParaPr : function()
+	{
+		return this.Content.GetDirectParaPr();
+	},
 
     GetAllParagraphs : function(Props, ParaArray)
     {
@@ -2051,45 +2051,45 @@ CHeaderFooterController.prototype =
 			return this.CurHdrFtr.IncreaseDecreaseIndent(bIncrease);
 	},
 
-    Set_ImageProps : function(Props)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_ImageProps( Props );
-    },
+	SetImageProps : function(Props)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetImageProps(Props);
+	},
 
-    Set_TableProps : function(Props)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Set_TableProps( Props );
-    },
+	SetTableProps : function(Props)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SetTableProps(Props);
+	},
 
-    Get_Paragraph_ParaPr : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Get_Paragraph_ParaPr();
-    },
+	GetCalculatedParaPr : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.GetCalculatedParaPr();
+	},
 
-    Get_Paragraph_TextPr : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Get_Paragraph_TextPr();
-    },
+	GetCalculatedTextPr : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.GetCalculatedTextPr();
+	},
 
-    Get_Paragraph_TextPr_Copy : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Get_Paragraph_TextPr_Copy();
+	GetDirectTextPr : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.GetDirectTextPr();
 
-        return null;
-    },
+		return null;
+	},
 
-    Get_Paragraph_ParaPr_Copy : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Get_Paragraph_ParaPr_Copy();
+	GetDirectParaPr : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.GetDirectParaPr();
 
-        return null;
-    },    
+		return null;
+	},
 
     // Убираем селект
     Selection_Remove : function(bNoCheckDrawing)

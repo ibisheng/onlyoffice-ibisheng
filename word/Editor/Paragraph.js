@@ -6898,7 +6898,7 @@ Paragraph.prototype.Get_SelectedContent = function(DocContent)
 		DocContent.Add(new CSelectedElement(Para, false));
 	}
 };
-Paragraph.prototype.Get_Paragraph_TextPr = function()
+Paragraph.prototype.GetCalculatedTextPr = function()
 {
 	var TextPr;
 	if (true === this.ApplyToAll)
@@ -7007,7 +7007,7 @@ Paragraph.prototype.Get_Paragraph_TextPr = function()
 
 	return TextPr;
 };
-Paragraph.prototype.Get_Paragraph_ParaPr = function()
+Paragraph.prototype.GetCalculatedParaPr = function()
 {
 	var ParaPr = this.Get_CompiledPr2(false).ParaPr;
 	ParaPr.Locked = this.Lock.Is_Locked();
@@ -8011,7 +8011,7 @@ Paragraph.prototype.Internal_CalculateAutoSpacing = function(Value, UseAuto, Par
 
 	return Result;
 };
-Paragraph.prototype.Get_Paragraph_TextPr_Copy = function()
+Paragraph.prototype.GetDirectTextPr = function()
 {
 	var TextPr;
 	if (true === this.ApplyToAll)
@@ -8053,10 +8053,9 @@ Paragraph.prototype.Get_Paragraph_TextPr_Copy = function()
 
 	return TextPr;
 };
-Paragraph.prototype.Get_Paragraph_ParaPr_Copy = function()
+Paragraph.prototype.GetDirectParaPr = function()
 {
-	var ParaPr = this.Pr.Copy();
-	return ParaPr;
+	return this.Pr.Copy();
 };
 Paragraph.prototype.Paragraph_Format_Paste = function(TextPr, ParaPr, ApplyPara)
 {

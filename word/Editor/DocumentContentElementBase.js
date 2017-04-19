@@ -219,21 +219,25 @@ CDocumentContentElementBase.prototype.SelectAll = function(nDirection)
 {
 	this.Select_All(nDirection);
 };
-CDocumentContentElementBase.prototype.Get_Paragraph_TextPr = function()
+CDocumentContentElementBase.prototype.GetCalculatedTextPr = function()
 {
-	return new CTextPr();
+	var oTextPr = new CTextPr();
+	oTextPr.Init_Default();
+	return oTextPr;
 };
-CDocumentContentElementBase.prototype.GetParagraphTextPr = function()
+CDocumentContentElementBase.prototype.GetCalculatedParaPr = function()
 {
-	return this.Get_Paragraph_TextPr();
+	var oParaPr = new CParaPr();
+	oParaPr.Init_Default();
+	return oParaPr;
 };
-CDocumentContentElementBase.prototype.Get_Paragraph_ParaPr = function()
+CDocumentContentElementBase.prototype.GetDirectParaPr = function()
 {
 	return new CParaPr();
 };
-CDocumentContentElementBase.prototype.GetParagraphParaPr = function()
+CDocumentContentElementBase.prototype.GetDirectTextPr = function()
 {
-	return this.Get_Paragraph_ParaPr();
+	return new CTextPr();
 };
 CDocumentContentElementBase.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
 {
@@ -504,6 +508,12 @@ CDocumentContentElementBase.prototype.IncreaseDecreaseFontSize = function(bIncre
 {
 };
 CDocumentContentElementBase.prototype.IncreaseDecreaseIndent = function(bIncrease)
+{
+};
+CDocumentContentElementBase.prototype.SetImageProps = function(oProps)
+{
+};
+CDocumentContentElementBase.prototype.SetTableProps = function(oProps)
 {
 };
 //----------------------------------------------------------------------------------------------------------------------

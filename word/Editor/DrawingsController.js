@@ -256,11 +256,11 @@ CDrawingsController.prototype.SetTableProps = function(Props)
 {
 	this.DrawingObjects.setTableProps(Props);
 };
-CDrawingsController.prototype.GetCurrentParaPr = function()
+CDrawingsController.prototype.GetCalculatedParaPr = function()
 {
 	return this.DrawingObjects.getParagraphParaPr();
 };
-CDrawingsController.prototype.GetCurrentTextPr = function()
+CDrawingsController.prototype.GetCalculatedTextPr = function()
 {
 	return this.DrawingObjects.getParagraphTextPr();
 };

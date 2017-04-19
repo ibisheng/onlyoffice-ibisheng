@@ -4449,12 +4449,12 @@ CShape.prototype.getTextArtProperties = function()
             //var oTargetDocContent = oController.getTargetDocContent();
             //if(oTargetDocContent === oContent)
             //{
-            //    oTextPr = oContent.Get_Paragraph_TextPr();
+            //    oTextPr = oContent.GetCalculatedTextPr();
             //}
             //else
             //{
             //    oContent.Set_ApplyToAll(true);
-            //    oTextPr = oContent.Get_Paragraph_TextPr();
+            //    oTextPr = oContent.GetCalculatedTextPr();
             //    oContent.Set_ApplyToAll(false);
             //}
             //if(oTextPr.TextFill)
@@ -4505,7 +4505,7 @@ CShape.prototype.getParagraphParaPr = function () {
     if (this.txBody && this.txBody.content) {
         var _result;
         this.txBody.content.Set_ApplyToAll(true);
-        _result = this.txBody.content.Get_Paragraph_ParaPr();
+        _result = this.txBody.content.GetCalculatedParaPr();
         this.txBody.content.Set_ApplyToAll(false);
         return _result;
     }
@@ -4516,7 +4516,7 @@ CShape.prototype.getParagraphTextPr = function () {
     if (this.txBody && this.txBody.content) {
         var _result;
         this.txBody.content.Set_ApplyToAll(true);
-        _result = this.txBody.content.Get_Paragraph_TextPr();
+        _result = this.txBody.content.GetCalculatedTextPr();
         this.txBody.content.Set_ApplyToAll(false);
         return _result;
     }

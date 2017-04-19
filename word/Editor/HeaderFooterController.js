@@ -205,27 +205,27 @@ CHdrFtrController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 };
 CHdrFtrController.prototype.SetImageProps = function(Props)
 {
-	this.HdrFtr.Set_ImageProps(Props);
+	this.HdrFtr.SetImageProps(Props);
 };
 CHdrFtrController.prototype.SetTableProps = function(Props)
 {
-	this.HdrFtr.Set_TableProps(Props);
+	this.HdrFtr.SetTableProps(Props);
 };
-CHdrFtrController.prototype.GetCurrentParaPr = function()
+CHdrFtrController.prototype.GetCalculatedParaPr = function()
 {
-	return this.HdrFtr.Get_Paragraph_ParaPr();
+	return this.HdrFtr.GetCalculatedParaPr();
 };
-CHdrFtrController.prototype.GetCurrentTextPr = function()
+CHdrFtrController.prototype.GetCalculatedTextPr = function()
 {
-	return this.HdrFtr.Get_Paragraph_TextPr();
+	return this.HdrFtr.GetCalculatedTextPr();
 };
 CHdrFtrController.prototype.GetDirectParaPr = function()
 {
-	return this.HdrFtr.Get_Paragraph_ParaPr_Copy();
+	return this.HdrFtr.GetDirectParaPr();
 };
 CHdrFtrController.prototype.GetDirectTextPr = function()
 {
-	return this.HdrFtr.Get_Paragraph_TextPr_Copy();
+	return this.HdrFtr.GetDirectTextPr();
 };
 CHdrFtrController.prototype.RemoveSelection = function(bNoCheckDrawing)
 {

@@ -201,13 +201,21 @@ CBlockLevelSdt.prototype.Select_All = function(nDirection)
 {
 	this.Content.Select_All(nDirection);
 };
-CBlockLevelSdt.prototype.Get_Paragraph_TextPr = function()
+CBlockLevelSdt.prototype.GetCalculatedTextPr = function()
 {
-	return this.Content.Get_Paragraph_TextPr();
+	return this.Content.GetCalculatedTextPr();
 };
-CBlockLevelSdt.prototype.Get_Paragraph_ParaPr = function()
+CBlockLevelSdt.prototype.GetCalculatedParaPr = function()
 {
-	return this.Content.Get_Paragraph_ParaPr();
+	return this.Content.GetCalculatedParaPr();
+};
+CBlockLevelSdt.prototype.GetDirectParaPr = function()
+{
+	return this.Content.GetDirectParaPr();
+};
+CBlockLevelSdt.prototype.GetDirectTextPr = function()
+{
+	return this.Content.GetDirectTextPr();
 };
 CBlockLevelSdt.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
 {
@@ -460,6 +468,14 @@ CBlockLevelSdt.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 CBlockLevelSdt.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
 	return this.Content.IncreaseDecreaseIndent(bIncrease);
+};
+CBlockLevelSdt.prototype.SetImageProps = function(oProps)
+{
+	return this.Content.SetImageProps(oProps);
+};
+CBlockLevelSdt.prototype.SetTableProps = function(oProps)
+{
+	return this.Content.SetTableProps(oProps);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)

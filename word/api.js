@@ -1425,8 +1425,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.get_TextProps = function()
 	{
 		var Doc    = this.WordControl.m_oLogicDocument;
-		var ParaPr = Doc.Get_Paragraph_ParaPr();
-		var TextPr = Doc.Get_Paragraph_TextPr();
+		var ParaPr = Doc.GetCalculatedParaPr();
+		var TextPr = Doc.GetCalculatedTextPr();
 
 		// return { ParaPr: ParaPr, TextPr : TextPr };
 		return new Asc.CParagraphAndTextProp(ParaPr, TextPr);	// uncomment if this method will be used externally. 20/03/2012 uncommented for testers
@@ -1531,7 +1531,7 @@ background-repeat: no-repeat;\
 		//	}
 
 		// TODO: как только разъединят настройки параграфа и текста переделать тут
-		var TextPr         = editor.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
+		var TextPr         = editor.WordControl.m_oLogicDocument.GetCalculatedTextPr();
 		ParaPr.Subscript   = TextPr.VertAlign === AscCommon.vertalign_SubScript;
 		ParaPr.Superscript = TextPr.VertAlign === AscCommon.vertalign_SuperScript;
 		ParaPr.Strikeout   = TextPr.Strikeout;
@@ -3991,7 +3991,7 @@ background-repeat: no-repeat;\
 			}
 
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApplyTablePr);
-			this.WordControl.m_oLogicDocument.Set_TableProps(obj);
+			this.WordControl.m_oLogicDocument.SetTableProps(obj);
 		}
 	};
 	/*callbacks*/
@@ -4261,7 +4261,7 @@ background-repeat: no-repeat;\
 			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddImageToPage);
 			LogicDocument.Start_SilentMode();
 			LogicDocument.AddInlineImage(dW, dH, sUrl);
-			LogicDocument.Set_ImageProps(oImageProps);
+			LogicDocument.SetImageProps(oImageProps);
 			LogicDocument.End_SilentMode(true);
 		}
 	};
@@ -4400,14 +4400,14 @@ background-repeat: no-repeat;\
 					if (null != _img)
 					{
 						oApi.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApplyImagePrWithUrl);
-						oApi.WordControl.m_oLogicDocument.Set_ImageProps(ImagePr);
+						oApi.WordControl.m_oLogicDocument.SetImageProps(ImagePr);
 					}
 					else
 					{
 						oApi.asyncImageEndLoaded2 = function(_image)
 						{
 							oApi.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApplyImagePrWithUrlLong);
-							oApi.WordControl.m_oLogicDocument.Set_ImageProps(ImagePr);
+							oApi.WordControl.m_oLogicDocument.SetImageProps(ImagePr);
 						}
 					}
 				};
@@ -4498,14 +4498,14 @@ background-repeat: no-repeat;\
 						{
 							History.Create_NewPoint(AscDFH.historydescription_Document_ApplyImagePr);
 						}
-						this.WordControl.m_oLogicDocument.Set_ImageProps(ImagePr);
+						this.WordControl.m_oLogicDocument.SetImageProps(ImagePr);
 						this.exucuteHistoryEnd    = false;
 						this.nCurPointItemsLength = -1;
 					}
 					else
 					{
 						this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ApplyImagePr);
-						this.WordControl.m_oLogicDocument.Set_ImageProps(ImagePr);
+						this.WordControl.m_oLogicDocument.SetImageProps(ImagePr);
 					}
 					if (this.exucuteHistory)
 					{
@@ -4529,7 +4529,7 @@ background-repeat: no-repeat;\
 						bNeedCheckChangesCount = true;
 						History.Create_NewPoint(AscDFH.historydescription_Document_ApplyImagePr);
 					}
-					this.WordControl.m_oLogicDocument.Set_ImageProps(ImagePr);
+					this.WordControl.m_oLogicDocument.SetImageProps(ImagePr);
 					if (bNeedCheckChangesCount)
 					{
 						var oPoint = History.Points[History.Index];

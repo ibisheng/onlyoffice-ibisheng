@@ -112,7 +112,7 @@ var SKIP_LBL_LIMIT = 100;
             if(!oContent)
                 continue;
             oContent.Set_ApplyToAll(true);
-            var oTextPr = oContent.Get_Paragraph_TextPr();
+            var oTextPr = oContent.GetCalculatedTextPr();
             oContent.Set_ApplyToAll(false);
             if(!oResultTextPr)
             {
@@ -1039,7 +1039,7 @@ CChartSpace.prototype.getParagraphTextPr = function()
     }
     else  if(this.selection.textSelection)
     {
-        return this.selection.textSelection.txBody.content.Get_Paragraph_TextPr();
+        return this.selection.textSelection.txBody.content.GetCalculatedTextPr();
     }
     else if(this.selection.axisLbls && this.selection.axisLbls.labels)
     {

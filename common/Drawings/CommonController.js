@@ -2237,14 +2237,14 @@ DrawingObjectsController.prototype =
         {
             if(target_text_object.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                return target_text_object.graphicObject.Get_Paragraph_ParaPr();
+                return target_text_object.graphicObject.GetCalculatedParaPr();
             }
             else
             {
                 var content = this.getTargetDocContent();
                 if(content)
                 {
-                    return content.Get_Paragraph_ParaPr();
+                    return content.GetCalculatedParaPr();
                 }
             }
         }
@@ -2269,7 +2269,7 @@ DrawingObjectsController.prototype =
                             if(content)
                             {
                                 content.Set_ApplyToAll(true);
-                                cur_pr = content.Get_Paragraph_ParaPr();
+                                cur_pr = content.GetCalculatedParaPr();
                                 content.Set_ApplyToAll(false);
                             }
                         }
@@ -2310,14 +2310,14 @@ DrawingObjectsController.prototype =
         {
             if(target_text_object.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                return target_text_object.graphicObject.Get_Paragraph_TextPr();
+                return target_text_object.graphicObject.GetCalculatedTextPr();
             }
             else
             {
                 var content = this.getTargetDocContent();
                 if(content)
                 {
-                    return content.Get_Paragraph_TextPr();
+                    return content.GetCalculatedTextPr();
                 }
             }
         }
@@ -2346,7 +2346,7 @@ DrawingObjectsController.prototype =
                             if(content)
                             {
                                 content.Set_ApplyToAll(true);
-                                cur_pr = content.Get_Paragraph_TextPr();
+                                cur_pr = content.GetCalculatedTextPr();
                                 content.Set_ApplyToAll(false);
                             }
                         }
@@ -2372,12 +2372,12 @@ DrawingObjectsController.prototype =
 				&& this.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_ImageShape
 				&& this.selectedObjects[0].parent
 				&& this.selectedObjects[0].parent.Parent
-				&& this.selectedObjects[0].parent.Parent.Get_Paragraph_TextPr)
+				&& this.selectedObjects[0].parent.Parent.GetCalculatedTextPr)
 			{
 				var oParaDrawing = this.selectedObjects[0].parent;
 				var oParagraph   = oParaDrawing.Parent;
 				oParagraph.Cursor_MoveTo_Drawing(oParaDrawing.Get_Id(), true);
-				result = oParagraph.Get_Paragraph_TextPr();
+				result = oParagraph.GetCalculatedTextPr();
 			}
             else
             {

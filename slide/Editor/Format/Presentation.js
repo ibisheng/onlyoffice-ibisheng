@@ -2117,7 +2117,7 @@ CPresentation.prototype =
         return isRealObject(this.Slides[this.CurPage]) && this.Slides[this.CurPage].graphicObjects.canIncreaseParagraphLevel(bIncrease);
     },
 
-    Set_ImageProps : function(Props)
+	SetImageProps : function(Props)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.applyDrawingProps, [Props], false, AscDFH.historydescription_Presentation_SetImageProps);
         this.Document_UpdateInterfaceState();
@@ -2220,7 +2220,7 @@ CPresentation.prototype =
     },
 
 
-    Set_TableProps : function(Props)
+	SetTableProps : function(Props)
     {
         if(this.Slides[this.CurPage]){
             this.Slides[this.CurPage].graphicObjects.setTableProps(Props);
@@ -2230,7 +2230,7 @@ CPresentation.prototype =
         }
     },
 
-    Get_Paragraph_ParaPr : function()
+	GetCalculatedParaPr : function()
     {
         if(this.Slides[this.CurPage])
         {
@@ -2243,7 +2243,7 @@ CPresentation.prototype =
         return new CParaPr();
     },
 
-    Get_Paragraph_TextPr : function()
+	GetCalculatedTextPr : function()
     {
         if(this.Slides[this.CurPage])
         {
@@ -2256,7 +2256,7 @@ CPresentation.prototype =
         return new CTextPr();
     },
 
-    Get_Paragraph_TextPr_Copy : function()
+	GetDirectTextPr : function()
     {
         if(this.Slides[this.CurPage])
         {
@@ -2265,7 +2265,7 @@ CPresentation.prototype =
         return new CTextPr();
     },
 
-    Get_Paragraph_ParaPr_Copy : function()
+	GetDirectParaPr : function()
     {
         if(this.Slides[this.CurPage])
         {
@@ -2764,7 +2764,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 66 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + B - делаем текст жирным
         {
-            var TextPr = this.Get_Paragraph_TextPr();
+            var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
@@ -2801,7 +2801,7 @@ CPresentation.prototype =
         {
             if ( true !== e.AltKey ) // Ctrl + E - переключение прилегания параграфа между center и left
             {
-                var ParaPr = this.Get_Paragraph_ParaPr();
+                var ParaPr = this.GetCalculatedParaPr();
                 if ( null != ParaPr )
                 {
                     this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
@@ -2833,7 +2833,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 73 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + I - делаем текст наклонным
         {
-            var TextPr = this.Get_Paragraph_TextPr();
+            var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
@@ -2845,7 +2845,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 74 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
         {
-            var ParaPr = this.Get_Paragraph_ParaPr();
+            var ParaPr = this.GetCalculatedParaPr();
             if ( null != ParaPr )
             {
                 if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
@@ -2878,7 +2878,7 @@ CPresentation.prototype =
             }
             else // Ctrl + L - переключение прилегания параграфа между left и justify
             {
-                var ParaPr = this.Get_Paragraph_ParaPr();
+                var ParaPr = this.GetCalculatedParaPr();
                 if ( null != ParaPr )
                 {
                     if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
@@ -2926,7 +2926,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 82 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
         {
-            var ParaPr = this.Get_Paragraph_ParaPr();
+            var ParaPr = this.GetCalculatedParaPr();
             if ( null != ParaPr )
             {
                 if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
@@ -2945,7 +2945,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 85 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + U - делаем текст подчеркнутым
         {
-            var TextPr = this.Get_Paragraph_TextPr();
+            var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
@@ -2957,7 +2957,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 53 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + 5 - делаем текст зачеркнутым
         {
-            var TextPr = this.Get_Paragraph_TextPr();
+            var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
@@ -3015,7 +3015,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 187 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
         {
-            var TextPr = this.Get_Paragraph_TextPr();
+            var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
@@ -3030,7 +3030,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 188 && true === e.CtrlKey ) // Ctrl + ,
         {
-            var TextPr = this.Get_Paragraph_TextPr();
+            var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
@@ -3059,7 +3059,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 190 && true === e.CtrlKey ) // Ctrl + .
         {
-            var TextPr = this.Get_Paragraph_TextPr();
+            var TextPr = this.GetCalculatedTextPr();
             if ( null != TextPr )
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
@@ -3312,8 +3312,8 @@ CPresentation.prototype =
 
     Document_Format_Copy : function()
     {
-        this.CopyTextPr = this.Get_Paragraph_TextPr_Copy();
-        this.CopyParaPr = this.Get_Paragraph_ParaPr_Copy();
+        this.CopyTextPr = this.GetDirectTextPr();
+        this.CopyParaPr = this.GetDirectParaPr();
     },
 
     Document_Format_Paste : function()
@@ -3599,7 +3599,7 @@ CPresentation.prototype =
                     var oDocContent = oCurSlide.notesShape.getDocContent();
                     if(oDocContent)
                     {
-                        var oParaPr = oDocContent.Get_Paragraph_ParaPr();
+                        var oParaPr = oDocContent.GetCalculatedParaPr();
                         editor.sync_PrLineSpacingCallBack(oParaPr.Spacing);
                         oDocContent.Document_UpdateInterfaceState();
                     }

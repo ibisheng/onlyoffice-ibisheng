@@ -1443,8 +1443,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.get_TextProps = function()
 	{
 		var Doc    = this.WordControl.m_oLogicDocument;
-		var ParaPr = Doc.Get_Paragraph_ParaPr();
-		var TextPr = Doc.Get_Paragraph_TextPr();
+		var ParaPr = Doc.GetCalculatedParaPr();
+		var TextPr = Doc.GetCalculatedTextPr();
 
 		// return { ParaPr: ParaPr, TextPr : TextPr };
 		return new Asc.CParagraphAndTextProp(ParaPr, TextPr);	// uncomment if this method will be used externally. 20/03/2012 uncommented for testers
@@ -1550,7 +1550,7 @@ background-repeat: no-repeat;\
 	{
 
 		ParaPr.StyleName  = "";
-		var TextPr        = editor.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
+		var TextPr        = editor.WordControl.m_oLogicDocument.GetCalculatedTextPr();
 		var oDrawingProps = editor.WordControl.m_oLogicDocument.Get_GraphicObjectsProps();
 		if (oDrawingProps.shapeProps && oDrawingProps.shapeProps.locked
 			|| oDrawingProps.chartProps && oDrawingProps.chartProps.locked
@@ -3588,7 +3588,7 @@ background-repeat: no-repeat;\
 			{
 				obj.CellsBackground.Unifill = AscFormat.CreateUnifillFromAscColor(obj.CellsBackground.Color, 0);
 			}
-			this.WordControl.m_oLogicDocument.Set_TableProps(obj);
+			this.WordControl.m_oLogicDocument.SetTableProps(obj);
 		}
 	};
 	/*callbacks*/
@@ -3902,13 +3902,13 @@ background-repeat: no-repeat;\
 				}
 				if (null != _img)
 				{
-					oApi.WordControl.m_oLogicDocument.Set_ImageProps(ImagePr);
+					oApi.WordControl.m_oLogicDocument.SetImageProps(ImagePr);
 				}
 				else
 				{
 					oApi.asyncImageEndLoaded2 = function(_image)
 					{
-						oApi.WordControl.m_oLogicDocument.Set_ImageProps(ImagePr);
+						oApi.WordControl.m_oLogicDocument.SetImageProps(ImagePr);
 						oApi.asyncImageEndLoaded2 = null;
 					}
 				}
@@ -3988,7 +3988,7 @@ background-repeat: no-repeat;\
 		else
 		{
 			ImagePr.ImageUrl = null;
-			this.WordControl.m_oLogicDocument.Set_ImageProps(ImagePr);
+			this.WordControl.m_oLogicDocument.SetImageProps(ImagePr);
 		}
 	};
 

@@ -182,13 +182,13 @@ CLogicDocumentController.prototype.SetTableProps = function(Props)
 {
 	this.LogicDocument.controller_SetTableProps(Props);
 };
-CLogicDocumentController.prototype.GetCurrentParaPr = function()
+CLogicDocumentController.prototype.GetCalculatedParaPr = function()
 {
-	return this.LogicDocument.controller_GetCurrentParaPr();
+	return this.LogicDocument.controller_GetCalculatedParaPr();
 };
-CLogicDocumentController.prototype.GetCurrentTextPr = function()
+CLogicDocumentController.prototype.GetCalculatedTextPr = function()
 {
-	return this.LogicDocument.controller_GetCurrentTextPr();
+	return this.LogicDocument.controller_GetCalculatedTextPr();
 };
 CLogicDocumentController.prototype.GetDirectParaPr = function()
 {
