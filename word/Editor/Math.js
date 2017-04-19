@@ -2995,9 +2995,9 @@ ParaMath.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selection
     this.Root.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
 };
 
-ParaMath.prototype.Selection_IsEmpty = function(CheckEnd)
+ParaMath.prototype.IsSelectionEmpty = function(CheckEnd)
 {
-    return this.Root.Selection_IsEmpty();
+    return this.Root.IsSelectionEmpty();
 };
 
 ParaMath.prototype.Selection_IsPlaceholder = function()

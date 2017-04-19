@@ -103,7 +103,7 @@
 	{
 		if (-1 == this.LogicDocument.CurPage)
 			return null;
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.Get_SelectionBounds();
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.GetSelectionBounds();
 	};
 	CMobileDelegateEditorPresentation.prototype.ScrollTo = function(_scroll)
 	{
@@ -143,7 +143,7 @@
 		if (!_controller.Is_SelectionUse() && _elementsCount > 0)
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
-		if (_controller.Get_SelectionBounds())
+		if (_controller.GetSelectionBounds())
 			_mode = AscCommon.MobileTouchContextMenuType.Select;
 
 		if (_mode == AscCommon.MobileTouchContextMenuType.Slide && _controller.getSelectedObjectsBounds())
@@ -194,7 +194,7 @@
 			return;
 		}
 
-		var _select = _controller.Get_SelectionBounds();
+		var _select = _controller.GetSelectionBounds();
 		if (_select)
 		{
 			var _rect1 = _select.Start;
@@ -282,7 +282,7 @@
 			_mode = 1;
 		}
 
-		var _select = _controller.Get_SelectionBounds();
+		var _select = _controller.GetSelectionBounds();
 		if (_select)
 		{
 			var _rect1 = _select.Start;

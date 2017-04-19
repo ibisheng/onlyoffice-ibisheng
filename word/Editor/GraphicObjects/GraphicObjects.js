@@ -2472,7 +2472,7 @@ CGraphicObjects.prototype =
         return {X: 0, Y: 0};
     },
 
-    Get_SelectionBounds: DrawingObjectsController.prototype.Get_SelectionBounds,
+	GetSelectionBounds: DrawingObjectsController.prototype.GetSelectionBounds,
 
     checkCommonBounds: function(arrDrawings)
     {
@@ -2701,7 +2701,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Selection_IsEmpty(bCheckHidden);
+            content.IsSelectionEmpty(bCheckHidden);
         }
         return false;
     },
@@ -3182,7 +3182,7 @@ CGraphicObjects.prototype =
                     oMatrix = this.selection.textSelection.transformText.CreateDublicate();
                 }
                 this.drawingDocument.UpdateTargetTransform(oMatrix);
-                this.selection.textSelection.getDocContent().Selection_Draw_Page(0);
+                this.selection.textSelection.getDocContent().DrawSelectionOnPage(0);
             }
         }
         else if(this.selection.groupSelection)
@@ -3199,7 +3199,7 @@ CGraphicObjects.prototype =
                 oMatrix = this.selection.chartSelection.selection.textSelection.transformText.CreateDublicate();
             }
             this.drawingDocument.UpdateTargetTransform(oMatrix);
-            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(0);
+            this.selection.chartSelection.selection.textSelection.getDocContent().DrawSelectionOnPage(0);
         }
     },
     getAllRasterImagesOnPage: function(pageIndex)

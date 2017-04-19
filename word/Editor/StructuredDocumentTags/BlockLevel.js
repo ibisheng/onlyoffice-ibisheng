@@ -165,9 +165,9 @@ CBlockLevelSdt.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, 
 {
 	this.Content.Selection_SetEnd(X, Y, CurPage, MouseEvent, isTableBorder);
 };
-CBlockLevelSdt.prototype.Selection_IsEmpty = function(isCheckHidden)
+CBlockLevelSdt.prototype.IsSelectionEmpty = function(isCheckHidden)
 {
-	return this.Content.Selection_IsEmpty(isCheckHidden);
+	return this.Content.IsSelectionEmpty(isCheckHidden);
 };
 CBlockLevelSdt.prototype.Get_SelectedElementsInfo = function(oInfo)
 {
@@ -221,13 +221,13 @@ CBlockLevelSdt.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
 {
 	return this.Content.Hyperlink_CanAdd(bCheckInHyperlink);
 };
-CBlockLevelSdt.prototype.Selection_Draw_Page = function(CurPage)
+CBlockLevelSdt.prototype.DrawSelectionOnPage = function(CurPage)
 {
-	this.Content.Selection_Draw_Page(CurPage);
+	this.Content.DrawSelectionOnPage(CurPage);
 };
-CBlockLevelSdt.prototype.Get_SelectionBounds = function()
+CBlockLevelSdt.prototype.GetSelectionBounds = function()
 {
-	return this.Content.Get_SelectionBounds();
+	return this.Content.GetSelectionBounds();
 };
 CBlockLevelSdt.prototype.RecalculateCurPos = function()
 {

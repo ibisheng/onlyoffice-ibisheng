@@ -2429,7 +2429,7 @@ CFootnotesController.prototype.RemoveSelection = function(bNoCheckDrawing)
 	if (this.CurFootnote)
 		this.Selection.Footnotes[this.CurFootnote.Get_Id()] = this.CurFootnote;
 };
-CFootnotesController.prototype.IsEmptySelection = function(bCheckHidden)
+CFootnotesController.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
 	if (true !== this.IsSelectionUse())
 		return true;
@@ -2446,7 +2446,7 @@ CFootnotesController.prototype.IsEmptySelection = function(bCheckHidden)
 	if (null === oFootnote)
 		return true;
 
-	return oFootnote.Selection_IsEmpty(bCheckHidden);
+	return oFootnote.IsSelectionEmpty(bCheckHidden);
 };
 CFootnotesController.prototype.DrawSelectionOnPage = function(nPageAbs)
 {
@@ -2463,7 +2463,7 @@ CFootnotesController.prototype.DrawSelectionOnPage = function(nPageAbs)
 			if (oFootnote === this.Selection.Footnotes[oFootnote.Get_Id()])
 			{
 				var nFootnotePageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnIndex);
-				oFootnote.Selection_Draw_Page(nFootnotePageIndex);
+				oFootnote.DrawSelectionOnPage(nFootnotePageIndex);
 			}
 		}
 	}
@@ -2474,12 +2474,12 @@ CFootnotesController.prototype.GetSelectionBounds = function()
 	{
 		if (0 === this.Selection.Direction)
 		{
-			return this.CurFootnote.Get_SelectionBounds();
+			return this.CurFootnote.GetSelectionBounds();
 		}
 		else if (1 === this.Selection.Direction)
 		{
-			var StartBounds = this.Selection.Start.Footnote.Get_SelectionBounds();
-			var EndBounds   = this.Selection.End.Footnote.Get_SelectionBounds();
+			var StartBounds = this.Selection.Start.Footnote.GetSelectionBounds();
+			var EndBounds   = this.Selection.End.Footnote.GetSelectionBounds();
 
 			if (!StartBounds && !EndBounds)
 				return null;
@@ -2492,8 +2492,8 @@ CFootnotesController.prototype.GetSelectionBounds = function()
 		}
 		else
 		{
-			var StartBounds = this.Selection.End.Footnote.Get_SelectionBounds();
-			var EndBounds   = this.Selection.Start.Footnote.Get_SelectionBounds();
+			var StartBounds = this.Selection.End.Footnote.GetSelectionBounds();
+			var EndBounds   = this.Selection.Start.Footnote.GetSelectionBounds();
 
 			if (!StartBounds && !EndBounds)
 				return null;
@@ -2797,7 +2797,7 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 			this.DrawingDocument.TargetEnd();
 			this.DrawingDocument.SetCurrentPage(this.LogicDocument.CurPage);
 		}
-		else if (false === this.IsEmptySelection())
+		else if (false === this.IsSelectionEmpty())
 		{
 			if (true !== this.LogicDocument.Selection.Start)
 			{

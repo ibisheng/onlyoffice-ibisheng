@@ -4573,7 +4573,7 @@ function CDrawingDocument()
 
 	this.CheckSelectMobile = function (overlay)
 	{
-		var _select = this.m_oWordControl.m_oLogicDocument.Get_SelectionBounds();
+		var _select = this.m_oWordControl.m_oLogicDocument.GetSelectionBounds();
 		if (!_select)
 			return;
 

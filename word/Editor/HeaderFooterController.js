@@ -231,17 +231,17 @@ CHdrFtrController.prototype.RemoveSelection = function(bNoCheckDrawing)
 {
 	this.HdrFtr.RemoveSelection(bNoCheckDrawing);
 };
-CHdrFtrController.prototype.IsEmptySelection = function(bCheckHidden)
+CHdrFtrController.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
-	return this.HdrFtr.Selection_IsEmpty(bCheckHidden);
+	return this.HdrFtr.IsSelectionEmpty(bCheckHidden);
 };
 CHdrFtrController.prototype.DrawSelectionOnPage = function(PageAbs)
 {
-	this.HdrFtr.Selection_Draw_Page(PageAbs);
+	this.HdrFtr.DrawSelectionOnPage(PageAbs);
 };
 CHdrFtrController.prototype.GetSelectionBounds = function()
 {
-	return this.HdrFtr.Get_SelectionBounds();
+	return this.HdrFtr.GetSelectionBounds();
 };
 CHdrFtrController.prototype.IsMovingTableBorder = function()
 {

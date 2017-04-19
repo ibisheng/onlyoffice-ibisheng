@@ -797,15 +797,15 @@ CTableCell.prototype =
         this.Content.Update_CursorType(_X, _Y, CurPage);
     },
 
-    Content_Selection_Draw_Page : function(CurPage)
-    {
-        var Transform = this.private_GetTextDirectionTransform();
-        var DrawingDocument = this.Row.Table.DrawingDocument;
-        if (null !== Transform && DrawingDocument)
-            DrawingDocument.MultiplyTargetTransform(Transform);
+	Content_DrawSelectionOnPage : function(CurPage)
+	{
+		var Transform       = this.private_GetTextDirectionTransform();
+		var DrawingDocument = this.Row.Table.DrawingDocument;
+		if (null !== Transform && DrawingDocument)
+			DrawingDocument.MultiplyTargetTransform(Transform);
 
-        this.Content.Selection_Draw_Page(CurPage);
-    },
+		this.Content.DrawSelectionOnPage(CurPage);
+	},
 
     Content_RecalculateCurPos : function()
     {

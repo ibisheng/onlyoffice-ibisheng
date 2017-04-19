@@ -3839,7 +3839,7 @@ CShape.prototype.updateSelectionState = function ()
                 }
                 else
                 {
-                    if ( false === content.Selection_IsEmpty() )
+                    if ( false === content.IsSelectionEmpty() )
                     {
                         drawing_document.TargetEnd();
                         drawing_document.SelectEnabled(true);

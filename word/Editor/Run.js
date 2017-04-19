@@ -5944,7 +5944,7 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
     SelectionDraw.FindStart = FindStart;
 };
 
-ParaRun.prototype.Selection_IsEmpty = function(CheckEnd)
+ParaRun.prototype.IsSelectionEmpty = function(CheckEnd)
 {
     var Selection = this.State.Selection;
     if (true !== Selection.Use)

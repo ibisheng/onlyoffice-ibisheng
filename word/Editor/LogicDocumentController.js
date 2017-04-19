@@ -202,9 +202,9 @@ CLogicDocumentController.prototype.RemoveSelection = function(bNoCheckDrawing)
 {
 	this.LogicDocument.controller_RemoveSelection(bNoCheckDrawing);
 };
-CLogicDocumentController.prototype.IsEmptySelection = function(bCheckHidden)
+CLogicDocumentController.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
-	return this.LogicDocument.controller_IsEmptySelection(bCheckHidden);
+	return this.LogicDocument.controller_IsSelectionEmpty(bCheckHidden);
 };
 CLogicDocumentController.prototype.DrawSelectionOnPage = function(PageAbs)
 {

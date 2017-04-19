@@ -199,7 +199,7 @@
 	};
 	CMobileDelegateSimple.prototype.GetSelectionRectsBounds = function()
 	{
-		return this.LogicDocument.Get_SelectionBounds();
+		return this.LogicDocument.GetSelectionBounds();
 	};
 	CMobileDelegateSimple.prototype.IsReader = function()
 	{
@@ -269,7 +269,7 @@
 		if (!this.LogicDocument.Is_SelectionUse())
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
-		if (this.LogicDocument.Get_SelectionBounds())
+		if (this.LogicDocument.GetSelectionBounds())
 			_mode = AscCommon.MobileTouchContextMenuType.Select;
 
 		if (_mode == 0 && this.LogicDocument.DrawingObjects.getSelectedObjectsBounds())
@@ -315,7 +315,7 @@
 			return;
 		}
 
-		var _select = this.LogicDocument.Get_SelectionBounds();
+		var _select = this.LogicDocument.GetSelectionBounds();
 		if (_select)
 		{
 			var _rect1 = _select.Start;
@@ -398,7 +398,7 @@
 			_mode = 1;
 		}
 
-		var _select = this.LogicDocument.Get_SelectionBounds();
+		var _select = this.LogicDocument.GetSelectionBounds();
 		if (_select)
 		{
 			var _rect1 = _select.Start;
@@ -512,7 +512,7 @@
 	};
 	CMobileDelegateEditor.prototype.GetSelectionRectsBounds = function()
 	{
-		return this.LogicDocument.Get_SelectionBounds();
+		return this.LogicDocument.GetSelectionBounds();
 	};
 	CMobileDelegateEditor.prototype.IsReader = function()
 	{

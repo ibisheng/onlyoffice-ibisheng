@@ -626,7 +626,7 @@ CHeaderFooter.prototype =
                 }
                 else
                 {
-                    if ( false === this.Content.Selection_IsEmpty() )
+                    if ( false === this.Content.IsSelectionEmpty() )
                     {
                         if (true !== this.Content.Selection.Start)
                             this.RecalculateCurPos();
@@ -931,10 +931,9 @@ CHeaderFooter.prototype =
 		return this.Content.RemoveSelection(bNoCheckDrawing);
 	},
 
-    // Рисуем селект
-    Selection_Draw_Page : function(Page_abs)
+	DrawSelectionOnPage : function(CurPage)
     {
-        return this.Content.Selection_Draw_Page(0, true, true);
+        return this.Content.DrawSelectionOnPage(0, true, true);
     },
 
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent)
@@ -1232,12 +1231,12 @@ CHeaderFooter.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
 {
     return this.Content.Get_RevisionsChangeParagraph(SearchEngine);
 };
-CHeaderFooter.prototype.Get_SelectionBounds = function()
+CHeaderFooter.prototype.GetSelectionBounds = function()
 {
-    if (-1 !== this.RecalcInfo.CurPage)
-        return this.Content.Get_SelectionBounds();
+	if (-1 !== this.RecalcInfo.CurPage)
+		return this.Content.GetSelectionBounds();
 
-    return null;
+	return null;
 };
 CHeaderFooter.prototype.Get_DocumentContent = function()
 {
@@ -2096,12 +2095,11 @@ CHeaderFooterController.prototype =
 			return this.CurHdrFtr.RemoveSelection(bNoCheckDrawing);
 	},
 
-    // Рисуем селект
-    Selection_Draw_Page : function(Page_abs)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Draw_Page(Page_abs);
-    },
+	DrawSelectionOnPage : function(CurPage)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.DrawSelectionOnPage(CurPage);
+	},
 
     Selection_SetStart : function(X,Y, PageIndex, MouseEvent, bActivate)
     {
@@ -2290,13 +2288,13 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.Selection_Check(X, Y, PageAbs, NearPos);
     },
 
-    Selection_IsEmpty : function(bCheckHidden)
-    {
-        if (null !== this.CurHdrFtr)
-            return this.CurHdrFtr.Content.Selection_IsEmpty(bCheckHidden);
+	IsSelectionEmpty : function(bCheckHidden)
+	{
+		if (null !== this.CurHdrFtr)
+			return this.CurHdrFtr.Content.IsSelectionEmpty(bCheckHidden);
 
-        return true;
-    },
+		return true;
+	},
 
     // Селектим весь параграф
     Select_All : function()
@@ -2524,12 +2522,12 @@ CHeaderFooterController.prototype.SetParagraphFramePr = function(FramePr, bDelet
     if (null !== this.CurHdrFtr)
         this.CurHdrFtr.SetParagraphFramePr(FramePr, bDelete);
 };
-CHeaderFooterController.prototype.Get_SelectionBounds = function()
+CHeaderFooterController.prototype.GetSelectionBounds = function()
 {
-    if (null !== this.CurHdrFtr)
-        return this.CurHdrFtr.Get_SelectionBounds();
+	if (null !== this.CurHdrFtr)
+		return this.CurHdrFtr.GetSelectionBounds();
 
-    return null;
+	return null;
 };
 CHeaderFooterController.prototype.Get_CurHdrFtr = function()
 {

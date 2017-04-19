@@ -1119,7 +1119,7 @@ CDrawingDocument.prototype =
         this.SelectRect1 = null;
         this.SelectRect2 = null;
 
-        var _select = this.LogicDocument.Get_SelectionBounds();
+        var _select = this.LogicDocument.GetSelectionBounds();
         if (!_select)
             return;
 
@@ -1569,7 +1569,7 @@ CDrawingDocument.prototype =
             for (var i = drawingFirst; i <= drawingEnd; i++)
             {
                 if (!this.IsFreezePage(i))
-                    this.LogicDocument.Selection_Draw_Page(i);
+                    this.LogicDocument.DrawSelectionOnPage(i);
             }
 
             this.Native["DD_Overlay_EndDrawSelection"]();
@@ -2071,7 +2071,7 @@ CDrawingDocument.prototype =
             return _ret;
         }
 
-        var _select = this.LogicDocument.Get_SelectionBounds();
+        var _select = this.LogicDocument.GetSelectionBounds();
         if (_select)
         {
             _ret[0] = 2;

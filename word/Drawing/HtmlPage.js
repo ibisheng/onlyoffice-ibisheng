@@ -2890,7 +2890,7 @@ function CEditorPage(api)
 					for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
 					{
 						if (!drDoc.IsFreezePage(i))
-							this.m_oLogicDocument.Selection_Draw_Page(i);
+							this.m_oLogicDocument.DrawSelectionOnPage(i);
 					}
 				}
 				else
@@ -2898,7 +2898,7 @@ function CEditorPage(api)
 					for (var i = 0; i <= drDoc.m_lPagesCount; i++)
 					{
 						if (!drDoc.IsFreezePage(i))
-							this.m_oLogicDocument.Selection_Draw_Page(i);
+							this.m_oLogicDocument.DrawSelectionOnPage(i);
 					}
 				}
 
@@ -3633,13 +3633,13 @@ function CEditorPage(api)
 	};
 	this.onTimerScroll2          = function(is_no_timer)
 	{
-		try
-		{
+		// try
+		// {
 			oThis.onTimerScroll2_internal(is_no_timer);
-		}
-		catch (err)
-		{
-		}
+		// }
+		// catch (err)
+		// {
+		// }
 
 		if (true !== is_no_timer)
 			this.m_nPaintTimerId = setTimeout(oThis.onTimerScroll2, oThis.m_nTimerScrollInterval);

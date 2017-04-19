@@ -181,7 +181,7 @@ function CGroupShape()
                 oMatrix = this.selection.textSelection.transformText.CreateDublicate();
             }
             this.getDrawingDocument().UpdateTargetTransform(oMatrix);
-            this.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+            this.selection.textSelection.getDocContent().DrawSelectionOnPage(pageIndex);
         }
         else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
         {
@@ -190,7 +190,7 @@ function CGroupShape()
                 oMatrix = this.selection.chartSelection.selection.textSelection.transformText.CreateDublicate();
             }
             this.getDrawingDocument().UpdateTargetTransform(oMatrix);
-            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+            this.selection.chartSelection.selection.textSelection.getDocContent().DrawSelectionOnPage(pageIndex);
         }
     };
 

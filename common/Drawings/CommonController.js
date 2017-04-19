@@ -1279,12 +1279,12 @@ DrawingObjectsController.prototype =
         return bRet;
     },
 
-    Get_SelectionBounds: function()
+	GetSelectionBounds: function()
     {
         var oTargetDocContent = this.getTargetDocContent(false, true);
         if(isRealObject(oTargetDocContent))
         {
-            return oTargetDocContent.Get_SelectionBounds();
+            return oTargetDocContent.GetSelectionBounds();
         }
         return null;
     },
@@ -6581,9 +6581,9 @@ DrawingObjectsController.prototype =
                     {
                         var Element = paragraph.Content[CurPos];
 
-                        if ( true !== Element.Selection_IsEmpty() && para_Hyperlink !== Element.Type )
+                        if ( true !== Element.IsSelectionEmpty() && para_Hyperlink !== Element.Type )
                             break;
-                        else if ( true !== Element.Selection_IsEmpty() && para_Hyperlink === Element.Type )
+                        else if ( true !== Element.IsSelectionEmpty() && para_Hyperlink === Element.Type )
                         {
                             if ( -1 === HyperPos )
                                 HyperPos = CurPos;
@@ -6894,7 +6894,7 @@ DrawingObjectsController.prototype =
         {
             this.drawingObjects.getDrawingDocument().UpdateTargetTransform(this.getTargetTransform());
 
-            content.Selection_Draw_Page(0);
+            content.DrawSelectionOnPage(0);
         }
     },
 
@@ -7613,7 +7613,7 @@ DrawingObjectsController.prototype =
                     {
                         var Element = oParagraph.Content[CurPos];
 
-                        if (true !== Element.Selection_IsEmpty() && (para_Math === Element.Type))
+                        if (true !== Element.IsSelectionEmpty() && (para_Math === Element.Type))
                         {
                             ascSelectedObjects.push(new AscCommon.asc_CSelectedObject(Asc.c_oAscTypeSelectElement.Math, Element.Get_MenuProps()));
                         }

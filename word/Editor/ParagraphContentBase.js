@@ -840,14 +840,14 @@ CParagraphContentWithParagraphLikeContent.prototype.Apply_TextPr = function(Text
 
                 // Подправим селект. Заметим, что метки выделения изменяются внутри функции Add_ToContent
                 // за счет того, что EndPos - StartPos > 1.
-                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
+                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.StartPos].IsSelectionEmpty() )
                     Selection.StartPos++;
-                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
+                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.EndPos].IsSelectionEmpty() )
                     Selection.EndPos++;
 
-                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
+                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.EndPos].IsSelectionEmpty() )
                     Selection.EndPos--;
-                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
+                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.StartPos].IsSelectionEmpty() )
                     Selection.StartPos--;
             }
         }
@@ -1095,7 +1095,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceStat
         {
             var Element = this.Content[CurPos];
 
-            if (true !== Element.Selection_IsEmpty() && Element.Document_UpdateInterfaceState)
+            if (true !== Element.IsSelectionEmpty() && Element.Document_UpdateInterfaceState)
                 Element.Document_UpdateInterfaceState();
         }
     }
@@ -2206,7 +2206,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_DrawRange = functi
         this.Content[CurPos].Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Selection_IsEmpty = function(CheckEnd)
+CParagraphContentWithParagraphLikeContent.prototype.IsSelectionEmpty = function(CheckEnd)
 {
     var StartPos = this.State.Selection.StartPos;
     var EndPos   = this.State.Selection.EndPos;
@@ -2219,7 +2219,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_IsEmpty = function
 
     for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
     {
-        if ( false === this.Content[CurPos].Selection_IsEmpty(CheckEnd) )
+        if ( false === this.Content[CurPos].IsSelectionEmpty(CheckEnd) )
             return false;
     }
 

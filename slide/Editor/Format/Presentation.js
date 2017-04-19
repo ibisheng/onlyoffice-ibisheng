@@ -5250,7 +5250,7 @@ CPresentation.prototype =
 
         if (oTargetContent)
         {
-            if (true === oTargetContent.Is_SelectionUse() && true !== oTargetContent.Selection_IsEmpty(true))
+            if (true === oTargetContent.Is_SelectionUse() && true !== oTargetContent.IsSelectionEmpty(true))
             {
                  if (oTargetContent.Selection.StartPos !== oTargetContent.Selection.EndPos || type_Paragraph === oTargetContent.Content[oTargetContent.Selection.StartPos].Get_Type())
                     return true;

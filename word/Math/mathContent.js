@@ -1886,7 +1886,7 @@ CMathContent.prototype.Get_CompiledTextPr = function(Copy, bAll)
         while ( null === TextPr && StartPos <= EndPos )
         {
             var bComp = this.Content[StartPos].Type == para_Math_Composition,
-                bEmptyRun = this.Content[StartPos].Type == para_Math_Run && true === this.Content[StartPos].Selection_IsEmpty();
+                bEmptyRun = this.Content[StartPos].Type == para_Math_Run && true === this.Content[StartPos].IsSelectionEmpty();
 
             if(bComp || !bEmptyRun || bAll)    //пропускаем пустые Run
                 TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
@@ -1894,7 +1894,7 @@ CMathContent.prototype.Get_CompiledTextPr = function(Copy, bAll)
             StartPos++;
         }
 
-        while(this.Content[EndPos].Type == para_Math_Run && true === this.Content[EndPos].Selection_IsEmpty() && StartPos < EndPos + 1 && bAll == false) //пропускаем пустые Run
+        while(this.Content[EndPos].Type == para_Math_Run && true === this.Content[EndPos].IsSelectionEmpty() && StartPos < EndPos + 1 && bAll == false) //пропускаем пустые Run
         {
             EndPos--;
         }
@@ -2048,18 +2048,18 @@ CMathContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll, 
 
             if(!bStartComposition)
             {
-                if(this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty(true) )
+                if(this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.StartPos].IsSelectionEmpty(true) )
                     this.Selection.StartPos++;
-                else if (this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty(true) )
+                else if (this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.EndPos].IsSelectionEmpty(true) )
                     this.Selection.EndPos++;
             }
 
 
             if(!bEndCompostion)
             {
-                if(this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.EndPos].Selection_IsEmpty(true) )
+                if(this.Selection.StartPos < this.Selection.EndPos && true === this.Content[this.Selection.EndPos].IsSelectionEmpty(true) )
                     this.Selection.EndPos--;
-                else if (this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.StartPos].Selection_IsEmpty(true) )
+                else if (this.Selection.EndPos < this.Selection.StartPos && true === this.Content[this.Selection.StartPos].IsSelectionEmpty(true) )
                     this.Selection.StartPos--;
             }
 
@@ -2618,7 +2618,7 @@ CMathContent.prototype.private_LoadFromMenuSymbol = function(Type, Pr)
         if (this.Content.length <= 0)
 			this.Correct_Content();
 
-        if(this.Content.length > 0 && this.Content[this.CurPos].Type == para_Math_Run && this.Selection_IsEmpty() == true) // находимся в Run, селект отсутствует
+        if(this.Content.length > 0 && this.Content[this.CurPos].Type == para_Math_Run && this.IsSelectionEmpty() == true) // находимся в Run, селект отсутствует
         {
             TextPr = this.Content[this.CurPos].Get_TextPr();
             TextPr.RFonts.Set_All("Cambria Math", -1);          //  на данный момент добавляются символы исключительно из Cambria Math
@@ -3590,13 +3590,13 @@ CMathContent.prototype.Set_ParaContentPos = function(ContentPos, Depth)
         	this.Content[this.CurPos].Set_ParaContentPos(ContentPos, Depth + 1);
     }
 };
-CMathContent.prototype.Selection_IsEmpty = function()
+CMathContent.prototype.IsSelectionEmpty = function()
 {
     if (true !== this.Selection.Use)
         return true;
 
     if (this.Selection.StartPos === this.Selection.EndPos)
-        return this.Content[this.Selection.StartPos].Selection_IsEmpty();
+        return this.Content[this.Selection.StartPos].IsSelectionEmpty();
 
     return false;
 };
@@ -5040,7 +5040,7 @@ CMathContent.prototype.private_GetPosRunForForcedBreak = function()
         for(var CurPos = StartPos; CurPos <= EndPos; CurPos++)
         {
             var Item = this.Content[CurPos];
-            var bSelect     = true !== Item.Selection_IsEmpty(),
+            var bSelect     = true !== Item.IsSelectionEmpty(),
                 bSelectRun  = bSelect == true && Item.Type == para_Math_Run,
                 bSelectComp = bSelect == true && Item.Type == para_Math_Composition;
             var bSelectManyRuns = bSelectRun && bHaveSelectedItem;
@@ -5086,7 +5086,7 @@ CMathContent.prototype.private_FindCurrentPosInContent = function()
         {
             var Item = this.Content[CurPos];
 
-            if(Item.Type == para_Math_Run && true !== Item.Selection_IsEmpty())
+            if(Item.Type == para_Math_Run && true !== Item.IsSelectionEmpty())
             {
                 Pos = bComposition == true ? null : CurPos;
                 break;

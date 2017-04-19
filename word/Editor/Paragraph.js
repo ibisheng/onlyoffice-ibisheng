@@ -3763,9 +3763,9 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 
 		// Делаем как в Word: гиперссылка выделяется целиком, если выделение выходит за пределы гиперссылки
 		//            if ( para_Hyperlink === this.Content[StartPos].Type && true !==
-		// this.Content[StartPos].Selection_IsEmpty(true) ) this.Content[StartPos].Select_All( StartPos > EndPos ? -1 :
+		// this.Content[StartPos].IsSelectionEmpty(true) ) this.Content[StartPos].Select_All( StartPos > EndPos ? -1 :
 		// 1 );  if ( para_Hyperlink === this.Content[EndPos].Type && true !==
-		// this.Content[EndPos].Selection_IsEmpty(true) ) this.Content[EndPos].Select_All( StartPos > EndPos ? -1 : 1
+		// this.Content[EndPos].IsSelectionEmpty(true) ) this.Content[EndPos].Select_All( StartPos > EndPos ? -1 : 1
 		// );
 	}
 
@@ -3804,7 +3804,7 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 				}
 			}
 		}
-		else if (true !== this.Selection_IsEmpty(true) && ( ( 1 === Direction && true === this.Selection.StartManually ) || ( 1 !== Direction && true === this.Selection.EndManually ) ))
+		else if (true !== this.IsSelectionEmpty(true) && ( ( 1 === Direction && true === this.Selection.StartManually ) || ( 1 !== Direction && true === this.Selection.EndManually ) ))
 		{
 			// Эта ветка нужна для снятие выделения с плавающих объектов, стоящих в начале параграфа, когда параграф
 			// выделен не весь. Заметим, что это ветка имеет смысл, только при direction = 1, поэтому выделен весь
@@ -5733,9 +5733,9 @@ Paragraph.prototype.Hyperlink_Modify = function(HyperProps)
 		{
 			var Element = this.Content[CurPos];
 
-			if (true !== Element.Selection_IsEmpty() && para_Hyperlink !== Element.Type)
+			if (true !== Element.IsSelectionEmpty() && para_Hyperlink !== Element.Type)
 				break;
-			else if (true !== Element.Selection_IsEmpty() && para_Hyperlink === Element.Type)
+			else if (true !== Element.IsSelectionEmpty() && para_Hyperlink === Element.Type)
 			{
 				if (-1 === HyperPos)
 					HyperPos = CurPos;
@@ -5847,9 +5847,9 @@ Paragraph.prototype.Hyperlink_Remove = function()
 		{
 			var Element = this.Content[CurPos];
 
-			if (true !== Element.Selection_IsEmpty() && para_Hyperlink !== Element.Type)
+			if (true !== Element.IsSelectionEmpty() && para_Hyperlink !== Element.Type)
 				break;
-			else if (true !== Element.Selection_IsEmpty() && para_Hyperlink === Element.Type)
+			else if (true !== Element.IsSelectionEmpty() && para_Hyperlink === Element.Type)
 			{
 				if (-1 === HyperPos)
 					HyperPos = CurPos;
@@ -6010,7 +6010,7 @@ Paragraph.prototype.Hyperlink_Check = function(bCheckEnd)
 		//{
 		//    var Element = this.Content[CurPos];
 
-		//    if ( para_Hyperlink === Element.Type && true !== Element.Selection_IsEmpty() )
+		//    if ( para_Hyperlink === Element.Type && true !== Element.IsSelectionEmpty() )
 		//    {
 		//        if ( null === Hyper )
 		//            Hyper = Element;
@@ -6198,7 +6198,7 @@ Paragraph.prototype.RemoveSelection = function()
 	this.Selection.StartPos = 0;
 	this.Selection.EndPos   = 0;
 };
-Paragraph.prototype.Selection_Draw_Page = function(CurPage)
+Paragraph.prototype.DrawSelectionOnPage = function(CurPage)
 {
 	if (true != this.Selection.Use)
 		return;
@@ -6539,7 +6539,7 @@ Paragraph.prototype.Select_Math = function(ParaMath)
 		}
 	}
 };
-Paragraph.prototype.Get_SelectionBounds = function()
+Paragraph.prototype.GetSelectionBounds = function()
 {
 	var X0 = this.X, X1 = this.XLimit, Y = this.Y;
 
@@ -6916,7 +6916,7 @@ Paragraph.prototype.GetCalculatedTextPr = function()
 		for (var CurPos = StartPos + 1; CurPos < Count; CurPos++)
 		{
 			var TempTextPr = this.Content[CurPos].Get_CompiledTextPr(false);
-			if (null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty())
+			if (null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].IsSelectionEmpty())
 				TextPr = TextPr.Compare(TempTextPr);
 		}
 
@@ -6945,7 +6945,7 @@ Paragraph.prototype.GetCalculatedTextPr = function()
 			else
 			{
 				var bCheckParaEnd = false;
-				if (this.Content.length - 1 === EndPos && true !== this.Content[EndPos].Selection_IsEmpty(true))
+				if (this.Content.length - 1 === EndPos && true !== this.Content[EndPos].IsSelectionEmpty(true))
 				{
 					EndPos--;
 					bCheckParaEnd = true;
@@ -6954,7 +6954,7 @@ Paragraph.prototype.GetCalculatedTextPr = function()
 				// Сначала пропускаем все пустые элементы. После этой операции мы можем попасть в элемент, в котором
 				// нельзя находиться курсору, поэтому ищем в обратном направлении первый подходящий элемент.
 				var OldStartPos = StartPos;
-				while (true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos)
+				while (true === this.Content[StartPos].IsSelectionEmpty() && StartPos < EndPos)
 					StartPos++;
 
 				while (true !== this.Content[StartPos].Is_CursorPlaceable() && StartPos > OldStartPos)
@@ -6976,7 +6976,7 @@ Paragraph.prototype.GetCalculatedTextPr = function()
 
 					if (null === TextPr || undefined === TextPr)
 						TextPr = TempTextPr;
-					else if (null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].Selection_IsEmpty())
+					else if (null !== TempTextPr && undefined !== TempTextPr && true !== this.Content[CurPos].IsSelectionEmpty())
 						TextPr = TextPr.Compare(TempTextPr);
 				}
 
@@ -7078,7 +7078,7 @@ Paragraph.prototype.Is_UseInDocument = function(Id)
 /**
  * Проверяем пустой ли селект
  */
-Paragraph.prototype.Selection_IsEmpty = function(bCheckHidden)
+Paragraph.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
 	if (undefined === bCheckHidden)
 		bCheckHidden = true;
@@ -7096,7 +7096,7 @@ Paragraph.prototype.Selection_IsEmpty = function(bCheckHidden)
 
 		for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
 		{
-			if (true !== this.Content[CurPos].Selection_IsEmpty(bCheckHidden))
+			if (true !== this.Content[CurPos].IsSelectionEmpty(bCheckHidden))
 				return false;
 		}
 	}
@@ -8020,7 +8020,7 @@ Paragraph.prototype.GetDirectTextPr = function()
 
 		var Count    = this.Content.length;
 		var StartPos = 0;
-		while (true === this.Content[StartPos].Selection_IsEmpty() && StartPos < Count)
+		while (true === this.Content[StartPos].IsSelectionEmpty() && StartPos < Count)
 			StartPos++;
 
 		TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
@@ -8040,7 +8040,7 @@ Paragraph.prototype.GetDirectTextPr = function()
 				EndPos   = this.Selection.StartPos;
 			}
 
-			while (true === this.Content[StartPos].Selection_IsEmpty() && StartPos < EndPos)
+			while (true === this.Content[StartPos].IsSelectionEmpty() && StartPos < EndPos)
 				StartPos++;
 
 			TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
@@ -9361,7 +9361,7 @@ Paragraph.prototype.Document_UpdateInterfaceState = function()
 		{
 			var Element = this.Content[CurPos];
 
-			if (true !== Element.Selection_IsEmpty() && (para_Hyperlink === Element.Type || para_Math === Element.Type))
+			if (true !== Element.IsSelectionEmpty() && (para_Hyperlink === Element.Type || para_Math === Element.Type))
 				Element.Document_UpdateInterfaceState();
 		}
 	}
@@ -10799,7 +10799,7 @@ Paragraph.prototype.Add_Comment2 = function(Comment, ObjectId)
 };
 Paragraph.prototype.CanAdd_Comment = function()
 {
-	if (true === this.Selection.Use && true != this.Selection_IsEmpty())
+	if (true === this.Selection.Use && true != this.IsSelectionEmpty())
 		return true;
 
 	return false;
@@ -11122,7 +11122,7 @@ Paragraph.prototype.Get_StyleFromFormatting = function()
 
         for (CurPos = StartPos; CurPos < EndPos; ++CurPos)
         {
-            if (true !== this.Content[CurPos].Selection_IsEmpty())
+            if (true !== this.Content[CurPos].IsSelectionEmpty())
                 break;
         }
     }

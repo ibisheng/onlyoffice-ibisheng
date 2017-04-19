@@ -4155,7 +4155,7 @@ CTable.prototype.Can_IncreaseParagraphLevel = function(bIncrease)
 		this.CurCell.Content.Can_IncreaseParagraphLevel(bIncrease);
 	}
 };
-CTable.prototype.Get_SelectionBounds = function()
+CTable.prototype.GetSelectionBounds = function()
 {
 	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
 	{
@@ -4203,7 +4203,7 @@ CTable.prototype.Get_SelectionBounds = function()
 	}
 	else
 	{
-		return this.CurCell.Content.Get_SelectionBounds();
+		return this.CurCell.Content.GetSelectionBounds();
 	}
 };
 CTable.prototype.Get_SelectionAnchorPos = function()
@@ -4914,7 +4914,7 @@ CTable.prototype.Selection_Stop = function()
 	var Cell             = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
 	Cell.Content_Selection_Stop();
 };
-CTable.prototype.Selection_Draw_Page = function(CurPage)
+CTable.prototype.DrawSelectionOnPage = function(CurPage)
 {
 	if (false === this.Selection.Use)
 		return;
@@ -4934,7 +4934,7 @@ CTable.prototype.Selection_Draw_Page = function(CurPage)
 			{
 				var Cell         = Row.Get_Cell(CurCell);
 				var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
-				Cell.Content_Selection_Draw_Page(Cell_PageRel);
+				Cell.Content_DrawSelectionOnPage(Cell_PageRel);
 			}
 		}
 		return;
@@ -5000,7 +5000,7 @@ CTable.prototype.Selection_Draw_Page = function(CurPage)
 		{
 			var Cell         = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
 			var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
-			Cell.Content_Selection_Draw_Page(Cell_PageRel);
+			Cell.Content_DrawSelectionOnPage(Cell_PageRel);
 			break;
 		}
 	}
@@ -5091,14 +5091,14 @@ CTable.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
 		return false;
 	}
 };
-CTable.prototype.Selection_IsEmpty = function(bCheckHidden)
+CTable.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
 	if (true === this.Selection.Use)
 	{
 		if (table_Selection_Cell === this.Selection.Type)
 			return false;
 		else
-			return this.CurCell.Content.Selection_IsEmpty(bCheckHidden);
+			return this.CurCell.Content.IsSelectionEmpty(bCheckHidden);
 	}
 
 	return true;
@@ -6407,7 +6407,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 		this.CurCell = CurCell;
 		this.CurCell.Content.Select_All();
 
-		if (true === this.CurCell.Content.Selection_IsEmpty(false))
+		if (true === this.CurCell.Content.IsSelectionEmpty(false))
 		{
 			this.CurCell.Content.MoveCursorToStartPos();
 

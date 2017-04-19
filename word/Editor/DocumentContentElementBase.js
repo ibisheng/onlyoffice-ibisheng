@@ -176,7 +176,7 @@ CDocumentContentElementBase.prototype.Selection_SetStart = function(X, Y, CurPag
 CDocumentContentElementBase.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, isTableBorder)
 {
 };
-CDocumentContentElementBase.prototype.Selection_IsEmpty = function(isCheckHidden)
+CDocumentContentElementBase.prototype.IsSelectionEmpty = function(isCheckHidden)
 {
 	return true;
 };
@@ -243,23 +243,19 @@ CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperli
 {
 	return this.Hyperlink_CanAdd(bCheckInHyperlink);
 };
-CDocumentContentElementBase.prototype.Selection_Draw_Page = function(CurPage)
+CDocumentContentElementBase.prototype.DrawSelectionOnPage = function(CurPage)
 {
 };
 CDocumentContentElementBase.prototype.StopSelection = function()
 {
 };
-CDocumentContentElementBase.prototype.Get_SelectionBounds = function()
+CDocumentContentElementBase.prototype.GetSelectionBounds = function()
 {
 	return {
 		Start     : null,
 		End       : null,
 		Direction : 0
 	};
-};
-CDocumentContentElementBase.prototype.GetSelectionBounds = function()
-{
-	return this.Get_SelectionBounds();
 };
 CDocumentContentElementBase.prototype.RecalculateCurPos = function()
 {
@@ -601,10 +597,6 @@ CDocumentContentElementBase.prototype.GetSelectionState2 = function()
 CDocumentContentElementBase.prototype.SetSelectionState2 = function(State)
 {
 	return this.Set_SelectionState2(State);
-};
-CDocumentContentElementBase.prototype.IsSelectionEmpty = function(isCheckHidden)
-{
-	return this.Selection_IsEmpty(isCheckHidden);
 };
 CDocumentContentElementBase.prototype.SetReviewType = function(ReviewType)
 {

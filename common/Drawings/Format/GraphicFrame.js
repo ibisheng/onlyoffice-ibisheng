@@ -738,12 +738,12 @@ CGraphicFrame.prototype.updateSelectionState = function()
         {
             var drawingDocument = this.parent.presentation.DrawingDocument;
             var Doc = this.graphicObject;
-            if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty()) {
+            if ( true === Doc.Is_SelectionUse() && !Doc.IsSelectionEmpty()) {
                 drawingDocument.UpdateTargetTransform(this.transform);
                 drawingDocument.TargetEnd();
                 drawingDocument.SelectEnabled(true);
                 drawingDocument.SelectClear();
-                Doc.Selection_Draw_Page(0);
+                Doc.DrawSelectionOnPage(0);
                 drawingDocument.SelectShow();
             }
             else

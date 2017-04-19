@@ -281,7 +281,7 @@ CDrawingsController.prototype.RemoveSelection = function(bNoCheckDrawing)
 	}
 	return this.DrawingObjects.resetSelection(undefined, bNoCheckDrawing);
 };
-CDrawingsController.prototype.IsEmptySelection = function(bCheckHidden)
+CDrawingsController.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
 	return false;
 };
@@ -292,7 +292,7 @@ CDrawingsController.prototype.DrawSelectionOnPage = function(PageAbs)
 };
 CDrawingsController.prototype.GetSelectionBounds = function()
 {
-	return this.DrawingObjects.Get_SelectionBounds();
+	return this.DrawingObjects.GetSelectionBounds();
 };
 CDrawingsController.prototype.IsMovingTableBorder = function()
 {

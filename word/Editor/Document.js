@@ -5007,17 +5007,17 @@ CDocument.prototype.RemoveSelection = function(bNoCheckDrawing)
 	this.Reset_WordSelection();
 	this.Controller.RemoveSelection(bNoCheckDrawing);
 };
-CDocument.prototype.Selection_IsEmpty = function(bCheckHidden)
+CDocument.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
-	return this.Controller.IsEmptySelection(bCheckHidden);
+	return this.Controller.IsSelectionEmpty(bCheckHidden);
 };
-CDocument.prototype.Selection_Draw_Page = function(PageAbs)
+CDocument.prototype.DrawSelectionOnPage = function(PageAbs)
 {
 	this.DrawingDocument.UpdateTargetTransform(null);
 	this.DrawingDocument.SetTextSelectionOutline(false);
 	this.Controller.DrawSelectionOnPage(PageAbs);
 };
-CDocument.prototype.Get_SelectionBounds = function()
+CDocument.prototype.GetSelectionBounds = function()
 {
 	return this.Controller.GetSelectionBounds();
 };
@@ -5398,13 +5398,13 @@ CDocument.prototype.Selection_SetEnd = function(X, Y, MouseEvent)
     this.Content[ContentPos].Selection_SetEnd(X, Y, ElementPageIndex, MouseEvent);
 
     // Проверяем, чтобы у нас в селект не попали элементы, в которых не выделено ничего
-    if (true === this.Content[End].Selection_IsEmpty() && true === this.CheckEmptyElementsOnSelection)
+    if (true === this.Content[End].IsSelectionEmpty() && true === this.CheckEmptyElementsOnSelection)
     {
         this.Content[End].RemoveSelection();
         End--;
     }
 
-    if (Start != End && true === this.Content[Start].Selection_IsEmpty() && true === this.CheckEmptyElementsOnSelection)
+    if (Start != End && true === this.Content[Start].IsSelectionEmpty() && true === this.CheckEmptyElementsOnSelection)
     {
         this.Content[Start].RemoveSelection();
         Start++;
@@ -8113,7 +8113,7 @@ CDocument.prototype.Document_UpdateSelectionState = function()
 };
 CDocument.prototype.Document_UpdateTracks = function()
 {
-	this.private_UpdateTracks(this.Is_SelectionUse(), this.Selection_IsEmpty());
+	this.private_UpdateTracks(this.Is_SelectionUse(), this.IsSelectionEmpty());
 };
 CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
 {
@@ -8319,7 +8319,7 @@ CDocument.prototype.Can_CopyCut = function()
 
 	if (null !== LogicDocument)
 	{
-		if (true === LogicDocument.Is_SelectionUse() && true !== LogicDocument.Selection_IsEmpty(true))
+		if (true === LogicDocument.Is_SelectionUse() && true !== LogicDocument.IsSelectionEmpty(true))
 		{
 			if (selectionflag_Numbering === LogicDocument.Selection.Flag)
 				bCanCopyCut = false;
@@ -9505,7 +9505,7 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 
 	var NewCursorPos = null;
 
-	if (true !== this.Is_SelectionUse() || true === this.Selection_IsEmpty())
+	if (true !== this.Is_SelectionUse() || true === this.IsSelectionEmpty())
 	{
 		NewCursorPos = this.Controller.RecalculateCurPos();
 		if (NewCursorPos && NewCursorPos.Transform)
@@ -9520,7 +9520,7 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY)
 	else
 	{
 		// Обновляем всегда по концу селекта
-		var SelectionBounds = this.Get_SelectionBounds();
+		var SelectionBounds = this.GetSelectionBounds();
 		if (null !== SelectionBounds)
 		{
 			NewCursorPos = {};
@@ -14077,7 +14077,7 @@ CDocument.prototype.controller_RemoveSelection = function(bNoCheckDrawing)
 		}
 	}
 };
-CDocument.prototype.controller_IsEmptySelection = function(bCheckHidden)
+CDocument.prototype.controller_IsSelectionEmpty = function(bCheckHidden)
 {
 	if (true === this.Selection.Use)
 	{
@@ -14088,7 +14088,7 @@ CDocument.prototype.controller_IsEmptySelection = function(bCheckHidden)
 		else
 		{
 			if (this.Selection.StartPos === this.Selection.EndPos)
-				return this.Content[this.Selection.StartPos].Selection_IsEmpty(bCheckHidden);
+				return this.Content[this.Selection.StartPos].IsSelectionEmpty(bCheckHidden);
 			else
 				return false;
 		}
@@ -14129,7 +14129,7 @@ CDocument.prototype.controller_DrawSelectionOnPage = function(PageAbs)
 					for (var Index = Start; Index <= End; ++Index)
 					{
 						var ElementPage = this.private_GetElementPageIndex(Index, PageAbs, ColumnIndex, ColumnsCount);
-						this.Content[Index].Selection_Draw_Page(ElementPage);
+						this.Content[Index].DrawSelectionOnPage(ElementPage);
 					}
 
 					if (PageAbs >= 2 && End < this.Pages[PageAbs - 2].EndPos)
@@ -14152,7 +14152,7 @@ CDocument.prototype.controller_DrawSelectionOnPage = function(PageAbs)
 						if (Pos_start <= ElementPos && ElementPos <= Pos_end)
 						{
 							var ElementPage = this.private_GetElementPageIndex(ElementPos, PageAbs, ColumnIndex, ColumnsCount);
-							this.Content[ElementPos].Selection_Draw_Page(ElementPage);
+							this.Content[ElementPos].DrawSelectionOnPage(ElementPage);
 						}
 					}
 
@@ -14182,12 +14182,12 @@ CDocument.prototype.controller_GetSelectionBounds = function()
 		}
 
 		if (Start === End)
-			return this.Content[Start].Get_SelectionBounds();
+			return this.Content[Start].GetSelectionBounds();
 		else
 		{
 			var Result       = {};
-			Result.Start     = this.Content[Start].Get_SelectionBounds().Start;
-			Result.End       = this.Content[End].Get_SelectionBounds().End;
+			Result.Start     = this.Content[Start].GetSelectionBounds().Start;
+			Result.End       = this.Content[End].GetSelectionBounds().End;
 			Result.Direction = (this.Selection.StartPos > this.Selection.EndPos ? -1 : 1);
 			return Result;
 		}
@@ -14741,7 +14741,7 @@ CDocument.prototype.controller_UpdateSelectionState = function()
 		}
 		else
 		{
-			if (false === this.Selection_IsEmpty())
+			if (false === this.IsSelectionEmpty())
 			{
 				if (true !== this.Selection.Start)
 				{

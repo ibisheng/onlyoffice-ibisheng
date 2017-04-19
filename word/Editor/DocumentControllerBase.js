@@ -522,7 +522,7 @@ CDocumentControllerBase.prototype.RemoveSelection = function(bNoCheckDrawing){};
  * Проверяем пустой ли селект.
  * @returns {boolean}
  */
-CDocumentControllerBase.prototype.IsEmptySelection = function(bCheckHidden){return true;};
+CDocumentControllerBase.prototype.IsSelectionEmpty = function(bCheckHidden){return true;};
 /**
  * Рисуем селект на заданно странице.
  * @param PageAbs
