@@ -1081,7 +1081,7 @@ ParaComment.prototype =
     {
     },
 
-    Selection_Remove : function()
+	RemoveSelection : function()
     {
     },
 

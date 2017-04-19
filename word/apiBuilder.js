@@ -1360,7 +1360,7 @@
             this.Document.Start_SilentMode();
             this.Document.Remove(1, false, false, false);
             this.Document.End_SilentMode();
-            this.Document.Selection_Remove(true);
+            this.Document.RemoveSelection(true);
         }
 
         var oParagraph = this.Document.Get_CurrentParagraph();
@@ -1379,7 +1379,7 @@
 
 		oParagraph.Parent.Insert_Content(oSelectedContent, oNearestPos);
         oParagraph.Clear_NearestPosArray();
-		this.Document.Selection_Remove(true);
+		this.Document.RemoveSelection(true);
         return true;
     };
 
@@ -2175,7 +2175,7 @@
 
         var isMerged = this.Table.Cell_Merge(true);
         var oMergedCell = this.Table.CurCell;
-        oTable.Selection_Remove();
+        oTable.RemoveSelection();
 
         private_EndSilentMode();
 
@@ -2249,7 +2249,7 @@
 
         var nRowIndex = true === _isBefore ? _oCell.Row.Index : _oCell.Row.Index + 1;
 
-        this.Table.Selection_Remove();
+        this.Table.RemoveSelection();
         this.Table.CurCell = _oCell;
         this.Table.Row_Add(_isBefore);
 
@@ -2278,7 +2278,7 @@
             _isBefore = false;
         }
 
-        this.Table.Selection_Remove();
+        this.Table.RemoveSelection();
         this.Table.CurCell = _oCell;
         this.Table.Col_Add(_isBefore);
 
@@ -2297,7 +2297,7 @@
         private_StartSilentMode();
         this.private_PrepareTableForActions();
 
-        this.Table.Selection_Remove();
+        this.Table.RemoveSelection();
         this.Table.CurCell = oCell.Cell;
         var isEmpty = !(this.Table.Row_Remove());
 
@@ -2317,7 +2317,7 @@
         private_StartSilentMode();
         this.private_PrepareTableForActions();
 
-        this.Table.Selection_Remove();
+        this.Table.RemoveSelection();
         this.Table.CurCell = oCell.Cell;
         var isEmpty = !(this.Table.Col_Remove());
 

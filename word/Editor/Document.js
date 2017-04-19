@@ -1632,7 +1632,7 @@ CDocument.prototype.Set_CurrentElement = function(Index, bUpdateStates)
 		this.Selection.EndPos   = ContentPos;
 	}
 	else
-		this.Selection_Remove();
+		this.RemoveSelection();
 
 	if (false != bUpdateStates)
 	{
@@ -4097,7 +4097,7 @@ CDocument.prototype.AddDropCap = function(bInText)
 		this.Internal_Content_Add(Pos, NewParagraph);
 		NewParagraph.MoveCursorToEndPos();
 
-		this.Selection_Remove();
+		this.RemoveSelection();
 		this.CurPos.ContentPos = Pos;
 		this.Set_DocPosType(docpostype_Content);
 
@@ -4293,7 +4293,7 @@ CDocument.prototype.Remove = function(nDirection, bOnlyText, bRemoveOnlySelectio
 CDocument.prototype.RemoveBeforePaste = function()
 {
 	if (docpostype_DrawingObjects === this.Get_DocPosType() && null === this.DrawingObjects.getTargetDocContent())
-		this.Selection_Remove();
+		this.RemoveSelection();
 	else
 		this.Remove(1, true, true, true);
 };
@@ -5002,7 +5002,7 @@ CDocument.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum, Columns
 
     return InlineElements[0];
 };
-CDocument.prototype.Selection_Remove = function(bNoCheckDrawing)
+CDocument.prototype.RemoveSelection = function(bNoCheckDrawing)
 {
 	this.Reset_WordSelection();
 	this.Controller.RemoveSelection(bNoCheckDrawing);
@@ -5079,7 +5079,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
     {
         // Если был селект, тогда убираем его
         if (true === this.Selection.Use)
-            this.Selection_Remove();
+            this.RemoveSelection();
 
         this.Set_DocPosType(docpostype_HdrFtr);
 
@@ -5094,7 +5094,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
     }
 	else if (true !== bFlowTable && nInDrawing < 0 && true === bFootnotes)
 	{
-		this.Selection_Remove();
+		this.RemoveSelection();
         this.Selection.Start = true;
         this.Selection.Use   = true;
 
@@ -5104,7 +5104,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
     else if (nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ))
     {
         if (docpostype_DrawingObjects != this.CurPos.Type)
-            this.Selection_Remove();
+            this.RemoveSelection();
 
         // Прячем курсор
         this.DrawingDocument.TargetEnd();
@@ -5149,7 +5149,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
         if (!(true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon))
         {
             if ((selectionflag_Common != this.Selection.Flag) || ( true === this.Selection.Use && MouseEvent.ClickCount <= 1 && true != bTableBorder ))
-                this.Selection_Remove();
+                this.RemoveSelection();
         }
 
         this.Selection.Use   = true;
@@ -5483,7 +5483,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
 
     if (true === this.Selection_Check(0, 0, 0, NearPos))
     {
-        this.Selection_Remove();
+        this.RemoveSelection();
 
         // Нам надо снять селект и поставить курсор в то место, где была ближайшая позиция
         var Paragraph = NearPos.Paragraph;
@@ -5541,7 +5541,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
                 }
             }
 
-            this.Selection_Remove(true);
+            this.RemoveSelection(true);
 
             // Выделение выставляется внутри функции Insert_Content
             Para.Parent.Insert_Content(DocContent, NearPos);
@@ -5757,7 +5757,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			// Нам надо разделить наш параграф в заданной позиции, если позиция в
 			// начале или конце параграфа, тогда делить не надо
 			Para.Cursor_MoveToNearPos(NearPos);
-			Para.Selection_Remove();
+			Para.RemoveSelection();
 
 			var bAddEmptyPara          = false;
 			var bDoNotIncreaseDstIndex = false;
@@ -5884,7 +5884,7 @@ CDocument.prototype.Document_SelectNumbering = function(NumPr, Index)
 {
 	this.private_UpdateTargetForCollaboration();
 
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	this.Selection.Use      = true;
 	this.Selection.Flag     = selectionflag_Numbering;
@@ -5911,7 +5911,7 @@ CDocument.prototype.Document_SelectNumbering = function(NumPr, Index)
 CDocument.prototype.Remove_NumberingSelection = function()
 {
 	if (true === this.Selection.Use && selectionflag_Numbering == this.Selection.Flag)
-		this.Selection_Remove();
+		this.RemoveSelection();
 };
 CDocument.prototype.Update_CursorType = function(X, Y, PageAbs, MouseEvent)
 {
@@ -7347,7 +7347,7 @@ CDocument.prototype.Get_TextBackGroundColor = function()
 };
 CDocument.prototype.Select_DrawingObject = function(Id)
 {
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	// Прячем курсор
 	this.DrawingDocument.TargetEnd();
@@ -7724,7 +7724,7 @@ CDocument.prototype.Document_SetHdrFtrLink = function(bLinkToPrevious)
 			return;
 
 		// Очистим селект
-		_CurHdrFtr.Selection_Remove();
+		_CurHdrFtr.RemoveSelection();
 
 		// Просто удаляем запись о данном колонтитуле в секции
 		SectPr.Set_HdrFtr(bHeader, bFirst, bEven, null);
@@ -7786,7 +7786,7 @@ CDocument.prototype.EndHdrFtrEditing = function(bCanStayOnPage)
 		}
 		else
 		{
-			CurHdrFtr.Selection_Remove();
+			CurHdrFtr.RemoveSelection();
 
 			if (hdrftr_Header == CurHdrFtr.Type)
 				this.MoveCursorToXY(0, 0, false);
@@ -8443,7 +8443,7 @@ CDocument.prototype.Get_SelectionState = function()
 		DocState.Selection.Start = false;
 		DocState.Selection.Use   = false;
 
-		this.Content[DocState.CurPos.ContentPos].Selection_Remove();
+		this.Content[DocState.CurPos.ContentPos].RemoveSelection();
 		State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
 	}
 	else
@@ -8594,7 +8594,7 @@ CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, Additional
 };
 CDocument.prototype.Get_SelectionState2 = function()
 {
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	// Сохраняем Id ближайшего элемента в текущем классе
 	var State       = new CDocumentSelectionState();
@@ -8638,7 +8638,7 @@ CDocument.prototype.Get_SelectionState2 = function()
 };
 CDocument.prototype.Set_SelectionState2 = function(State)
 {
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	var Id = State.Id;
 	if (docpostype_HdrFtr === State.Type)
@@ -10004,7 +10004,7 @@ CDocument.prototype.Save_DocumentStateBeforeLoadChanges = function()
 	State.EndPos     = [];
 
 	this.Controller.SaveDocumentStateBeforeLoadChanges(State);
-	this.Selection_Remove();
+	this.RemoveSelection();
 	return State;
 };
 CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
@@ -10035,7 +10035,7 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
 		if (Table && true === Table.Is_UseInDocument())
 		{
 			Table.Set_CurCell(Cell);
-			Table.Selection_Remove();
+			Table.RemoveSelection();
 			Table.Table_Select(c_oAscTableSelectionType.Cell);
 		}
 	}
@@ -10354,7 +10354,7 @@ CDocument.prototype.private_CorrectDocumentPosition = function()
 {
 	if (this.CurPos.ContentPos < 0 || this.CurPos.ContentPos >= this.Content.length)
 	{
-		this.Selection_Remove();
+		this.RemoveSelection();
 		if (this.CurPos.ContentPos < 0)
 		{
 			this.CurPos.ContentPos = 0;
@@ -11095,7 +11095,7 @@ CDocument.prototype.AddFootnote = function(sText)
 			if (true === this.Is_SelectionUse())
 			{
 				this.MoveCursorRight(false, false, false);
-				this.Selection_Remove();
+				this.RemoveSelection();
 			}
 
 			if (sText)
@@ -11384,7 +11384,7 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				{
 					NewParagraph.Select_All();
 					NewParagraph.Add(new ParaTextPr({Lang : LastRun.Pr.Lang.Copy()}));
-					NewParagraph.Selection_Remove();
+					NewParagraph.RemoveSelection();
 				}
 			}
 			else
@@ -11909,7 +11909,7 @@ CDocument.prototype.controller_MoveCursorToStartPos = function(AddToSelect)
 	}
 	else
 	{
-		this.Selection_Remove();
+		this.RemoveSelection();
 
 		this.Selection.Start    = false;
 		this.Selection.Use      = false;
@@ -11965,7 +11965,7 @@ CDocument.prototype.controller_MoveCursorToEndPos = function(AddToSelect)
 	}
 	else
 	{
-		this.Selection_Remove();
+		this.RemoveSelection();
 
 		this.Selection.Start    = false;
 		this.Selection.Use      = false;
@@ -12025,7 +12025,7 @@ CDocument.prototype.controller_MoveCursorLeft = function(AddToSelect, Word)
 
 			this.CurPos.ContentPos = Start;
 			this.Content[this.CurPos.ContentPos].MoveCursorLeft(false, Word);
-			this.Selection_Remove();
+			this.RemoveSelection();
 		}
 	}
 	else
@@ -12129,7 +12129,7 @@ CDocument.prototype.controller_MoveCursorRight = function(AddToSelect, Word)
 				this.Content[this.CurPos.ContentPos].MoveCursorRight(false, Word);
 			}
 
-			this.Selection_Remove();
+			this.RemoveSelection();
 		}
 	}
 	else
@@ -12245,7 +12245,7 @@ CDocument.prototype.controller_MoveCursorToEndOfLine = function(AddToSelect)
 			var Item = this.Content[Pos];
 			Item.MoveCursorToEndOfLine(AddToSelect);
 
-			this.Selection_Remove();
+			this.RemoveSelection();
 		}
 	}
 	else
@@ -12304,7 +12304,7 @@ CDocument.prototype.controller_MoveCursorToStartOfLine = function(AddToSelect)
 			var Item = this.Content[Pos];
 			Item.MoveCursorToStartOfLine(AddToSelect);
 
-			this.Selection_Remove();
+			this.RemoveSelection();
 		}
 	}
 	else
@@ -12348,7 +12348,7 @@ CDocument.prototype.controller_MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 		}
 		else
 		{
-			this.Selection_Remove();
+			this.RemoveSelection();
 
 			var ContentPos         = this.Internal_GetContentPosByXY(X, Y);
 			this.CurPos.ContentPos = ContentPos;
@@ -13001,7 +13001,7 @@ CDocument.prototype.controller_SetParagraphNumbering = function(NumInfo)
 
 				if (selectionflag_Numbering === this.Selection.Flag)
 				{
-					this.Selection_Remove();
+					this.RemoveSelection();
 					Item.Document_SetThisElementCurrent(true);
 				}
 			}
@@ -14037,7 +14037,7 @@ CDocument.prototype.controller_RemoveSelection = function(bNoCheckDrawing)
 
 				for (var Index = Start; Index <= End; Index++)
 				{
-					this.Content[Index].Selection_Remove();
+					this.Content[Index].RemoveSelection();
 				}
 
 				this.Selection.Use   = false;
@@ -14060,7 +14060,7 @@ CDocument.prototype.controller_RemoveSelection = function(bNoCheckDrawing)
 
 				for (var Index = 0; Index < this.Selection.Data.length; Index++)
 				{
-					this.Content[this.Selection.Data[Index]].Selection_Remove();
+					this.Content[this.Selection.Data[Index]].RemoveSelection();
 				}
 
 				this.Selection.Use   = false;
@@ -14264,7 +14264,7 @@ CDocument.prototype.controller_CheckPosInSelection = function(X, Y, PageAbs, Nea
 CDocument.prototype.controller_SelectAll = function()
 {
 	if (true === this.Selection.Use)
-		this.Selection_Remove();
+		this.RemoveSelection();
 
 	this.DrawingDocument.SelectEnabled(true);
 	this.DrawingDocument.TargetEnd();
@@ -14553,7 +14553,7 @@ CDocument.prototype.controller_RemoveTable = function()
 			Table.Remove_InnerTable();
 		else
 		{
-			this.Selection_Remove();
+			this.RemoveSelection();
 			Table.PreDelete();
 			this.Internal_Content_Remove(Pos, 1);
 
@@ -14758,7 +14758,7 @@ CDocument.prototype.controller_UpdateSelectionState = function()
 			{
 				if (true !== this.Selection.Start)
 				{
-					this.Selection_Remove();
+					this.RemoveSelection();
 				}
 
 				this.private_CheckCurPage();
@@ -14773,7 +14773,7 @@ CDocument.prototype.controller_UpdateSelectionState = function()
 	}
 	else
 	{
-		this.Selection_Remove();
+		this.RemoveSelection();
 		this.private_CheckCurPage();
 		this.RecalculateCurPos();
 		this.private_UpdateTracks(false, false);
@@ -14830,10 +14830,10 @@ CDocument.prototype.controller_SetSelectionState = function(State, StateIndex)
 				if (undefined !== NumPr)
 					this.Document_SelectNumbering(NumPr, this.Selection.StartPos);
 				else
-					this.Selection_Remove();
+					this.RemoveSelection();
 			}
 			else
-				this.Selection_Remove();
+				this.RemoveSelection();
 		}
 		else
 		{
@@ -15099,7 +15099,7 @@ CDocument.prototype.MoveToFillingForm = function(bNext)
 	if (arrAllFields.length <= 0)
 		return;
 
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	var oInfo  = this.Get_SelectedElementsInfo();
 	var oField = oInfo.Get_Field();

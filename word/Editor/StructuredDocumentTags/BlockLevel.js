@@ -185,9 +185,9 @@ CBlockLevelSdt.prototype.IsSelectionToEnd = function()
 {
 	return this.Content.IsSelectionToEnd();
 };
-CBlockLevelSdt.prototype.Selection_Remove = function()
+CBlockLevelSdt.prototype.RemoveSelection = function()
 {
-	this.Content.Selection_Remove();
+	this.Content.RemoveSelection();
 };
 CBlockLevelSdt.prototype.SetSelectionUse = function(isUse)
 {

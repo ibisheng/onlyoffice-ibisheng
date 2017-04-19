@@ -280,7 +280,7 @@ Paragraph.prototype.Copy = function(Parent, DrawingDocument)
 		Para.Set_SectionPr(SectPr);
 	}
 
-	Para.Selection_Remove();
+	Para.RemoveSelection();
 	Para.MoveCursorToStartPos(false);
 
 	return Para;
@@ -306,7 +306,7 @@ Paragraph.prototype.Copy2 = function(Parent)
 	}
 
 
-	Para.Selection_Remove();
+	Para.RemoveSelection();
 	Para.MoveCursorToStartPos(false);
 
 	return Para;
@@ -2537,7 +2537,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 
 				for (var Pos = _StartPos; Pos <= _EndPos; ++Pos)
 				{
-					this.Content[Pos].Selection_Remove();
+					this.Content[Pos].RemoveSelection();
 				}
 
 				this.CurPos.ContentPos = StartPos;
@@ -2564,7 +2564,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 
 		if (true !== this.Content[this.CurPos.ContentPos].Selection_IsUse())
 		{
-			this.Selection_Remove();
+			this.RemoveSelection();
 
 			if (nCount > -1 && true !== bOnAddText)
 				this.Correct_Content();
@@ -2999,7 +2999,7 @@ Paragraph.prototype.Add = function(Item)
 						this.Apply_TextPr(TextPr);
 
 						// Убираем селект
-						this.Selection_Remove();
+						this.RemoveSelection();
 					}
 					else
 					{
@@ -3357,7 +3357,7 @@ Paragraph.prototype.IncDec_FontSize = function(bIncrease)
 				this.Apply_TextPr(undefined, bIncrease, false);
 
 				// Убираем селект
-				this.Selection_Remove();
+				this.RemoveSelection();
 			}
 			else
 			{
@@ -3722,7 +3722,7 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 		var TempLimit = Math.min(StartPos, EndPos);
 		for (var CurPos = OldStartPos; CurPos < TempLimit; CurPos++)
 		{
-			this.Content[CurPos].Selection_Remove();
+			this.Content[CurPos].RemoveSelection();
 		}
 	}
 
@@ -3731,7 +3731,7 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 		var TempLimit = Math.max(StartPos, EndPos);
 		for (var CurPos = TempLimit + 1; CurPos <= OldEndPos; CurPos++)
 		{
-			this.Content[CurPos].Selection_Remove();
+			this.Content[CurPos].RemoveSelection();
 		}
 	}
 
@@ -3844,7 +3844,7 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 							this.Selection.EndPos = Pos + 1;
 						}
 
-						this.Content[Pos].Selection_Remove();
+						this.Content[Pos].RemoveSelection();
 					}
 					else
 						break;
@@ -4023,7 +4023,7 @@ Paragraph.prototype.MoveCursorLeft = function(AddToSelect, Word)
 			if (CorrectedStartPos.Compare(CorrectedEndPos) > 0)
 				SelectPos = CorrectedEndPos;
 
-			this.Selection_Remove();
+			this.RemoveSelection();
 			this.Set_ParaContentPos(SelectPos, true, -1, -1);
 		}
 		else
@@ -4117,7 +4117,7 @@ Paragraph.prototype.MoveCursorRight = function(AddToSelect, Word)
 			// Проверим, попал ли конец параграфа в выделение
 			if (true === this.Selection_CheckParaEnd())
 			{
-				this.Selection_Remove();
+				this.RemoveSelection();
 				this.MoveCursorToEndPos(false);
 				return false;
 			}
@@ -4131,7 +4131,7 @@ Paragraph.prototype.MoveCursorRight = function(AddToSelect, Word)
 				if (CorrectedStartPos.Compare(CorrectedEndPos) > 0)
 					SelectPos = CorrectedStartPos;
 
-				this.Selection_Remove();
+				this.RemoveSelection();
 				this.Set_ParaContentPos(SelectPos, true, -1, -1);
 			}
 		}
@@ -4665,7 +4665,7 @@ Paragraph.prototype.MoveCursorUp = function(AddToSelect)
 			this.CurPos.RealX = this.CurPos.X;
 			this.CurPos.RealY = this.CurPos.Y;
 
-			this.Selection_Remove();
+			this.RemoveSelection();
 
 			if (0 == CurLine)
 			{
@@ -4766,7 +4766,7 @@ Paragraph.prototype.MoveCursorDown = function(AddToSelect)
 			this.CurPos.RealX = this.CurPos.X;
 			this.CurPos.RealY = this.CurPos.Y;
 
-			this.Selection_Remove();
+			this.RemoveSelection();
 
 			if (this.Lines.length - 1 == CurLine)
 			{
@@ -4844,7 +4844,7 @@ Paragraph.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 			var SearchPos = new CParagraphSearchPos();
 			this.Get_EndRangePos(SearchPos, RightPos);
 
-			this.Selection_Remove();
+			this.RemoveSelection();
 
 			this.Set_ParaContentPos(SearchPos.Pos, false, SearchPos.Line, SearchPos.Range);
 		}
@@ -4901,7 +4901,7 @@ Paragraph.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 			var SearchPos = new CParagraphSearchPos();
 			this.Get_StartRangePos(SearchPos, LeftPos);
 
-			this.Selection_Remove();
+			this.RemoveSelection();
 
 			this.Set_ParaContentPos(SearchPos.Pos, false, SearchPos.Line, SearchPos.Range);
 		}
@@ -4956,7 +4956,7 @@ Paragraph.prototype.MoveCursorToStartPos = function(AddToSelect)
 	}
 	else
 	{
-		this.Selection_Remove();
+		this.RemoveSelection();
 
 		this.CurPos.ContentPos = 0;
 		this.Content[0].MoveCursorToStartPos();
@@ -5000,7 +5000,7 @@ Paragraph.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelectFromEn
 		}
 		else
 		{
-			this.Selection_Remove();
+			this.RemoveSelection();
 
 			this.CurPos.ContentPos = this.Content.length - 1;
 			this.Content[this.CurPos.ContentPos].MoveCursorToEndPos();
@@ -5020,7 +5020,7 @@ Paragraph.prototype.Cursor_MoveToNearPos = function(NearPos)
 	var SelectionEndPos   = this.Get_ParaContentPos(true, false);
 
 	if (0 === SelectionStartPos.Compare(SelectionEndPos))
-		this.Selection_Remove();
+		this.RemoveSelection();
 };
 Paragraph.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 {
@@ -5094,7 +5094,7 @@ Paragraph.prototype.Cursor_MoveTo_Drawing = function(Id, bBefore)
 	if (true != bBefore)
 		ContentPos.Data[ContentPos.Depth - 1]++;
 
-	this.Selection_Remove();
+	this.RemoveSelection();
 	this.Set_ParaContentPos(ContentPos, false, -1, -1);
 
 	this.RecalculateCurPos();
@@ -5621,7 +5621,7 @@ Paragraph.prototype.Hyperlink_Add = function(HyperProps)
 		if (null !== NewElementE)
 			this.Internal_Content_Add(StartPos + 2, NewElementE);
 
-		this.Selection_Remove();
+		this.RemoveSelection();
 		this.Selection.Use      = true;
 		this.Selection.StartPos = StartPos + 1;
 		this.Selection.EndPos   = StartPos + 1;
@@ -6033,7 +6033,7 @@ Paragraph.prototype.Selection_SetStart = function(X, Y, CurPage, bTableBorder)
 {
 	// Избавляемся от старого селекта
 	if (true === this.Selection.Use)
-		this.Selection_Remove();
+		this.RemoveSelection();
 
 	// Найдем позицию в контенте, в которую мы попали (для селекта ищем и за знаком параграфа, для курсора только перед)
 	var SearchPosXY  = this.Get_ParaContentPosByXY(X, Y, CurPage, false, true);
@@ -6137,7 +6137,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 			if (1 >= MouseEvent.ClickCount)
 			{
 				// Убираем селект. Позицию курсора можно не выставлять, т.к. она у нас установлена на конец селекта
-				this.Selection_Remove();
+				this.RemoveSelection();
 			}
 			else if (0 == ClickCounter)
 			{
@@ -6170,7 +6170,7 @@ Paragraph.prototype.StopSelection = function()
 {
 	this.Selection.Start = false;
 };
-Paragraph.prototype.Selection_Remove = function()
+Paragraph.prototype.RemoveSelection = function()
 {
 	if (true === this.Selection.Use)
 	{
@@ -6188,7 +6188,7 @@ Paragraph.prototype.Selection_Remove = function()
 
 		for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
 		{
-			this.Content[CurPos].Selection_Remove();
+			this.Content[CurPos].RemoveSelection();
 		}
 	}
 
@@ -6920,7 +6920,7 @@ Paragraph.prototype.GetCalculatedTextPr = function()
 				TextPr = TextPr.Compare(TempTextPr);
 		}
 
-		this.Selection_Remove();
+		this.RemoveSelection();
 	}
 	else
 	{
@@ -8025,7 +8025,7 @@ Paragraph.prototype.GetDirectTextPr = function()
 
 		TextPr = this.Content[StartPos].Get_CompiledTextPr(true);
 
-		this.Selection_Remove();
+		this.RemoveSelection();
 	}
 	else
 	{
@@ -9534,7 +9534,7 @@ Paragraph.prototype.Set_FramePr = function(FramePr, bDelete)
 			var FF = new ParaTextPr({RFonts : {Ascii : {Name : FramePr.FontFamily.Name, Index : -1}}});
 			this.Select_All();
 			this.Add(FF);
-			this.Selection_Remove();
+			this.RemoveSelection();
 		}
 
 		if (undefined != FramePr.HSpace)
@@ -10029,7 +10029,7 @@ Paragraph.prototype.Update_DropCapByLines = function(TextPr, Count, LineH, LineT
 
 	this.Select_All();
 	this.Add(PTextPr);
-	this.Selection_Remove();
+	this.RemoveSelection();
 };
 Paragraph.prototype.Update_DropCapByHeight = function(_Height)
 {
@@ -10098,7 +10098,7 @@ Paragraph.prototype.Update_DropCapByHeight = function(_Height)
 	});
 	this.Select_All();
 	this.Add(PTextPr);
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	return LinesCount;
 };
@@ -10132,8 +10132,8 @@ Paragraph.prototype.Split = function(NewParagraph, Pos)
 	this.DeleteCommentOnRemove         = false;
 
 	// Обнулим селект и курсор
-	this.Selection_Remove();
-	NewParagraph.Selection_Remove();
+	this.RemoveSelection();
+	NewParagraph.RemoveSelection();
 
 	// Переносим контент, идущий с текущей позиции в параграфе и до конца параграфа,
 	// в новый параграф.
@@ -10327,7 +10327,7 @@ Paragraph.prototype.Set_SelectionState = function(State, StateIndex)
 
 	this.Set_ParaContentPos(ParaState.CurPos.ContentPos, true, -1, -1);
 
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	this.Selection.Start = ParaState.Selection.Start;
 	this.Selection.Use   = ParaState.Selection.Use;
@@ -10592,7 +10592,7 @@ Paragraph.prototype.Set_SelectionState2 = function(ParaState)
 
 	this.Set_ParaContentPos(ParaState.CurPos.ContentPos, true, -1, -1);
 
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	this.Selection.Start = ParaState.Selection.Start;
 	this.Selection.Use   = ParaState.Selection.Use;
@@ -10860,7 +10860,7 @@ Paragraph.prototype.Replace_MisspelledWord = function(Word, WordId)
 
 	this.Remove();
 
-	this.Selection_Remove();
+	this.RemoveSelection();
 	this.Set_ParaContentPos(StartPos, true, -1, -1);
 
 	this.RecalcInfo.Set_Type_0(pararecalc_0_All);

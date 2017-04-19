@@ -1381,7 +1381,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                             oContent.Correct_ContentPos(1);
                         }
 
-                        this.Selection_Remove();
+                        this.RemoveSelection();
                     }
                     else
                     {
@@ -1404,7 +1404,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                             oContent.Correct_ContentPos(-1);
                         }
 
-                        this.Selection_Remove();
+                        this.RemoveSelection();
                     }
                     else
                     {
@@ -1421,14 +1421,14 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     oContent.Correct_ContentPos(-1); // -1, потому что нам надо встать перед элементом, а не после
                 }
 
-                this.Selection_Remove();
+                this.RemoveSelection();
             }
 
             return true;
         }
         else
         {
-            this.Selection_Remove();
+            this.RemoveSelection();
             if (true === TrackRevisions)
             {
                 if (reviewtype_Common === ElementReviewType)
@@ -1498,7 +1498,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 }
             }
 
-            this.Selection_Remove();
+            this.RemoveSelection();
             if (Direction < 0)
             {
                 oContent.CurPos = nStartPos;
@@ -1527,7 +1527,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
             else
                 oContent.Remove_FromContent(nStartPos, 1);
 
-            this.Selection_Remove();
+            this.RemoveSelection();
             oContent.CurPos = nStartPos;
         }
         oContent.Correct_Content();
@@ -2978,10 +2978,10 @@ ParaMath.prototype.Selection_IsUse = function()
     return this.bSelectionUse;
 };
 
-ParaMath.prototype.Selection_Remove = function()
+ParaMath.prototype.RemoveSelection = function()
 {
     this.bSelectionUse = false;
-    this.Root.Selection_Remove();
+    this.Root.RemoveSelection();
 };
 
 ParaMath.prototype.Select_All = function(Direction)

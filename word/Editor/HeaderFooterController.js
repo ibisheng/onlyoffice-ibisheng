@@ -83,7 +83,7 @@ CHdrFtrController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelec
 
 	if (null !== this.HdrFtr.CurHdtr && docpostype_DrawingObjects !== this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
 	{
-		this.LogicDocument.Selection_Remove();
+		this.LogicDocument.RemoveSelection();
 		this.LogicDocument.Selection.Use = false;
 	}
 
@@ -229,7 +229,7 @@ CHdrFtrController.prototype.GetDirectTextPr = function()
 };
 CHdrFtrController.prototype.RemoveSelection = function(bNoCheckDrawing)
 {
-	this.HdrFtr.Selection_Remove(bNoCheckDrawing);
+	this.HdrFtr.RemoveSelection(bNoCheckDrawing);
 };
 CHdrFtrController.prototype.IsEmptySelection = function(bCheckHidden)
 {

@@ -451,7 +451,7 @@ function CTableOutlineDr()
 			}
 			this.IsChangeSmall = false;
 
-			this.TableOutline.Table.Selection_Remove();
+			this.TableOutline.Table.RemoveSelection();
 			this.TableOutline.Table.MoveCursorToStartPos();
 			editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		}

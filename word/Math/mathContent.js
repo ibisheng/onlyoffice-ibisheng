@@ -1257,7 +1257,7 @@ CMathContent.prototype.SetPlaceholder = function()
 
     this.addElementToContent(oRun);
 
-    this.Selection_Remove();
+    this.RemoveSelection();
     this.MoveCursorToEndPos();
 };
 //////////////////////////////////////
@@ -3993,7 +3993,7 @@ CMathContent.prototype.Draw_Lines = function(PDSL)
         PDSL.Baseline = Baseline;
     }
 };
-CMathContent.prototype.Selection_Remove = function()
+CMathContent.prototype.RemoveSelection = function()
 {
     var StartPos = this.Selection.StartPos;
     var EndPos   = this.Selection.EndPos;
@@ -4009,7 +4009,7 @@ CMathContent.prototype.Selection_Remove = function()
 
     for (var nPos = StartPos; nPos <= EndPos; nPos++)
     {
-        this.Content[nPos].Selection_Remove();
+        this.Content[nPos].RemoveSelection();
     }
 
     this.Selection.Use   = false;

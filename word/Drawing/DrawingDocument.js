@@ -492,7 +492,7 @@ function CTableOutlineDr()
 			}
 			this.IsChangeSmall = false;
 
-			this.TableOutline.Table.Selection_Remove();
+			this.TableOutline.Table.RemoveSelection();
 			this.TableOutline.Table.MoveCursorToStartPos();
 			editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		}
@@ -5995,7 +5995,7 @@ function CDrawingDocument()
 		var _ret = this.TableOutlineDr.checkMouseDown(pos, oWordControl);
 		if (_ret === true)
 		{
-			oWordControl.m_oLogicDocument.Selection_Remove(true);
+			oWordControl.m_oLogicDocument.RemoveSelection(true);
 			this.TableOutlineDr.bIsTracked = true;
 			this.LockCursorType("move");
 

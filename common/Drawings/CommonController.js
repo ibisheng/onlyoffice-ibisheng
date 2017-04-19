@@ -847,13 +847,13 @@ DrawingObjectsController.prototype =
                 {
                     if(this.selection.textSelection.graphicObject)
                     {
-                        this.selection.textSelection.graphicObject.Selection_Remove();
+                        this.selection.textSelection.graphicObject.RemoveSelection();
                     }
                 }
                 else
                 {
                     var content = this.selection.textSelection.getDocContent();
-                    content && content.Selection_Remove();
+                    content && content.RemoveSelection();
                 }
             }
             this.selection.textSelection = null;
@@ -2465,7 +2465,7 @@ DrawingObjectsController.prototype =
                 {
                     objects_by_type.tables[0].graphicObject.Select_All();
                     objects_by_type.tables[0].graphicObject.Set_Props(props2);
-                    objects_by_type.tables[0].graphicObject.Selection_Remove();
+                    objects_by_type.tables[0].graphicObject.RemoveSelection();
                 }
                 editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(objects_by_type.tables[0]);
             }
@@ -5376,7 +5376,7 @@ DrawingObjectsController.prototype =
         var oContent = this.getTargetDocContent();
         if(oContent)
         {
-            oContent.Selection_Remove();
+            oContent.RemoveSelection();
             var oTextSelection;
             if(this.selection.groupSelection)
             {
@@ -5536,7 +5536,7 @@ DrawingObjectsController.prototype =
             var content = this.getTargetDocContent();
             if(content)
             {
-                content.Selection_Remove();
+                content.RemoveSelection();
             }
 
             if(this.selection.textSelection)

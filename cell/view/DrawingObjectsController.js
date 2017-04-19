@@ -112,7 +112,7 @@ DrawingObjectsController.prototype.setTableProps = function(props)
         {
             by_type.tables[0].graphicObject.Select_All();
             by_type.tables[0].graphicObject.Set_Props(props);
-            by_type.tables[0].graphicObject.Selection_Remove();
+            by_type.tables[0].graphicObject.RemoveSelection();
         }
         props.TableCaption = sCaption;
         props.TableDescription = sDescription;

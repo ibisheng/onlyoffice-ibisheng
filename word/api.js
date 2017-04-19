@@ -810,7 +810,7 @@ background-repeat: no-repeat;\
 		};
 
 		this.asc_CheckCopy(text_data, 2);
-		this.WordControl.m_oLogicDocument.Selection_Remove();
+		this.WordControl.m_oLogicDocument.RemoveSelection();
 
 		return text_data.data;
 	};
@@ -1448,7 +1448,7 @@ background-repeat: no-repeat;\
 		var Document = this.WordControl.m_oLogicDocument;
 
 		if (true === Document.Selection.Use)
-			Document.Selection_Remove();
+			Document.RemoveSelection();
 
 		Document.DrawingDocument.SelectEnabled(true);
 		Document.DrawingDocument.TargetEnd();
@@ -7313,7 +7313,7 @@ background-repeat: no-repeat;\
 		var oCopyProcessor = new AscCommon.CopyProcessor(this);
 		oCopyProcessor.Start();
 		var _ret = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head><body>" + oCopyProcessor.getInnerHtml() + "</body></html>";
-		this.WordControl.m_oLogicDocument.Selection_Remove();
+		this.WordControl.m_oLogicDocument.RemoveSelection();
 		PasteElementsId.copyPasteUseBinary = _old;
 		return _ret;
 	};

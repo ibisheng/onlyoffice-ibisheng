@@ -823,7 +823,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                 this.Remove_FromContent(StartPos, EndPos - StartPos, true);
             }
 
-            this.Selection_Remove();
+            this.RemoveSelection();
             this.State.ContentPos = StartPos;
         }
         else
@@ -5853,7 +5853,7 @@ ParaRun.prototype.Selection_CorrectLeftPos = function(Direction)
     return true;
 };
 
-ParaRun.prototype.Selection_Remove = function()
+ParaRun.prototype.RemoveSelection = function()
 {
     var Selection = this.State.Selection;
 
@@ -6469,9 +6469,9 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
             }
 
             if ( null !== LRun )
-                LRun.Selection_Remove();
+                LRun.RemoveSelection();
 
-            CRun.Selection_Remove();
+            CRun.RemoveSelection();
             CRun.MoveCursorToStartPos();
 
             if (true === bReview && true !== CRun.Have_PrChange())
@@ -6491,7 +6491,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 
 
             if ( null !== RRun )
-                RRun.Selection_Remove();
+                RRun.RemoveSelection();
         }
 
         Result.push( LRun );
@@ -8818,7 +8818,7 @@ ParaRun.prototype.Accept_RevisionChanges = function(Type, bAll)
 
             if (Parent.Get_ContentLength() <= 0)
             {
-                Parent.Selection_Remove();
+                Parent.RemoveSelection();
                 Parent.Add_ToContent(0, new ParaRun());
                 Parent.MoveCursorToStartPos();
             }
@@ -8886,7 +8886,7 @@ ParaRun.prototype.Reject_RevisionChanges = function(Type, bAll)
 
             if (Parent.Get_ContentLength() <= 0)
             {
-                Parent.Selection_Remove();
+                Parent.RemoveSelection();
                 Parent.Add_ToContent(0, new ParaRun());
                 Parent.MoveCursorToStartPos();
             }
@@ -9094,7 +9094,7 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
 			{
 				if (this.Paragraph && this.Paragraph.LogicDocument)
-					this.Paragraph.LogicDocument.Selection_Remove();
+					this.Paragraph.LogicDocument.RemoveSelection();
 
 				this.State.ContentPos = nIndex;
 				this.Make_ThisElementCurrent(true);
@@ -9110,7 +9110,7 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
 			{
 				if (this.Paragraph && this.Paragraph.LogicDocument)
-					this.Paragraph.LogicDocument.Selection_Remove();
+					this.Paragraph.LogicDocument.RemoveSelection();
 
 				this.State.ContentPos = nIndex;
 				this.Make_ThisElementCurrent(true);

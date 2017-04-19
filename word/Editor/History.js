@@ -228,7 +228,7 @@ CHistory.prototype =
         if ( this.Index === this.Points.length - 1 )
             this.LastState = this.Document.Get_SelectionState();
         
-        this.Document.Selection_Remove(true);
+        this.Document.RemoveSelection(true);
 
         this.Internal_RecalcData_Clear();
 
@@ -282,7 +282,7 @@ CHistory.prototype =
         if ( true != this.Can_Redo() )
             return null;
 
-        this.Document.Selection_Remove(true);
+        this.Document.RemoveSelection(true);
         
         var Point = this.Points[++this.Index];
 

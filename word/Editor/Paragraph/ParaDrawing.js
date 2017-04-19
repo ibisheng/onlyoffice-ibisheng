@@ -2443,7 +2443,7 @@ ParaDrawing.prototype.private_ConvertToMathObject = function(isOpen)
 		if (!isOpen)
 		{
 			// Устанавливаем курсор в начало правого элемента, полученного после Split
-			LogicDocument.Selection_Remove();
+			LogicDocument.RemoveSelection();
 			RightElement.MoveCursorToStartPos();
 			Para.CurPos.ContentPos = TopElementPos + 2;
 			Para.Document_SetThisElementCurrent(false);

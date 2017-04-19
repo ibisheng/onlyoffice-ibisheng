@@ -199,12 +199,8 @@ CDocumentContentElementBase.prototype.IsSelectionToEnd = function()
 {
 	return false;
 };
-CDocumentContentElementBase.prototype.Selection_Remove = function()
-{
-};
 CDocumentContentElementBase.prototype.RemoveSelection = function()
 {
-	this.Selection_Remove();
 };
 CDocumentContentElementBase.prototype.SetSelectionUse = function(isUse)
 {

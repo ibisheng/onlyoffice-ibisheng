@@ -724,7 +724,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
                 this.Remove_FromContent(StartPos, 1, true);
         }
 
-        this.Selection_Remove();
+        this.RemoveSelection();
         this.State.ContentPos = StartPos;
     }
     else
@@ -1944,7 +1944,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
         var TempEnd   = Math.min(this.Content.length - 1, Math.min(StartPos, EndPos) - 1);
         for (var CurPos = TempBegin; CurPos <= TempEnd; ++CurPos)
         {
-            this.Content[CurPos].Selection_Remove();
+            this.Content[CurPos].RemoveSelection();
         }
     }
 
@@ -1954,7 +1954,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
         var TempEnd   = Math.min(OldEndPos, this.Content.length - 1);
         for (var CurPos = TempBegin; CurPos <= TempEnd; ++CurPos)
         {
-            this.Content[CurPos].Selection_Remove();
+            this.Content[CurPos].RemoveSelection();
         }
     }
 
@@ -2141,7 +2141,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_IsUse = function()
 {
     return this.State.Selection.Use;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Selection_Remove = function()
+CParagraphContentWithParagraphLikeContent.prototype.RemoveSelection = function()
 {
     var Selection = this.Selection;
 
@@ -2161,7 +2161,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_Remove = function(
 
         for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
-            this.Content[CurPos].Selection_Remove();
+            this.Content[CurPos].RemoveSelection();
         }
     }
 
@@ -2296,7 +2296,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_CorrectLeftPos = f
             else
                 this.Selection.EndPos   = Pos + 1;
 
-            this.Content[Pos].Selection_Remove();
+            this.Content[Pos].RemoveSelection();
         }
         else
             return false;

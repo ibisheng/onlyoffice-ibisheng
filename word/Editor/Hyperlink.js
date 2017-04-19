@@ -116,7 +116,7 @@ ParaHyperlink.prototype.Add = function(Item)
             var TextPr = this.Get_FirstTextPr();
             Item.Select_All();
             Item.Apply_TextPr(TextPr);
-            Item.Selection_Remove();
+            Item.RemoveSelection();
 
             var CurPos = this.State.ContentPos;
             var CurItem = this.Content[CurPos];

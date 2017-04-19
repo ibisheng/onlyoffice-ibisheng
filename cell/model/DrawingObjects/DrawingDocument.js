@@ -386,7 +386,7 @@ function CTableOutlineDr()
             }
             this.IsChangeSmall = false;
 
-            this.TableOutline.Table.Selection_Remove();
+            this.TableOutline.Table.RemoveSelection();
             editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
 

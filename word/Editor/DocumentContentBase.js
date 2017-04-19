@@ -289,7 +289,7 @@ CDocumentContentBase.prototype.MoveCursorToNearestPos = function(oNearestPos)
 	{
 		var oTopDocument = oParent.Is_TopDocument(true);
 		if (oTopDocument)
-			oTopDocument.Selection_Remove();
+			oTopDocument.RemoveSelection();
 	}
 
 	oPara.Set_ParaContentPos(oNearestPos.ContentPos, true, -1, -1);
@@ -357,7 +357,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 				this.Content[Index].Remove(1, true);
 			}
 
-			this.Selection_Remove();
+			this.RemoveSelection();
 			for (var Index = EndPos - 1; Index >= StartPos; Index--)
 			{
 				if (type_Paragraph === this.Content[Index].GetType() && reviewtype_Add === this.Content[Index].GetReviewType())

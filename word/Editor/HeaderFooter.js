@@ -926,11 +926,10 @@ CHeaderFooter.prototype =
         return null;
     },
 
-    // Убираем селект
-    Selection_Remove : function(bNoCheckDrawing)
-    {
-        return this.Content.Selection_Remove(bNoCheckDrawing);
-    },
+	RemoveSelection : function(bNoCheckDrawing)
+	{
+		return this.Content.RemoveSelection(bNoCheckDrawing);
+	},
 
     // Рисуем селект
     Selection_Draw_Page : function(Page_abs)
@@ -2091,12 +2090,11 @@ CHeaderFooterController.prototype =
 		return null;
 	},
 
-    // Убираем селект
-    Selection_Remove : function(bNoCheckDrawing)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Selection_Remove(bNoCheckDrawing);
-    },
+	RemoveSelection : function(bNoCheckDrawing)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.RemoveSelection(bNoCheckDrawing);
+	},
 
     // Рисуем селект
     Selection_Draw_Page : function(Page_abs)
@@ -2114,7 +2112,7 @@ CHeaderFooterController.prototype =
 			|| (null !== (TempHdrFtr = this.Pages[PageIndex].Footer) && true === TempHdrFtr.Is_PointInFlowTable(X, Y)))
 		{
 			if (this.CurHdrFtr && ((null !== TempHdrFtr && TempHdrFtr !== this.CurHdrFtr) || this.CurPage !== PageIndex))
-				this.CurHdrFtr.Selection_Remove();
+				this.CurHdrFtr.RemoveSelection();
 
 			if (null !== TempHdrFtr)
 				this.CurHdrFtr = TempHdrFtr;
@@ -2144,7 +2142,7 @@ CHeaderFooterController.prototype =
             // Убираем селект, если он был
             if ( null != this.CurHdrFtr )
             {
-                this.CurHdrFtr.Selection_Remove();
+                this.CurHdrFtr.RemoveSelection();
             }
 
             MouseEvent.ClickCount = 1;
@@ -2170,7 +2168,7 @@ CHeaderFooterController.prototype =
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
 
                     if (this.CurHdrFtr)
-                    	this.CurHdrFtr.Selection_Remove();
+                    	this.CurHdrFtr.RemoveSelection();
 
                     this.CurHdrFtr = HdrFtr;
 
@@ -2195,7 +2193,7 @@ CHeaderFooterController.prototype =
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
 
 					if (this.CurHdrFtr)
-						this.CurHdrFtr.Selection_Remove();
+						this.CurHdrFtr.RemoveSelection();
 
 					this.CurHdrFtr = HdrFtr;
 
@@ -2229,7 +2227,7 @@ CHeaderFooterController.prototype =
         if ( null != OldHdrFtr && (OldHdrFtr != this.CurHdrFtr || OldPage != this.CurPage) )
         {
             // Удаляем селект, если он был на предыдущем колонтитуле
-            OldHdrFtr.Selection_Remove();
+            OldHdrFtr.RemoveSelection();
         }
 
         if ( null != this.CurHdrFtr )
@@ -2540,7 +2538,7 @@ CHeaderFooterController.prototype.Get_CurHdrFtr = function()
 CHeaderFooterController.prototype.Set_CurHdrFtr = function(HdrFtr)
 {
     if (null !== this.CurHdrFtr)
-        this.CurHdrFtr.Selection_Remove();
+        this.CurHdrFtr.RemoveSelection();
 
     this.CurHdrFtr = HdrFtr;
 };

@@ -3662,7 +3662,7 @@ CShape.prototype.deselect = function (drawingObjectsController) {
     }
     if(this.graphicObject)
     {
-        this.graphicObject.Selection_Remove();
+        this.graphicObject.RemoveSelection();
     }
     return this;
 };

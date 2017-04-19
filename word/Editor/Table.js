@@ -2662,7 +2662,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 			oTargetTable.Start_TrackTable();
 		}
 	}
-	editor.WordControl.m_oLogicDocument.Selection_Remove();
+	editor.WordControl.m_oLogicDocument.RemoveSelection();
 	oTargetTable.Document_SetThisElementCurrent(true);
 	oTargetTable.MoveCursorToStartPos();
 	editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
@@ -4278,7 +4278,7 @@ CTable.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 		}
 		else
 		{
-			this.Selection_Remove();
+			this.RemoveSelection();
 
 			this.CurCell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
 			this.CurCell.Content_Selection_SetStart(X, Y, CurPage - this.CurCell.Content.Get_StartPage_Relative(), MouseEvent);
@@ -5005,7 +5005,7 @@ CTable.prototype.Selection_Draw_Page = function(CurPage)
 		}
 	}
 };
-CTable.prototype.Selection_Remove = function()
+CTable.prototype.RemoveSelection = function()
 {
 	if (false === this.Selection.Use)
 		return;
@@ -5019,12 +5019,12 @@ CTable.prototype.Selection_Remove = function()
 		if (table_Selection_Text === this.Selection.Type)
 		{
 			this.CurCell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
-			this.CurCell.Content.Selection_Remove();
+			this.CurCell.Content.RemoveSelection();
 		}
 		else if (this.Content.length > 0 && this.Content[0].Get_CellsCount() > 0)
 		{
 			this.CurCell = this.Content[0].Get_Cell(0);
-			this.CurCell.Content.Selection_Remove();
+			this.CurCell.Content.RemoveSelection();
 		}
 	}
 
@@ -6260,7 +6260,7 @@ CTable.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 	}
 	else
 	{
-		this.Selection_Remove();
+		this.RemoveSelection();
 		var Row  = this.Content[this.Content.length - 1];
 		var Cell = null;
 		for (var CurCell = 0; CurCell < Row.Get_CellsCount(); CurCell++)
@@ -6320,7 +6320,7 @@ CTable.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 	}
 	else
 	{
-		this.Selection_Remove();
+		this.RemoveSelection();
 		var Row  = this.Content[0];
 		var Cell = null;
 		for (var CurCell = 0; CurCell < Row.Get_CellsCount(); CurCell++)
@@ -6402,7 +6402,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 		}
 
 		// Предварительно очистим текущий селект
-		editor.WordControl.m_oLogicDocument.Selection_Remove();
+		editor.WordControl.m_oLogicDocument.RemoveSelection();
 
 		this.CurCell = CurCell;
 		this.CurCell.Content.Select_All();
@@ -8921,7 +8921,7 @@ CTable.prototype.Row_Remove = function(Ind)
 		}
 	}
 
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	// Удаляем строки.
 	for (var Index = Rows_to_delete.length - 1; Index >= 0; Index--)
@@ -8996,7 +8996,7 @@ CTable.prototype.Row_Remove2 = function()
 	if (this.CurCell.Row.Index >= this.Content.length)
 		this.CurCell = this.Content[this.Content.length - 1].Get_Cell(0);
 
-	this.Selection_Remove();
+	this.RemoveSelection();
 
 	return true;
 };

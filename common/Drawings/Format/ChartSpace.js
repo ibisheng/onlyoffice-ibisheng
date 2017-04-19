@@ -909,7 +909,7 @@ CChartSpace.prototype.resetInternalSelection = function(noResetContentSelect)
         if(!(noResetContentSelect === true))
         {
             var content = this.selection.textSelection.getDocContent();
-            content && content.Selection_Remove();
+            content && content.RemoveSelection();
         }
         this.selection.textSelection = null;
     }

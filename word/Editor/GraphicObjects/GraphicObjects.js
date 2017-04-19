@@ -290,7 +290,7 @@ CGraphicObjects.prototype =
     removeTextSelection: function(){
         var oTargetDocContent = this.getTargetDocContent();
         if(oTargetDocContent && oTargetDocContent.Is_SelectionUse()){
-            oTargetDocContent.Selection_Remove();
+            oTargetDocContent.RemoveSelection();
         }
     },
 

@@ -1621,7 +1621,7 @@ CPresentation.prototype =
         }, [], false, AscDFH.historydescription_Presentation_AddChart);
     },
 
-    Selection_Remove: function(bNoResetChartSelection)
+	RemoveSelection: function(bNoResetChartSelection)
     {
         if(this.Slides[this.CurPage]){
             this.Slides[this.CurPage].graphicObjects.resetSelection(undefined, bNoResetChartSelection);
@@ -2519,13 +2519,13 @@ CPresentation.prototype =
                             {
                                 if(oGroupSelection.textSelection.graphicObject)
                                 {
-                                    oGroupSelection.textSelection.graphicObject.Selection_Remove();
+                                    oGroupSelection.textSelection.graphicObject.RemoveSelection();
                                 }
                             }
                             else
                             {
                                 var content = oGroupSelection.textSelection.getDocContent();
-                                content && content.Selection_Remove();
+                                content && content.RemoveSelection();
                             }
                             oGroupSelection.textSelection = null;
                         }
@@ -2546,13 +2546,13 @@ CPresentation.prototype =
                         {
                             if(oDrawingObjects.selection.textSelection.graphicObject)
                             {
-                                oDrawingObjects.selection.textSelection.graphicObject.Selection_Remove();
+                                oDrawingObjects.selection.textSelection.graphicObject.RemoveSelection();
                             }
                         }
                         else
                         {
                             var content = oDrawingObjects.selection.textSelection.getDocContent();
-                            content && content.Selection_Remove();
+                            content && content.RemoveSelection();
                         }
                         oDrawingObjects.selection.textSelection = null;
                     }
