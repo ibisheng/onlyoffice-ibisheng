@@ -437,7 +437,7 @@ ParaComment.prototype =
     {
     },
 
-    Select_All : function(Direction)
+	SelectAll : function(Direction)
     {
     },
 

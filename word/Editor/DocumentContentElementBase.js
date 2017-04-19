@@ -208,12 +208,8 @@ CDocumentContentElementBase.prototype.SetSelectionUse = function(isUse)
 CDocumentContentElementBase.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElementStart)
 {
 };
-CDocumentContentElementBase.prototype.Select_All = function(nDirection)
-{
-};
 CDocumentContentElementBase.prototype.SelectAll = function(nDirection)
 {
-	this.Select_All(nDirection);
 };
 CDocumentContentElementBase.prototype.GetCalculatedTextPr = function()
 {
@@ -269,13 +265,9 @@ CDocumentContentElementBase.prototype.CanCopyCut = function()
 {
 	return this.Can_CopyCut();
 };
-CDocumentContentElementBase.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
-{
-	return false;
-};
 CDocumentContentElementBase.prototype.CheckPosInSelection = function(X, Y, CurPage, NearPos)
 {
-	return this.Selection_Check(X, Y, CurPage, NearPos);
+	return false;
 };
 CDocumentContentElementBase.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawing)
 {

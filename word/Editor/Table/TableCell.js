@@ -756,7 +756,7 @@ CTableCell.prototype =
         return this.Content.Selection_Stop();
     },
 
-    Content_Selection_Check : function(X, Y, CurPage, NearPos)
+    Content_CheckPosInSelection : function(X, Y, CurPage, NearPos)
     {
         var _X = X, _Y = Y;
         var Transform = this.private_GetTextDirectionTransform();
@@ -766,7 +766,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Selection_Check(_X, _Y, CurPage, NearPos);
+        return this.Content.CheckPosInSelection(_X, _Y, CurPage, NearPos);
     },
 
     Content_MoveCursorToXY : function(X, Y, bLine, bDontChangeRealPos, CurPage)

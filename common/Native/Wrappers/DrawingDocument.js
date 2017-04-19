@@ -2462,7 +2462,7 @@ CDrawingDocument.prototype =
             this.TableOutlineDr.bIsTracked = true;
             this.LockCursorType("move");
 
-            this.TableOutlineDr.TableOutline.Table.Select_All();
+            this.TableOutlineDr.TableOutline.Table.SelectAll();
             this.TableOutlineDr.TableOutline.Table.Document_SetThisElementCurrent(true);
 
             this.EndUpdateOverlay();

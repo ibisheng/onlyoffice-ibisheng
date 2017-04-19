@@ -5726,7 +5726,7 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Select = function()
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_SelectAll = function()
 {
-    this.WordControl.m_oLogicDocument.Select_All();
+    this.WordControl.m_oLogicDocument.SelectAll();
 };
 Asc['asc_docs_api'].prototype.pre_Paste = function(_fonts, _images, callback)
 {

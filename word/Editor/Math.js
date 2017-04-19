@@ -2984,10 +2984,10 @@ ParaMath.prototype.RemoveSelection = function()
     this.Root.RemoveSelection();
 };
 
-ParaMath.prototype.Select_All = function(Direction)
+ParaMath.prototype.SelectAll = function(Direction)
 {
     this.bSelectionUse = true;
-    this.Root.Select_All();
+    this.Root.SelectAll(Direction);
 };
 
 ParaMath.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)

@@ -110,7 +110,7 @@ DrawingObjectsController.prototype.setTableProps = function(props)
         }
         else
         {
-            by_type.tables[0].graphicObject.Select_All();
+            by_type.tables[0].graphicObject.SelectAll();
             by_type.tables[0].graphicObject.Set_Props(props);
             by_type.tables[0].graphicObject.RemoveSelection();
         }
@@ -493,7 +493,7 @@ DrawingObjectsController.prototype.addTextArtFromParams = function(nStyle, dRect
     this.selectObject(oTextArt, 0);
     var oContent = oTextArt.getDocContent();
     this.selection.textSelection = oTextArt;
-    oContent.Select_All();
+    oContent.SelectAll();
     oTextArt.addToRecalculate();
     this.startRecalculate();
 };

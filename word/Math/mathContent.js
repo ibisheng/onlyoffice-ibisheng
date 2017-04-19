@@ -2423,7 +2423,7 @@ CMathContent.prototype.Insert_MathContent = function(oMathContent, Pos, bSelect)
 
         if (true === bSelect)
         {
-            oMathContent.Content[nIndex].Select_All();
+            oMathContent.Content[nIndex].SelectAll();
         }
     }
 
@@ -3967,7 +3967,7 @@ CMathContent.prototype.Draw_HighLights = function(PDSH, bAll)
         PDSH.Y1 = Y1;
 
         if(bAll && this.Content[CurPos].Type == para_Math_Run)
-            this.Content[CurPos].Select_All();
+            this.Content[CurPos].SelectAll();
 
         this.Content[CurPos].Draw_HighLights(PDSH, bAll);
     }
@@ -4016,7 +4016,7 @@ CMathContent.prototype.RemoveSelection = function()
     this.Selection.StartPos = 0;
     this.Selection.EndPos   = 0;
 };
-CMathContent.prototype.Select_All = function(Direction)
+CMathContent.prototype.SelectAll = function(Direction)
 {
     this.Selection.Use   = true;
     this.Selection.StartPos = 0;
@@ -4024,7 +4024,7 @@ CMathContent.prototype.Select_All = function(Direction)
 
     for (var nPos = 0, nCount = this.Content.length; nPos < nCount; nPos++)
     {
-        this.Content[nPos].Select_All(Direction);
+        this.Content[nPos].SelectAll(Direction);
     }
 };
 CMathContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
@@ -4076,7 +4076,7 @@ CMathContent.prototype.Select_ElementByPos = function(nPos, bWhole)
     this.Selection.StartPos = nPos;
     this.Selection.EndPos   = nPos;
 
-    this.Content[nPos].Select_All();
+    this.Content[nPos].SelectAll();
 
     if (bWhole)
         this.Correct_Selection();

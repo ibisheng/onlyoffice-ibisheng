@@ -5038,7 +5038,7 @@ CTable.prototype.RemoveSelection = function()
 	this.Markup.Internal.CellIndex = 0;
 	this.Markup.Internal.PageNum   = 0;
 };
-CTable.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
+CTable.prototype.CheckPosInSelection = function(X, Y, CurPage, NearPos)
 {
 	if (undefined != NearPos)
 	{
@@ -5053,7 +5053,7 @@ CTable.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
 
 				CellContent.Set_ApplyToAll(true);
 
-				if (true === CellContent.Selection_Check(0, 0, 0, NearPos))
+				if (true === CellContent.CheckPosInSelection(0, 0, 0, NearPos))
 				{
 					CellContent.Set_ApplyToAll(false);
 					return true;
@@ -5063,7 +5063,7 @@ CTable.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
 			}
 		}
 		else
-			return this.CurCell.Content_Selection_Check(0, 0, 0, NearPos);
+			return this.CurCell.Content_CheckPosInSelection(0, 0, 0, NearPos);
 
 		return false;
 	}
@@ -5086,7 +5086,7 @@ CTable.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
 			return false;
 		}
 		else if (CellPos.Cell === this.CurCell.Index && CellPos.Row === this.CurCell.Row.Index)
-			return this.CurCell.Content_Selection_Check(X, Y, CurPage - this.CurCell.Content.Get_StartPage_Relative(), undefined);
+			return this.CurCell.Content_CheckPosInSelection(X, Y, CurPage - this.CurCell.Content.Get_StartPage_Relative(), undefined);
 
 		return false;
 	}
@@ -5103,7 +5103,7 @@ CTable.prototype.IsSelectionEmpty = function(bCheckHidden)
 
 	return true;
 };
-CTable.prototype.Select_All = function(nDirection)
+CTable.prototype.SelectAll = function(nDirection)
 {
 	this.Selection.Use   = true;
 	this.Selection.Start = false;
@@ -5413,7 +5413,7 @@ CTable.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTe
 			// Снимаем выделением со всех ячеек, кроме первой, попавшей в выделение
 			var Pos  = Cells_array[0];
 			var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
-			Cell.Content.Select_All();
+			Cell.Content.SelectAll();
 			Cell.Content.Remove(Count, bOnlyText, bRemoveOnlySelection, true);
 
 			this.CurCell = Cell;
@@ -6346,7 +6346,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 		var Pos             = this.Selection.Data[0];
 		this.Selection.Type = table_Selection_Text;
 		this.CurCell        = this.Content[Pos.Row].Get_Cell(Pos.Cell);
-		this.CurCell.Content.Select_All();
+		this.CurCell.Content.SelectAll();
 	}
 	else
 	{
@@ -6405,7 +6405,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 		editor.WordControl.m_oLogicDocument.RemoveSelection();
 
 		this.CurCell = CurCell;
-		this.CurCell.Content.Select_All();
+		this.CurCell.Content.SelectAll();
 
 		if (true === this.CurCell.Content.IsSelectionEmpty(false))
 		{

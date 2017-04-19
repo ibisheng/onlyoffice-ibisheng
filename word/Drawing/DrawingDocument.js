@@ -5999,7 +5999,7 @@ function CDrawingDocument()
 			this.TableOutlineDr.bIsTracked = true;
 			this.LockCursorType("move");
 
-			this.TableOutlineDr.TableOutline.Table.Select_All();
+			this.TableOutlineDr.TableOutline.Table.SelectAll();
 			this.TableOutlineDr.TableOutline.Table.Document_SetThisElementCurrent(true);
 
 			if (-1 == oWordControl.m_oTimerScrollSelect)

@@ -3929,7 +3929,7 @@ CDocument.prototype.Extend_ToPos = function(X, Y)
             TextPr.FontSize   = LastPara.TextPr.Value.FontSize;
             TextPr.FontSizeCS = LastPara.TextPr.Value.FontSize;
             TextPr.RFonts     = LastPara.TextPr.Value.RFonts.Copy();
-            NewParagraph.Select_All();
+            NewParagraph.SelectAll();
             NewParagraph.Apply_TextPr(TextPr);
         }
 
@@ -4206,7 +4206,7 @@ CDocument.prototype.RemoveDropCap = function(bDropCap)
 					var FramePara = FrameParas[Index];
 					FramePara.Set_FramePr(undefined, true);
 					FramePara.Set_Spacing(Spacing, true);
-					FramePara.Select_All();
+					FramePara.SelectAll();
 					FramePara.Clear_TextFormatting();
 					FramePara.Apply_TextPr(TextPr, undefined);
 				}
@@ -5037,7 +5037,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
     // Сначала посмотрим, попалили мы в текстовый селект (но при этом не в границу таблицы и не более чем одинарным кликом)
     if (-1 !== this.Selection.DragDrop.Flag && MouseEvent.ClickCount <= 1 && false === bTableBorder &&
         ( nInDrawing < 0 || ( nInDrawing === DRAWING_ARRAY_TYPE_BEHIND && true === bInText ) || ( nInDrawing > -1 && ( docpostype_DrawingObjects === this.CurPos.Type || ( docpostype_HdrFtr === this.CurPos.Type && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ) ) && true === this.DrawingObjects.isSelectedText() && null !== this.DrawingObjects.getMajorParaDrawing() && this.DrawingObjects.getGraphicInfoUnderCursor(this.CurPage, X, Y).cursorType === "text" ) ) &&
-        true === this.Selection_Check(X, Y, this.CurPage, undefined))
+        true === this.CheckPosInSelection(X, Y, this.CurPage, undefined))
     {
         // Здесь мы сразу не начинаем перемещение текста. Его мы начинаем, курсор хотя бы немного изменит свою позицию,
         // это проверяется на MouseMove.
@@ -5438,14 +5438,14 @@ CDocument.prototype.IsMovingTableBorder = function()
  * @param NearPos
  * @returns {boolean}
  */
-CDocument.prototype.Selection_Check = function(X, Y, PageAbs, NearPos)
+CDocument.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {
 	return this.Controller.CheckPosInSelection(X, Y, PageAbs, NearPos);
 };
 /**
  * Выделяем все содержимое, в зависимости от текущего положения курсора.
  */
-CDocument.prototype.Select_All = function()
+CDocument.prototype.SelectAll = function()
 {
 	this.private_UpdateTargetForCollaboration();
 
@@ -5474,7 +5474,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
     // Сначала нам надо проверить попадаем ли мы обратно в выделенный текст, если да, тогда ничего не делаем,
     // а если нет, тогда удаляем выделенный текст и вставляем его в заданное место.
 
-    if (true === this.Selection_Check(0, 0, 0, NearPos))
+    if (true === this.CheckPosInSelection(0, 0, 0, NearPos))
     {
         this.RemoveSelection();
 
@@ -5710,7 +5710,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				PrevClass.Add_ToContent(PrevPos + 1 + Index, Item);
 
 				if (true === bNeedSelect)
-					Item.Select_All();
+					Item.SelectAll();
 			}
 
 			if (true === bNeedSelect)
@@ -5803,7 +5803,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			{
 				// Вызываем так, чтобы выделить все внутренние элементы
 				var _ParaS = Elements[0].Element;
-				_ParaS.Select_All();
+				_ParaS.SelectAll();
 				var _ParaSContentLen = _ParaS.Content.length;
 
 				// Если мы присоединяем новый параграф, то и копируем все настройки параграфа (так делает Word)
@@ -5829,7 +5829,7 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 				var _ParaE    = Elements[ElementsCount - 1].Element;
 				var TempCount = _ParaE.Content.length - 1;
 
-				_ParaE.Select_All();
+				_ParaE.SelectAll();
 				_ParaE.Concat(ParaE);
 				_ParaE.Set_Pr(ParaE.Pr);
 
@@ -5846,14 +5846,14 @@ CDocument.prototype.Insert_Content = function(SelectedContent, NearPos)
 			for (var Index = StartIndex; Index <= EndIndex; Index++)
 			{
 				this.Internal_Content_Add(DstIndex + Index, Elements[Index].Element);
-				this.Content[DstIndex + Index].Select_All();
+				this.Content[DstIndex + Index].SelectAll();
 			}
 
 			var LastPos = DstIndex + ElementsCount - 1;
 			if (NewEmptyPara && NewEmptyPara === this.Content[LastPos + 1])
 			{
 				LastPos++;
-				this.Content[LastPos].Select_All();
+				this.Content[LastPos].SelectAll();
 			}
 			else if (LastPos + 1 < this.Content.length && false === bConcatE && type_Paragraph === this.Content[LastPos + 1].Get_Type())
 			{
@@ -6633,7 +6633,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 65 && true === e.CtrlKey) // Ctrl + A - выделяем все
     {
-        this.Select_All();
+        this.SelectAll();
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
@@ -7116,7 +7116,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 		if (true === this.DrawingDocument.IsCursorInTableCur(X, Y, PageIndex))
 		{
 			var Table = this.DrawingDocument.TableOutlineDr.TableOutline.Table;
-			Table.Select_All();
+			Table.SelectAll();
 			Table.Document_SetThisElementCurrent(false);
 			this.Document_UpdateSelectionState();
 			this.Document_UpdateInterfaceState();
@@ -7157,7 +7157,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 		}
 
 		// Проверяем попалили мы в селект
-		if (false === this.Selection_Check(X, Y, PageIndex, undefined))
+		if (false === this.CheckPosInSelection(X, Y, PageIndex, undefined))
 		{
 			this.CurPage = PageIndex;
 
@@ -10128,7 +10128,7 @@ CDocument.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth
 
 		for (var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++)
 		{
-			this.Content[CurPos].Select_All(Direction);
+			this.Content[CurPos].SelectAll(Direction);
 		}
 	}
 	else
@@ -11375,7 +11375,7 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				var LastRun = Item.Content[Item.Content.length - 1];
 				if (LastRun && LastRun.Pr.Lang && LastRun.Pr.Lang.Val)
 				{
-					NewParagraph.Select_All();
+					NewParagraph.SelectAll();
 					NewParagraph.Add(new ParaTextPr({Lang : LastRun.Pr.Lang.Copy()}));
 					NewParagraph.RemoveSelection();
 				}
@@ -11523,7 +11523,7 @@ CDocument.prototype.controller_AddTextArt = function(nStyle)
 		{
 			var oContent = Drawing.GraphicObj.getDocContent();
 			oContent.Content[0].Document_SetThisElementCurrent(false);
-			this.Select_All();
+			this.SelectAll();
 		}
 	}
 	else
@@ -11895,7 +11895,7 @@ CDocument.prototype.controller_MoveCursorToStartPos = function(AddToSelect)
 
 		for (var Index = StartPos - 1; Index >= EndPos; Index--)
 		{
-			this.Content[Index].Select_All(-1);
+			this.Content[Index].SelectAll(-1);
 		}
 
 		this.Content[StartPos].MoveCursorToStartPos(true);
@@ -11939,7 +11939,7 @@ CDocument.prototype.controller_MoveCursorToEndPos = function(AddToSelect)
 
 			if (type_Paragraph === ItemType)
 			{
-				Item.Select_All(1);
+				Item.SelectAll(1);
 			}
 			else //if ( type_Table === ItemType )
 			{
@@ -14190,9 +14190,7 @@ CDocument.prototype.controller_GetSelectionBounds = function()
 };
 CDocument.prototype.controller_IsMovingTableBorder = function()
 {
-	//console.log((null != this.Selection.Data && true === this.Selection.Data.TableBorder));
-
-	if (null != this.Selection.Data && true === this.Selection.Data.TableBorder)// && type_Table == this.Content[this.Selection.Data.Pos].GetType())
+	if (null != this.Selection.Data && true === this.Selection.Data.TableBorder)
 		return true;
 
 	return false;
@@ -14275,7 +14273,7 @@ CDocument.prototype.controller_SelectAll = function()
 
 	for (var Index = 0; Index < this.Content.length; Index++)
 	{
-		this.Content[Index].Select_All();
+		this.Content[Index].SelectAll();
 	}
 };
 CDocument.prototype.controller_GetSelectedContent = function(SelectedContent)

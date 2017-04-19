@@ -2241,12 +2241,12 @@ CShape.prototype.selectionCheck = function (X, Y, PageAbs, NearPos) {
     var content = this.getDocContent();
     if (content) {
         if (undefined !== NearPos)
-            return content.Selection_Check(X, Y, 0, NearPos);
+            return content.CheckPosInSelection(X, Y, 0, NearPos);
 
         if (isRealObject(content) && this.hitInTextRect(X, Y) && this.invertTransformText) {
             var t_x = this.invertTransformText.TransformPointX(X, Y);
             var t_y = this.invertTransformText.TransformPointY(X, Y);
-            return content.Selection_Check(t_x, t_y, 0, NearPos);
+            return content.CheckPosInSelection(t_x, t_y, 0, NearPos);
         }
     }
     return false;
@@ -3774,7 +3774,7 @@ CShape.prototype.selectionSetStart = function (e, x, y, slideIndex)
         ty = this.invertTransformText.TransformPointY(x, y);
         if(e.Button === AscCommon.g_mouse_button_right)
         {
-            if(content.Selection_Check(tx, ty,  0))
+            if(content.CheckPosInSelection(tx, ty,  0))
             {
                 this.rightButtonFlag = true;
                 return;

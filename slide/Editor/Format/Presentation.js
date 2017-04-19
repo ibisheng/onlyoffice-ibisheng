@@ -2340,9 +2340,7 @@ CPresentation.prototype =
     },
 
 
-
-    // Селектим весь параграф
-    Select_All : function()
+	SelectAll : function()
     {
         if(this.Slides[this.CurPage])
         {
@@ -2759,7 +2757,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 65 && true === e.CtrlKey ) // Ctrl + A - выделяем все
         {
-            this.Select_All();
+            this.SelectAll();
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 66 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + B - делаем текст жирным
@@ -3381,7 +3379,7 @@ CPresentation.prototype =
                     }
                     else
                     {
-                        by_types.tables[0].graphicObject.Select_All();
+                        by_types.tables[0].graphicObject.SelectAll();
                     }
                     Function.apply(by_types.tables[0].graphicObject, args);
                     if(by_types.tables[0].graphicObject.Content.length === 0)
@@ -5302,7 +5300,7 @@ CPresentation.prototype =
             else{
                 var oContent = oTextArt.getDocContent();
                 oContent.Content[0].Document_SetThisElementCurrent(false);
-                this.Select_All();
+                this.SelectAll();
             }
             this.Recalculate();
             this.Document_UpdateInterfaceState();

@@ -2463,7 +2463,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
-                    objects_by_type.tables[0].graphicObject.Select_All();
+                    objects_by_type.tables[0].graphicObject.SelectAll();
                     objects_by_type.tables[0].graphicObject.Set_Props(props2);
                     objects_by_type.tables[0].graphicObject.RemoveSelection();
                 }
@@ -5415,14 +5415,14 @@ DrawingObjectsController.prototype =
         {
             if(target_text_object.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                target_text_object.graphicObject.Select_All();
+                target_text_object.graphicObject.SelectAll();
             }
             else
             {
                 var content = this.getTargetDocContent();
                 if(content)
                 {
-                    content.Select_All();
+                    content.SelectAll();
                 }
             }
         }
@@ -5452,7 +5452,7 @@ DrawingObjectsController.prototype =
         else{
             this.resetSelection();
             this.document.Set_DocPosType(docpostype_Content);
-            this.document.Select_All();
+            this.document.SelectAll();
         }
         this.updateSelectionState();
     },

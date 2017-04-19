@@ -788,7 +788,7 @@ function CEditorPage(api)
 
 				this.TextBoxBackground.HtmlElement["onselectstart"] = function(e)
 				{
-					oThis.m_oLogicDocument.Select_All();
+					oThis.m_oLogicDocument.SelectAll();
 
 					if (e.preventDefault)
 						e.preventDefault();

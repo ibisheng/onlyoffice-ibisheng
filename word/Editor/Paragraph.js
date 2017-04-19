@@ -3747,7 +3747,7 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 			this.Content[EndPos].Set_SelectionContentPos(null, EndContentPos, Depth + 1, -1, 0);
 
 			for (var CurPos = EndPos + 1; CurPos < StartPos; CurPos++)
-				this.Content[CurPos].Select_All(-1);
+				this.Content[CurPos].SelectAll(-1);
 		}
 		else// if ( StartPos < EndPos )
 		{
@@ -3755,7 +3755,7 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 			this.Content[EndPos].Set_SelectionContentPos(null, EndContentPos, Depth + 1, 1, 0);
 
 			for (var CurPos = StartPos + 1; CurPos < EndPos; CurPos++)
-				this.Content[CurPos].Select_All(1);
+				this.Content[CurPos].SelectAll(1);
 		}
 
 		// TODO: Реализовать выделение гиперссылки целиком (само выделение тут сделано, но непонятно как
@@ -3763,9 +3763,9 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 
 		// Делаем как в Word: гиперссылка выделяется целиком, если выделение выходит за пределы гиперссылки
 		//            if ( para_Hyperlink === this.Content[StartPos].Type && true !==
-		// this.Content[StartPos].IsSelectionEmpty(true) ) this.Content[StartPos].Select_All( StartPos > EndPos ? -1 :
+		// this.Content[StartPos].IsSelectionEmpty(true) ) this.Content[StartPos].SelectAll( StartPos > EndPos ? -1 :
 		// 1 );  if ( para_Hyperlink === this.Content[EndPos].Type && true !==
-		// this.Content[EndPos].IsSelectionEmpty(true) ) this.Content[EndPos].Select_All( StartPos > EndPos ? -1 : 1
+		// this.Content[EndPos].IsSelectionEmpty(true) ) this.Content[EndPos].SelectAll( StartPos > EndPos ? -1 : 1
 		// );
 	}
 
@@ -3800,7 +3800,7 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 
 				for (var Pos = 0; Pos <= StartPos; Pos++)
 				{
-					this.Content[Pos].Select_All(Direction);
+					this.Content[Pos].SelectAll(Direction);
 				}
 			}
 		}
@@ -5627,7 +5627,7 @@ Paragraph.prototype.Hyperlink_Add = function(HyperProps)
 		this.Selection.EndPos   = StartPos + 1;
 
 		Hyperlink.MoveCursorToStartPos();
-		Hyperlink.Select_All();
+		Hyperlink.SelectAll();
 
 		// Выставляем специальную текстовую настройку
 		var TextPr       = new CTextPr();
@@ -5812,7 +5812,7 @@ Paragraph.prototype.Hyperlink_Modify = function(HyperProps)
 				this.Selection.StartPos = HyperPos;
 				this.Selection.EndPos   = HyperPos;
 
-				Hyperlink.Select_All();
+				Hyperlink.SelectAll();
 			}
 			else
 			{
@@ -6127,7 +6127,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 		else if (oField && fieldtype_FORMTEXT === oField.Get_FieldType())
 		{
 			// TODO: Пока у нас невложенные поля так будет работать нормально. Со вложенными нужно переделать.
-			oField.Select_All(1);
+			oField.SelectAll(1);
 			this.Selection.Use = true;
 		}
 		else
@@ -6161,7 +6161,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 			{
 				// Выделяем весь параграф целиком
 
-				this.Select_All(1);
+				this.SelectAll(1);
 			}
 		}
 	}
@@ -6360,7 +6360,7 @@ Paragraph.prototype.Selection_CheckParaEnd = function()
 
 	return this.Content[EndPos].Selection_CheckParaEnd();
 };
-Paragraph.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
+Paragraph.prototype.CheckPosInSelection = function(X, Y, CurPage, NearPos)
 {
 	if (undefined !== NearPos)
 	{
@@ -6498,7 +6498,7 @@ Paragraph.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElemen
 {
 	this.Selection_SetBegEnd(isSelectionStart, isElementStart);
 };
-Paragraph.prototype.Select_All = function(Direction)
+Paragraph.prototype.SelectAll = function(Direction)
 {
 	var Count = this.Content.length;
 
@@ -6903,7 +6903,7 @@ Paragraph.prototype.GetCalculatedTextPr = function()
 	var TextPr;
 	if (true === this.ApplyToAll)
 	{
-		this.Select_All(1);
+		this.SelectAll(1);
 
 		var StartPos = 0;
 		var Count    = this.Content.length;
@@ -8016,7 +8016,7 @@ Paragraph.prototype.GetDirectTextPr = function()
 	var TextPr;
 	if (true === this.ApplyToAll)
 	{
-		this.Select_All(1);
+		this.SelectAll(1);
 
 		var Count    = this.Content.length;
 		var StartPos = 0;
@@ -9532,7 +9532,7 @@ Paragraph.prototype.Set_FramePr = function(FramePr, bDelete)
 		if (undefined != FramePr.FontFamily)
 		{
 			var FF = new ParaTextPr({RFonts : {Ascii : {Name : FramePr.FontFamily.Name, Index : -1}}});
-			this.Select_All();
+			this.SelectAll();
 			this.Add(FF);
 			this.RemoveSelection();
 		}
@@ -10027,7 +10027,7 @@ Paragraph.prototype.Update_DropCapByLines = function(TextPr, Count, LineH, LineT
 		Position : Dy
 	});
 
-	this.Select_All();
+	this.SelectAll();
 	this.Add(PTextPr);
 	this.RemoveSelection();
 };
@@ -10096,7 +10096,7 @@ Paragraph.prototype.Update_DropCapByHeight = function(_Height)
 		FontSize : TextPr.FontSize,
 		Position : Dy
 	});
-	this.Select_All();
+	this.SelectAll();
 	this.Add(PTextPr);
 	this.RemoveSelection();
 
@@ -10699,7 +10699,7 @@ Paragraph.prototype.Add_Comment = function(Comment, bStart, bEnd)
 					if (null !== NewElement)
 					{
 						this.Internal_Content_Add(StartPos + 1, NewElement);
-						NewElement.Select_All();
+						NewElement.SelectAll();
 					}
 
 					this.Internal_Content_Add(StartPos + 1, CommentStart);
@@ -11630,7 +11630,7 @@ Paragraph.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth
 
         for (var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++)
         {
-            this.Content[CurPos].Select_All(Direction);
+            this.Content[CurPos].SelectAll(Direction);
         }
     }
     else

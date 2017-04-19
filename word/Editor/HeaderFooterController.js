@@ -249,11 +249,11 @@ CHdrFtrController.prototype.IsMovingTableBorder = function()
 };
 CHdrFtrController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {
-	return this.HdrFtr.Selection_Check(X, Y, PageAbs, NearPos);
+	return this.HdrFtr.CheckPosInSelection(X, Y, PageAbs, NearPos);
 };
 CHdrFtrController.prototype.SelectAll = function()
 {
-	this.HdrFtr.Select_All();
+	this.HdrFtr.SelectAll();
 };
 CHdrFtrController.prototype.GetSelectedContent = function(SelectedContent)
 {

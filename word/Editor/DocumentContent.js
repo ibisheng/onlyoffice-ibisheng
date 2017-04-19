@@ -532,7 +532,7 @@ CDocumentContent.prototype.IsMovingTableBorder = function()
 	}
 	else //if ( docpostype_Content === this.CurPos.Type )
 	{
-		if (null != this.Selection.Data && true === this.Selection.Data.TableBorder && type_Table == this.Content[this.Selection.Data.Pos].GetType())
+		if (null != this.Selection.Data && true === this.Selection.Data.TableBorder)
 			return true;
 	}
 
@@ -1868,7 +1868,7 @@ CDocumentContent.prototype.MoveCursorToStartPos = function(AddToSelect)
 
 			for (var Index = StartPos - 1; Index >= EndPos; Index--)
 			{
-				this.Content[Index].Select_All(-1);
+				this.Content[Index].SelectAll(-1);
 			}
 
 			this.Content[StartPos].MoveCursorToStartPos(true);
@@ -1915,7 +1915,7 @@ CDocumentContent.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelec
 
 			for (var Index = StartPos + 1; Index <= EndPos; Index++)
 			{
-				this.Content[Index].Select_All(1);
+				this.Content[Index].SelectAll(1);
 			}
 
 			this.Content[StartPos].MoveCursorToEndPos(true);
@@ -1995,7 +1995,7 @@ CDocumentContent.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 				this.Content[StartPos].MoveCursorToEndPos(true);
 				for (var nPos = StartPos + 1; nPos <= EndPos; ++nPos)
 				{
-					this.Content[nPos].Select_All(1);
+					this.Content[nPos].SelectAll(1);
 				}
 
 				this.Content[EndPos].MoveCursorUpToLastRow(X, Y, true);
@@ -2053,7 +2053,7 @@ CDocumentContent.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect
 				this.Content[StartPos].MoveCursorToStartPos(true);
 				for (var nPos = EndPos; nPos < StartPos; ++nPos)
 				{
-					this.Content[nPos].Select_All(-1);
+					this.Content[nPos].SelectAll(-1);
 				}
 
 				this.Content[EndPos].MoveCursorDownToFirstRow(X, Y, true);
@@ -2202,7 +2202,7 @@ CDocumentContent.prototype.Add_NewParagraph = function()
 					var LastRun = Item.Content[Item.Content.length - 1];
 					if (LastRun && LastRun.Pr.Lang && LastRun.Pr.Lang.Val)
 					{
-						NewParagraph.Select_All();
+						NewParagraph.SelectAll();
 						NewParagraph.Add(new ParaTextPr({Lang : LastRun.Pr.Lang.Copy()}));
 						NewParagraph.RemoveSelection();
 					}
@@ -2284,7 +2284,7 @@ CDocumentContent.prototype.Extend_ToPos                       = function(X, Y)
             TextPr.FontSize   = LastPara.TextPr.Value.FontSize;
             TextPr.FontSizeCS = LastPara.TextPr.Value.FontSize;
             TextPr.RFonts     = LastPara.TextPr.Value.RFonts.Copy();
-            NewParagraph.Select_All();
+            NewParagraph.SelectAll();
             NewParagraph.Apply_TextPr(TextPr);
         }
 
@@ -2438,7 +2438,7 @@ CDocumentContent.prototype.AddTextArt = function(nStyle)
 			{
 				var oContent = Drawing.GraphicObj.getDocContent();
 				oContent.Content[0].Document_SetThisElementCurrent(false);
-				this.LogicDocument.Select_All();
+				this.LogicDocument.SelectAll();
 			}
 		}
 		else
@@ -3842,7 +3842,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
                 PrevClass.Add_ToContent(PrevPos + 1 + Index, Item);
 
                 if (true === bNeedSelect)
-                    Item.Select_All();
+                    Item.SelectAll();
             }
 
             if (true === bNeedSelect)
@@ -3930,7 +3930,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
             {
                 // Вызываем так, чтобы выделить все внутренние элементы
                 var _ParaS = Elements[0].Element;
-                _ParaS.Select_All();
+                _ParaS.SelectAll();
                 var _ParaSContentLen = _ParaS.Content.length;
 
                 // Если мы присоединяем новый параграф, то и копируем все настройки параграфа (так делает Word)
@@ -3952,7 +3952,7 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
                 var _ParaE    = Elements[ElementsCount - 1].Element;
                 var TempCount = _ParaE.Content.length - 1;
 
-                _ParaE.Select_All();
+                _ParaE.SelectAll();
                 _ParaE.Concat(ParaE);
                 _ParaE.Set_Pr(ParaE.Pr);
 
@@ -3970,14 +3970,14 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
             for (var Index = StartIndex; Index <= EndIndex; Index++)
             {
                 this.Internal_Content_Add(DstIndex + Index, Elements[Index].Element);
-                this.Content[DstIndex + Index].Select_All();
+                this.Content[DstIndex + Index].SelectAll();
             }
 
 			var LastPos = DstIndex + ElementsCount - 1;
 			if (NewEmptyPara && NewEmptyPara === this.Content[LastPos + 1])
 			{
 				LastPos++;
-				this.Content[LastPos].Select_All();
+				this.Content[LastPos].SelectAll();
 			}
 			else if (LastPos + 1 < this.Content.length && false === bConcatE && type_Paragraph === this.Content[LastPos + 1].Get_Type())
 			{
@@ -6596,10 +6596,12 @@ CDocumentContent.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent
 		}
 	}
 };
-CDocumentContent.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
+CDocumentContent.prototype.CheckPosInSelection = function(X, Y, CurPage, NearPos)
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
 		return this.DrawingObjects.selectionCheck(X, Y, this.Get_AbsolutePage(CurPage), NearPos);
+	}
 	else //if ( docpostype_Content === this.CurPos.Type )
 	{
 		if (true === this.Selection.Use || true === this.ApplyToAll)
@@ -6702,31 +6704,30 @@ CDocumentContent.prototype.IsSelectionEmpty = function(bCheckHidden)
 		return true;
 	}
 };
-// Селектим все содержимое
-CDocumentContent.prototype.Select_All                = function()
+CDocumentContent.prototype.SelectAll = function()
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type && true === this.DrawingObjects.isSelectedText())
-    {
-        this.DrawingObjects.selectAll();
-    }
-    else
-    {
-        if (true === this.Selection.Use)
-            this.RemoveSelection();
+	if (docpostype_DrawingObjects === this.CurPos.Type && true === this.DrawingObjects.isSelectedText())
+	{
+		this.DrawingObjects.selectAll();
+	}
+	else
+	{
+		if (true === this.Selection.Use)
+			this.RemoveSelection();
 
-        this.Set_DocPosType(docpostype_Content);
-        this.Selection.Use   = true;
-        this.Selection.Start = false;
-        this.Selection.Flag  = selectionflag_Common;
+		this.Set_DocPosType(docpostype_Content);
+		this.Selection.Use   = true;
+		this.Selection.Start = false;
+		this.Selection.Flag  = selectionflag_Common;
 
-        this.Selection.StartPos = 0;
-        this.Selection.EndPos   = this.Content.length - 1;
+		this.Selection.StartPos = 0;
+		this.Selection.EndPos   = this.Content.length - 1;
 
-        for (var Index = 0; Index < this.Content.length; Index++)
-        {
-            this.Content[Index].Select_All();
-        }
-    }
+		for (var Index = 0; Index < this.Content.length; Index++)
+		{
+			this.Content[Index].SelectAll();
+		}
+	}
 };
 CDocumentContent.prototype.SetSelectionUse = function(isUse)
 {
@@ -8267,7 +8268,7 @@ CDocumentContent.prototype.SetContentSelection = function(StartDocPos, EndDocPos
 
         for (var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++)
         {
-            this.Content[CurPos].Select_All(Direction);
+            this.Content[CurPos].SelectAll(Direction);
         }
     }
     else

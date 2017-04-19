@@ -5862,7 +5862,7 @@ ParaRun.prototype.RemoveSelection = function()
     Selection.EndPos   = 0;
 };
 
-ParaRun.prototype.Select_All = function(Direction)
+ParaRun.prototype.SelectAll = function(Direction)
 {
     var Selection = this.State.Selection;
 
@@ -6373,7 +6373,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 					LRun.Selection.EndPos   = LRun.Content.length;
 				}
 
-				CRun.Select_All(Direction);
+				CRun.SelectAll(Direction);
 
 				if (true === bReview && true !== CRun.Have_PrChange())
 					CRun.Add_PrChange();

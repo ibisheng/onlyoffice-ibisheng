@@ -197,9 +197,9 @@ CBlockLevelSdt.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isE
 {
 	this.Content.SetSelectionToBeginEnd(isSelectionStart, isElementStart);
 };
-CBlockLevelSdt.prototype.Select_All = function(nDirection)
+CBlockLevelSdt.prototype.SelectAll = function(nDirection)
 {
-	this.Content.Select_All(nDirection);
+	this.Content.SelectAll(nDirection);
 };
 CBlockLevelSdt.prototype.GetCalculatedTextPr = function()
 {
@@ -237,9 +237,9 @@ CBlockLevelSdt.prototype.Can_CopyCut = function()
 {
 	return this.Content.Can_CopyCut();
 };
-CBlockLevelSdt.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
+CBlockLevelSdt.prototype.CheckPosInSelection = function(X, Y, CurPage, NearPos)
 {
-	return this.Content.Selection_Check(X, Y, CurPage, NearPos);
+	return this.Content.CheckPosInSelection(X, Y, CurPage, NearPos);
 };
 CBlockLevelSdt.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawing)
 {

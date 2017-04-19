@@ -2571,7 +2571,7 @@ function DrawingObjects() {
                 _this.controller.selectObject(oTextArt, 0);
                 var oContent = oTextArt.getDocContent();
                 _this.controller.selection.textSelection = oTextArt;
-                //oContent.Select_All();
+                //oContent.SelectAll();
                 oTextArt.addToRecalculate();
                 _this.controller.startRecalculate();
                 worksheet.setSelectionShape(true);

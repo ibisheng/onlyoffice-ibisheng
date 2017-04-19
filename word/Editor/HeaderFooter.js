@@ -968,23 +968,22 @@ CHeaderFooter.prototype =
         return this.Content.IsMovingTableBorder();
     },
 
-	Selection_Check : function(X, Y, PageAbs, NearPos)
+	CheckPosInSelection : function(X, Y, PageAbs, NearPos)
 	{
 		if (-1 === this.RecalcInfo.CurPage)
 			return false;
 
 		var HdrFtrPage = this.Content.Get_StartPage_Absolute();
 		if (undefined !== NearPos || HdrFtrPage === PageAbs)
-			return this.Content.Selection_Check(X, Y, 0, NearPos);
+			return this.Content.CheckPosInSelection(X, Y, 0, NearPos);
 
 		return false;
 	},
 
-    // Селектим весь параграф
-    Select_All : function()
-    {
-        return this.Content.Select_All();
-    },
+	SelectAll : function()
+	{
+		return this.Content.SelectAll();
+	},
 
     Get_CurrentParagraph : function()
     {
@@ -2282,11 +2281,11 @@ CHeaderFooterController.prototype =
         return false;
     },
 
-    Selection_Check : function(X, Y, PageAbs, NearPos)
-    {
-        if (null != this.CurHdrFtr)
-            return this.CurHdrFtr.Selection_Check(X, Y, PageAbs, NearPos);
-    },
+	CheckPosInSelection : function(X, Y, PageAbs, NearPos)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.CheckPosInSelection(X, Y, PageAbs, NearPos);
+	},
 
 	IsSelectionEmpty : function(bCheckHidden)
 	{
@@ -2296,12 +2295,11 @@ CHeaderFooterController.prototype =
 		return true;
 	},
 
-    // Селектим весь параграф
-    Select_All : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Select_All();
-    },
+	SelectAll : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.SelectAll();
+	},
 
     Get_NearestPos : function(PageNum, X, Y, bAnchor, Drawing)
     {

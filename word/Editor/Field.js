@@ -129,7 +129,7 @@ ParaField.prototype.Add = function(Item)
         case para_Hyperlink:
         {
             var TextPr = this.Get_FirstTextPr();
-            Item.Select_All();
+            Item.SelectAll();
             Item.Apply_TextPr(TextPr);
             Item.RemoveSelection();
 

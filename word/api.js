@@ -803,7 +803,7 @@ background-repeat: no-repeat;\
 	{
 		this.DocumentReaderMode            = new AscCommon.CDocumentReaderMode();
 
-		this.WordControl.m_oLogicDocument.Select_All();
+		this.WordControl.m_oLogicDocument.SelectAll();
 		var text_data = {
 			data : "",
 			pushData : function(format, value) { this.data = value; }
@@ -7309,7 +7309,7 @@ background-repeat: no-repeat;\
 	{
 		var _old                           = PasteElementsId.copyPasteUseBinary;
 		PasteElementsId.copyPasteUseBinary = false;
-		this.WordControl.m_oLogicDocument.Select_All();
+		this.WordControl.m_oLogicDocument.SelectAll();
 		var oCopyProcessor = new AscCommon.CopyProcessor(this);
 		oCopyProcessor.Start();
 		var _ret = "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /></head><body>" + oCopyProcessor.getInnerHtml() + "</body></html>";
