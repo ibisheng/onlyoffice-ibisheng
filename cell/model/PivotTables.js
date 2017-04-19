@@ -255,14 +255,13 @@ var st_datetimegroupingSECOND = 5;
 
 function FromXml_ST_SourceType(val) {
 	var res = -1;
-	if ("worksheet" == val) {
+	if ("worksheet" === val) {
 		res = st_sourcetypeWORKSHEET;
-	} else if ("external" == val) {
+	} else if ("external" === val) {
 		res = st_sourcetypeEXTERNAL;
-	} else if ("consolidation" == val) {
+	} else if ("consolidation" === val) {
 		res = st_sourcetypeCONSOLIDATION;
-	} else if ("scenario" ==
-		val) {
+	} else if ("scenario" === val) {
 		res = st_sourcetypeSCENARIO;
 	}
 	return res;
@@ -270,14 +269,13 @@ function FromXml_ST_SourceType(val) {
 
 function FromXml_ST_Axis(val) {
 	var res = -1;
-	if ("axisRow" == val) {
+	if ("axisRow" === val) {
 		res = st_axisAXISROW;
-	} else if ("axisCol" == val) {
+	} else if ("axisCol" === val) {
 		res = st_axisAXISCOL;
-	} else if ("axisPage" ==
-		val) {
+	} else if ("axisPage" === val) {
 		res = st_axisAXISPAGE;
-	} else if ("axisValues" == val) {
+	} else if ("axisValues" === val) {
 		res = st_axisAXISVALUES;
 	}
 	return res;
@@ -285,11 +283,11 @@ function FromXml_ST_Axis(val) {
 
 function FromXml_ST_FieldSortType(val) {
 	var res = -1;
-	if ("manual" == val) {
+	if ("manual" === val) {
 		res = st_fieldsorttypeMANUAL;
-	} else if ("ascending" == val) {
+	} else if ("ascending" === val) {
 		res = st_fieldsorttypeASCENDING;
-	} else if ("descending" == val) {
+	} else if ("descending" === val) {
 		res = st_fieldsorttypeDESCENDING;
 	}
 	return res;
@@ -297,36 +295,35 @@ function FromXml_ST_FieldSortType(val) {
 
 function FromXml_ST_ItemType(val) {
 	var res = -1;
-	if ("data" == val) {
+	if ("data" === val) {
 		res = st_itemtypeDATA;
-	} else if ("default" == val) {
+	} else if ("default" === val) {
 		res = st_itemtypeDEFAULT;
-	} else if ("sum" ==
-		val) {
+	} else if ("sum" === val) {
 		res = st_itemtypeSUM;
-	} else if ("countA" == val) {
+	} else if ("countA" === val) {
 		res = st_itemtypeCOUNTA;
-	} else if ("avg" == val) {
+	} else if ("avg" === val) {
 		res = st_itemtypeAVG;
-	} else if ("max" == val) {
+	} else if ("max" === val) {
 		res = st_itemtypeMAX;
-	} else if ("min" == val) {
+	} else if ("min" === val) {
 		res = st_itemtypeMIN;
-	} else if ("product" == val) {
+	} else if ("product" === val) {
 		res = st_itemtypePRODUCT;
-	} else if ("count" == val) {
+	} else if ("count" === val) {
 		res = st_itemtypeCOUNT;
-	} else if ("stdDev" == val) {
+	} else if ("stdDev" === val) {
 		res = st_itemtypeSTDDEV;
-	} else if ("stdDevP" == val) {
+	} else if ("stdDevP" === val) {
 		res = st_itemtypeSTDDEVP;
-	} else if ("var" == val) {
+	} else if ("var" === val) {
 		res = st_itemtypeVAR;
-	} else if ("varP" == val) {
+	} else if ("varP" === val) {
 		res = st_itemtypeVARP;
-	} else if ("grand" == val) {
+	} else if ("grand" === val) {
 		res = st_itemtypeGRAND;
-	} else if ("blank" == val) {
+	} else if ("blank" === val) {
 		res = st_itemtypeBLANK;
 	}
 	return res;
@@ -334,29 +331,27 @@ function FromXml_ST_ItemType(val) {
 
 function FromXml_ST_DataConsolidateFunction(val) {
 	var res = -1;
-	if ("average" == val) {
+	if ("average" === val) {
 		res = st_dataconsolidatefunctionAVERAGE;
-	} else if ("count" == val) {
+	} else if ("count" === val) {
 		res = st_dataconsolidatefunctionCOUNT;
-	} else if ("countNums" == val) {
+	} else if ("countNums" === val) {
 		res = st_dataconsolidatefunctionCOUNTNUMS;
-	} else if ("max" == val) {
+	} else if ("max" === val) {
 		res = st_dataconsolidatefunctionMAX;
-	} else if ("min" == val) {
+	} else if ("min" === val) {
 		res = st_dataconsolidatefunctionMIN;
-	} else if ("product" ==
-		val) {
+	} else if ("product" === val) {
 		res = st_dataconsolidatefunctionPRODUCT;
-	} else if ("stdDev" == val) {
+	} else if ("stdDev" === val) {
 		res = st_dataconsolidatefunctionSTDDEV;
-	} else if ("stdDevp" == val) {
+	} else if ("stdDevp" === val) {
 		res = st_dataconsolidatefunctionSTDDEVP;
-	} else if ("sum" == val) {
+	} else if ("sum" === val) {
 		res = st_dataconsolidatefunctionSUM;
-	} else if ("var" ==
-		val) {
+	} else if ("var" === val) {
 		res = st_dataconsolidatefunctionVAR;
-	} else if ("varp" == val) {
+	} else if ("varp" === val) {
 		res = st_dataconsolidatefunctionVARP;
 	}
 	return res;
@@ -364,24 +359,23 @@ function FromXml_ST_DataConsolidateFunction(val) {
 
 function FromXml_ST_ShowDataAs(val) {
 	var res = -1;
-	if ("normal" == val) {
+	if ("normal" === val) {
 		res = st_showdataasNORMAL;
-	} else if ("difference" == val) {
+	} else if ("difference" === val) {
 		res = st_showdataasDIFFERENCE;
-	} else if ("percent" == val) {
+	} else if ("percent" === val) {
 		res = st_showdataasPERCENT;
-	} else if ("percentDiff" ==
-		val) {
+	} else if ("percentDiff" === val) {
 		res = st_showdataasPERCENTDIFF;
-	} else if ("runTotal" == val) {
+	} else if ("runTotal" === val) {
 		res = st_showdataasRUNTOTAL;
-	} else if ("percentOfRow" == val) {
+	} else if ("percentOfRow" === val) {
 		res = st_showdataasPERCENTOFROW;
-	} else if ("percentOfCol" == val) {
+	} else if ("percentOfCol" === val) {
 		res = st_showdataasPERCENTOFCOL;
-	} else if ("percentOfTotal" == val) {
+	} else if ("percentOfTotal" === val) {
 		res = st_showdataasPERCENTOFTOTAL;
-	} else if ("index" == val) {
+	} else if ("index" === val) {
 		res = st_showdataasINDEX;
 	}
 	return res;
@@ -389,13 +383,13 @@ function FromXml_ST_ShowDataAs(val) {
 
 function FromXml_ST_FormatAction(val) {
 	var res = -1;
-	if ("blank" == val) {
+	if ("blank" === val) {
 		res = st_formatactionBLANK;
-	} else if ("formatting" == val) {
+	} else if ("formatting" === val) {
 		res = st_formatactionFORMATTING;
-	} else if ("drill" == val) {
+	} else if ("drill" === val) {
 		res = st_formatactionDRILL;
-	} else if ("formula" == val) {
+	} else if ("formula" === val) {
 		res = st_formatactionFORMULA;
 	}
 	return res;
@@ -403,12 +397,11 @@ function FromXml_ST_FormatAction(val) {
 
 function FromXml_ST_Scope(val) {
 	var res = -1;
-	if ("selection" == val) {
+	if ("selection" === val) {
 		res = st_scopeSELECTION;
-	} else if ("data" == val) {
+	} else if ("data" === val) {
 		res = st_scopeDATA;
-	} else if ("field" ==
-		val) {
+	} else if ("field" === val) {
 		res = st_scopeFIELD;
 	}
 	return res;
@@ -416,13 +409,13 @@ function FromXml_ST_Scope(val) {
 
 function FromXml_ST_Type(val) {
 	var res = -1;
-	if ("none" == val) {
+	if ("none" === val) {
 		res = st_typeNONE;
-	} else if ("all" == val) {
+	} else if ("all" === val) {
 		res = st_typeALL;
-	} else if ("row" == val) {
+	} else if ("row" === val) {
 		res = st_typeROW;
-	} else if ("column" == val) {
+	} else if ("column" === val) {
 		res = st_typeCOLUMN;
 	}
 	return res;
@@ -430,141 +423,137 @@ function FromXml_ST_Type(val) {
 
 function FromXml_ST_PivotFilterType(val) {
 	var res = -1;
-	if ("unknown" == val) {
+	if ("unknown" === val) {
 		res = st_pivotfiltertypeUNKNOWN;
-	} else if ("count" == val) {
+	} else if ("count" === val) {
 		res = st_pivotfiltertypeCOUNT;
-	} else if ("percent" == val) {
+	} else if ("percent" === val) {
 		res = st_pivotfiltertypePERCENT;
-	} else if ("sum" ==
-		val) {
+	} else if ("sum" === val) {
 		res = st_pivotfiltertypeSUM;
-	} else if ("captionEqual" == val) {
+	} else if ("captionEqual" === val) {
 		res = st_pivotfiltertypeCAPTIONEQUAL;
-	} else if ("captionNotEqual" == val) {
+	} else if ("captionNotEqual" === val) {
 		res = st_pivotfiltertypeCAPTIONNOTEQUAL;
-	} else if ("captionBeginsWith" == val) {
+	} else if ("captionBeginsWith" === val) {
 		res = st_pivotfiltertypeCAPTIONBEGINSWITH;
-	} else if ("captionNotBeginsWith" == val) {
+	} else if ("captionNotBeginsWith" === val) {
 		res = st_pivotfiltertypeCAPTIONNOTBEGINSWITH;
-	} else if ("captionEndsWith" == val) {
+	} else if ("captionEndsWith" === val) {
 		res = st_pivotfiltertypeCAPTIONENDSWITH;
-	} else if ("captionNotEndsWith" == val) {
+	} else if ("captionNotEndsWith" === val) {
 		res = st_pivotfiltertypeCAPTIONNOTENDSWITH;
-	} else if ("captionContains" == val) {
+	} else if ("captionContains" === val) {
 		res = st_pivotfiltertypeCAPTIONCONTAINS;
-	} else if ("captionNotContains" == val) {
+	} else if ("captionNotContains" === val) {
 		res = st_pivotfiltertypeCAPTIONNOTCONTAINS;
-	} else if ("captionGreaterThan" == val) {
+	} else if ("captionGreaterThan" === val) {
 		res = st_pivotfiltertypeCAPTIONGREATERTHAN;
-	} else if ("captionGreaterThanOrEqual" == val) {
+	} else if ("captionGreaterThanOrEqual" === val) {
 		res = st_pivotfiltertypeCAPTIONGREATERTHANOREQUAL;
-	} else if ("captionLessThan" == val) {
+	} else if ("captionLessThan" === val) {
 		res = st_pivotfiltertypeCAPTIONLESSTHAN;
-	} else if ("captionLessThanOrEqual" == val) {
+	} else if ("captionLessThanOrEqual" === val) {
 		res = st_pivotfiltertypeCAPTIONLESSTHANOREQUAL;
-	} else if ("captionBetween" == val) {
+	} else if ("captionBetween" === val) {
 		res = st_pivotfiltertypeCAPTIONBETWEEN;
-	} else if ("captionNotBetween" == val) {
+	} else if ("captionNotBetween" === val) {
 		res = st_pivotfiltertypeCAPTIONNOTBETWEEN;
-	} else if ("valueEqual" == val) {
+	} else if ("valueEqual" === val) {
 		res = st_pivotfiltertypeVALUEEQUAL;
-	} else if ("valueNotEqual" == val) {
+	} else if ("valueNotEqual" === val) {
 		res = st_pivotfiltertypeVALUENOTEQUAL;
-	} else if ("valueGreaterThan" == val) {
+	} else if ("valueGreaterThan" === val) {
 		res = st_pivotfiltertypeVALUEGREATERTHAN;
-	} else if ("valueGreaterThanOrEqual" == val) {
+	} else if ("valueGreaterThanOrEqual" === val) {
 		res = st_pivotfiltertypeVALUEGREATERTHANOREQUAL;
-	} else if ("valueLessThan" == val) {
+	} else if ("valueLessThan" === val) {
 		res = st_pivotfiltertypeVALUELESSTHAN;
-	} else if ("valueLessThanOrEqual" == val) {
+	} else if ("valueLessThanOrEqual" === val) {
 		res = st_pivotfiltertypeVALUELESSTHANOREQUAL;
-	} else if ("valueBetween" == val) {
+	} else if ("valueBetween" === val) {
 		res = st_pivotfiltertypeVALUEBETWEEN;
-	} else if ("valueNotBetween" == val) {
+	} else if ("valueNotBetween" === val) {
 		res = st_pivotfiltertypeVALUENOTBETWEEN;
-	} else if ("dateEqual" == val) {
+	} else if ("dateEqual" === val) {
 		res = st_pivotfiltertypeDATEEQUAL;
-	} else if ("dateNotEqual" == val) {
+	} else if ("dateNotEqual" === val) {
 		res = st_pivotfiltertypeDATENOTEQUAL;
-	} else if ("dateOlderThan" == val) {
+	} else if ("dateOlderThan" === val) {
 		res = st_pivotfiltertypeDATEOLDERTHAN;
-	} else if ("dateOlderThanOrEqual" == val) {
+	} else if ("dateOlderThanOrEqual" === val) {
 		res = st_pivotfiltertypeDATEOLDERTHANOREQUAL;
-	} else if ("dateNewerThan" == val) {
+	} else if ("dateNewerThan" === val) {
 		res = st_pivotfiltertypeDATENEWERTHAN;
-	} else if ("dateNewerThanOrEqual" == val) {
+	} else if ("dateNewerThanOrEqual" === val) {
 		res = st_pivotfiltertypeDATENEWERTHANOREQUAL;
-	} else if ("dateBetween" == val) {
+	} else if ("dateBetween" === val) {
 		res = st_pivotfiltertypeDATEBETWEEN;
-	} else if ("dateNotBetween" == val) {
+	} else if ("dateNotBetween" === val) {
 		res = st_pivotfiltertypeDATENOTBETWEEN;
-	} else if ("tomorrow" == val) {
+	} else if ("tomorrow" === val) {
 		res = st_pivotfiltertypeTOMORROW;
-	} else if ("today" == val) {
+	} else if ("today" === val) {
 		res = st_pivotfiltertypeTODAY;
-	} else if ("yesterday" ==
-		val) {
+	} else if ("yesterday" === val) {
 		res = st_pivotfiltertypeYESTERDAY;
-	} else if ("nextWeek" == val) {
+	} else if ("nextWeek" === val) {
 		res = st_pivotfiltertypeNEXTWEEK;
-	} else if ("thisWeek" == val) {
+	} else if ("thisWeek" === val) {
 		res = st_pivotfiltertypeTHISWEEK;
-	} else if ("lastWeek" ==
-		val) {
+	} else if ("lastWeek" === val) {
 		res = st_pivotfiltertypeLASTWEEK;
-	} else if ("nextMonth" == val) {
+	} else if ("nextMonth" === val) {
 		res = st_pivotfiltertypeNEXTMONTH;
-	} else if ("thisMonth" == val) {
+	} else if ("thisMonth" === val) {
 		res = st_pivotfiltertypeTHISMONTH;
-	} else if ("lastMonth" == val) {
+	} else if ("lastMonth" === val) {
 		res = st_pivotfiltertypeLASTMONTH;
-	} else if ("nextQuarter" == val) {
+	} else if ("nextQuarter" === val) {
 		res = st_pivotfiltertypeNEXTQUARTER;
-	} else if ("thisQuarter" == val) {
+	} else if ("thisQuarter" === val) {
 		res = st_pivotfiltertypeTHISQUARTER;
-	} else if ("lastQuarter" == val) {
+	} else if ("lastQuarter" === val) {
 		res = st_pivotfiltertypeLASTQUARTER;
-	} else if ("nextYear" == val) {
+	} else if ("nextYear" === val) {
 		res = st_pivotfiltertypeNEXTYEAR;
-	} else if ("thisYear" == val) {
+	} else if ("thisYear" === val) {
 		res = st_pivotfiltertypeTHISYEAR;
-	} else if ("lastYear" ==
-		val) {
+	} else if ("lastYear" === val) {
 		res = st_pivotfiltertypeLASTYEAR;
-	} else if ("yearToDate" == val) {
+	} else if ("yearToDate" === val) {
 		res = st_pivotfiltertypeYEARTODATE;
-	} else if ("Q1" == val) {
+	} else if ("Q1" === val) {
 		res = st_pivotfiltertypeQ1;
-	} else if ("Q2" == val) {
+	} else if ("Q2" === val) {
 		res = st_pivotfiltertypeQ2;
-	} else if ("Q3" == val) {
+	} else if ("Q3" === val) {
 		res = st_pivotfiltertypeQ3;
-	} else if ("Q4" == val) {
+	} else if ("Q4" === val) {
 		res = st_pivotfiltertypeQ4;
-	} else if ("M1" == val) {
+	} else if ("M1" === val) {
 		res = st_pivotfiltertypeM1;
-	} else if ("M2" == val) {
+	} else if ("M2" === val) {
 		res = st_pivotfiltertypeM2;
-	} else if ("M3" == val) {
+	} else if ("M3" === val) {
 		res = st_pivotfiltertypeM3;
-	} else if ("M4" == val) {
+	} else if ("M4" === val) {
 		res = st_pivotfiltertypeM4;
-	} else if ("M5" == val) {
+	} else if ("M5" === val) {
 		res = st_pivotfiltertypeM5;
-	} else if ("M6" == val) {
+	} else if ("M6" === val) {
 		res = st_pivotfiltertypeM6;
-	} else if ("M7" == val) {
+	} else if ("M7" === val) {
 		res = st_pivotfiltertypeM7;
-	} else if ("M8" == val) {
+	} else if ("M8" === val) {
 		res = st_pivotfiltertypeM8;
-	} else if ("M9" == val) {
+	} else if ("M9" === val) {
 		res = st_pivotfiltertypeM9;
-	} else if ("M10" == val) {
+	} else if ("M10" === val) {
 		res = st_pivotfiltertypeM10;
-	} else if ("M11" == val) {
+	} else if ("M11" === val) {
 		res = st_pivotfiltertypeM11;
-	} else if ("M12" == val) {
+	} else if ("M12" === val) {
 		res = st_pivotfiltertypeM12;
 	}
 	return res;
@@ -572,20 +561,19 @@ function FromXml_ST_PivotFilterType(val) {
 
 function FromXml_ST_SortType(val) {
 	var res = -1;
-	if ("none" == val) {
+	if ("none" === val) {
 		res = st_sorttypeNONE;
-	} else if ("ascending" == val) {
+	} else if ("ascending" === val) {
 		res = st_sorttypeASCENDING;
-	} else if ("descending" == val) {
+	} else if ("descending" === val) {
 		res = st_sorttypeDESCENDING;
-	} else if ("ascendingAlpha" ==
-		val) {
+	} else if ("ascendingAlpha" === val) {
 		res = st_sorttypeASCENDINGALPHA;
-	} else if ("descendingAlpha" == val) {
+	} else if ("descendingAlpha" === val) {
 		res = st_sorttypeDESCENDINGALPHA;
-	} else if ("ascendingNatural" == val) {
+	} else if ("ascendingNatural" === val) {
 		res = st_sorttypeASCENDINGNATURAL;
-	} else if ("descendingNatural" == val) {
+	} else if ("descendingNatural" === val) {
 		res = st_sorttypeDESCENDINGNATURAL;
 	}
 	return res;
@@ -593,19 +581,19 @@ function FromXml_ST_SortType(val) {
 
 function FromXml_ST_PivotAreaType(val) {
 	var res = -1;
-	if ("none" == val) {
+	if ("none" === val) {
 		res = st_pivotareatypeNONE;
-	} else if ("normal" == val) {
+	} else if ("normal" === val) {
 		res = st_pivotareatypeNORMAL;
-	} else if ("data" == val) {
+	} else if ("data" === val) {
 		res = st_pivotareatypeDATA;
-	} else if ("all" == val) {
+	} else if ("all" === val) {
 		res = st_pivotareatypeALL;
-	} else if ("origin" == val) {
+	} else if ("origin" === val) {
 		res = st_pivotareatypeORIGIN;
-	} else if ("button" == val) {
+	} else if ("button" === val) {
 		res = st_pivotareatypeBUTTON;
-	} else if ("topEnd" == val) {
+	} else if ("topEnd" === val) {
 		res = st_pivotareatypeTOPEND;
 	}
 	return res;
@@ -613,22 +601,21 @@ function FromXml_ST_PivotAreaType(val) {
 
 function FromXml_ST_GroupBy(val) {
 	var res = -1;
-	if ("range" == val) {
+	if ("range" === val) {
 		res = st_groupbyRANGE;
-	} else if ("seconds" == val) {
+	} else if ("seconds" === val) {
 		res = st_groupbySECONDS;
-	} else if ("minutes" ==
-		val) {
+	} else if ("minutes" === val) {
 		res = st_groupbyMINUTES;
-	} else if ("hours" == val) {
+	} else if ("hours" === val) {
 		res = st_groupbyHOURS;
-	} else if ("days" == val) {
+	} else if ("days" === val) {
 		res = st_groupbyDAYS;
-	} else if ("months" == val) {
+	} else if ("months" === val) {
 		res = st_groupbyMONTHS;
-	} else if ("quarters" == val) {
+	} else if ("quarters" === val) {
 		res = st_groupbyQUARTERS;
-	} else if ("years" == val) {
+	} else if ("years" === val) {
 		res = st_groupbyYEARS;
 	}
 	return res;
@@ -636,11 +623,11 @@ function FromXml_ST_GroupBy(val) {
 
 function FromXml_ST_SortMethod(val) {
 	var res = -1;
-	if ("stroke" == val) {
+	if ("stroke" === val) {
 		res = st_sortmethodSTROKE;
-	} else if ("pinYin" == val) {
+	} else if ("pinYin" === val) {
 		res = st_sortmethodPINYIN;
-	} else if ("none" == val) {
+	} else if ("none" === val) {
 		res = st_sortmethodNONE;
 	}
 	return res;
@@ -648,76 +635,75 @@ function FromXml_ST_SortMethod(val) {
 
 function FromXml_ST_DynamicFilterType(val) {
 	var res = -1;
-	if ("null" == val) {
+	if ("null" === val) {
 		res = st_dynamicfiltertypeNULL;
-	} else if ("aboveAverage" == val) {
+	} else if ("aboveAverage" === val) {
 		res = st_dynamicfiltertypeABOVEAVERAGE;
-	} else if ("belowAverage" == val) {
+	} else if ("belowAverage" === val) {
 		res = st_dynamicfiltertypeBELOWAVERAGE;
-	} else if ("tomorrow" == val) {
+	} else if ("tomorrow" === val) {
 		res = st_dynamicfiltertypeTOMORROW;
-	} else if ("today" == val) {
+	} else if ("today" === val) {
 		res = st_dynamicfiltertypeTODAY;
-	} else if ("yesterday" ==
-		val) {
+	} else if ("yesterday" === val) {
 		res = st_dynamicfiltertypeYESTERDAY;
-	} else if ("nextWeek" == val) {
+	} else if ("nextWeek" === val) {
 		res = st_dynamicfiltertypeNEXTWEEK;
-	} else if ("thisWeek" == val) {
+	} else if ("thisWeek" === val) {
 		res = st_dynamicfiltertypeTHISWEEK;
-	} else if ("lastWeek" == val) {
+	} else if ("lastWeek" === val) {
 		res = st_dynamicfiltertypeLASTWEEK;
-	} else if ("nextMonth" == val) {
+	} else if ("nextMonth" === val) {
 		res = st_dynamicfiltertypeNEXTMONTH;
-	} else if ("thisMonth" == val) {
+	} else if ("thisMonth" === val) {
 		res = st_dynamicfiltertypeTHISMONTH;
-	} else if ("lastMonth" == val) {
+	} else if ("lastMonth" === val) {
 		res = st_dynamicfiltertypeLASTMONTH;
-	} else if ("nextQuarter" == val) {
+	} else if ("nextQuarter" === val) {
 		res = st_dynamicfiltertypeNEXTQUARTER;
-	} else if ("thisQuarter" == val) {
+	} else if ("thisQuarter" === val) {
 		res = st_dynamicfiltertypeTHISQUARTER;
-	} else if ("lastQuarter" == val) {
+	} else if ("lastQuarter" === val) {
 		res = st_dynamicfiltertypeLASTQUARTER;
-	} else if ("nextYear" == val) {
+	} else if ("nextYear" === val) {
 		res = st_dynamicfiltertypeNEXTYEAR;
-	} else if ("thisYear" == val) {
+	} else if ("thisYear" === val) {
 		res = st_dynamicfiltertypeTHISYEAR;
-	} else if ("lastYear" == val) {
+	} else if ("lastYear" === val) {
 		res = st_dynamicfiltertypeLASTYEAR;
-	} else if ("yearToDate" == val) {
+	} else if ("yearToDate" === val) {
 		res = st_dynamicfiltertypeYEARTODATE;
-	} else if ("Q1" == val) {
+	} else if ("Q1" === val) {
 		res = st_dynamicfiltertypeQ1;
-	} else if ("Q2" == val) {
+	} else if ("Q2" === val) {
 		res = st_dynamicfiltertypeQ2;
-	} else if ("Q3" == val) {
+	} else if ("Q3" === val) {
 		res = st_dynamicfiltertypeQ3;
-	} else if ("Q4" == val) {
+	} else if ("Q4" === val) {
 		res = st_dynamicfiltertypeQ4;
-	} else if ("M1" == val) {
+	} else if ("M1" === val) {
 		res = st_dynamicfiltertypeM1;
-	} else if ("M2" == val) {
+	} else if ("M2" === val) {
 		res = st_dynamicfiltertypeM2;
-	} else if ("M3" == val) {
+	} else if ("M3" === val) {
 		res = st_dynamicfiltertypeM3;
-	} else if ("M4" == val) {
+	} else if ("M4" === val) {
 		res = st_dynamicfiltertypeM4;
-	} else if ("M5" == val) {
+	} else if ("M5" === val) {
 		res = st_dynamicfiltertypeM5;
-	} else if ("M6" == val) {
+	} else if ("M6" === val) {
 		res = st_dynamicfiltertypeM6;
-	} else if ("M7" == val) {
+	} else if ("M7" === val) {
 		res = st_dynamicfiltertypeM7;
-	} else if ("M8" == val) {
+	} else if ("M8" === val) {
 		res = st_dynamicfiltertypeM8;
-	} else if ("M9" == val) {
+	} else if ("M9" === val) {
 		res = st_dynamicfiltertypeM9;
-	} else if ("M10" == val) {
+	} else if ("M10" === val) {
 		res = st_dynamicfiltertypeM10;
-	} else if ("M11" == val) {
+	} else if ("M11" === val) {
 		res = st_dynamicfiltertypeM11;
-	} else if ("M12" == val) {
+	} else if ("M12" === val) {
 		res = st_dynamicfiltertypeM12;
 	}
 	return res;
@@ -725,36 +711,33 @@ function FromXml_ST_DynamicFilterType(val) {
 
 function FromXml_ST_CalendarType(val) {
 	var res = -1;
-	if ("gregorian" == val) {
+	if ("gregorian" === val) {
 		res = st_calendartypeGREGORIAN;
-	} else if ("gregorianUs" == val) {
+	} else if ("gregorianUs" === val) {
 		res = st_calendartypeGREGORIANUS;
-	} else if ("gregorianMeFrench" == val) {
+	} else if ("gregorianMeFrench" === val) {
 		res = st_calendartypeGREGORIANMEFRENCH;
-	} else if ("gregorianArabic" == val) {
+	} else if ("gregorianArabic" === val) {
 		res = st_calendartypeGREGORIANARABIC;
-	} else if ("hijri" == val) {
+	} else if ("hijri" === val) {
 		res = st_calendartypeHIJRI;
-	} else if ("hebrew" ==
-		val) {
+	} else if ("hebrew" === val) {
 		res = st_calendartypeHEBREW;
-	} else if ("taiwan" == val) {
+	} else if ("taiwan" === val) {
 		res = st_calendartypeTAIWAN;
-	} else if ("japan" ==
-		val) {
+	} else if ("japan" === val) {
 		res = st_calendartypeJAPAN;
-	} else if ("thai" == val) {
+	} else if ("thai" === val) {
 		res = st_calendartypeTHAI;
-	} else if ("korea" ==
-		val) {
+	} else if ("korea" === val) {
 		res = st_calendartypeKOREA;
-	} else if ("saka" == val) {
+	} else if ("saka" === val) {
 		res = st_calendartypeSAKA;
-	} else if ("gregorianXlitEnglish" == val) {
+	} else if ("gregorianXlitEnglish" === val) {
 		res = st_calendartypeGREGORIANXLITENGLISH;
-	} else if ("gregorianXlitFrench" == val) {
+	} else if ("gregorianXlitFrench" === val) {
 		res = st_calendartypeGREGORIANXLITFRENCH;
-	} else if ("none" == val) {
+	} else if ("none" === val) {
 		res = st_calendartypeNONE;
 	}
 	return res;
@@ -762,44 +745,39 @@ function FromXml_ST_CalendarType(val) {
 
 function FromXml_ST_IconSetType(val) {
 	var res = -1;
-	if ("3Arrows" == val) {
+	if ("3Arrows" === val) {
 		res = st_iconsettype3ARROWS;
-	} else if ("3ArrowsGray" == val) {
+	} else if ("3ArrowsGray" === val) {
 		res = st_iconsettype3ARROWSGRAY;
-	} else if ("3Flags" == val) {
+	} else if ("3Flags" === val) {
 		res = st_iconsettype3FLAGS;
-	} else if ("3TrafficLights1" ==
-		val) {
+	} else if ("3TrafficLights1" === val) {
 		res = st_iconsettype3TRAFFICLIGHTS1;
-	} else if ("3TrafficLights2" == val) {
+	} else if ("3TrafficLights2" === val) {
 		res = st_iconsettype3TRAFFICLIGHTS2;
-	} else if ("3Signs" == val) {
+	} else if ("3Signs" === val) {
 		res = st_iconsettype3SIGNS;
-	} else if ("3Symbols" ==
-		val) {
+	} else if ("3Symbols" === val) {
 		res = st_iconsettype3SYMBOLS;
-	} else if ("3Symbols2" == val) {
+	} else if ("3Symbols2" === val) {
 		res = st_iconsettype3SYMBOLS2;
-	} else if ("4Arrows" == val) {
+	} else if ("4Arrows" === val) {
 		res = st_iconsettype4ARROWS;
-	} else if ("4ArrowsGray" ==
-		val) {
+	} else if ("4ArrowsGray" === val) {
 		res = st_iconsettype4ARROWSGRAY;
-	} else if ("4RedToBlack" == val) {
+	} else if ("4RedToBlack" === val) {
 		res = st_iconsettype4REDTOBLACK;
-	} else if ("4Rating" == val) {
+	} else if ("4Rating" === val) {
 		res = st_iconsettype4RATING;
-	} else if ("4TrafficLights" ==
-		val) {
+	} else if ("4TrafficLights" === val) {
 		res = st_iconsettype4TRAFFICLIGHTS;
-	} else if ("5Arrows" == val) {
+	} else if ("5Arrows" === val) {
 		res = st_iconsettype5ARROWS;
-	} else if ("5ArrowsGray" == val) {
+	} else if ("5ArrowsGray" === val) {
 		res = st_iconsettype5ARROWSGRAY;
-	} else if ("5Rating" ==
-		val) {
+	} else if ("5Rating" === val) {
 		res = st_iconsettype5RATING;
-	} else if ("5Quarters" == val) {
+	} else if ("5Quarters" === val) {
 		res = st_iconsettype5QUARTERS;
 	}
 	return res;
@@ -807,13 +785,13 @@ function FromXml_ST_IconSetType(val) {
 
 function FromXml_ST_SortBy(val) {
 	var res = -1;
-	if ("value" == val) {
+	if ("value" === val) {
 		res = st_sortbyVALUE;
-	} else if ("cellColor" == val) {
+	} else if ("cellColor" === val) {
 		res = st_sortbyCELLCOLOR;
-	} else if ("fontColor" == val) {
+	} else if ("fontColor" === val) {
 		res = st_sortbyFONTCOLOR;
-	} else if ("icon" == val) {
+	} else if ("icon" === val) {
 		res = st_sortbyICON;
 	}
 	return res;
@@ -821,17 +799,17 @@ function FromXml_ST_SortBy(val) {
 
 function FromXml_ST_FilterOperator(val) {
 	var res = -1;
-	if ("equal" == val) {
+	if ("equal" === val) {
 		res = st_filteroperatorEQUAL;
-	} else if ("lessThan" == val) {
+	} else if ("lessThan" === val) {
 		res = st_filteroperatorLESSTHAN;
-	} else if ("lessThanOrEqual" == val) {
+	} else if ("lessThanOrEqual" === val) {
 		res = st_filteroperatorLESSTHANOREQUAL;
-	} else if ("notEqual" == val) {
+	} else if ("notEqual" === val) {
 		res = st_filteroperatorNOTEQUAL;
-	} else if ("greaterThanOrEqual" == val) {
+	} else if ("greaterThanOrEqual" === val) {
 		res = st_filteroperatorGREATERTHANOREQUAL;
-	} else if ("greaterThan" == val) {
+	} else if ("greaterThan" === val) {
 		res = st_filteroperatorGREATERTHAN;
 	}
 	return res;
@@ -839,18 +817,17 @@ function FromXml_ST_FilterOperator(val) {
 
 function FromXml_ST_DateTimeGrouping(val) {
 	var res = -1;
-	if ("year" == val) {
+	if ("year" === val) {
 		res = st_datetimegroupingYEAR;
-	} else if ("month" == val) {
+	} else if ("month" === val) {
 		res = st_datetimegroupingMONTH;
-	} else if ("day" == val) {
+	} else if ("day" === val) {
 		res = st_datetimegroupingDAY;
-	} else if ("hour" == val) {
+	} else if ("hour" === val) {
 		res = st_datetimegroupingHOUR;
-	} else if ("minute" == val) {
+	} else if ("minute" === val) {
 		res = st_datetimegroupingMINUTE;
-	} else if ("second" ==
-		val) {
+	} else if ("second" === val) {
 		res = st_datetimegroupingSECOND;
 	}
 	return res;
@@ -969,69 +946,69 @@ CT_PivotCacheDefinition.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotCacheDefinition.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotCacheDefinition" == elem) {
+	if ("pivotCacheDefinition" === elem) {
 		newContext.readAttributes(attr, uq);
-	} else if ("cacheSource" == elem) {
+	} else if ("cacheSource" === elem) {
 		newContext = new CT_CacheSource();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.cacheSource = newContext;
-	} else if ("cacheFields" == elem) {
+	} else if ("cacheFields" === elem) {
 		newContext = new CT_CacheFields();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.cacheFields = newContext;
-	} else if ("cacheHierarchies" == elem) {
+	} else if ("cacheHierarchies" === elem) {
 		newContext = new CT_CacheHierarchies();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.cacheHierarchies = newContext;
-	} else if ("kpis" == elem) {
+	} else if ("kpis" === elem) {
 		newContext = new CT_PCDKPIs();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.kpis = newContext;
-	} else if ("tupleCache" == elem) {
+	} else if ("tupleCache" === elem) {
 		newContext = new CT_TupleCache();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.tupleCache = newContext;
-	} else if ("calculatedItems" == elem) {
+	} else if ("calculatedItems" === elem) {
 		newContext = new CT_CalculatedItems();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.calculatedItems = newContext;
-	} else if ("calculatedMembers" == elem) {
+	} else if ("calculatedMembers" === elem) {
 		newContext = new CT_CalculatedMembers();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.calculatedMembers = newContext;
-	} else if ("dimensions" == elem) {
+	} else if ("dimensions" === elem) {
 		newContext = new CT_Dimensions();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.dimensions = newContext;
-	} else if ("measureGroups" == elem) {
+	} else if ("measureGroups" === elem) {
 		newContext = new CT_MeasureGroups();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.measureGroups = newContext;
-	} else if ("maps" == elem) {
+	} else if ("maps" === elem) {
 		newContext = new CT_MeasureDimensionMaps();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.maps = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1061,15 +1038,15 @@ CT_PivotCacheRecords.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotCacheRecords.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotCacheRecords" == elem) {
+	if ("pivotCacheRecords" === elem) {
 		newContext.readAttributes(attr, uq);
-	} else if ("r" == elem) {
+	} else if ("r" === elem) {
 		newContext = new CT_r();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.r.push(newContext);
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1449,105 +1426,105 @@ CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 };
 CT_pivotTableDefinition.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotTableDefinition" == elem) {
+	if ("pivotTableDefinition" === elem) {
 		newContext.readAttributes(attr, uq);
-	} else if ("location" == elem) {
+	} else if ("location" === elem) {
 		newContext = new CT_Location();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.location = newContext;
-	} else if ("pivotFields" == elem) {
+	} else if ("pivotFields" === elem) {
 		newContext = new CT_PivotFields();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.pivotFields = newContext;
-	} else if ("rowFields" == elem) {
+	} else if ("rowFields" === elem) {
 		newContext = new CT_RowFields();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.rowFields = newContext;
-	} else if ("rowItems" == elem) {
+	} else if ("rowItems" === elem) {
 		newContext = new CT_rowItems();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.rowItems = newContext;
-	} else if ("colFields" == elem) {
+	} else if ("colFields" === elem) {
 		newContext = new CT_ColFields();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.colFields = newContext;
-	} else if ("colItems" == elem) {
+	} else if ("colItems" === elem) {
 		newContext = new CT_colItems();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.colItems = newContext;
-	} else if ("pageFields" == elem) {
+	} else if ("pageFields" === elem) {
 		newContext = new CT_PageFields();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.pageFields = newContext;
-	} else if ("dataFields" == elem) {
+	} else if ("dataFields" === elem) {
 		newContext = new CT_DataFields();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.dataFields = newContext;
-	} else if ("formats" == elem) {
+	} else if ("formats" === elem) {
 		newContext = new CT_Formats();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.formats = newContext;
-	} else if ("conditionalFormats" == elem) {
+	} else if ("conditionalFormats" === elem) {
 		newContext = new CT_ConditionalFormats();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.conditionalFormats = newContext;
-	} else if ("chartFormats" == elem) {
+	} else if ("chartFormats" === elem) {
 		newContext = new CT_ChartFormats();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.chartFormats = newContext;
-	} else if ("pivotHierarchies" == elem) {
+	} else if ("pivotHierarchies" === elem) {
 		newContext = new CT_PivotHierarchies();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.pivotHierarchies = newContext;
-	} else if ("pivotTableStyleInfo" == elem) {
+	} else if ("pivotTableStyleInfo" === elem) {
 		newContext = new CT_PivotTableStyle();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.pivotTableStyleInfo = newContext;
-	} else if ("filters" == elem) {
+	} else if ("filters" === elem) {
 		newContext = new CT_PivotFilters();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.filters = newContext;
-	} else if ("rowHierarchiesUsage" == elem) {
+	} else if ("rowHierarchiesUsage" === elem) {
 		newContext = new CT_RowHierarchiesUsage();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.rowHierarchiesUsage = newContext;
-	} else if ("colHierarchiesUsage" == elem) {
+	} else if ("colHierarchiesUsage" === elem) {
 		newContext = new CT_ColHierarchiesUsage();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.colHierarchiesUsage = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1586,19 +1563,19 @@ CT_CacheSource.prototype.readAttributes = function(attr, uq) {
 };
 CT_CacheSource.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("consolidation" == elem) {
+	if ("consolidation" === elem) {
 		newContext = new CT_Consolidation();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.consolidation = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.extLst = newContext;
-	} else if ("worksheetSource" == elem) {
+	} else if ("worksheetSource" === elem) {
 		newContext = new CT_WorksheetSource();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1627,7 +1604,7 @@ CT_CacheFields.prototype.readAttributes = function(attr, uq) {
 };
 CT_CacheFields.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("cacheField" == elem) {
+	if ("cacheField" === elem) {
 		newContext = new CT_CacheField();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1656,7 +1633,7 @@ CT_CacheHierarchies.prototype.readAttributes = function(attr, uq) {
 };
 CT_CacheHierarchies.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("cacheHierarchy" == elem) {
+	if ("cacheHierarchy" === elem) {
 		newContext = new CT_CacheHierarchy();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1685,7 +1662,7 @@ CT_PCDKPIs.prototype.readAttributes = function(attr, uq) {
 };
 CT_PCDKPIs.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("kpi" == elem) {
+	if ("kpi" === elem) {
 		newContext = new CT_PCDKPI();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1706,31 +1683,31 @@ function CT_TupleCache() {
 }
 CT_TupleCache.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("entries" == elem) {
+	if ("entries" === elem) {
 		newContext = new CT_PCDSDTCEntries();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.entries = newContext;
-	} else if ("sets" == elem) {
+	} else if ("sets" === elem) {
 		newContext = new CT_Sets();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.sets = newContext;
-	} else if ("queryCache" == elem) {
+	} else if ("queryCache" === elem) {
 		newContext = new CT_QueryCache();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.queryCache = newContext;
-	} else if ("serverFormats" == elem) {
+	} else if ("serverFormats" === elem) {
 		newContext = new CT_ServerFormats();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.serverFormats = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1759,7 +1736,7 @@ CT_CalculatedItems.prototype.readAttributes = function(attr, uq) {
 };
 CT_CalculatedItems.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("calculatedItem" == elem) {
+	if ("calculatedItem" === elem) {
 		newContext = new CT_CalculatedItem();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1788,7 +1765,7 @@ CT_CalculatedMembers.prototype.readAttributes = function(attr, uq) {
 };
 CT_CalculatedMembers.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("calculatedMember" == elem) {
+	if ("calculatedMember" === elem) {
 		newContext = new CT_CalculatedMember();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1817,7 +1794,7 @@ CT_Dimensions.prototype.readAttributes = function(attr, uq) {
 };
 CT_Dimensions.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("dimension" == elem) {
+	if ("dimension" === elem) {
 		newContext = new CT_PivotDimension();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1846,7 +1823,7 @@ CT_MeasureGroups.prototype.readAttributes = function(attr, uq) {
 };
 CT_MeasureGroups.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("measureGroup" == elem) {
+	if ("measureGroup" === elem) {
 		newContext = new CT_MeasureGroup();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1875,7 +1852,7 @@ CT_MeasureDimensionMaps.prototype.readAttributes = function(attr, uq) {
 };
 CT_MeasureDimensionMaps.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("map" == elem) {
+	if ("map" === elem) {
 		newContext = new CT_MeasureDimensionMap();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1892,7 +1869,7 @@ function CT_ExtensionList() {
 }
 CT_ExtensionList.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("ext" == elem) {
+	if ("ext" === elem) {
 		newContext = new CT_Extension();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -1915,43 +1892,43 @@ function CT_r() {
 }
 CT_r.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("b" == elem) {
+	if ("b" === elem) {
 		newContext = new CT_Boolean();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.b.push(newContext);
-	} else if ("d" == elem) {
+	} else if ("d" === elem) {
 		newContext = new CT_DateTime();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.d.push(newContext);
-	} else if ("e" == elem) {
+	} else if ("e" === elem) {
 		newContext = new CT_Error();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.e.push(newContext);
-	} else if ("m" == elem) {
+	} else if ("m" === elem) {
 		newContext = new CT_Missing();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.m.push(newContext);
-	} else if ("n" == elem) {
+	} else if ("n" === elem) {
 		newContext = new CT_Number();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.n.push(newContext);
-	} else if ("s" == elem) {
+	} else if ("s" === elem) {
 		newContext = new CT_String();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.s.push(newContext);
-	} else if ("x" == elem) {
+	} else if ("x" === elem) {
 		newContext = new CT_Index();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2019,7 +1996,7 @@ CT_PivotFields.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotFields.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotField" == elem) {
+	if ("pivotField" === elem) {
 		newContext = new CT_PivotField();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2048,7 +2025,7 @@ CT_RowFields.prototype.readAttributes = function(attr, uq) {
 };
 CT_RowFields.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("field" == elem) {
+	if ("field" === elem) {
 		newContext = new CT_Field();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2077,7 +2054,7 @@ CT_rowItems.prototype.readAttributes = function(attr, uq) {
 };
 CT_rowItems.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("i" == elem) {
+	if ("i" === elem) {
 		newContext = new CT_I();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2106,7 +2083,7 @@ CT_ColFields.prototype.readAttributes = function(attr, uq) {
 };
 CT_ColFields.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("field" == elem) {
+	if ("field" === elem) {
 		newContext = new CT_Field();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2135,7 +2112,7 @@ CT_colItems.prototype.readAttributes = function(attr, uq) {
 };
 CT_colItems.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("i" == elem) {
+	if ("i" === elem) {
 		newContext = new CT_I();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2164,7 +2141,7 @@ CT_PageFields.prototype.readAttributes = function(attr, uq) {
 };
 CT_PageFields.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pageField" == elem) {
+	if ("pageField" === elem) {
 		newContext = new CT_PageField();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2193,7 +2170,7 @@ CT_DataFields.prototype.readAttributes = function(attr, uq) {
 };
 CT_DataFields.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("dataField" == elem) {
+	if ("dataField" === elem) {
 		newContext = new CT_DataField();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2222,7 +2199,7 @@ CT_Formats.prototype.readAttributes = function(attr, uq) {
 };
 CT_Formats.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("format" == elem) {
+	if ("format" === elem) {
 		newContext = new CT_Format();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2251,7 +2228,7 @@ CT_ConditionalFormats.prototype.readAttributes = function(attr, uq) {
 };
 CT_ConditionalFormats.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("conditionalFormat" == elem) {
+	if ("conditionalFormat" === elem) {
 		newContext = new CT_ConditionalFormat();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2280,7 +2257,7 @@ CT_ChartFormats.prototype.readAttributes = function(attr, uq) {
 };
 CT_ChartFormats.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("chartFormat" == elem) {
+	if ("chartFormat" === elem) {
 		newContext = new CT_ChartFormat();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2309,7 +2286,7 @@ CT_PivotHierarchies.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotHierarchies.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotHierarchy" == elem) {
+	if ("pivotHierarchy" === elem) {
 		newContext = new CT_PivotHierarchy();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2377,7 +2354,7 @@ CT_PivotFilters.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotFilters.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("filter" == elem) {
+	if ("filter" === elem) {
 		newContext = new CT_PivotFilter();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2406,7 +2383,7 @@ CT_RowHierarchiesUsage.prototype.readAttributes = function(attr, uq) {
 };
 CT_RowHierarchiesUsage.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("rowHierarchyUsage" == elem) {
+	if ("rowHierarchyUsage" === elem) {
 		newContext = new CT_HierarchyUsage();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2435,7 +2412,7 @@ CT_ColHierarchiesUsage.prototype.readAttributes = function(attr, uq) {
 };
 CT_ColHierarchiesUsage.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("colHierarchyUsage" == elem) {
+	if ("colHierarchyUsage" === elem) {
 		newContext = new CT_HierarchyUsage();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2465,13 +2442,13 @@ CT_Consolidation.prototype.readAttributes = function(attr, uq) {
 };
 CT_Consolidation.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pages" == elem) {
+	if ("pages" === elem) {
 		newContext = new CT_Pages();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.pages = newContext;
-	} else if ("rangeSets" == elem) {
+	} else if ("rangeSets" === elem) {
 		newContext = new CT_RangeSets();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2592,25 +2569,25 @@ CT_CacheField.prototype.readAttributes = function(attr, uq) {
 };
 CT_CacheField.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("sharedItems" == elem) {
+	if ("sharedItems" === elem) {
 		newContext = new CT_SharedItems();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.sharedItems = newContext;
-	} else if ("fieldGroup" == elem) {
+	} else if ("fieldGroup" === elem) {
 		newContext = new CT_FieldGroup();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.fieldGroup = newContext;
-	} else if ("mpMap" == elem) {
+	} else if ("mpMap" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.mpMap.push(newContext);
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2746,19 +2723,19 @@ CT_CacheHierarchy.prototype.readAttributes = function(attr, uq) {
 };
 CT_CacheHierarchy.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("fieldsUsage" == elem) {
+	if ("fieldsUsage" === elem) {
 		newContext = new CT_FieldsUsage();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.fieldsUsage = newContext;
-	} else if ("groupLevels" == elem) {
+	} else if ("groupLevels" === elem) {
 		newContext = new CT_GroupLevels();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.groupLevels = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2853,25 +2830,25 @@ CT_PCDSDTCEntries.prototype.readAttributes = function(attr, uq) {
 };
 CT_PCDSDTCEntries.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("e" == elem) {
+	if ("e" === elem) {
 		newContext = new CT_Error();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("m" == elem) {
+	} else if ("m" === elem) {
 		newContext = new CT_Missing();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("n" == elem) {
+	} else if ("n" === elem) {
 		newContext = new CT_Number();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("s" == elem) {
+	} else if ("s" === elem) {
 		newContext = new CT_String();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2883,7 +2860,7 @@ CT_PCDSDTCEntries.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_PCDSDTCEntries.prototype.onTextNode = function(text, uq) {
-	if ("Items" == this._curElem) {
+	if ("Items" === this._curElem) {
 		this.Items = uq(text);
 	}
 };
@@ -2905,7 +2882,7 @@ CT_Sets.prototype.readAttributes = function(attr, uq) {
 };
 CT_Sets.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("set" == elem) {
+	if ("set" === elem) {
 		newContext = new CT_Set();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2934,7 +2911,7 @@ CT_QueryCache.prototype.readAttributes = function(attr, uq) {
 };
 CT_QueryCache.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("query" == elem) {
+	if ("query" === elem) {
 		newContext = new CT_Query();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2963,7 +2940,7 @@ CT_ServerFormats.prototype.readAttributes = function(attr, uq) {
 };
 CT_ServerFormats.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("serverFormat" == elem) {
+	if ("serverFormat" === elem) {
 		newContext = new CT_ServerFormat();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -2998,13 +2975,13 @@ CT_CalculatedItem.prototype.readAttributes = function(attr, uq) {
 };
 CT_CalculatedItem.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotArea" == elem) {
+	if ("pivotArea" === elem) {
 		newContext = new CT_PivotArea();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.pivotArea = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -3063,7 +3040,7 @@ CT_CalculatedMember.prototype.readAttributes = function(attr, uq) {
 };
 CT_CalculatedMember.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("extLst" == elem) {
+	if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -3161,7 +3138,7 @@ CT_Extension.prototype.readAttributes = function(attr, uq) {
 };
 CT_Extension.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("Any" == elem) {
+	if ("Any" === elem) {
 		this.Any = elem;
 	} else {
 		newContext = null;
@@ -3169,7 +3146,7 @@ CT_Extension.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_Extension.prototype.onTextNode = function(text, uq) {
-	if ("Any" == this._curElem) {
+	if ("Any" === this._curElem) {
 		this.Any = uq(text);
 	}
 };
@@ -3211,7 +3188,7 @@ CT_Boolean.prototype.readAttributes = function(attr, uq) {
 };
 CT_Boolean.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("x" == elem) {
+	if ("x" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -3260,7 +3237,7 @@ CT_DateTime.prototype.readAttributes = function(attr, uq) {
 };
 CT_DateTime.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("x" == elem) {
+	if ("x" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -3345,13 +3322,13 @@ CT_Error.prototype.readAttributes = function(attr, uq) {
 };
 CT_Error.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("tpls" == elem) {
+	if ("tpls" === elem) {
 		newContext = new CT_Tuples();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.tpls = newContext;
-	} else if ("x" == elem) {
+	} else if ("x" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -3431,13 +3408,13 @@ CT_Missing.prototype.readAttributes = function(attr, uq) {
 };
 CT_Missing.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("tpls" == elem) {
+	if ("tpls" === elem) {
 		newContext = new CT_Tuples();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.tpls.push(newContext);
-	} else if ("x" == elem) {
+	} else if ("x" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -3522,13 +3499,13 @@ CT_Number.prototype.readAttributes = function(attr, uq) {
 };
 CT_Number.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("tpls" == elem) {
+	if ("tpls" === elem) {
 		newContext = new CT_Tuples();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.tpls.push(newContext);
-	} else if ("x" == elem) {
+	} else if ("x" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -3613,13 +3590,13 @@ CT_String.prototype.readAttributes = function(attr, uq) {
 };
 CT_String.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("tpls" == elem) {
+	if ("tpls" === elem) {
 		newContext = new CT_Tuples();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.tpls.push(newContext);
-	} else if ("x" == elem) {
+	} else if ("x" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -3905,19 +3882,19 @@ CT_PivotField.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotField.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("items" == elem) {
+	if ("items" === elem) {
 		newContext = new CT_Items();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.items = newContext;
-	} else if ("autoSortScope" == elem) {
+	} else if ("autoSortScope" === elem) {
 		newContext = new CT_AutoSortScope();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.autoSortScope = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -3973,7 +3950,7 @@ CT_I.prototype.readAttributes = function(attr, uq) {
 };
 CT_I.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("x" == elem) {
+	if ("x" === elem) {
 		newContext = new CT_X();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4022,7 +3999,7 @@ CT_PageField.prototype.readAttributes = function(attr, uq) {
 };
 CT_PageField.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("extLst" == elem) {
+	if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4087,7 +4064,7 @@ CT_DataField.prototype.readAttributes = function(attr, uq) {
 };
 CT_DataField.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("extLst" == elem) {
+	if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4125,13 +4102,13 @@ CT_Format.prototype.readAttributes = function(attr, uq) {
 };
 CT_Format.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotArea" == elem) {
+	if ("pivotArea" === elem) {
 		newContext = new CT_PivotArea();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.pivotArea = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4177,13 +4154,13 @@ CT_ConditionalFormat.prototype.readAttributes = function(attr, uq) {
 };
 CT_ConditionalFormat.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotAreas" == elem) {
+	if ("pivotAreas" === elem) {
 		newContext = new CT_PivotAreas();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.pivotAreas = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4222,7 +4199,7 @@ CT_ChartFormat.prototype.readAttributes = function(attr, uq) {
 };
 CT_ChartFormat.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotArea" == elem) {
+	if ("pivotArea" === elem) {
 		newContext = new CT_PivotArea();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4303,19 +4280,19 @@ CT_PivotHierarchy.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotHierarchy.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("mps" == elem) {
+	if ("mps" === elem) {
 		newContext = new CT_MemberProperties();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.mps = newContext;
-	} else if ("members" == elem) {
+	} else if ("members" === elem) {
 		newContext = new CT_Members();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.members.push(newContext);
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4398,13 +4375,13 @@ CT_PivotFilter.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotFilter.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("autoFilter" == elem) {
+	if ("autoFilter" === elem) {
 		newContext = new CT_AutoFilter();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.autoFilter = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4447,7 +4424,7 @@ CT_Pages.prototype.readAttributes = function(attr, uq) {
 };
 CT_Pages.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("page" == elem) {
+	if ("page" === elem) {
 		newContext = new CT_PCDSCPage();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4476,7 +4453,7 @@ CT_RangeSets.prototype.readAttributes = function(attr, uq) {
 };
 CT_RangeSets.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("rangeSet" == elem) {
+	if ("rangeSet" === elem) {
 		newContext = new CT_RangeSet();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4572,37 +4549,37 @@ CT_SharedItems.prototype.readAttributes = function(attr, uq) {
 };
 CT_SharedItems.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("b" == elem) {
+	if ("b" === elem) {
 		newContext = new CT_Boolean();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("d" == elem) {
+	} else if ("d" === elem) {
 		newContext = new CT_DateTime();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("e" == elem) {
+	} else if ("e" === elem) {
 		newContext = new CT_Error();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("m" == elem) {
+	} else if ("m" === elem) {
 		newContext = new CT_Missing();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("n" == elem) {
+	} else if ("n" === elem) {
 		newContext = new CT_Number();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("s" == elem) {
+	} else if ("s" === elem) {
 		newContext = new CT_String();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4614,7 +4591,7 @@ CT_SharedItems.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_SharedItems.prototype.onTextNode = function(text, uq) {
-	if ("Items" == this._curElem) {
+	if ("Items" === this._curElem) {
 		this.Items = uq(text);
 	}
 };
@@ -4643,19 +4620,19 @@ CT_FieldGroup.prototype.readAttributes = function(attr, uq) {
 };
 CT_FieldGroup.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("rangePr" == elem) {
+	if ("rangePr" === elem) {
 		newContext = new CT_RangePr();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.rangePr = newContext;
-	} else if ("discretePr" == elem) {
+	} else if ("discretePr" === elem) {
 		newContext = new CT_DiscretePr();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.discretePr = newContext;
-	} else if ("groupItems" == elem) {
+	} else if ("groupItems" === elem) {
 		newContext = new CT_GroupItems();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4698,7 +4675,7 @@ CT_FieldsUsage.prototype.readAttributes = function(attr, uq) {
 };
 CT_FieldsUsage.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("fieldUsage" == elem) {
+	if ("fieldUsage" === elem) {
 		newContext = new CT_FieldUsage();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4727,7 +4704,7 @@ CT_GroupLevels.prototype.readAttributes = function(attr, uq) {
 };
 CT_GroupLevels.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("groupLevel" == elem) {
+	if ("groupLevel" === elem) {
 		newContext = new CT_GroupLevel();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4780,13 +4757,13 @@ CT_Set.prototype.readAttributes = function(attr, uq) {
 };
 CT_Set.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("tpls" == elem) {
+	if ("tpls" === elem) {
 		newContext = new CT_Tuples();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.tpls.push(newContext);
-	} else if ("sortByTuple" == elem) {
+	} else if ("sortByTuple" === elem) {
 		newContext = new CT_Tuples();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4815,7 +4792,7 @@ CT_Query.prototype.readAttributes = function(attr, uq) {
 };
 CT_Query.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("tpls" == elem) {
+	if ("tpls" === elem) {
 		newContext = new CT_Tuples();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4925,13 +4902,13 @@ CT_PivotArea.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotArea.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("references" == elem) {
+	if ("references" === elem) {
 		newContext = new CT_PivotAreaReferences();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.references = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4960,7 +4937,7 @@ CT_Tuples.prototype.readAttributes = function(attr, uq) {
 };
 CT_Tuples.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("tpl" == elem) {
+	if ("tpl" === elem) {
 		newContext = new CT_Tuple();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -4989,7 +4966,7 @@ CT_Items.prototype.readAttributes = function(attr, uq) {
 };
 CT_Items.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("item" == elem) {
+	if ("item" === elem) {
 		newContext = new CT_Item();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5006,7 +4983,7 @@ function CT_AutoSortScope() {
 }
 CT_AutoSortScope.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotArea" == elem) {
+	if ("pivotArea" === elem) {
 		newContext = new CT_PivotArea();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5035,7 +5012,7 @@ CT_PivotAreas.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotAreas.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pivotArea" == elem) {
+	if ("pivotArea" === elem) {
 		newContext = new CT_PivotArea();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5064,7 +5041,7 @@ CT_MemberProperties.prototype.readAttributes = function(attr, uq) {
 };
 CT_MemberProperties.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("mp" == elem) {
+	if ("mp" === elem) {
 		newContext = new CT_MemberProperty();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5098,7 +5075,7 @@ CT_Members.prototype.readAttributes = function(attr, uq) {
 };
 CT_Members.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("member" == elem) {
+	if ("member" === elem) {
 		newContext = new CT_Member();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5129,19 +5106,19 @@ CT_AutoFilter.prototype.readAttributes = function(attr, uq) {
 };
 CT_AutoFilter.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("filterColumn" == elem) {
+	if ("filterColumn" === elem) {
 		newContext = new CT_FilterColumn();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.filterColumn.push(newContext);
-	} else if ("sortState" == elem) {
+	} else if ("sortState" === elem) {
 		newContext = new CT_SortState();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.sortState = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5170,7 +5147,7 @@ CT_PCDSCPage.prototype.readAttributes = function(attr, uq) {
 };
 CT_PCDSCPage.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("pageItem" == elem) {
+	if ("pageItem" === elem) {
 		newContext = new CT_PageItem();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5300,7 +5277,7 @@ CT_DiscretePr.prototype.readAttributes = function(attr, uq) {
 };
 CT_DiscretePr.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("x" == elem) {
+	if ("x" === elem) {
 		newContext = new CT_Index();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5331,37 +5308,37 @@ CT_GroupItems.prototype.readAttributes = function(attr, uq) {
 };
 CT_GroupItems.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("b" == elem) {
+	if ("b" === elem) {
 		newContext = new CT_Boolean();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("d" == elem) {
+	} else if ("d" === elem) {
 		newContext = new CT_DateTime();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("e" == elem) {
+	} else if ("e" === elem) {
 		newContext = new CT_Error();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("m" == elem) {
+	} else if ("m" === elem) {
 		newContext = new CT_Missing();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("n" == elem) {
+	} else if ("n" === elem) {
 		newContext = new CT_Number();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.Items.push(newContext);
-	} else if ("s" == elem) {
+	} else if ("s" === elem) {
 		newContext = new CT_String();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5373,7 +5350,7 @@ CT_GroupItems.prototype.onStartNode = function(elem, attr, uq) {
 	return newContext;
 };
 CT_GroupItems.prototype.onTextNode = function(text, uq) {
-	if ("Items" == this._curElem) {
+	if ("Items" === this._curElem) {
 		this.Items = uq(text);
 	}
 };
@@ -5425,13 +5402,13 @@ CT_GroupLevel.prototype.readAttributes = function(attr, uq) {
 };
 CT_GroupLevel.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("groups" == elem) {
+	if ("groups" === elem) {
 		newContext = new CT_Groups();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.groups = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5460,7 +5437,7 @@ CT_PivotAreaReferences.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotAreaReferences.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("reference" == elem) {
+	if ("reference" === elem) {
 		newContext = new CT_PivotAreaReference();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5664,43 +5641,43 @@ CT_FilterColumn.prototype.readAttributes = function(attr, uq) {
 };
 CT_FilterColumn.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("colorFilter" == elem) {
+	if ("colorFilter" === elem) {
 		newContext = new CT_ColorFilter();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.colorFilter = newContext;
-	} else if ("customFilters" == elem) {
+	} else if ("customFilters" === elem) {
 		newContext = new CT_CustomFilters();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.customFilters = newContext;
-	} else if ("dynamicFilter" == elem) {
+	} else if ("dynamicFilter" === elem) {
 		newContext = new CT_DynamicFilter();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.dynamicFilter = newContext;
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.extLst = newContext;
-	} else if ("filters" == elem) {
+	} else if ("filters" === elem) {
 		newContext = new CT_Filters();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.filters = newContext;
-	} else if ("iconFilter" == elem) {
+	} else if ("iconFilter" === elem) {
 		newContext = new CT_IconFilter();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.iconFilter = newContext;
-	} else if ("top10" == elem) {
+	} else if ("top10" === elem) {
 		newContext = new CT_Top10();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5748,13 +5725,13 @@ CT_SortState.prototype.readAttributes = function(attr, uq) {
 };
 CT_SortState.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("sortCondition" == elem) {
+	if ("sortCondition" === elem) {
 		newContext = new CT_SortCondition();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.sortCondition.push(newContext);
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5797,7 +5774,7 @@ CT_Groups.prototype.readAttributes = function(attr, uq) {
 };
 CT_Groups.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("group" == elem) {
+	if ("group" === elem) {
 		newContext = new CT_LevelGroup();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5907,13 +5884,13 @@ CT_PivotAreaReference.prototype.readAttributes = function(attr, uq) {
 };
 CT_PivotAreaReference.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("x" == elem) {
+	if ("x" === elem) {
 		newContext = new CT_Index();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.x.push(newContext);
-	} else if ("extLst" == elem) {
+	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -5961,7 +5938,7 @@ CT_CustomFilters.prototype.readAttributes = function(attr, uq) {
 };
 CT_CustomFilters.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("customFilter" == elem) {
+	if ("customFilter" === elem) {
 		newContext = new CT_CustomFilter();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -6031,13 +6008,13 @@ CT_Filters.prototype.readAttributes = function(attr, uq) {
 };
 CT_Filters.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("filter" == elem) {
+	if ("filter" === elem) {
 		newContext = new CT_Filter();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
 		this.filter.push(newContext);
-	} else if ("dateGroupItem" == elem) {
+	} else if ("dateGroupItem" === elem) {
 		newContext = new CT_DateGroupItem();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -6187,7 +6164,7 @@ CT_LevelGroup.prototype.readAttributes = function(attr, uq) {
 };
 CT_LevelGroup.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("groupMembers" == elem) {
+	if ("groupMembers" === elem) {
 		newContext = new CT_GroupMembers();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
@@ -6299,7 +6276,7 @@ CT_GroupMembers.prototype.readAttributes = function(attr, uq) {
 };
 CT_GroupMembers.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("groupMember" == elem) {
+	if ("groupMember" === elem) {
 		newContext = new CT_GroupMember();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
