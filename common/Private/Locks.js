@@ -813,6 +813,16 @@ if(typeof CPresentation !== "undefined")
             this.slideSizeLock.Lock.Check(check_obj);
         }
 
+        if(CheckType === AscCommon.changestype_PresDefaultLang )
+        {
+            var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.defaultTextStyleLock.Get_Id(),
+                    "guid": this.defaultTextStyleLock.Get_Id()
+                };
+        }
+
         var bResult = AscCommon.CollaborativeEditing.OnEnd_CheckLock();
 
         if ( true === bResult )

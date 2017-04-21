@@ -6,6 +6,7 @@
         "../common/commonDefines.js",
 		"../common/docscoapicommon.js",
         "../common/docscoapi.js",
+		"../common/spellcheckapi.js",
 		"../common/apiCommon.js",
 		"../common/SerializeCommonWordExcel.js",
         "../common/editorscommon.js",

@@ -3126,10 +3126,35 @@
 		return this.image;
 	};
 
-	/*
-	 * Export
-	 * -----------------------------------------------------------------------------
-	 */
+
+    function asc_CSpellCheckProperty(Word, Checked, Variants, ParaId, ElemId)
+    {
+        this.Word     = Word;
+        this.Checked  = Checked;
+        this.Variants = Variants;
+
+        this.ParaId = ParaId;
+        this.ElemId = ElemId;
+    }
+
+    asc_CSpellCheckProperty.prototype.get_Word     = function()
+    {
+        return this.Word;
+    };
+    asc_CSpellCheckProperty.prototype.get_Checked  = function()
+    {
+        return this.Checked;
+    };
+    asc_CSpellCheckProperty.prototype.get_Variants = function()
+    {
+        return this.Variants;
+    };
+
+
+    /*
+     * Export
+     * -----------------------------------------------------------------------------
+     */
 	window['AscCommon'] = window['AscCommon'] || {};
 	window['Asc'] = window['Asc'] || {};
 
@@ -3841,4 +3866,10 @@
 	prot["asc_getName"] = prot["get_Name"] = prot.asc_getName;
 	prot["asc_getType"] = prot["get_Type"] = prot.asc_getType;
 	prot["asc_getImage"] = prot.asc_getImage;
+
+    window["AscCommon"].asc_CSpellCheckProperty = asc_CSpellCheckProperty;
+    prot = asc_CSpellCheckProperty.prototype;
+    prot["get_Word"] = prot.get_Word;
+    prot["get_Checked"] = prot.get_Checked;
+    prot["get_Variants"] = prot.get_Variants;
 })(window);

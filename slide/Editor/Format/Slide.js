@@ -1073,19 +1073,6 @@ Slide.prototype =
             this.graphicObjects.drawSelect(0, this.presentation.DrawingDocument);
     },
 
-
-    addAllCommentsToInterface: function()
-    {
-        if(this.slideComments)
-        {
-            var aComments = this.slideComments.comments;
-            for(var i = aComments.length - 1; i > -1; --i )
-            {
-                editor.sync_AddComment( aComments[i].Get_Id(), aComments[i].Data);
-            }
-        }
-    },
-
     removeAllCommentsToInterface: function()
     {
         if(this.slideComments)
@@ -1350,6 +1337,23 @@ Slide.prototype =
         }
 
         this.writecomments = [];
+    },
+
+
+    Restart_CheckSpelling: function()
+    {
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            this.cSld.spTree[i].Restart_CheckSpelling();
+        }
+        if(this.notes)
+        {
+            var spTree = this.notes.cSld.spTree;
+            for(i = 0; i < spTree.length; ++i)
+            {
+                spTree[i].Restart_CheckSpelling();
+            }
+        }
     }
 };
 

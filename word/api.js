@@ -4875,32 +4875,9 @@ background-repeat: no-repeat;\
 	//-----------------------------------------------------------------
 	// Функции для работы с орфографией
 	//-----------------------------------------------------------------
-	function asc_CSpellCheckProperty(Word, Checked, Variants, ParaId, ElemId)
-	{
-		this.Word     = Word;
-		this.Checked  = Checked;
-		this.Variants = Variants;
-
-		this.ParaId = ParaId;
-		this.ElemId = ElemId;
-	}
-
-	asc_CSpellCheckProperty.prototype.get_Word     = function()
-	{
-		return this.Word;
-	};
-	asc_CSpellCheckProperty.prototype.get_Checked  = function()
-	{
-		return this.Checked;
-	};
-	asc_CSpellCheckProperty.prototype.get_Variants = function()
-	{
-		return this.Variants;
-	};
-
 	asc_docs_api.prototype.sync_SpellCheckCallback = function(Word, Checked, Variants, ParaId, ElemId)
 	{
-		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.SpellCheck, new asc_CSpellCheckProperty(Word, Checked, Variants, ParaId, ElemId));
+		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.SpellCheck, new AscCommon.asc_CSpellCheckProperty(Word, Checked, Variants, ParaId, ElemId));
 	};
 
 	asc_docs_api.prototype.sync_SpellCheckVariantsFound = function()
@@ -8093,9 +8070,6 @@ background-repeat: no-repeat;\
 	CHyperlinkProperty.prototype['put_ToolTip']           = CHyperlinkProperty.prototype.put_ToolTip;
 	CHyperlinkProperty.prototype['get_Text']              = CHyperlinkProperty.prototype.get_Text;
 	CHyperlinkProperty.prototype['put_Text']              = CHyperlinkProperty.prototype.put_Text;
-	asc_CSpellCheckProperty.prototype['get_Word']         = asc_CSpellCheckProperty.prototype.get_Word;
-	asc_CSpellCheckProperty.prototype['get_Checked']      = asc_CSpellCheckProperty.prototype.get_Checked;
-	asc_CSpellCheckProperty.prototype['get_Variants']     = asc_CSpellCheckProperty.prototype.get_Variants;
 	window['Asc']['asc_CCommentDataWord']                 = asc_CCommentDataWord;
 	asc_CCommentDataWord.prototype['asc_getText']         = asc_CCommentDataWord.prototype.asc_getText;
 	asc_CCommentDataWord.prototype['asc_putText']         = asc_CCommentDataWord.prototype.asc_putText;

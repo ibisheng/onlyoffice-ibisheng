@@ -187,12 +187,12 @@
         oSp.setParent(oN);
         oN.addToSpTreeToPos(0, oSp);
 
-        var oSp = new AscFormat.CShape();
-        var oNvSpPr = new AscFormat.UniNvPr();
-        var oCNvPr = oNvSpPr.cNvPr;
+        oSp = new AscFormat.CShape();
+        oNvSpPr = new AscFormat.UniNvPr();
+        oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(3);
         oCNvPr.setName("Notes Placeholder 2");
-        var oPh = new AscFormat.Ph();
+        oPh = new AscFormat.Ph();
         oPh.setType(AscFormat.phType_body);
         oPh.setIdx(1);
         oNvSpPr.nvPr.setPh(oPh);
@@ -208,12 +208,12 @@
         oSp.setParent(oN);
         oN.addToSpTreeToPos(1, oSp);
 
-        var oSp = new AscFormat.CShape();
-        var oNvSpPr = new AscFormat.UniNvPr();
-        var oCNvPr = oNvSpPr.cNvPr;
+        oSp = new AscFormat.CShape();
+        oNvSpPr = new AscFormat.UniNvPr();
+        oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(4);
         oCNvPr.setName("Slide Number Placeholder 3");
-        var oPh = new AscFormat.Ph();
+        oPh = new AscFormat.Ph();
         oPh.setType(AscFormat.phType_sldNum);
         oPh.setSz(2);
         oPh.setIdx(10);
@@ -223,9 +223,9 @@
         oSp.setSpPr(new AscFormat.CSpPr());
         oSp.spPr.setParent(oSp);
         oSp.createTextBody();
-        var oBodyPr = new AscFormat.CBodyPr();
+        oBodyPr = new AscFormat.CBodyPr();
         oSp.txBody.setBodyPr(oBodyPr);
-        var oTxLstStyle = new AscFormat.TextListStyle();
+        oTxLstStyle = new AscFormat.TextListStyle();
         oSp.txBody.setLstStyle(oTxLstStyle);
         oSp.setParent(oN);
         oN.addToSpTreeToPos(2, oSp);

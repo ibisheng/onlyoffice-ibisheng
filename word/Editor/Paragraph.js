@@ -134,7 +134,7 @@ function Paragraph(DrawingDocument, Parent, bFromPresentation)
     if ( undefined !== DrawingDocument && null !== DrawingDocument )
     {
         this.DrawingDocument = DrawingDocument;
-        this.LogicDocument   = bFromPresentation ? null : this.DrawingDocument.m_oLogicDocument;
+        this.LogicDocument   = this.DrawingDocument.m_oLogicDocument;
         this.bFromDocument   = bFromPresentation === true ? false : !!this.LogicDocument;
     }   
     else
@@ -2116,19 +2116,19 @@ Paragraph.prototype.Internal_Draw_5 = function(CurPage, pGraphics, Pr, BgColor)
 					pGraphics.AddSmartRect(Element.x0, Page.Y + Line.Top, Element.x1 - Element.x0, Line.Bottom - Line.Top, 0);
 					Element = aCollChange.Get_Next();
 				}
-				// Рисуем подчеркивание орфографии
-				if (this.LogicDocument && true === this.LogicDocument.Spelling.Use)
-				{
-					pGraphics.p_color(255, 0, 0, 255);
-					var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
-					Element       = aSpelling.Get_Next();
-					while (null != Element)
-					{
-						pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
-						Element = aSpelling.Get_Next();
-					}
-				}
 			}
+            // Рисуем подчеркивание орфографии
+            if (this.LogicDocument && true === this.LogicDocument.Spelling.Use)
+            {
+                pGraphics.p_color(255, 0, 0, 255);
+                var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
+                Element       = aSpelling.Get_Next();
+                while (null != Element)
+                {
+                    pGraphics.DrawSpellingLine(Element.y0, Element.x0, Element.x1, SpellingW);
+                    Element = aSpelling.Get_Next();
+                }
+            }
 		}
 
 		if (pGraphics.End_Command)
@@ -9340,7 +9340,7 @@ Paragraph.prototype.Document_UpdateInterfaceState = function()
 		EndPos     = CurPos;
 	}
 
-	if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use && selectionflag_Numbering !== this.Selection.Flag)
+	if (this.LogicDocument && true === this.LogicDocument.Spelling.Use && selectionflag_Numbering !== this.Selection.Flag)
 		this.SpellChecker.Document_UpdateInterfaceState(StartPos, EndPos);
 
 	if (true === this.Selection.Use)
@@ -10527,7 +10527,7 @@ Paragraph.prototype.Read_FromBinary2 = function(Reader)
 		if (undefined !== DrawingDocument && null !== DrawingDocument)
 		{
 			this.DrawingDocument = DrawingDocument;
-			this.LogicDocument   = this.bFromDocument ? this.DrawingDocument.m_oLogicDocument : null;
+			this.LogicDocument   = this.DrawingDocument.m_oLogicDocument;
 		}
 	}
 	else

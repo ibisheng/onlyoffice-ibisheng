@@ -796,6 +796,12 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
     }
 };
 
+CShape.prototype.OnContentReDraw = function(){
+    if(AscCommonSlide && this.parent instanceof AscCommonSlide.Slide){
+        editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(this.parent.num, editor.WordControl.m_oLogicDocument.Slides[this.parent.num]);
+    }
+};
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].G_O_DEFAULT_COLOR_MAP = G_O_DEFAULT_COLOR_MAP;

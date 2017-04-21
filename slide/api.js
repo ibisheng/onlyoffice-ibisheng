@@ -568,11 +568,18 @@
 		this.tmpViewRulers = null;
 		this.tmpZoomType   = null;
 
-		this.DocumentUrl     = "";
+        // Spell Checking
+        this.SpellCheckApi      = new AscCommon.CSpellCheckApi();
+        this.isSpellCheckEnable = true;
+
+
+        this.DocumentUrl     = "";
 		this.bNoSendComments = false;
 
 		this.isApplyChangesOnOpen        = false;
 		this.isApplyChangesOnOpenEnabled = true;
+
+        this.IsSpellCheckCurrentWord = false;
 
 		this.IsSupportEmptyPresentation = true;
 
@@ -995,7 +1002,76 @@
 	};
 
 
-	asc_docs_api.prototype.pre_Save = function(_images)
+    /////////////////////////////////////////////////////////////////////////
+    //////////////////////////SpellChecking api//////////////////////////////
+    /////////////////////////////////////////////////////////////////////////
+    // Init SpellCheck
+    asc_docs_api.prototype._coSpellCheckInit = function()
+    {
+        if (!this.SpellCheckApi)
+        {
+            return; // Error
+        }
+
+        var t = this;
+        if (window["AscDesktopEditor"]) {
+            this.SpellCheckApi.spellCheck = function (spellData) {
+                window["AscDesktopEditor"]["SpellCheck"](spellData);
+            };
+            this.SpellCheckApi.disconnect = function () {
+            };
+        } else {
+            if (this.SpellCheckUrl && this.isSpellCheckEnable) {
+                this.SpellCheckApi.set_url(this.SpellCheckUrl);
+            }
+        }
+
+        this.SpellCheckApi.onInit = function (e) {
+            t.sendEvent('asc_onSpellCheckInit', e);
+        };
+        this.SpellCheckApi.onSpellCheck = function (e) {
+            t.SpellCheck_CallBack(e);
+        };
+        this.SpellCheckApi.init(this.documentId);
+    };
+    //----------------------------------------------------------------------------------------------------------------------
+    // SpellCheck_CallBack
+    //          Функция ответа от сервера.
+    //----------------------------------------------------------------------------------------------------------------------
+    asc_docs_api.prototype.SpellCheck_CallBack = function(Obj)
+    {
+        if (undefined != Obj && undefined != Obj["ParagraphId"])
+        {
+            var ParaId    = Obj["ParagraphId"];
+            var Paragraph = g_oTableId.Get_ById(ParaId);
+            var Type      = Obj["type"];
+            if (null != Paragraph)
+            {
+                if ("spell" === Type)
+                {
+                    Paragraph.SpellChecker.Check_CallBack(Obj["RecalcId"], Obj["usrCorrect"]);
+                    Paragraph.ReDraw();
+                }
+                else if ("suggest" === Type)
+                {
+                    Paragraph.SpellChecker.Check_CallBack2(Obj["RecalcId"], Obj["ElementId"], Obj["usrSuggest"]);
+                    this.sync_SpellCheckVariantsFound();
+                }
+            }
+        }
+    };
+
+    asc_docs_api.prototype.asc_SpellCheckDisconnect   = function()
+    {
+        if (!this.SpellCheckApi)
+            return; // Error
+        this.SpellCheckApi.disconnect();
+        this.isSpellCheckEnable = false;
+        if (this.WordControl.m_oLogicDocument)
+            this.WordControl.m_oLogicDocument.TurnOff_CheckSpelling();
+    };
+
+    asc_docs_api.prototype.pre_Save = function(_images)
 	{
 		this.isSaveFonts_Images = true;
 		this.saveImageMap       = _images;
@@ -3135,7 +3211,7 @@ background-repeat: no-repeat;\
 		this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.Paragraph, new Asc.asc_CParagraphProperty(prProp));
 	};
 
-	asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
+    asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
 	{
 		this.WordControl.m_oDrawingDocument.InitGuiCanvasTextProps(element_id);
 		this.WordControl.m_oDrawingDocument.DrawGuiCanvasTextProps(props);
@@ -5079,6 +5155,15 @@ background-repeat: no-repeat;\
 	{
 	};
 
+    asc_docs_api.prototype["asc_IsSpellCheckCurrentWord"]  = function()
+    {
+        return this.IsSpellCheckCurrentWord;
+    };
+    asc_docs_api.prototype["asc_putSpellCheckCurrentWord"] = function(value)
+    {
+        this.IsSpellCheckCurrentWord = value;
+    };
+
 	asc_docs_api.prototype.groupShapes = function()
 	{
 		this.WordControl.m_oLogicDocument.groupShapes();
@@ -5286,21 +5371,92 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onDialogAddHyperlink");
 	};
 
+    //-----------------------------------------------------------------
+    // Функции для работы с орфографией
+    //-----------------------------------------------------------------
+    asc_docs_api.prototype.sync_SpellCheckCallback = function(Word, Checked, Variants, ParaId, ElemId)
+    {
+        this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject(c_oAscTypeSelectElement.SpellCheck, new AscCommon.asc_CSpellCheckProperty(Word, Checked, Variants, ParaId, ElemId));
+    };
 
-	asc_docs_api.prototype.GoToFooter             = function(pageNumber)
-	{
-		if (this.WordControl.m_oDrawingDocument.IsFreezePage(pageNumber))
-			return;
+    asc_docs_api.prototype.sync_SpellCheckVariantsFound = function()
+    {
+        this.sendEvent("asc_onSpellCheckVariantsFound");
+    };
 
-		var oldClickCount            = global_mouseEvent.ClickCount;
-		global_mouseEvent.ClickCount = 2;
-		this.WordControl.m_oLogicDocument.OnMouseDown(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
-		this.WordControl.m_oLogicDocument.OnMouseUp(global_mouseEvent, 0, AscCommon.Page_Height, pageNumber);
+    asc_docs_api.prototype.asc_replaceMisspelledWord = function(Word, SpellCheckProperty)
+    {
+        if(this.WordControl.m_oLogicDocument){
+            this.WordControl.m_oLogicDocument.replaceMisspelledWord(Word, SpellCheckProperty);
+		}
+    };
 
-		this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    asc_docs_api.prototype.asc_ignoreMisspelledWord = function(SpellCheckProperty, bAll)
+    {
+        if (false === bAll)
+        {
+            var ParaId = SpellCheckProperty.ParaId;
+            var ElemId = SpellCheckProperty.ElemId;
 
-		global_mouseEvent.ClickCount = oldClickCount;
-	};
+            var Paragraph = g_oTableId.Get_ById(ParaId);
+            if (null != Paragraph)
+            {
+                Paragraph.Ignore_MisspelledWord(ElemId);
+            }
+        }
+        else
+        {
+            var LogicDocument = editor.WordControl.m_oLogicDocument;
+            LogicDocument.Spelling.Add_Word(SpellCheckProperty.Word);
+            LogicDocument.DrawingDocument.ClearCachePages();
+            LogicDocument.DrawingDocument.FirePaint();
+        }
+    };
+
+    asc_docs_api.prototype.asc_setDefaultLanguage = function(Lang)
+    {
+        if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
+        {
+            History.Create_NewPoint(AscDFH.historydescription_Document_SetDefaultLanguage);
+            editor.WordControl.m_oLogicDocument.Set_DefaultLanguage(Lang);
+        }
+    };
+
+    asc_docs_api.prototype.asc_getDefaultLanguage = function()
+    {
+        return editor.WordControl.m_oLogicDocument.Get_DefaultLanguage();
+    };
+
+    asc_docs_api.prototype.asc_getKeyboardLanguage = function()
+    {
+        if (undefined !== window["asc_current_keyboard_layout"])
+            return window["asc_current_keyboard_layout"];
+        return -1;
+    };
+
+    asc_docs_api.prototype.asc_setSpellCheck = function(isOn)
+    {
+        if (editor.WordControl.m_oLogicDocument)
+        {
+            editor.WordControl.m_oLogicDocument.Spelling.Use = isOn;
+            editor.WordControl.m_oDrawingDocument.ClearCachePages();
+            editor.WordControl.m_oDrawingDocument.FirePaint();
+        }
+    };
+
+    asc_docs_api.prototype.spellCheck = function(rdata)
+    {
+        //console.log("start - " + rdata);
+        // ToDo проверка на подключение
+        switch (rdata.type)
+        {
+            case "spell":
+            case "suggest":
+                this.SpellCheckApi.spellCheck(JSON.stringify(rdata));
+                break;
+        }
+    };
+
 	asc_docs_api.prototype.sync_shapePropCallback = function(pr)
 	{
 		var obj = AscFormat.CreateAscShapePropFromProp(pr);
@@ -6825,7 +6981,14 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_GoToInternalHyperlink']           = asc_docs_api.prototype.asc_GoToInternalHyperlink;
 	asc_docs_api.prototype['sync_CanAddHyperlinkCallback']        = asc_docs_api.prototype.sync_CanAddHyperlinkCallback;
 	asc_docs_api.prototype['sync_DialogAddHyperlink']             = asc_docs_api.prototype.sync_DialogAddHyperlink;
-	asc_docs_api.prototype['GoToFooter']                          = asc_docs_api.prototype.GoToFooter;
+    asc_docs_api.prototype['sync_SpellCheckCallback']             = asc_docs_api.prototype.sync_SpellCheckCallback;
+    asc_docs_api.prototype['sync_SpellCheckVariantsFound']        = asc_docs_api.prototype.sync_SpellCheckVariantsFound;
+    asc_docs_api.prototype['asc_replaceMisspelledWord']           = asc_docs_api.prototype.asc_replaceMisspelledWord;
+    asc_docs_api.prototype['asc_ignoreMisspelledWord']            = asc_docs_api.prototype.asc_ignoreMisspelledWord;
+    asc_docs_api.prototype['asc_setDefaultLanguage']              = asc_docs_api.prototype.asc_setDefaultLanguage;
+    asc_docs_api.prototype['asc_getDefaultLanguage']              = asc_docs_api.prototype.asc_getDefaultLanguage;
+    asc_docs_api.prototype['asc_getKeyboardLanguage']             = asc_docs_api.prototype.asc_getKeyboardLanguage;
+    asc_docs_api.prototype['asc_setSpellCheck']                   = asc_docs_api.prototype.asc_setSpellCheck;
 	asc_docs_api.prototype['sync_shapePropCallback']              = asc_docs_api.prototype.sync_shapePropCallback;
 	asc_docs_api.prototype['sync_slidePropCallback']              = asc_docs_api.prototype.sync_slidePropCallback;
 	asc_docs_api.prototype['ExitHeader_Footer']                   = asc_docs_api.prototype.ExitHeader_Footer;

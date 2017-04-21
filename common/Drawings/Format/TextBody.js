@@ -413,7 +413,12 @@ CTextBody.prototype =
     },
 
     OnContentReDraw: function()
-    {},
+    {
+        if(this.parent && this.parent.OnContentReDraw)
+        {
+            this.parent.OnContentReDraw();
+        }
+    },
 
     Get_StartPage_Absolute: function()
     {
@@ -706,6 +711,14 @@ CTextBody.prototype =
             return this.parent.transformText.CreateDublicate();
         }
         return null;
+    },
+
+    Is_ThisElementCurrent: function () {
+        if(this.parent && this.parent.Is_ThisElementCurrent)
+        {
+            return this.parent.Is_ThisElementCurrent();
+        }
+        return false;
     }
 };
 

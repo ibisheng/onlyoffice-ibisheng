@@ -382,7 +382,7 @@ AscDFH.changesFactory[AscDFH.historyitem_Presentation_SlideSize] = AscDFH.CChang
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_ChangeColorScheme] = AscDFH.CChangesDrawingChangeTheme      ;
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_RemoveSlide] = AscDFH.CChangesDrawingsContentPresentation         ;
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_AddSlide] = AscDFH.CChangesDrawingsContentPresentation         ;
-
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_SetDefaultTextStyle] = AscFormat.CChangesDrawingsObjectNoId;
 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SetShowPr] = function(oClass, value){oClass.showPr  = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SlideSize] = function(oClass, value){oClass.Width = value.a; oClass.Height = value.b; oClass.changeSlideSizeFunction(oClass.Width, oClass.Height);};
@@ -394,6 +394,9 @@ AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_AddSlideMaster] = f
 
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SetShowPr] = CShowPr;
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SlideSize] = AscFormat.CDrawingBaseCoordsWritable;
+
+
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SetDefaultTextStyle] = function(oClass, value){oClass.defaultTextStyle = value;};
 
 function CPresentation(DrawingDocument)
 {
@@ -472,7 +475,6 @@ function CPresentation(DrawingDocument)
 
     this.Width = 254;
     this.Height = 142;
-    this.updateSlideIndex = false;
     this.recalcMap = {};
     this.bClearSearch = true;
     this.bNeedUpdateTh = false;
@@ -500,13 +502,16 @@ function CPresentation(DrawingDocument)
 
     this.Spelling = new CDocumentSpelling();
 
+
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
    //
    this.themeLock = new PropLocker(this.Id);
    this.schemeLock = new PropLocker(this.Id);
    this.slideSizeLock = new PropLocker(this.Id);
+   this.defaultTextStyleLock = new PropLocker(this.Id);
 
+    this.RecalcId     = 0; // Номер пересчета
     this.CommentAuthors = {};
     this.createDefaultTableStyles();
     this.bGoToPage = false;
@@ -527,6 +532,10 @@ CPresentation.prototype =
      * @returns {boolean} Начался или нет составной ввод.
      */
 
+    Is_ThisElementCurrent: function()
+    {
+        return false;
+    },
 
     TurnOffCheckChartSelection: function(){
     },
@@ -534,7 +543,73 @@ CPresentation.prototype =
     TurnOnCheckChartSelection: function(){
     },
 
-    Get_DrawingDocument: function(){
+    setDefaultTextStyle: function(oStyle)
+    {
+        History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_Presentation_SetDefaultTextStyle, this.defaultTextStyle, oStyle));
+        this.defaultTextStyle = oStyle;
+    },
+
+    Set_DefaultLanguage: function(NewLangId)
+    {
+        var oTextStyle = this.defaultTextStyle ? this.defaultTextStyle.createDuplicate() : new AscFormat.TextListStyle();
+        if(!oTextStyle.levels[9])
+        {
+            oTextStyle.levels[9] = new CParaPr();
+        }
+        if(!oTextStyle.levels[9].DefaultRunPr)
+        {
+            oTextStyle.levels[9].DefaultRunPr = new CTextPr();
+        }
+        oTextStyle.levels[9].DefaultRunPr.Lang.Val = NewLangId;
+        this.setDefaultTextStyle(oTextStyle);
+        this.Restart_CheckSpelling();
+        this.Document_UpdateInterfaceState();
+    },
+
+    Get_DefaultLanguage: function()
+    {
+        var oTextPr = null;
+        if(this.defaultTextStyle && this.defaultTextStyle.levels[9])
+        {
+            oTextPr = this.defaultTextStyle.levels[9].DefaultRunPr;
+        }
+        return oTextPr && oTextPr.Lang.Val ? oTextPr.Lang.Val : 1033;
+    },
+
+    Restart_CheckSpelling: function()
+    {
+        this.Spelling.Reset();
+        for(var i = 0; i < this.Slides.length; ++i)
+        {
+            this.Slides[i].Restart_CheckSpelling();
+        }
+    },
+
+
+
+    Stop_CheckSpelling: function()
+    {
+        this.Spelling.Reset();
+    },
+
+    Continue_CheckSpelling: function()
+    {
+        this.Spelling.Continue_CheckSpelling();
+    },
+
+    TurnOff_CheckSpelling: function()
+    {
+        this.Spelling.TurnOff();
+    },
+
+    TurnOn_CheckSpelling: function()
+    {
+        this.Spelling.TurnOn();
+    },
+
+
+    Get_DrawingDocument: function()
+    {
         return this.DrawingDocument;
     },
 
@@ -592,6 +667,26 @@ CPresentation.prototype =
         return false;
     },
 
+
+    IsFillingFormMode: function()
+    {
+        return false;
+    },
+
+    Reset_WordSelection: function()
+    {
+        this.WordSelected = false;
+    },
+
+    Set_WordSelection: function()
+    {
+        this.WordSelected = true;
+    },
+
+    Is_WordSelection: function()
+    {
+        return this.WordSelected;
+    },
 
     addCompositeText: function(nCharCode){
         // TODO: При таком вводе не меняется язык в зависимости от раскладки, не учитывается режим рецензирования.
@@ -889,9 +984,22 @@ CPresentation.prototype =
         return ret;
     },
 
+    replaceMisspelledWord: function(Word, SpellCheckProperty){
+        var ParaId = SpellCheckProperty.ParaId;
+        var ElemId = SpellCheckProperty.ElemId;
+        var Paragraph = g_oTableId.Get_ById(ParaId);
+        Paragraph.Document_SetThisElementCurrent(true);
+        if(this.Slides[this.CurPage]){
+            this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(function(){
+                Paragraph.Replace_MisspelledWord(Word, ElemId);
+            }, [], false, AscDFH.historydescription_Document_ReplaceMisspelledWord);
+        }
+    },
+
 
     Recalculate : function(RecalcData)
     {
+        ++this.RecalcId;
         if (undefined === RecalcData)
         {
             // Проверяем можно ли сделать быстрый пересчет
@@ -1150,13 +1258,8 @@ CPresentation.prototype =
     // Вызываем перерисовку нужных страниц
     ReDraw : function(StartPage, EndPage)
     {
-        if ( "undefined" === typeof(StartPage) )
-            StartPage = 0;
-        if ( "undefined" === typeof(EndPage) )
-            EndPage = this.DrawingDocument.m_lCountCalculatePages;
 
-        for ( var CurPage = StartPage; CurPage <= EndPage; CurPage++ )
-            this.DrawingDocument.OnRepaintPage( CurPage );
+        this.DrawingDocument.OnRecalculatePage(StartPage, this.Slides[StartPage]);
     },
 
     DrawPage : function(nPageIndex, pGraphics)

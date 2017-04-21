@@ -166,7 +166,7 @@ ParaRun.prototype.Copy = function(Selected)
 
     NewRun.Set_Pr( this.Pr.Copy() );
 
-    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+    if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         NewRun.Set_ReviewType(reviewtype_Add);
 
     if(true === bMath)
@@ -357,7 +357,7 @@ ParaRun.prototype.Is_StartFromNewLine = function()
 // Добавляем элемент в текущую позицию
 ParaRun.prototype.Add = function(Item, bMath)
 {
-	if (this.Paragraph && this.Paragraph.LogicDocument)
+	if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
 	{
 		// Специальный код, связанный с обработкой изменения языка ввода при наборе.
 		if (true === this.Paragraph.LogicDocument.CheckLanguageOnTextAdd && editor)
@@ -551,7 +551,7 @@ ParaRun.prototype.private_SplitRunInCurPos = function()
 };
 ParaRun.prototype.private_IsCurPosNearFootnoteReference = function()
 {
-	if (this.Paragraph && this.Paragraph.LogicDocument)
+	if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
 	{
 		var oStyles = this.Paragraph.LogicDocument.Get_Styles();
 		var nCurPos = this.State.ContentPos;
@@ -1820,7 +1820,7 @@ ParaRun.prototype.Remove_DrawingObject = function(Id)
         if ( para_Drawing === Element.Type && Id === Element.Get_Id() )
         {
             var TrackRevisions = null;
-            if (this.Paragraph && this.Paragraph.LogicDocument)
+            if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
                 TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
 
             if (true === TrackRevisions)
@@ -3849,7 +3849,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_End:
             {
                 var SectPr = PRSA.Paragraph.Get_SectionPr();
-                if (!PRSA.Paragraph.LogicDocument || PRSA.Paragraph.LogicDocument !== PRSA.Paragraph.Parent)
+                if (!PRSA.Paragraph.LogicDocument || PRSA.Paragraph.LogicDocument !== PRSA.Paragraph.Parent || !PRSA.Paragraph.bFromDocument)
                     SectPr = undefined;
 
                 if ( undefined !== SectPr )
@@ -6232,7 +6232,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
 ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     var bReview = false;
-    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+    if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         bReview = true;
 
     var ReviewType = this.Get_ReviewType();
@@ -8718,7 +8718,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeContent = function(bUpdateI
     {
         this.private_UpdateTrackRevisions();
 
-        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions() && this.ReviewInfo && true === this.ReviewInfo.Is_CurrentUser())
+        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions() && this.ReviewInfo && true === this.ReviewInfo.Is_CurrentUser())
         {
             var OldReviewInfo = this.ReviewInfo.Copy();
             this.ReviewInfo.Update();
@@ -8732,7 +8732,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeTextPr = function(bUpdateIn
     {
         this.private_UpdateTrackRevisions();
 
-        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         {
             var OldReviewInfo = this.Pr.ReviewInfo.Copy();
             this.Pr.ReviewInfo.Update();
@@ -8742,7 +8742,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeTextPr = function(bUpdateIn
 };
 ParaRun.prototype.private_UpdateTrackRevisions = function()
 {
-    if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.LogicDocument.Get_TrackRevisionsManager)
+    if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument && this.Paragraph.LogicDocument.Get_TrackRevisionsManager)
     {
         var RevisionsManager = this.Paragraph.LogicDocument.Get_TrackRevisionsManager();
         RevisionsManager.Check_Paragraph(this.Paragraph);
@@ -9088,7 +9088,7 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 		{
 			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
 			{
-				if (this.Paragraph && this.Paragraph.LogicDocument)
+				if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument)
 					this.Paragraph.LogicDocument.RemoveSelection();
 
 				this.State.ContentPos = nIndex;
@@ -9104,7 +9104,7 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 		{
 			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
 			{
-				if (this.Paragraph && this.Paragraph.LogicDocument)
+				if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument)
 					this.Paragraph.LogicDocument.RemoveSelection();
 
 				this.State.ContentPos = nIndex;
