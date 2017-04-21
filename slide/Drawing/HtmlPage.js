@@ -2480,6 +2480,12 @@ function CEditorPage(api)
 		this.m_bIsUpdateHorRuler = true;
 		this.m_bIsUpdateVerRuler = true;
 
+		if (this.m_bIsRuler)
+		{
+			this.UpdateHorRulerBack(true);
+			this.UpdateVerRulerBack(true);
+		}
+
 		this.m_oHorRuler.RepaintChecker.BlitAttack = true;
 		this.m_oVerRuler.RepaintChecker.BlitAttack = true;
 
