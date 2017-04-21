@@ -969,19 +969,17 @@ var editor;
 			AscCommon.PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
 		}
 	}).catch(function(err) {
-		alert(err)
+		t.sendEvent('asc_onError', c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 	});
   };
 	spreadsheet_api.prototype.openDocumentFromZip = function(wb) {
 		var t = this;
 		return new Promise(function(resolve, reject) {
-			console.time('all');
 			AscCommon.getJSZipUtils().getBinaryContent(t.documentUrl, function(err, data) {
 				if (err) {
 					reject(err); // or handle err
 				} else {
 					var doc = new openXml.OpenXmlPackage();
-					var context = {workbook: null, sharedString: null, sharedStringParsed: null, worksheets: null};
 					require('jszip').loadAsync(data).then(function(zip) {
 						return doc.openFromZip(zip);
 					}).then(function() {
@@ -1026,8 +1024,9 @@ var editor;
 							});
 						}, Promise.resolve());
 					}).then(function() {
-						console.timeEnd('all');
 						resolve();
+					}).catch(function(err) {
+						reject(err);
 					});
 				}
 			});

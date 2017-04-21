@@ -3,6 +3,9 @@
 function getBoolFromXml(val) {
 	return "0" !== val && "false" !== val && "off" !== val;
 }
+function getXmlFromBool(val) {
+	return val ? "1" : "0";
+}
 var st_sourcetypeWORKSHEET = 0;
 var st_sourcetypeEXTERNAL = 1;
 var st_sourcetypeCONSOLIDATION = 2;
@@ -266,6 +269,19 @@ function FromXml_ST_SourceType(val) {
 	}
 	return res;
 }
+function ToXml_ST_SourceType(val) {
+	var res = "";
+	if (st_sourcetypeWORKSHEET === val) {
+		res = "worksheet";
+	} else if (st_sourcetypeEXTERNAL === val) {
+		res = "external";
+	} else if (st_sourcetypeCONSOLIDATION === val) {
+		res = "consolidation";
+	} else if (st_sourcetypeSCENARIO === val) {
+		res = "scenario";
+	}
+	return res;
+}
 
 function FromXml_ST_Axis(val) {
 	var res = -1;
@@ -280,6 +296,19 @@ function FromXml_ST_Axis(val) {
 	}
 	return res;
 }
+function ToXml_ST_Axis(val) {
+	var res = "";
+	if (st_axisAXISROW === val) {
+		res = "axisRow";
+	} else if (st_axisAXISCOL === val) {
+		res = "axisCol";
+	} else if (st_axisAXISPAGE === val) {
+		res = "axisPage";
+	} else if (st_axisAXISVALUES === val) {
+		res = "axisValues";
+	}
+	return res;
+}
 
 function FromXml_ST_FieldSortType(val) {
 	var res = -1;
@@ -289,6 +318,17 @@ function FromXml_ST_FieldSortType(val) {
 		res = st_fieldsorttypeASCENDING;
 	} else if ("descending" === val) {
 		res = st_fieldsorttypeDESCENDING;
+	}
+	return res;
+}
+function ToXml_ST_FieldSortType(val) {
+	var res = "";
+	if (st_fieldsorttypeMANUAL === val) {
+		res = "manual";
+	} else if (st_fieldsorttypeASCENDING === val) {
+		res = "ascending";
+	} else if (st_fieldsorttypeDESCENDING === val) {
+		res = "descending";
 	}
 	return res;
 }
@@ -328,6 +368,41 @@ function FromXml_ST_ItemType(val) {
 	}
 	return res;
 }
+function ToXml_ST_ItemType(val) {
+	var res = "";
+	if (st_itemtypeDATA === val) {
+		res = "data";
+	} else if (st_itemtypeDEFAULT === val) {
+		res = "default";
+	} else if (st_itemtypeSUM === val) {
+		res = "sum";
+	} else if (st_itemtypeCOUNTA === val) {
+		res = "countA";
+	} else if (st_itemtypeAVG === val) {
+		res = "avg";
+	} else if (st_itemtypeMAX === val) {
+		res = "max";
+	} else if (st_itemtypeMIN === val) {
+		res = "min";
+	} else if (st_itemtypePRODUCT === val) {
+		res = "product";
+	} else if (st_itemtypeCOUNT === val) {
+		res = "count";
+	} else if (st_itemtypeSTDDEV === val) {
+		res = "stdDev";
+	} else if (st_itemtypeSTDDEVP === val) {
+		res = "stdDevP";
+	} else if (st_itemtypeVAR === val) {
+		res = "var";
+	} else if (st_itemtypeVARP === val) {
+		res = "varP";
+	} else if (st_itemtypeGRAND === val) {
+		res = "grand";
+	} else if (st_itemtypeBLANK === val) {
+		res = "blank";
+	}
+	return res;
+}
 
 function FromXml_ST_DataConsolidateFunction(val) {
 	var res = -1;
@@ -356,6 +431,33 @@ function FromXml_ST_DataConsolidateFunction(val) {
 	}
 	return res;
 }
+function ToXml_ST_DataConsolidateFunction(val) {
+	var res = "";
+	if (st_dataconsolidatefunctionAVERAGE === val) {
+		res = "average";
+	} else if (st_dataconsolidatefunctionCOUNT === val) {
+		res = "count";
+	} else if (st_dataconsolidatefunctionCOUNTNUMS === val) {
+		res = "countNums";
+	} else if (st_dataconsolidatefunctionMAX === val) {
+		res = "max";
+	} else if (st_dataconsolidatefunctionMIN === val) {
+		res = "min";
+	} else if (st_dataconsolidatefunctionPRODUCT === val) {
+		res = "product";
+	} else if (st_dataconsolidatefunctionSTDDEV === val) {
+		res = "stdDev";
+	} else if (st_dataconsolidatefunctionSTDDEVP === val) {
+		res = "stdDevp";
+	} else if (st_dataconsolidatefunctionSUM === val) {
+		res = "sum";
+	} else if (st_dataconsolidatefunctionVAR === val) {
+		res = "var";
+	} else if (st_dataconsolidatefunctionVARP === val) {
+		res = "varp";
+	}
+	return res;
+}
 
 function FromXml_ST_ShowDataAs(val) {
 	var res = -1;
@@ -380,6 +482,29 @@ function FromXml_ST_ShowDataAs(val) {
 	}
 	return res;
 }
+function ToXml_ST_ShowDataAs(val) {
+	var res = "";
+	if (st_showdataasNORMAL === val) {
+		res = "normal";
+	} else if (st_showdataasDIFFERENCE === val) {
+		res = "difference";
+	} else if (st_showdataasPERCENT === val) {
+		res = "percent";
+	} else if (st_showdataasPERCENTDIFF === val) {
+		res = "percentDiff";
+	} else if (st_showdataasRUNTOTAL === val) {
+		res = "runTotal";
+	} else if (st_showdataasPERCENTOFROW === val) {
+		res = "percentOfRow";
+	} else if (st_showdataasPERCENTOFCOL === val) {
+		res = "percentOfCol";
+	} else if (st_showdataasPERCENTOFTOTAL === val) {
+		res = "percentOfTotal";
+	} else if (st_showdataasINDEX === val) {
+		res = "index";
+	}
+	return res;
+}
 
 function FromXml_ST_FormatAction(val) {
 	var res = -1;
@@ -391,6 +516,19 @@ function FromXml_ST_FormatAction(val) {
 		res = st_formatactionDRILL;
 	} else if ("formula" === val) {
 		res = st_formatactionFORMULA;
+	}
+	return res;
+}
+function ToXml_ST_FormatAction(val) {
+	var res = "";
+	if (st_formatactionBLANK === val) {
+		res = "blank";
+	} else if (st_formatactionFORMATTING === val) {
+		res = "formatting";
+	} else if (st_formatactionDRILL === val) {
+		res = "drill";
+	} else if (st_formatactionFORMULA === val) {
+		res = "formula";
 	}
 	return res;
 }
@@ -406,6 +544,17 @@ function FromXml_ST_Scope(val) {
 	}
 	return res;
 }
+function ToXml_ST_Scope(val) {
+	var res = "";
+	if (st_scopeSELECTION === val) {
+		res = "selection";
+	} else if (st_scopeDATA === val) {
+		res = "data";
+	} else if (st_scopeFIELD === val) {
+		res = "field";
+	}
+	return res;
+}
 
 function FromXml_ST_Type(val) {
 	var res = -1;
@@ -417,6 +566,19 @@ function FromXml_ST_Type(val) {
 		res = st_typeROW;
 	} else if ("column" === val) {
 		res = st_typeCOLUMN;
+	}
+	return res;
+}
+function ToXml_ST_Type(val) {
+	var res = "";
+	if (st_typeNONE === val) {
+		res = "none";
+	} else if (st_typeALL === val) {
+		res = "all";
+	} else if (st_typeROW === val) {
+		res = "row";
+	} else if (st_typeCOLUMN === val) {
+		res = "column";
 	}
 	return res;
 }
@@ -558,6 +720,143 @@ function FromXml_ST_PivotFilterType(val) {
 	}
 	return res;
 }
+function ToXml_ST_PivotFilterType(val) {
+	var res = "";
+	if (st_pivotfiltertypeUNKNOWN === val) {
+		res = "unknown";
+	} else if (st_pivotfiltertypeCOUNT === val) {
+		res = "count";
+	} else if (st_pivotfiltertypePERCENT === val) {
+		res = "percent";
+	} else if (st_pivotfiltertypeSUM === val) {
+		res = "sum";
+	} else if (st_pivotfiltertypeCAPTIONEQUAL === val) {
+		res = "captionEqual";
+	} else if (st_pivotfiltertypeCAPTIONNOTEQUAL === val) {
+		res = "captionNotEqual";
+	} else if (st_pivotfiltertypeCAPTIONBEGINSWITH === val) {
+		res = "captionBeginsWith";
+	} else if (st_pivotfiltertypeCAPTIONNOTBEGINSWITH === val) {
+		res = "captionNotBeginsWith";
+	} else if (st_pivotfiltertypeCAPTIONENDSWITH === val) {
+		res = "captionEndsWith";
+	} else if (st_pivotfiltertypeCAPTIONNOTENDSWITH === val) {
+		res = "captionNotEndsWith";
+	} else if (st_pivotfiltertypeCAPTIONCONTAINS === val) {
+		res = "captionContains";
+	} else if (st_pivotfiltertypeCAPTIONNOTCONTAINS === val) {
+		res = "captionNotContains";
+	} else if (st_pivotfiltertypeCAPTIONGREATERTHAN === val) {
+		res = "captionGreaterThan";
+	} else if (st_pivotfiltertypeCAPTIONGREATERTHANOREQUAL === val) {
+		res = "captionGreaterThanOrEqual";
+	} else if (st_pivotfiltertypeCAPTIONLESSTHAN === val) {
+		res = "captionLessThan";
+	} else if (st_pivotfiltertypeCAPTIONLESSTHANOREQUAL === val) {
+		res = "captionLessThanOrEqual";
+	} else if (st_pivotfiltertypeCAPTIONBETWEEN === val) {
+		res = "captionBetween";
+	} else if (st_pivotfiltertypeCAPTIONNOTBETWEEN === val) {
+		res = "captionNotBetween";
+	} else if (st_pivotfiltertypeVALUEEQUAL === val) {
+		res = "valueEqual";
+	} else if (st_pivotfiltertypeVALUENOTEQUAL === val) {
+		res = "valueNotEqual";
+	} else if (st_pivotfiltertypeVALUEGREATERTHAN === val) {
+		res = "valueGreaterThan";
+	} else if (st_pivotfiltertypeVALUEGREATERTHANOREQUAL === val) {
+		res = "valueGreaterThanOrEqual";
+	} else if (st_pivotfiltertypeVALUELESSTHAN === val) {
+		res = "valueLessThan";
+	} else if (st_pivotfiltertypeVALUELESSTHANOREQUAL === val) {
+		res = "valueLessThanOrEqual";
+	} else if (st_pivotfiltertypeVALUEBETWEEN === val) {
+		res = "valueBetween";
+	} else if (st_pivotfiltertypeVALUENOTBETWEEN === val) {
+		res = "valueNotBetween";
+	} else if (st_pivotfiltertypeDATEEQUAL === val) {
+		res = "dateEqual";
+	} else if (st_pivotfiltertypeDATENOTEQUAL === val) {
+		res = "dateNotEqual";
+	} else if (st_pivotfiltertypeDATEOLDERTHAN === val) {
+		res = "dateOlderThan";
+	} else if (st_pivotfiltertypeDATEOLDERTHANOREQUAL === val) {
+		res = "dateOlderThanOrEqual";
+	} else if (st_pivotfiltertypeDATENEWERTHAN === val) {
+		res = "dateNewerThan";
+	} else if (st_pivotfiltertypeDATENEWERTHANOREQUAL === val) {
+		res = "dateNewerThanOrEqual";
+	} else if (st_pivotfiltertypeDATEBETWEEN === val) {
+		res = "dateBetween";
+	} else if (st_pivotfiltertypeDATENOTBETWEEN === val) {
+		res = "dateNotBetween";
+	} else if (st_pivotfiltertypeTOMORROW === val) {
+		res = "tomorrow";
+	} else if (st_pivotfiltertypeTODAY === val) {
+		res = "today";
+	} else if (st_pivotfiltertypeYESTERDAY === val) {
+		res = "yesterday";
+	} else if (st_pivotfiltertypeNEXTWEEK === val) {
+		res = "nextWeek";
+	} else if (st_pivotfiltertypeTHISWEEK === val) {
+		res = "thisWeek";
+	} else if (st_pivotfiltertypeLASTWEEK === val) {
+		res = "lastWeek";
+	} else if (st_pivotfiltertypeNEXTMONTH === val) {
+		res = "nextMonth";
+	} else if (st_pivotfiltertypeTHISMONTH === val) {
+		res = "thisMonth";
+	} else if (st_pivotfiltertypeLASTMONTH === val) {
+		res = "lastMonth";
+	} else if (st_pivotfiltertypeNEXTQUARTER === val) {
+		res = "nextQuarter";
+	} else if (st_pivotfiltertypeTHISQUARTER === val) {
+		res = "thisQuarter";
+	} else if (st_pivotfiltertypeLASTQUARTER === val) {
+		res = "lastQuarter";
+	} else if (st_pivotfiltertypeNEXTYEAR === val) {
+		res = "nextYear";
+	} else if (st_pivotfiltertypeTHISYEAR === val) {
+		res = "thisYear";
+	} else if (st_pivotfiltertypeLASTYEAR === val) {
+		res = "lastYear";
+	} else if (st_pivotfiltertypeYEARTODATE === val) {
+		res = "yearToDate";
+	} else if (st_pivotfiltertypeQ1 === val) {
+		res = "Q1";
+	} else if (st_pivotfiltertypeQ2 === val) {
+		res = "Q2";
+	} else if (st_pivotfiltertypeQ3 === val) {
+		res = "Q3";
+	} else if (st_pivotfiltertypeQ4 === val) {
+		res = "Q4";
+	} else if (st_pivotfiltertypeM1 === val) {
+		res = "M1";
+	} else if (st_pivotfiltertypeM2 === val) {
+		res = "M2";
+	} else if (st_pivotfiltertypeM3 === val) {
+		res = "M3";
+	} else if (st_pivotfiltertypeM4 === val) {
+		res = "M4";
+	} else if (st_pivotfiltertypeM5 === val) {
+		res = "M5";
+	} else if (st_pivotfiltertypeM6 === val) {
+		res = "M6";
+	} else if (st_pivotfiltertypeM7 === val) {
+		res = "M7";
+	} else if (st_pivotfiltertypeM8 === val) {
+		res = "M8";
+	} else if (st_pivotfiltertypeM9 === val) {
+		res = "M9";
+	} else if (st_pivotfiltertypeM10 === val) {
+		res = "M10";
+	} else if (st_pivotfiltertypeM11 === val) {
+		res = "M11";
+	} else if (st_pivotfiltertypeM12 === val) {
+		res = "M12";
+	}
+	return res;
+}
 
 function FromXml_ST_SortType(val) {
 	var res = -1;
@@ -578,6 +877,25 @@ function FromXml_ST_SortType(val) {
 	}
 	return res;
 }
+function ToXml_ST_SortType(val) {
+	var res = "";
+	if (st_sorttypeNONE === val) {
+		res = "none";
+	} else if (st_sorttypeASCENDING === val) {
+		res = "ascending";
+	} else if (st_sorttypeDESCENDING === val) {
+		res = "descending";
+	} else if (st_sorttypeASCENDINGALPHA === val) {
+		res = "ascendingAlpha";
+	} else if (st_sorttypeDESCENDINGALPHA === val) {
+		res = "descendingAlpha";
+	} else if (st_sorttypeASCENDINGNATURAL === val) {
+		res = "ascendingNatural";
+	} else if (st_sorttypeDESCENDINGNATURAL === val) {
+		res = "descendingNatural";
+	}
+	return res;
+}
 
 function FromXml_ST_PivotAreaType(val) {
 	var res = -1;
@@ -595,6 +913,25 @@ function FromXml_ST_PivotAreaType(val) {
 		res = st_pivotareatypeBUTTON;
 	} else if ("topEnd" === val) {
 		res = st_pivotareatypeTOPEND;
+	}
+	return res;
+}
+function ToXml_ST_PivotAreaType(val) {
+	var res = "";
+	if (st_pivotareatypeNONE === val) {
+		res = "none";
+	} else if (st_pivotareatypeNORMAL === val) {
+		res = "normal";
+	} else if (st_pivotareatypeDATA === val) {
+		res = "data";
+	} else if (st_pivotareatypeALL === val) {
+		res = "all";
+	} else if (st_pivotareatypeORIGIN === val) {
+		res = "origin";
+	} else if (st_pivotareatypeBUTTON === val) {
+		res = "button";
+	} else if (st_pivotareatypeTOPEND === val) {
+		res = "topEnd";
 	}
 	return res;
 }
@@ -620,6 +957,27 @@ function FromXml_ST_GroupBy(val) {
 	}
 	return res;
 }
+function ToXml_ST_GroupBy(val) {
+	var res = "";
+	if (st_groupbyRANGE === val) {
+		res = "range";
+	} else if (st_groupbySECONDS === val) {
+		res = "seconds";
+	} else if (st_groupbyMINUTES === val) {
+		res = "minutes";
+	} else if (st_groupbyHOURS === val) {
+		res = "hours";
+	} else if (st_groupbyDAYS === val) {
+		res = "days";
+	} else if (st_groupbyMONTHS === val) {
+		res = "months";
+	} else if (st_groupbyQUARTERS === val) {
+		res = "quarters";
+	} else if (st_groupbyYEARS === val) {
+		res = "years";
+	}
+	return res;
+}
 
 function FromXml_ST_SortMethod(val) {
 	var res = -1;
@@ -629,6 +987,17 @@ function FromXml_ST_SortMethod(val) {
 		res = st_sortmethodPINYIN;
 	} else if ("none" === val) {
 		res = st_sortmethodNONE;
+	}
+	return res;
+}
+function ToXml_ST_SortMethod(val) {
+	var res = "";
+	if (st_sortmethodSTROKE === val) {
+		res = "stroke";
+	} else if (st_sortmethodPINYIN === val) {
+		res = "pinYin";
+	} else if (st_sortmethodNONE === val) {
+		res = "none";
 	}
 	return res;
 }
@@ -708,6 +1077,81 @@ function FromXml_ST_DynamicFilterType(val) {
 	}
 	return res;
 }
+function ToXml_ST_DynamicFilterType(val) {
+	var res = "";
+	if (st_dynamicfiltertypeNULL === val) {
+		res = "null";
+	} else if (st_dynamicfiltertypeABOVEAVERAGE === val) {
+		res = "aboveAverage";
+	} else if (st_dynamicfiltertypeBELOWAVERAGE === val) {
+		res = "belowAverage";
+	} else if (st_dynamicfiltertypeTOMORROW === val) {
+		res = "tomorrow";
+	} else if (st_dynamicfiltertypeTODAY === val) {
+		res = "today";
+	} else if (st_dynamicfiltertypeYESTERDAY === val) {
+		res = "yesterday";
+	} else if (st_dynamicfiltertypeNEXTWEEK === val) {
+		res = "nextWeek";
+	} else if (st_dynamicfiltertypeTHISWEEK === val) {
+		res = "thisWeek";
+	} else if (st_dynamicfiltertypeLASTWEEK === val) {
+		res = "lastWeek";
+	} else if (st_dynamicfiltertypeNEXTMONTH === val) {
+		res = "nextMonth";
+	} else if (st_dynamicfiltertypeTHISMONTH === val) {
+		res = "thisMonth";
+	} else if (st_dynamicfiltertypeLASTMONTH === val) {
+		res = "lastMonth";
+	} else if (st_dynamicfiltertypeNEXTQUARTER === val) {
+		res = "nextQuarter";
+	} else if (st_dynamicfiltertypeTHISQUARTER === val) {
+		res = "thisQuarter";
+	} else if (st_dynamicfiltertypeLASTQUARTER === val) {
+		res = "lastQuarter";
+	} else if (st_dynamicfiltertypeNEXTYEAR === val) {
+		res = "nextYear";
+	} else if (st_dynamicfiltertypeTHISYEAR === val) {
+		res = "thisYear";
+	} else if (st_dynamicfiltertypeLASTYEAR === val) {
+		res = "lastYear";
+	} else if (st_dynamicfiltertypeYEARTODATE === val) {
+		res = "yearToDate";
+	} else if (st_dynamicfiltertypeQ1 === val) {
+		res = "Q1";
+	} else if (st_dynamicfiltertypeQ2 === val) {
+		res = "Q2";
+	} else if (st_dynamicfiltertypeQ3 === val) {
+		res = "Q3";
+	} else if (st_dynamicfiltertypeQ4 === val) {
+		res = "Q4";
+	} else if (st_dynamicfiltertypeM1 === val) {
+		res = "M1";
+	} else if (st_dynamicfiltertypeM2 === val) {
+		res = "M2";
+	} else if (st_dynamicfiltertypeM3 === val) {
+		res = "M3";
+	} else if (st_dynamicfiltertypeM4 === val) {
+		res = "M4";
+	} else if (st_dynamicfiltertypeM5 === val) {
+		res = "M5";
+	} else if (st_dynamicfiltertypeM6 === val) {
+		res = "M6";
+	} else if (st_dynamicfiltertypeM7 === val) {
+		res = "M7";
+	} else if (st_dynamicfiltertypeM8 === val) {
+		res = "M8";
+	} else if (st_dynamicfiltertypeM9 === val) {
+		res = "M9";
+	} else if (st_dynamicfiltertypeM10 === val) {
+		res = "M10";
+	} else if (st_dynamicfiltertypeM11 === val) {
+		res = "M11";
+	} else if (st_dynamicfiltertypeM12 === val) {
+		res = "M12";
+	}
+	return res;
+}
 
 function FromXml_ST_CalendarType(val) {
 	var res = -1;
@@ -739,6 +1183,39 @@ function FromXml_ST_CalendarType(val) {
 		res = st_calendartypeGREGORIANXLITFRENCH;
 	} else if ("none" === val) {
 		res = st_calendartypeNONE;
+	}
+	return res;
+}
+function ToXml_ST_CalendarType(val) {
+	var res = "";
+	if (st_calendartypeGREGORIAN === val) {
+		res = "gregorian";
+	} else if (st_calendartypeGREGORIANUS === val) {
+		res = "gregorianUs";
+	} else if (st_calendartypeGREGORIANMEFRENCH === val) {
+		res = "gregorianMeFrench";
+	} else if (st_calendartypeGREGORIANARABIC === val) {
+		res = "gregorianArabic";
+	} else if (st_calendartypeHIJRI === val) {
+		res = "hijri";
+	} else if (st_calendartypeHEBREW === val) {
+		res = "hebrew";
+	} else if (st_calendartypeTAIWAN === val) {
+		res = "taiwan";
+	} else if (st_calendartypeJAPAN === val) {
+		res = "japan";
+	} else if (st_calendartypeTHAI === val) {
+		res = "thai";
+	} else if (st_calendartypeKOREA === val) {
+		res = "korea";
+	} else if (st_calendartypeSAKA === val) {
+		res = "saka";
+	} else if (st_calendartypeGREGORIANXLITENGLISH === val) {
+		res = "gregorianXlitEnglish";
+	} else if (st_calendartypeGREGORIANXLITFRENCH === val) {
+		res = "gregorianXlitFrench";
+	} else if (st_calendartypeNONE === val) {
+		res = "none";
 	}
 	return res;
 }
@@ -782,6 +1259,45 @@ function FromXml_ST_IconSetType(val) {
 	}
 	return res;
 }
+function ToXml_ST_IconSetType(val) {
+	var res = "";
+	if (st_iconsettype3ARROWS === val) {
+		res = "3Arrows";
+	} else if (st_iconsettype3ARROWSGRAY === val) {
+		res = "3ArrowsGray";
+	} else if (st_iconsettype3FLAGS === val) {
+		res = "3Flags";
+	} else if (st_iconsettype3TRAFFICLIGHTS1 === val) {
+		res = "3TrafficLights1";
+	} else if (st_iconsettype3TRAFFICLIGHTS2 === val) {
+		res = "3TrafficLights2";
+	} else if (st_iconsettype3SIGNS === val) {
+		res = "3Signs";
+	} else if (st_iconsettype3SYMBOLS === val) {
+		res = "3Symbols";
+	} else if (st_iconsettype3SYMBOLS2 === val) {
+		res = "3Symbols2";
+	} else if (st_iconsettype4ARROWS === val) {
+		res = "4Arrows";
+	} else if (st_iconsettype4ARROWSGRAY === val) {
+		res = "4ArrowsGray";
+	} else if (st_iconsettype4REDTOBLACK === val) {
+		res = "4RedToBlack";
+	} else if (st_iconsettype4RATING === val) {
+		res = "4Rating";
+	} else if (st_iconsettype4TRAFFICLIGHTS === val) {
+		res = "4TrafficLights";
+	} else if (st_iconsettype5ARROWS === val) {
+		res = "5Arrows";
+	} else if (st_iconsettype5ARROWSGRAY === val) {
+		res = "5ArrowsGray";
+	} else if (st_iconsettype5RATING === val) {
+		res = "5Rating";
+	} else if (st_iconsettype5QUARTERS === val) {
+		res = "5Quarters";
+	}
+	return res;
+}
 
 function FromXml_ST_SortBy(val) {
 	var res = -1;
@@ -793,6 +1309,19 @@ function FromXml_ST_SortBy(val) {
 		res = st_sortbyFONTCOLOR;
 	} else if ("icon" === val) {
 		res = st_sortbyICON;
+	}
+	return res;
+}
+function ToXml_ST_SortBy(val) {
+	var res = "";
+	if (st_sortbyVALUE === val) {
+		res = "value";
+	} else if (st_sortbyCELLCOLOR === val) {
+		res = "cellColor";
+	} else if (st_sortbyFONTCOLOR === val) {
+		res = "fontColor";
+	} else if (st_sortbyICON === val) {
+		res = "icon";
 	}
 	return res;
 }
@@ -814,6 +1343,23 @@ function FromXml_ST_FilterOperator(val) {
 	}
 	return res;
 }
+function ToXml_ST_FilterOperator(val) {
+	var res = "";
+	if (st_filteroperatorEQUAL === val) {
+		res = "equal";
+	} else if (st_filteroperatorLESSTHAN === val) {
+		res = "lessThan";
+	} else if (st_filteroperatorLESSTHANOREQUAL === val) {
+		res = "lessThanOrEqual";
+	} else if (st_filteroperatorNOTEQUAL === val) {
+		res = "notEqual";
+	} else if (st_filteroperatorGREATERTHANOREQUAL === val) {
+		res = "greaterThanOrEqual";
+	} else if (st_filteroperatorGREATERTHAN === val) {
+		res = "greaterThan";
+	}
+	return res;
+}
 
 function FromXml_ST_DateTimeGrouping(val) {
 	var res = -1;
@@ -829,6 +1375,23 @@ function FromXml_ST_DateTimeGrouping(val) {
 		res = st_datetimegroupingMINUTE;
 	} else if ("second" === val) {
 		res = st_datetimegroupingSECOND;
+	}
+	return res;
+}
+function ToXml_ST_DateTimeGrouping(val) {
+	var res = "";
+	if (st_datetimegroupingYEAR === val) {
+		res = "year";
+	} else if (st_datetimegroupingMONTH === val) {
+		res = "month";
+	} else if (st_datetimegroupingDAY === val) {
+		res = "day";
+	} else if (st_datetimegroupingHOUR === val) {
+		res = "hour";
+	} else if (st_datetimegroupingMINUTE === val) {
+		res = "minute";
+	} else if (st_datetimegroupingSECOND === val) {
+		res = "second";
 	}
 	return res;
 }
@@ -1019,12 +1582,146 @@ CT_PivotCacheDefinition.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_PivotCacheDefinition.prototype.toXml = function() {
+	var res = "";
+	res += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+	res +=
+		"<pivotCacheDefinition xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"";
+	if (null !== this.id) {
+		res += " r:id=\"";
+		res += this.id;
+		res += "\"";
+	}
+	if (null !== this.invalid) {
+		res += " invalid=\"";
+		res += getXmlFromBool(this.invalid);
+		res += "\"";
+	}
+	if (null !== this.saveData) {
+		res += " saveData=\"";
+		res += getXmlFromBool(this.saveData);
+		res += "\"";
+	}
+	if (null !== this.refreshOnLoad) {
+		res += " refreshOnLoad=\"";
+		res += getXmlFromBool(this.refreshOnLoad);
+		res += "\"";
+	}
+	if (null !== this.optimizeMemory) {
+		res += " optimizeMemory=\"";
+		res += getXmlFromBool(this.optimizeMemory);
+		res += "\"";
+	}
+	if (null !== this.enableRefresh) {
+		res += " enableRefresh=\"";
+		res += getXmlFromBool(this.enableRefresh);
+		res += "\"";
+	}
+	if (null !== this.refreshedBy) {
+		res += " refreshedBy=\"";
+		res += this.refreshedBy;
+		res += "\"";
+	}
+	if (null !== this.refreshedDateIso) {
+		res += " refreshedDateIso=\"";
+		res += this.refreshedDateIso;
+		res += "\"";
+	}
+	if (null !== this.backgroundQuery) {
+		res += " backgroundQuery=\"";
+		res += getXmlFromBool(this.backgroundQuery);
+		res += "\"";
+	}
+	if (null !== this.missingItemsLimit) {
+		res += " missingItemsLimit=\"";
+		res += this.missingItemsLimit.toString();
+		res += "\"";
+	}
+	if (null !== this.createdVersion) {
+		res += " createdVersion=\"";
+		res += this.createdVersion.toString();
+		res += "\"";
+	}
+	if (null !== this.refreshedVersion) {
+		res += " refreshedVersion=\"";
+		res += this.refreshedVersion.toString();
+		res += "\"";
+	}
+	if (null !== this.minRefreshableVersion) {
+		res += " minRefreshableVersion=\"";
+		res += this.minRefreshableVersion.toString();
+		res += "\"";
+	}
+	if (null !== this.recordCount) {
+		res += " recordCount=\"";
+		res += this.recordCount.toString();
+		res += "\"";
+	}
+	if (null !== this.upgradeOnRefresh) {
+		res += " upgradeOnRefresh=\"";
+		res += getXmlFromBool(this.upgradeOnRefresh);
+		res += "\"";
+	}
+	if (null !== this.tupleCache) {
+		res += " tupleCache=\"";
+		res += getXmlFromBool(this.tupleCache);
+		res += "\"";
+	}
+	if (null !== this.supportSubquery) {
+		res += " supportSubquery=\"";
+		res += getXmlFromBool(this.supportSubquery);
+		res += "\"";
+	}
+	if (null !== this.supportAdvancedDrill) {
+		res += " supportAdvancedDrill=\"";
+		res += getXmlFromBool(this.supportAdvancedDrill);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.cacheSource) {
+		res += this.cacheSource.toXml("cacheSource");
+	}
+	if (null !== this.cacheFields) {
+		res += this.cacheFields.toXml("cacheFields");
+	}
+	if (null !== this.cacheHierarchies) {
+		res += this.cacheHierarchies.toXml("cacheHierarchies");
+	}
+	if (null !== this.kpis) {
+		res += this.kpis.toXml("kpis");
+	}
+	if (null !== this.tupleCache) {
+		res += this.tupleCache.toXml("tupleCache");
+	}
+	if (null !== this.calculatedItems) {
+		res += this.calculatedItems.toXml("calculatedItems");
+	}
+	if (null !== this.calculatedMembers) {
+		res += this.calculatedMembers.toXml("calculatedMembers");
+	}
+	if (null !== this.dimensions) {
+		res += this.dimensions.toXml("dimensions");
+	}
+	if (null !== this.measureGroups) {
+		res += this.measureGroups.toXml("measureGroups");
+	}
+	if (null !== this.maps) {
+		res += this.maps.toXml("maps");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</pivotCacheDefinition>";
+	return res;
+};
 function CT_PivotCacheRecords() {
 //Attributes
 	this.count = null;
 //Members
 	this.r = [];
 	this.extLst = null;
+//internal
+	this._curArray = null;
 }
 CT_PivotCacheRecords.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -1041,11 +1738,49 @@ CT_PivotCacheRecords.prototype.onStartNode = function(elem, attr, uq) {
 	if ("pivotCacheRecords" === elem) {
 		newContext.readAttributes(attr, uq);
 	} else if ("r" === elem) {
-		newContext = new CT_r();
+		this._curArray = [];
+	} else if ("b" === elem) {
+		newContext = new CT_Boolean();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
-		this.r.push(newContext);
+		this._curArray.push(newContext);
+	} else if ("d" === elem) {
+		newContext = new CT_DateTime();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this._curArray.push(newContext);
+	} else if ("e" === elem) {
+		newContext = new CT_Error();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this._curArray.push(newContext);
+	} else if ("m" === elem) {
+		newContext = new CT_Missing();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this._curArray.push(newContext);
+	} else if ("n" === elem) {
+		newContext = new CT_Number();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this._curArray.push(newContext);
+	} else if ("s" === elem) {
+		newContext = new CT_String();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this._curArray.push(newContext);
+	} else if ("x" === elem) {
+		newContext = new CT_Index();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this._curArray.push(newContext);
 	} else if ("extLst" === elem) {
 		newContext = new CT_ExtensionList();
 		if (newContext.readAttributes) {
@@ -1056,6 +1791,54 @@ CT_PivotCacheRecords.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_PivotCacheRecords.prototype.onEndNode = function(prevContext, elem) {
+	if ("r" === elem) {
+		if (this._curArray && this._curArray.length > 0) {
+			this.r.push(this._curArray);
+			this._curArray = null;
+		}
+	}
+};
+CT_PivotCacheRecords.prototype.toXml = function() {
+	var res = "";
+	res += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+	res +=
+		"<pivotCacheRecords xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"";
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.r.length; ++i) {
+		var elem = this.r[i];
+		res += "<r>";
+		for (var j = 0; j < elem.length; ++j) {
+			var subelem = elem[j];
+			if (subelem instanceof CT_Boolean) {
+				res += subelem.toXml("b");
+			} else if (subelem instanceof CT_DateTime) {
+				res += subelem.toXml("d");
+			} else if (subelem instanceof CT_Error) {
+				res += subelem.toXml("e");
+			} else if (subelem instanceof CT_Missing) {
+				res += subelem.toXml("m");
+			} else if (subelem instanceof CT_Number) {
+				res += subelem.toXml("n");
+			} else if (subelem instanceof CT_String) {
+				res += subelem.toXml("s");
+			} else if (subelem instanceof CT_Index) {
+				res += subelem.toXml("x");
+			}
+		}
+		res += "</r>";
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</pivotCacheRecords>";
+	return res;
 };
 function CT_pivotTableDefinition() {
 //Attributes
@@ -1535,6 +2318,406 @@ CT_pivotTableDefinition.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_pivotTableDefinition.prototype.toXml = function() {
+	var res = "";
+	res += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+	res +=
+		"<pivotTableDefinition xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"";
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.cacheId) {
+		res += " cacheId=\"";
+		res += this.cacheId.toString();
+		res += "\"";
+	}
+	if (null !== this.dataOnRows) {
+		res += " dataOnRows=\"";
+		res += getXmlFromBool(this.dataOnRows);
+		res += "\"";
+	}
+	if (null !== this.dataPosition) {
+		res += " dataPosition=\"";
+		res += this.dataPosition.toString();
+		res += "\"";
+	}
+	if (null !== this.autoFormatId) {
+		res += " autoFormatId=\"";
+		res += this.autoFormatId.toString();
+		res += "\"";
+	}
+	if (null !== this.applyNumberFormats) {
+		res += " applyNumberFormats=\"";
+		res += getXmlFromBool(this.applyNumberFormats);
+		res += "\"";
+	}
+	if (null !== this.applyBorderFormats) {
+		res += " applyBorderFormats=\"";
+		res += getXmlFromBool(this.applyBorderFormats);
+		res += "\"";
+	}
+	if (null !== this.applyFontFormats) {
+		res += " applyFontFormats=\"";
+		res += getXmlFromBool(this.applyFontFormats);
+		res += "\"";
+	}
+	if (null !== this.applyPatternFormats) {
+		res += " applyPatternFormats=\"";
+		res += getXmlFromBool(this.applyPatternFormats);
+		res += "\"";
+	}
+	if (null !== this.applyAlignmentFormats) {
+		res += " applyAlignmentFormats=\"";
+		res += getXmlFromBool(this.applyAlignmentFormats);
+		res += "\"";
+	}
+	if (null !== this.applyWidthHeightFormats) {
+		res += " applyWidthHeightFormats=\"";
+		res += getXmlFromBool(this.applyWidthHeightFormats);
+		res += "\"";
+	}
+	if (null !== this.dataCaption) {
+		res += " dataCaption=\"";
+		res += this.dataCaption;
+		res += "\"";
+	}
+	if (null !== this.grandTotalCaption) {
+		res += " grandTotalCaption=\"";
+		res += this.grandTotalCaption;
+		res += "\"";
+	}
+	if (null !== this.errorCaption) {
+		res += " errorCaption=\"";
+		res += this.errorCaption;
+		res += "\"";
+	}
+	if (null !== this.showError) {
+		res += " showError=\"";
+		res += getXmlFromBool(this.showError);
+		res += "\"";
+	}
+	if (null !== this.missingCaption) {
+		res += " missingCaption=\"";
+		res += this.missingCaption;
+		res += "\"";
+	}
+	if (null !== this.showMissing) {
+		res += " showMissing=\"";
+		res += getXmlFromBool(this.showMissing);
+		res += "\"";
+	}
+	if (null !== this.pageStyle) {
+		res += " pageStyle=\"";
+		res += this.pageStyle;
+		res += "\"";
+	}
+	if (null !== this.pivotTableStyle) {
+		res += " pivotTableStyle=\"";
+		res += this.pivotTableStyle;
+		res += "\"";
+	}
+	if (null !== this.vacatedStyle) {
+		res += " vacatedStyle=\"";
+		res += this.vacatedStyle;
+		res += "\"";
+	}
+	if (null !== this.tag) {
+		res += " tag=\"";
+		res += this.tag;
+		res += "\"";
+	}
+	if (null !== this.updatedVersion) {
+		res += " updatedVersion=\"";
+		res += this.updatedVersion.toString();
+		res += "\"";
+	}
+	if (null !== this.minRefreshableVersion) {
+		res += " minRefreshableVersion=\"";
+		res += this.minRefreshableVersion.toString();
+		res += "\"";
+	}
+	if (null !== this.asteriskTotals) {
+		res += " asteriskTotals=\"";
+		res += getXmlFromBool(this.asteriskTotals);
+		res += "\"";
+	}
+	if (null !== this.showItems) {
+		res += " showItems=\"";
+		res += getXmlFromBool(this.showItems);
+		res += "\"";
+	}
+	if (null !== this.editData) {
+		res += " editData=\"";
+		res += getXmlFromBool(this.editData);
+		res += "\"";
+	}
+	if (null !== this.disableFieldList) {
+		res += " disableFieldList=\"";
+		res += getXmlFromBool(this.disableFieldList);
+		res += "\"";
+	}
+	if (null !== this.showCalcMbrs) {
+		res += " showCalcMbrs=\"";
+		res += getXmlFromBool(this.showCalcMbrs);
+		res += "\"";
+	}
+	if (null !== this.visualTotals) {
+		res += " visualTotals=\"";
+		res += getXmlFromBool(this.visualTotals);
+		res += "\"";
+	}
+	if (null !== this.showMultipleLabel) {
+		res += " showMultipleLabel=\"";
+		res += getXmlFromBool(this.showMultipleLabel);
+		res += "\"";
+	}
+	if (null !== this.showDataDropDown) {
+		res += " showDataDropDown=\"";
+		res += getXmlFromBool(this.showDataDropDown);
+		res += "\"";
+	}
+	if (null !== this.showDrill) {
+		res += " showDrill=\"";
+		res += getXmlFromBool(this.showDrill);
+		res += "\"";
+	}
+	if (null !== this.printDrill) {
+		res += " printDrill=\"";
+		res += getXmlFromBool(this.printDrill);
+		res += "\"";
+	}
+	if (null !== this.showMemberPropertyTips) {
+		res += " showMemberPropertyTips=\"";
+		res += getXmlFromBool(this.showMemberPropertyTips);
+		res += "\"";
+	}
+	if (null !== this.showDataTips) {
+		res += " showDataTips=\"";
+		res += getXmlFromBool(this.showDataTips);
+		res += "\"";
+	}
+	if (null !== this.enableWizard) {
+		res += " enableWizard=\"";
+		res += getXmlFromBool(this.enableWizard);
+		res += "\"";
+	}
+	if (null !== this.enableDrill) {
+		res += " enableDrill=\"";
+		res += getXmlFromBool(this.enableDrill);
+		res += "\"";
+	}
+	if (null !== this.enableFieldProperties) {
+		res += " enableFieldProperties=\"";
+		res += getXmlFromBool(this.enableFieldProperties);
+		res += "\"";
+	}
+	if (null !== this.preserveFormatting) {
+		res += " preserveFormatting=\"";
+		res += getXmlFromBool(this.preserveFormatting);
+		res += "\"";
+	}
+	if (null !== this.useAutoFormatting) {
+		res += " useAutoFormatting=\"";
+		res += getXmlFromBool(this.useAutoFormatting);
+		res += "\"";
+	}
+	if (null !== this.pageWrap) {
+		res += " pageWrap=\"";
+		res += this.pageWrap.toString();
+		res += "\"";
+	}
+	if (null !== this.pageOverThenDown) {
+		res += " pageOverThenDown=\"";
+		res += getXmlFromBool(this.pageOverThenDown);
+		res += "\"";
+	}
+	if (null !== this.subtotalHiddenItems) {
+		res += " subtotalHiddenItems=\"";
+		res += getXmlFromBool(this.subtotalHiddenItems);
+		res += "\"";
+	}
+	if (null !== this.rowGrandTotals) {
+		res += " rowGrandTotals=\"";
+		res += getXmlFromBool(this.rowGrandTotals);
+		res += "\"";
+	}
+	if (null !== this.colGrandTotals) {
+		res += " colGrandTotals=\"";
+		res += getXmlFromBool(this.colGrandTotals);
+		res += "\"";
+	}
+	if (null !== this.fieldPrintTitles) {
+		res += " fieldPrintTitles=\"";
+		res += getXmlFromBool(this.fieldPrintTitles);
+		res += "\"";
+	}
+	if (null !== this.itemPrintTitles) {
+		res += " itemPrintTitles=\"";
+		res += getXmlFromBool(this.itemPrintTitles);
+		res += "\"";
+	}
+	if (null !== this.mergeItem) {
+		res += " mergeItem=\"";
+		res += getXmlFromBool(this.mergeItem);
+		res += "\"";
+	}
+	if (null !== this.showDropZones) {
+		res += " showDropZones=\"";
+		res += getXmlFromBool(this.showDropZones);
+		res += "\"";
+	}
+	if (null !== this.createdVersion) {
+		res += " createdVersion=\"";
+		res += this.createdVersion.toString();
+		res += "\"";
+	}
+	if (null !== this.indent) {
+		res += " indent=\"";
+		res += this.indent.toString();
+		res += "\"";
+	}
+	if (null !== this.showEmptyRow) {
+		res += " showEmptyRow=\"";
+		res += getXmlFromBool(this.showEmptyRow);
+		res += "\"";
+	}
+	if (null !== this.showEmptyCol) {
+		res += " showEmptyCol=\"";
+		res += getXmlFromBool(this.showEmptyCol);
+		res += "\"";
+	}
+	if (null !== this.showHeaders) {
+		res += " showHeaders=\"";
+		res += getXmlFromBool(this.showHeaders);
+		res += "\"";
+	}
+	if (null !== this.compact) {
+		res += " compact=\"";
+		res += getXmlFromBool(this.compact);
+		res += "\"";
+	}
+	if (null !== this.outline) {
+		res += " outline=\"";
+		res += getXmlFromBool(this.outline);
+		res += "\"";
+	}
+	if (null !== this.outlineData) {
+		res += " outlineData=\"";
+		res += getXmlFromBool(this.outlineData);
+		res += "\"";
+	}
+	if (null !== this.compactData) {
+		res += " compactData=\"";
+		res += getXmlFromBool(this.compactData);
+		res += "\"";
+	}
+	if (null !== this.published) {
+		res += " published=\"";
+		res += getXmlFromBool(this.published);
+		res += "\"";
+	}
+	if (null !== this.gridDropZones) {
+		res += " gridDropZones=\"";
+		res += getXmlFromBool(this.gridDropZones);
+		res += "\"";
+	}
+	if (null !== this.immersive) {
+		res += " immersive=\"";
+		res += getXmlFromBool(this.immersive);
+		res += "\"";
+	}
+	if (null !== this.multipleFieldFilters) {
+		res += " multipleFieldFilters=\"";
+		res += getXmlFromBool(this.multipleFieldFilters);
+		res += "\"";
+	}
+	if (null !== this.chartFormat) {
+		res += " chartFormat=\"";
+		res += this.chartFormat.toString();
+		res += "\"";
+	}
+	if (null !== this.rowHeaderCaption) {
+		res += " rowHeaderCaption=\"";
+		res += this.rowHeaderCaption;
+		res += "\"";
+	}
+	if (null !== this.colHeaderCaption) {
+		res += " colHeaderCaption=\"";
+		res += this.colHeaderCaption;
+		res += "\"";
+	}
+	if (null !== this.fieldListSortAscending) {
+		res += " fieldListSortAscending=\"";
+		res += getXmlFromBool(this.fieldListSortAscending);
+		res += "\"";
+	}
+	if (null !== this.mdxSubqueries) {
+		res += " mdxSubqueries=\"";
+		res += getXmlFromBool(this.mdxSubqueries);
+		res += "\"";
+	}
+	if (null !== this.customListSort) {
+		res += " customListSort=\"";
+		res += getXmlFromBool(this.customListSort);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.location) {
+		res += this.location.toXml("location");
+	}
+	if (null !== this.pivotFields) {
+		res += this.pivotFields.toXml("pivotFields");
+	}
+	if (null !== this.rowFields) {
+		res += this.rowFields.toXml("rowFields");
+	}
+	if (null !== this.rowItems) {
+		res += this.rowItems.toXml("rowItems");
+	}
+	if (null !== this.colFields) {
+		res += this.colFields.toXml("colFields");
+	}
+	if (null !== this.colItems) {
+		res += this.colItems.toXml("colItems");
+	}
+	if (null !== this.pageFields) {
+		res += this.pageFields.toXml("pageFields");
+	}
+	if (null !== this.dataFields) {
+		res += this.dataFields.toXml("dataFields");
+	}
+	if (null !== this.formats) {
+		res += this.formats.toXml("formats");
+	}
+	if (null !== this.conditionalFormats) {
+		res += this.conditionalFormats.toXml("conditionalFormats");
+	}
+	if (null !== this.chartFormats) {
+		res += this.chartFormats.toXml("chartFormats");
+	}
+	if (null !== this.pivotHierarchies) {
+		res += this.pivotHierarchies.toXml("pivotHierarchies");
+	}
+	if (null !== this.pivotTableStyleInfo) {
+		res += this.pivotTableStyleInfo.toXml("pivotTableStyleInfo");
+	}
+	if (null !== this.filters) {
+		res += this.filters.toXml("filters");
+	}
+	if (null !== this.rowHierarchiesUsage) {
+		res += this.rowHierarchiesUsage.toXml("rowHierarchiesUsage");
+	}
+	if (null !== this.colHierarchiesUsage) {
+		res += this.colHierarchiesUsage.toXml("colHierarchiesUsage");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</pivotTableDefinition>";
+	return res;
+};
 function CT_CacheSource() {
 //Attributes
 	this.type = null;
@@ -1586,6 +2769,35 @@ CT_CacheSource.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_CacheSource.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.type) {
+		res += " type=\"";
+		res += ToXml_ST_SourceType(this.type);
+		res += "\"";
+	}
+	if (null !== this.connectionId) {
+		res += " connectionId=\"";
+		res += this.connectionId.toString();
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.consolidation) {
+		res += this.consolidation.toXml("consolidation");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	if (null !== this.worksheetSource) {
+		res += this.worksheetSource.toXml("worksheetSource");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_CacheFields() {
 //Attributes
 	this.count = null;
@@ -1614,6 +2826,25 @@ CT_CacheFields.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_CacheFields.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.cacheField.length; ++i) {
+		var elem = this.cacheField[i];
+		res += elem.toXml("cacheField");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_CacheHierarchies() {
 //Attributes
@@ -1644,6 +2875,25 @@ CT_CacheHierarchies.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_CacheHierarchies.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.cacheHierarchy.length; ++i) {
+		var elem = this.cacheHierarchy[i];
+		res += elem.toXml("cacheHierarchy");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_PCDKPIs() {
 //Attributes
 	this.count = null;
@@ -1672,6 +2922,25 @@ CT_PCDKPIs.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_PCDKPIs.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.kpi.length; ++i) {
+		var elem = this.kpi[i];
+		res += elem.toXml("kpi");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_TupleCache() {
 //Members
@@ -1718,6 +2987,31 @@ CT_TupleCache.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_TupleCache.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	res += ">";
+	if (null !== this.entries) {
+		res += this.entries.toXml("entries");
+	}
+	if (null !== this.sets) {
+		res += this.sets.toXml("sets");
+	}
+	if (null !== this.queryCache) {
+		res += this.queryCache.toXml("queryCache");
+	}
+	if (null !== this.serverFormats) {
+		res += this.serverFormats.toXml("serverFormats");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_CalculatedItems() {
 //Attributes
 	this.count = null;
@@ -1746,6 +3040,25 @@ CT_CalculatedItems.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_CalculatedItems.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.calculatedItem.length; ++i) {
+		var elem = this.calculatedItem[i];
+		res += elem.toXml("calculatedItem");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_CalculatedMembers() {
 //Attributes
@@ -1776,6 +3089,25 @@ CT_CalculatedMembers.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_CalculatedMembers.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.calculatedMember.length; ++i) {
+		var elem = this.calculatedMember[i];
+		res += elem.toXml("calculatedMember");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_Dimensions() {
 //Attributes
 	this.count = null;
@@ -1804,6 +3136,25 @@ CT_Dimensions.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_Dimensions.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.dimension.length; ++i) {
+		var elem = this.dimension[i];
+		res += elem.toXml("dimension");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_MeasureGroups() {
 //Attributes
@@ -1834,6 +3185,25 @@ CT_MeasureGroups.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_MeasureGroups.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.measureGroup.length; ++i) {
+		var elem = this.measureGroup[i];
+		res += elem.toXml("measureGroup");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_MeasureDimensionMaps() {
 //Attributes
 	this.count = null;
@@ -1863,6 +3233,25 @@ CT_MeasureDimensionMaps.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_MeasureDimensionMaps.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.map.length; ++i) {
+		var elem = this.map[i];
+		res += elem.toXml("map");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_ExtensionList() {
 //Members
 	this.ext = [];
@@ -1880,56 +3269,60 @@ CT_ExtensionList.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-function CT_r() {
+CT_ExtensionList.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	res += ">";
+	for (var i = 0; i < this.ext.length; ++i) {
+		var elem = this.ext[i];
+		res += elem.toXml("ext");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
+function CT_Boolean() {
+//Attributes
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
 //Members
-	this.b = [];
-	this.d = [];
-	this.e = [];
-	this.m = [];
-	this.n = [];
-	this.s = [];
 	this.x = [];
 }
-CT_r.prototype.onStartNode = function(elem, attr, uq) {
+CT_Boolean.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["v"];
+		if (undefined !== val) {
+			this.v = getBoolFromXml(val);
+		}
+		val = vals["u"];
+		if (undefined !== val) {
+			this.u = getBoolFromXml(val);
+		}
+		val = vals["f"];
+		if (undefined !== val) {
+			this.f = getBoolFromXml(val);
+		}
+		val = vals["c"];
+		if (undefined !== val) {
+			this.c = uq(val);
+		}
+		val = vals["cp"];
+		if (undefined !== val) {
+			this.cp = val - 0;
+		}
+	}
+};
+CT_Boolean.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
-	if ("b" === elem) {
-		newContext = new CT_Boolean();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.b.push(newContext);
-	} else if ("d" === elem) {
-		newContext = new CT_DateTime();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.d.push(newContext);
-	} else if ("e" === elem) {
-		newContext = new CT_Error();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.e.push(newContext);
-	} else if ("m" === elem) {
-		newContext = new CT_Missing();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.m.push(newContext);
-	} else if ("n" === elem) {
-		newContext = new CT_Number();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.n.push(newContext);
-	} else if ("s" === elem) {
-		newContext = new CT_String();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.s.push(newContext);
-	} else if ("x" === elem) {
-		newContext = new CT_Index();
+	if ("x" === elem) {
+		newContext = new CT_X();
 		if (newContext.readAttributes) {
 			newContext.readAttributes(attr, uq);
 		}
@@ -1938,6 +3331,824 @@ CT_r.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_Boolean.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.v) {
+		res += " v=\"";
+		res += getXmlFromBool(this.v);
+		res += "\"";
+	}
+	if (null !== this.u) {
+		res += " u=\"";
+		res += getXmlFromBool(this.u);
+		res += "\"";
+	}
+	if (null !== this.f) {
+		res += " f=\"";
+		res += getXmlFromBool(this.f);
+		res += "\"";
+	}
+	if (null !== this.c) {
+		res += " c=\"";
+		res += this.c;
+		res += "\"";
+	}
+	if (null !== this.cp) {
+		res += " cp=\"";
+		res += this.cp.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.x.length; ++i) {
+		var elem = this.x[i];
+		res += elem.toXml("x");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
+function CT_DateTime() {
+//Attributes
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+//Members
+	this.x = [];
+}
+CT_DateTime.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["v"];
+		if (undefined !== val) {
+			this.v = uq(val);
+		}
+		val = vals["u"];
+		if (undefined !== val) {
+			this.u = getBoolFromXml(val);
+		}
+		val = vals["f"];
+		if (undefined !== val) {
+			this.f = getBoolFromXml(val);
+		}
+		val = vals["c"];
+		if (undefined !== val) {
+			this.c = uq(val);
+		}
+		val = vals["cp"];
+		if (undefined !== val) {
+			this.cp = val - 0;
+		}
+	}
+};
+CT_DateTime.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = this;
+	if ("x" === elem) {
+		newContext = new CT_X();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.x.push(newContext);
+	} else {
+		newContext = null;
+	}
+	return newContext;
+};
+CT_DateTime.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.v) {
+		res += " v=\"";
+		res += this.v;
+		res += "\"";
+	}
+	if (null !== this.u) {
+		res += " u=\"";
+		res += getXmlFromBool(this.u);
+		res += "\"";
+	}
+	if (null !== this.f) {
+		res += " f=\"";
+		res += getXmlFromBool(this.f);
+		res += "\"";
+	}
+	if (null !== this.c) {
+		res += " c=\"";
+		res += this.c;
+		res += "\"";
+	}
+	if (null !== this.cp) {
+		res += " cp=\"";
+		res += this.cp.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.x.length; ++i) {
+		var elem = this.x[i];
+		res += elem.toXml("x");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
+function CT_Error() {
+//Attributes
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+//Members
+	this.tpls = null;
+	this.x = [];
+}
+CT_Error.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["v"];
+		if (undefined !== val) {
+			this.v = uq(val);
+		}
+		val = vals["u"];
+		if (undefined !== val) {
+			this.u = getBoolFromXml(val);
+		}
+		val = vals["f"];
+		if (undefined !== val) {
+			this.f = getBoolFromXml(val);
+		}
+		val = vals["c"];
+		if (undefined !== val) {
+			this.c = uq(val);
+		}
+		val = vals["cp"];
+		if (undefined !== val) {
+			this.cp = val - 0;
+		}
+		val = vals["in"];
+		if (undefined !== val) {
+			this.in = val - 0;
+		}
+		val = vals["bc"];
+		if (undefined !== val) {
+			this.bc = val - 0;
+		}
+		val = vals["fc"];
+		if (undefined !== val) {
+			this.fc = val - 0;
+		}
+		val = vals["i"];
+		if (undefined !== val) {
+			this.i = getBoolFromXml(val);
+		}
+		val = vals["un"];
+		if (undefined !== val) {
+			this.un = getBoolFromXml(val);
+		}
+		val = vals["st"];
+		if (undefined !== val) {
+			this.st = getBoolFromXml(val);
+		}
+		val = vals["b"];
+		if (undefined !== val) {
+			this.b = getBoolFromXml(val);
+		}
+	}
+};
+CT_Error.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = this;
+	if ("tpls" === elem) {
+		newContext = new CT_Tuples();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.tpls = newContext;
+	} else if ("x" === elem) {
+		newContext = new CT_X();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.x.push(newContext);
+	} else {
+		newContext = null;
+	}
+	return newContext;
+};
+CT_Error.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.v) {
+		res += " v=\"";
+		res += this.v;
+		res += "\"";
+	}
+	if (null !== this.u) {
+		res += " u=\"";
+		res += getXmlFromBool(this.u);
+		res += "\"";
+	}
+	if (null !== this.f) {
+		res += " f=\"";
+		res += getXmlFromBool(this.f);
+		res += "\"";
+	}
+	if (null !== this.c) {
+		res += " c=\"";
+		res += this.c;
+		res += "\"";
+	}
+	if (null !== this.cp) {
+		res += " cp=\"";
+		res += this.cp.toString();
+		res += "\"";
+	}
+	if (null !== this.in) {
+		res += " in=\"";
+		res += this.in.toString();
+		res += "\"";
+	}
+	if (null !== this.bc) {
+		res += " bc=\"";
+		res += this.bc.toString();
+		res += "\"";
+	}
+	if (null !== this.fc) {
+		res += " fc=\"";
+		res += this.fc.toString();
+		res += "\"";
+	}
+	if (null !== this.i) {
+		res += " i=\"";
+		res += getXmlFromBool(this.i);
+		res += "\"";
+	}
+	if (null !== this.un) {
+		res += " un=\"";
+		res += getXmlFromBool(this.un);
+		res += "\"";
+	}
+	if (null !== this.st) {
+		res += " st=\"";
+		res += getXmlFromBool(this.st);
+		res += "\"";
+	}
+	if (null !== this.b) {
+		res += " b=\"";
+		res += getXmlFromBool(this.b);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.tpls) {
+		res += this.tpls.toXml("tpls");
+	}
+	for (var i = 0; i < this.x.length; ++i) {
+		var elem = this.x[i];
+		res += elem.toXml("x");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
+function CT_Missing() {
+//Attributes
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+//Members
+	this.tpls = [];
+	this.x = [];
+}
+CT_Missing.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["u"];
+		if (undefined !== val) {
+			this.u = getBoolFromXml(val);
+		}
+		val = vals["f"];
+		if (undefined !== val) {
+			this.f = getBoolFromXml(val);
+		}
+		val = vals["c"];
+		if (undefined !== val) {
+			this.c = uq(val);
+		}
+		val = vals["cp"];
+		if (undefined !== val) {
+			this.cp = val - 0;
+		}
+		val = vals["in"];
+		if (undefined !== val) {
+			this.in = val - 0;
+		}
+		val = vals["bc"];
+		if (undefined !== val) {
+			this.bc = val - 0;
+		}
+		val = vals["fc"];
+		if (undefined !== val) {
+			this.fc = val - 0;
+		}
+		val = vals["i"];
+		if (undefined !== val) {
+			this.i = getBoolFromXml(val);
+		}
+		val = vals["un"];
+		if (undefined !== val) {
+			this.un = getBoolFromXml(val);
+		}
+		val = vals["st"];
+		if (undefined !== val) {
+			this.st = getBoolFromXml(val);
+		}
+		val = vals["b"];
+		if (undefined !== val) {
+			this.b = getBoolFromXml(val);
+		}
+	}
+};
+CT_Missing.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = this;
+	if ("tpls" === elem) {
+		newContext = new CT_Tuples();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.tpls.push(newContext);
+	} else if ("x" === elem) {
+		newContext = new CT_X();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.x.push(newContext);
+	} else {
+		newContext = null;
+	}
+	return newContext;
+};
+CT_Missing.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.u) {
+		res += " u=\"";
+		res += getXmlFromBool(this.u);
+		res += "\"";
+	}
+	if (null !== this.f) {
+		res += " f=\"";
+		res += getXmlFromBool(this.f);
+		res += "\"";
+	}
+	if (null !== this.c) {
+		res += " c=\"";
+		res += this.c;
+		res += "\"";
+	}
+	if (null !== this.cp) {
+		res += " cp=\"";
+		res += this.cp.toString();
+		res += "\"";
+	}
+	if (null !== this.in) {
+		res += " in=\"";
+		res += this.in.toString();
+		res += "\"";
+	}
+	if (null !== this.bc) {
+		res += " bc=\"";
+		res += this.bc.toString();
+		res += "\"";
+	}
+	if (null !== this.fc) {
+		res += " fc=\"";
+		res += this.fc.toString();
+		res += "\"";
+	}
+	if (null !== this.i) {
+		res += " i=\"";
+		res += getXmlFromBool(this.i);
+		res += "\"";
+	}
+	if (null !== this.un) {
+		res += " un=\"";
+		res += getXmlFromBool(this.un);
+		res += "\"";
+	}
+	if (null !== this.st) {
+		res += " st=\"";
+		res += getXmlFromBool(this.st);
+		res += "\"";
+	}
+	if (null !== this.b) {
+		res += " b=\"";
+		res += getXmlFromBool(this.b);
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.tpls.length; ++i) {
+		var elem = this.tpls[i];
+		res += elem.toXml("tpls");
+	}
+	for (var i = 0; i < this.x.length; ++i) {
+		var elem = this.x[i];
+		res += elem.toXml("x");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
+function CT_Number() {
+//Attributes
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+//Members
+	this.tpls = [];
+	this.x = [];
+}
+CT_Number.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["v"];
+		if (undefined !== val) {
+			this.v = val - 0;
+		}
+		val = vals["u"];
+		if (undefined !== val) {
+			this.u = getBoolFromXml(val);
+		}
+		val = vals["f"];
+		if (undefined !== val) {
+			this.f = getBoolFromXml(val);
+		}
+		val = vals["c"];
+		if (undefined !== val) {
+			this.c = uq(val);
+		}
+		val = vals["cp"];
+		if (undefined !== val) {
+			this.cp = val - 0;
+		}
+		val = vals["in"];
+		if (undefined !== val) {
+			this.in = val - 0;
+		}
+		val = vals["bc"];
+		if (undefined !== val) {
+			this.bc = val - 0;
+		}
+		val = vals["fc"];
+		if (undefined !== val) {
+			this.fc = val - 0;
+		}
+		val = vals["i"];
+		if (undefined !== val) {
+			this.i = getBoolFromXml(val);
+		}
+		val = vals["un"];
+		if (undefined !== val) {
+			this.un = getBoolFromXml(val);
+		}
+		val = vals["st"];
+		if (undefined !== val) {
+			this.st = getBoolFromXml(val);
+		}
+		val = vals["b"];
+		if (undefined !== val) {
+			this.b = getBoolFromXml(val);
+		}
+	}
+};
+CT_Number.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = this;
+	if ("tpls" === elem) {
+		newContext = new CT_Tuples();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.tpls.push(newContext);
+	} else if ("x" === elem) {
+		newContext = new CT_X();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.x.push(newContext);
+	} else {
+		newContext = null;
+	}
+	return newContext;
+};
+CT_Number.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.v) {
+		res += " v=\"";
+		res += this.v.toString();
+		res += "\"";
+	}
+	if (null !== this.u) {
+		res += " u=\"";
+		res += getXmlFromBool(this.u);
+		res += "\"";
+	}
+	if (null !== this.f) {
+		res += " f=\"";
+		res += getXmlFromBool(this.f);
+		res += "\"";
+	}
+	if (null !== this.c) {
+		res += " c=\"";
+		res += this.c;
+		res += "\"";
+	}
+	if (null !== this.cp) {
+		res += " cp=\"";
+		res += this.cp.toString();
+		res += "\"";
+	}
+	if (null !== this.in) {
+		res += " in=\"";
+		res += this.in.toString();
+		res += "\"";
+	}
+	if (null !== this.bc) {
+		res += " bc=\"";
+		res += this.bc.toString();
+		res += "\"";
+	}
+	if (null !== this.fc) {
+		res += " fc=\"";
+		res += this.fc.toString();
+		res += "\"";
+	}
+	if (null !== this.i) {
+		res += " i=\"";
+		res += getXmlFromBool(this.i);
+		res += "\"";
+	}
+	if (null !== this.un) {
+		res += " un=\"";
+		res += getXmlFromBool(this.un);
+		res += "\"";
+	}
+	if (null !== this.st) {
+		res += " st=\"";
+		res += getXmlFromBool(this.st);
+		res += "\"";
+	}
+	if (null !== this.b) {
+		res += " b=\"";
+		res += getXmlFromBool(this.b);
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.tpls.length; ++i) {
+		var elem = this.tpls[i];
+		res += elem.toXml("tpls");
+	}
+	for (var i = 0; i < this.x.length; ++i) {
+		var elem = this.x[i];
+		res += elem.toXml("x");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
+function CT_String() {
+//Attributes
+	this.v = null;
+	this.u = null;
+	this.f = null;
+	this.c = null;
+	this.cp = null;
+	this.in = null;
+	this.bc = null;
+	this.fc = null;
+	this.i = null;//false
+	this.un = null;//false
+	this.st = null;//false
+	this.b = null;//false
+//Members
+	this.tpls = [];
+	this.x = [];
+}
+CT_String.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["v"];
+		if (undefined !== val) {
+			this.v = uq(val);
+		}
+		val = vals["u"];
+		if (undefined !== val) {
+			this.u = getBoolFromXml(val);
+		}
+		val = vals["f"];
+		if (undefined !== val) {
+			this.f = getBoolFromXml(val);
+		}
+		val = vals["c"];
+		if (undefined !== val) {
+			this.c = uq(val);
+		}
+		val = vals["cp"];
+		if (undefined !== val) {
+			this.cp = val - 0;
+		}
+		val = vals["in"];
+		if (undefined !== val) {
+			this.in = val - 0;
+		}
+		val = vals["bc"];
+		if (undefined !== val) {
+			this.bc = val - 0;
+		}
+		val = vals["fc"];
+		if (undefined !== val) {
+			this.fc = val - 0;
+		}
+		val = vals["i"];
+		if (undefined !== val) {
+			this.i = getBoolFromXml(val);
+		}
+		val = vals["un"];
+		if (undefined !== val) {
+			this.un = getBoolFromXml(val);
+		}
+		val = vals["st"];
+		if (undefined !== val) {
+			this.st = getBoolFromXml(val);
+		}
+		val = vals["b"];
+		if (undefined !== val) {
+			this.b = getBoolFromXml(val);
+		}
+	}
+};
+CT_String.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = this;
+	if ("tpls" === elem) {
+		newContext = new CT_Tuples();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.tpls.push(newContext);
+	} else if ("x" === elem) {
+		newContext = new CT_X();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.x.push(newContext);
+	} else {
+		newContext = null;
+	}
+	return newContext;
+};
+CT_String.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.v) {
+		res += " v=\"";
+		res += this.v;
+		res += "\"";
+	}
+	if (null !== this.u) {
+		res += " u=\"";
+		res += getXmlFromBool(this.u);
+		res += "\"";
+	}
+	if (null !== this.f) {
+		res += " f=\"";
+		res += getXmlFromBool(this.f);
+		res += "\"";
+	}
+	if (null !== this.c) {
+		res += " c=\"";
+		res += this.c;
+		res += "\"";
+	}
+	if (null !== this.cp) {
+		res += " cp=\"";
+		res += this.cp.toString();
+		res += "\"";
+	}
+	if (null !== this.in) {
+		res += " in=\"";
+		res += this.in.toString();
+		res += "\"";
+	}
+	if (null !== this.bc) {
+		res += " bc=\"";
+		res += this.bc.toString();
+		res += "\"";
+	}
+	if (null !== this.fc) {
+		res += " fc=\"";
+		res += this.fc.toString();
+		res += "\"";
+	}
+	if (null !== this.i) {
+		res += " i=\"";
+		res += getXmlFromBool(this.i);
+		res += "\"";
+	}
+	if (null !== this.un) {
+		res += " un=\"";
+		res += getXmlFromBool(this.un);
+		res += "\"";
+	}
+	if (null !== this.st) {
+		res += " st=\"";
+		res += getXmlFromBool(this.st);
+		res += "\"";
+	}
+	if (null !== this.b) {
+		res += " b=\"";
+		res += getXmlFromBool(this.b);
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.tpls.length; ++i) {
+		var elem = this.tpls[i];
+		res += elem.toXml("tpls");
+	}
+	for (var i = 0; i < this.x.length; ++i) {
+		var elem = this.x[i];
+		res += elem.toXml("x");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
+function CT_Index() {
+//Attributes
+	this.v = null;
+}
+CT_Index.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["v"];
+		if (undefined !== val) {
+			this.v = val - 0;
+		}
+	}
+};
+CT_Index.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.v) {
+		res += " v=\"";
+		res += this.v.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_Location() {
 //Attributes
@@ -1978,6 +4189,43 @@ CT_Location.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_Location.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.ref) {
+		res += " ref=\"";
+		res += this.ref;
+		res += "\"";
+	}
+	if (null !== this.firstHeaderRow) {
+		res += " firstHeaderRow=\"";
+		res += this.firstHeaderRow.toString();
+		res += "\"";
+	}
+	if (null !== this.firstDataRow) {
+		res += " firstDataRow=\"";
+		res += this.firstDataRow.toString();
+		res += "\"";
+	}
+	if (null !== this.firstDataCol) {
+		res += " firstDataCol=\"";
+		res += this.firstDataCol.toString();
+		res += "\"";
+	}
+	if (null !== this.rowPageCount) {
+		res += " rowPageCount=\"";
+		res += this.rowPageCount.toString();
+		res += "\"";
+	}
+	if (null !== this.colPageCount) {
+		res += " colPageCount=\"";
+		res += this.colPageCount.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_PivotFields() {
 //Attributes
 	this.count = null;
@@ -2006,6 +4254,25 @@ CT_PivotFields.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_PivotFields.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.pivotField.length; ++i) {
+		var elem = this.pivotField[i];
+		res += elem.toXml("pivotField");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_RowFields() {
 //Attributes
@@ -2036,6 +4303,25 @@ CT_RowFields.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_RowFields.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.field.length; ++i) {
+		var elem = this.field[i];
+		res += elem.toXml("field");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_rowItems() {
 //Attributes
 	this.count = null;
@@ -2064,6 +4350,25 @@ CT_rowItems.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_rowItems.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.i.length; ++i) {
+		var elem = this.i[i];
+		res += elem.toXml("i");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_ColFields() {
 //Attributes
@@ -2094,6 +4399,25 @@ CT_ColFields.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_ColFields.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.field.length; ++i) {
+		var elem = this.field[i];
+		res += elem.toXml("field");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_colItems() {
 //Attributes
 	this.count = null;
@@ -2122,6 +4446,25 @@ CT_colItems.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_colItems.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.i.length; ++i) {
+		var elem = this.i[i];
+		res += elem.toXml("i");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_PageFields() {
 //Attributes
@@ -2152,6 +4495,25 @@ CT_PageFields.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_PageFields.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.pageField.length; ++i) {
+		var elem = this.pageField[i];
+		res += elem.toXml("pageField");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_DataFields() {
 //Attributes
 	this.count = null;
@@ -2180,6 +4542,25 @@ CT_DataFields.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_DataFields.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.dataField.length; ++i) {
+		var elem = this.dataField[i];
+		res += elem.toXml("dataField");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_Formats() {
 //Attributes
@@ -2210,6 +4591,25 @@ CT_Formats.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_Formats.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.format.length; ++i) {
+		var elem = this.format[i];
+		res += elem.toXml("format");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_ConditionalFormats() {
 //Attributes
 	this.count = null;//0
@@ -2238,6 +4638,25 @@ CT_ConditionalFormats.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_ConditionalFormats.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.conditionalFormat.length; ++i) {
+		var elem = this.conditionalFormat[i];
+		res += elem.toXml("conditionalFormat");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_ChartFormats() {
 //Attributes
@@ -2268,6 +4687,25 @@ CT_ChartFormats.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_ChartFormats.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.chartFormat.length; ++i) {
+		var elem = this.chartFormat[i];
+		res += elem.toXml("chartFormat");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_PivotHierarchies() {
 //Attributes
 	this.count = null;
@@ -2296,6 +4734,25 @@ CT_PivotHierarchies.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_PivotHierarchies.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.pivotHierarchy.length; ++i) {
+		var elem = this.pivotHierarchy[i];
+		res += elem.toXml("pivotHierarchy");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_PivotTableStyle() {
 //Attributes
@@ -2336,6 +4793,43 @@ CT_PivotTableStyle.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_PivotTableStyle.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.showRowHeaders) {
+		res += " showRowHeaders=\"";
+		res += getXmlFromBool(this.showRowHeaders);
+		res += "\"";
+	}
+	if (null !== this.showColHeaders) {
+		res += " showColHeaders=\"";
+		res += getXmlFromBool(this.showColHeaders);
+		res += "\"";
+	}
+	if (null !== this.showRowStripes) {
+		res += " showRowStripes=\"";
+		res += getXmlFromBool(this.showRowStripes);
+		res += "\"";
+	}
+	if (null !== this.showColStripes) {
+		res += " showColStripes=\"";
+		res += getXmlFromBool(this.showColStripes);
+		res += "\"";
+	}
+	if (null !== this.showLastColumn) {
+		res += " showLastColumn=\"";
+		res += getXmlFromBool(this.showLastColumn);
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_PivotFilters() {
 //Attributes
 	this.count = null;//0
@@ -2364,6 +4858,25 @@ CT_PivotFilters.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_PivotFilters.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.filter.length; ++i) {
+		var elem = this.filter[i];
+		res += elem.toXml("filter");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_RowHierarchiesUsage() {
 //Attributes
@@ -2394,6 +4907,25 @@ CT_RowHierarchiesUsage.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_RowHierarchiesUsage.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.rowHierarchyUsage.length; ++i) {
+		var elem = this.rowHierarchyUsage[i];
+		res += elem.toXml("rowHierarchyUsage");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_ColHierarchiesUsage() {
 //Attributes
 	this.count = null;
@@ -2422,6 +4954,25 @@ CT_ColHierarchiesUsage.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_ColHierarchiesUsage.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.colHierarchyUsage.length; ++i) {
+		var elem = this.colHierarchyUsage[i];
+		res += elem.toXml("colHierarchyUsage");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_Consolidation() {
 //Attributes
@@ -2459,6 +5010,27 @@ CT_Consolidation.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_Consolidation.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.autoPage) {
+		res += " autoPage=\"";
+		res += getXmlFromBool(this.autoPage);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.pages) {
+		res += this.pages.toXml("pages");
+	}
+	if (null !== this.rangeSets) {
+		res += this.rangeSets.toXml("rangeSets");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_WorksheetSource() {
 //Attributes
 	this.ref = null;
@@ -2487,6 +5059,33 @@ CT_WorksheetSource.prototype.readAttributes = function(attr, uq) {
 			this.id = uq(val);
 		}
 	}
+};
+CT_WorksheetSource.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.ref) {
+		res += " ref=\"";
+		res += this.ref;
+		res += "\"";
+	}
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.sheet) {
+		res += " sheet=\"";
+		res += this.sheet;
+		res += "\"";
+	}
+	if (null !== this.id) {
+		res += " r:id=\"";
+		res += this.id;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_CacheField() {
 //Attributes
@@ -2597,6 +5196,94 @@ CT_CacheField.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_CacheField.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.caption) {
+		res += " caption=\"";
+		res += this.caption;
+		res += "\"";
+	}
+	if (null !== this.propertyName) {
+		res += " propertyName=\"";
+		res += this.propertyName;
+		res += "\"";
+	}
+	if (null !== this.serverField) {
+		res += " serverField=\"";
+		res += getXmlFromBool(this.serverField);
+		res += "\"";
+	}
+	if (null !== this.uniqueList) {
+		res += " uniqueList=\"";
+		res += getXmlFromBool(this.uniqueList);
+		res += "\"";
+	}
+	if (null !== this.numFmtId) {
+		res += " numFmtId=\"";
+		res += this.numFmtId.toString();
+		res += "\"";
+	}
+	if (null !== this.formula) {
+		res += " formula=\"";
+		res += this.formula;
+		res += "\"";
+	}
+	if (null !== this.sqlType) {
+		res += " sqlType=\"";
+		res += this.sqlType.toString();
+		res += "\"";
+	}
+	if (null !== this.hierarchy) {
+		res += " hierarchy=\"";
+		res += this.hierarchy.toString();
+		res += "\"";
+	}
+	if (null !== this.level) {
+		res += " level=\"";
+		res += this.level.toString();
+		res += "\"";
+	}
+	if (null !== this.databaseField) {
+		res += " databaseField=\"";
+		res += getXmlFromBool(this.databaseField);
+		res += "\"";
+	}
+	if (null !== this.mappingCount) {
+		res += " mappingCount=\"";
+		res += this.mappingCount.toString();
+		res += "\"";
+	}
+	if (null !== this.memberPropertyField) {
+		res += " memberPropertyField=\"";
+		res += getXmlFromBool(this.memberPropertyField);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.sharedItems) {
+		res += this.sharedItems.toXml("sharedItems");
+	}
+	if (null !== this.fieldGroup) {
+		res += this.fieldGroup.toXml("fieldGroup");
+	}
+	for (var i = 0; i < this.mpMap.length; ++i) {
+		var elem = this.mpMap[i];
+		res += elem.toXml("mpMap");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_CacheHierarchy() {
 //Attributes
@@ -2746,6 +5433,135 @@ CT_CacheHierarchy.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_CacheHierarchy.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.uniqueName) {
+		res += " uniqueName=\"";
+		res += this.uniqueName;
+		res += "\"";
+	}
+	if (null !== this.caption) {
+		res += " caption=\"";
+		res += this.caption;
+		res += "\"";
+	}
+	if (null !== this.measure) {
+		res += " measure=\"";
+		res += getXmlFromBool(this.measure);
+		res += "\"";
+	}
+	if (null !== this.set) {
+		res += " set=\"";
+		res += getXmlFromBool(this.set);
+		res += "\"";
+	}
+	if (null !== this.parentSet) {
+		res += " parentSet=\"";
+		res += this.parentSet.toString();
+		res += "\"";
+	}
+	if (null !== this.iconSet) {
+		res += " iconSet=\"";
+		res += this.iconSet.toString();
+		res += "\"";
+	}
+	if (null !== this.attribute) {
+		res += " attribute=\"";
+		res += getXmlFromBool(this.attribute);
+		res += "\"";
+	}
+	if (null !== this.time) {
+		res += " time=\"";
+		res += getXmlFromBool(this.time);
+		res += "\"";
+	}
+	if (null !== this.keyAttribute) {
+		res += " keyAttribute=\"";
+		res += getXmlFromBool(this.keyAttribute);
+		res += "\"";
+	}
+	if (null !== this.defaultMemberUniqueName) {
+		res += " defaultMemberUniqueName=\"";
+		res += this.defaultMemberUniqueName;
+		res += "\"";
+	}
+	if (null !== this.allUniqueName) {
+		res += " allUniqueName=\"";
+		res += this.allUniqueName;
+		res += "\"";
+	}
+	if (null !== this.allCaption) {
+		res += " allCaption=\"";
+		res += this.allCaption;
+		res += "\"";
+	}
+	if (null !== this.dimensionUniqueName) {
+		res += " dimensionUniqueName=\"";
+		res += this.dimensionUniqueName;
+		res += "\"";
+	}
+	if (null !== this.displayFolder) {
+		res += " displayFolder=\"";
+		res += this.displayFolder;
+		res += "\"";
+	}
+	if (null !== this.measureGroup) {
+		res += " measureGroup=\"";
+		res += this.measureGroup;
+		res += "\"";
+	}
+	if (null !== this.measures) {
+		res += " measures=\"";
+		res += getXmlFromBool(this.measures);
+		res += "\"";
+	}
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	if (null !== this.oneField) {
+		res += " oneField=\"";
+		res += getXmlFromBool(this.oneField);
+		res += "\"";
+	}
+	if (null !== this.memberValueDatatype) {
+		res += " memberValueDatatype=\"";
+		res += this.memberValueDatatype.toString();
+		res += "\"";
+	}
+	if (null !== this.unbalanced) {
+		res += " unbalanced=\"";
+		res += getXmlFromBool(this.unbalanced);
+		res += "\"";
+	}
+	if (null !== this.unbalancedGroup) {
+		res += " unbalancedGroup=\"";
+		res += getXmlFromBool(this.unbalancedGroup);
+		res += "\"";
+	}
+	if (null !== this.hidden) {
+		res += " hidden=\"";
+		res += getXmlFromBool(this.hidden);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.fieldsUsage) {
+		res += this.fieldsUsage.toXml("fieldsUsage");
+	}
+	if (null !== this.groupLevels) {
+		res += this.groupLevels.toXml("groupLevels");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_PCDKPI() {
 //Attributes
 	this.uniqueName = null;
@@ -2810,13 +5626,73 @@ CT_PCDKPI.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_PCDKPI.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.uniqueName) {
+		res += " uniqueName=\"";
+		res += this.uniqueName;
+		res += "\"";
+	}
+	if (null !== this.caption) {
+		res += " caption=\"";
+		res += this.caption;
+		res += "\"";
+	}
+	if (null !== this.displayFolder) {
+		res += " displayFolder=\"";
+		res += this.displayFolder;
+		res += "\"";
+	}
+	if (null !== this.measureGroup) {
+		res += " measureGroup=\"";
+		res += this.measureGroup;
+		res += "\"";
+	}
+	if (null !== this.parent) {
+		res += " parent=\"";
+		res += this.parent;
+		res += "\"";
+	}
+	if (null !== this.value) {
+		res += " value=\"";
+		res += this.value;
+		res += "\"";
+	}
+	if (null !== this.goal) {
+		res += " goal=\"";
+		res += this.goal;
+		res += "\"";
+	}
+	if (null !== this.status) {
+		res += " status=\"";
+		res += this.status;
+		res += "\"";
+	}
+	if (null !== this.trend) {
+		res += " trend=\"";
+		res += this.trend;
+		res += "\"";
+	}
+	if (null !== this.weight) {
+		res += " weight=\"";
+		res += this.weight;
+		res += "\"";
+	}
+	if (null !== this.time) {
+		res += " time=\"";
+		res += this.time;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_PCDSDTCEntries() {
 //Attributes
 	this.count = null;
 //Members
 	this.Items = [];
-//internal
-	this._curElem = null;
 }
 CT_PCDSDTCEntries.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -2859,10 +5735,32 @@ CT_PCDSDTCEntries.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PCDSDTCEntries.prototype.onTextNode = function(text, uq) {
-	if ("Items" === this._curElem) {
-		this.Items = uq(text);
+CT_PCDSDTCEntries.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
 	}
+	res += ">";
+	for (var j = 0; j < this.Items.length; ++j) {
+		var subelem = this.Items[j];
+		if (subelem instanceof CT_Error) {
+			res += subelem.toXml("e");
+		} else if (subelem instanceof CT_Missing) {
+			res += subelem.toXml("m");
+		} else if (subelem instanceof CT_Number) {
+			res += subelem.toXml("n");
+		} else if (subelem instanceof CT_String) {
+			res += subelem.toXml("s");
+		}
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_Sets() {
 //Attributes
@@ -2893,6 +5791,25 @@ CT_Sets.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_Sets.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.set.length; ++i) {
+		var elem = this.set[i];
+		res += elem.toXml("set");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_QueryCache() {
 //Attributes
 	this.count = null;
@@ -2922,6 +5839,25 @@ CT_QueryCache.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_QueryCache.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.query.length; ++i) {
+		var elem = this.query[i];
+		res += elem.toXml("query");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_ServerFormats() {
 //Attributes
 	this.count = null;
@@ -2950,6 +5886,25 @@ CT_ServerFormats.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_ServerFormats.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.serverFormat.length; ++i) {
+		var elem = this.serverFormat[i];
+		res += elem.toXml("serverFormat");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_CalculatedItem() {
 //Attributes
@@ -2991,6 +5946,32 @@ CT_CalculatedItem.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_CalculatedItem.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.field) {
+		res += " field=\"";
+		res += this.field.toString();
+		res += "\"";
+	}
+	if (null !== this.formula) {
+		res += " formula=\"";
+		res += this.formula;
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.pivotArea) {
+		res += this.pivotArea.toXml("pivotArea");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_CalculatedMember() {
 //Attributes
@@ -3051,6 +6032,54 @@ CT_CalculatedMember.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_CalculatedMember.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.mdx) {
+		res += " mdx=\"";
+		res += this.mdx;
+		res += "\"";
+	}
+	if (null !== this.memberName) {
+		res += " memberName=\"";
+		res += this.memberName;
+		res += "\"";
+	}
+	if (null !== this.hierarchy) {
+		res += " hierarchy=\"";
+		res += this.hierarchy;
+		res += "\"";
+	}
+	if (null !== this.parent) {
+		res += " parent=\"";
+		res += this.parent;
+		res += "\"";
+	}
+	if (null !== this.solveOrder) {
+		res += " solveOrder=\"";
+		res += this.solveOrder.toString();
+		res += "\"";
+	}
+	if (null !== this.set) {
+		res += " set=\"";
+		res += getXmlFromBool(this.set);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_PivotDimension() {
 //Attributes
 	this.measure = null;//false
@@ -3080,6 +6109,33 @@ CT_PivotDimension.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_PivotDimension.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.measure) {
+		res += " measure=\"";
+		res += getXmlFromBool(this.measure);
+		res += "\"";
+	}
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.uniqueName) {
+		res += " uniqueName=\"";
+		res += this.uniqueName;
+		res += "\"";
+	}
+	if (null !== this.caption) {
+		res += " caption=\"";
+		res += this.caption;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_MeasureGroup() {
 //Attributes
 	this.name = null;
@@ -3099,6 +6155,23 @@ CT_MeasureGroup.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_MeasureGroup.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.caption) {
+		res += " caption=\"";
+		res += this.caption;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_MeasureDimensionMap() {
 //Attributes
 	this.measureGroup = null;
@@ -3117,6 +6190,23 @@ CT_MeasureDimensionMap.prototype.readAttributes = function(attr, uq) {
 			this.dimension = val - 0;
 		}
 	}
+};
+CT_MeasureDimensionMap.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.measureGroup) {
+		res += " measureGroup=\"";
+		res += this.measureGroup.toString();
+		res += "\"";
+	}
+	if (null !== this.dimension) {
+		res += " dimension=\"";
+		res += this.dimension.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_Extension() {
 //Attributes
@@ -3139,7 +6229,7 @@ CT_Extension.prototype.readAttributes = function(attr, uq) {
 CT_Extension.prototype.onStartNode = function(elem, attr, uq) {
 	var newContext = this;
 	if ("Any" === elem) {
-		this.Any = elem;
+		this._curElem = elem;
 	} else {
 		newContext = null;
 	}
@@ -3150,468 +6240,31 @@ CT_Extension.prototype.onTextNode = function(text, uq) {
 		this.Any = uq(text);
 	}
 };
-function CT_Boolean() {
+CT_Extension.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.uri) {
+		res += " uri=\"";
+		res += this.uri;
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.Any) {
+		res += "<Any>";
+		res += this.Any;
+		res += "</Any>";
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
+function CT_X() {
 //Attributes
-	this.v = null;
-	this.u = null;
-	this.f = null;
-	this.c = null;
-	this.cp = null;
-//Members
-	this.x = [];
+	this.v = null;//0
 }
-CT_Boolean.prototype.readAttributes = function(attr, uq) {
-	if (attr()) {
-		var vals = attr();
-		var val;
-		val = vals["v"];
-		if (undefined !== val) {
-			this.v = getBoolFromXml(val);
-		}
-		val = vals["u"];
-		if (undefined !== val) {
-			this.u = getBoolFromXml(val);
-		}
-		val = vals["f"];
-		if (undefined !== val) {
-			this.f = getBoolFromXml(val);
-		}
-		val = vals["c"];
-		if (undefined !== val) {
-			this.c = uq(val);
-		}
-		val = vals["cp"];
-		if (undefined !== val) {
-			this.cp = val - 0;
-		}
-	}
-};
-CT_Boolean.prototype.onStartNode = function(elem, attr, uq) {
-	var newContext = this;
-	if ("x" === elem) {
-		newContext = new CT_X();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.x.push(newContext);
-	} else {
-		newContext = null;
-	}
-	return newContext;
-};
-function CT_DateTime() {
-//Attributes
-	this.v = null;
-	this.u = null;
-	this.f = null;
-	this.c = null;
-	this.cp = null;
-//Members
-	this.x = [];
-}
-CT_DateTime.prototype.readAttributes = function(attr, uq) {
-	if (attr()) {
-		var vals = attr();
-		var val;
-		val = vals["v"];
-		if (undefined !== val) {
-			this.v = uq(val);
-		}
-		val = vals["u"];
-		if (undefined !== val) {
-			this.u = getBoolFromXml(val);
-		}
-		val = vals["f"];
-		if (undefined !== val) {
-			this.f = getBoolFromXml(val);
-		}
-		val = vals["c"];
-		if (undefined !== val) {
-			this.c = uq(val);
-		}
-		val = vals["cp"];
-		if (undefined !== val) {
-			this.cp = val - 0;
-		}
-	}
-};
-CT_DateTime.prototype.onStartNode = function(elem, attr, uq) {
-	var newContext = this;
-	if ("x" === elem) {
-		newContext = new CT_X();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.x.push(newContext);
-	} else {
-		newContext = null;
-	}
-	return newContext;
-};
-function CT_Error() {
-//Attributes
-	this.v = null;
-	this.u = null;
-	this.f = null;
-	this.c = null;
-	this.cp = null;
-	this.in = null;
-	this.bc = null;
-	this.fc = null;
-	this.i = null;//false
-	this.un = null;//false
-	this.st = null;//false
-	this.b = null;//false
-//Members
-	this.tpls = null;
-	this.x = [];
-}
-CT_Error.prototype.readAttributes = function(attr, uq) {
-	if (attr()) {
-		var vals = attr();
-		var val;
-		val = vals["v"];
-		if (undefined !== val) {
-			this.v = uq(val);
-		}
-		val = vals["u"];
-		if (undefined !== val) {
-			this.u = getBoolFromXml(val);
-		}
-		val = vals["f"];
-		if (undefined !== val) {
-			this.f = getBoolFromXml(val);
-		}
-		val = vals["c"];
-		if (undefined !== val) {
-			this.c = uq(val);
-		}
-		val = vals["cp"];
-		if (undefined !== val) {
-			this.cp = val - 0;
-		}
-		val = vals["in"];
-		if (undefined !== val) {
-			this.in = val - 0;
-		}
-		val = vals["bc"];
-		if (undefined !== val) {
-			this.bc = val - 0;
-		}
-		val = vals["fc"];
-		if (undefined !== val) {
-			this.fc = val - 0;
-		}
-		val = vals["i"];
-		if (undefined !== val) {
-			this.i = getBoolFromXml(val);
-		}
-		val = vals["un"];
-		if (undefined !== val) {
-			this.un = getBoolFromXml(val);
-		}
-		val = vals["st"];
-		if (undefined !== val) {
-			this.st = getBoolFromXml(val);
-		}
-		val = vals["b"];
-		if (undefined !== val) {
-			this.b = getBoolFromXml(val);
-		}
-	}
-};
-CT_Error.prototype.onStartNode = function(elem, attr, uq) {
-	var newContext = this;
-	if ("tpls" === elem) {
-		newContext = new CT_Tuples();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.tpls = newContext;
-	} else if ("x" === elem) {
-		newContext = new CT_X();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.x.push(newContext);
-	} else {
-		newContext = null;
-	}
-	return newContext;
-};
-function CT_Missing() {
-//Attributes
-	this.u = null;
-	this.f = null;
-	this.c = null;
-	this.cp = null;
-	this.in = null;
-	this.bc = null;
-	this.fc = null;
-	this.i = null;//false
-	this.un = null;//false
-	this.st = null;//false
-	this.b = null;//false
-//Members
-	this.tpls = [];
-	this.x = [];
-}
-CT_Missing.prototype.readAttributes = function(attr, uq) {
-	if (attr()) {
-		var vals = attr();
-		var val;
-		val = vals["u"];
-		if (undefined !== val) {
-			this.u = getBoolFromXml(val);
-		}
-		val = vals["f"];
-		if (undefined !== val) {
-			this.f = getBoolFromXml(val);
-		}
-		val = vals["c"];
-		if (undefined !== val) {
-			this.c = uq(val);
-		}
-		val = vals["cp"];
-		if (undefined !== val) {
-			this.cp = val - 0;
-		}
-		val = vals["in"];
-		if (undefined !== val) {
-			this.in = val - 0;
-		}
-		val = vals["bc"];
-		if (undefined !== val) {
-			this.bc = val - 0;
-		}
-		val = vals["fc"];
-		if (undefined !== val) {
-			this.fc = val - 0;
-		}
-		val = vals["i"];
-		if (undefined !== val) {
-			this.i = getBoolFromXml(val);
-		}
-		val = vals["un"];
-		if (undefined !== val) {
-			this.un = getBoolFromXml(val);
-		}
-		val = vals["st"];
-		if (undefined !== val) {
-			this.st = getBoolFromXml(val);
-		}
-		val = vals["b"];
-		if (undefined !== val) {
-			this.b = getBoolFromXml(val);
-		}
-	}
-};
-CT_Missing.prototype.onStartNode = function(elem, attr, uq) {
-	var newContext = this;
-	if ("tpls" === elem) {
-		newContext = new CT_Tuples();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.tpls.push(newContext);
-	} else if ("x" === elem) {
-		newContext = new CT_X();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.x.push(newContext);
-	} else {
-		newContext = null;
-	}
-	return newContext;
-};
-function CT_Number() {
-//Attributes
-	this.v = null;
-	this.u = null;
-	this.f = null;
-	this.c = null;
-	this.cp = null;
-	this.in = null;
-	this.bc = null;
-	this.fc = null;
-	this.i = null;//false
-	this.un = null;//false
-	this.st = null;//false
-	this.b = null;//false
-//Members
-	this.tpls = [];
-	this.x = [];
-}
-CT_Number.prototype.readAttributes = function(attr, uq) {
-	if (attr()) {
-		var vals = attr();
-		var val;
-		val = vals["v"];
-		if (undefined !== val) {
-			this.v = val - 0;
-		}
-		val = vals["u"];
-		if (undefined !== val) {
-			this.u = getBoolFromXml(val);
-		}
-		val = vals["f"];
-		if (undefined !== val) {
-			this.f = getBoolFromXml(val);
-		}
-		val = vals["c"];
-		if (undefined !== val) {
-			this.c = uq(val);
-		}
-		val = vals["cp"];
-		if (undefined !== val) {
-			this.cp = val - 0;
-		}
-		val = vals["in"];
-		if (undefined !== val) {
-			this.in = val - 0;
-		}
-		val = vals["bc"];
-		if (undefined !== val) {
-			this.bc = val - 0;
-		}
-		val = vals["fc"];
-		if (undefined !== val) {
-			this.fc = val - 0;
-		}
-		val = vals["i"];
-		if (undefined !== val) {
-			this.i = getBoolFromXml(val);
-		}
-		val = vals["un"];
-		if (undefined !== val) {
-			this.un = getBoolFromXml(val);
-		}
-		val = vals["st"];
-		if (undefined !== val) {
-			this.st = getBoolFromXml(val);
-		}
-		val = vals["b"];
-		if (undefined !== val) {
-			this.b = getBoolFromXml(val);
-		}
-	}
-};
-CT_Number.prototype.onStartNode = function(elem, attr, uq) {
-	var newContext = this;
-	if ("tpls" === elem) {
-		newContext = new CT_Tuples();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.tpls.push(newContext);
-	} else if ("x" === elem) {
-		newContext = new CT_X();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.x.push(newContext);
-	} else {
-		newContext = null;
-	}
-	return newContext;
-};
-function CT_String() {
-//Attributes
-	this.v = null;
-	this.u = null;
-	this.f = null;
-	this.c = null;
-	this.cp = null;
-	this.in = null;
-	this.bc = null;
-	this.fc = null;
-	this.i = null;//false
-	this.un = null;//false
-	this.st = null;//false
-	this.b = null;//false
-//Members
-	this.tpls = [];
-	this.x = [];
-}
-CT_String.prototype.readAttributes = function(attr, uq) {
-	if (attr()) {
-		var vals = attr();
-		var val;
-		val = vals["v"];
-		if (undefined !== val) {
-			this.v = uq(val);
-		}
-		val = vals["u"];
-		if (undefined !== val) {
-			this.u = getBoolFromXml(val);
-		}
-		val = vals["f"];
-		if (undefined !== val) {
-			this.f = getBoolFromXml(val);
-		}
-		val = vals["c"];
-		if (undefined !== val) {
-			this.c = uq(val);
-		}
-		val = vals["cp"];
-		if (undefined !== val) {
-			this.cp = val - 0;
-		}
-		val = vals["in"];
-		if (undefined !== val) {
-			this.in = val - 0;
-		}
-		val = vals["bc"];
-		if (undefined !== val) {
-			this.bc = val - 0;
-		}
-		val = vals["fc"];
-		if (undefined !== val) {
-			this.fc = val - 0;
-		}
-		val = vals["i"];
-		if (undefined !== val) {
-			this.i = getBoolFromXml(val);
-		}
-		val = vals["un"];
-		if (undefined !== val) {
-			this.un = getBoolFromXml(val);
-		}
-		val = vals["st"];
-		if (undefined !== val) {
-			this.st = getBoolFromXml(val);
-		}
-		val = vals["b"];
-		if (undefined !== val) {
-			this.b = getBoolFromXml(val);
-		}
-	}
-};
-CT_String.prototype.onStartNode = function(elem, attr, uq) {
-	var newContext = this;
-	if ("tpls" === elem) {
-		newContext = new CT_Tuples();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.tpls.push(newContext);
-	} else if ("x" === elem) {
-		newContext = new CT_X();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.x.push(newContext);
-	} else {
-		newContext = null;
-	}
-	return newContext;
-};
-function CT_Index() {
-//Attributes
-	this.v = null;
-}
-CT_Index.prototype.readAttributes = function(attr, uq) {
+CT_X.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
 		var vals = attr();
 		var val;
@@ -3620,6 +6273,66 @@ CT_Index.prototype.readAttributes = function(attr, uq) {
 			this.v = val - 0;
 		}
 	}
+};
+CT_X.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.v) {
+		res += " v=\"";
+		res += this.v.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
+function CT_Tuples() {
+//Attributes
+	this.c = null;
+//Members
+	this.tpl = [];
+}
+CT_Tuples.prototype.readAttributes = function(attr, uq) {
+	if (attr()) {
+		var vals = attr();
+		var val;
+		val = vals["c"];
+		if (undefined !== val) {
+			this.c = val - 0;
+		}
+	}
+};
+CT_Tuples.prototype.onStartNode = function(elem, attr, uq) {
+	var newContext = this;
+	if ("tpl" === elem) {
+		newContext = new CT_Tuple();
+		if (newContext.readAttributes) {
+			newContext.readAttributes(attr, uq);
+		}
+		this.tpl.push(newContext);
+	} else {
+		newContext = null;
+	}
+	return newContext;
+};
+CT_Tuples.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.c) {
+		res += " c=\"";
+		res += this.c.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.tpl.length; ++i) {
+		var elem = this.tpl[i];
+		res += elem.toXml("tpl");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_PivotField() {
 //Attributes
@@ -3905,6 +6618,265 @@ CT_PivotField.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_PivotField.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.axis) {
+		res += " axis=\"";
+		res += ToXml_ST_Axis(this.axis);
+		res += "\"";
+	}
+	if (null !== this.dataField) {
+		res += " dataField=\"";
+		res += getXmlFromBool(this.dataField);
+		res += "\"";
+	}
+	if (null !== this.subtotalCaption) {
+		res += " subtotalCaption=\"";
+		res += this.subtotalCaption;
+		res += "\"";
+	}
+	if (null !== this.showDropDowns) {
+		res += " showDropDowns=\"";
+		res += getXmlFromBool(this.showDropDowns);
+		res += "\"";
+	}
+	if (null !== this.hiddenLevel) {
+		res += " hiddenLevel=\"";
+		res += getXmlFromBool(this.hiddenLevel);
+		res += "\"";
+	}
+	if (null !== this.uniqueMemberProperty) {
+		res += " uniqueMemberProperty=\"";
+		res += this.uniqueMemberProperty;
+		res += "\"";
+	}
+	if (null !== this.compact) {
+		res += " compact=\"";
+		res += getXmlFromBool(this.compact);
+		res += "\"";
+	}
+	if (null !== this.allDrilled) {
+		res += " allDrilled=\"";
+		res += getXmlFromBool(this.allDrilled);
+		res += "\"";
+	}
+	if (null !== this.numFmtId) {
+		res += " numFmtId=\"";
+		res += this.numFmtId.toString();
+		res += "\"";
+	}
+	if (null !== this.outline) {
+		res += " outline=\"";
+		res += getXmlFromBool(this.outline);
+		res += "\"";
+	}
+	if (null !== this.subtotalTop) {
+		res += " subtotalTop=\"";
+		res += getXmlFromBool(this.subtotalTop);
+		res += "\"";
+	}
+	if (null !== this.dragToRow) {
+		res += " dragToRow=\"";
+		res += getXmlFromBool(this.dragToRow);
+		res += "\"";
+	}
+	if (null !== this.dragToCol) {
+		res += " dragToCol=\"";
+		res += getXmlFromBool(this.dragToCol);
+		res += "\"";
+	}
+	if (null !== this.multipleItemSelectionAllowed) {
+		res += " multipleItemSelectionAllowed=\"";
+		res += getXmlFromBool(this.multipleItemSelectionAllowed);
+		res += "\"";
+	}
+	if (null !== this.dragToPage) {
+		res += " dragToPage=\"";
+		res += getXmlFromBool(this.dragToPage);
+		res += "\"";
+	}
+	if (null !== this.dragToData) {
+		res += " dragToData=\"";
+		res += getXmlFromBool(this.dragToData);
+		res += "\"";
+	}
+	if (null !== this.dragOff) {
+		res += " dragOff=\"";
+		res += getXmlFromBool(this.dragOff);
+		res += "\"";
+	}
+	if (null !== this.showAll) {
+		res += " showAll=\"";
+		res += getXmlFromBool(this.showAll);
+		res += "\"";
+	}
+	if (null !== this.insertBlankRow) {
+		res += " insertBlankRow=\"";
+		res += getXmlFromBool(this.insertBlankRow);
+		res += "\"";
+	}
+	if (null !== this.serverField) {
+		res += " serverField=\"";
+		res += getXmlFromBool(this.serverField);
+		res += "\"";
+	}
+	if (null !== this.insertPageBreak) {
+		res += " insertPageBreak=\"";
+		res += getXmlFromBool(this.insertPageBreak);
+		res += "\"";
+	}
+	if (null !== this.autoShow) {
+		res += " autoShow=\"";
+		res += getXmlFromBool(this.autoShow);
+		res += "\"";
+	}
+	if (null !== this.topAutoShow) {
+		res += " topAutoShow=\"";
+		res += getXmlFromBool(this.topAutoShow);
+		res += "\"";
+	}
+	if (null !== this.hideNewItems) {
+		res += " hideNewItems=\"";
+		res += getXmlFromBool(this.hideNewItems);
+		res += "\"";
+	}
+	if (null !== this.measureFilter) {
+		res += " measureFilter=\"";
+		res += getXmlFromBool(this.measureFilter);
+		res += "\"";
+	}
+	if (null !== this.includeNewItemsInFilter) {
+		res += " includeNewItemsInFilter=\"";
+		res += getXmlFromBool(this.includeNewItemsInFilter);
+		res += "\"";
+	}
+	if (null !== this.itemPageCount) {
+		res += " itemPageCount=\"";
+		res += this.itemPageCount.toString();
+		res += "\"";
+	}
+	if (null !== this.sortType) {
+		res += " sortType=\"";
+		res += ToXml_ST_FieldSortType(this.sortType);
+		res += "\"";
+	}
+	if (null !== this.dataSourceSort) {
+		res += " dataSourceSort=\"";
+		res += getXmlFromBool(this.dataSourceSort);
+		res += "\"";
+	}
+	if (null !== this.nonAutoSortDefault) {
+		res += " nonAutoSortDefault=\"";
+		res += getXmlFromBool(this.nonAutoSortDefault);
+		res += "\"";
+	}
+	if (null !== this.rankBy) {
+		res += " rankBy=\"";
+		res += this.rankBy.toString();
+		res += "\"";
+	}
+	if (null !== this.defaultSubtotal) {
+		res += " defaultSubtotal=\"";
+		res += getXmlFromBool(this.defaultSubtotal);
+		res += "\"";
+	}
+	if (null !== this.sumSubtotal) {
+		res += " sumSubtotal=\"";
+		res += getXmlFromBool(this.sumSubtotal);
+		res += "\"";
+	}
+	if (null !== this.countASubtotal) {
+		res += " countASubtotal=\"";
+		res += getXmlFromBool(this.countASubtotal);
+		res += "\"";
+	}
+	if (null !== this.avgSubtotal) {
+		res += " avgSubtotal=\"";
+		res += getXmlFromBool(this.avgSubtotal);
+		res += "\"";
+	}
+	if (null !== this.maxSubtotal) {
+		res += " maxSubtotal=\"";
+		res += getXmlFromBool(this.maxSubtotal);
+		res += "\"";
+	}
+	if (null !== this.minSubtotal) {
+		res += " minSubtotal=\"";
+		res += getXmlFromBool(this.minSubtotal);
+		res += "\"";
+	}
+	if (null !== this.productSubtotal) {
+		res += " productSubtotal=\"";
+		res += getXmlFromBool(this.productSubtotal);
+		res += "\"";
+	}
+	if (null !== this.countSubtotal) {
+		res += " countSubtotal=\"";
+		res += getXmlFromBool(this.countSubtotal);
+		res += "\"";
+	}
+	if (null !== this.stdDevSubtotal) {
+		res += " stdDevSubtotal=\"";
+		res += getXmlFromBool(this.stdDevSubtotal);
+		res += "\"";
+	}
+	if (null !== this.stdDevPSubtotal) {
+		res += " stdDevPSubtotal=\"";
+		res += getXmlFromBool(this.stdDevPSubtotal);
+		res += "\"";
+	}
+	if (null !== this.varSubtotal) {
+		res += " varSubtotal=\"";
+		res += getXmlFromBool(this.varSubtotal);
+		res += "\"";
+	}
+	if (null !== this.varPSubtotal) {
+		res += " varPSubtotal=\"";
+		res += getXmlFromBool(this.varPSubtotal);
+		res += "\"";
+	}
+	if (null !== this.showPropCell) {
+		res += " showPropCell=\"";
+		res += getXmlFromBool(this.showPropCell);
+		res += "\"";
+	}
+	if (null !== this.showPropTip) {
+		res += " showPropTip=\"";
+		res += getXmlFromBool(this.showPropTip);
+		res += "\"";
+	}
+	if (null !== this.showPropAsCaption) {
+		res += " showPropAsCaption=\"";
+		res += getXmlFromBool(this.showPropAsCaption);
+		res += "\"";
+	}
+	if (null !== this.defaultAttributeDrillState) {
+		res += " defaultAttributeDrillState=\"";
+		res += getXmlFromBool(this.defaultAttributeDrillState);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.items) {
+		res += this.items.toXml("items");
+	}
+	if (null !== this.autoSortScope) {
+		res += this.autoSortScope.toXml("autoSortScope");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_Field() {
 //Attributes
 	this.x = null;
@@ -3918,6 +6890,18 @@ CT_Field.prototype.readAttributes = function(attr, uq) {
 			this.x = val - 0;
 		}
 	}
+};
+CT_Field.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.x) {
+		res += " x=\"";
+		res += this.x.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_I() {
 //Attributes
@@ -3960,6 +6944,35 @@ CT_I.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_I.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.t) {
+		res += " t=\"";
+		res += ToXml_ST_ItemType(this.t);
+		res += "\"";
+	}
+	if (null !== this.r) {
+		res += " r=\"";
+		res += this.r.toString();
+		res += "\"";
+	}
+	if (null !== this.i) {
+		res += " i=\"";
+		res += this.i.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.x.length; ++i) {
+		var elem = this.x[i];
+		res += elem.toXml("x");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_PageField() {
 //Attributes
@@ -4009,6 +7022,44 @@ CT_PageField.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_PageField.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.fld) {
+		res += " fld=\"";
+		res += this.fld.toString();
+		res += "\"";
+	}
+	if (null !== this.item) {
+		res += " item=\"";
+		res += this.item.toString();
+		res += "\"";
+	}
+	if (null !== this.hier) {
+		res += " hier=\"";
+		res += this.hier.toString();
+		res += "\"";
+	}
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.cap) {
+		res += " cap=\"";
+		res += this.cap;
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_DataField() {
 //Attributes
@@ -4075,6 +7126,54 @@ CT_DataField.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_DataField.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.fld) {
+		res += " fld=\"";
+		res += this.fld.toString();
+		res += "\"";
+	}
+	if (null !== this.subtotal) {
+		res += " subtotal=\"";
+		res += ToXml_ST_DataConsolidateFunction(this.subtotal);
+		res += "\"";
+	}
+	if (null !== this.showDataAs) {
+		res += " showDataAs=\"";
+		res += ToXml_ST_ShowDataAs(this.showDataAs);
+		res += "\"";
+	}
+	if (null !== this.baseField) {
+		res += " baseField=\"";
+		res += this.baseField.toString();
+		res += "\"";
+	}
+	if (null !== this.baseItem) {
+		res += " baseItem=\"";
+		res += this.baseItem.toString();
+		res += "\"";
+	}
+	if (null !== this.numFmtId) {
+		res += " numFmtId=\"";
+		res += this.numFmtId.toString();
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_Format() {
 //Attributes
 	this.action = null;//formatting
@@ -4118,6 +7217,32 @@ CT_Format.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_Format.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.action) {
+		res += " action=\"";
+		res += ToXml_ST_FormatAction(this.action);
+		res += "\"";
+	}
+	if (null !== this.dxfId) {
+		res += " dxfId=\"";
+		res += this.dxfId.toString();
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.pivotArea) {
+		res += this.pivotArea.toXml("pivotArea");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_ConditionalFormat() {
 //Attributes
@@ -4171,6 +7296,37 @@ CT_ConditionalFormat.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_ConditionalFormat.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.scope) {
+		res += " scope=\"";
+		res += ToXml_ST_Scope(this.scope);
+		res += "\"";
+	}
+	if (null !== this.type) {
+		res += " type=\"";
+		res += ToXml_ST_Type(this.type);
+		res += "\"";
+	}
+	if (null !== this.priority) {
+		res += " priority=\"";
+		res += this.priority.toString();
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.pivotAreas) {
+		res += this.pivotAreas.toXml("pivotAreas");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_ChartFormat() {
 //Attributes
 	this.chart = null;
@@ -4209,6 +7365,34 @@ CT_ChartFormat.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_ChartFormat.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.chart) {
+		res += " chart=\"";
+		res += this.chart.toString();
+		res += "\"";
+	}
+	if (null !== this.format) {
+		res += " format=\"";
+		res += this.format.toString();
+		res += "\"";
+	}
+	if (null !== this.series) {
+		res += " series=\"";
+		res += getXmlFromBool(this.series);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.pivotArea) {
+		res += this.pivotArea.toXml("pivotArea");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_PivotHierarchy() {
 //Attributes
@@ -4303,6 +7487,81 @@ CT_PivotHierarchy.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_PivotHierarchy.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.outline) {
+		res += " outline=\"";
+		res += getXmlFromBool(this.outline);
+		res += "\"";
+	}
+	if (null !== this.multipleItemSelectionAllowed) {
+		res += " multipleItemSelectionAllowed=\"";
+		res += getXmlFromBool(this.multipleItemSelectionAllowed);
+		res += "\"";
+	}
+	if (null !== this.subtotalTop) {
+		res += " subtotalTop=\"";
+		res += getXmlFromBool(this.subtotalTop);
+		res += "\"";
+	}
+	if (null !== this.showInFieldList) {
+		res += " showInFieldList=\"";
+		res += getXmlFromBool(this.showInFieldList);
+		res += "\"";
+	}
+	if (null !== this.dragToRow) {
+		res += " dragToRow=\"";
+		res += getXmlFromBool(this.dragToRow);
+		res += "\"";
+	}
+	if (null !== this.dragToCol) {
+		res += " dragToCol=\"";
+		res += getXmlFromBool(this.dragToCol);
+		res += "\"";
+	}
+	if (null !== this.dragToPage) {
+		res += " dragToPage=\"";
+		res += getXmlFromBool(this.dragToPage);
+		res += "\"";
+	}
+	if (null !== this.dragToData) {
+		res += " dragToData=\"";
+		res += getXmlFromBool(this.dragToData);
+		res += "\"";
+	}
+	if (null !== this.dragOff) {
+		res += " dragOff=\"";
+		res += getXmlFromBool(this.dragOff);
+		res += "\"";
+	}
+	if (null !== this.includeNewItemsInFilter) {
+		res += " includeNewItemsInFilter=\"";
+		res += getXmlFromBool(this.includeNewItemsInFilter);
+		res += "\"";
+	}
+	if (null !== this.caption) {
+		res += " caption=\"";
+		res += this.caption;
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.mps) {
+		res += this.mps.toXml("mps");
+	}
+	for (var i = 0; i < this.members.length; ++i) {
+		var elem = this.members[i];
+		res += elem.toXml("members");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_PivotFilter() {
 //Attributes
 	this.fld = null;
@@ -4392,6 +7651,77 @@ CT_PivotFilter.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_PivotFilter.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.fld) {
+		res += " fld=\"";
+		res += this.fld.toString();
+		res += "\"";
+	}
+	if (null !== this.mpFld) {
+		res += " mpFld=\"";
+		res += this.mpFld.toString();
+		res += "\"";
+	}
+	if (null !== this.type) {
+		res += " type=\"";
+		res += ToXml_ST_PivotFilterType(this.type);
+		res += "\"";
+	}
+	if (null !== this.evalOrder) {
+		res += " evalOrder=\"";
+		res += this.evalOrder.toString();
+		res += "\"";
+	}
+	if (null !== this.id) {
+		res += " id=\"";
+		res += this.id.toString();
+		res += "\"";
+	}
+	if (null !== this.iMeasureHier) {
+		res += " iMeasureHier=\"";
+		res += this.iMeasureHier.toString();
+		res += "\"";
+	}
+	if (null !== this.iMeasureFld) {
+		res += " iMeasureFld=\"";
+		res += this.iMeasureFld.toString();
+		res += "\"";
+	}
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.description) {
+		res += " description=\"";
+		res += this.description;
+		res += "\"";
+	}
+	if (null !== this.stringValue1) {
+		res += " stringValue1=\"";
+		res += this.stringValue1;
+		res += "\"";
+	}
+	if (null !== this.stringValue2) {
+		res += " stringValue2=\"";
+		res += this.stringValue2;
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.autoFilter) {
+		res += this.autoFilter.toXml("autoFilter");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_HierarchyUsage() {
 //Attributes
 	this.hierarchyUsage = null;
@@ -4405,6 +7735,18 @@ CT_HierarchyUsage.prototype.readAttributes = function(attr, uq) {
 			this.hierarchyUsage = val - 0;
 		}
 	}
+};
+CT_HierarchyUsage.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.hierarchyUsage) {
+		res += " hierarchyUsage=\"";
+		res += this.hierarchyUsage.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_Pages() {
 //Attributes
@@ -4435,6 +7777,25 @@ CT_Pages.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_Pages.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.page.length; ++i) {
+		var elem = this.page[i];
+		res += elem.toXml("page");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_RangeSets() {
 //Attributes
 	this.count = null;
@@ -4464,6 +7825,25 @@ CT_RangeSets.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_RangeSets.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.rangeSet.length; ++i) {
+		var elem = this.rangeSet[i];
+		res += elem.toXml("rangeSet");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_SharedItems() {
 //Attributes
 	this.containsSemiMixedTypes = null;//true
@@ -4482,8 +7862,6 @@ function CT_SharedItems() {
 	this.longText = null;//false
 //Members
 	this.Items = [];
-//internal
-	this._curElem = null;
 }
 CT_SharedItems.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -4590,10 +7968,101 @@ CT_SharedItems.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_SharedItems.prototype.onTextNode = function(text, uq) {
-	if ("Items" === this._curElem) {
-		this.Items = uq(text);
+CT_SharedItems.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.containsSemiMixedTypes) {
+		res += " containsSemiMixedTypes=\"";
+		res += getXmlFromBool(this.containsSemiMixedTypes);
+		res += "\"";
 	}
+	if (null !== this.containsNonDate) {
+		res += " containsNonDate=\"";
+		res += getXmlFromBool(this.containsNonDate);
+		res += "\"";
+	}
+	if (null !== this.containsDate) {
+		res += " containsDate=\"";
+		res += getXmlFromBool(this.containsDate);
+		res += "\"";
+	}
+	if (null !== this.containsString) {
+		res += " containsString=\"";
+		res += getXmlFromBool(this.containsString);
+		res += "\"";
+	}
+	if (null !== this.containsBlank) {
+		res += " containsBlank=\"";
+		res += getXmlFromBool(this.containsBlank);
+		res += "\"";
+	}
+	if (null !== this.containsMixedTypes) {
+		res += " containsMixedTypes=\"";
+		res += getXmlFromBool(this.containsMixedTypes);
+		res += "\"";
+	}
+	if (null !== this.containsNumber) {
+		res += " containsNumber=\"";
+		res += getXmlFromBool(this.containsNumber);
+		res += "\"";
+	}
+	if (null !== this.containsInteger) {
+		res += " containsInteger=\"";
+		res += getXmlFromBool(this.containsInteger);
+		res += "\"";
+	}
+	if (null !== this.minValue) {
+		res += " minValue=\"";
+		res += this.minValue.toString();
+		res += "\"";
+	}
+	if (null !== this.maxValue) {
+		res += " maxValue=\"";
+		res += this.maxValue.toString();
+		res += "\"";
+	}
+	if (null !== this.minDate) {
+		res += " minDate=\"";
+		res += this.minDate;
+		res += "\"";
+	}
+	if (null !== this.maxDate) {
+		res += " maxDate=\"";
+		res += this.maxDate;
+		res += "\"";
+	}
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	if (null !== this.longText) {
+		res += " longText=\"";
+		res += getXmlFromBool(this.longText);
+		res += "\"";
+	}
+	res += ">";
+	for (var j = 0; j < this.Items.length; ++j) {
+		var subelem = this.Items[j];
+		if (subelem instanceof CT_Boolean) {
+			res += subelem.toXml("b");
+		} else if (subelem instanceof CT_DateTime) {
+			res += subelem.toXml("d");
+		} else if (subelem instanceof CT_Error) {
+			res += subelem.toXml("e");
+		} else if (subelem instanceof CT_Missing) {
+			res += subelem.toXml("m");
+		} else if (subelem instanceof CT_Number) {
+			res += subelem.toXml("n");
+		} else if (subelem instanceof CT_String) {
+			res += subelem.toXml("s");
+		}
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_FieldGroup() {
 //Attributes
@@ -4643,19 +8112,34 @@ CT_FieldGroup.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-function CT_X() {
-//Attributes
-	this.v = null;//0
-}
-CT_X.prototype.readAttributes = function(attr, uq) {
-	if (attr()) {
-		var vals = attr();
-		var val;
-		val = vals["v"];
-		if (undefined !== val) {
-			this.v = val - 0;
-		}
+CT_FieldGroup.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.par) {
+		res += " par=\"";
+		res += this.par.toString();
+		res += "\"";
 	}
+	if (null !== this.base) {
+		res += " base=\"";
+		res += this.base.toString();
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.rangePr) {
+		res += this.rangePr.toXml("rangePr");
+	}
+	if (null !== this.discretePr) {
+		res += this.discretePr.toXml("discretePr");
+	}
+	if (null !== this.groupItems) {
+		res += this.groupItems.toXml("groupItems");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_FieldsUsage() {
 //Attributes
@@ -4686,6 +8170,25 @@ CT_FieldsUsage.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_FieldsUsage.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.fieldUsage.length; ++i) {
+		var elem = this.fieldUsage[i];
+		res += elem.toXml("fieldUsage");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_GroupLevels() {
 //Attributes
 	this.count = null;
@@ -4714,6 +8217,25 @@ CT_GroupLevels.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_GroupLevels.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.groupLevel.length; ++i) {
+		var elem = this.groupLevel[i];
+		res += elem.toXml("groupLevel");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_Set() {
 //Attributes
@@ -4774,6 +8296,48 @@ CT_Set.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_Set.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	if (null !== this.maxRank) {
+		res += " maxRank=\"";
+		res += this.maxRank.toString();
+		res += "\"";
+	}
+	if (null !== this.setDefinition) {
+		res += " setDefinition=\"";
+		res += this.setDefinition;
+		res += "\"";
+	}
+	if (null !== this.sortType) {
+		res += " sortType=\"";
+		res += ToXml_ST_SortType(this.sortType);
+		res += "\"";
+	}
+	if (null !== this.queryFailed) {
+		res += " queryFailed=\"";
+		res += getXmlFromBool(this.queryFailed);
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.tpls.length; ++i) {
+		var elem = this.tpls[i];
+		res += elem.toXml("tpls");
+	}
+	if (null !== this.sortByTuple) {
+		res += this.sortByTuple.toXml("sortByTuple");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_Query() {
 //Attributes
 	this.mdx = null;
@@ -4803,6 +8367,24 @@ CT_Query.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_Query.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.mdx) {
+		res += " mdx=\"";
+		res += this.mdx;
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.tpls) {
+		res += this.tpls.toXml("tpls");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_ServerFormat() {
 //Attributes
 	this.culture = null;
@@ -4821,6 +8403,23 @@ CT_ServerFormat.prototype.readAttributes = function(attr, uq) {
 			this.format = uq(val);
 		}
 	}
+};
+CT_ServerFormat.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.culture) {
+		res += " culture=\"";
+		res += this.culture;
+		res += "\"";
+	}
+	if (null !== this.format) {
+		res += " format=\"";
+		res += this.format;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_PivotArea() {
 //Attributes
@@ -4919,34 +8518,127 @@ CT_PivotArea.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-function CT_Tuples() {
+CT_PivotArea.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.field) {
+		res += " field=\"";
+		res += this.field.toString();
+		res += "\"";
+	}
+	if (null !== this.type) {
+		res += " type=\"";
+		res += ToXml_ST_PivotAreaType(this.type);
+		res += "\"";
+	}
+	if (null !== this.dataOnly) {
+		res += " dataOnly=\"";
+		res += getXmlFromBool(this.dataOnly);
+		res += "\"";
+	}
+	if (null !== this.labelOnly) {
+		res += " labelOnly=\"";
+		res += getXmlFromBool(this.labelOnly);
+		res += "\"";
+	}
+	if (null !== this.grandRow) {
+		res += " grandRow=\"";
+		res += getXmlFromBool(this.grandRow);
+		res += "\"";
+	}
+	if (null !== this.grandCol) {
+		res += " grandCol=\"";
+		res += getXmlFromBool(this.grandCol);
+		res += "\"";
+	}
+	if (null !== this.cacheIndex) {
+		res += " cacheIndex=\"";
+		res += getXmlFromBool(this.cacheIndex);
+		res += "\"";
+	}
+	if (null !== this.outline) {
+		res += " outline=\"";
+		res += getXmlFromBool(this.outline);
+		res += "\"";
+	}
+	if (null !== this.offset) {
+		res += " offset=\"";
+		res += this.offset;
+		res += "\"";
+	}
+	if (null !== this.collapsedLevelsAreSubtotals) {
+		res += " collapsedLevelsAreSubtotals=\"";
+		res += getXmlFromBool(this.collapsedLevelsAreSubtotals);
+		res += "\"";
+	}
+	if (null !== this.axis) {
+		res += " axis=\"";
+		res += ToXml_ST_Axis(this.axis);
+		res += "\"";
+	}
+	if (null !== this.fieldPosition) {
+		res += " fieldPosition=\"";
+		res += this.fieldPosition.toString();
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.references) {
+		res += this.references.toXml("references");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
+function CT_Tuple() {
 //Attributes
-	this.c = null;
-//Members
-	this.tpl = [];
+	this.fld = null;
+	this.hier = null;
+	this.item = null;
 }
-CT_Tuples.prototype.readAttributes = function(attr, uq) {
+CT_Tuple.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
 		var vals = attr();
 		var val;
-		val = vals["c"];
+		val = vals["fld"];
 		if (undefined !== val) {
-			this.c = val - 0;
+			this.fld = val - 0;
+		}
+		val = vals["hier"];
+		if (undefined !== val) {
+			this.hier = val - 0;
+		}
+		val = vals["item"];
+		if (undefined !== val) {
+			this.item = val - 0;
 		}
 	}
 };
-CT_Tuples.prototype.onStartNode = function(elem, attr, uq) {
-	var newContext = this;
-	if ("tpl" === elem) {
-		newContext = new CT_Tuple();
-		if (newContext.readAttributes) {
-			newContext.readAttributes(attr, uq);
-		}
-		this.tpl.push(newContext);
-	} else {
-		newContext = null;
+CT_Tuple.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.fld) {
+		res += " fld=\"";
+		res += this.fld.toString();
+		res += "\"";
 	}
-	return newContext;
+	if (null !== this.hier) {
+		res += " hier=\"";
+		res += this.hier.toString();
+		res += "\"";
+	}
+	if (null !== this.item) {
+		res += " item=\"";
+		res += this.item.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_Items() {
 //Attributes
@@ -4977,6 +8669,25 @@ CT_Items.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_Items.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.item.length; ++i) {
+		var elem = this.item[i];
+		res += elem.toXml("item");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_AutoSortScope() {
 //Members
 	this.pivotArea = null;
@@ -4993,6 +8704,19 @@ CT_AutoSortScope.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_AutoSortScope.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	res += ">";
+	if (null !== this.pivotArea) {
+		res += this.pivotArea.toXml("pivotArea");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_PivotAreas() {
 //Attributes
@@ -5023,6 +8747,25 @@ CT_PivotAreas.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_PivotAreas.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.pivotArea.length; ++i) {
+		var elem = this.pivotArea[i];
+		res += elem.toXml("pivotArea");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_MemberProperties() {
 //Attributes
 	this.count = null;
@@ -5051,6 +8794,25 @@ CT_MemberProperties.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_MemberProperties.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.mp.length; ++i) {
+		var elem = this.mp[i];
+		res += elem.toXml("mp");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_Members() {
 //Attributes
@@ -5085,6 +8847,30 @@ CT_Members.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_Members.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	if (null !== this.level) {
+		res += " level=\"";
+		res += this.level.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.member.length; ++i) {
+		var elem = this.member[i];
+		res += elem.toXml("member");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_AutoFilter() {
 //Attributes
@@ -5129,6 +8915,31 @@ CT_AutoFilter.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_AutoFilter.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.ref) {
+		res += " ref=\"";
+		res += this.ref;
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.filterColumn.length; ++i) {
+		var elem = this.filterColumn[i];
+		res += elem.toXml("filterColumn");
+	}
+	if (null !== this.sortState) {
+		res += this.sortState.toXml("sortState");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_PCDSCPage() {
 //Attributes
 	this.count = null;
@@ -5157,6 +8968,25 @@ CT_PCDSCPage.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_PCDSCPage.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.pageItem.length; ++i) {
+		var elem = this.pageItem[i];
+		res += elem.toXml("pageItem");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_RangeSet() {
 //Attributes
@@ -5206,6 +9036,53 @@ CT_RangeSet.prototype.readAttributes = function(attr, uq) {
 			this.id = uq(val);
 		}
 	}
+};
+CT_RangeSet.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.i1) {
+		res += " i1=\"";
+		res += this.i1.toString();
+		res += "\"";
+	}
+	if (null !== this.i2) {
+		res += " i2=\"";
+		res += this.i2.toString();
+		res += "\"";
+	}
+	if (null !== this.i3) {
+		res += " i3=\"";
+		res += this.i3.toString();
+		res += "\"";
+	}
+	if (null !== this.i4) {
+		res += " i4=\"";
+		res += this.i4.toString();
+		res += "\"";
+	}
+	if (null !== this.ref) {
+		res += " ref=\"";
+		res += this.ref;
+		res += "\"";
+	}
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.sheet) {
+		res += " sheet=\"";
+		res += this.sheet;
+		res += "\"";
+	}
+	if (null !== this.id) {
+		res += " r:id=\"";
+		res += this.id;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_RangePr() {
 //Attributes
@@ -5259,6 +9136,53 @@ CT_RangePr.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_RangePr.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.autoStart) {
+		res += " autoStart=\"";
+		res += getXmlFromBool(this.autoStart);
+		res += "\"";
+	}
+	if (null !== this.autoEnd) {
+		res += " autoEnd=\"";
+		res += getXmlFromBool(this.autoEnd);
+		res += "\"";
+	}
+	if (null !== this.groupBy) {
+		res += " groupBy=\"";
+		res += ToXml_ST_GroupBy(this.groupBy);
+		res += "\"";
+	}
+	if (null !== this.startNum) {
+		res += " startNum=\"";
+		res += this.startNum.toString();
+		res += "\"";
+	}
+	if (null !== this.endNum) {
+		res += " endNum=\"";
+		res += this.endNum.toString();
+		res += "\"";
+	}
+	if (null !== this.startDate) {
+		res += " startDate=\"";
+		res += this.startDate;
+		res += "\"";
+	}
+	if (null !== this.endDate) {
+		res += " endDate=\"";
+		res += this.endDate;
+		res += "\"";
+	}
+	if (null !== this.groupInterval) {
+		res += " groupInterval=\"";
+		res += this.groupInterval.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_DiscretePr() {
 //Attributes
 	this.count = null;
@@ -5288,13 +9212,30 @@ CT_DiscretePr.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_DiscretePr.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.x.length; ++i) {
+		var elem = this.x[i];
+		res += elem.toXml("x");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_GroupItems() {
 //Attributes
 	this.count = null;
 //Members
 	this.Items = [];
-//internal
-	this._curElem = null;
 }
 CT_GroupItems.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -5349,10 +9290,36 @@ CT_GroupItems.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_GroupItems.prototype.onTextNode = function(text, uq) {
-	if ("Items" === this._curElem) {
-		this.Items = uq(text);
+CT_GroupItems.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
 	}
+	res += ">";
+	for (var j = 0; j < this.Items.length; ++j) {
+		var subelem = this.Items[j];
+		if (subelem instanceof CT_Boolean) {
+			res += subelem.toXml("b");
+		} else if (subelem instanceof CT_DateTime) {
+			res += subelem.toXml("d");
+		} else if (subelem instanceof CT_Error) {
+			res += subelem.toXml("e");
+		} else if (subelem instanceof CT_Missing) {
+			res += subelem.toXml("m");
+		} else if (subelem instanceof CT_Number) {
+			res += subelem.toXml("n");
+		} else if (subelem instanceof CT_String) {
+			res += subelem.toXml("s");
+		}
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_FieldUsage() {
 //Attributes
@@ -5367,6 +9334,18 @@ CT_FieldUsage.prototype.readAttributes = function(attr, uq) {
 			this.x = val - 0;
 		}
 	}
+};
+CT_FieldUsage.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.x) {
+		res += " x=\"";
+		res += this.x.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_GroupLevel() {
 //Attributes
@@ -5419,6 +9398,42 @@ CT_GroupLevel.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_GroupLevel.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.uniqueName) {
+		res += " uniqueName=\"";
+		res += this.uniqueName;
+		res += "\"";
+	}
+	if (null !== this.caption) {
+		res += " caption=\"";
+		res += this.caption;
+		res += "\"";
+	}
+	if (null !== this.user) {
+		res += " user=\"";
+		res += getXmlFromBool(this.user);
+		res += "\"";
+	}
+	if (null !== this.customRollUp) {
+		res += " customRollUp=\"";
+		res += getXmlFromBool(this.customRollUp);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.groups) {
+		res += this.groups.toXml("groups");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_PivotAreaReferences() {
 //Attributes
 	this.count = null;
@@ -5448,29 +9463,24 @@ CT_PivotAreaReferences.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-function CT_Tuple() {
-//Attributes
-	this.fld = null;
-	this.hier = null;
-	this.item = null;
-}
-CT_Tuple.prototype.readAttributes = function(attr, uq) {
-	if (attr()) {
-		var vals = attr();
-		var val;
-		val = vals["fld"];
-		if (undefined !== val) {
-			this.fld = val - 0;
-		}
-		val = vals["hier"];
-		if (undefined !== val) {
-			this.hier = val - 0;
-		}
-		val = vals["item"];
-		if (undefined !== val) {
-			this.item = val - 0;
-		}
+CT_PivotAreaReferences.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
 	}
+	res += ">";
+	for (var i = 0; i < this.reference.length; ++i) {
+		var elem = this.reference[i];
+		res += elem.toXml("reference");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_Item() {
 //Attributes
@@ -5539,6 +9549,68 @@ CT_Item.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_Item.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.n) {
+		res += " n=\"";
+		res += this.n;
+		res += "\"";
+	}
+	if (null !== this.t) {
+		res += " t=\"";
+		res += ToXml_ST_ItemType(this.t);
+		res += "\"";
+	}
+	if (null !== this.h) {
+		res += " h=\"";
+		res += getXmlFromBool(this.h);
+		res += "\"";
+	}
+	if (null !== this.s) {
+		res += " s=\"";
+		res += getXmlFromBool(this.s);
+		res += "\"";
+	}
+	if (null !== this.sd) {
+		res += " sd=\"";
+		res += getXmlFromBool(this.sd);
+		res += "\"";
+	}
+	if (null !== this.f) {
+		res += " f=\"";
+		res += getXmlFromBool(this.f);
+		res += "\"";
+	}
+	if (null !== this.m) {
+		res += " m=\"";
+		res += getXmlFromBool(this.m);
+		res += "\"";
+	}
+	if (null !== this.c) {
+		res += " c=\"";
+		res += getXmlFromBool(this.c);
+		res += "\"";
+	}
+	if (null !== this.x) {
+		res += " x=\"";
+		res += this.x.toString();
+		res += "\"";
+	}
+	if (null !== this.d) {
+		res += " d=\"";
+		res += getXmlFromBool(this.d);
+		res += "\"";
+	}
+	if (null !== this.e) {
+		res += " e=\"";
+		res += getXmlFromBool(this.e);
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_MemberProperty() {
 //Attributes
 	this.name = null;
@@ -5593,6 +9665,58 @@ CT_MemberProperty.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_MemberProperty.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.showCell) {
+		res += " showCell=\"";
+		res += getXmlFromBool(this.showCell);
+		res += "\"";
+	}
+	if (null !== this.showTip) {
+		res += " showTip=\"";
+		res += getXmlFromBool(this.showTip);
+		res += "\"";
+	}
+	if (null !== this.showAsCaption) {
+		res += " showAsCaption=\"";
+		res += getXmlFromBool(this.showAsCaption);
+		res += "\"";
+	}
+	if (null !== this.nameLen) {
+		res += " nameLen=\"";
+		res += this.nameLen.toString();
+		res += "\"";
+	}
+	if (null !== this.pPos) {
+		res += " pPos=\"";
+		res += this.pPos.toString();
+		res += "\"";
+	}
+	if (null !== this.pLen) {
+		res += " pLen=\"";
+		res += this.pLen.toString();
+		res += "\"";
+	}
+	if (null !== this.level) {
+		res += " level=\"";
+		res += this.level.toString();
+		res += "\"";
+	}
+	if (null !== this.field) {
+		res += " field=\"";
+		res += this.field.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_Member() {
 //Attributes
 	this.name = null;
@@ -5606,6 +9730,18 @@ CT_Member.prototype.readAttributes = function(attr, uq) {
 			this.name = uq(val);
 		}
 	}
+};
+CT_Member.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_FilterColumn() {
 //Attributes
@@ -5688,6 +9824,52 @@ CT_FilterColumn.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_FilterColumn.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.colId) {
+		res += " colId=\"";
+		res += this.colId.toString();
+		res += "\"";
+	}
+	if (null !== this.hiddenButton) {
+		res += " hiddenButton=\"";
+		res += getXmlFromBool(this.hiddenButton);
+		res += "\"";
+	}
+	if (null !== this.showButton) {
+		res += " showButton=\"";
+		res += getXmlFromBool(this.showButton);
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.colorFilter) {
+		res += this.colorFilter.toXml("colorFilter");
+	}
+	if (null !== this.customFilters) {
+		res += this.customFilters.toXml("customFilters");
+	}
+	if (null !== this.dynamicFilter) {
+		res += this.dynamicFilter.toXml("dynamicFilter");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	if (null !== this.filters) {
+		res += this.filters.toXml("filters");
+	}
+	if (null !== this.iconFilter) {
+		res += this.iconFilter.toXml("iconFilter");
+	}
+	if (null !== this.top10) {
+		res += this.top10.toXml("top10");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_SortState() {
 //Attributes
 	this.columnSort = null;//false
@@ -5742,6 +9924,43 @@ CT_SortState.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_SortState.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.columnSort) {
+		res += " columnSort=\"";
+		res += getXmlFromBool(this.columnSort);
+		res += "\"";
+	}
+	if (null !== this.caseSensitive) {
+		res += " caseSensitive=\"";
+		res += getXmlFromBool(this.caseSensitive);
+		res += "\"";
+	}
+	if (null !== this.sortMethod) {
+		res += " sortMethod=\"";
+		res += ToXml_ST_SortMethod(this.sortMethod);
+		res += "\"";
+	}
+	if (null !== this.ref) {
+		res += " ref=\"";
+		res += this.ref;
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.sortCondition.length; ++i) {
+		var elem = this.sortCondition[i];
+		res += elem.toXml("sortCondition");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_PageItem() {
 //Attributes
 	this.name = null;
@@ -5755,6 +9974,18 @@ CT_PageItem.prototype.readAttributes = function(attr, uq) {
 			this.name = uq(val);
 		}
 	}
+};
+CT_PageItem.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_Groups() {
 //Attributes
@@ -5784,6 +10015,25 @@ CT_Groups.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_Groups.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.group.length; ++i) {
+		var elem = this.group[i];
+		res += elem.toXml("group");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_PivotAreaReference() {
 //Attributes
@@ -5901,6 +10151,108 @@ CT_PivotAreaReference.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_PivotAreaReference.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.field) {
+		res += " field=\"";
+		res += this.field.toString();
+		res += "\"";
+	}
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	if (null !== this.selected) {
+		res += " selected=\"";
+		res += getXmlFromBool(this.selected);
+		res += "\"";
+	}
+	if (null !== this.byPosition) {
+		res += " byPosition=\"";
+		res += getXmlFromBool(this.byPosition);
+		res += "\"";
+	}
+	if (null !== this.relative) {
+		res += " relative=\"";
+		res += getXmlFromBool(this.relative);
+		res += "\"";
+	}
+	if (null !== this.defaultSubtotal) {
+		res += " defaultSubtotal=\"";
+		res += getXmlFromBool(this.defaultSubtotal);
+		res += "\"";
+	}
+	if (null !== this.sumSubtotal) {
+		res += " sumSubtotal=\"";
+		res += getXmlFromBool(this.sumSubtotal);
+		res += "\"";
+	}
+	if (null !== this.countASubtotal) {
+		res += " countASubtotal=\"";
+		res += getXmlFromBool(this.countASubtotal);
+		res += "\"";
+	}
+	if (null !== this.avgSubtotal) {
+		res += " avgSubtotal=\"";
+		res += getXmlFromBool(this.avgSubtotal);
+		res += "\"";
+	}
+	if (null !== this.maxSubtotal) {
+		res += " maxSubtotal=\"";
+		res += getXmlFromBool(this.maxSubtotal);
+		res += "\"";
+	}
+	if (null !== this.minSubtotal) {
+		res += " minSubtotal=\"";
+		res += getXmlFromBool(this.minSubtotal);
+		res += "\"";
+	}
+	if (null !== this.productSubtotal) {
+		res += " productSubtotal=\"";
+		res += getXmlFromBool(this.productSubtotal);
+		res += "\"";
+	}
+	if (null !== this.countSubtotal) {
+		res += " countSubtotal=\"";
+		res += getXmlFromBool(this.countSubtotal);
+		res += "\"";
+	}
+	if (null !== this.stdDevSubtotal) {
+		res += " stdDevSubtotal=\"";
+		res += getXmlFromBool(this.stdDevSubtotal);
+		res += "\"";
+	}
+	if (null !== this.stdDevPSubtotal) {
+		res += " stdDevPSubtotal=\"";
+		res += getXmlFromBool(this.stdDevPSubtotal);
+		res += "\"";
+	}
+	if (null !== this.varSubtotal) {
+		res += " varSubtotal=\"";
+		res += getXmlFromBool(this.varSubtotal);
+		res += "\"";
+	}
+	if (null !== this.varPSubtotal) {
+		res += " varPSubtotal=\"";
+		res += getXmlFromBool(this.varPSubtotal);
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.x.length; ++i) {
+		var elem = this.x[i];
+		res += elem.toXml("x");
+	}
+	if (null !== this.extLst) {
+		res += this.extLst.toXml("extLst");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_ColorFilter() {
 //Attributes
 	this.dxfId = null;
@@ -5919,6 +10271,23 @@ CT_ColorFilter.prototype.readAttributes = function(attr, uq) {
 			this.cellColor = getBoolFromXml(val);
 		}
 	}
+};
+CT_ColorFilter.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.dxfId) {
+		res += " dxfId=\"";
+		res += this.dxfId.toString();
+		res += "\"";
+	}
+	if (null !== this.cellColor) {
+		res += " cellColor=\"";
+		res += getXmlFromBool(this.cellColor);
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_CustomFilters() {
 //Attributes
@@ -5948,6 +10317,25 @@ CT_CustomFilters.prototype.onStartNode = function(elem, attr, uq) {
 		newContext = null;
 	}
 	return newContext;
+};
+CT_CustomFilters.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.and) {
+		res += " and=\"";
+		res += getXmlFromBool(this.and);
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.customFilter.length; ++i) {
+		var elem = this.customFilter[i];
+		res += elem.toXml("customFilter");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
 };
 function CT_DynamicFilter() {
 //Attributes
@@ -5980,6 +10368,33 @@ CT_DynamicFilter.prototype.readAttributes = function(attr, uq) {
 			this.maxValIso = uq(val);
 		}
 	}
+};
+CT_DynamicFilter.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.type) {
+		res += " type=\"";
+		res += ToXml_ST_DynamicFilterType(this.type);
+		res += "\"";
+	}
+	if (null !== this.val) {
+		res += " val=\"";
+		res += this.val.toString();
+		res += "\"";
+	}
+	if (null !== this.valIso) {
+		res += " valIso=\"";
+		res += this.valIso;
+		res += "\"";
+	}
+	if (null !== this.maxValIso) {
+		res += " maxValIso=\"";
+		res += this.maxValIso;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_Filters() {
 //Attributes
@@ -6025,6 +10440,34 @@ CT_Filters.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_Filters.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.blank) {
+		res += " blank=\"";
+		res += getXmlFromBool(this.blank);
+		res += "\"";
+	}
+	if (null !== this.calendarType) {
+		res += " calendarType=\"";
+		res += ToXml_ST_CalendarType(this.calendarType);
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.filter.length; ++i) {
+		var elem = this.filter[i];
+		res += elem.toXml("filter");
+	}
+	for (var i = 0; i < this.dateGroupItem.length; ++i) {
+		var elem = this.dateGroupItem[i];
+		res += elem.toXml("dateGroupItem");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_IconFilter() {
 //Attributes
 	this.iconSet = null;
@@ -6046,6 +10489,23 @@ CT_IconFilter.prototype.readAttributes = function(attr, uq) {
 			this.iconId = val - 0;
 		}
 	}
+};
+CT_IconFilter.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.iconSet) {
+		res += " iconSet=\"";
+		res += ToXml_ST_IconSetType(this.iconSet);
+		res += "\"";
+	}
+	if (null !== this.iconId) {
+		res += " iconId=\"";
+		res += this.iconId.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_Top10() {
 //Attributes
@@ -6075,6 +10535,33 @@ CT_Top10.prototype.readAttributes = function(attr, uq) {
 			this.filterVal = val - 0;
 		}
 	}
+};
+CT_Top10.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.top) {
+		res += " top=\"";
+		res += getXmlFromBool(this.top);
+		res += "\"";
+	}
+	if (null !== this.percent) {
+		res += " percent=\"";
+		res += getXmlFromBool(this.percent);
+		res += "\"";
+	}
+	if (null !== this.val) {
+		res += " val=\"";
+		res += this.val.toString();
+		res += "\"";
+	}
+	if (null !== this.filterVal) {
+		res += " filterVal=\"";
+		res += this.filterVal.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_SortCondition() {
 //Attributes
@@ -6126,6 +10613,48 @@ CT_SortCondition.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_SortCondition.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.descending) {
+		res += " descending=\"";
+		res += getXmlFromBool(this.descending);
+		res += "\"";
+	}
+	if (null !== this.sortBy) {
+		res += " sortBy=\"";
+		res += ToXml_ST_SortBy(this.sortBy);
+		res += "\"";
+	}
+	if (null !== this.ref) {
+		res += " ref=\"";
+		res += this.ref;
+		res += "\"";
+	}
+	if (null !== this.customList) {
+		res += " customList=\"";
+		res += this.customList;
+		res += "\"";
+	}
+	if (null !== this.dxfId) {
+		res += " dxfId=\"";
+		res += this.dxfId.toString();
+		res += "\"";
+	}
+	if (null !== this.iconSet) {
+		res += " iconSet=\"";
+		res += ToXml_ST_IconSetType(this.iconSet);
+		res += "\"";
+	}
+	if (null !== this.iconId) {
+		res += " iconId=\"";
+		res += this.iconId.toString();
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_LevelGroup() {
 //Attributes
 	this.name = null;
@@ -6175,6 +10704,44 @@ CT_LevelGroup.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_LevelGroup.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.name) {
+		res += " name=\"";
+		res += this.name;
+		res += "\"";
+	}
+	if (null !== this.uniqueName) {
+		res += " uniqueName=\"";
+		res += this.uniqueName;
+		res += "\"";
+	}
+	if (null !== this.caption) {
+		res += " caption=\"";
+		res += this.caption;
+		res += "\"";
+	}
+	if (null !== this.uniqueParent) {
+		res += " uniqueParent=\"";
+		res += this.uniqueParent;
+		res += "\"";
+	}
+	if (null !== this.id) {
+		res += " id=\"";
+		res += this.id.toString();
+		res += "\"";
+	}
+	res += ">";
+	if (null !== this.groupMembers) {
+		res += this.groupMembers.toXml("groupMembers");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_CustomFilter() {
 //Attributes
 	this.operator = null;//equal
@@ -6197,6 +10764,23 @@ CT_CustomFilter.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_CustomFilter.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.operator) {
+		res += " operator=\"";
+		res += ToXml_ST_FilterOperator(this.operator);
+		res += "\"";
+	}
+	if (null !== this.val) {
+		res += " val=\"";
+		res += this.val;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_Filter() {
 //Attributes
 	this.val = null;
@@ -6210,6 +10794,18 @@ CT_Filter.prototype.readAttributes = function(attr, uq) {
 			this.val = uq(val);
 		}
 	}
+};
+CT_Filter.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.val) {
+		res += " val=\"";
+		res += this.val;
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
 function CT_DateGroupItem() {
 //Attributes
@@ -6258,6 +10854,48 @@ CT_DateGroupItem.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
+CT_DateGroupItem.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.year) {
+		res += " year=\"";
+		res += this.year.toString();
+		res += "\"";
+	}
+	if (null !== this.month) {
+		res += " month=\"";
+		res += this.month.toString();
+		res += "\"";
+	}
+	if (null !== this.day) {
+		res += " day=\"";
+		res += this.day.toString();
+		res += "\"";
+	}
+	if (null !== this.hour) {
+		res += " hour=\"";
+		res += this.hour.toString();
+		res += "\"";
+	}
+	if (null !== this.minute) {
+		res += " minute=\"";
+		res += this.minute.toString();
+		res += "\"";
+	}
+	if (null !== this.second) {
+		res += " second=\"";
+		res += this.second.toString();
+		res += "\"";
+	}
+	if (null !== this.dateTimeGrouping) {
+		res += " dateTimeGrouping=\"";
+		res += ToXml_ST_DateTimeGrouping(this.dateTimeGrouping);
+		res += "\"";
+	}
+	res += "/>";
+	return res;
+};
 function CT_GroupMembers() {
 //Attributes
 	this.count = null;
@@ -6287,6 +10925,25 @@ CT_GroupMembers.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
+CT_GroupMembers.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.count) {
+		res += " count=\"";
+		res += this.count.toString();
+		res += "\"";
+	}
+	res += ">";
+	for (var i = 0; i < this.groupMember.length; ++i) {
+		var elem = this.groupMember[i];
+		res += elem.toXml("groupMember");
+	}
+	res += "</";
+	res += name;
+	res += ">";
+	return res;
+};
 function CT_GroupMember() {
 //Attributes
 	this.uniqueName = null;
@@ -6305,4 +10962,21 @@ CT_GroupMember.prototype.readAttributes = function(attr, uq) {
 			this.group = getBoolFromXml(val);
 		}
 	}
+};
+CT_GroupMember.prototype.toXml = function(name) {
+	var res = "";
+	res += "<";
+	res += name;
+	if (null !== this.uniqueName) {
+		res += " uniqueName=\"";
+		res += this.uniqueName;
+		res += "\"";
+	}
+	if (null !== this.group) {
+		res += " group=\"";
+		res += getXmlFromBool(this.group);
+		res += "\"";
+	}
+	res += "/>";
+	return res;
 };
