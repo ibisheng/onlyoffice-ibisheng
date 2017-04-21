@@ -1280,6 +1280,26 @@ function CGroupShape()
         }
     };
 
+    CGroupShape.prototype.setColumnNumber = function(num){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setColumnNumber)
+            {
+                this.spTree[i].setColumnNumber(num);
+            }
+        }
+    };
+
+    CGroupShape.prototype.setColumnSpace = function(spcCol){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setColumnSpace)
+            {
+                this.spTree[i].setColumnSpace(spcCol);
+            }
+        }
+    };
+
     CGroupShape.prototype.getResizeCoefficients = function(numHandle, x, y)
     {
         var cx, cy;

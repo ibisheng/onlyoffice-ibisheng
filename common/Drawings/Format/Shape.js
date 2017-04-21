@@ -5287,7 +5287,65 @@ CShape.prototype.checkTypeCorrect = function(){
         return false;
     }
     return true;
-}
+};
+
+
+CShape.prototype.getColumnNumber = function(){
+    if(this.bWordShape){
+        return 1;
+    }
+    var oBodyPr = this.getBodyPr();
+    if(AscFormat.isRealNumber(oBodyPr.numCol))
+    {
+        return oBodyPr.numCol;
+    }
+    return 1;
+};
+
+    CShape.prototype.getColumnSpace = function(){
+        if(this.bWordShape){
+            return 0;
+        }
+        var oBodyPr = this.getBodyPr();
+        if(AscFormat.isRealNumber(oBodyPr.spcCol))
+        {
+            return oBodyPr.spcCol;
+        }
+        return 0;
+    };
+
+
+    CShape.prototype.setColumnNumber = function(num){
+        var new_body_pr = this.getBodyPr();
+        if (new_body_pr) {
+            new_body_pr = new_body_pr.createDuplicate();
+            new_body_pr.numCol = num;
+            if (this.bWordShape) {
+                this.setBodyPr(new_body_pr);
+            }
+            else {
+                if (this.txBody) {
+                    this.txBody.setBodyPr(new_body_pr);
+                }
+            }
+        }
+    };
+
+    CShape.prototype.setColumnSpace = function(spcCol){
+        var new_body_pr = this.getBodyPr();
+        if (new_body_pr) {
+            new_body_pr = new_body_pr.createDuplicate();
+            new_body_pr.spcCol = spcCol;
+            if (this.bWordShape) {
+                this.setBodyPr(new_body_pr);
+            }
+            else {
+                if (this.txBody) {
+                    this.txBody.setBodyPr(new_body_pr);
+                }
+            }
+        }
+    };
 
 function CreateBinaryReader(szSrc, offset, srcLen)
 {

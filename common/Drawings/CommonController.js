@@ -2470,6 +2470,31 @@ DrawingObjectsController.prototype =
                 editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(objects_by_type.tables[0]);
             }
         }
+
+        if(AscFormat.isRealNumber(props.columnNumber))
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].setColumnNumber(props.columnNumber);
+            }
+            for(i = 0; i < objects_by_type.groups.length; ++i)
+            {
+                objects_by_type.groups[i].setColumnNumber(props.columnNumber);
+            }
+        }
+
+        if(AscFormat.isRealNumber(props.columnSpace))
+        {
+            for(i = 0; i < objects_by_type.shapes.length; ++i)
+            {
+                objects_by_type.shapes[i].setColumnSpace(props.columnSpace);
+            }
+            for(i = 0; i < objects_by_type.groups.length; ++i)
+            {
+                objects_by_type.groups[i].setColumnSpace(props.columnSpace);
+            }
+        }
+
         if(AscFormat.isRealNumber(props.vert))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
@@ -6960,7 +6985,9 @@ DrawingObjectsController.prototype =
                         textArtProperties: drawing.getTextArtProperties(),
                         lockAspect: lockAspect,
                         title: drawing.getTitle(),
-                        description: drawing.getDescription()
+                        description: drawing.getDescription(),
+                        columnNumber: drawing.getColumnNumber(),
+                        columnSpace: drawing.getColumnSpace()
                     };
                     if(!shape_props)
                         shape_props = new_shape_props;
@@ -7462,6 +7489,9 @@ DrawingObjectsController.prototype =
             shape_props.title = props.shapeProps.title;
             shape_props.ShapeProperties.textArtProperties = AscFormat.CreateAscTextArtProps(props.shapeProps.textArtProperties);
             shape_props.lockAspect = props.shapeProps.lockAspect;
+
+            shape_props.ShapeProperties.columnNumber = props.shapeProps.columnNumber;
+            shape_props.ShapeProperties.columnSpace = props.shapeProps.columnSpace;
             if(props.shapeProps.textArtProperties)
             {
                 oTextArtProperties = props.shapeProps.textArtProperties;

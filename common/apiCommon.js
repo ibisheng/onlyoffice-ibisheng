@@ -1902,6 +1902,9 @@
 		this.lockAspect = null;
 		this.title = null;
 		this.description = null;
+
+        this.columnNumber = null;
+        this.columnSpace = null;
 	}
 
 	asc_CShapeProperty.prototype = {
@@ -1971,6 +1974,22 @@
 			return this.description;
 		}, asc_putDescription: function (v) {
 			this.description = v;
+		},
+
+		asc_getColumnNumber: function(){
+			return this.columnNumber;
+		},
+
+		asc_putColumnNumber: function(v){
+			this.columnNumber = v;
+		},
+
+		asc_getColumnSpace: function(){
+			return this.columnSpace;
+		},
+
+		asc_putColumnSpace: function(v){
+			this.columnSpace = v;
 		}
 	};
 
@@ -2219,6 +2238,9 @@
 			this.title = obj.title != undefined ? obj.title : undefined;
 			this.description = obj.description != undefined ? obj.description : undefined;
 
+            this.columnNumber =  obj.columnNumber != undefined ? obj.columnNumber : undefined;
+            this.columnSpace =  obj.columnSpace != undefined ? obj.columnSpace : undefined;
+
 		} else {
 			this.CanBeFlow = true;
 			this.Width = undefined;
@@ -2257,6 +2279,9 @@
 			this.oleHeight = undefined;
             this.title = undefined;
             this.description = undefined;
+
+            this.columnNumber = undefined;
+            this.columnSpace =  undefined;
 		}
 	}
 
@@ -2479,6 +2504,22 @@
 
 		asc_putDescription: function(v){
 			this.description = v;
+		},
+
+		asc_getColumnNumber: function(){
+			return this.columnNumber;
+		},
+
+		asc_putColumnNumber: function(v){
+			this.columnNumber = v;
+		},
+
+		asc_getColumnSpace: function(){
+			return this.columnSpace;
+		},
+
+		asc_putColumnSpace: function(v){
+			this.columnSpace = v;
 		}
 	};
 
@@ -3573,6 +3614,10 @@
 	prot["put_Title"] = prot["asc_putTitle"] = prot.asc_putTitle;
 	prot["get_Description"] = prot["asc_getDescription"] = prot.asc_getDescription;
 	prot["put_Description"] = prot["asc_putDescription"] = prot.asc_putDescription;
+	prot["get_ColumnNumber"] = prot["asc_getColumnNumber"] = prot.asc_getColumnNumber;
+	prot["put_ColumnNumber"] = prot["asc_putColumnNumber"] = prot.asc_putColumnNumber;
+	prot["get_ColumnSpace"] = prot["asc_getColumnSpace"] = prot.asc_getColumnSpace;
+	prot["put_ColumnSpace"] = prot["asc_putColumnSpace"] = prot.asc_putColumnSpace;
 
 	window["Asc"]["asc_TextArtProperties"] = window["Asc"].asc_TextArtProperties = asc_TextArtProperties;
 	prot = asc_TextArtProperties.prototype;
@@ -3695,6 +3740,10 @@
 	prot["put_Title"] = prot["asc_putTitle"] = prot.asc_putTitle;
 	prot["get_Description"] = prot["asc_getDescription"] = prot.asc_getDescription;
 	prot["put_Description"] = prot["asc_putDescription"] = prot.asc_putDescription;
+	prot["get_ColumnNumber"] = prot["asc_getColumnNumber"] = prot.asc_getColumnNumber;
+	prot["put_ColumnNumber"] = prot["asc_putColumnNumber"] = prot.asc_putColumnNumber;
+	prot["get_ColumnSpace"] = prot["asc_getColumnSpace"] = prot.asc_getColumnSpace;
+	prot["put_ColumnSpace"] = prot["asc_putColumnSpace"] = prot.asc_putColumnSpace;
 
 
 
