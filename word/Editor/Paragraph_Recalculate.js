@@ -3165,7 +3165,7 @@ CParagraphRecalculateStateInfo.prototype =
         }
     },
 
-    Add_Comment : function(Id)
+	AddComment : function(Id)
     {
         this.Comments.push( Id );
     },

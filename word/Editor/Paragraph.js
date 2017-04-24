@@ -5530,7 +5530,7 @@ Paragraph.prototype.Check_Hyperlink = function(X, Y, PageIndex)
 
 	return null;
 };
-Paragraph.prototype.Hyperlink_Add = function(HyperProps)
+Paragraph.prototype.AddHyperlink = function(HyperProps)
 {
 	if (true === this.Selection.Use)
 	{
@@ -5713,7 +5713,7 @@ Paragraph.prototype.Hyperlink_Add = function(HyperProps)
 
 	this.Correct_Content();
 };
-Paragraph.prototype.Hyperlink_Modify = function(HyperProps)
+Paragraph.prototype.ModifyHyperlink = function(HyperProps)
 {
 	var HyperPos = -1;
 
@@ -5826,7 +5826,7 @@ Paragraph.prototype.Hyperlink_Modify = function(HyperProps)
 
 	return false;
 };
-Paragraph.prototype.Hyperlink_Remove = function()
+Paragraph.prototype.RemoveHyperlink = function()
 {
 	// Сначала найдем гиперссылку, которую нужно удалить
 	var HyperPos = -1;
@@ -5901,7 +5901,7 @@ Paragraph.prototype.Hyperlink_Remove = function()
 
 	return false;
 };
-Paragraph.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
+Paragraph.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
 	if (true === bCheckInHyperlink)
 	{
@@ -5988,7 +5988,7 @@ Paragraph.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
 		}
 	}
 };
-Paragraph.prototype.Hyperlink_Check = function(bCheckEnd)
+Paragraph.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	var Hyper = null;
 
@@ -6679,7 +6679,7 @@ Paragraph.prototype.Get_SelectionDirection = function()
 
 	return this.Content[this.Selection.StartPos].Get_SelectionDirection();
 };
-Paragraph.prototype.Get_SelectionAnchorPos = function()
+Paragraph.prototype.GetSelectionAnchorPos = function()
 {
 	var X0 = this.X, X1 = this.XLimit, Y = this.Y, Page = this.Get_AbsolutePage(0);
 	if (true === this.ApplyToAll)
@@ -10598,7 +10598,7 @@ Paragraph.prototype.Set_SelectionState2 = function(ParaState)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //----------------------------------------------------------------------------------------------------------------------
-Paragraph.prototype.Add_Comment = function(Comment, bStart, bEnd)
+Paragraph.prototype.AddComment = function(Comment, bStart, bEnd)
 {
 	if (true == this.ApplyToAll)
 	{
@@ -10754,42 +10754,9 @@ Paragraph.prototype.Add_Comment = function(Comment, bStart, bEnd)
 
 	this.Correct_Content();
 };
-Paragraph.prototype.Add_Comment2 = function(Comment, ObjectId)
+Paragraph.prototype.AddCommentToObject = function(Comment, ObjectId)
 {
 	// TODO: Реализовать добавление комментария по ID объекта
-	//        var Pos = -1;
-	//        var Count = this.Content.length;
-	//        for ( var Index = 0; Index < Count; Index++ )
-	//        {
-	//            var Item = this.Content[Index];
-	//            if ( para_Drawing === Item.Type )
-	//            {
-	//                Pos = Index;
-	//                break;
-	//            }
-	//        }
-	//
-	//        if ( -1 != Pos )
-	//        {
-	//            var StartPos = Pos;
-	//            var EndPos   = Pos + 1;
-	//
-	//            var PagePos = this.Internal_GetXYByContentPos( EndPos );
-	//            var Line    = this.Lines[PagePos.Internal.Line];
-	//            var LineA   = Line.Metrics.Ascent;
-	//            var LineH   = Line.Bottom - Line.Top;
-	//            Comment.Set_EndInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.Get_Id() );
-	//
-	//            var Item = new ParaCommentEnd(Comment.Get_Id());
-	//            this.Internal_Content_Add( EndPos, Item );
-	//
-	//            var PagePos = this.Internal_GetXYByContentPos( StartPos );
-	//            var Line    = this.Lines[PagePos.Internal.Line];
-	//            var LineA   = Line.Metrics.Ascent;
-	//            var LineH   = Line.Bottom - Line.Top;
-	//            Comment.Set_StartInfo( PagePos.PageNum, PagePos.X, PagePos.Y - LineA, LineH, this.XLimit,
-	// this.Get_Id() );  var Item = new ParaCommentStart(Comment.Get_Id()); this.Internal_Content_Add( StartPos, Item
-	// ); }
 };
 Paragraph.prototype.CanAddComment = function()
 {
@@ -12663,7 +12630,7 @@ CParagraphDrawStateHightlights.prototype =
         this.Spaces = SpacesCount;
     },
 
-    Add_Comment : function(Id)
+	AddComment : function(Id)
     {
         if (true === this.DrawComments)
         {

@@ -1911,7 +1911,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.Hyperlink_Add( _props );
+                this.WordControl.m_oLogicDocument.AddHyperlink( _props );
             }
             break;
         }
@@ -1921,7 +1921,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.Hyperlink_Modify( _props );
+                this.WordControl.m_oLogicDocument.ModifyHyperlink( _props );
             }
             break;
         }
@@ -1930,13 +1930,13 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.Hyperlink_Remove();
+                this.WordControl.m_oLogicDocument.RemoveHyperlink();
             }
             break;
         }
         case 58: // ASC_MENU_EVENT_TYPE_CAN_ADD_HYPERLINK
         {
-            var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd(true);
+            var bCanAdd = this.WordControl.m_oLogicDocument.CanAddHyperlink(true);
 
             var _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
@@ -4664,7 +4664,7 @@ Asc['asc_docs_api'].prototype.put_AddPageBreak = function()
     {
         var Document = this.WordControl.m_oLogicDocument;
 
-        if ( null === Document.Hyperlink_Check(false) )
+        if ( null === Document.IsCursorInHyperlink(false) )
         {
             Document.Create_NewHistoryPoint();
             Document.Paragraph_Add( new ParaNewLine( break_Page ) );
@@ -4687,7 +4687,7 @@ Asc['asc_docs_api'].prototype.put_AddLineBreak = function()
     {
         var Document = this.WordControl.m_oLogicDocument;
 
-        if ( null === Document.Hyperlink_Check(false) )
+        if ( null === Document.IsCursorInHyperlink(false) )
         {
             Document.Create_NewHistoryPoint();
             Document.Paragraph_Add( new ParaNewLine( para_NewLine ) );

@@ -3928,41 +3928,41 @@ CTable.prototype.Set_SelectionState2 = function(TableState)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //----------------------------------------------------------------------------------------------------------------------
-CTable.prototype.Hyperlink_Add = function(HyperProps)
+CTable.prototype.AddHyperlink = function(HyperProps)
 {
 	// Выделения по ячейкам быть не должно
-	return this.CurCell.Content.Hyperlink_Add(HyperProps);
+	return this.CurCell.Content.AddHyperlink(HyperProps);
 };
-CTable.prototype.Hyperlink_Modify = function(HyperProps)
+CTable.prototype.ModifyHyperlink = function(HyperProps)
 {
-	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		this.CurCell.Content.Hyperlink_Modify(HyperProps);
+	if (false === this.Selection.Use || (true === this.Selection.Use && table_Selection_Text === this.Selection.Type))
+		this.CurCell.Content.ModifyHyperlink(HyperProps);
 
 	return false;
 };
-CTable.prototype.Hyperlink_Remove = function()
+CTable.prototype.RemoveHyperlink = function()
 {
-	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		this.CurCell.Content.Hyperlink_Remove();
+	if (false === this.Selection.Use || (true === this.Selection.Use && table_Selection_Text === this.Selection.Type))
+		this.CurCell.Content.RemoveHyperlink();
 };
-CTable.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
+CTable.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
-	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		return this.CurCell.Content.Hyperlink_CanAdd(bCheckInHyperlink);
+	if (false === this.Selection.Use || (true === this.Selection.Use && table_Selection_Text === this.Selection.Type))
+		return this.CurCell.Content.CanAddHyperlink(bCheckInHyperlink);
 
 	return false;
 };
-CTable.prototype.Hyperlink_Check = function(bCheckEnd)
+CTable.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
-	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		return this.CurCell.Content.Hyperlink_Check(bCheckEnd);
+	if (false === this.Selection.Use || (true === this.Selection.Use && table_Selection_Text === this.Selection.Type))
+		return this.CurCell.Content.IsCursorInHyperlink(bCheckEnd);
 
 	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //----------------------------------------------------------------------------------------------------------------------
-CTable.prototype.Add_Comment = function(Comment, bStart, bEnd)
+CTable.prototype.AddComment = function(Comment, bStart, bEnd)
 {
 	if (true === this.ApplyToAll)
 	{
@@ -3973,7 +3973,7 @@ CTable.prototype.Add_Comment = function(Comment, bStart, bEnd)
 		{
 			var Cell_Content = this.Content[0].Get_Cell(0).Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell_Content.Add_Comment(Comment, true, true);
+			Cell_Content.AddComment(Comment, true, true);
 			Cell_Content.Set_ApplyToAll(false);
 		}
 		else
@@ -3982,7 +3982,7 @@ CTable.prototype.Add_Comment = function(Comment, bStart, bEnd)
 			{
 				var Cell_Content = this.Content[0].Get_Cell(0).Content;
 				Cell_Content.Set_ApplyToAll(true);
-				Cell_Content.Add_Comment(Comment, true, false);
+				Cell_Content.AddComment(Comment, true, false);
 				Cell_Content.Set_ApplyToAll(false);
 			}
 
@@ -3990,7 +3990,7 @@ CTable.prototype.Add_Comment = function(Comment, bStart, bEnd)
 			{
 				var Cell_Content = this.Content[RowsCount - 1].Get_Cell(CellsCount - 1).Content;
 				Cell_Content.Set_ApplyToAll(true);
-				Cell_Content.Add_Comment(Comment, false, true);
+				Cell_Content.AddComment(Comment, false, true);
 				Cell_Content.Set_ApplyToAll(false);
 			}
 
@@ -4020,7 +4020,7 @@ CTable.prototype.Add_Comment = function(Comment, bStart, bEnd)
 				var Pos          = this.Selection.Data[0];
 				var Cell_Content = this.Content[Pos.Row].Get_Cell(Pos.Cell).Content;
 				Cell_Content.Set_ApplyToAll(true);
-				Cell_Content.Add_Comment(Comment, true, true);
+				Cell_Content.AddComment(Comment, true, true);
 				Cell_Content.Set_ApplyToAll(false);
 			}
 			else
@@ -4032,7 +4032,7 @@ CTable.prototype.Add_Comment = function(Comment, bStart, bEnd)
 					StartPos         = this.Selection.Data[0];
 					var Cell_Content = this.Content[StartPos.Row].Get_Cell(StartPos.Cell).Content;
 					Cell_Content.Set_ApplyToAll(true);
-					Cell_Content.Add_Comment(Comment, true, false);
+					Cell_Content.AddComment(Comment, true, false);
 					Cell_Content.Set_ApplyToAll(false);
 				}
 
@@ -4041,7 +4041,7 @@ CTable.prototype.Add_Comment = function(Comment, bStart, bEnd)
 					EndPos           = this.Selection.Data[this.Selection.Data.length - 1];
 					var Cell_Content = this.Content[EndPos.Row].Get_Cell(EndPos.Cell).Content;
 					Cell_Content.Set_ApplyToAll(true);
-					Cell_Content.Add_Comment(Comment, false, true);
+					Cell_Content.AddComment(Comment, false, true);
 					Cell_Content.Set_ApplyToAll(false);
 				}
 
@@ -4088,7 +4088,7 @@ CTable.prototype.Add_Comment = function(Comment, bStart, bEnd)
 		}
 		else
 		{
-			this.CurCell.Content.Add_Comment(Comment, bStart, bEnd);
+			this.CurCell.Content.AddComment(Comment, bStart, bEnd);
 		}
 	}
 };
@@ -4208,7 +4208,7 @@ CTable.prototype.GetSelectionBounds = function()
 		return this.CurCell.Content.GetSelectionBounds();
 	}
 };
-CTable.prototype.Get_SelectionAnchorPos = function()
+CTable.prototype.GetSelectionAnchorPos = function()
 {
 	if (true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ))
 	{
@@ -4228,7 +4228,7 @@ CTable.prototype.Get_SelectionAnchorPos = function()
 	}
 	else
 	{
-		return this.CurCell.Content.Get_SelectionAnchorPos();
+		return this.CurCell.Content.GetSelectionAnchorPos();
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------

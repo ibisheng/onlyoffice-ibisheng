@@ -7539,48 +7539,46 @@ CDocumentContent.prototype.Refresh_RecalcData2             = function(Index, Pag
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
-CDocumentContent.prototype.Hyperlink_Add    = function(HyperProps)
+CDocumentContent.prototype.AddHyperlink = function(HyperProps)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.hyperlinkAdd(HyperProps);
-    }
-    // Либо у нас нет выделения, либо выделение внутри одного элемента
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos ) || ( false == this.Selection.Use ) ))
-    {
-        var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-        this.Content[Pos].Hyperlink_Add(HyperProps);
-        this.Recalculate();
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.hyperlinkAdd(HyperProps);
+	}
+	else if (docpostype_Content === this.CurPos.Type
+		&& (false === this.Selection.Use || this.Selection.StartPos === this.Selection.EndPos))
+	{
+		var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
+		this.Content[Pos].AddHyperlink(HyperProps);
+	}
 };
-CDocumentContent.prototype.Hyperlink_Modify = function(HyperProps)
+CDocumentContent.prototype.ModifyHyperlink = function(HyperProps)
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.hyperlinkModify(HyperProps);
-    }
-    // Либо у нас нет выделения, либо выделение внутри одного элемента
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos ) || ( false == this.Selection.Use ) ))
-    {
-        var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-        if (true === this.Content[Pos].Hyperlink_Modify(HyperProps))
-            this.Recalculate();
-    }
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.hyperlinkModify(HyperProps);
+	}
+	else if (docpostype_Content == this.CurPos.Type
+		&& (false === this.Selection.Use || this.Selection.StartPos === this.Selection.EndPos))
+	{
+		var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
+		this.Content[Pos].ModifyHyperlink(HyperProps);
+	}
 };
-CDocumentContent.prototype.Hyperlink_Remove = function()
+CDocumentContent.prototype.RemoveHyperlink = function()
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.hyperlinkRemove();
-    }
-    // Либо у нас нет выделения, либо выделение внутри одного элемента
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos ) || ( false == this.Selection.Use ) ))
-    {
-        var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-        this.Content[Pos].Hyperlink_Remove();
-    }
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.hyperlinkRemove();
+	}
+	else if (docpostype_Content == this.CurPos.Type
+		&& (false === this.Selection.Use || this.Selection.StartPos === this.Selection.EndPos))
+	{
+		var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
+		this.Content[Pos].RemoveHyperlink();
+	}
 };
-CDocumentContent.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
+CDocumentContent.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
 	{
@@ -7609,34 +7607,36 @@ CDocumentContent.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
 
 	return false;
 };
-CDocumentContent.prototype.Hyperlink_Check  = function(bCheckEnd)
+CDocumentContent.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.hyperlinkCheck(bCheckEnd);
-    }
-    else //if ( docpostype_Content == this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Numbering:
-                    return null;
-                case selectionflag_Common:
-                {
-                    if (this.Selection.StartPos != this.Selection.EndPos)
-                        return null;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.hyperlinkCheck(bCheckEnd);
+	}
+	else //if ( docpostype_Content == this.CurPos.Type )
+	{
+		if (true === this.Selection.Use)
+		{
+			switch (this.Selection.Flag)
+			{
+				case selectionflag_Numbering:
+					return null;
+				case selectionflag_Common:
+				{
+					if (this.Selection.StartPos != this.Selection.EndPos)
+						return null;
 
-                    return this.Content[this.Selection.StartPos].Hyperlink_Check(bCheckEnd);
-                }
-            }
-        }
-        else
-            return this.Content[this.CurPos.ContentPos].Hyperlink_Check(bCheckEnd);
-    }
+					return this.Content[this.Selection.StartPos].IsCursorInHyperlink(bCheckEnd);
+				}
+			}
+		}
+		else
+		{
+			return this.Content[this.CurPos.ContentPos].IsCursorInHyperlink(bCheckEnd);
+		}
+	}
 
-    return null;
+	return null;
 };
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
@@ -7839,75 +7839,75 @@ CDocumentContent.prototype.Set_SelectionState2 = function(State)
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
-CDocumentContent.prototype.Add_Comment            = function(Comment, bStart, bEnd)
+CDocumentContent.prototype.AddComment = function(Comment, bStart, bEnd)
 {
-    if (true === this.ApplyToAll)
-    {
-        if (this.Content.length <= 1 && true === bStart && true === bEnd)
-        {
-            this.Content[0].Set_ApplyToAll(true);
-            this.Content[0].Add_Comment(Comment, true, true);
-            this.Content[0].Set_ApplyToAll(false);
-        }
-        else
-        {
-            if (true === bStart)
-            {
-                this.Content[0].Set_ApplyToAll(true);
-                this.Content[0].Add_Comment(Comment, true, false);
-                this.Content[0].Set_ApplyToAll(false);
-            }
+	if (true === this.ApplyToAll)
+	{
+		if (this.Content.length <= 1 && true === bStart && true === bEnd)
+		{
+			this.Content[0].Set_ApplyToAll(true);
+			this.Content[0].AddComment(Comment, true, true);
+			this.Content[0].Set_ApplyToAll(false);
+		}
+		else
+		{
+			if (true === bStart)
+			{
+				this.Content[0].Set_ApplyToAll(true);
+				this.Content[0].AddComment(Comment, true, false);
+				this.Content[0].Set_ApplyToAll(false);
+			}
 
-            if (true === bEnd)
-            {
-                this.Content[this.Content.length - 1].Set_ApplyToAll(true);
-                this.Content[this.Content.length - 1].Add_Comment(Comment, false, true);
-                this.Content[this.Content.length - 1].Set_ApplyToAll(true);
-            }
-        }
-    }
-    else
-    {
-        if (docpostype_DrawingObjects === this.CurPos.Type)
-        {
-            return this.LogicDocument.DrawingObjects.addComment(Comment);
-        }
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            if (selectionflag_Numbering === this.Selection.Flag)
-                return;
+			if (true === bEnd)
+			{
+				this.Content[this.Content.length - 1].Set_ApplyToAll(true);
+				this.Content[this.Content.length - 1].AddComment(Comment, false, true);
+				this.Content[this.Content.length - 1].Set_ApplyToAll(true);
+			}
+		}
+	}
+	else
+	{
+		if (docpostype_DrawingObjects === this.CurPos.Type)
+		{
+			return this.LogicDocument.DrawingObjects.addComment(Comment);
+		}
+		else //if ( docpostype_Content === this.CurPos.Type )
+		{
+			if (selectionflag_Numbering === this.Selection.Flag)
+				return;
 
-            if (true === this.Selection.Use)
-            {
-                var StartPos, EndPos;
-                if (this.Selection.StartPos < this.Selection.EndPos)
-                {
-                    StartPos = this.Selection.StartPos;
-                    EndPos   = this.Selection.EndPos;
-                }
-                else
-                {
-                    StartPos = this.Selection.EndPos;
-                    EndPos   = this.Selection.StartPos;
-                }
+			if (true === this.Selection.Use)
+			{
+				var StartPos, EndPos;
+				if (this.Selection.StartPos < this.Selection.EndPos)
+				{
+					StartPos = this.Selection.StartPos;
+					EndPos   = this.Selection.EndPos;
+				}
+				else
+				{
+					StartPos = this.Selection.EndPos;
+					EndPos   = this.Selection.StartPos;
+				}
 
-                if (StartPos === EndPos)
-                    this.Content[StartPos].Add_Comment(Comment, bStart, bEnd);
-                else
-                {
-                    if (true === bStart)
-                        this.Content[StartPos].Add_Comment(Comment, true, false);
+				if (StartPos === EndPos)
+					this.Content[StartPos].AddComment(Comment, bStart, bEnd);
+				else
+				{
+					if (true === bStart)
+						this.Content[StartPos].AddComment(Comment, true, false);
 
-                    if (true === bEnd)
-                        this.Content[EndPos].Add_Comment(Comment, false, true);
-                }
-            }
-            else
-            {
-                this.Content[this.CurPos.ContentPos].Add_Comment(Comment, bStart, bEnd);
-            }
-        }
-    }
+					if (true === bEnd)
+						this.Content[EndPos].AddComment(Comment, false, true);
+				}
+			}
+			else
+			{
+				this.Content[this.CurPos.ContentPos].AddComment(Comment, bStart, bEnd);
+			}
+		}
+	}
 };
 CDocumentContent.prototype.CanAddComment = function()
 {
@@ -7977,10 +7977,10 @@ CDocumentContent.prototype.GetSelectionBounds = function()
 
 	return null;
 };
-CDocumentContent.prototype.Get_SelectionAnchorPos = function()
+CDocumentContent.prototype.GetSelectionAnchorPos = function()
 {
-    var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) : this.CurPos.ContentPos );
-    return this.Content[Pos].Get_SelectionAnchorPos();
+	var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) : this.CurPos.ContentPos );
+	return this.Content[Pos].GetSelectionAnchorPos();
 };
 CDocumentContent.prototype.Get_EndInfo            = function()
 {

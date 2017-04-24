@@ -1123,30 +1123,30 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
-    Hyperlink_Add : function(HyperProps)
-    {
-        this.Content.Hyperlink_Add(HyperProps);
-    },
+	AddHyperlink : function(HyperProps)
+	{
+		this.Content.AddHyperlink(HyperProps);
+	},
 
-    Hyperlink_Modify : function(HyperProps)
-    {
-        this.Content.Hyperlink_Modify(HyperProps);
-    },
+	ModifyHyperlink : function(HyperProps)
+	{
+		this.Content.ModifyHyperlink(HyperProps);
+	},
 
-    Hyperlink_Remove : function()
-    {
-        this.Content.Hyperlink_Remove();
-    },
+	RemoveHyperlink : function()
+	{
+		this.Content.RemoveHyperlink();
+	},
 
-    Hyperlink_CanAdd : function(bCheckInHyperlink)
-    {
-        return this.Content.Hyperlink_CanAdd(bCheckInHyperlink);
-    },
+	CanAddHyperlink : function(bCheckInHyperlink)
+	{
+		return this.Content.CanAddHyperlink(bCheckInHyperlink);
+	},
 
-    Hyperlink_Check : function(bCheckEnd)
-    {
-        return this.Content.Hyperlink_Check(bCheckEnd);
-    },
+	IsCursorInHyperlink : function(bCheckEnd)
+	{
+		return this.Content.IsCursorInHyperlink(bCheckEnd);
+	},
 //-----------------------------------------------------------------------------------
 // Функции для работы с генерацией карты шрифтов
 //-----------------------------------------------------------------------------------
@@ -1200,10 +1200,10 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
-    Add_Comment : function(Comment)
-    {
-        this.Content.Add_Comment( Comment, true, true );
-    },
+	AddComment : function(Comment)
+	{
+		this.Content.AddComment(Comment, true, true);
+	},
 
 	CanAddComment : function()
 	{
@@ -2445,51 +2445,51 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
-    Hyperlink_Add : function(HyperProps)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Hyperlink_Add(HyperProps);
-    },
+	AddHyperlink : function(HyperProps)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.AddHyperlink(HyperProps);
+	},
 
-    Hyperlink_Modify : function(HyperProps)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Hyperlink_Modify(HyperProps);
-    },
+	ModifyHyperlink : function(HyperProps)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.ModifyHyperlink(HyperProps);
+	},
 
-    Hyperlink_Remove : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Hyperlink_Remove();
-    },
+	RemoveHyperlink : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.RemoveHyperlink();
+	},
 
-    Hyperlink_CanAdd : function(bCheckInHyperlink)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Hyperlink_CanAdd(bCheckInHyperlink);
+	CanAddHyperlink : function(bCheckInHyperlink)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.CanAddHyperlink(bCheckInHyperlink);
 
-        return false;
-    },
+		return false;
+	},
 
-    Hyperlink_Check : function(bCheckEnd)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Hyperlink_Check(bCheckEnd);
+	IsCursorInHyperlink : function(bCheckEnd)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.IsCursorInHyperlink(bCheckEnd);
 
-        return null;
-    },
+		return null;
+	},
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
-    Add_Comment : function(Comment)
-    {
-        if ( null != this.CurHdrFtr )
-        {
-            // Отмечаем, что данный комментарий добавлен к колонтитулу
-            Comment.Set_TypeInfo( comment_type_HdrFtr, this.CurHdrFtr );
-            this.CurHdrFtr.Add_Comment( Comment );
-        }
-    },
+	AddComment : function(Comment)
+	{
+		if (null != this.CurHdrFtr)
+		{
+			// Отмечаем, что данный комментарий добавлен к колонтитулу
+			Comment.Set_TypeInfo(comment_type_HdrFtr, this.CurHdrFtr);
+			this.CurHdrFtr.AddComment(Comment);
+		}
+	},
 
 	CanAddComment : function()
 	{
@@ -2498,14 +2498,14 @@ CHeaderFooterController.prototype =
 
 		return false;
 	},
-    
-    Get_SelectionAnchorPos : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Content.Get_SelectionAnchorPos();
-        
-        return { X : 0, Y : 0, Page : 0 };
-    }
+
+	GetSelectionAnchorPos : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.Content.GetSelectionAnchorPos();
+
+		return {X : 0, Y : 0, Page : 0};
+	}
 };
 CHeaderFooterController.prototype.Get_StyleFromFormatting = function()
 {

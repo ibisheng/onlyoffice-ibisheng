@@ -5021,10 +5021,6 @@ CDocument.prototype.GetSelectionBounds = function()
 {
 	return this.Controller.GetSelectionBounds();
 };
-CDocument.prototype.Selection_Clear = function()
-{
-	this.DrawingDocument.SelectClear();
-};
 CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 {
 	this.Reset_WordSelection();
@@ -6144,10 +6140,10 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 13) // Enter
     {
-        var Hyperlink = this.Hyperlink_Check(false);
+        var Hyperlink = this.IsCursorInHyperlink(false);
         if (null != Hyperlink && false === e.ShiftKey)
         {
-            editor.sync_HyperlinkClickCallback(Hyperlink.Get_Value())
+            editor.sync_HyperlinkClickCallback(Hyperlink.Get_Value());
             Hyperlink.Set_Visited(true);
 
             // TODO: Пока сделаем так, потом надо будет переделать
@@ -6708,7 +6704,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 75 && false === editor.isViewMode && true === e.CtrlKey && false === e.ShiftKey) // Ctrl + K - добавление гиперссылки
     {
-        if (true === this.Hyperlink_CanAdd(false))
+        if (true === this.CanAddHyperlink(false))
             editor.sync_DialogAddHyperlink();
 
         bRetValue = keydownresult_PreventAll;
@@ -8175,7 +8171,7 @@ CDocument.prototype.Document_UpdateCanAddHyperlinkState = function()
 		return;
 
 	// Проверяем можно ли добавить гиперссылку
-	this.Api.sync_CanAddHyperlinkCallback(this.Hyperlink_CanAdd(false));
+	this.Api.sync_CanAddHyperlinkCallback(this.CanAddHyperlink(false));
 };
 CDocument.prototype.Document_UpdateSectionPr = function()
 {
@@ -8525,7 +8521,7 @@ CDocument.prototype.Refresh_RecalcData2 = function(Index, Page_rel)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Hyperlink_Add = function(HyperProps)
+CDocument.prototype.AddHyperlink = function(HyperProps)
 {
 	// Проверку, возможно ли добавить гиперссылку, должны были вызвать до этой функции
 	if (null != HyperProps.Text && "" != HyperProps.Text && true === this.IsSelectionUse())
@@ -8545,20 +8541,20 @@ CDocument.prototype.Hyperlink_Add = function(HyperProps)
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateSelectionState();
 };
-CDocument.prototype.Hyperlink_Modify = function(HyperProps)
+CDocument.prototype.ModifyHyperlink = function(HyperProps)
 {
 	this.Controller.ModifyHyperlink(HyperProps);
 	this.Recalculate();
     this.Document_UpdateSelectionState();
     this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Hyperlink_Remove = function()
+CDocument.prototype.RemoveHyperlink = function()
 {
 	this.Controller.RemoveHyperlink();
 	this.Recalculate();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
+CDocument.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
 	return this.Controller.CanAddHyperlink(bCheckInHyperlink);
 };
@@ -8567,7 +8563,7 @@ CDocument.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
  * @param bCheckEnd
  * @returns {*}
  */
-CDocument.prototype.Hyperlink_Check = function(bCheckEnd)
+CDocument.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	if (undefined === bCheckEnd)
 		bCheckEnd = true;
@@ -8700,7 +8696,7 @@ CDocument.prototype.Set_SelectionState2 = function(State)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Add_Comment = function(CommentData)
+CDocument.prototype.AddComment = function(CommentData)
 {
 	if (true != this.CanAddComment())
 	{
@@ -8822,7 +8818,7 @@ CDocument.prototype.Get_PrevElementEndInfo = function(CurElement)
     else
         return null;
 };
-CDocument.prototype.Get_SelectionAnchorPos = function()
+CDocument.prototype.GetSelectionAnchorPos = function()
 {
 	var Result = this.Controller.GetSelectionAnchorPos();
 
@@ -14838,10 +14834,10 @@ CDocument.prototype.controller_SetSelectionState = function(State, StateIndex)
 };
 CDocument.prototype.controller_AddHyperlink = function(Props)
 {
-	if (false == this.Selection.Use || this.Selection.StartPos == this.Selection.EndPos)
+	if (false === this.Selection.Use || this.Selection.StartPos === this.Selection.EndPos)
 	{
 		var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-		this.Content[Pos].Hyperlink_Add(Props);
+		this.Content[Pos].AddHyperlink(Props);
 	}
 };
 CDocument.prototype.controller_ModifyHyperlink = function(Props)
@@ -14849,7 +14845,7 @@ CDocument.prototype.controller_ModifyHyperlink = function(Props)
 	if (false == this.Selection.Use || this.Selection.StartPos == this.Selection.EndPos)
 	{
 		var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-		this.Content[Pos].Hyperlink_Modify(Props);
+		this.Content[Pos].ModifyHyperlink(Props);
 	}
 };
 CDocument.prototype.controller_RemoveHyperlink = function()
@@ -14857,7 +14853,7 @@ CDocument.prototype.controller_RemoveHyperlink = function()
 	if (false == this.Selection.Use || this.Selection.StartPos == this.Selection.EndPos)
 	{
 		var Pos = ( true == this.Selection.Use ? this.Selection.StartPos : this.CurPos.ContentPos );
-		this.Content[Pos].Hyperlink_Remove();
+		this.Content[Pos].RemoveHyperlink();
 	}
 };
 CDocument.prototype.controller_CanAddHyperlink = function(bCheckInHyperlink)
@@ -14919,17 +14915,17 @@ CDocument.prototype.controller_AddComment = function(Comment)
 
 		if (StartPos === EndPos)
 		{
-			this.Content[StartPos].Add_Comment(Comment, true, true);
+			this.Content[StartPos].AddComment(Comment, true, true);
 		}
 		else
 		{
-			this.Content[StartPos].Add_Comment(Comment, true, false);
-			this.Content[EndPos].Add_Comment(Comment, false, true);
+			this.Content[StartPos].AddComment(Comment, true, false);
+			this.Content[EndPos].AddComment(Comment, false, true);
 		}
 	}
 	else
 	{
-		this.Content[this.CurPos.ContentPos].Add_Comment(Comment, true, true);
+		this.Content[this.CurPos.ContentPos].AddComment(Comment, true, true);
 	}
 };
 CDocument.prototype.controller_CanAddComment = function()
@@ -14953,7 +14949,7 @@ CDocument.prototype.controller_CanAddComment = function()
 CDocument.prototype.controller_GetSelectionAnchorPos = function()
 {
 	var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) : this.CurPos.ContentPos );
-	return this.Content[Pos].Get_SelectionAnchorPos();
+	return this.Content[Pos].GetSelectionAnchorPos();
 };
 CDocument.prototype.controller_StartSelectionFromCurPos = function()
 {

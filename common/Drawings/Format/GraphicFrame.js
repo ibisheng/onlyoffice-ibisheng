@@ -479,17 +479,17 @@ CGraphicFrame.prototype.isTable = function()
         return this.graphicObject instanceof CTable;
 };
 
-CGraphicFrame.prototype.Hyperlink_CanAdd = function(bCheck)
+CGraphicFrame.prototype.CanAddHyperlink = function(bCheck)
     {
         if(this.graphicObject)
-            return this.graphicObject.Hyperlink_CanAdd(bCheck);
+            return this.graphicObject.CanAddHyperlink(bCheck);
         return false;
 };
 
-CGraphicFrame.prototype.Hyperlink_Check = function(bCheck)
+CGraphicFrame.prototype.IsCursorInHyperlink = function(bCheck)
     {
         if(this.graphicObject)
-            return this.graphicObject.Hyperlink_Check(bCheck);
+            return this.graphicObject.IsCursorInHyperlink(bCheck);
         return false;
 };
 

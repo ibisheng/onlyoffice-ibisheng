@@ -2883,34 +2883,34 @@ CFootnotesController.prototype.AddHyperlink = function(Props)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Hyperlink_Add(Props);
+		this.CurFootnote.AddHyperlink(Props);
 	}
 };
 CFootnotesController.prototype.ModifyHyperlink = function(Props)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Hyperlink_Modify(Props);
+		this.CurFootnote.ModifyHyperlink(Props);
 	}
 };
 CFootnotesController.prototype.RemoveHyperlink = function()
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Hyperlink_Remove();
+		this.CurFootnote.RemoveHyperlink();
 	}
 };
 CFootnotesController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
-		return this.CurFootnote.Hyperlink_CanAdd(bCheckInHyperlink);
+		return this.CurFootnote.CanAddHyperlink(bCheckInHyperlink);
 
 	return false;
 };
 CFootnotesController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
-		return this.CurFootnote.Hyperlink_Check(bCheckEnd);
+		return this.CurFootnote.IsCursorInHyperlink(bCheckEnd);
 
 	return null;
 };
@@ -2918,7 +2918,7 @@ CFootnotesController.prototype.AddComment = function(Comment)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Add_Comment(Comment, true, true);
+		this.CurFootnote.AddComment(Comment, true, true);
 	}
 };
 CFootnotesController.prototype.CanAddComment = function()
@@ -2931,11 +2931,11 @@ CFootnotesController.prototype.CanAddComment = function()
 CFootnotesController.prototype.GetSelectionAnchorPos = function()
 {
 	if (true !== this.Selection.Use || 0 === this.Selection.Direction)
-		return this.CurFootnote.Get_SelectionAnchorPos();
+		return this.CurFootnote.GetSelectionAnchorPos();
 	else if (1 === this.Selection.Direction)
-		return this.Selection.Start.Footnote.Get_SelectionAnchorPos();
+		return this.Selection.Start.Footnote.GetSelectionAnchorPos();
 	else
-		return this.Selection.End.Footnote.Get_SelectionAnchorPos();
+		return this.Selection.End.Footnote.GetSelectionAnchorPos();
 };
 CFootnotesController.prototype.StartSelectionFromCurPos = function()
 {

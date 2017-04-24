@@ -441,13 +441,13 @@ CDrawingsController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 };
 CDrawingsController.prototype.AddComment = function(Comment)
 {
-	if (true != this.DrawingObjects.isSelectedText())
+	if (true !== this.DrawingObjects.isSelectedText())
 	{
 		var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
 		if (null != ParaDrawing)
 		{
 			var Paragraph = ParaDrawing.Parent;
-			Paragraph.Add_Comment2(Comment, ParaDrawing.Get_Id());
+			Paragraph.AddCommentToObject(Comment, ParaDrawing.Get_Id());
 		}
 	}
 	else

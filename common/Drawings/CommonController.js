@@ -2135,7 +2135,7 @@ DrawingObjectsController.prototype =
     {
         var content = this.getTargetDocContent();
         if(content)
-            return content.Hyperlink_Check(bCheckEnd);
+            return content.IsCursorInHyperlink(bCheckEnd);
         return null;
     },
 
@@ -2146,7 +2146,7 @@ DrawingObjectsController.prototype =
         {
             if(this.document && content.Parent && content.Parent instanceof  AscFormat.CTextBody)
                 return false;
-            return content.Hyperlink_CanAdd(bCheckInHyperlink);
+            return content.CanAddHyperlink(bCheckInHyperlink);
         }
         return false;
     },
@@ -2156,7 +2156,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent(true);
         if(content)
         {
-            var Ret = content.Hyperlink_Remove();
+            var Ret = content.RemoveHyperlink();
             var target_text_object = getTargetTextObject(this);
             if(target_text_object)
             {
@@ -2172,7 +2172,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent(true);
         if(content)
         {
-            var Ret = content.Hyperlink_Modify(HyperProps);
+            var Ret = content.ModifyHyperlink(HyperProps);
             var target_text_object = getTargetTextObject(this);
             if(target_text_object)
             {
@@ -2196,7 +2196,7 @@ DrawingObjectsController.prototype =
                     bCheckExtents = true;
                 }
             }
-            var Ret = content.Hyperlink_Add(HyperProps);
+            var Ret = content.AddHyperlink(HyperProps);
             if(bCheckExtents)
             {
                 var target_text_object = getTargetTextObject(this);

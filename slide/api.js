@@ -4440,7 +4440,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_getAnchorPosition = function()
 	{
-		var AnchorPos = this.WordControl.m_oLogicDocument.Get_SelectionAnchorPos();
+		var AnchorPos = this.WordControl.m_oLogicDocument.GetSelectionAnchorPos();
 		return new AscCommon.asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
 	};
 
@@ -5283,7 +5283,7 @@ background-repeat: no-repeat;\
 		//if ( true === CollaborativeEditing.Get_GlobalLock() )
 		//    return false;
 
-		var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd();
+		var bCanAdd = this.WordControl.m_oLogicDocument.CanAddHyperlink();
 		if (true === bCanAdd)
 			return this.WordControl.m_oLogicDocument.GetSelectedText(true);
 
@@ -5293,18 +5293,18 @@ background-repeat: no-repeat;\
 	// HyperProps - объект CHyperlinkProperty
 	asc_docs_api.prototype.add_Hyperlink = function(HyperProps)
 	{
-		this.WordControl.m_oLogicDocument.Hyperlink_Add(HyperProps);
+		this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
 	};
 
 	// HyperProps - объект CHyperlinkProperty
 	asc_docs_api.prototype.change_Hyperlink = function(HyperProps)
 	{
-		this.WordControl.m_oLogicDocument.Hyperlink_Modify(HyperProps);
+		this.WordControl.m_oLogicDocument.ModifyHyperlink(HyperProps);
 	};
 
 	asc_docs_api.prototype.remove_Hyperlink = function()
 	{
-		this.WordControl.m_oLogicDocument.Hyperlink_Remove();
+		this.WordControl.m_oLogicDocument.RemoveHyperlink();
 	};
 
 	function CHyperlinkProperty(obj)
@@ -5686,7 +5686,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.can_AddHyperlink            = function()
 	{
-		var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd();
+		var bCanAdd = this.WordControl.m_oLogicDocument.CanAddHyperlink();
 		if (true === bCanAdd)
 			return this.WordControl.m_oLogicDocument.GetSelectedText(true);
 
@@ -5694,7 +5694,7 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.add_Hyperlink               = function(HyperProps)
 	{
-		this.WordControl.m_oLogicDocument.Hyperlink_Add(HyperProps);
+		this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
 	};
 	asc_docs_api.prototype.sync_HyperlinkClickCallback = function(Url)
 	{

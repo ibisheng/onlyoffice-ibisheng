@@ -173,10 +173,6 @@ CBlockLevelSdt.prototype.GetSelectedElementsInfo = function(oInfo)
 {
 	this.Content.GetSelectedElementsInfo(oInfo);
 };
-CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)
-{
-	this.Content.Document_UpdateRulersState(CurPage);
-};
 CBlockLevelSdt.prototype.IsSelectionUse = function()
 {
 	return this.Content.IsSelectionUse();
@@ -216,10 +212,6 @@ CBlockLevelSdt.prototype.GetDirectParaPr = function()
 CBlockLevelSdt.prototype.GetDirectTextPr = function()
 {
 	return this.Content.GetDirectTextPr();
-};
-CBlockLevelSdt.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
-{
-	return this.Content.Hyperlink_CanAdd(bCheckInHyperlink);
 };
 CBlockLevelSdt.prototype.DrawSelectionOnPage = function(CurPage)
 {
@@ -324,10 +316,6 @@ CBlockLevelSdt.prototype.IsCursorAtEnd = function()
 CBlockLevelSdt.prototype.Add_NewParagraph = function()
 {
 	return this.Content.Add_NewParagraph();
-};
-CBlockLevelSdt.prototype.Hyperlink_Check = function(bCheckEnd)
-{
-	return this.Content.Hyperlink_Check(bCheckEnd);
 };
 CBlockLevelSdt.prototype.Get_SelectionState2 = function()
 {
@@ -549,10 +537,37 @@ CBlockLevelSdt.prototype.GetTableProps = function()
 {
 	return this.Content.GetTableProps();
 };
-
+CBlockLevelSdt.prototype.AddHyperlink = function(Props)
+{
+	return this.Content.AddHyperlink(Props);
+};
+CBlockLevelSdt.prototype.ModifyHyperlink = function(Props)
+{
+	this.Content.ModifyHyperlink(Props);
+};
+CBlockLevelSdt.prototype.RemoveHyperlink = function()
+{
+	this.Content.RemoveHyperlink();
+};
+CBlockLevelSdt.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	return this.Content.CanAddHyperlink(bCheckInHyperlink);
+};
+CBlockLevelSdt.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	return this.Content.IsCursorInHyperlink(bCheckEnd);
+};
+CBlockLevelSdt.prototype.AddComment = function(Comment, bStart, bEnd)
+{
+	return this.Content.AddComment(Comment, bStart, bEnd);
+};
 CBlockLevelSdt.prototype.CanAddComment = function()
 {
 	return this.Content.CanAddComment();
+};
+CBlockLevelSdt.prototype.GetSelectionAnchorPos = function()
+{
+	return this.Content.GetSelectionAnchorPos();
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)

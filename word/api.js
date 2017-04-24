@@ -3614,7 +3614,7 @@ background-repeat: no-repeat;\
 		{
 			var Document = this.WordControl.m_oLogicDocument;
 
-			if (null === Document.Hyperlink_Check(false))
+			if (null === Document.IsCursorInHyperlink(false))
 			{
 				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddPageBreak);
 				this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaNewLine(AscCommonWord.break_Page));
@@ -3626,7 +3626,7 @@ background-repeat: no-repeat;\
 		var Document = this.WordControl.m_oLogicDocument;
 		if (false === Document.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
-			if (null === Document.Hyperlink_Check(false))
+			if (null === Document.IsCursorInHyperlink(false))
 			{
 				this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddPageBreak);
 				this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaNewLine(AscCommonWord.break_Column));
@@ -4767,7 +4767,7 @@ background-repeat: no-repeat;\
 		//if ( true === CollaborativeEditing.Get_GlobalLock() )
 		//    return false;
 
-		var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd(true);
+		var bCanAdd = this.WordControl.m_oLogicDocument.CanAddHyperlink(true);
 		if (true === bCanAdd)
 			return this.WordControl.m_oLogicDocument.GetSelectedText(true);
 
@@ -4780,7 +4780,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddHyperlink);
-			this.WordControl.m_oLogicDocument.Hyperlink_Add(HyperProps);
+			this.WordControl.m_oLogicDocument.AddHyperlink(HyperProps);
 		}
 	};
 
@@ -4790,7 +4790,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ChangeHyperlink);
-			this.WordControl.m_oLogicDocument.Hyperlink_Modify(HyperProps);
+			this.WordControl.m_oLogicDocument.ModifyHyperlink(HyperProps);
 		}
 	};
 
@@ -4799,7 +4799,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveHyperlink);
-			this.WordControl.m_oLogicDocument.Hyperlink_Remove();
+			this.WordControl.m_oLogicDocument.RemoveHyperlink();
 		}
 	};
 
@@ -6394,7 +6394,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asc_getAnchorPosition = function()
 	{
-		var AnchorPos = this.WordControl.m_oLogicDocument.Get_SelectionAnchorPos();
+		var AnchorPos = this.WordControl.m_oLogicDocument.GetSelectionAnchorPos();
 		return new AscCommon.asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
 	};
 

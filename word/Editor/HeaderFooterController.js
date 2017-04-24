@@ -356,27 +356,27 @@ CHdrFtrController.prototype.SetSelectionState = function(State, StateIndex)
 };
 CHdrFtrController.prototype.AddHyperlink = function(Props)
 {
-	this.HdrFtr.Hyperlink_Add(Props);
+	this.HdrFtr.AddHyperlink(Props);
 };
 CHdrFtrController.prototype.ModifyHyperlink = function(Props)
 {
-	this.HdrFtr.Hyperlink_Modify(Props);
+	this.HdrFtr.ModifyHyperlink(Props);
 };
 CHdrFtrController.prototype.RemoveHyperlink = function()
 {
-	this.HdrFtr.Hyperlink_Remove();
+	this.HdrFtr.RemoveHyperlink();
 };
 CHdrFtrController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
-	return this.HdrFtr.Hyperlink_CanAdd(bCheckInHyperlink);
+	return this.HdrFtr.CanAddHyperlink(bCheckInHyperlink);
 };
 CHdrFtrController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
-	return this.HdrFtr.Hyperlink_Check(bCheckEnd);
+	return this.HdrFtr.IsCursorInHyperlink(bCheckEnd);
 };
 CHdrFtrController.prototype.AddComment = function(Comment)
 {
-	this.HdrFtr.Add_Comment(Comment);
+	this.HdrFtr.AddComment(Comment);
 };
 CHdrFtrController.prototype.CanAddComment = function()
 {
@@ -384,7 +384,7 @@ CHdrFtrController.prototype.CanAddComment = function()
 };
 CHdrFtrController.prototype.GetSelectionAnchorPos = function()
 {
-	return this.HdrFtr.Get_SelectionAnchorPos();
+	return this.HdrFtr.GetSelectionAnchorPos();
 };
 CHdrFtrController.prototype.StartSelectionFromCurPos = function()
 {

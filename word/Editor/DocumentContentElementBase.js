@@ -227,14 +227,6 @@ CDocumentContentElementBase.prototype.GetDirectTextPr = function()
 {
 	return new CTextPr();
 };
-CDocumentContentElementBase.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
-{
-	return false;
-};
-CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperlink)
-{
-	return this.Hyperlink_CanAdd(bCheckInHyperlink);
-};
 CDocumentContentElementBase.prototype.DrawSelectionOnPage = function(CurPage)
 {
 };
@@ -363,14 +355,6 @@ CDocumentContentElementBase.prototype.Add_NewParagraph = function()
 CDocumentContentElementBase.prototype.AddNewParagraph = function()
 {
 	return this.Add_NewParagraph();
-};
-CDocumentContentElementBase.prototype.Hyperlink_Check = function(bCheckEnd)
-{
-	return null;
-};
-CDocumentContentElementBase.prototype.IsCursorInHyperlink = function(bCheckEnd)
-{
-	return this.Hyperlink_Check(bCheckEnd);
 };
 CDocumentContentElementBase.prototype.Get_SelectionState2 = function()
 {
@@ -563,10 +547,33 @@ CDocumentContentElementBase.prototype.GetTableProps = function()
 {
 	return null;
 };
-
+CDocumentContentElementBase.prototype.AddHyperlink = function(Props)
+{
+};
+CDocumentContentElementBase.prototype.ModifyHyperlink = function(Props)
+{
+};
+CDocumentContentElementBase.prototype.RemoveHyperlink = function()
+{
+};
+CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.AddComment = function(Comment, bStart, bEnd)
+{
+};
 CDocumentContentElementBase.prototype.CanAddComment = function()
 {
 	return false;
+};
+CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
+{
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц

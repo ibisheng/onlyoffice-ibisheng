@@ -1429,7 +1429,7 @@ CGraphicObjects.prototype =
     addComment: function(commentData)
     {
         var content = this.getTargetDocContent();
-        return content && content.Add_Comment(commentData, true, true);
+        return content && content.AddComment(commentData, true, true);
     },
 
     hyperlinkCheck: DrawingObjectsController.prototype.hyperlinkCheck,
@@ -3381,6 +3381,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
             return content.Interface_Update_TablePr( true );
+
         return null;
     },
 

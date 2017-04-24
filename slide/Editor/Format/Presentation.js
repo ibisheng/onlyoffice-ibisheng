@@ -2523,7 +2523,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 13 && false === editor.isViewMode ) // Enter
         {
-            var Hyperlink = this.Hyperlink_Check(false);
+            var Hyperlink = this.IsCursorInHyperlink(false);
             if ( null != Hyperlink && false === e.ShiftKey )
             {
                 editor.sync_HyperlinkClickCallback( Hyperlink.Get_Value() );
@@ -2960,7 +2960,7 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 75 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + K - добавление гиперссылки
         {
-            if ( true === this.Hyperlink_CanAdd(false) )
+            if ( true === this.CanAddHyperlink(false) )
                 editor.sync_DialogAddHyperlink();
 
             bRetValue = keydownresult_PreventAll;
@@ -3372,7 +3372,7 @@ CPresentation.prototype =
         return null;
     },
 
-    Get_SelectionAnchorPos: function()
+	GetSelectionAnchorPos: function()
     {
         if(this.Slides[this.CurPage])
         {
@@ -3813,7 +3813,7 @@ CPresentation.prototype =
                      editor.UpdateTextPr(text_pr);
                      }
 
-                     var Hyperlink = this.Hyperlink_Check(false);
+                     var Hyperlink = this.IsCursorInHyperlink(false);
                      if (Hyperlink )
                      {
                      var HyperText = new CParagraphGetText();
@@ -4012,7 +4012,7 @@ CPresentation.prototype =
 
     Document_UpdateCanAddHyperlinkState : function()
     {
-        editor.sync_CanAddHyperlinkCallback( this.Hyperlink_CanAdd(false) );
+        editor.sync_CanAddHyperlinkCallback( this.CanAddHyperlink(false) );
     },
 
     Set_CurPage : function(PageNum)
@@ -4544,7 +4544,7 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
-    Hyperlink_Add : function(HyperProps)
+	AddHyperlink : function(HyperProps)
     {
         if(this.Slides[this.CurPage])
         {
@@ -4553,7 +4553,7 @@ CPresentation.prototype =
         }
     },
 
-    Hyperlink_Modify : function(HyperProps)
+	ModifyHyperlink : function(HyperProps)
     {
         if(this.Slides[this.CurPage])
         {
@@ -4562,7 +4562,7 @@ CPresentation.prototype =
         }
     },
 
-    Hyperlink_Remove : function()
+	RemoveHyperlink : function()
     {
         if(this.Slides[this.CurPage])
         {
@@ -4571,7 +4571,7 @@ CPresentation.prototype =
         }
     },
 
-    Hyperlink_CanAdd : function(bCheckInHyperlink)
+	CanAddHyperlink : function(bCheckInHyperlink)
     {
         if(this.Slides[this.CurPage])
             return this.Slides[this.CurPage].graphicObjects.hyperlinkCanAdd(bCheckInHyperlink);
@@ -4666,7 +4666,7 @@ CPresentation.prototype =
     },
 
     // Проверяем, находимся ли мы в гиперссылке сейчас
-    Hyperlink_Check : function(bCheckEnd)
+	IsCursorInHyperlink : function(bCheckEnd)
     {
         return isRealObject(this.Slides[this.CurPage]) && this.Slides[this.CurPage].graphicObjects.hyperlinkCheck(bCheckEnd);
     },
@@ -5089,7 +5089,7 @@ CPresentation.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
-    Add_Comment : function(CommentData)
+    AddComment : function(CommentData)
     {
         if(this.Slides[this.CurPage])
         {
