@@ -922,7 +922,7 @@ CShape.prototype.paragraphAdd = function (paraItem, bRecalculate) {
         content_to_add = this.getDocContent();
     }
     if (content_to_add) {
-        content_to_add.Paragraph_Add(paraItem, bRecalculate);
+        content_to_add.AddToParagraph(paraItem, bRecalculate);
     }
 };
 

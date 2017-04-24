@@ -12189,7 +12189,7 @@ CTitle.prototype =
         var content = this.getDocContent();
         if(content)
         {
-            content.Paragraph_Add(paraItem, bRecalculate);
+            content.AddToParagraph(paraItem, bRecalculate);
         }
     },
 
@@ -13465,21 +13465,21 @@ function AddToContentFromString(content, str)
         var ch = str[i];
         if (ch == '\t')
         {
-            content.Paragraph_Add( new ParaTab(), false );
+            content.AddToParagraph( new ParaTab(), false );
         }
         else if (ch == '\n')
         {
-            content.Paragraph_Add( new ParaNewLine(break_Line), false );
+            content.AddToParagraph( new ParaNewLine(break_Line), false );
         }
         else if (ch == '\r')
             ;
         else if (ch != ' ')
         {
-            content.Paragraph_Add(new ParaText(ch), false );
+            content.AddToParagraph(new ParaText(ch), false );
         }
         else
         {
-            content.Paragraph_Add(new ParaSpace(1), false );
+            content.AddToParagraph(new ParaSpace(1), false );
         }
     }
 }

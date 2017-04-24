@@ -525,7 +525,7 @@ function checkPointInMap(map, worksheet, row, col)
 
                 oElement.tx.rich.content.Set_ApplyToAll(true);
                 var oParTextPr = new AscCommonWord.ParaTextPr(oTextPr);
-                oElement.tx.rich.content.Paragraph_Add(oParTextPr);
+                oElement.tx.rich.content.AddToParagraph(oParTextPr);
                 oElement.tx.rich.content.Set_ApplyToAll(false);
             }
             CheckParagraphTextPr(oElement.txPr.content.Content[0], oTextPr);
@@ -1219,7 +1219,7 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
             if(this.selection.title.tx && this.selection.title.tx.rich && this.selection.title.tx.rich.content)
             {
                 this.selection.title.tx.rich.content.Set_ApplyToAll(true);
-                this.selection.title.tx.rich.content.Paragraph_Add(_paraItem);
+                this.selection.title.tx.rich.content.AddToParagraph(_paraItem);
                 this.selection.title.tx.rich.content.Set_ApplyToAll(false);
             }
             return;
@@ -1236,7 +1236,7 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
 };
 CChartSpace.prototype.applyTextFunction = function(docContentFunction, tableFunction, args)
 {
-    if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && !this.selection.textSelection)
+    if(docContentFunction === CDocumentContent.prototype.AddToParagraph && !this.selection.textSelection)
     {
         this.paragraphAdd(args[0], args[1]);
         return;

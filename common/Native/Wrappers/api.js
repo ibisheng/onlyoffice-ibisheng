@@ -1182,7 +1182,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             }
 
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr(_textPr));
+            this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr(_textPr));
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
         }
@@ -1385,7 +1385,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             }
 
             if (undefined !== _textPr)
-                this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr(_textPr));
+                this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr(_textPr));
 
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
@@ -4667,7 +4667,7 @@ Asc['asc_docs_api'].prototype.put_AddPageBreak = function()
         if ( null === Document.IsCursorInHyperlink(false) )
         {
             Document.Create_NewHistoryPoint();
-            Document.Paragraph_Add( new ParaNewLine( break_Page ) );
+            Document.AddToParagraph( new ParaNewLine( break_Page ) );
         }
     }
 };
@@ -4690,7 +4690,7 @@ Asc['asc_docs_api'].prototype.put_AddLineBreak = function()
         if ( null === Document.IsCursorInHyperlink(false) )
         {
             Document.Create_NewHistoryPoint();
-            Document.Paragraph_Add( new ParaNewLine( para_NewLine ) );
+            Document.AddToParagraph( new ParaNewLine( para_NewLine ) );
         }
     }
 };

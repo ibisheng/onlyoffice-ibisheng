@@ -2642,9 +2642,9 @@
 						{
 							var _char = text.charAt(Index);
 							if (" " == _char)
-								isIntoShape.Paragraph_Add(new ParaSpace());
+								isIntoShape.AddToParagraph(new ParaSpace());
 							else
-								isIntoShape.Paragraph_Add(new ParaText(_char));
+								isIntoShape.AddToParagraph(new ParaText(_char));
 						}
 						
 						AscCommonExcel.g_clipboardExcel.end_paste();

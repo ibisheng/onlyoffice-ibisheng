@@ -5318,9 +5318,9 @@ CTable.prototype.AddInlineTable = function(Cols, Rows)
 };
 CTable.prototype.Add = function(ParaItem, bRecalculate)
 {
-	this.Paragraph_Add(ParaItem, bRecalculate);
+	this.AddToParagraph(ParaItem, bRecalculate);
 };
-CTable.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
+CTable.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 {
 	if (para_TextPr === ParaItem.Type && ( true === this.ApplyToAll || ( true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0 ) ))
 	{
@@ -5333,7 +5333,7 @@ CTable.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
 
 			var Cell_Content = Cell.Content;
 			Cell_Content.Set_ApplyToAll(true);
-			Cell.Content.Paragraph_Add(ParaItem, bRecalculate);
+			Cell.Content.AddToParagraph(ParaItem, bRecalculate);
 			Cell_Content.Set_ApplyToAll(false);
 		}
 
@@ -5353,7 +5353,9 @@ CTable.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
 		}
 	}
 	else
-		this.CurCell.Content.Paragraph_Add(ParaItem, bRecalculate);
+	{
+		this.CurCell.Content.AddToParagraph(ParaItem, bRecalculate);
+	}
 };
 CTable.prototype.ClearParagraphFormatting = function()
 {
@@ -6742,7 +6744,7 @@ CTable.prototype.Set_ParagraphPrOnAdd = function(Para)
 
 	// Добавляем текстовые настройки во все параграфы
 	var TextPr = Para.Get_TextPr();
-	this.Paragraph_Add(new ParaTextPr(TextPr));
+	this.AddToParagraph(new ParaTextPr(TextPr));
 
 	this.ApplyToAll = false;
 };
@@ -8804,7 +8806,7 @@ CTable.prototype.AddTableRow = function(bBefore)
 				New_Cell.Content.SetParagraphStyle(Styles.Get_Name(PStyleId));
 			}
 
-			New_Cell.Content.Paragraph_Add(new ParaTextPr(TextPr));
+			New_Cell.Content.AddToParagraph(new ParaTextPr(TextPr));
 			New_Cell.Content.Set_ApplyToAll(false);
 
 			if (true === bBefore)
@@ -9332,7 +9334,7 @@ CTable.prototype.AddTableColumn = function(bBefore)
 					NewCell.Content.SetParagraphStyle(Styles.Get_Name(PStyleId));
 				}
 
-				NewCell.Content.Paragraph_Add(new ParaTextPr(TextPr));
+				NewCell.Content.AddToParagraph(new ParaTextPr(TextPr));
 				NewCell.Content.Set_ApplyToAll(false);
 
 				if (false === bBefore2)
@@ -9414,7 +9416,7 @@ CTable.prototype.AddTableColumn = function(bBefore)
 					NewCell.Content.SetParagraphStyle(Styles.Get_Name(PStyleId));
 				}
 
-				NewCell.Content.Paragraph_Add(new ParaTextPr(TextPr));
+				NewCell.Content.AddToParagraph(new ParaTextPr(TextPr));
 				NewCell.Content.Set_ApplyToAll(false);
 
 

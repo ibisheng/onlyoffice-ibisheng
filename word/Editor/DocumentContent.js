@@ -2374,7 +2374,7 @@ CDocumentContent.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 				Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
 				Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
 			}
-			this.Paragraph_Add(Drawing);
+			this.AddToParagraph(Drawing);
 			this.Select_DrawingObject(Drawing.Get_Id());
 		}
 		else
@@ -2402,7 +2402,7 @@ CDocumentContent.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, 
 			Image.setParent(Drawing);
 			Drawing.Set_GraphicObject(Image);
 
-			this.Paragraph_Add(Drawing);
+			this.AddToParagraph(Drawing);
 			this.Select_DrawingObject(Drawing.Get_Id());
 		}
 		else
@@ -2430,7 +2430,7 @@ CDocumentContent.prototype.AddTextArt = function(nStyle)
 			Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
 			if (true == this.Selection.Use)
 				this.Remove(1, true);
-			this.Paragraph_Add(Drawing);
+			this.AddToParagraph(Drawing);
 			if (TextArt.bSelectedText)
 			{
 				this.Select_DrawingObject(Drawing.Get_Id());
@@ -2523,7 +2523,7 @@ CDocumentContent.prototype.AddInlineTable = function(Cols, Rows)
 		}
 	}
 };
-CDocumentContent.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
+CDocumentContent.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 {
 	if (true === this.ApplyToAll)
 	{
@@ -2571,7 +2571,7 @@ CDocumentContent.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
 
 					if (true === bAddSpace)
 					{
-						this.Paragraph_Add(new ParaSpace());
+						this.AddToParagraph(new ParaSpace());
 						this.MoveCursorLeft(false, false);
 					}
 
@@ -3585,13 +3585,19 @@ CDocumentContent.prototype.MoveCursorToXY = function(X, Y, AddToSelect, bRemoveO
 };
 CDocumentContent.prototype.IsCursorAtBegin = function(bOnlyPara)
 {
+	if (undefined === bOnlyPara)
+		bOnlyPara = false;
+
+	if (true === bOnlyPara && true != this.Is_CurrentElementParagraph())
+		return false;
+
 	if (docpostype_DrawingObjects === this.CurPos.Type)
 		return false;
 	else if (false != this.Selection.Use || 0 != this.CurPos.ContentPos)
 		return false;
 
 	var Item = this.Content[0];
-	return Item.IsCursorAtBegin(bOnlyPara);
+	return Item.IsCursorAtBegin();
 };
 CDocumentContent.prototype.IsCursorAtEnd = function()
 {
@@ -5133,7 +5139,7 @@ CDocumentContent.prototype.SetParagraphShd = function(Shd)
 
 			if (undefined !== this.LogicDocument && true === this.LogicDocument.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() && selectionflag_Common === this.Selection.Flag)
 			{
-				this.Paragraph_Add(new ParaTextPr({Shd : Shd}));
+				this.AddToParagraph(new ParaTextPr({Shd : Shd}));
 			}
 			else
 			{
@@ -5607,7 +5613,7 @@ CDocumentContent.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 					var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
 					var TextPr      = new CTextPr();
 					TextPr.FontSize = NewFontSize;
-					this.Paragraph_Add(new ParaTextPr(TextPr), true);
+					this.AddToParagraph(new ParaTextPr(TextPr), true);
 					break;
 				}
 			}

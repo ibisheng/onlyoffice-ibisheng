@@ -73,7 +73,7 @@ CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 	if (para_NewLine === oItem.Type && true === oItem.IsPageOrColumnBreak())
 		return;
 
-	this.HdrFtr.Paragraph_Add(oItem, bRecalculate);
+	this.HdrFtr.AddToParagraph(oItem, bRecalculate);
 	this.LogicDocument.Document_UpdateSelectionState();
 	this.LogicDocument.Document_UpdateUndoRedoState();
 };

@@ -4106,7 +4106,7 @@
             var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, this.Chart.getDrawingDocument(), oTitle.tx);
             if(AscFormat.isRealNumber(nFontSize)){
                 oTextBody.content.Set_ApplyToAll(true);
-                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize}));
+                oTextBody.content.AddToParagraph(new ParaTextPr({ FontSize : nFontSize}));
                 oTextBody.content.Set_ApplyToAll(false);
             }
             oTitle.tx.setRich(oTextBody);
@@ -5026,7 +5026,7 @@
         oTextPr.RFonts.Ascii = sFontName2;
         oTextPr.TextFill = oTextFill2;
         oContent.Set_ApplyToAll(true);
-        oContent.Paragraph_Add(new ParaTextPr(oTextPr));
+        oContent.AddToParagraph(new ParaTextPr(oTextPr));
         oContent.SetParagraphAlign(AscCommon.align_Center);
         oContent.Set_ApplyToAll(false);
         var oBodyPr = oShape.getBodyPr().createDuplicate();

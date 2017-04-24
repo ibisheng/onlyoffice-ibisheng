@@ -375,7 +375,7 @@ CBlockLevelSdt.prototype.Is_Empty = function()
 };
 CBlockLevelSdt.prototype.Add = function(oParaItem)
 {
-	return this.Content.Paragraph_Add(oParaItem);
+	return this.Content.AddToParagraph(oParaItem);
 };
 CBlockLevelSdt.prototype.PreDelete = function()
 {
@@ -697,9 +697,9 @@ function TEST_ADD_SDT()
 	oLogicDocument.Create_NewHistoryPoint();
 
 	var oSdt = new CBlockLevelSdt(oLogicDocument, oLogicDocument);
-	oSdt.Content.Paragraph_Add(new ParaText("S"));
-	oSdt.Content.Paragraph_Add(new ParaText("d"));
-	oSdt.Content.Paragraph_Add(new ParaText("t"));
+	oSdt.Content.AddToParagraph(new ParaText("S"));
+	oSdt.Content.AddToParagraph(new ParaText("d"));
+	oSdt.Content.AddToParagraph(new ParaText("t"));
 
 	oLogicDocument.Internal_Content_Add(1, oSdt);
 	oLogicDocument.Recalculate_FromStart();

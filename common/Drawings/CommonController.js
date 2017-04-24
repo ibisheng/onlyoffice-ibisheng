@@ -1591,7 +1591,7 @@ DrawingObjectsController.prototype =
                 }
                 else if(arr[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
                 {
-                    if(f === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr)
+                    if(f === CDocumentContent.prototype.AddToParagraph && args[0].Type === para_TextPr)
                     {
                         AscFormat.CheckObjectTextPr(arr[i], args[0].Value, oThis.getDrawingDocument());
                     }
@@ -1721,7 +1721,7 @@ DrawingObjectsController.prototype =
             var ret = applyToArrayDrawings(this.selectedObjects);
            //if(!ret)
            //{
-           //    if(f !== CDocumentContent.prototype.Paragraph_Add && this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
+           //    if(f !== CDocumentContent.prototype.AddToParagraph && this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
            //    {
            //        var parent_paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
            //        parent_paragraph
@@ -1813,7 +1813,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr || docContentFunction === CDocumentContent.prototype.PasteFormatting)
+            if(docContentFunction === CDocumentContent.prototype.AddToParagraph && args[0].Type === para_TextPr || docContentFunction === CDocumentContent.prototype.PasteFormatting)
             {
                 this.applyDocContentFunction(docContentFunction, args, tableFunction);
             }
@@ -1858,7 +1858,7 @@ DrawingObjectsController.prototype =
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Paragraph_Add, CTable.prototype.Paragraph_Add, [paraItem, bRecalculate]);
+        this.applyTextFunction(CDocumentContent.prototype.AddToParagraph, CTable.prototype.AddToParagraph, [paraItem, bRecalculate]);
     },
 
 
@@ -7864,7 +7864,7 @@ DrawingObjectsController.prototype =
             oTextPr.RFonts.EastAsia = {Name: "Cambria Math", Index: -1};
         }
         oContent.Set_ApplyToAll(true);
-        oContent.Paragraph_Add(new ParaTextPr(oTextPr));
+        oContent.AddToParagraph(new ParaTextPr(oTextPr));
         oContent.SetParagraphAlign(AscCommon.align_Center);
         oContent.Set_ApplyToAll(false);
         var oBodyPr = oShape.getBodyPr().createDuplicate();

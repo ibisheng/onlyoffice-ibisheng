@@ -1897,7 +1897,7 @@ CPresentation.prototype =
     },
 
 
-    Paragraph_Add : function( ParaItem, bRecalculate, noUpdateInterface )
+	AddToParagraph : function( ParaItem, bRecalculate, noUpdateInterface )
     {
         if(this.Slides[this.CurPage])
         {
@@ -1925,7 +1925,7 @@ CPresentation.prototype =
 				//oTextPr.RFonts.CS = {Name: "Cambria Math", Index: -1};
 				//oTextPr.RFonts.EastAsia = {Name: "Cambria Math", Index: -1};
 				//oContent.Set_ApplyToAll(true);
-				//oContent.Paragraph_Add(new ParaTextPr(oTextPr));
+				//oContent.AddToParagraph(new ParaTextPr(oTextPr));
 				//oContent.Set_ApplyToAll(false);
 				
                 oMathShape.checkExtentsByDocContent();
@@ -2506,7 +2506,7 @@ CPresentation.prototype =
                             }
                             else{
                                 History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                                this.Paragraph_Add(new ParaTab());
+                                this.AddToParagraph(new ParaTab());
                             }
 
 
@@ -2540,7 +2540,7 @@ CPresentation.prototype =
                     if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.selectedObjects.length !== 0) {
                         if (AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.Paragraph_Add(new ParaNewLine(break_Line));
+                            this.AddToParagraph(new ParaNewLine(break_Line));
                         }
                     }
                 }
@@ -2549,7 +2549,7 @@ CPresentation.prototype =
                     if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.selectedObjects.length !== 0) {
                         if (AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.Paragraph_Add(new ParaNewLine(break_Page));
+                            this.AddToParagraph(new ParaNewLine(break_Page));
                         }
                     }
                 }
@@ -2683,7 +2683,7 @@ CPresentation.prototype =
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.selectedObjects.length !== 0){
                         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                        this.Paragraph_Add(new ParaText(String.fromCharCode(0x00A0)));
+                        this.AddToParagraph(new ParaText(String.fromCharCode(0x00A0)));
                     }
                 }
             }
@@ -2699,7 +2699,7 @@ CPresentation.prototype =
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.selectedObjects.length !== 0) {
                         History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                        this.Paragraph_Add(new ParaSpace(1));
+                        this.AddToParagraph(new ParaSpace(1));
                     }
                 }
             }
@@ -2870,7 +2870,7 @@ CPresentation.prototype =
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                    this.Paragraph_Add(new ParaTextPr({Bold: TextPr.Bold === true ? false : true}));
+                    this.AddToParagraph(new ParaTextPr({Bold: TextPr.Bold === true ? false : true}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -2915,7 +2915,7 @@ CPresentation.prototype =
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                    this.Paragraph_Add(new ParaText("€"));
+                    this.AddToParagraph(new ParaText("€"));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -2939,7 +2939,7 @@ CPresentation.prototype =
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                    this.Paragraph_Add(new ParaTextPr({Italic: TextPr.Italic === true ? false : true}));
+                    this.AddToParagraph(new ParaTextPr({Italic: TextPr.Italic === true ? false : true}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -3051,7 +3051,7 @@ CPresentation.prototype =
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                    this.Paragraph_Add(new ParaTextPr({Underline: TextPr.Underline === true ? false : true}));
+                    this.AddToParagraph(new ParaTextPr({Underline: TextPr.Underline === true ? false : true}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -3063,7 +3063,7 @@ CPresentation.prototype =
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                    this.Paragraph_Add(new ParaTextPr({Strikeout: TextPr.Strikeout === true ? false : true}));
+                    this.AddToParagraph(new ParaTextPr({Strikeout: TextPr.Strikeout === true ? false : true}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -3122,9 +3122,9 @@ CPresentation.prototype =
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
                     if (true === e.ShiftKey)
-                        this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SuperScript ? vertalign_Baseline : AscCommon.vertalign_SuperScript}));
+                        this.AddToParagraph(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SuperScript ? vertalign_Baseline : AscCommon.vertalign_SuperScript}));
                     else
-                        this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SubScript ? vertalign_Baseline : AscCommon.vertalign_SubScript}));
+                        this.AddToParagraph(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SubScript ? vertalign_Baseline : AscCommon.vertalign_SubScript}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -3136,7 +3136,7 @@ CPresentation.prototype =
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                    this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SuperScript ? vertalign_Baseline : AscCommon.vertalign_SuperScript}));
+                    this.AddToParagraph(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SuperScript ? vertalign_Baseline : AscCommon.vertalign_SuperScript}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -3154,7 +3154,7 @@ CPresentation.prototype =
                 var Item = new ParaText( String.fromCharCode( 0x2013 ) );
                 Item.SpaceAfter = false;
 
-                this.Paragraph_Add( Item );
+                this.AddToParagraph( Item );
                 bRetValue = keydownresult_PreventAll;
             }
         }
@@ -3165,7 +3165,7 @@ CPresentation.prototype =
             {
                 if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                     History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                    this.Paragraph_Add(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SubScript ? vertalign_Baseline : AscCommon.vertalign_SubScript}));
+                    this.AddToParagraph(new ParaTextPr({VertAlign: TextPr.VertAlign === AscCommon.vertalign_SubScript ? vertalign_Baseline : AscCommon.vertalign_SubScript}));
                 }
                 bRetValue = keydownresult_PreventAll;
             }
@@ -3238,7 +3238,7 @@ CPresentation.prototype =
             {
                 target_doc_content1 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
             }
-            this.Paragraph_Add( new ParaText( String.fromCharCode( Code ) ), undefined, true );
+            this.AddToParagraph( new ParaText( String.fromCharCode( Code ) ), undefined, true );
             if(this.Slides[this.CurPage])
             {
                 target_doc_content2 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
@@ -5279,9 +5279,9 @@ CPresentation.prototype =
 
                     var _char = sText.charAt(Index);
                     if (" " == _char)
-                        this.Paragraph_Add(new ParaSpace(1));
+                        this.AddToParagraph(new ParaSpace(1));
                     else
-                        this.Paragraph_Add(new ParaText(_char));
+                        this.AddToParagraph(new ParaText(_char));
 
                     // На случай, если Count = 0
                     this.TurnOffRecalc = false;

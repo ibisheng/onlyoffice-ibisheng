@@ -95,13 +95,13 @@ CFootnotesController.prototype.Get_Id = function()
 CFootnotesController.prototype.ResetSpecialFootnotes = function()
 {
 	var oSeparator = new CFootEndnote(this);
-	oSeparator.Paragraph_Add(new ParaSeparator(), false);
+	oSeparator.AddToParagraph(new ParaSeparator(), false);
 	var oParagraph = oSeparator.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetSeparator(oSeparator);
 
 	var oContinuationSeparator = new CFootEndnote(this);
-	oContinuationSeparator.Paragraph_Add(new ParaContinuationSeparator(), false);
+	oContinuationSeparator.AddToParagraph(new ParaContinuationSeparator(), false);
 	oParagraph = oContinuationSeparator.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetContinuationSeparator(oContinuationSeparator);
@@ -1417,7 +1417,7 @@ CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 		for (var sId in this.Selection.Footnotes)
 		{
 			var oFootnote = this.Selection.Footnotes[sId];
-			oFootnote.Paragraph_Add(oItem, false);
+			oFootnote.AddToParagraph(oItem, false);
 		}
 
 		if (false !== bRecalculate)
@@ -1431,7 +1431,7 @@ CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 			return;
 
 		if (null !== this.CurFootnote)
-			this.CurFootnote.Paragraph_Add(oItem, bRecalculate);
+			this.CurFootnote.AddToParagraph(oItem, bRecalculate);
 	}
 };
 CFootnotesController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)

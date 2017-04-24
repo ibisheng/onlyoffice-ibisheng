@@ -690,10 +690,10 @@ CHeaderFooter.prototype =
         this.Content.AddInlineTable( Cols, Rows );
     },
 
-    Paragraph_Add : function( ParaItem, bRecalculate )
-    {
-        this.Content.Paragraph_Add( ParaItem, bRecalculate );
-    },
+	AddToParagraph : function(ParaItem, bRecalculate)
+	{
+		this.Content.AddToParagraph(ParaItem, bRecalculate);
+	},
 
 	ClearParagraphFormatting : function()
     {
@@ -1864,14 +1864,14 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.AddInlineTable( Cols, Rows );
     },
 
-    Paragraph_Add : function( ParaItem, bRecalculate )
-    {
-        if (para_NewLine === ParaItem.Type && true === ParaItem.IsPageOrColumnBreak())
-            return;
+	AddToParagraph : function(ParaItem, bRecalculate)
+	{
+		if (para_NewLine === ParaItem.Type && true === ParaItem.IsPageOrColumnBreak())
+			return;
 
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Paragraph_Add( ParaItem, bRecalculate );
-    },
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.AddToParagraph(ParaItem, bRecalculate);
+	},
 
 	ClearParagraphFormatting : function()
     {

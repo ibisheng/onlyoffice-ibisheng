@@ -723,21 +723,21 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 			textStr = "abcde";
 			for(var i = 0; i < textStr.length; ++i)
 			{
-				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+				oContent.AddToParagraph(new ParaText(textStr[i]), false);
 			}
 
 			textStr = "Fghi";
 			oContent.AddNewParagraph();
 			for(var i = 0; i < textStr.length; ++i)
 			{
-				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+				oContent.AddToParagraph(new ParaText(textStr[i]), false);
 			}
 
 			textStr = "Jklmn";
 			oContent.AddNewParagraph();
 			for(var i = 0; i < textStr.length; ++i)
 			{
-				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+				oContent.AddToParagraph(new ParaText(textStr[i]), false);
 			}
 			break;
 		}
@@ -748,7 +748,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 			textStr = "abcdefg";
 			for(var i = 0; i < textStr.length; ++i)
 			{
-				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+				oContent.AddToParagraph(new ParaText(textStr[i]), false);
 			}
 			break;
 		}
@@ -759,7 +759,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 			textStr = "abcdefghijklmnop";
 			for(var i = 0; i < textStr.length; ++i)
 			{
-				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+				oContent.AddToParagraph(new ParaText(textStr[i]), false);
 			}
 			break;
 		}
@@ -768,14 +768,14 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
-                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+                oContent.AddToParagraph(new ParaText(textStr[i]), false);
             }
 
             oContent.AddNewParagraph();
             textStr = "abc";
             for(var i = 0; i < textStr.length; ++i)
             {
-                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+                oContent.AddToParagraph(new ParaText(textStr[i]), false);
             }
 
 
@@ -783,7 +783,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
-                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+                oContent.AddToParagraph(new ParaText(textStr[i]), false);
             }
             break;
         }
@@ -792,13 +792,13 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
-                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+                oContent.AddToParagraph(new ParaText(textStr[i]), false);
             }
             oContent.AddNewParagraph();
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
-                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+                oContent.AddToParagraph(new ParaText(textStr[i]), false);
             }
             break;
         }
@@ -807,19 +807,19 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
-                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+                oContent.AddToParagraph(new ParaText(textStr[i]), false);
             }
             oContent.AddNewParagraph();
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
-                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+                oContent.AddToParagraph(new ParaText(textStr[i]), false);
             }
             oContent.AddNewParagraph();
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
-                oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+                oContent.AddToParagraph(new ParaText(textStr[i]), false);
             }
             break;
         }
@@ -828,13 +828,13 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 			textStr = "abcde";
 			for(var i = 0; i < textStr.length; ++i)
 			{
-				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
+				oContent.AddToParagraph(new ParaText(textStr[i]), false);
 			}
 		}
 	}
 	oContent.Set_ApplyToAll(true);
 	oContent.SetParagraphAlign(AscCommon.align_Center);
-	oContent.Paragraph_Add(new ParaTextPr({FontSize: 36, Spacing: TextSpacing}));
+	oContent.AddToParagraph(new ParaTextPr({FontSize: 36, Spacing: TextSpacing}));
 	oContent.Set_ApplyToAll(false);
 
 	var oBodypr = oShape.getBodyPr().createDuplicate();
@@ -926,10 +926,10 @@ TextArtPreviewManager.prototype.getTAShape = function()
 		var oParagraph = oContent.Content[0];
 		for(var i = 0; i < sText.length; ++i)
 		{
-			oContent.Paragraph_Add(new ParaText(sText[i]), false);
+			oContent.AddToParagraph(new ParaText(sText[i]), false);
 		}
 		oContent.Set_ApplyToAll(true);
-		oContent.Paragraph_Add(new ParaTextPr({FontSize: 109, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
+		oContent.AddToParagraph(new ParaTextPr({FontSize: 109, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
 		oContent.SetParagraphAlign(AscCommon.align_Center);
 		oContent.SetParagraphIndent({FirstLine: 0, Left: 0, Right: 0});
 		oContent.Set_ApplyToAll(false);
@@ -998,7 +998,7 @@ TextArtPreviewManager.prototype.generateTextArtStyles = function()
         oContent.Set_ApplyToAll(true);
         for(var i = 0; i < this.aStylesByIndex.length; ++i)
         {
-            oContent.Paragraph_Add(new ParaTextPr(this.aStylesByIndex[i]));
+            oContent.AddToParagraph(new ParaTextPr(this.aStylesByIndex[i]));
             graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
             graphics.transform(1,0,0,1,0,0);
             oShape.recalcText();

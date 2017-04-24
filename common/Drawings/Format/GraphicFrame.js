@@ -910,7 +910,7 @@ CGraphicFrame.prototype.paragraphAdd = function(paraItem, bRecalculate)
 
 CGraphicFrame.prototype.applyTextFunction = function(docContentFunction, tableFunction, args)
     {
-        if(tableFunction === CTable.prototype.Paragraph_Add)
+        if(tableFunction === CTable.prototype.AddToParagraph)
         {
             if((args[0].Type === para_NewLine
                 || args[0].Type === para_Text

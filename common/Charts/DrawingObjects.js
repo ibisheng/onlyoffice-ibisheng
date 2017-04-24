@@ -2561,7 +2561,7 @@ function DrawingObjects() {
                 var oContent = oTextArt.getDocContent();
                 if(oContent){
                     oContent.MoveCursorToStartPos(false);
-                    oContent.Paragraph_Add(new AscCommonWord.MathMenu(Type), false);
+                    oContent.AddToParagraph(new AscCommonWord.MathMenu(Type), false);
                 }
                 oTextArt.checkExtentsByDocContent();
                 oTextArt.spPr.xfrm.setOffX(pxToMm(coordsFrom.x) + MOVE_DELTA);

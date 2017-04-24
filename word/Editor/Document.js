@@ -4264,7 +4264,7 @@ CDocument.prototype.CheckRange = function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, 
 	var HdrFtrRanges = this.HdrFtr.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum, bMathWrap);
 	return this.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum, HdrFtrRanges, null, bMathWrap);
 };
-CDocument.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
+CDocument.prototype.AddToParagraph = function(ParaItem, bRecalculate)
 {
 	this.Controller.AddToParagraph(ParaItem, bRecalculate);
 };
@@ -4529,9 +4529,9 @@ CDocument.prototype.Paragraph_SetHighlight = function(IsColor, r, g, b)
 			this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextHighlight);
 
 			if (false === IsColor)
-				this.Paragraph_Add(new ParaTextPr({HighLight : highlight_None}));
+				this.AddToParagraph(new ParaTextPr({HighLight : highlight_None}));
 			else
-				this.Paragraph_Add(new ParaTextPr({HighLight : new CDocumentColor(r, g, b)}));
+				this.AddToParagraph(new ParaTextPr({HighLight : new CDocumentColor(r, g, b)}));
 
 			this.Document_UpdateInterfaceState();
 			editor.sync_MarkerFormatCallback(false);
@@ -6132,7 +6132,7 @@ CDocument.prototype.OnKeyDown = function(e)
                 else if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
                 {
                     this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTab);
-                    this.Paragraph_Add(new ParaTab());
+                    this.AddToParagraph(new ParaTab());
                 }
             }
         }
@@ -6170,15 +6170,15 @@ CDocument.prototype.OnKeyDown = function(e)
                     {
                         if (e.ShiftKey && e.CtrlKey)
                         {
-                            this.Paragraph_Add(new ParaNewLine(break_Column));
+                            this.AddToParagraph(new ParaNewLine(break_Column));
                         }
                         else if (e.ShiftKey)
                         {
-                            this.Paragraph_Add(new ParaNewLine(break_Line));
+                            this.AddToParagraph(new ParaNewLine(break_Line));
                         }
                         else if (e.CtrlKey)
                         {
-                            this.Paragraph_Add(new ParaNewLine(break_Page));
+                            this.AddToParagraph(new ParaNewLine(break_Page));
                         }
                         else
                         {
@@ -6261,7 +6261,7 @@ CDocument.prototype.OnKeyDown = function(e)
                     this.DrawingDocument.TargetStart();
                     this.DrawingDocument.TargetShow();
 
-                    this.Paragraph_Add(new ParaText(String.fromCharCode(0x00A0)));
+                    this.AddToParagraph(new ParaText(String.fromCharCode(0x00A0)));
                 }
                 else if (true === e.CtrlKey)
                 {
@@ -6273,7 +6273,7 @@ CDocument.prototype.OnKeyDown = function(e)
                     this.DrawingDocument.TargetShow();
 
                     this.CheckLanguageOnTextAdd = true;
-                    this.Paragraph_Add(new ParaSpace());
+                    this.AddToParagraph(new ParaSpace());
                     this.CheckLanguageOnTextAdd = false;
                 }
             }
@@ -6621,7 +6621,7 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextStrikeoutHotKey);
-                this.Paragraph_Add(new ParaTextPr({Strikeout : TextPr.Strikeout === true ? false : true}));
+                this.AddToParagraph(new ParaTextPr({Strikeout : TextPr.Strikeout === true ? false : true}));
                 this.Document_UpdateInterfaceState();
             }
             bRetValue = keydownresult_PreventAll;
@@ -6641,7 +6641,7 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextBoldHotKey);
-                this.Paragraph_Add(new ParaTextPr({Bold : TextPr.Bold === true ? false : true}));
+                this.AddToParagraph(new ParaTextPr({Bold : TextPr.Bold === true ? false : true}));
                 this.Document_UpdateInterfaceState();
             }
             bRetValue = keydownresult_PreventAll;
@@ -6670,7 +6670,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
-                this.Paragraph_Add(new ParaText("€"));
+                this.AddToParagraph(new ParaText("€"));
             }
             bRetValue = keydownresult_PreventAll;
         }
@@ -6691,7 +6691,7 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextItalicHotKey);
-                this.Paragraph_Add(new ParaTextPr({Italic : TextPr.Italic === true ? false : true}));
+                this.AddToParagraph(new ParaTextPr({Italic : TextPr.Italic === true ? false : true}));
                 this.Document_UpdateInterfaceState();
             }
             bRetValue = keydownresult_PreventAll;
@@ -6743,7 +6743,7 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddPageNumHotKey);
-                this.Paragraph_Add(new ParaPageNum());
+                this.AddToParagraph(new ParaPageNum());
             }
             bRetValue = keydownresult_PreventAll;
         }
@@ -6771,7 +6771,7 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextUnderlineHotKey);
-                this.Paragraph_Add(new ParaTextPr({Underline : TextPr.Underline === true ? false : true}));
+                this.AddToParagraph(new ParaTextPr({Underline : TextPr.Underline === true ? false : true}));
                 this.Document_UpdateInterfaceState();
             }
             bRetValue = keydownresult_PreventAll;
@@ -6862,9 +6862,9 @@ CDocument.prototype.OnKeyDown = function(e)
                 {
                     this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextVertAlignHotKey);
                     if (true === e.ShiftKey)
-                        this.Paragraph_Add(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript}));
+                        this.AddToParagraph(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript}));
                     else
-                        this.Paragraph_Add(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SubScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SubScript}));
+                        this.AddToParagraph(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SubScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SubScript}));
                     this.Document_UpdateInterfaceState();
                 }
                 bRetValue = keydownresult_PreventAll;
@@ -6879,7 +6879,7 @@ CDocument.prototype.OnKeyDown = function(e)
                 if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
                 {
                     this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddMathHotKey);
-                    this.Paragraph_Add(new MathMenu(-1));
+                    this.AddToParagraph(new MathMenu(-1));
                     bRetValue = keydownresult_PreventAll;
                 }
             }
@@ -6893,7 +6893,7 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextVertAlignHotKey2);
-                this.Paragraph_Add(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript}));
+                this.AddToParagraph(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript}));
                 this.Document_UpdateInterfaceState();
             }
             bRetValue = keydownresult_PreventAll;
@@ -6911,7 +6911,7 @@ CDocument.prototype.OnKeyDown = function(e)
             var Item = new ParaText(String.fromCharCode(0x2013));
             Item.Set_SpaceAfter(false);
 
-            this.Paragraph_Add(Item);
+            this.AddToParagraph(Item);
             bRetValue = keydownresult_PreventAll;
         }
     }
@@ -6923,7 +6923,7 @@ CDocument.prototype.OnKeyDown = function(e)
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
                 this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextVertAlignHotKey3);
-                this.Paragraph_Add(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SubScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SubScript}));
+                this.AddToParagraph(new ParaTextPr({VertAlign : TextPr.VertAlign === AscCommon.vertalign_SubScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SubScript}));
                 this.Document_UpdateInterfaceState();
             }
             bRetValue = keydownresult_PreventAll;
@@ -6951,7 +6951,7 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.TargetShow();
 
             this.CheckLanguageOnTextAdd = true;
-            this.Paragraph_Add(new ParaSpace());
+            this.AddToParagraph(new ParaSpace());
             this.CheckLanguageOnTextAdd = false;
         }
 
@@ -6992,7 +6992,7 @@ CDocument.prototype.OnKeyPress = function(e)
 			this.DrawingDocument.TargetShow();
 
 			this.CheckLanguageOnTextAdd = true;
-			this.Paragraph_Add(new ParaText(String.fromCharCode(Code)));
+			this.AddToParagraph(new ParaText(String.fromCharCode(Code)));
 			this.CheckLanguageOnTextAdd = false;
 		}
 		bRetValue = true;
@@ -7257,7 +7257,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 				else
 					ParaItem = new ParaTextPr({HighLight : this.HighlightColor});
 
-				this.Paragraph_Add(ParaItem);
+				this.AddToParagraph(ParaItem);
 				this.MoveCursorToXY(X, Y, false);
 				this.Document_UpdateSelectionState();
 
@@ -7512,7 +7512,7 @@ CDocument.prototype.Document_AddPageNum = function(AlignV, AlignH)
 	}
 	else
 	{
-		this.Paragraph_Add(new ParaPageNum());
+		this.AddToParagraph(new ParaPageNum());
 	}
 
 	this.Document_UpdateInterfaceState();
@@ -8852,9 +8852,9 @@ CDocument.prototype.TextBox_Put = function(sText, rFonts)
 			{
 				var _char = sText.charAt(Index);
 				if (" " == _char)
-					this.Paragraph_Add(new ParaSpace());
+					this.AddToParagraph(new ParaSpace());
 				else
-					this.Paragraph_Add(new ParaText(_char));
+					this.AddToParagraph(new ParaText(_char));
 			}
 		}
 		else
@@ -10766,7 +10766,7 @@ CDocument.prototype.AddPageCount = function()
 	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 	{
 		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddPageCount);
-		this.Paragraph_Add(new ParaPageCount(this.Pages.length));
+		this.AddToParagraph(new ParaPageCount(this.Pages.length));
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -11084,9 +11084,9 @@ CDocument.prototype.AddFootnote = function(sText)
 			}
 
 			if (sText)
-				this.Paragraph_Add(new ParaFootnoteReference(oFootnote, sText));
+				this.AddToParagraph(new ParaFootnoteReference(oFootnote, sText));
 			else
-				this.Paragraph_Add(new ParaFootnoteReference(oFootnote));
+				this.AddToParagraph(new ParaFootnoteReference(oFootnote));
 
 			this.Set_DocPosType(docpostype_Footnotes);
 			this.Footnotes.Set_CurrentElement(true, 0, oFootnote);
@@ -11459,7 +11459,7 @@ CDocument.prototype.controller_AddInlineImage = function(W, H, Img, Chart, bFlow
 			Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
 			Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
 		}
-		this.Paragraph_Add(Drawing);
+		this.AddToParagraph(Drawing);
 		this.Select_DrawingObject(Drawing.Get_Id());
 	}
 	else
@@ -11479,7 +11479,7 @@ CDocument.prototype.controller_AddOleObject = function(W, H, nWidthPix, nHeightP
 		var Image = this.DrawingObjects.createOleObject(Data, sApplicationId, Img, 0, 0, W, H, nWidthPix, nHeightPix);
 		Image.setParent(Drawing);
 		Drawing.Set_GraphicObject(Image);
-		this.Paragraph_Add(Drawing);
+		this.AddToParagraph(Drawing);
 		this.Select_DrawingObject(Drawing.Get_Id());
 	}
 	else
@@ -11506,7 +11506,7 @@ CDocument.prototype.controller_AddTextArt = function(nStyle)
 		if (true == this.Selection.Use)
 			this.Remove(1, true);
 
-		this.Paragraph_Add(Drawing);
+		this.AddToParagraph(Drawing);
 		if (TextArt.bSelectedText)
 		{
 			this.Select_DrawingObject(Drawing.Get_Id());
@@ -11657,7 +11657,7 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 
 				if (true === bAddSpace)
 				{
-					this.Paragraph_Add(new ParaSpace());
+					this.AddToParagraph(new ParaSpace());
 					this.MoveCursorLeft(false, false);
 				}
 				break;
@@ -13309,7 +13309,7 @@ CDocument.prototype.controller_SetParagraphShd = function(Shd)
 
 		if (true === this.UseTextShd && StartPos === EndPos && type_Paragraph === this.Content[StartPos].GetType() && false === this.Content[StartPos].Selection_CheckParaEnd() && selectionflag_Common === this.Selection.Flag)
 		{
-			this.Paragraph_Add(new ParaTextPr({Shd : Shd}));
+			this.AddToParagraph(new ParaTextPr({Shd : Shd}));
 		}
 		else
 		{
@@ -13692,7 +13692,7 @@ CDocument.prototype.controller_IncreaseDecreaseFontSize = function(bIncrease)
 				var NewFontSize = FontSize_IncreaseDecreaseValue(bIncrease, OldFontSize);
 				var TextPr      = new CTextPr();
 				TextPr.FontSize = NewFontSize;
-				this.Paragraph_Add(new ParaTextPr(TextPr), true);
+				this.AddToParagraph(new ParaTextPr(TextPr), true);
 				break;
 			}
 		}
@@ -15033,7 +15033,7 @@ CDocument.prototype.AddFormTextField = function(sName, sDefaultText)
 		oField.Add_ToContent(0, oRun);
 
 		this.Register_Field(oField);
-		this.Paragraph_Add(oField);
+		this.AddToParagraph(oField);
 		this.Document_UpdateInterfaceState();
 	}
 };

@@ -682,7 +682,7 @@ CShape.prototype.recalculateContent2 = function()
                 content.Content[0].Pr  = content_.Content[0].Pr;
                 var para_text_pr = new ParaTextPr(content_.Content[0].Get_FirstRunPr());
                 content.Set_ApplyToAll(true);
-                content.Paragraph_Add(para_text_pr);
+                content.AddToParagraph(para_text_pr);
                 content.Set_ApplyToAll(false);
             }
             content.Set_StartPage(0);
