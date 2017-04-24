@@ -166,7 +166,7 @@ ParaRun.prototype.Copy = function(Selected)
 
     NewRun.Set_Pr( this.Pr.Copy() );
 
-    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+    if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         NewRun.Set_ReviewType(reviewtype_Add);
 
     if(true === bMath)
@@ -357,7 +357,7 @@ ParaRun.prototype.Is_StartFromNewLine = function()
 // Добавляем элемент в текущую позицию
 ParaRun.prototype.Add = function(Item, bMath)
 {
-	if (this.Paragraph && this.Paragraph.LogicDocument)
+	if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
 	{
 		// Специальный код, связанный с обработкой изменения языка ввода при наборе.
 		if (true === this.Paragraph.LogicDocument.CheckLanguageOnTextAdd && editor)
@@ -379,7 +379,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 					if (NewRun)
 					{
 						NewRun.Set_Lang(NewLang);
-						NewRun.Cursor_MoveToStartPos();
+						NewRun.MoveCursorToStartPos();
 						NewRun.Add(Item, bMath);
 						NewRun.Make_ThisElementCurrent();
 						return;
@@ -406,7 +406,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 				{
 					NewRun.Set_VertAlign(undefined);
 					NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
-					NewRun.Cursor_MoveToStartPos();
+					NewRun.MoveCursorToStartPos();
 					NewRun.Add(Item, bMath);
 					NewRun.Make_ThisElementCurrent();
 					return;
@@ -419,7 +419,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 			if (NewRun)
 			{
 				NewRun.Set_VertAlign(AscCommon.vertalign_Baseline);
-				NewRun.Cursor_MoveToStartPos();
+				NewRun.MoveCursorToStartPos();
 				NewRun.Add(Item, bMath);
 				NewRun.Make_ThisElementCurrent();
 				return;
@@ -551,7 +551,7 @@ ParaRun.prototype.private_SplitRunInCurPos = function()
 };
 ParaRun.prototype.private_IsCurPosNearFootnoteReference = function()
 {
-	if (this.Paragraph && this.Paragraph.LogicDocument)
+	if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
 	{
 		var oStyles = this.Paragraph.LogicDocument.Get_Styles();
 		var nCurPos = this.State.ContentPos;
@@ -823,7 +823,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                 this.Remove_FromContent(StartPos, EndPos - StartPos, true);
             }
 
-            this.Selection_Remove();
+            this.RemoveSelection();
             this.State.ContentPos = StartPos;
         }
         else
@@ -1617,7 +1617,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 
     // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
     var UpdateParent    = (undefined !== Parent && undefined !== ParentPos && this === Parent.Content[ParentPos] ? true : false);
-    var UpdateSelection = (true === UpdateParent && true === Parent.Is_SelectionUse() && true === this.Is_SelectionUse() ? true : false);
+    var UpdateSelection = (true === UpdateParent && true === Parent.IsSelectionUse() && true === this.IsSelectionUse() ? true : false);
 
     // Создаем новый ран
     var bMathRun = this.Type == para_Math_Run;
@@ -1820,7 +1820,7 @@ ParaRun.prototype.Remove_DrawingObject = function(Id)
         if ( para_Drawing === Element.Type && Id === Element.Get_Id() )
         {
             var TrackRevisions = null;
-            if (this.Paragraph && this.Paragraph.LogicDocument)
+            if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
                 TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
 
             if (true === TrackRevisions)
@@ -2063,7 +2063,7 @@ ParaRun.prototype.Get_AllFontNames = function(AllFonts)
     }
 };
 
-ParaRun.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
+ParaRun.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 {
     var StartPos = 0;
     var EndPos   = 0;
@@ -3849,7 +3849,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_End:
             {
                 var SectPr = PRSA.Paragraph.Get_SectionPr();
-                if (!PRSA.Paragraph.LogicDocument || PRSA.Paragraph.LogicDocument !== PRSA.Paragraph.Parent)
+                if (!PRSA.Paragraph.LogicDocument || PRSA.Paragraph.LogicDocument !== PRSA.Paragraph.Parent || !PRSA.Paragraph.bFromDocument)
                     SectPr = undefined;
 
                 if ( undefined !== SectPr )
@@ -5123,12 +5123,12 @@ ParaRun.prototype.Cursor_Is_End = function()
     return false;
 };
 
-ParaRun.prototype.Cursor_MoveToStartPos = function()
+ParaRun.prototype.MoveCursorToStartPos = function()
 {
     this.State.ContentPos = 0;
 };
 
-ParaRun.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
+ParaRun.prototype.MoveCursorToEndPos = function(SelectFromEnd)
 {
     if ( true === SelectFromEnd )
     {
@@ -5721,7 +5721,7 @@ ParaRun.prototype.Set_SelectionContentPos = function(StartContentPos, EndContent
     Selection.EndPos   = EndPos;
     Selection.Use      = true;
 };
-ParaRun.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+ParaRun.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
     var StartPos = 0;
     switch (StartFlag)
@@ -5744,7 +5744,7 @@ ParaRun.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth,
     Selection.EndPos   = EndPos;
     Selection.Use      = true;
 };
-ParaRun.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+ParaRun.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
     var Pos = 0;
     switch (Flag)
@@ -5770,12 +5770,7 @@ ParaRun.prototype.Set_SelectionAtStartPos = function()
     this.Set_SelectionContentPos(null, null, 0, 1, 1);
 };
 
-ParaRun.prototype.Selection_IsUse = function()
-{
-    return this.State.Selection.Use;
-};
-
-ParaRun.prototype.Is_SelectionUse = function()
+ParaRun.prototype.IsSelectionUse = function()
 {
     return this.State.Selection.Use;
 };
@@ -5853,11 +5848,7 @@ ParaRun.prototype.Selection_CorrectLeftPos = function(Direction)
     return true;
 };
 
-ParaRun.prototype.Selection_Stop = function()
-{
-};
-
-ParaRun.prototype.Selection_Remove = function()
+ParaRun.prototype.RemoveSelection = function()
 {
     var Selection = this.State.Selection;
 
@@ -5866,7 +5857,7 @@ ParaRun.prototype.Selection_Remove = function()
     Selection.EndPos   = 0;
 };
 
-ParaRun.prototype.Select_All = function(Direction)
+ParaRun.prototype.SelectAll = function(Direction)
 {
     var Selection = this.State.Selection;
 
@@ -5948,7 +5939,7 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
     SelectionDraw.FindStart = FindStart;
 };
 
-ParaRun.prototype.Selection_IsEmpty = function(CheckEnd)
+ParaRun.prototype.IsSelectionEmpty = function(CheckEnd)
 {
     var Selection = this.State.Selection;
     if (true !== Selection.Use)
@@ -6241,7 +6232,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
 ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     var bReview = false;
-    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+    if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         bReview = true;
 
     var ReviewType = this.Get_ReviewType();
@@ -6377,7 +6368,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 					LRun.Selection.EndPos   = LRun.Content.length;
 				}
 
-				CRun.Select_All(Direction);
+				CRun.SelectAll(Direction);
 
 				if (true === bReview && true !== CRun.Have_PrChange())
 					CRun.Add_PrChange();
@@ -6473,10 +6464,10 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
             }
 
             if ( null !== LRun )
-                LRun.Selection_Remove();
+                LRun.RemoveSelection();
 
-            CRun.Selection_Remove();
-            CRun.Cursor_MoveToStartPos();
+            CRun.RemoveSelection();
+            CRun.MoveCursorToStartPos();
 
             if (true === bReview && true !== CRun.Have_PrChange())
                 CRun.Add_PrChange();
@@ -6495,7 +6486,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 
 
             if ( null !== RRun )
-                RRun.Selection_Remove();
+                RRun.RemoveSelection();
         }
 
         Result.push( LRun );
@@ -8634,13 +8625,13 @@ ParaRun.prototype.Make_ThisElementCurrent = function(bUpdateStates)
         this.Paragraph.Document_SetThisElementCurrent(true === bUpdateStates ? true : false);
     }
 };
-ParaRun.prototype.Get_AllParagraphs = function(Props, ParaArray)
+ParaRun.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
     var ContentLen = this.Content.length;
     for (var CurPos = 0; CurPos < ContentLen; CurPos++)
     {
         if (para_Drawing == this.Content[CurPos].Type)
-            this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
+            this.Content[CurPos].GetAllParagraphs(Props, ParaArray);
     }
 };
 ParaRun.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
@@ -8727,7 +8718,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeContent = function(bUpdateI
     {
         this.private_UpdateTrackRevisions();
 
-        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions() && this.ReviewInfo && true === this.ReviewInfo.Is_CurrentUser())
+        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions() && this.ReviewInfo && true === this.ReviewInfo.Is_CurrentUser())
         {
             var OldReviewInfo = this.ReviewInfo.Copy();
             this.ReviewInfo.Update();
@@ -8741,7 +8732,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeTextPr = function(bUpdateIn
     {
         this.private_UpdateTrackRevisions();
 
-        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         {
             var OldReviewInfo = this.Pr.ReviewInfo.Copy();
             this.Pr.ReviewInfo.Update();
@@ -8751,7 +8742,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeTextPr = function(bUpdateIn
 };
 ParaRun.prototype.private_UpdateTrackRevisions = function()
 {
-    if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.LogicDocument.Get_TrackRevisionsManager)
+    if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument && this.Paragraph.LogicDocument.Get_TrackRevisionsManager)
     {
         var RevisionsManager = this.Paragraph.LogicDocument.Get_TrackRevisionsManager();
         RevisionsManager.Check_Paragraph(this.Paragraph);
@@ -8822,9 +8813,9 @@ ParaRun.prototype.Accept_RevisionChanges = function(Type, bAll)
 
             if (Parent.Get_ContentLength() <= 0)
             {
-                Parent.Selection_Remove();
+                Parent.RemoveSelection();
                 Parent.Add_ToContent(0, new ParaRun());
-                Parent.Cursor_MoveToStartPos();
+                Parent.MoveCursorToStartPos();
             }
         }
     }
@@ -8890,9 +8881,9 @@ ParaRun.prototype.Reject_RevisionChanges = function(Type, bAll)
 
             if (Parent.Get_ContentLength() <= 0)
             {
-                Parent.Selection_Remove();
+                Parent.RemoveSelection();
                 Parent.Add_ToContent(0, new ParaRun());
-                Parent.Cursor_MoveToStartPos();
+                Parent.MoveCursorToStartPos();
             }
         }
         else if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type))
@@ -9097,8 +9088,8 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 		{
 			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
 			{
-				if (this.Paragraph && this.Paragraph.LogicDocument)
-					this.Paragraph.LogicDocument.Selection_Remove();
+				if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument)
+					this.Paragraph.LogicDocument.RemoveSelection();
 
 				this.State.ContentPos = nIndex;
 				this.Make_ThisElementCurrent(true);
@@ -9113,8 +9104,8 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 		{
 			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
 			{
-				if (this.Paragraph && this.Paragraph.LogicDocument)
-					this.Paragraph.LogicDocument.Selection_Remove();
+				if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument)
+					this.Paragraph.LogicDocument.RemoveSelection();
 
 				this.State.ContentPos = nIndex;
 				this.Make_ThisElementCurrent(true);

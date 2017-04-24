@@ -18,9 +18,9 @@ function CLogicDocumentController(LogicDocument)
 CLogicDocumentController.prototype = Object.create(CDocumentControllerBase.prototype);
 CLogicDocumentController.prototype.constructor = CLogicDocumentController;
 
-CLogicDocumentController.prototype.CanTargetUpdate = function()
+CLogicDocumentController.prototype.CanUpdateTarget = function()
 {
-	return this.LogicDocument.controller_CanTargetUpdate();
+	return this.LogicDocument.controller_CanUpdateTarget();
 };
 CLogicDocumentController.prototype.RecalculateCurPos = function()
 {
@@ -82,9 +82,9 @@ CLogicDocumentController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
 	return this.LogicDocument.controller_MoveCursorLeft(AddToSelect, Word);
 };
-CLogicDocumentController.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
+CLogicDocumentController.prototype.MoveCursorRight = function(AddToSelect, Word)
 {
-	return this.LogicDocument.controller_MoveCursorRight(AddToSelect, Word, FromPaste);
+	return this.LogicDocument.controller_MoveCursorRight(AddToSelect, Word);
 };
 CLogicDocumentController.prototype.MoveCursorUp = function(AddToSelect)
 {
@@ -166,13 +166,13 @@ CLogicDocumentController.prototype.SetParagraphFramePr = function(FramePr, bDele
 {
 	this.LogicDocument.controller_SetParagraphFramePr(FramePr, bDelete);
 };
-CLogicDocumentController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+CLogicDocumentController.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
-	this.LogicDocument.controller_IncreaseOrDecreaseParagraphFontSize(bIncrease);
+	this.LogicDocument.controller_IncreaseDecreaseFontSize(bIncrease);
 };
-CLogicDocumentController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+CLogicDocumentController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
-	this.LogicDocument.controller_IncreaseOrDecreaseParagraphIndent(bIncrease);
+	this.LogicDocument.controller_IncreaseDecreaseIndent(bIncrease);
 };
 CLogicDocumentController.prototype.SetImageProps = function(Props)
 {
@@ -182,13 +182,13 @@ CLogicDocumentController.prototype.SetTableProps = function(Props)
 {
 	this.LogicDocument.controller_SetTableProps(Props);
 };
-CLogicDocumentController.prototype.GetCurrentParaPr = function()
+CLogicDocumentController.prototype.GetCalculatedParaPr = function()
 {
-	return this.LogicDocument.controller_GetCurrentParaPr();
+	return this.LogicDocument.controller_GetCalculatedParaPr();
 };
-CLogicDocumentController.prototype.GetCurrentTextPr = function()
+CLogicDocumentController.prototype.GetCalculatedTextPr = function()
 {
-	return this.LogicDocument.controller_GetCurrentTextPr();
+	return this.LogicDocument.controller_GetCalculatedTextPr();
 };
 CLogicDocumentController.prototype.GetDirectParaPr = function()
 {
@@ -202,9 +202,9 @@ CLogicDocumentController.prototype.RemoveSelection = function(bNoCheckDrawing)
 {
 	this.LogicDocument.controller_RemoveSelection(bNoCheckDrawing);
 };
-CLogicDocumentController.prototype.IsEmptySelection = function(bCheckHidden)
+CLogicDocumentController.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
-	return this.LogicDocument.controller_IsEmptySelection(bCheckHidden);
+	return this.LogicDocument.controller_IsSelectionEmpty(bCheckHidden);
 };
 CLogicDocumentController.prototype.DrawSelectionOnPage = function(PageAbs)
 {

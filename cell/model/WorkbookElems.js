@@ -2683,7 +2683,7 @@ Col.prototype =
 	},
 	setWrap : function(val)
 	{
-		var oRes = this.ws.workbook.oStyleManager.setShrinkToFit(this, val);
+		var oRes = this.ws.workbook.oStyleManager.setWrap(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
             History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Wrap, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
@@ -2962,7 +2962,7 @@ Row.prototype =
 	},
 	setWrap : function(val)
 	{
-		var oRes = this.ws.workbook.oStyleManager.setShrinkToFit(this, val);
+		var oRes = this.ws.workbook.oStyleManager.setWrap(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
             History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Wrap, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},

@@ -172,7 +172,7 @@ CDocumentContentBase.prototype.Get_FootnotesList = function(oFirstFootnote, oLas
 
 	var arrFootnotes = [];
 
-	var arrParagraphs = this.Get_AllParagraphs({OnlyMainDocument : true, All : true});
+	var arrParagraphs = this.GetAllParagraphs({OnlyMainDocument : true, All : true});
 	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
 	{
 		var oParagraph = arrParagraphs[nIndex];
@@ -289,7 +289,7 @@ CDocumentContentBase.prototype.MoveCursorToNearestPos = function(oNearestPos)
 	{
 		var oTopDocument = oParent.Is_TopDocument(true);
 		if (oTopDocument)
-			oTopDocument.Selection_Remove();
+			oTopDocument.RemoveSelection();
 	}
 
 	oPara.Set_ParaContentPos(oNearestPos.ContentPos, true, -1, -1);
@@ -299,6 +299,405 @@ CDocumentContentBase.prototype.private_CreateNewParagraph = function()
 {
 	var oPara = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
 	oPara.Correct_Content();
-	oPara.Cursor_MoveToStartPos(false);
+	oPara.MoveCursorToStartPos(false);
 	return oPara;
+};
+CDocumentContentBase.prototype.StopSelection = function()
+{
+	if (true !== this.Selection.Use)
+		return;
+
+	this.Selection.Start = false;
+
+	if (this.Content[this.Selection.StartPos])
+		this.Content[this.Selection.StartPos].StopSelection();
+};
+CDocumentContentBase.prototype.GetNumberingInfo = function(NumberingEngine, ParaId, NumPr)
+{
+	if (undefined === NumberingEngine || null === NumberingEngine)
+		NumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetNumberingInfo(NumberingEngine);
+		if (true === NumberingEngine.Is_Found())
+			break;
+	}
+
+	return NumberingEngine.Get_NumInfo();
+};
+CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
+{
+	if (this.CurPos.ContentPos < 0)
+		return false;
+
+	this.Remove_NumberingSelection();
+
+	if (true === this.Selection.Use)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (EndPos < StartPos)
+		{
+			var Temp = StartPos;
+			StartPos = EndPos;
+			EndPos   = Temp;
+		}
+
+		// Проверим, пустой ли селект в конечном элементе (для случая, когда конечный элемент параграф, и в нем
+		// не заселекчен знак конца параграфа)
+		if (StartPos !== EndPos && true === this.Content[EndPos].IsSelectionEmpty(true))
+			EndPos--;
+
+		if (true === this.Is_TrackRevisions())
+		{
+			// Если есть параграфы, которые были добавлены во время рецензирования, тогда мы их удаляем
+			for (var Index = StartPos; Index <= EndPos; Index++)
+			{
+				this.Content[Index].Remove(1, true);
+			}
+
+			this.RemoveSelection();
+			for (var Index = EndPos - 1; Index >= StartPos; Index--)
+			{
+				if (type_Paragraph === this.Content[Index].GetType() && reviewtype_Add === this.Content[Index].GetReviewType())
+				{
+					// Если параграф пустой, тогда удаляем параграф, если не пустой, тогда объединяем его со
+					// следующим параграф. Если следующий элемент таблица, тогда ничего не делаем.
+					if (this.Content[Index].IsEmpty())
+					{
+						this.Internal_Content_Remove(Index, 1);
+					}
+					else if (Index < this.Content.length - 1 && type_Paragraph === this.Content[Index + 1].GetType())
+					{
+						this.Content[Index].Concat(this.Content[Index + 1]);
+						this.Internal_Content_Remove(Index + 1, 1);
+					}
+				}
+				else
+				{
+					this.Content[Index].SetReviewType(reviewtype_Remove);
+				}
+			}
+
+			this.CurPos.ContentPos = StartPos;
+		}
+		else
+		{
+			this.Selection.Use      = false;
+			this.Selection.StartPos = 0;
+			this.Selection.EndPos   = 0;
+
+			if (StartPos !== EndPos)
+			{
+				var StartType = this.Content[StartPos].GetType();
+				var EndType   = this.Content[EndPos].GetType();
+
+				var bStartEmpty = false, bEndEmpty = false;
+				if (type_Paragraph === StartType)
+				{
+					this.Content[StartPos].Remove(1, true);
+					bStartEmpty = this.Content[StartPos].IsEmpty()
+				}
+				else if (type_Table === StartType)
+				{
+					bStartEmpty = !(this.Content[StartPos].Row_Remove2());
+				}
+				else if (type_BlockLevelSdt === StartType)
+				{
+					this.Content[StartPos].Remove(1, true);
+					bStartEmpty = false;
+				}
+
+				if (type_Paragraph === EndType)
+				{
+					this.Content[EndPos].Remove(1, true);
+					bEndEmpty = this.Content[EndPos].IsEmpty()
+				}
+				else if (type_Table === EndType)
+				{
+					bEndEmpty = !(this.Content[EndPos].Row_Remove2());
+				}
+				else if (type_BlockLevelSdt === EndType)
+				{
+					this.Content[EndPos].Remove(1, true);
+					bEndEmpty = false;
+				}
+
+				if (!bStartEmpty && !bEndEmpty)
+				{
+					this.Internal_Content_Remove(StartPos + 1, EndPos - StartPos - 1);
+					this.CurPos.ContentPos = StartPos;
+
+					if (type_Paragraph === StartType && type_Paragraph === EndType && true === bOnTextAdd)
+					{
+						// Встаем в конец параграфа и удаляем 1 элемент (чтобы соединить параграфы)
+						this.Content[StartPos].MoveCursorToEndPos(false, false);
+						this.Remove(1, true);
+					}
+					else
+					{
+						if (true === bOnTextAdd && type_Paragraph !== this.Content[StartPos + 1].GetType() && type_Paragraph !== this.Content[StartPos].GetType())
+						{
+							this.Internal_Content_Add(StartPos + 1, this.private_CreateNewParagraph());
+							this.CurPos.ContentPos = StartPos + 1;
+							this.Content[StartPos + 1].MoveCursorToStartPos(false);
+						}
+						else if (true === bOnTextAdd && type_Paragraph !== this.Content[StartPos + 1].GetType())
+						{
+							this.CurPos.ContentPos = StartPos;
+							this.Content[StartPos].MoveCursorToEndPos(false, false);
+						}
+						else
+						{
+							this.CurPos.ContentPos = StartPos + 1;
+							this.Content[StartPos + 1].MoveCursorToStartPos(false);
+						}
+					}
+				}
+				else if (!bStartEmpty)
+				{
+					if (true === bOnTextAdd && type_Table === StartType)
+					{
+						if (EndType !== type_Paragraph)
+							this.Internal_Content_Remove(StartPos + 1, EndPos - StartPos);
+						else
+							this.Internal_Content_Remove(StartPos + 1, EndPos - StartPos - 1);
+
+						if (type_Table === this.Content[StartPos + 1].GetType() && true === bOnTextAdd)
+							this.Internal_Content_Add(StartPos + 1, this.private_CreateNewParagraph());
+
+						this.CurPos.ContentPos = StartPos + 1;
+						this.Content[StartPos + 1].MoveCursorToStartPos(false);
+					}
+					else
+					{
+						this.Internal_Content_Remove(StartPos + 1, EndPos - StartPos);
+
+						if (type_Table == StartType)
+						{
+							// У нас обязательно есть элемент после таблицы (либо снова таблица, либо параграф)
+							// Встаем в начало следующего элемента.
+							this.CurPos.ContentPos = StartPos + 1;
+							this.Content[StartPos + 1].MoveCursorToStartPos(false);
+						}
+						else
+						{
+							this.CurPos.ContentPos = StartPos;
+							this.Content[StartPos].MoveCursorToEndPos(false, false);
+						}
+					}
+				}
+				else if (!bEndEmpty)
+				{
+					this.Internal_Content_Remove(StartPos, EndPos - StartPos);
+
+					if (type_Table === this.Content[StartPos].GetType() && true === bOnTextAdd)
+						this.Internal_Content_Add(StartPos, this.private_CreateNewParagraph());
+
+					this.CurPos.ContentPos = StartPos;
+					this.Content[StartPos].MoveCursorToStartPos(false);
+				}
+				else
+				{
+					if (true === bOnTextAdd)
+					{
+						// Удаляем весь промежуточный контент, начальный элемент и конечный элемент, если это
+						// таблица, поскольку таблица не может быть последним элементом в документе удаляем без проверок.
+						if (type_Paragraph !== EndType)
+							this.Internal_Content_Remove(StartPos, EndPos - StartPos + 1);
+						else
+							this.Internal_Content_Remove(StartPos, EndPos - StartPos);
+
+						if (type_Table === this.Content[StartPos].GetType() && true === bOnTextAdd)
+							this.Internal_Content_Add(StartPos, this.private_CreateNewParagraph());
+
+						this.CurPos.ContentPos = StartPos;
+						this.Content[StartPos].MoveCursorToStartPos();
+					}
+					else
+					{
+						// Удаляем весь промежуточный контент, начальный и конечный параграфы
+						// При таком удалении надо убедиться, что в документе останется хотя бы один элемент
+						if (0 === StartPos && (EndPos - StartPos + 1) >= this.Content.length)
+						{
+							this.Internal_Content_Add(0, this.private_CreateNewParagraph());
+							this.Internal_Content_Remove(1, this.Content.length - 1);
+						}
+						else
+						{
+							this.Internal_Content_Remove(StartPos, EndPos - StartPos + 1);
+						}
+
+						// Выставляем текущую позицию
+						if (StartPos >= this.Content.length)
+						{
+							this.CurPos.ContentPos = this.Content.length - 1;
+							this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
+						}
+						else
+						{
+							this.CurPos.ContentPos = StartPos;
+							this.Content[StartPos].MoveCursorToStartPos(false);
+						}
+					}
+				}
+			}
+			else
+			{
+				this.CurPos.ContentPos = StartPos;
+				if (Count < 0 && type_Table === this.Content[StartPos].GetType() && true === this.Content[StartPos].IsCellSelection() && true != bOnTextAdd)
+				{
+					this.Table_RemoveRow();
+				}
+				else if (false === this.Content[StartPos].Remove(Count, true, bRemoveOnlySelection, bOnTextAdd))
+				{
+					// При добавлении текста, параграф не объединяется
+					if (true !== bOnTextAdd)
+					{
+						// В ворде параграфы объединяются только когда у них все настройки совпадают.
+						// (почему то при изменении и обратном изменении настроек параграфы перестают объединятся)
+						// Пока у нас параграфы будут объединяться всегда и настройки будут браться из первого
+						// параграфа, кроме случая, когда первый параграф полностью удаляется.
+
+						if (true === this.Content[StartPos].IsEmpty() && this.Content.length > 1)
+						{
+							this.Internal_Content_Remove(StartPos, 1);
+
+							// Выставляем текущую позицию
+							if (StartPos >= this.Content.length)
+							{
+								// Документ не должен заканчиваться таблицей, поэтому здесь проверку не делаем
+								this.CurPos.ContentPos = this.Content.length - 1;
+								this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
+							}
+							else
+							{
+								this.CurPos.ContentPos = StartPos;
+								this.Content[StartPos].MoveCursorToStartPos(false);
+							}
+						}
+						else if (this.CurPos.ContentPos < this.Content.length - 1 && type_Paragraph === this.Content[this.CurPos.ContentPos].GetType() && type_Paragraph === this.Content[this.CurPos.ContentPos + 1].GetType())
+						{
+							// Соединяем текущий и предыдущий параграфы
+							this.Content[StartPos].Concat(this.Content[StartPos + 1]);
+							this.Internal_Content_Remove(StartPos + 1, 1);
+						}
+						else if (this.Content.length === 1 && true === this.Content[0].IsEmpty() && Count > 0)
+						{
+							this.Internal_Content_Add(0, this.private_CreateNewParagraph());
+							this.Internal_Content_Remove(1, this.Content.length - 1);
+						}
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if (true === bRemoveOnlySelection || true === bOnTextAdd)
+			return;
+
+		if (type_Paragraph == this.Content[this.CurPos.ContentPos].GetType())
+		{
+			if (false === this.Content[this.CurPos.ContentPos].Remove(Count, bOnlyText))
+			{
+				if (Count < 0)
+				{
+					if (this.CurPos.ContentPos > 0 && type_Paragraph == this.Content[this.CurPos.ContentPos - 1].GetType())
+					{
+						var CurrFramePr = this.Content[this.CurPos.ContentPos].Get_FramePr();
+						var PrevFramePr = this.Content[this.CurPos.ContentPos - 1].Get_FramePr();
+
+						if ((undefined === CurrFramePr && undefined === PrevFramePr) || (undefined !== CurrFramePr && undefined !== PrevFramePr && true === CurrFramePr.Compare(PrevFramePr)))
+						{
+							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos - 1].GetReviewType())
+							{
+								this.Content[this.CurPos.ContentPos - 1].SetReviewType(reviewtype_Remove);
+								this.CurPos.ContentPos--;
+								this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
+							}
+							else
+							{
+								if (true === this.Content[this.CurPos.ContentPos - 1].IsEmpty() && undefined === this.Content[this.CurPos.ContentPos - 1].Numbering_Get())
+								{
+									// Просто удаляем предыдущий параграф
+									this.Internal_Content_Remove(this.CurPos.ContentPos - 1, 1);
+									this.CurPos.ContentPos--;
+									this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+								}
+								else
+								{
+									// Соединяем текущий и предыдущий параграфы
+									var Prev = this.Content[this.CurPos.ContentPos - 1];
+
+									// Смещаемся в конец до объединения параграфов, чтобы курсор стоял в месте
+									// соединения.
+									Prev.MoveCursorToEndPos(false, false);
+
+									// Запоминаем новую позицию курсора, после совмещения параграфов
+									Prev.Concat(this.Content[this.CurPos.ContentPos]);
+									this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
+									this.CurPos.ContentPos--;
+								}
+							}
+						}
+					}
+				}
+				else if (Count > 0)
+				{
+					if (this.CurPos.ContentPos < this.Content.length - 1 && type_Paragraph == this.Content[this.CurPos.ContentPos + 1].GetType())
+					{
+						var CurrFramePr = this.Content[this.CurPos.ContentPos].Get_FramePr();
+						var NextFramePr = this.Content[this.CurPos.ContentPos + 1].Get_FramePr();
+
+						if ((undefined === CurrFramePr && undefined === NextFramePr) || ( undefined !== CurrFramePr && undefined !== NextFramePr && true === CurrFramePr.Compare(NextFramePr) ))
+						{
+							if (true === this.Is_TrackRevisions() && reviewtype_Add !== this.Content[this.CurPos.ContentPos].Get_ReviewType())
+							{
+								this.Content[this.CurPos.ContentPos].SetReviewType(reviewtype_Remove);
+								this.CurPos.ContentPos++;
+								this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+							}
+							else
+							{
+								if (true === this.Content[this.CurPos.ContentPos].IsEmpty())
+								{
+									// Просто удаляем текущий параграф
+									this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
+									this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
+								}
+								else
+								{
+									// Соединяем текущий и следующий параграфы
+									var Cur = this.Content[this.CurPos.ContentPos];
+									Cur.Concat(this.Content[this.CurPos.ContentPos + 1]);
+									this.Internal_Content_Remove(this.CurPos.ContentPos + 1, 1);
+								}
+							}
+						}
+					}
+					else if (true == this.Content[this.CurPos.ContentPos].IsEmpty() && this.CurPos.ContentPos == this.Content.length - 1 && this.CurPos.ContentPos != 0 && type_Paragraph === this.Content[this.CurPos.ContentPos - 1].GetType())
+					{
+						// Если данный параграф пустой, последний, не единственный и идущий перед
+						// ним элемент не таблица, удаляем его
+						this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
+						this.CurPos.ContentPos--;
+					}
+				}
+			}
+
+			var Item = this.Content[this.CurPos.ContentPos];
+			if (type_Paragraph === Item.GetType())
+			{
+				Item.CurPos.RealX = Item.CurPos.X;
+				Item.CurPos.RealY = Item.CurPos.Y;
+			}
+		}
+		else
+		{
+			this.Content[this.CurPos.ContentPos].Remove(Count, bOnlyText);
+		}
+	}
+
 };

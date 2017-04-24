@@ -148,7 +148,7 @@ if(typeof CDocument !== "undefined")
 				{
 					var CurElement = this.Content[this.CurPos.ContentPos];
 
-					if (AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd())
+					if (AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.IsCursorAtEnd())
 						AscCommon.CollaborativeEditing.Add_CheckLock(false);
 					else
 						this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
@@ -338,7 +338,7 @@ CDocumentContent.prototype.Document_Is_SelectionLocked = function(CheckType)
                     {
                         var CurElement = this.Content[this.CurPos.ContentPos];
 
-                        if ( AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.Cursor_IsEnd() )
+                        if ( AscCommon.changestype_Document_Content_Add === CheckType && type_Paragraph === CurElement.GetType() && true === CurElement.IsCursorAtEnd() )
                             AscCommon.CollaborativeEditing.Add_CheckLock(false);
                         else
                             this.Content[this.CurPos.ContentPos].Document_Is_SelectionLocked(CheckType);
@@ -380,7 +380,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
         {
             // Если у нас нет выделения, и курсор стоит в начале, мы должны проверить в том же порядке, в каком
             // идут проверки при удалении в команде Internal_Remove_Backward.
-            if ( true != this.Selection.Use && true == this.Cursor_IsStart() )
+            if ( true != this.Selection.Use && true == this.IsCursorAtBegin() )
             {
                 var Pr = this.Get_CompiledPr2(false).ParaPr;
                 if ( undefined != this.Numbering_Get() || Math.abs(Pr.Ind.FirstLine) > 0.001 || Math.abs(Pr.Ind.Left) > 0.001 )
@@ -422,7 +422,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
         case AscCommon.changestype_Delete:
         {
             // Если у нас нет выделения, и курсор стоит в конце, мы должны проверить следующий элемент
-            if ( true != this.Selection.Use && true === this.Cursor_IsEnd() )
+            if ( true != this.Selection.Use && true === this.IsCursorAtEnd() )
             {
                 var Next = this.Get_DocumentNext();
                 if ( null != Next && type_Paragraph === Next.GetType() )
@@ -546,6 +546,10 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
             break;
         }
     }
+};
+CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
+{
+	return this.Content.Document_Is_SelectionLocked(CheckType, bCheckInner);
 };
 if(typeof CComments !== "undefined")
 {
@@ -807,6 +811,16 @@ if(typeof CPresentation !== "undefined")
                 "guid": this.slideSizeLock.Get_Id()
             };
             this.slideSizeLock.Lock.Check(check_obj);
+        }
+
+        if(CheckType === AscCommon.changestype_PresDefaultLang )
+        {
+            var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.defaultTextStyleLock.Get_Id(),
+                    "guid": this.defaultTextStyleLock.Get_Id()
+                };
         }
 
         var bResult = AscCommon.CollaborativeEditing.OnEnd_CheckLock();

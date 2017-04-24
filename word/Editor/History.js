@@ -228,7 +228,7 @@ CHistory.prototype =
         if ( this.Index === this.Points.length - 1 )
             this.LastState = this.Document.Get_SelectionState();
         
-        this.Document.Selection_Remove(true);
+        this.Document.RemoveSelection(true);
 
         this.Internal_RecalcData_Clear();
 
@@ -287,7 +287,7 @@ CHistory.prototype =
         if ( true != this.Can_Redo() )
             return null;
 
-        this.Document.Selection_Remove(true);
+        this.Document.RemoveSelection(true);
         
         var Point = this.Points[++this.Index];
 
@@ -680,7 +680,7 @@ CHistory.prototype =
             for (var Lvl = 0; Lvl < 9; ++Lvl)
             {
                 NumPr.Lvl = Lvl;
-                var AllParagraphs = this.Document.Get_AllParagraphsByNumbering(NumPr);
+                var AllParagraphs = this.Document.GetAllParagraphsByNumbering(NumPr);
                 var Count = AllParagraphs.length;
                 for (var Index = 0; Index < Count; ++Index)
                 {
@@ -1172,7 +1172,7 @@ CHistory.prototype.GetAllParagraphsForRecalcData = function(Props)
 	if (!this.RecalculateData.AllParagraphs)
 	{
 		if (this.Document)
-			this.RecalculateData.AllParagraphs = this.Document.Get_AllParagraphs({All : true});
+			this.RecalculateData.AllParagraphs = this.Document.GetAllParagraphs({All : true});
 		else
 			this.RecalculateData.AllParagraphs = [];
 	}

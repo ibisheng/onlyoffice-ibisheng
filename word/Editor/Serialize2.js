@@ -13557,7 +13557,7 @@ OpenParStruct.prototype = {
 					if (fieldtype_PAGENUM == elem.Get_FieldType()) {
 						oNewRun.Add_ToContent(0, new ParaPageNum());
 					} else {
-						var pageCount = parseInt(elem.Get_SelectedText(true));
+						var pageCount = parseInt(elem.GetSelectedText(true));
 						oNewRun.Add_ToContent(0, new ParaPageCount(isNaN(pageCount) ? undefined : pageCount));
 					}
                     this.addToContent(oNewRun);

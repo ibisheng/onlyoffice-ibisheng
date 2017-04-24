@@ -304,21 +304,21 @@ CGraphicFrame.prototype.getAllFonts= function(fonts)
         }
 };
 
-CGraphicFrame.prototype.Cursor_MoveToStartPos = function()
+CGraphicFrame.prototype.MoveCursorToStartPos = function()
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Cursor_MoveToStartPos();
+            this.graphicObject.MoveCursorToStartPos();
             this.graphicObject.RecalculateCurPos();
 
         }
 };
 
-CGraphicFrame.prototype.Cursor_MoveToEndPos = function()
+CGraphicFrame.prototype.MoveCursorToEndPos = function()
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Cursor_MoveToEndPos();
+            this.graphicObject.MoveCursorToEndPos();
             this.graphicObject.RecalculateCurPos();
 
         }
@@ -333,7 +333,7 @@ CGraphicFrame.prototype.paragraphFormatPaste= function(CopyTextPr, CopyParaPr, B
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Paragraph_Format_Paste(CopyTextPr, CopyParaPr, Bool);
+            this.graphicObject.PasteFormatting(CopyTextPr, CopyParaPr, Bool);
 
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -342,11 +342,11 @@ CGraphicFrame.prototype.paragraphFormatPaste= function(CopyTextPr, CopyParaPr, B
 
 };
 
-CGraphicFrame.prototype.Paragraph_ClearFormatting= function()
+CGraphicFrame.prototype.ClearParagraphFormatting= function()
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Paragraph_ClearFormatting();
+            this.graphicObject.ClearParagraphFormatting();
 
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -374,7 +374,7 @@ CGraphicFrame.prototype.updateCursorType= function(x, y, e)
     {
         var tx = this.invertTransform.TransformPointX(x, y);
         var ty = this.invertTransform.TransformPointY(x, y);
-        this.graphicObject.Update_CursorType(tx, ty, 0)
+        this.graphicObject.UpdateCursorType(tx, ty, 0)
 };
 
 CGraphicFrame.prototype.getIsSingleBody = CShape.prototype.getIsSingleBody;
@@ -444,7 +444,7 @@ CGraphicFrame.prototype.recalculateSizes = function()
         }
 };
 
-CGraphicFrame.prototype.Selection_Is_OneElement = function()
+CGraphicFrame.prototype.GetSelectDirection = function()
     {
         return 0;
 };
@@ -691,7 +691,7 @@ CGraphicFrame.prototype.selectionSetStart = function(e, x, y, slideIndex)
             ty = this.invertTransform.TransformPointY(x, y);
             if(AscCommon.g_mouse_event_type_down === e.Type)
             {
-                if(this.graphicObject.Is_TableBorder( tx, ty, 0))
+                if(this.graphicObject.IsTableBorder( tx, ty, 0))
                 {
                     if(!editor.isViewMode && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
                     {
@@ -738,12 +738,12 @@ CGraphicFrame.prototype.updateSelectionState = function()
         {
             var drawingDocument = this.parent.presentation.DrawingDocument;
             var Doc = this.graphicObject;
-            if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty()) {
+            if ( true === Doc.IsSelectionUse() && !Doc.IsSelectionEmpty()) {
                 drawingDocument.UpdateTargetTransform(this.transform);
                 drawingDocument.TargetEnd();
                 drawingDocument.SelectEnabled(true);
                 drawingDocument.SelectClear();
-                Doc.Selection_Draw_Page(0);
+                Doc.DrawSelectionOnPage(0);
                 drawingDocument.SelectShow();
             }
             else
@@ -947,7 +947,7 @@ CGraphicFrame.prototype.setParagraphAlign = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphAlign(val);
+            this.graphicObject.SetParagraphAlign(val);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransform = true;
         }
@@ -958,7 +958,7 @@ CGraphicFrame.prototype.applyAllAlign = function(val)
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Set_ParagraphAlign(val);
+            this.graphicObject.SetParagraphAlign(val);
             this.graphicObject.Set_ApplyToAll(false);
         }
 };
@@ -967,7 +967,7 @@ CGraphicFrame.prototype.setParagraphSpacing = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphSpacing(val);
+            this.graphicObject.SetParagraphSpacing(val);
         }
 };
 
@@ -976,7 +976,7 @@ CGraphicFrame.prototype.applyAllSpacing = function(val)
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Set_ParagraphSpacing(val);
+            this.graphicObject.SetParagraphSpacing(val);
             this.graphicObject.Set_ApplyToAll(false);
         }
 };
@@ -985,7 +985,7 @@ CGraphicFrame.prototype.setParagraphNumbering = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphNumbering(val);
+            this.graphicObject.SetParagraphNumbering(val);
         }
 };
 
@@ -993,7 +993,7 @@ CGraphicFrame.prototype.setParagraphIndent = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphIndent(val);
+            this.graphicObject.SetParagraphIndent(val);
         }
 };
 
@@ -1099,6 +1099,22 @@ CGraphicFrame.prototype.checkTypeCorrect = function()
             return false;
         }
         return true;
+    };
+CGraphicFrame.prototype.Is_ThisElementCurrent = function()
+    {
+        if(this.parent && this.parent.graphicObjects)
+        {
+            if(this.group)
+            {
+                var main_group = this.group.getMainGroup();
+                return main_group.selection.textSelection === this;
+            }
+            else
+            {
+                return this.parent.graphicObjects.selection.textSelection === this;
+            }
+        }
+        return false;
     };
 
     //--------------------------------------------------------export----------------------------------------------------

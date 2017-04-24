@@ -115,13 +115,15 @@ String.prototype.strongMatch = function(regExp){
     return false;
 };
 
-if (typeof require =="function" && !window["XRegExp"]){window["XRegExp"] = require("xregexp");}
+	if (typeof require === "function" && !window["XRegExp"]) {
+		window["XRegExp"] = require("xregexp");
+	}
 
-var oZipChanges = null;
-var sDownloadServiceLocalUrl = "../../../../downloadas";
-var sUploadServiceLocalUrl = "../../../../upload";
-var sUploadServiceLocalUrlOld = "../../../../uploadold";
-var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
+	var oZipImages = null;
+	var sDownloadServiceLocalUrl = "../../../../downloadas";
+	var sUploadServiceLocalUrl = "../../../../upload";
+	var sUploadServiceLocalUrlOld = "../../../../uploadold";
+	var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 
 function getBaseUrl() {
 var index_html = window["location"]["href"];
@@ -254,98 +256,110 @@ function loadFileContent(url, callback) {
   });
 }
 
-function getJSZipUtils() {
-  return window['JSZipUtils'] ? window['JSZipUtils'] : require('jsziputils');
-}
-function getImageFromChanges (name) {
-	var file;
-	var ext = GetFileExtension(name);
-	if (null !== ext && oZipChanges && (file = oZipChanges.files[name])) {
-		var oFileArray = file.asUint8Array();
-		return 'data:image/' + ext + ';base64,' + AscCommon.Base64Encode(oFileArray, oFileArray.length, 0);
+	function getJSZipUtils() {
+		return window['JSZipUtils'] ? window['JSZipUtils'] : require('jsziputils');
 	}
-	return null;
-}
-function openFileCommand(binUrl, changesUrl, Signature, callback) {
-  var bError = false, oResult = new OpenFileResult(), bEndLoadFile = false, bEndLoadChanges = false;
-  var onEndOpen = function() {
-    if (bEndLoadFile && bEndLoadChanges) {
-      if (callback) {
-        callback(bError, oResult);
-      }
-    }
-  };
-  var sFileUrl = binUrl;
-  sFileUrl = sFileUrl.replace(/\\/g, "/");
 
-  if (!window['IS_NATIVE_EDITOR']) {
-    asc_ajax({
-    url: sFileUrl,
-    dataType: "text",
-    success: function(result) {
-      //получаем url к папке с файлом
-      var url;
-      var nIndex = sFileUrl.lastIndexOf("/");
-      url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
-      if (0 < result.length) {
-        oResult.bSerFormat = Signature === result.substring(0, Signature.length);
-        oResult.data = result;
-        oResult.url = url;
-      } else {
-        bError = true;
-      }
-      bEndLoadFile = true;
-      onEndOpen();
-    },
-    error: function() {
-      bEndLoadFile = true;
-      bError = true;
-      onEndOpen();
-    }
-  });
-  }
+	function getImageFromChanges(name) {
+		var content;
+		var ext = GetFileExtension(name);
+		if (null !== ext && oZipImages && (content = oZipImages[name])) {
+			return 'data:image/' + ext + ';base64,' + AscCommon.Base64Encode(content, content.length, 0);
+		}
+		return null;
+	}
 
-  if (null != changesUrl) {
-    getJSZipUtils().getBinaryContent(changesUrl, function(err, data) {
-      bEndLoadChanges = true;
-      if (err) {
-        bError = true;
-        onEndOpen();
-        return;
-      }
+	function openFileCommand(binUrl, changesUrl, Signature, callback) {
+		var bError = false, oResult = new OpenFileResult(), bEndLoadFile = false, bEndLoadChanges = false;
+		var onEndOpen = function () {
+			if (bEndLoadFile && bEndLoadChanges) {
+				if (callback) {
+					callback(bError, oResult);
+				}
+			}
+		};
+		var sFileUrl = binUrl;
+		sFileUrl = sFileUrl.replace(/\\/g, "/");
 
-      oZipChanges = new (require('jszip'))(data);
-      oResult.changes = [];
-      for (var i in oZipChanges.files) {
-        if (i.endsWith('.json')) {
-          // Заглушка на имя файла (стоило его начинать с цифры)
-          oResult.changes[parseInt(i.slice('changes'.length))] = JSON.parse(oZipChanges.files[i].asText());
-        }
-      }
-      onEndOpen();
-    });
-  } else {
-    bEndLoadChanges = true;
-  }
-
-	if (window['IS_NATIVE_EDITOR']) {
-		var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
-
-		var url;
-		var nIndex = sFileUrl.lastIndexOf("/");
-		url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
-		if (0 < result.length) {
-			oResult.bSerFormat = Signature === result.substring(0, Signature.length);
-			oResult.data = result;
-			oResult.url = url;
-		} else {
-			bError = true;
+		if (!window['IS_NATIVE_EDITOR']) {
+			asc_ajax({
+				url: sFileUrl, dataType: "text", success: function (result) {
+					//получаем url к папке с файлом
+					var url;
+					var nIndex = sFileUrl.lastIndexOf("/");
+					url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
+					if (0 < result.length) {
+						oResult.bSerFormat = Signature === result.substring(0, Signature.length);
+						oResult.data = result;
+						oResult.url = url;
+					} else {
+						bError = true;
+					}
+					bEndLoadFile = true;
+					onEndOpen();
+				}, error: function () {
+					bEndLoadFile = true;
+					bError = true;
+					onEndOpen();
+				}
+			});
 		}
 
-		bEndLoadFile = true;
-		onEndOpen();
+		if (changesUrl) {
+			oZipImages = {};
+			getJSZipUtils().getBinaryContent(changesUrl, function (err, data) {
+				if (err) {
+					bEndLoadChanges = true;
+					bError = true;
+					onEndOpen();
+					return;
+				}
+
+				oResult.changes = [];
+				require('jszip').loadAsync(data).then(function (zipChanges) {
+					var relativePaths = [];
+					var promises = [];
+					zipChanges.forEach(function (relativePath, file) {
+						relativePaths.push(relativePath);
+						promises.push(file.async(relativePath.endsWith('.json') ? 'string' : 'uint8array'));
+					});
+					Promise.all(promises).then(function (values) {
+						var relativePath;
+						for (var i = 0; i < values.length; ++i) {
+							if ((relativePath = relativePaths[i]).endsWith('.json')) {
+								oResult.changes[parseInt(relativePath.slice('changes'.length))] = JSON.parse(values[i]);
+							} else {
+								oZipImages[relativePath] = values[i];
+							}
+						}
+						bEndLoadChanges = true;
+						onEndOpen();
+					});
+				});
+			});
+		} else {
+			oZipImages = null;
+			bEndLoadChanges = true;
+		}
+
+		if (window['IS_NATIVE_EDITOR']) {
+			var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+
+			var url;
+			var nIndex = sFileUrl.lastIndexOf("/");
+			url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
+			if (0 < result.length) {
+				oResult.bSerFormat = Signature === result.substring(0, Signature.length);
+				oResult.data = result;
+				oResult.url = url;
+			} else {
+				bError = true;
+			}
+
+			bEndLoadFile = true;
+			onEndOpen();
+		}
 	}
- }
  function sendCommand(editor, fCallback, rdata, dataContainer) {
   //json не должен превышать размера 2097152, иначе при его чтении будет exception
   var docConnectionId = editor.CoAuthoringApi.getDocId();

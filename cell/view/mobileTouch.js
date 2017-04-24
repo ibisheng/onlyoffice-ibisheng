@@ -193,7 +193,7 @@ function (window, undefined)
 			return _obj;
 		}
 
-		return this.WB.getWorksheet().objectRender.controller.Get_SelectionBounds();
+		return this.WB.getWorksheet().objectRender.controller.GetSelectionBounds();
 	};
 	CMobileDelegateEditorCell.prototype.ScrollTo = function(_scroll)
 	{
@@ -232,10 +232,10 @@ function (window, undefined)
 		var _controller = this.WB.getWorksheet().objectRender.controller;
 		var _selection = this.WB.GetSelectionRectsBounds();
 
-		if (!_controller.Is_SelectionUse() && !_selection)
+		if (!_controller.IsSelectionUse() && !_selection)
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
-		if (_controller.Get_SelectionBounds() || _selection)
+		if (_controller.GetSelectionBounds() || _selection)
 			_mode = AscCommon.MobileTouchContextMenuType.Select;
 
 		if (_mode == 0 && _controller.getSelectedObjectsBounds())
@@ -258,7 +258,7 @@ function (window, undefined)
 		var _y = 0;
 
 		var _controller = this.WB.getWorksheet().objectRender.controller;
-		var _target = _controller.Is_SelectionUse();
+		var _target = _controller.IsSelectionUse();
 		var _selection = this.WB.GetSelectionRectsBounds();
 
 		if (!_target && !_selection)
@@ -282,7 +282,7 @@ function (window, undefined)
 			return;
 		}
 
-		var _select = _controller.Get_SelectionBounds();
+		var _select = _controller.GetSelectionBounds();
 		if (_select)
 		{
 			var _rect1 = _select.Start;
@@ -351,7 +351,7 @@ function (window, undefined)
 
 		var _mode = 0;
 
-		var _target = _controller.Is_SelectionUse();
+		var _target = _controller.IsSelectionUse();
 		var _selection = this.WB.GetSelectionRectsBounds();
 
 		if (!_target && !_selection)
@@ -379,7 +379,7 @@ function (window, undefined)
 			_mode = 1;
 		}
 
-		var _select = _controller.Get_SelectionBounds();
+		var _select = _controller.GetSelectionBounds();
 		if (_select)
 		{
 			var _rect1 = _select.Start;
@@ -1259,7 +1259,7 @@ function (window, undefined)
 
 	CMobileTouchManager.prototype.CheckSelectTrackObject = function()
 	{
-		if (!this.delegate.WB.Is_SelectionUse())
+		if (!this.delegate.WB.IsSelectionUse())
 			return;
 
 		if (null != this.RectSelect1 && null != this.RectSelect2)

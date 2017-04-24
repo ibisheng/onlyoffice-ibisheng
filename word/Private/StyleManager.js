@@ -107,7 +107,7 @@ CDocument.prototype.Add_NewStyle = function(oStyle)
     {
         AscCommon.History.Create_NewPoint(AscDFH.historydescription_Document_AddNewStyle);
         var NewStyle = this.Styles.Create_StyleFromInterface(oStyle);
-        this.Set_ParagraphStyle(NewStyle.Get_Name());
+        this.SetParagraphStyle(NewStyle.Get_Name());
         this.Recalculate();
         this.Document_UpdateInterfaceState();
     }
@@ -341,7 +341,7 @@ CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
 
         if (this.LogicDocument)
         {
-            var AllParagraphs = this.LogicDocument.Get_AllParagraphsByStyle([StyleId]);
+            var AllParagraphs = this.LogicDocument.GetAllParagraphsByStyle([StyleId]);
             var Count = AllParagraphs.length;
             for (var Index = 0; Index < Count; Index++)
             {

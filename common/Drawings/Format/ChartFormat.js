@@ -13459,7 +13459,7 @@ function CreateDocContentFromString(str, drawingDocument, parent)
 
 function AddToContentFromString(content, str)
 {
-    content.Cursor_MoveToStartPos(false);
+    content.MoveCursorToStartPos(false);
     for(var i = 0; i < str.length; ++i)
     {
         var ch = str[i];

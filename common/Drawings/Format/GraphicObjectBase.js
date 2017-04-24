@@ -775,6 +775,10 @@
         return 1;
     };
 
+    CGraphicObjectBase.prototype.Restart_CheckSpelling = function()
+    {
+    };
+
 window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;

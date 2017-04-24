@@ -21,7 +21,7 @@ function CDrawingsController(LogicDocument, DrawingsObjects)
 CDrawingsController.prototype = Object.create(CDocumentControllerBase.prototype);
 CDrawingsController.prototype.constructor = CDrawingsController;
 
-CDrawingsController.prototype.CanTargetUpdate = function()
+CDrawingsController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
@@ -67,7 +67,7 @@ CDrawingsController.prototype.ClearParagraphFormatting = function()
 };
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
-	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+	if (para_NewLine === oItem.Type && true === oItem.IsPageOrColumnBreak())
 		return;
 
 	this.DrawingObjects.paragraphAdd(oItem, bRecalculate);
@@ -228,11 +228,11 @@ CDrawingsController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
 	// Не добавляем и не работаем с рамками в автофигурах
 };
-CDrawingsController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+CDrawingsController.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
 	this.DrawingObjects.paragraphIncDecFontSize(bIncrease);
 };
-CDrawingsController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+CDrawingsController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
 	if (true != this.DrawingObjects.isSelectedText())
 	{
@@ -240,7 +240,7 @@ CDrawingsController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncr
 		if (null != ParaDrawing)
 		{
 			var Paragraph = ParaDrawing.Parent;
-			Paragraph.IncDec_Indent(bIncrease);
+			Paragraph.IncreaseDecreaseIndent(bIncrease);
 		}
 	}
 	else
@@ -256,11 +256,11 @@ CDrawingsController.prototype.SetTableProps = function(Props)
 {
 	this.DrawingObjects.setTableProps(Props);
 };
-CDrawingsController.prototype.GetCurrentParaPr = function()
+CDrawingsController.prototype.GetCalculatedParaPr = function()
 {
 	return this.DrawingObjects.getParagraphParaPr();
 };
-CDrawingsController.prototype.GetCurrentTextPr = function()
+CDrawingsController.prototype.GetCalculatedTextPr = function()
 {
 	return this.DrawingObjects.getParagraphTextPr();
 };
@@ -281,7 +281,7 @@ CDrawingsController.prototype.RemoveSelection = function(bNoCheckDrawing)
 	}
 	return this.DrawingObjects.resetSelection(undefined, bNoCheckDrawing);
 };
-CDrawingsController.prototype.IsEmptySelection = function(bCheckHidden)
+CDrawingsController.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
 	return false;
 };
@@ -292,7 +292,7 @@ CDrawingsController.prototype.DrawSelectionOnPage = function(PageAbs)
 };
 CDrawingsController.prototype.GetSelectionBounds = function()
 {
-	return this.DrawingObjects.Get_SelectionBounds();
+	return this.DrawingObjects.GetSelectionBounds();
 };
 CDrawingsController.prototype.IsMovingTableBorder = function()
 {
@@ -308,7 +308,7 @@ CDrawingsController.prototype.SelectAll = function()
 };
 CDrawingsController.prototype.GetSelectedContent = function(SelectedContent)
 {
-	this.DrawingObjects.Get_SelectedContent(SelectedContent);
+	this.DrawingObjects.GetSelectedContent(SelectedContent);
 };
 CDrawingsController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
 {
@@ -495,7 +495,7 @@ CDrawingsController.prototype.RestoreDocumentStateAfterLoadChanges = function(St
 
 		ContentPos = Math.max(0, Math.min(LogicDocument.Content.length - 1, ContentPos));
 		LogicDocument.CurPos.ContentPos = ContentPos;
-		LogicDocument.Content[ContentPos].Cursor_MoveToStartPos(false);
+		LogicDocument.Content[ContentPos].MoveCursorToStartPos(false);
 	}
 };
 CDrawingsController.prototype.GetColumnSize = function()

@@ -1245,7 +1245,7 @@ CopyProcessor.prototype =
 		
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
-			var selectedContent = oDocument.Get_SelectedContent();
+			var selectedContent = oDocument.GetSelectedContent();
 				
 			var elementsContent;
 			if(selectedContent && selectedContent.Elements && selectedContent.Elements[0] && selectedContent.Elements[0].Element)
@@ -1282,8 +1282,8 @@ CopyProcessor.prototype =
 			
 			var sBase64 = this.oBinaryFileWriter.GetResult();
 			var text = "";
-            if (oDocument.Get_SelectedText)
-                text = oDocument.Get_SelectedText();
+            if (oDocument.GetSelectedText)
+                text = oDocument.GetSelectedText();
 			
 			return {sBase64: "docData;" + sBase64, text: text, drawingUrls: drawingUrls};
 		}
@@ -1296,7 +1296,7 @@ CopyProcessor.prototype =
 		
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
-			var selectedContent = oDocument.Get_SelectedContent();
+			var selectedContent = oDocument.GetSelectedContent();
 			
 			var elementsContent;
 			if(selectedContent && selectedContent.Elements && selectedContent.Elements[0] && selectedContent.Elements[0].Element)
@@ -1323,7 +1323,7 @@ CopyProcessor.prototype =
         {
 			var presentation = editor.WordControl.m_oLogicDocument;
 			
-			var selectedContent = oDocument.Get_SelectedContent();			
+			var selectedContent = oDocument.GetSelectedContent();
 			
 			if(!selectedContent.DocContent && (!selectedContent.Drawings || (selectedContent.Drawings && !selectedContent.Drawings.length)) && (!selectedContent.SlideObjects || (selectedContent.SlideObjects && !selectedContent.SlideObjects.length)))
 				return false;
@@ -2029,7 +2029,7 @@ PasteProcessor.prototype =
             
             if ((oDocument.Get_DocPosType() !== docpostype_DrawingObjects || true === this.oLogicDocument.DrawingObjects.isSelectedText()) && true === bNeedMoveCursor)
             {
-                this.oLogicDocument.Cursor_MoveRight(false, false, true);
+                this.oLogicDocument.MoveCursorRight(false, false, true);
             }
             
             this.oLogicDocument.Document_UpdateInterfaceState();
@@ -2424,7 +2424,7 @@ PasteProcessor.prototype =
                 //����� ��������� ��������
                 var oSourceFirstPar = Item;
                 var oSourceLastPar = new Paragraph(oDoc.DrawingDocument, oDoc);
-                if(true !== oSourceFirstPar.Cursor_IsEnd() || oSourceFirstPar.IsEmpty())
+                if(true !== oSourceFirstPar.IsCursorAtEnd() || oSourceFirstPar.IsEmpty())
                     oSourceFirstPar.Split(oSourceLastPar);
                 var oInsFirstPar = aNewContent[0];
                 var oInsLastPar = null;
@@ -3643,7 +3643,7 @@ PasteProcessor.prototype =
 				shape.spPr.xfrm.setExtY(h);
 				shape.spPr.xfrm.setOffX(0);
 				shape.spPr.xfrm.setOffY(0);
-				shape.txBody.content.Cursor_MoveToEndPos();
+				shape.txBody.content.MoveCursorToEndPos();
 				arrShapes[i] = new DrawingCopyObject(shape, 0, 0, w, h);
 			}
 			
@@ -5338,7 +5338,7 @@ PasteProcessor.prototype =
 							case "upper-alpha": num = numbering_numfmt_UpperLetter;break;
 						}
 					}
-					//����� ���� ����������� �� Document.Set_ParagraphNumbering
+					//����� ���� ����������� �� Document.SetParagraphNumbering
 					
 					//������� ����������� ��������, ���� ��� ������ ���������, �� ����� ��� ������ �� ����������� ���������
 					if(this.aContent.length > 1)
@@ -6175,7 +6175,7 @@ PasteProcessor.prototype =
 			}
             //�������� content
             this._ExecuteTable(tableNode, node, table, aSumGrid, nMaxColCount != nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef);
-            table.Cursor_MoveToStartPos();
+            table.MoveCursorToStartPos();
             this.aContent.push(table);
         }
     },
@@ -6812,7 +6812,7 @@ PasteProcessor.prototype =
 								if(this.oCurHyperlink)
 									this.oCurRun = new ParaRun(this.oCurPar);
 
-                                    //oDocument.Add_InlineImage(nWidth, nHeight, img);
+                                    //oDocument.AddInlineImage(nWidth, nHeight, img);
                             }
                         }
                     }
@@ -7516,7 +7516,7 @@ PasteProcessor.prototype =
             }
             //�������� content
              this._ExecuteTablePresentation(tableNode, node, table, aSumGrid, nMaxColCount != nMinColCount ? aColsCountByRow : null, pPr, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables);
-            table.Cursor_MoveToStartPos();
+            table.MoveCursorToStartPos();
             return;
         }
     },
@@ -7921,6 +7921,15 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
         aPrepeareFonts.push(new CFont(font_family, 0, "", 0));
     };
 
+    var isDesktopEditor = (window["AscDesktopEditor"] !== undefined) ? true : false;
+    var isDesktopEditorLocal = false;
+
+    if (isDesktopEditor)
+	{
+		if (window["AscDesktopEditor"]["IsLocalFile"] && window["AscDesktopEditor"]["IsLocalFile"]())
+			isDesktopEditorLocal = true;
+	}
+
     var aImagesToDownload = [];
     var _mapLocal = {};
     for (var image in _images)
@@ -7955,7 +7964,7 @@ function Check_LoadingDataBeforePrepaste(_api, _fonts, _images, _callback)
             else
                 _images[image] = "local";
         }
-        else if (window["AscDesktopEditor"] !== undefined)
+        else if (isDesktopEditorLocal)
 		{
 			if (!g_oDocumentUrls.getImageLocal(src))
 				aImagesToDownload.push(src);

@@ -744,7 +744,7 @@ CRadical.prototype.raw_SetHideDegree = function(Value)
         if(this.Pr.type === SQUARE_RADICAL && this.CurPos == 0) // находимся в степени
         {
             this.CurPos = 1;
-            this.Base.Cursor_MoveToStartPos();
+            this.Base.MoveCursorToStartPos();
         }
     }
 };

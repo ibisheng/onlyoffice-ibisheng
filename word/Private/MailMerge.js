@@ -278,7 +278,7 @@ CDocument.prototype.Preview_MailMergeResult = function(Index)
     if (true !== this.MailMergePreview)
     {
         this.MailMergePreview = true;
-        this.Selection_Remove();
+        this.RemoveSelection();
         AscCommon.CollaborativeEditing.Set_GlobalLock(true);
     }
 

@@ -181,7 +181,7 @@ function CGroupShape()
                 oMatrix = this.selection.textSelection.transformText.CreateDublicate();
             }
             this.getDrawingDocument().UpdateTargetTransform(oMatrix);
-            this.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+            this.selection.textSelection.getDocContent().DrawSelectionOnPage(pageIndex);
         }
         else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
         {
@@ -190,7 +190,7 @@ function CGroupShape()
                 oMatrix = this.selection.chartSelection.selection.textSelection.transformText.CreateDublicate();
             }
             this.getDrawingDocument().UpdateTargetTransform(oMatrix);
-            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+            this.selection.chartSelection.selection.textSelection.getDocContent().DrawSelectionOnPage(pageIndex);
         }
     };
 
@@ -836,17 +836,6 @@ function CGroupShape()
         return bRet;
     };
 
-    CGroupShape.prototype.Paragraph_IncDecFontSizeAll = function(val)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            if(typeof this.spTree[i].Paragraph_IncDecFontSizeAll === "function")
-            {
-                this.spTree[i].Paragraph_IncDecFontSizeAll(val);
-            }
-        }
-    };
-
     CGroupShape.prototype.changeSize = function(kw, kh)
     {
         if(this.spPr && this.spPr.xfrm && this.spPr.xfrm.isNotNullForGroup())
@@ -1287,6 +1276,26 @@ function CGroupShape()
             if(this.spTree[i].setPaddings)
             {
                 this.spTree[i].setPaddings(paddings);
+            }
+        }
+    };
+
+    CGroupShape.prototype.setColumnNumber = function(num){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setColumnNumber)
+            {
+                this.spTree[i].setColumnNumber(num);
+            }
+        }
+    };
+
+    CGroupShape.prototype.setColumnSpace = function(spcCol){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setColumnSpace)
+            {
+                this.spTree[i].setColumnSpace(spcCol);
             }
         }
     };

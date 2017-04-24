@@ -393,7 +393,7 @@ function CTableOutlineDr()
 		var _outline = this.TableOutline;
 		var _table = _outline.Table;
 
-		_table.Cursor_MoveToStartPos();
+		_table.MoveCursorToStartPos();
 		_table.Document_SetThisElementCurrent(true);
 
 		if (!_table.Is_Inline())
@@ -492,8 +492,8 @@ function CTableOutlineDr()
 			}
 			this.IsChangeSmall = false;
 
-			this.TableOutline.Table.Selection_Remove();
-			this.TableOutline.Table.Cursor_MoveToStartPos();
+			this.TableOutline.Table.RemoveSelection();
+			this.TableOutline.Table.MoveCursorToStartPos();
 			editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		}
 
@@ -4573,7 +4573,7 @@ function CDrawingDocument()
 
 	this.CheckSelectMobile = function (overlay)
 	{
-		var _select = this.m_oWordControl.m_oLogicDocument.Get_SelectionBounds();
+		var _select = this.m_oWordControl.m_oLogicDocument.GetSelectionBounds();
 		if (!_select)
 			return;
 
@@ -5673,7 +5673,7 @@ function CDrawingDocument()
 
 		var par = new Paragraph(this, this.m_oWordControl.m_oLogicDocument);
 
-		par.Cursor_MoveToStartPos();
+		par.MoveCursorToStartPos();
 
 		var _paraPr = new CParaPr();
 		par.Pr = _paraPr;
@@ -5995,11 +5995,11 @@ function CDrawingDocument()
 		var _ret = this.TableOutlineDr.checkMouseDown(pos, oWordControl);
 		if (_ret === true)
 		{
-			oWordControl.m_oLogicDocument.Selection_Remove(true);
+			oWordControl.m_oLogicDocument.RemoveSelection(true);
 			this.TableOutlineDr.bIsTracked = true;
 			this.LockCursorType("move");
 
-			this.TableOutlineDr.TableOutline.Table.Select_All();
+			this.TableOutlineDr.TableOutline.Table.SelectAll();
 			this.TableOutlineDr.TableOutline.Table.Document_SetThisElementCurrent(true);
 
 			if (-1 == oWordControl.m_oTimerScrollSelect)

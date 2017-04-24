@@ -757,7 +757,8 @@ function CEditorPage(api)
 				global_mouseEvent.KoefPixToMM = 5;
 				AscCommon.isTouch = false;
 				AscCommon.stopEvent(e);
-				var _ret = this.onmouseup(_check_e(e), undefined, true);
+				var _natE = _check_e(e);
+				var _ret = this.onmouseup(_natE, undefined, true);
 				global_mouseEvent.KoefPixToMM = _old;
 
 				if (!AscCommon.isTouchMove && (-1 != AscCommon.TouchStartTime) && (Math.abs(AscCommon.TouchStartTime - (new Date().getTime())) > 900))
@@ -814,7 +815,7 @@ function CEditorPage(api)
 
 				this.TextBoxBackground.HtmlElement["onselectstart"] = function(e)
 				{
-					oThis.m_oLogicDocument.Select_All();
+					oThis.m_oLogicDocument.SelectAll();
 
 					if (e.preventDefault)
 						e.preventDefault();
@@ -2693,6 +2694,12 @@ function CEditorPage(api)
 		this.m_bIsUpdateHorRuler = true;
 		this.m_bIsUpdateVerRuler = true;
 
+		if (this.m_bIsRuler)
+		{
+			this.UpdateHorRulerBack(true);
+			this.UpdateVerRulerBack(true);
+		}
+
 		this.m_oHorRuler.RepaintChecker.BlitAttack = true;
 		this.m_oVerRuler.RepaintChecker.BlitAttack = true;
 
@@ -2889,7 +2896,7 @@ function CEditorPage(api)
 					for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
 					{
 						if (!drDoc.IsFreezePage(i))
-							this.m_oLogicDocument.Selection_Draw_Page(i);
+							this.m_oLogicDocument.DrawSelectionOnPage(i);
 					}
 				}
 				else
@@ -2897,7 +2904,7 @@ function CEditorPage(api)
 					for (var i = 0; i <= drDoc.m_lPagesCount; i++)
 					{
 						if (!drDoc.IsFreezePage(i))
-							this.m_oLogicDocument.Selection_Draw_Page(i);
+							this.m_oLogicDocument.DrawSelectionOnPage(i);
 					}
 				}
 
@@ -3799,7 +3806,7 @@ function CEditorPage(api)
 			{
 				this.m_oLogicDocument.Set_DocPosType(docpostype_Content);
 				this.m_oLogicDocument.Set_CurPage(drDoc.m_lCurrentPage);
-				this.m_oLogicDocument.Cursor_MoveAt(0, 0, false);
+				this.m_oLogicDocument.MoveCursorToXY(0, 0, false);
 				this.m_oLogicDocument.RecalculateCurPos();
 				this.m_oLogicDocument.Document_UpdateSelectionState();
 

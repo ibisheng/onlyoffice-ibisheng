@@ -988,7 +988,7 @@
 			}
 			else
 			{
-				var _textPr = this.Api.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
+				var _textPr = this.Api.WordControl.m_oLogicDocument.GetCalculatedTextPr();
 
 				var _check_obj = _fontSelections.checkPasteText(_textPr, _language);
 				if (_check_obj.is_async)

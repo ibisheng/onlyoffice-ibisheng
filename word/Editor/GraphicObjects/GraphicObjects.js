@@ -289,8 +289,8 @@ CGraphicObjects.prototype =
 
     removeTextSelection: function(){
         var oTargetDocContent = this.getTargetDocContent();
-        if(oTargetDocContent && oTargetDocContent.Is_SelectionUse()){
-            oTargetDocContent.Selection_Remove();
+        if(oTargetDocContent && oTargetDocContent.IsSelectionUse()){
+            oTargetDocContent.RemoveSelection();
         }
     },
 
@@ -1100,7 +1100,7 @@ CGraphicObjects.prototype =
     {
         var content = this.getTargetDocContent();
         if(content)
-            return content.Selection_Is_TableBorderMove();
+            return content.IsMovingTableBorder();
         return false;
     },
 
@@ -1346,13 +1346,13 @@ CGraphicObjects.prototype =
         if(content)
         {
             if(!content.bPresentation){
-                content.Add_InlineImage(W, H, Img, Chart, bFlow );
+                content.AddInlineImage(W, H, Img, Chart, bFlow );
             }
             else{
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                    this.document.AddInlineImage(W, H, Img, Chart, bFlow );
                 }
             }
         }
@@ -1362,14 +1362,14 @@ CGraphicObjects.prototype =
             {
                 this.resetInternalSelection();
                 this.document.Remove(1, true);
-                this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                this.document.AddInlineImage(W, H, Img, Chart, bFlow );
             }
             else
             {
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_InlineImage(W, H, Img, Chart, bFlow );
+                    this.document.AddInlineImage(W, H, Img, Chart, bFlow );
                 }
             }
         }
@@ -1381,13 +1381,13 @@ CGraphicObjects.prototype =
         if(content)
         {
             if(!content.bPresentation){
-                content.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
             }
             else{
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                    this.document.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
                 }
             }
         }
@@ -1397,14 +1397,14 @@ CGraphicObjects.prototype =
             {
                 this.resetInternalSelection();
                 this.document.Remove(1, true);
-                this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                this.document.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
             }
             else
             {
                 if(this.selectedObjects.length > 0)
                 {
                     this.resetSelection2();
-                    this.document.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+                    this.document.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
                 }
             }
         }
@@ -1415,7 +1415,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Add_InlineTable(Cols, Rows);
+            content.AddInlineTable(Cols, Rows);
         }
     },
 
@@ -1454,12 +1454,12 @@ CGraphicObjects.prototype =
     },
 
 
-    Get_SelectedContent: function(SelectedContent)
+	GetSelectedContent : function(SelectedContent)
     {
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Get_SelectedContent(SelectedContent);
+            content.GetSelectedContent(SelectedContent);
         }
         else
         {
@@ -1981,7 +1981,7 @@ CGraphicObjects.prototype =
         if(content)
         {
             Info.Set_Drawing(selected_DrawingObjectText);
-            content.Get_SelectedElementsInfo(Info);
+            content.GetSelectedElementsInfo(Info);
         }
         else
         {
@@ -2012,7 +2012,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_CurrentParagraph();
+            return content.GetCurrentParagraph();
         }
         else
         {
@@ -2029,7 +2029,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_SelectedText(bClearText, oPr);
+            return content.GetSelectedText(bClearText, oPr);
         }
         else
         {
@@ -2042,7 +2042,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Get_CurPosXY();
+            return content.GetCurPosXY();
         }
         else
         {
@@ -2060,7 +2060,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Is_TextSelectionUse();
+            return content.IsTextSelectionUse();
         }
         else
         {
@@ -2074,7 +2074,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            return content.Is_TextSelectionUse();
+            return content.IsTextSelectionUse();
         }
         else
         {
@@ -2085,7 +2085,7 @@ CGraphicObjects.prototype =
     paragraphFormatPaste: function( CopyTextPr, CopyParaPr, Bool )
     {
         var content = this.getTargetDocContent();
-        content && content.Paragraph_Format_Paste(CopyTextPr, CopyParaPr, Bool );
+        content && content.PasteFormatting(CopyTextPr, CopyParaPr, Bool );
     },
 
     getHdrFtrObjectsByPageIndex: function(pageIndex)
@@ -2422,7 +2422,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Start_SelectionFromCurPos();
+            content.StartSelectionFromCurPos();
         }
     },
 
@@ -2460,7 +2460,7 @@ CGraphicObjects.prototype =
     {
         var oTargetDocContent = this.getTargetDocContent();
         if(oTargetDocContent){
-            var oPos = oTargetDocContent.Cursor_GetPos();
+            var oPos = oTargetDocContent.GetCursorPosXY();
             var oTransform = oTargetDocContent.Get_ParentTextTransform();
             if(oTransform){
                 var _x = oTransform.TransformPointX(oPos.X, oPos.Y);
@@ -2472,7 +2472,7 @@ CGraphicObjects.prototype =
         return {X: 0, Y: 0};
     },
 
-    Get_SelectionBounds: DrawingObjectsController.prototype.Get_SelectionBounds,
+	GetSelectionBounds: DrawingObjectsController.prototype.GetSelectionBounds,
 
     checkCommonBounds: function(arrDrawings)
     {
@@ -2543,7 +2543,6 @@ CGraphicObjects.prototype =
         for(i = 0; i < objects_for_grouping.length; ++i)
         {
             objects_for_grouping[i].parent.Remove_FromDocument(false);
-            objects_for_grouping[i].parent.Set_GraphicObject(null);//for Bug 34548
             if(objects_for_grouping[i].setParent){
                 objects_for_grouping[i].setParent(null);
             }
@@ -2692,7 +2691,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Set_TableProps(Props);
+            content.SetTableProps(Props);
         }
     },
 
@@ -2702,7 +2701,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Selection_IsEmpty(bCheckHidden);
+            content.IsSelectionEmpty(bCheckHidden);
         }
         return false;
     },
@@ -2736,7 +2735,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            content.Cursor_MoveToCell(bNext);
+            content.MoveCursorToCell(bNext);
         }
     },
 
@@ -3044,9 +3043,9 @@ CGraphicObjects.prototype =
         var oTargetDocContent = this.getTargetDocContent(undefined, true);
         if(oTargetDocContent)
         {
-            oState.Pos      = oTargetDocContent.Get_ContentPosition(false, false, undefined);
-            oState.StartPos = oTargetDocContent.Get_ContentPosition(true, true, undefined);
-            oState.EndPos   = oTargetDocContent.Get_ContentPosition(true, false, undefined);
+            oState.Pos      = oTargetDocContent.GetContentPosition(false, false, undefined);
+            oState.StartPos = oTargetDocContent.GetContentPosition(true, true, undefined);
+            oState.EndPos   = oTargetDocContent.GetContentPosition(true, false, undefined);
             oState.DrawingSelection = oTargetDocContent.Selection.Use;
         }
         oState.DrawingsSelectionState = this.getSelectionState()[0];
@@ -3183,7 +3182,7 @@ CGraphicObjects.prototype =
                     oMatrix = this.selection.textSelection.transformText.CreateDublicate();
                 }
                 this.drawingDocument.UpdateTargetTransform(oMatrix);
-                this.selection.textSelection.getDocContent().Selection_Draw_Page(0);
+                this.selection.textSelection.getDocContent().DrawSelectionOnPage(0);
             }
         }
         else if(this.selection.groupSelection)
@@ -3200,7 +3199,7 @@ CGraphicObjects.prototype =
                 oMatrix = this.selection.chartSelection.selection.textSelection.transformText.CreateDublicate();
             }
             this.drawingDocument.UpdateTargetTransform(oMatrix);
-            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(0);
+            this.selection.chartSelection.selection.textSelection.getDocContent().DrawSelectionOnPage(0);
         }
     },
     getAllRasterImagesOnPage: function(pageIndex)

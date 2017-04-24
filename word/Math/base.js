@@ -1715,12 +1715,12 @@ CMathBase.prototype.Set_ParaContentPos = function(ContentPos, Depth)
     if (undefined === CurPos || this.CurPos < 0)
     {
         this.CurPos = 0;
-        this.Content[this.CurPos].Cursor_MoveToStartPos();
+        this.Content[this.CurPos].MoveCursorToStartPos();
     }
     else if (CurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+        this.Content[this.CurPos].MoveCursorToEndPos(false);
     }
     else
     {
@@ -1773,13 +1773,13 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
     }
 
 };
-CMathBase.prototype.Selection_IsEmpty = function()
+CMathBase.prototype.IsSelectionEmpty = function()
 {
     if (true !== this.Selection.Use)
         return true;
 
     if (this.Selection.StartPos === this.Selection.EndPos)
-        return this.Content[this.Selection.StartPos].Selection_IsEmpty();
+        return this.Content[this.Selection.StartPos].IsSelectionEmpty();
 
     return false;
 };
@@ -2814,13 +2814,13 @@ CMathBase.prototype.private_CorrectCurPos = function()
     if (this.CurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+        this.Content[this.CurPos].MoveCursorToEndPos(false);
     }
 
     if (this.CurPos < 0)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToStartPos();
+        this.Content[this.CurPos].MoveCursorToStartPos();
     }
 };
 CMathBase.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)

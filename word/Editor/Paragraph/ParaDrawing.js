@@ -205,11 +205,11 @@ ParaDrawing.prototype.Set_WidthVisible = function(WidthVisible)
 {
 	this.WidthVisible = WidthVisible;
 };
-ParaDrawing.prototype.Get_SelectedContent = function(SelectedContent)
+ParaDrawing.prototype.GetSelectedContent = function(SelectedContent)
 {
-	if (this.GraphicObj && this.GraphicObj.Get_SelectedContent)
+	if (this.GraphicObj && this.GraphicObj.GetSelectedContent)
 	{
-		this.GraphicObj.Get_SelectedContent(SelectedContent);
+		this.GraphicObj.GetSelectedContent(SelectedContent);
 	}
 };
 ParaDrawing.prototype.Search_GetId = function(bNext, bCurrent)
@@ -221,9 +221,6 @@ ParaDrawing.prototype.Search_GetId = function(bNext, bCurrent)
 
 ParaDrawing.prototype.CheckCorrect = function(){
 	if(!this.GraphicObj){
-		return false;
-	}
-	if(this.GraphicObj.parent !== this){
 		return false;
 	}
 	if(this.GraphicObj && this.GraphicObj.checkCorrect){
@@ -835,7 +832,7 @@ ParaDrawing.prototype.CheckWH = function()
 		return;
 	this.GraphicObj.recalculate();
 	var extX, extY, rot;
-	if (this.GraphicObj.spPr.xfrm )
+	if (this.GraphicObj.spPr && this.GraphicObj.spPr.xfrm )
 	{
 		if(AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extX) && AscFormat.isRealNumber(this.GraphicObj.spPr.xfrm.extY))
 		{
@@ -1077,10 +1074,10 @@ ParaDrawing.prototype.setParagraphTabs = function(tabs)
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.setParagraphTabs === "function")
 		this.GraphicObj.setParagraphTabs(tabs);
 };
-ParaDrawing.prototype.Selection_Is_TableBorderMove = function()
+ParaDrawing.prototype.IsMovingTableBorder = function()
 {
-	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.Selection_Is_TableBorderMove === "function")
-		return this.GraphicObj.Selection_Is_TableBorderMove();
+	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.IsMovingTableBorder === "function")
+		return this.GraphicObj.IsMovingTableBorder();
 	return false;
 };
 ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin, LineNum)
@@ -1479,7 +1476,7 @@ ParaDrawing.prototype.Add_ToDocument2 = function(Paragraph)
 
 	Paragraph.Add_ToContent(0, DrawingRun);
 };
-ParaDrawing.prototype.Update_CursorType = function(X, Y, PageIndex)
+ParaDrawing.prototype.UpdateCursorType = function(X, Y, PageIndex)
 {
 	this.DrawingDocument.SetCursorType("move", new AscCommon.CMouseMoveData());
 
@@ -1975,10 +1972,10 @@ ParaDrawing.prototype.Get_PageNum = function()
 {
 	return this.PageNum;
 };
-ParaDrawing.prototype.Get_AllParagraphs = function(Props, ParaArray)
+ParaDrawing.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
-	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.Get_AllParagraphs === "function")
-		this.GraphicObj.Get_AllParagraphs(Props, ParaArray);
+	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.GetAllParagraphs === "function")
+		this.GraphicObj.GetAllParagraphs(Props, ParaArray);
 };
 ParaDrawing.prototype.getTableProps = function()
 {
@@ -2446,8 +2443,8 @@ ParaDrawing.prototype.private_ConvertToMathObject = function(isOpen)
 		if (!isOpen)
 		{
 			// Устанавливаем курсор в начало правого элемента, полученного после Split
-			LogicDocument.Selection_Remove();
-			RightElement.Cursor_MoveToStartPos();
+			LogicDocument.RemoveSelection();
+			RightElement.MoveCursorToStartPos();
 			Para.CurPos.ContentPos = TopElementPos + 2;
 			Para.Document_SetThisElementCurrent(false);
 

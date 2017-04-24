@@ -120,6 +120,8 @@ Asc['asc_docs_api'].prototype["Call_CheckTargetUpdate"] = function()
     this.WordControl.m_oLogicDocument.CheckTargetUpdate();
     this.WordControl.m_oDrawingDocument.CheckTargetShow();
     this.WordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
+
+    this.WordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(false);
 };
 
 Asc['asc_docs_api'].prototype["Call_Common"] = function(type, param)
@@ -128,7 +130,7 @@ Asc['asc_docs_api'].prototype["Call_Common"] = function(type, param)
     {
         case 1:
         {
-            this.WordControl.m_oLogicDocument.Cursor_MoveLeft();
+            this.WordControl.m_oLogicDocument.MoveCursorLeft();
             break;
         }
         case 67:
@@ -164,7 +166,7 @@ Asc['asc_docs_api'].prototype["Call_HR_Tabs"] = function(arrT, arrP)
     if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
     {
         _logic.Create_NewHistoryPoint();
-        _logic.Set_ParagraphTabs(_arr);
+        _logic.SetParagraphTabs(_arr);
     }
 };
 Asc['asc_docs_api'].prototype["Call_HR_Pr"] = function(_indent_left, _indent_right, _indent_first)
@@ -173,7 +175,7 @@ Asc['asc_docs_api'].prototype["Call_HR_Pr"] = function(_indent_left, _indent_rig
     if ( false === _logic.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
     {
         _logic.Create_NewHistoryPoint();
-        _logic.Set_ParagraphIndent( { Left : _indent_left, Right : _indent_right, FirstLine: _indent_first } );
+        _logic.SetParagraphIndent( { Left : _indent_left, Right : _indent_right, FirstLine: _indent_first } );
         _logic.Document_UpdateInterfaceState();
     }
 };
@@ -1197,39 +1199,39 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                 {
                     case 0:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphContextualSpacing( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphContextualSpacing( _params[_current.pos++] );
                         break;
                     }
                     case 1:
                     {
                         var _ind = asc_menu_ReadParaInd(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphIndent( _ind );
+                        this.WordControl.m_oLogicDocument.SetParagraphIndent( _ind );
                         break;
                     }
                     case 2:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphKeepLines( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphKeepLines( _params[_current.pos++] );
                         break;
                     }
                     case 3:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphKeepNext( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphKeepNext( _params[_current.pos++] );
                         break;
                     }
                     case 4:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphWidowControl( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphWidowControl( _params[_current.pos++] );
                         break;
                     }
                     case 5:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphPageBreakBefore( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphPageBreakBefore( _params[_current.pos++] );
                         break;
                     }
                     case 6:
                     {
                         var _spacing = asc_menu_ReadParaSpacing(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( _spacing );
+                        this.WordControl.m_oLogicDocument.SetParagraphSpacing( _spacing );
                         break;
                     }
                     case 7:
@@ -1254,13 +1256,13 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                             _brds.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(_brds.Bottom.Color);
                         }
 
-                        this.WordControl.m_oLogicDocument.Set_ParagraphBorders( _brds );
+                        this.WordControl.m_oLogicDocument.SetParagraphBorders( _brds );
                         break;
                     }
                     case 8:
                     {
                         var _shd = asc_menu_ReadParaShd(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphShd( _shd );
+                        this.WordControl.m_oLogicDocument.SetParagraphShd( _shd );
                         break;
                     }
                     case 9:
@@ -1280,13 +1282,13 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     {
                         var _tabs = asc_menu_ReadParaTabs(_params, _current);
                         // TODO:
-                        this.WordControl.m_oLogicDocument.Set_ParagraphTabs( _tabs.Tabs );
+                        this.WordControl.m_oLogicDocument.SetParagraphTabs( _tabs.Tabs );
                         break;
                     }
                     case 14:
                     {
                         var _framePr = asc_menu_ReadParaFrame(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphFramePr( _framePr );
+                        this.WordControl.m_oLogicDocument.SetParagraphFramePr( _framePr );
                         break;
                     }
                     case 15:
@@ -1360,17 +1362,17 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 23:
                     {
                         var _listType = asc_menu_ReadParaListType(_params, _current);
-                        this.WordControl.m_oLogicDocument.Set_ParagraphNumbering( _listType );
+                        this.WordControl.m_oLogicDocument.SetParagraphNumbering( _listType );
                         break;
                     }
                     case 24:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphStyle( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphStyle( _params[_current.pos++] );
                         break;
                     }
                     case 25:
                     {
-                        this.WordControl.m_oLogicDocument.Set_ParagraphAlign( _params[_current.pos++] );
+                        this.WordControl.m_oLogicDocument.SetParagraphAlign( _params[_current.pos++] );
                         break;
                     }
                     case 255:
@@ -1866,11 +1868,11 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.Add_InlineTable(_rows, _cols);
+                this.WordControl.m_oLogicDocument.AddInlineTable(_rows, _cols);
 
                 if (_style != null)
                 {
-                    this.WordControl.m_oLogicDocument.Set_TableProps({TableStyle : _style});
+                    this.WordControl.m_oLogicDocument.SetTableProps({TableStyle : _style});
                 }
             }
             break;
@@ -1940,7 +1942,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             _stream["ClearNoAttack"]();
             if ( true === bCanAdd )
             {
-                var _text = this.WordControl.m_oLogicDocument.Get_SelectedText(true);
+                var _text = this.WordControl.m_oLogicDocument.GetSelectedText(true);
                 if (null == _text)
                     _stream["WriteByte"](1);
                 else
@@ -4511,7 +4513,7 @@ Asc['asc_docs_api'].prototype.UpdateTextPr = function(TextPr)
 Asc['asc_docs_api'].prototype.UpdateParagraphProp = function(ParaPr)
 {
     // TODO: как только разъединят настройки параграфа и текста переделать тут
-    var TextPr = this.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
+    var TextPr = this.WordControl.m_oLogicDocument.GetCalculatedTextPr();
     ParaPr.Subscript   = ( TextPr.VertAlign === AscCommon.vertalign_SubScript   ? true : false );
     ParaPr.Superscript = ( TextPr.VertAlign === AscCommon.vertalign_SuperScript ? true : false );
     ParaPr.Strikeout   = TextPr.Strikeout;
@@ -4728,13 +4730,13 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
         if(ImagePr.ImageUrl != undefined && ImagePr.ImageUrl != null && ImagePr.ImageUrl != "")
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+            this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
         }
         else if (ImagePr.ShapeProperties && ImagePr.ShapeProperties.fill && ImagePr.ShapeProperties.fill.fill &&
                  ImagePr.ShapeProperties.fill.fill.url !== undefined && ImagePr.ShapeProperties.fill.fill.url != null && ImagePr.ShapeProperties.fill.fill.url != "")
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+            this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
         }
         else
         {
@@ -4745,13 +4747,13 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
             {
                 if( !this.noCreatePoint && !this.exucuteHistory && this.exucuteHistoryEnd)
                 {
-                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                    this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
                     this.exucuteHistoryEnd = false;
                 }
                 else
                 {
                     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                    this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                    this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
                 }
                 if(this.exucuteHistory)
                 {
@@ -4761,11 +4763,11 @@ Asc['asc_docs_api'].prototype.ImgApply = function(obj)
             else
             {
                 AscFormat.ExecuteNoHistory(function(){
-                                           this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+                                           this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
                                            }, this, []);
             }
 
-            this.WordControl.m_oLogicDocument.Set_ImageProps( ImagePr );
+            this.WordControl.m_oLogicDocument.SetImageProps( ImagePr );
         }
     }
 };
@@ -4843,7 +4845,7 @@ Asc['asc_docs_api'].prototype.AddImageUrlNative = function(url, _w, _h, _pageNum
 
     if (undefined === _pageNum)
     {
-        this.WordControl.m_oLogicDocument.Add_InlineImage(wI, hI, url);
+        this.WordControl.m_oLogicDocument.AddInlineImage(wI, hI, url);
     }
     else
     {
@@ -4887,9 +4889,9 @@ Asc['asc_docs_api'].prototype.AddImageUrlActionNative = function(src, _w, _h, _p
       }
       this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddImageUrlLong);
       //if (undefined === imgProp || undefined === imgProp.WrappingStyle || 0 == imgProp.WrappingStyle)
-        this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src);
+        this.WordControl.m_oLogicDocument.AddInlineImage(_w, _h, src);
       //else
-      //  this.WordControl.m_oLogicDocument.Add_InlineImage(_w, _h, src, null, true);
+      //  this.WordControl.m_oLogicDocument.AddInlineImage(_w, _h, src, null, true);
     }
   }
 };
@@ -5718,13 +5720,13 @@ Asc['asc_docs_api'].prototype.Call_Menu_Context_Delete = function()
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_Select = function()
 {
-    this.WordControl.m_oLogicDocument.Cursor_MoveLeft(false, true);
-    this.WordControl.m_oLogicDocument.Cursor_MoveRight(true, true);
+    this.WordControl.m_oLogicDocument.MoveCursorLeft(false, true);
+    this.WordControl.m_oLogicDocument.MoveCursorRight(true, true);
     this.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 };
 Asc['asc_docs_api'].prototype.Call_Menu_Context_SelectAll = function()
 {
-    this.WordControl.m_oLogicDocument.Select_All();
+    this.WordControl.m_oLogicDocument.SelectAll();
 };
 Asc['asc_docs_api'].prototype.pre_Paste = function(_fonts, _images, callback)
 {
@@ -6066,6 +6068,8 @@ Asc['asc_docs_api'].prototype.openDocument = function(sData)
     }
 
     window["native"]["onEndLoadingFile"]();
+
+    this.WordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(true);
 
     var t = this;
     setInterval(function() {

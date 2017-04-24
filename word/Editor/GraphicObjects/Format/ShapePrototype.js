@@ -456,10 +456,10 @@ CShape.prototype.checkShapeChild = function()
 CShape.prototype.checkShapeChildTransform = function()
 {
 };
-CShape.prototype.Get_AllParagraphs = function(Props, ParaArray)
+CShape.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
     var oContent = this.getDocContent();
-    oContent && oContent.Get_AllParagraphs(Props, ParaArray);
+    oContent && oContent.GetAllParagraphs(Props, ParaArray);
 };
 
 
@@ -876,7 +876,7 @@ CShape.prototype.cursorGetPos = function()
     var content = this.getDocContent();
     if(isRealObject(content))
     {
-        var pos = content.Cursor_GetPos();
+        var pos = content.GetCursorPosXY();
         var transform = this.transformText;
         var x = transform.TransformPointX(pos.X, pos.Y);
         var y = transform.TransformPointY(pos.X, pos.Y);
@@ -893,7 +893,7 @@ CShape.prototype.cursorMoveAt = function( X, Y, AddToSelect )
     {
         var t_x = this.invertTransformText.TransformPointX(X, Y);
         var t_y = this.invertTransformText.TransformPointY(X, Y);
-        content.Cursor_MoveAt(t_x, t_y, AddToSelect, undefined, AscFormat.isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
+        content.MoveCursorToXY(t_x, t_y, AddToSelect, undefined, AscFormat.isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
     }
 };
 

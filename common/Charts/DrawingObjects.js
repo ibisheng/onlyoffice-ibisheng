@@ -2560,7 +2560,7 @@ function DrawingObjects() {
 
                 var oContent = oTextArt.getDocContent();
                 if(oContent){
-                    oContent.Cursor_MoveToStartPos(false);
+                    oContent.MoveCursorToStartPos(false);
                     oContent.Paragraph_Add(new AscCommonWord.MathMenu(Type), false);
                 }
                 oTextArt.checkExtentsByDocContent();
@@ -2571,7 +2571,7 @@ function DrawingObjects() {
                 _this.controller.selectObject(oTextArt, 0);
                 var oContent = oTextArt.getDocContent();
                 _this.controller.selection.textSelection = oTextArt;
-                //oContent.Select_All();
+                //oContent.SelectAll();
                 oTextArt.addToRecalculate();
                 _this.controller.startRecalculate();
                 worksheet.setSelectionShape(true);
@@ -4299,11 +4299,11 @@ function DrawingObjects() {
         if (!oContent) {
             return false;
         }
-        var oPara = oContent.Get_CurrentParagraph();
+        var oPara = oContent.GetCurrentParagraph();
         if (!oPara) {
             return false;
         }
-        if (true === oContent.Is_SelectionUse())
+        if (true === oContent.IsSelectionUse())
             oContent.Remove(1, true, false, true);
         var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
         if (!oRun || !(oRun instanceof ParaRun)) {

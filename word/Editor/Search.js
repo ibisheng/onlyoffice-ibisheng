@@ -154,7 +154,7 @@ CDocumentSearch.prototype =
                 if (true === bRestorePos)
                 {
                     // Сохраняем позицию состояние параграфа, чтобы курсор остался в том же месте и после замены.
-                    bSelection = Para.Is_SelectionUse();
+                    bSelection = Para.IsSelectionUse();
                     ContentPos = Para.Get_ParaContentPos(false, false);
                     StartPos   = Para.Get_ParaContentPos(true, true);
                     EndPos     = Para.Get_ParaContentPos(true, false);
@@ -182,7 +182,7 @@ CDocumentSearch.prototype =
                 Para.Remove();
 
                 // Перемещаем курсор в конец поиска
-                Para.Selection_Remove();
+                Para.RemoveSelection();
                 Para.Set_ParaContentPos( SearchElement.StartPos, true, -1, -1 );
 
                 // Удаляем запись о данном элементе
@@ -278,7 +278,7 @@ CDocument.prototype.Search = function(Str, Props, bDraw)
 };
 CDocument.prototype.Search_Select = function(Id)
 {
-    this.Selection_Remove();
+    this.RemoveSelection();
     this.SearchEngine.Select(Id, true);
     this.RecalculateCurPos();
 
@@ -290,7 +290,7 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
 {
     var bResult = false;
 
-    this.Selection_Remove();
+    this.RemoveSelection();
 
     var CheckParagraphs = [];
     if ( true === bAll )

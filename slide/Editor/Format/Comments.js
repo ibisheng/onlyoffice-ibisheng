@@ -148,7 +148,7 @@ ParaComment.prototype =
     {
     },
 
-    Get_SelectedText : function(bAll, bClearText)
+	GetSelectedText : function(bAll, bClearText)
     {
         return "";
     },
@@ -331,11 +331,11 @@ ParaComment.prototype =
         return true;
     },
 
-    Cursor_MoveToStartPos : function()
+	MoveCursorToStartPos : function()
     {
     },
 
-    Cursor_MoveToEndPos : function(SelectFromEnd)
+	MoveCursorToEndPos : function(SelectFromEnd)
     {
     },
 
@@ -433,15 +433,11 @@ ParaComment.prototype =
     {
     },
 
-    Selection_Stop : function()
+	RemoveSelection : function()
     {
     },
 
-    Selection_Remove : function()
-    {
-    },
-
-    Select_All : function(Direction)
+	SelectAll : function(Direction)
     {
     },
 
@@ -449,7 +445,7 @@ ParaComment.prototype =
     {
     },
 
-    Selection_IsEmpty : function(CheckEnd)
+	IsSelectionEmpty : function(CheckEnd)
     {
         return true;
     },

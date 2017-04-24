@@ -211,8 +211,9 @@
 
 		var oldOnError = window.onerror;
 		window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
-			var msg = 'Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber
-				+ ' Column: ' + column + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
+			var msg = 'Error: ' + errorMsg + ' Script: ' + url + ' Line: ' + lineNumber + ':' + column +
+				' userAgent: ' + (navigator.userAgent || navigator.vendor || window.opera) + ' platform: ' +
+				navigator.platform + ' StackTrace: ' + (errorObj ? errorObj.stack : "");
 			t.CoAuthoringApi.sendChangesError(msg);
 			if (oldOnError) {
 				return oldOnError.apply(this, arguments);

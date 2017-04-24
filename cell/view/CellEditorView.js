@@ -743,6 +743,7 @@
 		if ( this.textFlags.textAlign === AscCommon.align_Justify || this.isFormula() ) {
 			this.textFlags.textAlign = AscCommon.align_Left;
 		}
+		this.textFlags.shrinkToFit = false;
 
 		this._cleanFragments( opt.fragments );
 		this.textRender.setString( opt.fragments, this.textFlags );
@@ -1597,7 +1598,7 @@
 		var b = this.input.selectionStart;
 		var e = this.input.selectionEnd;
 		if (typeof b !== "undefined") {
-			if (this.cursorPos !== b || this.selectionBegin !== t.selectionEnd) {
+			if (this.cursorPos !== b || this.selectionBegin !== this.selectionEnd) {
 				this._moveCursor(kPosition, b);
 			}
 			if (b !== e) {

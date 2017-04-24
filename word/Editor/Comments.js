@@ -608,7 +608,7 @@ function CComments()
         for (var Id in this.m_aComments)
         {
         	if (!arrAllParagraphs && editor && editor.WordControl.m_oLogicDocument)
-        		arrAllParagraphs = editor.WordControl.m_oLogicDocument.Get_AllParagraphs({All : true});
+        		arrAllParagraphs = editor.WordControl.m_oLogicDocument.GetAllParagraphs({All : true});
 
             this.m_aComments[Id].Check_MergeData(arrAllParagraphs);
         }
@@ -735,7 +735,7 @@ ParaComment.prototype =
     {
     },
 
-    Get_SelectedText : function(bAll, bClearText, oPr)
+	GetSelectedText : function(bAll, bClearText, oPr)
     {        
         return "";
     },
@@ -979,11 +979,11 @@ ParaComment.prototype =
         return true;
     },
 
-    Cursor_MoveToStartPos : function()
+	MoveCursorToStartPos : function()
     {
     },
 
-    Cursor_MoveToEndPos : function(SelectFromEnd)
+	MoveCursorToEndPos : function(SelectFromEnd)
     {
     },
 
@@ -1081,15 +1081,11 @@ ParaComment.prototype =
     {
     },
 
-    Selection_Stop : function()
+	RemoveSelection : function()
     {
     },
 
-    Selection_Remove : function()
-    {
-    },
-
-    Select_All : function(Direction)
+	SelectAll : function(Direction)
     {
     },
 
@@ -1097,7 +1093,7 @@ ParaComment.prototype =
     {
     },
 
-    Selection_IsEmpty : function(CheckEnd)
+	IsSelectionEmpty : function(CheckEnd)
     {
         return true;
     },
