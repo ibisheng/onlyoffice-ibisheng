@@ -1563,7 +1563,7 @@
     var wb = this.model;
     var i = asc_typeof(index) === "number" && index >= 0 ? index : wb.getActive();
     var ws = this.wsViews[i];
-    if (null == ws && !onlyExist) {
+    if (!ws && !onlyExist) {
       ws = this.wsViews[i] = this._createWorksheetView(wb.getWorksheet(i));
       ws._prepareComments();
       ws._prepareDrawingObjects();
