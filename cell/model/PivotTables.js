@@ -3,9 +3,6 @@
 function getBoolFromXml(val) {
 	return "0" !== val && "false" !== val && "off" !== val;
 }
-function getXmlFromBool(val) {
-	return val ? "1" : "0";
-}
 var st_sourcetypeWORKSHEET = 0;
 var st_sourcetypeEXTERNAL = 1;
 var st_sourcetypeCONSOLIDATION = 2;
@@ -1405,7 +1402,7 @@ function CT_PivotCacheDefinition() {
 	this.optimizeMemory = null;//false
 	this.enableRefresh = null;//true
 	this.refreshedBy = null;
-	this.refreshedDateIso = null;
+	this.refreshedDate = null;
 	this.backgroundQuery = null;//false
 	this.missingItemsLimit = null;
 	this.createdVersion = null;//0
@@ -1461,9 +1458,9 @@ CT_PivotCacheDefinition.prototype.readAttributes = function(attr, uq) {
 		if (undefined !== val) {
 			this.refreshedBy = uq(val);
 		}
-		val = vals["refreshedDateIso"];
+		val = vals["refreshedDate"];
 		if (undefined !== val) {
-			this.refreshedDateIso = uq(val);
+			this.refreshedDate = val - 0;
 		}
 		val = vals["backgroundQuery"];
 		if (undefined !== val) {
@@ -1582,143 +1579,108 @@ CT_PivotCacheDefinition.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotCacheDefinition.prototype.toXml = function() {
+CT_PivotCacheDefinition.prototype.toXml = function(writer) {
 	var res = "";
-	res += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-	res +=
-		"<pivotCacheDefinition xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"";
+	writer.WriteXmlString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+	writer.WriteXmlNodeStart("pivotCacheDefinition");
+	writer.WriteXmlString(
+		" xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"");
 	if (null !== this.id) {
-		res += " r:id=\"";
-		res += this.id;
-		res += "\"";
+		writer.WriteXmlAttributeString("r:id", this.id);
 	}
 	if (null !== this.invalid) {
-		res += " invalid=\"";
-		res += getXmlFromBool(this.invalid);
-		res += "\"";
+		writer.WriteXmlAttributeBool("invalid", this.invalid);
 	}
 	if (null !== this.saveData) {
-		res += " saveData=\"";
-		res += getXmlFromBool(this.saveData);
-		res += "\"";
+		writer.WriteXmlAttributeBool("saveData", this.saveData);
 	}
 	if (null !== this.refreshOnLoad) {
-		res += " refreshOnLoad=\"";
-		res += getXmlFromBool(this.refreshOnLoad);
-		res += "\"";
+		writer.WriteXmlAttributeBool("refreshOnLoad", this.refreshOnLoad);
 	}
 	if (null !== this.optimizeMemory) {
-		res += " optimizeMemory=\"";
-		res += getXmlFromBool(this.optimizeMemory);
-		res += "\"";
+		writer.WriteXmlAttributeBool("optimizeMemory", this.optimizeMemory);
 	}
 	if (null !== this.enableRefresh) {
-		res += " enableRefresh=\"";
-		res += getXmlFromBool(this.enableRefresh);
-		res += "\"";
+		writer.WriteXmlAttributeBool("enableRefresh", this.enableRefresh);
 	}
 	if (null !== this.refreshedBy) {
-		res += " refreshedBy=\"";
-		res += this.refreshedBy;
-		res += "\"";
+		writer.WriteXmlAttributeString("refreshedBy", this.refreshedBy);
 	}
-	if (null !== this.refreshedDateIso) {
-		res += " refreshedDateIso=\"";
-		res += this.refreshedDateIso;
-		res += "\"";
+	if (null !== this.refreshedDate) {
+		writer.WriteXmlAttributeNumber("refreshedDate", this.refreshedDate);
 	}
 	if (null !== this.backgroundQuery) {
-		res += " backgroundQuery=\"";
-		res += getXmlFromBool(this.backgroundQuery);
-		res += "\"";
+		writer.WriteXmlAttributeBool("backgroundQuery", this.backgroundQuery);
 	}
 	if (null !== this.missingItemsLimit) {
-		res += " missingItemsLimit=\"";
-		res += this.missingItemsLimit.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("missingItemsLimit", this.missingItemsLimit);
 	}
 	if (null !== this.createdVersion) {
-		res += " createdVersion=\"";
-		res += this.createdVersion.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("createdVersion", this.createdVersion);
 	}
 	if (null !== this.refreshedVersion) {
-		res += " refreshedVersion=\"";
-		res += this.refreshedVersion.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("refreshedVersion", this.refreshedVersion);
 	}
 	if (null !== this.minRefreshableVersion) {
-		res += " minRefreshableVersion=\"";
-		res += this.minRefreshableVersion.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("minRefreshableVersion", this.minRefreshableVersion);
 	}
 	if (null !== this.recordCount) {
-		res += " recordCount=\"";
-		res += this.recordCount.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("recordCount", this.recordCount);
 	}
 	if (null !== this.upgradeOnRefresh) {
-		res += " upgradeOnRefresh=\"";
-		res += getXmlFromBool(this.upgradeOnRefresh);
-		res += "\"";
+		writer.WriteXmlAttributeBool("upgradeOnRefresh", this.upgradeOnRefresh);
 	}
 	if (null !== this.tupleCache) {
-		res += " tupleCache=\"";
-		res += getXmlFromBool(this.tupleCache);
-		res += "\"";
+		writer.WriteXmlAttributeBool("tupleCache", this.tupleCache);
 	}
 	if (null !== this.supportSubquery) {
-		res += " supportSubquery=\"";
-		res += getXmlFromBool(this.supportSubquery);
-		res += "\"";
+		writer.WriteXmlAttributeBool("supportSubquery", this.supportSubquery);
 	}
 	if (null !== this.supportAdvancedDrill) {
-		res += " supportAdvancedDrill=\"";
-		res += getXmlFromBool(this.supportAdvancedDrill);
-		res += "\"";
+		writer.WriteXmlAttributeBool("supportAdvancedDrill", this.supportAdvancedDrill);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd("pivotCacheDefinition", true);
 	if (null !== this.cacheSource) {
-		res += this.cacheSource.toXml("cacheSource");
+		res += this.cacheSource.toXml(writer, "cacheSource");
 	}
 	if (null !== this.cacheFields) {
-		res += this.cacheFields.toXml("cacheFields");
+		res += this.cacheFields.toXml(writer, "cacheFields");
 	}
 	if (null !== this.cacheHierarchies) {
-		res += this.cacheHierarchies.toXml("cacheHierarchies");
+		res += this.cacheHierarchies.toXml(writer, "cacheHierarchies");
 	}
 	if (null !== this.kpis) {
-		res += this.kpis.toXml("kpis");
+		res += this.kpis.toXml(writer, "kpis");
 	}
 	if (null !== this.tupleCache) {
-		res += this.tupleCache.toXml("tupleCache");
+		res += this.tupleCache.toXml(writer, "tupleCache");
 	}
 	if (null !== this.calculatedItems) {
-		res += this.calculatedItems.toXml("calculatedItems");
+		res += this.calculatedItems.toXml(writer, "calculatedItems");
 	}
 	if (null !== this.calculatedMembers) {
-		res += this.calculatedMembers.toXml("calculatedMembers");
+		res += this.calculatedMembers.toXml(writer, "calculatedMembers");
 	}
 	if (null !== this.dimensions) {
-		res += this.dimensions.toXml("dimensions");
+		res += this.dimensions.toXml(writer, "dimensions");
 	}
 	if (null !== this.measureGroups) {
-		res += this.measureGroups.toXml("measureGroups");
+		res += this.measureGroups.toXml(writer, "measureGroups");
 	}
 	if (null !== this.maps) {
-		res += this.maps.toXml("maps");
+		res += this.maps.toXml(writer, "maps");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</pivotCacheDefinition>";
+	writer.WriteXmlNodeEnd("pivotCacheDefinition");
 	return res;
 };
 function CT_PivotCacheRecords() {
 //Attributes
 	this.count = null;
 //Members
-	this.r = [];
+	this.r = null;
 	this.extLst = null;
 //internal
 	this._curArray = null;
@@ -1739,6 +1701,7 @@ CT_PivotCacheRecords.prototype.onStartNode = function(elem, attr, uq) {
 		newContext.readAttributes(attr, uq);
 	} else if ("r" === elem) {
 		this._curArray = [];
+		this.r = [];
 	} else if ("b" === elem) {
 		newContext = new CT_Boolean();
 		if (newContext.readAttributes) {
@@ -1800,44 +1763,45 @@ CT_PivotCacheRecords.prototype.onEndNode = function(prevContext, elem) {
 		}
 	}
 };
-CT_PivotCacheRecords.prototype.toXml = function() {
+CT_PivotCacheRecords.prototype.toXml = function(writer) {
 	var res = "";
-	res += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-	res +=
-		"<pivotCacheRecords xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"";
+	writer.WriteXmlString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+	writer.WriteXmlNodeStart("pivotCacheRecords");
+	writer.WriteXmlString(
+		" xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"");
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
-	for (var i = 0; i < this.r.length; ++i) {
-		var elem = this.r[i];
-		res += "<r>";
-		for (var j = 0; j < elem.length; ++j) {
-			var subelem = elem[j];
-			if (subelem instanceof CT_Boolean) {
-				res += subelem.toXml("b");
-			} else if (subelem instanceof CT_DateTime) {
-				res += subelem.toXml("d");
-			} else if (subelem instanceof CT_Error) {
-				res += subelem.toXml("e");
-			} else if (subelem instanceof CT_Missing) {
-				res += subelem.toXml("m");
-			} else if (subelem instanceof CT_Number) {
-				res += subelem.toXml("n");
-			} else if (subelem instanceof CT_String) {
-				res += subelem.toXml("s");
-			} else if (subelem instanceof CT_Index) {
-				res += subelem.toXml("x");
+	writer.WriteXmlNodeEnd("pivotCacheRecords", true);
+	if (null !== r) {
+		for (var i = 0; i < this.r.length; ++i) {
+			var elem = this.r[i];
+			writer.WriteXmlNodeEnd("r", true);
+			for (var j = 0; j < elem.length; ++j) {
+				var subelem = elem[j];
+				if (subelem instanceof CT_Boolean) {
+					subelem.toXml(writer, "b");
+				} else if (subelem instanceof CT_DateTime) {
+					subelem.toXml(writer, "d");
+				} else if (subelem instanceof CT_Error) {
+					subelem.toXml(writer, "e");
+				} else if (subelem instanceof CT_Missing) {
+					subelem.toXml(writer, "m");
+				} else if (subelem instanceof CT_Number) {
+					subelem.toXml(writer, "n");
+				} else if (subelem instanceof CT_String) {
+					subelem.toXml(writer, "s");
+				} else if (subelem instanceof CT_Index) {
+					subelem.toXml(writer, "x");
+				}
 			}
+			writer.WriteXmlNodeEnd("r");
 		}
-		res += "</r>";
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</pivotCacheRecords>";
+	writer.WriteXmlNodeEnd("pivotCacheRecords");
 	return res;
 };
 function CT_pivotTableDefinition() {
@@ -2318,404 +2282,269 @@ CT_pivotTableDefinition.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_pivotTableDefinition.prototype.toXml = function() {
+CT_pivotTableDefinition.prototype.toXml = function(writer) {
 	var res = "";
-	res += "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
-	res +=
-		"<pivotTableDefinition xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"";
+	writer.WriteXmlString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
+	writer.WriteXmlNodeStart("pivotTableDefinition");
+	writer.WriteXmlString(
+		" xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"");
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.cacheId) {
-		res += " cacheId=\"";
-		res += this.cacheId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("cacheId", this.cacheId);
 	}
 	if (null !== this.dataOnRows) {
-		res += " dataOnRows=\"";
-		res += getXmlFromBool(this.dataOnRows);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dataOnRows", this.dataOnRows);
 	}
 	if (null !== this.dataPosition) {
-		res += " dataPosition=\"";
-		res += this.dataPosition.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("dataPosition", this.dataPosition);
 	}
 	if (null !== this.autoFormatId) {
-		res += " autoFormatId=\"";
-		res += this.autoFormatId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("autoFormatId", this.autoFormatId);
 	}
 	if (null !== this.applyNumberFormats) {
-		res += " applyNumberFormats=\"";
-		res += getXmlFromBool(this.applyNumberFormats);
-		res += "\"";
+		writer.WriteXmlAttributeBool("applyNumberFormats", this.applyNumberFormats);
 	}
 	if (null !== this.applyBorderFormats) {
-		res += " applyBorderFormats=\"";
-		res += getXmlFromBool(this.applyBorderFormats);
-		res += "\"";
+		writer.WriteXmlAttributeBool("applyBorderFormats", this.applyBorderFormats);
 	}
 	if (null !== this.applyFontFormats) {
-		res += " applyFontFormats=\"";
-		res += getXmlFromBool(this.applyFontFormats);
-		res += "\"";
+		writer.WriteXmlAttributeBool("applyFontFormats", this.applyFontFormats);
 	}
 	if (null !== this.applyPatternFormats) {
-		res += " applyPatternFormats=\"";
-		res += getXmlFromBool(this.applyPatternFormats);
-		res += "\"";
+		writer.WriteXmlAttributeBool("applyPatternFormats", this.applyPatternFormats);
 	}
 	if (null !== this.applyAlignmentFormats) {
-		res += " applyAlignmentFormats=\"";
-		res += getXmlFromBool(this.applyAlignmentFormats);
-		res += "\"";
+		writer.WriteXmlAttributeBool("applyAlignmentFormats", this.applyAlignmentFormats);
 	}
 	if (null !== this.applyWidthHeightFormats) {
-		res += " applyWidthHeightFormats=\"";
-		res += getXmlFromBool(this.applyWidthHeightFormats);
-		res += "\"";
+		writer.WriteXmlAttributeBool("applyWidthHeightFormats", this.applyWidthHeightFormats);
 	}
 	if (null !== this.dataCaption) {
-		res += " dataCaption=\"";
-		res += this.dataCaption;
-		res += "\"";
+		writer.WriteXmlAttributeString("dataCaption", this.dataCaption);
 	}
 	if (null !== this.grandTotalCaption) {
-		res += " grandTotalCaption=\"";
-		res += this.grandTotalCaption;
-		res += "\"";
+		writer.WriteXmlAttributeString("grandTotalCaption", this.grandTotalCaption);
 	}
 	if (null !== this.errorCaption) {
-		res += " errorCaption=\"";
-		res += this.errorCaption;
-		res += "\"";
+		writer.WriteXmlAttributeString("errorCaption", this.errorCaption);
 	}
 	if (null !== this.showError) {
-		res += " showError=\"";
-		res += getXmlFromBool(this.showError);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showError", this.showError);
 	}
 	if (null !== this.missingCaption) {
-		res += " missingCaption=\"";
-		res += this.missingCaption;
-		res += "\"";
+		writer.WriteXmlAttributeString("missingCaption", this.missingCaption);
 	}
 	if (null !== this.showMissing) {
-		res += " showMissing=\"";
-		res += getXmlFromBool(this.showMissing);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showMissing", this.showMissing);
 	}
 	if (null !== this.pageStyle) {
-		res += " pageStyle=\"";
-		res += this.pageStyle;
-		res += "\"";
+		writer.WriteXmlAttributeString("pageStyle", this.pageStyle);
 	}
 	if (null !== this.pivotTableStyle) {
-		res += " pivotTableStyle=\"";
-		res += this.pivotTableStyle;
-		res += "\"";
+		writer.WriteXmlAttributeString("pivotTableStyle", this.pivotTableStyle);
 	}
 	if (null !== this.vacatedStyle) {
-		res += " vacatedStyle=\"";
-		res += this.vacatedStyle;
-		res += "\"";
+		writer.WriteXmlAttributeString("vacatedStyle", this.vacatedStyle);
 	}
 	if (null !== this.tag) {
-		res += " tag=\"";
-		res += this.tag;
-		res += "\"";
+		writer.WriteXmlAttributeString("tag", this.tag);
 	}
 	if (null !== this.updatedVersion) {
-		res += " updatedVersion=\"";
-		res += this.updatedVersion.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("updatedVersion", this.updatedVersion);
 	}
 	if (null !== this.minRefreshableVersion) {
-		res += " minRefreshableVersion=\"";
-		res += this.minRefreshableVersion.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("minRefreshableVersion", this.minRefreshableVersion);
 	}
 	if (null !== this.asteriskTotals) {
-		res += " asteriskTotals=\"";
-		res += getXmlFromBool(this.asteriskTotals);
-		res += "\"";
+		writer.WriteXmlAttributeBool("asteriskTotals", this.asteriskTotals);
 	}
 	if (null !== this.showItems) {
-		res += " showItems=\"";
-		res += getXmlFromBool(this.showItems);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showItems", this.showItems);
 	}
 	if (null !== this.editData) {
-		res += " editData=\"";
-		res += getXmlFromBool(this.editData);
-		res += "\"";
+		writer.WriteXmlAttributeBool("editData", this.editData);
 	}
 	if (null !== this.disableFieldList) {
-		res += " disableFieldList=\"";
-		res += getXmlFromBool(this.disableFieldList);
-		res += "\"";
+		writer.WriteXmlAttributeBool("disableFieldList", this.disableFieldList);
 	}
 	if (null !== this.showCalcMbrs) {
-		res += " showCalcMbrs=\"";
-		res += getXmlFromBool(this.showCalcMbrs);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showCalcMbrs", this.showCalcMbrs);
 	}
 	if (null !== this.visualTotals) {
-		res += " visualTotals=\"";
-		res += getXmlFromBool(this.visualTotals);
-		res += "\"";
+		writer.WriteXmlAttributeBool("visualTotals", this.visualTotals);
 	}
 	if (null !== this.showMultipleLabel) {
-		res += " showMultipleLabel=\"";
-		res += getXmlFromBool(this.showMultipleLabel);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showMultipleLabel", this.showMultipleLabel);
 	}
 	if (null !== this.showDataDropDown) {
-		res += " showDataDropDown=\"";
-		res += getXmlFromBool(this.showDataDropDown);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showDataDropDown", this.showDataDropDown);
 	}
 	if (null !== this.showDrill) {
-		res += " showDrill=\"";
-		res += getXmlFromBool(this.showDrill);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showDrill", this.showDrill);
 	}
 	if (null !== this.printDrill) {
-		res += " printDrill=\"";
-		res += getXmlFromBool(this.printDrill);
-		res += "\"";
+		writer.WriteXmlAttributeBool("printDrill", this.printDrill);
 	}
 	if (null !== this.showMemberPropertyTips) {
-		res += " showMemberPropertyTips=\"";
-		res += getXmlFromBool(this.showMemberPropertyTips);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showMemberPropertyTips", this.showMemberPropertyTips);
 	}
 	if (null !== this.showDataTips) {
-		res += " showDataTips=\"";
-		res += getXmlFromBool(this.showDataTips);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showDataTips", this.showDataTips);
 	}
 	if (null !== this.enableWizard) {
-		res += " enableWizard=\"";
-		res += getXmlFromBool(this.enableWizard);
-		res += "\"";
+		writer.WriteXmlAttributeBool("enableWizard", this.enableWizard);
 	}
 	if (null !== this.enableDrill) {
-		res += " enableDrill=\"";
-		res += getXmlFromBool(this.enableDrill);
-		res += "\"";
+		writer.WriteXmlAttributeBool("enableDrill", this.enableDrill);
 	}
 	if (null !== this.enableFieldProperties) {
-		res += " enableFieldProperties=\"";
-		res += getXmlFromBool(this.enableFieldProperties);
-		res += "\"";
+		writer.WriteXmlAttributeBool("enableFieldProperties", this.enableFieldProperties);
 	}
 	if (null !== this.preserveFormatting) {
-		res += " preserveFormatting=\"";
-		res += getXmlFromBool(this.preserveFormatting);
-		res += "\"";
+		writer.WriteXmlAttributeBool("preserveFormatting", this.preserveFormatting);
 	}
 	if (null !== this.useAutoFormatting) {
-		res += " useAutoFormatting=\"";
-		res += getXmlFromBool(this.useAutoFormatting);
-		res += "\"";
+		writer.WriteXmlAttributeBool("useAutoFormatting", this.useAutoFormatting);
 	}
 	if (null !== this.pageWrap) {
-		res += " pageWrap=\"";
-		res += this.pageWrap.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("pageWrap", this.pageWrap);
 	}
 	if (null !== this.pageOverThenDown) {
-		res += " pageOverThenDown=\"";
-		res += getXmlFromBool(this.pageOverThenDown);
-		res += "\"";
+		writer.WriteXmlAttributeBool("pageOverThenDown", this.pageOverThenDown);
 	}
 	if (null !== this.subtotalHiddenItems) {
-		res += " subtotalHiddenItems=\"";
-		res += getXmlFromBool(this.subtotalHiddenItems);
-		res += "\"";
+		writer.WriteXmlAttributeBool("subtotalHiddenItems", this.subtotalHiddenItems);
 	}
 	if (null !== this.rowGrandTotals) {
-		res += " rowGrandTotals=\"";
-		res += getXmlFromBool(this.rowGrandTotals);
-		res += "\"";
+		writer.WriteXmlAttributeBool("rowGrandTotals", this.rowGrandTotals);
 	}
 	if (null !== this.colGrandTotals) {
-		res += " colGrandTotals=\"";
-		res += getXmlFromBool(this.colGrandTotals);
-		res += "\"";
+		writer.WriteXmlAttributeBool("colGrandTotals", this.colGrandTotals);
 	}
 	if (null !== this.fieldPrintTitles) {
-		res += " fieldPrintTitles=\"";
-		res += getXmlFromBool(this.fieldPrintTitles);
-		res += "\"";
+		writer.WriteXmlAttributeBool("fieldPrintTitles", this.fieldPrintTitles);
 	}
 	if (null !== this.itemPrintTitles) {
-		res += " itemPrintTitles=\"";
-		res += getXmlFromBool(this.itemPrintTitles);
-		res += "\"";
+		writer.WriteXmlAttributeBool("itemPrintTitles", this.itemPrintTitles);
 	}
 	if (null !== this.mergeItem) {
-		res += " mergeItem=\"";
-		res += getXmlFromBool(this.mergeItem);
-		res += "\"";
+		writer.WriteXmlAttributeBool("mergeItem", this.mergeItem);
 	}
 	if (null !== this.showDropZones) {
-		res += " showDropZones=\"";
-		res += getXmlFromBool(this.showDropZones);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showDropZones", this.showDropZones);
 	}
 	if (null !== this.createdVersion) {
-		res += " createdVersion=\"";
-		res += this.createdVersion.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("createdVersion", this.createdVersion);
 	}
 	if (null !== this.indent) {
-		res += " indent=\"";
-		res += this.indent.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("indent", this.indent);
 	}
 	if (null !== this.showEmptyRow) {
-		res += " showEmptyRow=\"";
-		res += getXmlFromBool(this.showEmptyRow);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showEmptyRow", this.showEmptyRow);
 	}
 	if (null !== this.showEmptyCol) {
-		res += " showEmptyCol=\"";
-		res += getXmlFromBool(this.showEmptyCol);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showEmptyCol", this.showEmptyCol);
 	}
 	if (null !== this.showHeaders) {
-		res += " showHeaders=\"";
-		res += getXmlFromBool(this.showHeaders);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showHeaders", this.showHeaders);
 	}
 	if (null !== this.compact) {
-		res += " compact=\"";
-		res += getXmlFromBool(this.compact);
-		res += "\"";
+		writer.WriteXmlAttributeBool("compact", this.compact);
 	}
 	if (null !== this.outline) {
-		res += " outline=\"";
-		res += getXmlFromBool(this.outline);
-		res += "\"";
+		writer.WriteXmlAttributeBool("outline", this.outline);
 	}
 	if (null !== this.outlineData) {
-		res += " outlineData=\"";
-		res += getXmlFromBool(this.outlineData);
-		res += "\"";
+		writer.WriteXmlAttributeBool("outlineData", this.outlineData);
 	}
 	if (null !== this.compactData) {
-		res += " compactData=\"";
-		res += getXmlFromBool(this.compactData);
-		res += "\"";
+		writer.WriteXmlAttributeBool("compactData", this.compactData);
 	}
 	if (null !== this.published) {
-		res += " published=\"";
-		res += getXmlFromBool(this.published);
-		res += "\"";
+		writer.WriteXmlAttributeBool("published", this.published);
 	}
 	if (null !== this.gridDropZones) {
-		res += " gridDropZones=\"";
-		res += getXmlFromBool(this.gridDropZones);
-		res += "\"";
+		writer.WriteXmlAttributeBool("gridDropZones", this.gridDropZones);
 	}
 	if (null !== this.immersive) {
-		res += " immersive=\"";
-		res += getXmlFromBool(this.immersive);
-		res += "\"";
+		writer.WriteXmlAttributeBool("immersive", this.immersive);
 	}
 	if (null !== this.multipleFieldFilters) {
-		res += " multipleFieldFilters=\"";
-		res += getXmlFromBool(this.multipleFieldFilters);
-		res += "\"";
+		writer.WriteXmlAttributeBool("multipleFieldFilters", this.multipleFieldFilters);
 	}
 	if (null !== this.chartFormat) {
-		res += " chartFormat=\"";
-		res += this.chartFormat.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("chartFormat", this.chartFormat);
 	}
 	if (null !== this.rowHeaderCaption) {
-		res += " rowHeaderCaption=\"";
-		res += this.rowHeaderCaption;
-		res += "\"";
+		writer.WriteXmlAttributeString("rowHeaderCaption", this.rowHeaderCaption);
 	}
 	if (null !== this.colHeaderCaption) {
-		res += " colHeaderCaption=\"";
-		res += this.colHeaderCaption;
-		res += "\"";
+		writer.WriteXmlAttributeString("colHeaderCaption", this.colHeaderCaption);
 	}
 	if (null !== this.fieldListSortAscending) {
-		res += " fieldListSortAscending=\"";
-		res += getXmlFromBool(this.fieldListSortAscending);
-		res += "\"";
+		writer.WriteXmlAttributeBool("fieldListSortAscending", this.fieldListSortAscending);
 	}
 	if (null !== this.mdxSubqueries) {
-		res += " mdxSubqueries=\"";
-		res += getXmlFromBool(this.mdxSubqueries);
-		res += "\"";
+		writer.WriteXmlAttributeBool("mdxSubqueries", this.mdxSubqueries);
 	}
 	if (null !== this.customListSort) {
-		res += " customListSort=\"";
-		res += getXmlFromBool(this.customListSort);
-		res += "\"";
+		writer.WriteXmlAttributeBool("customListSort", this.customListSort);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd("pivotTableDefinition", true);
 	if (null !== this.location) {
-		res += this.location.toXml("location");
+		res += this.location.toXml(writer, "location");
 	}
 	if (null !== this.pivotFields) {
-		res += this.pivotFields.toXml("pivotFields");
+		res += this.pivotFields.toXml(writer, "pivotFields");
 	}
 	if (null !== this.rowFields) {
-		res += this.rowFields.toXml("rowFields");
+		res += this.rowFields.toXml(writer, "rowFields");
 	}
 	if (null !== this.rowItems) {
-		res += this.rowItems.toXml("rowItems");
+		res += this.rowItems.toXml(writer, "rowItems");
 	}
 	if (null !== this.colFields) {
-		res += this.colFields.toXml("colFields");
+		res += this.colFields.toXml(writer, "colFields");
 	}
 	if (null !== this.colItems) {
-		res += this.colItems.toXml("colItems");
+		res += this.colItems.toXml(writer, "colItems");
 	}
 	if (null !== this.pageFields) {
-		res += this.pageFields.toXml("pageFields");
+		res += this.pageFields.toXml(writer, "pageFields");
 	}
 	if (null !== this.dataFields) {
-		res += this.dataFields.toXml("dataFields");
+		res += this.dataFields.toXml(writer, "dataFields");
 	}
 	if (null !== this.formats) {
-		res += this.formats.toXml("formats");
+		res += this.formats.toXml(writer, "formats");
 	}
 	if (null !== this.conditionalFormats) {
-		res += this.conditionalFormats.toXml("conditionalFormats");
+		res += this.conditionalFormats.toXml(writer, "conditionalFormats");
 	}
 	if (null !== this.chartFormats) {
-		res += this.chartFormats.toXml("chartFormats");
+		res += this.chartFormats.toXml(writer, "chartFormats");
 	}
 	if (null !== this.pivotHierarchies) {
-		res += this.pivotHierarchies.toXml("pivotHierarchies");
+		res += this.pivotHierarchies.toXml(writer, "pivotHierarchies");
 	}
 	if (null !== this.pivotTableStyleInfo) {
-		res += this.pivotTableStyleInfo.toXml("pivotTableStyleInfo");
+		res += this.pivotTableStyleInfo.toXml(writer, "pivotTableStyleInfo");
 	}
 	if (null !== this.filters) {
-		res += this.filters.toXml("filters");
+		res += this.filters.toXml(writer, "filters");
 	}
 	if (null !== this.rowHierarchiesUsage) {
-		res += this.rowHierarchiesUsage.toXml("rowHierarchiesUsage");
+		res += this.rowHierarchiesUsage.toXml(writer, "rowHierarchiesUsage");
 	}
 	if (null !== this.colHierarchiesUsage) {
-		res += this.colHierarchiesUsage.toXml("colHierarchiesUsage");
+		res += this.colHierarchiesUsage.toXml(writer, "colHierarchiesUsage");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</pivotTableDefinition>";
+	writer.WriteXmlNodeEnd("pivotTableDefinition");
 	return res;
 };
 function CT_CacheSource() {
@@ -2769,33 +2598,26 @@ CT_CacheSource.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CacheSource.prototype.toXml = function(name) {
+CT_CacheSource.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.type) {
-		res += " type=\"";
-		res += ToXml_ST_SourceType(this.type);
-		res += "\"";
+		writer.WriteXmlAttributeString("type", ToXml_ST_SourceType(this.type));
 	}
 	if (null !== this.connectionId) {
-		res += " connectionId=\"";
-		res += this.connectionId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("connectionId", this.connectionId);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.consolidation) {
-		res += this.consolidation.toXml("consolidation");
+		res += this.consolidation.toXml(writer, "consolidation");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
 	if (null !== this.worksheetSource) {
-		res += this.worksheetSource.toXml("worksheetSource");
+		res += this.worksheetSource.toXml(writer, "worksheetSource");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_CacheFields() {
@@ -2827,23 +2649,18 @@ CT_CacheFields.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CacheFields.prototype.toXml = function(name) {
+CT_CacheFields.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.cacheField.length; ++i) {
 		var elem = this.cacheField[i];
-		res += elem.toXml("cacheField");
+		res += elem.toXml(writer, "cacheField");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_CacheHierarchies() {
@@ -2875,23 +2692,18 @@ CT_CacheHierarchies.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CacheHierarchies.prototype.toXml = function(name) {
+CT_CacheHierarchies.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.cacheHierarchy.length; ++i) {
 		var elem = this.cacheHierarchy[i];
-		res += elem.toXml("cacheHierarchy");
+		res += elem.toXml(writer, "cacheHierarchy");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PCDKPIs() {
@@ -2923,23 +2735,18 @@ CT_PCDKPIs.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PCDKPIs.prototype.toXml = function(name) {
+CT_PCDKPIs.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.kpi.length; ++i) {
 		var elem = this.kpi[i];
-		res += elem.toXml("kpi");
+		res += elem.toXml(writer, "kpi");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_TupleCache() {
@@ -2987,29 +2794,26 @@ CT_TupleCache.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_TupleCache.prototype.toXml = function(name) {
+CT_TupleCache.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeStart(name);
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.entries) {
-		res += this.entries.toXml("entries");
+		res += this.entries.toXml(writer, "entries");
 	}
 	if (null !== this.sets) {
-		res += this.sets.toXml("sets");
+		res += this.sets.toXml(writer, "sets");
 	}
 	if (null !== this.queryCache) {
-		res += this.queryCache.toXml("queryCache");
+		res += this.queryCache.toXml(writer, "queryCache");
 	}
 	if (null !== this.serverFormats) {
-		res += this.serverFormats.toXml("serverFormats");
+		res += this.serverFormats.toXml(writer, "serverFormats");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_CalculatedItems() {
@@ -3041,23 +2845,18 @@ CT_CalculatedItems.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CalculatedItems.prototype.toXml = function(name) {
+CT_CalculatedItems.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.calculatedItem.length; ++i) {
 		var elem = this.calculatedItem[i];
-		res += elem.toXml("calculatedItem");
+		res += elem.toXml(writer, "calculatedItem");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_CalculatedMembers() {
@@ -3089,23 +2888,18 @@ CT_CalculatedMembers.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CalculatedMembers.prototype.toXml = function(name) {
+CT_CalculatedMembers.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.calculatedMember.length; ++i) {
 		var elem = this.calculatedMember[i];
-		res += elem.toXml("calculatedMember");
+		res += elem.toXml(writer, "calculatedMember");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Dimensions() {
@@ -3137,23 +2931,18 @@ CT_Dimensions.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Dimensions.prototype.toXml = function(name) {
+CT_Dimensions.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.dimension.length; ++i) {
 		var elem = this.dimension[i];
-		res += elem.toXml("dimension");
+		res += elem.toXml(writer, "dimension");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_MeasureGroups() {
@@ -3185,23 +2974,18 @@ CT_MeasureGroups.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_MeasureGroups.prototype.toXml = function(name) {
+CT_MeasureGroups.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.measureGroup.length; ++i) {
 		var elem = this.measureGroup[i];
-		res += elem.toXml("measureGroup");
+		res += elem.toXml(writer, "measureGroup");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_MeasureDimensionMaps() {
@@ -3233,23 +3017,18 @@ CT_MeasureDimensionMaps.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_MeasureDimensionMaps.prototype.toXml = function(name) {
+CT_MeasureDimensionMaps.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.map.length; ++i) {
 		var elem = this.map[i];
-		res += elem.toXml("map");
+		res += elem.toXml(writer, "map");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ExtensionList() {
@@ -3269,18 +3048,15 @@ CT_ExtensionList.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_ExtensionList.prototype.toXml = function(name) {
+CT_ExtensionList.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeStart(name);
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.ext.length; ++i) {
 		var elem = this.ext[i];
-		res += elem.toXml("ext");
+		res += elem.toXml(writer, "ext");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Boolean() {
@@ -3332,43 +3108,30 @@ CT_Boolean.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Boolean.prototype.toXml = function(name) {
+CT_Boolean.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.v) {
-		res += " v=\"";
-		res += getXmlFromBool(this.v);
-		res += "\"";
+		writer.WriteXmlAttributeBool("v", this.v);
 	}
 	if (null !== this.u) {
-		res += " u=\"";
-		res += getXmlFromBool(this.u);
-		res += "\"";
+		writer.WriteXmlAttributeBool("u", this.u);
 	}
 	if (null !== this.f) {
-		res += " f=\"";
-		res += getXmlFromBool(this.f);
-		res += "\"";
+		writer.WriteXmlAttributeBool("f", this.f);
 	}
 	if (null !== this.c) {
-		res += " c=\"";
-		res += this.c;
-		res += "\"";
+		writer.WriteXmlAttributeString("c", this.c);
 	}
 	if (null !== this.cp) {
-		res += " cp=\"";
-		res += this.cp.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("cp", this.cp);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.x.length; ++i) {
 		var elem = this.x[i];
-		res += elem.toXml("x");
+		res += elem.toXml(writer, "x");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_DateTime() {
@@ -3420,43 +3183,30 @@ CT_DateTime.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_DateTime.prototype.toXml = function(name) {
+CT_DateTime.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.v) {
-		res += " v=\"";
-		res += this.v;
-		res += "\"";
+		writer.WriteXmlAttributeString("v", this.v);
 	}
 	if (null !== this.u) {
-		res += " u=\"";
-		res += getXmlFromBool(this.u);
-		res += "\"";
+		writer.WriteXmlAttributeBool("u", this.u);
 	}
 	if (null !== this.f) {
-		res += " f=\"";
-		res += getXmlFromBool(this.f);
-		res += "\"";
+		writer.WriteXmlAttributeBool("f", this.f);
 	}
 	if (null !== this.c) {
-		res += " c=\"";
-		res += this.c;
-		res += "\"";
+		writer.WriteXmlAttributeString("c", this.c);
 	}
 	if (null !== this.cp) {
-		res += " cp=\"";
-		res += this.cp.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("cp", this.cp);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.x.length; ++i) {
 		var elem = this.x[i];
-		res += elem.toXml("x");
+		res += elem.toXml(writer, "x");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Error() {
@@ -3550,81 +3300,54 @@ CT_Error.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Error.prototype.toXml = function(name) {
+CT_Error.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.v) {
-		res += " v=\"";
-		res += this.v;
-		res += "\"";
+		writer.WriteXmlAttributeString("v", this.v);
 	}
 	if (null !== this.u) {
-		res += " u=\"";
-		res += getXmlFromBool(this.u);
-		res += "\"";
+		writer.WriteXmlAttributeBool("u", this.u);
 	}
 	if (null !== this.f) {
-		res += " f=\"";
-		res += getXmlFromBool(this.f);
-		res += "\"";
+		writer.WriteXmlAttributeBool("f", this.f);
 	}
 	if (null !== this.c) {
-		res += " c=\"";
-		res += this.c;
-		res += "\"";
+		writer.WriteXmlAttributeString("c", this.c);
 	}
 	if (null !== this.cp) {
-		res += " cp=\"";
-		res += this.cp.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("cp", this.cp);
 	}
 	if (null !== this.in) {
-		res += " in=\"";
-		res += this.in.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("in", this.in);
 	}
 	if (null !== this.bc) {
-		res += " bc=\"";
-		res += this.bc.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("bc", this.bc);
 	}
 	if (null !== this.fc) {
-		res += " fc=\"";
-		res += this.fc.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("fc", this.fc);
 	}
 	if (null !== this.i) {
-		res += " i=\"";
-		res += getXmlFromBool(this.i);
-		res += "\"";
+		writer.WriteXmlAttributeBool("i", this.i);
 	}
 	if (null !== this.un) {
-		res += " un=\"";
-		res += getXmlFromBool(this.un);
-		res += "\"";
+		writer.WriteXmlAttributeBool("un", this.un);
 	}
 	if (null !== this.st) {
-		res += " st=\"";
-		res += getXmlFromBool(this.st);
-		res += "\"";
+		writer.WriteXmlAttributeBool("st", this.st);
 	}
 	if (null !== this.b) {
-		res += " b=\"";
-		res += getXmlFromBool(this.b);
-		res += "\"";
+		writer.WriteXmlAttributeBool("b", this.b);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.tpls) {
-		res += this.tpls.toXml("tpls");
+		res += this.tpls.toXml(writer, "tpls");
 	}
 	for (var i = 0; i < this.x.length; ++i) {
 		var elem = this.x[i];
-		res += elem.toXml("x");
+		res += elem.toXml(writer, "x");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Missing() {
@@ -3713,77 +3436,52 @@ CT_Missing.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Missing.prototype.toXml = function(name) {
+CT_Missing.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.u) {
-		res += " u=\"";
-		res += getXmlFromBool(this.u);
-		res += "\"";
+		writer.WriteXmlAttributeBool("u", this.u);
 	}
 	if (null !== this.f) {
-		res += " f=\"";
-		res += getXmlFromBool(this.f);
-		res += "\"";
+		writer.WriteXmlAttributeBool("f", this.f);
 	}
 	if (null !== this.c) {
-		res += " c=\"";
-		res += this.c;
-		res += "\"";
+		writer.WriteXmlAttributeString("c", this.c);
 	}
 	if (null !== this.cp) {
-		res += " cp=\"";
-		res += this.cp.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("cp", this.cp);
 	}
 	if (null !== this.in) {
-		res += " in=\"";
-		res += this.in.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("in", this.in);
 	}
 	if (null !== this.bc) {
-		res += " bc=\"";
-		res += this.bc.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("bc", this.bc);
 	}
 	if (null !== this.fc) {
-		res += " fc=\"";
-		res += this.fc.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("fc", this.fc);
 	}
 	if (null !== this.i) {
-		res += " i=\"";
-		res += getXmlFromBool(this.i);
-		res += "\"";
+		writer.WriteXmlAttributeBool("i", this.i);
 	}
 	if (null !== this.un) {
-		res += " un=\"";
-		res += getXmlFromBool(this.un);
-		res += "\"";
+		writer.WriteXmlAttributeBool("un", this.un);
 	}
 	if (null !== this.st) {
-		res += " st=\"";
-		res += getXmlFromBool(this.st);
-		res += "\"";
+		writer.WriteXmlAttributeBool("st", this.st);
 	}
 	if (null !== this.b) {
-		res += " b=\"";
-		res += getXmlFromBool(this.b);
-		res += "\"";
+		writer.WriteXmlAttributeBool("b", this.b);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.tpls.length; ++i) {
 		var elem = this.tpls[i];
-		res += elem.toXml("tpls");
+		res += elem.toXml(writer, "tpls");
 	}
 	for (var i = 0; i < this.x.length; ++i) {
 		var elem = this.x[i];
-		res += elem.toXml("x");
+		res += elem.toXml(writer, "x");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Number() {
@@ -3877,82 +3575,55 @@ CT_Number.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Number.prototype.toXml = function(name) {
+CT_Number.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.v) {
-		res += " v=\"";
-		res += this.v.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("v", this.v);
 	}
 	if (null !== this.u) {
-		res += " u=\"";
-		res += getXmlFromBool(this.u);
-		res += "\"";
+		writer.WriteXmlAttributeBool("u", this.u);
 	}
 	if (null !== this.f) {
-		res += " f=\"";
-		res += getXmlFromBool(this.f);
-		res += "\"";
+		writer.WriteXmlAttributeBool("f", this.f);
 	}
 	if (null !== this.c) {
-		res += " c=\"";
-		res += this.c;
-		res += "\"";
+		writer.WriteXmlAttributeString("c", this.c);
 	}
 	if (null !== this.cp) {
-		res += " cp=\"";
-		res += this.cp.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("cp", this.cp);
 	}
 	if (null !== this.in) {
-		res += " in=\"";
-		res += this.in.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("in", this.in);
 	}
 	if (null !== this.bc) {
-		res += " bc=\"";
-		res += this.bc.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("bc", this.bc);
 	}
 	if (null !== this.fc) {
-		res += " fc=\"";
-		res += this.fc.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("fc", this.fc);
 	}
 	if (null !== this.i) {
-		res += " i=\"";
-		res += getXmlFromBool(this.i);
-		res += "\"";
+		writer.WriteXmlAttributeBool("i", this.i);
 	}
 	if (null !== this.un) {
-		res += " un=\"";
-		res += getXmlFromBool(this.un);
-		res += "\"";
+		writer.WriteXmlAttributeBool("un", this.un);
 	}
 	if (null !== this.st) {
-		res += " st=\"";
-		res += getXmlFromBool(this.st);
-		res += "\"";
+		writer.WriteXmlAttributeBool("st", this.st);
 	}
 	if (null !== this.b) {
-		res += " b=\"";
-		res += getXmlFromBool(this.b);
-		res += "\"";
+		writer.WriteXmlAttributeBool("b", this.b);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.tpls.length; ++i) {
 		var elem = this.tpls[i];
-		res += elem.toXml("tpls");
+		res += elem.toXml(writer, "tpls");
 	}
 	for (var i = 0; i < this.x.length; ++i) {
 		var elem = this.x[i];
-		res += elem.toXml("x");
+		res += elem.toXml(writer, "x");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_String() {
@@ -4046,82 +3717,55 @@ CT_String.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_String.prototype.toXml = function(name) {
+CT_String.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.v) {
-		res += " v=\"";
-		res += this.v;
-		res += "\"";
+		writer.WriteXmlAttributeString("v", this.v);
 	}
 	if (null !== this.u) {
-		res += " u=\"";
-		res += getXmlFromBool(this.u);
-		res += "\"";
+		writer.WriteXmlAttributeBool("u", this.u);
 	}
 	if (null !== this.f) {
-		res += " f=\"";
-		res += getXmlFromBool(this.f);
-		res += "\"";
+		writer.WriteXmlAttributeBool("f", this.f);
 	}
 	if (null !== this.c) {
-		res += " c=\"";
-		res += this.c;
-		res += "\"";
+		writer.WriteXmlAttributeString("c", this.c);
 	}
 	if (null !== this.cp) {
-		res += " cp=\"";
-		res += this.cp.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("cp", this.cp);
 	}
 	if (null !== this.in) {
-		res += " in=\"";
-		res += this.in.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("in", this.in);
 	}
 	if (null !== this.bc) {
-		res += " bc=\"";
-		res += this.bc.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("bc", this.bc);
 	}
 	if (null !== this.fc) {
-		res += " fc=\"";
-		res += this.fc.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("fc", this.fc);
 	}
 	if (null !== this.i) {
-		res += " i=\"";
-		res += getXmlFromBool(this.i);
-		res += "\"";
+		writer.WriteXmlAttributeBool("i", this.i);
 	}
 	if (null !== this.un) {
-		res += " un=\"";
-		res += getXmlFromBool(this.un);
-		res += "\"";
+		writer.WriteXmlAttributeBool("un", this.un);
 	}
 	if (null !== this.st) {
-		res += " st=\"";
-		res += getXmlFromBool(this.st);
-		res += "\"";
+		writer.WriteXmlAttributeBool("st", this.st);
 	}
 	if (null !== this.b) {
-		res += " b=\"";
-		res += getXmlFromBool(this.b);
-		res += "\"";
+		writer.WriteXmlAttributeBool("b", this.b);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.tpls.length; ++i) {
 		var elem = this.tpls[i];
-		res += elem.toXml("tpls");
+		res += elem.toXml(writer, "tpls");
 	}
 	for (var i = 0; i < this.x.length; ++i) {
 		var elem = this.x[i];
-		res += elem.toXml("x");
+		res += elem.toXml(writer, "x");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Index() {
@@ -4138,16 +3782,13 @@ CT_Index.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_Index.prototype.toXml = function(name) {
+CT_Index.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.v) {
-		res += " v=\"";
-		res += this.v.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("v", this.v);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Location() {
@@ -4189,41 +3830,28 @@ CT_Location.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_Location.prototype.toXml = function(name) {
+CT_Location.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.ref) {
-		res += " ref=\"";
-		res += this.ref;
-		res += "\"";
+		writer.WriteXmlAttributeString("ref", this.ref);
 	}
 	if (null !== this.firstHeaderRow) {
-		res += " firstHeaderRow=\"";
-		res += this.firstHeaderRow.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("firstHeaderRow", this.firstHeaderRow);
 	}
 	if (null !== this.firstDataRow) {
-		res += " firstDataRow=\"";
-		res += this.firstDataRow.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("firstDataRow", this.firstDataRow);
 	}
 	if (null !== this.firstDataCol) {
-		res += " firstDataCol=\"";
-		res += this.firstDataCol.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("firstDataCol", this.firstDataCol);
 	}
 	if (null !== this.rowPageCount) {
-		res += " rowPageCount=\"";
-		res += this.rowPageCount.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("rowPageCount", this.rowPageCount);
 	}
 	if (null !== this.colPageCount) {
-		res += " colPageCount=\"";
-		res += this.colPageCount.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("colPageCount", this.colPageCount);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_PivotFields() {
@@ -4255,23 +3883,18 @@ CT_PivotFields.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotFields.prototype.toXml = function(name) {
+CT_PivotFields.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.pivotField.length; ++i) {
 		var elem = this.pivotField[i];
-		res += elem.toXml("pivotField");
+		res += elem.toXml(writer, "pivotField");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_RowFields() {
@@ -4303,23 +3926,18 @@ CT_RowFields.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_RowFields.prototype.toXml = function(name) {
+CT_RowFields.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.field.length; ++i) {
 		var elem = this.field[i];
-		res += elem.toXml("field");
+		res += elem.toXml(writer, "field");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_rowItems() {
@@ -4351,23 +3969,18 @@ CT_rowItems.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_rowItems.prototype.toXml = function(name) {
+CT_rowItems.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.i.length; ++i) {
 		var elem = this.i[i];
-		res += elem.toXml("i");
+		res += elem.toXml(writer, "i");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ColFields() {
@@ -4399,23 +4012,18 @@ CT_ColFields.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_ColFields.prototype.toXml = function(name) {
+CT_ColFields.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.field.length; ++i) {
 		var elem = this.field[i];
-		res += elem.toXml("field");
+		res += elem.toXml(writer, "field");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_colItems() {
@@ -4447,23 +4055,18 @@ CT_colItems.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_colItems.prototype.toXml = function(name) {
+CT_colItems.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.i.length; ++i) {
 		var elem = this.i[i];
-		res += elem.toXml("i");
+		res += elem.toXml(writer, "i");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PageFields() {
@@ -4495,23 +4098,18 @@ CT_PageFields.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PageFields.prototype.toXml = function(name) {
+CT_PageFields.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.pageField.length; ++i) {
 		var elem = this.pageField[i];
-		res += elem.toXml("pageField");
+		res += elem.toXml(writer, "pageField");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_DataFields() {
@@ -4543,23 +4141,18 @@ CT_DataFields.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_DataFields.prototype.toXml = function(name) {
+CT_DataFields.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.dataField.length; ++i) {
 		var elem = this.dataField[i];
-		res += elem.toXml("dataField");
+		res += elem.toXml(writer, "dataField");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Formats() {
@@ -4591,23 +4184,18 @@ CT_Formats.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Formats.prototype.toXml = function(name) {
+CT_Formats.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.format.length; ++i) {
 		var elem = this.format[i];
-		res += elem.toXml("format");
+		res += elem.toXml(writer, "format");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ConditionalFormats() {
@@ -4639,23 +4227,18 @@ CT_ConditionalFormats.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_ConditionalFormats.prototype.toXml = function(name) {
+CT_ConditionalFormats.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.conditionalFormat.length; ++i) {
 		var elem = this.conditionalFormat[i];
-		res += elem.toXml("conditionalFormat");
+		res += elem.toXml(writer, "conditionalFormat");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ChartFormats() {
@@ -4687,23 +4270,18 @@ CT_ChartFormats.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_ChartFormats.prototype.toXml = function(name) {
+CT_ChartFormats.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.chartFormat.length; ++i) {
 		var elem = this.chartFormat[i];
-		res += elem.toXml("chartFormat");
+		res += elem.toXml(writer, "chartFormat");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PivotHierarchies() {
@@ -4735,23 +4313,18 @@ CT_PivotHierarchies.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotHierarchies.prototype.toXml = function(name) {
+CT_PivotHierarchies.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.pivotHierarchy.length; ++i) {
 		var elem = this.pivotHierarchy[i];
-		res += elem.toXml("pivotHierarchy");
+		res += elem.toXml(writer, "pivotHierarchy");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PivotTableStyle() {
@@ -4793,41 +4366,28 @@ CT_PivotTableStyle.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_PivotTableStyle.prototype.toXml = function(name) {
+CT_PivotTableStyle.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.showRowHeaders) {
-		res += " showRowHeaders=\"";
-		res += getXmlFromBool(this.showRowHeaders);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showRowHeaders", this.showRowHeaders);
 	}
 	if (null !== this.showColHeaders) {
-		res += " showColHeaders=\"";
-		res += getXmlFromBool(this.showColHeaders);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showColHeaders", this.showColHeaders);
 	}
 	if (null !== this.showRowStripes) {
-		res += " showRowStripes=\"";
-		res += getXmlFromBool(this.showRowStripes);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showRowStripes", this.showRowStripes);
 	}
 	if (null !== this.showColStripes) {
-		res += " showColStripes=\"";
-		res += getXmlFromBool(this.showColStripes);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showColStripes", this.showColStripes);
 	}
 	if (null !== this.showLastColumn) {
-		res += " showLastColumn=\"";
-		res += getXmlFromBool(this.showLastColumn);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showLastColumn", this.showLastColumn);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_PivotFilters() {
@@ -4859,23 +4419,18 @@ CT_PivotFilters.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotFilters.prototype.toXml = function(name) {
+CT_PivotFilters.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.filter.length; ++i) {
 		var elem = this.filter[i];
-		res += elem.toXml("filter");
+		res += elem.toXml(writer, "filter");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_RowHierarchiesUsage() {
@@ -4907,23 +4462,18 @@ CT_RowHierarchiesUsage.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_RowHierarchiesUsage.prototype.toXml = function(name) {
+CT_RowHierarchiesUsage.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.rowHierarchyUsage.length; ++i) {
 		var elem = this.rowHierarchyUsage[i];
-		res += elem.toXml("rowHierarchyUsage");
+		res += elem.toXml(writer, "rowHierarchyUsage");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ColHierarchiesUsage() {
@@ -4955,23 +4505,18 @@ CT_ColHierarchiesUsage.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_ColHierarchiesUsage.prototype.toXml = function(name) {
+CT_ColHierarchiesUsage.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.colHierarchyUsage.length; ++i) {
 		var elem = this.colHierarchyUsage[i];
-		res += elem.toXml("colHierarchyUsage");
+		res += elem.toXml(writer, "colHierarchyUsage");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Consolidation() {
@@ -5010,25 +4555,20 @@ CT_Consolidation.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Consolidation.prototype.toXml = function(name) {
+CT_Consolidation.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.autoPage) {
-		res += " autoPage=\"";
-		res += getXmlFromBool(this.autoPage);
-		res += "\"";
+		writer.WriteXmlAttributeBool("autoPage", this.autoPage);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.pages) {
-		res += this.pages.toXml("pages");
+		res += this.pages.toXml(writer, "pages");
 	}
 	if (null !== this.rangeSets) {
-		res += this.rangeSets.toXml("rangeSets");
+		res += this.rangeSets.toXml(writer, "rangeSets");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_WorksheetSource() {
@@ -5060,31 +4600,22 @@ CT_WorksheetSource.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_WorksheetSource.prototype.toXml = function(name) {
+CT_WorksheetSource.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.ref) {
-		res += " ref=\"";
-		res += this.ref;
-		res += "\"";
+		writer.WriteXmlAttributeString("ref", this.ref);
 	}
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.sheet) {
-		res += " sheet=\"";
-		res += this.sheet;
-		res += "\"";
+		writer.WriteXmlAttributeString("sheet", this.sheet);
 	}
 	if (null !== this.id) {
-		res += " r:id=\"";
-		res += this.id;
-		res += "\"";
+		writer.WriteXmlAttributeString("r:id", this.id);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_CacheField() {
@@ -5197,92 +4728,63 @@ CT_CacheField.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CacheField.prototype.toXml = function(name) {
+CT_CacheField.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.caption) {
-		res += " caption=\"";
-		res += this.caption;
-		res += "\"";
+		writer.WriteXmlAttributeString("caption", this.caption);
 	}
 	if (null !== this.propertyName) {
-		res += " propertyName=\"";
-		res += this.propertyName;
-		res += "\"";
+		writer.WriteXmlAttributeString("propertyName", this.propertyName);
 	}
 	if (null !== this.serverField) {
-		res += " serverField=\"";
-		res += getXmlFromBool(this.serverField);
-		res += "\"";
+		writer.WriteXmlAttributeBool("serverField", this.serverField);
 	}
 	if (null !== this.uniqueList) {
-		res += " uniqueList=\"";
-		res += getXmlFromBool(this.uniqueList);
-		res += "\"";
+		writer.WriteXmlAttributeBool("uniqueList", this.uniqueList);
 	}
 	if (null !== this.numFmtId) {
-		res += " numFmtId=\"";
-		res += this.numFmtId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("numFmtId", this.numFmtId);
 	}
 	if (null !== this.formula) {
-		res += " formula=\"";
-		res += this.formula;
-		res += "\"";
+		writer.WriteXmlAttributeString("formula", this.formula);
 	}
 	if (null !== this.sqlType) {
-		res += " sqlType=\"";
-		res += this.sqlType.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("sqlType", this.sqlType);
 	}
 	if (null !== this.hierarchy) {
-		res += " hierarchy=\"";
-		res += this.hierarchy.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("hierarchy", this.hierarchy);
 	}
 	if (null !== this.level) {
-		res += " level=\"";
-		res += this.level.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("level", this.level);
 	}
 	if (null !== this.databaseField) {
-		res += " databaseField=\"";
-		res += getXmlFromBool(this.databaseField);
-		res += "\"";
+		writer.WriteXmlAttributeBool("databaseField", this.databaseField);
 	}
 	if (null !== this.mappingCount) {
-		res += " mappingCount=\"";
-		res += this.mappingCount.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("mappingCount", this.mappingCount);
 	}
 	if (null !== this.memberPropertyField) {
-		res += " memberPropertyField=\"";
-		res += getXmlFromBool(this.memberPropertyField);
-		res += "\"";
+		writer.WriteXmlAttributeBool("memberPropertyField", this.memberPropertyField);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.sharedItems) {
-		res += this.sharedItems.toXml("sharedItems");
+		res += this.sharedItems.toXml(writer, "sharedItems");
 	}
 	if (null !== this.fieldGroup) {
-		res += this.fieldGroup.toXml("fieldGroup");
+		res += this.fieldGroup.toXml(writer, "fieldGroup");
 	}
 	for (var i = 0; i < this.mpMap.length; ++i) {
 		var elem = this.mpMap[i];
-		res += elem.toXml("mpMap");
+		res += elem.toXml(writer, "mpMap");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_CacheHierarchy() {
@@ -5433,133 +4935,86 @@ CT_CacheHierarchy.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CacheHierarchy.prototype.toXml = function(name) {
+CT_CacheHierarchy.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.uniqueName) {
-		res += " uniqueName=\"";
-		res += this.uniqueName;
-		res += "\"";
+		writer.WriteXmlAttributeString("uniqueName", this.uniqueName);
 	}
 	if (null !== this.caption) {
-		res += " caption=\"";
-		res += this.caption;
-		res += "\"";
+		writer.WriteXmlAttributeString("caption", this.caption);
 	}
 	if (null !== this.measure) {
-		res += " measure=\"";
-		res += getXmlFromBool(this.measure);
-		res += "\"";
+		writer.WriteXmlAttributeBool("measure", this.measure);
 	}
 	if (null !== this.set) {
-		res += " set=\"";
-		res += getXmlFromBool(this.set);
-		res += "\"";
+		writer.WriteXmlAttributeBool("set", this.set);
 	}
 	if (null !== this.parentSet) {
-		res += " parentSet=\"";
-		res += this.parentSet.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("parentSet", this.parentSet);
 	}
 	if (null !== this.iconSet) {
-		res += " iconSet=\"";
-		res += this.iconSet.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("iconSet", this.iconSet);
 	}
 	if (null !== this.attribute) {
-		res += " attribute=\"";
-		res += getXmlFromBool(this.attribute);
-		res += "\"";
+		writer.WriteXmlAttributeBool("attribute", this.attribute);
 	}
 	if (null !== this.time) {
-		res += " time=\"";
-		res += getXmlFromBool(this.time);
-		res += "\"";
+		writer.WriteXmlAttributeBool("time", this.time);
 	}
 	if (null !== this.keyAttribute) {
-		res += " keyAttribute=\"";
-		res += getXmlFromBool(this.keyAttribute);
-		res += "\"";
+		writer.WriteXmlAttributeBool("keyAttribute", this.keyAttribute);
 	}
 	if (null !== this.defaultMemberUniqueName) {
-		res += " defaultMemberUniqueName=\"";
-		res += this.defaultMemberUniqueName;
-		res += "\"";
+		writer.WriteXmlAttributeString("defaultMemberUniqueName", this.defaultMemberUniqueName);
 	}
 	if (null !== this.allUniqueName) {
-		res += " allUniqueName=\"";
-		res += this.allUniqueName;
-		res += "\"";
+		writer.WriteXmlAttributeString("allUniqueName", this.allUniqueName);
 	}
 	if (null !== this.allCaption) {
-		res += " allCaption=\"";
-		res += this.allCaption;
-		res += "\"";
+		writer.WriteXmlAttributeString("allCaption", this.allCaption);
 	}
 	if (null !== this.dimensionUniqueName) {
-		res += " dimensionUniqueName=\"";
-		res += this.dimensionUniqueName;
-		res += "\"";
+		writer.WriteXmlAttributeString("dimensionUniqueName", this.dimensionUniqueName);
 	}
 	if (null !== this.displayFolder) {
-		res += " displayFolder=\"";
-		res += this.displayFolder;
-		res += "\"";
+		writer.WriteXmlAttributeString("displayFolder", this.displayFolder);
 	}
 	if (null !== this.measureGroup) {
-		res += " measureGroup=\"";
-		res += this.measureGroup;
-		res += "\"";
+		writer.WriteXmlAttributeString("measureGroup", this.measureGroup);
 	}
 	if (null !== this.measures) {
-		res += " measures=\"";
-		res += getXmlFromBool(this.measures);
-		res += "\"";
+		writer.WriteXmlAttributeBool("measures", this.measures);
 	}
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
 	if (null !== this.oneField) {
-		res += " oneField=\"";
-		res += getXmlFromBool(this.oneField);
-		res += "\"";
+		writer.WriteXmlAttributeBool("oneField", this.oneField);
 	}
 	if (null !== this.memberValueDatatype) {
-		res += " memberValueDatatype=\"";
-		res += this.memberValueDatatype.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("memberValueDatatype", this.memberValueDatatype);
 	}
 	if (null !== this.unbalanced) {
-		res += " unbalanced=\"";
-		res += getXmlFromBool(this.unbalanced);
-		res += "\"";
+		writer.WriteXmlAttributeBool("unbalanced", this.unbalanced);
 	}
 	if (null !== this.unbalancedGroup) {
-		res += " unbalancedGroup=\"";
-		res += getXmlFromBool(this.unbalancedGroup);
-		res += "\"";
+		writer.WriteXmlAttributeBool("unbalancedGroup", this.unbalancedGroup);
 	}
 	if (null !== this.hidden) {
-		res += " hidden=\"";
-		res += getXmlFromBool(this.hidden);
-		res += "\"";
+		writer.WriteXmlAttributeBool("hidden", this.hidden);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.fieldsUsage) {
-		res += this.fieldsUsage.toXml("fieldsUsage");
+		res += this.fieldsUsage.toXml(writer, "fieldsUsage");
 	}
 	if (null !== this.groupLevels) {
-		res += this.groupLevels.toXml("groupLevels");
+		res += this.groupLevels.toXml(writer, "groupLevels");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PCDKPI() {
@@ -5626,66 +5081,43 @@ CT_PCDKPI.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_PCDKPI.prototype.toXml = function(name) {
+CT_PCDKPI.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.uniqueName) {
-		res += " uniqueName=\"";
-		res += this.uniqueName;
-		res += "\"";
+		writer.WriteXmlAttributeString("uniqueName", this.uniqueName);
 	}
 	if (null !== this.caption) {
-		res += " caption=\"";
-		res += this.caption;
-		res += "\"";
+		writer.WriteXmlAttributeString("caption", this.caption);
 	}
 	if (null !== this.displayFolder) {
-		res += " displayFolder=\"";
-		res += this.displayFolder;
-		res += "\"";
+		writer.WriteXmlAttributeString("displayFolder", this.displayFolder);
 	}
 	if (null !== this.measureGroup) {
-		res += " measureGroup=\"";
-		res += this.measureGroup;
-		res += "\"";
+		writer.WriteXmlAttributeString("measureGroup", this.measureGroup);
 	}
 	if (null !== this.parent) {
-		res += " parent=\"";
-		res += this.parent;
-		res += "\"";
+		writer.WriteXmlAttributeString("parent", this.parent);
 	}
 	if (null !== this.value) {
-		res += " value=\"";
-		res += this.value;
-		res += "\"";
+		writer.WriteXmlAttributeString("value", this.value);
 	}
 	if (null !== this.goal) {
-		res += " goal=\"";
-		res += this.goal;
-		res += "\"";
+		writer.WriteXmlAttributeString("goal", this.goal);
 	}
 	if (null !== this.status) {
-		res += " status=\"";
-		res += this.status;
-		res += "\"";
+		writer.WriteXmlAttributeString("status", this.status);
 	}
 	if (null !== this.trend) {
-		res += " trend=\"";
-		res += this.trend;
-		res += "\"";
+		writer.WriteXmlAttributeString("trend", this.trend);
 	}
 	if (null !== this.weight) {
-		res += " weight=\"";
-		res += this.weight;
-		res += "\"";
+		writer.WriteXmlAttributeString("weight", this.weight);
 	}
 	if (null !== this.time) {
-		res += " time=\"";
-		res += this.time;
-		res += "\"";
+		writer.WriteXmlAttributeString("time", this.time);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_PCDSDTCEntries() {
@@ -5735,31 +5167,26 @@ CT_PCDSDTCEntries.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PCDSDTCEntries.prototype.toXml = function(name) {
+CT_PCDSDTCEntries.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
-	for (var j = 0; j < this.Items.length; ++j) {
-		var subelem = this.Items[j];
-		if (subelem instanceof CT_Error) {
-			res += subelem.toXml("e");
-		} else if (subelem instanceof CT_Missing) {
-			res += subelem.toXml("m");
-		} else if (subelem instanceof CT_Number) {
-			res += subelem.toXml("n");
-		} else if (subelem instanceof CT_String) {
-			res += subelem.toXml("s");
+	writer.WriteXmlNodeEnd(name, true);
+	for (var i = 0; i < this.Items.length; ++i) {
+		var elem = this.Items[i];
+		if (elem instanceof CT_Error) {
+			elem.toXml(writer, "e");
+		} else if (elem instanceof CT_Missing) {
+			elem.toXml(writer, "m");
+		} else if (elem instanceof CT_Number) {
+			elem.toXml(writer, "n");
+		} else if (elem instanceof CT_String) {
+			elem.toXml(writer, "s");
 		}
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Sets() {
@@ -5791,23 +5218,18 @@ CT_Sets.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Sets.prototype.toXml = function(name) {
+CT_Sets.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.set.length; ++i) {
 		var elem = this.set[i];
-		res += elem.toXml("set");
+		res += elem.toXml(writer, "set");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_QueryCache() {
@@ -5839,23 +5261,18 @@ CT_QueryCache.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_QueryCache.prototype.toXml = function(name) {
+CT_QueryCache.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.query.length; ++i) {
 		var elem = this.query[i];
-		res += elem.toXml("query");
+		res += elem.toXml(writer, "query");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ServerFormats() {
@@ -5887,23 +5304,18 @@ CT_ServerFormats.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_ServerFormats.prototype.toXml = function(name) {
+CT_ServerFormats.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.serverFormat.length; ++i) {
 		var elem = this.serverFormat[i];
-		res += elem.toXml("serverFormat");
+		res += elem.toXml(writer, "serverFormat");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_CalculatedItem() {
@@ -5947,30 +5359,23 @@ CT_CalculatedItem.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CalculatedItem.prototype.toXml = function(name) {
+CT_CalculatedItem.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.field) {
-		res += " field=\"";
-		res += this.field.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("field", this.field);
 	}
 	if (null !== this.formula) {
-		res += " formula=\"";
-		res += this.formula;
-		res += "\"";
+		writer.WriteXmlAttributeString("formula", this.formula);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.pivotArea) {
-		res += this.pivotArea.toXml("pivotArea");
+		res += this.pivotArea.toXml(writer, "pivotArea");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_CalculatedMember() {
@@ -6032,52 +5437,35 @@ CT_CalculatedMember.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CalculatedMember.prototype.toXml = function(name) {
+CT_CalculatedMember.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.mdx) {
-		res += " mdx=\"";
-		res += this.mdx;
-		res += "\"";
+		writer.WriteXmlAttributeString("mdx", this.mdx);
 	}
 	if (null !== this.memberName) {
-		res += " memberName=\"";
-		res += this.memberName;
-		res += "\"";
+		writer.WriteXmlAttributeString("memberName", this.memberName);
 	}
 	if (null !== this.hierarchy) {
-		res += " hierarchy=\"";
-		res += this.hierarchy;
-		res += "\"";
+		writer.WriteXmlAttributeString("hierarchy", this.hierarchy);
 	}
 	if (null !== this.parent) {
-		res += " parent=\"";
-		res += this.parent;
-		res += "\"";
+		writer.WriteXmlAttributeString("parent", this.parent);
 	}
 	if (null !== this.solveOrder) {
-		res += " solveOrder=\"";
-		res += this.solveOrder.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("solveOrder", this.solveOrder);
 	}
 	if (null !== this.set) {
-		res += " set=\"";
-		res += getXmlFromBool(this.set);
-		res += "\"";
+		writer.WriteXmlAttributeBool("set", this.set);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PivotDimension() {
@@ -6109,31 +5497,22 @@ CT_PivotDimension.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_PivotDimension.prototype.toXml = function(name) {
+CT_PivotDimension.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.measure) {
-		res += " measure=\"";
-		res += getXmlFromBool(this.measure);
-		res += "\"";
+		writer.WriteXmlAttributeBool("measure", this.measure);
 	}
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.uniqueName) {
-		res += " uniqueName=\"";
-		res += this.uniqueName;
-		res += "\"";
+		writer.WriteXmlAttributeString("uniqueName", this.uniqueName);
 	}
 	if (null !== this.caption) {
-		res += " caption=\"";
-		res += this.caption;
-		res += "\"";
+		writer.WriteXmlAttributeString("caption", this.caption);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_MeasureGroup() {
@@ -6155,21 +5534,16 @@ CT_MeasureGroup.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_MeasureGroup.prototype.toXml = function(name) {
+CT_MeasureGroup.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.caption) {
-		res += " caption=\"";
-		res += this.caption;
-		res += "\"";
+		writer.WriteXmlAttributeString("caption", this.caption);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_MeasureDimensionMap() {
@@ -6191,21 +5565,16 @@ CT_MeasureDimensionMap.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_MeasureDimensionMap.prototype.toXml = function(name) {
+CT_MeasureDimensionMap.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.measureGroup) {
-		res += " measureGroup=\"";
-		res += this.measureGroup.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("measureGroup", this.measureGroup);
 	}
 	if (null !== this.dimension) {
-		res += " dimension=\"";
-		res += this.dimension.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("dimension", this.dimension);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Extension() {
@@ -6240,24 +5609,19 @@ CT_Extension.prototype.onTextNode = function(text, uq) {
 		this.Any = uq(text);
 	}
 };
-CT_Extension.prototype.toXml = function(name) {
+CT_Extension.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.uri) {
-		res += " uri=\"";
-		res += this.uri;
-		res += "\"";
+		writer.WriteXmlAttributeString("uri", this.uri);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.Any) {
-		res += "<Any>";
-		res += this.Any;
-		res += "</Any>";
+		writer.WriteXmlNodeStart("Any", true);
+		writer.WriteXmlString(this.Any);
+		writer.WriteXmlNodeEnd("Any");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_X() {
@@ -6274,16 +5638,13 @@ CT_X.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_X.prototype.toXml = function(name) {
+CT_X.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.v) {
-		res += " v=\"";
-		res += this.v.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("v", this.v);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Tuples() {
@@ -6315,23 +5676,18 @@ CT_Tuples.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Tuples.prototype.toXml = function(name) {
+CT_Tuples.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.c) {
-		res += " c=\"";
-		res += this.c.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("c", this.c);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.tpl.length; ++i) {
 		var elem = this.tpl[i];
-		res += elem.toXml("tpl");
+		res += elem.toXml(writer, "tpl");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PivotField() {
@@ -6618,263 +5974,164 @@ CT_PivotField.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotField.prototype.toXml = function(name) {
+CT_PivotField.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.axis) {
-		res += " axis=\"";
-		res += ToXml_ST_Axis(this.axis);
-		res += "\"";
+		writer.WriteXmlAttributeString("axis", ToXml_ST_Axis(this.axis));
 	}
 	if (null !== this.dataField) {
-		res += " dataField=\"";
-		res += getXmlFromBool(this.dataField);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dataField", this.dataField);
 	}
 	if (null !== this.subtotalCaption) {
-		res += " subtotalCaption=\"";
-		res += this.subtotalCaption;
-		res += "\"";
+		writer.WriteXmlAttributeString("subtotalCaption", this.subtotalCaption);
 	}
 	if (null !== this.showDropDowns) {
-		res += " showDropDowns=\"";
-		res += getXmlFromBool(this.showDropDowns);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showDropDowns", this.showDropDowns);
 	}
 	if (null !== this.hiddenLevel) {
-		res += " hiddenLevel=\"";
-		res += getXmlFromBool(this.hiddenLevel);
-		res += "\"";
+		writer.WriteXmlAttributeBool("hiddenLevel", this.hiddenLevel);
 	}
 	if (null !== this.uniqueMemberProperty) {
-		res += " uniqueMemberProperty=\"";
-		res += this.uniqueMemberProperty;
-		res += "\"";
+		writer.WriteXmlAttributeString("uniqueMemberProperty", this.uniqueMemberProperty);
 	}
 	if (null !== this.compact) {
-		res += " compact=\"";
-		res += getXmlFromBool(this.compact);
-		res += "\"";
+		writer.WriteXmlAttributeBool("compact", this.compact);
 	}
 	if (null !== this.allDrilled) {
-		res += " allDrilled=\"";
-		res += getXmlFromBool(this.allDrilled);
-		res += "\"";
+		writer.WriteXmlAttributeBool("allDrilled", this.allDrilled);
 	}
 	if (null !== this.numFmtId) {
-		res += " numFmtId=\"";
-		res += this.numFmtId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("numFmtId", this.numFmtId);
 	}
 	if (null !== this.outline) {
-		res += " outline=\"";
-		res += getXmlFromBool(this.outline);
-		res += "\"";
+		writer.WriteXmlAttributeBool("outline", this.outline);
 	}
 	if (null !== this.subtotalTop) {
-		res += " subtotalTop=\"";
-		res += getXmlFromBool(this.subtotalTop);
-		res += "\"";
+		writer.WriteXmlAttributeBool("subtotalTop", this.subtotalTop);
 	}
 	if (null !== this.dragToRow) {
-		res += " dragToRow=\"";
-		res += getXmlFromBool(this.dragToRow);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragToRow", this.dragToRow);
 	}
 	if (null !== this.dragToCol) {
-		res += " dragToCol=\"";
-		res += getXmlFromBool(this.dragToCol);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragToCol", this.dragToCol);
 	}
 	if (null !== this.multipleItemSelectionAllowed) {
-		res += " multipleItemSelectionAllowed=\"";
-		res += getXmlFromBool(this.multipleItemSelectionAllowed);
-		res += "\"";
+		writer.WriteXmlAttributeBool("multipleItemSelectionAllowed", this.multipleItemSelectionAllowed);
 	}
 	if (null !== this.dragToPage) {
-		res += " dragToPage=\"";
-		res += getXmlFromBool(this.dragToPage);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragToPage", this.dragToPage);
 	}
 	if (null !== this.dragToData) {
-		res += " dragToData=\"";
-		res += getXmlFromBool(this.dragToData);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragToData", this.dragToData);
 	}
 	if (null !== this.dragOff) {
-		res += " dragOff=\"";
-		res += getXmlFromBool(this.dragOff);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragOff", this.dragOff);
 	}
 	if (null !== this.showAll) {
-		res += " showAll=\"";
-		res += getXmlFromBool(this.showAll);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showAll", this.showAll);
 	}
 	if (null !== this.insertBlankRow) {
-		res += " insertBlankRow=\"";
-		res += getXmlFromBool(this.insertBlankRow);
-		res += "\"";
+		writer.WriteXmlAttributeBool("insertBlankRow", this.insertBlankRow);
 	}
 	if (null !== this.serverField) {
-		res += " serverField=\"";
-		res += getXmlFromBool(this.serverField);
-		res += "\"";
+		writer.WriteXmlAttributeBool("serverField", this.serverField);
 	}
 	if (null !== this.insertPageBreak) {
-		res += " insertPageBreak=\"";
-		res += getXmlFromBool(this.insertPageBreak);
-		res += "\"";
+		writer.WriteXmlAttributeBool("insertPageBreak", this.insertPageBreak);
 	}
 	if (null !== this.autoShow) {
-		res += " autoShow=\"";
-		res += getXmlFromBool(this.autoShow);
-		res += "\"";
+		writer.WriteXmlAttributeBool("autoShow", this.autoShow);
 	}
 	if (null !== this.topAutoShow) {
-		res += " topAutoShow=\"";
-		res += getXmlFromBool(this.topAutoShow);
-		res += "\"";
+		writer.WriteXmlAttributeBool("topAutoShow", this.topAutoShow);
 	}
 	if (null !== this.hideNewItems) {
-		res += " hideNewItems=\"";
-		res += getXmlFromBool(this.hideNewItems);
-		res += "\"";
+		writer.WriteXmlAttributeBool("hideNewItems", this.hideNewItems);
 	}
 	if (null !== this.measureFilter) {
-		res += " measureFilter=\"";
-		res += getXmlFromBool(this.measureFilter);
-		res += "\"";
+		writer.WriteXmlAttributeBool("measureFilter", this.measureFilter);
 	}
 	if (null !== this.includeNewItemsInFilter) {
-		res += " includeNewItemsInFilter=\"";
-		res += getXmlFromBool(this.includeNewItemsInFilter);
-		res += "\"";
+		writer.WriteXmlAttributeBool("includeNewItemsInFilter", this.includeNewItemsInFilter);
 	}
 	if (null !== this.itemPageCount) {
-		res += " itemPageCount=\"";
-		res += this.itemPageCount.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("itemPageCount", this.itemPageCount);
 	}
 	if (null !== this.sortType) {
-		res += " sortType=\"";
-		res += ToXml_ST_FieldSortType(this.sortType);
-		res += "\"";
+		writer.WriteXmlAttributeString("sortType", ToXml_ST_FieldSortType(this.sortType));
 	}
 	if (null !== this.dataSourceSort) {
-		res += " dataSourceSort=\"";
-		res += getXmlFromBool(this.dataSourceSort);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dataSourceSort", this.dataSourceSort);
 	}
 	if (null !== this.nonAutoSortDefault) {
-		res += " nonAutoSortDefault=\"";
-		res += getXmlFromBool(this.nonAutoSortDefault);
-		res += "\"";
+		writer.WriteXmlAttributeBool("nonAutoSortDefault", this.nonAutoSortDefault);
 	}
 	if (null !== this.rankBy) {
-		res += " rankBy=\"";
-		res += this.rankBy.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("rankBy", this.rankBy);
 	}
 	if (null !== this.defaultSubtotal) {
-		res += " defaultSubtotal=\"";
-		res += getXmlFromBool(this.defaultSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("defaultSubtotal", this.defaultSubtotal);
 	}
 	if (null !== this.sumSubtotal) {
-		res += " sumSubtotal=\"";
-		res += getXmlFromBool(this.sumSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("sumSubtotal", this.sumSubtotal);
 	}
 	if (null !== this.countASubtotal) {
-		res += " countASubtotal=\"";
-		res += getXmlFromBool(this.countASubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("countASubtotal", this.countASubtotal);
 	}
 	if (null !== this.avgSubtotal) {
-		res += " avgSubtotal=\"";
-		res += getXmlFromBool(this.avgSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("avgSubtotal", this.avgSubtotal);
 	}
 	if (null !== this.maxSubtotal) {
-		res += " maxSubtotal=\"";
-		res += getXmlFromBool(this.maxSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("maxSubtotal", this.maxSubtotal);
 	}
 	if (null !== this.minSubtotal) {
-		res += " minSubtotal=\"";
-		res += getXmlFromBool(this.minSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("minSubtotal", this.minSubtotal);
 	}
 	if (null !== this.productSubtotal) {
-		res += " productSubtotal=\"";
-		res += getXmlFromBool(this.productSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("productSubtotal", this.productSubtotal);
 	}
 	if (null !== this.countSubtotal) {
-		res += " countSubtotal=\"";
-		res += getXmlFromBool(this.countSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("countSubtotal", this.countSubtotal);
 	}
 	if (null !== this.stdDevSubtotal) {
-		res += " stdDevSubtotal=\"";
-		res += getXmlFromBool(this.stdDevSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("stdDevSubtotal", this.stdDevSubtotal);
 	}
 	if (null !== this.stdDevPSubtotal) {
-		res += " stdDevPSubtotal=\"";
-		res += getXmlFromBool(this.stdDevPSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("stdDevPSubtotal", this.stdDevPSubtotal);
 	}
 	if (null !== this.varSubtotal) {
-		res += " varSubtotal=\"";
-		res += getXmlFromBool(this.varSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("varSubtotal", this.varSubtotal);
 	}
 	if (null !== this.varPSubtotal) {
-		res += " varPSubtotal=\"";
-		res += getXmlFromBool(this.varPSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("varPSubtotal", this.varPSubtotal);
 	}
 	if (null !== this.showPropCell) {
-		res += " showPropCell=\"";
-		res += getXmlFromBool(this.showPropCell);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showPropCell", this.showPropCell);
 	}
 	if (null !== this.showPropTip) {
-		res += " showPropTip=\"";
-		res += getXmlFromBool(this.showPropTip);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showPropTip", this.showPropTip);
 	}
 	if (null !== this.showPropAsCaption) {
-		res += " showPropAsCaption=\"";
-		res += getXmlFromBool(this.showPropAsCaption);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showPropAsCaption", this.showPropAsCaption);
 	}
 	if (null !== this.defaultAttributeDrillState) {
-		res += " defaultAttributeDrillState=\"";
-		res += getXmlFromBool(this.defaultAttributeDrillState);
-		res += "\"";
+		writer.WriteXmlAttributeBool("defaultAttributeDrillState", this.defaultAttributeDrillState);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.items) {
-		res += this.items.toXml("items");
+		res += this.items.toXml(writer, "items");
 	}
 	if (null !== this.autoSortScope) {
-		res += this.autoSortScope.toXml("autoSortScope");
+		res += this.autoSortScope.toXml(writer, "autoSortScope");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Field() {
@@ -6891,16 +6148,13 @@ CT_Field.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_Field.prototype.toXml = function(name) {
+CT_Field.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.x) {
-		res += " x=\"";
-		res += this.x.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("x", this.x);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_I() {
@@ -6945,33 +6199,24 @@ CT_I.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_I.prototype.toXml = function(name) {
+CT_I.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.t) {
-		res += " t=\"";
-		res += ToXml_ST_ItemType(this.t);
-		res += "\"";
+		writer.WriteXmlAttributeString("t", ToXml_ST_ItemType(this.t));
 	}
 	if (null !== this.r) {
-		res += " r=\"";
-		res += this.r.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("r", this.r);
 	}
 	if (null !== this.i) {
-		res += " i=\"";
-		res += this.i.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("i", this.i);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.x.length; ++i) {
 		var elem = this.x[i];
-		res += elem.toXml("x");
+		res += elem.toXml(writer, "x");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PageField() {
@@ -7023,42 +6268,29 @@ CT_PageField.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PageField.prototype.toXml = function(name) {
+CT_PageField.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.fld) {
-		res += " fld=\"";
-		res += this.fld.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("fld", this.fld);
 	}
 	if (null !== this.item) {
-		res += " item=\"";
-		res += this.item.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("item", this.item);
 	}
 	if (null !== this.hier) {
-		res += " hier=\"";
-		res += this.hier.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("hier", this.hier);
 	}
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.cap) {
-		res += " cap=\"";
-		res += this.cap;
-		res += "\"";
+		writer.WriteXmlAttributeString("cap", this.cap);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_DataField() {
@@ -7126,52 +6358,35 @@ CT_DataField.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_DataField.prototype.toXml = function(name) {
+CT_DataField.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.fld) {
-		res += " fld=\"";
-		res += this.fld.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("fld", this.fld);
 	}
 	if (null !== this.subtotal) {
-		res += " subtotal=\"";
-		res += ToXml_ST_DataConsolidateFunction(this.subtotal);
-		res += "\"";
+		writer.WriteXmlAttributeString("subtotal", ToXml_ST_DataConsolidateFunction(this.subtotal));
 	}
 	if (null !== this.showDataAs) {
-		res += " showDataAs=\"";
-		res += ToXml_ST_ShowDataAs(this.showDataAs);
-		res += "\"";
+		writer.WriteXmlAttributeString("showDataAs", ToXml_ST_ShowDataAs(this.showDataAs));
 	}
 	if (null !== this.baseField) {
-		res += " baseField=\"";
-		res += this.baseField.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("baseField", this.baseField);
 	}
 	if (null !== this.baseItem) {
-		res += " baseItem=\"";
-		res += this.baseItem.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("baseItem", this.baseItem);
 	}
 	if (null !== this.numFmtId) {
-		res += " numFmtId=\"";
-		res += this.numFmtId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("numFmtId", this.numFmtId);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Format() {
@@ -7218,30 +6433,23 @@ CT_Format.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Format.prototype.toXml = function(name) {
+CT_Format.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.action) {
-		res += " action=\"";
-		res += ToXml_ST_FormatAction(this.action);
-		res += "\"";
+		writer.WriteXmlAttributeString("action", ToXml_ST_FormatAction(this.action));
 	}
 	if (null !== this.dxfId) {
-		res += " dxfId=\"";
-		res += this.dxfId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("dxfId", this.dxfId);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.pivotArea) {
-		res += this.pivotArea.toXml("pivotArea");
+		res += this.pivotArea.toXml(writer, "pivotArea");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ConditionalFormat() {
@@ -7296,35 +6504,26 @@ CT_ConditionalFormat.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_ConditionalFormat.prototype.toXml = function(name) {
+CT_ConditionalFormat.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.scope) {
-		res += " scope=\"";
-		res += ToXml_ST_Scope(this.scope);
-		res += "\"";
+		writer.WriteXmlAttributeString("scope", ToXml_ST_Scope(this.scope));
 	}
 	if (null !== this.type) {
-		res += " type=\"";
-		res += ToXml_ST_Type(this.type);
-		res += "\"";
+		writer.WriteXmlAttributeString("type", ToXml_ST_Type(this.type));
 	}
 	if (null !== this.priority) {
-		res += " priority=\"";
-		res += this.priority.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("priority", this.priority);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.pivotAreas) {
-		res += this.pivotAreas.toXml("pivotAreas");
+		res += this.pivotAreas.toXml(writer, "pivotAreas");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ChartFormat() {
@@ -7366,32 +6565,23 @@ CT_ChartFormat.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_ChartFormat.prototype.toXml = function(name) {
+CT_ChartFormat.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.chart) {
-		res += " chart=\"";
-		res += this.chart.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("chart", this.chart);
 	}
 	if (null !== this.format) {
-		res += " format=\"";
-		res += this.format.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("format", this.format);
 	}
 	if (null !== this.series) {
-		res += " series=\"";
-		res += getXmlFromBool(this.series);
-		res += "\"";
+		writer.WriteXmlAttributeBool("series", this.series);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.pivotArea) {
-		res += this.pivotArea.toXml("pivotArea");
+		res += this.pivotArea.toXml(writer, "pivotArea");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PivotHierarchy() {
@@ -7487,79 +6677,54 @@ CT_PivotHierarchy.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotHierarchy.prototype.toXml = function(name) {
+CT_PivotHierarchy.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.outline) {
-		res += " outline=\"";
-		res += getXmlFromBool(this.outline);
-		res += "\"";
+		writer.WriteXmlAttributeBool("outline", this.outline);
 	}
 	if (null !== this.multipleItemSelectionAllowed) {
-		res += " multipleItemSelectionAllowed=\"";
-		res += getXmlFromBool(this.multipleItemSelectionAllowed);
-		res += "\"";
+		writer.WriteXmlAttributeBool("multipleItemSelectionAllowed", this.multipleItemSelectionAllowed);
 	}
 	if (null !== this.subtotalTop) {
-		res += " subtotalTop=\"";
-		res += getXmlFromBool(this.subtotalTop);
-		res += "\"";
+		writer.WriteXmlAttributeBool("subtotalTop", this.subtotalTop);
 	}
 	if (null !== this.showInFieldList) {
-		res += " showInFieldList=\"";
-		res += getXmlFromBool(this.showInFieldList);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showInFieldList", this.showInFieldList);
 	}
 	if (null !== this.dragToRow) {
-		res += " dragToRow=\"";
-		res += getXmlFromBool(this.dragToRow);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragToRow", this.dragToRow);
 	}
 	if (null !== this.dragToCol) {
-		res += " dragToCol=\"";
-		res += getXmlFromBool(this.dragToCol);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragToCol", this.dragToCol);
 	}
 	if (null !== this.dragToPage) {
-		res += " dragToPage=\"";
-		res += getXmlFromBool(this.dragToPage);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragToPage", this.dragToPage);
 	}
 	if (null !== this.dragToData) {
-		res += " dragToData=\"";
-		res += getXmlFromBool(this.dragToData);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragToData", this.dragToData);
 	}
 	if (null !== this.dragOff) {
-		res += " dragOff=\"";
-		res += getXmlFromBool(this.dragOff);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dragOff", this.dragOff);
 	}
 	if (null !== this.includeNewItemsInFilter) {
-		res += " includeNewItemsInFilter=\"";
-		res += getXmlFromBool(this.includeNewItemsInFilter);
-		res += "\"";
+		writer.WriteXmlAttributeBool("includeNewItemsInFilter", this.includeNewItemsInFilter);
 	}
 	if (null !== this.caption) {
-		res += " caption=\"";
-		res += this.caption;
-		res += "\"";
+		writer.WriteXmlAttributeString("caption", this.caption);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.mps) {
-		res += this.mps.toXml("mps");
+		res += this.mps.toXml(writer, "mps");
 	}
 	for (var i = 0; i < this.members.length; ++i) {
 		var elem = this.members[i];
-		res += elem.toXml("members");
+		res += elem.toXml(writer, "members");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PivotFilter() {
@@ -7651,75 +6816,50 @@ CT_PivotFilter.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotFilter.prototype.toXml = function(name) {
+CT_PivotFilter.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.fld) {
-		res += " fld=\"";
-		res += this.fld.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("fld", this.fld);
 	}
 	if (null !== this.mpFld) {
-		res += " mpFld=\"";
-		res += this.mpFld.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("mpFld", this.mpFld);
 	}
 	if (null !== this.type) {
-		res += " type=\"";
-		res += ToXml_ST_PivotFilterType(this.type);
-		res += "\"";
+		writer.WriteXmlAttributeString("type", ToXml_ST_PivotFilterType(this.type));
 	}
 	if (null !== this.evalOrder) {
-		res += " evalOrder=\"";
-		res += this.evalOrder.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("evalOrder", this.evalOrder);
 	}
 	if (null !== this.id) {
-		res += " id=\"";
-		res += this.id.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("id", this.id);
 	}
 	if (null !== this.iMeasureHier) {
-		res += " iMeasureHier=\"";
-		res += this.iMeasureHier.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("iMeasureHier", this.iMeasureHier);
 	}
 	if (null !== this.iMeasureFld) {
-		res += " iMeasureFld=\"";
-		res += this.iMeasureFld.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("iMeasureFld", this.iMeasureFld);
 	}
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.description) {
-		res += " description=\"";
-		res += this.description;
-		res += "\"";
+		writer.WriteXmlAttributeString("description", this.description);
 	}
 	if (null !== this.stringValue1) {
-		res += " stringValue1=\"";
-		res += this.stringValue1;
-		res += "\"";
+		writer.WriteXmlAttributeString("stringValue1", this.stringValue1);
 	}
 	if (null !== this.stringValue2) {
-		res += " stringValue2=\"";
-		res += this.stringValue2;
-		res += "\"";
+		writer.WriteXmlAttributeString("stringValue2", this.stringValue2);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.autoFilter) {
-		res += this.autoFilter.toXml("autoFilter");
+		res += this.autoFilter.toXml(writer, "autoFilter");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_HierarchyUsage() {
@@ -7736,16 +6876,13 @@ CT_HierarchyUsage.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_HierarchyUsage.prototype.toXml = function(name) {
+CT_HierarchyUsage.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.hierarchyUsage) {
-		res += " hierarchyUsage=\"";
-		res += this.hierarchyUsage.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("hierarchyUsage", this.hierarchyUsage);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Pages() {
@@ -7777,23 +6914,18 @@ CT_Pages.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Pages.prototype.toXml = function(name) {
+CT_Pages.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.page.length; ++i) {
 		var elem = this.page[i];
-		res += elem.toXml("page");
+		res += elem.toXml(writer, "page");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_RangeSets() {
@@ -7825,23 +6957,18 @@ CT_RangeSets.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_RangeSets.prototype.toXml = function(name) {
+CT_RangeSets.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.rangeSet.length; ++i) {
 		var elem = this.rangeSet[i];
-		res += elem.toXml("rangeSet");
+		res += elem.toXml(writer, "rangeSet");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_SharedItems() {
@@ -7968,100 +7095,69 @@ CT_SharedItems.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_SharedItems.prototype.toXml = function(name) {
+CT_SharedItems.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.containsSemiMixedTypes) {
-		res += " containsSemiMixedTypes=\"";
-		res += getXmlFromBool(this.containsSemiMixedTypes);
-		res += "\"";
+		writer.WriteXmlAttributeBool("containsSemiMixedTypes", this.containsSemiMixedTypes);
 	}
 	if (null !== this.containsNonDate) {
-		res += " containsNonDate=\"";
-		res += getXmlFromBool(this.containsNonDate);
-		res += "\"";
+		writer.WriteXmlAttributeBool("containsNonDate", this.containsNonDate);
 	}
 	if (null !== this.containsDate) {
-		res += " containsDate=\"";
-		res += getXmlFromBool(this.containsDate);
-		res += "\"";
+		writer.WriteXmlAttributeBool("containsDate", this.containsDate);
 	}
 	if (null !== this.containsString) {
-		res += " containsString=\"";
-		res += getXmlFromBool(this.containsString);
-		res += "\"";
+		writer.WriteXmlAttributeBool("containsString", this.containsString);
 	}
 	if (null !== this.containsBlank) {
-		res += " containsBlank=\"";
-		res += getXmlFromBool(this.containsBlank);
-		res += "\"";
+		writer.WriteXmlAttributeBool("containsBlank", this.containsBlank);
 	}
 	if (null !== this.containsMixedTypes) {
-		res += " containsMixedTypes=\"";
-		res += getXmlFromBool(this.containsMixedTypes);
-		res += "\"";
+		writer.WriteXmlAttributeBool("containsMixedTypes", this.containsMixedTypes);
 	}
 	if (null !== this.containsNumber) {
-		res += " containsNumber=\"";
-		res += getXmlFromBool(this.containsNumber);
-		res += "\"";
+		writer.WriteXmlAttributeBool("containsNumber", this.containsNumber);
 	}
 	if (null !== this.containsInteger) {
-		res += " containsInteger=\"";
-		res += getXmlFromBool(this.containsInteger);
-		res += "\"";
+		writer.WriteXmlAttributeBool("containsInteger", this.containsInteger);
 	}
 	if (null !== this.minValue) {
-		res += " minValue=\"";
-		res += this.minValue.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("minValue", this.minValue);
 	}
 	if (null !== this.maxValue) {
-		res += " maxValue=\"";
-		res += this.maxValue.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("maxValue", this.maxValue);
 	}
 	if (null !== this.minDate) {
-		res += " minDate=\"";
-		res += this.minDate;
-		res += "\"";
+		writer.WriteXmlAttributeString("minDate", this.minDate);
 	}
 	if (null !== this.maxDate) {
-		res += " maxDate=\"";
-		res += this.maxDate;
-		res += "\"";
+		writer.WriteXmlAttributeString("maxDate", this.maxDate);
 	}
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
 	if (null !== this.longText) {
-		res += " longText=\"";
-		res += getXmlFromBool(this.longText);
-		res += "\"";
+		writer.WriteXmlAttributeBool("longText", this.longText);
 	}
-	res += ">";
-	for (var j = 0; j < this.Items.length; ++j) {
-		var subelem = this.Items[j];
-		if (subelem instanceof CT_Boolean) {
-			res += subelem.toXml("b");
-		} else if (subelem instanceof CT_DateTime) {
-			res += subelem.toXml("d");
-		} else if (subelem instanceof CT_Error) {
-			res += subelem.toXml("e");
-		} else if (subelem instanceof CT_Missing) {
-			res += subelem.toXml("m");
-		} else if (subelem instanceof CT_Number) {
-			res += subelem.toXml("n");
-		} else if (subelem instanceof CT_String) {
-			res += subelem.toXml("s");
+	writer.WriteXmlNodeEnd(name, true);
+	for (var i = 0; i < this.Items.length; ++i) {
+		var elem = this.Items[i];
+		if (elem instanceof CT_Boolean) {
+			elem.toXml(writer, "b");
+		} else if (elem instanceof CT_DateTime) {
+			elem.toXml(writer, "d");
+		} else if (elem instanceof CT_Error) {
+			elem.toXml(writer, "e");
+		} else if (elem instanceof CT_Missing) {
+			elem.toXml(writer, "m");
+		} else if (elem instanceof CT_Number) {
+			elem.toXml(writer, "n");
+		} else if (elem instanceof CT_String) {
+			elem.toXml(writer, "s");
 		}
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_FieldGroup() {
@@ -8112,33 +7208,26 @@ CT_FieldGroup.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_FieldGroup.prototype.toXml = function(name) {
+CT_FieldGroup.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.par) {
-		res += " par=\"";
-		res += this.par.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("par", this.par);
 	}
 	if (null !== this.base) {
-		res += " base=\"";
-		res += this.base.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("base", this.base);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.rangePr) {
-		res += this.rangePr.toXml("rangePr");
+		res += this.rangePr.toXml(writer, "rangePr");
 	}
 	if (null !== this.discretePr) {
-		res += this.discretePr.toXml("discretePr");
+		res += this.discretePr.toXml(writer, "discretePr");
 	}
 	if (null !== this.groupItems) {
-		res += this.groupItems.toXml("groupItems");
+		res += this.groupItems.toXml(writer, "groupItems");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_FieldsUsage() {
@@ -8170,23 +7259,18 @@ CT_FieldsUsage.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_FieldsUsage.prototype.toXml = function(name) {
+CT_FieldsUsage.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.fieldUsage.length; ++i) {
 		var elem = this.fieldUsage[i];
-		res += elem.toXml("fieldUsage");
+		res += elem.toXml(writer, "fieldUsage");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_GroupLevels() {
@@ -8218,23 +7302,18 @@ CT_GroupLevels.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_GroupLevels.prototype.toXml = function(name) {
+CT_GroupLevels.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.groupLevel.length; ++i) {
 		var elem = this.groupLevel[i];
-		res += elem.toXml("groupLevel");
+		res += elem.toXml(writer, "groupLevel");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Set() {
@@ -8296,46 +7375,33 @@ CT_Set.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Set.prototype.toXml = function(name) {
+CT_Set.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
 	if (null !== this.maxRank) {
-		res += " maxRank=\"";
-		res += this.maxRank.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("maxRank", this.maxRank);
 	}
 	if (null !== this.setDefinition) {
-		res += " setDefinition=\"";
-		res += this.setDefinition;
-		res += "\"";
+		writer.WriteXmlAttributeString("setDefinition", this.setDefinition);
 	}
 	if (null !== this.sortType) {
-		res += " sortType=\"";
-		res += ToXml_ST_SortType(this.sortType);
-		res += "\"";
+		writer.WriteXmlAttributeString("sortType", ToXml_ST_SortType(this.sortType));
 	}
 	if (null !== this.queryFailed) {
-		res += " queryFailed=\"";
-		res += getXmlFromBool(this.queryFailed);
-		res += "\"";
+		writer.WriteXmlAttributeBool("queryFailed", this.queryFailed);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.tpls.length; ++i) {
 		var elem = this.tpls[i];
-		res += elem.toXml("tpls");
+		res += elem.toXml(writer, "tpls");
 	}
 	if (null !== this.sortByTuple) {
-		res += this.sortByTuple.toXml("sortByTuple");
+		res += this.sortByTuple.toXml(writer, "sortByTuple");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Query() {
@@ -8367,22 +7433,17 @@ CT_Query.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Query.prototype.toXml = function(name) {
+CT_Query.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.mdx) {
-		res += " mdx=\"";
-		res += this.mdx;
-		res += "\"";
+		writer.WriteXmlAttributeString("mdx", this.mdx);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.tpls) {
-		res += this.tpls.toXml("tpls");
+		res += this.tpls.toXml(writer, "tpls");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ServerFormat() {
@@ -8404,21 +7465,16 @@ CT_ServerFormat.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_ServerFormat.prototype.toXml = function(name) {
+CT_ServerFormat.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.culture) {
-		res += " culture=\"";
-		res += this.culture;
-		res += "\"";
+		writer.WriteXmlAttributeString("culture", this.culture);
 	}
 	if (null !== this.format) {
-		res += " format=\"";
-		res += this.format;
-		res += "\"";
+		writer.WriteXmlAttributeString("format", this.format);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_PivotArea() {
@@ -8518,80 +7574,53 @@ CT_PivotArea.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotArea.prototype.toXml = function(name) {
+CT_PivotArea.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.field) {
-		res += " field=\"";
-		res += this.field.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("field", this.field);
 	}
 	if (null !== this.type) {
-		res += " type=\"";
-		res += ToXml_ST_PivotAreaType(this.type);
-		res += "\"";
+		writer.WriteXmlAttributeString("type", ToXml_ST_PivotAreaType(this.type));
 	}
 	if (null !== this.dataOnly) {
-		res += " dataOnly=\"";
-		res += getXmlFromBool(this.dataOnly);
-		res += "\"";
+		writer.WriteXmlAttributeBool("dataOnly", this.dataOnly);
 	}
 	if (null !== this.labelOnly) {
-		res += " labelOnly=\"";
-		res += getXmlFromBool(this.labelOnly);
-		res += "\"";
+		writer.WriteXmlAttributeBool("labelOnly", this.labelOnly);
 	}
 	if (null !== this.grandRow) {
-		res += " grandRow=\"";
-		res += getXmlFromBool(this.grandRow);
-		res += "\"";
+		writer.WriteXmlAttributeBool("grandRow", this.grandRow);
 	}
 	if (null !== this.grandCol) {
-		res += " grandCol=\"";
-		res += getXmlFromBool(this.grandCol);
-		res += "\"";
+		writer.WriteXmlAttributeBool("grandCol", this.grandCol);
 	}
 	if (null !== this.cacheIndex) {
-		res += " cacheIndex=\"";
-		res += getXmlFromBool(this.cacheIndex);
-		res += "\"";
+		writer.WriteXmlAttributeBool("cacheIndex", this.cacheIndex);
 	}
 	if (null !== this.outline) {
-		res += " outline=\"";
-		res += getXmlFromBool(this.outline);
-		res += "\"";
+		writer.WriteXmlAttributeBool("outline", this.outline);
 	}
 	if (null !== this.offset) {
-		res += " offset=\"";
-		res += this.offset;
-		res += "\"";
+		writer.WriteXmlAttributeString("offset", this.offset);
 	}
 	if (null !== this.collapsedLevelsAreSubtotals) {
-		res += " collapsedLevelsAreSubtotals=\"";
-		res += getXmlFromBool(this.collapsedLevelsAreSubtotals);
-		res += "\"";
+		writer.WriteXmlAttributeBool("collapsedLevelsAreSubtotals", this.collapsedLevelsAreSubtotals);
 	}
 	if (null !== this.axis) {
-		res += " axis=\"";
-		res += ToXml_ST_Axis(this.axis);
-		res += "\"";
+		writer.WriteXmlAttributeString("axis", ToXml_ST_Axis(this.axis));
 	}
 	if (null !== this.fieldPosition) {
-		res += " fieldPosition=\"";
-		res += this.fieldPosition.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("fieldPosition", this.fieldPosition);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.references) {
-		res += this.references.toXml("references");
+		res += this.references.toXml(writer, "references");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Tuple() {
@@ -8618,26 +7647,19 @@ CT_Tuple.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_Tuple.prototype.toXml = function(name) {
+CT_Tuple.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.fld) {
-		res += " fld=\"";
-		res += this.fld.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("fld", this.fld);
 	}
 	if (null !== this.hier) {
-		res += " hier=\"";
-		res += this.hier.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("hier", this.hier);
 	}
 	if (null !== this.item) {
-		res += " item=\"";
-		res += this.item.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("item", this.item);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Items() {
@@ -8669,23 +7691,18 @@ CT_Items.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Items.prototype.toXml = function(name) {
+CT_Items.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.item.length; ++i) {
 		var elem = this.item[i];
-		res += elem.toXml("item");
+		res += elem.toXml(writer, "item");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_AutoSortScope() {
@@ -8705,17 +7722,14 @@ CT_AutoSortScope.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_AutoSortScope.prototype.toXml = function(name) {
+CT_AutoSortScope.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeStart(name);
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.pivotArea) {
-		res += this.pivotArea.toXml("pivotArea");
+		res += this.pivotArea.toXml(writer, "pivotArea");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PivotAreas() {
@@ -8747,23 +7761,18 @@ CT_PivotAreas.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotAreas.prototype.toXml = function(name) {
+CT_PivotAreas.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.pivotArea.length; ++i) {
 		var elem = this.pivotArea[i];
-		res += elem.toXml("pivotArea");
+		res += elem.toXml(writer, "pivotArea");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_MemberProperties() {
@@ -8795,23 +7804,18 @@ CT_MemberProperties.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_MemberProperties.prototype.toXml = function(name) {
+CT_MemberProperties.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.mp.length; ++i) {
 		var elem = this.mp[i];
-		res += elem.toXml("mp");
+		res += elem.toXml(writer, "mp");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Members() {
@@ -8848,28 +7852,21 @@ CT_Members.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Members.prototype.toXml = function(name) {
+CT_Members.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
 	if (null !== this.level) {
-		res += " level=\"";
-		res += this.level.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("level", this.level);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.member.length; ++i) {
 		var elem = this.member[i];
-		res += elem.toXml("member");
+		res += elem.toXml(writer, "member");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_AutoFilter() {
@@ -8915,29 +7912,24 @@ CT_AutoFilter.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_AutoFilter.prototype.toXml = function(name) {
+CT_AutoFilter.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.ref) {
-		res += " ref=\"";
-		res += this.ref;
-		res += "\"";
+		writer.WriteXmlAttributeString("ref", this.ref);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.filterColumn.length; ++i) {
 		var elem = this.filterColumn[i];
-		res += elem.toXml("filterColumn");
+		res += elem.toXml(writer, "filterColumn");
 	}
 	if (null !== this.sortState) {
-		res += this.sortState.toXml("sortState");
+		res += this.sortState.toXml(writer, "sortState");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PCDSCPage() {
@@ -8969,23 +7961,18 @@ CT_PCDSCPage.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PCDSCPage.prototype.toXml = function(name) {
+CT_PCDSCPage.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.pageItem.length; ++i) {
 		var elem = this.pageItem[i];
-		res += elem.toXml("pageItem");
+		res += elem.toXml(writer, "pageItem");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_RangeSet() {
@@ -9037,51 +8024,34 @@ CT_RangeSet.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_RangeSet.prototype.toXml = function(name) {
+CT_RangeSet.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.i1) {
-		res += " i1=\"";
-		res += this.i1.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("i1", this.i1);
 	}
 	if (null !== this.i2) {
-		res += " i2=\"";
-		res += this.i2.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("i2", this.i2);
 	}
 	if (null !== this.i3) {
-		res += " i3=\"";
-		res += this.i3.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("i3", this.i3);
 	}
 	if (null !== this.i4) {
-		res += " i4=\"";
-		res += this.i4.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("i4", this.i4);
 	}
 	if (null !== this.ref) {
-		res += " ref=\"";
-		res += this.ref;
-		res += "\"";
+		writer.WriteXmlAttributeString("ref", this.ref);
 	}
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.sheet) {
-		res += " sheet=\"";
-		res += this.sheet;
-		res += "\"";
+		writer.WriteXmlAttributeString("sheet", this.sheet);
 	}
 	if (null !== this.id) {
-		res += " r:id=\"";
-		res += this.id;
-		res += "\"";
+		writer.WriteXmlAttributeString("r:id", this.id);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_RangePr() {
@@ -9136,51 +8106,34 @@ CT_RangePr.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_RangePr.prototype.toXml = function(name) {
+CT_RangePr.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.autoStart) {
-		res += " autoStart=\"";
-		res += getXmlFromBool(this.autoStart);
-		res += "\"";
+		writer.WriteXmlAttributeBool("autoStart", this.autoStart);
 	}
 	if (null !== this.autoEnd) {
-		res += " autoEnd=\"";
-		res += getXmlFromBool(this.autoEnd);
-		res += "\"";
+		writer.WriteXmlAttributeBool("autoEnd", this.autoEnd);
 	}
 	if (null !== this.groupBy) {
-		res += " groupBy=\"";
-		res += ToXml_ST_GroupBy(this.groupBy);
-		res += "\"";
+		writer.WriteXmlAttributeString("groupBy", ToXml_ST_GroupBy(this.groupBy));
 	}
 	if (null !== this.startNum) {
-		res += " startNum=\"";
-		res += this.startNum.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("startNum", this.startNum);
 	}
 	if (null !== this.endNum) {
-		res += " endNum=\"";
-		res += this.endNum.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("endNum", this.endNum);
 	}
 	if (null !== this.startDate) {
-		res += " startDate=\"";
-		res += this.startDate;
-		res += "\"";
+		writer.WriteXmlAttributeString("startDate", this.startDate);
 	}
 	if (null !== this.endDate) {
-		res += " endDate=\"";
-		res += this.endDate;
-		res += "\"";
+		writer.WriteXmlAttributeString("endDate", this.endDate);
 	}
 	if (null !== this.groupInterval) {
-		res += " groupInterval=\"";
-		res += this.groupInterval.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("groupInterval", this.groupInterval);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_DiscretePr() {
@@ -9212,23 +8165,18 @@ CT_DiscretePr.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_DiscretePr.prototype.toXml = function(name) {
+CT_DiscretePr.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.x.length; ++i) {
 		var elem = this.x[i];
-		res += elem.toXml("x");
+		res += elem.toXml(writer, "x");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_GroupItems() {
@@ -9290,35 +8238,30 @@ CT_GroupItems.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_GroupItems.prototype.toXml = function(name) {
+CT_GroupItems.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
-	for (var j = 0; j < this.Items.length; ++j) {
-		var subelem = this.Items[j];
-		if (subelem instanceof CT_Boolean) {
-			res += subelem.toXml("b");
-		} else if (subelem instanceof CT_DateTime) {
-			res += subelem.toXml("d");
-		} else if (subelem instanceof CT_Error) {
-			res += subelem.toXml("e");
-		} else if (subelem instanceof CT_Missing) {
-			res += subelem.toXml("m");
-		} else if (subelem instanceof CT_Number) {
-			res += subelem.toXml("n");
-		} else if (subelem instanceof CT_String) {
-			res += subelem.toXml("s");
+	writer.WriteXmlNodeEnd(name, true);
+	for (var i = 0; i < this.Items.length; ++i) {
+		var elem = this.Items[i];
+		if (elem instanceof CT_Boolean) {
+			elem.toXml(writer, "b");
+		} else if (elem instanceof CT_DateTime) {
+			elem.toXml(writer, "d");
+		} else if (elem instanceof CT_Error) {
+			elem.toXml(writer, "e");
+		} else if (elem instanceof CT_Missing) {
+			elem.toXml(writer, "m");
+		} else if (elem instanceof CT_Number) {
+			elem.toXml(writer, "n");
+		} else if (elem instanceof CT_String) {
+			elem.toXml(writer, "s");
 		}
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_FieldUsage() {
@@ -9335,16 +8278,13 @@ CT_FieldUsage.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_FieldUsage.prototype.toXml = function(name) {
+CT_FieldUsage.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.x) {
-		res += " x=\"";
-		res += this.x.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("x", this.x);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_GroupLevel() {
@@ -9398,40 +8338,29 @@ CT_GroupLevel.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_GroupLevel.prototype.toXml = function(name) {
+CT_GroupLevel.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.uniqueName) {
-		res += " uniqueName=\"";
-		res += this.uniqueName;
-		res += "\"";
+		writer.WriteXmlAttributeString("uniqueName", this.uniqueName);
 	}
 	if (null !== this.caption) {
-		res += " caption=\"";
-		res += this.caption;
-		res += "\"";
+		writer.WriteXmlAttributeString("caption", this.caption);
 	}
 	if (null !== this.user) {
-		res += " user=\"";
-		res += getXmlFromBool(this.user);
-		res += "\"";
+		writer.WriteXmlAttributeBool("user", this.user);
 	}
 	if (null !== this.customRollUp) {
-		res += " customRollUp=\"";
-		res += getXmlFromBool(this.customRollUp);
-		res += "\"";
+		writer.WriteXmlAttributeBool("customRollUp", this.customRollUp);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.groups) {
-		res += this.groups.toXml("groups");
+		res += this.groups.toXml(writer, "groups");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PivotAreaReferences() {
@@ -9463,23 +8392,18 @@ CT_PivotAreaReferences.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotAreaReferences.prototype.toXml = function(name) {
+CT_PivotAreaReferences.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.reference.length; ++i) {
 		var elem = this.reference[i];
-		res += elem.toXml("reference");
+		res += elem.toXml(writer, "reference");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_Item() {
@@ -9549,66 +8473,43 @@ CT_Item.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_Item.prototype.toXml = function(name) {
+CT_Item.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.n) {
-		res += " n=\"";
-		res += this.n;
-		res += "\"";
+		writer.WriteXmlAttributeString("n", this.n);
 	}
 	if (null !== this.t) {
-		res += " t=\"";
-		res += ToXml_ST_ItemType(this.t);
-		res += "\"";
+		writer.WriteXmlAttributeString("t", ToXml_ST_ItemType(this.t));
 	}
 	if (null !== this.h) {
-		res += " h=\"";
-		res += getXmlFromBool(this.h);
-		res += "\"";
+		writer.WriteXmlAttributeBool("h", this.h);
 	}
 	if (null !== this.s) {
-		res += " s=\"";
-		res += getXmlFromBool(this.s);
-		res += "\"";
+		writer.WriteXmlAttributeBool("s", this.s);
 	}
 	if (null !== this.sd) {
-		res += " sd=\"";
-		res += getXmlFromBool(this.sd);
-		res += "\"";
+		writer.WriteXmlAttributeBool("sd", this.sd);
 	}
 	if (null !== this.f) {
-		res += " f=\"";
-		res += getXmlFromBool(this.f);
-		res += "\"";
+		writer.WriteXmlAttributeBool("f", this.f);
 	}
 	if (null !== this.m) {
-		res += " m=\"";
-		res += getXmlFromBool(this.m);
-		res += "\"";
+		writer.WriteXmlAttributeBool("m", this.m);
 	}
 	if (null !== this.c) {
-		res += " c=\"";
-		res += getXmlFromBool(this.c);
-		res += "\"";
+		writer.WriteXmlAttributeBool("c", this.c);
 	}
 	if (null !== this.x) {
-		res += " x=\"";
-		res += this.x.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("x", this.x);
 	}
 	if (null !== this.d) {
-		res += " d=\"";
-		res += getXmlFromBool(this.d);
-		res += "\"";
+		writer.WriteXmlAttributeBool("d", this.d);
 	}
 	if (null !== this.e) {
-		res += " e=\"";
-		res += getXmlFromBool(this.e);
-		res += "\"";
+		writer.WriteXmlAttributeBool("e", this.e);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_MemberProperty() {
@@ -9665,56 +8566,37 @@ CT_MemberProperty.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_MemberProperty.prototype.toXml = function(name) {
+CT_MemberProperty.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.showCell) {
-		res += " showCell=\"";
-		res += getXmlFromBool(this.showCell);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showCell", this.showCell);
 	}
 	if (null !== this.showTip) {
-		res += " showTip=\"";
-		res += getXmlFromBool(this.showTip);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showTip", this.showTip);
 	}
 	if (null !== this.showAsCaption) {
-		res += " showAsCaption=\"";
-		res += getXmlFromBool(this.showAsCaption);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showAsCaption", this.showAsCaption);
 	}
 	if (null !== this.nameLen) {
-		res += " nameLen=\"";
-		res += this.nameLen.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("nameLen", this.nameLen);
 	}
 	if (null !== this.pPos) {
-		res += " pPos=\"";
-		res += this.pPos.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("pPos", this.pPos);
 	}
 	if (null !== this.pLen) {
-		res += " pLen=\"";
-		res += this.pLen.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("pLen", this.pLen);
 	}
 	if (null !== this.level) {
-		res += " level=\"";
-		res += this.level.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("level", this.level);
 	}
 	if (null !== this.field) {
-		res += " field=\"";
-		res += this.field.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("field", this.field);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Member() {
@@ -9731,16 +8613,13 @@ CT_Member.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_Member.prototype.toXml = function(name) {
+CT_Member.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_FilterColumn() {
@@ -9824,50 +8703,41 @@ CT_FilterColumn.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_FilterColumn.prototype.toXml = function(name) {
+CT_FilterColumn.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.colId) {
-		res += " colId=\"";
-		res += this.colId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("colId", this.colId);
 	}
 	if (null !== this.hiddenButton) {
-		res += " hiddenButton=\"";
-		res += getXmlFromBool(this.hiddenButton);
-		res += "\"";
+		writer.WriteXmlAttributeBool("hiddenButton", this.hiddenButton);
 	}
 	if (null !== this.showButton) {
-		res += " showButton=\"";
-		res += getXmlFromBool(this.showButton);
-		res += "\"";
+		writer.WriteXmlAttributeBool("showButton", this.showButton);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.colorFilter) {
-		res += this.colorFilter.toXml("colorFilter");
+		res += this.colorFilter.toXml(writer, "colorFilter");
 	}
 	if (null !== this.customFilters) {
-		res += this.customFilters.toXml("customFilters");
+		res += this.customFilters.toXml(writer, "customFilters");
 	}
 	if (null !== this.dynamicFilter) {
-		res += this.dynamicFilter.toXml("dynamicFilter");
+		res += this.dynamicFilter.toXml(writer, "dynamicFilter");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
 	if (null !== this.filters) {
-		res += this.filters.toXml("filters");
+		res += this.filters.toXml(writer, "filters");
 	}
 	if (null !== this.iconFilter) {
-		res += this.iconFilter.toXml("iconFilter");
+		res += this.iconFilter.toXml(writer, "iconFilter");
 	}
 	if (null !== this.top10) {
-		res += this.top10.toXml("top10");
+		res += this.top10.toXml(writer, "top10");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_SortState() {
@@ -9924,41 +8794,30 @@ CT_SortState.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_SortState.prototype.toXml = function(name) {
+CT_SortState.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.columnSort) {
-		res += " columnSort=\"";
-		res += getXmlFromBool(this.columnSort);
-		res += "\"";
+		writer.WriteXmlAttributeBool("columnSort", this.columnSort);
 	}
 	if (null !== this.caseSensitive) {
-		res += " caseSensitive=\"";
-		res += getXmlFromBool(this.caseSensitive);
-		res += "\"";
+		writer.WriteXmlAttributeBool("caseSensitive", this.caseSensitive);
 	}
 	if (null !== this.sortMethod) {
-		res += " sortMethod=\"";
-		res += ToXml_ST_SortMethod(this.sortMethod);
-		res += "\"";
+		writer.WriteXmlAttributeString("sortMethod", ToXml_ST_SortMethod(this.sortMethod));
 	}
 	if (null !== this.ref) {
-		res += " ref=\"";
-		res += this.ref;
-		res += "\"";
+		writer.WriteXmlAttributeString("ref", this.ref);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.sortCondition.length; ++i) {
 		var elem = this.sortCondition[i];
-		res += elem.toXml("sortCondition");
+		res += elem.toXml(writer, "sortCondition");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PageItem() {
@@ -9975,16 +8834,13 @@ CT_PageItem.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_PageItem.prototype.toXml = function(name) {
+CT_PageItem.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Groups() {
@@ -10016,23 +8872,18 @@ CT_Groups.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Groups.prototype.toXml = function(name) {
+CT_Groups.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.group.length; ++i) {
 		var elem = this.group[i];
-		res += elem.toXml("group");
+		res += elem.toXml(writer, "group");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_PivotAreaReference() {
@@ -10151,106 +9002,69 @@ CT_PivotAreaReference.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_PivotAreaReference.prototype.toXml = function(name) {
+CT_PivotAreaReference.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.field) {
-		res += " field=\"";
-		res += this.field.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("field", this.field);
 	}
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
 	if (null !== this.selected) {
-		res += " selected=\"";
-		res += getXmlFromBool(this.selected);
-		res += "\"";
+		writer.WriteXmlAttributeBool("selected", this.selected);
 	}
 	if (null !== this.byPosition) {
-		res += " byPosition=\"";
-		res += getXmlFromBool(this.byPosition);
-		res += "\"";
+		writer.WriteXmlAttributeBool("byPosition", this.byPosition);
 	}
 	if (null !== this.relative) {
-		res += " relative=\"";
-		res += getXmlFromBool(this.relative);
-		res += "\"";
+		writer.WriteXmlAttributeBool("relative", this.relative);
 	}
 	if (null !== this.defaultSubtotal) {
-		res += " defaultSubtotal=\"";
-		res += getXmlFromBool(this.defaultSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("defaultSubtotal", this.defaultSubtotal);
 	}
 	if (null !== this.sumSubtotal) {
-		res += " sumSubtotal=\"";
-		res += getXmlFromBool(this.sumSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("sumSubtotal", this.sumSubtotal);
 	}
 	if (null !== this.countASubtotal) {
-		res += " countASubtotal=\"";
-		res += getXmlFromBool(this.countASubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("countASubtotal", this.countASubtotal);
 	}
 	if (null !== this.avgSubtotal) {
-		res += " avgSubtotal=\"";
-		res += getXmlFromBool(this.avgSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("avgSubtotal", this.avgSubtotal);
 	}
 	if (null !== this.maxSubtotal) {
-		res += " maxSubtotal=\"";
-		res += getXmlFromBool(this.maxSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("maxSubtotal", this.maxSubtotal);
 	}
 	if (null !== this.minSubtotal) {
-		res += " minSubtotal=\"";
-		res += getXmlFromBool(this.minSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("minSubtotal", this.minSubtotal);
 	}
 	if (null !== this.productSubtotal) {
-		res += " productSubtotal=\"";
-		res += getXmlFromBool(this.productSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("productSubtotal", this.productSubtotal);
 	}
 	if (null !== this.countSubtotal) {
-		res += " countSubtotal=\"";
-		res += getXmlFromBool(this.countSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("countSubtotal", this.countSubtotal);
 	}
 	if (null !== this.stdDevSubtotal) {
-		res += " stdDevSubtotal=\"";
-		res += getXmlFromBool(this.stdDevSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("stdDevSubtotal", this.stdDevSubtotal);
 	}
 	if (null !== this.stdDevPSubtotal) {
-		res += " stdDevPSubtotal=\"";
-		res += getXmlFromBool(this.stdDevPSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("stdDevPSubtotal", this.stdDevPSubtotal);
 	}
 	if (null !== this.varSubtotal) {
-		res += " varSubtotal=\"";
-		res += getXmlFromBool(this.varSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("varSubtotal", this.varSubtotal);
 	}
 	if (null !== this.varPSubtotal) {
-		res += " varPSubtotal=\"";
-		res += getXmlFromBool(this.varPSubtotal);
-		res += "\"";
+		writer.WriteXmlAttributeBool("varPSubtotal", this.varPSubtotal);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.x.length; ++i) {
 		var elem = this.x[i];
-		res += elem.toXml("x");
+		res += elem.toXml(writer, "x");
 	}
 	if (null !== this.extLst) {
-		res += this.extLst.toXml("extLst");
+		res += this.extLst.toXml(writer, "extLst");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_ColorFilter() {
@@ -10272,21 +9086,16 @@ CT_ColorFilter.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_ColorFilter.prototype.toXml = function(name) {
+CT_ColorFilter.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.dxfId) {
-		res += " dxfId=\"";
-		res += this.dxfId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("dxfId", this.dxfId);
 	}
 	if (null !== this.cellColor) {
-		res += " cellColor=\"";
-		res += getXmlFromBool(this.cellColor);
-		res += "\"";
+		writer.WriteXmlAttributeBool("cellColor", this.cellColor);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_CustomFilters() {
@@ -10318,23 +9127,18 @@ CT_CustomFilters.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_CustomFilters.prototype.toXml = function(name) {
+CT_CustomFilters.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.and) {
-		res += " and=\"";
-		res += getXmlFromBool(this.and);
-		res += "\"";
+		writer.WriteXmlAttributeBool("and", this.and);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.customFilter.length; ++i) {
 		var elem = this.customFilter[i];
-		res += elem.toXml("customFilter");
+		res += elem.toXml(writer, "customFilter");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_DynamicFilter() {
@@ -10369,31 +9173,22 @@ CT_DynamicFilter.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_DynamicFilter.prototype.toXml = function(name) {
+CT_DynamicFilter.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.type) {
-		res += " type=\"";
-		res += ToXml_ST_DynamicFilterType(this.type);
-		res += "\"";
+		writer.WriteXmlAttributeString("type", ToXml_ST_DynamicFilterType(this.type));
 	}
 	if (null !== this.val) {
-		res += " val=\"";
-		res += this.val.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("val", this.val);
 	}
 	if (null !== this.valIso) {
-		res += " valIso=\"";
-		res += this.valIso;
-		res += "\"";
+		writer.WriteXmlAttributeString("valIso", this.valIso);
 	}
 	if (null !== this.maxValIso) {
-		res += " maxValIso=\"";
-		res += this.maxValIso;
-		res += "\"";
+		writer.WriteXmlAttributeString("maxValIso", this.maxValIso);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Filters() {
@@ -10440,32 +9235,25 @@ CT_Filters.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_Filters.prototype.toXml = function(name) {
+CT_Filters.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.blank) {
-		res += " blank=\"";
-		res += getXmlFromBool(this.blank);
-		res += "\"";
+		writer.WriteXmlAttributeBool("blank", this.blank);
 	}
 	if (null !== this.calendarType) {
-		res += " calendarType=\"";
-		res += ToXml_ST_CalendarType(this.calendarType);
-		res += "\"";
+		writer.WriteXmlAttributeString("calendarType", ToXml_ST_CalendarType(this.calendarType));
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.filter.length; ++i) {
 		var elem = this.filter[i];
-		res += elem.toXml("filter");
+		res += elem.toXml(writer, "filter");
 	}
 	for (var i = 0; i < this.dateGroupItem.length; ++i) {
 		var elem = this.dateGroupItem[i];
-		res += elem.toXml("dateGroupItem");
+		res += elem.toXml(writer, "dateGroupItem");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_IconFilter() {
@@ -10490,21 +9278,16 @@ CT_IconFilter.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_IconFilter.prototype.toXml = function(name) {
+CT_IconFilter.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.iconSet) {
-		res += " iconSet=\"";
-		res += ToXml_ST_IconSetType(this.iconSet);
-		res += "\"";
+		writer.WriteXmlAttributeString("iconSet", ToXml_ST_IconSetType(this.iconSet));
 	}
 	if (null !== this.iconId) {
-		res += " iconId=\"";
-		res += this.iconId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("iconId", this.iconId);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Top10() {
@@ -10536,31 +9319,22 @@ CT_Top10.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_Top10.prototype.toXml = function(name) {
+CT_Top10.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.top) {
-		res += " top=\"";
-		res += getXmlFromBool(this.top);
-		res += "\"";
+		writer.WriteXmlAttributeBool("top", this.top);
 	}
 	if (null !== this.percent) {
-		res += " percent=\"";
-		res += getXmlFromBool(this.percent);
-		res += "\"";
+		writer.WriteXmlAttributeBool("percent", this.percent);
 	}
 	if (null !== this.val) {
-		res += " val=\"";
-		res += this.val.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("val", this.val);
 	}
 	if (null !== this.filterVal) {
-		res += " filterVal=\"";
-		res += this.filterVal.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("filterVal", this.filterVal);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_SortCondition() {
@@ -10613,46 +9387,31 @@ CT_SortCondition.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_SortCondition.prototype.toXml = function(name) {
+CT_SortCondition.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.descending) {
-		res += " descending=\"";
-		res += getXmlFromBool(this.descending);
-		res += "\"";
+		writer.WriteXmlAttributeBool("descending", this.descending);
 	}
 	if (null !== this.sortBy) {
-		res += " sortBy=\"";
-		res += ToXml_ST_SortBy(this.sortBy);
-		res += "\"";
+		writer.WriteXmlAttributeString("sortBy", ToXml_ST_SortBy(this.sortBy));
 	}
 	if (null !== this.ref) {
-		res += " ref=\"";
-		res += this.ref;
-		res += "\"";
+		writer.WriteXmlAttributeString("ref", this.ref);
 	}
 	if (null !== this.customList) {
-		res += " customList=\"";
-		res += this.customList;
-		res += "\"";
+		writer.WriteXmlAttributeString("customList", this.customList);
 	}
 	if (null !== this.dxfId) {
-		res += " dxfId=\"";
-		res += this.dxfId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("dxfId", this.dxfId);
 	}
 	if (null !== this.iconSet) {
-		res += " iconSet=\"";
-		res += ToXml_ST_IconSetType(this.iconSet);
-		res += "\"";
+		writer.WriteXmlAttributeString("iconSet", ToXml_ST_IconSetType(this.iconSet));
 	}
 	if (null !== this.iconId) {
-		res += " iconId=\"";
-		res += this.iconId.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("iconId", this.iconId);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_LevelGroup() {
@@ -10704,42 +9463,29 @@ CT_LevelGroup.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_LevelGroup.prototype.toXml = function(name) {
+CT_LevelGroup.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.name) {
-		res += " name=\"";
-		res += this.name;
-		res += "\"";
+		writer.WriteXmlAttributeString("name", this.name);
 	}
 	if (null !== this.uniqueName) {
-		res += " uniqueName=\"";
-		res += this.uniqueName;
-		res += "\"";
+		writer.WriteXmlAttributeString("uniqueName", this.uniqueName);
 	}
 	if (null !== this.caption) {
-		res += " caption=\"";
-		res += this.caption;
-		res += "\"";
+		writer.WriteXmlAttributeString("caption", this.caption);
 	}
 	if (null !== this.uniqueParent) {
-		res += " uniqueParent=\"";
-		res += this.uniqueParent;
-		res += "\"";
+		writer.WriteXmlAttributeString("uniqueParent", this.uniqueParent);
 	}
 	if (null !== this.id) {
-		res += " id=\"";
-		res += this.id.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("id", this.id);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.groupMembers) {
-		res += this.groupMembers.toXml("groupMembers");
+		res += this.groupMembers.toXml(writer, "groupMembers");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_CustomFilter() {
@@ -10764,21 +9510,16 @@ CT_CustomFilter.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_CustomFilter.prototype.toXml = function(name) {
+CT_CustomFilter.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.operator) {
-		res += " operator=\"";
-		res += ToXml_ST_FilterOperator(this.operator);
-		res += "\"";
+		writer.WriteXmlAttributeString("operator", ToXml_ST_FilterOperator(this.operator));
 	}
 	if (null !== this.val) {
-		res += " val=\"";
-		res += this.val;
-		res += "\"";
+		writer.WriteXmlAttributeString("val", this.val);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_Filter() {
@@ -10795,16 +9536,13 @@ CT_Filter.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_Filter.prototype.toXml = function(name) {
+CT_Filter.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.val) {
-		res += " val=\"";
-		res += this.val;
-		res += "\"";
+		writer.WriteXmlAttributeString("val", this.val);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_DateGroupItem() {
@@ -10854,46 +9592,31 @@ CT_DateGroupItem.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_DateGroupItem.prototype.toXml = function(name) {
+CT_DateGroupItem.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.year) {
-		res += " year=\"";
-		res += this.year.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("year", this.year);
 	}
 	if (null !== this.month) {
-		res += " month=\"";
-		res += this.month.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("month", this.month);
 	}
 	if (null !== this.day) {
-		res += " day=\"";
-		res += this.day.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("day", this.day);
 	}
 	if (null !== this.hour) {
-		res += " hour=\"";
-		res += this.hour.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("hour", this.hour);
 	}
 	if (null !== this.minute) {
-		res += " minute=\"";
-		res += this.minute.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("minute", this.minute);
 	}
 	if (null !== this.second) {
-		res += " second=\"";
-		res += this.second.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("second", this.second);
 	}
 	if (null !== this.dateTimeGrouping) {
-		res += " dateTimeGrouping=\"";
-		res += ToXml_ST_DateTimeGrouping(this.dateTimeGrouping);
-		res += "\"";
+		writer.WriteXmlAttributeString("dateTimeGrouping", ToXml_ST_DateTimeGrouping(this.dateTimeGrouping));
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
 function CT_GroupMembers() {
@@ -10925,23 +9648,18 @@ CT_GroupMembers.prototype.onStartNode = function(elem, attr, uq) {
 	}
 	return newContext;
 };
-CT_GroupMembers.prototype.toXml = function(name) {
+CT_GroupMembers.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.count) {
-		res += " count=\"";
-		res += this.count.toString();
-		res += "\"";
+		writer.WriteXmlAttributeNumber("count", this.count);
 	}
-	res += ">";
+	writer.WriteXmlNodeEnd(name, true);
 	for (var i = 0; i < this.groupMember.length; ++i) {
 		var elem = this.groupMember[i];
-		res += elem.toXml("groupMember");
+		res += elem.toXml(writer, "groupMember");
 	}
-	res += "</";
-	res += name;
-	res += ">";
+	writer.WriteXmlNodeEnd(name);
 	return res;
 };
 function CT_GroupMember() {
@@ -10963,20 +9681,15 @@ CT_GroupMember.prototype.readAttributes = function(attr, uq) {
 		}
 	}
 };
-CT_GroupMember.prototype.toXml = function(name) {
+CT_GroupMember.prototype.toXml = function(writer, name) {
 	var res = "";
-	res += "<";
-	res += name;
+	writer.WriteXmlNodeStart(name);
 	if (null !== this.uniqueName) {
-		res += " uniqueName=\"";
-		res += this.uniqueName;
-		res += "\"";
+		writer.WriteXmlAttributeString("uniqueName", this.uniqueName);
 	}
 	if (null !== this.group) {
-		res += " group=\"";
-		res += getXmlFromBool(this.group);
-		res += "\"";
+		writer.WriteXmlAttributeBool("group", this.group);
 	}
-	res += "/>";
+	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
