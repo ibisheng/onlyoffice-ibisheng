@@ -529,9 +529,9 @@ CBlockLevelSdt.prototype.Document_UpdateInterfaceState = function()
 {
 	this.Content.Document_UpdateInterfaceState();
 };
-CBlockLevelSdt.prototype.Document_UpdateRulersState = function()
+CBlockLevelSdt.prototype.Document_UpdateRulersState = function(CurPage)
 {
-	this.Content.Document_UpdateRulersState();
+	this.Content.Document_UpdateRulersState(CurPage);
 };
 CBlockLevelSdt.prototype.GetTableProps = function()
 {

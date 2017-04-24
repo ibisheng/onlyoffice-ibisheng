@@ -14622,6 +14622,8 @@ CDocument.prototype.controller_UpdateInterfaceState = function()
 };
 CDocument.prototype.controller_UpdateRulersState = function()
 {
+	this.Document_UpdateRulersStateBySection();
+
 	if (true === this.Selection.Use)
 	{
 		if (this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
@@ -14669,9 +14671,7 @@ CDocument.prototype.controller_UpdateRulersState = function()
 				}
 			}
 
-			if (undefined === FramePr)
-				this.Document_UpdateRulersStateBySection();
-			else
+			if (undefined !== FramePr)
 				this.Content[StartPos].Document_UpdateRulersState();
 		}
 	}
