@@ -348,13 +348,9 @@ CDocumentContentElementBase.prototype.SetSelectionState = function(State, StateI
 {
 
 };
-CDocumentContentElementBase.prototype.Add_NewParagraph = function()
-{
-
-};
 CDocumentContentElementBase.prototype.AddNewParagraph = function()
 {
-	return this.Add_NewParagraph();
+
 };
 CDocumentContentElementBase.prototype.Get_SelectionState2 = function()
 {

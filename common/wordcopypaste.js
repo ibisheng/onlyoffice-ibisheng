@@ -2086,7 +2086,7 @@ PasteProcessor.prototype =
     insertInPlace2: function(oDoc, aNewContent)
     {
         var nNewContentLength = aNewContent.length;
-        //����� ���� �� Document.Add_NewParagraph
+        //����� ���� �� Document.AddNewParagraph
 
         for(var i = 0; i < aNewContent.length; ++i)
         {
@@ -6751,7 +6751,7 @@ PasteProcessor.prototype =
                     {
                         this.oDocument = shape.txBody.content;
 						if(bAddParagraph)
-							shape.txBody.content.Add_NewParagraph();
+							shape.txBody.content.AddNewParagraph();
                        // bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
 
                         //��������� ������� ����� ���� �� ���������

@@ -42,7 +42,7 @@ CHdrFtrController.prototype.GetCurPage = function()
 };
 CHdrFtrController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
-	return this.HdrFtr.Add_NewParagraph(bRecalculate, bForceAdd);
+	return this.HdrFtr.AddNewParagraph(bRecalculate, bForceAdd);
 };
 CHdrFtrController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {

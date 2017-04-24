@@ -1330,7 +1330,7 @@ CPresentation.prototype =
         this.Slides[nPageIndex] && this.Slides[nPageIndex].draw(pGraphics);
     },
 
-    Add_NewParagraph : function(bRecalculate)
+	AddNewParagraph : function(bRecalculate)
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(this.Slides[this.CurPage].graphicObjects.addNewParagraph, [], false, AscDFH.historydescription_Presentation_AddNewParagraph);
         this.Document_UpdateInterfaceState();
@@ -2556,7 +2556,7 @@ CPresentation.prototype =
                 else
                 {
                     if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.selectedObjects.length !== 0) {
-                        this.Add_NewParagraph();
+                        this.AddNewParagraph();
                     }
                 }
             }

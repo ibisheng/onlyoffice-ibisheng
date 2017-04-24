@@ -660,10 +660,10 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с контентом
 //-----------------------------------------------------------------------------------
-    Add_NewParagraph : function()
-    {
-        this.Content.Add_NewParagraph();
-    },
+	AddNewParagraph : function()
+	{
+		this.Content.AddNewParagraph();
+	},
 
 	AddInlineImage : function(W, H, Img, Chart, bFlow)
     {
@@ -1828,11 +1828,11 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с контентом
 //-----------------------------------------------------------------------------------
-    Add_NewParagraph : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Add_NewParagraph();
-    },
+	AddNewParagraph : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.AddNewParagraph();
+	},
 
 	AddInlineImage : function(W, H, Img, Chart, bFlow)
     {

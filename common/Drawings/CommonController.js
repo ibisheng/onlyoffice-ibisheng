@@ -1557,7 +1557,7 @@ DrawingObjectsController.prototype =
 
     addNewParagraph: function(bRecalculate)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Add_NewParagraph, CTable.prototype.Add_NewParagraph, [bRecalculate]);
+        this.applyTextFunction(CDocumentContent.prototype.AddNewParagraph, CTable.prototype.AddNewParagraph, [bRecalculate]);
     },
 
 
@@ -1839,18 +1839,18 @@ DrawingObjectsController.prototype =
             {
                 this.parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.AddNewParagraph === docContentFunction)
                 {
-                    this.document.Add_NewParagraph(args[0]);
+                    this.document.AddNewParagraph(args[0]);
                 }
             }
             else if(this.selectedObjects.length > 0 && this.selectedObjects[0].parent && this.selectedObjects[0].parent.GoTo_Text)
             {
                 this.selectedObjects[0].parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.AddNewParagraph === docContentFunction)
                 {
-                    this.document.Add_NewParagraph(args[0]);
+                    this.document.AddNewParagraph(args[0]);
                 }
             }
         }

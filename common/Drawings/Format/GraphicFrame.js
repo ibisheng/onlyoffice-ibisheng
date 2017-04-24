@@ -922,7 +922,7 @@ CGraphicFrame.prototype.applyTextFunction = function(docContentFunction, tableFu
                 this.graphicObject.Remove(1, true, undefined, true);
             }
         }
-        else if(tableFunction === CTable.prototype.Add_NewParagraph)
+        else if(tableFunction === CTable.prototype.AddNewParagraph)
         {
             this.graphicObject.Selection.Use && this.graphicObject.Remove(1, true, undefined, true);
         }
@@ -938,7 +938,7 @@ CGraphicFrame.prototype.remove = function(Count, bOnlyText, bRemoveOnlySelection
 
 CGraphicFrame.prototype.addNewParagraph = function()
     {
-        this.graphicObject.Add_NewParagraph(false);
+        this.graphicObject.AddNewParagraph(false);
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
 };

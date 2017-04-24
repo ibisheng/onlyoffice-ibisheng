@@ -727,14 +727,14 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 			}
 
 			textStr = "Fghi";
-			oContent.Add_NewParagraph();
+			oContent.AddNewParagraph();
 			for(var i = 0; i < textStr.length; ++i)
 			{
 				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
 			}
 
 			textStr = "Jklmn";
-			oContent.Add_NewParagraph();
+			oContent.AddNewParagraph();
 			for(var i = 0; i < textStr.length; ++i)
 			{
 				oContent.Paragraph_Add(new ParaText(textStr[i]), false);
@@ -771,7 +771,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
                 oContent.Paragraph_Add(new ParaText(textStr[i]), false);
             }
 
-            oContent.Add_NewParagraph();
+            oContent.AddNewParagraph();
             textStr = "abc";
             for(var i = 0; i < textStr.length; ++i)
             {
@@ -779,7 +779,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
             }
 
 
-            oContent.Add_NewParagraph();
+            oContent.AddNewParagraph();
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
@@ -794,7 +794,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
             {
                 oContent.Paragraph_Add(new ParaText(textStr[i]), false);
             }
-            oContent.Add_NewParagraph();
+            oContent.AddNewParagraph();
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
@@ -809,13 +809,13 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
             {
                 oContent.Paragraph_Add(new ParaText(textStr[i]), false);
             }
-            oContent.Add_NewParagraph();
+            oContent.AddNewParagraph();
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {
                 oContent.Paragraph_Add(new ParaText(textStr[i]), false);
             }
-            oContent.Add_NewParagraph();
+            oContent.AddNewParagraph();
             textStr = "abcde";
             for(var i = 0; i < textStr.length; ++i)
             {

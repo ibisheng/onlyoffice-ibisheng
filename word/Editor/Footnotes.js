@@ -1361,7 +1361,7 @@ CFootnotesController.prototype.AddNewParagraph = function(bRecalculate, bForceAd
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Add_NewParagraph(bRecalculate, bForceAdd);
+	return this.CurFootnote.AddNewParagraph(bRecalculate, bForceAdd);
 };
 CFootnotesController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {

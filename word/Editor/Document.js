@@ -3881,7 +3881,7 @@ CDocument.prototype.Draw_Borders                             = function(Graphics
  * @param bRecalculate
  * @param bForceAdd - добавляем параграф, пропуская всякие проверки типа пустого параграфа с нумерацией.
  */
-CDocument.prototype.Add_NewParagraph = function(bRecalculate, bForceAdd)
+CDocument.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
 	// TODO: Пересчет нужно перенести сюда, и убрать из контроллеров
 	this.Controller.AddNewParagraph(bRecalculate, bForceAdd);
@@ -6182,7 +6182,7 @@ CDocument.prototype.OnKeyDown = function(e)
                         }
                         else
                         {
-                            this.Add_NewParagraph();
+                            this.AddNewParagraph();
                         }
                     }
                 }
@@ -11756,7 +11756,7 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 				}
 				else
 				{
-					this.Add_NewParagraph(undefined, true);
+					this.AddNewParagraph(undefined, true);
 					var CurPos = this.CurPos.ContentPos - 1;
 					this.Content[CurPos].MoveCursorToStartPos(false);
 					this.Content[CurPos].AddToParagraph(ParaItem);
@@ -11775,7 +11775,7 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 					}
 					else
 					{
-						this.Add_NewParagraph(undefined, true);
+						this.AddNewParagraph(undefined, true);
 						CurPos = this.CurPos.ContentPos;
 
 						this.Content[CurPos].MoveCursorToStartPos(false);
@@ -11784,8 +11784,8 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 				}
 				else
 				{
-					this.Add_NewParagraph(undefined, true);
-					this.Add_NewParagraph(undefined, true);
+					this.AddNewParagraph(undefined, true);
+					this.AddNewParagraph(undefined, true);
 					var CurPos = this.CurPos.ContentPos - 1;
 					this.Content[CurPos].MoveCursorToStartPos(false);
 					this.Content[CurPos].AddToParagraph(ParaItem);

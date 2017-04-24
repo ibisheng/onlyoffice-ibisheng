@@ -2127,7 +2127,7 @@ CDocumentContent.prototype.UpdateCursorType = function(X, Y, CurPage)
 //-----------------------------------------------------------------------------------
 // Функции для работы с контентом
 //-----------------------------------------------------------------------------------
-CDocumentContent.prototype.Add_NewParagraph = function()
+CDocumentContent.prototype.AddNewParagraph = function()
 {
     if (docpostype_DrawingObjects === this.CurPos.Type)
     {
@@ -2662,14 +2662,14 @@ CDocumentContent.prototype.Paragraph_Add = function(ParaItem, bRecalculate)
 			{
 				if (true === Item.IsCursorAtBegin())
 				{
-					this.Add_NewParagraph();
+					this.AddNewParagraph();
 					this.Content[this.CurPos.ContentPos - 1].AddToParagraph(ParaItem);
 					this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
 				}
 				else
 				{
-					this.Add_NewParagraph();
-					this.Add_NewParagraph();
+					this.AddNewParagraph();
+					this.AddNewParagraph();
 					this.Content[this.CurPos.ContentPos - 1].AddToParagraph(ParaItem);
 					this.Content[this.CurPos.ContentPos - 1].Clear_Formatting();
 				}

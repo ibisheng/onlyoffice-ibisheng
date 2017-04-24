@@ -313,9 +313,9 @@ CBlockLevelSdt.prototype.IsCursorAtEnd = function()
 {
 	return this.Content.IsCursorAtEnd();
 };
-CBlockLevelSdt.prototype.Add_NewParagraph = function()
+CBlockLevelSdt.prototype.AddNewParagraph = function()
 {
-	return this.Content.Add_NewParagraph();
+	return this.Content.AddNewParagraph();
 };
 CBlockLevelSdt.prototype.Get_SelectionState2 = function()
 {

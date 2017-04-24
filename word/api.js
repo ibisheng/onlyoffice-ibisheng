@@ -2134,7 +2134,7 @@ background-repeat: no-repeat;\
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
-				//t.WordControl.m_oLogicDocument.Add_NewParagraph();
+				//t.WordControl.m_oLogicDocument.AddNewParagraph();
 				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + result, undefined, undefined, true);
 			});
 		}
@@ -7432,7 +7432,7 @@ background-repeat: no-repeat;\
 		if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
 		{
 			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_EnterButton);
-			LogicDocument.Add_NewParagraph(true);
+			LogicDocument.AddNewParagraph(true);
 		}
 	};
 	window["asc_docs_api"].prototype["Cursor_MoveLeft"]              = function()
@@ -7509,7 +7509,7 @@ background-repeat: no-repeat;\
 			this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments};
 
 			//this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-			//this.WordControl.m_oLogicDocument.Add_NewParagraph();
+			//this.WordControl.m_oLogicDocument.AddNewParagraph();
 			this.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
 		}
 	};
