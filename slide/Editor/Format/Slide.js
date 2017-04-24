@@ -459,7 +459,7 @@ Slide.prototype =
             }
         }
 
-        if(body_count === 1 && type === AscFormat.phType_body && bSingleBody)
+        if(body_count === 1 && _input_reduced_type === AscFormat.phType_body && bSingleBody)
         {
             return last_body;
         }

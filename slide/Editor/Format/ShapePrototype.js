@@ -753,7 +753,8 @@ CShape.prototype.getIsSingleBody = function(x, y)
 {
     if(!this.isPlaceholder())
         return false;
-    if(this.getPlaceholderType() !== AscFormat.phType_body)
+    var ph_type = this.getPlaceholderType();
+    if(this.getPlaceholderType() !== AscFormat.phType_body && ph_type !== null)
         return false;
     if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
     {
