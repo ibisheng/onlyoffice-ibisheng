@@ -3840,7 +3840,7 @@ CT_Location.prototype.toXml = function(writer, name) {
 	var res = "";
 	writer.WriteXmlNodeStart(name);
 	if (null !== this.ref) {
-		writer.WriteXmlAttributeString("ref", this.ref);
+		writer.WriteXmlAttributeString("ref", this.ref.getName());
 	}
 	if (null !== this.firstHeaderRow) {
 		writer.WriteXmlAttributeNumber("firstHeaderRow", this.firstHeaderRow);
