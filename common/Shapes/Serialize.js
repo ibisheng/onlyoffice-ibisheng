@@ -8857,8 +8857,12 @@ function CPres()
                         oThis.bcr.Read1(nDocLength, function(t,l){
                             return oBinary_DocumentTableReader.ReadDocumentContent(t,l, content_arr);
                         });
-                        for(var i = 0, length = content_arr.length; i < length; ++i)
-                            shape.textBoxContent.Internal_Content_Add(i, content_arr[i]);
+                        for(var i = 0, length = content_arr.length; i < length; ++i){
+                            if(i == length - 1)
+                                shape.textBoxContent.Internal_Content_Add(i, content_arr[i], true);
+                            else
+                                shape.textBoxContent.Internal_Content_Add(i, content_arr[i], false);
+                        }
 
                         s.pos = oThis.stream.pos;
                         s.cur = oThis.stream.cur;
