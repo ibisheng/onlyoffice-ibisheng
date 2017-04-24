@@ -2220,7 +2220,7 @@ PasteProcessor.prototype =
 
 		if(specialPasteShowOptions)
 		{
-			var cursorPos = this.oLogicDocument.Cursor_GetPos();
+			var cursorPos = this.oLogicDocument.GetCursorPosXY();
 			var _Y = cursorPos.Y;
 			var _X = cursorPos.X;
 			var _PageNum = this.oLogicDocument.CurPage;
