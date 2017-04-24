@@ -10144,7 +10144,7 @@
 		specialPasteShowOptions.asc_setOptions(props);
 		specialPasteShowOptions.asc_setCellCoord(cellCoord);
 		this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
-	},
+	};
 
 	WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
 	{

@@ -3806,7 +3806,7 @@ CT_Location.prototype.readAttributes = function(attr, uq) {
 		var val;
 		val = vals["ref"];
 		if (undefined !== val) {
-			this.ref = uq(val);
+			this.ref = AscCommonExcel.g_oRangeCache.getAscRange(uq(val));
 		}
 		val = vals["firstHeaderRow"];
 		if (undefined !== val) {
