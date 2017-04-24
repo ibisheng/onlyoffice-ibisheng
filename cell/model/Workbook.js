@@ -1333,6 +1333,73 @@
 		return o;
 	}
 //-------------------------------------------------------------------------------------------------
+	function CT_Workbook() {
+		//Members
+		this.sheets = null;
+		this.pivotCaches = null;
+	}
+	CT_Workbook.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if ("workbook" === elem) {
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+		} else if ("sheets" === elem) {
+			//todo check name duplication
+			this.sheets = [];
+		} else if ("sheet" === elem) {
+			newContext = new CT_Sheet();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.sheets.push(newContext);
+		} else if ("pivotCaches" === elem) {
+			//todo check name duplication
+			this.pivotCaches = [];
+		} else if ("pivotCache" === elem) {
+			newContext = new CT_PivotCache();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.pivotCaches.push(newContext);
+		} else {
+			newContext = null;
+		}
+		return newContext;
+	};
+	function CT_Sheet() {
+		//Attributes
+		this.id = null;
+	}
+	CT_Sheet.prototype.readAttributes = function(attr, uq) {
+		if (attr()) {
+			var vals = attr();
+			var val;
+			val = vals["r:id"];
+			if (undefined !== val) {
+				this.id = uq(val);
+			}
+		}
+	};
+	function CT_PivotCache() {
+		//Attributes
+		this.cacheId = null;
+		this.id = null;
+	}
+	CT_PivotCache.prototype.readAttributes = function(attr, uq) {
+		if (attr()) {
+			var vals = attr();
+			var val;
+			val = vals["cacheId"];
+			if (undefined !== val) {
+				this.cacheId = val - 0;
+			}
+			val = vals["r:id"];
+			if (undefined !== val) {
+				this.id = uq(val);
+			}
+		}
+	};
 	/**
 	 * @constructor
 	 */
@@ -1352,6 +1419,7 @@
 		this.aCommentsCoords = [];
 		this.aWorksheets = [];
 		this.aWorksheetsById = {};
+		this.pivotCaches = [];
 		this.aCollaborativeActions = [];
 		this.bCollaborativeChanges = false;
 		this.bUndoChanges = false;
@@ -2392,9 +2460,7 @@
 		this.aSparklineGroups = [];
 
 		this.selectionRange = new AscCommonExcel.SelectionRange(this);
-		this.pivotTable = null;
-		this.pivotTableCacheDefinition = null;
-		this.pivotTableCacheRecords = null;
+		this.pivotTables = [];
 
 		/*handlers*/
 		this.handlers = null;
@@ -9173,6 +9239,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	window['AscCommonExcel'].angleFormatToInterface2 = angleFormatToInterface2;
 	window['AscCommonExcel'].angleInterfaceToFormat = angleInterfaceToFormat;
 	window['AscCommonExcel'].Workbook = Workbook;
+	window['AscCommonExcel'].CT_Workbook = CT_Workbook;
 	window['AscCommonExcel'].Woorksheet = Woorksheet;
 	window['AscCommonExcel'].Cell = Cell;
 	window['AscCommonExcel'].Range = Range;

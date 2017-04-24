@@ -1425,6 +1425,8 @@ function CT_PivotCacheDefinition() {
 	this.measureGroups = null;
 	this.maps = null;
 	this.extLst = null;
+	//editor
+	this.cacheRecords = null;
 }
 CT_PivotCacheDefinition.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -1701,7 +1703,6 @@ CT_PivotCacheRecords.prototype.onStartNode = function(elem, attr, uq) {
 		newContext.readAttributes(attr, uq);
 	} else if ("r" === elem) {
 		this._curArray = [];
-		this.r = [];
 	} else if ("b" === elem) {
 		newContext = new CT_Boolean();
 		if (newContext.readAttributes) {
@@ -1758,6 +1759,9 @@ CT_PivotCacheRecords.prototype.onStartNode = function(elem, attr, uq) {
 CT_PivotCacheRecords.prototype.onEndNode = function(prevContext, elem) {
 	if ("r" === elem) {
 		if (this._curArray && this._curArray.length > 0) {
+			if (!this.r) {
+				this.r = [];
+			}
 			this.r.push(this._curArray);
 			this._curArray = null;
 		}
@@ -1892,6 +1896,8 @@ function CT_pivotTableDefinition() {
 	this.rowHierarchiesUsage = null;
 	this.colHierarchiesUsage = null;
 	this.extLst = null;
+	//editor
+	this.cacheDefinition = null;
 }
 CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
