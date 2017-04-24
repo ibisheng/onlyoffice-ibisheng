@@ -4097,7 +4097,7 @@ CPresentation.prototype =
         AscCommon.CollaborativeEditing.Set_Fast(isOn);
     },
 
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
         var s = {};
         s.CurPage = this.CurPage;
@@ -4414,7 +4414,7 @@ CPresentation.prototype =
         }
     },
 
-    Set_SelectionState : function(State)
+	SetSelectionState : function(State)
     {
         if(State.CurPage > -1)
             this.Slides[State.CurPage].graphicObjects.setSelectionState(State.slideSelection);

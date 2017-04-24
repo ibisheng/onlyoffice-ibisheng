@@ -12244,9 +12244,9 @@ CTitle.prototype =
                     AscFormat.CheckParagraphTextPr(this.tx.rich.content.Content[i], this.txPr.content.Content[0].Pr.DefaultRunPr);
                 }
             }
-            var selection_state = this.txBody.content.Get_SelectionState();
+            var selection_state = this.txBody.content.GetSelectionState();
             this.txBody = this.tx.rich;
-            this.txBody.content.Set_SelectionState(selection_state, selection_state.length - 1);
+            this.txBody.content.SetSelectionState(selection_state, selection_state.length - 1);
             if(AscFormat.isRealNumber(StartPage))
             {
                 this.txBody.content.Set_StartPage(StartPage);

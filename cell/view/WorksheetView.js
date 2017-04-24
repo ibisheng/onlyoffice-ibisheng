@@ -8912,7 +8912,7 @@
 				isIntoShape = t.objectRender.controller.getTargetDocContent(true);
 				
 				var State = specialPasteUndoData.shapeSelectionState;
-				isIntoShape.Set_SelectionState(State, State.length - 1);
+				isIntoShape.SetSelectionState(State, State.length - 1);
 				isIntoShape.Remove(1, true, true);
 			}
 			
@@ -10157,8 +10157,8 @@
 				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 				var range = window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range;
 				
-				/*var trueShapeSelection = isIntoShape.Get_SelectionState();
-				isIntoShape.Set_SelectionState(range, range.length - 1);*/
+				/*var trueShapeSelection = isIntoShape.GetSelectionState();
+				isIntoShape.SetSelectionState(range, range.length - 1);*/
 				
 				var sProps = Asc.c_oSpecialPasteProps;
 				var curShape = isIntoShape.Parent.parent;
@@ -10182,7 +10182,7 @@
 				specialPasteShowOptions.asc_setCellCoord(cellCoord);
 				this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
 				
-				//isIntoShape.Set_SelectionState(trueShapeSelection, trueShapeSelection.length - 1);
+				//isIntoShape.SetSelectionState(trueShapeSelection, trueShapeSelection.length - 1);
 			}
 		}
 		else if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)

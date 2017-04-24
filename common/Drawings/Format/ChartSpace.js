@@ -839,7 +839,7 @@ CChartSpace.prototype.getSelectionState = function()
     {
         var content = this.selection.textSelection.getDocContent();
         if(content)
-            content_selection = content.Get_SelectionState();
+            content_selection = content.GetSelectionState();
     }
     return {
         title:            this.selection.title,
@@ -878,7 +878,7 @@ CChartSpace.prototype.setSelectionState = function(state)
        {
            var content = this.selection.textSelection.getDocContent();
            if(content)
-               content.Set_SelectionState(state.contentSelection, state.contentSelection.length - 1);
+               content.SetSelectionState(state.contentSelection, state.contentSelection.length - 1);
        }
    }
 };

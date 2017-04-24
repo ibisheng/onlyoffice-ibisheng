@@ -863,12 +863,12 @@ CGraphicFrame.prototype.OnContentRecalculate = function()
 
 CGraphicFrame.prototype.getTextSelectionState = function()
     {
-        return this.graphicObject.Get_SelectionState();
+        return this.graphicObject.GetSelectionState();
 };
 
 CGraphicFrame.prototype.setTextSelectionState = function(Sate)
     {
-        return this.graphicObject.Set_SelectionState(Sate, Sate.length-1);
+        return this.graphicObject.SetSelectionState(Sate, Sate.length-1);
 };
 
 CGraphicFrame.prototype.isPlaceholder = function()

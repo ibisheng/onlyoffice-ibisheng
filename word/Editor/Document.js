@@ -4847,16 +4847,16 @@ CDocument.prototype.Interface_Update_DrawingPr = function(Flag)
 CDocument.prototype.Interface_Update_TablePr = function(Flag)
 {
 	var TablePr = null;
-	if (docpostype_Content == this.Get_DocPosType()
-		&& ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType())))
+	if (docpostype_Content == this.Get_DocPosType() && ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos) || false == this.Selection.Use))
 	{
 		if (true == this.Selection.Use)
-			TablePr = this.Content[this.Selection.StartPos].Get_Props();
+			TablePr = this.Content[this.Selection.StartPos].GetTableProps();
 		else
-			TablePr = this.Content[this.CurPos.ContentPos].Get_Props();
+			TablePr = this.Content[this.CurPos.ContentPos].GetTableProps();
 	}
-	TablePr.CanBeFlow = true;
+
+	if (null !== TablePr)
+		TablePr.CanBeFlow = true;
 
 	if (true === Flag)
 		return TablePr;
@@ -8402,11 +8402,10 @@ CDocument.prototype.Document_Redo = function()
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateRulersState();
 };
-CDocument.prototype.Get_SelectionState = function()
+CDocument.prototype.GetSelectionState = function()
 {
 	var DocState    = {};
-	DocState.CurPos =
-	{
+	DocState.CurPos = {
 		X          : this.CurPos.X,
 		Y          : this.CurPos.Y,
 		ContentPos : this.CurPos.ContentPos,
@@ -8415,8 +8414,7 @@ CDocument.prototype.Get_SelectionState = function()
 		Type       : this.CurPos.Type
 	};
 
-	DocState.Selection =
-	{
+	DocState.Selection = {
 
 		Start    : this.Selection.Start,
 		Use      : this.Selection.Use,
@@ -8437,7 +8435,7 @@ CDocument.prototype.Get_SelectionState = function()
 		DocState.Selection.Use   = false;
 
 		this.Content[DocState.CurPos.ContentPos].RemoveSelection();
-		State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
+		State = this.Content[this.CurPos.ContentPos].GetSelectionState();
 	}
 	else
 	{
@@ -8448,7 +8446,7 @@ CDocument.prototype.Get_SelectionState = function()
 
 	return State;
 };
-CDocument.prototype.Set_SelectionState = function(State)
+CDocument.prototype.SetSelectionState = function(State)
 {
 	if (docpostype_DrawingObjects === this.Get_DocPosType())
 		this.DrawingObjects.resetSelection();
@@ -8477,8 +8475,6 @@ CDocument.prototype.Set_SelectionState = function(State)
 
 	this.CurPage = DocState.CurPage;
 	this.Comments.Set_Current(DocState.CurComment);
-
-	var StateIndex = State.length - 2;
 
 	this.Controller.SetSelectionState(State, State.length - 2);
 };
@@ -14603,8 +14599,8 @@ CDocument.prototype.controller_CanSplitTableCells = function()
 };
 CDocument.prototype.controller_UpdateInterfaceState = function()
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		this.Interface_Update_TablePr();
 
@@ -14632,7 +14628,7 @@ CDocument.prototype.controller_UpdateRulersState = function()
 {
 	if (true === this.Selection.Use)
 	{
-		if (this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType())
+		if (this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
 		{
 			var PagePos = this.Get_DocumentPagePositionByContentPosition(this.GetContentPosition(true, true));
 
@@ -14786,14 +14782,16 @@ CDocument.prototype.controller_GetSelectionState = function()
 			var TempState = [];
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
-				TempState.push(this.Content[Index].Get_SelectionState());
+				TempState.push(this.Content[Index].GetSelectionState());
 			}
 
 			State.push(TempState);
 		}
 	}
 	else
-		State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
+	{
+		State = this.Content[this.CurPos.ContentPos].GetSelectionState();
+	}
 
 	return State;
 };
@@ -14829,12 +14827,14 @@ CDocument.prototype.controller_SetSelectionState = function(State, StateIndex)
 			var CurState = State[StateIndex];
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
-				this.Content[Index].Set_SelectionState(CurState[Index - StartPos], CurState[Index - StartPos].length - 1);
+				this.Content[Index].SetSelectionState(CurState[Index - StartPos], CurState[Index - StartPos].length - 1);
 			}
 		}
 	}
 	else
-		this.Content[this.CurPos.ContentPos].Set_SelectionState(State, StateIndex);
+	{
+		this.Content[this.CurPos.ContentPos].SetSelectionState(State, StateIndex);
+	}
 };
 CDocument.prototype.controller_AddHyperlink = function(Props)
 {

@@ -212,7 +212,7 @@ CHistory.prototype =
                 oItem.Data.Undo();
             }
             oPoint.Items.length = _bottomIndex + 1;
-            this.Document.Set_SelectionState( oPoint.State );
+            this.Document.SetSelectionState( oPoint.State );
         }
     },
 
@@ -226,7 +226,7 @@ CHistory.prototype =
 
         // Запоминаем самое последнее состояние документа для Redo
         if ( this.Index === this.Points.length - 1 )
-            this.LastState = this.Document.Get_SelectionState();
+            this.LastState = this.Document.GetSelectionState();
         
         this.Document.RemoveSelection(true);
 
@@ -271,7 +271,7 @@ CHistory.prototype =
         }
 
         if (null != Point)
-            this.Document.Set_SelectionState( Point.State );
+            this.Document.SetSelectionState( Point.State );
 
         return this.RecalculateData;
     },
@@ -308,7 +308,7 @@ CHistory.prototype =
         else
             State = this.Points[this.Index + 1].State;
 
-        this.Document.Set_SelectionState( State );
+        this.Document.SetSelectionState( State );
 
         return this.RecalculateData;
     },
@@ -328,7 +328,7 @@ CHistory.prototype =
 
         this.Check_UninonLastPoints();
         
-        var State = this.Document.Get_SelectionState();
+        var State = this.Document.GetSelectionState();
         var Items = [];
         var Time  = new Date().getTime();
 

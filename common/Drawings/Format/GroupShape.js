@@ -971,7 +971,7 @@ function CGroupShape()
         {
             selection_state.textObject = this.selection.textSelection;
             selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
-            selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
+            selection_state.textSelection = this.selection.textSelection.getDocContent().GetSelectionState();
         }
         else if(this.selection.chartSelection)
         {
@@ -997,7 +997,7 @@ function CGroupShape()
         {
             this.selectObject(selection_state.textObject, selection_state.selectStartPage);
             this.selection.textSelection = selection_state.textObject;
-            selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+            selection_state.textObject.getDocContent().SetSelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
         }
         else if(selection_state.chartSelection)
         {

@@ -1529,7 +1529,7 @@
 					//TODO записываю активную область после каждой вставки. пересомтреть! не записывать при специальной вставке.
 					//if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
 					//{
-						window['AscCommon'].g_clipboardBase.specialPasteUndoData.shapeSelectionState = target_doc_content.Get_SelectionState();
+						window['AscCommon'].g_clipboardBase.specialPasteUndoData.shapeSelectionState = target_doc_content.GetSelectionState();
 					//}
 					
 					worksheet.objectRender.controller.cursorMoveRight(false, false);

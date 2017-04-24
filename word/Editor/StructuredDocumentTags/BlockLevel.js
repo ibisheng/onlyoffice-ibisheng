@@ -305,13 +305,13 @@ CBlockLevelSdt.prototype.MoveCursorToCell = function(bNext)
 {
 	return this.Content.MoveCursorToCell(bNext);
 };
-CBlockLevelSdt.prototype.Get_SelectionState = function()
+CBlockLevelSdt.prototype.GetSelectionState = function()
 {
-	return this.Content.Get_SelectionState();
+	return this.Content.GetSelectionState();
 };
-CBlockLevelSdt.prototype.Set_SelectionState = function(State, StateIndex)
+CBlockLevelSdt.prototype.SetSelectionState = function(State, StateIndex)
 {
-	return this.Content.Set_SelectionState(State, StateIndex);
+	return this.Content.SetSelectionState(State, StateIndex);
 };
 CBlockLevelSdt.prototype.IsCursorAtBegin = function(bOnlyPara)
 {
@@ -536,6 +536,18 @@ CBlockLevelSdt.prototype.CanMergeTableCells = function()
 CBlockLevelSdt.prototype.CanSplitTableCells = function()
 {
 	return this.Content.CanSplitTableCells();
+};
+CBlockLevelSdt.prototype.Document_UpdateInterfaceState = function()
+{
+	this.Content.Document_UpdateInterfaceState();
+};
+CBlockLevelSdt.prototype.Document_UpdateRulersState = function()
+{
+	this.Content.Document_UpdateRulersState();
+};
+CBlockLevelSdt.prototype.GetTableProps = function()
+{
+	return this.Content.GetTableProps();
 };
 
 CBlockLevelSdt.prototype.CanAddComment = function()

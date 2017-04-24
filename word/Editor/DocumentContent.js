@@ -1699,111 +1699,113 @@ CDocumentContent.prototype.Document_Get_AllFontNames     = function(AllFonts)
 };
 CDocumentContent.prototype.Document_UpdateInterfaceState = function()
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        var drawin_objects = this.LogicDocument.DrawingObjects;
-        if (drawin_objects.selection.textSelection
-            || drawin_objects.selection.groupSelection && drawin_objects.selection.groupSelection.selection.textSelection
-            || drawin_objects.selection.chartSelection && drawin_objects.selection.chartSelection.selection.textSelection)
-        {
-            this.LogicDocument.Interface_Update_DrawingPr();
-            drawin_objects.documentUpdateInterfaceState();
-        }
-        else
-        {
-            drawin_objects.documentUpdateInterfaceState();
-            this.LogicDocument.Interface_Update_DrawingPr();
-        }
-        return;
-    }
-    else //if (docpostype_Content === this.CurPos.Type)
-    {
-        if (( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ))
-        {
-            this.Interface_Update_TablePr();
-            if (true == this.Selection.Use)
-                this.Content[this.Selection.StartPos].Document_UpdateInterfaceState();
-            else
-                this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
-        }
-        else
-        {
-            this.Interface_Update_ParaPr();
-            this.Interface_Update_TextPr();
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		var drawin_objects = this.LogicDocument.DrawingObjects;
+		if (drawin_objects.selection.textSelection
+			|| drawin_objects.selection.groupSelection && drawin_objects.selection.groupSelection.selection.textSelection
+			|| drawin_objects.selection.chartSelection && drawin_objects.selection.chartSelection.selection.textSelection)
+		{
+			this.LogicDocument.Interface_Update_DrawingPr();
+			drawin_objects.documentUpdateInterfaceState();
+		}
+		else
+		{
+			drawin_objects.documentUpdateInterfaceState();
+			this.LogicDocument.Interface_Update_DrawingPr();
+		}
+		return;
+	}
+	else //if (docpostype_Content === this.CurPos.Type)
+	{
+		if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+			|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
+		{
+			this.Interface_Update_TablePr();
+			if (true == this.Selection.Use)
+				this.Content[this.Selection.StartPos].Document_UpdateInterfaceState();
+			else
+				this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
+		}
+		else
+		{
+			this.Interface_Update_ParaPr();
+			this.Interface_Update_TextPr();
 
-            // Если у нас в выделении находится 1 параграф, или курсор находится в параграфе
-            if (( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph == this.Content[this.CurPos.ContentPos].GetType() ))
-            {
-                if (true == this.Selection.Use)
-                    this.Content[this.Selection.StartPos].Document_UpdateInterfaceState();
-                else
-                    this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
-            }
-        }
-    }
+			// Если у нас в выделении находится 1 параграф, или курсор находится в параграфе
+			if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph == this.Content[this.Selection.StartPos].GetType())
+				|| (false == this.Selection.Use && type_Paragraph == this.Content[this.CurPos.ContentPos].GetType()))
+			{
+				if (true == this.Selection.Use)
+					this.Content[this.Selection.StartPos].Document_UpdateInterfaceState();
+				else
+					this.Content[this.CurPos.ContentPos].Document_UpdateInterfaceState();
+			}
+		}
+	}
 };
-CDocumentContent.prototype.Document_UpdateRulersState    = function(CurPage)
+CDocumentContent.prototype.Document_UpdateRulersState = function(CurPage)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        this.LogicDocument.DrawingObjects.documentUpdateRulersState(CurPage);
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            if (this.Selection.StartPos == this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType())
-            {
-                var ElementPos       = this.Selection.StartPos;
-                var Element          = this.Content[ElementPos];
-                var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, this.CurPage, Element.Get_StartColumn(), Element.Get_ColumnsCount());
-                Element.Document_UpdateRulersState(ElementPageIndex);
-            }
-            else
-            {
-                var StartPos = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.EndPos : this.Selection.StartPos );
-                var EndPos   = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.StartPos : this.Selection.EndPos );
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		this.LogicDocument.DrawingObjects.documentUpdateRulersState(CurPage);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (true === this.Selection.Use)
+		{
+			if (this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+			{
+				var ElementPos       = this.Selection.StartPos;
+				var Element          = this.Content[ElementPos];
+				var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, this.CurPage, Element.Get_StartColumn(), Element.Get_ColumnsCount());
+				Element.Document_UpdateRulersState(ElementPageIndex);
+			}
+			else
+			{
+				var StartPos = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.EndPos : this.Selection.StartPos );
+				var EndPos   = ( this.Selection.EndPos <= this.Selection.StartPos ? this.Selection.StartPos : this.Selection.EndPos );
 
-                var FramePr = undefined;
+				var FramePr = undefined;
 
-                for (var Pos = StartPos; Pos <= EndPos; Pos++)
-                {
-                    var Element = this.Content[Pos];
-                    if (type_Paragraph != Element.GetType())
-                    {
-                        FramePr = undefined;
-                        break;
-                    }
-                    else
-                    {
-                        var TempFramePr = Element.Get_FramePr();
-                        if (undefined === FramePr)
-                        {
-                            if (undefined === TempFramePr)
-                                break;
+				for (var Pos = StartPos; Pos <= EndPos; Pos++)
+				{
+					var Element = this.Content[Pos];
+					if (type_Paragraph != Element.GetType())
+					{
+						FramePr = undefined;
+						break;
+					}
+					else
+					{
+						var TempFramePr = Element.Get_FramePr();
+						if (undefined === FramePr)
+						{
+							if (undefined === TempFramePr)
+								break;
 
-                            FramePr = TempFramePr;
-                        }
-                        else if (undefined === TempFramePr || false === FramePr.Compare(TempFramePr))
-                        {
-                            FramePr = undefined;
-                            break;
-                        }
-                    }
-                }
+							FramePr = TempFramePr;
+						}
+						else if (undefined === TempFramePr || false === FramePr.Compare(TempFramePr))
+						{
+							FramePr = undefined;
+							break;
+						}
+					}
+				}
 
-                if (undefined !== FramePr)
-                    this.Content[StartPos].Document_UpdateRulersState();
-            }
-        }
-        else
-        {
-            var ElementPos       = this.CurPos.ContentPos;
-            var Element          = this.Content[ElementPos];
-            var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, this.CurPage, Element.Get_StartColumn(), Element.Get_ColumnsCount());
-            Element.Document_UpdateRulersState(ElementPageIndex);
-        }
-    }
+				if (undefined !== FramePr)
+					this.Content[StartPos].Document_UpdateRulersState();
+			}
+		}
+		else
+		{
+			var ElementPos       = this.CurPos.ContentPos;
+			var Element          = this.Content[ElementPos];
+			var ElementPageIndex = this.private_GetElementPageIndex(ElementPos, this.CurPage, Element.Get_StartColumn(), Element.Get_ColumnsCount());
+			Element.Document_UpdateRulersState(ElementPageIndex);
+		}
+	}
 };
 CDocumentContent.prototype.Can_CopyCut = function()
 {
@@ -5761,6 +5763,22 @@ CDocumentContent.prototype.SetTableProps = function(Props)
 		return false;
 	}
 };
+CDocumentContent.prototype.GetTableProps = function()
+{
+	var TablePr = null;
+	if (docpostype_Content == this.Get_DocPosType() && ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos) || false == this.Selection.Use))
+	{
+		if (true == this.Selection.Use)
+			TablePr = this.Content[this.Selection.StartPos].GetTableProps();
+		else
+			TablePr = this.Content[this.CurPos.ContentPos].GetTableProps();
+	}
+
+	if (null !== TablePr)
+		TablePr.CanBeFlow = true;
+
+	return TablePr;
+};
 CDocumentContent.prototype.GetCalculatedParaPr = function()
 {
 	var Result_ParaPr = new CParaPr();
@@ -7325,166 +7343,164 @@ CDocumentContent.prototype.private_GetColumnIndex = function(CurPage)
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-CDocumentContent.prototype.Get_SelectionState              = function()
+CDocumentContent.prototype.GetSelectionState = function()
 {
-    var DocState    = {};
-    DocState.CurPos =
-    {
-        X          : this.CurPos.X,
-        Y          : this.CurPos.Y,
-        ContentPos : this.CurPos.ContentPos,
-        RealX      : this.CurPos.RealX,
-        RealY      : this.CurPos.RealY,
-        Type       : this.CurPos.Type
-    };
+	var DocState    = {};
+	DocState.CurPos = {
+		X          : this.CurPos.X,
+		Y          : this.CurPos.Y,
+		ContentPos : this.CurPos.ContentPos,
+		RealX      : this.CurPos.RealX,
+		RealY      : this.CurPos.RealY,
+		Type       : this.CurPos.Type
+	};
 
-    DocState.Selection =
-    {
+	DocState.Selection = {
 
-        Start    : this.Selection.Start,
-        Use      : this.Selection.Use,
-        StartPos : this.Selection.StartPos,
-        EndPos   : this.Selection.EndPos,
-        Flag     : this.Selection.Flag,
-        Data     : this.Selection.Data
-    };
+		Start    : this.Selection.Start,
+		Use      : this.Selection.Use,
+		StartPos : this.Selection.StartPos,
+		EndPos   : this.Selection.EndPos,
+		Flag     : this.Selection.Flag,
+		Data     : this.Selection.Data
+	};
 
-    DocState.CurPage = this.CurPage;
+	DocState.CurPage = this.CurPage;
 
-    var State = null;
+	var State = null;
 
-    if (this.LogicDocument && true === editor.isStartAddShape && docpostype_DrawingObjects === this.CurPos.Type)
-    {
-        DocState.CurPos.Type     = docpostype_Content;
-        DocState.Selection.Start = false;
-        DocState.Selection.Use   = false;
+	if (this.LogicDocument && true === editor.isStartAddShape && docpostype_DrawingObjects === this.CurPos.Type)
+	{
+		DocState.CurPos.Type     = docpostype_Content;
+		DocState.Selection.Start = false;
+		DocState.Selection.Use   = false;
 
-        this.Content[DocState.CurPos.ContentPos].RemoveSelection();
-        State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
-    }
-    else
-    {
-        // Работаем с колонтитулом
-        if (docpostype_DrawingObjects === this.CurPos.Type)
-            State = this.LogicDocument.DrawingObjects.getSelectionState();
-        else if (docpostype_Content === this.CurPos.Type)
-        {
-            if (true === this.Selection.Use)
-            {
-                // Выделение нумерации
-                if (selectionflag_Numbering == this.Selection.Flag)
-                    State = [];
-                else
-                {
-                    var StartPos = this.Selection.StartPos;
-                    var EndPos   = this.Selection.EndPos;
-                    if (StartPos > EndPos)
-                    {
-                        var Temp = StartPos;
-                        StartPos = EndPos;
-                        EndPos   = Temp;
-                    }
+		this.Content[DocState.CurPos.ContentPos].RemoveSelection();
+		State = this.Content[this.CurPos.ContentPos].GetSelectionState();
+	}
+	else
+	{
+		// Работаем с колонтитулом
+		if (docpostype_DrawingObjects === this.CurPos.Type)
+			State = this.LogicDocument.DrawingObjects.getSelectionState();
+		else if (docpostype_Content === this.CurPos.Type)
+		{
+			if (true === this.Selection.Use)
+			{
+				// Выделение нумерации
+				if (selectionflag_Numbering == this.Selection.Flag)
+					State = [];
+				else
+				{
+					var StartPos = this.Selection.StartPos;
+					var EndPos   = this.Selection.EndPos;
+					if (StartPos > EndPos)
+					{
+						var Temp = StartPos;
+						StartPos = EndPos;
+						EndPos   = Temp;
+					}
 
-                    State = [];
+					State = [];
 
-                    var TempState = [];
-                    for (var Index = StartPos; Index <= EndPos; Index++)
-                    {
-                        TempState.push(this.Content[Index].Get_SelectionState());
-                    }
+					var TempState = [];
+					for (var Index = StartPos; Index <= EndPos; Index++)
+					{
+						TempState.push(this.Content[Index].GetSelectionState());
+					}
 
-                    State.push(TempState);
-                }
-            }
-            else
-                State = this.Content[this.CurPos.ContentPos].Get_SelectionState();
-        }
-    }
+					State.push(TempState);
+				}
+			}
+			else
+				State = this.Content[this.CurPos.ContentPos].GetSelectionState();
+		}
+	}
 
-    State.push(DocState);
-    return State;
+	State.push(DocState);
+	return State;
 };
-CDocumentContent.prototype.Set_SelectionState              = function(State, StateIndex)
+CDocumentContent.prototype.SetSelectionState = function(State, StateIndex)
 {
-    if (docpostype_DrawingObjects === this.CurPos.Type)
-        this.LogicDocument.DrawingObjects.resetSelection();
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+		this.LogicDocument.DrawingObjects.resetSelection();
 
-    if (State.length <= 0)
-        return;
+	if (State.length <= 0)
+		return;
 
-    var DocState = State[StateIndex];
+	var DocState = State[StateIndex];
 
-    this.CurPos =
-    {
-        X          : DocState.CurPos.X,
-        Y          : DocState.CurPos.Y,
-        ContentPos : DocState.CurPos.ContentPos,
-        RealX      : DocState.CurPos.RealX,
-        RealY      : DocState.CurPos.RealY,
-        Type       : DocState.CurPos.Type
-    };
+	this.CurPos = {
+		X          : DocState.CurPos.X,
+		Y          : DocState.CurPos.Y,
+		ContentPos : DocState.CurPos.ContentPos,
+		RealX      : DocState.CurPos.RealX,
+		RealY      : DocState.CurPos.RealY,
+		Type       : DocState.CurPos.Type
+	};
 
-    this.Set_DocPosType(DocState.CurPos.Type);
+	this.Set_DocPosType(DocState.CurPos.Type);
 
-    this.Selection =
-    {
+	this.Selection = {
 
-        Start    : DocState.Selection.Start,
-        Use      : DocState.Selection.Use,
-        StartPos : DocState.Selection.StartPos,
-        EndPos   : DocState.Selection.EndPos,
-        Flag     : DocState.Selection.Flag,
-        Data     : DocState.Selection.Data
-    };
+		Start    : DocState.Selection.Start,
+		Use      : DocState.Selection.Use,
+		StartPos : DocState.Selection.StartPos,
+		EndPos   : DocState.Selection.EndPos,
+		Flag     : DocState.Selection.Flag,
+		Data     : DocState.Selection.Data
+	};
 
-    this.CurPage = DocState.CurPage;
+	this.CurPage = DocState.CurPage;
 
-    var NewStateIndex = StateIndex - 1;
+	var NewStateIndex = StateIndex - 1;
 
-    // Работаем с колонтитулом
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        this.LogicDocument.DrawingObjects.setSelectionState(State, NewStateIndex);
-    }
-    else //if ( docpostype_Content === this.CurPos.Type )
-    {
-        if (true === this.Selection.Use)
-        {
-            if (selectionflag_Numbering == this.Selection.Flag)
-            {
-                if (type_Paragraph === this.Content[this.Selection.StartPos].Get_Type())
-                {
-                    var NumPr = this.Content[this.Selection.StartPos].Numbering_Get();
-                    if (undefined !== NumPr)
-                        this.Document_SelectNumbering(NumPr, this.Selection.StartPos);
-                    else
-                        this.LogicDocument.RemoveSelection();
-                }
-                else
-                    this.LogicDocument.RemoveSelection();
-            }
-            else
-            {
-                var StartPos = this.Selection.StartPos;
-                var EndPos   = this.Selection.EndPos;
-                if (StartPos > EndPos)
-                {
-                    var Temp = StartPos;
-                    StartPos = EndPos;
-                    EndPos   = Temp;
-                }
+	// Работаем с колонтитулом
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		this.LogicDocument.DrawingObjects.setSelectionState(State, NewStateIndex);
+	}
+	else //if ( docpostype_Content === this.CurPos.Type )
+	{
+		if (true === this.Selection.Use)
+		{
+			if (selectionflag_Numbering == this.Selection.Flag)
+			{
+				if (type_Paragraph === this.Content[this.Selection.StartPos].Get_Type())
+				{
+					var NumPr = this.Content[this.Selection.StartPos].Numbering_Get();
+					if (undefined !== NumPr)
+						this.Document_SelectNumbering(NumPr, this.Selection.StartPos);
+					else
+						this.LogicDocument.RemoveSelection();
+				}
+				else
+					this.LogicDocument.RemoveSelection();
+			}
+			else
+			{
+				var StartPos = this.Selection.StartPos;
+				var EndPos   = this.Selection.EndPos;
+				if (StartPos > EndPos)
+				{
+					var Temp = StartPos;
+					StartPos = EndPos;
+					EndPos   = Temp;
+				}
 
-                var CurState = State[NewStateIndex];
+				var CurState = State[NewStateIndex];
 
-                for (var Index = StartPos; Index <= EndPos; Index++)
-                {
-                    this.Content[Index].Set_SelectionState(CurState[Index - StartPos], CurState[Index - StartPos].length - 1);
-                }
-            }
-        }
-        else
-            this.Content[this.CurPos.ContentPos].Set_SelectionState(State, NewStateIndex);
-    }
+				for (var Index = StartPos; Index <= EndPos; Index++)
+				{
+					this.Content[Index].SetSelectionState(CurState[Index - StartPos], CurState[Index - StartPos].length - 1);
+				}
+			}
+		}
+		else
+		{
+			this.Content[this.CurPos.ContentPos].SetSelectionState(State, NewStateIndex);
+		}
+	}
 };
 CDocumentContent.prototype.Get_ParentObject_or_DocumentPos = function()
 {

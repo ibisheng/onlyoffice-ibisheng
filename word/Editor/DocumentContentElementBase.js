@@ -348,11 +348,11 @@ CDocumentContentElementBase.prototype.IsCursorAtEnd = function()
 {
 	return true;
 };
-CDocumentContentElementBase.prototype.Get_SelectionState = function()
+CDocumentContentElementBase.prototype.GetSelectionState = function()
 {
 	return [];
 };
-CDocumentContentElementBase.prototype.Set_SelectionState = function(State, StateIndex)
+CDocumentContentElementBase.prototype.SetSelectionState = function(State, StateIndex)
 {
 
 };
@@ -552,6 +552,16 @@ CDocumentContentElementBase.prototype.CanMergeTableCells = function()
 CDocumentContentElementBase.prototype.CanSplitTableCells = function()
 {
 	return false;
+};
+CDocumentContentElementBase.prototype.Document_UpdateInterfaceState = function()
+{
+};
+CDocumentContentElementBase.prototype.Document_UpdateRulersState = function()
+{
+};
+CDocumentContentElementBase.prototype.GetTableProps = function()
+{
+	return null;
 };
 
 CDocumentContentElementBase.prototype.CanAddComment = function()

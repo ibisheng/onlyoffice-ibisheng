@@ -2855,7 +2855,7 @@ CFootnotesController.prototype.GetSelectionState = function()
 		oState.Footnotes[sId] =
 		{
 			Footnote : oFootnote,
-			State    : oFootnote.Get_SelectionState()
+			State    : oFootnote.GetSelectionState()
 		};
 	}
 
@@ -2876,7 +2876,7 @@ CFootnotesController.prototype.SetSelectionState = function(State, StateIndex)
 	for (var sId in oState.Footnotes)
 	{
 		this.Selection.Footnotes[sId] = oState.Footnotes[sId].Footnote;
-		this.Selection.Footnotes[sId].Set_SelectionState(oState.Footnotes[sId].State, oState.Footnotes[sId].State.length - 1);
+		this.Selection.Footnotes[sId].SetSelectionState(oState.Footnotes[sId].State, oState.Footnotes[sId].State.length - 1);
 	}
 };
 CFootnotesController.prototype.AddHyperlink = function(Props)

@@ -3533,7 +3533,7 @@ CTable.prototype.CanMergeTableCells = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
 //----------------------------------------------------------------------------------------------------------------------
-CTable.prototype.Get_SelectionState = function()
+CTable.prototype.GetSelectionState = function()
 {
 	var TableState       = {};
 	TableState.Selection = {
@@ -3584,11 +3584,11 @@ CTable.prototype.Get_SelectionState = function()
 
 	TableState.CurCell = {Row : this.CurCell.Row.Index, Cell : this.CurCell.Index};
 
-	var State = this.CurCell.Content.Get_SelectionState()
+	var State = this.CurCell.Content.GetSelectionState();
 	State.push(TableState);
 	return State;
 };
-CTable.prototype.Set_SelectionState = function(State, StateIndex)
+CTable.prototype.SetSelectionState = function(State, StateIndex)
 {
 	if (State.length <= 0)
 		return;
@@ -3645,7 +3645,7 @@ CTable.prototype.Set_SelectionState = function(State, StateIndex)
 	}
 
 	this.CurCell = this.Content[TableState.CurCell.Row].Get_Cell(TableState.CurCell.Cell);
-	this.CurCell.Content.Set_SelectionState(State, StateIndex - 1);
+	this.CurCell.Content.SetSelectionState(State, StateIndex - 1);
 };
 CTable.prototype.Get_ParentObject_or_DocumentPos = function()
 {
@@ -11994,6 +11994,10 @@ CTable.prototype.IsCellSelection = function()
 CTable.prototype.SetTableProps = function(oProps)
 {
 	this.Set_Props(oProps);
+};
+CTable.prototype.GetTableProps = function()
+{
+	return this.Get_Props();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

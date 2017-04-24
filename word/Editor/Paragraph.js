@@ -10276,28 +10276,26 @@ Paragraph.prototype.Continue = function(NewParagraph)
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
 //----------------------------------------------------------------------------------------------------------------------
-Paragraph.prototype.Get_SelectionState = function()
+Paragraph.prototype.GetSelectionState = function()
 {
 	var ParaState    = {};
-	ParaState.CurPos =
-		{
-			X          : this.CurPos.X,
-			Y          : this.CurPos.Y,
-			Line       : this.CurPos.Line,
-			ContentPos : this.Get_ParaContentPos(false, false),
-			RealX      : this.CurPos.RealX,
-			RealY      : this.CurPos.RealY,
-			PagesPos   : this.CurPos.PagesPos
-		};
+	ParaState.CurPos = {
+		X          : this.CurPos.X,
+		Y          : this.CurPos.Y,
+		Line       : this.CurPos.Line,
+		ContentPos : this.Get_ParaContentPos(false, false),
+		RealX      : this.CurPos.RealX,
+		RealY      : this.CurPos.RealY,
+		PagesPos   : this.CurPos.PagesPos
+	};
 
-	ParaState.Selection =
-		{
-			Start    : this.Selection.Start,
-			Use      : this.Selection.Use,
-			StartPos : 0,
-			EndPos   : 0,
-			Flag     : this.Selection.Flag
-		};
+	ParaState.Selection = {
+		Start    : this.Selection.Start,
+		Use      : this.Selection.Use,
+		StartPos : 0,
+		EndPos   : 0,
+		Flag     : this.Selection.Flag
+	};
 
 	if (true === this.Selection.Use)
 	{
@@ -10307,7 +10305,7 @@ Paragraph.prototype.Get_SelectionState = function()
 
 	return [ParaState];
 };
-Paragraph.prototype.Set_SelectionState = function(State, StateIndex)
+Paragraph.prototype.SetSelectionState = function(State, StateIndex)
 {
 	if (State.length <= 0)
 		return;

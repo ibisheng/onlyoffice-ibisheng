@@ -348,11 +348,11 @@ CHdrFtrController.prototype.UpdateSelectionState = function()
 };
 CHdrFtrController.prototype.GetSelectionState = function()
 {
-	return this.HdrFtr.Get_SelectionState();
+	return this.HdrFtr.GetSelectionState();
 };
 CHdrFtrController.prototype.SetSelectionState = function(State, StateIndex)
 {
-	this.HdrFtr.Set_SelectionState(State, StateIndex);	
+	this.HdrFtr.SetSelectionState(State, StateIndex);
 };
 CHdrFtrController.prototype.AddHyperlink = function(Props)
 {

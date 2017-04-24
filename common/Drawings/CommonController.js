@@ -6649,11 +6649,11 @@ DrawingObjectsController.prototype =
             this.selection.textSelection = selection_state.textObject;
             if(selection_state.textObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                selection_state.textObject.graphicObject.Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+                selection_state.textObject.graphicObject.SetSelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
             }
             else
             {
-                selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+                selection_state.textObject.getDocContent().SetSelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
             }
         }
         else if(selection_state.groupObject && !selection_state.groupObject.bDeleted)
@@ -6696,11 +6696,11 @@ DrawingObjectsController.prototype =
             selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
             if(this.selection.textSelection.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                selection_state.textSelection = this.selection.textSelection.graphicObject.Get_SelectionState();
+                selection_state.textSelection = this.selection.textSelection.graphicObject.GetSelectionState();
             }
             else
             {
-                selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
+                selection_state.textSelection = this.selection.textSelection.getDocContent().GetSelectionState();
             }
         }
         else if(this.selection.groupSelection)

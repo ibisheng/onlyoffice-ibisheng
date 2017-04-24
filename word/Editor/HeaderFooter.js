@@ -2415,33 +2415,33 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
-    {
-        var HdrFtrState = {};
-        HdrFtrState.CurHdrFtr = this.CurHdrFtr;
+	GetSelectionState : function()
+	{
+		var HdrFtrState       = {};
+		HdrFtrState.CurHdrFtr = this.CurHdrFtr;
 
-        var State = null;
-        if ( null != this.CurHdrFtr )
-            State = this.CurHdrFtr.Content.Get_SelectionState();
-        else
-            State = [];
+		var State = null;
+		if (null != this.CurHdrFtr)
+			State = this.CurHdrFtr.Content.GetSelectionState();
+		else
+			State = [];
 
-        State.push( HdrFtrState );
+		State.push(HdrFtrState);
 
-        return State;
-    },
+		return State;
+	},
 
-    Set_SelectionState : function(State, StateIndex)
-    {
-        if ( State.length <= 0 )
-            return;
+	SetSelectionState : function(State, StateIndex)
+	{
+		if (State.length <= 0)
+			return;
 
-        var HdrFtrState = State[StateIndex];
-        this.CurHdrFtr = HdrFtrState.CurHdrFtr;
+		var HdrFtrState = State[StateIndex];
+		this.CurHdrFtr  = HdrFtrState.CurHdrFtr;
 
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Content.Set_SelectionState(State, StateIndex - 1);
-    },    
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.Content.SetSelectionState(State, StateIndex - 1);
+	},
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
