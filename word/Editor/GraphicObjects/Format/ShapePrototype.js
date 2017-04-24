@@ -748,12 +748,12 @@ CShape.prototype.Get_StartPage_Relative = function()
 {
     return 0;
 };
-CShape.prototype.Check_TableCoincidence = function(table)
+CShape.prototype.CheckTableCoincidence = function(table)
 {
     var para_drawing = this.GetParaDrawing();
     if(para_drawing && para_drawing.DocumentContent)
     {
-        return para_drawing.DocumentContent.Check_TableCoincidence(table);
+        return para_drawing.DocumentContent.CheckTableCoincidence(table);
     }
     return false;
 };

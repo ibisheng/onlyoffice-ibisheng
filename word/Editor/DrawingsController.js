@@ -347,7 +347,7 @@ CDrawingsController.prototype.AddTableRow = function(bBefore)
 {
 	this.DrawingObjects.tableAddRow(bBefore);
 };
-CDrawingsController.prototype.AddTableCol = function(bBefore)
+CDrawingsController.prototype.AddTableColumn = function(bBefore)
 {
 	this.DrawingObjects.tableAddCol(bBefore);
 };
@@ -355,7 +355,7 @@ CDrawingsController.prototype.RemoveTableRow = function()
 {
 	this.DrawingObjects.tableRemoveRow();
 };
-CDrawingsController.prototype.RemoveTableCol = function()
+CDrawingsController.prototype.RemoveTableColumn = function()
 {
 	this.DrawingObjects.tableRemoveCol();
 };

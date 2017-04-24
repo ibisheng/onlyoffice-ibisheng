@@ -2498,7 +2498,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 			var NewDocContent = NearestPos.Paragraph.Parent;
 			var OldDocContent = this.Parent;
 
-			if (true != NewDocContent.Check_TableCoincidence(this))
+			if (true != NewDocContent.CheckTableCoincidence(this))
 			{
 				var OldIndex = this.Index;
 				var NewIndex = NearestPos.Paragraph.Index;
@@ -2605,7 +2605,7 @@ CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
 			var NewDocContent = NearestPos.Paragraph.Parent;
 			var OldDocContent = this.Parent;
 
-			if (true != NewDocContent.Check_TableCoincidence(this))
+			if (true != NewDocContent.CheckTableCoincidence(this))
 			{
 				var TarParagraph   = NearestPos.Paragraph;
 				var ParaContentPos = NearestPos.ContentPos;
@@ -3045,7 +3045,7 @@ CTable.prototype.IsInDrawing  = function(X, Y, CurPage)
 		return Cell.Content_Is_InDrawing(X, Y, CurPage - Cell.Content.Get_StartPage_Relative());
 	}
 };
-CTable.prototype.Is_InnerTable = function()
+CTable.prototype.IsInnerTable = function()
 {
 	if (this.Content.length <= 0)
 		return false;
@@ -3344,15 +3344,15 @@ CTable.prototype.PreDelete = function()
 		Row.PreDelete();
 	}
 };
-CTable.prototype.Remove_InnerTable = function()
+CTable.prototype.RemoveInnerTable = function()
 {
-	this.CurCell.Content.Table_RemoveTable();
+	this.CurCell.Content.RemoveTable();
 };
-CTable.prototype.Table_Select = function(Type)
+CTable.prototype.SelectTable = function(Type)
 {
-	if (true === this.Is_InnerTable())
+	if (true === this.IsInnerTable())
 	{
-		this.CurCell.Content.Table_Select(Type);
+		this.CurCell.Content.SelectTable(Type);
 		if (true === this.CurCell.Content.IsSelectionUse())
 		{
 			this.Selection.Use   = true;
@@ -3509,10 +3509,10 @@ CTable.prototype.Table_Select = function(Type)
 	};
 
 };
-CTable.prototype.Check_Split = function()
+CTable.prototype.CanSplitTableCells = function()
 {
-	if (true === this.Is_InnerTable())
-		return this.CurCell.Content.Table_CheckSplit();
+	if (true === this.IsInnerTable())
+		return this.CurCell.Content.CanSplitTableCells();
 
 	// Разделение ячейки работает, только если выделена ровно одна ячейка.
 	if (!( false === this.Selection.Use || ( true === this.Selection.Use && ( table_Selection_Text === this.Selection.Type || ( table_Selection_Cell === this.Selection.Type && 1 === this.Selection.Data.length  ) ) ) ))
@@ -3520,10 +3520,10 @@ CTable.prototype.Check_Split = function()
 
 	return true;
 };
-CTable.prototype.Check_Merge = function()
+CTable.prototype.CanMergeTableCells = function()
 {
-	if (true === this.Is_InnerTable())
-		return this.CurCell.Content.Table_CheckMerge();
+	if (true === this.IsInnerTable())
+		return this.CurCell.Content.CanMergeTableCells();
 
 	if (true != this.Selection.Use || table_Selection_Cell != this.Selection.Type || this.Selection.Data.length <= 1)
 		return false;
@@ -4092,7 +4092,7 @@ CTable.prototype.Add_Comment = function(Comment, bStart, bEnd)
 		}
 	}
 };
-CTable.prototype.CanAdd_Comment = function()
+CTable.prototype.CanAddComment = function()
 {
 	if (true === this.ApplyToAll)
 	{
@@ -4100,7 +4100,7 @@ CTable.prototype.CanAdd_Comment = function()
 			return true;
 
 		this.Content[0].Get_Cell(0).Content.Set_ApplyToAll(true);
-		var Result = this.Content[0].Get_Cell(0).Content.CanAdd_Comment();
+		var Result = this.Content[0].Get_Cell(0).Content.CanAddComment();
 		this.Content[0].Get_Cell(0).Content.Set_ApplyToAll(false);
 		return Result;
 	}
@@ -4114,11 +4114,13 @@ CTable.prototype.CanAdd_Comment = function()
 			{
 				var Pos  = this.Selection.Data[0];
 				var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
-				return Cell.Content.CanAdd_Comment();
+				return Cell.Content.CanAddComment();
 			}
 		}
 		else
-			return this.CurCell.Content.CanAdd_Comment();
+		{
+			return this.CurCell.Content.CanAddComment();
+		}
 	}
 };
 CTable.prototype.Can_IncreaseParagraphLevel = function(bIncrease)
@@ -6345,7 +6347,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 	}
 	else
 	{
-		if (true === this.Is_InnerTable())
+		if (true === this.IsInnerTable())
 			return this.CurCell.Content.MoveCursorToCell(bNext);
 
 		var CurCell = this.CurCell;
@@ -6373,7 +6375,7 @@ CTable.prototype.MoveCursorToCell = function(bNext)
 					}))
 				{
 					History.Create_NewPoint(AscDFH.historydescription_Document_TableAddNewRowByTab);
-					this.Row_Add(false);
+					this.AddTableRow(false);
 				}
 				else
 					return;
@@ -8206,11 +8208,11 @@ CTable.prototype.Internal_CheckMerge = function()
  * Объединяем выделенные ячейки таблицы.
  * @param isClearMerge - используем или нет рассчетные данные (true - не используем, false - default value)
  */
-CTable.prototype.Cell_Merge = function(isClearMerge)
+CTable.prototype.MergeTableCells = function(isClearMerge)
 {
 	var bApplyToInnerTable = false;
 	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		bApplyToInnerTable = this.CurCell.Content.Table_MergeCells();
+		bApplyToInnerTable = this.CurCell.Content.MergeTableCells();
 
 	if (true === bApplyToInnerTable)
 		return false;
@@ -8322,11 +8324,11 @@ CTable.prototype.Cell_Merge = function(isClearMerge)
 /**
  * Разделяем текущую ячейку
  */
-CTable.prototype.Cell_Split = function(Rows, Cols)
+CTable.prototype.SplitTableCells = function(Rows, Cols)
 {
 	var bApplyToInnerTable = false;
 	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		bApplyToInnerTable = this.CurCell.Content.Table_SplitCell(Cols, Rows);
+		bApplyToInnerTable = this.CurCell.Content.SplitTableCells(Cols, Rows);
 
 	if (true === bApplyToInnerTable)
 		return true;
@@ -8694,14 +8696,14 @@ CTable.prototype.Cell_Split = function(Rows, Cols)
  * Добавление строки.
  * @param bBefore - true - до(сверху) первой выделенной строки, false - после(снизу) последней выделенной строки.
  */
-CTable.prototype.Row_Add = function(bBefore)
+CTable.prototype.AddTableRow = function(bBefore)
 {
 	if ("undefined" === typeof(bBefore))
 		bBefore = true;
 
 	var bApplyToInnerTable = false;
 	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		bApplyToInnerTable = this.CurCell.Content.Table_AddRow(bBefore);
+		bApplyToInnerTable = this.CurCell.Content.AddTableRow(bBefore);
 
 	if (true === bApplyToInnerTable)
 		return;
@@ -8855,11 +8857,11 @@ CTable.prototype.Row_Add = function(bBefore)
 /**
  * Удаление строки либо по номеру Ind, либо по выделению Selection, либо по текущей ячейке.
  */
-CTable.prototype.Row_Remove = function(Ind)
+CTable.prototype.RemoveTableRow = function(Ind)
 {
 	var bApplyToInnerTable = false;
 	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		bApplyToInnerTable = this.CurCell.Content.Table_RemoveRow(Ind);
+		bApplyToInnerTable = this.CurCell.Content.RemoveTableRow(Ind);
 
 	if (true === bApplyToInnerTable)
 		return true;
@@ -9002,11 +9004,11 @@ CTable.prototype.Row_Remove2 = function()
 /**
  * Удаление колонки либо по выделению Selection, либо по текущей ячейке.
  */
-CTable.prototype.Col_Remove = function()
+CTable.prototype.RemoveTableColumn = function()
 {
 	var bApplyToInnerTable = false;
 	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		bApplyToInnerTable = this.CurCell.Content.Table_RemoveCol();
+		bApplyToInnerTable = this.CurCell.Content.RemoveTableColumn();
 
 	if (true === bApplyToInnerTable)
 		return true;
@@ -9182,14 +9184,14 @@ CTable.prototype.Col_Remove = function()
  * Добавление колонки.
  * @param bBefore - true - до(слева) первой выделенной колонки, false - после(справа) последней выделенной колонки.
  */
-CTable.prototype.Col_Add = function(bBefore)
+CTable.prototype.AddTableColumn = function(bBefore)
 {
 	if ("undefined" === typeof(bBefore))
 		bBefore = true;
 
 	var bApplyToInnerTable = false;
 	if (false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ))
-		bApplyToInnerTable = this.CurCell.Content.Table_AddCol(bBefore);
+		bApplyToInnerTable = this.CurCell.Content.AddTableColumn(bBefore);
 
 	if (true === bApplyToInnerTable)
 		return;

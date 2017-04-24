@@ -1036,7 +1036,7 @@ CFootnotesController.prototype.GotoPage = function(nPageAbs)
 	this.private_SetCurrentFootnoteNoSelection(oFootnote);
 	oFootnote.MoveCursorToStartPos(false);
 };
-CFootnotesController.prototype.Check_TableCoincidence = function(oTable)
+CFootnotesController.prototype.CheckTableCoincidence = function(oTable)
 {
 	return false;
 };
@@ -2672,49 +2672,49 @@ CFootnotesController.prototype.AddTableRow = function(bBefore)
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_AddRow(bBefore);
+	this.CurFootnote.AddTableRow(bBefore);
 };
-CFootnotesController.prototype.AddTableCol = function(bBefore)
+CFootnotesController.prototype.AddTableColumn = function(bBefore)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_AddCol(bBefore);
+	this.CurFootnote.AddTableColumn(bBefore);
 };
 CFootnotesController.prototype.RemoveTableRow = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_RemoveRow();
+	this.CurFootnote.RemoveTableRow();
 };
-CFootnotesController.prototype.RemoveTableCol = function()
+CFootnotesController.prototype.RemoveTableColumn = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_RemoveCol();
+	this.CurFootnote.RemoveTableColumn();
 };
 CFootnotesController.prototype.MergeTableCells = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_MergeCells();
+	this.CurFootnote.MergeTableCells();
 };
 CFootnotesController.prototype.SplitTableCells = function(Cols, Rows)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_SplitCell(Cols, Rows);
+	this.CurFootnote.SplitTableCells(Cols, Rows);
 };
 CFootnotesController.prototype.RemoveTable = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_RemoveTable();
+	this.CurFootnote.RemoveTable();
 };
 CFootnotesController.prototype.SelectTable = function(Type)
 {
@@ -2723,7 +2723,7 @@ CFootnotesController.prototype.SelectTable = function(Type)
 
 	this.RemoveSelection();
 
-	this.CurFootnote.Table_Select(Type);
+	this.CurFootnote.SelectTable(Type);
 	if (true === this.CurFootnote.IsSelectionUse())
 	{
 		this.Selection.Use            = true;
@@ -2740,14 +2740,14 @@ CFootnotesController.prototype.CanMergeTableCells = function()
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Table_CheckMerge();
+	return this.CurFootnote.CanMergeTableCells();
 };
 CFootnotesController.prototype.CanSplitTableCells = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Table_CheckSplit();
+	return this.CurFootnote.CanSplitTableCells();
 };
 CFootnotesController.prototype.UpdateInterfaceState = function()
 {
@@ -2924,7 +2924,7 @@ CFootnotesController.prototype.AddComment = function(Comment)
 CFootnotesController.prototype.CanAddComment = function()
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
-		return this.CurFootnote.CanAdd_Comment();
+		return this.CurFootnote.CanAddComment();
 
 	return false;
 };

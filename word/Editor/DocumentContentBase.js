@@ -548,7 +548,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 				this.CurPos.ContentPos = StartPos;
 				if (Count < 0 && type_Table === this.Content[StartPos].GetType() && true === this.Content[StartPos].IsCellSelection() && true != bOnTextAdd)
 				{
-					this.Table_RemoveRow();
+					this.RemoveTableRow();
 				}
 				else if (false === this.Content[StartPos].Remove(Count, true, bRemoveOnlySelection, bOnTextAdd))
 				{

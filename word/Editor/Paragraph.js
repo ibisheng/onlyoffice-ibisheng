@@ -10793,7 +10793,7 @@ Paragraph.prototype.Add_Comment2 = function(Comment, ObjectId)
 	// this.Get_Id() );  var Item = new ParaCommentStart(Comment.Get_Id()); this.Internal_Content_Add( StartPos, Item
 	// ); }
 };
-Paragraph.prototype.CanAdd_Comment = function()
+Paragraph.prototype.CanAddComment = function()
 {
 	if (true === this.Selection.Use && true != this.IsSelectionEmpty())
 		return true;

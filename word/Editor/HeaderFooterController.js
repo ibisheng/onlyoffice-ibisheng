@@ -293,43 +293,43 @@ CHdrFtrController.prototype.GetSelectedElementsInfo = function(oInfo)
 };
 CHdrFtrController.prototype.AddTableRow = function(bBefore)
 {
-	this.HdrFtr.Table_AddRow(bBefore);
+	this.HdrFtr.AddTableRow(bBefore);
 };
-CHdrFtrController.prototype.AddTableCol = function(bBefore)
+CHdrFtrController.prototype.AddTableColumn = function(bBefore)
 {
-	this.HdrFtr.Table_AddCol(bBefore);
+	this.HdrFtr.AddTableColumn(bBefore);
 };
 CHdrFtrController.prototype.RemoveTableRow = function()
 {
-	this.HdrFtr.Table_RemoveRow();
+	this.HdrFtr.RemoveTableRow();
 };
-CHdrFtrController.prototype.RemoveTableCol = function()
+CHdrFtrController.prototype.RemoveTableColumn = function()
 {
-	this.HdrFtr.Table_RemoveCol();
+	this.HdrFtr.RemoveTableColumn();
 };
 CHdrFtrController.prototype.MergeTableCells = function()
 {
-	this.HdrFtr.Table_MergeCells();
+	this.HdrFtr.MergeTableCells();
 };
 CHdrFtrController.prototype.SplitTableCells = function(Cols, Rows)
 {
-	this.HdrFtr.Table_SplitCell(Cols, Rows);
+	this.HdrFtr.SplitTableCells(Cols, Rows);
 };
 CHdrFtrController.prototype.RemoveTable = function()
 {
-	this.HdrFtr.Table_RemoveTable();
+	this.HdrFtr.RemoveTable();
 };
 CHdrFtrController.prototype.SelectTable = function(Type)
 {
-	this.HdrFtr.Table_Select(Type);
+	this.HdrFtr.SelectTable(Type);
 };
 CHdrFtrController.prototype.CanMergeTableCells = function()
 {
-	return this.HdrFtr.Table_CheckMerge();
+	return this.HdrFtr.CanMergeTableCells();
 };
 CHdrFtrController.prototype.CanSplitTableCells = function()
 {
-	return this.HdrFtr.Table_CheckSplit();
+	return this.HdrFtr.CanSplitTableCells();
 };
 CHdrFtrController.prototype.UpdateInterfaceState = function()
 {
@@ -380,7 +380,7 @@ CHdrFtrController.prototype.AddComment = function(Comment)
 };
 CHdrFtrController.prototype.CanAddComment = function()
 {
-	return this.HdrFtr.CanAdd_Comment();
+	return this.HdrFtr.CanAddComment();
 };
 CHdrFtrController.prototype.GetSelectionAnchorPos = function()
 {

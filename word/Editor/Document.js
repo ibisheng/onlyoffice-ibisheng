@@ -7902,49 +7902,49 @@ CDocument.prototype.GetSelectedElementsInfo = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Table_AddRow = function(bBefore)
+CDocument.prototype.AddTableRow = function(bBefore)
 {
 	this.Controller.AddTableRow(bBefore);
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Table_AddCol = function(bBefore)
+CDocument.prototype.AddTableColumn = function(bBefore)
 {
-	this.Controller.AddTableCol(bBefore);
+	this.Controller.AddTableColumn(bBefore);
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Table_RemoveRow = function()
+CDocument.prototype.RemoveTableRow = function()
 {
 	this.Controller.RemoveTableRow();
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Table_RemoveCol = function()
+CDocument.prototype.RemoveTableColumn = function()
 {
-	this.Controller.RemoveTableCol();
+	this.Controller.RemoveTableColumn();
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Table_MergeCells = function()
+CDocument.prototype.MergeTableCells = function()
 {
 	this.Controller.MergeTableCells();
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Table_SplitCell = function(Cols, Rows)
+CDocument.prototype.SplitTableCells = function(Cols, Rows)
 {
 	this.Controller.SplitTableCells(Cols, Rows);
 	this.Recalculate();
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Table_RemoveTable = function()
+CDocument.prototype.RemoveTable = function()
 {
 	this.Controller.RemoveTable();
 	this.Recalculate();
@@ -7952,22 +7952,22 @@ CDocument.prototype.Table_RemoveTable = function()
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateRulersState();
 };
-CDocument.prototype.Table_Select = function(Type)
+CDocument.prototype.SelectTable = function(Type)
 {
 	this.Controller.SelectTable(Type);
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
 	//this.Document_UpdateRulersState();
 };
-CDocument.prototype.Table_CheckMerge = function()
+CDocument.prototype.CanMergeTableCells = function()
 {
 	return this.Controller.CanMergeTableCells();
 };
-CDocument.prototype.Table_CheckSplit = function()
+CDocument.prototype.CanSplitTableCells = function()
 {
 	return this.Controller.CanSplitTableCells();
 };
-CDocument.prototype.Check_TableCoincidence = function(Table)
+CDocument.prototype.CheckTableCoincidence = function(Table)
 {
 	return false;
 };
@@ -8706,7 +8706,7 @@ CDocument.prototype.Set_SelectionState2 = function(State)
 //----------------------------------------------------------------------------------------------------------------------
 CDocument.prototype.Add_Comment = function(CommentData)
 {
-	if (true != this.CanAdd_Comment())
+	if (true != this.CanAddComment())
 	{
 		CommentData.Set_QuoteText(null);
 		var Comment = new CComment(this.Comments, CommentData);
@@ -8756,7 +8756,7 @@ CDocument.prototype.Remove_Comment = function(Id, bSendEvent, bRecalculate)
 			this.Api.sync_RemoveComment(Id);
 	}
 };
-CDocument.prototype.CanAdd_Comment = function()
+CDocument.prototype.CanAddComment = function()
 {
 	if (true !== this.Comments.Is_Use())
 		return false;
@@ -10029,7 +10029,7 @@ CDocument.prototype.Load_DocumentStateAfterLoadChanges = function(State)
 		{
 			Table.Set_CurCell(Cell);
 			Table.RemoveSelection();
-			Table.Table_Select(c_oAscTableSelectionType.Cell);
+			Table.SelectTable(c_oAscTableSelectionType.Cell);
 		}
 	}
 };
@@ -14409,8 +14409,8 @@ CDocument.prototype.controller_GetSelectedElementsInfo = function(Info)
 };
 CDocument.prototype.controller_AddTableRow = function(bBefore)
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos = 0;
 		if (true === this.Selection.Use)
@@ -14418,7 +14418,7 @@ CDocument.prototype.controller_AddTableRow = function(bBefore)
 		else
 			Pos = this.CurPos.ContentPos;
 
-		this.Content[Pos].Row_Add(bBefore);
+		this.Content[Pos].AddTableRow(bBefore);
 
 		if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
 		{
@@ -14428,10 +14428,10 @@ CDocument.prototype.controller_AddTableRow = function(bBefore)
 		}
 	}
 };
-CDocument.prototype.controller_AddTableCol = function(bBefore)
+CDocument.prototype.controller_AddTableColumn = function(bBefore)
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos = 0;
 		if (true === this.Selection.Use)
@@ -14439,7 +14439,7 @@ CDocument.prototype.controller_AddTableCol = function(bBefore)
 		else
 			Pos = this.CurPos.ContentPos;
 
-		this.Content[Pos].Col_Add(bBefore);
+		this.Content[Pos].AddTableColumn(bBefore);
 
 		if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
 		{
@@ -14451,8 +14451,8 @@ CDocument.prototype.controller_AddTableCol = function(bBefore)
 };
 CDocument.prototype.controller_RemoveTableRow = function()
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos = 0;
 		if (true === this.Selection.Use)
@@ -14460,14 +14460,14 @@ CDocument.prototype.controller_RemoveTableRow = function()
 		else
 			Pos = this.CurPos.ContentPos;
 
-		if (false === this.Content[Pos].Row_Remove())
+		if (false === this.Content[Pos].RemoveTableRow())
 			this.controller_RemoveTable();
 	}
 };
-CDocument.prototype.controller_RemoveTableCol = function()
+CDocument.prototype.controller_RemoveTableColumn = function()
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos = 0;
 		if (true === this.Selection.Use)
@@ -14475,14 +14475,14 @@ CDocument.prototype.controller_RemoveTableCol = function()
 		else
 			Pos = this.CurPos.ContentPos;
 
-		if (false === this.Content[Pos].Col_Remove())
+		if (false === this.Content[Pos].RemoveTableColumn())
 			this.controller_RemoveTable();
 	}
 };
 CDocument.prototype.controller_MergeTableCells = function()
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos = 0;
 		if (true === this.Selection.Use)
@@ -14490,13 +14490,13 @@ CDocument.prototype.controller_MergeTableCells = function()
 		else
 			Pos = this.CurPos.ContentPos;
 
-		this.Content[Pos].Cell_Merge();
+		this.Content[Pos].MergeTableCells();
 	}
 };
 CDocument.prototype.controller_SplitTableCells = function(Cols, Rows)
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos = 0;
 		if (true === this.Selection.Use)
@@ -14504,13 +14504,13 @@ CDocument.prototype.controller_SplitTableCells = function(Cols, Rows)
 		else
 			Pos = this.CurPos.ContentPos;
 
-		this.Content[Pos].Cell_Split(Rows, Cols);
+		this.Content[Pos].SplitTableCells(Rows, Cols);
 	}
 };
 CDocument.prototype.controller_RemoveTable = function()
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos;
 		if (true === this.Selection.Use)
@@ -14519,30 +14519,40 @@ CDocument.prototype.controller_RemoveTable = function()
 			Pos = this.CurPos.ContentPos;
 
 		var Table = this.Content[Pos];
-		if (true === Table.Is_InnerTable())
-			Table.Remove_InnerTable();
+
+		if (type_Table === Table.GetType())
+		{
+			if (true === Table.IsInnerTable())
+			{
+				Table.RemoveInnerTable();
+			}
+			else
+			{
+				this.RemoveSelection();
+				Table.PreDelete();
+				this.Internal_Content_Remove(Pos, 1);
+
+				if (Pos >= this.Content.length - 1)
+					Pos--;
+
+				if (Pos < 0)
+					Pos = 0;
+
+				this.Set_DocPosType(docpostype_Content);
+				this.CurPos.ContentPos = Pos;
+				this.Content[Pos].MoveCursorToStartPos();
+			}
+		}
 		else
 		{
-			this.RemoveSelection();
-			Table.PreDelete();
-			this.Internal_Content_Remove(Pos, 1);
-
-			if (Pos >= this.Content.length - 1)
-				Pos--;
-
-			if (Pos < 0)
-				Pos = 0;
-
-			this.Set_DocPosType(docpostype_Content);
-			this.CurPos.ContentPos = Pos;
-			this.Content[Pos].MoveCursorToStartPos();
+			Table.RemoveTable();
 		}
 	}
 };
 CDocument.prototype.controller_SelectTable = function(Type)
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos = 0;
 		if (true === this.Selection.Use)
@@ -14550,7 +14560,7 @@ CDocument.prototype.controller_SelectTable = function(Type)
 		else
 			Pos = this.CurPos.ContentPos;
 
-		this.Content[Pos].Table_Select(Type);
+		this.Content[Pos].SelectTable(Type);
 		if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
 		{
 			this.Selection.Use      = true;
@@ -14561,8 +14571,8 @@ CDocument.prototype.controller_SelectTable = function(Type)
 };
 CDocument.prototype.controller_CanMergeTableCells = function()
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos = 0;
 		if (true === this.Selection.Use)
@@ -14570,15 +14580,15 @@ CDocument.prototype.controller_CanMergeTableCells = function()
 		else
 			Pos = this.CurPos.ContentPos;
 
-		return this.Content[Pos].Check_Merge();
+		return this.Content[Pos].CanMergeTableCells();
 	}
 
 	return false;
 };
 CDocument.prototype.controller_CanSplitTableCells = function()
 {
-	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType())
-		|| (false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType()))
+	if ((true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType())
+		|| (false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType()))
 	{
 		var Pos = 0;
 		if (true === this.Selection.Use)
@@ -14586,7 +14596,7 @@ CDocument.prototype.controller_CanSplitTableCells = function()
 		else
 			Pos = this.CurPos.ContentPos;
 
-		return this.Content[Pos].Check_Split();
+		return this.Content[Pos].CanSplitTableCells();
 	}
 
 	return false;
@@ -14927,12 +14937,14 @@ CDocument.prototype.controller_CanAddComment = function()
 	if (selectionflag_Common === this.Selection.Flag)
 	{
 		if (true === this.Selection.Use && this.Selection.StartPos != this.Selection.EndPos)
+		{
 			return true;
+		}
 		else
 		{
 			var Pos     = ( this.Selection.Use === true ? this.Selection.StartPos : this.CurPos.ContentPos );
 			var Element = this.Content[Pos];
-			return Element.CanAdd_Comment();
+			return Element.CanAddComment();
 		}
 	}
 

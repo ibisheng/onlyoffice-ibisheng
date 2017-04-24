@@ -607,7 +607,7 @@ CDocumentControllerBase.prototype.AddTableRow = function(bBefore){};
  * Добавляем столбец таблицы.
  * @param bBefore
  */
-CDocumentControllerBase.prototype.AddTableCol = function(bBefore){};
+CDocumentControllerBase.prototype.AddTableColumn = function(bBefore){};
 /**
  * Удаляем строку таблицы.
  */
@@ -615,7 +615,7 @@ CDocumentControllerBase.prototype.RemoveTableRow = function(){};
 /**
  * Удаляем колонку таблицы.
  */
-CDocumentControllerBase.prototype.RemoveTableCol = function(){};
+CDocumentControllerBase.prototype.RemoveTableColumn = function(){};
 /**
  * Объединяем ячейки таблицы.
  */

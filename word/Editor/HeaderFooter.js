@@ -1019,57 +1019,57 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //-----------------------------------------------------------------------------------
-    Table_AddRow : function(bBefore)
+	AddTableRow : function(bBefore)
+	{
+		this.Content.AddTableRow(bBefore);
+	},
+
+	AddTableColumn : function(bBefore)
     {
-        this.Content.Table_AddRow( bBefore );
+        this.Content.AddTableColumn( bBefore );
     },
 
-    Table_AddCol : function(bBefore)
-    {
-        this.Content.Table_AddCol( bBefore );
-    },
+	RemoveTableRow : function()
+	{
+		this.Content.RemoveTableRow();
+	},
 
-    Table_RemoveRow : function()
-    {
-        this.Content.Table_RemoveRow();
-    },
+	RemoveTableColumn : function()
+	{
+		this.Content.RemoveTableColumn();
+	},
 
-    Table_RemoveCol : function()
-    {
-        this.Content.Table_RemoveCol();
-    },
+	MergeTableCells : function()
+	{
+		this.Content.MergeTableCells();
+	},
 
-    Table_MergeCells : function()
-    {
-        this.Content.Table_MergeCells();
-    },
+	SplitTableCells : function(Cols, Rows)
+	{
+		this.Content.SplitTableCells(Cols, Rows);
+	},
 
-    Table_SplitCell : function( Cols, Rows )
-    {
-        this.Content.Table_SplitCell( Cols, Rows );
-    },
+	RemoveTable : function()
+	{
+		this.Content.RemoveTable();
+	},
 
-    Table_RemoveTable : function()
-    {
-        this.Content.Table_RemoveTable();
-    },
+	SelectTable : function(Type)
+	{
+		this.Content.SelectTable(Type);
+	},
 
-    Table_Select : function(Type)
-    {
-        this.Content.Table_Select(Type);
-    },
+	CanMergeTableCells : function()
+	{
+		return this.Content.CanMergeTableCells();
+	},
 
-    Table_CheckMerge : function()
-    {
-        return this.Content.Table_CheckMerge();
-    },
+	CanSplitTableCells : function()
+	{
+		return this.Content.CanSplitTableCells();
+	},
 
-    Table_CheckSplit : function()
-    {
-        return this.Content.Table_CheckSplit();
-    },
-
-    Check_TableCoincidence : function(Table)
+	CheckTableCoincidence : function(Table)
     {
         return false;
     },
@@ -1205,10 +1205,10 @@ CHeaderFooter.prototype =
         this.Content.Add_Comment( Comment, true, true );
     },
 
-    CanAdd_Comment : function()
-    {
-        return this.Content.CanAdd_Comment();
-    }
+	CanAddComment : function()
+	{
+		return this.Content.CanAddComment();
+	}
 };
 CHeaderFooter.prototype.Get_SectPr = function()
 {
@@ -2353,65 +2353,65 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //-----------------------------------------------------------------------------------
-    Table_AddRow : function(bBefore)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_AddRow( bBefore );
-    },
+	AddTableRow : function(bBefore)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.AddTableRow(bBefore);
+	},
 
-    Table_AddCol : function(bBefore)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_AddCol( bBefore );
-    },
+	AddTableColumn : function(bBefore)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.AddTableColumn(bBefore);
+	},
 
-    Table_RemoveRow : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_RemoveRow();
-    },
+	RemoveTableRow : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.RemoveTableRow();
+	},
 
-    Table_RemoveCol : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_RemoveCol();
-    },
+	RemoveTableColumn : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.RemoveTableColumn();
+	},
 
-    Table_MergeCells : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_MergeCells();
-    },
+	MergeTableCells : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.MergeTableCells();
+	},
 
-    Table_SplitCell : function( Cols, Rows )
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_SplitCell( Cols, Rows );
-    },
+	SplitTableCells : function(Cols, Rows)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.SplitTableCells(Cols, Rows);
+	},
 
-    Table_RemoveTable : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_RemoveTable();
-    },
+	RemoveTable : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.RemoveTable();
+	},
 
-    Table_Select : function(Type)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_Select(Type);
-    },
+	SelectTable : function(Type)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.SelectTable(Type);
+	},
 
-    Table_CheckMerge : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Table_CheckMerge();
-    },
+	CanMergeTableCells : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.CanMergeTableCells();
+	},
 
-    Table_CheckSplit : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Table_CheckSplit();
-    },
+	CanSplitTableCells : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.CanSplitTableCells();
+	},
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
@@ -2491,13 +2491,13 @@ CHeaderFooterController.prototype =
         }
     },
 
-    CanAdd_Comment : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.CanAdd_Comment();
+	CanAddComment : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.CanAddComment();
 
-        return false;
-    },
+		return false;
+	},
     
     Get_SelectionAnchorPos : function()
     {

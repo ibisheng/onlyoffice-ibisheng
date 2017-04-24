@@ -514,6 +514,50 @@ CDocumentContentElementBase.prototype.GetCurrentParagraph = function()
 {
 	return null;
 };
+CDocumentContentElementBase.prototype.AddTableRow = function(bBefore)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.AddTableColumn = function(bBefore)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.RemoveTableRow = function(nRowIndex)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.RemoveTableColumn = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MergeTableCells = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.SplitTableCells = function(nColsCount, nRowsCount)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.RemoveTable = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.SelectTable = function(Type)
+{
+};
+CDocumentContentElementBase.prototype.CanMergeTableCells = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.CanSplitTableCells = function()
+{
+	return false;
+};
+
+CDocumentContentElementBase.prototype.CanAddComment = function()
+{
+	return false;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

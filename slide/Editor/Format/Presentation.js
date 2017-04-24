@@ -3457,7 +3457,7 @@ CPresentation.prototype =
                 Function.apply(target_text_object.graphicObject, args);
                 if(target_text_object.graphicObject.Content.length === 0)
                 {
-                    this.Table_RemoveTable();
+                    this.RemoveTable();
                     return;
                 }
                 this.Recalculate();
@@ -3487,7 +3487,7 @@ CPresentation.prototype =
                     Function.apply(by_types.tables[0].graphicObject, args);
                     if(by_types.tables[0].graphicObject.Content.length === 0)
                     {
-                        this.Table_RemoveTable();
+                        this.RemoveTable();
                         return;
                     }
                     this.Recalculate();
@@ -3499,37 +3499,37 @@ CPresentation.prototype =
     },
 
 
-    Table_AddRow : function(bBefore)
+	AddTableRow : function(bBefore)
     {
-        this.ApplyTableFunction(CTable.prototype.Row_Add, bBefore);
+        this.ApplyTableFunction(CTable.prototype.AddTableRow, bBefore);
     },
 
-    Table_AddCol : function(bBefore)
+	AddTableColumn : function(bBefore)
     {
-        this.ApplyTableFunction(CTable.prototype.Col_Add, bBefore);
+        this.ApplyTableFunction(CTable.prototype.AddTableColumn, bBefore);
     },
 
-    Table_RemoveRow : function()
+	RemoveTableRow : function()
     {
-        this.ApplyTableFunction(CTable.prototype.Row_Remove, undefined);
+        this.ApplyTableFunction(CTable.prototype.RemoveTableRow, undefined);
     },
 
-    Table_RemoveCol : function()
+	RemoveTableColumn : function()
     {
-        this.ApplyTableFunction(CTable.prototype.Col_Remove, true);
+        this.ApplyTableFunction(CTable.prototype.RemoveTableColumn, true);
     },
 
-    Table_MergeCells : function()
+	MergeTableCells : function()
     {
-        this.ApplyTableFunction(CTable.prototype.Cell_Merge, true, true);
+        this.ApplyTableFunction(CTable.prototype.MergeTableCells, true, true);
     },
 
-    Table_SplitCell : function( Cols, Rows )
+	SplitTableCells : function( Cols, Rows )
     {
-        this.ApplyTableFunction(CTable.prototype.Cell_Split, true, true, parseInt(Cols, 10), parseInt(Rows, 10) );
+        this.ApplyTableFunction(CTable.prototype.SplitTableCells, true, true, parseInt(Cols, 10), parseInt(Rows, 10) );
     },
 
-    Table_RemoveTable : function()
+	RemoveTable : function()
     {
         if(this.Slides[this.CurPage])
         {
@@ -3554,7 +3554,7 @@ CPresentation.prototype =
         }
     },
 
-    Table_Select : function(Type)
+	SelectTable : function(Type)
     {
         if(this.Slides[this.CurPage])
         {
@@ -3562,7 +3562,7 @@ CPresentation.prototype =
             if(by_types.tables.length === 1)
             {
                 by_types.tables[0].Set_CurrentElement();
-                by_types.tables[0].graphicObject.Table_Select(Type);
+                by_types.tables[0].graphicObject.SelectTable(Type);
                 this.Document_UpdateSelectionState();
                 this.Document_UpdateInterfaceState();
             }
@@ -3595,17 +3595,17 @@ CPresentation.prototype =
         return false;
     },
 
-    Table_CheckMerge : function()
+	CanMergeTableCells : function()
     {
-        return this.Table_CheckFunction(CTable.prototype.Check_Merge);
+        return this.Table_CheckFunction(CTable.prototype.CanMergeTableCells);
     },
 
-    Table_CheckSplit : function()
+	CanSplitTableCells : function()
     {
-        return this.Table_CheckFunction(CTable.prototype.Check_Split);
+        return this.Table_CheckFunction(CTable.prototype.CanSplitTableCells);
     },
 
-    Check_TableCoincidence : function(Table)
+	CheckTableCoincidence : function(Table)
     {
         return false;
     },
@@ -5217,7 +5217,7 @@ CPresentation.prototype =
         editor.sync_HideComment();
     },
 
-    CanAdd_Comment : function()
+	CanAddComment : function()
     {
         return true;
     },

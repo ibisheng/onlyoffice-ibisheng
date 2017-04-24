@@ -2160,9 +2160,9 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                 {
                     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_TableAddColumnLeft);
                     if (_is_add)
-                        this.WordControl.m_oLogicDocument.Table_AddCol(!_is_above);
+                        this.WordControl.m_oLogicDocument.AddTableColumn(!_is_above);
                     else
-                        this.WordControl.m_oLogicDocument.Table_RemoveCol();
+                        this.WordControl.m_oLogicDocument.RemoveTableColumn();
                 }
             }
             else if (2 == _type)
@@ -2171,9 +2171,9 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                 {
                     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_TableAddColumnLeft);
                     if (_is_add)
-                        this.WordControl.m_oLogicDocument.Table_AddRow(!_is_above);
+                        this.WordControl.m_oLogicDocument.AddTableRow(!_is_above);
                     else
-                        this.WordControl.m_oLogicDocument.Table_RemoveRow();
+                        this.WordControl.m_oLogicDocument.RemoveTableRow();
                 }
             }
 
@@ -4777,7 +4777,7 @@ Asc['asc_docs_api'].prototype.MergeCells = function()
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Table_MergeCells();
+        this.WordControl.m_oLogicDocument.MergeTableCells();
     }
 }
 Asc['asc_docs_api'].prototype.SplitCell = function(Cols, Rows)
@@ -4785,7 +4785,7 @@ Asc['asc_docs_api'].prototype.SplitCell = function(Cols, Rows)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Table_SplitCell(Cols, Rows);
+        this.WordControl.m_oLogicDocument.SplitTableCells(Cols, Rows);
     }
 }
 

@@ -2173,7 +2173,7 @@
             oTable.Selection.Data.splice(nResultPos, 0, oPos);
         }
 
-        var isMerged = this.Table.Cell_Merge(true);
+        var isMerged = this.Table.MergeTableCells(true);
         var oMergedCell = this.Table.CurCell;
         oTable.RemoveSelection();
 
@@ -2251,7 +2251,7 @@
 
         this.Table.RemoveSelection();
         this.Table.CurCell = _oCell;
-        this.Table.Row_Add(_isBefore);
+        this.Table.AddTableRow(_isBefore);
 
         private_EndSilentMode();
         return new ApiTableRow(this.Table.Content[nRowIndex]);
@@ -2280,7 +2280,7 @@
 
         this.Table.RemoveSelection();
         this.Table.CurCell = _oCell;
-        this.Table.Col_Add(_isBefore);
+        this.Table.AddTableColumn(_isBefore);
 
         private_EndSilentMode();
     };
@@ -2299,7 +2299,7 @@
 
         this.Table.RemoveSelection();
         this.Table.CurCell = oCell.Cell;
-        var isEmpty = !(this.Table.Row_Remove());
+        var isEmpty = !(this.Table.RemoveTableRow());
 
         private_EndSilentMode();
         return isEmpty;
@@ -2319,7 +2319,7 @@
 
         this.Table.RemoveSelection();
         this.Table.CurCell = oCell.Cell;
-        var isEmpty = !(this.Table.Col_Remove());
+        var isEmpty = !(this.Table.RemoveTableColumn());
 
         private_EndSilentMode();
         return isEmpty;

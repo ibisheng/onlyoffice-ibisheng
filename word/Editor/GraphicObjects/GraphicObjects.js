@@ -1423,7 +1423,7 @@ CGraphicObjects.prototype =
     canAddComment: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.CanAdd_Comment();
+        return content && content.CanAddComment();
     },
 
     addComment: function(commentData)
@@ -1901,64 +1901,64 @@ CGraphicObjects.prototype =
     tableCheckSplit: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_CheckSplit();
+        return content && content.CanSplitTableCells();
     },
 
     tableCheckMerge: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_CheckMerge();
+        return content && content.CanMergeTableCells();
     },
 
     tableSelect: function( Type )
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_Select(Type);
+        return content && content.SelectTable(Type);
     },
 
     tableRemoveTable: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_RemoveTable();
+        return content && content.RemoveTable();
     },
 
     tableSplitCell: function(Cols, Rows)
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_SplitCell(Cols, Rows);
+        return content && content.SplitTableCells(Cols, Rows);
     },
 
     tableMergeCells: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_MergeCells();
+        return content && content.MergeTableCells();
     },
 
     tableRemoveCol: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_RemoveCol();
+        return content && content.RemoveTableColumn();
     },
 
 
     tableAddCol: function(bBefore)
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_AddCol(bBefore);
+        return content && content.AddTableColumn(bBefore);
     },
 
     tableRemoveRow: function()
     {
 
         var content = this.getTargetDocContent();
-        return content && content.Table_RemoveRow();
+        return content && content.RemoveTableRow();
     },
 
     tableAddRow: function(bBefore)
     {
 
         var content = this.getTargetDocContent();
-        return content && content.Table_AddRow(bBefore);
+        return content && content.AddTableRow(bBefore);
     },
 
 

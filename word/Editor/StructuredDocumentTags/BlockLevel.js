@@ -497,6 +497,51 @@ CBlockLevelSdt.prototype.GetCurrentParagraph = function()
 {
 	return this.Content.GetCurrentParagraph();
 };
+CBlockLevelSdt.prototype.AddTableRow = function(bBefore)
+{
+	return this.Content.AddTableRow(bBefore);
+};
+CBlockLevelSdt.prototype.AddTableColumn = function(bBefore)
+{
+	return this.Content.AddTableColumn(bBefore);
+};
+CBlockLevelSdt.prototype.RemoveTableRow = function(nRowIndex)
+{
+	return this.Content.RemoveTableRow(nRowIndex);
+};
+CBlockLevelSdt.prototype.RemoveTableColumn = function()
+{
+	return this.Content.RemoveTableColumn();
+};
+CBlockLevelSdt.prototype.MergeTableCells = function()
+{
+	return this.Content.MergeTableCells();
+};
+CBlockLevelSdt.prototype.SplitTableCells = function(nColsCount, nRowsCount)
+{
+	return this.Content.SplitTableCells(nColsCount, nRowsCount);
+};
+CBlockLevelSdt.prototype.RemoveTable = function()
+{
+	return this.Content.RemoveTable();
+};
+CBlockLevelSdt.prototype.SelectTable = function(Type)
+{
+	return this.Content.SelectTable(Type);
+};
+CBlockLevelSdt.prototype.CanMergeTableCells = function()
+{
+	return this.Content.CanMergeTableCells();
+};
+CBlockLevelSdt.prototype.CanSplitTableCells = function()
+{
+	return this.Content.CanSplitTableCells();
+};
+
+CBlockLevelSdt.prototype.CanAddComment = function()
+{
+	return this.Content.CanAddComment();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -607,6 +652,10 @@ CBlockLevelSdt.prototype.Is_InTable = function(bReturnTopTable)
 CBlockLevelSdt.prototype.Get_PageContentStartPos = function(PageIndex, ElementIndex)
 {
 	return this.Parent.Get_PageContentStartPos(PageIndex, ElementIndex);
+};
+CBlockLevelSdt.prototype.CheckTableCoincidence = function(Table)
+{
+	return this.Parent.CheckTableCoincidence(Table);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

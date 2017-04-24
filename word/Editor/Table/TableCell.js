@@ -584,14 +584,14 @@ CTableCell.prototype =
         return false;
     },
 
-    Check_TableCoincidence : function(Table)
-    {
-        var CurTable = this.Row.Table;
-        if ( Table === CurTable )
-            return true;
-        else
-            return CurTable.Parent.Check_TableCoincidence(Table);
-    },
+	CheckTableCoincidence : function(Table)
+	{
+		var CurTable = this.Row.Table;
+		if (Table === CurTable)
+			return true;
+		else
+			return CurTable.Parent.CheckTableCoincidence(Table);
+	},
 
     Get_LastParagraphPrevCell : function()
     {

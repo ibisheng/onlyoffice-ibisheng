@@ -538,9 +538,9 @@ CDocumentContent.prototype.IsMovingTableBorder = function()
 
 	return false;
 };
-CDocumentContent.prototype.Check_TableCoincidence       = function(Table)
+CDocumentContent.prototype.CheckTableCoincidence = function(Table)
 {
-    return this.Parent.Check_TableCoincidence(Table);
+	return this.Parent.CheckTableCoincidence(Table);
 };
 //-----------------------------------------------------------------------------------
 // Основные функции, к которым идет обращение от родительского класса
@@ -6835,151 +6835,151 @@ CDocumentContent.prototype.Remove_NumberingSelection = function()
 //-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //-----------------------------------------------------------------------------------
-CDocumentContent.prototype.Table_AddRow      = function(bBefore)
+CDocumentContent.prototype.AddTableRow = function(bBefore)
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.tableAddRow(bBefore);
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        var Pos = 0;
-        if (true === this.Selection.Use)
-            Pos = this.Selection.StartPos;
-        else
-            Pos = this.CurPos.ContentPos;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.tableAddRow(bBefore);
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
 
-        this.Content[Pos].Row_Add(bBefore);
-        if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
-        {
-            this.Selection.Use      = true;
-            this.Selection.StartPos = Pos;
-            this.Selection.EndPos   = Pos;
-        }
+		this.Content[Pos].AddTableRow(bBefore);
+		if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
+		{
+			this.Selection.Use      = true;
+			this.Selection.StartPos = Pos;
+			this.Selection.EndPos   = Pos;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    return false;
+	return false;
 };
-CDocumentContent.prototype.Table_AddCol      = function(bBefore)
+CDocumentContent.prototype.AddTableColumn = function(bBefore)
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.tableAddCol(bBefore);
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        var Pos = 0;
-        if (true === this.Selection.Use)
-            Pos = this.Selection.StartPos;
-        else
-            Pos = this.CurPos.ContentPos;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.tableAddCol(bBefore);
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
 
-        this.Content[Pos].Col_Add(bBefore);
-        if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
-        {
-            this.Selection.Use      = true;
-            this.Selection.StartPos = Pos;
-            this.Selection.EndPos   = Pos;
-        }
+		this.Content[Pos].AddTableColumn(bBefore);
+		if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
+		{
+			this.Selection.Use      = true;
+			this.Selection.StartPos = Pos;
+			this.Selection.EndPos   = Pos;
+		}
 
-        return true;
-    }
+		return true;
+	}
 
-    return false;
+	return false;
 };
-CDocumentContent.prototype.Table_RemoveRow   = function()
+CDocumentContent.prototype.RemoveTableRow = function()
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.tableRemoveRow();
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        var Pos = 0;
-        if (true === this.Selection.Use)
-            Pos = this.Selection.StartPos;
-        else
-            Pos = this.CurPos.ContentPos;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.tableRemoveRow();
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
 
-        if (false === this.Content[Pos].Row_Remove())
-            this.Table_RemoveTable();
+		if (false === this.Content[Pos].RemoveTableRow())
+			this.RemoveTable();
 
-        return true;
-    }
+		return true;
+	}
 
-    return false;
+	return false;
 };
-CDocumentContent.prototype.Table_RemoveCol   = function()
+CDocumentContent.prototype.RemoveTableColumn = function()
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.tableRemoveCol();
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        var Pos = 0;
-        if (true === this.Selection.Use)
-            Pos = this.Selection.StartPos;
-        else
-            Pos = this.CurPos.ContentPos;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.tableRemoveCol();
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
 
-        if (false === this.Content[Pos].Col_Remove())
-            this.Table_RemoveTable();
+		if (false === this.Content[Pos].RemoveTableColumn())
+			this.RemoveTable();
 
-        return true;
-    }
+		return true;
+	}
 
-    return false;
+	return false;
 };
-CDocumentContent.prototype.Table_MergeCells  = function()
+CDocumentContent.prototype.MergeTableCells = function()
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.tableMergeCells();
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        var Pos = 0;
-        if (true === this.Selection.Use)
-            Pos = this.Selection.StartPos;
-        else
-            Pos = this.CurPos.ContentPos;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.tableMergeCells();
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
 
-        this.Content[Pos].Cell_Merge();
-        return true;
-    }
+		this.Content[Pos].MergeTableCells();
+		return true;
+	}
 
-    return false;
+	return false;
 };
-CDocumentContent.prototype.Table_SplitCell   = function(Cols, Rows)
+CDocumentContent.prototype.SplitTableCells = function(Cols, Rows)
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.tableSplitCell();
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        var Pos = 0;
-        if (true === this.Selection.Use)
-            Pos = this.Selection.StartPos;
-        else
-            Pos = this.CurPos.ContentPos;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.tableSplitCell();
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
 
-        this.Content[Pos].Cell_Split(Rows, Cols);
-        return true;
-    }
+		this.Content[Pos].SplitTableCells(Rows, Cols);
+		return true;
+	}
 
-    return false;
+	return false;
 };
-CDocumentContent.prototype.Table_RemoveTable = function()
+CDocumentContent.prototype.RemoveTable = function()
 {
     if (docpostype_DrawingObjects == this.CurPos.Type)
     {
         return this.LogicDocument.DrawingObjects.tableRemoveTable();
     }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
+    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
     {
         var Pos;
         if (true === this.Selection.Use)
@@ -6988,93 +6988,101 @@ CDocumentContent.prototype.Table_RemoveTable = function()
             Pos = this.CurPos.ContentPos;
 
         var Table = this.Content[Pos];
-        if (true === Table.Is_InnerTable())
-            Table.Remove_InnerTable();
-        else
-        {
-            this.RemoveSelection();
-            Table.PreDelete();
-            this.Internal_Content_Remove(Pos, 1);
+        if (type_Table === Table.GetType())
+		{
+			if (true === Table.IsInnerTable())
+			{
+				Table.RemoveInnerTable();
+			}
+			else
+			{
+				this.RemoveSelection();
+				Table.PreDelete();
+				this.Internal_Content_Remove(Pos, 1);
 
-            if (Pos >= this.Content.length - 1)
-                Pos--;
+				if (Pos >= this.Content.length - 1)
+					Pos--;
 
-            if (Pos < 0)
-                Pos = 0;
+				if (Pos < 0)
+					Pos = 0;
 
-            this.Set_DocPosType(docpostype_Content);
-            this.CurPos.ContentPos = Pos;
-            this.Content[Pos].MoveCursorToStartPos();
-            this.Recalculate();
-        }
+				this.Set_DocPosType(docpostype_Content);
+				this.CurPos.ContentPos = Pos;
+				this.Content[Pos].MoveCursorToStartPos();
+			}
 
-        return true;
+			return true;
+		}
+		else
+		{
+			return Table.RemoveTable();
+		}
     }
     return false;
 };
-CDocumentContent.prototype.Table_Select      = function(Type)
+CDocumentContent.prototype.SelectTable = function(Type)
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.tableSelect(Type);
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        var Pos = 0;
-        if (true === this.Selection.Use)
-            Pos = this.Selection.StartPos;
-        else
-            Pos = this.CurPos.ContentPos;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.tableSelect(Type);
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
 
-        this.Content[Pos].Table_Select(Type);
-        if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
-        {
-            this.Selection.Use      = true;
-            this.Selection.StartPos = Pos;
-            this.Selection.EndPos   = Pos;
-        }
-        return true;
-    }
+		this.Content[Pos].SelectTable(Type);
+		if (false === this.Selection.Use && true === this.Content[Pos].IsSelectionUse())
+		{
+			this.Selection.Use      = true;
+			this.Selection.StartPos = Pos;
+			this.Selection.EndPos   = Pos;
+		}
+		return true;
+	}
 
-    return false;
+	return false;
 };
-CDocumentContent.prototype.Table_CheckMerge  = function()
+CDocumentContent.prototype.CanMergeTableCells = function()
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.tableCheckMerge();
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        var Pos = 0;
-        if (true === this.Selection.Use)
-            Pos = this.Selection.StartPos;
-        else
-            Pos = this.CurPos.ContentPos;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.tableCheckMerge();
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
 
-        return this.Content[Pos].Check_Merge();
-    }
+		return this.Content[Pos].CanMergeTableCells();
+	}
 
-    return false;
+	return false;
 };
-CDocumentContent.prototype.Table_CheckSplit  = function()
+CDocumentContent.prototype.CanSplitTableCells = function()
 {
-    if (docpostype_DrawingObjects == this.CurPos.Type)
-    {
-        return this.LogicDocument.DrawingObjects.tableCheckSplit();
-    }
-    else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Table == this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Table == this.Content[this.CurPos.ContentPos].GetType() ) ))
-    {
-        var Pos = 0;
-        if (true === this.Selection.Use)
-            Pos = this.Selection.StartPos;
-        else
-            Pos = this.CurPos.ContentPos;
+	if (docpostype_DrawingObjects == this.CurPos.Type)
+	{
+		return this.LogicDocument.DrawingObjects.tableCheckSplit();
+	}
+	else if (docpostype_Content == this.CurPos.Type && ( ( true === this.Selection.Use && this.Selection.StartPos == this.Selection.EndPos && type_Paragraph !== this.Content[this.Selection.StartPos].GetType() ) || ( false == this.Selection.Use && type_Paragraph !== this.Content[this.CurPos.ContentPos].GetType() ) ))
+	{
+		var Pos = 0;
+		if (true === this.Selection.Use)
+			Pos = this.Selection.StartPos;
+		else
+			Pos = this.CurPos.ContentPos;
 
-        return this.Content[Pos].Check_Split();
-    }
+		return this.Content[Pos].CanSplitTableCells();
+	}
 
-    return false;
+	return false;
 };
 //-----------------------------------------------------------------------------------
 // Вспомогательные(внутренние ) функции
@@ -7885,46 +7893,46 @@ CDocumentContent.prototype.Add_Comment            = function(Comment, bStart, bE
         }
     }
 };
-CDocumentContent.prototype.CanAdd_Comment         = function()
+CDocumentContent.prototype.CanAddComment = function()
 {
-    if (true === this.ApplyToAll)
-    {
-        if (this.Content.length > 1)
-            return true;
-        else
-            return this.Content[0].CanAdd_Comment();
-    }
-    else
-    {
-        if (docpostype_DrawingObjects === this.CurPos.Type)
-        {
-            if (true != this.LogicDocument.DrawingObjects.isSelectedText())
-                return true;
-            else
-                return this.LogicDocument.DrawingObjects.canAddComment();
-        }
-        else //if ( docpostype_Content === this.CurPos.Type )
-        {
-            switch (this.Selection.Flag)
-            {
-                case selectionflag_Numbering:
-                    return false;
-                case selectionflag_Common:
-                {
-                    if (true === this.Selection.Use && this.Selection.StartPos != this.Selection.EndPos)
-                        return true;
-                    else
-                    {
-                        var Pos     = ( this.Selection.Use === true ? this.Selection.StartPos : this.CurPos.ContentPos );
-                        var Element = this.Content[Pos];
-                        return Element.CanAdd_Comment();
-                    }
-                }
-            }
-        }
-    }
+	if (true === this.ApplyToAll)
+	{
+		if (this.Content.length > 1)
+			return true;
+		else
+			return this.Content[0].CanAddComment();
+	}
+	else
+	{
+		if (docpostype_DrawingObjects === this.CurPos.Type)
+		{
+			if (true != this.LogicDocument.DrawingObjects.isSelectedText())
+				return true;
+			else
+				return this.LogicDocument.DrawingObjects.canAddComment();
+		}
+		else //if ( docpostype_Content === this.CurPos.Type )
+		{
+			switch (this.Selection.Flag)
+			{
+				case selectionflag_Numbering:
+					return false;
+				case selectionflag_Common:
+				{
+					if (true === this.Selection.Use && this.Selection.StartPos != this.Selection.EndPos)
+						return true;
+					else
+					{
+						var Pos     = ( this.Selection.Use === true ? this.Selection.StartPos : this.CurPos.ContentPos );
+						var Element = this.Content[Pos];
+						return Element.CanAddComment();
+					}
+				}
+			}
+		}
+	}
 
-    return false;
+	return false;
 };
 CDocumentContent.prototype.GetSelectionBounds = function()
 {
