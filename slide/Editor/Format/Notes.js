@@ -168,7 +168,72 @@
     };
 
 
+    function CreateNotes(){
+        var oN = new CNotes();
+        var oSp = new AscFormat.CShape();
+        var oNvSpPr = new AscFormat.UniNvPr();
+        var oCNvPr = oNvSpPr.cNvPr;
+        oCNvPr.setId(2);
+        oCNvPr.setName("Slide Image Placeholder 1");
+        var oPh = new AscFormat.Ph();
+        oPh.setType(AscFormat.phType_sldImg);
+        oNvSpPr.nvPr.setPh(oPh);
+        oSp.setNvSpPr(oNvSpPr);
+        oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
+        oSp.setLockValue(AscFormat.LOCKS_MASKS.noRot, true);
+        oSp.setLockValue(AscFormat.LOCKS_MASKS.noChangeAspect, true);
+        oSp.setSpPr(new AscFormat.CSpPr());
+        oSp.spPr.setParent(oSp);
+        oSp.setParent(oN);
+        oN.addToSpTreeToPos(0, oSp);
+
+        oSp = new AscFormat.CShape();
+        oNvSpPr = new AscFormat.UniNvPr();
+        oCNvPr = oNvSpPr.cNvPr;
+        oCNvPr.setId(3);
+        oCNvPr.setName("Notes Placeholder 2");
+        oPh = new AscFormat.Ph();
+        oPh.setType(AscFormat.phType_body);
+        oPh.setIdx(1);
+        oNvSpPr.nvPr.setPh(oPh);
+        oSp.setNvSpPr(oNvSpPr);
+        oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
+        oSp.setSpPr(new AscFormat.CSpPr());
+        oSp.spPr.setParent(oSp);
+        oSp.createTextBody();
+        var oBodyPr = new AscFormat.CBodyPr();
+        oSp.txBody.setBodyPr(oBodyPr);
+        var oTxLstStyle = new AscFormat.TextListStyle();
+        oSp.txBody.setLstStyle(oTxLstStyle);
+        oSp.setParent(oN);
+        oN.addToSpTreeToPos(1, oSp);
+
+        oSp = new AscFormat.CShape();
+        oNvSpPr = new AscFormat.UniNvPr();
+        oCNvPr = oNvSpPr.cNvPr;
+        oCNvPr.setId(4);
+        oCNvPr.setName("Slide Number Placeholder 3");
+        oPh = new AscFormat.Ph();
+        oPh.setType(AscFormat.phType_sldNum);
+        oPh.setSz(2);
+        oPh.setIdx(10);
+        oNvSpPr.nvPr.setPh(oPh);
+        oSp.setNvSpPr(oNvSpPr);
+        oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
+        oSp.setSpPr(new AscFormat.CSpPr());
+        oSp.spPr.setParent(oSp);
+        oSp.createTextBody();
+        oBodyPr = new AscFormat.CBodyPr();
+        oSp.txBody.setBodyPr(oBodyPr);
+        oTxLstStyle = new AscFormat.TextListStyle();
+        oSp.txBody.setLstStyle(oTxLstStyle);
+        oSp.setParent(oN);
+        oN.addToSpTreeToPos(2, oSp);
+        return oN;
+    }
+
     window['AscCommonSlide'] = window['AscCommonSlide'] || {};
     window['AscCommonSlide'].CNotes = CNotes;
     window['AscCommonSlide'].GetNotesWidth = GetNotesWidth;
+    window['AscCommonSlide'].CreateNotes = CreateNotes;
 })();

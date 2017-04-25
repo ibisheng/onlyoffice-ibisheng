@@ -377,21 +377,21 @@ CParagraphContentWithParagraphLikeContent.prototype.Is_StartFromNewLine = functi
 
     return this.Content[0].Is_StartFromNewLine();
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo = function(Info)
+CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo = function(Info)
 {
-    var Selection = this.Selection;
+	var Selection = this.Selection;
 
-    if (true === Selection.Use && Selection.StartPos === Selection.EndPos && this.Content[Selection.EndPos].Get_SelectedElementsInfo)
-        this.Content[Selection.EndPos].Get_SelectedElementsInfo(Info);
-    else if (false === Selection.Use && this.Content[this.State.ContentPos].Get_SelectedElementsInfo)
-        this.Content[this.State.ContentPos].Get_SelectedElementsInfo(Info);
+	if (true === Selection.Use && Selection.StartPos === Selection.EndPos && this.Content[Selection.EndPos].GetSelectedElementsInfo)
+		this.Content[Selection.EndPos].GetSelectedElementsInfo(Info);
+	else if (false === Selection.Use && this.Content[this.State.ContentPos].GetSelectedElementsInfo)
+		this.Content[this.State.ContentPos].GetSelectedElementsInfo(Info);
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
+CParagraphContentWithParagraphLikeContent.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 {
     var Str = "";
     for (var Pos = 0, Count = this.Content.length; Pos < Count; Pos++)
     {
-        var _Str = this.Content[Pos].Get_SelectedText(bAll, bClearText, oPr);
+        var _Str = this.Content[Pos].GetSelectedText(bAll, bClearText, oPr);
 
         if (null === _Str)
             return null;
@@ -724,7 +724,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
                 this.Remove_FromContent(StartPos, 1, true);
         }
 
-        this.Selection_Remove();
+        this.RemoveSelection();
         this.State.ContentPos = StartPos;
     }
     else
@@ -733,7 +733,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
 
         if (true === this.Cursor_Is_Start() || true === this.Cursor_Is_End())
         {
-            this.Select_All();
+            this.SelectAll();
         }
         else
         {
@@ -748,9 +748,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
                     break;
 
                 if (Direction < 0)
-                    this.Content[ContentPos].Cursor_MoveToEndPos(false);
+                    this.Content[ContentPos].MoveCursorToEndPos(false);
                 else
-                    this.Content[ContentPos].Cursor_MoveToStartPos();
+                    this.Content[ContentPos].MoveCursorToStartPos();
 
             }
 
@@ -840,14 +840,14 @@ CParagraphContentWithParagraphLikeContent.prototype.Apply_TextPr = function(Text
 
                 // Подправим селект. Заметим, что метки выделения изменяются внутри функции Add_ToContent
                 // за счет того, что EndPos - StartPos > 1.
-                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
+                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.StartPos].IsSelectionEmpty() )
                     Selection.StartPos++;
-                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
+                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.EndPos].IsSelectionEmpty() )
                     Selection.EndPos++;
 
-                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.EndPos].Selection_IsEmpty() )
+                if ( Selection.StartPos < Selection.EndPos && true === this.Content[Selection.EndPos].IsSelectionEmpty() )
                     Selection.EndPos--;
-                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.StartPos].Selection_IsEmpty() )
+                else if ( Selection.EndPos < Selection.StartPos && true === this.Content[Selection.StartPos].IsSelectionEmpty() )
                     Selection.StartPos--;
             }
         }
@@ -1095,7 +1095,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Document_UpdateInterfaceStat
         {
             var Element = this.Content[CurPos];
 
-            if (true !== Element.Selection_IsEmpty() && Element.Document_UpdateInterfaceState)
+            if (true !== Element.IsSelectionEmpty() && Element.Document_UpdateInterfaceState)
                 Element.Document_UpdateInterfaceState();
         }
     }
@@ -1544,23 +1544,23 @@ CParagraphContentWithParagraphLikeContent.prototype.Cursor_Is_End = function()
 
     return this.Content[CurPos].Cursor_Is_End();
 };
-CParagraphContentWithParagraphLikeContent.prototype.Cursor_MoveToStartPos = function()
+CParagraphContentWithParagraphLikeContent.prototype.MoveCursorToStartPos = function()
 {
     this.State.ContentPos = 0;
 
     if ( this.Content.length > 0 )
     {
-        this.Content[0].Cursor_MoveToStartPos();
+        this.Content[0].MoveCursorToStartPos();
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
+CParagraphContentWithParagraphLikeContent.prototype.MoveCursorToEndPos = function(SelectFromEnd)
 {
     var ContentLen = this.Content.length;
 
     if ( ContentLen > 0 )
     {
         this.State.ContentPos = ContentLen - 1;
-        this.Content[ContentLen - 1].Cursor_MoveToEndPos( SelectFromEnd );
+        this.Content[ContentLen - 1].MoveCursorToEndPos( SelectFromEnd );
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd)
@@ -1944,7 +1944,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
         var TempEnd   = Math.min(this.Content.length - 1, Math.min(StartPos, EndPos) - 1);
         for (var CurPos = TempBegin; CurPos <= TempEnd; ++CurPos)
         {
-            this.Content[CurPos].Selection_Remove();
+            this.Content[CurPos].RemoveSelection();
         }
     }
 
@@ -1954,7 +1954,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
         var TempEnd   = Math.min(OldEndPos, this.Content.length - 1);
         for (var CurPos = TempBegin; CurPos <= TempEnd; ++CurPos)
         {
-            this.Content[CurPos].Selection_Remove();
+            this.Content[CurPos].RemoveSelection();
         }
     }
 
@@ -1982,7 +1982,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
 
         for ( var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++ )
         {
-            this.Content[CurPos].Select_All( Direction );
+            this.Content[CurPos].SelectAll( Direction );
         }
     }
     else
@@ -2080,7 +2080,7 @@ CParagraphContentWithParagraphLikeContent.prototype.SetContentSelection = functi
 
         for (var CurPos = _StartPos + 1; CurPos < _EndPos; CurPos++)
         {
-            this.Content[CurPos].Select_All(Direction);
+            this.Content[CurPos].SelectAll(Direction);
         }
     }
     else
@@ -2135,13 +2135,9 @@ CParagraphContentWithParagraphLikeContent.prototype.SetContentPosition = functio
     if (this.Content[Pos] && this.Content[Pos].SetContentPosition)
         this.Content[Pos].SetContentPosition(_DocPos, Depth + 1, _Flag);
     else
-        this.Content[Pos].Cursor_MoveToStartPos();
+        this.Content[Pos].MoveCursorToStartPos();
 };
-CParagraphContentWithParagraphLikeContent.prototype.Selection_IsUse = function()
-{
-    return this.State.Selection.Use;
-};
-CParagraphContentWithParagraphLikeContent.prototype.Selection_Remove = function()
+CParagraphContentWithParagraphLikeContent.prototype.RemoveSelection = function()
 {
     var Selection = this.Selection;
 
@@ -2161,7 +2157,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_Remove = function(
 
         for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
         {
-            this.Content[CurPos].Selection_Remove();
+            this.Content[CurPos].RemoveSelection();
         }
     }
 
@@ -2169,7 +2165,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_Remove = function(
     Selection.StartPos = 0;
     Selection.EndPos   = 0;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Select_All = function(Direction)
+CParagraphContentWithParagraphLikeContent.prototype.SelectAll = function(Direction)
 {
     var ContentLen = this.Content.length;
 
@@ -2190,7 +2186,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Select_All = function(Direct
 
     for ( var CurPos = 0; CurPos < ContentLen; CurPos++ )
     {
-        this.Content[CurPos].Select_All( Direction );
+        this.Content[CurPos].SelectAll( Direction );
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
@@ -2206,7 +2202,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_DrawRange = functi
         this.Content[CurPos].Selection_DrawRange( _CurLine, _CurRange, SelectionDraw );
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Selection_IsEmpty = function(CheckEnd)
+CParagraphContentWithParagraphLikeContent.prototype.IsSelectionEmpty = function(CheckEnd)
 {
     var StartPos = this.State.Selection.StartPos;
     var EndPos   = this.State.Selection.EndPos;
@@ -2219,7 +2215,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_IsEmpty = function
 
     for ( var CurPos = StartPos; CurPos <= EndPos; CurPos++ )
     {
-        if ( false === this.Content[CurPos].Selection_IsEmpty(CheckEnd) )
+        if ( false === this.Content[CurPos].IsSelectionEmpty(CheckEnd) )
             return false;
     }
 
@@ -2296,7 +2292,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_CorrectLeftPos = f
             else
                 this.Selection.EndPos   = Pos + 1;
 
-            this.Content[Pos].Selection_Remove();
+            this.Content[Pos].RemoveSelection();
         }
         else
             return false;
@@ -2304,7 +2300,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_CorrectLeftPos = f
 
     return true;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Is_SelectionUse = function()
+CParagraphContentWithParagraphLikeContent.prototype.IsSelectionUse = function()
 {
     return this.State.Selection.Use;
 };

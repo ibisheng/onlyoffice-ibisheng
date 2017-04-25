@@ -63,7 +63,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
         return [];
 
     // Если изменения происходят в специальном пустом параграфе-конце секции, тогда запускаем обычный пересчет
-    if ( this.LogicDocument && true === this.LogicDocument.Pages[this.Get_StartPage_Absolute()].Check_EndSectionPara(this))
+    if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Pages[this.Get_StartPage_Absolute()].Check_EndSectionPara(this))
         return [];
 
     // Если параграф - рамка с автошириной, надо пересчитывать по обычному
@@ -2085,7 +2085,7 @@ Paragraph.prototype.private_CheckColumnBreak = function(CurPage)
 
     if (Line.Info & paralineinfo_BreakPage && !(Line.Info & paralineinfo_BreakRealPage))
     {
-        if (this.LogicDocument)
+        if (this.bFromDocument && this.LogicDocument)
             this.LogicDocument.OnColumnBreak_WhileRecalculate();
     }
 };
@@ -3165,7 +3165,7 @@ CParagraphRecalculateStateInfo.prototype =
         }
     },
 
-    Add_Comment : function(Id)
+	AddComment : function(Id)
     {
         this.Comments.push( Id );
     },

@@ -205,11 +205,11 @@ ParaDrawing.prototype.Set_WidthVisible = function(WidthVisible)
 {
 	this.WidthVisible = WidthVisible;
 };
-ParaDrawing.prototype.Get_SelectedContent = function(SelectedContent)
+ParaDrawing.prototype.GetSelectedContent = function(SelectedContent)
 {
-	if (this.GraphicObj && this.GraphicObj.Get_SelectedContent)
+	if (this.GraphicObj && this.GraphicObj.GetSelectedContent)
 	{
-		this.GraphicObj.Get_SelectedContent(SelectedContent);
+		this.GraphicObj.GetSelectedContent(SelectedContent);
 	}
 };
 ParaDrawing.prototype.Search_GetId = function(bNext, bCurrent)
@@ -1476,7 +1476,7 @@ ParaDrawing.prototype.Add_ToDocument2 = function(Paragraph)
 
 	Paragraph.Add_ToContent(0, DrawingRun);
 };
-ParaDrawing.prototype.Update_CursorType = function(X, Y, PageIndex)
+ParaDrawing.prototype.UpdateCursorType = function(X, Y, PageIndex)
 {
 	this.DrawingDocument.SetCursorType("move", new AscCommon.CMouseMoveData());
 
@@ -2443,8 +2443,8 @@ ParaDrawing.prototype.private_ConvertToMathObject = function(isOpen)
 		if (!isOpen)
 		{
 			// Устанавливаем курсор в начало правого элемента, полученного после Split
-			LogicDocument.Selection_Remove();
-			RightElement.Cursor_MoveToStartPos();
+			LogicDocument.RemoveSelection();
+			RightElement.MoveCursorToStartPos();
 			Para.CurPos.ContentPos = TopElementPos + 2;
 			Para.Document_SetThisElementCurrent(false);
 

@@ -1569,7 +1569,7 @@
     var wb = this.model;
     var i = asc_typeof(index) === "number" && index >= 0 ? index : wb.getActive();
     var ws = this.wsViews[i];
-    if (null == ws && !onlyExist) {
+    if (!ws && !onlyExist) {
       ws = this.wsViews[i] = this._createWorksheetView(wb.getWorksheet(i));
       ws._prepareComments();
       ws._prepareDrawingObjects();
@@ -1819,10 +1819,6 @@
       this.canvas.style.height = this.canvasOverlay.style.height = this.canvasGraphic.style.height = this.canvasGraphicOverlay.style.height = height + 'px';
     }
 
-    // При смене ориентации у планшета, сбрасываются флаги у canvas!
-    // ToDo перепроверить на новых исходниках, должно поправиться, был баг в отрисовке!!!!!!!!!!!!!
-    //this.drawingCtx.initContextSmoothing();
-    //this.overlayCtx.initContextSmoothing();
     return true;
   };
 
@@ -2869,7 +2865,7 @@
     return canvas.toDataURL("image/png");
   };
 
-	WorkbookView.prototype.Is_SelectionUse = function () {
+	WorkbookView.prototype.IsSelectionUse = function () {
         return !this.getWorksheet().getSelectionShape();
     };
 	WorkbookView.prototype.GetSelectionRectsBounds = function () {

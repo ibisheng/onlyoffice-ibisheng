@@ -567,7 +567,7 @@
 				var sBase64;
 				
 				var selectedContent = new CSelectedContent();
-                AscFormat.ExecuteNoHistory(function(){isIntoShape.Get_SelectedContent(selectedContent);}, this, []);
+                AscFormat.ExecuteNoHistory(function(){isIntoShape.GetSelectedContent(selectedContent);}, this, []);
 
 				
 				var oPresentationWriter = new AscCommon.CBinaryFileWriter();
@@ -976,7 +976,7 @@
 					{
 						if(documentContent.Content[i])
 						{
-							var paraText = documentContent.Content[i].Get_SelectedText();
+							var paraText = documentContent.Content[i].GetSelectedText();
 							if(paraText)
 							{
 								if(i !== 0)
@@ -1419,7 +1419,7 @@
 				//for special paste
 				//TODO пока выключаю специальную ставку внутри math, позже доработать и включить
 				var oInfo = new CSelectedElementsInfo();
-				var selectedElementsInfo = isIntoShape.Get_SelectedElementsInfo(oInfo);
+				var selectedElementsInfo = isIntoShape.GetSelectedElementsInfo(oInfo);
 				var mathObj = oInfo.Get_Math();
 				if(!AscCommonExcel.g_clipboardExcel.specialPasteStart && null === mathObj)
 				{
@@ -1433,7 +1433,7 @@
 					var cellsLeft = worksheet.cellsLeft * ptToPx;
 					var cellsTop = worksheet.cellsTop * ptToPx;
 					
-					var cursorPos = target_doc_content.Cursor_GetPos();
+					var cursorPos = target_doc_content.GetCursorPosXY();
 					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left * ptToPx - cellsLeft;
 					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top * ptToPx - cellsTop;
 					var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;
@@ -1529,7 +1529,7 @@
 					//TODO записываю активную область после каждой вставки. пересомтреть! не записывать при специальной вставке.
 					//if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
 					//{
-						window['AscCommon'].g_clipboardBase.specialPasteUndoData.shapeSelectionState = target_doc_content.Get_SelectionState();
+						window['AscCommon'].g_clipboardBase.specialPasteUndoData.shapeSelectionState = target_doc_content.GetSelectionState();
 					//}
 					
 					worksheet.objectRender.controller.cursorMoveRight(false, false);
@@ -2642,9 +2642,9 @@
 						{
 							var _char = text.charAt(Index);
 							if (" " == _char)
-								isIntoShape.Paragraph_Add(new ParaSpace());
+								isIntoShape.AddToParagraph(new ParaSpace());
 							else
-								isIntoShape.Paragraph_Add(new ParaText(_char));
+								isIntoShape.AddToParagraph(new ParaText(_char));
 						}
 						
 						AscCommonExcel.g_clipboardExcel.end_paste();
@@ -2750,7 +2750,7 @@
 				{
 					for(var j = 0; j < paragraph.Content.length; j++)
 					{
-						res += paragraph.Content[j].Get_SelectedText(true)
+						res += paragraph.Content[j].GetSelectedText(true)
 					}
 				};
 				

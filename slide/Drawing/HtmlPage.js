@@ -788,7 +788,7 @@ function CEditorPage(api)
 
 				this.TextBoxBackground.HtmlElement["onselectstart"] = function(e)
 				{
-					oThis.m_oLogicDocument.Select_All();
+					oThis.m_oLogicDocument.SelectAll();
 
 					if (e.preventDefault)
 						e.preventDefault();
@@ -2480,6 +2480,12 @@ function CEditorPage(api)
 		this.m_bIsUpdateHorRuler = true;
 		this.m_bIsUpdateVerRuler = true;
 
+		if (this.m_bIsRuler)
+		{
+			this.UpdateHorRulerBack(true);
+			this.UpdateVerRulerBack(true);
+		}
+
 		this.m_oHorRuler.RepaintChecker.BlitAttack = true;
 		this.m_oVerRuler.RepaintChecker.BlitAttack = true;
 
@@ -2878,6 +2884,7 @@ function CEditorPage(api)
 			_c.m_nCurrentTimeClearCache = 0;
 			_c.m_oDrawingDocument.CheckFontCache();
 		}
+        oThis.m_oLogicDocument.Continue_CheckSpelling();
 	};
 	this.OnScroll       = function()
 	{
@@ -3472,7 +3479,7 @@ function CEditorPage(api)
 		if (this.m_oApi.isViewMode === false && null != this.m_oLogicDocument)
 		{
 			//this.m_oLogicDocument.Set_CurPage( drDoc.SlideCurrent );
-			//this.m_oLogicDocument.Cursor_MoveAt(0, 0, false);
+			//this.m_oLogicDocument.MoveCursorToXY(0, 0, false);
 			this.m_oLogicDocument.RecalculateCurPos();
 
 			this.m_oApi.sync_currentPageCallback(drDoc.SlideCurrent);

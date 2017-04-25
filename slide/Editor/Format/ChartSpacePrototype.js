@@ -554,7 +554,7 @@ CTable.prototype.Get_RightTableOffsetCorrection = function()
 {
     return 0;
 };
-CTable.prototype.Selection_Draw_Page = function(CurPage)
+CTable.prototype.DrawSelectionOnPage = function(CurPage)
 {
     if (false === this.Selection.Use)
         return;
@@ -607,7 +607,7 @@ CTable.prototype.Selection_Draw_Page = function(CurPage)
         {
             var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
             var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
-            Cell.Content.Selection_Draw_Page(Cell_PageRel);
+            Cell.Content.DrawSelectionOnPage(Cell_PageRel);
             break;
         }
     }

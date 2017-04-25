@@ -6858,6 +6858,9 @@ function BinaryPPTYLoader()
                 case 10:
                 {
                     var lang = s.GetString2();
+                    var nLcid = g_oLcidNameToIdMap[lang];
+                    if(nLcid)
+                        rPr.Lang.Val = nLcid;
                     break;
                 }
                 case 11:
@@ -7868,7 +7871,7 @@ function BinaryPPTYLoader()
                                         _paragraph.f_runPr.Unifill = undefined;
                                     }
                                     _value_text_pr.Set_FromObject(_paragraph.f_runPr);
-                                    txbody.content.Paragraph_Add( new ParaTextPr(_value_text_pr), false );
+                                    txbody.content.AddToParagraph( new ParaTextPr(_value_text_pr), false );
                                     delete _paragraph.f_runPr;
                                 }
                                 if(_paragraph.f_paraPr)

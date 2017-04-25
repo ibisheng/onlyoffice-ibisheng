@@ -199,10 +199,13 @@ CArrowDrawer.prototype.InitSize = function ( sizeW, sizeH, is_retina ) {
         this.SizeNaturalH <<= 1;
     }
 
-    this.ImageLeft = [document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' )];
-    this.ImageTop = [document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' )];
-    this.ImageRight = [document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' )];
-    this.ImageBottom = [document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' )];
+    if (null == this.ImageLeft || null == this.ImageTop || null == this.ImageRight || null == this.ImageBottom)
+	{
+		this.ImageLeft = [document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas')];
+		this.ImageTop = [document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas')];
+		this.ImageRight = [document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas')];
+		this.ImageBottom = [document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas')];
+	}
 
     this.ImageLeft[ScrollOverType.NONE].width = this.SizeW;
     this.ImageLeft[ScrollOverType.NONE].height = this.SizeH;
@@ -1619,8 +1622,7 @@ function ScrollObject( elemID, settings, dbg ) {
     this.startColorFadeOutStart = _HEXTORGB_(this.settings.scrollerColorOver).R;
     this.startColorFadeInOutStart = -1;
 
-    if ( window.devicePixelRatio == 2 )
-        this.IsRetina = true;
+    this.IsRetina = AscCommon.AscBrowser.isRetina;
 
     this.piperImgVert = [document.createElement( 'canvas' ), document.createElement( 'canvas' )];
     this.piperImgHor = [document.createElement( 'canvas' ), document.createElement( 'canvas' )];
@@ -1851,6 +1853,12 @@ ScrollObject.prototype = {
     },
     Repos:function ( settings, bIsHorAttack, bIsVerAttack )
     {
+		if (this.IsRetina != AscCommon.AscBrowser.isRetina)
+        {
+            this.IsRetina = AscCommon.AscBrowser.isRetina;
+            this.ArrowDrawer.InitSize(this.settings.arrowSizeH, this.settings.arrowSizeW, this.IsRetina);
+        }
+
         if (bIsVerAttack)
         {
             var _canvasH = settings.screenH;
@@ -2424,7 +2432,6 @@ ScrollObject.prototype = {
         }
 
         function drawScroller() {
-
 
             that.context.beginPath();
 

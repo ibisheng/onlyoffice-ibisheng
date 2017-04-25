@@ -413,7 +413,12 @@ CTextBody.prototype =
     },
 
     OnContentReDraw: function()
-    {},
+    {
+        if(this.parent && this.parent.OnContentReDraw)
+        {
+            this.parent.OnContentReDraw();
+        }
+    },
 
     Get_StartPage_Absolute: function()
     {
@@ -617,7 +622,7 @@ CTextBody.prototype =
     {
         var max_content = this.content.Recalculate_MinMaxContentWidth().Max;
         this.content.Set_ApplyToAll(true);
-        this.content.Set_ParagraphAlign(AscCommon.align_Center);
+        this.content.SetParagraphAlign(AscCommon.align_Center);
         this.content.Set_ApplyToAll(false);
         this.content.Reset(0, 0,max_content, 20000);
         this.content.Recalculate_Page(0, true);
@@ -661,7 +666,7 @@ CTextBody.prototype =
         if(bLeft)
         {
             this.content.Set_ApplyToAll(true);
-            this.content.Set_ParagraphAlign(AscCommon.align_Left);
+            this.content.SetParagraphAlign(AscCommon.align_Left);
             this.content.Set_ApplyToAll(false);
         }
         this.content.Recalculate_Page(0, true);
@@ -706,6 +711,14 @@ CTextBody.prototype =
             return this.parent.transformText.CreateDublicate();
         }
         return null;
+    },
+
+    Is_ThisElementCurrent: function () {
+        if(this.parent && this.parent.Is_ThisElementCurrent)
+        {
+            return this.parent.Is_ThisElementCurrent();
+        }
+        return false;
     }
 };
 

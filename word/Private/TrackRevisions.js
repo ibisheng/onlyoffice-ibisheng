@@ -172,7 +172,7 @@ CDocument.prototype.Get_NextRevisionChange = function()
     var Change = this.TrackRevisionsManager.Get_NextChange();
     if (null !== Change)
     {
-        this.Selection_Remove();
+        this.RemoveSelection();
         var Para = Change.get_Paragraph();
         Para.Selection.Use = true;
         Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
@@ -189,7 +189,7 @@ CDocument.prototype.Get_PrevRevisionChange = function()
     var Change = this.TrackRevisionsManager.Get_PrevChange();
     if (null !== Change)
     {
-        this.Selection_Remove();
+        this.RemoveSelection();
         var Para = Change.get_Paragraph();
         Para.Selection.Use = true;
         Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
@@ -209,7 +209,7 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
     var SearchEngine = new CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, this.TrackRevisionsManager);
     if (null === CurrentPara)
     {
-        CurrentPara = this.Get_CurrentParagraph();
+        CurrentPara = this.GetCurrentParagraph();
         if (null === CurrentPara)
             return SearchEngine;
 
@@ -397,7 +397,7 @@ CDocument.prototype.private_SelectRevisionChange = function(Change)
 {
     if (undefined !== Change && Change.get_Paragraph())
     {
-        this.Selection_Remove();
+        this.RemoveSelection();
         var Para = Change.get_Paragraph();
         Para.Selection.Use = true;
         Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
@@ -495,7 +495,7 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
             return;
         }
 
-        this.Selection_Remove();
+        this.RemoveSelection();
         this.private_CorrectDocumentPosition();
         this.Recalculate();
         this.Document_UpdateSelectionState();
@@ -524,7 +524,7 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
             return;
         }
 
-        this.Selection_Remove();
+        this.RemoveSelection();
         this.private_CorrectDocumentPosition();
         this.Recalculate();
         this.Document_UpdateSelectionState();

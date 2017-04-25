@@ -42,7 +42,7 @@ CHdrFtrController.prototype.GetCurPage = function()
 };
 CHdrFtrController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
-	return this.HdrFtr.Add_NewParagraph(bRecalculate, bForceAdd);
+	return this.HdrFtr.AddNewParagraph(bRecalculate, bForceAdd);
 };
 CHdrFtrController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
@@ -66,14 +66,14 @@ CHdrFtrController.prototype.AddInlineTable = function(Cols, Rows)
 };
 CHdrFtrController.prototype.ClearParagraphFormatting = function()
 {
-	this.HdrFtr.Paragraph_ClearFormatting();
+	this.HdrFtr.ClearParagraphFormatting();
 };
 CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
 	if (para_NewLine === oItem.Type && true === oItem.IsPageOrColumnBreak())
 		return;
 
-	this.HdrFtr.Paragraph_Add(oItem, bRecalculate);
+	this.HdrFtr.AddToParagraph(oItem, bRecalculate);
 	this.LogicDocument.Document_UpdateSelectionState();
 	this.LogicDocument.Document_UpdateUndoRedoState();
 };
@@ -83,7 +83,7 @@ CHdrFtrController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelec
 
 	if (null !== this.HdrFtr.CurHdtr && docpostype_DrawingObjects !== this.HdrFtr.CurHdrFtr.Content.CurPos.Type)
 	{
-		this.LogicDocument.Selection_Remove();
+		this.LogicDocument.RemoveSelection();
 		this.LogicDocument.Selection.Use = false;
 	}
 
@@ -91,157 +91,157 @@ CHdrFtrController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelec
 };
 CHdrFtrController.prototype.GetCursorPosXY = function()
 {
-	return this.HdrFtr.Cursor_GetPos();
+	return this.HdrFtr.GetCursorPosXY();
 };
 CHdrFtrController.prototype.MoveCursorToStartPos = function(AddToSelect)
 {
-	this.HdrFtr.Cursor_MoveToStartPos(AddToSelect);
+	this.HdrFtr.MoveCursorToStartPos(AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorToEndPos = function(AddToSelect)
 {
-	this.HdrFtr.Cursor_MoveToEndPos(AddToSelect);
+	this.HdrFtr.MoveCursorToEndPos(AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
-	return this.HdrFtr.Cursor_MoveLeft(AddToSelect, Word);
+	return this.HdrFtr.MoveCursorLeft(AddToSelect, Word);
 };
 CHdrFtrController.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste)
 {
-	return this.HdrFtr.Cursor_MoveRight(AddToSelect, Word, FromPaste);
+	return this.HdrFtr.MoveCursorRight(AddToSelect, Word, FromPaste);
 };
 CHdrFtrController.prototype.MoveCursorUp = function(AddToSelect)
 {
-	var RetValue = this.HdrFtr.Cursor_MoveUp(AddToSelect);
+	var RetValue = this.HdrFtr.MoveCursorUp(AddToSelect);
 	this.LogicDocument.Document_UpdateInterfaceState();
 	this.LogicDocument.Document_UpdateSelectionState();
 	return RetValue;
 };
 CHdrFtrController.prototype.MoveCursorDown = function(AddToSelect)
 {
-	var RetValue = this.HdrFtr.Cursor_MoveDown(AddToSelect);
+	var RetValue = this.HdrFtr.MoveCursorDown(AddToSelect);
 	this.LogicDocument.Document_UpdateInterfaceState();
 	this.LogicDocument.Document_UpdateSelectionState();
 	return RetValue;
 };
 CHdrFtrController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 {
-	return this.HdrFtr.Cursor_MoveEndOfLine(AddToSelect);
+	return this.HdrFtr.MoveCursorToEndOfLine(AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 {
-	return this.HdrFtr.Cursor_MoveStartOfLine(AddToSelect);
+	return this.HdrFtr.MoveCursorToStartOfLine(AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSelect)
 {
-	return this.HdrFtr.Cursor_MoveAt(X, Y, PageAbs, AddToSelect);
+	return this.HdrFtr.MoveCursorToXY(X, Y, PageAbs, AddToSelect);
 };
 CHdrFtrController.prototype.MoveCursorToCell = function(bNext)
 {
-	return this.HdrFtr.Cursor_MoveToCell(bNext);
+	return this.HdrFtr.MoveCursorToCell(bNext);
 };
 CHdrFtrController.prototype.SetParagraphAlign = function(Align)
 {
-	this.HdrFtr.Set_ParagraphAlign(Align);
+	this.HdrFtr.SetParagraphAlign(Align);
 };
 CHdrFtrController.prototype.SetParagraphSpacing = function (Spacing)
 {
-	this.HdrFtr.Set_ParagraphSpacing(Spacing);
+	this.HdrFtr.SetParagraphSpacing(Spacing);
 };
 CHdrFtrController.prototype.SetParagraphTabs = function(Tabs)
 {
-	this.HdrFtr.Set_ParagraphTabs(Tabs);
+	this.HdrFtr.SetParagraphTabs(Tabs);
 };
 CHdrFtrController.prototype.SetParagraphIndent = function(Ind)
 {
-	this.HdrFtr.Set_ParagraphIndent(Ind);
+	this.HdrFtr.SetParagraphIndent(Ind);
 };
 CHdrFtrController.prototype.SetParagraphNumbering = function(NumInfo)
 {
-	this.HdrFtr.Set_ParagraphNumbering(NumInfo);
+	this.HdrFtr.SetParagraphNumbering(NumInfo);
 };
 CHdrFtrController.prototype.SetParagraphShd = function(Shd)
 {
-	this.HdrFtr.Set_ParagraphShd(Shd);
+	this.HdrFtr.SetParagraphShd(Shd);
 };
 CHdrFtrController.prototype.SetParagraphStyle = function(Name)
 {
-	this.HdrFtr.Set_ParagraphStyle(Name);
+	this.HdrFtr.SetParagraphStyle(Name);
 };
 CHdrFtrController.prototype.SetParagraphContextualSpacing = function(Value)
 {
-	this.HdrFtr.Set_ParagraphContextualSpacing(Value);
+	this.HdrFtr.SetParagraphContextualSpacing(Value);
 };
 CHdrFtrController.prototype.SetParagraphPageBreakBefore = function(Value)
 {
-	this.HdrFtr.Set_ParagraphPageBreakBefore(Value);
+	this.HdrFtr.SetParagraphPageBreakBefore(Value);
 };
 CHdrFtrController.prototype.SetParagraphKeepLines = function(Value)
 {
-	this.HdrFtr.Set_ParagraphKeepLines(Value);
+	this.HdrFtr.SetParagraphKeepLines(Value);
 };
 CHdrFtrController.prototype.SetParagraphKeepNext = function(Value)
 {
-	this.HdrFtr.Set_ParagraphKeepNext(Value);
+	this.HdrFtr.SetParagraphKeepNext(Value);
 };
 CHdrFtrController.prototype.SetParagraphWidowControl = function(Value)
 {
-	this.HdrFtr.Set_ParagraphWidowControl(Value);
+	this.HdrFtr.SetParagraphWidowControl(Value);
 };
 CHdrFtrController.prototype.SetParagraphBorders = function(Borders)
 {
-	this.HdrFtr.Set_ParagraphBorders(Borders);
+	this.HdrFtr.SetParagraphBorders(Borders);
 };
 CHdrFtrController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
-	this.HdrFtr.Set_ParagraphFramePr(FramePr, bDelete);
+	this.HdrFtr.SetParagraphFramePr(FramePr, bDelete);
 };
-CHdrFtrController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+CHdrFtrController.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
-	this.HdrFtr.Paragraph_IncDecFontSize(bIncrease);
+	this.HdrFtr.IncreaseDecreaseFontSize(bIncrease);
 };
-CHdrFtrController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+CHdrFtrController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
-	this.HdrFtr.Paragraph_IncDecIndent(bIncrease);
+	this.HdrFtr.IncreaseDecreaseIndent(bIncrease);
 };
 CHdrFtrController.prototype.SetImageProps = function(Props)
 {
-	this.HdrFtr.Set_ImageProps(Props);
+	this.HdrFtr.SetImageProps(Props);
 };
 CHdrFtrController.prototype.SetTableProps = function(Props)
 {
-	this.HdrFtr.Set_TableProps(Props);
+	this.HdrFtr.SetTableProps(Props);
 };
-CHdrFtrController.prototype.GetCurrentParaPr = function()
+CHdrFtrController.prototype.GetCalculatedParaPr = function()
 {
-	return this.HdrFtr.Get_Paragraph_ParaPr();
+	return this.HdrFtr.GetCalculatedParaPr();
 };
-CHdrFtrController.prototype.GetCurrentTextPr = function()
+CHdrFtrController.prototype.GetCalculatedTextPr = function()
 {
-	return this.HdrFtr.Get_Paragraph_TextPr();
+	return this.HdrFtr.GetCalculatedTextPr();
 };
 CHdrFtrController.prototype.GetDirectParaPr = function()
 {
-	return this.HdrFtr.Get_Paragraph_ParaPr_Copy();
+	return this.HdrFtr.GetDirectParaPr();
 };
 CHdrFtrController.prototype.GetDirectTextPr = function()
 {
-	return this.HdrFtr.Get_Paragraph_TextPr_Copy();
+	return this.HdrFtr.GetDirectTextPr();
 };
 CHdrFtrController.prototype.RemoveSelection = function(bNoCheckDrawing)
 {
-	this.HdrFtr.Selection_Remove(bNoCheckDrawing);
+	this.HdrFtr.RemoveSelection(bNoCheckDrawing);
 };
-CHdrFtrController.prototype.IsEmptySelection = function(bCheckHidden)
+CHdrFtrController.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
-	return this.HdrFtr.Selection_IsEmpty(bCheckHidden);
+	return this.HdrFtr.IsSelectionEmpty(bCheckHidden);
 };
 CHdrFtrController.prototype.DrawSelectionOnPage = function(PageAbs)
 {
-	this.HdrFtr.Selection_Draw_Page(PageAbs);
+	this.HdrFtr.DrawSelectionOnPage(PageAbs);
 };
 CHdrFtrController.prototype.GetSelectionBounds = function()
 {
-	return this.HdrFtr.Get_SelectionBounds();
+	return this.HdrFtr.GetSelectionBounds();
 };
 CHdrFtrController.prototype.IsMovingTableBorder = function()
 {
@@ -249,87 +249,87 @@ CHdrFtrController.prototype.IsMovingTableBorder = function()
 };
 CHdrFtrController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {
-	return this.HdrFtr.Selection_Check(X, Y, PageAbs, NearPos);
+	return this.HdrFtr.CheckPosInSelection(X, Y, PageAbs, NearPos);
 };
 CHdrFtrController.prototype.SelectAll = function()
 {
-	this.HdrFtr.Select_All();
+	this.HdrFtr.SelectAll();
 };
 CHdrFtrController.prototype.GetSelectedContent = function(SelectedContent)
 {
-	this.HdrFtr.Get_SelectedContent(SelectedContent);
+	this.HdrFtr.GetSelectedContent(SelectedContent);
 };
 CHdrFtrController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
 {
-	this.HdrFtr.Update_CursorType(X, Y, PageAbs, MouseEvent);
+	this.HdrFtr.UpdateCursorType(X, Y, PageAbs, MouseEvent);
 };
 CHdrFtrController.prototype.PasteFormatting = function(TextPr, ParaPr)
 {
-	this.HdrFtr.Paragraph_Format_Paste(TextPr, ParaPr, false);
+	this.HdrFtr.PasteFormatting(TextPr, ParaPr, false);
 };
 CHdrFtrController.prototype.IsSelectionUse = function()
 {
-	return this.HdrFtr.Is_SelectionUse();
+	return this.HdrFtr.IsSelectionUse();
 };
 CHdrFtrController.prototype.IsTextSelectionUse = function()
 {
-	return this.HdrFtr.Is_TextSelectionUse();
+	return this.HdrFtr.IsTextSelectionUse();
 };
 CHdrFtrController.prototype.GetCurPosXY = function()
 {
-	return this.HdrFtr.Get_CurPosXY();
+	return this.HdrFtr.GetCurPosXY();
 };
 CHdrFtrController.prototype.GetSelectedText = function(bClearText, oPr)
 {
-	return this.HdrFtr.Get_SelectedText(bClearText, oPr);
+	return this.HdrFtr.GetSelectedText(bClearText, oPr);
 };
 CHdrFtrController.prototype.GetCurrentParagraph = function()
 {
-	return this.HdrFtr.Get_CurrentParagraph();
+	return this.HdrFtr.GetCurrentParagraph();
 };
 CHdrFtrController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
-	this.HdrFtr.Get_SelectedElementsInfo(oInfo);
+	this.HdrFtr.GetSelectedElementsInfo(oInfo);
 };
 CHdrFtrController.prototype.AddTableRow = function(bBefore)
 {
-	this.HdrFtr.Table_AddRow(bBefore);
+	this.HdrFtr.AddTableRow(bBefore);
 };
-CHdrFtrController.prototype.AddTableCol = function(bBefore)
+CHdrFtrController.prototype.AddTableColumn = function(bBefore)
 {
-	this.HdrFtr.Table_AddCol(bBefore);
+	this.HdrFtr.AddTableColumn(bBefore);
 };
 CHdrFtrController.prototype.RemoveTableRow = function()
 {
-	this.HdrFtr.Table_RemoveRow();
+	this.HdrFtr.RemoveTableRow();
 };
-CHdrFtrController.prototype.RemoveTableCol = function()
+CHdrFtrController.prototype.RemoveTableColumn = function()
 {
-	this.HdrFtr.Table_RemoveCol();
+	this.HdrFtr.RemoveTableColumn();
 };
 CHdrFtrController.prototype.MergeTableCells = function()
 {
-	this.HdrFtr.Table_MergeCells();
+	this.HdrFtr.MergeTableCells();
 };
 CHdrFtrController.prototype.SplitTableCells = function(Cols, Rows)
 {
-	this.HdrFtr.Table_SplitCell(Cols, Rows);
+	this.HdrFtr.SplitTableCells(Cols, Rows);
 };
 CHdrFtrController.prototype.RemoveTable = function()
 {
-	this.HdrFtr.Table_RemoveTable();
+	this.HdrFtr.RemoveTable();
 };
 CHdrFtrController.prototype.SelectTable = function(Type)
 {
-	this.HdrFtr.Table_Select(Type);
+	this.HdrFtr.SelectTable(Type);
 };
 CHdrFtrController.prototype.CanMergeTableCells = function()
 {
-	return this.HdrFtr.Table_CheckMerge();
+	return this.HdrFtr.CanMergeTableCells();
 };
 CHdrFtrController.prototype.CanSplitTableCells = function()
 {
-	return this.HdrFtr.Table_CheckSplit();
+	return this.HdrFtr.CanSplitTableCells();
 };
 CHdrFtrController.prototype.UpdateInterfaceState = function()
 {
@@ -348,47 +348,47 @@ CHdrFtrController.prototype.UpdateSelectionState = function()
 };
 CHdrFtrController.prototype.GetSelectionState = function()
 {
-	return this.HdrFtr.Get_SelectionState();
+	return this.HdrFtr.GetSelectionState();
 };
 CHdrFtrController.prototype.SetSelectionState = function(State, StateIndex)
 {
-	this.HdrFtr.Set_SelectionState(State, StateIndex);	
+	this.HdrFtr.SetSelectionState(State, StateIndex);
 };
 CHdrFtrController.prototype.AddHyperlink = function(Props)
 {
-	this.HdrFtr.Hyperlink_Add(Props);
+	this.HdrFtr.AddHyperlink(Props);
 };
 CHdrFtrController.prototype.ModifyHyperlink = function(Props)
 {
-	this.HdrFtr.Hyperlink_Modify(Props);
+	this.HdrFtr.ModifyHyperlink(Props);
 };
 CHdrFtrController.prototype.RemoveHyperlink = function()
 {
-	this.HdrFtr.Hyperlink_Remove();
+	this.HdrFtr.RemoveHyperlink();
 };
 CHdrFtrController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
-	return this.HdrFtr.Hyperlink_CanAdd(bCheckInHyperlink);
+	return this.HdrFtr.CanAddHyperlink(bCheckInHyperlink);
 };
 CHdrFtrController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
-	return this.HdrFtr.Hyperlink_Check(bCheckEnd);
+	return this.HdrFtr.IsCursorInHyperlink(bCheckEnd);
 };
 CHdrFtrController.prototype.AddComment = function(Comment)
 {
-	this.HdrFtr.Add_Comment(Comment);
+	this.HdrFtr.AddComment(Comment);
 };
 CHdrFtrController.prototype.CanAddComment = function()
 {
-	return this.HdrFtr.CanAdd_Comment();
+	return this.HdrFtr.CanAddComment();
 };
 CHdrFtrController.prototype.GetSelectionAnchorPos = function()
 {
-	return this.HdrFtr.Get_SelectionAnchorPos();
+	return this.HdrFtr.GetSelectionAnchorPos();
 };
 CHdrFtrController.prototype.StartSelectionFromCurPos = function()
 {
-	this.HdrFtr.Start_SelectionFromCurPos();
+	this.HdrFtr.StartSelectionFromCurPos();
 };
 CHdrFtrController.prototype.SaveDocumentStateBeforeLoadChanges = function(State)
 {
@@ -442,7 +442,7 @@ CHdrFtrController.prototype.RestoreDocumentStateAfterLoadChanges = function(Stat
 			if (true !== this.LogicDocument.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
 			{
 				HdrFtrContent.Set_DocPosType(docpostype_Content);
-				HdrFtrContent.Cursor_MoveToStartPos();
+				HdrFtrContent.MoveCursorToStartPos();
 			}
 		}
 	}

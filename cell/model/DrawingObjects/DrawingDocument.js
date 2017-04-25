@@ -291,7 +291,7 @@ function CTableOutlineDr()
         var _outline = this.TableOutline;
         var _table = _outline.Table;
 
-        _table.Cursor_MoveToStartPos();
+        _table.MoveCursorToStartPos();
         _table.Document_SetThisElementCurrent();
 
         if (!_table.Is_Inline())
@@ -386,7 +386,7 @@ function CTableOutlineDr()
             }
             this.IsChangeSmall = false;
 
-            this.TableOutline.Table.Selection_Remove();
+            this.TableOutline.Table.RemoveSelection();
             editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
 
@@ -4078,7 +4078,7 @@ function CDrawingDocument(drawingObjects)
             shape.setTxBody(AscFormat.CreateTextBodyFromString("", this, shape));
             var par = shape.txBody.content.Content[0];
             par.Reset(0, 0, 1000, 1000, 0);
-            par.Cursor_MoveToStartPos();
+            par.MoveCursorToStartPos();
             var _paraPr = new CParaPr();
             par.Pr = _paraPr;
             var _textPr = new CTextPr();

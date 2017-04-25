@@ -477,12 +477,12 @@ CDocumentControllerBase.prototype.SetParagraphFramePr = function(FramePr, bDelet
  * Уменьшаем или увеличиваем (по специальной таблице) размер шрифта в параграфе.
  * @param {boolean} bIncrease
  */
-CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease){};
+CDocumentControllerBase.prototype.IncreaseDecreaseFontSize = function(bIncrease){};
 /**
  * Уменьшаем или увеличиваем (по специальной таблице) отступы в параграфе.
  * @param {boolean} bIncrease
  */
-CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease){};
+CDocumentControllerBase.prototype.IncreaseDecreaseIndent = function(bIncrease){};
 /**
  * Устанавливаем настройки для изображений.
  * @param Props
@@ -497,12 +497,12 @@ CDocumentControllerBase.prototype.SetTableProps = function(Props){};
  * Получаем текущие настройки параграфа.
  * @returns {CParaPr}
  */
-CDocumentControllerBase.prototype.GetCurrentParaPr = function(){var oParaPr = new CParaPr(); oParaPr.Init_Default(); return oParaPr};
+CDocumentControllerBase.prototype.GetCalculatedParaPr = function(){var oParaPr = new CParaPr(); oParaPr.Init_Default(); return oParaPr};
 /**
  * Получаем текущие настройки текста.
  * @returns {CTextPr}
  */
-CDocumentControllerBase.prototype.GetCurrentTextPr = function(){var oTextPr = new CTextPr(); oTextPr.Init_Default(); return oTextPr};
+CDocumentControllerBase.prototype.GetCalculatedTextPr = function(){var oTextPr = new CTextPr(); oTextPr.Init_Default(); return oTextPr};
 /**
  * Получаем прямые настройки параграфа.
  * @returns {CParaPr}
@@ -522,7 +522,7 @@ CDocumentControllerBase.prototype.RemoveSelection = function(bNoCheckDrawing){};
  * Проверяем пустой ли селект.
  * @returns {boolean}
  */
-CDocumentControllerBase.prototype.IsEmptySelection = function(bCheckHidden){return true;};
+CDocumentControllerBase.prototype.IsSelectionEmpty = function(bCheckHidden){return true;};
 /**
  * Рисуем селект на заданно странице.
  * @param PageAbs
@@ -607,7 +607,7 @@ CDocumentControllerBase.prototype.AddTableRow = function(bBefore){};
  * Добавляем столбец таблицы.
  * @param bBefore
  */
-CDocumentControllerBase.prototype.AddTableCol = function(bBefore){};
+CDocumentControllerBase.prototype.AddTableColumn = function(bBefore){};
 /**
  * Удаляем строку таблицы.
  */
@@ -615,7 +615,7 @@ CDocumentControllerBase.prototype.RemoveTableRow = function(){};
 /**
  * Удаляем колонку таблицы.
  */
-CDocumentControllerBase.prototype.RemoveTableCol = function(){};
+CDocumentControllerBase.prototype.RemoveTableColumn = function(){};
 /**
  * Объединяем ячейки таблицы.
  */

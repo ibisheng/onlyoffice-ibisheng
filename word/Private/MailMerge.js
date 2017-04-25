@@ -255,7 +255,7 @@ CDocument.prototype.Add_MailMergeField = function(Name)
         oField.Add_ToContent(0, oRun);
 
         this.Register_Field(oField);
-        this.Paragraph_Add(oField);
+        this.AddToParagraph(oField);
         this.Document_UpdateInterfaceState();
     }
 };
@@ -278,7 +278,7 @@ CDocument.prototype.Preview_MailMergeResult = function(Index)
     if (true !== this.MailMergePreview)
     {
         this.MailMergePreview = true;
-        this.Selection_Remove();
+        this.RemoveSelection();
         AscCommon.CollaborativeEditing.Set_GlobalLock(true);
     }
 

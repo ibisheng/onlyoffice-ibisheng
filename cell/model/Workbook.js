@@ -5058,7 +5058,7 @@
 		if(false != bModifyValue)
 		{
 			//убираем комплексные строки
-			if(null != this.oValue.multiText)
+			if(null != this.oValue.multiText && false == this.ws.workbook.bUndoChanges && false == this.ws.workbook.bRedoChanges)
 			{
 				var oldVal = null;
 				if(History.Is_On())

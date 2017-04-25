@@ -93,10 +93,10 @@ ParaField.prototype.Copy = function(Selected)
 
     return NewField;
 };
-ParaField.prototype.Get_SelectedElementsInfo = function(Info)
+ParaField.prototype.GetSelectedElementsInfo = function(Info)
 {
-    Info.Set_Field(this);
-    CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo.apply(this, arguments);
+	Info.Set_Field(this);
+	CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo.apply(this, arguments);
 };
 ParaField.prototype.Get_Bounds = function()
 {
@@ -129,9 +129,9 @@ ParaField.prototype.Add = function(Item)
         case para_Hyperlink:
         {
             var TextPr = this.Get_FirstTextPr();
-            Item.Select_All();
+            Item.SelectAll();
             Item.Apply_TextPr(TextPr);
-            Item.Selection_Remove();
+            Item.RemoveSelection();
 
             var CurPos = this.State.ContentPos;
             var CurItem = this.Content[CurPos];
@@ -142,7 +142,7 @@ ParaField.prototype.Add = function(Item)
                 this.Add_ToContent(CurPos + 2, NewRun);
 
                 this.State.ContentPos = CurPos + 2;
-                this.Content[this.State.ContentPos].Cursor_MoveToStartPos();
+                this.Content[this.State.ContentPos].MoveCursorToStartPos();
             }
             else
                 CurItem.Add(Item);
@@ -171,7 +171,7 @@ ParaField.prototype.Add = function(Item)
 
                 // Перемещаем кусор в конец формулы
                 this.State.ContentPos = CurPos + 1;
-                this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
+                this.Content[this.State.ContentPos].MoveCursorToEndPos(false);
             }
             else
                 this.Content[CurPos].Add(Item);
@@ -198,7 +198,7 @@ ParaField.prototype.Add = function(Item)
                 }
                 this.Add_ToContent(CurPos + Count + 1, NewItem, false);
                 this.State.ContentPos = CurPos + Count;
-                this.Content[this.State.ContentPos].Cursor_MoveToEndPos();
+                this.Content[this.State.ContentPos].MoveCursorToEndPos();
             }
 
             break;
@@ -404,7 +404,7 @@ ParaField.prototype.Map_MailMerge = function(_Value)
     this.Content = [];
     this.Content[0] = oRun;
 
-    this.Cursor_MoveToStartPos();
+    this.MoveCursorToStartPos();
 
     History.TurnOn();
 };
@@ -418,7 +418,7 @@ ParaField.prototype.Restore_StandardTemplate = function()
         var oRun = this.private_GetMappedRun("«" + this.Arguments[0] + "»");
         this.Remove_FromContent(0, this.Content.length);
         this.Add_ToContent(0, oRun);
-        this.Cursor_MoveToStartPos();
+        this.MoveCursorToStartPos();
 
         this.TemplateContent = this.Content;
     }
@@ -427,7 +427,7 @@ ParaField.prototype.Restore_Template = function()
 {
     // Восстанавливаем содержимое поля.
     this.Content = this.TemplateContent;
-    this.Cursor_MoveToStartPos();
+    this.MoveCursorToStartPos();
 };
 ParaField.prototype.Is_NeedRestoreTemplate = function()
 {
@@ -537,7 +537,7 @@ ParaField.prototype.SetValue = function(sValue)
 	oRun.Apply_TextPr(this.Get_TextPr(), undefined, true);
 	this.Remove_FromContent(0, this.Content.length);
 	this.Add_ToContent(0, oRun);
-	this.Cursor_MoveToStartPos();
+	this.MoveCursorToStartPos();
 };
 ParaField.prototype.IsFillingForm = function()
 {

@@ -505,7 +505,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
         }
         case AscCommon.changestype_Table_Properties:
         {
-            if ( false != bCheckInner && true === this.Is_InnerTable() )
+            if ( false != bCheckInner && true === this.IsInnerTable() )
                 this.CurCell.Content.Document_Is_SelectionLocked( CheckType );
             else
                 this.Lock.Check( this.Get_Id() );
@@ -532,7 +532,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
 
             // Проверяем саму таблицу
 
-            if ( false != bCheckInner && true === this.Is_InnerTable() )
+            if ( false != bCheckInner && true === this.IsInnerTable() )
                 this.CurCell.Content.Document_Is_SelectionLocked( CheckType );
             else
                 this.Lock.Check( this.Get_Id() );
@@ -811,6 +811,16 @@ if(typeof CPresentation !== "undefined")
                 "guid": this.slideSizeLock.Get_Id()
             };
             this.slideSizeLock.Lock.Check(check_obj);
+        }
+
+        if(CheckType === AscCommon.changestype_PresDefaultLang )
+        {
+            var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.defaultTextStyleLock.Get_Id(),
+                    "guid": this.defaultTextStyleLock.Get_Id()
+                };
         }
 
         var bResult = AscCommon.CollaborativeEditing.OnEnd_CheckLock();

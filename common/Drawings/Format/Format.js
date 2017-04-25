@@ -3981,6 +3981,13 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     if(shapeProp1.description === shapeProp2.description){
         _result_shape_prop.description = shapeProp1.description;
     }
+    if(shapeProp1.columnNumber === shapeProp2.columnNumber){
+        _result_shape_prop.columnNumber = shapeProp1.columnNumber;
+    }
+    if(shapeProp1.columnSpace === shapeProp2.columnSpace){
+        _result_shape_prop.columnSpace = shapeProp1.columnSpace;
+    }
+
     return _result_shape_prop;
 }
 
@@ -9515,6 +9522,8 @@ function CreateAscShapePropFromProp(shapeProp)
     }
     obj.title = shapeProp.title;
     obj.description = shapeProp.description;
+    obj.columnNumber = shapeProp.columnNumber;
+    obj.columnSpace = shapeProp.columnSpace;
     return obj;
 }
 
@@ -9989,7 +9998,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oDrawingDocument, oTitle.tx);
             if(AscFormat.isRealNumber(nFontSize)){
                 oTextBody.content.Set_ApplyToAll(true);
-                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
+                oTextBody.content.AddToParagraph(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
                 oTextBody.content.Set_ApplyToAll(false);
             }
             oTitle.tx.setRich(oTextBody);
@@ -10008,7 +10017,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oChartSpace.getDrawingDocument(), oTitle.tx);
             if(AscFormat.isRealNumber(nFontSize)){
                 oTextBody.content.Set_ApplyToAll(true);
-                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
+                oTextBody.content.AddToParagraph(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
                 oTextBody.content.Set_ApplyToAll(false);
             }
             oTitle.tx.setRich(oTextBody);

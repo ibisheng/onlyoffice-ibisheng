@@ -158,18 +158,16 @@
 
 		/** @type RegExp */
 		this.reReplaceNL = /\r?\n|\r/g;
-		/** @type RegExp */
-		this.reReplaceTab = /[\t\v\f]/g;
-		// RegExp с поддержкой рэнджей вида $E1:$F2
-		this.reRangeStr = "[^a-z0-9_$!](\\$?[a-z]+\\$?\\d+:\\$?[a-z]+\\$?\\d+|\\$?[a-z]+:\\$?[a-z]+|\\$?\\d+:\\$?\\d+|\\$?[a-z]+\\$?\\d+)(?=[^a-z0-9_]|$)";
 		this.rangeChars = ["=", "-", "+", "*", "/", "(", "{", ",", "<", ">", "^", "!", "&", ":", ";", " "];
 		this.reNotFormula = new XRegExp( "[^\\p{L}0-9_]", "i" );
 		this.reFormula = new XRegExp( "^([\\p{L}][\\p{L}0-9_]*)", "i" );
 
 		this.defaults = {
-			padding: -1, selectColor: new AscCommon.CColor( 190, 190, 255, 0.5 ),
-
-			canvasZIndex: 500, blinkInterval: 500, cursorShape: "text"
+			padding: -1,
+			selectColor: new AscCommon.CColor(190, 190, 255, 0.5),
+			canvasZIndex: 500,
+			blinkInterval: 500,
+			cursorShape: "text"
 		};
 
 		this.dontUpdateText = false;

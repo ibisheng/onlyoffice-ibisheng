@@ -906,7 +906,7 @@ CShape.prototype.createTextBoxContent = function () {
     body_pr.setAnchor(1);
     this.setBodyPr(body_pr);
     this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
-    this.textBoxContent.Set_ParagraphAlign(AscCommon.align_Center);
+    this.textBoxContent.SetParagraphAlign(AscCommon.align_Center);
     this.textBoxContent.Content[0].Set_DocumentIndex(0);
 };
 
@@ -922,7 +922,7 @@ CShape.prototype.paragraphAdd = function (paraItem, bRecalculate) {
         content_to_add = this.getDocContent();
     }
     if (content_to_add) {
-        content_to_add.Paragraph_Add(paraItem, bRecalculate);
+        content_to_add.AddToParagraph(paraItem, bRecalculate);
     }
 };
 
@@ -940,7 +940,7 @@ CShape.prototype.applyTextFunction = function (docContentFunction, tableFunction
             this.createTextBody();
         }
         content_to_add = this.getDocContent();
-        content_to_add.Cursor_MoveToStartPos();
+        content_to_add.MoveCursorToStartPos();
     }
     if (content_to_add)
     {
@@ -1160,26 +1160,29 @@ CShape.prototype.isGroup = function () {
     return false;
 };
 
-CShape.prototype.getHierarchy = function () {
-    //if (this.recalcInfo.recalculateShapeHierarchy)
+CShape.prototype.getHierarchy = function()
+{
+    //if(this.recalcInfo.recalculateShapeHierarchy)
     {
         this.compiledHierarchy = [];
         var hierarchy = this.compiledHierarchy;
-        if (this.parent && this.isPlaceholder()) {
+        if(this.isPlaceholder())
+        {
             var ph_type = this.getPlaceholderType();
             var ph_index = this.getPlaceholderIndex();
-            switch (this.parent.kind) {
+            var b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
+            switch (this.parent.kind)
+            {
                 case AscFormat.TYPE_KIND.SLIDE:
                 {
-                    hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
-                    hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
+                    hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                    hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
                     break;
                 }
 
                 case AscFormat.TYPE_KIND.LAYOUT:
-                case AscFormat.TYPE_KIND.NOTES:
                 {
-                    hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
+                    hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
                     break;
                 }
             }
@@ -1188,6 +1191,7 @@ CShape.prototype.getHierarchy = function () {
     }
     return this.compiledHierarchy;
 };
+
 
 CShape.prototype.getPaddings = function () {
     var paddings = null;
@@ -2241,12 +2245,12 @@ CShape.prototype.selectionCheck = function (X, Y, PageAbs, NearPos) {
     var content = this.getDocContent();
     if (content) {
         if (undefined !== NearPos)
-            return content.Selection_Check(X, Y, 0, NearPos);
+            return content.CheckPosInSelection(X, Y, 0, NearPos);
 
         if (isRealObject(content) && this.hitInTextRect(X, Y) && this.invertTransformText) {
             var t_x = this.invertTransformText.TransformPointX(X, Y);
             var t_y = this.invertTransformText.TransformPointY(X, Y);
-            return content.Selection_Check(t_x, t_y, 0, NearPos);
+            return content.CheckPosInSelection(t_x, t_y, 0, NearPos);
         }
     }
     return false;
@@ -3662,7 +3666,7 @@ CShape.prototype.deselect = function (drawingObjectsController) {
     }
     if(this.graphicObject)
     {
-        this.graphicObject.Selection_Remove();
+        this.graphicObject.RemoveSelection();
     }
     return this;
 };
@@ -3758,7 +3762,7 @@ CShape.prototype.updateCursorType = function (x, y, e)
     {
         var tx = this.invertTransformText.TransformPointX(x, y);
         var ty = this.invertTransformText.TransformPointY(x, y);
-        this.txBody.content.Update_CursorType(tx, ty, 0);
+        this.txBody.content.UpdateCursorType(tx, ty, 0);
     }
 };
 
@@ -3774,13 +3778,13 @@ CShape.prototype.selectionSetStart = function (e, x, y, slideIndex)
         ty = this.invertTransformText.TransformPointY(x, y);
         if(e.Button === AscCommon.g_mouse_button_right)
         {
-            if(content.Selection_Check(tx, ty,  0))
+            if(content.CheckPosInSelection(tx, ty,  0))
             {
                 this.rightButtonFlag = true;
                 return;
             }
         }
-        if(!(content.Is_TextSelectionUse() && e.ShiftKey))
+        if(!(content.IsTextSelectionUse() && e.ShiftKey))
             content.Selection_SetStart(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
         else
             content.Selection_SetEnd(tx, ty, slideIndex - content.Get_StartPage_Relative(), e);
@@ -3821,7 +3825,7 @@ CShape.prototype.updateSelectionState = function ()
                 oMatrix = this.transformText.CreateDublicate();
             }
             drawing_document.UpdateTargetTransform(oMatrix);
-            if ( true === content.Is_SelectionUse() )
+            if ( true === content.IsSelectionUse() )
             {
                 // Выделение нумерации
                 if ( selectionflag_Numbering == content.Selection.Flag )
@@ -3839,7 +3843,7 @@ CShape.prototype.updateSelectionState = function ()
                 }
                 else
                 {
-                    if ( false === content.Selection_IsEmpty() )
+                    if ( false === content.IsSelectionEmpty() )
                     {
                         drawing_document.TargetEnd();
                         drawing_document.SelectEnabled(true);
@@ -4449,12 +4453,12 @@ CShape.prototype.getTextArtProperties = function()
             //var oTargetDocContent = oController.getTargetDocContent();
             //if(oTargetDocContent === oContent)
             //{
-            //    oTextPr = oContent.Get_Paragraph_TextPr();
+            //    oTextPr = oContent.GetCalculatedTextPr();
             //}
             //else
             //{
             //    oContent.Set_ApplyToAll(true);
-            //    oTextPr = oContent.Get_Paragraph_TextPr();
+            //    oTextPr = oContent.GetCalculatedTextPr();
             //    oContent.Set_ApplyToAll(false);
             //}
             //if(oTextPr.TextFill)
@@ -4505,7 +4509,7 @@ CShape.prototype.getParagraphParaPr = function () {
     if (this.txBody && this.txBody.content) {
         var _result;
         this.txBody.content.Set_ApplyToAll(true);
-        _result = this.txBody.content.Get_Paragraph_ParaPr();
+        _result = this.txBody.content.GetCalculatedParaPr();
         this.txBody.content.Set_ApplyToAll(false);
         return _result;
     }
@@ -4516,7 +4520,7 @@ CShape.prototype.getParagraphTextPr = function () {
     if (this.txBody && this.txBody.content) {
         var _result;
         this.txBody.content.Set_ApplyToAll(true);
-        _result = this.txBody.content.Get_Paragraph_TextPr();
+        _result = this.txBody.content.GetCalculatedTextPr();
         this.txBody.content.Set_ApplyToAll(false);
         return _result;
     }
@@ -5157,7 +5161,7 @@ CShape.prototype.checkTextWarp = function(oContent, oBodyPr, dWidth, dHeight, bN
                     }
                 }
                 oContentToDraw.Set_ApplyToAll(true);
-                oContentToDraw.Set_ParagraphSpacing({Before: 0, After: 0});
+                oContentToDraw.SetParagraphSpacing({Before: 0, After: 0});
                 oContentToDraw.Set_ApplyToAll(false);
                 if(bNeedTurnOn)
                 {
@@ -5287,7 +5291,65 @@ CShape.prototype.checkTypeCorrect = function(){
         return false;
     }
     return true;
-}
+};
+
+
+CShape.prototype.getColumnNumber = function(){
+    if(this.bWordShape){
+        return 1;
+    }
+    var oBodyPr = this.getBodyPr();
+    if(AscFormat.isRealNumber(oBodyPr.numCol))
+    {
+        return oBodyPr.numCol;
+    }
+    return 1;
+};
+
+    CShape.prototype.getColumnSpace = function(){
+        if(this.bWordShape){
+            return 0;
+        }
+        var oBodyPr = this.getBodyPr();
+        if(AscFormat.isRealNumber(oBodyPr.spcCol))
+        {
+            return oBodyPr.spcCol;
+        }
+        return 0;
+    };
+
+
+    CShape.prototype.setColumnNumber = function(num){
+        var new_body_pr = this.getBodyPr();
+        if (new_body_pr) {
+            new_body_pr = new_body_pr.createDuplicate();
+            new_body_pr.numCol = num;
+            if (this.bWordShape) {
+                this.setBodyPr(new_body_pr);
+            }
+            else {
+                if (this.txBody) {
+                    this.txBody.setBodyPr(new_body_pr);
+                }
+            }
+        }
+    };
+
+    CShape.prototype.setColumnSpace = function(spcCol){
+        var new_body_pr = this.getBodyPr();
+        if (new_body_pr) {
+            new_body_pr = new_body_pr.createDuplicate();
+            new_body_pr.spcCol = spcCol;
+            if (this.bWordShape) {
+                this.setBodyPr(new_body_pr);
+            }
+            else {
+                if (this.txBody) {
+                    this.txBody.setBodyPr(new_body_pr);
+                }
+            }
+        }
+    };
 
 function CreateBinaryReader(szSrc, offset, srcLen)
 {

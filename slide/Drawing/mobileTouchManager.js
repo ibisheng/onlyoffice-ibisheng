@@ -103,7 +103,7 @@
 	{
 		if (-1 == this.LogicDocument.CurPage)
 			return null;
-		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.Get_SelectionBounds();
+		return this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects.GetSelectionBounds();
 	};
 	CMobileDelegateEditorPresentation.prototype.ScrollTo = function(_scroll)
 	{
@@ -140,10 +140,10 @@
 		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
 		var _elementsCount = _controller.selectedObjects.length;
 
-		if (!_controller.Is_SelectionUse() && _elementsCount > 0)
+		if (!_controller.IsSelectionUse() && _elementsCount > 0)
 			_mode = AscCommon.MobileTouchContextMenuType.Target;
 
-		if (_controller.Get_SelectionBounds())
+		if (_controller.GetSelectionBounds())
 			_mode = AscCommon.MobileTouchContextMenuType.Select;
 
 		if (_mode == AscCommon.MobileTouchContextMenuType.Slide && _controller.getSelectedObjectsBounds())
@@ -165,7 +165,7 @@
 
 		var _controller = this.LogicDocument.Slides[this.LogicDocument.CurPage].graphicObjects;
 
-		var _target = _controller.Is_SelectionUse();
+		var _target = _controller.IsSelectionUse();
 		if (_target === false)
 		{
 			/*
@@ -194,7 +194,7 @@
 			return;
 		}
 
-		var _select = _controller.Get_SelectionBounds();
+		var _select = _controller.GetSelectionBounds();
 		if (_select)
 		{
 			var _rect1 = _select.Start;
@@ -256,7 +256,7 @@
 
 		var _mode = 0;
 
-		var _target = _controller.Is_SelectionUse();
+		var _target = _controller.IsSelectionUse();
 		if (_target === false)
 		{
 			_posX = this.DrawingDocument.m_dTargetX;
@@ -282,7 +282,7 @@
 			_mode = 1;
 		}
 
-		var _select = _controller.Get_SelectionBounds();
+		var _select = _controller.GetSelectionBounds();
 		if (_select)
 		{
 			var _rect1 = _select.Start;
@@ -499,7 +499,7 @@
 				var _x2 = this.RectSelect2.x + this.RectSelect2.w;
 				var _y2 = this.RectSelect2.y + this.RectSelect2.h / 2;
 
-				this.delegate.LogicDocument.Selection_Remove();
+				this.delegate.LogicDocument.RemoveSelection();
 				if (1 == this.DragSelect)
 				{
 					global_mouseEvent.Button = 0;

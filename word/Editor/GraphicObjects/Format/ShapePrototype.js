@@ -748,12 +748,12 @@ CShape.prototype.Get_StartPage_Relative = function()
 {
     return 0;
 };
-CShape.prototype.Check_TableCoincidence = function(table)
+CShape.prototype.CheckTableCoincidence = function(table)
 {
     var para_drawing = this.GetParaDrawing();
     if(para_drawing && para_drawing.DocumentContent)
     {
-        return para_drawing.DocumentContent.Check_TableCoincidence(table);
+        return para_drawing.DocumentContent.CheckTableCoincidence(table);
     }
     return false;
 };
@@ -876,7 +876,7 @@ CShape.prototype.cursorGetPos = function()
     var content = this.getDocContent();
     if(isRealObject(content))
     {
-        var pos = content.Cursor_GetPos();
+        var pos = content.GetCursorPosXY();
         var transform = this.transformText;
         var x = transform.TransformPointX(pos.X, pos.Y);
         var y = transform.TransformPointY(pos.X, pos.Y);
@@ -893,7 +893,7 @@ CShape.prototype.cursorMoveAt = function( X, Y, AddToSelect )
     {
         var t_x = this.invertTransformText.TransformPointX(X, Y);
         var t_y = this.invertTransformText.TransformPointY(X, Y);
-        content.Cursor_MoveAt(t_x, t_y, AddToSelect, undefined, AscFormat.isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
+        content.MoveCursorToXY(t_x, t_y, AddToSelect, undefined, AscFormat.isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
     }
 };
 

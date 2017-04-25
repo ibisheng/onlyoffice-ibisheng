@@ -682,7 +682,7 @@ CShape.prototype.recalculateContent2 = function()
                 content.Content[0].Pr  = content_.Content[0].Pr;
                 var para_text_pr = new ParaTextPr(content_.Content[0].Get_FirstRunPr());
                 content.Set_ApplyToAll(true);
-                content.Paragraph_Add(para_text_pr);
+                content.AddToParagraph(para_text_pr);
                 content.Set_ApplyToAll(false);
             }
             content.Set_StartPage(0);
@@ -753,7 +753,8 @@ CShape.prototype.getIsSingleBody = function(x, y)
 {
     if(!this.isPlaceholder())
         return false;
-    if(this.getPlaceholderType() !== AscFormat.phType_body)
+    var ph_type = this.getPlaceholderType();
+    if(this.getPlaceholderType() !== AscFormat.phType_body && ph_type !== null)
         return false;
     if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
     {
@@ -793,6 +794,12 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
             editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
             editor.WordControl.GoToPage(this.parent.num);
         }
+    }
+};
+
+CShape.prototype.OnContentReDraw = function(){
+    if(AscCommonSlide && this.parent instanceof AscCommonSlide.Slide){
+        editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(this.parent.num, editor.WordControl.m_oLogicDocument.Slides[this.parent.num]);
     }
 };
 

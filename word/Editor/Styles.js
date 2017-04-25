@@ -2764,11 +2764,11 @@ CStyle.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 
@@ -4299,11 +4299,11 @@ CStyles.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 

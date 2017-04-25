@@ -5697,8 +5697,8 @@ window["native"]["offline_keyboard_down"] = function(inputKeys) {
 
                 var content = ws.objectRender.controller.getTargetDocContent();
 
-                content.Cursor_MoveLeft(false, true);
-                content.Cursor_MoveRight(true, true);
+                content.MoveCursorLeft(false, true);
+                content.MoveCursorRight(true, true);
 
                 ws.objectRender.controller.updateSelectionState();
                 ws.objectRender.controller.drawingObjects.sendGraphicObjectProps();

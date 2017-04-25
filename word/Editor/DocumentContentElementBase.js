@@ -167,7 +167,7 @@ CDocumentContentElementBase.prototype.IsTableBorder = function(X, Y, CurPage)
 {
 	return null;
 };
-CDocumentContentElementBase.prototype.Update_CursorType = function(X, Y, CurPage)
+CDocumentContentElementBase.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
 };
 CDocumentContentElementBase.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent, isTableBorder)
@@ -176,11 +176,11 @@ CDocumentContentElementBase.prototype.Selection_SetStart = function(X, Y, CurPag
 CDocumentContentElementBase.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, isTableBorder)
 {
 };
-CDocumentContentElementBase.prototype.Selection_IsEmpty = function(isCheckHidden)
+CDocumentContentElementBase.prototype.IsSelectionEmpty = function(isCheckHidden)
 {
 	return true;
 };
-CDocumentContentElementBase.prototype.Get_SelectedElementsInfo = function(oInfo)
+CDocumentContentElementBase.prototype.GetSelectedElementsInfo = function(oInfo)
 {
 };
 CDocumentContentElementBase.prototype.Document_UpdateRulersState = function(CurPage)
@@ -189,22 +189,14 @@ CDocumentContentElementBase.prototype.Document_UpdateRulersState = function(CurP
 };
 CDocumentContentElementBase.prototype.IsSelectionUse = function()
 {
-	return this.Is_SelectionUse();
-};
-CDocumentContentElementBase.prototype.Is_SelectionUse = function()
-{
 	return false;
 };
 CDocumentContentElementBase.prototype.IsSelectionToEnd = function()
 {
 	return false;
 };
-CDocumentContentElementBase.prototype.Selection_Remove = function()
-{
-};
 CDocumentContentElementBase.prototype.RemoveSelection = function()
 {
-	this.Selection_Remove();
 };
 CDocumentContentElementBase.prototype.SetSelectionUse = function(isUse)
 {
@@ -212,54 +204,42 @@ CDocumentContentElementBase.prototype.SetSelectionUse = function(isUse)
 CDocumentContentElementBase.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElementStart)
 {
 };
-CDocumentContentElementBase.prototype.Select_All = function(nDirection)
-{
-};
 CDocumentContentElementBase.prototype.SelectAll = function(nDirection)
 {
-	this.Select_All(nDirection);
 };
-CDocumentContentElementBase.prototype.Get_Paragraph_TextPr = function()
+CDocumentContentElementBase.prototype.GetCalculatedTextPr = function()
 {
-	return new CTextPr();
+	var oTextPr = new CTextPr();
+	oTextPr.Init_Default();
+	return oTextPr;
 };
-CDocumentContentElementBase.prototype.GetParagraphTextPr = function()
+CDocumentContentElementBase.prototype.GetCalculatedParaPr = function()
 {
-	return this.Get_Paragraph_TextPr();
+	var oParaPr = new CParaPr();
+	oParaPr.Init_Default();
+	return oParaPr;
 };
-CDocumentContentElementBase.prototype.Get_Paragraph_ParaPr = function()
+CDocumentContentElementBase.prototype.GetDirectParaPr = function()
 {
 	return new CParaPr();
 };
-CDocumentContentElementBase.prototype.GetParagraphParaPr = function()
+CDocumentContentElementBase.prototype.GetDirectTextPr = function()
 {
-	return this.Get_Paragraph_ParaPr();
+	return new CTextPr();
 };
-CDocumentContentElementBase.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
-{
-	return false;
-};
-CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperlink)
-{
-	return this.Hyperlink_CanAdd(bCheckInHyperlink);
-};
-CDocumentContentElementBase.prototype.Selection_Draw_Page = function(CurPage)
+CDocumentContentElementBase.prototype.DrawSelectionOnPage = function(CurPage)
 {
 };
 CDocumentContentElementBase.prototype.StopSelection = function()
 {
 };
-CDocumentContentElementBase.prototype.Get_SelectionBounds = function()
+CDocumentContentElementBase.prototype.GetSelectionBounds = function()
 {
 	return {
 		Start     : null,
 		End       : null,
 		Direction : 0
 	};
-};
-CDocumentContentElementBase.prototype.GetSelectionBounds = function()
-{
-	return this.Get_SelectionBounds();
 };
 CDocumentContentElementBase.prototype.RecalculateCurPos = function()
 {
@@ -273,13 +253,9 @@ CDocumentContentElementBase.prototype.CanCopyCut = function()
 {
 	return this.Can_CopyCut();
 };
-CDocumentContentElementBase.prototype.Selection_Check = function(X, Y, CurPage, NearPos)
-{
-	return false;
-};
 CDocumentContentElementBase.prototype.CheckPosInSelection = function(X, Y, CurPage, NearPos)
 {
-	return this.Selection_Check(X, Y, CurPage, NearPos);
+	return false;
 };
 CDocumentContentElementBase.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawing)
 {
@@ -303,42 +279,58 @@ CDocumentContentElementBase.prototype.CanUpdateTarget = function(CurPage)
 {
 	return false;
 };
-CDocumentContentElementBase.prototype.Cursor_MoveLeft = function(Count, AddToSelect, Word)
-{
-	return false;
-};
 CDocumentContentElementBase.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
 {
 };
 CDocumentContentElementBase.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
-	return this.Cursor_MoveLeft(1, AddToSelect, Word);
-};
-CDocumentContentElementBase.prototype.Cursor_MoveRight = function(Count, AddToSelect, Word)
-{
 	return false;
 };
 CDocumentContentElementBase.prototype.MoveCursorRight = function(AddToSelect, Word)
 {
-	return this.Cursor_MoveRight(1, AddToSelect, Word);
+	return false;
 };
 CDocumentContentElementBase.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
 {
 
 };
-CDocumentContentElementBase.prototype.Cursor_MoveToStartPos = function(AddToSelect)
-{
-};
 CDocumentContentElementBase.prototype.MoveCursorToStartPos = function(AddToSelect)
-{
-	return this.Cursor_MoveToStartPos(AddToSelect);
-};
-CDocumentContentElementBase.prototype.Cursor_MoveToEndPos = function(AddToSelect, StartSelectFromEnd)
 {
 };
 CDocumentContentElementBase.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelectFromEnd)
 {
-	return this.Cursor_MoveToEndPos(AddToSelect, StartSelectFromEnd);
+};
+CDocumentContentElementBase.prototype.MoveCursorUp = function(AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorDown = function(AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorToEndOfLine = function(AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorToStartOfLine = function(AddToSelect)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorToXY = function(X, Y, bLine, bDontChangeRealPos, CurPage)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MoveCursorToCell = function(bNext)
+{
+	return false;
 };
 CDocumentContentElementBase.prototype.IsCursorAtBegin = function()
 {
@@ -348,29 +340,17 @@ CDocumentContentElementBase.prototype.IsCursorAtEnd = function()
 {
 	return true;
 };
-CDocumentContentElementBase.prototype.Get_SelectionState = function()
+CDocumentContentElementBase.prototype.GetSelectionState = function()
 {
 	return [];
 };
-CDocumentContentElementBase.prototype.Set_SelectionState = function(State, StateIndex)
-{
-
-};
-CDocumentContentElementBase.prototype.Add_NewParagraph = function()
+CDocumentContentElementBase.prototype.SetSelectionState = function(State, StateIndex)
 {
 
 };
 CDocumentContentElementBase.prototype.AddNewParagraph = function()
 {
-	return this.Add_NewParagraph();
-};
-CDocumentContentElementBase.prototype.Hyperlink_Check = function(bCheckEnd)
-{
-	return null;
-};
-CDocumentContentElementBase.prototype.IsCursorInHyperlink = function(bCheckEnd)
-{
-	return this.Hyperlink_Check(bCheckEnd);
+
 };
 CDocumentContentElementBase.prototype.Get_SelectionState2 = function()
 {
@@ -428,6 +408,168 @@ CDocumentContentElementBase.prototype.Is_Empty = function()
 CDocumentContentElementBase.prototype.Add = function(oParaItem)
 {
 	// TODO: Данную функцию нужно заменить на AddToParagraph
+};
+CDocumentContentElementBase.prototype.PreDelete = function()
+{
+};
+CDocumentContentElementBase.prototype.ClearParagraphFormatting = function()
+{
+};
+CDocumentContentElementBase.prototype.GetCursorPosXY = function()
+{
+	return {X : 0, Y : 0};
+};
+CDocumentContentElementBase.prototype.StartSelectionFromCurPos = function()
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphAlign = function(Align)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphSpacing = function(Spacing)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphTabs = function(Tabs)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphIndent = function(Ind)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphNumbering = function(NumInfo)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphShd = function(Shd)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphStyle = function(Name)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphContextualSpacing = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphPageBreakBefore = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphKeepLines = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphKeepNext = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphWidowControl = function(Value)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphBorders = function(Borders)
+{
+};
+CDocumentContentElementBase.prototype.SetParagraphFramePr = function(FramePr, bDelete)
+{
+};
+CDocumentContentElementBase.prototype.IncreaseDecreaseFontSize = function(bIncrease)
+{
+};
+CDocumentContentElementBase.prototype.IncreaseDecreaseIndent = function(bIncrease)
+{
+};
+CDocumentContentElementBase.prototype.SetImageProps = function(oProps)
+{
+};
+CDocumentContentElementBase.prototype.SetTableProps = function(oProps)
+{
+};
+CDocumentContentElementBase.prototype.GetSelectedContent = function(oSelectedContent)
+{
+};
+CDocumentContentElementBase.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
+{
+};
+CDocumentContentElementBase.prototype.GetCurPosXY = function()
+{
+	return {X : 0, Y : 0};
+};
+CDocumentContentElementBase.prototype.GetSelectedText = function(bClearText, oPr)
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.GetCurrentParagraph = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.AddTableRow = function(bBefore)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.AddTableColumn = function(bBefore)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.RemoveTableRow = function(nRowIndex)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.RemoveTableColumn = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MergeTableCells = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.SplitTableCells = function(nColsCount, nRowsCount)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.RemoveTable = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.SelectTable = function(Type)
+{
+};
+CDocumentContentElementBase.prototype.CanMergeTableCells = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.CanSplitTableCells = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.Document_UpdateInterfaceState = function()
+{
+};
+CDocumentContentElementBase.prototype.Document_UpdateRulersState = function()
+{
+};
+CDocumentContentElementBase.prototype.GetTableProps = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.AddHyperlink = function(Props)
+{
+};
+CDocumentContentElementBase.prototype.ModifyHyperlink = function(Props)
+{
+};
+CDocumentContentElementBase.prototype.RemoveHyperlink = function()
+{
+};
+CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.AddComment = function(Comment, bStart, bEnd)
+{
+};
+CDocumentContentElementBase.prototype.CanAddComment = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
+{
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
@@ -518,10 +660,6 @@ CDocumentContentElementBase.prototype.GetSelectionState2 = function()
 CDocumentContentElementBase.prototype.SetSelectionState2 = function(State)
 {
 	return this.Set_SelectionState2(State);
-};
-CDocumentContentElementBase.prototype.IsSelectionEmpty = function(isCheckHidden)
-{
-	return this.Selection_IsEmpty(isCheckHidden);
 };
 CDocumentContentElementBase.prototype.SetReviewType = function(ReviewType)
 {

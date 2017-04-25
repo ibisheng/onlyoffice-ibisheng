@@ -112,7 +112,7 @@ var SKIP_LBL_LIMIT = 100;
             if(!oContent)
                 continue;
             oContent.Set_ApplyToAll(true);
-            var oTextPr = oContent.Get_Paragraph_TextPr();
+            var oTextPr = oContent.GetCalculatedTextPr();
             oContent.Set_ApplyToAll(false);
             if(!oResultTextPr)
             {
@@ -525,7 +525,7 @@ function checkPointInMap(map, worksheet, row, col)
 
                 oElement.tx.rich.content.Set_ApplyToAll(true);
                 var oParTextPr = new AscCommonWord.ParaTextPr(oTextPr);
-                oElement.tx.rich.content.Paragraph_Add(oParTextPr);
+                oElement.tx.rich.content.AddToParagraph(oParTextPr);
                 oElement.tx.rich.content.Set_ApplyToAll(false);
             }
             CheckParagraphTextPr(oElement.txPr.content.Content[0], oTextPr);
@@ -557,7 +557,7 @@ function checkPointInMap(map, worksheet, row, col)
             if(oElement.tx && oElement.tx.rich)
             {
                 oElement.tx.rich.content.Set_ApplyToAll(true);
-                oElement.tx.rich.content.Paragraph_IncDecFontSize(bIncrease);
+                oElement.tx.rich.content.IncreaseDecreaseFontSize(bIncrease);
                 oElement.tx.rich.content.Set_ApplyToAll(false);
 
             }
@@ -839,7 +839,7 @@ CChartSpace.prototype.getSelectionState = function()
     {
         var content = this.selection.textSelection.getDocContent();
         if(content)
-            content_selection = content.Get_SelectionState();
+            content_selection = content.GetSelectionState();
     }
     return {
         title:            this.selection.title,
@@ -878,7 +878,7 @@ CChartSpace.prototype.setSelectionState = function(state)
        {
            var content = this.selection.textSelection.getDocContent();
            if(content)
-               content.Set_SelectionState(state.contentSelection, state.contentSelection.length - 1);
+               content.SetSelectionState(state.contentSelection, state.contentSelection.length - 1);
        }
    }
 };
@@ -909,7 +909,7 @@ CChartSpace.prototype.resetInternalSelection = function(noResetContentSelect)
         if(!(noResetContentSelect === true))
         {
             var content = this.selection.textSelection.getDocContent();
-            content && content.Selection_Remove();
+            content && content.RemoveSelection();
         }
         this.selection.textSelection = null;
     }
@@ -1039,7 +1039,7 @@ CChartSpace.prototype.getParagraphTextPr = function()
     }
     else  if(this.selection.textSelection)
     {
-        return this.selection.textSelection.txBody.content.Get_Paragraph_TextPr();
+        return this.selection.textSelection.txBody.content.GetCalculatedTextPr();
     }
     else if(this.selection.axisLbls && this.selection.axisLbls.labels)
     {
@@ -1185,7 +1185,7 @@ CChartSpace.prototype.paragraphIncDecFontSize = function(bIncrease)
         var content = this.selection.textSelection.getDocContent();
         if(content)
         {
-            content.Paragraph_IncDecFontSize(bIncrease);
+            content.IncreaseDecreaseFontSize(bIncrease);
         }
         return;
     }
@@ -1219,7 +1219,7 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
             if(this.selection.title.tx && this.selection.title.tx.rich && this.selection.title.tx.rich.content)
             {
                 this.selection.title.tx.rich.content.Set_ApplyToAll(true);
-                this.selection.title.tx.rich.content.Paragraph_Add(_paraItem);
+                this.selection.title.tx.rich.content.AddToParagraph(_paraItem);
                 this.selection.title.tx.rich.content.Set_ApplyToAll(false);
             }
             return;
@@ -1236,7 +1236,7 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
 };
 CChartSpace.prototype.applyTextFunction = function(docContentFunction, tableFunction, args)
 {
-    if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && !this.selection.textSelection)
+    if(docContentFunction === CDocumentContent.prototype.AddToParagraph && !this.selection.textSelection)
     {
         this.paragraphAdd(args[0], args[1]);
         return;
@@ -5738,7 +5738,7 @@ CChartSpace.prototype.recalculateAxis = function()
 
                             var content = dlbl.tx.rich.content;
                             content.Set_ApplyToAll(true);
-                            content.Set_ParagraphAlign(AscCommon.align_Center);
+                            content.SetParagraphAlign(AscCommon.align_Center);
                             content.Set_ApplyToAll(false);
                             dlbl.txBody = dlbl.tx.rich;
                             if(cat_ax.labels.arrLabels.length > 0)
@@ -6535,7 +6535,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
                                     cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(AscCommon.align_Left);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.SetParagraphAlign(AscCommon.align_Left);
                                     cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                                     var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
@@ -6580,7 +6580,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 {
                                     var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
                                     cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                    cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(AscCommon.align_Left);
+                                    cat_ax.labels.arrLabels[i].tx.rich.content.SetParagraphAlign(AscCommon.align_Left);
                                     cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                                     var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                     w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
@@ -7173,7 +7173,7 @@ CChartSpace.prototype.recalculateAxis = function()
                                 dlbl.lastStyleObject = cat_ax.labels.arrLabels[0].lastStyleObject;
                             }
                             dlbl.tx.rich.content.Set_ApplyToAll(true);
-                            dlbl.tx.rich.content.Set_ParagraphAlign(AscCommon.align_Center);
+                            dlbl.tx.rich.content.SetParagraphAlign(AscCommon.align_Center);
                             dlbl.tx.rich.content.Set_ApplyToAll(false);
                             var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
                             var max_min_content_width = min_max.Min;
@@ -7570,7 +7570,7 @@ CChartSpace.prototype.recalculateAxis = function()
                          if(cat_ax.labels.arrLabels[i])
                          {
                          cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                         cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Center);
+                         cat_ax.labels.arrLabels[i].tx.rich.content.SetParagraphAlign(align_Center);
                          cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                          cat_ax.labels.arrLabels[i].tx.rich.content.Reset(0, 0, cat_ax.labels.extX - labels_offset, 2000);
                          cat_ax.labels.arrLabels[i].tx.rich.content.Recalculate_Page(0, true);

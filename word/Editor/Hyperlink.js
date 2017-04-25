@@ -72,11 +72,11 @@ ParaHyperlink.prototype.Copy = function(Selected)
     return NewHyperlink;
 };
 
-ParaHyperlink.prototype.Get_SelectedElementsInfo = function(Info)
+ParaHyperlink.prototype.GetSelectedElementsInfo = function(Info)
 {
     Info.Set_Hyperlink(this);
 
-    CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo.apply(this, arguments);
 };
 
 ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
@@ -114,9 +114,9 @@ ParaHyperlink.prototype.Add = function(Item)
         case para_Field:
         {
             var TextPr = this.Get_FirstTextPr();
-            Item.Select_All();
+            Item.SelectAll();
             Item.Apply_TextPr(TextPr);
-            Item.Selection_Remove();
+            Item.RemoveSelection();
 
             var CurPos = this.State.ContentPos;
             var CurItem = this.Content[CurPos];
@@ -136,12 +136,12 @@ ParaHyperlink.prototype.Add = function(Item)
                 if (para_Field === Item.Type)
                 {
                     this.State.ContentPos = CurPos + 2;
-                    this.Content[this.State.ContentPos].Cursor_MoveToStartPos(false);
+                    this.Content[this.State.ContentPos].MoveCursorToStartPos(false);
                 }
                 else
                 {
                     this.State.ContentPos = CurPos + 1;
-                    this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
+                    this.Content[this.State.ContentPos].MoveCursorToEndPos(false);
                 }
             }
             else
@@ -171,7 +171,7 @@ ParaHyperlink.prototype.Add = function(Item)
 
                 // Перемещаем кусор в конец формулы
                 this.State.ContentPos = CurPos + 1;
-                this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
+                this.Content[this.State.ContentPos].MoveCursorToEndPos(false);
             }
             else
                 this.Content[CurPos].Add(Item);
@@ -198,7 +198,7 @@ ParaHyperlink.prototype.Add = function(Item)
                 }
                 this.Add_ToContent(CurPos + Count + 1, NewItem, false);
                 this.State.ContentPos = CurPos + Count;
-                this.Content[this.State.ContentPos].Cursor_MoveToEndPos();
+                this.Content[this.State.ContentPos].MoveCursorToEndPos();
             }
 
             break;

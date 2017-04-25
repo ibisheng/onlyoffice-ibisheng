@@ -735,7 +735,7 @@ ParaComment.prototype =
     {
     },
 
-    Get_SelectedText : function(bAll, bClearText, oPr)
+	GetSelectedText : function(bAll, bClearText, oPr)
     {        
         return "";
     },
@@ -860,7 +860,7 @@ ParaComment.prototype =
     Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
     {
         if ( true === this.Start )
-            PRSI.Add_Comment( this.CommentId );
+            PRSI.AddComment( this.CommentId );
         else
             PRSI.Remove_Comment( this.CommentId );
     },
@@ -944,7 +944,7 @@ ParaComment.prototype =
     Draw_HighLights : function(PDSH)
     {
         if ( true === this.Start )
-            PDSH.Add_Comment( this.CommentId );
+            PDSH.AddComment( this.CommentId );
         else
             PDSH.Remove_Comment( this.CommentId );
     },
@@ -979,11 +979,11 @@ ParaComment.prototype =
         return true;
     },
 
-    Cursor_MoveToStartPos : function()
+	MoveCursorToStartPos : function()
     {
     },
 
-    Cursor_MoveToEndPos : function(SelectFromEnd)
+	MoveCursorToEndPos : function(SelectFromEnd)
     {
     },
 
@@ -1081,11 +1081,11 @@ ParaComment.prototype =
     {
     },
 
-    Selection_Remove : function()
+	RemoveSelection : function()
     {
     },
 
-    Select_All : function(Direction)
+	SelectAll : function(Direction)
     {
     },
 
@@ -1093,7 +1093,7 @@ ParaComment.prototype =
     {
     },
 
-    Selection_IsEmpty : function(CheckEnd)
+	IsSelectionEmpty : function(CheckEnd)
     {
         return true;
     },

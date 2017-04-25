@@ -181,7 +181,7 @@ function CGroupShape()
                 oMatrix = this.selection.textSelection.transformText.CreateDublicate();
             }
             this.getDrawingDocument().UpdateTargetTransform(oMatrix);
-            this.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+            this.selection.textSelection.getDocContent().DrawSelectionOnPage(pageIndex);
         }
         else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
         {
@@ -190,7 +190,7 @@ function CGroupShape()
                 oMatrix = this.selection.chartSelection.selection.textSelection.transformText.CreateDublicate();
             }
             this.getDrawingDocument().UpdateTargetTransform(oMatrix);
-            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+            this.selection.chartSelection.selection.textSelection.getDocContent().DrawSelectionOnPage(pageIndex);
         }
     };
 
@@ -749,7 +749,7 @@ function CGroupShape()
             var i;
             if(paraItem.Type === para_TextPr)
             {
-                AscFormat.DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate], CTable.prototype.Paragraph_Add);
+                AscFormat.DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.AddToParagraph, [paraItem, bRecalculate], CTable.prototype.AddToParagraph);
             }
             else if(this.selectedObjects.length === 1
                 && this.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape
@@ -834,17 +834,6 @@ function CGroupShape()
             }
         }
         return bRet;
-    };
-
-    CGroupShape.prototype.Paragraph_IncDecFontSizeAll = function(val)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            if(typeof this.spTree[i].Paragraph_IncDecFontSizeAll === "function")
-            {
-                this.spTree[i].Paragraph_IncDecFontSizeAll(val);
-            }
-        }
     };
 
     CGroupShape.prototype.changeSize = function(kw, kh)
@@ -982,7 +971,7 @@ function CGroupShape()
         {
             selection_state.textObject = this.selection.textSelection;
             selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
-            selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
+            selection_state.textSelection = this.selection.textSelection.getDocContent().GetSelectionState();
         }
         else if(this.selection.chartSelection)
         {
@@ -1008,7 +997,7 @@ function CGroupShape()
         {
             this.selectObject(selection_state.textObject, selection_state.selectStartPage);
             this.selection.textSelection = selection_state.textObject;
-            selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+            selection_state.textObject.getDocContent().SetSelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
         }
         else if(selection_state.chartSelection)
         {
@@ -1287,6 +1276,26 @@ function CGroupShape()
             if(this.spTree[i].setPaddings)
             {
                 this.spTree[i].setPaddings(paddings);
+            }
+        }
+    };
+
+    CGroupShape.prototype.setColumnNumber = function(num){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setColumnNumber)
+            {
+                this.spTree[i].setColumnNumber(num);
+            }
+        }
+    };
+
+    CGroupShape.prototype.setColumnSpace = function(spcCol){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setColumnSpace)
+            {
+                this.spTree[i].setColumnSpace(spcCol);
             }
         }
     };
