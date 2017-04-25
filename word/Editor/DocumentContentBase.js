@@ -683,6 +683,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 						// ним элемент не таблица, удаляем его
 						this.Internal_Content_Remove(this.CurPos.ContentPos, 1);
 						this.CurPos.ContentPos--;
+						this.Content[this.CurPos.ContentPos].MoveCursorToEndPos(false, false);
 					}
 				}
 			}
@@ -700,4 +701,8 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 		}
 	}
 
+};
+CDocumentContentBase.prototype.IsBlockLevelSdtContent = function()
+{
+	return false;
 };

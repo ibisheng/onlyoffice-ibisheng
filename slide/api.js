@@ -2372,6 +2372,20 @@ background-repeat: no-repeat;\
 				this.UpdateInterfaceState();
 		}
 	};
+    asc_docs_api.prototype.put_TextPrLang = function(value)
+    {
+        if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+        {
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextLang);
+            this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Lang : {Val : value}}));
+
+            this.WordControl.m_oLogicDocument.Spelling.Check_CurParas();
+
+            //if (true === this.isMarkerFormat)
+            //    this.sync_MarkerFormatCallback(false);
+        }
+    };
+
 	asc_docs_api.prototype.put_TextPrBold             = function(value)
 	{
 		if (editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
@@ -5415,7 +5429,7 @@ background-repeat: no-repeat;\
 
     asc_docs_api.prototype.asc_setDefaultLanguage = function(Lang)
     {
-        if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
+        if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_PresDefaultLang))
         {
             History.Create_NewPoint(AscDFH.historydescription_Document_SetDefaultLanguage);
             editor.WordControl.m_oLogicDocument.Set_DefaultLanguage(Lang);
@@ -6763,6 +6777,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['sync_SearchEndCallback']              = asc_docs_api.prototype.sync_SearchEndCallback;
 	asc_docs_api.prototype['put_TextPrFontName']                  = asc_docs_api.prototype.put_TextPrFontName;
 	asc_docs_api.prototype['put_TextPrFontSize']                  = asc_docs_api.prototype.put_TextPrFontSize;
+	asc_docs_api.prototype['put_TextPrLang']                  	= asc_docs_api.prototype.put_TextPrLang;
 	asc_docs_api.prototype['put_TextPrBold']                      = asc_docs_api.prototype.put_TextPrBold;
 	asc_docs_api.prototype['put_TextPrItalic']                    = asc_docs_api.prototype.put_TextPrItalic;
 	asc_docs_api.prototype['put_TextPrUnderline']                 = asc_docs_api.prototype.put_TextPrUnderline;
