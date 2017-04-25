@@ -4042,11 +4042,12 @@ CDocument.prototype.GetChartObject = function(type)
 };
 CDocument.prototype.AddInlineTable = function(Cols, Rows)
 {
-	// TODO: Пересчет нужно перенести сюда, и убрать из контроллеров
 	if (Cols <= 0 || Rows <= 0)
 		return;
 
 	this.Controller.AddInlineTable(Cols, Rows);
+
+	this.Recalculate();
 
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateInterfaceState();
