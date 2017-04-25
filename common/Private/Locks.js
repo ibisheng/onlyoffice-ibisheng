@@ -821,6 +821,8 @@ if(typeof CPresentation !== "undefined")
                     "val": this.defaultTextStyleLock.Get_Id(),
                     "guid": this.defaultTextStyleLock.Get_Id()
                 };
+
+            this.defaultTextStyleLock.Lock.Check(check_obj);
         }
 
         var bResult = AscCommon.CollaborativeEditing.OnEnd_CheckLock();
