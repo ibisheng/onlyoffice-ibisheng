@@ -4897,7 +4897,7 @@ function UniNvPr()
     this.cNvPr = new CNvPr();
     this.UniPr = null;
     this.nvPr = new NvPr();
-    this.nvUniSpPr = CNvUniSpPr();
+    this.nvUniSpPr = new CNvUniSpPr();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
