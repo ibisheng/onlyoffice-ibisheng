@@ -4724,6 +4724,16 @@
 			return element.intersection(range);
 		});
 	};
+	Worksheet.prototype.getPivotTable = function (col, row) {
+		var res = null;
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			if (this.pivotTables[i].contains(col, row)) {
+				res = this.pivotTables[i];
+				break;
+			}
+		}
+		return res;
+	};
 //-------------------------------------------------------------------------------------------------
 	/**
 	 * @constructor

@@ -2556,6 +2556,9 @@ CT_pivotTableDefinition.prototype.toXml = function(writer) {
 CT_pivotTableDefinition.prototype.intersection = function (range) {
 	return this.location && this.location.intersection(range);
 };
+CT_pivotTableDefinition.prototype.contains = function (col, row) {
+	return this.location && this.location.contains(col, row);
+};
 function CT_CacheSource() {
 //Attributes
 	this.type = null;
@@ -3868,6 +3871,9 @@ CT_Location.prototype.intersection = function (range) {
 	return this.ref && (Array.isArray(range) ? range.some(function (element) {
 			return t.ref.intersectionSimple(element);
 		}) : this.ref.intersectionSimple(range));
+};
+CT_Location.prototype.contains = function (col, row) {
+	return this.ref && this.ref.contains(col, row);
 };
 function CT_PivotFields() {
 //Attributes

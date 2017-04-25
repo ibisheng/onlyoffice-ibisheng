@@ -7095,6 +7095,8 @@
 			}
 		}
 
+		cell_info.pivotTableInfo = this.model.getPivotTable(c1, r1);
+
         return cell_info;
 	};
 
