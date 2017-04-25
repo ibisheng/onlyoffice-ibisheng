@@ -1099,7 +1099,11 @@
 		mergeFormatting: 17,
 
 		uniteList: 18,
-		doNotUniteList: 19
+		doNotUniteList: 19,
+
+		insertAsNestedTable: 20,
+		uniteIntoTable: 21,
+		insertAsNewRows: 22
 	};
 	
 	//------------------------------------------------------------export--------------------------------------------------

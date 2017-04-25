@@ -2056,14 +2056,29 @@ PasteProcessor.prototype =
 			//TODO пересмотреть pasteTypeContent
 			this.pasteTypeContent = null;
 			var oSelectedContent = new CSelectedContent();
-            for (var i = 0, length = aNewContent.length; i < length; ++i) {
-                var oSelectedElement = new CSelectedElement();
-                oSelectedElement.Element = aNewContent[i];
-				
+            for (var i = 0; i < aNewContent.length; ++i) {
 				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
 				{
-					this._specialPasteItemConvert(aNewContent[i]);
+					var parseItem = this._specialPasteItemConvert(aNewContent[i]);
+					if(parseItem && parseItem.length)
+					{
+						for(var j = 0; j < parseItem.length; j++)
+						{
+							if(j === 0)
+							{
+								aNewContent.splice(i + j, 1, parseItem[j]);
+							}
+							else
+							{
+								aNewContent.splice(i + j, 0, parseItem[j]);
+							}
+						}
+
+					}
 				}
+
+				var oSelectedElement = new CSelectedElement();
+				oSelectedElement.Element = aNewContent[i];
 
 				var type = this._specialPasteGetElemType(aNewContent[i]);
 				if(0 === i)
@@ -2184,7 +2199,6 @@ PasteProcessor.prototype =
 		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
 		{
 			specialPasteShowOptions = new SpecialPasteShowOptions();
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
 
 			var sProps = Asc.c_oSpecialPasteProps;
 
@@ -2197,25 +2211,34 @@ PasteProcessor.prototype =
 				insertToElem = document.Content[curDocSelection[1].CurPos.ContentPos];
 			}
 
-			var props;
-			if(insertToElem && 1 === aContent.length && type_Table === this.aContent[0].GetType() && type_Table === insertToElem.GetType())//table into table
+			var props = null;
+			//table into table
+			//this.pasteTypeContent и this.pasteList нужны для вставки таблиц/списков и тд
+			//TODO пока вставка будет работать только с текстом(форматированный/не форматированный)
+			if(insertToElem && 1 === aContent.length && type_Table === this.aContent[0].GetType() && type_Table === insertToElem.GetType())
 			{
-				props = [sProps.paste, sProps.pasteOnlyValues];
+				//props = [sProps.paste, sProps.insertAsNestedTable, sProps.uniteIntoTable, sProps.insertAsNewRows, sProps.pasteOnlyValues];
 			}
 			else if(this.pasteList && insertToElem && type_Paragraph === insertToElem.GetType() && insertToElem.Pr && insertToElem.Pr.NumPr && insertToElem.Pr.NumPr.Is_Equal(this.pasteList))
 			{
 				//вставка нумерованного списка в нумерованный список
-				props = [sProps.paste, sProps.uniteList, sProps.doNotUniteList];
+				//props = [sProps.paste, sProps.uniteList, sProps.doNotUniteList];
 			}
 			else
 			{
 				props = [sProps.paste, sProps.mergeFormatting, sProps.pasteOnlyValues];
 			}
-			
-			specialPasteShowOptions.asc_setOptions(props);
 
-			console.log(this.pasteTypeContent);
-			console.log(this.pasteList);
+			if(null !== props)
+			{
+				specialPasteShowOptions.asc_setOptions(props);
+			}
+			else
+			{
+				specialPasteShowOptions = null;
+			}
+
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = specialPasteShowOptions;
 		}
 
 		if(specialPasteShowOptions)
@@ -2225,7 +2248,7 @@ PasteProcessor.prototype =
 			var _X = cursorPos.X;
 			var _PageNum = this.oLogicDocument.CurPage;
 
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum:_PageNum};
+			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum: _PageNum};
 
 			var _сoord = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
 			var curCoord = new AscCommon.asc_CRect( _сoord.X, _сoord.Y, 0, 0 );
@@ -2258,20 +2281,28 @@ PasteProcessor.prototype =
 		//TODO временная функция
 		var res = table;
 
-		for(var i = 0; i < table.Content.length; i++)
+		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+		if(props === Asc.c_oSpecialPasteProps.pasteOnlyValues)
 		{
-			for(var j = 0; j < table.Content[i].Content.length; j++)
+			res = this._convertTableToText(table);
+		}
+		else
+		{
+			for(var i = 0; i < table.Content.length; i++)
 			{
-				var cDocumentContent = table.Content[i].Content[j].Content;
-				for(var n = 0; n < cDocumentContent.Content.length; n++)
+				for(var j = 0; j < table.Content[i].Content.length; j++)
 				{
-					if(cDocumentContent.Content[n] instanceof Paragraph)
+					var cDocumentContent = table.Content[i].Content[j].Content;
+					for(var n = 0; n < cDocumentContent.Content.length; n++)
 					{
-						this._specialPasteParagraphConvert(cDocumentContent.Content[n]);
-					}
-					else if(cDocumentContent.Content[n] instanceof CTable)
-					{
-						this._specialPasteTableConvert(cDocumentContent.Content[n]);
+						if(cDocumentContent.Content[n] instanceof Paragraph)
+						{
+							this._specialPasteParagraphConvert(cDocumentContent.Content[n]);
+						}
+						else if(cDocumentContent.Content[n] instanceof CTable)
+						{
+							this._specialPasteTableConvert(cDocumentContent.Content[n]);
+						}
 					}
 				}
 			}
@@ -2355,7 +2386,102 @@ PasteProcessor.prototype =
 		
 		return res;
 	},
-	
+
+	_convertTableToText: function(table, obj)
+	{
+		var oDoc = this.oLogicDocument;
+
+		var addTextToRun = function(oCurRun, value)
+		{
+			for(var k = 0, length = value.length; k < length; k++)
+			{
+				var nUnicode = null;
+				var nCharCode = value.charCodeAt(k);
+				if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
+					if (k + 1 < length) {
+						k++;
+						var nTrailingChar = value.charCodeAt(k);
+						nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+					}
+				}
+				else
+					nUnicode = nCharCode;
+				if (null != nUnicode) {
+					var Item;
+					if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
+						Item = new ParaText();
+						Item.Set_CharCode(nUnicode);
+					}
+					else
+						Item = new ParaSpace();
+
+					//add text
+					oCurRun.Add_ToContent(k, Item, false);
+				}
+			}
+		};
+
+
+		if(!obj)
+		{
+			obj = [];
+		}
+		//row
+		for(var i = 0; i < table.Content.length; i++)
+		{
+			var newParagraph = new Paragraph(oDoc.DrawingDocument, oDoc);
+
+			//col
+			for(var j = 0; j < table.Content[i].Content.length; j++)
+			{
+				//content
+				var cDocumentContent = table.Content[i].Content[j].Content;
+				var bIsPreviousTable = false;
+				var isAddParagraph = false;
+				for(var n = 0; n < cDocumentContent.Content.length; n++)
+				{
+					if(bIsPreviousTable)
+					{
+						newParagraph = new Paragraph(oDoc.DrawingDocument, oDoc);
+						bIsPreviousTable = false;
+					}
+					if(cDocumentContent.Content[n] instanceof Paragraph)
+					{
+						var value = cDocumentContent.Content[n].GetText();
+						var newParaRun = new ParaRun();
+
+						addTextToRun(newParaRun, value);
+
+						isAddParagraph = true;
+
+						newParagraph.Internal_Content_Add(j, newParaRun, false);
+
+						/*if(isAddParagraph)
+						{
+							obj.push(newParagraph);
+							isAddParagraph = false;
+						}
+						bIsPreviousTable = true;*/
+					}
+					else if(cDocumentContent.Content[n] instanceof CTable)
+					{
+						if(isAddParagraph)
+						{
+							obj.push(newParagraph);
+							isAddParagraph = false;
+						}
+						bIsPreviousTable = true;
+						this._convertTableToText(cDocumentContent.Content[n], obj);
+					}
+				}
+			}
+
+			obj.push(newParagraph);
+		}
+
+		return obj;
+	},
+
 	InsertInPlacePresentation: function(aNewContent)
 	{
 		var presentation = editor.WordControl.m_oLogicDocument;
