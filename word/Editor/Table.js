@@ -5176,26 +5176,24 @@ CTable.prototype.SetSelectionUse = function(isUse)
 };
 CTable.prototype.SetSelectionToBeginEnd = function(isSelectionStart, isElementStart)
 {
+	var Pos;
 	if (false === isElementStart)
 	{
 		var Row  = this.Content.length - 1;
 		var Cell = this.Content[Row].Get_CellsCount() - 1;
-		var Pos  = {Row : Row, Cell : Cell};
 
-		if (isSelectionStart > 0)
-			this.Selection.EndPos.Pos = Pos;
-		else
-			this.Selection.StartPos.Pos = Pos;
+		Pos = {Row : Row, Cell : Cell};
 	}
 	else
 	{
-		var Pos = {Row : 0, Cell : 0};
-
-		if (isSelectionStart > 0)
-			this.Selection.StartPos.Pos = Pos;
-		else
-			this.Selection.EndPos.Pos = Pos;
+		Pos = {Row : 0, Cell : 0};
 	}
+
+	if (isSelectionStart)
+		this.Selection.StartPos.Pos = Pos;
+	else
+		this.Selection.EndPos.Pos = Pos;
+
 
 	this.Internal_Selection_UpdateCells();
 };
