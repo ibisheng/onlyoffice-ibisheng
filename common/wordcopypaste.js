@@ -2390,42 +2390,33 @@ PasteProcessor.prototype =
 	_convertTableToText: function(table, obj)
 	{
 		var oDoc = this.oLogicDocument;
-
-		var addTextToRun = function(oCurRun, value)
-		{
-			for(var k = 0, length = value.length; k < length; k++)
-			{
-				var nUnicode = null;
-				var nCharCode = value.charCodeAt(k);
-				if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
-					if (k + 1 < length) {
-						k++;
-						var nTrailingChar = value.charCodeAt(k);
-						nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
-					}
-				}
-				else
-					nUnicode = nCharCode;
-				if (null != nUnicode) {
-					var Item;
-					if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
-						Item = new ParaText();
-						Item.Set_CharCode(nUnicode);
-					}
-					else
-						Item = new ParaSpace();
-
-					//add text
-					oCurRun.Add_ToContent(k, Item, false);
-				}
-			}
-		};
-
-
+		var t = this;
 		if(!obj)
 		{
 			obj = [];
 		}
+
+		/*var parseDocumentContent = function(cDocumentContent, newParagraph, addPararunNum)
+		{
+			for(var n = 0; n < cDocumentContent.Content.length; n++)
+			{
+				if(cDocumentContent.Content[n] instanceof Paragraph)
+				{
+					var value = cDocumentContent.Content[n].GetText();
+					var newParaRun = new ParaRun();
+
+					t._addTextIntoRun(newParaRun, value);
+
+					newParagraph.Internal_Content_Add(addPararunNum, newParaRun, false);
+				}
+				else if(cDocumentContent.Content[n] instanceof CTable)
+				{
+					t._convertTableToText(cDocumentContent.Content[n], obj);
+				}
+			}
+		};*/
+
+
 		//row
 		for(var i = 0; i < table.Content.length; i++)
 		{
@@ -2436,50 +2427,78 @@ PasteProcessor.prototype =
 			{
 				//content
 				var cDocumentContent = table.Content[i].Content[j].Content;
-				var bIsPreviousTable = false;
-				var isAddParagraph = false;
+				//parseDocumentContent(cDocumentContent, newParagraph, j);
+
+				//TODO нужно поправить проблему с внутренними таблицами
+				var createNewParagraph = false;
+				var previousTableAdd = false;
 				for(var n = 0; n < cDocumentContent.Content.length; n++)
 				{
-					if(bIsPreviousTable)
+					previousTableAdd = false;
+					if(createNewParagraph)
 					{
 						newParagraph = new Paragraph(oDoc.DrawingDocument, oDoc);
-						bIsPreviousTable = false;
+						createNewParagraph = false;
 					}
+
 					if(cDocumentContent.Content[n] instanceof Paragraph)
 					{
 						var value = cDocumentContent.Content[n].GetText();
 						var newParaRun = new ParaRun();
 
-						addTextToRun(newParaRun, value);
-
-						isAddParagraph = true;
+						t._addTextIntoRun(newParaRun, value);
 
 						newParagraph.Internal_Content_Add(j, newParaRun, false);
-
-						/*if(isAddParagraph)
-						{
-							obj.push(newParagraph);
-							isAddParagraph = false;
-						}
-						bIsPreviousTable = true;*/
 					}
 					else if(cDocumentContent.Content[n] instanceof CTable)
 					{
-						if(isAddParagraph)
-						{
-							obj.push(newParagraph);
-							isAddParagraph = false;
-						}
-						bIsPreviousTable = true;
-						this._convertTableToText(cDocumentContent.Content[n], obj);
+						t._convertTableToText(cDocumentContent.Content[n], obj);
+						previousTableAdd = true;
+					}
+
+					if(!previousTableAdd && cDocumentContent.Content.length > 1 && n !== cDocumentContent.Content.length - 1)
+					{
+						obj.push(newParagraph);
+						createNewParagraph = true;
 					}
 				}
+
 			}
 
 			obj.push(newParagraph);
 		}
 
 		return obj;
+	},
+
+	_addTextIntoRun: function(oCurRun, value)
+	{
+		for(var k = 0, length = value.length; k < length; k++)
+		{
+			var nUnicode = null;
+			var nCharCode = value.charCodeAt(k);
+			if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
+				if (k + 1 < length) {
+					k++;
+					var nTrailingChar = value.charCodeAt(k);
+					nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
+				}
+			}
+			else
+				nUnicode = nCharCode;
+			if (null != nUnicode) {
+				var Item;
+				if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
+					Item = new ParaText();
+					Item.Set_CharCode(nUnicode);
+				}
+				else
+					Item = new ParaSpace();
+
+				//add text
+				oCurRun.Add_ToContent(k, Item, false);
+			}
+		}
 	},
 
 	InsertInPlacePresentation: function(aNewContent)
