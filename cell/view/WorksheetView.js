@@ -8570,7 +8570,7 @@
                         range.setFontcolor(val);
                         break;
                     case "bc":
-                        range.setFill((val) ? (val) : null);
+                        range.setFill(val || null);
                         break; // ToDo можно делать просто отрисовку
                     case "wrap":
                         range.setWrap(val);
@@ -8817,8 +8817,10 @@
         if ("paste" === prop && val.onlyImages === true) {
             onSelectionCallback();
         } else {
-			if (this.model.inPivotTable(checkRange)) {
-				this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
+			if (("merge" === prop || "paste" === prop || "sort" === prop || "empty" === prop || "hyperlink" === prop ||
+				"rh" === prop) && this.model.inPivotTable(checkRange)) {
+				this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+					c_oAscError.Level.NoCritical);
 				return;
             }
 
