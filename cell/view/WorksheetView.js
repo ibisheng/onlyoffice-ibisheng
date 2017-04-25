@@ -8476,7 +8476,7 @@
         }
     };
 
-    WorksheetView.prototype.setSelectionInfo = function (prop, val, onlyActive, fromBinary) {
+    WorksheetView.prototype.setSelectionInfo = function (prop, val, onlyActive) {
         // Проверка глобального лока
         if (this.collaborativeEditing.getGlobalLock()) {
             return;
@@ -8717,7 +8717,7 @@
 						var clipboardBase = window['AscCommon'].g_clipboardBase;
 						clipboardBase.specialPasteProps = clipboardBase.specialPasteProps ? clipboardBase.specialPasteProps : new Asc.SpecialPasteProps();
 					
-                        t._loadDataBeforePaste(isLargeRange, fromBinary, val, bIsUpdate, canChangeColWidth);
+                        t._loadDataBeforePaste(isLargeRange, val.fromBinary, val.data, bIsUpdate, canChangeColWidth);
                         bIsUpdate = false;
                         break;
                     case "hyperlink":
@@ -8767,7 +8767,7 @@
             }
 
 			//в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
-			if (prop !== "paste" || (prop === "paste" && fromBinary)) {
+			if (prop !== "paste" || (prop === "paste" && val.fromBinary)) {
 				History.EndTransaction();
 				AscCommonExcel.g_clipboardExcel.end_paste();
 			}
@@ -8779,13 +8779,7 @@
 		}
 
 		if ("paste" === prop && val.onlyImages !== true) {
-			var newRange;
-			if (fromBinary) {
-				newRange = this._pasteFromBinary(val, true);
-			} else {
-				newRange = this._pasteFromHTML(val, true);
-			}
-
+			var newRange = val.fromBinary ? this._pasteFromBinary(val.data, true) : this._pasteFromHTML(val.data, true);
 			var g_clipboardBase = window['AscCommon'].g_clipboardBase;
 			if (!AscCommonExcel.g_clipboardExcel.specialPasteStart) {
 				g_clipboardBase.specialPasteUndoData.data =
