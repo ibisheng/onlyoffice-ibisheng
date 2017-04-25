@@ -201,9 +201,9 @@ CDocumentContent.prototype.Copy3           = function(Parent)//для загол
 //-----------------------------------------------------------------------------------
 // Функции, к которым идет обращение из контента
 //-----------------------------------------------------------------------------------
-CDocumentContent.prototype.Get_PageContentStartPos  = function(PageNum)
+CDocumentContent.prototype.Get_PageContentStartPos = function(PageNum)
 {
-    return this.Parent.Get_PageContentStartPos(PageNum);
+	return this.Parent.Get_PageContentStartPos(PageNum);
 };
 CDocumentContent.prototype.Get_PageContentStartPos2 = function(StartPageIndex, StartColumnIndex, ElementPageIndex, ElementIndex)
 {
@@ -608,8 +608,7 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
     var StartPos;
     if (0 === PageIndex)
     {
-        StartPos =
-        {
+        StartPos = {
             X      : this.X,
             Y      : this.Y,
             XLimit : this.XLimit,
@@ -618,7 +617,7 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
     }
     else
     {
-        StartPos = this.Get_PageContentStartPos(PageIndex);
+		StartPos = this.Get_PageContentStartPos(PageIndex);
     }
 
     this.Pages[PageIndex].Update_Limits(StartPos);

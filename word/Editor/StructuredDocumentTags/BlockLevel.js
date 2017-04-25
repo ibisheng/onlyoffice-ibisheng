@@ -676,9 +676,12 @@ CBlockLevelSdt.prototype.Is_InTable = function(bReturnTopTable)
 {
 	return this.Parent.Is_InTable(bReturnTopTable);
 };
-CBlockLevelSdt.prototype.Get_PageContentStartPos = function(PageIndex, ElementIndex)
+CBlockLevelSdt.prototype.Get_PageContentStartPos = function(CurPage)
 {
-	return this.Parent.Get_PageContentStartPos(PageIndex, ElementIndex);
+	var StartPage   = this.Get_AbsolutePage(0);
+	var StartColumn = this.Get_AbsoluteColumn(0);
+
+	return this.Parent.Get_PageContentStartPos2(StartPage, StartColumn, CurPage, this.Index);
 };
 CBlockLevelSdt.prototype.CheckTableCoincidence = function(Table)
 {
