@@ -1419,7 +1419,7 @@
 		this.aCommentsCoords = [];
 		this.aWorksheets = [];
 		this.aWorksheetsById = {};
-		this.pivotCaches = [];
+		this.pivotCaches = {};
 		this.aCollaborativeActions = [];
 		this.bCollaborativeChanges = false;
 		this.bUndoChanges = false;

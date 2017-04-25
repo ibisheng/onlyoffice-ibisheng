@@ -178,7 +178,11 @@
         BookViews: 1,
         WorkbookView: 2,
         DefinedNames: 3,
-        DefinedName: 4
+        DefinedName: 4,
+		ExternalReferences: 5,
+		ExternalReference: 6,
+		PivotCaches: 7,
+		PivotCache: 8
     };
     /** @enum */
     var c_oSerWorkbookPrTypes =
@@ -227,7 +231,8 @@
         SheetViews: 22,
         SheetView: 23,
         SheetPr: 24,
-        SparklineGroups: 25
+        SparklineGroups: 25,
+		PivotTable: 26
     };
     /** @enum */
     var c_oSerWorksheetPropTypes =
@@ -704,6 +709,14 @@
 	var c_oSer_AltTextTable = {
 		AltText: 0,
 		AltTextSummary: 1
+	};
+	/** @enum */
+	var c_oSer_PivotTypes = {
+		id: 0,
+		cache: 1,
+		record: 2,
+		cacheId: 3,
+		table: 4
 	};
 	/** @enum */
     var EBorderStyle =
@@ -2224,6 +2237,16 @@
 
             //DefinedNames
             this.bs.WriteItem(c_oSerWorkbookTypes.DefinedNames, function(){oThis.WriteDefinedNames();});
+
+			//PivotCaches
+			var isEmpty = true;
+			for (var id in wb.pivotCaches) {
+				isEmpty = false;
+				break;
+			}
+			if(!isEmpty){
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function(){oThis.WritePivotCaches();});
+			}
         };
         this.WriteWorkbookPr = function()
         {
@@ -2294,6 +2317,29 @@
                 this.memory.WriteBool(oDefinedName.Hidden);
             }
         };
+		this.WritePivotCaches = function() {
+			var oThis = this;
+			for (var id in wb.pivotCaches) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCache, function(){oThis.WritePivotCache(id, wb.pivotCaches[id]);});
+			}
+		};
+		this.WritePivotCache = function(id, pivotCache) {
+			var oThis = this;
+			var oldId = pivotCache.id;
+			pivotCache.id = null;
+			this.bs.WriteItem(c_oSer_PivotTypes.id, function() {
+				oThis.memory.WriteLong(id - 0);
+			});
+			this.bs.WriteItem(c_oSer_PivotTypes.cache, function() {
+				pivotCache.toXml(oThis.memory);
+			});
+			if (pivotCache.cacheRecords) {
+				this.bs.WriteItem(c_oSer_PivotTypes.record, function() {
+					pivotCache.cacheRecords.toXml(oThis.memory);
+				});
+			}
+			pivotCache.id = oldId;
+		};
     }
     function BinaryWorksheetsTableWriter(memory, wb, oSharedStrings, aDxfs, aXfs, aFonts, aFills, aBorders, aNums, idWorksheet, isCopyPaste)
     {
@@ -2450,6 +2496,9 @@
             }
 			for (var i = 0; i < ws.aConditionalFormatting.length; ++i) {
 				this.bs.WriteItem(c_oSerWorksheetsTypes.ConditionalFormatting, function(){oThis.WriteConditionalFormatting(ws.aConditionalFormatting[i]);});
+			}
+			for (var i = 0; i < ws.pivotTables.length; ++i) {
+				this.bs.WriteItem(c_oSerWorksheetsTypes.PivotTable, function(){oThis.WritePivotTable(ws.pivotTables[i])});
 			}
         };
         this.WriteWorksheetProp = function(ws, index)
@@ -3886,6 +3935,14 @@
 				this.memory.WriteByte(c_oSer_Sparkline.SparklineSqRef);
                 this.memory.WriteString2(oSparkline.sqref.getName());
 			}
+		}
+		this.WritePivotTable = function(pivotTable)
+		{
+			var oThis = this;
+			if (null != pivotTable.cacheId) {
+				this.bs.WriteItem(c_oSer_PivotTypes.cacheId, function() {oThis.memory.WriteLong(pivotTable.cacheId);});
+			}
+			this.bs.WriteItem(c_oSer_PivotTypes.table, function() {pivotTable.toXml(oThis.memory);});
 		}
     }
     /** @constructor */
