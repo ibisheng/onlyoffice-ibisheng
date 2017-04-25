@@ -1098,6 +1098,7 @@
 				var oBinaryFileReader = new AscCommonExcel.BinaryFileReader(true);
 				var tempWorkbook = new AscCommonExcel.Workbook();
 				var t = this;
+				var newFonts;
 				
 				pptx_content_loader.Start_UseFullUrl();
 				oBinaryFileReader.Read(base64, tempWorkbook);
@@ -1137,7 +1138,7 @@
                         else if(!(window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
                         {
                             
-							var newFonts = {};
+							newFonts = {};
 							for(var i = 0; i < pasteData.Drawings.length; i++)
 							{
 								pasteData.Drawings[i].graphicObject.getAllFonts(newFonts);
@@ -1178,10 +1179,10 @@
 						}
 						else if(this._checkPasteFromBinaryExcel(worksheet, true, pasteData))
 						{
-							var newFonts = {};
+							newFonts = {};
 							pasteData.generateFontMap(newFonts);
 							worksheet._loadFonts(newFonts, function() {
-								worksheet.setSelectionInfo('paste', pasteData, false, true);
+								worksheet.setSelectionInfo('paste', {data: pasteData, fromBinary: true});
 							});
 						}
 					}
@@ -2665,7 +2666,7 @@
 				var aResult = this._getTableFromText(worksheet, text);
 				if(aResult && !(aResult.onlyImages && window["Asc"]["editor"] && window["Asc"]["editor"].isChartEditor))
 				{
-					worksheet.setSelectionInfo('paste', aResult, this);
+					worksheet.setSelectionInfo('paste', {data: aResult});
 				}
 			},
 			
@@ -2981,7 +2982,7 @@
 				this.aResult.props._images = pasteData.images && pasteData.images.length ? pasteData.images : this.aResult.props._images;
 				this.aResult.props._aPastedImages = pasteData.aPastedImages && pasteData.aPastedImages.length ? pasteData.aPastedImages : this.aResult.props._aPastedImages;
 				
-				worksheet.setSelectionInfo('paste', this.aResult, this);
+				worksheet.setSelectionInfo('paste', {data: this.aResult});
 			},
 			
 			_parseChildren: function(children)
