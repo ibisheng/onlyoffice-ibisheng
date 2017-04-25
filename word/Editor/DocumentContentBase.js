@@ -702,3 +702,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 	}
 
 };
+CDocumentContentBase.prototype.IsBlockLevelSdtContent = function()
+{
+	return false;
+};

@@ -82,6 +82,8 @@ CBlockLevelSdt.prototype.Reset = function(X, Y, XLimit, YLimit, PageAbs, ColumnA
 };
 CBlockLevelSdt.prototype.Recalculate_Page = function(CurPage)
 {
+	this.Content.RecalcInfo = this.Parent.RecalcInfo;
+
 	var RecalcResult = this.Content.Recalculate_Page(CurPage, true);
 
 	if (recalcresult2_End === RecalcResult)
@@ -686,6 +688,18 @@ CBlockLevelSdt.prototype.Get_PageContentStartPos = function(CurPage)
 CBlockLevelSdt.prototype.CheckTableCoincidence = function(Table)
 {
 	return this.Parent.CheckTableCoincidence(Table);
+};
+CBlockLevelSdt.prototype.CheckRange = function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, CurPage, Inner, bMathWrap)
+{
+	if (true === Inner)
+	{
+		var PageRel = this.Get_AbsolutePage(CurPage) - this.Get_AbsolutePage(0) + this.Get_StartPage_Relative();
+		return this.Parent.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageRel, Inner, bMathWrap);
+	}
+	else
+	{
+		return this.Content.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, CurPage, Inner, bMathWrap);
+	}
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

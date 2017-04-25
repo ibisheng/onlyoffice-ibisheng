@@ -1098,8 +1098,12 @@ ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimi
 		this.PositionV.Percent      = this.PositionV_Old.Percent2;
 	}
 
+	var oDocumentContent = this.Parent.Parent;
+	if (oDocumentContent && oDocumentContent.IsBlockLevelSdtContent())
+		oDocumentContent = oDocumentContent.Parent.Parent;
+
 	this.Parent          = Paragraph;
-	this.DocumentContent = this.Parent.Parent;
+	this.DocumentContent = oDocumentContent;
 	var PageNum          = ParaLayout.PageNum;
 
 	var OtherFlowObjects = editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatObjectsOnPage(PageNum, this.Parent.Parent);

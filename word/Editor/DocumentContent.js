@@ -307,22 +307,31 @@ CDocumentContent.prototype.Get_EmptyHeight          = function()
     else
         return 0;
 };
-// Inner = true  - запрос пришел из содержимого,
-//         false - запрос пришел от родительского класса
-// Запрос от родительского класса нужен, например, для колонтитулов, потому
-// что у них врапится текст не колонтитула, а документа.
-CDocumentContent.prototype.CheckRange                      = function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel, Inner, bMathWrap)
+/**
+ * Inner = true  - запрос пришел из содержимого,
+ *         false - запрос пришел от родительского класса
+ *         Запрос от родительского класса нужен, например, для колонтитулов, потому
+ *         что у них врапится текст не колонтитула, а документа.
+ */
+CDocumentContent.prototype.CheckRange = function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, CurPage, Inner, bMathWrap)
 {
-    if (this.LogicDocument && typeof(editor) !== "undefined" && editor.isDocumentEditor)
-    {
-        if (undefined === Inner)
-            Inner = true;
+	if (undefined === Inner)
+		Inner = true;
 
-        if ((false === this.TurnOffInnerWrap && true === Inner) || (false === Inner))
-            return this.LogicDocument.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, PageNum_rel + this.Get_StartPage_Absolute(), [], this, bMathWrap);
-    }
+	if (this.IsBlockLevelSdtContent() && true === Inner)
+		return this.Parent.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, CurPage, true, bMathWrap);
 
-    return [];
+	if (this.LogicDocument && editor && editor.isDocumentEditor)
+	{
+		var oDocContent = this;
+		if (this.Parent && this.Parent instanceof CBlockLevelSdt)
+			oDocContent = this.Parent.Parent;
+
+		if ((false === this.TurnOffInnerWrap && true === Inner) || (false === Inner))
+			return this.LogicDocument.DrawingObjects.CheckRange(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X_rf, this.Get_AbsolutePage(CurPage), [], this, bMathWrap);
+	}
+
+	return [];
 };
 CDocumentContent.prototype.Is_PointInDrawingObjects        = function(X, Y, Page_Abs)
 {
@@ -584,7 +593,7 @@ CDocumentContent.prototype.Reset_RecalculateCache         = function()
 // Пересчитываем отдельную страницу DocumentContent
 CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, bStart)
 {
-    if (0 === PageIndex && true === bStart)
+    if (0 === PageIndex && true === bStart && true !== this.IsBlockLevelSdtContent())
     {
         this.RecalcInfo.FlowObject                = null;
         this.RecalcInfo.FlowObjectPageBreakBefore = false;
@@ -1061,6 +1070,9 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
 
         if (RecalcResult & recalcresult_CurPage)
         {
+        	if (true === this.IsBlockLevelSdtContent())
+        		return recalcresult2_CurPage;
+
             // Такое не должно приходить в автофигурах, только в таблицах основного документа. Проверка на это находится в параграфе.
             if (RecalcResult & recalcresultflags_Footnotes)
 				return recalcresult2_CurPage | recalcresultflags_Column | recalcresultflags_Footnotes;
@@ -1358,7 +1370,7 @@ CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceChec
 	var PageAbs = this.Get_AbsolutePage(CurPage);
 
 	// В колонтитуле не учитывается.
-	if (true != this.Is_HdrFtr(false) || true === bForceCheckDrawings)
+	if ((true != this.Is_HdrFtr(false) && true !== this.IsBlockLevelSdtContent()) || true === bForceCheckDrawings)
 	{
 		// Учитываем все Drawing-объекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в
 		// случае, когда начальная точка (левый верхний угол) попадает в this.Y + Height
@@ -8462,6 +8474,10 @@ CDocumentContent.prototype.PreDelete = function()
 	{
 		this.Content[nIndex].PreDelete();
 	}
+};
+CDocumentContent.prototype.IsBlockLevelSdtContent = function()
+{
+	return (this.Parent && this.Parent instanceof CBlockLevelSdt);
 };
 
 function CDocumentContentStartState(DocContent)
