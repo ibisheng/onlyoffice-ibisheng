@@ -2553,6 +2553,9 @@ CT_pivotTableDefinition.prototype.toXml = function(writer) {
 	writer.WriteXmlNodeEnd("pivotTableDefinition");
 	return res;
 };
+CT_pivotTableDefinition.prototype.intersection = function (range) {
+	return this.location && this.location.intersection(range);
+};
 function CT_CacheSource() {
 //Attributes
 	this.type = null;
@@ -3859,6 +3862,9 @@ CT_Location.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
+};
+CT_Location.prototype.intersection = function (range) {
+	return this.ref && this.ref.intersectionSimple(range);
 };
 function CT_PivotFields() {
 //Attributes

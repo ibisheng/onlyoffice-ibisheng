@@ -1360,6 +1360,12 @@
     var activeCellRange = ws.getActiveCell(0, 0, false);
     var selectionRange = ws.model.selectionRange.clone();
 
+    var activeWsModel = this.model.getActiveWs();
+    if (activeWsModel.inPivotTable(activeCellRange)) {
+		this.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
+		return;
+	}
+
     var editFunction = function() {
       t.setCellEditMode(true);
       ws.setCellEditMode(true);
@@ -1972,104 +1978,110 @@
     }
   };
 
-  // Вставка формулы в редактор
-  WorkbookView.prototype.insertFormulaInEditor = function(name, type, autoComplete) {
-    var t = this, ws = this.getWorksheet(), cursorPos, isNotFunction, tmp;
+	// Вставка формулы в редактор
+	WorkbookView.prototype.insertFormulaInEditor = function (name, type, autoComplete) {
+		var t = this, ws = this.getWorksheet(), cursorPos, isNotFunction, tmp;
 
-    if (c_oAscPopUpSelectorType.None === type) {
-      this.getWorksheet().setSelectionInfo("value", name, /*onlyActive*/true);
-      return;
-    }
+		if (c_oAscPopUpSelectorType.None === type) {
+			this.getWorksheet().setSelectionInfo("value", name, /*onlyActive*/true);
+			return;
+		}
 
-    isNotFunction = c_oAscPopUpSelectorType.Func !== type;
+		isNotFunction = c_oAscPopUpSelectorType.Func !== type;
 
-    // Проверяем, открыт ли редактор
-    if (ws.getCellEditMode()) {
-      if (isNotFunction) {
-        this.skipHelpSelector = true;
-      }
-      if (-1 !== this.lastFormulaPos) {
-        if (-1 === this.arrExcludeFormulas.indexOf(name) && !isNotFunction) {
-          name += '('; // ToDo сделать проверки при добавлении, чтобы не вызывать постоянно окно
-        } else {
-          this.skipHelpSelector = true;
-        }
-        tmp = this.cellEditor.skipTLUpdate;
-        this.cellEditor.skipTLUpdate = false;
-        this.cellEditor.replaceText(this.lastFormulaPos, this.lastFormulaNameLength, name);
-        this.cellEditor.skipTLUpdate = tmp;
-      } else if (false === this.cellEditor.insertFormula(name, isNotFunction)) {
-        // Не смогли вставить формулу, закроем редактор, с сохранением текста
-        this.cellEditor.close(true);
-      }
-      this.skipHelpSelector = false;
-    } else {
-      // Проверка глобального лока
-      if (this.collaborativeEditing.getGlobalLock()) {
-        return false;
-      }
+		// Проверяем, открыт ли редактор
+		if (ws.getCellEditMode()) {
+			if (isNotFunction) {
+				this.skipHelpSelector = true;
+			}
+			if (-1 !== this.lastFormulaPos) {
+				if (-1 === this.arrExcludeFormulas.indexOf(name) && !isNotFunction) {
+					name += '('; // ToDo сделать проверки при добавлении, чтобы не вызывать постоянно окно
+				} else {
+					this.skipHelpSelector = true;
+				}
+				tmp = this.cellEditor.skipTLUpdate;
+				this.cellEditor.skipTLUpdate = false;
+				this.cellEditor.replaceText(this.lastFormulaPos, this.lastFormulaNameLength, name);
+				this.cellEditor.skipTLUpdate = tmp;
+			} else if (false === this.cellEditor.insertFormula(name, isNotFunction)) {
+				// Не смогли вставить формулу, закроем редактор, с сохранением текста
+				this.cellEditor.close(true);
+			}
+			this.skipHelpSelector = false;
+		} else {
+			// Проверка глобального лока
+			if (this.collaborativeEditing.getGlobalLock()) {
+				return false;
+			}
 
-      // Редактор закрыт
-      var cellRange = null;
-      // Если нужно сделать автозаполнение формулы, то ищем ячейки)
-      if (autoComplete) {
-        cellRange = ws.autoCompleteFormula(name);
-      }
-      if (isNotFunction) {
-        name = "=" + name;
-      } else {
-        if (cellRange) {
-          if (cellRange.notEditCell) {
-            // Мы уже ввели все что нужно, редактор открывать не нужно
-            return;
-          }
-          // Меняем значение ячейки
-          name = "=" + name + "(" + cellRange.text + ")";
-        } else {
-          // Меняем значение ячейки
-          name = "=" + name + "()";
-        }
-        // Вычисляем позицию курсора (он должен быть в функции)
-        cursorPos = name.length - 1;
-      }
+			var activeCellRange = ws.getActiveCell(0, 0, false);
+			var selectionRange = ws.model.selectionRange.clone();
 
-      var selectionRange = ws.model.selectionRange.clone();
+			var activeWsModel = this.model.getActiveWs();
+			if (activeWsModel.inPivotTable(activeCellRange)) {
+				this.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
+				return false;
+			}
 
-      var openEditor = function(res) {
-        if (res) {
-          // Выставляем переменные, что мы редактируем
-          t.setCellEditMode(true);
-          ws.setCellEditMode(true);
+			// Редактор закрыт
+			var cellRange = null;
+			// Если нужно сделать автозаполнение формулы, то ищем ячейки)
+			if (autoComplete) {
+				cellRange = ws.autoCompleteFormula(name);
+			}
+			if (isNotFunction) {
+				name = "=" + name;
+			} else {
+				if (cellRange) {
+					if (cellRange.notEditCell) {
+						// Мы уже ввели все что нужно, редактор открывать не нужно
+						return;
+					}
+					// Меняем значение ячейки
+					name = "=" + name + "(" + cellRange.text + ")";
+				} else {
+					// Меняем значение ячейки
+					name = "=" + name + "()";
+				}
+				// Вычисляем позицию курсора (он должен быть в функции)
+				cursorPos = name.length - 1;
+			}
 
-          t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
-          if (isNotFunction) {
-            t.skipHelpSelector = true;
-          }
-          // Открываем, с выставлением позиции курсора
-          if (!ws.openCellEditorWithText(t.cellEditor, name, cursorPos, /*isFocus*/false, selectionRange)) {
-            t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
-            t.setCellEditMode(false);
-            t.controller.setStrictClose(false);
-            t.controller.setFormulaEditMode(false);
-            ws.setCellEditMode(false);
-            ws.setFormulaEditMode(false);
-          }
-          if (isNotFunction) {
-            t.skipHelpSelector = false;
-          }
-        } else {
-          t.setCellEditMode(false);
-          t.controller.setStrictClose(false);
-          t.controller.setFormulaEditMode(false);
-          ws.setCellEditMode(false);
-          ws.setFormulaEditMode(false);
-        }
-      };
+			var openEditor = function (res) {
+				if (res) {
+					// Выставляем переменные, что мы редактируем
+					t.setCellEditMode(true);
+					ws.setCellEditMode(true);
 
-      var activeCellRange = ws.getActiveCell(0, 0, false);
-      ws._isLockedCells(activeCellRange, /*subType*/null, openEditor);
-    }
-  };
+					t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
+					if (isNotFunction) {
+						t.skipHelpSelector = true;
+					}
+					// Открываем, с выставлением позиции курсора
+					if (!ws.openCellEditorWithText(t.cellEditor, name, cursorPos, /*isFocus*/false, selectionRange)) {
+						t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
+						t.setCellEditMode(false);
+						t.controller.setStrictClose(false);
+						t.controller.setFormulaEditMode(false);
+						ws.setCellEditMode(false);
+						ws.setFormulaEditMode(false);
+					}
+					if (isNotFunction) {
+						t.skipHelpSelector = false;
+					}
+				} else {
+					t.setCellEditMode(false);
+					t.controller.setStrictClose(false);
+					t.controller.setFormulaEditMode(false);
+					ws.setCellEditMode(false);
+					ws.setFormulaEditMode(false);
+				}
+			};
+
+			ws._isLockedCells(activeCellRange, /*subType*/null, openEditor);
+		}
+	};
 
   WorkbookView.prototype.bIsEmptyClipboard = function() {
     return g_clipboardExcel.bIsEmptyClipboard(this.getCellEditMode());

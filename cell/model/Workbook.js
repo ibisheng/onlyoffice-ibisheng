@@ -4496,28 +4496,24 @@
 		}
 		return res;
 	};
-Woorksheet.prototype.isApplyFilterBySheet = function(){
-	var res = false;
-	
-	if(this.AutoFilter && this.AutoFilter.isApplyAutoFilter())
-	{
-		res = true;
-	}
-	
-	if(false === res && this.TableParts)
-	{
-		for(var i = 0; i < this.TableParts.length; i++)
-		{
-			if(true === this.TableParts[i].isApplyAutoFilter())
-			{
-				res = true;
-				break;
+	Woorksheet.prototype.isApplyFilterBySheet = function () {
+		var res = false;
+
+		if (this.AutoFilter && this.AutoFilter.isApplyAutoFilter()) {
+			res = true;
+		}
+
+		if (false === res && this.TableParts) {
+			for (var i = 0; i < this.TableParts.length; i++) {
+				if (true === this.TableParts[i].isApplyAutoFilter()) {
+					res = true;
+					break;
+				}
 			}
 		}
-	}
-	
-	return res;
-};
+
+		return res;
+	};
 	Woorksheet.prototype.getTableNames = function() {
 		var res = [];
 		if (this.TableParts) {
@@ -4722,6 +4718,11 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			}
 		}
 		
+	};
+	Woorksheet.prototype.inPivotTable = function (range) {
+		return this.pivotTables.some(function (element) {
+			return element.intersection(range);
+		});
 	};
 //-------------------------------------------------------------------------------------------------
 	/**
