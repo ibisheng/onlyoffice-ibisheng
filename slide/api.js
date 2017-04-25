@@ -5429,7 +5429,7 @@ background-repeat: no-repeat;\
 
     asc_docs_api.prototype.asc_setDefaultLanguage = function(Lang)
     {
-        if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
+        if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_PresDefaultLang))
         {
             History.Create_NewPoint(AscDFH.historydescription_Document_SetDefaultLanguage);
             editor.WordControl.m_oLogicDocument.Set_DefaultLanguage(Lang);
