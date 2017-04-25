@@ -3864,7 +3864,10 @@ CT_Location.prototype.toXml = function(writer, name) {
 	return res;
 };
 CT_Location.prototype.intersection = function (range) {
-	return this.ref && this.ref.intersectionSimple(range);
+	var t = this;
+	return this.ref && (Array.isArray(range) ? range.some(function (element) {
+			return t.ref.intersectionSimple(element);
+		}) : this.ref.intersectionSimple(range));
 };
 function CT_PivotFields() {
 //Attributes

@@ -5549,7 +5549,7 @@
             {
                 this.aMerged = [];
                 this.aHyperlinks = [];
-                var oNewWorksheet = new AscCommonExcel.Woorksheet(this.wb, wb.aWorksheets.length);
+                var oNewWorksheet = new AscCommonExcel.Worksheet(this.wb, wb.aWorksheets.length);
                 oNewWorksheet.aFormulaExt = [];
 				
 				//TODO при copy/paste в word из excel необходимо подменить DrawingDocument из word - пересмотреть правку!

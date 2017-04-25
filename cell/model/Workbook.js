@@ -1541,7 +1541,7 @@
 		History.Create_NewPoint();
 		History.TurnOff();
 		var wsActive = this.getActiveWs();
-		var oNewWorksheet = new Woorksheet(this, this.aWorksheets.length, sId);
+		var oNewWorksheet = new Worksheet(this, this.aWorksheets.length, sId);
 		if (this.checkValidSheetName(sName))
 			oNewWorksheet.sName = sName;
 		oNewWorksheet.initPostOpen(this.wsHandlers);
@@ -1569,7 +1569,7 @@
 			History.TurnOff();
 			var wsActive = this.getActiveWs();
 			var wsFrom = this.aWorksheets[index];
-			var newSheet = new Woorksheet(this, -1, sId);
+			var newSheet = new Worksheet(this, -1, sId);
 			if(null != insertBefore && insertBefore >= 0 && insertBefore < this.aWorksheets.length){
 				//помещаем новый sheet перед insertBefore
 				this.aWorksheets.splice(insertBefore, 0, newSheet);
@@ -2380,7 +2380,7 @@
 	/**
 	 * @constructor
 	 */
-	function Woorksheet(wb, _index, sId){
+	function Worksheet(wb, _index, sId){
 		this.workbook = wb;
 		this.sName = this.workbook.getUniqueSheetNameFrom(g_sNewSheetNamePattern, false);
 		this.bHidden = false;
@@ -2465,8 +2465,8 @@
 		/*handlers*/
 		this.handlers = null;
 	}
-	Woorksheet.prototype.getSnapshot = function(wb) {
-		var ws = new Woorksheet(wb, this.index, this.Id);
+	Worksheet.prototype.getSnapshot = function(wb) {
+		var ws = new Worksheet(wb, this.index, this.Id);
 		ws.sName = this.sName;
 		for (var i = 0; i < this.TableParts.length; ++i) {
 			var table = this.TableParts[i];
@@ -2477,18 +2477,18 @@
 		}
 		return ws;
 	};
-	Woorksheet.prototype.addContentChanges = function(changes)
+	Worksheet.prototype.addContentChanges = function(changes)
 	{
 		this.contentChanges.Add(changes);
 	};
 
-	Woorksheet.prototype.refreshContentChanges = function()
+	Worksheet.prototype.refreshContentChanges = function()
 	{
 		this.contentChanges.Refresh();
 		this.contentChanges.Clear();
 	};
 
-	Woorksheet.prototype.rebuildColors=function(){
+	Worksheet.prototype.rebuildColors=function(){
 		this._forEachCell(function(cell){
 			cell.cleanCache();
 		});
@@ -2498,7 +2498,7 @@
 			this.aSparklineGroups[i].cleanCache();
 		}
 	};
-	Woorksheet.prototype.generateFontMap=function(oFontMap){
+	Worksheet.prototype.generateFontMap=function(oFontMap){
 		//пробегаемся по Drawing
 		for(var i = 0, length = this.Drawings.length; i < length; ++i)
 		{
@@ -2545,17 +2545,17 @@
 			}
 		}
 	};
-	Woorksheet.prototype.getAllImageUrls = function(aImages){
+	Worksheet.prototype.getAllImageUrls = function(aImages){
 		for(var i = 0; i < this.Drawings.length; ++i){
 			this.Drawings[i].graphicObject.getAllRasterImages(aImages);
 		}
 	};
-	Woorksheet.prototype.reassignImageUrls = function(oImages){
+	Worksheet.prototype.reassignImageUrls = function(oImages){
 		for(var i = 0; i < this.Drawings.length; ++i){
 			this.Drawings[i].graphicObject.Reassign_ImageUrls(oImages);
 		}
 	};
-	Woorksheet.prototype.copyFrom=function(wsFrom, sName, tableNames){	var i, elem, range;
+	Worksheet.prototype.copyFrom=function(wsFrom, sName, tableNames){	var i, elem, range;
 		this.sName = this.workbook.checkValidSheetName(sName) ? sName : this.workbook.getUniqueSheetNameFrom(wsFrom.sName, true);
 		this.bHidden = wsFrom.bHidden;
 		this.oSheetFormatPr = wsFrom.oSheetFormatPr.clone();
@@ -2626,7 +2626,7 @@
 
 		return renameParams;
 	};
-	Woorksheet.prototype.copyDrawingObjects = function (oNewWs, wsFrom) {
+	Worksheet.prototype.copyDrawingObjects = function (oNewWs, wsFrom) {
 		var i;
 		if (null != this.Drawings && this.Drawings.length > 0) {
 			var drawingObjects = new AscFormat.DrawingObjects();
@@ -2660,7 +2660,7 @@
 			oNewWs.aSparklineGroups.push(newSparkline);
 		}
 	};
-	Woorksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
+	Worksheet.prototype.initPostOpen = function (handlers, bNoBuildDep) {
 		if (this.aFormulaExt) {
 			var formulaShared = {};
 			for (var i = 0; i < this.aFormulaExt.length; ++i) {
@@ -2739,7 +2739,7 @@
 		this.handlers = handlers;
 		this._setHandlersTablePart();
 	};
-	Woorksheet.prototype._getValuesForConditionalFormatting = function(ranges, withEmpty) {
+	Worksheet.prototype._getValuesForConditionalFormatting = function(ranges, withEmpty) {
 		var res = [];
 		for (var i = 0; i < ranges.length; ++i) {
 			var elem = ranges[i];
@@ -2748,7 +2748,7 @@
 		}
 		return res;
 	};
-	Woorksheet.prototype._isConditionalFormattingIntersect = function(range, ranges) {
+	Worksheet.prototype._isConditionalFormattingIntersect = function(range, ranges) {
 		for (var i = 0; i < ranges.length; ++i) {
 			if (range.isIntersect(ranges[i])) {
 				return true;
@@ -2756,7 +2756,7 @@
 		}
 		return false;
 	};
-	Woorksheet.prototype._updateConditionalFormatting = function(range) {
+	Worksheet.prototype._updateConditionalFormatting = function(range) {
 		var oGradient1, oGradient2;
 		var aCFs = this.aConditionalFormatting;
 		var aRules, oRule;
@@ -2991,7 +2991,7 @@
 			}
 		}
 	};
-	Woorksheet.prototype._forEachCell=function(fAction){
+	Worksheet.prototype._forEachCell=function(fAction){
 		for(var rowInd in this.aGCells){
 			var row = this.aGCells[rowInd];
 			if(row){
@@ -3004,16 +3004,16 @@
 			}
 		}
 	};
-	Woorksheet.prototype.getId=function(){
+	Worksheet.prototype.getId=function(){
 		return this.Id;
 	};
-	Woorksheet.prototype.getIndex=function(){
+	Worksheet.prototype.getIndex=function(){
 		return this.index;
 	};
-	Woorksheet.prototype.getName=function(){
+	Worksheet.prototype.getName=function(){
 		return this.sName !== undefined && this.sName.length > 0 ? this.sName : "";
 	};
-	Woorksheet.prototype.setName=function(name, bFromUndoRedo){
+	Worksheet.prototype.setName=function(name, bFromUndoRedo){
 		if(name.length <= g_nSheetNameMaxLength)
 		{
 			var lastName = this.sName;
@@ -3037,10 +3037,10 @@
 			this.workbook.dependencyFormulas.calcTree();
 		}
 	};
-	Woorksheet.prototype.getTabColor=function(){
+	Worksheet.prototype.getTabColor=function(){
 		return this.sheetPr && this.sheetPr.TabColor ? Asc.colorObjToAscColor(this.sheetPr.TabColor) : null;
 	};
-	Woorksheet.prototype.setTabColor=function(color){
+	Worksheet.prototype.setTabColor=function(color){
 		if (!this.sheetPr)
 			this.sheetPr = new AscCommonExcel.asc_CSheetPr();
 
@@ -3052,17 +3052,17 @@
 		if (!this.workbook.bUndoChanges && !this.workbook.bRedoChanges)
 			this.workbook.handlers.trigger("asc_onUpdateTabColor", this.getIndex());
 	};
-	Woorksheet.prototype.rebuildTabColor = function() {
+	Worksheet.prototype.rebuildTabColor = function() {
 		if (this.sheetPr && this.sheetPr.TabColor) {
 			this.workbook.handlers.trigger("asc_onUpdateTabColor", this.getIndex());
 		}
 	};
-	Woorksheet.prototype.getHidden=function(){
+	Worksheet.prototype.getHidden=function(){
 		if(null != this.bHidden)
 			return false != this.bHidden;
 		return false;
 	};
-	Woorksheet.prototype.setHidden = function (hidden) {
+	Worksheet.prototype.setHidden = function (hidden) {
 		var bOldHidden = this.bHidden, wb = this.workbook, wsActive = wb.getActiveWs(), oVisibleWs = null;
 		this.bHidden = hidden;
 		if (true == this.bHidden && this.getIndex() == wsActive.getIndex())
@@ -3084,10 +3084,10 @@
 			}
 		}
 	};
-	Woorksheet.prototype.getSheetViewSettings = function () {
+	Worksheet.prototype.getSheetViewSettings = function () {
 		return this.sheetViews[0].clone();
 	};
-	Woorksheet.prototype.setDisplayGridlines = function (value) {
+	Worksheet.prototype.setDisplayGridlines = function (value) {
 		var view = this.sheetViews[0];
 		if (value !== view.showGridLines) {
 			History.Create_NewPoint();
@@ -3100,7 +3100,7 @@
 			}
 		}
 	};
-	Woorksheet.prototype.setDisplayHeadings = function (value) {
+	Worksheet.prototype.setDisplayHeadings = function (value) {
 		var view = this.sheetViews[0];
 		if (value !== view.showRowColHeaders) {
 			History.Create_NewPoint();
@@ -3113,18 +3113,18 @@
 			}
 		}
 	};
-	Woorksheet.prototype.getRowsCount=function(){
+	Worksheet.prototype.getRowsCount=function(){
 		var result = this.nRowsCount;
 		var pane = this.sheetViews[0].pane;
 		if (null !== pane && null !== pane.topLeftFrozenCell)
 			result = Math.max(result, pane.topLeftFrozenCell.getRow0());
 		return result;
 	};
-	Woorksheet.prototype.removeRows=function(start, stop){
+	Worksheet.prototype.removeRows=function(start, stop){
 		var oRange = this.getRange(new CellAddress(start, 0, 0), new CellAddress(stop, gc_nMaxCol0, 0));
 		oRange.deleteCellsShiftUp();
 	};
-	Woorksheet.prototype._removeRows=function(start, stop){
+	Worksheet.prototype._removeRows=function(start, stop){
 		this.workbook.dependencyFormulas.lockRecal();
 		History.Create_NewPoint();
 		//start, stop 0 based
@@ -3188,11 +3188,11 @@
 
 		return true;
 	};
-	Woorksheet.prototype.insertRowsBefore=function(index, count){
+	Worksheet.prototype.insertRowsBefore=function(index, count){
 		var oRange = this.getRange(new CellAddress(index, 0, 0), new CellAddress(index + count - 1, gc_nMaxCol0, 0));
 		oRange.addCellsShiftBottom();
 	};
-	Woorksheet.prototype._insertRowsBefore=function(index, count){
+	Worksheet.prototype._insertRowsBefore=function(index, count){
 		this.workbook.dependencyFormulas.lockRecal();
 		var oActualRange = new Asc.Range(0, index, gc_nMaxCol0, index + count - 1);
 		History.Create_NewPoint();
@@ -3254,22 +3254,22 @@
 
 		return true;
 	};
-	Woorksheet.prototype.insertRowsAfter=function(index, count){
+	Worksheet.prototype.insertRowsAfter=function(index, count){
 		//index 0 based
 		return this.insertRowsBefore(index + 1, count);
 	};
-	Woorksheet.prototype.getColsCount=function(){
+	Worksheet.prototype.getColsCount=function(){
 		var result = this.nColsCount;
 		var pane = this.sheetViews[0].pane;
 		if (null !== pane && null !== pane.topLeftFrozenCell)
 			result = Math.max(result, pane.topLeftFrozenCell.getCol0());
 		return result;
 	};
-	Woorksheet.prototype.removeCols=function(start, stop){
+	Worksheet.prototype.removeCols=function(start, stop){
 		var oRange = this.getRange(new CellAddress(0, start, 0), new CellAddress(gc_nMaxRow0, stop, 0));
 		oRange.deleteCellsShiftLeft();
 	};
-	Woorksheet.prototype._removeCols=function(start, stop){
+	Worksheet.prototype._removeCols=function(start, stop){
 		this.workbook.dependencyFormulas.lockRecal();
 		History.Create_NewPoint();
 		//start, stop 0 based
@@ -3339,11 +3339,11 @@
 
 		return true;
 	};
-	Woorksheet.prototype.insertColsBefore=function(index, count){
+	Worksheet.prototype.insertColsBefore=function(index, count){
 		var oRange = this.getRange3(0, index, gc_nMaxRow0, index + count - 1);
 		oRange.addCellsShiftRight();
 	};
-	Woorksheet.prototype._insertColsBefore=function(index, count){
+	Worksheet.prototype._insertColsBefore=function(index, count){
 		this.workbook.dependencyFormulas.lockRecal();
 		var oActualRange = new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0);
 		History.Create_NewPoint();
@@ -3412,23 +3412,23 @@
 
 		return true;
 	};
-	Woorksheet.prototype.insertColsAfter=function(index, count){
+	Worksheet.prototype.insertColsAfter=function(index, count){
 		//index 0 based
 		return this.insertColsBefore(index + 1, count);
 	};
-	Woorksheet.prototype.getDefaultWidth=function(){
+	Worksheet.prototype.getDefaultWidth=function(){
 		return this.oSheetFormatPr.dDefaultColWidth;
 	};
-	Woorksheet.prototype.getDefaultFontName=function(){
+	Worksheet.prototype.getDefaultFontName=function(){
 		return this.workbook.getDefaultFont();
 	};
-	Woorksheet.prototype.getDefaultFontSize=function(){
+	Worksheet.prototype.getDefaultFontSize=function(){
 		return this.workbook.getDefaultSize();
 	};
-	Woorksheet.prototype.charCountToModelColWidth = function (count) {
+	Worksheet.prototype.charCountToModelColWidth = function (count) {
 		return this.workbook.charCountToModelColWidth(count);
 	};
-	Woorksheet.prototype.getColWidth=function(index){
+	Worksheet.prototype.getColWidth=function(index){
 		//index 0 based
 		//Результат в пунктах
 		var col = this._getColNoEmptyWithAll(index);
@@ -3440,7 +3440,7 @@
 			dResult = -1; // calc default width at presentation level
 		return dResult;
 	};
-	Woorksheet.prototype.setColWidth=function(width, start, stop){
+	Worksheet.prototype.setColWidth=function(width, start, stop){
 		width = this.charCountToModelColWidth(width);
 		if(0 == width)
 			return this.setColHidden(true, start, stop);
@@ -3494,11 +3494,11 @@
 			}
 		}
 	};
-	Woorksheet.prototype.getColHidden=function(index){
+	Worksheet.prototype.getColHidden=function(index){
 		var col = this._getColNoEmptyWithAll(index);
 		return col ? col.hd : false;
 	};
-	Woorksheet.prototype.setColHidden=function(bHidden, start, stop){
+	Worksheet.prototype.setColHidden=function(bHidden, start, stop){
 		//start, stop 0 based
 		if(null == start)
 			return;
@@ -3559,7 +3559,7 @@
 			}
 		}
 	};
-	Woorksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
+	Worksheet.prototype.setColBestFit=function(bBestFit, width, start, stop){
 		//start, stop 0 based
 		if(null == start)
 			return;
@@ -3611,13 +3611,13 @@
 			}
 		}
 	};
-	Woorksheet.prototype.isDefaultHeightHidden=function(){
+	Worksheet.prototype.isDefaultHeightHidden=function(){
 		return null != this.oSheetFormatPr.oAllRow && 0 != (AscCommonExcel.g_nRowFlag_hd & this.oSheetFormatPr.oAllRow.flags);
 	};
-	Woorksheet.prototype.isDefaultWidthHidden=function(){
+	Worksheet.prototype.isDefaultWidthHidden=function(){
 		return null != this.oAllCol && this.oAllCol.hd;
 	};
-	Woorksheet.prototype.getDefaultHeight=function(){
+	Worksheet.prototype.getDefaultHeight=function(){
 		// ToDo http://bugzilla.onlyoffice.com/show_bug.cgi?id=19666 (флага CustomHeight нет)
 		var dRes = null;
 		// Нужно возвращать выставленную, только если флаг CustomHeight = true
@@ -3625,7 +3625,7 @@
 			dRes = this.oSheetFormatPr.oAllRow.h;
 		return dRes;
 	};
-	Woorksheet.prototype.getRowHeight=function(index){
+	Worksheet.prototype.getRowHeight=function(index){
 		//index 0 based
 		var row = this.aGCells[index];
 		if(null != row && null != row.h)
@@ -3633,7 +3633,7 @@
 		else
 			return -1;
 	};
-	Woorksheet.prototype.setRowHeight=function(height, start, stop, isCustom){
+	Worksheet.prototype.setRowHeight=function(height, start, stop, isCustom){
 		if(0 == height)
 			return this.setRowHidden(true, start, stop);
 		//start, stop 0 based
@@ -3681,11 +3681,11 @@
 			}
 		}
 	};
-	Woorksheet.prototype.getRowHidden=function(index){
+	Worksheet.prototype.getRowHidden=function(index){
 		var row = this._getRowNoEmptyWithAll(index);
 		return row ? 0 != (AscCommonExcel.g_nRowFlag_hd & row.flags) : false;
 	};
-	Woorksheet.prototype.setRowHidden=function(bHidden, start, stop){
+	Worksheet.prototype.setRowHidden=function(bHidden, start, stop){
 		//start, stop 0 based
 		if(null == start)
 			return;
@@ -3735,7 +3735,7 @@
 			}
 		}
 	};
-	Woorksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
+	Worksheet.prototype.setRowBestFit=function(bBestFit, height, start, stop){
 		//start, stop 0 based
 		if(null == start)
 			return;
@@ -3768,18 +3768,18 @@
 		for(i = start; i <= stop; ++i)
 			fProcessRow(isDefaultProp ? this._getRowNoEmpty(i) : this._getRow(i));
 	};
-	Woorksheet.prototype.getCell=function(oCellAdd){
+	Worksheet.prototype.getCell=function(oCellAdd){
 		return this.getRange(oCellAdd, oCellAdd);
 	};
-	Woorksheet.prototype.getCell2=function(sCellAdd){
+	Worksheet.prototype.getCell2=function(sCellAdd){
 		if( sCellAdd.indexOf("$") > -1)
 			sCellAdd = sCellAdd.replace(/\$/g,"");
 		return this.getRange2(sCellAdd);
 	};
-	Woorksheet.prototype.getCell3=function(r1, c1){
+	Worksheet.prototype.getCell3=function(r1, c1){
 		return this.getRange3(r1, c1, r1, c1);
 	};
-	Woorksheet.prototype.getRange=function(cellAdd1, cellAdd2){
+	Worksheet.prototype.getRange=function(cellAdd1, cellAdd2){
 		//Если range находится за границами ячеек расширяем их
 		var nRow1 = cellAdd1.getRow0();
 		var nCol1 = cellAdd1.getCol0();
@@ -3787,13 +3787,13 @@
 		var nCol2 = cellAdd2.getCol0();
 		return this.getRange3(nRow1, nCol1, nRow2, nCol2);
 	};
-	Woorksheet.prototype.getRange2=function(sRange){
+	Worksheet.prototype.getRange2=function(sRange){
 		var bbox = AscCommonExcel.g_oRangeCache.getAscRange(sRange);
 		if(null != bbox)
 			return Range.prototype.createFromBBox(this, bbox);
 		return null;
 	};
-	Woorksheet.prototype.getRange3=function(r1, c1, r2, c2){
+	Worksheet.prototype.getRange3=function(r1, c1, r2, c2){
 		var nRowMin = r1;
 		var nRowMax = r2;
 		var nColMin = c1;
@@ -3808,13 +3808,13 @@
 		}
 		return new Range(this, nRowMin, nColMin, nRowMax, nColMax);
 	};
-	Woorksheet.prototype._getRows=function(){
+	Worksheet.prototype._getRows=function(){
 		return this.aGCells;
 	};
-	Woorksheet.prototype._getCols=function(){
+	Worksheet.prototype._getCols=function(){
 		return this.aCols;
 	};
-	Woorksheet.prototype._removeCell=function(nRow, nCol, cell){
+	Worksheet.prototype._removeCell=function(nRow, nCol, cell){
 		if(null != cell)
 		{
 			nRow = cell.nRow;
@@ -3847,7 +3847,7 @@
 			}
 		}
 	};
-	Woorksheet.prototype._getCell=function(row, col){
+	Worksheet.prototype._getCell=function(row, col){
 		//0-based
 		var oCurRow = this._getRow(row);
 		var oCurCell = oCurRow.c[col];
@@ -3870,7 +3870,7 @@
 		}
 		return oCurCell;
 	};
-	Woorksheet.prototype._getCellNoEmpty=function(row, col){
+	Worksheet.prototype._getCellNoEmpty=function(row, col){
 		//0-based
 		var oCurRow = this.aGCells[row];
 		if(oCurRow)
@@ -3880,30 +3880,30 @@
 		}
 		return null;
 	};
-	Woorksheet.prototype._getRowNoEmpty=function(row){
+	Worksheet.prototype._getRowNoEmpty=function(row){
 		//0-based
 		return this.aGCells[row];
 	};
-	Woorksheet.prototype._getRowNoEmptyWithAll=function(row){
+	Worksheet.prototype._getRowNoEmptyWithAll=function(row){
 		var oRes = this._getRowNoEmpty(row);
 		if(!oRes)
 			oRes = this.oSheetFormatPr.oAllRow;
 		return oRes;
 	};
-	Woorksheet.prototype._getColNoEmpty=function(col){
+	Worksheet.prototype._getColNoEmpty=function(col){
 		//0-based
 		var oCurCol = this.aCols[col];
 		if(oCurCol)
 			return oCurCol;
 		return null;
 	};
-	Woorksheet.prototype._getColNoEmptyWithAll=function(col){
+	Worksheet.prototype._getColNoEmptyWithAll=function(col){
 		var oRes = this._getColNoEmpty(col);
 		if(null == oRes)
 			oRes = this.oAllCol;
 		return oRes;
 	};
-	Woorksheet.prototype._getRow=function(row){
+	Worksheet.prototype._getRow=function(row){
 		//0-based
 		var oCurRow = null;
 		if (g_nAllRowIndex == row)
@@ -3923,10 +3923,10 @@
 		}
 		return oCurRow;
 	};
-	Woorksheet.prototype._removeRow=function(index){
+	Worksheet.prototype._removeRow=function(index){
 		delete this.aGCells[index];
 	};
-	Woorksheet.prototype._getCol=function(index){
+	Worksheet.prototype._getCol=function(index){
 		//0-based
 		var oCurCol;
 		if (g_nAllColIndex == index)
@@ -3950,11 +3950,11 @@
 		}
 		return oCurCol;
 	};
-	Woorksheet.prototype._removeCol=function(index){
+	Worksheet.prototype._removeCol=function(index){
 		//0-based
 		delete this.aCols[index];
 	};
-	Woorksheet.prototype._moveCellHor=function(nRow, nCol, dif){
+	Worksheet.prototype._moveCellHor=function(nRow, nCol, dif){
 		var cell = this._getCellNoEmpty(nRow, nCol);
 		if(cell)
 		{
@@ -3964,7 +3964,7 @@
 			delete row.c[nCol];
 		}
 	};
-	Woorksheet.prototype._moveCellVer=function(nRow, nCol, dif){
+	Worksheet.prototype._moveCellVer=function(nRow, nCol, dif){
 		var cell = this._getCellNoEmpty(nRow, nCol);
 		if(cell)
 		{
@@ -3977,7 +3977,7 @@
 				delete this.aGCells[nRow];
 		}
 	};
-	Woorksheet.prototype._prepareMoveRangeGetCleanRanges=function(oBBoxFrom, oBBoxTo){
+	Worksheet.prototype._prepareMoveRangeGetCleanRanges=function(oBBoxFrom, oBBoxTo){
 		var intersection = oBBoxFrom.intersectionSimple(oBBoxTo);
 		var aRangesToCheck = [];
 		if(null != intersection)
@@ -4013,7 +4013,7 @@
 			aRangesToCheck.push(this.getRange3(oBBoxTo.r1, oBBoxTo.c1, oBBoxTo.r2, oBBoxTo.c2));
 		return aRangesToCheck;
 	};
-	Woorksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
+	Worksheet.prototype._prepareMoveRange=function(oBBoxFrom, oBBoxTo){
 		var res = 0;
 		if(oBBoxFrom.isEqual(oBBoxTo))
 			return res;
@@ -4038,7 +4038,7 @@
 		}
 		return res;
 	};
-	Woorksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
+	Worksheet.prototype._moveRange=function(oBBoxFrom, oBBoxTo, copyRange){
 		if(oBBoxFrom.isEqual(oBBoxTo))
 			return;
 		var oThis = this;
@@ -4233,7 +4233,7 @@
 		History.EndTransaction();
 		return true;
 	};
-	Woorksheet.prototype._shiftCellsLeft=function(oBBox){
+	Worksheet.prototype._shiftCellsLeft=function(oBBox){
 		//todo удаление когда есть замерженые ячейки
 		var nLeft = oBBox.c1;
 		var nRight = oBBox.c2;
@@ -4279,7 +4279,7 @@
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
 		//todo проверить не уменьшились ли границы таблицы
 	};
-	Woorksheet.prototype._shiftCellsUp=function(oBBox){
+	Worksheet.prototype._shiftCellsUp=function(oBBox){
 		var nTop = oBBox.r1;
 		var nBottom = oBBox.r2;
 		var dif = nTop - nBottom - 1;
@@ -4328,7 +4328,7 @@
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
 		//todo проверить не уменьшились ли границы таблицы
 	};
-	Woorksheet.prototype._shiftCellsRight=function(oBBox, displayNameFormatTable){
+	Worksheet.prototype._shiftCellsRight=function(oBBox, displayNameFormatTable){
 		var nLeft = oBBox.c1;
 		var nRight = oBBox.c2;
 		var dif = nRight - nLeft + 1;
@@ -4371,7 +4371,7 @@
 
 		this.autoFilters.redrawStylesTables(redrawTablesArr);
 	};
-	Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
+	Worksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 		var nTop = oBBox.r1;
 		var nBottom = oBBox.r2;
 		var dif = nBottom - nTop + 1;
@@ -4420,10 +4420,10 @@
 		}
 
 	};
-	Woorksheet.prototype._setIndex=function(ind){
+	Worksheet.prototype._setIndex=function(ind){
 		this.index = ind;
 	};
-	Woorksheet.prototype._BuildDependencies=function(cellRange){
+	Worksheet.prototype._BuildDependencies=function(cellRange){
 		/*
 		 Построение графа зависимостей.
 		 */
@@ -4442,7 +4442,7 @@
 			}
 		}
 	};
-	Woorksheet.prototype._setHandlersTablePart = function(){
+	Worksheet.prototype._setHandlersTablePart = function(){
 		if(!this.TableParts)
 			return;
 
@@ -4451,7 +4451,7 @@
 			this.TableParts[i].setHandlers(this.handlers);
 		}
 	};
-	Woorksheet.prototype.getTableRangeForFormula = function(name, objectParam){
+	Worksheet.prototype.getTableRangeForFormula = function(name, objectParam){
 		var res = null;
 		if(!this.TableParts)
 			return res;
@@ -4466,7 +4466,7 @@
 		}
 		return res;
 	};
-	Woorksheet.prototype.getTableIndexColumnByName = function(tableName, columnName){
+	Worksheet.prototype.getTableIndexColumnByName = function(tableName, columnName){
 		var res = null;
 		if(!this.TableParts)
 			return res;
@@ -4481,7 +4481,7 @@
 		}
 		return res;
 	};
-	Woorksheet.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
+	Worksheet.prototype.getTableNameColumnByIndex = function(tableName, columnIndex){
 		var res = null;
 		if(!this.TableParts)
 			return res;
@@ -4496,7 +4496,7 @@
 		}
 		return res;
 	};
-	Woorksheet.prototype.isApplyFilterBySheet = function () {
+	Worksheet.prototype.isApplyFilterBySheet = function () {
 		var res = false;
 
 		if (this.AutoFilter && this.AutoFilter.isApplyAutoFilter()) {
@@ -4514,7 +4514,7 @@
 
 		return res;
 	};
-	Woorksheet.prototype.getTableNames = function() {
+	Worksheet.prototype.getTableNames = function() {
 		var res = [];
 		if (this.TableParts) {
 			for (var i = 0; i < this.TableParts.length; i++) {
@@ -4523,33 +4523,33 @@
 		}
 		return res;
 	};
-	Woorksheet.prototype.renameDependencyNodes = function(offset, oBBox){
+	Worksheet.prototype.renameDependencyNodes = function(offset, oBBox){
 		return this.workbook.dependencyFormulas.shift(this.Id, oBBox, offset);
 	};
-	Woorksheet.prototype.getAllCol = function(){
+	Worksheet.prototype.getAllCol = function(){
 		if(null == this.oAllCol)
 			this.oAllCol = new AscCommonExcel.Col(this, g_nAllColIndex);
 		return this.oAllCol;
 	};
-	Woorksheet.prototype.getAllRow = function(){
+	Worksheet.prototype.getAllRow = function(){
 		if (null == this.oSheetFormatPr.oAllRow) {
 			this.oSheetFormatPr.oAllRow = new AscCommonExcel.Row(this);
 			this.oSheetFormatPr.oAllRow.create(g_nAllRowIndex + 1);
 		}
 		return this.oSheetFormatPr.oAllRow;
 	};
-	Woorksheet.prototype.getHyperlinkByCell = function(row, col){
+	Worksheet.prototype.getHyperlinkByCell = function(row, col){
 		var oHyperlink = this.hyperlinkManager.getByCell(row, col);
 		return oHyperlink ? oHyperlink.data : null;
 	};
-	Woorksheet.prototype.getMergedByCell = function(row, col){
+	Worksheet.prototype.getMergedByCell = function(row, col){
 		var oMergeInfo = this.mergeManager.getByCell(row, col);
 		return oMergeInfo ? oMergeInfo.bbox : null;
 	};
-	Woorksheet.prototype.getMergedByRange = function(bbox){
+	Worksheet.prototype.getMergedByRange = function(bbox){
 		return this.mergeManager.get(bbox);
 	};
-	Woorksheet.prototype._expandRangeByMergedAddToOuter = function(aOuter, range, aMerged){
+	Worksheet.prototype._expandRangeByMergedAddToOuter = function(aOuter, range, aMerged){
 		for(var i = 0, length = aMerged.all.length; i < length; i++)
 		{
 			var elem = aMerged.all[i];
@@ -4557,7 +4557,7 @@
 				aOuter.push(elem);
 		}
 	};
-	Woorksheet.prototype._expandRangeByMergedGetOuter = function(range){
+	Worksheet.prototype._expandRangeByMergedGetOuter = function(range){
 		var aOuter = [];
 		//смотрим только границы
 		this._expandRangeByMergedAddToOuter(aOuter, range, this.mergeManager.get({r1: range.r1, c1: range.c1, r2: range.r2, c2: range.c1}));
@@ -4573,7 +4573,7 @@
 		}
 		return aOuter;
 	};
-	Woorksheet.prototype.expandRangeByMerged = function(range){
+	Worksheet.prototype.expandRangeByMerged = function(range){
 		if(null != range)
 		{
 			var aOuter = this._expandRangeByMergedGetOuter(range);
@@ -4590,21 +4590,21 @@
 		}
 		return range;
 	};
-	Woorksheet.prototype.createTablePart = function(){
+	Worksheet.prototype.createTablePart = function(){
 
 		return new AscCommonExcel.TablePart(this.handlers);
 	};
-	Woorksheet.prototype.onUpdateRanges = function(ranges) {
+	Worksheet.prototype.onUpdateRanges = function(ranges) {
 		this.workbook.updateSparklineCache(this.sName, ranges);
 		// ToDo do not update conditional formatting on hidden sheet
 		this._updateConditionalFormatting(new AscCommonExcel.MultiplyRange(ranges));
 	};
-	Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
+	Worksheet.prototype.updateSparklineCache = function(sheet, ranges) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			this.aSparklineGroups[i].updateCache(sheet, ranges);
 		}
 	};
-	Woorksheet.prototype.getSparklineGroup = function(c, r) {
+	Worksheet.prototype.getSparklineGroup = function(c, r) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (-1 !== this.aSparklineGroups[i].contains(c, r)) {
 				return this.aSparklineGroups[i];
@@ -4612,7 +4612,7 @@
 		}
 		return null;
 	};
-	Woorksheet.prototype.removeSparklines = function (range) {
+	Worksheet.prototype.removeSparklines = function (range) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (this.aSparklineGroups[i].remove(range)) {
 				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
@@ -4620,7 +4620,7 @@
 			}
 		}
 	};
-	Woorksheet.prototype.removeSparklineGroups = function (range) {
+	Worksheet.prototype.removeSparklineGroups = function (range) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (-1 !== this.aSparklineGroups[i].intersectionSimple(range)) {
 				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
@@ -4628,10 +4628,10 @@
 			}
 		}
 	};
-	Woorksheet.prototype.insertSparklineGroup = function (sparklineGroup) {
+	Worksheet.prototype.insertSparklineGroup = function (sparklineGroup) {
 		this.aSparklineGroups.push(sparklineGroup);
 	};
-	Woorksheet.prototype.removeSparklineGroup = function (id) {
+	Worksheet.prototype.removeSparklineGroup = function (id) {
 		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
 			if (id === this.aSparklineGroups[i].Get_Id()) {
 				this.aSparklineGroups.splice(i, 1);
@@ -4639,7 +4639,7 @@
 			}
 		}
 	};
-	Woorksheet.prototype.getCwf = function() {
+	Worksheet.prototype.getCwf = function() {
 		var cwf = {};
 		var range = this.getRange3(0,0, gc_nMaxRow0, gc_nMaxCol0);
 		range._setPropertyNoEmpty(null, null, function(cell){
@@ -4650,7 +4650,7 @@
 		});
 		return cwf;
 	};
-	Woorksheet.prototype.getAllFormulas = function(formulas) {
+	Worksheet.prototype.getAllFormulas = function(formulas) {
 		var range = this.getRange3(0, 0, gc_nMaxRow0, gc_nMaxCol0);
 		range._setPropertyNoEmpty(null, null, function(cell) {
 			if (cell.formulaParsed) {
@@ -4662,7 +4662,7 @@
 			table.getAllFormulas(formulas);
 		}
 	};
-	Woorksheet.prototype.setTableStyleAfterOpen = function () {
+	Worksheet.prototype.setTableStyleAfterOpen = function () {
 		if (this.TableParts && this.TableParts.length) {
 			for (var i = 0; i < this.TableParts.length; i++) {
 				var table = this.TableParts[i];
@@ -4670,7 +4670,7 @@
 			}
 		}
 	};
-	Woorksheet.prototype.setTableFormulaAfterOpen = function () {
+	Worksheet.prototype.setTableFormulaAfterOpen = function () {
 		if (this.TableParts && this.TableParts.length) {
 			for (var i = 0; i < this.TableParts.length; i++) {
 				var table = this.TableParts[i];
@@ -4679,14 +4679,14 @@
 			}
 		}
 	};
-	Woorksheet.prototype.addTablePart = function (tablePart, bAddToDependencies) {
+	Worksheet.prototype.addTablePart = function (tablePart, bAddToDependencies) {
 		this.TableParts.push(tablePart);
 		if (bAddToDependencies) {
 			this.workbook.dependencyFormulas.addTableName(this, tablePart);
 			tablePart.buildDependencies();
 		}
 	};
-	Woorksheet.prototype.changeTablePart = function (index, tablePart, bChangeName) {
+	Worksheet.prototype.changeTablePart = function (index, tablePart, bChangeName) {
 		var oldTablePart = this.TableParts[index];
 		if (oldTablePart) {
 			oldTablePart.removeDependencies();
@@ -4697,7 +4697,7 @@
 			this.workbook.dependencyFormulas.changeTableName(oldTablePart.DisplayName, tablePart.DisplayName);
 		}
 	};
-	Woorksheet.prototype.deleteTablePart = function (index, bConvertTableFormulaToRef) {
+	Worksheet.prototype.deleteTablePart = function (index, bConvertTableFormulaToRef) {
 		if(bConvertTableFormulaToRef)
 		{
 			//TODO скорее всего стоит убрать else
@@ -4719,7 +4719,7 @@
 		}
 		
 	};
-	Woorksheet.prototype.inPivotTable = function (range) {
+	Worksheet.prototype.inPivotTable = function (range) {
 		return this.pivotTables.some(function (element) {
 			return element.intersection(range);
 		});
@@ -9241,7 +9241,7 @@
 	window['AscCommonExcel'].angleInterfaceToFormat = angleInterfaceToFormat;
 	window['AscCommonExcel'].Workbook = Workbook;
 	window['AscCommonExcel'].CT_Workbook = CT_Workbook;
-	window['AscCommonExcel'].Woorksheet = Woorksheet;
+	window['AscCommonExcel'].Worksheet = Worksheet;
 	window['AscCommonExcel'].Cell = Cell;
 	window['AscCommonExcel'].Range = Range;
 	window['AscCommonExcel'].DefName = DefName;
