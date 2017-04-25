@@ -3883,8 +3883,8 @@ CDocument.prototype.Draw_Borders                             = function(Graphics
  */
 CDocument.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
-	// TODO: Пересчет нужно перенести сюда, и убрать из контроллеров
 	this.Controller.AddNewParagraph(bRecalculate, bForceAdd);
+	this.Recalculate();
 };
 /**
  * Расширяем документ до точки (X,Y) с помощью новых параграфов.
@@ -4278,7 +4278,6 @@ CDocument.prototype.ClearParagraphFormatting  = function()
 };
 CDocument.prototype.Remove = function(nDirection, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
 {
-	// TODO: Пересчет нужно перенести сюда, и убрать из контроллеров
 	if (undefined === bRemoveOnlySelection)
 		bRemoveOnlySelection = false;
 
@@ -4286,6 +4285,8 @@ CDocument.prototype.Remove = function(nDirection, bOnlyText, bRemoveOnlySelectio
 		bOnTextAdd = false;
 
 	this.Controller.Remove(nDirection, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
+
+	this.Recalculate();
 
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateRulersState();
