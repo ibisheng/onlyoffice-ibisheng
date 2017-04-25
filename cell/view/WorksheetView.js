@@ -8482,7 +8482,7 @@
         }
     };
 
-    WorksheetView.prototype.setSelectionInfo = function (prop, val, onlyActive, fromBinary, sortColor) {
+    WorksheetView.prototype.setSelectionInfo = function (prop, val, onlyActive, fromBinary) {
         // Проверка глобального лока
         if (this.collaborativeEditing.getGlobalLock()) {
             return;
@@ -8492,13 +8492,6 @@
         var checkRange = [];
         var activeCell = this.model.selectionRange.activeCell.clone();
         var arn = this.model.selectionRange.getLast().clone(true);
-        if (onlyActive) {
-            checkRange.push(new asc_Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row));
-        } else {
-            this.model.selectionRange.ranges.forEach(function (item) {
-                checkRange.push(item.getAllRange());
-            });
-        }
 
         var onSelectionCallback = function (isSuccess) {
             if (false === isSuccess) {
@@ -8646,7 +8639,7 @@
                             callTrigger = true;
                             t.handlers.trigger("slowOperation", true);
                         }
-                        t.cellCommentator.sortComments(range.sort(val, activeCell.col, sortColor, true));
+                        t.cellCommentator.sortComments(range.sort(val.type, activeCell.col, val.color, true));
                         break;
 
                     case "empty":
@@ -8785,51 +8778,53 @@
 				AscCommonExcel.g_clipboardExcel.end_paste();
 			}
         };
-		
-		//получаем диапазон вставки
-        if ("paste" === prop && val.onlyImages !== true) {
-            var newRange;
-            if (fromBinary) {
-                newRange = this._pasteFromBinary(val, true);
-            } else {
-                newRange = this._pasteFromHTML(val, true);
-            }
-			
+
+		if ("paste" === prop && val.onlyImages === true) {
+			onSelectionCallback();
+		    return;
+		}
+
+		if ("paste" === prop && val.onlyImages !== true) {
+			var newRange;
+			if (fromBinary) {
+				newRange = this._pasteFromBinary(val, true);
+			} else {
+				newRange = this._pasteFromHTML(val, true);
+			}
+
 			var g_clipboardBase = window['AscCommon'].g_clipboardBase;
-			if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
-			{
-				var sBinary = AscCommonExcel.g_clipboardExcel.copyProcessor.getBinaryForCopy(this, newRange);
-				g_clipboardBase.specialPasteUndoData.data = sBinary;
-				
+			if (!AscCommonExcel.g_clipboardExcel.specialPasteStart) {
+				g_clipboardBase.specialPasteUndoData.data =
+					AscCommonExcel.g_clipboardExcel.copyProcessor.getBinaryForCopy(this, newRange);
+
 				var specialPasteSelectionRange = new AscCommonExcel.SelectionRange();
 				specialPasteSelectionRange.ranges[0] = newRange.clone();
 				g_clipboardBase.specialPasteData.activeRange = specialPasteSelectionRange;
-				
+
 				window['AscCommon'].g_clipboardBase.specialPasteUndoData.transpose = null;
-			}
-			else if(g_clipboardBase.specialPasteProps && g_clipboardBase.specialPasteProps.transpose)
-			{
+			} else if (g_clipboardBase.specialPasteProps && g_clipboardBase.specialPasteProps.transpose) {
 				window['AscCommon'].g_clipboardBase.specialPasteUndoData.transpose = true;
 			}
-			
-            checkRange = [newRange];
-        }
-        if ("paste" === prop && val.onlyImages === true) {
-            onSelectionCallback();
-        } else {
-			if (("merge" === prop || "paste" === prop || "sort" === prop || "empty" === prop || "hyperlink" === prop ||
-				"rh" === prop) && this.model.inPivotTable(checkRange)) {
-				this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
-					c_oAscError.Level.NoCritical);
-				return;
-            }
 
-            this._isLockedCells(checkRange, /*subType*/null, onSelectionCallback);
-        }
+			checkRange.push(newRange);
+		} else if (onlyActive) {
+			checkRange.push(new asc_Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row));
+		} else {
+			this.model.selectionRange.ranges.forEach(function (item) {
+				checkRange.push(item.getAllRange());
+			});
+		}
+
+		if (("merge" === prop || "paste" === prop || "sort" === prop || "empty" === prop || "hyperlink" === prop ||
+			"rh" === prop) && this.model.inPivotTable(checkRange)) {
+			this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+				c_oAscError.Level.NoCritical);
+			return;
+		}
+		this._isLockedCells(checkRange, /*subType*/null, onSelectionCallback);
     };
 	
 	WorksheetView.prototype.specialPaste = function (props) {
-		var api = window["Asc"]["editor"];
 		var t = this;
 		
 		var clipboard_base = window['AscCommon'].g_clipboardBase;
@@ -12485,7 +12480,7 @@
 				}
 
 				//sort
-				t.setSelectionInfo("sort", type, null, null, rgbColor);
+				t.setSelectionInfo("sort", {type: type, color: rgbColor});
 				//TODO возможно стоит возвратить selection обратно
 
             } else if (false !== sortProps) {
