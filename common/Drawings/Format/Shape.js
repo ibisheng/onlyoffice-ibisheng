@@ -957,6 +957,7 @@ CShape.prototype.clearContent = function () {
     if (content) {
         content.Set_ApplyToAll(true);
         content.Remove(-1);
+        content.AddToParagraph(new AscCommonWord.ParaTextPr({Lang : {Val : undefined}}), false);
         content.Set_ApplyToAll(false);
     }
 };
@@ -1165,29 +1166,32 @@ CShape.prototype.getHierarchy = function()
     //if(this.recalcInfo.recalculateShapeHierarchy)
     {
         this.compiledHierarchy = [];
-        var hierarchy = this.compiledHierarchy;
-        if(this.isPlaceholder())
+        if(this.parent)
         {
-            var ph_type = this.getPlaceholderType();
-            var ph_index = this.getPlaceholderIndex();
-            var b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
-            switch (this.parent.kind)
+            var hierarchy = this.compiledHierarchy;
+            if(this.isPlaceholder())
             {
-                case AscFormat.TYPE_KIND.SLIDE:
+                var ph_type = this.getPlaceholderType();
+                var ph_index = this.getPlaceholderIndex();
+                var b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
+                switch (this.parent.kind)
                 {
-                    hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                    hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                    break;
-                }
+                    case AscFormat.TYPE_KIND.SLIDE:
+                    {
+                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        break;
+                    }
 
-                case AscFormat.TYPE_KIND.LAYOUT:
-                {
-                    hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                    break;
+                    case AscFormat.TYPE_KIND.LAYOUT:
+                    {
+                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        break;
+                    }
                 }
             }
+            this.recalcInfo.recalculateShapeHierarchy = true;
         }
-        this.recalcInfo.recalculateShapeHierarchy = true;
     }
     return this.compiledHierarchy;
 };
@@ -2322,11 +2326,20 @@ CShape.prototype.recalculateTextStyles = function (level) {
             default_style.TextPr.RFonts.CS = {Name: "+mn-cs", Index: -1};
             default_style.TextPr.RFonts.HAnsi = {Name: "+mn-lt", Index: -1};
         }
-        if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)
-            && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level])) {
-            var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
-            default_style.ParaPr.Merge(default_ppt_style.Copy());
-            default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+        if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)) {
+
+            if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[9]))
+            {
+                var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[9];
+                default_style.ParaPr.Merge(default_ppt_style.Copy());
+                default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+            }
+            if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
+            {
+                var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
+                default_style.ParaPr.Merge(default_ppt_style.Copy());
+                default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+            }
         }
 
         var master_style;
