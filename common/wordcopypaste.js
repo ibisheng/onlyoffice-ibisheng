@@ -2387,7 +2387,7 @@ PasteProcessor.prototype =
 		return res;
 	},
 
-	_convertTableToText: function(table, obj)
+	_convertTableToText: function(table, obj, newParagraph)
 	{
 		var oDoc = this.oLogicDocument;
 		var t = this;
@@ -2396,40 +2396,20 @@ PasteProcessor.prototype =
 			obj = [];
 		}
 
-		/*var parseDocumentContent = function(cDocumentContent, newParagraph, addPararunNum)
-		{
-			for(var n = 0; n < cDocumentContent.Content.length; n++)
-			{
-				if(cDocumentContent.Content[n] instanceof Paragraph)
-				{
-					var value = cDocumentContent.Content[n].GetText();
-					var newParaRun = new ParaRun();
-
-					t._addTextIntoRun(newParaRun, value);
-
-					newParagraph.Internal_Content_Add(addPararunNum, newParaRun, false);
-				}
-				else if(cDocumentContent.Content[n] instanceof CTable)
-				{
-					t._convertTableToText(cDocumentContent.Content[n], obj);
-				}
-			}
-		};*/
-
-
 		//row
 		for(var i = 0; i < table.Content.length; i++)
 		{
-			var newParagraph = new Paragraph(oDoc.DrawingDocument, oDoc);
+			if(!newParagraph)
+			{
+				newParagraph = new Paragraph(oDoc.DrawingDocument, oDoc);
+			}
 
 			//col
 			for(var j = 0; j < table.Content[i].Content.length; j++)
 			{
 				//content
 				var cDocumentContent = table.Content[i].Content[j].Content;
-				//parseDocumentContent(cDocumentContent, newParagraph, j);
 
-				//TODO нужно поправить проблему с внутренними таблицами
 				var createNewParagraph = false;
 				var previousTableAdd = false;
 				for(var n = 0; n < cDocumentContent.Content.length; n++)
@@ -2448,11 +2428,12 @@ PasteProcessor.prototype =
 
 						t._addTextIntoRun(newParaRun, value);
 
-						newParagraph.Internal_Content_Add(j, newParaRun, false);
+						newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
 					}
 					else if(cDocumentContent.Content[n] instanceof CTable)
 					{
-						t._convertTableToText(cDocumentContent.Content[n], obj);
+						t._convertTableToText(cDocumentContent.Content[n], obj, newParagraph);
+						createNewParagraph = true;
 						previousTableAdd = true;
 					}
 
@@ -2462,10 +2443,10 @@ PasteProcessor.prototype =
 						createNewParagraph = true;
 					}
 				}
-
 			}
 
 			obj.push(newParagraph);
+			newParagraph = null;
 		}
 
 		return obj;
