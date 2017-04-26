@@ -2581,6 +2581,9 @@ CT_pivotTableDefinition.prototype.contains = function (col, row) {
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
 };
+CT_pivotTableDefinition.prototype.asc_getStyleInfo = function () {
+	return this.pivotTableStyleInfo;
+};
 CT_pivotTableDefinition.prototype.asc_getFields = function () {
 	return this.cacheDefinition && this.cacheDefinition.getFields();
 };
@@ -4449,6 +4452,9 @@ CT_PivotTableStyle.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
+};
+CT_PivotTableStyle.prototype.asc_getName = function() {
+	return this.name;
 };
 function CT_PivotFilters() {
 //Attributes
@@ -9758,9 +9764,14 @@ CT_GroupMember.prototype.toXml = function(writer, name) {
 };
 
 var prot;
+
 prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getFields"] = prot.asc_getFields;
+prot["asc_getStyleInfo"] = prot.asc_getStyleInfo;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
 prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
+
+prot = CT_PivotTableStyle.prototype;
+prot["asc_getName"] = prot.asc_getName;
