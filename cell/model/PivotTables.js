@@ -1680,6 +1680,9 @@ CT_PivotCacheDefinition.prototype.toXml = function(writer) {
 	writer.WriteXmlNodeEnd("pivotCacheDefinition");
 	return res;
 };
+CT_PivotCacheDefinition.prototype.getField = function (index) {
+	return this.cacheFields && this.cacheFields.cacheField && this.cacheFields.cacheField[index];
+};
 CT_PivotCacheDefinition.prototype.getFields = function () {
 	var res = null;
 	if (this.cacheFields && this.cacheFields.cacheField) {
@@ -2580,6 +2583,20 @@ CT_pivotTableDefinition.prototype.asc_getName = function () {
 };
 CT_pivotTableDefinition.prototype.asc_getFields = function () {
 	return this.cacheDefinition && this.cacheDefinition.getFields();
+};
+CT_pivotTableDefinition.prototype.asc_getColumnFields = function () {
+	return this.getField(this.colFields);
+};
+CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
+	return this.getField(this.rowFields);
+};
+CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
+	return this.getField(this.dataFields);
+};
+CT_pivotTableDefinition.prototype.getField = function (arrFields) {
+	return arrFields && arrFields.map(function (element) {
+		return element && this.cacheDefinition.getField(element.x).name;
+	});
 };
 function CT_CacheSource() {
 //Attributes
@@ -9743,3 +9760,6 @@ CT_GroupMember.prototype.toXml = function(writer, name) {
 prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getFields"] = prot.asc_getFields;
+prot["asc_getColumnFields"] = prot.asc_getColumnFields;
+prot["asc_getRowFields"] = prot.asc_getRowFields;
+prot["asc_getDataFields"] = prot.asc_getDataFields;
