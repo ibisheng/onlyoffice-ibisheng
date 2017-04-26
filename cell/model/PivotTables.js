@@ -2565,6 +2565,9 @@ CT_pivotTableDefinition.prototype.intersection = function (range) {
 CT_pivotTableDefinition.prototype.contains = function (col, row) {
 	return this.location && this.location.contains(col, row);
 };
+CT_pivotTableDefinition.prototype.asc_getName = function () {
+	return this.name;
+};
 function CT_CacheSource() {
 //Attributes
 	this.type = null;
@@ -9723,3 +9726,6 @@ CT_GroupMember.prototype.toXml = function(writer, name) {
 	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
+
+prot = CT_pivotTableDefinition.prototype;
+prot["asc_getName"] = prot.asc_getName;
