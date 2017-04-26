@@ -2442,14 +2442,15 @@ PasteProcessor.prototype =
 								{
 									paragraphContent.splice(i + n, 0, elem.Content[n]);
 								}
-
 								i--;
-								//checkInsideDrawings(elem.Content);
 
 								break;
 							}
 							case para_Math:
 							{
+								//преобразуем в текст
+								this._convertParaMathToText(elem);
+
 								break;
 							}
 						}
@@ -2476,6 +2477,11 @@ PasteProcessor.prototype =
 				break;
 			}
 		}
+	},
+
+	_convertParaMathToText: function(paraMath)
+	{
+		//TODO пока добавляю функцию здесь. должна она находиться в Math.js
 	},
 
 	_convertTableToText: function(table, obj, newParagraph)
