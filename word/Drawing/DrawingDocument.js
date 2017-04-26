@@ -6246,6 +6246,7 @@ function CDrawingDocument()
 			var _old = this.ContentControlObjectState;
 			if (pos.X > _x && pos.X < _r && pos.Y > _y && pos.Y < _b)
 			{
+				oWordControl.m_oLogicDocument.SelectContentControl(this.ContentControlObject.id);
 				this.ContentControlObjectState = 1;
 
 				this.InlineTextTrackEnabled = true;
@@ -6459,16 +6460,13 @@ function CDrawingDocument()
 				if (this.InlineTextTrack) // значит был MouseMove
 				{
 					this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
-					// TODO:
-					//this.m_oWordControl.m_oLogicDocument.On_ContentControlTrackEnd(this.ContentControlObject.id, this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
-
+					this.m_oWordControl.m_oLogicDocument.OnContentControlTrackEnd(this.ContentControlObject.id, this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
 					this.InlineTextTrackEnabled = false;
 					this.InlineTextTrack = null;
 					this.InlineTextTrackPage = -1;
 				}
 				else
 				{
-					// TODO: Select?
 					this.InlineTextTrackEnabled = false;
 				}
 			}

@@ -15145,6 +15145,9 @@ CDocument.prototype.MoveToFillingForm = function(bNext)
 };
 CDocument.prototype.DrawContentControls = function(PageAbs, MouseX, MouseY, MousePage)
 {
+	if (null !== this.FullRecalc.Id && (this.FullRecalc.PageIndex < PageAbs || this.FullRecalc.PageIndex < MousePage))
+		return false;
+
 	var oBlockLevelSdt = this.Controller.IsInBlockLevelSdt();
 	if (null !== oBlockLevelSdt)
 	{
@@ -15153,6 +15156,52 @@ CDocument.prototype.DrawContentControls = function(PageAbs, MouseX, MouseY, Mous
 	else if (PageAbs === MousePage)
 	{
 		this.Controller.DrawContentControlsHover(MouseX, MouseY, MousePage);
+	}
+};
+CDocument.prototype.SelectContentControl = function(Id)
+{
+	var oBlockLevelSdt = this.TableId.Get_ById(Id);
+	if (oBlockLevelSdt)
+	{
+		this.RemoveSelection();
+		oBlockLevelSdt.SelectAll(1);
+		oBlockLevelSdt.Set_CurrentElement(false, 0, oBlockLevelSdt.Content);
+
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
+		this.Document_UpdateSelectionState();
+	}
+};
+CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
+{
+	if (true === this.Comments.Is_Use())
+	{
+		this.Select_Comment(null, false);
+		editor.sync_HideComment();
+	}
+
+	var oParagraph = NearestPos.Paragraph;
+
+	// Сначала нам надо проверить попадаем ли мы обратно в выделенный текст, если да, тогда ничего не делаем,
+	// а если нет, тогда удаляем выделенный текст и вставляем его в заданное место.
+	if (true === this.CheckPosInSelection(0, 0, 0, NearestPos))
+	{
+		this.RemoveSelection();
+
+		// Нам надо снять селект и поставить курсор в то место, где была ближайшая позиция
+		oParagraph.Cursor_MoveToNearPos(NearestPos);
+		oParagraph.Document_SetThisElementCurrent(false);
+
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateRulersState();
+	}
+	else
+	{
+
+
+
+		console.log("нормально");
 	}
 };
 

@@ -113,14 +113,18 @@ CBlockLevelSdt.prototype.Reset_RecalculateCache = function()
 CBlockLevelSdt.prototype.Write_ToBinary2 = function(Writer)
 {
 	Writer.WriteLong(AscDFH.historyitem_type_BlockLevelSdt);
+	// String : Id
 	// String : Content id
+	Writer.WriteString2(this.GetId());
 	Writer.WriteString2(this.Content.GetId());
 };
 CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 {
 	this.LogicDocument = editor.WordControl.m_oLogicDocument;
 
+	// String : Id
 	// String : Content id
+	this.Id      = Reader.GetString2();
 	this.Content = this.LogicDocument.Get_TableId().Get_ById(Reader.GetString2());
 };
 CBlockLevelSdt.prototype.Draw = function(CurPage, oGraphics)

@@ -1792,7 +1792,7 @@ CTableCell.prototype =
     {
     }
 };
-CTableCell.private_TransformXY = function(X, Y)
+CTableCell.prototype.private_TransformXY = function(X, Y)
 {
 	// TODO: Везде, где идет такой код заменить на данную функцию
 
