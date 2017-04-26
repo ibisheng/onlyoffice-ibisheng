@@ -3822,6 +3822,9 @@ function CDrawingDocument()
 			var cx = _x - 0.5 + 4;
 			var cy = _y - 0.5 + 4;
 
+			var _color1 = "#ADADAD";
+			var _color2 = "#D4D4D4";
+
 			overlay.AddRect(cx, cy, 3, 3);
 			overlay.AddRect(cx + 5, cy, 3, 3);
 			overlay.AddRect(cx + 10, cy, 3, 3);
@@ -3829,8 +3832,38 @@ function CDrawingDocument()
 			overlay.AddRect(cx + 5, cy + 5, 3, 3);
 			overlay.AddRect(cx + 10, cy + 5, 3, 3);
 
-			ctx.fillStyle = "#ADADAD";
+			ctx.fillStyle = _color2;
 			ctx.fill();
+			ctx.beginPath();
+
+			ctx.moveTo(cx + 1.5, cy);
+			ctx.lineTo(cx + 1.5, cy + 3);
+			ctx.moveTo(cx + 6.5, cy);
+			ctx.lineTo(cx + 6.5, cy + 3);
+			ctx.moveTo(cx + 11.5, cy);
+			ctx.lineTo(cx + 11.5, cy + 3);
+			ctx.moveTo(cx + 1.5, cy + 5);
+			ctx.lineTo(cx + 1.5, cy + 8);
+			ctx.moveTo(cx + 6.5, cy + 5);
+			ctx.lineTo(cx + 6.5, cy + 8);
+			ctx.moveTo(cx + 11.5, cy + 5);
+			ctx.lineTo(cx + 11.5, cy + 8);
+
+			ctx.moveTo(cx, cy + 1.5);
+			ctx.lineTo(cx + 3, cy + 1.5);
+			ctx.moveTo(cx + 5, cy + 1.5);
+			ctx.lineTo(cx + 8, cy + 1.5);
+			ctx.moveTo(cx + 10, cy + 1.5);
+			ctx.lineTo(cx + 13, cy + 1.5);
+			ctx.moveTo(cx, cy + 6.5);
+			ctx.lineTo(cx + 3, cy + 6.5);
+			ctx.moveTo(cx + 5, cy + 6.5);
+			ctx.lineTo(cx + 8, cy + 6.5);
+			ctx.moveTo(cx + 10, cy + 6.5);
+			ctx.lineTo(cx + 13, cy + 6.5);
+
+			ctx.strokeStyle = _color1;
+			ctx.stroke();
 			ctx.beginPath();
 		}
 	};
