@@ -2120,6 +2120,7 @@ function CDrawingDocument()
 	this.UpdateRulerStateParams = [];
 
 	this.ContentControlObject = null;
+	this.ContentControlObjectState = -1; // 0 - hover, 1 - down
 
 	// массивы ректов для поиска
 	this._search_HdrFtr_All = []; // Поиск в колонтитуле, который находится на всех страницах
@@ -3758,7 +3759,7 @@ function CDrawingDocument()
 	this.DrawContentControl = function(id, type, page, rects)
 	{
 		if (type == c_oContentControlTrack.In)
-			this.ContentControlObject = { id : id, page : page, rect : rect };
+			this.ContentControlObject = { id : id, page : page, rects : rects };
 
 		var overlay = this.m_oWordControl.m_oOverlayApi;
 
@@ -3816,6 +3817,13 @@ function CDrawingDocument()
 			_y = ((_y >> 0) + 0.5) - 15;
 
 			ctx.rect(_x, _y, 20, 15);
+
+			if (1 == this.ContentControlObjectState)
+			{
+				ctx.fillStyle = "#CFCFCF";
+				ctx.fill();
+			}
+
 			ctx.stroke();
 			ctx.beginPath();
 
@@ -3824,6 +3832,12 @@ function CDrawingDocument()
 
 			var _color1 = "#ADADAD";
 			var _color2 = "#D4D4D4";
+
+			if (0 == this.ContentControlObjectState || 1 == this.ContentControlObjectState)
+			{
+				_color1 = "#444444";
+				_color2 = "#9D9D9D";
+			}
 
 			overlay.AddRect(cx, cy, 3, 3);
 			overlay.AddRect(cx + 5, cy, 3, 3);
@@ -6200,6 +6214,31 @@ function CDrawingDocument()
 			}
 		}
 
+		if (this.ContentControlObject && pos.Page == this.ContentControlObject.page)
+		{
+			var _page = this.m_arrPages[this.ContentControlObject.page];
+			var drPage = _page.drawingPage;
+
+			var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+			var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+			var rect = this.ContentControlObject.rects[0];
+			var _x = rect.X;
+			var _y = rect.Y - (15 / dKoefY);
+			var _r = _x + (20 / dKoefX);
+			var _b = rect.Y;
+
+			var _old = this.ContentControlObjectState;
+			if (pos.X > _x && pos.X < _r && pos.Y > _y && pos.Y < _b)
+			{
+				this.ContentControlObjectState = 1;
+				oWordControl.ShowOverlay();
+				oWordControl.OnUpdateOverlay();
+				oWordControl.EndUpdateOverlay();
+				return true;
+			}
+		}
+
 		return false;
 	}
 
@@ -6299,8 +6338,45 @@ function CDrawingDocument()
 			}
 		}
 
+		if (this.ContentControlObject && pos.Page == this.ContentControlObject.page)
+		{
+			if (1 == this.ContentControlObjectState)
+			{
+				oWordControl.ShowOverlay();
+				oWordControl.OnUpdateOverlay();
+				oWordControl.EndUpdateOverlay();
+				return true;
+			}
+
+			var _page = this.m_arrPages[this.ContentControlObject.page];
+			var drPage = _page.drawingPage;
+
+			var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+			var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+			var rect = this.ContentControlObject.rects[0];
+			var _x = rect.X;
+			var _y = rect.Y - (15 / dKoefY);
+			var _r = _x + (20 / dKoefX);
+			var _b = rect.Y;
+
+			var _old = this.ContentControlObjectState;
+			this.ContentControlObjectState = -1;
+			if (pos.X > _x && pos.X < _r && pos.Y > _y && pos.Y < _b)
+			{
+				this.ContentControlObjectState = 0;
+				oWordControl.ShowOverlay();
+				oWordControl.OnUpdateOverlay();
+				oWordControl.EndUpdateOverlay();
+				return true;
+			}
+
+			if (_old != this.ContentControlObjectState)
+				oWordControl.OnUpdateOverlay();
+		}
+
 		return false;
-	}
+	};
 
 	this.checkMouseUp_Drawing = function (pos)
 	{
@@ -6349,6 +6425,15 @@ function CDrawingDocument()
 			}
 			oWordControl.OnUpdateOverlay();
 
+			oWordControl.EndUpdateOverlay();
+			return true;
+		}
+
+		if (this.ContentControlObject && this.ContentControlObjectState == 1)
+		{
+			this.ContentControlObjectState = 0;
+			oWordControl.ShowOverlay();
+			oWordControl.OnUpdateOverlay();
 			oWordControl.EndUpdateOverlay();
 			return true;
 		}
