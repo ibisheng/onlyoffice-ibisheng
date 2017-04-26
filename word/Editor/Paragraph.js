@@ -12094,6 +12094,10 @@ Paragraph.prototype.GetCurrentParagraph = function()
 {
 	return this;
 };
+Paragraph.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
+{
+	return oBlockLevelSdt;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

@@ -571,6 +571,10 @@ CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
 {
 	return null;
 };
+CDocumentContentElementBase.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
+{
+	return this.Content.IsInBlockLevelSdt(this);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

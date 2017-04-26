@@ -378,3 +378,7 @@ CLogicDocumentController.prototype.RemoveTextSelection = function()
 {
 	return this.RemoveSelection();
 };
+CLogicDocumentController.prototype.IsInBlockLevelSdt = function()
+{
+	return this.LogicDocument.controller_IsInBlockLevelSdt();
+};

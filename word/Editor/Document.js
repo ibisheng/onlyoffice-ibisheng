@@ -15011,6 +15011,18 @@ CDocument.prototype.controller_GetCurrentSectionPr = function()
 	var nContentPos = this.CurPos.ContentPos;
 	return this.SectionsInfo.Get_SectPr(nContentPos).SectPr;
 };
+CDocument.prototype.controller_IsInBlockLevelSdt = function()
+{
+	if (false === this.Selection.Use || this.Selection.StartPos === this.Selection.EndPos)
+	{
+		if (true === this.Selection.Use)
+			return this.Content[this.Selection.StartPos].IsInBlockLevelSdt(null);
+		else
+			return this.Content[this.CurPos.ContentPos].IsInBlockLevelSdt(null);
+	}
+
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -15122,6 +15134,21 @@ CDocument.prototype.MoveToFillingForm = function(bNext)
 
 		this.Document_UpdateInterfaceState();
 		this.Document_UpdateSelectionState();
+	}
+};
+CDocument.prototype.DrawContentControls = function(PageAbs, MouseX, MouseY, MousePage)
+{
+	var oBlockLevelSdt = this.Controller.IsInBlockLevelSdt();
+	if (null !== oBlockLevelSdt)
+	{
+		oBlockLevelSdt.DrawContentControls(PageAbs);
+	}
+	else if (PageAbs === MousePage)
+	{
+		var ContentPos       = this.Internal_GetContentPosByXY(MouseX, MouseY, MousePage);
+		var Item             = this.Content[ContentPos];
+		var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, MouseX, MouseY, MousePage);
+		//Item.DrawContentControls(MouseX, MouseY, MousePage);
 	}
 };
 

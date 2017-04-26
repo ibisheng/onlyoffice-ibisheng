@@ -482,3 +482,10 @@ CHdrFtrController.prototype.RemoveTextSelection = function()
 	if (null != CurHdrFtr)
 		return CurHdrFtr.Content.RemoveTextSelection();
 };
+CHdrFtrController.prototype.IsInBlockLevelSdt = function()
+{
+	if (this.HdrFtr.CurHdrFtr)
+		return this.HdrFtr.CurHdrFtr.Content.IsInBlockLevelSdt(null);
+
+	return null;
+};

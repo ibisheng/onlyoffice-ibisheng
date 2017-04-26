@@ -517,4 +517,11 @@ CDrawingsController.prototype.RemoveTextSelection = function()
 {
 	this.DrawingObjects.removeTextSelection();
 };
+CDrawingsController.prototype.IsInBlockLevelSdt = function()
+{
+	var oTargetTextObject = AscFormat.getTargetTextObject(this.DrawingObjects);
+	if (oTargetTextObject)
+		return oTargetTextObject.IsInBlockLevelSdt(null);
 
+	return null;
+};

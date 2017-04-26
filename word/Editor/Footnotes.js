@@ -3218,6 +3218,13 @@ CFootnotesController.prototype.ResetRecalculateCache = function()
 		this.Footnote[Id].Reset_RecalculateCache();
 	}
 };
+CFootnotesController.prototype.IsInBlockLevelSdt = function()
+{
+	if (true !== this.Selection.Use || 0 === this.Selection.Direction)
+		return this.CurFootnote.IsInBlockLevelSdt(null);
+
+	return null;
+};
 
 
 function CFootEndnotePageColumn()

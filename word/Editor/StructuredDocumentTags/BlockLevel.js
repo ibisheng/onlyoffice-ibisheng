@@ -126,14 +126,6 @@ CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 CBlockLevelSdt.prototype.Draw = function(CurPage, oGraphics)
 {
 	this.Content.Draw(CurPage, oGraphics);
-
-	var oPageBounds = this.GetPageBounds(CurPage);
-
-	oGraphics.p_color(0, 0, 255, 255);
-	oGraphics.drawVerLine(0, oPageBounds.Left, oPageBounds.Top, oPageBounds.Bottom, 0);
-	oGraphics.drawVerLine(0, oPageBounds.Right, oPageBounds.Top, oPageBounds.Bottom, 0);
-	oGraphics.drawHorLine(0, oPageBounds.Top, oPageBounds.Left, oPageBounds.Right, 0);
-	oGraphics.drawHorLine(0, oPageBounds.Bottom, oPageBounds.Left, oPageBounds.Right, 0);
 };
 CBlockLevelSdt.prototype.Get_CurrentPage_Absolute = function()
 {
@@ -570,6 +562,31 @@ CBlockLevelSdt.prototype.CanAddComment = function()
 CBlockLevelSdt.prototype.GetSelectionAnchorPos = function()
 {
 	return this.Content.GetSelectionAnchorPos();
+};
+CBlockLevelSdt.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
+{
+	return this.Content.IsInBlockLevelSdt(this);
+};
+CBlockLevelSdt.prototype.DrawContentControls = function(PageAbs)
+{
+	var oDrawingDocument = this.LogicDocument.Get_DrawingDocument();
+	var arrRects = [];
+
+	for (var nCurPage = 0, nPagesCount = this.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
+	{
+		var nCurPageAbs = this.Get_AbsolutePage(nCurPage);
+		if (nCurPageAbs === PageAbs)
+		{
+			var oBounds = this.GetPageBounds(nCurPage);
+			arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom});
+		}
+		else if (nCurPageAbs > PageAbs)
+		{
+			break;
+		}
+	}
+
+	oDrawingDocument.DrawContentControl(this.GetId(), c_oContentControlTrack.In, PageAbs, arrRects);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)

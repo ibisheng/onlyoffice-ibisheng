@@ -8479,6 +8479,18 @@ CDocumentContent.prototype.IsBlockLevelSdtContent = function()
 {
 	return (this.Parent && this.Parent instanceof CBlockLevelSdt);
 };
+CDocumentContent.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
+{
+	if (false === this.Selection.Use || this.Selection.StartPos === this.Selection.EndPos)
+	{
+		if (true === this.Selection.Use)
+			return this.Content[this.Selection.StartPos].IsInBlockLevelSdt(oBlockLevelSdt);
+		else
+			return this.Content[this.CurPos.ContentPos].IsInBlockLevelSdt(oBlockLevelSdt);
+	}
+
+	return oBlockLevelSdt;
+};
 
 function CDocumentContentStartState(DocContent)
 {

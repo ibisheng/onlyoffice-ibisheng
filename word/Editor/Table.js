@@ -11999,6 +11999,13 @@ CTable.prototype.GetTableProps = function()
 {
 	return this.Get_Props();
 };
+CTable.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
+{
+	if (true !== this.Selection.Use || table_Selection_Text === this.Selection.Type)
+		return this.CurCell.Content.IsInBlockLevelSdt(oBlockLevelSdt);
+
+	return oBlockLevelSdt;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------
