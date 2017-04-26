@@ -1674,6 +1674,24 @@ function CEditorPage(api)
 			oWordControl.OnUpdateOverlay();
 		}
 
+		if (!oWordControl.IsUpdateOverlayOnEndCheck)
+		{
+			var _hoverObj = oWordControl.m_oDrawingDocument.ContentControlObjectHover;
+			var _oldHover = {
+				state : _hoverObj.state,
+				id : _hoverObj.id
+			};
+			_hoverObj.check = true;
+			_hoverObj.state = 0;
+			_hoverObj.id = -1;
+
+			oWordControl.m_oLogicDocument.DrawContentControls(pos.Page, pos.X, pos.Y, pos.Page);
+			_hoverObj.check = false;
+
+			if (_hoverObj.state != _oldHover.state || _hoverObj.id != _oldHover.id)
+				oWordControl.OnUpdateOverlay();
+		}
+
 		oWordControl.EndUpdateOverlay();
 	};
 	this.onMouseMove2 = function()

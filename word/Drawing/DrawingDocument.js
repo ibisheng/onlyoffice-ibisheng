@@ -2121,6 +2121,7 @@ function CDrawingDocument()
 
 	this.ContentControlObject = null;
 	this.ContentControlObjectState = -1; // 0 - hover, 1 - down
+	this.ContentControlObjectHover = { check : false, state : -1, id : -1 };
 
 	// массивы ректов для поиска
 	this._search_HdrFtr_All = []; // Поиск в колонтитуле, который находится на всех страницах
@@ -3758,6 +3759,17 @@ function CDrawingDocument()
 
 	this.DrawContentControl = function(id, type, page, rects)
 	{
+		if (this.ContentControlObjectHover.check)
+		{
+			if (type == c_oContentControlTrack.Hover)
+			{
+				this.ContentControlObjectHover.state = 1;
+				this.ContentControlObjectHover.id = id;
+			}
+
+			return;
+		}
+
 		if (!rects || rects.length == 0)
 			return;
 
@@ -3803,7 +3815,7 @@ function CDrawingDocument()
 
 		if (type == c_oContentControlTrack.Hover)
 		{
-			ctx.fillStyle = "rgba(235, 235, 235, 0.5);";
+			ctx.fillStyle = "rgba(235, 235, 235, 0.5)";
 			ctx.fill();
 		}
 		ctx.stroke();
@@ -3816,10 +3828,10 @@ function CDrawingDocument()
 			_x = (drPage.left + dKoefX * rect.X);
 			_y = (drPage.top + dKoefY * rect.Y);
 
-			_x = ((_x >> 0) + 0.5);
-			_y = ((_y >> 0) + 0.5) - 15;
+			_x = ((_x >> 0) + 0.5) - 15;
+			_y = ((_y >> 0) + 0.5);
 
-			ctx.rect(_x, _y, 20, 15);
+			ctx.rect(_x, _y, 15, 20);
 
 			if (1 == this.ContentControlObjectState)
 			{
@@ -3844,10 +3856,10 @@ function CDrawingDocument()
 
 			overlay.AddRect(cx, cy, 3, 3);
 			overlay.AddRect(cx + 5, cy, 3, 3);
-			overlay.AddRect(cx + 10, cy, 3, 3);
 			overlay.AddRect(cx, cy + 5, 3, 3);
 			overlay.AddRect(cx + 5, cy + 5, 3, 3);
-			overlay.AddRect(cx + 10, cy + 5, 3, 3);
+			overlay.AddRect(cx, cy + 10, 3, 3);
+			overlay.AddRect(cx + 5, cy + 10, 3, 3);
 
 			ctx.fillStyle = _color2;
 			ctx.fill();
@@ -3857,27 +3869,27 @@ function CDrawingDocument()
 			ctx.lineTo(cx + 1.5, cy + 3);
 			ctx.moveTo(cx + 6.5, cy);
 			ctx.lineTo(cx + 6.5, cy + 3);
-			ctx.moveTo(cx + 11.5, cy);
-			ctx.lineTo(cx + 11.5, cy + 3);
 			ctx.moveTo(cx + 1.5, cy + 5);
 			ctx.lineTo(cx + 1.5, cy + 8);
 			ctx.moveTo(cx + 6.5, cy + 5);
 			ctx.lineTo(cx + 6.5, cy + 8);
-			ctx.moveTo(cx + 11.5, cy + 5);
-			ctx.lineTo(cx + 11.5, cy + 8);
+			ctx.moveTo(cx + 1.5, cy + 10);
+			ctx.lineTo(cx + 1.5, cy + 13);
+			ctx.moveTo(cx + 6.5, cy + 10);
+			ctx.lineTo(cx + 6.5, cy + 13);
 
 			ctx.moveTo(cx, cy + 1.5);
 			ctx.lineTo(cx + 3, cy + 1.5);
 			ctx.moveTo(cx + 5, cy + 1.5);
 			ctx.lineTo(cx + 8, cy + 1.5);
-			ctx.moveTo(cx + 10, cy + 1.5);
-			ctx.lineTo(cx + 13, cy + 1.5);
 			ctx.moveTo(cx, cy + 6.5);
 			ctx.lineTo(cx + 3, cy + 6.5);
 			ctx.moveTo(cx + 5, cy + 6.5);
 			ctx.lineTo(cx + 8, cy + 6.5);
-			ctx.moveTo(cx + 10, cy + 6.5);
-			ctx.lineTo(cx + 13, cy + 6.5);
+			ctx.moveTo(cx, cy + 11.5);
+			ctx.lineTo(cx + 3, cy + 11.5);
+			ctx.moveTo(cx + 5, cy + 11.5);
+			ctx.lineTo(cx + 8, cy + 11.5);
 
 			ctx.strokeStyle = _color1;
 			ctx.stroke();
@@ -6226,10 +6238,10 @@ function CDrawingDocument()
 			var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
 
 			var rect = this.ContentControlObject.rects[0];
-			var _x = rect.X;
-			var _y = rect.Y - (15 / dKoefY);
-			var _r = _x + (20 / dKoefX);
-			var _b = rect.Y;
+			var _x = rect.X - (15 / dKoefX);
+			var _y = rect.Y;
+			var _r = rect.X;
+			var _b = rect.Y + (20 / dKoefY);
 
 			var _old = this.ContentControlObjectState;
 			if (pos.X > _x && pos.X < _r && pos.Y > _y && pos.Y < _b)
@@ -6366,10 +6378,10 @@ function CDrawingDocument()
 			var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
 
 			var rect = this.ContentControlObject.rects[0];
-			var _x = rect.X;
-			var _y = rect.Y - (15 / dKoefY);
-			var _r = _x + (20 / dKoefX);
-			var _b = rect.Y;
+			var _x = rect.X - (15 / dKoefX);
+			var _y = rect.Y;
+			var _r = rect.X;
+			var _b = rect.Y + (20 / dKoefY);
 
 			var _old = this.ContentControlObjectState;
 			this.ContentControlObjectState = -1;
