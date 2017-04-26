@@ -9757,6 +9757,7 @@ CT_GroupMember.prototype.toXml = function(writer, name) {
 	return res;
 };
 
+var prot;
 prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getFields"] = prot.asc_getFields;
