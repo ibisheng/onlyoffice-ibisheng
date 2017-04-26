@@ -1680,6 +1680,16 @@ CT_PivotCacheDefinition.prototype.toXml = function(writer) {
 	writer.WriteXmlNodeEnd("pivotCacheDefinition");
 	return res;
 };
+CT_PivotCacheDefinition.prototype.getFields = function () {
+	var res = null;
+	if (this.cacheFields && this.cacheFields.cacheField) {
+		res = [];
+		this.cacheFields.cacheField.each(function (element) {
+			res.push(element.name);
+		});
+	}
+	return res;
+};
 function CT_PivotCacheRecords() {
 //Attributes
 	this.count = null;
@@ -2567,6 +2577,9 @@ CT_pivotTableDefinition.prototype.contains = function (col, row) {
 };
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
+};
+CT_pivotTableDefinition.prototype.asc_getFields = function () {
+	return this.cacheDefinition && this.cacheDefinition.getFields();
 };
 function CT_CacheSource() {
 //Attributes
@@ -9729,3 +9742,4 @@ CT_GroupMember.prototype.toXml = function(writer, name) {
 
 prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
+prot["asc_getFields"] = prot.asc_getFields;
