@@ -3758,6 +3758,9 @@ function CDrawingDocument()
 
 	this.DrawContentControl = function(id, type, page, rects)
 	{
+		if (!rects || rects.length == 0)
+			return;
+
 		if (type == c_oContentControlTrack.In)
 			this.ContentControlObject = { id : id, page : page, rects : rects };
 
@@ -6232,6 +6235,11 @@ function CDrawingDocument()
 			if (pos.X > _x && pos.X < _r && pos.Y > _y && pos.Y < _b)
 			{
 				this.ContentControlObjectState = 1;
+
+				this.InlineTextTrackEnabled = true;
+				this.InlineTextTrack = null;
+				this.InlineTextTrackPage = -1;
+
 				oWordControl.ShowOverlay();
 				oWordControl.OnUpdateOverlay();
 				oWordControl.EndUpdateOverlay();
@@ -6342,6 +6350,9 @@ function CDrawingDocument()
 		{
 			if (1 == this.ContentControlObjectState)
 			{
+				this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+				this.InlineTextTrackPage = pos.Page;
+
 				oWordControl.ShowOverlay();
 				oWordControl.OnUpdateOverlay();
 				oWordControl.EndUpdateOverlay();
@@ -6398,7 +6409,7 @@ function CDrawingDocument()
 			return true;
 		}
 
-		if (this.InlineTextTrackEnabled)
+		if (this.InlineTextTrackEnabled && !this.ContentControlObject)
 		{
 			this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
 			this.InlineTextTrackPage = pos.Page;
@@ -6431,6 +6442,25 @@ function CDrawingDocument()
 
 		if (this.ContentControlObject && this.ContentControlObjectState == 1)
 		{
+			if (this.InlineTextTrackEnabled)
+			{
+				if (this.InlineTextTrack) // значит был MouseMove
+				{
+					this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+					// TODO:
+					//this.m_oWordControl.m_oLogicDocument.On_ContentControlTrackEnd(this.ContentControlObject.id, this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
+
+					this.InlineTextTrackEnabled = false;
+					this.InlineTextTrack = null;
+					this.InlineTextTrackPage = -1;
+				}
+				else
+				{
+					// TODO: Select?
+					this.InlineTextTrackEnabled = false;
+				}
+			}
+
 			this.ContentControlObjectState = 0;
 			oWordControl.ShowOverlay();
 			oWordControl.OnUpdateOverlay();
