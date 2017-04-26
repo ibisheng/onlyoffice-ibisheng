@@ -2949,6 +2949,13 @@ function CEditorPage(api)
 				}
 			}
 
+			var posMouse = drDoc.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
+			drDoc.ContentControlObject = null;
+			for (var j = drDoc.m_lDrawingFirst; j <= drDoc.m_lDrawingEnd; j++)
+			{
+				this.m_oLogicDocument.DrawContentControls(j, posMouse.X, posMouse.Y, posMouse.Page);
+			}
+
 			if (drDoc.TableOutlineDr.bIsTracked)
 			{
 				drDoc.DrawTableTrack(overlay);

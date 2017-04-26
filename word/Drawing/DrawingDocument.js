@@ -49,6 +49,11 @@ var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 var _canvas_tables = null;
 var _table_styles = null;
 
+var c_oContentControlTrack = {
+	Hover 	: 0,
+	In 		: 1
+};
+
 function CColumnsMarkupColumn()
 {
 	this.W = 0;
@@ -2114,6 +2119,8 @@ function CDrawingDocument()
 	this.UpdateRulerStateFlag = false;
 	this.UpdateRulerStateParams = [];
 
+	this.ContentControlObject = null;
+
 	// массивы ректов для поиска
 	this._search_HdrFtr_All = []; // Поиск в колонтитуле, который находится на всех страницах
 	this._search_HdrFtr_All_no_First = []; // Поиск в колонтитуле, который находится на всех страницах, кроме первой
@@ -3745,6 +3752,61 @@ function CDrawingDocument()
 			ctx.beginPath();
 			this.AutoShapesTrack.AddRectDashClever(ctx, __x, __y, __r, __b, 3, 3, true);
 			ctx.beginPath();
+		}
+	};
+
+	this.DrawContentControl = function(id, type, page, rects)
+	{
+		if (type == c_oContentControlTrack.In)
+			this.ContentControlObject = { id : id, page : page, rect : rect };
+
+		var overlay = this.m_oHtmlPage.m_oOverlayApi;
+
+		var ctx = overlay.m_oContext;
+		ctx.strokeStyle = "#ADADAD";
+		ctx.lineWidth = 1;
+
+		var _page = this.m_arrPages[page];
+		var drPage = _page.drawingPage;
+
+		var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+		var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+		ctx.beginPath();
+
+		var _x, _y, _r, _b;
+		for (var i = 0; i < rects.length; i++)
+		{
+			_x = (drPage.left + dKoefX * rect.X);
+			_y = (drPage.top + dKoefY * rect.Y);
+			_r = (drPage.left + dKoefX * rect.R);
+			_b = (drPage.top + dKoefY * rect.B);
+
+			if (_x < overlay.min_x)
+				overlay.min_x = _x;
+			if (_r > overlay.max_x)
+				overlay.max_x = _r;
+
+			if (_y < overlay.min_y)
+				overlay.min_y = _y;
+			if (_b > overlay.max_y)
+				overlay.max_y = _b;
+
+			ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _t) >> 0);
+		}
+
+		if (type == c_oContentControlTrack.Hover)
+		{
+			ctx.fillStyle = "rgba(235, 235, 235, 0.5);";
+			ctx.fill();
+		}
+		ctx.stroke();
+
+		ctx.beginPath();
+
+		if (type == c_oContentControlTrack.In)
+		{
+
 		}
 	};
 
