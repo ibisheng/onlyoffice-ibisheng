@@ -3815,7 +3815,7 @@ function CDrawingDocument()
 
 		if (type == c_oContentControlTrack.Hover)
 		{
-			ctx.fillStyle = "rgba(235, 235, 235, 0.5)";
+			ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
 			ctx.fill();
 		}
 		ctx.stroke();
