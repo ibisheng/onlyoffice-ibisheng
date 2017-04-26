@@ -489,3 +489,9 @@ CHdrFtrController.prototype.IsInBlockLevelSdt = function()
 
 	return null;
 };
+CHdrFtrController.prototype.DrawContentControlsHover = function(X, Y, PageAbs)
+{
+	var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+	if (null != CurHdrFtr)
+		return CurHdrFtr.Content.DrawContentControlsHover(X, Y, CurHdrFtr.Content.Get_StartPage_Relative());
+};

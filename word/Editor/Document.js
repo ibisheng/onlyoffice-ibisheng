@@ -15023,6 +15023,13 @@ CDocument.prototype.controller_IsInBlockLevelSdt = function()
 
 	return null;
 };
+CDocument.prototype.controller_DrawContentControlsHover = function(X, Y, PageAbs)
+{
+	var ContentPos       = this.Internal_GetContentPosByXY(X, Y, PageAbs);
+	var Item             = this.Content[ContentPos];
+	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageAbs);
+	Item.DrawContentControlsHover(X, Y, ElementPageIndex);
+};
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -15145,10 +15152,7 @@ CDocument.prototype.DrawContentControls = function(PageAbs, MouseX, MouseY, Mous
 	}
 	else if (PageAbs === MousePage)
 	{
-		var ContentPos       = this.Internal_GetContentPosByXY(MouseX, MouseY, MousePage);
-		var Item             = this.Content[ContentPos];
-		var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, MouseX, MouseY, MousePage);
-		//Item.DrawContentControls(MouseX, MouseY, MousePage);
+		this.Controller.DrawContentControlsHover(MouseX, MouseY, MousePage);
 	}
 };
 

@@ -567,6 +567,28 @@ CBlockLevelSdt.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
 {
 	return this.Content.IsInBlockLevelSdt(this);
 };
+CBlockLevelSdt.prototype.DrawContentControlsHover = function(X, Y, CurPage)
+{
+	this.Content.DrawContentControlsHover(X, Y, CurPage);
+
+	var oDrawingDocument = this.LogicDocument.Get_DrawingDocument();
+	var oRects = {};
+	for (var nCurPage = 0, nPagesCount = this.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
+	{
+		var nPageAbs = this.Get_AbsolutePage(nCurPage);
+
+		if (!oRects[nPageAbs])
+			oRects[nPageAbs] = [];
+
+		var oBounds = this.GetPageBounds(nCurPage);
+		oRects[nPageAbs].push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom});
+	}
+
+	for (var nPageAbs in oRects)
+	{
+		oDrawingDocument.DrawContentControl(this.GetId(), c_oContentControlTrack.Hover, nPageAbs, oRects[nPageAbs]);
+	}
+};
 CBlockLevelSdt.prototype.DrawContentControls = function(PageAbs)
 {
 	var oDrawingDocument = this.LogicDocument.Get_DrawingDocument();

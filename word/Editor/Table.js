@@ -12006,6 +12006,16 @@ CTable.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
 
 	return oBlockLevelSdt;
 };
+CTable.prototype.DrawContentControlsHover = function(X, Y, CurPage)
+{
+	var oPos = this.Internal_GetCellByXY(X, Y, CurPage);
+	var oRow = this.Content[oPos.Row];
+	if (oRow && oPos.Cell < oRow.Get_CellsCount())
+	{
+		var oCell = oRow.Get_Cell(oPos.Cell);
+		oCell.Content_DrawContentControlsHover(X, Y, CurPage - oCell.Content.Get_StartPage_Relative());
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

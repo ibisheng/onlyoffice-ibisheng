@@ -525,3 +525,11 @@ CDrawingsController.prototype.IsInBlockLevelSdt = function()
 
 	return null;
 };
+CDrawingsController.prototype.DrawContentControlsHover = function(X, Y, PageAbs)
+{
+	var oTargetTextObject = AscFormat.getTargetTextObject(this.DrawingObjects);
+	if (oTargetTextObject)
+		return oTargetTextObject.DrawContentControlsHover(X, Y, 0);
+
+	return null;
+};

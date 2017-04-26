@@ -382,3 +382,7 @@ CLogicDocumentController.prototype.IsInBlockLevelSdt = function()
 {
 	return this.LogicDocument.controller_IsInBlockLevelSdt();
 };
+CLogicDocumentController.prototype.DrawContentControlsHover = function(X, Y, PageAbs)
+{
+	this.LogicDocument.controller_DrawContentControlsHover(X, Y, PageAbs);
+};

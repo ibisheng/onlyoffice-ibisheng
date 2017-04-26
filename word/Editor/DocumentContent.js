@@ -8491,6 +8491,14 @@ CDocumentContent.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
 
 	return oBlockLevelSdt;
 };
+CDocumentContent.prototype.DrawContentControlsHover = function(X, Y, CurPage)
+{
+	var ContentPos       = this.Internal_GetContentPosByXY(X, Y, CurPage);
+	var Item             = this.Content[ContentPos];
+	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
+	Item.DrawContentControlsHover(X, Y, ElementPageIndex);
+};
+
 
 function CDocumentContentStartState(DocContent)
 {

@@ -1792,7 +1792,21 @@ CTableCell.prototype =
     {
     }
 };
+CTableCell.private_TransformXY = function(X, Y)
+{
+	// TODO: Везде, где идет такой код заменить на данную функцию
 
+	var _X = X, _Y = Y;
+	var Transform = this.private_GetTextDirectionTransform();
+	if (null !== Transform)
+	{
+		Transform = global_MatrixTransformer.Invert(Transform);
+		_X = Transform.TransformPointX(X, Y);
+		_Y = Transform.TransformPointY(X, Y);
+	}
+
+	return {X : _X, Y : _Y};
+};
 CTableCell.prototype.Get_TopElement = function()
 {
     if (this.Row && this.Row.Table)
@@ -1845,6 +1859,11 @@ CTableCell.prototype.Get_TopDocumentContent = function()
         return this.Row.Table.Parent.Get_TopDocumentContent();
 
     return null;
+};
+CTableCell.prototype.Content_DrawContentControlsHover = function(X, Y, CurPage)
+{
+	var oPos = this.private_TransformXY(X, Y);
+	this.Content.DrawContentControlsHover(oPos.X, oPos.Y, CurPage);
 };
 
 function CTableCellRecalculateObject()

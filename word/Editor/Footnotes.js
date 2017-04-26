@@ -3225,6 +3225,15 @@ CFootnotesController.prototype.IsInBlockLevelSdt = function()
 
 	return null;
 };
+CFootnotesController.prototype.DrawContentControlsHover = function(X, Y, PageAbs)
+{
+	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
+	if (oResult)
+	{
+		var oFootnote = oResult.Footnote;
+		oFootnote.DrawContentControlsHover(X, Y, oResult.FootnotePageIndex);
+	}
+};
 
 
 function CFootEndnotePageColumn()

@@ -737,3 +737,7 @@ CDocumentControllerBase.prototype.RemoveTextSelection = function(){};
  * @returns {CBlockLevelSdt?}
  */
 CDocumentControllerBase.prototype.IsInBlockLevelSdt = function(){return null;};
+/**
+ * Рисуем выделение контейнер, когда проводим мышкой над ним
+ */
+CDocumentControllerBase.prototype.DrawContentControlsHover = function(X, Y, PageAbs){};
