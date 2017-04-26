@@ -3760,7 +3760,7 @@ function CDrawingDocument()
 		if (type == c_oContentControlTrack.In)
 			this.ContentControlObject = { id : id, page : page, rect : rect };
 
-		var overlay = this.m_oHtmlPage.m_oOverlayApi;
+		var overlay = this.m_oWordControl.m_oOverlayApi;
 
 		var ctx = overlay.m_oContext;
 		ctx.strokeStyle = "#ADADAD";
@@ -3774,9 +3774,11 @@ function CDrawingDocument()
 
 		ctx.beginPath();
 
-		var _x, _y, _r, _b;
-		for (var i = 0; i < rects.length; i++)
+		var _x, _y, _r, _b, rect;
+		var _rects_len = rects.length;
+		for (var i = 0; i < _rects_len; i++)
 		{
+			rect = rects[i];
 			_x = (drPage.left + dKoefX * rect.X);
 			_y = (drPage.top + dKoefY * rect.Y);
 			_r = (drPage.left + dKoefX * rect.R);
@@ -3792,7 +3794,7 @@ function CDrawingDocument()
 			if (_b > overlay.max_y)
 				overlay.max_y = _b;
 
-			ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _t) >> 0);
+			ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _y) >> 0);
 		}
 
 		if (type == c_oContentControlTrack.Hover)
@@ -3806,7 +3808,30 @@ function CDrawingDocument()
 
 		if (type == c_oContentControlTrack.In)
 		{
+			rect = rects[0];
+			_x = (drPage.left + dKoefX * rect.X);
+			_y = (drPage.top + dKoefY * rect.Y);
 
+			_x = ((_x >> 0) + 0.5);
+			_y = ((_y >> 0) + 0.5) - 15;
+
+			ctx.rect(_x, _y, 20, 15);
+			ctx.stroke();
+			ctx.beginPath();
+
+			var cx = _x - 0.5 + 4;
+			var cy = _y - 0.5 + 4;
+
+			overlay.AddRect(cx, cy, 3, 3);
+			overlay.AddRect(cx + 5, cy, 3, 3);
+			overlay.AddRect(cx + 10, cy, 3, 3);
+			overlay.AddRect(cx, cy + 5, 3, 3);
+			overlay.AddRect(cx + 5, cy + 5, 3, 3);
+			overlay.AddRect(cx + 10, cy + 5, 3, 3);
+
+			ctx.fillStyle = "#ADADAD";
+			ctx.fill();
+			ctx.beginPath();
 		}
 	};
 
