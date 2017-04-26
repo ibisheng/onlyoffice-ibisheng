@@ -2426,7 +2426,13 @@ PasteProcessor.prototype =
 						var value = cDocumentContent.Content[n].GetText();
 						var newParaRun = new ParaRun();
 
-						t._addTextIntoRun(newParaRun, value);
+						var bIsAddTabBefore = false;
+						if(newParagraph.Content.length > 1)
+						{
+							bIsAddTabBefore = true;
+						}
+
+						t._addTextIntoRun(newParaRun, value, bIsAddTabBefore, true);
 
 						newParagraph.Internal_Content_Add(newParagraph.Content.length - 1, newParaRun, false);
 					}
@@ -2452,8 +2458,14 @@ PasteProcessor.prototype =
 		return obj;
 	},
 
-	_addTextIntoRun: function(oCurRun, value)
+	_addTextIntoRun: function(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace)
 	{
+		var diffContentIndex = 0;
+		if(bIsAddTabBefore){
+			diffContentIndex = 1;
+			oCurRun.Add_ToContent(0, new ParaTab(), false);
+		}
+
 		for(var k = 0, length = value.length; k < length; k++)
 		{
 			var nUnicode = null;
@@ -2467,17 +2479,22 @@ PasteProcessor.prototype =
 			}
 			else
 				nUnicode = nCharCode;
+
+			var bIsSpace = true;
 			if (null != nUnicode) {
 				var Item;
 				if (0x20 !== nUnicode && 0xA0 !== nUnicode && 0x2009 !== nUnicode) {
 					Item = new ParaText();
 					Item.Set_CharCode(nUnicode);
+					bIsSpace = false;
 				}
 				else
 					Item = new ParaSpace();
 
 				//add text
-				oCurRun.Add_ToContent(k, Item, false);
+				if(!(dNotAddLastSpace && k === value.length - 1 && bIsSpace)){
+					oCurRun.Add_ToContent(k + diffContentIndex, Item, false);
+				}
 			}
 		}
 	},
