@@ -2123,6 +2123,7 @@ PasteProcessor.prototype =
         }
     },
 
+	//***functions for special paste***
 	_specialPasteGetElemType: function(elem)
 	{
 		var type = elem.GetType();
@@ -2226,7 +2227,7 @@ PasteProcessor.prototype =
 			}
 			else
 			{
-				props = [sProps.paste, sProps.mergeFormatting, sProps.pasteOnlyValues];
+				props = [sProps.paste/*, sProps.mergeFormatting*/, sProps.pasteOnlyValues];
 			}
 
 			if(null !== props)
@@ -2258,6 +2259,15 @@ PasteProcessor.prototype =
 
 	_specialPasteItemConvert: function(item)
 	{
+		//TODO рассмотреть вариант вставки текста ("text/plain")
+		//для вставки простого текста, можно было бы использовать ("text/plain")
+		//но в данном случае вставка текста будет работать не совсем корретно внутри приложения, поскольку
+		//когда мы пишем в буфер текст, функция GetSelectedText отдаёт вместо табуляции пробелы
+		//так же некорректно будут вставляться таблицы, поскольку табуляции между ячейками мы потеряем
+		//внутренние таблицы мы вообще теряем
+		//для реализации необходимо менять функцию GetSelectedText
+		//посмотреть, какие браузер могут заменить табуляцию на пробел при занесении текста в буфер обмена
+
 		var res = item;
 		var type = item.GetType();
 		switch(type)
@@ -2343,17 +2353,7 @@ PasteProcessor.prototype =
 						paragraph.TextPr.Value = pasteIntoParaRunPr;
 					}
 				}
-				
-				if(pasteIntoParaRunPr)
-				{
-					for(var j = 0; j < paragraph.Content.length; j++)
-					{
-						if(pasteIntoParaRunPr && paragraph.Content[j].Set_Pr)
-						{
-							paragraph.Content[j].Set_Pr( pasteIntoParaRunPr );
-						}
-					}
-				}
+				this._specialPasteParagraphContentConvert(paragraph.Content, pasteIntoParaRunPr);
 				
 				break;
 			}
@@ -2368,23 +2368,114 @@ PasteProcessor.prototype =
 						paragraph.TextPr.Value.Merge(pasteIntoParaRunPr);
 					}
 				}
-				
-				if(pasteIntoParaRunPr)
-				{
-					for(var j = 0; j < paragraph.Content.length; j++)
-					{
-						if(pasteIntoParaRunPr && paragraph.Content[j].Pr)
-						{
-							paragraph.Content[j].Pr.Merge(pasteIntoParaRunPr);
-						}
-					}
-				}
+				this._specialPasteParagraphContentConvert(paragraph.Content, pasteIntoParaRunPr);
 				
 				break;
 			}
 		}
 		
 		return res;
+	},
+
+	_specialPasteParagraphContentConvert: function(paragraphContent, pasteIntoParaRunPr)
+	{
+		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
+
+		var checkInsideDrawings = function(runContent)
+		{
+			for(var j = 0; j < runContent.length; j++)
+			{
+				var item = runContent[j];
+
+				switch(item.Type)
+				{
+					case para_Run:
+					{
+						checkInsideDrawings(item.Content);
+						break;
+					}
+					case para_Drawing:
+					{
+						runContent.splice(j, 1);
+						break;
+					}
+				}
+			}
+		};
+
+		switch(props)
+		{
+			case Asc.c_oSpecialPasteProps.paste:
+			{
+				break;
+			}
+			case Asc.c_oSpecialPasteProps.pasteOnlyValues:
+			{
+				//в данному случае мы должны применить к вставленному фрагменту стиль paraRun, в который вставляем
+				if(pasteIntoParaRunPr)
+				{
+					for(var i = 0; i < paragraphContent.length; i++)
+					{
+						var elem = paragraphContent[i];
+						var type = elem.Type;
+						switch(type)
+						{
+							case para_Run:
+							{
+								//проверить, есть ли внутри изображение
+								if(pasteIntoParaRunPr && elem.Set_Pr)
+								{
+									elem.Set_Pr( pasteIntoParaRunPr );
+								}
+
+								checkInsideDrawings(elem.Content);
+
+								break;
+							}
+							case para_Hyperlink:
+							{
+								//изменить hyperlink на pararun
+								//проверить, есть ли внутри изображение
+
+								paragraphContent.splice(i, 1);
+								for(var n = 0; n < elem.Content.length; n++)
+								{
+									paragraphContent.splice(i + n, 0, elem.Content[n]);
+								}
+
+								i--;
+								//checkInsideDrawings(elem.Content);
+
+								break;
+							}
+							case para_Math:
+							{
+								break;
+							}
+						}
+					}
+				}
+
+				break;
+			}
+			case Asc.c_oSpecialPasteProps.mergeFormatting:
+			{
+				//ms почему-то при merge игнорирует заливку текста
+				if(pasteIntoParaRunPr)
+				{
+					for(var i = 0; i < paragraphContent.length; i++)
+					{
+						var elem = paragraphContent[j];
+						if(pasteIntoParaRunPr && elem.Pr)
+						{
+							elem.Pr.Merge(pasteIntoParaRunPr);
+						}
+					}
+				}
+
+				break;
+			}
+		}
 	},
 
 	_convertTableToText: function(table, obj, newParagraph)
@@ -2498,6 +2589,7 @@ PasteProcessor.prototype =
 			}
 		}
 	},
+	//***end special paste***
 
 	InsertInPlacePresentation: function(aNewContent)
 	{
