@@ -1977,6 +1977,12 @@
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
                 this.memory.WriteBool(xfs.QuotePrefix);
             }
+			if(null != xfs.PivotButton)
+			{
+				this.memory.WriteByte(c_oSerXfsTypes.PivotButton);
+				this.memory.WriteByte(c_oSerPropLenType.Byte);
+				this.memory.WriteBool(xfs.PivotButton);
+			}
             if(null != xfs.XfId)
             {
                 this.memory.WriteByte(c_oSerXfsTypes.XfId);
@@ -2414,7 +2420,7 @@
                 sAlign = this._getStringFromObjWithProperty(g_oDefaultFormat.Align);
             }
             this.prepareXfsStyles();
-            var xfs = { borderid: 0, fontid: 0, fillid: oFillDefElement.index, numid: 0, align: oAlign, QuotePrefix: null };
+            var xfs = { borderid: 0, fontid: 0, fillid: oFillDefElement.index, numid: 0, align: oAlign, QuotePrefix: null, PivotButton: null };
             this.oXfsMap["0|0|" + this.nDefaultFillIndex + "|0|" + sAlign] = { index: this.nXfsMapIndex++, val: xfs };
         };
         this.Write = function()
@@ -3168,11 +3174,13 @@
                     var sStyle = this.prepareXfsStyle(xfs);
 					//XfId в CustomStyles писать не нужно, поэтому null
                     var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
-                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: null, index: style.XfId};
+                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: null, index: style.XfId, PivotButton: null};
                     if("0" != sStyle.align)
                         oXfs.align = xfs.align;
                     if(null != xfs.QuotePrefix)
                         oXfs.QuotePrefix = xfs.QuotePrefix;
+					if(null != xfs.PivotButton)
+						oXfs.PivotButton = xfs.PivotButton;
 
                     this.oXfsStylesMap.push(oXfs);
                 }
@@ -3243,6 +3251,10 @@
                 if (null != xfs.QuotePrefix) {
                   sStyle.val += xfs.QuotePrefix;
                 }
+				sStyle.val += "|";
+				if (null != xfs.PivotButton) {
+					sStyle.val += xfs.PivotButton;
+				}
                 sStyle.val += "|";
                 if (null != xfs.XfId) {
                   sStyle.val += xfs.XfId;
@@ -3286,11 +3298,13 @@
                 {
                     nXfsId = this.nXfsMapIndex;
                     var oXfs = {borderid: sStyle.borderid, fontid: sStyle.fontid, fillid: sStyle.fillid,
-                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: xfs.XfId};
+                        numid: sStyle.numid, align: null, QuotePrefix: null, XfId: xfs.XfId, PivotButton: null};
                     if("0" != sStyle.align)
                         oXfs.align = xfs.align;
                     if(null != xfs.QuotePrefix)
                         oXfs.QuotePrefix = xfs.QuotePrefix;
+					if(null != xfs.PivotButton)
+						oXfs.PivotButton = xfs.PivotButton;
                     this.oXfsMap[sStyle.val] = {index: this.nXfsMapIndex++, val: oXfs};
                 }
                 else
@@ -4749,6 +4763,9 @@
                 // QuotePrefix
                 if(null != oCellStyleXfs.QuotePrefix)
                     oCellStyle.xfs.QuotePrefix = oCellStyleXfs.QuotePrefix;
+				//PivotButton
+				if(null != oCellStyleXfs.PivotButton)
+					oCellStyle.xfs.PivotButton = oCellStyleXfs.PivotButton;
                 // align
                 if(null != oCellStyleXfs.align)
                     oCellStyle.xfs.align = oCellStyleXfs.align.clone();
@@ -4817,6 +4834,8 @@
                 }
                 if(null != xfs.QuotePrefix)
                     oNewXfs.QuotePrefix = xfs.QuotePrefix;
+				if(null != xfs.PivotButton)
+					oNewXfs.PivotButton = xfs.PivotButton;
                 if(null != xfs.align)
                     oNewXfs.align = xfs.align.clone();
                 if (null !== xfs.XfId) {
@@ -5080,7 +5099,7 @@
             var oThis = this;
             if (c_oSerStylesTypes.Xfs === type) {
                 var oNewXfs = {ApplyAlignment: null, ApplyBorder: null, ApplyFill: null, ApplyFont: null, ApplyNumberFormat: null,
-                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null};
+                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, PivotButton: null};
                 res = this.bcr.Read2Spreadsheet(length, function (t, l) {
                     return oThis.ReadXfs(t, l, oNewXfs);
                 });
@@ -5096,7 +5115,7 @@
             if ( c_oSerStylesTypes.Xfs == type )
             {
                 var oNewXfs = {ApplyAlignment: null, ApplyBorder: null, ApplyFill: null, ApplyFont: null, ApplyNumberFormat: null,
-                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null};
+                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null, PivotButton: null};
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadXfs(t,l,oNewXfs);
                 });
@@ -5130,6 +5149,8 @@
                 oXfs.numid = this.stream.GetULongLE();
             else if ( c_oSerXfsTypes.QuotePrefix == type )
                 oXfs.QuotePrefix = this.stream.GetBool();
+			else if ( c_oSerXfsTypes.PivotButton == type )
+				oXfs.PivotButton = this.stream.GetBool();
             else if (c_oSerXfsTypes.XfId === type)
                 oXfs.XfId = this.stream.GetULongLE();
             else if ( c_oSerXfsTypes.Aligment == type )
@@ -8260,7 +8281,7 @@
                 });
             } else if (Types.Xfs === type) {
                 oStyleObject.xfs = {ApplyAlignment: null, ApplyBorder: null, ApplyFill: null, ApplyFont: null, ApplyNumberFormat: null,
-                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null};
+                    BorderId: null, FillId: null, FontId: null, NumFmtId: null, QuotePrefix: null, Aligment: null, XfId: null, PivotButton: null};
                 res = bcr.Read2Spreadsheet(length, function (t, l) {
                     return oBinary_StylesTableReader.ReadXfs(t, l, oStyleObject.xfs);
                 });
@@ -8318,6 +8339,9 @@
                 // QuotePrefix
                 if(null != oStyleObject.xfs.QuotePrefix)
                     oCellStyle.xfs.QuotePrefix = oStyleObject.xfs.QuotePrefix;
+				// PivotButton
+				if(null != oStyleObject.xfs.PivotButton)
+					oCellStyle.xfs.PivotButton = oStyleObject.xfs.PivotButton;
                 // align
                 if(null != oStyleObject.xfs.align)
                     oCellStyle.xfs.align = oStyleObject.xfs.align.clone();

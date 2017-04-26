@@ -6466,9 +6466,10 @@ CT_Format.prototype.toXml = function(writer, name) {
 	if (null !== this.action) {
 		writer.WriteXmlAttributeStringEncode("action", ToXml_ST_FormatAction(this.action));
 	}
-	if (null !== this.dxfId) {
-		writer.WriteXmlAttributeNumber("dxfId", this.dxfId);
-	}
+	//todo
+	// if (null !== this.dxfId) {
+	// 	writer.WriteXmlAttributeNumber("dxfId", this.dxfId);
+	// }
 	writer.WriteXmlNodeEnd(name, true);
 	if (null !== this.pivotArea) {
 		res += this.pivotArea.toXml(writer, "pivotArea");
@@ -9116,9 +9117,10 @@ CT_ColorFilter.prototype.readAttributes = function(attr, uq) {
 CT_ColorFilter.prototype.toXml = function(writer, name) {
 	var res = "";
 	writer.WriteXmlNodeStart(name);
-	if (null !== this.dxfId) {
-		writer.WriteXmlAttributeNumber("dxfId", this.dxfId);
-	}
+	//todo
+	// if (null !== this.dxfId) {
+	// 	writer.WriteXmlAttributeNumber("dxfId", this.dxfId);
+	// }
 	if (null !== this.cellColor) {
 		writer.WriteXmlAttributeBool("cellColor", this.cellColor);
 	}
@@ -9429,9 +9431,10 @@ CT_SortCondition.prototype.toXml = function(writer, name) {
 	if (null !== this.customList) {
 		writer.WriteXmlAttributeStringEncode("customList", this.customList);
 	}
-	if (null !== this.dxfId) {
-		writer.WriteXmlAttributeNumber("dxfId", this.dxfId);
-	}
+	//todo
+	// if (null !== this.dxfId) {
+	// 	writer.WriteXmlAttributeNumber("dxfId", this.dxfId);
+	// }
 	if (null !== this.iconSet) {
 		writer.WriteXmlAttributeStringEncode("iconSet", ToXml_ST_IconSetType(this.iconSet));
 	}

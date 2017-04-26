@@ -123,6 +123,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Cell_Angle = 21;
 	window['AscCH'].historyitem_Cell_Style = 22;
 	window['AscCH'].historyitem_Cell_ChangeValueUndo = 23;
+	window['AscCH'].historyitem_Cell_SetPivotButton = 24;
 
 	window['AscCH'].historyitem_Comment_Add = 1;
 	window['AscCH'].historyitem_Comment_Remove = 2;

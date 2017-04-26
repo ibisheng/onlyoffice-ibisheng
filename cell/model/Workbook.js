@@ -5220,6 +5220,12 @@
 			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_SetQuotePrefix, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 		this.oValue.cleanCache();
 	};
+	Cell.prototype.setPivotButton=function(val){
+		var oRes = this.ws.workbook.oStyleManager.setPivotButton(this, val);
+		if(History.Is_On() && oRes.oldVal != oRes.newVal)
+			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_SetPivotButton, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+		this.oValue.cleanCache();
+	};
 	Cell.prototype.setConditionalFormattingStyle=function(xfs){
 		this.conditionalFormattingXfs = xfs || this.conditionalFormattingXfs;
 		this.compiledXfs = null;

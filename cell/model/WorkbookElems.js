@@ -1367,7 +1367,8 @@ var g_oCellXfsProperties = {
 		num: 3,
 		align: 4,
 		QuotePrefix: 5,
-		XfId: 6
+		XfId: 6,
+		PivotButton: 7
 	};
 /** @constructor */
 function CellXfs() {
@@ -1378,6 +1379,7 @@ function CellXfs() {
     this.num = null;
     this.align = null;
 	this.QuotePrefix = null;
+	this.PivotButton = null;
 	this.XfId = null;
     // Является ли стиль ссылкой (При открытии все стили будут ссылками. Поэтому при смене свойств нужно делать копию)
     this.isReference = false;
@@ -1412,6 +1414,7 @@ CellXfs.prototype =
 		oRes.num = this._mergeProperty(this.num, xfs.num);
 		oRes.align = this._mergeProperty(this.align, xfs.align);
 		oRes.QuotePrefix = this._mergeProperty(this.QuotePrefix, xfs.QuotePrefix);
+		oRes.PivotButton = this._mergeProperty(this.PivotButton, xfs.PivotButton);
 		oRes.XfId = this._mergeProperty(this.XfId, xfs.XfId);
 		return oRes;
 	},
@@ -1430,6 +1433,8 @@ CellXfs.prototype =
             res.align = this.align.clone();
         if(null != this.QuotePrefix)
             res.QuotePrefix = this.QuotePrefix;
+		if(null != this.PivotButton)
+			res.PivotButton = this.PivotButton;
 		if (null !== this.XfId)
 			res.XfId = this.XfId;
         return res;
@@ -1447,6 +1452,8 @@ CellXfs.prototype =
 		if(false == ((null == this.align && null == xfs.align) || (null != this.align && null != xfs.align && this.align.isEqual(xfs.align))))
 			return false;
 		if(this.QuotePrefix != xfs.QuotePrefix)
+			return false;
+		if(this.PivotButton != xfs.PivotButton)
 			return false;
 		if (this.XfId != xfs.XfId)
 			return false;
@@ -1470,6 +1477,7 @@ CellXfs.prototype =
 			case this.Properties.num: return this.num;break;
 			case this.Properties.align: return this.align;break;
 			case this.Properties.QuotePrefix: return this.QuotePrefix;break;
+			case this.Properties.PivotButton: return this.PivotButton;break;
 			case this.Properties.XfId: return this.XfId; break;
 		}
 	},
@@ -1483,6 +1491,7 @@ CellXfs.prototype =
 			case this.Properties.num: this.num = value;break;
 			case this.Properties.align: this.align = value;break;
 			case this.Properties.QuotePrefix: this.QuotePrefix = value;break;
+			case this.Properties.PivotButton: this.PivotButton = value;break;
 			case this.Properties.XfId: this.XfId = value; break;
 		}
 	}
@@ -2259,6 +2268,26 @@ StyleManager.prototype =
             xfs = this._prepareSet(oItemWithXfs);
             xfs.QuotePrefix = val;
         }
+		return oRes;
+	},
+	setPivotButton : function(oItemWithXfs, val)
+	{
+		var xfs = oItemWithXfs.xfs;
+		var oRes = {newVal: val, oldVal: null};
+		if(null != xfs && null != xfs.PivotButton)
+			oRes.oldVal = xfs.PivotButton;
+		if(null == val)
+		{
+			if(null != xfs) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+				xfs.PivotButton = val;
+			}
+		}
+		else
+		{
+			xfs = this._prepareSet(oItemWithXfs);
+			xfs.PivotButton = val;
+		}
 		return oRes;
 	},
     setAngle : function(oItemWithXfs, val)

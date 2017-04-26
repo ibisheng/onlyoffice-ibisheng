@@ -3041,6 +3041,10 @@ UndoRedoCell.prototype = {
 		{
 			cell.setQuotePrefix(Val);
 		}
+		else if(AscCH.historyitem_Cell_SetPivotButton == Type)
+		{
+			cell.setPivotButton(Val);
+		}
 		else if (AscCH.historyitem_Cell_Style == Type)
 		{
 			cell.setCellStyle(Val);
