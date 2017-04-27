@@ -8486,9 +8486,9 @@ CDocumentContent.prototype.IsSelectedAll = function()
 CDocumentContent.prototype.AddContentControl = function()
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
-		this.DrawingObjects.AddContentControl();
+		return this.DrawingObjects.AddContentControl();
 	else
-		this.private_AddContentControl();
+		return this.private_AddContentControl();
 };
 
 

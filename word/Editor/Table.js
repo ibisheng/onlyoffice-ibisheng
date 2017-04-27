@@ -12002,7 +12002,9 @@ CTable.prototype.GetTableProps = function()
 CTable.prototype.AddContentControl = function()
 {
 	if (this.CurCell)
-		this.CurCell.Content.AddContentControl();
+		return this.CurCell.Content.AddContentControl();
+
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

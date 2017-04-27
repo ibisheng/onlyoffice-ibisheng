@@ -15020,7 +15020,7 @@ CDocument.prototype.controller_GetCurrentSectionPr = function()
 };
 CDocument.prototype.controller_AddContentControl = function()
 {
-	this.private_AddContentControl();
+	return this.private_AddContentControl();
 };
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -15158,7 +15158,7 @@ CDocument.prototype.AddContentControl = function()
 	if (true === this.IsSelectionUse())
 		this.RemoveBeforePaste();
 
-	this.Controller.AddContentControl();
+	return this.Controller.AddContentControl();
 };
 
 function CDocumentSelectionState()

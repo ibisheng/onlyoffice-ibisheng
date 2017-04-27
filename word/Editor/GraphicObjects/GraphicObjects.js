@@ -206,8 +206,10 @@ CGraphicObjects.prototype =
     {
         var oTargetDocContent = this.getTargetDocContent();
         if(oTargetDocContent){
-            oTargetDocContent.AddContentControl();
+            return oTargetDocContent.AddContentControl();
         }
+
+        return null;
     },
 
     Get_Id: function()

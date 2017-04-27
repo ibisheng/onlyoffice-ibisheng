@@ -598,7 +598,7 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 };
 CBlockLevelSdt.prototype.AddContentControl = function()
 {
-	this.Content.AddContentControl();
+	return this.Content.AddContentControl();
 };
 CBlockLevelSdt.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 {

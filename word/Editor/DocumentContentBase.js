@@ -732,9 +732,10 @@ CDocumentContentBase.prototype.private_AddContentControl = function()
 			this.CurPos.ContentPos = this.CurPos.ContentPos + 1;
 		}
 		oSdt.MoveCursorToStartPos(false);
+		return oSdt;
 	}
 	else
 	{
-		oElement.AddContentControl();
+		return oElement.AddContentControl();
 	}
 };

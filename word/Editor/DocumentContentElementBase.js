@@ -573,6 +573,7 @@ CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
 };
 CDocumentContentElementBase.prototype.AddContentControl = function()
 {
+	return null;
 };
 CDocumentContentElementBase.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 {

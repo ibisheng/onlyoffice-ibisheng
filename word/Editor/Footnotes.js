@@ -3221,7 +3221,9 @@ CFootnotesController.prototype.ResetRecalculateCache = function()
 CFootnotesController.prototype.AddContentControl = function()
 {
 	if (this.CurFootnote)
-		this.CurFootnote.AddContentControl();
+		return this.CurFootnote.AddContentControl();
+
+	return null;
 };
 
 
