@@ -974,7 +974,7 @@
 			else//если не было специальной вставки, необходимо показать кнопку специальной вставки
 			{
 				this.specialPasteProps = null;
-				//this.SpecialPasteButton_Show();
+				this.SpecialPasteButton_Show();
 			}
 
 			//TODO для excel заглушка. пересмотреть!
