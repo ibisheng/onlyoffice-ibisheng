@@ -2453,6 +2453,14 @@ PasteProcessor.prototype =
 
 								break;
 							}
+							case para_Comment:
+							{
+								//TODO в дальнейшем лучше удалять коммент а не заменять его
+								paragraphContent.splice(i, 1, new ParaRun());
+								i--;
+
+								break;
+							}
 						}
 					}
 				}
