@@ -4677,7 +4677,7 @@ CMathContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRa
 
     this.Bounds.SetWidth(CurLine, CurRange, PRSC.Range.W - RangeW);
 };
-CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+CMathContent.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     if(this.RecalcInfo.bEqArray)
         this.InfoPoints.SetDefault();
@@ -4697,7 +4697,7 @@ CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
             if(Type == para_Math_Run)
                 Item.Math_RecalculateContent();
             else
-                Item.Recalculate_MinMaxContentWidth(MinMax);
+                Item.RecalculateMinMaxContentWidth(MinMax);
 
             if(this.RecalcInfo.bEqArray && Type == para_Math_Composition)
                 this.InfoPoints.ContentPoints.UpdatePoint(this.Content[Pos].size.width);
@@ -4715,7 +4715,7 @@ CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
         }
         else
         {
-            Item.Recalculate_MinMaxContentWidth(MinMax);
+            Item.RecalculateMinMaxContentWidth(MinMax);
         }
     }
 

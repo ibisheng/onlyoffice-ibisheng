@@ -282,7 +282,7 @@ ParaComment.prototype =
         return { X : X };
     },
 
-    Recalculate_MinMaxContentWidth : function()
+	RecalculateMinMaxContentWidth : function()
     {
 
     },

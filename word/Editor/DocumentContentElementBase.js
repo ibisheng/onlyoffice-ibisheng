@@ -574,6 +574,16 @@ CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
 CDocumentContentElementBase.prototype.AddContentControl = function()
 {
 };
+CDocumentContentElementBase.prototype.RecalculateMinMaxContentWidth = function(isRotated)
+{
+	return {Min : 0, Max : 0};
+};
+CDocumentContentElementBase.prototype.Shift = function(CurPage, dX, dY)
+{
+};
+CDocumentContentElementBase.prototype.UpdateEndInfo = function()
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

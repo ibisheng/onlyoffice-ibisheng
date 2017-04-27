@@ -954,7 +954,7 @@ Paragraph.prototype.Recalculate_PageEndInfo = function(PRSW, CurPage)
 	if (PRSW)
 		this.Pages[CurPage].EndInfo.RunRecalcInfo = PRSW.RunRecalcInfoBreak;
 };
-Paragraph.prototype.Update_EndInfo = function()
+Paragraph.prototype.UpdateEndInfo = function()
 {
 	for (var CurPage = 0, PagesCount = this.Pages.length; CurPage < PagesCount; CurPage++)
 	{
@@ -1179,7 +1179,7 @@ Paragraph.prototype.RecalculateCurPos = function()
 {
 	return this.Internal_Recalculate_CurPos(this.CurPos.ContentPos, true, true, false);
 };
-Paragraph.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
+Paragraph.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 {
 	var MinMax = new CParagraphMinMaxContentWidth();
 
@@ -1189,7 +1189,7 @@ Paragraph.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
 		var Item = this.Content[Pos];
 
 		Item.Set_Paragraph(this);
-		Item.Recalculate_MinMaxContentWidth(MinMax);
+		Item.RecalculateMinMaxContentWidth(MinMax);
 	}
 
 	var ParaPr = this.Get_CompiledPr2(false).ParaPr;

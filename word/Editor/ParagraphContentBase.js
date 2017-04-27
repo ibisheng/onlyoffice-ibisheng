@@ -1431,13 +1431,13 @@ CParagraphContentWithParagraphLikeContent.prototype.Refresh_RecalcData = functio
     if (undefined !== this.Paragraph && null !== this.Paragraph)
         this.Paragraph.Refresh_RecalcData2(0);
 };
-CParagraphContentWithParagraphLikeContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+CParagraphContentWithParagraphLikeContent.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
-    var Count = this.Content.length;
-    for ( var Pos = 0; Pos < Count; Pos++ )
-    {
-        this.Content[Pos].Recalculate_MinMaxContentWidth(MinMax);
-    }
+	var Count = this.Content.length;
+	for (var Pos = 0; Pos < Count; Pos++)
+	{
+		this.Content[Pos].RecalculateMinMaxContentWidth(MinMax);
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
 {

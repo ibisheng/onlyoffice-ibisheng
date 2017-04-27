@@ -1119,39 +1119,39 @@ CDocumentContent.prototype.RecalculateContent = function(fWidth, fHeight, nStart
     while ( recalcresult2_End !== nRecalcResult  )
         nRecalcResult = this.Recalculate_Page( nCurPage++, true );
 };
-CDocumentContent.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
+CDocumentContent.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 {
-    var Min   = 0;
-    var Max   = 0;
-    var Count = this.Content.length;
+	var Min   = 0;
+	var Max   = 0;
+	var Count = this.Content.length;
 
-    if (true === isRotated)
-    {
-        for (var Pos = 0; Pos < Count; ++Pos)
-        {
-            var Element   = this.Content[Pos];
-            var CurMinMax = Element.Recalculate_MinMaxContentWidth(isRotated);
+	if (true === isRotated)
+	{
+		for (var Pos = 0; Pos < Count; ++Pos)
+		{
+			var Element   = this.Content[Pos];
+			var CurMinMax = Element.RecalculateMinMaxContentWidth(isRotated);
 
-            Min += CurMinMax.Min;
-            Max += CurMinMax.Max;
-        }
-    }
-    else
-    {
-        for (var Pos = 0; Pos < Count; Pos++)
-        {
-            var Element   = this.Content[Pos];
-            var CurMinMax = Element.Recalculate_MinMaxContentWidth(isRotated);
+			Min += CurMinMax.Min;
+			Max += CurMinMax.Max;
+		}
+	}
+	else
+	{
+		for (var Pos = 0; Pos < Count; Pos++)
+		{
+			var Element   = this.Content[Pos];
+			var CurMinMax = Element.RecalculateMinMaxContentWidth(isRotated);
 
-            if (Min < CurMinMax.Min)
-                Min = CurMinMax.Min;
+			if (Min < CurMinMax.Min)
+				Min = CurMinMax.Min;
 
-            if (Max < CurMinMax.Max)
-                Max = CurMinMax.Max;
-        }
-    }
+			if (Max < CurMinMax.Max)
+				Max = CurMinMax.Max;
+		}
+	}
 
-    return {Min : Min, Max : Max};
+	return {Min : Min, Max : Max};
 };
 CDocumentContent.prototype.Recalculate_AllTables          = function()
 {
@@ -1302,58 +1302,55 @@ CDocumentContent.prototype.Get_AllFloatElements           = function(FloatObjs)
 
     return FloatObjs;
 };
-CDocumentContent.prototype.Shift                          = function(PageIndex, Dx, Dy)
+CDocumentContent.prototype.Shift = function(CurPage, Dx, Dy)
 {
-    this.Pages[PageIndex].Shift(Dx, Dy);
+	this.Pages[CurPage].Shift(Dx, Dy);
 
-    if (this.ClipInfo[PageIndex])
-    {
-        this.ClipInfo[PageIndex].X0 += Dx;
-        this.ClipInfo[PageIndex].X1 += Dx;
-    }
+	if (this.ClipInfo[CurPage])
+	{
+		this.ClipInfo[CurPage].X0 += Dx;
+		this.ClipInfo[CurPage].X1 += Dx;
+	}
 
-    var StartPos = this.Pages[PageIndex].Pos;
-    var EndPos   = this.Pages[PageIndex].EndPos;
-    for (var Index = StartPos; Index <= EndPos; Index++)
-    {
-        var Element          = this.Content[Index];
-        var ElementPageIndex = 0;
-        if (StartPos === Index)
-            ElementPageIndex = PageIndex - Element.Get_StartPage_Relative();
-
-        Element.Shift(ElementPageIndex, Dx, Dy);
-    }
+	var StartPos = this.Pages[CurPage].Pos;
+	var EndPos   = this.Pages[CurPage].EndPos;
+	for (var Index = StartPos; Index <= EndPos; Index++)
+	{
+		var Element          = this.Content[Index];
+		var ElementPageIndex = this.private_GetElementPageIndex(Index, CurPage, 0, 1);
+		Element.Shift(ElementPageIndex, Dx, Dy);
+	}
 };
-CDocumentContent.prototype.Update_EndInfo                 = function()
+CDocumentContent.prototype.UpdateEndInfo = function()
 {
-    for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
-    {
-        this.Content[Index].Update_EndInfo();
-    }
+	for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
+	{
+		this.Content[Index].UpdateEndInfo();
+	}
 };
-CDocumentContent.prototype.RecalculateCurPos              = function()
+CDocumentContent.prototype.RecalculateCurPos = function()
 {
-    if (docpostype_Content === this.CurPos.Type)
-    {
-        if (this.CurPos.ContentPos >= 0 && undefined != this.Content[this.CurPos.ContentPos])
-        {
-            this.private_CheckCurPage();
+	if (docpostype_Content === this.CurPos.Type)
+	{
+		if (this.CurPos.ContentPos >= 0 && undefined != this.Content[this.CurPos.ContentPos])
+		{
+			this.private_CheckCurPage();
 
-            if (this.CurPage > 0 && true === this.Parent.Is_HdrFtr(false))
-            {
-                this.CurPage = 0;
-                this.DrawingDocument.TargetEnd();
-            }
-            else
-                return this.Content[this.CurPos.ContentPos].RecalculateCurPos();
-        }
-    }
-    else // if ( docpostype_DrawingObjects === this.CurPos.Type )
-    {
-        return this.LogicDocument.DrawingObjects.recalculateCurPos();
-    }
+			if (this.CurPage > 0 && true === this.Parent.Is_HdrFtr(false))
+			{
+				this.CurPage = 0;
+				this.DrawingDocument.TargetEnd();
+			}
+			else
+				return this.Content[this.CurPos.ContentPos].RecalculateCurPos();
+		}
+	}
+	else // if ( docpostype_DrawingObjects === this.CurPos.Type )
+	{
+		return this.LogicDocument.DrawingObjects.recalculateCurPos();
+	}
 
-    return null;
+	return null;
 };
 CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceCheckDrawings)
 {
@@ -7158,7 +7155,7 @@ CDocumentContent.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum)
         var Item = this.Content[Index];
         var bEmptySectPara = this.Pages[PageNum].Check_EndSectionPara(Item);
 
-        if (false != Item.Is_Inline() && (type_Table === Item.GetType() || false === bEmptySectPara))
+        if (false != Item.Is_Inline() && (type_Paragraph !== Item.GetType() || false === bEmptySectPara))
             InlineElements.push(Index);
     }
 
@@ -7170,8 +7167,9 @@ CDocumentContent.prototype.Internal_GetContentPosByXY = function(X, Y, PageNum)
     {
         var Item = this.Content[InlineElements[Pos + 1]];
 
-        if (Y < Item.Pages[0].Bounds.Top)
-            return InlineElements[Pos];
+		var PageBounds = Item.GetPageBounds(0);
+		if (Y < PageBounds.Top)
+			return InlineElements[Pos];
 
         if (Item.GetPagesCount() > 1)
         {

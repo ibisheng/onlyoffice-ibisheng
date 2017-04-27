@@ -914,7 +914,7 @@ CTableCell.prototype =
         return this.Content.MoveCursorDownToFirstRow(_X, _Y, AddToSelect);
     },
 
-    Content_Recalculate_MinMaxContentWidth : function(isRotated)
+    Content_RecalculateMinMaxContentWidth : function(isRotated)
     {
         if (undefined === isRotated)
             isRotated = false;
@@ -922,7 +922,7 @@ CTableCell.prototype =
         if (true === this.Is_VerticalText())
             isRotated = true === isRotated ? false : true;
 
-        var Result = this.Content.Recalculate_MinMaxContentWidth(isRotated);
+        var Result = this.Content.RecalculateMinMaxContentWidth(isRotated);
 
         if (true !== isRotated && true === this.Get_NoWrap())
             Result.Min = Math.max(Result.Min, Result.Max);

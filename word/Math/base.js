@@ -2202,7 +2202,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     return Wrap;
 };*/
-CMathBase.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+CMathBase.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     var bOneLine = MinMax.bMath_OneLine;
 
@@ -2228,7 +2228,7 @@ CMathBase.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 }
                 else
                 {
-                    Item.Recalculate_MinMaxContentWidth(MinMax);
+                    Item.RecalculateMinMaxContentWidth(MinMax);
                 }
             }
         }
@@ -2274,7 +2274,7 @@ CMathBase.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
             var Item = this.Content[Pos];
 
             MinMax.bMath_OneLine = Pos !== Numb;
-            Item.Recalculate_MinMaxContentWidth(MinMax);
+            Item.RecalculateMinMaxContentWidth(MinMax);
 
             if(Pos !== Numb)
             {

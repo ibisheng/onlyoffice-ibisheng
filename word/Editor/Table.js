@@ -2457,7 +2457,7 @@ CTable.prototype.Shift = function(CurPage, Dx, Dy)
 		this.TableRowsBottom[CurRow][CurPage] += Dy;
 	}
 };
-CTable.prototype.Update_EndInfo = function()
+CTable.prototype.UpdateEndInfo = function()
 {
 	for (var RowIndex = 0, RowsCount = this.Content.length; RowIndex < RowsCount; RowIndex++)
 	{
@@ -2465,7 +2465,7 @@ CTable.prototype.Update_EndInfo = function()
 		for (var CellIndex = 0, CellsCount = Row.Get_CellsCount(); CellIndex < CellsCount; CellIndex++)
 		{
 			var Cell = Row.Get_Cell(CellIndex);
-			Cell.Content.Update_EndInfo();
+			Cell.Content.UpdateEndInfo();
 		}
 	}
 };
@@ -2718,7 +2718,7 @@ CTable.prototype.RecalculateCurPos = function()
 
 	return null;
 };
-CTable.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
+CTable.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 {
 	if (true === isRotated)
 	{
@@ -2739,7 +2739,7 @@ CTable.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
 			for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 			{
 				var Cell         = Row.Get_Cell(CurCell);
-				var CellMinMax   = Cell.Content_Recalculate_MinMaxContentWidth(isRotated);
+				var CellMinMax   = Cell.Content_RecalculateMinMaxContentWidth(isRotated);
 				var CellMin      = CellMinMax.Min;
 				var CellMax      = CellMinMax.Max;
 				var CellMargins  = Cell.Get_Margins();
@@ -2800,7 +2800,7 @@ CTable.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
 			for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 			{
 				var Cell         = Row.Get_Cell(CurCell);
-				var CellMinMax   = Cell.Content_Recalculate_MinMaxContentWidth(isRotated);
+				var CellMinMax   = Cell.Content_RecalculateMinMaxContentWidth(isRotated);
 				var CellMin      = CellMinMax.Min;
 				var CellMax      = CellMinMax.Max;
 				var GridSpan     = Cell.Get_GridSpan();

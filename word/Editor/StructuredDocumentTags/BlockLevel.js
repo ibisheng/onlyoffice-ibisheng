@@ -600,6 +600,18 @@ CBlockLevelSdt.prototype.AddContentControl = function()
 {
 	this.Content.AddContentControl();
 };
+CBlockLevelSdt.prototype.RecalculateMinMaxContentWidth = function(isRotated)
+{
+	return this.Content.RecalculateMinMaxContentWidth(isRotated);
+};
+CBlockLevelSdt.prototype.Shift = function(CurPage, dX, dY)
+{
+	this.Content.Shift(CurPage, dX, dY);
+};
+CBlockLevelSdt.prototype.UpdateEndInfo = function()
+{
+	this.Content.UpdateEndInfo();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

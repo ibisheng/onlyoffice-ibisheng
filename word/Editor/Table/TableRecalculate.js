@@ -455,7 +455,7 @@ CTable.prototype.private_RecalculateGrid = function()
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
                 var Cell         = Row.Get_Cell( CurCell );
-                var CellMinMax   = Cell.Content_Recalculate_MinMaxContentWidth(false);
+                var CellMinMax   = Cell.Content_RecalculateMinMaxContentWidth(false);
                 var CellMin      = CellMinMax.Min;
                 var CellMax      = CellMinMax.Max;
                 var GridSpan     = Cell.Get_GridSpan();
@@ -2345,7 +2345,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 if ( true === bCanShift )
                 {
                     Cell.Content.Shift( 0, ShiftDx, ShiftDy );
-                    Cell.Content.Update_EndInfo();
+                    Cell.Content.UpdateEndInfo();
                 }
                 else
                 {

@@ -5745,7 +5745,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             {
                                 dlbl.lastStyleObject = cat_ax.labels.arrLabels[0].lastStyleObject;
                             }
-                            var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
+                            var min_max =  dlbl.tx.rich.content.RecalculateMinMaxContentWidth();
                             var max_min_content_width = min_max.Min;
                             if(max_min_content_width > max_min_width)
                                 max_min_width = max_min_content_width;
@@ -7175,7 +7175,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             dlbl.tx.rich.content.Set_ApplyToAll(true);
                             dlbl.tx.rich.content.SetParagraphAlign(AscCommon.align_Center);
                             dlbl.tx.rich.content.Set_ApplyToAll(false);
-                            var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
+                            var min_max =  dlbl.tx.rich.content.RecalculateMinMaxContentWidth();
                             var max_min_content_width = min_max.Min;
                             if(min_max.Max > max_max_width)
                                 max_max_width = min_max.Max;

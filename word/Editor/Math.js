@@ -2426,13 +2426,13 @@ ParaMath.prototype.Refresh_RecalcData2 = function(Data)
     this.Paragraph.Refresh_RecalcData2(0);
 };
 
-ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+ParaMath.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     var RPI = new CRPI();
     RPI.MergeMathInfo(this.ParaMathRPI);
 
     this.Root.PreRecalc(null, this, new CMathArgSize(), RPI);
-    this.Root.Recalculate_MinMaxContentWidth(MinMax);
+    this.Root.RecalculateMinMaxContentWidth(MinMax);
 };
 
 ParaMath.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)

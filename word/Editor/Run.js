@@ -4088,7 +4088,7 @@ ParaRun.prototype.Check_BreakPageEnd = function(PBChecker)
     return true;
 };
 
-ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+ParaRun.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     this.Recalculate_MeasureContent();
 
