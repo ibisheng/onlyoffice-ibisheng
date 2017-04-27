@@ -4456,6 +4456,18 @@ CT_PivotTableStyle.prototype.toXml = function(writer, name) {
 CT_PivotTableStyle.prototype.asc_getName = function() {
 	return this.name;
 };
+CT_PivotTableStyle.prototype.asc_getShowRowHeaders = function() {
+	return this.showRowHeaders;
+};
+CT_PivotTableStyle.prototype.asc_getShowColHeaders = function() {
+	return this.showColHeaders;
+};
+CT_PivotTableStyle.prototype.asc_getShowRowStripes = function() {
+	return this.showRowStripes;
+};
+CT_PivotTableStyle.prototype.asc_getShowColStripes = function() {
+	return this.showColStripes;
+};
 function CT_PivotFilters() {
 //Attributes
 	this.count = null;//0
@@ -9775,3 +9787,7 @@ prot["asc_getDataFields"] = prot.asc_getDataFields;
 
 prot = CT_PivotTableStyle.prototype;
 prot["asc_getName"] = prot.asc_getName;
+prot["asc_getShowRowHeaders"] = prot.asc_getShowRowHeaders;
+prot["asc_getShowColHeaders"] = prot.asc_getShowColHeaders;
+prot["asc_getShowRowStripes"] = prot.asc_getShowRowStripes;
+prot["asc_getShowColStripes"] = prot.asc_getShowColStripes;
