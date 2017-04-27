@@ -192,7 +192,7 @@ CHeaderFooter.prototype =
         if ( false === bChanges )
         {
             var NewFlowPos = [];
-            var AllDrawingObjects = this.Content.Get_AllDrawingObjects();
+            var AllDrawingObjects = this.Content.GetAllDrawingObjects();
             var Count = AllDrawingObjects.length;
 
             for ( var Index = 0; Index < Count; Index++ )
@@ -916,10 +916,10 @@ CHeaderFooter.prototype =
         return this.Content.GetAllParagraphs(Props, ParaArray);
     },
 
-    Get_AllDrawingObjects  : function(arrDrawings)
-    {
-        return this.Content.Get_AllDrawingObjects(arrDrawings);
-    },
+	GetAllDrawingObjects : function(arrDrawings)
+	{
+		return this.Content.GetAllDrawingObjects(arrDrawings);
+	},
 
     Get_PrevElementEndInfo : function(CurElement)
     {
@@ -1502,7 +1502,7 @@ CHeaderFooterController.prototype =
                if ( -1 === Header.RecalcInfo.CurPage )
                     Header.Set_Page(PageIndex);
             }
-            HeaderDrawings = Header.Content.Get_AllDrawingObjects([]);
+            HeaderDrawings = Header.Content.GetAllDrawingObjects([]);
             HeaderTables = Header.Content.Get_AllFloatElements();
         }
         
@@ -1533,7 +1533,7 @@ CHeaderFooterController.prototype =
                 if ( -1 === Footer.RecalcInfo.CurPage )
                     Footer.Set_Page(PageIndex);
             }
-            FooterDrawings = Footer.Content.Get_AllDrawingObjects([]);
+            FooterDrawings = Footer.Content.GetAllDrawingObjects([]);
             FooterTables = Footer.Content.Get_AllFloatElements();
         }
 

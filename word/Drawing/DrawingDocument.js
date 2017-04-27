@@ -3757,6 +3757,11 @@ function CDrawingDocument()
 		}
 	};
 
+	this.OnDrawContentControl = function(id, type, rects)
+	{
+
+	};
+
 	this.DrawContentControl = function(id, type, page, rects)
 	{
 		if (this.ContentControlObjectHover.check)

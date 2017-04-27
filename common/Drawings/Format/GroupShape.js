@@ -97,13 +97,13 @@ function CGroupShape()
         return AscDFH.historyitem_type_GroupShape;
     };
 
-    CGroupShape.prototype.Get_AllDrawingObjects = function(DrawingObjects)
+    CGroupShape.prototype.GetAllDrawingObjects = function(DrawingObjects)
     {
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            if(this.spTree[i].Get_AllDrawingObjects)
+            if(this.spTree[i].GetAllDrawingObjects)
             {
-                this.spTree[i].Get_AllDrawingObjects(DrawingObjects);
+                this.spTree[i].GetAllDrawingObjects(DrawingObjects);
             }
         }
     };

@@ -1685,7 +1685,7 @@ function CEditorPage(api)
 			_hoverObj.state = 0;
 			_hoverObj.id = -1;
 
-			oWordControl.m_oLogicDocument.DrawContentControls(pos.Page, pos.X, pos.Y, pos.Page);
+			//oWordControl.m_oLogicDocument.DrawContentControls(pos.Page, pos.X, pos.Y, pos.Page);
 			_hoverObj.check = false;
 
 			if (_hoverObj.state != _oldHover.state || _hoverObj.id != _oldHover.id)
@@ -2969,10 +2969,10 @@ function CEditorPage(api)
 
 			var posMouse = drDoc.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
 			drDoc.ContentControlObject = null;
-			for (var j = drDoc.m_lDrawingFirst; j <= drDoc.m_lDrawingEnd; j++)
-			{
-				this.m_oLogicDocument.DrawContentControls(j, posMouse.X, posMouse.Y, posMouse.Page);
-			}
+			// for (var j = drDoc.m_lDrawingFirst; j <= drDoc.m_lDrawingEnd; j++)
+			// {
+			// 	this.m_oLogicDocument.DrawContentControls(j, posMouse.X, posMouse.Y, posMouse.Page);
+			// }
 
 			if (drDoc.TableOutlineDr.bIsTracked)
 			{

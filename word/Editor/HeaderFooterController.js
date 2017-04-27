@@ -482,16 +482,3 @@ CHdrFtrController.prototype.RemoveTextSelection = function()
 	if (null != CurHdrFtr)
 		return CurHdrFtr.Content.RemoveTextSelection();
 };
-CHdrFtrController.prototype.IsInBlockLevelSdt = function()
-{
-	if (this.HdrFtr.CurHdrFtr)
-		return this.HdrFtr.CurHdrFtr.Content.IsInBlockLevelSdt(null);
-
-	return null;
-};
-CHdrFtrController.prototype.DrawContentControlsHover = function(X, Y, PageAbs)
-{
-	var CurHdrFtr = this.HdrFtr.CurHdrFtr;
-	if (null != CurHdrFtr)
-		return CurHdrFtr.Content.DrawContentControlsHover(X, Y, CurHdrFtr.Content.Get_StartPage_Relative());
-};

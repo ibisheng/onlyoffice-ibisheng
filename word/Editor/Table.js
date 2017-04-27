@@ -2065,7 +2065,7 @@ CTable.prototype.Get_PagesCount = function()
 {
 	return this.Pages.length;
 };
-CTable.prototype.Get_AllDrawingObjects = function(DrawingObjs)
+CTable.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
 	if (undefined === DrawingObjs)
 		DrawingObjs = [];
@@ -2078,13 +2078,13 @@ CTable.prototype.Get_AllDrawingObjects = function(DrawingObjs)
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Get_AllDrawingObjects(DrawingObjs);
+			Cell.Content.GetAllDrawingObjects(DrawingObjs);
 		}
 	}
 
 	return DrawingObjs;
 };
-CTable.prototype.Get_AllComments = function(AllComments)
+CTable.prototype.GetAllComments = function(AllComments)
 {
 	if (undefined === AllComments)
 		AllComments = [];
@@ -2097,13 +2097,13 @@ CTable.prototype.Get_AllComments = function(AllComments)
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Get_AllComments(AllComments);
+			Cell.Content.GetAllComments(AllComments);
 		}
 	}
 
 	return AllComments;
 };
-CTable.prototype.Get_AllMaths = function(AllMaths)
+CTable.prototype.GetAllMaths = function(AllMaths)
 {
 	if (undefined === AllMaths)
 		AllMaths = [];
@@ -2116,7 +2116,7 @@ CTable.prototype.Get_AllMaths = function(AllMaths)
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Get_AllMaths(AllMaths);
+			Cell.Content.GetAllMaths(AllMaths);
 		}
 	}
 
@@ -8978,8 +8978,8 @@ CTable.prototype.Row_Remove2 = function()
 	for (var Index = 0; Index < this.Selection.Data.length; Index++)
 	{
 		var Pos = this.Selection.Data[Index];
-		if (0 == Rows_to_delete[Pos.Row]);
-		Rows_to_delete[Pos.Row] = 1;
+		if (0 == Rows_to_delete[Pos.Row])
+			Rows_to_delete[Pos.Row] = 1;
 	}
 
 	// Удаляем строки.
@@ -11214,7 +11214,7 @@ CTable.prototype.Get_SectPr = function()
 
     return null;
 };
-CTable.prototype.Is_SelectedAll = function()
+CTable.prototype.IsSelectedAll = function()
 {
     if (true !== this.Selection.Use)
         return false;
@@ -11998,23 +11998,6 @@ CTable.prototype.SetTableProps = function(oProps)
 CTable.prototype.GetTableProps = function()
 {
 	return this.Get_Props();
-};
-CTable.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
-{
-	if (true !== this.Selection.Use || table_Selection_Text === this.Selection.Type)
-		return this.CurCell.Content.IsInBlockLevelSdt(oBlockLevelSdt);
-
-	return oBlockLevelSdt;
-};
-CTable.prototype.DrawContentControlsHover = function(X, Y, CurPage)
-{
-	var oPos = this.Internal_GetCellByXY(X, Y, CurPage);
-	var oRow = this.Content[oPos.Row];
-	if (oRow && oPos.Cell < oRow.Get_CellsCount())
-	{
-		var oCell = oRow.Get_Cell(oPos.Cell);
-		oCell.Content_DrawContentControlsHover(X, Y, CurPage - oCell.Content.Get_StartPage_Relative());
-	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

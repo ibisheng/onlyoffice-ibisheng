@@ -3218,22 +3218,6 @@ CFootnotesController.prototype.ResetRecalculateCache = function()
 		this.Footnote[Id].Reset_RecalculateCache();
 	}
 };
-CFootnotesController.prototype.IsInBlockLevelSdt = function()
-{
-	if (true !== this.Selection.Use || 0 === this.Selection.Direction)
-		return this.CurFootnote.IsInBlockLevelSdt(null);
-
-	return null;
-};
-CFootnotesController.prototype.DrawContentControlsHover = function(X, Y, PageAbs)
-{
-	var oResult = this.private_GetFootnoteByXY(X, Y, PageAbs);
-	if (oResult)
-	{
-		var oFootnote = oResult.Footnote;
-		oFootnote.DrawContentControlsHover(X, Y, oResult.FootnotePageIndex);
-	}
-};
 
 
 function CFootEndnotePageColumn()

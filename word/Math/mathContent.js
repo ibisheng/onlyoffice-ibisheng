@@ -1616,19 +1616,19 @@ CMathContent.prototype.GetArgSize = function()
 /////////   Перемещение     ////////////
 
 // Поиск позиции, селект
-CMathContent.prototype.Is_SelectedAll = function(Props)
+CMathContent.prototype.IsSelectedAll = function(Props)
 {
     var bFirst = false, bEnd = false;
 
     if(this.Selection.StartPos == 0 && this.Selection.EndPos == this.Content.length - 1)
     {
         if(this.Content[this.Selection.StartPos].Type == para_Math_Run)
-            bFirst = this.Content[this.Selection.StartPos].Is_SelectedAll(Props);
+            bFirst = this.Content[this.Selection.StartPos].IsSelectedAll(Props);
         else
             bFirst = true;
 
         if(this.Content[this.Selection.EndPos].Type == para_Math_Run)
-            bEnd = this.Content[this.Selection.EndPos].Is_SelectedAll(Props);
+            bEnd = this.Content[this.Selection.EndPos].IsSelectedAll(Props);
         else
             bEnd = true;
     }

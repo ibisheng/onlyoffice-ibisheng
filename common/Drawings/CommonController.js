@@ -6194,7 +6194,7 @@ DrawingObjectsController.prototype =
                                 var oContent = oTargetTextObject.getDocContent();
                                 if(oContent)
                                 {
-                                    oContent.Get_AllDrawingObjects(oTargetTextObject.recalcInfo.AllDrawings);
+                                    oContent.GetAllDrawingObjects(oTargetTextObject.recalcInfo.AllDrawings);
                                 }
                             }
                         }

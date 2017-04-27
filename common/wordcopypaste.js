@@ -2596,7 +2596,7 @@ PasteProcessor.prototype =
 				selectedElement = new CSelectedElement();
 				element = aContent.content[i];
 				//drawings
-				element.Get_AllDrawingObjects(drawings);
+				element.GetAllDrawingObjects(drawings);
 				if(type_Paragraph == element.GetType())//paragraph
 				{
 					selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, null, null, true, false);
@@ -4035,7 +4035,7 @@ PasteProcessor.prototype =
 		for(var i = 0; i < aNewContent.length; i++)
 		{
 			content = aNewContent[i];
-			drawingObj = content.Get_AllDrawingObjects();
+			drawingObj = content.GetAllDrawingObjects();
 			
 			if(!drawingObj || (drawingObj && !drawingObj.length) || content.GetType() == type_Table)
 			{

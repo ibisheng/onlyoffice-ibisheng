@@ -1704,7 +1704,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             HeaderPage.Rows[Index].Index = Index;
             for(var CellIndex = 0; CellIndex < HeaderPage.Rows[Index].Content.length; ++CellIndex)
             {
-                HeaderPage.Rows[Index].Content[CellIndex].Content.Get_AllDrawingObjects(aContentDrawings);
+                HeaderPage.Rows[Index].Content[CellIndex].Content.GetAllDrawingObjects(aContentDrawings);
             }
         }
         for(var DrawingIndex = 0; DrawingIndex < aContentDrawings.length; ++DrawingIndex)

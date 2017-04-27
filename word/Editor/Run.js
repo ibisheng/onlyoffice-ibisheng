@@ -223,7 +223,7 @@ ParaRun.prototype.CopyContent = function(Selected)
     return [this.Copy(Selected)];
 };
 
-ParaRun.prototype.Get_AllDrawingObjects = function(DrawingObjs)
+ParaRun.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
     var Count = this.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
@@ -233,7 +233,7 @@ ParaRun.prototype.Get_AllDrawingObjects = function(DrawingObjs)
         if ( para_Drawing === Item.Type )
         {
             DrawingObjs.push(Item);
-            Item.Get_AllDrawingObjects(DrawingObjs);
+            Item.GetAllDrawingObjects(DrawingObjs);
         }
     }
 };
@@ -5775,7 +5775,7 @@ ParaRun.prototype.IsSelectionUse = function()
     return this.State.Selection.Use;
 };
 
-ParaRun.prototype.Is_SelectedAll = function(Props)
+ParaRun.prototype.IsSelectedAll = function(Props)
 {
     var Selection = this.State.Selection;
     if ( false === Selection.Use && true !== this.Is_Empty( Props ) )

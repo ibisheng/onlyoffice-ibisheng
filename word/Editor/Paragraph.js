@@ -325,7 +325,7 @@ Paragraph.prototype.Get_FirstTextPr = function()
 
 	return this.Content[0].Get_CompiledPr();
 };
-Paragraph.prototype.Get_AllDrawingObjects = function(DrawingObjs)
+Paragraph.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
 	if (undefined === DrawingObjs)
 		DrawingObjs = [];
@@ -334,13 +334,13 @@ Paragraph.prototype.Get_AllDrawingObjects = function(DrawingObjs)
 	for (var Pos = 0; Pos < Count; Pos++)
 	{
 		var Item = this.Content[Pos];
-		if (Item.Get_AllDrawingObjects)
-			Item.Get_AllDrawingObjects(DrawingObjs);
+		if (Item.GetAllDrawingObjects)
+			Item.GetAllDrawingObjects(DrawingObjs);
 	}
 
 	return DrawingObjs;
 };
-Paragraph.prototype.Get_AllComments = function(List)
+Paragraph.prototype.GetAllComments = function(List)
 {
 	if (undefined === List)
 		List = [];
@@ -356,7 +356,7 @@ Paragraph.prototype.Get_AllComments = function(List)
 
 	return List;
 };
-Paragraph.prototype.Get_AllMaths = function(List)
+Paragraph.prototype.GetAllMaths = function(List)
 {
 	if (undefined === List)
 		List = [];
@@ -3784,7 +3784,7 @@ Paragraph.prototype.Set_SelectionContentPos = function(StartContentPos, EndConte
 			var StartPos       = Math.min(this.Selection.StartPos, this.Selection.EndPos);
 			for (var Pos = 0; Pos <= StartPos; Pos++)
 			{
-				if (false === this.Content[Pos].Is_SelectedAll({SkipAnchor : true}))
+				if (false === this.Content[Pos].IsSelectedAll({SkipAnchor : true}))
 				{
 					bNeedSelectAll = false;
 					break;
@@ -6870,7 +6870,7 @@ Paragraph.prototype.GetSelectedContent = function(DocContent)
 		{
 			var Item = this.Content[Pos];
 
-			if ((StartPos === Pos || EndPos === Pos) && true !== Item.Is_SelectedAll())
+			if ((StartPos === Pos || EndPos === Pos) && true !== Item.IsSelectedAll())
 			{
 				var Content = Item.CopyContent(true);
 				for (var ContentPos = 0, ContentLen = Content.length; ContentPos < ContentLen; ContentPos++)
@@ -11437,7 +11437,7 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
     var Direction = SearchEngine.Get_Direction();
     if (Direction > 0)
     {
-        var DrawingObjects = this.Get_AllDrawingObjects();
+        var DrawingObjects = this.GetAllDrawingObjects();
         for (var DrawingIndex = 0, Count = DrawingObjects.length; DrawingIndex < Count; DrawingIndex++)
         {
             DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
@@ -11458,7 +11458,7 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
 
     if (Direction < 0 && true !== SearchEngine.Is_Found())
     {
-        var DrawingObjects = this.Get_AllDrawingObjects();
+        var DrawingObjects = this.GetAllDrawingObjects();
         for (var DrawingIndex = DrawingObjects.length - 1; DrawingIndex >= 0; DrawingIndex--)
         {
             DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
@@ -11467,7 +11467,7 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
         }
     }
 };
-Paragraph.prototype.Is_SelectedAll = function()
+Paragraph.prototype.IsSelectedAll = function()
 {
     var bStart = this.Selection_IsFromStart();
     var bEnd   = this.Selection_CheckParaEnd();
@@ -12093,13 +12093,6 @@ Paragraph.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 Paragraph.prototype.GetCurrentParagraph = function()
 {
 	return this;
-};
-Paragraph.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
-{
-	return oBlockLevelSdt;
-};
-Paragraph.prototype.DrawContentControlsHover = function(X, Y, CurPage)
-{
 };
 
 var pararecalc_0_All  = 0;

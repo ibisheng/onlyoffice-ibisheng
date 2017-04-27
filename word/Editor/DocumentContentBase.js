@@ -111,19 +111,19 @@ CDocumentContentBase.prototype.Update_ContentIndexing = function()
  * @param {Array} arrDrawings - Если задан массив, тогда мы дополняем данный массив и возвращаем его.
  * @returns {Array}
  */
-CDocumentContentBase.prototype.Get_AllDrawingObjects = function(arrDrawings)
+CDocumentContentBase.prototype.GetAllDrawingObjects = function(arrDrawings)
 {
 	if (undefined === arrDrawings || null === arrDrawings)
 		arrDrawings = [];
 
 	if (this instanceof CDocument)
 	{
-		this.SectionsInfo.Get_AllDrawingObjects(arrDrawings);
+		this.SectionsInfo.GetAllDrawingObjects(arrDrawings);
 	}
 
 	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
 	{
-		this.Content[nPos].Get_AllDrawingObjects(arrDrawings);
+		this.Content[nPos].GetAllDrawingObjects(arrDrawings);
 	}
 
 	return arrDrawings;
@@ -138,7 +138,7 @@ CDocumentContentBase.prototype.Get_AllImageUrls = function(arrUrls)
 	if (undefined === arrDrawings || null === arrDrawings)
 		arrUrls = [];
 
-	var arrDrawings = this.Get_AllDrawingObjects();
+	var arrDrawings = this.GetAllDrawingObjects();
 	for (var nIndex = 0, nCount = arrDrawings.length; nIndex < nCount; ++nIndex)
 	{
 		var oParaDrawing = arrDrawings[nIndex];
@@ -153,7 +153,7 @@ CDocumentContentBase.prototype.Get_AllImageUrls = function(arrUrls)
  */
 CDocumentContentBase.prototype.Reassign_ImageUrls = function(mapUrls)
 {
-	var arrDrawings = this.Get_AllDrawingObjects();
+	var arrDrawings = this.GetAllDrawingObjects();
 	for (var nIndex = 0, nCount = arrDrawings.length; nIndex < nCount; ++nIndex)
 	{
 		var oDrawing = arrDrawings[nIndex];
@@ -394,7 +394,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 				var EndType   = this.Content[EndPos].GetType();
 
 				var bStartEmpty = false, bEndEmpty = false;
-				if (type_Paragraph === StartType)
+				if (type_Paragraph === StartType || type_BlockLevelSdt === StartType)
 				{
 					this.Content[StartPos].Remove(1, true);
 					bStartEmpty = this.Content[StartPos].IsEmpty()
@@ -403,13 +403,8 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 				{
 					bStartEmpty = !(this.Content[StartPos].Row_Remove2());
 				}
-				else if (type_BlockLevelSdt === StartType)
-				{
-					this.Content[StartPos].Remove(1, true);
-					bStartEmpty = false;
-				}
 
-				if (type_Paragraph === EndType)
+				if (type_Paragraph === EndType || type_BlockLevelSdt === EndType)
 				{
 					this.Content[EndPos].Remove(1, true);
 					bEndEmpty = this.Content[EndPos].IsEmpty()
@@ -417,11 +412,6 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 				else if (type_Table === EndType)
 				{
 					bEndEmpty = !(this.Content[EndPos].Row_Remove2());
-				}
-				else if (type_BlockLevelSdt === EndType)
-				{
-					this.Content[EndPos].Remove(1, true);
-					bEndEmpty = false;
 				}
 
 				if (!bStartEmpty && !bEndEmpty)

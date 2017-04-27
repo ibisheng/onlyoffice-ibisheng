@@ -1860,11 +1860,6 @@ CTableCell.prototype.Get_TopDocumentContent = function()
 
     return null;
 };
-CTableCell.prototype.Content_DrawContentControlsHover = function(X, Y, CurPage)
-{
-	var oPos = this.private_TransformXY(X, Y);
-	this.Content.DrawContentControlsHover(oPos.X, oPos.Y, CurPage);
-};
 
 function CTableCellRecalculateObject()
 {

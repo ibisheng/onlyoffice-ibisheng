@@ -59,6 +59,12 @@ function CBlockLevelSdt(oLogicDocument, oParent)
 CBlockLevelSdt.prototype = Object.create(CDocumentContentElementBase.prototype);
 CBlockLevelSdt.prototype.constructor = CBlockLevelSdt;
 
+CBlockLevelSdt.prototype.Copy = function(Parent)
+{
+	var oNew = new CBlockLevelSdt(this.LogicDocument, Parent ? Parent : this.Parent);
+	oNew.Content.Copy2(this.Content);
+	return oNew;
+};
 CBlockLevelSdt.prototype.GetType = function()
 {
 	return type_BlockLevelSdt;
@@ -153,6 +159,7 @@ CBlockLevelSdt.prototype.IsTableBorder = function(X, Y, CurPage)
 };
 CBlockLevelSdt.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
+	this.DrawContentControlsTrack(true);
 	return this.Content.UpdateCursorType(X, Y, CurPage);
 };
 CBlockLevelSdt.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent, isTableBorder)
@@ -169,6 +176,7 @@ CBlockLevelSdt.prototype.IsSelectionEmpty = function(isCheckHidden)
 };
 CBlockLevelSdt.prototype.GetSelectedElementsInfo = function(oInfo)
 {
+	oInfo.SetBlockLevelSdt(this);
 	this.Content.GetSelectedElementsInfo(oInfo);
 };
 CBlockLevelSdt.prototype.IsSelectionUse = function()
@@ -465,7 +473,14 @@ CBlockLevelSdt.prototype.SetTableProps = function(oProps)
 };
 CBlockLevelSdt.prototype.GetSelectedContent = function(oSelectedContent)
 {
-	return this.Content.GetSelectedContent(oSelectedContent);
+	if (this.Content.IsSelectedAll())
+	{
+		oSelectedContent.Add(new CSelectedElement(this.Copy(this.Parent)));
+	}
+	else
+	{
+		return this.Content.GetSelectedContent(oSelectedContent);
+	}
 };
 CBlockLevelSdt.prototype.PasteFormatting = function(TextPr, ParaPr, ApplyPara)
 {
@@ -567,52 +582,19 @@ CBlockLevelSdt.prototype.GetSelectionAnchorPos = function()
 {
 	return this.Content.GetSelectionAnchorPos();
 };
-CBlockLevelSdt.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
-{
-	return this.Content.IsInBlockLevelSdt(this);
-};
-CBlockLevelSdt.prototype.DrawContentControlsHover = function(X, Y, CurPage)
-{
-	this.Content.DrawContentControlsHover(X, Y, CurPage);
-
-	var oDrawingDocument = this.LogicDocument.Get_DrawingDocument();
-	var oRects = {};
-	for (var nCurPage = 0, nPagesCount = this.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
-	{
-		var nPageAbs = this.Get_AbsolutePage(nCurPage);
-
-		if (!oRects[nPageAbs])
-			oRects[nPageAbs] = [];
-
-		var oBounds = this.GetPageBounds(nCurPage);
-		oRects[nPageAbs].push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom});
-	}
-
-	for (var nPageAbs in oRects)
-	{
-		oDrawingDocument.DrawContentControl(this.GetId(), c_oContentControlTrack.Hover, nPageAbs, oRects[nPageAbs]);
-	}
-};
-CBlockLevelSdt.prototype.DrawContentControls = function(PageAbs)
+CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 {
 	var oDrawingDocument = this.LogicDocument.Get_DrawingDocument();
 	var arrRects = [];
 
 	for (var nCurPage = 0, nPagesCount = this.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
 	{
-		var nCurPageAbs = this.Get_AbsolutePage(nCurPage);
-		if (nCurPageAbs === PageAbs)
-		{
-			var oBounds = this.GetPageBounds(nCurPage);
-			arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom});
-		}
-		else if (nCurPageAbs > PageAbs)
-		{
-			break;
-		}
+		var nPageAbs = this.Get_AbsolutePage(nCurPage);
+		var oBounds = this.GetPageBounds(nCurPage);
+		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
-	oDrawingDocument.DrawContentControl(this.GetId(), c_oContentControlTrack.In, PageAbs, arrRects);
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
@@ -747,6 +729,18 @@ CBlockLevelSdt.prototype.CheckRange = function(X0, Y0, X1, Y1, _Y0, _Y1, X_lf, X
 CBlockLevelSdt.prototype.Get_TopDocumentContent = function()
 {
 	return this.Parent.Get_TopDocumentContent();
+};
+CBlockLevelSdt.prototype.GetAllDrawingObjects = function(AllDrawingObjects)
+{
+	return this.Content.GetAllDrawingObjects(AllDrawingObjects);
+};
+CBlockLevelSdt.prototype.GetAllComments = function(AllComments)
+{
+	return this.Content.GetAllComments(AllComments);
+};
+CBlockLevelSdt.prototype.GetAllMaths = function(AllMaths)
+{
+	return this.Content.GetAllMaths(AllMaths);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

@@ -360,7 +360,7 @@ CShape.prototype.recalculateText = function()
                 var oContent = this.getDocContent();
                 if(oContent)
                 {
-                    oContent.Get_AllDrawingObjects(this.recalcInfo.AllDrawings);
+                    oContent.GetAllDrawingObjects(this.recalcInfo.AllDrawings);
                 }
             }
         }
@@ -516,7 +516,7 @@ CShape.prototype.checkContentDrawings = function()
 {
     if(this.textBoxContent)
     {
-        var all_drawings = this.textBoxContent.Get_AllDrawingObjects([]);
+        var all_drawings = this.textBoxContent.GetAllDrawingObjects([]);
         for(var i = 0; i < all_drawings.length; ++i)
         {
             all_drawings[i].GraphicObj.updateTransformMatrix();

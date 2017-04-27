@@ -455,7 +455,7 @@ ParaComment.prototype =
         return false;
     },
 
-    Is_SelectedAll : function(Props)
+	IsSelectedAll : function(Props)
     {
         return true;
     },

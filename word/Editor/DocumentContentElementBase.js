@@ -571,13 +571,6 @@ CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
 {
 	return null;
 };
-CDocumentContentElementBase.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
-{
-	return null;
-};
-CDocumentContentElementBase.prototype.DrawContentControlsHover = function(X, Y, CurPage)
-{
-};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
@@ -683,6 +676,15 @@ CDocumentContentElementBase.prototype.IsEmpty = function()
 CDocumentContentElementBase.prototype.AddToParagraph = function(oItem)
 {
 	return this.Add(oItem);
+};
+CDocumentContentElementBase.prototype.GetAllDrawingObjects = function(AllDrawingObjects)
+{
+};
+CDocumentContentElementBase.prototype.GetAllComments = function(AllComments)
+{
+};
+CDocumentContentElementBase.prototype.GetAllMaths = function(AllMaths)
+{
 };
 
 //--------------------------------------------------------export--------------------------------------------------------

@@ -544,7 +544,7 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
     oDocContent.Reset(0, 0, dMaxWidth, 20000);
     if(bNeedRecalcAllDrawings)
     {
-        var aAllDrawings = oDocContent.Get_AllDrawingObjects();
+        var aAllDrawings = oDocContent.GetAllDrawingObjects();
         for(i = 0; i < aAllDrawings.length; ++i)
         {
             aAllDrawings[i].GraphicObj.recalculate();
@@ -725,12 +725,12 @@ CShape.prototype.getObjectType = function () {
     return AscDFH.historyitem_type_Shape;
 };
 
-CShape.prototype.Get_AllDrawingObjects = function(DrawingObjects)
+CShape.prototype.GetAllDrawingObjects = function(DrawingObjects)
 {
     var oContent = this.getDocContent();
     if(oContent)
     {
-        oContent.Get_AllDrawingObjects(DrawingObjects);
+        oContent.GetAllDrawingObjects(DrawingObjects);
     }
 };
 
@@ -2940,7 +2940,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                 var oContent = this.getDocContent();
                 if(oContent)
                 {
-                    oContent.Get_AllDrawingObjects(this.recalcInfo.AllDrawings);
+                    oContent.GetAllDrawingObjects(this.recalcInfo.AllDrawings);
                 }
             }
         }
@@ -4561,7 +4561,7 @@ CShape.prototype.getAllRasterImages = function(images)
     {
         if(this.bWordShape)
         {
-            var drawings = oContent.Get_AllDrawingObjects();
+            var drawings = oContent.GetAllDrawingObjects();
             for(var i = 0; i < drawings.length; ++i)
             {
                 drawings[i].GraphicObj && drawings[i].GraphicObj.getAllRasterImages && drawings[i].GraphicObj.getAllRasterImages(images);

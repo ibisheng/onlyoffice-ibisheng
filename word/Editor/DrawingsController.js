@@ -517,19 +517,3 @@ CDrawingsController.prototype.RemoveTextSelection = function()
 {
 	this.DrawingObjects.removeTextSelection();
 };
-CDrawingsController.prototype.IsInBlockLevelSdt = function()
-{
-	var oTargetTextObject = this.DrawingObjects.getTargetDocContent();
-	if (oTargetTextObject)
-		return oTargetTextObject.IsInBlockLevelSdt(null);
-
-	return null;
-};
-CDrawingsController.prototype.DrawContentControlsHover = function(X, Y, PageAbs)
-{
-	var oTargetTextObject = AscFormat.getTargetTextObject(this.DrawingObjects);
-	if (oTargetTextObject)
-		return oTargetTextObject.DrawContentControlsHover(X, Y, 0);
-
-	return null;
-};

@@ -732,12 +732,3 @@ CDocumentControllerBase.prototype.GetCurrentSectionPr = function(){return null;}
  * Отличие от RemoveSelection в том, что сбрасываем селект с текста, но не сбрасываем с автофигур
  */
 CDocumentControllerBase.prototype.RemoveTextSelection = function(){};
-/**
- * Если выделение или курсор находятся в контейнере - получаем его.
- * @returns {CBlockLevelSdt?}
- */
-CDocumentControllerBase.prototype.IsInBlockLevelSdt = function(){return null;};
-/**
- * Рисуем выделение контейнер, когда проводим мышкой над ним
- */
-CDocumentControllerBase.prototype.DrawContentControlsHover = function(X, Y, PageAbs){};

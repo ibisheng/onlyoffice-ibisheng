@@ -229,15 +229,15 @@ ParaDrawing.prototype.CheckCorrect = function(){
 	return true;
 };
 
-ParaDrawing.prototype.Get_AllDrawingObjects = function(DrawingObjects)
+ParaDrawing.prototype.GetAllDrawingObjects = function(DrawingObjects)
 {
 	if (null == DrawingObjects)
 	{
 		DrawingObjects = [];
 	}
-	if (this.GraphicObj.Get_AllDrawingObjects)
+	if (this.GraphicObj.GetAllDrawingObjects)
 	{
-		this.GraphicObj.Get_AllDrawingObjects(DrawingObjects);
+		this.GraphicObj.GetAllDrawingObjects(DrawingObjects);
 	}
 };
 ParaDrawing.prototype.canRotate = function()

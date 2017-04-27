@@ -289,7 +289,7 @@ CParagraphContentWithParagraphLikeContent.prototype.CopyContent = function(Selec
     {
         var Item = this.Content[CurPos];
 
-        if ((StartPos === CurPos || EndPos === CurPos) && true !== Item.Is_SelectedAll())
+        if ((StartPos === CurPos || EndPos === CurPos) && true !== Item.IsSelectedAll())
         {
             var Content = Item.CopyContent(Selected);
             for (var ContentPos = 0, ContentLen = Content.length; ContentPos < ContentLen; ContentPos++)
@@ -332,15 +332,15 @@ CParagraphContentWithParagraphLikeContent.prototype.Recalc_RunsCompiledPr = func
             Item.Recalc_RunsCompiledPr();
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_AllDrawingObjects = function(DrawingObjs)
+CParagraphContentWithParagraphLikeContent.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
     var Count = this.Content.length;
     for (var Index = 0; Index < Count; Index++)
     {
         var Item = this.Content[Index];
 
-        if (Item.Get_AllDrawingObjects)
-            Item.Get_AllDrawingObjects(DrawingObjs);
+        if (Item.GetAllDrawingObjects)
+            Item.GetAllDrawingObjects(DrawingObjs);
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph = function(Paragraph)
@@ -2237,7 +2237,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_CheckParaContentPo
 
     return false;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Is_SelectedAll = function(Props)
+CParagraphContentWithParagraphLikeContent.prototype.IsSelectedAll = function(Props)
 {
     var Selection = this.State.Selection;
 
@@ -2255,14 +2255,14 @@ CParagraphContentWithParagraphLikeContent.prototype.Is_SelectedAll = function(Pr
 
     for ( var Pos = 0; Pos <= StartPos; Pos++ )
     {
-        if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
+        if ( false === this.Content[Pos].IsSelectedAll( Props ) )
             return false;
     }
 
     var Count = this.Content.length;
     for ( var Pos = EndPos; Pos < Count; Pos++ )
     {
-        if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
+        if ( false === this.Content[Pos].IsSelectedAll( Props ) )
             return false;
     }
 

@@ -1255,33 +1255,33 @@ CDocumentContent.prototype.Draw                           = function(nPageIndex,
         pGraphics.End_Command();
     }
 };
-CDocumentContent.prototype.Get_AllComments                = function(AllComments)
+CDocumentContent.prototype.GetAllComments = function(AllComments)
 {
-    if (undefined === AllComments)
-        AllComments = [];
+	if (undefined === AllComments)
+		AllComments = [];
 
-    var Count = this.Content.length;
-    for (var Pos = 0; Pos < Count; Pos++)
-    {
-        var Item = this.Content[Pos];
-        Item.Get_AllComments(AllComments);
-    }
+	var Count = this.Content.length;
+	for (var Pos = 0; Pos < Count; Pos++)
+	{
+		var Item = this.Content[Pos];
+		Item.GetAllComments(AllComments);
+	}
 
-    return AllComments;
+	return AllComments;
 };
-CDocumentContent.prototype.Get_AllMaths                   = function(AllMaths)
+CDocumentContent.prototype.GetAllMaths = function(AllMaths)
 {
-    if (undefined === AllMaths)
-        AllMaths = [];
+	if (undefined === AllMaths)
+		AllMaths = [];
 
-    var Count = this.Content.length;
-    for (var Pos = 0; Pos < Count; Pos++)
-    {
-        var Item = this.Content[Pos];
-        Item.Get_AllMaths(AllMaths);
-    }
+	var Count = this.Content.length;
+	for (var Pos = 0; Pos < Count; Pos++)
+	{
+		var Item = this.Content[Pos];
+		Item.GetAllMaths(AllMaths);
+	}
 
-    return AllMaths;
+	return AllMaths;
 };
 CDocumentContent.prototype.Get_AllFloatElements           = function(FloatObjs)
 {
@@ -1375,7 +1375,7 @@ CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceChec
 		// Учитываем все Drawing-объекты с обтеканием. Объекты без обтекания (над и под текстом) учитываем только в
 		// случае, когда начальная точка (левый верхний угол) попадает в this.Y + Height
 
-		var AllDrawingObjects = this.Get_AllDrawingObjects();
+		var AllDrawingObjects = this.GetAllDrawingObjects();
 		var Count             = AllDrawingObjects.length;
 		for (var Index = 0; Index < Count; Index++)
 		{
@@ -2800,7 +2800,7 @@ CDocumentContent.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelect
 			Data     : null
 		};
 
-		return;
+		return false;
 	}
 
 	if (undefined === bRemoveOnlySelection)
@@ -2812,7 +2812,7 @@ CDocumentContent.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelect
 	if (docpostype_DrawingObjects === this.CurPos.Type)
 		return this.LogicDocument.DrawingObjects.remove(Count, bOnlyText, bRemoveOnlySelection);
 	else //if ( docpostype_Content === this.CurPos.Type )
-		this.private_Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
+		return this.private_Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
 };
 CDocumentContent.prototype.GetCursorPosXY = function()
 {
@@ -8479,24 +8479,16 @@ CDocumentContent.prototype.IsBlockLevelSdtContent = function()
 {
 	return (this.Parent && this.Parent instanceof CBlockLevelSdt);
 };
-CDocumentContent.prototype.IsInBlockLevelSdt = function(oBlockLevelSdt)
+CDocumentContent.prototype.IsSelectedAll = function()
 {
-	if (false === this.Selection.Use || this.Selection.StartPos === this.Selection.EndPos)
-	{
-		if (true === this.Selection.Use)
-			return this.Content[this.Selection.StartPos].IsInBlockLevelSdt(oBlockLevelSdt);
-		else
-			return this.Content[this.CurPos.ContentPos].IsInBlockLevelSdt(oBlockLevelSdt);
-	}
+	if (true === this.Selection.Use
+		&& ((0 === this.Selection.StartPos && this.Content.length - 1 === this.Selection.EndPos)
+		|| (0 === this.Selection.EndPos && this.Content.length - 1 === this.Selection.EndPos))
+		&& true === this.Content[0].IsSelectedAll()
+		&& true === this.Content[this.Content.length - 1].IsSelectedAll())
+		return true;
 
-	return oBlockLevelSdt;
-};
-CDocumentContent.prototype.DrawContentControlsHover = function(X, Y, CurPage)
-{
-	var ContentPos       = this.Internal_GetContentPosByXY(X, Y, CurPage);
-	var Item             = this.Content[ContentPos];
-	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
-	Item.DrawContentControlsHover(X, Y, ElementPageIndex);
+	return false;
 };
 
 

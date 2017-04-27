@@ -3026,9 +3026,9 @@ ParaMath.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, b
     return this.Root.Selection_CheckParaContentPos(ContentPos, Depth, bStart, bEnd);
 };
 
-ParaMath.prototype.Is_SelectedAll = function(Props)
+ParaMath.prototype.IsSelectedAll = function(Props)
 {
-    return this.Root.Is_SelectedAll(Props);
+	return this.Root.IsSelectedAll(Props);
 };
 
 ParaMath.prototype.Selection_CorrectLeftPos = function(Direction)
