@@ -3896,8 +3896,8 @@ CDocumentContent.prototype.Insert_Content                     = function(Selecte
         }
         else
         {
-            var bConcatS   = ( type_Table === Elements[0].Element.GetType() ? false : true );
-            var bConcatE   = ( type_Table === Elements[ElementsCount - 1].Element.GetType() || true === Elements[ElementsCount - 1].SelectedAll ? false : true );
+            var bConcatS   = ( type_Paragraph !== Elements[0].Element.GetType() ? false : true );
+            var bConcatE   = ( type_Paragraph !== Elements[ElementsCount - 1].Element.GetType() || true === Elements[ElementsCount - 1].SelectedAll ? false : true );
             var ParaS      = Para;
             var ParaE      = Para;
             var ParaEIndex = DstIndex;
