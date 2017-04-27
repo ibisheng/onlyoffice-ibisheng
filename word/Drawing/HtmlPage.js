@@ -1674,6 +1674,12 @@ function CEditorPage(api)
 			oWordControl.OnUpdateOverlay();
 		}
 
+		if (!oWordControl.IsUpdateOverlayOnEndCheck)
+		{
+			if (oWordControl.m_oDrawingDocument.ContentControlsCheckLast())
+				oWordControl.OnUpdateOverlay();
+		}
+
 		oWordControl.EndUpdateOverlay();
 	};
 	this.onMouseMove2 = function()

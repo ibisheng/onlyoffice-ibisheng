@@ -3764,6 +3764,57 @@ function CDrawingDocument()
 		}
 	};
 
+	this.ContentControlsSaveLast = function()
+	{
+		this.ContentControlObjectsLast = [];
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		{
+			var _obj = this.ContentControlObjects[i];
+			this.ContentControlObjectsLast.push(new CContentControlTrack(_obj.id, _obj.type, _obj.rects));
+		}
+	};
+
+	this.ContentControlsCheckLast = function()
+	{
+		var _len1 = this.ContentControlObjects.length;
+		var _len2 = this.ContentControlObjectsLast.length;
+
+		if (_len1 != _len2)
+			return true;
+
+		var count1, count2;
+		for (var i = 0; i < _len1; i++)
+		{
+			var _obj1 = this.ContentControlObjects[i];
+			var _obj2 = this.ContentControlObjectsLast[i];
+
+			if (_obj1.id != _obj2.id)
+				return true;
+			if (_obj1.type != _obj2.type)
+				return true;
+
+			count1 = _obj1.rects.length;
+			count2 = _obj2.rects.length;
+
+			if (count1 != count2)
+				return true;
+
+			for (var j = 0; j < count1; j++)
+			{
+				if (Math.abs(_obj1.rects[j].X - _obj2.rects[j].X) > 0.00001 ||
+					Math.abs(_obj1.rects[j].Y - _obj2.rects[j].Y) > 0.00001 ||
+					Math.abs(_obj1.rects[j].R - _obj2.rects[j].R) > 0.00001 ||
+					Math.abs(_obj1.rects[j].B - _obj2.rects[j].B) > 0.00001 ||
+					_obj1.rects[j].Page != _obj2.rects[j].Page)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
+	};
+
 	this.DrawContentControlsTrack = function(overlay)
 	{
 		var ctx = overlay.m_oContext;
@@ -3896,11 +3947,8 @@ function CDrawingDocument()
 				ctx.beginPath();
 			}
 		}
-	};
 
-	this.DrawContentControlClear = function(id, type, rects)
-	{
-		this.ContentControlObjects = [];
+		this.ContentControlsSaveLast();
 	};
 
 	this.OnDrawContentControl = function(id, type, rects)
@@ -3918,7 +3966,21 @@ function CDrawingDocument()
 		if (null == id || !rects || rects.length == 0)
 			return;
 
-		this.ContentControlObjects.push(new CContentControlTrack(id, type, rects));
+		if (type == c_oContentControlTrack.In)
+		{
+			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
+			{
+				this.ContentControlObjects.splice(0, 1);
+			}
+			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects));
+		}
+		else
+		{
+			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
+				return;
+
+			this.ContentControlObjects.unshift(new CContentControlTrack(id, type, rects));
+		}
 	};
 
 	this.private_DrawMathTrack = function (overlay, oPath, shift, color, dKoefX, dKoefY, drPage)
