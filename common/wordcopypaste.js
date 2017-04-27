@@ -2021,8 +2021,8 @@ PasteProcessor.prototype =
     {
         if(!PasteElementsId.g_bIsDocumentCopyPaste)
             return;
-        var paragraph = oDoc.Content[oDoc.CurPos.ContentPos];
-        if (null != paragraph && type_Paragraph == paragraph.GetType()) {
+        var paragraph = oDoc.GetCurrentParagraph();
+        if (null != paragraph) {
             var NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
             paragraph.Check_NearestPos(NearPos);
             //делаем небольшой сдвиг по y, потому что сама точка TargetPos для двухстрочного параграфа определяется как верхняя
@@ -2051,7 +2051,7 @@ PasteProcessor.prototype =
                 return;
             }
 
-            oDoc.Insert_Content(oSelectedContent, NearPos);
+            paragraph.Parent.Insert_Content(oSelectedContent, NearPos);
             if(this.oLogicDocument && this.oLogicDocument.DrawingObjects)
             {
                 var oTargetTextObject = AscFormat.getTargetTextObject(this.oLogicDocument.DrawingObjects);

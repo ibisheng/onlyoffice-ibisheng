@@ -2134,7 +2134,7 @@ background-repeat: no-repeat;\
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
-				//t.WordControl.m_oLogicDocument.AddNewParagraph();
+				t.insertDocumentUrlsData.oSdt = t.WordControl.m_oLogicDocument.AddContentControl();
 				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + result, undefined, undefined, true);
 			});
 		}
@@ -2145,6 +2145,12 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.continueInsertDocumentUrls = function()
 	{
+		var oSdt = this.insertDocumentUrlsData.oSdt;
+		if(oSdt && oSdt.Content.Get_ElementsCount() > 1){
+			oSdt.Content.Remove_FromContent(oSdt.Content.Get_ElementsCount() - 1 , 1);
+			oSdt.MoveCursorToEndPos(false, false);
+		}
+		this.WordControl.m_oLogicDocument.MoveCursorRight(false, false, true);
 		if (this.insertDocumentUrlsData && this.insertDocumentUrlsData.documents.length > 0) {
 			this.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
 		} else {
@@ -7510,7 +7516,7 @@ background-repeat: no-repeat;\
 				window.g_asc_plugins.setPluginMethodReturnAsync();
 
 			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
-			this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments, endCallback : function(_api) {
+			this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments, oSdt: null, endCallback : function(_api) {
 				if (window.g_asc_plugins)
 					window.g_asc_plugins.onPluginMethodReturn();
 			}};
