@@ -571,6 +571,9 @@ CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
 {
 	return null;
 };
+CDocumentContentElementBase.prototype.AddContentControl = function()
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

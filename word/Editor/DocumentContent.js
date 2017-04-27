@@ -7209,75 +7209,63 @@ CDocumentContent.prototype.private_CheckCurPage = function()
 		}
 	}
 };
-CDocumentContent.prototype.Internal_Content_Add       = function(Position, NewObject, bCheckTable)
+CDocumentContent.prototype.Internal_Content_Add = function(Position, NewObject, bCheckLastElement)
 {
-    // Position = this.Content.length  допускается
-    if (Position < 0 || Position > this.Content.length)
-        return;
+	// Position = this.Content.length  допускается
+	if (Position < 0 || Position > this.Content.length)
+		return;
 
-    var PrevObj = this.Content[Position - 1];
-    var NextObj = this.Content[Position];
+	var PrevObj = this.Content[Position - 1] ? this.Content[Position - 1] : null;
+	var NextObj = this.Content[Position] ? this.Content[Position] : null;
 
-    if ("undefined" == typeof(PrevObj))
-        PrevObj = null;
+	this.private_RecalculateNumbering([NewObject]);
+	History.Add(new CChangesDocumentContentAddItem(this, Position, [NewObject]));
+	this.Content.splice(Position, 0, NewObject);
+	NewObject.Set_Parent(this);
+	NewObject.Set_DocumentNext(NextObj);
+	NewObject.Set_DocumentPrev(PrevObj);
 
-    if ("undefined" == typeof(NextObj))
-        NextObj = null;
+	if (null != PrevObj)
+		PrevObj.Set_DocumentNext(NewObject);
 
-    this.private_RecalculateNumbering([NewObject]);
-    History.Add(new CChangesDocumentContentAddItem(this, Position, [NewObject]));
-    this.Content.splice(Position, 0, NewObject);
-    NewObject.Set_Parent(this);
-    NewObject.Set_DocumentNext(NextObj);
-    NewObject.Set_DocumentPrev(PrevObj);
+	if (null != NextObj)
+		NextObj.Set_DocumentPrev(NewObject);
 
-    if (null != PrevObj)
-        PrevObj.Set_DocumentNext(NewObject);
+	if (Position <= this.CurPos.TableMove)
+		this.CurPos.TableMove++;
 
-    if (null != NextObj)
-        NextObj.Set_DocumentPrev(NewObject);
+	// Проверим, что последний элемент - параграф
+	if (false != bCheckLastElement && type_Paragraph !== this.Content[this.Content.length - 1].GetType())
+		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
 
-    if (Position <= this.CurPos.TableMove)
-        this.CurPos.TableMove++;
-
-    // Проверим, что последний элемент не таблица
-    if (false != bCheckTable && type_Table == this.Content[this.Content.length - 1].GetType())
-        this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
-
-    this.private_ReindexContent(Position);
+	this.private_ReindexContent(Position);
 };
-CDocumentContent.prototype.Internal_Content_Remove    = function(Position, Count, bCorrectionCheck)
+CDocumentContent.prototype.Internal_Content_Remove = function(Position, Count, bCheckLastElement)
 {
-    if (Position < 0 || Position >= this.Content.length || Count <= 0)
-        return;
+	if (Position < 0 || Position >= this.Content.length || Count <= 0)
+		return;
 
-    var PrevObj = this.Content[Position - 1];
-    var NextObj = this.Content[Position + Count];
+	var PrevObj = this.Content[Position - 1] ? this.Content[Position - 1] : null;
+	var NextObj = this.Content[Position + Count] ? this.Content[Position + Count] : null;
 
-    if ("undefined" == typeof(PrevObj))
-        PrevObj = null;
+	for (var Index = 0; Index < Count; Index++)
+		this.Content[Position + Index].PreDelete();
 
-    if ("undefined" == typeof(NextObj))
-        NextObj = null;
+	History.Add(new CChangesDocumentContentRemoveItem(this, Position, this.Content.slice(Position, Position + Count)));
+	var Elements = this.Content.splice(Position, Count);
+	this.private_RecalculateNumbering(Elements);
 
-    for (var Index = 0; Index < Count; Index++)
-        this.Content[Position + Index].PreDelete();
+	if (null != PrevObj)
+		PrevObj.Set_DocumentNext(NextObj);
 
-    History.Add(new CChangesDocumentContentRemoveItem(this, Position, this.Content.slice(Position, Position + Count)));
-    var Elements = this.Content.splice(Position, Count);
-    this.private_RecalculateNumbering(Elements);
+	if (null != NextObj)
+		NextObj.Set_DocumentPrev(PrevObj);
 
-    if (null != PrevObj)
-        PrevObj.Set_DocumentNext(NextObj);
+	// Проверим, что последний элемент - параграф
+	if (false !== bCheckLastElement && (this.Content.length <= 0 || type_Paragraph !== this.Content[this.Content.length - 1].GetType()))
+		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
 
-    if (null != NextObj)
-        NextObj.Set_DocumentPrev(PrevObj);
-
-    // Проверим, что последний элемент не таблица
-    if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Table == this.Content[this.Content.length - 1].GetType()))
-        this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
-
-    this.private_ReindexContent(Position);
+	this.private_ReindexContent(Position);
 };
 CDocumentContent.prototype.Clear_ContentChanges       = function()
 {
@@ -8489,6 +8477,13 @@ CDocumentContent.prototype.IsSelectedAll = function()
 		return true;
 
 	return false;
+};
+CDocumentContent.prototype.AddContentControl = function()
+{
+	if (docpostype_DrawingObjects === this.CurPos.Type)
+		this.DrawingObjects.AddContentControl();
+	else
+		this.private_AddContentControl();
 };
 
 

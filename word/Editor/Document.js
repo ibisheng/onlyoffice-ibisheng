@@ -7404,20 +7404,14 @@ CDocument.prototype.Get_NearestPos = function(PageNum, X, Y, bAnchor, Drawing)
 	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, PageNum);
 	return this.Content[ContentPos].GetNearestPos(ElementPageIndex, X, Y, bAnchor, Drawing);
 };
-CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckTable)
+CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckLastElement)
 {
 	// Position = this.Content.length  допускается
 	if (Position < 0 || Position > this.Content.length)
 		return;
 
-	var PrevObj = this.Content[Position - 1];
-	var NextObj = this.Content[Position];
-
-	if ("undefined" == typeof(PrevObj))
-		PrevObj = null;
-
-	if ("undefined" == typeof(NextObj))
-		NextObj = null;
+	var PrevObj = this.Content[Position - 1] ? this.Content[Position - 1] : null;
+	var NextObj = this.Content[Position] ? this.Content[Position] : null;
 
 	this.private_RecalculateNumbering([NewObject]);
 	this.History.Add(new CChangesDocumentAddItem(this, Position, [NewObject]));
@@ -7438,28 +7432,22 @@ CDocument.prototype.Internal_Content_Add = function(Position, NewObject, bCheckT
 	// Проверим последний параграф
 	this.Check_SectionLastParagraph();
 
-	// Проверим, что последний элемент не таблица
-	if (false != bCheckTable && type_Table == this.Content[this.Content.length - 1].GetType())
+	// Проверим, что последний элемент - параграф
+	if (false !== bCheckLastElement && type_Paragraph !== this.Content[this.Content.length - 1].GetType())
 		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this));
 
 	// Запоминаем, что нам нужно произвести переиндексацию элементов
 	this.private_ReindexContent(Position);
 };
-CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCorrectionCheck)
+CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCheckLastElement)
 {
 	var ChangePos = -1;
 
 	if (Position < 0 || Position >= this.Content.length || Count <= 0)
 		return -1;
 
-	var PrevObj = this.Content[Position - 1];
-	var NextObj = this.Content[Position + Count];
-
-	if ("undefined" == typeof(PrevObj))
-		PrevObj = null;
-
-	if ("undefined" == typeof(NextObj))
-		NextObj = null;
+	var PrevObj = this.Content[Position - 1] ? this.Content[Position - 1] : null;
+	var NextObj = this.Content[Position + Count] ? this.Content[Position + Count] : null;
 
 	for (var Index = 0; Index < Count; Index++)
 	{
@@ -7476,8 +7464,8 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count, bCorrect
 	if (null != NextObj)
 		NextObj.Set_DocumentPrev(PrevObj);
 
-	// Проверим, что последний параграф
-	if (false !== bCorrectionCheck && (this.Content.length <= 0 || type_Paragraph !== this.Content[this.Content.length - 1].GetType()))
+	// Проверим, что последний элемент - параграф
+	if (false !== bCheckLastElement && (this.Content.length <= 0 || type_Paragraph !== this.Content[this.Content.length - 1].GetType()))
 		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this));
 
 	// Обновим информацию о секциях
@@ -15030,6 +15018,10 @@ CDocument.prototype.controller_GetCurrentSectionPr = function()
 	var nContentPos = this.CurPos.ContentPos;
 	return this.SectionsInfo.Get_SectPr(nContentPos).SectPr;
 };
+CDocument.prototype.controller_AddContentControl = function()
+{
+	this.private_AddContentControl();
+};
 //----------------------------------------------------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------------------------------------------------
@@ -15224,6 +15216,13 @@ CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
 			this.Document_UpdateRulersState();
 		}
 	}
+};
+CDocument.prototype.AddContentControl = function()
+{
+	if (true === this.IsSelectionUse())
+		this.RemoveBeforePaste();
+
+	this.Controller.AddContentControl();
 };
 
 function CDocumentSelectionState()

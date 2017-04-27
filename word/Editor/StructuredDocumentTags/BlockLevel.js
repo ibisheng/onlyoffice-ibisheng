@@ -596,6 +596,10 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 
 	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects);
 };
+CBlockLevelSdt.prototype.AddContentControl = function()
+{
+	this.Content.AddContentControl();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -754,11 +758,13 @@ function TEST_ADD_SDT()
 
 	oLogicDocument.Create_NewHistoryPoint();
 
-	var oSdt = new CBlockLevelSdt(oLogicDocument, oLogicDocument);
-	oSdt.Content.AddToParagraph(new ParaText("S"));
-	oSdt.Content.AddToParagraph(new ParaText("d"));
-	oSdt.Content.AddToParagraph(new ParaText("t"));
+	oLogicDocument.AddContentControl();
+	oLogicDocument.AddToParagraph(new ParaText("S"));
+	oLogicDocument.AddToParagraph(new ParaText("d"));
+	oLogicDocument.AddToParagraph(new ParaText("t"));
 
-	oLogicDocument.Internal_Content_Add(1, oSdt);
-	oLogicDocument.Recalculate_FromStart();
+	oLogicDocument.Recalculate();
+	oLogicDocument.Document_UpdateSelectionState();
+	oLogicDocument.Document_UpdateInterfaceState();
+	oLogicDocument.Document_UpdateRulersState();
 }

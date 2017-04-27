@@ -3218,6 +3218,11 @@ CFootnotesController.prototype.ResetRecalculateCache = function()
 		this.Footnote[Id].Reset_RecalculateCache();
 	}
 };
+CFootnotesController.prototype.AddContentControl = function()
+{
+	if (this.CurFootnote)
+		this.CurFootnote.AddContentControl();
+};
 
 
 function CFootEndnotePageColumn()

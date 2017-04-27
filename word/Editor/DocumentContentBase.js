@@ -696,3 +696,37 @@ CDocumentContentBase.prototype.IsBlockLevelSdtContent = function()
 {
 	return false;
 };
+CDocumentContentBase.prototype.private_AddContentControl = function()
+{
+	// Селекта быть не должно при выполнении данной функции, поэтому не проверяем
+	var oElement = this.Content[this.CurPos.ContentPos];
+
+	if (type_Paragraph === oElement.GetType())
+	{
+		var oSdt = new CBlockLevelSdt(editor.WordControl.m_oLogicDocument, this);
+		if (oElement.IsCursorAtEnd())
+		{
+			this.Internal_Content_Add(this.CurPos.ContentPos + 1, oSdt);
+			this.CurPos.ContentPos = this.CurPos.ContentPos + 1;
+		}
+		else if (oElement.IsCursorAtBegin())
+		{
+			this.Internal_Content_Add(this.CurPos.ContentPos, oSdt);
+		}
+		else
+		{
+			var oNewParagraph = new Paragraph(this.DrawingDocument, this);
+			oElement.Split(oNewParagraph);
+
+			this.Internal_Content_Add(this.CurPos.ContentPos + 1, oSdt);
+			this.Internal_Content_Add(this.CurPos.ContentPos + 2, oNewParagraph);
+
+			this.CurPos.ContentPos = this.CurPos.ContentPos + 1;
+		}
+		oSdt.MoveCursorToStartPos(false);
+	}
+	else
+	{
+		oElement.AddContentControl();
+	}
+};
