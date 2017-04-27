@@ -333,6 +333,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 
 	this.Remove_NumberingSelection();
 
+	var bRetValue = true;
 	if (true === this.Selection.Use)
 	{
 		var StartPos = this.Selection.StartPos;
@@ -513,6 +514,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 						{
 							this.Internal_Content_Add(0, this.private_CreateNewParagraph());
 							this.Internal_Content_Remove(1, this.Content.length - 1);
+							bRetValue = false;
 						}
 						else
 						{
@@ -573,10 +575,15 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 							this.Content[StartPos].Concat(this.Content[StartPos + 1]);
 							this.Internal_Content_Remove(StartPos + 1, 1);
 						}
-						else if (this.Content.length === 1 && true === this.Content[0].IsEmpty() && Count > 0)
+						else if (this.Content.length === 1 && true === this.Content[0].IsEmpty())
 						{
-							this.Internal_Content_Add(0, this.private_CreateNewParagraph());
-							this.Internal_Content_Remove(1, this.Content.length - 1);
+							if (Count > 0)
+							{
+								this.Internal_Content_Add(0, this.private_CreateNewParagraph());
+								this.Internal_Content_Remove(1, this.Content.length - 1);
+							}
+
+							bRetValue = false;
 						}
 					}
 				}
@@ -586,7 +593,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 	else
 	{
 		if (true === bRemoveOnlySelection || true === bOnTextAdd)
-			return;
+			return true;
 
 		if (type_Paragraph == this.Content[this.CurPos.ContentPos].GetType())
 		{
@@ -691,6 +698,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 		}
 	}
 
+	return bRetValue;
 };
 CDocumentContentBase.prototype.IsBlockLevelSdtContent = function()
 {
