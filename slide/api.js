@@ -5504,12 +5504,6 @@ background-repeat: no-repeat;\
 				return;
 			}
 
-			if (this.bInit_word_control === true)
-			{
-				AscCommon.CollaborativeEditing.Apply_Changes();
-				AscCommon.CollaborativeEditing.Release_Locks();
-			}
-
 			this.isUseEmbeddedCutFonts = false;
 
 			this.WordControl.checkNeedRules();
