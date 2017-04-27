@@ -2165,7 +2165,7 @@ CDocumentContent.prototype.AddNewParagraph = function()
         //    в том числе если стиля нет у обоих, тогда копируем еще все прямые настройки.
         //    (Т.е. если стили разные, а у исходный параграф был параграфом со списком, тогда
         //    новый параграф будет без списка).
-        if (type_Paragraph == Item.GetType())
+        if (type_Paragraph === Item.GetType())
         {
             // Если текущий параграф пустой и с нумерацией, тогда удаляем нумерацию и отступы левый и первой строки
             if (undefined != Item.Numbering_Get() && true === Item.IsEmpty({SkipNewLine : true}) && true === Item.IsCursorAtBegin())
@@ -2236,7 +2236,7 @@ CDocumentContent.prototype.AddNewParagraph = function()
                 }
             }
         }
-        else if (type_Table == Item.GetType())
+        else if (type_Table === Item.GetType() || type_BlockLevelSdt === Item.GetType())
         {
             // Если мы находимся в начале первого параграфа первой ячейки, и
             // данная таблица - первый элемент, тогда добавляем параграф до таблицы.
@@ -2247,6 +2247,12 @@ CDocumentContent.prototype.AddNewParagraph = function()
                 var NewParagraph = new Paragraph(this.DrawingDocument, this, this.bPresentation === true);
                 this.Internal_Content_Add(0, NewParagraph);
                 this.CurPos.ContentPos = 0;
+
+				if (true === this.Is_TrackRevisions())
+				{
+					NewParagraph.Remove_PrChange();
+					NewParagraph.Set_ReviewType(reviewtype_Add);
+				}
             }
             else
 			{
