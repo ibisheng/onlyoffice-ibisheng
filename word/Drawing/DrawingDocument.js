@@ -54,6 +54,13 @@ var c_oContentControlTrack = {
 	In 		: 1
 };
 
+function CContentControlTrack(_id, _type, _rects)
+{
+	this.id = (undefined == _id) ? -1 : _id;
+	this.type = (undefined == _type) ? -1 : _type;
+	this.rects = (undefined == _rects) ? null : _rects;
+}
+
 function CColumnsMarkupColumn()
 {
 	this.W = 0;
@@ -2119,9 +2126,9 @@ function CDrawingDocument()
 	this.UpdateRulerStateFlag = false;
 	this.UpdateRulerStateParams = [];
 
-	this.ContentControlObject = null;
-	this.ContentControlObjectState = -1; // 0 - hover, 1 - down
-	this.ContentControlObjectHover = { check : false, state : -1, id : -1 };
+	this.ContentControlObjects = [];
+	this.ContentControlObjectsLast = [];
+	this.ContentControlObjectState = -1;
 
 	// массивы ректов для поиска
 	this._search_HdrFtr_All = []; // Поиск в колонтитуле, который находится на всех страницах
@@ -3757,149 +3764,161 @@ function CDrawingDocument()
 		}
 	};
 
-	this.OnDrawContentControl = function(id, type, rects)
+	this.DrawContentControlsTrack = function(overlay)
 	{
-
-	};
-
-	this.DrawContentControl = function(id, type, page, rects)
-	{
-		if (this.ContentControlObjectHover.check)
-		{
-			if (type == c_oContentControlTrack.Hover)
-			{
-				this.ContentControlObjectHover.state = 1;
-				this.ContentControlObjectHover.id = id;
-			}
-
-			return;
-		}
-
-		if (!rects || rects.length == 0)
-			return;
-
-		if (type == c_oContentControlTrack.In)
-			this.ContentControlObject = { id : id, page : page, rects : rects };
-
-		var overlay = this.m_oWordControl.m_oOverlayApi;
-
 		var ctx = overlay.m_oContext;
 		ctx.strokeStyle = "#ADADAD";
 		ctx.lineWidth = 1;
 
-		var _page = this.m_arrPages[page];
-		var drPage = _page.drawingPage;
+		var _object, _rect;
+		var _x, _y, _r, _b;
 
-		var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
-		var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
-
-		ctx.beginPath();
-
-		var _x, _y, _r, _b, rect;
-		var _rects_len = rects.length;
-		for (var i = 0; i < _rects_len; i++)
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
 		{
-			rect = rects[i];
-			_x = (drPage.left + dKoefX * rect.X);
-			_y = (drPage.top + dKoefY * rect.Y);
-			_r = (drPage.left + dKoefX * rect.R);
-			_b = (drPage.top + dKoefY * rect.B);
+			_object = this.ContentControlObjects[i];
 
-			if (_x < overlay.min_x)
-				overlay.min_x = _x;
-			if (_r > overlay.max_x)
-				overlay.max_x = _r;
-
-			if (_y < overlay.min_y)
-				overlay.min_y = _y;
-			if (_b > overlay.max_y)
-				overlay.max_y = _b;
-
-			ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _y) >> 0);
-		}
-
-		if (type == c_oContentControlTrack.Hover)
-		{
-			ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
-			ctx.fill();
-		}
-		ctx.stroke();
-
-		ctx.beginPath();
-
-		if (type == c_oContentControlTrack.In)
-		{
-			rect = rects[0];
-			_x = (drPage.left + dKoefX * rect.X);
-			_y = (drPage.top + dKoefY * rect.Y);
-
-			_x = ((_x >> 0) + 0.5) - 15;
-			_y = ((_y >> 0) + 0.5);
-
-			ctx.rect(_x, _y, 15, 20);
-
-			if (1 == this.ContentControlObjectState)
+			for (var j = 0; j < _object.rects.length; j++)
 			{
-				ctx.fillStyle = "#CFCFCF";
+				_rect = _object.rects[j];
+
+				if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
+					continue;
+
+				var _page = this.m_arrPages[_rect.Page];
+				var drPage = _page.drawingPage;
+
+				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+				var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+				ctx.beginPath();
+
+				_x = (drPage.left 	+ dKoefX * _rect.X);
+				_y = (drPage.top 	+ dKoefY * _rect.Y);
+				_r = (drPage.left 	+ dKoefX * _rect.R);
+				_b = (drPage.top 	+ dKoefY * _rect.B);
+
+				if (_x < overlay.min_x)
+					overlay.min_x = _x;
+				if (_r > overlay.max_x)
+					overlay.max_x = _r;
+
+				if (_y < overlay.min_y)
+					overlay.min_y = _y;
+				if (_b > overlay.max_y)
+					overlay.max_y = _b;
+
+				overlay.CheckRect(_x, _y, _r - _x, _b - _y);
+				ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _y) >> 0);
+
+				if (_object.type == c_oContentControlTrack.Hover)
+				{
+					ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+					ctx.fill();
+				}
+				ctx.stroke();
+
+				ctx.beginPath();
+			}
+
+			if (_object.type == c_oContentControlTrack.In)
+			{
+				_rect = _object.rects[0];
+				_x = (drPage.left 	+ dKoefX * _rect.X);
+				_y = (drPage.top 	+ dKoefY * _rect.Y);
+
+				_x = ((_x >> 0) + 0.5) - 15;
+				_y = ((_y >> 0) + 0.5);
+
+				ctx.rect(_x, _y, 15, 20);
+
+				overlay.CheckRect(_x, _y, 15, 20);
+
+				if (1 == this.ContentControlObjectState)
+				{
+					ctx.fillStyle = "#CFCFCF";
+					ctx.fill();
+				}
+
+				ctx.stroke();
+				ctx.beginPath();
+
+				var cx = _x - 0.5 + 4;
+				var cy = _y - 0.5 + 4;
+
+				var _color1 = "#ADADAD";
+				var _color2 = "#D4D4D4";
+
+				if (0 == this.ContentControlObjectState || 1 == this.ContentControlObjectState)
+				{
+					_color1 = "#444444";
+					_color2 = "#9D9D9D";
+				}
+
+				overlay.AddRect(cx, cy, 3, 3);
+				overlay.AddRect(cx + 5, cy, 3, 3);
+				overlay.AddRect(cx, cy + 5, 3, 3);
+				overlay.AddRect(cx + 5, cy + 5, 3, 3);
+				overlay.AddRect(cx, cy + 10, 3, 3);
+				overlay.AddRect(cx + 5, cy + 10, 3, 3);
+
+				ctx.fillStyle = _color2;
 				ctx.fill();
+				ctx.beginPath();
+
+				ctx.moveTo(cx + 1.5, cy);
+				ctx.lineTo(cx + 1.5, cy + 3);
+				ctx.moveTo(cx + 6.5, cy);
+				ctx.lineTo(cx + 6.5, cy + 3);
+				ctx.moveTo(cx + 1.5, cy + 5);
+				ctx.lineTo(cx + 1.5, cy + 8);
+				ctx.moveTo(cx + 6.5, cy + 5);
+				ctx.lineTo(cx + 6.5, cy + 8);
+				ctx.moveTo(cx + 1.5, cy + 10);
+				ctx.lineTo(cx + 1.5, cy + 13);
+				ctx.moveTo(cx + 6.5, cy + 10);
+				ctx.lineTo(cx + 6.5, cy + 13);
+
+				ctx.moveTo(cx, cy + 1.5);
+				ctx.lineTo(cx + 3, cy + 1.5);
+				ctx.moveTo(cx + 5, cy + 1.5);
+				ctx.lineTo(cx + 8, cy + 1.5);
+				ctx.moveTo(cx, cy + 6.5);
+				ctx.lineTo(cx + 3, cy + 6.5);
+				ctx.moveTo(cx + 5, cy + 6.5);
+				ctx.lineTo(cx + 8, cy + 6.5);
+				ctx.moveTo(cx, cy + 11.5);
+				ctx.lineTo(cx + 3, cy + 11.5);
+				ctx.moveTo(cx + 5, cy + 11.5);
+				ctx.lineTo(cx + 8, cy + 11.5);
+
+				ctx.strokeStyle = _color1;
+				ctx.stroke();
+				ctx.beginPath();
 			}
-
-			ctx.stroke();
-			ctx.beginPath();
-
-			var cx = _x - 0.5 + 4;
-			var cy = _y - 0.5 + 4;
-
-			var _color1 = "#ADADAD";
-			var _color2 = "#D4D4D4";
-
-			if (0 == this.ContentControlObjectState || 1 == this.ContentControlObjectState)
-			{
-				_color1 = "#444444";
-				_color2 = "#9D9D9D";
-			}
-
-			overlay.AddRect(cx, cy, 3, 3);
-			overlay.AddRect(cx + 5, cy, 3, 3);
-			overlay.AddRect(cx, cy + 5, 3, 3);
-			overlay.AddRect(cx + 5, cy + 5, 3, 3);
-			overlay.AddRect(cx, cy + 10, 3, 3);
-			overlay.AddRect(cx + 5, cy + 10, 3, 3);
-
-			ctx.fillStyle = _color2;
-			ctx.fill();
-			ctx.beginPath();
-
-			ctx.moveTo(cx + 1.5, cy);
-			ctx.lineTo(cx + 1.5, cy + 3);
-			ctx.moveTo(cx + 6.5, cy);
-			ctx.lineTo(cx + 6.5, cy + 3);
-			ctx.moveTo(cx + 1.5, cy + 5);
-			ctx.lineTo(cx + 1.5, cy + 8);
-			ctx.moveTo(cx + 6.5, cy + 5);
-			ctx.lineTo(cx + 6.5, cy + 8);
-			ctx.moveTo(cx + 1.5, cy + 10);
-			ctx.lineTo(cx + 1.5, cy + 13);
-			ctx.moveTo(cx + 6.5, cy + 10);
-			ctx.lineTo(cx + 6.5, cy + 13);
-
-			ctx.moveTo(cx, cy + 1.5);
-			ctx.lineTo(cx + 3, cy + 1.5);
-			ctx.moveTo(cx + 5, cy + 1.5);
-			ctx.lineTo(cx + 8, cy + 1.5);
-			ctx.moveTo(cx, cy + 6.5);
-			ctx.lineTo(cx + 3, cy + 6.5);
-			ctx.moveTo(cx + 5, cy + 6.5);
-			ctx.lineTo(cx + 8, cy + 6.5);
-			ctx.moveTo(cx, cy + 11.5);
-			ctx.lineTo(cx + 3, cy + 11.5);
-			ctx.moveTo(cx + 5, cy + 11.5);
-			ctx.lineTo(cx + 8, cy + 11.5);
-
-			ctx.strokeStyle = _color1;
-			ctx.stroke();
-			ctx.beginPath();
 		}
+	};
+
+	this.DrawContentControlClear = function(id, type, rects)
+	{
+		this.ContentControlObjects = [];
+	};
+
+	this.OnDrawContentControl = function(id, type, rects)
+	{
+		// всегда должен быть максимум один hover и in
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		{
+			if (type == this.ContentControlObjects[i].type)
+			{
+				this.ContentControlObjects.splice(i, 1);
+				i--;
+			}
+		}
+
+		if (null == id || !rects || rects.length == 0)
+			return;
+
+		this.ContentControlObjects.push(new CContentControlTrack(id, type, rects));
 	};
 
 	this.private_DrawMathTrack = function (overlay, oPath, shift, color, dKoefX, dKoefY, drPage)
@@ -6234,34 +6253,40 @@ function CDrawingDocument()
 			}
 		}
 
-		if (this.ContentControlObject && pos.Page == this.ContentControlObject.page)
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
 		{
-			var _page = this.m_arrPages[this.ContentControlObject.page];
-			var drPage = _page.drawingPage;
-
-			var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
-			var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
-
-			var rect = this.ContentControlObject.rects[0];
-			var _x = rect.X - (15 / dKoefX);
-			var _y = rect.Y;
-			var _r = rect.X;
-			var _b = rect.Y + (20 / dKoefY);
-
-			var _old = this.ContentControlObjectState;
-			if (pos.X > _x && pos.X < _r && pos.Y > _y && pos.Y < _b)
+			var _object = this.ContentControlObjects[i];
+			if (_object.type == c_oContentControlTrack.In)
 			{
-				oWordControl.m_oLogicDocument.SelectContentControl(this.ContentControlObject.id);
-				this.ContentControlObjectState = 1;
+				var _rect = _object.rects[0];
 
-				this.InlineTextTrackEnabled = true;
-				this.InlineTextTrack = null;
-				this.InlineTextTrackPage = -1;
+				var _page = this.m_arrPages[_rect.Page];
+				var drPage = _page.drawingPage;
 
-				oWordControl.ShowOverlay();
-				oWordControl.OnUpdateOverlay();
-				oWordControl.EndUpdateOverlay();
-				return true;
+				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+				var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+				var _x = _rect.X - (15 / dKoefX);
+				var _y = _rect.Y;
+				var _r = _rect.X;
+				var _b = _rect.Y + (20 / dKoefY);
+
+				if (pos.X > _x && pos.X < _r && pos.Y > _y && pos.Y < _b)
+				{
+					oWordControl.m_oLogicDocument.SelectContentControl(_object.id);
+					this.ContentControlObjectState = 1;
+
+					this.InlineTextTrackEnabled = true;
+					this.InlineTextTrack = null;
+					this.InlineTextTrackPage = -1;
+
+					oWordControl.ShowOverlay();
+					oWordControl.OnUpdateOverlay();
+					oWordControl.EndUpdateOverlay();
+					return true;
+				}
+
+				break;
 			}
 		}
 
@@ -6364,7 +6389,17 @@ function CDrawingDocument()
 			}
 		}
 
-		if (this.ContentControlObject && pos.Page == this.ContentControlObject.page)
+		var _content_control = null;
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		{
+			if (this.ContentControlObjects[i].type == c_oContentControlTrack.In)
+			{
+				_content_control = this.ContentControlObjects[i];
+				break;
+			}
+		}
+
+		if (_content_control && pos.Page == _content_control.rects[0].Page)
 		{
 			if (1 == this.ContentControlObjectState)
 			{
@@ -6377,13 +6412,13 @@ function CDrawingDocument()
 				return true;
 			}
 
-			var _page = this.m_arrPages[this.ContentControlObject.page];
+			var _page = this.m_arrPages[pos.Page];
 			var drPage = _page.drawingPage;
 
 			var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
 			var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
 
-			var rect = this.ContentControlObject.rects[0];
+			var rect = _content_control.rects[0];
 			var _x = rect.X - (15 / dKoefX);
 			var _y = rect.Y;
 			var _r = rect.X;
@@ -6427,7 +6462,7 @@ function CDrawingDocument()
 			return true;
 		}
 
-		if (this.InlineTextTrackEnabled && !this.ContentControlObject)
+		if (this.InlineTextTrackEnabled && (this.ContentControlObjectState != 1))
 		{
 			this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
 			this.InlineTextTrackPage = pos.Page;
@@ -6458,21 +6493,29 @@ function CDrawingDocument()
 			return true;
 		}
 
-		if (this.ContentControlObject && this.ContentControlObjectState == 1)
+		if (this.ContentControlObjectState == 1)
 		{
-			if (this.InlineTextTrackEnabled)
+			for (var i = 0; i < this.ContentControlObjects.length; i++)
 			{
-				if (this.InlineTextTrack) // значит был MouseMove
+				var _object = this.ContentControlObjects[i];
+				if (_object.type == c_oContentControlTrack.In)
 				{
-					this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
-					this.m_oWordControl.m_oLogicDocument.OnContentControlTrackEnd(this.ContentControlObject.id, this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
-					this.InlineTextTrackEnabled = false;
-					this.InlineTextTrack = null;
-					this.InlineTextTrackPage = -1;
-				}
-				else
-				{
-					this.InlineTextTrackEnabled = false;
+					if (this.InlineTextTrackEnabled)
+					{
+						if (this.InlineTextTrack) // значит был MouseMove
+						{
+							this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+							this.m_oWordControl.m_oLogicDocument.OnContentControlTrackEnd(_object.id, this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
+							this.InlineTextTrackEnabled = false;
+							this.InlineTextTrack = null;
+							this.InlineTextTrackPage = -1;
+						}
+						else
+						{
+							this.InlineTextTrackEnabled = false;
+						}
+					}
+					break;
 				}
 			}
 
