@@ -2154,6 +2154,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.endInsertDocumentUrls = function()
 	{
 		if (this.insertDocumentUrlsData) {
+			this.insertDocumentUrlsData.endCallback();
 			this.insertDocumentUrlsData = null;
 			//this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 		}
@@ -7505,8 +7506,14 @@ background-repeat: no-repeat;\
 		var LogicDocument = this.WordControl.m_oLogicDocument;
 		if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
 		{
+			if (window.g_asc_plugins)
+				window.g_asc_plugins.setPluginMethodReturnAsync();
+
 			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
-			this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments};
+			this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments, endCallback : function(_api) {
+				if (window.g_asc_plugins)
+					window.g_asc_plugins.onPluginMethodReturn();
+			}};
 
 			//this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 			//this.WordControl.m_oLogicDocument.AddNewParagraph();

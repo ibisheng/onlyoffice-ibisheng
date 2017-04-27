@@ -89,6 +89,8 @@
 		this.runAndCloseData = null;
 
 		this.closeAttackTimer = -1; // защита от плагитнов, которые не закрываются
+
+		this.methodReturnAsync = false;
 	}
 
 	CPluginsManager.prototype =
@@ -367,6 +369,25 @@
 		    this.startData.setAttribute("type", "onExternalMouseUp");
 		    this.correctData(this.startData);
 		    this.sendMessage(this.startData);
+		},
+
+		onPluginMethodReturn : function(_return)
+		{
+			if (!this.current)
+				return;
+
+			var pluginData = new CPluginData();
+			pluginData.setAttribute("guid", this.current.guid);
+			pluginData.setAttribute("type", "onMethodReturn");
+			pluginData.setAttribute("methodReturnData", _return);
+			var _iframe = document.getElementById("plugin_iframe");
+			if (_iframe)
+				_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
+		},
+
+		setPluginMethodReturnAsync : function()
+		{
+			this.methodReturnAsync = true;
 		}
 	};
 
@@ -536,13 +557,17 @@
 				if (window.g_asc_plugins.api[_apiMethodName])
 					_return = window.g_asc_plugins.api[_apiMethodName].apply(window.g_asc_plugins.api, value);
 
-				var pluginData = new CPluginData();
-				pluginData.setAttribute("guid", guid);
-				pluginData.setAttribute("type", "onMethodReturn");
-				pluginData.setAttribute("methodReturnData", _return);
-				var _iframe = document.getElementById("plugin_iframe");
-				if (_iframe)
-					_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
+				if (!window.g_asc_plugins.methodReturnAsync)
+				{
+					var pluginData = new CPluginData();
+					pluginData.setAttribute("guid", guid);
+					pluginData.setAttribute("type", "onMethodReturn");
+					pluginData.setAttribute("methodReturnData", _return);
+					var _iframe = document.getElementById("plugin_iframe");
+					if (_iframe)
+						_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
+				}
+				this.methodReturnAsync = false;
 				return;
 			}
 		}
