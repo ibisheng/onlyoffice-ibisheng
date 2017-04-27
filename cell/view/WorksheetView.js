@@ -8776,7 +8776,7 @@
 			//в случае, если вставляем из глобального буфера, транзакцию закрываем внутри функции _loadDataBeforePaste на callbacks от загрузки шрифтов и картинок
 			if (prop !== "paste" || (prop === "paste" && fromBinary)) {
 				History.EndTransaction();
-				AscCommonExcel.g_clipboardExcel.end_paste();
+				window['AscCommon'].g_clipboardBase.Paste_Process_End();
 			}
         };
 		
@@ -8818,8 +8818,8 @@
 				return false;
 			}
 
-			AscCommonExcel.g_clipboardExcel.start_specialpaste();
-			AscCommonExcel.g_clipboardExcel.start_paste();
+			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
+			window['AscCommon'].g_clipboardBase.Special_Paste_Start();
 
 			api.asc_Undo();
 
@@ -8830,7 +8830,7 @@
 			//далее специальная вставка
 			clipboard_base.specialPasteProps = props;
 			//TODO пока для закрытия транзации выставляю флаг. пересмотреть!
-			AscCommonExcel.g_clipboardExcel.bIsEndTransaction = true;
+			window['AscCommon'].g_clipboardBase.bIsEndTransaction = true;
 			AscCommonExcel.g_clipboardExcel.pasteData(t, specialPasteData._format, specialPasteData.data1, specialPasteData.data2, specialPasteData.text_data, true);
 		};
 		
@@ -8850,7 +8850,7 @@
 		var specialPasteProps = g_clipboardBase.specialPasteProps;
 		
 		if ( val.props && val.props.onlyImages === true ) {
-			if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
+			if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
 			{
 				this.handlers.trigger("showSpecialPasteOptions", [Asc.c_oSpecialPasteProps.picture]);
 			}
@@ -8984,7 +8984,7 @@
         }
 		
 		//for special paste
-		if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
+		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
 		{
 			//var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
 			var allowedSpecialPasteProps;
@@ -9088,7 +9088,7 @@
 								
 								//закрываем транзакцию, поскольку в setSelectionInfo она не закроется
 								History.EndTransaction();
-								AscCommonExcel.g_clipboardExcel.end_paste();
+								window['AscCommon'].g_clipboardBase.Paste_Process_End();
 							}, true );
 						}
 						
@@ -9104,7 +9104,7 @@
 				if ( isEndTransaction ) 
 				{
 					History.EndTransaction();
-					AscCommonExcel.g_clipboardExcel.end_paste();
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				}
 			};
 			
@@ -10043,7 +10043,7 @@
 		specialPasteShowOptions.asc_setOptions(props);
 		specialPasteShowOptions.asc_setCellCoord(cellCoord);
 		this.handlers.trigger("showSpecialPasteOptions", specialPasteShowOptions);
-	},
+	};
 
 	WorksheetView.prototype.updateSpecialPasteOptionsPosition = function(changeActiveRange)
 	{

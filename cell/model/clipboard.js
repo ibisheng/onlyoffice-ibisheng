@@ -281,13 +281,7 @@
 		{	
 			this.copyProcessor = new CopyProcessorExcel();
 			this.pasteProcessor = new PasteProcessorExcel();
-			
-			this.bIsEndTransaction = false;//если нужно сделать на end_paste endTransaction
-			
-			//TODO возможно стоит перенести в clipboard_base
-			this.pasteStart = false;//если true - осуществляется вставка. false выставляется только по полному окончанию вставки(загрузки картинок и тд)
-			this.specialPasteStart = false;
-			
+
 			return this;
 		}
 
@@ -382,8 +376,8 @@
 			{
 				var t = this;
 				t.pasteProcessor.clean();
-				
-				this.start_paste();
+
+				window['AscCommon'].g_clipboardBase.Paste_Process_Start();
 				
 				if(!bIsSpecialPaste)
 				{
@@ -401,7 +395,7 @@
 							if(text)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
-								this.end_paste();
+								window['AscCommon'].g_clipboardBase.Paste_Process_End();
 							}
 						}
 						else
@@ -426,7 +420,7 @@
 							if(text)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
-								this.end_paste();
+								window['AscCommon'].g_clipboardBase.Paste_Process_End();
 							}
 						}
 						else
@@ -443,7 +437,7 @@
 							if(data1)
 							{
 								window["Asc"]["editor"].wb.cellEditor.pasteText(data1);
-								this.end_paste();
+								window['AscCommon'].g_clipboardBase.Paste_Process_End();
 							}
 						}
 						else
@@ -462,35 +456,6 @@
 					window['AscCommon'].g_clipboardBase.specialPasteData.data2 = data2;
 					window['AscCommon'].g_clipboardBase.specialPasteData.text_data = text_data;
 				}
-			},
-			
-			start_paste: function()
-			{
-				this.pasteStart = true;
-			},
-			
-			end_paste: function()
-			{
-				this.pasteStart = false;
-				
-				if(this.specialPasteStart)
-				{
-					this.specialPasteStart = false;
-				}
-				
-				if(this.bIsEndTransaction)
-				{	
-					this.bIsEndTransaction = false;
-					History.EndTransaction();
-				}
-				
-				window['AscCommon'].g_clipboardBase.specialPasteProps = null;
-			},
-			
-			start_specialpaste: function()
-			{
-				//TODO переделать на методы, которые в clipboardBase specialPasteStart/specialPasteEnd
-				this.specialPasteStart = true;
 			}
 		};
 
@@ -1171,7 +1136,7 @@
 								{
 									t._insertBinaryIntoShapeContent(worksheet, [docContent]);
 								}
-								AscCommonExcel.g_clipboardExcel.end_paste();
+								window['AscCommon'].g_clipboardBase.Paste_Process_End();
 							};
 							
 							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1211,7 +1176,7 @@
 						{
 							t._insertBinaryIntoShapeContent(worksheet, pasteData.content, true);
 						}
-						AscCommonExcel.g_clipboardExcel.end_paste();
+						window['AscCommon'].g_clipboardBase.Paste_Process_End();
 					};
 							
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1248,7 +1213,7 @@
 						if(isCellEditMode)
 						{
 							var text = this._getTextFromWord(docContent);
-							AscCommonExcel.g_clipboardExcel.end_paste();
+							window['AscCommon'].g_clipboardBase.Paste_Process_End();
 							return text;
 						}
 						else if(isIntoShape)
@@ -1259,7 +1224,7 @@
 								{
 									t._insertBinaryIntoShapeContent(worksheet, docContent);
 								}
-								AscCommonExcel.g_clipboardExcel.end_paste();
+								window['AscCommon'].g_clipboardBase.Paste_Process_End();
 							};
 									
 							worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1421,7 +1386,7 @@
 				var oInfo = new CSelectedElementsInfo();
 				var selectedElementsInfo = isIntoShape.GetSelectedElementsInfo(oInfo);
 				var mathObj = oInfo.Get_Math();
-				if(!AscCommonExcel.g_clipboardExcel.specialPasteStart && null === mathObj)
+				if(!window['AscCommon'].g_clipboardBase.specialPasteStart && null === mathObj)
 				{
 					var sProps = Asc.c_oSpecialPasteProps;
 					var curShape = isIntoShape.Parent.parent;
@@ -1696,9 +1661,8 @@
                             ws.objectRender.controller.getGraphicObjectProps();
                     });
                 }
-				
-				AscCommonExcel.g_clipboardExcel.end_paste();
-				
+
+				window['AscCommon'].g_clipboardBase.Paste_Process_End();
 			},
 			
 			_insertImagesFromBinaryWord: function(ws, data, aImagesSync)
@@ -1906,8 +1870,8 @@
 					{
 						if(isSuccess)
 							t._pasteInShape(worksheet, node, isIntoShape);
-							
-						AscCommonExcel.g_clipboardExcel.end_paste();
+
+						window['AscCommon'].g_clipboardBase.Paste_Process_End();
 					};
 					
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -1952,7 +1916,7 @@
 					
 					//при специальной вставке в firefox _getComputedStyle возвращает null
 					//TODO пересмотреть функцию _getComputedStyle
-					if(AscCommonExcel.g_clipboardExcel.specialPasteStart && window['AscCommon'].g_clipboardBase.specialPasteData.aContent)
+					if(window['AscCommon'].g_clipboardBase.specialPasteStart && window['AscCommon'].g_clipboardBase.specialPasteData.aContent)
 					{
 						oPasteProcessor.aContent = window['AscCommon'].g_clipboardBase.specialPasteData.aContent;
 					}
@@ -2603,7 +2567,7 @@
 			{
 				if(!text || (text && !text.length))
 				{
-					AscCommonExcel.g_clipboardExcel.end_paste();
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 					return;
 				}
 
@@ -2630,11 +2594,11 @@
 							else
 								isIntoShape.Paragraph_Add(new ParaText(_char));
 						}
-						
-						AscCommonExcel.g_clipboardExcel.end_paste();
+
+						window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						
 						//for special paste
-						if(!AscCommonExcel.g_clipboardExcel.specialPasteStart)
+						if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
 						{
 							var sProps = Asc.c_oSpecialPasteProps;
 							var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];

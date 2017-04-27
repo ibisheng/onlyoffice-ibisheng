@@ -105,6 +105,8 @@
 		
 		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
 		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
+
+		this.bIsEndTransaction = false;//временный флаг для excel. TODO пересмотреть!
 	}
 
 	CClipboardBase.prototype =
@@ -971,12 +973,26 @@
 			}
 			else//если не было специальной вставки, необходимо показать кнопку специальной вставки
 			{
-				this.SpecialPasteButton_Show();
+				this.specialPasteProps = null;
+				//this.SpecialPasteButton_Show();
+			}
+
+			//TODO для excel заглушка. пересмотреть!
+			if(this.bIsEndTransaction)
+			{
+				this.bIsEndTransaction = false;
+				History.EndTransaction();
 			}
 		},
 		
 		SpecialPasteButton_Show : function(props)
 		{
+			//при быстром совместном редактировании отключаем возможность специальной вставки
+			if(AscCommon.CollaborativeEditing && AscCommon.CollaborativeEditing.m_bFast)
+			{
+				return;
+			}
+
 			if(!props)
 			{
 				props = this.specialPasteButtonProps.props;
