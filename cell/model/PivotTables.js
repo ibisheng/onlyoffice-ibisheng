@@ -1589,9 +1589,10 @@ CT_PivotCacheDefinition.prototype.toXml = function(writer) {
 	writer.WriteXmlNodeStart("pivotCacheDefinition");
 	writer.WriteXmlString(
 		" xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\"");
-	if (null !== this.id) {
-		writer.WriteXmlAttributeStringEncode("r:id", this.id);
-	}
+	//todo
+	// if (null !== this.id) {
+		// writer.WriteXmlAttributeStringEncode("r:id", this.id);
+	// }
 	if (null !== this.invalid) {
 		writer.WriteXmlAttributeBool("invalid", this.invalid);
 	}
@@ -4690,9 +4691,10 @@ CT_WorksheetSource.prototype.toXml = function(writer, name) {
 	if (null !== this.sheet) {
 		writer.WriteXmlAttributeStringEncode("sheet", this.sheet);
 	}
-	if (null !== this.id) {
-		writer.WriteXmlAttributeStringEncode("r:id", this.id);
-	}
+	//todo
+	// if (null !== this.id) {
+		// writer.WriteXmlAttributeStringEncode("r:id", this.id);
+	// }
 	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
@@ -8127,9 +8129,10 @@ CT_RangeSet.prototype.toXml = function(writer, name) {
 	if (null !== this.sheet) {
 		writer.WriteXmlAttributeStringEncode("sheet", this.sheet);
 	}
-	if (null !== this.id) {
-		writer.WriteXmlAttributeStringEncode("r:id", this.id);
-	}
+	//todo
+	// if (null !== this.id) {
+		// writer.WriteXmlAttributeStringEncode("r:id", this.id);
+	// }
 	writer.WriteXmlNodeEnd(name, true, true);
 	return res;
 };
