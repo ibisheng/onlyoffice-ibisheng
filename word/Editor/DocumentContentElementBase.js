@@ -598,6 +598,20 @@ CDocumentContentElementBase.prototype.LoadRecalculateObject = function(RecalcObj
 CDocumentContentElementBase.prototype.Set_ApplyToAll = function(bValue)
 {
 };
+CDocumentContentElementBase.prototype.RecalculateAllTables = function()
+{
+};
+CDocumentContentElementBase.prototype.GetAllFloatElements = function(FloatObjects)
+{
+	if (!FloatObjects)
+		return [];
+
+	return FloatObjects;
+};
+CDocumentContentElementBase.prototype.Get_FirstParagraph = function()
+{
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

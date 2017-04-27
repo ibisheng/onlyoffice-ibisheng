@@ -12094,6 +12094,10 @@ Paragraph.prototype.GetCurrentParagraph = function()
 {
 	return this;
 };
+Paragraph.prototype.Get_FirstParagraph = function()
+{
+	return this;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

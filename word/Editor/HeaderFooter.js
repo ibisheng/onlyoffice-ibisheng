@@ -1503,7 +1503,7 @@ CHeaderFooterController.prototype =
                     Header.Set_Page(PageIndex);
             }
             HeaderDrawings = Header.Content.GetAllDrawingObjects([]);
-            HeaderTables = Header.Content.Get_AllFloatElements();
+            HeaderTables = Header.Content.GetAllFloatElements();
         }
         
         var bRecalcFooter = false;
@@ -1534,7 +1534,7 @@ CHeaderFooterController.prototype =
                     Footer.Set_Page(PageIndex);
             }
             FooterDrawings = Footer.Content.GetAllDrawingObjects([]);
-            FooterTables = Footer.Content.Get_AllFloatElements();
+            FooterTables = Footer.Content.GetAllFloatElements();
         }
 
         // Подправляем позиции автофигур с учетом возможно изменившихся границ колонтитулов. Делаем это для всех автофигур,

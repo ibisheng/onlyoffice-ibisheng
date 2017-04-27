@@ -2122,7 +2122,7 @@ CTable.prototype.GetAllMaths = function(AllMaths)
 
 	return AllMaths;
 };
-CTable.prototype.Get_AllFloatElements = function(FloatObjs)
+CTable.prototype.GetAllFloatElements = function(FloatObjs)
 {
 	if (undefined === FloatObjs)
 		FloatObjs = [];
@@ -2135,7 +2135,7 @@ CTable.prototype.Get_AllFloatElements = function(FloatObjs)
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Get_AllFloatElements(FloatObjs);
+			Cell.Content.GetAllFloatElements(FloatObjs);
 		}
 	}
 
@@ -2893,7 +2893,7 @@ CTable.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 		return {Min : Min, Max : Max};
 	}
 };
-CTable.prototype.Recalculate_AllTables = function()
+CTable.prototype.RecalculateAllTables = function()
 {
 	this.private_RecalculateGrid();
 	this.private_RecalculateBorders();
@@ -2906,7 +2906,7 @@ CTable.prototype.Recalculate_AllTables = function()
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Recalculate_AllTables();
+			Cell.Content.RecalculateAllTables();
 		}
 	}
 };

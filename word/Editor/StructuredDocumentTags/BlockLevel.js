@@ -628,6 +628,18 @@ CBlockLevelSdt.prototype.Set_ApplyToAll = function(bValue)
 {
 	this.Content.Set_ApplyToAll(bValue);
 };
+CBlockLevelSdt.prototype.RecalculateAllTables = function()
+{
+	this.Content.RecalculateAllTables();
+};
+CBlockLevelSdt.prototype.GetAllFloatElements = function(FloatObjects)
+{
+	return this.Content.GetAllFloatElements(FloatObjects);
+};
+CBlockLevelSdt.prototype.Get_FirstParagraph = function()
+{
+	return this.Content.Get_FirstParagraph();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

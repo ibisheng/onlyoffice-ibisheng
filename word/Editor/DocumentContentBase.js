@@ -739,3 +739,11 @@ CDocumentContentBase.prototype.private_AddContentControl = function()
 		return oElement.AddContentControl();
 	}
 };
+CDocumentContentBase.prototype.RecalculateAllTables = function()
+{
+	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+	{
+		var Item = this.Content[nPos];
+		Item.RecalculateAllTables();
+	}
+};

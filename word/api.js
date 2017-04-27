@@ -5734,7 +5734,7 @@ background-repeat: no-repeat;\
 					}
 					else
 					{
-						Document.Recalculate_AllTables();
+						Document.RecalculateAllTables();
 						var data = {All : true};
 						Document.DrawingObjects.recalculate_(data);
 						Document.DrawingObjects.recalculateText_(data);
