@@ -415,18 +415,18 @@ Paragraph.prototype.Recalculate_SkipPage = function(PageIndex)
  * Функция для сохранения объекта пересчета.
  * @returns {*} Возвращается объект (CParagraphRecalculateObject) с информацией о текущем пересчете параграфа
  */
-Paragraph.prototype.Save_RecalculateObject = function()
+Paragraph.prototype.SaveRecalculateObject = function()
 {
-    var RecalcObj = new CParagraphRecalculateObject();
-    RecalcObj.Save(this);
-    return RecalcObj;
+	var RecalcObj = new CParagraphRecalculateObject();
+	RecalcObj.Save(this);
+	return RecalcObj;
 };
 
 /**
  * Загрузка сохраненного раннее пересчета.
  * @param RecalcObj (CParagraphRecalculateObject)
  */
-Paragraph.prototype.Load_RecalculateObject = function(RecalcObj)
+Paragraph.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load(this);
 };
@@ -434,16 +434,16 @@ Paragraph.prototype.Load_RecalculateObject = function(RecalcObj)
 /**
  * Очистка рассчетных классов параграфа.
  */
-Paragraph.prototype.Prepare_RecalculateObject = function()
+Paragraph.prototype.PrepareRecalculateObject = function()
 {
-    this.Pages = [];
-    this.Lines = [];
+	this.Pages = [];
+	this.Lines = [];
 
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        this.Content[Index].Prepare_RecalculateObject();
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		this.Content[Index].PrepareRecalculateObject();
+	}
 };
 
 /**
@@ -543,7 +543,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
 
         PRS.Update_CurPos( Pos, 0 );
 
-        var SavedLines = Item.Save_RecalculateObject(true);
+        var SavedLines = Item.SaveRecalculateObject(true);
 
         Item.Recalculate_Range( PRS, ParaPr, 1 );
 
@@ -562,7 +562,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
         if (false === SavedLines.Compare(CurLine, CurRange, Item))
             return -1;
 
-        Item.Load_RecalculateObject(SavedLines, this);
+        Item.LoadRecalculateObject(SavedLines, this);
     }
 
     // TODO: Здесь пересчеты идут целиком для строки, а не для конкретного отрезка.
@@ -3212,7 +3212,7 @@ CParagraphRecalculateObject.prototype =
         var Count = Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            this.Content[Index] = Content[Index].Save_RecalculateObject();
+            this.Content[Index] = Content[Index].SaveRecalculateObject();
         }
     },
 
@@ -3229,7 +3229,7 @@ CParagraphRecalculateObject.prototype =
         var Count = Para.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            Para.Content[Index].Load_RecalculateObject(this.Content[Index], Para);
+            Para.Content[Index].LoadRecalculateObject(this.Content[Index], Para);
         }
     },
 

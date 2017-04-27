@@ -969,7 +969,7 @@ ParaDrawing.prototype.Measure = function()
 		}
 	}
 };
-ParaDrawing.prototype.Save_RecalculateObject = function(Copy)
+ParaDrawing.prototype.SaveRecalculateObject = function(Copy)
 {
 	var DrawingObj = {};
 
@@ -995,7 +995,7 @@ ParaDrawing.prototype.Save_RecalculateObject = function(Copy)
 
 	return DrawingObj;
 };
-ParaDrawing.prototype.Load_RecalculateObject = function(RecalcObj)
+ParaDrawing.prototype.LoadRecalculateObject = function(RecalcObj)
 {
 	this.updatePosition3(RecalcObj.PageNum, RecalcObj.X, RecalcObj.Y);
 	this.GraphicObj.setRecalcObject(RecalcObj.spRecaclcObject);
@@ -1007,7 +1007,7 @@ ParaDrawing.prototype.Reassign_ImageUrls = function(mapUrls)
 		this.GraphicObj.Reassign_ImageUrls(mapUrls);
 	}
 };
-ParaDrawing.prototype.Prepare_RecalculateObject = function()
+ParaDrawing.prototype.PrepareRecalculateObject = function()
 {
 };
 ParaDrawing.prototype.Is_RealContent = function()

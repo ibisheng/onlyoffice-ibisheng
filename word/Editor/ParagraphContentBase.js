@@ -1315,27 +1315,27 @@ CParagraphContentWithParagraphLikeContent.prototype.Recalculate_PageEndInfo = fu
         this.Content[CurPos].Recalculate_PageEndInfo( PRSI, _CurLine, _CurRange );
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Save_RecalculateObject = function(Copy)
+CParagraphContentWithParagraphLikeContent.prototype.SaveRecalculateObject = function(Copy)
 {
-    var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
-    RecalcObj.Save_Lines( this, Copy );
-    RecalcObj.Save_Content( this, Copy );
-    return RecalcObj;
+	var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+	RecalcObj.Save_Lines(this, Copy);
+	RecalcObj.Save_Content(this, Copy);
+	return RecalcObj;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Load_RecalculateObject = function(RecalcObj)
+CParagraphContentWithParagraphLikeContent.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_Lines( this );
     RecalcObj.Load_Content( this );
 };
-CParagraphContentWithParagraphLikeContent.prototype.Prepare_RecalculateObject = function()
+CParagraphContentWithParagraphLikeContent.prototype.PrepareRecalculateObject = function()
 {
-    this.protected_ClearLines();
+	this.protected_ClearLines();
 
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        this.Content[Index].Prepare_RecalculateObject();
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		this.Content[Index].PrepareRecalculateObject();
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {

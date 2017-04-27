@@ -865,13 +865,13 @@ ParaComment.prototype =
             PRSI.Remove_Comment( this.CommentId );
     },
 
-    Save_RecalculateObject : function(Copy)
-    {
-        var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
-        return RecalcObj;
-    },
+	SaveRecalculateObject : function(Copy)
+	{
+		var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+		return RecalcObj;
+	},
 
-    Load_RecalculateObject : function(RecalcObj, Parent)
+	LoadRecalculateObject : function(RecalcObj, Parent)
     {
         this.StartLine  = RecalcObj.StartLine;
         this.StartRange = RecalcObj.StartRange;
@@ -884,7 +884,7 @@ ParaComment.prototype =
         Comment.m_oStartInfo.PageNum = PageNum;
     },
 
-    Prepare_RecalculateObject : function()
+	PrepareRecalculateObject : function()
     {
     },
 

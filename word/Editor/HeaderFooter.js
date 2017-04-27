@@ -122,7 +122,7 @@ CHeaderFooter.prototype =
             if ( undefined !== RecalcObj )
             {
                 this.RecalcInfo.CurPage = Page_abs;
-                this.Content.Load_RecalculateObject( RecalcObj );                
+                this.Content.LoadRecalculateObject( RecalcObj );
             }            
         }        
     },
@@ -164,7 +164,7 @@ CHeaderFooter.prototype =
         
         // Пересчитаем заново данный колонтитул        
         this.Content.Set_StartPage( Page_abs );
-        this.Content.Prepare_RecalculateObject();
+        this.Content.PrepareRecalculateObject();
 
 		this.Clear_PageCountElements();
 
@@ -173,7 +173,7 @@ CHeaderFooter.prototype =
         while ( recalcresult2_End != RecalcResult  )
             RecalcResult = this.Content.Recalculate_Page( CurPage++, true );
         
-        this.RecalcInfo.RecalcObj[Page_abs]   = this.Content.Save_RecalculateObject();
+        this.RecalcInfo.RecalcObj[Page_abs]   = this.Content.SaveRecalculateObject();
         this.RecalcInfo.PageNumInfo[Page_abs] = this.LogicDocument.Get_SectionPageNumInfo(Page_abs);
         this.RecalcInfo.SectPr[Page_abs]      = SectPr;
 		this.RecalcInfo.NeedRecalc[Page_abs]  = false;
@@ -254,7 +254,7 @@ CHeaderFooter.prototype =
         else            
         {
             var RecalcObj = this.RecalcInfo.RecalcObj[this.RecalcInfo.CurPage];
-            this.Content.Load_RecalculateObject( RecalcObj );
+            this.Content.LoadRecalculateObject( RecalcObj );
         }
 
         return bChanges;
@@ -263,7 +263,7 @@ CHeaderFooter.prototype =
     Recalculate2 : function(Page_abs)
     {
         this.Content.Set_StartPage( Page_abs );
-        this.Content.Prepare_RecalculateObject();
+        this.Content.PrepareRecalculateObject();
 
         var CurPage = 0;
         var RecalcResult = recalcresult2_NextPage;

@@ -612,6 +612,18 @@ CBlockLevelSdt.prototype.UpdateEndInfo = function()
 {
 	this.Content.UpdateEndInfo();
 };
+CBlockLevelSdt.prototype.PrepareRecalculateObject = function()
+{
+	this.Content.PrepareRecalculateObject();
+};
+CBlockLevelSdt.prototype.SaveRecalculateObject = function()
+{
+	return this.Content.SaveRecalculateObject();
+};
+CBlockLevelSdt.prototype.LoadRecalculateObject = function(RecalcObj)
+{
+	return this.Content.LoadRecalculateObject(RecalcObj);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

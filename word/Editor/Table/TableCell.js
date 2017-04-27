@@ -192,19 +192,19 @@ CTableCell.prototype =
         return this.Row.Get_PrevElementEndInfo( this.Index );
     },
 
-    Save_RecalculateObject : function()
+	SaveRecalculateObject : function()
     {
         var RecalcObj = new CTableCellRecalculateObject();
         RecalcObj.Save( this );
         return RecalcObj;
     },
 
-    Load_RecalculateObject : function(RecalcObj)
+	LoadRecalculateObject : function(RecalcObj)
     {
         RecalcObj.Load(this);
     },
 
-    Prepare_RecalculateObject : function()
+	PrepareRecalculateObject : function()
     {
         this.BorderInfo =
         {
@@ -237,7 +237,7 @@ CTableCell.prototype =
             Y_VAlign_offset : [] // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
         };
 
-        this.Content.Prepare_RecalculateObject();
+        this.Content.PrepareRecalculateObject();
     },
     //-----------------------------------------------------------------------------------
     // Работаем с стилем ячейки
@@ -1878,7 +1878,7 @@ CTableCellRecalculateObject.prototype =
         this.Metrics    = Cell.Metrics;
         this.Temp       = Cell.Temp;
 
-        this.Content = Cell.Content.Save_RecalculateObject();
+        this.Content = Cell.Content.SaveRecalculateObject();
     },
 
     Load : function(Cell)
@@ -1887,7 +1887,7 @@ CTableCellRecalculateObject.prototype =
         Cell.Metrics    = this.Metrics;
         Cell.Temp       = this.Temp;
 
-        Cell.Content.Load_RecalculateObject( this.Content );
+        Cell.Content.LoadRecalculateObject( this.Content );
     },
 
     Get_DrawingFlowPos : function(FlowPos)

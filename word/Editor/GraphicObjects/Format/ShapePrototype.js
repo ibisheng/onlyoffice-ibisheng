@@ -994,7 +994,7 @@ CShape.prototype.getRecalcObject = function()
     var content = this.getDocContent && this.getDocContent();
     if(content)
     {
-        return content.Save_RecalculateObject();
+        return content.SaveRecalculateObject();
     }
     if(this.spTree)
     {
@@ -1015,7 +1015,7 @@ CShape.prototype.setRecalcObject =  function(object)
     var content = this.getDocContent && this.getDocContent();
     if(content)
     {
-        content.Load_RecalculateObject(object);
+        content.LoadRecalculateObject(object);
     }
     if(Array.isArray(object) && this.spTree && this.spTree.length === object.length)
     {

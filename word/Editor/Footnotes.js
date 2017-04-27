@@ -263,11 +263,11 @@ CFootnotesController.prototype.ContinueElementsFromPreviousColumn = function(nPa
 
 		if (arrElements.length > 0 && null !== this.ContinuationSeparatorFootnote)
 		{
-			this.ContinuationSeparatorFootnote.Prepare_RecalculateObject();
+			this.ContinuationSeparatorFootnote.PrepareRecalculateObject();
 			this.ContinuationSeparatorFootnote.Reset(X, _Y, XLimit, _YLimit);
 			this.ContinuationSeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
 			this.ContinuationSeparatorFootnote.Recalculate_Page(0, true);
-			oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.Save_RecalculateObject();
+			oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.SaveRecalculateObject();
 
 			var oBounds = this.ContinuationSeparatorFootnote.Get_PageBounds(0);
 			_Y += oBounds.Bottom - oBounds.Top;
@@ -367,11 +367,11 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 
 	if (oColumn.Elements.length <= 0 && null !== this.SeparatorFootnote)
 	{
-		this.SeparatorFootnote.Prepare_RecalculateObject();
+		this.SeparatorFootnote.PrepareRecalculateObject();
 		this.SeparatorFootnote.Reset(X, _Y, XLimit, _YLimit);
 		this.SeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
 		this.SeparatorFootnote.Recalculate_Page(0, true);
-		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.SaveRecalculateObject();
 
 		var oBounds    = this.SeparatorFootnote.Get_PageBounds(0);
 		_Y += oBounds.Bottom - oBounds.Top;
@@ -455,12 +455,12 @@ CFootnotesController.prototype.Draw = function(nPageAbs, pGraphics)
 
 		if (null !== this.ContinuationSeparatorFootnote && null !== oColumn.ContinuationSeparatorRecalculateObject)
 		{
-			this.ContinuationSeparatorFootnote.Load_RecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
+			this.ContinuationSeparatorFootnote.LoadRecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
 			this.ContinuationSeparatorFootnote.Draw(nPageAbs, pGraphics);
 		}
 		if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
 		{
-			this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
+			this.SeparatorFootnote.LoadRecalculateObject(oColumn.SeparatorRecalculateObject);
 			this.SeparatorFootnote.Draw(nPageAbs, pGraphics);
 		}
 
@@ -487,15 +487,15 @@ CFootnotesController.prototype.Shift = function(nPageAbs, nColumnAbs, dX, dY)
 
 	if (null !== this.ContinuationSeparatorFootnote && null !== oColumn.ContinuationSeparatorRecalculateObject)
 	{
-		this.ContinuationSeparatorFootnote.Load_RecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
+		this.ContinuationSeparatorFootnote.LoadRecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
 		this.ContinuationSeparatorFootnote.Shift(0, dX, dY);
-		oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.Save_RecalculateObject();
+		oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.SaveRecalculateObject();
 	}
 	if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
 	{
-		this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
+		this.SeparatorFootnote.LoadRecalculateObject(oColumn.SeparatorRecalculateObject);
 		this.SeparatorFootnote.Shift(0, dX, dY);
-		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.SaveRecalculateObject();
 	}
 
 	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)

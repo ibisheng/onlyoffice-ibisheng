@@ -3739,7 +3739,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     if (true === PRSA.RecalcFast2)
                     {
                         // Тут мы должны сравнить положение картинок
-                        var oRecalcObj = Item.Save_RecalculateObject();
+                        var oRecalcObj = Item.SaveRecalculateObject();
                         Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[_CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
 
                         if (Math.abs(Item.X - oRecalcObj.X) > 0.001 || Math.abs(Item.Y - oRecalcObj.Y) > 0.001 || Item.PageNum !== oRecalcObj.PageNum)
@@ -3961,31 +3961,31 @@ ParaRun.prototype.Refresh_RecalcData = function(Data)
         Para.Refresh_RecalcData2(0);
     }
 };
-ParaRun.prototype.Save_RecalculateObject = function(Copy)
+ParaRun.prototype.SaveRecalculateObject = function(Copy)
 {
     var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
     RecalcObj.Save_Lines( this, Copy );
     RecalcObj.Save_RunContent( this, Copy );
     return RecalcObj;
 };
-ParaRun.prototype.Load_RecalculateObject = function(RecalcObj)
+ParaRun.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_Lines(this);
     RecalcObj.Load_RunContent(this);
 };
-ParaRun.prototype.Prepare_RecalculateObject = function()
+ParaRun.prototype.PrepareRecalculateObject = function()
 {
-    this.protected_ClearLines();
+	this.protected_ClearLines();
 
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        var Item = this.Content[Index];
-        var ItemType = Item.Type;
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Item     = this.Content[Index];
+		var ItemType = Item.Type;
 
-        if ( para_PageNum === ItemType || para_Drawing === ItemType )
-            Item.Prepare_RecalculateObject();
-    }
+		if (para_PageNum === ItemType || para_Drawing === ItemType)
+			Item.PrepareRecalculateObject();
+	}
 };
 ParaRun.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {

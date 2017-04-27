@@ -242,15 +242,15 @@ ParaComment.prototype =
     {
     },
 
-    Save_RecalculateObject : function(Copy)
+    SaveRecalculateObject : function(Copy)
     {
     },
 
-    Load_RecalculateObject : function(RecalcObj, Parent)
+    LoadRecalculateObject : function(RecalcObj, Parent)
     {
     },
 
-    Prepare_RecalculateObject : function()
+    PrepareRecalculateObject : function()
     {
     },
 

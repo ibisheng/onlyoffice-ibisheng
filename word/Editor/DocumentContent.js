@@ -1163,25 +1163,25 @@ CDocumentContent.prototype.Recalculate_AllTables          = function()
             Item.Recalculate_AllTables();
     }
 };
-CDocumentContent.prototype.Save_RecalculateObject         = function()
+CDocumentContent.prototype.SaveRecalculateObject = function()
 {
-    var RecalcObj = new CDocumentRecalculateObject();
-    RecalcObj.Save(this);
-    return RecalcObj;
+	var RecalcObj = new CDocumentRecalculateObject();
+	RecalcObj.Save(this);
+	return RecalcObj;
 };
-CDocumentContent.prototype.Load_RecalculateObject         = function(RecalcObj)
+CDocumentContent.prototype.LoadRecalculateObject = function(RecalcObj)
 {
-    RecalcObj.Load(this);
+	RecalcObj.Load(this);
 };
-CDocumentContent.prototype.Prepare_RecalculateObject      = function()
+CDocumentContent.prototype.PrepareRecalculateObject = function()
 {
-    this.ClipInfo = [];
-    this.Pages    = [];
-    var Count     = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        this.Content[Index].Prepare_RecalculateObject();
-    }
+	this.ClipInfo = [];
+	this.Pages    = [];
+	var Count     = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		this.Content[Index].PrepareRecalculateObject();
+	}
 };
 CDocumentContent.prototype.ReDraw                         = function(StartPage, EndPage)
 {
@@ -8515,7 +8515,7 @@ CDocumentRecalculateObject.prototype =
         var Count = Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            this.Content[Index] = Content[Index].Save_RecalculateObject();
+            this.Content[Index] = Content[Index].SaveRecalculateObject();
         }
     },
         
@@ -8528,7 +8528,7 @@ CDocumentRecalculateObject.prototype =
         var Count = Doc.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            Doc.Content[Index].Load_RecalculateObject( this.Content[Index] );
+            Doc.Content[Index].LoadRecalculateObject( this.Content[Index] );
         }
     },
     

@@ -1399,7 +1399,7 @@ CMathBase.prototype.Get_Width = function(_CurLine, _CurRange)
 
     return this.Bounds.Get_Width(CurLine, CurRange);
 };
-CMathBase.prototype.Save_RecalculateObject = function(Copy)
+CMathBase.prototype.SaveRecalculateObject = function(Copy)
 {
     var RecalcObj;
     if(this.bOneLine)
@@ -1418,7 +1418,7 @@ CMathBase.prototype.Save_RecalculateObject = function(Copy)
         {
             if(Pos == Num)
             {
-                RecalcObj.Content[Pos] = this.Content[Pos].Save_RecalculateObject(Copy);
+                RecalcObj.Content[Pos] = this.Content[Pos].SaveRecalculateObject(Copy);
             }
             else
             {
@@ -1429,10 +1429,10 @@ CMathBase.prototype.Save_RecalculateObject = function(Copy)
 
     return RecalcObj;
 };
-CMathBase.prototype.Load_RecalculateObject = function(RecalcObj)
+CMathBase.prototype.LoadRecalculateObject = function(RecalcObj)
 {
-    if(this.bOneLine == false)
-        CParagraphContentWithParagraphLikeContent.prototype.Load_RecalculateObject.call(this, RecalcObj);
+	if (this.bOneLine == false)
+		CParagraphContentWithParagraphLikeContent.prototype.LoadRecalculateObject.call(this, RecalcObj);
 
 };
 CMathBase.prototype.Fill_LogicalContent = function(nCount)

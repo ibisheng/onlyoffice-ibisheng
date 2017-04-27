@@ -83,17 +83,17 @@ CTable.prototype.Recalculate_Grid = function()
 {
 	this.private_RecalculateGrid();
 };
-CTable.prototype.Save_RecalculateObject = function()
+CTable.prototype.SaveRecalculateObject = function()
 {
 	var RecalcObj = new CTableRecalculateObject();
 	RecalcObj.Save(this);
 	return RecalcObj;
 };
-CTable.prototype.Load_RecalculateObject = function(RecalcObj)
+CTable.prototype.LoadRecalculateObject = function(RecalcObj)
 {
 	RecalcObj.Load(this);
 };
-CTable.prototype.Prepare_RecalculateObject = function()
+CTable.prototype.PrepareRecalculateObject = function()
 {
 	this.TableSumGrid  = [];
 	this.TableGridCalc = [];
@@ -119,7 +119,7 @@ CTable.prototype.Prepare_RecalculateObject = function()
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)
 	{
-		this.Content[Index].Prepare_RecalculateObject();
+		this.Content[Index].PrepareRecalculateObject();
 	}
 };
 CTable.prototype.Start_FromNewPage = function()
@@ -3174,7 +3174,7 @@ CTableRecalculateObject.prototype.Save = function(Table)
     var Count = Table.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
     {
-        this.Content[Index] = Table.Content[Index].Save_RecalculateObject();
+        this.Content[Index] = Table.Content[Index].SaveRecalculateObject();
     }
 };
 CTableRecalculateObject.prototype.Load = function(Table)
@@ -3201,7 +3201,7 @@ CTableRecalculateObject.prototype.Load = function(Table)
     var Count = this.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
     {
-        Table.Content[Index].Load_RecalculateObject( this.Content[Index] );
+        Table.Content[Index].LoadRecalculateObject( this.Content[Index] );
     }
 };
 CTableRecalculateObject.prototype.Get_DrawingFlowPos = function(FlowPos)

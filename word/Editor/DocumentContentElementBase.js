@@ -584,6 +584,16 @@ CDocumentContentElementBase.prototype.Shift = function(CurPage, dX, dY)
 CDocumentContentElementBase.prototype.UpdateEndInfo = function()
 {
 };
+CDocumentContentElementBase.prototype.PrepareRecalculateObject = function()
+{
+};
+CDocumentContentElementBase.prototype.SaveRecalculateObject = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.LoadRecalculateObject = function(RecalcObj)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

@@ -12998,7 +12998,7 @@ CRunRecalculateObject.prototype =
         var ContentLen = Content.length;
         for ( var Index = 0; Index < ContentLen; Index++ )
         {
-            this.Content[Index] = Content[Index].Save_RecalculateObject(Copy);
+            this.Content[Index] = Content[Index].SaveRecalculateObject(Copy);
         }
     },
 
@@ -13019,7 +13019,7 @@ CRunRecalculateObject.prototype =
         var Count = Obj.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            Obj.Content[Index].Load_RecalculateObject( this.Content[Index] );
+            Obj.Content[Index].LoadRecalculateObject( this.Content[Index] );
         }
     },
 
@@ -13036,7 +13036,7 @@ CRunRecalculateObject.prototype =
             var Item = Run.Content[Index];
 
             if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
-                this.Content[Index2++] = Item.Save_RecalculateObject(Copy);
+                this.Content[Index2++] = Item.SaveRecalculateObject(Copy);
         }
     },
 
@@ -13048,7 +13048,7 @@ CRunRecalculateObject.prototype =
             var Item = Run.Content[Index];
 
             if ( para_PageNum === Item.Type || para_Drawing === Item.Type )
-                Item.Load_RecalculateObject( this.Content[Index2++] );
+                Item.LoadRecalculateObject( this.Content[Index2++] );
         }
     },
 

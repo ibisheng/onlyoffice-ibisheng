@@ -2360,21 +2360,21 @@ ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
 
 };
-ParaMath.prototype.Save_RecalculateObject = function(Copy)
+ParaMath.prototype.SaveRecalculateObject = function(Copy)
 {
-    var RecalcObj = this.Root.Save_RecalculateObject(Copy);
-    RecalcObj.Save_MathInfo(this, Copy);
+	var RecalcObj = this.Root.SaveRecalculateObject(Copy);
+	RecalcObj.Save_MathInfo(this, Copy);
 
-    return RecalcObj;
+	return RecalcObj;
 };
-ParaMath.prototype.Load_RecalculateObject = function(RecalcObj)
+ParaMath.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_MathInfo(this);
-    this.Root.Load_RecalculateObject(RecalcObj);
+    this.Root.LoadRecalculateObject(RecalcObj);
 };
-ParaMath.prototype.Prepare_RecalculateObject = function()
+ParaMath.prototype.PrepareRecalculateObject = function()
 {
-    this.Root.Prepare_RecalculateObject();
+	this.Root.PrepareRecalculateObject();
 };
 ParaMath.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {
