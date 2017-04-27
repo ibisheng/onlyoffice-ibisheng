@@ -594,7 +594,7 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
-	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects);
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform());
 };
 CBlockLevelSdt.prototype.AddContentControl = function()
 {
@@ -623,6 +623,10 @@ CBlockLevelSdt.prototype.SaveRecalculateObject = function()
 CBlockLevelSdt.prototype.LoadRecalculateObject = function(RecalcObj)
 {
 	return this.Content.LoadRecalculateObject(RecalcObj);
+};
+CBlockLevelSdt.prototype.Set_ApplyToAll = function(bValue)
+{
+	this.Content.Set_ApplyToAll(bValue);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
@@ -769,6 +773,10 @@ CBlockLevelSdt.prototype.GetAllComments = function(AllComments)
 CBlockLevelSdt.prototype.GetAllMaths = function(AllMaths)
 {
 	return this.Content.GetAllMaths(AllMaths);
+};
+CBlockLevelSdt.prototype.Get_ParentTextTransform = function()
+{
+	return this.Parent.Get_ParentTextTransform();
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

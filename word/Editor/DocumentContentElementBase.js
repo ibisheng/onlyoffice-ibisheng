@@ -594,6 +594,9 @@ CDocumentContentElementBase.prototype.SaveRecalculateObject = function()
 CDocumentContentElementBase.prototype.LoadRecalculateObject = function(RecalcObj)
 {
 };
+CDocumentContentElementBase.prototype.Set_ApplyToAll = function(bValue)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

@@ -1607,6 +1607,7 @@ CDocumentContent.prototype.Get_ParentTextTransform       = function()
     {
         return this.Parent.Get_ParentTextTransform();
     }
+
     return null;
 };
 CDocumentContent.prototype.IsTableBorder = function(X, Y, CurPage)
@@ -2103,17 +2104,17 @@ CDocumentContent.prototype.MoveCursorToCell = function(bNext)
 		}
 	}
 };
-CDocumentContent.prototype.Set_ClipInfo                  = function(CurPage, X0, X1)
+CDocumentContent.prototype.Set_ClipInfo = function(CurPage, X0, X1)
 {
-    this.ClipInfo[CurPage] = {X0 : X0, X1 : X1};
+	this.ClipInfo[CurPage] = {X0 : X0, X1 : X1};
 };
-CDocumentContent.prototype.Set_ApplyToAll                = function(bValue)
+CDocumentContent.prototype.Set_ApplyToAll = function(bValue)
 {
-    this.ApplyToAll = bValue;
+	this.ApplyToAll = bValue;
 };
-CDocumentContent.prototype.Get_ApplyToAll                = function()
+CDocumentContent.prototype.Get_ApplyToAll = function()
 {
-    return this.ApplyToAll;
+	return this.ApplyToAll;
 };
 CDocumentContent.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
