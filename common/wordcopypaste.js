@@ -2197,6 +2197,17 @@ PasteProcessor.prototype =
 
 
 		var specialPasteShowOptions = window['AscCommon'].g_clipboardBase.specialPasteButtonProps ? window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props : null;
+		//если вставляются только изображения, пока не показываем параметры специальной
+		if(para_Drawing === this.pasteTypeContent)
+		{
+			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+			if(window['AscCommon'].g_clipboardBase.specialPasteButtonProps)
+			{
+				window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = null;
+			}
+			return;
+		}
+
 		if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
 		{
 			specialPasteShowOptions = new SpecialPasteShowOptions();
