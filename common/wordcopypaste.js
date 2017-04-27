@@ -2216,16 +2216,16 @@ PasteProcessor.prototype =
 			//table into table
 			//this.pasteTypeContent и this.pasteList нужны для вставки таблиц/списков и тд
 			//TODO пока вставка будет работать только с текстом(форматированный/не форматированный)
-			if(insertToElem && 1 === aContent.length && type_Table === this.aContent[0].GetType() && type_Table === insertToElem.GetType())
+			/*if(insertToElem && 1 === aContent.length && type_Table === this.aContent[0].GetType() && type_Table === insertToElem.GetType())
 			{
-				//props = [sProps.paste, sProps.insertAsNestedTable, sProps.uniteIntoTable, sProps.insertAsNewRows, sProps.pasteOnlyValues];
+				props = [sProps.paste, sProps.insertAsNestedTable, sProps.uniteIntoTable, sProps.insertAsNewRows, sProps.pasteOnlyValues];
 			}
 			else if(this.pasteList && insertToElem && type_Paragraph === insertToElem.GetType() && insertToElem.Pr && insertToElem.Pr.NumPr && insertToElem.Pr.NumPr.Is_Equal(this.pasteList))
 			{
 				//вставка нумерованного списка в нумерованный список
-				//props = [sProps.paste, sProps.uniteList, sProps.doNotUniteList];
-			}
-			else
+				props = [sProps.paste, sProps.uniteList, sProps.doNotUniteList];
+			}*/
+			if(true)
 			{
 				props = [sProps.paste/*, sProps.mergeFormatting*/, sProps.pasteOnlyValues];
 			}
@@ -2863,8 +2863,13 @@ PasteProcessor.prototype =
 			var aContentExcel = this._readFromBinaryExcel(base64FromExcel);
 			History.TurnOn();
 			
-			
-			if(aContentExcel.arrImages && aContentExcel.arrImages.length)
+			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.pasteOnlyValues === window['AscCommon'].g_clipboardBase.specialPasteProps)
+			{
+				var aContent = oThis._convertExcelBinary(aContentExcel);
+				oThis.aContent = aContent.content;
+				fPrepasteCallback();
+			}
+			else if(aContentExcel.arrImages && aContentExcel.arrImages.length)
 			{
 				var oObjectsForDownload = GetObjectsForImageDownload(aContentExcel.arrImages);
 				AscCommon.sendImgUrls(oThis.api, oObjectsForDownload.aUrls, function (data) {
@@ -3067,7 +3072,11 @@ PasteProcessor.prototype =
 			aContent.fonts = oThis._checkFontsOnLoad(aContent.fonts);
 
 			var oObjectsForDownload = GetObjectsForImageDownload(aContent.aPastedImages);
-			if(oObjectsForDownload.aUrls.length > 0)
+			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.pasteOnlyValues === window['AscCommon'].g_clipboardBase.specialPasteProps)
+			{
+				fPrepasteCallback();
+			}
+			else if(oObjectsForDownload.aUrls.length > 0)
 			{
 				if(bIsOnlyFromBinary && window["NativeCorrectImageUrlOnPaste"])
 				{
@@ -3990,10 +3999,19 @@ PasteProcessor.prototype =
 		};
 		
 		this.oRootNode = node;
+
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
 			this.bIsPlainText = this._CheckIsPlainText(node);
-            this._Prepeare(node, fPasteHtmlWordCallback);
+
+			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.pasteOnlyValues === window['AscCommon'].g_clipboardBase.specialPasteProps)
+			{
+				fPasteHtmlWordCallback();
+			}
+			else
+			{
+				this._Prepeare(node, fPasteHtmlWordCallback);
+			}
 			
             if(bTurnOffTrackRevisions){
                 oThis.api.WordControl.m_oLogicDocument.TrackRevisions = true;
