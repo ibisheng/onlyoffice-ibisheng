@@ -54,11 +54,12 @@ var c_oContentControlTrack = {
 	In 		: 1
 };
 
-function CContentControlTrack(_id, _type, _rects)
+function CContentControlTrack(_id, _type, _rects, _transform)
 {
 	this.id = (undefined == _id) ? -1 : _id;
 	this.type = (undefined == _type) ? -1 : _type;
 	this.rects = (undefined == _rects) ? null : _rects;
+	this.transform = (undefined == _transform) ? null : _transform;
 }
 
 function CColumnsMarkupColumn()
@@ -3823,135 +3824,299 @@ function CDrawingDocument()
 
 		var _object, _rect;
 		var _x, _y, _r, _b;
+		var _transform, offset_x, offset_y;
 
 		for (var i = 0; i < this.ContentControlObjects.length; i++)
 		{
 			_object = this.ContentControlObjects[i];
+			_transform = _object.transform;
 
-			for (var j = 0; j < _object.rects.length; j++)
+			offset_x = 0;
+			offset_y = 0;
+			if (_transform && global_MatrixTransformer.IsIdentity2(_transform))
 			{
-				_rect = _object.rects[j];
-
-				if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
-					continue;
-
-				var _page = this.m_arrPages[_rect.Page];
-				var drPage = _page.drawingPage;
-
-				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
-				var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
-
-				ctx.beginPath();
-
-				_x = (drPage.left 	+ dKoefX * _rect.X);
-				_y = (drPage.top 	+ dKoefY * _rect.Y);
-				_r = (drPage.left 	+ dKoefX * _rect.R);
-				_b = (drPage.top 	+ dKoefY * _rect.B);
-
-				if (_x < overlay.min_x)
-					overlay.min_x = _x;
-				if (_r > overlay.max_x)
-					overlay.max_x = _r;
-
-				if (_y < overlay.min_y)
-					overlay.min_y = _y;
-				if (_b > overlay.max_y)
-					overlay.max_y = _b;
-
-				overlay.CheckRect(_x, _y, _r - _x, _b - _y);
-				ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _y) >> 0);
-
-				if (_object.type == c_oContentControlTrack.Hover)
-				{
-					ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
-					ctx.fill();
-				}
-				ctx.stroke();
-
-				ctx.beginPath();
+				offset_x = _transform.tx;
+				offset_y = _transform.ty;
+				_transform = null;
 			}
 
-			if (_object.type == c_oContentControlTrack.In)
+			if (!_transform)
 			{
-				_rect = _object.rects[0];
-				_x = (drPage.left 	+ dKoefX * _rect.X);
-				_y = (drPage.top 	+ dKoefY * _rect.Y);
-
-				_x = ((_x >> 0) + 0.5) - 15;
-				_y = ((_y >> 0) + 0.5);
-
-				ctx.rect(_x, _y, 15, 20);
-
-				overlay.CheckRect(_x, _y, 15, 20);
-
-				if (1 == this.ContentControlObjectState)
+				for (var j = 0; j < _object.rects.length; j++)
 				{
-					ctx.fillStyle = "#CFCFCF";
+					_rect = _object.rects[j];
+
+					if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
+						continue;
+
+					var _page = this.m_arrPages[_rect.Page];
+					var drPage = _page.drawingPage;
+
+					var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+					var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+					ctx.beginPath();
+
+					_x = (drPage.left 	+ dKoefX * (_rect.X + offset_x));
+					_y = (drPage.top 	+ dKoefY * (_rect.Y + offset_y));
+					_r = (drPage.left 	+ dKoefX * (_rect.R + offset_x));
+					_b = (drPage.top 	+ dKoefY * (_rect.B + offset_y));
+
+					if (_x < overlay.min_x)
+						overlay.min_x = _x;
+					if (_r > overlay.max_x)
+						overlay.max_x = _r;
+
+					if (_y < overlay.min_y)
+						overlay.min_y = _y;
+					if (_b > overlay.max_y)
+						overlay.max_y = _b;
+
+					overlay.CheckRect(_x, _y, _r - _x, _b - _y);
+					ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _y) >> 0);
+
+					if (_object.type == c_oContentControlTrack.Hover)
+					{
+						ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+						ctx.fill();
+					}
+					ctx.stroke();
+
+					ctx.beginPath();
+				}
+
+				if (_object.type == c_oContentControlTrack.In)
+				{
+					_rect = _object.rects[0];
+					_x = (drPage.left 	+ dKoefX * (_rect.X + offset_x));
+					_y = (drPage.top 	+ dKoefY * (_rect.Y + offset_y));
+
+					_x = ((_x >> 0) + 0.5) - 15;
+					_y = ((_y >> 0) + 0.5);
+
+					ctx.rect(_x, _y, 15, 20);
+
+					overlay.CheckRect(_x, _y, 15, 20);
+
+					if (1 == this.ContentControlObjectState)
+					{
+						ctx.fillStyle = "#CFCFCF";
+						ctx.fill();
+					}
+
+					ctx.stroke();
+					ctx.beginPath();
+
+					var cx = _x - 0.5 + 4;
+					var cy = _y - 0.5 + 4;
+
+					var _color1 = "#ADADAD";
+					var _color2 = "#D4D4D4";
+
+					if (0 == this.ContentControlObjectState || 1 == this.ContentControlObjectState)
+					{
+						_color1 = "#444444";
+						_color2 = "#9D9D9D";
+					}
+
+					overlay.AddRect(cx, cy, 3, 3);
+					overlay.AddRect(cx + 5, cy, 3, 3);
+					overlay.AddRect(cx, cy + 5, 3, 3);
+					overlay.AddRect(cx + 5, cy + 5, 3, 3);
+					overlay.AddRect(cx, cy + 10, 3, 3);
+					overlay.AddRect(cx + 5, cy + 10, 3, 3);
+
+					ctx.fillStyle = _color2;
 					ctx.fill();
+					ctx.beginPath();
+
+					ctx.moveTo(cx + 1.5, cy);
+					ctx.lineTo(cx + 1.5, cy + 3);
+					ctx.moveTo(cx + 6.5, cy);
+					ctx.lineTo(cx + 6.5, cy + 3);
+					ctx.moveTo(cx + 1.5, cy + 5);
+					ctx.lineTo(cx + 1.5, cy + 8);
+					ctx.moveTo(cx + 6.5, cy + 5);
+					ctx.lineTo(cx + 6.5, cy + 8);
+					ctx.moveTo(cx + 1.5, cy + 10);
+					ctx.lineTo(cx + 1.5, cy + 13);
+					ctx.moveTo(cx + 6.5, cy + 10);
+					ctx.lineTo(cx + 6.5, cy + 13);
+
+					ctx.moveTo(cx, cy + 1.5);
+					ctx.lineTo(cx + 3, cy + 1.5);
+					ctx.moveTo(cx + 5, cy + 1.5);
+					ctx.lineTo(cx + 8, cy + 1.5);
+					ctx.moveTo(cx, cy + 6.5);
+					ctx.lineTo(cx + 3, cy + 6.5);
+					ctx.moveTo(cx + 5, cy + 6.5);
+					ctx.lineTo(cx + 8, cy + 6.5);
+					ctx.moveTo(cx, cy + 11.5);
+					ctx.lineTo(cx + 3, cy + 11.5);
+					ctx.moveTo(cx + 5, cy + 11.5);
+					ctx.lineTo(cx + 8, cy + 11.5);
+
+					ctx.strokeStyle = _color1;
+					ctx.stroke();
+					ctx.beginPath();
 				}
-
-				ctx.stroke();
-				ctx.beginPath();
-
-				var cx = _x - 0.5 + 4;
-				var cy = _y - 0.5 + 4;
-
-				var _color1 = "#ADADAD";
-				var _color2 = "#D4D4D4";
-
-				if (0 == this.ContentControlObjectState || 1 == this.ContentControlObjectState)
+			}
+			else
+			{
+				for (var j = 0; j < _object.rects.length; j++)
 				{
-					_color1 = "#444444";
-					_color2 = "#9D9D9D";
+					_rect = _object.rects[j];
+
+					if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
+						continue;
+
+					var x1 = _transform.TransformPointX(_rect.X, _rect.Y);
+					var y1 = _transform.TransformPointY(_rect.X, _rect.Y);
+
+					var x2 = _transform.TransformPointX(_rect.R, _rect.Y);
+					var y2 = _transform.TransformPointY(_rect.R, _rect.Y);
+
+					var x3 = _transform.TransformPointX(_rect.R, _rect.B);
+					var y3 = _transform.TransformPointY(_rect.R, _rect.B);
+
+					var x4 = _transform.TransformPointX(_rect.X, _rect.B);
+					var y4 = _transform.TransformPointY(_rect.X, _rect.B);
+
+					var _page = this.m_arrPages[_rect.Page];
+					var drPage = _page.drawingPage;
+
+					var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+					var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+					x1 = drPage.left + dKoefX * x1;
+					x2 = drPage.left + dKoefX * x2;
+					x3 = drPage.left + dKoefX * x3;
+					x4 = drPage.left + dKoefX * x4;
+
+					y1 = drPage.top + dKoefY * y1;
+					y2 = drPage.top + dKoefY * y2;
+					y3 = drPage.top + dKoefY * y3;
+					y4 = drPage.top + dKoefY * y4;
+
+					ctx.beginPath();
+
+					overlay.CheckPoint(x1, y1);
+					overlay.CheckPoint(x2, y2);
+					overlay.CheckPoint(x3, y3);
+					overlay.CheckPoint(x4, y4);
+
+					ctx.moveTo(x1, y1);
+					ctx.lineTo(x2, y2);
+					ctx.lineTo(x3, y3);
+					ctx.lineTo(x4, y4);
+					ctx.closePath();
+
+					if (_object.type == c_oContentControlTrack.Hover)
+					{
+						ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+						ctx.fill();
+					}
+					ctx.stroke();
+
+					ctx.beginPath();
 				}
 
-				overlay.AddRect(cx, cy, 3, 3);
-				overlay.AddRect(cx + 5, cy, 3, 3);
-				overlay.AddRect(cx, cy + 5, 3, 3);
-				overlay.AddRect(cx + 5, cy + 5, 3, 3);
-				overlay.AddRect(cx, cy + 10, 3, 3);
-				overlay.AddRect(cx + 5, cy + 10, 3, 3);
+				if (_object.type == c_oContentControlTrack.In)
+				{
+					_rect = _object.rects[0];
 
-				ctx.fillStyle = _color2;
-				ctx.fill();
-				ctx.beginPath();
+					var _page = this.m_arrPages[_rect.Page];
+					var drPage = _page.drawingPage;
 
-				ctx.moveTo(cx + 1.5, cy);
-				ctx.lineTo(cx + 1.5, cy + 3);
-				ctx.moveTo(cx + 6.5, cy);
-				ctx.lineTo(cx + 6.5, cy + 3);
-				ctx.moveTo(cx + 1.5, cy + 5);
-				ctx.lineTo(cx + 1.5, cy + 8);
-				ctx.moveTo(cx + 6.5, cy + 5);
-				ctx.lineTo(cx + 6.5, cy + 8);
-				ctx.moveTo(cx + 1.5, cy + 10);
-				ctx.lineTo(cx + 1.5, cy + 13);
-				ctx.moveTo(cx + 6.5, cy + 10);
-				ctx.lineTo(cx + 6.5, cy + 13);
+					var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+					var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
 
-				ctx.moveTo(cx, cy + 1.5);
-				ctx.lineTo(cx + 3, cy + 1.5);
-				ctx.moveTo(cx + 5, cy + 1.5);
-				ctx.lineTo(cx + 8, cy + 1.5);
-				ctx.moveTo(cx, cy + 6.5);
-				ctx.lineTo(cx + 3, cy + 6.5);
-				ctx.moveTo(cx + 5, cy + 6.5);
-				ctx.lineTo(cx + 8, cy + 6.5);
-				ctx.moveTo(cx, cy + 11.5);
-				ctx.lineTo(cx + 3, cy + 11.5);
-				ctx.moveTo(cx + 5, cy + 11.5);
-				ctx.lineTo(cx + 8, cy + 11.5);
+					var _x = _rect.X - (15 / dKoefX);
+					var _y = _rect.Y;
+					var _r = _rect.X;
+					var _b = _rect.Y + (20 / dKoefY);
 
-				ctx.strokeStyle = _color1;
-				ctx.stroke();
-				ctx.beginPath();
+					var x1 = _transform.TransformPointX(_x, _y);
+					var y1 = _transform.TransformPointY(_x, _y);
+
+					var x2 = _transform.TransformPointX(_r, _y);
+					var y2 = _transform.TransformPointY(_r, _y);
+
+					var x3 = _transform.TransformPointX(_r, _b);
+					var y3 = _transform.TransformPointY(_r, _b);
+
+					var x4 = _transform.TransformPointX(_x, _b);
+					var y4 = _transform.TransformPointY(_x, _b);
+
+					x1 = drPage.left + dKoefX * x1;
+					x2 = drPage.left + dKoefX * x2;
+					x3 = drPage.left + dKoefX * x3;
+					x4 = drPage.left + dKoefX * x4;
+
+					y1 = drPage.top + dKoefY * y1;
+					y2 = drPage.top + dKoefY * y2;
+					y3 = drPage.top + dKoefY * y3;
+					y4 = drPage.top + dKoefY * y4;
+
+					ctx.beginPath();
+
+					overlay.CheckPoint(x1, y1);
+					overlay.CheckPoint(x2, y2);
+					overlay.CheckPoint(x3, y3);
+					overlay.CheckPoint(x4, y4);
+
+					ctx.moveTo(x1, y1);
+					ctx.lineTo(x2, y2);
+					ctx.lineTo(x3, y3);
+					ctx.lineTo(x4, y4);
+					ctx.closePath();
+
+					if (1 == this.ContentControlObjectState)
+					{
+						ctx.fillStyle = "#CFCFCF";
+						ctx.fill();
+					}
+
+					ctx.stroke();
+					ctx.beginPath();
+
+					var cx1 = _x + 5  / dKoefX;
+					var cy1 = _y + 5  / dKoefY;
+					var cx2 = _x + 10 / dKoefX;
+					var cy2 = _y + 5  / dKoefY;
+
+					var cx3 = _x + 5  / dKoefX;
+					var cy3 = _y + 10 / dKoefY;
+					var cx4 = _x + 10 / dKoefX;
+					var cy4 = _y + 10 / dKoefY;
+
+					var cx5 = _x + 5  / dKoefX;
+					var cy5 = _y + 15 / dKoefY;
+					var cx6 = _x + 10 / dKoefX;
+					var cy6 = _y + 15 / dKoefY;
+
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx1, cy1), drPage.top + dKoefY * _transform.TransformPointY(cx1, cy1), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx2, cy2), drPage.top + dKoefY * _transform.TransformPointY(cx2, cy2), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx3, cy3), drPage.top + dKoefY * _transform.TransformPointY(cx3, cy3), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx4, cy4), drPage.top + dKoefY * _transform.TransformPointY(cx4, cy4), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx5, cy5), drPage.top + dKoefY * _transform.TransformPointY(cx5, cy5), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx6, cy6), drPage.top + dKoefY * _transform.TransformPointY(cx6, cy6), 1.5);
+
+					var _color1 = "#ADADAD";
+					if (0 == this.ContentControlObjectState || 1 == this.ContentControlObjectState)
+						_color1 = "#444444";
+
+					ctx.fillStyle = _color1;
+					ctx.fill();
+					ctx.beginPath();
+				}
 			}
 		}
 
 		this.ContentControlsSaveLast();
 	};
 
-	this.OnDrawContentControl = function(id, type, rects)
+	this.OnDrawContentControl = function(id, type, rects, transform)
 	{
 		// всегда должен быть максимум один hover и in
 		for (var i = 0; i < this.ContentControlObjects.length; i++)
@@ -3972,14 +4137,14 @@ function CDrawingDocument()
 			{
 				this.ContentControlObjects.splice(0, 1);
 			}
-			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects));
+			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform));
 		}
 		else
 		{
 			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
 				return;
 
-			this.ContentControlObjects.unshift(new CContentControlTrack(id, type, rects));
+			this.ContentControlObjects.unshift(new CContentControlTrack(id, type, rects, transform));
 		}
 	};
 
@@ -6333,7 +6498,27 @@ function CDrawingDocument()
 				var _r = _rect.X;
 				var _b = _rect.Y + (20 / dKoefY);
 
-				if (pos.X > _x && pos.X < _r && pos.Y > _y && pos.Y < _b)
+				var posX = pos.X;
+				var posY = pos.Y;
+
+				var _transform = _object.transform;
+				if (_transform && global_MatrixTransformer.IsIdentity2(_transform))
+				{
+					_x += _transform.tx;
+					_y += _transform.ty;
+					_r += _transform.tx;
+					_b += _transform.ty;
+
+					_transform = null;
+				}
+				if (_transform)
+				{
+					var _invert = global_MatrixTransformer.Invert(_transform);
+					posX = _invert.TransformPointX(pos.X, pos.Y);
+					posY = _invert.TransformPointY(pos.X, pos.Y);
+				}
+
+				if (posX > _x && posX < _r && posY > _y && posY < _b)
 				{
 					oWordControl.m_oLogicDocument.SelectContentControl(_object.id);
 					this.ContentControlObjectState = 1;
@@ -6486,9 +6671,29 @@ function CDrawingDocument()
 			var _r = rect.X;
 			var _b = rect.Y + (20 / dKoefY);
 
+			var posX = pos.X;
+			var posY = pos.Y;
+
+			var _transform = _content_control.transform;
+			if (_transform && global_MatrixTransformer.IsIdentity2(_transform))
+			{
+				_x += _transform.tx;
+				_y += _transform.ty;
+				_r += _transform.tx;
+				_b += _transform.ty;
+
+				_transform = null;
+			}
+			if (_transform)
+			{
+				var _invert = global_MatrixTransformer.Invert(_transform);
+				posX = _invert.TransformPointX(pos.X, pos.Y);
+				posY = _invert.TransformPointY(pos.X, pos.Y);
+			}
+
 			var _old = this.ContentControlObjectState;
 			this.ContentControlObjectState = -1;
-			if (pos.X > _x && pos.X < _r && pos.Y > _y && pos.Y < _b)
+			if (posX > _x && posX < _r && posY > _y && posY < _b)
 			{
 				this.ContentControlObjectState = 0;
 				oWordControl.ShowOverlay();
