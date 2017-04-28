@@ -2506,7 +2506,8 @@ CChartsDrawer.prototype =
 	
 	
 	//***spline functions***
-	calculate_Bezier: function(x, y, x1, y1, x2, y2, x3, y3)
+	//TODO пока включаю calculate_Bezier. проверить корретность calculate_Bezier2!
+	calculate_Bezier2: function(x, y, x1, y1, x2, y2, x3, y3)
 	{
 		var pts = [], bz = [];   
 
@@ -2563,6 +2564,82 @@ CChartsDrawer.prototype =
 		bz[3] = pts[2];
 		
 		return bz;
+	},
+
+	//***spline functions***
+	calculate_Bezier: function(x, y, x1, y1, x2, y2, x3, y3, t)
+	{
+		var pts = [], bz = [];
+
+		pts[0] = {x: x, y: y};
+		pts[1] = {x: x1, y: y1};
+		pts[2] = {x: x2, y: y2};
+		pts[3] = {x: x3, y: y3};
+
+		var d01 = this.XYZDist(pts[0], pts[1]);
+		var d12 = this.XYZDist(pts[1], pts[2]);
+		var d23 = this.XYZDist(pts[2], pts[3]);
+		var d02 = this.XYZDist(pts[0], pts[2]);
+		var d13 = this.XYZDist(pts[1], pts[3]);
+
+		bz[0] = pts[1];
+
+		if ((d02 / 6 < d12 / 2) && (d13 / 6 < d12 / 2))
+		{
+			var f;
+			if (x != x1)
+				f = 1 / 6;
+			else
+				f = 1 / 3;
+
+			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), f));
+
+			if (x2 != x3)
+				f = 1 / 6;
+			else
+				f = 1 / 3;
+
+			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), f))
+		}
+
+		else if ((d02 / 6 >= d12 / 2) && (d13 / 6 >= d12 / 2))
+		{
+			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02))
+			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13))
+		}
+		else if((d02 / 6 >= d12 / 2))
+		{
+			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02))
+			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13 * (d13 / d02)))
+		}
+		else
+		{
+			bz[1] = this.XYZAdd(pts[1], this.XYZMult(this.XYZSub(pts[2], pts[0]), d12 / 2 / d02 * (d02 / d13)))
+			bz[2] = this.XYZAdd(pts[2], this.XYZMult(this.XYZSub(pts[1], pts[3]), d12 / 2 / d13))
+		}
+
+		bz[3] = pts[2];
+
+		var pt = this._bezier4(bz[0], bz[1], bz[2], bz[3], t);
+
+		return [pt.x, pt.y];
+	},
+
+	_bezier4: function(p1, p2, p3, p4, t)
+	{
+		var mum1, mum13, t3, mum12, t2;
+		var p = {};
+
+		mum1 = 1 - t;
+		mum13 = mum1 * mum1 * mum1;
+		mum12 = mum1 * mum1;
+		t2 = t * t
+		t3 = t * t * t;
+
+		p.x = mum13 * p1.x + 3 * t * mum12 * p2.x + 3 * t2 * mum1 * p3.x + t3 * p4.x;
+		p.y = mum13 * p1.y + 3 * t * mum12 * p2.y + 3 * t2 * mum1 * p3.y + t3 * p4.y;
+
+		return p;
 	},
 
 	XYZAdd: function(a, b)
@@ -4634,8 +4711,9 @@ drawLineChart.prototype =
 		
 		return pathId;
 	},
-	
-	_calculateSplineLine : function(x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints)
+
+	//TODO пока включаю функцию _calculateSplineLine. с _calculateSplineLine2 отрисовается неверно. проверить!
+	_calculateSplineLine2 : function(x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints)
 	{
         var pathId = this.cChartSpace.AllocPath();
         var path  = this.cChartSpace.GetPath(pathId);
@@ -4666,7 +4744,41 @@ drawLineChart.prototype =
 		
 		return pathId;
 	},
-	
+
+	_calculateSplineLine : function(x, y, x1, y1, x2, y2, x3, y3, xPoints, yPoints)
+	{
+		var pathId = this.cChartSpace.AllocPath();
+		var path  = this.cChartSpace.GetPath(pathId);
+
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+
+		var startCoords;
+		var endCoords;
+
+		for(var i = 0; i <= 1;)
+		{
+			var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
+
+			if(i == 0)
+			{
+				startCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
+			}
+
+			endCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
+
+			if(i == 0)
+			{
+				path.moveTo(startCoords.x * pathW, startCoords.y * pathH);
+			}
+			path.lnTo(endCoords.x * pathW, endCoords.y * pathH);
+
+			i = i + 0.1;
+		}
+
+		return pathId;
+	},
+
 	_drawLines3D: function()
 	{
 		var t = this;
@@ -10382,9 +10494,9 @@ drawScatterChart.prototype =
 		
 		return {x: centerX, y: centerY};
 	},
-	
-	
-	_calculateSplineLine : function(points, k, xPoints, yPoints)
+
+	//TODO пока включаю функцию _calculateSplineLine. с _calculateSplineLine2 отрисовается неверно. проверить!
+	_calculateSplineLine2 : function(points, k, xPoints, yPoints)
 	{
 
         var pathId = this.cChartSpace.AllocPath();
@@ -10426,6 +10538,52 @@ drawScatterChart.prototype =
 		
 
 		
+		return pathId;
+	},
+
+	_calculateSplineLine : function(points, k, xPoints, yPoints)
+	{
+		var pathId = this.cChartSpace.AllocPath();
+		var path  = this.cChartSpace.GetPath(pathId);
+
+		var pathH = this.chartProp.pathH;
+		var pathW = this.chartProp.pathW;
+
+		var x = points[k - 1] ? points[k - 1].x : points[k].x;
+		var y = points[k - 1] ? points[k - 1].y : points[k].y;
+
+		var x1 = points[k].x;
+		var y1 = points[k].y;
+
+		var x2 = points[k + 1] ? points[k + 1].x : points[k].x;
+		var y2 = points[k + 1] ? points[k + 1].y : points[k].y;
+
+		var x3 = points[k + 2] ? points[k + 2].x : points[k + 1] ? points[k + 1].x : points[k].x;
+		var y3 = points[k + 2] ? points[k + 2].y : points[k + 1] ? points[k + 1].y : points[k].y;
+
+		var startCoords;
+		var endCoords;
+
+		for(var i = 0; i <= 1;)
+		{
+			var splineCoords = this.cChartDrawer.calculate_Bezier(x, y, x1, y1, x2, y2, x3, y3, i);
+
+			if(i == 0)
+			{
+				startCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
+			}
+
+			endCoords = {x: this.cChartDrawer.getYPosition(splineCoords[0], xPoints, true), y: this.cChartDrawer.getYPosition(splineCoords[1], yPoints)};
+
+			if(i == 0)
+			{
+				path.moveTo(startCoords.x * pathW, startCoords.y * pathH);
+			}
+			path.lnTo(endCoords.x * pathW, endCoords.y * pathH);
+
+			i = i + 0.1;
+		}
+
 		return pathId;
 	}
 };
