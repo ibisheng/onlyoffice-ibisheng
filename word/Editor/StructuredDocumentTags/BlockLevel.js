@@ -790,6 +790,16 @@ CBlockLevelSdt.prototype.Get_ParentTextTransform = function()
 {
 	return this.Parent.Get_ParentTextTransform();
 };
+CBlockLevelSdt.prototype.Get_SectPr = function()
+{
+	if (this.Parent && this.Parent.Get_SectPr)
+	{
+		this.Parent.Update_ContentIndexing();
+		return this.Parent.Get_SectPr(this.Index);
+	}
+
+	return null;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;
