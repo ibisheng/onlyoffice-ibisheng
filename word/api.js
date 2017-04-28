@@ -6352,15 +6352,6 @@ background-repeat: no-repeat;\
 				return;
 			}
 
-			// быстрого перехода больше нет
-			/*
-			 if ( this.bInit_word_control === true )
-			 {
-			 CollaborativeEditing.Apply_Changes();
-			 CollaborativeEditing.Release_Locks();
-			 }
-			 */
-
 			this.isUseEmbeddedCutFonts = false;
 			
 			//this.WordControl.m_bIsRuler = true;
