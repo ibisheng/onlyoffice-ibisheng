@@ -3439,7 +3439,7 @@ function ComparisonByZIndexSimple(obj1, obj2)
         {
             if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
             {
-                return editor.WordControl.m_oLogicDocument.Compare_DrawingsLogicPositions(obj2, obj1);
+                return editor.WordControl.m_oLogicDocument.CompareDrawingsLogicPositions(obj2, obj1);
             }
         }
         return obj1.RelativeHeight - obj2.RelativeHeight;

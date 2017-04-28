@@ -618,6 +618,10 @@ CDocumentContentElementBase.prototype.StartFromNewPage = function()
 CDocumentContentElementBase.prototype.CollectDocumentStatistics = function(Stats)
 {
 };
+CDocumentContentElementBase.prototype.CompareDrawingsLogicPositions = function(CompareObject)
+{
+	return 0;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

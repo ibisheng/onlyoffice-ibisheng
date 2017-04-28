@@ -11131,7 +11131,7 @@ CTable.prototype.private_GetVertMergeCountOnPage = function(CurPage, CurRow, Sta
 
 	return VMergeCount;
 };
-CTable.prototype.Get_TopElement = function()
+CTable.prototype.GetTopElement = function()
 {
     if (!this.Parent)
         return null;
@@ -11139,7 +11139,7 @@ CTable.prototype.Get_TopElement = function()
     if (true === this.Parent.Is_TopDocument(false))
         return this;
 
-    return this.Parent.Get_TopElement();
+    return this.Parent.GetTopElement();
 };
 CTable.prototype.Get_Index = function()
 {
@@ -11158,7 +11158,7 @@ CTable.prototype.Get_Row = function(Index)
 {
     return this.Content[Index];
 };
-CTable.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+CTable.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
     for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; CurRow++)
     {
@@ -11166,7 +11166,7 @@ CTable.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
         for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; CurCell++)
         {
             var Cell = Row.Get_Cell(CurCell);
-            Cell.Content.Compare_DrawingsLogicPositions(CompareObject);
+            Cell.Content.CompareDrawingsLogicPositions(CompareObject);
 
             if (0 !== CompareObject.Result)
                 return;

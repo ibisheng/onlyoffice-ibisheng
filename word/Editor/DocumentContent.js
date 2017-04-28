@@ -6238,7 +6238,6 @@ CDocumentContent.prototype.RemoveSelection = function(bNoCheckDrawing)
 		this.Selection.Flag  = selectionflag_Common;
 	}
 };
-// Рисуем селект
 CDocumentContent.prototype.DrawSelectionOnPage = function(PageIndex)
 {
     var CurPage = PageIndex;
@@ -7251,26 +7250,26 @@ CDocumentContent.prototype.Internal_Content_Remove = function(Position, Count, b
 
 	this.private_ReindexContent(Position);
 };
-CDocumentContent.prototype.Clear_ContentChanges       = function()
+CDocumentContent.prototype.Clear_ContentChanges = function()
 {
-    this.m_oContentChanges.Clear();
+	this.m_oContentChanges.Clear();
 };
-CDocumentContent.prototype.Add_ContentChanges         = function(Changes)
+CDocumentContent.prototype.Add_ContentChanges = function(Changes)
 {
-    this.m_oContentChanges.Add(Changes);
+	this.m_oContentChanges.Add(Changes);
 };
-CDocumentContent.prototype.Refresh_ContentChanges     = function()
+CDocumentContent.prototype.Refresh_ContentChanges = function()
 {
-    this.m_oContentChanges.Refresh();
+	this.m_oContentChanges.Refresh();
 };
 CDocumentContent.prototype.Internal_Content_RemoveAll = function()
 {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-        this.Content[Index].PreDelete();
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+		this.Content[Index].PreDelete();
 
-    History.Add(new CChangesDocumentRemoveItem(this, 0, this.Content.slice(0, this.Content.length)));
-    this.Content = [];
+	History.Add(new CChangesDocumentRemoveItem(this, 0, this.Content.slice(0, this.Content.length)));
+	this.Content = [];
 };
 //-----------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
@@ -7495,35 +7494,35 @@ CDocumentContent.prototype.Get_ParentObject_or_DocumentPos = function()
 {
     return this.Parent.Get_ParentObject_or_DocumentPos();
 };
-CDocumentContent.prototype.Refresh_RecalcData              = function(Data)
+CDocumentContent.prototype.Refresh_RecalcData = function(Data)
 {
-    var bNeedRecalc = false;
+	var bNeedRecalc = false;
 
-    var Type = Data.Type;
+	var Type = Data.Type;
 
-    var CurPage = 0;
+	var CurPage = 0;
 
-    switch (Type)
-    {
-        case AscDFH.historyitem_DocumentContent_AddItem:
-        case AscDFH.historyitem_DocumentContent_RemoveItem:
-        {
-            for (CurPage = this.Pages.length - 1; CurPage > 0; CurPage--)
-            {
-                if (Data.Pos > this.Pages[CurPage].Pos)
-                    break;
-            }
+	switch (Type)
+	{
+		case AscDFH.historyitem_DocumentContent_AddItem:
+		case AscDFH.historyitem_DocumentContent_RemoveItem:
+		{
+			for (CurPage = this.Pages.length - 1; CurPage > 0; CurPage--)
+			{
+				if (Data.Pos > this.Pages[CurPage].Pos)
+					break;
+			}
 
-            bNeedRecalc = true;
-            break;
-        }
-    }
+			bNeedRecalc = true;
+			break;
+		}
+	}
 
-    this.Refresh_RecalcData2(0, CurPage);
+	this.Refresh_RecalcData2(0, CurPage);
 };
-CDocumentContent.prototype.Refresh_RecalcData2             = function(Index, Page_rel)
+CDocumentContent.prototype.Refresh_RecalcData2 = function(Index, Page_rel)
 {
-    this.Parent.Refresh_RecalcData2(this.StartPage + Page_rel);
+	this.Parent.Refresh_RecalcData2(this.StartPage + Page_rel);
 };
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
@@ -7630,144 +7629,144 @@ CDocumentContent.prototype.IsCursorInHyperlink = function(bCheckEnd)
 //-----------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //-----------------------------------------------------------------------------------
-CDocumentContent.prototype.Write_ToBinary2     = function(Writer)
+CDocumentContent.prototype.Write_ToBinary2 = function(Writer)
 {
-    Writer.WriteLong(AscDFH.historyitem_type_DocumentContent);
+	Writer.WriteLong(AscDFH.historyitem_type_DocumentContent);
 
-    // String : Id текущего элемента
-    // Long   : StartPage
-    // String : Id родительского класса
-    // Bool   : TurnOffInnerWrap
-    // Bool   : Split
-    // Long   : Количество элементов в массиве this.Content
-    // Array of string : массив Id элементов
+	// String : Id текущего элемента
+	// Long   : StartPage
+	// String : Id родительского класса
+	// Bool   : TurnOffInnerWrap
+	// Bool   : Split
+	// Long   : Количество элементов в массиве this.Content
+	// Array of string : массив Id элементов
 
-    Writer.WriteString2(this.Id);
-    Writer.WriteLong(this.StartPage);
-    Writer.WriteString2(this.Parent.Get_Id());
-    Writer.WriteBool(this.TurnOffInnerWrap);
-    Writer.WriteBool(this.Split);
-    AscFormat.writeBool(Writer, this.bPresentation);
+	Writer.WriteString2(this.Id);
+	Writer.WriteLong(this.StartPage);
+	Writer.WriteString2(this.Parent.Get_Id());
+	Writer.WriteBool(this.TurnOffInnerWrap);
+	Writer.WriteBool(this.Split);
+	AscFormat.writeBool(Writer, this.bPresentation);
 
 
-    var ContentToWrite;
-    if (this.StartState)
-    {
-        ContentToWrite = this.StartState.Content;
-    }
-    else
-    {
-        ContentToWrite = this.Content;
-    }
+	var ContentToWrite;
+	if (this.StartState)
+	{
+		ContentToWrite = this.StartState.Content;
+	}
+	else
+	{
+		ContentToWrite = this.Content;
+	}
 
-    var Count = ContentToWrite.length;
-    Writer.WriteLong(Count);
-    for (var Index = 0; Index < Count; Index++)
-        Writer.WriteString2(ContentToWrite[Index].Get_Id());
+	var Count = ContentToWrite.length;
+	Writer.WriteLong(Count);
+	for (var Index = 0; Index < Count; Index++)
+		Writer.WriteString2(ContentToWrite[Index].Get_Id());
 
-    if (this.Parent && this.Parent.Get_Worksheet)
-    {
-        Writer.WriteBool(true);
-        var worksheet = this.Parent.Get_Worksheet();
-        if (worksheet)
-        {
-            Writer.WriteBool(true);
-            Writer.WriteString2(worksheet.getId())
-        }
-        else
-        {
-            Writer.WriteBool(false);
-        }
-    }
-    else
-    {
-        Writer.WriteBool(false);
-    }
+	if (this.Parent && this.Parent.Get_Worksheet)
+	{
+		Writer.WriteBool(true);
+		var worksheet = this.Parent.Get_Worksheet();
+		if (worksheet)
+		{
+			Writer.WriteBool(true);
+			Writer.WriteString2(worksheet.getId())
+		}
+		else
+		{
+			Writer.WriteBool(false);
+		}
+	}
+	else
+	{
+		Writer.WriteBool(false);
+	}
 };
-CDocumentContent.prototype.Read_FromBinary2    = function(Reader)
+CDocumentContent.prototype.Read_FromBinary2 = function(Reader)
 {
-    // String : Id текущего элемента
-    // Long   : StartPage
-    // String : Id родительского класса
-    // Bool   : TurnOffInnerWrap
-    // Bool   : Split
-    // Long   : Количество элементов в массиве this.Content
-    // Array of string : массив Id элементов
+	// String : Id текущего элемента
+	// Long   : StartPage
+	// String : Id родительского класса
+	// Bool   : TurnOffInnerWrap
+	// Bool   : Split
+	// Long   : Количество элементов в массиве this.Content
+	// Array of string : массив Id элементов
 
-    var LinkData = {};
+	var LinkData = {};
 
-    this.Id               = Reader.GetString2();
-    this.StartPage        = Reader.GetLong();
-    LinkData.Parent       = Reader.GetString2();
-    this.TurnOffInnerWrap = Reader.GetBool();
-    this.Split            = Reader.GetBool();
-    this.bPresentation    = AscFormat.readBool(Reader);
+	this.Id               = Reader.GetString2();
+	this.StartPage        = Reader.GetLong();
+	LinkData.Parent       = Reader.GetString2();
+	this.TurnOffInnerWrap = Reader.GetBool();
+	this.Split            = Reader.GetBool();
+	this.bPresentation    = AscFormat.readBool(Reader);
 
-    var Count    = Reader.GetLong();
-    this.Content = [];
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = g_oTableId.Get_ById(Reader.GetString2());
-        if (null != Element)
-        {
-            this.Content.push(Element);
-            Element.Parent = this;
-        }
-    }
+	var Count    = Reader.GetLong();
+	this.Content = [];
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = g_oTableId.Get_ById(Reader.GetString2());
+		if (null != Element)
+		{
+			this.Content.push(Element);
+			Element.Parent = this;
+		}
+	}
 
-    AscCommon.CollaborativeEditing.Add_LinkData(this, LinkData);
+	AscCommon.CollaborativeEditing.Add_LinkData(this, LinkData);
 
-    var b_worksheet = Reader.GetBool();
-    if (b_worksheet)
-    {
-        this.Parent        = g_oTableId.Get_ById(LinkData.Parent);
-        var b_worksheet_id = Reader.GetBool();
-        if (b_worksheet_id)
-        {
-            var id  = Reader.GetString2();
-            var api = window["Asc"]["editor"];
-            if (api.wb)
-            {
-                var worksheet = api.wbModel.getWorksheetById(id);
-                if (worksheet)
-                {
-                    this.DrawingDocument = worksheet.DrawingDocument;
-                }
-            }
-        }
-    }
-    else
-    {
-        var DrawingDocument;
-        if (editor && editor.WordControl && editor.WordControl.m_oDrawingDocument)
-            DrawingDocument = editor.WordControl.m_oDrawingDocument;
-        if (undefined !== DrawingDocument && null !== DrawingDocument)
-        {
-            this.DrawingDocument = DrawingDocument;
+	var b_worksheet = Reader.GetBool();
+	if (b_worksheet)
+	{
+		this.Parent        = g_oTableId.Get_ById(LinkData.Parent);
+		var b_worksheet_id = Reader.GetBool();
+		if (b_worksheet_id)
+		{
+			var id  = Reader.GetString2();
+			var api = window["Asc"]["editor"];
+			if (api.wb)
+			{
+				var worksheet = api.wbModel.getWorksheetById(id);
+				if (worksheet)
+				{
+					this.DrawingDocument = worksheet.DrawingDocument;
+				}
+			}
+		}
+	}
+	else
+	{
+		var DrawingDocument;
+		if (editor && editor.WordControl && editor.WordControl.m_oDrawingDocument)
+			DrawingDocument = editor.WordControl.m_oDrawingDocument;
+		if (undefined !== DrawingDocument && null !== DrawingDocument)
+		{
+			this.DrawingDocument = DrawingDocument;
 
-            if (undefined !== editor && true === editor.isDocumentEditor)
-            {
-                this.LogicDocument  = DrawingDocument.m_oLogicDocument;
-                this.Styles         = DrawingDocument.m_oLogicDocument.Get_Styles();
-                this.Numbering      = DrawingDocument.m_oLogicDocument.Get_Numbering();
-                this.DrawingObjects = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
-            }
-        }
-    }
+			if (undefined !== editor && true === editor.isDocumentEditor)
+			{
+				this.LogicDocument  = DrawingDocument.m_oLogicDocument;
+				this.Styles         = DrawingDocument.m_oLogicDocument.Get_Styles();
+				this.Numbering      = DrawingDocument.m_oLogicDocument.Get_Numbering();
+				this.DrawingObjects = DrawingDocument.m_oLogicDocument.DrawingObjects; // Массив укзателей на все инлайновые графические объекты
+			}
+		}
+	}
 };
-CDocumentContent.prototype.Load_LinkData       = function(LinkData)
+CDocumentContent.prototype.Load_LinkData = function(LinkData)
 {
-    if ("undefined" != typeof(LinkData.Parent))
-        this.Parent = g_oTableId.Get_ById(LinkData.Parent);
+	if ("undefined" != typeof(LinkData.Parent))
+		this.Parent = g_oTableId.Get_ById(LinkData.Parent);
 
-    if (this.Parent.getDrawingDocument)
-    {
-        this.DrawingDocument = this.Parent.getDrawingDocument();
-        for (var i = 0; i < this.Content.length; ++i)
-        {
-            this.Content[i].DrawingDocument = this.DrawingDocument;
-        }
-    }
+	if (this.Parent.getDrawingDocument)
+	{
+		this.DrawingDocument = this.Parent.getDrawingDocument();
+		for (var i = 0; i < this.Content.length; ++i)
+		{
+			this.Content[i].DrawingDocument = this.DrawingDocument;
+		}
+	}
 };
 CDocumentContent.prototype.Get_SelectionState2 = function()
 {
@@ -7777,7 +7776,7 @@ CDocumentContent.prototype.Get_SelectionState2 = function()
     State.Id   = this.Get_Id();
     State.Type = docpostype_Content;
 
-    var Element = this.Content[this.CurPos.ContentPos]
+    var Element = this.Content[this.CurPos.ContentPos];
     State.Data  = Element.Get_SelectionState2();
 
     return State;
@@ -7971,40 +7970,40 @@ CDocumentContent.prototype.GetSelectionAnchorPos = function()
 	var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) : this.CurPos.ContentPos );
 	return this.Content[Pos].GetSelectionAnchorPos();
 };
-CDocumentContent.prototype.Get_EndInfo            = function()
+CDocumentContent.prototype.Get_EndInfo = function()
 {
-    var ContentLen = this.Content.length;
-    if (ContentLen > 0)
-        return this.Content[ContentLen - 1].Get_EndInfo();
-    else
-        return null;
+	var ContentLen = this.Content.length;
+	if (ContentLen > 0)
+		return this.Content[ContentLen - 1].Get_EndInfo();
+	else
+		return null;
 };
 CDocumentContent.prototype.Get_PrevElementEndInfo = function(CurElement)
 {
-    var PrevElement = CurElement.Get_DocumentPrev();
+	var PrevElement = CurElement.Get_DocumentPrev();
 
-    if (null !== PrevElement && undefined !== PrevElement)
-    {
-        return PrevElement.Get_EndInfo();
-    }
-    else
-    {
-        return this.Parent.Get_PrevElementEndInfo(this);
-    }
+	if (null !== PrevElement && undefined !== PrevElement)
+	{
+		return PrevElement.Get_EndInfo();
+	}
+	else
+	{
+		return this.Parent.Get_PrevElementEndInfo(this);
+	}
 };
-CDocumentContent.prototype.Get_TopElement = function()
+CDocumentContent.prototype.GetTopElement = function()
 {
     if (this.Parent)
-        return this.Parent.Get_TopElement();
+        return this.Parent.GetTopElement();
 
     return null;
 };
-CDocumentContent.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+CDocumentContent.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
     for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
     {
         var Element = this.Content[Index];
-        Element.Compare_DrawingsLogicPositions(CompareObject);
+        Element.CompareDrawingsLogicPositions(CompareObject);
 
         if (0 !== CompareObject.Result)
             return;

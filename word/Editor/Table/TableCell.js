@@ -1807,10 +1807,10 @@ CTableCell.prototype.private_TransformXY = function(X, Y)
 
 	return {X : _X, Y : _Y};
 };
-CTableCell.prototype.Get_TopElement = function()
+CTableCell.prototype.GetTopElement = function()
 {
     if (this.Row && this.Row.Table)
-        return this.Row.Table.Get_TopElement();
+        return this.Row.Table.GetTopElement();
 
     return null;
 };

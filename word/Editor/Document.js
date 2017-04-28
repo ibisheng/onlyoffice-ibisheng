@@ -9400,7 +9400,7 @@ CDocument.prototype.Is_HightlightMailMergeFields = function()
 {
 	return this.MailMergeFieldsHighlight;
 };
-CDocument.prototype.Compare_DrawingsLogicPositions = function(Drawing1, Drawing2)
+CDocument.prototype.CompareDrawingsLogicPositions = function(Drawing1, Drawing2)
 {
 	var ParentPara1 = Drawing1.Get_Paragraph();
 	var ParentPara2 = Drawing2.Get_Paragraph();
@@ -9414,8 +9414,8 @@ CDocument.prototype.Compare_DrawingsLogicPositions = function(Drawing1, Drawing2
 	if (TopDocument1 !== TopDocument2 || !TopDocument1)
 		return 0;
 
-	var TopElement1 = ParentPara1.Get_TopElement();
-	var TopElement2 = ParentPara2.Get_TopElement();
+	var TopElement1 = ParentPara1.GetTopElement();
+	var TopElement2 = ParentPara2.GetTopElement();
 
 	if (!TopElement1 || !TopElement2)
 		return 0;
@@ -9431,13 +9431,13 @@ CDocument.prototype.Compare_DrawingsLogicPositions = function(Drawing1, Drawing2
 	if (undefined !== TopDocument1.Content[TopIndex1])
 	{
 		var CompareEngine = new CDocumentCompareDrawingsLogicPositions(Drawing1, Drawing2);
-		TopDocument1.Content[TopIndex1].Compare_DrawingsLogicPositions(CompareEngine);
+		TopDocument1.Content[TopIndex1].CompareDrawingsLogicPositions(CompareEngine);
 		return CompareEngine.Result;
 	}
 
 	return 0;
 };
-CDocument.prototype.Get_TopElement = function()
+CDocument.prototype.GetTopElement = function()
 {
 	return null;
 };

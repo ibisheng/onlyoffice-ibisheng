@@ -648,6 +648,10 @@ CBlockLevelSdt.prototype.CollectDocumentStatistics = function(Stats)
 {
 	return this.Content.CollectDocumentStatistics(Stats);
 };
+CBlockLevelSdt.prototype.CompareDrawingsLogicPositions = function(CompareObject)
+{
+	return this.Content.CompareDrawingsLogicPositions(CompareObject);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -807,6 +811,13 @@ CBlockLevelSdt.prototype.Get_SectPr = function()
 	}
 
 	return null;
+};
+CBlockLevelSdt.prototype.GetTopElement = function()
+{
+	if (true === this.Parent.Is_TopDocument(false))
+		return this;
+
+	return this.Parent.GetTopElement();
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

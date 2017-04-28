@@ -10993,12 +10993,12 @@ Paragraph.prototype.private_GetPageByLine = function(CurLine)
 
     return Math.min(PagesCount - 1, CurPage);
 };
-Paragraph.prototype.Get_TopElement = function()
+Paragraph.prototype.GetTopElement = function()
 {
     if (true === this.Parent.Is_TopDocument(false))
         return this;
 
-    return this.Parent.Get_TopElement();
+    return this.Parent.GetTopElement();
 };
 Paragraph.prototype.Get_Index = function()
 {
@@ -11009,7 +11009,7 @@ Paragraph.prototype.Get_Index = function()
 
     return this.Index;
 };
-Paragraph.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+Paragraph.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
     var Run1 = this.Get_DrawingObjectRun(CompareObject.Drawing1.Get_Id());
     var Run2 = this.Get_DrawingObjectRun(CompareObject.Drawing2.Get_Id());
@@ -11029,7 +11029,7 @@ Paragraph.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
             CompareObject.Result = Result;
         else
         {
-            Run1.Compare_DrawingsLogicPositions(CompareObject);
+            Run1.CompareDrawingsLogicPositions(CompareObject);
         }
     }
 };

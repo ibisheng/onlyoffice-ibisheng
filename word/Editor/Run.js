@@ -8509,7 +8509,7 @@ ParaRun.prototype.Get_RangesByPos = function(Pos)
 
     return Ranges;
 };
-ParaRun.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+ParaRun.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
     var Drawing1 = CompareObject.Drawing1;
     var Drawing2 = CompareObject.Drawing2;
