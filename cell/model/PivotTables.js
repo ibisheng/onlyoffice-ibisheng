@@ -4787,6 +4787,9 @@ CT_CacheField.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
+CT_CacheField.prototype.asc_getName = function () {
+	return this.name;
+};
 function CT_CacheHierarchy() {
 //Attributes
 	this.uniqueName = null;
@@ -9572,3 +9575,6 @@ prot["asc_getShowRowHeaders"] = prot.asc_getShowRowHeaders;
 prot["asc_getShowColHeaders"] = prot.asc_getShowColHeaders;
 prot["asc_getShowRowStripes"] = prot.asc_getShowRowStripes;
 prot["asc_getShowColStripes"] = prot.asc_getShowColStripes;
+
+prot = CT_CacheField.prototype;
+prot["asc_getName"] = prot.asc_getName;
