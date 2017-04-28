@@ -2197,12 +2197,12 @@ CGraphicObjects.prototype =
     },
 
 
-    Get_StyleFromFormatting: function()
+	GetStyleFromFormatting: function()
     {
         var oContent = this.getTargetDocContent();
         if(oContent)
         {
-            var oStyleFormatting = oContent.Get_StyleFromFormatting();
+            var oStyleFormatting = oContent.GetStyleFromFormatting();
             var oTextPr = oStyleFormatting.TextPr;
             if(oTextPr.TextFill)
             {

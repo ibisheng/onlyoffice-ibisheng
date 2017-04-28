@@ -11071,7 +11071,7 @@ Paragraph.prototype.Get_PosByDrawing = function(Id)
 
     return ContentPos;
 };
-Paragraph.prototype.Get_StyleFromFormatting = function()
+Paragraph.prototype.GetStyleFromFormatting = function()
 {
     // Получим настройки первого рана попавшего в выделение
     var TextPr = null;

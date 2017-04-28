@@ -652,6 +652,10 @@ CBlockLevelSdt.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
 	return this.Content.CompareDrawingsLogicPositions(CompareObject);
 };
+CBlockLevelSdt.prototype.GetStyleFromFormatting = function()
+{
+	return this.Content.GetStyleFromFormatting();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

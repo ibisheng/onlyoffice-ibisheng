@@ -11185,14 +11185,14 @@ CTable.prototype.StartSelectionFromCurPos = function()
 
 	this.CurCell.Content.StartSelectionFromCurPos();
 };
-CTable.prototype.Get_StyleFromFormatting = function()
+CTable.prototype.GetStyleFromFormatting = function()
 {
     var SelectionArray = this.Internal_Get_SelectionArray();
     if (SelectionArray.length > 0)
     {
         var Pos = SelectionArray[0];
         var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
-        return Cell.Content.Get_StyleFromFormatting();
+        return Cell.Content.GetStyleFromFormatting();
     }
     return null;
 };

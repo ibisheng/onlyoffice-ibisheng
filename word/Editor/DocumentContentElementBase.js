@@ -622,6 +622,10 @@ CDocumentContentElementBase.prototype.CompareDrawingsLogicPositions = function(C
 {
 	return 0;
 };
+CDocumentContentElementBase.prototype.GetStyleFromFormatting = function()
+{
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

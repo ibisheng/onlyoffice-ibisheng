@@ -2507,10 +2507,10 @@ CHeaderFooterController.prototype =
 		return {X : 0, Y : 0, Page : 0};
 	}
 };
-CHeaderFooterController.prototype.Get_StyleFromFormatting = function()
+CHeaderFooterController.prototype.GetStyleFromFormatting = function()
 {
     if (null != this.CurHdrFtr)
-        return this.CurHdrFtr.Content.Get_StyleFromFormatting();
+        return this.CurHdrFtr.Content.GetStyleFromFormatting();
 
     return null;
 };
