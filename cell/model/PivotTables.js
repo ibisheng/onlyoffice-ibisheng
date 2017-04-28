@@ -1686,7 +1686,7 @@ CT_PivotCacheDefinition.prototype.getFields = function () {
 	var res = null;
 	if (this.cacheFields && this.cacheFields.cacheField) {
 		res = [];
-		this.cacheFields.cacheField.each(function (element) {
+		this.cacheFields.cacheField.forEach(function (element) {
 			res.push(element.name);
 		});
 	}
