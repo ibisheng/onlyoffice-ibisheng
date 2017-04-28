@@ -2580,21 +2580,27 @@ CT_pivotTableDefinition.prototype.asc_getStyleInfo = function () {
 	return this.pivotTableStyleInfo;
 };
 CT_pivotTableDefinition.prototype.asc_getFields = function () {
-	return this.cacheDefinition && this.cacheDefinition.getFields();
+	return this.getField(this.pivotFields.pivotField, function (element, index) {
+		return element.name || this.cacheDefinition.getField(index).name;
+	});
 };
 CT_pivotTableDefinition.prototype.asc_getColumnFields = function () {
-	return this.getField(this.colFields);
+	return this.getField(this.colFields.field, function (element) {
+		return this.cacheDefinition.getField(element.x).name;
+	});
 };
 CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
-	return this.getField(this.rowFields);
+	return this.getField(this.rowFields.field, function (element) {
+		return this.cacheDefinition.getField(element.x).name;
+	});
 };
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
-	return this.getField(this.dataFields);
-};
-CT_pivotTableDefinition.prototype.getField = function (arrFields) {
-	return arrFields && arrFields.map(function (element) {
-		return element && this.cacheDefinition.getField(element.x).name;
+	return this.getField(this.dataFields.dataField, function (element) {
+		return element.name;
 	});
+};
+CT_pivotTableDefinition.prototype.getField = function (arrFields, callback) {
+	return arrFields && arrFields.map(callback, this);
 };
 function CT_CacheSource() {
 //Attributes
