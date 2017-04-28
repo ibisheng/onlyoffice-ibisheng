@@ -403,6 +403,12 @@ var editor;
     }
   };
 
+  spreadsheet_api.prototype.asc_ShowSpecialPasteButton = function(props) {
+      if (!this.getViewMode()) {
+          this.wb.showSpecialPasteButton(props);
+      }
+  };
+
   spreadsheet_api.prototype.asc_Cut = function() {
     if (window["AscDesktopEditor"])
     {

@@ -1406,9 +1406,9 @@
 					var position = {x: posX, y: posY};
 					
 					var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
-					worksheet.showSpecialPasteOptions(allowedSpecialPasteProps, null, position);
 					
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
+					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, position: position};
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = cursorPos;
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId = isIntoShape.Id;
 				}
@@ -2560,7 +2560,7 @@
 					
 					style = ' style = "text-decoration:' + underline + ";" + "font-style:" + italic + ";" + "font-weight:" + bold + ";" + '"';
 					$(oldElem).replaceWith("<span" + style +  ">" + value + "</span>");
-				};
+				}
 			},
 			
 			pasteTextOnSheet: function(worksheet, text)
@@ -2602,7 +2602,6 @@
 						{
 							var sProps = Asc.c_oSpecialPasteProps;
 							var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
-							//worksheet.showSpecialPasteOptions(allowedSpecialPasteProps);
 						}
 					};
 					

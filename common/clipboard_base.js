@@ -966,6 +966,7 @@
 		Paste_Process_End : function()
 		{
 			this.pasteStart = false;
+			this.specialPasteProps = null;
 			//процесс специальной вставки заканчивается вместе с общей вставкой
 			if(this.specialPasteStart)
 			{
@@ -973,7 +974,6 @@
 			}
 			else//если не было специальной вставки, необходимо показать кнопку специальной вставки
 			{
-				this.specialPasteProps = null;
 				this.SpecialPasteButton_Show();
 			}
 
@@ -1013,7 +1013,7 @@
 			}
 		},
 		
-		SpecialPasteButton_Update_Position : function(props)
+		SpecialPasteButton_Update_Position : function()
 		{
 			//TODO метод должен быть общий для всех редакторов
 			if(this.showSpecialPasteButton && this.specialPasteButtonProps.fixPosition)

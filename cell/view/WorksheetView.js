@@ -9003,7 +9003,8 @@
 				//matchDestinationFormatting - пока не добавляю, так как работает как и values
 				allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
 			}
-			this.showSpecialPasteOptions(allowedSpecialPasteProps, selectData[0]);
+			g_clipboardBase.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, range: selectData[0]};
+			//this.showSpecialPasteOptions(allowedSpecialPasteProps, selectData[0]);
 		}
 		else
 		{
@@ -10019,11 +10020,14 @@
 		}
 	};
 
-	WorksheetView.prototype.showSpecialPasteOptions = function(props, range, positionShapeContent)
+	WorksheetView.prototype.showSpecialPasteOptions = function(options/*, range, positionShapeContent*/)
 	{
 		var _clipboard = AscCommonExcel.g_clipboardExcel;
 		var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
-		
+
+		var positionShapeContent = options.position;
+		var range = options.range;
+		var props = options.props;
 		var cellCoord;
 		if(!positionShapeContent)
 		{
