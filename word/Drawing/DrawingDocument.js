@@ -3888,6 +3888,10 @@ function CDrawingDocument()
 				if (_object.type == c_oContentControlTrack.In)
 				{
 					_rect = _object.rects[0];
+
+					var _page = this.m_arrPages[_rect.Page];
+					var drPage = _page.drawingPage;
+
 					_x = (drPage.left 	+ dKoefX * (_rect.X + offset_x));
 					_y = (drPage.top 	+ dKoefY * (_rect.Y + offset_y));
 
