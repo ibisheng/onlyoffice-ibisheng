@@ -684,7 +684,7 @@ CTableCell.prototype =
     Content_Reset : function(X, Y, XLimit, YLimit)
     {
         this.Content.Reset( X, Y, XLimit, YLimit );
-        this.Content.Set_CurPosXY( X, Y );
+        this.Content.SetCurPosXY( X, Y );
     },
 
     Content_Get_PageBounds : function(PageIndex)
@@ -875,7 +875,7 @@ CTableCell.prototype =
         return this.Content.GetCurPosXY();
     },
 
-    Content_Set_CurPosXY : function(X, Y)
+    Content_SetCurPosXY : function(X, Y)
     {
         var _X = X, _Y = Y;
         var Transform = this.private_GetTextDirectionTransform();
@@ -885,7 +885,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Set_CurPosXY(_X, _Y);
+        return this.Content.SetCurPosXY(_X, _Y);
     },
 
     Content_MoveCursorUpToLastRow : function(X, Y, AddToSelect)

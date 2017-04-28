@@ -1658,32 +1658,32 @@ CDocumentContent.prototype.CollectDocumentStatistics = function(Stats)
 		Element.CollectDocumentStatistics(Stats);
 	}
 };
-CDocumentContent.prototype.Document_CreateFontMap        = function(FontMap)
+CDocumentContent.prototype.Document_CreateFontMap = function(FontMap)
 {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = this.Content[Index];
-        Element.Document_CreateFontMap(FontMap);
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = this.Content[Index];
+		Element.Document_CreateFontMap(FontMap);
+	}
 };
-CDocumentContent.prototype.Document_CreateFontCharMap    = function(FontCharMap)
+CDocumentContent.prototype.Document_CreateFontCharMap = function(FontCharMap)
 {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = this.Content[Index];
-        Element.Document_CreateFontCharMap(FontCharMap);
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = this.Content[Index];
+		Element.Document_CreateFontCharMap(FontCharMap);
+	}
 };
-CDocumentContent.prototype.Document_Get_AllFontNames     = function(AllFonts)
+CDocumentContent.prototype.Document_Get_AllFontNames = function(AllFonts)
 {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = this.Content[Index];
-        Element.Document_Get_AllFontNames(AllFonts);
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = this.Content[Index];
+		Element.Document_Get_AllFontNames(AllFonts);
+	}
 };
 CDocumentContent.prototype.Document_UpdateInterfaceState = function()
 {
@@ -1941,7 +1941,7 @@ CDocumentContent.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelec
 };
 CDocumentContent.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 {
-	this.Set_CurPosXY(X, Y);
+	this.SetCurPosXY(X, Y);
 	if (true === AddToSelect)
 	{
 		if (true !== this.Selection.Use)
@@ -1999,7 +1999,7 @@ CDocumentContent.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 };
 CDocumentContent.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 {
-	this.Set_CurPosXY(X, Y);
+	this.SetCurPosXY(X, Y);
 	if (true === AddToSelect)
 	{
 		if (true !== this.Selection.Use)
@@ -3607,10 +3607,10 @@ CDocumentContent.prototype.GetCurPosXY = function()
 {
 	return {X : this.CurPos.RealX, Y : this.CurPos.RealY};
 };
-CDocumentContent.prototype.Set_CurPosXY                       = function(X, Y)
+CDocumentContent.prototype.SetCurPosXY = function(X, Y)
 {
-    this.CurPos.RealX = X;
-    this.CurPos.RealY = Y;
+	this.CurPos.RealX = X;
+	this.CurPos.RealY = Y;
 };
 CDocumentContent.prototype.IsSelectionUse = function()
 {

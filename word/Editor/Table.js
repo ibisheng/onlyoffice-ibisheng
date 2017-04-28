@@ -4866,7 +4866,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 	}
 
 	var Pos = this.Internal_GetCellByXY(X, Y, CurPage);
-	this.Content[Pos.Row].Get_Cell(Pos.Cell).Content_Set_CurPosXY(X, Y);
+	this.Content[Pos.Row].Get_Cell(Pos.Cell).Content_SetCurPosXY(X, Y);
 	this.Selection.Data              = null;
 	this.Selection.EndPos.Pos        = Pos;
 	this.Selection.EndPos.X          = X;
@@ -5841,7 +5841,7 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 				if (null === Cell)
 					return true;
 
-				Cell.Content_Set_CurPosXY(X, Y);
+				Cell.Content_SetCurPosXY(X, Y);
 				this.CurCell              = Cell;
 				this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 			}
@@ -5869,7 +5869,7 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 			{
 				this.CurCell = Cell;
 				this.CurCell.Content.MoveCursorToStartPos();
-				this.CurCell.Content_Set_CurPosXY(X, Y);
+				this.CurCell.Content_SetCurPosXY(X, Y);
 
 				return false;
 			}
@@ -5932,7 +5932,7 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 					if (null === Cell)
 						return true;
 
-					Cell.Content_Set_CurPosXY(X, Y);
+					Cell.Content_SetCurPosXY(X, Y);
 					this.CurCell              = Cell;
 					this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 				}
@@ -6021,7 +6021,7 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 				if (null === Cell)
 					return true;
 
-				Cell.Content_Set_CurPosXY(X, Y);
+				Cell.Content_SetCurPosXY(X, Y);
 				this.CurCell              = Cell;
 				this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 			}
@@ -6049,7 +6049,7 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 			{
 				this.CurCell = Cell;
 				this.CurCell.Content.MoveCursorToStartPos();
-				this.CurCell.Content_Set_CurPosXY(X, Y);
+				this.CurCell.Content_SetCurPosXY(X, Y);
 
 				return false;
 			}
@@ -6111,7 +6111,7 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 					if (null === Cell)
 						return true;
 
-					Cell.Content_Set_CurPosXY(X, Y);
+					Cell.Content_SetCurPosXY(X, Y);
 					this.CurCell              = Cell;
 					this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 				}
@@ -6233,7 +6233,7 @@ CTable.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 			if (null === Cell)
 				return true;
 
-			Cell.Content_Set_CurPosXY(X, Y);
+			Cell.Content_SetCurPosXY(X, Y);
 			this.CurCell              = Cell;
 			this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 			this.Internal_Selection_UpdateCells();
@@ -6252,7 +6252,7 @@ CTable.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 
 			// У последней ячейки у первого параграфа, мы выставим RealX, RealY
 			var Cell = this.Content[this.Content.length - 1].Get_Cell(0);
-			Cell.Content_Set_CurPosXY(X, Y);
+			Cell.Content_SetCurPosXY(X, Y);
 		}
 	}
 	else
@@ -6296,7 +6296,7 @@ CTable.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 			if (null === Cell)
 				return true;
 
-			Cell.Content_Set_CurPosXY(X, Y);
+			Cell.Content_SetCurPosXY(X, Y);
 			this.CurCell              = Cell;
 			this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 			this.Internal_Selection_UpdateCells();
@@ -6312,7 +6312,7 @@ CTable.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 
 			// У последней ячейки у первого параграфа, мы выставим RealX, RealY
 			var Cell = this.Content[0].Get_Cell(0);
-			Cell.Content_Set_CurPosXY(X, Y);
+			Cell.Content_SetCurPosXY(X, Y);
 		}
 	}
 	else
