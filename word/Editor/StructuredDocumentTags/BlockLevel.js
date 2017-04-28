@@ -640,6 +640,10 @@ CBlockLevelSdt.prototype.Get_FirstParagraph = function()
 {
 	return this.Content.Get_FirstParagraph();
 };
+CBlockLevelSdt.prototype.StartFromNewPage = function()
+{
+	this.Content.StartFromNewPage();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

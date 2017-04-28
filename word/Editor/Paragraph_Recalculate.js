@@ -395,7 +395,7 @@ Paragraph.prototype.Recalculate_SkipPage = function(PageIndex)
 {
     if (0 === PageIndex)
     {
-        this.Start_FromNewPage();
+        this.StartFromNewPage();
     }
     else
     {
@@ -449,7 +449,7 @@ Paragraph.prototype.PrepareRecalculateObject = function()
 /**
  * Пересчитываем первую страницу параграфа так, чтобы он начинался с новой страницы.
  */
-Paragraph.prototype.Start_FromNewPage = function()
+Paragraph.prototype.StartFromNewPage = function()
 {
     this.Pages.length = 1;
     this.Pages[0] = new CParaPage(this.X, this.Y, this.XLimit, this.YLimit, 0);

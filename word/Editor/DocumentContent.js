@@ -988,7 +988,7 @@ CDocumentContent.prototype.Recalculate_Page               = function(PageIndex, 
                 if ((FrameY2 + FrameH2 > YLimit || Y > YLimit - 0.001 ) && Index != StartIndex)
                 {
                     this.RecalcInfo.Set_FrameRecalc(true);
-                    this.Content[Index].Start_FromNewPage();
+                    this.Content[Index].StartFromNewPage();
                     RecalcResult = recalcresult_NextPage;
                 }
                 else
@@ -1574,13 +1574,13 @@ CDocumentContent.prototype.Is_ContentOnFirstPage         = function()
     var Element = this.Content[0];
     return Element.Is_ContentOnFirstPage();
 };
-CDocumentContent.prototype.Start_FromNewPage             = function()
+CDocumentContent.prototype.StartFromNewPage = function()
 {
-    this.Pages.length = 1;
-    this.Pages[0]     = new CDocumentPage();
+	this.Pages.length = 1;
+	this.Pages[0]     = new CDocumentPage();
 
-    var Element = this.Content[0];
-    Element.Start_FromNewPage();
+	var Element = this.Content[0];
+	Element.StartFromNewPage();
 };
 CDocumentContent.prototype.Get_ParentTextTransform       = function()
 {

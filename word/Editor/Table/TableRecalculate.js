@@ -65,7 +65,7 @@ CTable.prototype.Recalculate_SkipPage = function(PageIndex)
 {
 	if (0 === PageIndex)
 	{
-		this.Start_FromNewPage();
+		this.StartFromNewPage();
 	}
 	else
 	{
@@ -122,7 +122,7 @@ CTable.prototype.PrepareRecalculateObject = function()
 		this.Content[Index].PrepareRecalculateObject();
 	}
 };
-CTable.prototype.Start_FromNewPage = function()
+CTable.prototype.StartFromNewPage = function()
 {
 	this.Pages.length = 1;
 	this.Pages[0]     = new CTablePage(0, 0, 0, 0, 0, 0);
@@ -164,7 +164,7 @@ CTable.prototype.Start_FromNewPage = function()
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell = this.Content[0].Get_Cell(CurCell);
-			Cell.Content.Start_FromNewPage();
+			Cell.Content.StartFromNewPage();
 			Cell.PagesCount = 2;
 		}
 	}
@@ -2437,7 +2437,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
                     continue;
 
-                Cell.Content.Start_FromNewPage();
+                Cell.Content.StartFromNewPage();
                 Cell.PagesCount = 2;
             }
         }
@@ -2485,7 +2485,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
                         continue;
 
-                    Cell.Content.Start_FromNewPage();
+                    Cell.Content.StartFromNewPage();
                     Cell.PagesCount = 2;
                 }
 
