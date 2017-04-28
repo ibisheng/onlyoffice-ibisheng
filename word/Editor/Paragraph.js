@@ -11648,7 +11648,7 @@ Paragraph.prototype.SetContentPosition = function(DocPos, Depth, Flag)
     else
         this.Correct_ContentPos2();
 };
-Paragraph.prototype.Get_DocumentPositionFromObject = function(PosArray)
+Paragraph.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -11656,7 +11656,7 @@ Paragraph.prototype.Get_DocumentPositionFromObject = function(PosArray)
     if (this.Parent)
     {
         PosArray.splice(0, 0, {Class : this.Parent, Position : this.Get_Index()});
-        this.Parent.Get_DocumentPositionFromObject(PosArray);
+        this.Parent.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;

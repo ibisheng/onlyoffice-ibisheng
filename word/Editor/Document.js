@@ -10185,7 +10185,7 @@ CDocument.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 	if (this.Content[Pos])
 		this.Content[Pos].SetContentPosition(_DocPos, Depth + 1, _Flag);
 };
-CDocument.prototype.Get_DocumentPositionFromObject = function(PosArray)
+CDocument.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
 	if (!PosArray)
 		PosArray = [];
@@ -10243,7 +10243,7 @@ CDocument.prototype.private_GetLogicDocumentPosition = function(LogicDocument)
 				return null;
 
 			var DocPos = [{Class : Run, Position : DrawingInRunPos}];
-			Run.Get_DocumentPositionFromObject(DocPos);
+			Run.GetDocumentPositionFromObject(DocPos);
 			return DocPos;
 		}
 	}
@@ -10292,7 +10292,7 @@ CDocument.prototype.Update_ForeignCursor = function(CursorInfo, UserId, Show, Us
 	}
 
 	var CursorPos = [{Class : Run, Position : InRunPos}];
-	Run.Get_DocumentPositionFromObject(CursorPos);
+	Run.GetDocumentPositionFromObject(CursorPos);
 	this.CollaborativeEditing.Add_ForeignCursor(UserId, CursorPos, UserShortId);
 
 	if (true === Show)

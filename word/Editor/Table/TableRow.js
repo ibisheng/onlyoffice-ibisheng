@@ -746,7 +746,7 @@ CTableRow.prototype =
     {
     }
 };
-CTableRow.prototype.Get_DocumentPositionFromObject = function(PosArray)
+CTableRow.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -754,7 +754,7 @@ CTableRow.prototype.Get_DocumentPositionFromObject = function(PosArray)
     if (this.Table)
     {
         PosArray.splice(0, 0, {Class : this.Table, Position : this.Index});
-        this.Table.Get_DocumentPositionFromObject(PosArray);
+        this.Table.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;

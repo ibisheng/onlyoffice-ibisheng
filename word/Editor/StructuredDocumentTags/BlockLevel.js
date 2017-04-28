@@ -823,6 +823,16 @@ CBlockLevelSdt.prototype.GetTopElement = function()
 
 	return this.Parent.GetTopElement();
 };
+CBlockLevelSdt.prototype.GetDocumentPositionFromObject = function(PosArray)
+{
+	if (!PosArray)
+		PosArray = [];
+
+	if (this.Parent && this.Parent.GetDocumentPositionFromObject)
+		this.Parent.GetDocumentPositionFromObject(PosArray);
+
+	return PosArray;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;

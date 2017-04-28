@@ -1828,7 +1828,7 @@ CTableCell.prototype.Get_SectPr = function()
 
     return null;
 };
-CTableCell.prototype.Get_DocumentPositionFromObject = function(PosArray)
+CTableCell.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -1836,7 +1836,7 @@ CTableCell.prototype.Get_DocumentPositionFromObject = function(PosArray)
     if (this.Row)
     {
         PosArray.splice(0, 0, {Class : this.Row, Position : this.Index});
-        this.Row.Get_DocumentPositionFromObject(PosArray);
+        this.Row.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;

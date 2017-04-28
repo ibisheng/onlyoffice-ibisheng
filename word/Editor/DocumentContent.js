@@ -8184,13 +8184,13 @@ CDocumentContent.prototype.GetContentPosition = function(bSelection, bStart, Pos
 
     return PosArray;
 };
-CDocumentContent.prototype.Get_DocumentPositionFromObject = function(PosArray)
+CDocumentContent.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
 
-    if (this.Parent && this.Parent.Get_DocumentPositionFromObject)
-        this.Parent.Get_DocumentPositionFromObject(PosArray);
+    if (this.Parent && this.Parent.GetDocumentPositionFromObject)
+        this.Parent.GetDocumentPositionFromObject(PosArray);
 
     return PosArray;
 };

@@ -11381,7 +11381,7 @@ CTable.prototype.Get_Index = function()
     this.Parent.Update_ContentIndexing();
     return this.Index;
 };
-CTable.prototype.Get_DocumentPositionFromObject = function(PosArray)
+CTable.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -11389,7 +11389,7 @@ CTable.prototype.Get_DocumentPositionFromObject = function(PosArray)
     if (this.Parent)
     {
         PosArray.splice(0, 0, {Class : this.Parent, Position : this.Get_Index()});
-        this.Parent.Get_DocumentPositionFromObject(PosArray);
+        this.Parent.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;

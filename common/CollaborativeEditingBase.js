@@ -1422,7 +1422,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
         {
             DocPos.length = 0;
             DocPos.push({Class : Run, Position : NewDocPos[0].Position});
-            Run.Get_DocumentPositionFromObject(DocPos);
+            Run.GetDocumentPositionFromObject(DocPos);
         }
     }
     // Возможно ран с позицией переместился в другой класс
@@ -1435,7 +1435,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
         {
             DocPos.length = 0;
             DocPos.push({Class : Run, Position : RunPos});
-            Run.Get_DocumentPositionFromObject(DocPos);
+            Run.GetDocumentPositionFromObject(DocPos);
         }
     }
 };

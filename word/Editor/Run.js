@@ -8923,7 +8923,7 @@ ParaRun.prototype.Get_ClassesByPos = function(Classes, ContentPos, Depth)
 {
     Classes.push(this);
 };
-ParaRun.prototype.Get_DocumentPositionFromObject = function(PosArray)
+ParaRun.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -8946,7 +8946,7 @@ ParaRun.prototype.Get_DocumentPositionFromObject = function(PosArray)
             PosArray.splice(0, 0, {Class : this.Paragraph, Position : ParaContentPos.Get(0)});
         }
 
-        this.Paragraph.Get_DocumentPositionFromObject(PosArray);
+        this.Paragraph.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;

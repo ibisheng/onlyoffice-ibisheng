@@ -98,7 +98,7 @@ CGraphicFrame.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBa
 CGraphicFrame.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 CGraphicFrame.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
-CGraphicFrame.prototype.Get_DocumentPositionFromObject= function(PosArray)
+CGraphicFrame.prototype.GetDocumentPositionFromObject= function(PosArray)
     {
         if (!PosArray)
             PosArray = [];
