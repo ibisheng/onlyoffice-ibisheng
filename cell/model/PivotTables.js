@@ -2596,7 +2596,7 @@ CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
 };
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.getField(this.dataFields.dataField, function (element) {
-		return element.name;
+		return element.name || this.cacheDefinition.getField(element.fld).name;
 	});
 };
 CT_pivotTableDefinition.prototype.getField = function (arrFields, callback) {
