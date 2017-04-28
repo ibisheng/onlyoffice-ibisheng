@@ -9086,7 +9086,7 @@ Paragraph.prototype.Get_CurrentPage_Relative = function()
 	this.Internal_Recalculate_CurPos(this.CurPos.ContentPos, true, false, false);
 	return this.private_GetRelativePageIndex(this.CurPos.PagesPos);
 };
-Paragraph.prototype.DocumentStatistics = function(Stats)
+Paragraph.prototype.CollectDocumentStatistics = function(Stats)
 {
 	var ParaStats = new CParagraphStatistics(Stats);
 	var Count     = this.Content.length;
@@ -9094,7 +9094,7 @@ Paragraph.prototype.DocumentStatistics = function(Stats)
 	for (var Index = 0; Index < Count; Index++)
 	{
 		var Item = this.Content[Index];
-		Item.Collect_DocumentStatistics(ParaStats);
+		Item.CollectDocumentStatistics(ParaStats);
 	}
 
 	var NumPr = this.Numbering_Get();
@@ -9104,7 +9104,7 @@ Paragraph.prototype.DocumentStatistics = function(Stats)
 		var AbstractNum          = this.Parent.Get_Numbering().Get_AbstractNum(NumPr.NumId);
 
 		if (undefined !== AbstractNum && null !== AbstractNum)
-			AbstractNum.DocumentStatistics(NumPr.Lvl, Stats);
+			AbstractNum.CollectDocumentStatistics(NumPr.Lvl, Stats);
 	}
 
 	if (false === ParaStats.EmptyParagraph)

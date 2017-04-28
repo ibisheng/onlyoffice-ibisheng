@@ -1627,9 +1627,9 @@ ParaMath.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, De
 {
 };
 
-ParaMath.prototype.Collect_DocumentStatistics = function(ParaStats)
+ParaMath.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-    // TODO: ParaMath.Collect_DocumentStatistics
+    // TODO: ParaMath.CollectDocumentStatistics
 };
 
 ParaMath.prototype.Create_FontMap = function(Map)

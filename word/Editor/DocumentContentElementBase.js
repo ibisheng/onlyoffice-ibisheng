@@ -615,6 +615,9 @@ CDocumentContentElementBase.prototype.Get_FirstParagraph = function()
 CDocumentContentElementBase.prototype.StartFromNewPage = function()
 {
 };
+CDocumentContentElementBase.prototype.CollectDocumentStatistics = function(Stats)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

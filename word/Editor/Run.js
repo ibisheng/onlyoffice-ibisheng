@@ -1967,43 +1967,43 @@ ParaRun.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Dep
     }
 };
 
-ParaRun.prototype.Collect_DocumentStatistics = function(ParaStats)
+ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        var Item = this.Content[Index];
-        var ItemType = Item.Type;
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Item     = this.Content[Index];
+		var ItemType = Item.Type;
 
-        var bSymbol  = false;
-        var bSpace   = false;
-        var bNewWord = false;
+		var bSymbol  = false;
+		var bSpace   = false;
+		var bNewWord = false;
 
-        if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
-        {
-            if ( false === ParaStats.Word )
-                bNewWord = true;
+		if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
+		{
+			if (false === ParaStats.Word)
+				bNewWord = true;
 
-            bSymbol = true;
-            bSpace  = false;
+			bSymbol = true;
+			bSpace  = false;
 
-            ParaStats.Word           = true;
-            ParaStats.EmptyParagraph = false;
-        }
-        else if ((para_Text === ItemType && true === Item.Is_NBSP()) || para_Space === ItemType || para_Tab === ItemType)
-        {
-            bSymbol = true;
-            bSpace  = true;
+			ParaStats.Word           = true;
+			ParaStats.EmptyParagraph = false;
+		}
+		else if ((para_Text === ItemType && true === Item.Is_NBSP()) || para_Space === ItemType || para_Tab === ItemType)
+		{
+			bSymbol = true;
+			bSpace  = true;
 
-            ParaStats.Word = false;
-        }
+			ParaStats.Word = false;
+		}
 
-        if ( true === bSymbol )
-            ParaStats.Stats.Add_Symbol( bSpace );
+		if (true === bSymbol)
+			ParaStats.Stats.Add_Symbol(bSpace);
 
-        if ( true === bNewWord )
-            ParaStats.Stats.Add_Word();
-    }
+		if (true === bNewWord)
+			ParaStats.Stats.Add_Word();
+	}
 };
 
 ParaRun.prototype.Create_FontMap = function(Map)

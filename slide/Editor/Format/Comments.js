@@ -136,7 +136,7 @@ ParaComment.prototype =
     {
     },
 
-    Collect_DocumentStatistics : function(ParaStats)
+	CollectDocumentStatistics : function(ParaStats)
     {
     },
 

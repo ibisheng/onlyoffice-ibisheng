@@ -1582,14 +1582,12 @@ CDocumentContent.prototype.StartFromNewPage = function()
 	var Element = this.Content[0];
 	Element.StartFromNewPage();
 };
-CDocumentContent.prototype.Get_ParentTextTransform       = function()
+CDocumentContent.prototype.Get_ParentTextTransform = function()
 {
-    if (this.Parent)
-    {
-        return this.Parent.Get_ParentTextTransform();
-    }
+	if (this.Parent)
+		return this.Parent.Get_ParentTextTransform();
 
-    return null;
+	return null;
 };
 CDocumentContent.prototype.IsTableBorder = function(X, Y, CurPage)
 {
@@ -1651,14 +1649,14 @@ CDocumentContent.prototype.Get_CurrentPage_Relative = function()
 {
 	return this.CurPage;
 };
-CDocumentContent.prototype.DocumentStatistics            = function(Stats)
+CDocumentContent.prototype.CollectDocumentStatistics = function(Stats)
 {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-    {
-        var Element = this.Content[Index];
-        Element.DocumentStatistics(Stats);
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Element = this.Content[Index];
+		Element.CollectDocumentStatistics(Stats);
+	}
 };
 CDocumentContent.prototype.Document_CreateFontMap        = function(FontMap)
 {

@@ -3191,7 +3191,7 @@ CTable.prototype.Start_TrackTable = function()
 
 	this.private_StartTrackTable(CurPage);
 };
-CTable.prototype.DocumentStatistics = function(Stats)
+CTable.prototype.CollectDocumentStatistics = function(Stats)
 {
 	for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
 	{
@@ -3200,7 +3200,7 @@ CTable.prototype.DocumentStatistics = function(Stats)
 
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
-			Row.Get_Cell(CurCell).Content.DocumentStatistics(Stats);
+			Row.Get_Cell(CurCell).Content.CollectDocumentStatistics(Stats);
 		}
 	}
 };

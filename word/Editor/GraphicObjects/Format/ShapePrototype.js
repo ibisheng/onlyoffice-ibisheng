@@ -839,7 +839,7 @@ CShape.prototype.Get_TextBackGroundColor = function()
 CShape.prototype.documentStatistics = function(stats)
 {
     var content = this.getDocContent();
-    return content && content.DocumentStatistics(stats);
+    return content && content.CollectDocumentStatistics(stats);
 };
 
 CShape.prototype.checkPosTransformText = function()

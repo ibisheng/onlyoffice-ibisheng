@@ -644,6 +644,10 @@ CBlockLevelSdt.prototype.StartFromNewPage = function()
 {
 	this.Content.StartFromNewPage();
 };
+CBlockLevelSdt.prototype.CollectDocumentStatistics = function(Stats)
+{
+	return this.Content.CollectDocumentStatistics(Stats);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

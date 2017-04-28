@@ -1005,11 +1005,11 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_PrevRunElements = functi
         CurPos--;
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Collect_DocumentStatistics = function(ParaStats)
+CParagraphContentWithParagraphLikeContent.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-        this.Content[Index].Collect_DocumentStatistics( ParaStats );
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+		this.Content[Index].CollectDocumentStatistics(ParaStats);
 };
 CParagraphContentWithParagraphLikeContent.prototype.Create_FontMap = function(Map)
 {

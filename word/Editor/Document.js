@@ -10810,7 +10810,7 @@ CDocument.prototype.Statistics_GetParagraphsInfo = function()
 	for (Index = this.Statistics.StartPos; Index < Count; ++Index, ++CurIndex)
 	{
 		var Element = this.Content[Index];
-		Element.DocumentStatistics(this.Statistics);
+		Element.CollectDocumentStatistics(this.Statistics);
 
 		if (CurIndex > 20)
 		{
