@@ -2145,13 +2145,16 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.continueInsertDocumentUrls = function()
 	{
-		var oSdt = this.insertDocumentUrlsData.oSdt;
-		if(oSdt && oSdt.Content.Get_ElementsCount() > 1){
-			oSdt.Content.Remove_FromContent(oSdt.Content.Get_ElementsCount() - 1 , 1);
-			oSdt.MoveCursorToEndPos(false, false);
+		if(this.insertDocumentUrlsData)
+		{
+			var oSdt = this.insertDocumentUrlsData.oSdt;
+			if(oSdt && oSdt.Content.Get_ElementsCount() > 1){
+				oSdt.Content.Remove_FromContent(oSdt.Content.Get_ElementsCount() - 1 , 1);
+				oSdt.MoveCursorToEndPos(false, false);
+			}
+			this.WordControl.m_oLogicDocument.MoveCursorRight(false, false, true);
+			this.WordControl.m_oLogicDocument.Recalculate();
 		}
-		this.WordControl.m_oLogicDocument.MoveCursorRight(false, false, true);
-		this.WordControl.m_oLogicDocument.Recalculate();
 		if (this.insertDocumentUrlsData && this.insertDocumentUrlsData.documents.length > 0) {
 			this.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
 		} else {
