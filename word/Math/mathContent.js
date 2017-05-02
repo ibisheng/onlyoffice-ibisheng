@@ -7239,6 +7239,142 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
     }
 };
 
+CMathContent.prototype.GetTextContent = function(arr, str)
+{
+    if(!arr)
+    {
+		arr = [];
+    }
+
+	if(!str)
+	{
+		str = "";
+	}
+
+    var getMathSymbol = function(elem)
+    {
+		var res = "";
+
+        if(elem instanceof CDegree)
+        {
+            res = "^";
+        }
+		else if(elem instanceof CDelimiter)
+		{
+			res = "Delimiter";
+		}
+		else if(elem instanceof CNary)
+		{
+			res = "CNary";
+		}
+		else if(elem instanceof CFraction)
+		{
+			res = "/";
+		}
+		else if(elem instanceof CRadical)
+		{
+			res = "√";//8730
+		}
+
+        return res;
+    };
+
+	for(var i = 0; i < this.Content.length; i++)
+    {
+		switch(this.Content[i].Type)
+        {
+			case para_Math_Run:
+            {
+                for(var j = 0; j < this.Content[i].Content.length; j++)
+                {
+                    if(para_Math_Content === this.Content[i].Content[j].Type)
+                    {
+						str = this.Content[i].Content[j].GetTextContent(arr, str);
+                    }
+					else if(para_Math_Text === this.Content[i].Content[j].Type)
+					{
+						arr.push(String.fromCharCode(this.Content[i].Content[j].value));
+						str += String.fromCharCode(this.Content[i].Content[j].value);
+					}
+					else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
+					{
+						arr.push(String.fromCharCode(this.Content[i].Content[j].value));
+						str += String.fromCharCode(this.Content[i].Content[j].value);
+					}
+
+                }
+
+                break;
+			}
+			case para_Math_Composition:
+			{
+				var symbol = getMathSymbol(this.Content[i]);
+
+			    for(var j = 0; j < this.Content[i].Content.length; j++)
+				{
+					if(para_Math_Content === this.Content[i].Content[j].Type)
+					{
+						if(this.Content[i].Content.length > 1)
+						{
+							arr.push("(");
+							str += "(";
+						}
+					    str = this.Content[i].Content[j].GetTextContent(arr, str);
+						if(this.Content[i].Content.length > 1)
+						{
+							arr.push(")");
+							str += ")";
+						}
+
+					    if(j !== this.Content[i].Content.length - 1)
+                        {
+							/*if(this.Content[i].Content.length > 1)
+							{
+								arr.push(")");
+								str += ")";
+							}*/
+
+                            arr.push(symbol);
+							str += symbol;
+
+							/*if(this.Content[i].Content.length > 1)
+							{
+								arr.push("(");
+								str += "(";
+							}*/
+                        }
+					}
+					else if(para_Math_Text === this.Content[i].Content[j].Type)
+					{
+						arr.push(String.fromCharCode(this.Content[i].Content[j].value));
+						str += String.fromCharCode(this.Content[i].Content[j].value);
+					}
+					else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
+					{
+						arr.push(String.fromCharCode(this.Content[i].Content[j].value));
+						str += String.fromCharCode(this.Content[i].Content[j].value);
+					}
+				}
+
+				/*if(this.Content[i].Content.length > 1)
+				{
+					arr.push(")");
+					str += ")";
+				}*/
+
+			    break;
+			}
+			case para_Math_Text:
+            {
+				arr.push(String.fromCharCode(this.Content[i].value));
+				str += String.fromCharCode(this.Content[i].value);
+                break;
+            }
+		}
+    }
+
+    return str;
+};
 
 function CMathBracketAcc()
 {

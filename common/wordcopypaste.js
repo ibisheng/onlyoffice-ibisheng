@@ -2501,6 +2501,9 @@ PasteProcessor.prototype =
 	_convertParaMathToText: function(paraMath)
 	{
 		//TODO пока добавляю функцию здесь. должна она находиться в Math.js
+		var res = paraMath.Root.GetTextContent();
+		console.log(res);
+		return res;
 	},
 
 	_convertTableToText: function(table, obj, newParagraph)
