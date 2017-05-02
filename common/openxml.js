@@ -108,6 +108,7 @@
 		parser.parse(xml);
 	};
 	openXml.SaxParserBase = SaxParserBase;
+	openXml.SaxParserDataTransfer = {};
 
 	function ContentTypes(){
 		this.Defaults = {};

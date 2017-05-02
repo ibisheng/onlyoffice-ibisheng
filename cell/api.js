@@ -979,10 +979,11 @@ var editor;
 				if (err) {
 					reject(err); // or handle err
 				} else {
+					openXml.SaxParserDataTransfer.wb = wb;
 					var doc = new openXml.OpenXmlPackage();
 					var wbPart = null;
 					var wbXml = null;
-					require('jszip').loadAsync(data).then(function(zip) {
+					var loadAsyncFile = require('jszip').loadAsync(data).then(function(zip) {
 						return doc.openFromZip(zip);
 					}).then(function() {
 						wbPart = doc.getPartByRelationshipType(openXml.relationshipTypes.workbook);
@@ -1051,7 +1052,10 @@ var editor;
 								});
 							}, Promise.resolve());
 						}
-					}).then(function() {
+					});
+					Promise.all([loadAsyncFile, Asc.ReadDefTableStyles(wb)]).then(function() {
+						//clean up
+						openXml.SaxParserDataTransfer = {};
 						resolve();
 					}).catch(function(err) {
 						reject(err);

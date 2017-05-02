@@ -48,6 +48,7 @@ var gc_nMaxDigCountView = AscCommon.gc_nMaxDigCountView;
 var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
 var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
 	var History = AscCommon.History;
+	var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
@@ -480,6 +481,28 @@ g_oColorManager = new ColorManager();
 		}
 	};
 
+	function readValAttr(attr){
+		if(attr()){
+			var val = attr()["val"];
+			return val ? val : null;
+		}
+		return null;
+	}
+	function getNumFromXml(val) {
+		return val ? val - 0 : null;
+	}
+	function getColorFromXml(attr) {
+		if(attr()){
+			var vals = attr();
+			if(null != vals["theme"]) {
+				return AscCommonExcel.g_oColorManager.getThemeColor(getNumFromXml(vals["theme"]), getNumFromXml(vals["tint"]));
+			} else if(null != vals["rgb"]){
+				return new AscCommonExcel.RgbColor(0x00ffffff & getNumFromXml(vals["rgb"]));
+			}
+		}
+		return null;
+	}
+
 var g_oFontProperties = {
 		fn: 0,
 		scheme: 1,
@@ -774,7 +797,257 @@ var g_oFontProperties = {
 				break;
 		}
 	};
-var g_oFillProperties = {
+	Font.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if("b" === elem){
+			this.b = getBoolFromXml(readValAttr(attr));
+		} else if("color" === elem){
+			this.c = getColorFromXml(attr);
+		} else if("i" === elem){
+			this.i = getBoolFromXml(readValAttr(attr));
+		} else if("name" === elem){
+			this.fn = readValAttr(attr);
+		} else if("scheme" === elem){
+			this.scheme = readValAttr(attr);
+		} else if("strike" === elem){
+			this.s = getBoolFromXml(readValAttr(attr));
+		} else if("sz" === elem){
+			this.fs = getNumFromXml(readValAttr(attr));
+		} else if("u" === elem){
+			switch (readValAttr(attr)) {
+				case "single":
+					this.u = Asc.EUnderline.underlineSingle;
+					break;
+				case "double":
+					this.u = Asc.EUnderline.underlineDouble;
+					break;
+				case "singleAccounting":
+					this.u = Asc.EUnderline.underlineSingleAccounting;
+					break;
+				case "doubleAccounting":
+					this.u = Asc.EUnderline.underlineDoubleAccounting;
+					break;
+				case "none":
+					this.u = Asc.EUnderline.underlineNone;
+					break;
+			}
+		} else if("vertAlign" === elem){
+			switch (readValAttr(attr)) {
+				case "baseline":
+					this.va = AscCommon.vertalign_Baseline;
+					break;
+				case "superscript":
+					this.va = AscCommon.vertalign_SuperScript;
+					break;
+				case "subscript":
+					this.va = AscCommon.vertalign_SubScript;
+					break;
+			}
+		} else {
+			newContext = null;
+		}
+		return newContext;
+	};
+
+	var st_gradienttypeLINEAR = 0;
+	var st_gradienttypePATH = 1;
+
+	var st_patterntypeNONE = 0;
+	var st_patterntypeSOLID = 1;
+	var st_patterntypeMEDIUMGRAY = 2;
+	var st_patterntypeDARKGRAY = 3;
+	var st_patterntypeLIGHTGRAY = 4;
+	var st_patterntypeDARKHORIZONTAL = 5;
+	var st_patterntypeDARKVERTICAL = 6;
+	var st_patterntypeDARKDOWN = 7;
+	var st_patterntypeDARKUP = 8;
+	var st_patterntypeDARKGRID = 9;
+	var st_patterntypeDARKTRELLIS = 10;
+	var st_patterntypeLIGHTHORIZONTAL = 11;
+	var st_patterntypeLIGHTVERTICAL = 12;
+	var st_patterntypeLIGHTDOWN = 13;
+	var st_patterntypeLIGHTUP = 14;
+	var st_patterntypeLIGHTGRID = 15;
+	var st_patterntypeLIGHTTRELLIS = 16;
+	var st_patterntypeGRAY125 = 17;
+	var st_patterntypeGRAY0625 = 18;
+
+	function FromXml_ST_GradientType(val) {
+		var res = -1;
+		if ("linear" === val) {
+			res = st_gradienttypeLINEAR;
+		} else if ("path" === val) {
+			res = st_gradienttypePATH;
+		}
+		return res;
+	}
+
+	function FromXml_ST_PatternType(val) {
+		var res = -1;
+		if ("none" === val) {
+			res = st_patterntypeNONE;
+		} else if ("solid" === val) {
+			res = st_patterntypeSOLID;
+		} else if ("mediumGray" === val) {
+			res = st_patterntypeMEDIUMGRAY;
+		} else if ("darkGray" === val) {
+			res = st_patterntypeDARKGRAY;
+		} else if ("lightGray" === val) {
+			res = st_patterntypeLIGHTGRAY;
+		} else if ("darkHorizontal" === val) {
+			res = st_patterntypeDARKHORIZONTAL;
+		} else if ("darkVertical" === val) {
+			res = st_patterntypeDARKVERTICAL;
+		} else if ("darkDown" === val) {
+			res = st_patterntypeDARKDOWN;
+		} else if ("darkUp" === val) {
+			res = st_patterntypeDARKUP;
+		} else if ("darkGrid" === val) {
+			res = st_patterntypeDARKGRID;
+		} else if ("darkTrellis" === val) {
+			res = st_patterntypeDARKTRELLIS;
+		} else if ("lightHorizontal" === val) {
+			res = st_patterntypeLIGHTHORIZONTAL;
+		} else if ("lightVertical" === val) {
+			res = st_patterntypeLIGHTVERTICAL;
+		} else if ("lightDown" === val) {
+			res = st_patterntypeLIGHTDOWN;
+		} else if ("lightUp" === val) {
+			res = st_patterntypeLIGHTUP;
+		} else if ("lightGrid" === val) {
+			res = st_patterntypeLIGHTGRID;
+		} else if ("lightTrellis" === val) {
+			res = st_patterntypeLIGHTTRELLIS;
+		} else if ("gray125" === val) {
+			res = st_patterntypeGRAY125;
+		} else if ("gray0625" === val) {
+			res = st_patterntypeGRAY0625;
+		}
+		return res;
+	}
+
+	function CT_GradientFill() {
+		//Attributes
+		this.type = null;//linear
+		this.degree = null;//0
+		this.left = null;//0
+		this.right = null;//0
+		this.top = null;//0
+		this.bottom = null;//0
+		//Members
+		this.stop = [];
+	}
+
+	CT_GradientFill.prototype.readAttributes = function(attr, uq) {
+		if (attr()) {
+			var vals = attr();
+			var val;
+			val = vals["type"];
+			if (undefined !== val) {
+				val = FromXml_ST_GradientType(val);
+				if (-1 !== val) {
+					this.type = val;
+				}
+			}
+			val = vals["degree"];
+			if (undefined !== val) {
+				this.degree = val - 0;
+			}
+			val = vals["left"];
+			if (undefined !== val) {
+				this.left = val - 0;
+			}
+			val = vals["right"];
+			if (undefined !== val) {
+				this.right = val - 0;
+			}
+			val = vals["top"];
+			if (undefined !== val) {
+				this.top = val - 0;
+			}
+			val = vals["bottom"];
+			if (undefined !== val) {
+				this.bottom = val - 0;
+			}
+		}
+	};
+	CT_GradientFill.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if ("stop" === elem) {
+			newContext = new CT_GradientStop();
+			if (newContext.readAttributes) {
+				newContext.readAttributes(attr, uq);
+			}
+			this.stop.push(newContext);
+		}
+		else {
+			newContext = null;
+		}
+		return newContext;
+	};
+	function CT_GradientStop() {
+		//Attributes
+		this.position = null;
+		//Members
+		this.color = null;
+	}
+
+	CT_GradientStop.prototype.readAttributes = function(attr, uq) {
+		if (attr()) {
+			var vals = attr();
+			var val;
+			val = vals["position"];
+			if (undefined !== val) {
+				this.position = val - 0;
+			}
+		}
+	};
+	CT_GradientStop.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if ("color" === elem) {
+			this.color = getColorFromXml(attr);
+		}
+		else {
+			newContext = null;
+		}
+		return newContext;
+	};
+	function CT_PatternFill() {
+		//Attributes
+		this.patternType = null;
+		//Members
+		this.fgColor = null;
+		this.bgColor = null;
+	}
+
+	CT_PatternFill.prototype.readAttributes = function(attr, uq) {
+		if (attr()) {
+			var vals = attr();
+			var val;
+			val = vals["patternType"];
+			if (undefined !== val) {
+				val = FromXml_ST_PatternType(val);
+				if (-1 !== val) {
+					this.patternType = val;
+				}
+			}
+		}
+	};
+	CT_PatternFill.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if ("fgColor" === elem) {
+			this.fgColor = getColorFromXml(attr);
+		}
+		else if ("bgColor" === elem) {
+			this.bgColor = getColorFromXml(attr);
+		}
+		else {
+			newContext = null;
+		}
+		return newContext;
+	};
+
+	var g_oFillProperties = {
 		bg: 0
 	};
 /** @constructor */
@@ -848,8 +1121,90 @@ Fill.prototype =
 		{
 			case this.Properties.bg: this.bg = value;break;
 		}
+	},
+	onStartNode : function(elem, attr, uq) {
+		var newContext = this;
+		if("gradientFill" === elem){
+			newContext = new CT_GradientFill();
+			if(newContext.readAttributes){
+				newContext.readAttributes(attr, uq);
+			}
+		}
+		else if("patternFill" === elem){
+			newContext = new CT_PatternFill();
+			if(newContext.readAttributes){
+				newContext.readAttributes(attr, uq);
+			}
+		}
+		else {
+			newContext = null;
+		}
+		return newContext;
+	},
+	onEndNode : function(prevContext, elem) {
+		if("gradientFill" === elem){
+			if(prevContext.stop.length > 0){
+				var stop = prevContext.stop[0];
+				if(stop.color){
+					this.bg = stop.color;
+				}
+			}
+		}
+		else if("patternFill" === elem) {
+			if(st_patterntypeNONE !== prevContext.patternType)
+			{
+				if(openXml.SaxParserDataTransfer.priorityBg)
+				{
+					if(prevContext.bgColor)
+						this.bg = prevContext.bgColor;
+					else if(prevContext.fgColor)
+						this.bg = prevContext.fgColor;
+				}
+				else
+				{
+					if(prevContext.fgColor)
+						this.bg = prevContext.fgColor;
+					else if(prevContext.bgColor)
+						this.bg = prevContext.bgColor;
+				}
+			}
+		}
 	}
 };
+	function FromXml_ST_BorderStyle(val) {
+		var res = -1;
+		if ("none" === val) {
+			res = c_oAscBorderStyles.None;
+		} else if ("thin" === val) {
+			res = c_oAscBorderStyles.Thin;
+		} else if ("medium" === val) {
+			res = c_oAscBorderStyles.Medium;
+		} else if ("dashed" === val) {
+			res = c_oAscBorderStyles.Dashed;
+		} else if ("dotted" === val) {
+			res = c_oAscBorderStyles.Dotted;
+		} else if ("thick" === val) {
+			res = c_oAscBorderStyles.Thick;
+		} else if ("double" === val) {
+			res = c_oAscBorderStyles.Double;
+		} else if ("hair" === val) {
+			res = c_oAscBorderStyles.Hair;
+		} else if ("mediumDashed" === val) {
+			res = c_oAscBorderStyles.MediumDashed;
+		} else if ("dashDot" === val) {
+			res = c_oAscBorderStyles.DashDot;
+		} else if ("mediumDashDot" === val) {
+			res = c_oAscBorderStyles.MediumDashDot;
+		} else if ("dashDotDot" === val) {
+			res = c_oAscBorderStyles.DashDotDot;
+		} else if ("mediumDashDotDot" === val) {
+			res = c_oAscBorderStyles.MediumDashDotDot;
+		} else if ("slantDashDot" === val) {
+			res = c_oAscBorderStyles.SlantDashDot;
+		}
+		return res;
+	}
+
 	var g_oBorderPropProperties = {
 		s: 0, c: 1
 	};
@@ -974,6 +1329,29 @@ Fill.prototype =
 				this.c = value;
 				break;
 		}
+	};
+	BorderProp.prototype.readAttributes = function(attr, uq) {
+		if(attr()){
+			var vals = attr();
+			var val;
+			val = vals["style"];
+			if(undefined !== val){
+				val = FromXml_ST_BorderStyle(val);
+				if(-1 !== val){
+					this.setStyle(val);
+				}
+			}
+		}
+	};
+	BorderProp.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if("color" === elem){
+			this.c = getColorFromXml(attr);
+		}
+		else {
+			newContext = null;
+		}
+		return newContext;
 	};
 var g_oBorderProperties = {
 		l: 0,
@@ -1200,6 +1578,76 @@ var g_oBorderProperties = {
 			(this.t && c_oAscBorderStyles.None !== this.t.s) || (this.b && c_oAscBorderStyles.None !== this.b.s) ||
 			(this.dd && c_oAscBorderStyles.None !== this.dd.s) || (this.du && c_oAscBorderStyles.None !== this.du.s);
 	};
+	Border.prototype.readAttributes = function(attr, uq) {
+		if(attr()){
+			var vals = attr();
+			var val;
+			val = vals["diagonalUp"];
+			if(undefined !== val){
+				this.du = getBoolFromXml(val);
+			}
+			val = vals["diagonalDown"];
+			if(undefined !== val){
+				this.dd = getBoolFromXml(val);
+			}
+		}
+	};
+	Border.prototype.onStartNode = function(elem, attr, uq) {
+		var newContext = this;
+		if("start" === elem || "left" === elem){
+			newContext = new BorderProp();
+			if(newContext.readAttributes){
+				newContext.readAttributes(attr, uq);
+			}
+			this.l = newContext;
+		}
+		else if("end" === elem || "right" === elem){
+			newContext = new BorderProp();
+			if(newContext.readAttributes){
+				newContext.readAttributes(attr, uq);
+			}
+			this.r = newContext;
+		}
+		else if("top" === elem){
+			newContext = new BorderProp();
+			if(newContext.readAttributes){
+				newContext.readAttributes(attr, uq);
+			}
+			this.t = newContext;
+		}
+		else if("bottom" === elem){
+			newContext = new BorderProp();
+			if(newContext.readAttributes){
+				newContext.readAttributes(attr, uq);
+			}
+			this.b = newContext;
+		}
+		else if("diagonal" === elem){
+			newContext = new BorderProp();
+			if(newContext.readAttributes){
+				newContext.readAttributes(attr, uq);
+			}
+			this.d = newContext;
+		}
+		else if("vertical" === elem){
+			newContext = new BorderProp();
+			if(newContext.readAttributes){
+				newContext.readAttributes(attr, uq);
+			}
+			this.iv = newContext;
+		}
+		else if("horizontal" === elem){
+			newContext = new BorderProp();
+			if(newContext.readAttributes){
+				newContext.readAttributes(attr, uq);
+			}
+			this.ih = newContext;
+		}
+		else {
+			newContext = null;
+		}
+		return newContext;
+	};
 var g_oNumProperties = {
 		f: 0
 	};
@@ -1358,6 +1806,27 @@ Num.prototype =
 		{
 			case this.Properties.f: this.setFormat(value);break;
 		}
+	},
+	readAttributes : function(attr, uq) {
+		if (attr()) {
+			var vals = attr();
+			var val;
+			val = vals["numFmtId"];
+			var sFormat = null;
+			var id;
+			if (undefined !== val) {
+				id = val - 0;
+			}
+			val = vals["formatCode"];
+			if (undefined !== val) {
+				sFormat = uq(val);
+			}
+			this.f = null != sFormat ? sFormat : (AscCommonExcel.aStandartNumFormats[id] || "General");
+			if ((5 <= id && id <= 8) || (14 <= id && id <= 17) || 22 == id || (27 <= id && id <= 31) ||
+				(36 <= id && id <= 44)) {
+				this.id = id;
+			}
+		}
 	}
 };
 var g_oCellXfsProperties = {
@@ -1496,6 +1965,45 @@ CellXfs.prototype =
 		}
 	}
 };
+
+	function FromXml_ST_HorizontalAlignment(val) {
+		var res = -1;
+		if ("general" === val) {
+			res = -1;
+		} else if ("left" === val) {
+			res = AscCommon.align_Left;
+		} else if ("center" === val) {
+			res = AscCommon.align_Center;
+		} else if ("right" === val) {
+			res = AscCommon.align_Right;
+		} else if ("fill" === val) {
+			res = AscCommon.align_Justify;
+		} else if ("justify" === val) {
+			res = AscCommon.align_Justify;
+		} else if ("centerContinuous" === val) {
+			res = AscCommon.align_Center;
+		} else if ("distributed" === val) {
+			res = AscCommon.align_Justify;
+		}
+		return res;
+	}
+
+	function FromXml_ST_VerticalAlignment(val) {
+		var res = -1;
+		if ("top" === val) {
+			res = Asc.c_oAscVAlign.Top;
+		} else if ("center" === val) {
+			res = Asc.c_oAscVAlign.Center;
+		} else if ("bottom" === val) {
+			res = Asc.c_oAscVAlign.Bottom;
+		} else if ("justify" === val) {
+			res = Asc.c_oAscVAlign.Center;
+		} else if ("distributed" === val) {
+			res = Asc.c_oAscVAlign.Center;
+		}
+		return res;
+	}
+
 var g_oAlignProperties = {
 		hor: 0,
 		indent: 1,
@@ -1619,7 +2127,47 @@ Align.prototype =
 			case this.Properties.ver: this.ver = value;break;
 			case this.Properties.wrap: this.wrap = value;break;
 		}
+	},
+	readAttributes : function(attr, uq) {
+	if(attr()){
+		var vals = attr();
+		var val;
+		val = vals["horizontal"];
+		if(undefined !== val){
+			val = FromXml_ST_HorizontalAlignment(val);
+			if(-1 !== val){
+				this.hor = val;
+			}
+		}
+		val = vals["vertical"];
+		if(undefined !== val){
+			val = FromXml_ST_VerticalAlignment(val);
+			if(-1 !== val){
+				this.ver = val;
+			}
+		}
+		val = vals["textRotation"];
+		if(undefined !== val){
+			this.angle = val - 0;
+		}
+		val = vals["wrapText"];
+		if(undefined !== val){
+			this.wrap = getBoolFromXml(val);
+		}
+		val = vals["indent"];
+		if(undefined !== val){
+			this.indent = val - 0;
+		}
+		val = vals["relativeIndent"];
+		if(undefined !== val){
+			this.RelativeIndent = val - 0;
+		}
+		val = vals["shrinkToFit"];
+		if(undefined !== val){
+			this.shrink = getBoolFromXml(val);
+		}
 	}
+}
 };
 /** @constructor */
 function CCellStyles() {
