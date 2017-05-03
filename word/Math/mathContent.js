@@ -7241,10 +7241,10 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
 
 CMathContent.prototype.GetTextContent = function(arr, str)
 {
-    if(!arr)
-    {
+	if(!arr)
+	{
 		arr = [];
-    }
+	}
 
 	if(!str)
 	{
@@ -7252,35 +7252,35 @@ CMathContent.prototype.GetTextContent = function(arr, str)
 	}
 
 	var addText = function(value)
-    {
+	{
 		arr.push(value);
 		str += value;
-    };
+	};
 
-    var getMathSymbol = function(elem)
-    {
+	var getMathSymbol = function(elem)
+	{
 		var res = [];
 
 		var getVal = function(val, position)
-        {
-            var newVal = {};
+		{
+			var newVal = {};
 			newVal.prePosition = !!position;
 			newVal.value = undefined !== val ? val : "";
 			return newVal;
-        };
+		};
 
-        if(elem instanceof CDegree)
-        {
+		if(elem instanceof CDegree)
+		{
 
-            if(DEGREE_SUPERSCRIPT === elem.Pr.type)
-            {
+			if(DEGREE_SUPERSCRIPT === elem.Pr.type)
+			{
 				res.push(getVal("^"));
-            }
-            else
-            {
+			}
+			else
+			{
 				res.push(getVal("_"));
-            }
-        }
+			}
+		}
 		else if(elem instanceof CDelimiter)
 		{
 			res[-1] = getVal("(", true);
@@ -7294,9 +7294,9 @@ CMathContent.prototype.GetTextContent = function(arr, str)
 				res.push(getVal("_", true));
 			}
 			if(!elem.Pr.subHide)
-            {
+			{
 				res.push(getVal("^", true));
-            }
+			}
 			res.push(getVal("▒", true));
 		}
 		else if(elem instanceof CFraction)
@@ -7306,40 +7306,73 @@ CMathContent.prototype.GetTextContent = function(arr, str)
 		else if(elem instanceof CRadical)
 		{
 			res.push(getVal("√", true));//8730;
+			//res.push(getVal("&", true));
+		}
+		else if(elem instanceof CMathMatrix)
+		{
+			res[-1] =  getVal("■", true);
+			for(var row = 0; row < elem.nRow; row++)
+			{
+				for(var col = 1; col < elem.nCol; col++)
+				{
+					res.push(getVal("&"));
+				}
+				if(row !== elem.nRow - 1)
+				{
+					res.push(getVal("@"));
+				}
+			}
 		}
 
-        return res;
-    };
+		return res;
+	};
 
 	for(var i = 0; i < this.Content.length; i++)
-    {
+	{
 		switch(this.Content[i].Type)
-        {
+		{
 			case para_Math_Run:
-            {
-                for(var j = 0; j < this.Content[i].Content.length; j++)
-                {
-                    if(para_Math_Content === this.Content[i].Content[j].Type)
-                    {
-						str = this.Content[i].Content[j].GetTextContent(arr, str);
-                    }
-					else if(para_Math_Text === this.Content[i].Content[j].Type)
+			{
+				if(this.Content[i].Content.length)
+				{
+					var string = "";
+					var isBreakOperator = false;
+					var isMathText = false;
+					for(var j = 0; j < this.Content[i].Content.length; j++)
 					{
-						addText(String.fromCharCode(this.Content[i].Content[j].value));
+						if(para_Math_Text === this.Content[i].Content[j].Type)
+						{
+							//addText(String.fromCharCode(this.Content[i].Content[j].value));
+							string += String.fromCharCode(this.Content[i].Content[j].value);
+							isMathText = true;
+						}
+						else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
+						{
+							//addText(String.fromCharCode(this.Content[i].Content[j].value));
+							string += String.fromCharCode(this.Content[i].Content[j].value);
+							isBreakOperator = true;
+						}
 					}
-					else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
+					if(string)
 					{
-						addText(String.fromCharCode(this.Content[i].Content[j].value));
+						if(isBreakOperator && isMathText)
+						{
+							addText("(");
+						}
+						addText(string);
+						if(isBreakOperator && isMathText)
+						{
+							addText(")");
+						}
 					}
-                }
-
-                break;
+				}
+				break;
 			}
 			case para_Math_Composition:
 			{
 				var symbol = getMathSymbol(this.Content[i]);
 
-			    for(var j = 0; j < this.Content[i].Content.length; j++)
+				for(var j = 0; j < this.Content[i].Content.length; j++)
 				{
 					if(para_Math_Content === this.Content[i].Content[j].Type)
 					{
@@ -7347,43 +7380,26 @@ CMathContent.prototype.GetTextContent = function(arr, str)
 						{
 							addText(symbol[-1].value);
 						}
-					    if(symbol[j] && symbol[j].prePosition)
-                        {
+						if(symbol[j] && symbol[j].prePosition)
+						{
 							addText(symbol[j].value);
-                        }
+						}
 
-                        addText("(");
+						str = this.Content[i].Content[j].GetTextContent(arr, str);
 
-					    str = this.Content[i].Content[j].GetTextContent(arr, str);
 
-                        addText(")");
-
-					    if(symbol[j] && !symbol[j].prePosition)
-                        {
+						if(symbol[j] && !symbol[j].prePosition)
+						{
 							addText(symbol[j].value);
-                        }
-					}
-					else if(para_Math_Text === this.Content[i].Content[j].Type)
-					{
-						addText(String.fromCharCode(this.Content[i].Content[j].value));
-					}
-					else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
-					{
-						addText(String.fromCharCode(this.Content[i].Content[j].value));
+						}
 					}
 				}
-
-			    break;
+				break;
 			}
-			/*case para_Math_Text:
-            {
-				addText(String.fromCharCode(this.Content[i].Content[j].value));
-                break;
-            }*/
 		}
-    }
+	}
 
-    return str;
+	return str;
 };
 
 function CMathBracketAcc()

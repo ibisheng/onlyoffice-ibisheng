@@ -1293,7 +1293,9 @@ CopyProcessor.prototype =
     {
 		var oDocument = this.oDocument;
 		var bFromPresentation;
-		
+
+		window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+
 		if(PasteElementsId.g_bIsDocumentCopyPaste)
 		{
 			var selectedContent = oDocument.GetSelectedContent();
