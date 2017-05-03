@@ -7251,29 +7251,61 @@ CMathContent.prototype.GetTextContent = function(arr, str)
 		str = "";
 	}
 
+	var addText = function(value)
+    {
+		arr.push(value);
+		str += value;
+    };
+
     var getMathSymbol = function(elem)
     {
-		var res = "";
+		var res = [];
+
+		var getVal = function(val, position)
+        {
+            var newVal = {};
+			newVal.prePosition = !!position;
+			newVal.value = undefined !== val ? val : "";
+			return newVal;
+        };
 
         if(elem instanceof CDegree)
         {
-            res = "^";
+
+            if(DEGREE_SUPERSCRIPT === elem.Pr.type)
+            {
+				res.push(getVal("^"));
+            }
+            else
+            {
+				res.push(getVal("_"));
+            }
         }
 		else if(elem instanceof CDelimiter)
 		{
-			res = "Delimiter";
+			res[-1] = getVal("(", true);
+			res.push(getVal(")"));
 		}
 		else if(elem instanceof CNary)
 		{
-			res = "CNary";
+			res[-1] = getVal(String.fromCharCode(elem.Pr.chr), true);
+			if(!elem.Pr.supHide)
+			{
+				res.push(getVal("_", true));
+			}
+			if(!elem.Pr.subHide)
+            {
+				res.push(getVal("^", true));
+            }
+			res.push(getVal("▒", true));
 		}
 		else if(elem instanceof CFraction)
 		{
-			res = "/";
+			res.push(getVal("/"));
 		}
 		else if(elem instanceof CRadical)
 		{
-			res = "√";//8730
+			res.push(getVal("√", true));//8730;
 		}
 
         return res;
@@ -7293,15 +7325,12 @@ CMathContent.prototype.GetTextContent = function(arr, str)
                     }
 					else if(para_Math_Text === this.Content[i].Content[j].Type)
 					{
-						arr.push(String.fromCharCode(this.Content[i].Content[j].value));
-						str += String.fromCharCode(this.Content[i].Content[j].value);
+						addText(String.fromCharCode(this.Content[i].Content[j].value));
 					}
 					else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
 					{
-						arr.push(String.fromCharCode(this.Content[i].Content[j].value));
-						str += String.fromCharCode(this.Content[i].Content[j].value);
+						addText(String.fromCharCode(this.Content[i].Content[j].value));
 					}
-
                 }
 
                 break;
@@ -7314,62 +7343,43 @@ CMathContent.prototype.GetTextContent = function(arr, str)
 				{
 					if(para_Math_Content === this.Content[i].Content[j].Type)
 					{
-						if(this.Content[i].Content.length > 1)
+						if(j === 0 && symbol[-1] && symbol[-1].prePosition)
 						{
-							arr.push("(");
-							str += "(";
+							addText(symbol[-1].value);
 						}
-					    str = this.Content[i].Content[j].GetTextContent(arr, str);
-						if(this.Content[i].Content.length > 1)
-						{
-							arr.push(")");
-							str += ")";
-						}
-
-					    if(j !== this.Content[i].Content.length - 1)
+					    if(symbol[j] && symbol[j].prePosition)
                         {
-							/*if(this.Content[i].Content.length > 1)
-							{
-								arr.push(")");
-								str += ")";
-							}*/
+							addText(symbol[j].value);
+                        }
 
-                            arr.push(symbol);
-							str += symbol;
+                        addText("(");
 
-							/*if(this.Content[i].Content.length > 1)
-							{
-								arr.push("(");
-								str += "(";
-							}*/
+					    str = this.Content[i].Content[j].GetTextContent(arr, str);
+
+                        addText(")");
+
+					    if(symbol[j] && !symbol[j].prePosition)
+                        {
+							addText(symbol[j].value);
                         }
 					}
 					else if(para_Math_Text === this.Content[i].Content[j].Type)
 					{
-						arr.push(String.fromCharCode(this.Content[i].Content[j].value));
-						str += String.fromCharCode(this.Content[i].Content[j].value);
+						addText(String.fromCharCode(this.Content[i].Content[j].value));
 					}
 					else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
 					{
-						arr.push(String.fromCharCode(this.Content[i].Content[j].value));
-						str += String.fromCharCode(this.Content[i].Content[j].value);
+						addText(String.fromCharCode(this.Content[i].Content[j].value));
 					}
 				}
 
-				/*if(this.Content[i].Content.length > 1)
-				{
-					arr.push(")");
-					str += ")";
-				}*/
-
 			    break;
 			}
-			case para_Math_Text:
+			/*case para_Math_Text:
             {
-				arr.push(String.fromCharCode(this.Content[i].value));
-				str += String.fromCharCode(this.Content[i].value);
+				addText(String.fromCharCode(this.Content[i].Content[j].value));
                 break;
-            }
+            }*/
 		}
     }
 
