@@ -2007,7 +2007,7 @@ PasteProcessor.prototype =
         var oDocument = this.oDocument;
 
 		//TODO ориентируюсь при специальной вставке на SelectionState. возможно стоит пересмотреть.
-		this.curDocSelection = this.oDocument.Get_SelectionState();
+		this.curDocSelection = this.oDocument.GetSelectionState();
 
         var nInsertLength = this.aContent.length;
         if(nInsertLength > 0)
@@ -2047,8 +2047,8 @@ PasteProcessor.prototype =
     {
         if(!PasteElementsId.g_bIsDocumentCopyPaste)
             return;
-        var paragraph = oDoc.Content[oDoc.CurPos.ContentPos];
-        if (null != paragraph && type_Paragraph === paragraph.GetType()) {
+        var paragraph = oDoc.GetCurrentParagraph();
+        if (null != paragraph) {
             var NearPos = { Paragraph: paragraph, ContentPos: paragraph.Get_ParaContentPos(false, false) };
             paragraph.Check_NearestPos(NearPos);
             //делаем небольшой сдвиг по y, потому что сама точка TargetPos для двухстрочного параграфа определяется как верхняя
@@ -2112,7 +2112,7 @@ PasteProcessor.prototype =
                 return;
             }
 
-            oDoc.Insert_Content(oSelectedContent, NearPos);
+            paragraph.Parent.Insert_Content(oSelectedContent, NearPos);
             if(this.oLogicDocument && this.oLogicDocument.DrawingObjects)
             {
                 var oTargetTextObject = AscFormat.getTargetTextObject(this.oLogicDocument.DrawingObjects);
@@ -2643,7 +2643,7 @@ PasteProcessor.prototype =
     insertInPlace2: function(oDoc, aNewContent)
     {
         var nNewContentLength = aNewContent.length;
-        //����� ���� �� Document.Add_NewParagraph
+        //����� ���� �� Document.AddNewParagraph
 
         for(var i = 0; i < aNewContent.length; ++i)
         {
@@ -3162,7 +3162,7 @@ PasteProcessor.prototype =
 				selectedElement = new CSelectedElement();
 				element = aContent.content[i];
 				//drawings
-				element.Get_AllDrawingObjects(drawings);
+				element.GetAllDrawingObjects(drawings);
 				if(type_Paragraph === element.GetType())//paragraph
 				{
 					selectedElement.Element = AscFormat.ConvertParagraphToPPTX(element, null, null, true, false);
@@ -4616,7 +4616,7 @@ PasteProcessor.prototype =
 		for(var i = 0; i < aNewContent.length; i++)
 		{
 			content = aNewContent[i];
-			drawingObj = content.Get_AllDrawingObjects();
+			drawingObj = content.GetAllDrawingObjects();
 			
 			if(!drawingObj || (drawingObj && !drawingObj.length) || content.GetType() === type_Table)
 			{
@@ -6188,7 +6188,7 @@ PasteProcessor.prototype =
             this.oCurParContentPos++;
         }
     },
-    _Paragraph_Add: function (elem)
+    _AddToParagraph: function (elem)
     {
         if (null != this.oCurRun) {
             if (para_Hyperlink === elem.Type) {
@@ -6241,10 +6241,10 @@ PasteProcessor.prototype =
         for(var i = 0, length = this.nBrCount - nIgnore; i < length; i++)
         {
             if ("always" === pPr["mso-column-break-before"])
-                this._Paragraph_Add(new ParaNewLine(break_Page));
+                this._AddToParagraph(new ParaNewLine(break_Page));
             else{
                 if (this.bInBlock)
-                    this._Paragraph_Add(new ParaNewLine(break_Line));
+                    this._AddToParagraph(new ParaNewLine(break_Line));
                 else
                     this._Execute_AddParagraph(node, pPr);
             }
@@ -6923,7 +6923,7 @@ PasteProcessor.prototype =
                                 }
                                 else
                                     Item = new ParaSpace();
-                                this._Paragraph_Add(Item);
+                                this._AddToParagraph(Item);
                             }
                         }
                     }
@@ -7087,7 +7087,7 @@ PasteProcessor.prototype =
 								var Drawing = CreateImageFromBinary(sSrc, nWidth, nHeight);
 								// oTargetDocument.DrawingObjects.Add( Drawing );
 
-                                this._Paragraph_Add( Drawing );
+                                this._AddToParagraph( Drawing );
 								
 								if(this.oCurHyperlink)
 									this.oCurRun = new ParaRun(this.oCurPar);
@@ -7112,12 +7112,12 @@ PasteProcessor.prototype =
                     bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
                     bAddParagraph = true;
                     this._Commit_Br(0, node, pPr);
-                    this._Paragraph_Add( new ParaNewLine( break_Page ) );
+                    this._AddToParagraph( new ParaNewLine( break_Page ) );
                 }
                 else
                 {
                     bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph, false);
-                    this.nBrCount++;//this._Paragraph_Add( new ParaNewLine( break_Line ) );
+                    this.nBrCount++;//this._AddToParagraph( new ParaNewLine( break_Line ) );
                     if("line-break" === pPr["mso-special-character"] || "always" === pPr["mso-column-break-before"])
                         this._Commit_Br(0, node, pPr);
 					return bAddParagraph;
@@ -7133,7 +7133,7 @@ PasteProcessor.prototype =
                     bAddParagraph = this._Decide_AddParagraph(node, pPr, bAddParagraph);
                     this._commit_rPr(node);
                     for(var i = 0; i < nTabCount; i++)
-                        this._Paragraph_Add( new ParaTab() );
+                        this._AddToParagraph( new ParaTab() );
                     return bAddParagraph;
                 }
             }
@@ -7271,7 +7271,7 @@ PasteProcessor.prototype =
 						}
 					}
 					
-                    this._Paragraph_Add(oHyperlink);
+                    this._AddToParagraph(oHyperlink);
                 }
             }
         }
@@ -7332,7 +7332,7 @@ PasteProcessor.prototype =
                     {
                         this.oDocument = shape.txBody.content;
 						if(bAddParagraph)
-							shape.txBody.content.Add_NewParagraph();
+							shape.txBody.content.AddNewParagraph();
                        // bAddParagraph = this._Decide_AddParagraph(node.parentNode, pPr, bAddParagraph);
 
                         //��������� ������� ����� ���� �� ���������
@@ -7590,7 +7590,7 @@ PasteProcessor.prototype =
 					if(isPasteHyperlink)
 					{
 						var HyperProps = new Asc.CHyperlinkProperty({ Text: text, Value: href, ToolTip: title});
-						this.oDocument.Content[Pos].Hyperlink_Add( HyperProps );
+						this.oDocument.Content[Pos].AddHyperlink( HyperProps );
 					}
                 }
             }

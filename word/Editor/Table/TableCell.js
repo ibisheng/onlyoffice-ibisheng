@@ -192,19 +192,19 @@ CTableCell.prototype =
         return this.Row.Get_PrevElementEndInfo( this.Index );
     },
 
-    Save_RecalculateObject : function()
+	SaveRecalculateObject : function()
     {
         var RecalcObj = new CTableCellRecalculateObject();
         RecalcObj.Save( this );
         return RecalcObj;
     },
 
-    Load_RecalculateObject : function(RecalcObj)
+	LoadRecalculateObject : function(RecalcObj)
     {
         RecalcObj.Load(this);
     },
 
-    Prepare_RecalculateObject : function()
+	PrepareRecalculateObject : function()
     {
         this.BorderInfo =
         {
@@ -237,7 +237,7 @@ CTableCell.prototype =
             Y_VAlign_offset : [] // Сдвиг, который нужно сделать из-за VAlign (массив по страницам)
         };
 
-        this.Content.Prepare_RecalculateObject();
+        this.Content.PrepareRecalculateObject();
     },
     //-----------------------------------------------------------------------------------
     // Работаем с стилем ячейки
@@ -584,14 +584,14 @@ CTableCell.prototype =
         return false;
     },
 
-    Check_TableCoincidence : function(Table)
-    {
-        var CurTable = this.Row.Table;
-        if ( Table === CurTable )
-            return true;
-        else
-            return CurTable.Parent.Check_TableCoincidence(Table);
-    },
+	CheckTableCoincidence : function(Table)
+	{
+		var CurTable = this.Row.Table;
+		if (Table === CurTable)
+			return true;
+		else
+			return CurTable.Parent.CheckTableCoincidence(Table);
+	},
 
     Get_LastParagraphPrevCell : function()
     {
@@ -684,7 +684,7 @@ CTableCell.prototype =
     Content_Reset : function(X, Y, XLimit, YLimit)
     {
         this.Content.Reset( X, Y, XLimit, YLimit );
-        this.Content.Set_CurPosXY( X, Y );
+        this.Content.SetCurPosXY( X, Y );
     },
 
     Content_Get_PageBounds : function(PageIndex)
@@ -875,7 +875,7 @@ CTableCell.prototype =
         return this.Content.GetCurPosXY();
     },
 
-    Content_Set_CurPosXY : function(X, Y)
+    Content_SetCurPosXY : function(X, Y)
     {
         var _X = X, _Y = Y;
         var Transform = this.private_GetTextDirectionTransform();
@@ -885,7 +885,7 @@ CTableCell.prototype =
             _X = Transform.TransformPointX(X, Y);
             _Y = Transform.TransformPointY(X, Y);
         }
-        return this.Content.Set_CurPosXY(_X, _Y);
+        return this.Content.SetCurPosXY(_X, _Y);
     },
 
     Content_MoveCursorUpToLastRow : function(X, Y, AddToSelect)
@@ -914,7 +914,7 @@ CTableCell.prototype =
         return this.Content.MoveCursorDownToFirstRow(_X, _Y, AddToSelect);
     },
 
-    Content_Recalculate_MinMaxContentWidth : function(isRotated)
+    Content_RecalculateMinMaxContentWidth : function(isRotated)
     {
         if (undefined === isRotated)
             isRotated = false;
@@ -922,7 +922,7 @@ CTableCell.prototype =
         if (true === this.Is_VerticalText())
             isRotated = true === isRotated ? false : true;
 
-        var Result = this.Content.Recalculate_MinMaxContentWidth(isRotated);
+        var Result = this.Content.RecalculateMinMaxContentWidth(isRotated);
 
         if (true !== isRotated && true === this.Get_NoWrap())
             Result.Min = Math.max(Result.Min, Result.Max);
@@ -1792,11 +1792,25 @@ CTableCell.prototype =
     {
     }
 };
+CTableCell.prototype.private_TransformXY = function(X, Y)
+{
+	// TODO: Везде, где идет такой код заменить на данную функцию
 
-CTableCell.prototype.Get_TopElement = function()
+	var _X = X, _Y = Y;
+	var Transform = this.private_GetTextDirectionTransform();
+	if (null !== Transform)
+	{
+		Transform = global_MatrixTransformer.Invert(Transform);
+		_X = Transform.TransformPointX(X, Y);
+		_Y = Transform.TransformPointY(X, Y);
+	}
+
+	return {X : _X, Y : _Y};
+};
+CTableCell.prototype.GetTopElement = function()
 {
     if (this.Row && this.Row.Table)
-        return this.Row.Table.Get_TopElement();
+        return this.Row.Table.GetTopElement();
 
     return null;
 };
@@ -1814,7 +1828,7 @@ CTableCell.prototype.Get_SectPr = function()
 
     return null;
 };
-CTableCell.prototype.Get_DocumentPositionFromObject = function(PosArray)
+CTableCell.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -1822,7 +1836,7 @@ CTableCell.prototype.Get_DocumentPositionFromObject = function(PosArray)
     if (this.Row)
     {
         PosArray.splice(0, 0, {Class : this.Row, Position : this.Index});
-        this.Row.Get_DocumentPositionFromObject(PosArray);
+        this.Row.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;
@@ -1864,7 +1878,7 @@ CTableCellRecalculateObject.prototype =
         this.Metrics    = Cell.Metrics;
         this.Temp       = Cell.Temp;
 
-        this.Content = Cell.Content.Save_RecalculateObject();
+        this.Content = Cell.Content.SaveRecalculateObject();
     },
 
     Load : function(Cell)
@@ -1873,7 +1887,7 @@ CTableCellRecalculateObject.prototype =
         Cell.Metrics    = this.Metrics;
         Cell.Temp       = this.Temp;
 
-        Cell.Content.Load_RecalculateObject( this.Content );
+        Cell.Content.LoadRecalculateObject( this.Content );
     },
 
     Get_DrawingFlowPos : function(FlowPos)

@@ -266,17 +266,17 @@ CLogicDocumentController.prototype.AddTableRow = function(bBefore)
 {
 	this.LogicDocument.controller_AddTableRow(bBefore);
 };
-CLogicDocumentController.prototype.AddTableCol = function(bBefore)
+CLogicDocumentController.prototype.AddTableColumn = function(bBefore)
 {
-	this.LogicDocument.controller_AddTableCol(bBefore);
+	this.LogicDocument.controller_AddTableColumn(bBefore);
 };
 CLogicDocumentController.prototype.RemoveTableRow = function()
 {
 	this.LogicDocument.controller_RemoveTableRow();
 };
-CLogicDocumentController.prototype.RemoveTableCol = function()
+CLogicDocumentController.prototype.RemoveTableColumn = function()
 {
-	this.LogicDocument.controller_RemoveTableCol();
+	this.LogicDocument.controller_RemoveTableColumn();
 };
 CLogicDocumentController.prototype.MergeTableCells = function()
 {
@@ -377,4 +377,8 @@ CLogicDocumentController.prototype.GetCurrentSectionPr = function()
 CLogicDocumentController.prototype.RemoveTextSelection = function()
 {
 	return this.RemoveSelection();
+};
+CLogicDocumentController.prototype.AddContentControl = function()
+{
+	return this.LogicDocument.controller_AddContentControl();
 };

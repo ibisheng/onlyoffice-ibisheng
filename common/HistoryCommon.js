@@ -1770,9 +1770,10 @@
 	window['AscDFH'].historyitem_Ph_SetSz              = window['AscDFH'].historyitem_type_Ph | 4;
 	window['AscDFH'].historyitem_Ph_SetType            = window['AscDFH'].historyitem_type_Ph | 5;
 
-	window['AscDFH'].historyitem_UniNvPr_SetCNvPr = window['AscDFH'].historyitem_type_UniNvPr | 1;
-	window['AscDFH'].historyitem_UniNvPr_SetUniPr = window['AscDFH'].historyitem_type_UniNvPr | 2;
-	window['AscDFH'].historyitem_UniNvPr_SetNvPr  = window['AscDFH'].historyitem_type_UniNvPr | 3;
+	window['AscDFH'].historyitem_UniNvPr_SetCNvPr    = window['AscDFH'].historyitem_type_UniNvPr | 1;
+	window['AscDFH'].historyitem_UniNvPr_SetUniPr    = window['AscDFH'].historyitem_type_UniNvPr | 2;
+	window['AscDFH'].historyitem_UniNvPr_SetNvPr     = window['AscDFH'].historyitem_type_UniNvPr | 3;
+	window['AscDFH'].historyitem_UniNvPr_SetUniSpPr  = window['AscDFH'].historyitem_type_UniNvPr | 4;
 
 	window['AscDFH'].historyitem_StyleRef_SetIdx   = window['AscDFH'].historyitem_type_StyleRef | 1;
 	window['AscDFH'].historyitem_StyleRef_SetColor = window['AscDFH'].historyitem_type_StyleRef | 2;
@@ -2328,6 +2329,7 @@
 	window['AscDFH'].historyitem_ImageShapeSetData          = window['AscDFH'].historyitem_type_ImageShape | 7;
 	window['AscDFH'].historyitem_ImageShapeSetApplicationId = window['AscDFH'].historyitem_type_ImageShape | 8;
 	window['AscDFH'].historyitem_ImageShapeSetPixSizes      = window['AscDFH'].historyitem_type_ImageShape | 9;
+	window['AscDFH'].historyitem_ImageShapeSetObjectFile	= window['AscDFH'].historyitem_type_ImageShape | 10;
 
 	window['AscDFH'].historyitem_GeometrySetParent      = window['AscDFH'].historyitem_type_Geometry | 1;
 	window['AscDFH'].historyitem_GeometryAddAdj         = window['AscDFH'].historyitem_type_Geometry | 2;

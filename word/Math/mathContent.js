@@ -1616,19 +1616,19 @@ CMathContent.prototype.GetArgSize = function()
 /////////   Перемещение     ////////////
 
 // Поиск позиции, селект
-CMathContent.prototype.Is_SelectedAll = function(Props)
+CMathContent.prototype.IsSelectedAll = function(Props)
 {
     var bFirst = false, bEnd = false;
 
     if(this.Selection.StartPos == 0 && this.Selection.EndPos == this.Content.length - 1)
     {
         if(this.Content[this.Selection.StartPos].Type == para_Math_Run)
-            bFirst = this.Content[this.Selection.StartPos].Is_SelectedAll(Props);
+            bFirst = this.Content[this.Selection.StartPos].IsSelectedAll(Props);
         else
             bFirst = true;
 
         if(this.Content[this.Selection.EndPos].Type == para_Math_Run)
-            bEnd = this.Content[this.Selection.EndPos].Is_SelectedAll(Props);
+            bEnd = this.Content[this.Selection.EndPos].IsSelectedAll(Props);
         else
             bEnd = true;
     }
@@ -4677,7 +4677,7 @@ CMathContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRa
 
     this.Bounds.SetWidth(CurLine, CurRange, PRSC.Range.W - RangeW);
 };
-CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+CMathContent.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     if(this.RecalcInfo.bEqArray)
         this.InfoPoints.SetDefault();
@@ -4697,7 +4697,7 @@ CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
             if(Type == para_Math_Run)
                 Item.Math_RecalculateContent();
             else
-                Item.Recalculate_MinMaxContentWidth(MinMax);
+                Item.RecalculateMinMaxContentWidth(MinMax);
 
             if(this.RecalcInfo.bEqArray && Type == para_Math_Composition)
                 this.InfoPoints.ContentPoints.UpdatePoint(this.Content[Pos].size.width);
@@ -4715,7 +4715,7 @@ CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
         }
         else
         {
-            Item.Recalculate_MinMaxContentWidth(MinMax);
+            Item.RecalculateMinMaxContentWidth(MinMax);
         }
     }
 

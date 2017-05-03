@@ -3456,12 +3456,12 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.BrGapRight = this.GapRight + this.endOper.size.width;
     }
 };
-CDelimiter.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+CDelimiter.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
     this.BrGapRight = this.GapRight + this.endOper.size.width;
 
-    CMathBase.prototype.Recalculate_MinMaxContentWidth.call(this, MinMax);
+    CMathBase.prototype.RecalculateMinMaxContentWidth.call(this, MinMax);
 };
 CDelimiter.prototype.Is_EmptyGaps = function()
 {

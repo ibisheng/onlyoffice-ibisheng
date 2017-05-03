@@ -4435,14 +4435,10 @@
 							}
 						}
 					}
-					
-					if(!style.Name || (style.Name && !worksheet.workbook.TableStyles.AllStyles[style.Name]))
-					{
+
+					styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name];
+					if (!styleForCurTable) {
 						return;
-					}
-					else
-					{
-						styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name]
 					}
 					
 					//заполняем стили

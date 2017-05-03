@@ -723,7 +723,7 @@ ParaComment.prototype =
     {
     },
 
-    Collect_DocumentStatistics : function(ParaStats)
+	CollectDocumentStatistics : function(ParaStats)
     {
     },
 
@@ -860,18 +860,18 @@ ParaComment.prototype =
     Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
     {
         if ( true === this.Start )
-            PRSI.Add_Comment( this.CommentId );
+            PRSI.AddComment( this.CommentId );
         else
             PRSI.Remove_Comment( this.CommentId );
     },
 
-    Save_RecalculateObject : function(Copy)
-    {
-        var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
-        return RecalcObj;
-    },
+	SaveRecalculateObject : function(Copy)
+	{
+		var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+		return RecalcObj;
+	},
 
-    Load_RecalculateObject : function(RecalcObj, Parent)
+	LoadRecalculateObject : function(RecalcObj, Parent)
     {
         this.StartLine  = RecalcObj.StartLine;
         this.StartRange = RecalcObj.StartRange;
@@ -884,7 +884,7 @@ ParaComment.prototype =
         Comment.m_oStartInfo.PageNum = PageNum;
     },
 
-    Prepare_RecalculateObject : function()
+	PrepareRecalculateObject : function()
     {
     },
 
@@ -916,7 +916,7 @@ ParaComment.prototype =
         return { X : X };
     },
 
-    Recalculate_MinMaxContentWidth : function()
+	RecalculateMinMaxContentWidth : function()
     {
 
     },
@@ -944,7 +944,7 @@ ParaComment.prototype =
     Draw_HighLights : function(PDSH)
     {
         if ( true === this.Start )
-            PDSH.Add_Comment( this.CommentId );
+            PDSH.AddComment( this.CommentId );
         else
             PDSH.Remove_Comment( this.CommentId );
     },
@@ -1103,7 +1103,7 @@ ParaComment.prototype =
         return false;
     },
 
-    Is_SelectedAll : function(Props)
+	IsSelectedAll : function(Props)
     {
         return true;
     },

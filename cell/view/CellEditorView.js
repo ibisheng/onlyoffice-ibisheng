@@ -158,18 +158,16 @@
 
 		/** @type RegExp */
 		this.reReplaceNL = /\r?\n|\r/g;
-		/** @type RegExp */
-		this.reReplaceTab = /[\t\v\f]/g;
-		// RegExp с поддержкой рэнджей вида $E1:$F2
-		this.reRangeStr = "[^a-z0-9_$!](\\$?[a-z]+\\$?\\d+:\\$?[a-z]+\\$?\\d+|\\$?[a-z]+:\\$?[a-z]+|\\$?\\d+:\\$?\\d+|\\$?[a-z]+\\$?\\d+)(?=[^a-z0-9_]|$)";
 		this.rangeChars = ["=", "-", "+", "*", "/", "(", "{", ",", "<", ">", "^", "!", "&", ":", ";", " "];
 		this.reNotFormula = new XRegExp( "[^\\p{L}0-9_]", "i" );
 		this.reFormula = new XRegExp( "^([\\p{L}][\\p{L}0-9_]*)", "i" );
 
 		this.defaults = {
-			padding: -1, selectColor: new AscCommon.CColor( 190, 190, 255, 0.5 ),
-
-			canvasZIndex: 500, blinkInterval: 500, cursorShape: "text"
+			padding: -1,
+			selectColor: new AscCommon.CColor(190, 190, 255, 0.5),
+			canvasZIndex: 500,
+			blinkInterval: 500,
+			cursorShape: "text"
 		};
 
 		this.dontUpdateText = false;
@@ -321,9 +319,9 @@
 	};
 
 	CellEditor.prototype.close = function (saveValue) {
-		var opt = this.options, ret;
+		var opt = this.options;
 
-		if (saveValue && "function" === typeof opt.saveValueCallback) {
+		if (saveValue) {
 			var isFormula = this.isFormula();
 			// Для формул делаем пересчет всегда. Для остального - только если мы изменили что-то. http://bugzilla.onlyoffice.com/show_bug.cgi?id=31889
 			// Сюда же добавляется и ячейка с wrap-текстом, у которой выключен wrap.
@@ -338,8 +336,7 @@
 					this.noUpdateMode = false;
 				}
 
-				ret = opt.saveValueCallback(opt.fragments, this.textFlags, /*skip NL check*/ret);
-				if (!ret) {
+				if (!opt.saveValueCallback(opt.fragments, this.textFlags)) {
 					// При ошибке нужно выставить флаг, чтобы по стрелкам не закрывался редактор
 					this.handlers.trigger('setStrictClose', true);
 					return false;
@@ -788,7 +785,7 @@
 			this.options.fragments), t = this, ret = false, range, wsOPEN = this.handlers.trigger(
 			"getCellFormulaEnterWSOpen"), ws = wsOPEN ? wsOPEN.model : this.handlers.trigger("getActiveWS");
 
-		if (s.length < 1 || s.charAt(0) !== "=" || this.options.cellNumFormat == Asc.c_oAscNumFormatType.Text) {
+		if (Asc.c_oAscNumFormatType.Text === this.options.cellNumFormat || s.length < 1 || s.charAt(0) !== "=") {
 			return ret;
 		}
 

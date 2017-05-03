@@ -360,7 +360,7 @@ CShape.prototype.recalculateText = function()
                 var oContent = this.getDocContent();
                 if(oContent)
                 {
-                    oContent.Get_AllDrawingObjects(this.recalcInfo.AllDrawings);
+                    oContent.GetAllDrawingObjects(this.recalcInfo.AllDrawings);
                 }
             }
         }
@@ -516,7 +516,7 @@ CShape.prototype.checkContentDrawings = function()
 {
     if(this.textBoxContent)
     {
-        var all_drawings = this.textBoxContent.Get_AllDrawingObjects([]);
+        var all_drawings = this.textBoxContent.GetAllDrawingObjects([]);
         for(var i = 0; i < all_drawings.length; ++i)
         {
             all_drawings[i].GraphicObj.updateTransformMatrix();
@@ -748,12 +748,12 @@ CShape.prototype.Get_StartPage_Relative = function()
 {
     return 0;
 };
-CShape.prototype.Check_TableCoincidence = function(table)
+CShape.prototype.CheckTableCoincidence = function(table)
 {
     var para_drawing = this.GetParaDrawing();
     if(para_drawing && para_drawing.DocumentContent)
     {
-        return para_drawing.DocumentContent.Check_TableCoincidence(table);
+        return para_drawing.DocumentContent.CheckTableCoincidence(table);
     }
     return false;
 };
@@ -839,7 +839,7 @@ CShape.prototype.Get_TextBackGroundColor = function()
 CShape.prototype.documentStatistics = function(stats)
 {
     var content = this.getDocContent();
-    return content && content.DocumentStatistics(stats);
+    return content && content.CollectDocumentStatistics(stats);
 };
 
 CShape.prototype.checkPosTransformText = function()
@@ -994,7 +994,7 @@ CShape.prototype.getRecalcObject = function()
     var content = this.getDocContent && this.getDocContent();
     if(content)
     {
-        return content.Save_RecalculateObject();
+        return content.SaveRecalculateObject();
     }
     if(this.spTree)
     {
@@ -1015,7 +1015,7 @@ CShape.prototype.setRecalcObject =  function(object)
     var content = this.getDocContent && this.getDocContent();
     if(content)
     {
-        content.Load_RecalculateObject(object);
+        content.LoadRecalculateObject(object);
     }
     if(Array.isArray(object) && this.spTree && this.spTree.length === object.length)
     {

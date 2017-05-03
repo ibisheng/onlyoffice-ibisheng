@@ -227,14 +227,6 @@ CDocumentContentElementBase.prototype.GetDirectTextPr = function()
 {
 	return new CTextPr();
 };
-CDocumentContentElementBase.prototype.Hyperlink_CanAdd = function(bCheckInHyperlink)
-{
-	return false;
-};
-CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperlink)
-{
-	return this.Hyperlink_CanAdd(bCheckInHyperlink);
-};
 CDocumentContentElementBase.prototype.DrawSelectionOnPage = function(CurPage)
 {
 };
@@ -348,29 +340,17 @@ CDocumentContentElementBase.prototype.IsCursorAtEnd = function()
 {
 	return true;
 };
-CDocumentContentElementBase.prototype.Get_SelectionState = function()
+CDocumentContentElementBase.prototype.GetSelectionState = function()
 {
 	return [];
 };
-CDocumentContentElementBase.prototype.Set_SelectionState = function(State, StateIndex)
-{
-
-};
-CDocumentContentElementBase.prototype.Add_NewParagraph = function()
+CDocumentContentElementBase.prototype.SetSelectionState = function(State, StateIndex)
 {
 
 };
 CDocumentContentElementBase.prototype.AddNewParagraph = function()
 {
-	return this.Add_NewParagraph();
-};
-CDocumentContentElementBase.prototype.Hyperlink_Check = function(bCheckEnd)
-{
-	return null;
-};
-CDocumentContentElementBase.prototype.IsCursorInHyperlink = function(bCheckEnd)
-{
-	return this.Hyperlink_Check(bCheckEnd);
+
 };
 CDocumentContentElementBase.prototype.Get_SelectionState2 = function()
 {
@@ -514,6 +494,141 @@ CDocumentContentElementBase.prototype.GetCurrentParagraph = function()
 {
 	return null;
 };
+CDocumentContentElementBase.prototype.AddTableRow = function(bBefore)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.AddTableColumn = function(bBefore)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.RemoveTableRow = function(nRowIndex)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.RemoveTableColumn = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.MergeTableCells = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.SplitTableCells = function(nColsCount, nRowsCount)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.RemoveTable = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.SelectTable = function(Type)
+{
+};
+CDocumentContentElementBase.prototype.CanMergeTableCells = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.CanSplitTableCells = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.Document_UpdateInterfaceState = function()
+{
+};
+CDocumentContentElementBase.prototype.Document_UpdateRulersState = function()
+{
+};
+CDocumentContentElementBase.prototype.GetTableProps = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.AddHyperlink = function(Props)
+{
+};
+CDocumentContentElementBase.prototype.ModifyHyperlink = function(Props)
+{
+};
+CDocumentContentElementBase.prototype.RemoveHyperlink = function()
+{
+};
+CDocumentContentElementBase.prototype.CanAddHyperlink = function(bCheckInHyperlink)
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.IsCursorInHyperlink = function(bCheckEnd)
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.AddComment = function(Comment, bStart, bEnd)
+{
+};
+CDocumentContentElementBase.prototype.CanAddComment = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.AddContentControl = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.RecalculateMinMaxContentWidth = function(isRotated)
+{
+	return {Min : 0, Max : 0};
+};
+CDocumentContentElementBase.prototype.Shift = function(CurPage, dX, dY)
+{
+};
+CDocumentContentElementBase.prototype.UpdateEndInfo = function()
+{
+};
+CDocumentContentElementBase.prototype.PrepareRecalculateObject = function()
+{
+};
+CDocumentContentElementBase.prototype.SaveRecalculateObject = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.LoadRecalculateObject = function(RecalcObj)
+{
+};
+CDocumentContentElementBase.prototype.Set_ApplyToAll = function(bValue)
+{
+};
+CDocumentContentElementBase.prototype.RecalculateAllTables = function()
+{
+};
+CDocumentContentElementBase.prototype.GetAllFloatElements = function(FloatObjects)
+{
+	if (!FloatObjects)
+		return [];
+
+	return FloatObjects;
+};
+CDocumentContentElementBase.prototype.Get_FirstParagraph = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.StartFromNewPage = function()
+{
+};
+CDocumentContentElementBase.prototype.CollectDocumentStatistics = function(Stats)
+{
+};
+CDocumentContentElementBase.prototype.CompareDrawingsLogicPositions = function(CompareObject)
+{
+	return 0;
+};
+CDocumentContentElementBase.prototype.GetStyleFromFormatting = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.GetAllContentControls = function(arrContentControls)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
@@ -619,6 +734,15 @@ CDocumentContentElementBase.prototype.IsEmpty = function()
 CDocumentContentElementBase.prototype.AddToParagraph = function(oItem)
 {
 	return this.Add(oItem);
+};
+CDocumentContentElementBase.prototype.GetAllDrawingObjects = function(AllDrawingObjects)
+{
+};
+CDocumentContentElementBase.prototype.GetAllComments = function(AllComments)
+{
+};
+CDocumentContentElementBase.prototype.GetAllMaths = function(AllMaths)
+{
 };
 
 //--------------------------------------------------------export--------------------------------------------------------

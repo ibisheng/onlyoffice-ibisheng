@@ -12189,7 +12189,7 @@ CTitle.prototype =
         var content = this.getDocContent();
         if(content)
         {
-            content.Paragraph_Add(paraItem, bRecalculate);
+            content.AddToParagraph(paraItem, bRecalculate);
         }
     },
 
@@ -12244,9 +12244,9 @@ CTitle.prototype =
                     AscFormat.CheckParagraphTextPr(this.tx.rich.content.Content[i], this.txPr.content.Content[0].Pr.DefaultRunPr);
                 }
             }
-            var selection_state = this.txBody.content.Get_SelectionState();
+            var selection_state = this.txBody.content.GetSelectionState();
             this.txBody = this.tx.rich;
-            this.txBody.content.Set_SelectionState(selection_state, selection_state.length - 1);
+            this.txBody.content.SetSelectionState(selection_state, selection_state.length - 1);
             if(AscFormat.isRealNumber(StartPage))
             {
                 this.txBody.content.Set_StartPage(StartPage);
@@ -13465,21 +13465,21 @@ function AddToContentFromString(content, str)
         var ch = str[i];
         if (ch == '\t')
         {
-            content.Paragraph_Add( new ParaTab(), false );
+            content.AddToParagraph( new ParaTab(), false );
         }
         else if (ch == '\n')
         {
-            content.Paragraph_Add( new ParaNewLine(break_Line), false );
+            content.AddToParagraph( new ParaNewLine(break_Line), false );
         }
         else if (ch == '\r')
             ;
         else if (ch != ' ')
         {
-            content.Paragraph_Add(new ParaText(ch), false );
+            content.AddToParagraph(new ParaText(ch), false );
         }
         else
         {
-            content.Paragraph_Add(new ParaSpace(1), false );
+            content.AddToParagraph(new ParaSpace(1), false );
         }
     }
 }
@@ -13528,10 +13528,10 @@ CValAxisLabels.prototype =
 
     getMinWidth: function()
     {
-        var max_min_width = this.arrLabels[0].txBody.content.Recalculate_MinMaxContentWidth().Min;
+        var max_min_width = this.arrLabels[0].txBody.content.RecalculateMinMaxContentWidth().Min;
         for(var i = 1; i < this.arrLabels.length; ++i)
         {
-            var t = this.arrLabels[i].txBody.content.Recalculate_MinMaxContentWidth().Min;
+            var t = this.arrLabels[i].txBody.content.RecalculateMinMaxContentWidth().Min;
             if(t > max_min_width)
                 max_min_width = t;
         }

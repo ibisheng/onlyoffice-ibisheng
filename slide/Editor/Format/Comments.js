@@ -136,7 +136,7 @@ ParaComment.prototype =
     {
     },
 
-    Collect_DocumentStatistics : function(ParaStats)
+	CollectDocumentStatistics : function(ParaStats)
     {
     },
 
@@ -242,15 +242,15 @@ ParaComment.prototype =
     {
     },
 
-    Save_RecalculateObject : function(Copy)
+    SaveRecalculateObject : function(Copy)
     {
     },
 
-    Load_RecalculateObject : function(RecalcObj, Parent)
+    LoadRecalculateObject : function(RecalcObj, Parent)
     {
     },
 
-    Prepare_RecalculateObject : function()
+    PrepareRecalculateObject : function()
     {
     },
 
@@ -282,7 +282,7 @@ ParaComment.prototype =
         return { X : X };
     },
 
-    Recalculate_MinMaxContentWidth : function()
+	RecalculateMinMaxContentWidth : function()
     {
 
     },
@@ -455,7 +455,7 @@ ParaComment.prototype =
         return false;
     },
 
-    Is_SelectedAll : function(Props)
+	IsSelectedAll : function(Props)
     {
         return true;
     },

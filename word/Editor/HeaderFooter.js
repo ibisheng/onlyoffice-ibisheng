@@ -122,7 +122,7 @@ CHeaderFooter.prototype =
             if ( undefined !== RecalcObj )
             {
                 this.RecalcInfo.CurPage = Page_abs;
-                this.Content.Load_RecalculateObject( RecalcObj );                
+                this.Content.LoadRecalculateObject( RecalcObj );
             }            
         }        
     },
@@ -164,7 +164,7 @@ CHeaderFooter.prototype =
         
         // Пересчитаем заново данный колонтитул        
         this.Content.Set_StartPage( Page_abs );
-        this.Content.Prepare_RecalculateObject();
+        this.Content.PrepareRecalculateObject();
 
 		this.Clear_PageCountElements();
 
@@ -173,7 +173,7 @@ CHeaderFooter.prototype =
         while ( recalcresult2_End != RecalcResult  )
             RecalcResult = this.Content.Recalculate_Page( CurPage++, true );
         
-        this.RecalcInfo.RecalcObj[Page_abs]   = this.Content.Save_RecalculateObject();
+        this.RecalcInfo.RecalcObj[Page_abs]   = this.Content.SaveRecalculateObject();
         this.RecalcInfo.PageNumInfo[Page_abs] = this.LogicDocument.Get_SectionPageNumInfo(Page_abs);
         this.RecalcInfo.SectPr[Page_abs]      = SectPr;
 		this.RecalcInfo.NeedRecalc[Page_abs]  = false;
@@ -192,7 +192,7 @@ CHeaderFooter.prototype =
         if ( false === bChanges )
         {
             var NewFlowPos = [];
-            var AllDrawingObjects = this.Content.Get_AllDrawingObjects();
+            var AllDrawingObjects = this.Content.GetAllDrawingObjects();
             var Count = AllDrawingObjects.length;
 
             for ( var Index = 0; Index < Count; Index++ )
@@ -254,7 +254,7 @@ CHeaderFooter.prototype =
         else            
         {
             var RecalcObj = this.RecalcInfo.RecalcObj[this.RecalcInfo.CurPage];
-            this.Content.Load_RecalculateObject( RecalcObj );
+            this.Content.LoadRecalculateObject( RecalcObj );
         }
 
         return bChanges;
@@ -263,7 +263,7 @@ CHeaderFooter.prototype =
     Recalculate2 : function(Page_abs)
     {
         this.Content.Set_StartPage( Page_abs );
-        this.Content.Prepare_RecalculateObject();
+        this.Content.PrepareRecalculateObject();
 
         var CurPage = 0;
         var RecalcResult = recalcresult2_NextPage;
@@ -660,10 +660,10 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с контентом
 //-----------------------------------------------------------------------------------
-    Add_NewParagraph : function()
-    {
-        this.Content.Add_NewParagraph();
-    },
+	AddNewParagraph : function()
+	{
+		this.Content.AddNewParagraph();
+	},
 
 	AddInlineImage : function(W, H, Img, Chart, bFlow)
     {
@@ -690,10 +690,10 @@ CHeaderFooter.prototype =
         this.Content.AddInlineTable( Cols, Rows );
     },
 
-    Paragraph_Add : function( ParaItem, bRecalculate )
-    {
-        this.Content.Paragraph_Add( ParaItem, bRecalculate );
-    },
+	AddToParagraph : function(ParaItem, bRecalculate)
+	{
+		this.Content.AddToParagraph(ParaItem, bRecalculate);
+	},
 
 	ClearParagraphFormatting : function()
     {
@@ -916,10 +916,10 @@ CHeaderFooter.prototype =
         return this.Content.GetAllParagraphs(Props, ParaArray);
     },
 
-    Get_AllDrawingObjects  : function(arrDrawings)
-    {
-        return this.Content.Get_AllDrawingObjects(arrDrawings);
-    },
+	GetAllDrawingObjects : function(arrDrawings)
+	{
+		return this.Content.GetAllDrawingObjects(arrDrawings);
+	},
 
     Get_PrevElementEndInfo : function(CurElement)
     {
@@ -1019,57 +1019,57 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //-----------------------------------------------------------------------------------
-    Table_AddRow : function(bBefore)
+	AddTableRow : function(bBefore)
+	{
+		this.Content.AddTableRow(bBefore);
+	},
+
+	AddTableColumn : function(bBefore)
     {
-        this.Content.Table_AddRow( bBefore );
+        this.Content.AddTableColumn( bBefore );
     },
 
-    Table_AddCol : function(bBefore)
-    {
-        this.Content.Table_AddCol( bBefore );
-    },
+	RemoveTableRow : function()
+	{
+		this.Content.RemoveTableRow();
+	},
 
-    Table_RemoveRow : function()
-    {
-        this.Content.Table_RemoveRow();
-    },
+	RemoveTableColumn : function()
+	{
+		this.Content.RemoveTableColumn();
+	},
 
-    Table_RemoveCol : function()
-    {
-        this.Content.Table_RemoveCol();
-    },
+	MergeTableCells : function()
+	{
+		this.Content.MergeTableCells();
+	},
 
-    Table_MergeCells : function()
-    {
-        this.Content.Table_MergeCells();
-    },
+	SplitTableCells : function(Cols, Rows)
+	{
+		this.Content.SplitTableCells(Cols, Rows);
+	},
 
-    Table_SplitCell : function( Cols, Rows )
-    {
-        this.Content.Table_SplitCell( Cols, Rows );
-    },
+	RemoveTable : function()
+	{
+		this.Content.RemoveTable();
+	},
 
-    Table_RemoveTable : function()
-    {
-        this.Content.Table_RemoveTable();
-    },
+	SelectTable : function(Type)
+	{
+		this.Content.SelectTable(Type);
+	},
 
-    Table_Select : function(Type)
-    {
-        this.Content.Table_Select(Type);
-    },
+	CanMergeTableCells : function()
+	{
+		return this.Content.CanMergeTableCells();
+	},
 
-    Table_CheckMerge : function()
-    {
-        return this.Content.Table_CheckMerge();
-    },
+	CanSplitTableCells : function()
+	{
+		return this.Content.CanSplitTableCells();
+	},
 
-    Table_CheckSplit : function()
-    {
-        return this.Content.Table_CheckSplit();
-    },
-
-    Check_TableCoincidence : function(Table)
+	CheckTableCoincidence : function(Table)
     {
         return false;
     },
@@ -1123,30 +1123,30 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
-    Hyperlink_Add : function(HyperProps)
-    {
-        this.Content.Hyperlink_Add(HyperProps);
-    },
+	AddHyperlink : function(HyperProps)
+	{
+		this.Content.AddHyperlink(HyperProps);
+	},
 
-    Hyperlink_Modify : function(HyperProps)
-    {
-        this.Content.Hyperlink_Modify(HyperProps);
-    },
+	ModifyHyperlink : function(HyperProps)
+	{
+		this.Content.ModifyHyperlink(HyperProps);
+	},
 
-    Hyperlink_Remove : function()
-    {
-        this.Content.Hyperlink_Remove();
-    },
+	RemoveHyperlink : function()
+	{
+		this.Content.RemoveHyperlink();
+	},
 
-    Hyperlink_CanAdd : function(bCheckInHyperlink)
-    {
-        return this.Content.Hyperlink_CanAdd(bCheckInHyperlink);
-    },
+	CanAddHyperlink : function(bCheckInHyperlink)
+	{
+		return this.Content.CanAddHyperlink(bCheckInHyperlink);
+	},
 
-    Hyperlink_Check : function(bCheckEnd)
-    {
-        return this.Content.Hyperlink_Check(bCheckEnd);
-    },
+	IsCursorInHyperlink : function(bCheckEnd)
+	{
+		return this.Content.IsCursorInHyperlink(bCheckEnd);
+	},
 //-----------------------------------------------------------------------------------
 // Функции для работы с генерацией карты шрифтов
 //-----------------------------------------------------------------------------------
@@ -1200,15 +1200,15 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
-    Add_Comment : function(Comment)
-    {
-        this.Content.Add_Comment( Comment, true, true );
-    },
+	AddComment : function(Comment)
+	{
+		this.Content.AddComment(Comment, true, true);
+	},
 
-    CanAdd_Comment : function()
-    {
-        return this.Content.CanAdd_Comment();
-    }
+	CanAddComment : function()
+	{
+		return this.Content.CanAddComment();
+	}
 };
 CHeaderFooter.prototype.Get_SectPr = function()
 {
@@ -1269,6 +1269,10 @@ CHeaderFooter.prototype.Update_PageCountElements = function(nPageCount)
 CHeaderFooter.prototype.ForceRecalculate = function(nPageAbs)
 {
 	this.RecalcInfo.NeedRecalc[nPageAbs] = true;
+};
+CHeaderFooter.prototype.GetAllContentControls = function(arrContentControls)
+{
+	return this.Content.GetAllContentControls(arrContentControls);
 };
 
 //-----------------------------------------------------------------------------------
@@ -1502,8 +1506,8 @@ CHeaderFooterController.prototype =
                if ( -1 === Header.RecalcInfo.CurPage )
                     Header.Set_Page(PageIndex);
             }
-            HeaderDrawings = Header.Content.Get_AllDrawingObjects([]);
-            HeaderTables = Header.Content.Get_AllFloatElements();
+            HeaderDrawings = Header.Content.GetAllDrawingObjects([]);
+            HeaderTables = Header.Content.GetAllFloatElements();
         }
         
         var bRecalcFooter = false;
@@ -1533,8 +1537,8 @@ CHeaderFooterController.prototype =
                 if ( -1 === Footer.RecalcInfo.CurPage )
                     Footer.Set_Page(PageIndex);
             }
-            FooterDrawings = Footer.Content.Get_AllDrawingObjects([]);
-            FooterTables = Footer.Content.Get_AllFloatElements();
+            FooterDrawings = Footer.Content.GetAllDrawingObjects([]);
+            FooterTables = Footer.Content.GetAllFloatElements();
         }
 
         // Подправляем позиции автофигур с учетом возможно изменившихся границ колонтитулов. Делаем это для всех автофигур,
@@ -1828,11 +1832,11 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с контентом
 //-----------------------------------------------------------------------------------
-    Add_NewParagraph : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Add_NewParagraph();
-    },
+	AddNewParagraph : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.AddNewParagraph();
+	},
 
 	AddInlineImage : function(W, H, Img, Chart, bFlow)
     {
@@ -1864,14 +1868,14 @@ CHeaderFooterController.prototype =
             return this.CurHdrFtr.AddInlineTable( Cols, Rows );
     },
 
-    Paragraph_Add : function( ParaItem, bRecalculate )
-    {
-        if (para_NewLine === ParaItem.Type && true === ParaItem.IsPageOrColumnBreak())
-            return;
+	AddToParagraph : function(ParaItem, bRecalculate)
+	{
+		if (para_NewLine === ParaItem.Type && true === ParaItem.IsPageOrColumnBreak())
+			return;
 
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Paragraph_Add( ParaItem, bRecalculate );
-    },
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.AddToParagraph(ParaItem, bRecalculate);
+	},
 
 	ClearParagraphFormatting : function()
     {
@@ -2353,164 +2357,164 @@ CHeaderFooterController.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для работы с таблицами
 //-----------------------------------------------------------------------------------
-    Table_AddRow : function(bBefore)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_AddRow( bBefore );
-    },
+	AddTableRow : function(bBefore)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.AddTableRow(bBefore);
+	},
 
-    Table_AddCol : function(bBefore)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_AddCol( bBefore );
-    },
+	AddTableColumn : function(bBefore)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.AddTableColumn(bBefore);
+	},
 
-    Table_RemoveRow : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_RemoveRow();
-    },
+	RemoveTableRow : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.RemoveTableRow();
+	},
 
-    Table_RemoveCol : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_RemoveCol();
-    },
+	RemoveTableColumn : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.RemoveTableColumn();
+	},
 
-    Table_MergeCells : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_MergeCells();
-    },
+	MergeTableCells : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.MergeTableCells();
+	},
 
-    Table_SplitCell : function( Cols, Rows )
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_SplitCell( Cols, Rows );
-    },
+	SplitTableCells : function(Cols, Rows)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.SplitTableCells(Cols, Rows);
+	},
 
-    Table_RemoveTable : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_RemoveTable();
-    },
+	RemoveTable : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.RemoveTable();
+	},
 
-    Table_Select : function(Type)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Table_Select(Type);
-    },
+	SelectTable : function(Type)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.SelectTable(Type);
+	},
 
-    Table_CheckMerge : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Table_CheckMerge();
-    },
+	CanMergeTableCells : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.CanMergeTableCells();
+	},
 
-    Table_CheckSplit : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Table_CheckSplit();
-    },
+	CanSplitTableCells : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.CanSplitTableCells();
+	},
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
-    {
-        var HdrFtrState = {};
-        HdrFtrState.CurHdrFtr = this.CurHdrFtr;
+	GetSelectionState : function()
+	{
+		var HdrFtrState       = {};
+		HdrFtrState.CurHdrFtr = this.CurHdrFtr;
 
-        var State = null;
-        if ( null != this.CurHdrFtr )
-            State = this.CurHdrFtr.Content.Get_SelectionState();
-        else
-            State = [];
+		var State = null;
+		if (null != this.CurHdrFtr)
+			State = this.CurHdrFtr.Content.GetSelectionState();
+		else
+			State = [];
 
-        State.push( HdrFtrState );
+		State.push(HdrFtrState);
 
-        return State;
-    },
+		return State;
+	},
 
-    Set_SelectionState : function(State, StateIndex)
-    {
-        if ( State.length <= 0 )
-            return;
+	SetSelectionState : function(State, StateIndex)
+	{
+		if (State.length <= 0)
+			return;
 
-        var HdrFtrState = State[StateIndex];
-        this.CurHdrFtr = HdrFtrState.CurHdrFtr;
+		var HdrFtrState = State[StateIndex];
+		this.CurHdrFtr  = HdrFtrState.CurHdrFtr;
 
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Content.Set_SelectionState(State, StateIndex - 1);
-    },    
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.Content.SetSelectionState(State, StateIndex - 1);
+	},
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
 //-----------------------------------------------------------------------------------
-    Hyperlink_Add : function(HyperProps)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Hyperlink_Add(HyperProps);
-    },
+	AddHyperlink : function(HyperProps)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.AddHyperlink(HyperProps);
+	},
 
-    Hyperlink_Modify : function(HyperProps)
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Hyperlink_Modify(HyperProps);
-    },
+	ModifyHyperlink : function(HyperProps)
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.ModifyHyperlink(HyperProps);
+	},
 
-    Hyperlink_Remove : function()
-    {
-        if ( null != this.CurHdrFtr )
-            this.CurHdrFtr.Hyperlink_Remove();
-    },
+	RemoveHyperlink : function()
+	{
+		if (null != this.CurHdrFtr)
+			this.CurHdrFtr.RemoveHyperlink();
+	},
 
-    Hyperlink_CanAdd : function(bCheckInHyperlink)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Hyperlink_CanAdd(bCheckInHyperlink);
+	CanAddHyperlink : function(bCheckInHyperlink)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.CanAddHyperlink(bCheckInHyperlink);
 
-        return false;
-    },
+		return false;
+	},
 
-    Hyperlink_Check : function(bCheckEnd)
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Hyperlink_Check(bCheckEnd);
+	IsCursorInHyperlink : function(bCheckEnd)
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.IsCursorInHyperlink(bCheckEnd);
 
-        return null;
-    },
+		return null;
+	},
 //-----------------------------------------------------------------------------------
 // Функции для работы с комментариями
 //-----------------------------------------------------------------------------------
-    Add_Comment : function(Comment)
-    {
-        if ( null != this.CurHdrFtr )
-        {
-            // Отмечаем, что данный комментарий добавлен к колонтитулу
-            Comment.Set_TypeInfo( comment_type_HdrFtr, this.CurHdrFtr );
-            this.CurHdrFtr.Add_Comment( Comment );
-        }
-    },
+	AddComment : function(Comment)
+	{
+		if (null != this.CurHdrFtr)
+		{
+			// Отмечаем, что данный комментарий добавлен к колонтитулу
+			Comment.Set_TypeInfo(comment_type_HdrFtr, this.CurHdrFtr);
+			this.CurHdrFtr.AddComment(Comment);
+		}
+	},
 
-    CanAdd_Comment : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.CanAdd_Comment();
+	CanAddComment : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.CanAddComment();
 
-        return false;
-    },
-    
-    Get_SelectionAnchorPos : function()
-    {
-        if ( null != this.CurHdrFtr )
-            return this.CurHdrFtr.Content.Get_SelectionAnchorPos();
-        
-        return { X : 0, Y : 0, Page : 0 };
-    }
+		return false;
+	},
+
+	GetSelectionAnchorPos : function()
+	{
+		if (null != this.CurHdrFtr)
+			return this.CurHdrFtr.Content.GetSelectionAnchorPos();
+
+		return {X : 0, Y : 0, Page : 0};
+	}
 };
-CHeaderFooterController.prototype.Get_StyleFromFormatting = function()
+CHeaderFooterController.prototype.GetStyleFromFormatting = function()
 {
     if (null != this.CurHdrFtr)
-        return this.CurHdrFtr.Content.Get_StyleFromFormatting();
+        return this.CurHdrFtr.Content.GetStyleFromFormatting();
 
     return null;
 };

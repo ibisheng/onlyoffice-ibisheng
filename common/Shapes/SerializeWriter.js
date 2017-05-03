@@ -2453,7 +2453,6 @@ function CBinaryFileWriter()
                     }
                     if (0 != (displayN & 4)) {
                       additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "bin"));
-                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "txt"));
                     }
                     var additionalUrl = [];
                     for (var i = 0; i < additionalSrc.length; ++i) {
@@ -2989,6 +2988,7 @@ function CBinaryFileWriter()
         oThis._WriteInt2(3, ratio * ole.m_nPixHeight);
         oThis._WriteUChar2(4, 0);
         oThis._WriteUChar2(5, 0);
+        oThis._WriteString2(7, ole.m_sObjectFile);
         oThis.WriteUChar(g_nodeAttributeEnd);
     }
     this.WriteTable = function(grObj)
@@ -4792,6 +4792,7 @@ function CBinaryFileWriter()
 			_writer._WriteInt2(3, ratio * ole.m_nPixHeight);
             _writer._WriteUChar2(4, 0);
             _writer._WriteUChar2(5, 0);
+			_writer._WriteString2(7, ole.m_sObjectFile);
             _writer.WriteUChar(g_nodeAttributeEnd);
         }
 

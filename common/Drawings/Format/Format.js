@@ -161,6 +161,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     drawingConstructorsMap[AscDFH.historyitem_ThemeSetColorScheme               ] = ClrScheme;
     drawingConstructorsMap[AscDFH.historyitem_ThemeSetFontScheme                ] = FontScheme;
     drawingConstructorsMap[AscDFH.historyitem_ThemeSetFmtScheme                 ] = FmtScheme;
+    drawingConstructorsMap[AscDFH.historyitem_UniNvPr_SetUniSpPr                 ] = CNvUniSpPr;
 
 
     AscDFH.changesFactory[AscDFH.historyitem_DefaultShapeDefinition_SetSpPr] = CChangesDrawingsObject;
@@ -183,6 +184,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_UniNvPr_SetCNvPr] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_UniNvPr_SetUniPr] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_UniNvPr_SetNvPr] = CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_UniNvPr_SetUniSpPr] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ShapeStyle_SetLnRef] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ShapeStyle_SetFillRef] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ShapeStyle_SetFontRef] = CChangesDrawingsObjectNoId;
@@ -4832,11 +4834,70 @@ Ph.prototype =
     }
 };
 
+
+
+function CNvUniSpPr()
+{
+    this.locks = null;
+
+    this.stCnxIdx = null;
+    this.stCnxId  = null;
+
+    this.endCnxIdx = null;
+    this.endCnxId  = null;
+}
+
+    CNvUniSpPr.prototype.Write_ToBinary = function(w){
+        if(AscFormat.isRealNumber(this.locks)){
+            w.WriteBool(true);
+            w.WriteLong(this.locks);
+        }
+        else {
+            w.WriteBool(false);
+        }
+        w.WriteLong(this.locks);
+        if(AscFormat.isRealNumber(this.stCnxIdx) && AscFormat.isRealNumber(this.stCnxId)){
+            w.WriteBool(true);
+            w.WriteLong(this.stCnxIdx);
+            w.WriteLong(this.stCnxId);
+        }
+        else {
+            w.WriteBool(false);
+        }
+        if(AscFormat.isRealNumber(this.endCnxIdx) && AscFormat.isRealNumber(this.endCnxId)){
+            w.WriteBool(true);
+            w.WriteLong(this.endCnxIdx);
+            w.WriteLong(this.endCnxId);
+        }
+        else {
+            w.WriteBool(false);
+        }
+    };
+    CNvUniSpPr.prototype.Read_FromBinary = function(r){
+        var bCnx = r.GetBool();
+        if(bCnx){
+            this.locks = r.GetLong();
+        }
+        else{
+            this.locks = null;
+        }
+        bCnx = r.GetBool();
+        if(bCnx){
+            this.stCnxIdx = r.GetLong();
+            this.stCnxId = r.GetLong();
+        }
+        else{
+            this.stCnxIdx = r.GetLong();
+            this.stCnxId = r.GetLong();
+        }
+    };
+
 function UniNvPr()
 {
     this.cNvPr = new CNvPr();
     this.UniPr = null;
     this.nvPr = new NvPr();
+    this.nvUniSpPr = new CNvUniSpPr();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
@@ -4860,6 +4921,11 @@ UniNvPr.prototype =
     {
         History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_UniNvPr_SetCNvPr, this.cNvPr, cNvPr));
         this.cNvPr = cNvPr;
+    },
+
+    setUniSpPr: function(pr){
+        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_UniNvPr_SetUniSpPr, this.UniPr, pr));
+        this.nvUniSpPr = pr;
     },
 
     setUniPr: function(uniPr)
@@ -9998,7 +10064,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oDrawingDocument, oTitle.tx);
             if(AscFormat.isRealNumber(nFontSize)){
                 oTextBody.content.Set_ApplyToAll(true);
-                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
+                oTextBody.content.AddToParagraph(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
                 oTextBody.content.Set_ApplyToAll(false);
             }
             oTitle.tx.setRich(oTextBody);
@@ -10017,7 +10083,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oChartSpace.getDrawingDocument(), oTitle.tx);
             if(AscFormat.isRealNumber(nFontSize)){
                 oTextBody.content.Set_ApplyToAll(true);
-                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
+                oTextBody.content.AddToParagraph(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
                 oTextBody.content.Set_ApplyToAll(false);
             }
             oTitle.tx.setRich(oTextBody);
@@ -10469,6 +10535,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].CreateUnifillFromAscColor = CreateUnifillFromAscColor;
     window['AscFormat'].CorrectUniColor = CorrectUniColor;
     window['AscFormat'].deleteDrawingBase = deleteDrawingBase;
+    window['AscFormat'].CNvUniSpPr = CNvUniSpPr;
 
 
     window['AscFormat'].builder_CreateShape = builder_CreateShape;

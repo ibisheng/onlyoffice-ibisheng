@@ -229,15 +229,15 @@ ParaDrawing.prototype.CheckCorrect = function(){
 	return true;
 };
 
-ParaDrawing.prototype.Get_AllDrawingObjects = function(DrawingObjects)
+ParaDrawing.prototype.GetAllDrawingObjects = function(DrawingObjects)
 {
 	if (null == DrawingObjects)
 	{
 		DrawingObjects = [];
 	}
-	if (this.GraphicObj.Get_AllDrawingObjects)
+	if (this.GraphicObj.GetAllDrawingObjects)
 	{
-		this.GraphicObj.Get_AllDrawingObjects(DrawingObjects);
+		this.GraphicObj.GetAllDrawingObjects(DrawingObjects);
 	}
 };
 ParaDrawing.prototype.canRotate = function()
@@ -969,7 +969,7 @@ ParaDrawing.prototype.Measure = function()
 		}
 	}
 };
-ParaDrawing.prototype.Save_RecalculateObject = function(Copy)
+ParaDrawing.prototype.SaveRecalculateObject = function(Copy)
 {
 	var DrawingObj = {};
 
@@ -995,7 +995,7 @@ ParaDrawing.prototype.Save_RecalculateObject = function(Copy)
 
 	return DrawingObj;
 };
-ParaDrawing.prototype.Load_RecalculateObject = function(RecalcObj)
+ParaDrawing.prototype.LoadRecalculateObject = function(RecalcObj)
 {
 	this.updatePosition3(RecalcObj.PageNum, RecalcObj.X, RecalcObj.Y);
 	this.GraphicObj.setRecalcObject(RecalcObj.spRecaclcObject);
@@ -1007,7 +1007,7 @@ ParaDrawing.prototype.Reassign_ImageUrls = function(mapUrls)
 		this.GraphicObj.Reassign_ImageUrls(mapUrls);
 	}
 };
-ParaDrawing.prototype.Prepare_RecalculateObject = function()
+ParaDrawing.prototype.PrepareRecalculateObject = function()
 {
 };
 ParaDrawing.prototype.Is_RealContent = function()
@@ -1098,8 +1098,12 @@ ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimi
 		this.PositionV.Percent      = this.PositionV_Old.Percent2;
 	}
 
+	var oDocumentContent = this.Parent.Parent;
+	if (oDocumentContent && oDocumentContent.IsBlockLevelSdtContent())
+		oDocumentContent = oDocumentContent.Parent.Parent;
+
 	this.Parent          = Paragraph;
-	this.DocumentContent = this.Parent.Parent;
+	this.DocumentContent = oDocumentContent;
 	var PageNum          = ParaLayout.PageNum;
 
 	var OtherFlowObjects = editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatObjectsOnPage(PageNum, this.Parent.Parent);
@@ -2466,6 +2470,14 @@ ParaDrawing.prototype.Get_ObjectType = function()
 
 	return AscDFH.historyitem_type_Drawing;
 };
+ParaDrawing.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if(this.GraphicObj)
+	{
+		this.GraphicObj.GetAllContentControls(arrContentControls);
+	}
+};
+
 
 /**
  * Класс, описывающий текущее положение параграфа при рассчете позиции автофигуры.

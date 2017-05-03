@@ -4504,7 +4504,7 @@ function BinaryPPTYLoader()
                 }
                 case 7:
                 {
-                    s.GetString2();
+                    ole.setObjectFile(s.GetString2());
                     break;
                 }
                 default:
@@ -7871,7 +7871,7 @@ function BinaryPPTYLoader()
                                         _paragraph.f_runPr.Unifill = undefined;
                                     }
                                     _value_text_pr.Set_FromObject(_paragraph.f_runPr);
-                                    txbody.content.Paragraph_Add( new ParaTextPr(_value_text_pr), false );
+                                    txbody.content.AddToParagraph( new ParaTextPr(_value_text_pr), false );
                                     delete _paragraph.f_runPr;
                                 }
                                 if(_paragraph.f_paraPr)
@@ -9027,8 +9027,12 @@ function CPres()
                         oThis.bcr.Read1(nDocLength, function(t,l){
                             return oBinary_DocumentTableReader.ReadDocumentContent(t,l, content_arr);
                         });
-                        for(var i = 0, length = content_arr.length; i < length; ++i)
-                            shape.textBoxContent.Internal_Content_Add(i, content_arr[i]);
+                        for(var i = 0, length = content_arr.length; i < length; ++i){
+                            if(i == length - 1)
+                                shape.textBoxContent.Internal_Content_Add(i, content_arr[i], true);
+                            else
+                                shape.textBoxContent.Internal_Content_Add(i, content_arr[i], false);
+                        }
 
                         s.pos = oThis.stream.pos;
                         s.cur = oThis.stream.cur;
@@ -9289,7 +9293,7 @@ function CPres()
                     }
                     case 7:
                     {
-                        var sFileName = s.GetString2();
+                        ole.setObjectFile(s.GetString2());
                         break;
                     }
                     default:

@@ -525,7 +525,7 @@ function checkPointInMap(map, worksheet, row, col)
 
                 oElement.tx.rich.content.Set_ApplyToAll(true);
                 var oParTextPr = new AscCommonWord.ParaTextPr(oTextPr);
-                oElement.tx.rich.content.Paragraph_Add(oParTextPr);
+                oElement.tx.rich.content.AddToParagraph(oParTextPr);
                 oElement.tx.rich.content.Set_ApplyToAll(false);
             }
             CheckParagraphTextPr(oElement.txPr.content.Content[0], oTextPr);
@@ -839,7 +839,7 @@ CChartSpace.prototype.getSelectionState = function()
     {
         var content = this.selection.textSelection.getDocContent();
         if(content)
-            content_selection = content.Get_SelectionState();
+            content_selection = content.GetSelectionState();
     }
     return {
         title:            this.selection.title,
@@ -878,7 +878,7 @@ CChartSpace.prototype.setSelectionState = function(state)
        {
            var content = this.selection.textSelection.getDocContent();
            if(content)
-               content.Set_SelectionState(state.contentSelection, state.contentSelection.length - 1);
+               content.SetSelectionState(state.contentSelection, state.contentSelection.length - 1);
        }
    }
 };
@@ -1219,7 +1219,7 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
             if(this.selection.title.tx && this.selection.title.tx.rich && this.selection.title.tx.rich.content)
             {
                 this.selection.title.tx.rich.content.Set_ApplyToAll(true);
-                this.selection.title.tx.rich.content.Paragraph_Add(_paraItem);
+                this.selection.title.tx.rich.content.AddToParagraph(_paraItem);
                 this.selection.title.tx.rich.content.Set_ApplyToAll(false);
             }
             return;
@@ -1236,7 +1236,7 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
 };
 CChartSpace.prototype.applyTextFunction = function(docContentFunction, tableFunction, args)
 {
-    if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && !this.selection.textSelection)
+    if(docContentFunction === CDocumentContent.prototype.AddToParagraph && !this.selection.textSelection)
     {
         this.paragraphAdd(args[0], args[1]);
         return;
@@ -5745,7 +5745,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             {
                                 dlbl.lastStyleObject = cat_ax.labels.arrLabels[0].lastStyleObject;
                             }
-                            var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
+                            var min_max =  dlbl.tx.rich.content.RecalculateMinMaxContentWidth();
                             var max_min_content_width = min_max.Min;
                             if(max_min_content_width > max_min_width)
                                 max_min_width = max_min_content_width;
@@ -7175,7 +7175,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             dlbl.tx.rich.content.Set_ApplyToAll(true);
                             dlbl.tx.rich.content.SetParagraphAlign(AscCommon.align_Center);
                             dlbl.tx.rich.content.Set_ApplyToAll(false);
-                            var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
+                            var min_max =  dlbl.tx.rich.content.RecalculateMinMaxContentWidth();
                             var max_min_content_width = min_max.Min;
                             if(min_max.Max > max_max_width)
                                 max_max_width = min_max.Max;

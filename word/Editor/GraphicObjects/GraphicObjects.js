@@ -202,6 +202,16 @@ CGraphicObjects.prototype =
     resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
     handleTextHit: DrawingObjectsController.prototype.handleTextHit,
 
+    AddContentControl: function()
+    {
+        var oTargetDocContent = this.getTargetDocContent();
+        if(oTargetDocContent){
+            return oTargetDocContent.AddContentControl();
+        }
+
+        return null;
+    },
+
     Get_Id: function()
     {
         return this.Id;
@@ -1423,13 +1433,13 @@ CGraphicObjects.prototype =
     canAddComment: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.CanAdd_Comment();
+        return content && content.CanAddComment();
     },
 
     addComment: function(commentData)
     {
         var content = this.getTargetDocContent();
-        return content && content.Add_Comment(commentData, true, true);
+        return content && content.AddComment(commentData, true, true);
     },
 
     hyperlinkCheck: DrawingObjectsController.prototype.hyperlinkCheck,
@@ -1901,64 +1911,64 @@ CGraphicObjects.prototype =
     tableCheckSplit: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_CheckSplit();
+        return content && content.CanSplitTableCells();
     },
 
     tableCheckMerge: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_CheckMerge();
+        return content && content.CanMergeTableCells();
     },
 
     tableSelect: function( Type )
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_Select(Type);
+        return content && content.SelectTable(Type);
     },
 
     tableRemoveTable: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_RemoveTable();
+        return content && content.RemoveTable();
     },
 
     tableSplitCell: function(Cols, Rows)
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_SplitCell(Cols, Rows);
+        return content && content.SplitTableCells(Cols, Rows);
     },
 
     tableMergeCells: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_MergeCells();
+        return content && content.MergeTableCells();
     },
 
     tableRemoveCol: function()
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_RemoveCol();
+        return content && content.RemoveTableColumn();
     },
 
 
     tableAddCol: function(bBefore)
     {
         var content = this.getTargetDocContent();
-        return content && content.Table_AddCol(bBefore);
+        return content && content.AddTableColumn(bBefore);
     },
 
     tableRemoveRow: function()
     {
 
         var content = this.getTargetDocContent();
-        return content && content.Table_RemoveRow();
+        return content && content.RemoveTableRow();
     },
 
     tableAddRow: function(bBefore)
     {
 
         var content = this.getTargetDocContent();
-        return content && content.Table_AddRow(bBefore);
+        return content && content.AddTableRow(bBefore);
     },
 
 
@@ -2187,12 +2197,12 @@ CGraphicObjects.prototype =
     },
 
 
-    Get_StyleFromFormatting: function()
+	GetStyleFromFormatting: function()
     {
         var oContent = this.getTargetDocContent();
         if(oContent)
         {
-            var oStyleFormatting = oContent.Get_StyleFromFormatting();
+            var oStyleFormatting = oContent.GetStyleFromFormatting();
             var oTextPr = oStyleFormatting.TextPr;
             if(oTextPr.TextFill)
             {
@@ -3381,6 +3391,7 @@ CGraphicObjects.prototype =
         var content = this.getTargetDocContent();
         if(content)
             return content.Interface_Update_TablePr( true );
+
         return null;
     },
 
@@ -3428,7 +3439,7 @@ function ComparisonByZIndexSimple(obj1, obj2)
         {
             if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
             {
-                return editor.WordControl.m_oLogicDocument.Compare_DrawingsLogicPositions(obj2, obj1);
+                return editor.WordControl.m_oLogicDocument.CompareDrawingsLogicPositions(obj2, obj1);
             }
         }
         return obj1.RelativeHeight - obj2.RelativeHeight;

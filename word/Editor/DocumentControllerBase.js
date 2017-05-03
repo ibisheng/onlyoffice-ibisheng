@@ -607,7 +607,7 @@ CDocumentControllerBase.prototype.AddTableRow = function(bBefore){};
  * Добавляем столбец таблицы.
  * @param bBefore
  */
-CDocumentControllerBase.prototype.AddTableCol = function(bBefore){};
+CDocumentControllerBase.prototype.AddTableColumn = function(bBefore){};
 /**
  * Удаляем строку таблицы.
  */
@@ -615,7 +615,7 @@ CDocumentControllerBase.prototype.RemoveTableRow = function(){};
 /**
  * Удаляем колонку таблицы.
  */
-CDocumentControllerBase.prototype.RemoveTableCol = function(){};
+CDocumentControllerBase.prototype.RemoveTableColumn = function(){};
 /**
  * Объединяем ячейки таблицы.
  */
@@ -732,3 +732,7 @@ CDocumentControllerBase.prototype.GetCurrentSectionPr = function(){return null;}
  * Отличие от RemoveSelection в том, что сбрасываем селект с текста, но не сбрасываем с автофигур
  */
 CDocumentControllerBase.prototype.RemoveTextSelection = function(){};
+/**
+ * Добавляем класс CBlockLevelSdt в текущую позицию курсора.
+ */
+CDocumentControllerBase.prototype.AddContentControl = function(){return null;};

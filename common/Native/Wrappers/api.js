@@ -1182,7 +1182,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             }
 
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-            this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr(_textPr));
+            this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr(_textPr));
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
         }
@@ -1385,7 +1385,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             }
 
             if (undefined !== _textPr)
-                this.WordControl.m_oLogicDocument.Paragraph_Add(new AscCommonWord.ParaTextPr(_textPr));
+                this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr(_textPr));
 
             this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
             break;
@@ -1911,7 +1911,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.Hyperlink_Add( _props );
+                this.WordControl.m_oLogicDocument.AddHyperlink( _props );
             }
             break;
         }
@@ -1921,7 +1921,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.Hyperlink_Modify( _props );
+                this.WordControl.m_oLogicDocument.ModifyHyperlink( _props );
             }
             break;
         }
@@ -1930,13 +1930,13 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content) )
             {
                 this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-                this.WordControl.m_oLogicDocument.Hyperlink_Remove();
+                this.WordControl.m_oLogicDocument.RemoveHyperlink();
             }
             break;
         }
         case 58: // ASC_MENU_EVENT_TYPE_CAN_ADD_HYPERLINK
         {
-            var bCanAdd = this.WordControl.m_oLogicDocument.Hyperlink_CanAdd(true);
+            var bCanAdd = this.WordControl.m_oLogicDocument.CanAddHyperlink(true);
 
             var _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
@@ -2160,9 +2160,9 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                 {
                     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_TableAddColumnLeft);
                     if (_is_add)
-                        this.WordControl.m_oLogicDocument.Table_AddCol(!_is_above);
+                        this.WordControl.m_oLogicDocument.AddTableColumn(!_is_above);
                     else
-                        this.WordControl.m_oLogicDocument.Table_RemoveCol();
+                        this.WordControl.m_oLogicDocument.RemoveTableColumn();
                 }
             }
             else if (2 == _type)
@@ -2171,9 +2171,9 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                 {
                     this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_TableAddColumnLeft);
                     if (_is_add)
-                        this.WordControl.m_oLogicDocument.Table_AddRow(!_is_above);
+                        this.WordControl.m_oLogicDocument.AddTableRow(!_is_above);
                     else
-                        this.WordControl.m_oLogicDocument.Table_RemoveRow();
+                        this.WordControl.m_oLogicDocument.RemoveTableRow();
                 }
             }
 
@@ -4664,10 +4664,10 @@ Asc['asc_docs_api'].prototype.put_AddPageBreak = function()
     {
         var Document = this.WordControl.m_oLogicDocument;
 
-        if ( null === Document.Hyperlink_Check(false) )
+        if ( null === Document.IsCursorInHyperlink(false) )
         {
             Document.Create_NewHistoryPoint();
-            Document.Paragraph_Add( new ParaNewLine( break_Page ) );
+            Document.AddToParagraph( new ParaNewLine( break_Page ) );
         }
     }
 };
@@ -4687,10 +4687,10 @@ Asc['asc_docs_api'].prototype.put_AddLineBreak = function()
     {
         var Document = this.WordControl.m_oLogicDocument;
 
-        if ( null === Document.Hyperlink_Check(false) )
+        if ( null === Document.IsCursorInHyperlink(false) )
         {
             Document.Create_NewHistoryPoint();
-            Document.Paragraph_Add( new ParaNewLine( para_NewLine ) );
+            Document.AddToParagraph( new ParaNewLine( para_NewLine ) );
         }
     }
 };
@@ -4777,7 +4777,7 @@ Asc['asc_docs_api'].prototype.MergeCells = function()
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Table_MergeCells();
+        this.WordControl.m_oLogicDocument.MergeTableCells();
     }
 }
 Asc['asc_docs_api'].prototype.SplitCell = function(Cols, Rows)
@@ -4785,7 +4785,7 @@ Asc['asc_docs_api'].prototype.SplitCell = function(Cols, Rows)
     if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint();
-        this.WordControl.m_oLogicDocument.Table_SplitCell(Cols, Rows);
+        this.WordControl.m_oLogicDocument.SplitTableCells(Cols, Rows);
     }
 }
 
@@ -5740,51 +5740,36 @@ AscCommon.ChartPreviewManager.prototype.clearPreviews = function()
 {
     window["native"]["DD_ClearCacheChartStyles"]();
 };
+
 AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex)
 {
     return AscFormat.ExecuteNoHistory(function(){
-                                      if(!this.chartsByTypes[type])
-                                      this.chartsByTypes[type] = this.getChartByType(type);
-                                      var chart_space = this.chartsByTypes[type];
-                                      if(chart_space.style !== styleIndex)
-                                      {
-                                      chart_space.style = styleIndex;
-                                      chart_space.recalculateMarkers();
-                                      chart_space.recalculateSeriesColors();
-                                      chart_space.recalculatePlotAreaChartBrush();
-                                      chart_space.recalculatePlotAreaChartPen();
-                                      chart_space.recalculateChartBrush();
-                                      chart_space.recalculateChartPen();
-                                      chart_space.recalculateUpDownBars();
-                                      }
-                                      chart_space.recalculatePenBrush();
+      if(!this.chartsByTypes[type])
+          this.chartsByTypes[type] = this.getChartByType(type);
 
-                                      var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
-                                      var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
-                                      if (AscCommon.AscBrowser.isRetina)
-                                      {
-                                      _width_px <<= 1;
-                                      _height_px <<= 1;
-                                      }
+      var chart_space = this.chartsByTypes[type];
+      AscFormat.ApplyPresetToChartSpace(chart_space, AscCommon.g_oChartPresets[type][styleIndex]);
+      chart_space.recalcInfo.recalculateReferences = false;
+      chart_space.recalculate();
 
-                                      window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
+      // sizes for imageView
+      window["native"]["DD_StartNativeDraw"](85 * 2, 85 * 2, 75, 75);
 
-                                      var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
-                                      if (this.IsRetinaEnabled)
-                                      dKoefToMM /= 2;
+      var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
+      if (this.IsRetinaEnabled)
+          dKoefToMM /= 2;
 
-                                      chart_space.draw(_graphics);
-                                      _graphics.ClearParams();
+      chart_space.draw(_graphics);
+      _graphics.ClearParams();
 
-                                      var _stream = global_memory_stream_menu;
-                                      _stream["ClearNoAttack"]();
-                                      _stream["WriteByte"](4);
-                                      _stream["WriteLong"](type);
-                                      _stream["WriteLong"](styleIndex);
-                                      window["native"]["DD_EndNativeDraw"](_stream);
+      var _stream = global_memory_stream_menu;
+      _stream["ClearNoAttack"]();
+      _stream["WriteByte"](4);
+      _stream["WriteLong"](type);
+      _stream["WriteLong"](styleIndex);
+      window["native"]["DD_EndNativeDraw"](_stream);
 
-                                      }, this, []);
-
+      }, this, []);
 };
 
 AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
@@ -5798,8 +5783,11 @@ AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
 
             var _graphics = new CDrawingStream();
 
-            for (var i = 1; i < 49; ++i)
-                this.createChartPreview(_graphics, chartType, i);
+            if(AscCommon.g_oChartPresets[chartType]){
+                var nStylesCount = AscCommon.g_oChartPresets[chartType].length;
+                for(var i = 0; i < nStylesCount; ++i)
+                    this.createChartPreview(_graphics, chartType, i);
+            }
 
             var _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();

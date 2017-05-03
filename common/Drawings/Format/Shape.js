@@ -544,7 +544,7 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
     oDocContent.Reset(0, 0, dMaxWidth, 20000);
     if(bNeedRecalcAllDrawings)
     {
-        var aAllDrawings = oDocContent.Get_AllDrawingObjects();
+        var aAllDrawings = oDocContent.GetAllDrawingObjects();
         for(i = 0; i < aAllDrawings.length; ++i)
         {
             aAllDrawings[i].GraphicObj.recalculate();
@@ -725,12 +725,12 @@ CShape.prototype.getObjectType = function () {
     return AscDFH.historyitem_type_Shape;
 };
 
-CShape.prototype.Get_AllDrawingObjects = function(DrawingObjects)
+CShape.prototype.GetAllDrawingObjects = function(DrawingObjects)
 {
     var oContent = this.getDocContent();
     if(oContent)
     {
-        oContent.Get_AllDrawingObjects(DrawingObjects);
+        oContent.GetAllDrawingObjects(DrawingObjects);
     }
 };
 
@@ -922,7 +922,7 @@ CShape.prototype.paragraphAdd = function (paraItem, bRecalculate) {
         content_to_add = this.getDocContent();
     }
     if (content_to_add) {
-        content_to_add.Paragraph_Add(paraItem, bRecalculate);
+        content_to_add.AddToParagraph(paraItem, bRecalculate);
     }
 };
 
@@ -957,6 +957,7 @@ CShape.prototype.clearContent = function () {
     if (content) {
         content.Set_ApplyToAll(true);
         content.Remove(-1);
+        content.AddToParagraph(new AscCommonWord.ParaTextPr({Lang : {Val : undefined}}), false);
         content.Set_ApplyToAll(false);
     }
 };
@@ -1160,34 +1161,41 @@ CShape.prototype.isGroup = function () {
     return false;
 };
 
-CShape.prototype.getHierarchy = function () {
-    //if (this.recalcInfo.recalculateShapeHierarchy)
+CShape.prototype.getHierarchy = function()
+{
+    //if(this.recalcInfo.recalculateShapeHierarchy)
     {
         this.compiledHierarchy = [];
-        var hierarchy = this.compiledHierarchy;
-        if (this.parent && this.isPlaceholder()) {
-            var ph_type = this.getPlaceholderType();
-            var ph_index = this.getPlaceholderIndex();
-            switch (this.parent.kind) {
-                case AscFormat.TYPE_KIND.SLIDE:
+        if(this.parent)
+        {
+            var hierarchy = this.compiledHierarchy;
+            if(this.isPlaceholder())
+            {
+                var ph_type = this.getPlaceholderType();
+                var ph_index = this.getPlaceholderIndex();
+                var b_is_single_body = this.getIsSingleBody && this.getIsSingleBody();
+                switch (this.parent.kind)
                 {
-                    hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index));
-                    hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index));
-                    break;
-                }
+                    case AscFormat.TYPE_KIND.SLIDE:
+                    {
+                        hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        break;
+                    }
 
-                case AscFormat.TYPE_KIND.LAYOUT:
-                case AscFormat.TYPE_KIND.NOTES:
-                {
-                    hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index));
-                    break;
+                    case AscFormat.TYPE_KIND.LAYOUT:
+                    {
+                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        break;
+                    }
                 }
             }
+            this.recalcInfo.recalculateShapeHierarchy = true;
         }
-        this.recalcInfo.recalculateShapeHierarchy = true;
     }
     return this.compiledHierarchy;
 };
+
 
 CShape.prototype.getPaddings = function () {
     var paddings = null;
@@ -2318,11 +2326,20 @@ CShape.prototype.recalculateTextStyles = function (level) {
             default_style.TextPr.RFonts.CS = {Name: "+mn-cs", Index: -1};
             default_style.TextPr.RFonts.HAnsi = {Name: "+mn-lt", Index: -1};
         }
-        if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)
-            && isRealObject(parent_objects.presentation.defaultTextStyle.levels[level])) {
-            var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
-            default_style.ParaPr.Merge(default_ppt_style.Copy());
-            default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+        if (isRealObject(parent_objects.presentation) && isRealObject(parent_objects.presentation.defaultTextStyle)) {
+
+            if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[9]))
+            {
+                var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[9];
+                default_style.ParaPr.Merge(default_ppt_style.Copy());
+                default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+            }
+            if(isRealObject(parent_objects.presentation.defaultTextStyle.levels[level]))
+            {
+                var default_ppt_style = parent_objects.presentation.defaultTextStyle.levels[level];
+                default_style.ParaPr.Merge(default_ppt_style.Copy());
+                default_ppt_style.DefaultRunPr && default_style.TextPr.Merge(default_ppt_style.DefaultRunPr.Copy());
+            }
         }
 
         var master_style;
@@ -2923,7 +2940,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
                 var oContent = this.getDocContent();
                 if(oContent)
                 {
-                    oContent.Get_AllDrawingObjects(this.recalcInfo.AllDrawings);
+                    oContent.GetAllDrawingObjects(this.recalcInfo.AllDrawings);
                 }
             }
         }
@@ -4544,7 +4561,7 @@ CShape.prototype.getAllRasterImages = function(images)
     {
         if(this.bWordShape)
         {
-            var drawings = oContent.Get_AllDrawingObjects();
+            var drawings = oContent.GetAllDrawingObjects();
             for(var i = 0; i < drawings.length; ++i)
             {
                 drawings[i].GraphicObj && drawings[i].GraphicObj.getAllRasterImages && drawings[i].GraphicObj.getAllRasterImages(images);
@@ -5344,6 +5361,12 @@ CShape.prototype.getColumnNumber = function(){
                     this.txBody.setBodyPr(new_body_pr);
                 }
             }
+        }
+    };
+    CShape.prototype.GetAllContentControls = function(arrContentControls){
+        var oContent = this.getDocContent();
+        if(oContent){
+            oContent.GetAllContentControls(arrContentControls);
         }
     };
 

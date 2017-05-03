@@ -98,7 +98,7 @@ CGraphicFrame.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBa
 CGraphicFrame.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 CGraphicFrame.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
-CGraphicFrame.prototype.Get_DocumentPositionFromObject= function(PosArray)
+CGraphicFrame.prototype.GetDocumentPositionFromObject= function(PosArray)
     {
         if (!PosArray)
             PosArray = [];
@@ -479,17 +479,17 @@ CGraphicFrame.prototype.isTable = function()
         return this.graphicObject instanceof CTable;
 };
 
-CGraphicFrame.prototype.Hyperlink_CanAdd = function(bCheck)
+CGraphicFrame.prototype.CanAddHyperlink = function(bCheck)
     {
         if(this.graphicObject)
-            return this.graphicObject.Hyperlink_CanAdd(bCheck);
+            return this.graphicObject.CanAddHyperlink(bCheck);
         return false;
 };
 
-CGraphicFrame.prototype.Hyperlink_Check = function(bCheck)
+CGraphicFrame.prototype.IsCursorInHyperlink = function(bCheck)
     {
         if(this.graphicObject)
-            return this.graphicObject.Hyperlink_Check(bCheck);
+            return this.graphicObject.IsCursorInHyperlink(bCheck);
         return false;
 };
 
@@ -863,12 +863,12 @@ CGraphicFrame.prototype.OnContentRecalculate = function()
 
 CGraphicFrame.prototype.getTextSelectionState = function()
     {
-        return this.graphicObject.Get_SelectionState();
+        return this.graphicObject.GetSelectionState();
 };
 
 CGraphicFrame.prototype.setTextSelectionState = function(Sate)
     {
-        return this.graphicObject.Set_SelectionState(Sate, Sate.length-1);
+        return this.graphicObject.SetSelectionState(Sate, Sate.length-1);
 };
 
 CGraphicFrame.prototype.isPlaceholder = function()
@@ -910,7 +910,7 @@ CGraphicFrame.prototype.paragraphAdd = function(paraItem, bRecalculate)
 
 CGraphicFrame.prototype.applyTextFunction = function(docContentFunction, tableFunction, args)
     {
-        if(tableFunction === CTable.prototype.Paragraph_Add)
+        if(tableFunction === CTable.prototype.AddToParagraph)
         {
             if((args[0].Type === para_NewLine
                 || args[0].Type === para_Text
@@ -922,7 +922,7 @@ CGraphicFrame.prototype.applyTextFunction = function(docContentFunction, tableFu
                 this.graphicObject.Remove(1, true, undefined, true);
             }
         }
-        else if(tableFunction === CTable.prototype.Add_NewParagraph)
+        else if(tableFunction === CTable.prototype.AddNewParagraph)
         {
             this.graphicObject.Selection.Use && this.graphicObject.Remove(1, true, undefined, true);
         }
@@ -938,7 +938,7 @@ CGraphicFrame.prototype.remove = function(Count, bOnlyText, bRemoveOnlySelection
 
 CGraphicFrame.prototype.addNewParagraph = function()
     {
-        this.graphicObject.Add_NewParagraph(false);
+        this.graphicObject.AddNewParagraph(false);
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
 };
@@ -1117,6 +1117,12 @@ CGraphicFrame.prototype.Is_ThisElementCurrent = function()
         return false;
     };
 
+
+    CGraphicFrame.prototype.GetAllContentControls = function(arrContentControls){
+       if(this.graphicObject){
+           this.graphicObject.GetAllContentControls(arrContentControls);
+       }
+    };
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicFrame = CGraphicFrame;

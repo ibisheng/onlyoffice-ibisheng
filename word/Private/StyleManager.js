@@ -37,7 +37,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 Asc['asc_docs_api'].prototype.asc_GetStyleFromFormatting = function()
 {
-    return this.WordControl.m_oLogicDocument.Get_StyleFromFormatting();
+    return this.WordControl.m_oLogicDocument.GetStyleFromFormatting();
 };
 Asc['asc_docs_api'].prototype.asc_AddNewStyle = function(oStyle)
 {
@@ -72,28 +72,28 @@ Asc['asc_docs_api'].prototype['asc_IsDefaultStyleChanged']  = Asc['asc_docs_api'
 /**
  * Получаем стиль по выделенному фрагменту.
  */
-CDocument.prototype.Get_StyleFromFormatting = function()
+CDocument.prototype.GetStyleFromFormatting = function()
 {
     if (docpostype_HdrFtr === this.CurPos.Type)
     {
-        return this.HdrFtr.Get_StyleFromFormatting();
+        return this.HdrFtr.GetStyleFromFormatting();
     }
     else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        return this.DrawingObjects.Get_StyleFromFormatting();
+        return this.DrawingObjects.GetStyleFromFormatting();
     }
     else //if (docpostype_Content === this.CurPos.Type)
     {
         if (true == this.Selection.Use)
         {
             if (this.Selection.StartPos > this.Selection.EndPos)
-                return this.Content[this.Selection.EndPos].Get_StyleFromFormatting();
+                return this.Content[this.Selection.EndPos].GetStyleFromFormatting();
             else
-                return this.Content[this.Selection.StartPos].Get_StyleFromFormatting();
+                return this.Content[this.Selection.StartPos].GetStyleFromFormatting();
         }
         else
         {
-            return this.Content[this.CurPos.ContentPos].Get_StyleFromFormatting();
+            return this.Content[this.CurPos.ContentPos].GetStyleFromFormatting();
         }
     }
 };

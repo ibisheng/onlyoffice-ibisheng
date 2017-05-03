@@ -347,7 +347,7 @@ CDrawingsController.prototype.AddTableRow = function(bBefore)
 {
 	this.DrawingObjects.tableAddRow(bBefore);
 };
-CDrawingsController.prototype.AddTableCol = function(bBefore)
+CDrawingsController.prototype.AddTableColumn = function(bBefore)
 {
 	this.DrawingObjects.tableAddCol(bBefore);
 };
@@ -355,7 +355,7 @@ CDrawingsController.prototype.RemoveTableRow = function()
 {
 	this.DrawingObjects.tableRemoveRow();
 };
-CDrawingsController.prototype.RemoveTableCol = function()
+CDrawingsController.prototype.RemoveTableColumn = function()
 {
 	this.DrawingObjects.tableRemoveCol();
 };
@@ -441,13 +441,13 @@ CDrawingsController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 };
 CDrawingsController.prototype.AddComment = function(Comment)
 {
-	if (true != this.DrawingObjects.isSelectedText())
+	if (true !== this.DrawingObjects.isSelectedText())
 	{
 		var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
 		if (null != ParaDrawing)
 		{
 			var Paragraph = ParaDrawing.Parent;
-			Paragraph.Add_Comment2(Comment, ParaDrawing.Get_Id());
+			Paragraph.AddCommentToObject(Comment, ParaDrawing.Get_Id());
 		}
 	}
 	else
@@ -517,4 +517,7 @@ CDrawingsController.prototype.RemoveTextSelection = function()
 {
 	this.DrawingObjects.removeTextSelection();
 };
-
+CDrawingsController.prototype.AddContentControl = function()
+{
+	return this.DrawingObjects.AddContentControl();
+};

@@ -1674,6 +1674,12 @@ function CEditorPage(api)
 			oWordControl.OnUpdateOverlay();
 		}
 
+		if (!oWordControl.IsUpdateOverlayOnEndCheck)
+		{
+			if (oWordControl.m_oDrawingDocument.ContentControlsCheckLast())
+				oWordControl.OnUpdateOverlay();
+		}
+
 		oWordControl.EndUpdateOverlay();
 	};
 	this.onMouseMove2 = function()
@@ -2948,6 +2954,8 @@ function CEditorPage(api)
 					this.m_oDrawingDocument.AutoShapesTrack.CorrectOverlayBounds();
 				}
 			}
+
+			drDoc.DrawContentControlsTrack(overlay);
 
 			if (drDoc.TableOutlineDr.bIsTracked)
 			{

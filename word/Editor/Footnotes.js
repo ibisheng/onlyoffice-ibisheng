@@ -95,13 +95,13 @@ CFootnotesController.prototype.Get_Id = function()
 CFootnotesController.prototype.ResetSpecialFootnotes = function()
 {
 	var oSeparator = new CFootEndnote(this);
-	oSeparator.Paragraph_Add(new ParaSeparator(), false);
+	oSeparator.AddToParagraph(new ParaSeparator(), false);
 	var oParagraph = oSeparator.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetSeparator(oSeparator);
 
 	var oContinuationSeparator = new CFootEndnote(this);
-	oContinuationSeparator.Paragraph_Add(new ParaContinuationSeparator(), false);
+	oContinuationSeparator.AddToParagraph(new ParaContinuationSeparator(), false);
 	oParagraph = oContinuationSeparator.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetContinuationSeparator(oContinuationSeparator);
@@ -263,11 +263,11 @@ CFootnotesController.prototype.ContinueElementsFromPreviousColumn = function(nPa
 
 		if (arrElements.length > 0 && null !== this.ContinuationSeparatorFootnote)
 		{
-			this.ContinuationSeparatorFootnote.Prepare_RecalculateObject();
+			this.ContinuationSeparatorFootnote.PrepareRecalculateObject();
 			this.ContinuationSeparatorFootnote.Reset(X, _Y, XLimit, _YLimit);
 			this.ContinuationSeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
 			this.ContinuationSeparatorFootnote.Recalculate_Page(0, true);
-			oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.Save_RecalculateObject();
+			oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.SaveRecalculateObject();
 
 			var oBounds = this.ContinuationSeparatorFootnote.Get_PageBounds(0);
 			_Y += oBounds.Bottom - oBounds.Top;
@@ -367,11 +367,11 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 
 	if (oColumn.Elements.length <= 0 && null !== this.SeparatorFootnote)
 	{
-		this.SeparatorFootnote.Prepare_RecalculateObject();
+		this.SeparatorFootnote.PrepareRecalculateObject();
 		this.SeparatorFootnote.Reset(X, _Y, XLimit, _YLimit);
 		this.SeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
 		this.SeparatorFootnote.Recalculate_Page(0, true);
-		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.SaveRecalculateObject();
 
 		var oBounds    = this.SeparatorFootnote.Get_PageBounds(0);
 		_Y += oBounds.Bottom - oBounds.Top;
@@ -455,12 +455,12 @@ CFootnotesController.prototype.Draw = function(nPageAbs, pGraphics)
 
 		if (null !== this.ContinuationSeparatorFootnote && null !== oColumn.ContinuationSeparatorRecalculateObject)
 		{
-			this.ContinuationSeparatorFootnote.Load_RecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
+			this.ContinuationSeparatorFootnote.LoadRecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
 			this.ContinuationSeparatorFootnote.Draw(nPageAbs, pGraphics);
 		}
 		if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
 		{
-			this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
+			this.SeparatorFootnote.LoadRecalculateObject(oColumn.SeparatorRecalculateObject);
 			this.SeparatorFootnote.Draw(nPageAbs, pGraphics);
 		}
 
@@ -487,15 +487,15 @@ CFootnotesController.prototype.Shift = function(nPageAbs, nColumnAbs, dX, dY)
 
 	if (null !== this.ContinuationSeparatorFootnote && null !== oColumn.ContinuationSeparatorRecalculateObject)
 	{
-		this.ContinuationSeparatorFootnote.Load_RecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
+		this.ContinuationSeparatorFootnote.LoadRecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
 		this.ContinuationSeparatorFootnote.Shift(0, dX, dY);
-		oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.Save_RecalculateObject();
+		oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.SaveRecalculateObject();
 	}
 	if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
 	{
-		this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
+		this.SeparatorFootnote.LoadRecalculateObject(oColumn.SeparatorRecalculateObject);
 		this.SeparatorFootnote.Shift(0, dX, dY);
-		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.SaveRecalculateObject();
 	}
 
 	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
@@ -1036,7 +1036,7 @@ CFootnotesController.prototype.GotoPage = function(nPageAbs)
 	this.private_SetCurrentFootnoteNoSelection(oFootnote);
 	oFootnote.MoveCursorToStartPos(false);
 };
-CFootnotesController.prototype.Check_TableCoincidence = function(oTable)
+CFootnotesController.prototype.CheckTableCoincidence = function(oTable)
 {
 	return false;
 };
@@ -1361,7 +1361,7 @@ CFootnotesController.prototype.AddNewParagraph = function(bRecalculate, bForceAd
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Add_NewParagraph(bRecalculate, bForceAdd);
+	return this.CurFootnote.AddNewParagraph(bRecalculate, bForceAdd);
 };
 CFootnotesController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
@@ -1417,7 +1417,7 @@ CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 		for (var sId in this.Selection.Footnotes)
 		{
 			var oFootnote = this.Selection.Footnotes[sId];
-			oFootnote.Paragraph_Add(oItem, false);
+			oFootnote.AddToParagraph(oItem, false);
 		}
 
 		if (false !== bRecalculate)
@@ -1431,7 +1431,7 @@ CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 			return;
 
 		if (null !== this.CurFootnote)
-			this.CurFootnote.Paragraph_Add(oItem, bRecalculate);
+			this.CurFootnote.AddToParagraph(oItem, bRecalculate);
 	}
 };
 CFootnotesController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
@@ -2672,49 +2672,49 @@ CFootnotesController.prototype.AddTableRow = function(bBefore)
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_AddRow(bBefore);
+	this.CurFootnote.AddTableRow(bBefore);
 };
-CFootnotesController.prototype.AddTableCol = function(bBefore)
+CFootnotesController.prototype.AddTableColumn = function(bBefore)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_AddCol(bBefore);
+	this.CurFootnote.AddTableColumn(bBefore);
 };
 CFootnotesController.prototype.RemoveTableRow = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_RemoveRow();
+	this.CurFootnote.RemoveTableRow();
 };
-CFootnotesController.prototype.RemoveTableCol = function()
+CFootnotesController.prototype.RemoveTableColumn = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_RemoveCol();
+	this.CurFootnote.RemoveTableColumn();
 };
 CFootnotesController.prototype.MergeTableCells = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_MergeCells();
+	this.CurFootnote.MergeTableCells();
 };
 CFootnotesController.prototype.SplitTableCells = function(Cols, Rows)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_SplitCell(Cols, Rows);
+	this.CurFootnote.SplitTableCells(Cols, Rows);
 };
 CFootnotesController.prototype.RemoveTable = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_RemoveTable();
+	this.CurFootnote.RemoveTable();
 };
 CFootnotesController.prototype.SelectTable = function(Type)
 {
@@ -2723,7 +2723,7 @@ CFootnotesController.prototype.SelectTable = function(Type)
 
 	this.RemoveSelection();
 
-	this.CurFootnote.Table_Select(Type);
+	this.CurFootnote.SelectTable(Type);
 	if (true === this.CurFootnote.IsSelectionUse())
 	{
 		this.Selection.Use            = true;
@@ -2740,14 +2740,14 @@ CFootnotesController.prototype.CanMergeTableCells = function()
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Table_CheckMerge();
+	return this.CurFootnote.CanMergeTableCells();
 };
 CFootnotesController.prototype.CanSplitTableCells = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Table_CheckSplit();
+	return this.CurFootnote.CanSplitTableCells();
 };
 CFootnotesController.prototype.UpdateInterfaceState = function()
 {
@@ -2855,7 +2855,7 @@ CFootnotesController.prototype.GetSelectionState = function()
 		oState.Footnotes[sId] =
 		{
 			Footnote : oFootnote,
-			State    : oFootnote.Get_SelectionState()
+			State    : oFootnote.GetSelectionState()
 		};
 	}
 
@@ -2876,41 +2876,41 @@ CFootnotesController.prototype.SetSelectionState = function(State, StateIndex)
 	for (var sId in oState.Footnotes)
 	{
 		this.Selection.Footnotes[sId] = oState.Footnotes[sId].Footnote;
-		this.Selection.Footnotes[sId].Set_SelectionState(oState.Footnotes[sId].State, oState.Footnotes[sId].State.length - 1);
+		this.Selection.Footnotes[sId].SetSelectionState(oState.Footnotes[sId].State, oState.Footnotes[sId].State.length - 1);
 	}
 };
 CFootnotesController.prototype.AddHyperlink = function(Props)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Hyperlink_Add(Props);
+		this.CurFootnote.AddHyperlink(Props);
 	}
 };
 CFootnotesController.prototype.ModifyHyperlink = function(Props)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Hyperlink_Modify(Props);
+		this.CurFootnote.ModifyHyperlink(Props);
 	}
 };
 CFootnotesController.prototype.RemoveHyperlink = function()
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Hyperlink_Remove();
+		this.CurFootnote.RemoveHyperlink();
 	}
 };
 CFootnotesController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
-		return this.CurFootnote.Hyperlink_CanAdd(bCheckInHyperlink);
+		return this.CurFootnote.CanAddHyperlink(bCheckInHyperlink);
 
 	return false;
 };
 CFootnotesController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
-		return this.CurFootnote.Hyperlink_Check(bCheckEnd);
+		return this.CurFootnote.IsCursorInHyperlink(bCheckEnd);
 
 	return null;
 };
@@ -2918,24 +2918,24 @@ CFootnotesController.prototype.AddComment = function(Comment)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Add_Comment(Comment, true, true);
+		this.CurFootnote.AddComment(Comment, true, true);
 	}
 };
 CFootnotesController.prototype.CanAddComment = function()
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
-		return this.CurFootnote.CanAdd_Comment();
+		return this.CurFootnote.CanAddComment();
 
 	return false;
 };
 CFootnotesController.prototype.GetSelectionAnchorPos = function()
 {
 	if (true !== this.Selection.Use || 0 === this.Selection.Direction)
-		return this.CurFootnote.Get_SelectionAnchorPos();
+		return this.CurFootnote.GetSelectionAnchorPos();
 	else if (1 === this.Selection.Direction)
-		return this.Selection.Start.Footnote.Get_SelectionAnchorPos();
+		return this.Selection.Start.Footnote.GetSelectionAnchorPos();
 	else
-		return this.Selection.End.Footnote.Get_SelectionAnchorPos();
+		return this.Selection.End.Footnote.GetSelectionAnchorPos();
 };
 CFootnotesController.prototype.StartSelectionFromCurPos = function()
 {
@@ -3217,6 +3217,13 @@ CFootnotesController.prototype.ResetRecalculateCache = function()
 	{
 		this.Footnote[Id].Reset_RecalculateCache();
 	}
+};
+CFootnotesController.prototype.AddContentControl = function()
+{
+	if (this.CurFootnote)
+		return this.CurFootnote.AddContentControl();
+
+	return null;
 };
 
 

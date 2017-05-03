@@ -1379,21 +1379,21 @@ ParaPageNum.prototype =
         this.WidthVisible = RealWidth;
     },
 
-    Save_RecalculateObject : function(Copy)
-    {
-        return new CPageNumRecalculateObject(this.Type, this.Widths, this.String, this.Width, Copy);
-    },
+	SaveRecalculateObject : function(Copy)
+	{
+		return new CPageNumRecalculateObject(this.Type, this.Widths, this.String, this.Width, Copy);
+	},
 
-    Load_RecalculateObject : function(RecalcObj)
-    {
-        this.Widths = RecalcObj.Widths;
-        this.String = RecalcObj.String;
+	LoadRecalculateObject : function(RecalcObj)
+	{
+		this.Widths = RecalcObj.Widths;
+		this.String = RecalcObj.String;
 
-        this.Width  = RecalcObj.Width;
-        this.WidthVisible = this.Width;
-    },
+		this.Width        = RecalcObj.Width;
+		this.WidthVisible = this.Width;
+	},
 
-    Prepare_RecalculateObject : function()
+	PrepareRecalculateObject : function()
     {
         this.Widths = [];
         this.String = "";
@@ -1728,6 +1728,11 @@ ParaFootnoteReference.prototype.CreateDocumentFontMap = function(FontMap)
 {
 	if (this.Footnote)
 		this.Footnote.Document_CreateFontMap(FontMap);
+};
+ParaFootnoteReference.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if (this.Footnote)
+		this.Footnote.GetAllContentControls(arrContentControls);
 };
 
 /**

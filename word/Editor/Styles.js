@@ -2764,11 +2764,11 @@ CStyle.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 
@@ -3770,15 +3770,19 @@ CStyles.prototype =
 
                 if (TableStyle != null || ShapeStyle != null)
                 {
-                    if (ShapeStyle != null)
-                    {
-                        Pr.TextPr.Merge(ShapeStyle.TextPr);
-                        Pr.ParaPr.Merge(ShapeStyle.ParaPr);
-                    }
                     if (TableStyle != null)
                     {
                         Pr.TextPr.Merge(TableStyle.TextPr);
                         Pr.ParaPr.Merge(TableStyle.ParaPr);
+                    }
+                    if (ShapeStyle != null)
+                    {
+                        Pr.TextPr.Merge(ShapeStyle.TextPr);
+                        if(!TableStyle)
+                        {
+                            Pr.ParaPr.Merge(ShapeStyle.ParaPr);
+                        }
+
                     }
                 }
                 else
@@ -4299,11 +4303,11 @@ CStyles.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 
@@ -6981,10 +6985,10 @@ CTextPr.prototype =
             this.Unifill = TextPr.Unifill.createDuplicate();
         else
         {
-            //if(undefined != TextPr.Color)
-            //{
-            //    this.Unifill = undefined;
-            //}
+            if(undefined != TextPr.Color)
+            {
+                this.Unifill = undefined;
+            }
         }
         if(undefined != TextPr.FontRef)
         {

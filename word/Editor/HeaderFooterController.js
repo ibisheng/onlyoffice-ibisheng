@@ -42,7 +42,7 @@ CHdrFtrController.prototype.GetCurPage = function()
 };
 CHdrFtrController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
-	return this.HdrFtr.Add_NewParagraph(bRecalculate, bForceAdd);
+	return this.HdrFtr.AddNewParagraph(bRecalculate, bForceAdd);
 };
 CHdrFtrController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
@@ -73,7 +73,7 @@ CHdrFtrController.prototype.AddToParagraph = function(oItem, bRecalculate)
 	if (para_NewLine === oItem.Type && true === oItem.IsPageOrColumnBreak())
 		return;
 
-	this.HdrFtr.Paragraph_Add(oItem, bRecalculate);
+	this.HdrFtr.AddToParagraph(oItem, bRecalculate);
 	this.LogicDocument.Document_UpdateSelectionState();
 	this.LogicDocument.Document_UpdateUndoRedoState();
 };
@@ -293,43 +293,43 @@ CHdrFtrController.prototype.GetSelectedElementsInfo = function(oInfo)
 };
 CHdrFtrController.prototype.AddTableRow = function(bBefore)
 {
-	this.HdrFtr.Table_AddRow(bBefore);
+	this.HdrFtr.AddTableRow(bBefore);
 };
-CHdrFtrController.prototype.AddTableCol = function(bBefore)
+CHdrFtrController.prototype.AddTableColumn = function(bBefore)
 {
-	this.HdrFtr.Table_AddCol(bBefore);
+	this.HdrFtr.AddTableColumn(bBefore);
 };
 CHdrFtrController.prototype.RemoveTableRow = function()
 {
-	this.HdrFtr.Table_RemoveRow();
+	this.HdrFtr.RemoveTableRow();
 };
-CHdrFtrController.prototype.RemoveTableCol = function()
+CHdrFtrController.prototype.RemoveTableColumn = function()
 {
-	this.HdrFtr.Table_RemoveCol();
+	this.HdrFtr.RemoveTableColumn();
 };
 CHdrFtrController.prototype.MergeTableCells = function()
 {
-	this.HdrFtr.Table_MergeCells();
+	this.HdrFtr.MergeTableCells();
 };
 CHdrFtrController.prototype.SplitTableCells = function(Cols, Rows)
 {
-	this.HdrFtr.Table_SplitCell(Cols, Rows);
+	this.HdrFtr.SplitTableCells(Cols, Rows);
 };
 CHdrFtrController.prototype.RemoveTable = function()
 {
-	this.HdrFtr.Table_RemoveTable();
+	this.HdrFtr.RemoveTable();
 };
 CHdrFtrController.prototype.SelectTable = function(Type)
 {
-	this.HdrFtr.Table_Select(Type);
+	this.HdrFtr.SelectTable(Type);
 };
 CHdrFtrController.prototype.CanMergeTableCells = function()
 {
-	return this.HdrFtr.Table_CheckMerge();
+	return this.HdrFtr.CanMergeTableCells();
 };
 CHdrFtrController.prototype.CanSplitTableCells = function()
 {
-	return this.HdrFtr.Table_CheckSplit();
+	return this.HdrFtr.CanSplitTableCells();
 };
 CHdrFtrController.prototype.UpdateInterfaceState = function()
 {
@@ -348,43 +348,43 @@ CHdrFtrController.prototype.UpdateSelectionState = function()
 };
 CHdrFtrController.prototype.GetSelectionState = function()
 {
-	return this.HdrFtr.Get_SelectionState();
+	return this.HdrFtr.GetSelectionState();
 };
 CHdrFtrController.prototype.SetSelectionState = function(State, StateIndex)
 {
-	this.HdrFtr.Set_SelectionState(State, StateIndex);	
+	this.HdrFtr.SetSelectionState(State, StateIndex);
 };
 CHdrFtrController.prototype.AddHyperlink = function(Props)
 {
-	this.HdrFtr.Hyperlink_Add(Props);
+	this.HdrFtr.AddHyperlink(Props);
 };
 CHdrFtrController.prototype.ModifyHyperlink = function(Props)
 {
-	this.HdrFtr.Hyperlink_Modify(Props);
+	this.HdrFtr.ModifyHyperlink(Props);
 };
 CHdrFtrController.prototype.RemoveHyperlink = function()
 {
-	this.HdrFtr.Hyperlink_Remove();
+	this.HdrFtr.RemoveHyperlink();
 };
 CHdrFtrController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
-	return this.HdrFtr.Hyperlink_CanAdd(bCheckInHyperlink);
+	return this.HdrFtr.CanAddHyperlink(bCheckInHyperlink);
 };
 CHdrFtrController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
-	return this.HdrFtr.Hyperlink_Check(bCheckEnd);
+	return this.HdrFtr.IsCursorInHyperlink(bCheckEnd);
 };
 CHdrFtrController.prototype.AddComment = function(Comment)
 {
-	this.HdrFtr.Add_Comment(Comment);
+	this.HdrFtr.AddComment(Comment);
 };
 CHdrFtrController.prototype.CanAddComment = function()
 {
-	return this.HdrFtr.CanAdd_Comment();
+	return this.HdrFtr.CanAddComment();
 };
 CHdrFtrController.prototype.GetSelectionAnchorPos = function()
 {
-	return this.HdrFtr.Get_SelectionAnchorPos();
+	return this.HdrFtr.GetSelectionAnchorPos();
 };
 CHdrFtrController.prototype.StartSelectionFromCurPos = function()
 {
@@ -481,4 +481,12 @@ CHdrFtrController.prototype.RemoveTextSelection = function()
 	var CurHdrFtr = this.HdrFtr.CurHdrFtr;
 	if (null != CurHdrFtr)
 		return CurHdrFtr.Content.RemoveTextSelection();
+};
+CHdrFtrController.prototype.AddContentControl = function()
+{
+	var CurHdrFtr = this.HdrFtr.CurHdrFtr;
+	if (null != CurHdrFtr)
+		return CurHdrFtr.Content.AddContentControl();
+
+	return null;
 };

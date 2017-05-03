@@ -1557,7 +1557,7 @@ DrawingObjectsController.prototype =
 
     addNewParagraph: function(bRecalculate)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Add_NewParagraph, CTable.prototype.Add_NewParagraph, [bRecalculate]);
+        this.applyTextFunction(CDocumentContent.prototype.AddNewParagraph, CTable.prototype.AddNewParagraph, [bRecalculate]);
     },
 
 
@@ -1591,7 +1591,7 @@ DrawingObjectsController.prototype =
                 }
                 else if(arr[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)
                 {
-                    if(f === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr)
+                    if(f === CDocumentContent.prototype.AddToParagraph && args[0].Type === para_TextPr)
                     {
                         AscFormat.CheckObjectTextPr(arr[i], args[0].Value, oThis.getDrawingDocument());
                     }
@@ -1721,7 +1721,7 @@ DrawingObjectsController.prototype =
             var ret = applyToArrayDrawings(this.selectedObjects);
            //if(!ret)
            //{
-           //    if(f !== CDocumentContent.prototype.Paragraph_Add && this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
+           //    if(f !== CDocumentContent.prototype.AddToParagraph && this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
            //    {
            //        var parent_paragraph = this.selectedObjects[0].parent.Get_ParentParagraph();
            //        parent_paragraph
@@ -1813,7 +1813,7 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            if(docContentFunction === CDocumentContent.prototype.Paragraph_Add && args[0].Type === para_TextPr || docContentFunction === CDocumentContent.prototype.PasteFormatting)
+            if(docContentFunction === CDocumentContent.prototype.AddToParagraph && args[0].Type === para_TextPr || docContentFunction === CDocumentContent.prototype.PasteFormatting)
             {
                 this.applyDocContentFunction(docContentFunction, args, tableFunction);
             }
@@ -1839,18 +1839,18 @@ DrawingObjectsController.prototype =
             {
                 this.parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.AddNewParagraph === docContentFunction)
                 {
-                    this.document.Add_NewParagraph(args[0]);
+                    this.document.AddNewParagraph(args[0]);
                 }
             }
             else if(this.selectedObjects.length > 0 && this.selectedObjects[0].parent && this.selectedObjects[0].parent.GoTo_Text)
             {
                 this.selectedObjects[0].parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.Get_DocPosType() || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.AddNewParagraph === docContentFunction)
                 {
-                    this.document.Add_NewParagraph(args[0]);
+                    this.document.AddNewParagraph(args[0]);
                 }
             }
         }
@@ -1858,7 +1858,7 @@ DrawingObjectsController.prototype =
 
     paragraphAdd: function(paraItem, bRecalculate)
     {
-        this.applyTextFunction(CDocumentContent.prototype.Paragraph_Add, CTable.prototype.Paragraph_Add, [paraItem, bRecalculate]);
+        this.applyTextFunction(CDocumentContent.prototype.AddToParagraph, CTable.prototype.AddToParagraph, [paraItem, bRecalculate]);
     },
 
 
@@ -2135,7 +2135,7 @@ DrawingObjectsController.prototype =
     {
         var content = this.getTargetDocContent();
         if(content)
-            return content.Hyperlink_Check(bCheckEnd);
+            return content.IsCursorInHyperlink(bCheckEnd);
         return null;
     },
 
@@ -2146,7 +2146,7 @@ DrawingObjectsController.prototype =
         {
             if(this.document && content.Parent && content.Parent instanceof  AscFormat.CTextBody)
                 return false;
-            return content.Hyperlink_CanAdd(bCheckInHyperlink);
+            return content.CanAddHyperlink(bCheckInHyperlink);
         }
         return false;
     },
@@ -2156,7 +2156,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent(true);
         if(content)
         {
-            var Ret = content.Hyperlink_Remove();
+            var Ret = content.RemoveHyperlink();
             var target_text_object = getTargetTextObject(this);
             if(target_text_object)
             {
@@ -2172,7 +2172,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent(true);
         if(content)
         {
-            var Ret = content.Hyperlink_Modify(HyperProps);
+            var Ret = content.ModifyHyperlink(HyperProps);
             var target_text_object = getTargetTextObject(this);
             if(target_text_object)
             {
@@ -2196,7 +2196,7 @@ DrawingObjectsController.prototype =
                     bCheckExtents = true;
                 }
             }
-            var Ret = content.Hyperlink_Add(HyperProps);
+            var Ret = content.AddHyperlink(HyperProps);
             if(bCheckExtents)
             {
                 var target_text_object = getTargetTextObject(this);
@@ -6194,7 +6194,7 @@ DrawingObjectsController.prototype =
                                 var oContent = oTargetTextObject.getDocContent();
                                 if(oContent)
                                 {
-                                    oContent.Get_AllDrawingObjects(oTargetTextObject.recalcInfo.AllDrawings);
+                                    oContent.GetAllDrawingObjects(oTargetTextObject.recalcInfo.AllDrawings);
                                 }
                             }
                         }
@@ -6649,11 +6649,11 @@ DrawingObjectsController.prototype =
             this.selection.textSelection = selection_state.textObject;
             if(selection_state.textObject.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                selection_state.textObject.graphicObject.Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+                selection_state.textObject.graphicObject.SetSelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
             }
             else
             {
-                selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+                selection_state.textObject.getDocContent().SetSelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
             }
         }
         else if(selection_state.groupObject && !selection_state.groupObject.bDeleted)
@@ -6696,11 +6696,11 @@ DrawingObjectsController.prototype =
             selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
             if(this.selection.textSelection.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
             {
-                selection_state.textSelection = this.selection.textSelection.graphicObject.Get_SelectionState();
+                selection_state.textSelection = this.selection.textSelection.graphicObject.GetSelectionState();
             }
             else
             {
-                selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
+                selection_state.textSelection = this.selection.textSelection.getDocContent().GetSelectionState();
             }
         }
         else if(this.selection.groupSelection)
@@ -7864,7 +7864,7 @@ DrawingObjectsController.prototype =
             oTextPr.RFonts.EastAsia = {Name: "Cambria Math", Index: -1};
         }
         oContent.Set_ApplyToAll(true);
-        oContent.Paragraph_Add(new ParaTextPr(oTextPr));
+        oContent.AddToParagraph(new ParaTextPr(oTextPr));
         oContent.SetParagraphAlign(AscCommon.align_Center);
         oContent.Set_ApplyToAll(false);
         var oBodyPr = oShape.getBodyPr().createDuplicate();

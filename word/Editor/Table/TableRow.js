@@ -177,30 +177,30 @@ CTableRow.prototype =
             return this.Content[CellIndex - 1].Get_EndInfo();
     },
 
-    Save_RecalculateObject : function()
-    {
-        var RecalcObj = new CTableRowRecalculateObject();
-        RecalcObj.Save( this );
-        return RecalcObj;
-    },
+	SaveRecalculateObject : function()
+	{
+		var RecalcObj = new CTableRowRecalculateObject();
+		RecalcObj.Save(this);
+		return RecalcObj;
+	},
 
-    Load_RecalculateObject : function(RecalcObj)
+	LoadRecalculateObject : function(RecalcObj)
     {
         RecalcObj.Load(this);
     },
 
-    Prepare_RecalculateObject : function()
-    {
-        this.CellsInfo   = [];
-        this.Metrics     = { X_min : 0, X_max : 0 };
-        this.SpacingInfo = { Top : false, Bottom : false };
+	PrepareRecalculateObject : function()
+	{
+		this.CellsInfo   = [];
+		this.Metrics     = {X_min : 0, X_max : 0};
+		this.SpacingInfo = {Top : false, Bottom : false};
 
-        var Count = this.Content.length;
-        for ( var Index = 0; Index < Count; Index++ )
-        {
-            this.Content[Index].Prepare_RecalculateObject();
-        }
-    },
+		var Count = this.Content.length;
+		for (var Index = 0; Index < Count; Index++)
+		{
+			this.Content[Index].PrepareRecalculateObject();
+		}
+	},
 
     PreDelete : function()
     {
@@ -746,7 +746,7 @@ CTableRow.prototype =
     {
     }
 };
-CTableRow.prototype.Get_DocumentPositionFromObject = function(PosArray)
+CTableRow.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -754,7 +754,7 @@ CTableRow.prototype.Get_DocumentPositionFromObject = function(PosArray)
     if (this.Table)
     {
         PosArray.splice(0, 0, {Class : this.Table, Position : this.Index});
-        this.Table.Get_DocumentPositionFromObject(PosArray);
+        this.Table.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;
@@ -786,7 +786,7 @@ CTableRowRecalculateObject.prototype =
         var Count = Row.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            this.Content[Index] = Row.Content[Index].Save_RecalculateObject();
+            this.Content[Index] = Row.Content[Index].SaveRecalculateObject();
         }
     },
 
@@ -802,7 +802,7 @@ CTableRowRecalculateObject.prototype =
         var Count = Row.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            Row.Content[Index].Load_RecalculateObject( this.Content[Index] );
+            Row.Content[Index].LoadRecalculateObject( this.Content[Index] );
         }
     },
 
