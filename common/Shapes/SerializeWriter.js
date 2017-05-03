@@ -2453,7 +2453,6 @@ function CBinaryFileWriter()
                     }
                     if (0 != (displayN & 4)) {
                       additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "bin"));
-                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "txt"));
                     }
                     var additionalUrl = [];
                     for (var i = 0; i < additionalSrc.length; ++i) {
