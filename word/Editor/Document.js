@@ -15162,6 +15162,10 @@ CDocument.prototype.GetAllContentControls = function()
 	}
 	return arrContentControls;
 };
+CDocument.prototype.SelectContentControl = function(oContentControl)
+{
+
+};
 
 function CDocumentSelectionState()
 {

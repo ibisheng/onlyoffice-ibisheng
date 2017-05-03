@@ -51,6 +51,7 @@ function CBlockLevelSdt(oLogicDocument, oParent)
 
 	this.LogicDocument = oLogicDocument;
 	this.Content       = new CDocumentContent(this, oLogicDocument ? oLogicDocument.Get_DrawingDocument() : null, 0, 0, 0, 0, true, false, false);
+	this.Pr            = new CSdtPr();
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);
@@ -760,6 +761,9 @@ CBlockLevelSdt.prototype.Refresh_RecalcData2 = function(CurPage)
 {
 	this.Parent.Refresh_RecalcData2(this.Index, CurPage);
 };
+CBlockLevelSdt.prototype.Refresh_RecalcData = function(Data)
+{
+};
 CBlockLevelSdt.prototype.Check_AutoFit = function()
 {
 	return this.Parent.Check_AutoFit();
@@ -837,6 +841,52 @@ CBlockLevelSdt.prototype.GetDocumentPositionFromObject = function(PosArray)
 		this.Parent.GetDocumentPositionFromObject(PosArray);
 
 	return PosArray;
+};
+//----------------------------------------------------------------------------------------------------------------------
+CBlockLevelSdt.prototype.SetAlias = function(sAlias)
+{
+	History.Add(new CChangesSdtPrAlias(this, this.Pr.Alias, sAlias));
+	this.Pr.Alias = sAlias;
+};
+CBlockLevelSdt.prototype.GetAlias = function()
+{
+	return (undefined !== this.Pr.Alias ? this.Pr.Alias : "");
+};
+CBlockLevelSdt.prototype.SetContentControlId = function(Id)
+{
+	History.Add(new CChangesSdtPrId(this, this.Pr.Id, Id));
+	this.Pr.Id = Id;
+};
+CBlockLevelSdt.prototype.GetContentControlId = function()
+{
+	return this.Pr.Id;
+};
+CBlockLevelSdt.prototype.SetTag = function(sTag)
+{
+	History.Add(new CChangesSdtPrTag(this, this.Pr.Tag, sTag));
+	this.Pr.Tag = sTag;
+};
+CBlockLevelSdt.prototype.GetTag = function()
+{
+	return (undefined !== this.Pr.Tag ? this.Pr.Tag : "");
+};
+CBlockLevelSdt.prototype.SetLabel = function(sLabel)
+{
+	History.Add(new CChangesSdtPrLabel(this, this.Pr.Label, sLabel));
+	this.Pr.Label = sLabel;
+};
+CBlockLevelSdt.prototype.GetLabel = function()
+{
+	return (undefined !== this.Pr.Label ? this.Pr.Label : "");
+};
+CBlockLevelSdt.prototype.SetContentControlLock = function(nLockType)
+{
+	History.Add(new CChangesSdtPrLock(this, this.Pr.Lock, nLockType));
+	this.Pr.Lock = nLockType;
+};
+CBlockLevelSdt.prototype.GetContentControlLock = function()
+{
+	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
