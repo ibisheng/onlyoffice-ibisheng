@@ -4504,7 +4504,7 @@ function BinaryPPTYLoader()
                 }
                 case 7:
                 {
-                    s.GetString2();
+                    ole.setObjectFile(s.GetString2());
                     break;
                 }
                 default:
@@ -9293,7 +9293,7 @@ function CPres()
                     }
                     case 7:
                     {
-                        var sFileName = s.GetString2();
+                        ole.setObjectFile(s.GetString2());
                         break;
                     }
                     default:
