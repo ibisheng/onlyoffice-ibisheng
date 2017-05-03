@@ -2470,6 +2470,11 @@ ParaDrawing.prototype.Get_ObjectType = function()
 
 	return AscDFH.historyitem_type_Drawing;
 };
+ParaDrawing.prototype.GetAllContentControls = function(arrContentControls)
+{
+	// TODO: Реализовать
+};
+
 
 /**
  * Класс, описывающий текущее положение параграфа при рассчете позиции автофигуры.

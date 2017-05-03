@@ -626,6 +626,9 @@ CDocumentContentElementBase.prototype.GetStyleFromFormatting = function()
 {
 	return null;
 };
+CDocumentContentElementBase.prototype.GetAllContentControls = function(arrContentControls)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

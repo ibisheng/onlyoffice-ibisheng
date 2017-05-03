@@ -1270,6 +1270,10 @@ CHeaderFooter.prototype.ForceRecalculate = function(nPageAbs)
 {
 	this.RecalcInfo.NeedRecalc[nPageAbs] = true;
 };
+CHeaderFooter.prototype.GetAllContentControls = function(arrContentControls)
+{
+	return this.Content.GetAllContentControls(arrContentControls);
+};
 
 //-----------------------------------------------------------------------------------
 // Класс для работы с колонтитулами

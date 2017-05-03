@@ -8468,6 +8468,18 @@ CDocumentContent.prototype.AddContentControl = function()
 	else
 		return this.private_AddContentControl();
 };
+CDocumentContent.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if (!arrContentControls)
+		arrContentControls = [];
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetAllContentControls(arrContentControls);
+	}
+
+	return arrContentControls;
+};
 
 
 function CDocumentContentStartState(DocContent)

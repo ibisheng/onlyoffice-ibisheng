@@ -656,6 +656,11 @@ CBlockLevelSdt.prototype.GetStyleFromFormatting = function()
 {
 	return this.Content.GetStyleFromFormatting();
 };
+CBlockLevelSdt.prototype.GetAllContentControls = function(arrContentControls)
+{
+	arrContentControls.push(this);
+	this.Content.GetAllContentControls(arrContentControls);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

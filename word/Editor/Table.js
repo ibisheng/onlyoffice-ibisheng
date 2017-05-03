@@ -12006,6 +12006,18 @@ CTable.prototype.AddContentControl = function()
 
 	return null;
 };
+CTable.prototype.GetAllContentControls = function(arrContentControls)
+{
+	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow = this.Content[nCurRow];
+		for (var nCurCell = 0, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell = oRow.Get_Cell(nCurCell);
+			oCell.Content.GetAllContentControls(arrContentControls);
+		}
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

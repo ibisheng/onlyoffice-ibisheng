@@ -15150,6 +15150,18 @@ CDocument.prototype.AddContentControl = function()
 
 	return this.Controller.AddContentControl();
 };
+CDocument.prototype.GetAllContentControls = function()
+{
+	var arrContentControls = [];
+
+	this.SectionsInfo.GetAllContentControls(arrContentControls);
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].GetAllContentControls(arrContentControls);
+	}
+	return arrContentControls;
+};
 
 function CDocumentSelectionState()
 {
@@ -15492,6 +15504,31 @@ CDocumentSectionsInfo.prototype =
                 this.Elements[Index].Index -= Count;
         }
     }
+};
+CDocumentSectionsInfo.prototype.GetAllContentControls = function(arrContentControls)
+{
+	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
+	{
+		var SectPr = this.Elements[nIndex].SectPr;
+
+		if (null != SectPr.HeaderFirst)
+			SectPr.HeaderFirst.GetAllContentControls(arrContentControls);
+
+		if (null != SectPr.HeaderDefault)
+			SectPr.HeaderDefault.GetAllContentControls(arrContentControls);
+
+		if (null != SectPr.HeaderEven)
+			SectPr.HeaderEven.GetAllContentControls(arrContentControls);
+
+		if (null != SectPr.FooterFirst)
+			SectPr.FooterFirst.GetAllContentControls(arrContentControls);
+
+		if (null != SectPr.FooterDefault)
+			SectPr.FooterDefault.GetAllContentControls(arrContentControls);
+
+		if (null != SectPr.FooterEven)
+			SectPr.FooterEven.GetAllContentControls(arrContentControls);
+	}
 };
 
 function CDocumentSectionsInfoElement(SectPr, Index)

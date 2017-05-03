@@ -9131,6 +9131,20 @@ ParaRun.prototype.GetFootnoteRefsInRange = function(arrFootnotes, _CurLine, _Cur
 			arrFootnotes.push(this.Content[CurPos]);
 	}
 };
+ParaRun.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if (!arrContentControls)
+		return;
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Content[nIndex];
+		if (para_Drawing === oItem.Type || para_FootnoteReference === oItem.Type)
+		{
+			oItem.GetAllContentControls(arrContentControls);
+		}
+	}
+};
 
 function CParaRunStartState(Run)
 {

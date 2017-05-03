@@ -1729,6 +1729,11 @@ ParaFootnoteReference.prototype.CreateDocumentFontMap = function(FontMap)
 	if (this.Footnote)
 		this.Footnote.Document_CreateFontMap(FontMap);
 };
+ParaFootnoteReference.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if (this.Footnote)
+		this.Footnote.GetAllContentControls(arrContentControls);
+};
 
 /**
  * Класс представляющий номер сноски внутри сноски.

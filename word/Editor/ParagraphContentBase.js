@@ -2677,6 +2677,19 @@ CParagraphContentWithParagraphLikeContent.prototype.GetFootnoteRefsInRange = fun
 			this.Content[CurPos].GetFootnoteRefsInRange(arrFootnotes, _CurLine, _CurRange);
 	}
 };
+CParagraphContentWithParagraphLikeContent.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if (!arrContentControls)
+		arrContentControls = [];
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].GetAllContentControls)
+			this.Content[nIndex].GetAllContentControls(arrContentControls);
+	}
+
+	return arrContentControls;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------
