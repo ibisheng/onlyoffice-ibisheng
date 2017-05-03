@@ -1117,6 +1117,12 @@ CGraphicFrame.prototype.Is_ThisElementCurrent = function()
         return false;
     };
 
+
+    CGraphicFrame.prototype.GetAllContentControls = function(arrContentControls){
+       if(this.graphicObject){
+           this.graphicObject.GetAllContentControls(arrContentControls);
+       }
+    };
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicFrame = CGraphicFrame;

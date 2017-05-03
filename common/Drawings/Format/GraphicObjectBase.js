@@ -779,6 +779,10 @@
     {
     };
 
+    CGraphicObjectBase.prototype.GetAllContentControls = function(arrContentControls)
+    {
+    };
+
 window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;

@@ -1834,6 +1834,13 @@ function CGroupShape()
         }
     };
 
+    CGroupShape.prototype.GetAllContentControls = function(arrContentControls){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].GetAllContentControls(arrContentControls);
+        }
+    };
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGroupShape = CGroupShape;

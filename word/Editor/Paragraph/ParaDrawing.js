@@ -2472,7 +2472,10 @@ ParaDrawing.prototype.Get_ObjectType = function()
 };
 ParaDrawing.prototype.GetAllContentControls = function(arrContentControls)
 {
-	// TODO: Реализовать
+	if(this.GraphicObj)
+	{
+		this.GraphicObj.GetAllContentControls(arrContentControls);
+	}
 };
 
 

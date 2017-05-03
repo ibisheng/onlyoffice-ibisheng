@@ -5363,6 +5363,12 @@ CShape.prototype.getColumnNumber = function(){
             }
         }
     };
+    CShape.prototype.GetAllContentControls = function(arrContentControls){
+        var oContent = this.getDocContent();
+        if(oContent){
+            oContent.GetAllContentControls(arrContentControls);
+        }
+    };
 
 function CreateBinaryReader(szSrc, offset, srcLen)
 {
