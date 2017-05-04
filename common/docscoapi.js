@@ -35,6 +35,9 @@
 (function(window, undefined) {
   'use strict';
 
+  var Asc = window['Asc'];
+  var AscCommon = window['AscCommon'];
+
   var ConnectionState = AscCommon.ConnectionState;
   var c_oEditorId = AscCommon.c_oEditorId;
   var c_oCloseCode = AscCommon.c_oCloseCode;

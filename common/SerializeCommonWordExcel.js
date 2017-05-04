@@ -123,7 +123,7 @@ BinaryCommonWriter.prototype.WriteItem = function(type, fWrite)
     this.memory.WriteByte(type);
     this.WriteItemWithLength(fWrite);
 };
-BinaryCommonWriter.prototype.WriteItemStart = function(type)
+BinaryCommonWriter.prototype.WriteItemStart = function(type, fWrite)
 {
 	this.memory.WriteByte(type);
     return this.WriteItemWithLengthStart(fWrite);
