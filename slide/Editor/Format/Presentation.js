@@ -43,8 +43,6 @@ var History = AscCommon.History;
 
 var CreateUnifillSolidFillSchemeColor = AscFormat.CreateUnifillSolidFillSchemeColor;
 
-var recalcSlideInterval = 30;
-
 function SlideCopyObject(Slide, ImageUrl)
 {
     this.Slide = Slide;

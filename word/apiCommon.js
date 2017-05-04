@@ -1171,7 +1171,7 @@
 			this.Italic = false;
 			this.Underline = false;
 			this.Strikeout = false;
-			this.FontFamily = new asc_CTextFontFamily();
+			this.FontFamily = new AscCommon.asc_CTextFontFamily();
 			this.FontSize = 12;
 			this.Color = AscCommon.CreateAscColorCustom(0, 0, 0);
 			this.VertAlign = AscCommon.vertalign_Baseline;

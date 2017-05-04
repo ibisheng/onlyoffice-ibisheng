@@ -262,8 +262,8 @@
 	  ],
       "dst": "../cell",
       "externs": [
-        "../common/Build/Externs.js",
-        "../../web-apps/vendor/jquery/jquery.min.js",
+        "../common/externs/global.js",
+        "../common/externs/jquery-3.2.js",
         "../../web-apps/vendor/sockjs/sockjs.min.js",
         "../../web-apps/vendor/xregexp/xregexp-all-min.js",
         "../../web-apps/vendor/jszip/jszip.min.js",
