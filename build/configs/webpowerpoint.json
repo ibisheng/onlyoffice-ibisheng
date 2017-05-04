@@ -264,10 +264,5 @@
     "source_map": {
       "url": "http://localhost:8080/sdkjs/slide"
     }
-  },
-  "tasks": {
-    "build": [
-      "compile_sdk"
-    ]
   }
 }

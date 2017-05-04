@@ -256,10 +256,5 @@
     "source_map": {
       "url": "http://localhost:8080/sdkjs/word"
     }
-  },
-  "tasks": {
-    "build": [
-      "compile_sdk"
-    ]
   }
 }

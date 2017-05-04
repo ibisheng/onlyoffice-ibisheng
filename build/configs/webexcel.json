@@ -276,10 +276,5 @@
     "source_map": {
       "url": "http://localhost:8080/sdkjs/cell"
     }
-  },
-  "tasks": {
-    "build": [
-      "compile_sdk"
-    ]
   }
 }
