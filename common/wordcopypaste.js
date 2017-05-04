@@ -2462,7 +2462,12 @@ PasteProcessor.prototype =
 							case para_Math:
 							{
 								//преобразуем в текст
-								this._convertParaMathToText(elem);
+								var mathToParaRun = this._convertParaMathToText(elem);
+								if(mathToParaRun)
+								{
+									paragraphContent.splice(i, 1, mathToParaRun);
+									i--;
+								}
 
 								break;
 							}
@@ -2502,9 +2507,18 @@ PasteProcessor.prototype =
 
 	_convertParaMathToText: function(paraMath)
 	{
-		//TODO пока добавляю функцию здесь. должна она находиться в Math.js
-		var res = paraMath.Root.GetTextContent();
-		console.log(res.str);
+		var res = null;
+		var oDoc = this.oLogicDocument;
+
+		var mathText = paraMath.Root.GetTextContent();
+		if(mathText && mathText.str)
+		{
+			var newParaRun = new ParaRun();
+			this._addTextIntoRun(newParaRun, mathText.str);
+
+			res = newParaRun;
+		}
+
 		return res;
 	},
 

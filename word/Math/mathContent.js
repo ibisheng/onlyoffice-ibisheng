@@ -7335,6 +7335,11 @@ CMathContent.prototype.GetTextContent = function()
 				}
 			}
 		}
+		else if(elem instanceof CMathFunc)
+		{
+			//todo сивмол должен быть другим!
+			res.push(getVal("#"));
+		}
 
 		return res;
 	};
@@ -7429,12 +7434,15 @@ CMathContent.prototype.GetTextContent = function()
 			addText(symbol[0].value);
 			//степень корня
 			tempStr = elem.Content[0].GetTextContent();
+			var isAddExp = false;
 			if(tempStr.str)
 			{
+				addText("(");
 				addText(tempStr.str, tempStr.bIsContainsOperator);
+				isAddExp = true;
 			}
 
-			if(tempStr)
+			if(tempStr.str)
 			{
 				addText(symbol[1].value);
 			}
@@ -7444,6 +7452,11 @@ CMathContent.prototype.GetTextContent = function()
 			if(tempStr.str)
 			{
 				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+
+			if(isAddExp)
+			{
+				addText(")");
 			}
 		}
 		else if(elem instanceof CMathMatrix)
@@ -7484,6 +7497,8 @@ CMathContent.prototype.GetTextContent = function()
 				addText(tempStr.str);
 			}
 
+			addText(symbol[0].value);
+
 			//аргумент
 			tempStr = elem.Content[1].GetTextContent();
 			if(tempStr.str)
@@ -7495,9 +7510,9 @@ CMathContent.prototype.GetTextContent = function()
 		{
 			//функция
 			tempStr = elem.Content[0].GetTextContent();
-			if(tempStr)
+			if(tempStr.str)
 			{
-				addText(tempStr);
+				addText(tempStr.str);
 			}
 
 			//аргумент
