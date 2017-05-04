@@ -1908,6 +1908,7 @@
 	}
 
 	asc_CShapeProperty.prototype = {
+		constructor: asc_CShapeProperty,
 		asc_getType: function () {
 			return this.type;
 		}, asc_putType: function (v) {
@@ -2286,6 +2287,7 @@
 	}
 
 	asc_CImgProperty.prototype = {
+		constructor: asc_CImgProperty,
 		asc_getChangeLevel: function () {
 			return this.ChangeLevel;
 		}, asc_putChangeLevel: function (v) {
