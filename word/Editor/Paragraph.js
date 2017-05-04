@@ -9227,65 +9227,7 @@ Paragraph.prototype.Document_CreateFontMap = function(FontMap)
 };
 Paragraph.prototype.Document_CreateFontCharMap = function(FontCharMap)
 {
-	this.Internal_CompileParaPr();
-
-	var CurTextPr = this.CompiledPr.Pr.TextPr.Copy();
-	FontCharMap.StartFont(CurTextPr.FontFamily.Name, CurTextPr.Bold, CurTextPr.Italic, CurTextPr.FontSize);
-
-	for (var Index = 0; Index < this.Content.length; Index++)
-	{
-		var Item = this.Content[Index];
-
-		if (para_TextPr === Item.Type)
-		{
-			// Выставляем начальные настройки текста у данного параграфа
-			CurTextPr = this.CompiledPr.Pr.TextPr.Copy();
-
-			var _CurTextPr = Item.Value;
-
-			// Копируем настройки из символьного стиля
-			if (undefined != _CurTextPr.RStyle)
-			{
-				var Styles      = this.Parent.Get_Styles();
-				var StyleTextPr = Styles.Get_Pr(_CurTextPr.RStyle, styletype_Character).TextPr;
-				CurTextPr.Merge(StyleTextPr);
-			}
-
-			// Копируем прямые настройки
-			CurTextPr.Merge(_CurTextPr);
-			FontCharMap.StartFont(CurTextPr.FontFamily.Name, CurTextPr.Bold, CurTextPr.Italic, CurTextPr.FontSize);
-		}
-		else if (para_Text === Item.Type)
-		{
-			FontCharMap.AddChar(Item.Value);
-		}
-		else if (para_Space === Item.Type)
-		{
-			FontCharMap.AddChar(' ');
-		}
-		else if (para_Numbering === Item.Type)
-		{
-			var ParaPr = this.CompiledPr.Pr.ParaPr;
-			var NumPr  = ParaPr.NumPr;
-			if (undefined === NumPr || undefined === NumPr.NumId || 0 === NumPr.NumId || "0" === NumPr.NumId)
-				continue;
-
-			var Numbering = this.Parent.Get_Numbering();
-			var NumInfo   = this.Parent.Internal_GetNumInfo(this.Id, NumPr);
-			var NumTextPr = this.CompiledPr.Pr.TextPr.Copy();
-			NumTextPr.Merge(this.TextPr.Value);
-			NumTextPr.Merge(NumLvl.TextPr);
-
-			Numbering.Document_CreateFontCharMap(FontCharMap, NumTextPr, NumPr, NumInfo);
-			FontCharMap.StartFont(CurTextPr.FontFamily.Name, CurTextPr.Bold, CurTextPr.Italic, CurTextPr.FontSize);
-		}
-		else if (para_PageNum === Item.Type)
-		{
-			Item.Document_CreateFontCharMap(FontCharMap);
-		}
-	}
-
-	CurTextPr.Merge(this.TextPr.Value);
+	// TODO: Данная функция устарела и не используется
 };
 Paragraph.prototype.Document_Get_AllFontNames = function(AllFonts)
 {
