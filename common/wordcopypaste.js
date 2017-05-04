@@ -2504,7 +2504,7 @@ PasteProcessor.prototype =
 	{
 		//TODO пока добавляю функцию здесь. должна она находиться в Math.js
 		var res = paraMath.Root.GetTextContent();
-		console.log(res);
+		console.log(res.str);
 		return res;
 	},
 
