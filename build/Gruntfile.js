@@ -160,7 +160,7 @@ module.exports = function(grunt) {
 		var tmp_sdk_path = sdkDstFolder + '/sdk-js-tmp.js';
 		var sdkAllMinDst = sdkDstFolder + '/sdk-all-min.js';
 		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
-		var sdkAllCashe = sdkDstFolder + '/*.cache'
+		var sdkAllCache = sdkDstFolder + '/*.cache'
 		var sdkOpt = {
 			compilation_level: level,
 			warning_level: 'QUIET',
@@ -211,7 +211,7 @@ module.exports = function(grunt) {
 					src: [
 						sdkTmp,
 						tmp_sdk_path,
-						sdkAllCashe
+						sdkAllCache
 					]
 				}
 			},
