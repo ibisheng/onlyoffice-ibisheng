@@ -7101,7 +7101,7 @@ function CDrawingDocument()
 		//_MathPainter.StartLoad();
 		//return;
 
-		var _MathPainter = new CMathPainter(this.m_oWordControl.m_oApi);
+		var _MathPainter = new AscFormat.CMathPainter(this.m_oWordControl.m_oApi);
 		_MathPainter.Generate();
 		this.MathMenuLoad = true;
 	};

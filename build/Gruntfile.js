@@ -73,17 +73,6 @@ module.exports = function(grunt) {
             grunt.log.error().writeln('Could not load config file'.red);
     });
 	
-	grunt.registerTask('build_sdk', 'Build sdk.', function(){
-        if (packageFile) {
-            if (packageFile['tasks']['build'])
-                grunt.task.run(packageFile['tasks']['build']);
-            else
-                grunt.log.error().writeln('Not found "build" task in configure'.red);
-        } else {
-            grunt.log.error().writeln('Is not load configure file.'.red);
-        }
-    });
-	
 	grunt.registerTask('build_word',     ['build_webword_init', 'build_sdk']);
 	grunt.registerTask('build_cell',  ['build_webexcel_init', 'build_sdk']);
 	grunt.registerTask('build_slide', ['build_webpowerpoint_init', 'build_sdk']);
@@ -171,7 +160,7 @@ module.exports = function(grunt) {
 		var tmp_sdk_path = sdkDstFolder + '/sdk-js-tmp.js';
 		var sdkAllMinDst = sdkDstFolder + '/sdk-all-min.js';
 		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
-		var sdkAllCashe = sdkDstFolder + '/*.cache'
+		var sdkAllCache = sdkDstFolder + '/*.cache'
 		var sdkOpt = {
 			compilation_level: level,
 			warning_level: 'QUIET',
@@ -222,7 +211,7 @@ module.exports = function(grunt) {
 					src: [
 						sdkTmp,
 						tmp_sdk_path,
-						sdkAllCashe
+						sdkAllCache
 					]
 				}
 			},
@@ -247,6 +236,6 @@ module.exports = function(grunt) {
 	});
 	
 	grunt.registerTask('concat_sdk', ['concat_sdk_init', 'concat', 'clean']);
-	grunt.registerTask('compile_sdk', ['concat_sdk', 'compile_sdk_init', 'closure-compiler', 'splitfile', 'concat', 'replace', 'clean']);
+	grunt.registerTask('build_sdk', ['concat_sdk', 'compile_sdk_init', 'closure-compiler', 'splitfile', 'concat', 'replace', 'clean']);
 	grunt.registerTask('default', ['build_all']);
 };

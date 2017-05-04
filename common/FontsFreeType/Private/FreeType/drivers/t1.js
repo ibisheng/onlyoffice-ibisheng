@@ -967,7 +967,7 @@ function T1_Get_Private_Dict(parser, psaux)
             parser.private_len = ret.num_bytes;
 
             /* put a safeguard */
-            parser.private_dict[len] = FT_Common.SYMBOL_CONST_S0;
+            parser.private_dict[ret.num_bytes] = FT_Common.SYMBOL_CONST_S0;
         }
         else
         {

@@ -114,9 +114,16 @@ var c_oAscError = Asc.c_oAscError;
 window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
 	if (window["Asc"].c_oAscAdvancedOptionsID.CSV === idOption) {
+		var delimiter = option.asc_getDelimiter();
+		var delimiterChar = option.asc_getDelimiterChar();
         var _param = "";
 	    _param += ("<m_nCsvTxtEncoding>" + option.asc_getCodePage() + "</m_nCsvTxtEncoding>");
-	    _param += ("<m_nCsvDelimiter>" + option.asc_getDelimiter() + "</m_nCsvDelimiter>");
+		if (null != delimiter) {
+			_param += ("<m_nCsvDelimiter>" + delimiter + "</m_nCsvDelimiter>");
+		}
+		if (null != delimiterChar) {
+			_param += ("<m_nCsvDelimiterChar>" + delimiterChar + "</m_nCsvDelimiterChar>");
+		}
 
 		window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
 	}

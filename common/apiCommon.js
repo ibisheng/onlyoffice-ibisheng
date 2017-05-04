@@ -37,6 +37,10 @@
  * @param {undefined} undefined
  */
 	function (window, undefined) {
+
+	var Asc = window['Asc'];
+	var AscCommon = window['AscCommon'];
+
 	// Import
 	var prot;
 	var c_oAscMouseMoveDataTypes = AscCommon.c_oAscMouseMoveDataTypes;
@@ -1254,8 +1258,8 @@
 			this.Space = (undefined != obj.Space) ? obj.Space : null;
 		} else {
 			this.Color = CreateAscColorCustom(0, 0, 0);
-			this.Size = 0.5 * AscCommonWord.g_dKoef_pt_to_mm;
-			this.Value = AscCommonWord.border_Single;
+			this.Size = 0.5 * window["AscCommonWord"].g_dKoef_pt_to_mm;
+			this.Value = window["AscCommonWord"].border_Single;
 			this.Space = 0;
 		}
 	}
@@ -1664,7 +1668,7 @@
 			this.Brd = (undefined != obj.Brd && null != obj.Brd) ? new asc_CParagraphBorders(obj.Brd) : null;
 			this.Shd = (undefined != obj.Shd && null != obj.Shd) ? new asc_CParagraphShd(obj.Shd) : null;
 			this.Tabs = (undefined != obj.Tabs) ? new asc_CParagraphTabs(obj.Tabs) : undefined;
-			this.DefaultTab = AscCommonWord.Default_Tab_Stop;
+			this.DefaultTab = window["AscCommonWord"].Default_Tab_Stop;
 			this.Locked = (undefined != obj.Locked && null != obj.Locked ) ? obj.Locked : false;
 			this.CanAddTable = (undefined != obj.CanAddTable ) ? obj.CanAddTable : true;
 
@@ -1908,6 +1912,7 @@
 	}
 
 	asc_CShapeProperty.prototype = {
+		constructor: asc_CShapeProperty,
 		asc_getType: function () {
 			return this.type;
 		}, asc_putType: function (v) {
@@ -2286,6 +2291,7 @@
 	}
 
 	asc_CImgProperty.prototype = {
+		constructor: asc_CImgProperty,
 		asc_getChangeLevel: function () {
 			return this.ChangeLevel;
 		}, asc_putChangeLevel: function (v) {
@@ -2425,7 +2431,7 @@
 		},
 
 		asc_getOriginSize: function (api) {
-			if (AscFormat.isRealNumber(this.oleWidth) && AscFormat.isRealNumber(this.oleHeight)) {
+			if (window['AscFormat'].isRealNumber(this.oleWidth) && window['AscFormat'].isRealNumber(this.oleHeight)) {
 				return new asc_CImageSize(this.oleWidth, this.oleHeight, true);
 			}
 			var _section_select = api.WordControl.m_oLogicDocument.Get_PageSizesByDrawingObjects();
@@ -2447,7 +2453,7 @@
 			}
 
 			var _image = api.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.ImageUrl)];
-			if (_image != undefined && _image.Image != null && _image.Status == AscFonts.ImageLoadStatus.Complete) {
+			if (_image != undefined && _image.Image != null && _image.Status == window['AscFonts'].ImageLoadStatus.Complete) {
 				var _w = Math.max(1, _page_width - (_page_x_left_margin + _page_x_right_margin));
 				var _h = Math.max(1, _page_height - (_page_y_top_margin + _page_y_bottom_margin));
 

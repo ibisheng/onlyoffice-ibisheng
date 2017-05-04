@@ -134,6 +134,8 @@
 		
 		"../word/Editor/DocumentContentElementBase.js",
 		"../word/Editor/StructuredDocumentTags/BlockLevel.js",
+        "../word/Editor/StructuredDocumentTags/SdtPr.js",
+        "../word/Editor/StructuredDocumentTags/SdtPrChanges.js",
         "../word/Editor/Comments.js",
         "../word/Editor/CommentsChanges.js",
         "../word/Editor/Styles.js",
@@ -262,7 +264,6 @@
       "externs": [
         "../common/Build/Externs.js",
         "../../web-apps/vendor/jquery/jquery.min.js",
-        "../../web-apps/vendor/underscore/underscore-min.js",
         "../../web-apps/vendor/sockjs/sockjs.min.js",
         "../../web-apps/vendor/xregexp/xregexp-all-min.js",
         "../../web-apps/vendor/jszip/jszip.min.js",
@@ -274,10 +275,5 @@
     "source_map": {
       "url": "http://localhost:8080/sdkjs/cell"
     }
-  },
-  "tasks": {
-    "build": [
-      "compile_sdk"
-    ]
   }
 }

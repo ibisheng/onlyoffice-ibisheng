@@ -2477,7 +2477,7 @@ CTable.prototype.Internal_UpdateFlowPosition = function(X, Y)
 	this.X = X + Dx;
 	this.Y = Y;
 
-	this.Set_PositionH(c_oAscHAnchor.Page, false, this.X);
+	this.Set_PositionH(c_oAscHAnchor.Page, false, this.X_origin);
 	this.Set_PositionV(c_oAscVAnchor.Page, false, this.Y);
 };
 CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
@@ -9502,7 +9502,7 @@ CTable.prototype.Update_TableMarkupFromRuler = function(NewMarkup, bCol, Index)
 		if (0 === Col)
 		{
 			Dx = this.Markup.X - NewMarkup.X;
-			this.X -= Dx;
+			this.X_origin -= Dx;
 
 			if (true === this.Is_Inline())
 			{
@@ -9513,7 +9513,7 @@ CTable.prototype.Update_TableMarkupFromRuler = function(NewMarkup, bCol, Index)
 			}
 			else
 			{
-				this.Internal_UpdateFlowPosition(this.X, this.Y);
+				this.Internal_UpdateFlowPosition(this.X_origin, this.Y);
 			}
 		}
 		else
@@ -9631,8 +9631,8 @@ CTable.prototype.Update_TableMarkupFromRuler = function(NewMarkup, bCol, Index)
 			else
 			{
 				var Dy = this.Markup.Rows[0].Y - NewMarkup.Rows[0].Y;
-				Page.Y -= Dy;
-				this.Internal_UpdateFlowPosition(Page.X, Page.Y);
+				this.Y -= Dy;
+				this.Internal_UpdateFlowPosition(this.X_origin, this.Y);
 				var NewH = NewMarkup.Rows[0].H;
 				this.Content[0].Set_Height(NewH, linerule_AtLeast);
 			}

@@ -6317,11 +6317,11 @@ AutoCorrectionControl.prototype.FindFunction = function(CanMakeAutoCorrect)
                         oLeftCommandType = MATH_RADICAL;
                         break;
                     case 0x221B:
-                        TempElements2.splice(0, 0, {Text : '3'});
+                        //TempElements2.splice(0, 0, {Text : '3'});
                         oLeftCommandType = MATH_RADICAL;
                         break;
                     case 0x221C:
-                        TempElements2.splice(0, 0, {Text : '4'});
+                        //TempElements2.splice(0, 0, {Text : '4'});
                         oLeftCommandType = MATH_RADICAL;
                         break;
                     case 0x23E0:

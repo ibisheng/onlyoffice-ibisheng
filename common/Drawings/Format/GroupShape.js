@@ -598,11 +598,6 @@ function CGroupShape()
         return this.scaleCoefficients;
     };
 
-    CGroupShape.prototype.getType = function()
-    {
-        return DRAWING_OBJECT_TYPE_GROUP;
-    };
-
     CGroupShape.prototype.getCompiledTransparent = function()
     {
         return null;

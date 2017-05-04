@@ -7530,13 +7530,12 @@ drawHBarChart.prototype =
 	{
 		var gradientPen = penFill;
 		var gradientBrush = brushFill;
-		
+
 		var angleKf = 60000;
 		var shade = "shade";
 		var shadeValue1 = 35000;
-		var shadeValue2 = 45000;
 		var t = this;
-		
+
 		if(brushFill.fill.lin && null !== brushFill.fill.lin.angle)
 		{
 			var getCSolidColor = function(color, colorMod)
@@ -7549,22 +7548,18 @@ drawHBarChart.prototype =
 				{
 					tempColor = t._applyColorModeByBrush(tempColor, colorMod);
 				}
-				
+
 				return tempColor;
 			};
-			
+
 			var angle = brushFill.fill.lin.angle / angleKf;
 			var colors = brushFill.fill.colors;
-			
+
 			if(angle >= 0 && angle < 45)
 			{
 				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.down)
 				{
 					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
-					if(null === gradientPen)
-					{
-						gradientPen = gradientPen.setFill(newBrush);
-					}
 				}
 				else if(faceIndex === c_oChartBar3dFaces.left)
 				{
@@ -7584,10 +7579,6 @@ drawHBarChart.prototype =
 				else if(faceIndex === c_oChartBar3dFaces.right)
 				{
 					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
-					if(null === gradientPen)
-					{
-						gradientPen = gradientPen.setFill(newBrush);
-					}
 				}
 				else if(faceIndex === c_oChartBar3dFaces.down)
 				{
@@ -7603,10 +7594,6 @@ drawHBarChart.prototype =
 				else if(faceIndex === c_oChartBar3dFaces.right)
 				{
 					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
-					if(null === gradientPen)
-					{
-						gradientPen = gradientPen.setFill(newBrush);
-					}
 				}
 				else if(faceIndex === c_oChartBar3dFaces.down)
 				{
@@ -7622,10 +7609,6 @@ drawHBarChart.prototype =
 				else if(faceIndex === c_oChartBar3dFaces.down)
 				{
 					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
-					if(null === gradientPen)
-					{
-						gradientPen = gradientPen.setFill(newBrush);
-					}
 				}
 			}
 			else if(angle >= 180 && angle < 225)
@@ -7633,10 +7616,6 @@ drawHBarChart.prototype =
 				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.down)
 				{
 					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
-					if(null === gradientPen)
-					{
-						gradientPen = gradientPen.setFill(newBrush);
-					}
 				}
 				else if(faceIndex === c_oChartBar3dFaces.right)
 				{
@@ -7652,10 +7631,6 @@ drawHBarChart.prototype =
 				if(faceIndex === c_oChartBar3dFaces.up)
 				{
 					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
-					if(null === gradientPen)
-					{
-						gradientPen = gradientPen.setFill(newBrush);
-					}
 				}
 				else if(faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.down || faceIndex === c_oChartBar3dFaces.right)
 				{
@@ -7675,10 +7650,6 @@ drawHBarChart.prototype =
 				else if(faceIndex === c_oChartBar3dFaces.right)
 				{
 					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
-					if(null === gradientPen)
-					{
-						gradientPen = gradientPen.setFill(newBrush);
-					}
 				}
 			}
 			else if(angle >= 315 && angle <= 360)
@@ -7686,10 +7657,6 @@ drawHBarChart.prototype =
 				if(faceIndex === c_oChartBar3dFaces.up || faceIndex === c_oChartBar3dFaces.right)
 				{
 					gradientBrush = this._applyColorModeByBrush(brushFill, shadeValue1);
-					if(null === gradientPen)
-					{
-						gradientPen = gradientPen.setFill(newBrush);
-					}
 				}
 				else if(faceIndex === c_oChartBar3dFaces.left || faceIndex === c_oChartBar3dFaces.down)
 				{
@@ -7697,7 +7664,7 @@ drawHBarChart.prototype =
 				}
 			}
 		}
-		
+
 		return {pen: gradientPen, brush: gradientBrush};
 	},
 	
@@ -13631,11 +13598,6 @@ CGeometry2.prototype =
         return  false;
     },
 
-    getObjectType: function()
-    {
-        return CLASS_TYPE_GEOMETRY;
-    },
-
     AddPath: function(path)
     {
         this.pathLst.push(path);
@@ -13901,52 +13863,6 @@ CSortFaces.prototype =
 		}
 		
 		return {intersections: intersections, reverseIntersections: reverseIntersections, countIntersection: countIntersection};
-	},
-	
-	sortFaces: function(faces)
-	{
-		var t = this;
-		
-		var iterCount = 0;
-		var newArr = [];
-		var lastFaces = faces;
-		
-		while(lastFaces.length !== 0)
-		{
-			var firstFaces1 = [], lastFaces1 = [];
-			t._getFirstLastFaces(lastFaces, firstFaces1, lastFaces1);
-			newArr = firstFaces1.concat(newArr);
-			lastFaces = lastFaces1;
-			iterCount++;
-			
-			if(iterCount > 50)
-			{
-				newArr = lastFaces.concat(newArr);
-				break;
-			}
-		}
-		
-		return newArr;
-	},
-	
-	_getFirstLastFaces: function(sortZIndexPaths, first, last)
-	{
-		//перебираем все грани
-		for(var i = 0; i < all.length; i++)
-		{
-			var plainVerge = all[i];
-			
-			var isFirstVerge = this._isIntersectionFacesPointLines(plainVerge, i, all);
-			//push into array
-			if(!isFirstVerge)
-			{
-				first.push(plainVerge);
-			}
-			else
-			{
-				last.push(plainVerge);
-			}
-		}
 	},
 	
 	//смотрим есть ли пересечения точек, выходящих из вершин данной грани, с другими гранями

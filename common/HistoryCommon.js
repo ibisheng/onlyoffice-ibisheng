@@ -1103,6 +1103,7 @@
 	window['AscDFH'].historyitem_type_FootEndNote      = 57 << 16;
 	window['AscDFH'].historyitem_type_Presentation     = 58 << 16;
 	window['AscDFH'].historyitem_type_BlockLevelSdt    = 59 << 16;
+	window['AscDFH'].historyitem_type_SdtPr            = 60 << 16;
 
 	window['AscDFH'].historyitem_type_CommonShape            = 1000 << 16; // Этот класс добавлен для элементов, у которых нет конкретного класса
 
@@ -1648,6 +1649,14 @@
 	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumStart    = window['AscDFH'].historyitem_type_Footnotes | 6;
 	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumRestart  = window['AscDFH'].historyitem_type_Footnotes | 7;
 	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumFormat   = window['AscDFH'].historyitem_type_Footnotes | 8;
+	//------------------------------------------------------------------------------------------------------------------
+	// Типы изменений в классе CSdtPr
+	//------------------------------------------------------------------------------------------------------------------
+	window['AscDFH'].historyitem_SdtPr_Alias = window['AscDFH'].historyitem_type_SdtPr | 1;
+	window['AscDFH'].historyitem_SdtPr_Id    = window['AscDFH'].historyitem_type_SdtPr | 2;
+	window['AscDFH'].historyitem_SdtPr_Tag   = window['AscDFH'].historyitem_type_SdtPr | 3;
+	window['AscDFH'].historyitem_SdtPr_Label = window['AscDFH'].historyitem_type_SdtPr | 4;
+	window['AscDFH'].historyitem_SdtPr_Lock  = window['AscDFH'].historyitem_type_SdtPr | 5;
 	//------------------------------------------------------------------------------------------------------------------
 	// Графические классы общего назначение (без привязки к конкретному классу)
 	//------------------------------------------------------------------------------------------------------------------
