@@ -553,7 +553,7 @@ FT_Stream.prototype =
                     if ( fval == 24 )
                     {
                         data = structure.data;
-                        pos = structure.pos + arrayFields[ind].offset;
+                        pos = structure.pos + fields[ind].offset;
 
                         for (var i=0;i<len;i++)
                             data[i] = this.data[cursor+i];
@@ -620,8 +620,8 @@ FT_Stream.prototype =
             /* finally, store the value in the object */
 
             data = structure.data;
-            pos = structure.pos + arrayFields[ind].offset;
-            switch (arrayFields[ind])
+            pos = structure.pos + fields[ind].offset;
+            switch (fields[ind])
             {
                 case 1:
                     data[pos] = value & 0xFF;

@@ -918,7 +918,7 @@ FT_Stream.prototype =
                     if ( fval == 24 )
                     {
                         data = structure.data;
-                        pos = structure.pos + arrayFields[ind].offset;
+                        pos = structure.pos + fields[ind].offset;
 
                         for (var i=0;i<len;i++)
                             data[i] = this.data[cursor+i];
@@ -985,8 +985,8 @@ FT_Stream.prototype =
             /* finally, store the value in the object */
 
             data = structure.data;
-            pos = structure.pos + arrayFields[ind].offset;
-            switch (arrayFields[ind])
+            pos = structure.pos + fields[ind].offset;
+            switch (fields[ind])
             {
                 case 1:
                     data[pos] = value & 0xFF;
@@ -10455,7 +10455,7 @@ function ps_tocoordarray(cur, limit, max_coords, coords)
 
         var old_cur = cur.pos;
 
-        if ( coords != NULL && count >= max_coords )
+        if ( coords != null && count >= max_coords )
             break;
 
         /* call PS_Conv_ToFixed() even if coords == NULL */
@@ -12861,7 +12861,7 @@ function sfnt_get_charset_id(face,acharset_encoding,acharset_registry)
         FT_Error = tt_face_find_bdf_prop(face, "CHARSET_ENCODING", encoding);
         if (FT_Error == 0)
         {
-            if (registry.type == BDF_PROPERTY_TYPE_ATOM && encoding.type == BDF_PROPERTY_TYPE_ATOM)
+            if (registry.type == 1 && encoding.type == 1)
             {
                 return {enc:encoding.u,reg:registry.u};
             }
@@ -15473,7 +15473,7 @@ function tt_cmap4_char_map_linear(cmap, _charcode, next)
     if (next != 0 && gindex != 0)
         return {gindex:gindex,char_code:charcode};
 
-    return {gindex:gindex,char_code:_char_code};
+    return {gindex:gindex,char_code:_charcode};
 }
 function tt_cmap4_char_map_binary(cmap, _charcode, next)
 {
@@ -16292,7 +16292,7 @@ function tt_cmap12_char_map_binary(cmap, _char_code, next)
 
         cmap.valid = 1;
         cmap.cur_charcode = char_code;
-        cmap12.cur_group = mid;
+        cmap.cur_group = mid;
 
         if (gindex == 0)
         {
@@ -16322,7 +16322,7 @@ function tt_cmap12_char_next(cmap, _char_code)
     if (cmap.cur_charcode >= 0xFFFFFFFF)
         return {gindex:gindex,char_code:__char_code};
 
-    if (cmap12.valid == 1 && cmap.cur_charcode == _char_code)
+    if (cmap.valid == 1 && cmap.cur_charcode == _char_code)
     {
         tt_cmap12_next(cmap);
         if (1 == cmap.valid)
@@ -16502,7 +16502,7 @@ function tt_cmap13_char_map_binary(cmap, _char_code, next)
 
         if (gindex == 0)
         {
-            tt_cmap13_next( cmap13 );
+            tt_cmap13_next( cmap );
             if (cmap.valid == 1)
                 gindex = cmap.cur_gindex;
         }
@@ -16539,7 +16539,7 @@ function tt_cmap13_char_next(cmap, _char_code)
             gindex = 0;
     }
     else
-        return tt_cmap13_char_map_binary( cmap, pchar_code, 1 );
+        return tt_cmap13_char_map_binary( cmap, _char_code, 1 );
 
     return {gindex:gindex,char_code:__char_code};
 }
@@ -16552,7 +16552,7 @@ function tt_cmap13_class_rec()
         var p = dublicate_pointer(table);
         var base = p.pos;
 
-        if (bae + 16 > valid.limit)
+        if (base + 16 > valid.limit)
             return 8;
 
         p.pos = base + 4;
@@ -16913,13 +16913,13 @@ function tt_cmap14_variant_chars(cmap, memory, variantSelector)
     {
         var __pp = dublicate_pointer(_cmap_data);
         __pp += defOff;
-        return tt_cmap14_get_def_chars(cmap, _p, memory);
+        return tt_cmap14_get_def_chars(cmap, __pp, memory);
     }
     if (dcnt == 0)
     {
         var __pp = dublicate_pointer(_cmap_data);
         __pp += nondefOff;
-        return tt_cmap14_get_nondef_chars(cmap, __p, memory);
+        return tt_cmap14_get_nondef_chars(cmap, __pp, memory);
     }
 
     if (0 != tt_cmap14_ensure(cmap, (dcnt + numMappings + 1), memory))
@@ -21784,7 +21784,7 @@ function Ins_SxVTL(exc, aIdx1, aIdx2, aOpc, Vec)
     if ((aIdx1 >= exc.zp2.n_points) || (aIdx2 >= exc.zp1.n_points))
     {
         if (exc.pedantic_hinting)
-            exc.error = FT_Err_Invalid_Reference;
+            exc.error = 0x86;
         return 1;
     }
 
@@ -28167,7 +28167,7 @@ function TT_Vary_Get_Glyph_Deltas(face, glyph_index, n_points)
         stream.cur = here;
     }
 
-    for ( i = 0; i < ( tupleCount & GX_TC_TUPLE_COUNT_MASK ); ++i )
+    for ( i = 0; i < ( tupleCount & 0x0FFF ); ++i )
     {
         var tupleDataSize = stream.GetUShort();
         var tupleIndex    = stream.GetUShort();

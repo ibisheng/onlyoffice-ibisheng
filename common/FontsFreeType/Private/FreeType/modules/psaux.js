@@ -2426,7 +2426,7 @@ function ps_tocoordarray(cur, limit, max_coords, coords)
 
         var old_cur = cur.pos;
 
-        if ( coords != NULL && count >= max_coords )
+        if ( coords != null && count >= max_coords )
             break;
 
         /* call PS_Conv_ToFixed() even if coords == NULL */
