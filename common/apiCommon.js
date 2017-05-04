@@ -2866,26 +2866,12 @@
 		return this.Number;
 	};
 
-	function asc_CUserInfo(obj) {
-		if (obj) {
-			if (typeof obj.Id != 'undefined') {
-				this.Id = obj.Id;
-			}
-			if (typeof obj.FullName != 'undefined') {
-				this.FullName = obj.FullName;
-			}
-			if (typeof obj.FirstName != 'undefined') {
-				this.FirstName = obj.FirstName;
-			}
-			if (typeof obj.LastName != 'undefined') {
-				this.LastName = obj.LastName;
-			}
-		} else {
-			this.Id = null;
-			this.FullName = null;
-			this.FirstName = null;
-			this.LastName = null;
-		}
+	/** @constructor */
+	function asc_CUserInfo() {
+		this.Id = null;
+		this.FullName = null;
+		this.FirstName = null;
+		this.LastName = null;
 	}
 
 	asc_CUserInfo.prototype.asc_putId = asc_CUserInfo.prototype.put_Id = function (v) {
@@ -2913,70 +2899,21 @@
 		return this.LastName;
 	};
 
-	function asc_CDocInfo(obj) {
-		if (obj) {
-			if (typeof obj.Id != 'undefined') {
-				this.Id = obj.Id;
-			}
-			if (typeof obj.Url != 'undefined') {
-				this.Url = obj.Url;
-			}
-			if (typeof obj.Title != 'undefined') {
-				this.Title = obj.Title;
-			}
-			if (typeof obj.Format != 'undefined') {
-				this.Format = obj.Format;
-			}
-			if (typeof obj.VKey != 'undefined') {
-				this.VKey = obj.VKey;
-			}
-			if (typeof obj.Token != 'undefined') {
-				this.Token = obj.Token;
-			}
-			if (typeof obj.UserId != 'undefined') {
-				this.UserId = obj.UserId;
-			}
-
-			if (typeof obj.UserInfo != 'undefined') {
-				this.UserInfo = new asc_CUserInfo(obj.UserInfo);
-			}
-
-			if (typeof obj.Options != 'undefined') {
-				this.Options = obj.Options;
-			}
-			if (typeof obj.CallbackUrl != 'undefined') {
-				this.CallbackUrl = obj.CallbackUrl;
-			}
-			if (typeof obj.Mode != 'undefined') {
-				this.Mode = obj.Mode;
-			}
-			if (typeof obj.Permissions != 'undefined') {
-				this.Permissions = obj.Permissions;
-			}
-			if (typeof obj.Lang != 'undefined') {
-				this.Lang = obj.Lang;
-			}
-        if (obj.OfflineApp === true) {
-            this.OfflineApp = true;
-        }
-
-			this.TemplateReplacement = (null != obj.TemplateReplacement ? obj.TemplateReplacement : null);
-
-		} else {
-			this.Id = null;
-			this.Url = null;
-			this.Title = null;
-			this.Format = null;
-			this.VKey = null;
-			this.Token = null;
-			this.UserInfo = null;
-			this.Options = null;
-			this.CallbackUrl = null;
-			this.TemplateReplacement = null;
-			this.Mode = null;
-			this.Permissions = null;
-			this.Lang = null;
-		}
+	/** @constructor */
+	function asc_CDocInfo() {
+		this.Id = null;
+		this.Url = null;
+		this.Title = null;
+		this.Format = null;
+		this.VKey = null;
+		this.Token = null;
+		this.UserInfo = null;
+		this.Options = null;
+		this.CallbackUrl = null;
+		this.TemplateReplacement = null;
+		this.Mode = null;
+		this.Permissions = null;
+		this.Lang = null;
 	}
 
 	asc_CDocInfo.prototype.get_Id = asc_CDocInfo.prototype.asc_getId = function () {
