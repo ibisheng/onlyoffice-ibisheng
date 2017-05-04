@@ -414,7 +414,7 @@
 
 		checkFocus : function()
 		{
-			if (oThis.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
+			if (this.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
 			{
 				if (document.activeElement != oThis.HtmlArea)
 					oThis.HtmlArea.focus();
