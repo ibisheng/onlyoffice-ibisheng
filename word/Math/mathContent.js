@@ -7241,6 +7241,307 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
 
 CMathContent.prototype.GetTextContent = function(arr, str)
 {
+
+	if(!arr)
+	{
+		arr = [];
+	}
+
+	if(!str)
+	{
+		str = "";
+	}
+
+	var addText = function(value, bIsAddParenthesis)
+	{
+		if(bIsAddParenthesis && value.length > 1)
+        {
+			arr.push("(");
+			str += "(";
+        }
+
+	    arr.push(value);
+		str += value;
+
+		if(bIsAddParenthesis && value.length > 1)
+		{
+			arr.push(")");
+			str += ")";
+		}
+	};
+
+	var getMathSymbol = function(elem)
+	{
+		var res = [];
+
+		var getVal = function(val, position)
+		{
+			var newVal = {};
+			newVal.prePosition = !!position;
+			newVal.value = undefined !== val ? val : "";
+			return newVal;
+		};
+
+		if(elem instanceof CDegree)
+		{
+
+			if(DEGREE_SUPERSCRIPT === elem.Pr.type)
+			{
+				res.push(getVal("^"));
+			}
+			else
+			{
+				res.push(getVal("_"));
+			}
+		}
+		else if(elem instanceof CDelimiter)
+		{
+			res.push(getVal("(", true));
+			res.push(getVal(")"));
+		}
+		else if(elem instanceof CNary)
+		{
+			res.push(getVal(String.fromCharCode(elem.Pr.chr), true));
+			if(!elem.Pr.supHide)
+			{
+				res.push(getVal("_", true));
+			}
+			else
+            {
+				res.push(null);
+            }
+			if(!elem.Pr.subHide)
+			{
+				res.push(getVal("^", true));
+			}
+			else
+			{
+				res.push(null);
+			}
+			res.push(getVal("▒", true));
+		}
+		else if(elem instanceof CFraction)
+		{
+			res.push(getVal("/"));
+		}
+		else if(elem instanceof CRadical)
+		{
+			res.push(getVal("√", true));//8730;
+			res.push(getVal("&", true));
+		}
+		else if(elem instanceof CMathMatrix)
+		{
+			res.push(getVal("■", true));
+			for(var row = 0; row < elem.nRow; row++)
+			{
+				for(var col = 1; col < elem.nCol; col++)
+				{
+					res.push(getVal("&"));
+				}
+				if(row !== elem.nRow - 1)
+				{
+					res.push(getVal("@"));
+				}
+			}
+		}
+
+		return res;
+	};
+
+	var tempStr;
+	for(var i = 0; i < this.Content.length; i++)
+	{
+		switch(this.Content[i].Type)
+		{
+			case para_Math_Run:
+			{
+				if(this.Content[i].Content.length)
+				{
+					var string = "";
+					for(var j = 0; j < this.Content[i].Content.length; j++)
+					{
+						if(para_Math_Text === this.Content[i].Content[j].Type)
+						{
+							string += String.fromCharCode(this.Content[i].Content[j].value);
+						}
+						else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
+						{
+							string += String.fromCharCode(this.Content[i].Content[j].value);
+						}
+					}
+                    addText(string);
+				}
+				break;
+			}
+			case para_Math_Composition:
+			{
+				var elem = this.Content[i];
+			    var symbol = getMathSymbol(elem);
+
+				if(elem instanceof CDegree)//степень
+				{
+                    //основание
+					tempStr = elem.Content[0].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr, true);
+					}
+
+					addText(symbol[0].value);
+
+					//показатель
+					tempStr = elem.Content[1].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr, true);
+					}
+				}
+				else if(elem instanceof CDelimiter)
+				{
+					tempStr = elem.Content[0].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr, true);
+					}
+				}
+				else if(elem instanceof CNary)//сумма
+				{
+					addText(symbol[0].value);
+
+					//нижняя граница суммирования
+                    if(null !== symbol[1])
+                    {
+						addText(symbol[1].value);
+
+						tempStr = elem.Content[0].GetTextContent();
+						if(tempStr)
+						{
+							addText(tempStr, true);
+						}
+                    }
+
+					if(null !== symbol[2])
+					{
+						addText(symbol[2].value);
+
+						//верхняя граница суммирования
+						tempStr = elem.Content[1].GetTextContent();
+						if(tempStr)
+						{
+							addText(tempStr, true);
+						}
+					}
+
+					addText(symbol[3].value);
+
+					tempStr = elem.Content[2].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr, true);
+					}
+				}
+				else if(elem instanceof CFraction)//дробь
+				{
+					//числитель
+					tempStr = elem.Content[0].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr, true);
+					}
+
+					addText(symbol[0].value);
+
+					//знаменатель
+                    tempStr = elem.Content[1].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr, true);
+					}
+				}
+				else if(elem instanceof CRadical)//корень
+				{
+					addText(symbol[0].value);
+					//степень корня
+					tempStr = elem.Content[0].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr, true);
+					}
+
+					if(tempStr)
+					{
+						addText(symbol[1].value);
+					}
+
+					//подкоренное выражение
+					tempStr = elem.Content[1].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr, true);
+					}
+				}
+				else if(elem instanceof CMathMatrix)
+				{
+					for(var j = 0; j < this.Content[i].Content.length; j++)
+					{
+						if(para_Math_Content === this.Content[i].Content[j].Type)
+						{
+							if(j === 0 && symbol[-1] && symbol[-1].prePosition)
+							{
+								addText(symbol[-1].value);
+							}
+							if(symbol[j] && symbol[j].prePosition)
+							{
+								addText(symbol[j].value);
+							}
+
+							var tempStr = this.Content[i].Content[j].GetTextContent();
+
+							if(tempStr)
+							{
+								if(tempStr.length > 1)
+									addText("(");
+								addText(tempStr);
+								if(tempStr.length > 1)
+									addText(")");
+							}
+
+
+							if(symbol[j] && !symbol[j].prePosition)
+							{
+								addText(symbol[j].value);
+							}
+						}
+					}
+				}
+				else if(elem instanceof CMathFunc)
+				{
+                    //функция
+					tempStr = elem.Content[0].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr);
+					}
+
+					//аргумент
+					tempStr = elem.Content[1].GetTextContent();
+					if(tempStr)
+					{
+						addText(tempStr, true);
+					}
+				}
+
+				break;
+			}
+		}
+	}
+
+
+	return str;
+};
+
+CMathContent.prototype.GetTextContent3 = function(arr, str)
+{
 	if(!arr)
 	{
 		arr = [];
