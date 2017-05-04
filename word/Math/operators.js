@@ -3095,7 +3095,7 @@ COperator.prototype.IsArrow = function()
 
     var bArrow = this.typeOper == ARROW_LEFT || this.typeOper == ARROW_RIGHT || this.typeOper == ARROW_LR,
         bDoubleArrow = this.typeOper == DOUBLE_LEFT_ARROW || this.typeOper == DOUBLE_RIGHT_ARROW || this.typeOper == DOUBLE_ARROW_LR,
-        bAccentArrow = his.typeOper == ACCENT_ARROW_LEFT || this.typeOper == ACCENT_ARROW_RIGHT || this.typeOper == ACCENT_ARROW_LR || this.typeOper == ACCENT_HALF_ARROW_LEFT || this.typeOper == ACCENT_HALF_ARROW_RIGHT;
+        bAccentArrow = this.typeOper == ACCENT_ARROW_LEFT || this.typeOper == ACCENT_ARROW_RIGHT || this.typeOper == ACCENT_ARROW_LR || this.typeOper == ACCENT_HALF_ARROW_LEFT || this.typeOper == ACCENT_HALF_ARROW_RIGHT;
 
     return bArrow || bDoubleArrow;
 };

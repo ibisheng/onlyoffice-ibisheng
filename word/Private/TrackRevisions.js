@@ -375,7 +375,7 @@ CDocument.prototype.private_GetRevisionsChangeParagraphInFooters = function(Sear
 	}
 
 	var nDirection = SearchEngine.Get_Direction();
-	if (nPos < 0 || nPos >= Count)
+	if (nPos < 0 || nPos >= nCount)
 	{
 		if (nDirection > 0)
 			nPos = 0;

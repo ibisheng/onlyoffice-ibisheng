@@ -37,10 +37,10 @@
  * Time: 12:12
  */
 
-var sdtlock_Unlocked         = 0x00;
-var sdtlock_ContentLocked    = 0x01;
-var sdtlock_SdtContentLocked = 0x02;
-var sdtlock_SdtLocked        = 0x03;
+var sdtlock_ContentLocked    = 0x00;
+var sdtlock_SdtContentLocked = 0x01;
+var sdtlock_SdtLocked        = 0x02;
+var sdtlock_Unlocked         = 0x03;
 
 function CSdtPr()
 {

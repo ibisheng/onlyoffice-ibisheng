@@ -280,7 +280,7 @@
                         if (true === Element.Is_EmptyPage(ElementPageIndex))
                             oColumn.Empty = true;
                     }
-                    for (var TempColumnIndex = ColumnIndex + 1; TempColumnIndex < ColumnsCount; ++TempColumnIndex)
+                    for (var TempColumnIndex = nColumnIndex + 1; TempColumnIndex < nColumnsCount; ++TempColumnIndex)
                     {
                         oSection.Columns[TempColumnIndex].Empty  = true;
                         oSection.Columns[TempColumnIndex].Pos    = i;
@@ -312,7 +312,7 @@
                     for (var TempColumnIndex = nColumnIndex + 1; TempColumnIndex < nColumnsCount; ++TempColumnIndex)
                     {
                         var ElementPageIndex = this.private_GetElementPageIndex(i, nPageIndex, TempColumnIndex, nColumnsCount);
-                        this.Content[Index].Recalculate_SkipPage(ElementPageIndex);
+                        this.Content[i].Recalculate_SkipPage(ElementPageIndex);
                         oSection.Columns[TempColumnIndex].Empty  = true;
                         oSection.Columns[TempColumnIndex].Pos    = i;
                         oSection.Columns[TempColumnIndex].EndPos = i - 1;

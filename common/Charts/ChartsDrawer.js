@@ -13631,11 +13631,6 @@ CGeometry2.prototype =
         return  false;
     },
 
-    getObjectType: function()
-    {
-        return CLASS_TYPE_GEOMETRY;
-    },
-
     AddPath: function(path)
     {
         this.pathLst.push(path);
@@ -13901,52 +13896,6 @@ CSortFaces.prototype =
 		}
 		
 		return {intersections: intersections, reverseIntersections: reverseIntersections, countIntersection: countIntersection};
-	},
-	
-	sortFaces: function(faces)
-	{
-		var t = this;
-		
-		var iterCount = 0;
-		var newArr = [];
-		var lastFaces = faces;
-		
-		while(lastFaces.length !== 0)
-		{
-			var firstFaces1 = [], lastFaces1 = [];
-			t._getFirstLastFaces(lastFaces, firstFaces1, lastFaces1);
-			newArr = firstFaces1.concat(newArr);
-			lastFaces = lastFaces1;
-			iterCount++;
-			
-			if(iterCount > 50)
-			{
-				newArr = lastFaces.concat(newArr);
-				break;
-			}
-		}
-		
-		return newArr;
-	},
-	
-	_getFirstLastFaces: function(sortZIndexPaths, first, last)
-	{
-		//перебираем все грани
-		for(var i = 0; i < all.length; i++)
-		{
-			var plainVerge = all[i];
-			
-			var isFirstVerge = this._isIntersectionFacesPointLines(plainVerge, i, all);
-			//push into array
-			if(!isFirstVerge)
-			{
-				first.push(plainVerge);
-			}
-			else
-			{
-				last.push(plainVerge);
-			}
-		}
 	},
 	
 	//смотрим есть ли пересечения точек, выходящих из вершин данной грани, с другими гранями

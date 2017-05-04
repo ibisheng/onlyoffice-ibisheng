@@ -4959,7 +4959,7 @@ function cff_decoder_parse_charstrings(decoder, charstring_base, charstring_len)
                 }
 
                 case FT_Common.cff_op_mul:
-                    topsargs[0] = FT_MulFix( args[0], args[1] );
+                    tops[args] = FT_MulFix( args[0], args[1] );
                     args++;
                     break;
 
@@ -5700,7 +5700,7 @@ function cff_get_glyph_name(face, glyph_index, buffer, buffer_max)
 function cff_get_name_index(face, glyph_name)
 {
     var cff = face.extra.data;
-    var charset = cf.charset;
+    var charset = cff.charset;
 
     var psnames = FT_FACE_FIND_GLOBAL_SERVICE(face, FT_SERVICE_ID_POSTSCRIPT_CMAPS);
     if (psnames == null)

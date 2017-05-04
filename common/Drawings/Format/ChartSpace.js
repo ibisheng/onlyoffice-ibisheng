@@ -1994,7 +1994,7 @@ CChartSpace.prototype.rebuildSeriesFromAsc = function(asc_chart)
                             var oDPt = new AscFormat.CDPt();
                             oDPt.setBubble3D(false);
                             oDPt.setIdx(j);
-                            ApplySpPr(oFirstSpPrPreset, oDPt, j, base_fills, bAccent1Background);
+                            AscFormat.ApplySpPr(oFirstSpPrPreset, oDPt, j, base_fills, bAccent1Background);
                             series.series[i].addDPt(oDPt);
                         }
                     }

@@ -583,6 +583,7 @@ function FT_Stream(data, size)
                 case 24:  /* read a byte sequence */
                 case 25:   /* skip some bytes      */
                 {
+					var len = arrayFields[ind].size;
                     if ( cursor + fsize > this.size )
                     {
                         error = 85;
@@ -594,7 +595,7 @@ function FT_Stream(data, size)
                     if ( fval == 24 )
                     {
                         data = structure.data;
-                        pos = structure.pos + arrayFields[ind].offset;
+                        pos = structure.pos + fields[ind].offset;
 
                         for (var i=0;i<len;i++)
                             data[i] = this.data[cursor+i];
@@ -661,8 +662,8 @@ function FT_Stream(data, size)
             /* finally, store the value in the object */
 
             data = structure.data;
-            pos = structure.pos + arrayFields[ind].offset;
-            switch (arrayFields[ind])
+            pos = structure.pos + fields[ind].offset;
+            switch (fields[ind])
             {
                 case 1:
                     data[pos] = value & 0xFF;

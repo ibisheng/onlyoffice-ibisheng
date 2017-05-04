@@ -544,10 +544,10 @@ CDocumentPageSection.prototype.Copy = function()
 
     for (var ColumnIndex = 0, Count = this.Columns.length; ColumnIndex < Count; ++ColumnIndex)
     {
-        NewPage.Columns[ColumnIndex] = this.Columns[ColumnIndex].Copy();
+		NewSection.Columns[ColumnIndex] = this.Columns[ColumnIndex].Copy();
     }
 
-    return NewPage;
+    return NewSection;
 };
 CDocumentPageSection.prototype.Shift = function(Dx, Dy)
 {
