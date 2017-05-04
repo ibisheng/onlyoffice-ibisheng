@@ -162,7 +162,7 @@ module.exports = function(grunt) {
 		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
 		var sdkAllCache = sdkDstFolder + '/*.cache'
 		var sdkOpt = {
-			jscomp_off: 'externsValidation',
+			jscomp_off: 'checkVars',
 			compilation_level: level,
 			warning_level: 'QUIET',
 			externs: packageFile['compile']['sdk']['externs']
