@@ -542,6 +542,7 @@ FT_Stream.prototype =
                 case 24:  /* read a byte sequence */
                 case 25:   /* skip some bytes      */
                 {
+					var len = fields[ind].size;
                     if ( cursor + fsize > this.size )
                     {
                         error = FT_Common.FT_Err_Invalid_Stream_Operation;

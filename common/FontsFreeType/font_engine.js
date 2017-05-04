@@ -907,6 +907,7 @@ FT_Stream.prototype =
                 case 24:  /* read a byte sequence */
                 case 25:   /* skip some bytes      */
                 {
+					var len = fields[ind].size;
                     if ( cursor + fsize > this.size )
                     {
                         error = 85;
@@ -35868,7 +35869,7 @@ function cff_decoder_parse_charstrings(decoder, charstring_base, charstring_len)
                 }
 
                 case 32:
-                    topsargs[0] = FT_MulFix( args[0], args[1] );
+                    tops[args] = FT_MulFix( args[0], args[1] );
                     args++;
                     break;
 
