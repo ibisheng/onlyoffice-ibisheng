@@ -603,6 +603,7 @@ var editor;
             "title": this.documentTitle,
             "embeddedfonts": this.isUseEmbeddedCutFonts,
             "delimiter": option.asc_getDelimiter(),
+            "delimiterChar": option.asc_getDelimiterChar(),
             "codepage": option.asc_getCodePage()};
 
           sendCommand(this, null, v);
@@ -646,8 +647,9 @@ var editor;
     var t = this;
     // Проверяем, возможно нам пришли опции для CSV
     if (this.documentOpenOptions && !opt_isPassword) {
-      var codePageCsv = AscCommon.c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || AscCommon.c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"];
-      if (null != codePageCsv && null != delimiterCsv) {
+      var codePageCsv = AscCommon.c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || AscCommon.c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"],
+		  delimiterCharCsv = this.documentOpenOptions["delimiterChar"];
+      if (null != codePageCsv && (null != delimiterCsv || null != delimiterCharCsv)) {
         this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
         return;
       }
@@ -772,6 +774,7 @@ var editor;
         if (options.CSVOptions instanceof asc.asc_CCSVAdvancedOptions) {
           oAdditionalData["codepage"] = options.CSVOptions.asc_getCodePage();
           oAdditionalData["delimiter"] = options.CSVOptions.asc_getDelimiter();
+          oAdditionalData["delimiterChar"] = options.CSVOptions.asc_getDelimiterChar();
         }
       }
       dataContainer.data = oBinaryFileWriter.Write();
