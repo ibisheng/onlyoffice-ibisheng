@@ -47,13 +47,10 @@
 
 	var c_oAscColor = Asc.c_oAscColor;
 	var c_oAscFill = Asc.c_oAscFill;
-	var c_oAscFillGradType = Asc.c_oAscFillGradType;
 	var c_oAscFillBlipType = Asc.c_oAscFillBlipType;
-	var c_oAscStrokeType = Asc.c_oAscStrokeType;
 	var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 	var c_oAscTickMark = Asc.c_oAscTickMark;
 	var c_oAscAxisType = Asc.c_oAscAxisType;
-	var c_oAscDropCap = Asc.c_oAscDropCap;
 	// ---------------------------------------------------------------------------------------------------------------
 
 	var c_oAscArrUserColors = [16757719, 7929702, 56805, 10081791, 12884479, 16751001, 6748927, 16762931, 6865407,
