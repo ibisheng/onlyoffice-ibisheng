@@ -83,7 +83,7 @@
 
         this._callback_font_load = function()
         {
-            if (undefined === embedded_fonts)
+            if (undefined === window.embedded_fonts)
                 return;
 
             oThis.CurrentFindFileParse = 0;
@@ -93,8 +93,8 @@
         this.parse_font = function()
         {
             var __font_data_idx = g_fonts_streams.length;
-            g_fonts_streams[__font_data_idx] = CreateFontData2(embedded_fonts[oThis.CurrentFindFileParse], undefined);
-            embedded_fonts[oThis.CurrentFindFileParse] = "";
+            g_fonts_streams[__font_data_idx] = CreateFontData2(window.embedded_fonts[oThis.CurrentFindFileParse], undefined);
+			window.embedded_fonts[oThis.CurrentFindFileParse] = "";
             oThis.font_files[oThis.CurrentFindFileParse].SetStreamIndex(__font_data_idx);
             oThis.font_files[oThis.CurrentFindFileParse].Status = 0;
 

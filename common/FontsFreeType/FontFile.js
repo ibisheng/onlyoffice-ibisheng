@@ -2026,8 +2026,8 @@
 
 		this.GetKerning = function (unPrevGID, unGID)
 		{
-			var pDelta = new FT_Vector();
-			FT_Get_Kerning(this.m_pFace, unPrevGID, unGID, 0, pDelta);
+			var pDelta = new AscFonts.FT_Vector();
+			AscFonts.FT_Get_Kerning(this.m_pFace, unPrevGID, unGID, 0, pDelta);
 			return (pDelta.x >> 6);
 		}
 

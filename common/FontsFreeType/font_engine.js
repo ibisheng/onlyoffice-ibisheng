@@ -41886,4 +41886,6 @@ function FT_CMap_New(clazz, init_data, charmap)
   window['AscFonts'].FT_Render_Glyph = FT_Render_Glyph;
   window['AscFonts'].raster_memory = raster_memory;
   window['AscFonts'].FT_Get_Charmap_Index = FT_Get_Charmap_Index;
+  window['AscFonts'].FT_Vector = FT_Vector;
+  window['AscFonts'].FT_Get_Kerning = FT_Get_Kerning;
 })(window);
