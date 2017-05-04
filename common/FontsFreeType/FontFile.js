@@ -1719,10 +1719,10 @@
 					pCurGlyph.fX = fPenX;
 					pCurGlyph.fY = fPenY;
 
-					pCurGlyph.fLeft = fLeft;
-					pCurGlyph.fTop = fTop;
-					pCurGlyph.fRight = fRight;
-					pCurGlyph.fBottom = fBottom;
+					pCurGlyph.fLeft = 0;
+					pCurGlyph.fTop = 0;
+					pCurGlyph.fRight = 0;
+					pCurGlyph.fBottom = 0;
 
 					pCurGlyph.eState = EGlyphState.glyphstateMiss;
 
