@@ -866,6 +866,16 @@ function AFM_StreamRec()
     this.status = 0;
 }
 
+function AFM_ParserRec()
+{
+	this.memory = null;
+	this.stream = null;
+
+	this.FontInfo = null;
+	this.get_index = null;
+	this.user_data = null;
+}
+
 function AFM_IS_NEWLINE(ch)
 {
     if (ch == FT_Common.SYMBOL_CONST_SR || ch == FT_Common.SYMBOL_CONST_SN)

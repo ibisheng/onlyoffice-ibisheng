@@ -8896,6 +8896,16 @@ function AFM_StreamRec()
     this.status = 0;
 }
 
+function AFM_ParserRec()
+{
+	this.memory = null;
+	this.stream = null;
+
+	this.FontInfo = null;
+	this.get_index = null;
+	this.user_data = null;
+}
+
 function AFM_IS_NEWLINE(ch)
 {
     if (ch == 13 || ch == 10)
@@ -36610,7 +36620,7 @@ function cff_get_glyph_name(face, glyph_index, buffer, buffer_max)
 function cff_get_name_index(face, glyph_name)
 {
     var cff = face.extra.data;
-    var charset = cf.charset;
+    var charset = cff.charset;
 
     var psnames = FT_FACE_FIND_GLOBAL_SERVICE(face, FT_SERVICE_ID_POSTSCRIPT_CMAPS);
     if (psnames == null)
@@ -37844,7 +37854,7 @@ function T1_Get_Private_Dict(parser, psaux)
             parser.private_len = ret.num_bytes;
 
             /* put a safeguard */
-            parser.private_dict[len] = 0;
+            parser.private_dict[ret.num_bytes] = 0;
         }
         else
         {
