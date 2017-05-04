@@ -33582,12 +33582,12 @@ function cff_size_done(cffsize)
     var internal = cffsize.internal;
     if (internal != null)
     {
-        var funcs = cff_size_get_globals_funcs(size);
+        var funcs = cff_size_get_globals_funcs(cffsize);
         if (funcs != null)
         {
             funcs.destroy(internal.topfont);
 
-            for (var i = font.num_subfonts; i > 0; i--)
+            for (var i = internal.topfont.num_subfonts; i > 0; i--)
                 funcs.destroy(internal.subfonts[i - 1]);
         }
         /* `internal' is freed by destroy_size (in ftobjs.c) */
@@ -34072,7 +34072,7 @@ function cff_face_init(stream, face, face_index, num_params, params)
             var cid_font_name = cff_index_get_sid_string(cff, dict.cid_font_name);
             /* do we have a `/FontName' for a CID-keyed font? */
             if (cid_font_name != null)
-                face.family_name = cff_strcpy(memory, cid_font_name);
+                face.family_name = cff_strcpy(face.memory, cid_font_name);
         }
 
         if (style_name != null)
@@ -36740,7 +36740,7 @@ function cff_get_ros(face, registry, ordering, supplement)
         ret.supplement = dict.cid_supplement;
     }
 
-    return error;
+    return ret;
 }
 
 function cff_get_is_cid(face)
@@ -38441,7 +38441,7 @@ function T1_Get_MM_Var(face)
     if (error != 0)
         return { err: error, mm : null };
 
-    var _num_axis = master.num_axis;
+    var _num_axis = mmaster.num_axis;
     mmvar.axis = new Array(_num_axis);
     for (var i = 0; i < _num_axis; i++)
         mmvar.axis[i] = new FT_Var_Axis();

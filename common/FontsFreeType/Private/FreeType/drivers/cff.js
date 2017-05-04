@@ -2662,7 +2662,7 @@ function cff_size_done(cffsize)
     var internal = cffsize.internal;
     if (internal != null)
     {
-        var funcs = cff_size_get_globals_funcs(size);
+        var funcs = cff_size_get_globals_funcs(cffsize);
         if (funcs != null)
         {
             funcs.destroy(internal.topfont);
@@ -3152,7 +3152,7 @@ function cff_face_init(stream, face, face_index, num_params, params)
             var cid_font_name = cff_index_get_sid_string(cff, dict.cid_font_name);
             /* do we have a `/FontName' for a CID-keyed font? */
             if (cid_font_name != null)
-                face.family_name = cff_strcpy(memory, cid_font_name);
+                face.family_name = cff_strcpy(face.memory, cid_font_name);
         }
 
         if (style_name != null)
@@ -5820,7 +5820,7 @@ function cff_get_ros(face, registry, ordering, supplement)
         ret.supplement = dict.cid_supplement;
     }
 
-    return error;
+    return ret;
 }
 
 function cff_get_is_cid(face)
