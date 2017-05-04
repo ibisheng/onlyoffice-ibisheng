@@ -264,7 +264,6 @@
       "externs": [
         "../common/Build/Externs.js",
         "../../web-apps/vendor/jquery/jquery.min.js",
-        "../../web-apps/vendor/underscore/underscore-min.js",
         "../../web-apps/vendor/sockjs/sockjs.min.js",
         "../../web-apps/vendor/xregexp/xregexp-all-min.js",
         "../../web-apps/vendor/jszip/jszip.min.js",

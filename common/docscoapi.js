@@ -254,7 +254,7 @@
     } else {
       var t = this;
       window.setTimeout(function() {
-        if (callback && _.isFunction(callback)) {
+        if (callback) {
           var lengthArray = (arrayBlockId) ? arrayBlockId.length : 0;
           if (0 < lengthArray) {
             callback({"lock": arrayBlockId[0]});
@@ -273,7 +273,7 @@
       this._CoAuthoringApi.askSaveChanges(callback);
     } else {
       window.setTimeout(function() {
-        if (callback && _.isFunction(callback)) {
+        if (callback) {
           // Фиктивные вызовы
           callback({"saveLock": false});
         }
@@ -738,7 +738,7 @@
     } else {
       // Вернем ошибку, т.к. залочены элементы
       window.setTimeout(function() {
-        if (callback && _.isFunction(callback)) {
+        if (callback) {
           callback({error: idLockInArray + '-lock'});
         }
       }, 100);
@@ -759,14 +759,14 @@
     // Проверим состояние, если мы не подсоединились, то сразу отправим ошибку
     if (ConnectionState.Authorized !== this._state) {
       this.saveLockCallbackErrorTimeOutId = window.setTimeout(function() {
-        if (callback && _.isFunction(callback)) {
+        if (callback) {
           // Фиктивные вызовы
           callback({error: "No connection"});
         }
       }, 100);
       return;
     }
-    if (callback && _.isFunction(callback)) {
+    if (callback) {
       var t = this;
       var indexCallback = this._saveCallback.length;
       this._saveCallback[indexCallback] = callback;
@@ -1051,7 +1051,7 @@
             if (changed) {
               this._locks[blockTmp] = {"state": lock["sessionId"] === this._id ? 2 : 3, "user": lock["user"], "time": lock["time"], "block": blockTmp, "blockValue": blockValue};//2-acquired by me!
             }
-            if (this._lockCallbacks.hasOwnProperty(blockTmp) && this._lockCallbacks[blockTmp] !== null && _.isFunction(this._lockCallbacks[blockTmp])) {
+            if (this._lockCallbacks.hasOwnProperty(blockTmp)) {
               if (lock["sessionId"] === this._id) {
                 //Do call back
                 this._lockCallbacks[blockTmp]({"lock": this._locks[blockTmp]});
