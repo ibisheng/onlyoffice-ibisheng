@@ -43,9 +43,7 @@ var AscCommonWord;
 var AscCommonExcel;
 var AscCommonSlide;
 
-function $(){}
 function jq(){}
-function jQuery(){}
 function DE(){}
 function SE(){}
 function SSE(){}
