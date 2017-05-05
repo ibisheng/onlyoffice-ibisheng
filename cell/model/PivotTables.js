@@ -2580,6 +2580,11 @@ CT_pivotTableDefinition.prototype.asc_getFields = function () {
 		return element.name || this.cacheDefinition.getField(index).name;
 	});
 };
+CT_pivotTableDefinition.prototype.asc_getPageFields = function () {
+	return this.getField(this.pageFields.pageField, function (element) {
+		return element.name || this.cacheDefinition.getField(element.fld).name;
+	});
+};
 CT_pivotTableDefinition.prototype.asc_getColumnFields = function () {
 	return this.getField(this.colFields.field, function (element) {
 		return this.cacheDefinition.getField(element.x).name;
@@ -9564,6 +9569,7 @@ prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getFields"] = prot.asc_getFields;
 prot["asc_getStyleInfo"] = prot.asc_getStyleInfo;
+prot["asc_getPageFields"] = prot.asc_getPageFields;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
 prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
