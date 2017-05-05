@@ -2913,100 +2913,101 @@
 		this.Lang = null;
 	}
 
-	asc_CDocInfo.prototype.get_Id = asc_CDocInfo.prototype.asc_getId = function () {
+	prot = asc_CDocInfo.prototype;
+	prot.get_Id = prot.asc_getId = function () {
 		return this.Id
 	};
-	asc_CDocInfo.prototype.put_Id = asc_CDocInfo.prototype.asc_putId = function (v) {
+	prot.put_Id = prot.asc_putId = function (v) {
 		this.Id = v;
 	};
-	asc_CDocInfo.prototype.get_Url = asc_CDocInfo.prototype.asc_getUrl = function () {
+	prot.get_Url = prot.asc_getUrl = function () {
 		return this.Url;
 	};
-	asc_CDocInfo.prototype.put_Url = asc_CDocInfo.prototype.asc_putUrl = function (v) {
+	prot.put_Url = prot.asc_putUrl = function (v) {
 		this.Url = v;
 	};
-	asc_CDocInfo.prototype.get_Title = asc_CDocInfo.prototype.asc_getTitle = function () {
+	prot.get_Title = prot.asc_getTitle = function () {
 		return this.Title;
 	};
-	asc_CDocInfo.prototype.put_Title = asc_CDocInfo.prototype.asc_putTitle = function (v) {
+	prot.put_Title = prot.asc_putTitle = function (v) {
 		this.Title = v;
 	};
-	asc_CDocInfo.prototype.get_Format = asc_CDocInfo.prototype.asc_getFormat = function () {
+	prot.get_Format = prot.asc_getFormat = function () {
 		return this.Format;
 	};
-	asc_CDocInfo.prototype.put_Format = asc_CDocInfo.prototype.asc_putFormat = function (v) {
+	prot.put_Format = prot.asc_putFormat = function (v) {
 		this.Format = v;
 	};
-	asc_CDocInfo.prototype.get_VKey = asc_CDocInfo.prototype.asc_getVKey = function () {
+	prot.get_VKey = prot.asc_getVKey = function () {
 		return this.VKey;
 	};
-	asc_CDocInfo.prototype.put_VKey = asc_CDocInfo.prototype.asc_putVKey = function (v) {
+	prot.put_VKey = prot.asc_putVKey = function (v) {
 		this.VKey = v;
 	};
-	asc_CDocInfo.prototype.get_Token = asc_CDocInfo.prototype.asc_getToken = function () {
+	prot.get_Token = prot.asc_getToken = function () {
 		return this.Token;
 	};
-	asc_CDocInfo.prototype.put_Token = asc_CDocInfo.prototype.asc_putToken = function (v) {
+	prot.put_Token = prot.asc_putToken = function (v) {
 		this.Token = v;
 	};
-	asc_CDocInfo.prototype.get_OfflineApp = asc_CDocInfo.prototype.asc_getOfflineApp = function () {
+	prot.get_OfflineApp = prot.asc_getOfflineApp = function () {
 		return this.OfflineApp;
 	};
-	asc_CDocInfo.prototype.put_OfflineApp = asc_CDocInfo.prototype.asc_putOfflineApp = function (v) {
+	prot.put_OfflineApp = prot.asc_putOfflineApp = function (v) {
 		this.OfflineApp = v;
 	};
-	asc_CDocInfo.prototype.get_UserId = asc_CDocInfo.prototype.asc_getUserId = function () {
+	prot.get_UserId = prot.asc_getUserId = function () {
 		return (this.UserInfo ? this.UserInfo.get_Id() : null );
 	};
-	asc_CDocInfo.prototype.get_UserName = asc_CDocInfo.prototype.asc_getUserName = function () {
+	prot.get_UserName = prot.asc_getUserName = function () {
 		return (this.UserInfo ? this.UserInfo.get_FullName() : null );
 	};
-	asc_CDocInfo.prototype.get_FirstName = asc_CDocInfo.prototype.asc_getFirstName = function () {
+	prot.get_FirstName = prot.asc_getFirstName = function () {
 		return (this.UserInfo ? this.UserInfo.get_FirstName() : null );
 	};
-	asc_CDocInfo.prototype.get_LastName = asc_CDocInfo.prototype.asc_getLastName = function () {
+	prot.get_LastName = prot.asc_getLastName = function () {
 		return (this.UserInfo ? this.UserInfo.get_LastName() : null );
 	};
-	asc_CDocInfo.prototype.get_Options = asc_CDocInfo.prototype.asc_getOptions = function () {
+	prot.get_Options = prot.asc_getOptions = function () {
 		return this.Options;
 	};
-	asc_CDocInfo.prototype.put_Options = asc_CDocInfo.prototype.asc_putOptions = function (v) {
+	prot.put_Options = prot.asc_putOptions = function (v) {
 		this.Options = v;
 	};
-	asc_CDocInfo.prototype.get_CallbackUrl = asc_CDocInfo.prototype.asc_getCallbackUrl = function () {
+	prot.get_CallbackUrl = prot.asc_getCallbackUrl = function () {
 		return this.CallbackUrl;
 	};
-	asc_CDocInfo.prototype.put_CallbackUrl = asc_CDocInfo.prototype.asc_putCallbackUrl = function (v) {
+	prot.put_CallbackUrl = prot.asc_putCallbackUrl = function (v) {
 		this.CallbackUrl = v;
 	};
-	asc_CDocInfo.prototype.get_TemplateReplacement = asc_CDocInfo.prototype.asc_getTemplateReplacement = function () {
+	prot.get_TemplateReplacement = prot.asc_getTemplateReplacement = function () {
 		return this.TemplateReplacement;
 	};
-	asc_CDocInfo.prototype.put_TemplateReplacement = asc_CDocInfo.prototype.asc_putTemplateReplacement = function (v) {
+	prot.put_TemplateReplacement = prot.asc_putTemplateReplacement = function (v) {
 		this.TemplateReplacement = v;
 	};
-	asc_CDocInfo.prototype.get_UserInfo = asc_CDocInfo.prototype.asc_getUserInfo = function () {
+	prot.get_UserInfo = prot.asc_getUserInfo = function () {
 		return this.UserInfo;
 	};
-	asc_CDocInfo.prototype.put_UserInfo = asc_CDocInfo.prototype.asc_putUserInfo = function (v) {
+	prot.put_UserInfo = prot.asc_putUserInfo = function (v) {
 		this.UserInfo = v;
 	};
-	asc_CDocInfo.prototype.get_Mode = asc_CDocInfo.prototype.asc_getMode = function () {
+	prot.get_Mode = prot.asc_getMode = function () {
 		return this.Mode;
 	};
-	asc_CDocInfo.prototype.put_Mode = asc_CDocInfo.prototype.asc_putMode = function (v) {
+	prot.put_Mode = prot.asc_putMode = function (v) {
 		this.Mode = v;
 	};
-	asc_CDocInfo.prototype.get_Permissions = asc_CDocInfo.prototype.asc_getPermissions = function () {
+	prot.get_Permissions = prot.asc_getPermissions = function () {
 		return this.Permissions;
 	};
-	asc_CDocInfo.prototype.put_Permissions = asc_CDocInfo.prototype.asc_putPermissions = function (v) {
+	prot.put_Permissions = prot.asc_putPermissions = function (v) {
 		this.Permissions = v;
 	};
-	asc_CDocInfo.prototype.get_Lang = asc_CDocInfo.prototype.asc_getLang = function () {
+	prot.get_Lang = prot.asc_getLang = function () {
 		return this.Lang;
 	};
-	asc_CDocInfo.prototype.put_Lang = asc_CDocInfo.prototype.asc_putLang = function (v) {
+	prot.put_Lang = prot.asc_putLang = function (v) {
 		this.Lang = v;
 	};
 
