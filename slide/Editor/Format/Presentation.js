@@ -1754,7 +1754,7 @@ CPresentation.prototype =
 			var fMaxTopMargin = 0, fMaxBottomMargin = 0, fMaxTopBorder = 0, fMaxBottomBorder = 0;
 			for(j = 0;  j < row.Content.length; ++j){
 				var oCell = row.Content[j];
-				var oMargins = oCell.Get_Margins();
+				var oMargins = oCell.GetMargins();
 				if(oMargins.Bottom.W > fMaxBottomMargin){
 					fMaxBottomMargin = oMargins.Bottom.W;
 				}

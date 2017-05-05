@@ -13692,7 +13692,7 @@ function Get_TableOffsetCorrection(tbl)
 
     var Row = tbl.Content[0];
     var Cell = Row.Get_Cell( 0 );
-    var Margins = Cell.Get_Margins();
+    var Margins = Cell.GetMargins();
 
     var CellSpacing = Row.Get_CellSpacing();
     if ( null != CellSpacing )

@@ -1186,29 +1186,28 @@ CTableCell.prototype =
 		this.Recalc_CompiledPr();
 	},
 
-    Get_Margins : function()
-    {
-        var TableCellMar = this.Get_CompiledPr(false).TableCellMar;
+	GetMargins : function()
+	{
+		var TableCellMar = this.Get_CompiledPr(false).TableCellMar;
 
-        if ( null === TableCellMar )
-        {
-            return this.Row.Table.Get_TableCellMar();
-        }
-        else
-        {
-            var TableCellDefMargins = this.Row.Table.Get_TableCellMar();
+		if (null === TableCellMar)
+		{
+			return this.Row.Table.Get_TableCellMar();
+		}
+		else
+		{
+			var TableCellDefMargins = this.Row.Table.Get_TableCellMar();
 
-            var Margins =
-                {
-                    Top    : undefined != TableCellMar.Top    ? TableCellMar.Top    : TableCellDefMargins.Top,
-                    Bottom : undefined != TableCellMar.Bottom ? TableCellMar.Bottom : TableCellDefMargins.Bottom,
-                    Left   : undefined != TableCellMar.Left   ? TableCellMar.Left   : TableCellDefMargins.Left,
-                    Right  : undefined != TableCellMar.Right  ? TableCellMar.Right  : TableCellDefMargins.Right
-                };
+			var Margins = {
+				Top    : undefined != TableCellMar.Top ? TableCellMar.Top : TableCellDefMargins.Top,
+				Bottom : undefined != TableCellMar.Bottom ? TableCellMar.Bottom : TableCellDefMargins.Bottom,
+				Left   : undefined != TableCellMar.Left ? TableCellMar.Left : TableCellDefMargins.Left,
+				Right  : undefined != TableCellMar.Right ? TableCellMar.Right : TableCellDefMargins.Right
+			};
 
-            return Margins;
-        }
-    },
+			return Margins;
+		}
+	},
 
     Is_TableMargins : function()
     {

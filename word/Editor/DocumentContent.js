@@ -221,7 +221,7 @@ CDocumentContent.prototype.Get_PageLimits = function(PageIndex)
 {
 	if (true === this.Parent.Is_Cell())
 	{
-		var Margins = this.Parent.Get_Margins();
+		var Margins = this.Parent.GetMargins();
 
 		var Y      = this.Pages[PageIndex].Y - Margins.Top.W;
 		var YLimit = this.Pages[PageIndex].YLimit + Margins.Bottom.W;
@@ -8479,6 +8479,18 @@ CDocumentContent.prototype.GetAllContentControls = function(arrContentControls)
 	}
 
 	return arrContentControls;
+};
+CDocumentContent.prototype.GetMargins = function()
+{
+	if (this.Parent.GetMargins)
+		return this.Parent.GetMargins();
+
+	return {
+		Top    : new CTableMeasurement(tblwidth_Mm, 0),
+		Left   : new CTableMeasurement(tblwidth_Mm, 0),
+		Bottom : new CTableMeasurement(tblwidth_Mm, 0),
+		Right  : new CTableMeasurement(tblwidth_Mm, 0)
+	};
 };
 
 

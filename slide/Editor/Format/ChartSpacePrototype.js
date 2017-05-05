@@ -575,7 +575,7 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
                 var Row      = this.Content[Pos.Row];
                 var Cell     = Row.Get_Cell(Pos.Cell);
                 var CellInfo = Row.Get_CellInfo(Pos.Cell);
-                var CellMar  = Cell.Get_Margins();
+                var CellMar  = Cell.GetMargins();
 
                 var X_start = Page.X + CellInfo.X_cell_start;
                 var X_end   = Page.X + CellInfo.X_cell_end;

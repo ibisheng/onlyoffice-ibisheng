@@ -847,6 +847,10 @@ CBlockLevelSdt.prototype.GetDocumentPositionFromObject = function(PosArray)
 
 	return PosArray;
 };
+CBlockLevelSdt.prototype.GetMargins = function()
+{
+	return this.Parent.GetMargins();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.SetPr = function(oPr)
 {

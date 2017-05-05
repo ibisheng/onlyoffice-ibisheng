@@ -309,7 +309,7 @@ CTable.prototype.Get_Props = function()
 			var Row          = this.Content[Pos.Row];
 			var Cell         = Row.Get_Cell(Pos.Cell);
 			var Cell_borders = Cell.Get_Borders();
-			var Cell_margins = Cell.Get_Margins();
+			var Cell_margins = Cell.GetMargins();
 			var Cell_shd     = Cell.Get_Shd();
 			var Cell_w       = Cell.Get_W();
 
@@ -531,7 +531,7 @@ CTable.prototype.Get_Props = function()
 		Pr.CellSelect = false;
 
 		var Cell        = this.CurCell;
-		var CellMargins = Cell.Get_Margins();
+		var CellMargins = Cell.GetMargins();
 		var CellBorders = Cell.Get_Borders();
 		var CellShd     = Cell.Get_Shd();
 		var CellW       = Cell.Get_W();
@@ -2148,7 +2148,7 @@ CTable.prototype.Get_PageContentStartPos = function(CurPage, RowIndex, CellIndex
 {
 	var Row      = this.Content[RowIndex];
 	var Cell     = Row.Get_Cell(CellIndex);
-	var CellMar  = Cell.Get_Margins();
+	var CellMar  = Cell.GetMargins();
 	var CellInfo = Row.Get_CellInfo(CellIndex);
 
 	var VMerge_count = this.Internal_GetVertMergeCount(RowIndex, CellInfo.StartGridCol, Cell.Get_GridSpan());
@@ -2280,7 +2280,7 @@ CTable.prototype.Get_TableOffsetCorrection = function()
 
 	var Row     = this.Content[0];
 	var Cell    = Row.Get_Cell(0);
-	var Margins = Cell.Get_Margins();
+	var Margins = Cell.GetMargins();
 
 	var CellSpacing = Row.Get_CellSpacing();
 	if (null != CellSpacing)
@@ -2320,7 +2320,7 @@ CTable.prototype.Get_RightTableOffsetCorrection = function()
 
 	var Row         = this.Content[0];
 	var Cell        = Row.Get_Cell(Row.Get_CellsCount() - 1);
-	var Margins     = Cell.Get_Margins();
+	var Margins     = Cell.GetMargins();
 	var CellSpacing = Row.Get_CellSpacing();
 	if (null != CellSpacing)
 	{
@@ -2742,7 +2742,7 @@ CTable.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 				var CellMinMax   = Cell.Content_RecalculateMinMaxContentWidth(isRotated);
 				var CellMin      = CellMinMax.Min;
 				var CellMax      = CellMinMax.Max;
-				var CellMargins  = Cell.Get_Margins();
+				var CellMargins  = Cell.GetMargins();
 				var CellMarginsW = CellMargins.Top.W + CellMargins.Bottom.W;
 
 				if (MinMargin[CurRow] < CellMarginsW)
@@ -2804,7 +2804,7 @@ CTable.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 				var CellMin      = CellMinMax.Min;
 				var CellMax      = CellMinMax.Max;
 				var GridSpan     = Cell.Get_GridSpan();
-				var CellMargins  = Cell.Get_Margins();
+				var CellMargins  = Cell.GetMargins();
 				var CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
 				var CellW        = Cell.Get_W();
 				var CellWW       = null;
@@ -2922,7 +2922,7 @@ CTable.prototype.Get_LastRangeVisibleBounds = function()
 
 	var Cell     = Row.Get_Cell(CurCell);
 	var CellInfo = Row.Get_CellInfo(CurCell);
-	var CellMar  = Cell.Get_Margins();
+	var CellMar  = Cell.GetMargins();
 
 	var X_start = Page.X + CellInfo.X_cell_start;
 	var X_end   = Page.X + CellInfo.X_cell_end;
@@ -4375,7 +4375,7 @@ CTable.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 
 			if (0 != this.Selection.Data2.Index)
 			{
-				var Margins = Row.Get_Cell(this.Selection.Data2.Index - 1).Get_Margins();
+				var Margins = Row.Get_Cell(this.Selection.Data2.Index - 1).GetMargins();
 				if (0 != this.Selection.Data2.Index - 1 && this.Selection.Data2.Index != CellsCount)
 					X_min = Page.X + Row.Get_CellInfo(this.Selection.Data2.Index - 1).X_grid_start + Margins.Left.W + Margins.Right.W + CellSpacing;
 				else
@@ -4384,7 +4384,7 @@ CTable.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEvent)
 
 			if (CellsCount != this.Selection.Data2.Index)
 			{
-				var Margins = Row.Get_Cell(this.Selection.Data2.Index).Get_Margins();
+				var Margins = Row.Get_Cell(this.Selection.Data2.Index).GetMargins();
 				if (CellsCount - 1 != this.Selection.Data2.Index)
 					X_max = Page.X + Row.Get_CellInfo(this.Selection.Data2.Index).X_grid_end - (Margins.Left.W + Margins.Right.W + CellSpacing);
 				else
@@ -4643,7 +4643,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 							for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 							{
 								var Cell           = Row.Get_Cell(CurCell);
-								var CellMargins    = Cell.Get_Margins();
+								var CellMargins    = Cell.GetMargins();
 								var Cur_Grid_start = Row.Get_CellInfo(CurCell).StartGridCol;
 								var Cur_Grid_end   = Cur_Grid_start + Cell.Get_GridSpan() - 1;
 
@@ -4777,7 +4777,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 							for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 							{
 								var Cell           = Row.Get_Cell(CurCell);
-								var CellMargins    = Cell.Get_Margins();
+								var CellMargins    = Cell.GetMargins();
 								var Cur_Grid_start = Row.Get_CellInfo(CurCell).StartGridCol;
 								var Cur_Grid_end   = Cur_Grid_start + Cell.Get_GridSpan() - 1;
 
@@ -4952,7 +4952,7 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
 				var Row      = this.Content[Pos.Row];
 				var Cell     = Row.Get_Cell(Pos.Cell);
 				var CellInfo = Row.Get_CellInfo(Pos.Cell);
-				var CellMar  = Cell.Get_Margins();
+				var CellMar  = Cell.GetMargins();
 
 				var X_start = (0 === Pos.Cell ? Page.X + CellInfo.X_content_start : Page.X + CellInfo.X_cell_start);
 				var X_end   = Page.X + CellInfo.X_cell_end;
@@ -8398,7 +8398,7 @@ CTable.prototype.SplitTableCells = function(Rows, Cols)
 		var Grid_width = Span_width / Cols;
 
 		var CellSpacing = Row.Get_CellSpacing();
-		var CellMar     = Cell.Get_Margins();
+		var CellMar     = Cell.GetMargins();
 
 		var MinW = CellSpacing + CellMar.Right.W + CellMar.Left.W;
 
@@ -9591,7 +9591,7 @@ CTable.prototype.Update_TableMarkupFromRuler = function(NewMarkup, bCol, Index)
 						for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 						{
 							var Cell           = Row.Get_Cell(CurCell);
-							var CellMargins    = Cell.Get_Margins();
+							var CellMargins    = Cell.GetMargins();
 							var Cur_Grid_start = Row.Get_CellInfo(CurCell).StartGridCol;
 							var Cur_Grid_end   = Cur_Grid_start + Cell.Get_GridSpan() - 1;
 
@@ -10563,7 +10563,7 @@ CTable.prototype.Internal_Update_TableMarkup = function(RowIndex, CellIndex, Pag
 		var Cell         = Row.Get_Cell(CurCell);
 		var StartGridCol = Row.Get_CellInfo(CurCell).StartGridCol;
 		var GridSpan     = Cell.Get_GridSpan();
-		var CellMargin   = Cell.Get_Margins();
+		var CellMargin   = Cell.GetMargins();
 
 		this.Markup.Cols.push(this.TableSumGrid[StartGridCol + GridSpan - 1] - this.TableSumGrid[StartGridCol - 1]);
 
@@ -10921,7 +10921,7 @@ CTable.prototype.Internal_Get_TableMinWidth = function()
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell         = Row.Get_Cell(CurCell);
-			var Cell_Margins = Cell.Get_Margins();
+			var Cell_Margins = Cell.GetMargins();
 
 			RowWidth += Cell_Margins.Left.W + Cell_Margins.Right.W;
 		}
@@ -10954,7 +10954,7 @@ CTable.prototype.Internal_Get_MinSumGrid = function()
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell         = Row.Get_Cell(CurCell);
-			var Cell_Margins = Cell.Get_Margins();
+			var Cell_Margins = Cell.GetMargins();
 			var GridSpan     = Cell.Get_GridSpan();
 
 			var Cell_MinWidth = Cell_Margins.Left.W + Cell_Margins.Right.W;

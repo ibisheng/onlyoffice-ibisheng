@@ -6189,7 +6189,7 @@ function BinaryPPTYLoader()
             AscCommon.g_oIdCounter.m_bRead = false;
             for(i = 0;  i < row.Content.length; ++i){
                 var oCell = row.Content[i];
-                var oMargins = oCell.Get_Margins();
+                var oMargins = oCell.GetMargins();
                 if(oMargins.Bottom.W > fMaxBottomMargin){
                     fMaxBottomMargin = oMargins.Bottom.W;
                 }
