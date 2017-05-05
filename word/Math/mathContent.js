@@ -7241,8 +7241,8 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
 
 CMathContent.prototype.GetTextContent = function()
 {
+	//TODO временная функция. пересмотреть!
 	var arr = [], str = "", bIsContainsOperator = false;
-
 
 	var addText = function(value, bIsAddParenthesis)
 	{
@@ -7278,11 +7278,13 @@ CMathContent.prototype.GetTextContent = function()
 		{
 			if(DEGREE_SUPERSCRIPT === elem.Pr.type)
 			{
-				res.push(getVal("^"));
+				//res.push(getVal("^"));
+				res.push(getVal(String.fromCharCode(94)));
 			}
 			else
 			{
-				res.push(getVal("_"));
+				//res.push(getVal("_"));
+				res.push(getVal(String.fromCharCode(95)));
 			}
 		}
 		else if(elem instanceof CDelimiter)
@@ -7295,7 +7297,8 @@ CMathContent.prototype.GetTextContent = function()
 			res.push(getVal(String.fromCharCode(elem.Pr.chr), true));
 			if(!elem.Pr.supHide)
 			{
-				res.push(getVal("_", true));
+				res.push(getVal(String.fromCharCode(95), true))
+				//res.push(getVal("_", true));
 			}
 			else
 			{
@@ -7303,13 +7306,15 @@ CMathContent.prototype.GetTextContent = function()
 			}
 			if(!elem.Pr.subHide)
 			{
-				res.push(getVal("^", true));
+				res.push(getVal(String.fromCharCode(94), true));
+				//res.push(getVal("^", true));//94
 			}
 			else
 			{
 				res.push(null);
 			}
-			res.push(getVal("▒", true));
+			res.push(getVal(String.fromCharCode(9618), true));
+			//res.push(getVal("▒", true));//9618
 		}
 		else if(elem instanceof CFraction)
 		{
@@ -7317,28 +7322,34 @@ CMathContent.prototype.GetTextContent = function()
 		}
 		else if(elem instanceof CRadical)
 		{
-			res.push(getVal("√", true));//8730;
-			res.push(getVal("&", true));
+			//res.push(getVal("√", true));
+			res.push(getVal(String.fromCharCode(8730), true));
+			//res.push(getVal("&", true));
+			res.push(getVal(String.fromCharCode(38), true));
 		}
 		else if(elem instanceof CMathMatrix)
 		{
-			res[-1] = getVal("■", true);
+			//res[-1] = getVal("■", true);//9632
+			res[-1] = getVal(String.fromCharCode(9632), true);
+
 			for(var row = 0; row < elem.nRow; row++)
 			{
 				for(var col = 1; col < elem.nCol; col++)
 				{
-					res.push(getVal("&"));
+					res.push(getVal(String.fromCharCode(38)));
+					//res.push(getVal("&"));
 				}
 				if(row !== elem.nRow - 1)
 				{
-					res.push(getVal("@"));
+					res.push(getVal(String.fromCharCode(64)));
+					//res.push(getVal("@"));
 				}
 			}
 		}
 		else if(elem instanceof CMathFunc)
 		{
-			//todo сивмол должен быть другим!
-			res.push(getVal("#"));
+			//res.push(getVal("#"));//8289
+			res.push(getVal(String.fromCharCode(8289)));
 		}
 
 		return res;
