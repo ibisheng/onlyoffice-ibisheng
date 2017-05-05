@@ -8454,7 +8454,7 @@ CDocumentContent.prototype.IsSelectedAll = function()
 {
 	if (true === this.Selection.Use
 		&& ((0 === this.Selection.StartPos && this.Content.length - 1 === this.Selection.EndPos)
-		|| (0 === this.Selection.EndPos && this.Content.length - 1 === this.Selection.EndPos))
+		|| (0 === this.Selection.EndPos && this.Content.length - 1 === this.Selection.StartPos))
 		&& true === this.Content[0].IsSelectedAll()
 		&& true === this.Content[this.Content.length - 1].IsSelectedAll())
 		return true;

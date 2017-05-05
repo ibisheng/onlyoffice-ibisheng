@@ -110,13 +110,13 @@ CChangesSdtPrTag.prototype.private_SetValue = function(Value)
 };
 /**
  * @constructor
- * @extends {AscDFH.CChangesBaseStringProperty}
+ * @extends {AscDFH.CChangesBaseLongProperty}
  */
 function CChangesSdtPrLabel(Class, Old, New)
 {
-	AscDFH.CChangesBaseStringProperty.call(this, Class, Old, New);
+	AscDFH.CChangesBaseLongProperty.call(this, Class, Old, New);
 }
-CChangesSdtPrLabel.prototype = Object.create(AscDFH.CChangesBaseStringProperty.prototype);
+CChangesSdtPrLabel.prototype = Object.create(AscDFH.CChangesBaseLongProperty.prototype);
 CChangesSdtPrLabel.prototype.constructor = CChangesSdtPrLabel;
 CChangesSdtPrLabel.prototype.Type = AscDFH.historyitem_SdtPr_Label;
 CChangesSdtPrLabel.prototype.private_SetValue = function(Value)

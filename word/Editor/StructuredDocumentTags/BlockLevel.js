@@ -663,6 +663,10 @@ CBlockLevelSdt.prototype.GetAllContentControls = function(arrContentControls)
 	arrContentControls.push(this);
 	this.Content.GetAllContentControls(arrContentControls);
 };
+CBlockLevelSdt.prototype.IsSelectedAll = function()
+{
+	return this.Content.IsSelectedAll();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

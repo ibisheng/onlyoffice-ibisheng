@@ -33,7 +33,6 @@
 // Import
 var locktype_None = AscCommon.locktype_None;
 var locktype_Mine = AscCommon.locktype_Mine;
-var changestype_Paragraph_Content = AscCommon.changestype_Paragraph_Content;
 
 if(typeof CDocument !== "undefined")
 {
@@ -202,7 +201,7 @@ CAbstractNum.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
     switch ( CheckType )
     {
-        case changestype_Paragraph_Content:
+        case AscCommon.changestype_Paragraph_Content:
         case AscCommon.changestype_Paragraph_Properties:
         {
             this.Lock.Check( this.Get_Id() );
@@ -236,7 +235,7 @@ if(typeof CGraphicObjects !== "undefined")
             || AscCommon.changestype_Image_Properties === CheckType
             || AscCommon.changestype_Delete === CheckType
             || AscCommon.changestype_Remove === CheckType
-            || changestype_Paragraph_Content === CheckType
+            || AscCommon.changestype_Paragraph_Content === CheckType
             || AscCommon.changestype_Paragraph_Properties === CheckType
             || AscCommon.changestype_Document_Content_Add === CheckType)
         {
@@ -260,7 +259,7 @@ CStyle.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
     switch ( CheckType )
     {
-        case changestype_Paragraph_Content:
+        case AscCommon.changestype_Paragraph_Content:
         case AscCommon.changestype_Paragraph_Properties:
         case AscCommon.changestype_Document_Content:
         case AscCommon.changestype_Document_Content_Add:
@@ -281,7 +280,7 @@ CStyles.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
     switch ( CheckType )
     {
-        case changestype_Paragraph_Content:
+        case AscCommon.changestype_Paragraph_Content:
         case AscCommon.changestype_Paragraph_Properties:
         case AscCommon.changestype_Document_Content:
         case AscCommon.changestype_Document_Content_Add:
@@ -363,17 +362,31 @@ CDocumentContent.prototype.Document_Is_SelectionLocked = function(CheckType)
         }
     }
 };
+CDocumentContent.prototype.CheckContentControlEditingLock = function()
+{
+	if (this.Parent && this.Parent.CheckContentControlEditingLock)
+		this.Parent.CheckContentControlEditingLock();
+};
+CDocumentContent.prototype.CheckContentControlDeletingLock = function()
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].CheckContentControlDeletingLock();
+	}
+};
 Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
+	var bCheckContentControl = false;
     switch ( CheckType )
     {
-        case changestype_Paragraph_Content:
+        case AscCommon.changestype_Paragraph_Content:
         case AscCommon.changestype_Paragraph_Properties:
         case AscCommon.changestype_Document_Content:
         case AscCommon.changestype_Document_Content_Add:
         case AscCommon.changestype_Image_Properties:
         {
             this.Lock.Check( this.Get_Id() );
+            bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Remove:
@@ -416,7 +429,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
             }
 
             this.Lock.Check( this.Get_Id() );
-
+            bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Delete:
@@ -450,7 +463,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
             }
 
             this.Lock.Check( this.Get_Id() );
-
+			bCheckContentControl = true;
             break;
         }
         case AscCommon.changestype_Document_SectPr:
@@ -462,12 +475,18 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
             break;
         }
     }
+
+    if (bCheckContentControl && this.Parent && this.Parent.CheckContentControlEditingLock)
+		this.Parent.CheckContentControlEditingLock();
+};
+Paragraph.prototype.CheckContentControlDeletingLock = function()
+{
 };
 CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
 {
     switch (CheckType)
     {
-        case changestype_Paragraph_Content:
+        case AscCommon.changestype_Paragraph_Content:
         case AscCommon.changestype_Paragraph_Properties:
         case AscCommon.changestype_Document_Content:
         case AscCommon.changestype_Document_Content_Add:
@@ -497,9 +516,21 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
         case AscCommon.changestype_Remove:
         {
 			if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type))
+			{
 				this.Lock.Check(this.Get_Id());
+
+				var arrCells = this.Internal_Get_SelectionArray();
+				for (var nIndex = 0, nCellsCount = arrCells.length; nIndex < nCellsCount; ++nIndex)
+				{
+					var Pos  = arrCells[nIndex];
+					var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+					Cell.Content.CheckContentControlDeletingLock();
+				}
+			}
 			else
+			{
 				this.CurCell.Content.Document_Is_SelectionLocked(CheckType);
+			}
 
             break;
         }
@@ -547,10 +578,68 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
         }
     }
 };
+CTable.prototype.CheckContentControlDeletingLock = function()
+{
+	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow = this.Content[nCurRow];
+		for (var nCurCell = 0, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			oRow.Get_Cell(nCurCell).Content.CheckContentControlDeletingLock();
+		}
+	}
+};
 CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
 {
-	return this.Content.Document_Is_SelectionLocked(CheckType, bCheckInner);
+	var nContentControlLock = this.GetContentControlLock();
+
+	if ((AscCommon.changestype_Paragraph_Content === CheckType
+		|| AscCommon.changestype_Remove === CheckType
+		|| AscCommon.changestype_Delete === CheckType
+		|| AscCommon.changestype_Document_Content === CheckType
+		|| AscCommon.changestype_Document_Content_Add === CheckType)
+		&& this.IsSelectionUse()
+		&& this.IsSelectedAll())
+	{
+		if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_SdtLocked === nContentControlLock)
+			return AscCommon.CollaborativeEditing.Add_CheckLock(true);
+		else
+			return this.Content.Document_Is_SelectionLocked(CheckType, bCheckInner);
+	}
+	else if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_ContentLocked === nContentControlLock)
+	{
+		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
+	}
+	else
+	{
+		return this.Content.Document_Is_SelectionLocked(CheckType, bCheckInner);
+	}
 };
+CBlockLevelSdt.prototype.CheckContentControlEditingLock = function()
+{
+	var nContentControlLock = this.GetContentControlLock();
+
+	if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_ContentLocked === nContentControlLock)
+		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
+
+	if (this.Parent && this.Parent.CheckContentControlEditingLock)
+		this.Parent.CheckContentControlEditingLock();
+};
+CBlockLevelSdt.prototype.CheckContentControlDeletingLock = function()
+{
+	var nContentControlLock = this.GetContentControlLock();
+
+	if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_SdtLocked === nContentControlLock)
+		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
+
+	this.Content.CheckContentControlEditingLock();
+};
+CTableCell.prototype.CheckContentControlEditingLock = function()
+{
+	if (this.Row && this.Row.Table && this.Row.Table.Parent && this.Row.Table.Parent.CheckContentControlEditingLock)
+		this.Row.Table.Parent.CheckContentControlEditingLock();
+};
+
 if(typeof CComments !== "undefined")
 {
     CComments.prototype.Document_Is_SelectionLocked = function(Id)
