@@ -607,9 +607,16 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 		&& this.IsSelectedAll())
 	{
 		if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_SdtLocked === nContentControlLock)
+		{
 			return AscCommon.CollaborativeEditing.Add_CheckLock(true);
+		}
 		else
-			return this.Content.Document_Is_SelectionLocked(CheckType, bCheckInner);
+		{
+			AscCommon.CollaborativeEditing.AddContentControlForSkippingOnCheckEditingLock(this);
+			this.Content.Document_Is_SelectionLocked(CheckType, bCheckInner);
+			AscCommon.CollaborativeEditing.RemoveContentControlForSkippingOnCheckEditingLock(this);
+			return;
+		}
 	}
 	else if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_ContentLocked === nContentControlLock)
 	{
@@ -624,7 +631,8 @@ CBlockLevelSdt.prototype.CheckContentControlEditingLock = function()
 {
 	var nContentControlLock = this.GetContentControlLock();
 
-	if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_ContentLocked === nContentControlLock)
+	if (false === AscCommon.CollaborativeEditing.IsNeedToSkipContentControlOnCheckEditingLock(this)
+		&& (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_ContentLocked === nContentControlLock))
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 
 	if (this.Parent && this.Parent.CheckContentControlEditingLock)
