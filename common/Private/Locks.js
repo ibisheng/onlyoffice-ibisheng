@@ -231,6 +231,7 @@ if(typeof CGraphicObjects !== "undefined")
     CGraphicObjects.prototype.documentIsSelectionLocked = function(CheckType)
     {
         var oDrawing, i;
+        var bDelete = (AscCommon.changestype_Delete === CheckType || AscCommon.changestype_Remove === CheckType);
         if(AscCommon.changestype_Drawing_Props === CheckType
             || AscCommon.changestype_Image_Properties === CheckType
             || AscCommon.changestype_Delete === CheckType
@@ -242,6 +243,10 @@ if(typeof CGraphicObjects !== "undefined")
             for(i = 0; i < this.selectedObjects.length; ++i)
             {
                 oDrawing = this.selectedObjects[i].parent;
+                if(bDelete)
+                {
+                    oDrawing.CheckContentControlDeletingLock();
+                }
                 oDrawing.Lock.Check(oDrawing.Get_Id());
             }
         }

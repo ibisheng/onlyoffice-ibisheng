@@ -2479,6 +2479,19 @@ ParaDrawing.prototype.GetAllContentControls = function(arrContentControls)
 };
 
 
+ParaDrawing.prototype.CheckContentControlEditingLock = function(){
+	if(this.DocumentContent && this.DocumentContent.CheckContentControlEditingLock){
+        this.DocumentContent.CheckContentControlEditingLock();
+	}
+};
+
+
+ParaDrawing.prototype.CheckContentControlDeletingLock = function(){
+	if(this.DocumentContent && this.DocumentContent.CheckContentControlDeletingLock){
+        this.DocumentContent.CheckContentControlDeletingLock();
+	}
+};
+
 /**
  * Класс, описывающий текущее положение параграфа при рассчете позиции автофигуры.
  * @constructor

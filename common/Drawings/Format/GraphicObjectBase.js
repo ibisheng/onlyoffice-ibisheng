@@ -783,6 +783,16 @@
     {
     };
 
+    CGraphicObjectBase.prototype.CheckContentControlEditingLock = function () {
+        if(this.group){
+            this.group.CheckContentControlEditingLock();
+            return;
+        }
+        if(this.parent && this.parent.CheckContentControlEditingLock){
+            this.parent.CheckContentControlEditingLock();
+        }
+    };
+
 window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicObjectBase = CGraphicObjectBase;
     window['AscFormat'].CGraphicBounds     = CGraphicBounds;
