@@ -4719,6 +4719,22 @@
 		}
 		
 	};
+	Worksheet.prototype._updatePivotTables = function () {
+		var pivotTable, range, styleInfo, style;
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			pivotTable = this.pivotTables[i];
+			range = pivotTable.getRange();
+			styleInfo = pivotTable.asc_getStyleInfo();
+			if (!range || !styleInfo) {
+				continue;
+			}
+			style = this.workbook.TableStyles.AllStyles[styleInfo.asc_getName()];
+			if (!style) {
+				continue;
+			}
+
+		}
+	};
 	Worksheet.prototype.inPivotTable = function (range) {
 		return this.pivotTables.some(function (element) {
 			return element.intersection(range);

@@ -1152,6 +1152,7 @@
         this._initCellsArea(AscCommonExcel.recalcType.full);
         this.model.setTableStyleAfterOpen();
 		this.model._updateConditionalFormatting(null);
+		this.model._updatePivotTables();
         this._cleanCellsTextMetricsCache();
         this._prepareCellTextMetricsCache();
 
