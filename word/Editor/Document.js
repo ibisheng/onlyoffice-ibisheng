@@ -6236,6 +6236,12 @@ CDocument.prototype.OnKeyDown = function(e)
         {
             this.EndHdrFtrEditing(true);
         }
+		
+		if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
+		{
+			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+		}
+		
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 32 && false === editor.isViewMode) // Space
@@ -8912,7 +8918,7 @@ CDocument.prototype.Viewer_OnChangePosition = function()
 		var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
 		this.Api.sync_UpdateCommentPosition(Comment.Get_Id(), Coords.X, Coords.Y);
 	}
-
+    window['AscCommon'].g_clipboardBase.SpecialPasteButton_Update_Position();
 	this.TrackRevisionsManager.Update_VisibleChangesPosition(this.Api);
 };
 //----------------------------------------------------------------------------------------------------------------------

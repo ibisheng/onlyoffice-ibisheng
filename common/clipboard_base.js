@@ -96,13 +96,17 @@
 		
 		//special paste
 		this.specialPasteData = {};//данные последней вставки перед специальной вставкой
-		this.specialPasteUndoData = {};//для того, чтобы сделать повторную вставку с помощью special paste нужно сначала откатиться до того состояния, которое было до первой вставки
 		
 		//параметры специальной вставки из меню.используется класс для EXCEL СSpecialPasteProps. чтобы не протаскивать через все вызываемые функции, добавил это свойство
 		this.specialPasteProps = null;
 		
 		this.showSpecialPasteButton = false;//нужно показывать или нет кнопку специальной вставки
 		this.specialPasteButtonProps = {};//параметры кнопки специальной вставки - позиция. нужно при прокрутке документа, изменения масштаба и тп
+		
+		this.specialPasteStart = false;//если true, то в данный момент выполняется специальная вставка
+		this.pasteStart = false;//идет процесс вставки, выставится в false только после полного ее окончания(загрузка картинок и шрифтов)
+
+		this.bIsEndTransaction = false;//временный флаг для excel. TODO пересмотреть!
 	}
 
 	CClipboardBase.prototype =
@@ -942,7 +946,90 @@
 		Clean_SpecialPasteObj : function()
 		{
 			this.specialPasteData = {};
-			this.specialPasteUndoData = {};
+		},
+		
+		Special_Paste_Start : function()
+		{
+			this.specialPasteStart = true;
+		},
+		
+		Special_Paste_End : function()
+		{
+			this.specialPasteStart = false;
+		},
+		
+		Paste_Process_Start : function()
+		{
+			this.pasteStart = true;
+		},
+		
+		Paste_Process_End : function()
+		{
+			this.pasteStart = false;
+			this.specialPasteProps = null;
+			//процесс специальной вставки заканчивается вместе с общей вставкой
+			if(this.specialPasteStart)
+			{
+				this.Special_Paste_End();
+			}
+			else//если не было специальной вставки, необходимо показать кнопку специальной вставки
+			{
+				this.SpecialPasteButton_Show();
+			}
+
+			//TODO для excel заглушка. пересмотреть!
+			if(this.bIsEndTransaction)
+			{
+				this.bIsEndTransaction = false;
+				History.EndTransaction();
+			}
+		},
+		
+		SpecialPasteButton_Show : function(props)
+		{
+			//при быстром совместном редактировании отключаем возможность специальной вставки
+			if(AscCommon.CollaborativeEditing && AscCommon.CollaborativeEditing.m_bFast)
+			{
+				return;
+			}
+
+			if(!props)
+			{
+				props = this.specialPasteButtonProps.props;
+			}
+			if(props)
+			{
+				this.showSpecialPasteButton = true;
+				this.Api.asc_ShowSpecialPasteButton(props);
+			}
+		},
+		
+		SpecialPasteButton_Hide : function()
+		{
+			if(this.showSpecialPasteButton)
+			{
+				this.showSpecialPasteButton = false;
+				this.Api.asc_HideSpecialPasteButton();
+			}
+		},
+		
+		SpecialPasteButton_Update_Position : function()
+		{
+			//TODO метод должен быть общий для всех редакторов
+			if(this.showSpecialPasteButton && this.specialPasteButtonProps.fixPosition)
+			{
+				var specialPasteShowOptions = new Asc.SpecialPasteShowOptions();
+				
+				var _Y = this.specialPasteButtonProps.fixPosition.y;
+				var _X = this.specialPasteButtonProps.fixPosition.x;
+				var _PageNum = this.specialPasteButtonProps.fixPosition.pageNum;
+				
+				var _сoord = this.Api.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
+				var curCoord = new AscCommon.asc_CRect( _сoord.X, _сoord.Y, 0, 0 );
+				specialPasteShowOptions.asc_setCellCoord(curCoord);
+				
+				this.Api.asc_ShowSpecialPasteButton(specialPasteShowOptions);
+			}
 		}
 	};
 

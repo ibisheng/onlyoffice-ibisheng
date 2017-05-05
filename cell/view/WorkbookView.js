@@ -2089,6 +2089,12 @@
 	}
   };
 
+  WorkbookView.prototype.showSpecialPasteButton = function(props) {
+	if (!this.getCellEditMode()) {
+		this.getWorksheet().showSpecialPasteOptions(props);
+	}
+  };
+
   WorkbookView.prototype.selectionCut = function() {
     if (this.getCellEditMode()) {
       this.cellEditor.cutSelection();
