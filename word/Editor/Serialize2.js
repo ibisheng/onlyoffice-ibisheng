@@ -121,7 +121,6 @@ var c_oSerNumTypes = {
 var c_oSerOtherTableTypes = {
     ImageMap:0,
     ImageMap_Src:1,
-	EmbeddedFonts: 2,
 	DocxTheme: 3
 };
 var c_oSerFontsTypes = {
@@ -5323,7 +5322,6 @@ function BinaryOtherTableWriter(memory, doc)
     {
         var oThis = this;
         //delete ImageMap
-        //todo EmbeddedFonts
 		//DocxTheme
 		this.bs.WriteItem(c_oSerOtherTableTypes.DocxTheme, function(){pptx_content_writer.WriteTheme(oThis.memory, oThis.Document.theme);});
     };
@@ -13069,62 +13067,6 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
                     return oThis.ReadImageMapContent(t,l);
                 });
         }
-		else if ( c_oSerOtherTableTypes.EmbeddedFonts === type )
-        {
-            var _count = this.stream.GetULongLE();
-			var _embedded_fonts = [];
-            for (var i = 0; i < _count; i++)
-            {
-                var _at = this.stream.GetUChar();
-                if (_at != AscCommon.g_nodeAttributeStart)
-                    break;
-
-                var _f_i = {};
-
-                while (true)
-                {
-                    _at = this.stream.GetUChar();
-                    if (_at == AscCommon.g_nodeAttributeEnd)
-                        break;
-
-                    switch (_at)
-                    {
-                        case 0:
-                        {
-                            _f_i.Name = this.stream.GetString();
-                            break;
-                        }
-                        case 1:
-                        {
-                            _f_i.Style = this.stream.GetULongLE();
-                            break;
-                        }
-                        case 2:
-                        {
-                            _f_i.IsCut = this.stream.GetBool();
-                            break;
-                        }
-                        case 3:
-                        {
-                            _f_i.IndexCut = this.stream.GetULongLE();
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-
-                _embedded_fonts.push(_f_i);
-            }
-			var api = this.Document.DrawingDocument.m_oWordControl.m_oApi;
-			if(true == api.isUseEmbeddedCutFonts)
-			{
-				var font_cuts = api.FontLoader.embedded_cut_manager;
-				font_cuts.Url = AscCommon.g_oDocumentUrls.getUrl('fonts/fonts.js');
-				font_cuts.init_cut_fonts(_embedded_fonts);
-				font_cuts.bIsCutFontsUse = true;
-			}
-		}
 		else if ( c_oSerOtherTableTypes.DocxTheme === type )
         {
 		    this.Document.theme = pptx_content_loader.ReadTheme(this, this.stream);

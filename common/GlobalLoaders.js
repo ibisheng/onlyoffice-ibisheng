@@ -34,122 +34,12 @@
 
 (function(window, document){
     // Import
-    var CreateFontData2 = AscFonts.CreateFontData2;
     var g_fontApplication = AscFonts.g_fontApplication;
     var CFontFileLoader = AscFonts.CFontFileLoader;
     var FONT_TYPE_EMBEDDED = AscFonts.FONT_TYPE_EMBEDDED;
     var CFontInfo = AscFonts.CFontInfo;
     var ImageLoadStatus = AscFonts.ImageLoadStatus;
     var CImage = AscFonts.CImage;
-    var g_fonts_streams = AscFonts.g_fonts_streams;
-
-    function CEmbeddedCutFontsLoader()
-    {
-        this.Api = null;
-
-        this.font_infos = [];
-        this.font_files = [];
-
-        this.map_name_cutindex = null;
-        this.CurrentFindFileParse = -1;
-
-        this.Url = "";
-        this.bIsCutFontsUse = false;
-
-        var oThis = this;
-
-        this.load_cut_fonts = function()
-        {
-            var scriptElem = document.createElement('script');
-
-            if (scriptElem.readyState && false)
-            {
-                scriptElem.onreadystatechange = function () {
-                    if (this.readyState == 'complete' || this.readyState == 'loaded')
-                    {
-                        scriptElem.onreadystatechange = null;
-                        setTimeout(oThis._callback_script_load, 0);
-                    }
-                }
-            }
-            scriptElem.onload = scriptElem.onerror = oThis._callback_font_load;
-
-            scriptElem.setAttribute('src', this.Url);
-            scriptElem.setAttribute('type','text/javascript');
-            document.getElementsByTagName('head')[0].appendChild(scriptElem);
-
-            this.Api.asyncFontsDocumentStartLoaded();
-        };
-
-        this._callback_font_load = function()
-        {
-            if (undefined === window.embedded_fonts)
-                return;
-
-            oThis.CurrentFindFileParse = 0;
-            setTimeout(oThis.parse_font, 10);
-        };
-
-        this.parse_font = function()
-        {
-            var __font_data_idx = g_fonts_streams.length;
-            g_fonts_streams[__font_data_idx] = CreateFontData2(window.embedded_fonts[oThis.CurrentFindFileParse], undefined);
-			window.embedded_fonts[oThis.CurrentFindFileParse] = "";
-            oThis.font_files[oThis.CurrentFindFileParse].SetStreamIndex(__font_data_idx);
-            oThis.font_files[oThis.CurrentFindFileParse].Status = 0;
-
-            oThis.CurrentFindFileParse++;
-            if (oThis.CurrentFindFileParse >= oThis.font_files.length)
-            {
-                oThis.Api.asyncFontsDocumentEndLoaded();
-                return;
-            }
-
-            setTimeout(oThis.parse_font, 10);
-        };
-
-        this.init_cut_fonts = function(_fonts)
-        {
-            this.map_name_cutindex = {};
-            var _len = _fonts.length;
-
-            for (var i = 0; i < _len; i++)
-            {
-                var _font = _fonts[i];
-                var _info = this.map_name_cutindex[_font.Name];
-
-                if (_info === undefined)
-                {
-                    _info = new CFontInfo(_font.Name, "", AscFonts.FONT_TYPE_ADDITIONAL_CUT, -1, -1, -1, -1, -1, -1, -1, -1);
-                    this.map_name_cutindex[_font.Name] = _info;
-                }
-
-                switch (_font.Style)
-                {
-                    case 0:
-                        _info.indexR = _font.IndexCut;
-                        _info.faceIndexR = 0;
-                        break;
-                    case 1:
-                        _info.indexB = _font.IndexCut;
-                        _info.faceIndexB = 0;
-                        break;
-                    case 2:
-                        _info.indexI = _font.IndexCut;
-                        _info.faceIndexI = 0;
-                        break;
-                    case 3:
-                        _info.indexBI = _font.IndexCut;
-                        _info.faceIndexBI = 0;
-                        break;
-                    default:
-                        break;
-                }
-
-                this.font_files[i] = new CFontFileLoader("embedded_cut" + i);
-            }
-        }
-    }
 
     function CGlobalFontLoader()
     {
@@ -181,15 +71,11 @@
         this.loadFontCallBack     = null;
         this.loadFontCallBackArgs = null;
 
-        // embedded_cut_fonts
-        this.embedded_cut_manager = new CEmbeddedCutFontsLoader();
-
         this.IsLoadDocumentFonts2 = false;
 
         this.put_Api = function(_api)
         {
             this.Api = _api;
-            this.embedded_cut_manager.Api = _api;
         };
                 
         this.LoadEmbeddedFonts = function(url, _fonts)
@@ -280,9 +166,6 @@
         {
             if (this.IsLoadDocumentFonts2)
                 return this.LoadDocumentFonts2(_fonts);
-
-            if (this.embedded_cut_manager.bIsCutFontsUse)
-                return this.embedded_cut_manager.load_cut_fonts();
 
             // в конце метода нужно отдать список шрифтов
             var gui_fonts = [];

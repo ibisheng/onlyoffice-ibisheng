@@ -604,8 +604,6 @@
 
 		this.isPasteFonts_Images = false;
 
-		this.isLoadNoCutFonts = false;
-
 		this.nCurPointItemsLength = -1;
 
 		this.pasteCallback       = null;
@@ -1430,7 +1428,6 @@ background-repeat: no-repeat;\
 
 		this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 
-		//this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
 		this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 
@@ -2096,7 +2093,6 @@ background-repeat: no-repeat;\
 					"c": "reopen",
 					"url": this.documentUrl,
 					"title": this.documentTitle,
-					"embeddedfonts": this.isUseEmbeddedCutFonts,
 					"password": option.asc_getPassword()
 				};
 
@@ -4643,13 +4639,6 @@ background-repeat: no-repeat;\
 		this.GenerateStyles();
 		// открытие после загрузки документа
 
-		if (this.isLoadNoCutFonts)
-		{
-			this.isLoadNoCutFonts = false;
-			this.asc_setViewMode(false);
-			return;
-		}
-
 		var _loader_object = this.WordControl.m_oLogicDocument;
 		if (null == _loader_object)
 			_loader_object = this.WordControl.m_oDrawingDocument.m_oDocumentRenderer;
@@ -5666,21 +5655,11 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
-			if (this.bInit_word_control === true && this.FontLoader.embedded_cut_manager.bIsCutFontsUse)
-			{
-				this.isLoadNoCutFonts                               = true;
-				this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-				this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, true);
-				return;
-			}
-
 			if (this.bInit_word_control === true)
 			{
 				AscCommon.CollaborativeEditing.Apply_Changes();
 				AscCommon.CollaborativeEditing.Release_Locks();
 			}
-
-			this.isUseEmbeddedCutFonts = false;
 
 			this.WordControl.checkNeedRules();
 			this.WordControl.m_oDrawingDocument.ClearCachePages();
@@ -5691,11 +5670,6 @@ background-repeat: no-repeat;\
 				this.WordControl.m_oLogicDocument.viewMode = false;
 			}
 		}
-	};
-
-	asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)
-	{
-		this.isUseEmbeddedCutFonts = bUse;
 	};
 
 	asc_docs_api.prototype.can_AddHyperlink            = function()
@@ -7013,7 +6987,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['ClearFormating']                      = asc_docs_api.prototype.ClearFormating;
 	asc_docs_api.prototype['SetDeviceInputHelperId']              = asc_docs_api.prototype.SetDeviceInputHelperId;
 	asc_docs_api.prototype['asc_setViewMode']                     = asc_docs_api.prototype.asc_setViewMode;
-	asc_docs_api.prototype['SetUseEmbeddedCutFonts']              = asc_docs_api.prototype.SetUseEmbeddedCutFonts;
 	asc_docs_api.prototype['can_AddHyperlink']                    = asc_docs_api.prototype.can_AddHyperlink;
 	asc_docs_api.prototype['add_Hyperlink']                       = asc_docs_api.prototype.add_Hyperlink;
 	asc_docs_api.prototype['sync_HyperlinkClickCallback']         = asc_docs_api.prototype.sync_HyperlinkClickCallback;

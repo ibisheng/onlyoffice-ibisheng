@@ -948,21 +948,6 @@ CFontInfo.prototype =
 
     LoadFont : function(font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform)
     {
-        // сначала нужно проверить на обрезанный шрифт
-        var _embedded_cur = AscCommon.g_font_loader.embedded_cut_manager;
-        if (_embedded_cur.bIsCutFontsUse)
-        {
-            if (this.Type != FONT_TYPE_ADDITIONAL_CUT)
-            {
-                var _font_info = _embedded_cur.map_name_cutindex[this.Name];
-
-                if (_font_info !== undefined)
-                {
-                    return _font_info.LoadFont(AscCommon.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
-                }
-            }
-        }
-
         // подбираем шрифт по стилю
         var sReturnName = this.Name;
         var bNeedBold   = false;
@@ -1100,31 +1085,12 @@ CFontInfo.prototype =
         var fontfile = null;
         if (this.Type == FONT_TYPE_EMBEDDED)
             fontfile = font_loader.embeddedFontFiles[index];
-        else if (this.Type == FONT_TYPE_ADDITIONAL_CUT)
-            fontfile = font_loader.embedded_cut_manager.font_files[index];
         else
             fontfile = font_loader.fontFiles[index];
 
-        if (window["NATIVE_EDITOR_ENJINE"] === undefined)
+        if (window["NATIVE_EDITOR_ENJINE"] && fontfile.Status != 0)
         {
-            if (fontfile.Status != 0 && (this.Type == FONT_TYPE_STANDART || this.Type == FONT_TYPE_ADDITIONAL) &&
-                null != _embedded_cur.map_name_cutindex && undefined !== _embedded_cur.map_name_cutindex[this.Name])
-            {
-                // нормальный шрифт пока не подгрузился... берем обрезанный
-                var _font_info = _embedded_cur.map_name_cutindex[this.Name];
-
-                if (_font_info !== undefined)
-                {
-                    return _font_info.LoadFont(AscCommon.g_font_loader, fontManager, fEmSize, lStyle, dHorDpi, dVerDpi, transform);
-                }
-            }
-        }
-        else
-        {
-            if (fontfile.Status != 0)
-            {
-                fontfile.LoadFontNative();
-            }
+			fontfile.LoadFontNative();
         }        
 
         var _ext = "";

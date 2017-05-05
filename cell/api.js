@@ -566,15 +566,6 @@ var editor;
     }
 
     if (false === isViewMode) {
-      // Загружаем не обрезанные шрифты для полной версии (при редактировании)
-      if (this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
-        this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-        this.asyncMethodCallback = undefined;
-        this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
-      }
-
-      this.isUseEmbeddedCutFonts = false;
-
       // Отправка стилей
       this._sendWorkbookStyles();
       if (this.IsSendDocumentLoadCompleate && this.collaborativeEditing) {
@@ -584,10 +575,6 @@ var editor;
         this.collaborativeEditing.sendChanges();
       }
     }
-  };
-
-  spreadsheet_api.prototype.asc_setUseEmbeddedCutFonts = function(bUse) {
-    this.isUseEmbeddedCutFonts = bUse;
   };
 
   /*
@@ -607,7 +594,6 @@ var editor;
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
-            "embeddedfonts": this.isUseEmbeddedCutFonts,
             "delimiter": option.asc_getDelimiter(),
             "delimiterChar": option.asc_getDelimiterChar(),
             "codepage": option.asc_getCodePage()};
@@ -629,7 +615,6 @@ var editor;
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
-            "embeddedfonts": this.isUseEmbeddedCutFonts,
             "password": option.asc_getPassword()
           };
 
@@ -3403,7 +3388,6 @@ var editor;
 
   prot["asc_setMobileVersion"] = prot.asc_setMobileVersion;
   prot["asc_setViewMode"] = prot.asc_setViewMode;
-  prot["asc_setUseEmbeddedCutFonts"] = prot.asc_setUseEmbeddedCutFonts;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;

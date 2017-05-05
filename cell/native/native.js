@@ -4068,8 +4068,7 @@ function OfflineEditor () {
                          "format"        : "xlsx",
                          "vkey"          : undefined,
                          "url"           : t.initSettings["docURL"],
-                         "title"         : this.documentTitle,
-                         "embeddedfonts" : false};
+                         "title"         : this.documentTitle};
 
                          _api.CoAuthoringApi.auth(t.initSettings["viewmode"], rData);
         });
@@ -7499,7 +7498,6 @@ window["Asc"]["spreadsheet_api"].prototype.asc_setDocumentPassword = function(pa
       "c": "reopen",
       "url": this.documentUrl,
       "title": this.documentTitle,
-      "embeddedfonts": this.isUseEmbeddedCutFonts,
       "password": password
     };
 

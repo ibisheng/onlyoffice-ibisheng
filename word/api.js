@@ -465,7 +465,6 @@
 		this.FontAsyncLoadParam   = null;
 
 		this.isPasteFonts_Images = false;
-		this.isLoadNoCutFonts    = false;
 
 		this.pasteCallback       = null;
 		this.pasteImageMap       = null;
@@ -869,7 +868,6 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 			AscCommon.pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
 
-			//this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
 			this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 		}
 		else
@@ -2083,8 +2081,7 @@ background-repeat: no-repeat;\
 						"c"             : "reopen",
 						"url"           : this.documentUrl,
 						"title"         : this.documentTitle,
-						"codepage"      : option.asc_getCodePage(),
-						"embeddedfonts" : this.isUseEmbeddedCutFonts
+						"codepage"      : option.asc_getCodePage()
 					};
 					sendCommand(this, null, rData);
 				}
@@ -2104,7 +2101,6 @@ background-repeat: no-repeat;\
 						"c": "reopen",
 						"url": this.documentUrl,
 						"title": this.documentTitle,
-						"embeddedfonts": this.isUseEmbeddedCutFonts,
 						"password": option.asc_getPassword()
 					};
 
@@ -5503,21 +5499,13 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		if (!this.FontLoader.embedded_cut_manager.bIsCutFontsUse)
-			this.GenerateStyles();
+		this.GenerateStyles();
 
 		if (null != this.WordControl.m_oLogicDocument)
 		{
 			this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
 			this.sendColorThemes(this.WordControl.m_oLogicDocument.theme);
 			this.sendEvent("asc_onUpdateChartStyles");
-		}
-
-		if (this.isLoadNoCutFonts)
-		{
-			this.isLoadNoCutFonts = false;
-			this.asc_setViewMode(false);
-			return;
 		}
 
 		// открытие после загрузки документа
@@ -6370,35 +6358,11 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
-			if (this.bInit_word_control === true && this.FontLoader.embedded_cut_manager.bIsCutFontsUse)
-			{
-				this.isLoadNoCutFonts                               = true;
-				this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-				this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, true);
-				return;
-			}
-
-			// быстрого перехода больше нет
-			/*
-			 if ( this.bInit_word_control === true )
-			 {
-			 CollaborativeEditing.Apply_Changes();
-			 CollaborativeEditing.Release_Locks();
-			 }
-			 */
-
-			this.isUseEmbeddedCutFonts = false;
-			
 			//this.WordControl.m_bIsRuler = true;
 			this.WordControl.checkNeedRules();
 			this.WordControl.m_oDrawingDocument.ClearCachePages();
 			this.WordControl.OnResize(true);
 		}
-	};
-
-	asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)
-	{
-		this.isUseEmbeddedCutFonts = bUse;
 	};
 
 	asc_docs_api.prototype.OnMouseUp = function(x, y)
@@ -8017,7 +7981,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['GetSectionInfo']                            = asc_docs_api.prototype.GetSectionInfo;
 	asc_docs_api.prototype['add_SectionBreak']                          = asc_docs_api.prototype.add_SectionBreak;
 	asc_docs_api.prototype['asc_setViewMode']                           = asc_docs_api.prototype.asc_setViewMode;
-	asc_docs_api.prototype['SetUseEmbeddedCutFonts']                    = asc_docs_api.prototype.SetUseEmbeddedCutFonts;
 	asc_docs_api.prototype['OnMouseUp']                                 = asc_docs_api.prototype.OnMouseUp;
 	asc_docs_api.prototype['asyncImageEndLoaded2']                      = asc_docs_api.prototype.asyncImageEndLoaded2;
 	asc_docs_api.prototype['SetDrawImagePlaceParagraph']                = asc_docs_api.prototype.SetDrawImagePlaceParagraph;

@@ -2341,7 +2341,6 @@ Asc['asc_docs_api'].prototype.asc_setDocumentPassword = function(password)
       "c": "reopen",
       "url": this.documentUrl,
       "title": this.documentTitle,
-      "embeddedfonts": this.isUseEmbeddedCutFonts,
       "password": password
     };
 
@@ -5874,8 +5873,7 @@ function NativeOpenFile3(_params, documentInfo)
                                       "format"        : "docx",
                                       "vkey"          : undefined,
                                       "url"           : window.documentInfo["docURL"],
-                                      "title"         : this.documentTitle,
-                                      "embeddedfonts" : false};
+                                      "title"         : this.documentTitle};
 
                                       _api.CoAuthoringApi.auth(window.documentInfo["viewmode"], rData);
                                       });
@@ -5963,7 +5961,6 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, v
             //this.WordControl.m_oDrawingDocument.CheckFontNeeds();
             AscCommon.pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
 
-            //this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
             //this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
         }
         else
