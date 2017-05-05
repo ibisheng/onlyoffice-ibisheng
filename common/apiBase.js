@@ -43,8 +43,6 @@
 	var c_oAscAsyncAction     = Asc.c_oAscAsyncAction;
 	var c_oAscAsyncActionType = Asc.c_oAscAsyncActionType;
 
-	var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
-
 	/** @constructor */
 	function baseEditorsApi(config, editorId)
 	{
@@ -152,13 +150,6 @@
 		this.noCreatePoint     = false;
 		this.exucuteHistory    = false;
 		this.exucuteHistoryEnd = false;
-
-		// На этапе сборки значение переменной ASC_DOCS_API_USE_EMBEDDED_FONTS может менятся.
-		// По дефолту встроенные шрифты использоваться не будут, как и при любом значении
-		// ASC_DOCS_API_USE_EMBEDDED_FONTS, кроме "true"(написание от регистра не зависит).
-
-		// Использовать ли обрезанные шрифты
-		this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 
 		this.isSendStandartTextures = false;
 
@@ -427,8 +418,7 @@
 				"userid"        : this.documentUserId,
 				"format"        : this.documentFormat,
 				"url"           : this.documentUrl,
-				"title"         : this.documentTitle,
-				"embeddedfonts" : this.isUseEmbeddedCutFonts
+				"title"         : this.documentTitle
 			};
 			if (versionHistory)
 			{

@@ -3259,7 +3259,7 @@ ScrollObject.prototype = {
         this.that.scrollByY( delta )
     },
     evt_click:function ( e ) {
-        var evt = e || windows.event;
+        var evt = e || window.event;
         var mousePos = this.that.getMousePosition( evt );
         if ( this.that.isHorizontalScroll ) {
             if ( mousePos.x > this.arrowPosition && mousePos.x < this.that.canvasW - this.that.arrowPosition ) {

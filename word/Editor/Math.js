@@ -1627,9 +1627,9 @@ ParaMath.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, De
 {
 };
 
-ParaMath.prototype.Collect_DocumentStatistics = function(ParaStats)
+ParaMath.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-    // TODO: ParaMath.Collect_DocumentStatistics
+    // TODO: ParaMath.CollectDocumentStatistics
 };
 
 ParaMath.prototype.Create_FontMap = function(Map)
@@ -2360,21 +2360,21 @@ ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
 
 };
-ParaMath.prototype.Save_RecalculateObject = function(Copy)
+ParaMath.prototype.SaveRecalculateObject = function(Copy)
 {
-    var RecalcObj = this.Root.Save_RecalculateObject(Copy);
-    RecalcObj.Save_MathInfo(this, Copy);
+	var RecalcObj = this.Root.SaveRecalculateObject(Copy);
+	RecalcObj.Save_MathInfo(this, Copy);
 
-    return RecalcObj;
+	return RecalcObj;
 };
-ParaMath.prototype.Load_RecalculateObject = function(RecalcObj)
+ParaMath.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_MathInfo(this);
-    this.Root.Load_RecalculateObject(RecalcObj);
+    this.Root.LoadRecalculateObject(RecalcObj);
 };
-ParaMath.prototype.Prepare_RecalculateObject = function()
+ParaMath.prototype.PrepareRecalculateObject = function()
 {
-    this.Root.Prepare_RecalculateObject();
+	this.Root.PrepareRecalculateObject();
 };
 ParaMath.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {
@@ -2426,13 +2426,13 @@ ParaMath.prototype.Refresh_RecalcData2 = function(Data)
     this.Paragraph.Refresh_RecalcData2(0);
 };
 
-ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+ParaMath.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     var RPI = new CRPI();
     RPI.MergeMathInfo(this.ParaMathRPI);
 
     this.Root.PreRecalc(null, this, new CMathArgSize(), RPI);
-    this.Root.Recalculate_MinMaxContentWidth(MinMax);
+    this.Root.RecalculateMinMaxContentWidth(MinMax);
 };
 
 ParaMath.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
@@ -3026,9 +3026,9 @@ ParaMath.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, b
     return this.Root.Selection_CheckParaContentPos(ContentPos, Depth, bStart, bEnd);
 };
 
-ParaMath.prototype.Is_SelectedAll = function(Props)
+ParaMath.prototype.IsSelectedAll = function(Props)
 {
-    return this.Root.Is_SelectedAll(Props);
+	return this.Root.IsSelectedAll(Props);
 };
 
 ParaMath.prototype.Selection_CorrectLeftPos = function(Direction)

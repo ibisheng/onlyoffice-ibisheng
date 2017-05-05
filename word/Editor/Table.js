@@ -2065,7 +2065,7 @@ CTable.prototype.Get_PagesCount = function()
 {
 	return this.Pages.length;
 };
-CTable.prototype.Get_AllDrawingObjects = function(DrawingObjs)
+CTable.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
 	if (undefined === DrawingObjs)
 		DrawingObjs = [];
@@ -2078,13 +2078,13 @@ CTable.prototype.Get_AllDrawingObjects = function(DrawingObjs)
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Get_AllDrawingObjects(DrawingObjs);
+			Cell.Content.GetAllDrawingObjects(DrawingObjs);
 		}
 	}
 
 	return DrawingObjs;
 };
-CTable.prototype.Get_AllComments = function(AllComments)
+CTable.prototype.GetAllComments = function(AllComments)
 {
 	if (undefined === AllComments)
 		AllComments = [];
@@ -2097,13 +2097,13 @@ CTable.prototype.Get_AllComments = function(AllComments)
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Get_AllComments(AllComments);
+			Cell.Content.GetAllComments(AllComments);
 		}
 	}
 
 	return AllComments;
 };
-CTable.prototype.Get_AllMaths = function(AllMaths)
+CTable.prototype.GetAllMaths = function(AllMaths)
 {
 	if (undefined === AllMaths)
 		AllMaths = [];
@@ -2116,13 +2116,13 @@ CTable.prototype.Get_AllMaths = function(AllMaths)
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Get_AllMaths(AllMaths);
+			Cell.Content.GetAllMaths(AllMaths);
 		}
 	}
 
 	return AllMaths;
 };
-CTable.prototype.Get_AllFloatElements = function(FloatObjs)
+CTable.prototype.GetAllFloatElements = function(FloatObjs)
 {
 	if (undefined === FloatObjs)
 		FloatObjs = [];
@@ -2135,7 +2135,7 @@ CTable.prototype.Get_AllFloatElements = function(FloatObjs)
 		for (var CurCell = 0; CurCell < Cells_Count; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Get_AllFloatElements(FloatObjs);
+			Cell.Content.GetAllFloatElements(FloatObjs);
 		}
 	}
 
@@ -2457,7 +2457,7 @@ CTable.prototype.Shift = function(CurPage, Dx, Dy)
 		this.TableRowsBottom[CurRow][CurPage] += Dy;
 	}
 };
-CTable.prototype.Update_EndInfo = function()
+CTable.prototype.UpdateEndInfo = function()
 {
 	for (var RowIndex = 0, RowsCount = this.Content.length; RowIndex < RowsCount; RowIndex++)
 	{
@@ -2465,7 +2465,7 @@ CTable.prototype.Update_EndInfo = function()
 		for (var CellIndex = 0, CellsCount = Row.Get_CellsCount(); CellIndex < CellsCount; CellIndex++)
 		{
 			var Cell = Row.Get_Cell(CellIndex);
-			Cell.Content.Update_EndInfo();
+			Cell.Content.UpdateEndInfo();
 		}
 	}
 };
@@ -2477,7 +2477,7 @@ CTable.prototype.Internal_UpdateFlowPosition = function(X, Y)
 	this.X = X + Dx;
 	this.Y = Y;
 
-	this.Set_PositionH(c_oAscHAnchor.Page, false, this.X);
+	this.Set_PositionH(c_oAscHAnchor.Page, false, this.X_origin);
 	this.Set_PositionV(c_oAscVAnchor.Page, false, this.Y);
 };
 CTable.prototype.Move = function(X, Y, PageNum, NearestPos)
@@ -2718,7 +2718,7 @@ CTable.prototype.RecalculateCurPos = function()
 
 	return null;
 };
-CTable.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
+CTable.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 {
 	if (true === isRotated)
 	{
@@ -2739,7 +2739,7 @@ CTable.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
 			for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 			{
 				var Cell         = Row.Get_Cell(CurCell);
-				var CellMinMax   = Cell.Content_Recalculate_MinMaxContentWidth(isRotated);
+				var CellMinMax   = Cell.Content_RecalculateMinMaxContentWidth(isRotated);
 				var CellMin      = CellMinMax.Min;
 				var CellMax      = CellMinMax.Max;
 				var CellMargins  = Cell.Get_Margins();
@@ -2800,7 +2800,7 @@ CTable.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
 			for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 			{
 				var Cell         = Row.Get_Cell(CurCell);
-				var CellMinMax   = Cell.Content_Recalculate_MinMaxContentWidth(isRotated);
+				var CellMinMax   = Cell.Content_RecalculateMinMaxContentWidth(isRotated);
 				var CellMin      = CellMinMax.Min;
 				var CellMax      = CellMinMax.Max;
 				var GridSpan     = Cell.Get_GridSpan();
@@ -2893,7 +2893,7 @@ CTable.prototype.Recalculate_MinMaxContentWidth = function(isRotated)
 		return {Min : Min, Max : Max};
 	}
 };
-CTable.prototype.Recalculate_AllTables = function()
+CTable.prototype.RecalculateAllTables = function()
 {
 	this.private_RecalculateGrid();
 	this.private_RecalculateBorders();
@@ -2906,7 +2906,7 @@ CTable.prototype.Recalculate_AllTables = function()
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell = Row.Get_Cell(CurCell);
-			Cell.Content.Recalculate_AllTables();
+			Cell.Content.RecalculateAllTables();
 		}
 	}
 };
@@ -3191,7 +3191,7 @@ CTable.prototype.Start_TrackTable = function()
 
 	this.private_StartTrackTable(CurPage);
 };
-CTable.prototype.DocumentStatistics = function(Stats)
+CTable.prototype.CollectDocumentStatistics = function(Stats)
 {
 	for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
 	{
@@ -3200,7 +3200,7 @@ CTable.prototype.DocumentStatistics = function(Stats)
 
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
-			Row.Get_Cell(CurCell).Content.DocumentStatistics(Stats);
+			Row.Get_Cell(CurCell).Content.CollectDocumentStatistics(Stats);
 		}
 	}
 };
@@ -4866,7 +4866,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 	}
 
 	var Pos = this.Internal_GetCellByXY(X, Y, CurPage);
-	this.Content[Pos.Row].Get_Cell(Pos.Cell).Content_Set_CurPosXY(X, Y);
+	this.Content[Pos.Row].Get_Cell(Pos.Cell).Content_SetCurPosXY(X, Y);
 	this.Selection.Data              = null;
 	this.Selection.EndPos.Pos        = Pos;
 	this.Selection.EndPos.X          = X;
@@ -5841,7 +5841,7 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 				if (null === Cell)
 					return true;
 
-				Cell.Content_Set_CurPosXY(X, Y);
+				Cell.Content_SetCurPosXY(X, Y);
 				this.CurCell              = Cell;
 				this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 			}
@@ -5869,7 +5869,7 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 			{
 				this.CurCell = Cell;
 				this.CurCell.Content.MoveCursorToStartPos();
-				this.CurCell.Content_Set_CurPosXY(X, Y);
+				this.CurCell.Content_SetCurPosXY(X, Y);
 
 				return false;
 			}
@@ -5932,7 +5932,7 @@ CTable.prototype.MoveCursorUp = function(AddToSelect)
 					if (null === Cell)
 						return true;
 
-					Cell.Content_Set_CurPosXY(X, Y);
+					Cell.Content_SetCurPosXY(X, Y);
 					this.CurCell              = Cell;
 					this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 				}
@@ -6021,7 +6021,7 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 				if (null === Cell)
 					return true;
 
-				Cell.Content_Set_CurPosXY(X, Y);
+				Cell.Content_SetCurPosXY(X, Y);
 				this.CurCell              = Cell;
 				this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 			}
@@ -6049,7 +6049,7 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 			{
 				this.CurCell = Cell;
 				this.CurCell.Content.MoveCursorToStartPos();
-				this.CurCell.Content_Set_CurPosXY(X, Y);
+				this.CurCell.Content_SetCurPosXY(X, Y);
 
 				return false;
 			}
@@ -6111,7 +6111,7 @@ CTable.prototype.MoveCursorDown = function(AddToSelect)
 					if (null === Cell)
 						return true;
 
-					Cell.Content_Set_CurPosXY(X, Y);
+					Cell.Content_SetCurPosXY(X, Y);
 					this.CurCell              = Cell;
 					this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 				}
@@ -6233,7 +6233,7 @@ CTable.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 			if (null === Cell)
 				return true;
 
-			Cell.Content_Set_CurPosXY(X, Y);
+			Cell.Content_SetCurPosXY(X, Y);
 			this.CurCell              = Cell;
 			this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 			this.Internal_Selection_UpdateCells();
@@ -6252,7 +6252,7 @@ CTable.prototype.MoveCursorUpToLastRow = function(X, Y, AddToSelect)
 
 			// У последней ячейки у первого параграфа, мы выставим RealX, RealY
 			var Cell = this.Content[this.Content.length - 1].Get_Cell(0);
-			Cell.Content_Set_CurPosXY(X, Y);
+			Cell.Content_SetCurPosXY(X, Y);
 		}
 	}
 	else
@@ -6296,7 +6296,7 @@ CTable.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 			if (null === Cell)
 				return true;
 
-			Cell.Content_Set_CurPosXY(X, Y);
+			Cell.Content_SetCurPosXY(X, Y);
 			this.CurCell              = Cell;
 			this.Selection.EndPos.Pos = {Cell : Cell.Index, Row : Cell.Row.Index};
 			this.Internal_Selection_UpdateCells();
@@ -6312,7 +6312,7 @@ CTable.prototype.MoveCursorDownToFirstRow = function(X, Y, AddToSelect)
 
 			// У последней ячейки у первого параграфа, мы выставим RealX, RealY
 			var Cell = this.Content[0].Get_Cell(0);
-			Cell.Content_Set_CurPosXY(X, Y);
+			Cell.Content_SetCurPosXY(X, Y);
 		}
 	}
 	else
@@ -8978,8 +8978,8 @@ CTable.prototype.Row_Remove2 = function()
 	for (var Index = 0; Index < this.Selection.Data.length; Index++)
 	{
 		var Pos = this.Selection.Data[Index];
-		if (0 == Rows_to_delete[Pos.Row]);
-		Rows_to_delete[Pos.Row] = 1;
+		if (0 == Rows_to_delete[Pos.Row])
+			Rows_to_delete[Pos.Row] = 1;
 	}
 
 	// Удаляем строки.
@@ -9502,7 +9502,7 @@ CTable.prototype.Update_TableMarkupFromRuler = function(NewMarkup, bCol, Index)
 		if (0 === Col)
 		{
 			Dx = this.Markup.X - NewMarkup.X;
-			this.X -= Dx;
+			this.X_origin -= Dx;
 
 			if (true === this.Is_Inline())
 			{
@@ -9513,7 +9513,7 @@ CTable.prototype.Update_TableMarkupFromRuler = function(NewMarkup, bCol, Index)
 			}
 			else
 			{
-				this.Internal_UpdateFlowPosition(this.X, this.Y);
+				this.Internal_UpdateFlowPosition(this.X_origin, this.Y);
 			}
 		}
 		else
@@ -9631,8 +9631,8 @@ CTable.prototype.Update_TableMarkupFromRuler = function(NewMarkup, bCol, Index)
 			else
 			{
 				var Dy = this.Markup.Rows[0].Y - NewMarkup.Rows[0].Y;
-				Page.Y -= Dy;
-				this.Internal_UpdateFlowPosition(Page.X, Page.Y);
+				this.Y -= Dy;
+				this.Internal_UpdateFlowPosition(this.X_origin, this.Y);
 				var NewH = NewMarkup.Rows[0].H;
 				this.Content[0].Set_Height(NewH, linerule_AtLeast);
 			}
@@ -11131,7 +11131,7 @@ CTable.prototype.private_GetVertMergeCountOnPage = function(CurPage, CurRow, Sta
 
 	return VMergeCount;
 };
-CTable.prototype.Get_TopElement = function()
+CTable.prototype.GetTopElement = function()
 {
     if (!this.Parent)
         return null;
@@ -11139,7 +11139,7 @@ CTable.prototype.Get_TopElement = function()
     if (true === this.Parent.Is_TopDocument(false))
         return this;
 
-    return this.Parent.Get_TopElement();
+    return this.Parent.GetTopElement();
 };
 CTable.prototype.Get_Index = function()
 {
@@ -11158,7 +11158,7 @@ CTable.prototype.Get_Row = function(Index)
 {
     return this.Content[Index];
 };
-CTable.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+CTable.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
     for (var CurRow = 0, RowsCount = this.Get_RowsCount(); CurRow < RowsCount; CurRow++)
     {
@@ -11166,7 +11166,7 @@ CTable.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
         for (var CurCell = 0, CellsCount = Row.Get_CellsCount(); CurCell < CellsCount; CurCell++)
         {
             var Cell = Row.Get_Cell(CurCell);
-            Cell.Content.Compare_DrawingsLogicPositions(CompareObject);
+            Cell.Content.CompareDrawingsLogicPositions(CompareObject);
 
             if (0 !== CompareObject.Result)
                 return;
@@ -11185,14 +11185,14 @@ CTable.prototype.StartSelectionFromCurPos = function()
 
 	this.CurCell.Content.StartSelectionFromCurPos();
 };
-CTable.prototype.Get_StyleFromFormatting = function()
+CTable.prototype.GetStyleFromFormatting = function()
 {
     var SelectionArray = this.Internal_Get_SelectionArray();
     if (SelectionArray.length > 0)
     {
         var Pos = SelectionArray[0];
         var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
-        return Cell.Content.Get_StyleFromFormatting();
+        return Cell.Content.GetStyleFromFormatting();
     }
     return null;
 };
@@ -11214,7 +11214,7 @@ CTable.prototype.Get_SectPr = function()
 
     return null;
 };
-CTable.prototype.Is_SelectedAll = function()
+CTable.prototype.IsSelectedAll = function()
 {
     if (true !== this.Selection.Use)
         return false;
@@ -11381,7 +11381,7 @@ CTable.prototype.Get_Index = function()
     this.Parent.Update_ContentIndexing();
     return this.Index;
 };
-CTable.prototype.Get_DocumentPositionFromObject = function(PosArray)
+CTable.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -11389,7 +11389,7 @@ CTable.prototype.Get_DocumentPositionFromObject = function(PosArray)
     if (this.Parent)
     {
         PosArray.splice(0, 0, {Class : this.Parent, Position : this.Get_Index()});
-        this.Parent.Get_DocumentPositionFromObject(PosArray);
+        this.Parent.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;
@@ -11998,6 +11998,25 @@ CTable.prototype.SetTableProps = function(oProps)
 CTable.prototype.GetTableProps = function()
 {
 	return this.Get_Props();
+};
+CTable.prototype.AddContentControl = function()
+{
+	if (this.CurCell)
+		return this.CurCell.Content.AddContentControl();
+
+	return null;
+};
+CTable.prototype.GetAllContentControls = function(arrContentControls)
+{
+	for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+	{
+		var oRow = this.Content[nCurRow];
+		for (var nCurCell = 0, nCellsCount = oRow.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+		{
+			var oCell = oRow.Get_Cell(nCurCell);
+			oCell.Content.GetAllContentControls(arrContentControls);
+		}
+	}
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

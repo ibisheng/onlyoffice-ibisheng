@@ -4068,8 +4068,7 @@ function OfflineEditor () {
                          "format"        : "xlsx",
                          "vkey"          : undefined,
                          "url"           : t.initSettings["docURL"],
-                         "title"         : this.documentTitle,
-                         "embeddedfonts" : false};
+                         "title"         : this.documentTitle};
 
                          _api.CoAuthoringApi.auth(t.initSettings["viewmode"], rData);
         });
@@ -4731,9 +4730,16 @@ function OfflineEditor () {
             var box = selectedRange.getBBox0();
             settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
         }
-        settings.putRange(ws.getSelectionRangeValue());
-        //settings.putShowHorAxis(true);
-        //settings.putShowVerAxis(true);
+
+        var oRangeValue = ws.getSelectionRangeValue();
+        if (oRangeValue) {
+          settings.putRange(oRangeValue.asc_getName());
+        }
+
+        settings.putStyle(2);
+        settings.putTitle(Asc.c_oAscChartTitleShowSettings.noOverlay);
+        settings.putShowHorAxis(true);
+        settings.putShowVerAxis(true);
         var series = AscFormat.getChartSeries(ws.model, settings);
         if(series && series.series.length > 1)
         {
@@ -4743,11 +4749,15 @@ function OfflineEditor () {
         {
             settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
         }
-        // settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
-        // settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);
-        // settings.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
-        // settings.putHorGridLines(c_oAscGridLinesSettings.major);
-        // settings.putVertGridLines(c_oAscGridLinesSettings.none);
+        settings.putHorAxisLabel(Asc.c_oAscChartHorAxisLabelShowSettings.none);
+        settings.putVertAxisLabel(Asc.c_oAscChartVertAxisLabelShowSettings.none);
+        settings.putDataLabelsPos(Asc.c_oAscChartDataLabelsPos.none);
+        settings.putHorGridLines(Asc.c_oAscGridLinesSettings.major);
+        settings.putVertGridLines(Asc.c_oAscGridLinesSettings.none);
+        //settings.putInColumns(false);
+        settings.putSeparator(",");
+        settings.putLine(true);
+        settings.putShowMarker(false);
 
         var vert_axis_settings = new AscCommon.asc_ValAxisSettings();
         settings.putVertAxisProps(vert_axis_settings);
@@ -7488,7 +7498,6 @@ window["Asc"]["spreadsheet_api"].prototype.asc_setDocumentPassword = function(pa
       "c": "reopen",
       "url": this.documentUrl,
       "title": this.documentTitle,
-      "embeddedfonts": this.isUseEmbeddedCutFonts,
       "password": password
     };
 

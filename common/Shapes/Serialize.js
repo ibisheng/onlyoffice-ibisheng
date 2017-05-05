@@ -312,7 +312,6 @@ function BinaryPPTYLoader()
 
         this.presentation.ImageMap = {};
         this.presentation.Fonts = [];
-        this.presentation.EmbeddedFonts = [];
 
         if (presentation.globalTableStyles)
             this.NextTableStyleId = this.presentation.globalTableStyles.length;
@@ -332,7 +331,6 @@ function BinaryPPTYLoader()
 
         this.presentation.ImageMap = {};
         this.presentation.Fonts = [];
-        this.presentation.EmbeddedFonts = [];
 
         if (presentation.globalTableStyles)
             this.NextTableStyleId = this.presentation.globalTableStyles.length;
@@ -591,65 +589,6 @@ function BinaryPPTYLoader()
                 var _master_type = s.GetUChar(); // must be 0
                 this.ReadMasterInfo(i);
             }
-        }
-
-        if (undefined != _main_tables["44"] && this.Api.isUseEmbeddedCutFonts)
-        {
-            var _embedded_fonts = [];
-            // themes
-            s.Seek2(_main_tables["44"]);
-
-            s.Skip2(5); // type + len
-            var _count = s.GetULong();
-
-            for (var i = 0; i < _count; i++)
-            {
-                var _at = s.GetUChar();
-                if (_at != AscCommon.g_nodeAttributeStart)
-                    break;
-
-                var _f_i = {};
-
-                while (true)
-                {
-                    _at = s.GetUChar();
-                    if (_at == g_nodeAttributeEnd)
-                        break;
-
-                    switch (_at)
-                    {
-                        case 0:
-                        {
-                            _f_i.Name = s.GetString2();
-                            break;
-                        }
-                        case 1:
-                        {
-                            _f_i.Style = s.GetULong();
-                            break;
-                        }
-                        case 2:
-                        {
-                            _f_i.IsCut = s.GetBool();
-                            break;
-                        }
-                        case 3:
-                        {
-                            _f_i.IndexCut = s.GetULong();
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                }
-
-                _embedded_fonts.push(_f_i);
-            }
-
-            var font_cuts = this.Api.FontLoader.embedded_cut_manager;
-            font_cuts.Url = AscCommon.g_oDocumentUrls.getUrl("fonts/fonts.js");
-            font_cuts.init_cut_fonts(_embedded_fonts);
-            font_cuts.bIsCutFontsUse = true;
         }
 
         if (!this.IsThemeLoader)
@@ -4504,7 +4443,7 @@ function BinaryPPTYLoader()
                 }
                 case 7:
                 {
-                    s.GetString2();
+                    ole.setObjectFile(s.GetString2());
                     break;
                 }
                 default:
@@ -9027,8 +8966,12 @@ function CPres()
                         oThis.bcr.Read1(nDocLength, function(t,l){
                             return oBinary_DocumentTableReader.ReadDocumentContent(t,l, content_arr);
                         });
-                        for(var i = 0, length = content_arr.length; i < length; ++i)
-                            shape.textBoxContent.Internal_Content_Add(i, content_arr[i]);
+                        for(var i = 0, length = content_arr.length; i < length; ++i){
+                            if(i == length - 1)
+                                shape.textBoxContent.Internal_Content_Add(i, content_arr[i], true);
+                            else
+                                shape.textBoxContent.Internal_Content_Add(i, content_arr[i], false);
+                        }
 
                         s.pos = oThis.stream.pos;
                         s.cur = oThis.stream.cur;
@@ -9289,7 +9232,7 @@ function CPres()
                     }
                     case 7:
                     {
-                        var sFileName = s.GetString2();
+                        ole.setObjectFile(s.GetString2());
                         break;
                     }
                     default:

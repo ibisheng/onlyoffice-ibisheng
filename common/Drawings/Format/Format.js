@@ -39,6 +39,8 @@
 */
 function (window, undefined) {
 
+	var recalcSlideInterval = 30;
+
 // Import
 var CreateAscColor = AscCommon.CreateAscColor;
 var g_oIdCounter = AscCommon.g_oIdCounter;
@@ -9993,7 +9995,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
 
     function builder_CreateGradientStop(oUniColor, nPos){
         var Gs = new AscFormat.CGs();
-        Gs.pos = pos;
+        Gs.pos = nPos;
         Gs.color = oUniColor;
         return Gs;
     }

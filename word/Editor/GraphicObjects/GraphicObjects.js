@@ -202,6 +202,16 @@ CGraphicObjects.prototype =
     resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
     handleTextHit: DrawingObjectsController.prototype.handleTextHit,
 
+    AddContentControl: function()
+    {
+        var oTargetDocContent = this.getTargetDocContent();
+        if(oTargetDocContent){
+            return oTargetDocContent.AddContentControl();
+        }
+
+        return null;
+    },
+
     Get_Id: function()
     {
         return this.Id;
@@ -2187,12 +2197,12 @@ CGraphicObjects.prototype =
     },
 
 
-    Get_StyleFromFormatting: function()
+	GetStyleFromFormatting: function()
     {
         var oContent = this.getTargetDocContent();
         if(oContent)
         {
-            var oStyleFormatting = oContent.Get_StyleFromFormatting();
+            var oStyleFormatting = oContent.GetStyleFromFormatting();
             var oTextPr = oStyleFormatting.TextPr;
             if(oTextPr.TextFill)
             {
@@ -3429,7 +3439,7 @@ function ComparisonByZIndexSimple(obj1, obj2)
         {
             if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
             {
-                return editor.WordControl.m_oLogicDocument.Compare_DrawingsLogicPositions(obj2, obj1);
+                return editor.WordControl.m_oLogicDocument.CompareDrawingsLogicPositions(obj2, obj1);
             }
         }
         return obj1.RelativeHeight - obj2.RelativeHeight;

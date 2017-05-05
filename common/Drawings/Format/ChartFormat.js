@@ -13528,10 +13528,10 @@ CValAxisLabels.prototype =
 
     getMinWidth: function()
     {
-        var max_min_width = this.arrLabels[0].txBody.content.Recalculate_MinMaxContentWidth().Min;
+        var max_min_width = this.arrLabels[0].txBody.content.RecalculateMinMaxContentWidth().Min;
         for(var i = 1; i < this.arrLabels.length; ++i)
         {
-            var t = this.arrLabels[i].txBody.content.Recalculate_MinMaxContentWidth().Min;
+            var t = this.arrLabels[i].txBody.content.RecalculateMinMaxContentWidth().Min;
             if(t > max_min_width)
                 max_min_width = t;
         }

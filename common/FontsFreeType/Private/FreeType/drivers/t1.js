@@ -967,7 +967,7 @@ function T1_Get_Private_Dict(parser, psaux)
             parser.private_len = ret.num_bytes;
 
             /* put a safeguard */
-            parser.private_dict[len] = FT_Common.SYMBOL_CONST_S0;
+            parser.private_dict[ret.num_bytes] = FT_Common.SYMBOL_CONST_S0;
         }
         else
         {
@@ -1554,7 +1554,7 @@ function T1_Get_MM_Var(face)
     if (error != 0)
         return { err: error, mm : null };
 
-    var _num_axis = master.num_axis;
+    var _num_axis = mmaster.num_axis;
     mmvar.axis = new Array(_num_axis);
     for (var i = 0; i < _num_axis; i++)
         mmvar.axis[i] = new FT_Var_Axis();

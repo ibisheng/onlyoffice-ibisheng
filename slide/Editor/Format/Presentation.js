@@ -43,8 +43,6 @@ var History = AscCommon.History;
 
 var CreateUnifillSolidFillSchemeColor = AscFormat.CreateUnifillSolidFillSchemeColor;
 
-var recalcSlideInterval = 30;
-
 function SlideCopyObject(Slide, ImageUrl)
 {
     this.Slide = Slide;
@@ -1297,7 +1295,7 @@ CPresentation.prototype =
         }
 
         var CursorPos = [{Class : Run, Position : InRunPos}];
-        Run.Get_DocumentPositionFromObject(CursorPos);
+        Run.GetDocumentPositionFromObject(CursorPos);
         AscCommon.CollaborativeEditing.Add_ForeignCursor(UserId, CursorPos, UserShortId);
 
         if (true === Show){

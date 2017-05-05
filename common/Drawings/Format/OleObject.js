@@ -56,6 +56,7 @@ function (window, undefined) {
         AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetData] = AscDFH.CChangesDrawingsString;
         AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetApplicationId] = AscDFH.CChangesDrawingsString;
         AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetPixSizes] = AscDFH.CChangesDrawingsObjectNoId;
+		AscDFH.changesFactory[AscDFH.historyitem_ImageShapeSetObjectFile] = AscDFH.CChangesDrawingsString;
 
 
         AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetData] = function(oClass, value){oClass.m_sData = value;};
@@ -67,6 +68,7 @@ function (window, undefined) {
             }
         };
         AscDFH.drawingsConstructorsMap[AscDFH.historyitem_ImageShapeSetPixSizes] = COleSize;
+		AscDFH.drawingsChangesMap[AscDFH.historyitem_ImageShapeSetObjectFile] = function(oClass, value){oClass.m_sObjectFile = value;};
 
     function COleObject()
     {
@@ -77,6 +79,7 @@ function (window, undefined) {
         this.m_nPixHeight = null;
         this.m_fDefaultSizeX = null;
         this.m_fDefaultSizeY = null;
+        this.m_sObjectFile = null;//ole object name in OOX
     }
 
 		COleObject.prototype = Object.create(AscFormat.CImageShape.prototype);
@@ -101,6 +104,11 @@ function (window, undefined) {
         AscCommon.History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_ImageShapeSetPixSizes, new COleSize(this.m_nPixWidth, this.m_nPixHeight), new COleSize(nPixWidth, nPixHeight)));
         this.m_nPixWidth = nPixWidth;
         this.m_nPixHeight = nPixHeight;
+    };
+    COleObject.prototype.setObjectFile = function(sObjectFile)
+    {
+        AscCommon.History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_ImageShapeSetObjectFile, this.m_sObjectFile, sObjectFile));
+        this.m_sObjectFile = sObjectFile;
     };
 
     COleObject.prototype.canRotate = function () {
@@ -135,6 +143,7 @@ function (window, undefined) {
         copy.setData(this.m_sData);
         copy.setApplicationId(this.m_sApplicationId);
         copy.setPixSizes(this.m_nPixWidth, this.m_nPixHeight);
+        copy.setObjectFile(this.m_sObjectFile);
         copy.cachedImage = this.getBase64Img();
         copy.cachedPixH = this.cachedPixH;
         copy.cachedPixW = this.cachedPixW;

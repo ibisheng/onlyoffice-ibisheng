@@ -108,6 +108,8 @@
         "../word/Editor/GraphicObjects/WrapManager.js",
 		"../word/Editor/DocumentContentElementBase.js",
 		"../word/Editor/StructuredDocumentTags/BlockLevel.js",
+        "../word/Editor/StructuredDocumentTags/SdtPr.js",
+        "../word/Editor/StructuredDocumentTags/SdtPrChanges.js",
         "../word/Editor/Comments.js",
         "../word/Editor/CommentsChanges.js",
         "../word/Editor/Styles.js",
@@ -240,11 +242,10 @@
       ],
       "dst": "../word",
       "externs": [
-        "../common/Build/Externs.js",
-        "../../web-apps/vendor/jquery/jquery.min.js",
-        "../../web-apps/vendor/underscore/underscore-min.js",
+        "../common/externs/global.js",
+        "../common/externs/jquery-3.2.js",
+        "../common/externs/xregexp-3.0.0.js",
         "../../web-apps/vendor/sockjs/sockjs.min.js",
-        "../../web-apps/vendor/xregexp/xregexp-all-min.js",
         "../../web-apps/vendor/jszip/jszip.min.js",
         "../../web-apps/vendor/jszip-utils/jszip-utils.min.js"
       ],
@@ -254,10 +255,5 @@
     "source_map": {
       "url": "http://localhost:8080/sdkjs/word"
     }
-  },
-  "tasks": {
-    "build": [
-      "compile_sdk"
-    ]
   }
 }

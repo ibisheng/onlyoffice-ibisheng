@@ -1719,10 +1719,10 @@
 					pCurGlyph.fX = fPenX;
 					pCurGlyph.fY = fPenY;
 
-					pCurGlyph.fLeft = fLeft;
-					pCurGlyph.fTop = fTop;
-					pCurGlyph.fRight = fRight;
-					pCurGlyph.fBottom = fBottom;
+					pCurGlyph.fLeft = 0;
+					pCurGlyph.fTop = 0;
+					pCurGlyph.fRight = 0;
+					pCurGlyph.fBottom = 0;
 
 					pCurGlyph.eState = EGlyphState.glyphstateMiss;
 
@@ -2026,8 +2026,8 @@
 
 		this.GetKerning = function (unPrevGID, unGID)
 		{
-			var pDelta = new FT_Vector();
-			FT_Get_Kerning(this.m_pFace, unPrevGID, unGID, 0, pDelta);
+			var pDelta = new AscFonts.FT_Vector();
+			AscFonts.FT_Get_Kerning(this.m_pFace, unPrevGID, unGID, 0, pDelta);
 			return (pDelta.x >> 6);
 		}
 

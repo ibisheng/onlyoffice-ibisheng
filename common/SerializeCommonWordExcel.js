@@ -123,7 +123,7 @@ BinaryCommonWriter.prototype.WriteItem = function(type, fWrite)
     this.memory.WriteByte(type);
     this.WriteItemWithLength(fWrite);
 };
-BinaryCommonWriter.prototype.WriteItemStart = function(type)
+BinaryCommonWriter.prototype.WriteItemStart = function(type, fWrite)
 {
 	this.memory.WriteByte(type);
     return this.WriteItemWithLengthStart(fWrite);
@@ -162,10 +162,10 @@ BinaryCommonWriter.prototype.WriteBorder = function(border)
         if (null != border.Color)
             color = border.Color;
         else if (null != border.Unifill) {
-            var doc = editor.WordControl.m_oLogicDocument;
+            var doc = window.editor.WordControl.m_oLogicDocument;
             border.Unifill.check(doc.Get_Theme(), doc.Get_ColorMap());
             var RGBA = border.Unifill.getRGBAColor();
-            color = new AscCommonWord.CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
+            color = new window['AscCommonWord'].CDocumentColor(RGBA.R, RGBA.G, RGBA.B);
         }
         if (null != color && !color.Auto)
             this.WriteColor(c_oSerBorderType.Color, color);

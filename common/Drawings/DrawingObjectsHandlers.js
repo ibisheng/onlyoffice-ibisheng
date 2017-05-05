@@ -197,7 +197,7 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
     {
         if(bWord/* && (!drawing.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === drawing || drawing.haveSelectedDrawingInContent && drawing.haveSelectedDrawingInContent())*/)
         {
-            var all_drawings = drawing.getDocContent().Get_AllDrawingObjects();
+            var all_drawings = drawing.getDocContent().GetAllDrawingObjects();
             var drawings2 = [];
             for(var i = 0; i < all_drawings.length; ++i)
             {
@@ -227,7 +227,7 @@ function handleShapeImageInGroup(drawingObjectsController, drawing, shape, e, x,
     {
         if(bWord/* &&
             (!shape.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === shape || shape.haveSelectedDrawingInContent && shape.haveSelectedDrawingInContent())*/) {
-            var all_drawings = shape.getDocContent().Get_AllDrawingObjects();
+            var all_drawings = shape.getDocContent().GetAllDrawingObjects();
             var drawings2 = [];
             for (var i = 0; i < all_drawings.length; ++i) {
                 drawings2.push(all_drawings[i].GraphicObj);
@@ -642,7 +642,7 @@ function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, page
     {
         if(drawing.bWordShape /*&& (!drawing.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === drawing || drawing.haveSelectedDrawingInContent && drawing.haveSelectedDrawingInContent())*/)
         {
-            var all_drawings = drawing.getDocContent().Get_AllDrawingObjects();
+            var all_drawings = drawing.getDocContent().GetAllDrawingObjects();
             var drawings2 = [];
             for(var i = 0; i < all_drawings.length; ++i)
             {

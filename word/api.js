@@ -465,7 +465,6 @@
 		this.FontAsyncLoadParam   = null;
 
 		this.isPasteFonts_Images = false;
-		this.isLoadNoCutFonts    = false;
 
 		this.pasteCallback       = null;
 		this.pasteImageMap       = null;
@@ -501,7 +500,6 @@
 		if (window.editor == undefined)
 		{
 			window.editor = this;
-			window.editor;
 			window['editor'] = window.editor;
 
 			if (window["NATIVE_EDITOR_ENJINE"])
@@ -870,7 +868,6 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oDrawingDocument.CheckFontNeeds();
 			AscCommon.pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
 
-			//this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
 			this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 		}
 		else
@@ -1769,6 +1766,8 @@ background-repeat: no-repeat;\
 
 		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
 		{
+			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
+			
 			if (!useCurrentPoint) {
 				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 			}
@@ -1793,8 +1792,43 @@ background-repeat: no-repeat;\
 	
 	asc_docs_api.prototype.asc_SpecialPasteData = function(props) 
 	{
-		AscCommon.Editor_Paste_Exec(this, null, null, null, props);
-		//this.wb.specialPasteData(props);
+		if (AscCommon.CollaborativeEditing.Get_GlobalLock())
+	        return;
+
+		var _logicDoc = this.WordControl.m_oLogicDocument;
+		if (!_logicDoc)
+			return;
+		
+		//TODO пересмотреть проверку лока и добавление новой точки(AscDFH.historydescription_Document_PasteHotKey)
+		if (false === _logicDoc.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, false))
+		{
+			window['AscCommon'].g_clipboardBase.Paste_Process_Start();
+			window['AscCommon'].g_clipboardBase.Special_Paste_Start();
+			
+			//undo previous action
+			this.WordControl.m_oLogicDocument.Document_Undo();
+			
+			//if (!useCurrentPoint) {
+				_logicDoc.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
+			//}
+			
+			AscCommon.Editor_Paste_Exec(this, null, null, null, props);
+		}
+	};
+	
+	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props) 
+	{
+		this.sendEvent("asc_onShowSpecialPasteOptions", props);
+	};
+	
+	asc_docs_api.prototype.asc_HideSpecialPasteButton = function() 
+	{
+		this.sendEvent("asc_onHideSpecialPasteOptions");
+	};
+	
+	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function() 
+	{
+		this.sendEvent("asc_onShowSpecialPasteOptions", props);
 	};
 	
 	asc_docs_api.prototype.onSaveCallback = function(e, isUndoRequest)
@@ -2047,8 +2081,7 @@ background-repeat: no-repeat;\
 						"c"             : "reopen",
 						"url"           : this.documentUrl,
 						"title"         : this.documentTitle,
-						"codepage"      : option.asc_getCodePage(),
-						"embeddedfonts" : this.isUseEmbeddedCutFonts
+						"codepage"      : option.asc_getCodePage()
 					};
 					sendCommand(this, null, rData);
 				}
@@ -2068,7 +2101,6 @@ background-repeat: no-repeat;\
 						"c": "reopen",
 						"url": this.documentUrl,
 						"title": this.documentTitle,
-						"embeddedfonts": this.isUseEmbeddedCutFonts,
 						"password": option.asc_getPassword()
 					};
 
@@ -2134,7 +2166,7 @@ background-repeat: no-repeat;\
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
-				//t.WordControl.m_oLogicDocument.AddNewParagraph();
+				t.insertDocumentUrlsData.oSdt = t.WordControl.m_oLogicDocument.AddContentControl();
 				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + result, undefined, undefined, true);
 			});
 		}
@@ -2145,6 +2177,16 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.continueInsertDocumentUrls = function()
 	{
+		if(this.insertDocumentUrlsData)
+		{
+			var oSdt = this.insertDocumentUrlsData.oSdt;
+			if(oSdt && oSdt.Content.Get_ElementsCount() > 1){
+				oSdt.Content.Remove_FromContent(oSdt.Content.Get_ElementsCount() - 1 , 1);
+				oSdt.MoveCursorToEndPos(false, false);
+			}
+			this.WordControl.m_oLogicDocument.MoveCursorRight(false, false, true);
+			this.WordControl.m_oLogicDocument.Recalculate();
+		}
 		if (this.insertDocumentUrlsData && this.insertDocumentUrlsData.documents.length > 0) {
 			this.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
 		} else {
@@ -2154,6 +2196,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.endInsertDocumentUrls = function()
 	{
 		if (this.insertDocumentUrlsData) {
+			this.insertDocumentUrlsData.endCallback();
 			this.insertDocumentUrlsData = null;
 			//this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 		}
@@ -5456,21 +5499,13 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		if (!this.FontLoader.embedded_cut_manager.bIsCutFontsUse)
-			this.GenerateStyles();
+		this.GenerateStyles();
 
 		if (null != this.WordControl.m_oLogicDocument)
 		{
 			this.WordControl.m_oDrawingDocument.CheckGuiControlColors();
 			this.sendColorThemes(this.WordControl.m_oLogicDocument.theme);
 			this.sendEvent("asc_onUpdateChartStyles");
-		}
-
-		if (this.isLoadNoCutFonts)
-		{
-			this.isLoadNoCutFonts = false;
-			this.asc_setViewMode(false);
-			return;
 		}
 
 		// открытие после загрузки документа
@@ -5726,7 +5761,7 @@ background-repeat: no-repeat;\
 					}
 					else
 					{
-						Document.Recalculate_AllTables();
+						Document.RecalculateAllTables();
 						var data = {All : true};
 						Document.DrawingObjects.recalculate_(data);
 						Document.DrawingObjects.recalculateText_(data);
@@ -6048,20 +6083,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.SetMobileVersion = function(val)
-	{
-		this.isMobileVersion = val;
-		if (/*this.isMobileVersion*/false)
-		{
-			this.WordControl.bIsRetinaSupport         = false; // ipad имеет проблемы с большими картинками
-			this.WordControl.bIsRetinaNoSupportAttack = true;
-			this.WordControl.m_bIsRuler               = false;
-			this.ShowParaMarks                        = false;
-
-			this.SetFontRenderingMode(1);
-		}
-	};
-
 	asc_docs_api.prototype.GoToHeader = function(pageNumber)
 	{
 		if (this.WordControl.m_oDrawingDocument.IsFreezePage(pageNumber))
@@ -6323,35 +6344,11 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
-			if (this.bInit_word_control === true && this.FontLoader.embedded_cut_manager.bIsCutFontsUse)
-			{
-				this.isLoadNoCutFonts                               = true;
-				this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-				this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, true);
-				return;
-			}
-
-			// быстрого перехода больше нет
-			/*
-			 if ( this.bInit_word_control === true )
-			 {
-			 CollaborativeEditing.Apply_Changes();
-			 CollaborativeEditing.Release_Locks();
-			 }
-			 */
-
-			this.isUseEmbeddedCutFonts = false;
-			
 			//this.WordControl.m_bIsRuler = true;
 			this.WordControl.checkNeedRules();
 			this.WordControl.m_oDrawingDocument.ClearCachePages();
 			this.WordControl.OnResize(true);
 		}
-	};
-
-	asc_docs_api.prototype.SetUseEmbeddedCutFonts = function(bUse)
-	{
-		this.isUseEmbeddedCutFonts = bUse;
 	};
 
 	asc_docs_api.prototype.OnMouseUp = function(x, y)
@@ -6907,9 +6904,6 @@ background-repeat: no-repeat;\
 					break;
 			}
 		}
-
-		if (this.isMobileVersion)
-			this.SetMobileVersion(true);
 
 		this.asc_setViewMode(this.isViewMode);
 		this.asc_setDrawCollaborationMarks(this.tmpCoMarksDraw);
@@ -7505,8 +7499,14 @@ background-repeat: no-repeat;\
 		var LogicDocument = this.WordControl.m_oLogicDocument;
 		if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
 		{
+			if (window.g_asc_plugins)
+				window.g_asc_plugins.setPluginMethodReturnAsync();
+
 			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
-			this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments};
+			this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments, oSdt: null, endCallback : function(_api) {
+				if (window.g_asc_plugins)
+					window.g_asc_plugins.onPluginMethodReturn();
+			}};
 
 			//this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 			//this.WordControl.m_oLogicDocument.AddNewParagraph();
@@ -7942,7 +7942,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_SetViewRulersChange']                   = asc_docs_api.prototype.asc_SetViewRulersChange;
 	asc_docs_api.prototype['asc_GetViewRulers']                         = asc_docs_api.prototype.asc_GetViewRulers;
 	asc_docs_api.prototype['asc_SetDocumentUnits']                      = asc_docs_api.prototype.asc_SetDocumentUnits;
-	asc_docs_api.prototype['SetMobileVersion']                          = asc_docs_api.prototype.SetMobileVersion;
 	asc_docs_api.prototype['GoToHeader']                                = asc_docs_api.prototype.GoToHeader;
 	asc_docs_api.prototype['GoToFooter']                                = asc_docs_api.prototype.GoToFooter;
 	asc_docs_api.prototype['ExitHeader_Footer']                         = asc_docs_api.prototype.ExitHeader_Footer;
@@ -7964,7 +7963,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['GetSectionInfo']                            = asc_docs_api.prototype.GetSectionInfo;
 	asc_docs_api.prototype['add_SectionBreak']                          = asc_docs_api.prototype.add_SectionBreak;
 	asc_docs_api.prototype['asc_setViewMode']                           = asc_docs_api.prototype.asc_setViewMode;
-	asc_docs_api.prototype['SetUseEmbeddedCutFonts']                    = asc_docs_api.prototype.SetUseEmbeddedCutFonts;
 	asc_docs_api.prototype['OnMouseUp']                                 = asc_docs_api.prototype.OnMouseUp;
 	asc_docs_api.prototype['asyncImageEndLoaded2']                      = asc_docs_api.prototype.asyncImageEndLoaded2;
 	asc_docs_api.prototype['SetDrawImagePlaceParagraph']                = asc_docs_api.prototype.SetDrawImagePlaceParagraph;

@@ -50,968 +50,968 @@
 		switch (nDescription)
 		{
 			case AscDFH.historydescription_Cut                                         :
-				sString = "Cut                                        ";
+				sString = "Cut";
 				break;
 			case AscDFH.historydescription_PasteButtonIE                               :
-				sString = "PasteButtonIE                              ";
+				sString = "PasteButtonIE";
 				break;
 			case AscDFH.historydescription_PasteButtonNotIE                            :
-				sString = "PasteButtonNotIE                           ";
+				sString = "PasteButtonNotIE";
 				break;
 			case AscDFH.historydescription_ChartDrawingObjects                         :
-				sString = "ChartDrawingObjects                        ";
+				sString = "ChartDrawingObjects";
 				break;
 			case AscDFH.historydescription_CommonControllerCheckChartText              :
-				sString = "CommonControllerCheckChartText             ";
+				sString = "CommonControllerCheckChartText";
 				break;
 			case AscDFH.historydescription_CommonControllerUnGroup                     :
-				sString = "CommonControllerUnGroup                    ";
+				sString = "CommonControllerUnGroup";
 				break;
 			case AscDFH.historydescription_CommonControllerCheckSelected               :
-				sString = "CommonControllerCheckSelected              ";
+				sString = "CommonControllerCheckSelected";
 				break;
 			case AscDFH.historydescription_CommonControllerSetGraphicObject            :
-				sString = "CommonControllerSetGraphicObject           ";
+				sString = "CommonControllerSetGraphicObject";
 				break;
 			case AscDFH.historydescription_CommonStatesAddNewShape                     :
-				sString = "CommonStatesAddNewShape                    ";
+				sString = "CommonStatesAddNewShape";
 				break;
 			case AscDFH.historydescription_CommonStatesRotate                          :
-				sString = "CommonStatesRotate                         ";
+				sString = "CommonStatesRotate";
 				break;
 			case AscDFH.historydescription_PasteNative                                 :
-				sString = "PasteNative                                ";
+				sString = "PasteNative";
 				break;
 			case AscDFH.historydescription_Document_GroupUnGroup                       :
-				sString = "Document_GroupUnGroup                      ";
+				sString = "Document_GroupUnGroup";
 				break;
 			case AscDFH.historydescription_Document_SetDefaultLanguage                 :
-				sString = "Document_SetDefaultLanguage                ";
+				sString = "Document_SetDefaultLanguage";
 				break;
 			case AscDFH.historydescription_Document_ChangeColorScheme                  :
-				sString = "Document_ChangeColorScheme                 ";
+				sString = "Document_ChangeColorScheme";
 				break;
 			case AscDFH.historydescription_Document_AddChart                           :
-				sString = "Document_AddChart                          ";
+				sString = "Document_AddChart";
 				break;
 			case AscDFH.historydescription_Document_EditChart                          :
-				sString = "Document_EditChart                         ";
+				sString = "Document_EditChart";
 				break;
 			case AscDFH.historydescription_Document_DragText                           :
-				sString = "Document_DragText                          ";
+				sString = "Document_DragText";
 				break;
 			case AscDFH.historydescription_Document_DocumentContentExtendToPos         :
-				sString = "Document_DocumentContentExtendToPos        ";
+				sString = "Document_DocumentContentExtendToPos";
 				break;
 			case AscDFH.historydescription_Document_AddHeader                          :
-				sString = "Document_AddHeader                         ";
+				sString = "Document_AddHeader";
 				break;
 			case AscDFH.historydescription_Document_AddFooter                          :
-				sString = "Document_AddFooter                         ";
+				sString = "Document_AddFooter";
 				break;
 			case AscDFH.historydescription_Document_ParagraphExtendToPos               :
-				sString = "Document_ParagraphExtendToPos              ";
+				sString = "Document_ParagraphExtendToPos";
 				break;
 			case AscDFH.historydescription_Document_ParagraphChangeFrame               :
-				sString = "Document_ParagraphChangeFrame              ";
+				sString = "Document_ParagraphChangeFrame";
 				break;
 			case AscDFH.historydescription_Document_ReplaceAll                         :
-				sString = "Document_ReplaceAll                        ";
+				sString = "Document_ReplaceAll";
 				break;
 			case AscDFH.historydescription_Document_ReplaceSingle                      :
-				sString = "Document_ReplaceSingle                     ";
+				sString = "Document_ReplaceSingle";
 				break;
 			case AscDFH.historydescription_Document_TableAddNewRowByTab                :
-				sString = "Document_TableAddNewRowByTab               ";
+				sString = "Document_TableAddNewRowByTab";
 				break;
 			case AscDFH.historydescription_Document_AddNewShape                        :
-				sString = "Document_AddNewShape                       ";
+				sString = "Document_AddNewShape";
 				break;
 			case AscDFH.historydescription_Document_EditWrapPolygon                    :
-				sString = "Document_EditWrapPolygon                   ";
+				sString = "Document_EditWrapPolygon";
 				break;
 			case AscDFH.historydescription_Document_MoveInlineObject                   :
-				sString = "Document_MoveInlineObject                  ";
+				sString = "Document_MoveInlineObject";
 				break;
 			case AscDFH.historydescription_Document_CopyAndMoveInlineObject            :
-				sString = "Document_CopyAndMoveInlineObject           ";
+				sString = "Document_CopyAndMoveInlineObject";
 				break;
 			case AscDFH.historydescription_Document_RotateInlineDrawing                :
-				sString = "Document_RotateInlineDrawing               ";
+				sString = "Document_RotateInlineDrawing";
 				break;
 			case AscDFH.historydescription_Document_RotateFlowDrawingCtrl              :
-				sString = "Document_RotateFlowDrawingCtrl             ";
+				sString = "Document_RotateFlowDrawingCtrl";
 				break;
 			case AscDFH.historydescription_Document_RotateFlowDrawingNoCtrl            :
-				sString = "Document_RotateFlowDrawingNoCtrl           ";
+				sString = "Document_RotateFlowDrawingNoCtrl";
 				break;
 			case AscDFH.historydescription_Document_MoveInGroup                        :
-				sString = "Document_MoveInGroup                       ";
+				sString = "Document_MoveInGroup";
 				break;
 			case AscDFH.historydescription_Document_ChangeWrapContour                  :
-				sString = "Document_ChangeWrapContour                 ";
+				sString = "Document_ChangeWrapContour";
 				break;
 			case AscDFH.historydescription_Document_ChangeWrapContourAddPoint          :
-				sString = "Document_ChangeWrapContourAddPoint         ";
+				sString = "Document_ChangeWrapContourAddPoint";
 				break;
 			case AscDFH.historydescription_Document_GrObjectsBringToFront              :
-				sString = "Document_GrObjectsBringToFront             ";
+				sString = "Document_GrObjectsBringToFront";
 				break;
 			case AscDFH.historydescription_Document_GrObjectsBringForwardGroup         :
-				sString = "Document_GrObjectsBringForwardGroup        ";
+				sString = "Document_GrObjectsBringForwardGroup";
 				break;
 			case AscDFH.historydescription_Document_GrObjectsBringForward              :
-				sString = "Document_GrObjectsBringForward             ";
+				sString = "Document_GrObjectsBringForward";
 				break;
 			case AscDFH.historydescription_Document_GrObjectsSendToBackGroup           :
-				sString = "Document_GrObjectsSendToBackGroup          ";
+				sString = "Document_GrObjectsSendToBackGroup";
 				break;
 			case AscDFH.historydescription_Document_GrObjectsSendToBack                :
-				sString = "Document_GrObjectsSendToBack               ";
+				sString = "Document_GrObjectsSendToBack";
 				break;
 			case AscDFH.historydescription_Document_GrObjectsBringBackwardGroup        :
-				sString = "Document_GrObjectsBringBackwardGroup       ";
+				sString = "Document_GrObjectsBringBackwardGroup";
 				break;
 			case AscDFH.historydescription_Document_GrObjectsBringBackward             :
-				sString = "Document_GrObjectsBringBackward            ";
+				sString = "Document_GrObjectsBringBackward";
 				break;
 			case AscDFH.historydescription_Document_GrObjectsChangeWrapPolygon         :
-				sString = "Document_GrObjectsChangeWrapPolygon        ";
+				sString = "Document_GrObjectsChangeWrapPolygon";
 				break;
 			case AscDFH.historydescription_Document_MathAutoCorrect                    :
-				sString = "Document_MathAutoCorrect                   ";
+				sString = "Document_MathAutoCorrect";
 				break;
 			case AscDFH.historydescription_Document_SetFramePrWithFontFamily           :
-				sString = "Document_SetFramePrWithFontFamily          ";
+				sString = "Document_SetFramePrWithFontFamily";
 				break;
 			case AscDFH.historydescription_Document_SetFramePr                         :
-				sString = "Document_SetFramePr                        ";
+				sString = "Document_SetFramePr";
 				break;
 			case AscDFH.historydescription_Document_SetFramePrWithFontFamilyLong       :
-				sString = "Document_SetFramePrWithFontFamilyLong      ";
+				sString = "Document_SetFramePrWithFontFamilyLong";
 				break;
 			case AscDFH.historydescription_Document_SetTextFontName                    :
-				sString = "Document_SetTextFontName                   ";
+				sString = "Document_SetTextFontName";
 				break;
 			case AscDFH.historydescription_Document_SetTextFontSize                    :
-				sString = "Document_SetTextFontSize                   ";
+				sString = "Document_SetTextFontSize";
 				break;
 			case AscDFH.historydescription_Document_SetTextBold                        :
-				sString = "Document_SetTextBold                       ";
+				sString = "Document_SetTextBold";
 				break;
 			case AscDFH.historydescription_Document_SetTextItalic                      :
-				sString = "Document_SetTextItalic                     ";
+				sString = "Document_SetTextItalic";
 				break;
 			case AscDFH.historydescription_Document_SetTextUnderline                   :
-				sString = "Document_SetTextUnderline                  ";
+				sString = "Document_SetTextUnderline";
 				break;
 			case AscDFH.historydescription_Document_SetTextStrikeout                   :
-				sString = "Document_SetTextStrikeout                  ";
+				sString = "Document_SetTextStrikeout";
 				break;
 			case AscDFH.historydescription_Document_SetTextDStrikeout                  :
-				sString = "Document_SetTextDStrikeout                 ";
+				sString = "Document_SetTextDStrikeout";
 				break;
 			case AscDFH.historydescription_Document_SetTextSpacing                     :
-				sString = "Document_SetTextSpacing                    ";
+				sString = "Document_SetTextSpacing";
 				break;
 			case AscDFH.historydescription_Document_SetTextCaps                        :
-				sString = "Document_SetTextCaps                       ";
+				sString = "Document_SetTextCaps";
 				break;
 			case AscDFH.historydescription_Document_SetTextSmallCaps                   :
-				sString = "Document_SetTextSmallCaps                  ";
+				sString = "Document_SetTextSmallCaps";
 				break;
 			case AscDFH.historydescription_Document_SetTextPosition                    :
-				sString = "Document_SetTextPosition                   ";
+				sString = "Document_SetTextPosition";
 				break;
 			case AscDFH.historydescription_Document_SetTextLang                        :
-				sString = "Document_SetTextLang                       ";
+				sString = "Document_SetTextLang";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphLineSpacing            :
-				sString = "Document_SetParagraphLineSpacing           ";
+				sString = "Document_SetParagraphLineSpacing";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphLineSpacingBeforeAfter :
 				sString = "Document_SetParagraphLineSpacingBeforeAfter";
 				break;
 			case AscDFH.historydescription_Document_IncFontSize                        :
-				sString = "Document_IncFontSize                       ";
+				sString = "Document_IncFontSize";
 				break;
 			case AscDFH.historydescription_Document_DecFontSize                        :
-				sString = "Document_DecFontSize                       ";
+				sString = "Document_DecFontSize";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphBorders                :
-				sString = "Document_SetParagraphBorders               ";
+				sString = "Document_SetParagraphBorders";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphPr                     :
-				sString = "Document_SetParagraphPr                    ";
+				sString = "Document_SetParagraphPr";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphAlign                  :
-				sString = "Document_SetParagraphAlign                 ";
+				sString = "Document_SetParagraphAlign";
 				break;
 			case AscDFH.historydescription_Document_SetTextVertAlign                   :
-				sString = "Document_SetTextVertAlign                  ";
+				sString = "Document_SetTextVertAlign";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphNumbering              :
-				sString = "Document_SetParagraphNumbering             ";
+				sString = "Document_SetParagraphNumbering";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphStyle                  :
-				sString = "Document_SetParagraphStyle                 ";
+				sString = "Document_SetParagraphStyle";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphPageBreakBefore        :
-				sString = "Document_SetParagraphPageBreakBefore       ";
+				sString = "Document_SetParagraphPageBreakBefore";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphWidowControl           :
-				sString = "Document_SetParagraphWidowControl          ";
+				sString = "Document_SetParagraphWidowControl";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphKeepLines              :
-				sString = "Document_SetParagraphKeepLines             ";
+				sString = "Document_SetParagraphKeepLines";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphKeepNext               :
-				sString = "Document_SetParagraphKeepNext              ";
+				sString = "Document_SetParagraphKeepNext";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphContextualSpacing      :
-				sString = "Document_SetParagraphContextualSpacing     ";
+				sString = "Document_SetParagraphContextualSpacing";
 				break;
 			case AscDFH.historydescription_Document_SetTextHighlightNone               :
-				sString = "Document_SetTextHighlightNone              ";
+				sString = "Document_SetTextHighlightNone";
 				break;
 			case AscDFH.historydescription_Document_SetTextHighlightColor              :
-				sString = "Document_SetTextHighlightColor             ";
+				sString = "Document_SetTextHighlightColor";
 				break;
 			case AscDFH.historydescription_Document_SetTextColor                       :
-				sString = "Document_SetTextColor                      ";
+				sString = "Document_SetTextColor";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphShd                    :
-				sString = "Document_SetParagraphShd                   ";
+				sString = "Document_SetParagraphShd";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphIndent                 :
-				sString = "Document_SetParagraphIndent                ";
+				sString = "Document_SetParagraphIndent";
 				break;
 			case AscDFH.historydescription_Document_IncParagraphIndent                 :
-				sString = "Document_IncParagraphIndent                ";
+				sString = "Document_IncParagraphIndent";
 				break;
 			case AscDFH.historydescription_Document_DecParagraphIndent                 :
-				sString = "Document_DecParagraphIndent                ";
+				sString = "Document_DecParagraphIndent";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphIndentRight            :
-				sString = "Document_SetParagraphIndentRight           ";
+				sString = "Document_SetParagraphIndentRight";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphIndentFirstLine        :
-				sString = "Document_SetParagraphIndentFirstLine       ";
+				sString = "Document_SetParagraphIndentFirstLine";
 				break;
 			case AscDFH.historydescription_Document_SetPageOrientation                 :
-				sString = "Document_SetPageOrientation                ";
+				sString = "Document_SetPageOrientation";
 				break;
 			case AscDFH.historydescription_Document_SetPageSize                        :
-				sString = "Document_SetPageSize                       ";
+				sString = "Document_SetPageSize";
 				break;
 			case AscDFH.historydescription_Document_AddPageBreak                       :
-				sString = "Document_AddPageBreak                      ";
+				sString = "Document_AddPageBreak";
 				break;
 			case AscDFH.historydescription_Document_AddPageNumToHdrFtr                 :
-				sString = "Document_AddPageNumToHdrFtr                ";
+				sString = "Document_AddPageNumToHdrFtr";
 				break;
 			case AscDFH.historydescription_Document_AddPageNumToCurrentPos             :
-				sString = "Document_AddPageNumToCurrentPos            ";
+				sString = "Document_AddPageNumToCurrentPos";
 				break;
 			case AscDFH.historydescription_Document_SetHdrFtrDistance                  :
-				sString = "Document_SetHdrFtrDistance                 ";
+				sString = "Document_SetHdrFtrDistance";
 				break;
 			case AscDFH.historydescription_Document_SetHdrFtrFirstPage                 :
-				sString = "Document_SetHdrFtrFirstPage                ";
+				sString = "Document_SetHdrFtrFirstPage";
 				break;
 			case AscDFH.historydescription_Document_SetHdrFtrEvenAndOdd                :
-				sString = "Document_SetHdrFtrEvenAndOdd               ";
+				sString = "Document_SetHdrFtrEvenAndOdd";
 				break;
 			case AscDFH.historydescription_Document_SetHdrFtrLink                      :
-				sString = "Document_SetHdrFtrLink                     ";
+				sString = "Document_SetHdrFtrLink";
 				break;
 			case AscDFH.historydescription_Document_AddTable                           :
-				sString = "Document_AddTable                          ";
+				sString = "Document_AddTable";
 				break;
 			case AscDFH.historydescription_Document_TableAddRowAbove                   :
-				sString = "Document_TableAddRowAbove                  ";
+				sString = "Document_TableAddRowAbove";
 				break;
 			case AscDFH.historydescription_Document_TableAddRowBelow                   :
-				sString = "Document_TableAddRowBelow                  ";
+				sString = "Document_TableAddRowBelow";
 				break;
 			case AscDFH.historydescription_Document_TableAddColumnLeft                 :
-				sString = "Document_TableAddColumnLeft                ";
+				sString = "Document_TableAddColumnLeft";
 				break;
 			case AscDFH.historydescription_Document_TableAddColumnRight                :
-				sString = "Document_TableAddColumnRight               ";
+				sString = "Document_TableAddColumnRight";
 				break;
 			case AscDFH.historydescription_Document_TableRemoveRow                     :
-				sString = "Document_TableRemoveRow                    ";
+				sString = "Document_TableRemoveRow";
 				break;
 			case AscDFH.historydescription_Document_TableRemoveColumn                  :
-				sString = "Document_TableRemoveColumn                 ";
+				sString = "Document_TableRemoveColumn";
 				break;
 			case AscDFH.historydescription_Document_RemoveTable                        :
-				sString = "Document_RemoveTable                       ";
+				sString = "Document_RemoveTable";
 				break;
 			case AscDFH.historydescription_Document_MergeTableCells                    :
-				sString = "Document_MergeTableCells                   ";
+				sString = "Document_MergeTableCells";
 				break;
 			case AscDFH.historydescription_Document_SplitTableCells                    :
-				sString = "Document_SplitTableCells                   ";
+				sString = "Document_SplitTableCells";
 				break;
 			case AscDFH.historydescription_Document_ApplyTablePr                       :
-				sString = "Document_ApplyTablePr                      ";
+				sString = "Document_ApplyTablePr";
 				break;
 			case AscDFH.historydescription_Document_AddImageUrl                        :
-				sString = "Document_AddImageUrl                       ";
+				sString = "Document_AddImageUrl";
 				break;
 			case AscDFH.historydescription_Document_AddImageUrlLong                    :
-				sString = "Document_AddImageUrlLong                   ";
+				sString = "Document_AddImageUrlLong";
 				break;
 			case AscDFH.historydescription_Document_AddImageToPage                     :
-				sString = "Document_AddImageToPage                    ";
+				sString = "Document_AddImageToPage";
 				break;
 			case AscDFH.historydescription_Document_ApplyImagePrWithUrl                :
-				sString = "Document_ApplyImagePrWithUrl               ";
+				sString = "Document_ApplyImagePrWithUrl";
 				break;
 			case AscDFH.historydescription_Document_ApplyImagePrWithUrlLong            :
-				sString = "Document_ApplyImagePrWithUrlLong           ";
+				sString = "Document_ApplyImagePrWithUrlLong";
 				break;
 			case AscDFH.historydescription_Document_ApplyImagePrWithFillUrl            :
-				sString = "Document_ApplyImagePrWithFillUrl           ";
+				sString = "Document_ApplyImagePrWithFillUrl";
 				break;
 			case AscDFH.historydescription_Document_ApplyImagePrWithFillUrlLong        :
-				sString = "Document_ApplyImagePrWithFillUrlLong       ";
+				sString = "Document_ApplyImagePrWithFillUrlLong";
 				break;
 			case AscDFH.historydescription_Document_ApplyImagePr                       :
-				sString = "Document_ApplyImagePr                      ";
+				sString = "Document_ApplyImagePr";
 				break;
 			case AscDFH.historydescription_Document_AddHyperlink                       :
-				sString = "Document_AddHyperlink                      ";
+				sString = "Document_AddHyperlink";
 				break;
 			case AscDFH.historydescription_Document_ChangeHyperlink                    :
-				sString = "Document_ChangeHyperlink                   ";
+				sString = "Document_ChangeHyperlink";
 				break;
 			case AscDFH.historydescription_Document_RemoveHyperlink                    :
-				sString = "Document_RemoveHyperlink                   ";
+				sString = "Document_RemoveHyperlink";
 				break;
 			case AscDFH.historydescription_Document_ReplaceMisspelledWord              :
-				sString = "Document_ReplaceMisspelledWord             ";
+				sString = "Document_ReplaceMisspelledWord";
 				break;
 			case AscDFH.historydescription_Document_AddComment                         :
-				sString = "Document_AddComment                        ";
+				sString = "Document_AddComment";
 				break;
 			case AscDFH.historydescription_Document_RemoveComment                      :
-				sString = "Document_RemoveComment                     ";
+				sString = "Document_RemoveComment";
 				break;
 			case AscDFH.historydescription_Document_ChangeComment                      :
-				sString = "Document_ChangeComment                     ";
+				sString = "Document_ChangeComment";
 				break;
 			case AscDFH.historydescription_Document_SetTextFontNameLong                :
-				sString = "Document_SetTextFontNameLong               ";
+				sString = "Document_SetTextFontNameLong";
 				break;
 			case AscDFH.historydescription_Document_AddImage                           :
-				sString = "Document_AddImage                          ";
+				sString = "Document_AddImage";
 				break;
 			case AscDFH.historydescription_Document_ClearFormatting                    :
-				sString = "Document_ClearFormatting                   ";
+				sString = "Document_ClearFormatting";
 				break;
 			case AscDFH.historydescription_Document_AddSectionBreak                    :
-				sString = "Document_AddSectionBreak                   ";
+				sString = "Document_AddSectionBreak";
 				break;
 			case AscDFH.historydescription_Document_AddMath                            :
-				sString = "Document_AddMath                           ";
+				sString = "Document_AddMath";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphTabs                   :
-				sString = "Document_SetParagraphTabs                  ";
+				sString = "Document_SetParagraphTabs";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphIndentFromRulers       :
-				sString = "Document_SetParagraphIndentFromRulers      ";
+				sString = "Document_SetParagraphIndentFromRulers";
 				break;
 			case AscDFH.historydescription_Document_SetDocumentMargin_Hor              :
-				sString = "Document_SetDocumentMargin_Hor             ";
+				sString = "Document_SetDocumentMargin_Hor";
 				break;
 			case AscDFH.historydescription_Document_SetTableMarkup_Hor                 :
-				sString = "Document_SetTableMarkup_Hor                ";
+				sString = "Document_SetTableMarkup_Hor";
 				break;
 			case AscDFH.historydescription_Document_SetDocumentMargin_Ver              :
-				sString = "Document_SetDocumentMargin_Ver             ";
+				sString = "Document_SetDocumentMargin_Ver";
 				break;
 			case AscDFH.historydescription_Document_SetHdrFtrBounds                    :
-				sString = "Document_SetHdrFtrBounds                   ";
+				sString = "Document_SetHdrFtrBounds";
 				break;
 			case AscDFH.historydescription_Document_SetTableMarkup_Ver                 :
-				sString = "Document_SetTableMarkup_Ver                ";
+				sString = "Document_SetTableMarkup_Ver";
 				break;
 			case AscDFH.historydescription_Document_DocumentExtendToPos                :
-				sString = "Document_DocumentExtendToPos               ";
+				sString = "Document_DocumentExtendToPos";
 				break;
 			case AscDFH.historydescription_Document_AddDropCap                         :
-				sString = "Document_AddDropCap                        ";
+				sString = "Document_AddDropCap";
 				break;
 			case AscDFH.historydescription_Document_RemoveDropCap                      :
-				sString = "Document_RemoveDropCap                     ";
+				sString = "Document_RemoveDropCap";
 				break;
 			case AscDFH.historydescription_Document_SetTextHighlight                   :
-				sString = "Document_SetTextHighlight                  ";
+				sString = "Document_SetTextHighlight";
 				break;
 			case AscDFH.historydescription_Document_BackSpaceButton                    :
-				sString = "Document_BackSpaceButton                   ";
+				sString = "Document_BackSpaceButton";
 				break;
 			case AscDFH.historydescription_Document_MoveParagraphByTab                 :
-				sString = "Document_MoveParagraphByTab                ";
+				sString = "Document_MoveParagraphByTab";
 				break;
 			case AscDFH.historydescription_Document_AddTab                             :
-				sString = "Document_AddTab                            ";
+				sString = "Document_AddTab";
 				break;
 			case AscDFH.historydescription_Document_EnterButton                        :
-				sString = "Document_EnterButton                       ";
+				sString = "Document_EnterButton";
 				break;
 			case AscDFH.historydescription_Document_SpaceButton                        :
-				sString = "Document_SpaceButton                       ";
+				sString = "Document_SpaceButton";
 				break;
 			case AscDFH.historydescription_Document_ShiftInsert                        :
-				sString = "Document_ShiftInsert                       ";
+				sString = "Document_ShiftInsert";
 				break;
 			case AscDFH.historydescription_Document_ShiftInsertSafari                  :
-				sString = "Document_ShiftInsertSafari                 ";
+				sString = "Document_ShiftInsertSafari";
 				break;
 			case AscDFH.historydescription_Document_DeleteButton                       :
-				sString = "Document_DeleteButton                      ";
+				sString = "Document_DeleteButton";
 				break;
 			case AscDFH.historydescription_Document_ShiftDeleteButton                  :
-				sString = "Document_ShiftDeleteButton                 ";
+				sString = "Document_ShiftDeleteButton";
 				break;
 			case AscDFH.historydescription_Document_SetStyleHeading1                   :
-				sString = "Document_SetStyleHeading1                  ";
+				sString = "Document_SetStyleHeading1";
 				break;
 			case AscDFH.historydescription_Document_SetStyleHeading2                   :
-				sString = "Document_SetStyleHeading2                  ";
+				sString = "Document_SetStyleHeading2";
 				break;
 			case AscDFH.historydescription_Document_SetStyleHeading3                   :
-				sString = "Document_SetStyleHeading3                  ";
+				sString = "Document_SetStyleHeading3";
 				break;
 			case AscDFH.historydescription_Document_SetTextStrikeoutHotKey             :
-				sString = "Document_SetTextStrikeoutHotKey            ";
+				sString = "Document_SetTextStrikeoutHotKey";
 				break;
 			case AscDFH.historydescription_Document_SetTextBoldHotKey                  :
-				sString = "Document_SetTextBoldHotKey                 ";
+				sString = "Document_SetTextBoldHotKey";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphAlignHotKey            :
-				sString = "Document_SetParagraphAlignHotKey           ";
+				sString = "Document_SetParagraphAlignHotKey";
 				break;
 			case AscDFH.historydescription_Document_AddEuroLetter                      :
-				sString = "Document_AddEuroLetter                     ";
+				sString = "Document_AddEuroLetter";
 				break;
 			case AscDFH.historydescription_Document_SetTextItalicHotKey                :
-				sString = "Document_SetTextItalicHotKey               ";
+				sString = "Document_SetTextItalicHotKey";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphAlignHotKey2           :
-				sString = "Document_SetParagraphAlignHotKey2          ";
+				sString = "Document_SetParagraphAlignHotKey2";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphNumberingHotKey        :
-				sString = "Document_SetParagraphNumberingHotKey       ";
+				sString = "Document_SetParagraphNumberingHotKey";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphAlignHotKey3           :
-				sString = "Document_SetParagraphAlignHotKey3          ";
+				sString = "Document_SetParagraphAlignHotKey3";
 				break;
 			case AscDFH.historydescription_Document_AddPageNumHotKey                   :
-				sString = "Document_AddPageNumHotKey                  ";
+				sString = "Document_AddPageNumHotKey";
 				break;
 			case AscDFH.historydescription_Document_SetParagraphAlignHotKey4           :
-				sString = "Document_SetParagraphAlignHotKey4          ";
+				sString = "Document_SetParagraphAlignHotKey4";
 				break;
 			case AscDFH.historydescription_Document_SetTextUnderlineHotKey             :
-				sString = "Document_SetTextUnderlineHotKey            ";
+				sString = "Document_SetTextUnderlineHotKey";
 				break;
 			case AscDFH.historydescription_Document_FormatPasteHotKey                  :
-				sString = "Document_FormatPasteHotKey                 ";
+				sString = "Document_FormatPasteHotKey";
 				break;
 			case AscDFH.historydescription_Document_PasteHotKey                        :
-				sString = "Document_PasteHotKey                       ";
+				sString = "Document_PasteHotKey";
 				break;
 			case AscDFH.historydescription_Document_PasteSafariHotKey                  :
-				sString = "Document_PasteSafariHotKey                 ";
+				sString = "Document_PasteSafariHotKey";
 				break;
 			case AscDFH.historydescription_Document_CutHotKey                          :
-				sString = "Document_CutHotKey                         ";
+				sString = "Document_CutHotKey";
 				break;
 			case AscDFH.historydescription_Document_SetTextVertAlignHotKey             :
-				sString = "Document_SetTextVertAlignHotKey            ";
+				sString = "Document_SetTextVertAlignHotKey";
 				break;
 			case AscDFH.historydescription_Document_AddMathHotKey                      :
-				sString = "Document_AddMathHotKey                     ";
+				sString = "Document_AddMathHotKey";
 				break;
 			case AscDFH.historydescription_Document_SetTextVertAlignHotKey2            :
-				sString = "Document_SetTextVertAlignHotKey2           ";
+				sString = "Document_SetTextVertAlignHotKey2";
 				break;
 			case AscDFH.historydescription_Document_MinusButton                        :
-				sString = "Document_MinusButton                       ";
+				sString = "Document_MinusButton";
 				break;
 			case AscDFH.historydescription_Document_SetTextVertAlignHotKey3            :
-				sString = "Document_SetTextVertAlignHotKey3           ";
+				sString = "Document_SetTextVertAlignHotKey3";
 				break;
 			case AscDFH.historydescription_Document_AddLetter                          :
-				sString = "Document_AddLetter                         ";
+				sString = "Document_AddLetter";
 				break;
 			case AscDFH.historydescription_Document_MoveTableBorder                    :
-				sString = "Document_MoveTableBorder                   ";
+				sString = "Document_MoveTableBorder";
 				break;
 			case AscDFH.historydescription_Document_FormatPasteHotKey2                 :
-				sString = "Document_FormatPasteHotKey2                ";
+				sString = "Document_FormatPasteHotKey2";
 				break;
 			case AscDFH.historydescription_Document_SetTextHighlight2                  :
-				sString = "Document_SetTextHighlight2                 ";
+				sString = "Document_SetTextHighlight2";
 				break;
 			case AscDFH.historydescription_Document_AddTextFromTextBox                 :
-				sString = "Document_AddTextFromTextBox                ";
+				sString = "Document_AddTextFromTextBox";
 				break;
 			case AscDFH.historydescription_Document_AddMailMergeField                  :
-				sString = "Document_AddMailMergeField                 ";
+				sString = "Document_AddMailMergeField";
 				break;
 			case AscDFH.historydescription_Document_MoveInlineTable                    :
-				sString = "Document_MoveInlineTable                   ";
+				sString = "Document_MoveInlineTable";
 				break;
 			case AscDFH.historydescription_Document_MoveFlowTable                      :
-				sString = "Document_MoveFlowTable                     ";
+				sString = "Document_MoveFlowTable";
 				break;
 			case AscDFH.historydescription_Document_RestoreFieldTemplateText           :
-				sString = "Document_RestoreFieldTemplateText          ";
+				sString = "Document_RestoreFieldTemplateText";
 				break;
 
 			case AscDFH.historydescription_Spreadsheet_SetCellFontName                 :
-				sString = "Spreadsheet_SetCellFontName                ";
+				sString = "Spreadsheet_SetCellFontName";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellFontSize                 :
-				sString = "Spreadsheet_SetCellFontSize                ";
+				sString = "Spreadsheet_SetCellFontSize";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellBold                     :
-				sString = "Spreadsheet_SetCellBold                    ";
+				sString = "Spreadsheet_SetCellBold";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellItalic                   :
-				sString = "Spreadsheet_SetCellItalic                  ";
+				sString = "Spreadsheet_SetCellItalic";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellUnderline                :
-				sString = "Spreadsheet_SetCellUnderline               ";
+				sString = "Spreadsheet_SetCellUnderline";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellStrikeout                :
-				sString = "Spreadsheet_SetCellStrikeout               ";
+				sString = "Spreadsheet_SetCellStrikeout";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellSubscript                :
-				sString = "Spreadsheet_SetCellSubscript               ";
+				sString = "Spreadsheet_SetCellSubscript";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellSuperscript              :
-				sString = "Spreadsheet_SetCellSuperscript             ";
+				sString = "Spreadsheet_SetCellSuperscript";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellAlign                    :
-				sString = "Spreadsheet_SetCellAlign                   ";
+				sString = "Spreadsheet_SetCellAlign";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellVertAlign                :
-				sString = "Spreadsheet_SetCellVertAlign               ";
+				sString = "Spreadsheet_SetCellVertAlign";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellTextColor                :
-				sString = "Spreadsheet_SetCellTextColor               ";
+				sString = "Spreadsheet_SetCellTextColor";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellBackgroundColor          :
-				sString = "Spreadsheet_SetCellBackgroundColor         ";
+				sString = "Spreadsheet_SetCellBackgroundColor";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellIncreaseFontSize         :
-				sString = "Spreadsheet_SetCellIncreaseFontSize        ";
+				sString = "Spreadsheet_SetCellIncreaseFontSize";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellDecreaseFontSize         :
-				sString = "Spreadsheet_SetCellDecreaseFontSize        ";
+				sString = "Spreadsheet_SetCellDecreaseFontSize";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellHyperlinkAdd             :
-				sString = "Spreadsheet_SetCellHyperlinkAdd            ";
+				sString = "Spreadsheet_SetCellHyperlinkAdd";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellHyperlinkModify          :
-				sString = "Spreadsheet_SetCellHyperlinkModify         ";
+				sString = "Spreadsheet_SetCellHyperlinkModify";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetCellHyperlinkRemove          :
-				sString = "Spreadsheet_SetCellHyperlinkRemove         ";
+				sString = "Spreadsheet_SetCellHyperlinkRemove";
 				break;
 			case AscDFH.historydescription_Spreadsheet_EditChart                       :
-				sString = "Spreadsheet_EditChart                      ";
+				sString = "Spreadsheet_EditChart";
 				break;
 			case AscDFH.historydescription_Spreadsheet_Remove                          :
-				sString = "Spreadsheet_Remove                         ";
+				sString = "Spreadsheet_Remove";
 				break;
 			case AscDFH.historydescription_Spreadsheet_AddTab                          :
-				sString = "Spreadsheet_AddTab                         ";
+				sString = "Spreadsheet_AddTab";
 				break;
 			case AscDFH.historydescription_Spreadsheet_AddNewParagraph                 :
-				sString = "Spreadsheet_AddNewParagraph                ";
+				sString = "Spreadsheet_AddNewParagraph";
 				break;
 			case AscDFH.historydescription_Spreadsheet_AddSpace                        :
-				sString = "Spreadsheet_AddSpace                       ";
+				sString = "Spreadsheet_AddSpace";
 				break;
 			case AscDFH.historydescription_Spreadsheet_AddItem                         :
-				sString = "Spreadsheet_AddItem                        ";
+				sString = "Spreadsheet_AddItem";
 				break;
 			case AscDFH.historydescription_Spreadsheet_PutPrLineSpacing                :
-				sString = "Spreadsheet_PutPrLineSpacing               ";
+				sString = "Spreadsheet_PutPrLineSpacing";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetParagraphSpacing             :
-				sString = "Spreadsheet_SetParagraphSpacing            ";
+				sString = "Spreadsheet_SetParagraphSpacing";
 				break;
 			case AscDFH.historydescription_Spreadsheet_SetGraphicObjectsProps          :
-				sString = "Spreadsheet_SetGraphicObjectsProps         ";
+				sString = "Spreadsheet_SetGraphicObjectsProps";
 				break;
 			case AscDFH.historydescription_Spreadsheet_ParaApply                       :
-				sString = "Spreadsheet_ParaApply                      ";
+				sString = "Spreadsheet_ParaApply";
 				break;
 			case AscDFH.historydescription_Spreadsheet_GraphicObjectLayer              :
-				sString = "Spreadsheet_GraphicObjectLayer             ";
+				sString = "Spreadsheet_GraphicObjectLayer";
 				break;
 			case AscDFH.historydescription_Spreadsheet_ParagraphAdd                    :
-				sString = "Spreadsheet_ParagraphAdd                   ";
+				sString = "Spreadsheet_ParagraphAdd";
 				break;
 			case AscDFH.historydescription_Spreadsheet_CreateGroup                     :
-				sString = "Spreadsheet_CreateGroup                    ";
+				sString = "Spreadsheet_CreateGroup";
 				break;
 			case AscDFH.historydescription_CommonDrawings_ChangeAdj                    :
-				sString = "CommonDrawings_ChangeAdj                   ";
+				sString = "CommonDrawings_ChangeAdj";
 				break;
 			case AscDFH.historydescription_CommonDrawings_EndTrack                     :
-				sString = "CommonDrawings_EndTrack                    ";
+				sString = "CommonDrawings_EndTrack";
 				break;
 			case AscDFH.historydescription_CommonDrawings_CopyCtrl                     :
-				sString = "CommonDrawings_CopyCtrl                    ";
+				sString = "CommonDrawings_CopyCtrl";
 				break;
 			case AscDFH.historydescription_Presentation_ParaApply                      :
-				sString = "Presentation_ParaApply                     ";
+				sString = "Presentation_ParaApply";
 				break;
 			case AscDFH.historydescription_Presentation_ParaFormatPaste                :
-				sString = "Presentation_ParaFormatPaste               ";
+				sString = "Presentation_ParaFormatPaste";
 				break;
 			case AscDFH.historydescription_Presentation_AddNewParagraph                :
-				sString = "Presentation_AddNewParagraph               ";
+				sString = "Presentation_AddNewParagraph";
 				break;
 			case AscDFH.historydescription_Presentation_CreateGroup                    :
-				sString = "Presentation_CreateGroup                   ";
+				sString = "Presentation_CreateGroup";
 				break;
 			case AscDFH.historydescription_Presentation_UnGroup                        :
-				sString = "Presentation_UnGroup                       ";
+				sString = "Presentation_UnGroup";
 				break;
 			case AscDFH.historydescription_Presentation_AddChart                       :
-				sString = "Presentation_AddChart                      ";
+				sString = "Presentation_AddChart";
 				break;
 			case AscDFH.historydescription_Presentation_EditChart                      :
-				sString = "Presentation_EditChart                     ";
+				sString = "Presentation_EditChart";
 				break;
 			case AscDFH.historydescription_Presentation_ParagraphAdd                   :
-				sString = "Presentation_ParagraphAdd                  ";
+				sString = "Presentation_ParagraphAdd";
 				break;
 			case AscDFH.historydescription_Presentation_ParagraphClearFormatting       :
-				sString = "Presentation_ParagraphClearFormatting      ";
+				sString = "Presentation_ParagraphClearFormatting";
 				break;
 			case AscDFH.historydescription_Presentation_SetParagraphAlign              :
-				sString = "Presentation_SetParagraphAlign             ";
+				sString = "Presentation_SetParagraphAlign";
 				break;
 			case AscDFH.historydescription_Presentation_SetParagraphSpacing            :
-				sString = "Presentation_SetParagraphSpacing           ";
+				sString = "Presentation_SetParagraphSpacing";
 				break;
 			case AscDFH.historydescription_Presentation_SetParagraphTabs               :
-				sString = "Presentation_SetParagraphTabs              ";
+				sString = "Presentation_SetParagraphTabs";
 				break;
 			case AscDFH.historydescription_Presentation_SetParagraphIndent             :
-				sString = "Presentation_SetParagraphIndent            ";
+				sString = "Presentation_SetParagraphIndent";
 				break;
 			case AscDFH.historydescription_Presentation_SetParagraphNumbering          :
-				sString = "Presentation_SetParagraphNumbering         ";
+				sString = "Presentation_SetParagraphNumbering";
 				break;
 			case AscDFH.historydescription_Presentation_ParagraphIncDecFontSize        :
-				sString = "Presentation_ParagraphIncDecFontSize       ";
+				sString = "Presentation_ParagraphIncDecFontSize";
 				break;
 			case AscDFH.historydescription_Presentation_ParagraphIncDecIndent          :
-				sString = "Presentation_ParagraphIncDecIndent         ";
+				sString = "Presentation_ParagraphIncDecIndent";
 				break;
 			case AscDFH.historydescription_Presentation_SetImageProps                  :
-				sString = "Presentation_SetImageProps                 ";
+				sString = "Presentation_SetImageProps";
 				break;
 			case AscDFH.historydescription_Presentation_SetShapeProps                  :
-				sString = "Presentation_SetShapeProps                 ";
+				sString = "Presentation_SetShapeProps";
 				break;
 			case AscDFH.historydescription_Presentation_ChartApply                     :
-				sString = "Presentation_ChartApply                    ";
+				sString = "Presentation_ChartApply";
 				break;
 			case AscDFH.historydescription_Presentation_ChangeShapeType                :
-				sString = "Presentation_ChangeShapeType               ";
+				sString = "Presentation_ChangeShapeType";
 				break;
 			case AscDFH.historydescription_Presentation_SetVerticalAlign               :
-				sString = "Presentation_SetVerticalAlign              ";
+				sString = "Presentation_SetVerticalAlign";
 				break;
 			case AscDFH.historydescription_Presentation_HyperlinkAdd                   :
-				sString = "Presentation_HyperlinkAdd                  ";
+				sString = "Presentation_HyperlinkAdd";
 				break;
 			case AscDFH.historydescription_Presentation_HyperlinkModify                :
-				sString = "Presentation_HyperlinkModify               ";
+				sString = "Presentation_HyperlinkModify";
 				break;
 			case AscDFH.historydescription_Presentation_HyperlinkRemove                :
-				sString = "Presentation_HyperlinkRemove               ";
+				sString = "Presentation_HyperlinkRemove";
 				break;
 			case AscDFH.historydescription_Presentation_DistHor                        :
-				sString = "Presentation_DistHor                       ";
+				sString = "Presentation_DistHor";
 				break;
 			case AscDFH.historydescription_Presentation_DistVer                        :
-				sString = "Presentation_DistVer                       ";
+				sString = "Presentation_DistVer";
 				break;
 			case AscDFH.historydescription_Presentation_BringToFront                   :
-				sString = "Presentation_BringToFront                  ";
+				sString = "Presentation_BringToFront";
 				break;
 			case AscDFH.historydescription_Presentation_BringForward                   :
-				sString = "Presentation_BringForward                  ";
+				sString = "Presentation_BringForward";
 				break;
 			case AscDFH.historydescription_Presentation_SendToBack                     :
-				sString = "Presentation_SendToBack                    ";
+				sString = "Presentation_SendToBack";
 				break;
 			case AscDFH.historydescription_Presentation_BringBackward                  :
-				sString = "Presentation_BringBackward                 ";
+				sString = "Presentation_BringBackward";
 				break;
 			case AscDFH.historydescription_Presentation_ApplyTiming                    :
-				sString = "Presentation_ApplyTiming                   ";
+				sString = "Presentation_ApplyTiming";
 				break;
 			case AscDFH.historydescription_Presentation_MoveSlidesToEnd                :
-				sString = "Presentation_MoveSlidesToEnd               ";
+				sString = "Presentation_MoveSlidesToEnd";
 				break;
 			case AscDFH.historydescription_Presentation_MoveSlidesNextPos              :
-				sString = "Presentation_MoveSlidesNextPos             ";
+				sString = "Presentation_MoveSlidesNextPos";
 				break;
 			case AscDFH.historydescription_Presentation_MoveSlidesPrevPos              :
-				sString = "Presentation_MoveSlidesPrevPos             ";
+				sString = "Presentation_MoveSlidesPrevPos";
 				break;
 			case AscDFH.historydescription_Presentation_MoveSlidesToStart              :
-				sString = "Presentation_MoveSlidesToStart             ";
+				sString = "Presentation_MoveSlidesToStart";
 				break;
 			case AscDFH.historydescription_Presentation_MoveComments                   :
-				sString = "Presentation_MoveComments                  ";
+				sString = "Presentation_MoveComments";
 				break;
 			case AscDFH.historydescription_Presentation_TableBorder                    :
-				sString = "Presentation_TableBorder                   ";
+				sString = "Presentation_TableBorder";
 				break;
 			case AscDFH.historydescription_Presentation_AddFlowImage                   :
-				sString = "Presentation_AddFlowImage                  ";
+				sString = "Presentation_AddFlowImage";
 				break;
 			case AscDFH.historydescription_Presentation_AddFlowTable                   :
-				sString = "Presentation_AddFlowTable                  ";
+				sString = "Presentation_AddFlowTable";
 				break;
 			case AscDFH.historydescription_Presentation_ChangeBackground               :
-				sString = "Presentation_ChangeBackground              ";
+				sString = "Presentation_ChangeBackground";
 				break;
 			case AscDFH.historydescription_Presentation_AddNextSlide                   :
-				sString = "Presentation_AddNextSlide                  ";
+				sString = "Presentation_AddNextSlide";
 				break;
 			case AscDFH.historydescription_Presentation_ShiftSlides                    :
-				sString = "Presentation_ShiftSlides                   ";
+				sString = "Presentation_ShiftSlides";
 				break;
 			case AscDFH.historydescription_Presentation_DeleteSlides                   :
-				sString = "Presentation_DeleteSlides                  ";
+				sString = "Presentation_DeleteSlides";
 				break;
 			case AscDFH.historydescription_Presentation_ChangeLayout                   :
-				sString = "Presentation_ChangeLayout                  ";
+				sString = "Presentation_ChangeLayout";
 				break;
 			case AscDFH.historydescription_Presentation_ChangeSlideSize                :
-				sString = "Presentation_ChangeSlideSize               ";
+				sString = "Presentation_ChangeSlideSize";
 				break;
 			case AscDFH.historydescription_Presentation_ChangeColorScheme              :
-				sString = "Presentation_ChangeColorScheme             ";
+				sString = "Presentation_ChangeColorScheme";
 				break;
 			case AscDFH.historydescription_Presentation_AddComment                     :
-				sString = "Presentation_AddComment                    ";
+				sString = "Presentation_AddComment";
 				break;
 			case AscDFH.historydescription_Presentation_ChangeComment                  :
-				sString = "Presentation_ChangeComment                 ";
+				sString = "Presentation_ChangeComment";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrFontName              :
-				sString = "Presentation_PutTextPrFontName             ";
+				sString = "Presentation_PutTextPrFontName";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrFontSize              :
-				sString = "Presentation_PutTextPrFontSize             ";
+				sString = "Presentation_PutTextPrFontSize";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrBold                  :
-				sString = "Presentation_PutTextPrBold                 ";
+				sString = "Presentation_PutTextPrBold";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrItalic                :
-				sString = "Presentation_PutTextPrItalic               ";
+				sString = "Presentation_PutTextPrItalic";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrUnderline             :
-				sString = "Presentation_PutTextPrUnderline            ";
+				sString = "Presentation_PutTextPrUnderline";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrStrikeout             :
-				sString = "Presentation_PutTextPrStrikeout            ";
+				sString = "Presentation_PutTextPrStrikeout";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrLineSpacing           :
-				sString = "Presentation_PutTextPrLineSpacing          ";
+				sString = "Presentation_PutTextPrLineSpacing";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrSpacingBeforeAfter    :
-				sString = "Presentation_PutTextPrSpacingBeforeAfter   ";
+				sString = "Presentation_PutTextPrSpacingBeforeAfter";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrIncreaseFontSize      :
-				sString = "Presentation_PutTextPrIncreaseFontSize     ";
+				sString = "Presentation_PutTextPrIncreaseFontSize";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrDecreaseFontSize      :
-				sString = "Presentation_PutTextPrDecreaseFontSize     ";
+				sString = "Presentation_PutTextPrDecreaseFontSize";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrAlign                 :
-				sString = "Presentation_PutTextPrAlign                ";
+				sString = "Presentation_PutTextPrAlign";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrBaseline              :
-				sString = "Presentation_PutTextPrBaseline             ";
+				sString = "Presentation_PutTextPrBaseline";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextPrListType              :
-				sString = "Presentation_PutTextPrListType             ";
+				sString = "Presentation_PutTextPrListType";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextColor                   :
-				sString = "Presentation_PutTextColor                  ";
+				sString = "Presentation_PutTextColor";
 				break;
 			case AscDFH.historydescription_Presentation_PutTextColor2                  :
-				sString = "Presentation_PutTextColor2                 ";
+				sString = "Presentation_PutTextColor2";
 				break;
 			case AscDFH.historydescription_Presentation_PutPrIndent                    :
-				sString = "Presentation_PutPrIndent                   ";
+				sString = "Presentation_PutPrIndent";
 				break;
 			case AscDFH.historydescription_Presentation_PutPrIndentRight               :
-				sString = "Presentation_PutPrIndentRight              ";
+				sString = "Presentation_PutPrIndentRight";
 				break;
 			case AscDFH.historydescription_Presentation_PutPrFirstLineIndent           :
-				sString = "Presentation_PutPrFirstLineIndent          ";
+				sString = "Presentation_PutPrFirstLineIndent";
 				break;
 			case AscDFH.historydescription_Presentation_AddPageBreak                   :
-				sString = "Presentation_AddPageBreak                  ";
+				sString = "Presentation_AddPageBreak";
 				break;
 			case AscDFH.historydescription_Presentation_AddRowAbove                    :
-				sString = "Presentation_AddRowAbove                   ";
+				sString = "Presentation_AddRowAbove";
 				break;
 			case AscDFH.historydescription_Presentation_AddRowBelow                    :
-				sString = "Presentation_AddRowBelow                   ";
+				sString = "Presentation_AddRowBelow";
 				break;
 			case AscDFH.historydescription_Presentation_AddColLeft                     :
-				sString = "Presentation_AddColLeft                    ";
+				sString = "Presentation_AddColLeft";
 				break;
 			case AscDFH.historydescription_Presentation_AddColRight                    :
-				sString = "Presentation_AddColRight                   ";
+				sString = "Presentation_AddColRight";
 				break;
 			case AscDFH.historydescription_Presentation_RemoveRow                      :
-				sString = "Presentation_RemoveRow                     ";
+				sString = "Presentation_RemoveRow";
 				break;
 			case AscDFH.historydescription_Presentation_RemoveCol                      :
-				sString = "Presentation_RemoveCol                     ";
+				sString = "Presentation_RemoveCol";
 				break;
 			case AscDFH.historydescription_Presentation_RemoveTable                    :
-				sString = "Presentation_RemoveTable                   ";
+				sString = "Presentation_RemoveTable";
 				break;
 			case AscDFH.historydescription_Presentation_MergeCells                     :
-				sString = "Presentation_MergeCells                    ";
+				sString = "Presentation_MergeCells";
 				break;
 			case AscDFH.historydescription_Presentation_SplitCells                     :
-				sString = "Presentation_SplitCells                    ";
+				sString = "Presentation_SplitCells";
 				break;
 			case AscDFH.historydescription_Presentation_TblApply                       :
-				sString = "Presentation_TblApply                      ";
+				sString = "Presentation_TblApply";
 				break;
 			case AscDFH.historydescription_Presentation_RemoveComment                  :
-				sString = "Presentation_RemoveComment                 ";
+				sString = "Presentation_RemoveComment";
 				break;
 			case AscDFH.historydescription_Presentation_EndFontLoad                    :
-				sString = "Presentation_EndFontLoad                   ";
+				sString = "Presentation_EndFontLoad";
 				break;
 			case AscDFH.historydescription_Presentation_ChangeTheme                    :
-				sString = "Presentation_ChangeTheme                   ";
+				sString = "Presentation_ChangeTheme";
 				break;
 			case AscDFH.historydescription_Presentation_TableMoveFromRulers            :
-				sString = "Presentation_TableMoveFromRulers           ";
+				sString = "Presentation_TableMoveFromRulers";
 				break;
 			case AscDFH.historydescription_Presentation_TableMoveFromRulersInline      :
-				sString = "Presentation_TableMoveFromRulersInline     ";
+				sString = "Presentation_TableMoveFromRulersInline";
 				break;
 			case AscDFH.historydescription_Presentation_PasteOnThumbnails              :
-				sString = "Presentation_PasteOnThumbnails             ";
+				sString = "Presentation_PasteOnThumbnails";
 				break;
 			case AscDFH.historydescription_Presentation_PasteOnThumbnailsSafari        :
-				sString = "Presentation_PasteOnThumbnailsSafari       ";
+				sString = "Presentation_PasteOnThumbnailsSafari";
 				break;
 			case AscDFH.historydescription_Document_ConvertOldEquation                 :
-				sString = "Document_ConvertOldEquation                ";
+				sString = "Document_ConvertOldEquation";
 				break;
 			case AscDFH.historydescription_Document_AddNewStyle                        :
-				sString = "Document_AddNewStyle                       ";
+				sString = "Document_AddNewStyle";
 				break;
 			case AscDFH.historydescription_Document_RemoveStyle                        :
-				sString = "Document_RemoveStyle                       ";
+				sString = "Document_RemoveStyle";
 				break;
 			case AscDFH.historydescription_Document_AddTextArt                         :
-				sString = "Document_AddTextArt                        ";
+				sString = "Document_AddTextArt";
 				break;
 			case AscDFH.historydescription_Document_RemoveAllCustomStyles              :
-				sString = "Document_RemoveAllCustomStyles             ";
+				sString = "Document_RemoveAllCustomStyles";
 				break;
 			case AscDFH.historydescription_Document_AcceptAllRevisionChanges           :
-				sString = "Document_AcceptAllRevisionChanges          ";
+				sString = "Document_AcceptAllRevisionChanges";
 				break;
 			case AscDFH.historydescription_Document_RejectAllRevisionChanges           :
-				sString = "Document_RejectAllRevisionChanges          ";
+				sString = "Document_RejectAllRevisionChanges";
 				break;
 			case AscDFH.historydescription_Document_AcceptRevisionChange               :
-				sString = "Document_AcceptRevisionChange              ";
+				sString = "Document_AcceptRevisionChange";
 				break;
 			case AscDFH.historydescription_Document_RejectRevisionChange               :
-				sString = "Document_RejectRevisionChange              ";
+				sString = "Document_RejectRevisionChange";
 				break;
 			case AscDFH.historydescription_Document_AcceptRevisionChangesBySelection   :
-				sString = "Document_AcceptRevisionChangesBySelection  ";
+				sString = "Document_AcceptRevisionChangesBySelection";
 				break;
 			case AscDFH.historydescription_Document_RejectRevisionChangesBySelection   :
-				sString = "Document_RejectRevisionChangesBySelection  ";
+				sString = "Document_RejectRevisionChangesBySelection";
 				break;
 			case AscDFH.historydescription_Document_AddLetterUnion                     :
-				sString = "Document_AddLetterUnion                    ";
+				sString = "Document_AddLetterUnion";
 				break;
 			case AscDFH.historydescription_Document_SetColumnsFromRuler                :
-				sString = "Document_SetColumnsFromRuler               ";
+				sString = "Document_SetColumnsFromRuler";
 				break;
 			case AscDFH.historydescription_Document_SetColumnsProps                    :
-				sString = "Document_SetColumnsProps                   ";
+				sString = "Document_SetColumnsProps";
 				break;
 			case AscDFH.historydescription_Document_AddColumnBreak                     :
-				sString = "Document_AddColumnBreak                    ";
+				sString = "Document_AddColumnBreak";
 				break;
 			case AscDFH.historydescription_Document_AddTabToMath                       :
-				sString = "Document_AddTabToMath                      ";
+				sString = "Document_AddTabToMath";
 				break;
 			case AscDFH.historydescription_Document_ApplyPrToMath:
-				sString = "Document_ApplyPrToMath                     ";
+				sString = "Document_ApplyPrToMath";
 				break;
 			case AscDFH.historydescription_Document_SetMathProps:
-				sString = "Document_SetMathProps                      ";
+				sString = "Document_SetMathProps";
 				break;
 			case AscDFH.historydescription_Document_SetSectionProps:
-				sString = "Document_SetColumnsProps                   ";
+				sString = "Document_SetColumnsProps";
 				break;
 			case AscDFH.historydescription_Document_ApiBuilder:
-				sString = "Document_ApiBuilder                        ";
+				sString = "Document_ApiBuilder";
 				break;
 			case AscDFH.historydescription_Document_AddOleObject:
-				sString = "Document_AddOleObject                      ";
+				sString = "Document_AddOleObject";
 				break;
 			case AscDFH.historydescription_Document_EditOleObject:
-				sString = "Document_EditOleObject                     ";
+				sString = "Document_EditOleObject";
 				break;
 			case AscDFH.historydescription_Document_CompositeInput:
-				sString = "Document_CompositeInput                    ";
+				sString = "Document_CompositeInput";
 				break;
 			case AscDFH.historydescription_Document_CompositeInputReplace:
-				sString = "Document_CompositeInputReplace             ";
+				sString = "Document_CompositeInputReplace";
 				break;
 			case AscDFH.historydescription_Document_AddPageCount:
-				sString = "Document_AddPageCount                      ";
+				sString = "Document_AddPageCount";
 				break;
 			case AscDFH.historydescription_Document_AddFootnote:
-				sString = "Document_AddFootnote                       ";
+				sString = "Document_AddFootnote";
 				break;
 			case AscDFH.historydescription_Document_SetFootnotePr:
-				sString = "Document_SetFootnotePr                     ";
+				sString = "Document_SetFootnotePr";
 				break;
 			case AscDFH.historydescription_Document_RemoveAllFootnotes:
-				sString = "Document_RemoveAllFootnotes                ";
+				sString = "Document_RemoveAllFootnotes";
 				break;
 			case AscDFH.historydescription_Document_InsertDocumentsByUrls:
-				sString = "Document_InsertDocumentsByUrls             ";
+				sString = "Document_InsertDocumentsByUrls";
 				break;
 		}
 		return sString;
@@ -1103,6 +1103,7 @@
 	window['AscDFH'].historyitem_type_FootEndNote      = 57 << 16;
 	window['AscDFH'].historyitem_type_Presentation     = 58 << 16;
 	window['AscDFH'].historyitem_type_BlockLevelSdt    = 59 << 16;
+	window['AscDFH'].historyitem_type_SdtPr            = 60 << 16;
 
 	window['AscDFH'].historyitem_type_CommonShape            = 1000 << 16; // Этот класс добавлен для элементов, у которых нет конкретного класса
 
@@ -1648,6 +1649,14 @@
 	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumStart    = window['AscDFH'].historyitem_type_Footnotes | 6;
 	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumRestart  = window['AscDFH'].historyitem_type_Footnotes | 7;
 	window['AscDFH'].historyitem_Footnotes_SetFootnotePrNumFormat   = window['AscDFH'].historyitem_type_Footnotes | 8;
+	//------------------------------------------------------------------------------------------------------------------
+	// Типы изменений в классе CSdtPr
+	//------------------------------------------------------------------------------------------------------------------
+	window['AscDFH'].historyitem_SdtPr_Alias = window['AscDFH'].historyitem_type_SdtPr | 1;
+	window['AscDFH'].historyitem_SdtPr_Id    = window['AscDFH'].historyitem_type_SdtPr | 2;
+	window['AscDFH'].historyitem_SdtPr_Tag   = window['AscDFH'].historyitem_type_SdtPr | 3;
+	window['AscDFH'].historyitem_SdtPr_Label = window['AscDFH'].historyitem_type_SdtPr | 4;
+	window['AscDFH'].historyitem_SdtPr_Lock  = window['AscDFH'].historyitem_type_SdtPr | 5;
 	//------------------------------------------------------------------------------------------------------------------
 	// Графические классы общего назначение (без привязки к конкретному классу)
 	//------------------------------------------------------------------------------------------------------------------
@@ -2329,6 +2338,7 @@
 	window['AscDFH'].historyitem_ImageShapeSetData          = window['AscDFH'].historyitem_type_ImageShape | 7;
 	window['AscDFH'].historyitem_ImageShapeSetApplicationId = window['AscDFH'].historyitem_type_ImageShape | 8;
 	window['AscDFH'].historyitem_ImageShapeSetPixSizes      = window['AscDFH'].historyitem_type_ImageShape | 9;
+	window['AscDFH'].historyitem_ImageShapeSetObjectFile	= window['AscDFH'].historyitem_type_ImageShape | 10;
 
 	window['AscDFH'].historyitem_GeometrySetParent      = window['AscDFH'].historyitem_type_Geometry | 1;
 	window['AscDFH'].historyitem_GeometryAddAdj         = window['AscDFH'].historyitem_type_Geometry | 2;

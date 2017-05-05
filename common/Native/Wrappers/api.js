@@ -2341,7 +2341,6 @@ Asc['asc_docs_api'].prototype.asc_setDocumentPassword = function(password)
       "c": "reopen",
       "url": this.documentUrl,
       "title": this.documentTitle,
-      "embeddedfonts": this.isUseEmbeddedCutFonts,
       "password": password
     };
 
@@ -5740,51 +5739,36 @@ AscCommon.ChartPreviewManager.prototype.clearPreviews = function()
 {
     window["native"]["DD_ClearCacheChartStyles"]();
 };
+
 AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex)
 {
     return AscFormat.ExecuteNoHistory(function(){
-                                      if(!this.chartsByTypes[type])
-                                      this.chartsByTypes[type] = this.getChartByType(type);
-                                      var chart_space = this.chartsByTypes[type];
-                                      if(chart_space.style !== styleIndex)
-                                      {
-                                      chart_space.style = styleIndex;
-                                      chart_space.recalculateMarkers();
-                                      chart_space.recalculateSeriesColors();
-                                      chart_space.recalculatePlotAreaChartBrush();
-                                      chart_space.recalculatePlotAreaChartPen();
-                                      chart_space.recalculateChartBrush();
-                                      chart_space.recalculateChartPen();
-                                      chart_space.recalculateUpDownBars();
-                                      }
-                                      chart_space.recalculatePenBrush();
+      if(!this.chartsByTypes[type])
+          this.chartsByTypes[type] = this.getChartByType(type);
 
-                                      var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
-                                      var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
-                                      if (AscCommon.AscBrowser.isRetina)
-                                      {
-                                      _width_px <<= 1;
-                                      _height_px <<= 1;
-                                      }
+      var chart_space = this.chartsByTypes[type];
+      AscFormat.ApplyPresetToChartSpace(chart_space, AscCommon.g_oChartPresets[type][styleIndex]);
+      chart_space.recalcInfo.recalculateReferences = false;
+      chart_space.recalculate();
 
-                                      window["native"]["DD_StartNativeDraw"](_width_px, _height_px, 50, 50);
+      // sizes for imageView
+      window["native"]["DD_StartNativeDraw"](85 * 2, 85 * 2, 75, 75);
 
-                                      var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
-                                      if (this.IsRetinaEnabled)
-                                      dKoefToMM /= 2;
+      var dKoefToMM = AscCommon.g_dKoef_pix_to_mm;
+      if (this.IsRetinaEnabled)
+          dKoefToMM /= 2;
 
-                                      chart_space.draw(_graphics);
-                                      _graphics.ClearParams();
+      chart_space.draw(_graphics);
+      _graphics.ClearParams();
 
-                                      var _stream = global_memory_stream_menu;
-                                      _stream["ClearNoAttack"]();
-                                      _stream["WriteByte"](4);
-                                      _stream["WriteLong"](type);
-                                      _stream["WriteLong"](styleIndex);
-                                      window["native"]["DD_EndNativeDraw"](_stream);
+      var _stream = global_memory_stream_menu;
+      _stream["ClearNoAttack"]();
+      _stream["WriteByte"](4);
+      _stream["WriteLong"](type);
+      _stream["WriteLong"](styleIndex);
+      window["native"]["DD_EndNativeDraw"](_stream);
 
-                                      }, this, []);
-
+      }, this, []);
 };
 
 AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
@@ -5798,8 +5782,11 @@ AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
 
             var _graphics = new CDrawingStream();
 
-            for (var i = 1; i < 49; ++i)
-                this.createChartPreview(_graphics, chartType, i);
+            if(AscCommon.g_oChartPresets[chartType]){
+                var nStylesCount = AscCommon.g_oChartPresets[chartType].length;
+                for(var i = 0; i < nStylesCount; ++i)
+                    this.createChartPreview(_graphics, chartType, i);
+            }
 
             var _stream = global_memory_stream_menu;
             _stream["ClearNoAttack"]();
@@ -5886,8 +5873,7 @@ function NativeOpenFile3(_params, documentInfo)
                                       "format"        : "docx",
                                       "vkey"          : undefined,
                                       "url"           : window.documentInfo["docURL"],
-                                      "title"         : this.documentTitle,
-                                      "embeddedfonts" : false};
+                                      "title"         : this.documentTitle};
 
                                       _api.CoAuthoringApi.auth(window.documentInfo["viewmode"], rData);
                                       });
@@ -5975,7 +5961,6 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, v
             //this.WordControl.m_oDrawingDocument.CheckFontNeeds();
             AscCommon.pptx_content_loader.CheckImagesNeeds(this.WordControl.m_oLogicDocument);
 
-            //this.FontLoader.LoadEmbeddedFonts(this.DocumentUrl, this.WordControl.m_oLogicDocument.EmbeddedFonts);
             //this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
         }
         else

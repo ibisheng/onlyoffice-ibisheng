@@ -223,7 +223,7 @@ ParaRun.prototype.CopyContent = function(Selected)
     return [this.Copy(Selected)];
 };
 
-ParaRun.prototype.Get_AllDrawingObjects = function(DrawingObjs)
+ParaRun.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
     var Count = this.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
@@ -233,7 +233,7 @@ ParaRun.prototype.Get_AllDrawingObjects = function(DrawingObjs)
         if ( para_Drawing === Item.Type )
         {
             DrawingObjs.push(Item);
-            Item.Get_AllDrawingObjects(DrawingObjs);
+            Item.GetAllDrawingObjects(DrawingObjs);
         }
     }
 };
@@ -1967,43 +1967,43 @@ ParaRun.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Dep
     }
 };
 
-ParaRun.prototype.Collect_DocumentStatistics = function(ParaStats)
+ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        var Item = this.Content[Index];
-        var ItemType = Item.Type;
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Item     = this.Content[Index];
+		var ItemType = Item.Type;
 
-        var bSymbol  = false;
-        var bSpace   = false;
-        var bNewWord = false;
+		var bSymbol  = false;
+		var bSpace   = false;
+		var bNewWord = false;
 
-        if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
-        {
-            if ( false === ParaStats.Word )
-                bNewWord = true;
+		if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
+		{
+			if (false === ParaStats.Word)
+				bNewWord = true;
 
-            bSymbol = true;
-            bSpace  = false;
+			bSymbol = true;
+			bSpace  = false;
 
-            ParaStats.Word           = true;
-            ParaStats.EmptyParagraph = false;
-        }
-        else if ((para_Text === ItemType && true === Item.Is_NBSP()) || para_Space === ItemType || para_Tab === ItemType)
-        {
-            bSymbol = true;
-            bSpace  = true;
+			ParaStats.Word           = true;
+			ParaStats.EmptyParagraph = false;
+		}
+		else if ((para_Text === ItemType && true === Item.Is_NBSP()) || para_Space === ItemType || para_Tab === ItemType)
+		{
+			bSymbol = true;
+			bSpace  = true;
 
-            ParaStats.Word = false;
-        }
+			ParaStats.Word = false;
+		}
 
-        if ( true === bSymbol )
-            ParaStats.Stats.Add_Symbol( bSpace );
+		if (true === bSymbol)
+			ParaStats.Stats.Add_Symbol(bSpace);
 
-        if ( true === bNewWord )
-            ParaStats.Stats.Add_Word();
-    }
+		if (true === bNewWord)
+			ParaStats.Stats.Add_Word();
+	}
 };
 
 ParaRun.prototype.Create_FontMap = function(Map)
@@ -3739,7 +3739,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     if (true === PRSA.RecalcFast2)
                     {
                         // Тут мы должны сравнить положение картинок
-                        var oRecalcObj = Item.Save_RecalculateObject();
+                        var oRecalcObj = Item.SaveRecalculateObject();
                         Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[_CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
 
                         if (Math.abs(Item.X - oRecalcObj.X) > 0.001 || Math.abs(Item.Y - oRecalcObj.Y) > 0.001 || Item.PageNum !== oRecalcObj.PageNum)
@@ -3961,31 +3961,31 @@ ParaRun.prototype.Refresh_RecalcData = function(Data)
         Para.Refresh_RecalcData2(0);
     }
 };
-ParaRun.prototype.Save_RecalculateObject = function(Copy)
+ParaRun.prototype.SaveRecalculateObject = function(Copy)
 {
     var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
     RecalcObj.Save_Lines( this, Copy );
     RecalcObj.Save_RunContent( this, Copy );
     return RecalcObj;
 };
-ParaRun.prototype.Load_RecalculateObject = function(RecalcObj)
+ParaRun.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_Lines(this);
     RecalcObj.Load_RunContent(this);
 };
-ParaRun.prototype.Prepare_RecalculateObject = function()
+ParaRun.prototype.PrepareRecalculateObject = function()
 {
-    this.protected_ClearLines();
+	this.protected_ClearLines();
 
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        var Item = this.Content[Index];
-        var ItemType = Item.Type;
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Item     = this.Content[Index];
+		var ItemType = Item.Type;
 
-        if ( para_PageNum === ItemType || para_Drawing === ItemType )
-            Item.Prepare_RecalculateObject();
-    }
+		if (para_PageNum === ItemType || para_Drawing === ItemType)
+			Item.PrepareRecalculateObject();
+	}
 };
 ParaRun.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {
@@ -4088,7 +4088,7 @@ ParaRun.prototype.Check_BreakPageEnd = function(PBChecker)
     return true;
 };
 
-ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+ParaRun.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     this.Recalculate_MeasureContent();
 
@@ -5775,7 +5775,7 @@ ParaRun.prototype.IsSelectionUse = function()
     return this.State.Selection.Use;
 };
 
-ParaRun.prototype.Is_SelectedAll = function(Props)
+ParaRun.prototype.IsSelectedAll = function(Props)
 {
     var Selection = this.State.Selection;
     if ( false === Selection.Use && true !== this.Is_Empty( Props ) )
@@ -8509,7 +8509,7 @@ ParaRun.prototype.Get_RangesByPos = function(Pos)
 
     return Ranges;
 };
-ParaRun.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+ParaRun.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
     var Drawing1 = CompareObject.Drawing1;
     var Drawing2 = CompareObject.Drawing2;
@@ -8923,7 +8923,7 @@ ParaRun.prototype.Get_ClassesByPos = function(Classes, ContentPos, Depth)
 {
     Classes.push(this);
 };
-ParaRun.prototype.Get_DocumentPositionFromObject = function(PosArray)
+ParaRun.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -8946,7 +8946,7 @@ ParaRun.prototype.Get_DocumentPositionFromObject = function(PosArray)
             PosArray.splice(0, 0, {Class : this.Paragraph, Position : ParaContentPos.Get(0)});
         }
 
-        this.Paragraph.Get_DocumentPositionFromObject(PosArray);
+        this.Paragraph.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;
@@ -9129,6 +9129,20 @@ ParaRun.prototype.GetFootnoteRefsInRange = function(arrFootnotes, _CurLine, _Cur
 	{
 		if (para_FootnoteReference === this.Content[CurPos].Type)
 			arrFootnotes.push(this.Content[CurPos]);
+	}
+};
+ParaRun.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if (!arrContentControls)
+		return;
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Content[nIndex];
+		if (para_Drawing === oItem.Type || para_FootnoteReference === oItem.Type)
+		{
+			oItem.GetAllContentControls(arrContentControls);
+		}
 	}
 };
 

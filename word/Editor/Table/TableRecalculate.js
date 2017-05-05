@@ -65,7 +65,7 @@ CTable.prototype.Recalculate_SkipPage = function(PageIndex)
 {
 	if (0 === PageIndex)
 	{
-		this.Start_FromNewPage();
+		this.StartFromNewPage();
 	}
 	else
 	{
@@ -83,17 +83,17 @@ CTable.prototype.Recalculate_Grid = function()
 {
 	this.private_RecalculateGrid();
 };
-CTable.prototype.Save_RecalculateObject = function()
+CTable.prototype.SaveRecalculateObject = function()
 {
 	var RecalcObj = new CTableRecalculateObject();
 	RecalcObj.Save(this);
 	return RecalcObj;
 };
-CTable.prototype.Load_RecalculateObject = function(RecalcObj)
+CTable.prototype.LoadRecalculateObject = function(RecalcObj)
 {
 	RecalcObj.Load(this);
 };
-CTable.prototype.Prepare_RecalculateObject = function()
+CTable.prototype.PrepareRecalculateObject = function()
 {
 	this.TableSumGrid  = [];
 	this.TableGridCalc = [];
@@ -119,10 +119,10 @@ CTable.prototype.Prepare_RecalculateObject = function()
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)
 	{
-		this.Content[Index].Prepare_RecalculateObject();
+		this.Content[Index].PrepareRecalculateObject();
 	}
 };
-CTable.prototype.Start_FromNewPage = function()
+CTable.prototype.StartFromNewPage = function()
 {
 	this.Pages.length = 1;
 	this.Pages[0]     = new CTablePage(0, 0, 0, 0, 0, 0);
@@ -164,7 +164,7 @@ CTable.prototype.Start_FromNewPage = function()
 		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
 		{
 			var Cell = this.Content[0].Get_Cell(CurCell);
-			Cell.Content.Start_FromNewPage();
+			Cell.Content.StartFromNewPage();
 			Cell.PagesCount = 2;
 		}
 	}
@@ -455,7 +455,7 @@ CTable.prototype.private_RecalculateGrid = function()
             for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
             {
                 var Cell         = Row.Get_Cell( CurCell );
-                var CellMinMax   = Cell.Content_Recalculate_MinMaxContentWidth(false);
+                var CellMinMax   = Cell.Content_RecalculateMinMaxContentWidth(false);
                 var CellMin      = CellMinMax.Min;
                 var CellMax      = CellMinMax.Max;
                 var GridSpan     = Cell.Get_GridSpan();
@@ -1704,7 +1704,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             HeaderPage.Rows[Index].Index = Index;
             for(var CellIndex = 0; CellIndex < HeaderPage.Rows[Index].Content.length; ++CellIndex)
             {
-                HeaderPage.Rows[Index].Content[CellIndex].Content.Get_AllDrawingObjects(aContentDrawings);
+                HeaderPage.Rows[Index].Content[CellIndex].Content.GetAllDrawingObjects(aContentDrawings);
             }
         }
         for(var DrawingIndex = 0; DrawingIndex < aContentDrawings.length; ++DrawingIndex)
@@ -2345,7 +2345,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 if ( true === bCanShift )
                 {
                     Cell.Content.Shift( 0, ShiftDx, ShiftDy );
-                    Cell.Content.Update_EndInfo();
+                    Cell.Content.UpdateEndInfo();
                 }
                 else
                 {
@@ -2437,7 +2437,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
                     continue;
 
-                Cell.Content.Start_FromNewPage();
+                Cell.Content.StartFromNewPage();
                 Cell.PagesCount = 2;
             }
         }
@@ -2485,7 +2485,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     if ( vmerge_Continue === Vmerge || VMergeCount > 1 )
                         continue;
 
-                    Cell.Content.Start_FromNewPage();
+                    Cell.Content.StartFromNewPage();
                     Cell.PagesCount = 2;
                 }
 
@@ -3174,7 +3174,7 @@ CTableRecalculateObject.prototype.Save = function(Table)
     var Count = Table.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
     {
-        this.Content[Index] = Table.Content[Index].Save_RecalculateObject();
+        this.Content[Index] = Table.Content[Index].SaveRecalculateObject();
     }
 };
 CTableRecalculateObject.prototype.Load = function(Table)
@@ -3201,7 +3201,7 @@ CTableRecalculateObject.prototype.Load = function(Table)
     var Count = this.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
     {
-        Table.Content[Index].Load_RecalculateObject( this.Content[Index] );
+        Table.Content[Index].LoadRecalculateObject( this.Content[Index] );
     }
 };
 CTableRecalculateObject.prototype.Get_DrawingFlowPos = function(FlowPos)

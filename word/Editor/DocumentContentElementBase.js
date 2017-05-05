@@ -571,6 +571,64 @@ CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
 {
 	return null;
 };
+CDocumentContentElementBase.prototype.AddContentControl = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.RecalculateMinMaxContentWidth = function(isRotated)
+{
+	return {Min : 0, Max : 0};
+};
+CDocumentContentElementBase.prototype.Shift = function(CurPage, dX, dY)
+{
+};
+CDocumentContentElementBase.prototype.UpdateEndInfo = function()
+{
+};
+CDocumentContentElementBase.prototype.PrepareRecalculateObject = function()
+{
+};
+CDocumentContentElementBase.prototype.SaveRecalculateObject = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.LoadRecalculateObject = function(RecalcObj)
+{
+};
+CDocumentContentElementBase.prototype.Set_ApplyToAll = function(bValue)
+{
+};
+CDocumentContentElementBase.prototype.RecalculateAllTables = function()
+{
+};
+CDocumentContentElementBase.prototype.GetAllFloatElements = function(FloatObjects)
+{
+	if (!FloatObjects)
+		return [];
+
+	return FloatObjects;
+};
+CDocumentContentElementBase.prototype.Get_FirstParagraph = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.StartFromNewPage = function()
+{
+};
+CDocumentContentElementBase.prototype.CollectDocumentStatistics = function(Stats)
+{
+};
+CDocumentContentElementBase.prototype.CompareDrawingsLogicPositions = function(CompareObject)
+{
+	return 0;
+};
+CDocumentContentElementBase.prototype.GetStyleFromFormatting = function()
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.GetAllContentControls = function(arrContentControls)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
@@ -676,6 +734,15 @@ CDocumentContentElementBase.prototype.IsEmpty = function()
 CDocumentContentElementBase.prototype.AddToParagraph = function(oItem)
 {
 	return this.Add(oItem);
+};
+CDocumentContentElementBase.prototype.GetAllDrawingObjects = function(AllDrawingObjects)
+{
+};
+CDocumentContentElementBase.prototype.GetAllComments = function(AllComments)
+{
+};
+CDocumentContentElementBase.prototype.GetAllMaths = function(AllMaths)
+{
 };
 
 //--------------------------------------------------------export--------------------------------------------------------

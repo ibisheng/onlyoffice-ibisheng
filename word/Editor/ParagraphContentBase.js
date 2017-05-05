@@ -289,7 +289,7 @@ CParagraphContentWithParagraphLikeContent.prototype.CopyContent = function(Selec
     {
         var Item = this.Content[CurPos];
 
-        if ((StartPos === CurPos || EndPos === CurPos) && true !== Item.Is_SelectedAll())
+        if ((StartPos === CurPos || EndPos === CurPos) && true !== Item.IsSelectedAll())
         {
             var Content = Item.CopyContent(Selected);
             for (var ContentPos = 0, ContentLen = Content.length; ContentPos < ContentLen; ContentPos++)
@@ -332,15 +332,15 @@ CParagraphContentWithParagraphLikeContent.prototype.Recalc_RunsCompiledPr = func
             Item.Recalc_RunsCompiledPr();
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_AllDrawingObjects = function(DrawingObjs)
+CParagraphContentWithParagraphLikeContent.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
     var Count = this.Content.length;
     for (var Index = 0; Index < Count; Index++)
     {
         var Item = this.Content[Index];
 
-        if (Item.Get_AllDrawingObjects)
-            Item.Get_AllDrawingObjects(DrawingObjs);
+        if (Item.GetAllDrawingObjects)
+            Item.GetAllDrawingObjects(DrawingObjs);
     }
 };
 CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph = function(Paragraph)
@@ -1005,11 +1005,11 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_PrevRunElements = functi
         CurPos--;
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Collect_DocumentStatistics = function(ParaStats)
+CParagraphContentWithParagraphLikeContent.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
-        this.Content[Index].Collect_DocumentStatistics( ParaStats );
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+		this.Content[Index].CollectDocumentStatistics(ParaStats);
 };
 CParagraphContentWithParagraphLikeContent.prototype.Create_FontMap = function(Map)
 {
@@ -1315,27 +1315,27 @@ CParagraphContentWithParagraphLikeContent.prototype.Recalculate_PageEndInfo = fu
         this.Content[CurPos].Recalculate_PageEndInfo( PRSI, _CurLine, _CurRange );
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Save_RecalculateObject = function(Copy)
+CParagraphContentWithParagraphLikeContent.prototype.SaveRecalculateObject = function(Copy)
 {
-    var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
-    RecalcObj.Save_Lines( this, Copy );
-    RecalcObj.Save_Content( this, Copy );
-    return RecalcObj;
+	var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+	RecalcObj.Save_Lines(this, Copy);
+	RecalcObj.Save_Content(this, Copy);
+	return RecalcObj;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Load_RecalculateObject = function(RecalcObj)
+CParagraphContentWithParagraphLikeContent.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_Lines( this );
     RecalcObj.Load_Content( this );
 };
-CParagraphContentWithParagraphLikeContent.prototype.Prepare_RecalculateObject = function()
+CParagraphContentWithParagraphLikeContent.prototype.PrepareRecalculateObject = function()
 {
-    this.protected_ClearLines();
+	this.protected_ClearLines();
 
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        this.Content[Index].Prepare_RecalculateObject();
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		this.Content[Index].PrepareRecalculateObject();
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {
@@ -1431,13 +1431,13 @@ CParagraphContentWithParagraphLikeContent.prototype.Refresh_RecalcData = functio
     if (undefined !== this.Paragraph && null !== this.Paragraph)
         this.Paragraph.Refresh_RecalcData2(0);
 };
-CParagraphContentWithParagraphLikeContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+CParagraphContentWithParagraphLikeContent.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
-    var Count = this.Content.length;
-    for ( var Pos = 0; Pos < Count; Pos++ )
-    {
-        this.Content[Pos].Recalculate_MinMaxContentWidth(MinMax);
-    }
+	var Count = this.Content.length;
+	for (var Pos = 0; Pos < Count; Pos++)
+	{
+		this.Content[Pos].RecalculateMinMaxContentWidth(MinMax);
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
 {
@@ -2237,7 +2237,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_CheckParaContentPo
 
     return false;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Is_SelectedAll = function(Props)
+CParagraphContentWithParagraphLikeContent.prototype.IsSelectedAll = function(Props)
 {
     var Selection = this.State.Selection;
 
@@ -2255,14 +2255,14 @@ CParagraphContentWithParagraphLikeContent.prototype.Is_SelectedAll = function(Pr
 
     for ( var Pos = 0; Pos <= StartPos; Pos++ )
     {
-        if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
+        if ( false === this.Content[Pos].IsSelectedAll( Props ) )
             return false;
     }
 
     var Count = this.Content.length;
     for ( var Pos = EndPos; Pos < Count; Pos++ )
     {
-        if ( false === this.Content[Pos].Is_SelectedAll( Props ) )
+        if ( false === this.Content[Pos].IsSelectedAll( Props ) )
             return false;
     }
 
@@ -2676,6 +2676,19 @@ CParagraphContentWithParagraphLikeContent.prototype.GetFootnoteRefsInRange = fun
 		if (this.Content[CurPos].GetFootnoteRefsInRange)
 			this.Content[CurPos].GetFootnoteRefsInRange(arrFootnotes, _CurLine, _CurRange);
 	}
+};
+CParagraphContentWithParagraphLikeContent.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if (!arrContentControls)
+		arrContentControls = [];
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex].GetAllContentControls)
+			this.Content[nIndex].GetAllContentControls(arrContentControls);
+	}
+
+	return arrContentControls;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках

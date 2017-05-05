@@ -335,7 +335,6 @@
         MediaItem: 1,
         MediaId: 2,
         MediaSrc: 3,
-        EmbeddedFonts: 4,
         Theme: 5
     };
     /** @enum */
@@ -7068,62 +7067,6 @@
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadMediaContent(t,l);
                 });
-            }
-            else if ( c_oSer_OtherType.EmbeddedFonts === type )
-            {
-                var _count = this.stream.GetULongLE();
-                var _embedded_fonts = [];
-                for (var i = 0; i < _count; i++)
-                {
-                    var _at = this.stream.GetUChar();
-                    if (_at != AscCommon.g_nodeAttributeStart)
-                        break;
-
-                    var _f_i = {};
-
-                    while (true)
-                    {
-                        _at = this.stream.GetUChar();
-                        if (_at == AscCommon.g_nodeAttributeEnd)
-                            break;
-
-                        switch (_at)
-                        {
-                            case 0:
-                            {
-                                _f_i.Name = this.stream.GetString();
-                                break;
-                            }
-                            case 1:
-                            {
-                                _f_i.Style = this.stream.GetULongLE();
-                                break;
-                            }
-                            case 2:
-                            {
-                                _f_i.IsCut = this.stream.GetBool();
-                                break;
-                            }
-                            case 3:
-                            {
-                                _f_i.IndexCut = this.stream.GetULongLE();
-                                break;
-                            }
-                            default:
-                                break;
-                        }
-                    }
-
-                    _embedded_fonts.push(_f_i);
-                }
-                var api = this.wb.oApi;
-                if(true == api.isUseEmbeddedCutFonts)
-                {
-                    var font_cuts = api.FontLoader.embedded_cut_manager;
-                    font_cuts.Url = AscCommon.g_oDocumentUrls.getUrl('fonts/fonts.js');
-                    font_cuts.init_cut_fonts(_embedded_fonts);
-                    font_cuts.bIsCutFontsUse = true;
-                }
             }
             else if ( c_oSer_OtherType.Theme === type )
             {

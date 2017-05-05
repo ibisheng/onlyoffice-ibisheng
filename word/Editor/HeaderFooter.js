@@ -122,7 +122,7 @@ CHeaderFooter.prototype =
             if ( undefined !== RecalcObj )
             {
                 this.RecalcInfo.CurPage = Page_abs;
-                this.Content.Load_RecalculateObject( RecalcObj );                
+                this.Content.LoadRecalculateObject( RecalcObj );
             }            
         }        
     },
@@ -164,7 +164,7 @@ CHeaderFooter.prototype =
         
         // Пересчитаем заново данный колонтитул        
         this.Content.Set_StartPage( Page_abs );
-        this.Content.Prepare_RecalculateObject();
+        this.Content.PrepareRecalculateObject();
 
 		this.Clear_PageCountElements();
 
@@ -173,7 +173,7 @@ CHeaderFooter.prototype =
         while ( recalcresult2_End != RecalcResult  )
             RecalcResult = this.Content.Recalculate_Page( CurPage++, true );
         
-        this.RecalcInfo.RecalcObj[Page_abs]   = this.Content.Save_RecalculateObject();
+        this.RecalcInfo.RecalcObj[Page_abs]   = this.Content.SaveRecalculateObject();
         this.RecalcInfo.PageNumInfo[Page_abs] = this.LogicDocument.Get_SectionPageNumInfo(Page_abs);
         this.RecalcInfo.SectPr[Page_abs]      = SectPr;
 		this.RecalcInfo.NeedRecalc[Page_abs]  = false;
@@ -192,7 +192,7 @@ CHeaderFooter.prototype =
         if ( false === bChanges )
         {
             var NewFlowPos = [];
-            var AllDrawingObjects = this.Content.Get_AllDrawingObjects();
+            var AllDrawingObjects = this.Content.GetAllDrawingObjects();
             var Count = AllDrawingObjects.length;
 
             for ( var Index = 0; Index < Count; Index++ )
@@ -254,7 +254,7 @@ CHeaderFooter.prototype =
         else            
         {
             var RecalcObj = this.RecalcInfo.RecalcObj[this.RecalcInfo.CurPage];
-            this.Content.Load_RecalculateObject( RecalcObj );
+            this.Content.LoadRecalculateObject( RecalcObj );
         }
 
         return bChanges;
@@ -263,7 +263,7 @@ CHeaderFooter.prototype =
     Recalculate2 : function(Page_abs)
     {
         this.Content.Set_StartPage( Page_abs );
-        this.Content.Prepare_RecalculateObject();
+        this.Content.PrepareRecalculateObject();
 
         var CurPage = 0;
         var RecalcResult = recalcresult2_NextPage;
@@ -916,10 +916,10 @@ CHeaderFooter.prototype =
         return this.Content.GetAllParagraphs(Props, ParaArray);
     },
 
-    Get_AllDrawingObjects  : function(arrDrawings)
-    {
-        return this.Content.Get_AllDrawingObjects(arrDrawings);
-    },
+	GetAllDrawingObjects : function(arrDrawings)
+	{
+		return this.Content.GetAllDrawingObjects(arrDrawings);
+	},
 
     Get_PrevElementEndInfo : function(CurElement)
     {
@@ -1270,6 +1270,10 @@ CHeaderFooter.prototype.ForceRecalculate = function(nPageAbs)
 {
 	this.RecalcInfo.NeedRecalc[nPageAbs] = true;
 };
+CHeaderFooter.prototype.GetAllContentControls = function(arrContentControls)
+{
+	return this.Content.GetAllContentControls(arrContentControls);
+};
 
 //-----------------------------------------------------------------------------------
 // Класс для работы с колонтитулами
@@ -1502,8 +1506,8 @@ CHeaderFooterController.prototype =
                if ( -1 === Header.RecalcInfo.CurPage )
                     Header.Set_Page(PageIndex);
             }
-            HeaderDrawings = Header.Content.Get_AllDrawingObjects([]);
-            HeaderTables = Header.Content.Get_AllFloatElements();
+            HeaderDrawings = Header.Content.GetAllDrawingObjects([]);
+            HeaderTables = Header.Content.GetAllFloatElements();
         }
         
         var bRecalcFooter = false;
@@ -1533,8 +1537,8 @@ CHeaderFooterController.prototype =
                 if ( -1 === Footer.RecalcInfo.CurPage )
                     Footer.Set_Page(PageIndex);
             }
-            FooterDrawings = Footer.Content.Get_AllDrawingObjects([]);
-            FooterTables = Footer.Content.Get_AllFloatElements();
+            FooterDrawings = Footer.Content.GetAllDrawingObjects([]);
+            FooterTables = Footer.Content.GetAllFloatElements();
         }
 
         // Подправляем позиции автофигур с учетом возможно изменившихся границ колонтитулов. Делаем это для всех автофигур,
@@ -2507,10 +2511,10 @@ CHeaderFooterController.prototype =
 		return {X : 0, Y : 0, Page : 0};
 	}
 };
-CHeaderFooterController.prototype.Get_StyleFromFormatting = function()
+CHeaderFooterController.prototype.GetStyleFromFormatting = function()
 {
     if (null != this.CurHdrFtr)
-        return this.CurHdrFtr.Content.Get_StyleFromFormatting();
+        return this.CurHdrFtr.Content.GetStyleFromFormatting();
 
     return null;
 };

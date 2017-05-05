@@ -1444,7 +1444,7 @@ CAbstractNum.prototype =
         }
     },
 
-    DocumentStatistics : function(Lvl, Stats)
+	CollectDocumentStatistics : function(Lvl, Stats)
     {
         var Text = this.Lvl[Lvl].LvlText;
 

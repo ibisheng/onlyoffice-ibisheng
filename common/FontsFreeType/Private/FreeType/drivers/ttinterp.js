@@ -1175,7 +1175,7 @@ function Ins_SxVTL(exc, aIdx1, aIdx2, aOpc, Vec)
     if ((aIdx1 >= exc.zp2.n_points) || (aIdx2 >= exc.zp1.n_points))
     {
         if (exc.pedantic_hinting)
-            exc.error = FT_Err_Invalid_Reference;
+            exc.error = FT_Common.FT_Err_Invalid_Reference;
         return 1;
     }
 

@@ -620,7 +620,7 @@ CTextBody.prototype =
 
     recalculateByMaxWord: function()
     {
-        var max_content = this.content.Recalculate_MinMaxContentWidth().Max;
+        var max_content = this.content.RecalculateMinMaxContentWidth().Max;
         this.content.Set_ApplyToAll(true);
         this.content.SetParagraphAlign(AscCommon.align_Center);
         this.content.Set_ApplyToAll(false);

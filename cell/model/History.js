@@ -485,7 +485,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	if (oRedoObjectParam.bIsOn)
 		this.TurnOn();
 		
-	if(!AscCommonExcel.g_clipboardExcel.pasteStart)
+	if(!window['AscCommon'].g_clipboardBase.pasteStart)
 	{
 		this.workbook.handlers.trigger("hideSpecialPasteOptions");
 	}
@@ -742,7 +742,7 @@ CHistory.prototype._sendCanUndoRedo = function()
 	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
 	//скрываю кнопку специальной вставки при каждом действии/undoredo
 	//при выполнении специальной вставки и при сохранении(-1 !== this.Index) не скрываю кнопку 
-	if(!AscCommonExcel.g_clipboardExcel.pasteStart && -1 !== this.Index && !(this.workbook.bUndoChanges || this.workbook.bRedoChanges))
+	if(!window['AscCommon'].g_clipboardBase.pasteStart && -1 !== this.Index && !(this.workbook.bUndoChanges || this.workbook.bRedoChanges))
 	{
 		this.workbook.handlers.trigger("hideSpecialPasteOptions");
 	}

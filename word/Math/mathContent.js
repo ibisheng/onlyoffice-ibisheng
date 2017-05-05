@@ -1616,19 +1616,19 @@ CMathContent.prototype.GetArgSize = function()
 /////////   Перемещение     ////////////
 
 // Поиск позиции, селект
-CMathContent.prototype.Is_SelectedAll = function(Props)
+CMathContent.prototype.IsSelectedAll = function(Props)
 {
     var bFirst = false, bEnd = false;
 
     if(this.Selection.StartPos == 0 && this.Selection.EndPos == this.Content.length - 1)
     {
         if(this.Content[this.Selection.StartPos].Type == para_Math_Run)
-            bFirst = this.Content[this.Selection.StartPos].Is_SelectedAll(Props);
+            bFirst = this.Content[this.Selection.StartPos].IsSelectedAll(Props);
         else
             bFirst = true;
 
         if(this.Content[this.Selection.EndPos].Type == para_Math_Run)
-            bEnd = this.Content[this.Selection.EndPos].Is_SelectedAll(Props);
+            bEnd = this.Content[this.Selection.EndPos].IsSelectedAll(Props);
         else
             bEnd = true;
     }
@@ -4677,7 +4677,7 @@ CMathContent.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRa
 
     this.Bounds.SetWidth(CurLine, CurRange, PRSC.Range.W - RangeW);
 };
-CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+CMathContent.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     if(this.RecalcInfo.bEqArray)
         this.InfoPoints.SetDefault();
@@ -4697,7 +4697,7 @@ CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
             if(Type == para_Math_Run)
                 Item.Math_RecalculateContent();
             else
-                Item.Recalculate_MinMaxContentWidth(MinMax);
+                Item.RecalculateMinMaxContentWidth(MinMax);
 
             if(this.RecalcInfo.bEqArray && Type == para_Math_Composition)
                 this.InfoPoints.ContentPoints.UpdatePoint(this.Content[Pos].size.width);
@@ -4715,7 +4715,7 @@ CMathContent.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
         }
         else
         {
-            Item.Recalculate_MinMaxContentWidth(MinMax);
+            Item.RecalculateMinMaxContentWidth(MinMax);
         }
     }
 
@@ -6317,11 +6317,11 @@ AutoCorrectionControl.prototype.FindFunction = function(CanMakeAutoCorrect)
                         oLeftCommandType = MATH_RADICAL;
                         break;
                     case 0x221B:
-                        TempElements2.splice(0, 0, {Text : '3'});
+                        //TempElements2.splice(0, 0, {Text : '3'});
                         oLeftCommandType = MATH_RADICAL;
                         break;
                     case 0x221C:
-                        TempElements2.splice(0, 0, {Text : '4'});
+                        //TempElements2.splice(0, 0, {Text : '4'});
                         oLeftCommandType = MATH_RADICAL;
                         break;
                     case 0x23E0:
@@ -7239,6 +7239,502 @@ CMathContent.prototype.ReplaceAutoCorrect = function(AutoCorrectEngine, bCursorS
     }
 };
 
+CMathContent.prototype.GetTextContent = function()
+{
+	//TODO временная функция. пересмотреть!
+	var arr = [], str = "", bIsContainsOperator = false;
+
+	var addText = function(value, bIsAddParenthesis)
+	{
+		if(bIsAddParenthesis && value.length > 1 && value.match())
+		{
+			arr.push("(");
+			str += "(";
+		}
+
+		arr.push(value);
+		str += value;
+
+		if(bIsAddParenthesis && value.length > 1)
+		{
+			arr.push(")");
+			str += ")";
+		}
+	};
+
+	var getMathSymbol = function(elem)
+	{
+		var res = [];
+
+		var getVal = function(val, position)
+		{
+			var newVal = {};
+			newVal.prePosition = !!position;
+			newVal.value = undefined !== val ? val : "";
+			return newVal;
+		};
+
+		if(elem instanceof CDegree)
+		{
+			if(DEGREE_SUPERSCRIPT === elem.Pr.type)
+			{
+				//res.push(getVal("^"));
+				res.push(getVal(String.fromCharCode(94)));
+			}
+			else
+			{
+				//res.push(getVal("_"));
+				res.push(getVal(String.fromCharCode(95)));
+			}
+		}
+		else if(elem instanceof CDelimiter)
+		{
+			res.push(getVal("(", true));
+			res.push(getVal(")"));
+		}
+		else if(elem instanceof CNary)
+		{
+			res.push(getVal(String.fromCharCode(elem.Pr.chr), true));
+			if(!elem.Pr.supHide)
+			{
+				res.push(getVal(String.fromCharCode(95), true))
+				//res.push(getVal("_", true));
+			}
+			else
+			{
+				res.push(null);
+			}
+			if(!elem.Pr.subHide)
+			{
+				res.push(getVal(String.fromCharCode(94), true));
+				//res.push(getVal("^", true));//94
+			}
+			else
+			{
+				res.push(null);
+			}
+			res.push(getVal(String.fromCharCode(9618), true));
+			//res.push(getVal("▒", true));//9618
+		}
+		else if(elem instanceof CFraction)
+		{
+			res.push(getVal("/"));
+		}
+		else if(elem instanceof CRadical)
+		{
+			//res.push(getVal("√", true));
+			res.push(getVal(String.fromCharCode(8730), true));
+			//res.push(getVal("&", true));
+			res.push(getVal(String.fromCharCode(38), true));
+		}
+		else if(elem instanceof CMathMatrix)
+		{
+			//res[-1] = getVal("■", true);//9632
+			res[-1] = getVal(String.fromCharCode(9632), true);
+
+			for(var row = 0; row < elem.nRow; row++)
+			{
+				for(var col = 1; col < elem.nCol; col++)
+				{
+					res.push(getVal(String.fromCharCode(38)));
+					//res.push(getVal("&"));
+				}
+				if(row !== elem.nRow - 1)
+				{
+					res.push(getVal(String.fromCharCode(64)));
+					//res.push(getVal("@"));
+				}
+			}
+		}
+		else if(elem instanceof CMathFunc)
+		{
+			//res.push(getVal("#"));//8289
+			res.push(getVal(String.fromCharCode(8289)));
+		}
+
+		return res;
+	};
+
+	var parseMathComposition = function(elem)
+	{
+		var tempStr;
+		var symbol = getMathSymbol(elem);
+
+		if(elem instanceof CDegree)//степень
+		{
+			//основание
+			tempStr = elem.Content[0].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+
+			addText(symbol[0].value);
+
+			//показатель
+			tempStr = elem.Content[1].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+		}
+		else if(elem instanceof CDelimiter)
+		{
+			tempStr = elem.Content[0].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+		}
+		else if(elem instanceof CNary)//сумма
+		{
+			addText(symbol[0].value);
+
+			//нижняя граница суммирования
+			if(null !== symbol[1])
+			{
+				addText(symbol[1].value);
+
+				tempStr = elem.Content[0].GetTextContent();
+				if(tempStr.str)
+				{
+					addText(tempStr.str, tempStr.bIsContainsOperator);
+				}
+			}
+
+			//верхняя граница суммирования
+			if(null !== symbol[2])
+			{
+				addText(symbol[2].value);
+
+				tempStr = elem.Content[1].GetTextContent();
+				if(tempStr.str)
+				{
+					addText(tempStr.str, tempStr.bIsContainsOperator);
+				}
+			}
+
+			addText(symbol[3].value);
+
+			tempStr = elem.Content[2].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+		}
+		else if(elem instanceof CFraction)//дробь
+		{
+			//числитель
+			tempStr = elem.Content[0].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+
+			addText(symbol[0].value);
+
+			//знаменатель
+			tempStr = elem.Content[1].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+		}
+		else if(elem instanceof CRadical)//корень
+		{
+			addText(symbol[0].value);
+			//степень корня
+			tempStr = elem.Content[0].GetTextContent();
+			var isAddExp = false;
+			if(tempStr.str)
+			{
+				addText("(");
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+				isAddExp = true;
+			}
+
+			if(tempStr.str)
+			{
+				addText(symbol[1].value);
+			}
+
+			//подкоренное выражение
+			tempStr = elem.Content[1].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+
+			if(isAddExp)
+			{
+				addText(")");
+			}
+		}
+		else if(elem instanceof CMathMatrix)
+		{
+			addText(symbol[-1].value);
+			addText("(");
+			for(var j = 0; j < elem.Content.length; j++)
+			{
+				if(para_Math_Content === elem.Content[j].Type)
+				{
+					if(symbol[j] && symbol[j].prePosition)
+					{
+						addText(symbol[j].value);
+					}
+
+					tempStr = elem.Content[j].GetTextContent();
+
+					if(tempStr.str)
+					{
+						addText(tempStr.str, tempStr.bIsContainsOperator);
+					}
+
+
+					if(symbol[j] && !symbol[j].prePosition)
+					{
+						addText(symbol[j].value);
+					}
+				}
+			}
+			addText(")");
+		}
+		else if(elem instanceof CMathFunc)
+		{
+			//функция
+			tempStr = elem.Content[0].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str);
+			}
+
+			addText(symbol[0].value);
+
+			//аргумент
+			tempStr = elem.Content[1].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+		}
+		else if(elem instanceof CLimit)
+		{
+			//функция
+			tempStr = elem.Content[0].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str);
+			}
+
+			//аргумент
+			tempStr = elem.Content[1].GetTextContent();
+			if(tempStr.str)
+			{
+				addText(tempStr.str, tempStr.bIsContainsOperator);
+			}
+		}
+
+	};
+
+
+	for(var i = 0; i < this.Content.length; i++)
+	{
+		switch(this.Content[i].Type)
+		{
+			case para_Math_Run:
+			{
+				if(this.Content[i].Content.length)
+				{
+					var string = "";
+					for(var j = 0; j < this.Content[i].Content.length; j++)
+					{
+						if(para_Math_Text === this.Content[i].Content[j].Type)
+						{
+							string += String.fromCharCode(this.Content[i].Content[j].value);
+						}
+						else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
+						{
+							string += String.fromCharCode(this.Content[i].Content[j].value);
+							bIsContainsOperator = true;
+						}
+					}
+					addText(string);
+				}
+				break;
+			}
+			case para_Math_Composition:
+			{
+				parseMathComposition(this.Content[i]);
+				break;
+			}
+		}
+	}
+
+	return {str: str, bIsContainsOperator: bIsContainsOperator};
+};
+
+CMathContent.prototype.GetTextContent3 = function(arr, str)
+{
+	if(!arr)
+	{
+		arr = [];
+	}
+
+	if(!str)
+	{
+		str = "";
+	}
+
+	var addText = function(value)
+	{
+		arr.push(value);
+		str += value;
+	};
+
+	var getMathSymbol = function(elem)
+	{
+		var res = [];
+
+		var getVal = function(val, position)
+		{
+			var newVal = {};
+			newVal.prePosition = !!position;
+			newVal.value = undefined !== val ? val : "";
+			return newVal;
+		};
+
+		if(elem instanceof CDegree)
+		{
+
+			if(DEGREE_SUPERSCRIPT === elem.Pr.type)
+			{
+				res.push(getVal("^"));
+			}
+			else
+			{
+				res.push(getVal("_"));
+			}
+		}
+		else if(elem instanceof CDelimiter)
+		{
+			res[-1] = getVal("(", true);
+			res.push(getVal(")"));
+		}
+		else if(elem instanceof CNary)
+		{
+			res[-1] = getVal(String.fromCharCode(elem.Pr.chr), true);
+			if(!elem.Pr.supHide)
+			{
+				res.push(getVal("_", true));
+			}
+			if(!elem.Pr.subHide)
+			{
+				res.push(getVal("^", true));
+			}
+			res.push(getVal("▒", true));
+		}
+		else if(elem instanceof CFraction)
+		{
+			res.push(getVal("/"));
+		}
+		else if(elem instanceof CRadical)
+		{
+			res.push(getVal("√", true));//8730;
+			//res.push(getVal("&", true));
+		}
+		else if(elem instanceof CMathMatrix)
+		{
+			res[-1] =  getVal("■", true);
+			for(var row = 0; row < elem.nRow; row++)
+			{
+				for(var col = 1; col < elem.nCol; col++)
+				{
+					res.push(getVal("&"));
+				}
+				if(row !== elem.nRow - 1)
+				{
+					res.push(getVal("@"));
+				}
+			}
+		}
+
+		return res;
+	};
+
+	for(var i = 0; i < this.Content.length; i++)
+	{
+		switch(this.Content[i].Type)
+		{
+			case para_Math_Run:
+			{
+				if(this.Content[i].Content.length)
+				{
+					var string = "";
+					var isBreakOperator = false;
+					var isMathText = false;
+					for(var j = 0; j < this.Content[i].Content.length; j++)
+					{
+						if(para_Math_Text === this.Content[i].Content[j].Type)
+						{
+							//addText(String.fromCharCode(this.Content[i].Content[j].value));
+							string += String.fromCharCode(this.Content[i].Content[j].value);
+							isMathText = true;
+						}
+						else if(para_Math_BreakOperator === this.Content[i].Content[j].Type)
+						{
+							//addText(String.fromCharCode(this.Content[i].Content[j].value));
+							string += String.fromCharCode(this.Content[i].Content[j].value);
+							isBreakOperator = true;
+						}
+					}
+					if(string)
+					{
+						if(isBreakOperator && isMathText)
+						{
+							addText("(");
+						}
+						addText(string);
+						if(isBreakOperator && isMathText)
+						{
+							addText(")");
+						}
+					}
+				}
+				break;
+			}
+			case para_Math_Composition:
+			{
+				var symbol = getMathSymbol(this.Content[i]);
+
+				for(var j = 0; j < this.Content[i].Content.length; j++)
+				{
+					if(para_Math_Content === this.Content[i].Content[j].Type)
+					{
+						if(j === 0 && symbol[-1] && symbol[-1].prePosition)
+						{
+							addText(symbol[-1].value);
+						}
+						if(symbol[j] && symbol[j].prePosition)
+						{
+							addText(symbol[j].value);
+						}
+
+						str = this.Content[i].Content[j].GetTextContent(arr, str);
+
+
+						if(symbol[j] && !symbol[j].prePosition)
+						{
+							addText(symbol[j].value);
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	return str;
+};
 
 function CMathBracketAcc()
 {

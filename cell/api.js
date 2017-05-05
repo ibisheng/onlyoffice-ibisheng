@@ -403,6 +403,12 @@ var editor;
     }
   };
 
+  spreadsheet_api.prototype.asc_ShowSpecialPasteButton = function(props) {
+      if (!this.getViewMode()) {
+          this.wb.showSpecialPasteButton(props);
+      }
+  };
+
   spreadsheet_api.prototype.asc_Cut = function() {
     if (window["AscDesktopEditor"])
     {
@@ -540,11 +546,6 @@ var editor;
 	return this.wb.getTablePictures(props); 
   };
 
-  spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
-    this.isMobileVersion = isMobile;
-    AscCommon.AscBrowser.isMobileVersion = isMobile;
-  };
-
   spreadsheet_api.prototype.getViewMode = function() {
     return this.isViewMode;
   };
@@ -560,15 +561,6 @@ var editor;
     }
 
     if (false === isViewMode) {
-      // Загружаем не обрезанные шрифты для полной версии (при редактировании)
-      if (this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
-        this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-        this.asyncMethodCallback = undefined;
-        this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
-      }
-
-      this.isUseEmbeddedCutFonts = false;
-
       // Отправка стилей
       this._sendWorkbookStyles();
       if (this.IsSendDocumentLoadCompleate && this.collaborativeEditing) {
@@ -578,10 +570,6 @@ var editor;
         this.collaborativeEditing.sendChanges();
       }
     }
-  };
-
-  spreadsheet_api.prototype.asc_setUseEmbeddedCutFonts = function(bUse) {
-    this.isUseEmbeddedCutFonts = bUse;
   };
 
   /*
@@ -601,8 +589,8 @@ var editor;
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
-            "embeddedfonts": this.isUseEmbeddedCutFonts,
             "delimiter": option.asc_getDelimiter(),
+            "delimiterChar": option.asc_getDelimiterChar(),
             "codepage": option.asc_getCodePage()};
 
           sendCommand(this, null, v);
@@ -622,7 +610,6 @@ var editor;
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
-            "embeddedfonts": this.isUseEmbeddedCutFonts,
             "password": option.asc_getPassword()
           };
 
@@ -646,8 +633,9 @@ var editor;
     var t = this;
     // Проверяем, возможно нам пришли опции для CSV
     if (this.documentOpenOptions && !opt_isPassword) {
-      var codePageCsv = AscCommon.c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || AscCommon.c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"];
-      if (null != codePageCsv && null != delimiterCsv) {
+      var codePageCsv = AscCommon.c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || AscCommon.c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"],
+		  delimiterCharCsv = this.documentOpenOptions["delimiterChar"];
+      if (null != codePageCsv && (null != delimiterCsv || null != delimiterCharCsv)) {
         this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
         return;
       }
@@ -772,6 +760,7 @@ var editor;
         if (options.CSVOptions instanceof asc.asc_CCSVAdvancedOptions) {
           oAdditionalData["codepage"] = options.CSVOptions.asc_getCodePage();
           oAdditionalData["delimiter"] = options.CSVOptions.asc_getDelimiter();
+          oAdditionalData["delimiterChar"] = options.CSVOptions.asc_getDelimiterChar();
         }
       }
       dataContainer.data = oBinaryFileWriter.Write();
@@ -3426,10 +3415,6 @@ var editor;
 	spreadsheet_api.prototype._onEndLoadSdk = function () {
 		History = AscCommon.History;
 
-		if (this.isMobileVersion) {
-			this.asc_setMobileVersion(true);
-		}
-
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
 		this.controller = new AscCommonExcel.asc_CEventsController();
@@ -3487,9 +3472,7 @@ var editor;
 
   prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 
-  prot["asc_setMobileVersion"] = prot.asc_setMobileVersion;
   prot["asc_setViewMode"] = prot.asc_setViewMode;
-  prot["asc_setUseEmbeddedCutFonts"] = prot.asc_setUseEmbeddedCutFonts;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;
