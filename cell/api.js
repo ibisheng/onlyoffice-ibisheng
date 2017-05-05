@@ -546,11 +546,6 @@ var editor;
 	return this.wb.getTablePictures(props); 
   };
 
-  spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
-    this.isMobileVersion = isMobile;
-    AscCommon.AscBrowser.isMobileVersion = isMobile;
-  };
-
   spreadsheet_api.prototype.getViewMode = function() {
     return this.isViewMode;
   };
@@ -3325,10 +3320,6 @@ var editor;
 	spreadsheet_api.prototype._onEndLoadSdk = function () {
 		History = AscCommon.History;
 
-		if (this.isMobileVersion) {
-			this.asc_setMobileVersion(true);
-		}
-
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
 		this.controller = new AscCommonExcel.asc_CEventsController();
@@ -3386,7 +3377,6 @@ var editor;
 
   prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 
-  prot["asc_setMobileVersion"] = prot.asc_setMobileVersion;
   prot["asc_setViewMode"] = prot.asc_setViewMode;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;

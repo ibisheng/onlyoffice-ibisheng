@@ -5073,18 +5073,6 @@ background-repeat: no-repeat;\
 		}
 	};
 
-	asc_docs_api.prototype.SetMobileVersion = function(val)
-	{
-		this.isMobileVersion = val;
-		if (/*this.isMobileVersion*/false)
-		{
-			this.WordControl.bIsRetinaSupport         = false; // ipad имеет проблемы с большими картинками
-			this.WordControl.bIsRetinaNoSupportAttack = true;
-			this.WordControl.m_bIsRuler               = false;
-			this.ShowParaMarks                        = false;
-		}
-	};
-
 	asc_docs_api.prototype.GoToHeader = function(pageNumber)
 	{
 		if (this.WordControl.m_oDrawingDocument.IsFreezePage(pageNumber))
@@ -6190,9 +6178,6 @@ background-repeat: no-repeat;\
 			}
 		}
 
-		if (this.isMobileVersion)
-			this.SetMobileVersion(true);
-
 		this.asc_setViewMode(this.isViewMode);
 
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
@@ -6941,7 +6926,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_SetViewRulersChange']             = asc_docs_api.prototype.asc_SetViewRulersChange;
 	asc_docs_api.prototype['asc_GetViewRulers']                   = asc_docs_api.prototype.asc_GetViewRulers;
 	asc_docs_api.prototype['asc_SetDocumentUnits']                = asc_docs_api.prototype.asc_SetDocumentUnits;
-	asc_docs_api.prototype['SetMobileVersion']                    = asc_docs_api.prototype.SetMobileVersion;
 	asc_docs_api.prototype['GoToHeader']                          = asc_docs_api.prototype.GoToHeader;
 	asc_docs_api.prototype['changeSlideSize']                     = asc_docs_api.prototype.changeSlideSize;
 	asc_docs_api.prototype['AddSlide']                            = asc_docs_api.prototype.AddSlide;
