@@ -1682,16 +1682,6 @@ CT_PivotCacheDefinition.prototype.toXml = function(writer) {
 CT_PivotCacheDefinition.prototype.getField = function (index) {
 	return this.cacheFields && this.cacheFields.cacheField && this.cacheFields.cacheField[index];
 };
-CT_PivotCacheDefinition.prototype.getFields = function () {
-	var res = null;
-	if (this.cacheFields && this.cacheFields.cacheField) {
-		res = [];
-		this.cacheFields.cacheField.forEach(function (element) {
-			res.push(element.name);
-		});
-	}
-	return res;
-};
 function CT_PivotCacheRecords() {
 //Attributes
 	this.count = null;
@@ -2573,6 +2563,12 @@ CT_pivotTableDefinition.prototype.intersection = function (range) {
 CT_pivotTableDefinition.prototype.contains = function (col, row) {
 	return this.location && this.location.contains(col, row);
 };
+CT_pivotTableDefinition.prototype.getRange = function () {
+	return this.location && this.location.ref;
+};
+CT_pivotTableDefinition.prototype.getField = function (arrFields, callback) {
+	return arrFields && arrFields.map(callback, this);
+};
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
 };
@@ -2598,9 +2594,6 @@ CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.getField(this.dataFields.dataField, function (element) {
 		return element.name || this.cacheDefinition.getField(element.fld).name;
 	});
-};
-CT_pivotTableDefinition.prototype.getField = function (arrFields, callback) {
-	return arrFields && arrFields.map(callback, this);
 };
 function CT_CacheSource() {
 //Attributes
