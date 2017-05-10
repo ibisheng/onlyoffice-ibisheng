@@ -125,6 +125,29 @@
         this.notesLst.splice(_pos, 0, pr);
     };
 
+
+    CNotesMaster.prototype.getAllFonts = function(fonts)
+    {
+        var i;
+        if(this.Theme){
+            this.Theme.Document_Get_AllFontNames(fonts);
+        }
+
+        if(this.txStyles){
+            this.txStyles.Document_Get_AllFontNames(fonts);
+        }
+
+        for(i = 0; i < this.notesLst.length; ++i){
+            this.notesLst[i].getAllFonts(fonts);
+        }
+
+        for(i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            if(typeof  this.cSld.spTree[i].getAllFonts === "function")
+                this.cSld.spTree[i].getAllFonts(fonts);
+        }
+    };
+
     function CreateNotesMaster(){
         var oNM = new CNotesMaster();
         var oBG = new AscFormat.CBg();

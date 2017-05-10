@@ -3645,6 +3645,15 @@ CPresentation.prototype =
         {
             this.globalTableStyles.Document_Get_AllFontNames(AllFonts);
         }
+
+        for(var i = 0; i < this.notesMasters.length; ++i)
+        {
+            this.notesMasters[i].getAllFonts(AllFonts);
+        }
+        for(var i = 0; i < this.notes.length; ++i)
+        {
+            this.notes[i].getAllFonts(AllFonts);
+        }
         delete AllFonts["+mj-lt"];
         delete AllFonts["+mn-lt"];
         delete AllFonts["+mj-ea"];
