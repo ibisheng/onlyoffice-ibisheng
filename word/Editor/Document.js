@@ -15179,6 +15179,10 @@ CDocument.prototype.RemoveContentControl = function(Id)
 		oDocContent.Remove_FromContent(nIndex, 1);
 	}
 };
+CDocument.prototype.GetContentControl = function(Id)
+{
+	return this.TableId.Get_ById(Id);
+};
 
 function CDocumentSelectionState()
 {
