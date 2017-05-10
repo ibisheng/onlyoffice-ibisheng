@@ -55,6 +55,7 @@
 		"../common/Drawings/Format/Format.js",
 		"../common/Drawings/Format/GraphicObjectBase.js",
 		"../common/Drawings/Format/Shape.js",
+		"../common/Drawings/Format/CnxShape.js",
 		"../slide/Editor/Format/ShapePrototype.js",
 		"../common/Drawings/Format/Path.js",
 		"../common/Drawings/Format/Image.js",

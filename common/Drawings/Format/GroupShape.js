@@ -1829,6 +1829,26 @@ function CGroupShape()
         }
     };
 
+    CGroupShape.prototype.findConnector = function(x, y){
+        for(var i = this.spTree.length - 1; i > -1; --i ){
+            var oConInfo = this.spTree[i].findConnector(x, y);
+            if(oConInfo){
+                return oConInfo;
+            }
+        }
+        return null;
+    };
+
+    CGroupShape.prototype.findConnectionShape = function(x, y){
+        for(var i = this.spTree.length - 1; i > -1; --i){
+            var _ret = this.spTree[i].findConnectionShape(x, y);
+            if(_ret){
+                return _ret;
+            }
+        }
+        return null;
+    };
+
     CGroupShape.prototype.GetAllContentControls = function(arrContentControls){
         for(var i = 0; i < this.spTree.length; ++i)
         {

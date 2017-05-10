@@ -493,7 +493,7 @@ function CheckStockChart(oDrawingObjects, oApi)
 
 function CheckLinePreset(preset)
 {
-    return preset === "line";
+    return CheckLinePresetForParagraphAdd(preset);
 }
 
 function CheckLinePresetForParagraphAdd(preset)
@@ -8150,7 +8150,7 @@ DrawingObjectsController.prototype =
 
             if ( undefined != Props.DefaultTab )
             {
-                //this.setDefa( Props.DefaultTab );
+                this.setDefaltTabSize( Props.DefaultTab );
             }
 
 
@@ -10629,6 +10629,15 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     window['AscFormat'].SCATTER_STYLE_SMOOTH = SCATTER_STYLE_SMOOTH;
     window['AscFormat'].SCATTER_STYLE_SMOOTH_MARKER = SCATTER_STYLE_SMOOTH_MARKER;
     window['AscFormat'].CARD_DIRECTION_N = CARD_DIRECTION_N;
+    window['AscFormat'].CARD_DIRECTION_NE = CARD_DIRECTION_NE;
+    window['AscFormat'].CARD_DIRECTION_E = CARD_DIRECTION_E;
+    window['AscFormat'].CARD_DIRECTION_SE = CARD_DIRECTION_SE;
+    window['AscFormat'].CARD_DIRECTION_S = CARD_DIRECTION_S;
+    window['AscFormat'].CARD_DIRECTION_SW = CARD_DIRECTION_SW;
+    window['AscFormat'].CARD_DIRECTION_W = CARD_DIRECTION_W;
+    window['AscFormat'].CARD_DIRECTION_NW = CARD_DIRECTION_NW;
+
+
     window['AscFormat'].CURSOR_TYPES_BY_CARD_DIRECTION = CURSOR_TYPES_BY_CARD_DIRECTION;
     window['AscFormat'].removeDPtsFromSeries = removeDPtsFromSeries;
     window['AscFormat'].checkTxBodyDefFonts = checkTxBodyDefFonts;
