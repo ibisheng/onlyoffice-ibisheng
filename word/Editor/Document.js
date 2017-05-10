@@ -15168,9 +15168,16 @@ CDocument.prototype.GetAllContentControls = function()
 	}
 	return arrContentControls;
 };
-CDocument.prototype.SelectContentControl = function(oContentControl)
+CDocument.prototype.RemoveContentControl = function(Id)
 {
-
+	var oBlockLevelSdt = this.TableId.Get_ById(Id);
+	if (oBlockLevelSdt && oBlockLevelSdt.Parent)
+	{
+		var oDocContent = oBlockLevelSdt.Parent;
+		oDocContent.Update_ContentIndexing();
+		var nIndex = oBlockLevelSdt.GetIndex();
+		oDocContent.Remove_FromContent(nIndex, 1);
+	}
 };
 
 function CDocumentSelectionState()

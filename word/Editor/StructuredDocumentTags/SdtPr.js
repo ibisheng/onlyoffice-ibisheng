@@ -124,6 +124,42 @@ CSdtPr.prototype.Read_FromBinary = function(Reader)
 		this.Lock = Reader.GetLong();
 };
 
+function CContentControlPr()
+{
+	this.Id         = undefined;
+	this.Tag        = undefined;
+	this.Lock       = undefined;
+	this.InternalId = undefined;
+}
+CContentControlPr.prototype.get_Id = function()
+{
+	return this.Id;
+};
+CContentControlPr.prototype.put_Id = function(Id)
+{
+	this.Id = Id;
+};
+CContentControlPr.prototype.get_Tag = function()
+{
+	return this.Tag;
+};
+CContentControlPr.prototype.put_Tag = function(sTag)
+{
+	this.Tag = sTag;
+};
+CContentControlPr.prototype.get_Lock = function()
+{
+	return this.Lock;
+};
+CContentControlPr.prototype.put_Lock = function(nLock)
+{
+	this.Lock = nLock;
+};
+CContentControlPr.prototype.get_InternalId = function()
+{
+	return this.InternalId;
+};
+
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CSdtPr = CSdtPr;
@@ -131,3 +167,13 @@ window['AscCommonWord'].sdtlock_Unlocked         = sdtlock_Unlocked;
 window['AscCommonWord'].sdtlock_ContentLocked    = sdtlock_ContentLocked;
 window['AscCommonWord'].sdtlock_SdtContentLocked = sdtlock_SdtContentLocked;
 window['AscCommonWord'].sdtlock_SdtLocked        = sdtlock_SdtLocked;
+window['AscCommonWord'].CContentControlPr = CContentControlPr;
+
+CContentControlPr.prototype['get_Id']         = CContentControlPr.prototype.get_Id;
+CContentControlPr.prototype['put_Id']         = CContentControlPr.prototype.put_Id;
+CContentControlPr.prototype['get_Tag']        = CContentControlPr.prototype.get_Tag;
+CContentControlPr.prototype['put_Tag']        = CContentControlPr.prototype.put_Tag;
+CContentControlPr.prototype['get_Lock']       = CContentControlPr.prototype.get_Lock;
+CContentControlPr.prototype['put_Lock']       = CContentControlPr.prototype.put_Lock;
+CContentControlPr.prototype['get_InternalId'] = CContentControlPr.prototype.get_InternalId;
+

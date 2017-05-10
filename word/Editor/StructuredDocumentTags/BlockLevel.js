@@ -919,6 +919,31 @@ CBlockLevelSdt.prototype.GetContentControlLock = function()
 {
 	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
 };
+CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
+{
+	if (oPr)
+		return;
+
+	if (undefined !== oPr.Tag)
+		this.SetTag(oPr.Tag);
+
+	if (undefined !== oPr.Id)
+		this.SetContentControlId(oPr.Id);
+
+	if (undefined !== oPr.Lock)
+		this.SetContentControlLock(oPr.Lock);
+};
+CBlockLevelSdt.prototype.GetContentControlPr = function()
+{
+	var oPr = new CContentControlPr();
+
+	oPr.Tag        = this.Pr.Tag;
+	oPr.Id         = this.Pr.Id;
+	oPr.Lock       = this.Pr.Lock;
+	oPr.InternalId = this.GetId();
+
+	return oPr;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;
@@ -931,10 +956,26 @@ function TEST_ADD_SDT()
 
 	oLogicDocument.Create_NewHistoryPoint();
 
-	oLogicDocument.AddContentControl();
+	var oContentControl = oLogicDocument.AddContentControl();
 	oLogicDocument.AddToParagraph(new ParaText("S"));
 	oLogicDocument.AddToParagraph(new ParaText("d"));
 	oLogicDocument.AddToParagraph(new ParaText("t"));
+
+	oLogicDocument.Recalculate();
+	oLogicDocument.Document_UpdateSelectionState();
+	oLogicDocument.Document_UpdateInterfaceState();
+	oLogicDocument.Document_UpdateRulersState();
+
+	return oContentControl ? oContentControl.GetId() : null;
+}
+
+function TEST_REMOVE_SDT(Id)
+{
+	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+
+	oLogicDocument.Create_NewHistoryPoint();
+
+	oLogicDocument.RemoveContentControl(Id);
 
 	oLogicDocument.Recalculate();
 	oLogicDocument.Document_UpdateSelectionState();
