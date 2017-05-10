@@ -390,6 +390,155 @@
 		this.NumRestart = v;
 	};
 
+	function CContentControlPluginWorker(_api, _docs)
+	{
+		this.api = _api;
+		this.documents = _docs;
+		this.returnDocuments = [];
+		this.current = -1;
+		this.isAsync = false;
+
+		this.start = function()
+		{
+			// save worker in api
+			this.api.__content_control_worker = this;
+			this.api.incrementCounterLongAction();
+
+			if (window.g_asc_plugins)
+				window.g_asc_plugins.setPluginMethodReturnAsync();
+
+			this.run();
+		};
+		this.end = function()
+		{
+			if (window.g_asc_plugins)
+				window.g_asc_plugins.onPluginMethodReturn(this.returnDocuments);
+
+			delete this.api.__content_control_worker;
+			this.api.decrementCounterLongAction();
+		};
+
+		this.run = function()
+		{
+			++this.current;
+			if (this.current >= this.documents.length)
+			{
+				this.end();
+				return;
+			}
+
+			var LogicDocument = this.WordControl.m_oLogicDocument;
+			if (0 == this.current)
+				LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
+
+			while (true) // no recursion
+			{
+				this.isAsync = true;
+
+				if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
+				{
+					var _current = this.documents[this.current];
+
+					var _content_control_pr = new CContentControlPr();
+					_content_control_pr.Id = _current.Props.Id;
+					_content_control_pr.Tag = _current.Props.Tag;
+					_content_control_pr.Lock = _current.Props.Lock;
+					_content_control_pr.InternalId = _current.Props.InternalId;
+
+					if (undefined !== _content_control_pr.InternalId)
+					{
+						// remove block sdt
+						LogicDocument.SelectContentControl(_content_control_pr.InternalId);
+						LogicDocument.RemoveContentControl(_content_control_pr.InternalId);
+					}
+
+					if (_current.Url !== undefined)
+					{
+						// insert/replace document
+						this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments, oSdt: null, endCallback : function(_api, _props) {
+							_api.__content_control_worker.isAsync = false;
+							_api.__content_control_worker.returnDocuments.push(_props);
+							_api.__content_control_worker.run();
+						}};
+						this.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
+					}
+					else if (_current.Script !== undefined)
+					{
+						// insert/replace script
+						var _blockStd = LogicDocument.AddContentControl();
+
+						var _content_control_pr = new CContentControlPr();
+						_content_control_pr.Id = _current.Props.Id;
+						_content_control_pr.Tag = _current.Props.Tag;
+						_content_control_pr.Lock = _current.Props.Lock;
+						_content_control_pr.InternalId = _current.Props.InternalId;
+
+						_blockStd.SetContentControlPr(_content_control_pr);
+
+						this.returnDocuments.push(_blockStd.GetContentControlPr());
+
+						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current.Script + "\n})();";
+						eval(_script);
+
+						var _fonts         = LogicDocument.Document_Get_AllFontNames();
+						var _imagesArray   = LogicDocument.Get_AllImageUrls();
+						var _images        = {};
+						for (var i = 0; i < _imagesArray.length; i++)
+						{
+							_images[_imagesArray[i]] = _imagesArray[i];
+						}
+
+						window.g_asc_plugins.images_rename = _images;
+						AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, _fonts, _images,
+							function()
+							{
+								window.g_asc_plugins.api.__content_control_worker.isAsync = false;
+
+								delete window.g_asc_plugins.images_rename;
+								window.g_asc_plugins.api.asc_Recalculate();
+								window.g_asc_plugins.api.WordControl.m_oLogicDocument.UnlockPanelStyles(true);
+
+								window.g_asc_plugins.api.__content_control_worker.run();
+							});
+					}
+					else
+					{
+						// change properties
+						var _blockStd = LogicDocument.GetContentControl(_content_control_pr.InternalId);
+						_blockStd.SetContentControlPr(_content_control_pr);
+						this.returnDocuments.push(_blockStd.GetContentControlPr());
+
+						this.isAsync = false;
+					}
+
+					if (this.isAsync)
+						return;
+				}
+
+				++this.current;
+			}
+
+			if (this.current >= this.documents.length)
+			{
+				this.end();
+				return;
+			}
+		};
+
+		this.delete = function()
+		{
+			var LogicDocument = this.WordControl.m_oLogicDocument;
+			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
+			if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
+			{
+				for (var i = 0; i < this.documents.length; i++)
+				{
+					LogicDocument.RemoveContentControl(this.documents[i].Props.InternalId);
+				}
+			}
+		};
+	}
+
 	// пользоваться так:
 	// подрубить его последним из скриптов к страничке
 	// и вызвать, после подгрузки (конец метода OnInit <- Drawing/HtmlPage.js)
@@ -7494,24 +7643,15 @@ background-repeat: no-repeat;\
 		return this.asc_GetBlockChainData();
 	};
 
-	window["asc_docs_api"].prototype["pluginMethod_InsertDocuments"] = function(arrDocuments)
+	window["asc_docs_api"].prototype["pluginMethod_InsertAndReplaceContentControls"] = function(arrDocuments)
 	{
-		var LogicDocument = this.WordControl.m_oLogicDocument;
-		if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
-		{
-			if (window.g_asc_plugins)
-				window.g_asc_plugins.setPluginMethodReturnAsync();
-
-			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
-			this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments, oSdt: null, endCallback : function(_api) {
-				if (window.g_asc_plugins)
-					window.g_asc_plugins.onPluginMethodReturn();
-			}};
-
-			//this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
-			//this.WordControl.m_oLogicDocument.AddNewParagraph();
-			this.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
-		}
+		var _worker = new CContentControlPluginWorker(this, arrDocuments);
+		return _worker.start();
+	};
+	window["asc_docs_api"].prototype["pluginMethod_RemoveContentControls"] = function(arrDocuments)
+	{
+		var _worker = new CContentControlPluginWorker(this, arrDocuments);
+		return _worker.delete();
 	};
 	/********************************************************************/
 
