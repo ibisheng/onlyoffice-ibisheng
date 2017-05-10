@@ -863,7 +863,8 @@
 						break;
 					}
 					case cElementType.table          :
-					case cElementType.name          : {
+					case cElementType.name          :
+					case cElementType.name3D : {
 						var nameRef = r.oper.toRef(bbox);
 						if (nameRef instanceof AscCommonExcel.cError) {
 							continue;
@@ -983,7 +984,8 @@
 						break;
 					}
 					case cElementType.table          :
-					case cElementType.name          : {
+					case cElementType.name          :
+					case cElementType.name3D : {
 						var nameRef = r.oper.toRef(bbox);
 						if (nameRef instanceof AscCommonExcel.cError) {
 							continue;

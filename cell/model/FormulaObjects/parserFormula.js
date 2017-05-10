@@ -3071,6 +3071,7 @@ var cFormulaOperators = {
 					switch (item.oper.type) {
 						case cElementType.table:
 						case cElementType.name:
+						case cElementType.name3D:
 							ref = item.oper.toRef();
 							break;
 						case cElementType.cell:
@@ -4686,7 +4687,10 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           }
           this.RefPos.push(pos);
         } else if (parserHelp.isName.call(this, this.Formula, this.pCurrPos)) {
+          pos.end = this.pCurrPos;
           found_operand = new cName3D(this.operand_str, wsF);
+          pos.oper = found_operand;
+          this.RefPos.push(pos);
         }
         this.countRef++;
       }
