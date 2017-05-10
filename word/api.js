@@ -396,7 +396,6 @@
 		this.documents = _docs;
 		this.returnDocuments = [];
 		this.current = -1;
-		this.isAsync = false;
 
 		this.start = function()
 		{
@@ -427,14 +426,12 @@
 				return;
 			}
 
-			var LogicDocument = this.WordControl.m_oLogicDocument;
+			var LogicDocument = this.api.WordControl.m_oLogicDocument;
 			if (0 == this.current)
 				LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
 
-			while (true) // no recursion
+			while (this.current < this.documents.length) // no recursion
 			{
-				this.isAsync = true;
-
 				if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
 				{
 					var _current = this.documents[this.current];
@@ -455,12 +452,15 @@
 					if (_current.Url !== undefined)
 					{
 						// insert/replace document
-						this.insertDocumentUrlsData = {imageMap: null, documents: arrDocuments, oSdt: null, endCallback : function(_api, _props) {
-							_api.__content_control_worker.isAsync = false;
+						this.api.insertDocumentUrlsData = {imageMap: null, documents: [{url : _current.Url, format: _current.Format}], oSdt: null, endCallback : function(_api, _props) {
 							_api.__content_control_worker.returnDocuments.push(_props);
-							_api.__content_control_worker.run();
+
+							setTimeout(function() {
+								window.g_asc_plugins.api.__content_control_worker.run();
+							}, 1);
 						}};
-						this.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
+						this.api.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
+						return;
 					}
 					else if (_current.Script !== undefined)
 					{
@@ -477,15 +477,15 @@
 
 						this.returnDocuments.push(_blockStd.GetContentControlPr());
 
+						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current.Script + "\n})();";
+						eval(_script);
+
 						if(_blockStd.Content.Get_ElementsCount() > 1)
 						{
 							_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1 , 1);
 							_blockStd.MoveCursorToEndPos(false, false);
 						}
 						LogicDocument.MoveCursorRight(false, false, true);
-
-						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current.Script + "\n})();";
-						eval(_script);
 
 						var _fonts         = LogicDocument.Document_Get_AllFontNames();
 						var _imagesArray   = LogicDocument.Get_AllImageUrls();
@@ -499,14 +499,18 @@
 						AscCommon.Check_LoadingDataBeforePrepaste(window.g_asc_plugins.api, _fonts, _images,
 							function()
 							{
-								window.g_asc_plugins.api.__content_control_worker.isAsync = false;
+								var _api = window.g_asc_plugins.api;
 
 								delete window.g_asc_plugins.images_rename;
-								window.g_asc_plugins.api.asc_Recalculate();
-								window.g_asc_plugins.api.WordControl.m_oLogicDocument.UnlockPanelStyles(true);
+								_api.asc_Recalculate();
+								_api.WordControl.m_oLogicDocument.UnlockPanelStyles(true);
 
-								window.g_asc_plugins.api.__content_control_worker.run();
+								setTimeout(function() {
+									window.g_asc_plugins.api.__content_control_worker.run();
+								}, 1);
 							});
+
+						return;
 					}
 					else
 					{
@@ -514,12 +518,7 @@
 						var _blockStd = LogicDocument.GetContentControl(_content_control_pr.InternalId);
 						_blockStd.SetContentControlPr(_content_control_pr);
 						this.returnDocuments.push(_blockStd.GetContentControlPr());
-
-						this.isAsync = false;
 					}
-
-					if (this.isAsync)
-						return;
 				}
 
 				++this.current;
@@ -2352,7 +2351,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.endInsertDocumentUrls = function()
 	{
 		if (this.insertDocumentUrlsData) {
-			this.insertDocumentUrlsData.endCallback();
+			this.insertDocumentUrlsData.endCallback(this);
 			this.insertDocumentUrlsData = null;
 			//this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.DownloadAs);
 		}
