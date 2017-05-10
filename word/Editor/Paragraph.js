@@ -12053,7 +12053,7 @@ Paragraph.prototype.GetAllContentControls = function(arrContentControls)
 
 	return arrContentControls;
 };
-Paragraph.prototype.GetCursorPos = function()
+Paragraph.prototype.GetTargetPos = function()
 {
 	return this.Internal_Recalculate_CurPos(this.CurPos.ContentPos, false, false, true);
 };
