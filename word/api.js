@@ -477,6 +477,13 @@
 
 						this.returnDocuments.push(_blockStd.GetContentControlPr());
 
+						if(_blockStd.Content.Get_ElementsCount() > 1)
+						{
+							_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1 , 1);
+							_blockStd.MoveCursorToEndPos(false, false);
+						}
+						LogicDocument.MoveCursorRight(false, false, true);
+
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current.Script + "\n})();";
 						eval(_script);
 
