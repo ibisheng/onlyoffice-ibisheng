@@ -451,9 +451,25 @@
 
 					if (_current.Url !== undefined)
 					{
+						var _blockStd = LogicDocument.AddContentControl();
+
+						var _content_control_pr = new CContentControlPr();
+						_content_control_pr.Id = _current.Props.Id;
+						_content_control_pr.Tag = _current.Props.Tag;
+						_content_control_pr.Lock = _current.Props.Lock;
+						_content_control_pr.InternalId = _current.Props.InternalId;
+
+						_blockStd.SetContentControlPr(_content_control_pr);
+
+						this.returnDocuments.push(_blockStd.GetContentControlPr());
+
 						// insert/replace document
-						this.api.insertDocumentUrlsData = {imageMap: null, documents: [{url : _current.Url, format: _current.Format}], oSdt: null, endCallback : function(_api, _props) {
-							_api.__content_control_worker.returnDocuments.push(_props);
+						this.api.insertDocumentUrlsData = {imageMap: null, documents: [{url : _current.Url, format: _current.Format}], endCallback : function(_api) {
+
+							_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1 , 1);
+							_blockStd.MoveCursorToEndPos(false, false);
+
+							_blockStd = null;
 
 							setTimeout(function() {
 								window.g_asc_plugins.api.__content_control_worker.run();
@@ -2321,7 +2337,6 @@ background-repeat: no-repeat;\
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
-				t.insertDocumentUrlsData.oSdt = t.WordControl.m_oLogicDocument.AddContentControl();
 				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + result, undefined, undefined, true);
 			});
 		}
@@ -2334,11 +2349,6 @@ background-repeat: no-repeat;\
 	{
 		if(this.insertDocumentUrlsData)
 		{
-			var oSdt = this.insertDocumentUrlsData.oSdt;
-			if(oSdt && oSdt.Content.Get_ElementsCount() > 1){
-				oSdt.Content.Remove_FromContent(oSdt.Content.Get_ElementsCount() - 1 , 1);
-				oSdt.MoveCursorToEndPos(false, false);
-			}
 			this.WordControl.m_oLogicDocument.MoveCursorRight(false, false, true);
 			this.WordControl.m_oLogicDocument.Recalculate();
 		}
