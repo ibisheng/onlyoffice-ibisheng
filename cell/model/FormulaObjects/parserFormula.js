@@ -632,13 +632,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cBaseType(val) {
-		this.needRecalc = false;
 		this.numFormat = null;
 		this.value = val;
 	}
 
 	cBaseType.prototype.cloneTo = function (oRes) {
-		oRes.needRecalc = this.needRecalc;
 		oRes.numFormat = this.numFormat;
 		oRes.value = this.value;
 	};
@@ -1548,12 +1546,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		this.cloneTo(oRes);
 		return oRes;
 	};
-	cName.prototype.toRef = function () {
+	cName.prototype.toRef = function (opt_bbox) {
 		var defName = this.getDefName();
 		if (!defName || !defName.ref) {
 			return new cError(cErrorType.wrong_name);
 		}
-		return this.Calculate();
+		return this.Calculate(undefined, opt_bbox);
 	};
 	cName.prototype.toString = function () {
 		var defName = this.getDefName();
@@ -1576,9 +1574,13 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			return new cError(cErrorType.wrong_name);
 		}
 		//defName not linked to cell, use inherit range
-		var r1 = arguments[1];
-		return defName.parsedRef.calculate(this, r1);
-
+		var offset;
+		var bbox = arguments[1];
+		if (bbox) {
+			//offset - to support relative references in def names
+			offset = {offsetRow: bbox.r1, offsetCol: bbox.c1};
+		}
+		return defName.parsedRef.calculate(this, bbox, offset);
 	};
 	cName.prototype.getDefName = function () {
 		return this.ws ? this.ws.workbook.getDefinesNames(this.value, this.ws.getId()) : null;
@@ -1666,7 +1668,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			return val;
 		}
 	};
-	cStrucTable.prototype.toRef = function (opt_bbox) {
+	cStrucTable.prototype.toRef = function (opt_bbox, opt_bConvertTableFormulaToRef) {
 		//opt_bbox usefull only for #This row
 		//case null == opt_bbox works like FormulaTablePartInfo.data
 		var table = this.wb.getDefinesNames(this.tableName, this.ws ? this.ws.getId() : null);
@@ -1674,7 +1676,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			return new cError(cErrorType.wrong_name);
 		}
 		if (!this.area || this.isDynamic) {
-			this._updateArea(opt_bbox, true);
+			this._updateArea(opt_bbox, true, opt_bConvertTableFormulaToRef);
 		}
 		return this.area;
 	};
@@ -1786,8 +1788,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		return bRes;
 	};
-	cStrucTable.prototype._updateArea = function (opt_bbox, opt_toRef) {
-		var paramObj = {param: null, startCol: null, endCol: null, cell: opt_bbox, toRef: opt_toRef};
+	cStrucTable.prototype._updateArea = function (bbox, toRef, bConvertTableFormulaToRef) {
+		var paramObj = {param: null, startCol: null, endCol: null, cell: bbox, toRef: toRef, bConvertTableFormulaToRef: bConvertTableFormulaToRef};
 		var isThisRow = false;
 		var tableData;
 		if (this.oneColumnIndex) {
@@ -1832,7 +1834,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 					return this._createAreaError(isThisRow);
 				}
 				if (range) {
+					var r1Abs = range.isAbsR1();
+					var c1Abs = data.range.isAbsC1();
+					var r2Abs = range.isAbsR2();
+					var c2Abs = data.range.isAbsC2();
 					range = new Asc.Range(data.range.c1, range.r1, data.range.c2, range.r2);
+					range.setAbs(r1Abs, c1Abs, r2Abs, c2Abs);
 				} else {
 					range = data.range;
 				}
@@ -1850,7 +1857,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			}
 		}
 		if (tableData.range) {
-			var refName = tableData.range.getAbsName();
+			var refName = tableData.range.getName();
 			var wsFrom = this.wb.getWorksheetById(tableData.wsID);
 			if (tableData.range.isOneCell()) {
 				this.area = new cRef3D(refName, wsFrom);
@@ -3054,6 +3061,8 @@ var cFormulaOperators = {
 		if (ref[ref.length - 1] === ')') {
 			ref = ref.slice(0, -1);
 		}
+		var activeCell = ws.selectionRange.activeCell;
+		var bbox = new Asc.Range(activeCell.col, activeCell.row, activeCell.col, activeCell.row);
 		// ToDo in parser formula
 		var ranges = [];
 		var arrRefs = ref.split(',');
@@ -3072,7 +3081,7 @@ var cFormulaOperators = {
 						case cElementType.table:
 						case cElementType.name:
 						case cElementType.name3D:
-							ref = item.oper.toRef();
+							ref = item.oper.toRef(bbox);
 							break;
 						case cElementType.cell:
 						case cElementType.cell3D:
@@ -4858,7 +4867,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
   }
 };
 
-	parserFormula.prototype.calculate = function (opt_defName, opt_bbox) {
+	parserFormula.prototype.calculate = function (opt_defName, opt_bbox, opt_offset) {
 		if (this.isCalculate) {
 			this.value = new cError(cErrorType.bad_reference);
 			this._endCalculate();
@@ -4909,6 +4918,35 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 				elemArr.push(currentElement.Calculate(arg, bbox));
 			} else if (currentElement.type === cElementType.table) {
 				elemArr.push(currentElement.toRef(bbox));
+			} else if (opt_offset) {
+				var cloneElem = null;
+				var bbox = null;
+				var ws;
+				if (cElementType.cell === currentElement.type || cElementType.cell3D === currentElement.type ||
+					cElementType.cellsRange === currentElement.type) {
+					var range = currentElement.getRange();
+					if (range) {
+						bbox = range.getBBox0();
+						ws = range.getWorksheet();
+						if (!bbox.isAbsAll()) {
+							cloneElem = currentElement.clone();
+							bbox = cloneElem.getRange().getBBox0();
+						}
+					}
+				} else if (cElementType.cellsRange3D === currentElement.type) {
+					bbox = currentElement.getBBox0();
+					if (!bbox.isAbsAll()) {
+						cloneElem = currentElement.clone();
+						bbox = cloneElem.getBBox0();
+					}
+				}
+				if(cloneElem){
+					bbox.setOffsetWithAbs(opt_offset, false, true);
+					this.changeOffsetBBox(cloneElem, bbox, ws);
+					elemArr.push(cloneElem);
+				} else {
+					elemArr.push(currentElement);
+				}
 			} else {
 				elemArr.push(currentElement);
 			}
@@ -4936,13 +4974,14 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 	};
 	parserFormula.prototype.changeOffsetElem = function(elem, container, index, offset, canResize) {//offset =
 		// AscCommonExcel.CRangeOffset
-		var range, bbox = null, isErr = false;
+		var range, bbox = null, ws, isErr = false;
 		if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
 			cElementType.cellsRange === elem.type) {
 			isErr = true;
 			range = elem.getRange();
 			if (range) {
 				bbox = range.getBBox0();
+				ws = range.getWorksheet();
 			}
 		} else if (cElementType.cellsRange3D === elem.type) {
 			isErr = true;
@@ -4951,18 +4990,21 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 		if (bbox) {
 			if (bbox.setOffsetWithAbs(offset, canResize)) {
 				isErr = false;
-				if (cElementType.cellsRange3D === elem.type) {
-					elem.bbox = bbox;
-				} else {
-					elem.range = AscCommonExcel.Range.prototype.createFromBBox(range.getWorksheet(), bbox);
-				}
-				elem.value = bbox.getName();
+				this.changeOffsetBBox(elem, bbox, ws);
 			}
 		}
 		if (isErr) {
 			container[index] = new cError(cErrorType.bad_reference);
 		}
 		return elem;
+	};
+	parserFormula.prototype.changeOffsetBBox = function(elem, bbox, ws) {
+		if (cElementType.cellsRange3D === elem.type) {
+			elem.bbox = bbox;
+		} else {
+			elem.range = AscCommonExcel.Range.prototype.createFromBBox(ws, bbox);
+		}
+		elem.value = bbox.getName();
 	};
 	parserFormula.prototype.changeDefName = function(from, to) {
 		var i, elem;
@@ -4975,12 +5017,17 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 	};
 	parserFormula.prototype.removeTableName = function(defName, bConvertTableFormulaToRef) {
 		var i, elem;
+		var bbox;
+		if (this.parent && this.parent.onFormulaEvent) {
+			bbox= this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
+		}
+
 		for (i = 0; i < this.outStack.length; i++) {
 			elem = this.outStack[i];
 			if (elem.type == cElementType.table && elem.tableName == defName.name) {
 				if(bConvertTableFormulaToRef)
 				{
-					this.outStack[i] = this.outStack[i].toRef();
+					this.outStack[i] = this.outStack[i].toRef(bbox, bConvertTableFormulaToRef);
 				}
 				else
 				{

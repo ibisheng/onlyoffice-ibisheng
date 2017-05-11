@@ -5482,7 +5482,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		{
 			if(this.HeaderRowCount === null) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
-			} else if(!objectParam.toRef) {
+			} else if(!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
 				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			}
 			break;
@@ -5491,7 +5491,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		{
 			if(this.TotalsRowCount) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
-			} else if(!objectParam.toRef) {
+			} else if(!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
 				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			}
 			break;
@@ -5501,9 +5501,15 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 			if (objectParam.cell) {
 				if (startRow <= objectParam.cell.r1 && objectParam.cell.r1 <= endRow) {
 					res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
+				} else if (objectParam.bConvertTableFormulaToRef) {
+					res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 				}
 			} else {
-				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+				if (objectParam.bConvertTableFormulaToRef) {
+					res = new Asc.Range(this.Ref.c1, 0, this.Ref.c2, 0);
+				} else {
+					res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+				}
 			}
 			break;
 		}
@@ -5519,6 +5525,13 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 
 			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
 			break;
+		}
+	}
+	if (res) {
+		if (objectParam.param === FormulaTablePartInfo.thisRow) {
+			res.setAbs(false, true, false, true);
+		} else {
+			res.setAbs(true, true, true, true);
 		}
 	}
 	return res;

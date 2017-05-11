@@ -502,7 +502,7 @@
 			this.r1 = Math.min(this.r1, r);
 			this.r2 = Math.max(this.r2, r);
 		};
-		Range.prototype.setOffsetWithAbs = function(offset, canResize) {
+		Range.prototype.setOffsetWithAbs = function(offset, opt_canResize, opt_circle) {
 			var temp;
 			var offsetRow = offset.offsetRow;
 			var offsetCol = offset.offsetCol;
@@ -519,52 +519,84 @@
 			if (!isAbsRow1) {
 				this.r1 += offsetRow;
 				if (this.r1 < 0) {
-					this.r1 = 0;
-					if (!canResize) {
-						return false;
+					if (opt_circle) {
+						this.r1 += gc_nMaxRow0 + 1;
+					} else {
+						this.r1 = 0;
+						if (!opt_canResize) {
+							return false;
+						}
 					}
 				}
 				if (this.r1 > gc_nMaxRow0) {
-					this.r1 = gc_nMaxRow0;
-					return false;
+					if (opt_circle) {
+						this.r1 -= gc_nMaxRow0 + 1;
+					} else {
+						this.r1 = gc_nMaxRow0;
+						return false;
+					}
 				}
 			}
 			if (!isAbsCol1) {
 				this.c1 += offsetCol;
 				if (this.c1 < 0) {
-					this.c1 = 0;
-					if (!canResize) {
-						return false;
+					if (opt_circle) {
+						this.c1 += gc_nMaxCol0 + 1;
+					} else {
+						this.c1 = 0;
+						if (!opt_canResize) {
+							return false;
+						}
 					}
 				}
 				if (this.c1 > gc_nMaxCol0) {
-					this.c1 = gc_nMaxCol0;
-					return false;
+					if (opt_circle) {
+						this.c1 -= gc_nMaxCol0 + 1;
+					} else {
+						this.c1 = gc_nMaxCol0;
+						return false;
+					}
 				}
 			}
 			if (!isAbsRow2) {
 				this.r2 += offsetRow;
 				if (this.r2 < 0) {
-					this.r2 = 0;
-					return false;
+					if (opt_circle) {
+						this.r2 += gc_nMaxRow0 + 1;
+					} else {
+						this.r2 = 0;
+						return false;
+					}
 				}
 				if (this.r2 > gc_nMaxRow0) {
-					this.r2 = gc_nMaxRow0;
-					if (!canResize) {
-						return false;
+					if (opt_circle) {
+						this.r2 -= gc_nMaxRow0 + 1;
+					} else {
+						this.r2 = gc_nMaxRow0;
+						if (!opt_canResize) {
+							return false;
+						}
 					}
 				}
 			}
 			if (!isAbsCol2) {
 				this.c2 += offsetCol;
 				if (this.c2 < 0) {
-					this.c2 = 0;
-					return false;
+					if (opt_circle) {
+						this.c2 += gc_nMaxCol0 + 1;
+					} else {
+						this.c2 = 0;
+						return false;
+					}
 				}
 				if (this.c2 > gc_nMaxCol0) {
-					this.c2 = gc_nMaxCol0;
-					if (!canResize) {
-						return false;
+					if (opt_circle) {
+						this.c2 -= gc_nMaxCol0 + 1;
+					} else {
+						this.c2 = gc_nMaxCol0;
+						if (!opt_canResize) {
+							return false;
+						}
 					}
 				}
 			}
@@ -783,6 +815,21 @@
 		};
 		Range.prototype.isAbsRow = function (refType) {
 			return (refType === referenceType.A || refType === referenceType.ARRC);
+		};
+		Range.prototype.isAbsR1 = function () {
+			return this.isAbsRow(this.refType1);
+		};
+		Range.prototype.isAbsC1 = function () {
+			return this.isAbsCol(this.refType1);
+		};
+		Range.prototype.isAbsR2 = function () {
+			return this.isAbsRow(this.refType2);
+		};
+		Range.prototype.isAbsC2 = function () {
+			return this.isAbsCol(this.refType2);
+		};
+		Range.prototype.isAbsAll = function () {
+			return this.isAbsR1() && this.isAbsC1() && this.isAbsR2() && this.isAbsC2();
 		};
 		Range.prototype.switchReference = function () {
 			this.refType1 = (this.refType1 + 1) % 4;
@@ -1393,6 +1440,8 @@
 			}
 			if (null == oRes && null != oCacheVal.first && null != oCacheVal.last) {
 				var r1 = oCacheVal.first.getRow0(), r2 = oCacheVal.last.getRow0(), c1 = oCacheVal.first.getCol0(), c2 = oCacheVal.last.getCol0();
+				var r1Abs = oCacheVal.first.getRowAbs(), r2Abs = oCacheVal.last.getRowAbs(),
+					c1Abs = oCacheVal.first.getColAbs(), c2Abs = oCacheVal.first.getColAbs();
 				if (oCacheVal.first.getIsRow() && oCacheVal.last.getIsRow()) {
 					c1 = 0;
 					c2 = gc_nMaxCol0;
@@ -1405,18 +1454,23 @@
 					var temp = r1;
 					r1 = r2;
 					r2 = temp;
+					temp = r1Abs;
+					r1Abs = r2Abs;
+					r2Abs = temp;
 				}
 				if (c1 > c2) {
 					var temp = c1;
 					c1 = c2;
 					c2 = temp;
+					temp = c1Abs;
+					c1Abs = c2Abs;
+					c2Abs = temp;
 				}
 
 				if (1 == type) {
 					if (null == oCacheVal.ascRange) {
 						var oAscRange = new Range(c1, r1, c2, r2);
-						oAscRange.setAbs(oCacheVal.first.getRowAbs(), oCacheVal.first.getColAbs(), oCacheVal.last.getRowAbs(),
-							oCacheVal.last.getColAbs());
+						oAscRange.setAbs(r1Abs, c1Abs, r2Abs, c2Abs);
 
 						oCacheVal.ascRange = oAscRange;
 					}
@@ -1424,8 +1478,7 @@
 				} else if (2 == type) {
 					if (null == oCacheVal.activeRange) {
 						var oActiveRange = new ActiveRange(c1, r1, c2, r2);
-						oActiveRange.setAbs(oCacheVal.first.getRowAbs(), oCacheVal.first.getColAbs(), oCacheVal.last.getRowAbs(),
-							oCacheVal.last.getColAbs());
+						oActiveRange.setAbs(r1Abs, c1Abs, r2Abs, c2Abs);
 
 						var bCol = 0 == r1 && gc_nMaxRow0 == r2;
 						var bRow = 0 == c1 && gc_nMaxCol0 == c2;
@@ -1446,8 +1499,7 @@
 				} else {
 					if (null == oCacheVal.formulaRange) {
 						var oFormulaRange = new FormulaRange(c1, r1, c2, r2);
-						oFormulaRange.setAbs(oCacheVal.first.getRowAbs(), oCacheVal.first.getColAbs(), oCacheVal.last.getRowAbs(),
-							oCacheVal.last.getColAbs());
+						oFormulaRange.setAbs(r1Abs, c1Abs, r2Abs, c2Abs);
 
 						oCacheVal.formulaRange = oFormulaRange;
 					}

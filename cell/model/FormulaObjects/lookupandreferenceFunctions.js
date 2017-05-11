@@ -615,7 +615,7 @@
 			parseReference();
 			if (found_operand) {
 				if (cElementType.name === found_operand.type) {
-					found_operand = found_operand.toRef();
+					found_operand = found_operand.toRef(arguments[1]);
 				}
 
 				ret  = found_operand;
