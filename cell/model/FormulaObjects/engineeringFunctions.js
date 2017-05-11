@@ -893,14 +893,14 @@
 	 n = arg[1];
 
 	 if ( x instanceof cArea || x instanceof cArea3D ) {
-	 x = x.cross( arguments[1].bbox );
+	 x = x.cross( arguments[1] );
 	 }
 	 else if ( x instanceof cArray ) {
 	 x = x.getElementRowCol( 0, 0 );
 	 }
 
 	 if ( n instanceof cArea || n instanceof cArea3D ) {
-	 n = n.cross( arguments[1].bbox );
+	 n = n.cross( arguments[1] );
 	 }
 	 else if ( n instanceof cArray ) {
 	 n = n.getElementRowCol( 0, 0 );
@@ -982,7 +982,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1036,13 +1036,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1105,13 +1105,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1174,19 +1174,19 @@
 		var real = arg[0], img = arg[1], suf = !arg[2] || arg[2] instanceof AscCommonExcel.cEmpty ? new cString("i") :
 			arg[2];
 		if (real instanceof cArea || img instanceof cArea3D) {
-			real = real.cross(arguments[1].bbox);
+			real = real.cross(arguments[1]);
 		} else if (real instanceof cArray) {
 			real = real.getElement(0);
 		}
 
 		if (img instanceof cArea || img instanceof cArea3D) {
-			img = img.cross(arguments[1].bbox);
+			img = img.cross(arguments[1]);
 		} else if (img instanceof cArray) {
 			img = img.getElement(0);
 		}
 
 		if (suf instanceof cArea || suf instanceof cArea3D) {
-			suf = suf.cross(arguments[1].bbox);
+			suf = suf.cross(arguments[1]);
 		} else if (suf instanceof cArray) {
 			suf = suf.getElement(0);
 		}
@@ -1253,13 +1253,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1317,13 +1317,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1380,13 +1380,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1444,13 +1444,13 @@
 		var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
 
 		if (number1 instanceof cArea || number2 instanceof cArea3D) {
-			number1 = number1.cross(arguments[1].bbox);
+			number1 = number1.cross(arguments[1]);
 		} else if (number1 instanceof cArray) {
 			number1 = number1.getElement(0);
 		}
 
 		if (number2 instanceof cArea || number2 instanceof cArea3D) {
-			number2 = number2.cross(arguments[1].bbox);
+			number2 = number2.cross(arguments[1]);
 		} else if (number2 instanceof cArray) {
 			number2 = number2.getElement(0);
 		}
@@ -1495,13 +1495,13 @@
 
 		var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
 		if (a instanceof cArea || a instanceof cArea3D) {
-			a = a.cross(arguments[1].bbox);
+			a = a.cross(arguments[1]);
 		} else if (a instanceof cArray) {
 			a = a.getElement(0);
 		}
 
 		if (b instanceof cArea || b instanceof cArea3D) {
-			b = b.cross(arguments[1].bbox);
+			b = b.cross(arguments[1]);
 		} else if (b instanceof cArray) {
 			b = b.getElement(0);
 		}
@@ -1552,7 +1552,7 @@
 
 		var a = arg[0];
 		if (a instanceof cArea || a instanceof cArea3D) {
-			a = a.cross(arguments[1].bbox);
+			a = a.cross(arguments[1]);
 		} else if (a instanceof cArray) {
 			a = a.getElement(0);
 		}
@@ -1592,13 +1592,13 @@
 		var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
 
 		if (number1 instanceof cArea || number2 instanceof cArea3D) {
-			number1 = number1.cross(arguments[1].bbox);
+			number1 = number1.cross(arguments[1]);
 		} else if (number1 instanceof cArray) {
 			number1 = number1.getElement(0);
 		}
 
 		if (number2 instanceof cArea || number2 instanceof cArea3D) {
-			number2 = number2.cross(arguments[1].bbox);
+			number2 = number2.cross(arguments[1]);
 		} else if (number2 instanceof cArray) {
 			number2 = number2.getElement(0);
 		}
@@ -1644,13 +1644,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1720,7 +1720,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1772,13 +1772,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1847,7 +1847,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1892,7 +1892,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1937,7 +1937,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1982,7 +1982,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2027,7 +2027,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2074,14 +2074,14 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -2132,7 +2132,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2179,7 +2179,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2230,7 +2230,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2281,7 +2281,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2332,13 +2332,13 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -2391,7 +2391,7 @@
 		var arg0 = arg[0], t = this;
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2495,7 +2495,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2540,7 +2540,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2587,7 +2587,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2634,14 +2634,14 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -2691,7 +2691,7 @@
 		var arg0 = arg[0], t = this;
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2795,13 +2795,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -2871,7 +2871,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2923,13 +2923,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}

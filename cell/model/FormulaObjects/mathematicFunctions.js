@@ -98,7 +98,7 @@
 	cABS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -139,7 +139,7 @@
 	cACOS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -182,7 +182,7 @@
 	cACOSH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -225,7 +225,7 @@
 	cASIN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -268,7 +268,7 @@
 	cASINH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -311,7 +311,7 @@
 	cATAN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -354,10 +354,10 @@
 	cATAN2.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
@@ -431,7 +431,7 @@
 	cATANH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -474,10 +474,10 @@
 	cCEILING.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 		arg0 = arg[0].tocNumber();
 		arg1 = arg[1].tocNumber();
@@ -575,12 +575,12 @@
 	cCOMBIN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 		arg1 = arg1.tocNumber();
 
@@ -666,7 +666,7 @@
 	cCOS.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -709,7 +709,7 @@
 	cCOSH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -752,7 +752,7 @@
 	cDEGREES.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -827,7 +827,7 @@
 
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 
 		arg0 = arg0.tocNumber();
@@ -873,7 +873,7 @@
 	cEXP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -918,7 +918,7 @@
 	cFACT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -987,7 +987,7 @@
 
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -1037,10 +1037,10 @@
 	cFLOOR.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 
 		arg0 = arg[0].tocNumber();
@@ -1241,7 +1241,7 @@
 	cINT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -1403,7 +1403,7 @@
 	cLN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -1454,12 +1454,12 @@
 	cLOG.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(10);
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 		arg1 = arg1.tocNumber();
 
@@ -1550,7 +1550,7 @@
 	cLOG10.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -1914,10 +1914,10 @@
 	cMOD.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
@@ -2039,10 +2039,10 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 
 		arg0 = arg0.tocNumber();
@@ -2229,7 +2229,7 @@
 
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 
@@ -2317,10 +2317,10 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg1 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
@@ -2455,10 +2455,10 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg1 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
@@ -2526,7 +2526,7 @@
 
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 
@@ -2605,10 +2605,10 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg1 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		arg1 = arg1.tocNumber();
@@ -2831,10 +2831,10 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 
 		if (arg0 instanceof cError) {
@@ -2960,10 +2960,10 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 
 		if (arg0 instanceof cError) {
@@ -3088,10 +3088,10 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 
 		if (arg0 instanceof cError) {
@@ -3280,7 +3280,7 @@
 
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 
 		arg0 = arg0.tocNumber();
@@ -3325,7 +3325,7 @@
 	cSIN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -3368,7 +3368,7 @@
 	cSINH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -3411,7 +3411,7 @@
 	cSQRT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -3454,7 +3454,7 @@
 	cSQRTPI.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -3497,7 +3497,7 @@
 		var f, exclude = false, arg0 = arg[0];
 
 		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (cElementType.number !== arg0.type) {
@@ -3679,7 +3679,7 @@
 		}
 
 		if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -3759,7 +3759,7 @@
 			}
 
 			if (cElementType.cellsRange === arg2.type || cElementType.cellsRange3D === arg2.type) {
-				arg2 = arg2.cross(arguments[1].bbox);
+				arg2 = arg2.cross(arguments[1]);
 			} else if (cElementType.array === arg2.type) {
 				arg2 = arg2.getElementRowCol(0, 0);
 			}
@@ -4224,7 +4224,7 @@
 	cTAN.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -4267,7 +4267,7 @@
 	cTANH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -4322,10 +4322,10 @@
 
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(0);
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 
 		if (arg0 instanceof cError) {

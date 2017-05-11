@@ -5314,7 +5314,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		if (AscCommon.c_oNotifyParentType.CanDo === type) {
 			return true;
 		} else if (AscCommon.c_oNotifyParentType.GetRangeCell === type) {
-			return this.ws.getCell3(this.nRow, this.nCol);
+			return new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow);
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			this.ws.workbook.dependencyFormulas.addToChangedCell(this);
 		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {

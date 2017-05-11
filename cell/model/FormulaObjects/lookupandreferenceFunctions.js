@@ -113,31 +113,31 @@
 			arg[3] : new cBool(true), sheetName = arg[4] ? arg[4] : new cEmpty();
 
 		if (cElementType.cellsRange === rowNumber.type || cElementType.cellsRange3D === rowNumber.type) {
-			rowNumber = rowNumber.cross(arguments[1].bbox);
+			rowNumber = rowNumber.cross(arguments[1]);
 		} else if (cElementType.array === rowNumber.type) {
 			rowNumber = rowNumber.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === colNumber.type || cElementType.cellsRange3D === colNumber.type) {
-			colNumber = colNumber.cross(arguments[1].bbox);
+			colNumber = colNumber.cross(arguments[1]);
 		} else if (cElementType.array === colNumber.type) {
 			colNumber = colNumber.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === refType.type || cElementType.cellsRange3D === refType.type) {
-			refType = refType.cross(arguments[1].bbox);
+			refType = refType.cross(arguments[1]);
 		} else if (cElementType.array === refType.type) {
 			refType = refType.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === A1RefType.type || cElementType.cellsRange3D === A1RefType.type) {
-			A1RefType = A1RefType.cross(arguments[1].bbox);
+			A1RefType = A1RefType.cross(arguments[1]);
 		} else if (cElementType.array === A1RefType.type) {
 			A1RefType = A1RefType.getElementRowCol(0, 0);
 		}
 
 		if (cElementType.cellsRange === sheetName.type || cElementType.cellsRange3D === sheetName.type) {
-			sheetName = sheetName.cross(arguments[1].bbox);
+			sheetName = sheetName.cross(arguments[1]);
 		} else if (cElementType.array === sheetName.type) {
 			sheetName = sheetName.getElementRowCol(0, 0);
 		}
@@ -243,7 +243,7 @@
 		var arg0 = arg[0];
 
 		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 
