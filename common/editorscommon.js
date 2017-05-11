@@ -2303,7 +2303,7 @@ CUserCacheColor.prototype.init = function(nColor) {
     var script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = url;
-    script.onload = scriptElem.onerror = callback;
+    script.onload = script.onerror = callback;
 
     // Fire the loading
     document.head.appendChild(script);
