@@ -1104,7 +1104,7 @@
 		insertAsNestedTable: 20,
 		uniteIntoTable: 21,
 		insertAsNewRows: 22,
-		saveOnlyText: 23
+		keepTextOnly: 23
 	};
 	
 	//------------------------------------------------------------export--------------------------------------------------
@@ -1785,7 +1785,7 @@
 	prot['mergeFormatting'] = prot.mergeFormatting;
 	prot['uniteList'] = prot.uniteList;
 	prot['doNotUniteList'] = prot.doNotUniteList;
-	prot['saveOnlyText'] = prot.saveOnlyText;
+	prot['keepTextOnly'] = prot.keepTextOnly;
 	
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =
