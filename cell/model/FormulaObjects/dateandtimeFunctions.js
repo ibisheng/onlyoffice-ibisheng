@@ -1313,9 +1313,7 @@
 
 		var v = (hour * 60 * 60 + minute * 60 + second) / c_sPerDay;
 		this.value = new cNumber(v - Math.floor(v));
-		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
-			this.value.numFormat = 18;
-		}
+		this.value.numFormat = 18;
 		return this.value;
 	};
 	cTIME.prototype.getInfo = function () {
@@ -1384,9 +1382,7 @@
 	cTODAY.prototype.ca = true;
 	cTODAY.prototype.Calculate = function () {
 		this.value = new cNumber(new Date().getExcelDate());
-		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
-			this.value.numFormat = 14;
-		}
+		this.value.numFormat = 14;
 		return this.value;
 	};
 	cTODAY.prototype.getInfo = function () {
@@ -1718,11 +1714,7 @@
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
-		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
-			return this.setCalcValue(new cNumber(val), 14);
-		} else {
-			return this.value = new cNumber(val);
-		}
+		return this.setCalcValue(new cNumber(val), 14);
 	};
 	cWORKDAY.prototype.getInfo = function () {
 		return {
