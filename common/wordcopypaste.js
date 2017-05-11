@@ -2313,7 +2313,7 @@ PasteProcessor.prototype =
 		var res = table;
 
 		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
-		if(props === Asc.c_oSpecialPasteProps.pasteOnlyValues)
+		if(props === Asc.c_oSpecialPasteProps.saveOnlyText)
 		{
 			res = this._convertTableToText(table);
 		}
