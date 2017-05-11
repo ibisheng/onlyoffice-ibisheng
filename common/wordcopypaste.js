@@ -2252,7 +2252,7 @@ PasteProcessor.prototype =
 				props = [sProps.paste, sProps.uniteList, sProps.doNotUniteList];
 			}*/
 
-			props = [sProps.paste/*, sProps.mergeFormatting*/, sProps.pasteOnlyValues];
+			props = [sProps.paste/*, sProps.mergeFormatting*/, sProps.saveOnlyText];
 
 			if(null !== props)
 			{
@@ -2363,7 +2363,7 @@ PasteProcessor.prototype =
 			{
 				break;
 			}
-			case Asc.c_oSpecialPasteProps.pasteOnlyValues:
+			case Asc.c_oSpecialPasteProps.saveOnlyText:
 			{	
 				//в данному случае мы должны применить к вставленному фрагменту стиль paraRun, в который вставляем
 				if(pasteIntoParagraphPr)
@@ -2430,7 +2430,7 @@ PasteProcessor.prototype =
 			{
 				break;
 			}
-			case Asc.c_oSpecialPasteProps.pasteOnlyValues:
+			case Asc.c_oSpecialPasteProps.saveOnlyText:
 			{
 				//в данному случае мы должны применить к вставленному фрагменту стиль paraRun, в который вставляем
 				if(pasteIntoParaRunPr)
@@ -2909,7 +2909,7 @@ PasteProcessor.prototype =
 			var aContentExcel = this._readFromBinaryExcel(base64FromExcel);
 			History.TurnOn();
 			
-			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.pasteOnlyValues === window['AscCommon'].g_clipboardBase.specialPasteProps)
+			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.saveOnlyText === window['AscCommon'].g_clipboardBase.specialPasteProps)
 			{
 				var aContent = oThis._convertExcelBinary(aContentExcel);
 				oThis.aContent = aContent.content;
@@ -3118,7 +3118,7 @@ PasteProcessor.prototype =
 			aContent.fonts = oThis._checkFontsOnLoad(aContent.fonts);
 
 			var oObjectsForDownload = GetObjectsForImageDownload(aContent.aPastedImages);
-			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.pasteOnlyValues === window['AscCommon'].g_clipboardBase.specialPasteProps)
+			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.saveOnlyText === window['AscCommon'].g_clipboardBase.specialPasteProps)
 			{
 				fPrepasteCallback();
 			}
@@ -4050,7 +4050,7 @@ PasteProcessor.prototype =
 		{
 			this.bIsPlainText = this._CheckIsPlainText(node);
 
-			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.pasteOnlyValues === window['AscCommon'].g_clipboardBase.specialPasteProps)
+			if(window['AscCommon'].g_clipboardBase.specialPasteStart && Asc.c_oSpecialPasteProps.saveOnlyText === window['AscCommon'].g_clipboardBase.specialPasteProps)
 			{
 				fPasteHtmlWordCallback();
 			}
