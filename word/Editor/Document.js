@@ -2868,6 +2868,12 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 					this.private_RecalculateHdrFtrPageCountUpdate();
 				}
 			}
+
+			if(window['AscCommon'].g_clipboardBase && window['AscCommon'].g_clipboardBase.showButtonIdParagraph && !window['AscCommon'].g_clipboardBase.pasteStart)
+			{
+				window['AscCommon'].g_clipboardBase.SpecialPasteButtonById_Show();
+			}
+			window['AscCommon'].g_clipboardBase.endRecalcDocument = true;
 		}
     }
 
@@ -5071,6 +5077,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 
     var PageMetrics = this.Get_PageContentStartPos(this.CurPage, this.Pages[this.CurPage].Pos);
 
+	var oldDocPosType = this.Get_DocPosType();
     // Проверяем, не попали ли мы в колонтитул (если мы попадаем в Flow-объект, то попадание в колонтитул не проверяем)
     if (true != bFlowTable && nInDrawing < 0 && true === bCheckHdrFtr && MouseEvent.ClickCount >= 2 && ( Y <= PageMetrics.Y || Y > PageMetrics.YLimit ))
     {
@@ -5196,6 +5203,13 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 			}
 		}
 	}
+
+	//при переходе из колонтитула в контент(и обратно) необходимо скрывать иконку с/в
+	var newDocPosType = this.Get_DocPosType();
+    if((docpostype_HdrFtr === newDocPosType && docpostype_Content === oldDocPosType) || (docpostype_Content === newDocPosType && docpostype_HdrFtr === oldDocPosType))
+    {
+		window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+    }
 };
 /**
  * Данная функция может использоваться как при движении, так и при окончательном выставлении селекта.

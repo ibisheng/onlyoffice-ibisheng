@@ -1997,7 +1997,7 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onHideSpecialPasteOptions");
 	};
 	
-	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function() 
+	asc_docs_api.prototype.asc_UpdateSpecialPasteButton = function(props)
 	{
 		this.sendEvent("asc_onShowSpecialPasteOptions", props);
 	};

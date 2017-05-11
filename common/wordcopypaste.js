@@ -1782,6 +1782,7 @@ function CopyPasteCorrectString(str)
 function Editor_Paste_Exec(api, pastebin, nodeDisplay, onlyBinary, specialPasteProps)
 {
     var oPasteProcessor = new PasteProcessor(api, true, true, false);
+	window['AscCommon'].g_clipboardBase.endRecalcDocument = false;
 	if(undefined === specialPasteProps)
 	{
 		window['AscCommon'].g_clipboardBase.specialPasteData.pastebin = pastebin;
@@ -2113,6 +2114,18 @@ PasteProcessor.prototype =
             }
 
             paragraph.Parent.Insert_Content(oSelectedContent, NearPos);
+
+			if(oSelectedContent.Elements.length === 1)
+			{
+				var curDocSelection = this.curDocSelection;
+
+				window['AscCommon'].g_clipboardBase.showButtonIdParagraph =this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Id;
+			}
+			else
+			{
+				window['AscCommon'].g_clipboardBase.showButtonIdParagraph = oSelectedContent.Elements[oSelectedContent.Elements.length - 1].Element.Id;
+			}
+
             if(this.oLogicDocument && this.oLogicDocument.DrawingObjects)
             {
                 var oTargetTextObject = AscFormat.getTargetTextObject(this.oLogicDocument.DrawingObjects);
@@ -2238,10 +2251,8 @@ PasteProcessor.prototype =
 				//вставка нумерованного списка в нумерованный список
 				props = [sProps.paste, sProps.uniteList, sProps.doNotUniteList];
 			}*/
-			if(true)
-			{
-				props = [sProps.paste/*, sProps.mergeFormatting*/, sProps.pasteOnlyValues];
-			}
+
+			props = [sProps.paste/*, sProps.mergeFormatting*/, sProps.pasteOnlyValues];
 
 			if(null !== props)
 			{
@@ -2257,16 +2268,13 @@ PasteProcessor.prototype =
 
 		if(specialPasteShowOptions)
 		{
-			var cursorPos = this.oLogicDocument.GetCursorPosXY();
-			var _Y = cursorPos.Y;
-			var _X = cursorPos.X;
-			var _PageNum = this.oLogicDocument.CurPage;
-
-			window['AscCommon'].g_clipboardBase.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum: _PageNum};
-
-			var _сoord = this.oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
-			var curCoord = new AscCommon.asc_CRect( _сoord.X, _сoord.Y, 0, 0 );
-			specialPasteShowOptions.asc_setCellCoord(curCoord);
+			//SpecialPasteButtonById_Show вызываю здесь, если пересчет документа завершился раньше, чем мы попали сюда и сгенерировали параметры вставки
+			//в противном случае вызываю SpecialPasteButtonById_Show в drawingDocument->OnEndRecalculate
+			//TODO пересмотреть проверку на CDrawingDocContent и CShape
+			if(window['AscCommon'].g_clipboardBase.endRecalcDocument || (this.oDocument.Parent && this.oDocument.Parent instanceof CShape) || (this.oDocument instanceof AscFormat.CDrawingDocContent))
+			{
+				window['AscCommon'].g_clipboardBase.SpecialPasteButtonById_Show();
+			}
 		}
 	},
 
@@ -3065,7 +3073,7 @@ PasteProcessor.prototype =
 						presentation.Check_CursorMoveRight();
 						presentation.Document_UpdateInterfaceState();
 					}
-				}
+				};
 				
 				oThis.api.pre_Paste(aContent.fonts, null, paste_callback);
 			}
