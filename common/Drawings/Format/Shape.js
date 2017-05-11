@@ -5390,6 +5390,7 @@ CShape.prototype.getColumnNumber = function(){
         _ret.x = oTransform.TransformPointX(oConnectorInfo.x, oConnectorInfo.y);
         _ret.y = oTransform.TransformPointY(oConnectorInfo.x, oConnectorInfo.y);
         _ret.bounds.fromOther(this.bounds);
+        _ret.idx = oConnectorInfo.idx;
         return _ret;
     };
 

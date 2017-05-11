@@ -131,6 +131,10 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
     this.oShapeDrawConnectors = null;
     this.lastSpPr = null;
 
+    this.startShape = null;
+    this.endShape = null;
+    this.endConnectionInfo = null;
+
     AscFormat.ExecuteNoHistory(function(){
 
         if(slide){
@@ -144,6 +148,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                         this.startConnectionInfo = oConnector;
                         this.startX = oConnector.x;
                         this.startY = oConnector.y;
+                        this.startShape = aSpTree[i];
                         break;
                     }
                 }
@@ -268,6 +273,9 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         this.oShapeDrawConnectors = null;
         this.lastSpPr = null;
 
+        this.endShape  = null;
+        this.endConnectionInfo = null;
+
         if(this.bConnector){
             var aSpTree = slide.cSld.spTree;
             var oConnector = null;
@@ -277,6 +285,8 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                 if(oConnector){
                     oEndConnectionInfo = oConnector;
                     this.oShapeDrawConnectors = aSpTree[i];
+                    this.endShape = aSpTree[i];
+                    this.endConnectionInfo = oEndConnectionInfo;
                     break;
                 }
             }
@@ -548,22 +558,47 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     this.getShape = function(bFromWord, DrawingDocument, drawingObjects)
     {
-        var shape = new AscFormat.CShape();
-        if(drawingObjects)
-        {
-            shape.setDrawingObjects(drawingObjects);
-        }
 
 
 
 
         var _sp_pr;
         if(this.lastSpPr){
+
+            var shape = new AscFormat.CConnectionShape();
+            if(drawingObjects)
+            {
+                shape.setDrawingObjects(drawingObjects);
+            }
             _sp_pr = this.lastSpPr.createDuplicate();
             shape.setSpPr(_sp_pr);
             _sp_pr.setParent(shape);
+
+            var nv_sp_pr = new AscFormat.UniNvPr();
+            nv_sp_pr.cNvPr.setId(++slide.maxId);
+            shape.setNvSpPr(nv_sp_pr);
+
+            var nvUniSpPr = new AscFormat.CNvUniSpPr();
+            if(this.startShape && this.startConnectionInfo)
+            {
+                nvUniSpPr.stCnxIdx = this.startConnectionInfo.idx;
+                nvUniSpPr.stCnxId  = this.startShape.nvSpPr.cNvPr.id;
+            }
+            if(this.endShape && this.endConnectionInfo)
+            {
+
+                nvUniSpPr.endCnxIdx = this.endConnectionInfo.idx;
+                nvUniSpPr.endCnxId  = this.endShape.nvSpPr.cNvPr.id;
+            }
+            shape.nvSpPr.setUniSpPr(nvUniSpPr);
         }
         else{
+
+            var shape = new AscFormat.CShape();
+            if(drawingObjects)
+            {
+                shape.setDrawingObjects(drawingObjects);
+            }
             shape.setSpPr(new AscFormat.CSpPr());
             shape.spPr.setParent(shape);
             if(bFromWord)

@@ -1087,7 +1087,7 @@ Geometry.prototype=
 
             if(Math.sqrt(dx*dx+dy*dy) < distanse)
             {
-                return {ang: this.cnxLst[i].ang, x: this.cnxLst[i].x, y: this.cnxLst[i].y};
+                return {idx: i, ang: this.cnxLst[i].ang, x: this.cnxLst[i].x, y: this.cnxLst[i].y};
             }
         }
         return null;
