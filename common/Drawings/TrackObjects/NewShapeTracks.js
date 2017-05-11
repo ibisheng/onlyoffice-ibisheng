@@ -300,7 +300,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                 else if(!_endInfo){
                     _endInfo = AscFormat.fCalculateConnectionInfo(_startInfo, x, y);
                 }
-                var oSpPr = AscFormat.fCalculateSpPr(_startInfo, _endInfo, this.presetGeom);
+                var oSpPr = AscFormat.fCalculateSpPr(_startInfo, _endInfo, this.presetGeom, this.overlayObject.pen.w);
                 this.flipH = oSpPr.xfrm.flipH === true;
                 this.flipV = oSpPr.xfrm.flipV === true;
                 this.rot = AscFormat.isRealNumber(oSpPr.xfrm.rot) ? oSpPr.xfrm.rot : 0;

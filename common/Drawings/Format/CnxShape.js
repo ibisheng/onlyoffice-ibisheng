@@ -34,7 +34,7 @@
         this.y = _y;
     };
 
-    function fCalculateSpPr(begin, end, sPreset){
+    function fCalculateSpPr(begin, end, sPreset, penW){
         return AscFormat.ExecuteNoHistory(function(){
             var oSpPr = new AscFormat.CSpPr();
             var oXfrm = new AscFormat.CXfrm();
@@ -44,6 +44,10 @@
             var _begin = begin.copy();
             var _end = end.copy();
             var fAngle = 0;
+
+            if(!penW){
+                penW = 12700;
+            }
 
             switch(begin.dir){
                 case AscFormat.CARD_DIRECTION_N:{
@@ -126,8 +130,8 @@
 
             var posX = Math.min(_begin.x, _end.x);
             var posY = Math.min(_begin.y, _end.y);
-            var extX = Math.abs(_end.x - _begin.x);
-            var extY = Math.abs(_end.y - _begin.y);
+            var extX = Math.max(penW/36000.0, Math.abs(_end.x - _begin.x));
+            var extY = Math.max(penW/36000.0, Math.abs(_end.y - _begin.y));
             var flipV = false;
             var flipH = false;
             var rot = 0;
@@ -137,17 +141,18 @@
             if(sPreset === "line"){
 
             }
-            else if(sPreset.indexOf("curvedConnector") > 0){
-
-            }
             else{
+                var sPrefix = "bentConnector";
+                if(sPreset.indexOf("curvedConnector") > -1){
+                    sPrefix = "curvedConnector";
+                }
                 //returns "bentConnector" by default
                 switch(_end.dir){
                     case AscFormat.CARD_DIRECTION_N:{
 
                         if(_end.bounds.l > _begin.bounds.r){
                             if(_end.y <= _begin.y){
-                                sPreset = "bentConnector4";
+                                sPreset = "4";
                                 rot = 3.0*Math.PI/2.0;
                                 tmp = extX;
                                 extX = extY;
@@ -160,7 +165,7 @@
                                 oMapAdj["adj1"] = (-100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0;
                             }
                             else{
-                                sPreset = "bentConnector2";
+                                sPreset = "2";
                                 rot = 3.0*Math.PI/2.0;
                                 tmp = extX;
                                 extX = extY;
@@ -173,7 +178,7 @@
                         else{
                             if(_end.y <= _begin.bounds.b){
                                 if(_end.y <= _begin.y){
-                                    sPreset = "bentConnector4";
+                                    sPreset = "4";
                                     rot = 3.0*Math.PI/2.0;
                                     tmp = extX;
                                     extX = extY;
@@ -185,7 +190,7 @@
                                     oMapAdj["adj2"] = 100000 + (100000*(Math.max(CONNECTOR_MARGIN, _end.bounds.r + CONNECTOR_MARGIN - _begin.x)/extY) + 0.5) >> 0;
                                 }
                                 else{
-                                    sPreset = "bentConnector4";
+                                    sPreset = "4";
                                     rot = Math.PI/2.0;
                                     tmp = extX;
                                     extX = extY;
@@ -200,7 +205,7 @@
 
                             }
                             else{
-                                sPreset = "bentConnector4";
+                                sPreset = "4";
                                 rot = Math.PI/2.0;
                                 tmp = extX;
                                 extX = extY;
@@ -218,7 +223,7 @@
                     case AscFormat.CARD_DIRECTION_S:{
                         if(_end.bounds.l > _begin.bounds.r){
                             if(_end.bounds.b < _begin.y){
-                                sPreset = "bentConnector2";
+                                sPreset = "2";
                                 rot = Math.PI/2.0;
                                 tmp = extX;
                                 extX = extY;
@@ -227,7 +232,7 @@
                                 posY = (_end.y + _begin.y)/2.0 - extY/2.0;
                             }
                             else{
-                                sPreset = "bentConnector4";
+                                sPreset = "4";
                                 rot = Math.PI / 2.0;
                                 tmp = extX;
                                 extX = extY;
@@ -243,7 +248,7 @@
                             if(_end.bounds.b < _begin.bounds.t){
 
                                 if(_end.x > _begin.bounds.r){
-                                    sPreset = "bentConnector2";
+                                    sPreset = "2";
                                     rot = Math.PI/2.0;
                                     tmp = extX;
                                     extX = extY;
@@ -252,7 +257,7 @@
                                     posY = (_end.y + _begin.y)/2.0 - extY/2.0;
                                 }
                                 else{
-                                    sPreset = "bentConnector4";
+                                    sPreset = "4";
                                     rot = 3.0 * Math.PI / 2.0;
                                     tmp = extX;
                                     extX = extY;
@@ -269,7 +274,7 @@
 
                                 if(_end.x < _begin.x){
                                     if(_end.y > _begin.y){
-                                        sPreset = "bentConnector4";
+                                        sPreset = "4";
                                         rot =  Math.PI / 2.0;
                                         tmp = extX;
                                         extX = extY;
@@ -283,7 +288,7 @@
                                         oMapAdj["adj2"] = 100000 + (100000*(Math.max(CONNECTOR_MARGIN, _end.bounds.r + CONNECTOR_MARGIN - _begin.x)/extY) + 0.5) >> 0;
                                     }
                                     else{
-                                        sPreset = "bentConnector4";
+                                        sPreset = "4";
                                         flipH = true;
                                         flipV = true;
                                         oMapAdj["adj1"] = -((100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - begin.x)/extX + 0.5) >> 0);
@@ -291,7 +296,7 @@
                                     }
                                 }
                                 else{
-                                    sPreset = "bentConnector4";
+                                    sPreset = "4";
                                     rot =  Math.PI / 2.0;
                                     tmp = extX;
                                     extX = extY;
@@ -310,15 +315,15 @@
                     case AscFormat.CARD_DIRECTION_W:{
 
                         if(_begin.x < _end.x){
-                            sPreset = "bentConnector3";
+                            sPreset = "3";
                             flipV = _begin.y > _end.y;
                         }
                         else{
-                            sPreset = "bentConnector5";
+                            sPreset = "5";
                             rot = Math.PI;
                             flipH = true;
                             oMapAdj["adj3"] = (100000 + 100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0;
-                            var leftX =_end.x - Math.min(_begin.bounds.l, _end.bounds.l) + CONNECTOR_MARGIN;
+                            var leftX =_end.x - _end.bounds.l + CONNECTOR_MARGIN;
                             oMapAdj["adj1"] = (-100000*(leftX/extX) + 0.5) >> 0;
                             if(_end.bounds.b < _begin.bounds.t || _end.bounds.t > _begin.bounds.b){
                                 if(_end.bounds.b < _begin.bounds.t){
@@ -344,29 +349,26 @@
                     case AscFormat.CARD_DIRECTION_E:{
                         if(_end.bounds.l > _begin.bounds.r){
                             if(_end.bounds.b < _begin.y ){
-                                sPreset = "bentConnector3";
+                                sPreset = "3";
                                 flipH = true;
                                 oMapAdj["adj1"] = -(100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0;
                             }
                             else if(_end.bounds.t > _begin.y){
-                                sPreset = "bentConnector5";
-                                flipV = true;
+                                sPreset = "3";
 
-                                oMapAdj["adj1"] = (100000*((_end.bounds.l + _begin.bounds.r)/2 - _begin.x)/extX + 0.5) >> 0;
-                                oMapAdj["adj2"] = (100000 + (_end.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
-                                oMapAdj["adj3"] = 100000 + (100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0;
+                                oMapAdj["adj1"] = 100000 + (100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0;
 
                             }
                             else{
                                 if(_end.y < _begin.y){
-                                    sPreset = "bentConnector5";
+                                    sPreset = "5";
                                     flipV = true;
                                     oMapAdj["adj1"] = (100000*((_end.bounds.l + _begin.bounds.r)/2 - _begin.x)/extX + 0.5) >> 0;
                                     oMapAdj["adj2"] =  (100000 + 100000*(_end.y  - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
                                     oMapAdj["adj3"] = 100000 + (100000*(_end.bounds.r + CONNECTOR_MARGIN - _end.x)/extX + 0.5) >> 0;
                                 }
                                 else{
-                                    sPreset = "bentConnector5";
+                                    sPreset = "5";
                                     oMapAdj["adj1"] = (100000*((_end.bounds.l + _begin.bounds.r)/2 - _begin.x)/extX + 0.5) >> 0;
                                     oMapAdj["adj2"] =  -(100000*(begin.y  - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
                                     oMapAdj["adj3"] = 100000 + (100000*(_end.bounds.r + CONNECTOR_MARGIN - _end.x)/extX + 0.5) >> 0;
@@ -379,37 +381,37 @@
                                     if(_end.x < _begin.x){
                                         flipH = true;
                                         flipV = true;
-                                        sPreset = "bentConnector3";
+                                        sPreset = "3";
                                         oMapAdj["adj1"] = -(100000*(Math.max(_end.bounds.r, _begin.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
                                     }
                                     else {
                                         flipV = true;
-                                        sPreset = "bentConnector3";
+                                        sPreset = "3";
                                         oMapAdj["adj1"] =  100000 + (100000*(Math.max(_end.bounds.r, _begin.bounds.r) + CONNECTOR_MARGIN - _end.x)/extX + 0.5) >> 0;
                                     }
                                 }
                                 else{
                                     if(_end.x < _begin.x){
                                         flipH = true;
-                                        sPreset = "bentConnector3";
+                                        sPreset = "3";
                                         oMapAdj["adj1"] = -(100000*(Math.max(_end.bounds.r, _begin.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
                                     }
                                     else {
-                                        sPreset = "bentConnector3";
+                                        sPreset = "3";
                                         oMapAdj["adj1"] =  100000 + (100000*(Math.max(_end.bounds.r, _begin.bounds.r) + CONNECTOR_MARGIN - _end.x)/extX + 0.5) >> 0;
                                     }
                                 }
                             }
                             else{
                                 if(_end.y >= _begin.y){
-                                    sPreset = "bentConnector5";
+                                    sPreset = "5";
                                     flipH = true;
                                     oMapAdj["adj1"] = -((100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0);
                                     oMapAdj["adj2"] = (100000 + 100000*(_begin.bounds.b + CONNECTOR_MARGIN - _end.y)/extY + 0.5) >> 0;
                                     oMapAdj["adj3"] = (100000*(_begin.x - (_end.bounds.r + _begin.bounds.l)/2.0)/extX + 0.5) >> 0;
                                 }
                                 else{
-                                    sPreset = "bentConnector5";
+                                    sPreset = "5";
                                     flipH = true;
                                     flipV = true;
                                     oMapAdj["adj1"] = -((100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0);
@@ -421,8 +423,8 @@
                         break;
                     }
                 }
+                sPreset = sPrefix + sPreset;
             }
-
             var _posX = (end.x + begin.x)/2.0 - extX/2.0;
             var _posY = (end.y + begin.y)/2.0 - extY/2.0;
             var _fAng = AscFormat.normalizeRotate(rot - fAngle);
