@@ -921,7 +921,7 @@ CBlockLevelSdt.prototype.GetContentControlLock = function()
 };
 CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 {
-	if (oPr)
+	if (!oPr)
 		return;
 
 	if (undefined !== oPr.Tag)
