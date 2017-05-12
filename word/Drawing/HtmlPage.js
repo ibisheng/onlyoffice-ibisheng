@@ -3185,6 +3185,9 @@ function CEditorPage(api)
 
 	this.OnPaint = function()
 	{
+		if (this.m_oApi.isLongAction())
+			return;
+
 		if (this.DrawingFreeze || true === window["DisableVisibleComponents"])
 		{
 			this.m_oApi.checkLastWork();
