@@ -436,38 +436,42 @@
 				{
 					var _current = this.documents[this.current];
 
-					var _content_control_pr = new CContentControlPr();
-					_content_control_pr.Id = _current.Props.Id;
-					_content_control_pr.Tag = _current.Props.Tag;
-					_content_control_pr.Lock = _current.Props.Lock;
-					_content_control_pr.InternalId = _current.Props.InternalId;
+					var _content_control_pr;
+					var _blockStd;
 
-					if (undefined !== _content_control_pr.InternalId)
+					if (_current.Url !== undefined || _current.Script !== undefined)
 					{
-						// remove block sdt
-						LogicDocument.SelectContentControl(_content_control_pr.InternalId);
-						LogicDocument.RemoveContentControl(_content_control_pr.InternalId);
+						if (undefined !== _current.Props.InternalId)
+						{
+							// remove block sdt
+							LogicDocument.SelectContentControl(_current.Props.InternalId);
+							LogicDocument.RemoveContentControl(_current.Props.InternalId);
+						}
+
+						_content_control_pr = new CContentControlPr();
+						_content_control_pr.Id = _current.Props.Id;
+						_content_control_pr.Tag = _current.Props.Tag;
+						_content_control_pr.Lock = sdtlock_Unlocked;
+						_content_control_pr.InternalId = _current.Props.InternalId;
+
+						var _blockStd = LogicDocument.AddContentControl();
+						_blockStd.SetContentControlPr(_content_control_pr);
+
+						this.returnDocuments.push(_blockStd.GetContentControlPr());
 					}
 
 					if (_current.Url !== undefined)
 					{
-						var _blockStd = LogicDocument.AddContentControl();
-
-						var _content_control_pr = new CContentControlPr();
-						_content_control_pr.Id = _current.Props.Id;
-						_content_control_pr.Tag = _current.Props.Tag;
-						_content_control_pr.Lock = _current.Props.Lock;
-						_content_control_pr.InternalId = _current.Props.InternalId;
-
-						_blockStd.SetContentControlPr(_content_control_pr);
-
-						this.returnDocuments.push(_blockStd.GetContentControlPr());
-
 						// insert/replace document
 						this.api.insertDocumentUrlsData = {imageMap: null, documents: [{url : _current.Url, format: _current.Format}], endCallback : function(_api) {
 
 							_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1 , 1);
 							_blockStd.MoveCursorToEndPos(false, false);
+
+							var _worker = _api.__content_control_worker;
+							if (_worker.documents[_worker.current].Props)
+								_blockStd.SetContentControlPr({ Lock : _worker.documents[_worker.current].Props.Lock });
+							_worker = null;
 
 							_blockStd = null;
 
@@ -481,18 +485,6 @@
 					else if (_current.Script !== undefined)
 					{
 						// insert/replace script
-						var _blockStd = LogicDocument.AddContentControl();
-
-						var _content_control_pr = new CContentControlPr();
-						_content_control_pr.Id = _current.Props.Id;
-						_content_control_pr.Tag = _current.Props.Tag;
-						_content_control_pr.Lock = _current.Props.Lock;
-						_content_control_pr.InternalId = _current.Props.InternalId;
-
-						_blockStd.SetContentControlPr(_content_control_pr);
-
-						this.returnDocuments.push(_blockStd.GetContentControlPr());
-
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current.Script + "\n})();";
 						eval(_script);
 
@@ -502,6 +494,11 @@
 							_blockStd.MoveCursorToEndPos(false, false);
 						}
 						LogicDocument.MoveCursorRight(false, false, true);
+
+						var _worker = _api.__content_control_worker;
+						if (_worker.documents[_worker.current].Props)
+							_blockStd.SetContentControlPr({ Lock : _worker.documents[_worker.current].Props.Lock });
+						_worker = null;
 
 						var _fonts         = LogicDocument.Document_Get_AllFontNames();
 						var _imagesArray   = LogicDocument.Get_AllImageUrls();
