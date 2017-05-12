@@ -10229,9 +10229,11 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		var oThis = this;
 		if (c_oSerSdt.Pr === type) {
 			if (0 === typeContainer) {
+				var sdtPr = new AscCommonWord.CSdtPr();
 				res = this.bcr.Read1(length, function(t, l) {
-					return oThis.ReadSdtPr(t, l, oSdt.Pr);
+					return oThis.ReadSdtPr(t, l, sdtPr);
 				});
+				oSdt.SetPr(sdtPr);
 			} else {
 				res = c_oSerConstants.ReadUnknown;
 			}
