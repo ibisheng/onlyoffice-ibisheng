@@ -6089,13 +6089,13 @@ background-repeat: no-repeat;\
 		{
 			// никаких евентов. ничего грузить не нужно. сделано для сафари под макОс.
 			// там при LongActions теряется фокус и вставляются пробелы
-			this.decrementCounterLongAction();
 			this.pasteCallback();
 			this.pasteCallback            = null;
 
 			return;
 		}
 
+		this.incrementCounterLongAction();
 		this.isPasteFonts_Images = true;
 		this.FontLoader.LoadDocumentFonts2(_fonts);
 	};
