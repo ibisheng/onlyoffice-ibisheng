@@ -367,9 +367,9 @@
 		this.init(ws);
 		return this._f.calculate(null, null).getValue();
 	};
-	CFormulaCF.prototype.getValueRaw = function(ws, opt_parent, opt_offset) {
+	CFormulaCF.prototype.getValueRaw = function(ws, opt_parent, opt_bbox, opt_offset) {
 		this.init(ws, opt_parent);
-		return this._f.calculate(null, null, opt_offset);
+		return this._f.calculate(null, opt_bbox, opt_offset);
 	};
 
 	function CIconSet () {

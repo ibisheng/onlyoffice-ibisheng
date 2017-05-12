@@ -2921,7 +2921,8 @@
 									return function(val, c) {
 										offset.offsetRow = c.nRow - rowLT;
 										offset.offsetCol = c.nCol - colLT;
-										var res = formulaCF && formulaCF.getValueRaw(t, formulaParent, offset);
+										var bboxCell = new Asc.Range(c.nCol, c.nRow, c.nCol, c.nRow);
+										var res = formulaCF && formulaCF.getValueRaw(t, formulaParent, bboxCell, offset);
 										if(res && res.tocBool){
 											res = res.tocBool();
 											if(res && res.toBool) {
