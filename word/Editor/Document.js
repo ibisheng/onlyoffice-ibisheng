@@ -1247,6 +1247,7 @@ function CSelectedElementsInfo()
     this.m_oField          = null;  // Поле, в котором находится выделение
     this.m_oCell           = null;  // Выделенная ячейка (специальная ситуация, когда выделена ровно одна ячейка)
 	this.m_oBlockLevelSdt  = null;  // Если мы находимся в классе CBlockLevelSdt
+	this.m_oInlineLevelSdt = null;  // Если мы находимся в классе CInlineLevelSdt
 
     this.Reset = function()
     {
@@ -1343,6 +1344,14 @@ CSelectedElementsInfo.prototype.SetBlockLevelSdt = function(oSdt)
 CSelectedElementsInfo.prototype.GetBlockLevelSdt = function()
 {
 	return this.m_oBlockLevelSdt;
+};
+CSelectedElementsInfo.prototype.SetInlineLevelSdt = function(oSdt)
+{
+	this.m_oInlineLevelSdt = oSdt;
+};
+CSelectedElementsInfo.prototype.GetInlineLevelSdt = function()
+{
+	return this.m_oInlineLevelSdt;
 };
 
 var document_compatibility_mode_Word14 = 14;
@@ -15187,10 +15196,12 @@ CDocument.prototype.RemoveContentControl = function(Id)
 	var oBlockLevelSdt = this.TableId.Get_ById(Id);
 	if (oBlockLevelSdt && oBlockLevelSdt.Parent)
 	{
+		this.RemoveSelection();
 		var oDocContent = oBlockLevelSdt.Parent;
 		oDocContent.Update_ContentIndexing();
 		var nIndex = oBlockLevelSdt.GetIndex();
 		oDocContent.Remove_FromContent(nIndex, 1);
+		oDocContent.MoveCursorToStartPos();
 	}
 };
 CDocument.prototype.GetContentControl = function(Id)
