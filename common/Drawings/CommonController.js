@@ -143,7 +143,7 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
             return Math.abs( a - b ) < fDelta;
         }
         return Math.abs( a - b ) < 1e-15;
-    };
+    }
 
 
 	function fSolveQuadraticEquation(a, b, c){
@@ -717,6 +717,107 @@ DrawingObjectsController.prototype =
     handleOleDblClick: function(drawing, e, x, y, pageIndex)
     {
 
+    },
+
+    getAllConnectors: function(aDrawings, allDrawings){
+        var _ret = allDrawings;
+        if(!_ret){
+            _ret = [];
+        }
+        for(var i = 0; i < aDrawings.length; ++i){
+            if(aDrawings[i].getObjectType() === AscDFH.historyitem_type_Cnx){
+                _ret.push(aDrawings[i]);
+            }
+            else if(aDrawings[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                aDrawings[i].getAllConnectors(aDrawings[i].spTree, _ret);
+            }
+        }
+        return _ret;
+    },
+
+    getAllShapes:  function(aDrawings, allDrawings){
+        var _ret = allDrawings;
+        if(!_ret){
+            _ret = [];
+        }
+        for(var i = 0; i < aDrawings.length; ++i){
+            if(aDrawings[i].getObjectType() === AscDFH.historyitem_type_Shape){
+                _ret.push(aDrawings[i]);
+            }
+            else if(aDrawings[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                aDrawings[i].getAllShapes(aDrawings[i].spTree, _ret);
+            }
+        }
+        return _ret;
+    },
+
+    checkConnectorsPreTrack: function(){
+
+        if(this.arrPreTrackObjects.length > 0 && this.arrPreTrackObjects[0].originalObject){
+
+            var aAllConnectors = this.getAllConnectors(this.getDrawingArray());
+            var oPreTrack;
+            var stId = null, endId = null, oBeginTrack = null, oEndTrack = null, oBeginShape = null, oEndShape = null;
+            var aConnectionPreTracks = [];
+            var aAllShapes = null;
+            for(var i = 0; i < aAllConnectors.length; ++i){
+                stId = aAllConnectors[i].nvSpPr.nvUniSpPr.stCnxId;
+                endId = aAllConnectors[i].nvSpPr.nvUniSpPr.endCnxId;
+                oBeginTrack = null;
+                oEndTrack = null;
+                oBeginShape = null;
+                oEndShape = null;
+
+                if(stId !== null || endId !== null){
+                    for(var j = 0; j < this.arrPreTrackObjects.length; ++j){
+                        oPreTrack = this.arrPreTrackObjects[j].originalObject;
+                        if(oPreTrack.getObjectType() === AscDFH.historyitem_type_Shape && oPreTrack.nvSpPr){
+                            if(oPreTrack.nvSpPr.cNvPr.id === stId){
+                                oBeginTrack = this.arrPreTrackObjects[j];
+                            }
+                            if(oPreTrack.nvSpPr.cNvPr.id === endId){
+                                oEndTrack = this.arrPreTrackObjects[j];
+                            }
+                        }
+                    }
+                }
+                if(oBeginTrack || oEndTrack){
+
+                    if(oBeginTrack){
+                        oBeginShape = oBeginTrack.originalObject;
+                    }
+                    else{
+                        if(stId !== null){
+                            if(!aAllShapes){
+                                aAllShapes = this.getAllShapes(this.getDrawingArray());
+                            }
+                            for(var j = 0; j < aAllShapes.length; ++j){
+                                if(aAllShapes[j].nvSpPr.cNvPr.id === stId){
+                                    oBeginShape = aAllShapes[j];
+                                }
+                            }
+                        }
+                    }
+                    if(oEndTrack){
+                        oEndShape = oEndTrack.originalObject;
+                    }
+                    else if(endId !== null){
+                        if(!aAllShapes){
+                            aAllShapes = this.getAllShapes(this.getDrawingArray());
+                        }
+                        for(var j = 0; j < aAllShapes.length; ++j){
+                            if(aAllShapes[j].nvSpPr.cNvPr.id === endId){
+                                oEndShape = aAllShapes[j];
+                            }
+                        }
+                    }
+                    aConnectionPreTracks.push(new AscFormat.CConnectorTrack(aAllConnectors[i], oBeginTrack, oEndTrack, oBeginShape, oEndShape));
+                }
+            }
+            for(i = 0; i < aConnectionPreTracks.length; ++i){
+                this.arrPreTrackObjects.push(aConnectionPreTracks[i]);
+            }
+        }
     },
 
     //for mobile spreadsheet editor
@@ -6314,6 +6415,7 @@ DrawingObjectsController.prototype =
 
     swapTrackObjects: function()
     {
+        this.checkConnectorsPreTrack();
         this.clearTrackObjects();
         for(var i = 0; i < this.arrPreTrackObjects.length; ++i)
             this.addTrackObject(this.arrPreTrackObjects[i]);

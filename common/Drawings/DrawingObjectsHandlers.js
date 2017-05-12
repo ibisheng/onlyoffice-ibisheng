@@ -144,6 +144,7 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
             case AscDFH.historyitem_type_Shape:
             case AscDFH.historyitem_type_ImageShape:
             case AscDFH.historyitem_type_OleObject:
+            case AscDFH.historyitem_type_Cnx:
             {
                 ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
@@ -252,6 +253,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
             case AscDFH.historyitem_type_Shape:
             case AscDFH.historyitem_type_ImageShape:
             case AscDFH.historyitem_type_OleObject:
+            case AscDFH.historyitem_type_Cnx:
             {
                 ret = handleShapeImageInGroup(drawingObjectsController, drawing, cur_grouped_object, e, x, y, pageIndex, bWord);
                 if(ret)
@@ -718,6 +720,7 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
             case AscDFH.historyitem_type_Shape:
             case AscDFH.historyitem_type_ImageShape:
             case AscDFH.historyitem_type_OleObject:
+            case AscDFH.historyitem_type_Cnx:
             {
                 ret = handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
                 if(ret)

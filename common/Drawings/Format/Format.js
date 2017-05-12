@@ -4889,8 +4889,17 @@ function CNvUniSpPr()
             this.stCnxId = r.GetLong();
         }
         else{
-            this.stCnxIdx = r.GetLong();
-            this.stCnxId = r.GetLong();
+            this.stCnxIdx = null;
+            this.stCnxId =  null;
+        }
+        bCnx = r.GetBool();
+        if(bCnx){
+            this.endCnxIdx = r.GetLong();
+            this.endCnxId = r.GetLong();
+        }
+        else{
+            this.endCnxIdx = null;
+            this.endCnxId =  null;
         }
     };
 

@@ -558,10 +558,6 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     this.getShape = function(bFromWord, DrawingDocument, drawingObjects)
     {
-
-
-
-
         var _sp_pr;
         if(this.lastSpPr){
 
