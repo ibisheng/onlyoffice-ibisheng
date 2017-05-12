@@ -841,7 +841,8 @@
 		Change: 1,
 		ChangeFormula: 2,
 		EndCalculate: 3,
-		GetRangeCell: 4
+		GetRangeCell: 4,
+		IsDefName: 5
 	};
 
 	var c_oDashType = {

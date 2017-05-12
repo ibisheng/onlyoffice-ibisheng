@@ -1252,11 +1252,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cArea3D.prototype.getWS = function () {
 		return this.wsFrom;
 	};
-	cArea3D.prototype.cross = function (arg, wsID) {
+	cArea3D.prototype.cross = function (arg, ws) {
 		if (!this.isSingleSheet()) {
 			return new cError(cErrorType.wrong_value_type);
 		}
-		/*if ( this.wsFrom !== wsID ) {
+		/*if ( this.wsFrom !== ws ) {
 		 return new cError( cErrorType.wrong_value_type );
 		 }*/
 		var r = this.getRange();
@@ -4906,7 +4906,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 					for (var ind = 0; ind < currentElement.getArguments(); ind++) {
 						arg.unshift(elemArr.pop());
 					}
-					_tmp = currentElement.Calculate(arg, bbox, opt_defName, this.ws.getId());
+					_tmp = currentElement.Calculate(arg, bbox, opt_defName, this.ws);
 					if (null != _tmp.numFormat) {
 						numFormat = _tmp.numFormat;
 					} else if (0 > numFormat || cNumFormatNone === currentElement.numFormat) {
@@ -5334,6 +5334,11 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 			this.wb.dependencyFormulas.startListeningVolatile(this);
 		}
 
+		var isDefName;
+		if (this.parent && this.parent.onFormulaEvent) {
+			isDefName = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.IsDefName);
+		}
+
 		for (var i = 0; i < this.outStack.length; i++) {
 			ref = this.outStack[i];
 
@@ -5353,6 +5358,7 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 					bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
 					bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
 				}
+				bbox = this.extentBBoxDefName(isDefName, bbox);
 				this.wb.dependencyFormulas.startListeningRange(ref.getWsId(), bbox, this);
 			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
 				wsR = ref.range(ref.wsRange());
@@ -5369,6 +5375,7 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 							bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
 							bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
 						}
+						bbox = this.extentBBoxDefName(isDefName, bbox);
 						this.wb.dependencyFormulas.startListeningRange(wsId, bbox, this);
 					}
 				}
@@ -5388,6 +5395,11 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 			this.wb.dependencyFormulas.endListeningVolatile(this);
 		}
 
+		var isDefName;
+		if (this.parent && this.parent.onFormulaEvent) {
+			isDefName = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.IsDefName);
+		}
+
 		for (var i = 0; i < this.outStack.length; i++) {
 			ref = this.outStack[i];
 
@@ -5405,6 +5417,7 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 					bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
 					bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
 				}
+				bbox = this.extentBBoxDefName(isDefName, bbox);
 				this.wb.dependencyFormulas.endListeningRange(ref.getWsId(), bbox, this);
 			} else if (cElementType.cellsRange3D === ref.type && ref.dependenceRange) {
 				wsR = ref.dependenceRange;
@@ -5418,13 +5431,27 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 							bbox.setOffsetFirst({offsetRow: -1, offsetCol: 0});
 							bbox.setOffsetLast({offsetRow: 1, offsetCol: 0});
 						}
+						bbox = this.extentBBoxDefName(isDefName, bbox);
 						this.wb.dependencyFormulas.endListeningRange(wsId, bbox, this);
 					}
 				}
 			}
 		}
 	};
-
+	parserFormula.prototype.extentBBoxDefName = function(isDefName, bbox) {
+		if (isDefName && !bbox.isAbsAll()) {
+			bbox = bbox.clone();
+			if (!bbox.isAbsR1() || !bbox.isAbsR2()) {
+				bbox.r1 = 0;
+				bbox.r2 = AscCommon.gc_nMaxRow0;
+			}
+			if (!bbox.isAbsC1() || !bbox.isAbsC2()) {
+				bbox.c1 = 0;
+				bbox.c2 = AscCommon.gc_nMaxCol0;
+			}
+		}
+		return bbox;
+	};
 parserFormula.prototype.getElementByPos = function(pos) {
   var curPos = 0;
   for (var i = 0; i < this.f.length; ++i) {

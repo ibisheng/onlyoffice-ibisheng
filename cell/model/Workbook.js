@@ -238,6 +238,8 @@
 				return !(this.isTable &&
 				(AscCommon.c_oNotifyType.Shift === type || AscCommon.c_oNotifyType.Move === type ||
 				AscCommon.c_oNotifyType.Delete === type));
+			} else if (AscCommon.c_oNotifyParentType.IsDefName === type) {
+				return true;
 			} else if (AscCommon.c_oNotifyParentType.Change === type) {
 				this.wb.dependencyFormulas.addToChangedDefName(this);
 			} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
@@ -2688,6 +2690,7 @@
 		return false;
 	};
 	Woorksheet.prototype._updateConditionalFormatting = function(range) {
+		var t = this;
 		var oGradient1, oGradient2;
 		var aCFs = this.aConditionalFormatting;
 		var aRules, oRule;
@@ -2907,6 +2910,27 @@
 										return rule.cellIs(val, v1, v2);
 									};
 								})(oRule, oRule.aRuleElements[0] && oRule.aRuleElements[0].getValue(this), oRule.aRuleElements[1] && oRule.aRuleElements[1].getValue(this));
+								break;
+							case AscCommonExcel.ECfType.expression:
+								var offset = {offsetRow: 0, offsetCol: 0};
+								var bboxCf = cf.getBBox();
+								var rowLT = bboxCf ? bboxCf.r1 : 0;
+								var colLT = bboxCf ? bboxCf.c1 : 0;
+								var formulaParent =  new AscCommonExcel.CConditionalFormattingFormulaWrapper(this, cf);
+								compareFunction = (function(rule, formulaCF) {
+									return function(val, c) {
+										offset.offsetRow = c.nRow - rowLT;
+										offset.offsetCol = c.nCol - colLT;
+										var res = formulaCF && formulaCF.getValueRaw(t, formulaParent, offset);
+										if(res && res.tocBool){
+											res = res.tocBool();
+											if(res && res.toBool) {
+												return res.toBool();
+											}
+										}
+										return false;
+									};
+								})(oRule, oRule.aRuleElements[0]);
 								break;
 							default:
 								continue;

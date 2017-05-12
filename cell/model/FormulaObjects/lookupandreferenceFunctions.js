@@ -281,12 +281,10 @@
 	cCOLUMN.prototype.constructor = cCOLUMN;
 	cCOLUMN.prototype.argumentsMax = 1;
 	cCOLUMN.prototype.Calculate = function (arg) {
-		var arg0;
 		if (this.argumentsCurrent == 0) {
-			arg0 = arguments[1];
-			return this.value = new cNumber(arg0.bbox.c1 + 1);
+			return this.value = new cNumber(arguments[1].c1 + 1);
 		}
-		arg0 = arg[0];
+		var arg0 = arg[0];
 		var range;
 		if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
 			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
@@ -570,7 +568,7 @@
 	cINDIRECT.prototype.ca = true;
 	cINDIRECT.prototype.Calculate = function (arg) {
 		var t = this, arg0 = arg[0].tocString(), arg1 = arg[1] ? arg[1] :
-			new cBool(true), r1 = arguments[1], wb = r1.worksheet.workbook, o = {
+			new cBool(true), ws = arguments[3], wb = ws.workbook, o = {
 			Formula: "", pCurrPos: 0
 		}, ref, found_operand, ret;
 
@@ -591,11 +589,11 @@
 					}
 				}
 			} else if (parserHelp.isArea.call(o, o.Formula, o.pCurrPos)) {
-				found_operand = new cArea(o.operand_str.toUpperCase(), r1.worksheet);
+				found_operand = new cArea(o.operand_str.toUpperCase(), ws);
 			} else if (parserHelp.isRef.call(o, o.Formula, o.pCurrPos, true)) {
-				found_operand = new cRef(o.operand_str.toUpperCase(), r1.worksheet);
+				found_operand = new cRef(o.operand_str.toUpperCase(), ws);
 			} else if (parserHelp.isName.call(o, o.Formula, o.pCurrPos, wb)[0]) {
-				found_operand = new AscCommonExcel.cName(o.operand_str, r1.worksheet);
+				found_operand = new AscCommonExcel.cName(o.operand_str, ws);
 			}
 		}
 
@@ -1012,12 +1010,10 @@
 	cROW.prototype.constructor = cROW;
 	cROW.prototype.argumentsMax = 1;
 	cROW.prototype.Calculate = function (arg) {
-		var arg0;
 		if (this.argumentsCurrent == 0) {
-			arg0 = arguments[1];
-			return this.value = new cNumber(arg0.bbox.r1 + 1);
+			return this.value = new cNumber(arguments[1].r1 + 1);
 		}
-		arg0 = arg[0];
+		var arg0 = arg[0];
 		var range;
 		if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
 			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
