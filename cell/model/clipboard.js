@@ -3029,7 +3029,7 @@
 						oNewItem.colSpan = cell.colSpan;
 					}
 					this.aResult.deleteCell(row + this.maxLengthRowCount, col)
-				};
+				}
 	
 				var s = 0;
 				var c1 = col !== undefined ? col : 0;

@@ -2364,8 +2364,26 @@ PasteProcessor.prototype =
 				break;
 			}
 			case Asc.c_oSpecialPasteProps.keepTextOnly:
-			{	
-				//в данному случае мы должны применить к вставленному фрагменту стиль paraRun, в который вставляем
+			{
+				/*for(var i = 0; i < this.aContent.length; i++)
+				{
+					var elem = this.aContent[i];
+					if()
+					{
+
+					}
+				}
+				var NumberingEngine = new CDocumentNumberingInfoEngine(paragraph.Id, NumPr, this.Get_Numbering());
+				for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+				{
+					this.Content[nIndex].GetNumberingInfo(NumberingEngine);
+					if (true === NumberingEngine.Is_Found())
+						break;
+				}*/
+
+				//this._checkNumberingText(paragraph);
+
+
 				if(pasteIntoParagraphPr)
 				{
 					paragraph.Set_Pr(pasteIntoParagraphPr);
@@ -2601,7 +2619,235 @@ PasteProcessor.prototype =
 		return obj;
 	},
 
-	_addTextIntoRun: function(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace)
+	_checkNumberingText: function(paragraph)
+	{
+		var NumPr = paragraph.Numbering_Get();
+		if(NumPr)
+		{
+			var text = paragraph.GetText();
+			paragraph.Parent.Internal_GetNumInfo(paragraph.Id, paragraph.Numbering_Get());
+
+			var Para, ParaNumPr;
+			if(!this.numIds)
+			{
+				this.numIds = [];
+				for(var i = 0; i < this.aContent.length; i++)
+				{
+					Para = this.aContent[i];
+					ParaNumPr = Para.Numbering_Get();
+					if(ParaNumPr)
+					{
+						this.numIds[i] = ParaNumPr;
+					}
+				}
+			}
+
+
+			var num = 1;
+			for(var i = 0; i < this.aContent.length; i++)
+			{
+				Para = this.aContent[i];
+				ParaNumPr = this.numIds[i];
+
+				if(paragraph.Id === Para.Id)
+				{
+					break;
+				}
+
+				if (ParaNumPr.Lvl === NumPr.Lvl && undefined !== ParaNumPr && ParaNumPr.NumId === NumPr.NumId && (undefined === Para.Get_SectionPr() || true !== Para.IsEmpty()))
+				{
+					num++;
+				}
+			}
+
+			var NumInfo = [];
+			NumInfo[ParaNumPr.Lvl] = num;
+
+
+
+			var abstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(paragraph.Pr.NumPr.NumId);
+			var NumTextPr = paragraph.Get_CompiledPr2(false).TextPr.Copy();
+			var lvl = abstractNum.Lvl[paragraph.Pr.NumPr.Lvl];
+			var numberingText = this._getNumberingText(lvl, NumInfo, NumTextPr, lvl);
+
+			var newParaRun = new ParaRun();
+			this._addTextIntoRun(newParaRun, numberingText, false, true, true);
+			paragraph.Internal_Content_Add(0, newParaRun, false);
+		}
+	},
+
+	_getNumberingText: function(Lvl, NumInfo, NumTextPr, LvlPr/*, bAddTabBetween*/)
+	{
+		var Text = LvlPr.LvlText;
+
+		var Char = "";
+		//Context.SetTextPr( NumTextPr, Theme );
+		//Context.SetFontSlot( fontslot_ASCII );
+		//g_oTextMeasurer.SetTextPr( NumTextPr, Theme );
+		//g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+
+		for ( var Index = 0; Index < Text.length; Index++ )
+		{
+			switch( Text[Index].Type )
+			{
+				case numbering_lvltext_Text:
+				{
+					var Hint = NumTextPr.RFonts.Hint;
+					var bCS  = NumTextPr.CS;
+					var bRTL = NumTextPr.RTL;
+					var lcid = NumTextPr.Lang.EastAsia;
+
+					var FontSlot = g_font_detector.Get_FontClass( Text[Index].Value.charCodeAt(0), Hint, lcid, bCS, bRTL );
+
+					Char += Text[Index].Value;
+					//Context.SetFontSlot( FontSlot );
+					//g_oTextMeasurer.SetFontSlot( FontSlot );
+
+					//Context.FillText( X, Y, Text[Index].Value );
+					//X += g_oTextMeasurer.Measure( Text[Index].Value ).Width;
+
+					break;
+				}
+				case numbering_lvltext_Num:
+				{
+					//Context.SetFontSlot( fontslot_ASCII );
+					//g_oTextMeasurer.SetFontSlot( fontslot_ASCII );
+
+					var CurLvl = Text[Index].Value;
+					switch( LvlPr.Format )
+					{
+						case numbering_numfmt_Bullet:
+						{
+							break;
+						}
+
+						case numbering_numfmt_Decimal:
+						{
+							if ( CurLvl < NumInfo.length )
+							{
+								var T = "" + ( LvlPr.Start - 1 + NumInfo[CurLvl] );
+								for ( var Index2 = 0; Index2 < T.length; Index2++ )
+								{
+									Char += T.charAt(Index2);
+									//Context.FillText( X, Y, Char );
+									//X += g_oTextMeasurer.Measure( Char ).Width;
+								}
+							}
+							break;
+						}
+
+						case numbering_numfmt_DecimalZero:
+						{
+							if ( CurLvl < NumInfo.length )
+							{
+								var T = "" + ( LvlPr.Start - 1 + NumInfo[CurLvl] );
+
+								if ( 1 === T.length )
+								{
+									//Context.FillText( X, Y, '0' );
+									//X += g_oTextMeasurer.Measure( '0' ).Width;
+
+									var Char = T.charAt(0);
+									//Context.FillText( X, Y, Char );
+									//X += g_oTextMeasurer.Measure( Char ).Width;
+								}
+								else
+								{
+									for ( var Index2 = 0; Index2 < T.length; Index2++ )
+									{
+										Char += T.charAt(Index2);
+										//Context.FillText( X, Y, Char );
+										//X += g_oTextMeasurer.Measure( Char ).Width;
+									}
+								}
+							}
+							break;
+						}
+
+						case numbering_numfmt_LowerLetter:
+						case numbering_numfmt_UpperLetter:
+						{
+							if ( CurLvl < NumInfo.length )
+							{
+								// Формат: a,..,z,aa,..,zz,aaa,...,zzz,...
+								var Num = LvlPr.Start - 1 + NumInfo[CurLvl] - 1;
+
+								var Count = (Num - Num % 26) / 26;
+								var Ost   = Num % 26;
+
+								var T = "";
+
+								var Letter;
+								if ( numbering_numfmt_LowerLetter === LvlPr.Format )
+									Letter = String.fromCharCode( Ost + 97 );
+								else
+									Letter = String.fromCharCode( Ost + 65 );
+
+								for ( var Index2 = 0; Index2 < Count + 1; Index2++ )
+									T += Letter;
+
+								for ( var Index2 = 0; Index2 < T.length; Index2++ )
+								{
+									Char += T.charAt(Index2);
+									//Context.FillText( X, Y, Char );
+									//X += g_oTextMeasurer.Measure( Char ).Width;
+								}
+							}
+							break;
+						}
+
+						case numbering_numfmt_LowerRoman:
+						case numbering_numfmt_UpperRoman:
+						{
+							if ( CurLvl < NumInfo.length )
+							{
+								var Num = LvlPr.Start - 1 + NumInfo[CurLvl];
+
+								// Переводим число Num в римскую систему исчисления
+								var Rims;
+
+								if ( numbering_numfmt_LowerRoman === LvlPr.Format )
+									Rims = [  'm', 'cm', 'd', 'cd', 'c', 'xc', 'l', 'xl', 'x', 'ix', 'v', 'iv', 'i', ' '];
+								else
+									Rims = [  'M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I', ' '];
+
+								var Vals = [ 1000,  900, 500,  400, 100,   90,  50,   40,  10,    9,   5,    4,   1,   0];
+
+								var T = "";
+								var Index2 = 0;
+								while ( Num > 0 )
+								{
+									while ( Vals[Index2] <= Num )
+									{
+										T   += Rims[Index2];
+										Num -= Vals[Index2];
+									}
+
+									Index2++;
+
+									if ( Index2 >= Rims.length )
+										break;
+								}
+
+								for ( var Index2 = 0; Index2 < T.length; Index2++ )
+								{
+									Char += T.charAt(Index2);
+									//Context.FillText( X, Y, Char );
+									//X += g_oTextMeasurer.Measure( T.charAt(Index2) ).Width;
+								}
+							}
+							break;
+						}
+					}
+
+					break;
+				}
+			}
+		}
+		return Char;
+	},
+
+	_addTextIntoRun: function(oCurRun, value, bIsAddTabBefore, dNotAddLastSpace, bIsAddTabAfter)
 	{
 		var diffContentIndex = 0;
 		if(bIsAddTabBefore){
@@ -2639,6 +2885,10 @@ PasteProcessor.prototype =
 					oCurRun.Add_ToContent(k + diffContentIndex, Item, false);
 				}
 			}
+		}
+
+		if(bIsAddTabAfter){
+			oCurRun.Add_ToContent(oCurRun.Content.length, new ParaTab(), false);
 		}
 	},
 	//***end special paste***
