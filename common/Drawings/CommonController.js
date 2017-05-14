@@ -676,6 +676,14 @@ function getTargetTextObject(controller)
     return null;
 }
 
+
+function isConnectorPreset(sPreset){
+        if(typeof sPreset === "string" && sPreset.length > 0){
+            return "line" === sPreset || sPreset.toLowerCase().indexOf("connector") > -1;
+        }
+        return false;
+}
+
 function DrawingObjectsController(drawingObjects)
 {
     this.drawingObjects = drawingObjects;
@@ -697,6 +705,8 @@ function DrawingObjectsController(drawingObjects)
     this.objectsForRecalculate = {};
 
     this.chartForProps = null;
+
+    this.lastOverObject = null;
 
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
@@ -1562,6 +1572,14 @@ DrawingObjectsController.prototype =
         {
             drawingDocument.DrawTrackSelectShapes(this.selectionRect.x, this.selectionRect.y, this.selectionRect.w, this.selectionRect.h);
         }
+
+
+        if(this.connector){
+            this.connector.drawConnectors(drawingDocument.AutoShapesTrack);
+            this.connector = null;
+        }
+
+
       
 		if (undefined !== drawingDocument.EndDrawTracking)
 			drawingDocument.EndDrawTracking();
@@ -10778,4 +10796,5 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].CollectDLbls = CollectDLbls;
 	window['AscFormat'].CollectSettingsSpPr = CollectSettingsSpPr;
 	window['AscFormat'].CheckLinePresetForParagraphAdd = CheckLinePresetForParagraphAdd;
+	window['AscFormat'].isConnectorPreset = isConnectorPreset;
 })(window);

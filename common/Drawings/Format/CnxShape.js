@@ -261,7 +261,7 @@
                                 posX = (_end.x + _begin.x)/2.0 - extX/2.0;
                                 posY = (_end.y + _begin.y)/2.0 - extY/2.0;
                                 flipH = true;
-                                oMapAdj["adj1"] = (-100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0;
+                                oMapAdj["adj1"] = (-100000*((_end.bounds.b + CONNECTOR_MARGIN - _end.y)/extX) + 0.5) >> 0;
                                 oMapAdj["adj2"] = 100000 - (100000*(((_begin.bounds.r + _end.bounds.l)/2 - (xc - extY/2))/extY) + 0.5) >> 0;
                             }
                         }

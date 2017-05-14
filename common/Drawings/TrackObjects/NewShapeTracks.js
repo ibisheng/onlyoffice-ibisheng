@@ -138,7 +138,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
     AscFormat.ExecuteNoHistory(function(){
 
         if(slide){
-            this.bConnector = presetGeom.toLowerCase().indexOf("connector") > -1;
+            this.bConnector = AscFormat.isConnectorPreset(presetGeom);
             if(this.bConnector){
                 var aSpTree = slide.cSld.spTree;
                 var oConnector = null;
