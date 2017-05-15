@@ -1515,7 +1515,37 @@ CChartsDrawer.prototype =
 				arrayValues = this._getArrayDataValues(newStep, axisMin, axisMax, manualMin, manualMax);
 			};	
 		};*/
-		
+
+		//TODO для 3d диаграмм. пересмотреть!
+		if(this._isSwitchCurrent3DChart(chartProp))
+		{
+			if(this.calcProp.max > 0 && this.calcProp.min < 0)
+			{
+				if(manualMax == null && this.calcProp.max <= arrayValues[arrayValues.length - 2])
+				{
+					arrayValues.splice(arrayValues.length - 1, 1);
+				}
+				if(manualMin == null && this.calcProp.min >= arrayValues[1])
+				{
+					arrayValues.splice(0, 1);
+				}
+			}
+			else if(this.calcProp.max > 0 && this.calcProp.min >= 0)
+			{
+				if(manualMax == null && this.calcProp.max <= arrayValues[arrayValues.length - 2])
+				{
+					arrayValues.splice(arrayValues.length - 1, 1);
+				}
+			}
+			else if(this.calcProp.min < 0 && this.calcProp.max <= 0)
+			{
+				if(manualMin == null && this.calcProp.min >= arrayValues[1])
+				{
+					arrayValues.splice(0, 1);
+				}
+			}
+		}
+
 		return arrayValues;
 	},
 	
