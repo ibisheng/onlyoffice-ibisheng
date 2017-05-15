@@ -5643,12 +5643,6 @@ background-repeat: no-repeat;\
 		}
 		else
 		{
-			if (this.bInit_word_control === true)
-			{
-				AscCommon.CollaborativeEditing.Apply_Changes();
-				AscCommon.CollaborativeEditing.Release_Locks();
-			}
-
 			this.WordControl.checkNeedRules();
 			this.WordControl.m_oDrawingDocument.ClearCachePages();
 			this.WordControl.OnResize(true);
