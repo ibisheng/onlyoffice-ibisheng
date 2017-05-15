@@ -5309,7 +5309,7 @@
                     return oThis.ReadNumFmt(t,l,oNewNumFmt);
                 });
                 if(null != oNewNumFmt.id)
-                    oDxf.num = this.ParseNum({id: oNewNumFmt.id, f: null}, null);
+                    oDxf.num = this.ParseNum(oNewNumFmt, null);
             }
             else
                 res = c_oSerConstants.ReadUnknown;
