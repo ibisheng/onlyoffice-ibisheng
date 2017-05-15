@@ -1205,7 +1205,7 @@
 			arg0 = arg[k];
 			arg1 = arg[k + 1];
 			if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
-				cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
+				cElementType.cellsRange !== arg0.type && !(cElementType.cellsRange3D === arg0.type && arg0.isSingleSheet())) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
@@ -1222,6 +1222,9 @@
 
 			matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
 			arg1Matrix = arg0.getMatrix();
+			if (cElementType.cellsRange3D === arg0.type) {
+				arg1Matrix = arg1Matrix[0];
+			}
 			if (!arg0Matrix) {
 				arg0Matrix = arg1Matrix;
 			}
