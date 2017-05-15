@@ -2426,19 +2426,19 @@ CChartsDrawer.prototype =
 		var secPart = val.toString().split('.');
 		var numPow = 1, tempMax;
 		
-		if(secPart[1] && secPart[1].toString().indexOf('e+') !== -1 && secPart[0] && secPart[0].toString().length === 1)
+		if(secPart[1] && secPart[1].toString().indexOf('e+') != -1 && secPart[0] && secPart[0].toString().length == 1)
 		{
 			var expNum = secPart[1].toString().split('e+');
 			numPow = Math.pow(10, expNum[1]);
 		}
-		else if(secPart[1] && secPart[1].toString().indexOf('e-') !== -1 && secPart[0] && secPart[0].toString().length === 1)
+		else if(secPart[1] && secPart[1].toString().indexOf('e-') != -1 && secPart[0] && secPart[0].toString().length == 1)
 		{
 			var expNum = secPart[1].toString().split('e');
 			numPow = Math.pow(10, expNum[1]);
 		}
-		else if(0 !== secPart[0])
+		else if(0 != secPart[0])
 			numPow = Math.pow(10, secPart[0].toString().length - 1);
-		else if(0 === secPart[0] && secPart[1] != undefined)
+		else if(0 == secPart[0] && secPart[1] != undefined)
 		{
 			tempMax = val;
 			var num = 0;
