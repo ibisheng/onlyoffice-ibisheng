@@ -141,12 +141,13 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
                 oWordGraphicObjects.document.Api.textArtPreviewManager.clear();
             }
         };
-        drawingsChangesMap[AscDFH.historyitem_ThemeSetFontScheme                ] = function (oClass, value){oClass.themeElements.fontScheme  = value;};
-        drawingsChangesMap[AscDFH.historyitem_ThemeSetFmtScheme                 ] = function (oClass, value){oClass.themeElements.fmtScheme   = value;};
-        drawingsChangesMap[AscDFH.historyitem_HF_SetDt                          ] = function (oClass, value){oClass.dt     = value;};
-        drawingsChangesMap[AscDFH.historyitem_HF_SetFtr                         ] = function (oClass, value){oClass.ftr    = value;};
-        drawingsChangesMap[AscDFH.historyitem_HF_SetHdr                         ] = function (oClass, value){oClass.hdr    = value;};
-        drawingsChangesMap[AscDFH.historyitem_HF_SetSldNum                      ] = function (oClass, value){oClass.sldNum = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetFontScheme] = function (oClass, value){oClass.themeElements.fontScheme  = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetFmtScheme ] = function (oClass, value){oClass.themeElements.fmtScheme   = value;};
+        drawingsChangesMap[AscDFH.historyitem_HF_SetDt          ] = function (oClass, value){oClass.dt     = value;};
+        drawingsChangesMap[AscDFH.historyitem_HF_SetFtr         ] = function (oClass, value){oClass.ftr    = value;};
+        drawingsChangesMap[AscDFH.historyitem_HF_SetHdr         ] = function (oClass, value){oClass.hdr    = value;};
+        drawingsChangesMap[AscDFH.historyitem_HF_SetSldNum      ] = function (oClass, value){oClass.sldNum = value;};
+        drawingsChangesMap[AscDFH.historyitem_UniNvPr_SetUniSpPr] = function (oClass, value){oClass.nvUniSpPr = value;};
 
     drawingContentChanges[AscDFH.historyitem_ClrMap_SetClr] = function(oClass){return oClass.color_map};
 
@@ -4857,19 +4858,18 @@ function CNvUniSpPr()
         else {
             w.WriteBool(false);
         }
-        w.WriteLong(this.locks);
-        if(AscFormat.isRealNumber(this.stCnxIdx) && AscFormat.isRealNumber(this.stCnxId)){
+        if(AscFormat.isRealNumber(this.stCnxIdx) && typeof (this.stCnxId) === "string" && this.stCnxId.length > 0){
             w.WriteBool(true);
             w.WriteLong(this.stCnxIdx);
-            w.WriteLong(this.stCnxId);
+            w.WriteString2(this.stCnxId);
         }
         else {
             w.WriteBool(false);
         }
-        if(AscFormat.isRealNumber(this.endCnxIdx) && AscFormat.isRealNumber(this.endCnxId)){
+        if(AscFormat.isRealNumber(this.endCnxIdx) && typeof (this.endCnxId) === "string" && this.endCnxId.length > 0){
             w.WriteBool(true);
             w.WriteLong(this.endCnxIdx);
-            w.WriteLong(this.endCnxId);
+            w.WriteString2(this.endCnxId);
         }
         else {
             w.WriteBool(false);
@@ -4886,7 +4886,7 @@ function CNvUniSpPr()
         bCnx = r.GetBool();
         if(bCnx){
             this.stCnxIdx = r.GetLong();
-            this.stCnxId = r.GetLong();
+            this.stCnxId = r.GetString2();
         }
         else{
             this.stCnxIdx = null;
@@ -4895,7 +4895,7 @@ function CNvUniSpPr()
         bCnx = r.GetBool();
         if(bCnx){
             this.endCnxIdx = r.GetLong();
-            this.endCnxId = r.GetLong();
+            this.endCnxId = r.GetString2();
         }
         else{
             this.endCnxIdx = null;
@@ -4935,7 +4935,7 @@ UniNvPr.prototype =
     },
 
     setUniSpPr: function(pr){
-        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_UniNvPr_SetUniSpPr, this.UniPr, pr));
+        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_UniNvPr_SetUniSpPr, this.nvUniSpPr, pr));
         this.nvUniSpPr = pr;
     },
 

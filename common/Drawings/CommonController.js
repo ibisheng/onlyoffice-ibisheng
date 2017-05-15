@@ -769,7 +769,6 @@ DrawingObjectsController.prototype =
             var oPreTrack;
             var stId = null, endId = null, oBeginTrack = null, oEndTrack = null, oBeginShape = null, oEndShape = null;
             var aConnectionPreTracks = [];
-            var aAllShapes = null;
             for(var i = 0; i < aAllConnectors.length; ++i){
                 stId = aAllConnectors[i].nvSpPr.nvUniSpPr.stCnxId;
                 endId = aAllConnectors[i].nvSpPr.nvUniSpPr.endCnxId;
@@ -782,10 +781,10 @@ DrawingObjectsController.prototype =
                     for(var j = 0; j < this.arrPreTrackObjects.length; ++j){
                         oPreTrack = this.arrPreTrackObjects[j].originalObject;
                         if(oPreTrack.getObjectType() === AscDFH.historyitem_type_Shape && oPreTrack.nvSpPr){
-                            if(oPreTrack.nvSpPr.cNvPr.id === stId){
+                            if(oPreTrack.Id === stId){
                                 oBeginTrack = this.arrPreTrackObjects[j];
                             }
-                            if(oPreTrack.nvSpPr.cNvPr.id === endId){
+                            if(oPreTrack.Id === endId){
                                 oEndTrack = this.arrPreTrackObjects[j];
                             }
                         }
@@ -798,13 +797,9 @@ DrawingObjectsController.prototype =
                     }
                     else{
                         if(stId !== null){
-                            if(!aAllShapes){
-                                aAllShapes = this.getAllShapes(this.getDrawingArray());
-                            }
-                            for(var j = 0; j < aAllShapes.length; ++j){
-                                if(aAllShapes[j].nvSpPr.cNvPr.id === stId){
-                                    oBeginShape = aAllShapes[j];
-                                }
+                            oBeginShape = AscCommon.g_oTableId.Get_ById(stId);
+                            if(oBeginShape && oBeginShape.bDeleted){
+                                oBeginShape = null;
                             }
                         }
                     }
@@ -812,13 +807,9 @@ DrawingObjectsController.prototype =
                         oEndShape = oEndTrack.originalObject;
                     }
                     else if(endId !== null){
-                        if(!aAllShapes){
-                            aAllShapes = this.getAllShapes(this.getDrawingArray());
-                        }
-                        for(var j = 0; j < aAllShapes.length; ++j){
-                            if(aAllShapes[j].nvSpPr.cNvPr.id === endId){
-                                oEndShape = aAllShapes[j];
-                            }
+                        oEndShape = AscCommon.g_oTableId.Get_ById(endId);
+                        if(oEndShape && oEndShape.bDeleted){
+                            oEndShape = null;
                         }
                     }
                     aConnectionPreTracks.push(new AscFormat.CConnectorTrack(aAllConnectors[i], oBeginTrack, oEndTrack, oBeginShape, oEndShape));

@@ -35,14 +35,14 @@
         var _endConnectionParams = null;
         if(this.beginTrack){
             track_bounds = this.convertTrackBounds(this.beginTrack.getBounds());
-            _rot = AscFormat.isRealNumber(this.beginTrack.rot) ? this.beginTrack.rot : this.beginTrack.originalObject.rot;
+            _rot = AscFormat.isRealNumber(this.beginTrack.angle) ? this.beginTrack.angle : this.beginTrack.originalObject.rot;
             oConectionObject = this.beginTrack.overlayObject.geometry.cnxLst[oConnectorInfo.stCnxIdx];
             g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
             _startConnectionParams = this.connector.convertToConnectionParams(_rot, this.beginTrack.overlayObject.TransformMatrix, track_bounds, g_conn_info)
         }
         if(this.endTrack){
             track_bounds = this.convertTrackBounds(this.endTrack.getBounds());
-            _rot = AscFormat.isRealNumber(this.endTrack.rot) ? this.endTrack.rot : this.endTrack.originalObject.rot;
+            _rot = AscFormat.isRealNumber(this.endTrack.angle) ? this.endTrack.angle : this.endTrack.originalObject.rot;
             oConectionObject = this.endTrack.overlayObject.geometry.cnxLst[oConnectorInfo.endCnxIdx];
             g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
             _endConnectionParams = this.connector.convertToConnectionParams(_rot, this.endTrack.overlayObject.TransformMatrix, track_bounds, g_conn_info)
@@ -72,6 +72,8 @@
                 }
             }
             this.oSpPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.connector.spPr.geometry.preset, this.overlayObject.pen.w);
+            this.geometry = this.oSpPr.geometry;
+            this.overlayObject.geometry = this.geometry;
         }
         this.geometry.Recalculate(this.oSpPr.xfrm.extX, this.oSpPr.xfrm.extY);
 
@@ -96,8 +98,16 @@
 
     CConnectorTrack.prototype.trackEnd = function()
     {
-        this.connector.setSpPr(this.oSpPr.createDuplicate());
-        this.connector.spPr.setParent(this.connector);
+        var _xfrm = this.connector.spPr.xfrm;
+        var _xfrm2 = this.oSpPr.xfrm;
+        _xfrm.setOffX(_xfrm2.offX);
+        _xfrm.setOffY(_xfrm2.offY);
+        _xfrm.setExtX(_xfrm2.extX);
+        _xfrm.setExtY(_xfrm2.extY);
+        _xfrm.setFlipH(_xfrm2.flipH);
+        _xfrm.setFlipV(_xfrm2.flipV);
+        _xfrm.setRot(_xfrm2.rot);
+        this.connector.spPr.setGeometry(this.oSpPr.geometry.createDuplicate());
     };
     CConnectorTrack.prototype.convertTrackBounds = function(trackBounds)
     {

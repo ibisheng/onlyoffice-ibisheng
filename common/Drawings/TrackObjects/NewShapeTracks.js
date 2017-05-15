@@ -578,13 +578,12 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             if(this.startShape && this.startConnectionInfo)
             {
                 nvUniSpPr.stCnxIdx = this.startConnectionInfo.idx;
-                nvUniSpPr.stCnxId  = this.startShape.nvSpPr.cNvPr.id;
+                nvUniSpPr.stCnxId  = this.startShape.Id;
             }
             if(this.endShape && this.endConnectionInfo)
             {
-
                 nvUniSpPr.endCnxIdx = this.endConnectionInfo.idx;
-                nvUniSpPr.endCnxId  = this.endShape.nvSpPr.cNvPr.id;
+                nvUniSpPr.endCnxId  = this.endShape.Id;
             }
             shape.nvSpPr.setUniSpPr(nvUniSpPr);
         }
