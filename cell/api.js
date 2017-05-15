@@ -568,15 +568,6 @@ var editor;
       }
 
       this.isUseEmbeddedCutFonts = false;
-
-      // Отправка стилей
-      this._sendWorkbookStyles();
-      if (this.IsSendDocumentLoadCompleate && this.collaborativeEditing) {
-        // Принимаем чужие изменения
-        this.collaborativeEditing.applyChanges();
-        // Пересылаем свои изменения
-        this.collaborativeEditing.sendChanges();
-      }
     }
   };
 

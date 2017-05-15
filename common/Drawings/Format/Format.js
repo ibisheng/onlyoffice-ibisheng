@@ -9916,7 +9916,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
 
     function builder_CreateGradientStop(oUniColor, nPos){
         var Gs = new AscFormat.CGs();
-        Gs.pos = pos;
+        Gs.pos = nPos;
         Gs.color = oUniColor;
         return Gs;
     }
@@ -9934,7 +9934,12 @@ function CorrectUniColor(asc_color, unicolor, flag)
     function builder_CreateLinearGradient(aGradientStop, Angle){
         var oUniFill = builder_CreateGradient(aGradientStop);
         oUniFill.fill.lin = new AscFormat.GradLin();
-        oUniFill.fill.lin.angle = Angle;
+        if(!AscFormat.isRealNumber(Angle)){
+            oUniFill.fill.lin.angle = 0;
+        }
+        else{
+            oUniFill.fill.lin.angle = Angle;
+        }
         return oUniFill;
     }
 
