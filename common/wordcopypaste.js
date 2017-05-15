@@ -2365,23 +2365,29 @@ PasteProcessor.prototype =
 			}
 			case Asc.c_oSpecialPasteProps.keepTextOnly:
 			{
-				/*for(var i = 0; i < this.aContent.length; i++)
+				var numbering =  paragraph.Numbering_Get();
+				if(numbering)
 				{
-					var elem = this.aContent[i];
-					if()
+					if(!paragraph.Numbering.Internal.NumInfo)
 					{
+						//проставляем параграфам NumInfo
+						var parentContent = paragraph.Parent instanceof CDocument ? this.aContent : paragraph.Parent.Content;
+						for(var i = 0; i < parentContent.length; i++)
+						{
+							var tempParagraph = parentContent[i];
+							var NumberingEngine = new CDocumentNumberingInfoEngine(tempParagraph.Id, numbering, this.oLogicDocument.Get_Numbering());
 
+							for (var nIndex = 0, nCount = parentContent.length; nIndex < nCount; ++nIndex)
+							{
+								parentContent[nIndex].GetNumberingInfo(NumberingEngine);
+							}
+
+							tempParagraph.Numbering.Internal.NumInfo = NumberingEngine.NumInfo;
+						}
 					}
-				}
-				var NumberingEngine = new CDocumentNumberingInfoEngine(paragraph.Id, NumPr, this.Get_Numbering());
-				for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
-				{
-					this.Content[nIndex].GetNumberingInfo(NumberingEngine);
-					if (true === NumberingEngine.Is_Found())
-						break;
-				}*/
 
-				//this._checkNumberingText(paragraph);
+					this._checkNumberingText(paragraph, paragraph.Numbering.Internal.NumInfo, numbering);
+				}
 
 
 				if(pasteIntoParagraphPr)
@@ -2584,6 +2590,9 @@ PasteProcessor.prototype =
 
 					if(cDocumentContent.Content[n] instanceof Paragraph)
 					{
+						//TODO пересмотреть обработку. получаем текст из контента, затем делаем контент из текста!
+						this._specialPasteParagraphConvert(cDocumentContent.Content[n]);
+
 						var value = cDocumentContent.Content[n].GetText();
 						var newParaRun = new ParaRun();
 
@@ -2619,52 +2628,10 @@ PasteProcessor.prototype =
 		return obj;
 	},
 
-	_checkNumberingText: function(paragraph)
+	_checkNumberingText: function(paragraph, NumInfo, numbering)
 	{
-		var NumPr = paragraph.Numbering_Get();
-		if(NumPr)
+		if(numbering)
 		{
-			var text = paragraph.GetText();
-			paragraph.Parent.Internal_GetNumInfo(paragraph.Id, paragraph.Numbering_Get());
-
-			var Para, ParaNumPr;
-			if(!this.numIds)
-			{
-				this.numIds = [];
-				for(var i = 0; i < this.aContent.length; i++)
-				{
-					Para = this.aContent[i];
-					ParaNumPr = Para.Numbering_Get();
-					if(ParaNumPr)
-					{
-						this.numIds[i] = ParaNumPr;
-					}
-				}
-			}
-
-
-			var num = 1;
-			for(var i = 0; i < this.aContent.length; i++)
-			{
-				Para = this.aContent[i];
-				ParaNumPr = this.numIds[i];
-
-				if(paragraph.Id === Para.Id)
-				{
-					break;
-				}
-
-				if (ParaNumPr.Lvl === NumPr.Lvl && undefined !== ParaNumPr && ParaNumPr.NumId === NumPr.NumId && (undefined === Para.Get_SectionPr() || true !== Para.IsEmpty()))
-				{
-					num++;
-				}
-			}
-
-			var NumInfo = [];
-			NumInfo[ParaNumPr.Lvl] = num;
-
-
-
 			var abstractNum = this.oLogicDocument.Numbering.Get_AbstractNum(paragraph.Pr.NumPr.NumId);
 			var NumTextPr = paragraph.Get_CompiledPr2(false).TextPr.Copy();
 			var lvl = abstractNum.Lvl[paragraph.Pr.NumPr.Lvl];
@@ -2876,6 +2843,9 @@ PasteProcessor.prototype =
 					Item = new ParaText();
 					Item.Set_CharCode(nUnicode);
 					bIsSpace = false;
+				}
+				else if(0x20 === nUnicode){
+					Item = new ParaTab();
 				}
 				else
 					Item = new ParaSpace();
