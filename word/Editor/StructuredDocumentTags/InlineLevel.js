@@ -351,3 +351,23 @@ CInlineLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 			this.Content.push(Element);
 	}
 };
+
+function TEST_ADD_SDT()
+{
+	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+
+	oLogicDocument.Create_NewHistoryPoint();
+
+	//var oPara = oLogicDocument.GetCurrentParagraph();
+	var oInlineContentControl = new CInlineLevelSdt();
+	oInlineContentControl.Add(new ParaRun());
+	oLogicDocument.AddToParagraph(oInlineContentControl);
+
+
+	oLogicDocument.Recalculate();
+	oLogicDocument.Document_UpdateSelectionState();
+	oLogicDocument.Document_UpdateInterfaceState();
+	oLogicDocument.Document_UpdateRulersState();
+
+	return oInlineContentControl ? oInlineContentControl.GetId() : null;
+}

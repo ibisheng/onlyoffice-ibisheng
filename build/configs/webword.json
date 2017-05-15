@@ -110,6 +110,7 @@
         "../word/Editor/GraphicObjects/WrapManager.js",
 		"../word/Editor/DocumentContentElementBase.js",
 		"../word/Editor/StructuredDocumentTags/BlockLevel.js",
+        "../word/Editor/StructuredDocumentTags/InlineLevel.js",
         "../word/Editor/StructuredDocumentTags/SdtPr.js",
         "../word/Editor/StructuredDocumentTags/SdtPrChanges.js",
         "../word/Editor/Comments.js",

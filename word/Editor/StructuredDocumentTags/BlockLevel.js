@@ -948,37 +948,3 @@ CBlockLevelSdt.prototype.GetContentControlPr = function()
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;
 window['AscCommonWord'].type_BlockLevelSdt = type_BlockLevelSdt;
-
-
-function TEST_ADD_SDT()
-{
-	var oLogicDocument = editor.WordControl.m_oLogicDocument;
-
-	oLogicDocument.Create_NewHistoryPoint();
-
-	var oContentControl = oLogicDocument.AddContentControl();
-	oLogicDocument.AddToParagraph(new ParaText("S"));
-	oLogicDocument.AddToParagraph(new ParaText("d"));
-	oLogicDocument.AddToParagraph(new ParaText("t"));
-
-	oLogicDocument.Recalculate();
-	oLogicDocument.Document_UpdateSelectionState();
-	oLogicDocument.Document_UpdateInterfaceState();
-	oLogicDocument.Document_UpdateRulersState();
-
-	return oContentControl ? oContentControl.GetId() : null;
-}
-
-function TEST_REMOVE_SDT(Id)
-{
-	var oLogicDocument = editor.WordControl.m_oLogicDocument;
-
-	oLogicDocument.Create_NewHistoryPoint();
-
-	oLogicDocument.RemoveContentControl(Id);
-
-	oLogicDocument.Recalculate();
-	oLogicDocument.Document_UpdateSelectionState();
-	oLogicDocument.Document_UpdateInterfaceState();
-	oLogicDocument.Document_UpdateRulersState();
-}
