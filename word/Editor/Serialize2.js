@@ -747,7 +747,8 @@ var c_oSer_HyperlinkType = {
 };
 var c_oSer_FldSimpleType = {
 	Content: 0,
-	Instr: 1
+	Instr: 1,
+	FFData: 2
 };
 var c_oSerProp_RevisionType = {
     Author: 0,
@@ -854,6 +855,33 @@ var c_oSerSdt = {
 	Tag: 33,
 	Temporary: 34,
 	MultiLine: 35
+};
+var c_oSerFFData = {
+	CalcOnExit: 0,
+	CheckBox: 1,
+	DDList: 2,
+	Enabled: 3,
+	EntryMacro: 4,
+	ExitMacro: 5,
+	HelpText: 6,
+	Label: 7,
+	Name: 8,
+	StatusText: 9,
+	TabIndex: 10,
+	TextInput: 11,
+	CBChecked: 12,
+	CBDefault: 13,
+	CBSize: 14,
+	CBSizeAuto: 15,
+	DLDefault: 16,
+	DLResult: 17,
+	DLListEntry: 18,
+	HTType: 19,
+	HTVal: 20,
+	TIDefault: 21,
+	TIFormat: 22,
+	TIMaxLength: 23,
+	TIType: 24,
 };
 var ETblStyleOverrideType = {
 	tblstyleoverridetypeBand1Horz:  0,
@@ -4270,32 +4298,19 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     }
                     break;
 				case para_Field:
-					if(fieldtype_MERGEFIELD == item.FieldType){
-						if(this.saveParams && this.saveParams.bMailMergeDocx)
-							oThis.WriteParagraphContent(item, bUseSelection, false);
-						else
-						{
-							var Instr = "MERGEFIELD";
-							for(var j = 0; j < item.Arguments.length; ++j){
-								var argument = item.Arguments[j];
-								argument = argument.replace(/(\\|")/g, "\\$1");
-								if(-1 != argument.indexOf(' '))
-									argument = "\"" + argument + "\"";
-								Instr += " " + argument;
-							}
-							for(var j = 0; j < item.Switches.length; ++j)
-								Instr += " \\" + item.Switches[j];
-							this.bs.WriteItem(c_oSerParType.FldSimple, function () {
-								oThis.WriteFldSimple(Instr, function(){oThis.WriteParagraphContent(item, bUseSelection, false);});
-							});
-						}
+					var Instr = null;
+					var oFFData = null;
+					if (fieldtype_MERGEFIELD == item.FieldType) {
+						Instr = "MERGEFIELD";
+					} else if (fieldtype_FORMTEXT === item.Get_FieldType()) {
+						Instr = "FORMTEXT";
+						oFFData = {};
 					}
-					else if (fieldtype_FORMTEXT === item.Get_FieldType()){
+					if (null !== Instr) {
 						if(this.saveParams && this.saveParams.bMailMergeDocx)
 							oThis.WriteParagraphContent(item, bUseSelection, false);
 						else
 						{
-							var Instr = "FORMTEXT";
 							for(var j = 0; j < item.Arguments.length; ++j){
 								var argument = item.Arguments[j];
 								argument = argument.replace(/(\\|")/g, "\\$1");
@@ -4306,7 +4321,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 							for(var j = 0; j < item.Switches.length; ++j)
 								Instr += " \\" + item.Switches[j];
 							this.bs.WriteItem(c_oSerParType.FldSimple, function () {
-								oThis.WriteFldSimple(Instr, function(){oThis.WriteParagraphContent(item, bUseSelection, false);});
+								oThis.WriteFldSimple(Instr, oFFData, function(){oThis.WriteParagraphContent(item, bUseSelection, false);});
 							});
 						}
 					}
@@ -4505,7 +4520,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				} else {
 					Instr = "PAGE \\* MERGEFORMAT";
 				}
-				this.bs.WriteItem(c_oSerParType.FldSimple, function(){oThis.WriteFldSimple(Instr, function(){
+				this.bs.WriteItem(c_oSerParType.FldSimple, function(){oThis.WriteFldSimple(Instr, null, function(){
                     oThis.WriteRun2(function () {
                         //todo не писать через fldsimple
 						var num = elem.pageNum.Type == para_PageCount ? elem.pageNum.GetPageCountValue() : elem.pageNum.GetPageNumValue();
@@ -4515,16 +4530,161 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             }
         }
     }
-	this.WriteFldSimple = function (Instr, fWriteContent)
+	this.WriteFldSimple = function (Instr, oFFData, fWriteContent)
     {
 		var oThis = this;
 		//порядок записи важен
 		//Instr
 		this.memory.WriteByte(c_oSer_FldSimpleType.Instr);
         this.memory.WriteString2(Instr);
+		//FFData
+		if (null !== oFFData) {
+			this.bs.WriteItem(c_oSer_FldSimpleType.FFData, function() {
+				oThis.WriteFFData(oFFData);
+			});
+		}
 		//Content
 		this.bs.WriteItem(c_oSer_FldSimpleType.Content, fWriteContent);
     };
+	this.WriteFFData = function(oFFData) {
+		var oThis = this;
+		if (null != oFFData.CalcOnExit) {
+			this.bs.WriteItem(c_oSerFFData.CalcOnExit, function() {
+				oThis.memory.WriteBool(oFFData.CalcOnExit);
+			});
+		}
+		if (null != oFFData.CheckBox) {
+			this.bs.WriteItem(c_oSerFFData.CheckBox, function() {
+				oThis.WriteFFCheckBox(oFFData.CheckBox);
+			});
+		}
+		if (null != oFFData.DDList) {
+			this.bs.WriteItem(c_oSerFFData.DDList, function() {
+				oThis.WriteDDList(oFFData.DDList);
+			});
+		}
+		if (null != oFFData.Enabled) {
+			this.bs.WriteItem(c_oSerFFData.Enabled, function() {
+				oThis.memory.WriteBool(oFFData.Enabled);
+			});
+		}
+		if (null != oFFData.EntryMacro) {
+			this.memory.WriteByte(c_oSerFFData.EntryMacro);
+			this.memory.WriteString2(oFFData.EntryMacro);
+		}
+		if (null != oFFData.ExitMacro) {
+			this.memory.WriteByte(c_oSerFFData.ExitMacro);
+			this.memory.WriteString2(oFFData.ExitMacro);
+		}
+		if (null != oFFData.HelpText) {
+			this.bs.WriteItem(c_oSerFFData.HelpText, function() {
+				oThis.WriteFFHelpText(oFFData.HelpText);
+			});
+		}
+		if (null != oFFData.Label) {
+			this.bs.WriteItem(c_oSerFFData.Label, function() {
+				oThis.memory.WriteLong(oFFData.Label);
+			});
+		}
+		if (null != oFFData.Name) {
+			this.memory.WriteByte(c_oSerFFData.Name);
+			this.memory.WriteString2(oFFData.Name);
+		}
+		if (null != oFFData.StatusText) {
+			this.bs.WriteItem(c_oSerFFData.StatusText, function() {
+				oThis.WriteFFHelpText(oFFData.StatusText);
+			});
+		}
+		if (null != oFFData.TabIndex) {
+			this.bs.WriteItem(c_oSerFFData.TabIndex, function() {
+				oThis.memory.WriteLong(oFFData.TabIndex);
+			});
+		}
+		if (null != oFFData.TabIndex) {
+			this.bs.WriteItem(c_oSerFFData.TabIndex, function() {
+				oThis.memory.WriteLong(oFFData.TabIndex);
+			});
+		}
+		if (null != oFFData.TextInput) {
+			this.bs.WriteItem(c_oSerFFData.TextInput, function() {
+				oThis.WriteTextInput(oFFData.TextInput);
+			});
+		}
+	};
+	this.WriteFFCheckBox = function(oCheckBox) {
+		var oThis = this;
+		if (null != oCheckBox.CBChecked) {
+			this.bs.WriteItem(c_oSerFFData.CBChecked, function() {
+				oThis.memory.WriteBool(oCheckBox.CBChecked);
+			});
+		}
+		if (null != oCheckBox.CBDefault) {
+			this.bs.WriteItem(c_oSerFFData.CBDefault, function() {
+				oThis.memory.WriteBool(oCheckBox.CBDefault);
+			});
+		}
+		if (null != oCheckBox.CBSize) {
+			this.bs.WriteItem(c_oSerFFData.CBSize, function() {
+				oThis.memory.WriteLong(oCheckBox.CBSize);
+			});
+		}
+		if (null != oCheckBox.CBSizeAuto) {
+			this.bs.WriteItem(c_oSerFFData.CBSizeAuto, function() {
+				oThis.memory.WriteBool(oCheckBox.CBSizeAuto);
+			});
+		}
+	};
+	this.WriteDDList = function(oDDList) {
+		var oThis = this;
+		if (null != oDDList.DLDefault) {
+			this.bs.WriteItem(c_oSerFFData.DLDefault, function() {
+				oThis.memory.WriteLong(oDDList.DLDefault);
+			});
+		}
+		if (null != oDDList.DLResult) {
+			this.bs.WriteItem(c_oSerFFData.DLResult, function() {
+				oThis.memory.WriteLong(oDDList.DLResult);
+			});
+		}
+		for (var i = 0; i < oDDList.DLListEntry.length; ++i) {
+			this.memory.WriteByte(c_oSerFFData.DLListEntry);
+			this.memory.WriteString2(oDDList.DLListEntry[i]);
+		}
+	};
+	this.WriteFFHelpText = function(oHelpText) {
+		var oThis = this;
+		if (null != oHelpText.HTType) {
+			this.bs.WriteItem(c_oSerFFData.HTType, function() {
+				oThis.memory.WriteByte(oHelpText.HTType);
+			});
+		}
+		if (null != oHelpText.HTVal) {
+			this.memory.WriteByte(c_oSerFFData.HTVal);
+			this.memory.WriteString2(oHelpText.HTVal);
+		}
+	};
+	this.WriteTextInput = function(oTextInput) {
+		var oThis = this;
+		if (null != oTextInput.TIDefault) {
+			this.memory.WriteByte(c_oSerFFData.TIDefault);
+			this.memory.WriteString2(oTextInput.TIDefault);
+		}
+		if (null != oTextInput.TIFormat) {
+			this.memory.WriteByte(c_oSerFFData.TIFormat);
+			this.memory.WriteString2(oTextInput.TIFormat);
+		}
+		if (null != oTextInput.TIMaxLength) {
+			this.bs.WriteItem(c_oSerFFData.TIMaxLength, function() {
+				oThis.memory.WriteLong(oTextInput.TIMaxLength);
+			});
+		}
+		if (null != oTextInput.TIType) {
+			this.bs.WriteItem(c_oSerFFData.TIType, function() {
+				oThis.memory.WriteByte(oTextInput.TIType);
+			});
+		}
+	};
+
     this.WriteRunContent = function (oRun, nStart, nEnd, delText)
     {
         var oThis = this;
@@ -9158,8 +9318,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
         if (c_oSer_FldSimpleType.Instr === type) {
 			var Instr = this.stream.GetString2LE(length);
 			oFldSimpleObj.ParaField = this.parseField(Instr, oParStruct.paragraph);
-        }
-        else if (c_oSer_FldSimpleType.Content === type) {
+		// } else  if (c_oSer_FldSimpleType.FFData === type) {
+		// 	var FFData = {};
+		// 	res = this.bcr.Read1(length, function (t, l) {
+		// 		return oThis.ReadFFData(t, l, FFData);
+		// 	});
+		// 	oFldSimpleObj.ParaField.FFData = FFData;
+		} else if (c_oSer_FldSimpleType.Content === type) {
 			if(null != oFldSimpleObj.ParaField) {
 				var oFldStruct = new OpenParStruct(oFldSimpleObj.ParaField, oParStruct.paragraph);
 				res = this.bcr.Read1(length, function (t, l) {
@@ -9176,6 +9341,111 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
             res = c_oSerConstants.ReadUnknown;
         return res;
     }
+	this.ReadFFData = function(type, length, oFFData) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerFFData.CalcOnExit === type) {
+			oFFData.CalcOnExit = this.stream.GetBool();
+		} else if (c_oSerFFData.CheckBox === type) {
+			oFFData.CheckBox = {};
+			res = this.bcr.Read1(length, function(t, l) {
+				return oThis.ReadFFCheckBox(t, l, oFFData.CheckBox);
+			});
+		} else if (c_oSerFFData.DDList === type) {
+			oFFData.DDList = {DLListEntry: []};
+			res = this.bcr.Read1(length, function(t, l) {
+				return oThis.ReadDDList(t, l, oFFData.DDList);
+			});
+		} else if (c_oSerFFData.Enabled === type) {
+			oFFData.Enabled = this.stream.GetBool();
+		} else if (c_oSerFFData.EntryMacro === type) {
+			oFFData.EntryMacro = this.stream.GetString2LE(length);
+		} else if (c_oSerFFData.ExitMacro === type) {
+			oFFData.ExitMacro = this.stream.GetString2LE(length);
+		} else if (c_oSerFFData.HelpText === type) {
+			oFFData.HelpText = {};
+			res = this.bcr.Read1(length, function(t, l) {
+				return oThis.ReadFFHelpText(t, l, oFFData.HelpText);
+			});
+		} else if (c_oSerFFData.Label === type) {
+			oFFData.Label = this.stream.GetLong();
+		} else if (c_oSerFFData.Name === type) {
+			oFFData.Name = this.stream.GetString2LE(length);
+		} else if (c_oSerFFData.StatusText === type) {
+			oFFData.StatusText = {};
+			res = this.bcr.Read1(length, function(t, l) {
+				return oThis.ReadFFHelpText(t, l, oFFData.StatusText);
+			});
+		} else if (c_oSerFFData.TabIndex === type) {
+			oFFData.TabIndex = this.stream.GetLong();
+		} else if (c_oSerFFData.TextInput === type) {
+			oFFData.TextInput = {};
+			res = this.bcr.Read1(length, function(t, l) {
+				return oThis.ReadTextInput(t, l, oFFData.TextInput);
+			});
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	};
+	this.ReadFFCheckBox = function(type, length, oFFCheckBox) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerFFData.CBChecked === type) {
+			oFFCheckBox.CBChecked = this.stream.GetBool();
+		} else if (c_oSerFFData.CBDefault === type) {
+			oFFCheckBox.CBDefault = this.stream.GetBool();
+		} else if (c_oSerFFData.CBSize === type) {
+			oFFCheckBox.CBSize = this.stream.GetULongLE();
+		} else if (c_oSerFFData.CBSizeAuto === type) {
+			oFFCheckBox.CBSizeAuto = this.stream.GetBool();
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	};
+	this.ReadDDList = function(type, length, oDDList) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerFFData.DLDefault === type) {
+			oDDList.DLDefault = this.stream.GetULongLE();
+		} else if (c_oSerFFData.DLResult === type) {
+			oDDList.DLResult = this.stream.GetULongLE();
+		} else if (c_oSerFFData.DLListEntry === type) {
+			oDDList.DLListEntry.push(this.stream.GetString2LE(length));
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	};
+	this.ReadFFHelpText = function(type, length, oHelpText) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerFFData.HTType === type) {
+			oHelpText.HTType = this.stream.GetUChar();
+		} else if (c_oSerFFData.HTVal === type) {
+			oHelpText.HTVal = this.stream.GetString2LE(length);
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	};
+	this.ReadTextInput = function(type, length, oTextInput) {
+		var res = c_oSerConstants.ReadOk;
+		var oThis = this;
+		if (c_oSerFFData.TIDefault === type) {
+			oTextInput.TIDefault = this.stream.GetString2LE(length);
+		} else if (c_oSerFFData.TIFormat === type) {
+			oTextInput.TIFormat = this.stream.GetString2LE(length);
+		} else if (c_oSerFFData.TIMaxLength === type) {
+			oTextInput.TIMaxLength = this.stream.GetULongLE();
+		} else if (c_oSerFFData.TIType === type) {
+			oTextInput.TIType = this.stream.GetUChar();
+		} else {
+			res = c_oSerConstants.ReadUnknown;
+		}
+		return res;
+	};
     this.ReadHyperlink = function (type, length, oHyperlinkObj, oNewHyperlink, oParStruct) {
         var res = c_oSerConstants.ReadOk;
         var oThis = this;
