@@ -12493,10 +12493,8 @@
     };
 
     WorksheetView.prototype.af_drawButtons = function (updatedRange, offsetX, offsetY) {
-        var ws = this;
         var aWs = this.model;
         var t = this;
-        var m_oColor = new CColor(120, 120, 120);
 
         if (aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges) {
             return false;
@@ -12577,6 +12575,7 @@
 
 	WorksheetView.prototype.af_drawCurrentButton = function (offsetX, offsetY, props) {
 		var t = this;
+		var ctx = t.drawingCtx;
 
 	    //TODO пересмотреть масштабирование!!!
 		var isApplyAutoFilter = props.isSetFilter;
@@ -12584,36 +12583,41 @@
 		var row = props.row;
         var col = props.col;
 
-		var width1 = 13;
-		var height1 = 13;
-		var rowHeight1 = t.rows[row].height;
-		if (rowHeight1 < height1) {
-			width1 = width1 * (rowHeight1 / height1);
-			height1 = rowHeight1;
-		}
+		var widthButtonPx = 17;
+		var heightButtonPx = 17;
+		var widthBorder = 1;
 
-		var x1 = t.cols[col].left + t.cols[col].width - width1 - 0.5 - offsetX;
-		var y1 = t.rows[row].top + t.rows[row].height - height1 - 0.5 - offsetY;
+		var scaleIndex = 1;
+		var scaleFactor = ctx.scaleFactor;
 
 		var width_1px = t.width_1px;
 		var height_1px = t.height_1px;
-		var height = 15 * width_1px;
-		var width = 15 * height_1px;
-        var m_oColor = new CColor(120, 120, 120);
 
-		var rowHeight = t.rows[row].height;
+		var m_oColor = new CColor(120, 120, 120);
+
+		var widthWithBorders = widthButtonPx * width_1px;
+		var heightWithBorders = heightButtonPx * height_1px;
+		var width = (widthButtonPx - widthBorder * 2) * width_1px;
+		var height = (heightButtonPx - widthBorder * 2) * height_1px;
 		var colWidth = t.cols[col].width;
+		var rowHeight = t.rows[row].height;
+		if (rowHeight < heightWithBorders)
+		{
+			widthWithBorders = widthWithBorders * (rowHeight / heightWithBorders);
+			heightWithBorders = rowHeight;
+		}
 
-		var scaleIndex = 1;
-		var scaleFactor = t.drawingCtx.scaleFactor;
+		//стартовая позиция кнопки
+		var x1 = t.cols[col].left + t.cols[col].width - widthWithBorders - 0.5 - offsetX;
+		var y1 = t.rows[row].top + t.rows[row].height - heightWithBorders - 0.5 - offsetY;
 
 		var _drawButtonFrame = function(startX, startY, width, height)
 		{
-			t.drawingCtx.setFillStyle(t.settings.cells.defaultState.background);
-			t.drawingCtx.setLineWidth(1);
-			t.drawingCtx.setStrokeStyle(t.settings.cells.defaultState.border);
-			t.drawingCtx.fillRect(startX, startY, width, height);
-			t.drawingCtx .strokeRect(startX, startY, width, height);
+			ctx.setFillStyle(t.settings.cells.defaultState.background);
+			ctx.setLineWidth(1);
+			ctx.setStrokeStyle(t.settings.cells.defaultState.border);
+			ctx.fillRect(startX, startY, width, height);
+			ctx.strokeRect(startX, startY, width, height);
 		};
 
 		var _drawSortArrow = function(startX, startY, isDescending, heightArrow)
@@ -12622,7 +12626,6 @@
 
 			//isDescending = true - стрелочка смотрит вниз
 			//рисуем сверху вниз
-			var ctx = t.drawingCtx;
 			ctx.beginPath();
 			ctx.lineVer(startX, startY, startY + heightArrow);
 			
@@ -12630,7 +12633,7 @@
 			
 			if(isDescending)
 			{
-				var r = t.drawingCtx._calcRect(startX, startY);
+				var r = ctx._calcRect(startX, startY);
 				var x = Math.round(r.x);
 				var y = Math.round(r.y);
 				
@@ -12639,16 +12642,16 @@
 				var diffY = 0;
 				for(var i = 0; i < height; i++)
 				{
-					t.drawingCtx.ctx.moveTo(x - (i), y + 0.5 - (i) + heightArrow1 + height - 1);
-					t.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
-					
-					t.drawingCtx.ctx.moveTo(x + i, y + 0.5 - (i) + heightArrow1 + height - 1);
-					t.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
+					ctx.ctx.moveTo(x - (i), y + 0.5 - (i) + heightArrow1 + height - 1);
+					ctx.ctx.lineTo(x - (i) + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
+
+					ctx.ctx.moveTo(x + i, y + 0.5 - (i) + heightArrow1 + height - 1);
+					ctx.ctx.lineTo(x + i + 1, y + 0.5 - (i) + heightArrow1 + height - 1);
 				}
 			}
 			else
 			{
-				var r = t.drawingCtx._calcRect(startX, startY);
+				var r = ctx._calcRect(startX, startY);
 				var x = Math.round(r.x);
 				var y = Math.round(r.y);
 				
@@ -12656,11 +12659,11 @@
 				var diffY = 0;
 				for(var i = 0; i < height; i++)
 				{
-					t.drawingCtx.ctx.moveTo(x - (i), y + 0.5 + (i) - diffY);
-					t.drawingCtx.ctx.lineTo(x - (i) + 1, y + 0.5 + (i) - diffY);
-					
-					t.drawingCtx.ctx.moveTo(x + i, y + 0.5 + (i) - diffY);
-					t.drawingCtx.ctx.lineTo(x + i + 1, y + 0.5 + (i) - diffY);
+					ctx.ctx.moveTo(x - (i), y + 0.5 + (i) - diffY);
+					ctx.ctx.lineTo(x - (i) + 1, y + 0.5 + (i) - diffY);
+
+					ctx.ctx.moveTo(x + i, y + 0.5 + (i) - diffY);
+					ctx.ctx.lineTo(x + i + 1, y + 0.5 + (i) - diffY);
 				}
 			}
 			
@@ -12675,18 +12678,18 @@
             y = Math.round((y) / height_1px) * height_1px;
             var heightLine = Math.round(height);
 			var heightCleanLine = heightLine - 4 + 2;
+
+			ctx.beginPath();
+
+			ctx.moveTo(x, y);
+			ctx.lineTo(x, y - heightCleanLine);
+			ctx.setLineWidth(t.width_2px);
+			ctx.setStrokeStyle(m_oColor);
+			ctx.setStrokeStyle(m_oColor);
+			ctx.stroke();
 			
-			t.drawingCtx.beginPath();
 			
-            t.drawingCtx.moveTo(x, y);
-			t.drawingCtx.lineTo(x, y - heightCleanLine);
-            t.drawingCtx.setLineWidth(t.width_2px);
-			t.drawingCtx.setStrokeStyle(m_oColor);
-			t.drawingCtx.setStrokeStyle(m_oColor);
-			t.drawingCtx.stroke();
-			
-			
-			var r = t.drawingCtx._calcRect(x, y - heightLine);
+			var r = ctx._calcRect(x, y - heightLine);
 			x = Math.round(r.x) + 1;
 			y = Math.round(r.y) - 1;
 			
@@ -12694,33 +12697,33 @@
 			var diffY = 0;
 			for(var i = 0; i < heightTriangle; i++)
 			{
-				t.drawingCtx.ctx.moveTo(x - (i) - 2, y + 0.5 + (heightTriangle - i) - diffY);
-				t.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (heightTriangle - i) - diffY);
+				ctx.ctx.moveTo(x - (i) - 2, y + 0.5 + (heightTriangle - i) - diffY);
+				ctx.ctx.lineTo(x + i, y + 0.5 + (heightTriangle - i) - diffY);
 			}
-			
-			t.drawingCtx.setLineWidth(t.width_1px);
-            t.drawingCtx.setStrokeStyle(m_oColor);
-			t.drawingCtx.stroke();
+
+			ctx.setLineWidth(t.width_1px);
+			ctx.setStrokeStyle(m_oColor);
+			ctx.stroke();
         };
 
         var _drawFilterDreieck = function (x, y, height)
 		{
-			var r = t.drawingCtx._calcRect(x, y);
+			var r = ctx._calcRect(x, y);
 			x = Math.round(r.x) + 1;
 			y = Math.round(r.y);
-			
-			t.drawingCtx.beginPath();
+
+			ctx.beginPath();
 			
 			height = Math.round(height * scaleIndex * scaleFactor);
 			var diffY = Math.round(height / 2);
 			for(var i = 0; i < height; i++)
 			{
-				t.drawingCtx.ctx.moveTo(x - (i + 1), y + 0.5 + (height - i) - diffY);
-				t.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
+				ctx.ctx.moveTo(x - (i + 1), y + 0.5 + (height - i) - diffY);
+				ctx.ctx.lineTo(x + i, y + 0.5 + (height - i) - diffY);
 			}
-			
-            t.drawingCtx.setStrokeStyle(m_oColor);
-			t.drawingCtx.stroke();
+
+			ctx.setStrokeStyle(m_oColor);
+			ctx.stroke();
         };
 
 		//TODO пересмотреть отрисовку кнопок + отрисовку при масштабировании
