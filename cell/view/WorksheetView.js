@@ -12555,18 +12555,7 @@
                             continue;
                         }
 
-                        var width = 13;
-                        var height = 13;
-                        var rowHeight = ws.rows[row].height;
-                        if (rowHeight < height) {
-                            width = width * (rowHeight / height);
-                            height = rowHeight;
-                        }
-
-                        var x1 = ws.cols[col].left + ws.cols[col].width - width - 0.5;
-                        var y1 = ws.rows[row].top + ws.rows[row].height - height - 0.5;
-
-                        t.af_drawCurrentButton(x1 - offsetX, y1 - offsetY, {isSortState: isSortState, isSetFilter: isSetFilter, row: row, col: col});
+                        t.af_drawCurrentButton(offsetX, offsetY, {isSortState: isSortState, isSetFilter: isSetFilter, row: row, col: col});
                     }
                 }
             }
@@ -12586,12 +12575,25 @@
         return true;
     };
 
-	WorksheetView.prototype.af_drawCurrentButton = function (x1, y1, props) {
-		//TODO пересмотреть масштабирование!!!
+	WorksheetView.prototype.af_drawCurrentButton = function (offsetX, offsetY, props) {
+		var t = this;
+
+	    //TODO пересмотреть масштабирование!!!
 		var isApplyAutoFilter = props.isSetFilter;
 		var isApplySortState = props.isSortState;
+		var row = props.row;
+        var col = props.col;
 
-        var t = this;
+		var width1 = 13;
+		var height1 = 13;
+		var rowHeight1 = t.rows[row].height;
+		if (rowHeight1 < height1) {
+			width1 = width1 * (rowHeight1 / height1);
+			height1 = rowHeight1;
+		}
+
+		var x1 = t.cols[col].left + t.cols[col].width - width1 - 0.5 - offsetX;
+		var y1 = t.rows[row].top + t.rows[row].height - height1 - 0.5 - offsetY;
 
 		var width_1px = t.width_1px;
 		var height_1px = t.height_1px;
@@ -12599,8 +12601,8 @@
 		var width = 15 * height_1px;
         var m_oColor = new CColor(120, 120, 120);
 
-		var rowHeight = t.rows[props.row].height;
-		var colWidth = t.cols[props.col].width;
+		var rowHeight = t.rows[row].height;
+		var colWidth = t.cols[col].width;
 
 		var scaleIndex = 1;
 		var scaleFactor = t.drawingCtx.scaleFactor;
@@ -12696,7 +12698,7 @@
 				t.drawingCtx.ctx.lineTo(x + i, y + 0.5 + (heightTriangle - i) - diffY);
 			}
 			
-			t.drawingCtx.setLineWidth(t.width_1px)
+			t.drawingCtx.setLineWidth(t.width_1px);
             t.drawingCtx.setStrokeStyle(m_oColor);
 			t.drawingCtx.stroke();
         };
