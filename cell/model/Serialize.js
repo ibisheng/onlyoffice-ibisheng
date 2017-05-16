@@ -5820,6 +5820,8 @@
                 oCol.width = this.stream.GetDoubleLE();
 				if (oCol.width < 0) {
 					oCol.width = 0;
+				} else if (oCol.width > Asc.c_oAscMaxColumnWidth) {
+					oCol.width = Asc.c_oAscMaxColumnWidth;
 				}
                 if(AscCommon.CurFileVersion < 2)
                     oCol.CustomWidth = 1;
@@ -6003,6 +6005,11 @@
                 oRow.h = this.stream.GetDoubleLE();
                 if(AscCommon.CurFileVersion < 2)
                     oRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+				if (oRow.h < 0) {
+					oRow.h = 0;
+				} else if (oRow.h > Asc.c_oAscMaxRowHeight) {
+					oRow.h = Asc.c_oAscMaxRowHeight;
+				}
             }
             else if ( c_oSerRowTypes.CustomHeight == type )
 			{
