@@ -8421,8 +8421,8 @@
 				this.size = val - 0;
 			}
 			val = vals["dxfId"];
-			if(undefined !== val){
-				this.dxf = openXml.SaxParserDataTransfer.dxfs[val - 1] || null;
+			if (undefined !== val) {
+				this.dxf = openXml.SaxParserDataTransfer.dxfs[tableStyle.pivot ? val - 0 : val - 1] || null;
 			}
 		}
 	};
