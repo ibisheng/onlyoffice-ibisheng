@@ -167,7 +167,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
                 && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NONE)
                 || (this.brush && this.brush.fill && this.brush.fill
                 && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.brush.fill.type != c_oAscFill.FILL_TYPE_NONE) );
-    }
+    };
 
 
     this.check_bounds = function(boundsChecker)
@@ -186,7 +186,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
             boundsChecker._z();
             boundsChecker._e();
         }
-    }
+    };
 }
 
 function ObjectToDraw(brush, pen, extX, extY, geometry, transform, x, y, oComment)

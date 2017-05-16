@@ -459,7 +459,7 @@ CTable.prototype.private_RecalculateGrid = function()
                 var CellMin      = CellMinMax.Min;
                 var CellMax      = CellMinMax.Max;
                 var GridSpan     = Cell.Get_GridSpan();
-                var CellMargins  = Cell.Get_Margins();
+                var CellMargins  = Cell.GetMargins();
                 var CellW        = Cell.Get_W();
                 var CellRBorder  = Cell.Get_Border(1);
                 var CellLBorder  = Cell.Get_Border(3);
@@ -967,7 +967,7 @@ CTable.prototype.private_RecalculateBorders = function()
 
             var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
 
-            var CellMargins = Cell.Get_Margins();
+            var CellMargins = Cell.GetMargins();
             if ( CellMargins.Bottom.W > MaxBotMargin[CurRow + VMergeCount - 1] )
                 MaxBotMargin[CurRow + VMergeCount - 1] = CellMargins.Bottom.W;
 
@@ -1264,7 +1264,7 @@ CTable.prototype.private_RecalculateBorders = function()
                     X_cell_end -= CellSpacing / 2;
             }
 
-            var CellMar = Cell.Get_Margins();
+            var CellMar = Cell.GetMargins();
 
             var VMergeCount = this.Internal_GetVertMergeCount( CurRow, CurGridCol, GridSpan );
 
@@ -1582,8 +1582,8 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
                 var Cell_Left  = FirstRow.Get_Cell(0);
                 var Cell_Right = FirstRow.Get_Cell(FirstRow.Get_CellsCount() - 1);
 
-                OffsetCorrection_Left  = Cell_Left.Get_Margins().Left.W;
-                OffsetCorrection_Right = Cell_Right.Get_Margins().Right.W;
+                OffsetCorrection_Left  = Cell_Left.GetMargins().Left.W;
+                OffsetCorrection_Right = Cell_Right.GetMargins().Right.W;
             }
 
             this.X = this.X_origin + this.Get_TableOffsetCorrection();
@@ -1804,7 +1804,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 var Cell     = Row.Get_Cell( CurCell );
                 var GridSpan = Cell.Get_GridSpan();
                 var Vmerge   = Cell.Get_VMerge();
-                var CellMar  = Cell.Get_Margins();
+                var CellMar  = Cell.GetMargins();
 
                 Row.Update_CellInfo(CurCell);
 
@@ -1853,7 +1853,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 
                         Cell = HeaderPage.Rows[rIndex].Get_Cell( cIndex );
 
-                        CellMar = Cell.Get_Margins();
+                        CellMar = Cell.GetMargins();
 
                         Y_content_start = Cell.Temp.Y + CellMar.Top.W;
                     }
@@ -1951,7 +1951,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 var rIndex = Cell.Row.Index;
                 Cell = HeaderPage.Rows[rIndex].Get_Cell( cIndex );
 
-                var CellMar     = Cell.Get_Margins();
+                var CellMar     = Cell.GetMargins();
                 var CellMetrics = Cell.Row.Get_CellInfo(CurCell);
 
                 var X_content_start = Page.X + CellMetrics.X_content_start;
@@ -2045,7 +2045,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                         }
                     }
 
-                    var CellMar       = Cell.Get_Margins();
+                    var CellMar       = Cell.GetMargins();
                     var VAlign        = Cell.Get_VAlign();
                     var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
 
@@ -2210,7 +2210,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 		{
 			var Cell    = Row.Get_Cell(CurCell);
 			var Vmerge  = Cell.Get_VMerge();
-			var CellMar = Cell.Get_Margins();
+			var CellMar = Cell.GetMargins();
 			if (vmerge_Restart === Vmerge && CellMar.Top.W > MaxTopMargin)
 				MaxTopMargin = CellMar.Top.W;
 		}
@@ -2241,7 +2241,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             var Cell     = Row.Get_Cell( CurCell );
             var GridSpan = Cell.Get_GridSpan();
             var Vmerge   = Cell.Get_VMerge();
-            var CellMar  = Cell.Get_Margins();
+            var CellMar  = Cell.GetMargins();
 
             Row.Update_CellInfo(CurCell);
 
@@ -2285,7 +2285,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 if ( vmerge_Restart != Vmerge )
                 {
                     Cell = this.Internal_Get_StartMergedCell( CurRow, CurGridCol, GridSpan );
-                    CellMar = Cell.Get_Margins();
+                    CellMar = Cell.GetMargins();
 
                     Y_content_start = Cell.Temp.Y + CellMar.Top.W;
                 }
@@ -2526,7 +2526,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                     continue;
                 }
 
-                var CellMar = Cell.Get_Margins();
+                var CellMar = Cell.GetMargins();
                 var CellMetrics = Row.Get_CellInfo(CurCell);
 
                 var X_content_start = Page.X + CellMetrics.X_content_start;
@@ -2671,7 +2671,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             // Возьмем верхнюю ячейку текущего объединения
             Cell = this.Internal_Get_StartMergedCell(CurRow, CurGridCol, GridSpan);
 
-            var CellMar     = Cell.Get_Margins();
+            var CellMar     = Cell.GetMargins();
             var CellMetrics = Cell.Row.Get_CellInfo(Cell.Index);
 
             var X_content_start = Page.X + CellMetrics.X_content_start;
@@ -2808,7 +2808,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
                 }
             }
 
-            var CellMar       = Cell.Get_Margins();
+            var CellMar       = Cell.GetMargins();
             var VAlign        = Cell.Get_VAlign();
             var CellPageIndex = CurPage - Cell.Content.Get_StartPage_Relative();
 

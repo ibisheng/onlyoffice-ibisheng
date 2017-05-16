@@ -663,6 +663,10 @@ CBlockLevelSdt.prototype.GetAllContentControls = function(arrContentControls)
 	arrContentControls.push(this);
 	this.Content.GetAllContentControls(arrContentControls);
 };
+CBlockLevelSdt.prototype.IsSelectedAll = function()
+{
+	return this.Content.IsSelectedAll();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -843,6 +847,10 @@ CBlockLevelSdt.prototype.GetDocumentPositionFromObject = function(PosArray)
 
 	return PosArray;
 };
+CBlockLevelSdt.prototype.GetMargins = function()
+{
+	return this.Parent.GetMargins();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.SetPr = function(oPr)
 {
@@ -911,25 +919,32 @@ CBlockLevelSdt.prototype.GetContentControlLock = function()
 {
 	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
 };
+CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
+{
+	if (!oPr)
+		return;
+
+	if (undefined !== oPr.Tag)
+		this.SetTag(oPr.Tag);
+
+	if (undefined !== oPr.Id)
+		this.SetContentControlId(oPr.Id);
+
+	if (undefined !== oPr.Lock)
+		this.SetContentControlLock(oPr.Lock);
+};
+CBlockLevelSdt.prototype.GetContentControlPr = function()
+{
+	var oPr = new CContentControlPr();
+
+	oPr.Tag        = this.Pr.Tag;
+	oPr.Id         = this.Pr.Id;
+	oPr.Lock       = this.Pr.Lock;
+	oPr.InternalId = this.GetId();
+
+	return oPr;
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;
 window['AscCommonWord'].type_BlockLevelSdt = type_BlockLevelSdt;
-
-
-function TEST_ADD_SDT()
-{
-	var oLogicDocument = editor.WordControl.m_oLogicDocument;
-
-	oLogicDocument.Create_NewHistoryPoint();
-
-	oLogicDocument.AddContentControl();
-	oLogicDocument.AddToParagraph(new ParaText("S"));
-	oLogicDocument.AddToParagraph(new ParaText("d"));
-	oLogicDocument.AddToParagraph(new ParaText("t"));
-
-	oLogicDocument.Recalculate();
-	oLogicDocument.Document_UpdateSelectionState();
-	oLogicDocument.Document_UpdateInterfaceState();
-	oLogicDocument.Document_UpdateRulersState();
-}

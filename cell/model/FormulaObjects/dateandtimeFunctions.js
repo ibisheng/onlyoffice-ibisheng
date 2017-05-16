@@ -311,17 +311,17 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], year, month, day;
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
@@ -383,19 +383,19 @@
 	cDATEDIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElementRowCol(0, 0);
 		}
@@ -505,7 +505,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -549,7 +549,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox).tocNumber();
+			arg0 = arg0.cross(arguments[1]).tocNumber();
 			val = arg0.tocNumber().getValue();
 		}
 		if (arg0 instanceof cError) {
@@ -622,19 +622,19 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cBool(false);
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElementRowCol(0, 0);
 		}
@@ -691,13 +691,13 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -769,13 +769,13 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -839,7 +839,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox).tocNumber();
+			arg0 = arg0.cross(arguments[1]).tocNumber();
 		}
 
 		if (arg0 instanceof cError) {
@@ -907,7 +907,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox).tocNumber();
+			arg0 = arg0.cross(arguments[1]).tocNumber();
 		}
 
 		if (arg0 instanceof cError) {
@@ -974,7 +974,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox).tocNumber();
+			arg0 = arg0.cross(arguments[1]).tocNumber();
 		}
 
 		if (arg0 instanceof cError) {
@@ -1045,13 +1045,13 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1213,7 +1213,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox).tocNumber();
+			arg0 = arg0.cross(arguments[1]).tocNumber();
 		}
 
 		if (arg0 instanceof cError) {
@@ -1278,17 +1278,17 @@
 		var hour = arg[0], minute = arg[1], second = arg[2];
 
 		if (hour instanceof cArea || hour instanceof cArea3D) {
-			hour = hour.cross(arguments[1].bbox);
+			hour = hour.cross(arguments[1]);
 		} else if (hour instanceof cArray) {
 			hour = hour.getElement(0);
 		}
 		if (minute instanceof cArea || minute instanceof cArea3D) {
-			minute = minute.cross(arguments[1].bbox);
+			minute = minute.cross(arguments[1]);
 		} else if (minute instanceof cArray) {
 			minute = minute.getElement(0);
 		}
 		if (second instanceof cArea || second instanceof cArea3D) {
-			second = second.cross(arguments[1].bbox);
+			second = second.cross(arguments[1]);
 		} else if (second instanceof cArray) {
 			second = second.getElement(0);
 		}
@@ -1313,9 +1313,7 @@
 
 		var v = (hour * 60 * 60 + minute * 60 + second) / c_sPerDay;
 		this.value = new cNumber(v - Math.floor(v));
-		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
-			this.value.numFormat = 18;
-		}
+		this.value.numFormat = 18;
 		return this.value;
 	};
 	cTIME.prototype.getInfo = function () {
@@ -1343,7 +1341,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1384,9 +1382,7 @@
 	cTODAY.prototype.ca = true;
 	cTODAY.prototype.Calculate = function () {
 		this.value = new cNumber(new Date().getExcelDate());
-		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
-			this.value.numFormat = 14;
-		}
+		this.value.numFormat = 14;
 		return this.value;
 	};
 	cTODAY.prototype.getInfo = function () {
@@ -1414,13 +1410,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(1);
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1529,13 +1525,13 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1619,13 +1615,13 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1718,11 +1714,7 @@
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
-		if (arguments[1].getNumFormatStr().toLowerCase() === "general") {
-			return this.setCalcValue(new cNumber(val), 14);
-		} else {
-			return this.value = new cNumber(val);
-		}
+		return this.setCalcValue(new cNumber(val), 14);
 	};
 	cWORKDAY.prototype.getInfo = function () {
 		return {
@@ -1761,7 +1753,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox).tocNumber();
+			arg0 = arg0.cross(arguments[1]).tocNumber();
 		}
 
 		if (arg0 instanceof cError) {
@@ -1825,19 +1817,19 @@
 	cYEARFRAC.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2] ? arg[2] : new cNumber(0);
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElementRowCol(0, 0);
 		}

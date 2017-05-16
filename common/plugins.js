@@ -593,7 +593,7 @@
 					if (_iframe)
 						_iframe.contentWindow.postMessage(pluginData.serialize(), "*");
 				}
-				this.methodReturnAsync = false;
+				window.g_asc_plugins.methodReturnAsync = false;
 				return;
 			}
 		}

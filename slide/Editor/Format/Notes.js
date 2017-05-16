@@ -168,6 +168,16 @@
     };
 
 
+    CNotes.prototype.getAllFonts = function(fonts)
+    {
+        var i;
+        for(i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            if(typeof  this.cSld.spTree[i].getAllFonts === "function")
+                this.cSld.spTree[i].getAllFonts(fonts);
+        }
+    };
+
     function CreateNotes(){
         var oN = new CNotes();
         var oSp = new AscFormat.CShape();

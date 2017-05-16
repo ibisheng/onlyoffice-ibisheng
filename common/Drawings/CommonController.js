@@ -143,7 +143,7 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
             return Math.abs( a - b ) < fDelta;
         }
         return Math.abs( a - b ) < 1e-15;
-    };
+    }
 
 
 	function fSolveQuadraticEquation(a, b, c){
@@ -493,7 +493,7 @@ function CheckStockChart(oDrawingObjects, oApi)
 
 function CheckLinePreset(preset)
 {
-    return preset === "line";
+    return CheckLinePresetForParagraphAdd(preset);
 }
 
 function CheckLinePresetForParagraphAdd(preset)
@@ -676,6 +676,14 @@ function getTargetTextObject(controller)
     return null;
 }
 
+
+function isConnectorPreset(sPreset){
+        if(typeof sPreset === "string" && sPreset.length > 0){
+            return "line" === sPreset || sPreset.toLowerCase().indexOf("connector") > -1;
+        }
+        return false;
+}
+
 function DrawingObjectsController(drawingObjects)
 {
     this.drawingObjects = drawingObjects;
@@ -698,6 +706,8 @@ function DrawingObjectsController(drawingObjects)
 
     this.chartForProps = null;
 
+    this.lastOverObject = null;
+
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
 
@@ -717,6 +727,98 @@ DrawingObjectsController.prototype =
     handleOleDblClick: function(drawing, e, x, y, pageIndex)
     {
 
+    },
+
+    getAllConnectors: function(aDrawings, allDrawings){
+        var _ret = allDrawings;
+        if(!_ret){
+            _ret = [];
+        }
+        for(var i = 0; i < aDrawings.length; ++i){
+            if(aDrawings[i].getObjectType() === AscDFH.historyitem_type_Cnx){
+                _ret.push(aDrawings[i]);
+            }
+            else if(aDrawings[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                aDrawings[i].getAllConnectors(aDrawings[i].spTree, _ret);
+            }
+        }
+        return _ret;
+    },
+
+    getAllShapes:  function(aDrawings, allDrawings){
+        var _ret = allDrawings;
+        if(!_ret){
+            _ret = [];
+        }
+        for(var i = 0; i < aDrawings.length; ++i){
+            if(aDrawings[i].getObjectType() === AscDFH.historyitem_type_Shape){
+                _ret.push(aDrawings[i]);
+            }
+            else if(aDrawings[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                aDrawings[i].getAllShapes(aDrawings[i].spTree, _ret);
+            }
+        }
+        return _ret;
+    },
+
+    checkConnectorsPreTrack: function(){
+
+        if(this.arrPreTrackObjects.length > 0 && this.arrPreTrackObjects[0].originalObject){
+
+            var aAllConnectors = this.getAllConnectors(this.getDrawingArray());
+            var oPreTrack;
+            var stId = null, endId = null, oBeginTrack = null, oEndTrack = null, oBeginShape = null, oEndShape = null;
+            var aConnectionPreTracks = [];
+            for(var i = 0; i < aAllConnectors.length; ++i){
+                stId = aAllConnectors[i].nvSpPr.nvUniSpPr.stCnxId;
+                endId = aAllConnectors[i].nvSpPr.nvUniSpPr.endCnxId;
+                oBeginTrack = null;
+                oEndTrack = null;
+                oBeginShape = null;
+                oEndShape = null;
+
+                if(stId !== null || endId !== null){
+                    for(var j = 0; j < this.arrPreTrackObjects.length; ++j){
+                        oPreTrack = this.arrPreTrackObjects[j].originalObject;
+                        if(oPreTrack.getObjectType() === AscDFH.historyitem_type_Shape && oPreTrack.nvSpPr){
+                            if(oPreTrack.Id === stId){
+                                oBeginTrack = this.arrPreTrackObjects[j];
+                            }
+                            if(oPreTrack.Id === endId){
+                                oEndTrack = this.arrPreTrackObjects[j];
+                            }
+                        }
+                    }
+                }
+                if(oBeginTrack || oEndTrack){
+
+                    if(oBeginTrack){
+                        oBeginShape = oBeginTrack.originalObject;
+                    }
+                    else{
+                        if(stId !== null){
+                            oBeginShape = AscCommon.g_oTableId.Get_ById(stId);
+                            if(oBeginShape && oBeginShape.bDeleted){
+                                oBeginShape = null;
+                            }
+                        }
+                    }
+                    if(oEndTrack){
+                        oEndShape = oEndTrack.originalObject;
+                    }
+                    else if(endId !== null){
+                        oEndShape = AscCommon.g_oTableId.Get_ById(endId);
+                        if(oEndShape && oEndShape.bDeleted){
+                            oEndShape = null;
+                        }
+                    }
+                    aConnectionPreTracks.push(new AscFormat.CConnectorTrack(aAllConnectors[i], oBeginTrack, oEndTrack, oBeginShape, oEndShape));
+                }
+            }
+            for(i = 0; i < aConnectionPreTracks.length; ++i){
+                this.arrPreTrackObjects.push(aConnectionPreTracks[i]);
+            }
+        }
     },
 
     //for mobile spreadsheet editor
@@ -1461,6 +1563,14 @@ DrawingObjectsController.prototype =
         {
             drawingDocument.DrawTrackSelectShapes(this.selectionRect.x, this.selectionRect.y, this.selectionRect.w, this.selectionRect.h);
         }
+
+
+        if(this.connector){
+            this.connector.drawConnectors(drawingDocument.AutoShapesTrack);
+            this.connector = null;
+        }
+
+
       
 		if (undefined !== drawingDocument.EndDrawTracking)
 			drawingDocument.EndDrawTracking();
@@ -6314,6 +6424,7 @@ DrawingObjectsController.prototype =
 
     swapTrackObjects: function()
     {
+        this.checkConnectorsPreTrack();
         this.clearTrackObjects();
         for(var i = 0; i < this.arrPreTrackObjects.length; ++i)
             this.addTrackObject(this.arrPreTrackObjects[i]);
@@ -8150,7 +8261,7 @@ DrawingObjectsController.prototype =
 
             if ( undefined != Props.DefaultTab )
             {
-                //this.setDefa( Props.DefaultTab );
+                this.setDefaltTabSize( Props.DefaultTab );
             }
 
 
@@ -10629,6 +10740,15 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     window['AscFormat'].SCATTER_STYLE_SMOOTH = SCATTER_STYLE_SMOOTH;
     window['AscFormat'].SCATTER_STYLE_SMOOTH_MARKER = SCATTER_STYLE_SMOOTH_MARKER;
     window['AscFormat'].CARD_DIRECTION_N = CARD_DIRECTION_N;
+    window['AscFormat'].CARD_DIRECTION_NE = CARD_DIRECTION_NE;
+    window['AscFormat'].CARD_DIRECTION_E = CARD_DIRECTION_E;
+    window['AscFormat'].CARD_DIRECTION_SE = CARD_DIRECTION_SE;
+    window['AscFormat'].CARD_DIRECTION_S = CARD_DIRECTION_S;
+    window['AscFormat'].CARD_DIRECTION_SW = CARD_DIRECTION_SW;
+    window['AscFormat'].CARD_DIRECTION_W = CARD_DIRECTION_W;
+    window['AscFormat'].CARD_DIRECTION_NW = CARD_DIRECTION_NW;
+
+
     window['AscFormat'].CURSOR_TYPES_BY_CARD_DIRECTION = CURSOR_TYPES_BY_CARD_DIRECTION;
     window['AscFormat'].removeDPtsFromSeries = removeDPtsFromSeries;
     window['AscFormat'].checkTxBodyDefFonts = checkTxBodyDefFonts;
@@ -10667,4 +10787,5 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].CollectDLbls = CollectDLbls;
 	window['AscFormat'].CollectSettingsSpPr = CollectSettingsSpPr;
 	window['AscFormat'].CheckLinePresetForParagraphAdd = CheckLinePresetForParagraphAdd;
+	window['AscFormat'].isConnectorPreset = isConnectorPreset;
 })(window);

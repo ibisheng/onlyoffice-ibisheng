@@ -1672,6 +1672,8 @@ function CGroupShape()
     CGroupShape.prototype.recalculateCurPos = AscFormat.DrawingObjectsController.prototype.recalculateCurPos;
 
     CGroupShape.prototype.loadDocumentStateAfterLoadChanges = AscFormat.DrawingObjectsController.prototype.loadDocumentStateAfterLoadChanges;
+    CGroupShape.prototype.getAllConnectors = AscFormat.DrawingObjectsController.prototype.getAllConnectors;
+    CGroupShape.prototype.getAllShapes = AscFormat.DrawingObjectsController.prototype.getAllShapes;
 
     CGroupShape.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
 
@@ -1827,6 +1829,26 @@ function CGroupShape()
                 this.spTree[i].setGroup(this);
             }
         }
+    };
+
+    CGroupShape.prototype.findConnector = function(x, y){
+        for(var i = this.spTree.length - 1; i > -1; --i ){
+            var oConInfo = this.spTree[i].findConnector(x, y);
+            if(oConInfo){
+                return oConInfo;
+            }
+        }
+        return null;
+    };
+
+    CGroupShape.prototype.findConnectionShape = function(x, y){
+        for(var i = this.spTree.length - 1; i > -1; --i){
+            var _ret = this.spTree[i].findConnectionShape(x, y);
+            if(_ret){
+                return _ret;
+            }
+        }
+        return null;
     };
 
     CGroupShape.prototype.GetAllContentControls = function(arrContentControls){

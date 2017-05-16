@@ -551,7 +551,7 @@
 		}
 
 		if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (cElementType.array === arg1.type) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -645,7 +645,7 @@
 			}
 
 			if (cElementType.cellsRange === arg2.type || cElementType.cellsRange3D === arg2.type) {
-				arg2 = arg2.cross(arguments[1].bbox);
+				arg2 = arg2.cross(arguments[1]);
 			} else if (cElementType.array === arg2.type) {
 				arg2 = arg2.getElementRowCol(0, 0);
 			}
@@ -746,25 +746,25 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
 
 		if (arg3 instanceof cArea || arg3 instanceof cArea3D) {
-			arg3 = arg3.cross(arguments[1].bbox);
+			arg3 = arg3.cross(arguments[1]);
 		} else if (arg3 instanceof cArray) {
 			arg3 = arg3.getElement(0);
 		}
@@ -859,19 +859,19 @@
 
 		var alpha = arg[0], stdev_sigma = arg[1], size = arg[2];
 		if (alpha instanceof cArea || alpha instanceof cArea3D) {
-			alpha = alpha.cross(arguments[1].bbox);
+			alpha = alpha.cross(arguments[1]);
 		} else if (alpha instanceof cArray) {
 			alpha = alpha.getElement(0);
 		}
 
 		if (stdev_sigma instanceof cArea || stdev_sigma instanceof cArea3D) {
-			stdev_sigma = stdev_sigma.cross(arguments[1].bbox);
+			stdev_sigma = stdev_sigma.cross(arguments[1]);
 		} else if (stdev_sigma instanceof cArray) {
 			stdev_sigma = stdev_sigma.getElement(0);
 		}
 
 		if (size instanceof cArea || size instanceof cArea3D) {
-			size = size.cross(arguments[1].bbox);
+			size = size.cross(arguments[1]);
 		} else if (size instanceof cArray) {
 			size = size.getElement(0);
 		}
@@ -1140,6 +1140,7 @@
 	cCOUNTIF.prototype.constructor = cCOUNTIF;
 	cCOUNTIF.prototype.argumentsMin = 2;
 	cCOUNTIF.prototype.argumentsMax = 2;
+	cCOUNTIF.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUNTIF.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], _count = 0, matchingInfo;
 		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
@@ -1148,7 +1149,7 @@
 		}
 
 		if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (cElementType.array === arg1.type) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1197,18 +1198,19 @@
 	cCOUNTIFS.prototype.constructor = cCOUNTIFS;
 	cCOUNTIFS.prototype.argumentsMin = 2;
 	cCOUNTIFS.prototype.argumentsMax = 254;
+	cCOUNTIFS.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cCOUNTIFS.prototype.Calculate = function (arg) {
 		var i, j, arg0, arg1, matchingInfo, arg0Matrix, arg1Matrix, _count = 0;
 		for (var k = 0; k < arg.length; k += 2) {
 			arg0 = arg[k];
 			arg1 = arg[k + 1];
 			if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
-				cElementType.cellsRange !== arg0.type && cElementType.cellsRange3D !== arg0.type) {
+				cElementType.cellsRange !== arg0.type && !(cElementType.cellsRange3D === arg0.type && arg0.isSingleSheet())) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 
 			if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
-				arg1 = arg1.cross(arguments[1].bbox);
+				arg1 = arg1.cross(arguments[1]);
 			} else if (cElementType.array === arg1.type) {
 				arg1 = arg1.getElementRowCol(0, 0);
 			}
@@ -1220,6 +1222,9 @@
 
 			matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
 			arg1Matrix = arg0.getMatrix();
+			if (cElementType.cellsRange3D === arg0.type) {
+				arg1Matrix = arg1Matrix[0];
+			}
 			if (!arg0Matrix) {
 				arg0Matrix = arg1Matrix;
 			}
@@ -1386,19 +1391,19 @@
 		}
 
 		if (alpha instanceof cArea || alpha instanceof cArea3D) {
-			alpha = alpha.cross(arguments[1].bbox);
+			alpha = alpha.cross(arguments[1]);
 		} else if (alpha instanceof cArray) {
 			alpha = alpha.getElement(0);
 		}
 
 		if (n instanceof cArea || n instanceof cArea3D) {
-			n = n.cross(arguments[1].bbox);
+			n = n.cross(arguments[1]);
 		} else if (n instanceof cArray) {
 			n = n.getElement(0);
 		}
 
 		if (p instanceof cArea || p instanceof cArea3D) {
-			p = p.cross(arguments[1].bbox);
+			p = p.cross(arguments[1]);
 		} else if (p instanceof cArray) {
 			p = p.getElement(0);
 		}
@@ -1523,19 +1528,19 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
@@ -1614,7 +1619,7 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -1663,7 +1668,7 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -1748,7 +1753,7 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arr0 = [], arr1 = [];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
@@ -1935,7 +1940,7 @@
 
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -2148,25 +2153,25 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
 
 		if (arg3 instanceof cArea || arg3 instanceof cArea3D) {
-			arg3 = arg3.cross(arguments[1].bbox);
+			arg3 = arg3.cross(arguments[1]);
 		} else if (arg3 instanceof cArray) {
 			arg3 = arg3.getElement(0);
 		}
@@ -2446,7 +2451,7 @@
 
 
 		if (cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (cElementType.array === arg1.type) {
 			arg1 = arg1.getElement(0);
 		}
@@ -2509,19 +2514,19 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
@@ -2575,19 +2580,19 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
@@ -3161,19 +3166,19 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
@@ -3233,25 +3238,25 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
 
 		if (arg3 instanceof cArea || arg3 instanceof cArea3D) {
-			arg3 = arg3.cross(arguments[1].bbox);
+			arg3 = arg3.cross(arguments[1]);
 		} else if (arg3 instanceof cArray) {
 			arg3 = arg3.getElement(0);
 		}
@@ -3310,19 +3315,19 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
@@ -3366,7 +3371,7 @@
 	cNORMSDIST.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -3418,7 +3423,7 @@
 
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 		if (arg0 instanceof cError) {
@@ -3578,7 +3583,7 @@
 
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
@@ -3684,13 +3689,13 @@
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
@@ -3731,12 +3736,12 @@
 	cPERMUT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		arg0 = arg0.tocNumber();
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		}
 		arg1 = arg1.tocNumber();
 
@@ -3840,19 +3845,19 @@
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
@@ -3967,13 +3972,13 @@
 
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}
 
 		if (arg3 instanceof cArea || arg3 instanceof cArea3D) {
-			arg3 = arg3.cross(arguments[1].bbox);
+			arg3 = arg3.cross(arguments[1]);
 		} else if (arg3 instanceof cArray) {
 			arg3 = arg3.getElement(0);
 		}
@@ -4088,7 +4093,7 @@
 
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
@@ -4452,7 +4457,7 @@
 
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 //        arg1 = arg1.getElement( 0 );
 			arg1.foreach(actionArray);
@@ -4495,19 +4500,19 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElement(0);
 		}
 
 		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 		} else if (arg2 instanceof cArray) {
 			arg2 = arg2.getElement(0);
 		}

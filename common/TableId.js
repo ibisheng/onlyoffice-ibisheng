@@ -241,6 +241,7 @@
 		this.m_oFactoryClass[AscDFH.historyitem_type_SerAx]                  = AscFormat.CSerAx;
 		this.m_oFactoryClass[AscDFH.historyitem_type_Title]                  = AscFormat.CTitle;
 		this.m_oFactoryClass[AscDFH.historyitem_type_OleObject]              = AscFormat.COleObject;
+        this.m_oFactoryClass[AscDFH.historyitem_type_Cnx]                    = AscFormat.CConnectionShape;
 		this.m_oFactoryClass[AscDFH.historyitem_type_DrawingContent]         = AscFormat.CDrawingDocContent;
 		this.m_oFactoryClass[AscDFH.historyitem_type_Math]                   = AscCommonWord.ParaMath;
 		this.m_oFactoryClass[AscDFH.historyitem_type_MathContent]            = AscCommonWord.CMathContent;
@@ -261,6 +262,7 @@
 		this.m_oFactoryClass[AscDFH.historyitem_type_deg_subsup]             = AscCommonWord.CDegreeSubSup;
 		this.m_oFactoryClass[AscDFH.historyitem_type_deg]                    = AscCommonWord.CDegree;
 		this.m_oFactoryClass[AscDFH.historyitem_type_BlockLevelSdt]          = AscCommonWord.CBlockLevelSdt;
+
 
 		if (window['AscCommonSlide'])
 		{

@@ -12053,6 +12053,10 @@ Paragraph.prototype.GetAllContentControls = function(arrContentControls)
 
 	return arrContentControls;
 };
+Paragraph.prototype.GetTargetPos = function()
+{
+	return this.Internal_Recalculate_CurPos(this.CurPos.ContentPos, false, false, true);
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

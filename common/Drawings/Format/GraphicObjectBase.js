@@ -249,6 +249,42 @@
         this.w = r - l;
         this.h = b - t;
     }
+
+    CGraphicBounds.prototype.fromOther = function(oBounds){
+        this.l = oBounds.l;
+        this.t = oBounds.t;
+        this.r = oBounds.r;
+        this.b = oBounds.b;
+
+        this.x = oBounds.x;
+        this.y = oBounds.y;
+        this.w = oBounds.w;
+        this.h = oBounds.h;
+    };
+    CGraphicBounds.prototype.transform = function(oTransform){
+
+        var xlt = oTransform.TransformPointX(this.l, this.t);
+        var ylt = oTransform.TransformPointY(this.l, this.t);
+
+        var xrt = oTransform.TransformPointX(this.r, this.t);
+        var yrt = oTransform.TransformPointY(this.r, this.t);
+        var xlb = oTransform.TransformPointX(this.l, this.b);
+        var ylb = oTransform.TransformPointY(this.l, this.b);
+
+        var xrb = oTransform.TransformPointX(this.r, this.b);
+        var yrb = oTransform.TransformPointY(this.r, this.b);
+
+        this.l = Math.min(xlb, xlt, xrb, xrt);
+        this.t = Math.min(ylb, ylt, yrb, yrt);
+
+        this.r = Math.max(xlb, xlt, xrb, xrt);
+        this.b = Math.max(ylb, ylt, yrb, yrt);
+
+        this.x = this.l;
+        this.y = this.t;
+        this.w = this.r - this.l;
+        this.h = this.b - this.t;
+    };
     /**
      * Base class for all graphic objects
      * @constructor
@@ -778,9 +814,30 @@
     CGraphicObjectBase.prototype.Restart_CheckSpelling = function()
     {
     };
+    CGraphicObjectBase.prototype.findConnector = function()
+    {
+        return null;
+    };
+    CGraphicObjectBase.prototype.findConnectionShape = function(x, y)
+    {
+        return null;
+    };
+    CGraphicObjectBase.prototype.drawConnectors = function(overlay)
+    {
+    };
 
     CGraphicObjectBase.prototype.GetAllContentControls = function(arrContentControls)
     {
+    };
+
+    CGraphicObjectBase.prototype.CheckContentControlEditingLock = function () {
+        if(this.group){
+            this.group.CheckContentControlEditingLock();
+            return;
+        }
+        if(this.parent && this.parent.CheckContentControlEditingLock){
+            this.parent.CheckContentControlEditingLock();
+        }
     };
 
 window['AscFormat'] = window['AscFormat'] || {};

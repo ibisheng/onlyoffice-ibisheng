@@ -843,7 +843,8 @@
 		Change: 1,
 		ChangeFormula: 2,
 		EndCalculate: 3,
-		GetRangeCell: 4
+		GetRangeCell: 4,
+		IsDefName: 5
 	};
 
 	var c_oDashType = {
@@ -1105,7 +1106,8 @@
 
 		insertAsNestedTable: 20,
 		uniteIntoTable: 21,
-		insertAsNewRows: 22
+		insertAsNewRows: 22,
+		keepTextOnly: 23
 	};
 	
 	//------------------------------------------------------------export--------------------------------------------------
@@ -1786,6 +1788,7 @@
 	prot['mergeFormatting'] = prot.mergeFormatting;
 	prot['uniteList'] = prot.uniteList;
 	prot['doNotUniteList'] = prot.doNotUniteList;
+	prot['keepTextOnly'] = prot.keepTextOnly;
 	
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =

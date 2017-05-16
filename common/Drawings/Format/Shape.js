@@ -61,7 +61,7 @@ var c_oAscFill = Asc.c_oAscFill;
 
 function CheckObjectLine(obj)
 {
-    return (obj instanceof CShape && obj.spPr && obj.spPr.geometry && obj.spPr.geometry.preset === "line");
+    return (obj instanceof CShape && obj.spPr && obj.spPr.geometry && AscFormat.CheckLinePreset(obj.spPr.geometry.preset));
 }
 
 
@@ -5367,6 +5367,66 @@ CShape.prototype.getColumnNumber = function(){
         var oContent = this.getDocContent();
         if(oContent){
             oContent.GetAllContentControls(arrContentControls);
+        }
+    };
+
+    CShape.prototype.convertToConnectionParams = function(rot, oTransform, oBounds, oConnectorInfo){
+        var _ret =  new AscFormat.ConnectionParams();
+        var _rot = oConnectorInfo.ang*AscFormat.cToRad + rot;
+        var _normalized_rot = AscFormat.normalizeRotate(_rot);
+        _ret.dir = AscFormat.CARD_DIRECTION_E;
+        if(_normalized_rot >= 0 && _normalized_rot < Math.PI * 0.25 || _normalized_rot >= 7 * Math.PI * 0.25 && _normalized_rot < 2 * Math.PI){
+            _ret.dir = AscFormat.CARD_DIRECTION_E;
+        }
+        else if(_normalized_rot >= Math.PI * 0.25 && _normalized_rot < 3 * Math.PI * 0.25){
+            _ret.dir = AscFormat.CARD_DIRECTION_S;
+        }
+        else if(_normalized_rot >= 3 * Math.PI * 0.25 && _normalized_rot < 5 * Math.PI * 0.25){
+            _ret.dir = AscFormat.CARD_DIRECTION_W;
+        }
+        else if(_normalized_rot >= 5 * Math.PI * 0.25 && _normalized_rot < 7 * Math.PI * 0.25){
+            _ret.dir = AscFormat.CARD_DIRECTION_N;
+        }
+        _ret.x = oTransform.TransformPointX(oConnectorInfo.x, oConnectorInfo.y);
+        _ret.y = oTransform.TransformPointY(oConnectorInfo.x, oConnectorInfo.y);
+        _ret.bounds.fromOther(oBounds);
+        _ret.idx = oConnectorInfo.idx;
+        return _ret;
+    };
+
+
+    CShape.prototype.findGeomConnector = function(x, y){
+        if(this.spPr && this.spPr.geometry){
+            var oInvertTransform = this.invertTransform;
+            var _x = oInvertTransform.TransformPointX(x, y);
+            var _y = oInvertTransform.TransformPointY(x, y);
+            return this.spPr.geometry.findConnector(_x, _y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * AscCommon.TRACK_CIRCLE_RADIUS));
+        }
+        return null;
+    };
+
+    CShape.prototype.findConnector = function(x, y){
+        var oConnGeom = this.findGeomConnector(x, y);
+        if(oConnGeom){
+            return this.convertToConnectionParams(this.rot, this.transform, this.bounds, oConnGeom);
+        }
+        return null;
+    };
+
+    CShape.prototype.findConnectionShape = function(x, y){
+        if(this.spPr && this.spPr.geometry && this.spPr.geometry.cnxLst.length >0){
+            if(this.hit(x, y)){
+                return this;
+            }
+        }
+        return null;
+    };
+
+
+    CShape.prototype.drawConnectors = function(overlay)
+    {
+        if(this.spPr && this.spPr.geometry){
+            this.spPr.geometry.drawConnectors(overlay, this.transform);
         }
     };
 

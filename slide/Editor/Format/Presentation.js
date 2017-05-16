@@ -1754,7 +1754,7 @@ CPresentation.prototype =
 			var fMaxTopMargin = 0, fMaxBottomMargin = 0, fMaxTopBorder = 0, fMaxBottomBorder = 0;
 			for(j = 0;  j < row.Content.length; ++j){
 				var oCell = row.Content[j];
-				var oMargins = oCell.Get_Margins();
+				var oMargins = oCell.GetMargins();
 				if(oMargins.Bottom.W > fMaxBottomMargin){
 					fMaxBottomMargin = oMargins.Bottom.W;
 				}
@@ -3644,6 +3644,15 @@ CPresentation.prototype =
         if(this.globalTableStyles)
         {
             this.globalTableStyles.Document_Get_AllFontNames(AllFonts);
+        }
+
+        for(var i = 0; i < this.notesMasters.length; ++i)
+        {
+            this.notesMasters[i].getAllFonts(AllFonts);
+        }
+        for(var i = 0; i < this.notes.length; ++i)
+        {
+            this.notes[i].getAllFonts(AllFonts);
         }
         delete AllFonts["+mj-lt"];
         delete AllFonts["+mn-lt"];

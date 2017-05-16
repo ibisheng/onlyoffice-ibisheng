@@ -55,6 +55,8 @@ function StartAddNewShape(drawingObjects, preset)
     this.startX = null;
     this.startY = null;
 
+    this.oldConnector = null;
+
 }
 
 StartAddNewShape.prototype =
@@ -90,6 +92,30 @@ StartAddNewShape.prototype =
                 this.bMoved = true;
             this.drawingObjects.arrTrackObjects[0].track(e, x, y);
             this.drawingObjects.updateOverlay();
+        }
+        else
+        {
+            if(AscFormat.isConnectorPreset(this.preset)){
+                var oOldState = this.drawingObjects.curState;
+                this.drawingObjects.connector = null;
+                this.drawingObjects.changeCurrentState(new AscFormat.NullState(this.drawingObjects));
+                var oResult;
+                this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+                oResult = this.drawingObjects.curState.onMouseDown(e, x, y, 0);
+                this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+                this.drawingObjects.changeCurrentState(oOldState);
+
+                if(oResult){
+                    var oObject = AscCommon.g_oTableId.Get_ById(oResult.objectId);
+                    if(oObject.getObjectType() === AscDFH.historyitem_type_Shape){
+                        this.drawingObjects.connector = oObject;
+                    }
+                }
+                if(this.drawingObjects.connector !== this.oldConnector){
+                    this.drawingObjects.updateOverlay();
+                }
+                this.oldConnector = this.drawingObjects.connector;
+            }
         }
     },
 

@@ -2690,6 +2690,21 @@ CParagraphContentWithParagraphLikeContent.prototype.GetAllContentControls = func
 
 	return arrContentControls;
 };
+CParagraphContentWithParagraphLikeContent.prototype.Is_UseInDocument = function()
+{
+	return (this.Paragraph && true === this.Paragraph.Is_UseInDocument() && true === this.Is_UseInParagraph() ? true : false);
+};
+CParagraphContentWithParagraphLikeContent.prototype.Is_UseInParagraph = function()
+{
+	if (!this.Paragraph)
+		return false;
+
+	var ContentPos = this.Paragraph.Get_PosByElement(this);
+	if (!ContentPos)
+		return false;
+
+	return true;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------

@@ -1247,6 +1247,7 @@ function CSelectedElementsInfo()
     this.m_oField          = null;  // Поле, в котором находится выделение
     this.m_oCell           = null;  // Выделенная ячейка (специальная ситуация, когда выделена ровно одна ячейка)
 	this.m_oBlockLevelSdt  = null;  // Если мы находимся в классе CBlockLevelSdt
+	this.m_oInlineLevelSdt = null;  // Если мы находимся в классе CInlineLevelSdt
 
     this.Reset = function()
     {
@@ -1343,6 +1344,14 @@ CSelectedElementsInfo.prototype.SetBlockLevelSdt = function(oSdt)
 CSelectedElementsInfo.prototype.GetBlockLevelSdt = function()
 {
 	return this.m_oBlockLevelSdt;
+};
+CSelectedElementsInfo.prototype.SetInlineLevelSdt = function(oSdt)
+{
+	this.m_oInlineLevelSdt = oSdt;
+};
+CSelectedElementsInfo.prototype.GetInlineLevelSdt = function()
+{
+	return this.m_oInlineLevelSdt;
 };
 
 var document_compatibility_mode_Word14 = 14;
@@ -2868,6 +2877,12 @@ CDocument.prototype.Recalculate_PageColumn                   = function()
 					this.private_RecalculateHdrFtrPageCountUpdate();
 				}
 			}
+
+			if(window['AscCommon'].g_clipboardBase && window['AscCommon'].g_clipboardBase.showButtonIdParagraph && !window['AscCommon'].g_clipboardBase.pasteStart)
+			{
+				window['AscCommon'].g_clipboardBase.SpecialPasteButtonById_Show();
+			}
+			window['AscCommon'].g_clipboardBase.endRecalcDocument = true;
 		}
     }
 
@@ -5071,6 +5086,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 
     var PageMetrics = this.Get_PageContentStartPos(this.CurPage, this.Pages[this.CurPage].Pos);
 
+	var oldDocPosType = this.Get_DocPosType();
     // Проверяем, не попали ли мы в колонтитул (если мы попадаем в Flow-объект, то попадание в колонтитул не проверяем)
     if (true != bFlowTable && nInDrawing < 0 && true === bCheckHdrFtr && MouseEvent.ClickCount >= 2 && ( Y <= PageMetrics.Y || Y > PageMetrics.YLimit ))
     {
@@ -5196,6 +5212,13 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 			}
 		}
 	}
+
+	//при переходе из колонтитула в контент(и обратно) необходимо скрывать иконку с/в
+	var newDocPosType = this.Get_DocPosType();
+    if((docpostype_HdrFtr === newDocPosType && docpostype_Content === oldDocPosType) || (docpostype_Content === newDocPosType && docpostype_HdrFtr === oldDocPosType))
+    {
+		window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+    }
 };
 /**
  * Данная функция может использоваться как при движении, так и при окончательном выставлении селекта.
@@ -15168,9 +15191,22 @@ CDocument.prototype.GetAllContentControls = function()
 	}
 	return arrContentControls;
 };
-CDocument.prototype.SelectContentControl = function(oContentControl)
+CDocument.prototype.RemoveContentControl = function(Id)
 {
-
+	var oBlockLevelSdt = this.TableId.Get_ById(Id);
+	if (oBlockLevelSdt && oBlockLevelSdt.Parent)
+	{
+		this.RemoveSelection();
+		var oDocContent = oBlockLevelSdt.Parent;
+		oDocContent.Update_ContentIndexing();
+		var nIndex = oBlockLevelSdt.GetIndex();
+		oDocContent.Remove_FromContent(nIndex, 1);
+		oDocContent.MoveCursorToStartPos();
+	}
+};
+CDocument.prototype.GetContentControl = function(Id)
+{
+	return this.TableId.Get_ById(Id);
 };
 
 function CDocumentSelectionState()

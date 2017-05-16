@@ -629,6 +629,13 @@ CDocumentContentElementBase.prototype.GetStyleFromFormatting = function()
 CDocumentContentElementBase.prototype.GetAllContentControls = function(arrContentControls)
 {
 };
+CDocumentContentElementBase.prototype.IsSelectedAll = function()
+{
+	return false;
+};
+CDocumentContentElementBase.prototype.CheckContentControlDeletingLock = function()
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
