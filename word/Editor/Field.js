@@ -240,7 +240,7 @@ ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
 		X1        : X1,
 		Y0        : Y0,
 		Y1        : Y1,
-		PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()
+		PageIndex : PRSA.Paragraph.Get_AbsolutePage(_CurPage)
 	};
 };
 ParaField.prototype.Draw_HighLights = function(PDSH)

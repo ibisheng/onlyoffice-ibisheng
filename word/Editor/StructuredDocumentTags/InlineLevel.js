@@ -45,7 +45,10 @@ function CInlineLevelSdt()
 {
 	CParagraphContentWithParagraphLikeContent.call(this);
 
-	this.Pr = new CSdtPr();
+	this.Pr   = new CSdtPr();
+	this.Type = para_InlineLevelSdt;
+
+	this.BoundsPath = [];
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);
@@ -204,12 +207,15 @@ CInlineLevelSdt.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _C
 	var X1 = PRSA.X;
 
 	this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)] = {
-		X0        : X0,
-		X1        : X1,
-		Y0        : Y0,
-		Y1        : Y1,
-		PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()
+		X    : X0,
+		W    : X1 - X0,
+		Y    : Y0,
+		H    : Y1 - Y0,
+		Page : PRSA.Paragraph.Get_AbsolutePage(_CurPage)
 	};
+
+	this.BoundsPath[_CurPage] = null;
+	this.BoundsPath.length    = _CurPage;
 };
 CInlineLevelSdt.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
@@ -316,6 +322,103 @@ CInlineLevelSdt.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth
 
 	return bResult;
 };
+CInlineLevelSdt.prototype.GetBoundingPolygon = function()
+{
+	var arrRects = [];
+	for (var Key in this.Bounds)
+	{
+		arrRects.push(this.Bounds[Key]);
+	}
+
+	var oPolygon = new CPolygon();
+	oPolygon.fill([arrRects]);
+
+	return oPolygon.GetPaths(0);
+};
+CInlineLevelSdt.prototype.DrawBoundingPolygon = function(pGraphics, arrPaths)
+{
+	pGraphics.p_color(255, 0, 0, 255);
+	for (var nIndex = 0, nCount = arrPaths.length; nIndex < nCount; ++nIndex)
+	{
+		pGraphics.DrawPolygon(arrPaths[nIndex], 1, 0);
+	}
+};
+CInlineLevelSdt.prototype.Draw_Lines = function(PDSL)
+{
+	CParagraphContentWithParagraphLikeContent.prototype.Draw_Lines.apply(this, arguments);
+
+	this.DrawBoundingPolygon(PDSL.Graphics, this.GetBoundingPolygon());
+};
+//----------------------------------------------------------------------------------------------------------------------
+// Выставление настроек
+//----------------------------------------------------------------------------------------------------------------------
+CInlineLevelSdt.prototype.SetPr = function(oPr)
+{
+	this.SetAlias(oPr.Alias);
+	this.SetTag(oPr.Tag);
+	this.SetLabel(oPr.Label);
+	this.SetContentControlLock(oPr.Lock);
+};
+CInlineLevelSdt.prototype.SetAlias = function(sAlias)
+{
+	if (sAlias !== this.Pr.Alias)
+	{
+		History.Add(new CChangesSdtPrAlias(this, this.Pr.Alias, sAlias));
+		this.Pr.Alias = sAlias;
+	}
+};
+CInlineLevelSdt.prototype.GetAlias = function()
+{
+	return (undefined !== this.Pr.Alias ? this.Pr.Alias : "");
+};
+CInlineLevelSdt.prototype.SetContentControlId = function(Id)
+{
+	if (this.Pr.Id !== Id)
+	{
+		History.Add(new CChangesSdtPrId(this, this.Pr.Id, Id));
+		this.Pr.Id = Id;
+	}
+};
+CInlineLevelSdt.prototype.GetContentControlId = function()
+{
+	return this.Pr.Id;
+};
+CInlineLevelSdt.prototype.SetTag = function(sTag)
+{
+	if (this.Pr.Tag !== sTag)
+	{
+		History.Add(new CChangesSdtPrTag(this, this.Pr.Tag, sTag));
+		this.Pr.Tag = sTag;
+	}
+};
+CInlineLevelSdt.prototype.GetTag = function()
+{
+	return (undefined !== this.Pr.Tag ? this.Pr.Tag : "");
+};
+CInlineLevelSdt.prototype.SetLabel = function(sLabel)
+{
+	if (this.Pr.Label !== sLabel)
+	{
+		History.Add(new CChangesSdtPrLabel(this, this.Pr.Label, sLabel));
+		this.Pr.Label = sLabel;
+	}
+};
+CInlineLevelSdt.prototype.GetLabel = function()
+{
+	return (undefined !== this.Pr.Label ? this.Pr.Label : "");
+};
+CInlineLevelSdt.prototype.SetContentControlLock = function(nLockType)
+{
+	if (this.Pr.Lock !== nLockType)
+	{
+		History.Add(new CChangesSdtPrLock(this, this.Pr.Lock, nLockType));
+		this.Pr.Lock = nLockType;
+	}
+};
+CInlineLevelSdt.prototype.GetContentControlLock = function()
+{
+	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
@@ -351,6 +454,21 @@ CInlineLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 			this.Content.push(Element);
 	}
 };
+CInlineLevelSdt.prototype.Write_ToBinary = function(Writer)
+{
+	// Long   : Type
+	// String : Id
+
+	Writer.WriteLong(this.Type);
+	Writer.WriteString2(this.Id);
+};
+//----------------------------------------------------------------------------------------------------------------------
+//
+//----------------------------------------------------------------------------------------------------------------------
+CInlineLevelSdt.prototype.UpdatePath = function(CurPage, oPath)
+{
+	this.BoundsPath[CurPage] = oPath;
+};
 
 function TEST_ADD_SDT()
 {
@@ -358,10 +476,16 @@ function TEST_ADD_SDT()
 
 	oLogicDocument.Create_NewHistoryPoint();
 
-	//var oPara = oLogicDocument.GetCurrentParagraph();
+	var oRun = new ParaRun();
+	oRun.Add(new ParaText("S"));
+	oRun.Add(new ParaText("d"));
+	oRun.Add(new ParaText("t"));
+
 	var oInlineContentControl = new CInlineLevelSdt();
-	oInlineContentControl.Add(new ParaRun());
-	oLogicDocument.AddToParagraph(oInlineContentControl);
+	oInlineContentControl.Add_ToContent(0, oRun);
+
+	var oPara = oLogicDocument.GetCurrentParagraph();
+	oPara.Add_ToContent(0, oInlineContentControl);
 
 
 	oLogicDocument.Recalculate();
