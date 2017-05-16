@@ -2368,22 +2368,29 @@ PasteProcessor.prototype =
 				var numbering =  paragraph.Numbering_Get();
 				if(numbering)
 				{
-					if(!paragraph.Numbering.Internal.NumInfo)
+					//проставляем параграфам NumInfo
+					var parentContent = paragraph.Parent instanceof CDocument ? this.aContent : paragraph.Parent.Content;
+					for(var i = 0; i < parentContent.length; i++)
 					{
-						//проставляем параграфам NumInfo
-						var parentContent = paragraph.Parent instanceof CDocument ? this.aContent : paragraph.Parent.Content;
-						for(var i = 0; i < parentContent.length; i++)
+						var tempParagraph = parentContent[i];
+						var numbering2 =  tempParagraph.Numbering_Get();
+
+						if(numbering2)
 						{
-							var tempParagraph = parentContent[i];
-							var NumberingEngine = new CDocumentNumberingInfoEngine(tempParagraph.Id, numbering, this.oLogicDocument.Get_Numbering());
+							var NumberingEngine = new CDocumentNumberingInfoEngine(tempParagraph.Id, numbering2, this.oLogicDocument.Get_Numbering());
+							var numInfo2 = tempParagraph.Numbering.Internal.NumInfo;
 
-							for (var nIndex = 0, nCount = parentContent.length; nIndex < nCount; ++nIndex)
+							if(!numInfo2 || (numInfo2 && !numInfo2[numbering.Lvl]))
 							{
-								parentContent[nIndex].GetNumberingInfo(NumberingEngine);
-							}
+								for (var nIndex = 0, nCount = parentContent.length; nIndex < nCount; ++nIndex)
+								{
+									parentContent[nIndex].GetNumberingInfo(NumberingEngine);
+								}
 
-							tempParagraph.Numbering.Internal.NumInfo = NumberingEngine.NumInfo;
+								tempParagraph.Numbering.Internal.NumInfo = NumberingEngine.NumInfo;
+							}
 						}
+
 					}
 
 					this._checkNumberingText(paragraph, paragraph.Numbering.Internal.NumInfo, numbering);
