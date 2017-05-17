@@ -81,7 +81,7 @@ CContentControlTrack.prototype.getXY = function()
 {
 	if (this.rects)
 		return { X : this.rects[0].X, Y : this.rects[0].Y };
-	if (this.path)
+	if (this.paths)
 		return { X : this.paths[0].Points[0].X, Y : this.paths[0].Points[0].Y };
 	return null;
 };
@@ -3948,7 +3948,7 @@ function CDrawingDocument()
 						if (_path.Page < this.m_lDrawingFirst || _path.Page > this.m_lDrawingEnd)
 							continue;
 
-						var _page = this.m_arrPages[_rect.Page];
+						var _page = this.m_arrPages[_path.Page];
 						var drPage = _page.drawingPage;
 
 						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
@@ -3956,13 +3956,15 @@ function CDrawingDocument()
 
 						ctx.beginPath();
 
-						var Points = _object.path.Points;
+						var Points = _path.Points;
 
 						var nCount = Points.length;
 						for (var nIndex = 0; nIndex < nCount; nIndex++)
 						{
 							_x = (drPage.left + dKoefX * (Points[nIndex].X + offset_x));
 							_y = (drPage.top + dKoefY * (Points[nIndex].Y + offset_y));
+
+							overlay.CheckPoint(_x, _y);
 
 							_x = (_x >> 0) + 0.5;
 							_y = (_y >> 0) + 0.5;
@@ -4056,7 +4058,7 @@ function CDrawingDocument()
 						if (_path.Page < this.m_lDrawingFirst || _path.Page > this.m_lDrawingEnd)
 							continue;
 
-						var _page = this.m_arrPages[_rect.Page];
+						var _page = this.m_arrPages[_path.Page];
 						var drPage = _page.drawingPage;
 
 						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
@@ -4064,7 +4066,7 @@ function CDrawingDocument()
 
 						ctx.beginPath();
 
-						var Points = _object.path.Points;
+						var Points = _path.Points;
 
 						var nCount = Points.length;
 						for (var nIndex = 0; nIndex < nCount; nIndex++)
@@ -4074,6 +4076,8 @@ function CDrawingDocument()
 
 							_x = (drPage.left + dKoefX * _x);
 							_y = (drPage.top + dKoefY * _y);
+
+							overlay.CheckPoint(_x, _y);
 
 							if (0 == nIndex)
 								ctx.moveTo(_x, _y);
