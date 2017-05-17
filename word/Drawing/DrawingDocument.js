@@ -54,13 +54,41 @@ var c_oContentControlTrack = {
 	In 		: 1
 };
 
-function CContentControlTrack(_id, _type, _rects, _transform)
+function CContentControlTrack(_id, _type, _data, _transform)
 {
 	this.id = (undefined == _id) ? -1 : _id;
 	this.type = (undefined == _type) ? -1 : _type;
-	this.rects = (undefined == _rects) ? null : _rects;
+
+	this.rects = undefined;
+	this.paths = undefined;
+
+	if (undefined === _data[0].Points)
+		this.rects = _data;
+	else
+		this.paths = _data;
+
 	this.transform = (undefined == _transform) ? null : _transform;
 }
+CContentControlTrack.prototype.getPage = function()
+{
+	if (this.rects)
+		return this.rects[0].Page;
+	if (this.path)
+		return this.paths[0].Page;
+	return 0;
+};
+CContentControlTrack.prototype.getXY = function()
+{
+	if (this.rects)
+		return { X : this.rects[0].X, Y : this.rects[0].Y };
+	if (this.path)
+		return { X : this.paths[0].Points[0].X, Y : this.paths[0].Points[0].Y };
+	return null;
+};
+CContentControlTrack.prototype.Copy = function()
+{
+	return new CContentControlTrack(this.id, this.type, this.rects ? this.rects : this.paths, this.transform);
+};
 
 function CColumnsMarkupColumn()
 {
@@ -3770,8 +3798,7 @@ function CDrawingDocument()
 		this.ContentControlObjectsLast = [];
 		for (var i = 0; i < this.ContentControlObjects.length; i++)
 		{
-			var _obj = this.ContentControlObjects[i];
-			this.ContentControlObjectsLast.push(new CContentControlTrack(_obj.id, _obj.type, _obj.rects));
+			this.ContentControlObjectsLast.push(this.ContentControlObjects[i].Copy());
 		}
 	};
 
@@ -3794,22 +3821,56 @@ function CDrawingDocument()
 			if (_obj1.type != _obj2.type)
 				return true;
 
-			count1 = _obj1.rects.length;
-			count2 = _obj2.rects.length;
-
-			if (count1 != count2)
-				return true;
-
-			for (var j = 0; j < count1; j++)
+			if (_obj1.rects && _obj2.rects)
 			{
-				if (Math.abs(_obj1.rects[j].X - _obj2.rects[j].X) > 0.00001 ||
-					Math.abs(_obj1.rects[j].Y - _obj2.rects[j].Y) > 0.00001 ||
-					Math.abs(_obj1.rects[j].R - _obj2.rects[j].R) > 0.00001 ||
-					Math.abs(_obj1.rects[j].B - _obj2.rects[j].B) > 0.00001 ||
-					_obj1.rects[j].Page != _obj2.rects[j].Page)
-				{
+				count1 = _obj1.rects.length;
+				count2 = _obj2.rects.length;
+
+				if (count1 != count2)
 					return true;
+
+				for (var j = 0; j < count1; j++)
+				{
+					if (Math.abs(_obj1.rects[j].X - _obj2.rects[j].X) > 0.00001 ||
+						Math.abs(_obj1.rects[j].Y - _obj2.rects[j].Y) > 0.00001 ||
+						Math.abs(_obj1.rects[j].R - _obj2.rects[j].R) > 0.00001 ||
+						Math.abs(_obj1.rects[j].B - _obj2.rects[j].B) > 0.00001 ||
+						_obj1.rects[j].Page != _obj2.rects[j].Page)
+					{
+						return true;
+					}
 				}
+			}
+			else if (_obj1.path && _obj2.path)
+			{
+				count1 = _obj1.paths.length;
+				count2 = _obj2.paths.length;
+
+				if (count1 != count2)
+					return true;
+
+				var _points1, _points2;
+				for (var j = 0; j < count1; j++)
+				{
+					if (_obj1.paths[j].Page != _obj2.paths[j].Page)
+						return true;
+
+					_points1 = _obj1.paths[j].Points;
+					_points2 = _obj2.paths[j].Points;
+
+					if (_points1.length != _points2.length)
+						return true;
+
+					for (var k = 0; k < _points1.length; k++)
+					{
+						if (Math.abs(_points1[k].X - _points[k].X) > 0.00001 || Math.abs(_points1[k].Y - _points[k].Y) > 0.00001)
+							return true;
+					}
+				}
+			}
+			else
+			{
+				return true;
 			}
 		}
 
@@ -3822,14 +3883,16 @@ function CDrawingDocument()
 		ctx.strokeStyle = "#ADADAD";
 		ctx.lineWidth = 1;
 
-		var _object, _rect;
+		var _object, _rect, _path;
 		var _x, _y, _r, _b;
 		var _transform, offset_x, offset_y;
+		var _curPage;
 
 		for (var i = 0; i < this.ContentControlObjects.length; i++)
 		{
 			_object = this.ContentControlObjects[i];
 			_transform = _object.transform;
+			_curPage = _object.getPage();
 
 			offset_x = 0;
 			offset_y = 0;
@@ -3842,56 +3905,210 @@ function CDrawingDocument()
 
 			if (!_transform)
 			{
-				for (var j = 0; j < _object.rects.length; j++)
+				if (_object.rects)
 				{
-					_rect = _object.rects[j];
-
-					if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
-						continue;
-
-					var _page = this.m_arrPages[_rect.Page];
-					var drPage = _page.drawingPage;
-
-					var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
-					var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
-
-					ctx.beginPath();
-
-					_x = (drPage.left 	+ dKoefX * (_rect.X + offset_x));
-					_y = (drPage.top 	+ dKoefY * (_rect.Y + offset_y));
-					_r = (drPage.left 	+ dKoefX * (_rect.R + offset_x));
-					_b = (drPage.top 	+ dKoefY * (_rect.B + offset_y));
-
-					if (_x < overlay.min_x)
-						overlay.min_x = _x;
-					if (_r > overlay.max_x)
-						overlay.max_x = _r;
-
-					if (_y < overlay.min_y)
-						overlay.min_y = _y;
-					if (_b > overlay.max_y)
-						overlay.max_y = _b;
-
-					overlay.CheckRect(_x, _y, _r - _x, _b - _y);
-					ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _y) >> 0);
-
-					if (_object.type == c_oContentControlTrack.Hover)
+					for (var j = 0; j < _object.rects.length; j++)
 					{
-						ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
-						ctx.fill();
+						_rect = _object.rects[j];
+
+						if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
+							continue;
+
+						var _page = this.m_arrPages[_rect.Page];
+						var drPage = _page.drawingPage;
+
+						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+						var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+						ctx.beginPath();
+
+						_x = (drPage.left + dKoefX * (_rect.X + offset_x));
+						_y = (drPage.top + dKoefY * (_rect.Y + offset_y));
+						_r = (drPage.left + dKoefX * (_rect.R + offset_x));
+						_b = (drPage.top + dKoefY * (_rect.B + offset_y));
+
+						overlay.CheckRect(_x, _y, _r - _x, _b - _y);
+						ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _y) >> 0);
+
+						if (_object.type == c_oContentControlTrack.Hover)
+						{
+							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							ctx.fill();
+						}
+						ctx.stroke();
+
+						ctx.beginPath();
 					}
-					ctx.stroke();
-
-					ctx.beginPath();
 				}
-
-				if (_object.type == c_oContentControlTrack.In)
+				else if (_object.paths)
 				{
-					_rect = _object.rects[0];
+					for (var j = 0; j < _object.paths.length; j++)
+					{
+						_path = _object.paths[j];
+						if (_path.Page < this.m_lDrawingFirst || _path.Page > this.m_lDrawingEnd)
+							continue;
 
-					var _page = this.m_arrPages[_rect.Page];
-					var drPage = _page.drawingPage;
+						var _page = this.m_arrPages[_rect.Page];
+						var drPage = _page.drawingPage;
 
+						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+						var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+						ctx.beginPath();
+
+						var Points = _object.path.Points;
+
+						var nCount = Points.length;
+						for (var nIndex = 0; nIndex < nCount; nIndex++)
+						{
+							_x = (drPage.left + dKoefX * (Points[nIndex].X + offset_x));
+							_y = (drPage.top + dKoefY * (Points[nIndex].Y + offset_y));
+
+							_x = (_x >> 0) + 0.5;
+							_y = (_y >> 0) + 0.5;
+
+							if (0 == nIndex)
+								ctx.moveTo(_x, _y);
+							else
+								ctx.lineTo(_x, _y);
+						}
+
+						ctx.closePath();
+
+						if (_object.type == c_oContentControlTrack.Hover)
+						{
+							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							ctx.fill();
+						}
+
+						ctx.stroke();
+						ctx.beginPath();
+					}
+				}
+			}
+			else
+			{
+				if (_object.rects)
+				{
+					for (var j = 0; j < _object.rects.length; j++)
+					{
+						_rect = _object.rects[j];
+
+						if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
+							continue;
+
+						var x1 = _transform.TransformPointX(_rect.X, _rect.Y);
+						var y1 = _transform.TransformPointY(_rect.X, _rect.Y);
+
+						var x2 = _transform.TransformPointX(_rect.R, _rect.Y);
+						var y2 = _transform.TransformPointY(_rect.R, _rect.Y);
+
+						var x3 = _transform.TransformPointX(_rect.R, _rect.B);
+						var y3 = _transform.TransformPointY(_rect.R, _rect.B);
+
+						var x4 = _transform.TransformPointX(_rect.X, _rect.B);
+						var y4 = _transform.TransformPointY(_rect.X, _rect.B);
+
+						var _page = this.m_arrPages[_rect.Page];
+						var drPage = _page.drawingPage;
+
+						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+						var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+						x1 = drPage.left + dKoefX * x1;
+						x2 = drPage.left + dKoefX * x2;
+						x3 = drPage.left + dKoefX * x3;
+						x4 = drPage.left + dKoefX * x4;
+
+						y1 = drPage.top + dKoefY * y1;
+						y2 = drPage.top + dKoefY * y2;
+						y3 = drPage.top + dKoefY * y3;
+						y4 = drPage.top + dKoefY * y4;
+
+						ctx.beginPath();
+
+						overlay.CheckPoint(x1, y1);
+						overlay.CheckPoint(x2, y2);
+						overlay.CheckPoint(x3, y3);
+						overlay.CheckPoint(x4, y4);
+
+						ctx.moveTo(x1, y1);
+						ctx.lineTo(x2, y2);
+						ctx.lineTo(x3, y3);
+						ctx.lineTo(x4, y4);
+						ctx.closePath();
+
+						if (_object.type == c_oContentControlTrack.Hover)
+						{
+							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							ctx.fill();
+						}
+						ctx.stroke();
+
+						ctx.beginPath();
+					}
+				}
+				else if (_object.paths)
+				{
+					for (var j = 0; j < _object.paths.length; j++)
+					{
+						_path = _object.paths[j];
+						if (_path.Page < this.m_lDrawingFirst || _path.Page > this.m_lDrawingEnd)
+							continue;
+
+						var _page = this.m_arrPages[_rect.Page];
+						var drPage = _page.drawingPage;
+
+						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+						var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+						ctx.beginPath();
+
+						var Points = _object.path.Points;
+
+						var nCount = Points.length;
+						for (var nIndex = 0; nIndex < nCount; nIndex++)
+						{
+							var _x = _transform.TransformPointX(Points[nIndex].X, Points[nIndex].Y);
+							var _y = _transform.TransformPointY(Points[nIndex].X, Points[nIndex].Y);
+
+							_x = (drPage.left + dKoefX * _x);
+							_y = (drPage.top + dKoefY * _y);
+
+							if (0 == nIndex)
+								ctx.moveTo(_x, _y);
+							else
+								ctx.lineTo(_x, _y);
+						}
+
+						ctx.closePath();
+
+						if (_object.type == c_oContentControlTrack.Hover)
+						{
+							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							ctx.fill();
+						}
+
+						ctx.stroke();
+						ctx.beginPath();
+					}
+				}
+			}
+
+			if (_object.type == c_oContentControlTrack.In)
+			{
+				if (_curPage < this.m_lDrawingFirst || _curPage > this.m_lDrawingEnd)
+					continue;
+
+				_rect = _object.getXY();
+				var _page = this.m_arrPages[_curPage];
+				var drPage = _page.drawingPage;
+
+				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+				var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+				if (!_transform)
+				{
 					_x = (drPage.left 	+ dKoefX * (_rect.X + offset_x));
 					_y = (drPage.top 	+ dKoefY * (_rect.Y + offset_y));
 
@@ -3964,77 +4181,8 @@ function CDrawingDocument()
 					ctx.stroke();
 					ctx.beginPath();
 				}
-			}
-			else
-			{
-				for (var j = 0; j < _object.rects.length; j++)
+				else
 				{
-					_rect = _object.rects[j];
-
-					if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
-						continue;
-
-					var x1 = _transform.TransformPointX(_rect.X, _rect.Y);
-					var y1 = _transform.TransformPointY(_rect.X, _rect.Y);
-
-					var x2 = _transform.TransformPointX(_rect.R, _rect.Y);
-					var y2 = _transform.TransformPointY(_rect.R, _rect.Y);
-
-					var x3 = _transform.TransformPointX(_rect.R, _rect.B);
-					var y3 = _transform.TransformPointY(_rect.R, _rect.B);
-
-					var x4 = _transform.TransformPointX(_rect.X, _rect.B);
-					var y4 = _transform.TransformPointY(_rect.X, _rect.B);
-
-					var _page = this.m_arrPages[_rect.Page];
-					var drPage = _page.drawingPage;
-
-					var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
-					var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
-
-					x1 = drPage.left + dKoefX * x1;
-					x2 = drPage.left + dKoefX * x2;
-					x3 = drPage.left + dKoefX * x3;
-					x4 = drPage.left + dKoefX * x4;
-
-					y1 = drPage.top + dKoefY * y1;
-					y2 = drPage.top + dKoefY * y2;
-					y3 = drPage.top + dKoefY * y3;
-					y4 = drPage.top + dKoefY * y4;
-
-					ctx.beginPath();
-
-					overlay.CheckPoint(x1, y1);
-					overlay.CheckPoint(x2, y2);
-					overlay.CheckPoint(x3, y3);
-					overlay.CheckPoint(x4, y4);
-
-					ctx.moveTo(x1, y1);
-					ctx.lineTo(x2, y2);
-					ctx.lineTo(x3, y3);
-					ctx.lineTo(x4, y4);
-					ctx.closePath();
-
-					if (_object.type == c_oContentControlTrack.Hover)
-					{
-						ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
-						ctx.fill();
-					}
-					ctx.stroke();
-
-					ctx.beginPath();
-				}
-
-				if (_object.type == c_oContentControlTrack.In)
-				{
-					_rect = _object.rects[0];
-
-					var _page = this.m_arrPages[_rect.Page];
-					var drPage = _page.drawingPage;
-
-					var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
-					var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
-
 					var _x = _rect.X - (15 / dKoefX);
 					var _y = _rect.Y;
 					var _r = _rect.X;
@@ -4148,7 +4296,7 @@ function CDrawingDocument()
 			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
 				return;
 
-			this.ContentControlObjects.unshift(new CContentControlTrack(id, type, rects, transform));
+			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform));
 		}
 	};
 
@@ -6489,9 +6637,9 @@ function CDrawingDocument()
 			var _object = this.ContentControlObjects[i];
 			if (_object.type == c_oContentControlTrack.In)
 			{
-				var _rect = _object.rects[0];
+				var _rect = _object.getXY();
 
-				var _page = this.m_arrPages[_rect.Page];
+				var _page = this.m_arrPages[_object.getPage()];
 				var drPage = _page.drawingPage;
 
 				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
@@ -6650,7 +6798,7 @@ function CDrawingDocument()
 			}
 		}
 
-		if (_content_control && pos.Page == _content_control.rects[0].Page)
+		if (_content_control && pos.Page == _content_control.getPage())
 		{
 			if (1 == this.ContentControlObjectState)
 			{
@@ -6669,7 +6817,7 @@ function CDrawingDocument()
 			var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
 			var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
 
-			var rect = _content_control.rects[0];
+			var rect = _content_control.getXY();
 			var _x = rect.X - (15 / dKoefX);
 			var _y = rect.Y;
 			var _r = rect.X;
