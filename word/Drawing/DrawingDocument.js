@@ -68,6 +68,9 @@ function CContentControlTrack(_id, _type, _data, _transform)
 		this.paths = _data;
 
 	this.transform = (undefined == _transform) ? null : _transform;
+
+	this.X = undefined;
+	this.Y = undefined;
 }
 CContentControlTrack.prototype.getPage = function()
 {
@@ -79,11 +82,30 @@ CContentControlTrack.prototype.getPage = function()
 };
 CContentControlTrack.prototype.getXY = function()
 {
-	if (this.rects)
-		return { X : this.rects[0].X, Y : this.rects[0].Y };
-	if (this.paths)
-		return { X : this.paths[0].Points[0].X, Y : this.paths[0].Points[0].Y };
-	return null;
+	if (undefined === this.X && undefined === this.Y)
+	{
+		if (this.rects)
+		{
+			this.X = this.rects[0].X;
+			this.Y = this.rects[0].Y;
+		}
+		else if (this.paths)
+		{
+			var _points = this.paths[0].Points;
+			this.X = _points[0].X;
+			this.Y = _points[0].Y;
+
+			for (var i = 1; i < _points.length; i++)
+			{
+				if (this.X > _points[i].X)
+					this.X = _points[i].X;
+				if (this.Y > _points[i].Y)
+					this.Y = _points[i].Y;
+			}
+		}
+	}
+
+	return { X : this.X, Y : this.Y };
 };
 CContentControlTrack.prototype.Copy = function()
 {
