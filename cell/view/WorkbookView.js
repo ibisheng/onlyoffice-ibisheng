@@ -1543,7 +1543,7 @@
   };
 
   WorkbookView.prototype.getTablePictures = function(props) {
-      return this.af_getTablePictures(this.model, this.fmgrGraphics, this.m_oFont, props);
+      return this.af_getTablePictures(props);
   };
 
   WorkbookView.prototype.getCellStyles = function(width, height) {
@@ -2682,55 +2682,60 @@
     this.model.paddingPlusBorder = this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
   };
 
-  WorkbookView.prototype.af_getTablePictures = function (wb, fmgrGraphics, oFont, props) {
-    var styleThumbnailWidth = 61;
-    var styleThumbnailHeight = 46;
-    if (AscBrowser.isRetina) {
-      styleThumbnailWidth = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailWidth, true);
-      styleThumbnailHeight = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailHeight, true);
-    }
+	WorkbookView.prototype.af_getTablePictures = function (props, bPivotTable) {
+		var wb = this.model;
+		var t = this;
 
-    var canvas = document.createElement('canvas');
-    canvas.width = styleThumbnailWidth;
-    canvas.height = styleThumbnailHeight;
-    var customStyles = wb.TableStyles.CustomStyles;
-    var result = [];
-    var options;
-    var n = 0;
-    if (customStyles) {
-      for (var i in customStyles) {
-        if (customStyles[i].table) {
-          options = {
-            name: i,
-            displayName: customStyles[i].displayName,
-            type: 'custom',
-            image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont, props)
-          };
-          result[n] = new AscCommonExcel.formatTablePictures(options);
-          n++;
-        }
-      }
-    }
-    var defaultStyles = wb.TableStyles.DefaultStyles;
-    if (defaultStyles) {
-      for (var i in defaultStyles) {
-        if (defaultStyles[i].table) {
-          options = {
-            name: i,
-            displayName: defaultStyles[i].displayName,
-            type: 'default',
-            image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont, props)
-          };
-          result[n] = new AscCommonExcel.formatTablePictures(options);
-          n++;
-        }
-      }
-    }
-    return result;
-  };
+		var result = [];
+		var canvas = document.createElement('canvas');
 
-  WorkbookView.prototype.af_getSmallIconTable = function (canvas, style, fmgrGraphics, oFont, props) {
-	var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+		var styleThumbnailWidth = 61, styleThumbnailHeight = 46, row = 5, col = 5;
+		var customStyles = wb.TableStyles.CustomStyles, defaultStyles = wb.TableStyles.DefaultStyles;
+		if(bPivotTable)
+		{
+			styleThumbnailHeight = 49;
+			row = 8;
+			customStyles = null;
+			defaultStyles =  wb.TableStyles.DefaultStylesPivot;
+		}
+
+		if (AscBrowser.isRetina)
+		{
+			styleThumbnailWidth = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailWidth, true);
+			styleThumbnailHeight = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailHeight, true);
+		}
+		canvas.width = styleThumbnailWidth;
+		canvas.height = styleThumbnailHeight;
+
+		var addStyles = function(styles, type)
+		{
+			if(styles)
+			{
+				for (var i in styles)
+				{
+					var bIsAddNeedStyle = (bPivotTable && styles[i].pivot) || (!bPivotTable && styles[i].table);
+					if (bIsAddNeedStyle)
+					{
+						var image = t.af_getSmallIconTable(canvas, styles[i], props, {w: styleThumbnailWidth, h: styleThumbnailHeight, row: row, col: col});
+						var options = {name: i, displayName: styles[i].displayName, type: type, image: image};
+						result.push(new AscCommonExcel.formatTablePictures(options));
+					}
+				}
+			}
+		};
+
+		addStyles(customStyles, "custom");
+		addStyles(defaultStyles, "default");
+
+		return result;
+	};
+
+  WorkbookView.prototype.af_getSmallIconTable = function (canvas, style, props, size) {
+
+    var fmgrGraphics = this.fmgrGraphics;
+    var oFont = this.m_oFont;
+  	var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+
 
 	//по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
 	var styleInfo;
@@ -2753,16 +2758,21 @@
 			TotalsRowCount: false
 		};
 	}
-	
+
+	var w = size.w;
+	var h = size.h;
+	var row = size.row;
+	var col = size.col;
+
 	var pxToMM = 72 / 96;
 	var startX = 1 * pxToMM;
 	var startY = 1 * pxToMM;
 
-	var ySize = 45 * pxToMM - 2 * startY;
-	var xSize = 61 * pxToMM - 2 * startX;
+	var ySize = (h - 1) * pxToMM - 2 * startY;
+	var xSize = w * pxToMM - 2 * startX;
 	
-	var stepY = (ySize) / 5;
-	var stepX = (xSize) / 5;
+	var stepY = (ySize) / row;
+	var stepX = (xSize) / col;
 	var lineStepX = (xSize - 1 * pxToMM) / 5;
 	
 	var whiteColor = new CColor(255, 255, 255);
@@ -2819,9 +2829,9 @@
 		ctx.closePath();
 	};
 	
-	var bbox = {c1: 0, r1: 0, c2: 4, r2: 4};
-	for (var i = 0; i < 5; i++) {
-		for (var j = 0; j < 5; j++) {
+	var bbox = {c1: 0, r1: 0, c2: col - 1, r2: row - 1};
+	for (var i = 0; i < row; i++) {
+		for (var j = 0; j < col; j++) {
 			var color = null;
 			var curStyle = style.getStyle(bbox, i, j, styleInfo, headerRowCount, totalsRowCount);
 			
