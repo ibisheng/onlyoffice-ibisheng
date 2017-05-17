@@ -4744,13 +4744,18 @@
 		}
 		
 	};
-	Worksheet.prototype._updatePivotTables = function () {
-		var pivotTable, range, styleInfo, style;
+	Worksheet.prototype._initPivotTables = function () {
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			this.pivotTables[i].init();
+		}
+	};
+	Worksheet.prototype._updatePivotTables = function (range) {
+		var pivotTable, pivotRange, styleInfo, style, l, cell, j, pos;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			pivotTable = this.pivotTables[i];
-			range = pivotTable.getRange();
+			pivotRange = pivotTable.getRange();
 			styleInfo = pivotTable.asc_getStyleInfo();
-			if (!range || !styleInfo) {
+			if (!pivotRange || !styleInfo || (range && !range.isIntersect(pivotRange))) {
 				continue;
 			}
 			style = this.workbook.TableStyles.AllStyles[styleInfo.asc_getName()];
@@ -4758,6 +4763,15 @@
 				continue;
 			}
 
+			var dxfLabels = style.pageFieldLabels && style.pageFieldLabels.dxf;
+			var dxfValues = style.pageFieldValues && style.pageFieldValues.dxf;
+			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
+				pos = pivotTable.pageFieldsPositions[j];
+				cell = this.getRange3(pos.row, pos.col, pos.row, pos.col);
+				cell.setTableStyle(dxfLabels);
+				cell = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
+				cell.setTableStyle(dxfValues);
+			}
 		}
 	};
 	Worksheet.prototype.inPivotTable = function (range) {

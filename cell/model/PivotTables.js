@@ -1902,6 +1902,8 @@ function CT_pivotTableDefinition() {
 	this.extLst = null;
 	//editor
 	this.cacheDefinition = null;
+
+	this.pageFieldsPositions = null;
 }
 CT_pivotTableDefinition.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
@@ -2556,6 +2558,43 @@ CT_pivotTableDefinition.prototype.toXml = function(writer) {
 		this.extLst.toXml(writer, "extLst");
 	}
 	writer.WriteXmlNodeEnd("pivotTableDefinition");
+};
+CT_pivotTableDefinition.prototype.init = function () {
+	this.pageFieldsPositions = [];
+
+	var wrap, pageOverThenDown;
+	var l = this.pageFields.pageField.length;
+	var dr;
+	if (0 < l) {
+		if (this.pageWrap) {
+			dr = this.pageOverThenDown ? Math.ceil(l / this.pageWrap) : Math.min(this.pageWrap, l);
+		} else {
+			dr = this.pageOverThenDown ? 1 : l;
+		}
+		var range = this.getRange();
+		var _c = range.c1;
+		var _r = range.r1 - 1 - dr;
+		var c = _c, r = _r;
+
+		for (var i = 0; i < l; ++i) {
+			this.pageFieldsPositions.push(new AscCommon.CellBase(r, c));
+
+			wrap = (this.pageWrap && 0 === (i + 1) % this.pageWrap);
+			pageOverThenDown = this.pageOverThenDown;
+			if (wrap) {
+				_r += pageOverThenDown;
+				_c += !pageOverThenDown;
+				pageOverThenDown = !pageOverThenDown;
+			}
+			if (pageOverThenDown) {
+				r = _r;
+				c += 3;
+			} else {
+				++r;
+				c = _c;
+			}
+		}
+	}
 };
 CT_pivotTableDefinition.prototype.intersection = function (range) {
 	return this.location && this.location.intersection(range);
