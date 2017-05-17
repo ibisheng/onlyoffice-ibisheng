@@ -43,6 +43,8 @@
  */
 function CInlineLevelSdt()
 {
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
+
 	CParagraphContentWithParagraphLikeContent.call(this);
 
 	this.Pr   = new CSdtPr();
