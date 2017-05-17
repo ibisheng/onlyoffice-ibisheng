@@ -343,10 +343,10 @@ CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 };
 CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 {
-	if (!this.Paragraph)
+	if (!this.Paragraph && this.Paragraph.LogicDocument)
 		return;
 
-	var oDrawingDocument = this.Paragraph.Get_DrawingDocument();
+	var oDrawingDocument = this.Paragraph.LogicDocument.Get_DrawingDocument();
 	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Get_ParentTextTransform());
 };
 //----------------------------------------------------------------------------------------------------------------------
