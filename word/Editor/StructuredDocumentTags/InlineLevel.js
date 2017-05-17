@@ -48,7 +48,7 @@ function CInlineLevelSdt()
 	this.Pr   = new CSdtPr();
 	this.Type = para_InlineLevelSdt;
 
-	this.BoundsPath = [];
+	this.BoundsPaths = null;
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);
@@ -198,9 +198,10 @@ CInlineLevelSdt.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _C
 	if (0 === CurLine && 0 === CurRange && true !== PRSA.RecalcFast)
 		this.Bounds = {};
 
-	var X0 = PRSA.X;
-	var Y0 = PRSA.Y0;
-	var Y1 = PRSA.Y1;
+	var oParagraph = PRSA.Paragraph;
+	var Y0         = oParagraph.Lines[_CurLine].Top + oParagraph.Pages[_CurPage].Y;
+	var Y1         = oParagraph.Lines[_CurLine].Bottom + oParagraph.Pages[_CurPage].Y;
+	var X0         = PRSA.X;
 
 	CParagraphContentWithParagraphLikeContent.prototype.Recalculate_Range_Spaces.apply(this, arguments);
 
@@ -214,8 +215,7 @@ CInlineLevelSdt.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _C
 		Page : PRSA.Paragraph.Get_AbsolutePage(_CurPage)
 	};
 
-	this.BoundsPath[_CurPage] = null;
-	this.BoundsPath.length    = _CurPage;
+	this.BoundsPath = null;
 };
 CInlineLevelSdt.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
@@ -324,30 +324,30 @@ CInlineLevelSdt.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth
 };
 CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 {
-	var arrRects = [];
-	for (var Key in this.Bounds)
+	if (null === this.BoundsPaths)
 	{
-		arrRects.push(this.Bounds[Key]);
+		var arrRects = [];
+		for (var Key in this.Bounds)
+		{
+			arrRects.push(this.Bounds[Key]);
+		}
+
+		var oPolygon = new CPolygon();
+		oPolygon.fill([arrRects]);
+
+
+		this.BoundsPaths = oPolygon.GetPaths(0);
 	}
 
-	var oPolygon = new CPolygon();
-	oPolygon.fill([arrRects]);
-
-	return oPolygon.GetPaths(0);
+	return this.BoundsPaths;
 };
-CInlineLevelSdt.prototype.DrawBoundingPolygon = function(pGraphics, arrPaths)
+CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 {
-	pGraphics.p_color(255, 0, 0, 255);
-	for (var nIndex = 0, nCount = arrPaths.length; nIndex < nCount; ++nIndex)
-	{
-		pGraphics.DrawPolygon(arrPaths[nIndex], 1, 0);
-	}
-};
-CInlineLevelSdt.prototype.Draw_Lines = function(PDSL)
-{
-	CParagraphContentWithParagraphLikeContent.prototype.Draw_Lines.apply(this, arguments);
+	if (!this.Paragraph)
+		return;
 
-	this.DrawBoundingPolygon(PDSL.Graphics, this.GetBoundingPolygon());
+	var oDrawingDocument = this.Paragraph.Get_DrawingDocument();
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Get_ParentTextTransform());
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
@@ -424,7 +424,7 @@ CInlineLevelSdt.prototype.GetContentControlLock = function()
 //----------------------------------------------------------------------------------------------------------------------
 CInlineLevelSdt.prototype.Write_ToBinary2 = function(Writer)
 {
-	Writer.WriteLong(AscDFH.historyitem_type_Field);
+	Writer.WriteLong(AscDFH.historyitem_type_InlineLevelSdt);
 
 	// String : Id
 	// Long   : Количество элементов
@@ -469,6 +469,9 @@ CInlineLevelSdt.prototype.UpdatePath = function(CurPage, oPath)
 {
 	this.BoundsPath[CurPage] = oPath;
 };
+//--------------------------------------------------------export--------------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CInlineLevelSdt = CInlineLevelSdt;
 
 function TEST_ADD_SDT()
 {
@@ -485,7 +488,8 @@ function TEST_ADD_SDT()
 	oInlineContentControl.Add_ToContent(0, oRun);
 
 	var oPara = oLogicDocument.GetCurrentParagraph();
-	oPara.Add_ToContent(0, oInlineContentControl);
+	oPara.Add_ToContent(0, new ParaRun());
+	oPara.Add_ToContent(1, oInlineContentControl);
 
 
 	oLogicDocument.Recalculate();

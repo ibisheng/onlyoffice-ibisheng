@@ -1104,6 +1104,7 @@
 	window['AscDFH'].historyitem_type_Presentation     = 58 << 16;
 	window['AscDFH'].historyitem_type_BlockLevelSdt    = 59 << 16;
 	window['AscDFH'].historyitem_type_SdtPr            = 60 << 16;
+	window['AscDFH'].historyitem_type_InlineLevelSdt   = 61 << 16;
 
 	window['AscDFH'].historyitem_type_CommonShape            = 1000 << 16; // Этот класс добавлен для элементов, у которых нет конкретного класса
 

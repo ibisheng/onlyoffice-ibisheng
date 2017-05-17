@@ -8138,8 +8138,12 @@ CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
 	else
 		this.DrawingDocument.Update_MathTrack(false);
 
-	var oBlockLevelSdt = oSelectedInfo.GetBlockLevelSdt();
-	if (oBlockLevelSdt)
+	var oBlockLevelSdt  = oSelectedInfo.GetBlockLevelSdt();
+	var oInlineLevelSdt = oSelectedInfo.GetInlineLevelSdt();
+
+	if (oInlineLevelSdt)
+		oInlineLevelSdt.DrawContentControlsTrack(false);
+	else if (oBlockLevelSdt)
 		oBlockLevelSdt.DrawContentControlsTrack(false);
 	else
 		this.DrawingDocument.OnDrawContentControl(null, c_oContentControlTrack.In);
