@@ -347,7 +347,7 @@ CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 		return;
 
 	var oDrawingDocument = this.Paragraph.LogicDocument.Get_DrawingDocument();
-	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Get_ParentTextTransform());
+	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Paragraph.Get_ParentTextTransform());
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
