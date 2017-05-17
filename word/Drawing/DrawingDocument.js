@@ -92,15 +92,22 @@ CContentControlTrack.prototype.getXY = function()
 		else if (this.paths)
 		{
 			var _points = this.paths[0].Points;
-			this.X = _points[0].X;
 			this.Y = _points[0].Y;
 
 			for (var i = 1; i < _points.length; i++)
 			{
-				if (this.X > _points[i].X)
-					this.X = _points[i].X;
 				if (this.Y > _points[i].Y)
 					this.Y = _points[i].Y;
+			}
+
+			this.X = 1000000000;
+			for (var i = 0; i < _points.length; i++)
+			{
+				if (Math.abs(this.Y - _points[i].Y) < 0.0001)
+				{
+					if (this.X > _points[i].X)
+						this.X = _points[i].X;
+				}
 			}
 		}
 	}
