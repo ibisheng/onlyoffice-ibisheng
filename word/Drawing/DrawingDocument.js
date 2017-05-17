@@ -4157,6 +4157,11 @@ function CDrawingDocument()
 						ctx.fillStyle = "#CFCFCF";
 						ctx.fill();
 					}
+					else
+					{
+						ctx.fillStyle = "#FFFFFF";
+						ctx.fill();
+					}
 
 					ctx.stroke();
 					ctx.beginPath();
@@ -4259,6 +4264,11 @@ function CDrawingDocument()
 					if (1 == this.ContentControlObjectState)
 					{
 						ctx.fillStyle = "#CFCFCF";
+						ctx.fill();
+					}
+					else
+					{
+						ctx.fillStyle = "#FFFFFF";
 						ctx.fill();
 					}
 
