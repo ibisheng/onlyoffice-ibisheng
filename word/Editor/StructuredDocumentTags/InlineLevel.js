@@ -342,9 +342,13 @@ CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 			arrRects.push(this.Bounds[Key]);
 		}
 
-		var oPolygon = new CPolygon();
-		oPolygon.fill(arrBounds);
-		this.BoundsPaths = oPolygon.GetPaths(0);
+		this.BoundsPaths = [];
+		for (var nIndex = 0, nCount = arrBounds.length; nIndex < nCount; ++nIndex)
+		{
+			var oPolygon = new CPolygon();
+			oPolygon.fill([arrBounds[nIndex]]);
+			this.BoundsPaths = this.BoundsPaths.concat(oPolygon.GetPaths(0));
+		}
 	}
 
 	return this.BoundsPaths;
