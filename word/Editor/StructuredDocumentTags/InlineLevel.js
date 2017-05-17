@@ -210,14 +210,15 @@ CInlineLevelSdt.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _C
 	var X1 = PRSA.X;
 
 	this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)] = {
-		X    : X0,
-		W    : X1 - X0,
-		Y    : Y0,
-		H    : Y1 - Y0,
-		Page : PRSA.Paragraph.Get_AbsolutePage(_CurPage)
+		X            : X0,
+		W            : X1 - X0,
+		Y            : Y0,
+		H            : Y1 - Y0,
+		Page         : PRSA.Paragraph.Get_AbsolutePage(_CurPage),
+		PageInternal : _CurPage
 	};
 
-	this.BoundsPath = null;
+	this.BoundsPaths = null;
 };
 CInlineLevelSdt.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
@@ -328,16 +329,21 @@ CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 {
 	if (null === this.BoundsPaths)
 	{
-		var arrRects = [];
+		var arrBounds = [], arrRects = [], CurPage = -1;
 		for (var Key in this.Bounds)
 		{
+			if (CurPage !== this.Bounds[Key].PageInternal)
+			{
+				arrRects = [];
+				arrBounds.push(arrRects);
+				CurPage  = this.Bounds[Key].PageInternal;
+			}
+
 			arrRects.push(this.Bounds[Key]);
 		}
 
 		var oPolygon = new CPolygon();
-		oPolygon.fill([arrRects]);
-
-
+		oPolygon.fill(arrBounds);
 		this.BoundsPaths = oPolygon.GetPaths(0);
 	}
 
@@ -463,13 +469,6 @@ CInlineLevelSdt.prototype.Write_ToBinary = function(Writer)
 
 	Writer.WriteLong(this.Type);
 	Writer.WriteString2(this.Id);
-};
-//----------------------------------------------------------------------------------------------------------------------
-//
-//----------------------------------------------------------------------------------------------------------------------
-CInlineLevelSdt.prototype.UpdatePath = function(CurPage, oPath)
-{
-	this.BoundsPath[CurPage] = oPath;
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
