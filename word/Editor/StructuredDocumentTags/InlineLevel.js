@@ -361,6 +361,10 @@ CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 	var oDrawingDocument = this.Paragraph.LogicDocument.Get_DrawingDocument();
 	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, this.GetBoundingPolygon(), this.Paragraph.Get_ParentTextTransform());
 };
+CInlineLevelSdt.prototype.SelectContentControl = function()
+{
+	this.SelectThisElement(1);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
 //----------------------------------------------------------------------------------------------------------------------
@@ -503,4 +507,25 @@ function TEST_ADD_SDT()
 	oLogicDocument.Document_UpdateRulersState();
 
 	return oInlineContentControl ? oInlineContentControl.GetId() : null;
+}
+
+function TEST_ADD_SDT2()
+{
+	var oLogicDocument = editor.WordControl.m_oLogicDocument;
+
+	oLogicDocument.Create_NewHistoryPoint();
+
+
+	var oSdt = oLogicDocument.AddContentControl();
+	oSdt.AddToParagraph(new ParaText("S"));
+	oSdt.AddToParagraph(new ParaText("d"));
+	oSdt.AddToParagraph(new ParaText("t"));
+
+
+	oLogicDocument.Recalculate();
+	oLogicDocument.Document_UpdateSelectionState();
+	oLogicDocument.Document_UpdateInterfaceState();
+	oLogicDocument.Document_UpdateRulersState();
+
+	return oSdt;
 }

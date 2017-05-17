@@ -851,6 +851,11 @@ CBlockLevelSdt.prototype.GetMargins = function()
 {
 	return this.Parent.GetMargins();
 };
+CBlockLevelSdt.prototype.SelectContentControl = function()
+{
+	this.SelectAll(1);
+	this.Set_CurrentElement(false, 0, this.Content);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.SetPr = function(oPr)
 {

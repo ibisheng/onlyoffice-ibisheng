@@ -15164,8 +15164,7 @@ CDocument.prototype.SelectContentControl = function(Id)
 	if (oBlockLevelSdt)
 	{
 		this.RemoveSelection();
-		oBlockLevelSdt.SelectAll(1);
-		oBlockLevelSdt.Set_CurrentElement(false, 0, oBlockLevelSdt.Content);
+		oBlockLevelSdt.SelectContentControl();
 
 		this.Document_UpdateInterfaceState();
 		this.Document_UpdateRulersState();

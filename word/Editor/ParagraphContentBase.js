@@ -2705,6 +2705,33 @@ CParagraphContentWithParagraphLikeContent.prototype.Is_UseInParagraph = function
 
 	return true;
 };
+CParagraphContentWithParagraphLikeContent.prototype.SelectThisElement = function(nDirection)
+{
+	var ContentPos = this.Paragraph.Get_PosByElement(this);
+	if (!ContentPos)
+		return false;
+
+	var StartPos = ContentPos.Copy();
+	var EndPos   = ContentPos.Copy();
+
+	if (nDirection > 0)
+	{
+		this.Get_StartPos(StartPos, StartPos.Get_Depth() + 1);
+		this.Get_EndPos(true, EndPos, EndPos.Get_Depth() + 1);
+	}
+	else
+	{
+		this.Get_StartPos(EndPos, EndPos.Get_Depth() + 1);
+		this.Get_EndPos(true, StartPos, StartPos.Get_Depth() + 1);
+	}
+
+	this.Paragraph.Selection.Use   = true;
+	this.Paragraph.Selection.Start = false;
+	this.Paragraph.Set_SelectionContentPos(StartPos, EndPos, false);
+	this.Paragraph.Document_SetThisElementCurrent(false);
+
+	return true;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------
