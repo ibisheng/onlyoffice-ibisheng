@@ -2666,6 +2666,17 @@ var editor;
 	};
 
     spreadsheet_api.prototype.asc_setListType = function (type, subtype) {
+      var t = this;
+      if(type === 0){
+          var t = this, fonts = {};
+          fonts["Wingdings"] = 1;
+          t._loadFonts(fonts, function() {t.asc_setListType2(type, subtype);});
+      }
+      else{
+          t.asc_setListType2(type, subtype);
+      }
+    };
+    spreadsheet_api.prototype.asc_setListType2 = function (type, subtype) {
         var oWorksheet = this.wb.getWorksheet();
         if(oWorksheet){
             if(oWorksheet.isSelectOnShape){
