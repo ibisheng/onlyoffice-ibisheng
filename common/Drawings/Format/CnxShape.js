@@ -198,7 +198,7 @@
                                         sPreset = "4";
                                         flipV = true;
                                         oMapAdj["adj1"] =  (100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
-                                        oMapAdj["adj2"] =  (100000*(_begin.y - (_end.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                        oMapAdj["adj2"] =  (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
                                     }
                                 }
                                 else{
