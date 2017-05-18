@@ -1672,6 +1672,10 @@ function BinaryPPTYLoader()
             }
         }
 
+        if(!uni_color.color){
+            return null;
+        }
+
         s.Seek2(read_end);
         return uni_color;
     }
