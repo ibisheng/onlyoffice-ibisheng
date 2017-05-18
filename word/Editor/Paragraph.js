@@ -9233,6 +9233,14 @@ Paragraph.prototype.Document_Get_AllFontNames = function(AllFonts)
 {
 	// Смотрим на знак конца параграфа
 	this.TextPr.Value.Document_Get_AllFontNames(AllFonts);
+	if(this.Pr.Bullet)
+	{
+		this.Pr.Bullet.Get_AllFontNames(AllFonts);
+	}
+	if(this.Pr.DefaultRunPr)
+	{
+        this.Pr.DefaultRunPr.Document_Get_AllFontNames(AllFonts);
+	}
 
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)

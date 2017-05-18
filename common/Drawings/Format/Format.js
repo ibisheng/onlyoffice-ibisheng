@@ -8467,6 +8467,12 @@ CBullet.prototype =
             this.bulletType = new CBulletType();
             this.bulletType.Read_FromBinary(r);
         }
+    },
+
+    Get_AllFontNames: function(AllFonts){
+        if(this.bulletTypeface && typeof this.bulletTypeface.typeface === "string" && this.bulletTypeface.typeface.length > 0){
+            AllFonts[this.bulletTypeface.typeface] = true;
+        }
     }
 
 };
