@@ -618,7 +618,11 @@ ParaField.prototype.Read_FromBinary2 = function(Reader)
     if (editor)
         editor.WordControl.m_oLogicDocument.Register_Field(this);
 };
-
+//----------------------------------------------------------------------------------------------------------------------
+ParaField.prototype.IsStopCursorOnEntryExit = function()
+{
+	return true;
+};
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].ParaField = ParaField;

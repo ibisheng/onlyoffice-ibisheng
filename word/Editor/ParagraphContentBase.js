@@ -42,6 +42,10 @@ CParagraphContentBase.prototype.IsParagraphContentElement = function()
 {
 	return true;
 };
+CParagraphContentBase.prototype.IsStopCursorOnEntryExit = function()
+{
+	return false;
+};
 
 /**
  * Это базовый класс для элементов содержимого(контент) параграфа, у которых есть свое содержимое.

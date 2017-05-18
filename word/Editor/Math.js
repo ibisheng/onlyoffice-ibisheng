@@ -3357,6 +3357,10 @@ ParaMath.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
     return this.Root.SetContentPosition(DocPos, Depth, Flag);
 };
+ParaMath.prototype.IsStopCursorOnEntryExit = function()
+{
+	return true;
+};
 
 function MatGetKoeffArgSize(FontSize, ArgSize)
 {
