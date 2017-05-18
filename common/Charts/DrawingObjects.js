@@ -2585,6 +2585,19 @@ function DrawingObjects() {
         _this.controller.setMathProps(MathProps);
     }
 
+    _this.setListType = function(type, subtype)
+    {
+        var NumberInfo =
+            {
+                Type    : 0,
+                SubType : -1
+            };
+
+        NumberInfo.Type    = type;
+        NumberInfo.SubType = subtype;
+        _this.controller.checkSelectedObjectsAndCallback(_this.controller.setParagraphNumbering, [AscFormat.fGetPresentationBulletByNumInfo(NumberInfo)], false, AscDFH.historydescription_Presentation_SetParagraphNumbering);
+    };
+
     _this.editImageDrawingObject = function(imageUrl) {
 
         if ( imageUrl ) {

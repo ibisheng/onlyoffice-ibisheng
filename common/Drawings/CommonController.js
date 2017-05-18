@@ -10748,6 +10748,223 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 
         return oShape;
     }
+
+
+    function fGetListTypeFromBullet(Bullet) {
+
+        var ListType = {
+            Type    : -1,
+            SubType : -1
+        };
+        if (Bullet)
+        {
+            if (Bullet && Bullet.bulletType)
+            {
+                switch (Bullet.bulletType.type)
+                {
+                    case AscFormat.BULLET_TYPE_BULLET_CHAR:
+                    {
+                        ListType.Type    = 0;
+                        ListType.SubType = undefined;
+                        switch (Bullet.bulletType.Char)
+                        {
+                            case "•":
+                            {
+                                ListType.SubType = 1;
+                                break;
+                            }
+                            case  "o":
+                            {
+                                ListType.SubType = 2;
+                                break;
+                            }
+                            case  "§":
+                            {
+                                ListType.SubType = 3;
+                                break;
+                            }
+                            case  String.fromCharCode(0x0076):
+                            {
+                                ListType.SubType = 4;
+                                break;
+                            }
+                            case  String.fromCharCode(0x00D8):
+                            {
+                                ListType.SubType = 5;
+                                break;
+                            }
+                            case  String.fromCharCode(0x00FC):
+                            {
+                                ListType.SubType = 6;
+                                break;
+                            }
+                            case String.fromCharCode(119):
+                            {
+                                ListType.SubType = 7;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    case AscFormat.BULLET_TYPE_BULLET_BLIP:
+                    {
+                        ListType.Type    = 0;
+                        ListType.SubType = undefined;
+                        break;
+                    }
+                    case AscFormat.BULLET_TYPE_BULLET_AUTONUM:
+                    {
+                        ListType.Type    = 1;
+                        ListType.SubType = undefined;
+                        if (AscFormat.isRealNumber(Bullet.bulletType.AutoNumType))
+                        {
+                            var AutoNumType = AscCommonWord.g_NumberingArr[Bullet.bulletType.AutoNumType] - 99;
+                            if (AutoNumType > 0 && AutoNumType < 9)
+                            {
+                                ListType.SubType = AutoNumType;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        return ListType;
+    }
+
+    function fGetPresentationBulletByNumInfo(NumInfo){
+        var bullet = new AscFormat.CBullet();
+        if(NumInfo.SubType < 0)
+        {
+            bullet.bulletType = new AscFormat.CBulletType();
+            bullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
+        }
+        else
+        {
+            switch (NumInfo.Type)
+            {
+                case 0 : /*bulletChar*/
+                {
+                    switch(NumInfo.SubType)
+                    {
+                        case 0:
+                        case 1:
+                        {
+                            var bulletText = "•";
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Arial";
+                            break;
+                        }
+                        case 2:
+                        {
+                            bulletText = "o";
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Courier New";
+                            break;
+                        }
+                        case 3:
+                        {
+                            bulletText = "§";
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                        case 4:
+                        {
+                            bulletText = String.fromCharCode( 0x0076 );
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                        case 5:
+                        {
+                            bulletText = String.fromCharCode( 0x00D8 );
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                        case 6:
+                        {
+                            bulletText = String.fromCharCode( 0x00FC );
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                        case 7:
+                        {
+
+                            bulletText = String.fromCharCode(119);
+                            bullet.bulletTypeface = new AscFormat.CBulletTypeface();
+                            bullet.bulletTypeface.type = AscFormat.BULLET_TYPE_TYPEFACE_BUFONT;
+                            bullet.bulletTypeface.typeface = "Wingdings";
+                            break;
+                        }
+                    }
+                    bullet.bulletType = new AscFormat.CBulletType();
+                    bullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_CHAR;
+                    bullet.bulletType.Char = bulletText;
+                    break;
+                }
+                case 1 : /*autonum*/
+                {
+                    switch(NumInfo.SubType)
+                    {
+                        case 0 :
+                        case 1 :
+                        {
+                            var numberingType = 12;//numbering_numfmt_arabicPeriod;
+                            break;
+                        }
+                        case 2:
+                        {
+                            numberingType = 11;//numbering_numfmt_arabicParenR;
+                            break;
+                        }
+                        case 3 :
+                        {
+                            numberingType = 34;//numbering_numfmt_romanUcPeriod;
+                            break;
+                        }
+                        case 4 :
+                        {
+                            numberingType = 5;//numbering_numfmt_alphaUcPeriod;
+                            break;
+                        }
+                        case 5 :
+                        {
+                            numberingType = 8;
+                            break;
+                        }
+                        case 6 :
+                        {
+                            numberingType = 40;
+                            break;
+                        }
+                        case 7 :
+                        {
+                            numberingType = 31;//numbering_numfmt_romanLcPeriod;
+                            break;
+                        }
+                    }
+                    bullet.bulletType = new AscFormat.CBulletType();
+                    bullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_AUTONUM;
+                    bullet.bulletType.AutoNumType = numberingType;
+                    break;
+                }
+                default :
+                {
+                    break;
+                }
+            }
+        }
+        return bullet;
+    }
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].HANDLE_EVENT_MODE_HANDLE = HANDLE_EVENT_MODE_HANDLE;
@@ -10819,4 +11036,6 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].isConnectorPreset = isConnectorPreset;
 	window['AscFormat'].fCreateSignatureShape = fCreateSignatureShape;
 	window['AscFormat'].CreateBlipFillUniFillFromUrl = CreateBlipFillUniFillFromUrl;
+	window['AscFormat'].fGetListTypeFromBullet = fGetListTypeFromBullet;
+	window['AscFormat'].fGetPresentationBulletByNumInfo = fGetPresentationBulletByNumInfo;
 })(window);
