@@ -2118,6 +2118,11 @@ ParaDrawing.prototype.addInlineImage = function(W, H, Img, chart, bFlow)
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.addInlineImage === "function")
 		this.GraphicObj.addInlineImage(W, H, Img, chart, bFlow);
 };
+ParaDrawing.prototype.addSignatureLine = function(oSignatureDrawing)
+{
+	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.addSignatureLine === "function")
+		this.GraphicObj.addSignatureLine(oSignatureDrawing);
+};
 ParaDrawing.prototype.canAddComment = function()
 {
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.canAddComment === "function")

@@ -1254,6 +1254,15 @@
 	baseEditorsApi.prototype.Input_UpdatePos = function()
 	{
 	};
+
+	baseEditorsApi.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail) {
+
+    };
+
+	baseEditorsApi.prototype.asc_getSignatureImage = function (sGuid) {
+		return "";
+    };
+
 	baseEditorsApi.prototype.asc_InputClearKeyboardElement = function()
 	{
 		if (AscCommon.g_inputContext)

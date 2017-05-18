@@ -384,6 +384,9 @@ CDocumentContentElementBase.prototype.AddInlineImage = function(W, H, Img, Chart
 CDocumentContentElementBase.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 };
+CDocumentContentElementBase.prototype.AddSignatureLine = function(oSignatureDrawing)
+{
+};
 CDocumentContentElementBase.prototype.AddTextArt = function(nStyle)
 {
 };

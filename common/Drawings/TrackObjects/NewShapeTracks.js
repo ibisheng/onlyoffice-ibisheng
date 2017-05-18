@@ -109,7 +109,7 @@
     SHAPE_ASPECTS["accentBorderCallout2"] = 914400/612648;
     SHAPE_ASPECTS["accentBorderCallout3"] = 914400/612648;
 
-function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide, pageIndex)
+function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide, pageIndex, drawingsController)
 {
     this.presetGeom = presetGeom;
     this.startX = startX;
@@ -124,6 +124,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
     this.transform = new AscCommon.CMatrix();
     this.pageIndex = pageIndex;
     this.theme = theme;
+    this.drawingsController = drawingsController;
 
     //for connectors
     this.bConnector = false;
@@ -137,10 +138,11 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     AscFormat.ExecuteNoHistory(function(){
 
-        if(slide){
+        if(this.drawingsController){
             this.bConnector = AscFormat.isConnectorPreset(presetGeom);
             if(this.bConnector){
-                var aSpTree = slide.cSld.spTree;
+
+                var aSpTree = this.drawingsController.getAllShapes(this.drawingsController.getDrawingArray());
                 var oConnector = null;
                 for(var i = aSpTree.length - 1; i > -1; --i){
                     oConnector = aSpTree[i].findConnector(startX, startY);
@@ -254,6 +256,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
         var geometry = AscFormat.CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
 
+        this.startGeom = geometry;
         if(pen.Fill)
         {
             pen.Fill.calculate(theme, slide, layout, master, RGBA);
@@ -277,7 +280,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         this.endConnectionInfo = null;
 
         if(this.bConnector){
-            var aSpTree = slide.cSld.spTree;
+            var aSpTree = this.drawingsController.getAllShapes(this.drawingsController.getDrawingArray());
             var oConnector = null;
             var oEndConnectionInfo = null;
             for(var i = aSpTree.length - 1; i > -1; --i){
@@ -322,6 +325,9 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                     }
                 }
             }
+            if(false === bConnectorHandled){
+                this.overlayObject = new AscFormat.OverlayObject(this.startGeom, 5, 5, this.overlayObject.brush, this.overlayObject.pen, this.transform);
+            }
         }
 
         if(false === bConnectorHandled){
@@ -333,7 +339,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             this.flipV = false;
             this.rot = 0;
 
-            if(this.isLine)
+            if(this.isLine || this.bConnector)
             {
                 if(x < this.startX)
                 {
@@ -559,19 +565,25 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
     this.getShape = function(bFromWord, DrawingDocument, drawingObjects)
     {
         var _sp_pr;
-        if(this.lastSpPr){
+        if(this.bConnector){
 
             var shape = new AscFormat.CConnectionShape();
             if(drawingObjects)
             {
                 shape.setDrawingObjects(drawingObjects);
             }
-            _sp_pr = this.lastSpPr.createDuplicate();
+            if(this.lastSpPr){
+                _sp_pr = this.lastSpPr.createDuplicate();
+            }
+            else{
+                _sp_pr = new AscFormat.CSpPr();
+            }
+
             shape.setSpPr(_sp_pr);
             _sp_pr.setParent(shape);
 
             var nv_sp_pr = new AscFormat.UniNvPr();
-            nv_sp_pr.cNvPr.setId(++slide.maxId);
+            nv_sp_pr.cNvPr.setId(0);
             shape.setNvSpPr(nv_sp_pr);
 
             var nvUniSpPr = new AscFormat.CNvUniSpPr();

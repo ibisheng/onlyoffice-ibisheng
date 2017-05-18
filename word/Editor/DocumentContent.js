@@ -2442,6 +2442,27 @@ CDocumentContent.prototype.AddTextArt = function(nStyle)
 		}
 	}
 };
+CDocumentContent.prototype.AddSignatureLine = function(oSignatureDrawing)
+{
+	if (docpostype_DrawingObjects !== this.CurPos.Type)
+	{
+        var Item = this.Content[this.CurPos.ContentPos];
+        if (type_Paragraph == Item.GetType())
+        {
+            var Drawing = oSignatureDrawing;
+
+            if (true == this.Selection.Use)
+                this.Remove(1, true);
+
+            this.AddToParagraph(Drawing);
+            this.Select_DrawingObject(Drawing.Get_Id());
+        }
+        else
+        {
+            Item.AddSignatureLine(oSignatureDrawing);
+        }
+	}
+};
 CDocumentContent.prototype.EditChart = function(Chart)
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)

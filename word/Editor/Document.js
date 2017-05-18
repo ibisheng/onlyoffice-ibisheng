@@ -4046,6 +4046,11 @@ CDocument.prototype.AddTextArt = function(nStyle)
 {
 	this.Controller.AddTextArt(nStyle);
 };
+
+CDocument.prototype.AddSignatureLine = function(oSignatureDrawing){
+    this.Controller.AddSignatureLine(oSignatureDrawing);
+};
+
 CDocument.prototype.EditChart = function(Chart)
 {
 	this.Controller.EditChart(Chart);
@@ -11553,6 +11558,24 @@ CDocument.prototype.controller_AddTextArt = function(nStyle)
 	else
 	{
 		Item.AddTextArt(nStyle);
+	}
+};
+CDocument.prototype.controller_AddSignatureLine = function(oSignatureDrawing)
+{
+	var Item = this.Content[this.CurPos.ContentPos];
+	if (type_Paragraph == Item.GetType())
+	{
+		var Drawing = oSignatureDrawing;
+
+		if (true == this.Selection.Use)
+			this.Remove(1, true);
+
+		this.AddToParagraph(Drawing);
+        this.Select_DrawingObject(Drawing.Get_Id());
+	}
+	else
+	{
+		Item.AddSignatureLine(oSignatureDrawing);
 	}
 };
 CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)

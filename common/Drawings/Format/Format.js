@@ -4903,6 +4903,16 @@ function CNvUniSpPr()
         }
     };
 
+    CNvUniSpPr.prototype.copy = function(){
+        var _ret = new CNvUniSpPr();
+        _ret.locks = this.locks;
+        _ret.stCnxId = this.stCnxId;
+        _ret.stCnxIdx = this.stCnxIdx;
+        _ret.endCnxId = this.endCnxId;
+        _ret.endCnxIdx = this.endCnxIdx;
+        return _ret;
+    };
+
 function UniNvPr()
 {
     this.cNvPr = new CNvPr();

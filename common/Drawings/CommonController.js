@@ -1010,7 +1010,7 @@ DrawingObjectsController.prototype =
                     for(var j = 0; j < selected_objects.length; ++j)
                     {
                         if(selected_objects[j].canResize())
-                            this.arrPreTrackObjects.push(selected_objects[j].createResizeTrack(card_direction));
+                            this.arrPreTrackObjects.push(selected_objects[j].createResizeTrack(card_direction, selected_objects.length === 1 ? this : null));
                     }
                     if(!isRealObject(group))
                     {
@@ -6454,10 +6454,10 @@ DrawingObjectsController.prototype =
             this.arrTrackObjects[i].track(dx, dy);
     },
 
-    trackResizeObjects: function(kd1, kd2, e)
+    trackResizeObjects: function(kd1, kd2, e, x, y)
     {
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
-            this.arrTrackObjects[i].track(kd1, kd2, e);
+            this.arrTrackObjects[i].track(kd1, kd2, e, x, y);
     },
 
     trackEnd: function()
@@ -10719,6 +10719,35 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
         }
     }
 
+
+    function fCreateSignatureShape(sGuid, sSigner, sSigner2, sEmail, bWord, wsModel){
+        var oShape = new AscFormat.CShape();
+        oShape.setWordShape(bWord === true);
+        oShape.setBDeleted(false);
+        if(wsModel)
+            oShape.setWorksheet(wsModel);
+        var oSpPr = new AscFormat.CSpPr();
+        var oXfrm = new AscFormat.CXfrm();
+        oXfrm.setOffX(0);
+        oXfrm.setOffY(0);
+        oXfrm.setExtX(1828800/36000);
+        oXfrm.setExtY(1828800/36000);
+        oSpPr.setXfrm(oXfrm);
+        oXfrm.setParent(oSpPr);
+        oSpPr.setFill(AscFormat.CreateNoFillUniFill());
+        oSpPr.setLn(AscFormat.CreateNoFillLine());
+        oSpPr.setGeometry(AscFormat.CreateGeometry("rect"));
+        oShape.setSpPr(oSpPr);
+        oSpPr.setParent(oShape);
+        var oSignatureLine = new AscFormat.CSignatureLine();
+        oSignatureLine.id = sGuid;
+        oSignatureLine.signer = sSigner;
+        oSignatureLine.signer2 = sSigner2;
+        oSignatureLine.email = sEmail;
+        oShape.setSignature(oSignatureLine);
+
+        return oShape;
+    }
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].HANDLE_EVENT_MODE_HANDLE = HANDLE_EVENT_MODE_HANDLE;
@@ -10788,4 +10817,6 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].CollectSettingsSpPr = CollectSettingsSpPr;
 	window['AscFormat'].CheckLinePresetForParagraphAdd = CheckLinePresetForParagraphAdd;
 	window['AscFormat'].isConnectorPreset = isConnectorPreset;
+	window['AscFormat'].fCreateSignatureShape = fCreateSignatureShape;
+	window['AscFormat'].CreateBlipFillUniFillFromUrl = CreateBlipFillUniFillFromUrl;
 })(window);

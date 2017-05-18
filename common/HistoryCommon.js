@@ -2318,6 +2318,7 @@
 	window['AscDFH'].historyitem_ShapeSetGroup          = window['AscDFH'].historyitem_type_Shape | 8;
 	window['AscDFH'].historyitem_ShapeSetBodyPr         = window['AscDFH'].historyitem_type_Shape | 9;
 	window['AscDFH'].historyitem_ShapeSetWordShape      = window['AscDFH'].historyitem_type_Shape | 10;
+	window['AscDFH'].historyitem_ShapeSetSignature      = window['AscDFH'].historyitem_type_Shape | 11;
 
 	window['AscDFH'].historyitem_DispUnitsSetBuiltInUnit  = window['AscDFH'].historyitem_type_DispUnits | 1;
 	window['AscDFH'].historyitem_DispUnitsSetCustUnit     = window['AscDFH'].historyitem_type_DispUnits | 2;
@@ -2897,6 +2898,7 @@
 	window['AscDFH'].historydescription_Document_SetFootnotePr                      = 0x013d;
 	window['AscDFH'].historydescription_Document_RemoveAllFootnotes                 = 0x013e;
 	window['AscDFH'].historydescription_Document_InsertDocumentsByUrls              = 0x013f;
+	window['AscDFH'].historydescription_Document_InsertSignatureLine                = 0x0140;
 
 
 
