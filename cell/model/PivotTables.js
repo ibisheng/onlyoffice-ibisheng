@@ -2607,6 +2607,12 @@ CT_pivotTableDefinition.prototype.contains = function (col, row) {
 CT_pivotTableDefinition.prototype.getRange = function () {
 	return this.location && this.location.ref;
 };
+CT_pivotTableDefinition.prototype.getColumnFieldsCount = function () {
+	return this.colFields ? this.colFields.field.length : 0;
+};
+CT_pivotTableDefinition.prototype.getRowFieldsCount = function () {
+	return this.rowFields ? this.rowFields.field.length : 0;
+};
 CT_pivotTableDefinition.prototype.getField = function (arrFields, callback) {
 	return arrFields && arrFields.map(callback, this);
 };

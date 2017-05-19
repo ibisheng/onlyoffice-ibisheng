@@ -4750,7 +4750,8 @@
 		}
 	};
 	Worksheet.prototype._updatePivotTables = function (range) {
-		var pivotTable, pivotRange, styleInfo, style, l, cell, j, pos;
+		var pivotTable, pivotRange, styleInfo, style, cells, j, pos, countC, countR;
+		var dxf, dxfLabels, dxfValues;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			pivotTable = this.pivotTables[i];
 			pivotRange = pivotTable.getRange();
@@ -4763,14 +4764,22 @@
 				continue;
 			}
 
-			var dxfLabels = style.pageFieldLabels && style.pageFieldLabels.dxf;
-			var dxfValues = style.pageFieldValues && style.pageFieldValues.dxf;
+			dxfLabels = style.pageFieldLabels && style.pageFieldLabels.dxf;
+			dxfValues = style.pageFieldValues && style.pageFieldValues.dxf;
 			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
 				pos = pivotTable.pageFieldsPositions[j];
-				cell = this.getRange3(pos.row, pos.col, pos.row, pos.col);
-				cell.setTableStyle(dxfLabels);
-				cell = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
-				cell.setTableStyle(dxfValues);
+				cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
+				cells.setTableStyle(dxfLabels);
+				cells = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
+				cells.setTableStyle(dxfValues);
+			}
+
+			if (styleInfo.showColHeaders) {
+				countC = pivotTable.getColumnFieldsCount();
+				countR = pivotTable.getRowFieldsCount();
+				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC, pivotRange.c2);
+				dxf = style.headerRow && style.headerRow.dxf;
+				cells.setTableStyle(dxf);
 			}
 		}
 	};
