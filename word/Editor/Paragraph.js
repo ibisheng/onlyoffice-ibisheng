@@ -11984,6 +11984,34 @@ Paragraph.prototype.GetTargetPos = function()
 {
 	return this.Internal_Recalculate_CurPos(this.CurPos.ContentPos, false, false, true);
 };
+Paragraph.prototype.GetSelectedContentControls = function()
+{
+	var arrContentControls = [];
+
+	if (true === this.Selection.Use)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (StartPos > EndPos)
+		{
+			StartPos = this.Selection.EndPos;
+			EndPos   = this.Selection.StartPos;
+		}
+
+		for (var Index = StartPos; Index <= EndPos; ++Index)
+		{
+			if (this.Content[Index].GetSelectedContentControls)
+				this.Content[Index].GetSelectedContentControls(arrContentControls);
+		}
+	}
+	else
+	{
+		if (this.Content[this.CurPos.ContentPos].GetSelectedContentControls)
+			this.Content[this.CurPos.ContentPos].GetSelectedContentControls(arrContentControls);
+	}
+
+	return arrContentControls;
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

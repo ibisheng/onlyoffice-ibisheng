@@ -2736,6 +2736,30 @@ CParagraphContentWithParagraphLikeContent.prototype.SelectThisElement = function
 
 	return true;
 };
+CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls = function(arrContentControls)
+{
+	if (true === this.Selection.Use)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (StartPos > EndPos)
+		{
+			StartPos = this.Selection.EndPos;
+			EndPos   = this.Selection.StartPos;
+		}
+
+		for (var Index = StartPos; Index <= EndPos; ++Index)
+		{
+			if (this.Content[Index].GetSelectedContentControls)
+				this.Content[Index].GetSelectedContentControls(arrContentControls);
+		}
+	}
+	else
+	{
+		if (this.Content[this.State.ContentPos].GetSelectedContentControls)
+			this.Content[this.State.ContentPos].GetSelectedContentControls(arrContentControls);
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------

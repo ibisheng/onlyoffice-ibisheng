@@ -407,6 +407,7 @@ CInlineLevelSdt.prototype.SetContentControlLock = function(nLockType)
 };
 CInlineLevelSdt.prototype.GetContentControlLock = function()
 {
+	return sdtlock_SdtContentLocked;
 	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
 };
 //----------------------------------------------------------------------------------------------------------------------
@@ -456,6 +457,11 @@ CInlineLevelSdt.prototype.Write_ToBinary = function(Writer)
 CInlineLevelSdt.prototype.IsStopCursorOnEntryExit = function()
 {
 	return true;
+};
+CInlineLevelSdt.prototype.GetSelectedContentControls = function(arrContentControls)
+{
+	arrContentControls.push(this);
+	CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls.call(this, arrContentControls);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
