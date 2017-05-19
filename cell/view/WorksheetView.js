@@ -12552,7 +12552,7 @@
     };
 
     WorksheetView.prototype.af_drawButtons = function (updatedRange, offsetX, offsetY) {
-        var aWs = this.model;
+        var i, aWs = this.model;
         var t = this;
 
         if (aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges) {
@@ -12622,11 +12622,17 @@
             drawCurrentFilterButtons(aWs.AutoFilter);
         }
         if (aWs.TableParts && aWs.TableParts.length) {
-            for (var i = 0; i < aWs.TableParts.length; i++) {
+            for (i = 0; i < aWs.TableParts.length; i++) {
                 if (aWs.TableParts[i].AutoFilter && aWs.TableParts[i].HeaderRowCount !== 0) {
                     drawCurrentFilterButtons(aWs.TableParts[i], true);
                 }
             }
+        }
+
+        var pivotButtons = this.model.getPivotTableButtons(updatedRange);
+        for (i = 0; i < pivotButtons.length; ++i) {
+			this.af_drawCurrentButton(offsetX, offsetY,
+				{isSortState: null, isSetFilter: false, row: pivotButtons[i].row, col: pivotButtons[i].col});
         }
 
         return true;

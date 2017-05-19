@@ -4798,6 +4798,36 @@
 		}
 		return res;
 	};
+	Worksheet.prototype.getPivotTableButtons = function (range) {
+		var res = [];
+		var pivotTable, pivotRange, j, pos, countC, countR;
+		for (var i = 0; i < this.pivotTables.length; ++i) {
+			pivotTable = this.pivotTables[i];
+			pivotRange = pivotTable.getRange();
+
+			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
+				pos = pivotTable.pageFieldsPositions[j];
+				res.push(new AscCommon.CellBase(pos.row, pos.col + 1));
+			}
+
+			if (!pivotRange || (range && !range.isIntersect(pivotRange))) {
+				continue;
+			}
+
+			if (false !== pivotTable.showHeaders) {
+				countC = pivotTable.getColumnFieldsCount();
+				countR = pivotTable.getRowFieldsCount();
+
+				if (countR) {
+					res.push(new AscCommon.CellBase(pivotRange.r1 + countC, pivotRange.c1));
+				}
+				if (countC) {
+					res.push(new AscCommon.CellBase(pivotRange.r1, pivotRange.c1 + Math.max(1, countR)));
+				}
+			}
+		}
+		return res;
+	};
 //-------------------------------------------------------------------------------------------------
 	/**
 	 * @constructor
