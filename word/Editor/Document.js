@@ -15235,6 +15235,11 @@ CDocument.prototype.GetContentControl = function(Id)
 	return this.TableId.Get_ById(Id);
 };
 
+CDocument.prototype.GetAllSignatures = function()
+{
+    return this.DrawingObjects.getAllSignatures();
+};
+
 function CDocumentSelectionState()
 {
     this.Id        = null;

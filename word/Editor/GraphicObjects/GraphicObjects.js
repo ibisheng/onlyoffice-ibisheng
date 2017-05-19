@@ -1420,6 +1420,34 @@ CGraphicObjects.prototype =
         }
     },
 
+    getDrawingArray: function()
+    {
+        var ret = [];
+        for(var i = 0; i < this.drawingObjects.length; ++i) {
+            if(this.drawingObjects[i] && this.drawingObjects[i].GraphicObj && !this.drawingObjects[i].GraphicObj.bDeleted){
+                ret.push(this.drawingObjects[i].GraphicObj);
+            }
+        }
+        return ret;
+    },
+
+    getAllSignatures: function(){
+        var _ret = [];
+        this.getAllSignatures2(_ret, this.getDrawingArray());
+        return _ret;
+    },
+
+    getAllSignatures2: function(aRet, spTree){
+        for(var i = 0; i < spTree.length; ++i){
+            if(spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                this.getAllSignatures2(aRet, spTree[i].spTree);
+            }
+            else if(spTree[i].signatureLine){
+                aRet.push(spTree[i].signatureLine);
+            }
+        }
+    },
+
     addOleObject: function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
     {
         var content = this.getTargetDocContent();
@@ -2952,6 +2980,9 @@ CGraphicObjects.prototype =
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].parent.Remove_FromDocument(false);
+                    if(this.selectedObjects[i].signatureLine){
+                        this.document.Api.sendEvent("asc_onAddSignature", this.selectedObjects[i].signatureLine.id);
+                    }
                     arr_drawings_.push(this.selectedObjects[i].parent);
                 }
                 this.resetSelection();

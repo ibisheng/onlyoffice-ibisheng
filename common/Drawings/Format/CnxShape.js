@@ -171,18 +171,31 @@
                         }
                         else{
                             if(_end.bounds.t > _begin.bounds.b){
-                                sPreset = "4";
-                                flipH = true;
-                                oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
-                                oMapAdj["adj2"] = (100000*((_end.bounds.t + _begin.bounds.b)/2.0 - _begin.y)/extY) >> 0;
+                                if(_end.x < _begin.x){
+                                    sPreset = "4";
+                                    flipH = true;
+                                    oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                    oMapAdj["adj2"] = (100000*((_end.bounds.t + _begin.bounds.b)/2.0 - _begin.y)/extY) >> 0;
+                                }
+                                else{
+                                    sPreset = "2";
+                                }
 
                             }
                             else if(_end.bounds.b < _begin.bounds.t){
-                                sPreset = "4";
-                                flipH = true;
-                                flipV = true;
-                                oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
-                                oMapAdj["adj2"] = (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                if(_end.x < _begin.x){
+                                    sPreset = "4";
+                                    flipH = true;
+                                    flipV = true;
+                                    oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                    oMapAdj["adj2"] = (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                }
+                                else{
+                                    sPreset = "4";
+                                    flipV = true;
+                                    oMapAdj["adj1"] = (100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX) >> 0;
+                                    oMapAdj["adj2"] = (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                }
                             }
                             else{
 
@@ -202,18 +215,18 @@
                                     }
                                 }
                                 else{
+                                    if(_end.x > _begin.x){
+                                        sPreset = "2";
+                                    }
+                                    else{
+                                        sPreset = "4";
+                                        flipH = true;
+                                        oMapAdj["adj1"] =  -(100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
+                                        oMapAdj["adj2"] =  -((100000*(_begin.y - (Math.min(_begin.bounds.t, _end.bounds.t) - CONNECTOR_MARGIN))/extY + 0.5) >> 0);
+
+                                    }
 
                                 }
-
-                                //if(_end.x < _begin.x){
-                                //    sPreset = "4";
-                                //    flipH = true;
-                                //    oMapAdj["adj1"] = -(100000*(Math.max(_end.bounds.r, _begin.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
-                                //    oMapAdj["adj2"] = (100000*(((_begin.bounds.b + _end.bounds.t)/2  - _begin.y)/extY) + 0.5) >> 0;
-                                //}
-                                //else{
-                                //    sPreset = "2";
-                                //}
                             }
                         }
                         break;

@@ -3511,8 +3511,13 @@ background-repeat: no-repeat;\
             oSignature.setParent(Drawing);
             Drawing.Set_GraphicObject(oSignature);
             this.WordControl.m_oLogicDocument.AddSignatureLine(Drawing);
+            this.sendEvent("asc_onAddSignature", sGuid);
         }
     };
+
+    asc_docs_api.prototype.asc_getAllSignatures = function(){
+    	return this.WordControl.m_oLogicDocument.GetAllSignatures();
+	};
 
 	asc_docs_api.prototype.IncreaseIndent         = function()
 	{
@@ -8234,6 +8239,10 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_Remove"]             					= asc_docs_api.prototype.asc_Remove;
 	asc_docs_api.prototype["asc_OnHideContextMenu"] 					= asc_docs_api.prototype.asc_OnHideContextMenu;
 	asc_docs_api.prototype["asc_OnShowContextMenu"] 					= asc_docs_api.prototype.asc_OnShowContextMenu;
+	asc_docs_api.prototype["asc_addSignatureLine"] 					= asc_docs_api.prototype.asc_addSignatureLine;
+	asc_docs_api.prototype["asc_getAllSignatures"] 					= asc_docs_api.prototype.asc_getAllSignatures;
+
+
 
 	CDocInfoProp.prototype['get_PageCount']             = CDocInfoProp.prototype.get_PageCount;
 	CDocInfoProp.prototype['put_PageCount']             = CDocInfoProp.prototype.put_PageCount;
