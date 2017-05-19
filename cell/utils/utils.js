@@ -1992,7 +1992,7 @@
 
         var oStyle;
         this.docStyles = [];
-        for (var i = 0; i < cellStyles.length; ++i) {
+        for (var i = 0; i < cellStyles.length && i < 1000; ++i) {
           oStyle = cellStyles[i];
           if (oStyle.Hidden || null != oStyle.BuiltinId) {
             continue;
