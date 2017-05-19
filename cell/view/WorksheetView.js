@@ -651,9 +651,24 @@
             this._initCellsArea(AscCommonExcel.recalcType.recalc);
             this._normalizeViewRange();
             this._cleanCellsTextMetricsCache();
-            this._shiftVisibleRange();
+
+            // ToDo fix with sheetView->topLeftCell on open
+			var ar = this._getSelection().getLast();
+			if (ar.c2 >= this.nColsCount) {
+				this.expandColsOnScroll(false, true, ar.c2 + 1);
+			}
+			if (ar.r2 >= this.nRowsCount) {
+				this.expandRowsOnScroll(false, true, ar.r2 + 1);
+			}
+			var d = this._calcActiveRangeOffset();
+			if (d.deltaX) {
+				this.scrollHorizontal(d.deltaX);
+            }
+            if (d.deltaY) {
+			    this.scrollVertical(d.deltaY);
+            }
+
             this._prepareCellTextMetricsCache();
-            this._shiftVisibleRange();
             this.cellCommentator.updateCommentPosition();
             this.updateSpecialPasteOptionsPosition();
             this.handlers.trigger("onDocumentPlaceChanged");
@@ -670,9 +685,24 @@
         this._initCellsArea(AscCommonExcel.recalcType.full);
         this._normalizeViewRange();
         this._cleanCellsTextMetricsCache();
-        this._shiftVisibleRange();
+
+		// ToDo fix with sheetView->topLeftCell on open
+		var ar = this._getSelection().getLast();
+		if (ar.c2 >= this.nColsCount) {
+			this.expandColsOnScroll(false, true, ar.c2 + 1);
+		}
+		if (ar.r2 >= this.nRowsCount) {
+			this.expandRowsOnScroll(false, true, ar.r2 + 1);
+		}
+		var d = this._calcActiveRangeOffset();
+		if (d.deltaX) {
+			this.scrollHorizontal(d.deltaX);
+		}
+		if (d.deltaY) {
+			this.scrollVertical(d.deltaY);
+		}
+
         this._prepareCellTextMetricsCache();
-        this._shiftVisibleRange();
         this.cellCommentator.updateCommentPosition();
         this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
@@ -1563,65 +1593,6 @@
                 vr.r1 = 0;
             }
         }
-    };
-
-    WorksheetView.prototype._shiftVisibleRange = function (range) {
-        var t = this;
-        var vr = t.visibleRange;
-        var arn = range ? range : this.model.selectionRange.getLast();
-        var i;
-
-        var cFrozen = 0, rFrozen = 0;
-        if (this.topLeftFrozenCell) {
-            cFrozen = this.topLeftFrozenCell.getCol0();
-            rFrozen = this.topLeftFrozenCell.getRow0();
-        }
-
-        do {
-            if (arn.r2 > vr.r2) {
-                i = arn.r2 - vr.r2;
-                vr.r1 += i;
-                vr.r2 += i;
-                t._calcVisibleRows();
-                continue;
-            }
-            if (t._isRowDrawnPartially(arn.r2, vr.r1)) {
-                vr.r1 += 1;
-                t._calcVisibleRows();
-            }
-            if (arn.r1 < vr.r1 && arn.r1 >= rFrozen) {
-                i = arn.r1 - vr.r1;
-                vr.r1 += i;
-                vr.r2 += i;
-                t._calcVisibleRows();
-            }
-            break;
-        } while (1);
-
-        do {
-            if (arn.c2 > vr.c2) {
-                i = arn.c2 - vr.c2;
-                vr.c1 += i;
-                vr.c2 += i;
-                t._calcVisibleColumns();
-                continue;
-            }
-            if (t._isColDrawnPartially(arn.c2, vr.c1)) {
-                vr.c1 += 1;
-                t._calcVisibleColumns();
-            }
-            if (arn.c1 < vr.c1 && arn.c1 >= cFrozen) {
-                i = arn.c1 - vr.c1;
-                vr.c1 += i;
-                vr.c2 += i;
-                if (vr.c1 < 0) {
-                    vr.c1 = 0;
-                    vr.c2 -= vr.c1;
-                }
-                t._calcVisibleColumns();
-            }
-            break;
-        } while (1);
     };
 
     // ----- Drawing for print -----
@@ -5434,8 +5405,10 @@
             return this;
         }
 
-        this.cleanSelection();
-        this.cellCommentator.cleanSelectedComment();
+		if (!this.notUpdateRowHeight) {
+			this.cleanSelection();
+			this.cellCommentator.cleanSelectedComment();
+		}
 
         var ctx = this.drawingCtx;
         var ctxW = ctx.getWidth();
@@ -5468,6 +5441,10 @@
                 this._prepareCellTextMetricsCache(new asc_Range(vr.c1, oldEnd + 1, vr.c2, vr.r2));
             }
         }
+
+		if (this.notUpdateRowHeight) {
+			return this;
+		}
 
         var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
         var oldW, x, dx;
@@ -5637,8 +5614,10 @@
             return this;
         }
 
-        this.cleanSelection();
-        this.cellCommentator.cleanSelectedComment();
+        if (!this.notUpdateRowHeight) {
+			this.cleanSelection();
+			this.cellCommentator.cleanSelectedComment();
+		}
 
         var ctx = this.drawingCtx;
         var ctxW = ctx.getWidth();
@@ -5678,6 +5657,10 @@
                 // Идем вправо
                 this._prepareCellTextMetricsCache(new asc_Range(oldEnd + 1, vr.r1, vr.c2, vr.r2));
             }
+        }
+
+        if (this.notUpdateRowHeight) {
+            return this;
         }
 
         var lastColWidth = (scrollRight && oldVCE_isPartial) ?
