@@ -1260,6 +1260,8 @@
 	baseEditorsApi.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail) {
 
     };
+	baseEditorsApi.prototype.asc_getAllSignatures = function () {
+	};
 
 	// signatures
 	baseEditorsApi.prototype.asc_AddSignarureLine2 = function(_obj)
@@ -1268,6 +1270,37 @@
 		function guid() { return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();	}
 
 		return this.asc_addSignatureLine(guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail());
+	};
+
+	baseEditorsApi.prototype.asc_getAllRequestSignatures = function()
+	{
+		var _sigs = this.asc_getAllSignatures();
+		var _sigs_ret = [];
+
+		var _found;
+		for (var i = _sigs.length - 1; i >= 0; i--)
+		{
+			var _sig = _sigs[i];
+			_found = false;
+
+			for (var j = this.signatures.length - 1; j >= 0; j--)
+			{
+				if (this.signatures[j].guid == _sig.guid)
+				{
+					_found = true;
+					break;
+				}
+			}
+
+			if (!_found)
+			{
+				var _add_sig = new AscCommon.asc_CSignarureLine();
+				_add_sig.guid = _sig.guid;
+				_add_sig.signer1 = _sig.signer1;
+				_add_sig.signer2 = _sig.signer2;
+				_add_sig.email = _sig.email;
+			}
+		}
 	};
 
 	baseEditorsApi.prototype.asc_Sign = function(guid)

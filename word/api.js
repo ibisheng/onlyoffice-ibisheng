@@ -8262,10 +8262,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_Remove"]             					= asc_docs_api.prototype.asc_Remove;
 	asc_docs_api.prototype["asc_OnHideContextMenu"] 					= asc_docs_api.prototype.asc_OnHideContextMenu;
 	asc_docs_api.prototype["asc_OnShowContextMenu"] 					= asc_docs_api.prototype.asc_OnShowContextMenu;
-	asc_docs_api.prototype["asc_addSignatureLine"] 					= asc_docs_api.prototype.asc_addSignatureLine;
-	asc_docs_api.prototype["asc_getAllSignatures"] 					= asc_docs_api.prototype.asc_getAllSignatures;
-
-
+	asc_docs_api.prototype["asc_addSignatureLine"] 						= asc_docs_api.prototype.asc_addSignatureLine;
+	asc_docs_api.prototype["asc_getAllRequestSignatures"] 				= asc_docs_api.prototype.asc_getAllRequestSignatures;
 
 	// signatures
 	asc_docs_api.prototype["asc_AddSignarureLine2"]             		= asc_docs_api.prototype.asc_AddSignarureLine2;
