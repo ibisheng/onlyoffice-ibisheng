@@ -8644,26 +8644,22 @@
                         /* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
                         t.model.workbook.dependencyFormulas.lockRecal();
 
-                        // Если нужно удалить автофильтры - удаляем
-                        if (val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text) {
-                            t.model.autoFilters.isEmptyAutoFilters(arn);
-                        } else if (val === c_oAscCleanOptions.Format) {
-                            t.model.autoFilters.cleanFormat(arn);
-                        }
-
+                        //нужно ли удалять скрытые строки
+						var excludeHiddenRows = t.model.autoFilters.bIsExcludeHiddenRows(arn, activeCell);
+                        
                         switch(val) {
 							case c_oAscCleanOptions.All:
-                            range.cleanAll();
+                            range.cleanAll(excludeHiddenRows);
 								t.model.removeSparklines(arn);
                             // Удаляем комментарии
                             t.cellCommentator.deleteCommentsRange(arn);
 								break;
 							case c_oAscCleanOptions.Text:
 							case c_oAscCleanOptions.Formula:
-                            range.cleanText();
+                            range.cleanText(excludeHiddenRows);
 								break;
 							case c_oAscCleanOptions.Format:
-                            range.cleanFormat();
+                            range.cleanFormat(excludeHiddenRows);
 								break;
 							case c_oAscCleanOptions.Comments:
                             t.cellCommentator.deleteCommentsRange(arn);
@@ -8678,6 +8674,13 @@
 								t.model.removeSparklineGroups(arn);
 								break;
                         }
+
+						// Если нужно удалить автофильтры - удаляем
+						if (val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text) {
+							t.model.autoFilters.isEmptyAutoFilters(arn);
+						} else if (val === c_oAscCleanOptions.Format) {
+							t.model.autoFilters.cleanFormat(arn);
+						}
 
                         // Вызываем функцию пересчета для заголовков форматированной таблицы
                         if (val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text) {
