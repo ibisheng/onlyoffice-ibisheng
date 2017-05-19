@@ -1611,7 +1611,7 @@
             this._prepareCellTextMetricsCache(range);
 
             var rowModel, rowCells, rowCache, rightSide, c;
-            for (var r = 0; r <= maxRows; ++r) {
+            for (var r = 0; r < maxRows; ++r) {
                 if (this.height_1px > this.rows[r].height) {
                     continue;
                 }
