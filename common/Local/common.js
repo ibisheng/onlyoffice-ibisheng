@@ -262,6 +262,19 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 
 		_editor.signatures.push(_add_sign);
 	}
+
+	_editor.asc_registerCallback("asc_onAddSignature", function(guid) {
+
+		var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+		_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
+
+	});
+	_editor.asc_registerCallback("asc_onRemoveSignature", function(guid) {
+
+		var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+		_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
+
+	});
 };
 
 // меняем среду
