@@ -407,7 +407,6 @@ CInlineLevelSdt.prototype.SetContentControlLock = function(nLockType)
 };
 CInlineLevelSdt.prototype.GetContentControlLock = function()
 {
-	return sdtlock_SdtContentLocked;
 	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
 };
 //----------------------------------------------------------------------------------------------------------------------
