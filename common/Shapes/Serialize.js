@@ -4349,6 +4349,98 @@ function BinaryPPTYLoader()
         return ret;
     }
 
+	this.ReadSignatureLine = function()
+	{
+		var ret = new AscFormat.CSignatureLine();
+
+		var s = this.stream;
+
+		var _rec_start = s.cur;
+		var _end_rec = _rec_start + s.GetULong() + 4;
+
+		s.Skip2(1); // start attributes
+
+		while (true)
+		{
+			var _at = s.GetUChar();
+			if (_at == g_nodeAttributeEnd)
+				break;
+			switch (_at)
+			{
+				case 0:
+				{
+					s.GetString2();
+					break;
+				}
+				case 1:
+				{
+					s.GetBool();
+					break;
+				}
+				case 2:
+				{
+					s.GetUChar();
+					break;
+				}
+				case 3:
+				{
+					ret.id = s.GetString2();
+					break;
+				}
+				case 4:
+				{
+					s.GetBool();
+					break;
+				}
+				case 5:
+				{
+					s.GetString2();
+					break;
+				}
+				case 6:
+				{
+					s.GetBool();
+					break;
+				}
+				case 7:
+				{
+					s.GetString2();
+					break;
+				}
+				case 8:
+				{
+					s.GetBool();
+					break;
+				}
+				case 9:
+				{
+					s.GetString2();
+					break;
+				}
+				case 10:
+				{
+					ret.signer = s.GetString2();
+					break;
+				}
+				case 11:
+				{
+					ret.signer2 = s.GetString2();
+					break;
+				}
+				case 12:
+				{
+					ret.email = s.GetString2();
+					break;
+				}
+				default:
+					break;
+			}
+		}
+
+		s.Seek2(_end_rec);
+		return ret;
+	}
+
     this.ReadShapeStyle = function()
     {
         var def = new AscFormat.CShapeStyle();
@@ -8997,8 +9089,14 @@ function CPres()
                         oXFRM = this.Reader.ReadXfrm();
                         break;
                     }
+                    case 7:
+                    {
+                        shape.setSignature(this.Reader.ReadSignatureLine());
+                        break;
+                    }
                     default:
                     {
+                        s.SkipRecord();
                         break;
                     }
                 }

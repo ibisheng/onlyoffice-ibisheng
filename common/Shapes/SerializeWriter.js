@@ -3553,6 +3553,19 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
     }
 
+	this.WriteSignatureLine = function(oSignatureLine)
+	{
+		oThis.WriteUChar(g_nodeAttributeStart);
+		oThis._WriteUChar2(2, 1);
+		oThis._WriteString2(3, oSignatureLine.id);
+		oThis._WriteBool2(4, true);
+		oThis._WriteString2(5, "{00000000-0000-0000-0000-000000000000}");
+		oThis._WriteString2(10, oSignatureLine.signer);
+		oThis._WriteString2(11, oSignatureLine.signer2);
+		oThis._WriteString2(12, oSignatureLine.email);
+		oThis.WriteUChar(g_nodeAttributeEnd);
+	}
+
     this.WriteXfrmRot = function(xfrm)
     {
         oThis.WriteUChar(g_nodeAttributeStart);
@@ -4728,6 +4741,7 @@ function CBinaryFileWriter()
                 _writer.WriteBodyPr(shape.bodyPr);
                 _writer.EndRecord();
             }
+            _writer.WriteRecord2(7, shape.signatureLine, _writer.WriteSignatureLine);
 
             if (isUseTmpFill)
             {
