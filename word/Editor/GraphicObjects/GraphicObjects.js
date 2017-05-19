@@ -2981,7 +2981,7 @@ CGraphicObjects.prototype =
                 {
                     this.selectedObjects[i].parent.Remove_FromDocument(false);
                     if(this.selectedObjects[i].signatureLine){
-                        this.document.Api.sendEvent("asc_onAddSignature", this.selectedObjects[i].signatureLine.id);
+                        this.document.Api.sendEvent("asc_onRemoveSignature", this.selectedObjects[i].signatureLine.id);
                     }
                     arr_drawings_.push(this.selectedObjects[i].parent);
                 }
