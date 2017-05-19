@@ -1272,7 +1272,7 @@
 		return this.asc_addSignatureLine(guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail());
 	};
 
-	baseEditorsApi.prototype.asc_getAllRequestSignatures = function()
+	baseEditorsApi.prototype.asc_getRequestSignatures = function()
 	{
 		var _sigs = this.asc_getAllSignatures();
 		var _sigs_ret = [];
