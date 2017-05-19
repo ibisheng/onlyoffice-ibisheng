@@ -240,8 +240,28 @@ window["asc_initAdvancedOptions"] = function(_code)
 
 window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 {
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+	_editor.signatures = [];
+
 	var _signatures = JSON.parse(_json);
-	console.log(_signatures);
+	var _count = _signatures["count"];
+	var _data = _signatures["data"];
+	var _sign;
+	var _add_sign;
+	for (var i = 0; i < _count; i++)
+	{
+		_sign = _data[i];
+		_add_sign = new window["AscCommon"].asc_CSignarureLine();
+
+		_add_sign.guid = _sign["guid"];
+		_add_sign.valid = _sign["valid"];
+		_add_sign.image = (_add_sign.valid == 0) ? _sign["image_valid"] : _sign["image_invalid"];
+		_add_sign.signer1 = _sign["name"];
+		_add_sign.id = i;
+
+		_editor.signatures.push(_add_sign);
+	}
 };
 
 // меняем среду

@@ -163,6 +163,8 @@
 
 		this.lastWorkTime = 0;
 
+		this.signatures = [];
+
 		return this;
 	}
 
@@ -1258,6 +1260,32 @@
 	baseEditorsApi.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail) {
 
     };
+
+	// signatures
+	baseEditorsApi.prototype.asc_AddSignarureLine2 = function(_obj)
+	{
+		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
+		function guid() { return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();	}
+
+		return this.asc_addSignatureLine(guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail());
+	};
+
+	baseEditorsApi.prototype.asc_Sign = function(guid)
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["Sign"](guid);
+	};
+
+	baseEditorsApi.prototype.asc_ViewSign = function(id)
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["ViewCertificate"](guid);
+	};
+
+	baseEditorsApi.prototype.asc_getSignatures = function()
+	{
+		return this.signatures;
+	};
 
 	baseEditorsApi.prototype.asc_getSignatureImage = function (sGuid) {
 		return "";

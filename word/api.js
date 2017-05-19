@@ -3501,6 +3501,15 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	// signatures
+	asc_docs_api.prototype.asc_AddSignarureLine2 = function(_obj)
+	{
+		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
+		function guid() { return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();	}
+
+		return this.asc_addSignatureLine(guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail());
+	};
+
     asc_docs_api.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail) {
         if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
         {
@@ -3518,6 +3527,20 @@ background-repeat: no-repeat;\
     asc_docs_api.prototype.asc_getAllSignatures = function(){
     	return this.WordControl.m_oLogicDocument.GetAllSignatures();
 	};
+
+    asc_docs_api.prototype.asc_Sign = function(guid)
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["Sign"](guid);
+	};
+
+    asc_docs_api.prototype.asc_ViewSign = function(id)
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["ViewSertificate"](guid);
+	};
+
+    //////////////////////////////////////////////////////////////////////////
 
 	asc_docs_api.prototype.IncreaseIndent         = function()
 	{
@@ -8243,6 +8266,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_getAllSignatures"] 					= asc_docs_api.prototype.asc_getAllSignatures;
 
 
+
+	// signatures
+	asc_docs_api.prototype["asc_AddSignarureLine2"]             		= asc_docs_api.prototype.asc_AddSignarureLine2;
+	asc_docs_api.prototype["asc_Sign"]             						= asc_docs_api.prototype.asc_Sign;
+	asc_docs_api.prototype["asc_ViewSign"] 								= asc_docs_api.prototype.asc_ViewSign;
+	asc_docs_api.prototype["asc_getSignatures"] 						= asc_docs_api.prototype.asc_getSignatures;
 
 	CDocInfoProp.prototype['get_PageCount']             = CDocInfoProp.prototype.get_PageCount;
 	CDocInfoProp.prototype['put_PageCount']             = CDocInfoProp.prototype.put_PageCount;
