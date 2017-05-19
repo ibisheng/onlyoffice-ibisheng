@@ -435,6 +435,11 @@
 
         this.bIsAsyncLoadDocumentImages = false;
 
+        this.bIsLoadDocumentImagesNoByOrder = true;
+        this.nNoByOrderCounter = 0;
+
+		var oThis = this;
+
         this.put_Api = function(_api)
         {
             this.Api = _api;
@@ -467,6 +472,7 @@
 
             if (!this.bIsAsyncLoadDocumentImages)
             {
+				this.nNoByOrderCounter = 0;
                 this._LoadImages();
             }
             else
@@ -486,11 +492,14 @@
             }
         };
 
-        var oThis = this;
         this._LoadImages = function()
         {
-            if (0 == this.images_loading.length)
+			var _count_images = this.images_loading.length;
+
+            if (0 == _count_images)
             {
+				this.nNoByOrderCounter = 0;
+
                 if (this.ThemeLoader == null)
                     this.Api.asyncImagesDocumentEndLoaded();
                 else
@@ -499,38 +508,65 @@
                 return;
             }
 
-            var _id = this.images_loading[0];
-            var oImage = new CImage(_id);
-            oImage.Status = ImageLoadStatus.Loading;
-            oImage.Image = new Image();
-            oThis.map_image_index[oImage.src] = oImage;
-            oImage.Image.onload = function(){
-                oImage.Status = ImageLoadStatus.Complete;
+            for (var i = 0; i < _count_images; i++)
+			{
+				var _id = this.images_loading[i];
+				var oImage = new CImage(_id);
+				oImage.Status = ImageLoadStatus.Loading;
+				oImage.Image = new Image();
+				oThis.map_image_index[oImage.src] = oImage;
+				oImage.Image.parentImage = oImage;
+				oImage.Image.onload = function ()
+				{
+					this.parentImage.Status = ImageLoadStatus.Complete;
+					oThis.nNoByOrderCounter++;
 
-                if (oThis.bIsLoadDocumentFirst === true)
-                {
-                    oThis.Api.OpenDocumentProgress.CurrentImage++;
-                    oThis.Api.SendOpenProgress();
-                }
+					if (oThis.bIsLoadDocumentFirst === true)
+					{
+						oThis.Api.OpenDocumentProgress.CurrentImage++;
+						oThis.Api.SendOpenProgress();
+					}
 
-                oThis.images_loading.shift();
-                oThis._LoadImages();
-            };
-            oImage.Image.onerror = function(){
-                oImage.Status = ImageLoadStatus.Complete;
-                oImage.Image = null;
+					if (!oThis.bIsLoadDocumentImagesNoByOrder)
+					{
+						oThis.images_loading.shift();
+						oThis._LoadImages();
+					}
+					else if (oThis.nNoByOrderCounter == oThis.images_loading.length)
+                    {
+						oThis.images_loading = [];
+						oThis._LoadImages();
+                    }
+				};
+				oImage.Image.onerror = function ()
+				{
+					this.parentImage.Status = ImageLoadStatus.Complete;
+					this.parentImage.Image = null;
+					oThis.nNoByOrderCounter++;
 
-                if (oThis.bIsLoadDocumentFirst === true)
-                {
-                    oThis.Api.OpenDocumentProgress.CurrentImage++;
-                    oThis.Api.SendOpenProgress();
-                }
+					if (oThis.bIsLoadDocumentFirst === true)
+					{
+						oThis.Api.OpenDocumentProgress.CurrentImage++;
+						oThis.Api.SendOpenProgress();
+					}
 
-                oThis.images_loading.shift();
-                oThis._LoadImages();
-            };
-            //oImage.Image.crossOrigin = 'anonymous';
-            oImage.Image.src = oImage.src;
+					if (!oThis.bIsLoadDocumentImagesNoByOrder)
+					{
+						oThis.images_loading.shift();
+						oThis._LoadImages();
+					}
+					else if (oThis.nNoByOrderCounter == oThis.images_loading.length)
+					{
+						oThis.images_loading = [];
+						oThis._LoadImages();
+					}
+				};
+				//oImage.Image.crossOrigin = 'anonymous';
+				oImage.Image.src = oImage.src;
+
+				if (!oThis.bIsLoadDocumentImagesNoByOrder)
+                    return;
+			}
         };
 
         this.LoadImage = function(src, Type)

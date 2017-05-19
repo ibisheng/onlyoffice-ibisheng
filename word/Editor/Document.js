@@ -4046,6 +4046,11 @@ CDocument.prototype.AddTextArt = function(nStyle)
 {
 	this.Controller.AddTextArt(nStyle);
 };
+
+CDocument.prototype.AddSignatureLine = function(oSignatureDrawing){
+    this.Controller.AddSignatureLine(oSignatureDrawing);
+};
+
 CDocument.prototype.EditChart = function(Chart)
 {
 	this.Controller.EditChart(Chart);
@@ -8138,8 +8143,12 @@ CDocument.prototype.private_UpdateTracks = function(bSelection, bEmptySelection)
 	else
 		this.DrawingDocument.Update_MathTrack(false);
 
-	var oBlockLevelSdt = oSelectedInfo.GetBlockLevelSdt();
-	if (oBlockLevelSdt)
+	var oBlockLevelSdt  = oSelectedInfo.GetBlockLevelSdt();
+	var oInlineLevelSdt = oSelectedInfo.GetInlineLevelSdt();
+
+	if (oInlineLevelSdt)
+		oInlineLevelSdt.DrawContentControlsTrack(false);
+	else if (oBlockLevelSdt)
 		oBlockLevelSdt.DrawContentControlsTrack(false);
 	else
 		this.DrawingDocument.OnDrawContentControl(null, c_oContentControlTrack.In);
@@ -11549,6 +11558,24 @@ CDocument.prototype.controller_AddTextArt = function(nStyle)
 	else
 	{
 		Item.AddTextArt(nStyle);
+	}
+};
+CDocument.prototype.controller_AddSignatureLine = function(oSignatureDrawing)
+{
+	var Item = this.Content[this.CurPos.ContentPos];
+	if (type_Paragraph == Item.GetType())
+	{
+		var Drawing = oSignatureDrawing;
+
+		if (true == this.Selection.Use)
+			this.Remove(1, true);
+
+		this.AddToParagraph(Drawing);
+        this.Select_DrawingObject(Drawing.Get_Id());
+	}
+	else
+	{
+		Item.AddSignatureLine(oSignatureDrawing);
 	}
 };
 CDocument.prototype.controller_AddInlineTable = function(Cols, Rows)
@@ -15160,8 +15187,7 @@ CDocument.prototype.SelectContentControl = function(Id)
 	if (oBlockLevelSdt)
 	{
 		this.RemoveSelection();
-		oBlockLevelSdt.SelectAll(1);
-		oBlockLevelSdt.Set_CurrentElement(false, 0, oBlockLevelSdt.Content);
+		oBlockLevelSdt.SelectContentControl();
 
 		this.Document_UpdateInterfaceState();
 		this.Document_UpdateRulersState();

@@ -307,6 +307,11 @@ CDocumentControllerBase.prototype.AddOleObject = function(nW, nH, nWidthPix, nHe
  */
 CDocumentControllerBase.prototype.AddTextArt = function(nStyle){};
 /**
+ * Вставляем объект SignatureLine
+ * @param oSignatureDrawing
+ */
+CDocumentControllerBase.prototype.AddSignatureLine = function(oSignatureDrawing){};
+/**
  * Редактируем диаграмму.
  * @param Chart
  */

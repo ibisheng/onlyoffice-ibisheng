@@ -3637,7 +3637,7 @@ Paragraph.prototype.Correct_ContentPos2 = function()
 	}
 
 	// Если курсор находится в начале или конце гиперссылки, тогда выводим его из гиперссылки
-	while (CurPos > 0 && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && para_Field !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_Start())
+	while (CurPos > 0 && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && para_Field !== this.Content[CurPos].Type && para_InlineLevelSdt !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_Start())
 	{
 		if (false === this.Content[CurPos - 1].Is_CursorPlaceable())
 			break;
@@ -3646,7 +3646,7 @@ Paragraph.prototype.Correct_ContentPos2 = function()
 		this.Content[CurPos].MoveCursorToEndPos();
 	}
 
-	while (CurPos < Count && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && para_Field !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_End())
+	while (CurPos < Count && para_Run !== this.Content[CurPos].Type && para_Math !== this.Content[CurPos].Type && para_Field !== this.Content[CurPos].Type && para_InlineLevelSdt !== this.Content[CurPos].Type && true === this.Content[CurPos].Cursor_Is_End())
 	{
 		if (false === this.Content[CurPos + 1].Is_CursorPlaceable())
 			break;
@@ -4335,7 +4335,7 @@ Paragraph.prototype.Get_LeftPos = function(SearchPos, ContentPos)
 
 	CurPos--;
 
-	if (CurPos >= 0 && (para_Math === this.Content[CurPos + 1].Type || para_Field === this.Content[CurPos + 1].Type))
+	if (CurPos >= 0 && this.Content[CurPos + 1].IsStopCursorOnEntryExit())
 	{
 		// При выходе из формулы встаем в конец рана
 		this.Content[CurPos].Get_EndPos(false, SearchPos.Pos, Depth + 1);
@@ -4371,7 +4371,7 @@ Paragraph.prototype.Get_RightPos = function(SearchPos, ContentPos, StepEnd)
 	CurPos++;
 
 	var Count = this.Content.length;
-	if (CurPos < Count && (para_Math === this.Content[CurPos - 1].Type || para_Field === this.Content[CurPos - 1].Type))
+	if (CurPos < Count && this.Content[CurPos - 1].IsStopCursorOnEntryExit())
 	{
 		// При выходе из формулы встаем в конец рана
 		this.Content[CurPos].Get_StartPos(SearchPos.Pos, Depth + 1);
@@ -5100,87 +5100,6 @@ Paragraph.prototype.Cursor_MoveTo_Drawing = function(Id, bBefore)
 	this.RecalculateCurPos();
 	this.CurPos.RealX = this.CurPos.X;
 	this.CurPos.RealY = this.CurPos.Y;
-};
-Paragraph.prototype.Set_ContentPos = function(Pos, bCorrectPos, Line)
-{
-	this.CurPos.ContentPos = Math.max(0, Math.min(this.Content.length - 1, Pos));
-	this.CurPos.Line       = ( undefined === Line ? -1 : Line );
-
-	if (false != bCorrectPos)
-		this.Internal_Correct_ContentPos();
-};
-Paragraph.prototype.Internal_Correct_ContentPos = function()
-{
-	// 1. Ищем ближайший справа элемент
-	//    Это делается для того, чтобы если мы находимся в конце гиперссылки выйти из нее.
-	var Count  = this.Content.length;
-	var CurPos = this.CurPos.ContentPos;
-
-	var TempPos = CurPos;
-	while (TempPos >= 0 && TempPos < Count && undefined === this.Content[TempPos].CurLine)
-		TempPos--;
-
-	var CurLine = ( this.CurPos.Line === -1 ? ( TempPos >= 0 && TempPos < Count ? this.Content[TempPos].CurLine : -1 ) : this.CurPos.Line );
-
-	while (CurPos < Count - 1)
-	{
-		var Item     = this.Content[CurPos];
-		var ItemType = Item.Type;
-
-		if (para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_HyperlinkStart === ItemType || para_Math === ItemType)
-			break;
-
-		CurPos++;
-	}
-
-	// 2. Ищем ближайший слева (текcт, пробел, картинку, нумерацию и т.д.)
-	//    Смещаемся к концу ближайшего левого элемента, чтобы продолжался набор с
-	//    настройками левого ближайшего элемента.
-	while (CurPos > 0)
-	{
-		CurPos--;
-		var Item     = this.Content[CurPos];
-		var ItemType = Item.Type;
-		var bEnd     = false;
-
-		if (para_Text === ItemType || para_Space === ItemType || para_End === ItemType || para_Tab === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_NewLine === ItemType || para_Math === ItemType)
-		{
-			this.CurPos.ContentPos = CurPos + 1;
-			bEnd                   = true;
-		}
-		else if (para_HyperlinkEnd === ItemType)
-		{
-			while (CurPos < Count - 1 && para_TextPr === this.Content[CurPos + 1].Type)
-				CurPos++;
-
-			this.CurPos.ContentPos = CurPos + 1;
-			bEnd                   = true;
-		}
-
-		if (true === bEnd)
-		{
-			TempPos = CurPos;
-			while (TempPos >= 0 && TempPos < Count && undefined === this.Content[TempPos].CurLine)
-				TempPos--;
-
-			var NewLine = ( TempPos >= 0 && TempPos < Count ? this.Content[TempPos].CurLine : -1 );
-
-			if (NewLine != CurLine && -1 != CurLine)
-				this.CurPos.Line = CurLine;
-
-			return;
-		}
-	}
-
-	// 3. Если мы попали в начало параграфа, тогда пропускаем все TextPr
-	if (CurPos <= 0)
-	{
-		CurPos = 0;
-		while (para_TextPr === this.Content[CurPos].Type || para_CollaborativeChangesEnd === this.Content[CurPos].Type || para_CollaborativeChangesStart === this.Content[CurPos].Type)
-			CurPos++;
-
-		this.CurPos.ContentPos = CurPos;
-	}
 };
 Paragraph.prototype.GetCurPosXY = function()
 {
@@ -9233,6 +9152,14 @@ Paragraph.prototype.Document_Get_AllFontNames = function(AllFonts)
 {
 	// Смотрим на знак конца параграфа
 	this.TextPr.Value.Document_Get_AllFontNames(AllFonts);
+	if(this.Pr.Bullet)
+	{
+		this.Pr.Bullet.Get_AllFontNames(AllFonts);
+	}
+	if(this.Pr.DefaultRunPr)
+	{
+        this.Pr.DefaultRunPr.Document_Get_AllFontNames(AllFonts);
+	}
 
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)

@@ -238,6 +238,12 @@ window["asc_initAdvancedOptions"] = function(_code)
 	_editor._onNeedParams(undefined, (_code == 90 || _code == 91) ? true : undefined);
 };
 
+window["DesktopOfflineAppDocumentSignatures"] = function(_json)
+{
+	var _signatures = JSON.parse(_json);
+	console.log(_signatures);
+};
+
 // меняем среду
 //AscBrowser.isSafari = false;
 //AscBrowser.isSafariMacOs = false;

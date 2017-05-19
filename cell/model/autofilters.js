@@ -5062,7 +5062,49 @@
 				
 				return result;
 			},
-			
+
+			bIsExcludeHiddenRows: function(range, activeCell)
+			{
+				var worksheet = this.worksheet;
+				var result = false;
+
+				//если есть общий фильтр со скрытыми строками, чтобы мы не удаляли на странице, данные в скрытых строках не трогаем
+				if(worksheet.AutoFilter && worksheet.AutoFilter.isApplyAutoFilter())
+				{
+					result = true;
+				}
+				else if(this._getTableIntersectionWithActiveCell(activeCell, true))//если activeCell лежит внутри таблицы c примененным фильтром
+				{
+					result = true;
+				}
+
+				return result;
+			},
+
+			_getTableIntersectionWithActiveCell: function(activeCell, checkApplyFiltering)
+			{
+				var result = false;
+
+				var worksheet = this.worksheet;
+				if(worksheet.TableParts && worksheet.TableParts.length > 0)
+				{
+					for(var i = 0; i < worksheet.TableParts.length; i++)
+					{
+						var ref = worksheet.TableParts[i].Ref;
+						if(ref.contains(activeCell.col, activeCell.row))
+						{
+							if(checkApplyFiltering && worksheet.TableParts[i].isApplyAutoFilter())
+							{
+								result = worksheet.TableParts[i];
+								break;
+							}
+						}
+					}
+				}
+
+				return result;
+			},
+
 			_isPartAutoFilterUnderRange: function(range)
 			{
 				var worksheet = this.worksheet;

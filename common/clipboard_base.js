@@ -991,7 +991,7 @@
 		SpecialPasteButton_Show : function(props)
 		{
 			//при быстром совместном редактировании отключаем возможность специальной вставки
-			if(AscCommon.CollaborativeEditing && AscCommon.CollaborativeEditing.m_bFast)
+			if(this.CheckFastCoEditing())
 			{
 				return;
 			}
@@ -1014,7 +1014,7 @@
 		SpecialPasteButtonById_Show: function()
 		{
 			//при быстром совместном редактировании отключаем возможность специальной вставки
-			if(AscCommon.CollaborativeEditing && AscCommon.CollaborativeEditing.m_bFast)
+			if(this.CheckFastCoEditing())
 			{
 				return;
 			}
@@ -1095,6 +1095,31 @@
 				
 				this.Api.asc_ShowSpecialPasteButton(specialPasteShowOptions);
 			}
+		},
+
+		CheckFastCoEditing: function()
+		{
+			var res = false;
+
+			var bFast = false;
+			var bIsSingleUser = false;
+			if(this.Api.collaborativeEditing)
+			{
+				bFast = this.Api.collaborativeEditing.m_bFast;
+				bIsSingleUser = !this.Api.collaborativeEditing.getCollaborativeEditing();
+			}
+			else
+			{
+				bFast = AscCommon.CollaborativeEditing.m_bFast;
+				bIsSingleUser = AscCommon.CollaborativeEditing.Is_SingleUser();
+			}
+
+			if(bFast && !bIsSingleUser)
+			{
+				res = true;
+			}
+
+			return res;
 		}
 	};
 

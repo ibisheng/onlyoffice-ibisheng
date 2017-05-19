@@ -3500,6 +3500,20 @@ background-repeat: no-repeat;\
 			this.WordControl.m_oLogicDocument.SetParagraphIndent({Left : value, ChangeLevel : levelValue});
 		}
 	};
+
+    asc_docs_api.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail) {
+        if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
+        {
+            this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertSignatureLine);
+
+            var oSignature = AscFormat.fCreateSignatureShape(sGuid, sSigner, sSigner2, sEmail, true, null);
+            var Drawing   = new ParaDrawing(oSignature.spPr.xfrm.extX, oSignature.spPr.xfrm.extY, null, this.WordControl.m_oDrawingDocument, null, null);
+            oSignature.setParent(Drawing);
+            Drawing.Set_GraphicObject(oSignature);
+            this.WordControl.m_oLogicDocument.AddSignatureLine(Drawing);
+        }
+    };
+
 	asc_docs_api.prototype.IncreaseIndent         = function()
 	{
 		this.WordControl.m_oLogicDocument.IncreaseIndent();
@@ -6412,6 +6426,15 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.AddTextArt = function(nStyle)
+	{
+		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		{
+			History.Create_NewPoint(AscDFH.historydescription_Document_AddTextArt);
+			this.WordControl.m_oLogicDocument.AddTextArt(nStyle);
+		}
+	};
+
 
 	asc_docs_api.prototype.sync_StartAddShapeCallback = function(value)
 	{
@@ -8202,6 +8225,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_SetSilentMode"]                         = asc_docs_api.prototype.asc_SetSilentMode;
 	asc_docs_api.prototype["asc_addOleObject"]                          = asc_docs_api.prototype.asc_addOleObject;
 	asc_docs_api.prototype["asc_editOleObject"]                         = asc_docs_api.prototype.asc_editOleObject;
+	asc_docs_api.prototype["asc_addSignatureLine"]                      = asc_docs_api.prototype.asc_addSignatureLine;
 	asc_docs_api.prototype["asc_startEditCurrentOleObject"]             = asc_docs_api.prototype.asc_startEditCurrentOleObject;
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]             = asc_docs_api.prototype.asc_InputClearKeyboardElement;
 

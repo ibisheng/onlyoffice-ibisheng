@@ -105,6 +105,7 @@ var para_FootnoteRef               = 0x0040; // Номер сноски (дол�
 var para_Separator                 = 0x0041; // Разделить, который используется для сносок
 var para_ContinuationSeparator     = 0x0042; // Большой разделитель, который используется для сносок
 var para_PageCount                 = 0x0043; // Количество страниц
+var para_InlineLevelSdt            = 0x0044; // Внутристроковый контейнер
 
 var break_Line   = 0x01;
 var break_Page   = 0x02;
@@ -1986,9 +1987,10 @@ function ParagraphContent_Read_FromBinary(Reader)
 	var Element = null;
 	switch (ElementType)
 	{
-		case para_TextPr                :
-		case para_Drawing               :
-		case para_HyperlinkStart        :
+		case para_TextPr:
+		case para_Drawing:
+		case para_HyperlinkStart:
+		case para_InlineLevelSdt:
 		{
 			var ElementId = Reader.GetString2();
 			Element       = g_oTableId.Get_ById(ElementId);

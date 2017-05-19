@@ -478,6 +478,7 @@
 	cINDEX.prototype.constructor = cINDEX;
 	cINDEX.prototype.argumentsMin = 2;
 	cINDEX.prototype.argumentsMax = 4;
+	cINDEX.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cINDEX.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] && (cElementType.empty !== arg[1].type) ? arg[1] :
 			new cNumber(1), arg2 = arg[2] && (cElementType.empty !== arg[2].type) ? arg[2] :

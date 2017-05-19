@@ -5634,13 +5634,17 @@
 			}
 		}
 	};
-	Range.prototype._foreachRowNoEmpty=function(actionRow, actionCell){
+	Range.prototype._foreachRowNoEmpty=function(actionRow, actionCell, excludeHiddenRows){
 		var oBBox = this.bbox;
 		if(0 == oBBox.r1 && gc_nMaxRow0 == oBBox.r2)
 		{
 			var aRows = this.worksheet._getRows();
 			for(var i in aRows)
 			{
+				if (excludeHiddenRows && this.worksheet.getRowHidden(i)) {
+					continue;
+				}
+
 				var row = aRows[i];
 				if( null != actionRow )
 				{
@@ -5664,6 +5668,10 @@
 		{
 			var minR = Math.min(oBBox.r2,this.worksheet.getRowsCount());
 			for(var i = oBBox.r1; i <= minR; i++){
+				if (excludeHiddenRows && this.worksheet.getRowHidden(i)) {
+					continue;
+				}
+
 				var row = this.worksheet._getRowNoEmpty(i);
 				if(row)
 				{
@@ -5873,17 +5881,17 @@
 			// this._foreachCol(actionCol, null);
 		}
 	};
-	Range.prototype._setPropertyNoEmpty=function(actionRow, actionCol, actionCell){
+	Range.prototype._setPropertyNoEmpty=function(actionRow, actionCol, actionCell, excludeHiddenRows){
 		var nRangeType = this._getRangeType();
 		if(c_oRangeType.Range == nRangeType)
-			return this._foreachNoEmpty(actionCell);
+			return this._foreachNoEmpty(actionCell, excludeHiddenRows);
 		else if(c_oRangeType.Row == nRangeType)
-			return this._foreachRowNoEmpty(actionRow, actionCell);
+			return this._foreachRowNoEmpty(actionRow, actionCell, excludeHiddenRows);
 		else if(c_oRangeType.Col == nRangeType)
 			return this._foreachColNoEmpty(actionCol, actionCell);
 		else
 		{
-			var oRes = this._foreachRowNoEmpty(actionRow, actionCell);
+			var oRes = this._foreachRowNoEmpty(actionRow, actionCell, excludeHiddenRows);
 			if(null != oRes)
 				return oRes;
 			if(null != actionCol)
@@ -7826,7 +7834,7 @@
 			cell.cleanCache();
 		});
 	};
-	Range.prototype.cleanFormat=function(){
+	Range.prototype.cleanFormat=function(excludeHiddenRows){
 		History.Create_NewPoint();
 		History.StartTransaction();
 		this.unmerge();
@@ -7842,10 +7850,10 @@
 			cell.setStyle(null);
 			// if(cell.isEmpty())
 			// cell.Remove();
-		});
+		}, excludeHiddenRows);
 		History.EndTransaction();
 	};
-	Range.prototype.cleanText=function(){
+	Range.prototype.cleanText=function(excludeHiddenRows){
 		History.Create_NewPoint();
 		History.StartTransaction();
 		this._setPropertyNoEmpty(null, null,
@@ -7853,10 +7861,10 @@
 									 cell.setValue("");
 									 // if(cell.isEmpty())
 									 // cell.Remove();
-								 });
+								 }, excludeHiddenRows);
 		History.EndTransaction();
 	};
-	Range.prototype.cleanAll=function(){
+	Range.prototype.cleanAll=function(excludeHiddenRows){
 		History.Create_NewPoint();
 		History.StartTransaction();
 		this.unmerge();
@@ -7875,7 +7883,7 @@
 			// col.Remove();
 		},function(cell, nRow0, nCol0, nRowStart, nColStart){
 			oThis.worksheet._removeCell(nRow0, nCol0);
-		});
+		}, excludeHiddenRows);
 
 		this.worksheet.workbook.dependencyFormulas.calcTree();
 		History.EndTransaction();

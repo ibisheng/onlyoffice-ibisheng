@@ -1385,6 +1385,41 @@ CGraphicObjects.prototype =
         }
     },
 
+    addSignatureLine: function(oSignatureDrawing)
+    {
+        var content = this.getTargetDocContent();
+        if(content)
+        {
+            if(!content.bPresentation){
+                content.AddSignatureLine(oSignatureDrawing);
+            }
+            else{
+                if(this.selectedObjects.length > 0)
+                {
+                    this.resetSelection2();
+                    this.document.AddSignatureLine(oSignatureDrawing);
+                }
+            }
+        }
+        else
+        {
+            if(this.selectedObjects[0] && this.selectedObjects[0].parent && this.selectedObjects[0].parent.Is_Inline())
+            {
+                this.resetInternalSelection();
+                this.document.Remove(1, true);
+                this.document.AddSignatureLine(oSignatureDrawing);
+            }
+            else
+            {
+                if(this.selectedObjects.length > 0)
+                {
+                    this.resetSelection2();
+                    this.document.AddSignatureLine(oSignatureDrawing);
+                }
+            }
+        }
+    },
+
     addOleObject: function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
     {
         var content = this.getTargetDocContent();

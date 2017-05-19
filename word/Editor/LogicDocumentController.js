@@ -50,6 +50,12 @@ CLogicDocumentController.prototype.EditChart = function(Chart)
 {
 	// Ничего не делаем
 };
+CLogicDocumentController.prototype.AddSignatureLine = function(oSignatureDrawing)
+{
+    this.LogicDocument.controller_AddSignatureLine(oSignatureDrawing);
+};
+
+
 CLogicDocumentController.prototype.AddInlineTable = function(nCols, nRows)
 {
 	this.LogicDocument.controller_AddInlineTable(nCols, nRows);

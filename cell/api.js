@@ -249,7 +249,27 @@ var editor;
     }
     return AscCommonExcel.getCurrencyFormat(cultureInfo, 2, true, true);
   };
-  spreadsheet_api.prototype.asc_setLocale = function(val) {
+
+
+  spreadsheet_api.prototype.asc_getCurrentListType = function(){
+      var ws = this.wb.getWorksheet();
+      var oParaPr;
+      if (ws && ws.objectRender && ws.objectRender.controller) {
+          oParaPr = ws.objectRender.controller.getParagraphParaPr();
+      }
+      return new AscCommon.asc_CListType(AscFormat.fGetListTypeFromBullet(oParaPr && oParaPr.Bullet));
+  };
+
+    spreadsheet_api.prototype.asc_setListType = function(type, subtype){
+        var ws = this.wb.getWorksheet();
+        var oParaPr;
+        if (ws && ws.objectRender && ws.objectRender.controller) {
+            ws.objectRender.setListType(type, subtype);
+        }
+    };
+
+
+    spreadsheet_api.prototype.asc_setLocale = function(val) {
     if (!this.isLoadFullApi) {
       this.tmpLocale = val;
       return;
@@ -2740,6 +2760,26 @@ var editor;
 		this._isLockedSparkline(id, changeSparkline);
 	};
 
+    spreadsheet_api.prototype.asc_setListType = function (type, subtype) {
+      var t = this;
+      if(type === 0){
+          var t = this, fonts = {};
+          fonts["Wingdings"] = 1;
+          t._loadFonts(fonts, function() {t.asc_setListType2(type, subtype);});
+      }
+      else{
+          t.asc_setListType2(type, subtype);
+      }
+    };
+    spreadsheet_api.prototype.asc_setListType2 = function (type, subtype) {
+        var oWorksheet = this.wb.getWorksheet();
+        if(oWorksheet){
+            if(oWorksheet.isSelectOnShape){
+                return oWorksheet.objectRender.setListType(type, subtype);
+            }
+        }
+    };
+
   // Cell interface
   spreadsheet_api.prototype.asc_getCellInfo = function() {
     return this.wb.getSelectionInfo();
@@ -3672,6 +3712,8 @@ var editor;
   prot["asc_setFontRenderingMode"] = prot.asc_setFontRenderingMode;
   prot["asc_setSelectionDialogMode"] = prot.asc_setSelectionDialogMode;
   prot["asc_ChangeColorScheme"] = prot.asc_ChangeColorScheme;
+  prot["asc_setListType"] = prot.asc_setListType;
+  prot["asc_getCurrentListType"] = prot.asc_getCurrentListType;
   /////////////////////////////////////////////////////////////////////////
   ///////////////////CoAuthoring and Chat api//////////////////////////////
   /////////////////////////////////////////////////////////////////////////

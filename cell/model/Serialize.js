@@ -4944,10 +4944,13 @@
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadBorders(t, l, oStyleObject.aBorders);
                 });
+                oStyleObject.aBorders[0] = new AscCommonExcel.Border();
             } else if (c_oSerStylesTypes.Fills === type) {
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadFills(t, l, oStyleObject.aFills);
                 });
+                oStyleObject.aFills[0] = new AscCommonExcel.Fill();
+                oStyleObject.aFills[1] = new AscCommonExcel.Fill();
             } else if (c_oSerStylesTypes.Fonts === type) {
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadFonts(t, l, oStyleObject.aFonts);

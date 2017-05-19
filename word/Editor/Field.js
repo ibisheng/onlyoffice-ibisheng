@@ -240,7 +240,7 @@ ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
 		X1        : X1,
 		Y0        : Y0,
 		Y1        : Y1,
-		PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()
+		PageIndex : PRSA.Paragraph.Get_AbsolutePage(_CurPage)
 	};
 };
 ParaField.prototype.Draw_HighLights = function(PDSH)
@@ -618,7 +618,11 @@ ParaField.prototype.Read_FromBinary2 = function(Reader)
     if (editor)
         editor.WordControl.m_oLogicDocument.Register_Field(this);
 };
-
+//----------------------------------------------------------------------------------------------------------------------
+ParaField.prototype.IsStopCursorOnEntryExit = function()
+{
+	return true;
+};
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].ParaField = ParaField;

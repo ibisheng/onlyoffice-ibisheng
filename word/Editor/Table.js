@@ -5295,6 +5295,12 @@ CTable.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 	this.Selection.Type = table_Selection_Text;
 	this.CurCell.Content.AddInlineImage(W, H, Img, Chart, bFlow);
 };
+CTable.prototype.AddSignatureLine = function(oSignatureDrawing)
+{
+	this.Selection.Use  = true;
+	this.Selection.Type = table_Selection_Text;
+	this.CurCell.Content.AddSignatureLine(oSignatureDrawing);
+};
 CTable.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 	this.Selection.Use  = true;

@@ -685,9 +685,34 @@ function SetXfrmFromMetrics(oDrawing, metrics)
     AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetParent]               = function(oClass, value){oClass.parent = value;};
     AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetGroup]                = function(oClass, value){oClass.group = value;};
     AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetWordShape]            = function(oClass, value){oClass.bWordShape = value;};
+    AscDFH.drawingsChangesMap[AscDFH.historyitem_ShapeSetSignature]            = function(oClass, value){oClass.signatureLine = value;};
 
+
+    function CSignatureLine(){
+        this.id = null;
+        this.signer = null;
+        this.signer2 = null;
+        this.email = null;
+    }
+
+    CSignatureLine.prototype.Write_ToBinary = function(writer){
+        AscFormat.writeString(writer, this.id);
+        AscFormat.writeString(writer, this.signer);
+        AscFormat.writeString(writer, this.signer2);
+        AscFormat.writeString(writer, this.email);
+    };
+    CSignatureLine.prototype.Read_FromBinary = function(reader){
+        this.id =  AscFormat.readString(reader);
+        this.signer = AscFormat.readString(reader);
+        this.signer2 =  AscFormat.readString(reader);
+        this.email =  AscFormat.readString(reader);
+    };
 
     AscDFH.drawingsConstructorsMap[AscDFH.historyitem_ShapeSetBodyPr] = AscFormat.CBodyPr;
+    AscDFH.drawingsConstructorsMap[AscDFH.historyitem_ShapeSetSignature] = CSignatureLine;
+
+
+
 
 function CShape()
 {
@@ -700,6 +725,8 @@ function CShape()
     this.drawingBase    = null;//DrawingBase в Excell'е
     this.bWordShape     = null;//если этот флаг стоит в true то автофигура имеет формат как в редакторе документов
     this.bCheckAutoFitFlag = false;
+    this.signatureLine = null;
+
 
     this.transformText = new CMatrix();
     this.invertTransformText = null;
@@ -732,6 +759,11 @@ CShape.prototype.GetAllDrawingObjects = function(DrawingObjects)
     {
         oContent.GetAllDrawingObjects(DrawingObjects);
     }
+};
+CShape.prototype.setSignature = function(oSignature)
+{
+    History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_ShapeSetSignature, this.signatureLine, oSignature));
+    this.signatureLine = oSignature;
 };
 
 CShape.prototype.convertToWord = function (document) {
@@ -2495,6 +2527,12 @@ CShape.prototype.recalculateTextStyles = function (level) {
 };
 
 CShape.prototype.recalculateBrush = function () {
+
+    if(this.signatureLine){
+        this.brush = AscFormat.CreateBlipFillUniFillFromUrl("");
+        return;
+    }
+
     var compiled_style = this.getCompiledStyle();
     var RGBA = {R: 0, G: 0, B: 0, A: 255};
     var parents = this.getParentObjects();
@@ -3613,6 +3651,30 @@ CShape.prototype.getNumByCardDirection = function (cardDirection) {
     return (north_number - cardDirection + 8) % 8;
 };
 
+
+CShape.prototype.getHandlePosByIndex = function(numHandle){
+    var t = this.transform;
+    switch (numHandle){
+        case 0:
+            return { x: t.TransformPointX(0, 0), y: t.TransformPointY(0, 0) };
+        case 1:
+            return { x: t.TransformPointX(this.extX/2.0, 0), y: t.TransformPointY(this.extX/2.0, 0) };
+        case 2:
+            return { x: t.TransformPointX(this.extX, 0), y: t.TransformPointY(this.extX, 0) };
+        case 3:
+            return { x: t.TransformPointX(this.extX, this.extY/2.0), y: t.TransformPointY(this.extX, this.extY/2.0) };
+        case 4:
+            return { x: t.TransformPointX(this.extX, this.extY), y: t.TransformPointY(this.extX, this.extY) };
+        case 5:
+            return { x: t.TransformPointX(this.extX/2.0, this.extY), y: t.TransformPointY(this.extX/2.0, this.extY) };
+        case 6:
+            return { x: t.TransformPointX(0, this.extY), y: t.TransformPointY(0, this.extY) };
+        case 7:
+            return { x: t.TransformPointX(0, this.extY/2.0), y: t.TransformPointY(0, 0) };
+        default:
+    }
+};
+
 CShape.prototype.getResizeCoefficients = function (numHandle, x, y) {
     var cx, cy;
     cx = this.extX > 0 ? this.extX : 0.01;
@@ -4016,6 +4078,14 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             || bounds.x + bounds.w < rect.x
             || bounds.y + bounds.h < rect.y)
             return;
+    }
+
+    if(this.signatureLine){
+        var sSignatureUrl = "";
+        if(typeof editor !== "undefined" && editor){
+            sSignatureUrl = editor.asc_getSignatureImage(this.signatureLine.id);
+        }
+        this.brush = AscFormat.CreateBlipFillUniFillFromUrl(sSignatureUrl);
     }
     var _transform = transform ? transform : this.transform;
     var _transform_text = transformText ? transformText : this.transformText;
@@ -4921,8 +4991,8 @@ CShape.prototype.createRotateTrack = function () {
     return new AscFormat.RotateTrackShapeImage(this);
 };
 
-CShape.prototype.createResizeTrack = function (cardDirection) {
-    return new AscFormat.ResizeTrackShapeImage(this, cardDirection);
+CShape.prototype.createResizeTrack = function (cardDirection, oController) {
+    return new AscFormat.ResizeTrackShapeImage(this, cardDirection, oController);
 };
 
 CShape.prototype.createMoveTrack = function () {
@@ -5551,4 +5621,5 @@ function getParaDrawing(oDrawing)
     window['AscFormat'].getParaDrawing = getParaDrawing;
     window['AscFormat'].ConvertGraphicFrameToWordTable = ConvertGraphicFrameToWordTable;
     window['AscFormat'].ConvertTableToGraphicFrame = ConvertTableToGraphicFrame;
+    window['AscFormat'].CSignatureLine = CSignatureLine;
 })(window);

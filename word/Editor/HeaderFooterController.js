@@ -44,6 +44,10 @@ CHdrFtrController.prototype.AddNewParagraph = function(bRecalculate, bForceAdd)
 {
 	return this.HdrFtr.AddNewParagraph(bRecalculate, bForceAdd);
 };
+CHdrFtrController.prototype.AddSignatureLine = function(oSignatureDrawing)
+{
+	this.HdrFtr.AddSignatureLine(oSignatureDrawing);
+};
 CHdrFtrController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
 	this.HdrFtr.AddInlineImage(nW, nH, oImage, oChart, bFlow);

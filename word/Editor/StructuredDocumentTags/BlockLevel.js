@@ -361,6 +361,10 @@ CBlockLevelSdt.prototype.AddInlineImage = function(W, H, Img, Chart, bFlow)
 {
 	this.Content.AddInlineImage(W, H, Img, Chart, bFlow);
 };
+CBlockLevelSdt.prototype.AddSignatureLine = function(oSignatureDrawing)
+{
+	this.Content.AddSignatureLine(oSignatureDrawing);
+};
 CBlockLevelSdt.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 	this.Content.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
@@ -850,6 +854,11 @@ CBlockLevelSdt.prototype.GetDocumentPositionFromObject = function(PosArray)
 CBlockLevelSdt.prototype.GetMargins = function()
 {
 	return this.Parent.GetMargins();
+};
+CBlockLevelSdt.prototype.SelectContentControl = function()
+{
+	this.SelectAll(1);
+	this.Set_CurrentElement(false, 0, this.Content);
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.SetPr = function(oPr)

@@ -155,16 +155,9 @@
                             if(_end.bounds.t < _begin.y){
                                 if(_end.y <= _begin.y){
                                     sPreset = "4";
-                                    rot = 3.0*Math.PI/2.0;
-                                    tmp = extX;
-                                    extX = extY;
-                                    extY = tmp;
-                                    posX = (_end.x + _begin.x)/2.0 - extX/2.0;
-                                    posY = (_end.y + _begin.y)/2.0 - extY/2.0;
-                                    flipH = true;
                                     flipV = true;
-                                    oMapAdj["adj2"] = 100000 - (100000*(((_begin.bounds.r + _end.bounds.l)/2 - (xc - extY/2))/extY) + 0.5) >> 0;
-                                    oMapAdj["adj1"] = (-100000*(  ( _end.y - (_end.bounds.t - CONNECTOR_MARGIN) )/extX) + 0.5) >> 0;
+                                    oMapAdj["adj1"] = (100000*(((_begin.bounds.r + _end.bounds.l)/2  - _begin.x)/extX) + 0.5) >> 0;
+                                    oMapAdj["adj2"] = (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
                                 }
                                 else{
                                     sPreset = "4";
@@ -174,70 +167,53 @@
                             }
                             else{
                                 sPreset = "2";
-                                rot = 3.0*Math.PI/2.0;
-                                tmp = extX;
-                                extX = extY;
-                                extY = tmp;
-                                posX = (_end.x + _begin.x)/2.0 - extX/2.0;
-                                posY = (_end.y + _begin.y)/2.0 - extY/2.0;
-                                flipV = true;
                             }
                         }
                         else{
-                            if(_end.bounds.t <= _begin.bounds.b){
-                                if(_end.y <= _begin.y){
-
-                                    if(_end.x <= _begin.x){
-                                        sPreset = "4";
-                                        rot = 3.0*Math.PI/2.0;
-                                        tmp = extX;
-                                        extX = extY;
-                                        extY = tmp;
-                                        posX = (_end.x + _begin.x)/2.0 - extX/2.0;
-                                        posY = (_end.y + _begin.y)/2.0 - extY/2.0;
-                                        flipH = true;
-                                        oMapAdj["adj1"] = -((100000*((yc - extX/2 - (Math.min(_end.bounds.t, _begin.bounds.t) - CONNECTOR_MARGIN))/extX) + 0.5) >> 0);
-                                        oMapAdj["adj2"] = 100000 + (100000*(Math.max(CONNECTOR_MARGIN, _end.bounds.r + CONNECTOR_MARGIN - _begin.x)/extY) + 0.5) >> 0;
-                                    }
-                                    else{
-
-                                        sPreset = "4";
-                                        flipV = true;
-                                        oMapAdj["adj1"] = 100000 + (100000*((Math.max(_end.bounds.r, _begin.bounds.r) + CONNECTOR_MARGIN - _end.x)/extX) + 0.5) >> 0;
-                                        oMapAdj["adj2"] = 100000 +(100000*(_end.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
-                                    }
-                                }
-                                else{
-
-                                    if(_end.x <= _begin.x){
-                                        sPreset = "4";
-                                        rot = Math.PI/2.0;
-                                        tmp = extX;
-                                        extX = extY;
-                                        extY = tmp;
-                                        posX = (_end.x + _begin.x)/2.0 - extX/2.0;
-                                        posY = (_end.y + _begin.y)/2.0 - extY/2.0;
-                                        flipH = true;
-                                        flipV = true;
-                                        oMapAdj["adj1"] = 100000 + ((100000*((yc - extX/2 - (Math.min(_end.bounds.t, _begin.bounds.t) - CONNECTOR_MARGIN))/extX) + 0.5) >> 0);
-                                        oMapAdj["adj2"] = 100000 + (100000*(Math.max(CONNECTOR_MARGIN, _end.bounds.r + CONNECTOR_MARGIN - _begin.x)/extY) + 0.5) >> 0;
-                                    }
-                                    else{
-                                        sPreset = "2";
-                                    }
-                                }
+                            if(_end.bounds.t > _begin.bounds.b){
+                                sPreset = "4";
+                                flipH = true;
+                                oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                oMapAdj["adj2"] = (100000*((_end.bounds.t + _begin.bounds.b)/2.0 - _begin.y)/extY) >> 0;
 
                             }
+                            else if(_end.bounds.b < _begin.bounds.t){
+                                sPreset = "4";
+                                flipH = true;
+                                flipV = true;
+                                oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                oMapAdj["adj2"] = (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                            }
                             else{
-                                if(_end.x < _begin.x){
-                                    sPreset = "4";
-                                    flipH = true;
-                                    oMapAdj["adj1"] = -(100000*(Math.max(_end.bounds.r, _begin.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
-                                    oMapAdj["adj2"] = (100000*(((_begin.bounds.b + _end.bounds.t)/2  - _begin.y)/extY) + 0.5) >> 0;
+
+                                if(_end.y < _begin.y){
+                                    if(_end.x < _begin.x){
+                                        sPreset = "4";
+                                        flipH = true;
+                                        flipV = true;
+                                        oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                        oMapAdj["adj2"] = (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                    }
+                                    else {
+                                        sPreset = "4";
+                                        flipV = true;
+                                        oMapAdj["adj1"] =  (100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
+                                        oMapAdj["adj2"] =  (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                    }
                                 }
                                 else{
-                                    sPreset = "2";
+
                                 }
+
+                                //if(_end.x < _begin.x){
+                                //    sPreset = "4";
+                                //    flipH = true;
+                                //    oMapAdj["adj1"] = -(100000*(Math.max(_end.bounds.r, _begin.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
+                                //    oMapAdj["adj2"] = (100000*(((_begin.bounds.b + _end.bounds.t)/2  - _begin.y)/extY) + 0.5) >> 0;
+                                //}
+                                //else{
+                                //    sPreset = "2";
+                                //}
                             }
                         }
                         break;
@@ -348,30 +324,38 @@
                             flipV = _begin.y > _end.y;
                         }
                         else{
+
                             sPreset = "5";
-                            rot = Math.PI;
-                            flipH = true;
-                            oMapAdj["adj3"] = (100000 + 100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0;
-                            var leftX =_end.x - _end.bounds.l + CONNECTOR_MARGIN;
-                            oMapAdj["adj1"] = (-100000*(leftX/extX) + 0.5) >> 0;
-                            if(_end.bounds.b < _begin.bounds.t || _end.bounds.t > _begin.bounds.b){
-                                if(_end.bounds.b < _begin.bounds.t){
-                                    flipV = true;
-                                    oMapAdj["adj2"] = (100000*(((_begin.bounds.t + _end.bounds.b)/2 - posY)/extY) + 0.5) >> 0;
-                                }
-                                else{
-                                    oMapAdj["adj2"] = 100000 - (100000*(((_end.bounds.t + _begin.bounds.b)/2 - posY)/extY) + 0.5) >> 0;
-                                }
+                            if(_end.bounds.t > _begin.bounds.b){
+
+                                flipH = true;
+                                oMapAdj["adj1"] =  -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                oMapAdj["adj2"] =   (100000*((_end.bounds.t + _begin.bounds.b)/2.0 - _begin.y)/extY + 0.5) >> 0;
+                                oMapAdj["adj3"] =   (100000*(_begin.x - (_end.bounds.l - CONNECTOR_MARGIN))/extX + 0.5) >> 0;
+                            }
+                            else if(_end.bounds.b < _begin.bounds.t){
+                                flipH = true;
+                                flipV = true;
+                                oMapAdj["adj1"] =  -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                oMapAdj["adj2"] =  (100000*(_begin.y - (_end.bounds.b + _begin.bounds.t)/2.0)/extY + 0.5) >> 0;
+                                oMapAdj["adj3"] =   (100000*(_begin.x - (_end.bounds.l - CONNECTOR_MARGIN))/extX + 0.5) >> 0;
                             }
                             else{
-                                if(_end.y < _begin.y){
-                                    flipV = true;
-                                    oMapAdj["adj2"] = (100000*((Math.max(_begin.bounds.b, _end.bounds.b) + CONNECTOR_MARGIN - posY)/extY) + 0.5) >> 0;
+                                if(_end.y > _begin.y){
+                                    flipH = true;
+                                    oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                    oMapAdj["adj2"] =  (100000*(Math.max(_begin.bounds.b, _end.bounds.b) + CONNECTOR_MARGIN - _begin.y)/extY + 0.5) >> 0;
+                                    oMapAdj["adj3"] =  (100000*(_begin.x - (_end.bounds.l - CONNECTOR_MARGIN))/extX + 0.5) >> 0;
                                 }
                                 else{
-                                    oMapAdj["adj2"] = 100000 - (100000*((Math.min(_begin.bounds.t, _end.bounds.t) - CONNECTOR_MARGIN - posY)/extY) + 0.5) >> 0;
+                                    flipH = true;
+                                    flipV = true;
+                                    oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                    oMapAdj["adj2"] =  (100000*(_begin.y - (Math.min(_begin.bounds.t, _end.bounds.t) - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                    oMapAdj["adj3"] =  (100000*(_begin.x - (_end.bounds.l - CONNECTOR_MARGIN))/extX + 0.5) >> 0;
                                 }
                             }
+
                         }
                         break;
                     }
@@ -379,8 +363,8 @@
                         if(_end.bounds.l > _begin.bounds.r){
                             if(_end.bounds.b < _begin.y ){
                                 sPreset = "3";
-                                flipH = true;
-                                oMapAdj["adj1"] = -(100000*(CONNECTOR_MARGIN/extX) + 0.5) >> 0;
+                                flipV = true;
+                                oMapAdj["adj1"] = (100000*(_end.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX) >> 0;
                             }
                             else if(_end.bounds.t > _begin.y){
                                 sPreset = "3";

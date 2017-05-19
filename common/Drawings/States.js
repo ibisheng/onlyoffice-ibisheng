@@ -79,7 +79,7 @@ StartAddNewShape.prototype =
                 slide = oParentObjects.slide;
             }
         }
-        this.drawingObjects.arrPreTrackObjects.push(new AscFormat.NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), master, layout, slide, 0));
+        this.drawingObjects.arrPreTrackObjects.push(new AscFormat.NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), master, layout, slide, 0, this.drawingObjects));
         this.bStart = true;
         this.drawingObjects.swapTrackObjects();
     },
@@ -781,7 +781,7 @@ ResizeState.prototype =
         }
         var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
         var resize_coef = this.majorObject.getResizeCoefficients(this.handleNum, coords.x, coords.y);
-        this.drawingObjects.trackResizeObjects(resize_coef.kd1, resize_coef.kd2, e);
+        this.drawingObjects.trackResizeObjects(resize_coef.kd1, resize_coef.kd2, e, x, y);
         this.drawingObjects.updateOverlay();
     },
 
