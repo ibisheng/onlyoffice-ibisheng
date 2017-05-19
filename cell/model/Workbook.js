@@ -5516,11 +5516,11 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			var aRows = this.worksheet._getRows();
 			for(var i in aRows)
 			{
-				if (excludeHiddenRows && this.worksheet.getRowHidden(i)) {
+				var row = aRows[i];
+				if (excludeHiddenRows && row.getHidden())
+				{
 					continue;
 				}
-
-				var row = aRows[i];
 				if( null != actionRow )
 				{
 					var oRes = actionRow(row);
@@ -5543,13 +5543,14 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		{
 			var minR = Math.min(oBBox.r2,this.worksheet.getRowsCount());
 			for(var i = oBBox.r1; i <= minR; i++){
-				if (excludeHiddenRows && this.worksheet.getRowHidden(i)) {
-					continue;
-				}
-
 				var row = this.worksheet._getRowNoEmpty(i);
 				if(row)
 				{
+					if (excludeHiddenRows && row.getHidden())
+					{
+						continue;
+					}
+
 					if( null != actionRow )
 					{
 						var oRes = actionRow(row);

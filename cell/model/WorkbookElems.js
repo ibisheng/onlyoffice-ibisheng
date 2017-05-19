@@ -2977,6 +2977,11 @@ Row.prototype =
         var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
             History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+	},
+
+	getHidden: function()
+	{
+		return 0 != (AscCommonExcel.g_nRowFlag_hd & this.flags);
 	}
 };
 var g_oCCellValueMultiTextProperties = {
