@@ -2332,6 +2332,7 @@
 		this.aComments = [];
 		this.aCommentsCoords = [];
 		var oThis = this;
+		this.bExcludeHiddenRows = false;
 		this.mergeManager = new RangeDataManager(function(data, from, to){
 			if(History.Is_On() && (null != from || null != to))
 			{
@@ -4679,6 +4680,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		}
 		
 	};
+	Woorksheet.prototype.excludeHiddenRows = function (bExclude) {
+		this.bExcludeHiddenRows = bExclude;
+	};
 //-------------------------------------------------------------------------------------------------
 	/**
 	 * @constructor
@@ -5449,6 +5453,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		{
 			var oBBox = this.bbox;
 			for(var i = oBBox.r1; i <= oBBox.r2; i++){
+				if (this.worksheet.bExcludeHiddenRows && this.worksheet.getRowHidden(i)) {
+					continue;
+				}
 				for(var j = oBBox.c1; j <= oBBox.c2; j++){
 					var oCurCell = this.worksheet._getCell(i, j);
 					action(oCurCell, i, j, oBBox.r1, oBBox.c1);
@@ -5461,6 +5468,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		{
 			var oBBox = this.bbox, minC = Math.min( this.worksheet.getColsCount(), oBBox.c2 ), minR = Math.min( this.worksheet.getRowsCount(), oBBox.r2 );
 			for(var i = oBBox.r1; i <= minR; i++){
+				if (this.worksheet.bExcludeHiddenRows && this.worksheet.getRowHidden(i)) {
+					continue;
+				}
 				for(var j = oBBox.c1; j <= minC; j++){
 					var oCurCell = this.worksheet._getCellNoEmpty(i, j);
 					var oRes = action(oCurCell, i, j, oBBox.r1, oBBox.c1);
@@ -5475,9 +5485,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		{
 			var oBBox = this.bbox, minC = Math.min( this.worksheet.getColsCount(), oBBox.c2 ), minR = Math.min( this.worksheet.getRowsCount(), oBBox.r2 );
 			for(var i = oBBox.r1; i <= minR; i++){
-			if (excludeHiddenRows && this.worksheet.getRowHidden(i)) {
-				continue;
-			}
+				if ((this.worksheet.bExcludeHiddenRows || excludeHiddenRows) && this.worksheet.getRowHidden(i)) {
+					continue;
+				}
 				for(var j = oBBox.c1; j <= minC; j++){
 					var oCurCell = this.worksheet._getCellNoEmpty(i, j);
 					if(null != oCurCell)
@@ -5509,7 +5519,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			}
 		}
 	};
-	Range.prototype._foreachRowNoEmpty=function(actionRow, actionCell, excludeHiddenRows){
+	Range.prototype._foreachRowNoEmpty=function(actionRow, actionCell){
 		var oBBox = this.bbox;
 		if(0 == oBBox.r1 && gc_nMaxRow0 == oBBox.r2)
 		{
@@ -5517,8 +5527,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			for(var i in aRows)
 			{
 				var row = aRows[i];
-				if (excludeHiddenRows && row.getHidden())
-				{
+				if (this.worksheet.bExcludeHiddenRows && row.getHidden()) {
 					continue;
 				}
 				if( null != actionRow )
@@ -5546,8 +5555,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 				var row = this.worksheet._getRowNoEmpty(i);
 				if(row)
 				{
-					if (excludeHiddenRows && row.getHidden())
-					{
+					if (this.worksheet.bExcludeHiddenRows && row.getHidden()) {
 						continue;
 					}
 
@@ -5757,17 +5765,17 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			// this._foreachCol(actionCol, null);
 		}
 	};
-	Range.prototype._setPropertyNoEmpty=function(actionRow, actionCol, actionCell, excludeHiddenRows){
+	Range.prototype._setPropertyNoEmpty=function(actionRow, actionCol, actionCell){
 		var nRangeType = this._getRangeType();
 		if(c_oRangeType.Range == nRangeType)
-			return this._foreachNoEmpty(actionCell, excludeHiddenRows);
+			return this._foreachNoEmpty(actionCell);
 		else if(c_oRangeType.Row == nRangeType)
-			return this._foreachRowNoEmpty(actionRow, actionCell, excludeHiddenRows);
+			return this._foreachRowNoEmpty(actionRow, actionCell);
 		else if(c_oRangeType.Col == nRangeType)
 			return this._foreachColNoEmpty(actionCol, actionCell);
 		else
 		{
-			var oRes = this._foreachRowNoEmpty(actionRow, actionCell, excludeHiddenRows);
+			var oRes = this._foreachRowNoEmpty(actionRow, actionCell);
 			if(null != oRes)
 				return oRes;
 			if(null != actionCol)
@@ -7710,7 +7718,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			cell.cleanCache();
 		});
 	};
-	Range.prototype.cleanFormat=function(excludeHiddenRows){
+	Range.prototype.cleanFormat=function(){
 		History.Create_NewPoint();
 		History.StartTransaction();
 		this.unmerge();
@@ -7726,10 +7734,10 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			cell.setStyle(null);
 			// if(cell.isEmpty())
 			// cell.Remove();
-		}, excludeHiddenRows);
+		});
 		History.EndTransaction();
 	};
-	Range.prototype.cleanText=function(excludeHiddenRows){
+	Range.prototype.cleanText=function(){
 		History.Create_NewPoint();
 		History.StartTransaction();
 		this._setPropertyNoEmpty(null, null,
@@ -7737,10 +7745,10 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 									 cell.setValue("");
 									 // if(cell.isEmpty())
 									 // cell.Remove();
-								 }, excludeHiddenRows);
+								 });
 		History.EndTransaction();
 	};
-	Range.prototype.cleanAll=function(excludeHiddenRows){
+	Range.prototype.cleanAll=function(){
 		History.Create_NewPoint();
 		History.StartTransaction();
 		this.unmerge();
@@ -7759,7 +7767,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			// col.Remove();
 		},function(cell, nRow0, nCol0, nRowStart, nColStart){
 			oThis.worksheet._removeCell(nRow0, nCol0);
-		}, excludeHiddenRows);
+		});
 
 		this.worksheet.workbook.dependencyFormulas.calcTree();
 		History.EndTransaction();

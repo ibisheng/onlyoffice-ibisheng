@@ -8506,6 +8506,11 @@
                 var isLargeRange = t._isLargeRange(range.bbox);
                 var canChangeColWidth = c_oAscCanChangeColWidth.none;
 
+                if(t.model.autoFilters.bIsExcludeHiddenRows(arn, activeCell))
+				{
+					t.model.excludeHiddenRows(true);
+				}
+
                 switch (prop) {
                     case "fn":
                         range.setFontname(val);
@@ -8627,22 +8632,19 @@
                         /* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
                         t.model.workbook.dependencyFormulas.lockRecal();
 
-                        //нужно ли удалять скрытые строки
-						var excludeHiddenRows = t.model.autoFilters.bIsExcludeHiddenRows(arn, activeCell);
-                        
                         switch(val) {
 							case c_oAscCleanOptions.All:
-                            range.cleanAll(excludeHiddenRows);
+                            range.cleanAll();
 								t.model.removeSparklines(arn);
                             // Удаляем комментарии
                             t.cellCommentator.deleteCommentsRange(arn);
 								break;
 							case c_oAscCleanOptions.Text:
 							case c_oAscCleanOptions.Formula:
-                            range.cleanText(excludeHiddenRows);
+                            range.cleanText();
 								break;
 							case c_oAscCleanOptions.Format:
-                            range.cleanFormat(excludeHiddenRows);
+                            range.cleanFormat();
 								break;
 							case c_oAscCleanOptions.Comments:
                             t.cellCommentator.deleteCommentsRange(arn);
@@ -8657,6 +8659,8 @@
 								t.model.removeSparklineGroups(arn);
 								break;
                         }
+
+						t.model.excludeHiddenRows(false);
 
 						// Если нужно удалить автофильтры - удаляем
 						if (val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text) {
@@ -8736,6 +8740,8 @@
                         bIsUpdate = false;
                         break;
                 }
+
+				t.model.excludeHiddenRows(false);
 
                 if (bIsUpdate) {
                     hasUpdates = true;
