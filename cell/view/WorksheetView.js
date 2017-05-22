@@ -6293,10 +6293,21 @@
 				}
 			}
 
-			if(!isViewerMode)
-			{
+			if (!isViewerMode) {
+				var pivotButtons = this.model.getPivotTableButtons(new asc_Range(c.col, r.row, c.col, r.row));
+				var isPivot = pivotButtons.some(function (element) {
+					return element.row === r.row && element.col === c.col;
+				});
 				this._drawElements(function (_vr, _offsetX, _offsetY) {
-					return (null === (res = this.af_checkCursor(x, y, _vr, _offsetX, _offsetY, r, c)));
+					if (isPivot) {
+						if (_vr.contains(c.col, r.row) &&
+							this._hitCursorFilterButton(x + _offsetX, y + _offsetY, c.col, r.row,)) {
+							res = {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1};
+						}
+					} else {
+						res = this.af_checkCursor(x, y, _vr, _offsetX, _offsetY, r, c);
+					}
+					return (null === res);
 				});
 				if (res) {
 					return res;
@@ -12934,8 +12945,6 @@
 
 	WorksheetView.prototype._hitCursorFilterButton = function(x, y, col, row)
 	{
-		var res = false;
-
 		var ws = this;
 		var width = 13;
 		var height = 13;
@@ -12950,11 +12959,7 @@
 		var x2 = ws.cols[col].left + ws.cols[col].width - 0.5;
 		var y2 = ws.rows[row].top + ws.rows[row].height - 0.5;
 
-		if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-			res = true;
-		}
-
-		return res;
+		return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 	};
 
     WorksheetView.prototype._checkAddAutoFilter = function (activeRange, styleName, addFormatTableOptionsObj, filterByCellContextMenu) {
