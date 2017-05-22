@@ -6293,17 +6293,14 @@
 				}
 			}
 
-			var autoFilterInfo = this.af_checkCursor(x, y, offsetX, offsetY, {
-				cFrozen: cFrozen, rFrozen: rFrozen
-			}, r, c);
-			if (autoFilterInfo && !isViewerMode) {
-				return {
-					cursor: kCurAutoFilter,
-					target: c_oTargetType.FilterObject,
-					col: -1,
-					row: -1,
-					idFilter: autoFilterInfo.id
-				};
+			if(!isViewerMode)
+			{
+				this._drawElements(function (_vr, _offsetX, _offsetY) {
+					return (null === (res = this.af_checkCursor(x, y, _vr, _offsetX, _offsetY, r, c)));
+				});
+				if (res) {
+					return res;
+				}
 			}
 
 			// Проверим есть ли комменты
@@ -12866,113 +12863,99 @@
 
 		_drawButton(x1 + diffX, y1 + diffY);
 	};
-	
-    WorksheetView.prototype.af_checkCursor = function (x, y, offsetX, offsetY, frozenObj, r, c) {
-        var ws = this;
-        var aWs = this.model;
-        var result = false;
-        var t = this;
 
-        var _checkClickFrozenArea = function (x, y, offsetX, offsetY, frozenObj) {
-            var frosenPosX = frozenObj && frozenObj.cFrozen != undefined && ws.cols[frozenObj.cFrozen] ?
-              ws.cols[frozenObj.cFrozen].left : null;
-            var frosenPosY = frozenObj && frozenObj.rFrozen != undefined && ws.rows[frozenObj.rFrozen] ?
-              ws.rows[frozenObj.rFrozen].top : null;
-            var result;
+	WorksheetView.prototype.af_checkCursor = function (x, y, _vr, offsetX, offsetY, r, c) {
+		var aWs = this.model;
+		var t = this;
+		var result = null;
 
-            if (frosenPosX != null && frosenPosY != null && x < frosenPosX && y < frosenPosY) {
-                result = {x: x, y: y};
-            } else if (frosenPosX != null && x < frosenPosX) {
-                result = {x: x, y: y + offsetY};
-            } else if (frosenPosY != null && y < frosenPosY) {
-                result = {x: x + offsetX, y: y};
-            } else {
-                result = {x: x + offsetX, y: y + offsetY};
-            }
+		var _isShowButtonInFilter = function (col, filter) {
+			var result = true;
+			var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
 
-            return result;
-        };
+			if (filter.HeaderRowCount === 0) {
+				result = null;
+			} else if (autoFilter && autoFilter.FilterColumns)//проверяем скрытые ячейки
+			{
+				var colId = col - autoFilter.Ref.c1;
+				for (var i = 0; i < autoFilter.FilterColumns.length; i++) {
+					if (autoFilter.FilterColumns[i].ColId === colId) {
+						if (autoFilter.FilterColumns[i].ShowButton === false) {
+							result = null;
+						}
 
-        var _isShowButtonInFilter = function (col, filter) {
-            var result = true;
-            var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
+						break;
+					}
+				}
+			} else if (!filter.isAutoFilter() && autoFilter === null)//если форматированная таблица и отсутсвует а/ф
+			{
+				result = null;
+			}
 
-            if (filter.HeaderRowCount === 0) {
-                result = false;
-            } else if (autoFilter && autoFilter.FilterColumns)//проверяем скрытые ячейки
-            {
-                var colId = col - autoFilter.Ref.c1;
-                for (var i = 0; i < autoFilter.FilterColumns.length; i++) {
-                    if (autoFilter.FilterColumns[i].ColId === colId) {
-                        if (autoFilter.FilterColumns[i].ShowButton === false) {
-                            result = false;
-                        }
+			return result;
+		};
 
-                        break;
-                    }
-                }
-            } else if (!filter.isAutoFilter() && autoFilter === null)//если форматированная таблица и отсутсвует а/ф
-            {
-                result = false;
-            }
+		var checkCurrentFilter = function (filter, num) {
+			var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
+			if (range.contains(c.col, r.row) && _isShowButtonInFilter(c.col, filter)) {
+				var row = range.r1;
+				for (var col = range.c1; col <= range.c2; col++) {
+					if (col === c.col) {
 
-            return result;
-        };
+						if(t._hitCursorFilterButton(x, y, col, row)){
+							result = {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: {id: num, colId: col - range.c1}};
+							break;
+						}
+					}
+				}
+			}
+		};
 
-        var checkCurrentFilter = function (filter, num) {
-            var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
-            if (range.contains(c.col, r.row) && _isShowButtonInFilter(c.col, filter)) {
-                var row = range.r1;
-                for (var col = range.c1; col <= range.c2; col++) {
-                    if (col === c.col) {
-                        var width = 13;
-                        var height = 13;
-                        var rowHeight = ws.rows[row].height;
-                        if (rowHeight < height) {
-                            width = width * (rowHeight / height);
-                            height = rowHeight;
-                        }
+		if(_vr.contains(c.col, r.row))
+		{
+			x = x + offsetX;
+			y = y + offsetY;
 
-                        var x1 = ws.cols[col].left + ws.cols[col].width - width - 0.5;
-                        var y1 = ws.rows[row].top + ws.rows[row].height - height - 0.5;
-                        var x2 = ws.cols[col].left + ws.cols[col].width - 0.5;
-                        var y2 = ws.rows[row].top + ws.rows[row].height - 0.5;
+			if (aWs.AutoFilter && aWs.AutoFilter.Ref) {
+				checkCurrentFilter(aWs.AutoFilter, null);
+			}
 
-                        if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-                            result = {
-                                id: {id: num, colId: col - range.c1},
-                                target: c_oTargetType.FilterObject,
-                                col: -1,
-                                row: -1
-                            };
-                            return;
-                        }
-                    }
-                }
-            }
-        };
+			if (aWs.TableParts && aWs.TableParts.length && !result) {
+				for (var i = 0; i < aWs.TableParts.length; i++) {
+					if (aWs.TableParts[i].AutoFilter) {
+						checkCurrentFilter(aWs.TableParts[i], i);
+					}
+				}
+			}
+		}
 
+		return result;
+	};
 
-        var checkFrozenArea = _checkClickFrozenArea(x, y, offsetX, offsetY, frozenObj);
-        if (checkFrozenArea) {
-            x = checkFrozenArea.x;
-            y = checkFrozenArea.y;
-        }
+	WorksheetView.prototype._hitCursorFilterButton = function(x, y, col, row)
+	{
+		var res = false;
 
-        if (aWs.AutoFilter && aWs.AutoFilter.Ref) {
-            checkCurrentFilter(aWs.AutoFilter, null);
-        }
+		var ws = this;
+		var width = 13;
+		var height = 13;
+		var rowHeight = ws.rows[row].height;
+		if (rowHeight < height) {
+			width = width * (rowHeight / height);
+			height = rowHeight;
+		}
 
-        if (aWs.TableParts && aWs.TableParts.length && !result) {
-            for (var i = 0; i < aWs.TableParts.length; i++) {
-                if (aWs.TableParts[i].AutoFilter) {
-                    checkCurrentFilter(aWs.TableParts[i], i);
-                }
-            }
-        }
+		var x1 = ws.cols[col].left + ws.cols[col].width - width - 0.5;
+		var y1 = ws.rows[row].top + ws.rows[row].height - height - 0.5;
+		var x2 = ws.cols[col].left + ws.cols[col].width - 0.5;
+		var y2 = ws.rows[row].top + ws.rows[row].height - 0.5;
 
-        return result;
-    };
+		if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
+			res = true;
+		}
+
+		return res;
+	};
 
     WorksheetView.prototype._checkAddAutoFilter = function (activeRange, styleName, addFormatTableOptionsObj, filterByCellContextMenu) {
         //write error, if not add autoFilter and return false
