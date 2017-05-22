@@ -1264,7 +1264,7 @@
 	};
 
 	// signatures
-	baseEditorsApi.prototype.asc_AddSignarureLine2 = function(_obj)
+	baseEditorsApi.prototype.asc_AddSignatureLine2 = function(_obj)
 	{
 		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
 		function guid() { return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();	}
@@ -1294,7 +1294,7 @@
 
 			if (!_found)
 			{
-				var _add_sig = new AscCommon.asc_CSignarureLine();
+				var _add_sig = new AscCommon.asc_CSignatureLine();
 				_add_sig.guid = _sig.guid;
 				_add_sig.signer1 = _sig.signer1;
 				_add_sig.signer2 = _sig.signer2;

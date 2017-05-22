@@ -3502,7 +3502,7 @@ background-repeat: no-repeat;\
 	};
 
 	// signatures
-	asc_docs_api.prototype.asc_AddSignarureLine2 = function(_obj)
+	asc_docs_api.prototype.asc_AddSignatureLine2 = function(_obj)
 	{
 		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
 		function guid() { return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();	}
@@ -8266,7 +8266,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_getRequestSignatures"] 					= asc_docs_api.prototype.asc_getRequestSignatures;
 
 	// signatures
-	asc_docs_api.prototype["asc_AddSignarureLine2"]             		= asc_docs_api.prototype.asc_AddSignarureLine2;
+	asc_docs_api.prototype["asc_AddSignatureLine2"]             		= asc_docs_api.prototype.asc_AddSignatureLine2;
 	asc_docs_api.prototype["asc_Sign"]             						= asc_docs_api.prototype.asc_Sign;
 	asc_docs_api.prototype["asc_ViewSign"] 								= asc_docs_api.prototype.asc_ViewSign;
 	asc_docs_api.prototype["asc_getSignatures"] 						= asc_docs_api.prototype.asc_getSignatures;

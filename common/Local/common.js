@@ -252,7 +252,7 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 	for (var i = 0; i < _count; i++)
 	{
 		_sign = _data[i];
-		_add_sign = new window["AscCommon"].asc_CSignarureLine();
+		_add_sign = new window["AscCommon"].asc_CSignatureLine();
 
 		_add_sign.guid = _sign["guid"];
 		_add_sign.valid = _sign["valid"];

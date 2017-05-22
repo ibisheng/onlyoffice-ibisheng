@@ -121,7 +121,7 @@
 		View    : 4
 	};
 
-	function asc_CSignarureLine()
+	function asc_CSignatureLine()
 	{
 		this.id = undefined;
 		this.guid = "";
@@ -136,22 +136,22 @@
 
 		this.image = "";
 	}
-	asc_CSignarureLine.prototype.asc_getId = function(){ return this.id; };
-	asc_CSignarureLine.prototype.asc_setId = function(v){ this.id = v; };
-	asc_CSignarureLine.prototype.asc_getGuid = function(){ return this.guid; };
-	asc_CSignarureLine.prototype.asc_setGuid = function(v){ this.guid = v; };
-	asc_CSignarureLine.prototype.asc_getSigner1 = function(){ return this.signer1; };
-	asc_CSignarureLine.prototype.asc_setSigner1 = function(v){ this.signer1 = v; };
-	asc_CSignarureLine.prototype.asc_getSigner2 = function(){ return this.signer2; };
-	asc_CSignarureLine.prototype.asc_setSigner2 = function(v){ this.signer2 = v; };
-	asc_CSignarureLine.prototype.asc_getEmail = function(){ return this.email; };
-	asc_CSignarureLine.prototype.asc_setEmail = function(v){ this.email = v; };
-	asc_CSignarureLine.prototype.asc_getInstructions = function(){ return this.instructions; };
-	asc_CSignarureLine.prototype.asc_setInstructions = function(v){ this.instructions = v; };
-	asc_CSignarureLine.prototype.asc_getShowDate = function(){ return this.showDate; };
-	asc_CSignarureLine.prototype.asc_setShowDate = function(v){ this.showDate = v; };
-	asc_CSignarureLine.prototype.asc_getValid = function(){ return this.valid; };
-	asc_CSignarureLine.prototype.asc_setValid = function(v){ this.valid = v; };
+	asc_CSignatureLine.prototype.asc_getId = function(){ return this.id; };
+	asc_CSignatureLine.prototype.asc_setId = function(v){ this.id = v; };
+	asc_CSignatureLine.prototype.asc_getGuid = function(){ return this.guid; };
+	asc_CSignatureLine.prototype.asc_setGuid = function(v){ this.guid = v; };
+	asc_CSignatureLine.prototype.asc_getSigner1 = function(){ return this.signer1; };
+	asc_CSignatureLine.prototype.asc_setSigner1 = function(v){ this.signer1 = v; };
+	asc_CSignatureLine.prototype.asc_getSigner2 = function(){ return this.signer2; };
+	asc_CSignatureLine.prototype.asc_setSigner2 = function(v){ this.signer2 = v; };
+	asc_CSignatureLine.prototype.asc_getEmail = function(){ return this.email; };
+	asc_CSignatureLine.prototype.asc_setEmail = function(v){ this.email = v; };
+	asc_CSignatureLine.prototype.asc_getInstructions = function(){ return this.instructions; };
+	asc_CSignatureLine.prototype.asc_setInstructions = function(v){ this.instructions = v; };
+	asc_CSignatureLine.prototype.asc_getShowDate = function(){ return this.showDate; };
+	asc_CSignatureLine.prototype.asc_setShowDate = function(v){ this.showDate = v; };
+	asc_CSignatureLine.prototype.asc_getValid = function(){ return this.valid; };
+	asc_CSignatureLine.prototype.asc_setValid = function(v){ this.valid = v; };
 
 	/**
 	 * Класс asc_CAscEditorPermissions для прав редакторов
@@ -3195,8 +3195,8 @@
 	prot['Comment'] = prot.Comment;
 	prot['View'] = prot.View;
 
-	window["AscCommon"]["asc_CSignarureLine"] = window["AscCommon"].asc_CSignarureLine = asc_CSignarureLine;
-	prot = asc_CSignarureLine.prototype;
+	window["AscCommon"]["asc_CSignatureLine"] = window["AscCommon"].asc_CSignatureLine = asc_CSignatureLine;
+	prot = asc_CSignatureLine.prototype;
 	prot["asc_getId"] = prot.asc_getId;
 	prot["asc_setId"] = prot.asc_setId;
 	prot["asc_getGuid"] = prot.asc_getGuid;
