@@ -1301,6 +1301,8 @@
 				_add_sig.email = _sig.email;
 			}
 		}
+
+		return _sigs_ret;
 	};
 
 	baseEditorsApi.prototype.asc_Sign = function(guid)
