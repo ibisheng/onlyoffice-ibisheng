@@ -3124,14 +3124,14 @@
 	};
 
 	function CStyleImage(name, type, image, uiPriority) {
-		this.name = name;
+		this.Name = name;
 		this.type = type;
 		this.image = image;
 		this.uiPriority = uiPriority;
 	}
 
 	CStyleImage.prototype.asc_getName = CStyleImage.prototype.get_Name = function () {
-		return this.name;
+		return this.Name;
 	};
 	CStyleImage.prototype.asc_getType = CStyleImage.prototype.get_Type = function () {
 		return this.type;
