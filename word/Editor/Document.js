@@ -3118,9 +3118,20 @@ CDocument.prototype.private_RecalculateFlowParagraph         = function(RecalcIn
         {
             var TempElement = this.Content[TempIndex];
             TempElement.Set_DocumentIndex(TempIndex);
-            TempElement.Reset(0, FrameH, Frame_XLimit, Frame_YLimit, PageIndex, ColumnIndex, ColumnsCount);
 
-            RecalcResult = TempElement.Recalculate_Page(0);
+			var ElementPageIndex = 0;
+			if ((0 === TempIndex && 0 === PageIndex) || TempIndex != StartIndex || (TempIndex === StartIndex && true === bResetStartElement))
+			{
+				TempElement.Set_DocumentIndex(TempIndex);
+				TempElement.Reset(0, FrameH, Frame_XLimit, Frame_YLimit, PageIndex, ColumnIndex, ColumnsCount);
+				ElementPageIndex = 0;
+			}
+			else
+			{
+				ElementPageIndex = PageIndex - Element.PageNum;
+			}
+
+            RecalcResult = TempElement.Recalculate_Page(ElementPageIndex);
 
             if (!(RecalcResult & recalcresult_NextElement))
                 break;
@@ -3389,7 +3400,7 @@ CDocument.prototype.private_RecalculateFlowParagraph         = function(RecalcIn
             for (var TempIndex = Index; TempIndex < Index + FlowCount; ++TempIndex)
             {
                 var TempElement = this.Content[TempIndex];
-                TempElement.Reset(TempElement.X, TempElement.Y, TempElement.XLimit, TempElement.YLimit, PageIndex, ColumnIndex, ColumnsCount);
+                TempElement.Reset(TempElement.X, TempElement.Y, TempElement.XLimit, TempElement.YLimit, TempElement.PageNum, ColumnIndex, ColumnsCount);
             }
 
 
