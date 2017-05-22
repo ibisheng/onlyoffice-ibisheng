@@ -277,6 +277,12 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 	});
 };
 
+window["OnNativeReturnCallback"] = function(name, obj)
+{
+	console.log(name);
+	console.log(obj);
+};
+
 // меняем среду
 //AscBrowser.isSafari = false;
 //AscBrowser.isSafariMacOs = false;
