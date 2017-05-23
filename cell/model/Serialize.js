@@ -1130,7 +1130,7 @@
         this.aDxfs = aDxfs;
         this.bs = new BinaryCommonWriter(this.memory);
         this.isCopyPaste = isCopyPaste;
-        this.Write = function(aTables)
+        this.Write = function(aTables, ws)
         {
             var oThis = this;
             for(var i = 0, length = aTables.length; i < length; ++i)
@@ -1140,7 +1140,7 @@
                 if (this.isCopyPaste)
                     rangeTable = aTables[i].Ref;
 
-                if(!this.isCopyPaste || (this.isCopyPaste && rangeTable && this.isCopyPaste.containsRange(rangeTable)))
+                if(!this.isCopyPaste || (this.isCopyPaste && rangeTable && this.isCopyPaste.containsRange(rangeTable) && !ws.bExcludeHiddenRows))
                     this.bs.WriteItem(c_oSer_TablePart.Table, function(){oThis.WriteTable(aTables[i]);});
             }
         };
@@ -2442,7 +2442,7 @@
             if(null != ws.TableParts && ws.TableParts.length > 0)
             {
                 oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs, this.isCopyPaste);
-                this.bs.WriteItem(c_oSerWorksheetsTypes.TableParts, function(){oBinaryTableWriter.Write(ws.TableParts);});
+                this.bs.WriteItem(c_oSerWorksheetsTypes.TableParts, function(){oBinaryTableWriter.Write(ws.TableParts, ws);});
             }
 			if (ws.aSparklineGroups.length > 0) {
                 this.bs.WriteItem(c_oSerWorksheetsTypes.SparklineGroups, function(){oThis.WriteSparklineGroups(ws.aSparklineGroups);});
@@ -2475,9 +2475,32 @@
             //activeRange(serialize activeRange)
             if(oThis.isCopyPaste)
             {
+                var activeRange = oThis.isCopyPaste;
+
+                var newRange = null;
+                if(ws.bExcludeHiddenRows)
+                {
+                    for(var i = activeRange.r1; i < activeRange.r2; i++)
+                    {
+                        if(ws.getRowHidden(i))
+                        {
+                            if(!newRange)
+                            {
+								newRange = activeRange.clone();
+                            }
+							newRange.r2--;
+                        }
+                    }
+
+                    if(newRange)
+                    {
+						activeRange = newRange;
+                    }
+                }
+
                 this.memory.WriteByte(c_oSerWorksheetPropTypes.Ref);
                 this.memory.WriteByte(c_oSerPropLenType.Variable);
-                this.memory.WriteString2(oThis.isCopyPaste.getName());
+                this.memory.WriteString2(activeRange.getName());
             }
         };
         this.WriteWorksheetCols = function(ws)
@@ -3019,16 +3042,38 @@
                     aIndexes.push(i - 0);
             }
             aIndexes.sort(AscCommon.fSortAscending);
-            for(var i = 0, length = aIndexes.length; i < length; ++i)
-            {
-                var row = ws.aGCells[aIndexes[i]];
-                if(null != row)
-                {
-                    if(false == row.isEmpty())
-                        this.bs.WriteItem(c_oSerWorksheetsTypes.Row, function(){oThis.WriteRow(row);});
-                }
-            }
-        };
+
+			var index = aIndexes[0];
+			for(var i = 0, length = aIndexes.length; i < length; ++i)
+			{
+				var row = ws.aGCells[aIndexes[i]];
+				if(null != row)
+				{
+					if(ws.bExcludeHiddenRows && oThis.isCopyPaste && row.getHidden())
+					{
+						continue;
+					}
+
+					if(false == row.isEmpty())
+					{
+						if(oThis.isCopyPaste && ws.bExcludeHiddenRows)
+						{
+							//подменяем индекс
+							var oldIndex = row.index;
+							row.index = index;
+							this.bs.WriteItem(c_oSerWorksheetsTypes.Row, function(){oThis.WriteRow(row);});
+							row.index = oldIndex;
+						}
+						else
+						{
+							this.bs.WriteItem(c_oSerWorksheetsTypes.Row, function(){oThis.WriteRow(row);});
+						}
+					}
+				}
+				index++;
+			}
+		};
+      
         this.WriteRow = function(oRow)
         {
             var oThis = this;
