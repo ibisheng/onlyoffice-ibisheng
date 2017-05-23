@@ -2891,14 +2891,14 @@
 			_drawer.ImageHtml.onload = function()
 			{
 				var _drawer = window.Asc.g_signature_drawer;
-				var _w = _drawer.Canvas.width;
-				var _h = _drawer.Canvas.heigth;
+				var w = _drawer.Canvas.width;
+				var h = _drawer.Canvas.height;
 				var _ctx = _drawer.Canvas.getContext("2d");
 				_ctx.clearRect(0, 0, w, h);
 				_ctx.drawImage(this, 0, 0, w, h);
 				_drawer = null;
 			};
-			_drawer.ImageHtml = _drawer.Image;
+			_drawer.ImageHtml.src = _drawer.Image;
 			_drawer = null;
 		};
 		window["AscDesktopEditor"]["OpenFilenameDialog"]("filter");
