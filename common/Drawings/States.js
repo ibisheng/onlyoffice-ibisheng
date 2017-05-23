@@ -488,7 +488,9 @@ ChangeAdjState.prototype =
             return;
         }
         var t = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
-        this.drawingObjects.arrTrackObjects[0].track(t.x, t.y);
+        for(var i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i){
+            this.drawingObjects.arrTrackObjects[i].track(t.x, t.y);
+        }
         this.drawingObjects.updateOverlay();
     },
 
@@ -496,11 +498,13 @@ ChangeAdjState.prototype =
     {
         if(this.drawingObjects.isViewMode() === false)
         {
-            var track = this.drawingObjects.arrTrackObjects[0];
+            var trackObjects = this.drawingObjects.arrTrackObjects;
             var drawingObjects = this.drawingObjects;
             this.drawingObjects.checkSelectedObjectsAndCallback(function()
             {
-                track.trackEnd();
+                for(var i = 0; i < trackObjects.length; ++i){
+                    trackObjects[i].trackEnd();
+                }
                 drawingObjects.startRecalculate();
             },[], false, AscDFH.historydescription_CommonDrawings_ChangeAdj);
 
