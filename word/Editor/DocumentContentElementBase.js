@@ -128,6 +128,10 @@ CDocumentContentElementBase.prototype.Get_PageBounds = function(CurPage)
 {
 	return new CDocumentBounds(this.X, this.Y, this.XLimit, this.YLimit);
 };
+CDocumentContentElementBase.prototype.GetContentBounds = function(CurPage)
+{
+	return new CDocumentBounds(this.X, this.Y, this.XLimit, this.YLimit);
+};
 CDocumentContentElementBase.prototype.Is_EmptyPage = function(CurPage)
 {
 	return false;

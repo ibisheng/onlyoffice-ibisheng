@@ -2061,6 +2061,10 @@ CTable.prototype.Get_PageBounds = function(CurPage)
 {
 	return this.Pages[CurPage].Bounds;
 };
+CTable.prototype.GetContentBounds = function(CurPage)
+{
+	return this.Get_PageBounds(CurPage);
+};
 CTable.prototype.Get_PagesCount = function()
 {
 	return this.Pages.length;

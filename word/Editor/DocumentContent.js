@@ -1395,6 +1395,38 @@ CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceChec
 
 	return Bounds;
 };
+CDocumentContent.prototype.GetContentBounds = function(CurPage)
+{
+	var oBounds = this.Get_PageBounds(CurPage);
+
+	var oPage = this.Pages[CurPage];
+	if (!oPage)
+		return oBounds;
+
+	this.Pos    = 0;
+	this.EndPos = -1;
+	for (var nIndex = oPage.Pos; nIndex <= oPage.EndPos; ++nIndex)
+	{
+		var oElement          = this.Content[nIndex];
+		var nElementPageIndex = this.private_GetElementPageIndex(nIndex, CurPage, 0, 1);
+
+		var oElementBounds = oElement.GetContentBounds(nElementPageIndex);
+
+		if (oElementBounds.Bottom > oBounds.Bottom)
+			oBounds.Bottom = oElementBounds.Bottom;
+
+		if (oElementBounds.Top < oBounds.Top)
+			oBounds.Top = oElementBounds.Top;
+
+		if (oElementBounds.Right > oBounds.Right)
+			oBounds.Right = oElementBounds.Right;
+
+		if (oElementBounds.Left < oBounds.Left)
+			oBounds.Left = oElementBounds.Left;
+	}
+
+	return oBounds;
+};
 CDocumentContent.prototype.Get_PagesCount = function()
 {
 	return this.Pages.length;

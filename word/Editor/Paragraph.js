@@ -414,6 +414,39 @@ Paragraph.prototype.Get_PageBounds = function(CurPage)
 {
 	return this.Pages[CurPage].Bounds;
 };
+Paragraph.prototype.GetContentBounds = function(CurPage)
+{
+	var oBounds = this.Get_PageBounds(CurPage).Copy();
+
+	var oPage = this.Pages[CurPage];
+	if (!oPage)
+		return oBounds;
+
+	for (var CurLine = oPage.StartLine; CurLine <= oPage.EndLine; ++CurLine)
+	{
+		var oLine = this.Lines[CurLine];
+
+		var Top = oLine.Top + oPage.Y;
+		if (oBounds.Top > Top)
+			oBounds.Top = Top;
+
+		var Bottom = oLine.Bottom + oPage.Y;
+		if (oBounds.Bottom < Bottom)
+			oBounds.Bottom = Bottom;
+
+		for (var CurRange = 0, RangesCount = oLine.Ranges.length; CurRange < RangesCount; ++CurRange)
+		{
+			var oRange = oLine.Ranges[CurRange];
+			if (oBounds.Left > oRange.X)
+				oBounds.Left = oRange.X;
+
+			if (oBounds.Right < oRange.XEnd)
+				oBounds.Right = oRange.XEnd;
+		}
+	}
+
+	return oBounds;
+};
 Paragraph.prototype.Get_EmptyHeight = function()
 {
 	var Pr        = this.Get_CompiledPr();
@@ -12136,6 +12169,10 @@ CDocumentBounds.prototype.Reset = function()
     this.Left   = 0;
     this.Right  = 0;
     this.Top    = 0;
+};
+CDocumentBounds.prototype.Copy = function()
+{
+	return new CDocumentBounds(this.Left, this.Top, this.Right, this.Bottom);
 };
 
 function CParagraphPageEndInfo()

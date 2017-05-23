@@ -105,6 +105,10 @@ CBlockLevelSdt.prototype.Get_PageBounds = function(CurPage)
 {
 	return this.Content.Get_PageBounds(CurPage);
 };
+CBlockLevelSdt.prototype.GetContentBounds = function(CurPage)
+{
+	return this.Content.GetContentBounds(CurPage);
+};
 CBlockLevelSdt.prototype.Is_EmptyPage = function(CurPage)
 {
 	// TODO: Реализовать
@@ -596,7 +600,7 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 	for (var nCurPage = 0, nPagesCount = this.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
 	{
 		var nPageAbs = this.Get_AbsolutePage(nCurPage);
-		var oBounds = this.GetPageBounds(nCurPage);
+		var oBounds = this.Content.GetContentBounds(nCurPage);
 		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
