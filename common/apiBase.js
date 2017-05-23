@@ -1305,16 +1305,28 @@
 		return _sigs_ret;
 	};
 
-	baseEditorsApi.prototype.asc_Sign = function(guid)
+	baseEditorsApi.prototype.asc_Sign = function(id, guid)
 	{
 		if (window["AscDesktopEditor"])
-			window["AscDesktopEditor"]["Sign"](guid);
+			window["AscDesktopEditor"]["Sign"](id, guid);
 	};
 
-	baseEditorsApi.prototype.asc_ViewSign = function(id)
+	baseEditorsApi.prototype.asc_ViewCertificate = function(id)
 	{
 		if (window["AscDesktopEditor"])
-			window["AscDesktopEditor"]["ViewCertificate"](guid);
+			window["AscDesktopEditor"]["ViewCertificate"](id);
+	};
+
+	baseEditorsApi.prototype.asc_SelectCertificate = function()
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["SelectCertificate"]();
+	};
+
+	baseEditorsApi.prototype.asc_GetDefaultCertificate = function()
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["GetDefaultCertificate"]();
 	};
 
 	baseEditorsApi.prototype.asc_getSignatures = function()

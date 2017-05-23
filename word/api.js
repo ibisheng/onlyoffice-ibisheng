@@ -8260,7 +8260,9 @@ background-repeat: no-repeat;\
 	// signatures
 	asc_docs_api.prototype["asc_AddSignatureLine2"]             		= asc_docs_api.prototype.asc_AddSignatureLine2;
 	asc_docs_api.prototype["asc_Sign"]             						= asc_docs_api.prototype.asc_Sign;
-	asc_docs_api.prototype["asc_ViewSign"] 								= asc_docs_api.prototype.asc_ViewSign;
+	asc_docs_api.prototype["asc_ViewCertificate"] 						= asc_docs_api.prototype.asc_ViewCertificate;
+	asc_docs_api.prototype["asc_SelectCertificate"] 					= asc_docs_api.prototype.asc_SelectCertificate;
+	asc_docs_api.prototype["asc_GetDefaultCertificate"] 				= asc_docs_api.prototype.asc_GetDefaultCertificate;
 	asc_docs_api.prototype["asc_getSignatures"] 						= asc_docs_api.prototype.asc_getSignatures;
 
 	CDocInfoProp.prototype['get_PageCount']             = CDocInfoProp.prototype.get_PageCount;

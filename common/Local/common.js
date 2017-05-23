@@ -279,8 +279,8 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 
 window["OnNativeReturnCallback"] = function(name, obj)
 {
-	console.log(name);
-	console.log(obj);
+	var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+	_api.sendEvent(name, obj);
 };
 
 // меняем среду
