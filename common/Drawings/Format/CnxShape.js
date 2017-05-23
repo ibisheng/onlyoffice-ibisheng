@@ -263,7 +263,7 @@
                                     flipH = true;
                                     flipV = true;
 
-                                    oMapAdj["adj1"] = -((100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                    oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
                                     oMapAdj["adj2"] =  (100000*(_begin.y - ((_end.bounds.b + _begin.bounds.t)/2.0))/extY + 0.5) >> 0;
                                 }
                             }
@@ -366,7 +366,7 @@
                                 else{
                                     sPreset = "5";
                                     oMapAdj["adj1"] = (100000*((_end.bounds.l + _begin.bounds.r)/2 - _begin.x)/extX + 0.5) >> 0;
-                                    oMapAdj["adj2"] =  -(100000*(begin.y  - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                    oMapAdj["adj2"] =  -(100000*(_begin.y  - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
                                     oMapAdj["adj3"] = 100000 + (100000*(_end.bounds.r + CONNECTOR_MARGIN - _end.x)/extX + 0.5) >> 0;
                                 }
                             }
