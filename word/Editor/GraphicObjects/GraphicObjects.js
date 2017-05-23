@@ -1300,6 +1300,10 @@ CGraphicObjects.prototype =
         this.document.OnMouseUp(e, x, y, pageIndex);
     },
 
+    handleSignatureDblClick: function(sGuid){
+        editor.sendEvent("asc_onSignatureClick", sGuid);
+    },
+
 
     handleOleObjectDoubleClick: function(drawing, oleObject, e, x, y, pageIndex)
     {

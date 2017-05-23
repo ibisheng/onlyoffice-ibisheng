@@ -2292,8 +2292,7 @@ CShape.prototype.selectionCheck = function (X, Y, PageAbs, NearPos) {
     return false;
 };
 
-CShape.prototype.copy = function () {
-    var copy = new CShape();
+CShape.prototype.fillObject = function(copy){
     if (this.nvSpPr)
         copy.setNvSpPr(this.nvSpPr.createDuplicate());
     if (this.spPr) {
@@ -2323,6 +2322,11 @@ CShape.prototype.copy = function () {
     copy.cachedImage = this.getBase64Img();
     copy.cachedPixH = this.cachedPixH;
     copy.cachedPixW = this.cachedPixW;
+};
+
+CShape.prototype.copy = function () {
+    var copy = new CShape();
+    this.fillObject(copy);
     return copy;
 };
 

@@ -75,11 +75,6 @@ function MoveShapeImageTrack(originalObject)
         this.groupInvertMatrix.ty = 0;
     }
 
-    this.getOriginalBoundsRect = function()
-    {
-        return this.originalObject.getRectBounds();
-    };
-
     this.track = function(dx, dy, pageIndex)
     {
         var original = this.originalObject;
@@ -156,8 +151,20 @@ function MoveShapeImageTrack(originalObject)
                 this.y = 0;
             }
         }
+        var _xfrm = this.originalObject.spPr.xfrm;
+        var _x = _xfrm.offX;
+        var _y = _xfrm.offY;
         this.originalObject.spPr.xfrm.setOffX(this.x/scale_coefficients.cx + ch_off_x);
         this.originalObject.spPr.xfrm.setOffY(this.y/scale_coefficients.cy + ch_off_y);
+
+        if(this.originalObject.getObjectType() === AscDFH.historyitem_type_Cnx){
+            if(!AscFormat.fApproxEqual(_x, _xfrm.offX) || !AscFormat.fApproxEqual(_y, _xfrm.offY)){
+                var nvUniSpPr = this.originalObject.nvSpPr.nvUniSpPr;
+                if(nvUniSpPr.stCnxId !== null || nvUniSpPr.stCnxIdx !== null || nvUniSpPr.endCnxId !== null || nvUniSpPr.endCnxIdx !== null){
+                    this.originalObject.nvSpPr.setUniSpPr(new AscFormat.CNvUniSpPr());
+                }
+            }
+        }
         this.originalObject.checkDrawingBaseCoords();
     };
 }
@@ -194,80 +201,6 @@ MoveShapeImageTrack.prototype.getBounds = function()
     return boundsChecker.Bounds;
 };
 
-function MoveShapeImageTrackInGroup(originalObject)
-{
-    this.originalObject = originalObject;
-    this.x = null;
-    this.y = null;
-    this.transform = new CMatrix();
-    if(!originalObject.isChart())
-    {
-        this.brush = originalObject.brush;
-        this.pen = originalObject.pen;
-    }
-    else
-    {
-        var pen_brush = AscFormat.CreatePenBrushForChartTrack();
-        this.brush = pen_brush.brush;
-        this.pen = pen_brush.pen;
-    }
-    this.overlayObject = new AscFormat.OverlayObject(!(this.originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace)&& this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
-    this.inv = global_MatrixTransformer.Invert(originalObject.group.transform);
-    this.inv.tx = 0;
-    this.inv.ty = 0;
-    this.draw = function(overlay)
-    {
-        if(AscFormat.isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
-        {
-            overlay.SetCurrentPage(this.pageIndex);
-        }
-        this.overlayObject.draw(overlay);
-    };
-
-    this.track = function(dx, dy)
-    {
-        var dx_t = this.inv.TransformPointX(dx, dy);
-        var dy_t = this.inv.TransformPointY(dx, dy);
-        this.x = this.originalObject.x + dx_t;
-        this.y = this.originalObject.y + dy_t;
-        this.calculateTransform();
-    };
-
-    this.getOriginalBoundsRect = function()
-    {
-        return this.originalObject.getRectBounds();
-    };
-
-    this.calculateTransform = function()
-    {
-        var t = this.transform;
-        t.Reset();
-        global_MatrixTransformer.TranslateAppend(t, -this.originalObject.extX*0.5, -this.originalObject.extY*0.5);
-        if(this.originalObject.flipH)
-        {
-            global_MatrixTransformer.ScaleAppend(t, -1, 1);
-        }
-        if(this.originalObject.flipV)
-        {
-            global_MatrixTransformer.ScaleAppend(t, 1, -1);
-        }
-        global_MatrixTransformer.RotateRadAppend(t, -this.originalObject.rot);
-        global_MatrixTransformer.TranslateAppend(t, this.x + this.originalObject.extX*0.5, this.y + this.originalObject.extY*0.5);
-        global_MatrixTransformer.MultiplyAppend(t, this.originalObject.group.getTransformMatrix());
-    };
-
-    this.trackEnd = function()
-    {
-        var scale_scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
-        var xfrm = this.originalObject.group.spPr.xfrm;
-
-        AscFormat.CheckSpPrXfrm(this.originalObject);
-        var shape_xfrm = this.originalObject.spPr.xfrm;
-        shape_xfrm.setOffX(this.x/scale_scale_coefficients.cx + xfrm.chOffX);
-        shape_xfrm.setOffY(this.y/scale_scale_coefficients.cy + xfrm.chOffY);
-    }
-}
-
 function MoveGroupTrack(originalObject)
 {
     this.x = null;
@@ -291,10 +224,6 @@ function MoveGroupTrack(originalObject)
     }
 
 
-    this.getOriginalBoundsRect = function()
-    {
-        return this.originalObject.getRectBounds();
-    };
 
     this.track = function(dx, dy, pageIndex)
     {
@@ -357,8 +286,11 @@ function MoveGroupTrack(originalObject)
         }
         AscFormat.CheckSpPrXfrm(this.originalObject);
         var xfrm = this.originalObject.spPr.xfrm;
+
+
         xfrm.setOffX(this.x);
         xfrm.setOffY(this.y);
+
         if(bWord)
         {
             if(this.originalObject.selectStartPage !== this.pageIndex)
@@ -373,10 +305,6 @@ function MoveComment(comment)
     this.comment = comment;
     this.x = comment.x;
     this.y = comment.y;
-
-    this.getOriginalBoundsRect = function()
-    {
-    };
 
     this.track = function(dx, dy)
     {

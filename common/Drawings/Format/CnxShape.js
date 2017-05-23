@@ -488,6 +488,12 @@
         return AscDFH.historyitem_type_Cnx;
     };
 
+    CConnectionShape.prototype.copy = function () {
+        var copy = new CConnectionShape();
+        this.fillObject(copy);
+        return copy;
+    };
+
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].fCalculateSpPr = fCalculateSpPr;
     window['AscFormat'].fCalculateConnectionInfo = fCalculateConnectionInfo;
