@@ -124,6 +124,9 @@ function CBinaryFileWriter()
     this.IsUseFullUrl = false;
     this.PresentationThemesOrigin = "";
 
+    this.arr_connectors_pos = [];
+    this.max_shape_id = 1;
+
 	this.DocSaveParams = null;
     var oThis = this;
 
@@ -1539,6 +1542,7 @@ function CBinaryFileWriter()
             oThis.StartRecord(2);
             oThis.WriteULong(_len);
 
+            oThis.arr_connectors_pos.length = 0;
             for (var i = 0; i < _len; i++)
             {
                 oThis.StartRecord(0);
@@ -1546,6 +1550,7 @@ function CBinaryFileWriter()
 				switch(spTree[i].getObjectType())
                 {
                     case AscDFH.historyitem_type_Shape:
+                    case AscDFH.historyitem_type_Cnx:
                     {
 						oThis.WriteShape(spTree[i]);
                         break;
@@ -1577,7 +1582,18 @@ function CBinaryFileWriter()
 
                 oThis.EndRecord();
             }
+            var _oldPos = oThis.pos;
+            for(var i = 0; i < oThis.arr_connectors_pos.length; ++i){
+                var oPos = oThis.arr_connectors_pos[i];
 
+                var oShape = AscCommon.g_oTableId.Get_ById(oPos.shapeId);
+                if(oShape && oShape.nvSpPr && oShape.nvSpPr.cNvPr){
+                    oThis.Seek(oPos.pos);
+                    oThis._WriteInt2(oPos.type, oShape.nvSpPr.cNvPr.id);
+                }
+            }
+            oThis.arr_connectors_pos.length = 0;
+            oThis.Seek(_oldPos);
             oThis.EndRecord();
         }
 
@@ -2881,7 +2897,13 @@ function CBinaryFileWriter()
 
     this.WriteShape = function(shape)
     {
-        oThis.StartRecord(1);
+        if(shape.getObjectType() === AscDFH.historyitem_type_Cnx){
+            oThis.StartRecord(3);
+        }
+        else{
+            oThis.StartRecord(1);
+        }
+
 
         oThis.WriteUChar(g_nodeAttributeStart);
         oThis._WriteBool2(0, shape.attrUseBgFill);
@@ -3702,10 +3724,48 @@ function CBinaryFileWriter()
         oThis.WriteUChar(g_nodeAttributeEnd);
     };
 
+    this.WriteCnxCNvPr = function(pr){
+        var locks = pr.locks;
+        oThis.WriteUChar(g_nodeAttributeStart);
+        if(locks & AscFormat.LOCKS_MASKS.noAdjustHandles)
+            oThis._WriteBool2(0, !!(locks & (AscFormat.LOCKS_MASKS.noAdjustHandles << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeArrowheads)
+            oThis._WriteBool2(1, !!(locks & (AscFormat.LOCKS_MASKS.noChangeArrowheads << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeAspect)
+            oThis._WriteBool2(2, !!(locks & (AscFormat.LOCKS_MASKS.noChangeAspect << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noChangeShapeType)
+            oThis._WriteBool2(3, !!(locks & (AscFormat.LOCKS_MASKS.noChangeShapeType << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noEditPoints)
+            oThis._WriteBool2(4, !!(locks & (AscFormat.LOCKS_MASKS.noEditPoints << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noGrp)
+            oThis._WriteBool2(5, !!(locks & (AscFormat.LOCKS_MASKS.noGrp << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noMove)
+            oThis._WriteBool2(6, !!(locks & (AscFormat.LOCKS_MASKS.noMove << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noResize)
+            oThis._WriteBool2(7, !!(locks & (AscFormat.LOCKS_MASKS.noResize << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noRot)
+            oThis._WriteBool2(8, !!(locks & (AscFormat.LOCKS_MASKS.noRot << 1)));
+        if(locks & AscFormat.LOCKS_MASKS.noSelect)
+            oThis._WriteBool2(9, !!(locks & (AscFormat.LOCKS_MASKS.noSelect << 1)));
+
+        if(pr.stCnxId && AscFormat.isRealNumber(pr.stCnxIdx)){
+            oThis.arr_connectors_pos.push({pos: oThis.pos, shapeId: pr.stCnxId, type: 10});
+            oThis._WriteInt2(10, -1);
+            oThis._WriteInt2(11, pr.stCnxIdx);
+        }
+        if(pr.endCnxId && AscFormat.isRealNumber(pr.endCnxIdx)){
+            oThis.arr_connectors_pos.push({pos: oThis.pos, shapeId: pr.endCnxId, type: 12});
+            oThis._WriteInt2(12, -1);
+            oThis._WriteInt2(13, pr.endCnxIdx);
+
+        }
+        oThis.WriteUChar(g_nodeAttributeEnd);
+    };
+
     this.WriteUniNvPr = function(nv)
     {
         oThis.WriteRecord2(0, nv.cNvPr, oThis.Write_cNvPr);
-        if(AscFormat.isRealNumber(nv.locks) && nv.locks !== 0 && AscFormat.isRealNumber(nv.objectType))
+        if(AscFormat.isRealNumber(nv.locks) && (nv.locks !== 0 || nv.nvUniSpPr) && AscFormat.isRealNumber(nv.objectType))
         {
             switch(nv.objectType)
             {
@@ -3730,6 +3790,12 @@ function CBinaryFileWriter()
                     oThis.WriteRecord1(1, nv.locks, oThis.WriteGrFrameCNvPr);
                     break;
                 }
+                case AscDFH.historyitem_type_Cnx:
+                {
+                    nv.nvUniSpPr.locks = nv.locks;
+                    oThis.WriteRecord1(1, nv.nvUniSpPr, oThis.WriteCnxCNvPr);
+                    break;
+                }
             }
         }
         nv.locks     = null;
@@ -3740,6 +3806,7 @@ function CBinaryFileWriter()
     this.Write_cNvPr = function(cNvPr)
     {
         oThis.WriteUChar(g_nodeAttributeStart);
+        cNvPr.id = ++oThis.max_shape_id;
         oThis._WriteInt1(0, cNvPr.id);
         oThis._WriteString1(1, cNvPr.name);
 		oThis._WriteBool1(2, cNvPr.isHidden);
