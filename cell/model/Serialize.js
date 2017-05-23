@@ -2429,7 +2429,7 @@
               ws.aCommentsCoords;
             if (aComments.length > 0 && aCommentsCoords.length > 0) {
                 this.bs.WriteItem(c_oSerWorksheetsTypes.Comments, function () {
-                    oThis.WriteComments(aComments, aCommentsCoords);
+                    oThis.WriteComments(aComments, aCommentsCoords, ws);
                 });
             }
 
@@ -3479,15 +3479,21 @@
             this.memory.WriteByte(c_oSerPropLenType.Variable);
             this.memory.WriteString2(formulaParsed.Formula);
         };
-        this.WriteComments = function(aComments, aCommentsCoords)
+        this.WriteComments = function(aComments, aCommentsCoords, ws)
         {
             var oThis = this;
             var oNewComments = {}, i, length, elem, nRow, nCol, row, comment;
             for(i = 0, length = aComments.length; i < length; ++i)
             {
                 //write only active comments, if copy/paste
-                if(this.isCopyPaste && !this.isCopyPaste.contains(aComments[i].nCol, aComments[i].nRow))
-                    continue;
+                if(this.isCopyPaste)
+				{
+					//ignore hidden rows if ws.bExcludeHiddenRows === true
+					if(!this.isCopyPaste.contains(aComments[i].nCol, aComments[i].nRow) || (ws.bExcludeHiddenRows && ws.getRowHidden(aComments[i].nRow)))
+					{
+						continue;
+					}
+				}
 
                 elem = aComments[i];
                 nRow = elem.asc_getRow();
