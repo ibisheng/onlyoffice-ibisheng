@@ -1201,7 +1201,8 @@ var g_oBorderProperties = {
 			(this.dd && c_oAscBorderStyles.None !== this.dd.s) || (this.du && c_oAscBorderStyles.None !== this.du.s);
 	};
 var g_oNumProperties = {
-		f: 0
+		f: 0,
+		id: 1
 	};
 /** @constructor */
 function Num(val)
@@ -1219,78 +1220,7 @@ Num.prototype =
     this.id = opt_id;
   },
   getFormat: function() {
-    var res = this.f;
-    if (null != this.id) {
-      if (15 <= this.id && this.id <= 17) {
-        switch (this.id) {
-          case 15:
-            res = AscCommon.getShortDateMonthFormat(true, true, null);
-            break;
-          case 16:
-            res = AscCommon.getShortDateMonthFormat(true, false, null);
-            break;
-          case 17:
-            res = AscCommon.getShortDateMonthFormat(false, true, null);
-            break;
-        }
-      } else {
-		//todo currencyLocale true/false?
-		var currencyLocale = true;
-        switch (this.id) {
-          case 5:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, true, currencyLocale, false);
-            break;
-          case 6:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, true, currencyLocale, true);
-            break;
-          case 7:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, true, currencyLocale, false);
-            break;
-          case 8:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, true, currencyLocale, true);
-            break;
-          case 14:
-            res = AscCommon.getShortDateFormat(null);
-            break;
-          case 22:
-            res = AscCommon.getShortDateFormat(null) + " h:mm";
-            break;
-          case 27:
-          case 28:
-          case 29:
-          case 30:
-          case 31:
-          case 36:
-            res = AscCommon.getShortDateFormat(null);
-            break;
-          case 37:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, false, currencyLocale, false);
-            break;
-          case 38:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, false, currencyLocale, true);
-            break;
-          case 39:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, false, currencyLocale, false);
-            break;
-          case 40:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, false, currencyLocale, true);
-            break;
-          case 41:
-            res = AscCommon.getCurrencyFormat(null, 0, false, currencyLocale);
-            break;
-          case 42:
-            res = AscCommon.getCurrencyFormat(null, 0, true, currencyLocale);
-            break;
-          case 43:
-            res = AscCommon.getCurrencyFormat(null, 2, false, currencyLocale);
-            break;
-          case 44:
-            res = AscCommon.getCurrencyFormat(null, 2, true, currencyLocale);
-            break;
-        }
-      }
-    }
-    return res;
+    return (null != this.id) ? (AscCommon.getFormatByStandardId(this.id) || this.f) : this.f;
   },
   _mergeProperty : function(first, second, def)
   {
@@ -1349,14 +1279,16 @@ Num.prototype =
 	{
 		switch(nType)
 		{
-			case this.Properties.f: return this.getFormat();break;
+			case this.Properties.f: return this.f;break;
+			case this.Properties.id: return this.id;break;
 		}
 	},
 	setProperty : function(nType, value)
 	{
 		switch(nType)
 		{
-			case this.Properties.f: this.setFormat(value);break;
+			case this.Properties.f: this.f = value;break;
+			case this.Properties.id: this.id = value;break;
 		}
 	}
 };
@@ -1929,6 +1861,28 @@ StyleManager.prototype =
                 xfs.num = g_oDefaultFormat.Num.clone();
             xfs.num.setFormat(val);
         }
+		return oRes;
+	},
+	setNum : function(oItemWithXfs, val)
+	{
+		var xfs = oItemWithXfs.xfs;
+		var oRes = {newVal: val, oldVal: null};
+		if(null != xfs && null != xfs.num)
+			oRes.oldVal = xfs.num;
+		else
+			oRes.oldVal = null;
+		if(null == val)
+		{
+			if(null != xfs) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+				xfs.num = null;
+			}
+		}
+		else
+		{
+			xfs = this._prepareSet(oItemWithXfs);
+			xfs.num = val.clone();
+		}
 		return oRes;
 	},
 	setFont : function(oItemWithXfs, val, oHistoryObj, nHistoryId, sSheetId, oRange)
@@ -2577,9 +2531,15 @@ Col.prototype =
 	},
 	setNumFormat : function(val)
 	{
-		var oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, new Num({f:val}));
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_NumFormat, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+	},
+	setNum : function(val)
+	{
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, val);
+		if(History.Is_On() && oRes.oldVal != oRes.newVal)
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFont : function(val)
     {
@@ -2856,9 +2816,15 @@ Row.prototype =
 	},
 	setNumFormat : function(val)
 	{
-		var oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, new Num({f:val}));
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_NumFormat, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+	},
+	setNum : function(val)
+	{
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, val);
+		if(History.Is_On() && oRes.oldVal != oRes.newVal)
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFont : function(val)
     {

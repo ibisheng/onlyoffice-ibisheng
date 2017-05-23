@@ -4973,15 +4973,16 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		this.oValue.cleanCache();
 	};
 	Cell.prototype.setNumFormat=function(val){
-		var oRes;
-		/*if( val == aStandartNumFormats[0] &&
-		 this.formulaParsed && this.formulaParsed.value && this.formulaParsed.value.numFormat !== null &&
-		 this.formulaParsed.value.numFormat !== undefined && aStandartNumFormats[this.formulaParsed.value.numFormat] )
-		 oRes = this.ws.workbook.oStyleManager.setNumFormat(this, aStandartNumFormats[this.formulaParsed.value.numFormat]);
-		 else*/
-		oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
+		var oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
 		if(History.Is_On() && oRes.oldVal != oRes.newVal)
-			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_Numformat, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_Num, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+		this.compiledXfs = null;
+		this.oValue.cleanCache();
+	};
+	Cell.prototype.setNum=function(val){
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, val);
+		if(History.Is_On() && oRes.oldVal != oRes.newVal)
+			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_Num, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 		this.compiledXfs = null;
 		this.oValue.cleanCache();
 	};
@@ -5315,7 +5316,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			var valueCalc = this.formulaParsed.value;
 			if (0 <= valueCalc.numFormat) {
 				if (aStandartNumFormatsId[this.getNumFormatStr()] == 0) {
-					this.setNumFormat(aStandartNumFormats[valueCalc.numFormat]);
+					this.setNum(new AscCommonExcel.Num({id: valueCalc.numFormat}));
 				}
 			} else if (AscCommonExcel.cNumFormatFirstCell === valueCalc.numFormat) {
 				// ищет в формуле первый рэндж и устанавливает формат ячейки как формат первой ячейки в рэндже

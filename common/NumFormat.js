@@ -4159,6 +4159,81 @@ function setCurrentCultureInfo(val) {
 		}
 		return res;
 	}
+	function getFormatByStandardId(id) {
+		var res = null;
+		if (15 <= id && id <= 17) {
+			switch (id) {
+				case 15:
+					res = AscCommon.getShortDateMonthFormat(true, true, null);
+					break;
+				case 16:
+					res = AscCommon.getShortDateMonthFormat(true, false, null);
+					break;
+				case 17:
+					res = AscCommon.getShortDateMonthFormat(false, true, null);
+					break;
+			}
+		} else {
+			//todo currencyLocale true/false?
+			var currencyLocale = true;
+			switch (id) {
+				case 5:
+					res = AscCommon.getCurrencyFormatSimple(null, 0, true, currencyLocale, false);
+					break;
+				case 6:
+					res = AscCommon.getCurrencyFormatSimple(null, 0, true, currencyLocale, true);
+					break;
+				case 7:
+					res = AscCommon.getCurrencyFormatSimple(null, 2, true, currencyLocale, false);
+					break;
+				case 8:
+					res = AscCommon.getCurrencyFormatSimple(null, 2, true, currencyLocale, true);
+					break;
+				case 14:
+					res = AscCommon.getShortDateFormat(null);
+					break;
+				case 22:
+					res = AscCommon.getShortDateFormat(null) + " h:mm";
+					break;
+				case 27:
+				case 28:
+				case 29:
+				case 30:
+				case 31:
+				case 36:
+					res = AscCommon.getShortDateFormat(null);
+					break;
+				case 37:
+					res = AscCommon.getCurrencyFormatSimple(null, 0, false, currencyLocale, false);
+					break;
+				case 38:
+					res = AscCommon.getCurrencyFormatSimple(null, 0, false, currencyLocale, true);
+					break;
+				case 39:
+					res = AscCommon.getCurrencyFormatSimple(null, 2, false, currencyLocale, false);
+					break;
+				case 40:
+					res = AscCommon.getCurrencyFormatSimple(null, 2, false, currencyLocale, true);
+					break;
+				case 41:
+					res = AscCommon.getCurrencyFormat(null, 0, false, currencyLocale);
+					break;
+				case 42:
+					res = AscCommon.getCurrencyFormat(null, 0, true, currencyLocale);
+					break;
+				case 43:
+					res = AscCommon.getCurrencyFormat(null, 2, false, currencyLocale);
+					break;
+				case 44:
+					res = AscCommon.getCurrencyFormat(null, 2, true, currencyLocale);
+					break;
+                default:
+                    res = AscCommonExcel.aStandartNumFormats[id];
+                    break;
+			}
+		}
+		return res;
+	}
 
 var g_aCultureInfos = {
 	1029: {LCID: 1029, Name: "cs-CZ", CurrencyPositivePattern: 3, CurrencyNegativePattern: 8, CurrencySymbol: "Kč", NumberDecimalSeparator: ",", NumberGroupSeparator: " ", NumberGroupSizes: [3], DayNames: ["neděle", "pondělí", "úterý", "středa", "čtvrtek", "pátek", "sobota"], AbbreviatedDayNames: ["ne", "po", "út", "st", "čt", "pá", "so"], MonthNames: ["leden", "únor", "březen", "duben", "květen", "červen", "červenec", "srpen", "září", "říjen", "listopad", "prosinec", ""], AbbreviatedMonthNames: ["led", "úno", "bře", "dub", "kvě", "čvn", "čvc", "srp", "zář", "říj", "lis", "pro", ""], MonthGenitiveNames: ["ledna", "února", "března", "dubna", "května", "června", "července", "srpna", "září", "října", "listopadu", "prosince", ""], AbbreviatedMonthGenitiveNames: [], AMDesignator: "dop.", PMDesignator: "odp.", DateSeparator: ".", TimeSeparator: ":", ShortDatePattern: "135"},
@@ -4204,6 +4279,7 @@ var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//ba
 	window['AscCommon'].getCurrencyFormatSimple2 = getCurrencyFormatSimple2;
 	window['AscCommon'].getCurrencyFormat = getCurrencyFormat;
 	window['AscCommon'].getFormatCells = getFormatCells;
+	window['AscCommon'].getFormatByStandardId = getFormatByStandardId;
 
     window["AscCommon"].gc_nMaxDigCount = gc_nMaxDigCount;
     window["AscCommon"].gc_nMaxDigCountView = gc_nMaxDigCountView;
