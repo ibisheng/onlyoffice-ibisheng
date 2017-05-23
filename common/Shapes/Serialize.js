@@ -2398,7 +2398,10 @@ function BinaryPPTYLoader()
                     }
                     else
                     {
-                        uni_fill.fill.color.setMods(new AscFormat.CColorModifiers());
+                        if(uni_fill.fill.color){
+                            uni_fill.fill.color.setMods(new AscFormat.CColorModifiers());
+                        }
+
                     }
                     break;
                 }
