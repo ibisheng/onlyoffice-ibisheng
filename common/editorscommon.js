@@ -2845,7 +2845,7 @@
 		this.Bold = false;
 	}
 
-	CSignatureDrawer.prototype.getImages = CSignatureDrawer.prototype["getImages"] = function()
+	CSignatureDrawer.prototype.getImages = function()
 	{
 		var _ret = [];
 		_ret.push(this.Canvas.toDataURL("image/png"));
@@ -2865,7 +2865,7 @@
 		return _ret;
 	};
 
-	CSignatureDrawer.prototype.setText = CSignatureDrawer.prototype["setText"] = function(text, font, size, isItalic, isBold)
+	CSignatureDrawer.prototype.setText = function(text, font, size, isItalic, isBold)
 	{
 		this.Image = "";
 		this.ImageHtml = null;
@@ -2921,12 +2921,12 @@
 		window["AscDesktopEditor"]["OpenFilenameDialog"]("filter");
 	};
 
-	CSignatureDrawer.prototype.isValid = CSignatureDrawer.prototype["isValid"] = function()
+	CSignatureDrawer.prototype.isValid = function()
 	{
 		return (this.Image != "" || this.Text != "");
 	};
 
-	CSignatureDrawer.prototype.destroy = CSignatureDrawer.prototype["destroy"] = function()
+	CSignatureDrawer.prototype.destroy = function()
 	{
 		window.Asc.g_signature_drawer.CanvasParent.removeChild(window.Asc.g_signature_drawer);
 		delete window.Asc.g_signature_drawer;
@@ -2989,5 +2989,11 @@
 	window["AscCommon"].parserHelp = parserHelp;
 	window["AscCommon"].g_oIdCounter = g_oIdCounter;
 
-	window["AscCommon"].CSignatureDrawer = CSignatureDrawer;
+	window["AscCommon"].CSignatureDrawer = window["AscCommon"]["CSignatureDrawer"] = CSignatureDrawer;
+	var prot = CSignatureDrawer.prototype;
+	prot["getImages"] 	= prot.getImages;
+	prot["setText"] 	= prot.setText;
+	prot["selectImage"] = prot.selectImage;
+	prot["isValid"] 	= prot.isValid;
+	prot["destroy"] 	= prot.destroy;
 })(window);
