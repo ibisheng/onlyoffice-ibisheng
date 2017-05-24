@@ -446,6 +446,12 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
 
             }
             else{
+                this.oSpPr = null;
+                this.resizedRot = this.originalObject.rot;
+                this.geometry = AscFormat.ExecuteNoHistory(function(){
+                    return originalObject.spPr.geometry.createDuplicate();
+                }, this, []);
+                this.overlayObject.geometry = this.geometry;
                 this.resize(kd1, kd2, e.ShiftKey);
             }
         };
