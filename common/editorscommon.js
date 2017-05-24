@@ -2870,10 +2870,27 @@
 		this.Image = "";
 		this.ImageHtml = null;
 
-		var _w = _drawer.Canvas.width;
-		var _h = _drawer.Canvas.heigth;
-		var _ctx = _drawer.Canvas.getContext("2d");
-		_ctx.clearRect(0, 0, w, h);
+		this.Text = text;
+		this.Font = font;
+		this.Size = size;
+		this.Italic = isItalic;
+		this.Bold = isBold;
+
+		var loader     = AscCommon.g_font_loader;
+		var fontinfo   = AscFonts.g_fontApplication.GetFontInfo(font);
+		var isasync    = loader.LoadFont(fontinfo, function() {
+			window.Asc.g_signature_drawer.drawText();
+		});
+
+		if (false === isasync)
+		{
+			this.drawText();
+		}
+	};
+
+	CSignatureDrawer.prototype.drawText = function()
+	{
+		AscFormat.ExecuteNoHistory(AscCommon.DrawTextByCenter, this, []);
 	};
 
 	CSignatureDrawer.prototype.selectImage = CSignatureDrawer.prototype["selectImage"] = function()

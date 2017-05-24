@@ -2617,10 +2617,80 @@ CAutoshapeTrack.prototype =
     }
 };
 
+	function DrawTextByCenter() // this!
+	{
+		var shape = new AscFormat.CShape();
+		shape.setTxBody(AscFormat.CreateTextBodyFromString("", this, shape));
+		var par = shape.txBody.content.Content[0];
+		par.Reset(0, 0, 1000, 1000, 0);
+		par.MoveCursorToStartPos();
+		var _paraPr = new CParaPr();
+		par.Pr = _paraPr;
+		var _textPr = new CTextPr();
+		_textPr.FontFamily = { Name : this.Font, Index : -1 };
+		_textPr.RFonts.Ascii = { Name : this.Font, Index : -1 };
+		_textPr.RFonts.EastAsia = { Name : this.Font, Index : -1 };
+		_textPr.RFonts.CS = { Name : this.Font, Index : -1 };
+		_textPr.RFonts.HAnsi = { Name : this.Font, Index : -1 };
+
+		_textPr.Bold = this.Bold;
+		_textPr.Italic = this.Italic;
+
+		_textPr.FontSize = this.Size;
+		_textPr.FontSizeCS = this.Size;
+
+		var parRun = new ParaRun(par); var Pos = 0;
+		parRun.Set_Pr(_textPr);
+
+		var _len = this.Text.length;
+		for (var i = 0; i < _len; i++)
+		{
+			if (this.Text.charAt(i) == " ")
+				parRun.Add_ToContent(Pos++,new ParaSpace(1), false);
+			else
+				parRun.Add_ToContent(Pos++,new ParaText(this.Text.charAt(i)), false);
+		}
+		par.Add_ToContent(0, parRun);
+
+		par.Recalculate_Page(0);
+		par.Recalculate_Page(0);
+
+		var baseLineOffset = par.Lines[0].Y;
+		var _bounds = par.Get_PageBounds(0);
+
+		var ctx = this.Canvas.getContext('2d');
+		var _wPx = this.Canvas.width;
+		var _hPx = this.Canvas.height;
+
+		var _wMm = _wPx * g_dKoef_pix_to_mm;
+		var _hMm = _hPx * g_dKoef_pix_to_mm;
+
+		ctx.clearRect(0, 0, _wPx, _hPx);
+
+		var _pxBoundsW = par.Lines[0].Ranges[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
+		var _pxBoundsH = (_bounds.Bottom - _bounds.Top) * g_dKoef_mm_to_pix;
+
+		var _yOffset = (_hPx - _pxBoundsH) >> 1;
+		var _xOffset = (_wPx - _pxBoundsW) >> 1;
+
+		var graphics = new AscCommon.CGraphics();
+		graphics.init(ctx, _wPx, _hPx, _wMm, _hMm);
+		graphics.m_oFontManager = AscCommon.g_fontManager;
+
+		graphics.m_oCoordTransform.tx = _xOffset;
+		graphics.m_oCoordTransform.ty = _yOffset;
+
+		graphics.transform(1,0,0,1,0,0);
+
+		par.Draw(0, graphics);
+	}
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
     window['AscCommon'].TRACK_CIRCLE_RADIUS = TRACK_CIRCLE_RADIUS;
     window['AscCommon'].TRACK_DISTANCE_ROTATE = TRACK_DISTANCE_ROTATE;
     window['AscCommon'].COverlay = COverlay;
     window['AscCommon'].CAutoshapeTrack = CAutoshapeTrack;
+
+    window['AscCommon'].DrawTextByCenter = DrawTextByCenter;
 })(window);
