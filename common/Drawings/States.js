@@ -176,7 +176,7 @@ StartAddNewShape.prototype =
                         shape.setParent(oThis.drawingObjects.drawingObjects);
                         shape.setRecalculateInfo();
                     }
-                    shape.addToDrawingObjects();
+                    shape.addToDrawingObjects(undefined, AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
                     shape.checkDrawingBaseCoords();
                     oThis.drawingObjects.checkChartTextSelection();
                     oThis.drawingObjects.resetSelection();

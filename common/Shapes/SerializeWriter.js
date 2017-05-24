@@ -124,11 +124,16 @@ function CBinaryFileWriter()
     this.IsUseFullUrl = false;
     this.PresentationThemesOrigin = "";
 
-    this.arr_connectors_pos = [];
-    this.max_shape_id = 1;
+    this.max_shape_id = 3;
+    this.arr_map_shapes_id = {};
 
 	this.DocSaveParams = null;
     var oThis = this;
+
+    this.ClearIdMap = function(){
+        this.max_shape_id = 3;
+        this.arr_map_shapes_id = {};
+    };
 
     this.Start_UseFullUrl = function()
     {
@@ -1542,7 +1547,7 @@ function CBinaryFileWriter()
             oThis.StartRecord(2);
             oThis.WriteULong(_len);
 
-            oThis.arr_connectors_pos.length = 0;
+            oThis.ClearIdMap();
             for (var i = 0; i < _len; i++)
             {
                 oThis.StartRecord(0);
@@ -1582,18 +1587,7 @@ function CBinaryFileWriter()
 
                 oThis.EndRecord();
             }
-            var _oldPos = oThis.pos;
-            for(var i = 0; i < oThis.arr_connectors_pos.length; ++i){
-                var oPos = oThis.arr_connectors_pos[i];
-
-                var oShape = AscCommon.g_oTableId.Get_ById(oPos.shapeId);
-                if(oShape && oShape.nvSpPr && oShape.nvSpPr.cNvPr){
-                    oThis.Seek(oPos.pos);
-                    oThis._WriteInt2(oPos.type, oShape.nvSpPr.cNvPr.id);
-                }
-            }
-            oThis.arr_connectors_pos.length = 0;
-            oThis.Seek(_oldPos);
+            oThis.ClearIdMap();
             oThis.EndRecord();
         }
 
@@ -2936,6 +2930,9 @@ function CBinaryFileWriter()
         }
         nvSpPr.locks = shape.locks;
         nvSpPr.objectType = shape.getObjectType();
+        if(nvSpPr.cNvPr){
+            nvSpPr.cNvPr.shapeId = shape.Id;
+        }
         oThis.WriteRecord2(0, nvSpPr, oThis.WriteUniNvPr);
 
         oThis.WriteRecord1(1, shape.spPr, oThis.WriteSpPr);
@@ -2975,6 +2972,10 @@ function CBinaryFileWriter()
         }
         nvPicPr.locks = image.locks;
         nvPicPr.objectType = image.getObjectType();
+        if(nvPicPr.cNvPr){
+            nvPicPr.cNvPr.shapeId = image.Id;
+        }
+
         oThis.WriteRecord1(0, nvPicPr, this.WriteUniNvPr);
 
         image.spPr.WriteXfrm = image.spPr.xfrm;
@@ -3032,6 +3033,10 @@ function CBinaryFileWriter()
         }
         nvGraphicFramePr.locks = grObj.locks;
         nvGraphicFramePr.objectType = grObj.getObjectType();
+        if(nvGraphicFramePr.cNvPr){
+            nvGraphicFramePr.cNvPr.shapeId = grObj.Id;
+        }
+
         oThis.WriteRecord1(0, nvGraphicFramePr, oThis.WriteUniNvPr);
 
         if (grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
@@ -3060,6 +3065,10 @@ function CBinaryFileWriter()
 
         nvGraphicFramePr.locks = grObj.locks;
         nvGraphicFramePr.objectType = grObj.getObjectType();
+        if(nvGraphicFramePr.cNvPr){
+            nvGraphicFramePr.cNvPr.shapeId = grObj.Id;
+        }
+
         oThis.WriteRecord1(0, nvGraphicFramePr, oThis.WriteUniNvPr);
 
         if (grObj.spPr && grObj.spPr.xfrm && grObj.spPr.xfrm.isNotNull())
@@ -3441,6 +3450,7 @@ function CBinaryFileWriter()
             group.nvGrpSpPr.nvPr.ph = null;
             group.nvGrpSpPr.locks = group.locks;
             group.nvGrpSpPr.objectType = group.getObjectType();
+            group.nvGrpSpPr.cNvPr.shapeId = group.Id;
             oThis.WriteRecord1(0, group.nvGrpSpPr, oThis.WriteUniNvPr);
             group.nvGrpSpPr.nvPr.ph = _old_ph;
         }
@@ -3749,13 +3759,18 @@ function CBinaryFileWriter()
             oThis._WriteBool2(9, !!(locks & (AscFormat.LOCKS_MASKS.noSelect << 1)));
 
         if(pr.stCnxId && AscFormat.isRealNumber(pr.stCnxIdx)){
-            oThis.arr_connectors_pos.push({pos: oThis.pos, shapeId: pr.stCnxId, type: 10});
-            oThis._WriteInt2(10, -1);
+
+            if(!AscFormat.isRealNumber(oThis.arr_map_shapes_id[pr.stCnxId])){
+                oThis.arr_map_shapes_id[pr.stCnxId] = ++oThis.max_shape_id;
+            }
+            oThis._WriteInt2(10, oThis.arr_map_shapes_id[pr.stCnxId]);
             oThis._WriteInt2(11, pr.stCnxIdx);
         }
         if(pr.endCnxId && AscFormat.isRealNumber(pr.endCnxIdx)){
-            oThis.arr_connectors_pos.push({pos: oThis.pos, shapeId: pr.endCnxId, type: 12});
-            oThis._WriteInt2(12, -1);
+            if(!AscFormat.isRealNumber(oThis.arr_map_shapes_id[pr.endCnxId])){
+                oThis.arr_map_shapes_id[pr.endCnxId] = ++oThis.max_shape_id;
+            }
+            oThis._WriteInt2(12, oThis.arr_map_shapes_id[pr.endCnxId]);
             oThis._WriteInt2(13, pr.endCnxIdx);
 
         }
@@ -3806,7 +3821,15 @@ function CBinaryFileWriter()
     this.Write_cNvPr = function(cNvPr)
     {
         oThis.WriteUChar(g_nodeAttributeStart);
-        cNvPr.id = ++oThis.max_shape_id;
+        if(cNvPr.shapeId){
+            if(AscFormat.isRealNumber(oThis.arr_map_shapes_id[cNvPr.shapeId])){
+                cNvPr.id = oThis.arr_map_shapes_id[cNvPr.shapeId];
+            }
+            else{
+                oThis.arr_map_shapes_id[cNvPr.shapeId] = ++oThis.max_shape_id;
+            }
+            cNvPr.id = oThis.arr_map_shapes_id[cNvPr.shapeId];
+        }
         oThis._WriteInt1(0, cNvPr.id);
         oThis._WriteString1(1, cNvPr.name);
 		oThis._WriteBool1(2, cNvPr.isHidden);
@@ -4701,6 +4724,7 @@ function CBinaryFileWriter()
             switch(grObject.getObjectType())
             {
                 case AscDFH.historyitem_type_Shape:
+                case AscDFH.historyitem_type_Cnx:
                 {
                     if(grObject.bWordShape)
                     {

@@ -258,7 +258,7 @@ function CChangesDrawingObjectsRemoveFromDrawingObjects(Class, Pos){
 
     AscDFH.changesFactory[AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects] = CChangesDrawingObjectsRemoveFromDrawingObjects;
 
-CShape.prototype.addToDrawingObjects =  function(pos)
+CShape.prototype.addToDrawingObjects =  function(pos, type)
 {
     var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
     //var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};

@@ -1165,6 +1165,8 @@ CShapeDrawer.prototype =
 
     drawFillStroke : function(bIsFill, fill_mode, bIsStroke)
     {
+        if(this.Graphics.IsSlideBoundsCheckerType)
+            return;
         if (this.Graphics.RENDERER_PDF_FLAG === undefined)
         {
             if (bIsFill)

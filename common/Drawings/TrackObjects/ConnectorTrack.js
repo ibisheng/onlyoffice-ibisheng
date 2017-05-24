@@ -108,6 +108,8 @@
         _xfrm.setFlipV(_xfrm2.flipV);
         _xfrm.setRot(_xfrm2.rot);
         this.connector.spPr.setGeometry(this.oSpPr.geometry.createDuplicate());
+
+        this.connector.checkDrawingBaseCoords();
     };
     CConnectorTrack.prototype.convertTrackBounds = function(trackBounds)
     {
