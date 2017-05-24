@@ -68,7 +68,7 @@
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cACOT, cACOTH, cAGGREGATE, cARABIC, cBASE, cCEILING_MATH, cCEILING_PRECISE,
+	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cARABIC, cBASE, cCEILING_MATH, cCEILING_PRECISE,
 		cCOMBINA, cCOT, cCOTH, cCSC, cCSCH, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT, cSEC, cSECH);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
@@ -76,30 +76,6 @@
 	cFormulaFunctionGroup['Information'].push(cISFORMULA, cSHEET, cSHEETS);
 	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
 	cFormulaFunctionGroup['Logical'].push(cIFNA, cXOR);
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cACOT() {
-		cBaseFunction.call(this, "ACOT");
-		this.isXLFN = true;
-	}
-
-	cACOT.prototype = Object.create(cBaseFunction.prototype);
-	cACOT.prototype.constructor = cACOT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cACOTH() {
-		cBaseFunction.call(this, "ACOTH");
-		this.isXLFN = true;
-	}
-
-	cACOTH.prototype = Object.create(cBaseFunction.prototype);
-	cACOTH.prototype.constructor = cACOTH;
 
 	/**
 	 * @constructor

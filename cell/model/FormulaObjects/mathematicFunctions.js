@@ -212,11 +212,11 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	//TODO скорее всего стоит
 	function cACOT() {
 		this.name = "ACOT";
 		this.value = null;
 		this.argumentsCurrent = 0;
+		this.isXLFN = true;
 	}
 	cACOT.prototype = Object.create(cBaseFunction.prototype);
 	cACOT.prototype.constructor = cACOT;
@@ -260,6 +260,7 @@
 		this.name = "ACOTH";
 		this.value = null;
 		this.argumentsCurrent = 0;
+		this.isXLFN = true;
 	}
 	cACOTH.prototype = Object.create(cBaseFunction.prototype);
 	cACOTH.prototype.constructor = cACOTH;
