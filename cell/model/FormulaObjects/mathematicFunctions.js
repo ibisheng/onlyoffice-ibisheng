@@ -56,7 +56,7 @@
 	var _func = AscCommonExcel._func;
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
+	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
 		cCOMBIN, cCOS, cCOSH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSERIESSUM,
@@ -247,6 +247,49 @@
 		}
 	};
 	cACOT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cACOTH() {
+		this.name = "ACOTH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cACOTH.prototype = Object.create(cBaseFunction.prototype);
+	cACOTH.prototype.constructor = cACOTH;
+	cACOTH.prototype.argumentsMin = 1;
+	cACOTH.prototype.argumentsMax = 1;
+	cACOTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cACOTH.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (ElementType.number === elem.type) {
+					var a = Math.atanh(1 / elem.getValue());
+					this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			var a = Math.atanh(1 / arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cACOTH.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x )"
 		};
