@@ -4973,7 +4973,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		this.oValue.cleanCache();
 	};
 	Cell.prototype.setNumFormat=function(val){
-		var oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, new AscCommonExcel.Num({f:val}));
 		if(History.Is_On() && oRes.oldVal != oRes.newVal)
 			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_Num, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 		this.compiledXfs = null;

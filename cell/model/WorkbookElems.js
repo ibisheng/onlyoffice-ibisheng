@@ -1839,30 +1839,6 @@ StyleManager.prototype =
 		}
 		return oRes;
 	},
-	setNumFormat : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.num)
-            oRes.oldVal = xfs.num.getFormat();
-		else
-			oRes.oldVal = g_oDefaultFormat.Num.getFormat();
-        if(null == val)
-        {
-            if(null != xfs) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.num = null;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSet(oItemWithXfs);
-            if(null == xfs.num)
-                xfs.num = g_oDefaultFormat.Num.clone();
-            xfs.num.setFormat(val);
-        }
-		return oRes;
-	},
 	setNum : function(oItemWithXfs, val)
 	{
 		var xfs = oItemWithXfs.xfs;
