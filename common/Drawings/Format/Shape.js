@@ -5444,22 +5444,34 @@ CShape.prototype.getColumnNumber = function(){
         }
     };
 
-    CShape.prototype.convertToConnectionParams = function(rot, oTransform, oBounds, oConnectorInfo){
+    CShape.prototype.convertToConnectionParams = function(rot, flipH, flipV, oTransform, oBounds, oConnectorInfo){
         var _ret =  new AscFormat.ConnectionParams();
         var _rot = oConnectorInfo.ang*AscFormat.cToRad + rot;
         var _normalized_rot = AscFormat.normalizeRotate(_rot);
         _ret.dir = AscFormat.CARD_DIRECTION_E;
         if(_normalized_rot >= 0 && _normalized_rot < Math.PI * 0.25 || _normalized_rot >= 7 * Math.PI * 0.25 && _normalized_rot < 2 * Math.PI){
             _ret.dir = AscFormat.CARD_DIRECTION_E;
+            if(flipH){
+                _ret.dir = AscFormat.CARD_DIRECTION_W;
+            }
         }
         else if(_normalized_rot >= Math.PI * 0.25 && _normalized_rot < 3 * Math.PI * 0.25){
             _ret.dir = AscFormat.CARD_DIRECTION_S;
+            if(flipV){
+                _ret.dir = AscFormat.CARD_DIRECTION_N;
+            }
         }
         else if(_normalized_rot >= 3 * Math.PI * 0.25 && _normalized_rot < 5 * Math.PI * 0.25){
             _ret.dir = AscFormat.CARD_DIRECTION_W;
+            if(flipH){
+                _ret.dir = AscFormat.CARD_DIRECTION_E;
+            }
         }
         else if(_normalized_rot >= 5 * Math.PI * 0.25 && _normalized_rot < 7 * Math.PI * 0.25){
             _ret.dir = AscFormat.CARD_DIRECTION_N;
+            if(flipV){
+                _ret.dir = AscFormat.CARD_DIRECTION_S;
+            }
         }
         _ret.x = oTransform.TransformPointX(oConnectorInfo.x, oConnectorInfo.y);
         _ret.y = oTransform.TransformPointY(oConnectorInfo.x, oConnectorInfo.y);
@@ -5482,7 +5494,7 @@ CShape.prototype.getColumnNumber = function(){
     CShape.prototype.findConnector = function(x, y){
         var oConnGeom = this.findGeomConnector(x, y);
         if(oConnGeom){
-            return this.convertToConnectionParams(this.rot, this.transform, this.bounds, oConnGeom);
+            return this.convertToConnectionParams(this.rot, this.flipH, this.flipV, this.transform, this.bounds, oConnGeom);
         }
         return null;
     };

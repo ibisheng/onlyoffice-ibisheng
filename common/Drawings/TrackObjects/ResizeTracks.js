@@ -381,7 +381,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                 if(oEndShape){
                     var oConectionObject = oEndShape.spPr.geometry.cnxLst[oConnectorInfo.endCnxIdx];
                     var g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _endConnectionInfo = oEndShape.convertToConnectionParams(oEndShape.rot, oEndShape.transform, oEndShape.bounds, g_conn_info);
+                    _endConnectionInfo = oEndShape.convertToConnectionParams(oEndShape.rot, oEndShape.flipH, oEndShape.flipV, oEndShape.transform, oEndShape.bounds, g_conn_info);
                 }
                 _beginConnectionInfo = oConnectionInfo;
                 if(_beginConnectionInfo){
@@ -393,7 +393,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                 if(oBeginShape){
                     var oConectionObject = oBeginShape.spPr.geometry.cnxLst[oConnectorInfo.stCnxIdx];
                     var g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _beginConnectionInfo = oBeginShape.convertToConnectionParams(oBeginShape.rot, oBeginShape.transform, oBeginShape.bounds, g_conn_info);
+                    _beginConnectionInfo = oBeginShape.convertToConnectionParams(oBeginShape.rot, oBeginShape.flipH, oBeginShape.flipV, oBeginShape.transform, oBeginShape.bounds, g_conn_info);
                 }
                 _endConnectionInfo = oConnectionInfo;
 

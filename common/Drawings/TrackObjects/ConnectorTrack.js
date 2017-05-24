@@ -30,22 +30,26 @@
     {
 
         var oConnectorInfo = this.connector.nvSpPr.nvUniSpPr;
-        var _rot, track_bounds, g_conn_info, oConectionObject;
+        var _rot, track_bounds, g_conn_info, oConectionObject, _flipH, _flipV;
         var _startConnectionParams = null;
         var _endConnectionParams = null;
         if(this.beginTrack){
             track_bounds = this.convertTrackBounds(this.beginTrack.getBounds());
             _rot = AscFormat.isRealNumber(this.beginTrack.angle) ? this.beginTrack.angle : this.beginTrack.originalObject.rot;
+            _flipH =  AscFormat.isRealBool(this.beginTrack.resizedflipH) ? this.beginTrack.resizedflipH : this.beginTrack.originalObject.flipH;
+            _flipV =  AscFormat.isRealBool(this.beginTrack.resizedflipV) ? this.beginTrack.resizedflipV : this.beginTrack.originalObject.flipV;
             oConectionObject = this.beginTrack.overlayObject.geometry.cnxLst[oConnectorInfo.stCnxIdx];
             g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-            _startConnectionParams = this.connector.convertToConnectionParams(_rot, this.beginTrack.overlayObject.TransformMatrix, track_bounds, g_conn_info)
+            _startConnectionParams = this.connector.convertToConnectionParams(_rot, _flipH, _flipV, this.beginTrack.overlayObject.TransformMatrix, track_bounds, g_conn_info)
         }
         if(this.endTrack){
             track_bounds = this.convertTrackBounds(this.endTrack.getBounds());
             _rot = AscFormat.isRealNumber(this.endTrack.angle) ? this.endTrack.angle : this.endTrack.originalObject.rot;
+            _flipH =  AscFormat.isRealBool(this.endTrack.resizedflipH) ? this.endTrack.resizedflipH : this.endTrack.originalObject.flipH;
+            _flipV =  AscFormat.isRealBool(this.endTrack.resizedflipV) ? this.endTrack.resizedflipV : this.endTrack.originalObject.flipV;
             oConectionObject = this.endTrack.overlayObject.geometry.cnxLst[oConnectorInfo.endCnxIdx];
             g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-            _endConnectionParams = this.connector.convertToConnectionParams(_rot, this.endTrack.overlayObject.TransformMatrix, track_bounds, g_conn_info)
+            _endConnectionParams = this.connector.convertToConnectionParams(_rot, _flipH, _flipV, this.endTrack.overlayObject.TransformMatrix, track_bounds, g_conn_info)
         }
         if(_startConnectionParams || _endConnectionParams){
 
@@ -53,7 +57,7 @@
                 if(this.beginShape && oConnectorInfo.stCnxIdx !== null){
                     oConectionObject = this.beginShape.spPr.geometry.cnxLst[oConnectorInfo.stCnxIdx];
                     g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _startConnectionParams = this.beginShape.convertToConnectionParams(this.beginShape.rot, this.beginShape.transform, this.beginShape.bounds, g_conn_info);
+                    _startConnectionParams = this.beginShape.convertToConnectionParams(this.beginShape.rot, this.beginShape.flipH, this.beginShape.flipV, this.beginShape.transform, this.beginShape.bounds, g_conn_info);
                 }
                 else{
                     _startConnectionParams = AscFormat.fCalculateConnectionInfo(_endConnectionParams, this.startX, this.startY);
@@ -65,7 +69,7 @@
                 if(this.endShape && oConnectorInfo.endCnxIdx !== null){
                     oConectionObject = this.endShape.spPr.geometry.cnxLst[oConnectorInfo.endCnxIdx];
                     g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _endConnectionParams = this.endShape.convertToConnectionParams(this.endShape.rot, this.endShape.transform, this.endShape.bounds, g_conn_info);
+                    _endConnectionParams = this.endShape.convertToConnectionParams(this.endShape.rot, this.endShape.flipH, this.endShape.flipV, this.endShape.transform, this.endShape.bounds, g_conn_info);
                 }
                 else {
                     _endConnectionParams = AscFormat.fCalculateConnectionInfo(_startConnectionParams, this.endX, this.endY);
