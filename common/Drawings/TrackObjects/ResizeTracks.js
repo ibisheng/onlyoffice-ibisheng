@@ -960,7 +960,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
 
         this.trackEnd = function(bWord)
         {
-            if(!this.bConnector){
+            if(!this.bConnector || !this.oSpPr){
                 var scale_coefficients, ch_off_x, ch_off_y;
                 if(this.originalObject.group)
                 {

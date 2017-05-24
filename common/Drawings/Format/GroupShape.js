@@ -1331,7 +1331,7 @@ function CGroupShape()
     {
         for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
         {
-            if(this.spTree[_shape_index].changePresetGeom)
+            if(this.spTree[_shape_index].getObjectType() === AscDFH.historyitem_type_Shape)
             {
                 this.spTree[_shape_index].changePresetGeom(preset);
             }

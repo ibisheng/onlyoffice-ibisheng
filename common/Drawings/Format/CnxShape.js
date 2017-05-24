@@ -490,6 +490,23 @@
         return copy;
     };
 
+    CConnectionShape.prototype.resetShape = function (oShape) {
+        var cnxPr = this.nvSpPr.nvUniSpPr;
+
+        if(cnxPr.stCnxId === oShape.Id || cnxPr.endCnxId === oShape.Id){
+            var oNewPr = cnxPr.copy();
+            if(cnxPr.stCnxId === oShape.Id){
+                oNewPr.stCnxId = null;
+                oNewPr.stCnxIdx = null;
+            }
+            if(cnxPr.endCnxId === oShape.Id){
+                oNewPr.endCnxId = null;
+                oNewPr.endCnxIdx = null;
+            }
+            this.nvSpPr.setUniSpPr(oNewPr);
+        }
+    };
+
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].fCalculateSpPr = fCalculateSpPr;
     window['AscFormat'].fCalculateConnectionInfo = fCalculateConnectionInfo;

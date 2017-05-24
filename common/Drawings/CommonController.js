@@ -581,9 +581,6 @@ function CheckSpPrXfrm2(object)
 
 }
 
-
-
-
 function getObjectsByTypesFromArr(arr, bGrouped)
 {
     var ret = {shapes: [], images: [], groups: [], charts: [], tables: [], oleObjects: []};
@@ -595,6 +592,7 @@ function getObjectsByTypesFromArr(arr, bGrouped)
         switch(type)
         {
             case AscDFH.historyitem_type_Shape:
+            case AscDFH.historyitem_type_Cnx:
             {
                 ret.shapes.push(drawing);
                 break;
@@ -2537,6 +2535,15 @@ DrawingObjectsController.prototype =
         return api.textArtPreviewManager;
     },
 
+    resetConnectors: function(aShapes){
+        var aAllConnectors = this.getAllConnectors(this.getDrawingArray());
+        for(var  i = 0; i < aAllConnectors.length; ++i){
+            for(var j = 0; j < aShapes.length; ++j){
+                aAllConnectors[i].resetShape(aShapes[j]);
+            }
+        }
+    },
+
     applyDrawingProps: function(props)
     {
         var objects_by_type = this.getSelectedObjectsByTypes(true);
@@ -2629,14 +2636,20 @@ DrawingObjectsController.prototype =
         }
         if(typeof(props.type) === "string")
         {
+            var aShapes = [];
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
-                objects_by_type.shapes[i].changePresetGeom(props.type);
+                if(objects_by_type.shapes[i].getObjectType() === AscDFH.historyitem_type_Shape){
+                    objects_by_type.shapes[i].changePresetGeom(props.type);
+                    aShapes.push(objects_by_type.shapes[i]);
+                }
             }
             for(i = 0; i < objects_by_type.groups.length; ++i)
             {
                 objects_by_type.groups[i].changePresetGeom(props.type);
+                objects_by_type.groups[i].getAllShapes(objects_by_type.groups[i].spTree, aShapes);
             }
+            this.resetConnectors(aShapes);
         }
         if(isRealObject(props.stroke))
         {
@@ -5031,6 +5044,7 @@ DrawingObjectsController.prototype =
             {
                 worksheet.endEditChart();
             }
+            var aAllShapes = [];
             if(this.selection.groupSelection)
             {
                 if(this.selection.groupSelection.selection.chartSelection)
@@ -5039,6 +5053,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
+                    this.getAllShapes(this.selection.groupSelection.selectedObjects, aAllShapes);
                     var group_map = {}, group_arr = [], i, cur_group, sp, xc, yc, hc, vc, rel_xc, rel_yc, j;
                     for(i = 0; i < this.selection.groupSelection.selectedObjects.length; ++i)
                     {
@@ -5131,6 +5146,7 @@ DrawingObjectsController.prototype =
             }
             else
             {
+                this.getAllShapes(this.selectedObjects, aAllShapes);
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].deleteDrawingBase(true);
@@ -5139,6 +5155,7 @@ DrawingObjectsController.prototype =
                     }
 
                 }
+                this.resetConnectors(aAllShapes);
                 this.resetSelection();
                 this.recalculate();
             }
@@ -7077,6 +7094,7 @@ DrawingObjectsController.prototype =
             switch(drawing.getObjectType())
             {
                 case AscDFH.historyitem_type_Shape:
+                case AscDFH.historyitem_type_Cnx:
                 {
 
                     new_shape_props =
