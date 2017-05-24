@@ -128,19 +128,15 @@
             _begin.transform(oTransform);
             _end.transform(oTransform);
 
-            var posX = Math.min(_begin.x, _end.x);
-            var posY = Math.min(_begin.y, _end.y);
             var extX = Math.max(penW/36000.0, Math.abs(_end.x - _begin.x));
             var extY = Math.max(penW/36000.0, Math.abs(_end.y - _begin.y));
             var flipV = false;
             var flipH = false;
             var rot = 0;
             var oMapAdj = {};
-            var tmp;
-            var xc = posX + extX/2, yc = posY + extY/2;
             if(sPreset === "line"){
-                flipH = (begin.x > _end.x);
-                flipV = (begin.y > _end.y);
+                flipH = (_begin.x > _end.x);
+                flipV = (_begin.y > _end.y);
             }
             else{
                 var sPrefix = "bentConnector";

@@ -68,7 +68,7 @@
                     _endConnectionParams = this.endShape.convertToConnectionParams(this.endShape.rot, this.endShape.transform, this.endShape.bounds, g_conn_info);
                 }
                 else {
-                    _endConnectionParams = AscFormat.fCalculateConnectionInfo(_endConnectionParams, this.endX, this.endY);
+                    _endConnectionParams = AscFormat.fCalculateConnectionInfo(_startConnectionParams, this.endX, this.endY);
                 }
             }
             this.oSpPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.connector.spPr.geometry.preset, this.overlayObject.pen.w);

@@ -679,7 +679,7 @@ function getTargetTextObject(controller)
 
 function isConnectorPreset(sPreset){
         if(typeof sPreset === "string" && sPreset.length > 0){
-            return "line" === sPreset || sPreset.toLowerCase().indexOf("connector") > -1;
+            return (sPreset.toLowerCase().indexOf("line") > -1 || sPreset.toLowerCase().indexOf("connector") > -1);
         }
         return false;
 }
