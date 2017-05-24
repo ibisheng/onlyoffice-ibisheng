@@ -56,7 +56,7 @@
 	var _func = AscCommonExcel._func;
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
+	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cASIN, cASINH, cATAN, cATAN2, cATANH, cACOT, cCEILING,
 		cCOMBIN, cCOS, cCOSH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSERIESSUM,
@@ -452,6 +452,50 @@
 		return this.value = arg0;
 	};
 	cATANH.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	//TODO скорее всего стоит
+	function cACOT() {
+		this.name = "ACOT";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cACOT.prototype = Object.create(cBaseFunction.prototype);
+	cACOT.prototype.constructor = cACOT;
+	cACOT.prototype.argumentsMin = 1;
+	cACOT.prototype.argumentsMax = 1;
+	cACOT.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		} else if (arg0 instanceof cArray) {
+			arg0.foreach(function (elem, r, c) {
+				if (elem instanceof cNumber) {
+					var a = Math.PI / 2 - Math.atan(elem.getValue());
+					this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			var a = Math.PI / 2 - Math.atan(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cACOT.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x )"
 		};
