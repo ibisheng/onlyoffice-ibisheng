@@ -10749,20 +10749,22 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
         oXfrm.setOffX(0);
         oXfrm.setOffY(0);
         if(AscFormat.isRealNumber(Width) && AscFormat.isRealNumber(Height)){
-            oXfrm.setExtX(1828800/36000);
-            oXfrm.setExtY(1828800/36000);
+            oXfrm.setExtX(Width);
+			oXfrm.setExtY(Height);
         }
         else{
-            oXfrm.setExtX(Width);
-            oXfrm.setExtY(Height);
+			oXfrm.setExtX(1828800/36000);
+			oXfrm.setExtY(1828800/36000);
         }
         if(typeof sImgUrl === "string" && sImgUrl.length > 0){
             var oBlipFillUnifill = AscFormat.CreateBlipFillUniFillFromUrl(sImgUrl);
             oSpPr.setFill(oBlipFillUnifill);
         }
+        else {
+			oSpPr.setFill(AscFormat.CreateNoFillUniFill());
+        }
         oSpPr.setXfrm(oXfrm);
         oXfrm.setParent(oSpPr);
-        oSpPr.setFill(AscFormat.CreateNoFillUniFill());
         oSpPr.setLn(AscFormat.CreateNoFillLine());
         oSpPr.setGeometry(AscFormat.CreateGeometry("rect"));
         oShape.setSpPr(oSpPr);

@@ -1266,10 +1266,40 @@
 	// signatures
 	baseEditorsApi.prototype.asc_AddSignatureLine2 = function(_obj)
 	{
+		var _w = 50;
+		var _h = 50;
+		var _w_pix = (_w * AscCommon.g_dKoef_mm_to_pix) >> 0;
+		var _h_pix = (_h * AscCommon.g_dKoef_mm_to_pix) >> 0;
+		var _canvas = document.createElement("canvas");
+		_canvas.width = _w_pix;
+		_canvas.height = _h_pix;
+		var _ctx = _canvas.getContext("2d");
+		_ctx.fillStyle = "#000000";
+		_ctx.strokeStyle = "#000000";
+		_ctx.font = "10pt 'Courier New'";
+		_ctx.lineWidth = 3;
+
+		_ctx.beginPath();
+		var _y_line = (_h_pix >> 1) + 0.5;
+		_ctx.moveTo(0, _y_line);
+		_ctx.lineTo(_w_pix, _y_line);
+		_ctx.stroke();
+		_ctx.beginPath();
+		_ctx.fillText(_obj.asc_getSigner1(), 10, _y_line + 20);
+		_ctx.fillText(_obj.asc_getSigner2(), 10, _y_line + 35);
+		_ctx.fillText(_obj.asc_getEmail(), 10, _y_line + 50);
+
+		var _url = _canvas.toDataURL("image/png");
+		_canvas = null;
+
 		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
 		function guid() { return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();	}
 
-		return this.asc_addSignatureLine(guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail());
+		var _args = [guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail(), _w, _h, _url];
+
+		this.ImageLoader.LoadImageWithCallback(_url, function(_args) {
+			this.asc_addSignatureLine(_args[0], _args[1], _args[2], _args[3], _args[4], _args[5], _args[6]);
+		}, _args);
 	};
 
 	baseEditorsApi.prototype.asc_getRequestSignatures = function()

@@ -2655,17 +2655,17 @@ CAutoshapeTrack.prototype =
 		par.Recalculate_Page(0);
 		par.Recalculate_Page(0);
 
-		var baseLineOffset = par.Lines[0].Y;
 		var _bounds = par.Get_PageBounds(0);
 
-		var ctx = this.Canvas.getContext('2d');
-		var _wPx = this.Canvas.width;
-		var _hPx = this.Canvas.height;
+        var _canvas = this.getCanvas();
+		var _ctx = _canvas.getContext('2d');
+		var _wPx = _canvas.width;
+		var _hPx = _canvas.height;
 
 		var _wMm = _wPx * g_dKoef_pix_to_mm;
 		var _hMm = _hPx * g_dKoef_pix_to_mm;
 
-		ctx.clearRect(0, 0, _wPx, _hPx);
+		_ctx.clearRect(0, 0, _wPx, _hPx);
 
 		var _pxBoundsW = par.Lines[0].Ranges[0].W * g_dKoef_mm_to_pix;//(_bounds.Right - _bounds.Left) * g_dKoef_mm_to_pix;
 		var _pxBoundsH = (_bounds.Bottom - _bounds.Top) * g_dKoef_mm_to_pix;
@@ -2674,7 +2674,7 @@ CAutoshapeTrack.prototype =
 		var _xOffset = (_wPx - _pxBoundsW) >> 1;
 
 		var graphics = new AscCommon.CGraphics();
-		graphics.init(ctx, _wPx, _hPx, _wMm, _hMm);
+		graphics.init(_ctx, _wPx, _hPx, _wMm, _hMm);
 		graphics.m_oFontManager = AscCommon.g_fontManager;
 
 		graphics.m_oCoordTransform.tx = _xOffset;

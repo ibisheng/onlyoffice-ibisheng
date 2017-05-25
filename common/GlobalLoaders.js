@@ -438,6 +438,9 @@
         this.bIsLoadDocumentImagesNoByOrder = true;
         this.nNoByOrderCounter = 0;
 
+        this.loadFontCallBack = null;
+        this.loadFontCallBackArgs = null;
+
 		var oThis = this;
 
         this.put_Api = function(_api)
@@ -615,7 +618,40 @@
             };
             //oImage.Image.crossOrigin = 'anonymous';
             oImage.Image.src = oImage.src;
-        }
+        };
+
+        this.LoadImageWithCallback = function(src, loadFontCallBack, loadFontCallBackArgs)
+        {
+            if (this.map_image_index[src])
+            {
+                loadFontCallBack.call(this.Api, loadFontCallBackArgs);
+                return;
+            }
+
+			this.loadFontCallBack = loadFontCallBack;
+            this.loadFontCallBackArgs = loadFontCallBackArgs;
+
+			var oImage = new CImage(src);
+			oImage.Image = new Image();
+			oImage.Status = ImageLoadStatus.Loading;
+			this.map_image_index[oImage.src] = oImage;
+
+			oImage.Image.onload = function(){
+				oImage.Status = ImageLoadStatus.Complete;
+				oThis.loadFontCallBack.call(oThis.Api, oThis.loadFontCallBackArgs);
+				oThis.loadFontCallBack = null;
+				oThis.loadFontCallBackArgs = null;
+			};
+			oImage.Image.onerror = function(){
+				oImage.Image = null;
+				oImage.Status = ImageLoadStatus.Complete;
+				oThis.loadFontCallBack.call(oThis.Api, oThis.loadFontCallBackArgs);
+				oThis.loadFontCallBack = null;
+				oThis.loadFontCallBackArgs = null;
+			};
+			//oImage.Image.crossOrigin = 'anonymous';
+			oImage.Image.src = oImage.src;
+        };
     }
 
     var g_flow_anchor = new Image();

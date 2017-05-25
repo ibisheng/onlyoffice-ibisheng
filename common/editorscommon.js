@@ -2811,7 +2811,7 @@
 	};
 
 	window.Asc.g_signature_drawer = null;
-	function CSignatureDrawer(id, api)
+	function CSignatureDrawer(id, api, w, h)
 	{
 		window.Asc.g_signature_drawer = this;
 
@@ -2843,25 +2843,49 @@
 		this.Size = 10;
 		this.Italic = true;
 		this.Bold = false;
+
+		this.Width = w;
+		this.Height = h;
+
+		this.CanvasReturn = null;
 	}
+
+	CSignatureDrawer.prototype.getCanvas = function()
+	{
+		return (this.CanvasReturn != null) ? this.Canvas : this.CanvasReturn;
+	};
 
 	CSignatureDrawer.prototype.getImages = function()
 	{
-		var _ret = [];
-		_ret.push(this.Canvas.toDataURL("image/png"));
+		if (!this.isValid())
+			return ["", ""];
 
-		var _ctx = this.Canvas.getContext("2d");
+		this.CanvasReturn = document.createElement("canvas");
+		this.CanvasReturn.width = (this.Width * AscCommon.g_dKoef_mm_to_pix);
+		this.CanvasReturn.height = (this.Height * AscCommon.g_dKoef_mm_to_pix);
+
+		if (this.Text != "")
+			this.drawText();
+		else
+			this.drawImage();
+
+		var _ret = [];
+		_ret.push(this.CanvasReturn.toDataURL("image/png"));
+
+		var _ctx = this.CanvasReturn.getContext("2d");
 		_ctx.strokeStyle = "#FF0000";
 		_ctx.lineWidth = 2;
 
 		_ctx.moveTo(0, 0);
-		_ctx.lineTo(this.Canvas.width, this.Canvas.height);
-		_ctx.moveTo(0, this.Canvas.height);
-		_ctx.lineTo(this.Canvas.width, 0);
+		_ctx.lineTo(this.CanvasReturn.width, this.CanvasReturn.height);
+		_ctx.moveTo(0, this.CanvasReturn.height);
+		_ctx.lineTo(this.CanvasReturn.width, 0);
 
 		_ctx.stroke();
 
-		_ret.push(this.Canvas.toDataURL("image/png"));
+		_ret.push(this.CanvasReturn.toDataURL("image/png"));
+
+		this.CanvasReturn = null;
 		return _ret;
 	};
 
@@ -2893,6 +2917,43 @@
 		AscFormat.ExecuteNoHistory(AscCommon.DrawTextByCenter, this, []);
 	};
 
+	CSignatureDrawer.prototype.drawImage = function()
+	{
+		var _canvas = this.getCanvas();
+		var w = _canvas.width;
+		var h = _canvas.height;
+		var _ctx = _canvas.getContext("2d");
+		_ctx.clearRect(0, 0, w, h);
+
+		var im_w = this.ImageHtml.width;
+		var im_h = this.ImageHtml.height;
+
+		var _x = 0;
+		var _y = 0;
+		var _w = 0;
+		var _h = 0;
+
+		var koef1 = w / h;
+		var koef2 = im_w / im_h;
+
+		if (koef1 > koef2)
+		{
+			_h = h;
+			_w = (koef2 * _h) >> 0;
+			_y = 0;
+			_x = (w - _w) >> 1;
+		}
+		else
+		{
+			_w = w;
+			_h = (_w / koef2) >> 0;
+			_x = 0;
+			_y = (h - _h) >> 1;
+		}
+
+		_ctx.drawImage(this.ImageHtml, _x, _y, _w, _h);
+	};
+
 	CSignatureDrawer.prototype.selectImage = CSignatureDrawer.prototype["selectImage"] = function()
 	{
 		this.Text = "";
@@ -2907,13 +2968,7 @@
 			_drawer.ImageHtml = new Image();
 			_drawer.ImageHtml.onload = function()
 			{
-				var _drawer = window.Asc.g_signature_drawer;
-				var w = _drawer.Canvas.width;
-				var h = _drawer.Canvas.height;
-				var _ctx = _drawer.Canvas.getContext("2d");
-				_ctx.clearRect(0, 0, w, h);
-				_ctx.drawImage(this, 0, 0, w, h);
-				_drawer = null;
+				window.Asc.g_signature_drawer.drawImage();
 			};
 			_drawer.ImageHtml.src = _drawer.Image;
 			_drawer = null;
@@ -2931,6 +2986,44 @@
 		window.Asc.g_signature_drawer.CanvasParent.removeChild(window.Asc.g_signature_drawer);
 		delete window.Asc.g_signature_drawer;
 	};
+
+	function CSignatureImage()
+	{
+		this.ImageValidBase64 = "";
+		this.ImageInvalidBase64 = "";
+
+		this.ImageValid = null;
+		this.ImageInvalid = null;
+
+		this.Valid = false;
+		this.Loading = 0;
+
+		this.Remove = function()
+		{
+			this.ImageValidBase64 = "";
+			this.ImageInvalidBase64 = "";
+
+			this.ImageValid = null;
+			this.ImageInvalid = null;
+
+			this.Valid = false;
+			this.Loading = 0;
+		};
+
+		this.Register = function(_api, _guid)
+		{
+			if (_api.ImageLoader.map_image_index[_guid])
+				return;
+			var _obj = { Image : (this.Valid ? this.ImageValid : this.ImageInvalid), Status : ImageLoadStatus.Complete, src : _guid };
+			_api.ImageLoader.map_image_index[_guid] = _obj;
+		};
+
+		this.Unregister = function(api, _guid)
+		{
+			if (_api.ImageLoader.map_image_index[_guid])
+				delete _api.ImageLoader.map_image_index[_guid];
+		};
+	}
 
 	//------------------------------------------------------------export---------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
@@ -2989,6 +3082,7 @@
 	window["AscCommon"].parserHelp = parserHelp;
 	window["AscCommon"].g_oIdCounter = g_oIdCounter;
 
+	window["AscCommon"].CDocumentSignatureImages = CDocumentSignatureImages;
 	window["AscCommon"].CSignatureDrawer = window["AscCommon"]["CSignatureDrawer"] = CSignatureDrawer;
 	var prot = CSignatureDrawer.prototype;
 	prot["getImages"] 	= prot.getImages;
