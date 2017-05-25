@@ -600,6 +600,18 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), Math.cos( Math.PI / 2 ) );
     } );
 
+	test( "Test: \"ACOT(2)\"", function () {
+		oParser = new parserFormula( 'ACOT(2)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), Math.PI / 2 - Math.atan(2) );
+	} );
+
+	test( "Test: \"ACOTH(6)\"", function () {
+		oParser = new parserFormula( 'ACOTH(6)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), Math.atanh(1 / 6) );
+	} );
+
     test( "Test: \"SUM(1,2,3)\"", function () {
         oParser = new parserFormula( 'SUM(1,2,3)', "A1", ws );
         ok( oParser.parse() );
