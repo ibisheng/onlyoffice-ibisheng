@@ -5539,7 +5539,8 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
 
         if (false === this.Can_InsertContent(DocContent, NearPos))
         {
-            History.Remove_LastPoint();
+            this.History.Remove_LastPoint();
+			NearPos.Paragraph.Clear_NearestPosArray();
             return;
         }
 
@@ -5565,7 +5566,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
                 if (false === Para.Is_UseInDocument())
                 {
                     this.Document_Undo();
-                    History.Clear_Redo();
+                    this.History.Clear_Redo();
                     return;
                 }
             }
@@ -5582,7 +5583,10 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
             this.Document_UpdateRulersState();
         }
         else
-            History.Remove_LastPoint();
+		{
+			this.History.Remove_LastPoint();
+			NearPos.Paragraph.Clear_NearestPosArray();
+		}
     }
 };
 /**

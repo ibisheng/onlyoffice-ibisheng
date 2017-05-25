@@ -389,6 +389,24 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
 			arrContentControls[nIndex].Document_Is_SelectionLocked(CheckType);
 	}
 
+	// Проверка для специального случая, когда мы переносим текст из параграфа в него самого. В такой ситуации надо
+	// проверять не только выделенную часть, но и место куда происходит вставка/перенос.
+	if (this.NearPosArray.length > 0)
+	{
+		var ParaState = this.GetSelectionState();
+		this.Selection.Use = false;
+		this.Set_ParaContentPos(this.NearPosArray[0].NearPos.ContentPos, true, -1, -1);
+		arrContentControls = this.GetSelectedContentControls();
+
+		for (var nIndex = 0, nCount = arrContentControls.length; nIndex < nCount; ++nIndex)
+		{
+			if (false === arrContentControls[nIndex].IsSelectionUse())
+				arrContentControls[nIndex].Document_Is_SelectionLocked(CheckType);
+		}
+
+		this.SetSelectionState(ParaState, 0);
+	}
+
 	var bCheckContentControl = false;
     switch ( CheckType )
     {
