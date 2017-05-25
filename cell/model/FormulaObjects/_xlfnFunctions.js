@@ -68,7 +68,7 @@
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cARABIC, cBASE, cCEILING_MATH, cCEILING_PRECISE,
+	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cCEILING_MATH, cCEILING_PRECISE,
 		cCOMBINA, cCOT, cCOTH, cCSC, cCSCH, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT, cSEC, cSECH);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
@@ -88,18 +88,6 @@
 
 	cAGGREGATE.prototype = Object.create(cBaseFunction.prototype);
 	cAGGREGATE.prototype.constructor = cAGGREGATE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cARABIC() {
-		cBaseFunction.call(this, "ARABIC");
-		this.isXLFN = true;
-	}
-
-	cARABIC.prototype = Object.create(cBaseFunction.prototype);
-	cARABIC.prototype.constructor = cARABIC;
 
 	/**
 	 * @constructor
