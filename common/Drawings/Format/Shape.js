@@ -2531,12 +2531,6 @@ CShape.prototype.recalculateTextStyles = function (level) {
 };
 
 CShape.prototype.recalculateBrush = function () {
-
-    if(this.signatureLine){
-        this.brush = AscFormat.CreateBlipFillUniFillFromUrl("");
-        return;
-    }
-
     var compiled_style = this.getCompiledStyle();
     var RGBA = {R: 0, G: 0, B: 0, A: 255};
     var parents = this.getParentObjects();
@@ -4084,13 +4078,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             return;
     }
 
-    if(this.signatureLine){
-        var sSignatureUrl = "";
-        if(typeof editor !== "undefined" && editor){
-            sSignatureUrl = editor.asc_getSignatureImage(this.signatureLine.id);
-        }
-        this.brush = AscFormat.CreateBlipFillUniFillFromUrl(sSignatureUrl);
-    }
+
     var _transform = transform ? transform : this.transform;
     var _transform_text = transformText ? transformText : this.transformText;
     if (graphics.IsSlideBoundsCheckerType === true) {
@@ -4132,6 +4120,17 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
         return;
     }
 
+
+    var _oldBrush = this.brush;
+    if(this.signatureLine){
+        var sSignatureUrl = null;
+        if(typeof editor !== "undefined" && editor){
+            sSignatureUrl = editor.asc_getSignatureImage(this.signatureLine.id);
+        }
+        if(typeof sSignatureUrl === "string" && sSignatureUrl.length > 0){
+            this.brush = AscFormat.CreateBlipFillUniFillFromUrl(sSignatureUrl);
+        }
+    }
     if (this.spPr && this.spPr.geometry || this.style || (this.brush && this.brush.fill) || (this.pen && this.pen.Fill && this.pen.Fill.fill)) {
         graphics.SetIntegerGrid(false);
         graphics.transform3(_transform, false);
@@ -4208,7 +4207,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             graphics.SetIntegerGrid(true);
         }
     }
-
+    this.brush = _oldBrush;
     var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
     if(!this.txWarpStruct && !this.txWarpStructParamarksNoTransform || (!this.txWarpStructParamarksNoTransform && oController && (AscFormat.getTargetTextObject(oController) === this) || (!this.txBody && !this.textBoxContent)) /*|| this.haveSelectedDrawingInContent()*/)
     {

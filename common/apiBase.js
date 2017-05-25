@@ -1257,7 +1257,7 @@
 	{
 	};
 
-	baseEditorsApi.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail) {
+	baseEditorsApi.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl) {
 
     };
 	baseEditorsApi.prototype.asc_getAllSignatures = function () {
