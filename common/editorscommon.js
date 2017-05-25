@@ -2903,6 +2903,7 @@
 		var loader     = AscCommon.g_font_loader;
 		var fontinfo   = AscFonts.g_fontApplication.GetFontInfo(font);
 		var isasync    = loader.LoadFont(fontinfo, function() {
+			window.Asc.g_signature_drawer.Api.sync_EndAction(Asc.c_oAscAsyncActionType.Information, Asc.c_oAscAsyncAction.LoadFont);
 			window.Asc.g_signature_drawer.drawText();
 		});
 
