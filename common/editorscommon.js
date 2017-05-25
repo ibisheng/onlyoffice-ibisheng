@@ -3082,7 +3082,6 @@
 	window["AscCommon"].parserHelp = parserHelp;
 	window["AscCommon"].g_oIdCounter = g_oIdCounter;
 
-	window["AscCommon"].CDocumentSignatureImages = CDocumentSignatureImages;
 	window["AscCommon"].CSignatureDrawer = window["AscCommon"]["CSignatureDrawer"] = CSignatureDrawer;
 	var prot = CSignatureDrawer.prototype;
 	prot["getImages"] 	= prot.getImages;

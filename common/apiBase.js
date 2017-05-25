@@ -1285,9 +1285,18 @@
 		_ctx.lineTo(_w_pix, _y_line);
 		_ctx.stroke();
 		_ctx.beginPath();
-		_ctx.fillText(_obj.asc_getSigner1(), 10, _y_line + 20);
-		_ctx.fillText(_obj.asc_getSigner2(), 10, _y_line + 35);
-		_ctx.fillText(_obj.asc_getEmail(), 10, _y_line + 50);
+
+		_ctx.lineWidth = 2;
+		_y_line -= 10;
+		_ctx.moveTo(10, _y_line);
+		_ctx.lineTo(25, _y_line - 10);
+		_ctx.lineTo(10, _y_line - 20);
+		_ctx.stroke();
+		_ctx.beginPath();
+
+		_ctx.fillText(_obj.asc_getSigner1(), 10, _y_line + 25);
+		_ctx.fillText(_obj.asc_getSigner2(), 10, _y_line + 40);
+		_ctx.fillText(_obj.asc_getEmail(), 10, _y_line + 55);
 
 		var _url = _canvas.toDataURL("image/png");
 		_canvas = null;
