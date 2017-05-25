@@ -233,7 +233,7 @@
 			return this.value = arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
-				if (ElementType.number === elem.type) {
+				if (cElementType.number === elem.type) {
 					var a = Math.PI / 2 - Math.atan(elem.getValue());
 					this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 				} else {
@@ -277,7 +277,7 @@
 			return this.value = arg0;
 		} else if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
-				if (ElementType.number === elem.type) {
+				if (cElementType.number === elem.type) {
 					var a = Math.atanh(1 / elem.getValue());
 					this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 				} else {
@@ -331,19 +331,19 @@
 		};
 
 		var arg0 = arg[0];
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 		arg0 = arg0.tocString();
 
-		if (arg0 instanceof cError) {
+		if (cElementType.error === arg0.type) {
 			return this.value = arg0;
 		}
 
-		if (arg0 instanceof cArray) {
+		if (cElementType.array === arg0.type) {
 			arg0.foreach(function (elem, r, c) {
 				var a = elem;
-				if (a instanceof cString) {
+				if (cElementType.string === a.type) {
 					var res = to_arabic(a.getValue());
 					this.array[r][c] = isNaN(res) ? new cError(cErrorType.wrong_value_type) : new cNumber(res);
 				} else {
