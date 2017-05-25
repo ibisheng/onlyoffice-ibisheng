@@ -69,7 +69,7 @@
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cCEILING_MATH, cCEILING_PRECISE,
-		cCOMBINA, cCOT, cCOTH, cCSC, cCSCH, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT, cSEC, cSECH);
+		cCOMBINA, cCSC, cCSCH, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT, cSEC, cSECH);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
@@ -340,30 +340,6 @@
 
 	cCONFIDENCE_T.prototype = Object.create(cBaseFunction.prototype);
 	cCONFIDENCE_T.prototype.constructor = cCONFIDENCE_T;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCOT() {
-		cBaseFunction.call(this, "COT");
-		this.isXLFN = true;
-	}
-
-	cCOT.prototype = Object.create(cBaseFunction.prototype);
-	cCOT.prototype.constructor = cCOT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCOTH() {
-		cBaseFunction.call(this, "COTH");
-		this.isXLFN = true;
-	}
-
-	cCOTH.prototype = Object.create(cBaseFunction.prototype);
-	cCOTH.prototype.constructor = cCOTH;
 
 	/**
 	 * @constructor

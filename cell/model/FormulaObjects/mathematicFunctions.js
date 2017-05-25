@@ -57,7 +57,7 @@
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
-		cCOMBIN, cCOS, cCOSH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cGCD, cINT,
+		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSERIESSUM,
 		cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS, cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2,
@@ -885,6 +885,121 @@
 		return this.value = arg0;
 	};
 	cCOSH.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCOT() {
+		this.name = "COT";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cCOT.prototype = Object.create(cBaseFunction.prototype);
+	cCOT.prototype.constructor = cCOT;
+	cCOT.prototype.argumentsMin = 1;
+	cCOT.prototype.argumentsMax = 1;
+	cCOT.prototype.isXLFN = true;
+	cCOT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cCOT.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		var maxVal = Math.pow(2, 27);
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (cElementType.number === elem.type) {
+					if(0 === elem.getValue()){
+						this.array[r][c] = new cError(cErrorType.division_by_zero);
+					}
+					else if (Math.abs(elem.getValue()) >= maxVal) {
+						this.array[r][c] = new cError(cErrorType.not_numeric);
+					}
+					else{
+						var a = 1 / Math.tan(elem.getValue());
+						this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+					}
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			if(0 === arg0.getValue()){
+				return this.value = new cError(cErrorType.division_by_zero);
+			}
+			else if (Math.abs(arg0.getValue()) >= maxVal) {
+				return this.value = new cError(cErrorType.not_numeric);
+			}
+
+			var a = 1 / Math.tan(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cCOT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCOTH() {
+		this.name = "COTH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cCOTH.prototype = Object.create(cBaseFunction.prototype);
+	cCOTH.prototype.constructor = cCOTH;
+	cCOTH.prototype.argumentsMin = 1;
+	cCOTH.prototype.argumentsMax = 1;
+	cCOTH.prototype.isXLFN = true;
+	cCOTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cCOTH.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+
+		//TODO в документации к COTH написано максимальное значение - Math.pow(2, 27), но MS EXCEL в данном случае не выдает ошибку
+		//проверку на максиимальное значение убрал
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (cElementType.number === elem.type) {
+					if(0 === elem.getValue()){
+						this.array[r][c] = new cError(cErrorType.division_by_zero);
+					}else{
+						var a = 1 / Math.tanh(elem.getValue());
+						this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+					}
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			if(0 === arg0.getValue()){
+				return this.value = new cError(cErrorType.division_by_zero);
+			}
+
+			var a = 1 / Math.tanh(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cCOTH.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x )"
 		};

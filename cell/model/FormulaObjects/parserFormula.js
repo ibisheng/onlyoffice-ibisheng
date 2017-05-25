@@ -537,8 +537,20 @@ Math.cosh = function ( arg ) {
     return (this.pow( this.E, arg ) + this.pow( this.E, -arg )) / 2;
 };
 
-Math.tanh = function ( arg ) {
-    return this.sinh( arg ) / this.cosh( arg );
+Math.tanh = Math.tanh || function(x) {
+	if (x === Infinity) {
+		return 1;
+	} else if (x === -Infinity) {
+		return -1;
+	} else {
+		var y = Math.exp(2 * x);
+		if (y === Infinity) {
+			return 1;
+		} else if (y === -Infinity) {
+			return -1;
+		}
+		return (y - 1) / (y + 1);
+	}
 };
 
 Math.asinh = function ( arg ) {
