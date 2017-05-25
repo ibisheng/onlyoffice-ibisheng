@@ -1374,6 +1374,13 @@
 	};
 
 	baseEditorsApi.prototype.asc_getSignatureImage = function (sGuid) {
+
+		var count = this.signatures.length;
+		for (var i = 0; i < count; i++)
+		{
+			if (this.signatures[i].guid == sGuid)
+				return this.signatures[i].image;
+		}
 		return "";
     };
 

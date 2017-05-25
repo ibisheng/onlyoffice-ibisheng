@@ -2852,7 +2852,7 @@
 
 	CSignatureDrawer.prototype.getCanvas = function()
 	{
-		return (this.CanvasReturn != null) ? this.Canvas : this.CanvasReturn;
+		return (this.CanvasReturn == null) ? this.Canvas : this.CanvasReturn;
 	};
 
 	CSignatureDrawer.prototype.getImages = function()

@@ -249,6 +249,8 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 	var _data = _signatures["data"];
 	var _sign;
 	var _add_sign;
+
+	var _images_loading = [];
 	for (var i = 0; i < _count; i++)
 	{
 		_sign = _data[i];
@@ -257,10 +259,13 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 		_add_sign.guid = _sign["guid"];
 		_add_sign.valid = _sign["valid"];
 		_add_sign.image = (_add_sign.valid == 0) ? _sign["image_valid"] : _sign["image_invalid"];
+		_add_sign.image = "data:image/png;base64," + _add_sign.image;
 		_add_sign.signer1 = _sign["name"];
 		_add_sign.id = i;
 
 		_editor.signatures.push(_add_sign);
+
+		_images_loading.push(_add_sign.image);
 	}
 
 	_editor.asc_registerCallback("asc_onAddSignature", function(guid) {
@@ -275,6 +280,11 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 		_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
 
 	});
+
+	_editor.ImageLoader.LoadImagesWithCallback(_images_loading, function() {
+		if (this.WordControl)
+			this.WordControl.m_oDrawingDocument.OnRePaintAttack();
+	}, null);
 };
 
 window["OnNativeReturnCallback"] = function(name, obj)
