@@ -260,7 +260,7 @@ function CChangesDrawingObjectsRemoveFromDrawingObjects(Class, Pos){
 
 CShape.prototype.addToDrawingObjects =  function(pos, type)
 {
-    var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
+    var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, type);
     //var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
     History.Add(new CChangesDrawingObjectsAddToDrawingObjects(this, position));
     //this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));

@@ -494,7 +494,93 @@
 	ApiWorksheet.prototype.AddImage = function(sImageSrc, nWidth, nHeight, nFromCol, nColOffset, nFromRow, nRowOffset){
 		var oImage = AscFormat.DrawingObjectsController.prototype.createImage(sImageSrc, 0, 0, nWidth/36000, nHeight/36000);
 		private_SetCoords(oImage, this.worksheet, nWidth, nHeight, nFromCol, nColOffset,  nFromRow, nRowOffset);
-		return new ApiImage(AscFormat.DrawingObjectsController.prototype.createImage(sImageSrc, 0, 0, nWidth/36000, nHeight/36000));
+		return new ApiImage(oImage);
+	};
+
+	/**
+	 */
+	ApiWorksheet.prototype.ReplaceCurrentImage = function(sImageUrl, Width, Height){
+
+        var oWorksheet = Asc.editor.wb.getWorksheet();
+        if(oWorksheet && oWorksheet.objectRender && oWorksheet.objectRender.controller){
+
+            var oController = oWorksheet.objectRender.controller;
+            var _w = Width/36000.0;
+            var _h = Height/36000.0;
+            var oImage = oController.createImage(sImageUrl, 0, 0, _w, _h);
+            oImage.setWorksheet(oWorksheet.model);
+            var selectedObjects, spTree;
+            if(oController.selection.groupSelection){
+                selectedObjects = oController.selection.groupSelection.selectedObjects;
+            }
+            else{
+                selectedObjects = oController.selectedObjects;
+            }
+            if(selectedObjects.length > 0){
+                if(selectedObjects[0].group){
+                    spTree = selectedObjects[0].group.spTree;
+                }
+                else{
+					spTree = oController.getDrawingArray();
+                }
+
+                for(var i = 0; i < spTree.length; ++i){
+                    if(spTree[i] === selectedObjects[0]){
+                    	if(spTree[i].getObjectType() === AscDFH.historyitem_type_ImageShape){
+                            spTree[i].setBlipFill(AscFormat.CreateBlipFillRasterImageId(sImageUrl));
+                            if(selectedObjects[0].group){
+                                oController.selection.groupSelection.resetInternalSelection();
+                                _group.selectObject(spTree[i], 0);
+                            }
+                            else{
+                                oController.resetSelection();
+                                oController.selectObject(spTree[i], 0);
+                            }
+						}
+						else{
+                            var _xfrm = spTree[i].spPr && spTree[i].spPr.xfrm;
+                            var _xfrm2 = oImage.spPr.xfrm;
+                            if(_xfrm){
+                                _xfrm2.setOffX(_xfrm.offX);
+                                _xfrm2.setOffY(_xfrm.offY);
+                            }
+                            else{
+                                if(AscFormat.isRealNumber(spTree[i].x) && AscFormat.isRealNumber(spTree[i].y)){
+                                    _xfrm2.setOffX(spTree[i].x);
+                                    _xfrm2.setOffY(spTree[i].y);
+                                }
+                            }
+                            if(selectedObjects[0].group){
+                                var _group = selectedObjects[0].group;
+                                _group.removeFromSpTreeByPos(i);
+                                _group.addToSpTree(i, oImage);
+                                oImage.setGroup(_group);
+                                oController.selection.groupSelection.resetInternalSelection();
+                                _group.selectObject(oImage, 0);
+                            }
+                            else{
+                                var _object = spTree[i];
+                                _object.deleteDrawingBase();
+                                oImage.setBDeleted(false);
+                                oImage.setWorksheet(oWorksheet.model);
+                                oImage.setBFromSerialize(true);
+                                oImage.addToDrawingObjects(i);
+                                oImage.setDrawingBaseType(AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
+                                oImage.setDrawingBaseCoords(0, 0, 0, 0, 0, 0, 0, 0, _object.x, _object.y, oImage.spPr.xfrm.extX, oImage.spPr.xfrm.extY);
+                                oImage.setDrawingBaseExt(oImage.spPr.xfrm.extX, oImage.spPr.xfrm.extY);
+                                oController.resetSelection();
+                                oController.selectObject(oImage, 0);
+                            }
+						}
+                        return;
+                    }
+                }
+            }
+            var cell = this.worksheet.selectionRange.activeCell;
+            private_SetCoords(oImage, oWorksheet.model, Width, Height, cell ? cell.col : 0, 0,  cell ? cell.row : 0, 0, undefined);
+            oController.resetSelection();
+            oController.selectObject(oImage, 0);
+        }
 	};
 
 	/**
@@ -1189,7 +1275,7 @@
     ApiColor.prototype["GetClassType"]                 =  ApiColor.prototype.GetClassType;
 
 
-	function private_SetCoords(oDrawing, oWorksheet, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset){
+	function private_SetCoords(oDrawing, oWorksheet, nExtX, nExtY, nFromCol, nColOffset,  nFromRow, nRowOffset, pos){
 		oDrawing.x = 0;
 		oDrawing.y = 0;
 		oDrawing.extX = 0;
@@ -1200,7 +1286,7 @@
 		oDrawing.setBDeleted(false);
 		oDrawing.setWorksheet(oWorksheet);
 		oDrawing.setBFromSerialize(true);
-		oDrawing.addToDrawingObjects();
+		oDrawing.addToDrawingObjects(pos);
 		oDrawing.setDrawingBaseType(AscCommon.c_oAscCellAnchorType.cellanchorOneCell);
 		oDrawing.setDrawingBaseCoords(nFromCol, nColOffset/36000.0, nFromRow, nRowOffset/36000.0, 0, 0, 0, 0, 0, 0, 0, 0);
 		oDrawing.setDrawingBaseExt(nExtX/36000.0, nExtY/36000.0);

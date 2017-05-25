@@ -11068,4 +11068,5 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].CreateBlipFillUniFillFromUrl = CreateBlipFillUniFillFromUrl;
 	window['AscFormat'].fGetListTypeFromBullet = fGetListTypeFromBullet;
 	window['AscFormat'].fGetPresentationBulletByNumInfo = fGetPresentationBulletByNumInfo;
+	window['AscFormat'].CreateBlipFillRasterImageId = CreateBlipFillRasterImageId;
 })(window);

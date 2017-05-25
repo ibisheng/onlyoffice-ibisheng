@@ -11651,7 +11651,7 @@ CSurfaceChart.prototype =
 
 
     isWireframe: function(){
-        return this.wireframe !== false;
+        return this.wireframe === true;
     },
 
     getBandFmtByIndex: function(idx){
