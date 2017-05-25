@@ -1306,7 +1306,7 @@
 
 		var _args = [guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail(), _w, _h, _url];
 
-		this.ImageLoader.LoadImageWithCallback(_url, function(_args) {
+		this.ImageLoader.LoadImagesWithCallback([_url], function(_args) {
 			this.asc_addSignatureLine(_args[0], _args[1], _args[2], _args[3], _args[4], _args[5], _args[6]);
 		}, _args);
 	};
