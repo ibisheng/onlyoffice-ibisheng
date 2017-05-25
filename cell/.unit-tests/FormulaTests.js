@@ -611,6 +611,11 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), Math.atanh(1 / 6) );
 	} );
+	test( "Test: \"ARABIC('LVII')\"", function () {
+		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 57 );
+	} );
 
     test( "Test: \"SUM(1,2,3)\"", function () {
         oParser = new parserFormula( 'SUM(1,2,3)', "A1", ws );
