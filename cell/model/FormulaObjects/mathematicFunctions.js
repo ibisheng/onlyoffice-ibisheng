@@ -56,7 +56,7 @@
 	var _func = AscCommonExcel._func;
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
+	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
 		cCOMBIN, cCOS, cCOSH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSERIESSUM,
@@ -293,6 +293,73 @@
 	cACOTH.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cARABIC() {
+		this.name = "ARABIC";
+		this.value = null;
+		this.argumentsCurrent = 0;
+		this.isXLFN = true;
+	}
+
+	cARABIC.prototype = Object.create(cBaseFunction.prototype);
+	cARABIC.prototype.constructor = cARABIC;
+	cARABIC.prototype.argumentsMin = 1;
+	cARABIC.prototype.argumentsMax = 1;
+	cARABIC.prototype.Calculate = function (arg) {
+		var to_arabic = function(roman) {
+			roman = roman.toUpperCase();
+			if (roman < 1){
+				return 0;
+			}
+			else if(!/^M*(?:D?C{0,3}|C[MD])(?:L?X{0,3}|X[CL])(?:V?I{0,3}|I[XV])$/i.test(roman))	{
+				return NaN;
+			}
+
+			var chars = {M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1};
+			var arabic = 0;
+			roman.replace(/[MDLV]|C[MD]?|X[CL]?|I[XV]?/g, function(i){
+				arabic += chars[i];
+			});
+
+			return arabic;
+		};
+
+		var arg0 = arg[0];
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		arg0 = arg0.tocString();
+
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		if (arg0 instanceof cArray) {
+			arg0.foreach(function (elem, r, c) {
+				var a = elem;
+				if (a instanceof cString) {
+					var res = to_arabic(a.getValue());
+					this.array[r][c] = isNaN(res) ? new cError(cErrorType.wrong_value_type) : new cNumber(res);
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		}
+
+		//TODO проверить возвращение ошибок!
+		var res = to_arabic(arg0.getValue());
+		return this.value = isNaN(res) ? new cError(cErrorType.wrong_value_type) : new cNumber(res);
+	};
+	cARABIC.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( text )"
 		};
 	};
 
