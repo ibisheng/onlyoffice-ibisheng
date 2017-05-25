@@ -216,12 +216,12 @@
 		this.name = "ACOT";
 		this.value = null;
 		this.argumentsCurrent = 0;
-		this.isXLFN = true;
 	}
 	cACOT.prototype = Object.create(cBaseFunction.prototype);
 	cACOT.prototype.constructor = cACOT;
 	cACOT.prototype.argumentsMin = 1;
 	cACOT.prototype.argumentsMax = 1;
+	cACOT.prototype.isXLFN = true;
 	cACOT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cACOT.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -260,12 +260,12 @@
 		this.name = "ACOTH";
 		this.value = null;
 		this.argumentsCurrent = 0;
-		this.isXLFN = true;
 	}
 	cACOTH.prototype = Object.create(cBaseFunction.prototype);
 	cACOTH.prototype.constructor = cACOTH;
 	cACOTH.prototype.argumentsMin = 1;
 	cACOTH.prototype.argumentsMax = 1;
+	cACOTH.prototype.isXLFN = true;
 	cACOTH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cACOTH.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
@@ -304,13 +304,13 @@
 		this.name = "ARABIC";
 		this.value = null;
 		this.argumentsCurrent = 0;
-		this.isXLFN = true;
 	}
 
 	cARABIC.prototype = Object.create(cBaseFunction.prototype);
 	cARABIC.prototype.constructor = cARABIC;
 	cARABIC.prototype.argumentsMin = 1;
 	cARABIC.prototype.argumentsMax = 1;
+	cARABIC.prototype.isXLFN = true;
 	cARABIC.prototype.Calculate = function (arg) {
 		var to_arabic = function(roman) {
 			roman = roman.toUpperCase();
