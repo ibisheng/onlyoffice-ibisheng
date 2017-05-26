@@ -717,7 +717,7 @@ CChartsDrawer.prototype =
 		
 		//valAx
 		var valAx = chartSpace.chart.plotArea.valAx;
-		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.labels && this.calcProp.widthCanvas != undefined)
+		if(chartSpace.chart.plotArea.valAx && /*chartSpace.chart.plotArea.valAx.labels &&*/ this.calcProp.widthCanvas != undefined)
 		{
 			if(isHBar)
 			{
