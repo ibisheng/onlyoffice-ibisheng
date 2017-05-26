@@ -612,239 +612,161 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), Math.atanh(1 / 6) );
 	} );
 
-	test( "Test: \"COT(30)\"", function () {
+
+
+	test( "Test: \"COT\"", function () {
 		oParser = new parserFormula( 'COT(30)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, -0.156 );
-	} );
 
-	test( "Test: \"COT(0)\"", function () {
 		oParser = new parserFormula( 'COT(0)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
-	} );
 
-	//> Math.pow(2, 27)
-	test( "Test: \"COT(1000000000)\"", function () {
 		oParser = new parserFormula( 'COT(1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NUM!" );
-	} );
 
-	//ABS > Math.pow(2, 27)
-	test( "Test: \"COT(-1000000000)\"", function () {
 		oParser = new parserFormula( 'COT(-1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NUM!" );
-	} );
 
-	test( "Test: \"COT(test)\"", function () {
 		oParser = new parserFormula( 'COT(test)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NAME?" );
-	} );
 
-	test( "Test: \"COT('test')\"", function () {
 		oParser = new parserFormula( 'COT("test")', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 	} );
-    
-	test( "Test: \"COTH(2)\"", function () {
+
+	test( "Test: \"COTH\"", function () {
 		oParser = new parserFormula( 'COTH(2)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 1.037 );
-	} );
 
-	test( "Test: \"COTH(0)\"", function () {
 		oParser = new parserFormula( 'COTH(0)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
-	} );
 
-	//> Math.pow(2, 27)
-	test( "Test: \"COTH(1000000000)\"", function () {
 		oParser = new parserFormula( 'COTH(1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 1 );
-	} );
 
-	//ABS > Math.pow(2, 27)
-	test( "Test: \"COTH(-1000000000)\"", function () {
 		oParser = new parserFormula( 'COTH(-1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), -1 );
-	} );
 
-	test( "Test: \"COTH(test)\"", function () {
 		oParser = new parserFormula( 'COTH(test)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NAME?" );
-	} );
 
-	test( "Test: \"COTH('test')\"", function () {
 		oParser = new parserFormula( 'COTH("test")', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 	} );
-    
-	test( "Test: \"CSC(15)\"", function () {
+
+	test( "Test: \"CSC\"", function () {
 		oParser = new parserFormula( 'CSC(15)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 1.538 );
-	} );
 
-	test( "Test: \"CSC(0)\"", function () {
 		oParser = new parserFormula( 'CSC(0)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
-	} );
 
-	//> Math.pow(2, 27)
-	test( "Test: \"CSC(1000000000)\"", function () {
 		oParser = new parserFormula( 'CSC(1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NUM!" );
-	} );
 
-	//ABS > Math.pow(2, 27)
-	test( "Test: \"CSC(-1000000000)\"", function () {
 		oParser = new parserFormula( 'CSC(-1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NUM!" );
-	} );
 
-	test( "Test: \"CSC(test)\"", function () {
 		oParser = new parserFormula( 'CSC(test)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NAME?" );
-	} );
 
-	test( "Test: \"CSC('test')\"", function () {
 		oParser = new parserFormula( 'CSC("test")', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 	} );
 
-	test( "Test: \"CSCH(1.5)\"", function () {
+	test( "Test: \"CSCH\"", function () {
 		oParser = new parserFormula( 'CSCH(1.5)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 0.4696 );
-	} );
 
-	test( "Test: \"CSCH(0)\"", function () {
 		oParser = new parserFormula( 'CSCH(0)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
-	} );
 
-	//> Math.pow(2, 27)
-	test( "Test: \"CSCH(1000000000)\"", function () {
 		oParser = new parserFormula( 'CSCH(1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 0 );
-	} );
 
-	//ABS > Math.pow(2, 27)
-	test( "Test: \"CSCH(-1000000000)\"", function () {
 		oParser = new parserFormula( 'CSCH(-1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 0 );
-	} );
 
-	test( "Test: \"CSCH(test)\"", function () {
 		oParser = new parserFormula( 'CSCH(test)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NAME?" );
-	} );
 
-	test( "Test: \"CSCH('test')\"", function () {
 		oParser = new parserFormula( 'CSCH("test")', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 	} );
 
-	test( "Test: \"SEC(45)\"", function () {
+	test( "Test: \"SEC\"", function () {
 		oParser = new parserFormula( 'SEC(45)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 1.90359 );
-	} );
 
-	test( "Test: \"SEC(30)\"", function () {
 		oParser = new parserFormula( 'SEC(30)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 6.48292 );
-	} );
 
-	test( "Test: \"SEC(0)\"", function () {
 		oParser = new parserFormula( 'SEC(0)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 1 );
-	} );
 
-	//> Math.pow(2, 27)
-	test( "Test: \"SEC(1000000000)\"", function () {
 		oParser = new parserFormula( 'SEC(1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NUM!" );
-	} );
 
-	//ABS > Math.pow(2, 27)
-	test( "Test: \"CSC(-1000000000)\"", function () {
-		oParser = new parserFormula( 'CSC(-1000000000)', "A1", ws );
-		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue(), "#NUM!" );
-	} );
-
-	test( "Test: \"SEC(test)\"", function () {
 		oParser = new parserFormula( 'SEC(test)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NAME?" );
-	} );
 
-	test( "Test: \"SEC('test')\"", function () {
 		oParser = new parserFormula( 'SEC("test")', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 	} );
 
-	test( "Test: \"SECH(5)\"", function () {
+	test( "Test: \"SECH\"", function () {
 		oParser = new parserFormula( 'SECH(5)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 0.013 );
-	} );
 
-	test( "Test: \"SECH(0)\"", function () {
 		oParser = new parserFormula( 'SECH(0)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 1 );
-	} );
 
-	//> Math.pow(2, 27)
-	test( "Test: \"SECH(1000000000)\"", function () {
 		oParser = new parserFormula( 'SECH(1000000000)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), 0 );
-	} );
 
-	//ABS > Math.pow(2, 27)
-	test( "Test: \"CSCH(-1000000000)\"", function () {
-		oParser = new parserFormula( 'CSCH(-1000000000)', "A1", ws );
-		ok( oParser.parse() );
-		strictEqual( oParser.calculate().getValue(), 0 );
-	} );
-
-	test( "Test: \"SECH(test)\"", function () {
 		oParser = new parserFormula( 'SECH(test)', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#NAME?" );
-	} );
 
-	test( "Test: \"SECH('test')\"", function () {
 		oParser = new parserFormula( 'SECH("test")', "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 	} );
+
+
 
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
