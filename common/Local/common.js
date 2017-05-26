@@ -283,7 +283,7 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 
 	_editor.ImageLoader.LoadImagesWithCallback(_images_loading, function() {
 		if (this.WordControl)
-			this.WordControl.m_oDrawingDocument.OnRePaintAttack();
+			this.WordControl.OnRePaintAttack();
 	}, null);
 };
 

@@ -1302,7 +1302,11 @@
 		_canvas = null;
 
 		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
-		function guid() { return '{' + s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4() + '}'; }
+		function guid() {
+			var val = '{' + s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4() + '}';
+			val = val.toUpperCase();
+			return val;
+		}
 
 		var _args = [guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail(), _w, _h, _url];
 
