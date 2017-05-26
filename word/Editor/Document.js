@@ -3650,7 +3650,7 @@ CDocument.prototype.Draw                                     = function(nPageInd
     var Page_StartPos = this.Pages[nPageIndex].Pos;
     var SectPr        = this.SectionsInfo.Get_SectPr(Page_StartPos).SectPr;
 
-    if (docpostype_HdrFtr !== this.CurPos.Type)
+    if (docpostype_HdrFtr !== this.CurPos.Type && !this.Api.isViewMode)
         pGraphics.Start_GlobalAlpha();
 
     // Рисуем границы вокруг страницы (если границы надо рисовать под текстом)
@@ -3662,7 +3662,7 @@ CDocument.prototype.Draw                                     = function(nPageInd
     // Рисуем содержимое документа на данной странице
     if (docpostype_HdrFtr === this.CurPos.Type)
         pGraphics.put_GlobalAlpha(true, 0.4);
-    else
+    else if (!this.Api.isViewMode)
         pGraphics.End_GlobalAlpha();
 
     this.DrawingObjects.drawBehindDoc(nPageIndex, pGraphics);
