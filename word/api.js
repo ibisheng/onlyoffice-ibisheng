@@ -3520,18 +3520,6 @@ background-repeat: no-repeat;\
     	return this.WordControl.m_oLogicDocument.GetAllSignatures();
 	};
 
-    asc_docs_api.prototype.asc_Sign = function(guid)
-	{
-		if (window["AscDesktopEditor"])
-			window["AscDesktopEditor"]["Sign"](guid);
-	};
-
-    asc_docs_api.prototype.asc_ViewSign = function(id)
-	{
-		if (window["AscDesktopEditor"])
-			window["AscDesktopEditor"]["ViewSertificate"](guid);
-	};
-
     //////////////////////////////////////////////////////////////////////////
 
 	asc_docs_api.prototype.IncreaseIndent         = function()
