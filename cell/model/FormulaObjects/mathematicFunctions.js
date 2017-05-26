@@ -59,7 +59,7 @@
 	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
 		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
-		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSERIESSUM,
+		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSEC, cSECH, cSERIESSUM,
 		cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS, cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2,
 		cSUMXMY2, cTAN, cTANH, cTRUNC);
 
@@ -3559,6 +3559,107 @@
 	cROUNDUP.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x , number-digits )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSEC() {
+		this.name = "SEC";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cSEC.prototype = Object.create(cBaseFunction.prototype);
+	cSEC.prototype.constructor = cSEC;
+	cSEC.prototype.argumentsMin = 1;
+	cSEC.prototype.argumentsMax = 1;
+	cSEC.prototype.isXLFN = true;
+	cSEC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cSEC.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		var maxVal = Math.pow(2, 27);
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (cElementType.number === elem.type) {
+					if (Math.abs(elem.getValue()) >= maxVal) {
+						this.array[r][c] = new cError(cErrorType.not_numeric);
+					}
+					else{
+						var a = 1 / Math.cos(elem.getValue());
+						this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+					}
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			if (Math.abs(arg0.getValue()) >= maxVal) {
+				return this.value = new cError(cErrorType.not_numeric);
+			}
+
+			var a = 1 / Math.cos(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cSEC.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSECH() {
+		this.name = "SECH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cSECH.prototype = Object.create(cBaseFunction.prototype);
+	cSECH.prototype.constructor = cSECH;
+	cSECH.prototype.argumentsMin = 1;
+	cSECH.prototype.argumentsMax = 1;
+	cSECH.prototype.isXLFN = true;
+	cSECH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cSECH.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+
+		//TODO в документации к COTH написано максимальное значение - Math.pow(2, 27), но MS EXCEL в данном случае не выдает ошибку
+		//проверку на максиимальное значение убрал
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (cElementType.number === elem.type) {
+					var a = 1 / Math.cosh(elem.getValue());
+					this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			var a = 1 / Math.cosh(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cSECH.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
 		};
 	};
 

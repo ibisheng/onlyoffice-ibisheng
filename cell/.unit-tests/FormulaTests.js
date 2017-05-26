@@ -764,6 +764,88 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 	} );
 
+	test( "Test: \"SEC(45)\"", function () {
+		oParser = new parserFormula( 'SEC(45)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 1.90359 );
+	} );
+
+	test( "Test: \"SEC(30)\"", function () {
+		oParser = new parserFormula( 'SEC(30)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 6.48292 );
+	} );
+
+	test( "Test: \"SEC(0)\"", function () {
+		oParser = new parserFormula( 'SEC(0)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+	} );
+
+	//> Math.pow(2, 27)
+	test( "Test: \"SEC(1000000000)\"", function () {
+		oParser = new parserFormula( 'SEC(1000000000)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+	} );
+
+	//ABS > Math.pow(2, 27)
+	test( "Test: \"CSC(-1000000000)\"", function () {
+		oParser = new parserFormula( 'CSC(-1000000000)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+	} );
+
+	test( "Test: \"SEC(test)\"", function () {
+		oParser = new parserFormula( 'SEC(test)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NAME?" );
+	} );
+
+	test( "Test: \"SEC('test')\"", function () {
+		oParser = new parserFormula( 'SEC("test")', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+	} );
+
+	test( "Test: \"SECH(5)\"", function () {
+		oParser = new parserFormula( 'SECH(5)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 0.013 );
+	} );
+
+	test( "Test: \"SECH(0)\"", function () {
+		oParser = new parserFormula( 'SECH(0)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+	} );
+
+	//> Math.pow(2, 27)
+	test( "Test: \"SECH(1000000000)\"", function () {
+		oParser = new parserFormula( 'SECH(1000000000)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+	} );
+
+	//ABS > Math.pow(2, 27)
+	test( "Test: \"CSCH(-1000000000)\"", function () {
+		oParser = new parserFormula( 'CSCH(-1000000000)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+	} );
+
+	test( "Test: \"SECH(test)\"", function () {
+		oParser = new parserFormula( 'SECH(test)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NAME?" );
+	} );
+
+	test( "Test: \"SECH('test')\"", function () {
+		oParser = new parserFormula( 'SECH("test")', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+	} );
+
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
 		ok( oParser.parse() );

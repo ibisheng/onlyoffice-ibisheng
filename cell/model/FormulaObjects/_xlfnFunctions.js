@@ -69,7 +69,7 @@
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cCEILING_MATH, cCEILING_PRECISE,
-		cCOMBINA, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT, cSEC, cSECH);
+		cCOMBINA, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
@@ -1108,30 +1108,6 @@
 
 	cRRI.prototype = Object.create(cBaseFunction.prototype);
 	cRRI.prototype.constructor = cRRI;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cSEC() {
-		cBaseFunction.call(this, "SEC");
-		this.isXLFN = true;
-	}
-
-	cSEC.prototype = Object.create(cBaseFunction.prototype);
-	cSEC.prototype.constructor = cSEC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cSECH() {
-		cBaseFunction.call(this, "SECH");
-		this.isXLFN = true;
-	}
-
-	cSECH.prototype = Object.create(cBaseFunction.prototype);
-	cSECH.prototype.constructor = cSECH;
 
 	/**
 	 * @constructor
