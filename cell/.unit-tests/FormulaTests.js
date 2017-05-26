@@ -726,6 +726,44 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 	} );
 
+	test( "Test: \"CSCH(1.5)\"", function () {
+		oParser = new parserFormula( 'CSCH(1.5)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 0.4696 );
+	} );
+
+	test( "Test: \"CSCH(0)\"", function () {
+		oParser = new parserFormula( 'CSCH(0)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+	} );
+
+	//> Math.pow(2, 27)
+	test( "Test: \"CSCH(1000000000)\"", function () {
+		oParser = new parserFormula( 'CSCH(1000000000)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+	} );
+
+	//ABS > Math.pow(2, 27)
+	test( "Test: \"CSCH(-1000000000)\"", function () {
+		oParser = new parserFormula( 'CSCH(-1000000000)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+	} );
+
+	test( "Test: \"CSCH(test)\"", function () {
+		oParser = new parserFormula( 'CSCH(test)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NAME?" );
+	} );
+
+	test( "Test: \"CSCH('test')\"", function () {
+		oParser = new parserFormula( 'CSCH("test")', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+	} );
+
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
 		ok( oParser.parse() );

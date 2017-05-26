@@ -57,7 +57,7 @@
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
-		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cCSC, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cGCD, cINT,
+		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSERIESSUM,
 		cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS, cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2,
@@ -1060,6 +1060,61 @@
 		}
 	};
 	cCSC.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCSCH() {
+		this.name = "CSCH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cCSCH.prototype = Object.create(cBaseFunction.prototype);
+	cCSCH.prototype.constructor = cCSCH;
+	cCSCH.prototype.argumentsMin = 1;
+	cCSCH.prototype.argumentsMax = 1;
+	cCSCH.prototype.isXLFN = true;
+	cCSCH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cCSCH.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+
+		//TODO в документации к COTH написано максимальное значение - Math.pow(2, 27), но MS EXCEL в данном случае не выдает ошибку
+		//проверку на максиимальное значение убрал
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (cElementType.number === elem.type) {
+					if(0 === elem.getValue()){
+						this.array[r][c] = new cError(cErrorType.division_by_zero);
+					}else{
+						var a = 1 / Math.sinh(elem.getValue());
+						this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+					}
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			if(0 === arg0.getValue()){
+				return this.value = new cError(cErrorType.division_by_zero);
+			}
+
+			var a = 1 / Math.sinh(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cCSCH.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x )"
 		};

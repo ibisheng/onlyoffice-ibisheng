@@ -69,7 +69,7 @@
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cCEILING_MATH, cCEILING_PRECISE,
-		cCOMBINA, cCSCH, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT, cSEC, cSECH);
+		cCOMBINA, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT, cSEC, cSECH);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
@@ -364,18 +364,6 @@
 
 	cCOVARIANCE_S.prototype = Object.create(cBaseFunction.prototype);
 	cCOVARIANCE_S.prototype.constructor = cCOVARIANCE_S;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCSCH() {
-		cBaseFunction.call(this, "CSCH");
-		this.isXLFN = true;
-	}
-
-	cCSCH.prototype = Object.create(cBaseFunction.prototype);
-	cCSCH.prototype.constructor = cCSCH;
 
 	/**
 	 * @constructor
