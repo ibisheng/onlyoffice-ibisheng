@@ -687,6 +687,44 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
 	} );
+    
+	test( "Test: \"CSC(15)\"", function () {
+		oParser = new parserFormula( 'CSC(15)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 1.538 );
+	} );
+
+	test( "Test: \"CSC(0)\"", function () {
+		oParser = new parserFormula( 'CSC(0)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
+	} );
+
+	//> Math.pow(2, 27)
+	test( "Test: \"CSC(1000000000)\"", function () {
+		oParser = new parserFormula( 'CSC(1000000000)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+	} );
+
+	//ABS > Math.pow(2, 27)
+	test( "Test: \"CSC(-1000000000)\"", function () {
+		oParser = new parserFormula( 'CSC(-1000000000)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+	} );
+
+	test( "Test: \"CSC(test)\"", function () {
+		oParser = new parserFormula( 'CSC(test)', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NAME?" );
+	} );
+
+	test( "Test: \"CSC('test')\"", function () {
+		oParser = new parserFormula( 'CSC("test")', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+	} );
 
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
