@@ -1362,7 +1362,7 @@ function BinaryPPTYLoader()
                             case 1:
                             {
                                 var _Unicolor = this.ReadUniColor();
-                                if(_Unicolor.color)
+                                if(_Unicolor && _Unicolor.color)
                                 {
                                     _part.TextPr.Unifill = new AscFormat.CUniFill();
                                     _part.TextPr.Unifill.fill = new AscFormat.CSolidFill();
