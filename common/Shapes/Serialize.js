@@ -5376,6 +5376,7 @@ function BinaryPPTYLoader()
                             }
                             case 6:
                             case 2:
+                            case 7:
                             {
                                 var _object = this.ReadPic(6 === _type);
                                 if (!IsHiddenObj(_object))
@@ -5416,7 +5417,10 @@ function BinaryPPTYLoader()
                                 break;
                             }
                             default:
+                            {
+                                s.SkipRecord();
                                 break;
+                            }
                         }
                     }
                     break;
@@ -5488,6 +5492,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    this.stream.SkipRecord();
                     break;
                 }
             }
@@ -6241,8 +6246,10 @@ function BinaryPPTYLoader()
                     cNvPr.descr = s.GetString2();
                     break;
                 }
-                default:
+                default:{
+                    this.stream.SkipRecord();
                     break;
+                }
             }
         }
 
