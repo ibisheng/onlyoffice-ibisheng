@@ -3472,6 +3472,7 @@ function CBinaryFileWriter()
 				switch(spTree[i].getObjectType())
                 {
                     case AscDFH.historyitem_type_Shape:
+                    case AscDFH.historyitem_type_Cnx:
                     {
 						oThis.WriteShape(spTree[i]);
                         break;

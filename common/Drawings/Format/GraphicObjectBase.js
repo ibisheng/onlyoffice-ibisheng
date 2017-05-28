@@ -261,6 +261,9 @@
         this.w = oBounds.w;
         this.h = oBounds.h;
     };
+    CGraphicBounds.prototype.copy = function(){
+        return new CGraphicBounds(this.l, this.t, this.r, this.b);
+    };
     CGraphicBounds.prototype.transform = function(oTransform){
 
         var xlt = oTransform.TransformPointX(this.l, this.t);

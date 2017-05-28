@@ -707,8 +707,6 @@ function DrawingObjectsController(drawingObjects)
 
     this.chartForProps = null;
 
-    this.lastOverObject = null;
-
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
 
@@ -724,12 +722,6 @@ function CanStartEditText(oController)
 
 DrawingObjectsController.prototype =
 {
-
-    handleOleDblClick: function(drawing, e, x, y, pageIndex)
-    {
-
-    },
-
     getAllConnectors: function(aDrawings, allDrawings){
         var _ret = allDrawings;
         if(!_ret){
