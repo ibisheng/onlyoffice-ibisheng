@@ -677,6 +677,9 @@ function getTargetTextObject(controller)
 
 function isConnectorPreset(sPreset){
         if(typeof sPreset === "string" && sPreset.length > 0){
+            if(sPreset === "flowChartOffpageConnector" || sPreset === "flowChartConnector"){
+                return false;
+            }
             return (sPreset.toLowerCase().indexOf("line") > -1 || sPreset.toLowerCase().indexOf("connector") > -1);
         }
         return false;
