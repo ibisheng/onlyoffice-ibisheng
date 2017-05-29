@@ -3211,6 +3211,8 @@
 	prot["asc_setInstructions"] = prot.asc_setInstructions;
 	prot["asc_getShowDate"] = prot.asc_getShowDate;
 	prot["asc_setShowDate"] = prot.asc_setShowDate;
+	prot["asc_getValid"] = prot.asc_getValid;
+	prot["asc_setValid"] = prot.asc_setValid;
 
 	window["AscCommon"].asc_CAscEditorPermissions = asc_CAscEditorPermissions;
 	prot = asc_CAscEditorPermissions.prototype;
