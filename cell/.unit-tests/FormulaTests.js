@@ -766,7 +766,31 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "#VALUE!", 'SECH("test")' );
 	} );
 
+	test( "Test: \"FLOOR.PRECISE\"", function () {
+		oParser = new parserFormula( 'FLOOR.PRECISE(-3.2, -1)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.PRECISE(-3.2, -1)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'FLOOR.PRECISE(-3.2, -1)' );
 
+		oParser = new parserFormula( 'FLOOR.PRECISE(3.2, 1)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.PRECISE(3.2, 1)' );
+		strictEqual( oParser.calculate().getValue(), 3, 'FLOOR.PRECISE(3.2, 1)' );
+
+		oParser = new parserFormula( 'FLOOR.PRECISE(-3.2, 1)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.PRECISE(-3.2, 1)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'FLOOR.PRECISE(-3.2, 1)' );
+
+		oParser = new parserFormula( 'FLOOR.PRECISE(3.2, -1)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.PRECISE(3.2, -1)' );
+		strictEqual( oParser.calculate().getValue(), 3, 'FLOOR.PRECISE(3.2, -1)' );
+
+		oParser = new parserFormula( 'FLOOR.PRECISE(3.2)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.PRECISE(3.2)' );
+		strictEqual( oParser.calculate().getValue(), 3, 'FLOOR.PRECISE(3.2)' );
+
+		oParser = new parserFormula( 'FLOOR.PRECISE(test)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.PRECISE(test)' );
+		strictEqual( oParser.calculate().getValue(), "#NAME?", 'FLOOR.PRECISE(test)' );
+	} );
 
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );

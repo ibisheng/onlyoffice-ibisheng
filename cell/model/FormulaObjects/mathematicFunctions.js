@@ -1554,9 +1554,9 @@
 				return new cNumber(0.0);
 			}
 
-			var sign = number > 0 ? 1 : -1;
-			var quotient = Math.abs(number / significance);
-			return new cNumber(sign * Math.floor(quotient) * Math.abs(significance));
+			var absSignificance = Math.abs(significance);
+			var quotient = number / absSignificance;
+			return new cNumber(Math.floor(quotient) * absSignificance);
 		}
 
 		if (arg0 instanceof cArray && arg1 instanceof cArray) {
