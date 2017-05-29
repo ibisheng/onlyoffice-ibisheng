@@ -69,7 +69,7 @@
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cCEILING_MATH, cCEILING_PRECISE,
-		cCOMBINA, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT);
+		cCOMBINA, cDECIMAL, cFLOOR_MATH, cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
@@ -520,18 +520,6 @@
 
 	cFLOOR_MATH.prototype = Object.create(cBaseFunction.prototype);
 	cFLOOR_MATH.prototype.constructor = cFLOOR_MATH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cFLOOR_PRECISE() {
-		cBaseFunction.call(this, "FLOOR.PRECISE");
-		this.isXLFN = true;
-	}
-
-	cFLOOR_PRECISE.prototype = Object.create(cBaseFunction.prototype);
-	cFLOOR_PRECISE.prototype.constructor = cFLOOR_PRECISE;
 
 	/**
 	 * @constructor
