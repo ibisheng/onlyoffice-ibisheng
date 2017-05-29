@@ -384,7 +384,7 @@ CLogicDocumentController.prototype.RemoveTextSelection = function()
 {
 	return this.RemoveSelection();
 };
-CLogicDocumentController.prototype.AddContentControl = function()
+CLogicDocumentController.prototype.AddContentControl = function(nContentControlType)
 {
-	return this.LogicDocument.controller_AddContentControl();
+	return this.LogicDocument.controller_AddContentControl(nContentControlType);
 };

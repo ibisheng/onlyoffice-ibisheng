@@ -394,7 +394,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
 	if (this.NearPosArray.length > 0)
 	{
 		var ParaState = this.GetSelectionState();
-		this.Selection.Use = false;
+		this.RemoveSelection();
 		this.Set_ParaContentPos(this.NearPosArray[0].NearPos.ContentPos, true, -1, -1);
 		arrContentControls = this.GetSelectedContentControls();
 

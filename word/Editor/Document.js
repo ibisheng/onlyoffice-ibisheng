@@ -15079,9 +15079,9 @@ CDocument.prototype.controller_GetCurrentSectionPr = function()
 	var nContentPos = this.CurPos.ContentPos;
 	return this.SectionsInfo.Get_SectPr(nContentPos).SectPr;
 };
-CDocument.prototype.controller_AddContentControl = function()
+CDocument.prototype.controller_AddContentControl = function(nContentControlType)
 {
-	return this.private_AddContentControl();
+	return this.private_AddContentControl(nContentControlType);
 };
 //----------------------------------------------------------------------------------------------------------------------
 //
@@ -15213,12 +15213,12 @@ CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
 {
 	return this.On_DragTextEnd(NearestPos, isCopy);
 };
-CDocument.prototype.AddContentControl = function()
+CDocument.prototype.AddContentControl = function(nContentControlType)
 {
 	if (true === this.IsSelectionUse())
 		this.RemoveBeforePaste();
 
-	return this.Controller.AddContentControl();
+	return this.Controller.AddContentControl(nContentControlType);
 };
 CDocument.prototype.GetAllContentControls = function()
 {
@@ -15249,7 +15249,6 @@ CDocument.prototype.GetContentControl = function(Id)
 {
 	return this.TableId.Get_ById(Id);
 };
-
 CDocument.prototype.GetAllSignatures = function()
 {
     return this.DrawingObjects.getAllSignatures();

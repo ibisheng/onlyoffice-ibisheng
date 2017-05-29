@@ -3073,6 +3073,7 @@ Paragraph.prototype.Add = function(Item)
 			break;
 		}
 		case para_Field:
+		case para_InlineLevelSdt:
 		{
 			var ContentPos = this.Get_ParaContentPos(false, false);
 			var CurPos     = ContentPos.Get(0);
@@ -3093,7 +3094,9 @@ Paragraph.prototype.Add = function(Item)
 				this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 			}
 			else
+			{
 				this.Content[CurPos].Add(Item);
+			}
 
 			break;
 		}
@@ -10762,7 +10765,7 @@ Paragraph.prototype.Set_SectionPr = function(SectPr, bUpdate)
 		}
 	}
 };
-Paragraph.prototype.Get_LastRangeVisibleBounds = function()
+Paragraph.prototype.GetLastRangeVisibleBounds = function()
 {
 	var CurLine = this.Lines.length - 1;
 	var CurPage = this.Pages.length - 1;
@@ -12044,6 +12047,17 @@ Paragraph.prototype.GetSelectedContentControls = function()
 	}
 
 	return arrContentControls;
+};
+Paragraph.prototype.AddContentControl = function(nContentControlType)
+{
+	if (AscCommonWord.sdttype_InlineLevel !== nContentControlType)
+		return null;
+
+	// Тут не должно быть селекта, поэтому мы просто вставляем в текущую позицию курсора
+	var oContentControl = new CInlineLevelSdt();
+	oContentControl.Add_ToContent(0, new ParaRun());
+	this.Add(oContentControl);
+	return oContentControl;
 };
 
 var pararecalc_0_All  = 0;

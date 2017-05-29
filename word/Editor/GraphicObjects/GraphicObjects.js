@@ -202,11 +202,11 @@ CGraphicObjects.prototype =
     resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
     handleTextHit: DrawingObjectsController.prototype.handleTextHit,
 
-    AddContentControl: function()
+    AddContentControl: function(nContentControlType)
     {
         var oTargetDocContent = this.getTargetDocContent();
         if(oTargetDocContent){
-            return oTargetDocContent.AddContentControl();
+            return oTargetDocContent.AddContentControl(nContentControlType);
         }
 
         return null;

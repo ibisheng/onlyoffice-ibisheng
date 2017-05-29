@@ -98,8 +98,10 @@ CInlineLevelSdt.prototype.Add = function(Item)
 {
 	switch (Item.Type)
 	{
-		case para_Run      :
+		case para_Run:
 		case para_Hyperlink:
+		case para_InlineLevelSdt:
+		case para_Field:
 		{
 			var TextPr = this.Get_FirstTextPr();
 			Item.SelectAll();
@@ -148,31 +150,6 @@ CInlineLevelSdt.prototype.Add = function(Item)
 			}
 			else
 				this.Content[CurPos].Add(Item);
-
-			break;
-		}
-		case para_Field:
-		{
-			// Вместо добавления самого элемента добавляем его содержимое
-			var Count = Item.Content.length;
-
-			if (Count > 0)
-			{
-				var CurPos  = this.State.ContentPos;
-				var CurItem = this.Content[CurPos];
-
-				var CurContentPos = new CParagraphContentPos();
-				CurItem.Get_ParaContentPos(false, false, CurContentPos);
-
-				var NewItem = CurItem.Split(CurContentPos, 0);
-				for (var Index = 0; Index < Count; Index++)
-				{
-					this.Add_ToContent(CurPos + Index + 1, Item.Content[Index], false);
-				}
-				this.Add_ToContent(CurPos + Count + 1, NewItem, false);
-				this.State.ContentPos = CurPos + Count;
-				this.Content[this.State.ContentPos].MoveCursorToEndPos();
-			}
 
 			break;
 		}
@@ -342,6 +319,10 @@ CInlineLevelSdt.prototype.SelectContentControl = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
 //----------------------------------------------------------------------------------------------------------------------
+CInlineLevelSdt.prototype.GetContentControlType = function()
+{
+	return AscCommonWord.sdttype_InlineLevel;
+};
 CInlineLevelSdt.prototype.SetPr = function(oPr)
 {
 	this.SetAlias(oPr.Alias);
@@ -477,12 +458,15 @@ function TEST_ADD_SDT()
 	oRun.Add(new ParaText("d"));
 	oRun.Add(new ParaText("t"));
 
-	var oInlineContentControl = new CInlineLevelSdt();
+
+	var oInlineContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_InlineLevel);
+
+	// var oInlineContentControl = new CInlineLevelSdt();
 	oInlineContentControl.Add_ToContent(0, oRun);
 
-	var oPara = oLogicDocument.GetCurrentParagraph();
-	oPara.Add_ToContent(0, new ParaRun());
-	oPara.Add_ToContent(1, oInlineContentControl);
+	// var oPara = oLogicDocument.GetCurrentParagraph();
+	// oPara.Add_ToContent(0, new ParaRun());
+	// oPara.Add_ToContent(1, oInlineContentControl);
 
 
 	oLogicDocument.Recalculate();

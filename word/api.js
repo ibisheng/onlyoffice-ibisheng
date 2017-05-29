@@ -454,7 +454,7 @@
 						_content_control_pr.Lock = sdtlock_Unlocked;
 						_content_control_pr.InternalId = _current.Props.InternalId;
 
-						var _blockStd = LogicDocument.AddContentControl();
+						var _blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 						_blockStd.SetContentControlPr(_content_control_pr);
 
 						this.returnDocuments.push(_blockStd.GetContentControlPr());

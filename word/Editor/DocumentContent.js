@@ -8514,12 +8514,12 @@ CDocumentContent.prototype.IsSelectedAll = function()
 
 	return false;
 };
-CDocumentContent.prototype.AddContentControl = function()
+CDocumentContent.prototype.AddContentControl = function(nContentControlType)
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
-		return this.DrawingObjects.AddContentControl();
+		return this.DrawingObjects.AddContentControl(nContentControlType);
 	else
-		return this.private_AddContentControl();
+		return this.private_AddContentControl(nContentControlType);
 };
 CDocumentContent.prototype.GetAllContentControls = function(arrContentControls)
 {

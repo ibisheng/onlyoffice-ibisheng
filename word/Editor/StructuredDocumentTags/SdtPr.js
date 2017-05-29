@@ -42,6 +42,11 @@ var sdtlock_SdtContentLocked = 0x01;
 var sdtlock_SdtLocked        = 0x02;
 var sdtlock_Unlocked         = 0x03;
 
+var sdttype_BlockLevel  = 0x01;
+var sdttype_InlineLevel = 0x02;
+var sdttype_RowLevel    = 0x03;
+var sdttype_CellLevel   = 0x04;
+
 function CSdtPr()
 {
 	this.Alias = undefined;
@@ -161,12 +166,19 @@ CContentControlPr.prototype.get_InternalId = function()
 };
 
 //--------------------------------------------------------export--------------------------------------------------------
-window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord']        = window['AscCommonWord'] || {};
 window['AscCommonWord'].CSdtPr = CSdtPr;
+
 window['AscCommonWord'].sdtlock_Unlocked         = sdtlock_Unlocked;
 window['AscCommonWord'].sdtlock_ContentLocked    = sdtlock_ContentLocked;
 window['AscCommonWord'].sdtlock_SdtContentLocked = sdtlock_SdtContentLocked;
 window['AscCommonWord'].sdtlock_SdtLocked        = sdtlock_SdtLocked;
+
+window['AscCommonWord'].sdttype_BlockLevel  = sdttype_BlockLevel;
+window['AscCommonWord'].sdttype_InlineLevel = sdttype_InlineLevel;
+window['AscCommonWord'].sdttype_RowLevel    = sdttype_RowLevel;
+window['AscCommonWord'].sdttype_CellLevel   = sdttype_CellLevel;
+
 window['AscCommonWord'].CContentControlPr = CContentControlPr;
 
 CContentControlPr.prototype['get_Id']         = CContentControlPr.prototype.get_Id;

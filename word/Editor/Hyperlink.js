@@ -110,8 +110,9 @@ ParaHyperlink.prototype.Add = function(Item)
 {
     switch (Item.Type)
     {
-        case para_Run  :
-        case para_Field:
+		case para_Run  :
+		case para_Field:
+		case para_InlineLevelSdt:
         {
             var TextPr = this.Get_FirstTextPr();
             Item.SelectAll();

@@ -205,7 +205,7 @@ CDocumentContentBase.prototype.private_ReindexContent = function(StartPos)
  */
 CDocumentContentBase.prototype.private_RecalculateEmptySectionParagraph = function(Element, PrevElement, PageIndex, ColumnIndex, ColumnsCount)
 {
-	var LastVisibleBounds = PrevElement.Get_LastRangeVisibleBounds();
+	var LastVisibleBounds = PrevElement.GetLastRangeVisibleBounds();
 
 	var ___X = LastVisibleBounds.X + LastVisibleBounds.W;
 	var ___Y = LastVisibleBounds.Y;
@@ -704,12 +704,12 @@ CDocumentContentBase.prototype.IsBlockLevelSdtContent = function()
 {
 	return false;
 };
-CDocumentContentBase.prototype.private_AddContentControl = function()
+CDocumentContentBase.prototype.private_AddContentControl = function(nContentControlType)
 {
 	// Селекта быть не должно при выполнении данной функции, поэтому не проверяем
 	var oElement = this.Content[this.CurPos.ContentPos];
 
-	if (type_Paragraph === oElement.GetType())
+	if (type_Paragraph === oElement.GetType() && AscCommonWord.sdttype_BlockLevel === nContentControlType)
 	{
 		var oSdt = new CBlockLevelSdt(editor.WordControl.m_oLogicDocument, this);
 		if (oElement.IsCursorAtEnd())
@@ -736,7 +736,7 @@ CDocumentContentBase.prototype.private_AddContentControl = function()
 	}
 	else
 	{
-		return oElement.AddContentControl();
+		return oElement.AddContentControl(nContentControlType);
 	}
 };
 CDocumentContentBase.prototype.RecalculateAllTables = function()
@@ -746,4 +746,18 @@ CDocumentContentBase.prototype.RecalculateAllTables = function()
 		var Item = this.Content[nPos];
 		Item.RecalculateAllTables();
 	}
+};
+CDocumentContentBase.prototype.GetLastRangeVisibleBounds = function()
+{
+	if (this.Content.length <= 0)
+		return {
+			X        : 0,
+			Y        : 0,
+			W        : 0,
+			H        : 0,
+			BaseLine : 0,
+			XLimit   : 0
+		};
+
+	return this.Content[this.Content.length - 1].GetLastRangeVisibleBounds();
 };

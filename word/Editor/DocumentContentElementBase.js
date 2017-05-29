@@ -578,7 +578,7 @@ CDocumentContentElementBase.prototype.GetSelectionAnchorPos = function()
 {
 	return null;
 };
-CDocumentContentElementBase.prototype.AddContentControl = function()
+CDocumentContentElementBase.prototype.AddContentControl = function(nContentControlType)
 {
 	return null;
 };
@@ -642,6 +642,17 @@ CDocumentContentElementBase.prototype.IsSelectedAll = function()
 };
 CDocumentContentElementBase.prototype.CheckContentControlDeletingLock = function()
 {
+};
+CDocumentContentElementBase.prototype.GetLastRangeVisibleBounds = function()
+{
+	return {
+		X        : 0,
+		Y        : 0,
+		W        : 0,
+		H        : 0,
+		BaseLine : 0,
+		XLimit   : 0
+	};
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
