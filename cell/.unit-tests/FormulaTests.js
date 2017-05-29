@@ -792,6 +792,24 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "#NAME?", 'FLOOR.PRECISE(test)' );
 	} );
 
+	test( "Test: \"FLOOR.MATH\"", function () {
+		oParser = new parserFormula( 'FLOOR.MATH(24.3, 5)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.MATH(24.3, 5)' );
+		strictEqual( oParser.calculate().getValue(), 20, 'FLOOR.MATH(24.3, 5)' );
+
+		oParser = new parserFormula( 'FLOOR.MATH(6.7)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.MATH(6.7)' );
+		strictEqual( oParser.calculate().getValue(), 6, 'FLOOR.MATH(6.7)' );
+
+		oParser = new parserFormula( 'FLOOR.MATH(-8.1, 5)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.MATH(-8.1, 5)' );
+		strictEqual( oParser.calculate().getValue(), -10, 'FLOOR.MATH(-8.1, 5)' );
+
+		oParser = new parserFormula( 'FLOOR.MATH(-5.5, 2, -1)', "A1", ws );
+		ok( oParser.parse(), 'FLOOR.MATH(-5.5, 2, -1)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'FLOOR.MATH(-5.5, 2, -1)' );
+	} );
+
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
 		ok( oParser.parse() );

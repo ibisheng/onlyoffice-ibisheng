@@ -69,7 +69,7 @@
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cCEILING_MATH, cCEILING_PRECISE,
-		cCOMBINA, cDECIMAL, cFLOOR_MATH, cMUNIT);
+		cCOMBINA, cDECIMAL, cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
@@ -508,18 +508,6 @@
 
 	cFILTERXML.prototype = Object.create(cBaseFunction.prototype);
 	cFILTERXML.prototype.constructor = cFILTERXML;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cFLOOR_MATH() {
-		cBaseFunction.call(this, "FLOOR.MATH");
-		this.isXLFN = true;
-	}
-
-	cFLOOR_MATH.prototype = Object.create(cBaseFunction.prototype);
-	cFLOOR_MATH.prototype.constructor = cFLOOR_MATH;
 
 	/**
 	 * @constructor

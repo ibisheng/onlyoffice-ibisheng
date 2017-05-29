@@ -57,7 +57,7 @@
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
-		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cGCD, cINT,
+		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSEC, cSECH, cSERIESSUM,
 		cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS, cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2,
@@ -1564,7 +1564,7 @@
 				var a = elem;
 				var b = arg1.getElementRowCol(r, c);
 				if (a instanceof cNumber && b instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue())
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue());
 				} else {
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
@@ -1575,7 +1575,7 @@
 				var a = elem;
 				var b = arg1;
 				if (a instanceof cNumber && b instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue())
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue());
 				} else {
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
@@ -1586,7 +1586,7 @@
 				var a = arg0;
 				var b = elem;
 				if (a instanceof cNumber && b instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue())
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue());
 				} else {
 					this.array[r][c] = new cError(cErrorType.wrong_value_type);
 				}
@@ -1603,6 +1603,163 @@
 	cFLOOR_PRECISE.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x, significance )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cFLOOR_MATH() {
+		this.name = "FLOOR.MATH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cFLOOR_MATH.prototype = Object.create(cBaseFunction.prototype);
+	cFLOOR_MATH.prototype.constructor = cFLOOR_MATH;
+	cFLOOR_MATH.prototype.argumentsMin = 1;
+	cFLOOR_MATH.prototype.argumentsMax = 3;
+	cFLOOR_MATH.prototype.isXLFN = true;
+	cFLOOR_MATH.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1]);
+		}
+		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
+			arg2 = arg2.cross(arguments[1]);
+		}
+
+		arg0 = arg[0].tocNumber();
+		if(!arg1){
+			arg1 = arg[0] > 0 ? new cNumber(1) : new cNumber(-1);
+		}
+		arg2 = arg[2] ? arg[2].tocNumber() : new cNumber(0);
+
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+		if (arg1 instanceof cError) {
+			return this.value = arg1;
+		}
+		if (arg2 instanceof cError) {
+			return this.value = arg2;
+		}
+
+		function floorHelper(number, significance, mod) {
+			if (significance === 0 || number === 0) {
+				return new cNumber(0.0);
+			}
+
+			if ( number * significance < 0.0 )
+				significance = - significance;
+
+			if ( mod === 0 && number < 0.0 ){
+				return new cNumber(Math.ceil( number / significance) * significance);
+			}else{
+				return new cNumber(Math.floor( number / significance) * significance);
+			}
+		}
+
+		if (arg0 instanceof cArray && arg1 instanceof cArray && arg2 instanceof cArray) {
+			arg0.foreach(function (elem, r, c) {
+				var a = elem;
+				var b = arg1.getElementRowCol(r, c);
+				var d = arg2.getElementRowCol(r, c);
+				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		}else if (arg0 instanceof cArray && arg1 instanceof cArray) {
+			arg0.foreach(function (elem, r, c) {
+				var a = elem;
+				var b = arg1.getElementRowCol(r, c);
+				var d = arg2;
+				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else if (arg0 instanceof cArray && arg2 instanceof cArray) {
+			arg0.foreach(function (elem, r, c) {
+				var a = elem;
+				var b = arg1;
+				var d = arg2.getElementRowCol(r, c);
+				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else if (arg1 instanceof cArray && arg2 instanceof cArray) {
+			arg1.foreach(function (elem, r, c) {
+				var a = arg0;
+				var b = elem;
+				var d = arg2.getElementRowCol(r, c);
+				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg1;
+		}else if (arg0 instanceof cArray) {
+			arg0.foreach(function (elem, r, c) {
+				var a = elem;
+				var b = arg1;
+				var d = arg2;
+				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else if (arg1 instanceof cArray) {
+			arg1.foreach(function (elem, r, c) {
+				var a = arg0;
+				var b = elem;
+				var d = arg2;
+				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg1;
+		} else if (arg2 instanceof cArray) {
+			arg2.foreach(function (elem, r, c) {
+				var a = arg0;
+				var b = arg1;
+				var d = elem;
+
+				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
+					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg2;
+		}
+
+		if (arg0 instanceof cString || arg1 instanceof cString || arg2 instanceof cString) {
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		return this.value = floorHelper(arg0.getValue(), arg1.getValue(), arg2.getValue());
+	};
+	cFLOOR_MATH.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x, significance, mode )"
 		};
 	};
 
