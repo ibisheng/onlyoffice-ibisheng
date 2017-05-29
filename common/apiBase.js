@@ -1261,6 +1261,7 @@
 
     };
 	baseEditorsApi.prototype.asc_getAllSignatures = function () {
+		return [];
 	};
 
 	// signatures
