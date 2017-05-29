@@ -507,6 +507,12 @@
         }
     };
 
+    CConnectionShape.prototype.getStCxnId = function(){
+        return   this.nvSpPr.nvUniSpPr.stCnxId;
+    };
+    CConnectionShape.prototype.getEndCxnId = function(){
+        return   this.nvSpPr.nvUniSpPr.endCnxId;
+    };
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].fCalculateSpPr = fCalculateSpPr;
     window['AscFormat'].fCalculateConnectionInfo = fCalculateConnectionInfo;

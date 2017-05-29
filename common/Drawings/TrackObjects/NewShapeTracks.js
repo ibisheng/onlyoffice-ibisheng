@@ -280,7 +280,8 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         this.endConnectionInfo = null;
 
         if(this.bConnector){
-            var aSpTree = this.drawingsController.getAllShapes(this.drawingsController.getDrawingArray());
+            var aSpTree = [];
+            this.drawingsController.getAllSingularDrawings(this.drawingsController.getDrawingArray(), aSpTree);
             var oConnector = null;
             var oEndConnectionInfo = null;
             for(var i = aSpTree.length - 1; i > -1; --i){

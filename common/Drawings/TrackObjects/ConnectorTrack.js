@@ -98,7 +98,7 @@
 
             if(!_startConnectionParams){
                 if(this.beginShape && oConnectorInfo.stCnxIdx !== null){
-                    oConnectionObject = this.beginShape.spPr.geometry.cnxLst[oConnectorInfo.stCnxIdx];
+                    oConnectionObject = this.beginShape.getGeom().cnxLst[oConnectorInfo.stCnxIdx];
                     g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConnectionObject.ang, x: oConnectionObject.x, y: oConnectionObject.y};
                     _rot = this.beginShape.rot;
                     _flipH =  this.beginShape.flipH;
@@ -129,7 +129,7 @@
 
             if(!_endConnectionParams){
                 if(this.endShape && oConnectorInfo.endCnxIdx !== null){
-                    oConnectionObject = this.endShape.spPr.geometry.cnxLst[oConnectorInfo.endCnxIdx];
+                    oConnectionObject = this.endShape.getGeom().cnxLst[oConnectorInfo.endCnxIdx];
                     g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConnectionObject.ang, x: oConnectionObject.x, y: oConnectionObject.y};
                     _rot = this.endShape.rot;
                     _flipH =  this.endShape.flipH;
