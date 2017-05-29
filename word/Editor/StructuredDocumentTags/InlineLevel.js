@@ -484,7 +484,7 @@ function TEST_ADD_SDT2()
 	oLogicDocument.Create_NewHistoryPoint();
 
 
-	var oSdt = oLogicDocument.AddContentControl();
+	var oSdt = oLogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 	oSdt.AddToParagraph(new ParaText("S"));
 	oSdt.AddToParagraph(new ParaText("d"));
 	oSdt.AddToParagraph(new ParaText("t"));
