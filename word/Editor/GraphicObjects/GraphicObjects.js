@@ -1302,7 +1302,7 @@ CGraphicObjects.prototype =
     },
 
     handleSignatureDblClick: function(sGuid, width, height){
-        editor.sendEvent("asc_onSignatureClick", sGuid, width, height);
+        editor.sendEvent("asc_onSignatureDblClick", sGuid, width, height);
     },
 
 

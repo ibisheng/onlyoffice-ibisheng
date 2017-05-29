@@ -295,6 +295,15 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 	_editor.sendEvent("asc_onUpdateSignatures", _editor.asc_getSignatures(), _editor.asc_getRequestSignatures());
 };
 
+window["DesktopSaveQuestionReturn"] = function(isNeedSaved)
+{
+	if (isNeedSaved)
+	{
+		var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+		_editor.asc_Save(false);
+	}
+};
+
 window["OnNativeReturnCallback"] = function(name, obj)
 {
 	var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
@@ -305,6 +314,31 @@ window["OnNativeOpenFilenameDialog"] = function(file)
 {
 	window.on_native_open_filename_dialog(file);
 	delete window.on_native_open_filename_dialog;
+};
+
+window["DesktopAfterOpen"] = function(_api)
+{
+	_api.asc_registerCallback("asc_onSignatureDblClick", function (guid, width, height)
+	{
+		var _length = _api.signatures.length;
+		for (var i = 0; i < _length; i++)
+		{
+			if (_api.signatures[i].guid == guid)
+			{
+				window["AscDesktopEditor"]["ViewCertificate"](_api.signatures[i].id);
+				return;
+			}
+		}
+
+		if (!_api.isDocumentModify)
+		{
+			_api.sendEvent("asc_onSignatureClick", guid, width, height);
+			return;
+		}
+
+		window.SaveQuestionObjectBeforeSign = { guid : guid, width : width, height : height };
+		window["AscDesktopEditor"]["SaveQuestion"]();
+	});
 };
 
 // меняем среду
