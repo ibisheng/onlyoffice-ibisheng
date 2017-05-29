@@ -268,23 +268,31 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 		_images_loading.push(_add_sign.image);
 	}
 
-	_editor.asc_registerCallback("asc_onAddSignature", function(guid) {
+	if (!window.FirstSignaturesCall)
+	{
+		_editor.asc_registerCallback("asc_onAddSignature", function (guid)
+		{
 
-		var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-		_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
+			var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+			_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
 
-	});
-	_editor.asc_registerCallback("asc_onRemoveSignature", function(guid) {
+		});
+		_editor.asc_registerCallback("asc_onRemoveSignature", function (guid)
+		{
 
-		var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
-		_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
+			var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+			_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
 
-	});
+		});
+	}
+	window.FirstSignaturesCall = true;
 
 	_editor.ImageLoader.LoadImagesWithCallback(_images_loading, function() {
 		if (this.WordControl)
 			this.WordControl.OnRePaintAttack();
 	}, null);
+
+	_editor.sendEvent("asc_onUpdateSignatures", _editor.asc_getSignatures(), _editor.asc_getRequestSignatures());
 };
 
 window["OnNativeReturnCallback"] = function(name, obj)
