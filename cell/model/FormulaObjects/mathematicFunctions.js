@@ -56,7 +56,7 @@
 	var _func = AscCommonExcel._func;
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING, cCEILING_MATH,
+	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING, cCEILING_MATH, cCEILING_PRECISE,
 		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSEC, cSECH, cSERIESSUM,
@@ -769,6 +769,54 @@
 	cCEILING_MATH.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x, significance, mode )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCEILING_PRECISE() {
+		this.name = "CEILING.PRECISE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cCEILING_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cCEILING_PRECISE.prototype.constructor = cCEILING_PRECISE;
+	cCEILING_PRECISE.prototype.argumentsMin = 1;
+	cCEILING_PRECISE.prototype.argumentsMax = 2;
+	cCEILING_PRECISE.prototype.isXLFN = true;
+	cCEILING_PRECISE.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function floorHelper(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
+			if (significance === 0 || number === 0) {
+				return new cNumber(0.0);
+			}
+
+			var absSignificance = Math.abs(significance);
+			var quotient = number / absSignificance;
+			return new cNumber(Math.ceil(quotient) * absSignificance);
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+	};
+	cCEILING_PRECISE.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x, significance )"
 		};
 	};
 

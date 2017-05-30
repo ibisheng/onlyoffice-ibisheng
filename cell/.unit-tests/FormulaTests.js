@@ -810,7 +810,7 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), -4, 'FLOOR.MATH(-5.5, 2, -1)' );
 	} );
 
-	test( "Test: \"CEILING.MATH\"", function () {
+	test( "Test: \"CEILING.PRECISE\"", function () {
 		oParser = new parserFormula( 'CEILING.MATH(24.3, 5)', "A1", ws );
 		ok( oParser.parse(), 'CEILING.MATH(24.3, 5)' );
 		strictEqual( oParser.calculate().getValue(), 25, 'CEILING.MATH(24.3, 5)' );
@@ -826,6 +826,36 @@ $( function () {
 		oParser = new parserFormula( 'CEILING.MATH(-5.5, 2, -1)', "A1", ws );
 		ok( oParser.parse(), 'CEILING.MATH(-5.5, 2, -1)' );
 		strictEqual( oParser.calculate().getValue(), -6, 'CEILING.MATH(-5.5, 2, -1)' );
+	} );
+
+	test( "Test: \"CEILING.PRECISE\"", function () {
+		oParser = new parserFormula( 'CEILING.PRECISE(4.3)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.PRECISE(4.3)' );
+		strictEqual( oParser.calculate().getValue(), 5, 'CEILING.PRECISE(4.3)' );
+
+		oParser = new parserFormula( 'CEILING.PRECISE(-4.3)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.PRECISE(-4.3)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'CEILING.PRECISE(-4.3)' );
+
+		oParser = new parserFormula( 'CEILING.PRECISE(4.3, 2)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.PRECISE(4.3, 2)' );
+		strictEqual( oParser.calculate().getValue(), 6, 'CEILING.PRECISE(4.3, 2)' );
+
+		oParser = new parserFormula( 'CEILING.PRECISE(4.3,-2)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.PRECISE(4.3,-2)' );
+		strictEqual( oParser.calculate().getValue(), 6, 'CEILING.PRECISE(4.3,-2)' );
+
+		oParser = new parserFormula( 'CEILING.PRECISE(-4.3,2)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.PRECISE(-4.3,2)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'CEILING.PRECISE(-4.3,2)' );
+
+		oParser = new parserFormula( 'CEILING.PRECISE(-4.3,-2)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.PRECISE(-4.3,-2)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'CEILING.PRECISE(-4.3,-2)' );
+
+		oParser = new parserFormula( 'CEILING.PRECISE(test)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.PRECISE(test)' );
+		strictEqual( oParser.calculate().getValue(), "#NAME?", 'CEILING.PRECISE(test)' );
 	} );
 
 	test( "Test: \"ARABIC('LVII')\"", function () {
