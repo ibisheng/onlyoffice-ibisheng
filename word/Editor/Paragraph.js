@@ -3074,6 +3074,7 @@ Paragraph.prototype.Add = function(Item)
 		}
 		case para_Field:
 		case para_InlineLevelSdt:
+		case para_Hyperlink:
 		{
 			var ContentPos = this.Get_ParaContentPos(false, false);
 			var CurPos     = ContentPos.Get(0);
@@ -12057,6 +12058,7 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 	var oContentControl = new CInlineLevelSdt();
 	oContentControl.Add_ToContent(0, new ParaRun());
 	this.Add(oContentControl);
+	oContentControl.MoveCursorToStartPos();
 	return oContentControl;
 };
 

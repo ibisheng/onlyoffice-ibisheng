@@ -94,72 +94,6 @@ CInlineLevelSdt.prototype.Remove_FromContent = function(Pos, Count, UpdatePositi
 
 	CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent.apply(this, arguments);
 };
-CInlineLevelSdt.prototype.Add = function(Item)
-{
-	switch (Item.Type)
-	{
-		case para_Run:
-		case para_Hyperlink:
-		case para_InlineLevelSdt:
-		case para_Field:
-		{
-			var TextPr = this.Get_FirstTextPr();
-			Item.SelectAll();
-			Item.Apply_TextPr(TextPr);
-			Item.RemoveSelection();
-
-			var CurPos = this.State.ContentPos;
-			var CurItem = this.Content[CurPos];
-			if (para_Run === CurItem.Type)
-			{
-				var NewRun = CurItem.Split2(CurItem.State.ContentPos);
-				this.Add_ToContent(CurPos + 1, Item);
-				this.Add_ToContent(CurPos + 2, NewRun);
-
-				this.State.ContentPos = CurPos + 2;
-				this.Content[this.State.ContentPos].MoveCursorToStartPos();
-			}
-			else
-				CurItem.Add(Item);
-
-			break;
-		}
-		case para_Math :
-		{
-			var ContentPos = new CParagraphContentPos();
-			this.Get_ParaContentPos(false, false, ContentPos);
-			var CurPos = ContentPos.Get(0);
-
-			// Ран формула делит на части, а в остальные элементы добавляется целиком
-			if (para_Run === this.Content[CurPos].Type)
-			{
-				// Разделяем текущий элемент (возвращается правая часть)
-				var NewElement = this.Content[CurPos].Split(ContentPos, 1);
-
-				if (null !== NewElement)
-					this.Add_ToContent(CurPos + 1, NewElement, true);
-
-				var Elem = new ParaMath();
-				Elem.Root.Load_FromMenu(Item.Menu, this.Get_Paragraph());
-				Elem.Root.Correct_Content(true);
-				this.Add_ToContent(CurPos + 1, Elem, true);
-
-				// Перемещаем кусор в конец формулы
-				this.State.ContentPos = CurPos + 1;
-				this.Content[this.State.ContentPos].MoveCursorToEndPos(false);
-			}
-			else
-				this.Content[CurPos].Add(Item);
-
-			break;
-		}
-		default :
-		{
-			this.Content[this.State.ContentPos].Add(Item);
-			break;
-		}
-	}
-};
 CInlineLevelSdt.prototype.Split = function (ContentPos, Depth)
 {
 	// Не даем разделять
@@ -453,21 +387,10 @@ function TEST_ADD_SDT()
 
 	oLogicDocument.Create_NewHistoryPoint();
 
-	var oRun = new ParaRun();
-	oRun.Add(new ParaText("S"));
-	oRun.Add(new ParaText("d"));
-	oRun.Add(new ParaText("t"));
-
-
 	var oInlineContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_InlineLevel);
-
-	// var oInlineContentControl = new CInlineLevelSdt();
-	oInlineContentControl.Add_ToContent(0, oRun);
-
-	// var oPara = oLogicDocument.GetCurrentParagraph();
-	// oPara.Add_ToContent(0, new ParaRun());
-	// oPara.Add_ToContent(1, oInlineContentControl);
-
+	oInlineContentControl.Add(new ParaText("S"));
+	oInlineContentControl.Add(new ParaText("d"));
+	oInlineContentControl.Add(new ParaText("t"));
 
 	oLogicDocument.Recalculate();
 	oLogicDocument.Document_UpdateSelectionState();
@@ -483,12 +406,10 @@ function TEST_ADD_SDT2()
 
 	oLogicDocument.Create_NewHistoryPoint();
 
-
 	var oSdt = oLogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 	oSdt.AddToParagraph(new ParaText("S"));
 	oSdt.AddToParagraph(new ParaText("d"));
 	oSdt.AddToParagraph(new ParaText("t"));
-
 
 	oLogicDocument.Recalculate();
 	oLogicDocument.Document_UpdateSelectionState();
