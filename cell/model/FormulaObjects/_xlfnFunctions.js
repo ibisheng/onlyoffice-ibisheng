@@ -68,7 +68,7 @@
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cCEILING_MATH, cCEILING_PRECISE,
+	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cCEILING_PRECISE,
 		cCOMBINA, cDECIMAL, cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
@@ -220,18 +220,6 @@
 
 	cBITXOR.prototype = Object.create(cBaseFunction.prototype);
 	cBITXOR.prototype.constructor = cBITXOR;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCEILING_MATH() {
-		cBaseFunction.call(this, "CEILING.MATH");
-		this.isXLFN = true;
-	}
-
-	cCEILING_MATH.prototype = Object.create(cBaseFunction.prototype);
-	cCEILING_MATH.prototype.constructor = cCEILING_MATH;
 
 	/**
 	 * @constructor

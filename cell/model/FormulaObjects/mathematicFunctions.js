@@ -56,7 +56,7 @@
 	var _func = AscCommonExcel._func;
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
+	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING, cCEILING_MATH,
 		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSEC, cSECH, cSERIESSUM,
@@ -710,6 +710,65 @@
 	cCEILING.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x, significance )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCEILING_MATH() {
+		this.name = "CEILING.MATH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cCEILING_MATH.prototype = Object.create(cBaseFunction.prototype);
+	cCEILING_MATH.prototype.constructor = cCEILING_MATH;
+	cCEILING_MATH.prototype.argumentsMin = 1;
+	cCEILING_MATH.prototype.argumentsMax = 3;
+	cCEILING_MATH.prototype.isXLFN = true;
+	cCEILING_MATH.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		argClone[2] = this._checkCAreaArg(arg[2], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		if(!argClone[1]){
+			argClone[1] = argClone[0] > 0 ? new cNumber(1) : new cNumber(-1);
+		}
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function floor_math(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
+			var mod = argArray[2];
+
+			if (significance === 0 || number === 0) {
+				return new cNumber(0.0);
+			}
+
+			if ( number * significance < 0.0 )
+				significance = - significance;
+
+			if ( mod === 0 && number < 0.0 ){
+				return new cNumber(Math.floor( number / significance) * significance);
+			}else{
+				return new cNumber(Math.ceil( number / significance) * significance);
+			}
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, floor_math);
+	};
+	cCEILING_MATH.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x, significance, mode )"
 		};
 	};
 

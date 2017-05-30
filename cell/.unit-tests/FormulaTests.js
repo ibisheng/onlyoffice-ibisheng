@@ -810,6 +810,24 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), -4, 'FLOOR.MATH(-5.5, 2, -1)' );
 	} );
 
+	test( "Test: \"CEILING.MATH\"", function () {
+		oParser = new parserFormula( 'CEILING.MATH(24.3, 5)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.MATH(24.3, 5)' );
+		strictEqual( oParser.calculate().getValue(), 25, 'CEILING.MATH(24.3, 5)' );
+
+		oParser = new parserFormula( 'CEILING.MATH(6.7)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.MATH(6.7)' );
+		strictEqual( oParser.calculate().getValue(), 7, 'CEILING.MATH(6.7)' );
+
+		oParser = new parserFormula( 'CEILING.MATH(-8.1, 2)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.MATH(-8.1, 2)' );
+		strictEqual( oParser.calculate().getValue(), -8, 'CEILING.MATH(-8.1, 2)' );
+
+		oParser = new parserFormula( 'CEILING.MATH(-5.5, 2, -1)', "A1", ws );
+		ok( oParser.parse(), 'CEILING.MATH(-5.5, 2, -1)' );
+		strictEqual( oParser.calculate().getValue(), -6, 'CEILING.MATH(-5.5, 2, -1)' );
+	} );
+
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
 		ok( oParser.parse() );
