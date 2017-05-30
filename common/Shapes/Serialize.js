@@ -857,7 +857,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -954,7 +957,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -1184,7 +1190,10 @@ function BinaryPPTYLoader()
                                             }
                                         }
                                         default:
+                                        {
+                                            s.SkipRecord();
                                             break;
+                                        }
                                     }
                                 }
                                 break;
@@ -1200,7 +1209,10 @@ function BinaryPPTYLoader()
                                 break;
                             }
                             default:
+                            {
+                                s.SkipRecord();
                                 break;
+                            }
                         }
                     }
 
@@ -1273,7 +1285,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -1404,7 +1419,10 @@ function BinaryPPTYLoader()
                                 break;
                             }
                             default:
+                            {
+                                s.SkipRecord();
                                 break;
+                            }
                         }
                     }
 
@@ -1458,7 +1476,10 @@ function BinaryPPTYLoader()
                                             break;
                                         }
                                         default:
+                                        {
+                                            s.SkipRecord();
                                             break;
+                                        }
                                     }
                                 }
                                 break;
@@ -1469,7 +1490,10 @@ function BinaryPPTYLoader()
                                 break;
                             }
                             default:
+                            {
+                                s.SkipRecord();
                                 break;
+                            }
                         }
                     }
 
@@ -1477,7 +1501,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -1539,7 +1566,10 @@ function BinaryPPTYLoader()
                     s.SkipRecord();
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -1575,7 +1605,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -2482,7 +2515,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -2634,7 +2670,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -2836,7 +2875,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -2874,7 +2916,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -3656,7 +3701,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -3703,7 +3751,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -3746,7 +3797,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -3789,7 +3843,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -3903,7 +3960,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -3947,7 +4007,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -3988,7 +4051,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -4117,7 +4183,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -4165,7 +4234,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -4241,7 +4313,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -4298,7 +4373,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -4515,7 +4593,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -4646,7 +4727,10 @@ function BinaryPPTYLoader()
                             break;
                         }
                         default:
+                        {
+                            s.SkipRecord();
                             break;
+                        }
                     }
                 }
             }
@@ -4694,7 +4778,10 @@ function BinaryPPTYLoader()
                             break;
                         }
                         default:
+                        {
+                            s.SkipRecord();
                             break;
+                        }
                     }
                 }
             }
@@ -4953,7 +5040,10 @@ function BinaryPPTYLoader()
                         break;
                     }
                     default:
+                    {
+                        s.SkipRecord();
                         break;
+                    }
                 }
             }
 
@@ -5043,7 +5133,10 @@ function BinaryPPTYLoader()
                 break;
             }
             default:
+            {
+                s.SkipRecord();
                 break;
+            }
         }
 
         s.Seek2(_e);
@@ -5068,6 +5161,7 @@ function BinaryPPTYLoader()
             }
             case 6:
             case 2:
+            case 7:
             {
                 _object = this.ReadPic(6 === _type);
                 break;
@@ -5085,9 +5179,13 @@ function BinaryPPTYLoader()
             case 5:
             {
                 _object = this.ReadGrFrame();
+                break;
             }
             default:
+            {
+                s.SkipRecord();
                 break;
+            }
         }
 
         return _object;
@@ -5167,6 +5265,7 @@ function BinaryPPTYLoader()
 				}
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -5259,6 +5358,7 @@ function BinaryPPTYLoader()
                             }
                             case 6:
                             case 2:
+                            case 7:
                             {
                                 _object = this.ReadPic(6 === _type);
                                 if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm)
@@ -5304,13 +5404,17 @@ function BinaryPPTYLoader()
                                 break;
                             }
                             default:
+                            {
+                                s.SkipRecord();
                                 break;
+                            }
                         }
                     }
                     break;
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -5427,6 +5531,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -5541,6 +5646,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -5641,6 +5747,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -5737,6 +5844,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -6192,7 +6300,10 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:
+                {
+                    s.SkipRecord();
                     break;
+                }
             }
         }
 
@@ -6247,7 +6358,6 @@ function BinaryPPTYLoader()
                     break;
                 }
                 default:{
-                    this.stream.SkipRecord();
                     break;
                 }
             }
@@ -6307,6 +6417,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -6527,6 +6638,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -7439,7 +7551,10 @@ function BinaryPPTYLoader()
                                break;
                            }
                            default:
+                           {
+                               s.SkipRecord();
                                break;
+                           }
                        }
                     }
                     s.Seek2(_end_rec3);
@@ -8061,6 +8176,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -8142,6 +8258,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -8187,6 +8304,7 @@ function BinaryPPTYLoader()
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -8413,6 +8531,7 @@ function BinaryPPTYLoader()
                                         }
                                         default:
                                         {
+                                            s.SkipRecord();
                                             break;
                                         }
                                     }
@@ -8513,13 +8632,17 @@ function BinaryPPTYLoader()
 								break;
 							}
                             default:
+                            {
+                                s.SkipRecord();
                                 break;
+                            }
                         }
                     }
                     break;
                 }
                 default:
                 {
+                    s.SkipRecord();
                     break;
                 }
             }
@@ -8800,8 +8923,8 @@ function CPres()
                 }
                 default:
                 {
-                    s.Seek2(_end_pos);
-                    return;
+                    s.SkipRecord();
+                    break;
                 }
             }
         }
@@ -8903,7 +9026,10 @@ function CPres()
                         break;
                     }
                     default:
+                    {
+                        s.SkipRecord();
                         break;
+                    }
                 }
             }
 
@@ -9340,6 +9466,7 @@ function CPres()
                     }
                     default:
                     {
+                        s.SkipRecord();
                         break;
                     }
                 }
@@ -9409,6 +9536,7 @@ function CPres()
                     }
                     default:
                     {
+                        s.SkipRecord();
                         break;
                     }
                 }
@@ -9546,6 +9674,7 @@ function CPres()
                                 }
                                 case 6:
                                 case 2:
+                                case 7:
                                 {
                                     sp = this.ReadPic(6 == _type);
                                     if(sp.spPr && sp.spPr.xfrm){
@@ -9583,13 +9712,17 @@ function CPres()
                                     break;
                                 }
                                 default:
+                                {
+                                    s.SkipRecord();
                                     break;
+                                }
                             }
                         }
                         break;
                     }
                     default:
                     {
+                        s.SkipRecord();
                         break;
                     }
                 }
@@ -9674,7 +9807,10 @@ function CPres()
                         break;
                     }
                     default:
+                    {
+                        s.SkipRecord();
                         break;
+                    }
                 }
             }
 
