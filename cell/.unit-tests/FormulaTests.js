@@ -810,7 +810,7 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), -4, 'FLOOR.MATH(-5.5, 2, -1)' );
 	} );
 
-	test( "Test: \"CEILING.PRECISE\"", function () {
+	test( "Test: \"CEILING.MATH\"", function () {
 		oParser = new parserFormula( 'CEILING.MATH(24.3, 5)', "A1", ws );
 		ok( oParser.parse(), 'CEILING.MATH(24.3, 5)' );
 		strictEqual( oParser.calculate().getValue(), 25, 'CEILING.MATH(24.3, 5)' );
@@ -856,6 +856,32 @@ $( function () {
 		oParser = new parserFormula( 'CEILING.PRECISE(test)', "A1", ws );
 		ok( oParser.parse(), 'CEILING.PRECISE(test)' );
 		strictEqual( oParser.calculate().getValue(), "#NAME?", 'CEILING.PRECISE(test)' );
+	} );
+
+	test( "Test: \"ISO.CEILING\"", function () {
+		oParser = new parserFormula( 'ISO.CEILING(4.3)', "A1", ws );
+		ok( oParser.parse(), 'ISO.CEILING(4.3)' );
+		strictEqual( oParser.calculate().getValue(), 5, 'ISO.CEILING(4.3)' );
+
+		oParser = new parserFormula( 'ISO.CEILING(-4.3)', "A1", ws );
+		ok( oParser.parse(), 'ISO.CEILING(-4.3)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'ISO.CEILING(-4.3)' );
+
+		oParser = new parserFormula( 'ISO.CEILING(4.3, 2)', "A1", ws );
+		ok( oParser.parse(), 'ISO.CEILING(4.3, 2)' );
+		strictEqual( oParser.calculate().getValue(), 6, 'ISO.CEILING(4.3, 2)' );
+
+		oParser = new parserFormula( 'ISO.CEILING(4.3,-2)', "A1", ws );
+		ok( oParser.parse(), 'ISO.CEILING(4.3,-2)' );
+		strictEqual( oParser.calculate().getValue(), 6, 'ISO.CEILING(4.3,-2)' );
+
+		oParser = new parserFormula( 'ISO.CEILING(-4.3,2)', "A1", ws );
+		ok( oParser.parse(), 'ISO.CEILING(-4.3,2)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'ISO.CEILING(-4.3,2)' );
+
+		oParser = new parserFormula( 'ISO.CEILING(-4.3,-2)', "A1", ws );
+		ok( oParser.parse(), 'ISO.CEILING(-4.3,-2)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'ISO.CEILING(-4.3,-2)' );
 	} );
 
 	test( "Test: \"ARABIC('LVII')\"", function () {

@@ -1875,12 +1875,50 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
+	//TODO точная копия функции CEILING.PRECISE. зачем excel две одинаковые функции?
 	function cISO_CEILING() {
-		cBaseFunction.call(this, "ISO_CEILING");
+		this.name = "ISO.CEILING";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cISO_CEILING.prototype = Object.create(cBaseFunction.prototype);
 	cISO_CEILING.prototype.constructor = cISO_CEILING;
+	cISO_CEILING.prototype.argumentsMin = 1;
+	cISO_CEILING.prototype.argumentsMax = 2;
+	//cISO_CEILING.prototype.isXLFN = true;
+	cISO_CEILING.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function floorHelper(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
+			if (significance === 0 || number === 0) {
+				return new cNumber(0.0);
+			}
+
+			var absSignificance = Math.abs(significance);
+			var quotient = number / absSignificance;
+			return new cNumber(Math.ceil(quotient) * absSignificance);
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+	};
+	cISO_CEILING.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x, significance )"
+		};
+	};
 
 	/**
 	 * @constructor
