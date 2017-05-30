@@ -134,7 +134,8 @@
             var flipH = false;
             var rot = 0;
             var oMapAdj = {};
-            if(sPreset === "line"){
+            if(sPreset === "line" ||
+                sPreset.indexOf("straightConnector") > -1){
                 flipH = (_begin.x > _end.x);
                 flipV = (_begin.y > _end.y);
             }
