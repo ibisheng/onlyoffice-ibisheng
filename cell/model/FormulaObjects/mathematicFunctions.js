@@ -1526,30 +1526,21 @@
 	cFLOOR_PRECISE.prototype.argumentsMax = 2;
 	cFLOOR_PRECISE.prototype.isXLFN = true;
 	cFLOOR_PRECISE.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1];
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]);
-		}
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
 		}
 
-		arg0 = arg[0].tocNumber();
-		if(arg[1]){
-			arg1 = arg[1].tocNumber();
-		}
-		else{
-			arg1 = new cNumber(1);
-		}
-
-		if (arg0 instanceof cError) {
-			return this.value = arg0;
-		}
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
-		}
-
-		function floorHelper(number, significance) {
+		function floorHelper(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
 			if (significance === 0 || number === 0) {
 				return new cNumber(0.0);
 			}
@@ -1559,46 +1550,7 @@
 			return new cNumber(Math.floor(quotient) * absSignificance);
 		}
 
-		if (arg0 instanceof cArray && arg1 instanceof cArray) {
-			arg0.foreach(function (elem, r, c) {
-				var a = elem;
-				var b = arg1.getElementRowCol(r, c);
-				if (a instanceof cNumber && b instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg0;
-		} else if (arg0 instanceof cArray) {
-			arg0.foreach(function (elem, r, c) {
-				var a = elem;
-				var b = arg1;
-				if (a instanceof cNumber && b instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg0;
-		} else if (arg1 instanceof cArray) {
-			arg1.foreach(function (elem, r, c) {
-				var a = arg0;
-				var b = elem;
-				if (a instanceof cNumber && b instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg1;
-		}
-
-		if (arg0 instanceof cString || arg1 instanceof cString) {
-			return this.value = new cError(cErrorType.wrong_value_type);
-		}
-
-		return this.value = floorHelper(arg0.getValue(), arg1.getValue());
+		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
 	};
 	cFLOOR_PRECISE.prototype.getInfo = function () {
 		return {
