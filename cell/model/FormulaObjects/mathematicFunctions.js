@@ -1622,34 +1622,27 @@
 	cFLOOR_MATH.prototype.argumentsMax = 3;
 	cFLOOR_MATH.prototype.isXLFN = true;
 	cFLOOR_MATH.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]);
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		argClone[2] = this._checkCAreaArg(arg[2], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		if(!argClone[1]){
+			argClone[1] = argClone[0] > 0 ? new cNumber(1) : new cNumber(-1);
 		}
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
-		}
-		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1]);
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
 		}
 
-		arg0 = arg[0].tocNumber();
-		if(!arg1){
-			arg1 = arg[0] > 0 ? new cNumber(1) : new cNumber(-1);
-		}
-		arg2 = arg[2] ? arg[2].tocNumber() : new cNumber(0);
+		function floor_math(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
+			var mod = argArray[2];
 
-		if (arg0 instanceof cError) {
-			return this.value = arg0;
-		}
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
-		}
-		if (arg2 instanceof cError) {
-			return this.value = arg2;
-		}
-
-		function floorHelper(number, significance, mod) {
 			if (significance === 0 || number === 0) {
 				return new cNumber(0.0);
 			}
@@ -1664,98 +1657,7 @@
 			}
 		}
 
-		if (arg0 instanceof cArray && arg1 instanceof cArray && arg2 instanceof cArray) {
-			arg0.foreach(function (elem, r, c) {
-				var a = elem;
-				var b = arg1.getElementRowCol(r, c);
-				var d = arg2.getElementRowCol(r, c);
-				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg0;
-		}else if (arg0 instanceof cArray && arg1 instanceof cArray) {
-			arg0.foreach(function (elem, r, c) {
-				var a = elem;
-				var b = arg1.getElementRowCol(r, c);
-				var d = arg2;
-				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg0;
-		} else if (arg0 instanceof cArray && arg2 instanceof cArray) {
-			arg0.foreach(function (elem, r, c) {
-				var a = elem;
-				var b = arg1;
-				var d = arg2.getElementRowCol(r, c);
-				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg0;
-		} else if (arg1 instanceof cArray && arg2 instanceof cArray) {
-			arg1.foreach(function (elem, r, c) {
-				var a = arg0;
-				var b = elem;
-				var d = arg2.getElementRowCol(r, c);
-				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg1;
-		}else if (arg0 instanceof cArray) {
-			arg0.foreach(function (elem, r, c) {
-				var a = elem;
-				var b = arg1;
-				var d = arg2;
-				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg0;
-		} else if (arg1 instanceof cArray) {
-			arg1.foreach(function (elem, r, c) {
-				var a = arg0;
-				var b = elem;
-				var d = arg2;
-				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg1;
-		} else if (arg2 instanceof cArray) {
-			arg2.foreach(function (elem, r, c) {
-				var a = arg0;
-				var b = arg1;
-				var d = elem;
-
-				if (a instanceof cNumber && b instanceof cNumber && d instanceof cNumber) {
-					this.array[r][c] = floorHelper(a.getValue(), b.getValue(), d.getValue());
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg2;
-		}
-
-		if (arg0 instanceof cString || arg1 instanceof cString || arg2 instanceof cString) {
-			return this.value = new cError(cErrorType.wrong_value_type);
-		}
-
-		return this.value = floorHelper(arg0.getValue(), arg1.getValue(), arg2.getValue());
+		return this.value = this._findArrayInNumberArguments(argClone, floor_math);
 	};
 	cFLOOR_MATH.prototype.getInfo = function () {
 		return {

@@ -2369,6 +2369,62 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.checkArguments = function () {
 		return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
 	};
+	cBaseFunction.prototype._findArrayInNumberArguments = function (inputArguments, calculateFunc){
+		var argsArray = [];
+		for(var i = 0; i < inputArguments.length; i++){
+			if(cElementType.array === inputArguments[i].type){
+				inputArguments[i].foreach(function (elem, r, c) {
+
+					var arg;
+					argsArray = [];
+					for(var j = 0; j < inputArguments.length; j++){
+						if(i === j){
+							arg = elem;
+						}else if(cElementType.array === inputArguments[j].type){
+							arg = inputArguments[j].getElementRowCol(r, c);
+						}else{
+							arg = inputArguments[j];
+						}
+
+						if(arg && cElementType.number === arg.type){
+							argsArray[j] = arg.getValue();
+						}else{
+							argsArray = null;
+							break;
+						}
+					}
+
+					this.array[r][c] = null === argsArray ? new cError(cErrorType.wrong_value_type) : calculateFunc(argsArray);
+				});
+				return inputArguments[i];
+			}else{
+				if(cElementType.string === inputArguments[i].type){
+					return new cError(cErrorType.wrong_value_type);
+				}else{
+					argsArray[i] = inputArguments[i].getValue();
+				}
+			}
+		}
+
+		return calculateFunc(argsArray);
+	};
+	cBaseFunction.prototype._checkCAreaArg = function (arg, arg1) {
+		if (arg instanceof cArea || arg instanceof cArea3D) {
+			arg = arg.cross(arg1);
+		}
+		return arg;
+	};
+	cBaseFunction.prototype._checkErrorArg = function (argArray) {
+		var res = false;
+		for(var i = 0; i < argArray.length; i++)
+		{
+			if(argArray[i] instanceof cError)
+			{
+				return argArray[i];
+			}
+		}
+		return res;
+	};
 
 	/** @constructor */
 	function parentLeft() {
