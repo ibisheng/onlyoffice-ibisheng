@@ -5902,13 +5902,9 @@ function BinaryPPTYLoader()
                     _chart.setLocks(_nvGraphicFramePr.locks);
                 }
             }
+            this.map_shapes_by_id[_nvGraphicFramePr.cNvPr.id] = _chart;
             _chart.spPr.setXfrm(_xfrm);
             _xfrm.setParent(_chart.spPr);
-            _chart.setNvSpPr(_nvGraphicFramePr);
-            if(AscCommon.isRealObject(_nvGraphicFramePr) && AscFormat.isRealNumber(_nvGraphicFramePr.locks))
-            {
-                _chart.setLocks(_nvGraphicFramePr.locks);
-            }
             return _chart;
         }
 
@@ -5934,9 +5930,7 @@ function BinaryPPTYLoader()
                     this.ReadCNvPr(prop.cNvPr);
                     if(AscCommon.isRealObject(drawing))
                     {
-                        if(AscDFH.historyitem_type_Shape === drawing.getObjectType()){
-                            this.map_shapes_by_id[prop.cNvPr.id] = drawing;
-                        }
+                        this.map_shapes_by_id[prop.cNvPr.id] = drawing;
                     }
                     break;
                 }
