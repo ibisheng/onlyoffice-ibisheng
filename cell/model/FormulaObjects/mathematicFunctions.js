@@ -939,7 +939,7 @@
 			return this.value = argError;
 		}
 
-		function floorHelper(argArray) {
+		function combinaCalculate(argArray) {
 			var a = argArray[0];
 			var b = argArray[1];
 
@@ -952,7 +952,7 @@
 			return new cNumber(Math.binomCoeff(a + b - 1, b));
 		}
 
-		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+		return this.value = this._findArrayInNumberArguments(argClone, combinaCalculate);
 	};
 	cCOMBINA.prototype.getInfo = function () {
 		return {
