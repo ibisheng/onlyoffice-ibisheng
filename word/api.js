@@ -547,14 +547,31 @@
 		this.delete = function()
 		{
 			var LogicDocument = this.api.WordControl.m_oLogicDocument;
-			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
-			if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
+
+			var arrContentControl = [];
+			for (var i = 0; i < this.documents.length; i++)
 			{
+				var oContentControl = g_oTableId.Get_ById(this.documents[i].InternalId);
+				if (oContentControl
+					&& (oContentControl instanceof AscCommonWord.CBlockLevelSdt
+					|| oContentControl instanceof AscCommonWord.CInlineLevelSdt))
+					arrContentControl.push(g_oTableId.Get_ById(this.documents[i].InternalId));
+			}
+
+			LogicDocument.SetCheckContentControlsLock(false);
+			if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+					Elements  : arrContentControl,
+					CheckType : AscCommon.changestype_Remove
+				}))
+			{
+				LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
 				for (var i = 0; i < this.documents.length; i++)
 				{
 					LogicDocument.RemoveContentControl(this.documents[i].InternalId);
 				}
 			}
+			LogicDocument.SetCheckContentControlsLock(true);
 			this.api.asc_Recalculate();
 			delete this.api.__content_control_worker;
 		};

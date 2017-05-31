@@ -1546,6 +1546,9 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 	// Объект для составного ввода текста
 	this.CompositeInput = null;
 
+	// Нужно ли проверять тип лока у ContentControl при проверке залоченности выделенных объектов
+	this.CheckContentControlsLock = true;
+
 	// Класс для работы со сносками
 	this.Footnotes               = new CFootnotesController(this);
 	this.LogicDocumentController = new CLogicDocumentController(this);
@@ -15252,6 +15255,14 @@ CDocument.prototype.GetContentControl = function(Id)
 CDocument.prototype.GetAllSignatures = function()
 {
     return this.DrawingObjects.getAllSignatures();
+};
+CDocument.prototype.SetCheckContentControlsLock = function(isLocked)
+{
+	this.CheckContentControlsLock = isLocked;
+};
+CDocument.prototype.IsCheckContentControlsLock = function()
+{
+	return this.CheckContentControlsLock;
 };
 
 function CDocumentSelectionState()

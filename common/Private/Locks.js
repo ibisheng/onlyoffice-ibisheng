@@ -622,9 +622,12 @@ CTable.prototype.CheckContentControlDeletingLock = function()
 };
 CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
 {
+	var isCheckContentControlLock = this.LogicDocument ? this.LogicDocument.IsCheckContentControlsLock() : true;
+
 	var nContentControlLock = this.GetContentControlLock();
 
-	if ((AscCommon.changestype_Paragraph_Content === CheckType
+	if (isCheckContentControlLock
+		&& (AscCommon.changestype_Paragraph_Content === CheckType
 		|| AscCommon.changestype_Remove === CheckType
 		|| AscCommon.changestype_Delete === CheckType
 		|| AscCommon.changestype_Document_Content === CheckType
@@ -644,7 +647,9 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 			return;
 		}
 	}
-	else if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_ContentLocked === nContentControlLock)
+	else if (isCheckContentControlLock
+		&& (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
+		|| AscCommonWord.sdtlock_ContentLocked === nContentControlLock))
 	{
 		return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 	}
@@ -655,6 +660,10 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 };
 CBlockLevelSdt.prototype.CheckContentControlEditingLock = function()
 {
+	var isCheckContentControlLock = this.LogicDocument ? this.LogicDocument.IsCheckContentControlsLock() : true;
+	if (!isCheckContentControlLock)
+		return;
+
 	var nContentControlLock = this.GetContentControlLock();
 
 	if (false === AscCommon.CollaborativeEditing.IsNeedToSkipContentControlOnCheckEditingLock(this)
@@ -666,6 +675,10 @@ CBlockLevelSdt.prototype.CheckContentControlEditingLock = function()
 };
 CBlockLevelSdt.prototype.CheckContentControlDeletingLock = function()
 {
+	var isCheckContentControlLock = this.LogicDocument ? this.LogicDocument.IsCheckContentControlsLock() : true;
+	if (!isCheckContentControlLock)
+		return;
+
 	var nContentControlLock = this.GetContentControlLock();
 
 	if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_SdtLocked === nContentControlLock)
@@ -675,9 +688,14 @@ CBlockLevelSdt.prototype.CheckContentControlDeletingLock = function()
 };
 CInlineLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType)
 {
+	var isCheckContentControlLock = this.Paragraph && this.Paragraph.LogicDocument ? this.Paragraph.LogicDocument.IsCheckContentControlsLock() : true;
+	if (!isCheckContentControlLock)
+		return;
+
 	var nContentControlLock = this.GetContentControlLock();
 
-	if ((AscCommon.changestype_Paragraph_Content === CheckType
+	if (CheckContentControlLock
+		&& (AscCommon.changestype_Paragraph_Content === CheckType
 		|| AscCommon.changestype_Remove === CheckType
 		|| AscCommon.changestype_Delete === CheckType
 		|| AscCommon.changestype_Document_Content === CheckType
