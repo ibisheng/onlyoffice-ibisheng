@@ -241,7 +241,17 @@
 		getMaxIndex:     function (url)
 						 {
 							 return this.imageCount;
-						 }
+						 },
+		getImageUrlsWithOtherExtention: function(imageLocal) {
+			var res = [];
+			var filename = GetFileName(imageLocal);
+			for (var i in this.urls) {
+				if (0 == i.indexOf(this.mediaPrefix + filename + '.') && this.mediaPrefix + imageLocal !== i) {
+					res.push(this.urls[i]);
+				}
+			}
+			return res;
+		}
 	};
 	var g_oDocumentUrls = new DocumentUrls();
 
@@ -979,6 +989,13 @@
 		var nIndex = sName ? sName.lastIndexOf(".") : -1;
 		if (-1 != nIndex)
 			return sName.substring(nIndex + 1).toLowerCase();
+		return null;
+	}
+	function GetFileName(sName)
+	{
+		var nIndex = sName ? sName.lastIndexOf(".") : -1;
+		if (-1 != nIndex)
+			return sName.substring(0, nIndex);
 		return null;
 	}
 
@@ -3047,6 +3064,7 @@
 	window["AscCommon"].convertUnicodeToUTF16 = convertUnicodeToUTF16;
 	window["AscCommon"].convertUTF16toUnicode = convertUTF16toUnicode;
 	window["AscCommon"].build_local_rx = build_local_rx;
+	window["AscCommon"].GetFileName = GetFileName;
 	window["AscCommon"].GetFileExtension = GetFileExtension;
 	window["AscCommon"].changeFileExtention = changeFileExtention;
 	window["AscCommon"].getExtentionByFormat = getExtentionByFormat;

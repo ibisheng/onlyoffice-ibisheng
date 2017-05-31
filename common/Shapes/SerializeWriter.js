@@ -2454,23 +2454,7 @@ function CBinaryFileWriter()
                 if (oThis.IsUseFullUrl) {
                   var displayN = oThis._isDisplayedImage(imageLocal);
                   if (0 != displayN) {
-                    var additionalSrc = [];
-                    if (0 != (displayN & 1)) {
-                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "wmf"));
-                    }
-                    if (0 != (displayN & 2)) {
-                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "emf"));
-                    }
-                    if (0 != (displayN & 4)) {
-                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "bin"));
-                    }
-                    var additionalUrl = [];
-                    for (var i = 0; i < additionalSrc.length; ++i) {
-                      var imageUrl = AscCommon.g_oDocumentUrls.getImageUrl(additionalSrc[i]);
-                      if (imageUrl) {
-                        additionalUrl.push(imageUrl);
-                      }
-                    }
+                      var additionalUrl = AscCommon.g_oDocumentUrls.getImageUrlsWithOtherExtention(imageLocal);
                     oThis.StartRecord(101);
                     oThis.WriteUChar(additionalUrl.length);
                     for (var i = 0; i < additionalUrl.length; ++i) {
@@ -2505,7 +2489,7 @@ function CBinaryFileWriter()
         if (-1 != index) {
           if (index + findStr.length < strName.length) {
             var displayN = parseInt(strName[index + findStr.length]);
-            if (1 <= displayN && displayN <= 6) {
+            if (!isNaN(displayN)) {
               var imageIndex = index + findStr.length + 1;
               if (imageIndex == strName.indexOf("image", imageIndex))
                 res = displayN;
