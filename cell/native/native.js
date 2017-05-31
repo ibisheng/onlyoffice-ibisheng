@@ -7012,7 +7012,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
                     {
                         var isLines = _api.asc_getSheetViewSettings();
                         isLines.asc_setShowGridLines(params[_current.pos++]);
-                        _api.asc_setSheetViewSettings(isLines);
+                        _api.asc_setDisplayGridlines(isLines.showGridLines);
                         _s.asc_WriteAllWorksheets(true);
                         break;
                     }
@@ -7021,7 +7021,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
                     {
                         var isHeaders = _api.asc_getSheetViewSettings();
                         isHeaders.asc_setShowRowColHeaders(params[_current.pos++]);
-                        _api.asc_setSheetViewSettings(isHeaders);
+                        _api.asc_setDisplayHeadings(isHeaders.showRowColHeaders);
                         _s.asc_WriteAllWorksheets(true);
                         break;
                     }
@@ -7089,16 +7089,12 @@ window["native"]["offline_apply_event"] = function(type,params) {
         }
         case 2205: // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEET_SHOW_LINES
         {
-            var gridLines = _api.asc_getSheetViewSettings();
-            gridLines.asc_setShowGridLines(params > 0);
-            _api.asc_setSheetViewSettings(gridLines);
+            _api.asc_setDisplayGridlines(params > 0);
             break;
         }
         case 2210: // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEET_SHOW_HEADINGS
         {
-            var colRowHeaders = _api.asc_getSheetViewSettings();
-            colRowHeaders.asc_setShowRowColHeaders(params > 0);
-            _api.asc_setSheetViewSettings(colRowHeaders);
+            _api.asc_setDisplayHeadings(params > 0);
             break;
         }
         case 2215: // ASC_SPREADSHEETS_EVENT_TYPE_SET_PAGE_OPTIONS
@@ -7735,3 +7731,14 @@ window["AscCommon"].getFullImageSrc2 = function (src) {
     }
     return src;
 }
+
+
+
+
+
+
+
+
+
+
+
