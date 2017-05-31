@@ -934,6 +934,11 @@
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1].tocNumber();
 
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
 		function floorHelper(argArray) {
 			var a = argArray[0];
 			var b = argArray[1];
