@@ -57,7 +57,7 @@
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING, cCEILING_MATH, cCEILING_PRECISE,
-		cCOMBIN, cCOMBINA, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
+		cCOMBIN, cCOMBINA, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDECIMAL, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSEC, cSECH, cSERIESSUM,
 		cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS, cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2,
@@ -1276,6 +1276,89 @@
 		};
 	};
 
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDECIMAL() {
+		this.name = "DECIMAL";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cDECIMAL.prototype = Object.create(cBaseFunction.prototype);
+	cDECIMAL.prototype.constructor = cDECIMAL;
+	cDECIMAL.prototype.argumentsMin = 2;
+	cDECIMAL.prototype.argumentsMax = 2;
+	cDECIMAL.prototype.isXLFN = true;
+	cDECIMAL.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+
+		argClone[0] = argClone[0].tocString();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function decimal_calculate(argArray){
+			var a = argArray[0];
+			var b = argArray[1];
+			b = parseInt(b);
+
+			if ( b < 2  || b > 36 ) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var fVal = 0;
+			var startIndex = 0;
+			while ( a[startIndex] === ' ' ){
+				startIndex++;
+			}
+
+			if ( b === 16 ){
+				if ( a[startIndex] === 'x' || a[startIndex] === 'X' ){
+					startIndex++;
+				}
+				else if ( a[startIndex] === '0' && ( a[startIndex + 1] === 'x' || a[startIndex + 1] === 'X' ) ){
+					startIndex += 2;
+				}
+			}
+
+			a = a.toLowerCase();
+			var startPos = 'a'.charCodeAt(0);
+			for(var i = startIndex; i < a.length; i++){
+				var n;
+				if ( '0' <= a[i] && a[i] <= '9' ){
+					n = a[i] - '0';
+				} else if ( 'a' <= a[i] && a[i] <= 'z' ){
+					var currentPos = a[i].charCodeAt(0);
+					n = 10 + parseInt(currentPos - startPos);
+				}else{
+					n = b;
+				}
+
+				if ( b <= n ){
+					return new cError(cErrorType.not_numeric);
+				}
+				else{
+					fVal = fVal * b + n;
+				}
+			}
+
+			return isNaN(fVal) ? new cError(cErrorType.not_numeric) : new cNumber(fVal);
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, decimal_calculate, true);
+	};
+	cDECIMAL.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( number , number-chosen )"
+		};
+	};
 
 	/**
 	 * @constructor

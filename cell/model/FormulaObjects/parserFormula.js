@@ -2369,7 +2369,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.checkArguments = function () {
 		return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
 	};
-	cBaseFunction.prototype._findArrayInNumberArguments = function (inputArguments, calculateFunc){
+	cBaseFunction.prototype._findArrayInNumberArguments = function (inputArguments, calculateFunc, dNotCheckNumberType){
 		var argsArray = [];
 		for(var i = 0; i < inputArguments.length; i++){
 			if(cElementType.array === inputArguments[i].type){
@@ -2386,7 +2386,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 							arg = inputArguments[j];
 						}
 
-						if(arg && cElementType.number === arg.type){
+						if(arg && ((dNotCheckNumberType) || (cElementType.number === arg.type && !dNotCheckNumberType))){
 							argsArray[j] = arg.getValue();
 						}else{
 							argsArray = null;
@@ -2398,7 +2398,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				});
 				return inputArguments[i];
 			}else{
-				if(cElementType.string === inputArguments[i].type){
+				if(cElementType.string === inputArguments[i].type && !dNotCheckNumberType){
 					return new cError(cErrorType.wrong_value_type);
 				}else{
 					argsArray[i] = inputArguments[i].getValue();

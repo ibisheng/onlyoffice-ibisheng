@@ -68,7 +68,7 @@
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cDECIMAL, cMUNIT);
+	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
@@ -363,18 +363,6 @@
 
 	cDBCS.prototype = Object.create(cBaseFunction.prototype);
 	cDBCS.prototype.constructor = cDBCS;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cDECIMAL() {
-		cBaseFunction.call(this, "DECIMAL");
-		this.isXLFN = true;
-	}
-
-	cDECIMAL.prototype = Object.create(cBaseFunction.prototype);
-	cDECIMAL.prototype.constructor = cDECIMAL;
 
 	/**
 	 * @constructor
