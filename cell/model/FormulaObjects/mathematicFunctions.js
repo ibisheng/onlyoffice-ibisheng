@@ -57,7 +57,7 @@
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING, cCEILING_MATH, cCEILING_PRECISE,
-		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
+		cCOMBIN, cCOMBINA, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSEC, cSECH, cSERIESSUM,
 		cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS, cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2,
@@ -906,6 +906,50 @@
 		return this.value = new cNumber(Math.binomCoeff(arg0.getValue(), arg1.getValue()));
 	};
 	cCOMBIN.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( number , number-chosen )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCOMBINA() {
+		this.name = "COMBINA";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cCOMBINA.prototype = Object.create(cBaseFunction.prototype);
+	cCOMBINA.prototype.constructor = cCOMBINA;
+	cCOMBINA.prototype.argumentsMin = 2;
+	cCOMBINA.prototype.argumentsMax = 2;
+	cCOMBINA.prototype.isXLFN = true;
+	cCOMBINA.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		function floorHelper(argArray) {
+			var a = argArray[0];
+			var b = argArray[1];
+
+			if (a < 0 || b < 0 || a < b) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			a = parseInt(a);
+			b = parseInt(b);
+			return new cNumber(Math.binomCoeff(a + b - 1, b));
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+	};
+	cCOMBINA.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( number , number-chosen )"
 		};

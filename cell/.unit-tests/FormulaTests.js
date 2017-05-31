@@ -884,6 +884,24 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), -4, 'ISO.CEILING(-4.3,-2)' );
 	} );
 
+	test( "Test: \"COMBINA\"", function () {
+		oParser = new parserFormula( 'COMBINA(4,3)', "A1", ws );
+		ok( oParser.parse(), 'COMBINA(4,3)' );
+		strictEqual( oParser.calculate().getValue(), 20, 'COMBINA(4,3)' );
+
+		oParser = new parserFormula( 'COMBINA(10,3)', "A1", ws );
+		ok( oParser.parse(), 'COMBINA(10,3)' );
+		strictEqual( oParser.calculate().getValue(), 220, 'COMBINA(10,3)' );
+
+		oParser = new parserFormula( 'COMBINA(3,10)', "A1", ws );
+		ok( oParser.parse(), 'COMBINA(3,10)' );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", 'COMBINA(10,3)' );
+
+		oParser = new parserFormula( 'COMBINA(10,-3)', "A1", ws );
+		ok( oParser.parse(), 'COMBINA(10,-3)' );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", 'COMBINA(10,-3)' );
+	} );
+
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
 		ok( oParser.parse() );
