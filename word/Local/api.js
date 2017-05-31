@@ -67,6 +67,8 @@ Asc['asc_docs_api'].prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 		this.WordControl.m_oLogicDocument.Set_FastCollaborativeEditing(false);
 	}
 	DesktopOfflineUpdateLocalName(this);
+
+	window["DesktopAfterOpen"](this);
 };
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {
@@ -228,6 +230,16 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	
 	if (2 == error)
 		editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationSaveError, c_oAscError.Level.NoCritical);
+
+	if (0 == error)
+	{
+		if (window.SaveQuestionObjectBeforeSign)
+		{
+			var _obj = window.SaveQuestionObjectBeforeSign;
+			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height);
+			window.SaveQuestionObjectBeforeSign = null;
+		}
+	}
 };
 Asc['asc_docs_api'].prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {

@@ -660,6 +660,7 @@ CImageShape.prototype.draw = function(graphics, transform)
 CImageShape.prototype.select = CShape.prototype.select;
 
 CImageShape.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
+CImageShape.prototype.hit = CShape.prototype.hit;
 
 CImageShape.prototype.deselect = function(drawingObjectsController)
 {

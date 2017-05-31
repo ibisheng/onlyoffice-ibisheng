@@ -2896,12 +2896,12 @@ function CBinaryFileWriter()
         }
         else{
             oThis.StartRecord(1);
+            oThis.WriteUChar(g_nodeAttributeStart);
+            oThis._WriteBool2(0, shape.attrUseBgFill);
+            oThis.WriteUChar(g_nodeAttributeEnd);
         }
 
 
-        oThis.WriteUChar(g_nodeAttributeStart);
-        oThis._WriteBool2(0, shape.attrUseBgFill);
-        oThis.WriteUChar(g_nodeAttributeEnd);
 
         shape.spPr.WriteXfrm = shape.spPr.xfrm;
 
@@ -3472,6 +3472,7 @@ function CBinaryFileWriter()
 				switch(spTree[i].getObjectType())
                 {
                     case AscDFH.historyitem_type_Shape:
+                    case AscDFH.historyitem_type_Cnx:
                     {
 						oThis.WriteShape(spTree[i]);
                         break;
@@ -4781,11 +4782,16 @@ function CBinaryFileWriter()
         this.WriteShape = function(shape, Document, oMapCommentId, oNumIdMap, copyParams, saveParams)
         {
             var _writer = this.BinaryFileWriter;
-            _writer.StartRecord(1);
 
-            _writer.WriteUChar(AscCommon.g_nodeAttributeStart);
-            _writer._WriteBool2(0, shape.attrUseBgFill);
-            _writer.WriteUChar(AscCommon.g_nodeAttributeEnd);
+            if(shape.getObjectType() === AscDFH.historyitem_type_Cnx){
+                _writer.StartRecord(3);
+            }
+            else{
+                _writer.StartRecord(1);
+                _writer.WriteUChar(AscCommon.g_nodeAttributeStart);
+                _writer._WriteBool2(0, shape.attrUseBgFill);
+                _writer.WriteUChar(AscCommon.g_nodeAttributeEnd);
+            }
 
             shape.spPr.WriteXfrm = shape.spPr.xfrm;
 

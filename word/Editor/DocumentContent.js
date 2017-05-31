@@ -1397,14 +1397,11 @@ CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceChec
 };
 CDocumentContent.prototype.GetContentBounds = function(CurPage)
 {
-	var oBounds = this.Get_PageBounds(CurPage);
-
 	var oPage = this.Pages[CurPage];
-	if (!oPage)
-		return oBounds;
+	if (!oPage || oPage.Pos > oPage.EndPos)
+		return this.Get_PageBounds(CurPage);
 
-	this.Pos    = 0;
-	this.EndPos = -1;
+	var oBounds = null;
 	for (var nIndex = oPage.Pos; nIndex <= oPage.EndPos; ++nIndex)
 	{
 		var oElement          = this.Content[nIndex];
@@ -1412,17 +1409,24 @@ CDocumentContent.prototype.GetContentBounds = function(CurPage)
 
 		var oElementBounds = oElement.GetContentBounds(nElementPageIndex);
 
-		if (oElementBounds.Bottom > oBounds.Bottom)
-			oBounds.Bottom = oElementBounds.Bottom;
+		if (null === oBounds)
+		{
+			oBounds = oElementBounds.Copy();
+		}
+		else
+		{
+			if (oElementBounds.Bottom > oBounds.Bottom)
+				oBounds.Bottom = oElementBounds.Bottom;
 
-		if (oElementBounds.Top < oBounds.Top)
-			oBounds.Top = oElementBounds.Top;
+			if (oElementBounds.Top < oBounds.Top)
+				oBounds.Top = oElementBounds.Top;
 
-		if (oElementBounds.Right > oBounds.Right)
-			oBounds.Right = oElementBounds.Right;
+			if (oElementBounds.Right > oBounds.Right)
+				oBounds.Right = oElementBounds.Right;
 
-		if (oElementBounds.Left < oBounds.Left)
-			oBounds.Left = oElementBounds.Left;
+			if (oElementBounds.Left < oBounds.Left)
+				oBounds.Left = oElementBounds.Left;
+		}
 	}
 
 	return oBounds;
@@ -8514,12 +8518,12 @@ CDocumentContent.prototype.IsSelectedAll = function()
 
 	return false;
 };
-CDocumentContent.prototype.AddContentControl = function()
+CDocumentContent.prototype.AddContentControl = function(nContentControlType)
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
-		return this.DrawingObjects.AddContentControl();
+		return this.DrawingObjects.AddContentControl(nContentControlType);
 	else
-		return this.private_AddContentControl();
+		return this.private_AddContentControl(nContentControlType);
 };
 CDocumentContent.prototype.GetAllContentControls = function(arrContentControls)
 {

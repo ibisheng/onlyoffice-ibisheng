@@ -740,4 +740,4 @@ CDocumentControllerBase.prototype.RemoveTextSelection = function(){};
 /**
  * Добавляем класс CBlockLevelSdt в текущую позицию курсора.
  */
-CDocumentControllerBase.prototype.AddContentControl = function(){return null;};
+CDocumentControllerBase.prototype.AddContentControl = function(nContentControlType){return null;};

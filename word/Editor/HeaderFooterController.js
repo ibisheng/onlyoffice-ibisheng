@@ -486,11 +486,11 @@ CHdrFtrController.prototype.RemoveTextSelection = function()
 	if (null != CurHdrFtr)
 		return CurHdrFtr.Content.RemoveTextSelection();
 };
-CHdrFtrController.prototype.AddContentControl = function()
+CHdrFtrController.prototype.AddContentControl = function(nContentControlType)
 {
 	var CurHdrFtr = this.HdrFtr.CurHdrFtr;
 	if (null != CurHdrFtr)
-		return CurHdrFtr.Content.AddContentControl();
+		return CurHdrFtr.Content.AddContentControl(nContentControlType);
 
 	return null;
 };

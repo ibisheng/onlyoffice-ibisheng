@@ -280,7 +280,8 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         this.endConnectionInfo = null;
 
         if(this.bConnector){
-            var aSpTree = this.drawingsController.getAllShapes(this.drawingsController.getDrawingArray());
+            var aSpTree = [];
+            this.drawingsController.getAllSingularDrawings(this.drawingsController.getDrawingArray(), aSpTree);
             var oConnector = null;
             var oEndConnectionInfo = null;
             for(var i = aSpTree.length - 1; i > -1; --i){
@@ -564,10 +565,10 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     this.getShape = function(bFromWord, DrawingDocument, drawingObjects)
     {
-        var _sp_pr;
+        var _sp_pr, shape;
         if(this.bConnector){
 
-            var shape = new AscFormat.CConnectionShape();
+            shape = new AscFormat.CConnectionShape();
             if(drawingObjects)
             {
                 shape.setDrawingObjects(drawingObjects);
@@ -577,6 +578,26 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             }
             else{
                 _sp_pr = new AscFormat.CSpPr();
+                _sp_pr.setXfrm(new AscFormat.CXfrm());
+                var xfrm = _sp_pr.xfrm;
+                xfrm.setParent(_sp_pr);
+                var x, y;
+                if(bFromWord)
+                {
+                    x = 0;
+                    y = 0;
+                }
+                else
+                {
+                    x = this.x;
+                    y = this.y;
+                }
+                xfrm.setOffX(x);
+                xfrm.setOffY(y);
+                xfrm.setExtX(this.extX);
+                xfrm.setExtY(this.extY);
+                xfrm.setFlipH(this.flipH);
+                xfrm.setFlipV(this.flipV);
             }
 
             shape.setSpPr(_sp_pr);
@@ -600,8 +621,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             shape.nvSpPr.setUniSpPr(nvUniSpPr);
         }
         else{
-
-            var shape = new AscFormat.CShape();
+            shape = new AscFormat.CShape();
             if(drawingObjects)
             {
                 shape.setDrawingObjects(drawingObjects);

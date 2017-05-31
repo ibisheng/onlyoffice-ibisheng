@@ -454,7 +454,7 @@
 						_content_control_pr.Lock = sdtlock_Unlocked;
 						_content_control_pr.InternalId = _current.Props.InternalId;
 
-						var _blockStd = LogicDocument.AddContentControl();
+						var _blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 						_blockStd.SetContentControlPr(_content_control_pr);
 
 						this.returnDocuments.push(_blockStd.GetContentControlPr());
@@ -3518,18 +3518,6 @@ background-repeat: no-repeat;\
 
     asc_docs_api.prototype.asc_getAllSignatures = function(){
     	return this.WordControl.m_oLogicDocument.GetAllSignatures();
-	};
-
-    asc_docs_api.prototype.asc_Sign = function(guid)
-	{
-		if (window["AscDesktopEditor"])
-			window["AscDesktopEditor"]["Sign"](guid);
-	};
-
-    asc_docs_api.prototype.asc_ViewSign = function(id)
-	{
-		if (window["AscDesktopEditor"])
-			window["AscDesktopEditor"]["ViewSertificate"](guid);
 	};
 
     //////////////////////////////////////////////////////////////////////////

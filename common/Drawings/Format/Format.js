@@ -4587,6 +4587,12 @@ DefaultShapeDefinition.prototype=
     }
 };
 
+
+
+function CHyperlink(){
+
+}
+
 function CNvPr()
 {
     this.id = 0;

@@ -530,7 +530,7 @@
                             spTree[i].setBlipFill(AscFormat.CreateBlipFillRasterImageId(sImageUrl));
                             if(selectedObjects[0].group){
                                 oController.selection.groupSelection.resetInternalSelection();
-                                _group.selectObject(spTree[i], 0);
+                                selectedObjects[0].group.selectObject(spTree[i], 0);
                             }
                             else{
                                 oController.resetSelection();

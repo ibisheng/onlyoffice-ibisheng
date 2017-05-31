@@ -2914,7 +2914,7 @@ CTable.prototype.RecalculateAllTables = function()
 		}
 	}
 };
-CTable.prototype.Get_LastRangeVisibleBounds = function()
+CTable.prototype.GetLastRangeVisibleBounds = function()
 {
 	var CurPage = this.Pages.length - 1;
 	var Page    = this.Pages[CurPage];
@@ -12009,10 +12009,10 @@ CTable.prototype.GetTableProps = function()
 {
 	return this.Get_Props();
 };
-CTable.prototype.AddContentControl = function()
+CTable.prototype.AddContentControl = function(nContentControlType)
 {
 	if (this.CurCell)
-		return this.CurCell.Content.AddContentControl();
+		return this.CurCell.Content.AddContentControl(nContentControlType);
 
 	return null;
 };

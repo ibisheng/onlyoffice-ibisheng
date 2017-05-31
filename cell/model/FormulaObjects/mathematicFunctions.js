@@ -56,10 +56,10 @@
 	var _func = AscCommonExcel._func;
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING,
-		cCOMBIN, cCOS, cCOSH, cCOT, cCOTH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cGCD, cINT,
+	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING, cCEILING_MATH, cCEILING_PRECISE,
+		cCOMBIN, cCOMBINA, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
-		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSERIESSUM,
+		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSEC, cSECH, cSERIESSUM,
 		cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS, cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2,
 		cSUMXMY2, cTAN, cTANH, cTRUNC);
 
@@ -321,7 +321,7 @@
 				return NaN;
 			}
 
-			var chars = {M:1000, CM:900, D:500, CD:400, C:100, XC:90, L:50, XL:40, X:10, IX:9, V:5, IV:4, I:1};
+			var chars = {"M":1000, "CM":900, "D":500, "CD":400, "C":100, "XC":90, "L":50, "XL":40, "X":10, "IX":9, "V":5, "IV":4, "I":1};
 			var arabic = 0;
 			roman.replace(/[MDLV]|C[MD]?|X[CL]?|I[XV]?/g, function(i){
 				arabic += chars[i];
@@ -717,6 +717,113 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
+	function cCEILING_MATH() {
+		this.name = "CEILING.MATH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cCEILING_MATH.prototype = Object.create(cBaseFunction.prototype);
+	cCEILING_MATH.prototype.constructor = cCEILING_MATH;
+	cCEILING_MATH.prototype.argumentsMin = 1;
+	cCEILING_MATH.prototype.argumentsMax = 3;
+	cCEILING_MATH.prototype.isXLFN = true;
+	cCEILING_MATH.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		argClone[2] = this._checkCAreaArg(arg[2], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		if(!argClone[1]){
+			argClone[1] = argClone[0] > 0 ? new cNumber(1) : new cNumber(-1);
+		}
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function floor_math(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
+			var mod = argArray[2];
+
+			if (significance === 0 || number === 0) {
+				return new cNumber(0.0);
+			}
+
+			if ( number * significance < 0.0 )
+				significance = - significance;
+
+			if ( mod === 0 && number < 0.0 ){
+				return new cNumber(Math.floor( number / significance) * significance);
+			}else{
+				return new cNumber(Math.ceil( number / significance) * significance);
+			}
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, floor_math);
+	};
+	cCEILING_MATH.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x, significance, mode )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCEILING_PRECISE() {
+		this.name = "CEILING.PRECISE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cCEILING_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cCEILING_PRECISE.prototype.constructor = cCEILING_PRECISE;
+	cCEILING_PRECISE.prototype.argumentsMin = 1;
+	cCEILING_PRECISE.prototype.argumentsMax = 2;
+	cCEILING_PRECISE.prototype.isXLFN = true;
+	cCEILING_PRECISE.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function floorHelper(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
+			if (significance === 0 || number === 0) {
+				return new cNumber(0.0);
+			}
+
+			var absSignificance = Math.abs(significance);
+			var quotient = number / absSignificance;
+			return new cNumber(Math.ceil(quotient) * absSignificance);
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+	};
+	cCEILING_PRECISE.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x, significance )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cCOMBIN() {
 		this.name = "COMBIN";
 		this.value = null;
@@ -799,6 +906,55 @@
 		return this.value = new cNumber(Math.binomCoeff(arg0.getValue(), arg1.getValue()));
 	};
 	cCOMBIN.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( number , number-chosen )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCOMBINA() {
+		this.name = "COMBINA";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cCOMBINA.prototype = Object.create(cBaseFunction.prototype);
+	cCOMBINA.prototype.constructor = cCOMBINA;
+	cCOMBINA.prototype.argumentsMin = 2;
+	cCOMBINA.prototype.argumentsMax = 2;
+	cCOMBINA.prototype.isXLFN = true;
+	cCOMBINA.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function combinaCalculate(argArray) {
+			var a = argArray[0];
+			var b = argArray[1];
+
+			if (a < 0 || b < 0 || a < b) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			a = parseInt(a);
+			b = parseInt(b);
+			return new cNumber(Math.binomCoeff(a + b - 1, b));
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, combinaCalculate);
+	};
+	cCOMBINA.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( number , number-chosen )"
 		};
@@ -1004,6 +1160,122 @@
 			name: this.name, args: "( x )"
 		};
 	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCSC() {
+		this.name = "CSC";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cCSC.prototype = Object.create(cBaseFunction.prototype);
+	cCSC.prototype.constructor = cCSC;
+	cCSC.prototype.argumentsMin = 1;
+	cCSC.prototype.argumentsMax = 1;
+	cCSC.prototype.isXLFN = true;
+	cCSC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cCSC.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		var maxVal = Math.pow(2, 27);
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (cElementType.number === elem.type) {
+					if(0 === elem.getValue()){
+						this.array[r][c] = new cError(cErrorType.division_by_zero);
+					}
+					else if (Math.abs(elem.getValue()) >= maxVal) {
+						this.array[r][c] = new cError(cErrorType.not_numeric);
+					}
+					else{
+						var a = 1 / Math.sin(elem.getValue());
+						this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+					}
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			if(0 === arg0.getValue()){
+				return this.value = new cError(cErrorType.division_by_zero);
+			}
+			else if (Math.abs(arg0.getValue()) >= maxVal) {
+				return this.value = new cError(cErrorType.not_numeric);
+			}
+
+			var a = 1 / Math.sin(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cCSC.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCSCH() {
+		this.name = "CSCH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cCSCH.prototype = Object.create(cBaseFunction.prototype);
+	cCSCH.prototype.constructor = cCSCH;
+	cCSCH.prototype.argumentsMin = 1;
+	cCSCH.prototype.argumentsMax = 1;
+	cCSCH.prototype.isXLFN = true;
+	cCSCH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cCSCH.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+
+		//TODO в документации к COTH написано максимальное значение - Math.pow(2, 27), но MS EXCEL в данном случае не выдает ошибку
+		//проверку на максиимальное значение убрал
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (cElementType.number === elem.type) {
+					if(0 === elem.getValue()){
+						this.array[r][c] = new cError(cErrorType.division_by_zero);
+					}else{
+						var a = 1 / Math.sinh(elem.getValue());
+						this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+					}
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			if(0 === arg0.getValue()){
+				return this.value = new cError(cErrorType.division_by_zero);
+			}
+
+			var a = 1 / Math.sinh(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cCSCH.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
+		};
+	};
+
 
 	/**
 	 * @constructor
@@ -1398,6 +1670,113 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
+	function cFLOOR_PRECISE() {
+		this.name = "FLOOR.PRECISE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cFLOOR_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cFLOOR_PRECISE.prototype.constructor = cFLOOR_PRECISE;
+	cFLOOR_PRECISE.prototype.argumentsMin = 1;
+	cFLOOR_PRECISE.prototype.argumentsMax = 2;
+	cFLOOR_PRECISE.prototype.isXLFN = true;
+	cFLOOR_PRECISE.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function floorHelper(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
+			if (significance === 0 || number === 0) {
+				return new cNumber(0.0);
+			}
+
+			var absSignificance = Math.abs(significance);
+			var quotient = number / absSignificance;
+			return new cNumber(Math.floor(quotient) * absSignificance);
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+	};
+	cFLOOR_PRECISE.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x, significance )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cFLOOR_MATH() {
+		this.name = "FLOOR.MATH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cFLOOR_MATH.prototype = Object.create(cBaseFunction.prototype);
+	cFLOOR_MATH.prototype.constructor = cFLOOR_MATH;
+	cFLOOR_MATH.prototype.argumentsMin = 1;
+	cFLOOR_MATH.prototype.argumentsMax = 3;
+	cFLOOR_MATH.prototype.isXLFN = true;
+	cFLOOR_MATH.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		argClone[2] = this._checkCAreaArg(arg[2], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		if(!argClone[1]){
+			argClone[1] = argClone[0] > 0 ? new cNumber(1) : new cNumber(-1);
+		}
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function floor_math(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
+			var mod = argArray[2];
+
+			if (significance === 0 || number === 0) {
+				return new cNumber(0.0);
+			}
+
+			if ( number * significance < 0.0 )
+				significance = - significance;
+
+			if ( mod === 0 && number < 0.0 ){
+				return new cNumber(Math.ceil( number / significance) * significance);
+			}else{
+				return new cNumber(Math.floor( number / significance) * significance);
+			}
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, floor_math);
+	};
+	cFLOOR_MATH.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x, significance, mode )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cGCD() {
 		this.name = "GCD";
 		this.value = null;
@@ -1545,12 +1924,50 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
+	//TODO точная копия функции CEILING.PRECISE. зачем excel две одинаковые функции?
 	function cISO_CEILING() {
-		cBaseFunction.call(this, "ISO_CEILING");
+		this.name = "ISO.CEILING";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cISO_CEILING.prototype = Object.create(cBaseFunction.prototype);
 	cISO_CEILING.prototype.constructor = cISO_CEILING;
+	cISO_CEILING.prototype.argumentsMin = 1;
+	cISO_CEILING.prototype.argumentsMax = 2;
+	//cISO_CEILING.prototype.isXLFN = true;
+	cISO_CEILING.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function floorHelper(argArray) {
+			var number = argArray[0];
+			var significance = argArray[1];
+			if (significance === 0 || number === 0) {
+				return new cNumber(0.0);
+			}
+
+			var absSignificance = Math.abs(significance);
+			var quotient = number / absSignificance;
+			return new cNumber(Math.ceil(quotient) * absSignificance);
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+	};
+	cISO_CEILING.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x, significance )"
+		};
+	};
 
 	/**
 	 * @constructor
@@ -3443,6 +3860,107 @@
 	cROUNDUP.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x , number-digits )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSEC() {
+		this.name = "SEC";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cSEC.prototype = Object.create(cBaseFunction.prototype);
+	cSEC.prototype.constructor = cSEC;
+	cSEC.prototype.argumentsMin = 1;
+	cSEC.prototype.argumentsMax = 1;
+	cSEC.prototype.isXLFN = true;
+	cSEC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cSEC.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		var maxVal = Math.pow(2, 27);
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (cElementType.number === elem.type) {
+					if (Math.abs(elem.getValue()) >= maxVal) {
+						this.array[r][c] = new cError(cErrorType.not_numeric);
+					}
+					else{
+						var a = 1 / Math.cos(elem.getValue());
+						this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+					}
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			if (Math.abs(arg0.getValue()) >= maxVal) {
+				return this.value = new cError(cErrorType.not_numeric);
+			}
+
+			var a = 1 / Math.cos(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cSEC.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSECH() {
+		this.name = "SECH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+	cSECH.prototype = Object.create(cBaseFunction.prototype);
+	cSECH.prototype.constructor = cSECH;
+	cSECH.prototype.argumentsMin = 1;
+	cSECH.prototype.argumentsMax = 1;
+	cSECH.prototype.isXLFN = true;
+	cSECH.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cSECH.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+
+		//TODO в документации к COTH написано максимальное значение - Math.pow(2, 27), но MS EXCEL в данном случае не выдает ошибку
+		//проверку на максиимальное значение убрал
+		if (cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+		arg0 = arg0.tocNumber();
+		if (cElementType.error === arg0.type) {
+			return this.value = arg0;
+		} else if (cElementType.array === arg0.type) {
+			arg0.foreach(function (elem, r, c) {
+				if (cElementType.number === elem.type) {
+					var a = 1 / Math.cosh(elem.getValue());
+					this.array[r][c] = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+				} else {
+					this.array[r][c] = new cError(cErrorType.wrong_value_type);
+				}
+			});
+			return this.value = arg0;
+		} else {
+			var a = 1 / Math.cosh(arg0.getValue());
+			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		}
+	};
+	cSECH.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( x )"
 		};
 	};
 

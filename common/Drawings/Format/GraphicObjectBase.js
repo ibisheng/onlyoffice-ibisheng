@@ -261,6 +261,9 @@
         this.w = oBounds.w;
         this.h = oBounds.h;
     };
+    CGraphicBounds.prototype.copy = function(){
+        return new CGraphicBounds(this.l, this.t, this.r, this.b);
+    };
     CGraphicBounds.prototype.transform = function(oTransform){
 
         var xlt = oTransform.TransformPointX(this.l, this.t);
@@ -763,6 +766,7 @@
         return null;
     };
 
+
     CGraphicObjectBase.prototype.setTitle = function(sTitle){
         if(undefined === sTitle || null === sTitle){
             return;
@@ -814,18 +818,99 @@
     CGraphicObjectBase.prototype.Restart_CheckSpelling = function()
     {
     };
-    CGraphicObjectBase.prototype.findConnector = function()
-    {
-        return null;
-    };
-    CGraphicObjectBase.prototype.findConnectionShape = function(x, y)
-    {
-        return null;
-    };
-    CGraphicObjectBase.prototype.drawConnectors = function(overlay)
-    {
+
+    CGraphicObjectBase.prototype.convertToConnectionParams = function(rot, flipH, flipV, oTransform, oBounds, oConnectorInfo){
+        var _ret =  new AscFormat.ConnectionParams();
+        var _rot = oConnectorInfo.ang*AscFormat.cToRad + rot;
+        var _normalized_rot = AscFormat.normalizeRotate(_rot);
+        _ret.dir = AscFormat.CARD_DIRECTION_E;
+        if(_normalized_rot >= 0 && _normalized_rot < Math.PI * 0.25 || _normalized_rot >= 7 * Math.PI * 0.25 && _normalized_rot < 2 * Math.PI){
+            _ret.dir = AscFormat.CARD_DIRECTION_E;
+            if(flipH){
+                _ret.dir = AscFormat.CARD_DIRECTION_W;
+            }
+        }
+        else if(_normalized_rot >= Math.PI * 0.25 && _normalized_rot < 3 * Math.PI * 0.25){
+            _ret.dir = AscFormat.CARD_DIRECTION_S;
+            if(flipV){
+                _ret.dir = AscFormat.CARD_DIRECTION_N;
+            }
+        }
+        else if(_normalized_rot >= 3 * Math.PI * 0.25 && _normalized_rot < 5 * Math.PI * 0.25){
+            _ret.dir = AscFormat.CARD_DIRECTION_W;
+            if(flipH){
+                _ret.dir = AscFormat.CARD_DIRECTION_E;
+            }
+        }
+        else if(_normalized_rot >= 5 * Math.PI * 0.25 && _normalized_rot < 7 * Math.PI * 0.25){
+            _ret.dir = AscFormat.CARD_DIRECTION_N;
+            if(flipV){
+                _ret.dir = AscFormat.CARD_DIRECTION_S;
+            }
+        }
+        _ret.x = oTransform.TransformPointX(oConnectorInfo.x, oConnectorInfo.y);
+        _ret.y = oTransform.TransformPointY(oConnectorInfo.x, oConnectorInfo.y);
+        _ret.bounds.fromOther(oBounds);
+        _ret.idx = oConnectorInfo.idx;
+        return _ret;
     };
 
+
+
+    CGraphicObjectBase.prototype.getRectGeometry = function(){
+        return AscFormat.ExecuteNoHistory(
+            function(){
+                var _ret = AscFormat.CreateGeometry("rect");
+                _ret.Recalculate(this.extX, this.extY);
+                return _ret;
+            }, this, []
+        );
+    };
+
+    CGraphicObjectBase.prototype.getGeom = function () {
+
+        var _geom;
+        if(this.rectGeometry){
+            _geom = this.rectGeometry;
+        }
+        else if(this.spPr && this.spPr.geometry){
+            _geom = this.spPr.geometry;
+        }
+        else{
+            _geom = this.getRectGeometry();
+        }
+        return _geom;
+    };
+
+    CGraphicObjectBase.prototype.findGeomConnector = function(x, y){
+        var _geom = this.getGeom();
+        var oInvertTransform = this.invertTransform;
+        var _x = oInvertTransform.TransformPointX(x, y);
+        var _y = oInvertTransform.TransformPointY(x, y);
+        return _geom.findConnector(_x, _y, this.convertPixToMM(AscCommon.global_mouseEvent.KoefPixToMM * AscCommon.TRACK_CIRCLE_RADIUS));
+
+    };
+
+    CGraphicObjectBase.prototype.findConnector = function(x, y){
+        var oConnGeom = this.findGeomConnector(x, y);
+        if(oConnGeom){
+            return this.convertToConnectionParams(this.rot, this.flipH, this.flipV, this.transform, this.bounds, oConnGeom);
+        }
+        return null;
+    };
+
+    CGraphicObjectBase.prototype.findConnectionShape = function(x, y){
+        if(this.hit(x, y)){
+            return this;
+        }
+        return null;
+    };
+
+    CGraphicObjectBase.prototype.drawConnectors = function(overlay)
+    {
+        var _geom = this.getGeom();
+        _geom.drawConnectors(overlay, this.transform);
+    };
     CGraphicObjectBase.prototype.GetAllContentControls = function(arrContentControls)
     {
     };

@@ -416,32 +416,48 @@ Paragraph.prototype.Get_PageBounds = function(CurPage)
 };
 Paragraph.prototype.GetContentBounds = function(CurPage)
 {
-	var oBounds = this.Get_PageBounds(CurPage).Copy();
-
 	var oPage = this.Pages[CurPage];
-	if (!oPage)
-		return oBounds;
+	if (!oPage || oPage.StartLine > oPage.EndLine)
+		return this.Get_PageBounds(CurPage).Copy();
 
+	var oBounds = null;
 	for (var CurLine = oPage.StartLine; CurLine <= oPage.EndLine; ++CurLine)
 	{
 		var oLine = this.Lines[CurLine];
 
-		var Top = oLine.Top + oPage.Y;
-		if (oBounds.Top > Top)
-			oBounds.Top = Top;
-
+		var Top    = oLine.Top + oPage.Y;
 		var Bottom = oLine.Bottom + oPage.Y;
-		if (oBounds.Bottom < Bottom)
-			oBounds.Bottom = Bottom;
+
+		var Left = null, Right = null;
 
 		for (var CurRange = 0, RangesCount = oLine.Ranges.length; CurRange < RangesCount; ++CurRange)
 		{
 			var oRange = oLine.Ranges[CurRange];
-			if (oBounds.Left > oRange.X)
-				oBounds.Left = oRange.X;
+			if (null === Left || Left > oRange.XVisible)
+				Left = oRange.XVisible;
 
-			if (oBounds.Right < oRange.XEnd)
-				oBounds.Right = oRange.XEnd;
+			if (null === Right || Right < oRange.XVisible + oRange.W)
+				Right = oRange.XVisible + oRange.W;
+		}
+
+
+		if (!oBounds)
+		{
+			oBounds = new CDocumentBounds(Left, Top, Right, Bottom);
+		}
+		else
+		{
+			if (oBounds.Top > Top)
+				oBounds.Top = Top;
+
+			if (oBounds.Bottom < Bottom)
+				oBounds.Bottom = Bottom;
+
+			if (oBounds.Left > Left)
+				oBounds.Left = Left;
+
+			if (oBounds.Right < Right)
+				oBounds.Right = Right;
 		}
 	}
 
@@ -3073,6 +3089,8 @@ Paragraph.prototype.Add = function(Item)
 			break;
 		}
 		case para_Field:
+		case para_InlineLevelSdt:
+		case para_Hyperlink:
 		{
 			var ContentPos = this.Get_ParaContentPos(false, false);
 			var CurPos     = ContentPos.Get(0);
@@ -3093,7 +3111,9 @@ Paragraph.prototype.Add = function(Item)
 				this.Content[this.CurPos.ContentPos].MoveCursorToStartPos(false);
 			}
 			else
+			{
 				this.Content[CurPos].Add(Item);
+			}
 
 			break;
 		}
@@ -10762,7 +10782,7 @@ Paragraph.prototype.Set_SectionPr = function(SectPr, bUpdate)
 		}
 	}
 };
-Paragraph.prototype.Get_LastRangeVisibleBounds = function()
+Paragraph.prototype.GetLastRangeVisibleBounds = function()
 {
 	var CurLine = this.Lines.length - 1;
 	var CurPage = this.Pages.length - 1;
@@ -12044,6 +12064,18 @@ Paragraph.prototype.GetSelectedContentControls = function()
 	}
 
 	return arrContentControls;
+};
+Paragraph.prototype.AddContentControl = function(nContentControlType)
+{
+	if (AscCommonWord.sdttype_InlineLevel !== nContentControlType)
+		return null;
+
+	// Тут не должно быть селекта, поэтому мы просто вставляем в текущую позицию курсора
+	var oContentControl = new CInlineLevelSdt();
+	oContentControl.Add_ToContent(0, new ParaRun());
+	this.Add(oContentControl);
+	oContentControl.MoveCursorToStartPos();
+	return oContentControl;
 };
 
 var pararecalc_0_All  = 0;

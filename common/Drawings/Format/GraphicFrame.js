@@ -97,6 +97,8 @@ CGraphicFrame.prototype.getBase64Img = CShape.prototype.getBase64Img;
 CGraphicFrame.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
 CGraphicFrame.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 CGraphicFrame.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
+CGraphicFrame.prototype.convertPixToMM = CShape.prototype.convertPixToMM;
+CGraphicFrame.prototype.hit = CShape.prototype.hit;
 
 CGraphicFrame.prototype.GetDocumentPositionFromObject= function(PosArray)
     {

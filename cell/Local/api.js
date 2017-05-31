@@ -73,6 +73,8 @@ var c_oAscError = Asc.c_oAscError;
 		AscCommon.History.UserSaveMode = true;
 		
 		DesktopOfflineUpdateLocalName(this);
+
+		window["DesktopAfterOpen"](this);
 		
 		this.onUpdateDocumentModified(AscCommon.History.Have_Changes());
 	};
@@ -271,6 +273,16 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	
 	if (2 == error)
 		window["Asc"]["editor"].sendEvent("asc_onError", c_oAscError.ID.ConvertationSaveError, c_oAscError.Level.NoCritical);
+
+	if (0 == error)
+	{
+		if (window.SaveQuestionObjectBeforeSign)
+		{
+			var _obj = window.SaveQuestionObjectBeforeSign;
+			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height);
+			window.SaveQuestionObjectBeforeSign = null;
+		}
+	}
 };
 
 window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;

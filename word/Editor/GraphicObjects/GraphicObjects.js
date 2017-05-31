@@ -202,11 +202,11 @@ CGraphicObjects.prototype =
     resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
     handleTextHit: DrawingObjectsController.prototype.handleTextHit,
 
-    AddContentControl: function()
+    AddContentControl: function(nContentControlType)
     {
         var oTargetDocContent = this.getTargetDocContent();
         if(oTargetDocContent){
-            return oTargetDocContent.AddContentControl();
+            return oTargetDocContent.AddContentControl(nContentControlType);
         }
 
         return null;
@@ -1302,7 +1302,7 @@ CGraphicObjects.prototype =
     },
 
     handleSignatureDblClick: function(sGuid, width, height){
-        editor.sendEvent("asc_onSignatureClick", sGuid, width, height);
+        editor.sendEvent("asc_onSignatureDblClick", sGuid, width, height);
     },
 
 
