@@ -476,6 +476,14 @@
 			} else {
 				this.real = Math.cos(this.real);
 			}
+		}, Tan: function () {
+			if (this.img) {
+				var a = Math.sin(2 * this.real) / (Math.cos(2 * this.real) + Math.cosh(2 * this.img));
+				this.img = Math.sinh(2 * this.img) / (Math.cos(2 * this.real) + Math.cosh(2 * this.img));
+				this.real = a;
+			} else {
+				this.real = Math.tan(this.real);
+			}
 		}, Cot: function () {
 			if (this.img) {
 				var a = Math.sin(2 * this.real) / (Math.cosh(2 * this.img) - Math.cos(2 * this.real));
@@ -890,7 +898,7 @@
 	cFormulaFunctionGroup['Engineering'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cBIN2DEC, cBIN2HEX, cBIN2OCT,
 		cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA, cERF, cERFC, cGESTEP, cHEX2BIN, cHEX2DEC, cHEX2OCT,
 		cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMCOSH, cIMCOT, cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER,
-		cIMPRODUCT, cIMREAL, cIMSIN, cIMSQRT, cIMSUB, cIMSUM, cOCT2BIN, cOCT2DEC, cOCT2HEX);
+		cIMPRODUCT, cIMREAL, cIMSIN, cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN, cOCT2DEC, cOCT2HEX);
 
 	/**
 	 * @constructor
@@ -2898,6 +2906,58 @@
 	cIMSUM.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( argument-list )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMTAN() {
+		cBaseFunction.call(this, "IMTAN");
+	}
+	//TODO проверить!!!
+	cIMTAN.prototype = Object.create(cBaseFunction.prototype);
+	cIMTAN.prototype.constructor = cIMTAN;
+	cIMTAN.prototype.argumentsMin = 1;
+	cIMTAN.prototype.argumentsMax = 1;
+	cIMTAN.prototype.isXLFN = true;
+	cIMTAN.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Tan();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
+	};
+	cIMTAN.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( complex-number )"
 		};
 	};
 
