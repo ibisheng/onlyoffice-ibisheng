@@ -694,8 +694,7 @@ CInlineLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType)
 
 	var nContentControlLock = this.GetContentControlLock();
 
-	if (CheckContentControlLock
-		&& (AscCommon.changestype_Paragraph_Content === CheckType
+	if ((AscCommon.changestype_Paragraph_Content === CheckType
 		|| AscCommon.changestype_Remove === CheckType
 		|| AscCommon.changestype_Delete === CheckType
 		|| AscCommon.changestype_Document_Content === CheckType

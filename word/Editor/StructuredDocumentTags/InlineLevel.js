@@ -50,7 +50,8 @@ function CInlineLevelSdt()
 	this.Pr   = new CSdtPr();
 	this.Type = para_InlineLevelSdt;
 
-	this.BoundsPaths = null;
+	this.BoundsPaths          = null;
+	this.BoundsPathsStartPage = -1;
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);
@@ -212,7 +213,8 @@ CInlineLevelSdt.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth
 };
 CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 {
-	if (null === this.BoundsPaths)
+	var StartPage = this.Paragraph.Get_StartPage_Absolute();
+	if (null === this.BoundsPaths || StartPage !== this.BoundsPathsStartPage)
 	{
 		var arrBounds = [], arrRects = [], CurPage = -1;
 		for (var Key in this.Bounds)
@@ -223,7 +225,7 @@ CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 				arrBounds.push(arrRects);
 				CurPage  = this.Bounds[Key].PageInternal;
 			}
-
+			this.Bounds[Key].Page = this.Paragraph.Get_AbsolutePage(this.Bounds[Key].PageInternal);
 			arrRects.push(this.Bounds[Key]);
 		}
 
@@ -234,6 +236,8 @@ CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 			oPolygon.fill([arrBounds[nIndex]]);
 			this.BoundsPaths = this.BoundsPaths.concat(oPolygon.GetPaths(0));
 		}
+
+		this.BoundsPathsStartPage = StartPage;
 	}
 
 	return this.BoundsPaths;

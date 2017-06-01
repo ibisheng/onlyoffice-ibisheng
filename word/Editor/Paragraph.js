@@ -436,8 +436,8 @@ Paragraph.prototype.GetContentBounds = function(CurPage)
 			if (null === Left || Left > oRange.XVisible)
 				Left = oRange.XVisible;
 
-			if (null === Right || Right < oRange.XVisible + oRange.W)
-				Right = oRange.XVisible + oRange.W;
+			if (null === Right || Right < oRange.XVisible + oRange.W + oRange.WEnd)
+				Right = oRange.XVisible + oRange.W + oRange.WEnd;
 		}
 
 
