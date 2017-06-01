@@ -5300,12 +5300,12 @@ background-repeat: no-repeat;\
 	};
 
 
-	asc_docs_api.prototype.asc_showComments = function()
+	asc_docs_api.prototype.asc_showComments = function(isShowSolved)
 	{
 		if (null == this.WordControl.m_oLogicDocument)
 			return;
 
-		this.WordControl.m_oLogicDocument.Show_Comments();
+		this.WordControl.m_oLogicDocument.Show_Comments(isShowSolved);
 	};
 
 	asc_docs_api.prototype.asc_hideComments = function()

@@ -1445,12 +1445,13 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 	var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
 	var Page_abs         = this.Get_AbsolutePage(CurPage);
 
-	var DrawComm     = ( DocumentComments.Is_Use() && true != editor.isViewMode);
-	var DrawFind     = editor.WordControl.m_oLogicDocument.SearchEngine.Selection;
-	var DrawColl     = ( undefined === pGraphics.RENDERER_PDF_FLAG ? false : true );
-	var DrawMMFields = (this.LogicDocument && true === this.LogicDocument.Is_HightlightMailMergeFields() ? true : false);
+	var DrawComm           = ( DocumentComments.Is_Use() && true != editor.isViewMode);
+	var DrawFind           = editor.WordControl.m_oLogicDocument.SearchEngine.Selection;
+	var DrawColl           = ( undefined === pGraphics.RENDERER_PDF_FLAG ? false : true );
+	var DrawMMFields       = (this.LogicDocument && true === this.LogicDocument.Is_HightlightMailMergeFields() ? true : false);
+	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && true != editor.isViewMode);
 
-	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.Get_EndInfoByPage(CurPage - 1));
+	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.Get_EndInfoByPage(CurPage - 1), DrawSolvedComments);
 
 	var StartLine = _Page.StartLine;
 	var EndLine   = _Page.EndLine;
@@ -12559,9 +12560,10 @@ function CParagraphDrawStateHightlights()
     this.Shd      = new CParaDrawingRangeLines();
     this.MMFields = new CParaDrawingRangeLines();
 
-    this.DrawComments = true;
-    this.Comments     = [];
-    this.CommentsFlag = comments_NoComment;
+	this.DrawComments       = true;
+	this.DrawSolvedComments = true;
+	this.Comments           = [];
+	this.CommentsFlag       = comments_NoComment;
 
     this.SearchCounter = 0;
 
@@ -12577,7 +12579,7 @@ function CParagraphDrawStateHightlights()
 
 CParagraphDrawStateHightlights.prototype =
 {
-    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo)
+    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
     {
         this.Paragraph = Paragraph;
         this.Graphics  = Graphics;
@@ -12590,11 +12592,13 @@ CParagraphDrawStateHightlights.prototype =
 
         this.SearchCounter = 0;
 
-        this.DrawComments = DrawComments;
-        if ( null !== PageEndInfo )
-            this.Comments = PageEndInfo.Comments;
-        else
-            this.Comments = [];
+		this.DrawComments       = DrawComments;
+		this.DrawSolvedComments = DrawSolvedComments;
+
+		if (null !== PageEndInfo)
+			this.Comments = PageEndInfo.Comments;
+		else
+			this.Comments = [];
 
         this.Check_CommentsFlag();
     },
@@ -12619,30 +12623,36 @@ CParagraphDrawStateHightlights.prototype =
 
 	AddComment : function(Id)
     {
-        if (true === this.DrawComments)
-        {
-            this.Comments.push(Id);
+    	if (!this.DrawComments)
+    		return;
 
-            this.Check_CommentsFlag();
-        }
+    	var oComment = AscCommon.g_oTableId.Get_ById(Id);
+    	if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
+    		return;
+
+		this.Comments.push(Id);
+		this.Check_CommentsFlag();
     },
 
     Remove_Comment : function(Id)
     {
-        if (true === this.DrawComments)
-        {
-            var CommentsLen = this.Comments.length;
-            for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
-            {
-                if (this.Comments[CurPos] === Id)
-                {
-                    this.Comments.splice(CurPos, 1);
-                    break;
-                }
-            }
+		if (!this.DrawComments)
+			return;
 
-            this.Check_CommentsFlag();
-        }
+		var oComment = AscCommon.g_oTableId.Get_ById(Id);
+		if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
+			return;
+
+		for (var nIndex = 0, nCount = this.Comments.length; nIndex < nCount; ++nIndex)
+		{
+			if (this.Comments[nIndex] === Id)
+			{
+				this.Comments.splice(nIndex, 1);
+				break;
+			}
+		}
+
+		this.Check_CommentsFlag();
     },
 
     Check_CommentsFlag : function()

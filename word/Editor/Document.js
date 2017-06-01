@@ -7242,7 +7242,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 			var Type    = ( docpostype_HdrFtr === this.CurPos.Type ? comment_type_HdrFtr : comment_type_Common );
 			// Проверяем не попали ли мы в комментарий
 			var Comment = this.Comments.Get_ByXY(PageIndex, X, Y, Type);
-			if (null != Comment)
+			if (null != Comment && (this.Comments.IsUseSolved() || !Comment.IsSolved()))
 			{
 				var Comment_PageNum = Comment.m_oStartInfo.PageNum;
 				var Comment_Y       = Comment.m_oStartInfo.Y;
@@ -8849,15 +8849,20 @@ CDocument.prototype.Show_Comment = function(Id)
 		this.Api.sync_HideComment();
 	}
 };
-CDocument.prototype.Show_Comments = function()
+CDocument.prototype.Show_Comments = function(isShowSolved)
 {
+	if (false !== isShowSolved)
+		isShowSolved = true;
+
 	this.Comments.Set_Use(true);
+	this.Comments.SetUseSolved(isShowSolved);
 	this.DrawingDocument.ClearCachePages();
 	this.DrawingDocument.FirePaint();
 };
 CDocument.prototype.Hide_Comments = function()
 {
 	this.Comments.Set_Use(false);
+	this.Comments.SetUseSolved(false);
 	this.Comments.Set_Current(null);
 	this.DrawingDocument.ClearCachePages();
 	this.DrawingDocument.FirePaint();

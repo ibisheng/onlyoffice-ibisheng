@@ -469,6 +469,13 @@ CComment.prototype.GetData = function()
 {
 	return this.Data;
 };
+CComment.prototype.IsSolved = function()
+{
+	if (this.Data)
+		return this.Data.IsSolved();
+
+	return false;
+};
 
 var comments_NoComment        = 0;
 var comments_NonActiveComment = 1;
@@ -478,7 +485,8 @@ function CComments()
 {
     this.Id     = AscCommon.g_oIdCounter.Get_NewId();
 
-    this.m_bUse         = false; // Используются ли комментарии
+    this.m_bUse       = false; // Используются ли комментарии
+	this.m_bUseSolved = false; // Использовать ли разрешенные комментарии
 
     this.m_aComments    = {};    // ассоциативный  массив
     this.m_sCurrent     = null;  // текущий комментарий
@@ -628,6 +636,14 @@ function CComments()
 CComments.prototype.GetAllComments = function()
 {
 	return this.m_aComments;
+};
+CComments.prototype.SetUseSolved = function(isUse)
+{
+	this.m_bUseSolved = isUse;
+};
+CComments.prototype.IsUseSolved = function()
+{
+	return this.m_bUseSolved;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
