@@ -2032,6 +2032,18 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), ((Math.E + 1 / Math.E) / 2) );
     } );
 
+	test( "Test: \"IMCOSH\"", function () {
+		oParser = new parserFormula( 'IMCOSH("4+3i")', "A2", ws );
+		ok( oParser.parse(), 'IMCOSH("4+3i")' );
+		strictEqual( oParser.calculate().getValue(), "-27.03494560307422+3.8511533348117766i", 'IMCOSH("4+3i")' );
+	} );
+
+	test( "Test: \"IMCOS\"", function () {
+		oParser = new parserFormula( 'IMCOS("1+i")', "A2", ws );
+		ok( oParser.parse(), 'IMCOS("1+i")' );
+		strictEqual( oParser.calculate().getValue(), "0.8337300251311491-0.9888977057628651i", 'IMCOS("1+i")' );
+	} );
+
     test( "Test: \"TANH\"", function () {
 
         oParser = new parserFormula( "TANH(0)", "A2", ws );

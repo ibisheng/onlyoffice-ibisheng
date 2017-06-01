@@ -479,7 +479,7 @@
 		}, Cosh: function () {
 			if (this.img) {
 				var a = Math.cosh(this.real) * Math.cos(this.img);
-				this.img = -( Math.sinh(this.real) * Math.sin(this.img) );
+				this.img = Math.sinh(this.real) * Math.sin(this.img);
 				this.real = a;
 			} else {
 				this.real = Math.cosh(this.real);
