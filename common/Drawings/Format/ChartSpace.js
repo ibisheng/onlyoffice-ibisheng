@@ -1310,12 +1310,6 @@ CChartSpace.prototype.getAllTitles = function()
     }
     return ret;
 };
-CChartSpace.prototype.getMainGroup = function()
-{
-    if(!isRealObject(this.group))
-        return this;
-    return this.group.getMainGroup();
-};
 CChartSpace.prototype.getFill = CShape.prototype.getFill;
 CChartSpace.prototype.getStroke = CShape.prototype.getStroke;
 CChartSpace.prototype.changeSize = CShape.prototype.changeSize;

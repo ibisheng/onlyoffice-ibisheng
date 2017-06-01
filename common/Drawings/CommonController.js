@@ -815,6 +815,11 @@ DrawingObjectsController.prototype =
 
                 if(stId !== null || endId !== null){
                     for(var j = 0; j < this.arrPreTrackObjects.length; ++j){
+                        if(this.arrPreTrackObjects[j].originalObject === aAllConnectors[i]){
+                            oEndTrack = null;
+                            oBeginTrack = null;
+                            break;
+                        }
                         oPreTrack = this.arrPreTrackObjects[j].originalObject;
                         if(oPreTrack.Id === stId){
                             oBeginTrack = this.arrPreTrackObjects[j];
@@ -6482,27 +6487,10 @@ DrawingObjectsController.prototype =
         this.clearPreTrackObjects();
     },
 
-    getTrackObjects: function()
-    {
-        return this.arrTrackObjects;
-    },
-
     rotateTrackObjects: function(angle, e)
     {
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
             this.arrTrackObjects[i].track(angle, e);
-    },
-
-    trackNewShape: function(e, x, y)
-    {
-        this.arrTrackObjects[0].track(e, x, y);
-        this.updateOverlay();
-    },
-
-    trackMoveObjects: function(dx, dy)
-    {
-        for(var i = 0; i < this.arrTrackObjects.length; ++i)
-            this.arrTrackObjects[i].track(dx, dy);
     },
 
     trackResizeObjects: function(kd1, kd2, e, x, y)
@@ -6513,8 +6501,17 @@ DrawingObjectsController.prototype =
 
     trackEnd: function()
     {
-        for(var i = 0; i < this.arrTrackObjects.length; ++i)
+        var oOriginalObjects = [];
+        for(var i = 0; i < this.arrTrackObjects.length; ++i){
             this.arrTrackObjects[i].trackEnd();
+            if(this.arrTrackObjects[i].originalObject && !this.arrTrackObjects[i].processor3D){
+                oOriginalObjects.push(this.arrTrackObjects[i].originalObject);
+            }
+        }
+        var aAllConnectors = this.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
+        for(i = 0; i < aAllConnectors.length; ++i){
+            aAllConnectors[i].calculateTransform();
+        }
         this.drawingObjects.showDrawingObjects(true);
     },
 

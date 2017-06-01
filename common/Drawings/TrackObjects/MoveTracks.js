@@ -45,6 +45,8 @@ function MoveShapeImageTrack(originalObject)
     this.y = null;
     this.pageIndex = null;
     this.originalShape = originalObject;
+    this.lastDx = 0;
+    this.lastDy = 0;
 
     if(!originalObject.isChart())
     {
@@ -77,6 +79,8 @@ function MoveShapeImageTrack(originalObject)
 
     this.track = function(dx, dy, pageIndex)
     {
+        this.lastDx = dx;
+        this.lastDy = dy;
         var original = this.originalObject;
         var dx2, dy2;
         if(this.groupInvertMatrix)
@@ -160,8 +164,42 @@ function MoveShapeImageTrack(originalObject)
         if(this.originalObject.getObjectType() === AscDFH.historyitem_type_Cnx){
             if(!AscFormat.fApproxEqual(_x, _xfrm.offX) || !AscFormat.fApproxEqual(_y, _xfrm.offY)){
                 var nvUniSpPr = this.originalObject.nvSpPr.nvUniSpPr;
-                if(nvUniSpPr.stCnxId !== null || nvUniSpPr.stCnxIdx !== null || nvUniSpPr.endCnxId !== null || nvUniSpPr.endCnxIdx !== null){
-                    this.originalObject.nvSpPr.setUniSpPr(new AscFormat.CNvUniSpPr());
+
+                var bResetBegin = false, bResetEnd = false;
+                var oBeginShape = AscCommon.g_oTableId.Get_ById(nvUniSpPr.stCnxId);
+                var oEndShape = AscCommon.g_oTableId.Get_ById(nvUniSpPr.endCnxId);
+                if(oBeginShape){
+                    if(oBeginShape.bDeleted){
+                        bResetBegin = true;
+                    }
+                    else{
+                        if(!oBeginShape.selected){
+                            bResetBegin = true;
+                        }
+                    }
+                }
+                if(oEndShape){
+                    if(oEndShape.bDeleted){
+                        bResetEnd = true;
+                    }
+                    else{
+                        if(!oEndShape.selected){
+                            bResetEnd = true;
+                        }
+                    }
+                }
+
+                if(bResetEnd || bResetBegin){
+                    var _copy_nv_sp_pr = nvUniSpPr.copy();
+                    if(bResetBegin){
+                        _copy_nv_sp_pr.stCnxId = null;
+                        _copy_nv_sp_pr.stCnxIdx = null;
+                    }
+                    if(bResetEnd){
+                        _copy_nv_sp_pr.endCnxId = null;
+                        _copy_nv_sp_pr.endCnxIdx = null;
+                    }
+                    this.originalObject.nvSpPr.setUniSpPr(_copy_nv_sp_pr);
                 }
             }
         }

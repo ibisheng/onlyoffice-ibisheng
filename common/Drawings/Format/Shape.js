@@ -3745,16 +3745,6 @@ CShape.prototype.deselect = function (drawingObjectsController) {
     return this;
 };
 
-CShape.prototype.getMainGroup = function () {
-    if (!isRealObject(this.group))
-        return null;
-
-    var cur_group = this.group;
-    while (isRealObject(cur_group.group))
-        cur_group = cur_group.group;
-    return cur_group;
-};
-
 CShape.prototype.getGroupHierarchy = function () {
     if (this.recalcInfo.recalculateGroupHierarchy) {
         this.groupHierarchy = [];
@@ -4416,17 +4406,6 @@ CShape.prototype.getRotateAngle = function (x, y) {
     return same_flip ? angle : -angle;
 };
 
-CShape.prototype.getFullFlipH = function () {
-    if (!isRealObject(this.group))
-        return this.flipH;
-    return this.group.getFullFlipH() ? !this.flipH : this.flipH;
-};
-
-CShape.prototype.getFullFlipV = function () {
-    if (!isRealObject(this.group))
-        return this.flipV;
-    return this.group.getFullFlipV() ? !this.flipV : this.flipV;
-};
 
 CShape.prototype.getAspect = function (num) {
     var _tmp_x = this.extX != 0 ? this.extX : 0.1;
@@ -4434,9 +4413,6 @@ CShape.prototype.getAspect = function (num) {
     return num === 0 || num === 4 ? _tmp_x / _tmp_y : _tmp_y / _tmp_x;
 };
 
-CShape.prototype.getFullRotate = function () {
-    return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
-};
 
 CShape.prototype.getRectBounds = function () {
     var transform = this.getTransformMatrix();

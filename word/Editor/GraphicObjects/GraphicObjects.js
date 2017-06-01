@@ -2807,6 +2807,8 @@ CGraphicObjects.prototype =
     cursorMoveStartOfLine: DrawingObjectsController.prototype.cursorMoveStartOfLine,
 
     cursorMoveAt: DrawingObjectsController.prototype.cursorMoveAt,
+    getAllConnectors: DrawingObjectsController.prototype.getAllConnectors,
+    getAllConnectorsByDrawings: DrawingObjectsController.prototype.getAllConnectorsByDrawings,
 
     cursorMoveToCell: function(bNext )
     {

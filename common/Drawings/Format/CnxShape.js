@@ -478,10 +478,7 @@
     CConnectionShape.prototype = Object.create(AscFormat.CShape.prototype);
     CConnectionShape.prototype.constructor = CConnectionShape;
 
-    CConnectionShape.prototype.calculateSpPr = function(begin, end){
-    };
-
-    CConnectionShape.prototype.getObjectType = function(begin, end){
+    CConnectionShape.prototype.getObjectType = function(){
         return AscDFH.historyitem_type_Cnx;
     };
 
@@ -509,11 +506,154 @@
     };
 
     CConnectionShape.prototype.getStCxnId = function(){
-        return   this.nvSpPr.nvUniSpPr.stCnxId;
+        return this.nvSpPr.nvUniSpPr.stCnxId;
     };
     CConnectionShape.prototype.getEndCxnId = function(){
-        return   this.nvSpPr.nvUniSpPr.endCnxId;
+        return this.nvSpPr.nvUniSpPr.endCnxId;
     };
+    CConnectionShape.prototype.getStCxnIdx = function(){
+        return this.nvSpPr.nvUniSpPr.stCnxIdx;
+    };
+    CConnectionShape.prototype.getEndCxnIdx = function(){
+        return this.nvSpPr.nvUniSpPr.endCnxIdx;
+    };
+
+    CConnectionShape.prototype.calculateTransform = function (bMove) {
+        var oBeginDrawing = null;
+        var oEndDrawing = null;
+        var sStId = this.getStCxnId();
+        var sEndId = this.getEndCxnId();
+        var _group;
+        if(null !== sStId){
+            oBeginDrawing = AscCommon.g_oTableId.Get_ById(sStId);
+            if(oBeginDrawing && oBeginDrawing.bDeleted){
+                oBeginDrawing = null;
+            }
+            if(oBeginDrawing){
+                _group = oBeginDrawing.getMainGroup();
+                if(_group){
+                    _group.recalculate();
+                }
+                else{
+                    oBeginDrawing.recalculate();
+                }
+            }
+        }
+        if(null !== sEndId){
+            oEndDrawing = AscCommon.g_oTableId.Get_ById(sEndId);
+            if(oEndDrawing && oEndDrawing.bDeleted){
+                oEndDrawing = null;
+            }
+            if(oEndDrawing){
+                _group = oEndDrawing.getMainGroup();
+                if(_group){
+                    _group.recalculate();
+                }
+                else{
+                    oEndDrawing.recalculate();
+                }
+            }
+        }
+        var _startConnectionParams, _endConnectionParams, _spPr, _xfrm2;
+        var _xfrm = this.spPr.xfrm;
+
+        if(oBeginDrawing && oEndDrawing){
+            _startConnectionParams = oBeginDrawing.getConnectionParams(this.getStCxnIdx(), this.group);
+            _endConnectionParams = oEndDrawing.getConnectionParams(this.getEndCxnIdx(), this.group);
+            _spPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.spPr.geometry.preset, this.pen.w);
+            _xfrm2 = _spPr.xfrm;
+            _xfrm.setOffX(_xfrm2.offX);
+            _xfrm.setOffY(_xfrm2.offY);
+            _xfrm.setExtX(_xfrm2.extX);
+            _xfrm.setExtY(_xfrm2.extY);
+            _xfrm.setFlipH(_xfrm2.flipH);
+            _xfrm.setFlipV(_xfrm2.flipV);
+            _xfrm.setRot(_xfrm2.rot);
+            this.spPr.setGeometry(_spPr.geometry.createDuplicate());
+            this.checkDrawingBaseCoords();
+            this.recalculate();
+        }
+        else if(oBeginDrawing || oEndDrawing){
+            if(bMove){
+                var _x, _y;
+                var _spX, _spY, diffX, diffY, bChecked = false;
+                var _oCnxInfo;
+                var _groupTransform;
+                if(oBeginDrawing){
+                    _oCnxInfo = oBeginDrawing.getGeom().cnxLst[this.getStCxnIdx()];
+                    if(_oCnxInfo){
+                        _spX = oBeginDrawing.transform.TransformPointX(_oCnxInfo.x, _oCnxInfo.y);
+                        _spY = oBeginDrawing.transform.TransformPointY(_oCnxInfo.x, _oCnxInfo.y);
+                        _x = this.transform.TransformPointX(0, 0);
+                        _y = this.transform.TransformPointY(0, 0);
+                        bChecked = true;
+                    }
+                }
+                else {
+                    _oCnxInfo = oEndDrawing.getGeom().cnxLst[this.getEndCxnIdx()];
+                    if(_oCnxInfo){
+                        _spX = oEndDrawing.transform.TransformPointX(_oCnxInfo.x, _oCnxInfo.y);
+                        _spY = oEndDrawing.transform.TransformPointY(_oCnxInfo.x, _oCnxInfo.y);
+                        _x = this.transform.TransformPointX(this.extX, this.extY);
+                        _y = this.transform.TransformPointY(this.extX, this.extY);
+                        bChecked = true;
+                    }
+                }
+
+                if(bChecked){
+                    if(this.group){
+                        _groupTransform = this.group.invertTransform.CreateDublicate();
+                        _groupTransform.tx = 0;
+                        _groupTransform.ty = 0;
+                        diffX = _groupTransform.TransformPointX(_spX - _x, _spY - _y);
+                        diffY = _groupTransform.TransformPointY(_spX - _x, _spY - _y);
+                    }
+                    else{
+                        diffX = _spX - _x;
+                        diffY = _spY - _y;
+                    }
+                    this.spPr.xfrm.setOffX(this.spPr.xfrm.offX + diffX);
+                    this.spPr.xfrm.setOffY(this.spPr.xfrm.offY + diffY);
+                    this.recalculate();
+                }
+            }
+            else{
+                if(oBeginDrawing){
+                    _startConnectionParams = oBeginDrawing.getConnectionParams(this.getStCxnIdx(), this.group);
+                }
+                if(oEndDrawing){
+                    _endConnectionParams = oEndDrawing.getConnectionParams(this.getEndCxnIdx(), this.group);
+                }
+                var _tx, _ty;
+                if(_startConnectionParams || _endConnectionParams){
+
+                    if(!_startConnectionParams){
+                        _tx = this.transform.TransformPointX(0, 0);
+                        _ty = this.transform.TransformPointY(0, 0);
+                        _startConnectionParams = AscFormat.fCalculateConnectionInfo(_endConnectionParams, _tx, _ty);
+                    }
+                    if(!_endConnectionParams){
+                        _tx = this.transform.TransformPointX(this.extX, this.extY);
+                        _ty = this.transform.TransformPointY(this.extX, this.extY);
+                        _endConnectionParams = AscFormat.fCalculateConnectionInfo(_startConnectionParams, _tx, _ty);
+                    }
+                    _spPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.spPr.geometry.preset, this.pen && this.pen.w);
+                    _xfrm2 = _spPr.xfrm;
+                    _xfrm.setOffX(_xfrm2.offX);
+                    _xfrm.setOffY(_xfrm2.offY);
+                    _xfrm.setExtX(_xfrm2.extX);
+                    _xfrm.setExtY(_xfrm2.extY);
+                    _xfrm.setFlipH(_xfrm2.flipH);
+                    _xfrm.setFlipV(_xfrm2.flipV);
+                    _xfrm.setRot(_xfrm2.rot);
+                    this.spPr.setGeometry(_spPr.geometry.createDuplicate());
+                    this.checkDrawingBaseCoords();
+                    this.recalculate();
+                }
+            }
+        }
+    };
+
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].fCalculateSpPr = fCalculateSpPr;
     window['AscFormat'].fCalculateConnectionInfo = fCalculateConnectionInfo;

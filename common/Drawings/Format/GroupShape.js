@@ -1360,13 +1360,6 @@ function CGroupShape()
         }
     };
 
-    CGroupShape.prototype.getMainGroup = function()
-    {
-        if(!isRealObject(this.group))
-            return this;
-        return this.group.getMainGroup();
-    };
-
     CGroupShape.prototype.canUnGroup = function()
     {
         return true;
