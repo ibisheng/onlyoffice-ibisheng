@@ -2077,6 +2077,7 @@
 	cIMCOSH.prototype.constructor = cIMCOSH;
 	cIMCOSH.prototype.argumentsMin = 1;
 	cIMCOSH.prototype.argumentsMax = 1;
+	cIMCOSH.prototype.isXLFN = true;
 	cIMCOSH.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
