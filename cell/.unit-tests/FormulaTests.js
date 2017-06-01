@@ -902,6 +902,20 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "#NUM!", 'COMBINA(10,-3)' );
 	} );
 
+	test( "Test: \"DECIMAL\"", function () {
+		oParser = new parserFormula( 'DECIMAL("FF",16)', "A1", ws );
+		ok( oParser.parse(), 'DECIMAL("FF",16)' );
+		strictEqual( oParser.calculate().getValue(), 255, 'DECIMAL("FF",16)' );
+
+		oParser = new parserFormula( 'DECIMAL(111,2)', "A1", ws );
+		ok( oParser.parse(), 'DECIMAL(111,2)' );
+		strictEqual( oParser.calculate().getValue(), 7, 'DECIMAL(111,2)' );
+
+		oParser = new parserFormula( 'DECIMAL("zap",36)', "A1", ws );
+		ok( oParser.parse(), 'DECIMAL("zap",36)' );
+		strictEqual( oParser.calculate().getValue(), 45745, 'DECIMAL("zap",36)' );
+	} );
+
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
 		ok( oParser.parse() );
