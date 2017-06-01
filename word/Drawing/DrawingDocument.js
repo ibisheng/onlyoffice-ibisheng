@@ -76,7 +76,7 @@ CContentControlTrack.prototype.getPage = function()
 {
 	if (this.rects)
 		return this.rects[0].Page;
-	if (this.path)
+	if (this.paths)
 		return this.paths[0].Page;
 	return 0;
 };
