@@ -52,7 +52,7 @@
 	cFormulaFunctionGroup['DateAndTime'].push(cDAYS, cISOWEEKNUM);
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
 	cFormulaFunctionGroup['Engineering'].push(cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR, cERF_PRECISE,
-		cERFC_PRECISE, cIMCOT, cIMCSC, cIMCSCH, cIMSEC, cIMSECH, cIMSINH, cIMTAN);
+		cERFC_PRECISE, cIMCSC, cIMCSCH, cIMSEC, cIMSECH, cIMSINH, cIMTAN);
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cNUMBERVALUE, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
@@ -615,18 +615,6 @@
 
 	cIFNA.prototype = Object.create(cBaseFunction.prototype);
 	cIFNA.prototype.constructor = cIFNA;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMCOT() {
-		cBaseFunction.call(this, "IMCOT");
-		this.isXLFN = true;
-	}
-
-	cIMCOT.prototype = Object.create(cBaseFunction.prototype);
-	cIMCOT.prototype.constructor = cIMCOT;
 
 	/**
 	 * @constructor
