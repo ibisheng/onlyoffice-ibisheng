@@ -12422,13 +12422,12 @@ CDocument.prototype.controller_MoveCursorToCell = function(bNext)
 {
 	if (true === this.Selection.Use)
 	{
-		if (this.Selection.StartPos === this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType())
+		if (this.Selection.StartPos === this.Selection.EndPos)
 			this.Content[this.Selection.StartPos].MoveCursorToCell(bNext);
 	}
 	else
 	{
-		if (type_Table === this.Content[this.CurPos.ContentPos].GetType())
-			this.Content[this.CurPos.ContentPos].MoveCursorToCell(bNext);
+		this.Content[this.CurPos.ContentPos].MoveCursorToCell(bNext);
 	}
 };
 CDocument.prototype.controller_SetParagraphAlign = function(Align)

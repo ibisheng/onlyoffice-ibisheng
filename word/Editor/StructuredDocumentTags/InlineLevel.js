@@ -179,10 +179,8 @@ CInlineLevelSdt.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 	var oRangeBounds = this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)];
 	if (oRangeBounds)
 	{
-		oRangeBounds.X0 += Dx;
-		oRangeBounds.X1 += Dx;
-		oRangeBounds.Y0 += Dy;
-		oRangeBounds.Y1 += Dy;
+		oRangeBounds.X += Dx;
+		oRangeBounds.Y += Dy;
 	}
 };
 CInlineLevelSdt.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
