@@ -2044,6 +2044,18 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "0.8337300251311491-0.9888977057628651i", 'IMCOS("1+i")' );
 	} );
 
+	test( "Test: \"IMCOT\"", function () {
+		oParser = new parserFormula( 'IMCOT("4+3i")', "A2", ws );
+		ok( oParser.parse(), 'IMCOT("4+3i")' );
+		strictEqual( oParser.calculate().getValue(), "0.004901182394304475-0.9992669278059015i", 'IMCOT("4+3i")' );
+	} );
+
+	test( "Test: \"IMTAN\"", function () {
+		oParser = new parserFormula( 'IMTAN("4+3i")', "A2", ws );
+		ok( oParser.parse(), 'IMTAN("4+3i")' );
+		strictEqual( oParser.calculate().getValue(), "0.004908258067496062+1.000709536067233i", 'IMTAN("4+3i")' );
+	} );
+
     test( "Test: \"TANH\"", function () {
 
         oParser = new parserFormula( "TANH(0)", "A2", ws );
