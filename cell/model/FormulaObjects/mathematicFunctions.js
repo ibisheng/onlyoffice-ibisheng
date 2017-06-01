@@ -56,7 +56,7 @@
 	var _func = AscCommonExcel._func;
 
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cCEILING, cCEILING_MATH, cCEILING_PRECISE,
+	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cBASE, cCEILING, cCEILING_MATH, cCEILING_PRECISE,
 		cCOMBIN, cCOMBINA, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDECIMAL, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
 		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
 		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSEC, cSECH, cSERIESSUM,
@@ -609,6 +609,66 @@
 	cATANH.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( x )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cBASE() {
+		this.name = "BASE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cBASE.prototype = Object.create(cBaseFunction.prototype);
+	cBASE.prototype.constructor = cBASE;
+	cBASE.prototype.argumentsMin = 2;
+	cBASE.prototype.argumentsMax = 3;
+	cBASE.prototype.isXLFN = true;
+	cBASE.prototype.Calculate = function (arg) {
+		var argClone = [];
+		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
+		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		argClone[2] = this._checkCAreaArg(arg[2], arguments[1]);
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
+
+		var argError;
+		if(false !== (argError = this._checkErrorArg(argClone))){
+			return this.value = argError;
+		}
+
+		function base_math(argArray) {
+			var number = parseInt(argArray[0]);
+			var radix = parseInt(argArray[1]);
+			var min_length = parseInt(argArray[2]);
+
+			if(radix < 2 || radix > 36 || number < 0 || number > Math.pow(2, 53) || min_length < 0){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var str = number.toString(radix);
+			str = str.toUpperCase();
+			if(str.length < min_length){
+				var prefix = "";
+				for(var i = 0; i < min_length - str.length; i++){
+					prefix += "0";
+				}
+				str = prefix + str;
+			}
+
+			return new cString(str);
+		}
+
+		return this.value = this._findArrayInNumberArguments(argClone, base_math);
+	};
+	cBASE.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( number , radix [ , min_length ] )"
 		};
 	};
 
@@ -1356,7 +1416,7 @@
 	};
 	cDECIMAL.prototype.getInfo = function () {
 		return {
-			name: this.name, args: "( number , number-chosen )"
+			name: this.name, args: "( text , radix )"
 		};
 	};
 

@@ -916,6 +916,20 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), 45745, 'DECIMAL("zap",36)' );
 	} );
 
+	test( "Test: \"BASE\"", function () {
+		oParser = new parserFormula( 'BASE(7,2)', "A1", ws );
+		ok( oParser.parse(), 'BASE(7,2)' );
+		strictEqual( oParser.calculate().getValue(), "111", 'BASE(7,2)' );
+
+		oParser = new parserFormula( 'BASE(100,16)', "A1", ws );
+		ok( oParser.parse(), 'BASE(100,16)' );
+		strictEqual( oParser.calculate().getValue(), "64", 'BASE(100,16)' );
+
+		oParser = new parserFormula( 'BASE(15,2,10)', "A1", ws );
+		ok( oParser.parse(), 'BASE(15,2,10)' );
+		strictEqual( oParser.calculate().getValue(), "0000001111", 'BASE(15,2,10)' );
+	} );
+
 	test( "Test: \"ARABIC('LVII')\"", function () {
 		oParser = new parserFormula( 'ARABIC("LVII")', "A1", ws );
 		ok( oParser.parse() );

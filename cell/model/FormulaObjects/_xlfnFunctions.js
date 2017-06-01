@@ -68,7 +68,7 @@
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cBASE, cMUNIT);
+	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
@@ -87,18 +87,6 @@
 
 	cAGGREGATE.prototype = Object.create(cBaseFunction.prototype);
 	cAGGREGATE.prototype.constructor = cAGGREGATE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBASE() {
-		cBaseFunction.call(this, "BASE");
-		this.isXLFN = true;
-	}
-
-	cBASE.prototype = Object.create(cBaseFunction.prototype);
-	cBASE.prototype.constructor = cBASE;
 
 	/**
 	 * @constructor
