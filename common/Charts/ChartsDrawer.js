@@ -721,7 +721,7 @@ CChartsDrawer.prototype =
 		{
 			if(isHBar)
 			{
-				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
+				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX && valAx.xPoints)
 				{
 					calculateLeft  = valAx.xPoints[0].pos;
 					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[valAx.xPoints.length - 1].pos;
@@ -732,7 +732,7 @@ CChartsDrawer.prototype =
 					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[0].pos;
 				}
 			}
-			else if(this.calcProp.heightCanvas != undefined)
+			else if(this.calcProp.heightCanvas != undefined && valAx.yPoints)
 			{
 				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
