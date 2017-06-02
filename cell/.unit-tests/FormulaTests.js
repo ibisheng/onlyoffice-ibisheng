@@ -2062,6 +2062,12 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "-0.03627588962862601-0.0051744731840193976i", 'IMCSCH("4+3i")' );
 	} );
 
+	test( "Test: \"IMSINH\"", function () {
+		oParser = new parserFormula( 'IMSINH("4+3i")', "A2", ws );
+		ok( oParser.parse(), 'IMSINH("4+3i")' );
+		strictEqual( oParser.calculate().getValue(), "-27.01681325800393+3.8537380379193764i", 'IMSINH("4+3i")' );
+	} );
+
 	test( "Test: \"IMSEC\"", function () {
 		oParser = new parserFormula( 'IMSEC("4+3i")', "A2", ws );
 		ok( oParser.parse(), 'IMSEC("4+3i")' );
