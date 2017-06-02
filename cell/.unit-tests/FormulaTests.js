@@ -2050,6 +2050,18 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "0.004901182394304475-0.9992669278059015i", 'IMCOT("4+3i")' );
 	} );
 
+	test( "Test: \"IMCSC\"", function () {
+		oParser = new parserFormula( 'IMCSC("4+3i")', "A2", ws );
+		ok( oParser.parse(), 'IMCSC("4+3i")' );
+		strictEqual( oParser.calculate().getValue(), "-0.0754898329158637+0.06487747137063551i", 'IMCSC("4+3i")' );
+	} );
+
+	test( "Test: \"IMCSCH\"", function () {
+		oParser = new parserFormula( 'IMCSCH("4+3i")', "A2", ws );
+		ok( oParser.parse(), 'IMCSCH("4+3i")' );
+		strictEqual( oParser.calculate().getValue(), "-0.03627588962862601-0.0051744731840193976i", 'IMCSCH("4+3i")' );
+	} );
+
 	test( "Test: \"IMTAN\"", function () {
 		oParser = new parserFormula( 'IMTAN("4+3i")', "A2", ws );
 		ok( oParser.parse(), 'IMTAN("4+3i")' );

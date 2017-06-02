@@ -500,6 +500,22 @@
 			} else {
 				this.real = Math.cosh(this.real);
 			}
+		}, Csc: function () {
+			if (this.img) {
+				var a = (2 * Math.sin(this.real) * Math.cosh(this.img)) / (Math.cosh(2 * this.img) - Math.cos(2 *this.real));
+				this.img = (-2 * Math.cos(this.real) * Math.sinh(this.img)) / (Math.cosh(2 * this.img) - Math.cos(2 *this.real));
+				this.real = a;
+			} else {
+				this.real = 1 / Math.sin(this.real);
+			}
+		}, Csch: function () {
+			if (this.img) {
+				var a = (2 * Math.sinh(this.real) * Math.cos(this.img)) / (Math.cosh(2 * this.real) - Math.cos(2 *this.img));
+				this.img = (-2 * Math.cosh(this.real) * Math.sin(this.img)) / (Math.cosh(2 * this.real) - Math.cos(2 *this.img));
+				this.real = a;
+			} else {
+				this.real = 1 / Math.sinh(this.real);
+			}
 		}, Sin: function () {
 			if (this.img) {
 				var a = Math.sin(this.real) * Math.cosh(this.img);
@@ -897,7 +913,7 @@
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
 	cFormulaFunctionGroup['Engineering'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cBIN2DEC, cBIN2HEX, cBIN2OCT,
 		cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA, cERF, cERFC, cGESTEP, cHEX2BIN, cHEX2DEC, cHEX2OCT,
-		cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMCOSH, cIMCOT, cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER,
+		cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMCOSH, cIMCOT, cIMCSC, cIMCSCH, cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER,
 		cIMPRODUCT, cIMREAL, cIMSIN, cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN, cOCT2DEC, cOCT2HEX);
 
 	/**
@@ -2183,6 +2199,118 @@
 
 	};
 	cIMCOT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( complex-number )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMCSC() {
+		cBaseFunction.call(this, "IMCSC");
+	}
+	//TODO проверить!!!
+	cIMCSC.prototype = Object.create(cBaseFunction.prototype);
+	cIMCSC.prototype.constructor = cIMCSC;
+	cIMCSC.prototype.argumentsMin = 1;
+	cIMCSC.prototype.argumentsMax = 1;
+	cIMCSC.prototype.isXLFN = true;
+	cIMCSC.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		if(0 == arg0.value){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Csc();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
+	};
+	cIMCSC.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "( complex-number )"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMCSCH() {
+		cBaseFunction.call(this, "IMCSCH");
+	}
+	//TODO проверить!!!
+	cIMCSCH.prototype = Object.create(cBaseFunction.prototype);
+	cIMCSCH.prototype.constructor = cIMCSCH;
+	cIMCSCH.prototype.argumentsMin = 1;
+	cIMCSCH.prototype.argumentsMax = 1;
+	cIMCSCH.prototype.isXLFN = true;
+	cIMCSCH.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		if(0 == arg0.value){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Csch();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
+	};
+	cIMCSCH.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "( complex-number )"
 		};
