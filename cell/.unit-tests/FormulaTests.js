@@ -2062,6 +2062,18 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "-0.03627588962862601-0.0051744731840193976i", 'IMCSCH("4+3i")' );
 	} );
 
+	test( "Test: \"IMSEC\"", function () {
+		oParser = new parserFormula( 'IMSEC("4+3i")', "A2", ws );
+		ok( oParser.parse(), 'IMSEC("4+3i")' );
+		strictEqual( oParser.calculate().getValue(), "-0.06529402785794705-0.07522496030277323i", 'IMSEC("4+3i")' );
+	} );
+
+	test( "Test: \"IMSECH\"", function () {
+		oParser = new parserFormula( 'IMSECH("4+3i")', "A2", ws );
+		ok( oParser.parse(), 'IMSECH("4+3i")' );
+		strictEqual( oParser.calculate().getValue(), "-0.03625349691586888+0.00516434460775318i", 'IMSECH("4+3i")' );
+	} );
+
 	test( "Test: \"IMTAN\"", function () {
 		oParser = new parserFormula( 'IMTAN("4+3i")', "A2", ws );
 		ok( oParser.parse(), 'IMTAN("4+3i")' );

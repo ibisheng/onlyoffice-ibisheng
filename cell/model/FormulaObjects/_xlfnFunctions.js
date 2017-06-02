@@ -52,7 +52,7 @@
 	cFormulaFunctionGroup['DateAndTime'].push(cDAYS, cISOWEEKNUM);
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
 	cFormulaFunctionGroup['Engineering'].push(cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR, cERF_PRECISE,
-		cERFC_PRECISE, cIMSEC, cIMSECH, cIMSINH);
+		cERFC_PRECISE, cIMSINH);
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cNUMBERVALUE, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
@@ -615,30 +615,6 @@
 
 	cIFNA.prototype = Object.create(cBaseFunction.prototype);
 	cIFNA.prototype.constructor = cIFNA;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMSEC() {
-		cBaseFunction.call(this, "IMSEC");
-		this.isXLFN = true;
-	}
-
-	cIMSEC.prototype = Object.create(cBaseFunction.prototype);
-	cIMSEC.prototype.constructor = cIMSEC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMSECH() {
-		cBaseFunction.call(this, "IMSECH");
-		this.isXLFN = true;
-	}
-
-	cIMSECH.prototype = Object.create(cBaseFunction.prototype);
-	cIMSECH.prototype.constructor = cIMSECH;
 
 	/**
 	 * @constructor
