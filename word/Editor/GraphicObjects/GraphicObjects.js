@@ -3010,6 +3010,27 @@ CGraphicObjects.prototype =
         return this.maximalGraphicObjectZIndex;
     },
 
+    IsInDrawingObject: function(X, Y, nPageIndex, oContent){
+        var _X, _Y, oTransform, oInvertTransform;
+        if(oContent){
+            oTransform = oContent.Get_ParentTextTransform();
+            if(oTransform){
+                oInvertTransform = AscCommon.global_MatrixTransformer.Invert(oTransform);
+                _X = oInvertTransform.TransformPointX(X, Y);
+                _Y = oInvertTransform.TransformPointY(X, Y);
+            }
+            else{
+                _X = X;
+                _Y = Y;
+            }
+        }
+        else{
+            _X = X;
+            _Y = Y;
+        }
+        return this.isPointInDrawingObjects(_X, _Y, nPageIndex);
+    },
+
     isPointInDrawingObjects: function(x, y, pageIndex, bSelected, bNoText)
     {
         var ret;
@@ -3026,7 +3047,7 @@ CGraphicObjects.prototype =
                 }
             }
             var object = g_oTableId.Get_ById(ret.objectId);
-            if(isRealObject(object) && (!(bSelected === true) || bSelected && object.selected) )
+            if(isRealObject(object) && (!(bSelected === true) ||  bSelected && object.selected) )
             {
                 if(object.group)
                     object = object.getMainGroup();

@@ -5062,7 +5062,7 @@ CDocument.prototype.Selection_SetStart         = function(X, Y, MouseEvent)
 
     var bInText      = (null === this.IsInText(X, Y, this.CurPage) ? false : true);
     var bTableBorder = (null === this.IsTableBorder(X, Y, this.CurPage) ? false : true);
-    var nInDrawing   = this.DrawingObjects.isPointInDrawingObjects(X, Y, this.CurPage, this);
+    var nInDrawing   = this.DrawingObjects.IsInDrawingObject(X, Y, this.CurPage, this);
 	var bFlowTable   = (null === this.DrawingObjects.getTableByXY(X, Y, this.CurPage, this) ? false : true);
 
     // Сначала посмотрим, попалили мы в текстовый селект (но при этом не в границу таблицы и не более чем одинарным кликом)
@@ -6002,7 +6002,7 @@ CDocument.prototype.IsTableBorder = function(X, Y, PageIndex)
 	}
 	else
 	{
-		if (-1 != this.DrawingObjects.isPointInDrawingObjects(X, Y, PageIndex, this))
+		if (-1 != this.DrawingObjects.IsInDrawingObject(X, Y, PageIndex, this))
 		{
 			return null;
 		}
@@ -6070,7 +6070,7 @@ CDocument.prototype.IsInDrawing = function(X, Y, PageIndex)
 	}
 	else
 	{
-		if (-1 != this.DrawingObjects.isPointInDrawingObjects(X, Y, this.CurPage, this))
+		if (-1 != this.DrawingObjects.IsInDrawingObject(X, Y, this.CurPage, this))
 		{
 			return true;
 		}
@@ -7177,7 +7177,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 
 		// Сначала проверим попадание в Flow-таблицы и автофигуры
 		var pFlowTable = this.DrawingObjects.getTableByXY(X, Y, PageIndex, this);
-		var nInDrawing = this.DrawingObjects.isPointInDrawingObjects(X, Y, PageIndex, this);
+		var nInDrawing = this.DrawingObjects.IsInDrawingObject(X, Y, PageIndex, this);
 
 		if (docpostype_HdrFtr != this.CurPos.Type && -1 === nInDrawing && null === pFlowTable)
 		{
@@ -7423,7 +7423,7 @@ CDocument.prototype.Get_NearestPos = function(PageNum, X, Y, bAnchor, Drawing)
 		return this.HdrFtr.Get_NearestPos(PageNum, X, Y, bAnchor, Drawing);
 
 	var bInText    = (null === this.IsInText(X, Y, PageNum) ? false : true);
-	var nInDrawing = this.DrawingObjects.isPointInDrawingObjects(X, Y, PageNum, this);
+	var nInDrawing = this.DrawingObjects.IsInDrawingObject(X, Y, PageNum, this);
 
 	if (true != bAnchor)
 	{

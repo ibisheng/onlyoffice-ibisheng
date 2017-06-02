@@ -434,7 +434,7 @@ CDocumentContent.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Dra
 	if (this.Parent && this.Parent instanceof CHeaderFooter)
 	{
 		var bInText    = (null === this.IsInText(X, Y, CurPage) ? false : true);
-		var nInDrawing = this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, PageAbs, this);
+		var nInDrawing = this.LogicDocument.DrawingObjects.IsInDrawingObject(X, Y, PageAbs, this);
 
 		if (true != bAnchor)
 		{
@@ -1646,7 +1646,7 @@ CDocumentContent.prototype.IsInText = function(X, Y, CurPage)
 };
 CDocumentContent.prototype.IsInDrawing = function(X, Y, CurPage)
 {
-	if (-1 != this.DrawingObjects.isPointInDrawingObjects(X, Y, this.Get_AbsolutePage(CurPage), this))
+	if (-1 != this.DrawingObjects.IsInDrawingObject(X, Y, this.Get_AbsolutePage(CurPage), this))
 	{
 		return true;
 	}
@@ -6381,7 +6381,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 	// Сначала проверим, не попали ли мы в один из "плавающих" объектов
 	var bInText      = (null === this.IsInText(X, Y, AbsPage) ? false : true);
 	var bTableBorder = (null === this.IsTableBorder(X, Y, AbsPage) ? false : true);
-	var nInDrawing   = this.LogicDocument && this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, AbsPage, this);
+	var nInDrawing   = this.LogicDocument && this.LogicDocument.DrawingObjects.IsInDrawingObject(X, Y, AbsPage, this);
 
 	if (this.Parent instanceof CHeaderFooter && ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ) ))
 	{
