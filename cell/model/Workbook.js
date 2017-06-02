@@ -8668,6 +8668,11 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 				oPromoteHelper.setIndex(i - nStartRow);
 				for(var j = nStartCol; (nStartCol - j) * (nEndCol - j) <= 0; j += nColDx)
 				{
+					if (bVertical && wsTo.bExcludeHiddenRows && wsTo.getRowHidden(j))
+					{
+						continue;
+					}
+
 					var data = oPromoteHelper.getNext();
 					if(null != data && (data.oAdditional || (false == bCopy && null != data.nCurValue)))
 					{

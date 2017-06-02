@@ -8011,8 +8011,14 @@
                     if (null != oCanPromote) {
                         History.Create_NewPoint();
                         History.StartTransaction();
+
+						if(t.model.autoFilters.bIsExcludeHiddenRows(changedRange, t.model.selectionRange.activeCell)){
+							t.model.excludeHiddenRows(true);
+						}
                         range.promote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex,
                           oCanPromote);
+						t.model.excludeHiddenRows(false);
+
                         // Вызываем функцию пересчета для заголовков форматированной таблицы
                         t.model.autoFilters.renameTableColumn(arn);
 
