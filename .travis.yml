@@ -2,10 +2,11 @@ language: node_js
 node_js:
   - '6'
 before_install:
-  - npm install -g grunt-cli
+  - npm install -g grunt-cli node-qunit-phantomjs
 before_script:
-  - git clone https://github.com/ONLYOFFICE/web-apps.git ../web-apps
-  - cd build
+  - git clone -b develop https://github.com/ONLYOFFICE/web-apps.git ../web-apps
 script:
+  - node-qunit-phantomjs cell/.unit-tests/FormulaTests.html
+  - cd build
   - npm install
   - grunt --level=WHITESPACE_ONLY
