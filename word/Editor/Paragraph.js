@@ -7463,17 +7463,19 @@ Paragraph.prototype.Add_PresentationNumbering = function(_Bullet)
 		oBullet2.bulletType      = new AscFormat.CBulletType();
 		oBullet2.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
 	}
+	var oTheme = this.Get_Theme();
+	var oColorMap = this.Get_ColorMap();
 	var oUndefParaPr = this.Get_CompiledPr2(false).ParaPr;
 	var NewType      = oBullet2.getBulletType();
-	var UndefType    = oUndefParaPr.Bullet ? oUndefParaPr.Bullet.getBulletType() : numbering_presentationnumfrmt_None;
+	var UndefType    = oUndefParaPr.Bullet ? oUndefParaPr.Bullet.getBulletType(oTheme, oColorMap) : numbering_presentationnumfrmt_None;
 	var LeftInd;
 
 	if (NewType === UndefType)
 	{
 		if (NewType === numbering_presentationnumfrmt_Char)//буллеты
 		{
-			var oUndefPresentationBullet = oUndefParaPr.Bullet.getPresentationBullet();
-			var oNewPresentationBullet   = oBullet2.getPresentationBullet();
+			var oUndefPresentationBullet = oUndefParaPr.Bullet.getPresentationBullet(oTheme, oColorMap);
+			var oNewPresentationBullet   = oBullet2.getPresentationBullet(oTheme, oColorMap);
 			if (oUndefPresentationBullet.m_sChar === oNewPresentationBullet.m_sChar)//символы совпали. ничего выставлять не надо.
 			{
 				this.Set_Bullet(undefined);
@@ -7812,7 +7814,7 @@ Paragraph.prototype.Internal_CompileParaPr = function()
 			if (!this.bFromDocument)
 			{
 				this.PresentationPr.Level  = AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0;
-				this.PresentationPr.Bullet = this.CompiledPr.Pr.ParaPr.Get_PresentationBullet();
+				this.PresentationPr.Bullet = this.CompiledPr.Pr.ParaPr.Get_PresentationBullet(this.Get_Theme(), this.Get_ColorMap());
 				this.Numbering.Bullet      = this.PresentationPr.Bullet;
 			}
 

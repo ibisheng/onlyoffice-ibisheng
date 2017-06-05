@@ -9938,7 +9938,7 @@ CParaPr.prototype =
         return true;
     },
 
-    Get_PresentationBullet: function()
+    Get_PresentationBullet: function(theme, colorMap)
     {
         var Bullet = new CPresentationBullet();
         if(this.Bullet && this.Bullet.isBullet())
@@ -9984,6 +9984,22 @@ CParaPr.prototype =
                     Bullet.m_nType = numbering_presentationnumfrmt_Char;
                     Bullet.m_sChar = "•";
                     break;
+                }
+            }
+
+            if(this.Bullet.bulletColor){
+                if(this.Bullet.bulletColor.type === AscFormat.BULLET_TYPE_COLOR_NONE){
+                    Bullet.m_bColorTx = false;
+                    Bullet.m_oColor.a = 0;
+                }
+                if(this.Bullet.bulletColor.type === AscFormat.BULLET_TYPE_COLOR_CLR){
+                    if(this.Bullet.bulletColor.UniColor && this.Bullet.bulletColor.UniColor.color && theme && colorMap){
+                        Bullet.m_bColorTx = false;
+                        this.Bullet.bulletColor.UniColor.check(theme, colorMap);
+                        Bullet.m_oColor.r = this.Bullet.bulletColor.UniColor.RGBA.R;
+                        Bullet.m_oColor.g = this.Bullet.bulletColor.UniColor.RGBA.G;
+                        Bullet.m_oColor.b = this.Bullet.bulletColor.UniColor.RGBA.B;
+                    }
                 }
             }
         }

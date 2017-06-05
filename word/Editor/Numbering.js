@@ -1929,7 +1929,7 @@ function CPresentationBullet()
     this.m_nStartAt = null;                                // Стартовое значение для нумерованных списков
     this.m_sChar    = null;                                // Значение для символьных списков
 
-    this.m_oColor   = { r : 0, g : 0, b : 0 };             // Цвет
+    this.m_oColor   = { r : 0, g : 0, b : 0, a: 255 };     // Цвет
     this.m_bColorTx = true;                                // Использовать ли цвет первого рана в параграфе
 
     this.m_sFont    = "Arial";                             // Шрифт
@@ -2130,7 +2130,7 @@ function CPresentationBullet()
         if ( null === this.m_oTextPr || null === this.m_nNum || null == this.m_sString || this.m_sString.length == 0)
             return;
 
-        var oColor = { r : this.m_oColor.r, g : this.m_oColor.g, b : this.m_oColor.b };
+        var oColor = { r : this.m_oColor.r, g : this.m_oColor.g, b : this.m_oColor.b, a : this.m_oColor.a};
         if ( true === this.m_bColorTx )
         {
             if(FirstTextPr.Unifill)
@@ -2160,10 +2160,19 @@ function CPresentationBullet()
 
         var sT = this.m_sString;
         var FontSlot = g_font_detector.Get_FontClass( sT.charCodeAt(0), Hint, lcid, bCS, bRTL );
+        var _OldUniFill = this.m_oTextPr.Unifill;
+        if(Context.Start_Command){
+            this.m_oTextPr.Unifill = AscFormat.CreateUnfilFromRGB(oColor.r, oColor.g, oColor.b);
+        }
         Context.SetTextPr( this.m_oTextPr, PDSE.Theme );
         Context.SetFontSlot( FontSlot );
-        Context.p_color( oColor.r, oColor.g, oColor.b, 255 );
-        Context.b_color1( oColor.r, oColor.g, oColor.b, 255 );
+        if(!Context.Start_Command){
+            Context.p_color( oColor.r, oColor.g, oColor.b, 255 );
+            Context.b_color1( oColor.r, oColor.g, oColor.b, 255 );
+        }
+        else{
+            this.m_oTextPr.Unifill = _OldUniFill;
+        }
         g_oTextMeasurer.SetTextPr( this.m_oTextPr, PDSE.Theme  );
         g_oTextMeasurer.SetFontSlot( FontSlot );
 
