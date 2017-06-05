@@ -2471,8 +2471,10 @@ function CBinaryFileWriter()
             {
                 oThis.StartRecord(c_oAscFill.FILL_TYPE_SOLID);
 
-                oThis.CorrectUniColorAlpha(fill.color, trans);
-                oThis.WriteRecord1(0, fill.color, oThis.WriteUniColor);
+                if(fill.color){
+                    oThis.CorrectUniColorAlpha(fill.color, trans);
+                    oThis.WriteRecord1(0, fill.color, oThis.WriteUniColor);
+                }
                 oThis.EndRecord();
                 break;
             }

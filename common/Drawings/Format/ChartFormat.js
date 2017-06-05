@@ -1478,7 +1478,7 @@ CDLbl.prototype =
             if(this.lastStyleObject)
                 return this.lastStyleObject;
             var styles = new CStyles(false);
-            var style = new CStyle("dataLblStyle", null, null, null);
+            var style = new CStyle("dataLblStyle", null, null, null, true);
             var text_pr = new CTextPr();
             text_pr.FontSize = 10;
             if(this.chart && AscFormat.isRealNumber(this.chart.style) )
