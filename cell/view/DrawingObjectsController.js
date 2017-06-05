@@ -110,9 +110,9 @@ DrawingObjectsController.prototype.setTableProps = function(props)
         }
         else
         {
-            by_type.tables[0].graphicObject.Select_All();
+            by_type.tables[0].graphicObject.SelectAll();
             by_type.tables[0].graphicObject.Set_Props(props);
-            by_type.tables[0].graphicObject.Selection_Remove();
+            by_type.tables[0].graphicObject.RemoveSelection();
         }
         props.TableCaption = sCaption;
         props.TableDescription = sDescription;
@@ -493,7 +493,7 @@ DrawingObjectsController.prototype.addTextArtFromParams = function(nStyle, dRect
     this.selectObject(oTextArt, 0);
     var oContent = oTextArt.getDocContent();
     this.selection.textSelection = oTextArt;
-    oContent.Select_All();
+    oContent.SelectAll();
     oTextArt.addToRecalculate();
     this.startRecalculate();
 };
@@ -523,7 +523,7 @@ DrawingObjectsController.prototype.setParagraphIndent = function(Indent)
     {
         Indent.Left = 0;
     }
-    this.applyDocContentFunction(CDocumentContent.prototype.Set_ParagraphIndent, [Indent], CTable.prototype.Set_ParagraphIndent);
+    this.applyDocContentFunction(CDocumentContent.prototype.SetParagraphIndent, [Indent], CTable.prototype.SetParagraphIndent);
 };
 
 DrawingObjectsController.prototype.paragraphIncDecIndent = function(bIncrease)
@@ -558,7 +558,7 @@ DrawingObjectsController.prototype.canIncreaseParagraphLevel = function(bIncreas
         if(window["Asc"]["editor"].isMobileVersion){
             var oTargetDocContent = this.getTargetDocContent(false, false);
             if(oTargetDocContent){
-                var oPos = oTargetDocContent.Cursor_GetPos();
+                var oPos = oTargetDocContent.GetCursorPosXY();
                 var oParentTextTransform = oTargetDocContent.Get_ParentTextTransform();
                 var _x, _y;
                 if(oParentTextTransform){

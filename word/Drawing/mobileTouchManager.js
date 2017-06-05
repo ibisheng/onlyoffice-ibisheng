@@ -196,7 +196,7 @@
 				var _x2 = this.RectSelect2.x + this.RectSelect2.w;
 				var _y2 = this.RectSelect2.y + this.RectSelect2.h / 2;
 
-				this.delegate.LogicDocument.Selection_Remove();
+				this.delegate.LogicDocument.RemoveSelection();
 				if (1 == this.DragSelect)
 				{
 					global_mouseEvent.Button = 0;

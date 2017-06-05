@@ -51,7 +51,7 @@ Asc['asc_docs_api'].prototype.asc_addComment = function(AscCommentData)
 		CommentData.Read_FromAscCommentData(AscCommentData);
 
 		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddComment);
-		var Comment = this.WordControl.m_oLogicDocument.Add_Comment(CommentData);
+		var Comment = this.WordControl.m_oLogicDocument.AddComment(CommentData);
 		if (null != Comment)
 		{
 			this.sync_AddComment(Comment.Get_Id(), CommentData);

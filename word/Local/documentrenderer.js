@@ -176,7 +176,7 @@ CDocMeta.prototype.selectAllCheckStart = function()
     }
 
     this.waitSelectAll = true;
-    editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);
+    editor.sync_StartAction(window['Asc'].c_oAscAsyncActionType.BlockInteraction, window['Asc'].c_oAscAsyncAction.SlowOperation);
 };
 
 CDocMeta.prototype.selectAllCheckEnd = function()
@@ -184,7 +184,7 @@ CDocMeta.prototype.selectAllCheckEnd = function()
     if (this.waitSelectAll)
     {
         this.waitSelectAll = false;
-        editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.SlowOperation);
+        editor.sync_EndAction(window['Asc'].c_oAscAsyncActionType.BlockInteraction, window['Asc'].c_oAscAsyncAction.SlowOperation);
         this.selectAll();
     }
 };

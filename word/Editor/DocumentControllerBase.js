@@ -264,7 +264,7 @@ CDocumentControllerBase.prototype.Set_CurrentElement = function(bUpdateStates, P
  * Можно ли обновлять позицию курсора.
  * @returns {boolean}
  */
-CDocumentControllerBase.prototype.CanTargetUpdate = function(){return true;};
+CDocumentControllerBase.prototype.CanUpdateTarget = function(){return true;};
 /**
  * Пересчитываем текущую позицию.
  * @returns {{X: number, Y: number, Height: number, PageNum: number, Internal: {Line: number, Page: number, Range: number}, Transform: null}}
@@ -306,6 +306,11 @@ CDocumentControllerBase.prototype.AddOleObject = function(nW, nH, nWidthPix, nHe
  * @param nStyle
  */
 CDocumentControllerBase.prototype.AddTextArt = function(nStyle){};
+/**
+ * Вставляем объект SignatureLine
+ * @param oSignatureDrawing
+ */
+CDocumentControllerBase.prototype.AddSignatureLine = function(oSignatureDrawing){};
 /**
  * Редактируем диаграмму.
  * @param Chart
@@ -364,7 +369,7 @@ CDocumentControllerBase.prototype.MoveCursorLeft = function(AddToSelect, Word){r
  * @param {boolean} FromPaste Пришла ли данная комнда после "вставки"
  * @returns {boolean} Получилось ли перемещение, или мы достигли предела.
  */
-CDocumentControllerBase.prototype.MoveCursorRight = function(AddToSelect, Word, FromPaste){return false;};
+CDocumentControllerBase.prototype.MoveCursorRight = function(AddToSelect, Word){return false;};
 /**
  * Смещаем курсор вверх.
  * @param AddToSelect Добавлять ли к селекту смещение
@@ -477,12 +482,12 @@ CDocumentControllerBase.prototype.SetParagraphFramePr = function(FramePr, bDelet
  * Уменьшаем или увеличиваем (по специальной таблице) размер шрифта в параграфе.
  * @param {boolean} bIncrease
  */
-CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease){};
+CDocumentControllerBase.prototype.IncreaseDecreaseFontSize = function(bIncrease){};
 /**
  * Уменьшаем или увеличиваем (по специальной таблице) отступы в параграфе.
  * @param {boolean} bIncrease
  */
-CDocumentControllerBase.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease){};
+CDocumentControllerBase.prototype.IncreaseDecreaseIndent = function(bIncrease){};
 /**
  * Устанавливаем настройки для изображений.
  * @param Props
@@ -497,12 +502,12 @@ CDocumentControllerBase.prototype.SetTableProps = function(Props){};
  * Получаем текущие настройки параграфа.
  * @returns {CParaPr}
  */
-CDocumentControllerBase.prototype.GetCurrentParaPr = function(){var oParaPr = new CParaPr(); oParaPr.Init_Default(); return oParaPr};
+CDocumentControllerBase.prototype.GetCalculatedParaPr = function(){var oParaPr = new CParaPr(); oParaPr.Init_Default(); return oParaPr};
 /**
  * Получаем текущие настройки текста.
  * @returns {CTextPr}
  */
-CDocumentControllerBase.prototype.GetCurrentTextPr = function(){var oTextPr = new CTextPr(); oTextPr.Init_Default(); return oTextPr};
+CDocumentControllerBase.prototype.GetCalculatedTextPr = function(){var oTextPr = new CTextPr(); oTextPr.Init_Default(); return oTextPr};
 /**
  * Получаем прямые настройки параграфа.
  * @returns {CParaPr}
@@ -522,7 +527,7 @@ CDocumentControllerBase.prototype.RemoveSelection = function(bNoCheckDrawing){};
  * Проверяем пустой ли селект.
  * @returns {boolean}
  */
-CDocumentControllerBase.prototype.IsEmptySelection = function(bCheckHidden){return true;};
+CDocumentControllerBase.prototype.IsSelectionEmpty = function(bCheckHidden){return true;};
 /**
  * Рисуем селект на заданно странице.
  * @param PageAbs
@@ -607,7 +612,7 @@ CDocumentControllerBase.prototype.AddTableRow = function(bBefore){};
  * Добавляем столбец таблицы.
  * @param bBefore
  */
-CDocumentControllerBase.prototype.AddTableCol = function(bBefore){};
+CDocumentControllerBase.prototype.AddTableColumn = function(bBefore){};
 /**
  * Удаляем строку таблицы.
  */
@@ -615,7 +620,7 @@ CDocumentControllerBase.prototype.RemoveTableRow = function(){};
 /**
  * Удаляем колонку таблицы.
  */
-CDocumentControllerBase.prototype.RemoveTableCol = function(){};
+CDocumentControllerBase.prototype.RemoveTableColumn = function(){};
 /**
  * Объединяем ячейки таблицы.
  */
@@ -732,3 +737,7 @@ CDocumentControllerBase.prototype.GetCurrentSectionPr = function(){return null;}
  * Отличие от RemoveSelection в том, что сбрасываем селект с текста, но не сбрасываем с автофигур
  */
 CDocumentControllerBase.prototype.RemoveTextSelection = function(){};
+/**
+ * Добавляем класс CBlockLevelSdt в текущую позицию курсора.
+ */
+CDocumentControllerBase.prototype.AddContentControl = function(nContentControlType){return null;};

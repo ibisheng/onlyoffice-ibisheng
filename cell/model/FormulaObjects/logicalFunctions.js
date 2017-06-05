@@ -222,7 +222,7 @@
 			arg0 = arg0.getValue();
 		}
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 
 		if (arg0 instanceof cError) {
@@ -258,7 +258,7 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 
 		if (arg0 instanceof cString) {

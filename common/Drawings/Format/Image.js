@@ -660,6 +660,7 @@ CImageShape.prototype.draw = function(graphics, transform)
 CImageShape.prototype.select = CShape.prototype.select;
 
 CImageShape.prototype.recalculateLocalTransform = CShape.prototype.recalculateLocalTransform;
+CImageShape.prototype.hit = CShape.prototype.hit;
 
 CImageShape.prototype.deselect = function(drawingObjectsController)
 {
@@ -678,17 +679,6 @@ CImageShape.prototype.deselect = function(drawingObjectsController)
         }
     }
     return this;
-};
-
-CImageShape.prototype.getMainGroup = function()
-{
-    if(!isRealObject(this.group))
-        return null;
-
-    var cur_group = this.group;
-    while(isRealObject(cur_group.group))
-        cur_group = cur_group.group;
-    return cur_group;
 };
 
 CImageShape.prototype.drawAdjustments = function(drawingDocument)

@@ -2560,8 +2560,8 @@ function DrawingObjects() {
 
                 var oContent = oTextArt.getDocContent();
                 if(oContent){
-                    oContent.Cursor_MoveToStartPos(false);
-                    oContent.Paragraph_Add(new AscCommonWord.MathMenu(Type), false);
+                    oContent.MoveCursorToStartPos(false);
+                    oContent.AddToParagraph(new AscCommonWord.MathMenu(Type), false);
                 }
                 oTextArt.checkExtentsByDocContent();
                 oTextArt.spPr.xfrm.setOffX(pxToMm(coordsFrom.x) + MOVE_DELTA);
@@ -2571,7 +2571,7 @@ function DrawingObjects() {
                 _this.controller.selectObject(oTextArt, 0);
                 var oContent = oTextArt.getDocContent();
                 _this.controller.selection.textSelection = oTextArt;
-                //oContent.Select_All();
+                //oContent.SelectAll();
                 oTextArt.addToRecalculate();
                 _this.controller.startRecalculate();
                 worksheet.setSelectionShape(true);
@@ -2584,6 +2584,19 @@ function DrawingObjects() {
     {
         _this.controller.setMathProps(MathProps);
     }
+
+    _this.setListType = function(type, subtype)
+    {
+        var NumberInfo =
+            {
+                Type    : 0,
+                SubType : -1
+            };
+
+        NumberInfo.Type    = type;
+        NumberInfo.SubType = subtype;
+        _this.controller.checkSelectedObjectsAndCallback(_this.controller.setParagraphNumbering, [AscFormat.fGetPresentationBulletByNumInfo(NumberInfo)], false, AscDFH.historydescription_Presentation_SetParagraphNumbering);
+    };
 
     _this.editImageDrawingObject = function(imageUrl) {
 
@@ -4107,7 +4120,11 @@ function DrawingObjects() {
                 var box = selectedRange.getBBox0();
                 settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
             }
-            settings.putRange(worksheet.getSelectionRangeValue());
+            var oRangeValue = worksheet.getSelectionRangeValue();
+            if(oRangeValue){
+                settings.putRange(oRangeValue.asc_getName());
+            }
+
             settings.putStyle(2);
             settings.putType(Asc.c_oAscChartTypeSettings.lineNormal);
             settings.putTitle(Asc.c_oAscChartTitleShowSettings.noOverlay);
@@ -4295,11 +4312,11 @@ function DrawingObjects() {
         if (!oContent) {
             return false;
         }
-        var oPara = oContent.Get_CurrentParagraph();
+        var oPara = oContent.GetCurrentParagraph();
         if (!oPara) {
             return false;
         }
-        if (true === oContent.Is_SelectionUse())
+        if (true === oContent.IsSelectionUse())
             oContent.Remove(1, true, false, true);
         var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
         if (!oRun || !(oRun instanceof ParaRun)) {

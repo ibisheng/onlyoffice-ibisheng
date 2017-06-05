@@ -167,7 +167,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
                 && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NONE)
                 || (this.brush && this.brush.fill && this.brush.fill
                 && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.brush.fill.type != c_oAscFill.FILL_TYPE_NONE) );
-    }
+    };
 
 
     this.check_bounds = function(boundsChecker)
@@ -186,7 +186,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
             boundsChecker._z();
             boundsChecker._e();
         }
-    }
+    };
 }
 
 function ObjectToDraw(brush, pen, extX, extY, geometry, transform, x, y, oComment)
@@ -362,7 +362,7 @@ function RotateTrackShapeImage(originalObject)
     {
         brush = originalObject.brush;
     }
-    this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, brush, originalObject.pen, this.transform);
+    this.overlayObject = new OverlayObject(originalObject.getGeom(), originalObject.extX, originalObject.extY, brush, originalObject.pen, this.transform);
 
     this.angle = originalObject.rot;
     var full_flip_h = this.originalObject.getFullFlipH();
@@ -495,7 +495,7 @@ function RotateTrackGroup(originalObject)
         var gr_obj_transform_copy = arr_graphic_objects[i].getTransformMatrix().CreateDublicate();
         global_MatrixTransformer.MultiplyAppend(gr_obj_transform_copy, group_invert_transform);
         this.arrTransforms2[i] = gr_obj_transform_copy;
-        this.overlayObjects[i] = new OverlayObject(arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
+        this.overlayObjects[i] = new OverlayObject(arr_graphic_objects[i].getGeom(), arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
             arr_graphic_objects[i].brush,  arr_graphic_objects[i].pen, new CMatrix());
     }
 

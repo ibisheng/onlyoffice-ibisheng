@@ -39,6 +39,8 @@
 */
 function (window, undefined) {
 
+	var recalcSlideInterval = 30;
+
 // Import
 var CreateAscColor = AscCommon.CreateAscColor;
 var g_oIdCounter = AscCommon.g_oIdCounter;
@@ -139,12 +141,13 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
                 oWordGraphicObjects.document.Api.textArtPreviewManager.clear();
             }
         };
-        drawingsChangesMap[AscDFH.historyitem_ThemeSetFontScheme                ] = function (oClass, value){oClass.themeElements.fontScheme  = value;};
-        drawingsChangesMap[AscDFH.historyitem_ThemeSetFmtScheme                 ] = function (oClass, value){oClass.themeElements.fmtScheme   = value;};
-        drawingsChangesMap[AscDFH.historyitem_HF_SetDt                          ] = function (oClass, value){oClass.dt     = value;};
-        drawingsChangesMap[AscDFH.historyitem_HF_SetFtr                         ] = function (oClass, value){oClass.ftr    = value;};
-        drawingsChangesMap[AscDFH.historyitem_HF_SetHdr                         ] = function (oClass, value){oClass.hdr    = value;};
-        drawingsChangesMap[AscDFH.historyitem_HF_SetSldNum                      ] = function (oClass, value){oClass.sldNum = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetFontScheme] = function (oClass, value){oClass.themeElements.fontScheme  = value;};
+        drawingsChangesMap[AscDFH.historyitem_ThemeSetFmtScheme ] = function (oClass, value){oClass.themeElements.fmtScheme   = value;};
+        drawingsChangesMap[AscDFH.historyitem_HF_SetDt          ] = function (oClass, value){oClass.dt     = value;};
+        drawingsChangesMap[AscDFH.historyitem_HF_SetFtr         ] = function (oClass, value){oClass.ftr    = value;};
+        drawingsChangesMap[AscDFH.historyitem_HF_SetHdr         ] = function (oClass, value){oClass.hdr    = value;};
+        drawingsChangesMap[AscDFH.historyitem_HF_SetSldNum      ] = function (oClass, value){oClass.sldNum = value;};
+        drawingsChangesMap[AscDFH.historyitem_UniNvPr_SetUniSpPr] = function (oClass, value){oClass.nvUniSpPr = value;};
 
     drawingContentChanges[AscDFH.historyitem_ClrMap_SetClr] = function(oClass){return oClass.color_map};
 
@@ -161,6 +164,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     drawingConstructorsMap[AscDFH.historyitem_ThemeSetColorScheme               ] = ClrScheme;
     drawingConstructorsMap[AscDFH.historyitem_ThemeSetFontScheme                ] = FontScheme;
     drawingConstructorsMap[AscDFH.historyitem_ThemeSetFmtScheme                 ] = FmtScheme;
+    drawingConstructorsMap[AscDFH.historyitem_UniNvPr_SetUniSpPr                 ] = CNvUniSpPr;
 
 
     AscDFH.changesFactory[AscDFH.historyitem_DefaultShapeDefinition_SetSpPr] = CChangesDrawingsObject;
@@ -183,6 +187,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_UniNvPr_SetCNvPr] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_UniNvPr_SetUniPr] = CChangesDrawingsObject;
     AscDFH.changesFactory[AscDFH.historyitem_UniNvPr_SetNvPr] = CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_UniNvPr_SetUniSpPr] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ShapeStyle_SetLnRef] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ShapeStyle_SetFillRef] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_ShapeStyle_SetFontRef] = CChangesDrawingsObjectNoId;
@@ -546,7 +551,9 @@ var TYPE_TRACK = {
 var TYPE_KIND = {
     SLIDE : 0,
     LAYOUT : 1,
-    MASTER : 2
+    MASTER : 2,
+    NOTES  : 3,
+    NOTES_MASTER: 4
 };
 
 var TYPE_TRACK_SHAPE = 0;
@@ -3979,6 +3986,13 @@ function CompareShapeProperties(shapeProp1, shapeProp2)
     if(shapeProp1.description === shapeProp2.description){
         _result_shape_prop.description = shapeProp1.description;
     }
+    if(shapeProp1.columnNumber === shapeProp2.columnNumber){
+        _result_shape_prop.columnNumber = shapeProp1.columnNumber;
+    }
+    if(shapeProp1.columnSpace === shapeProp2.columnSpace){
+        _result_shape_prop.columnSpace = shapeProp1.columnSpace;
+    }
+
     return _result_shape_prop;
 }
 
@@ -4573,6 +4587,12 @@ DefaultShapeDefinition.prototype=
     }
 };
 
+
+
+function CHyperlink(){
+
+}
+
 function CNvPr()
 {
     this.id = 0;
@@ -4823,11 +4843,88 @@ Ph.prototype =
     }
 };
 
+
+
+function CNvUniSpPr()
+{
+    this.locks = null;
+
+    this.stCnxIdx = null;
+    this.stCnxId  = null;
+
+    this.endCnxIdx = null;
+    this.endCnxId  = null;
+}
+
+    CNvUniSpPr.prototype.Write_ToBinary = function(w){
+        if(AscFormat.isRealNumber(this.locks)){
+            w.WriteBool(true);
+            w.WriteLong(this.locks);
+        }
+        else {
+            w.WriteBool(false);
+        }
+        if(AscFormat.isRealNumber(this.stCnxIdx) && typeof (this.stCnxId) === "string" && this.stCnxId.length > 0){
+            w.WriteBool(true);
+            w.WriteLong(this.stCnxIdx);
+            w.WriteString2(this.stCnxId);
+        }
+        else {
+            w.WriteBool(false);
+        }
+        if(AscFormat.isRealNumber(this.endCnxIdx) && typeof (this.endCnxId) === "string" && this.endCnxId.length > 0){
+            w.WriteBool(true);
+            w.WriteLong(this.endCnxIdx);
+            w.WriteString2(this.endCnxId);
+        }
+        else {
+            w.WriteBool(false);
+        }
+    };
+    CNvUniSpPr.prototype.Read_FromBinary = function(r){
+        var bCnx = r.GetBool();
+        if(bCnx){
+            this.locks = r.GetLong();
+        }
+        else{
+            this.locks = null;
+        }
+        bCnx = r.GetBool();
+        if(bCnx){
+            this.stCnxIdx = r.GetLong();
+            this.stCnxId = r.GetString2();
+        }
+        else{
+            this.stCnxIdx = null;
+            this.stCnxId =  null;
+        }
+        bCnx = r.GetBool();
+        if(bCnx){
+            this.endCnxIdx = r.GetLong();
+            this.endCnxId = r.GetString2();
+        }
+        else{
+            this.endCnxIdx = null;
+            this.endCnxId =  null;
+        }
+    };
+
+    CNvUniSpPr.prototype.copy = function(){
+        var _ret = new CNvUniSpPr();
+        _ret.locks = this.locks;
+        _ret.stCnxId = this.stCnxId;
+        _ret.stCnxIdx = this.stCnxIdx;
+        _ret.endCnxId = this.endCnxId;
+        _ret.endCnxIdx = this.endCnxIdx;
+        return _ret;
+    };
+
 function UniNvPr()
 {
     this.cNvPr = new CNvPr();
     this.UniPr = null;
     this.nvPr = new NvPr();
+    this.nvUniSpPr = new CNvUniSpPr();
     this.Id = g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
@@ -4851,6 +4948,11 @@ UniNvPr.prototype =
     {
         History.Add(new CChangesDrawingsObject(this, AscDFH.historyitem_UniNvPr_SetCNvPr, this.cNvPr, cNvPr));
         this.cNvPr = cNvPr;
+    },
+
+    setUniSpPr: function(pr){
+        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_UniNvPr_SetUniSpPr, this.nvUniSpPr, pr));
+        this.nvUniSpPr = pr;
     },
 
     setUniPr: function(uniPr)
@@ -7471,7 +7573,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteBool(this.spcCol);
+            w.WriteDouble(this.spcCol);
         }
 
         flag = this.spcFirstLastPara != null;
@@ -7622,7 +7724,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.spcCol = r.GetBool();
+            this.spcCol = r.GetDouble();
         }
 
         flag = r.GetBool();
@@ -7940,7 +8042,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteBool(this.spcCol);
+            w.WriteDouble(this.spcCol);
         }
 
         flag = this.spcFirstLastPara != null;
@@ -8089,7 +8191,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.spcCol = r.GetBool();
+            this.spcCol = r.GetDouble();
         }
 
         flag = r.GetBool();
@@ -8304,16 +8406,16 @@ CBullet.prototype =
         return this.bulletType != null && this.bulletType.type != null;
     },
 
-    getPresentationBullet: function()
+    getPresentationBullet: function(theme, color)
     {
         var para_pr = new CParaPr();
         para_pr.Bullet = this;
-        return para_pr.Get_PresentationBullet();
+        return para_pr.Get_PresentationBullet(theme, color);
     },
 
-    getBulletType: function()
+    getBulletType: function(theme, color)
     {
-        return this.getPresentationBullet().m_nType;
+        return this.getPresentationBullet(theme, color).m_nType;
     },
 
     Write_ToBinary: function(w)
@@ -8370,6 +8472,12 @@ CBullet.prototype =
         {
             this.bulletType = new CBulletType();
             this.bulletType.Read_FromBinary(r);
+        }
+    },
+
+    Get_AllFontNames: function(AllFonts){
+        if(this.bulletTypeface && typeof this.bulletTypeface.typeface === "string" && this.bulletTypeface.typeface.length > 0){
+            AllFonts[this.bulletTypeface.typeface] = true;
         }
     }
 
@@ -9513,6 +9621,8 @@ function CreateAscShapePropFromProp(shapeProp)
     }
     obj.title = shapeProp.title;
     obj.description = shapeProp.description;
+    obj.columnNumber = shapeProp.columnNumber;
+    obj.columnSpace = shapeProp.columnSpace;
     return obj;
 }
 
@@ -9992,7 +10102,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oDrawingDocument, oTitle.tx);
             if(AscFormat.isRealNumber(nFontSize)){
                 oTextBody.content.Set_ApplyToAll(true);
-                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
+                oTextBody.content.AddToParagraph(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
                 oTextBody.content.Set_ApplyToAll(false);
             }
             oTitle.tx.setRich(oTextBody);
@@ -10011,7 +10121,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             var oTextBody = AscFormat.CreateTextBodyFromString(sTitle, oChartSpace.getDrawingDocument(), oTitle.tx);
             if(AscFormat.isRealNumber(nFontSize)){
                 oTextBody.content.Set_ApplyToAll(true);
-                oTextBody.content.Paragraph_Add(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
+                oTextBody.content.AddToParagraph(new ParaTextPr({ FontSize : nFontSize, Bold: bIsBold}));
                 oTextBody.content.Set_ApplyToAll(false);
             }
             oTitle.tx.setRich(oTextBody);
@@ -10463,6 +10573,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].CreateUnifillFromAscColor = CreateUnifillFromAscColor;
     window['AscFormat'].CorrectUniColor = CorrectUniColor;
     window['AscFormat'].deleteDrawingBase = deleteDrawingBase;
+    window['AscFormat'].CNvUniSpPr = CNvUniSpPr;
 
 
     window['AscFormat'].builder_CreateShape = builder_CreateShape;

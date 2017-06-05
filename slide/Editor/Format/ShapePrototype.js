@@ -434,6 +434,17 @@ CShape.prototype.getParentObjects = function ()
                     theme: this.themeOverride ? this.themeOverride : this.parent.Theme
                 };
             }
+            case AscDFH.historyitem_type_Notes:
+            {
+                return {
+
+                    presentation: editor.WordControl.m_oLogicDocument,
+                    slide: null,
+                    layout: null,
+                    master: this.parent.Master,
+                    theme: this.themeOverride ? this.themeOverride : (this.parent.Master ? this.parent.Master.Theme : null)
+                }
+            }
         }
     }
     return { slide: null, layout: null, master: null, theme: null};
@@ -450,9 +461,8 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted || !this.parent)
         return;
-    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && this.parent.getObjectType() === AscDFH.historyitem_type_Slide);
+    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && (this.parent.getObjectType() === AscDFH.historyitem_type_Slide || this.parent.getObjectType() === AscDFH.historyitem_type_Notes));
     AscFormat.ExecuteNoHistory(function(){
-
 
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
@@ -672,7 +682,7 @@ CShape.prototype.recalculateContent2 = function()
                 content.Content[0].Pr  = content_.Content[0].Pr;
                 var para_text_pr = new ParaTextPr(content_.Content[0].Get_FirstRunPr());
                 content.Set_ApplyToAll(true);
-                content.Paragraph_Add(para_text_pr);
+                content.AddToParagraph(para_text_pr);
                 content.Set_ApplyToAll(false);
             }
             content.Set_StartPage(0);
@@ -743,7 +753,8 @@ CShape.prototype.getIsSingleBody = function(x, y)
 {
     if(!this.isPlaceholder())
         return false;
-    if(this.getPlaceholderType() !== AscFormat.phType_body)
+    var ph_type = this.getPlaceholderType();
+    if(this.getPlaceholderType() !== AscFormat.phType_body && ph_type !== null)
         return false;
     if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
     {
@@ -783,6 +794,12 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
             editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
             editor.WordControl.GoToPage(this.parent.num);
         }
+    }
+};
+
+CShape.prototype.OnContentReDraw = function(){
+    if(AscCommonSlide && this.parent instanceof AscCommonSlide.Slide){
+        editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(this.parent.num, editor.WordControl.m_oLogicDocument.Slides[this.parent.num]);
     }
 };
 

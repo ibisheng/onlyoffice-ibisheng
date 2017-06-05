@@ -690,7 +690,7 @@ function CMasterThumbnailDrawer()
         *   var docContent = new CDocumentContent(this.m_oWordControl.m_oLogicDocument, this.m_oWordControl.m_oDrawingDocument, 0, 0,1000, 1000, false, false, true);
          var par = docContent.Content[0];
 
-         par.Cursor_MoveToStartPos();
+         par.MoveCursorToStartPos();
 
          par.Set_Pr(new CParaPr());
          var _textPr = new CTextPr();
@@ -733,7 +733,7 @@ function CMasterThumbnailDrawer()
 
         var docContent = new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0,1000, 1000, false, false, true);
         var par = docContent.Content[0];
-        par.Cursor_MoveToStartPos();
+        par.MoveCursorToStartPos();
         var _paraPr = new CParaPr();
         par.Pr = _paraPr;
         var parRun = new ParaRun(par);

@@ -249,7 +249,27 @@ var editor;
     }
     return AscCommonExcel.getCurrencyFormat(cultureInfo, 2, true, true);
   };
-  spreadsheet_api.prototype.asc_setLocale = function(val) {
+
+
+  spreadsheet_api.prototype.asc_getCurrentListType = function(){
+      var ws = this.wb.getWorksheet();
+      var oParaPr;
+      if (ws && ws.objectRender && ws.objectRender.controller) {
+          oParaPr = ws.objectRender.controller.getParagraphParaPr();
+      }
+      return new AscCommon.asc_CListType(AscFormat.fGetListTypeFromBullet(oParaPr && oParaPr.Bullet));
+  };
+
+    spreadsheet_api.prototype.asc_setListType = function(type, subtype){
+        var ws = this.wb.getWorksheet();
+        var oParaPr;
+        if (ws && ws.objectRender && ws.objectRender.controller) {
+            ws.objectRender.setListType(type, subtype);
+        }
+    };
+
+
+    spreadsheet_api.prototype.asc_setLocale = function(val) {
     if (!this.isLoadFullApi) {
       this.tmpLocale = val;
       return;
@@ -269,6 +289,9 @@ var editor;
       }
     }
   };
+	spreadsheet_api.prototype.asc_getLocale = function() {
+		return AscCommon.g_oDefaultCultureInfo.LCID;
+	};
 
   spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
     this.CoAuthoringApi.auth(this.getViewMode());
@@ -401,6 +424,12 @@ var editor;
 	if (!this.getViewMode()) {
       this.wb.specialPasteData(props);
     }
+  };
+
+  spreadsheet_api.prototype.asc_ShowSpecialPasteButton = function(props) {
+      if (!this.getViewMode()) {
+          this.wb.showSpecialPasteButton(props);
+      }
   };
 
   spreadsheet_api.prototype.asc_Cut = function() {
@@ -540,11 +569,6 @@ var editor;
 	return this.wb.getTablePictures(props); 
   };
 
-  spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
-    this.isMobileVersion = isMobile;
-    AscCommon.AscBrowser.isMobileVersion = isMobile;
-  };
-
   spreadsheet_api.prototype.getViewMode = function() {
     return this.isViewMode;
   };
@@ -558,21 +582,6 @@ var editor;
     if (this.collaborativeEditing) {
       this.collaborativeEditing.setViewerMode(isViewMode);
     }
-
-    if (false === isViewMode) {
-      // Загружаем не обрезанные шрифты для полной версии (при редактировании)
-      if (this.FontLoader.embedded_cut_manager.bIsCutFontsUse) {
-        this.FontLoader.embedded_cut_manager.bIsCutFontsUse = false;
-        this.asyncMethodCallback = undefined;
-        this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
-      }
-
-      this.isUseEmbeddedCutFonts = false;
-    }
-  };
-
-  spreadsheet_api.prototype.asc_setUseEmbeddedCutFonts = function(bUse) {
-    this.isUseEmbeddedCutFonts = bUse;
   };
 
   /*
@@ -592,8 +601,8 @@ var editor;
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
-            "embeddedfonts": this.isUseEmbeddedCutFonts,
             "delimiter": option.asc_getDelimiter(),
+            "delimiterChar": option.asc_getDelimiterChar(),
             "codepage": option.asc_getCodePage()};
 
           sendCommand(this, null, v);
@@ -613,7 +622,6 @@ var editor;
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
-            "embeddedfonts": this.isUseEmbeddedCutFonts,
             "password": option.asc_getPassword()
           };
 
@@ -637,8 +645,9 @@ var editor;
     var t = this;
     // Проверяем, возможно нам пришли опции для CSV
     if (this.documentOpenOptions && !opt_isPassword) {
-      var codePageCsv = AscCommon.c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || AscCommon.c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"];
-      if (null != codePageCsv && null != delimiterCsv) {
+      var codePageCsv = AscCommon.c_oAscEncodingsMap[this.documentOpenOptions["codePage"]] || AscCommon.c_oAscCodePageUtf8, delimiterCsv = this.documentOpenOptions["delimiter"],
+		  delimiterCharCsv = this.documentOpenOptions["delimiterChar"];
+      if (null != codePageCsv && (null != delimiterCsv || null != delimiterCharCsv)) {
         this.asc_setAdvancedOptions(c_oAscAdvancedOptionsID.CSV, new asc.asc_CCSVAdvancedOptions(codePageCsv, delimiterCsv));
         return;
       }
@@ -763,6 +772,7 @@ var editor;
         if (options.CSVOptions instanceof asc.asc_CCSVAdvancedOptions) {
           oAdditionalData["codepage"] = options.CSVOptions.asc_getCodePage();
           oAdditionalData["delimiter"] = options.CSVOptions.asc_getDelimiter();
+          oAdditionalData["delimiterChar"] = options.CSVOptions.asc_getDelimiterChar();
         }
       }
       dataContainer.data = oBinaryFileWriter.Write();
@@ -2367,11 +2377,11 @@ var editor;
     return this.wb.cellCommentator.getDocumentComments();
   };
 
-  spreadsheet_api.prototype.asc_showComments = function () {
-    this.wb.showComments(true);
+  spreadsheet_api.prototype.asc_showComments = function (isShowSolved) {
+    this.wb.showComments(true, isShowSolved);
   };
   spreadsheet_api.prototype.asc_hideComments = function () {
-    this.wb.showComments(false);
+    this.wb.showComments(false, false);
   };
 
   // Shapes
@@ -2657,6 +2667,26 @@ var editor;
 		};
 		this._isLockedSparkline(id, changeSparkline);
 	};
+
+    spreadsheet_api.prototype.asc_setListType = function (type, subtype) {
+      var t = this;
+      if(type === 0){
+          var t = this, fonts = {};
+          fonts["Wingdings"] = 1;
+          t._loadFonts(fonts, function() {t.asc_setListType2(type, subtype);});
+      }
+      else{
+          t.asc_setListType2(type, subtype);
+      }
+    };
+    spreadsheet_api.prototype.asc_setListType2 = function (type, subtype) {
+        var oWorksheet = this.wb.getWorksheet();
+        if(oWorksheet){
+            if(oWorksheet.isSelectOnShape){
+                return oWorksheet.objectRender.setListType(type, subtype);
+            }
+        }
+    };
 
   // Cell interface
   spreadsheet_api.prototype.asc_getCellInfo = function() {
@@ -3322,10 +3352,6 @@ var editor;
 	spreadsheet_api.prototype._onEndLoadSdk = function () {
 		History = AscCommon.History;
 
-		if (this.isMobileVersion) {
-			this.asc_setMobileVersion(true);
-		}
-
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
 		this.controller = new AscCommonExcel.asc_CEventsController();
@@ -3359,6 +3385,7 @@ var editor;
 	prot['asc_getFormatCells'] = prot.asc_getFormatCells;
   prot["asc_getLocaleCurrency"] = prot.asc_getLocaleCurrency;
   prot["asc_setLocale"] = prot.asc_setLocale;
+  prot["asc_getLocale"] = prot.asc_getLocale;
   prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
   prot["asc_LoadDocument"] = prot.asc_LoadDocument;
   prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;
@@ -3383,9 +3410,7 @@ var editor;
 
   prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 
-  prot["asc_setMobileVersion"] = prot.asc_setMobileVersion;
   prot["asc_setViewMode"] = prot.asc_setViewMode;
-  prot["asc_setUseEmbeddedCutFonts"] = prot.asc_setUseEmbeddedCutFonts;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;
@@ -3596,6 +3621,8 @@ var editor;
   prot["asc_setFontRenderingMode"] = prot.asc_setFontRenderingMode;
   prot["asc_setSelectionDialogMode"] = prot.asc_setSelectionDialogMode;
   prot["asc_ChangeColorScheme"] = prot.asc_ChangeColorScheme;
+  prot["asc_setListType"] = prot.asc_setListType;
+  prot["asc_getCurrentListType"] = prot.asc_getCurrentListType;
   /////////////////////////////////////////////////////////////////////////
   ///////////////////CoAuthoring and Chat api//////////////////////////////
   /////////////////////////////////////////////////////////////////////////

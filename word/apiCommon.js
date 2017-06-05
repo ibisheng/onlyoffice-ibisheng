@@ -1171,7 +1171,7 @@
 			this.Italic = false;
 			this.Underline = false;
 			this.Strikeout = false;
-			this.FontFamily = new asc_CTextFontFamily();
+			this.FontFamily = new AscCommon.asc_CTextFontFamily();
 			this.FontSize = 12;
 			this.Color = AscCommon.CreateAscColorCustom(0, 0, 0);
 			this.VertAlign = AscCommon.vertalign_Baseline;
@@ -1330,7 +1330,7 @@
 			if (!_style || _style.Type != styletype_Table)
 				continue;
 
-			var table = new CTable(drawingDoc, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
+			var table = new CTable(drawingDoc, logicDoc, true, Rows, Cols, Grid);
 			table.Set_Props({TableStyle: i});
 
 			for (var j = 0; j < Rows; j++)
@@ -1344,6 +1344,7 @@
 			graphics.m_oFontManager = AscCommon.g_fontManager;
 			graphics.transform(1, 0, 0, 1, 0, 0);
 
+			table.Reset(_x_mar, _y_mar, 1000, 1000, 0, 0, 1);
 			table.Recalculate_Page(0);
 			table.Draw(0, graphics);
 

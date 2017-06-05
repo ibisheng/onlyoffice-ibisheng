@@ -2764,11 +2764,11 @@ CStyle.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 
@@ -3107,12 +3107,12 @@ CStyle.prototype =
             if (this.Id != Styles.Default.Paragraph)
             {
                 var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
                 LogicDocument.Add_ChangedStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
                 LogicDocument.Add_ChangedStyle([this.Id]);
             }
 
@@ -4303,11 +4303,11 @@ CStyles.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 
@@ -4351,11 +4351,11 @@ CStyles.prototype =
             if (StyleId != this.Default.Paragraph)
             {
                 var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
             }
 
             var Count = AllParagraphs.length;
@@ -4384,11 +4384,11 @@ CStyles.prototype =
             if (StyleId != this.Default.Paragraph)
             {
                 var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
             }
 
             var Count = AllParagraphs.length;
@@ -9938,7 +9938,7 @@ CParaPr.prototype =
         return true;
     },
 
-    Get_PresentationBullet: function()
+    Get_PresentationBullet: function(theme, colorMap)
     {
         var Bullet = new CPresentationBullet();
         if(this.Bullet && this.Bullet.isBullet())
@@ -9984,6 +9984,22 @@ CParaPr.prototype =
                     Bullet.m_nType = numbering_presentationnumfrmt_Char;
                     Bullet.m_sChar = "•";
                     break;
+                }
+            }
+
+            if(this.Bullet.bulletColor){
+                if(this.Bullet.bulletColor.type === AscFormat.BULLET_TYPE_COLOR_NONE){
+                    Bullet.m_bColorTx = false;
+                    Bullet.m_oColor.a = 0;
+                }
+                if(this.Bullet.bulletColor.type === AscFormat.BULLET_TYPE_COLOR_CLR){
+                    if(this.Bullet.bulletColor.UniColor && this.Bullet.bulletColor.UniColor.color && theme && colorMap){
+                        Bullet.m_bColorTx = false;
+                        this.Bullet.bulletColor.UniColor.check(theme, colorMap);
+                        Bullet.m_oColor.r = this.Bullet.bulletColor.UniColor.RGBA.R;
+                        Bullet.m_oColor.g = this.Bullet.bulletColor.UniColor.RGBA.G;
+                        Bullet.m_oColor.b = this.Bullet.bulletColor.UniColor.RGBA.B;
+                    }
                 }
             }
         }

@@ -300,7 +300,7 @@ function setTimeout(func, interval) {
 
     var id = window["native"]["GenerateTimeoutId"](interval);
     window.NativeTimeoutObject["" + id] = {"func": func, repeat: false};
-   
+
     return id;
 }
 
@@ -318,7 +318,7 @@ function setInterval(func, interval) {
 
     var id = window["native"]["GenerateTimeoutId"](interval);
     window.NativeTimeoutObject["" + id] = {func: func, repeat: true, interval: interval};
-    
+
     return id;
 }
 function clearInterval(id) {
@@ -334,26 +334,26 @@ function offline_timeoutFire(id) {
         return;
 
     var prop = "" + id;
-    
+
     if (undefined === window.NativeTimeoutObject[prop]) {
         return;
     }
-    
+
     var func = window.NativeTimeoutObject[prop].func;
     var repeat = window.NativeTimeoutObject[prop].repeat;
     var interval = window.NativeTimeoutObject[prop].interval;
-   
+
     window.NativeTimeoutObject[prop] = undefined;
 
     if (!func)
         return;
 
     func.call(null);
-    
+
     if (repeat) {
         setInterval(func, interval);
     }
-    
+
     func = null;
 }
 
@@ -363,7 +363,7 @@ window.clearInterval = clearInterval;
 window.setInterval = setInterval;
 
 var console = {
-    log : function(param) { window.native.consoleLog(param); },
+    log : function(param) { window["native"]["consoleLog"](param); },
     time : function (param) {},
     timeEnd : function (param) {}
 };

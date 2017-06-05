@@ -280,7 +280,7 @@
                         if (true === Element.Is_EmptyPage(ElementPageIndex))
                             oColumn.Empty = true;
                     }
-                    for (var TempColumnIndex = ColumnIndex + 1; TempColumnIndex < ColumnsCount; ++TempColumnIndex)
+                    for (var TempColumnIndex = nColumnIndex + 1; TempColumnIndex < nColumnsCount; ++TempColumnIndex)
                     {
                         oSection.Columns[TempColumnIndex].Empty  = true;
                         oSection.Columns[TempColumnIndex].Pos    = i;
@@ -312,7 +312,7 @@
                     for (var TempColumnIndex = nColumnIndex + 1; TempColumnIndex < nColumnsCount; ++TempColumnIndex)
                     {
                         var ElementPageIndex = this.private_GetElementPageIndex(i, nPageIndex, TempColumnIndex, nColumnsCount);
-                        this.Content[Index].Recalculate_SkipPage(ElementPageIndex);
+                        this.Content[i].Recalculate_SkipPage(ElementPageIndex);
                         oSection.Columns[TempColumnIndex].Empty  = true;
                         oSection.Columns[TempColumnIndex].Pos    = i;
                         oSection.Columns[TempColumnIndex].EndPos = i - 1;
@@ -435,7 +435,7 @@
         return false;
     };
 
-    CDrawingDocContent.prototype.Selection_Draw_Page = function(PageIndex){
+    CDrawingDocContent.prototype.DrawSelectionOnPage = function(PageIndex){
         var CurPage = PageIndex;
         if (CurPage < 0 || CurPage >= this.Pages.length)
             return;
@@ -463,7 +463,7 @@
                     for (var Index = Start; Index <= End; Index++)
                     {
                         var ElementPageIndex = this.private_GetElementPageIndex(Index, CurPage, 0, 1);
-                        this.Content[Index].Selection_Draw_Page(ElementPageIndex);
+                        this.Content[Index].DrawSelectionOnPage(ElementPageIndex);
                     }
                 }
                 else{
@@ -488,7 +488,7 @@
                         for (var Index = Start; Index <= End; ++Index)
                         {
                             var ElementPage = this.private_GetElementPageIndex(Index, 0, ColumnIndex, ColumnsCount);
-                            this.Content[Index].Selection_Draw_Page(ElementPage);
+                            this.Content[Index].DrawSelectionOnPage(ElementPage);
                         }
 
                     }

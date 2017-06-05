@@ -205,11 +205,11 @@ ParaDrawing.prototype.Set_WidthVisible = function(WidthVisible)
 {
 	this.WidthVisible = WidthVisible;
 };
-ParaDrawing.prototype.Get_SelectedContent = function(SelectedContent)
+ParaDrawing.prototype.GetSelectedContent = function(SelectedContent)
 {
-	if (this.GraphicObj && this.GraphicObj.Get_SelectedContent)
+	if (this.GraphicObj && this.GraphicObj.GetSelectedContent)
 	{
-		this.GraphicObj.Get_SelectedContent(SelectedContent);
+		this.GraphicObj.GetSelectedContent(SelectedContent);
 	}
 };
 ParaDrawing.prototype.Search_GetId = function(bNext, bCurrent)
@@ -229,15 +229,15 @@ ParaDrawing.prototype.CheckCorrect = function(){
 	return true;
 };
 
-ParaDrawing.prototype.Get_AllDrawingObjects = function(DrawingObjects)
+ParaDrawing.prototype.GetAllDrawingObjects = function(DrawingObjects)
 {
 	if (null == DrawingObjects)
 	{
 		DrawingObjects = [];
 	}
-	if (this.GraphicObj.Get_AllDrawingObjects)
+	if (this.GraphicObj.GetAllDrawingObjects)
 	{
-		this.GraphicObj.Get_AllDrawingObjects(DrawingObjects);
+		this.GraphicObj.GetAllDrawingObjects(DrawingObjects);
 	}
 };
 ParaDrawing.prototype.canRotate = function()
@@ -969,7 +969,7 @@ ParaDrawing.prototype.Measure = function()
 		}
 	}
 };
-ParaDrawing.prototype.Save_RecalculateObject = function(Copy)
+ParaDrawing.prototype.SaveRecalculateObject = function(Copy)
 {
 	var DrawingObj = {};
 
@@ -995,7 +995,7 @@ ParaDrawing.prototype.Save_RecalculateObject = function(Copy)
 
 	return DrawingObj;
 };
-ParaDrawing.prototype.Load_RecalculateObject = function(RecalcObj)
+ParaDrawing.prototype.LoadRecalculateObject = function(RecalcObj)
 {
 	this.updatePosition3(RecalcObj.PageNum, RecalcObj.X, RecalcObj.Y);
 	this.GraphicObj.setRecalcObject(RecalcObj.spRecaclcObject);
@@ -1007,7 +1007,7 @@ ParaDrawing.prototype.Reassign_ImageUrls = function(mapUrls)
 		this.GraphicObj.Reassign_ImageUrls(mapUrls);
 	}
 };
-ParaDrawing.prototype.Prepare_RecalculateObject = function()
+ParaDrawing.prototype.PrepareRecalculateObject = function()
 {
 };
 ParaDrawing.prototype.Is_RealContent = function()
@@ -1074,10 +1074,10 @@ ParaDrawing.prototype.setParagraphTabs = function(tabs)
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.setParagraphTabs === "function")
 		this.GraphicObj.setParagraphTabs(tabs);
 };
-ParaDrawing.prototype.Selection_Is_TableBorderMove = function()
+ParaDrawing.prototype.IsMovingTableBorder = function()
 {
-	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.Selection_Is_TableBorderMove === "function")
-		return this.GraphicObj.Selection_Is_TableBorderMove();
+	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.IsMovingTableBorder === "function")
+		return this.GraphicObj.IsMovingTableBorder();
 	return false;
 };
 ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimits, PageLimitsOrigin, LineNum)
@@ -1098,8 +1098,12 @@ ParaDrawing.prototype.Update_Position = function(Paragraph, ParaLayout, PageLimi
 		this.PositionV.Percent      = this.PositionV_Old.Percent2;
 	}
 
+	var oDocumentContent = this.Parent.Parent;
+	if (oDocumentContent && oDocumentContent.IsBlockLevelSdtContent())
+		oDocumentContent = oDocumentContent.Parent.Parent;
+
 	this.Parent          = Paragraph;
-	this.DocumentContent = this.Parent.Parent;
+	this.DocumentContent = oDocumentContent;
 	var PageNum          = ParaLayout.PageNum;
 
 	var OtherFlowObjects = editor.WordControl.m_oLogicDocument.DrawingObjects.getAllFloatObjectsOnPage(PageNum, this.Parent.Parent);
@@ -1476,7 +1480,7 @@ ParaDrawing.prototype.Add_ToDocument2 = function(Paragraph)
 
 	Paragraph.Add_ToContent(0, DrawingRun);
 };
-ParaDrawing.prototype.Update_CursorType = function(X, Y, PageIndex)
+ParaDrawing.prototype.UpdateCursorType = function(X, Y, PageIndex)
 {
 	this.DrawingDocument.SetCursorType("move", new AscCommon.CMouseMoveData());
 
@@ -1972,10 +1976,10 @@ ParaDrawing.prototype.Get_PageNum = function()
 {
 	return this.PageNum;
 };
-ParaDrawing.prototype.Get_AllParagraphs = function(Props, ParaArray)
+ParaDrawing.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
-	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.Get_AllParagraphs === "function")
-		this.GraphicObj.Get_AllParagraphs(Props, ParaArray);
+	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.GetAllParagraphs === "function")
+		this.GraphicObj.GetAllParagraphs(Props, ParaArray);
 };
 ParaDrawing.prototype.getTableProps = function()
 {
@@ -2113,6 +2117,11 @@ ParaDrawing.prototype.addInlineImage = function(W, H, Img, chart, bFlow)
 {
 	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.addInlineImage === "function")
 		this.GraphicObj.addInlineImage(W, H, Img, chart, bFlow);
+};
+ParaDrawing.prototype.addSignatureLine = function(oSignatureDrawing)
+{
+	if (isRealObject(this.GraphicObj) && typeof this.GraphicObj.addSignatureLine === "function")
+		this.GraphicObj.addSignatureLine(oSignatureDrawing);
 };
 ParaDrawing.prototype.canAddComment = function()
 {
@@ -2443,8 +2452,8 @@ ParaDrawing.prototype.private_ConvertToMathObject = function(isOpen)
 		if (!isOpen)
 		{
 			// Устанавливаем курсор в начало правого элемента, полученного после Split
-			LogicDocument.Selection_Remove();
-			RightElement.Cursor_MoveToStartPos();
+			LogicDocument.RemoveSelection();
+			RightElement.MoveCursorToStartPos();
 			Para.CurPos.ContentPos = TopElementPos + 2;
 			Para.Document_SetThisElementCurrent(false);
 
@@ -2465,6 +2474,27 @@ ParaDrawing.prototype.Get_ObjectType = function()
 		return this.GraphicObj.getObjectType();
 
 	return AscDFH.historyitem_type_Drawing;
+};
+ParaDrawing.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if(this.GraphicObj)
+	{
+		this.GraphicObj.GetAllContentControls(arrContentControls);
+	}
+};
+
+
+ParaDrawing.prototype.CheckContentControlEditingLock = function(){
+	if(this.DocumentContent && this.DocumentContent.CheckContentControlEditingLock){
+        this.DocumentContent.CheckContentControlEditingLock();
+	}
+};
+
+
+ParaDrawing.prototype.CheckContentControlDeletingLock = function(){
+	if(this.DocumentContent && this.DocumentContent.CheckContentControlDeletingLock){
+        this.DocumentContent.CheckContentControlDeletingLock();
+	}
 };
 
 /**

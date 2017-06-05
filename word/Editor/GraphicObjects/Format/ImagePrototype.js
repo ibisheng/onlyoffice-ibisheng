@@ -224,7 +224,6 @@ CImageShape.prototype.getRecalcObject = CShape.prototype.getRecalcObject;
 CImageShape.prototype.setRecalcObject = CShape.prototype.setRecalcObject;
 CImageShape.prototype.checkContentDrawings = function()
 {};
-CImageShape.prototype.hit = CShape.prototype.hit;
 CImageShape.prototype.checkShapeChildTransform = function()
 {
 };

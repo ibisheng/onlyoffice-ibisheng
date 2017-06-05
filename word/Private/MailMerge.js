@@ -255,7 +255,7 @@ CDocument.prototype.Add_MailMergeField = function(Name)
         oField.Add_ToContent(0, oRun);
 
         this.Register_Field(oField);
-        this.Paragraph_Add(oField);
+        this.AddToParagraph(oField);
         this.Document_UpdateInterfaceState();
     }
 };
@@ -278,7 +278,7 @@ CDocument.prototype.Preview_MailMergeResult = function(Index)
     if (true !== this.MailMergePreview)
     {
         this.MailMergePreview = true;
-        this.Selection_Remove();
+        this.RemoveSelection();
         AscCommon.CollaborativeEditing.Set_GlobalLock(true);
     }
 
@@ -393,7 +393,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
         }
 
         // Добавляем дополнительный параграф с окончанием секции
-        var SectionPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+        var SectionPara = new Paragraph(this.DrawingDocument, this);
         var SectPr = new CSectionPr();
         SectPr.Copy(this.SectPr, true);
         SectPr.Set_Type(c_oAscSectionBreakType.NextPage);
@@ -407,7 +407,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     this.ForceCopySectPr  = false;
 
     // Добавляем дополнительный параграф в самом конце для последней секции документа
-    var SectPara = new Paragraph(this.DrawingDocument, this, 0, 0, 0, 0, 0);
+    var SectPara = new Paragraph(this.DrawingDocument, this);
     LogicDocument.Content[OverallIndex++] = SectPara;
     LogicDocument.SectPr.Copy(this.SectPr);
     LogicDocument.SectPr.Set_Type(c_oAscSectionBreakType.Continuous);

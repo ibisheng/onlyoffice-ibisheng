@@ -186,8 +186,6 @@ CChartSpace.prototype.getNumByCardDirection = CShape.prototype.getNumByCardDirec
 CChartSpace.prototype.getCardDirectionByNum = CShape.prototype.getCardDirectionByNum;
 CChartSpace.prototype.getResizeCoefficients = CShape.prototype.getResizeCoefficients;
 CChartSpace.prototype.check_bounds = CShape.prototype.check_bounds;
-CChartSpace.prototype.getFullFlipH = CShape.prototype.getFullFlipH;
-CChartSpace.prototype.getFullFlipV = CShape.prototype.getFullFlipV;
 CChartSpace.prototype.setWorksheet = CShape.prototype.setWorksheet;
 CChartSpace.prototype.handleUpdateLn = function()
 {
@@ -554,7 +552,7 @@ CTable.prototype.Get_RightTableOffsetCorrection = function()
 {
     return 0;
 };
-CTable.prototype.Selection_Draw_Page = function(CurPage)
+CTable.prototype.DrawSelectionOnPage = function(CurPage)
 {
     if (false === this.Selection.Use)
         return;
@@ -575,7 +573,7 @@ CTable.prototype.Selection_Draw_Page = function(CurPage)
                 var Row      = this.Content[Pos.Row];
                 var Cell     = Row.Get_Cell(Pos.Cell);
                 var CellInfo = Row.Get_CellInfo(Pos.Cell);
-                var CellMar  = Cell.Get_Margins();
+                var CellMar  = Cell.GetMargins();
 
                 var X_start = Page.X + CellInfo.X_cell_start;
                 var X_end   = Page.X + CellInfo.X_cell_end;
@@ -607,7 +605,7 @@ CTable.prototype.Selection_Draw_Page = function(CurPage)
         {
             var Cell = this.Content[this.Selection.StartPos.Pos.Row].Get_Cell(this.Selection.StartPos.Pos.Cell);
             var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
-            Cell.Content.Selection_Draw_Page(Cell_PageRel);
+            Cell.Content.DrawSelectionOnPage(Cell_PageRel);
             break;
         }
     }

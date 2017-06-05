@@ -1499,7 +1499,7 @@ CEqArray.prototype.setJustificationForConversion = function(js) // эта фун
         {
             NewElement = new CMathAmp();
             Run = this.Content[i].Content[0];
-            Run.Cursor_MoveToStartPos();
+            Run.MoveCursorToStartPos();
             Run.Add(NewElement, true);
         }
     }
@@ -1510,7 +1510,7 @@ CEqArray.prototype.setJustificationForConversion = function(js) // эта фун
             NewElement = new CMathAmp();
             var EndPos = this.Content[i].Content.length - 1;
             Run = this.Content[i].Content[EndPos];
-            Run.Cursor_MoveToEndPos();
+            Run.MoveCursorToEndPos();
             Run.Add(NewElement, true);
         }
     }
