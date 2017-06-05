@@ -390,6 +390,7 @@
 	cXOR.prototype = Object.create(cBaseFunction.prototype);
 	cXOR.prototype.constructor = cXOR;
 	cXOR.prototype.argumentsMin = 1;
+	cXOR.prototype.argumentsMax = 254;
 	cXOR.prototype.isXLFN = true;
 	cXOR.prototype.Calculate = function (arg) {
 		var argResult = null;
