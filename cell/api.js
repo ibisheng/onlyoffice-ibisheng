@@ -2377,11 +2377,11 @@ var editor;
     return this.wb.cellCommentator.getDocumentComments();
   };
 
-  spreadsheet_api.prototype.asc_showComments = function () {
-    this.wb.showComments(true);
+  spreadsheet_api.prototype.asc_showComments = function (isShowSolved) {
+    this.wb.showComments(true, isShowSolved);
   };
   spreadsheet_api.prototype.asc_hideComments = function () {
-    this.wb.showComments(false);
+    this.wb.showComments(false, false);
   };
 
   // Shapes

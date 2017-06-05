@@ -176,7 +176,8 @@
 
     this.isCellEditMode = false;
 
-    this.isShowComments = true;
+	  this.isShowComments = true;
+	  this.isShowSolved = true;
 
     this.formulasList = [];		// Список всех формул
     this.lastFormulaPos = -1; 		// Последняя позиция формулы
@@ -835,6 +836,9 @@
     this.handlers.add('hiddenComments', function () {
       return !self.isShowComments;
     });
+	  this.handlers.add('showSolved', function () {
+		  return self.isShowSolved;
+	  });
 	this.model.handlers.add("hideSpecialPasteOptions", function() {
       if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
 	  {
@@ -2572,12 +2576,13 @@
     this.isDocumentPlaceChangedEnabled = val;
   };
 
-  WorkbookView.prototype.showComments = function (val) {
-    if (this.isShowComments !== val) {
-      this.isShowComments = val;
-      this.drawWS();
-    }
-  };
+	WorkbookView.prototype.showComments = function (val, isShowSolved) {
+		if (this.isShowComments !== val || this.isShowSolved !== isShowSolved) {
+			this.isShowComments = val;
+			this.isShowSolved = isShowSolved;
+			this.drawWS();
+		}
+	};
 
   /*
    * @param {c_oAscRenderingModeType} mode Режим отрисовки
