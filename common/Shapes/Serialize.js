@@ -1362,7 +1362,7 @@ function BinaryPPTYLoader()
                             case 1:
                             {
                                 var _Unicolor = this.ReadUniColor();
-                                if(_Unicolor.color)
+                                if(_Unicolor && _Unicolor.color)
                                 {
                                     _part.TextPr.Unifill = new AscFormat.CUniFill();
                                     _part.TextPr.Unifill.fill = new AscFormat.CSolidFill();
@@ -1674,6 +1674,10 @@ function BinaryPPTYLoader()
                     break;
                 }
             }
+        }
+
+        if(!uni_color.color){
+            return null;
         }
 
         s.Seek2(read_end);
@@ -2394,7 +2398,10 @@ function BinaryPPTYLoader()
                     }
                     else
                     {
-                        uni_fill.fill.color.setMods(new AscFormat.CColorModifiers());
+                        if(uni_fill.fill.color){
+                            uni_fill.fill.color.setMods(new AscFormat.CColorModifiers());
+                        }
+
                     }
                     break;
                 }

@@ -6320,6 +6320,10 @@ PasteProcessor.prototype =
 
                         //��������� ������� ����� ���� �� ���������
                         this._commit_rPr(oTargetNode, bUseOnlyInherit);
+
+                        //TODO поправить проблему с лишними прообелами в начале новой строки при копировании из MS EXCEL ячеек с текстом, разделенным alt+enter
+						//bIsPreviuosSpace - игнорируем несколько пробелов подряд
+						var bIsPreviuosSpace = false;
                         for(var i = 0, length = value.length; i < length; i++)
                         {
                             var nUnicode = null;
@@ -6338,9 +6342,15 @@ PasteProcessor.prototype =
                                 if (0x20 != nUnicode && 0x2009 != nUnicode) {
                                     Item = new ParaText();
                                     Item.Set_CharCode(nUnicode);
+									bIsPreviuosSpace = false;
                                 }
-                                else
+								else{
                                     Item = new ParaSpace();
+									if(bIsPreviuosSpace){
+										continue;
+									}
+									bIsPreviuosSpace = true;
+								}
                                 this._Paragraph_Add(Item);
                             }
                         }
