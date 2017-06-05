@@ -7573,7 +7573,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteBool(this.spcCol);
+            w.WriteDouble(this.spcCol);
         }
 
         flag = this.spcFirstLastPara != null;
@@ -7724,7 +7724,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.spcCol = r.GetBool();
+            this.spcCol = r.GetDouble();
         }
 
         flag = r.GetBool();
@@ -8042,7 +8042,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteBool(this.spcCol);
+            w.WriteDouble(this.spcCol);
         }
 
         flag = this.spcFirstLastPara != null;
@@ -8191,7 +8191,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.spcCol = r.GetBool();
+            this.spcCol = r.GetDouble();
         }
 
         flag = r.GetBool();
