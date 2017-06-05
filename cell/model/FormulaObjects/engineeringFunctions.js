@@ -2973,6 +2973,7 @@
 	cIMSINH.prototype.constructor = cIMSINH;
 	cIMSINH.prototype.argumentsMin = 1;
 	cIMSINH.prototype.argumentsMax = 1;
+	cIMSINH.prototype.isXLFN = true;
 	cIMSINH.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
