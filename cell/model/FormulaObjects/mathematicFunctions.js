@@ -638,7 +638,7 @@
 		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
 
 		var argError;
-		if(false !== (argError = this._checkErrorArg(argClone))){
+		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 
@@ -801,7 +801,7 @@
 		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
 
 		var argError;
-		if(false !== (argError = this._checkErrorArg(argClone))){
+		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 
@@ -856,7 +856,7 @@
 		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
 
 		var argError;
-		if(false !== (argError = this._checkErrorArg(argClone))){
+		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 
@@ -995,7 +995,7 @@
 		argClone[1] = argClone[1].tocNumber();
 
 		var argError;
-		if(false !== (argError = this._checkErrorArg(argClone))){
+		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 
@@ -1360,7 +1360,7 @@
 		argClone[1] = argClone[1].tocNumber();
 
 		var argError;
-		if(false !== (argError = this._checkErrorArg(argClone))){
+		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 
@@ -1833,7 +1833,7 @@
 		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
 
 		var argError;
-		if(false !== (argError = this._checkErrorArg(argClone))){
+		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 
@@ -1885,7 +1885,7 @@
 		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
 
 		var argError;
-		if(false !== (argError = this._checkErrorArg(argClone))){
+		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 
@@ -2088,7 +2088,7 @@
 		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
 
 		var argError;
-		if(false !== (argError = this._checkErrorArg(argClone))){
+		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 

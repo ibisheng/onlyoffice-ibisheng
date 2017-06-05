@@ -2415,15 +2415,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return arg;
 	};
 	cBaseFunction.prototype._checkErrorArg = function (argArray) {
-		var res = false;
-		for(var i = 0; i < argArray.length; i++)
-		{
-			if(argArray[i] instanceof cError)
-			{
+		for (var i = 0; i < argArray.length; i++) {
+			if (cElementType.error === argArray[i].type) {
 				return argArray[i];
 			}
 		}
-		return res;
+		return null;
 	};
 
 	/** @constructor */
