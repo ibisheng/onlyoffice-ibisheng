@@ -1359,6 +1359,7 @@
 		this.bUndoChanges = false;
 		this.bRedoChanges = false;
 		this.aCollaborativeChangeElements = [];
+		this.externalReferences = [];
 
 		this.wsHandlers = null;
 
