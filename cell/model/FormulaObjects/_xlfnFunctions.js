@@ -74,7 +74,7 @@
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
 	cFormulaFunctionGroup['Information'].push(cISFORMULA, cSHEET, cSHEETS);
 	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
-	cFormulaFunctionGroup['Logical'].push(cIFNA, cXOR);
+	cFormulaFunctionGroup['Logical'].push(cIFNA);
 
 	/**
 	 * @constructor
@@ -1143,18 +1143,6 @@
 
 	cWEIBULL_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cWEIBULL_DIST.prototype.constructor = cWEIBULL_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cXOR() {
-		cBaseFunction.call(this, "XOR");
-		this.isXLFN = true;
-	}
-
-	cXOR.prototype = Object.create(cBaseFunction.prototype);
-	cXOR.prototype.constructor = cXOR;
 
 	/**
 	 * @constructor
