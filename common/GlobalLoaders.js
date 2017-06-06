@@ -438,6 +438,11 @@
         this.bIsLoadDocumentImagesNoByOrder = true;
         this.nNoByOrderCounter = 0;
 
+        this.loadImageCallBackCounter = 0;
+        this.loadImageCallBackCounterMax = 0;
+        this.loadImageCallBack = null;
+        this.loadImageCallBackArgs = null;
+
 		var oThis = this;
 
         this.put_Api = function(_api)
@@ -615,7 +620,66 @@
             };
             //oImage.Image.crossOrigin = 'anonymous';
             oImage.Image.src = oImage.src;
-        }
+        };
+
+        this.LoadImagesWithCallback = function(arr, loadImageCallBack, loadImageCallBackArgs)
+        {
+            var arrAsync = [];
+            var i = 0;
+            for (i = 0; i < arr.length; i++)
+            {
+                if (this.map_image_index[arr[i]] === undefined)
+                    arrAsync.push(arr[i]);
+            }
+
+            if (arrAsync.length == 0)
+            {
+				loadImageCallBack.call(this.Api, loadImageCallBackArgs);
+                return;
+            }
+
+			this.loadImageCallBackCounter = 0;
+            this.loadImageCallBackCounterMax = arrAsync.length;
+			this.loadImageCallBack = loadImageCallBack;
+			this.loadImageCallBackArgs = loadImageCallBackArgs;
+
+			for (i = 0; i < arrAsync.length; i++)
+			{
+				var oImage = new CImage(arrAsync[i]);
+				oImage.Image = new Image();
+				oImage.Image.parentImage = oImage;
+				oImage.Status = ImageLoadStatus.Loading;
+				this.map_image_index[oImage.src] = oImage;
+
+				oImage.Image.onload = function ()
+				{
+					this.parentImage.Status = ImageLoadStatus.Complete;
+					oThis.loadImageCallBackCounter++;
+
+					if (oThis.loadImageCallBackCounter == oThis.loadImageCallBackCounterMax)
+					    oThis.LoadImagesWithCallbackEnd();
+				};
+				oImage.Image.onerror = function ()
+				{
+					this.parentImage.Image = null;
+					this.parentImage.Status = ImageLoadStatus.Complete;
+
+					if (oThis.loadImageCallBackCounter == oThis.loadImageCallBackCounterMax)
+						oThis.LoadImagesWithCallbackEnd();
+				};
+				//oImage.Image.crossOrigin = 'anonymous';
+				oImage.Image.src = oImage.src;
+			}
+        };
+
+        this.LoadImagesWithCallbackEnd = function()
+        {
+			this.loadImageCallBack.call(this.Api, this.loadImageCallBackArgs);
+			this.loadImageCallBack = null;
+			this.loadImageCallBackArgs = null;
+			this.loadImageCallBackCounterMax = 0;
+			this.loadImageCallBackCounter = 0;
+        };
     }
 
     var g_flow_anchor = new Image();

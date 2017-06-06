@@ -105,6 +105,10 @@ CBlockLevelSdt.prototype.Get_PageBounds = function(CurPage)
 {
 	return this.Content.Get_PageBounds(CurPage);
 };
+CBlockLevelSdt.prototype.GetContentBounds = function(CurPage)
+{
+	return this.Content.GetContentBounds(CurPage);
+};
 CBlockLevelSdt.prototype.Is_EmptyPage = function(CurPage)
 {
 	// TODO: Реализовать
@@ -596,15 +600,15 @@ CBlockLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 	for (var nCurPage = 0, nPagesCount = this.GetPagesCount(); nCurPage < nPagesCount; ++nCurPage)
 	{
 		var nPageAbs = this.Get_AbsolutePage(nCurPage);
-		var oBounds = this.GetPageBounds(nCurPage);
+		var oBounds = this.Content.GetContentBounds(nCurPage);
 		arrRects.push({X : oBounds.Left, Y : oBounds.Top, R : oBounds.Right, B : oBounds.Bottom, Page : nPageAbs});
 	}
 
 	oDrawingDocument.OnDrawContentControl(this.GetId(), isHover ? c_oContentControlTrack.Hover : c_oContentControlTrack.In, arrRects, this.Get_ParentTextTransform());
 };
-CBlockLevelSdt.prototype.AddContentControl = function()
+CBlockLevelSdt.prototype.AddContentControl = function(nContentControlType)
 {
-	return this.Content.AddContentControl();
+	return this.Content.AddContentControl(nContentControlType);
 };
 CBlockLevelSdt.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 {
@@ -670,6 +674,10 @@ CBlockLevelSdt.prototype.GetAllContentControls = function(arrContentControls)
 CBlockLevelSdt.prototype.IsSelectedAll = function()
 {
 	return this.Content.IsSelectedAll();
+};
+CBlockLevelSdt.prototype.GetLastRangeVisibleBounds = function()
+{
+	return this.Content.GetLastRangeVisibleBounds();
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
@@ -861,6 +869,10 @@ CBlockLevelSdt.prototype.SelectContentControl = function()
 	this.Set_CurrentElement(false, 0, this.Content);
 };
 //----------------------------------------------------------------------------------------------------------------------
+CBlockLevelSdt.prototype.GetContentControlType = function()
+{
+	return AscCommonWord.sdttype_BlockLevel;
+};
 CBlockLevelSdt.prototype.SetPr = function(oPr)
 {
 	this.SetAlias(oPr.Alias);

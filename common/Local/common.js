@@ -240,8 +240,105 @@ window["asc_initAdvancedOptions"] = function(_code)
 
 window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 {
+	var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+
+	_editor.signatures = [];
+
 	var _signatures = JSON.parse(_json);
-	console.log(_signatures);
+	var _count = _signatures["count"];
+	var _data = _signatures["data"];
+	var _sign;
+	var _add_sign;
+
+	var _images_loading = [];
+	for (var i = 0; i < _count; i++)
+	{
+		_sign = _data[i];
+		_add_sign = new window["AscCommon"].asc_CSignatureLine();
+
+		_add_sign.guid = _sign["guid"];
+		_add_sign.valid = _sign["valid"];
+		_add_sign.image = (_add_sign.valid == 0) ? _sign["image_valid"] : _sign["image_invalid"];
+		_add_sign.image = "data:image/png;base64," + _add_sign.image;
+		_add_sign.signer1 = _sign["name"];
+		_add_sign.id = i;
+
+		_editor.signatures.push(_add_sign);
+
+		_images_loading.push(_add_sign.image);
+	}
+
+	if (!window.FirstSignaturesCall)
+	{
+		_editor.asc_registerCallback("asc_onAddSignature", function (guid)
+		{
+
+			var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+			_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
+
+		});
+		_editor.asc_registerCallback("asc_onRemoveSignature", function (guid)
+		{
+
+			var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+			_api.sendEvent("asc_onUpdateSignatures", _api.asc_getSignatures(), _api.asc_getRequestSignatures());
+
+		});
+	}
+	window.FirstSignaturesCall = true;
+
+	_editor.ImageLoader.LoadImagesWithCallback(_images_loading, function() {
+		if (this.WordControl)
+			this.WordControl.OnRePaintAttack();
+	}, null);
+
+	_editor.sendEvent("asc_onUpdateSignatures", _editor.asc_getSignatures(), _editor.asc_getRequestSignatures());
+};
+
+window["DesktopSaveQuestionReturn"] = function(isNeedSaved)
+{
+	if (isNeedSaved)
+	{
+		var _editor = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+		_editor.asc_Save(false);
+	}
+};
+
+window["OnNativeReturnCallback"] = function(name, obj)
+{
+	var _api = window["Asc"]["editor"] ? window["Asc"]["editor"] : window.editor;
+	_api.sendEvent(name, obj);
+};
+
+window["OnNativeOpenFilenameDialog"] = function(file)
+{
+	window.on_native_open_filename_dialog(file);
+	delete window.on_native_open_filename_dialog;
+};
+
+window["DesktopAfterOpen"] = function(_api)
+{
+	_api.asc_registerCallback("asc_onSignatureDblClick", function (guid, width, height)
+	{
+		var _length = _api.signatures.length;
+		for (var i = 0; i < _length; i++)
+		{
+			if (_api.signatures[i].guid == guid)
+			{
+				window["AscDesktopEditor"]["ViewCertificate"](_api.signatures[i].id);
+				return;
+			}
+		}
+
+		if (!_api.isDocumentModify)
+		{
+			_api.sendEvent("asc_onSignatureClick", guid, width, height);
+			return;
+		}
+
+		window.SaveQuestionObjectBeforeSign = { guid : guid, width : width, height : height };
+		window["AscDesktopEditor"]["SaveQuestion"]();
+	});
 };
 
 // меняем среду

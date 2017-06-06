@@ -128,19 +128,16 @@
             _begin.transform(oTransform);
             _end.transform(oTransform);
 
-            var posX = Math.min(_begin.x, _end.x);
-            var posY = Math.min(_begin.y, _end.y);
             var extX = Math.max(penW/36000.0, Math.abs(_end.x - _begin.x));
             var extY = Math.max(penW/36000.0, Math.abs(_end.y - _begin.y));
             var flipV = false;
             var flipH = false;
             var rot = 0;
             var oMapAdj = {};
-            var tmp;
-            var xc = posX + extX/2, yc = posY + extY/2;
-            if(sPreset === "line"){
-                flipH = (begin.x > _end.x);
-                flipV = (begin.y > _end.y);
+            if(sPreset === "line" ||
+                sPreset.indexOf("straightConnector") > -1){
+                flipH = (_begin.x > _end.x);
+                flipV = (_begin.y > _end.y);
             }
             else{
                 var sPrefix = "bentConnector";
@@ -171,18 +168,31 @@
                         }
                         else{
                             if(_end.bounds.t > _begin.bounds.b){
-                                sPreset = "4";
-                                flipH = true;
-                                oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
-                                oMapAdj["adj2"] = (100000*((_end.bounds.t + _begin.bounds.b)/2.0 - _begin.y)/extY) >> 0;
+                                if(_end.x < _begin.x){
+                                    sPreset = "4";
+                                    flipH = true;
+                                    oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                    oMapAdj["adj2"] = (100000*((_end.bounds.t + _begin.bounds.b)/2.0 - _begin.y)/extY) >> 0;
+                                }
+                                else{
+                                    sPreset = "2";
+                                }
 
                             }
                             else if(_end.bounds.b < _begin.bounds.t){
-                                sPreset = "4";
-                                flipH = true;
-                                flipV = true;
-                                oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
-                                oMapAdj["adj2"] = (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                if(_end.x < _begin.x){
+                                    sPreset = "4";
+                                    flipH = true;
+                                    flipV = true;
+                                    oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                    oMapAdj["adj2"] = (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                }
+                                else{
+                                    sPreset = "4";
+                                    flipV = true;
+                                    oMapAdj["adj1"] = (100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX) >> 0;
+                                    oMapAdj["adj2"] = (100000*(_begin.y - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                }
                             }
                             else{
 
@@ -202,18 +212,18 @@
                                     }
                                 }
                                 else{
+                                    if(_end.x > _begin.x){
+                                        sPreset = "2";
+                                    }
+                                    else{
+                                        sPreset = "4";
+                                        flipH = true;
+                                        oMapAdj["adj1"] =  -(100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
+                                        oMapAdj["adj2"] =  -((100000*(_begin.y - (Math.min(_begin.bounds.t, _end.bounds.t) - CONNECTOR_MARGIN))/extY + 0.5) >> 0);
+
+                                    }
 
                                 }
-
-                                //if(_end.x < _begin.x){
-                                //    sPreset = "4";
-                                //    flipH = true;
-                                //    oMapAdj["adj1"] = -(100000*(Math.max(_end.bounds.r, _begin.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0;
-                                //    oMapAdj["adj2"] = (100000*(((_begin.bounds.b + _end.bounds.t)/2  - _begin.y)/extY) + 0.5) >> 0;
-                                //}
-                                //else{
-                                //    sPreset = "2";
-                                //}
                             }
                         }
                         break;
@@ -222,12 +232,7 @@
                         if(_end.bounds.l > _begin.bounds.r){
                             if(_end.bounds.b < _begin.y){
                                 sPreset = "2";
-                                rot = Math.PI/2.0;
-                                tmp = extX;
-                                extX = extY;
-                                extY = tmp;
-                                posX = (_end.x + _begin.x)/2.0 - extX/2.0;
-                                posY = (_end.y + _begin.y)/2.0 - extY/2.0;
+                                flipV = true;
                             }
                             else{
                                 if(_end.y < _begin.y){
@@ -248,25 +253,15 @@
 
                                 if(_end.x > _begin.bounds.r){
                                     sPreset = "2";
-                                    rot = Math.PI/2.0;
-                                    tmp = extX;
-                                    extX = extY;
-                                    extY = tmp;
-                                    posX = (_end.x + _begin.x)/2.0 - extX/2.0;
-                                    posY = (_end.y + _begin.y)/2.0 - extY/2.0;
+                                    flipV = true;
                                 }
                                 else{
                                     sPreset = "4";
-                                    rot = 3.0 * Math.PI / 2.0;
-                                    tmp = extX;
-                                    extX = extY;
-                                    extY = tmp;
-                                    posX = (_end.x + _begin.x)/2.0 - extX/2.0;
-                                    posY = (_end.y + _begin.y)/2.0 - extY/2.0;
                                     flipH = true;
+                                    flipV = true;
 
-                                    oMapAdj["adj1"] = (100000*(((_begin.bounds.t + _end.bounds.b)/2 - (yc - extX/2))/extX) + 0.5) >> 0;
-                                    oMapAdj["adj2"] = 100000 + (100000*(CONNECTOR_MARGIN/extY) + 0.5) >> 0;
+                                    oMapAdj["adj1"] = -((100000*(_begin.bounds.r + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                    oMapAdj["adj2"] =  (100000*(_begin.y - ((_end.bounds.b + _begin.bounds.t)/2.0))/extY + 0.5) >> 0;
                                 }
                             }
                             else{
@@ -274,39 +269,24 @@
                                 if(_end.x < _begin.x){
                                     if(_end.y > _begin.y){
                                         sPreset = "4";
-                                        rot =  Math.PI / 2.0;
-                                        tmp = extX;
-                                        extX = extY;
-                                        extY = tmp;
-                                        posX = (_end.x + _begin.x)/2.0 - extX/2.0;
-                                        posY = (_end.y + _begin.y)/2.0 - extY/2.0;
                                         flipH = true;
-                                        flipV = true;
-
-                                        oMapAdj["adj1"] = -((100000*(Math.max(_begin.bounds.b, _end.bounds.b) + CONNECTOR_MARGIN - _end.y)/extX + 0.5) >> 0);
-                                        oMapAdj["adj2"] = 100000 + (100000*(Math.max(CONNECTOR_MARGIN, _end.bounds.r + CONNECTOR_MARGIN - _begin.x)/extY) + 0.5) >> 0;
+                                        oMapAdj["adj1"] = -((100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                        oMapAdj["adj2"] = (100000*((Math.max(_end.bounds.b, _begin.bounds.b) - _begin.y + CONNECTOR_MARGIN)/extY) + 0.5) >> 0;
                                     }
                                     else{
                                         sPreset = "4";
                                         flipH = true;
                                         flipV = true;
-                                        oMapAdj["adj1"] = -((100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - begin.x)/extX + 0.5) >> 0);
+                                        oMapAdj["adj1"] = -((100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
                                         oMapAdj["adj2"] = - (100000*((Math.max(_end.bounds.b, _begin.bounds.b) - _begin.y + CONNECTOR_MARGIN)/extY) + 0.5) >> 0;
                                     }
                                 }
                                 else{
                                     if(_end.y > _begin.y){
                                         sPreset = "4";
-                                        rot =  Math.PI / 2.0;
-                                        tmp = extX;
-                                        extX = extY;
-                                        extY = tmp;
-                                        posX = (_end.x + _begin.x)/2.0 - extX/2.0;
-                                        posY = (_end.y + _begin.y)/2.0 - extY/2.0;
-                                        flipH = true;
 
-                                        oMapAdj["adj1"] = -((100000*(Math.max(_begin.bounds.b, _end.bounds.b) + CONNECTOR_MARGIN - _end.y)/extX + 0.5) >> 0);
-                                        oMapAdj["adj2"] = -(100000*((Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - Math.max(_begin.x, _end.x))/extY) + 0.5) >> 0;
+                                        oMapAdj["adj1"] = ((100000*(Math.max(_begin.bounds.r, _end.bounds.r) + CONNECTOR_MARGIN - _begin.x)/extX + 0.5) >> 0);
+                                        oMapAdj["adj2"] = ((100000*(_end.bounds.b + CONNECTOR_MARGIN - _begin.y)/extY + 0.5) >> 0);
                                     }
                                     else{
                                         sPreset = "2";
@@ -383,7 +363,7 @@
                                 else{
                                     sPreset = "5";
                                     oMapAdj["adj1"] = (100000*((_end.bounds.l + _begin.bounds.r)/2 - _begin.x)/extX + 0.5) >> 0;
-                                    oMapAdj["adj2"] =  -(100000*(begin.y  - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
+                                    oMapAdj["adj2"] =  -(100000*(_begin.y  - (_end.bounds.t - CONNECTOR_MARGIN))/extY + 0.5) >> 0;
                                     oMapAdj["adj3"] = 100000 + (100000*(_end.bounds.r + CONNECTOR_MARGIN - _end.x)/extX + 0.5) >> 0;
                                 }
                             }
@@ -498,11 +478,180 @@
     CConnectionShape.prototype = Object.create(AscFormat.CShape.prototype);
     CConnectionShape.prototype.constructor = CConnectionShape;
 
-    CConnectionShape.prototype.calculateSpPr = function(begin, end){
+    CConnectionShape.prototype.getObjectType = function(){
+        return AscDFH.historyitem_type_Cnx;
     };
 
-    CConnectionShape.prototype.getObjectType = function(begin, end){
-        return AscDFH.historyitem_type_Cnx;
+    CConnectionShape.prototype.copy = function () {
+        var copy = new CConnectionShape();
+        this.fillObject(copy);
+        return copy;
+    };
+
+    CConnectionShape.prototype.resetShape = function (oShape) {
+        var cnxPr = this.nvSpPr.nvUniSpPr;
+
+        if(cnxPr.stCnxId === oShape.Id || cnxPr.endCnxId === oShape.Id){
+            var oNewPr = cnxPr.copy();
+            if(cnxPr.stCnxId === oShape.Id){
+                oNewPr.stCnxId = null;
+                oNewPr.stCnxIdx = null;
+            }
+            if(cnxPr.endCnxId === oShape.Id){
+                oNewPr.endCnxId = null;
+                oNewPr.endCnxIdx = null;
+            }
+            this.nvSpPr.setUniSpPr(oNewPr);
+        }
+    };
+
+    CConnectionShape.prototype.getStCxnId = function(){
+        return this.nvSpPr.nvUniSpPr.stCnxId;
+    };
+    CConnectionShape.prototype.getEndCxnId = function(){
+        return this.nvSpPr.nvUniSpPr.endCnxId;
+    };
+    CConnectionShape.prototype.getStCxnIdx = function(){
+        return this.nvSpPr.nvUniSpPr.stCnxIdx;
+    };
+    CConnectionShape.prototype.getEndCxnIdx = function(){
+        return this.nvSpPr.nvUniSpPr.endCnxIdx;
+    };
+
+    CConnectionShape.prototype.calculateTransform = function (bMove) {
+        var oBeginDrawing = null;
+        var oEndDrawing = null;
+        var sStId = this.getStCxnId();
+        var sEndId = this.getEndCxnId();
+        var _group;
+        if(null !== sStId){
+            oBeginDrawing = AscCommon.g_oTableId.Get_ById(sStId);
+            if(oBeginDrawing && oBeginDrawing.bDeleted){
+                oBeginDrawing = null;
+            }
+            if(oBeginDrawing){
+                _group = oBeginDrawing.getMainGroup();
+                if(_group){
+                    _group.recalculate();
+                }
+                else{
+                    oBeginDrawing.recalculate();
+                }
+            }
+        }
+        if(null !== sEndId){
+            oEndDrawing = AscCommon.g_oTableId.Get_ById(sEndId);
+            if(oEndDrawing && oEndDrawing.bDeleted){
+                oEndDrawing = null;
+            }
+            if(oEndDrawing){
+                _group = oEndDrawing.getMainGroup();
+                if(_group){
+                    _group.recalculate();
+                }
+                else{
+                    oEndDrawing.recalculate();
+                }
+            }
+        }
+        var _startConnectionParams, _endConnectionParams, _spPr, _xfrm2;
+        var _xfrm = this.spPr.xfrm;
+
+        if(oBeginDrawing && oEndDrawing){
+            _startConnectionParams = oBeginDrawing.getConnectionParams(this.getStCxnIdx(), this.group);
+            _endConnectionParams = oEndDrawing.getConnectionParams(this.getEndCxnIdx(), this.group);
+            _spPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.spPr.geometry.preset, this.pen.w);
+            _xfrm2 = _spPr.xfrm;
+            _xfrm.setOffX(_xfrm2.offX);
+            _xfrm.setOffY(_xfrm2.offY);
+            _xfrm.setExtX(_xfrm2.extX);
+            _xfrm.setExtY(_xfrm2.extY);
+            _xfrm.setFlipH(_xfrm2.flipH);
+            _xfrm.setFlipV(_xfrm2.flipV);
+            _xfrm.setRot(_xfrm2.rot);
+            this.spPr.setGeometry(_spPr.geometry.createDuplicate());
+            this.checkDrawingBaseCoords();
+            this.recalculate();
+        }
+        else if(oBeginDrawing || oEndDrawing){
+            if(bMove){
+                var _x, _y;
+                var _spX, _spY, diffX, diffY, bChecked = false;
+                var _oCnxInfo;
+                var _groupTransform;
+                if(oBeginDrawing){
+                    _oCnxInfo = oBeginDrawing.getGeom().cnxLst[this.getStCxnIdx()];
+                    if(_oCnxInfo){
+                        _spX = oBeginDrawing.transform.TransformPointX(_oCnxInfo.x, _oCnxInfo.y);
+                        _spY = oBeginDrawing.transform.TransformPointY(_oCnxInfo.x, _oCnxInfo.y);
+                        _x = this.transform.TransformPointX(0, 0);
+                        _y = this.transform.TransformPointY(0, 0);
+                        bChecked = true;
+                    }
+                }
+                else {
+                    _oCnxInfo = oEndDrawing.getGeom().cnxLst[this.getEndCxnIdx()];
+                    if(_oCnxInfo){
+                        _spX = oEndDrawing.transform.TransformPointX(_oCnxInfo.x, _oCnxInfo.y);
+                        _spY = oEndDrawing.transform.TransformPointY(_oCnxInfo.x, _oCnxInfo.y);
+                        _x = this.transform.TransformPointX(this.extX, this.extY);
+                        _y = this.transform.TransformPointY(this.extX, this.extY);
+                        bChecked = true;
+                    }
+                }
+
+                if(bChecked){
+                    if(this.group){
+                        _groupTransform = this.group.invertTransform.CreateDublicate();
+                        _groupTransform.tx = 0;
+                        _groupTransform.ty = 0;
+                        diffX = _groupTransform.TransformPointX(_spX - _x, _spY - _y);
+                        diffY = _groupTransform.TransformPointY(_spX - _x, _spY - _y);
+                    }
+                    else{
+                        diffX = _spX - _x;
+                        diffY = _spY - _y;
+                    }
+                    this.spPr.xfrm.setOffX(this.spPr.xfrm.offX + diffX);
+                    this.spPr.xfrm.setOffY(this.spPr.xfrm.offY + diffY);
+                    this.recalculate();
+                }
+            }
+            else{
+                if(oBeginDrawing){
+                    _startConnectionParams = oBeginDrawing.getConnectionParams(this.getStCxnIdx(), this.group);
+                }
+                if(oEndDrawing){
+                    _endConnectionParams = oEndDrawing.getConnectionParams(this.getEndCxnIdx(), this.group);
+                }
+                var _tx, _ty;
+                if(_startConnectionParams || _endConnectionParams){
+
+                    if(!_startConnectionParams){
+                        _tx = this.transform.TransformPointX(0, 0);
+                        _ty = this.transform.TransformPointY(0, 0);
+                        _startConnectionParams = AscFormat.fCalculateConnectionInfo(_endConnectionParams, _tx, _ty);
+                    }
+                    if(!_endConnectionParams){
+                        _tx = this.transform.TransformPointX(this.extX, this.extY);
+                        _ty = this.transform.TransformPointY(this.extX, this.extY);
+                        _endConnectionParams = AscFormat.fCalculateConnectionInfo(_startConnectionParams, _tx, _ty);
+                    }
+                    _spPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.spPr.geometry.preset, this.pen && this.pen.w);
+                    _xfrm2 = _spPr.xfrm;
+                    _xfrm.setOffX(_xfrm2.offX);
+                    _xfrm.setOffY(_xfrm2.offY);
+                    _xfrm.setExtX(_xfrm2.extX);
+                    _xfrm.setExtY(_xfrm2.extY);
+                    _xfrm.setFlipH(_xfrm2.flipH);
+                    _xfrm.setFlipV(_xfrm2.flipV);
+                    _xfrm.setRot(_xfrm2.rot);
+                    this.spPr.setGeometry(_spPr.geometry.createDuplicate());
+                    this.checkDrawingBaseCoords();
+                    this.recalculate();
+                }
+            }
+        }
     };
 
     window['AscFormat'] = window['AscFormat'] || {};

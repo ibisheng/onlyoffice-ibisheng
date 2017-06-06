@@ -419,6 +419,77 @@
 
 
     /**
+     * Replace current image
+     */
+    ApiPresentation.prototype.ReplaceCurrentImage = function(sImageUrl, Width, Height)
+    {
+        var oPr = this.Presentation;
+        if(oPr.Slides[oPr.CurPage]){
+            var _slide = oPr.Slides[oPr.CurPage];
+            var oController = _slide.graphicObjects;
+            var _w = Width/36000.0;
+            var _h = Height/36000.0;
+            var oImage = oController.createImage(sImageUrl, 0, 0, _w, _h);
+            oImage.setParent(_slide);
+            var selectedObjects, spTree;
+            if(oController.selection.groupSelection){
+                selectedObjects = oController.selection.groupSelection.selectedObjects;
+            }
+            else{
+                selectedObjects = oController.selectedObjects;
+            }
+            if(selectedObjects.length > 0){
+                if(selectedObjects[0].group){
+                    spTree = selectedObjects[0].group.spTree;
+                }
+                else{
+                    spTree = _slide.cSld.spTree;
+                }
+                for(var i = 0; i < spTree.length; ++i){
+                    if(spTree[i] === selectedObjects[0]){
+                        var _xfrm = spTree[i].spPr && spTree[i].spPr.xfrm;
+                        var _xfrm2 = oImage.spPr.xfrm;
+                        if(_xfrm){
+                            _xfrm2.setOffX(_xfrm.offX);
+                            _xfrm2.setOffY(_xfrm.offY);
+                            //_xfrm2.setRot(_xfrm.rot);
+                        }
+                        else{
+                            if(AscFormat.isRealNumber(spTree[i].x) && AscFormat.isRealNumber(spTree[i].y)){
+                                _xfrm2.setOffX(spTree[i].x);
+                                _xfrm2.setOffY(spTree[i].y);
+                            }
+                        }
+                        if(selectedObjects[0].group){
+                            var _group = selectedObjects[0].group;
+                            _group.removeFromSpTreeByPos(i);
+                            _group.addToSpTree(i, oImage);
+                            oImage.setGroup(_group);
+                            oController.selection.groupSelection.resetInternalSelection();
+                            _group.selectObject(oImage, oPr.CurPage);
+                        }
+                        else{
+                            _slide.removeFromSpTreeByPos(i);
+                            _slide.addToSpTreeToPos(i, oImage);
+                            oController.resetSelection();
+                            oController.selectObject(oImage, oPr.CurPage);
+                        }
+                        return;
+                    }
+                }
+            }
+            var _x = (this.Presentation.Width - _w)/2.0;
+            var _y = (this.Presentation.Height - _h)/2.0;
+            oImage.spPr.xfrm.setOffX(_x);
+            oImage.spPr.xfrm.setOffY(_y);
+            _slide.addToSpTreeToPos(_slide.cSld.spTree.length, oImage);
+            oController.resetSelection();
+            oController.selectObject(oImage, oPr.CurPage);
+        }
+    };
+
+
+    /**
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -843,6 +914,7 @@
     ApiPresentation.prototype["AddSlide"]              = ApiPresentation.prototype.AddSlide;
     ApiPresentation.prototype["CreateNewHistoryPoint"] = ApiPresentation.prototype.CreateNewHistoryPoint;
     ApiPresentation.prototype["SetSizes"]              = ApiPresentation.prototype.SetSizes;
+    ApiPresentation.prototype["ReplaceCurrentImage"]   = ApiPresentation.prototype.ReplaceCurrentImage;
 
     ApiSlide.prototype["GetClassType"]               = ApiSlide.prototype.GetClassType;
     ApiSlide.prototype["RemoveAllObjects"]           = ApiSlide.prototype.RemoveAllObjects;

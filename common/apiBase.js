@@ -163,6 +163,8 @@
 
 		this.lastWorkTime = 0;
 
+		this.signatures = [];
+
 		return this;
 	}
 
@@ -1258,11 +1260,135 @@
 	{
 	};
 
-	baseEditorsApi.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail) {
+	baseEditorsApi.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl) {
 
     };
+	baseEditorsApi.prototype.asc_getAllSignatures = function () {
+		return [];
+	};
+
+	// signatures
+	baseEditorsApi.prototype.asc_AddSignatureLine2 = function(_obj)
+	{
+		var _w = 50;
+		var _h = 50;
+		var _w_pix = (_w * AscCommon.g_dKoef_mm_to_pix) >> 0;
+		var _h_pix = (_h * AscCommon.g_dKoef_mm_to_pix) >> 0;
+		var _canvas = document.createElement("canvas");
+		_canvas.width = _w_pix;
+		_canvas.height = _h_pix;
+		var _ctx = _canvas.getContext("2d");
+		_ctx.fillStyle = "#000000";
+		_ctx.strokeStyle = "#000000";
+		_ctx.font = "10pt 'Courier New'";
+		_ctx.lineWidth = 3;
+
+		_ctx.beginPath();
+		var _y_line = (_h_pix >> 1) + 0.5;
+		_ctx.moveTo(0, _y_line);
+		_ctx.lineTo(_w_pix, _y_line);
+		_ctx.stroke();
+		_ctx.beginPath();
+
+		_ctx.lineWidth = 2;
+		_y_line -= 10;
+		_ctx.moveTo(10, _y_line);
+		_ctx.lineTo(25, _y_line - 10);
+		_ctx.lineTo(10, _y_line - 20);
+		_ctx.stroke();
+		_ctx.beginPath();
+
+		_ctx.fillText(_obj.asc_getSigner1(), 10, _y_line + 25);
+		_ctx.fillText(_obj.asc_getSigner2(), 10, _y_line + 40);
+		_ctx.fillText(_obj.asc_getEmail(), 10, _y_line + 55);
+
+		var _url = _canvas.toDataURL("image/png");
+		_canvas = null;
+
+		function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);	}
+		function guid() {
+			var val = '{' + s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4() + '}';
+			val = val.toUpperCase();
+			return val;
+		}
+
+		var _args = [guid(), _obj.asc_getSigner1(), _obj.asc_getSigner2(), _obj.asc_getEmail(), _w, _h, _url];
+
+		this.ImageLoader.LoadImagesWithCallback([_url], function(_args) {
+			this.asc_addSignatureLine(_args[0], _args[1], _args[2], _args[3], _args[4], _args[5], _args[6]);
+		}, _args);
+	};
+
+	baseEditorsApi.prototype.asc_getRequestSignatures = function()
+	{
+		var _sigs = this.asc_getAllSignatures();
+		var _sigs_ret = [];
+
+		var _found;
+		for (var i = _sigs.length - 1; i >= 0; i--)
+		{
+			var _sig = _sigs[i];
+			_found = false;
+
+			for (var j = this.signatures.length - 1; j >= 0; j--)
+			{
+				if (this.signatures[j].guid == _sig.guid)
+				{
+					_found = true;
+					break;
+				}
+			}
+
+			if (!_found)
+			{
+				var _add_sig = new AscCommon.asc_CSignatureLine();
+				_add_sig.guid = _sig.guid;
+				_add_sig.signer1 = _sig.signer1;
+				_add_sig.signer2 = _sig.signer2;
+				_add_sig.email = _sig.email;
+			}
+		}
+
+		return _sigs_ret;
+	};
+
+	baseEditorsApi.prototype.asc_Sign = function(id, guid, url1, url2)
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["Sign"](id, guid, url1, url2);
+	};
+
+	baseEditorsApi.prototype.asc_ViewCertificate = function(id)
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["ViewCertificate"](id);
+	};
+
+	baseEditorsApi.prototype.asc_SelectCertificate = function()
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["SelectCertificate"]();
+	};
+
+	baseEditorsApi.prototype.asc_GetDefaultCertificate = function()
+	{
+		if (window["AscDesktopEditor"])
+			window["AscDesktopEditor"]["GetDefaultCertificate"]();
+	};
+
+	baseEditorsApi.prototype.asc_getSignatures = function()
+	{
+		return this.signatures;
+	};
 
 	baseEditorsApi.prototype.asc_getSignatureImage = function (sGuid) {
+
+		var count = this.signatures.length;
+		for (var i = 0; i < count; i++)
+		{
+			if (this.signatures[i].guid == sGuid)
+				return this.signatures[i].image;
+		}
 		return "";
     };
 

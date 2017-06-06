@@ -4587,6 +4587,12 @@ DefaultShapeDefinition.prototype=
     }
 };
 
+
+
+function CHyperlink(){
+
+}
+
 function CNvPr()
 {
     this.id = 0;
@@ -7567,7 +7573,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteBool(this.spcCol);
+            w.WriteDouble(this.spcCol);
         }
 
         flag = this.spcFirstLastPara != null;
@@ -7718,7 +7724,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.spcCol = r.GetBool();
+            this.spcCol = r.GetDouble();
         }
 
         flag = r.GetBool();
@@ -8036,7 +8042,7 @@ CBodyPr.prototype =
         w.WriteBool(flag);
         if(flag)
         {
-            w.WriteBool(this.spcCol);
+            w.WriteDouble(this.spcCol);
         }
 
         flag = this.spcFirstLastPara != null;
@@ -8185,7 +8191,7 @@ CBodyPr.prototype =
         flag = r.GetBool();
         if(flag)
         {
-            this.spcCol = r.GetBool();
+            this.spcCol = r.GetDouble();
         }
 
         flag = r.GetBool();
@@ -8400,16 +8406,16 @@ CBullet.prototype =
         return this.bulletType != null && this.bulletType.type != null;
     },
 
-    getPresentationBullet: function()
+    getPresentationBullet: function(theme, color)
     {
         var para_pr = new CParaPr();
         para_pr.Bullet = this;
-        return para_pr.Get_PresentationBullet();
+        return para_pr.Get_PresentationBullet(theme, color);
     },
 
-    getBulletType: function()
+    getBulletType: function(theme, color)
     {
-        return this.getPresentationBullet().m_nType;
+        return this.getPresentationBullet(theme, color).m_nType;
     },
 
     Write_ToBinary: function(w)

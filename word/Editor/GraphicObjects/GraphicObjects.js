@@ -202,11 +202,11 @@ CGraphicObjects.prototype =
     resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
     handleTextHit: DrawingObjectsController.prototype.handleTextHit,
 
-    AddContentControl: function()
+    AddContentControl: function(nContentControlType)
     {
         var oTargetDocContent = this.getTargetDocContent();
         if(oTargetDocContent){
-            return oTargetDocContent.AddContentControl();
+            return oTargetDocContent.AddContentControl(nContentControlType);
         }
 
         return null;
@@ -1287,6 +1287,7 @@ CGraphicObjects.prototype =
     getTargetDocContent: DrawingObjectsController.prototype.getTargetDocContent,
     getTextArtPreviewManager: DrawingObjectsController.prototype.getTextArtPreviewManager,
     getEditorApi: DrawingObjectsController.prototype.getEditorApi,
+    resetConnectors: DrawingObjectsController.prototype.resetConnectors,
 
     handleChartDoubleClick: function(drawing, chart, e, x, y, pageIndex)
     {
@@ -1298,6 +1299,10 @@ CGraphicObjects.prototype =
         this.clearPreTrackObjects();
         this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);
+    },
+
+    handleSignatureDblClick: function(sGuid, width, height){
+        editor.sendEvent("asc_onSignatureDblClick", sGuid, width, height);
     },
 
 
@@ -1416,6 +1421,34 @@ CGraphicObjects.prototype =
                     this.resetSelection2();
                     this.document.AddSignatureLine(oSignatureDrawing);
                 }
+            }
+        }
+    },
+
+    getDrawingArray: function()
+    {
+        var ret = [];
+        for(var i = 0; i < this.drawingObjects.length; ++i) {
+            if(this.drawingObjects[i] && this.drawingObjects[i].GraphicObj && !this.drawingObjects[i].GraphicObj.bDeleted){
+                ret.push(this.drawingObjects[i].GraphicObj);
+            }
+        }
+        return ret;
+    },
+
+    getAllSignatures: function(){
+        var _ret = [];
+        this.getAllSignatures2(_ret, this.getDrawingArray());
+        return _ret;
+    },
+
+    getAllSignatures2: function(aRet, spTree){
+        for(var i = 0; i < spTree.length; ++i){
+            if(spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                this.getAllSignatures2(aRet, spTree[i].spTree);
+            }
+            else if(spTree[i].signatureLine){
+                aRet.push(spTree[i].signatureLine);
             }
         }
     },
@@ -2774,6 +2807,8 @@ CGraphicObjects.prototype =
     cursorMoveStartOfLine: DrawingObjectsController.prototype.cursorMoveStartOfLine,
 
     cursorMoveAt: DrawingObjectsController.prototype.cursorMoveAt,
+    getAllConnectors: DrawingObjectsController.prototype.getAllConnectors,
+    getAllConnectorsByDrawings: DrawingObjectsController.prototype.getAllConnectorsByDrawings,
 
     cursorMoveToCell: function(bNext )
     {
@@ -2952,6 +2987,9 @@ CGraphicObjects.prototype =
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].parent.Remove_FromDocument(false);
+                    if(this.selectedObjects[i].signatureLine){
+                        this.document.Api.sendEvent("asc_onRemoveSignature", this.selectedObjects[i].signatureLine.id);
+                    }
                     arr_drawings_.push(this.selectedObjects[i].parent);
                 }
                 this.resetSelection();
@@ -2972,6 +3010,27 @@ CGraphicObjects.prototype =
         return this.maximalGraphicObjectZIndex;
     },
 
+    IsInDrawingObject: function(X, Y, nPageIndex, oContent){
+        var _X, _Y, oTransform, oInvertTransform;
+        if(oContent){
+            oTransform = oContent.Get_ParentTextTransform();
+            if(oTransform){
+                oInvertTransform = AscCommon.global_MatrixTransformer.Invert(oTransform);
+                _X = oInvertTransform.TransformPointX(X, Y);
+                _Y = oInvertTransform.TransformPointY(X, Y);
+            }
+            else{
+                _X = X;
+                _Y = Y;
+            }
+        }
+        else{
+            _X = X;
+            _Y = Y;
+        }
+        return this.isPointInDrawingObjects(_X, _Y, nPageIndex);
+    },
+
     isPointInDrawingObjects: function(x, y, pageIndex, bSelected, bNoText)
     {
         var ret;
@@ -2988,7 +3047,7 @@ CGraphicObjects.prototype =
                 }
             }
             var object = g_oTableId.Get_ById(ret.objectId);
-            if(isRealObject(object) && (!(bSelected === true) || bSelected && object.selected) )
+            if(isRealObject(object) && (!(bSelected === true) ||  bSelected && object.selected) )
             {
                 if(object.group)
                     object = object.getMainGroup();

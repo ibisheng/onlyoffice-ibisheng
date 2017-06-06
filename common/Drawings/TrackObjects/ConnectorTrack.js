@@ -11,8 +11,17 @@
         this.beginShape = oBeginShape;
         this.endShape = oEndShape;
 
+
         this.startX = this.connector.transform.TransformPointX(0, 0);
         this.startY = this.connector.transform.TransformPointY(0, 0);
+
+        if(this.connector.group){
+            var oInvertTransform = this.connector.group.invertTransform;
+            var _stX =  oInvertTransform.TransformPointX(this.startX, this.startY);
+            var _stY =  oInvertTransform.TransformPointY(this.startX, this.startY);
+            this.startX = _stX;
+            this.startY = _stY;
+        }
 
 
         this.endX = this.connector.transform.TransformPointX(this.connector.extX, this.connector.extY);
@@ -30,53 +39,155 @@
     {
 
         var oConnectorInfo = this.connector.nvSpPr.nvUniSpPr;
-        var _rot, track_bounds, g_conn_info, oConectionObject;
+        var _rot, track_bounds, g_conn_info, oConnectionObject, _flipH, _flipV, _bounds, _transform;
         var _startConnectionParams = null;
         var _endConnectionParams = null;
+        var _group = null;
+        if(this.connector.group) {
+            _group = this.connector.group;
+        }
         if(this.beginTrack){
             track_bounds = this.convertTrackBounds(this.beginTrack.getBounds());
             _rot = AscFormat.isRealNumber(this.beginTrack.angle) ? this.beginTrack.angle : this.beginTrack.originalObject.rot;
-            oConectionObject = this.beginTrack.overlayObject.geometry.cnxLst[oConnectorInfo.stCnxIdx];
-            g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-            _startConnectionParams = this.connector.convertToConnectionParams(_rot, this.beginTrack.overlayObject.TransformMatrix, track_bounds, g_conn_info)
+            _flipH =  AscFormat.isRealBool(this.beginTrack.resizedflipH) ? this.beginTrack.resizedflipH : this.beginTrack.originalObject.flipH;
+            _flipV =  AscFormat.isRealBool(this.beginTrack.resizedflipV) ? this.beginTrack.resizedflipV : this.beginTrack.originalObject.flipV;
+            if(this.beginTrack.originalObject.group){
+                _rot = AscFormat.normalizeRotate(this.beginTrack.originalObject.group.getFullRotate() + _rot);
+                if(this.beginTrack.originalObject.group.getFullFlipH()){
+                    _flipH = !_flipH;
+                }
+                if(this.beginTrack.originalObject.group.getFullFlipV()){
+                    _flipV = !_flipV;
+                }
+            }
+            _bounds = track_bounds;
+            _transform = this.beginTrack.overlayObject.TransformMatrix;
+            if(_group){
+                _rot = AscFormat.normalizeRotate((this.beginTrack.originalObject.group ? this.beginTrack.originalObject.group.getFullRotate() : 0) + _rot - _group.getFullRotate());
+                if(_group.getFullFlipH()){
+                    _flipH = !_flipH;
+                }
+                if(_group.getFullFlipV()){
+                    _flipV = !_flipV;
+                }
+                _bounds = _bounds.copy();
+                _bounds.transform(_group.invertTransform);
+                _transform = _transform.CreateDublicate();
+                AscCommon.global_MatrixTransformer.MultiplyAppend(_transform, _group.invertTransform);
+            }
+            oConnectionObject = this.beginTrack.overlayObject.geometry.cnxLst[oConnectorInfo.stCnxIdx];
+            g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConnectionObject.ang, x: oConnectionObject.x, y: oConnectionObject.y};
+            _startConnectionParams = this.connector.convertToConnectionParams(_rot, _flipH, _flipV, _transform, _bounds, g_conn_info);
         }
         if(this.endTrack){
             track_bounds = this.convertTrackBounds(this.endTrack.getBounds());
             _rot = AscFormat.isRealNumber(this.endTrack.angle) ? this.endTrack.angle : this.endTrack.originalObject.rot;
-            oConectionObject = this.endTrack.overlayObject.geometry.cnxLst[oConnectorInfo.endCnxIdx];
-            g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-            _endConnectionParams = this.connector.convertToConnectionParams(_rot, this.endTrack.overlayObject.TransformMatrix, track_bounds, g_conn_info)
+            _flipH =  AscFormat.isRealBool(this.endTrack.resizedflipH) ? this.endTrack.resizedflipH : this.endTrack.originalObject.flipH;
+            _flipV =  AscFormat.isRealBool(this.endTrack.resizedflipV) ? this.endTrack.resizedflipV : this.endTrack.originalObject.flipV;
+            if(this.endTrack.originalObject.group){
+                _rot = AscFormat.normalizeRotate(this.endTrack.originalObject.group.getFullRotate() + _rot);
+                if(this.endTrack.originalObject.group.getFullFlipH()){
+                    _flipH = !_flipH;
+                }
+                if(this.endTrack.originalObject.group.getFullFlipV()){
+                    _flipV = !_flipV;
+                }
+            }
+            _bounds = track_bounds;
+            _transform = this.endTrack.overlayObject.TransformMatrix;
+            if(_group){
+                _rot = AscFormat.normalizeRotate((this.endTrack.originalObject.group ? this.endTrack.originalObject.group.getFullRotate() : 0) + _rot - _group.getFullRotate());
+                if(_group.getFullFlipH()){
+                    _flipH = !_flipH;
+                }
+                if(_group.getFullFlipV()){
+                    _flipV = !_flipV;
+                }
+                _bounds = _bounds.copy();
+                _bounds.transform(_group.invertTransform);
+                _transform = _transform.CreateDublicate();
+                AscCommon.global_MatrixTransformer.MultiplyAppend(_transform, _group.invertTransform);
+            }
+            oConnectionObject = this.endTrack.overlayObject.geometry.cnxLst[oConnectorInfo.endCnxIdx];
+            g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConnectionObject.ang, x: oConnectionObject.x, y: oConnectionObject.y};
+            _endConnectionParams = this.connector.convertToConnectionParams(_rot, _flipH, _flipV, _transform, _bounds, g_conn_info);
         }
         if(_startConnectionParams || _endConnectionParams){
 
             if(!_startConnectionParams){
                 if(this.beginShape && oConnectorInfo.stCnxIdx !== null){
-                    oConectionObject = this.beginShape.spPr.geometry.cnxLst[oConnectorInfo.stCnxIdx];
-                    g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _startConnectionParams = this.beginShape.convertToConnectionParams(this.beginShape.rot, this.beginShape.transform, this.beginShape.bounds, g_conn_info);
+                    _startConnectionParams = this.beginShape.getConnectionParams(oConnectorInfo.stCnxIdx, _group);
                 }
                 else{
+                    if((this.endTrack instanceof AscFormat.MoveShapeImageTrack)){
+                        var _dx,_dy;
+                        if(this.connector.group){
+                            var _oCopyMatrix = this.connector.group.invertTransform.CreateDublicate();
+                            _oCopyMatrix.tx = 0;
+                            _oCopyMatrix.ty = 0;
+                            _dx = _oCopyMatrix.TransformPointX(this.endTrack.lastDx, this.endTrack.lastDy);
+                            _dy = _oCopyMatrix.TransformPointY(this.endTrack.lastDx, this.endTrack.lastDy);
+                        }
+                        else{
+                            _dx = this.endTrack.lastDx;
+                            _dy = this.endTrack.lastDy;
+                        }
+                        this.oSpPr = AscFormat.ExecuteNoHistory(function(){return this.connector.spPr.createDuplicate()}, this, []);
+                        this.oSpPr.xfrm.offX += _dx;
+                        this.oSpPr.xfrm.offY += _dy;
+                        this.geometry = this.oSpPr.geometry;
+                        this.overlayObject.geometry = this.geometry;
+                        this.calculateTransform();
+                        return;
+                    }
+                }
+                if(!_startConnectionParams){
                     _startConnectionParams = AscFormat.fCalculateConnectionInfo(_endConnectionParams, this.startX, this.startY);
                 }
-
             }
 
             if(!_endConnectionParams){
                 if(this.endShape && oConnectorInfo.endCnxIdx !== null){
-                    oConectionObject = this.endShape.spPr.geometry.cnxLst[oConnectorInfo.endCnxIdx];
-                    g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _endConnectionParams = this.endShape.convertToConnectionParams(this.endShape.rot, this.endShape.transform, this.endShape.bounds, g_conn_info);
+                    _endConnectionParams = this.endShape.getConnectionParams(oConnectorInfo.endCnxIdx, _group);
                 }
-                else {
-                    _endConnectionParams = AscFormat.fCalculateConnectionInfo(_endConnectionParams, this.endX, this.endY);
+                else{
+                    if((this.beginTrack instanceof AscFormat.MoveShapeImageTrack)){
+                        var _dx,_dy;
+                        if(this.connector.group){
+                            var _oCopyMatrix = this.connector.group.invertTransform.CreateDublicate();
+                            _oCopyMatrix.tx = 0;
+                            _oCopyMatrix.ty = 0;
+                            _dx = _oCopyMatrix.TransformPointX(this.beginTrack.lastDx, this.beginTrack.lastDy);
+                            _dy = _oCopyMatrix.TransformPointY(this.beginTrack.lastDx, this.beginTrack.lastDy);
+                        }
+                        else{
+                            _dx = this.beginTrack.lastDx;
+                            _dy = this.beginTrack.lastDy;
+                        }
+                        this.oSpPr = AscFormat.ExecuteNoHistory(function(){return this.connector.spPr.createDuplicate()}, this, []);
+                        this.oSpPr.xfrm.offX += _dx;
+                        this.oSpPr.xfrm.offY += _dy;
+                        this.geometry = this.oSpPr.geometry;
+                        this.overlayObject.geometry = this.geometry;
+                        this.calculateTransform();
+                        return;
+                    }
+                }
+                if(!_endConnectionParams){
+                    _endConnectionParams = AscFormat.fCalculateConnectionInfo(_startConnectionParams, this.endX, this.endY);
                 }
             }
             this.oSpPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.connector.spPr.geometry.preset, this.overlayObject.pen.w);
             this.geometry = this.oSpPr.geometry;
             this.overlayObject.geometry = this.geometry;
+            this.calculateTransform();
         }
-        this.geometry.Recalculate(this.oSpPr.xfrm.extX, this.oSpPr.xfrm.extY);
 
+
+    };
+
+    CConnectorTrack.prototype.calculateTransform = function(){
+        this.geometry.Recalculate(this.oSpPr.xfrm.extX, this.oSpPr.xfrm.extY);
         var _transform = this.transform;
         _transform.Reset();
 
@@ -94,6 +205,10 @@
         global_MatrixTransformer.RotateRadAppend(_transform, -(AscFormat.isRealNumber(this.oSpPr.xfrm.rot) ? this.oSpPr.xfrm.rot : 0 ));
         global_MatrixTransformer.TranslateAppend(_transform, this.oSpPr.xfrm.offX, this.oSpPr.xfrm.offY);
         global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
+        if(this.connector.group)
+        {
+            global_MatrixTransformer.MultiplyAppend(_transform, this.connector.group.transform);
+        }
     };
 
     CConnectorTrack.prototype.trackEnd = function()
@@ -108,6 +223,8 @@
         _xfrm.setFlipV(_xfrm2.flipV);
         _xfrm.setRot(_xfrm2.rot);
         this.connector.spPr.setGeometry(this.oSpPr.geometry.createDuplicate());
+
+        this.connector.checkDrawingBaseCoords();
     };
     CConnectorTrack.prototype.convertTrackBounds = function(trackBounds)
     {

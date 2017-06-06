@@ -731,14 +731,14 @@ DrawingArea.prototype.drawSelection = function(drawingDocument) {
             this.worksheet.objectRender.controller.drawSelection(drawingDocument);
             if ( this.worksheet.objectRender.controller.needUpdateOverlay() ) {
                 trackOverlay.Show();
-                shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
-                this.worksheet.objectRender.controller.drawTracks(shapeOverlayCtx);
-                shapeOverlayCtx.put_GlobalAlpha(true, 1);
+                autoShapeTrack.Graphics.put_GlobalAlpha(true, 0.5);
+                this.worksheet.objectRender.controller.drawTracks(autoShapeTrack);
+                autoShapeTrack.Graphics.put_GlobalAlpha(true, 1);
             }
         }
 
         // Restore
-        this.frozenPlaces[i].restore(shapeOverlayCtx);
+        this.frozenPlaces[i].restore(autoShapeTrack);
     }
 };
 

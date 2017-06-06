@@ -309,7 +309,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
         this.resizedRot = originalObject.rot;
 
         this.transform = originalObject.transform.CreateDublicate();
-        this.geometry = !(originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace) && originalObject.spPr && originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = AscFormat.CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
+        this.geometry = (function(){ var geometry = originalObject.getGeom(); geometry.Recalculate(5, 5); return geometry})();
 
         if(!originalObject.isChart())
         {
@@ -349,7 +349,8 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             if(oEndShape && oEndShape.bDeleted){
                 oEndShape = null;
             }
-            var aDrawings = this.drawingsController.getAllShapes(this.drawingsController.getDrawingArray());
+            var aDrawings = [];
+            this.drawingsController.getAllSingularDrawings(this.drawingsController.getDrawingArray(), aDrawings);
             var oConnectionInfo = null;
             var oNewShape = null;
             this.oNewShape = null;
@@ -379,9 +380,9 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             var _beginConnectionInfo, _endConnectionInfo;
             if(this.numberHandle === 0){
                 if(oEndShape){
-                    var oConectionObject = oEndShape.spPr.geometry.cnxLst[oConnectorInfo.endCnxIdx];
+                    var oConectionObject = oEndShape.getGeom().cnxLst[oConnectorInfo.endCnxIdx];
                     var g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _endConnectionInfo = oEndShape.convertToConnectionParams(oEndShape.rot, oEndShape.transform, oEndShape.bounds, g_conn_info);
+                    _endConnectionInfo = oEndShape.convertToConnectionParams(oEndShape.rot, oEndShape.flipH, oEndShape.flipV, oEndShape.transform, oEndShape.bounds, g_conn_info);
                 }
                 _beginConnectionInfo = oConnectionInfo;
                 if(_beginConnectionInfo){
@@ -391,9 +392,9 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             }
             else{
                 if(oBeginShape){
-                    var oConectionObject = oBeginShape.spPr.geometry.cnxLst[oConnectorInfo.stCnxIdx];
+                    var oConectionObject = oBeginShape.getGeom().cnxLst[oConnectorInfo.stCnxIdx];
                     var g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _beginConnectionInfo = oBeginShape.convertToConnectionParams(oBeginShape.rot, oBeginShape.transform, oBeginShape.bounds, g_conn_info);
+                    _beginConnectionInfo = oBeginShape.convertToConnectionParams(oBeginShape.rot, oBeginShape.flipH, oBeginShape.flipV, oBeginShape.transform, oBeginShape.bounds, g_conn_info);
                 }
                 _endConnectionInfo = oConnectionInfo;
 
@@ -446,6 +447,12 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
 
             }
             else{
+                this.oSpPr = null;
+                this.resizedRot = this.originalObject.rot;
+                this.geometry = AscFormat.ExecuteNoHistory(function(){
+                    return originalObject.spPr.geometry.createDuplicate();
+                }, this, []);
+                this.overlayObject.geometry = this.geometry;
                 this.resize(kd1, kd2, e.ShiftKey);
             }
         };
@@ -960,7 +967,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
 
         this.trackEnd = function(bWord)
         {
-            if(!this.bConnector){
+            if(!this.bConnector || !this.oSpPr){
                 var scale_coefficients, ch_off_x, ch_off_y;
                 if(this.originalObject.group)
                 {
@@ -1728,7 +1735,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.bSwapCoef = !(AscFormat.checkNormalRotate(this.rot));
         this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
         this.centerDistY = this.y + this.extY*0.5 - this.parentTrack.extY*0.5;
-        this.geometry = !(originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace) && originalObject.spPr.geometry !== null ? originalObject.spPr.geometry.createDuplicate() : null;
+        this.geometry = originalObject.getGeom();
         if(this.geometry)
         {
             this.geometry.Recalculate(this.extX, this.extY);

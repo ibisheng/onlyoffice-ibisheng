@@ -434,7 +434,7 @@ CDocumentContent.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Dra
 	if (this.Parent && this.Parent instanceof CHeaderFooter)
 	{
 		var bInText    = (null === this.IsInText(X, Y, CurPage) ? false : true);
-		var nInDrawing = this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, PageAbs, this);
+		var nInDrawing = this.LogicDocument.DrawingObjects.IsInDrawingObject(X, Y, PageAbs, this);
 
 		if (true != bAnchor)
 		{
@@ -1395,6 +1395,42 @@ CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceChec
 
 	return Bounds;
 };
+CDocumentContent.prototype.GetContentBounds = function(CurPage)
+{
+	var oPage = this.Pages[CurPage];
+	if (!oPage || oPage.Pos > oPage.EndPos)
+		return this.Get_PageBounds(CurPage);
+
+	var oBounds = null;
+	for (var nIndex = oPage.Pos; nIndex <= oPage.EndPos; ++nIndex)
+	{
+		var oElement          = this.Content[nIndex];
+		var nElementPageIndex = this.private_GetElementPageIndex(nIndex, CurPage, 0, 1);
+
+		var oElementBounds = oElement.GetContentBounds(nElementPageIndex);
+
+		if (null === oBounds)
+		{
+			oBounds = oElementBounds.Copy();
+		}
+		else
+		{
+			if (oElementBounds.Bottom > oBounds.Bottom)
+				oBounds.Bottom = oElementBounds.Bottom;
+
+			if (oElementBounds.Top < oBounds.Top)
+				oBounds.Top = oElementBounds.Top;
+
+			if (oElementBounds.Right > oBounds.Right)
+				oBounds.Right = oElementBounds.Right;
+
+			if (oElementBounds.Left < oBounds.Left)
+				oBounds.Left = oElementBounds.Left;
+		}
+	}
+
+	return oBounds;
+};
 CDocumentContent.prototype.Get_PagesCount = function()
 {
 	return this.Pages.length;
@@ -1610,7 +1646,7 @@ CDocumentContent.prototype.IsInText = function(X, Y, CurPage)
 };
 CDocumentContent.prototype.IsInDrawing = function(X, Y, CurPage)
 {
-	if (-1 != this.DrawingObjects.isPointInDrawingObjects(X, Y, this.Get_AbsolutePage(CurPage), this))
+	if (-1 != this.DrawingObjects.IsInDrawingObject(X, Y, this.Get_AbsolutePage(CurPage), this))
 	{
 		return true;
 	}
@@ -2059,7 +2095,7 @@ CDocumentContent.prototype.MoveCursorToCell = function(bNext)
 {
 	if (true === this.ApplyToAll)
 	{
-		if (1 === this.Content.length && type_Table === this.Content[0].GetType())
+		if (1 === this.Content.length)
 			this.Content[0].MoveCursorToCell(bNext);
 	}
 	else
@@ -2072,13 +2108,12 @@ CDocumentContent.prototype.MoveCursorToCell = function(bNext)
 		{
 			if (true === this.Selection.Use)
 			{
-				if (this.Selection.StartPos === this.Selection.EndPos && type_Table === this.Content[this.Selection.StartPos].GetType())
+				if (this.Selection.StartPos === this.Selection.EndPos)
 					this.Content[this.Selection.StartPos].MoveCursorToCell(bNext);
 			}
 			else
 			{
-				if (type_Table === this.Content[this.CurPos.ContentPos].GetType())
-					this.Content[this.CurPos.ContentPos].MoveCursorToCell(bNext);
+				this.Content[this.CurPos.ContentPos].MoveCursorToCell(bNext);
 			}
 		}
 	}
@@ -6346,7 +6381,7 @@ CDocumentContent.prototype.Selection_SetStart = function(X, Y, CurPage, MouseEve
 	// Сначала проверим, не попали ли мы в один из "плавающих" объектов
 	var bInText      = (null === this.IsInText(X, Y, AbsPage) ? false : true);
 	var bTableBorder = (null === this.IsTableBorder(X, Y, AbsPage) ? false : true);
-	var nInDrawing   = this.LogicDocument && this.LogicDocument.DrawingObjects.isPointInDrawingObjects(X, Y, AbsPage, this);
+	var nInDrawing   = this.LogicDocument && this.LogicDocument.DrawingObjects.IsInDrawingObject(X, Y, AbsPage, this);
 
 	if (this.Parent instanceof CHeaderFooter && ( nInDrawing === DRAWING_ARRAY_TYPE_BEFORE || nInDrawing === DRAWING_ARRAY_TYPE_INLINE || ( false === bTableBorder && false === bInText && nInDrawing >= 0 ) ))
 	{
@@ -8482,12 +8517,12 @@ CDocumentContent.prototype.IsSelectedAll = function()
 
 	return false;
 };
-CDocumentContent.prototype.AddContentControl = function()
+CDocumentContent.prototype.AddContentControl = function(nContentControlType)
 {
 	if (docpostype_DrawingObjects === this.CurPos.Type)
-		return this.DrawingObjects.AddContentControl();
+		return this.DrawingObjects.AddContentControl(nContentControlType);
 	else
-		return this.private_AddContentControl();
+		return this.private_AddContentControl(nContentControlType);
 };
 CDocumentContent.prototype.GetAllContentControls = function(arrContentControls)
 {

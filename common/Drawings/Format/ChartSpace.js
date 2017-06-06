@@ -935,9 +935,8 @@ CChartSpace.prototype.getStyles = function()
 {
     return AscFormat.ExecuteNoHistory(function(){
 
-        //todo: доработать
-        var styles = new CStyles();
-        var style = new CStyle("dataLblStyle", null, null, null);
+        var styles = new CStyles(false);
+        var style = new CStyle("dataLblStyle", null, null, null, true);
         var text_pr = new CTextPr();
         text_pr.FontSize = 10;
         text_pr.Unifill = CreateUnfilFromRGB(0,0,0);
@@ -1309,12 +1308,6 @@ CChartSpace.prototype.getAllTitles = function()
         }
     }
     return ret;
-};
-CChartSpace.prototype.getMainGroup = function()
-{
-    if(!isRealObject(this.group))
-        return this;
-    return this.group.getMainGroup();
 };
 CChartSpace.prototype.getFill = CShape.prototype.getFill;
 CChartSpace.prototype.getStroke = CShape.prototype.getStroke;

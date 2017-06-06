@@ -521,7 +521,7 @@ CDrawingsController.prototype.RemoveTextSelection = function()
 {
 	this.DrawingObjects.removeTextSelection();
 };
-CDrawingsController.prototype.AddContentControl = function()
+CDrawingsController.prototype.AddContentControl = function(nContentControlType)
 {
-	return this.DrawingObjects.AddContentControl();
+	return this.DrawingObjects.AddContentControl(nContentControlType);
 };

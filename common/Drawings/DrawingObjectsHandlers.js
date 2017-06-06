@@ -488,7 +488,8 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         }
 
         var chart_titles = drawing.getAllTitles();
-        var bIsMobileVersion = AscCommon.AscBrowser.isMobileVersion;
+        var oApi = editor || Asc.editor;
+        var bIsMobileVersion = oApi && oApi.isMobileVersion;
         for(i = 0; i < chart_titles.length; ++i)
         {
             title = chart_titles[i];
@@ -688,6 +689,9 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex, bInS
                     drawingObjects.handleChartDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
                 else if (drawing.getObjectType() === AscDFH.historyitem_type_OleObject && drawingObjects.handleChartDoubleClick){
                     drawingObjects.handleOleObjectDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
+                }
+                else if (drawing.signatureLine && drawingObjects.handleSignatureDblClick){
+                    drawingObjects.handleSignatureDblClick(drawing.signatureLine.id, drawing.extX, drawing.extY);
                 }
                 else if (2 == e.ClickCount && drawing.parent instanceof ParaDrawing && drawing.parent.Is_MathEquation())
                     drawingObjects.handleMathDrawingDoubleClick(drawing.parent, e, x, y, pageIndex);

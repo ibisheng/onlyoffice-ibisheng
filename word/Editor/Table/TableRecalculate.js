@@ -2801,7 +2801,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             else
             {
                 var Vmerge = Cell.Get_VMerge();
-                // Возьмем верхнюю ячейку теккущего объединения
+                // Возьмем верхнюю ячейку текущего объединения
                 if ( vmerge_Restart != Vmerge )
                 {
                     Cell = this.Internal_Get_StartMergedCell( CurRow, Cell.Metrics.StartGridCol, Cell.Get_GridSpan() );

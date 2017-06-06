@@ -651,9 +651,24 @@
             this._initCellsArea(AscCommonExcel.recalcType.recalc);
             this._normalizeViewRange();
             this._cleanCellsTextMetricsCache();
-            this._shiftVisibleRange();
+
+            // ToDo fix with sheetView->topLeftCell on open
+			var ar = this._getSelection().getLast();
+			if (ar.c2 >= this.nColsCount) {
+				this.expandColsOnScroll(false, true, ar.c2 + 1);
+			}
+			if (ar.r2 >= this.nRowsCount) {
+				this.expandRowsOnScroll(false, true, ar.r2 + 1);
+			}
+			var d = this._calcActiveRangeOffset();
+			if (d.deltaX) {
+				this.scrollHorizontal(d.deltaX);
+            }
+            if (d.deltaY) {
+			    this.scrollVertical(d.deltaY);
+            }
+
             this._prepareCellTextMetricsCache();
-            this._shiftVisibleRange();
             this.cellCommentator.updateCommentPosition();
             this.updateSpecialPasteOptionsPosition();
             this.handlers.trigger("onDocumentPlaceChanged");
@@ -670,9 +685,24 @@
         this._initCellsArea(AscCommonExcel.recalcType.full);
         this._normalizeViewRange();
         this._cleanCellsTextMetricsCache();
-        this._shiftVisibleRange();
+
+		// ToDo fix with sheetView->topLeftCell on open
+		var ar = this._getSelection().getLast();
+		if (ar.c2 >= this.nColsCount) {
+			this.expandColsOnScroll(false, true, ar.c2 + 1);
+		}
+		if (ar.r2 >= this.nRowsCount) {
+			this.expandRowsOnScroll(false, true, ar.r2 + 1);
+		}
+		var d = this._calcActiveRangeOffset();
+		if (d.deltaX) {
+			this.scrollHorizontal(d.deltaX);
+		}
+		if (d.deltaY) {
+			this.scrollVertical(d.deltaY);
+		}
+
         this._prepareCellTextMetricsCache();
-        this._shiftVisibleRange();
         this.cellCommentator.updateCommentPosition();
         this.updateSpecialPasteOptionsPosition();
         this.handlers.trigger("onDocumentPlaceChanged");
@@ -1567,65 +1597,6 @@
         }
     };
 
-    WorksheetView.prototype._shiftVisibleRange = function (range) {
-        var t = this;
-        var vr = t.visibleRange;
-        var arn = range ? range : this.model.selectionRange.getLast();
-        var i;
-
-        var cFrozen = 0, rFrozen = 0;
-        if (this.topLeftFrozenCell) {
-            cFrozen = this.topLeftFrozenCell.getCol0();
-            rFrozen = this.topLeftFrozenCell.getRow0();
-        }
-
-        do {
-            if (arn.r2 > vr.r2) {
-                i = arn.r2 - vr.r2;
-                vr.r1 += i;
-                vr.r2 += i;
-                t._calcVisibleRows();
-                continue;
-            }
-            if (t._isRowDrawnPartially(arn.r2, vr.r1)) {
-                vr.r1 += 1;
-                t._calcVisibleRows();
-            }
-            if (arn.r1 < vr.r1 && arn.r1 >= rFrozen) {
-                i = arn.r1 - vr.r1;
-                vr.r1 += i;
-                vr.r2 += i;
-                t._calcVisibleRows();
-            }
-            break;
-        } while (1);
-
-        do {
-            if (arn.c2 > vr.c2) {
-                i = arn.c2 - vr.c2;
-                vr.c1 += i;
-                vr.c2 += i;
-                t._calcVisibleColumns();
-                continue;
-            }
-            if (t._isColDrawnPartially(arn.c2, vr.c1)) {
-                vr.c1 += 1;
-                t._calcVisibleColumns();
-            }
-            if (arn.c1 < vr.c1 && arn.c1 >= cFrozen) {
-                i = arn.c1 - vr.c1;
-                vr.c1 += i;
-                vr.c2 += i;
-                if (vr.c1 < 0) {
-                    vr.c1 = 0;
-                    vr.c2 -= vr.c1;
-                }
-                t._calcVisibleColumns();
-            }
-            break;
-        } while (1);
-    };
-
     // ----- Drawing for print -----
     WorksheetView.prototype.calcPagesPrint = function(pageOptions, printOnlySelection, indexWorksheet, arrPages) {
         var range;
@@ -1642,7 +1613,7 @@
             this._prepareCellTextMetricsCache(range);
 
             var rowModel, rowCells, rowCache, rightSide, c;
-            for (var r = 0; r <= maxRows; ++r) {
+            for (var r = 0; r < maxRows; ++r) {
                 if (this.height_1px > this.rows[r].height) {
                     continue;
                 }
@@ -5436,8 +5407,10 @@
             return this;
         }
 
-        this.cleanSelection();
-        this.cellCommentator.cleanSelectedComment();
+		if (!this.notUpdateRowHeight) {
+			this.cleanSelection();
+			this.cellCommentator.cleanSelectedComment();
+		}
 
         var ctx = this.drawingCtx;
         var ctxW = ctx.getWidth();
@@ -5470,6 +5443,10 @@
                 this._prepareCellTextMetricsCache(new asc_Range(vr.c1, oldEnd + 1, vr.c2, vr.r2));
             }
         }
+
+		if (this.notUpdateRowHeight) {
+			return this;
+		}
 
         var oldDec = Math.max(calcDecades(oldEnd + 1), 3);
         var oldW, x, dx;
@@ -5639,8 +5616,10 @@
             return this;
         }
 
-        this.cleanSelection();
-        this.cellCommentator.cleanSelectedComment();
+        if (!this.notUpdateRowHeight) {
+			this.cleanSelection();
+			this.cellCommentator.cleanSelectedComment();
+		}
 
         var ctx = this.drawingCtx;
         var ctxW = ctx.getWidth();
@@ -5680,6 +5659,10 @@
                 // Идем вправо
                 this._prepareCellTextMetricsCache(new asc_Range(oldEnd + 1, vr.r1, vr.c2, vr.r2));
             }
+        }
+
+        if (this.notUpdateRowHeight) {
+            return this;
         }
 
         var lastColWidth = (scrollRight && oldVCE_isPartial) ?
@@ -8040,8 +8023,14 @@
                     if (null != oCanPromote) {
                         History.Create_NewPoint();
                         History.StartTransaction();
+
+						if(t.model.autoFilters.bIsExcludeHiddenRows(changedRange, t.model.selectionRange.activeCell)){
+							t.model.excludeHiddenRows(true);
+						}
                         range.promote(/*bCtrl*/ctrlPress, /*bVertical*/(1 === t.fillHandleDirection), nIndex,
                           oCanPromote);
+						t.model.excludeHiddenRows(false);
+
                         // Вызываем функцию пересчета для заголовков форматированной таблицы
                         t.model.autoFilters.renameTableColumn(arn);
 
@@ -8541,6 +8530,11 @@
                 var isLargeRange = t._isLargeRange(range.bbox);
                 var canChangeColWidth = c_oAscCanChangeColWidth.none;
 
+                if(t.model.autoFilters.bIsExcludeHiddenRows(arn, activeCell))
+				{
+					t.model.excludeHiddenRows(true);
+				}
+
                 switch (prop) {
                     case "fn":
                         range.setFontname(val);
@@ -8662,22 +8656,19 @@
                         /* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
                         t.model.workbook.dependencyFormulas.lockRecal();
 
-                        //нужно ли удалять скрытые строки
-						var excludeHiddenRows = t.model.autoFilters.bIsExcludeHiddenRows(arn, activeCell);
-                        
                         switch(val) {
 							case c_oAscCleanOptions.All:
-                            range.cleanAll(excludeHiddenRows);
+                            range.cleanAll();
 								t.model.removeSparklines(arn);
                             // Удаляем комментарии
                             t.cellCommentator.deleteCommentsRange(arn);
 								break;
 							case c_oAscCleanOptions.Text:
 							case c_oAscCleanOptions.Formula:
-                            range.cleanText(excludeHiddenRows);
+                            range.cleanText();
 								break;
 							case c_oAscCleanOptions.Format:
-                            range.cleanFormat(excludeHiddenRows);
+                            range.cleanFormat();
 								break;
 							case c_oAscCleanOptions.Comments:
                             t.cellCommentator.deleteCommentsRange(arn);
@@ -8692,6 +8683,8 @@
 								t.model.removeSparklineGroups(arn);
 								break;
                         }
+
+						t.model.excludeHiddenRows(false);
 
 						// Если нужно удалить автофильтры - удаляем
 						if (val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text) {
@@ -8771,6 +8764,8 @@
                         bIsUpdate = false;
                         break;
                 }
+
+				t.model.excludeHiddenRows(false);
 
                 if (bIsUpdate) {
                     hasUpdates = true;

@@ -2736,10 +2736,103 @@ CParagraphContentWithParagraphLikeContent.prototype.SelectThisElement = function
 
 	return true;
 };
+CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls = function(arrContentControls)
+{
+	if (true === this.Selection.Use)
+	{
+		var StartPos = this.Selection.StartPos;
+		var EndPos   = this.Selection.EndPos;
+		if (StartPos > EndPos)
+		{
+			StartPos = this.Selection.EndPos;
+			EndPos   = this.Selection.StartPos;
+		}
+
+		for (var Index = StartPos; Index <= EndPos; ++Index)
+		{
+			if (this.Content[Index].GetSelectedContentControls)
+				this.Content[Index].GetSelectedContentControls(arrContentControls);
+		}
+	}
+	else
+	{
+		if (this.Content[this.State.ContentPos].GetSelectedContentControls)
+			this.Content[this.State.ContentPos].GetSelectedContentControls(arrContentControls);
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------
-CParagraphContentWithParagraphLikeContent.prototype.Add = function(Item){};
+CParagraphContentWithParagraphLikeContent.prototype.Add = function(Item)
+{
+	switch (Item.Type)
+	{
+		case para_Run:
+		case para_Hyperlink:
+		case para_InlineLevelSdt:
+		case para_Field:
+		{
+			var TextPr = this.Get_FirstTextPr();
+			Item.SelectAll();
+			Item.Apply_TextPr(TextPr);
+			Item.RemoveSelection();
+
+			var CurPos = this.State.ContentPos;
+			var CurItem = this.Content[CurPos];
+			if (para_Run === CurItem.Type)
+			{
+				var NewRun = CurItem.Split2(CurItem.State.ContentPos);
+				this.Add_ToContent(CurPos + 1, Item);
+				this.Add_ToContent(CurPos + 2, NewRun);
+
+				this.State.ContentPos = CurPos + 2;
+				this.Content[this.State.ContentPos].MoveCursorToStartPos();
+			}
+			else
+			{
+				CurItem.Add(Item);
+			}
+
+			break;
+		}
+		case para_Math :
+		{
+			var ContentPos = new CParagraphContentPos();
+			this.Get_ParaContentPos(false, false, ContentPos);
+			var CurPos = ContentPos.Get(0);
+
+			// Ран формула делит на части, а в остальные элементы добавляется целиком
+			if (para_Run === this.Content[CurPos].Type)
+			{
+				// Разделяем текущий элемент (возвращается правая часть)
+				var NewElement = this.Content[CurPos].Split(ContentPos, 1);
+
+				if (null !== NewElement)
+					this.Add_ToContent(CurPos + 1, NewElement, true);
+
+				var Elem = new ParaMath();
+				Elem.Root.Load_FromMenu(Item.Menu, this.Get_Paragraph());
+				Elem.Root.Correct_Content(true);
+				this.Add_ToContent(CurPos + 1, Elem, true);
+
+				// Перемещаем кусор в конец формулы
+				this.State.ContentPos = CurPos + 1;
+				this.Content[this.State.ContentPos].MoveCursorToEndPos(false);
+			}
+			else
+			{
+				this.Content[CurPos].Add(Item);
+			}
+
+			break;
+		}
+		default:
+		{
+			this.Content[this.State.ContentPos].Add(Item);
+			break;
+		}
+	}
+};
 CParagraphContentWithParagraphLikeContent.prototype.Undo = function(Data){};
 CParagraphContentWithParagraphLikeContent.prototype.Redo = function(Data){};
 CParagraphContentWithParagraphLikeContent.prototype.Save_Changes = function(Data, Writer){};

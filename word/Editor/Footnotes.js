@@ -3225,10 +3225,10 @@ CFootnotesController.prototype.ResetRecalculateCache = function()
 		this.Footnote[Id].Reset_RecalculateCache();
 	}
 };
-CFootnotesController.prototype.AddContentControl = function()
+CFootnotesController.prototype.AddContentControl = function(nContentControlType)
 {
 	if (this.CurFootnote)
-		return this.CurFootnote.AddContentControl();
+		return this.CurFootnote.AddContentControl(nContentControlType);
 
 	return null;
 };

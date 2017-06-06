@@ -454,7 +454,7 @@
 						_content_control_pr.Lock = sdtlock_Unlocked;
 						_content_control_pr.InternalId = _current.Props.InternalId;
 
-						var _blockStd = LogicDocument.AddContentControl();
+						var _blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 						_blockStd.SetContentControlPr(_content_control_pr);
 
 						this.returnDocuments.push(_blockStd.GetContentControlPr());
@@ -547,14 +547,31 @@
 		this.delete = function()
 		{
 			var LogicDocument = this.api.WordControl.m_oLogicDocument;
-			LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
-			if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
+
+			var arrContentControl = [];
+			for (var i = 0; i < this.documents.length; i++)
 			{
+				var oContentControl = g_oTableId.Get_ById(this.documents[i].InternalId);
+				if (oContentControl
+					&& (oContentControl instanceof AscCommonWord.CBlockLevelSdt
+					|| oContentControl instanceof AscCommonWord.CInlineLevelSdt))
+					arrContentControl.push(g_oTableId.Get_ById(this.documents[i].InternalId));
+			}
+
+			LogicDocument.SetCheckContentControlsLock(false);
+			if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+					Elements  : arrContentControl,
+					CheckType : AscCommon.changestype_Remove
+				}))
+			{
+				LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
 				for (var i = 0; i < this.documents.length; i++)
 				{
 					LogicDocument.RemoveContentControl(this.documents[i].InternalId);
 				}
 			}
+			LogicDocument.SetCheckContentControlsLock(true);
 			this.api.asc_Recalculate();
 			delete this.api.__content_control_worker;
 		};
@@ -3501,18 +3518,26 @@ background-repeat: no-repeat;\
 		}
 	};
 
-    asc_docs_api.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail) {
+	// signatures
+	asc_docs_api.prototype.asc_addSignatureLine = function (sGuid, sSigner, sSigner2, sEmail, Width, Height, sImgUrl) {
         if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertSignatureLine);
 
-            var oSignature = AscFormat.fCreateSignatureShape(sGuid, sSigner, sSigner2, sEmail, true, null);
-            var Drawing   = new ParaDrawing(oSignature.spPr.xfrm.extX, oSignature.spPr.xfrm.extY, null, this.WordControl.m_oDrawingDocument, null, null);
+            var oSignature = AscFormat.fCreateSignatureShape(sGuid, sSigner, sSigner2, sEmail, true, null, Width, Height, sImgUrl);
+            var Drawing   = new AscCommonWord.ParaDrawing(oSignature.spPr.xfrm.extX, oSignature.spPr.xfrm.extY, null, this.WordControl.m_oDrawingDocument, null, null);
             oSignature.setParent(Drawing);
             Drawing.Set_GraphicObject(oSignature);
             this.WordControl.m_oLogicDocument.AddSignatureLine(Drawing);
+            this.sendEvent("asc_onAddSignature", sGuid);
         }
     };
+
+    asc_docs_api.prototype.asc_getAllSignatures = function(){
+    	return this.WordControl.m_oLogicDocument.GetAllSignatures();
+	};
+
+    //////////////////////////////////////////////////////////////////////////
 
 	asc_docs_api.prototype.IncreaseIndent         = function()
 	{
@@ -5275,12 +5300,12 @@ background-repeat: no-repeat;\
 	};
 
 
-	asc_docs_api.prototype.asc_showComments = function()
+	asc_docs_api.prototype.asc_showComments = function(isShowSolved)
 	{
 		if (null == this.WordControl.m_oLogicDocument)
 			return;
 
-		this.WordControl.m_oLogicDocument.Show_Comments();
+		this.WordControl.m_oLogicDocument.Show_Comments(isShowSolved);
 	};
 
 	asc_docs_api.prototype.asc_hideComments = function()
@@ -8228,12 +8253,23 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_addSignatureLine"]                      = asc_docs_api.prototype.asc_addSignatureLine;
 	asc_docs_api.prototype["asc_startEditCurrentOleObject"]             = asc_docs_api.prototype.asc_startEditCurrentOleObject;
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]             = asc_docs_api.prototype.asc_InputClearKeyboardElement;
+	asc_docs_api.prototype["asc_SpecialPaste"]                          = asc_docs_api.prototype.asc_SpecialPaste;
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;
 	asc_docs_api.prototype["asc_Remove"]             					= asc_docs_api.prototype.asc_Remove;
 	asc_docs_api.prototype["asc_OnHideContextMenu"] 					= asc_docs_api.prototype.asc_OnHideContextMenu;
 	asc_docs_api.prototype["asc_OnShowContextMenu"] 					= asc_docs_api.prototype.asc_OnShowContextMenu;
+	asc_docs_api.prototype["asc_addSignatureLine"] 						= asc_docs_api.prototype.asc_addSignatureLine;
+	asc_docs_api.prototype["asc_getRequestSignatures"] 					= asc_docs_api.prototype.asc_getRequestSignatures;
+
+	// signatures
+	asc_docs_api.prototype["asc_AddSignatureLine2"]             		= asc_docs_api.prototype.asc_AddSignatureLine2;
+	asc_docs_api.prototype["asc_Sign"]             						= asc_docs_api.prototype.asc_Sign;
+	asc_docs_api.prototype["asc_ViewCertificate"] 						= asc_docs_api.prototype.asc_ViewCertificate;
+	asc_docs_api.prototype["asc_SelectCertificate"] 					= asc_docs_api.prototype.asc_SelectCertificate;
+	asc_docs_api.prototype["asc_GetDefaultCertificate"] 				= asc_docs_api.prototype.asc_GetDefaultCertificate;
+	asc_docs_api.prototype["asc_getSignatures"] 						= asc_docs_api.prototype.asc_getSignatures;
 
 	CDocInfoProp.prototype['get_PageCount']             = CDocInfoProp.prototype.get_PageCount;
 	CDocInfoProp.prototype['put_PageCount']             = CDocInfoProp.prototype.put_PageCount;

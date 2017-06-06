@@ -1674,7 +1674,8 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
 
         PRSC.Reset( this, Range );
 
-        PRSC.Range.W = 0;
+		PRSC.Range.W    = 0;
+		PRSC.Range.WEnd = 0;
         if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
             PRSC.Range.W += this.Numbering.WidthVisible;
 
@@ -2453,6 +2454,7 @@ function CParaLineRange(X, XEnd)
     this.EndPos    = 0;    // Позиция в контенте параграфа, на которой заканчиваетсяданный отрезок
     this.W         = 0;
     this.Spaces    = 0;    // Количество пробелов в отрезке, без учета пробелов в конце отрезка
+	this.WEnd      = 0;    // Если есть знак конца параграфа в данном отрезке, то это его ширина
 }
 
 CParaLineRange.prototype =

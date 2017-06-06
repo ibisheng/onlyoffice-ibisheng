@@ -2061,6 +2061,10 @@ CTable.prototype.Get_PageBounds = function(CurPage)
 {
 	return this.Pages[CurPage].Bounds;
 };
+CTable.prototype.GetContentBounds = function(CurPage)
+{
+	return this.Get_PageBounds(CurPage);
+};
 CTable.prototype.Get_PagesCount = function()
 {
 	return this.Pages.length;
@@ -2910,7 +2914,7 @@ CTable.prototype.RecalculateAllTables = function()
 		}
 	}
 };
-CTable.prototype.Get_LastRangeVisibleBounds = function()
+CTable.prototype.GetLastRangeVisibleBounds = function()
 {
 	var CurPage = this.Pages.length - 1;
 	var Page    = this.Pages[CurPage];
@@ -4434,7 +4438,8 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 	var Page = this.Pages[CurPage];
 	if (this.Selection.Type2 === table_Selection_Border)
 	{
-		if (true === editor.isViewMode || this.Selection.Data2.PageNum != CurPage)
+		var LogicDocument = this.LogicDocument;
+		if (!LogicDocument || true === LogicDocument.IsViewMode() || this.Selection.Data2.PageNum != CurPage)
 			return;
 
 		var _X = X;
@@ -4472,8 +4477,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 				return;
 			}
 
-			var LogicDocument = (editor && true !== editor.isViewMode ? editor.WordControl.m_oLogicDocument : null);
-			if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+			if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_Element_and_Type,
 					Element   : this,
 					CheckType : AscCommon.changestype_Table_Properties
@@ -12005,10 +12009,10 @@ CTable.prototype.GetTableProps = function()
 {
 	return this.Get_Props();
 };
-CTable.prototype.AddContentControl = function()
+CTable.prototype.AddContentControl = function(nContentControlType)
 {
 	if (this.CurCell)
-		return this.CurCell.Content.AddContentControl();
+		return this.CurCell.Content.AddContentControl(nContentControlType);
 
 	return null;
 };

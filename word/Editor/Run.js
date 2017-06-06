@@ -3551,6 +3551,8 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 if ( true === PRSC.Word )
                     PRSC.Spaces += PRSC.SpacesCount;
 
+				PRSC.Range.WEnd = Item.Get_WidthVisible();
+
                 break;
             }
         }

@@ -176,7 +176,7 @@ StartAddNewShape.prototype =
                         shape.setParent(oThis.drawingObjects.drawingObjects);
                         shape.setRecalculateInfo();
                     }
-                    shape.addToDrawingObjects();
+                    shape.addToDrawingObjects(undefined, AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
                     shape.checkDrawingBaseCoords();
                     oThis.drawingObjects.checkChartTextSelection();
                     oThis.drawingObjects.resetSelection();
@@ -488,7 +488,9 @@ ChangeAdjState.prototype =
             return;
         }
         var t = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
-        this.drawingObjects.arrTrackObjects[0].track(t.x, t.y);
+        for(var i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i){
+            this.drawingObjects.arrTrackObjects[i].track(t.x, t.y);
+        }
         this.drawingObjects.updateOverlay();
     },
 
@@ -496,11 +498,26 @@ ChangeAdjState.prototype =
     {
         if(this.drawingObjects.isViewMode() === false)
         {
-            var track = this.drawingObjects.arrTrackObjects[0];
+            var trackObjects = this.drawingObjects.arrTrackObjects;
             var drawingObjects = this.drawingObjects;
             this.drawingObjects.checkSelectedObjectsAndCallback(function()
             {
-                track.trackEnd();
+                var oOriginalObjects = [];
+                var oMapOriginalsIds = {};
+                for(var i = 0; i < trackObjects.length; ++i){
+                    trackObjects[i].trackEnd();
+                    if(trackObjects[i].originalObject && !trackObjects[i].processor3D){
+                        oOriginalObjects.push(trackObjects[i].originalObject);
+                        oMapOriginalsIds[trackObjects[i].originalObject.Get_Id()] = true;
+                    }
+                }
+                var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
+                for(i = 0; i < aAllConnectors.length; ++i){
+                    if(!oMapOriginalsIds[aAllConnectors.Get_Id()]){
+                        aAllConnectors[i].calculateTransform();
+                    }
+                }
+
                 drawingObjects.startRecalculate();
             },[], false, AscDFH.historydescription_CommonDrawings_ChangeAdj);
 
@@ -649,9 +666,21 @@ RotateState.prototype =
                         }
                         else
                         {
+                            var oOriginalObjects = [];
+                            var oMapOriginalsId = {};
                             for(i = 0; i < tracks.length; ++i)
                             {
                                 tracks[i].trackEnd(false);
+                                if(tracks[i].originalObject && !tracks[i].processor3D){
+                                    oOriginalObjects.push(tracks[i].originalObject);
+                                    oMapOriginalsId[tracks[i].originalObject.Get_Id()] = true;
+                                }
+                            }
+                            var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
+                            for(i = 0; i < aAllConnectors.length; ++i){
+                                if(!oMapOriginalsId[aAllConnectors[i].Get_Id()]){
+                                    aAllConnectors[i].calculateTransform(((oThis instanceof MoveInGroupState) || (oThis instanceof MoveState)));
+                                }
                             }
                         }
                         if(group)

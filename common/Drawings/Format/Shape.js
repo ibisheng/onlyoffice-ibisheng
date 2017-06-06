@@ -672,6 +672,7 @@ function SetXfrmFromMetrics(oDrawing, metrics)
            AscDFH.changesFactory[AscDFH.historyitem_ShapeSetParent]   = AscDFH.CChangesDrawingsObject;
            AscDFH.changesFactory[AscDFH.historyitem_ShapeSetGroup]   = AscDFH.CChangesDrawingsObject;
            AscDFH.changesFactory[AscDFH.historyitem_ShapeSetWordShape]   = AscDFH.CChangesDrawingsBool;
+           AscDFH.changesFactory[AscDFH.historyitem_ShapeSetSignature]   = AscDFH.CChangesDrawingsObjectNoId;
 
 
 
@@ -2292,8 +2293,7 @@ CShape.prototype.selectionCheck = function (X, Y, PageAbs, NearPos) {
     return false;
 };
 
-CShape.prototype.copy = function () {
-    var copy = new CShape();
+CShape.prototype.fillObject = function(copy){
     if (this.nvSpPr)
         copy.setNvSpPr(this.nvSpPr.createDuplicate());
     if (this.spPr) {
@@ -2323,6 +2323,11 @@ CShape.prototype.copy = function () {
     copy.cachedImage = this.getBase64Img();
     copy.cachedPixH = this.cachedPixH;
     copy.cachedPixW = this.cachedPixW;
+};
+
+CShape.prototype.copy = function () {
+    var copy = new CShape();
+    this.fillObject(copy);
     return copy;
 };
 
@@ -2527,12 +2532,6 @@ CShape.prototype.recalculateTextStyles = function (level) {
 };
 
 CShape.prototype.recalculateBrush = function () {
-
-    if(this.signatureLine){
-        this.brush = AscFormat.CreateBlipFillUniFillFromUrl("");
-        return;
-    }
-
     var compiled_style = this.getCompiledStyle();
     var RGBA = {R: 0, G: 0, B: 0, A: 255};
     var parents = this.getParentObjects();
@@ -3746,16 +3745,6 @@ CShape.prototype.deselect = function (drawingObjectsController) {
     return this;
 };
 
-CShape.prototype.getMainGroup = function () {
-    if (!isRealObject(this.group))
-        return null;
-
-    var cur_group = this.group;
-    while (isRealObject(cur_group.group))
-        cur_group = cur_group.group;
-    return cur_group;
-};
-
 CShape.prototype.getGroupHierarchy = function () {
     if (this.recalcInfo.recalculateGroupHierarchy) {
         this.groupHierarchy = [];
@@ -4080,13 +4069,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             return;
     }
 
-    if(this.signatureLine){
-        var sSignatureUrl = "";
-        if(typeof editor !== "undefined" && editor){
-            sSignatureUrl = editor.asc_getSignatureImage(this.signatureLine.id);
-        }
-        this.brush = AscFormat.CreateBlipFillUniFillFromUrl(sSignatureUrl);
-    }
+
     var _transform = transform ? transform : this.transform;
     var _transform_text = transformText ? transformText : this.transformText;
     if (graphics.IsSlideBoundsCheckerType === true) {
@@ -4128,6 +4111,17 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
         return;
     }
 
+
+    var _oldBrush = this.brush;
+    if(this.signatureLine){
+        var sSignatureUrl = null;
+        if(typeof editor !== "undefined" && editor){
+            sSignatureUrl = editor.asc_getSignatureImage(this.signatureLine.id);
+        }
+        if(typeof sSignatureUrl === "string" && sSignatureUrl.length > 0){
+            this.brush = AscFormat.CreateBlipFillUniFillFromUrl(sSignatureUrl);
+        }
+    }
     if (this.spPr && this.spPr.geometry || this.style || (this.brush && this.brush.fill) || (this.pen && this.pen.Fill && this.pen.Fill.fill)) {
         graphics.SetIntegerGrid(false);
         graphics.transform3(_transform, false);
@@ -4204,7 +4198,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             graphics.SetIntegerGrid(true);
         }
     }
-
+    this.brush = _oldBrush;
     var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
     if(!this.txWarpStruct && !this.txWarpStructParamarksNoTransform || (!this.txWarpStructParamarksNoTransform && oController && (AscFormat.getTargetTextObject(oController) === this) || (!this.txBody && !this.textBoxContent)) /*|| this.haveSelectedDrawingInContent()*/)
     {
@@ -4412,17 +4406,6 @@ CShape.prototype.getRotateAngle = function (x, y) {
     return same_flip ? angle : -angle;
 };
 
-CShape.prototype.getFullFlipH = function () {
-    if (!isRealObject(this.group))
-        return this.flipH;
-    return this.group.getFullFlipH() ? !this.flipH : this.flipH;
-};
-
-CShape.prototype.getFullFlipV = function () {
-    if (!isRealObject(this.group))
-        return this.flipV;
-    return this.group.getFullFlipV() ? !this.flipV : this.flipV;
-};
 
 CShape.prototype.getAspect = function (num) {
     var _tmp_x = this.extX != 0 ? this.extX : 0.1;
@@ -4430,9 +4413,6 @@ CShape.prototype.getAspect = function (num) {
     return num === 0 || num === 4 ? _tmp_x / _tmp_y : _tmp_y / _tmp_x;
 };
 
-CShape.prototype.getFullRotate = function () {
-    return !isRealObject(this.group) ? this.rot : this.rot + this.group.getFullRotate();
-};
 
 CShape.prototype.getRectBounds = function () {
     var transform = this.getTransformMatrix();
@@ -5440,65 +5420,6 @@ CShape.prototype.getColumnNumber = function(){
         }
     };
 
-    CShape.prototype.convertToConnectionParams = function(rot, oTransform, oBounds, oConnectorInfo){
-        var _ret =  new AscFormat.ConnectionParams();
-        var _rot = oConnectorInfo.ang*AscFormat.cToRad + rot;
-        var _normalized_rot = AscFormat.normalizeRotate(_rot);
-        _ret.dir = AscFormat.CARD_DIRECTION_E;
-        if(_normalized_rot >= 0 && _normalized_rot < Math.PI * 0.25 || _normalized_rot >= 7 * Math.PI * 0.25 && _normalized_rot < 2 * Math.PI){
-            _ret.dir = AscFormat.CARD_DIRECTION_E;
-        }
-        else if(_normalized_rot >= Math.PI * 0.25 && _normalized_rot < 3 * Math.PI * 0.25){
-            _ret.dir = AscFormat.CARD_DIRECTION_S;
-        }
-        else if(_normalized_rot >= 3 * Math.PI * 0.25 && _normalized_rot < 5 * Math.PI * 0.25){
-            _ret.dir = AscFormat.CARD_DIRECTION_W;
-        }
-        else if(_normalized_rot >= 5 * Math.PI * 0.25 && _normalized_rot < 7 * Math.PI * 0.25){
-            _ret.dir = AscFormat.CARD_DIRECTION_N;
-        }
-        _ret.x = oTransform.TransformPointX(oConnectorInfo.x, oConnectorInfo.y);
-        _ret.y = oTransform.TransformPointY(oConnectorInfo.x, oConnectorInfo.y);
-        _ret.bounds.fromOther(oBounds);
-        _ret.idx = oConnectorInfo.idx;
-        return _ret;
-    };
-
-
-    CShape.prototype.findGeomConnector = function(x, y){
-        if(this.spPr && this.spPr.geometry){
-            var oInvertTransform = this.invertTransform;
-            var _x = oInvertTransform.TransformPointX(x, y);
-            var _y = oInvertTransform.TransformPointY(x, y);
-            return this.spPr.geometry.findConnector(_x, _y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * AscCommon.TRACK_CIRCLE_RADIUS));
-        }
-        return null;
-    };
-
-    CShape.prototype.findConnector = function(x, y){
-        var oConnGeom = this.findGeomConnector(x, y);
-        if(oConnGeom){
-            return this.convertToConnectionParams(this.rot, this.transform, this.bounds, oConnGeom);
-        }
-        return null;
-    };
-
-    CShape.prototype.findConnectionShape = function(x, y){
-        if(this.spPr && this.spPr.geometry && this.spPr.geometry.cnxLst.length >0){
-            if(this.hit(x, y)){
-                return this;
-            }
-        }
-        return null;
-    };
-
-
-    CShape.prototype.drawConnectors = function(overlay)
-    {
-        if(this.spPr && this.spPr.geometry){
-            this.spPr.geometry.drawConnectors(overlay, this.transform);
-        }
-    };
 
 function CreateBinaryReader(szSrc, offset, srcLen)
 {

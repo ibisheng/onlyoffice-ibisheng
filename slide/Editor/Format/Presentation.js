@@ -3985,10 +3985,14 @@ CPresentation.prototype =
 
 
     Get_SelectionState2: function()
-    {},
+    {
+        return this.Save_DocumentStateBeforeLoadChanges();
+    },
 
     Set_SelectionState2: function(oDocState)
-    {},
+    {
+        this.Load_DocumentStateAfterLoadChanges(oDocState);
+    },
 
     Save_DocumentStateBeforeLoadChanges: function()
     {

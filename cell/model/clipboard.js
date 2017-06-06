@@ -324,7 +324,15 @@
 							return;
 						}
 					}
-					
+
+					//ignore hidden rows
+					var selectionRange = activeRange ? activeRange : ws.model.selectionRange.getLast();
+					var activeCell = ws.model.selectionRange.activeCell.clone();
+					if(ws.model.autoFilters.bIsExcludeHiddenRows(selectionRange, activeCell))
+					{
+						ws.model.excludeHiddenRows(true);
+					}
+
 					//TEXT
 					if (AscCommon.c_oAscClipboardDataFormat.Text & _formats)
 					{
@@ -369,6 +377,8 @@
 							_clipboard.pushData(AscCommon.c_oAscClipboardDataFormat.Internal, _data);
 						}
 					}
+
+					ws.model.excludeHiddenRows(false);
 				}
 			},
 
@@ -776,6 +786,11 @@
 				{	
 					for (row = bbox.r1; row <= bbox.r2; ++row) 
 					{
+						if(worksheet.model.bExcludeHiddenRows && worksheet.model.getRowHidden(row))
+						{
+							continue;
+						}
+
 						tr = doc.createElement("TR");
 						h = worksheet.model.getRowHeight(row);
 						if (h > 0) {tr.style.height = h + "pt";}
@@ -969,6 +984,11 @@
 					var res = '';	
 					for (var row = bbox.r1; row <= bbox.r2; ++row) 
 					{
+						if(worksheet.model.bExcludeHiddenRows && worksheet.model.getRowHidden(row))
+						{
+							continue;
+						}
+
 						if(row !== bbox.r1)
 							res += '\n';
 						

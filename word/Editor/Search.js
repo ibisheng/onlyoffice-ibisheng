@@ -1352,6 +1352,17 @@ ParaMath.prototype.Search_GetId = function(bNext, bUseContentPos, ContentPos, De
     return this.Root.Search_GetId(bNext, bUseContentPos, ContentPos, Depth);
     //return null;
 };
+//----------------------------------------------------------------------------------------------------------------------
+// CBLockLevelSdt
+//----------------------------------------------------------------------------------------------------------------------
+CBlockLevelSdt.prototype.Search = function(Str, Props, SearchEngine, Type)
+{
+	this.Content.Search(Str, Props, SearchEngine, Type);
+};
+CBlockLevelSdt.prototype.Search_GetId = function(bNext, bCurrent)
+{
+	return this.Content.Search_GetId(bNext, bCurrent);
+};
 
 //----------------------------------------------------------------------------------------------------------------------
 // Вспомогательные классы для поиска внутри параграфа

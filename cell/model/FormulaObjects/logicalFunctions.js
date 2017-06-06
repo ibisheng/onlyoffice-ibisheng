@@ -50,7 +50,7 @@
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
-	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cNOT, cOR, cTRUE);
+	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cNOT, cOR, cTRUE, cXOR);
 
 	/**
 	 * @constructor
@@ -374,6 +374,96 @@
 	cTRUE.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "()"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cXOR() {
+		this.name = "XOR";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cXOR.prototype = Object.create(cBaseFunction.prototype);
+	cXOR.prototype.constructor = cXOR;
+	cXOR.prototype.argumentsMin = 1;
+	cXOR.prototype.argumentsMax = 254;
+	cXOR.prototype.isXLFN = true;
+	cXOR.prototype.Calculate = function (arg) {
+		var argResult = null;
+		var nTrueValues = 0;
+		for (var i = 0; i < arg.length; i++) {
+			if (arg[i] instanceof cArea || arg[i] instanceof cArea3D) {
+				var argArr = arg[i].getValue();
+				for (var j = 0; j < argArr.length; j++) {
+					if (argArr[j] instanceof cError) {
+						return this.value = argArr[j];
+					} else if (argArr[j] instanceof cString || argArr[j] instanceof cEmpty) {
+						if (argResult === null) {
+							argResult = argArr[j].tocBool();
+						} else {
+							argResult = new cBool(argResult.value || argArr[j].tocBool().value);
+						}
+					}
+					if (argResult.value === true) {
+						nTrueValues++;
+					}
+				}
+			} else {
+				if (arg[i] instanceof cString) {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				} else if (arg[i] instanceof cError) {
+					return this.value = arg[i];
+				} else if (arg[i] instanceof cArray) {
+					arg[i].foreach(function (elem) {
+						if (elem instanceof cError) {
+							argResult = elem;
+							return true;
+						} else if (elem instanceof cString || elem instanceof cEmpty) {
+							return false;
+						} else {
+							if (argResult === null) {
+								argResult = elem.tocBool();
+							} else {
+								argResult = new cBool(elem.tocBool().value);
+							}
+						}
+
+						if (argResult.value === true) {
+							nTrueValues++;
+						}
+					})
+				} else {
+					if (argResult == null) {
+						argResult = arg[i].tocBool();
+					} else {
+						argResult = new cBool(arg[i].tocBool().value);
+					}
+
+					if (argResult.value === true) {
+						nTrueValues++;
+					}
+				}
+			}
+		}
+		if (argResult == null) {
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}else{
+			if(nTrueValues % 2){
+				argResult = new cBool(true);
+			}else{
+				argResult = new cBool(false);
+			}
+		}
+
+		return this.value = argResult;
+	};
+	cXOR.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(logical1, logical2, ...)"
 		};
 	};
 })(window);

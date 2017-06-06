@@ -289,6 +289,9 @@ var editor;
       }
     }
   };
+	spreadsheet_api.prototype.asc_getLocale = function() {
+		return AscCommon.g_oDefaultCultureInfo.LCID;
+	};
 
   spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
     this.CoAuthoringApi.auth(this.getViewMode());
@@ -2469,11 +2472,11 @@ var editor;
     return this.wb.cellCommentator.getDocumentComments();
   };
 
-  spreadsheet_api.prototype.asc_showComments = function () {
-    this.wb.showComments(true);
+  spreadsheet_api.prototype.asc_showComments = function (isShowSolved) {
+    this.wb.showComments(true, isShowSolved);
   };
   spreadsheet_api.prototype.asc_hideComments = function () {
-    this.wb.showComments(false);
+    this.wb.showComments(false, false);
   };
 
   // Shapes
@@ -3477,6 +3480,7 @@ var editor;
 	prot['asc_getFormatCells'] = prot.asc_getFormatCells;
   prot["asc_getLocaleCurrency"] = prot.asc_getLocaleCurrency;
   prot["asc_setLocale"] = prot.asc_setLocale;
+  prot["asc_getLocale"] = prot.asc_getLocale;
   prot["asc_getEditorPermissions"] = prot.asc_getEditorPermissions;
   prot["asc_LoadDocument"] = prot.asc_LoadDocument;
   prot["asc_LoadEmptyDocument"] = prot.asc_LoadEmptyDocument;

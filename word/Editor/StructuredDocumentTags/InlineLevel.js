@@ -50,7 +50,8 @@ function CInlineLevelSdt()
 	this.Pr   = new CSdtPr();
 	this.Type = para_InlineLevelSdt;
 
-	this.BoundsPaths = null;
+	this.BoundsPaths          = null;
+	this.BoundsPathsStartPage = -1;
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);
@@ -93,95 +94,6 @@ CInlineLevelSdt.prototype.Remove_FromContent = function(Pos, Count, UpdatePositi
 	History.Add(new CChangesParaFieldRemoveItem(this, Pos, DeletedItems));
 
 	CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent.apply(this, arguments);
-};
-CInlineLevelSdt.prototype.Add = function(Item)
-{
-	switch (Item.Type)
-	{
-		case para_Run      :
-		case para_Hyperlink:
-		{
-			var TextPr = this.Get_FirstTextPr();
-			Item.SelectAll();
-			Item.Apply_TextPr(TextPr);
-			Item.RemoveSelection();
-
-			var CurPos = this.State.ContentPos;
-			var CurItem = this.Content[CurPos];
-			if (para_Run === CurItem.Type)
-			{
-				var NewRun = CurItem.Split2(CurItem.State.ContentPos);
-				this.Add_ToContent(CurPos + 1, Item);
-				this.Add_ToContent(CurPos + 2, NewRun);
-
-				this.State.ContentPos = CurPos + 2;
-				this.Content[this.State.ContentPos].MoveCursorToStartPos();
-			}
-			else
-				CurItem.Add(Item);
-
-			break;
-		}
-		case para_Math :
-		{
-			var ContentPos = new CParagraphContentPos();
-			this.Get_ParaContentPos(false, false, ContentPos);
-			var CurPos = ContentPos.Get(0);
-
-			// Ран формула делит на части, а в остальные элементы добавляется целиком
-			if (para_Run === this.Content[CurPos].Type)
-			{
-				// Разделяем текущий элемент (возвращается правая часть)
-				var NewElement = this.Content[CurPos].Split(ContentPos, 1);
-
-				if (null !== NewElement)
-					this.Add_ToContent(CurPos + 1, NewElement, true);
-
-				var Elem = new ParaMath();
-				Elem.Root.Load_FromMenu(Item.Menu, this.Get_Paragraph());
-				Elem.Root.Correct_Content(true);
-				this.Add_ToContent(CurPos + 1, Elem, true);
-
-				// Перемещаем кусор в конец формулы
-				this.State.ContentPos = CurPos + 1;
-				this.Content[this.State.ContentPos].MoveCursorToEndPos(false);
-			}
-			else
-				this.Content[CurPos].Add(Item);
-
-			break;
-		}
-		case para_Field:
-		{
-			// Вместо добавления самого элемента добавляем его содержимое
-			var Count = Item.Content.length;
-
-			if (Count > 0)
-			{
-				var CurPos  = this.State.ContentPos;
-				var CurItem = this.Content[CurPos];
-
-				var CurContentPos = new CParagraphContentPos();
-				CurItem.Get_ParaContentPos(false, false, CurContentPos);
-
-				var NewItem = CurItem.Split(CurContentPos, 0);
-				for (var Index = 0; Index < Count; Index++)
-				{
-					this.Add_ToContent(CurPos + Index + 1, Item.Content[Index], false);
-				}
-				this.Add_ToContent(CurPos + Count + 1, NewItem, false);
-				this.State.ContentPos = CurPos + Count;
-				this.Content[this.State.ContentPos].MoveCursorToEndPos();
-			}
-
-			break;
-		}
-		default :
-		{
-			this.Content[this.State.ContentPos].Add(Item);
-			break;
-		}
-	}
 };
 CInlineLevelSdt.prototype.Split = function (ContentPos, Depth)
 {
@@ -267,10 +179,8 @@ CInlineLevelSdt.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 	var oRangeBounds = this.Bounds[((CurLine << 16) & 0xFFFF0000) | (CurRange & 0x0000FFFF)];
 	if (oRangeBounds)
 	{
-		oRangeBounds.X0 += Dx;
-		oRangeBounds.X1 += Dx;
-		oRangeBounds.Y0 += Dy;
-		oRangeBounds.Y1 += Dy;
+		oRangeBounds.X += Dx;
+		oRangeBounds.Y += Dy;
 	}
 };
 CInlineLevelSdt.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
@@ -301,7 +211,8 @@ CInlineLevelSdt.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth
 };
 CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 {
-	if (null === this.BoundsPaths)
+	var StartPage = this.Paragraph.Get_StartPage_Absolute();
+	if (null === this.BoundsPaths || StartPage !== this.BoundsPathsStartPage)
 	{
 		var arrBounds = [], arrRects = [], CurPage = -1;
 		for (var Key in this.Bounds)
@@ -312,7 +223,7 @@ CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 				arrBounds.push(arrRects);
 				CurPage  = this.Bounds[Key].PageInternal;
 			}
-
+			this.Bounds[Key].Page = this.Paragraph.Get_AbsolutePage(this.Bounds[Key].PageInternal);
 			arrRects.push(this.Bounds[Key]);
 		}
 
@@ -323,6 +234,8 @@ CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 			oPolygon.fill([arrBounds[nIndex]]);
 			this.BoundsPaths = this.BoundsPaths.concat(oPolygon.GetPaths(0));
 		}
+
+		this.BoundsPathsStartPage = StartPage;
 	}
 
 	return this.BoundsPaths;
@@ -342,6 +255,10 @@ CInlineLevelSdt.prototype.SelectContentControl = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
 //----------------------------------------------------------------------------------------------------------------------
+CInlineLevelSdt.prototype.GetContentControlType = function()
+{
+	return AscCommonWord.sdttype_InlineLevel;
+};
 CInlineLevelSdt.prototype.SetPr = function(oPr)
 {
 	this.SetAlias(oPr.Alias);
@@ -457,6 +374,11 @@ CInlineLevelSdt.prototype.IsStopCursorOnEntryExit = function()
 {
 	return true;
 };
+CInlineLevelSdt.prototype.GetSelectedContentControls = function(arrContentControls)
+{
+	arrContentControls.push(this);
+	CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls.call(this, arrContentControls);
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CInlineLevelSdt = CInlineLevelSdt;
@@ -467,18 +389,10 @@ function TEST_ADD_SDT()
 
 	oLogicDocument.Create_NewHistoryPoint();
 
-	var oRun = new ParaRun();
-	oRun.Add(new ParaText("S"));
-	oRun.Add(new ParaText("d"));
-	oRun.Add(new ParaText("t"));
-
-	var oInlineContentControl = new CInlineLevelSdt();
-	oInlineContentControl.Add_ToContent(0, oRun);
-
-	var oPara = oLogicDocument.GetCurrentParagraph();
-	oPara.Add_ToContent(0, new ParaRun());
-	oPara.Add_ToContent(1, oInlineContentControl);
-
+	var oInlineContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_InlineLevel);
+	oInlineContentControl.Add(new ParaText("S"));
+	oInlineContentControl.Add(new ParaText("d"));
+	oInlineContentControl.Add(new ParaText("t"));
 
 	oLogicDocument.Recalculate();
 	oLogicDocument.Document_UpdateSelectionState();
@@ -494,12 +408,10 @@ function TEST_ADD_SDT2()
 
 	oLogicDocument.Create_NewHistoryPoint();
 
-
-	var oSdt = oLogicDocument.AddContentControl();
+	var oSdt = oLogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 	oSdt.AddToParagraph(new ParaText("S"));
 	oSdt.AddToParagraph(new ParaText("d"));
 	oSdt.AddToParagraph(new ParaText("t"));
-
 
 	oLogicDocument.Recalculate();
 	oLogicDocument.Document_UpdateSelectionState();
