@@ -2097,6 +2097,20 @@ $( function () {
         strictEqual( difBetween( oParser.calculate().getValue(), ((Math.E * Math.E - 1) / (Math.E * Math.E + 1)) ), true );
     } );
 
+	test( "Test: \"XOR\"", function () {
+		oParser = new parserFormula( 'XOR(3>0,2<9)', "A2", ws );
+		ok( oParser.parse(), 'XOR(3>0,2<9)' );
+		strictEqual( oParser.calculate().getValue(), "FALSE", 'XOR(3>0,2<9)' );
+
+		oParser = new parserFormula( 'XOR(3>12,4>6)', "A2", ws );
+		ok( oParser.parse(), 'XOR(3>12,4>6)' );
+		strictEqual( oParser.calculate().getValue(), "FALSE", 'XOR(3>12,4>6)' );
+
+		oParser = new parserFormula( 'XOR(3>12,4<6)', "A2", ws );
+		ok( oParser.parse(), 'XOR(3>12,4<6)' );
+		strictEqual( oParser.calculate().getValue(), "TRUE", 'XOR(3>12,4<6)' );
+	} );
+
     test( "Test: \"COMBIN\"", function () {
 
         oParser = new parserFormula( "COMBIN(8,2)", "A2", ws );
