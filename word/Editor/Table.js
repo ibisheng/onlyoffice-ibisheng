@@ -4439,7 +4439,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 	if (this.Selection.Type2 === table_Selection_Border)
 	{
 		var LogicDocument = this.LogicDocument;
-		if (!LogicDocument || true === LogicDocument.IsViewMode() || this.Selection.Data2.PageNum != CurPage)
+		if (!LogicDocument || true !== LogicDocument.CanEdit() || this.Selection.Data2.PageNum != CurPage)
 			return;
 
 		var _X = X;
