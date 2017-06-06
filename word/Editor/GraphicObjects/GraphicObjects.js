@@ -258,7 +258,7 @@ CGraphicObjects.prototype =
 
     isViewMode: function()
     {
-        return editor.isViewMode;
+        return this.document.IsViewMode();
     },
 
     convertPixToMM: function(v)
@@ -2657,7 +2657,7 @@ CGraphicObjects.prototype =
 
     unGroupSelectedObjects: function()
     {
-        if(!(editor.isViewMode === false))
+        if(!(this.isViewMode() === false))
             return;
         var bTrackRevisions = false;
         if(this.document.TrackRevisions){
@@ -2782,11 +2782,6 @@ CGraphicObjects.prototype =
             content.IsSelectionEmpty(bCheckHidden);
         }
         return false;
-    },
-
-    isViewMod: function()
-    {
-        return editor.isViewMode;
     },
 
     moveSelectedObjects: DrawingObjectsController.prototype.moveSelectedObjects,

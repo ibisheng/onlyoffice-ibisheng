@@ -687,7 +687,7 @@ CShape.prototype.recalculateContent2 = function()
             }
             content.Set_StartPage(0);
             content.Reset(0, 0, w, 20000);
-            content.Recalculate_Page(content.StartPage, true);
+            content.RecalculateContent(this.txBody.contentWidth2, this.txBody.contentHeight2, 0);
 
             var oTextWarpContent = this.checkTextWarp(content, body_pr, this.txBody.contentWidth2, this.txBody.contentHeight2, false, true);
             this.txWarpStructParamarks2 = oTextWarpContent.oTxWarpStructParamarks;

@@ -1549,9 +1549,6 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 	// Нужно ли проверять тип лока у ContentControl при проверке залоченности выделенных объектов
 	this.CheckContentControlsLock = true;
 
-	// Можно ли работать с комментариями в режиме просмотра документа
-	this.EditCommentsInViewMode = true;
-
 	// Класс для работы со сносками
 	this.Footnotes               = new CFootnotesController(this);
 	this.LogicDocumentController = new CLogicDocumentController(this);
@@ -3656,7 +3653,7 @@ CDocument.prototype.Draw                                     = function(nPageInd
     var Page_StartPos = this.Pages[nPageIndex].Pos;
     var SectPr        = this.SectionsInfo.Get_SectPr(Page_StartPos).SectPr;
 
-    if (docpostype_HdrFtr !== this.CurPos.Type && !this.Api.isViewMode)
+    if (docpostype_HdrFtr !== this.CurPos.Type && !this.IsViewMode())
         pGraphics.Start_GlobalAlpha();
 
     // Рисуем границы вокруг страницы (если границы надо рисовать под текстом)
@@ -3668,7 +3665,7 @@ CDocument.prototype.Draw                                     = function(nPageInd
     // Рисуем содержимое документа на данной странице
     if (docpostype_HdrFtr === this.CurPos.Type)
         pGraphics.put_GlobalAlpha(true, 0.4);
-    else if (!this.Api.isViewMode)
+    else if (!this.IsViewMode())
         pGraphics.End_GlobalAlpha();
 
     this.DrawingObjects.drawBehindDoc(nPageIndex, pGraphics);
@@ -6116,7 +6113,7 @@ CDocument.prototype.OnKeyDown = function(e)
     var bUpdateSelection = true;
     var bRetValue        = keydownresult_PreventNothing;
 
-    if (e.KeyCode == 8 && false === this.IsViewMode()) // BackSpace
+    if (e.KeyCode == 8) // BackSpace
     {
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true, this.IsFormFieldEditing()))
         {
@@ -6125,7 +6122,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 9 && false === this.IsViewMode()) // Tab
+    else if (e.KeyCode == 9) // Tab
     {
         var SelectedInfo = this.GetSelectedElementsInfo();
 
@@ -6203,43 +6200,40 @@ CDocument.prototype.OnKeyDown = function(e)
             this.DrawingDocument.FirePaint();
         }
         else
-        {
-            if (false === this.IsViewMode())
-            {
-                var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : AscCommon.changestype_Document_Content_Add );
-                if (false === this.Document_Is_SelectionLocked(CheckType))
-                {
-                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_EnterButton);
+		{
+			var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : AscCommon.changestype_Document_Content_Add );
+			if (false === this.Document_Is_SelectionLocked(CheckType))
+			{
+				this.Create_NewHistoryPoint(AscDFH.historydescription_Document_EnterButton);
 
-                    var oSelectedInfo = this.GetSelectedElementsInfo();
-                    var oMath         = oSelectedInfo.Get_Math();
-                    if (null !== oMath && oMath.Is_InInnerContent())
-                    {
-                        if (oMath.Handle_AddNewLine())
-                            this.Recalculate();
-                    }
-                    else
-                    {
-                        if (e.ShiftKey && e.CtrlKey)
-                        {
-                            this.AddToParagraph(new ParaNewLine(break_Column));
-                        }
-                        else if (e.ShiftKey)
-                        {
-                            this.AddToParagraph(new ParaNewLine(break_Line));
-                        }
-                        else if (e.CtrlKey)
-                        {
-                            this.AddToParagraph(new ParaNewLine(break_Page));
-                        }
-                        else
-                        {
-                            this.AddNewParagraph();
-                        }
-                    }
-                }
-            }
-        }
+				var oSelectedInfo = this.GetSelectedElementsInfo();
+				var oMath         = oSelectedInfo.Get_Math();
+				if (null !== oMath && oMath.Is_InInnerContent())
+				{
+					if (oMath.Handle_AddNewLine())
+						this.Recalculate();
+				}
+				else
+				{
+					if (e.ShiftKey && e.CtrlKey)
+					{
+						this.AddToParagraph(new ParaNewLine(break_Column));
+					}
+					else if (e.ShiftKey)
+					{
+						this.AddToParagraph(new ParaNewLine(break_Line));
+					}
+					else if (e.CtrlKey)
+					{
+						this.AddToParagraph(new ParaNewLine(break_Page));
+					}
+					else
+					{
+						this.AddNewParagraph();
+					}
+				}
+			}
+		}
 
         bRetValue = keydownresult_PreventAll;
     }
@@ -6293,7 +6287,7 @@ CDocument.prototype.OnKeyDown = function(e)
 		
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 32 && false === this.IsViewMode()) // Space
+    else if (e.KeyCode == 32) // Space
     {
     	var bFillingForm = false;
     	if (this.IsFormFieldEditing() && ((true === e.ShiftKey && true === e.CtrlKey) || true !== e.CtrlKey))
@@ -6629,7 +6623,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.MoveCursorDown(true === e.ShiftKey, true === e.CtrlKey);
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 46 && false === this.IsViewMode()) // Delete
+    else if (e.KeyCode == 46) // Delete
     {
         if (true != e.ShiftKey)
         {
@@ -6641,7 +6635,7 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-    else if (e.KeyCode == 49 && false === this.IsViewMode() && true === e.AltKey && !e.AltGr) // Alt + Ctrl + Num1 - применяем стиль Heading1
+    else if (e.KeyCode == 49 && true === e.AltKey && !e.AltGr) // Alt + Ctrl + Num1 - применяем стиль Heading1
     {
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
         {
@@ -6651,7 +6645,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 50 && false === this.IsViewMode() && true === e.AltKey && !e.AltGr) // Alt + Ctrl + Num2 - применяем стиль Heading2
+    else if (e.KeyCode == 50 && true === e.AltKey && !e.AltGr) // Alt + Ctrl + Num2 - применяем стиль Heading2
     {
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
         {
@@ -6661,7 +6655,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 51 && false === this.IsViewMode() && true === e.AltKey && !e.AltGr) // Alt + Ctrl + Num3 - применяем стиль Heading3
+    else if (e.KeyCode == 51 && true === e.AltKey && !e.AltGr) // Alt + Ctrl + Num3 - применяем стиль Heading3
     {
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
         {
@@ -6671,7 +6665,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode === 53 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + Num5 - зачеркиваем текст
+    else if (e.KeyCode === 53 && true === e.CtrlKey) // Ctrl + Num5 - зачеркиваем текст
     {
         var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
@@ -6691,7 +6685,7 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 66 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + B - делаем текст жирным
+    else if (e.KeyCode == 66 && true === e.CtrlKey) // Ctrl + B - делаем текст жирным
     {
         var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
@@ -6713,7 +6707,7 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-    else if (e.KeyCode == 69 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + E + ...
+    else if (e.KeyCode == 69 && true === e.CtrlKey) // Ctrl + E + ...
     {
         if (true !== e.AltKey) // Ctrl + E - переключение прилегания параграфа между center и left
         {
@@ -6733,7 +6727,7 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-	else if (e.KeyCode == 70 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + F + ...
+	else if (e.KeyCode == 70 && true === e.CtrlKey) // Ctrl + F + ...
 	{
 		if (true === e.AltKey)
 		{
@@ -6741,7 +6735,7 @@ CDocument.prototype.OnKeyDown = function(e)
 			bRetValue = keydownresult_PreventAll;
 		}
 	}
-    else if (e.KeyCode == 73 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + I - делаем текст наклонным
+    else if (e.KeyCode == 73 && true === e.CtrlKey) // Ctrl + I - делаем текст наклонным
     {
         var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
@@ -6755,19 +6749,19 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-    else if (e.KeyCode == 74 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + J переключение прилегания параграфа между justify и left
+    else if (e.KeyCode == 74 && true === e.CtrlKey) // Ctrl + J переключение прилегания параграфа между justify и left
     {
         this.private_ToggleParagraphAlignByHotkey(AscCommon.align_Justify);
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 75 && false === this.IsViewMode() && true === e.CtrlKey && false === e.ShiftKey) // Ctrl + K - добавление гиперссылки
+    else if (e.KeyCode == 75 && true === e.CtrlKey && false === e.ShiftKey) // Ctrl + K - добавление гиперссылки
     {
-        if (true === this.CanAddHyperlink(false))
-            editor.sync_DialogAddHyperlink();
+        if (true === this.CanAddHyperlink(false) && this.CanEdit())
+            this.Api.sync_DialogAddHyperlink();
 
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 76 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + L + ...
+    else if (e.KeyCode == 76 && true === e.CtrlKey) // Ctrl + L + ...
     {
         if (true === e.ShiftKey) // Ctrl + Shift + L - добавляем список к данному параграфу
         {
@@ -6785,7 +6779,7 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-    else if (e.KeyCode == 77 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + M + ...
+    else if (e.KeyCode == 77 && true === e.CtrlKey) // Ctrl + M + ...
     {
         if (true === e.ShiftKey) // Ctrl + Shift + M - уменьшаем левый отступ
             this.DecreaseIndent();
@@ -6796,7 +6790,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 80 && true === e.CtrlKey) // Ctrl + P + ...
     {
-        if (true === e.ShiftKey && false === this.IsViewMode()) // Ctrl + Shift + P - добавляем номер страницы в текущую позицию
+        if (true === e.ShiftKey) // Ctrl + Shift + P - добавляем номер страницы в текущую позицию
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
@@ -6811,7 +6805,7 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-    else if (e.KeyCode == 82 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + R - переключение прилегания параграфа между right и left
+    else if (e.KeyCode == 82 && true === e.CtrlKey) // Ctrl + R - переключение прилегания параграфа между right и left
     {
         this.private_ToggleParagraphAlignByHotkey(AscCommon.align_Right);
         bRetValue = keydownresult_PreventAll;
@@ -6821,7 +6815,7 @@ CDocument.prototype.OnKeyDown = function(e)
 		this.DrawingDocument.m_oWordControl.m_oApi.asc_Save(false);
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 85 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + U - делаем текст подчеркнутым
+    else if (e.KeyCode == 85 && true === e.CtrlKey) // Ctrl + U - делаем текст подчеркнутым
     {
         var TextPr = this.GetCalculatedTextPr();
         if (null != TextPr)
@@ -6835,7 +6829,7 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-	else if (e.KeyCode == 86 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + V
+	else if (e.KeyCode == 86 && true === e.CtrlKey) // Ctrl + V
 	{
 		if (true === e.ShiftKey) // Ctrl + Shift + V - вставка форматирования текста
 		{
@@ -6847,12 +6841,12 @@ CDocument.prototype.OnKeyDown = function(e)
 			bRetValue = keydownresult_PreventAll;
 		}
 	}
-    else if (e.KeyCode == 89 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + Y - Redo
+    else if (e.KeyCode == 89 && true === e.CtrlKey && (this.CanEdit() || this.CanEditCommentsInViewMode() || this.IsFillingFormMode())) // Ctrl + Y - Redo
     {
         this.Document_Redo();
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 90 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + Z - Undo
+    else if (e.KeyCode == 90 && true === e.CtrlKey && (this.CanEdit() || this.CanEditCommentsInViewMode() || this.IsFillingFormMode())) // Ctrl + Z - Undo
     {
        	this.Document_Undo();
         bRetValue = keydownresult_PreventAll;
@@ -6909,7 +6903,7 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 187 && false === this.IsViewMode()) // =
+    else if (e.KeyCode == 187) // =
     {
         if (true === e.CtrlKey) // Ctrl + Shift + +, Ctrl + = - superscript/subscript
         {
@@ -6957,7 +6951,7 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-    else if (e.KeyCode == 189 && false === this.IsViewMode()) // Клавиша Num-
+    else if (e.KeyCode == 189) // Клавиша Num-
     {
         if (true === e.CtrlKey && true === e.ShiftKey && false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
         {
@@ -6987,19 +6981,19 @@ CDocument.prototype.OnKeyDown = function(e)
             bRetValue = keydownresult_PreventAll;
         }
     }
-    else if (e.KeyCode == 219 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + [
+    else if (e.KeyCode == 219 && true === e.CtrlKey) // Ctrl + [
     {
-        editor.FontSizeOut();
+    	this.Api.FontSizeOut();
         this.Document_UpdateInterfaceState();
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 221 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + ]
+    else if (e.KeyCode == 221 && true === e.CtrlKey) // Ctrl + ]
     {
-        editor.FontSizeIn();
+        this.Api.FontSizeIn();
         this.Document_UpdateInterfaceState();
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 12288 && false === this.IsViewMode()) // Space
+    else if (e.KeyCode == 12288) // Space
     {
         if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, this.IsFormFieldEditing()))
         {
@@ -7027,9 +7021,6 @@ CDocument.prototype.OnKeyDown = function(e)
 };
 CDocument.prototype.OnKeyPress = function(e)
 {
-	if (true === this.Api.isViewMode)
-		return false;
-
 	var Code;
 	if (null != e.Which)
 		Code = e.Which;
@@ -8631,7 +8622,7 @@ CDocument.prototype.IsCursorInHyperlink = function(bCheckEnd)
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с совместным редактирования
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData)
+CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode, isIgnoreCanEditFlag)
 {
 	return false;
 };
@@ -8808,6 +8799,9 @@ CDocument.prototype.Remove_Comment = function(Id, bSendEvent, bRecalculate)
 };
 CDocument.prototype.CanAddComment = function()
 {
+	if (!this.CanEdit() && !this.CanEditCommentsInViewMode())
+		return false;
+
 	if (true !== this.Comments.Is_Use())
 		return false;
 
@@ -8899,7 +8893,7 @@ CDocument.prototype.GetSelectionAnchorPos = function()
 //----------------------------------------------------------------------------------------------------------------------
 CDocument.prototype.TextBox_Put = function(sText, rFonts)
 {
-	if (true !== this.Api.isViewMode && false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+	if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
 	{
 		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTextFromTextBox);
 
@@ -15146,11 +15140,10 @@ CDocument.prototype.IsInFormField = function()
 CDocument.prototype.StartFillingFormMode = function()
 {
 	this.SetFillingFormMode(true);
-	this.CollaborativeEditing.Set_GlobalLock(true)
 };
 CDocument.prototype.IsFormFieldEditing = function()
 {
-	if (true === this.CollaborativeEditing.Get_GlobalLock() && true === this.IsFillingFormMode() && true === this.IsInFormField())
+	if (true === this.IsFillingFormMode() && true === this.IsInFormField())
 		return true;
 
 	return false;
@@ -15273,18 +15266,19 @@ CDocument.prototype.IsCheckContentControlsLock = function()
 };
 CDocument.prototype.CanEditCommentsInViewMode = function()
 {
+	return false;
 	return this.EditCommentsInViewMode;
-};
-CDocument.prototype.SetEditCommentsInViewMode = function(isCan)
-{
-	this.EditCommentsInViewMode = isCan;
 };
 CDocument.prototype.IsViewMode = function()
 {
-	if (this.Api.isViewMode)
-		return true;
+	return this.Api.isViewMode;
+};
+CDocument.prototype.CanEdit = function()
+{
+	if (this.IsViewMode() || this.CanEditCommentsInViewMode() || this.IsFillingFormMode())
+		return false;
 
-	return false;
+	return true;
 };
 
 function CDocumentSelectionState()

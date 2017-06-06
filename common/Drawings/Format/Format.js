@@ -8485,7 +8485,7 @@ CBullet.prototype =
 
 function CBulletColor()
 {
-    this.type = AscFormat.BULLET_TYPE_COLOR_NONE;
+    this.type = AscFormat.BULLET_TYPE_COLOR_CLRTX;
     this.UniColor = null;
 
 }

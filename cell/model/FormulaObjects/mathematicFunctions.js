@@ -628,7 +628,8 @@
 	cBASE.prototype.argumentsMax = 3;
 	cBASE.prototype.isXLFN = true;
 	cBASE.prototype.Calculate = function (arg) {
-		var argClone = this._checkArguments(arg, arguments[1]);
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1].tocNumber();
@@ -661,7 +662,7 @@
 			return new cString(str);
 		}
 
-		return this.value = this._findArrayInNumberArguments(argClone, base_math);
+		return this.value = this._findArrayInNumberArguments(oArguments, base_math);
 	};
 	cBASE.prototype.getInfo = function () {
 		return {
@@ -786,7 +787,8 @@
 	cCEILING_MATH.prototype.argumentsMax = 3;
 	cCEILING_MATH.prototype.isXLFN = true;
 	cCEILING_MATH.prototype.Calculate = function (arg) {
-		var argClone = this._checkArguments(arg, arguments[1]);
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
 
 		argClone[0] = argClone[0].tocNumber();
 		if(!argClone[1]){
@@ -818,7 +820,7 @@
 			}
 		}
 
-		return this.value = this._findArrayInNumberArguments(argClone, floor_math);
+		return this.value = this._findArrayInNumberArguments(oArguments, floor_math);
 	};
 	cCEILING_MATH.prototype.getInfo = function () {
 		return {
@@ -842,7 +844,8 @@
 	cCEILING_PRECISE.prototype.argumentsMax = 2;
 	cCEILING_PRECISE.prototype.isXLFN = true;
 	cCEILING_PRECISE.prototype.Calculate = function (arg) {
-		var argClone = this._checkArguments(arg, arguments[1]);
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
@@ -864,7 +867,7 @@
 			return new cNumber(Math.ceil(quotient) * absSignificance);
 		}
 
-		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+		return this.value = this._findArrayInNumberArguments(oArguments, floorHelper);
 	};
 	cCEILING_PRECISE.prototype.getInfo = function () {
 		return {
@@ -979,7 +982,8 @@
 	cCOMBINA.prototype.argumentsMax = 2;
 	cCOMBINA.prototype.isXLFN = true;
 	cCOMBINA.prototype.Calculate = function (arg) {
-		var argClone = this._checkArguments(arg, arguments[1]);
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1].tocNumber();
@@ -1002,7 +1006,7 @@
 			return new cNumber(Math.binomCoeff(a + b - 1, b));
 		}
 
-		return this.value = this._findArrayInNumberArguments(argClone, combinaCalculate);
+		return this.value = this._findArrayInNumberArguments(oArguments, combinaCalculate);
 	};
 	cCOMBINA.prototype.getInfo = function () {
 		return {
@@ -1342,7 +1346,8 @@
 	cDECIMAL.prototype.argumentsMax = 2;
 	cDECIMAL.prototype.isXLFN = true;
 	cDECIMAL.prototype.Calculate = function (arg) {
-		var argClone = this._checkArguments(arg, arguments[1]);
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
 
 		argClone[0] = argClone[0].tocString();
 		argClone[1] = argClone[1].tocNumber();
@@ -1400,7 +1405,7 @@
 			return isNaN(fVal) ? new cError(cErrorType.not_numeric) : new cNumber(fVal);
 		}
 
-		return this.value = this._findArrayInNumberArguments(argClone, decimal_calculate, true);
+		return this.value = this._findArrayInNumberArguments(oArguments, decimal_calculate, true);
 	};
 	cDECIMAL.prototype.getInfo = function () {
 		return {
@@ -1813,7 +1818,8 @@
 	cFLOOR_PRECISE.prototype.argumentsMax = 2;
 	cFLOOR_PRECISE.prototype.isXLFN = true;
 	cFLOOR_PRECISE.prototype.Calculate = function (arg) {
-		var argClone = this._checkArguments(arg, arguments[1]);
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
@@ -1835,7 +1841,7 @@
 			return new cNumber(Math.floor(quotient) * absSignificance);
 		}
 
-		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+		return this.value = this._findArrayInNumberArguments(oArguments, floorHelper);
 	};
 	cFLOOR_PRECISE.prototype.getInfo = function () {
 		return {
@@ -1859,7 +1865,8 @@
 	cFLOOR_MATH.prototype.argumentsMax = 3;
 	cFLOOR_MATH.prototype.isXLFN = true;
 	cFLOOR_MATH.prototype.Calculate = function (arg) {
-		var argClone = this._checkArguments(arg, arguments[1]);
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
 
 		argClone[0] = argClone[0].tocNumber();
 		if(!argClone[1]){
@@ -1891,7 +1898,7 @@
 			}
 		}
 
-		return this.value = this._findArrayInNumberArguments(argClone, floor_math);
+		return this.value = this._findArrayInNumberArguments(oArguments, floor_math);
 	};
 	cFLOOR_MATH.prototype.getInfo = function () {
 		return {
@@ -2063,7 +2070,8 @@
 	cISO_CEILING.prototype.argumentsMax = 2;
 	//cISO_CEILING.prototype.isXLFN = true;
 	cISO_CEILING.prototype.Calculate = function (arg) {
-		var argClone = this._checkArguments(arg, arguments[1]);
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
@@ -2085,7 +2093,7 @@
 			return new cNumber(Math.ceil(quotient) * absSignificance);
 		}
 
-		return this.value = this._findArrayInNumberArguments(argClone, floorHelper);
+		return this.value = this._findArrayInNumberArguments(oArguments, floorHelper);
 	};
 	cISO_CEILING.prototype.getInfo = function () {
 		return {
