@@ -2271,8 +2271,9 @@
 				isEmpty = false;
 				break;
 			}
-			if(!isEmpty){
-				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function(){oThis.WritePivotCaches();});
+			if(!isEmpty) {
+				this.bs.WriteItem(c_oSerWorkbookTypes.PivotCaches, function () {oThis.WritePivotCaches();});
+			}
 			if (this.wb.externalReferences.length > 0) {
 				this.bs.WriteItem(c_oSerWorkbookTypes.ExternalReferences, function() {oThis.WriteExternalReferences();});
 			}
