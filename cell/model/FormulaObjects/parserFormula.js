@@ -2293,7 +2293,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		this.value = null;
 		this.argumentsCurrent = 0;
 
-		this.findArgArrayIndex = null;
 //    this.isXLFN = rx_sFuncPref.test(this.name);
 	}
 
@@ -2371,8 +2370,10 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cBaseFunction.prototype.checkArguments = function () {
 		return this.argumentsMin <= this.argumentsCurrent && this.argumentsCurrent <= this.argumentsMax;
 	};
-	cBaseFunction.prototype._findArrayInNumberArguments = function (inputArguments, calculateFunc, dNotCheckNumberType){
+	cBaseFunction.prototype._findArrayInNumberArguments = function (oArguments, calculateFunc, dNotCheckNumberType){
 		var argsArray = [];
+		var inputArguments = oArguments.args;
+		var findArgArrayIndex = oArguments.indexArr;
 
 		var parseArray = function(array){
 			array.foreach(function (elem, r, c) {
@@ -2401,43 +2402,38 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			return array;
 		};
 
-		if(null !== this.findArgArrayIndex){
-			return parseArray(inputArguments[this.findArgArrayIndex]);
-		}
-		else{
+		if(null !== findArgArrayIndex){
+			return parseArray(inputArguments[findArgArrayIndex]);
+		}else{
 			for(var i = 0; i < inputArguments.length; i++){
-				if(cElementType.array === inputArguments[i].type){
-					return parseArray(inputArguments[i]);
+				if(cElementType.string === inputArguments[i].type && !dNotCheckNumberType){
+					return new cError(cErrorType.wrong_value_type);
 				}else{
-					if(cElementType.string === inputArguments[i].type && !dNotCheckNumberType){
-						return new cError(cErrorType.wrong_value_type);
-					}else{
-						argsArray[i] = inputArguments[i].getValue();
-					}
+					argsArray[i] = inputArguments[i].getValue();
 				}
 			}
 		}
 
 		return calculateFunc(argsArray);
 	};
-	cBaseFunction.prototype._checkArguments = function (args, arg1) {
+	cBaseFunction.prototype._prepareArguments = function (args, arg1) {
 		var newArgs = [];
+		var indexArr = null;
 
-		this.findArgArrayIndex = null;
 		for(var i = 0; i < args.length; i++){
 			var arg = args[i];
 
 			if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
 				newArgs[i] = arg.cross(arg1);
 			}else if(cElementType.array === arg.type){
-				this.findArgArrayIndex = i;
+				indexArr = i;
 				newArgs[i] = arg;
 			}else{
 				newArgs[i] = arg;
 			}
 		}
 
-		return newArgs;
+		return {args: newArgs, indexArr: indexArr};
 	};
 	cBaseFunction.prototype._checkErrorArg = function (argArray) {
 		for (var i = 0; i < argArray.length; i++) {
