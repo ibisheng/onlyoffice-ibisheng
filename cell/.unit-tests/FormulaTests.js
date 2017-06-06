@@ -2077,7 +2077,7 @@ $( function () {
 	test( "Test: \"IMSECH\"", function () {
 		oParser = new parserFormula( 'IMSECH("4+3i")', "A2", ws );
 		ok( oParser.parse(), 'IMSECH("4+3i")' );
-		strictEqual( oParser.calculate().getValue(), "-0.03625349691586888+0.00516434460775318i", 'IMSECH("4+3i")' );
+		strictEqual( oParser.calculate().getValue(), "-0.03625349691586888-0.00516434460775318i", 'IMSECH("4+3i")' );
 	} );
 
 	test( "Test: \"IMTAN\"", function () {
