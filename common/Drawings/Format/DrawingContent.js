@@ -133,9 +133,17 @@
             this.Start_Recalculate(fWidth, fHeight);
             if(this.Pages.length > 1){
                 var fSummaryHeight = this.Get_SummaryHeight();
-                var fNeedHeight = fSummaryHeight;
+
+                var fLow = fHeight, fHigh = fSummaryHeight;
+                this.Start_Recalculate(fWidth, fHigh);
+                var nItCount = 0;
+                while(this.Pages.length > 1 && nItCount < 5){
+                    fHigh += fSummaryHeight;
+                    this.Start_Recalculate(fWidth, fHigh);
+                    ++nItCount;
+                }
+                var fNeedHeight = fHigh;
                 if(this.Get_ColumnsCount() > 1){
-                    var fLow = fHeight, fHigh = fSummaryHeight;
                     while((fHigh - fLow) > 0.1){
                         var fCheckHeight = fLow +  (fHigh - fLow)/2;
                         this.Start_Recalculate(fWidth, fCheckHeight);

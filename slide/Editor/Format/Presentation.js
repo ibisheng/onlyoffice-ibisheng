@@ -3106,7 +3106,7 @@ CPresentation.prototype =
             {
                 target_doc_content1 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
             }
-            this.AddToParagraph( new ParaText( String.fromCharCode( Code ) ), undefined, true );
+            this.AddToParagraph( new ParaText( String.fromCharCode( Code ) ), false, true );
             if(this.Slides[this.CurPage])
             {
                 target_doc_content2 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();

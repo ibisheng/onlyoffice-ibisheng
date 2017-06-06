@@ -2989,7 +2989,7 @@ CParagraphRecalculateStateWrap.prototype =
 
             NumberingItem.Bullet = Bullet;
             NumberingItem.BulletNum = BulletNum + 1;
-            NumberingItem.Measure(g_oTextMeasurer, FirstTextPr, Para.Get_Theme());
+            NumberingItem.Measure(g_oTextMeasurer, FirstTextPr, Para.Get_Theme(), Para.Get_ColorMap());
 
 
             if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
