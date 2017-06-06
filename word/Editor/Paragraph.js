@@ -1431,7 +1431,8 @@ Paragraph.prototype.Internal_Draw_2 = function(CurPage, pGraphics, Pr)
 };
 Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 {
-	if (!this.bFromDocument)
+	var LogicDocument = this.LogicDocument;
+	if (!this.bFromDocument || !LogicDocument)
 		return;
 
 	var bDrawBorders = this.Is_NeedDrawBorders();
@@ -1442,14 +1443,14 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 
 	var _Page = this.Pages[CurPage];
 
-	var DocumentComments = editor.WordControl.m_oLogicDocument.Comments;
+	var DocumentComments = LogicDocument.Comments;
 	var Page_abs         = this.Get_AbsolutePage(CurPage);
 
-	var DrawComm           = ( DocumentComments.Is_Use() && true != editor.isViewMode);
-	var DrawFind           = editor.WordControl.m_oLogicDocument.SearchEngine.Selection;
+	var DrawComm           = ( DocumentComments.Is_Use() && (true !== LogicDocument.IsViewMode() || true === LogicDocument.CanEditCommentsInViewMode()));
+	var DrawFind           = LogicDocument.SearchEngine.Selection;
 	var DrawColl           = ( undefined === pGraphics.RENDERER_PDF_FLAG ? false : true );
 	var DrawMMFields       = (this.LogicDocument && true === this.LogicDocument.Is_HightlightMailMergeFields() ? true : false);
-	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && true != editor.isViewMode);
+	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && (true !== LogicDocument.IsViewMode() || true === LogicDocument.CanEditCommentsInViewMode()));
 
 	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.Get_EndInfoByPage(CurPage - 1), DrawSolvedComments);
 
@@ -6030,7 +6031,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 {
 	var PagesCount = this.Pages.length;
 
-	if (this.bFromDocument && false === editor.isViewMode && null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && CurPage >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2)
+	if (this.bFromDocument && this.LogicDocument && false === this.LogicDocument.IsViewMode() && null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && CurPage >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2)
 		return this.Parent.Extend_ToPos(X, Y);
 
 	// Обновляем позицию курсора
@@ -6051,7 +6052,10 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 		var LastRange = this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1];
 		if (CurPage >= PagesCount - 1 && X > LastRange.W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom)
 		{
-			if (this.bFromDocument && false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+			if (this.bFromDocument
+				&& this.LogicDocument
+				&& false === this.LogicDocument.IsViewMode()
+				&& false === this.LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_Element_and_Type,
 					Element   : this,
 					CheckType : AscCommon.changestype_Paragraph_Content
@@ -6064,11 +6068,13 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 				{
 					this.MoveCursorToEndPos();
 					this.Document_SetThisElementCurrent(true);
-					editor.WordControl.m_oLogicDocument.Recalculate();
+					this.LogicDocument.Recalculate();
 					return;
 				}
 				else
+				{
 					History.Remove_LastPoint();
+				}
 			}
 		}
 	}

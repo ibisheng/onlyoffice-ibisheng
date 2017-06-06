@@ -4438,7 +4438,8 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 	var Page = this.Pages[CurPage];
 	if (this.Selection.Type2 === table_Selection_Border)
 	{
-		if (true === editor.isViewMode || this.Selection.Data2.PageNum != CurPage)
+		var LogicDocument = this.LogicDocument;
+		if (!LogicDocument || true === LogicDocument.IsViewMode() || this.Selection.Data2.PageNum != CurPage)
 			return;
 
 		var _X = X;
@@ -4476,8 +4477,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 				return;
 			}
 
-			var LogicDocument = (editor && true !== editor.isViewMode ? editor.WordControl.m_oLogicDocument : null);
-			if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+			if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_Element_and_Type,
 					Element   : this,
 					CheckType : AscCommon.changestype_Table_Properties
