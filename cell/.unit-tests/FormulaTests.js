@@ -2821,6 +2821,35 @@ $( function () {
 
     } );
 
+	test( "Test: \"CONCAT\"", function () {
+
+		ws.getRange2( "AA1" ).setValue( "a1" );
+		ws.getRange2( "AA2" ).setValue( "a2" );
+		ws.getRange2( "AA4" ).setValue( "a4" );
+		ws.getRange2( "AA5" ).setValue( "a5" );
+		ws.getRange2( "AA6" ).setValue( "a6" );
+		ws.getRange2( "AA7" ).setValue( "a7" );
+
+		ws.getRange2( "BB1" ).setValue( "b1" );
+		ws.getRange2( "BB2" ).setValue( "b2" );
+		ws.getRange2( "BB4" ).setValue( "b4" );
+		ws.getRange2( "BB5" ).setValue( "b5" );
+		ws.getRange2( "BB6" ).setValue( "b6" );
+		ws.getRange2( "BB7" ).setValue( "b7" );
+
+		oParser = new parserFormula('CONCAT("The"," ","sun"," ","will"," ","come"," ","up"," ","tomorrow.")', "A3", ws);
+		ok(oParser.parse(), "CONCAT(AA:AA, BB:BB)");
+		strictEqual(oParser.calculate().getValue(), "The sun will come up tomorrow.", "CONCAT(AA:AA, BB:BB)");
+
+	    oParser = new parserFormula("CONCAT(AA:AA, BB:BB)", "A3", ws);
+		ok(oParser.parse(), "CONCAT(AA:AA, BB:BB)");
+		strictEqual(oParser.calculate().getValue(), "a1a2a4a5a6a7b1b2b4b5b6b7", "CONCAT(AA:AA, BB:BB)");
+
+		oParser = new parserFormula("CONCAT(AA1:BB7)", "A3", ws);
+		ok(oParser.parse(), "CONCAT(AA1:BB7)");
+		strictEqual(oParser.calculate().getValue(), "a1b1a2b2a4b4a5b5a6b6a7b7", "CONCAT(AA1:BB7)");
+	});
+
     test( "Test: \"DEVSQ\"", function () {
 
         var ws1 = wb.getWorksheet( 1 );
