@@ -717,6 +717,7 @@
 		record: 2,
 		cacheId: 3,
 		table: 4
+	};
 	/** @enum */
 	var c_oSer_ExternalLinkTypes = {
 		Id: 0,
