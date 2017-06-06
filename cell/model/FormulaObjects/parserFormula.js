@@ -2292,6 +2292,8 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		this.name = name;
 		this.value = null;
 		this.argumentsCurrent = 0;
+
+		this.findArgArrayIndex = null;
 //    this.isXLFN = rx_sFuncPref.test(this.name);
 	}
 
@@ -2371,48 +2373,71 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 	cBaseFunction.prototype._findArrayInNumberArguments = function (inputArguments, calculateFunc, dNotCheckNumberType){
 		var argsArray = [];
-		for(var i = 0; i < inputArguments.length; i++){
-			if(cElementType.array === inputArguments[i].type){
-				inputArguments[i].foreach(function (elem, r, c) {
 
-					var arg;
-					argsArray = [];
-					for(var j = 0; j < inputArguments.length; j++){
-						if(i === j){
-							arg = elem;
-						}else if(cElementType.array === inputArguments[j].type){
-							arg = inputArguments[j].getElementRowCol(r, c);
-						}else{
-							arg = inputArguments[j];
-						}
+		var parseArray = function(array){
+			array.foreach(function (elem, r, c) {
 
-						if(arg && ((dNotCheckNumberType) || (cElementType.number === arg.type && !dNotCheckNumberType))){
-							argsArray[j] = arg.getValue();
-						}else{
-							argsArray = null;
-							break;
-						}
+				var arg;
+				argsArray = [];
+				for(var j = 0; j < inputArguments.length; j++){
+					if(i === j){
+						arg = elem;
+					}else if(cElementType.array === inputArguments[j].type){
+						arg = inputArguments[j].getElementRowCol(r, c);
+					}else{
+						arg = inputArguments[j];
 					}
 
-					this.array[r][c] = null === argsArray ? new cError(cErrorType.wrong_value_type) : calculateFunc(argsArray);
-				});
-				return inputArguments[i];
-			}else{
-				if(cElementType.string === inputArguments[i].type && !dNotCheckNumberType){
-					return new cError(cErrorType.wrong_value_type);
+					if(arg && ((dNotCheckNumberType) || (cElementType.number === arg.type && !dNotCheckNumberType))){
+						argsArray[j] = arg.getValue();
+					}else{
+						argsArray = null;
+						break;
+					}
+				}
+
+				this.array[r][c] = null === argsArray ? new cError(cErrorType.wrong_value_type) : calculateFunc(argsArray);
+			});
+			return array;
+		};
+
+		if(null !== this.findArgArrayIndex){
+			return parseArray(inputArguments[this.findArgArrayIndex]);
+		}
+		else{
+			for(var i = 0; i < inputArguments.length; i++){
+				if(cElementType.array === inputArguments[i].type){
+					return parseArray(inputArguments[i]);
 				}else{
-					argsArray[i] = inputArguments[i].getValue();
+					if(cElementType.string === inputArguments[i].type && !dNotCheckNumberType){
+						return new cError(cErrorType.wrong_value_type);
+					}else{
+						argsArray[i] = inputArguments[i].getValue();
+					}
 				}
 			}
 		}
 
 		return calculateFunc(argsArray);
 	};
-	cBaseFunction.prototype._checkCAreaArg = function (arg, arg1) {
-		if (arg instanceof cArea || arg instanceof cArea3D) {
-			arg = arg.cross(arg1);
+	cBaseFunction.prototype._checkArguments = function (args, arg1) {
+		var newArgs = [];
+
+		this.findArgArrayIndex = null;
+		for(var i = 0; i < args.length; i++){
+			var arg = args[i];
+
+			if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
+				newArgs[i] = arg.cross(arg1);
+			}else if(cElementType.array === arg.type){
+				this.findArgArrayIndex = i;
+				newArgs[i] = arg;
+			}else{
+				newArgs[i] = arg;
+			}
 		}
-		return arg;
+
+		return newArgs;
 	};
 	cBaseFunction.prototype._checkErrorArg = function (argArray) {
 		for (var i = 0; i < argArray.length; i++) {

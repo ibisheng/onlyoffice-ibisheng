@@ -628,10 +628,7 @@
 	cBASE.prototype.argumentsMax = 3;
 	cBASE.prototype.isXLFN = true;
 	cBASE.prototype.Calculate = function (arg) {
-		var argClone = [];
-		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
-		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
-		argClone[2] = this._checkCAreaArg(arg[2], arguments[1]);
+		var argClone = this._checkArguments(arg, arguments[1]);
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1].tocNumber();
@@ -789,10 +786,7 @@
 	cCEILING_MATH.prototype.argumentsMax = 3;
 	cCEILING_MATH.prototype.isXLFN = true;
 	cCEILING_MATH.prototype.Calculate = function (arg) {
-		var argClone = [];
-		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
-		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
-		argClone[2] = this._checkCAreaArg(arg[2], arguments[1]);
+		var argClone = this._checkArguments(arg, arguments[1]);
 
 		argClone[0] = argClone[0].tocNumber();
 		if(!argClone[1]){
@@ -848,9 +842,7 @@
 	cCEILING_PRECISE.prototype.argumentsMax = 2;
 	cCEILING_PRECISE.prototype.isXLFN = true;
 	cCEILING_PRECISE.prototype.Calculate = function (arg) {
-		var argClone = [];
-		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
-		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		var argClone = this._checkArguments(arg, arguments[1]);
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
@@ -987,9 +979,7 @@
 	cCOMBINA.prototype.argumentsMax = 2;
 	cCOMBINA.prototype.isXLFN = true;
 	cCOMBINA.prototype.Calculate = function (arg) {
-		var argClone = [];
-		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
-		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		var argClone = this._checkArguments(arg, arguments[1]);
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1].tocNumber();
@@ -1352,9 +1342,7 @@
 	cDECIMAL.prototype.argumentsMax = 2;
 	cDECIMAL.prototype.isXLFN = true;
 	cDECIMAL.prototype.Calculate = function (arg) {
-		var argClone = [];
-		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
-		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		var argClone = this._checkArguments(arg, arguments[1]);
 
 		argClone[0] = argClone[0].tocString();
 		argClone[1] = argClone[1].tocNumber();
@@ -1825,9 +1813,7 @@
 	cFLOOR_PRECISE.prototype.argumentsMax = 2;
 	cFLOOR_PRECISE.prototype.isXLFN = true;
 	cFLOOR_PRECISE.prototype.Calculate = function (arg) {
-		var argClone = [];
-		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
-		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		var argClone = this._checkArguments(arg, arguments[1]);
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
@@ -1873,10 +1859,7 @@
 	cFLOOR_MATH.prototype.argumentsMax = 3;
 	cFLOOR_MATH.prototype.isXLFN = true;
 	cFLOOR_MATH.prototype.Calculate = function (arg) {
-		var argClone = [];
-		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
-		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
-		argClone[2] = this._checkCAreaArg(arg[2], arguments[1]);
+		var argClone = this._checkArguments(arg, arguments[1]);
 
 		argClone[0] = argClone[0].tocNumber();
 		if(!argClone[1]){
@@ -2080,9 +2063,7 @@
 	cISO_CEILING.prototype.argumentsMax = 2;
 	//cISO_CEILING.prototype.isXLFN = true;
 	cISO_CEILING.prototype.Calculate = function (arg) {
-		var argClone = [];
-		argClone[0] = this._checkCAreaArg(arg[0], arguments[1]);
-		argClone[1] = this._checkCAreaArg(arg[1], arguments[1]);
+		var argClone = this._checkArguments(arg, arguments[1]);
 
 		argClone[0] = argClone[0].tocNumber();
 		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cNumber(1);
