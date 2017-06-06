@@ -3878,6 +3878,8 @@ function OfflineEditor () {
         window.g_file_path = "native_open_file";
         window.NATIVE_DOCUMENT_TYPE = "";
         _api = new window["Asc"]["spreadsheet_api"]({});
+        
+        AscCommon.g_clipboardBase.Init(_api);
 
         var userInfo = new Asc.asc_CUserInfo();
         userInfo.asc_putId(this.initSettings["docUserId"]);
