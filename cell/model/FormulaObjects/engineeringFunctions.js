@@ -527,7 +527,7 @@
 		}, Sech: function () {
 			if (this.img) {
 				var a = (2 * Math.cosh(this.real) * Math.cos(this.img)) / (Math.cosh(2 * this.real) + Math.cos(2 *this.img));
-				this.img = (2 * Math.sinh(this.real) * Math.sin(this.img)) / (Math.cosh(2 * this.real) + Math.cos(2 *this.img));
+				this.img = (-2 * Math.sinh(this.real) * Math.sin(this.img)) / (Math.cosh(2 * this.real) + Math.cos(2 *this.img));
 				this.real = a;
 			} else {
 				this.real = 1 / Math.cosh(this.real);
