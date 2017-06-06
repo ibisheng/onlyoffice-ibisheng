@@ -2386,10 +2386,10 @@ CTable.prototype.Get_EndInfo = function()
 
 	return null;
 };
-CTable.prototype.Get_PrevElementEndInfo = function(RowIndex)
+CTable.prototype.GetPrevElementEndInfo = function(RowIndex)
 {
 	if (0 === RowIndex)
-		return this.Parent.Get_PrevElementEndInfo(this);
+		return this.Parent.GetPrevElementEndInfo(this);
 	else
 		return this.Content[RowIndex - 1].Get_EndInfo();
 };

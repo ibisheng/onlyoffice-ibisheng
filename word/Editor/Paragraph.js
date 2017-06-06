@@ -736,7 +736,7 @@ Paragraph.prototype.Internal_Content_Remove = function(Pos)
 
 	// Удаляем комментарий, если это необходимо
 	if (true === this.DeleteCommentOnRemove && para_Comment === Item.Type)
-		this.LogicDocument.Remove_Comment(Item.CommentId, true, false);
+		this.LogicDocument.RemoveComment(Item.CommentId, true, false);
 
 	var SpellingsCount = this.SpellChecker.Elements.length;
 	for (var Pos = 0; Pos < SpellingsCount; Pos++)
@@ -824,7 +824,7 @@ Paragraph.prototype.Internal_Content_Remove2 = function(Pos, Count)
 	var CountCommentsToDelete = CommentsToDelete.length;
 	for (var Index = 0; Index < CountCommentsToDelete; Index++)
 	{
-		this.LogicDocument.Remove_Comment(CommentsToDelete[Index], true, false);
+		this.LogicDocument.RemoveComment(CommentsToDelete[Index], true, false);
 	}
 
 	// Передвинем все метки слов для проверки орфографии
@@ -968,13 +968,13 @@ Paragraph.prototype.Get_EndInfoByPage = function(CurPage)
 	// Здесь может приходить отрицательное значение
 
 	if (CurPage < 0)
-		return this.Parent.Get_PrevElementEndInfo(this);
+		return this.Parent.GetPrevElementEndInfo(this);
 	else
 		return this.Pages[CurPage].EndInfo.Copy();
 };
 Paragraph.prototype.Recalculate_PageEndInfo = function(PRSW, CurPage)
 {
-	var PrevInfo = ( 0 === CurPage ? this.Parent.Get_PrevElementEndInfo(this) : this.Pages[CurPage - 1].EndInfo.Copy() );
+	var PrevInfo = ( 0 === CurPage ? this.Parent.GetPrevElementEndInfo(this) : this.Pages[CurPage - 1].EndInfo.Copy() );
 
 	var PRSI = this.m_oPRSI;
 
@@ -2609,7 +2609,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 
 			for (var CommentId in CommentsToDelete)
 			{
-				this.LogicDocument.Remove_Comment(CommentId, true, false);
+				this.LogicDocument.RemoveComment(CommentId, true, false);
 			}
 		}
 
@@ -5261,7 +5261,7 @@ Paragraph.prototype.Correct_Content = function(_StartPos, _EndPos, bDoNotDeleteE
 	var CommentsCount = CommentsToDelete.length;
 	for (var CommentIndex = 0; CommentIndex < CommentsCount; CommentIndex++)
 	{
-		this.LogicDocument.Remove_Comment(CommentsToDelete[CommentIndex], true, false);
+		this.LogicDocument.RemoveComment(CommentsToDelete[CommentIndex], true, false);
 	}
 
 	// Проверим, чтобы предпоследний элемент был Run
@@ -5545,7 +5545,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 
 		for (var CommentId in CommentsToDelete)
 		{
-			this.LogicDocument.Remove_Comment(CommentId, true, false);
+			this.LogicDocument.RemoveComment(CommentId, true, false);
 		}
 
 		// Еще раз обновим метки
@@ -9363,7 +9363,7 @@ Paragraph.prototype.PreDelete = function()
 		var Item = this.Content[Index];
 		if (para_Comment === Item.Type)
 		{
-			this.LogicDocument.Remove_Comment(Item.CommentId, true, false);
+			this.LogicDocument.RemoveComment(Item.CommentId, true, false);
 		}
 	}
 };
@@ -10693,7 +10693,7 @@ Paragraph.prototype.CanAddComment = function()
 
 	return false;
 };
-Paragraph.prototype.Remove_CommentMarks = function(Id)
+Paragraph.prototype.RemoveCommentMarks = function(Id)
 {
 	var Count = this.Content.length;
 	for (var Pos = 0; Pos < Count; Pos++)
@@ -10740,7 +10740,7 @@ Paragraph.prototype.Replace_MisspelledWord = function(Word, WordId)
 
 	for (var CommentId in CommentsToDelete)
 	{
-		this.LogicDocument.Remove_Comment(CommentId, true, false);
+		this.LogicDocument.RemoveComment(CommentId, true, false);
 	}
 
 	this.Set_SelectionContentPos(StartPos, EndPos);
@@ -12639,7 +12639,7 @@ CParagraphDrawStateHightlights.prototype =
 		this.Check_CommentsFlag();
     },
 
-    Remove_Comment : function(Id)
+	RemoveComment : function(Id)
     {
 		if (!this.DrawComments)
 			return;

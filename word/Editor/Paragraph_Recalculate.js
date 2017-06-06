@@ -3172,7 +3172,7 @@ CParagraphRecalculateStateInfo.prototype =
         this.Comments.push( Id );
     },
 
-    Remove_Comment : function(Id)
+	RemoveComment : function(Id)
     {
         var CommentsLen = this.Comments.length;
         for (var CurPos = 0; CurPos < CommentsLen; CurPos++)

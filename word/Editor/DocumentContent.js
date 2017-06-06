@@ -8034,7 +8034,7 @@ CDocumentContent.prototype.Get_EndInfo = function()
 	else
 		return null;
 };
-CDocumentContent.prototype.Get_PrevElementEndInfo = function(CurElement)
+CDocumentContent.prototype.GetPrevElementEndInfo = function(CurElement)
 {
 	var PrevElement = CurElement.Get_DocumentPrev();
 
@@ -8044,7 +8044,7 @@ CDocumentContent.prototype.Get_PrevElementEndInfo = function(CurElement)
 	}
 	else
 	{
-		return this.Parent.Get_PrevElementEndInfo(this);
+		return this.Parent.GetPrevElementEndInfo(this);
 	}
 };
 CDocumentContent.prototype.GetTopElement = function()

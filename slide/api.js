@@ -4346,7 +4346,7 @@ background-repeat: no-repeat;\
 		if (null == this.WordControl.m_oLogicDocument)
 			return;
 
-		this.WordControl.m_oLogicDocument.Show_Comments();
+		this.WordControl.m_oLogicDocument.ShowComments();
 	};
 
 	asc_docs_api.prototype.asc_hideComments = function()
@@ -4354,7 +4354,7 @@ background-repeat: no-repeat;\
 		if (null == this.WordControl.m_oLogicDocument)
 			return;
 
-		this.WordControl.m_oLogicDocument.Hide_Comments();
+		this.WordControl.m_oLogicDocument.HideComments();
 		editor.sync_HideComment();
 	};
 
@@ -4381,7 +4381,7 @@ background-repeat: no-repeat;\
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_RemoveComment);
-			this.WordControl.m_oLogicDocument.Remove_Comment(Id, true);
+			this.WordControl.m_oLogicDocument.RemoveComment(Id, true);
 		}
 	};
 
@@ -4395,7 +4395,7 @@ background-repeat: no-repeat;\
 			var CommentData = new AscCommon.CCommentData();
 			CommentData.Read_FromAscCommentData(AscCommentData);
 
-			this.WordControl.m_oLogicDocument.Change_Comment(Id, CommentData);
+			this.WordControl.m_oLogicDocument.EditComment(Id, CommentData);
 
 		}
 	};
@@ -4405,12 +4405,12 @@ background-repeat: no-repeat;\
 		if (null == this.WordControl.m_oLogicDocument)
 			return;
 
-		this.WordControl.m_oLogicDocument.Select_Comment(Id);
+		this.WordControl.m_oLogicDocument.SelectComment(Id);
 	};
 
 	asc_docs_api.prototype.asc_showComment = function(Id)
 	{
-		this.WordControl.m_oLogicDocument.Show_Comment(Id);
+		this.WordControl.m_oLogicDocument.ShowComment(Id);
 	};
 
 	asc_docs_api.prototype.can_AddQuotedComment = function()

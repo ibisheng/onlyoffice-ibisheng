@@ -166,7 +166,7 @@ CGraphicFrame.prototype.Get_TextBackGroundColor= function()
         return undefined;
 };
 
-CGraphicFrame.prototype.Get_PrevElementEndInfo= function()
+CGraphicFrame.prototype.GetPrevElementEndInfo = function()
     {
         return null;
 };

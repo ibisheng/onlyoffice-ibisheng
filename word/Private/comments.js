@@ -35,17 +35,15 @@
 Asc['asc_docs_api'].prototype.asc_addComment = function(AscCommentData)
 {
 	if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
-	{
 		return;
-	}
 
-	if (null == this.WordControl.m_oLogicDocument)
-	{
+	var oLogicDocument = this.WordControl.m_oLogicDocument;
+
+	if (!oLogicDocument)
 		return;
-	}
 
 	// Комментарий без цитаты позволяем добавить всегда
-	if (true !== this.can_AddQuotedComment() || false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
+	if (true !== this.can_AddQuotedComment() || false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content, null, true, oLogicDocument.IsEditCommentsMode()))
 	{
 		var CommentData = new CCommentData();
 		CommentData.Read_FromAscCommentData(AscCommentData);

@@ -441,7 +441,7 @@ CSelectedContent.prototype =
             {
                 var OldVal = Para.DeleteCommentOnRemove;
                 Para.DeleteCommentOnRemove = false;
-                Para.Remove_CommentMarks(Id);
+                Para.RemoveCommentMarks(Id);
                 Para.DeleteCommentOnRemove = OldVal;
             }
         }
@@ -5506,7 +5506,7 @@ CDocument.prototype.On_DragTextEnd = function(NearPos, bCopy)
 {
     if (true === this.Comments.Is_Use())
     {
-        this.Select_Comment(null, false);
+        this.SelectComment(null, false);
         editor.sync_HideComment();
     }
 
@@ -6841,12 +6841,12 @@ CDocument.prototype.OnKeyDown = function(e)
 			bRetValue = keydownresult_PreventAll;
 		}
 	}
-    else if (e.KeyCode == 89 && true === e.CtrlKey && (this.CanEdit() || this.CanEditCommentsInViewMode() || this.IsFillingFormMode())) // Ctrl + Y - Redo
+    else if (e.KeyCode == 89 && true === e.CtrlKey && (this.CanEdit() || this.IsEditCommentsMode() || this.IsFillingFormMode())) // Ctrl + Y - Redo
     {
         this.Document_Redo();
         bRetValue = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 90 && true === e.CtrlKey && (this.CanEdit() || this.CanEditCommentsInViewMode() || this.IsFillingFormMode())) // Ctrl + Z - Undo
+    else if (e.KeyCode == 90 && true === e.CtrlKey && (this.CanEdit() || this.IsEditCommentsMode() || this.IsFillingFormMode())) // Ctrl + Z - Undo
     {
        	this.Document_Undo();
         bRetValue = keydownresult_PreventAll;
@@ -7246,7 +7246,7 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 				if (!Para)
 				{
 					// Такое может быть, если комментарий добавлен к заголовку таблицы
-					this.Select_Comment(null, false);
+					this.SelectComment(null, false);
 					editor.sync_HideComment();
 				}
 				else
@@ -7258,13 +7258,13 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 					}
 
 					var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(Comment_X, Comment_Y, Comment_PageNum);
-					this.Select_Comment(Comment.Get_Id(), false);
+					this.SelectComment(Comment.Get_Id(), false);
 					editor.sync_ShowComment(Comment.Get_Id(), Coords.X, Coords.Y);
 				}
 			}
 			else
 			{
-				this.Select_Comment(null, false);
+				this.SelectComment(null, false);
 				editor.sync_HideComment();
 			}
 		}
@@ -8774,12 +8774,12 @@ CDocument.prototype.AddComment = function(CommentData)
 
 	return Comment;
 };
-CDocument.prototype.Change_Comment = function(Id, CommentData)
+CDocument.prototype.EditComment = function(Id, CommentData)
 {
 	this.Comments.Set_CommentData(Id, CommentData);
 	this.Document_UpdateInterfaceState();
 };
-CDocument.prototype.Remove_Comment = function(Id, bSendEvent, bRecalculate)
+CDocument.prototype.RemoveComment = function(Id, bSendEvent, bRecalculate)
 {
 	if (null === Id)
 		return;
@@ -8799,7 +8799,7 @@ CDocument.prototype.Remove_Comment = function(Id, bSendEvent, bRecalculate)
 };
 CDocument.prototype.CanAddComment = function()
 {
-	if (!this.CanEdit() && !this.CanEditCommentsInViewMode())
+	if (!this.CanEdit() && !this.IsEditCommentsMode())
 		return false;
 
 	if (true !== this.Comments.Is_Use())
@@ -8807,7 +8807,7 @@ CDocument.prototype.CanAddComment = function()
 
 	return this.Controller.CanAddComment();
 };
-CDocument.prototype.Select_Comment = function(Id, ScrollToComment)
+CDocument.prototype.SelectComment = function(Id, ScrollToComment)
 {
 	var OldId = this.Comments.Get_CurrentId();
 	this.Comments.Set_Current(Id);
@@ -8829,7 +8829,7 @@ CDocument.prototype.Select_Comment = function(Id, ScrollToComment)
 		this.DrawingDocument.FirePaint();
 	}
 };
-CDocument.prototype.Show_Comment = function(Id)
+CDocument.prototype.ShowComment = function(Id)
 {
 	var Comment = this.Comments.Get_ById(Id);
 	if (null != Comment && null != Comment.StartId && null != Comment.EndId)
@@ -8846,7 +8846,7 @@ CDocument.prototype.Show_Comment = function(Id)
 		this.Api.sync_HideComment();
 	}
 };
-CDocument.prototype.Show_Comments = function(isShowSolved)
+CDocument.prototype.ShowComments = function(isShowSolved)
 {
 	if (false !== isShowSolved)
 		isShowSolved = true;
@@ -8856,7 +8856,7 @@ CDocument.prototype.Show_Comments = function(isShowSolved)
 	this.DrawingDocument.ClearCachePages();
 	this.DrawingDocument.FirePaint();
 };
-CDocument.prototype.Hide_Comments = function()
+CDocument.prototype.HideComments = function()
 {
 	this.Comments.Set_Use(false);
 	this.Comments.SetUseSolved(false);
@@ -8864,7 +8864,7 @@ CDocument.prototype.Hide_Comments = function()
 	this.DrawingDocument.ClearCachePages();
 	this.DrawingDocument.FirePaint();
 };
-CDocument.prototype.Get_PrevElementEndInfo = function(CurElement)
+CDocument.prototype.GetPrevElementEndInfo = function(CurElement)
 {
     var PrevElement = CurElement.Get_DocumentPrev();
 
@@ -15264,10 +15264,9 @@ CDocument.prototype.IsCheckContentControlsLock = function()
 {
 	return this.CheckContentControlsLock;
 };
-CDocument.prototype.CanEditCommentsInViewMode = function()
+CDocument.prototype.IsEditCommentsMode = function()
 {
 	return false;
-	return this.EditCommentsInViewMode;
 };
 CDocument.prototype.IsViewMode = function()
 {
@@ -15275,7 +15274,7 @@ CDocument.prototype.IsViewMode = function()
 };
 CDocument.prototype.CanEdit = function()
 {
-	if (this.IsViewMode() || this.CanEditCommentsInViewMode() || this.IsFillingFormMode())
+	if (this.IsViewMode() || this.IsEditCommentsMode() || this.IsFillingFormMode())
 		return false;
 
 	return true;

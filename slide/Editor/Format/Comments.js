@@ -995,15 +995,15 @@ CComment.prototype =
         if ( Para_start === Para_end )
         {
             if ( null != Para_start )
-                Para_start.Remove_CommentMarks( this.Id );
+                Para_start.RemoveCommentMarks( this.Id );
         }
         else
         {
             if ( null != Para_start )
-                Para_start.Remove_CommentMarks( this.Id );
+                Para_start.RemoveCommentMarks( this.Id );
 
             if ( null != Para_end )
-                Para_end.Remove_CommentMarks( this.Id );
+                Para_end.RemoveCommentMarks( this.Id );
         }
     },
 
@@ -1105,7 +1105,7 @@ CComment.prototype =
         }
 
         if ( false === bUse )
-            editor.WordControl.m_oLogicDocument.Remove_Comment( this.Id, true );
+            editor.WordControl.m_oLogicDocument.RemoveComment( this.Id, true );
     }
 };
 

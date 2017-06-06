@@ -180,7 +180,7 @@ CDocumentControllerBase.prototype.Get_ColorMap = function()
  * @param CurElement
  * @returns {null}
  */
-CDocumentControllerBase.prototype.Get_PrevElementEndInfo = function(CurElement)
+CDocumentControllerBase.prototype.GetPrevElementEndInfo = function(CurElement)
 {
 	return null;
 };

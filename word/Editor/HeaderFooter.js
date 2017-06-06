@@ -925,7 +925,7 @@ CHeaderFooter.prototype =
 		return this.Content.GetAllDrawingObjects(arrDrawings);
 	},
 
-    Get_PrevElementEndInfo : function(CurElement)
+	GetPrevElementEndInfo : function(CurElement)
     {
         return null;
     },
