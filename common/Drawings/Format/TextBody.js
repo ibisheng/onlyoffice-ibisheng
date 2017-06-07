@@ -167,12 +167,18 @@ CTextBody.prototype =
 
     Get_Theme : function()
     {
-        return this.parent.Get_Theme();
+        if(this.parent){
+            return this.parent.Get_Theme();
+        }
+        return null;
     },
 
     Get_ColorMap: function()
     {
-        return this.parent.Get_ColorMap();
+        if(this.parent){
+            return this.parent.Get_ColorMap();
+        }
+        return null;
     },
 
     setParent: function(pr)

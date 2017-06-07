@@ -211,11 +211,17 @@ CDocumentContent.prototype.Get_PageContentStartPos2 = function(StartPageIndex, S
 };
 CDocumentContent.prototype.Get_Theme = function()
 {
-	return this.Parent.Get_Theme();
+	if(this.Parent){
+        return this.Parent.Get_Theme();
+	}
+	return null;
 };
 CDocumentContent.prototype.Get_ColorMap = function()
 {
-	return this.Parent.Get_ColorMap();
+	if(this.Parent){
+        return this.Parent.Get_ColorMap();
+	}
+	return null;
 };
 CDocumentContent.prototype.Get_PageLimits = function(PageIndex)
 {
