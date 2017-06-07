@@ -4312,6 +4312,14 @@ $( function () {
 
     } );
 
+	test( "Test: \"IFNA\"", function () {
+
+		oParser = new parserFormula( 'IFNA(MATCH(30,B1:B5,0),"Not found")', "A2", ws );
+		ok( oParser.parse(), 'IFNA(MATCH(30,B1:B5,0),"Not found")' );
+		strictEqual( oParser.calculate().getValue(), "Not found", 'IFNA(MATCH(30,B1:B5,0),"Not found")' );
+
+	} );
+
     test( "Test: \"XNPV\"", function () {
 
         function xnpv( rate, valueArray, dateArray ){
