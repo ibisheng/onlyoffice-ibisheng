@@ -4041,13 +4041,12 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.get_OriginalSizeImage   = function()
 	{
-		if (0 == this.SelectedObjectsStack.length)
-			return null;
-		var obj = this.SelectedObjectsStack[this.SelectedObjectsStack.length - 1];
-		if (obj == null)
-			return null;
-		if (obj.Type == c_oAscTypeSelectElement.Image)
-			return obj.Value.asc_getOriginSize(this);
+		for(var i = 0; i < this.SelectedObjectsStack.length; ++i){
+			if(this.SelectedObjectsStack[i].Type == c_oAscTypeSelectElement.Image){
+                return this.SelectedObjectsStack[i].Value.asc_getOriginSize(this);
+			}
+		}
+		return null;
 	};
 	/*callbacks*/
 	asc_docs_api.prototype.sync_AddImageCallback = function()
