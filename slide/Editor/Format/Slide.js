@@ -1033,15 +1033,24 @@ Slide.prototype =
 
     draw: function(graphics)
     {
+        var _bounds;
         DrawBackground(graphics, this.backgroundFill, this.Width, this.Height);
         if(this.showMasterSp === true || (!(this.showMasterSp === false) && (this.Layout.showMasterSp == undefined || this.Layout.showMasterSp)))
         {
             if (graphics.IsSlideBoundsCheckerType === undefined)
                 this.Layout.Master.draw(graphics);
+            else if(graphics.IsSlideBoundsCheckerType){
+                _bounds =  this.Layout.Master.bounds;
+                graphics.rect(_bounds.l, _bounds.t, _bounds.w, _bounds.h);
+            }
         }
 
         if (graphics && graphics.IsSlideBoundsCheckerType === undefined)
             this.Layout.draw(graphics);
+        else{
+            _bounds =  this.Layout.bounds;
+            graphics.rect(_bounds.l, _bounds.t, _bounds.w, _bounds.h);
+        }
         for(var i=0; i < this.cSld.spTree.length; ++i)
         {
             this.cSld.spTree[i].draw(graphics);
