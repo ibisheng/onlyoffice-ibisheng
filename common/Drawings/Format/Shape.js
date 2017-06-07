@@ -5383,30 +5383,33 @@ CShape.prototype.getColumnNumber = function(){
 
 
     CShape.prototype.setColumnNumber = function(num){
-        var new_body_pr = this.getBodyPr();
-        if (new_body_pr) {
-            new_body_pr = new_body_pr.createDuplicate();
-            new_body_pr.numCol = num;
-            if (this.bWordShape) {
-                this.setBodyPr(new_body_pr);
-            }
-            else {
+        if(!this.bWordShape && !CheckObjectLine(this)){
+            var new_body_pr = this.getBodyPr();
+            if (new_body_pr) {
+                new_body_pr = new_body_pr.createDuplicate();
+                new_body_pr.numCol = num;
+
+                if(!this.txBody){
+                    this.createTextBody();
+                }
                 if (this.txBody) {
                     this.txBody.setBodyPr(new_body_pr);
                 }
+
             }
         }
+
     };
 
     CShape.prototype.setColumnSpace = function(spcCol){
-        var new_body_pr = this.getBodyPr();
-        if (new_body_pr) {
-            new_body_pr = new_body_pr.createDuplicate();
-            new_body_pr.spcCol = spcCol;
-            if (this.bWordShape) {
-                this.setBodyPr(new_body_pr);
-            }
-            else {
+        if(!this.bWordShape && !CheckObjectLine(this)){
+            var new_body_pr = this.getBodyPr();
+            if (new_body_pr) {
+                new_body_pr = new_body_pr.createDuplicate();
+                new_body_pr.spcCol = spcCol;
+                if(!this.txBody){
+                    this.createTextBody();
+                }
                 if (this.txBody) {
                     this.txBody.setBodyPr(new_body_pr);
                 }
