@@ -1749,7 +1749,7 @@ CShape.prototype.recalculateTransformText2 = function () {
             global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
             var _alpha;
             _alpha = Math.atan2(_dy_t, _dx_t);
-            if (_body_pr.vert === AscFormat.nVertTTvert) {
+            if (_body_pr.vert === AscFormat.nVertTTvert  || _body_pr.vert === AscFormat.nVertTTeaVert) {
                 if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
                     global_MatrixTransformer.RotateRadAppend(_text_transform, -_alpha - Math.PI * 0.5);
                     global_MatrixTransformer.TranslateAppend(_text_transform, _t_x_rt, _t_y_rt);
@@ -1874,13 +1874,13 @@ CShape.prototype.recalculateTransformText2 = function () {
         }
 
         global_MatrixTransformer.TranslateAppend(_text_transform, 0, _vertical_shift);
-        if (_body_pr.vert === AscFormat.nVertTTvert) {
+        if (_body_pr.vert === AscFormat.nVertTTvert || _body_pr.vert === AscFormat.nVertTTeaVert) {
             global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
             global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 0.5);
             global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
 
         }
-        if (_body_pr.vert === AscFormat.nVertTTvert270 || _body_pr.vert === AscFormat.nVertTTeaVert) {
+        if (_body_pr.vert === AscFormat.nVertTTvert270) {
             global_MatrixTransformer.TranslateAppend(_text_transform, -_content_width * 0.5, -content_height2 * 0.5);
             global_MatrixTransformer.RotateRadAppend(_text_transform, -Math.PI * 1.5);
             global_MatrixTransformer.TranslateAppend(_text_transform, _content_width * 0.5, content_height2 * 0.5);
@@ -2104,7 +2104,7 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
             global_MatrixTransformer.TranslateAppend(oMatrix, 0, _vertical_shift);
             var _alpha;
             _alpha = Math.atan2(_dy_t, _dx_t);
-            if (oBodyPr.vert === AscFormat.nVertTTvert) {
+            if (oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTeaVert) {
                 if (_dx_lt_rb * _dy_t - _dy_lt_rb * _dx_t <= 0) {
                     global_MatrixTransformer.RotateRadAppend(oMatrix, -_alpha - Math.PI * 0.5);
                     global_MatrixTransformer.TranslateAppend(oMatrix, _t_x_rt, _t_y_rt);
@@ -2243,13 +2243,13 @@ CShape.prototype.checkTransformTextMatrix = function (oMatrix, oContent, oBodyPr
         }
 
         global_MatrixTransformer.TranslateAppend(oMatrix, 0, _vertical_shift);
-        if (oBodyPr.vert === AscFormat.nVertTTvert) {
+        if (oBodyPr.vert === AscFormat.nVertTTvert || oBodyPr.vert === AscFormat.nVertTTeaVert) {
             global_MatrixTransformer.TranslateAppend(oMatrix, -_content_width * 0.5, -content_height2 * 0.5);
             global_MatrixTransformer.RotateRadAppend(oMatrix, -Math.PI * 0.5);
             global_MatrixTransformer.TranslateAppend(oMatrix, _content_width * 0.5, content_height2 * 0.5);
 
         }
-        if (oBodyPr.vert === AscFormat.nVertTTvert270 || oBodyPr.vert === AscFormat.nVertTTeaVert) {
+        if (oBodyPr.vert === AscFormat.nVertTTvert270) {
             global_MatrixTransformer.TranslateAppend(oMatrix, -_content_width * 0.5, -content_height2 * 0.5);
             global_MatrixTransformer.RotateRadAppend(oMatrix, -Math.PI * 1.5);
             global_MatrixTransformer.TranslateAppend(oMatrix, _content_width * 0.5, content_height2 * 0.5);
