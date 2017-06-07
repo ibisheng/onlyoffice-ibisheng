@@ -405,7 +405,9 @@ CTextBody.prototype =
             this.parent.recalcInfo.recalcTransformText = true;
 
             this.parent.recalcInfo.recalculateContent = true;
+            this.parent.recalcInfo.recalculateContent2 = true;
             this.parent.recalcInfo.recalculateTransformText = true;
+
             if(this.parent.addToRecalculate)
             {
                 this.parent.addToRecalculate();

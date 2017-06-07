@@ -1530,7 +1530,7 @@ CShape.prototype.recalculateTransformText = function () {
     if (this.txBody && this.txBody.content2) {
         this.transformText2 = new CMatrix();
         this.clipRect2 = this.checkTransformTextMatrix(this.transformText2, this.txBody.content2, oBodyPr, false);
-        this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText);
+        this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText2);
     }
     //if (oBodyPr.prstTxWarp) {
         var bNoTextNoShape = oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape";
@@ -4221,7 +4221,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
                 if(!(oController && (AscFormat.getTargetTextObject(oController) === this)))
                     this.clipTextRect(graphics);
             }
-            graphics.transform3(this.transformText, true);
+            graphics.transform3(transform_text, true);
             if (graphics.CheckUseFonts2 !== undefined)
                 graphics.CheckUseFonts2(transform_text);
 
