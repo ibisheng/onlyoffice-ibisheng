@@ -62,7 +62,7 @@
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
 		cBETAINV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
-		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
+		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
 		cFTEST, cGAMMADIST, cGAMMAINV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
@@ -505,8 +505,8 @@
 
 		var fLogDblMax = Math.log( 2.22507e+308);
 		var fLogDblMin = Math.log( 2.22507e-308 );
-		var fLogY = (fX < 0.1) ? Math.log1p(-fX) : log(0.5 - fX + 0.5);
-		var fLogX = log(fX);
+		var fLogY = (fX < 0.1) ? Math.log1p(-fX) : Math.log(0.5 - fX + 0.5);
+		var fLogX = Math.log(fX);
 		var fAm1LogX = (fA - 1) * fLogX;
 		var fBm1LogY = (fB - 1) * fLogY;
 		var fLogBeta = getLogBeta(fA,fB);
@@ -515,7 +515,7 @@
 			&& fBm1LogY < fLogDblMax  && fBm1LogY > fLogDblMin
 			&& fLogBeta < fLogDblMax  && fLogBeta > fLogDblMin
 			&& fAm1LogX + fBm1LogY < fLogDblMax && fAm1LogX + fBm1LogY > fLogDblMin){
-			return Math.pow(fX, fA - 1) * pow(0.5 - fX + 0.5, fB - 1) / getBeta(fA, fB);
+			return Math.pow(fX, fA - 1) * Math.pow(0.5 - fX + 0.5, fB - 1) / getBeta(fA, fB);
 		}else{
 			return Math.exp( fAm1LogX + fBm1LogY - fLogBeta);
 		}
@@ -614,7 +614,14 @@
 		return fResult;
 	}
 
-	
+	function getFDist( x, fF1, fF2)	{
+		var arg = fF2 / (fF2 + fF1 * x);
+		var alpha = fF2 / 2;
+		var beta = fF1 / 2;
+		return getBetaDist(arg, alpha, beta);
+	}
+
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
@@ -1878,6 +1885,113 @@
 
 	cFDIST.prototype = Object.create(cBaseFunction.prototype);
 	cFDIST.prototype.constructor = cFDIST;
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cF_DIST() {
+		cBaseFunction.call(this, "F.DIST");
+	}
+
+	cF_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cF_DIST.prototype.constructor = cF_DIST;
+	cF_DIST.prototype.argumentsMin = 3;
+	cF_DIST.prototype.argumentsMax = 4;
+	cF_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cBool(true);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFDist = function(argArray){
+			var fF = argArray[0];
+			var fF1 = argArray[1];
+			var fF2 = argArray[2];
+			var bCum = argArray[3];
+
+			if ( fF < 0 || fF1 < 1 || fF2 < 1 || fF1 >= 1.0E10 || fF2 >= 1.0E10 ){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res;
+			if ( bCum )	{
+				res =  1 - getFDist( fF, fF1, fF2 );
+			}else{
+				res = Math.pow( fF1 / fF2, fF1 / 2 ) * Math.pow( fF, ( fF1 / 2 ) - 1 ) /
+					( Math.pow( ( 1 + ( fF * fF1 / fF2 ) ), ( fF1 + fF2 ) / 2 ) *
+					getBeta( fF1 / 2, fF2 / 2 ) );
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+	};
+	cF_DIST.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom1, deg_freedom2, cumulative)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cF_DIST_RT() {
+		cBaseFunction.call(this, "F.DIST.RT");
+	}
+
+	cF_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
+	cF_DIST_RT.prototype.constructor = cF_DIST_RT;
+	cF_DIST_RT.prototype.argumentsMin = 3;
+	cF_DIST_RT.prototype.argumentsMax = 3;
+	cF_DIST_RT.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFDist = function(argArray){
+			var fF = argArray[0];
+			var fF1 = argArray[1];
+			var fF2 = argArray[2];
+
+			if (fF < 0 || fF1 < 1 || fF2 < 1 || fF1 >= 1.0E10 || fF2 >= 1.0E10){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = getFDist(fF, fF1, fF2);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		if (argClone[1].getValue() < 1 ){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+	};
+	cF_DIST_RT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom1, deg_freedom2)"
+		};
+	};
 
 	/**
 	 * @constructor

@@ -985,6 +985,30 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.027322, "T.DIST.RT(A2,A3)" );
 	} );
 
+	test( "Test: \"F.DIST\"", function () {
+		ws.getRange2( "A2" ).setValue( "15.2069" );
+		ws.getRange2( "A3" ).setValue( "6" );
+		ws.getRange2( "A4" ).setValue( "4" );
+
+		oParser = new parserFormula( "F.DIST(A2,A3,A4,TRUE)", "A1", ws );
+		ok( oParser.parse(), "F.DIST(A2,A3,A4,TRUE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.99, "F.DIST(A2,A3,A4,TRUE)" );
+
+		oParser = new parserFormula( "F.DIST(A2,A3,A4,FALSE)", "A1", ws );
+		ok( oParser.parse(), "F.DIST(A2,A3,A4,FALSE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0012238, "F.DIST(A2,A3,A4,FALSE)" );
+	} );
+
+	test( "Test: \"F.DIST.RT\"", function () {
+		ws.getRange2( "A2" ).setValue( "15.2069" );
+		ws.getRange2( "A3" ).setValue( "6" );
+		ws.getRange2( "A4" ).setValue( "4" );
+
+		oParser = new parserFormula( "F.DIST.RT(A2,A3,A4)", "A1", ws );
+		ok( oParser.parse(), "F.DIST.RT(A2,A3,A4)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.01, "F.DIST.RT(A2,A3,A4)" );
+	} );
+
     test( "Test: \"SUM(1,2,3)\"", function () {
         oParser = new parserFormula( 'SUM(1,2,3)', "A1", ws );
         ok( oParser.parse() );
