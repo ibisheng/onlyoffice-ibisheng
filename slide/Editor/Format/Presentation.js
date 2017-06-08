@@ -585,6 +585,20 @@ CPresentation.prototype =
 
 
 
+    IsViewMode: function()
+    {
+        return this.Api.isViewMode;
+    },
+
+    CanEdit: function()
+    {
+        if (this.IsViewMode())
+            return false;
+
+        return true;
+    },
+
+
     Stop_CheckSpelling: function()
     {
         this.Spelling.Reset();
