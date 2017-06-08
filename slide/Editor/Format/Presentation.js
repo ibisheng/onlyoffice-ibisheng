@@ -1931,7 +1931,11 @@ CPresentation.prototype =
                 oMathShape.spPr.xfrm.setOffY((this.Slides[this.CurPage].Height - oMathShape.spPr.xfrm.extY)/2);
                 
             }
-            this.Slides[this.CurPage].graphicObjects.startRecalculate();
+            if(false === bRecalculate){
+                this.Recalculate();
+            }
+            //this.Slides[this.CurPage].graphicObjects.startRecalculate();
+            //this.Slides[this.CurPage].graphicObjects.recalculateCurPos();
             if(!(noUpdateInterface === true))
             {
                 this.Document_UpdateInterfaceState();
@@ -3106,7 +3110,7 @@ CPresentation.prototype =
             {
                 target_doc_content1 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
             }
-            this.AddToParagraph( new ParaText( String.fromCharCode( Code ) ), false, true );
+            this.AddToParagraph( new ParaText( String.fromCharCode( Code ) ), undefined, true );
             if(this.Slides[this.CurPage])
             {
                 target_doc_content2 = this.Slides[this.CurPage].graphicObjects.getTargetDocContent();
