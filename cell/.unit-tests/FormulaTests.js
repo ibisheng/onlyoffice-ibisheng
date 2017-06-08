@@ -1009,7 +1009,26 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.01, "F.DIST.RT(A2,A3,A4)" );
 	} );
 
-    test( "Test: \"SUM(1,2,3)\"", function () {
+	test( "Test: \"GAMMA\"", function () {
+		oParser = new parserFormula( "GAMMA(2.5)", "A1", ws );
+		ok( oParser.parse(), "GAMMA(2.5)" );
+		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 1.329, "GAMMA(2.5)" );
+
+		oParser = new parserFormula( "GAMMA(-3.75)", "A1", ws );
+		ok( oParser.parse(), "GAMMA(-3.75)" );
+		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 0.268, "GAMMA(0.268)" );
+
+		oParser = new parserFormula( "GAMMA(0)", "A1", ws );
+		ok( oParser.parse(), "GAMMA(0)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "GAMMA(0)" );
+
+		oParser = new parserFormula( "GAMMA(-2)", "A1", ws );
+		ok( oParser.parse(), "GAMMA(-2)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "GAMMA(-2)" );
+
+	} );
+    
+	test( "Test: \"SUM(1,2,3)\"", function () {
         oParser = new parserFormula( 'SUM(1,2,3)', "A1", ws );
         ok( oParser.parse() );
         strictEqual( oParser.calculate().getValue(), 1 + 2 + 3 );

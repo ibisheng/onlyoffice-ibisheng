@@ -63,11 +63,15 @@
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
 		cBETAINV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
-		cFTEST, cGAMMADIST, cGAMMAINV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cFTEST, cGAMMA, cGAMMADIST, cGAMMAINV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
 		cT_DIST_2T, cT_DIST_RT, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+
+	function isInteger(value) {
+		return typeof value === 'number' && isFinite(value) && 	Math.floor(value) === value;
+	}
 
 	function integralPhi(x) { // Using gauss(x)+0.5 has severe cancellation errors for x<-4
 		return 0.5 * AscCommonExcel.rtl_math_erfc(-x * 0.7071067811865475); // * 1/sqrt(2)
@@ -350,7 +354,7 @@
 			return getGammaHelper(fZ + 2) / (fZ + 1) / fZ;
 		}
 
-		var  fLogDivisor = getLogGammaHelper(1 - fZ) + Math.log( Math.abs( Math.sin( Math.PI() * fZ)));
+		var  fLogDivisor = getLogGammaHelper(1 - fZ) + Math.log( Math.abs( Math.sin( Math.PI * fZ)));
 		if (fLogDivisor - fLogPi >= fLogDblMax){
 			return 0;
 		}
@@ -2299,6 +2303,46 @@
 
 	cFTEST.prototype = Object.create(cBaseFunction.prototype);
 	cFTEST.prototype.constructor = cFTEST;
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cGAMMA() {
+		this.name = "GAMMA";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cGAMMA.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMA.prototype.constructor = cGAMMA;
+	cGAMMA.prototype.argumentsMin = 1;
+	cGAMMA.prototype.argumentsMax = 1;
+	cGAMMA.prototype.isXLFN = true;
+	cGAMMA.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			if(argArray[0] <= 0 && isInteger(argArray[0])){
+				return  new cError(cErrorType.not_numeric);
+			}
+			var res = getGamma(argArray[0]);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cGAMMA.prototype.getInfo = function () {
+		return {name: this.name, args: "(number)"}
+	};
 
 	/**
 	 * @constructor
