@@ -66,8 +66,8 @@
 		cFTEST, cGAMMADIST, cGAMMAINV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
-		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cTINV,
-		cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
+		cT_DIST_2T, cT_DIST_RT, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
 
 	function integralPhi(x) { // Using gauss(x)+0.5 has severe cancellation errors for x<-4
 		return 0.5 * AscCommonExcel.rtl_math_erfc(-x * 0.7071067811865475); // * 1/sqrt(2)
@@ -5314,6 +5314,98 @@
 	cT_DIST.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "(x, deg_freedom, cumulative)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cT_DIST_2T() {
+		cBaseFunction.call(this, "T.DIST.2T");
+	}
+
+	cT_DIST_2T.prototype = Object.create(cBaseFunction.prototype);
+	cT_DIST_2T.prototype.constructor = cT_DIST_2T;
+	cT_DIST_2T.prototype.argumentsMin = 2;
+	cT_DIST_2T.prototype.argumentsMax = 2;
+	cT_DIST_2T.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var T = argArray[0];
+			var fDF = argArray[1];
+
+			if (fDF < 1  || T < 0){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = getTDist(T, fDF, 2);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cT_DIST_2T.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cT_DIST_RT() {
+		cBaseFunction.call(this, "T.DIST.RT");
+	}
+
+	cT_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
+	cT_DIST_RT.prototype.constructor = cT_DIST_RT;
+	cT_DIST_RT.prototype.argumentsMin = 2;
+	cT_DIST_RT.prototype.argumentsMax = 2;
+	cT_DIST_RT.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var T = argArray[0];
+			var fDF = argArray[1];
+
+			if (fDF < 1){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = getTDist(T, fDF, 1);
+			if ( T < 0 ){
+				res = 1 - res;
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cT_DIST_RT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom)"
 		};
 	};
 

@@ -967,6 +967,24 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.00073691, "T.DIST(8,3,FALSE)" );
 	} );
 
+	test( "Test: \"T.DIST.2T\"", function () {
+		ws.getRange2( "A2" ).setValue( "1.959999998" );
+		ws.getRange2( "A3" ).setValue( "60" );
+
+		oParser = new parserFormula( "T.DIST.2T(A2,A3)", "A1", ws );
+		ok( oParser.parse(), "T.DIST.2T(A2,A3)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.054644930, "T.DIST.2T(A2,A3)" );
+	} );
+
+	test( "Test: \"T.DIST.RT\"", function () {
+		ws.getRange2( "A2" ).setValue( "1.959999998" );
+		ws.getRange2( "A3" ).setValue( "60" );
+
+		oParser = new parserFormula( "T.DIST.RT(A2,A3)", "A1", ws );
+		ok( oParser.parse(), "T.DIST.RT(A2,A3)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.027322, "T.DIST.RT(A2,A3)" );
+	} );
+
     test( "Test: \"SUM(1,2,3)\"", function () {
         oParser = new parserFormula( 'SUM(1,2,3)', "A1", ws );
         ok( oParser.parse() );
