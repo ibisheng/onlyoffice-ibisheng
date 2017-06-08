@@ -63,7 +63,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
 		cBETAINV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
-		cFTEST, cGAMMA, cGAMMADIST, cGAMMAINV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMAINV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
@@ -369,6 +369,134 @@
 
 		return Math.exp( fLogPi - fLogDivisor) * ((Math.sin( Math.PI * fZ) < 0) ? -1 : 1);
 	}
+
+	function getGammaDist( fX, fAlpha, fLambda ){
+		if (fX <= 0){
+			return 0;
+		}
+		else{
+			return GetLowRegIGamma( fAlpha, fX / fLambda);
+		}
+	}
+	function GetLowRegIGamma( fA, fX ){
+		var fLnFactor = fA * Math.log(fX) - fX - getLogGamma(fA);
+		var fFactor = Math.exp(fLnFactor);
+
+		if (fX > fA + 1){
+			return 1 - fFactor * getGammaContFraction(fA, fX);
+		} else{
+			return fFactor * getGammaSeries(fA, fX);
+		}
+	}
+
+	function getGammaContFraction( fA, fX )	{
+		var fBigInv = 2.22045e-016;//epsilon
+		var fHalfMachEps = fBigInv / 2;
+		var fBig = 1 / fBigInv;
+		var fCount = 0;
+		var fY = 1 - fA;
+		var fDenom = fX + 2 - fA;
+		var fPkm1 = fX + 1;
+		var fPkm2 = 1;
+		var fQkm1 = fDenom * fX;
+		var fQkm2 = fX;
+		var fApprox = fPkm1 / fQkm1;
+		var bFinished = false;
+
+		do
+		{
+			fCount = fCount + 1;
+			fY = fY + 1;
+			var fNum = fY * fCount;
+			fDenom = fDenom + 2;
+			var fPk = fPkm1 * fDenom  -  fPkm2 * fNum;
+			var fQk = fQkm1 * fDenom  -  fQkm2 * fNum;
+			if (fQk !== 0)
+			{
+				var fR = fPk / fQk;
+				bFinished = (Math.abs( (fApprox - fR) / fR ) <= fHalfMachEps);
+				fApprox = fR;
+			}
+			fPkm2 = fPkm1;
+			fPkm1 = fPk;
+			fQkm2 = fQkm1;
+			fQkm1 = fQk;
+			if (Math.abs(fPk) > fBig)
+			{
+				// reduce a fraction does not change the value
+				fPkm2 = fPkm2 * fBigInv;
+				fPkm1 = fPkm1 * fBigInv;
+				fQkm2 = fQkm2 * fBigInv;
+				fQkm1 = fQkm1 * fBigInv;
+			}
+		} while (!bFinished && fCount < 10000);
+
+		if (!bFinished)
+		{
+			//SetError(FormulaError::NoConvergence);
+			return;
+		}
+		return fApprox;
+	}
+
+	function getGammaSeries( fA, fX ){
+		var fHalfMachEps = 2.22045e-016 / 2;
+		var fDenomfactor = fA;
+		var fSummand = 1 / fA;
+		var fSum = fSummand;
+		var nCount = 1;
+		do
+		{
+			fDenomfactor = fDenomfactor + 1;
+			fSummand = fSummand * fX / fDenomfactor;
+			fSum = fSum + fSummand;
+			nCount = nCount + 1;
+		} while ( fSummand/fSum > fHalfMachEps && nCount <= 10000);
+
+		if (nCount > 10000)
+		{
+			//SetError(FormulaError::NoConvergence);
+			return;
+		}
+
+		return fSum;
+	}
+
+	function getGammaDistPDF( fX, fAlpha, fLambda )
+	{
+		if (fX < 0){
+			return 0;
+		}else if (fX === 0){
+			if (fAlpha < 1.0){
+				//SetError(FormulaError::DivisionByZero);  // should be #DIV/0
+				//return HUGE_VAL;
+				return;
+			}else if (fAlpha === 1){
+				return (1 / fLambda);
+			}else{
+				return 0;
+			}
+		}else{
+			var fXr = fX / fLambda;
+
+			if (fXr > 1){
+				var fLogDblMax = Math.log( 2.22507e+308 );
+
+				if (Math.log(fXr) * (fAlpha - 1) < fLogDblMax && fAlpha < maxGammaArgument){
+					return Math.pow( fXr, fAlpha - 1) * Math.exp(-fXr) / fLambda / getGamma(fAlpha);
+				}else{
+					return Math.exp( (fAlpha - 1) * Math.log(fXr) - fXr - Math.log(fLambda) - getLogGamma(fAlpha));
+				}
+			}else {
+				if (fAlpha < maxGammaArgument){
+					return Math.pow( fXr, fAlpha - 1) * Math.exp(-fXr) / fLambda / getGamma(fAlpha);
+				}else{
+					return Math.pow( fXr, fAlpha - 1) * Math.exp(-fXr) / fLambda / Math.exp( getLogGamma(fAlpha));
+				}
+			}
+		}
+	}
+
 
 	//BETA DISTRIBUTION
 	function getBetaDist(fXin, fAlpha, fBeta) {
@@ -2348,13 +2476,57 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cGAMMADIST() {
-		cBaseFunction.call(this, "GAMMADIST");
+	function cGAMMA_DIST() {
+		this.name = "GAMMA.DIST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
-	cGAMMADIST.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMADIST.prototype.constructor = cGAMMADIST;
+	cGAMMA_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMA_DIST.prototype.constructor = cGAMMA_DIST;
+	cGAMMA_DIST.prototype.argumentsMin = 4;
+	cGAMMA_DIST.prototype.argumentsMax = 4;
+	cGAMMA_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
 
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			var fX = argArray[0];
+			var fAlpha = argArray[1];
+			var fBeta = argArray[2];
+			var bCumulative = argArray[3];
+
+			var res = null;
+			if ((fX < 0) || fAlpha <= 0 || fBeta <= 0){
+				return new cError(cErrorType.not_numeric);
+			}
+			else
+			{
+				if (bCumulative) {
+					res = getGammaDist( fX, fAlpha, fBeta );
+				}else {
+					res = getGammaDistPDF( fX, fAlpha, fBeta );
+				}
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cGAMMA_DIST.prototype.getInfo = function () {
+		return {name: this.name, args: "(x, alpha, beta, cumulative )"}
+	};
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
