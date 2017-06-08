@@ -936,6 +936,27 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), 57 );
 	} );
 
+	test( "Test: \"TDIST\"", function () {
+		oParser = new parserFormula( "TDIST(60,1,2)", "A1", ws );
+		ok( oParser.parse(), "TDIST(60,1,2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.010609347, "TDIST(60,1,2)" );
+
+		oParser = new parserFormula( "TDIST(8,3,1)", "A1", ws );
+		ok( oParser.parse(), "TDIST(8,3,1)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.002038289, "TDIST(8,3,1)" );
+
+		ws.getRange2( "A2" ).setValue( "1.959999998" );
+		ws.getRange2( "A3" ).setValue( "60" );
+
+		oParser = new parserFormula( "TDIST(A2,A3,2)", "A1", ws );
+		ok( oParser.parse(), "TDIST(A2,A3,2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.054644930, "TDIST(A2,A3,2)" );
+
+		oParser = new parserFormula( "TDIST(A2,A3,1)", "A1", ws );
+		ok( oParser.parse(), "TDIST(A2,A3,1)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.027322465, "TDIST(A2,A3,1)" );
+	} );
+
     test( "Test: \"SUM(1,2,3)\"", function () {
         oParser = new parserFormula( 'SUM(1,2,3)', "A1", ws );
         ok( oParser.parse() );
