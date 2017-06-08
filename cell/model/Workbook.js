@@ -4766,6 +4766,8 @@
 				continue;
 			}
 
+			// ToDo Whole Table
+
 			dxfLabels = style.pageFieldLabels && style.pageFieldLabels.dxf;
 			dxfValues = style.pageFieldValues && style.pageFieldValues.dxf;
 			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
@@ -4776,13 +4778,72 @@
 				cells.setTableStyle(dxfValues);
 			}
 
+			countC = pivotTable.getColumnFieldsCount();
+			countR = pivotTable.getRowFieldsCount(true);
 			if (styleInfo.showColHeaders) {
-				countC = pivotTable.getColumnFieldsCount();
-				countR = pivotTable.getRowFieldsCount();
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC, pivotRange.c2);
 				dxf = style.headerRow && style.headerRow.dxf;
 				cells.setTableStyle(dxf);
+				if (styleInfo.showRowHeaders && countC) {
+					cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC - 1,
+						pivotRange.c1 + Math.max(0, countR - 1));
+					dxf = style.firstHeaderCell && style.firstHeaderCell.dxf;
+					if (dxf) {
+						cells.setTableStyle(dxf);
+					}
+				}
 			}
+
+			pivotTable.forEachColItems((function (thisArg, _pivotRange, _style, _styleInfo, _countC, _countR) {
+				return function (item, index) {
+					var _dxf, _cells, r, _col;
+					if (st_itemtypeGRAND === item.t) {
+						_dxf = _style.lastColumn;
+					} else if (_styleInfo.showRowHeaders) {
+						r = item.r || 0;
+						if (r + 1 !== _countC) {
+							if (0 === r) {
+								_dxf = item.t ? _style.firstSubtotalColumn : _style.firstColumnSubheading;
+							} else if (1 === r % 2) {
+								_dxf = item.t ? _style.secondSubtotalColumn : _style.secondColumnSubheading;
+							} else {
+								_dxf = item.t ? _style.thirdSubtotalColumn : _style.thirdColumnSubheading;
+							}
+						}
+					}
+					_dxf = _dxf && _dxf.dxf;
+					if (_dxf) {
+						_col = _pivotRange.c1 + Math.max(1, _countR) + index;
+						_cells = thisArg.getRange3(_pivotRange.r1 + 1, _col, _pivotRange.r2, _col);
+						_cells.setTableStyle(_dxf);
+					}
+				};
+			})(this, pivotRange, style, styleInfo, countC, countR));
+			pivotTable.forEachRowItems((function (thisArg, _pivotRange, _style, _countC, _countR) {
+				return function (item, index) {
+					var _dxf, _cells, r, _row;
+					if (st_itemtypeGRAND === item.t) {
+						_dxf = _style.totalRow;
+					} else {
+						r = item.r || 0;
+						if (r + 1 !== _countR) {
+							if (0 === r) {
+								_dxf = item.t ? _style.firstSubtotalRow : _style.firstRowSubheading;
+							} else if (1 === r % 2) {
+								_dxf = item.t ? _style.secondSubtotalRow : _style.secondRowSubheading;
+							} else {
+								_dxf = item.t ? _style.thirdSubtotalRow : _style.thirdRowSubheading;
+							}
+						}
+					}
+					_dxf = _dxf && _dxf.dxf;
+					if (_dxf) {
+						_row = _pivotRange.r1 + _countC + 1 + index;
+						_cells = thisArg.getRange3(_row, _pivotRange.c1, _row, _pivotRange.c2);
+						_cells.setTableStyle(_dxf);
+					}
+				};
+			})(this, pivotRange, style, countC, countR));
 		}
 	};
 	Worksheet.prototype.inPivotTable = function (range) {
@@ -4818,7 +4879,7 @@
 
 			if (false !== pivotTable.showHeaders) {
 				countC = pivotTable.getColumnFieldsCount();
-				countR = pivotTable.getRowFieldsCount();
+				countR = pivotTable.getRowFieldsCount(true);
 
 				if (countR) {
 					res.push(new AscCommon.CellBase(pivotRange.r1 + countC, pivotRange.c1));
