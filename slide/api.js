@@ -2568,7 +2568,6 @@ background-repeat: no-repeat;\
 
 		NumberInfo.Type    = type;
 		NumberInfo.SubType = subtype;
-		this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_PutTextPrListType);
 		this.WordControl.m_oLogicDocument.SetParagraphNumbering(NumberInfo);
 	};
 
