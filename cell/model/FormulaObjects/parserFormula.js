@@ -610,6 +610,14 @@ Math.log10 = function ( x ) {
     return this.log( x ) / this.log( 10 );
 };
 
+Math.log1p = Math.log1p || function(x) {
+	return Math.log(1 + x);
+};
+
+Math.expm1 = Math.expm1 || function(x) {
+	return Math.exp(x) - 1;
+};
+
 Math.fmod = function ( a, b ) {
     return Number( (a - (this.floor( a / b ) * b)).toPrecision( cExcelSignificantDigits ) );
 };
@@ -2416,7 +2424,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 		return calculateFunc(argsArray);
 	};
-	cBaseFunction.prototype._prepareArguments = function (args, arg1) {
+	cBaseFunction.prototype._prepareArguments = function (args, arg1, bAddFirstArrElem) {
 		var newArgs = [];
 		var indexArr = null;
 
@@ -2426,8 +2434,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
 				newArgs[i] = arg.cross(arg1);
 			}else if(cElementType.array === arg.type){
-				indexArr = i;
-				newArgs[i] = arg;
+				if(bAddFirstArrElem){
+					newArgs[i] = arg.getElementRowCol(0,0);
+				}else{
+					indexArr = i;
+					newArgs[i] = arg;
+				}
 			}else{
 				newArgs[i] = arg;
 			}

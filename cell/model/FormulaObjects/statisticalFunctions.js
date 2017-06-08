@@ -322,6 +322,277 @@
 		}
 	}
 
+	function getGamma(fZ)
+	{
+		var fLogPi = Math.log(Math.PI());
+		var fLogDblMax = Math.log(2.22507e+308);
+
+		if (fZ > maxGammaArgument)
+		{
+			//SetError(FormulaError::IllegalFPOperation);
+			//return HUGE_VAL;
+			return;
+		}
+
+		if (fZ >= 1.0)
+			return getGammaHelper(fZ);
+
+		if (fZ >= 0.5)  // shift to x>=1 using Gamma(x)=Gamma(x+1)/x
+			return getGammaHelper(fZ + 1) / fZ;
+
+		if (fZ >= -0.5) // shift to x>=1, might overflow
+		{
+			var fLogTest = getLogGammaHelper(fZ+2) - Math.log1p(fZ) -  Math.log( Math.abs(fZ));
+			if (fLogTest >= fLogDblMax)
+			{
+				//SetError(FormulaError::IllegalFPOperation);
+				//return HUGE_VAL;
+				return;
+			}
+			return getGammaHelper(fZ + 2) / (fZ + 1) / fZ;
+		}
+
+		var  fLogDivisor = getLogGammaHelper(1 - fZ) + Math.log( Math.abs( Math.sin( Math.PI() * fZ)));
+		if (fLogDivisor - fLogPi >= fLogDblMax)
+			return 0;
+
+		if (fLogDivisor < 0)
+			if (fLogPi - fLogDivisor > fLogDblMax)
+			{
+				//SetError(FormulaError::IllegalFPOperation);
+				//return HUGE_VAL;
+				return;
+			}
+
+		return Math.exp( fLogPi - fLogDivisor) * ((Math.sin( Math.PI * fZ) < 0) ? -1 : 1);
+	}
+
+	//BETA DISTRIBUTION
+	function getBetaDist(fXin, fAlpha, fBeta)
+	{
+		if (fXin <= 0) {
+			return 0;
+		}
+		if (fXin >= 1){
+			return 1;
+		}
+		if (fBeta === 1) {
+			return Math.pow(fXin, fAlpha);
+		}
+		if (fAlpha === 1){
+			return - Math.expm1(fBeta * Math.log1p(-fXin));
+		}
+
+		var fResult;
+		var fY = (0.5 - fXin) + 0.5;
+		var flnY = Math.log1p(-fXin);
+		var fX = fXin;
+		var flnX = Math.log(fXin);
+		var fA = fAlpha;
+		var fB = fBeta;
+		var bReflect = fXin > fAlpha / (fAlpha + fBeta);
+		if (bReflect){
+			fA = fBeta;
+			fB = fAlpha;
+			fX = fY;
+			fY = fXin;
+			flnX = flnY;
+			flnY = Math.log(fXin);
+		}
+		fResult = getBetaHelperContFrac(fX, fA, fB);
+		fResult = fResult / fA;
+		var fP = fA / (fA + fB);
+		var fQ = fB / (fA + fB);
+
+		var fTemp;
+		if (fA > 1 && fB > 1 && fP < 0.97 && fQ < 0.97){
+			fTemp = getBetaDistPDF(fX, fA, fB) * fX * fY;
+		}
+		else{
+			fTemp = Math.exp(fA * flnX + fB * flnY - getLogBeta(fA, fB));
+		}
+
+		fResult *= fTemp;
+		if (bReflect){
+			fResult = 0.5 - fResult + 0.5;
+		}
+		if (fResult > 1){
+			fResult = 1;
+		}
+		if (fResult < 0){
+			fResult = 0;
+		}
+
+		return fResult;
+	}
+
+	// beta distribution probability density function
+	function getBetaDistPDF(fX, fA, fB)
+	{
+		// special cases
+		if (fA === 1){
+			if (fB === 1)
+				return 1;
+			if (fB === 2)
+				return -2 * fX + 2;
+			if (fX === 1 && fB < 1){
+				//SetError(FormulaError::IllegalArgument);
+				//return HUGE_VAL;
+				return;
+			}
+
+			if (fX <= 0.01)
+				return fB + fB * Math.expm1((fB - 1) * Math.log1p(-fX));
+			else
+				return fB * Math.pow(0.5 - fX + 0.5, fB - 1);
+		}
+		if (fB === 1){
+			if (fA === 2)
+				return fA * fX;
+			if (fX === 0 && fA < 1){
+				//SetError(FormulaError::IllegalArgument);
+				//return HUGE_VAL;
+				return;
+			}
+			return fA * pow(fX, fA - 1);
+		}
+		if (fX <= 0){
+			if (fA < 1 && fX === 0){
+				//SetError(FormulaError::IllegalArgument);
+				//return HUGE_VAL;
+				return;
+			}
+			else
+				return 0;
+		}
+		if (fX >= 1){
+			if (fB < 1 && fX === 1){
+				//SetError(FormulaError::IllegalArgument);
+				//return HUGE_VAL;
+				return;
+			}
+			else
+				return 0;
+		}
+
+
+		var fLogDblMax = Math.log( 2.22507e+308);
+		var fLogDblMin = Math.log( 2.22507e-308 );
+		var fLogY = (fX < 0.1) ? Math.log1p(-fX) : log(0.5 - fX + 0.5);
+		var fLogX = log(fX);
+		var fAm1LogX = (fA - 1) * fLogX;
+		var fBm1LogY = (fB - 1) * fLogY;
+		var fLogBeta = getLogBeta(fA,fB);
+
+		if ( fAm1LogX < fLogDblMax  && fAm1LogX > fLogDblMin
+			&& fBm1LogY < fLogDblMax  && fBm1LogY > fLogDblMin
+			&& fLogBeta < fLogDblMax  && fLogBeta > fLogDblMin
+			&& fAm1LogX + fBm1LogY < fLogDblMax && fAm1LogX + fBm1LogY > fLogDblMin){
+			return Math.pow(fX, fA - 1) * pow(0.5 - fX + 0.5, fB - 1) / getBeta(fA, fB);
+		}else{
+			return Math.exp( fAm1LogX + fBm1LogY - fLogBeta);
+		}
+	}
+
+	function getBeta(fAlpha, fBeta)
+	{
+		var fA;
+		var fB;
+		if (fAlpha > fBeta){
+			fA = fAlpha;
+			fB = fBeta;
+		}else{
+			fA = fBeta;
+			fB = fAlpha;
+		}
+
+		if (fA + fB < maxGammaArgument){
+			return getGamma(fA) / getGamma(fA + fB) * getGamma(fB);
+		}
+
+		var fg = 6.024680040776729583740234375;
+		var fgm = fg - 0.5;
+		var fLanczos = getLanczosSum(fA);
+		fLanczos /= getLanczosSum(fA + fB);
+		fLanczos *= getLanczosSum(fB);
+		var fABgm = fA  +fB + fgm;
+		fLanczos *= Math.sqrt((fABgm / (fA + fgm)) / (fB + fgm));
+		var fTempA = fB / (fA + fgm);
+		var fTempB = fA / (fB + fgm);
+		var fResult = Math.exp(-fA * Math.log1p(fTempA) - fB * Math.log1p(fTempB) - fgm);
+		fResult *= fLanczos;
+		return fResult;
+	}
+
+	function getBetaHelperContFrac(fX, fA, fB)
+	{
+		var a1, b1, a2, b2, fnorm, cfnew, cf;
+		a1 = 1; b1 = 1;
+		b2 = 1 - (fA + fB) / (fA + 1) * fX;
+		if (b2 === 0){
+			a2 = 0;
+			fnorm = 1;
+			cf = 1;
+		}else{
+			a2 = 1;
+			fnorm = 1 / b2;
+			cf = a2 * fnorm;
+		}
+		cfnew = 1;
+		var rm = 1;
+
+		var fMaxIter = 50000;
+		var fMachEps = 2.22045e-016;
+		var bfinished = false;
+		do
+		{
+			var apl2m = fA + 2 * rm;
+			var d2m = rm * (fB - rm) * fX / ((apl2m - 1) * apl2m);
+			var d2m1 = -(fA + rm) * (fA + fB + rm) * fX / (apl2m * (apl2m + 1));
+			a1 = (a2 + d2m * a1) * fnorm;
+			b1 = (b2 + d2m * b1) * fnorm;
+			a2 = a1 + d2m1 * a2 * fnorm;
+			b2 = b1 + d2m1 * b2 * fnorm;
+			if (b2 !== 0){
+				fnorm = 1 / b2;
+				cfnew = a2 * fnorm;
+				bfinished = (Math.abs(cf - cfnew) < Math.abs(cf) * fMachEps);
+			}
+			cf = cfnew;
+			rm += 1;
+		}
+		while (rm < fMaxIter && !bfinished);
+		return cf;
+	}
+
+	function getLogBeta(fAlpha, fBeta)
+	{
+		var fA;
+		var fB;
+		if (fAlpha > fBeta)
+		{
+			fA = fAlpha; fB = fBeta;
+		}
+		else
+		{
+			fA = fBeta; fB = fAlpha;
+		}
+		var fg = 6.024680040776729583740234375;
+		var fgm = fg - 0.5;
+		var fLanczos = getLanczosSum(fA);
+		fLanczos /= getLanczosSum(fA + fB);
+		fLanczos *= getLanczosSum(fB);
+		var fLogLanczos = Math.log(fLanczos);
+		var fABgm = fA + fB + fgm;
+		fLogLanczos += 0.5 * (Math.log(fABgm) - Math.log(fA + fgm) - Math.log(fB + fgm));
+		var fTempA = fB / (fA + fgm);
+		var fTempB = fA / (fB + fgm);
+		var fResult = - fA * Math.log1p(fTempA) -fB * Math.log1p(fTempB) - fgm;
+		fResult += fLogLanczos;
+		return fResult;
+	}
+
+	
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
@@ -4942,6 +5213,66 @@
 
 	cTDIST.prototype = Object.create(cBaseFunction.prototype);
 	cTDIST.prototype.constructor = cTDIST;
+	cTDIST.prototype.argumentsMin = 3;
+	cTDIST.prototype.argumentsMax = 3;
+	cTDIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var T = argArray[0];
+			var fDF = argArray[1];
+			var nType = argArray[2];
+
+			var res = null;
+			switch ( nType ){
+				case 1:
+				{
+					res = 0.5 * getBetaDist(fDF / ( fDF + T * T ), fDF / 2, 0.5);
+					break;
+				}
+				case 2:
+				{
+					res = getBetaDist(fDF / ( fDF + T * T ), fDF / 2, 0.5);
+					break;
+				}
+				/*case 3:
+				{
+					res = Math.pow( 1 + ( T * T / fDF ), -( fDF + 1 ) / 2 ) / ( Math.sqrt( fDF ) * GetBeta( 0.5, fDF / 2.0 ) );
+					break;
+				}
+				case 4:
+				{
+					var X = fDF / ( T * T + fDF );
+					var R = 0.5 * getBetaDist( X, 0.5 * fDF, 0.5 );
+					res = ( T < 0 ? R : 1 - R );
+					break;
+				}*/
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		if (argClone[1].getValue() < 1 || argClone[0].getValue() < 0 || (argClone[2].getValue() !== 1 && argClone[2].getValue() !== 2) ){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cTDIST.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom, cumulative)"
+		};
+	};
 
 	/**
 	 * @constructor
