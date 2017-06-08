@@ -957,6 +957,16 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.027322465, "TDIST(A2,A3,1)" );
 	} );
 
+	test( "Test: \"T.DIST\"", function () {
+		oParser = new parserFormula( "T.DIST(60,1,TRUE)", "A1", ws );
+		ok( oParser.parse(), "T.DIST(60,1,TRUE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.99469533, "T.DIST(60,1,TRUE)" );
+
+		oParser = new parserFormula( "T.DIST(8,3,FALSE)", "A1", ws );
+		ok( oParser.parse(), "T.DIST(8,3,FALSE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.00073691, "T.DIST(8,3,FALSE)" );
+	} );
+
     test( "Test: \"SUM(1,2,3)\"", function () {
         oParser = new parserFormula( 'SUM(1,2,3)', "A1", ws );
         ok( oParser.parse() );
