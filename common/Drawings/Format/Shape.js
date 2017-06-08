@@ -4871,12 +4871,13 @@ CShape.prototype.hitToAdjustment = function (x, y) {
     var t_x, t_y, ret;
     t_x = invert_transform.TransformPointX(x, y);
     t_y = invert_transform.TransformPointY(x, y);
-    if (this.spPr && isRealObject(this.spPr.geometry))
+    var _calcGeoem = this.calcGeometry || (this.spPr && this.spPr.geometry);
+    if (_calcGeoem)
     {
         invert_transform = this.getInvertTransform();
         t_x = invert_transform.TransformPointX(x, y);
         t_y = invert_transform.TransformPointY(x, y);
-        ret = this.spPr.geometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * AscCommon.TRACK_CIRCLE_RADIUS));
+        ret = _calcGeoem.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * AscCommon.TRACK_CIRCLE_RADIUS));
         if(ret.hit)
         {
             ret.warp = false;

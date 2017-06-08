@@ -42,7 +42,12 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
         var oPen, oBrush;
         if(bTextWarp !== true)
         {
-            this.geometry = originalShape.spPr.geometry.createDuplicate();
+            if(originalShape.spPr && originalShape.spPr.geometry){
+                this.geometry = originalShape.spPr.geometry.createDuplicate();
+            }
+            else if(originalShape.calcGeometry){
+                this.geometry = originalShape.calcGeometry.createDuplicate();
+            }
             this.shapeWidth = originalShape.extX;
             this.shapeHeight = originalShape.extY;
             this.transform = originalShape.transform.CreateDublicate();
@@ -251,6 +256,9 @@ XYAdjustmentTrack.prototype.trackEnd = function()
     var oGeometryToSet;
     if(!this.bTextWarp)
     {
+        if(!this.originalShape.spPr.geometry){
+            this.originalShape.spPr.setGeometry(this.geometry.createDuplicate());
+        }
         oGeometryToSet =  this.originalShape.spPr.geometry;
         if(this.xFlag)
         {
@@ -303,7 +311,12 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
         var oPen, oBrush;
         if(bTextWarp !== true)
         {
-            this.geometry = originalShape.spPr.geometry.createDuplicate();
+            if(originalShape.spPr && originalShape.spPr.geometry){
+                this.geometry = originalShape.spPr.geometry.createDuplicate();
+            }
+            else if(originalShape.calcGeometry){
+                this.geometry = originalShape.calcGeometry.createDuplicate();
+            }
             this.shapeWidth = originalShape.extX;
             this.shapeHeight = originalShape.extY;
             this.transform = originalShape.transform;
@@ -449,6 +462,9 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
         var oGeometryToSet;
         if(!this.bTextWarp)
         {
+            if(!this.originalShape.spPr.geometry){
+                this.originalShape.spPr.setGeometry(this.geometry.createDuplicate());
+            }
             oGeometryToSet =  this.originalShape.spPr.geometry;
             if(this.radiusFlag)
             {
