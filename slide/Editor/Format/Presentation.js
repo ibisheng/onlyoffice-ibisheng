@@ -585,6 +585,20 @@ CPresentation.prototype =
 
 
 
+    IsViewMode: function()
+    {
+        return this.Api.isViewMode;
+    },
+
+    CanEdit: function()
+    {
+        if (this.IsViewMode())
+            return false;
+
+        return true;
+    },
+
+
     Stop_CheckSpelling: function()
     {
         this.Spelling.Reset();
@@ -1931,7 +1945,11 @@ CPresentation.prototype =
                 oMathShape.spPr.xfrm.setOffY((this.Slides[this.CurPage].Height - oMathShape.spPr.xfrm.extY)/2);
                 
             }
-            this.Slides[this.CurPage].graphicObjects.startRecalculate();
+            if(false === bRecalculate){
+                this.Recalculate();
+            }
+            //this.Slides[this.CurPage].graphicObjects.startRecalculate();
+            //this.Slides[this.CurPage].graphicObjects.recalculateCurPos();
             if(!(noUpdateInterface === true))
             {
                 this.Document_UpdateInterfaceState();
@@ -2181,7 +2199,7 @@ CPresentation.prototype =
         return false;
     },
 
-    Get_PrevElementEndInfo : function(CurElement)
+	GetPrevElementEndInfo : function(CurElement)
     {
         return null;
     },
@@ -5020,7 +5038,7 @@ CPresentation.prototype =
         }
     },
 
-    Change_Comment : function(Id, CommentData)
+	EditComment : function(Id, CommentData)
     {
         if(this.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id) === false)
         {
@@ -5070,7 +5088,7 @@ CPresentation.prototype =
         }
     },
 
-    Remove_Comment : function(Id, bSendEvent)
+	RemoveComment : function(Id, bSendEvent)
     {
         if ( null === Id )
             return;
@@ -5103,12 +5121,12 @@ CPresentation.prototype =
         return true;
     },
 
-    Select_Comment : function(Id)
+	SelectComment : function(Id)
     {
 
     },
 
-    Show_Comment : function(Id)
+    ShowComment : function(Id)
     {
 
         for(var i = 0; i < this.Slides.length; ++i)
@@ -5133,11 +5151,11 @@ CPresentation.prototype =
         editor.sync_HideComment();
     },
 
-    Show_Comments : function()
+    ShowComments : function()
     {
     },
 
-    Hide_Comments : function()
+    HideComments : function()
     {
         //this.Slides[this.CurPage].graphicObjects.hideComment();
     },

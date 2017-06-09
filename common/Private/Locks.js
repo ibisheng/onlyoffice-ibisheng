@@ -36,9 +36,12 @@ var locktype_Mine = AscCommon.locktype_Mine;
 
 if(typeof CDocument !== "undefined")
 {
-	CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode, isFillingForm)
+	CDocument.prototype.Document_Is_SelectionLocked = function(CheckType, AdditionalData, DontLockInFastMode, isIgnoreCanEditFlag)
 	{
-		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock() && true !== isFillingForm)
+		if (!this.CanEdit() && true !== isIgnoreCanEditFlag)
+			return true;
+
+		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
 			return true;
 
 		AscCommon.CollaborativeEditing.OnStart_CheckLock();

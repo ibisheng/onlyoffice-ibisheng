@@ -208,6 +208,12 @@
 		Save : 2
 	};
 
+	var c_oAscRestrictionType = {
+		None : 0,
+		OnlyForms : 1,
+		OnlyComments : 2
+	};
+
 	// Режимы отрисовки
 	var c_oAscFontRenderingModeType = {
 		noHinting             : 1,
@@ -1679,6 +1685,11 @@
 	prot['None']   = c_oAscMathInterfaceGroupCharPos.None;
 	prot['Top']    = c_oAscMathInterfaceGroupCharPos.Top;
 	prot['Bottom'] = c_oAscMathInterfaceGroupCharPos.Bottom;
+
+	prot = window['Asc']['c_oAscRestrictionType'] = window['Asc'].c_oAscRestrictionType = c_oAscRestrictionType;
+	prot['None'] = c_oAscRestrictionType.None;
+	prot['OnlyForms'] = c_oAscRestrictionType.OnlyForms;
+	prot['OnlyComments'] = c_oAscRestrictionType.OnlyComments;
 
     window['AscCommon']                             = window['AscCommon'] || {};
 	window["AscCommon"].g_cCharDelimiter            = g_cCharDelimiter;

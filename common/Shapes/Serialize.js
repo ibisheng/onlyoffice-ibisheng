@@ -7824,13 +7824,13 @@ function BinaryPPTYLoader()
                 }
                 case 3:
                 {
-                    b_bullet = true;
-                    bullet.bulletColor = new AscFormat.CBulletColor();
 
                     var cur_pos = s.cur;
                     var _len = s.GetULong();
                     if (0 != _len)
                     {
+                        b_bullet = true;
+                        bullet.bulletColor = new AscFormat.CBulletColor();
                         bullet.bulletColor.type = s.GetUChar();
 
                         if (bullet.bulletColor.type == AscFormat.BULLET_TYPE_COLOR_CLRTX)
@@ -7849,13 +7849,13 @@ function BinaryPPTYLoader()
                 }
                 case 4:
                 {
-                    b_bullet = true;
-                    bullet.bulletSize = new AscFormat.CBulletSize();
-
                     var cur_pos = s.cur;
                     var _len = s.GetULong();
                     if (0 != _len)
                     {
+                        b_bullet = true;
+                        bullet.bulletSize = new AscFormat.CBulletSize();
+
                         bullet.bulletSize.type = s.GetUChar();
 
                         if (bullet.bulletSize.type == AscFormat.BULLET_TYPE_SIZE_TX)
@@ -7865,7 +7865,7 @@ function BinaryPPTYLoader()
                         else
                         {
                             var _l = s.GetULong();
-                            s.Skip2(2); // start attributes + type value (need 0)
+                            s.Skip2(2); // start attributes + type
                             bullet.bulletSize.val = s.GetLong();
                             s.Skip2(1); // end attributes
                         }
@@ -7875,13 +7875,13 @@ function BinaryPPTYLoader()
                 }
                 case 5:
                 {
-                    b_bullet = true;
-                    bullet.bulletTypeface = new AscFormat.CBulletTypeface();
 
                     var cur_pos = s.cur;
                     var _len = s.GetULong();
                     if (0 != _len)
                     {
+                        b_bullet = true;
+                        bullet.bulletTypeface = new AscFormat.CBulletTypeface();
                         bullet.bulletTypeface.type = s.GetUChar();
 
                         if (bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
@@ -7898,13 +7898,13 @@ function BinaryPPTYLoader()
                 }
                 case 6:
                 {
-                    b_bullet = true;
-                    bullet.bulletType = new AscFormat.CBulletType();
 
                     var cur_pos = s.cur;
                     var _len = s.GetULong();
                     if (0 != _len)
                     {
+                        b_bullet = true;
+                        bullet.bulletType = new AscFormat.CBulletType();
                         bullet.bulletType.type = s.GetUChar();
 
                         if (bullet.bulletType.type == AscFormat.BULLET_TYPE_BULLET_NONE)

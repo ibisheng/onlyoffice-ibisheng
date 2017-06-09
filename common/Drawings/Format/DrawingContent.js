@@ -102,6 +102,7 @@
         if(nNumCol > 1 && oBodyPr)
         {
             var fSpace = AscFormat.isRealNumber(oBodyPr.spcCol) ? oBodyPr.spcCol : 0;
+            fSpace = Math.min(fSpace, this.XLimit/(nNumCol - 1));
             var fColumnWidth = Math.max((this.XLimit - this.X - (nNumCol - 1)*fSpace)/nNumCol, 0);
             X += nColumnIndex*(fColumnWidth + fSpace);
             XLimit = X + fColumnWidth;
@@ -133,9 +134,17 @@
             this.Start_Recalculate(fWidth, fHeight);
             if(this.Pages.length > 1){
                 var fSummaryHeight = this.Get_SummaryHeight();
-                var fNeedHeight = fSummaryHeight;
+
+                var fLow = fHeight, fHigh = fSummaryHeight;
+                this.Start_Recalculate(fWidth, fHigh);
+                var nItCount = 0;
+                while(this.Pages.length > 1 && nItCount < 5){
+                    fHigh += fSummaryHeight;
+                    this.Start_Recalculate(fWidth, fHigh);
+                    ++nItCount;
+                }
+                var fNeedHeight = fHigh;
                 if(this.Get_ColumnsCount() > 1){
-                    var fLow = fHeight, fHigh = fSummaryHeight;
                     while((fHigh - fLow) > 0.1){
                         var fCheckHeight = fLow +  (fHigh - fLow)/2;
                         this.Start_Recalculate(fWidth, fCheckHeight);

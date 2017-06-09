@@ -191,6 +191,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
 {
     AscFormat.ExecuteNoHistory(function()
     {
+        this.bIsTracked = false;
         this.originalObject = originalObject;
         this.numberHandle = originalObject.getNumByCardDirection(cardDirection);
         this.lastSpPr = null;
@@ -309,7 +310,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
         this.resizedRot = originalObject.rot;
 
         this.transform = originalObject.transform.CreateDublicate();
-        this.geometry = (function(){ var geometry = originalObject.getGeom(); geometry.Recalculate(5, 5); return geometry})();
+        this.geometry = (function(){ return originalObject.getGeom();})();
 
         if(!originalObject.isChart())
         {
@@ -458,6 +459,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
         };
 
         this.track = function(kd1, kd2, e, x, y){
+            this.bIsTracked = true;
             if(this.bConnector){
                 this.resizeConnector(kd1, kd2, e, x, y);
             }
@@ -967,6 +969,9 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
 
         this.trackEnd = function(bWord)
         {
+            if(!this.bIsTracked){
+                return;
+            }
             if(!this.bConnector || !this.oSpPr){
                 var scale_coefficients, ch_off_x, ch_off_y;
                 if(this.originalObject.group)
@@ -1048,6 +1053,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 {
     AscFormat.ExecuteNoHistory(function()
     {
+        this.bIsTracked = false;
         this.original = originalObject;
 
         this.originalObject = originalObject;
@@ -1177,6 +1183,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.track = function(kd1, kd2, e)
         {
+            this.bIsTracked = true;
             if(!e.CtrlKey)
                 this.resize(kd1, kd2, e.ShiftKey);
             else
@@ -1674,6 +1681,9 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.trackEnd = function(bWord)
         {
+            if(!this.bIsTracked){
+                return;
+            }
             if(!AscCommon.isRealObject(this.original.group))
             {
                 this.original.normalize();

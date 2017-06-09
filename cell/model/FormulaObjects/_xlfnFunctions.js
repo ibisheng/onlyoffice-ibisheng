@@ -73,8 +73,6 @@
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
 	cFormulaFunctionGroup['Information'].push(cISFORMULA, cSHEET, cSHEETS);
-	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
-	cFormulaFunctionGroup['Logical'].push(cIFNA);
 
 	/**
 	 * @constructor
@@ -603,18 +601,6 @@
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIFNA() {
-		cBaseFunction.call(this, "IFNA");
-		this.isXLFN = true;
-	}
-
-	cIFNA.prototype = Object.create(cBaseFunction.prototype);
-	cIFNA.prototype.constructor = cIFNA;
 
 	/**
 	 * @constructor

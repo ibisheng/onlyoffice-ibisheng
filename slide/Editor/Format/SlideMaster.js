@@ -110,6 +110,7 @@ function MasterSlide(presentation, theme)
     this.DrawingDocument = editor.WordControl.m_oDrawingDocument;
     this.maxId = 1000;
 
+    this.bounds = new AscFormat.CGraphicBounds(0, 0, this.Width, this.Height);
 
 //----------------------------------------------
     this.presentation = editor.WordControl.m_oLogicDocument;
@@ -119,7 +120,9 @@ function MasterSlide(presentation, theme)
     this.recalcInfo =
     {
         recalculateBackground: true,
-        recalculateSpTree: true
+        recalculateSpTree: true,
+        recalculateBounds: true
+
     };
 
 
@@ -157,6 +160,7 @@ MasterSlide.prototype =
         this.Id = r.GetString2();
         this.theme = AscFormat.readObject(r);
     },
+
     draw: function(graphics)
     {
         for(var i=0; i < this.cSld.spTree.length; ++i)
@@ -165,8 +169,6 @@ MasterSlide.prototype =
                 this.cSld.spTree[i].draw(graphics);
         }
     },
-
-
 
     getMatchingLayout: function(type, matchingName, cSldName, themeFlag)
     {
@@ -252,7 +254,6 @@ MasterSlide.prototype =
 
         return this.sldLayoutLst[0];
     },
-
 
     getMatchingShape:  Slide.prototype.getMatchingShape,/*function(type, idx, bSingleBody)
     {
@@ -393,11 +394,31 @@ MasterSlide.prototype =
             var _shapes = this.cSld.spTree;
             var _shape_index;
             var _shape_count = _shapes.length;
+            var bRecalculateBounds = this.recalcInfo.recalculateBounds;
+            if(bRecalculateBounds){
+                this.bounds.reset(this.Width + 100.0, this.Height + 100.0, -100.0, -100.0);
+            }
+            var bChecked = false;
             for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
             {
-                if(!_shapes[_shape_index].isPlaceholder())
+                if(!_shapes[_shape_index].isPlaceholder()){
                     _shapes[_shape_index].recalculate();
+                    if(bRecalculateBounds){
+                        this.bounds.checkByOther(_shapes[_shape_index].bounds);
+                    }
+                    bChecked = true;
+                }
             }
+            if(bRecalculateBounds){
+                if(bChecked){
+                    this.bounds.checkWH();
+                }
+                else{
+                    this.bounds.reset(0.0, 0.0, 0.0, 0.0);
+                }
+                this.recalcInfo.recalculateBounds = false;
+            }
+
 
     },
 

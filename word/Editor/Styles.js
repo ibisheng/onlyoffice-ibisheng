@@ -9340,8 +9340,27 @@ CParaPr.prototype =
             this.DefaultRunPr.Merge(ParaPr.DefaultRunPr);
         }
 
-        if( undefined != ParaPr.Bullet && ParaPr.Bullet.isBullet())
-            this.Bullet = ParaPr.Bullet.createDuplicate();
+        if(undefined != ParaPr.Bullet)
+        {
+            if(ParaPr.Bullet.isBullet())
+            {
+                this.Bullet = ParaPr.Bullet.createDuplicate();
+            }
+            else
+            {
+                if(this.Bullet && this.Bullet.isBullet()){
+                    if(ParaPr.Bullet.bulletColor){
+                        this.Bullet.bulletColor = ParaPr.Bullet.bulletColor.createDuplicate();
+                    }
+                    if(ParaPr.Bullet.bulletSize){
+                        this.Bullet.bulletSize = ParaPr.Bullet.bulletSize.createDuplicate();
+                    }
+                    if(ParaPr.Bullet.bulletTypeface){
+                        this.Bullet.bulletTypeface = ParaPr.Bullet.bulletTypeface.createDuplicate();
+                    }
+                }
+            }
+        }
 
         if(undefined != ParaPr.Lvl)
             this.Lvl = ParaPr.Lvl;
@@ -9956,11 +9975,6 @@ CParaPr.prototype =
                     {
                         Bullet.m_sChar = "•";
                     }
-                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
-                    {
-                        Bullet.m_bFontTx = false;
-                        Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
-                    }
                     break;
                 }
 
@@ -9968,11 +9982,6 @@ CParaPr.prototype =
                 {
                     Bullet.m_nType = g_NumberingArr[this.Bullet.bulletType.AutoNumType];
                     Bullet.m_nStartAt = this.Bullet.bulletType.startAt;
-                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
-                    {
-                        Bullet.m_bFontTx = false;
-                        Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
-                    }
                     break;
                 }
                 case AscFormat.BULLET_TYPE_BULLET_NONE :
@@ -9995,10 +10004,36 @@ CParaPr.prototype =
                 if(this.Bullet.bulletColor.type === AscFormat.BULLET_TYPE_COLOR_CLR){
                     if(this.Bullet.bulletColor.UniColor && this.Bullet.bulletColor.UniColor.color && theme && colorMap){
                         Bullet.m_bColorTx = false;
-                        this.Bullet.bulletColor.UniColor.check(theme, colorMap);
-                        Bullet.m_oColor.r = this.Bullet.bulletColor.UniColor.RGBA.R;
-                        Bullet.m_oColor.g = this.Bullet.bulletColor.UniColor.RGBA.G;
-                        Bullet.m_oColor.b = this.Bullet.bulletColor.UniColor.RGBA.B;
+                        Bullet.Unifill = AscFormat.CreateUniFillByUniColor(this.Bullet.bulletColor.UniColor);
+                    }
+                }
+            }
+            if(this.Bullet.bulletTypeface)
+            {
+                if(this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT){
+                    Bullet.m_bFontTx = false;
+                    Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
+                }
+
+            }
+            if(this.Bullet.bulletSize)
+            {
+                switch (this.Bullet.bulletSize.type){
+                    case AscFormat.BULLET_TYPE_SIZE_TX:{
+                        Bullet.m_bSizeTx = true;
+                        break;
+                    }
+                    case AscFormat.BULLET_TYPE_SIZE_PCT:{
+                        Bullet.m_bSizeTx = false;
+                        Bullet.m_bSizePct = true;
+                        Bullet.m_dSize = this.Bullet.bulletSize.val/100000.0;
+                        break;
+                    }
+                    case AscFormat.BULLET_TYPE_SIZE_PCT:{
+                        Bullet.m_bSizeTx = false;
+                        Bullet.m_bSizePct = false;
+                        Bullet.m_dSize = this.Bullet.bulletSize.val/100000.0;
+                        break;
                     }
                 }
             }

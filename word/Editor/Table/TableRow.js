@@ -169,10 +169,10 @@ CTableRow.prototype =
             return null;
     },
 
-    Get_PrevElementEndInfo : function(CellIndex)
+	GetPrevElementEndInfo : function(CellIndex)
     {
         if ( 0 === CellIndex )
-            return this.Table.Get_PrevElementEndInfo( this.Index );
+            return this.Table.GetPrevElementEndInfo( this.Index );
         else
             return this.Content[CellIndex - 1].Get_EndInfo();
     },

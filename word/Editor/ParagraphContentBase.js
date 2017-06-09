@@ -1717,57 +1717,73 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos = function(Searc
 	if (this.Content.length <= 0)
 		return false;
 
-    var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
+	var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : this.Content.length - 1 );
 
-    this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
-    SearchPos.Pos.Update( CurPos, Depth );
+	this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, UseContentPos);
+	SearchPos.Pos.Update(CurPos, Depth);
 
-    if ( true === SearchPos.Found )
-        return true;
+	if (true === SearchPos.Found)
+		return true;
 
-    CurPos--;
+	CurPos--;
 
-    while ( CurPos >= 0 )
-    {
-        this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, false);
-        SearchPos.Pos.Update( CurPos, Depth );
+	if (CurPos >= 0 && this.Content[CurPos + 1].IsStopCursorOnEntryExit())
+	{
+		this.Content[CurPos].Get_EndPos(false, SearchPos.Pos, Depth + 1);
+		SearchPos.Pos.Update(CurPos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
 
-        if ( true === SearchPos.Found )
-            return true;
+	while (CurPos >= 0)
+	{
+		this.Content[CurPos].Get_LeftPos(SearchPos, ContentPos, Depth + 1, false);
+		SearchPos.Pos.Update(CurPos, Depth);
 
-        CurPos--;
-    }
+		if (true === SearchPos.Found)
+			return true;
 
-    return false;
+		CurPos--;
+	}
+
+	return false;
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
 	if (this.Content.length <= 0)
 		return false;
 
-    var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
+	var CurPos = ( true === UseContentPos ? ContentPos.Get(Depth) : 0 );
 
-    this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
-    SearchPos.Pos.Update( CurPos, Depth );
+	this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, UseContentPos, StepEnd);
+	SearchPos.Pos.Update(CurPos, Depth);
 
-    if ( true === SearchPos.Found )
-        return true;
+	if (true === SearchPos.Found)
+		return true;
 
-    CurPos++;
+	CurPos++;
 
-    var Count = this.Content.length;
-    while ( CurPos < this.Content.length )
-    {
-        this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
-        SearchPos.Pos.Update( CurPos, Depth );
+	var Count = this.Content.length;
+	if (CurPos < Count && this.Content[CurPos - 1].IsStopCursorOnEntryExit())
+	{
+		this.Content[CurPos].Get_StartPos(SearchPos.Pos, Depth + 1);
+		SearchPos.Pos.Update(CurPos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
 
-        if ( true === SearchPos.Found )
-            return true;
+	while (CurPos < this.Content.length)
+	{
+		this.Content[CurPos].Get_RightPos(SearchPos, ContentPos, Depth + 1, false, StepEnd);
+		SearchPos.Pos.Update(CurPos, Depth);
 
-        CurPos++;
-    }
+		if (true === SearchPos.Found)
+			return true;
 
-    return false;
+		CurPos++;
+	}
+
+	return false;
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {

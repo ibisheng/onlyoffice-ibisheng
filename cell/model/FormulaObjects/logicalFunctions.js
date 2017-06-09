@@ -50,7 +50,7 @@
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
-	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cNOT, cOR, cTRUE, cXOR);
+	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cIFNA, cNOT, cOR, cTRUE, cXOR);
 
 	/**
 	 * @constructor
@@ -234,6 +234,45 @@
 	cIFERROR.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "(value, value_if_error)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIFNA() {
+		this.name = "IFNA";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cIFNA.prototype = Object.create(cBaseFunction.prototype);
+	cIFNA.prototype.constructor = cIFNA;
+	cIFNA.prototype.argumentsMin = 2;
+	cIFNA.prototype.argumentsMax = 2;
+	cIFNA.prototype.isXLFN = true;
+	cIFNA.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (arg0 instanceof cArray) {
+			arg0 = arg0.getElement(0);
+		}
+		if (arg0 instanceof AscCommonExcel.cRef || arg0 instanceof AscCommonExcel.cRef3D) {
+			arg0 = arg0.getValue();
+		}
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		}
+
+		if (arg0 instanceof cError && cErrorType.not_available === arg0.errorType) {
+			return this.value = arg[1] instanceof cArray ? arg[1].getElement(0) : arg[1];
+		} else {
+			return this.value = arg[0];
+		}
+	};
+	cIFNA.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(value, value_if_na)"
 		};
 	};
 

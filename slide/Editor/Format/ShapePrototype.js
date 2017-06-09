@@ -679,15 +679,15 @@ CShape.prototype.recalculateContent2 = function()
             var content_ = this.getDocContent();
             if(content_ && content_.Content[0])
             {
-                content.Content[0].Pr  = content_.Content[0].Pr;
-                var para_text_pr = new ParaTextPr(content_.Content[0].Get_FirstRunPr());
-                content.Set_ApplyToAll(true);
-                content.AddToParagraph(para_text_pr);
-                content.Set_ApplyToAll(false);
+                content.Content[0].Pr  = content_.Content[0].Pr.Copy();
+                if(!content.Content[0].Pr.DefaultRunPr){
+                    content.Content[0].Pr.DefaultRunPr = new AscCommonWord.CTextPr();
+                }
+                content.Content[0].Pr.DefaultRunPr.Merge(content_.Content[0].Get_FirstRunPr());
             }
             content.Set_StartPage(0);
             content.Reset(0, 0, w, 20000);
-            content.Recalculate_Page(content.StartPage, true);
+            content.RecalculateContent(this.txBody.contentWidth2, this.txBody.contentHeight2, 0);
 
             var oTextWarpContent = this.checkTextWarp(content, body_pr, this.txBody.contentWidth2, this.txBody.contentHeight2, false, true);
             this.txWarpStructParamarks2 = oTextWarpContent.oTxWarpStructParamarks;

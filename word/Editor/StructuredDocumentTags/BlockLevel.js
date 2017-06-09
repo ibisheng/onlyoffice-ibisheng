@@ -716,9 +716,9 @@ CBlockLevelSdt.prototype.Get_Theme = function()
 {
 	return this.Parent.Get_Theme();
 };
-CBlockLevelSdt.prototype.Get_PrevElementEndInfo = function()
+CBlockLevelSdt.prototype.GetPrevElementEndInfo = function()
 {
-	return this.Parent.Get_PrevElementEndInfo(this);
+	return this.Parent.GetPrevElementEndInfo(this);
 };
 CBlockLevelSdt.prototype.Get_EndInfo = function()
 {

@@ -167,12 +167,18 @@ CTextBody.prototype =
 
     Get_Theme : function()
     {
-        return this.parent.Get_Theme();
+        if(this.parent){
+            return this.parent.Get_Theme();
+        }
+        return null;
     },
 
     Get_ColorMap: function()
     {
-        return this.parent.Get_ColorMap();
+        if(this.parent){
+            return this.parent.Get_ColorMap();
+        }
+        return null;
     },
 
     setParent: function(pr)
@@ -399,7 +405,9 @@ CTextBody.prototype =
             this.parent.recalcInfo.recalcTransformText = true;
 
             this.parent.recalcInfo.recalculateContent = true;
+            this.parent.recalcInfo.recalculateContent2 = true;
             this.parent.recalcInfo.recalculateTransformText = true;
+
             if(this.parent.addToRecalculate)
             {
                 this.parent.addToRecalculate();
@@ -683,7 +691,7 @@ CTextBody.prototype =
         return max_width + 0.01;
     },
 
-    Get_PrevElementEndInfo : function(CurElement)
+	GetPrevElementEndInfo : function(CurElement)
     {
         return null;
     },

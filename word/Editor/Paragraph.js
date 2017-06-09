@@ -736,7 +736,7 @@ Paragraph.prototype.Internal_Content_Remove = function(Pos)
 
 	// Удаляем комментарий, если это необходимо
 	if (true === this.DeleteCommentOnRemove && para_Comment === Item.Type)
-		this.LogicDocument.Remove_Comment(Item.CommentId, true, false);
+		this.LogicDocument.RemoveComment(Item.CommentId, true, false);
 
 	var SpellingsCount = this.SpellChecker.Elements.length;
 	for (var Pos = 0; Pos < SpellingsCount; Pos++)
@@ -824,7 +824,7 @@ Paragraph.prototype.Internal_Content_Remove2 = function(Pos, Count)
 	var CountCommentsToDelete = CommentsToDelete.length;
 	for (var Index = 0; Index < CountCommentsToDelete; Index++)
 	{
-		this.LogicDocument.Remove_Comment(CommentsToDelete[Index], true, false);
+		this.LogicDocument.RemoveComment(CommentsToDelete[Index], true, false);
 	}
 
 	// Передвинем все метки слов для проверки орфографии
@@ -968,13 +968,13 @@ Paragraph.prototype.Get_EndInfoByPage = function(CurPage)
 	// Здесь может приходить отрицательное значение
 
 	if (CurPage < 0)
-		return this.Parent.Get_PrevElementEndInfo(this);
+		return this.Parent.GetPrevElementEndInfo(this);
 	else
 		return this.Pages[CurPage].EndInfo.Copy();
 };
 Paragraph.prototype.Recalculate_PageEndInfo = function(PRSW, CurPage)
 {
-	var PrevInfo = ( 0 === CurPage ? this.Parent.Get_PrevElementEndInfo(this) : this.Pages[CurPage - 1].EndInfo.Copy() );
+	var PrevInfo = ( 0 === CurPage ? this.Parent.GetPrevElementEndInfo(this) : this.Pages[CurPage - 1].EndInfo.Copy() );
 
 	var PRSI = this.m_oPRSI;
 
@@ -1446,11 +1446,11 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 	var DocumentComments = LogicDocument.Comments;
 	var Page_abs         = this.Get_AbsolutePage(CurPage);
 
-	var DrawComm           = ( DocumentComments.Is_Use() && (true !== LogicDocument.IsViewMode() || true === LogicDocument.CanEditCommentsInViewMode()));
+	var DrawComm           = ( DocumentComments.Is_Use() && true !== LogicDocument.IsViewMode());
 	var DrawFind           = LogicDocument.SearchEngine.Selection;
 	var DrawColl           = ( undefined === pGraphics.RENDERER_PDF_FLAG ? false : true );
 	var DrawMMFields       = (this.LogicDocument && true === this.LogicDocument.Is_HightlightMailMergeFields() ? true : false);
-	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && (true !== LogicDocument.IsViewMode() || true === LogicDocument.CanEditCommentsInViewMode()));
+	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && true !== LogicDocument.IsViewMode());
 
 	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.Get_EndInfoByPage(CurPage - 1), DrawSolvedComments);
 
@@ -2609,7 +2609,7 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 
 			for (var CommentId in CommentsToDelete)
 			{
-				this.LogicDocument.Remove_Comment(CommentId, true, false);
+				this.LogicDocument.RemoveComment(CommentId, true, false);
 			}
 		}
 
@@ -5261,7 +5261,7 @@ Paragraph.prototype.Correct_Content = function(_StartPos, _EndPos, bDoNotDeleteE
 	var CommentsCount = CommentsToDelete.length;
 	for (var CommentIndex = 0; CommentIndex < CommentsCount; CommentIndex++)
 	{
-		this.LogicDocument.Remove_Comment(CommentsToDelete[CommentIndex], true, false);
+		this.LogicDocument.RemoveComment(CommentsToDelete[CommentIndex], true, false);
 	}
 
 	// Проверим, чтобы предпоследний элемент был Run
@@ -5545,7 +5545,7 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 
 		for (var CommentId in CommentsToDelete)
 		{
-			this.LogicDocument.Remove_Comment(CommentId, true, false);
+			this.LogicDocument.RemoveComment(CommentId, true, false);
 		}
 
 		// Еще раз обновим метки
@@ -6031,7 +6031,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 {
 	var PagesCount = this.Pages.length;
 
-	if (this.bFromDocument && this.LogicDocument && false === this.LogicDocument.IsViewMode() && null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && CurPage >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2)
+	if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.CanEdit() && null === this.Parent.Is_HdrFtr(true) && null == this.Get_DocumentNext() && CurPage >= PagesCount - 1 && Y > this.Pages[PagesCount - 1].Bounds.Bottom && MouseEvent.ClickCount >= 2)
 		return this.Parent.Extend_ToPos(X, Y);
 
 	// Обновляем позицию курсора
@@ -6052,10 +6052,7 @@ Paragraph.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent, bTabl
 		var LastRange = this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1];
 		if (CurPage >= PagesCount - 1 && X > LastRange.W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom)
 		{
-			if (this.bFromDocument
-				&& this.LogicDocument
-				&& false === this.LogicDocument.IsViewMode()
-				&& false === this.LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+			if (this.bFromDocument && false === this.LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
 					Type      : AscCommon.changestype_2_Element_and_Type,
 					Element   : this,
 					CheckType : AscCommon.changestype_Paragraph_Content
@@ -7455,6 +7452,7 @@ Paragraph.prototype.Numbering_IsUse = function(NumId, Lvl)
 Paragraph.prototype.Add_PresentationNumbering = function(_Bullet)
 {
 	var ParaPr                 = this.Get_CompiledPr2(false).ParaPr;
+	var _OldBullet = this.Pr.Bullet;
 	this.Pr.Bullet             = undefined;
 	this.CompiledPr.NeedRecalc = true;
 
@@ -7484,10 +7482,12 @@ Paragraph.prototype.Add_PresentationNumbering = function(_Bullet)
 			var oNewPresentationBullet   = oBullet2.getPresentationBullet(oTheme, oColorMap);
 			if (oUndefPresentationBullet.m_sChar === oNewPresentationBullet.m_sChar)//символы совпали. ничего выставлять не надо.
 			{
+                this.Pr.Bullet = _OldBullet;
 				this.Set_Bullet(undefined);
 			}
 			else
 			{
+                this.Pr.Bullet = _OldBullet;
 				this.Set_Bullet(oBullet2.createDuplicate());//тип совпал, но не совпали символы. выставляем Bullet.
 															// Indent в данном случае не выставляем как это делает
 															// PowerPoint.
@@ -7495,12 +7495,14 @@ Paragraph.prototype.Add_PresentationNumbering = function(_Bullet)
 		}
 		else //нумерация или отсутствие нумерации
 		{
+            this.Pr.Bullet = _OldBullet;
 			this.Set_Bullet(undefined);
 		}
 		this.Set_Ind({Left : undefined, FirstLine : undefined}, true);
 	}
 	else//тип не совпал. выставляем буллет, а также проверим нужно ли выставлять Indent.
 	{
+        this.Pr.Bullet = _OldBullet;
 		this.Set_Bullet(oBullet2.createDuplicate());
 		LeftInd = Math.min(ParaPr.Ind.Left, ParaPr.Ind.Left + ParaPr.Ind.FirstLine);
 		if (NewType === numbering_presentationnumfrmt_Char)
@@ -9366,7 +9368,7 @@ Paragraph.prototype.PreDelete = function()
 		var Item = this.Content[Index];
 		if (para_Comment === Item.Type)
 		{
-			this.LogicDocument.Remove_Comment(Item.CommentId, true, false);
+			this.LogicDocument.RemoveComment(Item.CommentId, true, false);
 		}
 	}
 };
@@ -10696,7 +10698,7 @@ Paragraph.prototype.CanAddComment = function()
 
 	return false;
 };
-Paragraph.prototype.Remove_CommentMarks = function(Id)
+Paragraph.prototype.RemoveCommentMarks = function(Id)
 {
 	var Count = this.Content.length;
 	for (var Pos = 0; Pos < Count; Pos++)
@@ -10743,7 +10745,7 @@ Paragraph.prototype.Replace_MisspelledWord = function(Word, WordId)
 
 	for (var CommentId in CommentsToDelete)
 	{
-		this.LogicDocument.Remove_Comment(CommentId, true, false);
+		this.LogicDocument.RemoveComment(CommentId, true, false);
 	}
 
 	this.Set_SelectionContentPos(StartPos, EndPos);
@@ -12642,7 +12644,7 @@ CParagraphDrawStateHightlights.prototype =
 		this.Check_CommentsFlag();
     },
 
-    Remove_Comment : function(Id)
+	RemoveComment : function(Id)
     {
 		if (!this.DrawComments)
 			return;

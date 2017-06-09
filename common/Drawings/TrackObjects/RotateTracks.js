@@ -350,6 +350,7 @@ ObjectToDraw.prototype =
 };
 function RotateTrackShapeImage(originalObject)
 {
+    this.bIsTracked = false;
     this.originalObject = originalObject;
     this.transform = new CMatrix();
     var brush;
@@ -379,6 +380,7 @@ function RotateTrackShapeImage(originalObject)
 
     this.track = function(angle, e)
     {
+        this.bIsTracked = true;
         var new_rot = angle + this.originalObject.rot;
         while(new_rot < 0)
             new_rot += 2*Math.PI;
@@ -429,6 +431,9 @@ function RotateTrackShapeImage(originalObject)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         AscFormat.CheckSpPrXfrm(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     };
@@ -480,6 +485,7 @@ function RotateTrackShapeImage(originalObject)
 
 function RotateTrackGroup(originalObject)
 {
+    this.bIsTracked = false;
     this.originalObject = originalObject;
     this.transform = new CMatrix();
 
@@ -548,6 +554,7 @@ function RotateTrackGroup(originalObject)
 
     this.track = function(angle, e)
     {
+        this.bIsTracked = true;
         var new_rot = angle + this.originalObject.rot;
         while(new_rot < 0)
             new_rot += 2*Math.PI;
@@ -591,6 +598,9 @@ function RotateTrackGroup(originalObject)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         AscFormat.CheckSpPrXfrm(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
@@ -598,6 +608,7 @@ function RotateTrackGroup(originalObject)
 
 function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 {
+    this.bIsTracked = false;
     this.chartSpace = oChartSpace;
 
 
@@ -808,6 +819,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 
     this.track = function(x, y)
     {
+        this.bIsTracked = true;
 
         var tx = this.chartSpace.invertTransform.TransformPointX(x, y);
         var ty = this.chartSpace.invertTransform.TransformPointY(x, y);
@@ -858,6 +870,9 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         oChartSpace.chart.setView3D(this.view3D.createDuplicate());
         oChartSpace.setRecalculateInfo();
     }

@@ -187,9 +187,9 @@ CTableCell.prototype =
         return this.Content.Get_EndInfo();
     },
 
-    Get_PrevElementEndInfo : function(CurElement)
+	GetPrevElementEndInfo : function(CurElement)
     {
-        return this.Row.Get_PrevElementEndInfo( this.Index );
+        return this.Row.GetPrevElementEndInfo( this.Index );
     },
 
 	SaveRecalculateObject : function()

@@ -2386,10 +2386,10 @@ CTable.prototype.Get_EndInfo = function()
 
 	return null;
 };
-CTable.prototype.Get_PrevElementEndInfo = function(RowIndex)
+CTable.prototype.GetPrevElementEndInfo = function(RowIndex)
 {
 	if (0 === RowIndex)
-		return this.Parent.Get_PrevElementEndInfo(this);
+		return this.Parent.GetPrevElementEndInfo(this);
 	else
 		return this.Content[RowIndex - 1].Get_EndInfo();
 };
@@ -4439,7 +4439,7 @@ CTable.prototype.Selection_SetEnd = function(X, Y, CurPage, MouseEvent)
 	if (this.Selection.Type2 === table_Selection_Border)
 	{
 		var LogicDocument = this.LogicDocument;
-		if (!LogicDocument || true === LogicDocument.IsViewMode() || this.Selection.Data2.PageNum != CurPage)
+		if (!LogicDocument || true !== LogicDocument.CanEdit() || this.Selection.Data2.PageNum != CurPage)
 			return;
 
 		var _X = X;

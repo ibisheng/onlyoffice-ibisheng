@@ -1,16 +1,21 @@
+sudo: required
+services:
+  - docker
 language: node_js
 node_js:
   - '6'
-before_install:
-  - npm install -g grunt-cli node-qunit-phantomjs
 before_script:
   - git clone -b develop https://github.com/ONLYOFFICE/web-apps.git ../web-apps
 jobs:
   include:
     - stage: Formulas tests
-      script: node-qunit-phantomjs cell/.unit-tests/FormulaTests.html
-    - stage: Building SDK
       script:
-        - cd build
-        - npm install
-        - grunt --level=WHITESPACE_ONLY
+        - npm install -g node-qunit-phantomjs
+        - node-qunit-phantomjs cell/.unit-tests/FormulaTests.html
+    - stage: Building SDK and test it by `onlyofficetestingrobot/doc-builder-testing`
+      script:
+        - npm install -g grunt-cli
+        - npm install --prefix build
+        - grunt --level=WHITESPACE_ONLY --base build --gruntfile build/Gruntfile.js
+        - docker pull onlyofficetestingrobot/doc-builder-testing
+        - docker run -v $PWD/word:/opt/onlyoffice/documentbuilder/sdkjs/word -v $PWD/cell:/opt/onlyoffice/documentbuilder/sdkjs/cell -v $PWD/slide:/opt/onlyoffice/documentbuilder/sdkjs/slide onlyofficetestingrobot/doc-builder-testing

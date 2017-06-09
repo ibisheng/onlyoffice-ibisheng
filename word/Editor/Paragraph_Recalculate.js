@@ -2989,7 +2989,7 @@ CParagraphRecalculateStateWrap.prototype =
 
             NumberingItem.Bullet = Bullet;
             NumberingItem.BulletNum = BulletNum + 1;
-            NumberingItem.Measure(g_oTextMeasurer, FirstTextPr, Para.Get_Theme());
+            NumberingItem.Measure(g_oTextMeasurer, FirstTextPr, Para.Get_Theme(), Para.Get_ColorMap());
 
 
             if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
@@ -3172,7 +3172,7 @@ CParagraphRecalculateStateInfo.prototype =
         this.Comments.push( Id );
     },
 
-    Remove_Comment : function(Id)
+	RemoveComment : function(Id)
     {
         var CommentsLen = this.Comments.length;
         for (var CurPos = 0; CurPos < CommentsLen; CurPos++)

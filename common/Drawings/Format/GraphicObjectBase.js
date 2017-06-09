@@ -288,6 +288,43 @@
         this.w = this.r - this.l;
         this.h = this.b - this.t;
     };
+
+    CGraphicBounds.prototype.checkByOther = function(oBounds){
+        if(oBounds){
+            if(oBounds.l < this.l){
+                this.l = oBounds.l;
+            }
+            if(oBounds.t < this.t){
+                this.t = oBounds.t;
+            }
+            if(oBounds.r > this.r){
+                this.r = oBounds.r;
+            }
+            if(oBounds.b > this.b){
+                this.b = oBounds.b;
+            }
+        }
+    };
+    CGraphicBounds.prototype.checkWH = function(){
+
+        this.x = this.l;
+        this.y = this.t;
+        this.w = this.r - this.l;
+        this.h = this.b - this.t;
+    };
+    CGraphicBounds.prototype.reset = function(l, t, r, b){
+
+        this.l = l;
+        this.t = t;
+        this.r = r;
+        this.b = b;
+
+        this.x = l;
+        this.y = t;
+        this.w = r - l;
+        this.h = b - t;
+    };
+
     /**
      * Base class for all graphic objects
      * @constructor

@@ -211,11 +211,17 @@ CDocumentContent.prototype.Get_PageContentStartPos2 = function(StartPageIndex, S
 };
 CDocumentContent.prototype.Get_Theme = function()
 {
-	return this.Parent.Get_Theme();
+	if(this.Parent){
+        return this.Parent.Get_Theme();
+	}
+	return null;
 };
 CDocumentContent.prototype.Get_ColorMap = function()
 {
-	return this.Parent.Get_ColorMap();
+	if(this.Parent){
+        return this.Parent.Get_ColorMap();
+	}
+	return null;
 };
 CDocumentContent.prototype.Get_PageLimits = function(PageIndex)
 {
@@ -8034,7 +8040,7 @@ CDocumentContent.prototype.Get_EndInfo = function()
 	else
 		return null;
 };
-CDocumentContent.prototype.Get_PrevElementEndInfo = function(CurElement)
+CDocumentContent.prototype.GetPrevElementEndInfo = function(CurElement)
 {
 	var PrevElement = CurElement.Get_DocumentPrev();
 
@@ -8044,7 +8050,7 @@ CDocumentContent.prototype.Get_PrevElementEndInfo = function(CurElement)
 	}
 	else
 	{
-		return this.Parent.Get_PrevElementEndInfo(this);
+		return this.Parent.GetPrevElementEndInfo(this);
 	}
 };
 CDocumentContent.prototype.GetTopElement = function()

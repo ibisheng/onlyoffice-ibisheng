@@ -324,15 +324,15 @@ function CComment(Parent, Data)
         if ( ObjStart === ObjEnd )
         {
             if ( null != ObjStart )
-                ObjStart.Remove_CommentMarks( this.Id );
+                ObjStart.RemoveCommentMarks( this.Id );
         }
         else
         {
             if ( null != ObjStart )
-                ObjStart.Remove_CommentMarks( this.Id );
+                ObjStart.RemoveCommentMarks( this.Id );
 
             if ( null != ObjEnd )
-                ObjEnd.Remove_CommentMarks( this.Id );
+                ObjEnd.RemoveCommentMarks( this.Id );
         }
     };
 
@@ -459,7 +459,7 @@ function CComment(Parent, Data)
 		}
 
         if ( false === bUse )
-            editor.WordControl.m_oLogicDocument.Remove_Comment( this.Id, true, false );
+            editor.WordControl.m_oLogicDocument.RemoveComment( this.Id, true, false );
     };
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
@@ -878,7 +878,7 @@ ParaComment.prototype =
         if ( true === this.Start )
             PRSI.AddComment( this.CommentId );
         else
-            PRSI.Remove_Comment( this.CommentId );
+            PRSI.RemoveComment( this.CommentId );
     },
 
 	SaveRecalculateObject : function(Copy)
@@ -962,7 +962,7 @@ ParaComment.prototype =
         if ( true === this.Start )
             PDSH.AddComment( this.CommentId );
         else
-            PDSH.Remove_Comment( this.CommentId );
+            PDSH.RemoveComment( this.CommentId );
     },
 
     Draw_Elements : function(PDSE)

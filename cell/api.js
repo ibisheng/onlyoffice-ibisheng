@@ -260,15 +260,6 @@ var editor;
       return new AscCommon.asc_CListType(AscFormat.fGetListTypeFromBullet(oParaPr && oParaPr.Bullet));
   };
 
-    spreadsheet_api.prototype.asc_setListType = function(type, subtype){
-        var ws = this.wb.getWorksheet();
-        var oParaPr;
-        if (ws && ws.objectRender && ws.objectRender.controller) {
-            ws.objectRender.setListType(type, subtype);
-        }
-    };
-
-
     spreadsheet_api.prototype.asc_setLocale = function(val) {
     if (!this.isLoadFullApi) {
       this.tmpLocale = val;
@@ -2765,9 +2756,10 @@ var editor;
 
     spreadsheet_api.prototype.asc_setListType = function (type, subtype) {
       var t = this;
-      if(type === 0){
+        var sNeedFont = AscFormat.fGetFontByNumInfo(type, subtype);
+      if(typeof sNeedFont === "string" && sNeedFont.length > 0){
           var t = this, fonts = {};
-          fonts["Wingdings"] = 1;
+          fonts[sNeedFont] = 1;
           t._loadFonts(fonts, function() {t.asc_setListType2(type, subtype);});
       }
       else{
@@ -3505,7 +3497,8 @@ var editor;
 
   prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 
-  prot["asc_setViewMode"] = prot.asc_setViewMode;
+	prot["asc_setViewMode"] = prot.asc_setViewMode;
+	prot["asc_setRestriction"] = prot.asc_setRestriction;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;

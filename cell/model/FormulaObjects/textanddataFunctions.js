@@ -38,6 +38,7 @@
  */
 	function (window, undefined) {
 	// Import
+	var cElementType = AscCommonExcel.cElementType;
 	var CellValueType = AscCommon.CellValueType;
 	var g_oFormatParser = AscCommon.g_oFormatParser;
 	var oNumFormatCache = AscCommon.oNumFormatCache;
@@ -56,7 +57,7 @@
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
-	cFormulaFunctionGroup['TextAndData'].push(cASC, cBAHTTEXT, cCHAR, cCLEAN, cCODE, cCONCATENATE, cDOLLAR, cEXACT,
+	cFormulaFunctionGroup['TextAndData'].push(cASC, cBAHTTEXT, cCHAR, cCLEAN, cCODE, cCONCATENATE, cCONCAT, cDOLLAR, cEXACT,
 		cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cPHONETIC, cPROPER, cREPLACE,
 		cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTRIM, cUPPER, cVALUE);
 
@@ -234,6 +235,7 @@
 		this.argumentsCurrent = 0;
 	}
 
+	//TODO пересмотреть функцию!!!
 	cCONCATENATE.prototype = Object.create(cBaseFunction.prototype);
 	cCONCATENATE.prototype.constructor = cCONCATENATE;
 	cCONCATENATE.prototype.argumentsMin = 1;
@@ -268,6 +270,66 @@
 		return this.value = arg0;
 	};
 	cCONCATENATE.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(text1, text2, ...)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCONCAT() {
+		this.name = "CONCAT";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cCONCAT.prototype = Object.create(cBaseFunction.prototype);
+	cCONCAT.prototype.constructor = cCONCAT;
+	cCONCAT.prototype.argumentsMin = 1;
+	cCONCAT.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cCONCAT.prototype.Calculate = function (arg) {
+		var arg0 = new cString(""), argI;
+
+		for (var i = 0; i < this.argumentsCurrent; i++) {
+			argI = arg[i];
+
+			if (cElementType.cellsRange === argI.type || cElementType.cellsRange3D === argI.type) {
+				var _arrVal = argI.getValue(this.checkExclude, this.excludeHiddenRows);
+				for (var j = 0; j < _arrVal.length; j++) {
+					var _arrElem = _arrVal[j].tocString();
+					if (cElementType.error === _arrElem.type) {
+						return this.value = arrVal[j];
+					}else {
+						arg0 = new cString(arg0.toString().concat(_arrElem));
+					}
+				}
+			}else{
+				argI = argI.tocString();
+				if (cElementType.error === argI.type) {
+					return this.value = argI;
+				} else if (cElementType.array === argI.type) {
+					argI.foreach(function (elem) {
+						if (cElementType.error === elem.type) {
+							arg0 = elem;
+							return true;
+						}
+
+						arg0 = new cString(arg0.toString().concat(elem.toString()));
+
+					});
+					if (cElementType.error === arg0.type) {
+						return this.value = arg0;
+					}
+				} else {
+					arg0 = new cString(arg0.toString().concat(argI.toString()));
+				}
+			}
+		}
+		return this.value = arg0;
+	};
+	cCONCAT.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "(text1, text2, ...)"
 		};

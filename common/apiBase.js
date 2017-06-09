@@ -57,6 +57,7 @@
 		this.isEmbedVersion = (config['embedded'] === true);
 
 		this.isViewMode = false;
+		this.restrictions = Asc.c_oAscRestrictionType.None;
 
 		this.FontLoader  = null;
 		this.ImageLoader = null;
@@ -340,6 +341,10 @@
 	};
 	baseEditorsApi.prototype.asc_setViewMode                 = function()
 	{
+	};
+	baseEditorsApi.prototype.asc_setRestriction              = function(val)
+	{
+		this.restrictions = val;
 	};
 	baseEditorsApi.prototype.getViewMode                     = function()
 	{

@@ -194,7 +194,7 @@
         var oTxLstStyle = new AscFormat.TextListStyle();
         oTxLstStyle.levels[0] =  new CParaPr();
         oTxLstStyle.levels[0].Jc = AscCommon.align_Left;
-        oTxLstStyle.levels[0].DefaultRunPr = new AscCommon.CTextPr();
+        oTxLstStyle.levels[0].DefaultRunPr = new AscCommonWord.CTextPr();
         oTxLstStyle.levels[0].DefaultRunPr.FontSize = 12;
         oSp.txBody.setLstStyle(oTxLstStyle);
         oSp.setParent(oNM);
@@ -235,7 +235,7 @@
         oTxLstStyle = new AscFormat.TextListStyle();
         oTxLstStyle.levels[0] =  new CParaPr();
         oTxLstStyle.levels[0].Jc = AscCommon.align_Right;
-        oTxLstStyle.levels[0].DefaultRunPr = new AscCommon.CTextPr();
+        oTxLstStyle.levels[0].DefaultRunPr = new AscCommonWord.CTextPr();
         oTxLstStyle.levels[0].DefaultRunPr.FontSize = 12;
         //endParaPr
         oSp.txBody.setLstStyle(oTxLstStyle);
@@ -276,7 +276,7 @@
         oTxLstStyle = new AscFormat.TextListStyle();
         oTxLstStyle.levels[0] =  new CParaPr();
         oTxLstStyle.levels[0].Jc = AscCommon.align_Right;
-        oTxLstStyle.levels[0].DefaultRunPr = new AscCommon.CTextPr();
+        oTxLstStyle.levels[0].DefaultRunPr = new AscCommonWord.CTextPr();
         oTxLstStyle.levels[0].DefaultRunPr.FontSize = 12;
         //endParaPr
         oSp.txBody.setLstStyle(oTxLstStyle);
@@ -356,7 +356,7 @@
         oTxLstStyle = new AscFormat.TextListStyle();
         oTxLstStyle.levels[0] =  new CParaPr();
         oTxLstStyle.levels[0].Jc = AscCommon.align_Left;
-        oTxLstStyle.levels[0].DefaultRunPr = new AscCommon.CTextPr();
+        oTxLstStyle.levels[0].DefaultRunPr = new AscCommonWord.CTextPr();
         oTxLstStyle.levels[0].DefaultRunPr.FontSize = 12;
         //endParaPr
         oSp.txBody.setLstStyle(oTxLstStyle);
@@ -398,7 +398,7 @@
         oTxLstStyle = new AscFormat.TextListStyle();
         oTxLstStyle.levels[0] =  new CParaPr();
         oTxLstStyle.levels[0].Jc = AscCommon.align_Right;
-        oTxLstStyle.levels[0].DefaultRunPr = new AscCommon.CTextPr();
+        oTxLstStyle.levels[0].DefaultRunPr = new AscCommonWord.CTextPr();
         oTxLstStyle.levels[0].DefaultRunPr.FontSize = 12;
         //endParaPr
         oSp.txBody.setLstStyle(oTxLstStyle);
@@ -426,7 +426,7 @@
         oTxLstStyle.levels[0].Jc = AscCommon.align_Left;
         oTxLstStyle.levels[0].DefaultTabSize = 914400/36000;
 
-        oTxLstStyle.levels[0].DefaultRunPr = new AscCommon.CTextPr();
+        oTxLstStyle.levels[0].DefaultRunPr = new AscCommonWord.CTextPr();
         oTxLstStyle.levels[0].DefaultRunPr.FontSize = 12;
         oTxLstStyle.levels[0].DefaultRunPr.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(15, 0);
 
