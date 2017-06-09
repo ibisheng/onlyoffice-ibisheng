@@ -1041,6 +1041,16 @@ $( function () {
 		ok( oParser.parse(), "GAMMA.DIST(A2,A3,A4,TRUE)" );
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.068094, "GAMMA.DIST(A2,A3,A4,TRUE)" );
 	} );
+
+	test( "Test: \"GAMMA.INV\"", function () {
+		ws.getRange2( "A2" ).setValue( "0.068094" );
+		ws.getRange2( "A3" ).setValue( "9" );
+		ws.getRange2( "A4" ).setValue( "2" );
+
+		oParser = new parserFormula( "GAMMA.INV(A2,A3,A4)", "A1", ws );
+		ok( oParser.parse(), "GAMMA.INV(A2,A3,A4)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 10.0000112, "GAMMA.INV(A2,A3,A4)" );
+	} );
     
 	test( "Test: \"SUM(1,2,3)\"", function () {
         oParser = new parserFormula( 'SUM(1,2,3)', "A1", ws );

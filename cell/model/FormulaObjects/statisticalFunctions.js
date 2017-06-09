@@ -63,7 +63,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
 		cBETAINV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
-		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMAINV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
@@ -753,6 +753,114 @@
 		return getBetaDist(arg, alpha, beta);
 	}
 
+	function iterateInverse( rFunction, fAx, fBx )	{
+		var rConvError = false;
+		var fYEps = 1.0E-307;
+		var fXEps = 2.22045e-016;
+
+		var fAy = rFunction.GetValue(fAx);
+		var fBy = rFunction.GetValue(fBx);
+		var fTemp;
+		var nCount;
+		for (nCount = 0; nCount < 1000 && !hasChangeOfSign(fAy, fBy); nCount++)	{
+			if (Math.abs(fAy) <= Math.abs(fBy))	{
+				fTemp = fAx;
+				fAx += 2 * (fAx - fBx);
+				if (fAx < 0){
+					fAx = 0;
+				}
+				fBx = fTemp;
+				fBy = fAy;
+				fAy = rFunction.GetValue(fAx);
+			} else {
+				fTemp = fBx;
+				fBx += 2 * (fBx - fAx);
+				fAx = fTemp;
+				fAy = fBy;
+				fBy = rFunction.GetValue(fBx);
+			}
+		}
+
+		if (fAy === 0){
+			return fAx;
+		}
+		if (fBy === 0){
+			return fBx;
+		}
+		if (!hasChangeOfSign( fAy, fBy)){
+			rConvError = true;
+			return 0.0;
+		}
+		// inverse quadric interpolation with additional brackets
+		// set three points
+		var fPx = fAx;
+		var fPy = fAy;
+		var fQx = fBx;
+		var fQy = fBy;
+		var fRx = fAx;
+		var fRy = fAy;
+		var fSx = 0.5 * (fAx + fBx);
+		var bHasToInterpolate = true;
+
+		nCount = 0;
+		while ( nCount < 500 && Math.abs(fRy) > fYEps && (fBx - fAx) > Math.max( Math.abs(fAx), Math.abs(fBx)) * fXEps ){
+			if (bHasToInterpolate){
+				if (fPy !== fQy && fQy !== fRy && fRy !== fPy){
+					fSx = fPx * fRy * fQy / (fRy-fPy) / (fQy-fPy)
+						+ fRx * fQy * fPy / (fQy-fRy) / (fPy-fRy)
+						+ fQx * fPy * fRy / (fPy-fQy) / (fRy-fQy);
+					bHasToInterpolate = (fAx < fSx) && (fSx < fBx); // inside the brackets?
+				}else{
+					bHasToInterpolate = false;
+				}
+			}
+			if(!bHasToInterpolate){
+				fSx = 0.5 * (fAx + fBx);
+
+				fQx = fBx;
+				fQy = fBy;
+				bHasToInterpolate = true;
+			}
+
+			fPx = fQx; fQx = fRx; fRx = fSx;
+			fPy = fQy; fQy = fRy; fRy = rFunction.GetValue(fSx);
+
+			if (hasChangeOfSign( fAy, fRy))	{
+				fBx = fRx; fBy = fRy;
+			}else{
+				fAx = fRx; fAy = fRy;
+			}
+
+			bHasToInterpolate = bHasToInterpolate && (Math.abs(fRy) * 2 <= Math.abs(fQy));
+			++nCount;
+		}
+		return {val: fRx, bError: rConvError};
+	}
+
+	function hasChangeOfSign( u, w )
+	{
+		return (u < 0 && w > 0) || (u > 0 && w < 0);
+	}
+
+	function cGammaDistFunction(fp, fAlpha, fBeta){
+		this.fp = fp;
+		this.fAlpha = fAlpha;
+		this.fBeta = fBeta;
+	}
+	cGammaDistFunction.prototype.constructor = cGammaDistFunction;
+	cGammaDistFunction.prototype.GetValue = function(x){
+		return this.fp - getGammaDist(x, this.fAlpha, this.fBeta);
+	};
+
+	function getLowRegIGamma( fA, fX ){
+		var fLnFactor = fA * Math.log(fX) - fX - getLogGamma(fA);
+		var fFactor = Math.exp(fLnFactor);
+		if (fX > fA + 1){
+			return 1 - fFactor * getGammaContFraction(fA,fX);
+		} else {
+			return fFactor * getGammaSeries(fA,fX);
+		}
+	}
 
 	/**
 	 * @constructor
@@ -2527,16 +2635,67 @@
 	cGAMMA_DIST.prototype.getInfo = function () {
 		return {name: this.name, args: "(x, alpha, beta, cumulative )"}
 	};
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cGAMMAINV() {
-		cBaseFunction.call(this, "GAMMAINV");
+	function cGAMMA_INV() {
+		this.name = "GAMMA.INV";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
-	cGAMMAINV.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMAINV.prototype.constructor = cGAMMAINV;
+	cGAMMA_INV.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMA_INV.prototype.constructor = cGAMMA_INV;
+	cGAMMA_INV.prototype.argumentsMin = 3;
+	cGAMMA_INV.prototype.argumentsMax = 3;
+	cGAMMA_INV.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			var fP = argArray[0];
+			var fAlpha = argArray[1];
+			var fBeta = argArray[2];
+
+			if (fAlpha <= 0 || fBeta <= 0 || fP < 0 || fP >= 1 ){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = null;
+			if (fP === 0){
+				res = 0;
+			}else {
+				var aFunc = new cGammaDistFunction(fP, fAlpha, fBeta);
+				var fStart = fAlpha * fBeta;
+				var oVal = iterateInverse(aFunc, fStart * 0.5, fStart);
+				var bConvError = oVal.bError;
+
+				if (bConvError){
+					return new cError(cErrorType.not_numeric);
+					//SetError(FormulaError::NoConvergence);
+				}
+				res = oVal.val;
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cGAMMA_INV.prototype.getInfo = function () {
+		return {name: this.name, args: "(probability, alpha, beta )"}
+	};
 
 	/**
 	 * @constructor
