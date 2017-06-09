@@ -4783,6 +4783,13 @@
 
 			countC = pivotTable.getColumnFieldsCount();
 			countR = pivotTable.getRowFieldsCount(true);
+
+			if (styleInfo.showRowHeaders && countR) {
+				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c1 + Math.max(0, countR - 1));
+				dxf = style.firstColumn && style.firstColumn.dxf;
+				cells.setTableStyle(dxf);
+			}
+
 			if (styleInfo.showColHeaders) {
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC, pivotRange.c2);
 				dxf = style.headerRow && style.headerRow.dxf;
