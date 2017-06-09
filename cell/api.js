@@ -3402,7 +3402,8 @@ var editor;
 
   prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 
-  prot["asc_setViewMode"] = prot.asc_setViewMode;
+	prot["asc_setViewMode"] = prot.asc_setViewMode;
+	prot["asc_setRestriction"] = prot.asc_setRestriction;
   prot["asc_setAdvancedOptions"] = prot.asc_setAdvancedOptions;
   prot["asc_setPageOptions"] = prot.asc_setPageOptions;
   prot["asc_getPageOptions"] = prot.asc_getPageOptions;
