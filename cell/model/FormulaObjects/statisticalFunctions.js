@@ -61,7 +61,7 @@
 
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
-		cBETAINV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
+		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
 		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
@@ -782,14 +782,14 @@
 		}
 
 		if (fAy === 0){
-			return fAx;
+			return {val: fAx, bError: rConvError};
 		}
 		if (fBy === 0){
-			return fBx;
+			return {val: fBx, bError: rConvError};
 		}
 		if (!hasChangeOfSign( fAy, fBy)){
 			rConvError = true;
-			return 0.0;
+			return {val: 0, bError: rConvError};
 		}
 		// inverse quadric interpolation with additional brackets
 		// set three points
@@ -847,11 +847,22 @@
 		this.fAlpha = fAlpha;
 		this.fBeta = fBeta;
 	}
-	GAMMADISTFUNCTION.prototype.constructor = GAMMADISTFUNCTION;
 	GAMMADISTFUNCTION.prototype.GetValue = function(x){
 		var res;
 		var gammaDistVal = getGammaDist(x, this.fAlpha, this.fBeta);
 		res = this.fp - gammaDistVal;
+		return res;
+	};
+
+	function BETADISTFUNCTION(fp, fAlpha, fBeta){
+		this.fp = fp;
+		this.fAlpha = fAlpha;
+		this.fBeta = fBeta;
+	}
+	BETADISTFUNCTION.prototype.GetValue = function(x){
+		var res;
+		var betaDistVal = getBetaDist(x, this.fAlpha, this.fBeta);
+		res = this.fp - betaDistVal;
 		return res;
 	};
 
@@ -1248,12 +1259,61 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cBETAINV() {/*Нет реализации в Google Docs*/
-		cBaseFunction.call(this, "BETAINV");
+	function cBETA_INV() {
+		this.name = "BETA.INV";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
-	cBETAINV.prototype = Object.create(cBaseFunction.prototype);
-	cBETAINV.prototype.constructor = cBETAINV;
+	cBETA_INV.prototype = Object.create(cBaseFunction.prototype);
+	cBETA_INV.prototype.constructor = cBETA_INV;
+	cBETA_INV.prototype.argumentsMin = 3;
+	cBETA_INV.prototype.argumentsMax = 5;
+	cBETA_INV.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cNumber(0);
+		argClone[4] = argClone[4] ? argClone[4].tocNumber() : new cNumber(1);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			var fP = argArray[0];
+			var fAlpha = argArray[1];
+			var fBeta = argArray[2];
+			var fA = argArray[3];
+			var fB = argArray[4];
+
+			if (fP < 0 || fP > 1 || fA >= fB || fAlpha <= 0 || fBeta <= 0){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var aFunc = new BETADISTFUNCTION(fP, fAlpha, fBeta);
+			var oVal = iterateInverse( aFunc, 0, 1 );
+			var bConvError = oVal.bError;
+
+			if (bConvError){
+				return new cError(cErrorType.not_numeric);
+				//SetError(FormulaError::NoConvergence);
+			}
+			var res = fA + oVal.val * (fB - fA) ;
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cBETA_INV.prototype.getInfo = function () {
+		return {name: this.name, args: "( probability, alpha, beta, a, b )"}
+	};
 
 	/**
 	 * @constructor
