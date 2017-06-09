@@ -38,11 +38,17 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
     AscFormat.ExecuteNoHistory(function(){
         this.originalShape = originalShape;
+        this.bIsTracked = false;
 
         var oPen, oBrush;
         if(bTextWarp !== true)
         {
-            this.geometry = originalShape.spPr.geometry.createDuplicate();
+            if(originalShape.spPr && originalShape.spPr.geometry){
+                this.geometry = originalShape.spPr.geometry.createDuplicate();
+            }
+            else if(originalShape.calcGeometry){
+                this.geometry = originalShape.calcGeometry.createDuplicate();
+            }
             this.shapeWidth = originalShape.extX;
             this.shapeHeight = originalShape.extY;
             this.transform = originalShape.transform.CreateDublicate();
@@ -189,6 +195,7 @@ XYAdjustmentTrack.prototype.draw = function(overlay)
 
 XYAdjustmentTrack.prototype.track = function(posX, posY)
 {
+    this.bIsTracked = true;
     var invert_transform = this.invertTransform;
     var _relative_x = invert_transform.TransformPointX(posX, posY);
     var _relative_y = invert_transform.TransformPointY(posX, posY);
@@ -248,9 +255,15 @@ XYAdjustmentTrack.prototype.track = function(posX, posY)
 
 XYAdjustmentTrack.prototype.trackEnd = function()
 {
+    if(!this.bIsTracked){
+        return;
+    }
     var oGeometryToSet;
     if(!this.bTextWarp)
     {
+        if(!this.originalShape.spPr.geometry){
+            this.originalShape.spPr.setGeometry(this.geometry.createDuplicate());
+        }
         oGeometryToSet =  this.originalShape.spPr.geometry;
         if(this.xFlag)
         {
@@ -296,6 +309,7 @@ XYAdjustmentTrack.prototype.trackEnd = function()
 function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
     AscFormat.ExecuteNoHistory(function(){
+        this.bIsTracked = false;
         this.originalShape = originalShape;
 
 
@@ -303,7 +317,12 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
         var oPen, oBrush;
         if(bTextWarp !== true)
         {
-            this.geometry = originalShape.spPr.geometry.createDuplicate();
+            if(originalShape.spPr && originalShape.spPr.geometry){
+                this.geometry = originalShape.spPr.geometry.createDuplicate();
+            }
+            else if(originalShape.calcGeometry){
+                this.geometry = originalShape.calcGeometry.createDuplicate();
+            }
             this.shapeWidth = originalShape.extX;
             this.shapeHeight = originalShape.extY;
             this.transform = originalShape.transform;
@@ -392,6 +411,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
     this.track = function(posX, posY)
     {
+        this.bIsTracked = true;
         var invert_transform = this.invertTransform;
         var _relative_x = invert_transform.TransformPointX(posX, posY);
         var _relative_y = invert_transform.TransformPointY(posX, posY);
@@ -446,9 +466,15 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         var oGeometryToSet;
         if(!this.bTextWarp)
         {
+            if(!this.originalShape.spPr.geometry){
+                this.originalShape.spPr.setGeometry(this.geometry.createDuplicate());
+            }
             oGeometryToSet =  this.originalShape.spPr.geometry;
             if(this.radiusFlag)
             {

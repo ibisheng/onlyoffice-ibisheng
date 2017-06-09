@@ -10905,6 +10905,35 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
         return ListType;
     }
 
+
+    function fGetFontByNumInfo(Type, SubType){
+        if(SubType >= 0){
+            if(Type === 0){
+                switch(SubType)
+                {
+                    case 0:
+                    case 1:
+                    {
+                        return "Arial";
+                    }
+                    case 2:
+                    {
+                        return "Courier New";
+                    }
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    {
+                        return "Wingdings";
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     function fGetPresentationBulletByNumInfo(NumInfo){
         var bullet = new AscFormat.CBullet();
         if(NumInfo.SubType < 0)
@@ -11111,5 +11140,6 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].CreateBlipFillUniFillFromUrl = CreateBlipFillUniFillFromUrl;
 	window['AscFormat'].fGetListTypeFromBullet = fGetListTypeFromBullet;
 	window['AscFormat'].fGetPresentationBulletByNumInfo = fGetPresentationBulletByNumInfo;
+	window['AscFormat'].fGetFontByNumInfo = fGetFontByNumInfo;
 	window['AscFormat'].CreateBlipFillRasterImageId = CreateBlipFillRasterImageId;
 })(window);

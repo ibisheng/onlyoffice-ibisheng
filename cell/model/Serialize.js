@@ -183,7 +183,9 @@
         ExternalReference: 6,
         PivotCaches: 7,
         PivotCache: 8,
-        ExternalBook: 9
+        ExternalBook: 9,
+        OleLink:10,
+        DdeLink: 11
     };
     /** @enum */
     var c_oSerWorkbookPrTypes =
@@ -2326,9 +2328,24 @@
 		this.WriteExternalReferences = function() {
 			var oThis = this;
 			for (var i = 0; i < this.wb.externalReferences.length; i++) {
-				this.bs.WriteItem(c_oSerWorkbookTypes.ExternalBook, function() {
-					oThis.WriteExternalReference(oThis.wb.externalReferences[i]);
-				});
+				var externalReference = this.wb.externalReferences[i];
+				switch (externalReference.Type) {
+					case 0:
+						this.bs.WriteItem(c_oSerWorkbookTypes.ExternalBook, function() {
+							oThis.WriteExternalReference(externalReference);
+						});
+						break;
+					case 1:
+						this.bs.WriteItem(c_oSerWorkbookTypes.OleLink, function() {
+							oThis.memory.WriteBuffer(externalReference.Buffer, 0, externalReference.Buffer.length);
+						});
+						break;
+					case 2:
+						this.bs.WriteItem(c_oSerWorkbookTypes.DdeLink, function() {
+							oThis.memory.WriteBuffer(externalReference.Buffer, 0, externalReference.Buffer.length);
+						});
+						break;
+				}
 			}
 		};
 		this.WriteExternalReference = function(externalReference) {
@@ -5733,11 +5750,15 @@
 			var res = c_oSerConstants.ReadOk;
 			var oThis = this;
 			if (c_oSerWorkbookTypes.ExternalBook == type) {
-				var externalBook = {Id: null, SheetNames: [], DefinedNames: [], SheetDataSet: []};
+				var externalBook = {Type: 0, Id: null, SheetNames: [], DefinedNames: [], SheetDataSet: []};
 				res = this.bcr.Read1(length, function(t, l) {
 					return oThis.ReadExternalBook(t, l, externalBook);
 				});
 				this.oWorkbook.externalReferences.push(externalBook);
+			} else if (c_oSerWorkbookTypes.OleLink == type) {
+				this.oWorkbook.externalReferences.push({Type: 1, Buffer: this.stream.GetBuffer(length)});
+			} else if (c_oSerWorkbookTypes.DdeLink == type) {
+				this.oWorkbook.externalReferences.push({Type: 2, Buffer: this.stream.GetBuffer(length)});
 			} else {
 				res = c_oSerConstants.ReadUnknown;
 			}

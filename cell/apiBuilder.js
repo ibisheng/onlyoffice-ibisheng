@@ -1115,6 +1115,21 @@
 	{
 		AscFormat.builder_SetShowDataLabels(this.Chart, bShowSerName, bShowCatName, bShowVal, bShowPercent);
 	};
+
+    /**
+     * Spicifies a show options for data labels
+	 * @param {number} nSeriesIndex
+	 * @param {number} nPointIndex
+     * @param {boolean} bShowSerName
+     * @param {boolean} bShowCatName
+     * @param {boolean} bShowVal
+     * @param {boolean} bShowPercent
+     * */
+    ApiChart.prototype.SetShowPointDataLabel = function(nSeriesIndex, nPointIndex, bShowSerName, bShowCatName, bShowVal, bShowPercent)
+    {
+        AscFormat.builder_SetShowPointDataLabel(this.Chart, nSeriesIndex, nPointIndex, bShowSerName, bShowCatName, bShowVal, bShowPercent);
+    };
+
 	/**
 	 * Spicifies tick labels position vertical axis
 	 * @param {TickLabelPosition} sTickLabelPosition
@@ -1254,6 +1269,7 @@
 	ApiChart.prototype["SetLegendPos"]                 =  ApiChart.prototype.SetLegendPos;
 	ApiChart.prototype["SetLegendFontSize"]            =  ApiChart.prototype.SetLegendFontSize;
 	ApiChart.prototype["SetShowDataLabels"]            =  ApiChart.prototype.SetShowDataLabels;
+	ApiChart.prototype["SetShowPointDataLabel"]        =  ApiChart.prototype.SetShowPointDataLabel;
 	ApiChart.prototype["SetVertAxisTickLabelPosition"] =  ApiChart.prototype.SetVertAxisTickLabelPosition;
 	ApiChart.prototype["SetHorAxisTickLabelPosition"]  =  ApiChart.prototype.SetHorAxisTickLabelPosition;
 

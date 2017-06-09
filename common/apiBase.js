@@ -57,6 +57,7 @@
 		this.isEmbedVersion = (config['embedded'] === true);
 
 		this.isViewMode = false;
+		this.restrictions = Asc.c_oAscRestrictionType.None;
 
 		this.FontLoader  = null;
 		this.ImageLoader = null;
@@ -340,6 +341,10 @@
 	};
 	baseEditorsApi.prototype.asc_setViewMode                 = function()
 	{
+	};
+	baseEditorsApi.prototype.asc_setRestriction              = function(val)
+	{
+		this.restrictions = val;
 	};
 	baseEditorsApi.prototype.getViewMode                     = function()
 	{
@@ -1003,6 +1008,14 @@
 	baseEditorsApi.prototype.asc_isDocumentCanSave = function()
 	{
 		return this.isDocumentCanSave;
+	};
+	baseEditorsApi.prototype.asc_getCanUndo = function()
+	{
+		return AscCommon.History.Can_Undo();
+	};
+	baseEditorsApi.prototype.asc_getCanRedo = function()
+	{
+		return AscCommon.History.Can_Redo();
 	};
 	// Offline mode
 	baseEditorsApi.prototype.asc_isOffline  = function()

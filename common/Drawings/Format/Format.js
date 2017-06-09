@@ -10298,6 +10298,56 @@ function CorrectUniColor(asc_color, unicolor, flag)
         builder_SetObjectFontSize(oChartSpace.chart.plotArea.getVerticalAxis(), nFontSize, oChartSpace.getDrawingDocument());
     }
 
+
+    function builder_SetShowPointDataLabel(oChartSpace, nSeriesIndex, nPointIndex, bShowSerName, bShowCatName, bShowVal, bShowPerecent){
+        if(oChartSpace && oChartSpace.chart && oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.charts[0]){
+            var oChart =  oChartSpace.chart.plotArea.charts[0];
+            var bPieChart = oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart;
+            var ser = oChart.series[nSeriesIndex];
+            if(ser){
+                {
+                    if(!ser.dLbls){
+                        if(oChart.dLbls){
+                            ser.setDLbls(oChart.dLbls.createDuplicate());
+                        }
+                        else{
+                            ser.setDLbls(new AscFormat.CDLbls());
+                            ser.dLbls.setSeparator(",");
+                            ser.dLbls.setShowSerName(false);
+                            ser.dLbls.setShowCatName(false);
+                            ser.dLbls.setShowVal(false);
+                            ser.dLbls.setShowLegendKey(false);
+                            if(bPieChart){
+                                ser.dLbls.setShowPercent(false);
+                            }
+                            ser.dLbls.setShowBubbleSize(false);
+                        }
+                    }
+                    var dLbl  = ser.dLbls.findDLblByIdx(nPointIndex);
+                    if(!dLbl)
+                    {
+                        dLbl = new AscFormat.CDLbl();
+                        dLbl.setIdx(nPointIndex);
+                        if(ser.dLbls.txPr)
+                        {
+                            dLbl.merge(ser.dLbls);
+                        }
+                        ser.dLbls.addDLbl(dLbl);
+                    }
+                    dLbl.setSeparator(",");
+                    dLbl.setShowSerName(true == bShowSerName);
+                    dLbl.setShowCatName(true == bShowCatName);
+                    dLbl.setShowVal(true == bShowVal);
+                    dLbl.setShowLegendKey(false);
+                    if(bPieChart){
+                        dLbl.setShowPercent(true === bShowPerecent);
+                    }
+                    dLbl.setShowBubbleSize(false);
+                }
+            }
+        }
+    }
+
     function builder_SetShowDataLabels(oChartSpace, bShowSerName, bShowCatName, bShowVal, bShowPerecent){
         if(oChartSpace && oChartSpace.chart && oChartSpace.chart.plotArea && oChartSpace.chart.plotArea.charts[0]){
             var oChart = oChartSpace.chart.plotArea.charts[0];
@@ -10609,6 +10659,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].builder_SetVerAxisMinorGridlines = builder_SetVerAxisMinorGridlines;
     window['AscFormat'].builder_SetHorAxisFontSize = builder_SetHorAxisFontSize;
     window['AscFormat'].builder_SetVerAxisFontSize = builder_SetVerAxisFontSize;
+    window['AscFormat'].builder_SetShowPointDataLabel = builder_SetShowPointDataLabel;
 
 
 

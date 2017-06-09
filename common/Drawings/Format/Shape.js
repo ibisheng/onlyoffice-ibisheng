@@ -1530,7 +1530,7 @@ CShape.prototype.recalculateTransformText = function () {
     if (this.txBody && this.txBody.content2) {
         this.transformText2 = new CMatrix();
         this.clipRect2 = this.checkTransformTextMatrix(this.transformText2, this.txBody.content2, oBodyPr, false);
-        this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText);
+        this.invertTransformText2 = global_MatrixTransformer.Invert(this.transformText2);
     }
     //if (oBodyPr.prstTxWarp) {
         var bNoTextNoShape = oBodyPr.prstTxWarp && oBodyPr.prstTxWarp.preset !== "textNoShape";
@@ -4221,7 +4221,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
                 if(!(oController && (AscFormat.getTargetTextObject(oController) === this)))
                     this.clipTextRect(graphics);
             }
-            graphics.transform3(this.transformText, true);
+            graphics.transform3(transform_text, true);
             if (graphics.CheckUseFonts2 !== undefined)
                 graphics.CheckUseFonts2(transform_text);
 
@@ -4871,12 +4871,13 @@ CShape.prototype.hitToAdjustment = function (x, y) {
     var t_x, t_y, ret;
     t_x = invert_transform.TransformPointX(x, y);
     t_y = invert_transform.TransformPointY(x, y);
-    if (this.spPr && isRealObject(this.spPr.geometry))
+    var _calcGeoem = this.calcGeometry || (this.spPr && this.spPr.geometry);
+    if (_calcGeoem)
     {
         invert_transform = this.getInvertTransform();
         t_x = invert_transform.TransformPointX(x, y);
         t_y = invert_transform.TransformPointY(x, y);
-        ret = this.spPr.geometry.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * AscCommon.TRACK_CIRCLE_RADIUS));
+        ret = _calcGeoem.hitToAdj(t_x, t_y, this.convertPixToMM(global_mouseEvent.KoefPixToMM * AscCommon.TRACK_CIRCLE_RADIUS));
         if(ret.hit)
         {
             ret.warp = false;
@@ -5383,30 +5384,33 @@ CShape.prototype.getColumnNumber = function(){
 
 
     CShape.prototype.setColumnNumber = function(num){
-        var new_body_pr = this.getBodyPr();
-        if (new_body_pr) {
-            new_body_pr = new_body_pr.createDuplicate();
-            new_body_pr.numCol = num;
-            if (this.bWordShape) {
-                this.setBodyPr(new_body_pr);
-            }
-            else {
+        if(!this.bWordShape && !CheckObjectLine(this)){
+            var new_body_pr = this.getBodyPr();
+            if (new_body_pr) {
+                new_body_pr = new_body_pr.createDuplicate();
+                new_body_pr.numCol = num;
+
+                if(!this.txBody){
+                    this.createTextBody();
+                }
                 if (this.txBody) {
                     this.txBody.setBodyPr(new_body_pr);
                 }
+
             }
         }
+
     };
 
     CShape.prototype.setColumnSpace = function(spcCol){
-        var new_body_pr = this.getBodyPr();
-        if (new_body_pr) {
-            new_body_pr = new_body_pr.createDuplicate();
-            new_body_pr.spcCol = spcCol;
-            if (this.bWordShape) {
-                this.setBodyPr(new_body_pr);
-            }
-            else {
+        if(!this.bWordShape && !CheckObjectLine(this)){
+            var new_body_pr = this.getBodyPr();
+            if (new_body_pr) {
+                new_body_pr = new_body_pr.createDuplicate();
+                new_body_pr.spcCol = spcCol;
+                if(!this.txBody){
+                    this.createTextBody();
+                }
                 if (this.txBody) {
                     this.txBody.setBodyPr(new_body_pr);
                 }

@@ -702,10 +702,29 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
                 shape.txBody.setContent(content);
                 var body_pr = new AscFormat.CBodyPr();
                 body_pr.setDefault();
-                if(drawingObjects && !drawingObjects.cSld){
-                    body_pr.vertOverflow = AscFormat.nOTClip;
+                var bNeedCheckExtents = false;
+                if(drawingObjects){
+                    if(!drawingObjects.cSld){
+                        body_pr.vertOverflow = AscFormat.nOTClip;
+                    }
+                    else{
+                        body_pr.textFit = new AscFormat.CTextFit();
+                        body_pr.textFit.type = AscFormat.text_fit_Auto;
+                        body_pr.wrap = AscFormat.nTWTSquare;
+                       bNeedCheckExtents = true;
+                    }
                 }
                 shape.txBody.setBodyPr(body_pr);
+                if(bNeedCheckExtents){
+                    var dOldX = shape.spPr.xfrm.offX;
+                    var dOldY = shape.spPr.xfrm.offY;
+                    shape.setParent(drawingObjects);
+                    shape.recalculateContent();
+                    shape.checkExtentsByDocContent(true, true);
+                    shape.spPr.xfrm.setExtX(this.extX);
+                    shape.spPr.xfrm.setOffX(dOldX);
+                    shape.spPr.xfrm.setOffY(dOldY);
+                }
             }
         }
         else

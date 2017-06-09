@@ -706,6 +706,13 @@ FT_Stream2.prototype.GetDouble = function() {
 	dRes /= 100000;
 	return dRes;
 };
+FT_Stream2.prototype.GetBuffer = function(length) {
+	var res = new Array(length);
+	for(var i = 0 ; i < length ;++i){
+		res[i] = this.data[this.cur++]
+	}
+	return res;
+};
 var gc_nMaxRow = 1048576;
 var gc_nMaxCol = 16384;
 var gc_nMaxRow0 = gc_nMaxRow - 1;

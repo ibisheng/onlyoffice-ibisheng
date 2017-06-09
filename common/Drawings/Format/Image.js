@@ -569,10 +569,28 @@ CImageShape.prototype.Refresh_RecalcData = function(data)
 
 CImageShape.prototype.recalculateGeometry = function()
 {
-    if(isRealObject(this.spPr.geometry))
+    this.calcGeometry = null;
+    if(isRealObject(this.spPr.geometry)){
+        this.calcGeometry = this.spPr.geometry;
+    }
+    else{
+        var hierarchy = this.getHierarchy();
+        for(var i = 0; i < hierarchy.length; ++i){
+            if(hierarchy[i] && hierarchy[i].spPr && hierarchy[i].spPr.geometry){
+                var _g = hierarchy[i].spPr.geometry;
+                this.calcGeometry = AscFormat.ExecuteNoHistory(function(){
+                    var _r = _g.createDuplicate();
+                    _r.setParent(this);
+                    return _r;
+                }, this, []);
+                break;
+            }
+        }
+    }
+    if(isRealObject(this.calcGeometry))
     {
         var transform = this.getTransform();
-        this.spPr.geometry.Recalculate(transform.extX, transform.extY);
+        this.calcGeometry.Recalculate(transform.extX, transform.extY);
     }
 };
 
@@ -614,8 +632,8 @@ CImageShape.prototype.draw = function(graphics, transform)
     var shape_drawer = new AscCommon.CShapeDrawer();
     if(this.getObjectType() !== AscDFH.historyitem_type_OleObject && (this.pen || this.brush))
     {
-        shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
-        shape_drawer.draw(this.spPr.geometry);
+        shape_drawer.fromShape2(this, graphics, this.calcGeometry);
+        shape_drawer.draw(this.calcGeometry);
         shape_drawer.Clear();
     }
     var oldBrush = this.brush;
@@ -625,8 +643,8 @@ CImageShape.prototype.draw = function(graphics, transform)
     this.brush.fill = this.blipFill;
     this.pen = null;
 
-    shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
-    shape_drawer.draw(this.spPr.geometry);
+    shape_drawer.fromShape2(this, graphics, this.calcGeometry);
+    shape_drawer.draw(this.calcGeometry);
     this.brush = oldBrush;
     this.pen = oldPen;
 
@@ -683,12 +701,12 @@ CImageShape.prototype.deselect = function(drawingObjectsController)
 
 CImageShape.prototype.drawAdjustments = function(drawingDocument)
 {
+    if (this.calcGeometry) {
+        this.calcGeometry.drawAdjustments(drawingDocument, this.transform, false);
+    }
 };
 
-CImageShape.prototype.hitToAdjustment = function()
-{
-    return {hit:false};
-};
+CImageShape.prototype.hitToAdjustment = CShape.prototype.hitToAdjustment;
 
 CImageShape.prototype.getPlaceholderType = function()
 {

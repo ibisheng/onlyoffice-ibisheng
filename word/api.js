@@ -4822,13 +4822,12 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.get_OriginalSizeImage   = function()
 	{
-		if (0 == this.SelectedObjectsStack.length)
-			return null;
-		var obj = this.SelectedObjectsStack[this.SelectedObjectsStack.length - 1];
-		if (obj == null)
-			return null;
-		if (obj.Type == c_oAscTypeSelectElement.Image)
-			return obj.Value.asc_getOriginSize(this);
+        for(var i = 0; i < this.SelectedObjectsStack.length; ++i){
+            if(this.SelectedObjectsStack[i].Type == c_oAscTypeSelectElement.Image){
+                return this.SelectedObjectsStack[i].Value.asc_getOriginSize(this);
+            }
+        }
+        return null;
 	};
 
 	asc_docs_api.prototype.ShapeApply = function(shapeProps)
@@ -7696,12 +7695,7 @@ background-repeat: no-repeat;\
 		if (fields)
 			this.asc_SetBlockChainData(fields);
 
-		var oLogicDocument = this.WordControl.m_oLogicDocument;
-		if (oLogicDocument)
-		{
-			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
-			oLogicDocument.SetFillingFormMode(true);
-		}
+		this.restrictions = Asc.c_oAscRestrictionType.OnlyForms;
 	};
 	window["asc_docs_api"].prototype["pluginMethod_GetFields"] = function()
 	{
@@ -7812,6 +7806,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['SetDocumentModified']                       = asc_docs_api.prototype.SetDocumentModified;
 	asc_docs_api.prototype['isDocumentModified']                        = asc_docs_api.prototype.isDocumentModified;
 	asc_docs_api.prototype['asc_isDocumentCanSave']                     = asc_docs_api.prototype.asc_isDocumentCanSave;
+	asc_docs_api.prototype['asc_getCanUndo']                            = asc_docs_api.prototype.asc_getCanUndo;
+	asc_docs_api.prototype['asc_getCanRedo']                            = asc_docs_api.prototype.asc_getCanRedo;
 	asc_docs_api.prototype['sync_BeginCatchSelectedElements']           = asc_docs_api.prototype.sync_BeginCatchSelectedElements;
 	asc_docs_api.prototype['sync_EndCatchSelectedElements']             = asc_docs_api.prototype.sync_EndCatchSelectedElements;
 	asc_docs_api.prototype['getSelectedElements']                       = asc_docs_api.prototype.getSelectedElements;
@@ -8178,6 +8174,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['GetSectionInfo']                            = asc_docs_api.prototype.GetSectionInfo;
 	asc_docs_api.prototype['add_SectionBreak']                          = asc_docs_api.prototype.add_SectionBreak;
 	asc_docs_api.prototype['asc_setViewMode']                           = asc_docs_api.prototype.asc_setViewMode;
+	asc_docs_api.prototype['asc_setRestriction']                        = asc_docs_api.prototype.asc_setRestriction;
 	asc_docs_api.prototype['OnMouseUp']                                 = asc_docs_api.prototype.OnMouseUp;
 	asc_docs_api.prototype['asyncImageEndLoaded2']                      = asc_docs_api.prototype.asyncImageEndLoaded2;
 	asc_docs_api.prototype['SetDrawImagePlaceParagraph']                = asc_docs_api.prototype.SetDrawImagePlaceParagraph;

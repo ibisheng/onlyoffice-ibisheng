@@ -7452,6 +7452,7 @@ Paragraph.prototype.Numbering_IsUse = function(NumId, Lvl)
 Paragraph.prototype.Add_PresentationNumbering = function(_Bullet)
 {
 	var ParaPr                 = this.Get_CompiledPr2(false).ParaPr;
+	var _OldBullet = this.Pr.Bullet;
 	this.Pr.Bullet             = undefined;
 	this.CompiledPr.NeedRecalc = true;
 
@@ -7481,10 +7482,12 @@ Paragraph.prototype.Add_PresentationNumbering = function(_Bullet)
 			var oNewPresentationBullet   = oBullet2.getPresentationBullet(oTheme, oColorMap);
 			if (oUndefPresentationBullet.m_sChar === oNewPresentationBullet.m_sChar)//символы совпали. ничего выставлять не надо.
 			{
+                this.Pr.Bullet = _OldBullet;
 				this.Set_Bullet(undefined);
 			}
 			else
 			{
+                this.Pr.Bullet = _OldBullet;
 				this.Set_Bullet(oBullet2.createDuplicate());//тип совпал, но не совпали символы. выставляем Bullet.
 															// Indent в данном случае не выставляем как это делает
 															// PowerPoint.
@@ -7492,12 +7495,14 @@ Paragraph.prototype.Add_PresentationNumbering = function(_Bullet)
 		}
 		else //нумерация или отсутствие нумерации
 		{
+            this.Pr.Bullet = _OldBullet;
 			this.Set_Bullet(undefined);
 		}
 		this.Set_Ind({Left : undefined, FirstLine : undefined}, true);
 	}
 	else//тип не совпал. выставляем буллет, а также проверим нужно ли выставлять Indent.
 	{
+        this.Pr.Bullet = _OldBullet;
 		this.Set_Bullet(oBullet2.createDuplicate());
 		LeftInd = Math.min(ParaPr.Ind.Left, ParaPr.Ind.Left + ParaPr.Ind.FirstLine);
 		if (NewType === numbering_presentationnumfrmt_Char)

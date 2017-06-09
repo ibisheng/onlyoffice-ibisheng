@@ -102,6 +102,7 @@
         if(nNumCol > 1 && oBodyPr)
         {
             var fSpace = AscFormat.isRealNumber(oBodyPr.spcCol) ? oBodyPr.spcCol : 0;
+            fSpace = Math.min(fSpace, this.XLimit/(nNumCol - 1));
             var fColumnWidth = Math.max((this.XLimit - this.X - (nNumCol - 1)*fSpace)/nNumCol, 0);
             X += nColumnIndex*(fColumnWidth + fSpace);
             XLimit = X + fColumnWidth;

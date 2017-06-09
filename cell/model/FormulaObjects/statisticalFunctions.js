@@ -61,13 +61,17 @@
 
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
-		cBETAINV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
-		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
-		cFTEST, cGAMMADIST, cGAMMAINV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
+		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
+		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
-		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cTINV,
-		cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
+		cT_DIST_2T, cT_DIST_RT, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+
+	function isInteger(value) {
+		return typeof value === 'number' && isFinite(value) && 	Math.floor(value) === value;
+	}
 
 	function integralPhi(x) { // Using gauss(x)+0.5 has severe cancellation errors for x<-4
 		return 0.5 * AscCommonExcel.rtl_math_erfc(-x * 0.7071067811865475); // * 1/sqrt(2)
@@ -313,7 +317,7 @@
 			} else {
 				var nIndex = Math.floor(alpha * (nSize - 1));
 				var fDiff = alpha * (nSize - 1) - Math.floor(alpha * (nSize - 1));
-				if (fDiff == 0.0) {
+				if (fDiff === 0.0) {
 					return new cNumber(values[nIndex]);
 				} else {
 					return new cNumber(values[nIndex] + fDiff * (values[nIndex + 1] - values[nIndex]));
@@ -321,6 +325,546 @@
 			}
 		}
 	}
+
+	function getGamma(fZ) {
+		var fLogPi = Math.log(Math.PI);
+		var fLogDblMax = Math.log(2.22507e+308);
+
+		if (fZ > maxGammaArgument){
+			//SetError(FormulaError::IllegalFPOperation);
+			//return HUGE_VAL;
+			return;
+		}
+
+		if (fZ >= 1.0){
+			return getGammaHelper(fZ);
+		}
+
+		if (fZ >= 0.5){
+			return getGammaHelper(fZ + 1) / fZ;
+		}
+
+		if (fZ >= -0.5){
+			var fLogTest = getLogGammaHelper(fZ+2) - Math.log1p(fZ) -  Math.log( Math.abs(fZ));
+			if (fLogTest >= fLogDblMax){
+				//SetError(FormulaError::IllegalFPOperation);
+				//return HUGE_VAL;
+				return;
+			}
+			return getGammaHelper(fZ + 2) / (fZ + 1) / fZ;
+		}
+
+		var  fLogDivisor = getLogGammaHelper(1 - fZ) + Math.log( Math.abs( Math.sin( Math.PI * fZ)));
+		if (fLogDivisor - fLogPi >= fLogDblMax){
+			return 0;
+		}
+
+		if (fLogDivisor < 0){
+			if (fLogPi - fLogDivisor > fLogDblMax){
+				//SetError(FormulaError::IllegalFPOperation);
+				//return HUGE_VAL;
+				return;
+			}
+		}
+
+		return Math.exp( fLogPi - fLogDivisor) * ((Math.sin( Math.PI * fZ) < 0) ? -1 : 1);
+	}
+
+	function getGammaDist( fX, fAlpha, fLambda ){
+		if (fX <= 0){
+			return 0;
+		}
+		else{
+			return GetLowRegIGamma( fAlpha, fX / fLambda);
+		}
+	}
+	function GetLowRegIGamma( fA, fX ){
+		var fLnFactor = fA * Math.log(fX) - fX - getLogGamma(fA);
+		var fFactor = Math.exp(fLnFactor);
+
+		if (fX > fA + 1){
+			return 1 - fFactor * getGammaContFraction(fA, fX);
+		} else{
+			return fFactor * getGammaSeries(fA, fX);
+		}
+	}
+
+	function getGammaContFraction( fA, fX )	{
+		var fBigInv = 2.22045e-016;//epsilon
+		var fHalfMachEps = fBigInv / 2;
+		var fBig = 1 / fBigInv;
+		var fCount = 0;
+		var fY = 1 - fA;
+		var fDenom = fX + 2 - fA;
+		var fPkm1 = fX + 1;
+		var fPkm2 = 1;
+		var fQkm1 = fDenom * fX;
+		var fQkm2 = fX;
+		var fApprox = fPkm1 / fQkm1;
+		var bFinished = false;
+
+		do
+		{
+			fCount = fCount + 1;
+			fY = fY + 1;
+			var fNum = fY * fCount;
+			fDenom = fDenom + 2;
+			var fPk = fPkm1 * fDenom  -  fPkm2 * fNum;
+			var fQk = fQkm1 * fDenom  -  fQkm2 * fNum;
+			if (fQk !== 0)
+			{
+				var fR = fPk / fQk;
+				bFinished = (Math.abs( (fApprox - fR) / fR ) <= fHalfMachEps);
+				fApprox = fR;
+			}
+			fPkm2 = fPkm1;
+			fPkm1 = fPk;
+			fQkm2 = fQkm1;
+			fQkm1 = fQk;
+			if (Math.abs(fPk) > fBig)
+			{
+				// reduce a fraction does not change the value
+				fPkm2 = fPkm2 * fBigInv;
+				fPkm1 = fPkm1 * fBigInv;
+				fQkm2 = fQkm2 * fBigInv;
+				fQkm1 = fQkm1 * fBigInv;
+			}
+		} while (!bFinished && fCount < 10000);
+
+		if (!bFinished)
+		{
+			//SetError(FormulaError::NoConvergence);
+			return;
+		}
+		return fApprox;
+	}
+
+	function getGammaSeries( fA, fX ){
+		var fHalfMachEps = 2.22045e-016 / 2;
+		var fDenomfactor = fA;
+		var fSummand = 1 / fA;
+		var fSum = fSummand;
+		var nCount = 1;
+		do
+		{
+			fDenomfactor = fDenomfactor + 1;
+			fSummand = fSummand * fX / fDenomfactor;
+			fSum = fSum + fSummand;
+			nCount = nCount + 1;
+		} while ( fSummand/fSum > fHalfMachEps && nCount <= 10000);
+
+		if (nCount > 10000)
+		{
+			//SetError(FormulaError::NoConvergence);
+			return;
+		}
+
+		return fSum;
+	}
+
+	function getGammaDistPDF( fX, fAlpha, fLambda )
+	{
+		if (fX < 0){
+			return 0;
+		}else if (fX === 0){
+			if (fAlpha < 1.0){
+				//SetError(FormulaError::DivisionByZero);  // should be #DIV/0
+				//return HUGE_VAL;
+				return;
+			}else if (fAlpha === 1){
+				return (1 / fLambda);
+			}else{
+				return 0;
+			}
+		}else{
+			var fXr = fX / fLambda;
+
+			if (fXr > 1){
+				var fLogDblMax = Math.log( 2.22507e+308 );
+
+				if (Math.log(fXr) * (fAlpha - 1) < fLogDblMax && fAlpha < maxGammaArgument){
+					return Math.pow( fXr, fAlpha - 1) * Math.exp(-fXr) / fLambda / getGamma(fAlpha);
+				}else{
+					return Math.exp( (fAlpha - 1) * Math.log(fXr) - fXr - Math.log(fLambda) - getLogGamma(fAlpha));
+				}
+			}else {
+				if (fAlpha < maxGammaArgument){
+					return Math.pow( fXr, fAlpha - 1) * Math.exp(-fXr) / fLambda / getGamma(fAlpha);
+				}else{
+					return Math.pow( fXr, fAlpha - 1) * Math.exp(-fXr) / fLambda / Math.exp( getLogGamma(fAlpha));
+				}
+			}
+		}
+	}
+
+
+	//BETA DISTRIBUTION
+	function getBetaDist(fXin, fAlpha, fBeta) {
+		if (fXin <= 0) {
+			return 0;
+		}
+		if (fXin >= 1){
+			return 1;
+		}
+		if (fBeta === 1) {
+			return Math.pow(fXin, fAlpha);
+		}
+		if (fAlpha === 1){
+			return - Math.expm1(fBeta * Math.log1p(-fXin));
+		}
+
+		var fResult;
+		var fY = (0.5 - fXin) + 0.5;
+		var flnY = Math.log1p(-fXin);
+		var fX = fXin;
+		var flnX = Math.log(fXin);
+		var fA = fAlpha;
+		var fB = fBeta;
+		var bReflect = fXin > fAlpha / (fAlpha + fBeta);
+		if (bReflect){
+			fA = fBeta;
+			fB = fAlpha;
+			fX = fY;
+			fY = fXin;
+			flnX = flnY;
+			flnY = Math.log(fXin);
+		}
+		fResult = getBetaHelperContFrac(fX, fA, fB);
+		fResult = fResult / fA;
+		var fP = fA / (fA + fB);
+		var fQ = fB / (fA + fB);
+
+		var fTemp;
+		if (fA > 1 && fB > 1 && fP < 0.97 && fQ < 0.97){
+			fTemp = getBetaDistPDF(fX, fA, fB) * fX * fY;
+		}
+		else{
+			fTemp = Math.exp(fA * flnX + fB * flnY - getLogBeta(fA, fB));
+		}
+
+		fResult *= fTemp;
+		if (bReflect){
+			fResult = 0.5 - fResult + 0.5;
+		}
+		if (fResult > 1){
+			fResult = 1;
+		}
+		if (fResult < 0){
+			fResult = 0;
+		}
+
+		return fResult;
+	}
+
+	// beta distribution probability density function
+	function getTDist(T, fDF, nType) {
+		var res = null;
+		switch ( nType ){
+			case 1:
+			{
+				res = 0.5 * getBetaDist(fDF / ( fDF + T * T ), fDF / 2, 0.5);
+				break;
+			}
+			case 2:
+			{
+				res = getBetaDist(fDF / ( fDF + T * T ), fDF / 2, 0.5);
+				break;
+			}
+			case 3:
+			{
+				res = Math.pow( 1 + ( T * T / fDF ), -( fDF + 1 ) / 2 ) / ( Math.sqrt( fDF ) * getBeta( 0.5, fDF / 2.0 ) );
+				break;
+			}
+			case 4:
+			{
+				var X = fDF / ( T * T + fDF );
+				var R = 0.5 * getBetaDist( X, 0.5 * fDF, 0.5 );
+				res = ( T < 0 ? R : 1 - R );
+				break;
+			}
+		}
+		return res;
+	}
+
+
+	function getBetaDistPDF(fX, fA, fB) {
+		// special cases
+		if (fA === 1){
+			if (fB === 1)
+				return 1;
+			if (fB === 2)
+				return -2 * fX + 2;
+			if (fX === 1 && fB < 1){
+				//SetError(FormulaError::IllegalArgument);
+				//return HUGE_VAL;
+				return;
+			}
+
+			if (fX <= 0.01)
+				return fB + fB * Math.expm1((fB - 1) * Math.log1p(-fX));
+			else
+				return fB * Math.pow(0.5 - fX + 0.5, fB - 1);
+		}
+		if (fB === 1){
+			if (fA === 2)
+				return fA * fX;
+			if (fX === 0 && fA < 1){
+				//SetError(FormulaError::IllegalArgument);
+				//return HUGE_VAL;
+				return;
+			}
+			return fA * pow(fX, fA - 1);
+		}
+		if (fX <= 0){
+			if (fA < 1 && fX === 0){
+				//SetError(FormulaError::IllegalArgument);
+				//return HUGE_VAL;
+				return;
+			}
+			else
+				return 0;
+		}
+		if (fX >= 1){
+			if (fB < 1 && fX === 1){
+				//SetError(FormulaError::IllegalArgument);
+				//return HUGE_VAL;
+				return;
+			}
+			else
+				return 0;
+		}
+
+
+		var fLogDblMax = Math.log( 2.22507e+308);
+		var fLogDblMin = Math.log( 2.22507e-308 );
+		var fLogY = (fX < 0.1) ? Math.log1p(-fX) : Math.log(0.5 - fX + 0.5);
+		var fLogX = Math.log(fX);
+		var fAm1LogX = (fA - 1) * fLogX;
+		var fBm1LogY = (fB - 1) * fLogY;
+		var fLogBeta = getLogBeta(fA,fB);
+
+		if ( fAm1LogX < fLogDblMax  && fAm1LogX > fLogDblMin
+			&& fBm1LogY < fLogDblMax  && fBm1LogY > fLogDblMin
+			&& fLogBeta < fLogDblMax  && fLogBeta > fLogDblMin
+			&& fAm1LogX + fBm1LogY < fLogDblMax && fAm1LogX + fBm1LogY > fLogDblMin){
+			return Math.pow(fX, fA - 1) * Math.pow(0.5 - fX + 0.5, fB - 1) / getBeta(fA, fB);
+		}else{
+			return Math.exp( fAm1LogX + fBm1LogY - fLogBeta);
+		}
+	}
+
+	function getBeta(fAlpha, fBeta) {
+		var fA;
+		var fB;
+		if (fAlpha > fBeta){
+			fA = fAlpha;
+			fB = fBeta;
+		}else{
+			fA = fBeta;
+			fB = fAlpha;
+		}
+
+		if (fA + fB < maxGammaArgument){
+			return getGamma(fA) / getGamma(fA + fB) * getGamma(fB);
+		}
+
+		var fg = 6.024680040776729583740234375;
+		var fgm = fg - 0.5;
+		var fLanczos = getLanczosSum(fA);
+		fLanczos /= getLanczosSum(fA + fB);
+		fLanczos *= getLanczosSum(fB);
+		var fABgm = fA  +fB + fgm;
+		fLanczos *= Math.sqrt((fABgm / (fA + fgm)) / (fB + fgm));
+		var fTempA = fB / (fA + fgm);
+		var fTempB = fA / (fB + fgm);
+		var fResult = Math.exp(-fA * Math.log1p(fTempA) - fB * Math.log1p(fTempB) - fgm);
+		fResult *= fLanczos;
+		return fResult;
+	}
+
+	function getBetaHelperContFrac(fX, fA, fB) {
+		var a1, b1, a2, b2, fnorm, cfnew, cf;
+		a1 = 1; b1 = 1;
+		b2 = 1 - (fA + fB) / (fA + 1) * fX;
+		if (b2 === 0){
+			a2 = 0;
+			fnorm = 1;
+			cf = 1;
+		}else{
+			a2 = 1;
+			fnorm = 1 / b2;
+			cf = a2 * fnorm;
+		}
+		cfnew = 1;
+		var rm = 1;
+
+		var fMaxIter = 50000;
+		var fMachEps = 2.22045e-016;
+		var bfinished = false;
+		do
+		{
+			var apl2m = fA + 2 * rm;
+			var d2m = rm * (fB - rm) * fX / ((apl2m - 1) * apl2m);
+			var d2m1 = -(fA + rm) * (fA + fB + rm) * fX / (apl2m * (apl2m + 1));
+			a1 = (a2 + d2m * a1) * fnorm;
+			b1 = (b2 + d2m * b1) * fnorm;
+			a2 = a1 + d2m1 * a2 * fnorm;
+			b2 = b1 + d2m1 * b2 * fnorm;
+			if (b2 !== 0){
+				fnorm = 1 / b2;
+				cfnew = a2 * fnorm;
+				bfinished = (Math.abs(cf - cfnew) < Math.abs(cf) * fMachEps);
+			}
+			cf = cfnew;
+			rm += 1;
+		}
+		while (rm < fMaxIter && !bfinished);
+		return cf;
+	}
+
+	function getLogBeta(fAlpha, fBeta) {
+		var fA;
+		var fB;
+		if (fAlpha > fBeta)	{
+			fA = fAlpha; fB = fBeta;
+		} else {
+			fA = fBeta; fB = fAlpha;
+		}
+
+		var fg = 6.024680040776729583740234375;
+		var fgm = fg - 0.5;
+		var fLanczos = getLanczosSum(fA);
+		fLanczos /= getLanczosSum(fA + fB);
+		fLanczos *= getLanczosSum(fB);
+		var fLogLanczos = Math.log(fLanczos);
+		var fABgm = fA + fB + fgm;
+		fLogLanczos += 0.5 * (Math.log(fABgm) - Math.log(fA + fgm) - Math.log(fB + fgm));
+		var fTempA = fB / (fA + fgm);
+		var fTempB = fA / (fB + fgm);
+		var fResult = - fA * Math.log1p(fTempA) -fB * Math.log1p(fTempB) - fgm;
+		fResult += fLogLanczos;
+		return fResult;
+	}
+
+	function getFDist( x, fF1, fF2)	{
+		var arg = fF2 / (fF2 + fF1 * x);
+		var alpha = fF2 / 2;
+		var beta = fF1 / 2;
+		return getBetaDist(arg, alpha, beta);
+	}
+
+	function iterateInverse( rFunction, fAx, fBx )	{
+		var rConvError = false;
+		var fYEps = 1.0E-307;
+		var fXEps = 2.22045e-016;
+
+		var fAy = rFunction.GetValue(fAx);
+		var fBy = rFunction.GetValue(fBx);
+		var fTemp;
+		var nCount;
+		for (nCount = 0; nCount < 1000 && !hasChangeOfSign(fAy, fBy); nCount++)	{
+			if (Math.abs(fAy) <= Math.abs(fBy))	{
+				fTemp = fAx;
+				fAx += 2 * (fAx - fBx);
+				if (fAx < 0){
+					fAx = 0;
+				}
+				fBx = fTemp;
+				fBy = fAy;
+				fAy = rFunction.GetValue(fAx);
+			} else {
+				fTemp = fBx;
+				fBx += 2 * (fBx - fAx);
+				fAx = fTemp;
+				fAy = fBy;
+				fBy = rFunction.GetValue(fBx);
+			}
+		}
+
+		if (fAy === 0){
+			return {val: fAx, bError: rConvError};
+		}
+		if (fBy === 0){
+			return {val: fBx, bError: rConvError};
+		}
+		if (!hasChangeOfSign( fAy, fBy)){
+			rConvError = true;
+			return {val: 0, bError: rConvError};
+		}
+		// inverse quadric interpolation with additional brackets
+		// set three points
+		var fPx = fAx;
+		var fPy = fAy;
+		var fQx = fBx;
+		var fQy = fBy;
+		var fRx = fAx;
+		var fRy = fAy;
+		var fSx = 0.5 * (fAx + fBx);
+		var bHasToInterpolate = true;
+
+		nCount = 0;
+		while ( nCount < 500 && Math.abs(fRy) > fYEps && (fBx - fAx) > Math.max( Math.abs(fAx), Math.abs(fBx)) * fXEps ){
+			if (bHasToInterpolate){
+				if (fPy !== fQy && fQy !== fRy && fRy !== fPy){
+					fSx = fPx * fRy * fQy / (fRy-fPy) / (fQy-fPy)
+						+ fRx * fQy * fPy / (fQy-fRy) / (fPy-fRy)
+						+ fQx * fPy * fRy / (fPy-fQy) / (fRy-fQy);
+					bHasToInterpolate = (fAx < fSx) && (fSx < fBx); // inside the brackets?
+				}else{
+					bHasToInterpolate = false;
+				}
+			}
+			if(!bHasToInterpolate){
+				fSx = 0.5 * (fAx + fBx);
+
+				fQx = fBx;
+				fQy = fBy;
+				bHasToInterpolate = true;
+			}
+
+			fPx = fQx; fQx = fRx; fRx = fSx;
+			fPy = fQy; fQy = fRy; fRy = rFunction.GetValue(fSx);
+
+			if (hasChangeOfSign( fAy, fRy))	{
+				fBx = fRx; fBy = fRy;
+			}else{
+				fAx = fRx; fAy = fRy;
+			}
+
+			bHasToInterpolate = bHasToInterpolate && (Math.abs(fRy) * 2 <= Math.abs(fQy));
+			++nCount;
+		}
+		return {val: fRx, bError: rConvError};
+	}
+
+	function hasChangeOfSign( u, w )
+	{
+		return (u < 0 && w > 0) || (u > 0 && w < 0);
+	}
+
+	function GAMMADISTFUNCTION(fp, fAlpha, fBeta){
+		this.fp = fp;
+		this.fAlpha = fAlpha;
+		this.fBeta = fBeta;
+	}
+	GAMMADISTFUNCTION.prototype.GetValue = function(x){
+		var res;
+		var gammaDistVal = getGammaDist(x, this.fAlpha, this.fBeta);
+		res = this.fp - gammaDistVal;
+		return res;
+	};
+
+	function BETADISTFUNCTION(fp, fAlpha, fBeta){
+		this.fp = fp;
+		this.fAlpha = fAlpha;
+		this.fBeta = fBeta;
+	}
+	BETADISTFUNCTION.prototype.GetValue = function(x){
+		var res;
+		var betaDistVal = getBetaDist(x, this.fAlpha, this.fBeta);
+		res = this.fp - betaDistVal;
+		return res;
+	};
 
 	/**
 	 * @constructor
@@ -715,12 +1259,61 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cBETAINV() {/*Нет реализации в Google Docs*/
-		cBaseFunction.call(this, "BETAINV");
+	function cBETA_INV() {
+		this.name = "BETA.INV";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
-	cBETAINV.prototype = Object.create(cBaseFunction.prototype);
-	cBETAINV.prototype.constructor = cBETAINV;
+	cBETA_INV.prototype = Object.create(cBaseFunction.prototype);
+	cBETA_INV.prototype.constructor = cBETA_INV;
+	cBETA_INV.prototype.argumentsMin = 3;
+	cBETA_INV.prototype.argumentsMax = 5;
+	cBETA_INV.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cNumber(0);
+		argClone[4] = argClone[4] ? argClone[4].tocNumber() : new cNumber(1);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			var fP = argArray[0];
+			var fAlpha = argArray[1];
+			var fBeta = argArray[2];
+			var fA = argArray[3];
+			var fB = argArray[4];
+
+			if (fP < 0 || fP > 1 || fA >= fB || fAlpha <= 0 || fBeta <= 0){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var aFunc = new BETADISTFUNCTION(fP, fAlpha, fBeta);
+			var oVal = iterateInverse( aFunc, 0, 1 );
+			var bConvError = oVal.bError;
+
+			if (bConvError){
+				return new cError(cErrorType.not_numeric);
+				//SetError(FormulaError::NoConvergence);
+			}
+			var res = fA + oVal.val * (fB - fA) ;
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cBETA_INV.prototype.getInfo = function () {
+		return {name: this.name, args: "( probability, alpha, beta, a, b )"}
+	};
 
 	/**
 	 * @constructor
@@ -1590,6 +2183,113 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
+	function cF_DIST() {
+		cBaseFunction.call(this, "F.DIST");
+	}
+
+	cF_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cF_DIST.prototype.constructor = cF_DIST;
+	cF_DIST.prototype.argumentsMin = 3;
+	cF_DIST.prototype.argumentsMax = 4;
+	cF_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cBool(true);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFDist = function(argArray){
+			var fF = argArray[0];
+			var fF1 = argArray[1];
+			var fF2 = argArray[2];
+			var bCum = argArray[3];
+
+			if ( fF < 0 || fF1 < 1 || fF2 < 1 || fF1 >= 1.0E10 || fF2 >= 1.0E10 ){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res;
+			if ( bCum )	{
+				res =  1 - getFDist( fF, fF1, fF2 );
+			}else{
+				res = Math.pow( fF1 / fF2, fF1 / 2 ) * Math.pow( fF, ( fF1 / 2 ) - 1 ) /
+					( Math.pow( ( 1 + ( fF * fF1 / fF2 ) ), ( fF1 + fF2 ) / 2 ) *
+					getBeta( fF1 / 2, fF2 / 2 ) );
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+	};
+	cF_DIST.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom1, deg_freedom2, cumulative)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cF_DIST_RT() {
+		cBaseFunction.call(this, "F.DIST.RT");
+	}
+
+	cF_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
+	cF_DIST_RT.prototype.constructor = cF_DIST_RT;
+	cF_DIST_RT.prototype.argumentsMin = 3;
+	cF_DIST_RT.prototype.argumentsMax = 3;
+	cF_DIST_RT.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFDist = function(argArray){
+			var fF = argArray[0];
+			var fF1 = argArray[1];
+			var fF2 = argArray[2];
+
+			if (fF < 0 || fF1 < 1 || fF2 < 1 || fF1 >= 1.0E10 || fF2 >= 1.0E10){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = getFDist(fF, fF1, fF2);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		if (argClone[1].getValue() < 1 ){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+	};
+	cF_DIST_RT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom1, deg_freedom2)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cFINV() {
 		cBaseFunction.call(this, "FINV");
 	}
@@ -1897,23 +2597,158 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cGAMMADIST() {
-		cBaseFunction.call(this, "GAMMADIST");
+	function cGAMMA() {
+		this.name = "GAMMA";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
-	cGAMMADIST.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMADIST.prototype.constructor = cGAMMADIST;
+	cGAMMA.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMA.prototype.constructor = cGAMMA;
+	cGAMMA.prototype.argumentsMin = 1;
+	cGAMMA.prototype.argumentsMax = 1;
+	cGAMMA.prototype.isXLFN = true;
+	cGAMMA.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			if(argArray[0] <= 0 && isInteger(argArray[0])){
+				return  new cError(cErrorType.not_numeric);
+			}
+			var res = getGamma(argArray[0]);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cGAMMA.prototype.getInfo = function () {
+		return {name: this.name, args: "(number)"}
+	};
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cGAMMAINV() {
-		cBaseFunction.call(this, "GAMMAINV");
+	function cGAMMA_DIST() {
+		this.name = "GAMMA.DIST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
-	cGAMMAINV.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMAINV.prototype.constructor = cGAMMAINV;
+	cGAMMA_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMA_DIST.prototype.constructor = cGAMMA_DIST;
+	cGAMMA_DIST.prototype.argumentsMin = 4;
+	cGAMMA_DIST.prototype.argumentsMax = 4;
+	cGAMMA_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			var fX = argArray[0];
+			var fAlpha = argArray[1];
+			var fBeta = argArray[2];
+			var bCumulative = argArray[3];
+
+			var res = null;
+			if ((fX < 0) || fAlpha <= 0 || fBeta <= 0){
+				return new cError(cErrorType.not_numeric);
+			}
+			else
+			{
+				if (bCumulative) {
+					res = getGammaDist( fX, fAlpha, fBeta );
+				}else {
+					res = getGammaDistPDF( fX, fAlpha, fBeta );
+				}
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cGAMMA_DIST.prototype.getInfo = function () {
+		return {name: this.name, args: "(x, alpha, beta, cumulative )"}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cGAMMA_INV() {
+		this.name = "GAMMA.INV";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cGAMMA_INV.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMA_INV.prototype.constructor = cGAMMA_INV;
+	cGAMMA_INV.prototype.argumentsMin = 3;
+	cGAMMA_INV.prototype.argumentsMax = 3;
+	cGAMMA_INV.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			var fP = argArray[0];
+			var fAlpha = argArray[1];
+			var fBeta = argArray[2];
+
+			if (fAlpha <= 0 || fBeta <= 0 || fP < 0 || fP >= 1 ){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = null;
+			if (fP === 0){
+				res = 0;
+			}else {
+				var aFunc = new GAMMADISTFUNCTION(fP, fAlpha, fBeta);
+				var fStart = fAlpha * fBeta;
+				var oVal = iterateInverse(aFunc, fStart * 0.5, fStart);
+				var bConvError = oVal.bError;
+
+				if (bConvError){
+					return new cError(cErrorType.not_numeric);
+					//SetError(FormulaError::NoConvergence);
+				}
+				res = oVal.val;
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cGAMMA_INV.prototype.getInfo = function () {
+		return {name: this.name, args: "(probability, alpha, beta )"}
+	};
 
 	/**
 	 * @constructor
@@ -4942,6 +5777,179 @@
 
 	cTDIST.prototype = Object.create(cBaseFunction.prototype);
 	cTDIST.prototype.constructor = cTDIST;
+	cTDIST.prototype.argumentsMin = 3;
+	cTDIST.prototype.argumentsMax = 3;
+	cTDIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var T = argArray[0];
+			var fDF = argArray[1];
+			var nType = argArray[2];
+
+			var res = getTDist(T, fDF, nType);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		if (argClone[1].getValue() < 1 || argClone[0].getValue() < 0 || (argClone[2].getValue() !== 1 && argClone[2].getValue() !== 2) ){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cTDIST.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom, tails)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cT_DIST() {
+		cBaseFunction.call(this, "T.DIST");
+	}
+
+	cT_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cT_DIST.prototype.constructor = cT_DIST;
+	cT_DIST.prototype.argumentsMin = 3;
+	cT_DIST.prototype.argumentsMax = 3;
+	cT_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var T = argArray[0];
+			var fDF = argArray[1];
+			var bCumulative = argArray[2];
+
+			var res = getTDist(T, fDF, bCumulative ? 4 : 3);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		if (argClone[1].getValue() < 1 ){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cT_DIST.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom, cumulative)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cT_DIST_2T() {
+		cBaseFunction.call(this, "T.DIST.2T");
+	}
+
+	cT_DIST_2T.prototype = Object.create(cBaseFunction.prototype);
+	cT_DIST_2T.prototype.constructor = cT_DIST_2T;
+	cT_DIST_2T.prototype.argumentsMin = 2;
+	cT_DIST_2T.prototype.argumentsMax = 2;
+	cT_DIST_2T.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var T = argArray[0];
+			var fDF = argArray[1];
+
+			if (fDF < 1  || T < 0){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = getTDist(T, fDF, 2);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cT_DIST_2T.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cT_DIST_RT() {
+		cBaseFunction.call(this, "T.DIST.RT");
+	}
+
+	cT_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
+	cT_DIST_RT.prototype.constructor = cT_DIST_RT;
+	cT_DIST_RT.prototype.argumentsMin = 2;
+	cT_DIST_RT.prototype.argumentsMax = 2;
+	cT_DIST_RT.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var T = argArray[0];
+			var fDF = argArray[1];
+
+			if (fDF < 1){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = getTDist(T, fDF, 1);
+			if ( T < 0 ){
+				res = 1 - res;
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cT_DIST_RT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom)"
+		};
+	};
 
 	/**
 	 * @constructor
