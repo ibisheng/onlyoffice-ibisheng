@@ -317,7 +317,7 @@
 			} else {
 				var nIndex = Math.floor(alpha * (nSize - 1));
 				var fDiff = alpha * (nSize - 1) - Math.floor(alpha * (nSize - 1));
-				if (fDiff == 0.0) {
+				if (fDiff === 0.0) {
 					return new cNumber(values[nIndex]);
 				} else {
 					return new cNumber(values[nIndex] + fDiff * (values[nIndex + 1] - values[nIndex]));
@@ -842,25 +842,18 @@
 		return (u < 0 && w > 0) || (u > 0 && w < 0);
 	}
 
-	function cGammaDistFunction(fp, fAlpha, fBeta){
+	function GAMMADISTFUNCTION(fp, fAlpha, fBeta){
 		this.fp = fp;
 		this.fAlpha = fAlpha;
 		this.fBeta = fBeta;
 	}
-	cGammaDistFunction.prototype.constructor = cGammaDistFunction;
-	cGammaDistFunction.prototype.GetValue = function(x){
-		return this.fp - getGammaDist(x, this.fAlpha, this.fBeta);
+	GAMMADISTFUNCTION.prototype.constructor = GAMMADISTFUNCTION;
+	GAMMADISTFUNCTION.prototype.GetValue = function(x){
+		var res;
+		var gammaDistVal = getGammaDist(x, this.fAlpha, this.fBeta);
+		res = this.fp - gammaDistVal;
+		return res;
 	};
-
-	function getLowRegIGamma( fA, fX ){
-		var fLnFactor = fA * Math.log(fX) - fX - getLogGamma(fA);
-		var fFactor = Math.exp(fLnFactor);
-		if (fX > fA + 1){
-			return 1 - fFactor * getGammaContFraction(fA,fX);
-		} else {
-			return fFactor * getGammaSeries(fA,fX);
-		}
-	}
 
 	/**
 	 * @constructor
@@ -2676,7 +2669,7 @@
 			if (fP === 0){
 				res = 0;
 			}else {
-				var aFunc = new cGammaDistFunction(fP, fAlpha, fBeta);
+				var aFunc = new GAMMADISTFUNCTION(fP, fAlpha, fBeta);
 				var fStart = fAlpha * fBeta;
 				var oVal = iterateInverse(aFunc, fStart * 0.5, fStart);
 				var bConvError = oVal.bError;
