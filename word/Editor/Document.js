@@ -15121,11 +15121,7 @@ CDocument.prototype.GetAllFormTextFields = function()
 };
 CDocument.prototype.IsFillingFormMode = function()
 {
-	return this.FillingFormMode;
-};
-CDocument.prototype.SetFillingFormMode = function(isFillingForm)
-{
-	this.FillingFormMode = isFillingForm;
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyForms);
 };
 CDocument.prototype.IsInFormField = function()
 {
@@ -15136,10 +15132,6 @@ CDocument.prototype.IsInFormField = function()
 		return false;
 
 	return true;
-};
-CDocument.prototype.StartFillingFormMode = function()
-{
-	this.SetFillingFormMode(true);
 };
 CDocument.prototype.IsFormFieldEditing = function()
 {
@@ -15266,7 +15258,7 @@ CDocument.prototype.IsCheckContentControlsLock = function()
 };
 CDocument.prototype.IsEditCommentsMode = function()
 {
-	return false;
+	return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
 };
 CDocument.prototype.IsViewMode = function()
 {
