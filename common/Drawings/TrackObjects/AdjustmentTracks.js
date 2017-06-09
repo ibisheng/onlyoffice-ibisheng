@@ -38,6 +38,7 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
     AscFormat.ExecuteNoHistory(function(){
         this.originalShape = originalShape;
+        this.bIsTracked = false;
 
         var oPen, oBrush;
         if(bTextWarp !== true)
@@ -194,6 +195,7 @@ XYAdjustmentTrack.prototype.draw = function(overlay)
 
 XYAdjustmentTrack.prototype.track = function(posX, posY)
 {
+    this.bIsTracked = true;
     var invert_transform = this.invertTransform;
     var _relative_x = invert_transform.TransformPointX(posX, posY);
     var _relative_y = invert_transform.TransformPointY(posX, posY);
@@ -253,6 +255,9 @@ XYAdjustmentTrack.prototype.track = function(posX, posY)
 
 XYAdjustmentTrack.prototype.trackEnd = function()
 {
+    if(!this.bIsTracked){
+        return;
+    }
     var oGeometryToSet;
     if(!this.bTextWarp)
     {
@@ -304,6 +309,7 @@ XYAdjustmentTrack.prototype.trackEnd = function()
 function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
     AscFormat.ExecuteNoHistory(function(){
+        this.bIsTracked = false;
         this.originalShape = originalShape;
 
 
@@ -405,6 +411,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
     this.track = function(posX, posY)
     {
+        this.bIsTracked = true;
         var invert_transform = this.invertTransform;
         var _relative_x = invert_transform.TransformPointX(posX, posY);
         var _relative_y = invert_transform.TransformPointY(posX, posY);
@@ -459,6 +466,9 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         var oGeometryToSet;
         if(!this.bTextWarp)
         {

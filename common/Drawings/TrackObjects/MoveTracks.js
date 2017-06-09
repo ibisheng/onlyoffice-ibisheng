@@ -39,6 +39,7 @@
 
 function MoveShapeImageTrack(originalObject)
 {
+    this.bIsTracked = false;
     this.originalObject = originalObject;
     this.transform = new CMatrix();
     this.x = null;
@@ -79,6 +80,7 @@ function MoveShapeImageTrack(originalObject)
 
     this.track = function(dx, dy, pageIndex)
     {
+        this.bIsTracked = true;
         this.lastDx = dx;
         this.lastDy = dy;
         var original = this.originalObject;
@@ -126,6 +128,9 @@ function MoveShapeImageTrack(originalObject)
 
     this.trackEnd = function(bWord)
     {
+        if(!this.bIsTracked){
+            return;
+        }
         if(bWord)
         {
             if(this.originalObject.selectStartPage !== this.pageIndex)
@@ -241,6 +246,7 @@ MoveShapeImageTrack.prototype.getBounds = function()
 
 function MoveGroupTrack(originalObject)
 {
+    this.bIsTracked = false;
     this.x = null;
     this.y = null;
     this.originalObject = originalObject;
@@ -265,6 +271,7 @@ function MoveGroupTrack(originalObject)
 
     this.track = function(dx, dy, pageIndex)
     {
+        this.bIsTracked = true;
         this.pageIndex = pageIndex;
         var original = this.originalObject;
         this.x = original.x + dx;
@@ -317,6 +324,9 @@ function MoveGroupTrack(originalObject)
 
     this.trackEnd = function(bWord)
     {
+        if(!this.bIsTracked){
+            return;
+        }
         if(bWord)
         {
             this.x = 0;
@@ -340,12 +350,14 @@ function MoveGroupTrack(originalObject)
 
 function MoveComment(comment)
 {
+    this.bIsTracked = false;
     this.comment = comment;
     this.x = comment.x;
     this.y = comment.y;
 
     this.track = function(dx, dy)
     {
+        this.bIsTracked = true;
         var original = this.comment;
         this.x = original.x + dx;
         this.y = original.y + dy;
@@ -366,6 +378,9 @@ function MoveComment(comment)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         this.comment.setPosition(this.x, this.y);
     };
 }
