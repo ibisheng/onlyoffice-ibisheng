@@ -3908,7 +3908,7 @@ function OfflineEditor () {
 
             this.asc_WriteAllWorksheets(true);
 
-			      _api.sendColorThemes(_api.wbModel.theme);
+			_api.sendColorThemes(_api.wbModel.theme);
             _api.asc_ApplyColorScheme(false);
             _api._applyFirstLoadChanges();
 
@@ -3920,6 +3920,14 @@ function OfflineEditor () {
             if (ws.topLeftFrozenCell) {
               this.row0 = ws.topLeftFrozenCell.getRow0();
               this.col0 = ws.topLeftFrozenCell.getCol0();
+            }
+            
+            var chartData = this.initSettings["chartData"];
+            if (chartData.length > 0) {
+                var json = JSON.parse(chartData);
+                if (json) {
+                    _api.asc_addChartDrawingObject(json);
+                }
             }
 
             // TODO: Implement frozen places
