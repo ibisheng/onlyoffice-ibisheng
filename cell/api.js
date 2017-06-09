@@ -806,14 +806,6 @@ var editor;
     return false;
   };
 
-  spreadsheet_api.prototype.asc_getCanUndo = function() {
-    return History.Can_Undo();
-  };
-  spreadsheet_api.prototype.asc_getCanRedo = function() {
-    return History.Can_Redo();
-  };
-
-
   // Actions and callbacks interface
 
   /*
@@ -3397,8 +3389,8 @@ var editor;
   prot["asc_getDocumentName"] = prot.asc_getDocumentName;
   prot["asc_isDocumentModified"] = prot.asc_isDocumentModified;
   prot["asc_isDocumentCanSave"] = prot.asc_isDocumentCanSave;
-  prot["asc_getCanUndo"] = prot.asc_getCanUndo;
-  prot["asc_getCanRedo"] = prot.asc_getCanRedo;
+	prot["asc_getCanUndo"] = prot.asc_getCanUndo;
+	prot["asc_getCanRedo"] = prot.asc_getCanRedo;
 
   prot["asc_setAutoSaveGap"] = prot.asc_setAutoSaveGap;
 

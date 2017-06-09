@@ -7811,6 +7811,8 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['SetDocumentModified']                       = asc_docs_api.prototype.SetDocumentModified;
 	asc_docs_api.prototype['isDocumentModified']                        = asc_docs_api.prototype.isDocumentModified;
 	asc_docs_api.prototype['asc_isDocumentCanSave']                     = asc_docs_api.prototype.asc_isDocumentCanSave;
+	asc_docs_api.prototype['asc_getCanUndo']                            = asc_docs_api.prototype.asc_getCanUndo;
+	asc_docs_api.prototype['asc_getCanRedo']                            = asc_docs_api.prototype.asc_getCanRedo;
 	asc_docs_api.prototype['sync_BeginCatchSelectedElements']           = asc_docs_api.prototype.sync_BeginCatchSelectedElements;
 	asc_docs_api.prototype['sync_EndCatchSelectedElements']             = asc_docs_api.prototype.sync_EndCatchSelectedElements;
 	asc_docs_api.prototype['getSelectedElements']                       = asc_docs_api.prototype.getSelectedElements;

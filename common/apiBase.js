@@ -1009,6 +1009,14 @@
 	{
 		return this.isDocumentCanSave;
 	};
+	baseEditorsApi.prototype.asc_getCanUndo = function()
+	{
+		return AscCommon.History.Can_Undo();
+	};
+	baseEditorsApi.prototype.asc_getCanRedo = function()
+	{
+		return AscCommon.History.Can_Redo();
+	};
 	// Offline mode
 	baseEditorsApi.prototype.asc_isOffline  = function()
 	{
