@@ -4752,7 +4752,7 @@
 		}
 	};
 	Worksheet.prototype._updatePivotTables = function (range) {
-		var pivotTable, pivotRange, styleInfo, style, cells, j, pos, countC, countR;
+		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, pos, countC, countR;
 		var dxf, dxfLabels, dxfValues;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			pivotTable = this.pivotTables[i];
@@ -4766,17 +4766,20 @@
 				continue;
 			}
 
-			// ToDo Whole Table
+			wholeStyle = style.wholeTable && style.wholeTable.dxf;
 
 			dxfLabels = style.pageFieldLabels && style.pageFieldLabels.dxf;
 			dxfValues = style.pageFieldValues && style.pageFieldValues.dxf;
 			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
 				pos = pivotTable.pageFieldsPositions[j];
 				cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
-				cells.setTableStyle(dxfLabels);
+				cells.setTableStyle(dxfLabels || wholeStyle);
 				cells = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
-				cells.setTableStyle(dxfValues);
+				cells.setTableStyle(dxfValues || wholeStyle);
 			}
+
+			cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
+			cells.setTableStyle(wholeStyle);
 
 			countC = pivotTable.getColumnFieldsCount();
 			countR = pivotTable.getRowFieldsCount(true);
