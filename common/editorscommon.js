@@ -121,7 +121,7 @@
 		String.prototype['repeat'] = String.prototype.repeat;
 	}
 // Extend javascript String type
-  String.prototype.strongMatch = function (regExp)
+	String.prototype.strongMatch = function (regExp)
 	{
 		if (regExp && regExp instanceof RegExp)
 		{
@@ -145,12 +145,13 @@
 
 	function getBaseUrl()
 	{
-    var indexHtml = window["location"]["href"];
-    var questInd = indexHtml.indexOf("?");
-    if (questInd > 0) {
-      indexHtml = indexHtml.substring(0, questInd);
-    }
-    return indexHtml.substring(0, indexHtml.lastIndexOf("/") + 1);
+		var indexHtml = window["location"]["href"];
+		var questInd = indexHtml.indexOf("?");
+    		if (questInd > 0)
+		{
+			indexHtml = indexHtml.substring(0, questInd);
+		}
+    		return indexHtml.substring(0, indexHtml.lastIndexOf("/") + 1);
 	}
 
 	function getEncodingParams()
