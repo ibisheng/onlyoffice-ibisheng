@@ -34,122 +34,12 @@
 
 (function(window, document){
     // Import
-    var CreateFontData2 = AscFonts.CreateFontData2;
     var g_fontApplication = AscFonts.g_fontApplication;
     var CFontFileLoader = AscFonts.CFontFileLoader;
     var FONT_TYPE_EMBEDDED = AscFonts.FONT_TYPE_EMBEDDED;
     var CFontInfo = AscFonts.CFontInfo;
     var ImageLoadStatus = AscFonts.ImageLoadStatus;
     var CImage = AscFonts.CImage;
-    var g_fonts_streams = AscFonts.g_fonts_streams;
-
-    function CEmbeddedCutFontsLoader()
-    {
-        this.Api = null;
-
-        this.font_infos = [];
-        this.font_files = [];
-
-        this.map_name_cutindex = null;
-        this.CurrentFindFileParse = -1;
-
-        this.Url = "";
-        this.bIsCutFontsUse = false;
-
-        var oThis = this;
-
-        this.load_cut_fonts = function()
-        {
-            var scriptElem = document.createElement('script');
-
-            if (scriptElem.readyState && false)
-            {
-                scriptElem.onreadystatechange = function () {
-                    if (this.readyState == 'complete' || this.readyState == 'loaded')
-                    {
-                        scriptElem.onreadystatechange = null;
-                        setTimeout(oThis._callback_script_load, 0);
-                    }
-                }
-            }
-            scriptElem.onload = scriptElem.onerror = oThis._callback_font_load;
-
-            scriptElem.setAttribute('src', this.Url);
-            scriptElem.setAttribute('type','text/javascript');
-            document.getElementsByTagName('head')[0].appendChild(scriptElem);
-
-            this.Api.asyncFontsDocumentStartLoaded();
-        };
-
-        this._callback_font_load = function()
-        {
-            if (undefined === embedded_fonts)
-                return;
-
-            oThis.CurrentFindFileParse = 0;
-            setTimeout(oThis.parse_font, 10);
-        };
-
-        this.parse_font = function()
-        {
-            var __font_data_idx = g_fonts_streams.length;
-            g_fonts_streams[__font_data_idx] = CreateFontData2(embedded_fonts[oThis.CurrentFindFileParse], undefined);
-            embedded_fonts[oThis.CurrentFindFileParse] = "";
-            oThis.font_files[oThis.CurrentFindFileParse].SetStreamIndex(__font_data_idx);
-            oThis.font_files[oThis.CurrentFindFileParse].Status = 0;
-
-            oThis.CurrentFindFileParse++;
-            if (oThis.CurrentFindFileParse >= oThis.font_files.length)
-            {
-                oThis.Api.asyncFontsDocumentEndLoaded();
-                return;
-            }
-
-            setTimeout(oThis.parse_font, 10);
-        };
-
-        this.init_cut_fonts = function(_fonts)
-        {
-            this.map_name_cutindex = {};
-            var _len = _fonts.length;
-
-            for (var i = 0; i < _len; i++)
-            {
-                var _font = _fonts[i];
-                var _info = this.map_name_cutindex[_font.Name];
-
-                if (_info === undefined)
-                {
-                    _info = new CFontInfo(_font.Name, "", AscFonts.FONT_TYPE_ADDITIONAL_CUT, -1, -1, -1, -1, -1, -1, -1, -1);
-                    this.map_name_cutindex[_font.Name] = _info;
-                }
-
-                switch (_font.Style)
-                {
-                    case 0:
-                        _info.indexR = _font.IndexCut;
-                        _info.faceIndexR = 0;
-                        break;
-                    case 1:
-                        _info.indexB = _font.IndexCut;
-                        _info.faceIndexB = 0;
-                        break;
-                    case 2:
-                        _info.indexI = _font.IndexCut;
-                        _info.faceIndexI = 0;
-                        break;
-                    case 3:
-                        _info.indexBI = _font.IndexCut;
-                        _info.faceIndexBI = 0;
-                        break;
-                    default:
-                        break;
-                }
-
-                this.font_files[i] = new CFontFileLoader("embedded_cut" + i);
-            }
-        }
-    }
 
     function CGlobalFontLoader()
     {
@@ -181,15 +71,11 @@
         this.loadFontCallBack     = null;
         this.loadFontCallBackArgs = null;
 
-        // embedded_cut_fonts
-        this.embedded_cut_manager = new CEmbeddedCutFontsLoader();
-
         this.IsLoadDocumentFonts2 = false;
 
         this.put_Api = function(_api)
         {
             this.Api = _api;
-            this.embedded_cut_manager.Api = _api;
         };
                 
         this.LoadEmbeddedFonts = function(url, _fonts)
@@ -280,9 +166,6 @@
         {
             if (this.IsLoadDocumentFonts2)
                 return this.LoadDocumentFonts2(_fonts);
-
-            if (this.embedded_cut_manager.bIsCutFontsUse)
-                return this.embedded_cut_manager.load_cut_fonts();
 
             // в конце метода нужно отдать список шрифтов
             var gui_fonts = [];
@@ -555,6 +438,11 @@
         this.bIsLoadDocumentImagesNoByOrder = true;
         this.nNoByOrderCounter = 0;
 
+        this.loadImageCallBackCounter = 0;
+        this.loadImageCallBackCounterMax = 0;
+        this.loadImageCallBack = null;
+        this.loadImageCallBackArgs = null;
+
 		var oThis = this;
 
         this.put_Api = function(_api)
@@ -732,7 +620,66 @@
             };
             //oImage.Image.crossOrigin = 'anonymous';
             oImage.Image.src = oImage.src;
-        }
+        };
+
+        this.LoadImagesWithCallback = function(arr, loadImageCallBack, loadImageCallBackArgs)
+        {
+            var arrAsync = [];
+            var i = 0;
+            for (i = 0; i < arr.length; i++)
+            {
+                if (this.map_image_index[arr[i]] === undefined)
+                    arrAsync.push(arr[i]);
+            }
+
+            if (arrAsync.length == 0)
+            {
+				loadImageCallBack.call(this.Api, loadImageCallBackArgs);
+                return;
+            }
+
+			this.loadImageCallBackCounter = 0;
+            this.loadImageCallBackCounterMax = arrAsync.length;
+			this.loadImageCallBack = loadImageCallBack;
+			this.loadImageCallBackArgs = loadImageCallBackArgs;
+
+			for (i = 0; i < arrAsync.length; i++)
+			{
+				var oImage = new CImage(arrAsync[i]);
+				oImage.Image = new Image();
+				oImage.Image.parentImage = oImage;
+				oImage.Status = ImageLoadStatus.Loading;
+				this.map_image_index[oImage.src] = oImage;
+
+				oImage.Image.onload = function ()
+				{
+					this.parentImage.Status = ImageLoadStatus.Complete;
+					oThis.loadImageCallBackCounter++;
+
+					if (oThis.loadImageCallBackCounter == oThis.loadImageCallBackCounterMax)
+					    oThis.LoadImagesWithCallbackEnd();
+				};
+				oImage.Image.onerror = function ()
+				{
+					this.parentImage.Image = null;
+					this.parentImage.Status = ImageLoadStatus.Complete;
+
+					if (oThis.loadImageCallBackCounter == oThis.loadImageCallBackCounterMax)
+						oThis.LoadImagesWithCallbackEnd();
+				};
+				//oImage.Image.crossOrigin = 'anonymous';
+				oImage.Image.src = oImage.src;
+			}
+        };
+
+        this.LoadImagesWithCallbackEnd = function()
+        {
+			this.loadImageCallBack.call(this.Api, this.loadImageCallBackArgs);
+			this.loadImageCallBack = null;
+			this.loadImageCallBackArgs = null;
+			this.loadImageCallBackCounterMax = 0;
+			this.loadImageCallBackCounter = 0;
+        };
     }
 
     var g_flow_anchor = new Image();

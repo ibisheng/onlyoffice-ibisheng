@@ -74,6 +74,32 @@
 		//todo more checks
 		return this.ranges && this.ranges.length > 0;
 	}
+	CConditionalFormatting.prototype.getBBox = function() {
+		var bbox = null;
+		if (this.ranges && this.ranges.length > 0) {
+			bbox = this.ranges[0].clone();
+			for(var i = 1 ; i < this.ranges.length; ++i){
+				bbox.union2(this.ranges[i]);
+			}
+		}
+		return bbox;
+	};
+
+	//todo need another approach
+	function CConditionalFormattingFormulaWrapper (ws, cf) {
+		this.ws = ws;
+		this.cf = cf;
+	}
+	CConditionalFormattingFormulaWrapper.prototype.onFormulaEvent = function(type, eventData) {
+		if (AscCommon.c_oNotifyParentType.CanDo === type) {
+			return true;
+		} else if (AscCommon.c_oNotifyParentType.IsDefName === type) {
+			return true;
+		} else if (AscCommon.c_oNotifyParentType.Change === type) {
+			//todo collect
+			this.ws._updateConditionalFormatting(new AscCommonExcel.MultiplyRange(this.cf.ranges));
+		}
+	};
 
 	function CConditionalFormattingRule () {
 		this.aboveAverage = true;
@@ -327,16 +353,23 @@
 		res.Text = this.Text;
 		return res;
 	};
-	CFormulaCF.prototype.init = function(ws) {
+	CFormulaCF.prototype.init = function(ws, opt_parent) {
 		if (!this._f) {
-			this._f = new AscCommonExcel.parserFormula(this.Text, null, ws);
+			this._f = new AscCommonExcel.parserFormula(this.Text, opt_parent, ws);
 			this._f.parse();
+			if (opt_parent) {
+				//todo realize removeDependencies
+				this._f.buildDependencies();
+			}
 		}
 	};
 	CFormulaCF.prototype.getValue = function(ws) {
 		this.init(ws);
-		//todo bbox
 		return this._f.calculate(null, null).getValue();
+	};
+	CFormulaCF.prototype.getValueRaw = function(ws, opt_parent, opt_bbox, opt_offset) {
+		this.init(ws, opt_parent);
+		return this._f.calculate(null, opt_bbox, opt_offset);
 	};
 
 	function CIconSet () {
@@ -425,6 +458,7 @@
 	 */
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window['AscCommonExcel'].CConditionalFormatting = CConditionalFormatting;
+	window['AscCommonExcel'].CConditionalFormattingFormulaWrapper = CConditionalFormattingFormulaWrapper;
 	window['AscCommonExcel'].CConditionalFormattingRule = CConditionalFormattingRule;
 	window['AscCommonExcel'].CColorScale = CColorScale;
 	window['AscCommonExcel'].CDataBar = CDataBar;

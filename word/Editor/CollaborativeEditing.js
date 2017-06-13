@@ -47,6 +47,8 @@ function CWordCollaborativeEditing()
     this.m_aForeignCursors       = {};
     this.m_aForeignCursorsXY     = {};
     this.m_aForeignCursorsToShow = {};
+
+    this.m_aSkipContentControlsOnCheckEditingLock = {};
 }
 
 CWordCollaborativeEditing.prototype = Object.create(AscCommon.CCollaborativeEditingBase.prototype);
@@ -336,6 +338,21 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
 
         oEditor.isChartEditor = false;
     }
+};
+CWordCollaborativeEditing.prototype.AddContentControlForSkippingOnCheckEditingLock = function(oContentControl)
+{
+	this.m_aSkipContentControlsOnCheckEditingLock[oContentControl.GetId()] = oContentControl;
+};
+CWordCollaborativeEditing.prototype.RemoveContentControlForSkippingOnCheckEditingLock = function(oContentControl)
+{
+	delete this.m_aSkipContentControlsOnCheckEditingLock[oContentControl.GetId()];
+};
+CWordCollaborativeEditing.prototype.IsNeedToSkipContentControlOnCheckEditingLock = function(oContentControl)
+{
+	if (this.m_aSkipContentControlsOnCheckEditingLock[oContentControl.GetId()] === oContentControl)
+		return true;
+
+	return false;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с сохраненными позициями документа.

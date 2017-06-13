@@ -167,12 +167,18 @@ CTextBody.prototype =
 
     Get_Theme : function()
     {
-        return this.parent.Get_Theme();
+        if(this.parent){
+            return this.parent.Get_Theme();
+        }
+        return null;
     },
 
     Get_ColorMap: function()
     {
-        return this.parent.Get_ColorMap();
+        if(this.parent){
+            return this.parent.Get_ColorMap();
+        }
+        return null;
     },
 
     setParent: function(pr)
@@ -399,7 +405,9 @@ CTextBody.prototype =
             this.parent.recalcInfo.recalcTransformText = true;
 
             this.parent.recalcInfo.recalculateContent = true;
+            this.parent.recalcInfo.recalculateContent2 = true;
             this.parent.recalcInfo.recalculateTransformText = true;
+
             if(this.parent.addToRecalculate)
             {
                 this.parent.addToRecalculate();
@@ -413,7 +421,12 @@ CTextBody.prototype =
     },
 
     OnContentReDraw: function()
-    {},
+    {
+        if(this.parent && this.parent.OnContentReDraw)
+        {
+            this.parent.OnContentReDraw();
+        }
+    },
 
     Get_StartPage_Absolute: function()
     {
@@ -615,9 +628,9 @@ CTextBody.prototype =
 
     recalculateByMaxWord: function()
     {
-        var max_content = this.content.Recalculate_MinMaxContentWidth().Max;
+        var max_content = this.content.RecalculateMinMaxContentWidth().Max;
         this.content.Set_ApplyToAll(true);
-        this.content.Set_ParagraphAlign(AscCommon.align_Center);
+        this.content.SetParagraphAlign(AscCommon.align_Center);
         this.content.Set_ApplyToAll(false);
         this.content.Reset(0, 0,max_content, 20000);
         this.content.Recalculate_Page(0, true);
@@ -661,7 +674,7 @@ CTextBody.prototype =
         if(bLeft)
         {
             this.content.Set_ApplyToAll(true);
-            this.content.Set_ParagraphAlign(AscCommon.align_Left);
+            this.content.SetParagraphAlign(AscCommon.align_Left);
             this.content.Set_ApplyToAll(false);
         }
         this.content.Recalculate_Page(0, true);
@@ -678,7 +691,7 @@ CTextBody.prototype =
         return max_width + 0.01;
     },
 
-    Get_PrevElementEndInfo : function(CurElement)
+	GetPrevElementEndInfo : function(CurElement)
     {
         return null;
     },
@@ -706,6 +719,14 @@ CTextBody.prototype =
             return this.parent.transformText.CreateDublicate();
         }
         return null;
+    },
+
+    Is_ThisElementCurrent: function () {
+        if(this.parent && this.parent.Is_ThisElementCurrent)
+        {
+            return this.parent.Is_ThisElementCurrent();
+        }
+        return false;
     }
 };
 

@@ -176,7 +176,8 @@
 
     this.isCellEditMode = false;
 
-    this.isShowComments = true;
+	  this.isShowComments = true;
+	  this.isShowSolved = true;
 
     this.formulasList = [];		// Список всех формул
     this.lastFormulaPos = -1; 		// Последняя позиция формулы
@@ -835,6 +836,9 @@
     this.handlers.add('hiddenComments', function () {
       return !self.isShowComments;
     });
+	  this.handlers.add('showSolved', function () {
+		  return self.isShowSolved;
+	  });
 	this.model.handlers.add("hideSpecialPasteOptions", function() {
       if(window['AscCommon'].g_clipboardBase.showSpecialPasteButton)
 	  {
@@ -1140,7 +1144,7 @@
       // Отсылаем эвент с объектами
       this.handlers.trigger("asc_onMouseMove", arrMouseMoveObjects);
 
-      if (ct.target === c_oTargetType.MoveRange && ctrlKey && ct.cursor == "move") {
+      if (ct.target === c_oTargetType.MoveRange && ctrlKey && ct.cursor === "move") {
         ct.cursor = "copy";
       }
 
@@ -1563,7 +1567,7 @@
     var wb = this.model;
     var i = asc_typeof(index) === "number" && index >= 0 ? index : wb.getActive();
     var ws = this.wsViews[i];
-    if (null == ws && !onlyExist) {
+    if (!ws && !onlyExist) {
       ws = this.wsViews[i] = this._createWorksheetView(wb.getWorksheet(i));
       ws._prepareComments();
       ws._prepareDrawingObjects();
@@ -1813,10 +1817,6 @@
       this.canvas.style.height = this.canvasOverlay.style.height = this.canvasGraphic.style.height = this.canvasGraphicOverlay.style.height = height + 'px';
     }
 
-    // При смене ориентации у планшета, сбрасываются флаги у canvas!
-    // ToDo перепроверить на новых исходниках, должно поправиться, был баг в отрисовке!!!!!!!!!!!!!
-    //this.drawingCtx.initContextSmoothing();
-    //this.overlayCtx.initContextSmoothing();
     return true;
   };
 
@@ -2090,6 +2090,12 @@
   WorkbookView.prototype.specialPasteData = function(props) {
     if (!this.getCellEditMode()) {
 		this.getWorksheet().specialPaste(props);
+	}
+  };
+
+  WorkbookView.prototype.showSpecialPasteButton = function(props) {
+	if (!this.getCellEditMode()) {
+		this.getWorksheet().showSpecialPasteOptions(props);
 	}
   };
 
@@ -2434,8 +2440,8 @@
     //ToDo проверка defName.ref на знак "=" в начале ссылки. знака нет тогда это либо число либо строка, так делает Excel.
 
     var ws = this.getWorksheet();
-
-    return new Asc.asc_CDefName("", ws.getSelectionRangeValue(), null);
+    var oRangeValue = ws.getSelectionRangeValue();
+    return new Asc.asc_CDefName("", oRangeValue.asc_getName(), null);
 
   };
   WorkbookView.prototype.unlockDefName = function() {
@@ -2570,12 +2576,13 @@
     this.isDocumentPlaceChangedEnabled = val;
   };
 
-  WorkbookView.prototype.showComments = function (val) {
-    if (this.isShowComments !== val) {
-      this.isShowComments = val;
-      this.drawWS();
-    }
-  };
+	WorkbookView.prototype.showComments = function (val, isShowSolved) {
+		if (this.isShowComments !== val || this.isShowSolved !== isShowSolved) {
+			this.isShowComments = val;
+			this.isShowSolved = isShowSolved;
+			this.drawWS();
+		}
+	};
 
   /*
    * @param {c_oAscRenderingModeType} mode Режим отрисовки
@@ -2648,9 +2655,7 @@
     // set default worksheet header font for calculations
     this.buffers.main.setFont(this.defaultFont);
     // Измеряем в pt
-    this.stringRender.measureString("0123456789", {
-      wrapText: false, shrinkToFit: false, isMerged: false, textAlign: /*khaLeft*/AscCommon.align_Left
-    });
+    this.stringRender.measureString("0123456789", new AscCommonExcel.CellFlags());
 
     var ppiX = 96; // Мерить только с 96
     var ptConvToPx = asc_getcvt(1/*pt*/, 0/*px*/, ppiX);
@@ -2859,7 +2864,7 @@
     return canvas.toDataURL("image/png");
   };
 
-	WorkbookView.prototype.Is_SelectionUse = function () {
+	WorkbookView.prototype.IsSelectionUse = function () {
         return !this.getWorksheet().getSelectionShape();
     };
 	WorkbookView.prototype.GetSelectionRectsBounds = function () {

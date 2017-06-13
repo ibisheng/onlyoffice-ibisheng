@@ -172,7 +172,7 @@ CDocument.prototype.Get_NextRevisionChange = function()
     var Change = this.TrackRevisionsManager.Get_NextChange();
     if (null !== Change)
     {
-        this.Selection_Remove();
+        this.RemoveSelection();
         var Para = Change.get_Paragraph();
         Para.Selection.Use = true;
         Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
@@ -189,7 +189,7 @@ CDocument.prototype.Get_PrevRevisionChange = function()
     var Change = this.TrackRevisionsManager.Get_PrevChange();
     if (null !== Change)
     {
-        this.Selection_Remove();
+        this.RemoveSelection();
         var Para = Change.get_Paragraph();
         Para.Selection.Use = true;
         Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
@@ -209,7 +209,7 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
     var SearchEngine = new CRevisionsChangeParagraphSearchEngine(Direction, CurrentPara, this.TrackRevisionsManager);
     if (null === CurrentPara)
     {
-        CurrentPara = this.Get_CurrentParagraph();
+        CurrentPara = this.GetCurrentParagraph();
         if (null === CurrentPara)
             return SearchEngine;
 
@@ -375,7 +375,7 @@ CDocument.prototype.private_GetRevisionsChangeParagraphInFooters = function(Sear
 	}
 
 	var nDirection = SearchEngine.Get_Direction();
-	if (nPos < 0 || nPos >= Count)
+	if (nPos < 0 || nPos >= nCount)
 	{
 		if (nDirection > 0)
 			nPos = 0;
@@ -397,7 +397,7 @@ CDocument.prototype.private_SelectRevisionChange = function(Change)
 {
     if (undefined !== Change && Change.get_Paragraph())
     {
-        this.Selection_Remove();
+        this.RemoveSelection();
         var Para = Change.get_Paragraph();
         Para.Selection.Use = true;
         Para.Set_SelectionContentPos(Change.get_StartPos(), Change.get_EndPos());
@@ -438,7 +438,7 @@ CDocument.prototype.Accept_RevisionChangesBySelection = function()
         this.Accept_RevisionChange(CurrentChange);
     else
     {
-        var SelectedParagraphs = this.Get_AllParagraphs({Selected : true});
+        var SelectedParagraphs = this.GetAllParagraphs({Selected : true});
         var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphsBySelectedParagraphs(SelectedParagraphs, true);
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
@@ -459,7 +459,7 @@ CDocument.prototype.Reject_RevisionChangesBySelection = function()
         this.Reject_RevisionChange(CurrentChange);
     else
     {
-        var SelectedParagraphs = this.Get_AllParagraphs({Selected : true});
+        var SelectedParagraphs = this.GetAllParagraphs({Selected : true});
         var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphsBySelectedParagraphs(SelectedParagraphs, false);
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
@@ -495,7 +495,7 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
             return;
         }
 
-        this.Selection_Remove();
+        this.RemoveSelection();
         this.private_CorrectDocumentPosition();
         this.Recalculate();
         this.Document_UpdateSelectionState();
@@ -524,7 +524,7 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
             return;
         }
 
-        this.Selection_Remove();
+        this.RemoveSelection();
         this.private_CorrectDocumentPosition();
         this.Recalculate();
         this.Document_UpdateSelectionState();
@@ -566,7 +566,7 @@ CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
                 for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
                 {
                     var Element = this.Content[CurPos];
-                    if (type_Paragraph === Element.Get_Type() && (true === Element.Is_SelectedAll() || true == bAll) && true === Element.Have_PrChange())
+                    if (type_Paragraph === Element.Get_Type() && (true === Element.IsSelectedAll() || true == bAll) && true === Element.Have_PrChange())
                     {
                         Element.Accept_PrChange();
                     }
@@ -658,7 +658,7 @@ CDocument.prototype.Reject_RevisionChanges = function(Type, bAll)
                 for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
                 {
                     var Element = this.Content[CurPos];
-                    if (type_Paragraph === Element.Get_Type() && (true === Element.Is_SelectedAll() || true === bAll) && true === Element.Have_PrChange())
+                    if (type_Paragraph === Element.Get_Type() && (true === Element.IsSelectedAll() || true === bAll) && true === Element.Have_PrChange())
                     {
                         Element.Reject_PrChange();
                     }
@@ -763,7 +763,7 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
                 for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
                 {
                     var Element = this.Content[CurPos];
-                    if (type_Paragraph === Element.Get_Type() && (true === Element.Is_SelectedAll() || true === bAll) && true === Element.Have_PrChange())
+                    if (type_Paragraph === Element.Get_Type() && (true === Element.IsSelectedAll() || true === bAll) && true === Element.Have_PrChange())
                     {
                         Element.Accept_PrChange();
                     }
@@ -832,7 +832,7 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
                 for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
                 {
                     var Element = this.Content[CurPos];
-                    if (type_Paragraph === Element.Get_Type() && (true === Element.Is_SelectedAll() || true === bAll) && true === Element.Have_PrChange())
+                    if (type_Paragraph === Element.Get_Type() && (true === Element.IsSelectedAll() || true === bAll) && true === Element.Have_PrChange())
                     {
                         Element.Reject_PrChange();
                     }

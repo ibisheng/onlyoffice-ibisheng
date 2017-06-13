@@ -144,6 +144,7 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
             case AscDFH.historyitem_type_Shape:
             case AscDFH.historyitem_type_ImageShape:
             case AscDFH.historyitem_type_OleObject:
+            case AscDFH.historyitem_type_Cnx:
             {
                 ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
@@ -197,7 +198,7 @@ function handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pag
     {
         if(bWord/* && (!drawing.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === drawing || drawing.haveSelectedDrawingInContent && drawing.haveSelectedDrawingInContent())*/)
         {
-            var all_drawings = drawing.getDocContent().Get_AllDrawingObjects();
+            var all_drawings = drawing.getDocContent().GetAllDrawingObjects();
             var drawings2 = [];
             for(var i = 0; i < all_drawings.length; ++i)
             {
@@ -227,7 +228,7 @@ function handleShapeImageInGroup(drawingObjectsController, drawing, shape, e, x,
     {
         if(bWord/* &&
             (!shape.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === shape || shape.haveSelectedDrawingInContent && shape.haveSelectedDrawingInContent())*/) {
-            var all_drawings = shape.getDocContent().Get_AllDrawingObjects();
+            var all_drawings = shape.getDocContent().GetAllDrawingObjects();
             var drawings2 = [];
             for (var i = 0; i < all_drawings.length; ++i) {
                 drawings2.push(all_drawings[i].GraphicObj);
@@ -252,6 +253,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
             case AscDFH.historyitem_type_Shape:
             case AscDFH.historyitem_type_ImageShape:
             case AscDFH.historyitem_type_OleObject:
+            case AscDFH.historyitem_type_Cnx:
             {
                 ret = handleShapeImageInGroup(drawingObjectsController, drawing, cur_grouped_object, e, x, y, pageIndex, bWord);
                 if(ret)
@@ -320,7 +322,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
                                     {
                                         tx = invert_transform_text.TransformPointX(x, y);
                                         ty = invert_transform_text.TransformPointY(x, y);
-                                        content.Update_CursorType(tx, ty, 0);
+                                        content.UpdateCursorType(tx, ty, 0);
                                     }
                                 }
                                 return {objectId: drawing.Get_Id(), cursorType: "text"};
@@ -486,7 +488,8 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         }
 
         var chart_titles = drawing.getAllTitles();
-        var bIsMobileVersion = AscCommon.AscBrowser.isMobileVersion;
+        var oApi = editor || Asc.editor;
+        var bIsMobileVersion = oApi && oApi.isMobileVersion;
         for(i = 0; i < chart_titles.length; ++i)
         {
             title = chart_titles[i];
@@ -544,7 +547,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                         {
                             tx = invert_transform_text.TransformPointX(x, y);
                             ty = invert_transform_text.TransformPointY(x, y);
-                            content.Update_CursorType(tx, ty, 0);
+                            content.UpdateCursorType(tx, ty, 0);
                         }
                     }
                     return {objectId: drawing.Get_Id(), cursorType: "text", title: title};
@@ -642,7 +645,7 @@ function handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, page
     {
         if(drawing.bWordShape /*&& (!drawing.txWarpStruct || drawingObjectsController.curState.startTargetTextObject === drawing || drawing.haveSelectedDrawingInContent && drawing.haveSelectedDrawingInContent())*/)
         {
-            var all_drawings = drawing.getDocContent().Get_AllDrawingObjects();
+            var all_drawings = drawing.getDocContent().GetAllDrawingObjects();
             var drawings2 = [];
             for(var i = 0; i < all_drawings.length; ++i)
             {
@@ -687,6 +690,9 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex, bInS
                 else if (drawing.getObjectType() === AscDFH.historyitem_type_OleObject && drawingObjects.handleChartDoubleClick){
                     drawingObjects.handleOleObjectDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
                 }
+                else if (drawing.signatureLine && drawingObjects.handleSignatureDblClick){
+                    drawingObjects.handleSignatureDblClick(drawing.signatureLine.id, drawing.extX, drawing.extY);
+                }
                 else if (2 == e.ClickCount && drawing.parent instanceof ParaDrawing && drawing.parent.Is_MathEquation())
                     drawingObjects.handleMathDrawingDoubleClick(drawing.parent, e, x, y, pageIndex);
 
@@ -718,6 +724,7 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
             case AscDFH.historyitem_type_Shape:
             case AscDFH.historyitem_type_ImageShape:
             case AscDFH.historyitem_type_OleObject:
+            case AscDFH.historyitem_type_Cnx:
             {
                 ret = handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
                 if(ret)

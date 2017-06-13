@@ -35,16 +35,6 @@
 // Import
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 
-//change FontSize
-// api 2003: asc_docs_api.prototype.put_TextPrFontSize
-//Document: Paragraph_Add
-
-//api 2215: asc_docs_api.prototype.sync_TextPrFontSizeCallBack
-// возвращает размер шрифта
-
-//api 2212: asc_docs_api.prototype.sync_TextPrFontFamilyCallBack
-// возвращает название шрифта
-
 // Таблица соответствия кодов ASCII (десятичные, соответствующие восьмеричные, шестнадцатиричные, двоичные, ASCII коды )
 // http://www.dpva.info/Guide/GuideMathematics/GuideMathematicsNumericalSystems/TableCodeEquivalent/
 

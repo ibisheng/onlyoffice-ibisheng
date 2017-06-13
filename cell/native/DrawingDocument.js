@@ -521,7 +521,7 @@ function CTableOutlineDr()
         var _outline = this.TableOutline;
         var _table = _outline.Table;
 
-        _table.Cursor_MoveToStartPos();
+        _table.MoveCursorToStartPos();
         _table.Document_SetThisElementCurrent();
 
         if (!_table.Is_Inline())
@@ -616,7 +616,7 @@ function CTableOutlineDr()
             }
             this.IsChangeSmall = false;
 
-            this.TableOutline.Table.Selection_Remove();
+            this.TableOutline.Table.RemoveSelection();
             editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
         }
 
@@ -3575,7 +3575,7 @@ function CDrawingDocument(drawingObjects)
             if (!_style || _style.Type != styletype_Table)
                 continue;
 
-            var table = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
+            var table = new CTable(this, logicDoc, true, Rows, Cols, Grid);
             table.Set_Props({TableStyle : i, TableLook : tableLook});
 
             for (var j = 0; j < Rows; j++)
@@ -3589,6 +3589,7 @@ function CDrawingDocument(drawingObjects)
             graphics.m_oFontManager = AscCommon.g_fontManager;
             graphics.transform(1,0,0,1,0,0);
 
+            table.Reset(_x_mar, _y_mar, 1000, 1000, 0, 0, 1);
             table.Recalculate_Page(0);
             table.Draw(0, graphics);
 

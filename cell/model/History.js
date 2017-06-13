@@ -94,11 +94,11 @@ function (window, undefined) {
 	window['AscCH'].historyitem_RowCol_Border = 12;
 	window['AscCH'].historyitem_RowCol_ShrinkToFit = 13;
 	window['AscCH'].historyitem_RowCol_Wrap = 14;
-	window['AscCH'].historyitem_RowCol_NumFormat = 15;
 	window['AscCH'].historyitem_RowCol_SetFont = 16;
 	window['AscCH'].historyitem_RowCol_Angle = 17;
 	window['AscCH'].historyitem_RowCol_SetStyle = 18;
 	window['AscCH'].historyitem_RowCol_SetCellStyle = 19;
+	window['AscCH'].historyitem_RowCol_Num = 20;
 
 	window['AscCH'].historyitem_Cell_Fontname = 1;
 	window['AscCH'].historyitem_Cell_Fontsize = 2;
@@ -114,7 +114,6 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Cell_Border = 12;
 	window['AscCH'].historyitem_Cell_ShrinkToFit = 13;
 	window['AscCH'].historyitem_Cell_Wrap = 14;
-	window['AscCH'].historyitem_Cell_Numformat = 15;
 	window['AscCH'].historyitem_Cell_ChangeValue = 16;
 	window['AscCH'].historyitem_Cell_ChangeArrayValueFormat = 17;
 	window['AscCH'].historyitem_Cell_SetStyle = 18;
@@ -123,6 +122,7 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Cell_Angle = 21;
 	window['AscCH'].historyitem_Cell_Style = 22;
 	window['AscCH'].historyitem_Cell_ChangeValueUndo = 23;
+	window['AscCH'].historyitem_Cell_Num = 24;
 
 	window['AscCH'].historyitem_Comment_Add = 1;
 	window['AscCH'].historyitem_Comment_Remove = 2;
@@ -484,7 +484,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	if (oRedoObjectParam.bIsOn)
 		this.TurnOn();
 		
-	if(!AscCommonExcel.g_clipboardExcel.pasteStart)
+	if(!window['AscCommon'].g_clipboardBase.pasteStart)
 	{
 		this.workbook.handlers.trigger("hideSpecialPasteOptions");
 	}
@@ -741,7 +741,7 @@ CHistory.prototype._sendCanUndoRedo = function()
 	this.workbook.handlers.trigger("setDocumentModified", this.Have_Changes());
 	//скрываю кнопку специальной вставки при каждом действии/undoredo
 	//при выполнении специальной вставки и при сохранении(-1 !== this.Index) не скрываю кнопку 
-	if(!AscCommonExcel.g_clipboardExcel.pasteStart && -1 !== this.Index && !(this.workbook.bUndoChanges || this.workbook.bRedoChanges))
+	if(!window['AscCommon'].g_clipboardBase.pasteStart && !(this.workbook.bUndoChanges || this.workbook.bRedoChanges))
 	{
 		this.workbook.handlers.trigger("hideSpecialPasteOptions");
 	}

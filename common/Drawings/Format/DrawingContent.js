@@ -102,6 +102,7 @@
         if(nNumCol > 1 && oBodyPr)
         {
             var fSpace = AscFormat.isRealNumber(oBodyPr.spcCol) ? oBodyPr.spcCol : 0;
+            fSpace = Math.min(fSpace, this.XLimit/(nNumCol - 1));
             var fColumnWidth = Math.max((this.XLimit - this.X - (nNumCol - 1)*fSpace)/nNumCol, 0);
             X += nColumnIndex*(fColumnWidth + fSpace);
             XLimit = X + fColumnWidth;
@@ -133,9 +134,17 @@
             this.Start_Recalculate(fWidth, fHeight);
             if(this.Pages.length > 1){
                 var fSummaryHeight = this.Get_SummaryHeight();
-                var fNeedHeight = fSummaryHeight;
+
+                var fLow = fHeight, fHigh = fSummaryHeight;
+                this.Start_Recalculate(fWidth, fHigh);
+                var nItCount = 0;
+                while(this.Pages.length > 1 && nItCount < 5){
+                    fHigh += fSummaryHeight;
+                    this.Start_Recalculate(fWidth, fHigh);
+                    ++nItCount;
+                }
+                var fNeedHeight = fHigh;
                 if(this.Get_ColumnsCount() > 1){
-                    var fLow = fHeight, fHigh = fSummaryHeight;
                     while((fHigh - fLow) > 0.1){
                         var fCheckHeight = fLow +  (fHigh - fLow)/2;
                         this.Start_Recalculate(fWidth, fCheckHeight);
@@ -280,7 +289,7 @@
                         if (true === Element.Is_EmptyPage(ElementPageIndex))
                             oColumn.Empty = true;
                     }
-                    for (var TempColumnIndex = ColumnIndex + 1; TempColumnIndex < ColumnsCount; ++TempColumnIndex)
+                    for (var TempColumnIndex = nColumnIndex + 1; TempColumnIndex < nColumnsCount; ++TempColumnIndex)
                     {
                         oSection.Columns[TempColumnIndex].Empty  = true;
                         oSection.Columns[TempColumnIndex].Pos    = i;
@@ -312,7 +321,7 @@
                     for (var TempColumnIndex = nColumnIndex + 1; TempColumnIndex < nColumnsCount; ++TempColumnIndex)
                     {
                         var ElementPageIndex = this.private_GetElementPageIndex(i, nPageIndex, TempColumnIndex, nColumnsCount);
-                        this.Content[Index].Recalculate_SkipPage(ElementPageIndex);
+                        this.Content[i].Recalculate_SkipPage(ElementPageIndex);
                         oSection.Columns[TempColumnIndex].Empty  = true;
                         oSection.Columns[TempColumnIndex].Pos    = i;
                         oSection.Columns[TempColumnIndex].EndPos = i - 1;
@@ -435,7 +444,7 @@
         return false;
     };
 
-    CDrawingDocContent.prototype.Selection_Draw_Page = function(PageIndex){
+    CDrawingDocContent.prototype.DrawSelectionOnPage = function(PageIndex){
         var CurPage = PageIndex;
         if (CurPage < 0 || CurPage >= this.Pages.length)
             return;
@@ -463,7 +472,7 @@
                     for (var Index = Start; Index <= End; Index++)
                     {
                         var ElementPageIndex = this.private_GetElementPageIndex(Index, CurPage, 0, 1);
-                        this.Content[Index].Selection_Draw_Page(ElementPageIndex);
+                        this.Content[Index].DrawSelectionOnPage(ElementPageIndex);
                     }
                 }
                 else{
@@ -488,7 +497,7 @@
                         for (var Index = Start; Index <= End; ++Index)
                         {
                             var ElementPage = this.private_GetElementPageIndex(Index, 0, ColumnIndex, ColumnsCount);
-                            this.Content[Index].Selection_Draw_Page(ElementPage);
+                            this.Content[Index].DrawSelectionOnPage(ElementPage);
                         }
 
                     }

@@ -97,8 +97,10 @@ CGraphicFrame.prototype.getBase64Img = CShape.prototype.getBase64Img;
 CGraphicFrame.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
 CGraphicFrame.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
 CGraphicFrame.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
+CGraphicFrame.prototype.convertPixToMM = CShape.prototype.convertPixToMM;
+CGraphicFrame.prototype.hit = CShape.prototype.hit;
 
-CGraphicFrame.prototype.Get_DocumentPositionFromObject= function(PosArray)
+CGraphicFrame.prototype.GetDocumentPositionFromObject= function(PosArray)
     {
         if (!PosArray)
             PosArray = [];
@@ -164,7 +166,7 @@ CGraphicFrame.prototype.Get_TextBackGroundColor= function()
         return undefined;
 };
 
-CGraphicFrame.prototype.Get_PrevElementEndInfo= function()
+CGraphicFrame.prototype.GetPrevElementEndInfo = function()
     {
         return null;
 };
@@ -304,21 +306,21 @@ CGraphicFrame.prototype.getAllFonts= function(fonts)
         }
 };
 
-CGraphicFrame.prototype.Cursor_MoveToStartPos = function()
+CGraphicFrame.prototype.MoveCursorToStartPos = function()
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Cursor_MoveToStartPos();
+            this.graphicObject.MoveCursorToStartPos();
             this.graphicObject.RecalculateCurPos();
 
         }
 };
 
-CGraphicFrame.prototype.Cursor_MoveToEndPos = function()
+CGraphicFrame.prototype.MoveCursorToEndPos = function()
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Cursor_MoveToEndPos();
+            this.graphicObject.MoveCursorToEndPos();
             this.graphicObject.RecalculateCurPos();
 
         }
@@ -333,7 +335,7 @@ CGraphicFrame.prototype.paragraphFormatPaste= function(CopyTextPr, CopyParaPr, B
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Paragraph_Format_Paste(CopyTextPr, CopyParaPr, Bool);
+            this.graphicObject.PasteFormatting(CopyTextPr, CopyParaPr, Bool);
 
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -342,11 +344,11 @@ CGraphicFrame.prototype.paragraphFormatPaste= function(CopyTextPr, CopyParaPr, B
 
 };
 
-CGraphicFrame.prototype.Paragraph_ClearFormatting= function()
+CGraphicFrame.prototype.ClearParagraphFormatting= function()
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Paragraph_ClearFormatting();
+            this.graphicObject.ClearParagraphFormatting();
 
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransformText = true;
@@ -374,7 +376,7 @@ CGraphicFrame.prototype.updateCursorType= function(x, y, e)
     {
         var tx = this.invertTransform.TransformPointX(x, y);
         var ty = this.invertTransform.TransformPointY(x, y);
-        this.graphicObject.Update_CursorType(tx, ty, 0)
+        this.graphicObject.UpdateCursorType(tx, ty, 0)
 };
 
 CGraphicFrame.prototype.getIsSingleBody = CShape.prototype.getIsSingleBody;
@@ -444,7 +446,7 @@ CGraphicFrame.prototype.recalculateSizes = function()
         }
 };
 
-CGraphicFrame.prototype.Selection_Is_OneElement = function()
+CGraphicFrame.prototype.GetSelectDirection = function()
     {
         return 0;
 };
@@ -479,17 +481,17 @@ CGraphicFrame.prototype.isTable = function()
         return this.graphicObject instanceof CTable;
 };
 
-CGraphicFrame.prototype.Hyperlink_CanAdd = function(bCheck)
+CGraphicFrame.prototype.CanAddHyperlink = function(bCheck)
     {
         if(this.graphicObject)
-            return this.graphicObject.Hyperlink_CanAdd(bCheck);
+            return this.graphicObject.CanAddHyperlink(bCheck);
         return false;
 };
 
-CGraphicFrame.prototype.Hyperlink_Check = function(bCheck)
+CGraphicFrame.prototype.IsCursorInHyperlink = function(bCheck)
     {
         if(this.graphicObject)
-            return this.graphicObject.Hyperlink_Check(bCheck);
+            return this.graphicObject.IsCursorInHyperlink(bCheck);
         return false;
 };
 
@@ -691,7 +693,7 @@ CGraphicFrame.prototype.selectionSetStart = function(e, x, y, slideIndex)
             ty = this.invertTransform.TransformPointY(x, y);
             if(AscCommon.g_mouse_event_type_down === e.Type)
             {
-                if(this.graphicObject.Is_TableBorder( tx, ty, 0))
+                if(this.graphicObject.IsTableBorder( tx, ty, 0))
                 {
                     if(!editor.isViewMode && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
                     {
@@ -738,12 +740,12 @@ CGraphicFrame.prototype.updateSelectionState = function()
         {
             var drawingDocument = this.parent.presentation.DrawingDocument;
             var Doc = this.graphicObject;
-            if ( true === Doc.Is_SelectionUse() && !Doc.Selection_IsEmpty()) {
+            if ( true === Doc.IsSelectionUse() && !Doc.IsSelectionEmpty()) {
                 drawingDocument.UpdateTargetTransform(this.transform);
                 drawingDocument.TargetEnd();
                 drawingDocument.SelectEnabled(true);
                 drawingDocument.SelectClear();
-                Doc.Selection_Draw_Page(0);
+                Doc.DrawSelectionOnPage(0);
                 drawingDocument.SelectShow();
             }
             else
@@ -863,12 +865,12 @@ CGraphicFrame.prototype.OnContentRecalculate = function()
 
 CGraphicFrame.prototype.getTextSelectionState = function()
     {
-        return this.graphicObject.Get_SelectionState();
+        return this.graphicObject.GetSelectionState();
 };
 
 CGraphicFrame.prototype.setTextSelectionState = function(Sate)
     {
-        return this.graphicObject.Set_SelectionState(Sate, Sate.length-1);
+        return this.graphicObject.SetSelectionState(Sate, Sate.length-1);
 };
 
 CGraphicFrame.prototype.isPlaceholder = function()
@@ -910,7 +912,7 @@ CGraphicFrame.prototype.paragraphAdd = function(paraItem, bRecalculate)
 
 CGraphicFrame.prototype.applyTextFunction = function(docContentFunction, tableFunction, args)
     {
-        if(tableFunction === CTable.prototype.Paragraph_Add)
+        if(tableFunction === CTable.prototype.AddToParagraph)
         {
             if((args[0].Type === para_NewLine
                 || args[0].Type === para_Text
@@ -922,7 +924,7 @@ CGraphicFrame.prototype.applyTextFunction = function(docContentFunction, tableFu
                 this.graphicObject.Remove(1, true, undefined, true);
             }
         }
-        else if(tableFunction === CTable.prototype.Add_NewParagraph)
+        else if(tableFunction === CTable.prototype.AddNewParagraph)
         {
             this.graphicObject.Selection.Use && this.graphicObject.Remove(1, true, undefined, true);
         }
@@ -938,7 +940,7 @@ CGraphicFrame.prototype.remove = function(Count, bOnlyText, bRemoveOnlySelection
 
 CGraphicFrame.prototype.addNewParagraph = function()
     {
-        this.graphicObject.Add_NewParagraph(false);
+        this.graphicObject.AddNewParagraph(false);
         this.recalcInfo.recalculateContent = true;
         this.recalcInfo.recalculateTransformText = true;
 };
@@ -947,7 +949,7 @@ CGraphicFrame.prototype.setParagraphAlign = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphAlign(val);
+            this.graphicObject.SetParagraphAlign(val);
             this.recalcInfo.recalculateContent = true;
             this.recalcInfo.recalculateTransform = true;
         }
@@ -958,7 +960,7 @@ CGraphicFrame.prototype.applyAllAlign = function(val)
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Set_ParagraphAlign(val);
+            this.graphicObject.SetParagraphAlign(val);
             this.graphicObject.Set_ApplyToAll(false);
         }
 };
@@ -967,7 +969,7 @@ CGraphicFrame.prototype.setParagraphSpacing = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphSpacing(val);
+            this.graphicObject.SetParagraphSpacing(val);
         }
 };
 
@@ -976,7 +978,7 @@ CGraphicFrame.prototype.applyAllSpacing = function(val)
         if(isRealObject(this.graphicObject))
         {
             this.graphicObject.Set_ApplyToAll(true);
-            this.graphicObject.Set_ParagraphSpacing(val);
+            this.graphicObject.SetParagraphSpacing(val);
             this.graphicObject.Set_ApplyToAll(false);
         }
 };
@@ -985,7 +987,7 @@ CGraphicFrame.prototype.setParagraphNumbering = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphNumbering(val);
+            this.graphicObject.SetParagraphNumbering(val);
         }
 };
 
@@ -993,7 +995,7 @@ CGraphicFrame.prototype.setParagraphIndent = function(val)
     {
         if(isRealObject(this.graphicObject))
         {
-            this.graphicObject.Set_ParagraphIndent(val);
+            this.graphicObject.SetParagraphIndent(val);
         }
 };
 
@@ -1100,7 +1102,29 @@ CGraphicFrame.prototype.checkTypeCorrect = function()
         }
         return true;
     };
+CGraphicFrame.prototype.Is_ThisElementCurrent = function()
+    {
+        if(this.parent && this.parent.graphicObjects)
+        {
+            if(this.group)
+            {
+                var main_group = this.group.getMainGroup();
+                return main_group.selection.textSelection === this;
+            }
+            else
+            {
+                return this.parent.graphicObjects.selection.textSelection === this;
+            }
+        }
+        return false;
+    };
 
+
+    CGraphicFrame.prototype.GetAllContentControls = function(arrContentControls){
+       if(this.graphicObject){
+           this.graphicObject.GetAllContentControls(arrContentControls);
+       }
+    };
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CGraphicFrame = CGraphicFrame;

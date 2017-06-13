@@ -49,6 +49,76 @@ var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 var _canvas_tables = null;
 var _table_styles = null;
 
+var c_oContentControlTrack = {
+	Hover 	: 0,
+	In 		: 1
+};
+
+function CContentControlTrack(_id, _type, _data, _transform)
+{
+	this.id = (undefined == _id) ? -1 : _id;
+	this.type = (undefined == _type) ? -1 : _type;
+
+	this.rects = undefined;
+	this.paths = undefined;
+
+	if (undefined === _data[0].Points)
+		this.rects = _data;
+	else
+		this.paths = _data;
+
+	this.transform = (undefined == _transform) ? null : _transform;
+
+	this.X = undefined;
+	this.Y = undefined;
+}
+CContentControlTrack.prototype.getPage = function()
+{
+	if (this.rects)
+		return this.rects[0].Page;
+	if (this.paths)
+		return this.paths[0].Page;
+	return 0;
+};
+CContentControlTrack.prototype.getXY = function()
+{
+	if (undefined === this.X && undefined === this.Y)
+	{
+		if (this.rects)
+		{
+			this.X = this.rects[0].X;
+			this.Y = this.rects[0].Y;
+		}
+		else if (this.paths)
+		{
+			var _points = this.paths[0].Points;
+			this.Y = _points[0].Y;
+
+			for (var i = 1; i < _points.length; i++)
+			{
+				if (this.Y > _points[i].Y)
+					this.Y = _points[i].Y;
+			}
+
+			this.X = 1000000000;
+			for (var i = 0; i < _points.length; i++)
+			{
+				if (Math.abs(this.Y - _points[i].Y) < 0.0001)
+				{
+					if (this.X > _points[i].X)
+						this.X = _points[i].X;
+				}
+			}
+		}
+	}
+
+	return { X : this.X, Y : this.Y };
+};
+CContentControlTrack.prototype.Copy = function()
+{
+	return new CContentControlTrack(this.id, this.type, this.rects ? this.rects : this.paths, this.transform);
+};
+
 function CColumnsMarkupColumn()
 {
 	this.W = 0;
@@ -393,7 +463,7 @@ function CTableOutlineDr()
 		var _outline = this.TableOutline;
 		var _table = _outline.Table;
 
-		_table.Cursor_MoveToStartPos();
+		_table.MoveCursorToStartPos();
 		_table.Document_SetThisElementCurrent(true);
 
 		if (!_table.Is_Inline())
@@ -492,8 +562,8 @@ function CTableOutlineDr()
 			}
 			this.IsChangeSmall = false;
 
-			this.TableOutline.Table.Selection_Remove();
-			this.TableOutline.Table.Cursor_MoveToStartPos();
+			this.TableOutline.Table.RemoveSelection();
+			this.TableOutline.Table.MoveCursorToStartPos();
 			editor.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
 		}
 
@@ -2093,8 +2163,8 @@ function CDrawingDocument()
 	this.TableStylesLastLook = null;
 	this.LastParagraphMargins = null;
 
-	this.TableStylesСheckLook = null;
-	this.TableStylesСheckLookFlag = false;
+	this.TableStylesCheckLook = null;
+	this.TableStylesCheckLookFlag = false;
 
 	this.InlineTextTrackEnabled = false;
 	this.InlineTextTrack = null;
@@ -2113,6 +2183,10 @@ function CDrawingDocument()
 
 	this.UpdateRulerStateFlag = false;
 	this.UpdateRulerStateParams = [];
+
+	this.ContentControlObjects = [];
+	this.ContentControlObjectsLast = [];
+	this.ContentControlObjectState = -1;
 
 	// массивы ректов для поиска
 	this._search_HdrFtr_All = []; // Поиск в колонтитуле, который находится на всех страницах
@@ -3748,6 +3822,527 @@ function CDrawingDocument()
 		}
 	};
 
+	this.ContentControlsSaveLast = function()
+	{
+		this.ContentControlObjectsLast = [];
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		{
+			this.ContentControlObjectsLast.push(this.ContentControlObjects[i].Copy());
+		}
+	};
+
+	this.ContentControlsCheckLast = function()
+	{
+		var _len1 = this.ContentControlObjects.length;
+		var _len2 = this.ContentControlObjectsLast.length;
+
+		if (_len1 != _len2)
+			return true;
+
+		var count1, count2;
+		for (var i = 0; i < _len1; i++)
+		{
+			var _obj1 = this.ContentControlObjects[i];
+			var _obj2 = this.ContentControlObjectsLast[i];
+
+			if (_obj1.id != _obj2.id)
+				return true;
+			if (_obj1.type != _obj2.type)
+				return true;
+
+			if (_obj1.rects && _obj2.rects)
+			{
+				count1 = _obj1.rects.length;
+				count2 = _obj2.rects.length;
+
+				if (count1 != count2)
+					return true;
+
+				for (var j = 0; j < count1; j++)
+				{
+					if (Math.abs(_obj1.rects[j].X - _obj2.rects[j].X) > 0.00001 ||
+						Math.abs(_obj1.rects[j].Y - _obj2.rects[j].Y) > 0.00001 ||
+						Math.abs(_obj1.rects[j].R - _obj2.rects[j].R) > 0.00001 ||
+						Math.abs(_obj1.rects[j].B - _obj2.rects[j].B) > 0.00001 ||
+						_obj1.rects[j].Page != _obj2.rects[j].Page)
+					{
+						return true;
+					}
+				}
+			}
+			else if (_obj1.path && _obj2.path)
+			{
+				count1 = _obj1.paths.length;
+				count2 = _obj2.paths.length;
+
+				if (count1 != count2)
+					return true;
+
+				var _points1, _points2;
+				for (var j = 0; j < count1; j++)
+				{
+					if (_obj1.paths[j].Page != _obj2.paths[j].Page)
+						return true;
+
+					_points1 = _obj1.paths[j].Points;
+					_points2 = _obj2.paths[j].Points;
+
+					if (_points1.length != _points2.length)
+						return true;
+
+					for (var k = 0; k < _points1.length; k++)
+					{
+						if (Math.abs(_points1[k].X - _points[k].X) > 0.00001 || Math.abs(_points1[k].Y - _points[k].Y) > 0.00001)
+							return true;
+					}
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		return false;
+	};
+
+	this.DrawContentControlsTrack = function(overlay)
+	{
+		var ctx = overlay.m_oContext;
+		ctx.strokeStyle = "#ADADAD";
+		ctx.lineWidth = 1;
+
+		var _object, _rect, _path;
+		var _x, _y, _r, _b;
+		var _transform, offset_x, offset_y;
+		var _curPage;
+
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		{
+			_object = this.ContentControlObjects[i];
+			_transform = _object.transform;
+			_curPage = _object.getPage();
+
+			offset_x = 0;
+			offset_y = 0;
+			if (_transform && global_MatrixTransformer.IsIdentity2(_transform))
+			{
+				offset_x = _transform.tx;
+				offset_y = _transform.ty;
+				_transform = null;
+			}
+
+			if (!_transform)
+			{
+				if (_object.rects)
+				{
+					for (var j = 0; j < _object.rects.length; j++)
+					{
+						_rect = _object.rects[j];
+
+						if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
+							continue;
+
+						var _page = this.m_arrPages[_rect.Page];
+						var drPage = _page.drawingPage;
+
+						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+						var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+						ctx.beginPath();
+
+						_x = (drPage.left + dKoefX * (_rect.X + offset_x));
+						_y = (drPage.top + dKoefY * (_rect.Y + offset_y));
+						_r = (drPage.left + dKoefX * (_rect.R + offset_x));
+						_b = (drPage.top + dKoefY * (_rect.B + offset_y));
+
+						overlay.CheckRect(_x, _y, _r - _x, _b - _y);
+						ctx.rect((_x >> 0) + 0.5, (_y >> 0) + 0.5, (_r - _x) >> 0, (_b - _y) >> 0);
+
+						if (_object.type == c_oContentControlTrack.Hover)
+						{
+							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							ctx.fill();
+						}
+						ctx.stroke();
+
+						ctx.beginPath();
+					}
+				}
+				else if (_object.paths)
+				{
+					for (var j = 0; j < _object.paths.length; j++)
+					{
+						_path = _object.paths[j];
+						if (_path.Page < this.m_lDrawingFirst || _path.Page > this.m_lDrawingEnd)
+							continue;
+
+						var _page = this.m_arrPages[_path.Page];
+						var drPage = _page.drawingPage;
+
+						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+						var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+						ctx.beginPath();
+
+						var Points = _path.Points;
+
+						var nCount = Points.length;
+						for (var nIndex = 0; nIndex < nCount; nIndex++)
+						{
+							_x = (drPage.left + dKoefX * (Points[nIndex].X + offset_x));
+							_y = (drPage.top + dKoefY * (Points[nIndex].Y + offset_y));
+
+							overlay.CheckPoint(_x, _y);
+
+							_x = (_x >> 0) + 0.5;
+							_y = (_y >> 0) + 0.5;
+
+							if (0 == nIndex)
+								ctx.moveTo(_x, _y);
+							else
+								ctx.lineTo(_x, _y);
+						}
+
+						ctx.closePath();
+
+						if (_object.type == c_oContentControlTrack.Hover)
+						{
+							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							ctx.fill();
+						}
+
+						ctx.stroke();
+						ctx.beginPath();
+					}
+				}
+			}
+			else
+			{
+				if (_object.rects)
+				{
+					for (var j = 0; j < _object.rects.length; j++)
+					{
+						_rect = _object.rects[j];
+
+						if (_rect.Page < this.m_lDrawingFirst || _rect.Page > this.m_lDrawingEnd)
+							continue;
+
+						var x1 = _transform.TransformPointX(_rect.X, _rect.Y);
+						var y1 = _transform.TransformPointY(_rect.X, _rect.Y);
+
+						var x2 = _transform.TransformPointX(_rect.R, _rect.Y);
+						var y2 = _transform.TransformPointY(_rect.R, _rect.Y);
+
+						var x3 = _transform.TransformPointX(_rect.R, _rect.B);
+						var y3 = _transform.TransformPointY(_rect.R, _rect.B);
+
+						var x4 = _transform.TransformPointX(_rect.X, _rect.B);
+						var y4 = _transform.TransformPointY(_rect.X, _rect.B);
+
+						var _page = this.m_arrPages[_rect.Page];
+						var drPage = _page.drawingPage;
+
+						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+						var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+						x1 = drPage.left + dKoefX * x1;
+						x2 = drPage.left + dKoefX * x2;
+						x3 = drPage.left + dKoefX * x3;
+						x4 = drPage.left + dKoefX * x4;
+
+						y1 = drPage.top + dKoefY * y1;
+						y2 = drPage.top + dKoefY * y2;
+						y3 = drPage.top + dKoefY * y3;
+						y4 = drPage.top + dKoefY * y4;
+
+						ctx.beginPath();
+
+						overlay.CheckPoint(x1, y1);
+						overlay.CheckPoint(x2, y2);
+						overlay.CheckPoint(x3, y3);
+						overlay.CheckPoint(x4, y4);
+
+						ctx.moveTo(x1, y1);
+						ctx.lineTo(x2, y2);
+						ctx.lineTo(x3, y3);
+						ctx.lineTo(x4, y4);
+						ctx.closePath();
+
+						if (_object.type == c_oContentControlTrack.Hover)
+						{
+							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							ctx.fill();
+						}
+						ctx.stroke();
+
+						ctx.beginPath();
+					}
+				}
+				else if (_object.paths)
+				{
+					for (var j = 0; j < _object.paths.length; j++)
+					{
+						_path = _object.paths[j];
+						if (_path.Page < this.m_lDrawingFirst || _path.Page > this.m_lDrawingEnd)
+							continue;
+
+						var _page = this.m_arrPages[_path.Page];
+						var drPage = _page.drawingPage;
+
+						var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+						var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+						ctx.beginPath();
+
+						var Points = _path.Points;
+
+						var nCount = Points.length;
+						for (var nIndex = 0; nIndex < nCount; nIndex++)
+						{
+							var _x = _transform.TransformPointX(Points[nIndex].X, Points[nIndex].Y);
+							var _y = _transform.TransformPointY(Points[nIndex].X, Points[nIndex].Y);
+
+							_x = (drPage.left + dKoefX * _x);
+							_y = (drPage.top + dKoefY * _y);
+
+							overlay.CheckPoint(_x, _y);
+
+							if (0 == nIndex)
+								ctx.moveTo(_x, _y);
+							else
+								ctx.lineTo(_x, _y);
+						}
+
+						ctx.closePath();
+
+						if (_object.type == c_oContentControlTrack.Hover)
+						{
+							ctx.fillStyle = "rgba(205, 205, 205, 0.5)";
+							ctx.fill();
+						}
+
+						ctx.stroke();
+						ctx.beginPath();
+					}
+				}
+			}
+
+			if (_object.type == c_oContentControlTrack.In)
+			{
+				if (_curPage < this.m_lDrawingFirst || _curPage > this.m_lDrawingEnd)
+					continue;
+
+				_rect = _object.getXY();
+				var _page = this.m_arrPages[_curPage];
+				var drPage = _page.drawingPage;
+
+				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+				var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+				if (!_transform)
+				{
+					_x = (drPage.left 	+ dKoefX * (_rect.X + offset_x));
+					_y = (drPage.top 	+ dKoefY * (_rect.Y + offset_y));
+
+					_x = ((_x >> 0) + 0.5) - 15;
+					_y = ((_y >> 0) + 0.5);
+
+					ctx.rect(_x, _y, 15, 20);
+
+					overlay.CheckRect(_x, _y, 15, 20);
+
+					if (1 == this.ContentControlObjectState)
+					{
+						ctx.fillStyle = "#CFCFCF";
+						ctx.fill();
+					}
+					else
+					{
+						ctx.fillStyle = "#FFFFFF";
+						ctx.fill();
+					}
+
+					ctx.stroke();
+					ctx.beginPath();
+
+					var cx = _x - 0.5 + 4;
+					var cy = _y - 0.5 + 4;
+
+					var _color1 = "#ADADAD";
+					var _color2 = "#D4D4D4";
+
+					if (0 == this.ContentControlObjectState || 1 == this.ContentControlObjectState)
+					{
+						_color1 = "#444444";
+						_color2 = "#9D9D9D";
+					}
+
+					overlay.AddRect(cx, cy, 3, 3);
+					overlay.AddRect(cx + 5, cy, 3, 3);
+					overlay.AddRect(cx, cy + 5, 3, 3);
+					overlay.AddRect(cx + 5, cy + 5, 3, 3);
+					overlay.AddRect(cx, cy + 10, 3, 3);
+					overlay.AddRect(cx + 5, cy + 10, 3, 3);
+
+					ctx.fillStyle = _color2;
+					ctx.fill();
+					ctx.beginPath();
+
+					ctx.moveTo(cx + 1.5, cy);
+					ctx.lineTo(cx + 1.5, cy + 3);
+					ctx.moveTo(cx + 6.5, cy);
+					ctx.lineTo(cx + 6.5, cy + 3);
+					ctx.moveTo(cx + 1.5, cy + 5);
+					ctx.lineTo(cx + 1.5, cy + 8);
+					ctx.moveTo(cx + 6.5, cy + 5);
+					ctx.lineTo(cx + 6.5, cy + 8);
+					ctx.moveTo(cx + 1.5, cy + 10);
+					ctx.lineTo(cx + 1.5, cy + 13);
+					ctx.moveTo(cx + 6.5, cy + 10);
+					ctx.lineTo(cx + 6.5, cy + 13);
+
+					ctx.moveTo(cx, cy + 1.5);
+					ctx.lineTo(cx + 3, cy + 1.5);
+					ctx.moveTo(cx + 5, cy + 1.5);
+					ctx.lineTo(cx + 8, cy + 1.5);
+					ctx.moveTo(cx, cy + 6.5);
+					ctx.lineTo(cx + 3, cy + 6.5);
+					ctx.moveTo(cx + 5, cy + 6.5);
+					ctx.lineTo(cx + 8, cy + 6.5);
+					ctx.moveTo(cx, cy + 11.5);
+					ctx.lineTo(cx + 3, cy + 11.5);
+					ctx.moveTo(cx + 5, cy + 11.5);
+					ctx.lineTo(cx + 8, cy + 11.5);
+
+					ctx.strokeStyle = _color1;
+					ctx.stroke();
+					ctx.beginPath();
+				}
+				else
+				{
+					var _x = _rect.X - (15 / dKoefX);
+					var _y = _rect.Y;
+					var _r = _rect.X;
+					var _b = _rect.Y + (20 / dKoefY);
+
+					var x1 = _transform.TransformPointX(_x, _y);
+					var y1 = _transform.TransformPointY(_x, _y);
+
+					var x2 = _transform.TransformPointX(_r, _y);
+					var y2 = _transform.TransformPointY(_r, _y);
+
+					var x3 = _transform.TransformPointX(_r, _b);
+					var y3 = _transform.TransformPointY(_r, _b);
+
+					var x4 = _transform.TransformPointX(_x, _b);
+					var y4 = _transform.TransformPointY(_x, _b);
+
+					x1 = drPage.left + dKoefX * x1;
+					x2 = drPage.left + dKoefX * x2;
+					x3 = drPage.left + dKoefX * x3;
+					x4 = drPage.left + dKoefX * x4;
+
+					y1 = drPage.top + dKoefY * y1;
+					y2 = drPage.top + dKoefY * y2;
+					y3 = drPage.top + dKoefY * y3;
+					y4 = drPage.top + dKoefY * y4;
+
+					ctx.beginPath();
+
+					overlay.CheckPoint(x1, y1);
+					overlay.CheckPoint(x2, y2);
+					overlay.CheckPoint(x3, y3);
+					overlay.CheckPoint(x4, y4);
+
+					ctx.moveTo(x1, y1);
+					ctx.lineTo(x2, y2);
+					ctx.lineTo(x3, y3);
+					ctx.lineTo(x4, y4);
+					ctx.closePath();
+
+					if (1 == this.ContentControlObjectState)
+					{
+						ctx.fillStyle = "#CFCFCF";
+						ctx.fill();
+					}
+					else
+					{
+						ctx.fillStyle = "#FFFFFF";
+						ctx.fill();
+					}
+
+					ctx.stroke();
+					ctx.beginPath();
+
+					var cx1 = _x + 5  / dKoefX;
+					var cy1 = _y + 5  / dKoefY;
+					var cx2 = _x + 10 / dKoefX;
+					var cy2 = _y + 5  / dKoefY;
+
+					var cx3 = _x + 5  / dKoefX;
+					var cy3 = _y + 10 / dKoefY;
+					var cx4 = _x + 10 / dKoefX;
+					var cy4 = _y + 10 / dKoefY;
+
+					var cx5 = _x + 5  / dKoefX;
+					var cy5 = _y + 15 / dKoefY;
+					var cx6 = _x + 10 / dKoefX;
+					var cy6 = _y + 15 / dKoefY;
+
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx1, cy1), drPage.top + dKoefY * _transform.TransformPointY(cx1, cy1), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx2, cy2), drPage.top + dKoefY * _transform.TransformPointY(cx2, cy2), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx3, cy3), drPage.top + dKoefY * _transform.TransformPointY(cx3, cy3), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx4, cy4), drPage.top + dKoefY * _transform.TransformPointY(cx4, cy4), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx5, cy5), drPage.top + dKoefY * _transform.TransformPointY(cx5, cy5), 1.5);
+					overlay.AddEllipse(drPage.left + dKoefX * _transform.TransformPointX(cx6, cy6), drPage.top + dKoefY * _transform.TransformPointY(cx6, cy6), 1.5);
+
+					var _color1 = "#ADADAD";
+					if (0 == this.ContentControlObjectState || 1 == this.ContentControlObjectState)
+						_color1 = "#444444";
+
+					ctx.fillStyle = _color1;
+					ctx.fill();
+					ctx.beginPath();
+				}
+			}
+		}
+
+		this.ContentControlsSaveLast();
+	};
+
+	this.OnDrawContentControl = function(id, type, rects, transform)
+	{
+		// всегда должен быть максимум один hover и in
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		{
+			if (type == this.ContentControlObjects[i].type)
+			{
+				this.ContentControlObjects.splice(i, 1);
+				i--;
+			}
+		}
+
+		if (null == id || !rects || rects.length == 0)
+			return;
+
+		if (type == c_oContentControlTrack.In)
+		{
+			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
+			{
+				this.ContentControlObjects.splice(0, 1);
+			}
+			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform));
+		}
+		else
+		{
+			if (this.ContentControlObjects.length != 0 && this.ContentControlObjects[0].id == id)
+				return;
+
+			this.ContentControlObjects.push(new CContentControlTrack(id, type, rects, transform));
+		}
+	};
+
 	this.private_DrawMathTrack = function (overlay, oPath, shift, color, dKoefX, dKoefY, drPage)
 	{
 		var ctx = overlay.m_oContext;
@@ -4573,7 +5168,7 @@ function CDrawingDocument()
 
 	this.CheckSelectMobile = function (overlay)
 	{
-		var _select = this.m_oWordControl.m_oLogicDocument.Get_SelectionBounds();
+		var _select = this.m_oWordControl.m_oLogicDocument.GetSelectionBounds();
 		if (!_select)
 			return;
 
@@ -5671,9 +6266,9 @@ function CDrawingDocument()
 		var _oldTurn = editor.isViewMode;
 		editor.isViewMode = true;
 
-		var par = new Paragraph(this, this.m_oWordControl.m_oLogicDocument, 0, 0, 0, 1000, 1000);
+		var par = new Paragraph(this, this.m_oWordControl.m_oLogicDocument);
 
-		par.Cursor_MoveToStartPos();
+		par.MoveCursorToStartPos();
 
 		var _paraPr = new CParaPr();
 		par.Pr = _paraPr;
@@ -5712,6 +6307,7 @@ function CDrawingDocument()
 		parRun.Add_ToContent(Pos++, new ParaText("d"), false);
 		par.Add_ToContent(0, parRun);
 
+		par.Reset(0, 0, 1000, 1000, 0, 0, 1);
 		par.Recalculate_Page(0);
 
 		var baseLineOffset = par.Lines[0].Y;
@@ -5779,24 +6375,24 @@ function CDrawingDocument()
 
 	this.StartTableStylesCheck = function ()
 	{
-		this.TableStylesСheckLookFlag = true;
+		this.TableStylesCheckLookFlag = true;
 	}
 
 	this.EndTableStylesCheck = function ()
 	{
-		this.TableStylesСheckLookFlag = false;
-		if (this.TableStylesСheckLook != null)
+		this.TableStylesCheckLookFlag = false;
+		if (this.TableStylesCheckLook != null)
 		{
-			this.CheckTableStyles(this.TableStylesСheckLook);
-			this.TableStylesСheckLook = null;
+			this.CheckTableStyles(this.TableStylesCheckLook);
+			this.TableStylesCheckLook = null;
 		}
 	}
 
 	this.CheckTableStyles = function (tableLook)
 	{
-		if (this.TableStylesСheckLookFlag)
+		if (this.TableStylesCheckLookFlag)
 		{
-			this.TableStylesСheckLook = tableLook;
+			this.TableStylesCheckLook = tableLook;
 			return;
 		}
 
@@ -5913,8 +6509,8 @@ function CDrawingDocument()
 				for (var ii = 0; ii < Cols; ii++)
 					Grid[ii] = W / Cols;
 
-				_table_styles = new CTable(this, logicDoc, true, 0, _x_mar, _y_mar, 1000, 1000, Rows, Cols, Grid);
-
+				_table_styles = new CTable(this, logicDoc, true, Rows, Cols, Grid);
+				_table_styles.Reset(_x_mar, _y_mar, 1000, 1000, 0, 0, 1);
 				_table_styles.Set_Props({
 					TableStyle: i,
 					TableLook: tableLook,
@@ -5994,11 +6590,11 @@ function CDrawingDocument()
 		var _ret = this.TableOutlineDr.checkMouseDown(pos, oWordControl);
 		if (_ret === true)
 		{
-			oWordControl.m_oLogicDocument.Selection_Remove(true);
+			oWordControl.m_oLogicDocument.RemoveSelection(true);
 			this.TableOutlineDr.bIsTracked = true;
 			this.LockCursorType("move");
 
-			this.TableOutlineDr.TableOutline.Table.Select_All();
+			this.TableOutlineDr.TableOutline.Table.SelectAll();
 			this.TableOutlineDr.TableOutline.Table.Document_SetThisElementCurrent(true);
 
 			if (-1 == oWordControl.m_oTimerScrollSelect)
@@ -6076,6 +6672,63 @@ function CDrawingDocument()
 				}
 				oWordControl.EndUpdateOverlay();
 				return true;
+			}
+		}
+
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		{
+			var _object = this.ContentControlObjects[i];
+			if (_object.type == c_oContentControlTrack.In)
+			{
+				var _rect = _object.getXY();
+
+				var _page = this.m_arrPages[_object.getPage()];
+				var drPage = _page.drawingPage;
+
+				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+				var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+				var _x = _rect.X - (15 / dKoefX);
+				var _y = _rect.Y;
+				var _r = _rect.X;
+				var _b = _rect.Y + (20 / dKoefY);
+
+				var posX = pos.X;
+				var posY = pos.Y;
+
+				var _transform = _object.transform;
+				if (_transform && global_MatrixTransformer.IsIdentity2(_transform))
+				{
+					_x += _transform.tx;
+					_y += _transform.ty;
+					_r += _transform.tx;
+					_b += _transform.ty;
+
+					_transform = null;
+				}
+				if (_transform)
+				{
+					var _invert = global_MatrixTransformer.Invert(_transform);
+					posX = _invert.TransformPointX(pos.X, pos.Y);
+					posY = _invert.TransformPointY(pos.X, pos.Y);
+				}
+
+				if (posX > _x && posX < _r && posY > _y && posY < _b)
+				{
+					oWordControl.m_oLogicDocument.SelectContentControl(_object.id);
+					this.ContentControlObjectState = 1;
+
+					this.InlineTextTrackEnabled = true;
+					this.InlineTextTrack = null;
+					this.InlineTextTrackPage = -1;
+
+					oWordControl.ShowOverlay();
+					oWordControl.OnUpdateOverlay();
+					oWordControl.EndUpdateOverlay();
+					return true;
+				}
+
+				break;
 			}
 		}
 
@@ -6178,8 +6831,78 @@ function CDrawingDocument()
 			}
 		}
 
+		var _content_control = null;
+		for (var i = 0; i < this.ContentControlObjects.length; i++)
+		{
+			if (this.ContentControlObjects[i].type == c_oContentControlTrack.In)
+			{
+				_content_control = this.ContentControlObjects[i];
+				break;
+			}
+		}
+
+		if (_content_control && pos.Page == _content_control.getPage())
+		{
+			if (1 == this.ContentControlObjectState)
+			{
+				this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+				this.InlineTextTrackPage = pos.Page;
+
+				oWordControl.ShowOverlay();
+				oWordControl.OnUpdateOverlay();
+				oWordControl.EndUpdateOverlay();
+				return true;
+			}
+
+			var _page = this.m_arrPages[pos.Page];
+			var drPage = _page.drawingPage;
+
+			var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
+			var dKoefY = (drPage.bottom - drPage.top) / _page.height_mm;
+
+			var rect = _content_control.getXY();
+			var _x = rect.X - (15 / dKoefX);
+			var _y = rect.Y;
+			var _r = rect.X;
+			var _b = rect.Y + (20 / dKoefY);
+
+			var posX = pos.X;
+			var posY = pos.Y;
+
+			var _transform = _content_control.transform;
+			if (_transform && global_MatrixTransformer.IsIdentity2(_transform))
+			{
+				_x += _transform.tx;
+				_y += _transform.ty;
+				_r += _transform.tx;
+				_b += _transform.ty;
+
+				_transform = null;
+			}
+			if (_transform)
+			{
+				var _invert = global_MatrixTransformer.Invert(_transform);
+				posX = _invert.TransformPointX(pos.X, pos.Y);
+				posY = _invert.TransformPointY(pos.X, pos.Y);
+			}
+
+			var _old = this.ContentControlObjectState;
+			this.ContentControlObjectState = -1;
+			if (posX > _x && posX < _r && posY > _y && posY < _b)
+			{
+				this.ContentControlObjectState = 0;
+				oWordControl.ShowOverlay();
+				oWordControl.OnUpdateOverlay();
+				oWordControl.EndUpdateOverlay();
+				return true;
+			}
+
+			if (_old != this.ContentControlObjectState)
+				oWordControl.OnUpdateOverlay();
+		}
+
 		return false;
-	}
+	};
 
 	this.checkMouseUp_Drawing = function (pos)
 	{
@@ -6201,7 +6924,7 @@ function CDrawingDocument()
 			return true;
 		}
 
-		if (this.InlineTextTrackEnabled)
+		if (this.InlineTextTrackEnabled && (this.ContentControlObjectState != 1))
 		{
 			this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
 			this.InlineTextTrackPage = pos.Page;
@@ -6228,6 +6951,39 @@ function CDrawingDocument()
 			}
 			oWordControl.OnUpdateOverlay();
 
+			oWordControl.EndUpdateOverlay();
+			return true;
+		}
+
+		if (this.ContentControlObjectState == 1)
+		{
+			for (var i = 0; i < this.ContentControlObjects.length; i++)
+			{
+				var _object = this.ContentControlObjects[i];
+				if (_object.type == c_oContentControlTrack.In)
+				{
+					if (this.InlineTextTrackEnabled)
+					{
+						if (this.InlineTextTrack) // значит был MouseMove
+						{
+							this.InlineTextTrack = oWordControl.m_oLogicDocument.Get_NearestPos(pos.Page, pos.X, pos.Y);
+							this.m_oWordControl.m_oLogicDocument.OnContentControlTrackEnd(_object.id, this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
+							this.InlineTextTrackEnabled = false;
+							this.InlineTextTrack = null;
+							this.InlineTextTrackPage = -1;
+						}
+						else
+						{
+							this.InlineTextTrackEnabled = false;
+						}
+					}
+					break;
+				}
+			}
+
+			this.ContentControlObjectState = 0;
+			oWordControl.ShowOverlay();
+			oWordControl.OnUpdateOverlay();
 			oWordControl.EndUpdateOverlay();
 			return true;
 		}
@@ -6536,7 +7292,7 @@ function CDrawingDocument()
 		//_MathPainter.StartLoad();
 		//return;
 
-		var _MathPainter = new CMathPainter(this.m_oWordControl.m_oApi);
+		var _MathPainter = new AscFormat.CMathPainter(this.m_oWordControl.m_oApi);
 		_MathPainter.Generate();
 		this.MathMenuLoad = true;
 	};
@@ -6924,7 +7680,7 @@ CStylesPainter.prototype =
 			var hdr = new CHeaderFooter(editor.WordControl.m_oLogicDocument.HdrFtr, editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
 			var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
 
-			var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
+			var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, false);
 			var run = new ParaRun(par, false);
 
 			for (var i = 0; i < style.Name.length; i++)

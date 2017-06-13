@@ -95,13 +95,13 @@ CFootnotesController.prototype.Get_Id = function()
 CFootnotesController.prototype.ResetSpecialFootnotes = function()
 {
 	var oSeparator = new CFootEndnote(this);
-	oSeparator.Paragraph_Add(new ParaSeparator(), false);
+	oSeparator.AddToParagraph(new ParaSeparator(), false);
 	var oParagraph = oSeparator.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetSeparator(oSeparator);
 
 	var oContinuationSeparator = new CFootEndnote(this);
-	oContinuationSeparator.Paragraph_Add(new ParaContinuationSeparator(), false);
+	oContinuationSeparator.AddToParagraph(new ParaContinuationSeparator(), false);
 	oParagraph = oContinuationSeparator.Get_ElementByIndex(0);
 	oParagraph.Set_Spacing({After : 0, Line : 1, LineRule : Asc.linerule_Auto}, false);
 	this.SetContinuationSeparator(oContinuationSeparator);
@@ -263,11 +263,11 @@ CFootnotesController.prototype.ContinueElementsFromPreviousColumn = function(nPa
 
 		if (arrElements.length > 0 && null !== this.ContinuationSeparatorFootnote)
 		{
-			this.ContinuationSeparatorFootnote.Prepare_RecalculateObject();
+			this.ContinuationSeparatorFootnote.PrepareRecalculateObject();
 			this.ContinuationSeparatorFootnote.Reset(X, _Y, XLimit, _YLimit);
 			this.ContinuationSeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
 			this.ContinuationSeparatorFootnote.Recalculate_Page(0, true);
-			oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.Save_RecalculateObject();
+			oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.SaveRecalculateObject();
 
 			var oBounds = this.ContinuationSeparatorFootnote.Get_PageBounds(0);
 			_Y += oBounds.Bottom - oBounds.Top;
@@ -367,11 +367,11 @@ CFootnotesController.prototype.RecalculateFootnotes = function(nPageAbs, nColumn
 
 	if (oColumn.Elements.length <= 0 && null !== this.SeparatorFootnote)
 	{
-		this.SeparatorFootnote.Prepare_RecalculateObject();
+		this.SeparatorFootnote.PrepareRecalculateObject();
 		this.SeparatorFootnote.Reset(X, _Y, XLimit, _YLimit);
 		this.SeparatorFootnote.Set_StartPage(nPageAbs, nColumnAbs, nColumnsCount);
 		this.SeparatorFootnote.Recalculate_Page(0, true);
-		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.SaveRecalculateObject();
 
 		var oBounds    = this.SeparatorFootnote.Get_PageBounds(0);
 		_Y += oBounds.Bottom - oBounds.Top;
@@ -455,12 +455,12 @@ CFootnotesController.prototype.Draw = function(nPageAbs, pGraphics)
 
 		if (null !== this.ContinuationSeparatorFootnote && null !== oColumn.ContinuationSeparatorRecalculateObject)
 		{
-			this.ContinuationSeparatorFootnote.Load_RecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
+			this.ContinuationSeparatorFootnote.LoadRecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
 			this.ContinuationSeparatorFootnote.Draw(nPageAbs, pGraphics);
 		}
 		if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
 		{
-			this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
+			this.SeparatorFootnote.LoadRecalculateObject(oColumn.SeparatorRecalculateObject);
 			this.SeparatorFootnote.Draw(nPageAbs, pGraphics);
 		}
 
@@ -487,15 +487,15 @@ CFootnotesController.prototype.Shift = function(nPageAbs, nColumnAbs, dX, dY)
 
 	if (null !== this.ContinuationSeparatorFootnote && null !== oColumn.ContinuationSeparatorRecalculateObject)
 	{
-		this.ContinuationSeparatorFootnote.Load_RecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
+		this.ContinuationSeparatorFootnote.LoadRecalculateObject(oColumn.ContinuationSeparatorRecalculateObject);
 		this.ContinuationSeparatorFootnote.Shift(0, dX, dY);
-		oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.Save_RecalculateObject();
+		oColumn.ContinuationSeparatorRecalculateObject = this.ContinuationSeparatorFootnote.SaveRecalculateObject();
 	}
 	if (null !== this.SeparatorFootnote && null !== oColumn.SeparatorRecalculateObject)
 	{
-		this.SeparatorFootnote.Load_RecalculateObject(oColumn.SeparatorRecalculateObject);
+		this.SeparatorFootnote.LoadRecalculateObject(oColumn.SeparatorRecalculateObject);
 		this.SeparatorFootnote.Shift(0, dX, dY);
-		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.Save_RecalculateObject();
+		oColumn.SeparatorRecalculateObject = this.SeparatorFootnote.SaveRecalculateObject();
 	}
 
 	for (var nIndex = 0, nCount = oColumn.Elements.length; nIndex < nCount; ++nIndex)
@@ -780,7 +780,7 @@ CFootnotesController.prototype.IsInDrawing = function(X, Y, PageAbs)
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		return oFootnote.Is_InDrawing(X, Y, oResult.FootnotePageIndex);
+		return oFootnote.IsInDrawing(X, Y, oResult.FootnotePageIndex);
 	}
 
 	return false;
@@ -791,7 +791,7 @@ CFootnotesController.prototype.IsTableBorder = function(X, Y, PageAbs)
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		return oFootnote.Is_TableBorder(X, Y, oResult.FootnotePageIndex);
+		return oFootnote.IsTableBorder(X, Y, oResult.FootnotePageIndex);
 	}
 
 	return null;
@@ -802,7 +802,7 @@ CFootnotesController.prototype.IsInText = function(X, Y, PageAbs)
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		return oFootnote.Is_InText(X, Y, oResult.FootnotePageIndex);
+		return oFootnote.IsInText(X, Y, oResult.FootnotePageIndex);
 	}
 
 	return null;
@@ -871,7 +871,7 @@ CFootnotesController.prototype.GetAllParagraphs = function(Props, ParaArray)
 	for (var sId in  this.Footnote)
 	{
 		var oFootnote = this.Footnote[sId];
-		oFootnote.Get_AllParagraphs(Props, ParaArray);
+		oFootnote.GetAllParagraphs(Props, ParaArray);
 	}
 };
 CFootnotesController.prototype.StartSelection = function(X, Y, PageAbs, MouseEvent)
@@ -925,7 +925,7 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 	for (var sFootnoteId in this.Selection.Footnotes)
 	{
 		if (sFootnoteId !== sStartId)
-			this.Selection.Footnotes[sFootnoteId].Selection_Remove();
+			this.Selection.Footnotes[sFootnoteId].RemoveSelection();
 	}
 
 	// Новый селект
@@ -955,7 +955,7 @@ CFootnotesController.prototype.EndSelection = function(X, Y, PageAbs, MouseEvent
 			if (sFootnoteId !== sStartId && sFootnoteId !== sEndId)
 			{
 				var oFootnote = oRange[sFootnoteId];
-				oFootnote.Select_All();
+				oFootnote.SelectAll();
 			}
 		}
 		this.Selection.Footnotes = oRange;
@@ -972,7 +972,7 @@ CFootnotesController.prototype.Set_CurrentElement = function(bUpdateStates, Page
 {
 	if (oFootnote instanceof CFootEndnote)
 	{
-		if (oFootnote.Is_SelectionUse())
+		if (oFootnote.IsSelectionUse())
 		{
 			this.CurFootnote              = oFootnote;
 			this.Selection.Use            = true;
@@ -1034,9 +1034,9 @@ CFootnotesController.prototype.GotoPage = function(nPageAbs)
 
 	var oFootnote = oColumn.Elements[0];
 	this.private_SetCurrentFootnoteNoSelection(oFootnote);
-	oFootnote.Cursor_MoveToStartPos(false);
+	oFootnote.MoveCursorToStartPos(false);
 };
-CFootnotesController.prototype.Check_TableCoincidence = function(oTable)
+CFootnotesController.prototype.CheckTableCoincidence = function(oTable)
 {
 	return false;
 };
@@ -1045,7 +1045,7 @@ CFootnotesController.prototype.GotoNextFootnote = function()
 	var oNextFootnote = this.private_GetNextFootnote(this.CurFootnote);
 	if (oNextFootnote)
 	{
-		oNextFootnote.Cursor_MoveToStartPos(false);
+		oNextFootnote.MoveCursorToStartPos(false);
 		this.private_SetCurrentFootnoteNoSelection(oNextFootnote);
 	}
 };
@@ -1054,7 +1054,7 @@ CFootnotesController.prototype.GotoPrevFootnote = function()
 	var oPrevFootnote = this.private_GetPrevFootnote(this.CurFootnote);
 	if (oPrevFootnote)
 	{
-		oPrevFootnote.Cursor_MoveToStartPos(false);
+		oPrevFootnote.MoveCursorToStartPos(false);
 		this.private_SetCurrentFootnoteNoSelection(oPrevFootnote);
 	}
 };
@@ -1064,7 +1064,7 @@ CFootnotesController.prototype.GetNumberingInfo = function(ParaId, NumPr, oFootn
 	var oNumberingEngine = new CDocumentNumberingInfoEngine(ParaId, NumPr, this.Get_Numbering());
 	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
 	{
-		arrFootnotes[nIndex].Get_NumberingInfo(oNumberingEngine, ParaId, NumPr);
+		arrFootnotes[nIndex].GetNumberingInfo(oNumberingEngine, ParaId, NumPr);
 	}
 	return oNumberingEngine.Get_NumInfo();
 };
@@ -1338,7 +1338,7 @@ CFootnotesController.prototype.private_GetSelectionArray = function()
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Controller area
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-CFootnotesController.prototype.CanTargetUpdate = function()
+CFootnotesController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
@@ -1361,35 +1361,42 @@ CFootnotesController.prototype.AddNewParagraph = function(bRecalculate, bForceAd
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Add_NewParagraph(bRecalculate, bForceAdd);
+	return this.CurFootnote.AddNewParagraph(bRecalculate, bForceAdd);
 };
 CFootnotesController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, bFlow)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Add_InlineImage(nW, nH, oImage, oChart, bFlow);
+	return this.CurFootnote.AddInlineImage(nW, nH, oImage, oChart, bFlow);
+};
+CFootnotesController.prototype.AddSignatureLine = function(oSignatureDrawing)
+{
+	if (false === this.private_CheckFootnotesSelectionBeforeAction())
+		return false;
+
+	return this.CurFootnote.AddSignatureLine(oSignatureDrawing);
 };
 CFootnotesController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Add_OleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
+	return this.CurFootnote.AddOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
 };
 CFootnotesController.prototype.AddTextArt = function(nStyle)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Add_TextArt(nStyle);
+	return this.CurFootnote.AddTextArt(nStyle);
 };
 CFootnotesController.prototype.EditChart = function(Chart)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Edit_Chart(Chart);
+	this.CurFootnote.EditChart(Chart);
 };
 CFootnotesController.prototype.AddInlineTable = function(Cols, Rows)
 {
@@ -1397,19 +1404,19 @@ CFootnotesController.prototype.AddInlineTable = function(Cols, Rows)
 		return;
 
 	if (null !== this.CurFootnote)
-		this.CurFootnote.Add_InlineTable(Cols, Rows);
+		this.CurFootnote.AddInlineTable(Cols, Rows);
 };
 CFootnotesController.prototype.ClearParagraphFormatting = function()
 {
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Paragraph_ClearFormatting();
+		oFootnote.ClearParagraphFormatting();
 	}
 };
 CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
-	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+	if (para_NewLine === oItem.Type && true === oItem.IsPageOrColumnBreak())
 		return;
 
 	if (oItem instanceof ParaTextPr)
@@ -1417,7 +1424,7 @@ CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 		for (var sId in this.Selection.Footnotes)
 		{
 			var oFootnote = this.Selection.Footnotes[sId];
-			oFootnote.Paragraph_Add(oItem, false);
+			oFootnote.AddToParagraph(oItem, false);
 		}
 
 		if (false !== bRecalculate)
@@ -1431,7 +1438,7 @@ CFootnotesController.prototype.AddToParagraph = function(oItem, bRecalculate)
 			return;
 
 		if (null !== this.CurFootnote)
-			this.CurFootnote.Paragraph_Add(oItem, bRecalculate);
+			this.CurFootnote.AddToParagraph(oItem, bRecalculate);
 	}
 };
 CFootnotesController.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd)
@@ -1445,7 +1452,7 @@ CFootnotesController.prototype.GetCursorPosXY = function()
 {
 	// Если есть селект, тогда конец селекта совпадает с CurFootnote
 	if (null !== this.CurFootnote)
-		return this.CurFootnote.Cursor_GetPos();
+		return this.CurFootnote.GetCursorPosXY();
 
 	return {X : 0, Y : 0}
 };
@@ -1466,13 +1473,13 @@ CFootnotesController.prototype.MoveCursorToStartPos = function(AddToSelect)
 			return;
 
 		if (true !== this.Selection.Use)
-			this.LogicDocument.Start_SelectionFromCurPos();
+			this.LogicDocument.StartSelectionFromCurPos();
 
 		this.Selection.End.Footnote   = arrRange[0];
 		this.Selection.Start.Footnote = oFootnote;
 		this.Selection.Footnotes      = {};
 
-		oFootnote.Cursor_MoveToStartPos(true);
+		oFootnote.MoveCursorToStartPos(true);
 		this.Selection.Footnotes = {};
 		this.Selection.Footnotes[oFootnote.Get_Id()]  = oFootnote;
 		for (var nIndex = 0, nCount = arrRange.length; nIndex < nCount; ++nIndex)
@@ -1480,7 +1487,7 @@ CFootnotesController.prototype.MoveCursorToStartPos = function(AddToSelect)
 			var oTempFootnote = arrRange[nIndex];
 			if (oTempFootnote !== oFootnote)
 			{
-				oTempFootnote.Select_All(-1);
+				oTempFootnote.SelectAll(-1);
 				this.Selection.Footnotes[oTempFootnote.Get_Id()] = oTempFootnote;
 			}
 		}
@@ -1508,13 +1515,13 @@ CFootnotesController.prototype.MoveCursorToEndPos = function(AddToSelect)
 			return;
 
 		if (true !== this.Selection.Use)
-			this.LogicDocument.Start_SelectionFromCurPos();
+			this.LogicDocument.StartSelectionFromCurPos();
 
 		this.Selection.End.Footnote   = arrRange[arrRange.length - 1];
 		this.Selection.Start.Footnote = oFootnote;
 		this.Selection.Footnotes      = {};
 
-		oFootnote.Cursor_MoveToEndPos(true);
+		oFootnote.MoveCursorToEndPos(true);
 		this.Selection.Footnotes = {};
 		this.Selection.Footnotes[oFootnote.Get_Id()]  = oFootnote;
 		for (var nIndex = 0, nCount = arrRange.length; nIndex < nCount; ++nIndex)
@@ -1522,7 +1529,7 @@ CFootnotesController.prototype.MoveCursorToEndPos = function(AddToSelect)
 			var oTempFootnote = arrRange[nIndex];
 			if (oTempFootnote !== oFootnote)
 			{
-				oTempFootnote.Select_All(1);
+				oTempFootnote.SelectAll(1);
 				this.Selection.Footnotes[oTempFootnote.Get_Id()] = oTempFootnote;
 			}
 		}
@@ -1550,17 +1557,17 @@ CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 			for (var sId in this.Selection.Footnotes)
 			{
 				if (oFootnote !== this.Selection.Footnotes[sId])
-					this.Selection.Footnotes[sId].Selection_Remove();
+					this.Selection.Footnotes[sId].RemoveSelection();
 			}
 
-			oFootnote.Cursor_MoveLeft(false, Word);
-			oFootnote.Selection_Remove();
+			oFootnote.MoveCursorLeft(false, Word);
+			oFootnote.RemoveSelection();
 			this.private_SetCurrentFootnoteNoSelection(oFootnote);
 		}
 		else
 		{
 			var oFootnote = this.Selection.End.Footnote;
-			if (false === oFootnote.Cursor_MoveLeft(true, Word))
+			if (false === oFootnote.MoveCursorLeft(true, Word))
 			{
 				var oPrevFootnote = this.private_GetPrevFootnote(oFootnote);
 				if (null === oPrevFootnote)
@@ -1574,8 +1581,8 @@ CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 
 					this.Selection.Footnotes[oPrevFootnote.Get_Id()] = oPrevFootnote;
 
-					oPrevFootnote.Cursor_MoveToEndPos(false, true);
-					oPrevFootnote.Cursor_MoveLeft(true, Word);
+					oPrevFootnote.MoveCursorToEndPos(false, true);
+					oPrevFootnote.MoveCursorLeft(true, Word);
 				}
 				else
 				{
@@ -1585,10 +1592,10 @@ CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 					if (oPrevFootnote === this.Selection.Start.Footnote)
 						this.Selection.Direction = 0;
 
-					oFootnote.Selection_Remove();
+					oFootnote.RemoveSelection();
 					delete this.Selection.Footnotes[oFootnote.Get_Id()];
 
-					oPrevFootnote.Cursor_MoveLeft(true, Word);
+					oPrevFootnote.MoveCursorLeft(true, Word);
 				}
 			}
 		}
@@ -1606,7 +1613,7 @@ CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 			this.Selection.Direction      = 0;
 
 			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
-			if (false === oFootnote.Cursor_MoveLeft(true, Word))
+			if (false === oFootnote.MoveCursorLeft(true, Word))
 			{
 				var oPrevFootnote = this.private_GetPrevFootnote(oFootnote);
 				if (null === oPrevFootnote)
@@ -1618,14 +1625,14 @@ CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 
 				this.Selection.Footnotes[oPrevFootnote.Get_Id()] = oPrevFootnote;
 
-				oPrevFootnote.Cursor_MoveToEndPos(false, true);
-				oPrevFootnote.Cursor_MoveLeft(true, Word);
+				oPrevFootnote.MoveCursorToEndPos(false, true);
+				oPrevFootnote.MoveCursorLeft(true, Word);
 			}
 		}
 		else
 		{
 			var oFootnote = this.CurFootnote;
-			if (false === oFootnote.Cursor_MoveLeft(false, Word))
+			if (false === oFootnote.MoveCursorLeft(false, Word))
 			{
 				var oPrevFootnote = this.private_GetPrevFootnote(oFootnote);
 				if (null === oPrevFootnote)
@@ -1639,7 +1646,7 @@ CFootnotesController.prototype.MoveCursorLeft = function(AddToSelect, Word)
 
 				this.Selection.Footnotes[oPrevFootnote.Get_Id()] = oPrevFootnote;
 
-				oPrevFootnote.Cursor_MoveToEndPos(false);
+				oPrevFootnote.MoveCursorToEndPos(false);
 			}
 		}
 	}
@@ -1663,17 +1670,17 @@ CFootnotesController.prototype.MoveCursorRight = function(AddToSelect, Word, Fro
 			for (var sId in this.Selection.Footnotes)
 			{
 				if (oFootnote !== this.Selection.Footnotes[sId])
-					this.Selection.Footnotes[sId].Selection_Remove();
+					this.Selection.Footnotes[sId].RemoveSelection();
 			}
 
-			oFootnote.Cursor_MoveRight(false, Word, FromPaste);
-			oFootnote.Selection_Remove();
+			oFootnote.MoveCursorRight(false, Word, FromPaste);
+			oFootnote.RemoveSelection();
 			this.private_SetCurrentFootnoteNoSelection(oFootnote);
 		}
 		else
 		{
 			var oFootnote = this.Selection.End.Footnote;
-			if (false === oFootnote.Cursor_MoveRight(true, Word, FromPaste))
+			if (false === oFootnote.MoveCursorRight(true, Word, FromPaste))
 			{
 				var oNextFootnote = this.private_GetNextFootnote(oFootnote);
 				if (null === oNextFootnote)
@@ -1687,8 +1694,8 @@ CFootnotesController.prototype.MoveCursorRight = function(AddToSelect, Word, Fro
 
 					this.Selection.Footnotes[oNextFootnote.Get_Id()] = oNextFootnote;
 
-					oNextFootnote.Cursor_MoveToStartPos(false);
-					oNextFootnote.Cursor_MoveRight(true, Word, FromPaste);
+					oNextFootnote.MoveCursorToStartPos(false);
+					oNextFootnote.MoveCursorRight(true, Word, FromPaste);
 				}
 				else
 				{
@@ -1698,10 +1705,10 @@ CFootnotesController.prototype.MoveCursorRight = function(AddToSelect, Word, Fro
 					if (oNextFootnote === this.Selection.Start.Footnote)
 						this.Selection.Direction = 0;
 
-					oFootnote.Selection_Remove();
+					oFootnote.RemoveSelection();
 					delete this.Selection.Footnotes[oFootnote.Get_Id()];
 
-					oNextFootnote.Cursor_MoveRight(true, Word, FromPaste);
+					oNextFootnote.MoveCursorRight(true, Word, FromPaste);
 				}
 			}
 		}
@@ -1719,7 +1726,7 @@ CFootnotesController.prototype.MoveCursorRight = function(AddToSelect, Word, Fro
 			this.Selection.Direction      = 0;
 
 			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
-			if (false === oFootnote.Cursor_MoveRight(true, Word, FromPaste))
+			if (false === oFootnote.MoveCursorRight(true, Word, FromPaste))
 			{
 				var oNextFootnote = this.private_GetNextFootnote(oFootnote);
 				if (null === oNextFootnote)
@@ -1731,14 +1738,14 @@ CFootnotesController.prototype.MoveCursorRight = function(AddToSelect, Word, Fro
 
 				this.Selection.Footnotes[oNextFootnote.Get_Id()] = oNextFootnote;
 
-				oNextFootnote.Cursor_MoveToStartPos(false);
-				oNextFootnote.Cursor_MoveRight(true, Word, FromPaste);
+				oNextFootnote.MoveCursorToStartPos(false);
+				oNextFootnote.MoveCursorRight(true, Word, FromPaste);
 			}
 		}
 		else
 		{
 			var oFootnote = this.CurFootnote;
-			if (false === oFootnote.Cursor_MoveRight(false, Word ,FromPaste))
+			if (false === oFootnote.MoveCursorRight(false, Word ,FromPaste))
 			{
 				var oNextFootnote = this.private_GetNextFootnote(oFootnote);
 				if (null === oNextFootnote)
@@ -1752,7 +1759,7 @@ CFootnotesController.prototype.MoveCursorRight = function(AddToSelect, Word, Fro
 
 				this.Selection.Footnotes[oNextFootnote.Get_Id()] = oNextFootnote;
 
-				oNextFootnote.Cursor_MoveToStartPos(false);
+				oNextFootnote.MoveCursorToStartPos(false);
 			}
 		}
 	}
@@ -1766,15 +1773,15 @@ CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
 		if (true === AddToSelect)
 		{
 			var oFootnote = this.Selection.End.Footnote;
-			var oPos = oFootnote.Cursor_GetPos();
+			var oPos = oFootnote.GetCursorPosXY();
 
-			if (false === oFootnote.Cursor_MoveUp(true))
+			if (false === oFootnote.MoveCursorUp(true))
 			{
 				var oPrevFootnote = this.private_GetPrevFootnote(oFootnote);
 				if (null === oPrevFootnote)
 					return false;
 
-				oFootnote.Cursor_MoveToStartPos(true);
+				oFootnote.MoveCursorToStartPos(true);
 
 				if (1 !== this.Selection.Direction)
 				{
@@ -1784,7 +1791,7 @@ CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
 
 					this.Selection.Footnotes[oPrevFootnote.Get_Id()] = oPrevFootnote;
 
-					oPrevFootnote.Cursor_MoveUp_To_LastRow(oPos.X, oPos.Y, true);
+					oPrevFootnote.MoveCursorUpToLastRow(oPos.X, oPos.Y, true);
 				}
 				else
 				{
@@ -1794,10 +1801,10 @@ CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
 					if (oPrevFootnote === this.Selection.Start.Footnote)
 						this.Selection.Direction = 0;
 
-					oFootnote.Selection_Remove();
+					oFootnote.RemoveSelection();
 					delete this.Selection.Footnotes[oFootnote.Get_Id()];
 
-					oPrevFootnote.Cursor_MoveUp_To_LastRow(oPos.X, oPos.Y, true);
+					oPrevFootnote.MoveCursorUpToLastRow(oPos.X, oPos.Y, true);
 				}
 
 			}
@@ -1815,11 +1822,11 @@ CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
 			for (var sId in this.Selection.Footnotes)
 			{
 				if (oFootnote !== this.Selection.Footnotes[sId])
-					this.Selection.Footnotes[sId].Selection_Remove();
+					this.Selection.Footnotes[sId].RemoveSelection();
 			}
 
-			oFootnote.Cursor_MoveLeft(false, false);
-			oFootnote.Selection_Remove();
+			oFootnote.MoveCursorLeft(false, false);
+			oFootnote.RemoveSelection();
 			this.private_SetCurrentFootnoteNoSelection(oFootnote);
 		}
 	}
@@ -1828,7 +1835,7 @@ CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
 		if (true === AddToSelect)
 		{
 			var oFootnote = this.CurFootnote;
-			var oPos = oFootnote.Cursor_GetPos();
+			var oPos = oFootnote.GetCursorPosXY();
 			
 			this.Selection.Use            = true;
 			this.Selection.Start.Footnote = oFootnote;
@@ -1837,13 +1844,13 @@ CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
 			this.Selection.Direction      = 0;
 
 			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
-			if (false === oFootnote.Cursor_MoveUp(true))
+			if (false === oFootnote.MoveCursorUp(true))
 			{
 				var oPrevFootnote = this.private_GetPrevFootnote(oFootnote);
 				if (null === oPrevFootnote)
 					return false;
 
-				oFootnote.Cursor_MoveToStartPos(true);
+				oFootnote.MoveCursorToStartPos(true);
 
 				this.Selection.End.Footnote = oPrevFootnote;
 				this.Selection.Direction    = -1;
@@ -1851,14 +1858,14 @@ CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
 
 				this.Selection.Footnotes[oPrevFootnote.Get_Id()] = oPrevFootnote;
 
-				oPrevFootnote.Cursor_MoveUp_To_LastRow(oPos.X, oPos.Y, true);
+				oPrevFootnote.MoveCursorUpToLastRow(oPos.X, oPos.Y, true);
 			}
 		}
 		else
 		{
 			var oFootnote = this.CurFootnote;
-			var oPos = oFootnote.Cursor_GetPos();
-			if (false === oFootnote.Cursor_MoveUp(false))
+			var oPos = oFootnote.GetCursorPosXY();
+			if (false === oFootnote.MoveCursorUp(false))
 			{
 				var oPrevFootnote = this.private_GetPrevFootnote(oFootnote);
 				if (null === oPrevFootnote)
@@ -1872,7 +1879,7 @@ CFootnotesController.prototype.MoveCursorUp = function(AddToSelect)
 
 				this.Selection.Footnotes[oPrevFootnote.Get_Id()] = oPrevFootnote;
 
-				oPrevFootnote.Cursor_MoveUp_To_LastRow(oPos.X, oPos.Y, false);
+				oPrevFootnote.MoveCursorUpToLastRow(oPos.X, oPos.Y, false);
 			}
 		}
 	}
@@ -1886,15 +1893,15 @@ CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
 		if (true === AddToSelect)
 		{
 			var oFootnote = this.Selection.End.Footnote;
-			var oPos = oFootnote.Cursor_GetPos();
+			var oPos = oFootnote.GetCursorPosXY();
 
-			if (false === oFootnote.Cursor_MoveDown(true))
+			if (false === oFootnote.MoveCursorDown(true))
 			{
 				var oNextFootnote = this.private_GetNextFootnote(oFootnote);
 				if (null === oNextFootnote)
 					return false;
 
-				oFootnote.Cursor_MoveToEndPos(true);
+				oFootnote.MoveCursorToEndPos(true);
 
 				if (-1 !== this.Selection.Direction)
 				{
@@ -1904,7 +1911,7 @@ CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
 
 					this.Selection.Footnotes[oNextFootnote.Get_Id()] = oNextFootnote;
 
-					oNextFootnote.Cursor_MoveDown_To_FirstRow(oPos.X, oPos.Y, true);
+					oNextFootnote.MoveCursorDownToFirstRow(oPos.X, oPos.Y, true);
 				}
 				else
 				{
@@ -1914,10 +1921,10 @@ CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
 					if (oNextFootnote === this.Selection.Start.Footnote)
 						this.Selection.Direction = 0;
 
-					oFootnote.Selection_Remove();
+					oFootnote.RemoveSelection();
 					delete this.Selection.Footnotes[oFootnote.Get_Id()];
 
-					oNextFootnote.Cursor_MoveDown_To_FirstRow(oPos.X, oPos.Y, true);
+					oNextFootnote.MoveCursorDownToFirstRow(oPos.X, oPos.Y, true);
 				}
 
 			}
@@ -1935,11 +1942,11 @@ CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
 			for (var sId in this.Selection.Footnotes)
 			{
 				if (oFootnote !== this.Selection.Footnotes[sId])
-					this.Selection.Footnotes[sId].Selection_Remove();
+					this.Selection.Footnotes[sId].RemoveSelection();
 			}
 
-			oFootnote.Cursor_MoveRight(false, false);
-			oFootnote.Selection_Remove();
+			oFootnote.MoveCursorRight(false, false);
+			oFootnote.RemoveSelection();
 			this.private_SetCurrentFootnoteNoSelection(oFootnote);
 		}
 	}
@@ -1948,7 +1955,7 @@ CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
 		if (true === AddToSelect)
 		{
 			var oFootnote = this.CurFootnote;
-			var oPos = oFootnote.Cursor_GetPos();
+			var oPos = oFootnote.GetCursorPosXY();
 
 			this.Selection.Use            = true;
 			this.Selection.Start.Footnote = oFootnote;
@@ -1957,13 +1964,13 @@ CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
 			this.Selection.Direction      = 0;
 
 			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
-			if (false === oFootnote.Cursor_MoveDown(true))
+			if (false === oFootnote.MoveCursorDown(true))
 			{
 				var oNextFootnote = this.private_GetNextFootnote(oFootnote);
 				if (null === oNextFootnote)
 					return false;
 
-				oFootnote.Cursor_MoveToEndPos(true, false);
+				oFootnote.MoveCursorToEndPos(true, false);
 
 				this.Selection.End.Footnote = oNextFootnote;
 				this.Selection.Direction    = 1;
@@ -1971,14 +1978,14 @@ CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
 
 				this.Selection.Footnotes[oNextFootnote.Get_Id()] = oNextFootnote;
 
-				oNextFootnote.Cursor_MoveDown_To_FirstRow(oPos.X, oPos.Y, true);
+				oNextFootnote.MoveCursorDownToFirstRow(oPos.X, oPos.Y, true);
 			}
 		}
 		else
 		{
 			var oFootnote = this.CurFootnote;
-			var oPos = oFootnote.Cursor_GetPos();
-			if (false === oFootnote.Cursor_MoveDown(false))
+			var oPos = oFootnote.GetCursorPosXY();
+			if (false === oFootnote.MoveCursorDown(false))
 			{
 				var oNextFootnote = this.private_GetNextFootnote(oFootnote);
 				if (null === oNextFootnote)
@@ -1992,7 +1999,7 @@ CFootnotesController.prototype.MoveCursorDown = function(AddToSelect)
 
 				this.Selection.Footnotes[oNextFootnote.Get_Id()] = oNextFootnote;
 
-				oNextFootnote.Cursor_MoveDown_To_FirstRow(oPos.X, oPos.Y, false);
+				oNextFootnote.MoveCursorDownToFirstRow(oPos.X, oPos.Y, false);
 			}
 		}
 	}
@@ -2006,7 +2013,7 @@ CFootnotesController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 		if (true === AddToSelect)
 		{
 			var oFootnote = this.Selection.End.Footnote;
-			oFootnote.Cursor_MoveEndOfLine(true);
+			oFootnote.MoveCursorToEndOfLine(true);
 		}
 		else
 		{
@@ -2021,11 +2028,11 @@ CFootnotesController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 			for (var sId in this.Selection.Footnotes)
 			{
 				if (oFootnote !== this.Selection.Footnotes[sId])
-					this.Selection.Footnotes[sId].Selection_Remove();
+					this.Selection.Footnotes[sId].RemoveSelection();
 			}
 
-			oFootnote.Cursor_MoveEndOfLine(false);
-			oFootnote.Selection_Remove();
+			oFootnote.MoveCursorToEndOfLine(false);
+			oFootnote.RemoveSelection();
 			this.private_SetCurrentFootnoteNoSelection(oFootnote);
 		}
 	}
@@ -2042,11 +2049,11 @@ CFootnotesController.prototype.MoveCursorToEndOfLine = function(AddToSelect)
 			this.Selection.Direction      = 0;
 
 			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
-			oFootnote.Cursor_MoveEndOfLine(true);
+			oFootnote.MoveCursorToEndOfLine(true);
 		}
 		else
 		{
-			this.CurFootnote.Cursor_MoveEndOfLine(false);
+			this.CurFootnote.MoveCursorToEndOfLine(false);
 		}
 	}
 
@@ -2059,7 +2066,7 @@ CFootnotesController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 		if (true === AddToSelect)
 		{
 			var oFootnote = this.Selection.End.Footnote;
-			oFootnote.Cursor_MoveStartOfLine(true);
+			oFootnote.MoveCursorToStartOfLine(true);
 		}
 		else
 		{
@@ -2074,11 +2081,11 @@ CFootnotesController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 			for (var sId in this.Selection.Footnotes)
 			{
 				if (oFootnote !== this.Selection.Footnotes[sId])
-					this.Selection.Footnotes[sId].Selection_Remove();
+					this.Selection.Footnotes[sId].RemoveSelection();
 			}
 
-			oFootnote.Cursor_MoveStartOfLine(false);
-			oFootnote.Selection_Remove();
+			oFootnote.MoveCursorToStartOfLine(false);
+			oFootnote.RemoveSelection();
 			this.private_SetCurrentFootnoteNoSelection(oFootnote);
 		}
 	}
@@ -2095,11 +2102,11 @@ CFootnotesController.prototype.MoveCursorToStartOfLine = function(AddToSelect)
 			this.Selection.Direction      = 0;
 
 			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
-			oFootnote.Cursor_MoveStartOfLine(true);
+			oFootnote.MoveCursorToStartOfLine(true);
 		}
 		else
 		{
-			this.CurFootnote.Cursor_MoveStartOfLine(false);
+			this.CurFootnote.MoveCursorToStartOfLine(false);
 		}
 	}
 
@@ -2123,7 +2130,7 @@ CFootnotesController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 			{
 				if (this.Selection.Footnotes[sId] !== StartFootnote)
 				{
-					this.Selection.Footnotes[sId].Selection_Remove();
+					this.Selection.Footnotes[sId].RemoveSelection();
 				}
 			}
 		}
@@ -2142,7 +2149,7 @@ CFootnotesController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 			this.Selection.Direction      = 0;
 
 			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
-			oFootnote.Cursor_MoveAt(X, Y, true, true, PageRel);
+			oFootnote.MoveCursorToXY(X, Y, true, true, PageRel);
 		}
 		else if (nDirection > 0)
 		{
@@ -2160,18 +2167,18 @@ CFootnotesController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 			this.Selection.Footnotes      = {};
 			this.Selection.Direction      = 1;
 
-			oStartFootnote.Cursor_MoveToEndPos(true, false);
+			oStartFootnote.MoveCursorToEndPos(true, false);
 
 			for (var nPos = 0, nCount = arrFootnotes.length; nPos < nCount; ++nPos)
 			{
 				this.Selection.Footnotes[arrFootnotes[nPos].Get_Id()] = arrFootnotes[nPos];
 
 				if (0 !== nPos && nPos !== nCount - 1)
-					arrFootnotes[nPos].Select_All(1);
+					arrFootnotes[nPos].SelectAll(1);
 			}
 
-			oEndFootnote.Cursor_MoveToStartPos(false);
-			oEndFootnote.Cursor_MoveAt(X, Y, true, true, PageRel);
+			oEndFootnote.MoveCursorToStartPos(false);
+			oEndFootnote.MoveCursorToXY(X, Y, true, true, PageRel);
 		}
 		else if (nDirection < 0)
 		{
@@ -2189,18 +2196,18 @@ CFootnotesController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 			this.Selection.Footnotes      = {};
 			this.Selection.Direction      = -1;
 
-			oStartFootnote.Cursor_MoveToStartPos(true);
+			oStartFootnote.MoveCursorToStartPos(true);
 
 			for (var nPos = 0, nCount = arrFootnotes.length; nPos < nCount; ++nPos)
 			{
 				this.Selection.Footnotes[arrFootnotes[nPos].Get_Id()] = arrFootnotes[nPos];
 
 				if (0 !== nPos && nPos !== nCount - 1)
-					arrFootnotes[nPos].Select_All(-1);
+					arrFootnotes[nPos].SelectAll(-1);
 			}
 
-			oEndFootnote.Cursor_MoveToEndPos(false, true);
-			oEndFootnote.Cursor_MoveAt(X, Y, true, true, PageRel);
+			oEndFootnote.MoveCursorToEndPos(false, true);
+			oEndFootnote.MoveCursorToXY(X, Y, true, true, PageRel);
 		}
 	}
 	else
@@ -2211,7 +2218,7 @@ CFootnotesController.prototype.MoveCursorToXY = function(X, Y, PageAbs, AddToSel
 		}
 
 		this.private_SetCurrentFootnoteNoSelection(oFootnote);
-		oFootnote.Cursor_MoveAt(X, Y, false, true, PageRel);
+		oFootnote.MoveCursorToXY(X, Y, false, true, PageRel);
 	}
 };
 CFootnotesController.prototype.MoveCursorToCell = function(bNext)
@@ -2219,14 +2226,14 @@ CFootnotesController.prototype.MoveCursorToCell = function(bNext)
 	if (true !== this.private_IsOnFootnoteSelected() || null === this.CurFootnote)
 		return false;
 
-	return this.CurFootnote.Cursor_MoveToCell(bNext);
+	return this.CurFootnote.MoveCursorToCell(bNext);
 };
 CFootnotesController.prototype.SetParagraphAlign = function(Align)
 {
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphAlign(Align);
+		oFootnote.SetParagraphAlign(Align);
 	}
 };
 CFootnotesController.prototype.SetParagraphSpacing = function(Spacing)
@@ -2234,7 +2241,7 @@ CFootnotesController.prototype.SetParagraphSpacing = function(Spacing)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphSpacing(Spacing);
+		oFootnote.SetParagraphSpacing(Spacing);
 	}
 };
 CFootnotesController.prototype.SetParagraphTabs = function(Tabs)
@@ -2242,7 +2249,7 @@ CFootnotesController.prototype.SetParagraphTabs = function(Tabs)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphTabs(Tabs);
+		oFootnote.SetParagraphTabs(Tabs);
 	}
 };
 CFootnotesController.prototype.SetParagraphIndent = function(Ind)
@@ -2250,7 +2257,7 @@ CFootnotesController.prototype.SetParagraphIndent = function(Ind)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphIndent(Ind);
+		oFootnote.SetParagraphIndent(Ind);
 	}
 };
 CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
@@ -2258,7 +2265,7 @@ CFootnotesController.prototype.SetParagraphNumbering = function(NumInfo)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphNumbering(NumInfo);
+		oFootnote.SetParagraphNumbering(NumInfo);
 	}
 };
 CFootnotesController.prototype.SetParagraphShd = function(Shd)
@@ -2266,7 +2273,7 @@ CFootnotesController.prototype.SetParagraphShd = function(Shd)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphShd(Shd);
+		oFootnote.SetParagraphShd(Shd);
 	}
 };
 CFootnotesController.prototype.SetParagraphStyle = function(Name)
@@ -2274,7 +2281,7 @@ CFootnotesController.prototype.SetParagraphStyle = function(Name)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphStyle(Name);
+		oFootnote.SetParagraphStyle(Name);
 	}
 };
 CFootnotesController.prototype.SetParagraphContextualSpacing = function(Value)
@@ -2282,7 +2289,7 @@ CFootnotesController.prototype.SetParagraphContextualSpacing = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphContextualSpacing(Value);
+		oFootnote.SetParagraphContextualSpacing(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphPageBreakBefore = function(Value)
@@ -2290,7 +2297,7 @@ CFootnotesController.prototype.SetParagraphPageBreakBefore = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphPageBreakBefore(Value);
+		oFootnote.SetParagraphPageBreakBefore(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphKeepLines = function(Value)
@@ -2298,7 +2305,7 @@ CFootnotesController.prototype.SetParagraphKeepLines = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphKeepLines(Value);
+		oFootnote.SetParagraphKeepLines(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphKeepNext = function(Value)
@@ -2306,7 +2313,7 @@ CFootnotesController.prototype.SetParagraphKeepNext = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphKeepNext(Value);
+		oFootnote.SetParagraphKeepNext(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphWidowControl = function(Value)
@@ -2314,7 +2321,7 @@ CFootnotesController.prototype.SetParagraphWidowControl = function(Value)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphWidowControl(Value);
+		oFootnote.SetParagraphWidowControl(Value);
 	}
 };
 CFootnotesController.prototype.SetParagraphBorders = function(Borders)
@@ -2322,27 +2329,27 @@ CFootnotesController.prototype.SetParagraphBorders = function(Borders)
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Set_ParagraphBorders(Borders);
+		oFootnote.SetParagraphBorders(Borders);
 	}
 };
 CFootnotesController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
 	// Не позволяем делать рамки внутри сносок
 };
-CFootnotesController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+CFootnotesController.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Paragraph_IncDecFontSize(bIncrease);
+		oFootnote.IncreaseDecreaseFontSize(bIncrease);
 	}
 };
-CFootnotesController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+CFootnotesController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		oFootnote.Paragraph_IncDecIndent(bIncrease);
+		oFootnote.IncreaseDecreaseIndent(bIncrease);
 	}
 };
 CFootnotesController.prototype.SetImageProps = function(Props)
@@ -2350,24 +2357,24 @@ CFootnotesController.prototype.SetImageProps = function(Props)
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	return this.CurFootnote.Set_ImageProps(Props);
+	return this.CurFootnote.SetImageProps(Props);
 };
 CFootnotesController.prototype.SetTableProps = function(Props)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	return this.CurFootnote.Set_TableProps(Props);
+	return this.CurFootnote.SetTableProps(Props);
 };
-CFootnotesController.prototype.GetCurrentParaPr = function()
+CFootnotesController.prototype.GetCalculatedParaPr = function()
 {
-	var StartPr = this.CurFootnote.Get_Paragraph_ParaPr();
+	var StartPr = this.CurFootnote.GetCalculatedParaPr();
 	var Pr = StartPr.Copy();
 
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		var TempPr = oFootnote.Get_Paragraph_ParaPr();
+		var TempPr = oFootnote.GetCalculatedParaPr();
 		Pr = Pr.Compare(TempPr);
 	}
 
@@ -2385,15 +2392,15 @@ CFootnotesController.prototype.GetCurrentParaPr = function()
 
 	return Pr;
 };
-CFootnotesController.prototype.GetCurrentTextPr = function()
+CFootnotesController.prototype.GetCalculatedTextPr = function()
 {
-	var StartPr = this.CurFootnote.Get_Paragraph_TextPr();
+	var StartPr = this.CurFootnote.GetCalculatedTextPr();
 	var Pr = StartPr.Copy();
 
 	for (var sId in this.Selection.Footnotes)
 	{
 		var oFootnote = this.Selection.Footnotes[sId];
-		var TempPr = oFootnote.Get_Paragraph_TextPr();
+		var TempPr = oFootnote.GetCalculatedTextPr();
 		Pr = Pr.Compare(TempPr);
 	}
 
@@ -2402,14 +2409,14 @@ CFootnotesController.prototype.GetCurrentTextPr = function()
 CFootnotesController.prototype.GetDirectParaPr = function()
 {
 	if (null !== this.CurFootnote)
-		return this.CurFootnote.Get_Paragraph_ParaPr_Copy();
+		return this.CurFootnote.GetDirectParaPr();
 
 	return new CParaPr();
 };
 CFootnotesController.prototype.GetDirectTextPr = function()
 {
 	if (null !== this.CurFootnote)
-		return this.CurFootnote.Get_Paragraph_TextPr_Copy();
+		return this.CurFootnote.GetDirectTextPr();
 
 	return new CTextPr();
 };
@@ -2419,7 +2426,7 @@ CFootnotesController.prototype.RemoveSelection = function(bNoCheckDrawing)
 	{
 		for (var sId in this.Selection.Footnotes)
 		{
-			this.Selection.Footnotes[sId].Selection_Remove(bNoCheckDrawing);
+			this.Selection.Footnotes[sId].RemoveSelection(bNoCheckDrawing);
 		}
 
 		this.Selection.Use = false;
@@ -2429,7 +2436,7 @@ CFootnotesController.prototype.RemoveSelection = function(bNoCheckDrawing)
 	if (this.CurFootnote)
 		this.Selection.Footnotes[this.CurFootnote.Get_Id()] = this.CurFootnote;
 };
-CFootnotesController.prototype.IsEmptySelection = function(bCheckHidden)
+CFootnotesController.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
 	if (true !== this.IsSelectionUse())
 		return true;
@@ -2446,7 +2453,7 @@ CFootnotesController.prototype.IsEmptySelection = function(bCheckHidden)
 	if (null === oFootnote)
 		return true;
 
-	return oFootnote.Selection_IsEmpty(bCheckHidden);
+	return oFootnote.IsSelectionEmpty(bCheckHidden);
 };
 CFootnotesController.prototype.DrawSelectionOnPage = function(nPageAbs)
 {
@@ -2463,7 +2470,7 @@ CFootnotesController.prototype.DrawSelectionOnPage = function(nPageAbs)
 			if (oFootnote === this.Selection.Footnotes[oFootnote.Get_Id()])
 			{
 				var nFootnotePageIndex = oFootnote.GetElementPageIndex(nPageAbs, nColumnIndex);
-				oFootnote.Selection_Draw_Page(nFootnotePageIndex);
+				oFootnote.DrawSelectionOnPage(nFootnotePageIndex);
 			}
 		}
 	}
@@ -2474,12 +2481,12 @@ CFootnotesController.prototype.GetSelectionBounds = function()
 	{
 		if (0 === this.Selection.Direction)
 		{
-			return this.CurFootnote.Get_SelectionBounds();
+			return this.CurFootnote.GetSelectionBounds();
 		}
 		else if (1 === this.Selection.Direction)
 		{
-			var StartBounds = this.Selection.Start.Footnote.Get_SelectionBounds();
-			var EndBounds   = this.Selection.End.Footnote.Get_SelectionBounds();
+			var StartBounds = this.Selection.Start.Footnote.GetSelectionBounds();
+			var EndBounds   = this.Selection.End.Footnote.GetSelectionBounds();
 
 			if (!StartBounds && !EndBounds)
 				return null;
@@ -2492,8 +2499,8 @@ CFootnotesController.prototype.GetSelectionBounds = function()
 		}
 		else
 		{
-			var StartBounds = this.Selection.End.Footnote.Get_SelectionBounds();
-			var EndBounds   = this.Selection.Start.Footnote.Get_SelectionBounds();
+			var StartBounds = this.Selection.End.Footnote.GetSelectionBounds();
+			var EndBounds   = this.Selection.Start.Footnote.GetSelectionBounds();
 
 			if (!StartBounds && !EndBounds)
 				return null;
@@ -2513,7 +2520,7 @@ CFootnotesController.prototype.IsMovingTableBorder = function()
 	if (true !== this.private_IsOnFootnoteSelected())
 		return false;
 
-	return this.CurFootnote.Selection_Is_TableBorderMove();
+	return this.CurFootnote.IsMovingTableBorder();
 };
 CFootnotesController.prototype.CheckPosInSelection = function(X, Y, PageAbs, NearPos)
 {
@@ -2521,7 +2528,7 @@ CFootnotesController.prototype.CheckPosInSelection = function(X, Y, PageAbs, Nea
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		return oFootnote.Selection_Check(X, Y, oResult.FootnotePageIndex, NearPos);
+		return oFootnote.CheckPosInSelection(X, Y, oResult.FootnotePageIndex, NearPos);
 	}
 
 	return false;
@@ -2544,7 +2551,7 @@ CFootnotesController.prototype.SelectAll = function(nDirection)
 		this.Selection.Direction      = 0;
 
 		this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
-		oFootnote.Select_All(nDirection);
+		oFootnote.SelectAll(nDirection);
 	}
 	else
 	{
@@ -2571,7 +2578,7 @@ CFootnotesController.prototype.SelectAll = function(nDirection)
 		for (var nPos = 0, nCount = arrFootnotes.length; nPos < nCount; ++nPos)
 		{
 			var oFootnote = arrFootnotes[nPos];
-			oFootnote.Select_All(nDirection);
+			oFootnote.SelectAll(nDirection);
 			this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
 		}
 	}
@@ -2583,14 +2590,14 @@ CFootnotesController.prototype.GetSelectedContent = function(SelectedContent)
 
 	if (0 === this.Selection.Direction)
 	{
-		this.CurFootnote.Get_SelectedContent(SelectedContent);
+		this.CurFootnote.GetSelectedContent(SelectedContent);
 	}
 	else
 	{
 		var arrFootnotes = this.private_GetSelectionArray();
 		for (var nPos = 0, nCount = arrFootnotes.length; nPos < nCount; ++nPos)
 		{
-			arrFootnotes[nPos].Get_SelectedContent(SelectedContent);
+			arrFootnotes[nPos].GetSelectedContent(SelectedContent);
 		}
 	}
 };
@@ -2600,14 +2607,14 @@ CFootnotesController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseE
 	if (oResult)
 	{
 		var oFootnote = oResult.Footnote;
-		oFootnote.Update_CursorType(X, Y, oResult.FootnotePageIndex, MouseEvent);
+		oFootnote.UpdateCursorType(X, Y, oResult.FootnotePageIndex, MouseEvent);
 	}
 };
 CFootnotesController.prototype.PasteFormatting = function(TextPr, ParaPr)
 {
 	for (var sId in this.Selection.Footnotes)
 	{
-		this.Selection.Footnotes[sId].Paragraph_Format_Paste(TextPr, ParaPr, true);
+		this.Selection.Footnotes[sId].PasteFormatting(TextPr, ParaPr, true);
 	}
 };
 CFootnotesController.prototype.IsSelectionUse = function()
@@ -2620,14 +2627,14 @@ CFootnotesController.prototype.IsTextSelectionUse = function()
 		return false;
 
 	if (0 === this.Selection.Direction)
-		return this.CurFootnote.Is_TextSelectionUse();
+		return this.CurFootnote.IsTextSelectionUse();
 
 	return true;
 };
 CFootnotesController.prototype.GetCurPosXY = function()
 {
 	if (this.CurFootnote)
-		return this.CurFootnote.Get_CurPosXY();
+		return this.CurFootnote.GetCurPosXY();
 
 	return {X : 0, Y : 0};
 };
@@ -2638,7 +2645,7 @@ CFootnotesController.prototype.GetSelectedText = function(bClearText, oPr)
 		if (true !== this.Selection.Use || 0 !== this.Selection.Direction)
 			return "";
 
-		return this.CurFootnote.Get_SelectedText(true, oPr);
+		return this.CurFootnote.GetSelectedText(true, oPr);
 	}
 	else
 	{
@@ -2646,7 +2653,7 @@ CFootnotesController.prototype.GetSelectedText = function(bClearText, oPr)
 		var arrFootnotes = this.private_GetSelectionArray();
 		for (var nPos = 0, nCount = arrFootnotes.length; nPos < nCount; ++nPos)
 		{
-			var sTempResult = arrFootnotes[nPos].Get_SelectedText(false, oPr);
+			var sTempResult = arrFootnotes[nPos].GetSelectedText(false, oPr);
 			if (null == sTempResult)
 				return null;
 
@@ -2658,63 +2665,63 @@ CFootnotesController.prototype.GetSelectedText = function(bClearText, oPr)
 };
 CFootnotesController.prototype.GetCurrentParagraph = function()
 {
-	return this.CurFootnote.Get_CurrentParagraph();
+	return this.CurFootnote.GetCurrentParagraph();
 };
 CFootnotesController.prototype.GetSelectedElementsInfo = function(oInfo)
 {
 	if (true !== this.private_IsOnFootnoteSelected() || null === this.CurFootnote)
 		oInfo.Set_MixedSelection();
 	else
-		this.CurFootnote.Get_SelectedElementsInfo(oInfo);
+		this.CurFootnote.GetSelectedElementsInfo(oInfo);
 };
 CFootnotesController.prototype.AddTableRow = function(bBefore)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_AddRow(bBefore);
+	this.CurFootnote.AddTableRow(bBefore);
 };
-CFootnotesController.prototype.AddTableCol = function(bBefore)
+CFootnotesController.prototype.AddTableColumn = function(bBefore)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_AddCol(bBefore);
+	this.CurFootnote.AddTableColumn(bBefore);
 };
 CFootnotesController.prototype.RemoveTableRow = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_RemoveRow();
+	this.CurFootnote.RemoveTableRow();
 };
-CFootnotesController.prototype.RemoveTableCol = function()
+CFootnotesController.prototype.RemoveTableColumn = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_RemoveCol();
+	this.CurFootnote.RemoveTableColumn();
 };
 CFootnotesController.prototype.MergeTableCells = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_MergeCells();
+	this.CurFootnote.MergeTableCells();
 };
 CFootnotesController.prototype.SplitTableCells = function(Cols, Rows)
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_SplitCell(Cols, Rows);
+	this.CurFootnote.SplitTableCells(Cols, Rows);
 };
 CFootnotesController.prototype.RemoveTable = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return;
 
-	this.CurFootnote.Table_RemoveTable();
+	this.CurFootnote.RemoveTable();
 };
 CFootnotesController.prototype.SelectTable = function(Type)
 {
@@ -2723,8 +2730,8 @@ CFootnotesController.prototype.SelectTable = function(Type)
 
 	this.RemoveSelection();
 
-	this.CurFootnote.Table_Select(Type);
-	if (true === this.CurFootnote.Is_SelectionUse())
+	this.CurFootnote.SelectTable(Type);
+	if (true === this.CurFootnote.IsSelectionUse())
 	{
 		this.Selection.Use            = true;
 		this.Selection.Start.Footnote = this.CurFootnote;
@@ -2740,14 +2747,14 @@ CFootnotesController.prototype.CanMergeTableCells = function()
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Table_CheckMerge();
+	return this.CurFootnote.CanMergeTableCells();
 };
 CFootnotesController.prototype.CanSplitTableCells = function()
 {
 	if (false === this.private_CheckFootnotesSelectionBeforeAction())
 		return false;
 
-	return this.CurFootnote.Table_CheckSplit();
+	return this.CurFootnote.CanSplitTableCells();
 };
 CFootnotesController.prototype.UpdateInterfaceState = function()
 {
@@ -2761,13 +2768,13 @@ CFootnotesController.prototype.UpdateInterfaceState = function()
 		if (!Api)
 			return;
 
-		var ParaPr = this.GetCurrentParaPr();
+		var ParaPr = this.GetCalculatedParaPr();
 
 		if (undefined != ParaPr.Tabs)
 			Api.Update_ParaTab(AscCommonWord.Default_Tab_Stop, ParaPr.Tabs);
 
 		Api.UpdateParagraphProp(ParaPr);
-		Api.UpdateTextPr(this.GetCurrentTextPr());
+		Api.UpdateTextPr(this.GetCalculatedTextPr());
 	}
 };
 CFootnotesController.prototype.UpdateRulersState = function()
@@ -2797,11 +2804,11 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 			this.DrawingDocument.TargetEnd();
 			this.DrawingDocument.SetCurrentPage(this.LogicDocument.CurPage);
 		}
-		else if (false === this.IsEmptySelection())
+		else if (false === this.IsSelectionEmpty())
 		{
 			if (true !== this.LogicDocument.Selection.Start)
 			{
-				this.LogicDocument.Internal_CheckCurPage();
+				this.LogicDocument.private_CheckCurPage();
 				this.RecalculateCurPos();
 			}
 
@@ -2814,9 +2821,9 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 		else
 		{
 			if (true !== this.LogicDocument.Selection.Start)
-				this.LogicDocument.Selection_Remove();
+				this.LogicDocument.RemoveSelection();
 
-			this.LogicDocument.Internal_CheckCurPage();
+			this.LogicDocument.private_CheckCurPage();
 			this.RecalculateCurPos();
 			this.LogicDocument.private_UpdateTracks(true, true);
 
@@ -2827,8 +2834,8 @@ CFootnotesController.prototype.UpdateSelectionState = function()
 	}
 	else
 	{
-		this.LogicDocument.Selection_Remove();
-		this.LogicDocument.Internal_CheckCurPage();
+		this.LogicDocument.RemoveSelection();
+		this.LogicDocument.private_CheckCurPage();
 		this.RecalculateCurPos();
 		this.LogicDocument.private_UpdateTracks(false, false);
 
@@ -2855,7 +2862,7 @@ CFootnotesController.prototype.GetSelectionState = function()
 		oState.Footnotes[sId] =
 		{
 			Footnote : oFootnote,
-			State    : oFootnote.Get_SelectionState()
+			State    : oFootnote.GetSelectionState()
 		};
 	}
 
@@ -2876,41 +2883,41 @@ CFootnotesController.prototype.SetSelectionState = function(State, StateIndex)
 	for (var sId in oState.Footnotes)
 	{
 		this.Selection.Footnotes[sId] = oState.Footnotes[sId].Footnote;
-		this.Selection.Footnotes[sId].Set_SelectionState(oState.Footnotes[sId].State, oState.Footnotes[sId].State.length - 1);
+		this.Selection.Footnotes[sId].SetSelectionState(oState.Footnotes[sId].State, oState.Footnotes[sId].State.length - 1);
 	}
 };
 CFootnotesController.prototype.AddHyperlink = function(Props)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Hyperlink_Add(Props);
+		this.CurFootnote.AddHyperlink(Props);
 	}
 };
 CFootnotesController.prototype.ModifyHyperlink = function(Props)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Hyperlink_Modify(Props);
+		this.CurFootnote.ModifyHyperlink(Props);
 	}
 };
 CFootnotesController.prototype.RemoveHyperlink = function()
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Hyperlink_Remove();
+		this.CurFootnote.RemoveHyperlink();
 	}
 };
 CFootnotesController.prototype.CanAddHyperlink = function(bCheckInHyperlink)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
-		return this.CurFootnote.Hyperlink_CanAdd(bCheckInHyperlink);
+		return this.CurFootnote.CanAddHyperlink(bCheckInHyperlink);
 
 	return false;
 };
 CFootnotesController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
-		return this.CurFootnote.Hyperlink_Check(bCheckEnd);
+		return this.CurFootnote.IsCursorInHyperlink(bCheckEnd);
 
 	return null;
 };
@@ -2918,24 +2925,24 @@ CFootnotesController.prototype.AddComment = function(Comment)
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
 	{
-		this.CurFootnote.Add_Comment(Comment, true, true);
+		this.CurFootnote.AddComment(Comment, true, true);
 	}
 };
 CFootnotesController.prototype.CanAddComment = function()
 {
 	if (true !== this.IsSelectionUse() || true === this.private_IsOnFootnoteSelected())
-		return this.CurFootnote.CanAdd_Comment();
+		return this.CurFootnote.CanAddComment();
 
 	return false;
 };
 CFootnotesController.prototype.GetSelectionAnchorPos = function()
 {
 	if (true !== this.Selection.Use || 0 === this.Selection.Direction)
-		return this.CurFootnote.Get_SelectionAnchorPos();
+		return this.CurFootnote.GetSelectionAnchorPos();
 	else if (1 === this.Selection.Direction)
-		return this.Selection.Start.Footnote.Get_SelectionAnchorPos();
+		return this.Selection.Start.Footnote.GetSelectionAnchorPos();
 	else
-		return this.Selection.End.Footnote.Get_SelectionAnchorPos();
+		return this.Selection.End.Footnote.GetSelectionAnchorPos();
 };
 CFootnotesController.prototype.StartSelectionFromCurPos = function()
 {
@@ -2947,7 +2954,7 @@ CFootnotesController.prototype.StartSelectionFromCurPos = function()
 	this.Selection.End.Footnote   = this.CurFootnote;
 	this.Selection.Footnotes = {};
 	this.Selection.Footnotes[this.CurFootnote.Get_Id()] = this.CurFootnote;
-	this.CurFootnote.Start_SelectionFromCurPos();
+	this.CurFootnote.StartSelectionFromCurPos();
 };
 CFootnotesController.prototype.SaveDocumentStateBeforeLoadChanges   = function(State)
 {
@@ -2963,9 +2970,9 @@ CFootnotesController.prototype.SaveDocumentStateBeforeLoadChanges   = function(S
 
 		if (docpostype_Content === oFootnote.Get_DocPosType())
 		{
-			State.Pos      = oFootnote.Get_ContentPosition(false, false, undefined);
-			State.StartPos = oFootnote.Get_ContentPosition(true, true, undefined);
-			State.EndPos   = oFootnote.Get_ContentPosition(true, false, undefined);
+			State.Pos      = oFootnote.GetContentPosition(false, false, undefined);
+			State.StartPos = oFootnote.GetContentPosition(true, true, undefined);
+			State.EndPos   = oFootnote.GetContentPosition(true, false, undefined);
 		}
 		else if (docpostype_DrawingObjects === oFootnote.Get_DocPosType())
 		{
@@ -2977,16 +2984,16 @@ CFootnotesController.prototype.SaveDocumentStateBeforeLoadChanges   = function(S
 		State.FootnotesList  = this.private_GetSelectionArray();
 		var oFootnote        = State.FootnotesList[0];
 		State.FootnotesStart = {
-			Pos      : oFootnote.Get_ContentPosition(false, false, undefined),
-			StartPos : oFootnote.Get_ContentPosition(true, true, undefined),
-			EndPos   : oFootnote.Get_ContentPosition(true, false, undefined)
+			Pos      : oFootnote.GetContentPosition(false, false, undefined),
+			StartPos : oFootnote.GetContentPosition(true, true, undefined),
+			EndPos   : oFootnote.GetContentPosition(true, false, undefined)
 		};
 
 		oFootnote          = State.FootnotesList[State.FootnotesList.length - 1];
 		State.FootnotesEnd = {
-			Pos      : oFootnote.Get_ContentPosition(false, false, undefined),
-			StartPos : oFootnote.Get_ContentPosition(true, true, undefined),
-			EndPos   : oFootnote.Get_ContentPosition(true, false, undefined)
+			Pos      : oFootnote.GetContentPosition(false, false, undefined),
+			StartPos : oFootnote.GetContentPosition(true, true, undefined),
+			EndPos   : oFootnote.GetContentPosition(true, false, undefined)
 		};
 	}
 };
@@ -3013,12 +3020,12 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 				oFootnote.Selection.Use = State.CurFootnoteSelection;
 				if (true === oFootnote.Selection.Use)
 				{
-					oFootnote.Set_ContentPosition(State.StartPos, 0, 0);
-					oFootnote.Set_ContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
+					oFootnote.SetContentPosition(State.StartPos, 0, 0);
+					oFootnote.SetContentSelection(State.StartPos, State.EndPos, 0, 0, 0);
 				}
 				else
 				{
-					oFootnote.Set_ContentPosition(State.Pos, 0, 0);
+					oFootnote.SetContentPosition(State.Pos, 0, 0);
 					this.LogicDocument.NeedUpdateTarget = true;
 				}
 			}
@@ -3028,7 +3035,7 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 				if (true !== this.LogicDocument.DrawingObjects.Load_DocumentStateAfterLoadChanges(State))
 				{
 					oFootnote.Set_DocPosType(docpostype_Content);
-					this.LogicDocument.Cursor_MoveAt(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
+					this.LogicDocument.MoveCursorToXY(State.X ? State.X : 0, State.Y ? State.Y : 0, false);
 				}
 			}
 		}
@@ -3069,12 +3076,12 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 		{
 			if (null !== EndFootnote)
 			{
-				EndFootnote.Selection_Remove();
+				EndFootnote.RemoveSelection();
 				this.private_SetCurrentFootnoteNoSelection(EndFootnote);
 			}
 			else if (null !== StartFootnote)
 			{
-				StartFootnote.Selection_Remove();
+				StartFootnote.RemoveSelection();
 				this.private_SetCurrentFootnoteNoSelection(StartFootnote);
 			}
 			else
@@ -3097,20 +3104,20 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 			{
 				StartFootnote.Set_DocPosType(docpostype_Content);
 				StartFootnote.Selection.Use = true;
-				StartFootnote.Set_ContentPosition(State.FootnotesStart.Pos, 0, 0);
-				StartFootnote.Set_ContentSelection(State.FootnotesStart.StartPos, State.FootnotesStart.EndPos, 0, 0, 0);
+				StartFootnote.SetContentPosition(State.FootnotesStart.Pos, 0, 0);
+				StartFootnote.SetContentSelection(State.FootnotesStart.StartPos, State.FootnotesStart.EndPos, 0, 0, 0);
 			}
 			else if (arrFootnotesList[arrAllFootnotes.length - 1] === StartFootnote)
 			{
 				StartFootnote.Set_DocPosType(docpostype_Content);
 				StartFootnote.Selection.Use = true;
-				StartFootnote.Set_ContentPosition(State.FootnotesEnd.Pos, 0, 0);
-				StartFootnote.Set_ContentSelection(State.FootnotesEnd.StartPos, State.FootnotesEnd.EndPos, 0, 0, 0);
+				StartFootnote.SetContentPosition(State.FootnotesEnd.Pos, 0, 0);
+				StartFootnote.SetContentSelection(State.FootnotesEnd.StartPos, State.FootnotesEnd.EndPos, 0, 0, 0);
 			}
 			else
 			{
 				StartFootnote.Set_DocPosType(docpostype_Content);
-				StartFootnote.Select_All(1);
+				StartFootnote.SelectAll(1);
 			}
 		}
 		else
@@ -3122,7 +3129,7 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 			for (var nIndex = 1, nCount = arrNewFootnotesList.length; nIndex < nCount - 1; ++nIndex)
 			{
 				var oFootnote = arrNewFootnotesList[nIndex];
-				oFootnote.Select_All(this.Selection.Direction);
+				oFootnote.SelectAll(this.Selection.Direction);
 				this.Selection.Footnotes[oFootnote.Get_Id()] = oFootnote;
 			}
 
@@ -3134,26 +3141,26 @@ CFootnotesController.prototype.RestoreDocumentStateAfterLoadChanges = function(S
 			{
 				StartFootnote.Set_DocPosType(docpostype_Content);
 				StartFootnote.Selection.Use = true;
-				StartFootnote.Set_ContentPosition(State.FootnotesStart.Pos, 0, 0);
-				StartFootnote.Set_ContentSelection(State.FootnotesStart.StartPos, State.FootnotesStart.EndPos, 0, 0, 0);
+				StartFootnote.SetContentPosition(State.FootnotesStart.Pos, 0, 0);
+				StartFootnote.SetContentSelection(State.FootnotesStart.StartPos, State.FootnotesStart.EndPos, 0, 0, 0);
 			}
 			else
 			{
 				StartFootnote.Set_DocPosType(docpostype_Content);
-				StartFootnote.Select_All(1);
+				StartFootnote.SelectAll(1);
 			}
 
 			if (arrFootnotesList[arrFootnotesList.length - 1] === EndFootnote)
 			{
 				EndFootnote.Set_DocPosType(docpostype_Content);
 				EndFootnote.Selection.Use = true;
-				EndFootnote.Set_ContentPosition(State.FootnotesEnd.Pos, 0, 0);
-				EndFootnote.Set_ContentSelection(State.FootnotesEnd.StartPos, State.FootnotesEnd.EndPos, 0, 0, 0);
+				EndFootnote.SetContentPosition(State.FootnotesEnd.Pos, 0, 0);
+				EndFootnote.SetContentSelection(State.FootnotesEnd.StartPos, State.FootnotesEnd.EndPos, 0, 0, 0);
 			}
 			else
 			{
 				EndFootnote.Set_DocPosType(docpostype_Content);
-				EndFootnote.Select_All(1);
+				EndFootnote.SelectAll(1);
 			}
 
 			if (1 !== this.Selection.Direction)
@@ -3198,7 +3205,7 @@ CFootnotesController.prototype.RemoveTextSelection = function()
 		for (var sId in this.Selection.Footnotes)
 		{
 			if (this.Selection.Footnotes[sId] !== this.CurFootnote)
-				this.Selection.Footnotes[sId].Selection_Remove();
+				this.Selection.Footnotes[sId].RemoveSelection();
 		}
 
 		this.Selection.Use = false;
@@ -3217,6 +3224,13 @@ CFootnotesController.prototype.ResetRecalculateCache = function()
 	{
 		this.Footnote[Id].Reset_RecalculateCache();
 	}
+};
+CFootnotesController.prototype.AddContentControl = function(nContentControlType)
+{
+	if (this.CurFootnote)
+		return this.CurFootnote.AddContentControl(nContentControlType);
+
+	return null;
 };
 
 

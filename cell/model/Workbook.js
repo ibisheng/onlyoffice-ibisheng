@@ -238,6 +238,8 @@
 				return !(this.isTable &&
 				(AscCommon.c_oNotifyType.Shift === type || AscCommon.c_oNotifyType.Move === type ||
 				AscCommon.c_oNotifyType.Delete === type));
+			} else if (AscCommon.c_oNotifyParentType.IsDefName === type) {
+				return true;
 			} else if (AscCommon.c_oNotifyParentType.Change === type) {
 				this.wb.dependencyFormulas.addToChangedDefName(this);
 			} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
@@ -1357,6 +1359,7 @@
 		this.bUndoChanges = false;
 		this.bRedoChanges = false;
 		this.aCollaborativeChangeElements = [];
+		this.externalReferences = [];
 
 		this.wsHandlers = null;
 
@@ -2330,6 +2333,7 @@
 		this.aComments = [];
 		this.aCommentsCoords = [];
 		var oThis = this;
+		this.bExcludeHiddenRows = false;
 		this.mergeManager = new RangeDataManager(function(data, from, to){
 			if(History.Is_On() && (null != from || null != to))
 			{
@@ -2688,6 +2692,7 @@
 		return false;
 	};
 	Woorksheet.prototype._updateConditionalFormatting = function(range) {
+		var t = this;
 		var oGradient1, oGradient2;
 		var aCFs = this.aConditionalFormatting;
 		var aRules, oRule;
@@ -2907,6 +2912,28 @@
 										return rule.cellIs(val, v1, v2);
 									};
 								})(oRule, oRule.aRuleElements[0] && oRule.aRuleElements[0].getValue(this), oRule.aRuleElements[1] && oRule.aRuleElements[1].getValue(this));
+								break;
+							case AscCommonExcel.ECfType.expression:
+								var offset = {offsetRow: 0, offsetCol: 0};
+								var bboxCf = cf.getBBox();
+								var rowLT = bboxCf ? bboxCf.r1 : 0;
+								var colLT = bboxCf ? bboxCf.c1 : 0;
+								var formulaParent =  new AscCommonExcel.CConditionalFormattingFormulaWrapper(this, cf);
+								compareFunction = (function(rule, formulaCF) {
+									return function(val, c) {
+										offset.offsetRow = c.nRow - rowLT;
+										offset.offsetCol = c.nCol - colLT;
+										var bboxCell = new Asc.Range(c.nCol, c.nRow, c.nCol, c.nRow);
+										var res = formulaCF && formulaCF.getValueRaw(t, formulaParent, bboxCell, offset);
+										if(res && res.tocBool){
+											res = res.tocBool();
+											if(res && res.toBool) {
+												return res.toBool();
+											}
+										}
+										return false;
+									};
+								})(oRule, oRule.aRuleElements[0]);
 								break;
 							default:
 								continue;
@@ -4654,6 +4681,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		}
 		
 	};
+	Woorksheet.prototype.excludeHiddenRows = function (bExclude) {
+		this.bExcludeHiddenRows = bExclude;
+	};
 //-------------------------------------------------------------------------------------------------
 	/**
 	 * @constructor
@@ -4944,15 +4974,16 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		this.oValue.cleanCache();
 	};
 	Cell.prototype.setNumFormat=function(val){
-		var oRes;
-		/*if( val == aStandartNumFormats[0] &&
-		 this.formulaParsed && this.formulaParsed.value && this.formulaParsed.value.numFormat !== null &&
-		 this.formulaParsed.value.numFormat !== undefined && aStandartNumFormats[this.formulaParsed.value.numFormat] )
-		 oRes = this.ws.workbook.oStyleManager.setNumFormat(this, aStandartNumFormats[this.formulaParsed.value.numFormat]);
-		 else*/
-		oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, new AscCommonExcel.Num({f:val}));
 		if(History.Is_On() && oRes.oldVal != oRes.newVal)
-			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_Numformat, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_Num, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
+		this.compiledXfs = null;
+		this.oValue.cleanCache();
+	};
+	Cell.prototype.setNum=function(val){
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, val);
+		if(History.Is_On() && oRes.oldVal != oRes.newVal)
+			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_Num, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 		this.compiledXfs = null;
 		this.oValue.cleanCache();
 	};
@@ -4988,7 +5019,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		if(false != bModifyValue)
 		{
 			//убираем комплексные строки
-			if(null != this.oValue.multiText)
+			if(null != this.oValue.multiText && false == this.ws.workbook.bUndoChanges && false == this.ws.workbook.bRedoChanges)
 			{
 				var oldVal = null;
 				if(History.Is_On())
@@ -5286,7 +5317,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			var valueCalc = this.formulaParsed.value;
 			if (0 <= valueCalc.numFormat) {
 				if (aStandartNumFormatsId[this.getNumFormatStr()] == 0) {
-					this.setNumFormat(aStandartNumFormats[valueCalc.numFormat]);
+					this.setNum(new AscCommonExcel.Num({id: valueCalc.numFormat}));
 				}
 			} else if (AscCommonExcel.cNumFormatFirstCell === valueCalc.numFormat) {
 				// ищет в формуле первый рэндж и устанавливает формат ячейки как формат первой ячейки в рэндже
@@ -5314,7 +5345,7 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		if (AscCommon.c_oNotifyParentType.CanDo === type) {
 			return true;
 		} else if (AscCommon.c_oNotifyParentType.GetRangeCell === type) {
-			return this.ws.getCell3(this.nRow, this.nCol);
+			return new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow);
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
 			this.ws.workbook.dependencyFormulas.addToChangedCell(this);
 		} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
@@ -5335,7 +5366,6 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 	Cell.prototype._calculateRefType = function () {
 		var val = this.formulaParsed.value;
 		var nF = val.numFormat;
-		var ca = val.ca;
 		if (cElementType.cell === val.type || cElementType.cell3D === val.type) {
 			val = val.getValue();
 			if (cElementType.empty === val.type) {
@@ -5349,7 +5379,6 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			val = val.cross(new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), this.ws.getId());
 		}
 		val.numFormat = nF;
-		val.ca = ca;
 		this.formulaParsed.value = val;
 	};
 	Cell.prototype._updateCellValue = function() {
@@ -5426,6 +5455,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		{
 			var oBBox = this.bbox;
 			for(var i = oBBox.r1; i <= oBBox.r2; i++){
+				if (this.worksheet.bExcludeHiddenRows && this.worksheet.getRowHidden(i)) {
+					continue;
+				}
 				for(var j = oBBox.c1; j <= oBBox.c2; j++){
 					var oCurCell = this.worksheet._getCell(i, j);
 					action(oCurCell, i, j, oBBox.r1, oBBox.c1);
@@ -5438,6 +5470,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		{
 			var oBBox = this.bbox, minC = Math.min( this.worksheet.getColsCount(), oBBox.c2 ), minR = Math.min( this.worksheet.getRowsCount(), oBBox.r2 );
 			for(var i = oBBox.r1; i <= minR; i++){
+				if (this.worksheet.bExcludeHiddenRows && this.worksheet.getRowHidden(i)) {
+					continue;
+				}
 				for(var j = oBBox.c1; j <= minC; j++){
 					var oCurCell = this.worksheet._getCellNoEmpty(i, j);
 					var oRes = action(oCurCell, i, j, oBBox.r1, oBBox.c1);
@@ -5452,9 +5487,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		{
 			var oBBox = this.bbox, minC = Math.min( this.worksheet.getColsCount(), oBBox.c2 ), minR = Math.min( this.worksheet.getRowsCount(), oBBox.r2 );
 			for(var i = oBBox.r1; i <= minR; i++){
-			if (excludeHiddenRows && this.worksheet.getRowHidden(i)) {
-				continue;
-			}
+				if ((this.worksheet.bExcludeHiddenRows || excludeHiddenRows) && this.worksheet.getRowHidden(i)) {
+					continue;
+				}
 				for(var j = oBBox.c1; j <= minC; j++){
 					var oCurCell = this.worksheet._getCellNoEmpty(i, j);
 					if(null != oCurCell)
@@ -5494,6 +5529,9 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			for(var i in aRows)
 			{
 				var row = aRows[i];
+				if (this.worksheet.bExcludeHiddenRows && row.getHidden()) {
+					continue;
+				}
 				if( null != actionRow )
 				{
 					var oRes = actionRow(row);
@@ -5519,6 +5557,10 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 				var row = this.worksheet._getRowNoEmpty(i);
 				if(row)
 				{
+					if (this.worksheet.bExcludeHiddenRows && row.getHidden()) {
+						continue;
+					}
+
 					if( null != actionRow )
 					{
 						var oRes = actionRow(row);
@@ -8627,6 +8669,11 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 				oPromoteHelper.setIndex(i - nStartRow);
 				for(var j = nStartCol; (nStartCol - j) * (nEndCol - j) <= 0; j += nColDx)
 				{
+					if (bVertical && wsTo.bExcludeHiddenRows && wsTo.getRowHidden(j))
+					{
+						continue;
+					}
+
 					var data = oPromoteHelper.getNext();
 					if(null != data && (data.oAdditional || (false == bCopy && null != data.nCurValue)))
 					{

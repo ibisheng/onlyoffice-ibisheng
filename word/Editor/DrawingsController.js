@@ -21,7 +21,7 @@ function CDrawingsController(LogicDocument, DrawingsObjects)
 CDrawingsController.prototype = Object.create(CDocumentControllerBase.prototype);
 CDrawingsController.prototype.constructor = CDrawingsController;
 
-CDrawingsController.prototype.CanTargetUpdate = function()
+CDrawingsController.prototype.CanUpdateTarget = function()
 {
 	return true;
 };
@@ -45,6 +45,10 @@ CDrawingsController.prototype.AddInlineImage = function(nW, nH, oImage, oChart, 
 {
 	return this.DrawingObjects.addInlineImage(nW, nH, oImage, oChart, bFlow);
 };
+CDrawingsController.prototype.AddSignatureLine = function(oSignatureDrawing)
+{
+	return this.DrawingObjects.addSignatureLine(oSignatureDrawing);
+};
 CDrawingsController.prototype.AddOleObject = function(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId)
 {
 	this.DrawingObjects.addOleObject(W, H, nWidthPix, nHeightPix, Img, Data, sApplicationId);
@@ -67,7 +71,7 @@ CDrawingsController.prototype.ClearParagraphFormatting = function()
 };
 CDrawingsController.prototype.AddToParagraph = function(oItem, bRecalculate)
 {
-	if (para_NewLine === oItem.Type && true === oItem.Is_PageOrColumnBreak())
+	if (para_NewLine === oItem.Type && true === oItem.IsPageOrColumnBreak())
 		return;
 
 	this.DrawingObjects.paragraphAdd(oItem, bRecalculate);
@@ -228,11 +232,11 @@ CDrawingsController.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
 	// Не добавляем и не работаем с рамками в автофигурах
 };
-CDrawingsController.prototype.IncreaseOrDecreaseParagraphFontSize = function(bIncrease)
+CDrawingsController.prototype.IncreaseDecreaseFontSize = function(bIncrease)
 {
 	this.DrawingObjects.paragraphIncDecFontSize(bIncrease);
 };
-CDrawingsController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncrease)
+CDrawingsController.prototype.IncreaseDecreaseIndent = function(bIncrease)
 {
 	if (true != this.DrawingObjects.isSelectedText())
 	{
@@ -240,7 +244,7 @@ CDrawingsController.prototype.IncreaseOrDecreaseParagraphIndent = function(bIncr
 		if (null != ParaDrawing)
 		{
 			var Paragraph = ParaDrawing.Parent;
-			Paragraph.IncDec_Indent(bIncrease);
+			Paragraph.IncreaseDecreaseIndent(bIncrease);
 		}
 	}
 	else
@@ -256,11 +260,11 @@ CDrawingsController.prototype.SetTableProps = function(Props)
 {
 	this.DrawingObjects.setTableProps(Props);
 };
-CDrawingsController.prototype.GetCurrentParaPr = function()
+CDrawingsController.prototype.GetCalculatedParaPr = function()
 {
 	return this.DrawingObjects.getParagraphParaPr();
 };
-CDrawingsController.prototype.GetCurrentTextPr = function()
+CDrawingsController.prototype.GetCalculatedTextPr = function()
 {
 	return this.DrawingObjects.getParagraphTextPr();
 };
@@ -281,7 +285,7 @@ CDrawingsController.prototype.RemoveSelection = function(bNoCheckDrawing)
 	}
 	return this.DrawingObjects.resetSelection(undefined, bNoCheckDrawing);
 };
-CDrawingsController.prototype.IsEmptySelection = function(bCheckHidden)
+CDrawingsController.prototype.IsSelectionEmpty = function(bCheckHidden)
 {
 	return false;
 };
@@ -292,7 +296,7 @@ CDrawingsController.prototype.DrawSelectionOnPage = function(PageAbs)
 };
 CDrawingsController.prototype.GetSelectionBounds = function()
 {
-	return this.DrawingObjects.Get_SelectionBounds();
+	return this.DrawingObjects.GetSelectionBounds();
 };
 CDrawingsController.prototype.IsMovingTableBorder = function()
 {
@@ -308,7 +312,7 @@ CDrawingsController.prototype.SelectAll = function()
 };
 CDrawingsController.prototype.GetSelectedContent = function(SelectedContent)
 {
-	this.DrawingObjects.Get_SelectedContent(SelectedContent);
+	this.DrawingObjects.GetSelectedContent(SelectedContent);
 };
 CDrawingsController.prototype.UpdateCursorType = function(X, Y, PageAbs, MouseEvent)
 {
@@ -347,7 +351,7 @@ CDrawingsController.prototype.AddTableRow = function(bBefore)
 {
 	this.DrawingObjects.tableAddRow(bBefore);
 };
-CDrawingsController.prototype.AddTableCol = function(bBefore)
+CDrawingsController.prototype.AddTableColumn = function(bBefore)
 {
 	this.DrawingObjects.tableAddCol(bBefore);
 };
@@ -355,7 +359,7 @@ CDrawingsController.prototype.RemoveTableRow = function()
 {
 	this.DrawingObjects.tableRemoveRow();
 };
-CDrawingsController.prototype.RemoveTableCol = function()
+CDrawingsController.prototype.RemoveTableColumn = function()
 {
 	this.DrawingObjects.tableRemoveCol();
 };
@@ -441,13 +445,13 @@ CDrawingsController.prototype.IsCursorInHyperlink = function(bCheckEnd)
 };
 CDrawingsController.prototype.AddComment = function(Comment)
 {
-	if (true != this.DrawingObjects.isSelectedText())
+	if (true !== this.DrawingObjects.isSelectedText())
 	{
 		var ParaDrawing = this.DrawingObjects.getMajorParaDrawing();
 		if (null != ParaDrawing)
 		{
 			var Paragraph = ParaDrawing.Parent;
-			Paragraph.Add_Comment2(Comment, ParaDrawing.Get_Id());
+			Paragraph.AddCommentToObject(Comment, ParaDrawing.Get_Id());
 		}
 	}
 	else
@@ -495,7 +499,7 @@ CDrawingsController.prototype.RestoreDocumentStateAfterLoadChanges = function(St
 
 		ContentPos = Math.max(0, Math.min(LogicDocument.Content.length - 1, ContentPos));
 		LogicDocument.CurPos.ContentPos = ContentPos;
-		LogicDocument.Content[ContentPos].Cursor_MoveToStartPos(false);
+		LogicDocument.Content[ContentPos].MoveCursorToStartPos(false);
 	}
 };
 CDrawingsController.prototype.GetColumnSize = function()
@@ -517,4 +521,7 @@ CDrawingsController.prototype.RemoveTextSelection = function()
 {
 	this.DrawingObjects.removeTextSelection();
 };
-
+CDrawingsController.prototype.AddContentControl = function(nContentControlType)
+{
+	return this.DrawingObjects.AddContentControl(nContentControlType);
+};

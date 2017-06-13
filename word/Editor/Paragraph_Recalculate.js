@@ -63,7 +63,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
         return [];
 
     // Если изменения происходят в специальном пустом параграфе-конце секции, тогда запускаем обычный пересчет
-    if ( this.LogicDocument && true === this.LogicDocument.Pages[this.Get_StartPage_Absolute()].Check_EndSectionPara(this))
+    if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Pages[this.Get_StartPage_Absolute()].Check_EndSectionPara(this))
         return [];
 
     // Если параграф - рамка с автошириной, надо пересчитывать по обычному
@@ -395,7 +395,7 @@ Paragraph.prototype.Recalculate_SkipPage = function(PageIndex)
 {
     if (0 === PageIndex)
     {
-        this.Start_FromNewPage();
+        this.StartFromNewPage();
     }
     else
     {
@@ -415,18 +415,18 @@ Paragraph.prototype.Recalculate_SkipPage = function(PageIndex)
  * Функция для сохранения объекта пересчета.
  * @returns {*} Возвращается объект (CParagraphRecalculateObject) с информацией о текущем пересчете параграфа
  */
-Paragraph.prototype.Save_RecalculateObject = function()
+Paragraph.prototype.SaveRecalculateObject = function()
 {
-    var RecalcObj = new CParagraphRecalculateObject();
-    RecalcObj.Save(this);
-    return RecalcObj;
+	var RecalcObj = new CParagraphRecalculateObject();
+	RecalcObj.Save(this);
+	return RecalcObj;
 };
 
 /**
  * Загрузка сохраненного раннее пересчета.
  * @param RecalcObj (CParagraphRecalculateObject)
  */
-Paragraph.prototype.Load_RecalculateObject = function(RecalcObj)
+Paragraph.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load(this);
 };
@@ -434,22 +434,22 @@ Paragraph.prototype.Load_RecalculateObject = function(RecalcObj)
 /**
  * Очистка рассчетных классов параграфа.
  */
-Paragraph.prototype.Prepare_RecalculateObject = function()
+Paragraph.prototype.PrepareRecalculateObject = function()
 {
-    this.Pages = [];
-    this.Lines = [];
+	this.Pages = [];
+	this.Lines = [];
 
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        this.Content[Index].Prepare_RecalculateObject();
-    }
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		this.Content[Index].PrepareRecalculateObject();
+	}
 };
 
 /**
  * Пересчитываем первую страницу параграфа так, чтобы он начинался с новой страницы.
  */
-Paragraph.prototype.Start_FromNewPage = function()
+Paragraph.prototype.StartFromNewPage = function()
 {
     this.Pages.length = 1;
     this.Pages[0] = new CParaPage(this.X, this.Y, this.XLimit, this.YLimit, 0);
@@ -543,7 +543,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
 
         PRS.Update_CurPos( Pos, 0 );
 
-        var SavedLines = Item.Save_RecalculateObject(true);
+        var SavedLines = Item.SaveRecalculateObject(true);
 
         Item.Recalculate_Range( PRS, ParaPr, 1 );
 
@@ -562,7 +562,7 @@ Paragraph.prototype.private_RecalculateFastRange       = function(CurRange, CurL
         if (false === SavedLines.Compare(CurLine, CurRange, Item))
             return -1;
 
-        Item.Load_RecalculateObject(SavedLines, this);
+        Item.LoadRecalculateObject(SavedLines, this);
     }
 
     // TODO: Здесь пересчеты идут целиком для строки, а не для конкретного отрезка.
@@ -1674,7 +1674,8 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
 
         PRSC.Reset( this, Range );
 
-        PRSC.Range.W = 0;
+		PRSC.Range.W    = 0;
+		PRSC.Range.WEnd = 0;
         if ( true === this.Numbering.Check_Range(CurRange, CurLine) )
             PRSC.Range.W += this.Numbering.WidthVisible;
 
@@ -2085,7 +2086,7 @@ Paragraph.prototype.private_CheckColumnBreak = function(CurPage)
 
     if (Line.Info & paralineinfo_BreakPage && !(Line.Info & paralineinfo_BreakRealPage))
     {
-        if (this.LogicDocument)
+        if (this.bFromDocument && this.LogicDocument)
             this.LogicDocument.OnColumnBreak_WhileRecalculate();
     }
 };
@@ -2453,6 +2454,7 @@ function CParaLineRange(X, XEnd)
     this.EndPos    = 0;    // Позиция в контенте параграфа, на которой заканчиваетсяданный отрезок
     this.W         = 0;
     this.Spaces    = 0;    // Количество пробелов в отрезке, без учета пробелов в конце отрезка
+	this.WEnd      = 0;    // Если есть знак конца параграфа в данном отрезке, то это его ширина
 }
 
 CParaLineRange.prototype =
@@ -2987,7 +2989,7 @@ CParagraphRecalculateStateWrap.prototype =
 
             NumberingItem.Bullet = Bullet;
             NumberingItem.BulletNum = BulletNum + 1;
-            NumberingItem.Measure(g_oTextMeasurer, FirstTextPr, Para.Get_Theme());
+            NumberingItem.Measure(g_oTextMeasurer, FirstTextPr, Para.Get_Theme(), Para.Get_ColorMap());
 
 
             if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
@@ -3165,12 +3167,12 @@ CParagraphRecalculateStateInfo.prototype =
         }
     },
 
-    Add_Comment : function(Id)
+	AddComment : function(Id)
     {
         this.Comments.push( Id );
     },
 
-    Remove_Comment : function(Id)
+	RemoveComment : function(Id)
     {
         var CommentsLen = this.Comments.length;
         for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
@@ -3212,7 +3214,7 @@ CParagraphRecalculateObject.prototype =
         var Count = Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            this.Content[Index] = Content[Index].Save_RecalculateObject();
+            this.Content[Index] = Content[Index].SaveRecalculateObject();
         }
     },
 
@@ -3229,7 +3231,7 @@ CParagraphRecalculateObject.prototype =
         var Count = Para.Content.length;
         for ( var Index = 0; Index < Count; Index++ )
         {
-            Para.Content[Index].Load_RecalculateObject(this.Content[Index], Para);
+            Para.Content[Index].LoadRecalculateObject(this.Content[Index], Para);
         }
     },
 

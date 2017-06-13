@@ -324,15 +324,15 @@ function CComment(Parent, Data)
         if ( ObjStart === ObjEnd )
         {
             if ( null != ObjStart )
-                ObjStart.Remove_CommentMarks( this.Id );
+                ObjStart.RemoveCommentMarks( this.Id );
         }
         else
         {
             if ( null != ObjStart )
-                ObjStart.Remove_CommentMarks( this.Id );
+                ObjStart.RemoveCommentMarks( this.Id );
 
             if ( null != ObjEnd )
-                ObjEnd.Remove_CommentMarks( this.Id );
+                ObjEnd.RemoveCommentMarks( this.Id );
         }
     };
 
@@ -459,7 +459,7 @@ function CComment(Parent, Data)
 		}
 
         if ( false === bUse )
-            editor.WordControl.m_oLogicDocument.Remove_Comment( this.Id, true, false );
+            editor.WordControl.m_oLogicDocument.RemoveComment( this.Id, true, false );
     };
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
@@ -468,6 +468,13 @@ function CComment(Parent, Data)
 CComment.prototype.GetData = function()
 {
 	return this.Data;
+};
+CComment.prototype.IsSolved = function()
+{
+	if (this.Data)
+		return this.Data.IsSolved();
+
+	return false;
 };
 
 var comments_NoComment        = 0;
@@ -478,7 +485,8 @@ function CComments()
 {
     this.Id     = AscCommon.g_oIdCounter.Get_NewId();
 
-    this.m_bUse         = false; // Используются ли комментарии
+    this.m_bUse       = false; // Используются ли комментарии
+	this.m_bUseSolved = false; // Использовать ли разрешенные комментарии
 
     this.m_aComments    = {};    // ассоциативный  массив
     this.m_sCurrent     = null;  // текущий комментарий
@@ -608,7 +616,7 @@ function CComments()
         for (var Id in this.m_aComments)
         {
         	if (!arrAllParagraphs && editor && editor.WordControl.m_oLogicDocument)
-        		arrAllParagraphs = editor.WordControl.m_oLogicDocument.Get_AllParagraphs({All : true});
+        		arrAllParagraphs = editor.WordControl.m_oLogicDocument.GetAllParagraphs({All : true});
 
             this.m_aComments[Id].Check_MergeData(arrAllParagraphs);
         }
@@ -628,6 +636,14 @@ function CComments()
 CComments.prototype.GetAllComments = function()
 {
 	return this.m_aComments;
+};
+CComments.prototype.SetUseSolved = function(isUse)
+{
+	this.m_bUseSolved = isUse;
+};
+CComments.prototype.IsUseSolved = function()
+{
+	return this.m_bUseSolved;
 };
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -723,7 +739,7 @@ ParaComment.prototype =
     {
     },
 
-    Collect_DocumentStatistics : function(ParaStats)
+	CollectDocumentStatistics : function(ParaStats)
     {
     },
 
@@ -735,7 +751,7 @@ ParaComment.prototype =
     {
     },
 
-    Get_SelectedText : function(bAll, bClearText, oPr)
+	GetSelectedText : function(bAll, bClearText, oPr)
     {        
         return "";
     },
@@ -860,18 +876,18 @@ ParaComment.prototype =
     Recalculate_PageEndInfo : function(PRSI, _CurLine, _CurRange)
     {
         if ( true === this.Start )
-            PRSI.Add_Comment( this.CommentId );
+            PRSI.AddComment( this.CommentId );
         else
-            PRSI.Remove_Comment( this.CommentId );
+            PRSI.RemoveComment( this.CommentId );
     },
 
-    Save_RecalculateObject : function(Copy)
-    {
-        var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
-        return RecalcObj;
-    },
+	SaveRecalculateObject : function(Copy)
+	{
+		var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+		return RecalcObj;
+	},
 
-    Load_RecalculateObject : function(RecalcObj, Parent)
+	LoadRecalculateObject : function(RecalcObj, Parent)
     {
         this.StartLine  = RecalcObj.StartLine;
         this.StartRange = RecalcObj.StartRange;
@@ -884,7 +900,7 @@ ParaComment.prototype =
         Comment.m_oStartInfo.PageNum = PageNum;
     },
 
-    Prepare_RecalculateObject : function()
+	PrepareRecalculateObject : function()
     {
     },
 
@@ -916,7 +932,7 @@ ParaComment.prototype =
         return { X : X };
     },
 
-    Recalculate_MinMaxContentWidth : function()
+	RecalculateMinMaxContentWidth : function()
     {
 
     },
@@ -944,9 +960,9 @@ ParaComment.prototype =
     Draw_HighLights : function(PDSH)
     {
         if ( true === this.Start )
-            PDSH.Add_Comment( this.CommentId );
+            PDSH.AddComment( this.CommentId );
         else
-            PDSH.Remove_Comment( this.CommentId );
+            PDSH.RemoveComment( this.CommentId );
     },
 
     Draw_Elements : function(PDSE)
@@ -979,11 +995,11 @@ ParaComment.prototype =
         return true;
     },
 
-    Cursor_MoveToStartPos : function()
+	MoveCursorToStartPos : function()
     {
     },
 
-    Cursor_MoveToEndPos : function(SelectFromEnd)
+	MoveCursorToEndPos : function(SelectFromEnd)
     {
     },
 
@@ -1081,15 +1097,11 @@ ParaComment.prototype =
     {
     },
 
-    Selection_Stop : function()
+	RemoveSelection : function()
     {
     },
 
-    Selection_Remove : function()
-    {
-    },
-
-    Select_All : function(Direction)
+	SelectAll : function(Direction)
     {
     },
 
@@ -1097,7 +1109,7 @@ ParaComment.prototype =
     {
     },
 
-    Selection_IsEmpty : function(CheckEnd)
+	IsSelectionEmpty : function(CheckEnd)
     {
         return true;
     },
@@ -1107,7 +1119,7 @@ ParaComment.prototype =
         return false;
     },
 
-    Is_SelectedAll : function(Props)
+	IsSelectedAll : function(Props)
     {
         return true;
     },
@@ -1171,6 +1183,10 @@ ParaComment.prototype.GetCommentId = function()
 ParaComment.prototype.IsCommentStart = function()
 {
 	return this.Start;
+};
+ParaComment.prototype.IsStopCursorOnEntryExit = function()
+{
+	return false;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Разное

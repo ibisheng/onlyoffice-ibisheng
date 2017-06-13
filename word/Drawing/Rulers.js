@@ -2223,7 +2223,7 @@ function CHorRuler()
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphTabs);
-            this.m_oWordControl.m_oLogicDocument.Set_ParagraphTabs(_arr);
+            this.m_oWordControl.m_oLogicDocument.SetParagraphTabs(_arr);
         }
     }
 
@@ -2232,7 +2232,7 @@ function CHorRuler()
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphIndentFromRulers);
-            this.m_oWordControl.m_oLogicDocument.Set_ParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
+            this.m_oWordControl.m_oLogicDocument.SetParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
                 FirstLine: (this.m_dIndentLeftFirst - this.m_dIndentLeft) } );
             this.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
         }
@@ -2244,7 +2244,7 @@ function CHorRuler()
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetDocumentMargin_Hor);
             this.m_oWordControl.m_oLogicDocument.Set_DocumentMargin( { Left : this.m_dMarginLeft, Right : this.m_dMarginRight });
         }
-        //oWordControl.m_oLogicDocument.Set_ParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
+        //oWordControl.m_oLogicDocument.SetParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
         //    FirstLine: (this.m_dIndentLeftFirst - this.m_dIndentLeft) } );
     }
 

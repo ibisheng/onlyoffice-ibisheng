@@ -481,7 +481,6 @@
         if (null == canvas) {return;}
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
-        //this.initContextSmoothing();
     };
 
     /**
@@ -624,25 +623,6 @@
         }
         return this;
     };
-
-    /**
-     * Delete smoothing
-     */
-    /*DrawingContext.prototype.initContextSmoothing = function () {
-     var ctx = this.ctx;
-     if (!AscBrowser.isMobileVersion || null === ctx)
-     return;
-
-     // Не убирать. Баг на android при scroll!!!
-     if (ctx.imageSmoothingEnabled)
-     ctx.imageSmoothingEnabled = false;
-     if (ctx.mozImageSmoothingEnabled)
-     ctx.mozImageSmoothingEnabled = false;
-     if (ctx.oImageSmoothingEnabled)
-     ctx.oImageSmoothingEnabled = false;
-     if (ctx.webkitImageSmoothingEnabled)
-     ctx.webkitImageSmoothingEnabled = false;
-     };*/
 
     // Canvas methods
 
@@ -1003,33 +983,8 @@
         var _g = this.fillColor.g;
         var _b = this.fillColor.b;
 
-        if (AscCommon.AscBrowser.isMobileVersion) {
-            // Special for iPad (5.1)
-
-            if (!_r && !_g && !_b) {
-                this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
-            } else {
-                var canvD = $("<canvas width='"+nW+"' height='"+nH+"'/>")[0];
-                var ctxD = canvD.getContext("2d");
-                var pixDst = ctxD.getImageData(0, 0, nW, nH);
-                var dstP = pixDst.data;
-                var data = pGlyph.oBitmap.oGlyphData.m_oContext.getImageData(0, 0, nW, nH);
-                var dataPx = data.data;
-                var cur = 0;
-                var cnt = 4 * nW * nH;
-                for (var i = 3; i < cnt; i += 4) {
-                    dstP[cur++] = _r;
-                    dstP[cur++] = _g;
-                    dstP[cur++] = _b;
-                    dstP[cur++] = dataPx[i];
-                }
-                ctxD.putImageData(pixDst, 0, 0, 0, 0, nW, nH);
-                this.ctx.drawImage(canvD, 0, 0, nW, nH, nX, nY, nW, nH);
-            }
-        } else {
-            pGlyph.oBitmap.oGlyphData.checkColor(_r, _g, _b, nW, nH);
-            pGlyph.oBitmap.draw(this.ctx, nX, nY);
-        }
+		pGlyph.oBitmap.oGlyphData.checkColor(_r, _g, _b, nW, nH);
+		pGlyph.oBitmap.draw(this.ctx, nX, nY);
     };
 
     DrawingContext.prototype.fillText = function (text, x, y, maxWidth, charWidths, angle) {

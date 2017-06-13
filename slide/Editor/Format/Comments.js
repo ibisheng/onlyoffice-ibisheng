@@ -136,7 +136,7 @@ ParaComment.prototype =
     {
     },
 
-    Collect_DocumentStatistics : function(ParaStats)
+	CollectDocumentStatistics : function(ParaStats)
     {
     },
 
@@ -148,7 +148,7 @@ ParaComment.prototype =
     {
     },
 
-    Get_SelectedText : function(bAll, bClearText)
+	GetSelectedText : function(bAll, bClearText)
     {
         return "";
     },
@@ -242,15 +242,15 @@ ParaComment.prototype =
     {
     },
 
-    Save_RecalculateObject : function(Copy)
+    SaveRecalculateObject : function(Copy)
     {
     },
 
-    Load_RecalculateObject : function(RecalcObj, Parent)
+    LoadRecalculateObject : function(RecalcObj, Parent)
     {
     },
 
-    Prepare_RecalculateObject : function()
+    PrepareRecalculateObject : function()
     {
     },
 
@@ -282,7 +282,7 @@ ParaComment.prototype =
         return { X : X };
     },
 
-    Recalculate_MinMaxContentWidth : function()
+	RecalculateMinMaxContentWidth : function()
     {
 
     },
@@ -331,11 +331,11 @@ ParaComment.prototype =
         return true;
     },
 
-    Cursor_MoveToStartPos : function()
+	MoveCursorToStartPos : function()
     {
     },
 
-    Cursor_MoveToEndPos : function(SelectFromEnd)
+	MoveCursorToEndPos : function(SelectFromEnd)
     {
     },
 
@@ -433,15 +433,11 @@ ParaComment.prototype =
     {
     },
 
-    Selection_Stop : function()
+	RemoveSelection : function()
     {
     },
 
-    Selection_Remove : function()
-    {
-    },
-
-    Select_All : function(Direction)
+	SelectAll : function(Direction)
     {
     },
 
@@ -449,7 +445,7 @@ ParaComment.prototype =
     {
     },
 
-    Selection_IsEmpty : function(CheckEnd)
+	IsSelectionEmpty : function(CheckEnd)
     {
         return true;
     },
@@ -459,7 +455,7 @@ ParaComment.prototype =
         return false;
     },
 
-    Is_SelectedAll : function(Props)
+	IsSelectedAll : function(Props)
     {
         return true;
     },
@@ -999,15 +995,15 @@ CComment.prototype =
         if ( Para_start === Para_end )
         {
             if ( null != Para_start )
-                Para_start.Remove_CommentMarks( this.Id );
+                Para_start.RemoveCommentMarks( this.Id );
         }
         else
         {
             if ( null != Para_start )
-                Para_start.Remove_CommentMarks( this.Id );
+                Para_start.RemoveCommentMarks( this.Id );
 
             if ( null != Para_end )
-                Para_end.Remove_CommentMarks( this.Id );
+                Para_end.RemoveCommentMarks( this.Id );
         }
     },
 
@@ -1109,7 +1105,7 @@ CComment.prototype =
         }
 
         if ( false === bUse )
-            editor.WordControl.m_oLogicDocument.Remove_Comment( this.Id, true );
+            editor.WordControl.m_oLogicDocument.RemoveComment( this.Id, true );
     }
 };
 

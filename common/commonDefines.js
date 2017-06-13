@@ -206,6 +206,12 @@
 		Save : 2
 	};
 
+	var c_oAscRestrictionType = {
+		None : 0,
+		OnlyForms : 1,
+		OnlyComments : 2
+	};
+
 	// Режимы отрисовки
 	var c_oAscFontRenderingModeType = {
 		noHinting             : 1,
@@ -841,7 +847,8 @@
 		Change: 1,
 		ChangeFormula: 2,
 		EndCalculate: 3,
-		GetRangeCell: 4
+		GetRangeCell: 4,
+		IsDefName: 5
 	};
 
 	var c_oDashType = {
@@ -1061,6 +1068,7 @@
 	var changestype_Layout               = 71;
 	var changestype_AddShape             = 72;
 	var changestype_AddShapes            = 73;
+	var changestype_PresDefaultLang      = 74;
 
 	var changestype_2_InlineObjectMove       = 1; // Передвигаем объект в заданную позцию (проверяем место, в которое пытаемся передвинуть)
 	var changestype_2_HdrFtr                 = 2; // Изменения с колонтитулом
@@ -1074,7 +1082,38 @@
 
 
 	var offlineMode = '_offline_';
+	
+	var c_oSpecialPasteProps = {
+		paste: 0,
+		pasteOnlyFormula: 1,
+		formulaNumberFormat: 2,
+		formulaAllFormatting: 3,
+		formulaWithoutBorders: 4, 
+		formulaColumnWidth: 5,
+		mergeConditionalFormating: 6, 
+		pasteOnlyValues: 7,
+		valueNumberFormat: 8,
+		valueAllFormating: 9,
+		pasteOnlyFormating: 10,
+		transpose: 11,
+		link: 12,
+		picture: 13,
+		linkedPicture: 14,
 
+		sourceformatting: 15,
+		destinationFormatting: 16,
+		
+		mergeFormatting: 17,
+
+		uniteList: 18,
+		doNotUniteList: 19,
+
+		insertAsNestedTable: 20,
+		uniteIntoTable: 21,
+		insertAsNewRows: 22,
+		keepTextOnly: 23
+	};
+	
 	//------------------------------------------------------------export--------------------------------------------------
 	var prot;
 	window['Asc']                          = window['Asc'] || {};
@@ -1645,6 +1684,11 @@
 	prot['Top']    = c_oAscMathInterfaceGroupCharPos.Top;
 	prot['Bottom'] = c_oAscMathInterfaceGroupCharPos.Bottom;
 
+	prot = window['Asc']['c_oAscRestrictionType'] = window['Asc'].c_oAscRestrictionType = c_oAscRestrictionType;
+	prot['None'] = c_oAscRestrictionType.None;
+	prot['OnlyForms'] = c_oAscRestrictionType.OnlyForms;
+	prot['OnlyComments'] = c_oAscRestrictionType.OnlyComments;
+
     window['AscCommon']                             = window['AscCommon'] || {};
 	window["AscCommon"].g_cCharDelimiter            = g_cCharDelimiter;
 	window["AscCommon"].g_cGeneralFormat            = g_cGeneralFormat;
@@ -1719,6 +1763,7 @@
 	window["AscCommon"].changestype_Layout                   = changestype_Layout;
 	window["AscCommon"].changestype_AddShape                 = changestype_AddShape;
 	window["AscCommon"].changestype_AddShapes                = changestype_AddShapes;
+	window["AscCommon"].changestype_PresDefaultLang          = changestype_PresDefaultLang;
 	window["AscCommon"].changestype_2_InlineObjectMove       = changestype_2_InlineObjectMove;
 	window["AscCommon"].changestype_2_HdrFtr                 = changestype_2_HdrFtr;
 	window["AscCommon"].changestype_2_Comment                = changestype_2_Comment;
@@ -1729,7 +1774,31 @@
 	window["AscCommon"].contentchanges_Remove                = contentchanges_Remove;
 
 	window["AscCommon"].offlineMode = offlineMode;
-
+	
+	window['Asc']['c_oSpecialPasteProps'] = window['Asc'].c_oSpecialPasteProps = c_oSpecialPasteProps;
+	prot = c_oSpecialPasteProps;
+	prot['paste'] = prot.paste;
+	prot['pasteOnlyFormula'] = prot.pasteOnlyFormula;
+	prot['formulaNumberFormat'] = prot.formulaNumberFormat;
+	prot['formulaAllFormatting'] = prot.formulaAllFormatting;
+	prot['formulaWithoutBorders'] = prot.formulaWithoutBorders;
+	prot['formulaColumnWidth'] = prot.formulaColumnWidth;
+	prot['mergeConditionalFormating'] = prot.mergeConditionalFormating;
+	prot['pasteOnlyValues'] = prot.pasteOnlyValues;
+	prot['valueNumberFormat'] = prot.valueNumberFormat;
+	prot['valueAllFormating'] = prot.valueAllFormating;
+	prot['pasteOnlyFormating'] = prot.pasteOnlyFormating;
+	prot['transpose'] = prot.transpose;
+	prot['link'] = prot.link;
+	prot['picture'] = prot.picture;
+	prot['linkedPicture'] = prot.linkedPicture;
+	prot['sourceformatting'] = prot.sourceformatting;
+	prot['destinationFormatting'] = prot.destinationFormatting;
+	prot['mergeFormatting'] = prot.mergeFormatting;
+	prot['uniteList'] = prot.uniteList;
+	prot['doNotUniteList'] = prot.doNotUniteList;
+	prot['keepTextOnly'] = prot.keepTextOnly;
+	
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =
 		{

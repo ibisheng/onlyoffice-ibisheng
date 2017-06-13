@@ -2764,11 +2764,11 @@ CStyle.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 
@@ -3107,12 +3107,12 @@ CStyle.prototype =
             if (this.Id != Styles.Default.Paragraph)
             {
                 var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
                 LogicDocument.Add_ChangedStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
                 LogicDocument.Add_ChangedStyle([this.Id]);
             }
 
@@ -4303,11 +4303,11 @@ CStyles.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 
@@ -4351,11 +4351,11 @@ CStyles.prototype =
             if (StyleId != this.Default.Paragraph)
             {
                 var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
             }
 
             var Count = AllParagraphs.length;
@@ -4384,11 +4384,11 @@ CStyles.prototype =
             if (StyleId != this.Default.Paragraph)
             {
                 var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
             }
 
             var Count = AllParagraphs.length;
@@ -9340,8 +9340,27 @@ CParaPr.prototype =
             this.DefaultRunPr.Merge(ParaPr.DefaultRunPr);
         }
 
-        if( undefined != ParaPr.Bullet && ParaPr.Bullet.isBullet())
-            this.Bullet = ParaPr.Bullet.createDuplicate();
+        if(undefined != ParaPr.Bullet)
+        {
+            if(ParaPr.Bullet.isBullet())
+            {
+                this.Bullet = ParaPr.Bullet.createDuplicate();
+            }
+            else
+            {
+                if(this.Bullet && this.Bullet.isBullet()){
+                    if(ParaPr.Bullet.bulletColor){
+                        this.Bullet.bulletColor = ParaPr.Bullet.bulletColor.createDuplicate();
+                    }
+                    if(ParaPr.Bullet.bulletSize){
+                        this.Bullet.bulletSize = ParaPr.Bullet.bulletSize.createDuplicate();
+                    }
+                    if(ParaPr.Bullet.bulletTypeface){
+                        this.Bullet.bulletTypeface = ParaPr.Bullet.bulletTypeface.createDuplicate();
+                    }
+                }
+            }
+        }
 
         if(undefined != ParaPr.Lvl)
             this.Lvl = ParaPr.Lvl;
@@ -9938,7 +9957,7 @@ CParaPr.prototype =
         return true;
     },
 
-    Get_PresentationBullet: function()
+    Get_PresentationBullet: function(theme, colorMap)
     {
         var Bullet = new CPresentationBullet();
         if(this.Bullet && this.Bullet.isBullet())
@@ -9956,11 +9975,6 @@ CParaPr.prototype =
                     {
                         Bullet.m_sChar = "•";
                     }
-                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
-                    {
-                        Bullet.m_bFontTx = false;
-                        Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
-                    }
                     break;
                 }
 
@@ -9968,11 +9982,6 @@ CParaPr.prototype =
                 {
                     Bullet.m_nType = g_NumberingArr[this.Bullet.bulletType.AutoNumType];
                     Bullet.m_nStartAt = this.Bullet.bulletType.startAt;
-                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
-                    {
-                        Bullet.m_bFontTx = false;
-                        Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
-                    }
                     break;
                 }
                 case AscFormat.BULLET_TYPE_BULLET_NONE :
@@ -9984,6 +9993,48 @@ CParaPr.prototype =
                     Bullet.m_nType = numbering_presentationnumfrmt_Char;
                     Bullet.m_sChar = "•";
                     break;
+                }
+            }
+
+            if(this.Bullet.bulletColor){
+                if(this.Bullet.bulletColor.type === AscFormat.BULLET_TYPE_COLOR_NONE){
+                    Bullet.m_bColorTx = false;
+                    Bullet.m_oColor.a = 0;
+                }
+                if(this.Bullet.bulletColor.type === AscFormat.BULLET_TYPE_COLOR_CLR){
+                    if(this.Bullet.bulletColor.UniColor && this.Bullet.bulletColor.UniColor.color && theme && colorMap){
+                        Bullet.m_bColorTx = false;
+                        Bullet.Unifill = AscFormat.CreateUniFillByUniColor(this.Bullet.bulletColor.UniColor);
+                    }
+                }
+            }
+            if(this.Bullet.bulletTypeface)
+            {
+                if(this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT){
+                    Bullet.m_bFontTx = false;
+                    Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
+                }
+
+            }
+            if(this.Bullet.bulletSize)
+            {
+                switch (this.Bullet.bulletSize.type){
+                    case AscFormat.BULLET_TYPE_SIZE_TX:{
+                        Bullet.m_bSizeTx = true;
+                        break;
+                    }
+                    case AscFormat.BULLET_TYPE_SIZE_PCT:{
+                        Bullet.m_bSizeTx = false;
+                        Bullet.m_bSizePct = true;
+                        Bullet.m_dSize = this.Bullet.bulletSize.val/100000.0;
+                        break;
+                    }
+                    case AscFormat.BULLET_TYPE_SIZE_PCT:{
+                        Bullet.m_bSizeTx = false;
+                        Bullet.m_bSizePct = false;
+                        Bullet.m_dSize = this.Bullet.bulletSize.val/100000.0;
+                        break;
+                    }
                 }
             }
         }

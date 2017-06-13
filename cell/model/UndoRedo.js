@@ -3010,8 +3010,8 @@ UndoRedoCell.prototype = {
 			cell.setFill(Val);
 		else if(AscCH.historyitem_Cell_Wrap == Type)
 			cell.setWrap(Val);
-		else if(AscCH.historyitem_Cell_Numformat == Type)
-			cell.setNumFormat(Val);
+		else if(AscCH.historyitem_Cell_Num == Type)
+			cell.setNum(Val);
         else if(AscCH.historyitem_Cell_Angle == Type)
             cell.setAngle(Val);
         else if(AscCH.historyitem_Cell_ChangeArrayValueFormat == Type)
@@ -3669,8 +3669,8 @@ UndoRedoRowCol.prototype = {
 			row.setShrinkToFit(Val);
 		else if(AscCH.historyitem_RowCol_Wrap == Type)
 			row.setWrap(Val);
-		else if(AscCH.historyitem_RowCol_NumFormat == Type)
-			row.setNumFormat(Val);
+		else if(AscCH.historyitem_RowCol_Num == Type)
+			row.setNum(Val);
         else if(AscCH.historyitem_RowCol_Angle == Type)
             row.setAngle(Val);
 		else if(AscCH.historyitem_RowCol_SetStyle == Type)

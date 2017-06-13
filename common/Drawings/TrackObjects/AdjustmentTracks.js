@@ -38,14 +38,20 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
     AscFormat.ExecuteNoHistory(function(){
         this.originalShape = originalShape;
+        this.bIsTracked = false;
 
         var oPen, oBrush;
         if(bTextWarp !== true)
         {
-            this.geometry = originalShape.spPr.geometry.createDuplicate();
+            if(originalShape.spPr && originalShape.spPr.geometry){
+                this.geometry = originalShape.spPr.geometry.createDuplicate();
+            }
+            else if(originalShape.calcGeometry){
+                this.geometry = originalShape.calcGeometry.createDuplicate();
+            }
             this.shapeWidth = originalShape.extX;
             this.shapeHeight = originalShape.extY;
-            this.transform = originalShape.transform;
+            this.transform = originalShape.transform.CreateDublicate();
             this.invertTransform = originalShape.invertTransform;
             oPen = originalShape.pen;
             oBrush = originalShape.brush;
@@ -141,122 +147,6 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
 
     }, this, []);
-
-    this.draw = function(overlay)
-    {
-        if(AscFormat.isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
-        {
-            overlay.SetCurrentPage(this.originalShape.selectStartPage);
-        }
-        this.overlayObject.draw(overlay);
-    };
-
-
-    this.track = function(posX, posY)
-    {
-        var invert_transform = this.invertTransform;
-        var _relative_x = invert_transform.TransformPointX(posX, posY);
-        var _relative_y = invert_transform.TransformPointY(posX, posY);
-
-        var bRecalculate = false;
-
-        if(this.xFlag)
-        {
-            var _new_x = this.adjastment.minX + this.coeffX*(_relative_x - this.minRealX);
-
-            if(_new_x <= this.maximalRealativeX && _new_x >= this.minimalRealativeX)
-            {
-                if(this.geometry.gdLst[this.adjastment.gdRefX] !== _new_x)
-                    bRecalculate = true;
-                this.geometry.gdLst[this.adjastment.gdRefX] = _new_x;
-            }
-            else if( _new_x > this.maximalRealativeX)
-            {
-                if(this.geometry.gdLst[this.adjastment.gdRefX] !== this.maximalRealativeX)
-                    bRecalculate = true;
-                this.geometry.gdLst[this.adjastment.gdRefX] = this.maximalRealativeX;
-            }
-            else
-            {
-                if(this.geometry.gdLst[this.adjastment.gdRefX] !== this.minimalRealativeX)
-                    bRecalculate = true;
-                this.geometry.gdLst[this.adjastment.gdRefX] = this.minimalRealativeX;
-            }
-        }
-
-        if(this.yFlag)
-        {
-            var _new_y = this.adjastment.minY + this.coeffY*(_relative_y - this.minRealY);
-
-            if(_new_y <= this.maximalRealativeY && _new_y >= this.minimalRealativeY)
-            {
-                if(this.geometry.gdLst[this.adjastment.gdRefY] !== _new_y)
-                    bRecalculate = true;
-                this.geometry.gdLst[this.adjastment.gdRefY] = _new_y;
-            }
-            else if(_new_y > this.maximalRealativeY)
-            {
-                if(this.geometry.gdLst[this.adjastment.gdRefY] !== this.maximalRealativeY)
-                    bRecalculate = true;
-                this.geometry.gdLst[this.adjastment.gdRefY] = this.maximalRealativeY;
-            }
-            else
-            {
-                if(this.geometry.gdLst[this.adjastment.gdRefY] !== this.minimalRealativeY)
-                    bRecalculate = true;
-                this.geometry.gdLst[this.adjastment.gdRefY] = this.minimalRealativeY;
-            }
-        }
-        if(bRecalculate)
-            this.geometry.Recalculate(this.shapeWidth, this.shapeHeight);
-    };
-
-    this.trackEnd = function()
-    {
-        var oGeometryToSet;
-        if(!this.bTextWarp)
-        {
-            oGeometryToSet =  this.originalShape.spPr.geometry;
-            if(this.xFlag)
-            {
-                oGeometryToSet.setAdjValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX]+"");
-            }
-            if(this.yFlag)
-            {
-                oGeometryToSet.setAdjValue(this.refY, this.geometry.gdLst[this.adjastment.gdRefY]+"");
-            }
-        }
-        else
-        {
-            var new_body_pr = this.originalShape.getBodyPr();
-            if (new_body_pr) {
-                oGeometryToSet = AscFormat.ExecuteNoHistory(function(){
-                    var oGeom = this.geometry.createDuplicate();
-                    if(this.xFlag)
-                    {
-                        oGeom.setAdjValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX]+"");
-                    }
-                    if(this.yFlag)
-                    {
-                        oGeom.setAdjValue(this.refY, this.geometry.gdLst[this.adjastment.gdRefY]+"");
-                    }
-                    return oGeom;
-                }, this, []);
-
-                new_body_pr = new_body_pr.createDuplicate();
-                new_body_pr.prstTxWarp = oGeometryToSet;
-                if (this.originalShape.bWordShape) {
-                    this.originalShape.setBodyPr(new_body_pr);
-                }
-                else {
-                    if (this.originalShape.txBody) {
-                        this.originalShape.txBody.setBodyPr(new_body_pr);
-                    }
-                }
-            }
-
-        }
-    };
 }
 
 XYAdjustmentTrack.prototype.getBounds = function()
@@ -294,9 +184,132 @@ XYAdjustmentTrack.prototype.getBounds = function()
     return bounds_checker.Bounds;
 };
 
+XYAdjustmentTrack.prototype.draw = function(overlay)
+{
+    if(AscFormat.isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
+    {
+        overlay.SetCurrentPage(this.originalShape.selectStartPage);
+    }
+    this.overlayObject.draw(overlay);
+};
+
+XYAdjustmentTrack.prototype.track = function(posX, posY)
+{
+    this.bIsTracked = true;
+    var invert_transform = this.invertTransform;
+    var _relative_x = invert_transform.TransformPointX(posX, posY);
+    var _relative_y = invert_transform.TransformPointY(posX, posY);
+
+    var bRecalculate = false;
+
+    if(this.xFlag)
+    {
+        var _new_x = this.adjastment.minX + this.coeffX*(_relative_x - this.minRealX);
+
+        if(_new_x <= this.maximalRealativeX && _new_x >= this.minimalRealativeX)
+        {
+            if(this.geometry.gdLst[this.adjastment.gdRefX] !== _new_x)
+                bRecalculate = true;
+            this.geometry.gdLst[this.adjastment.gdRefX] = _new_x;
+        }
+        else if( _new_x > this.maximalRealativeX)
+        {
+            if(this.geometry.gdLst[this.adjastment.gdRefX] !== this.maximalRealativeX)
+                bRecalculate = true;
+            this.geometry.gdLst[this.adjastment.gdRefX] = this.maximalRealativeX;
+        }
+        else
+        {
+            if(this.geometry.gdLst[this.adjastment.gdRefX] !== this.minimalRealativeX)
+                bRecalculate = true;
+            this.geometry.gdLst[this.adjastment.gdRefX] = this.minimalRealativeX;
+        }
+    }
+
+    if(this.yFlag)
+    {
+        var _new_y = this.adjastment.minY + this.coeffY*(_relative_y - this.minRealY);
+
+        if(_new_y <= this.maximalRealativeY && _new_y >= this.minimalRealativeY)
+        {
+            if(this.geometry.gdLst[this.adjastment.gdRefY] !== _new_y)
+                bRecalculate = true;
+            this.geometry.gdLst[this.adjastment.gdRefY] = _new_y;
+        }
+        else if(_new_y > this.maximalRealativeY)
+        {
+            if(this.geometry.gdLst[this.adjastment.gdRefY] !== this.maximalRealativeY)
+                bRecalculate = true;
+            this.geometry.gdLst[this.adjastment.gdRefY] = this.maximalRealativeY;
+        }
+        else
+        {
+            if(this.geometry.gdLst[this.adjastment.gdRefY] !== this.minimalRealativeY)
+                bRecalculate = true;
+            this.geometry.gdLst[this.adjastment.gdRefY] = this.minimalRealativeY;
+        }
+    }
+    if(bRecalculate)
+        this.geometry.Recalculate(this.shapeWidth, this.shapeHeight);
+};
+
+XYAdjustmentTrack.prototype.trackEnd = function()
+{
+    if(!this.bIsTracked){
+        return;
+    }
+    var oGeometryToSet;
+    if(!this.bTextWarp)
+    {
+        if(!this.originalShape.spPr.geometry){
+            this.originalShape.spPr.setGeometry(this.geometry.createDuplicate());
+        }
+        oGeometryToSet =  this.originalShape.spPr.geometry;
+        if(this.xFlag)
+        {
+            oGeometryToSet.setAdjValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX]+"");
+        }
+        if(this.yFlag)
+        {
+            oGeometryToSet.setAdjValue(this.refY, this.geometry.gdLst[this.adjastment.gdRefY]+"");
+        }
+    }
+    else
+    {
+        var new_body_pr = this.originalShape.getBodyPr();
+        if (new_body_pr) {
+            oGeometryToSet = AscFormat.ExecuteNoHistory(function(){
+                var oGeom = this.geometry.createDuplicate();
+                if(this.xFlag)
+                {
+                    oGeom.setAdjValue(this.refX, this.geometry.gdLst[this.adjastment.gdRefX]+"");
+                }
+                if(this.yFlag)
+                {
+                    oGeom.setAdjValue(this.refY, this.geometry.gdLst[this.adjastment.gdRefY]+"");
+                }
+                return oGeom;
+            }, this, []);
+
+            new_body_pr = new_body_pr.createDuplicate();
+            new_body_pr.prstTxWarp = oGeometryToSet;
+            if (this.originalShape.bWordShape) {
+                this.originalShape.setBodyPr(new_body_pr);
+            }
+            else {
+                if (this.originalShape.txBody) {
+                    this.originalShape.txBody.setBodyPr(new_body_pr);
+                }
+            }
+        }
+
+    }
+};
+
 function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
     AscFormat.ExecuteNoHistory(function(){
+        this.bIsTracked = false;
         this.originalShape = originalShape;
 
 
@@ -304,7 +317,12 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
         var oPen, oBrush;
         if(bTextWarp !== true)
         {
-            this.geometry = originalShape.spPr.geometry.createDuplicate();
+            if(originalShape.spPr && originalShape.spPr.geometry){
+                this.geometry = originalShape.spPr.geometry.createDuplicate();
+            }
+            else if(originalShape.calcGeometry){
+                this.geometry = originalShape.calcGeometry.createDuplicate();
+            }
             this.shapeWidth = originalShape.extX;
             this.shapeHeight = originalShape.extY;
             this.transform = originalShape.transform;
@@ -393,6 +411,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
     this.track = function(posX, posY)
     {
+        this.bIsTracked = true;
         var invert_transform = this.invertTransform;
         var _relative_x = invert_transform.TransformPointX(posX, posY);
         var _relative_y = invert_transform.TransformPointY(posX, posY);
@@ -447,9 +466,15 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         var oGeometryToSet;
         if(!this.bTextWarp)
         {
+            if(!this.originalShape.spPr.geometry){
+                this.originalShape.spPr.setGeometry(this.geometry.createDuplicate());
+            }
             oGeometryToSet =  this.originalShape.spPr.geometry;
             if(this.radiusFlag)
             {

@@ -52,7 +52,7 @@
 	cFormulaFunctionGroup['DateAndTime'].push(cDAYS, cISOWEEKNUM);
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
 	cFormulaFunctionGroup['Engineering'].push(cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR, cERF_PRECISE,
-		cERFC_PRECISE, cIMCOSH, cIMCOT, cIMCSC, cIMCSCH, cIMSEC, cIMSECH, cIMSINH, cIMTAN);
+		cERFC_PRECISE);
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cNUMBERVALUE, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
@@ -68,38 +68,11 @@
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cACOT, cACOTH, cAGGREGATE, cARABIC, cBASE, cCEILING_MATH, cCEILING_PRECISE,
-		cCOMBINA, cCOT, cCOTH, cCSC, cCSCH, cDECIMAL, cFLOOR_MATH, cFLOOR_PRECISE, cMUNIT, cSEC, cSECH);
+	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
 	cFormulaFunctionGroup['Information'].push(cISFORMULA, cSHEET, cSHEETS);
-	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
-	cFormulaFunctionGroup['Logical'].push(cIFNA, cXOR);
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cACOT() {
-		cBaseFunction.call(this, "ACOT");
-		this.isXLFN = true;
-	}
-
-	cACOT.prototype = Object.create(cBaseFunction.prototype);
-	cACOT.prototype.constructor = cACOT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cACOTH() {
-		cBaseFunction.call(this, "ACOTH");
-		this.isXLFN = true;
-	}
-
-	cACOTH.prototype = Object.create(cBaseFunction.prototype);
-	cACOTH.prototype.constructor = cACOTH;
 
 	/**
 	 * @constructor
@@ -112,30 +85,6 @@
 
 	cAGGREGATE.prototype = Object.create(cBaseFunction.prototype);
 	cAGGREGATE.prototype.constructor = cAGGREGATE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cARABIC() {
-		cBaseFunction.call(this, "ARABIC");
-		this.isXLFN = true;
-	}
-
-	cARABIC.prototype = Object.create(cBaseFunction.prototype);
-	cARABIC.prototype.constructor = cARABIC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBASE() {
-		cBaseFunction.call(this, "BASE");
-		this.isXLFN = true;
-	}
-
-	cBASE.prototype = Object.create(cBaseFunction.prototype);
-	cBASE.prototype.constructor = cBASE;
 
 	/**
 	 * @constructor
@@ -261,30 +210,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cCEILING_MATH() {
-		cBaseFunction.call(this, "CEILING.MATH");
-		this.isXLFN = true;
-	}
-
-	cCEILING_MATH.prototype = Object.create(cBaseFunction.prototype);
-	cCEILING_MATH.prototype.constructor = cCEILING_MATH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCEILING_PRECISE() {
-		cBaseFunction.call(this, "CEILING.PRECISE");
-		this.isXLFN = true;
-	}
-
-	cCEILING_PRECISE.prototype = Object.create(cBaseFunction.prototype);
-	cCEILING_PRECISE.prototype.constructor = cCEILING_PRECISE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cCHISQ_DIST() {
 		cBaseFunction.call(this, "CHISQ.DIST");
 		this.isXLFN = true;
@@ -381,30 +306,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cCOT() {
-		cBaseFunction.call(this, "COT");
-		this.isXLFN = true;
-	}
-
-	cCOT.prototype = Object.create(cBaseFunction.prototype);
-	cCOT.prototype.constructor = cCOT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCOTH() {
-		cBaseFunction.call(this, "COTH");
-		this.isXLFN = true;
-	}
-
-	cCOTH.prototype = Object.create(cBaseFunction.prototype);
-	cCOTH.prototype.constructor = cCOTH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cCOVARIANCE_P() {
 		cBaseFunction.call(this, "COVARIANCE.P");
 		this.isXLFN = true;
@@ -429,30 +330,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cCSC() {
-		cBaseFunction.call(this, "CSC");
-		this.isXLFN = true;
-	}
-
-	cCSC.prototype = Object.create(cBaseFunction.prototype);
-	cCSC.prototype.constructor = cCSC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCSCH() {
-		cBaseFunction.call(this, "CSCH");
-		this.isXLFN = true;
-	}
-
-	cCSCH.prototype = Object.create(cBaseFunction.prototype);
-	cCSCH.prototype.constructor = cCSCH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cDAYS() {
 		cBaseFunction.call(this, "DAYS");
 		this.isXLFN = true;
@@ -472,18 +349,6 @@
 
 	cDBCS.prototype = Object.create(cBaseFunction.prototype);
 	cDBCS.prototype.constructor = cDBCS;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cDECIMAL() {
-		cBaseFunction.call(this, "DECIMAL");
-		this.isXLFN = true;
-	}
-
-	cDECIMAL.prototype = Object.create(cBaseFunction.prototype);
-	cDECIMAL.prototype.constructor = cDECIMAL;
 
 	/**
 	 * @constructor
@@ -592,30 +457,6 @@
 
 	cFILTERXML.prototype = Object.create(cBaseFunction.prototype);
 	cFILTERXML.prototype.constructor = cFILTERXML;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cFLOOR_MATH() {
-		cBaseFunction.call(this, "FLOOR.MATH");
-		this.isXLFN = true;
-	}
-
-	cFLOOR_MATH.prototype = Object.create(cBaseFunction.prototype);
-	cFLOOR_MATH.prototype.constructor = cFLOOR_MATH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cFLOOR_PRECISE() {
-		cBaseFunction.call(this, "FLOOR.PRECISE");
-		this.isXLFN = true;
-	}
-
-	cFLOOR_PRECISE.prototype = Object.create(cBaseFunction.prototype);
-	cFLOOR_PRECISE.prototype.constructor = cFLOOR_PRECISE;
 
 	/**
 	 * @constructor
@@ -760,114 +601,6 @@
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIFNA() {
-		cBaseFunction.call(this, "IFNA");
-		this.isXLFN = true;
-	}
-
-	cIFNA.prototype = Object.create(cBaseFunction.prototype);
-	cIFNA.prototype.constructor = cIFNA;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMCOSH() {
-		cBaseFunction.call(this, "IMCOSH");
-		this.isXLFN = true;
-	}
-
-	cIMCOSH.prototype = Object.create(cBaseFunction.prototype);
-	cIMCOSH.prototype.constructor = cIMCOSH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMCOT() {
-		cBaseFunction.call(this, "IMCOT");
-		this.isXLFN = true;
-	}
-
-	cIMCOT.prototype = Object.create(cBaseFunction.prototype);
-	cIMCOT.prototype.constructor = cIMCOT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMCSC() {
-		cBaseFunction.call(this, "IMCSC");
-		this.isXLFN = true;
-	}
-
-	cIMCSC.prototype = Object.create(cBaseFunction.prototype);
-	cIMCSC.prototype.constructor = cIMCSC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMCSCH() {
-		cBaseFunction.call(this, "IMCSCH");
-		this.isXLFN = true;
-	}
-
-	cIMCSCH.prototype = Object.create(cBaseFunction.prototype);
-	cIMCSCH.prototype.constructor = cIMCSCH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMSEC() {
-		cBaseFunction.call(this, "IMSEC");
-		this.isXLFN = true;
-	}
-
-	cIMSEC.prototype = Object.create(cBaseFunction.prototype);
-	cIMSEC.prototype.constructor = cIMSEC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMSECH() {
-		cBaseFunction.call(this, "IMSECH");
-		this.isXLFN = true;
-	}
-
-	cIMSECH.prototype = Object.create(cBaseFunction.prototype);
-	cIMSECH.prototype.constructor = cIMSECH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMSINH() {
-		cBaseFunction.call(this, "IMSINH");
-		this.isXLFN = true;
-	}
-
-	cIMSINH.prototype = Object.create(cBaseFunction.prototype);
-	cIMSINH.prototype.constructor = cIMSINH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cIMTAN() {
-		cBaseFunction.call(this, "IMTAN");
-		this.isXLFN = true;
-	}
-
-	cIMTAN.prototype = Object.create(cBaseFunction.prototype);
-	cIMTAN.prototype.constructor = cIMTAN;
 
 	/**
 	 * @constructor
@@ -1197,30 +930,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cSEC() {
-		cBaseFunction.call(this, "SEC");
-		this.isXLFN = true;
-	}
-
-	cSEC.prototype = Object.create(cBaseFunction.prototype);
-	cSEC.prototype.constructor = cSEC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cSECH() {
-		cBaseFunction.call(this, "SECH");
-		this.isXLFN = true;
-	}
-
-	cSECH.prototype = Object.create(cBaseFunction.prototype);
-	cSECH.prototype.constructor = cSECH;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cSHEET() {
 		cBaseFunction.call(this, "SHEET");
 		this.isXLFN = true;
@@ -1420,18 +1129,6 @@
 
 	cWEIBULL_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cWEIBULL_DIST.prototype.constructor = cWEIBULL_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cXOR() {
-		cBaseFunction.call(this, "XOR");
-		this.isXLFN = true;
-	}
-
-	cXOR.prototype = Object.create(cBaseFunction.prototype);
-	cXOR.prototype.constructor = cXOR;
 
 	/**
 	 * @constructor

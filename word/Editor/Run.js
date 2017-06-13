@@ -166,7 +166,7 @@ ParaRun.prototype.Copy = function(Selected)
 
     NewRun.Set_Pr( this.Pr.Copy() );
 
-    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+    if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         NewRun.Set_ReviewType(reviewtype_Add);
 
     if(true === bMath)
@@ -223,7 +223,7 @@ ParaRun.prototype.CopyContent = function(Selected)
     return [this.Copy(Selected)];
 };
 
-ParaRun.prototype.Get_AllDrawingObjects = function(DrawingObjs)
+ParaRun.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
     var Count = this.Content.length;
     for ( var Index = 0; Index < Count; Index++ )
@@ -233,7 +233,7 @@ ParaRun.prototype.Get_AllDrawingObjects = function(DrawingObjs)
         if ( para_Drawing === Item.Type )
         {
             DrawingObjs.push(Item);
-            Item.Get_AllDrawingObjects(DrawingObjs);
+            Item.GetAllDrawingObjects(DrawingObjs);
         }
     }
 };
@@ -357,7 +357,7 @@ ParaRun.prototype.Is_StartFromNewLine = function()
 // Добавляем элемент в текущую позицию
 ParaRun.prototype.Add = function(Item, bMath)
 {
-	if (this.Paragraph && this.Paragraph.LogicDocument)
+	if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
 	{
 		// Специальный код, связанный с обработкой изменения языка ввода при наборе.
 		if (true === this.Paragraph.LogicDocument.CheckLanguageOnTextAdd && editor)
@@ -379,7 +379,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 					if (NewRun)
 					{
 						NewRun.Set_Lang(NewLang);
-						NewRun.Cursor_MoveToStartPos();
+						NewRun.MoveCursorToStartPos();
 						NewRun.Add(Item, bMath);
 						NewRun.Make_ThisElementCurrent();
 						return;
@@ -406,7 +406,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 				{
 					NewRun.Set_VertAlign(undefined);
 					NewRun.Set_RStyle(oStyles.GetDefaultFootnoteReference());
-					NewRun.Cursor_MoveToStartPos();
+					NewRun.MoveCursorToStartPos();
 					NewRun.Add(Item, bMath);
 					NewRun.Make_ThisElementCurrent();
 					return;
@@ -419,7 +419,7 @@ ParaRun.prototype.Add = function(Item, bMath)
 			if (NewRun)
 			{
 				NewRun.Set_VertAlign(AscCommon.vertalign_Baseline);
-				NewRun.Cursor_MoveToStartPos();
+				NewRun.MoveCursorToStartPos();
 				NewRun.Add(Item, bMath);
 				NewRun.Make_ThisElementCurrent();
 				return;
@@ -551,7 +551,7 @@ ParaRun.prototype.private_SplitRunInCurPos = function()
 };
 ParaRun.prototype.private_IsCurPosNearFootnoteReference = function()
 {
-	if (this.Paragraph && this.Paragraph.LogicDocument)
+	if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
 	{
 		var oStyles = this.Paragraph.LogicDocument.Get_Styles();
 		var nCurPos = this.State.ContentPos;
@@ -823,7 +823,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                 this.Remove_FromContent(StartPos, EndPos - StartPos, true);
             }
 
-            this.Selection_Remove();
+            this.RemoveSelection();
             this.State.ContentPos = StartPos;
         }
         else
@@ -1617,7 +1617,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 
     // Если задается Parent и ParentPos, тогда ран автоматически добавляется в родительский класс
     var UpdateParent    = (undefined !== Parent && undefined !== ParentPos && this === Parent.Content[ParentPos] ? true : false);
-    var UpdateSelection = (true === UpdateParent && true === Parent.Is_SelectionUse() && true === this.Is_SelectionUse() ? true : false);
+    var UpdateSelection = (true === UpdateParent && true === Parent.IsSelectionUse() && true === this.IsSelectionUse() ? true : false);
 
     // Создаем новый ран
     var bMathRun = this.Type == para_Math_Run;
@@ -1820,7 +1820,7 @@ ParaRun.prototype.Remove_DrawingObject = function(Id)
         if ( para_Drawing === Element.Type && Id === Element.Get_Id() )
         {
             var TrackRevisions = null;
-            if (this.Paragraph && this.Paragraph.LogicDocument)
+            if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
                 TrackRevisions = this.Paragraph.LogicDocument.Is_TrackRevisions();
 
             if (true === TrackRevisions)
@@ -1934,9 +1934,8 @@ ParaRun.prototype.Get_NextRunElements = function(RunElements, UseContentPos, Dep
     for ( var CurPos = StartPos; CurPos < ContentLen; CurPos++ )
     {
         var Item = this.Content[CurPos];
-        var ItemType = Item.Type;
 
-        if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType)
+        if (RunElements.CheckType(Item.Type))
         {
             RunElements.Elements.push( Item );
             RunElements.Count--;
@@ -1957,7 +1956,7 @@ ParaRun.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Dep
         var Item = this.Content[CurPos];
         var ItemType = Item.Type;
 
-        if ( para_Text === ItemType || para_Space === ItemType || para_Tab === ItemType )
+		if (RunElements.CheckType(Item.Type))
         {
             RunElements.Elements.push( Item );
             RunElements.Count--;
@@ -1968,43 +1967,43 @@ ParaRun.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, Dep
     }
 };
 
-ParaRun.prototype.Collect_DocumentStatistics = function(ParaStats)
+ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        var Item = this.Content[Index];
-        var ItemType = Item.Type;
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Item     = this.Content[Index];
+		var ItemType = Item.Type;
 
-        var bSymbol  = false;
-        var bSpace   = false;
-        var bNewWord = false;
+		var bSymbol  = false;
+		var bSpace   = false;
+		var bNewWord = false;
 
-        if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
-        {
-            if ( false === ParaStats.Word )
-                bNewWord = true;
+		if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
+		{
+			if (false === ParaStats.Word)
+				bNewWord = true;
 
-            bSymbol = true;
-            bSpace  = false;
+			bSymbol = true;
+			bSpace  = false;
 
-            ParaStats.Word           = true;
-            ParaStats.EmptyParagraph = false;
-        }
-        else if ((para_Text === ItemType && true === Item.Is_NBSP()) || para_Space === ItemType || para_Tab === ItemType)
-        {
-            bSymbol = true;
-            bSpace  = true;
+			ParaStats.Word           = true;
+			ParaStats.EmptyParagraph = false;
+		}
+		else if ((para_Text === ItemType && true === Item.Is_NBSP()) || para_Space === ItemType || para_Tab === ItemType)
+		{
+			bSymbol = true;
+			bSpace  = true;
 
-            ParaStats.Word = false;
-        }
+			ParaStats.Word = false;
+		}
 
-        if ( true === bSymbol )
-            ParaStats.Stats.Add_Symbol( bSpace );
+		if (true === bSymbol)
+			ParaStats.Stats.Add_Symbol(bSpace);
 
-        if ( true === bNewWord )
-            ParaStats.Stats.Add_Word();
-    }
+		if (true === bNewWord)
+			ParaStats.Stats.Add_Word();
+	}
 };
 
 ParaRun.prototype.Create_FontMap = function(Map)
@@ -2036,8 +2035,10 @@ ParaRun.prototype.Create_FontMap = function(Map)
         {
             var Item = this.Content[Index];
 
-            if ( para_Drawing === Item.Type )
-                Item.documentCreateFontMap( Map );
+			if (para_Drawing === Item.Type)
+				Item.documentCreateFontMap(Map);
+			else if (para_FootnoteReference === Item.Type)
+				Item.CreateDocumentFontMap(Map);
         }
 
         if(this.Type === para_Math_Run)
@@ -2062,7 +2063,7 @@ ParaRun.prototype.Get_AllFontNames = function(AllFonts)
     }
 };
 
-ParaRun.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
+ParaRun.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 {
     var StartPos = 0;
     var EndPos   = 0;
@@ -3137,20 +3138,20 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         if (break_Page === Item.BreakType)
                             PRS.BreakRealPageLine = true;
 
-                        if (break_Page === Item.BreakType && true === Para.Check_BreakPageEnd(Item))
+						// PageBreak вне самого верхнего документа не надо учитывать
+						if (!(Para.Parent instanceof CDocument) || true !== Para.Is_Inline())
+						{
+							// TODO: Продумать, как избавиться от данного элемента, т.к. удалять его при пересчете нельзя,
+							//       иначе будут проблемы с совместным редактированием.
+
+							Item.Flags.Use = false;
+							continue;
+						}
+
+						if (break_Page === Item.BreakType && true === Para.Check_BreakPageEnd(Item))
                             continue;
 
                         Item.Flags.NewLine = true;
-
-                        // PageBreak вне самого верхнего документа не надо учитывать
-                        if (!(Para.Parent instanceof CDocument) || true !== Para.Is_Inline())
-                        {
-                            // TODO: Продумать, как избавиться от данного элемента, т.к. удалять его при пересчете нельзя,
-                            //       иначе будут проблемы с совместным редактированием.
-
-                            Item.Flags.Use = false;
-                            continue;
-                        }
 
                         NewPage       = true;
                         NewRange      = true;
@@ -3550,6 +3551,8 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 if ( true === PRSC.Word )
                     PRSC.Spaces += PRSC.SpacesCount;
 
+				PRSC.Range.WEnd = Item.Get_WidthVisible();
+
                 break;
             }
         }
@@ -3738,7 +3741,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     if (true === PRSA.RecalcFast2)
                     {
                         // Тут мы должны сравнить положение картинок
-                        var oRecalcObj = Item.Save_RecalculateObject();
+                        var oRecalcObj = Item.SaveRecalculateObject();
                         Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[_CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
 
                         if (Math.abs(Item.X - oRecalcObj.X) > 0.001 || Math.abs(Item.Y - oRecalcObj.Y) > 0.001 || Item.PageNum !== oRecalcObj.PageNum)
@@ -3848,7 +3851,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             case para_End:
             {
                 var SectPr = PRSA.Paragraph.Get_SectionPr();
-                if (!PRSA.Paragraph.LogicDocument || PRSA.Paragraph.LogicDocument !== PRSA.Paragraph.Parent)
+                if (!PRSA.Paragraph.LogicDocument || PRSA.Paragraph.LogicDocument !== PRSA.Paragraph.Parent || !PRSA.Paragraph.bFromDocument)
                     SectPr = undefined;
 
                 if ( undefined !== SectPr )
@@ -3868,8 +3871,8 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             }
             case para_NewLine:
             {
-                if (break_Page === Item.BreakType || break_Column === Item.BreakType)
-                    Item.Update_String( PRSA.XEnd - PRSA.X );
+				if (break_Page === Item.BreakType || break_Column === Item.BreakType)
+					Item.Update_String(PRSA.XEnd - PRSA.X);
 
                 PRSA.X += Item.WidthVisible;
 
@@ -3960,31 +3963,31 @@ ParaRun.prototype.Refresh_RecalcData = function(Data)
         Para.Refresh_RecalcData2(0);
     }
 };
-ParaRun.prototype.Save_RecalculateObject = function(Copy)
+ParaRun.prototype.SaveRecalculateObject = function(Copy)
 {
     var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
     RecalcObj.Save_Lines( this, Copy );
     RecalcObj.Save_RunContent( this, Copy );
     return RecalcObj;
 };
-ParaRun.prototype.Load_RecalculateObject = function(RecalcObj)
+ParaRun.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_Lines(this);
     RecalcObj.Load_RunContent(this);
 };
-ParaRun.prototype.Prepare_RecalculateObject = function()
+ParaRun.prototype.PrepareRecalculateObject = function()
 {
-    this.protected_ClearLines();
+	this.protected_ClearLines();
 
-    var Count = this.Content.length;
-    for ( var Index = 0; Index < Count; Index++ )
-    {
-        var Item = this.Content[Index];
-        var ItemType = Item.Type;
+	var Count = this.Content.length;
+	for (var Index = 0; Index < Count; Index++)
+	{
+		var Item     = this.Content[Index];
+		var ItemType = Item.Type;
 
-        if ( para_PageNum === ItemType || para_Drawing === ItemType )
-            Item.Prepare_RecalculateObject();
-    }
+		if (para_PageNum === ItemType || para_Drawing === ItemType)
+			Item.PrepareRecalculateObject();
+	}
 };
 ParaRun.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {
@@ -4087,7 +4090,7 @@ ParaRun.prototype.Check_BreakPageEnd = function(PBChecker)
     return true;
 };
 
-ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+ParaRun.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     this.Recalculate_MeasureContent();
 
@@ -5122,12 +5125,12 @@ ParaRun.prototype.Cursor_Is_End = function()
     return false;
 };
 
-ParaRun.prototype.Cursor_MoveToStartPos = function()
+ParaRun.prototype.MoveCursorToStartPos = function()
 {
     this.State.ContentPos = 0;
 };
 
-ParaRun.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
+ParaRun.prototype.MoveCursorToEndPos = function(SelectFromEnd)
 {
     if ( true === SelectFromEnd )
     {
@@ -5720,7 +5723,7 @@ ParaRun.prototype.Set_SelectionContentPos = function(StartContentPos, EndContent
     Selection.EndPos   = EndPos;
     Selection.Use      = true;
 };
-ParaRun.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+ParaRun.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
     var StartPos = 0;
     switch (StartFlag)
@@ -5743,7 +5746,7 @@ ParaRun.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth,
     Selection.EndPos   = EndPos;
     Selection.Use      = true;
 };
-ParaRun.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+ParaRun.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
     var Pos = 0;
     switch (Flag)
@@ -5769,17 +5772,12 @@ ParaRun.prototype.Set_SelectionAtStartPos = function()
     this.Set_SelectionContentPos(null, null, 0, 1, 1);
 };
 
-ParaRun.prototype.Selection_IsUse = function()
+ParaRun.prototype.IsSelectionUse = function()
 {
     return this.State.Selection.Use;
 };
 
-ParaRun.prototype.Is_SelectionUse = function()
-{
-    return this.State.Selection.Use;
-};
-
-ParaRun.prototype.Is_SelectedAll = function(Props)
+ParaRun.prototype.IsSelectedAll = function(Props)
 {
     var Selection = this.State.Selection;
     if ( false === Selection.Use && true !== this.Is_Empty( Props ) )
@@ -5852,11 +5850,7 @@ ParaRun.prototype.Selection_CorrectLeftPos = function(Direction)
     return true;
 };
 
-ParaRun.prototype.Selection_Stop = function()
-{
-};
-
-ParaRun.prototype.Selection_Remove = function()
+ParaRun.prototype.RemoveSelection = function()
 {
     var Selection = this.State.Selection;
 
@@ -5865,7 +5859,7 @@ ParaRun.prototype.Selection_Remove = function()
     Selection.EndPos   = 0;
 };
 
-ParaRun.prototype.Select_All = function(Direction)
+ParaRun.prototype.SelectAll = function(Direction)
 {
     var Selection = this.State.Selection;
 
@@ -5947,7 +5941,7 @@ ParaRun.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionD
     SelectionDraw.FindStart = FindStart;
 };
 
-ParaRun.prototype.Selection_IsEmpty = function(CheckEnd)
+ParaRun.prototype.IsSelectionEmpty = function(CheckEnd)
 {
     var Selection = this.State.Selection;
     if (true !== Selection.Use)
@@ -6240,7 +6234,7 @@ ParaRun.prototype.Set_Pr = function(TextPr)
 ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 {
     var bReview = false;
-    if (this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+    if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         bReview = true;
 
     var ReviewType = this.Get_ReviewType();
@@ -6376,7 +6370,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 					LRun.Selection.EndPos   = LRun.Content.length;
 				}
 
-				CRun.Select_All(Direction);
+				CRun.SelectAll(Direction);
 
 				if (true === bReview && true !== CRun.Have_PrChange())
 					CRun.Add_PrChange();
@@ -6472,10 +6466,10 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
             }
 
             if ( null !== LRun )
-                LRun.Selection_Remove();
+                LRun.RemoveSelection();
 
-            CRun.Selection_Remove();
-            CRun.Cursor_MoveToStartPos();
+            CRun.RemoveSelection();
+            CRun.MoveCursorToStartPos();
 
             if (true === bReview && true !== CRun.Have_PrChange())
                 CRun.Add_PrChange();
@@ -6494,7 +6488,7 @@ ParaRun.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll)
 
 
             if ( null !== RRun )
-                RRun.Selection_Remove();
+                RRun.RemoveSelection();
         }
 
         Result.push( LRun );
@@ -8517,7 +8511,7 @@ ParaRun.prototype.Get_RangesByPos = function(Pos)
 
     return Ranges;
 };
-ParaRun.prototype.Compare_DrawingsLogicPositions = function(CompareObject)
+ParaRun.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
     var Drawing1 = CompareObject.Drawing1;
     var Drawing2 = CompareObject.Drawing2;
@@ -8633,13 +8627,13 @@ ParaRun.prototype.Make_ThisElementCurrent = function(bUpdateStates)
         this.Paragraph.Document_SetThisElementCurrent(true === bUpdateStates ? true : false);
     }
 };
-ParaRun.prototype.Get_AllParagraphs = function(Props, ParaArray)
+ParaRun.prototype.GetAllParagraphs = function(Props, ParaArray)
 {
     var ContentLen = this.Content.length;
     for (var CurPos = 0; CurPos < ContentLen; CurPos++)
     {
         if (para_Drawing == this.Content[CurPos].Type)
-            this.Content[CurPos].Get_AllParagraphs(Props, ParaArray);
+            this.Content[CurPos].GetAllParagraphs(Props, ParaArray);
     }
 };
 ParaRun.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
@@ -8726,7 +8720,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeContent = function(bUpdateI
     {
         this.private_UpdateTrackRevisions();
 
-        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions() && this.ReviewInfo && true === this.ReviewInfo.Is_CurrentUser())
+        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions() && this.ReviewInfo && true === this.ReviewInfo.Is_CurrentUser())
         {
             var OldReviewInfo = this.ReviewInfo.Copy();
             this.ReviewInfo.Update();
@@ -8740,7 +8734,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeTextPr = function(bUpdateIn
     {
         this.private_UpdateTrackRevisions();
 
-        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
+        if (true === bUpdateInfo && this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.Is_TrackRevisions())
         {
             var OldReviewInfo = this.Pr.ReviewInfo.Copy();
             this.Pr.ReviewInfo.Update();
@@ -8750,7 +8744,7 @@ ParaRun.prototype.private_UpdateTrackRevisionOnChangeTextPr = function(bUpdateIn
 };
 ParaRun.prototype.private_UpdateTrackRevisions = function()
 {
-    if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.LogicDocument.Get_TrackRevisionsManager)
+    if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument && this.Paragraph.LogicDocument.Get_TrackRevisionsManager)
     {
         var RevisionsManager = this.Paragraph.LogicDocument.Get_TrackRevisionsManager();
         RevisionsManager.Check_Paragraph(this.Paragraph);
@@ -8821,9 +8815,9 @@ ParaRun.prototype.Accept_RevisionChanges = function(Type, bAll)
 
             if (Parent.Get_ContentLength() <= 0)
             {
-                Parent.Selection_Remove();
+                Parent.RemoveSelection();
                 Parent.Add_ToContent(0, new ParaRun());
-                Parent.Cursor_MoveToStartPos();
+                Parent.MoveCursorToStartPos();
             }
         }
     }
@@ -8889,9 +8883,9 @@ ParaRun.prototype.Reject_RevisionChanges = function(Type, bAll)
 
             if (Parent.Get_ContentLength() <= 0)
             {
-                Parent.Selection_Remove();
+                Parent.RemoveSelection();
                 Parent.Add_ToContent(0, new ParaRun());
-                Parent.Cursor_MoveToStartPos();
+                Parent.MoveCursorToStartPos();
             }
         }
         else if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type))
@@ -8931,7 +8925,7 @@ ParaRun.prototype.Get_ClassesByPos = function(Classes, ContentPos, Depth)
 {
     Classes.push(this);
 };
-ParaRun.prototype.Get_DocumentPositionFromObject = function(PosArray)
+ParaRun.prototype.GetDocumentPositionFromObject = function(PosArray)
 {
     if (!PosArray)
         PosArray = [];
@@ -8954,7 +8948,7 @@ ParaRun.prototype.Get_DocumentPositionFromObject = function(PosArray)
             PosArray.splice(0, 0, {Class : this.Paragraph, Position : ParaContentPos.Get(0)});
         }
 
-        this.Paragraph.Get_DocumentPositionFromObject(PosArray);
+        this.Paragraph.GetDocumentPositionFromObject(PosArray);
     }
 
     return PosArray;
@@ -9096,8 +9090,8 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 		{
 			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
 			{
-				if (this.Paragraph && this.Paragraph.LogicDocument)
-					this.Paragraph.LogicDocument.Selection_Remove();
+				if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument)
+					this.Paragraph.LogicDocument.RemoveSelection();
 
 				this.State.ContentPos = nIndex;
 				this.Make_ThisElementCurrent(true);
@@ -9112,8 +9106,8 @@ ParaRun.prototype.GotoFootnoteRef = function(isNext, isCurrent, isStepOver)
 		{
 			if (para_FootnoteReference === this.Content[nIndex].Type && ((true !== isCurrent && true === isStepOver) || (true === isCurrent && (true === this.Selection.Use || nPos !== nIndex))))
 			{
-				if (this.Paragraph && this.Paragraph.LogicDocument)
-					this.Paragraph.LogicDocument.Selection_Remove();
+				if (this.Paragraph && this.Paragraph.bFromDocument && this.Paragraph.LogicDocument)
+					this.Paragraph.LogicDocument.RemoveSelection();
 
 				this.State.ContentPos = nIndex;
 				this.Make_ThisElementCurrent(true);
@@ -9137,6 +9131,20 @@ ParaRun.prototype.GetFootnoteRefsInRange = function(arrFootnotes, _CurLine, _Cur
 	{
 		if (para_FootnoteReference === this.Content[CurPos].Type)
 			arrFootnotes.push(this.Content[CurPos]);
+	}
+};
+ParaRun.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if (!arrContentControls)
+		return;
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Content[nIndex];
+		if (para_Drawing === oItem.Type || para_FootnoteReference === oItem.Type)
+		{
+			oItem.GetAllContentControls(arrContentControls);
+		}
 	}
 };
 
