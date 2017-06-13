@@ -63,7 +63,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
 		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
-		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
@@ -2796,6 +2796,42 @@
 		return this.value = arg0;
 	};
 	cGAMMALN.prototype.getInfo = function () {
+		return {name: this.name, args: "(number)"}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cGAMMALN_PRECISE() {
+		this.name = "GAMMALN.PRECISE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cGAMMALN_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMALN_PRECISE.prototype.constructor = cGAMMALN_PRECISE;
+	cGAMMALN_PRECISE.prototype.argumentsMin = 1;
+	cGAMMALN_PRECISE.prototype.argumentsMax = 1;
+	cGAMMALN_PRECISE.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray) {
+			var a = getLogGamma(argArray[0]);
+			return isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cGAMMALN_PRECISE.prototype.getInfo = function () {
 		return {name: this.name, args: "(number)"}
 	};
 
