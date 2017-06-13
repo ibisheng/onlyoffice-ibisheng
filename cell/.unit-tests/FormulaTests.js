@@ -3386,6 +3386,25 @@ $( function () {
 
     } );
 
+	test( "Test: \"NUMBERVALUE\"", function () {
+		oParser = new parserFormula( 'NUMBERVALUE("2.500,27",",",".")', "A1", ws );
+		ok( oParser.parse(), 'NUMBERVALUE("2.500,27",",",".")');
+		strictEqual( oParser.calculate().getValue(), 2500.27, 'NUMBERVALUE("2.500,27",",",".")');
+
+		oParser = new parserFormula( 'NUMBERVALUE("3.5%")', "A1", ws );
+		ok( oParser.parse(), 'NUMBERVALUE("3.5%")');
+		strictEqual( oParser.calculate().getValue(), 0.035, 'NUMBERVALUE("3.5%")');
+
+		oParser = new parserFormula( 'NUMBERVALUE("3.5%%%")', "A1", ws );
+		ok( oParser.parse(), 'NUMBERVALUE("3.5%%%")');
+		strictEqual( oParser.calculate().getValue(), 0.0000035, 'NUMBERVALUE("3.5%%%")');
+
+		oParser = new parserFormula( 'NUMBERVALUE(123123,6,6)', "A1", ws );
+		ok( oParser.parse(), 'NUMBERVALUE(123123,6,6)');
+		strictEqual( oParser.calculate().getValue(), "#VALUE!", 'NUMBERVALUE(123123,6,6)');
+
+	});
+
     test( "Test: \"NORMDIST\"", function () {
 
         function normdist( x, mue, sigma, kum ) {
