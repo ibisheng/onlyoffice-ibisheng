@@ -3136,6 +3136,18 @@ $( function () {
 
     } );
 
+	test( "Test: \"GAMMALN.PRECISE\"", function () {
+
+		oParser = new parserFormula( "GAMMALN.PRECISE(4)", "A1", ws );
+		ok( oParser.parse(), "GAMMALN.PRECISE(4)" );
+		strictEqual( oParser.calculate().getValue().toFixed( 7 ) - 0, 1.7917595, "GAMMALN.PRECISE(4)" );
+
+		oParser = new parserFormula( "GAMMALN.PRECISE(-4.5)", "A1", ws );
+		ok( oParser.parse(), "GAMMALN.PRECISE(-4.5)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "GAMMALN.PRECISE(-4.5)" );
+
+	} );
+
     test( "Test: \"GEOMEAN\"", function () {
 
         function geommean( x ) {
