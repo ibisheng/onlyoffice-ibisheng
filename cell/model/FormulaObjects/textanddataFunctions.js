@@ -58,7 +58,7 @@
 
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cASC, cBAHTTEXT, cCHAR, cCLEAN, cCODE, cCONCATENATE, cCONCAT, cDOLLAR, cEXACT,
-		cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cPHONETIC, cPROPER, cREPLACE,
+		cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cNUMBERVALUE, cPHONETIC, cPROPER, cREPLACE,
 		cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTRIM, cUPPER, cVALUE);
 
 	/**
@@ -1147,6 +1147,135 @@
 
 	cMIDB.prototype = Object.create(cMID.prototype);
 	cMIDB.prototype.constructor = cMIDB;
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cNUMBERVALUE() {
+		this.name = "NUMBERVALUE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cNUMBERVALUE.prototype = Object.create(cBaseFunction.prototype);
+	cNUMBERVALUE.prototype.constructor = cNUMBERVALUE;
+	cNUMBERVALUE.prototype.argumentsMin = 1;
+	cNUMBERVALUE.prototype.argumentsMax = 3;
+	cNUMBERVALUE.prototype.isXLFN = true;
+	cNUMBERVALUE.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocString();
+		argClone[1] = argClone[1] ? argClone[1].tocString() : new cString(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
+		argClone[2] = argClone[2] ? argClone[2].tocString() : new cString(AscCommon.g_oDefaultCultureInfo.NumberGroupSeparator);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var replaceAt = function(str, index, chr) {
+			if (index > str.length - 1){
+				return str;
+			}else{
+				return str.substr(0, index) + chr + str.substr(index + 1);
+			}
+		};
+
+		var calcText = function(argArray){
+			var aInputString = argArray[0];
+			var aDecimalSeparator = argArray[1], aGroupSeparator = argArray[2];
+			var cDecimalSeparator = 0;
+
+			if(aDecimalSeparator){
+				if ( aDecimalSeparator.length === 1 ){
+					cDecimalSeparator = aDecimalSeparator[0];
+				}else{
+					return new cError(cErrorType.wrong_value_type);
+				}
+			}
+
+			if ( cDecimalSeparator && aGroupSeparator && aGroupSeparator.indexOf(cDecimalSeparator) !== -1 ){
+				return new cError(cErrorType.wrong_value_type)
+			}
+
+			if ( aInputString.length === 0 ){
+				return new cError(cErrorType.wrong_value_type)
+			}
+
+			//считаем количество вхождений cDecimalSeparator в строке
+			var count = 0;
+			for ( var i = 0; i < aInputString.length; i++){
+				if(cDecimalSeparator === aInputString[i]){
+					count++;
+				}
+				if(count > 1){
+					return new cError(cErrorType.wrong_value_type);
+				}
+			}
+
+			var nDecSep = cDecimalSeparator ? aInputString.indexOf( cDecimalSeparator ) : 0;
+			if ( nDecSep !== 0 ){
+				var aTemporary = nDecSep >= 0 ? aInputString.substr( 0, nDecSep ) : aInputString;
+
+				var nIndex = 0;
+				while (nIndex < aGroupSeparator.length) {
+					var nChar = aGroupSeparator[nIndex];
+
+					aTemporary = aTemporary.replace(new RegExp(RegExp.escape(nChar), "g"), "");
+					nIndex++;
+				}
+
+				if ( nDecSep >= 0 ) {
+					aInputString = aTemporary + aInputString.substr( nDecSep );
+				} else {
+					aInputString = aTemporary;
+				}
+			}
+
+			//replace decimal separator
+			aInputString = aInputString.replace(cDecimalSeparator, AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
+
+			//delete spaces
+			aInputString = aInputString.replace(/(\s|\r|\t|\n)/g, "");
+			/*for ( var i = aInputString.length; i >= 0; i--){
+				var c = aInputString.charCodeAt(i);
+				if ( c == 0x0020 || c == 0x0009 || c == 0x000A || c == 0x000D ){
+					aInputString = aInputString.replaceAt( i, 1, "" ); // remove spaces etc.
+				}
+			}*/
+
+			//remove and count '%'
+			var nPercentCount = 0;
+			for ( var i = aInputString.length - 1; i >= 0 && aInputString.charCodeAt(i) === 0x0025; i-- ){
+				aInputString = replaceAt(aInputString, i, "");
+				nPercentCount++;
+			}
+
+			var fVal = AscCommon.g_oFormatParser.parse(aInputString, AscCommon.g_oDefaultCultureInfo);
+			if ( fVal ) {
+				fVal = fVal.value;
+				if (nPercentCount){
+					 fVal *= Math.pow( 10, -(nPercentCount * 2));
+				}
+
+				return new cNumber(fVal);
+			 }
+
+			 return new cError(cErrorType.wrong_value_type)
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcText, true);
+	};
+	cNUMBERVALUE.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(text, decimal_separator, group_separator )"
+		};
+	};
+
 
 	/**
 	 * @constructor
