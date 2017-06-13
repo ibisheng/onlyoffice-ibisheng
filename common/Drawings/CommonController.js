@@ -1230,7 +1230,7 @@ DrawingObjectsController.prototype =
                     par = content.Content[hit_paragraph];
                     if(isRealObject(par))
                     {
-                        check_hyperlink = par.Check_Hyperlink(tx, ty, 0);
+                        check_hyperlink = par.CheckHyperlink(tx, ty, 0);
                         if(!isRealObject(check_hyperlink))
                         {
                             return this.handleMoveHit(object, e, x, y, group, false, pageIndex, bWord);
@@ -1298,7 +1298,7 @@ DrawingObjectsController.prototype =
                     par = content.Content[hit_paragraph];
                     if(isRealObject(par))
                     {
-                        check_hyperlink = par.Check_Hyperlink(tx, ty, 0);
+                        check_hyperlink = par.CheckHyperlink(tx, ty, 0);
                         if(isRealObject(check_hyperlink))
                         {
                             ret.hyperlink = check_hyperlink;

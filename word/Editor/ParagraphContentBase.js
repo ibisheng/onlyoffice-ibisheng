@@ -381,14 +381,23 @@ CParagraphContentWithParagraphLikeContent.prototype.Is_StartFromNewLine = functi
 
     return this.Content[0].Is_StartFromNewLine();
 };
-CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo = function(Info)
+CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
 	var Selection = this.Selection;
 
-	if (true === Selection.Use && Selection.StartPos === Selection.EndPos && this.Content[Selection.EndPos].GetSelectedElementsInfo)
-		this.Content[Selection.EndPos].GetSelectedElementsInfo(Info);
-	else if (false === Selection.Use && this.Content[this.State.ContentPos].GetSelectedElementsInfo)
-		this.Content[this.State.ContentPos].GetSelectedElementsInfo(Info);
+	if (ContentPos)
+	{
+		var Pos = ContentPos.Get(Depth);
+		if (this.Content[Pos].GetSelectedElementsInfo)
+			this.Content[Pos].GetSelectedElementsInfo(Info, ContentPos, Depth + 1);
+	}
+	else
+	{
+		if (true === Selection.Use && Selection.StartPos === Selection.EndPos && this.Content[Selection.EndPos].GetSelectedElementsInfo)
+			this.Content[Selection.EndPos].GetSelectedElementsInfo(Info);
+		else if (false === Selection.Use && this.Content[this.State.ContentPos].GetSelectedElementsInfo)
+			this.Content[this.State.ContentPos].GetSelectedElementsInfo(Info);
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 {

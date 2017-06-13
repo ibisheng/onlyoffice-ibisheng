@@ -5494,15 +5494,11 @@ Paragraph.prototype.Internal_ReplaceRun = function(Pos, NewRuns)
 
 	return CenterRunPos;
 };
-Paragraph.prototype.Check_Hyperlink = function(X, Y, PageIndex)
+Paragraph.prototype.CheckHyperlink = function(X, Y, CurPage)
 {
-	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, PageIndex, false, false);
-	var CurPos      = SearchPosXY.Pos.Get(0);
-
-	if (true === SearchPosXY.InText && para_Hyperlink === this.Content[CurPos].Type)
-		return this.Content[CurPos];
-
-	return null;
+	var oInfo = new CSelectedElementsInfo();
+	this.GetSelectedElementsInfo(oInfo, X, Y, CurPage);
+	return oInfo.Get_Hyperlink();
 };
 Paragraph.prototype.AddHyperlink = function(HyperProps)
 {
@@ -6805,14 +6801,28 @@ Paragraph.prototype.GetSelectedText = function(bClearText, oPr)
 
 	return Str;
 };
-Paragraph.prototype.GetSelectedElementsInfo = function(Info)
+Paragraph.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
 	Info.Set_Paragraph(this);
 
-	if (true === this.Selection.Use && this.Selection.StartPos === this.Selection.EndPos && this.Content[this.Selection.EndPos].GetSelectedElementsInfo)
-		this.Content[this.Selection.EndPos].GetSelectedElementsInfo(Info);
-	else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo)
-		this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo(Info);
+	if (ContentPos)
+	{
+		var Pos = ContentPos.Get(Depth);
+		if (this.Content[Pos].GetSelectedElementsInfo)
+			this.Content[Pos].GetSelectedElementsInfo(Info, ContentPos, Depth + 1);
+	}
+	else
+	{
+		if (true === this.Selection.Use && this.Selection.StartPos === this.Selection.EndPos && this.Content[this.Selection.EndPos].GetSelectedElementsInfo)
+			this.Content[this.Selection.EndPos].GetSelectedElementsInfo(Info);
+		else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo)
+			this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo(Info);
+	}
+};
+Paragraph.prototype.GetElementsInfoByXY = function(oInfo, X, Y, CurPage)
+{
+	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, false, false);
+	this.GetSelectedElementsInfo(oInfo, SearchPosXY.Pos, 0);
 };
 Paragraph.prototype.GetSelectedContent = function(DocContent)
 {
@@ -9138,13 +9148,21 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	MMData.X_abs       = Coords.X;
 	MMData.Y_abs       = Coords.Y;
 
-	var Hyperlink = this.Check_Hyperlink(X, Y, CurPage);
+	// TODO: Поиск гиперссылок и сносок нужно переделать через работу с SelectedElementsInfo
+	var oInfo = new CSelectedElementsInfo();
+	this.GetElementsInfoByXY(oInfo, X, Y, CurPage);
+
+	var oContentControl = oInfo.GetInlineLevelSdt();
+	var oHyperlink      = oInfo.Get_Hyperlink();
+	if (oContentControl)
+		oContentControl.DrawContentControlsTrack(true);
+
 	var Footnote  = this.CheckFootnote(X, Y, CurPage);
 
-	if (null != Hyperlink && (Y <= this.Pages[CurPage].Bounds.Bottom && Y >= this.Pages[CurPage].Bounds.Top))
+	if (null != oHyperlink && (Y <= this.Pages[CurPage].Bounds.Bottom && Y >= this.Pages[CurPage].Bounds.Top))
 	{
 		MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
-		MMData.Hyperlink = new Asc.CHyperlinkProperty(Hyperlink);
+		MMData.Hyperlink = new Asc.CHyperlinkProperty(oHyperlink);
 	}
 	else if (null !== Footnote && this.Parent instanceof CDocument)
 	{
@@ -9155,7 +9173,7 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	else
 		MMData.Type = AscCommon.c_oAscMouseMoveDataTypes.Common;
 
-	if (null != Hyperlink && true === AscCommon.global_keyboardEvent.CtrlKey)
+	if (null != oHyperlink && true === AscCommon.global_keyboardEvent.CtrlKey)
 		this.DrawingDocument.SetCursorType("pointer", MMData);
 	else
 		this.DrawingDocument.SetCursorType("default", MMData);

@@ -1648,7 +1648,7 @@ ParaMath.prototype.Get_AllFontNames = function(AllFonts)
     this.Root.Get_AllFontNames(AllFonts);
 };
 
-ParaMath.prototype.GetSelectedElementsInfo = function(Info)
+ParaMath.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
     Info.Set_Math(this);
 };
