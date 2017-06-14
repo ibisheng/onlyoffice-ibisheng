@@ -63,7 +63,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST, cBETA_DIST,
 		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
-		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cFTEST, cGAMMA, cGAMMAINV, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
@@ -2745,6 +2745,68 @@
 	};
 	cGAMMA.prototype.getInfo = function () {
 		return {name: this.name, args: "(number)"}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	//CLONE cGAMMA_INV FUNCTION
+	function cGAMMAINV() {
+		this.name = "GAMMAINV";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cGAMMAINV.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMAINV.prototype.constructor = cGAMMAINV;
+	cGAMMAINV.prototype.argumentsMin = 3;
+	cGAMMAINV.prototype.argumentsMax = 3;
+	cGAMMAINV.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			var fP = argArray[0];
+			var fAlpha = argArray[1];
+			var fBeta = argArray[2];
+
+			if (fAlpha <= 0 || fBeta <= 0 || fP < 0 || fP >= 1 ){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = null;
+			if (fP === 0){
+				res = 0;
+			}else {
+				var aFunc = new GAMMADISTFUNCTION(fP, fAlpha, fBeta);
+				var fStart = fAlpha * fBeta;
+				var oVal = iterateInverse(aFunc, fStart * 0.5, fStart);
+				var bConvError = oVal.bError;
+
+				if (bConvError){
+					return new cError(cErrorType.not_numeric);
+					//SetError(FormulaError::NoConvergence);
+				}
+				res = oVal.val;
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cGAMMAINV.prototype.getInfo = function () {
+		return {name: this.name, args: "(probability, alpha, beta )"}
 	};
 
 	/**
