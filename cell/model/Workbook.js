@@ -4752,7 +4752,8 @@
 		}
 	};
 	Worksheet.prototype._updatePivotTables = function (range) {
-		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, pos, countC, countR;
+		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, pos, countC, countR, stripes = [],
+			stripeIndex, stripeCount, emptyStripe = new Asc.CTableStyleElement();
 		var dxf, dxfLabels, dxfValues;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			pivotTable = this.pivotTables[i];
@@ -4784,8 +4785,48 @@
 			countC = pivotTable.getColumnFieldsCount();
 			countR = pivotTable.getRowFieldsCount(true);
 
+			if (styleInfo.showColStripes) {
+				stripeIndex = stripeCount = 0;
+				stripes[0] = style.firstColumnStripe || emptyStripe;
+				stripes[1] = style.secondColumnStripe || emptyStripe;
+				if (stripes[0].dxf || stripes[1].dxf) {
+					for (j = pivotRange.c1 + countR; j <= pivotRange.c2; ++j) {
+						if (!this.getColHidden()) {
+							if (dxf = stripes[stripeIndex].dxf) {
+								cells = this.getRange3(pivotRange.r1, j, pivotRange.r2, j);
+								cells.setTableStyle(dxf);
+							}
+							if (stripes[stripeIndex].size === ++stripeCount) {
+								stripeIndex = (stripeIndex + 1) % 2;
+								stripeCount = 0;
+							}
+						}
+					}
+				}
+			}
+			if (styleInfo.showRowStripes) {
+				stripeIndex = stripeCount = 0;
+				stripes[0] = style.firstRowStripe || emptyStripe;
+				stripes[1] = style.secondRowStripe || emptyStripe;
+				if (stripes[0].dxf || stripes[1].dxf) {
+					for (j = pivotRange.r1 + countC + 1; j <= pivotRange.r2; ++j) {
+						if (!this.getRowHidden()) {
+							if (dxf = stripes[stripeIndex].dxf) {
+								cells = this.getRange3(j, pivotRange.c1, j, pivotRange.c2);
+								cells.setTableStyle(dxf);
+							}
+							if (stripes[stripeIndex].size === ++stripeCount) {
+								stripeIndex = (stripeIndex + 1) % 2;
+								stripeCount = 0;
+							}
+						}
+					}
+				}
+			}
+
 			if (styleInfo.showRowHeaders && countR) {
-				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c1 + Math.max(0, countR - 1));
+				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2,
+					pivotRange.c1 + Math.max(0, countR - 1));
 				dxf = style.firstColumn && style.firstColumn.dxf;
 				cells.setTableStyle(dxf);
 			}
