@@ -15229,16 +15229,37 @@ CDocument.prototype.GetAllContentControls = function()
 };
 CDocument.prototype.RemoveContentControl = function(Id)
 {
-	var oBlockLevelSdt = this.TableId.Get_ById(Id);
-	if (oBlockLevelSdt && oBlockLevelSdt.Parent)
+	var oContentControl = this.TableId.Get_ById(Id);
+	if (!oContentControl)
+		return;
+
+	if (AscCommonWord.sdttype_BlockLevel === oContentControl.GetContentControlType() && oContentControl.Parent)
 	{
 		this.RemoveSelection();
-		var oDocContent = oBlockLevelSdt.Parent;
+		var oDocContent = oContentControl.Parent;
 		oDocContent.Update_ContentIndexing();
-		var nIndex = oBlockLevelSdt.GetIndex();
+		var nIndex = oContentControl.GetIndex();
 		oDocContent.Remove_FromContent(nIndex, 1);
 		oDocContent.MoveCursorToStartPos();
 	}
+	else if (AscCommonWord.sdttype_InlineLevel === oContentControl.GetContentControlType())
+	{
+		this.SelectContentControl(Id);
+		this.RemoveBeforePaste();
+	}
+};
+CDocument.prototype.RemoveContentControlWrapper = function(Id)
+{
+	var oContentControl = this.TableId.Get_ById(Id);
+	if (!oContentControl)
+		return;
+
+	this.History.Create_NewPoint();
+
+	oContentControl.RemoveContentControlWrapper();
+	this.Recalculate();
+	this.Document_UpdateInterfaceState();
+	this.Document_UpdateSelectionState();
 };
 CDocument.prototype.GetContentControl = function(Id)
 {

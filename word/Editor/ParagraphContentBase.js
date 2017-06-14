@@ -626,8 +626,8 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = functio
                     this.State.Selection.EndPos = Pos;
             }
 
-            this.Selection.StartPos = Math.min(this.Content.length - 1, Math.max(0, this.Selection.StartPos));
-            this.Selection.EndPos   = Math.min(this.Content.length - 1, Math.max(0, this.Selection.EndPos));
+            this.Selection.StartPos = Math.max(0, Math.min(this.Content.length - 1, this.Selection.StartPos));
+            this.Selection.EndPos   = Math.max(0, Math.min(this.Content.length - 1, this.Selection.EndPos));
         }
 
         // Также передвинем всем метки переносов страниц и строк
@@ -1185,9 +1185,6 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_ContentLength = function
 };
 CParagraphContentWithParagraphLikeContent.prototype.Get_Parent = function()
 {
-    if (this.Parent)
-        return this.Parent;
-
     if (!this.Paragraph)
         return null;
 
@@ -1969,7 +1966,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
     // Удалим отметки о старом селекте
     if ( OldStartPos < StartPos && OldStartPos < EndPos )
     {
-        var TempBegin = OldStartPos;
+        var TempBegin = Math.max(0, OldStartPos);
         var TempEnd   = Math.min(this.Content.length - 1, Math.min(StartPos, EndPos) - 1);
         for (var CurPos = TempBegin; CurPos <= TempEnd; ++CurPos)
         {
@@ -1979,7 +1976,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_SelectionContentPos = fu
 
     if ( OldEndPos > StartPos && OldEndPos > EndPos )
     {
-        var TempBegin = Math.max(StartPos, EndPos) + 1;
+        var TempBegin = Math.max(0, Math.max(StartPos, EndPos) + 1);
         var TempEnd   = Math.min(OldEndPos, this.Content.length - 1);
         for (var CurPos = TempBegin; CurPos <= TempEnd; ++CurPos)
         {
