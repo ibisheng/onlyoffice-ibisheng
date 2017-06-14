@@ -2823,7 +2823,7 @@
 	};
 	cFINV.prototype.getInfo = function () {
 		return {
-			name: this.name, args: "(x, deg_freedom1, deg_freedom2)"
+			name: this.name, args: "(probability, deg_freedom1, deg_freedom2)"
 		};
 	};
 
