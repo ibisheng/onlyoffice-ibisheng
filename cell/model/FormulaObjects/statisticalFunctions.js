@@ -61,7 +61,7 @@
 
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST, cBETA_DIST,
-		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
+		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
 		cFTEST, cGAMMA, cGAMMADIST, cGAMMAINV, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
@@ -462,8 +462,7 @@
 		return fSum;
 	}
 
-	function getGammaDistPDF( fX, fAlpha, fLambda )
-	{
+	function getGammaDistPDF( fX, fAlpha, fLambda )	{
 		if (fX < 0){
 			return 0;
 		}else if (fX === 0){
@@ -497,8 +496,7 @@
 		}
 	}
 
-	function getChiDist( fX, fDF)
-	{
+	function getChiDist( fX, fDF){
 		if (fX <= 0.0){
 			return 1.0;
 		}else{
@@ -506,8 +504,7 @@
 		}
 	}
 
-	function getUpRegIGamma( fA, fX )
-	{
+	function getUpRegIGamma( fA, fX ){
 		var fLnFactor= fA * Math.log(fX) - fX - getLogGamma(fA);
 		var fFactor = Math.exp(fLnFactor);
 		if (fX > fA + 1){
@@ -515,6 +512,45 @@
 		}else{
 			return 1 - fFactor * getGammaSeries(fA, fX);
 		}
+	}
+
+	function getChiSqDistCDF( fX, fDF){
+		if (fX <= 0){
+			return 0;
+		}else{
+			return GetLowRegIGamma( fDF/2, fX/2);
+		}
+	}
+
+	function getChiSqDistPDF( fX, fDF){
+		var fValue;
+		if (fX <= 0){
+			return 0;
+		}
+		if (fDF*fX > 1391000)	{
+			fValue = Math.exp((0.5*fDF - 1) * Math.log(fX*0.5) - 0.5 * fX - Math.log(2) - getLogGamma(0.5*fDF));
+		}
+		else {
+			var fCount;
+			if (Math.fmod(fDF, 2) < 0.5){
+				fValue = 0.5;
+				fCount = 2;
+			}else{
+				fValue = 1 / Math.sqrt(fX * 2 * Math.PI);
+				fCount = 1;
+			}
+
+			while ( fCount < fDF){
+				fValue *= (fX / fCount);
+				fCount += 2;
+			}
+			if (fX >= 1425){
+				fValue = Math.exp(Math.log(fValue) - fX / 2);
+			}else{
+				fValue *= Math.exp(- fX/2);
+			}
+		}
+		return fValue;
 	}
 
 	//BETA DISTRIBUTION
@@ -1639,6 +1675,62 @@
 	cCHIINV.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "(probability, deg_freedom)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCHISQ_DIST() {
+		cBaseFunction.call(this, "CHISQ.DIST");
+	}
+
+	cCHISQ_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cCHISQ_DIST.prototype.constructor = cCHISQ_DIST;
+	cCHISQ_DIST.prototype.argumentsMin = 3;
+	cCHISQ_DIST.prototype.argumentsMax = 3;
+	cCHISQ_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var fX = argArray[0];
+			var fDF = parseInt(argArray[1]);
+			var bCumulative = argArray[2];
+
+			var res = null;
+			if ( fDF < 1 || fDF > 1E10 || fX < 0){
+				return  new cError(cErrorType.not_numeric);
+			}else{
+				if ( bCumulative ){
+					res = getChiSqDistCDF( fX, fDF );
+				}else{
+					res = getChiSqDistPDF( fX, fDF );
+				}
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		if (argClone[1].getValue() < 1 ){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cCHISQ_DIST.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom, cumulative)"
 		};
 	};
 
