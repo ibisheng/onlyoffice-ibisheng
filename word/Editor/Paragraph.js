@@ -5497,7 +5497,7 @@ Paragraph.prototype.Internal_ReplaceRun = function(Pos, NewRuns)
 Paragraph.prototype.CheckHyperlink = function(X, Y, CurPage)
 {
 	var oInfo = new CSelectedElementsInfo();
-	this.GetSelectedElementsInfo(oInfo, X, Y, CurPage);
+	this.GetElementsInfoByXY(oInfo, X, Y, CurPage);
 	return oInfo.Get_Hyperlink();
 };
 Paragraph.prototype.AddHyperlink = function(HyperProps)
