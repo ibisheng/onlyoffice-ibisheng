@@ -1065,6 +1065,15 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0500006, "CHIDIST(A2,A3)" );
 	} );
 
+	test( "Test: \"CHISQ.DIST.RT\"", function () {
+		ws.getRange2( "A2" ).setValue( "18.307" );
+		ws.getRange2( "A3" ).setValue( "10" );
+
+		oParser = new parserFormula( "CHISQ.DIST.RT(A2,A3)", "A1", ws );
+		ok( oParser.parse(), "CHISQ.DIST.RT(A2,A3)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0500006, "CHISQ.DIST.RT(A2,A3)" );
+	} );
+
 	test( "Test: \"CHISQ.DIST\"", function () {
 		oParser = new parserFormula( "CHISQ.DIST(0.5,1,TRUE)", "A1", ws );
 		ok( oParser.parse(), "CHISQ.DIST(0.5,1,TRUE)" );

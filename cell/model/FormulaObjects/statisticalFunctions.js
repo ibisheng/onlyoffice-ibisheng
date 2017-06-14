@@ -61,7 +61,7 @@
 
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST, cBETA_DIST,
-		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
+		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
 		cFTEST, cGAMMA, cGAMMADIST, cGAMMAINV, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
@@ -1731,6 +1731,51 @@
 	cCHISQ_DIST.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "(x, deg_freedom, cumulative)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	//clone cCHIDIST function
+	function cCHISQ_DIST_RT() {
+		cBaseFunction.call(this, "CHISQ.DIST.RT");
+	}
+
+	cCHISQ_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
+	cCHISQ_DIST_RT.prototype.constructor = cCHISQ_DIST_RT;
+	cCHISQ_DIST_RT.prototype.argumentsMin = 2;
+	cCHISQ_DIST_RT.prototype.argumentsMax = 2;
+	cCHISQ_DIST_RT.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var fChi = argArray[0];
+			var fDF = parseInt(argArray[1]);
+
+			if ( fDF < 1 || fChi < 0 || fDF > Math.pow(10, 10)){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var res = getChiDist( fChi, fDF);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cCHISQ_DIST_RT.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom)"
 		};
 	};
 
