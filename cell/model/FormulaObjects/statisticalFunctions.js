@@ -1248,12 +1248,62 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cBETADIST() {/*Нет реализации в Google Docs*/
-		cBaseFunction.call(this, "BETADIST");
+	function cBETADIST() {
+		this.name = "BETADIST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cBETADIST.prototype = Object.create(cBaseFunction.prototype);
 	cBETADIST.prototype.constructor = cBETADIST;
+	cBETADIST.prototype.argumentsMin = 3;
+	cBETADIST.prototype.argumentsMax = 5;
+	cBETADIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cNumber(0);
+		argClone[4] = argClone[4] ? argClone[4].tocNumber() : new cNumber(1);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcBeta = function(argArray){
+			var x = argArray[0];
+			var alpha = argArray[1];
+			var beta = argArray[2];
+			var fLowerBound = argArray[3];
+			var fUpperBound = argArray[4];
+
+			var fScale = fUpperBound - fLowerBound;
+			if (fScale <= 0 || alpha <= 0 || beta <= 0){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = null;
+			if (x < fLowerBound){
+				res = 0;
+			}else if(x > fUpperBound){
+				res = 1;
+			}else {
+				x = (x - fLowerBound) / fScale;
+				res = getBetaDist(x, alpha, beta);
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcBeta);
+	};
+	cBETADIST.prototype.getInfo = function () {
+		return {name: this.name, args: "( x, alpha, beta, a, b )"}
+	};
 
 	/**
 	 * @constructor
@@ -1286,7 +1336,7 @@
 			return this.value = argError;
 		}
 
-		var calcGamma = function(argArray){
+		var calcBeta = function(argArray){
 			var x = argArray[0];
 			var alpha = argArray[1];
 			var beta = argArray[2];
@@ -1313,7 +1363,7 @@
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+		return this.value = this._findArrayInNumberArguments(oArguments, calcBeta);
 	};
 	cBETA_DIST.prototype.getInfo = function () {
 		return {name: this.name, args: "( x, alpha, beta, cumulative, a, b )"}
