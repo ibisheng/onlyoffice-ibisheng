@@ -126,7 +126,7 @@ function MoveShapeImageTrack(originalObject)
         this.overlayObject.draw(overlay);
     };
 
-    this.trackEnd = function(bWord)
+    this.trackEnd = function(bWord, bNoResetCnx)
     {
         if(!this.bIsTracked){
             return;
@@ -194,7 +194,7 @@ function MoveShapeImageTrack(originalObject)
                     }
                 }
 
-                if(bResetEnd || bResetBegin){
+                if((bResetEnd || bResetBegin) && (bNoResetCnx !== false)){
                     var _copy_nv_sp_pr = nvUniSpPr.copy();
                     if(bResetBegin){
                         _copy_nv_sp_pr.stCnxId = null;

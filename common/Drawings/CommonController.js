@@ -11067,6 +11067,51 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
         }
         return bullet;
     }
+
+
+
+    function fResetConnectorsIds(aCopyObjects, oIdMaps){
+        for(var i = 0; i < aCopyObjects.length; ++i){
+            var oDrawing = aCopyObjects[i].Drawing ? aCopyObjects[i].Drawing : aCopyObjects[i];
+            if(oDrawing.getObjectType){
+                if(oDrawing.getObjectType() === AscDFH.historyitem_type_Cnx){
+                    var sStId = oDrawing.getStCxnId();
+                    var sEndId = oDrawing.getEndCxnId();
+                    var sStCnxId = null, sEndCnxId = null;
+                    if(oIdMaps[sStId]){
+                        sStCnxId = oIdMaps[sStId];
+                    }
+                    if(oIdMaps[sEndId]){
+                        sEndCnxId = oIdMaps[sEndId];
+                    }
+                    if(sStId !==  sStCnxId || sEndCnxId !== sEndId){
+
+                        var nvUniSpPr = oDrawing.nvSpPr.nvUniSpPr.copy();
+                        if(!sStCnxId){
+                            nvUniSpPr.stCnxIdx = null;
+                            nvUniSpPr.stCnxId  = null;
+                        }
+                        else{
+                            nvUniSpPr.stCnxId  = sStCnxId;
+                        }
+                        if(!sEndCnxId){
+                            nvUniSpPr.endCnxIdx = null;
+                            nvUniSpPr.endCnxId  = null;
+                        }
+                        else{
+                            nvUniSpPr.endCnxId  = sEndCnxId;
+                        }
+                        oDrawing.nvSpPr.setUniSpPr(nvUniSpPr);
+                    }
+                }
+                else if(oDrawing.getObjectType() === AscDFH.historyitem_type_GroupShape){
+                    fResetConnectorsIds(oDrawing.spTree, oIdMaps);
+                }
+            }
+        }
+    }
+
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].HANDLE_EVENT_MODE_HANDLE = HANDLE_EVENT_MODE_HANDLE;
@@ -11142,4 +11187,5 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].fGetPresentationBulletByNumInfo = fGetPresentationBulletByNumInfo;
 	window['AscFormat'].fGetFontByNumInfo = fGetFontByNumInfo;
 	window['AscFormat'].CreateBlipFillRasterImageId = CreateBlipFillRasterImageId;
+	window['AscFormat'].fResetConnectorsIds = fResetConnectorsIds;
 })(window);

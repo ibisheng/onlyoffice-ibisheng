@@ -526,11 +526,13 @@
 				{
 					pptx_content_writer.Start_UseFullUrl();
 
+                    pptx_content_writer.BinaryFileWriter.ClearIdMap();
+
 					// ToDo multiselect ?
 					var selectionRange = activeRange ? activeRange : worksheet.model.selectionRange.getLast();
 					var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(worksheet.model.workbook, selectionRange);
 					sBase64 = "xslData;" + oBinaryFileWriter.Write();
-					
+                    pptx_content_writer.BinaryFileWriter.ClearIdMap();
 					pptx_content_writer.End_UseFullUrl();
 				}
 				
@@ -1086,9 +1088,11 @@
 				var newFonts;
 				
 				pptx_content_loader.Start_UseFullUrl();
+                pptx_content_loader.Reader.ClearConnectorsMaps();
 				oBinaryFileReader.Read(base64, tempWorkbook);
 				this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
 				var aPastedImages = pptx_content_loader.End_UseFullUrl();
+                pptx_content_loader.Reader.AssignConnectorsId();
 				
 				var pasteData = null;
 				if (tempWorkbook)
@@ -1602,10 +1606,22 @@
 						}
 					}
 				}
-				
+
+				var aCopies = [];
+				var oIdMap = {};
 				for(var i = 0; i < data.Drawings.length; i++)
 				{	
-					data.Drawings[i].graphicObject = data.Drawings[i].graphicObject.copy();
+					var _copy;
+					if(data.Drawings[i].graphicObject.getObjectType() === AscDFH.historyitem_type_GroupShape){
+                        _copy = data.Drawings[i].graphicObject.copy(oIdMap);
+					}
+					else{
+                        _copy = data.Drawings[i].graphicObject.copy();
+					}
+					oIdMap[data.Drawings[i].graphicObject.Id] = _copy.Id;
+					data.Drawings[i].graphicObject = _copy;
+                    aCopies.push(data.Drawings[i].graphicObject);
+
 					drawingObject = data.Drawings[i];
 					
                     if(drawingObject.graphicObject.fromSerialize && drawingObject.graphicObject.setBFromSerialize)
@@ -1668,7 +1684,7 @@
 						}
 					}
 				}
-
+				AscFormat.fResetConnectorsIds(aCopies, oIdMap);
                 ws.objectRender.showDrawingObjects(true);
                 ws.objectRender.controller.updateOverlay();
                 ws.setSelectionShape(true);
@@ -2194,6 +2210,8 @@
 				var loader = new AscCommon.BinaryPPTYLoader();
 				loader.presentation = worksheet.model;
 				loader.Start_UseFullUrl();
+
+                loader.ClearConnectorsMaps();
 				loader.stream = stream;
 				
 				var count = stream.GetULong();
@@ -2242,7 +2260,7 @@
 					arr_shapes[i] = worksheet.objectRender.createDrawingObject();
 					arr_shapes[i].graphicObject = drawing;
 				}
-				
+                loader.AssignConnectorsId();
 				History.TurnOn();
 				
 				var arrImages = arrBase64Img.concat(loader.End_UseFullUrl());

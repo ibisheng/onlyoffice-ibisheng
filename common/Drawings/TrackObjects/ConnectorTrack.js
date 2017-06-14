@@ -4,7 +4,7 @@
 
 (function () {
     function CConnectorTrack(oConnector, oBeginTrack, oEndTrack, oBeginShape, oEndShape){
-        this.connector = oConnector;
+        this.originalObject = oConnector;
         this.beginTrack = oBeginTrack;
         this.endTrack = oEndTrack;
 
@@ -12,11 +12,11 @@
         this.endShape = oEndShape;
 
 
-        this.startX = this.connector.transform.TransformPointX(0, 0);
-        this.startY = this.connector.transform.TransformPointY(0, 0);
+        this.startX = this.originalObject.transform.TransformPointX(0, 0);
+        this.startY = this.originalObject.transform.TransformPointY(0, 0);
 
-        if(this.connector.group){
-            var oInvertTransform = this.connector.group.invertTransform;
+        if(this.originalObject.group){
+            var oInvertTransform = this.originalObject.group.invertTransform;
             var _stX =  oInvertTransform.TransformPointX(this.startX, this.startY);
             var _stY =  oInvertTransform.TransformPointY(this.startX, this.startY);
             this.startX = _stX;
@@ -24,8 +24,8 @@
         }
 
 
-        this.endX = this.connector.transform.TransformPointX(this.connector.extX, this.connector.extY);
-        this.endY = this.connector.transform.TransformPointY(this.connector.extX, this.connector.extY);
+        this.endX = this.originalObject.transform.TransformPointX(this.originalObject.extX, this.originalObject.extY);
+        this.endY = this.originalObject.transform.TransformPointY(this.originalObject.extX, this.originalObject.extY);
 
 
         this.oSpPr = AscFormat.ExecuteNoHistory(function () {
@@ -38,13 +38,13 @@
     CConnectorTrack.prototype.track = function()
     {
 
-        var oConnectorInfo = this.connector.nvSpPr.nvUniSpPr;
+        var oConnectorInfo = this.originalObject.nvSpPr.nvUniSpPr;
         var _rot, track_bounds, g_conn_info, oConnectionObject, _flipH, _flipV, _bounds, _transform;
         var _startConnectionParams = null;
         var _endConnectionParams = null;
         var _group = null;
-        if(this.connector.group) {
-            _group = this.connector.group;
+        if(this.originalObject.group) {
+            _group = this.originalObject.group;
         }
         if(this.beginTrack){
             track_bounds = this.convertTrackBounds(this.beginTrack.getBounds());
@@ -77,7 +77,7 @@
             }
             oConnectionObject = this.beginTrack.overlayObject.geometry.cnxLst[oConnectorInfo.stCnxIdx];
             g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConnectionObject.ang, x: oConnectionObject.x, y: oConnectionObject.y};
-            _startConnectionParams = this.connector.convertToConnectionParams(_rot, _flipH, _flipV, _transform, _bounds, g_conn_info);
+            _startConnectionParams = this.originalObject.convertToConnectionParams(_rot, _flipH, _flipV, _transform, _bounds, g_conn_info);
         }
         if(this.endTrack){
             track_bounds = this.convertTrackBounds(this.endTrack.getBounds());
@@ -110,7 +110,7 @@
             }
             oConnectionObject = this.endTrack.overlayObject.geometry.cnxLst[oConnectorInfo.endCnxIdx];
             g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConnectionObject.ang, x: oConnectionObject.x, y: oConnectionObject.y};
-            _endConnectionParams = this.connector.convertToConnectionParams(_rot, _flipH, _flipV, _transform, _bounds, g_conn_info);
+            _endConnectionParams = this.originalObject.convertToConnectionParams(_rot, _flipH, _flipV, _transform, _bounds, g_conn_info);
         }
         if(_startConnectionParams || _endConnectionParams){
 
@@ -121,8 +121,8 @@
                 else{
                     if((this.endTrack instanceof AscFormat.MoveShapeImageTrack)){
                         var _dx,_dy;
-                        if(this.connector.group){
-                            var _oCopyMatrix = this.connector.group.invertTransform.CreateDublicate();
+                        if(this.originalObject.group){
+                            var _oCopyMatrix = this.originalObject.group.invertTransform.CreateDublicate();
                             _oCopyMatrix.tx = 0;
                             _oCopyMatrix.ty = 0;
                             _dx = _oCopyMatrix.TransformPointX(this.endTrack.lastDx, this.endTrack.lastDy);
@@ -132,7 +132,7 @@
                             _dx = this.endTrack.lastDx;
                             _dy = this.endTrack.lastDy;
                         }
-                        this.oSpPr = AscFormat.ExecuteNoHistory(function(){return this.connector.spPr.createDuplicate()}, this, []);
+                        this.oSpPr = AscFormat.ExecuteNoHistory(function(){return this.originalObject.spPr.createDuplicate()}, this, []);
                         this.oSpPr.xfrm.offX += _dx;
                         this.oSpPr.xfrm.offY += _dy;
                         this.geometry = this.oSpPr.geometry;
@@ -153,8 +153,8 @@
                 else{
                     if((this.beginTrack instanceof AscFormat.MoveShapeImageTrack)){
                         var _dx,_dy;
-                        if(this.connector.group){
-                            var _oCopyMatrix = this.connector.group.invertTransform.CreateDublicate();
+                        if(this.originalObject.group){
+                            var _oCopyMatrix = this.originalObject.group.invertTransform.CreateDublicate();
                             _oCopyMatrix.tx = 0;
                             _oCopyMatrix.ty = 0;
                             _dx = _oCopyMatrix.TransformPointX(this.beginTrack.lastDx, this.beginTrack.lastDy);
@@ -164,7 +164,7 @@
                             _dx = this.beginTrack.lastDx;
                             _dy = this.beginTrack.lastDy;
                         }
-                        this.oSpPr = AscFormat.ExecuteNoHistory(function(){return this.connector.spPr.createDuplicate()}, this, []);
+                        this.oSpPr = AscFormat.ExecuteNoHistory(function(){return this.originalObject.spPr.createDuplicate()}, this, []);
                         this.oSpPr.xfrm.offX += _dx;
                         this.oSpPr.xfrm.offY += _dy;
                         this.geometry = this.oSpPr.geometry;
@@ -177,7 +177,7 @@
                     _endConnectionParams = AscFormat.fCalculateConnectionInfo(_startConnectionParams, this.endX, this.endY);
                 }
             }
-            this.oSpPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.connector.spPr.geometry.preset, this.overlayObject.pen.w);
+            this.oSpPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.originalObject.spPr.geometry.preset, this.overlayObject.pen.w);
             this.geometry = this.oSpPr.geometry;
             this.overlayObject.geometry = this.geometry;
             this.calculateTransform();
@@ -205,15 +205,15 @@
         global_MatrixTransformer.RotateRadAppend(_transform, -(AscFormat.isRealNumber(this.oSpPr.xfrm.rot) ? this.oSpPr.xfrm.rot : 0 ));
         global_MatrixTransformer.TranslateAppend(_transform, this.oSpPr.xfrm.offX, this.oSpPr.xfrm.offY);
         global_MatrixTransformer.TranslateAppend(_transform, _horizontal_center, _vertical_center);
-        if(this.connector.group)
+        if(this.originalObject.group)
         {
-            global_MatrixTransformer.MultiplyAppend(_transform, this.connector.group.transform);
+            global_MatrixTransformer.MultiplyAppend(_transform, this.originalObject.group.transform);
         }
     };
 
     CConnectorTrack.prototype.trackEnd = function()
     {
-        var _xfrm = this.connector.spPr.xfrm;
+        var _xfrm = this.originalObject.spPr.xfrm;
         var _xfrm2 = this.oSpPr.xfrm;
         _xfrm.setOffX(_xfrm2.offX);
         _xfrm.setOffY(_xfrm2.offY);
@@ -222,9 +222,9 @@
         _xfrm.setFlipH(_xfrm2.flipH);
         _xfrm.setFlipV(_xfrm2.flipV);
         _xfrm.setRot(_xfrm2.rot);
-        this.connector.spPr.setGeometry(this.oSpPr.geometry.createDuplicate());
+        this.originalObject.spPr.setGeometry(this.oSpPr.geometry.createDuplicate());
 
-        this.connector.checkDrawingBaseCoords();
+        this.originalObject.checkDrawingBaseCoords();
     };
     CConnectorTrack.prototype.convertTrackBounds = function(trackBounds)
     {
