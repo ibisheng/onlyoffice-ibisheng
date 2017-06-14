@@ -943,6 +943,18 @@
 		return res;
 	};
 
+	function FDISTFUNCTION(fp, fF1, fF2){
+		this.fp = fp;
+		this.fF1 = fF1;
+		this.fF2 = fF2;
+	}
+	FDISTFUNCTION.prototype.GetValue = function(x){
+		var res;
+		var betaDistVal = getFDist(x, this.fF1, this.fF2);
+		res = this.fp - betaDistVal;
+		return res;
+	};
+
 
 	/**
 	 * @constructor
@@ -2767,6 +2779,53 @@
 
 	cFINV.prototype = Object.create(cBaseFunction.prototype);
 	cFINV.prototype.constructor = cFINV;
+	cFINV.prototype.argumentsMin = 3;
+	cFINV.prototype.argumentsMax = 3;
+	cFINV.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFDist = function(argArray){
+			var fP = argArray[0];
+			var fF1 = parseInt(argArray[1]);
+			var fF2 = parseInt(argArray[2]);
+
+			if (fP <= 0 || fF1 < 1 || fF2 < 1 || fF1 >= 1.0E10 || fF2 >= 1.0E10 || fP > 1){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var aFunc = new FDISTFUNCTION(fP, fF1, fF2);
+			var oVal = iterateInverse( aFunc, fF1*0.5, fF1 );
+			var bConvError = oVal.bError;
+
+			if (bConvError){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = oVal.val;
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		if (argClone[1].getValue() < 1 ){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
+	};
+	cFINV.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom1, deg_freedom2)"
+		};
+	};
 
 	/**
 	 * @constructor
