@@ -1009,6 +1009,16 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.01, "F.DIST.RT(A2,A3,A4)" );
 	} );
 
+	test( "Test: \"FINV\"", function () {
+		ws.getRange2( "A2" ).setValue( "0.01" );
+		ws.getRange2( "A3" ).setValue( "6" );
+		ws.getRange2( "A4" ).setValue( "4" );
+
+		oParser = new parserFormula( "FINV(A2,A3,A4)", "A1", ws );
+		ok( oParser.parse(), "FINV(A2,A3,A4)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 15.206865, "FINV(A2,A3,A4)" );
+	} );
+
 	test( "Test: \"GAMMA\"", function () {
 		oParser = new parserFormula( "GAMMA(2.5)", "A1", ws );
 		ok( oParser.parse(), "GAMMA(2.5)" );
