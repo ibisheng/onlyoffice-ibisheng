@@ -497,6 +497,25 @@
 		}
 	}
 
+	function getChiDist( fX, fDF)
+	{
+		if (fX <= 0.0){
+			return 1.0;
+		}else{
+			return getUpRegIGamma( fDF/2.0, fX/2.0);
+		}
+	}
+
+	function getUpRegIGamma( fA, fX )
+	{
+		var fLnFactor= fA * Math.log(fX) - fX - getLogGamma(fA);
+		var fFactor = Math.exp(fLnFactor);
+		if (fX > fA + 1){
+			return fFactor * getGammaContFraction(fA, fX);
+		}else{
+			return 1 - fFactor * getGammaSeries(fA, fX);
+		}
+	}
 
 	//BETA DISTRIBUTION
 	function getBetaDist(fXin, fAlpha, fBeta) {
@@ -1525,6 +1544,39 @@
 
 	cCHIDIST.prototype = Object.create(cBaseFunction.prototype);
 	cCHIDIST.prototype.constructor = cCHIDIST;
+	cCHIDIST.prototype.argumentsMin = 2;
+	cCHIDIST.prototype.argumentsMax = 2;
+	cCHIDIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var fChi = argArray[0];
+			var fDF = parseInt(argArray[1]);
+
+			if ( fDF < 1 || fChi < 0 || fDF > Math.pow(10, 10)){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var res = getChiDist( fChi, fDF);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cCHIDIST.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(x, deg_freedom)"
+		};
+	};
 
 	/**
 	 * @constructor

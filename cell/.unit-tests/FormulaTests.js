@@ -1056,6 +1056,15 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.068094, "GAMMADIST(A2,A3,A4,TRUE)" );
 	} );
 
+	test( "Test: \"CHIDIST\"", function () {
+		ws.getRange2( "A2" ).setValue( "18.307" );
+		ws.getRange2( "A3" ).setValue( "10" );
+
+		oParser = new parserFormula( "CHIDIST(A2,A3)", "A1", ws );
+		ok( oParser.parse(), "CHIDIST(A2,A3)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0500006, "CHIDIST(A2,A3)" );
+	} );
+
 	test( "Test: \"BETA.INV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.685470581" );
 		ws.getRange2( "A3" ).setValue( "8" );
