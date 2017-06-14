@@ -1065,6 +1065,15 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0500006, "CHIDIST(A2,A3)" );
 	} );
 
+	test( "Test: \"CHIINV\"", function () {
+		ws.getRange2( "A2" ).setValue( "0.050001" );
+		ws.getRange2( "A3" ).setValue( "10" );
+
+		oParser = new parserFormula( "CHIINV(A2,A3)", "A1", ws );
+		ok( oParser.parse(), "CHIINV(A2,A3)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 18.306973, "CHIINV(A2,A3)" );
+	} );
+
 	test( "Test: \"BETA.INV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.685470581" );
 		ws.getRange2( "A3" ).setValue( "8" );

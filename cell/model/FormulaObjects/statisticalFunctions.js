@@ -885,6 +885,18 @@
 		return res;
 	};
 
+	function CHIDISTFUNCTION(fp, fDF){
+		this.fp = fp;
+		this.fDF = fDF;
+	}
+	CHIDISTFUNCTION.prototype.GetValue = function(x){
+		var res;
+		var betaDistVal = getChiDist(x, this.fDF);
+		res = this.fp - betaDistVal;
+		return res;
+	};
+
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
@@ -1588,6 +1600,47 @@
 
 	cCHIINV.prototype = Object.create(cBaseFunction.prototype);
 	cCHIINV.prototype.constructor = cCHIINV;
+	cCHIINV.prototype.argumentsMin = 2;
+	cCHIINV.prototype.argumentsMax = 2;
+	cCHIINV.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var fP = argArray[0];
+			var fDF = parseInt(argArray[1]);
+
+			if ( fDF < 1 || fP <= 0 || fP > 1){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var aFunc = new CHIDISTFUNCTION(fP, fDF);
+			var oVal = iterateInverse(aFunc, fDF * 0.5, fDF);
+			var bConvError = oVal.bError;
+
+			if (bConvError){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res = oVal.val;
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cCHIINV.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(probability, deg_freedom)"
+		};
+	};
 
 	/**
 	 * @constructor
