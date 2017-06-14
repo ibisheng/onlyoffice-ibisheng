@@ -63,7 +63,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST, cBETA_DIST,
 		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
-		cFTEST, cGAMMA, cGAMMAINV, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cFTEST, cGAMMA, cGAMMADIST, cGAMMAINV, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
@@ -2745,6 +2745,63 @@
 	};
 	cGAMMA.prototype.getInfo = function () {
 		return {name: this.name, args: "(number)"}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	//CLONE cGAMMA_DIST FUNCTION
+	function cGAMMADIST() {
+		this.name = "GAMMADIST";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cGAMMADIST.prototype = Object.create(cBaseFunction.prototype);
+	cGAMMADIST.prototype.constructor = cGAMMADIST;
+	cGAMMADIST.prototype.argumentsMin = 4;
+	cGAMMADIST.prototype.argumentsMax = 4;
+	cGAMMADIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			var fX = argArray[0];
+			var fAlpha = argArray[1];
+			var fBeta = argArray[2];
+			var bCumulative = argArray[3];
+
+			var res = null;
+			if ((fX < 0) || fAlpha <= 0 || fBeta <= 0){
+				return new cError(cErrorType.not_numeric);
+			}
+			else
+			{
+				if (bCumulative) {
+					res = getGammaDist( fX, fAlpha, fBeta );
+				}else {
+					res = getGammaDistPDF( fX, fAlpha, fBeta );
+				}
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cGAMMADIST.prototype.getInfo = function () {
+		return {name: this.name, args: "(x, alpha, beta, cumulative )"}
 	};
 
 	/**

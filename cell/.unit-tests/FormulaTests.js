@@ -1042,6 +1042,20 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.068094, "GAMMA.DIST(A2,A3,A4,TRUE)" );
 	} );
 
+	test( "Test: \"GAMMADIST\"", function () {
+		ws.getRange2( "A2" ).setValue( "10.00001131" );
+		ws.getRange2( "A3" ).setValue( "9" );
+		ws.getRange2( "A4" ).setValue( "2" );
+
+		oParser = new parserFormula( "GAMMADIST(A2,A3,A4,FALSE)", "A1", ws );
+		ok( oParser.parse(), "GAMMADIST(A2,A3,A4,FALSE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.032639, "GAMMADIST(A2,A3,A4,FALSE)" );
+
+		oParser = new parserFormula( "GAMMADIST(A2,A3,A4,TRUE)", "A1", ws );
+		ok( oParser.parse(), "GAMMADIST(A2,A3,A4,TRUE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.068094, "GAMMADIST(A2,A3,A4,TRUE)" );
+	} );
+
 	test( "Test: \"BETA.INV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.685470581" );
 		ws.getRange2( "A3" ).setValue( "8" );
