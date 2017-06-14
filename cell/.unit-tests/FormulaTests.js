@@ -1074,6 +1074,16 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0500006, "CHISQ.DIST.RT(A2,A3)" );
 	} );
 
+	test( "Test: \"CHISQ.INV\"", function () {
+		oParser = new parserFormula( "CHISQ.INV(0.93,1)", "A1", ws );
+		ok( oParser.parse(), "CHISQ.INV(0.93,1)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 3.283020287, "CHISQ.INV(0.93,1)" );
+
+		oParser = new parserFormula( "CHISQ.INV(0.6,2)", "A1", ws );
+		ok( oParser.parse(), "CHISQ.INV(0.6,2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 1.832581464, "CHISQ.INV(0.6,2)" );
+	} );
+
 	test( "Test: \"CHISQ.DIST\"", function () {
 		oParser = new parserFormula( "CHISQ.DIST(0.5,1,TRUE)", "A1", ws );
 		ok( oParser.parse(), "CHISQ.DIST(0.5,1,TRUE)" );
