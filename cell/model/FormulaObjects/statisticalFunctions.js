@@ -60,7 +60,7 @@
 	var maxGammaArgument = 171.624376956302;
 
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
+	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST, cBETA_DIST,
 		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
 		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
@@ -1254,6 +1254,70 @@
 
 	cBETADIST.prototype = Object.create(cBaseFunction.prototype);
 	cBETADIST.prototype.constructor = cBETADIST;
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cBETA_DIST() {
+		this.name = "BETA.DIST";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cBETA_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cBETA_DIST.prototype.constructor = cBETA_DIST;
+	cBETA_DIST.prototype.argumentsMin = 4;
+	cBETA_DIST.prototype.argumentsMax = 6;
+	cBETA_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+
+		argClone[4] = argClone[4] ? argClone[4].tocNumber() : new cNumber(0);
+		argClone[5] = argClone[5] ? argClone[5].tocNumber() : new cNumber(1);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGamma = function(argArray){
+			var x = argArray[0];
+			var alpha = argArray[1];
+			var beta = argArray[2];
+			var bIsCumulative = argArray[3];
+			var fLowerBound = argArray[4];
+			var fUpperBound = argArray[5];
+
+			var res = null;
+			if (alpha <= 0 || beta <= 0 || x < fLowerBound || x > fUpperBound)
+			{
+				return new cError(cErrorType.not_numeric);
+			}
+			var fScale = fUpperBound - fLowerBound;
+			x = (x - fLowerBound) / fScale;
+			if (bIsCumulative)
+			{
+				res = getBetaDist(x, alpha, beta);
+			}
+			else
+			{
+				res = getBetaDistPDF(x, alpha, beta) / fScale;
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
+	};
+	cBETA_DIST.prototype.getInfo = function () {
+		return {name: this.name, args: "( x, alpha, beta, cumulative, a, b )"}
+	};
 
 	/**
 	 * @constructor
