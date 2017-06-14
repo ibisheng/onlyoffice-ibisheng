@@ -1054,6 +1054,22 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(1) - 0, 2, "BETA.INV(A2,A3,A4,A5,A6)" );
 	} );
 
+	test( "Test: \"BETA.DIST\"", function () {
+		ws.getRange2( "A2" ).setValue( "2" );
+		ws.getRange2( "A3" ).setValue( "8" );
+		ws.getRange2( "A4" ).setValue( "10" );
+		ws.getRange2( "A5" ).setValue( "1" );
+		ws.getRange2( "A6" ).setValue( "3" );
+
+		oParser = new parserFormula( "BETA.DIST(A2,A3,A4,TRUE,A5,A6)", "A1", ws );
+		ok( oParser.parse(), "BETA.DIST(A2,A3,A4,TRUE,A5,A6)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.6854706, "BETA.DIST(A2,A3,A4,TRUE,A5,A6)" );
+
+		oParser = new parserFormula( "BETA.DIST(A2,A3,A4,FALSE,A5,A6)", "A1", ws );
+		ok( oParser.parse(), "BETA.DIST(A2,A3,A4,FALSE,A5,A6)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 1.4837646, "BETA.DIST(A2,A3,A4,FALSE,A5,A6)" );
+	} );
+
 	test( "Test: \"GAMMA.INV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.068094" );
 		ws.getRange2( "A3" ).setValue( "9" );
