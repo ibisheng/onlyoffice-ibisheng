@@ -1065,6 +1065,16 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0500006, "CHIDIST(A2,A3)" );
 	} );
 
+	test( "Test: \"CHISQ.DIST\"", function () {
+		oParser = new parserFormula( "CHISQ.DIST(0.5,1,TRUE)", "A1", ws );
+		ok( oParser.parse(), "CHISQ.DIST(0.5,1,TRUE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.52049988, "CHISQ.DIST(0.5,1,TRUE)" );
+
+		oParser = new parserFormula( "CHISQ.DIST(2,3,FALSE)", "A1", ws );
+		ok( oParser.parse(), "CHISQ.DIST(2,3,FALSE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.20755375, "CHISQ.DIST(2,3,FALSE)" );
+	} );
+
 	test( "Test: \"CHIINV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.050001" );
 		ws.getRange2( "A3" ).setValue( "10" );
