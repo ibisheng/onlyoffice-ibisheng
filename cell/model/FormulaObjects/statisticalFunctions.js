@@ -6886,9 +6886,51 @@
 	function cTINV() {
 		cBaseFunction.call(this, "TINV");
 	}
-
+	//clone T.INV.2T
 	cTINV.prototype = Object.create(cBaseFunction.prototype);
 	cTINV.prototype.constructor = cTINV;
+	cTINV.prototype.argumentsMin = 2;
+	cTINV.prototype.argumentsMax = 2;
+	cTINV.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var fP = argArray[0];
+			var fDF = parseInt(argArray[1]);
+
+			//ms игнорирует услвие fP > 1. сделал как в документации
+			if ( fDF < 1.0 || fP <= 0 || fP > 1 ){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var aFunc = new TDISTFUNCTION(fP, fDF, 2);
+			var oVal = iterateInverse(aFunc, fDF * 0.5, fDF);
+			var bConvError = oVal.bError;
+			var res = oVal.val;
+
+			if (bConvError){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cTINV.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(probability, deg_freedom)"
+		};
+	};
 
 	/**
 	 * @constructor
