@@ -1009,6 +1009,12 @@ background-repeat: no-repeat;\
 
 		if (this.WordControl.MobileTouchManager)
 			this.WordControl.MobileTouchManager.delegate.LogicDocument = this.WordControl.m_oLogicDocument;
+
+		if (this.restrictions == Asc.c_oAscRestrictionType.OnlyForms || this.restrictions == Asc.c_oAscRestrictionType.OnlyComments)
+		{
+			this.ShowParaMarks = false;
+			this.WordControl.HideRulers();
+		}
 	};
 
 	asc_docs_api.prototype.InitViewer = function()
@@ -3351,6 +3357,9 @@ background-repeat: no-repeat;\
 		 }
 		 */
 
+		if (this.restrictions == Asc.c_oAscRestrictionType.OnlyForms || this.restrictions == Asc.c_oAscRestrictionType.OnlyComments)
+			isShow = false;
+
 		this.ShowParaMarks = isShow;
 		this.WordControl.OnRePaintAttack();
 
@@ -5201,6 +5210,7 @@ background-repeat: no-repeat;\
 			editor.WordControl.m_oDrawingDocument.FirePaint();
 		}
 	};
+
 	//-----------------------------------------------------------------
 	// Функции для работы с комментариями
 	//-----------------------------------------------------------------
