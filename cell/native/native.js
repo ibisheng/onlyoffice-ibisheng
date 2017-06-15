@@ -6713,6 +6713,17 @@ window["native"]["offline_apply_event"] = function(type,params) {
             _return = _s.offline_addChartDrawingObject(params);
             break;
         }
+        case 450:   // ASC_MENU_EVENT_TYPE_GET_CHART_DATA
+        {
+            var chart = _api.asc_getWordChartObject();
+            
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](JSON.stringify(chart));
+            _return = _stream;
+            
+            break;
+        }
 
         // Cell interface
 

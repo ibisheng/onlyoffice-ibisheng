@@ -2191,7 +2191,20 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
             
             break;
         }
-            
+        
+        case 460:   // ASC_MENU_EVENT_TYPE_SET_CHART_DATA
+        {
+            if (undefined !== _params) {
+                var chartData = _params[0];
+                if (chartData && chartData.length > 0) {
+                    var json = JSON.parse(chartData);
+                    if (json) {
+                        _api.asc_editChartDrawingObject(json);
+                    }
+                }
+            }
+            break;
+        }
             
         case 2415: // ASC_MENU_EVENT_TYPE_CHANGE_COLOR_SCHEME
         {
