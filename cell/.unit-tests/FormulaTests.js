@@ -1068,6 +1068,16 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0176176, "LOGNORM.DIST(A2,A3,A4,FALSE)" );
 	} );
 
+	test( "Test: \"LOGNORM.INV\"", function () {
+		ws.getRange2( "A2" ).setValue( "0.039084" );
+		ws.getRange2( "A3" ).setValue( "3.5" );
+		ws.getRange2( "A4" ).setValue( "1.2" );
+
+		oParser = new parserFormula( "LOGNORM.INV(A2, A3, A4)", "A1", ws );
+		ok( oParser.parse(), "LOGNORM.INV(A2, A3, A4)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 4.0000252, "LOGNORM.INV(A2, A3, A4)" );
+	} );
+
 	test( "Test: \"GAMMA.DIST\"", function () {
 		ws.getRange2( "A2" ).setValue( "10.00001131" );
 		ws.getRange2( "A3" ).setValue( "9" );
