@@ -244,6 +244,7 @@ Slide.prototype =
 
     createDuplicate: function()
     {
+        var oIdMap = {};
         var copy = new Slide(this.presentation, this.Layout, 0), i;
         if(typeof this.cSld.name === "string" && this.cSld.name.length > 0)
         {
@@ -255,7 +256,18 @@ Slide.prototype =
         }
         for(i = 0; i < this.cSld.spTree.length; ++i)
         {
-            copy.shapeAdd(copy.cSld.spTree.length, this.cSld.spTree[i].copy());
+            var _copy;
+
+            if(this.cSld.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                _copy = this.cSld.spTree[i].copy(oIdMap);
+            }
+            else{
+                _copy = this.cSld.spTree[i].copy();
+            }
+            if(AscCommon.isRealObject(oIdMap)){
+                oIdMap[this.cSld.spTree[i].Id] = _copy.Id;
+            }
+            copy.shapeAdd(copy.cSld.spTree.length, _copy);
             copy.cSld.spTree[copy.cSld.spTree.length - 1].setParent2(copy);
         }
 

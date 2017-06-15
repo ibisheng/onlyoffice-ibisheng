@@ -102,7 +102,7 @@
       }, padding: -1, /*px horizontal padding*/
       paddingPlusBorder: -1
     };
-    this.activeCellBorderColor = new CColor(126, 152, 63);
+    this.activeCellBorderColor = new CColor(72, 121, 92);
     this.activeCellBorderColor2 = new CColor(255, 255, 255, 1);
 
     // Цвет закрепленных областей
@@ -120,6 +120,9 @@
     ctx.fillRect(0, 0, 1, 1);
     ctx.fillRect(1, 1, 1, 1);
     this.ptrnLineDotted1 = ctx.createPattern(cnv, "repeat");
+
+    this.frozenImageH = new Image();
+    this.frozenImageH.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAKCAYAAAB10jRKAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAJElEQVQYV2MAAjUQoQIiFECEDIiQABHCIIIPRHCBCDYgZmACABohANImre1SAAAAAElFTkSuQmCC';
 
     this.halfSelection = false;
 

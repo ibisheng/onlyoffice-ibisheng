@@ -1027,7 +1027,7 @@ CColorModifiers.prototype =
 
     lclGamma: function(nComp, fGamma)
     {
-        return (Math.pow(nComp/MAX_PERCENT, fGamma)*MAX_PERCENT) >> 0;
+        return (Math.pow(nComp/MAX_PERCENT, fGamma)*MAX_PERCENT + 0.5) >> 0;
     },
 
     RgbtoCrgb: function(RGBA)
@@ -1040,9 +1040,9 @@ CColorModifiers.prototype =
 
     CrgbtoRgb: function(RGBA)
     {
-        RGBA.R = this.lclCrgbCompToRgbComp(this.lclGamma(RGBA.R, INC_GAMMA)) >> 0;
-        RGBA.G = this.lclCrgbCompToRgbComp(this.lclGamma(RGBA.G, INC_GAMMA)) >> 0;
-        RGBA.B = this.lclCrgbCompToRgbComp(this.lclGamma(RGBA.B, INC_GAMMA)) >> 0;
+        RGBA.R = (this.lclCrgbCompToRgbComp(this.lclGamma(RGBA.R, INC_GAMMA)) + 0.5) >> 0;
+        RGBA.G = (this.lclCrgbCompToRgbComp(this.lclGamma(RGBA.G, INC_GAMMA)) + 0.5) >> 0;
+        RGBA.B = (this.lclCrgbCompToRgbComp(this.lclGamma(RGBA.B, INC_GAMMA)) + 0.5) >> 0;
     },
 
     Apply : function(RGBA)
@@ -1058,50 +1058,50 @@ CColorModifiers.prototype =
 
             if (colorMod.name == "alpha")
             {
-                RGBA.A = Math.min(255, Math.max(0, 255 * val));
+                RGBA.A = Math.min(255, Math.max(0, 255 * val + 0.5)) >> 0;
             }
             else if (colorMod.name == "blue")
             {
-                RGBA.B = Math.min(255, Math.max(0, 255 * val));
+                RGBA.B = Math.min(255, Math.max(0, 255 * val + 0.5)) >> 0;
             }
             else if (colorMod.name == "blueMod")
             {
-                RGBA.B = Math.max(0, (RGBA.B * val) >> 0);
+                RGBA.B = Math.max(0, ((RGBA.B * val) + 0.5) >> 0);
             }
             else if (colorMod.name == "blueOff")
             {
-                RGBA.B = Math.max(0, (RGBA.B + val * 255)) >> 0;
+                RGBA.B = Math.max(0, ((RGBA.B + val * 255) + 0.5)) >> 0;
             }
             else if (colorMod.name == "green")
             {
-                RGBA.G = Math.min(255, Math.max(0, 255 * val)) >> 0;
+                RGBA.G = Math.min(255, Math.max(0, 255 * val + 0.5)) >> 0;
             }
             else if (colorMod.name == "greenMod")
             {
-                RGBA.G = Math.max(0, (RGBA.G * val) >> 0);
+                RGBA.G = Math.max(0, (RGBA.G * val  + 0.5) >> 0);
             }
             else if (colorMod.name == "greenOff")
             {
-                RGBA.G = Math.max(0, (RGBA.G + val * 255)) >> 0;
+                RGBA.G = Math.max(0, (RGBA.G + val * 255  + 0.5)) >> 0;
             }
             else if (colorMod.name == "red")
             {
-                RGBA.R = Math.min(255, Math.max(0, 255 * val)) >> 0;
+                RGBA.R = Math.min(255, Math.max(0, 255 * val + 0.5)) >> 0;
             }
             else if (colorMod.name == "redMod")
             {
-                RGBA.R = Math.max(0, (RGBA.R * val) >> 0);
+                RGBA.R = Math.max(0, (RGBA.R * val + 0.5) >> 0);
             }
             else if (colorMod.name == "redOff")
             {
-                RGBA.R = Math.max(0, (RGBA.R + val * 255) >> 0);
+                RGBA.R = Math.max(0, (RGBA.R + val * 255 + 0.5) >> 0);
             }
             else if (colorMod.name == "hueOff")
             {
                 var HSL = {H: 0, S: 0, L: 0};
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
-                var res = (HSL.H + (val * 10.0) / 9.0) >> 0;
+                var res = (HSL.H + (val * 10.0) / 9.0 + 0.5) >> 0;
                 while(res > max_hls)
                     res = res - max_hls;
                 while(res < 0)
@@ -1124,7 +1124,7 @@ CColorModifiers.prototype =
                 if(HSL.L*val > max_hls)
                     HSL.L = max_hls;
                 else
-                    HSL.L = Math.max(0, (HSL.L * val) >> 0);
+                    HSL.L = Math.max(0, (HSL.L * val + 0.5) >> 0);
                 this.HSL2RGB(HSL, RGBA);
             }
             else if (colorMod.name == "lumOff")
@@ -1132,7 +1132,7 @@ CColorModifiers.prototype =
                 var HSL = {H: 0, S: 0, L: 0};
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
-                var res = (HSL.L + val * max_hls) >> 0;
+                var res = (HSL.L + val * max_hls + 0.5) >> 0;
                 while(res > max_hls)
                     res = res - max_hls;
                 while(res < 0)
@@ -1149,7 +1149,7 @@ CColorModifiers.prototype =
                 if(HSL.S*val > max_hls)
                     HSL.S = max_hls;
                 else
-                    HSL.S = Math.max(0, (HSL.S * val) >> 0);
+                    HSL.S = Math.max(0, (HSL.S * val + 0.5) >> 0);
                 this.HSL2RGB(HSL, RGBA);
             }
             else if (colorMod.name == "satOff")
@@ -1157,7 +1157,7 @@ CColorModifiers.prototype =
                 var HSL = {H: 0, S: 0, L: 0};
                 this.RGB2HSL(RGBA.R, RGBA.G, RGBA.B, HSL);
 
-                var res = (HSL.S + val * max_hls) >> 0;
+                var res = (HSL.S + val * max_hls + 0.5) >> 0;
                 while(res > max_hls)
                     res = res - max_hls;
                 while(res < 0)
@@ -1184,7 +1184,7 @@ CColorModifiers.prototype =
                 if(HSL.L*val_ > max_hls)
                     HSL.L = max_hls;
                 else
-                    HSL.L = Math.max(0, (HSL.L * val_) >> 0);
+                    HSL.L = Math.max(0, (HSL.L * val_ + 0.5) >> 0);
                 this.HSL2RGB(HSL, RGBA);
             }
             else if (colorMod.name == "wordTint")
@@ -1201,7 +1201,7 @@ CColorModifiers.prototype =
                 if(L_ > max_hls)
                     HSL.L = max_hls;
                 else
-                    HSL.L = Math.max(0, (L_) >> 0);
+                    HSL.L = Math.max(0, (L_ + 0.5) >> 0);
                 this.HSL2RGB(HSL, RGBA);
             }
             else if (colorMod.name == "shade")
@@ -1209,9 +1209,9 @@ CColorModifiers.prototype =
                 this.RgbtoCrgb(RGBA);
                 if (val < 0) val = 0;
                 if (val > 1) val = 1;
-                RGBA.R = ((RGBA.R * val)) >> 0;
-                RGBA.G = ((RGBA.G * val)) >> 0;
-                RGBA.B = ((RGBA.B * val)) >> 0;
+                RGBA.R = (RGBA.R * val);
+                RGBA.G = (RGBA.G * val);
+                RGBA.B = (RGBA.B * val);
                 this.CrgbtoRgb(RGBA);
             }
             else if (colorMod.name == "tint")
@@ -1241,16 +1241,6 @@ CColorModifiers.prototype =
                 this.CrgbtoRgb(RGBA);
             }
         }
-    },
-
-    applyGamma : function(c, gamma)
-    {
-        // LO
-        var _max = 256;
-        var _ret = (Math.pow(c / _max, gamma) * _max) >> 0;
-        if (_ret > 255)
-            _ret = 255;
-        return _ret;
     }
 };
 
@@ -4972,7 +4962,8 @@ UniNvPr.prototype =
     {
         var duplicate = new UniNvPr();
         this.cNvPr && duplicate.setCNvPr(this.cNvPr.createDuplicate());
-        duplicate.nvPr && duplicate.setNvPr(this.nvPr.createDuplicate());
+        this.nvPr && duplicate.setNvPr(this.nvPr.createDuplicate());
+        this.nvUniSpPr && duplicate.setUniSpPr(this.nvUniSpPr.copy());
         return duplicate;
     },
 

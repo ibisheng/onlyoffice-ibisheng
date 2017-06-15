@@ -3258,48 +3258,51 @@
         }
     };
 
-    /** Рисует закрепление областей */
-    WorksheetView.prototype._drawFrozenPaneLines = function ( drawingCtx ) {
-        // Возможно стоит отрисовывать на overlay, а не на основной канве
-        var ctx = drawingCtx ? drawingCtx : this.drawingCtx;
-        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, this.model.getId(), AscCommonExcel.c_oAscLockNameFrozenPane );
-        var isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, false );
-        var color = isLocked ? AscCommonExcel.c_oAscCoAuthoringOtherBorderColor : this.settings.frozenColor;
-        ctx.setLineWidth( 1 ).setStrokeStyle( color ).beginPath();
-        var fHorLine, fVerLine;
-        if ( isLocked ) {
-            fHorLine = ctx.dashLineCleverHor;
-            fVerLine = ctx.dashLineCleverVer;
-        }
-        else {
-            fHorLine = ctx.lineHorPrevPx;
-            fVerLine = ctx.lineVerPrevPx;
-        }
+	/** Рисует закрепление областей */
+	WorksheetView.prototype._drawFrozenPaneLines = function (drawingCtx) {
+		// Возможно стоит отрисовывать на overlay, а не на основной канве
+		var ctx = drawingCtx ? drawingCtx : this.drawingCtx;
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
+			AscCommonExcel.c_oAscLockNameFrozenPane);
+		var isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
+		var color = isLocked ? AscCommonExcel.c_oAscCoAuthoringOtherBorderColor : this.settings.frozenColor;
+		ctx.setLineWidth(1).setStrokeStyle(color).beginPath();
+		var fHorLine, fVerLine;
+		if (isLocked) {
+			fHorLine = ctx.dashLineCleverHor;
+			fVerLine = ctx.dashLineCleverVer;
+		} else {
+			fHorLine = ctx.lineHorPrevPx;
+			fVerLine = ctx.lineVerPrevPx;
+		}
 
-        if ( this.topLeftFrozenCell ) {
-            var row = this.topLeftFrozenCell.getRow0();
-            var col = this.topLeftFrozenCell.getCol0();
-            if ( 0 < row ) {
-                fHorLine.apply( ctx, [0, this.rows[row].top, ctx.getWidth()] );
-            }
-            else {
-                fHorLine.apply( ctx, [0, this.headersHeight, this.headersWidth] );
-            }
+		if (this.topLeftFrozenCell) {
+			var row = this.topLeftFrozenCell.getRow0();
+			var col = this.topLeftFrozenCell.getCol0();
+			if (0 < row) {
+				fHorLine.apply(ctx, [0, this.rows[row].top, ctx.getWidth()]);
+			} else {
+				fHorLine.apply(ctx, [0, this.headersHeight, this.headersWidth]);
+			}
 
-            if ( 0 < col ) {
-                fVerLine.apply( ctx, [this.cols[col].left, 0, ctx.getHeight()] );
-            }
-            else {
-                fVerLine.apply( ctx, [this.headersWidth, 0, this.headersHeight] );
-            }
-        }
-        else if ( this.model.sheetViews[0].asc_getShowRowColHeaders() ) {
-            fHorLine.apply( ctx, [0, this.headersHeight, this.headersWidth] );
-            fVerLine.apply( ctx, [this.headersWidth, 0, this.headersHeight] );
-        }
+			if (0 < col) {
+				fVerLine.apply(ctx, [this.cols[col].left, 0, ctx.getHeight()]);
+			} else {
+				fVerLine.apply(ctx, [this.headersWidth, 0, this.headersHeight]);
 
-        ctx.stroke();
-    };
+			}
+			ctx.stroke();
+
+			if (0 < row) {
+				ctx.drawImage(this.settings.frozenImageH, 0, 0, 1 * this.width_1px, 10 * this.height_1px, 0,
+					this.rows[row].top, ctx.getWidth(), this.height_1px * 10);
+			}
+		} else if (this.model.sheetViews[0].asc_getShowRowColHeaders()) {
+			fHorLine.apply(ctx, [0, this.headersHeight, this.headersWidth]);
+			fVerLine.apply(ctx, [this.headersWidth, 0, this.headersHeight]);
+			ctx.stroke();
+		}
+	};
 
     WorksheetView.prototype.drawFrozenGuides = function ( x, y, target ) {
         var data, offsetFrozen;

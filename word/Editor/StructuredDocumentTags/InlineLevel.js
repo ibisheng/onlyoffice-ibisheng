@@ -252,6 +252,55 @@ CInlineLevelSdt.prototype.SelectContentControl = function()
 {
 	this.SelectThisElement(1);
 };
+CInlineLevelSdt.prototype.RemoveContentControlWrapper = function()
+{
+	var oParent = this.Get_Parent();
+	if (!oParent)
+		return;
+
+	var nElementPos = this.Get_PosInParent(oParent);
+	if (-1 === nElementPos)
+		return;
+
+	var nParentCurPos            = oParent instanceof Paragraph ? oParent.CurPos.ContentPos : oParent.State.ContentPos;
+	var nParentSelectionStartPos = oParent.Selection.StartPos;
+	var nParentSelectionEndPos   = oParent.Selection.EndPos;
+
+	var nCount = this.Content.length;
+	oParent.Remove_FromContent(nElementPos, 1);
+	for (var nIndex = 0; nIndex < nCount; ++nIndex)
+	{
+		oParent.Add_ToContent(nElementPos + nIndex, this.Content[nIndex]);
+	}
+
+	if (nParentCurPos === nElementPos)
+	{
+		if (oParent instanceof Paragraph)
+			oParent.CurPos.ContentPos = nParentCurPos + this.State.ContentPos;
+		else
+			oParent.State.ContentPos = nParentCurPos + this.State.ContentPos;
+
+	}
+	else if (nParentCurPos > nElementPos)
+	{
+		if (oParent instanceof Paragraph)
+			oParent.CurPos.ContentPos = nParentCurPos + nCount - 1;
+		else
+			oParent.State.ContentPos = nParentCurPos + nCount - 1;
+	}
+
+	if (nParentSelectionStartPos === nElementPos)
+		oParent.Selection.StartPos = nParentSelectionStartPos + this.Selection.StartPos;
+	else if (nParentSelectionStartPos > nElementPos)
+		oParent.Selection.StartPos = nParentSelectionStartPos + nCount - 1;
+
+	if (nParentSelectionEndPos === nElementPos)
+		oParent.Selection.EndPos = nParentSelectionEndPos + this.Selection.EndPos;
+	else if (nParentSelectionEndPos > nElementPos)
+		oParent.Selection.EndPos = nParentSelectionEndPos + nCount - 1;
+
+	this.Remove_FromContent(0, this.Content.length);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
 //----------------------------------------------------------------------------------------------------------------------

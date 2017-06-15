@@ -868,6 +868,44 @@ CBlockLevelSdt.prototype.SelectContentControl = function()
 	this.SelectAll(1);
 	this.Set_CurrentElement(false, 0, this.Content);
 };
+CBlockLevelSdt.prototype.RemoveContentControlWrapper = function()
+{
+	if (!this.Parent)
+		return;
+
+	this.Parent.Update_ContentIndexing();
+	var nElementPos = this.GetIndex();
+
+	if (this.Parent.Content[nElementPos] !== this)
+		return;
+
+	var nParentCurPos            = this.Parent.CurPos.ContentPos;
+	var nParentSelectionStartPos = this.Parent.Selection.StartPos;
+	var nParentSelectionEndPos   = this.Parent.Selection.EndPos;
+
+	this.Parent.Remove_FromContent(nElementPos, 1);
+	for (var nIndex = 0, nCount = this.Content.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Parent.Add_ToContent(nElementPos + nIndex, this.Content.Content[nIndex]);
+	}
+
+	if (nParentCurPos === nElementPos)
+		this.Parent.CurPos.ContentPos = nParentCurPos + this.Content.CurPos.ContentPos;
+	else if (nParentCurPos > nElementPos)
+		this.Parent.CurPos.ContentPos = nParentCurPos + nCount - 1;
+
+	if (nParentSelectionStartPos === nElementPos)
+		this.Parent.Selection.StartPos = nParentSelectionStartPos + this.Content.Selection.StartPos;
+	else if (nParentSelectionStartPos > nElementPos)
+		this.Parent.Selection.StartPos = nParentSelectionStartPos + nCount - 1;
+
+	if (nParentSelectionEndPos === nElementPos)
+		this.Parent.Selection.EndPos = nParentSelectionEndPos + this.Content.Selection.EndPos;
+	else if (nParentSelectionEndPos > nElementPos)
+		this.Parent.Selection.EndPos = nParentSelectionEndPos + nCount - 1;
+
+	this.Content.Remove_FromContent(0, this.Content.Content.length - 1);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.GetContentControlType = function()
 {
