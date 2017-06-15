@@ -64,7 +64,7 @@
 		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cF_INV, cF_INV_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
 		cFTEST, cGAMMA, cGAMMADIST, cGAMMAINV, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
-		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
+		cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
 		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
@@ -4199,6 +4199,69 @@
 		return {
 			name: this.name, args: "( x , mean , standard-deviation )"
 		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cLOGNORM_DIST() {
+		this.name = "LOGNORM.DIST";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cLOGNORM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cLOGNORM_DIST.prototype.constructor = cLOGNORM_DIST;
+	cLOGNORM_DIST.prototype.argumentsMin = 4;
+	cLOGNORM_DIST.prototype.argumentsMax = 4;
+	cLOGNORM_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var normdist = function(argArray){
+			var x = argArray[0];
+			var mue = argArray[1];
+			var sigma = argArray[2];
+			var bCumulative = argArray[3];
+
+			var res = null;
+			if (sigma <= 0.0)
+			{
+				return new cError(cErrorType.not_numeric);
+			}
+			if (bCumulative) {
+				if (x <= 0){
+					res = 0;
+				}else{
+					res = 0.5 + gauss((Math.ln(x) - mue) / sigma);
+				}
+			}
+			else{
+				if (x <= 0){
+					return new cError(cErrorType.not_numeric);
+				}else{
+					res = phi((Math.log(x) - mue) / sigma) / sigma / x;
+				}
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, normdist);
+	};
+	cLOGNORM_DIST.prototype.getInfo = function () {
+		return {name: this.name, args: "( x , mean , standard-deviation, cumulative )"}
 	};
 
 	/**

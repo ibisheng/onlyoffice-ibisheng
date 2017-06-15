@@ -1054,23 +1054,18 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.606533, "T.INV.2T(A2,A3)" );
 	} );
 
-	test( "Test: \"GAMMA\"", function () {
-		oParser = new parserFormula( "GAMMA(2.5)", "A1", ws );
-		ok( oParser.parse(), "GAMMA(2.5)" );
-		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 1.329, "GAMMA(2.5)" );
+	test( "Test: \"LOGNORM.DIST\"", function () {
+		ws.getRange2( "A2" ).setValue( "4" );
+		ws.getRange2( "A3" ).setValue( "3.5" );
+		ws.getRange2( "A4" ).setValue( "1.2" );
 
-		oParser = new parserFormula( "GAMMA(-3.75)", "A1", ws );
-		ok( oParser.parse(), "GAMMA(-3.75)" );
-		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 0.268, "GAMMA(0.268)" );
+		oParser = new parserFormula( "LOGNORM.DIST(A2,A3,A4,TRUE)", "A1", ws );
+		ok( oParser.parse(), "LOGNORM.DIST(A2,A3,A4,TRUE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0390836, "LOGNORM.DIST(A2,A3,A4,TRUE)" );
 
-		oParser = new parserFormula( "GAMMA(0)", "A1", ws );
-		ok( oParser.parse(), "GAMMA(0)" );
-		strictEqual( oParser.calculate().getValue(), "#NUM!", "GAMMA(0)" );
-
-		oParser = new parserFormula( "GAMMA(-2)", "A1", ws );
-		ok( oParser.parse(), "GAMMA(-2)" );
-		strictEqual( oParser.calculate().getValue(), "#NUM!", "GAMMA(-2)" );
-
+		oParser = new parserFormula( "LOGNORM.DIST(A2,A3,A4,FALSE)", "A1", ws );
+		ok( oParser.parse(), "LOGNORM.DIST(A2,A3,A4,FALSE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0176176, "LOGNORM.DIST(A2,A3,A4,FALSE)" );
 	} );
 
 	test( "Test: \"GAMMA.DIST\"", function () {
