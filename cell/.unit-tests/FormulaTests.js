@@ -1019,6 +1019,16 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 15.206865, "FINV(A2,A3,A4)" );
 	} );
 
+	test( "Test: \"F.INV\"", function () {
+		ws.getRange2( "A2" ).setValue( "0.01" );
+		ws.getRange2( "A3" ).setValue( "6" );
+		ws.getRange2( "A4" ).setValue( "4" );
+
+		oParser = new parserFormula( "F.INV(A2,A3,A4)", "A1", ws );
+		ok( oParser.parse(), "F.INV(A2,A3,A4)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.10930991, "F.INV(A2,A3,A4)" );
+	} );
+
 	test( "Test: \"GAMMA\"", function () {
 		oParser = new parserFormula( "GAMMA(2.5)", "A1", ws );
 		ok( oParser.parse(), "GAMMA(2.5)" );
