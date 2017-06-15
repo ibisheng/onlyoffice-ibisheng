@@ -2218,6 +2218,7 @@ function CDrawingDocument()
 
 		hor_ruler.CurrentObjectType = RULER_OBJECT_TYPE_TABLE;
 		hor_ruler.m_oTableMarkup    = markup.CreateDublicate();
+		hor_ruler.m_oColumnMarkup	= null;
 		hor_ruler.CalculateMargins();
 
 		ver_ruler.CurrentObjectType = RULER_OBJECT_TYPE_TABLE;
@@ -2272,6 +2273,7 @@ function CDrawingDocument()
 
 		hor_ruler.CurrentObjectType = RULER_OBJECT_TYPE_PARAGRAPH;
 		hor_ruler.m_oTableMarkup    = null;
+		hor_ruler.m_oColumnMarkup	= null;
 
 		ver_ruler.CurrentObjectType = RULER_OBJECT_TYPE_PARAGRAPH;
 		ver_ruler.m_oTableMarkup    = null;
@@ -2302,6 +2304,7 @@ function CDrawingDocument()
 
 		hor_ruler.CurrentObjectType = RULER_OBJECT_TYPE_PARAGRAPH;
 		hor_ruler.m_oTableMarkup    = null;
+		hor_ruler.m_oColumnMarkup	= null;
 
 		ver_ruler.CurrentObjectType = (true === bHeader) ? RULER_OBJECT_TYPE_HEADER : RULER_OBJECT_TYPE_FOOTER;
 		ver_ruler.header_top        = Y0;
@@ -2319,6 +2322,33 @@ function CDrawingDocument()
 		this.m_oWordControl.UpdateHorRuler();
 		this.m_oWordControl.UpdateVerRuler();
 	}
+
+	this.Set_RulerState_Columns = function (markup)
+	{
+		var hor_ruler = this.m_oWordControl.m_oHorRuler;
+		var ver_ruler = this.m_oWordControl.m_oVerRuler;
+
+		hor_ruler.CurrentObjectType = RULER_OBJECT_TYPE_COLUMNS;
+		hor_ruler.m_oTableMarkup = null;
+		hor_ruler.m_oColumnMarkup = markup.CreateDuplicate();
+
+		ver_ruler.CurrentObjectType = RULER_OBJECT_TYPE_PARAGRAPH;
+		ver_ruler.m_oTableMarkup = null;
+
+		this.TableOutlineDr.TableMatrix = null;
+		this.TableOutlineDr.CurrentPageIndex = this.m_lCurrentPage;
+
+		hor_ruler.CalculateMargins();
+
+		if (0 <= this.m_lCurrentPage && this.m_lCurrentPage < this.m_lPagesCount)
+		{
+			this.m_oWordControl.CreateBackgroundHorRuler();
+			this.m_oWordControl.CreateBackgroundVerRuler();
+		}
+
+		this.m_oWordControl.UpdateHorRuler();
+		this.m_oWordControl.UpdateVerRuler();
+	};
 
 	this.Update_ParaTab = function(Default_Tab, ParaTabs)
 	{
