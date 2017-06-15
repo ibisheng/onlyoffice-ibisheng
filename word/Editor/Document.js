@@ -1152,7 +1152,7 @@ CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
             for (var Index = 0, Count = this.m_oMailMergeFields[FieldName].length; Index < Count; Index++)
             {
                 var oField = this.m_oMailMergeFields[FieldName][Index];
-                var oFieldPara = oField.Get_Paragraph();
+                var oFieldPara = oField.GetParagraph();
 
                 if (oFieldPara && oField.Is_NeedRestoreTemplate())
                 {
@@ -1257,11 +1257,6 @@ function CSelectedElementsInfo()
         this.m_nDrawing        = -1;
     };
 
-    this.Set_Paragraph = function(Para)
-    {
-        this.m_pParagraph = Para;
-    };
-
     this.Set_Math = function(Math)
     {
         this.m_oMath = Math;
@@ -1275,11 +1270,6 @@ function CSelectedElementsInfo()
     this.Set_Hyperlink = function(Hyperlink)
     {
         this.m_oHyperlink = Hyperlink;
-    };
-
-    this.Get_Paragraph = function()
-    {
-        return this.m_pParagraph;
     };
 
     this.Get_Math = function()
@@ -1337,6 +1327,14 @@ function CSelectedElementsInfo()
         return this.m_oCell;
     };
 }
+CSelectedElementsInfo.prototype.SetParagraph = function(Para)
+{
+	this.m_pParagraph = Para;
+};
+CSelectedElementsInfo.prototype.GetParagraph = function()
+{
+	return this.m_pParagraph;
+};
 CSelectedElementsInfo.prototype.SetBlockLevelSdt = function(oSdt)
 {
 	this.m_oBlockLevelSdt = oSdt;
@@ -6129,7 +6127,7 @@ CDocument.prototype.OnKeyDown = function(e)
         if (null !== SelectedInfo.Get_Math())
         {
             var ParaMath  = SelectedInfo.Get_Math();
-            var Paragraph = ParaMath.Get_Paragraph();
+            var Paragraph = ParaMath.GetParagraph();
             if (Paragraph && false === this.Document_Is_SelectionLocked(changestype_None, {
                     Type      : changestype_2_Element_and_Type,
                     Element   : Paragraph,
@@ -6160,7 +6158,7 @@ CDocument.prototype.OnKeyDown = function(e)
             }
             else
             {
-                var Paragraph = SelectedInfo.Get_Paragraph();
+                var Paragraph = SelectedInfo.GetParagraph();
                 var ParaPr    = Paragraph.Get_CompiledPr2(false).ParaPr;
                 if (null != Paragraph && ( true === Paragraph.IsCursorAtBegin() || true === Paragraph.Selection_IsFromStart() ) && ( undefined != Paragraph.Numbering_Get() || ( true != Paragraph.IsEmpty() && ParaPr.Tabs.Tabs.length <= 0 ) ))
                 {
@@ -8577,7 +8575,7 @@ CDocument.prototype.AddHyperlink = function(HyperProps)
 	{
 		// Корректировка в данном случае пройдет при добавлении гиперссылки.
 		var SelectionInfo = this.GetSelectedElementsInfo();
-		var Para          = SelectionInfo.Get_Paragraph();
+		var Para          = SelectionInfo.GetParagraph();
 		if (null !== Para)
 			HyperProps.TextPr = Para.Get_TextPr(Para.Get_ParaContentPos(true, true));
 
@@ -9460,8 +9458,8 @@ CDocument.prototype.Is_HightlightMailMergeFields = function()
 };
 CDocument.prototype.CompareDrawingsLogicPositions = function(Drawing1, Drawing2)
 {
-	var ParentPara1 = Drawing1.Get_Paragraph();
-	var ParentPara2 = Drawing2.Get_Paragraph();
+	var ParentPara1 = Drawing1.GetParagraph();
+	var ParentPara2 = Drawing2.GetParagraph();
 
 	if (!ParentPara1 || !ParentPara2 || !ParentPara1.Parent || !ParentPara2.Parent)
 		return 0;

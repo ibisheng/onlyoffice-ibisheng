@@ -2449,7 +2449,7 @@
 					if(isHyperLink)
 					{
 						var oCurHyperlink = new ParaHyperlink();
-						oCurHyperlink.Set_Paragraph(oCurPar);
+						oCurHyperlink.SetParagraph(oCurPar);
 						oCurHyperlink.Set_Value( isHyperLink.Hyperlink );
 						if(isHyperLink.Tooltip)
 						{

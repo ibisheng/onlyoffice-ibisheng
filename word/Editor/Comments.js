@@ -687,11 +687,6 @@ ParaComment.prototype =
 		}
 	},
 
-    Set_Paragraph : function(Paragraph)
-    {
-        this.Paragraph = Paragraph;
-    },
-
     Is_Empty : function()
     {
         return true;
@@ -1159,6 +1154,10 @@ ParaComment.prototype =
         this.CommentId = Reader.GetString2();
         this.Start     = Reader.GetBool();
     }
+};
+ParaComment.prototype.SetParagraph = function(Paragraph)
+{
+	this.Paragraph = Paragraph;
 };
 ParaComment.prototype.Get_CurrentParaPos = function()
 {

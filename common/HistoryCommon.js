@@ -1013,6 +1013,12 @@
 			case AscDFH.historydescription_Document_InsertDocumentsByUrls:
 				sString = "Document_InsertDocumentsByUrls";
 				break;
+			case AscDFH.historydescription_Document_AddBlockLevelContentControl:
+				sString = "Document_AddBlockLevelContentControl";
+				break;
+			case AscDFH.historydescription_Document_AddInlineLevelContentControl:
+				sString = "Document_AddInlineLevelContentControl";
+				break;
 		}
 		return sString;
 	}
@@ -2899,7 +2905,8 @@
 	window['AscDFH'].historydescription_Document_RemoveAllFootnotes                 = 0x013e;
 	window['AscDFH'].historydescription_Document_InsertDocumentsByUrls              = 0x013f;
 	window['AscDFH'].historydescription_Document_InsertSignatureLine                = 0x0140;
-
+	window['AscDFH'].historydescription_Document_AddBlockLevelContentControl        = 0x0141;
+	window['AscDFH'].historydescription_Document_AddInlineLevelContentControl       = 0x0142;
 
 
 

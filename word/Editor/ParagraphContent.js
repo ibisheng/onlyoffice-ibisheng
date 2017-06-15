@@ -1677,7 +1677,7 @@ ParaFootnoteReference.prototype.private_Measure = function()
 	var oMeasurer = g_oTextMeasurer;
 
 	var TextPr = this.Run.Get_CompiledPr(false);
-	var Theme  = this.Run.Get_Paragraph().Get_Theme();
+	var Theme  = this.Run.GetParagraph().Get_Theme();
 
     var FontKoef = 1;
     if (TextPr.VertAlign !== AscCommon.vertalign_Baseline)

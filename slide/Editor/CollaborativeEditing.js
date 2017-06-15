@@ -538,7 +538,7 @@ CCollaborativeEditing.prototype.Update_ForeignCursorPosition = function(UserId, 
 
     var DrawingDocument = editor.WordControl.m_oDrawingDocument;
     var oPresentation = editor.WordControl.m_oLogicDocument;
-    var Paragraph = Run.Get_Paragraph();
+    var Paragraph = Run.GetParagraph();
     if (!Paragraph || !Paragraph.Parent){
         DrawingDocument.Collaborative_RemoveTarget(UserId);
         return;

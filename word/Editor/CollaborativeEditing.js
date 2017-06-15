@@ -436,7 +436,7 @@ CWordCollaborativeEditing.prototype.Update_ForeignCursorPosition = function(User
     if (!(Run instanceof AscCommonWord.ParaRun))
         return;
 
-    var Paragraph = Run.Get_Paragraph();
+    var Paragraph = Run.GetParagraph();
 
     if (!Paragraph)
     {

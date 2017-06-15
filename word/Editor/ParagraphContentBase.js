@@ -309,9 +309,9 @@ CParagraphContentWithParagraphLikeContent.prototype.CopyContent = function(Selec
 
     return CopyContent;
 };
-CParagraphContentWithParagraphLikeContent.prototype.Get_Paragraph = function()
+CParagraphContentWithParagraphLikeContent.prototype.GetParagraph = function()
 {
-    return this.Paragraph;
+	return this.Paragraph;
 };
 CParagraphContentWithParagraphLikeContent.prototype.Clear_ContentChanges = function()
 {
@@ -347,15 +347,15 @@ CParagraphContentWithParagraphLikeContent.prototype.GetAllDrawingObjects = funct
             Item.GetAllDrawingObjects(DrawingObjs);
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Set_Paragraph = function(Paragraph)
+CParagraphContentWithParagraphLikeContent.prototype.SetParagraph = function(Paragraph)
 {
-    this.Paragraph = Paragraph;
+	this.Paragraph = Paragraph;
 
-    var ContentLen = this.Content.length;
-    for (var CurPos = 0; CurPos < ContentLen; CurPos++)
-    {
-        this.Content[CurPos].Set_Paragraph( Paragraph );
-    }
+	var ContentLen = this.Content.length;
+	for (var CurPos = 0; CurPos < ContentLen; CurPos++)
+	{
+		this.Content[CurPos].SetParagraph(Paragraph);
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.Is_Empty = function()
 {
@@ -702,7 +702,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
         {
             this.Content[StartPos].Remove(Direction, bOnAddText);
 
-            if (StartPos !== this.Content.length - 1 && true === this.Content[StartPos].Is_Empty())
+            if (StartPos !== this.Content.length - 1 && true === this.Content[StartPos].Is_Empty() && true !== bOnAddText)
             {
                 this.Remove_FromContent( StartPos, 1, true );
             }
@@ -711,7 +711,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
         {
             this.Content[EndPos].Remove(Direction, bOnAddText);
 
-            if (EndPos !== this.Content.length - 1 && true === this.Content[EndPos].Is_Empty())
+            if (EndPos !== this.Content.length - 1 && true === this.Content[EndPos].Is_Empty() && true !== bOnAddText)
             {
                 this.Remove_FromContent(EndPos, 1, true);
             }
@@ -771,7 +771,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction,
                 return false;
             else
             {
-                if (ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty())
+                if (ContentPos !== this.Content.length - 1 && true === this.Content[ContentPos].Is_Empty() && true !== bOnAddText)
                     this.Remove_FromContent(ContentPos, 1, true);
 
                 this.State.ContentPos = ContentPos;
@@ -2787,6 +2787,9 @@ CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls =
 //----------------------------------------------------------------------------------------------------------------------
 CParagraphContentWithParagraphLikeContent.prototype.Add = function(Item)
 {
+	if (undefined !== Item.Parent)
+		Item.Parent = this;
+
 	switch (Item.Type)
 	{
 		case para_Run:
@@ -2833,7 +2836,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Add = function(Item)
 					this.Add_ToContent(CurPos + 1, NewElement, true);
 
 				var Elem = new ParaMath();
-				Elem.Root.Load_FromMenu(Item.Menu, this.Get_Paragraph());
+				Elem.Root.Load_FromMenu(Item.Menu, this.GetParagraph());
 				Elem.Root.Correct_Content(true);
 				this.Add_ToContent(CurPos + 1, Elem, true);
 

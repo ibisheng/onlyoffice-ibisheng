@@ -642,7 +642,7 @@ Paragraph.prototype.Internal_Content_Add = function(Pos, Item, bCorrectPos)
 
 	this.SpellChecker.Update_OnAdd(this, Pos, Item);
 
-	Item.Set_Paragraph(this);
+	Item.SetParagraph(this);
 };
 Paragraph.prototype.Add_ToContent = function(Pos, Item)
 {
@@ -666,7 +666,7 @@ Paragraph.prototype.Internal_Content_Concat = function(Items)
 	// Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
 	for (var CurPos = StartPos; CurPos < this.Content.length; CurPos++)
 	{
-		this.Content[CurPos].Set_Paragraph(this);
+		this.Content[CurPos].SetParagraph(this);
 		if (this.Content[CurPos].Recalc_RunsCompiledPr)
 			this.Content[CurPos].Recalc_RunsCompiledPr();
 	}
@@ -1237,7 +1237,7 @@ Paragraph.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 	{
 		var Item = this.Content[Pos];
 
-		Item.Set_Paragraph(this);
+		Item.SetParagraph(this);
 		Item.RecalculateMinMaxContentWidth(MinMax);
 	}
 
@@ -2952,6 +2952,9 @@ Paragraph.prototype.Add = function(Item)
 {
 	// Выставляем родительский класс
 	Item.Parent = this;
+
+	if (Item.SetParagraph)
+		Item.SetParagraph(this);
 
 	switch (Item.Get_Type())
 	{
@@ -6803,7 +6806,7 @@ Paragraph.prototype.GetSelectedText = function(bClearText, oPr)
 };
 Paragraph.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
-	Info.Set_Paragraph(this);
+	Info.SetParagraph(this);
 
 	if (ContentPos)
 	{
@@ -10458,8 +10461,8 @@ Paragraph.prototype.Read_FromBinary2 = function(Reader)
 		if (null != Element)
 		{
 			this.Content.push(Element);
-			if (Element.Set_Paragraph)
-				Element.Set_Paragraph(this);
+			if (Element.SetParagraph)
+				Element.SetParagraph(this);
 		}
 	}
 
@@ -12103,7 +12106,14 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 	var oContentControl = new CInlineLevelSdt();
 	oContentControl.Add_ToContent(0, new ParaRun());
 	this.Add(oContentControl);
-	oContentControl.MoveCursorToStartPos();
+
+	var oContentControlPos = this.Get_PosByElement(oContentControl);
+	if (oContentControlPos)
+	{
+		oContentControl.Get_StartPos(oContentControlPos, oContentControlPos.Get_Depth() + 1);
+		this.Set_ParaContentPos(oContentControlPos, false, -1, -1);
+	}
+
 	return oContentControl;
 };
 

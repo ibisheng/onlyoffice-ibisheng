@@ -4619,7 +4619,7 @@ PasteProcessor.prototype =
 				if(hyperLink)
 				{
 					var oCurHyperlink = new ParaHyperlink();
-					oCurHyperlink.Set_Paragraph(this.oCurPar);
+					oCurHyperlink.SetParagraph(this.oCurPar);
 					oCurHyperlink.Set_Value( hyperLink.Hyperlink );
 					if(hyperLink.Tooltip)
 						oCurHyperlink.Set_ToolTip(hyperLink.Tooltip);
@@ -7494,7 +7494,7 @@ PasteProcessor.prototype =
 
 						bAddParagraph = this._Decide_AddParagraph(child, pPr, bAddParagraph);
 						oHyperlink = new ParaHyperlink();
-						oHyperlink.Set_Paragraph(this.oCurPar);
+						oHyperlink.SetParagraph(this.oCurPar);
 						oHyperlink.Set_Value( href );
 						if(null != title)
 							oHyperlink.Set_ToolTip(title);

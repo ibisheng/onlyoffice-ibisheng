@@ -7190,6 +7190,61 @@ background-repeat: no-repeat;\
 		if (!this.isLongAction())
 			oLogicDocument.Recalculate_FromStart();
 	};
+	//----------------------------------------------------------------------------------------------------------------------
+	// Работаем с ContentControl
+	//----------------------------------------------------------------------------------------------------------------------
+	asc_docs_api.prototype.asc_AddContentControl = function(nType, oContentControlPr)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		var sDefaultText = this.textArtTranslate ? this.textArtTranslate.DefaultText : "Your text here";
+		if (AscCommonWord.sdttype_BlockLevel === nType)
+		{
+			if (false === oLogicDocument.Document_Is_SelectionLocked())
+			{
+				History.Create_NewPoint(AscDFH.historydescription_Document_AddBlockLevelContentControl);
+
+				var oContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+				if (oContentControlPr)
+					oContentControl.SetContentControlPr(oContentControlPr);
+
+				for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+				{
+					oContentControl.AddToParagraph(new ParaText(sDefaultText.charAt(nIndex)));
+				}
+				oLogicDocument.SelectContentControl(oContentControl.GetId());
+
+				oLogicDocument.Recalculate();
+				oLogicDocument.Document_UpdateInterfaceState();
+				oLogicDocument.Document_UpdateSelectionState();
+			}
+		}
+		else if (AscCommonWord.sdttype_InlineLevel === nType)
+		{
+			if (false === oLogicDocument.Document_Is_SelectionLocked())
+			{
+				History.Create_NewPoint(AscDFH.historydescription_Document_AddInlineLevelContentControl);
+
+				var oContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_InlineLevel);
+
+				for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+				{
+					oContentControl.Add(new ParaText(sDefaultText.charAt(nIndex)));
+				}
+				oContentControl.SelectThisElement();
+
+				if (oContentControlPr)
+					oContentControl.SetContentControlPr(oContentControlPr);
+
+				oLogicDocument.Recalculate();
+				oLogicDocument.Document_UpdateInterfaceState();
+				oLogicDocument.Document_UpdateSelectionState();
+			}
+		}
+	};
+
 
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()

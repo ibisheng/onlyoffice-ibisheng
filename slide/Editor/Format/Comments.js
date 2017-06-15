@@ -84,11 +84,6 @@ ParaComment.prototype =
     {
     },
 
-    Set_Paragraph : function(Paragraph)
-    {
-        this.Paragraph = Paragraph;
-    },
-
     Is_Empty : function()
     {
         return true;
@@ -482,6 +477,10 @@ ParaComment.prototype =
     Read_FromBinary2 : function(Reader)
     {
     }
+};
+ParaComment.prototype.SetParagraph = function(Paragraph)
+{
+	this.Paragraph = Paragraph;
 };
 ParaComment.prototype.Get_CurrentParaPos = function()
 {
