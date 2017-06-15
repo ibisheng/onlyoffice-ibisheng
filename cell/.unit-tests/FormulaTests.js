@@ -1045,6 +1045,15 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.8164966, "T.INV(0.75,2)" );
 	} );
 
+	test( "Test: \"T.INV.2T\"", function () {
+		ws.getRange2( "A2" ).setValue( "0.546449" );
+		ws.getRange2( "A3" ).setValue( "60" );
+
+		oParser = new parserFormula( "T.INV.2T(A2,A3)", "A1", ws );
+		ok( oParser.parse(), "T.INV.2T(A2,A3)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.606533, "T.INV.2T(A2,A3)" );
+	} );
+
 	test( "Test: \"GAMMA\"", function () {
 		oParser = new parserFormula( "GAMMA(2.5)", "A1", ws );
 		ok( oParser.parse(), "GAMMA(2.5)" );

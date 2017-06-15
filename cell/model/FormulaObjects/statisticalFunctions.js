@@ -67,7 +67,7 @@
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
-		cT_DIST_2T, cT_DIST_RT, cT_INV, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
 
 	function isInteger(value) {
 		return typeof value === 'number' && isFinite(value) && 	Math.floor(value) === value;
@@ -6821,6 +6821,59 @@
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
 	cT_INV.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(probability, deg_freedom)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cT_INV_2T() {
+		cBaseFunction.call(this, "T.INV.2T");
+	}
+
+	cT_INV_2T.prototype = Object.create(cBaseFunction.prototype);
+	cT_INV_2T.prototype.constructor = cT_INV_2T;
+	cT_INV_2T.prototype.argumentsMin = 2;
+	cT_INV_2T.prototype.argumentsMax = 2;
+	cT_INV_2T.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var fP = argArray[0];
+			var fDF = parseInt(argArray[1]);
+
+			//ms игнорирует услвие fP > 1. сделал как в документации
+			if ( fDF < 1.0 || fP <= 0 || fP > 1 ){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var aFunc = new TDISTFUNCTION(fP, fDF, 2);
+			var oVal = iterateInverse(aFunc, fDF * 0.5, fDF);
+			var bConvError = oVal.bError;
+			var res = oVal.val;
+
+			if (bConvError){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cT_INV_2T.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "(probability, deg_freedom)"
 		};
