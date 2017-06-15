@@ -67,7 +67,7 @@
 		cLINEST, cLOGEST, cLOGINV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
-		cT_DIST_2T, cT_DIST_RT, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+		cT_DIST_2T, cT_DIST_RT, cT_INV, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
 
 	function isInteger(value) {
 		return typeof value === 'number' && isFinite(value) && 	Math.floor(value) === value;
@@ -951,6 +951,18 @@
 	FDISTFUNCTION.prototype.GetValue = function(x){
 		var res;
 		var betaDistVal = getFDist(x, this.fF1, this.fF2);
+		res = this.fp - betaDistVal;
+		return res;
+	};
+
+	function TDISTFUNCTION(fp, fDF, nT){
+		this.fp = fp;
+		this.fDF = fDF;
+		this.nT = nT;
+	}
+	TDISTFUNCTION.prototype.GetValue = function(x){
+		var res;
+		var betaDistVal = getTDist(x, this.fDF, this.nT);
 		res = this.fp - betaDistVal;
 		return res;
 	};
@@ -6749,6 +6761,68 @@
 	cT_DIST_RT.prototype.getInfo = function () {
 		return {
 			name: this.name, args: "(x, deg_freedom)"
+		};
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cT_INV() {
+		cBaseFunction.call(this, "T.INV");
+	}
+
+	cT_INV.prototype = Object.create(cBaseFunction.prototype);
+	cT_INV.prototype.constructor = cT_INV;
+	cT_INV.prototype.argumentsMin = 2;
+	cT_INV.prototype.argumentsMax = 2;
+	cT_INV.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var fP = argArray[0];
+			var fDF = parseInt(argArray[1]);
+
+			if ( fDF < 1.0 || fP <= 0.0 || fP > 1.0 ){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var aFunc, oVal, bConvError, res = null;
+			if ( fP === 1.0 ){
+				return  new cError(cErrorType.not_numeric);
+			}else if(fP < 0.5){
+				aFunc = new TDISTFUNCTION(1 - fP, fDF, 4);
+				oVal = iterateInverse(aFunc, fDF * 0.5, fDF);
+				bConvError = oVal.bError;
+				res = - oVal.val;
+			}else{
+				aFunc = new TDISTFUNCTION(fP, fDF, 4);
+				oVal = iterateInverse(aFunc, fDF * 0.5, fDF);
+				bConvError = oVal.bError;
+				res = oVal.val;
+			}
+
+			if (bConvError){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+	cT_INV.prototype.getInfo = function () {
+		return {
+			name: this.name, args: "(probability, deg_freedom)"
 		};
 	};
 

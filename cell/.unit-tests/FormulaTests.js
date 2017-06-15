@@ -1039,6 +1039,12 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 15.20686, "F.INV.RT(A2,A3,A4)" );
 	} );
 
+	test( "Test: \"T.INV\"", function () {
+		oParser = new parserFormula( "T.INV(0.75,2)", "A1", ws );
+		ok( oParser.parse(), "T.INV(0.75,2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.8164966, "T.INV(0.75,2)" );
+	} );
+
 	test( "Test: \"GAMMA\"", function () {
 		oParser = new parserFormula( "GAMMA(2.5)", "A1", ws );
 		ok( oParser.parse(), "GAMMA(2.5)" );
