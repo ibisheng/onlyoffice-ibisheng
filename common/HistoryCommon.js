@@ -1022,6 +1022,9 @@
 			case AscDFH.historydescription_Document_RemoveContentControl:
 				sString = "Document_RemoveContentControl";
 				break;
+			case AscDFH.historydescription_Document_RemoveContentControlWrapper:
+				sString = "Document_RemoveContentControlWrapper";
+				break;
 		}
 		return sString;
 	}
@@ -2911,8 +2914,7 @@
 	window['AscDFH'].historydescription_Document_AddBlockLevelContentControl        = 0x0141;
 	window['AscDFH'].historydescription_Document_AddInlineLevelContentControl       = 0x0142;
 	window['AscDFH'].historydescription_Document_RemoveContentControl               = 0x0143;
-
-
+	window['AscDFH'].historydescription_Document_RemoveContentControlWrapper        = 0x0144;
 
 
 

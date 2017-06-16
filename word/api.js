@@ -7303,6 +7303,65 @@ background-repeat: no-repeat;\
 			oLogicDocument.Document_UpdateSelectionState();
 		}
 	};
+	asc_docs_api.prototype.asc_RemoveContentControlWrapper = function(Id)
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return;
+
+		var isLocked        = true;
+		var oContentControl = null;
+		if (undefined === Id)
+		{
+			var oInfo          = oLogicDocument.GetSelectedElementsInfo();
+			var oInlineControl = oInfo.GetInlineLevelSdt();
+			var oBlockControl  = oInfo.GetBlockLevelSdt();
+
+			if (oInlineControl)
+				oContentControl = oInlineControl;
+			else if (oBlockControl)
+				oContentControl = oBlockControl;
+		}
+		else
+		{
+			oContentControl = AscCommon.g_oTableId.Get_ById(Id);
+		}
+
+		if (oContentControl && oContentControl.GetContentControlType)
+		{
+			if (AscCommonWord.sdttype_BlockLevel === oContentControl.GetContentControlType())
+			{
+				isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+					Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+					Elements  : [oContentControl],
+					CheckType : AscCommon.changestype_ContentControl_Remove
+				});
+			}
+			else if (AscCommonWord.sdttype_InlineLevel === oContentControl.GetContentControlType())
+			{
+				var oParagraph = oContentControl.GetParagraph();
+				if (oParagraph)
+				{
+					isLocked = oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+						Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+						Elements  : [oParagraph],
+						CheckType : AscCommon.changestype_Paragraph_Content
+					});
+				}
+			}
+
+			Id = oContentControl.GetId();
+		}
+
+		if (false === isLocked)
+		{
+			oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveContentControl);
+			oLogicDocument.RemoveContentControlWrapper(Id);
+			oLogicDocument.Recalculate();
+			oLogicDocument.Document_UpdateInterfaceState();
+			oLogicDocument.Document_UpdateSelectionState();
+		}
+	};
 
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()
