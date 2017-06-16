@@ -1629,7 +1629,7 @@
 				for(var i = 0; i < tableParts.length; i++)
 					changeFilter(tableParts[i], true);
 				
-				if(displayNameFormatTable && type == 'insCell')
+				if(displayNameFormatTable && type === 'insCell')
 				{
 					redrawTablesArr = redrawTablesArr.concat(this.insertLastTableRow(displayNameFormatTable, activeRange));
 				}

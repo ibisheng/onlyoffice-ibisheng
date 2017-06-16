@@ -4338,7 +4338,7 @@
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes({offsetRow: dif, offsetCol: 0}, oBBox);
 		var redrawTablesArr;
-		if (!this.workbook.bUndoChanges) {
+		if (!this.workbook.bUndoChanges && undefined === displayNameFormatTable) {
 			redrawTablesArr = this.autoFilters.insertRows("insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown,
 				displayNameFormatTable);
 		}
@@ -4371,6 +4371,13 @@
 		//notifyChanged after move cells to get new locations(for intersect ranges)
 		this.workbook.dependencyFormulas.notifyChanged(changedFormulas);
 		History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ShiftCellsBottom, this.getId(), oActualRange, new UndoRedoData_BBox(oBBox));
+
+		//пока перенес добавление только последней строки(в данном случае порядок занесения в истрию должен быть именно в таком порядке)
+		//TODO возможно стоит полностью перенести сюда обработку для ф/т и а/ф
+		if (!this.workbook.bUndoChanges && undefined !== displayNameFormatTable) {
+			redrawTablesArr = this.autoFilters.insertRows("insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown,
+				displayNameFormatTable);
+		}
 
 		if(!this.workbook.bUndoChanges)
 		{
