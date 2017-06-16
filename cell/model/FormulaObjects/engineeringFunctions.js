@@ -1080,11 +1080,6 @@
 		return this.value;
 
 	};
-	cBIN2DEC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1148,11 +1143,6 @@
 
 		return this.value;
 
-	};
-	cBIN2HEX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
 	};
 
 	/**
@@ -1218,11 +1208,6 @@
 		return this.value;
 
 	};
-	cBIN2OCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1286,11 +1271,6 @@
 
 		return this.value;
 
-	};
-	cCOMPLEX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( real-number , imaginary-number [ , suffix ] )"
-		};
 	};
 
 	/**
@@ -1362,11 +1342,6 @@
 		return this.value;
 
 	};
-	cDEC2BIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1424,11 +1399,6 @@
 
 		return this.value;
 
-	};
-	cDEC2HEX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
 	};
 
 	/**
@@ -1488,11 +1458,6 @@
 		return this.value;
 
 	};
-	cDEC2OCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1539,11 +1504,6 @@
 
 		return this.value;
 
-	};
-	cDELTA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number-1 [ , number-2 ] )"
-		};
 	};
 
 	/**
@@ -1597,11 +1557,6 @@
 		return this.value;
 
 	};
-	cERF.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( lower-bound [ , upper-bound ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1635,11 +1590,6 @@
 
 		return this.value;
 
-	};
-	cERFC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( lower-bound )"
-		};
 	};
 
 	/**
@@ -1687,11 +1637,6 @@
 
 		return this.value;
 
-	};
-	cGESTEP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , step ] )"
-		};
 	};
 
 	/**
@@ -1764,11 +1709,6 @@
 		return this.value;
 
 	};
-	cHEX2BIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1815,11 +1755,6 @@
 
 		return this.value;
 
-	};
-	cHEX2DEC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number )"
-		};
 	};
 
 	/**
@@ -1891,11 +1826,6 @@
 		return this.value;
 
 	};
-	cHEX2OCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1935,11 +1865,6 @@
 
 		return this.value;
 
-	};
-	cIMABS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -1981,11 +1906,6 @@
 		return this.value;
 
 	};
-	cIMAGINARY.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2026,11 +1946,6 @@
 		return this.value;
 
 	};
-	cIMARGUMENT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2070,11 +1985,6 @@
 
 		return this.value;
 
-	};
-	cIMCONJUGATE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -2117,11 +2027,6 @@
 
 		return this.value;
 
-	};
-	cIMCOS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -2169,11 +2074,6 @@
 
 		return this.value;
 
-	};
-	cIMCOSH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -2224,11 +2124,6 @@
 
 		return this.value;
 
-	};
-	cIMCOT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -2281,11 +2176,6 @@
 		return this.value;
 
 	};
-	cIMCSC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2336,11 +2226,6 @@
 
 		return this.value;
 
-	};
-	cIMCSCH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -2395,11 +2280,6 @@
 		return this.value;
 
 	};
-	cIMDIV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number-1 , complex-number-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2441,11 +2321,6 @@
 
 		return this.value;
 
-	};
-	cIMEXP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -2493,11 +2368,6 @@
 		return this.value;
 
 	};
-	cIMLN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2544,11 +2414,6 @@
 		return this.value;
 
 	};
-	cIMLOG10.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2594,11 +2459,6 @@
 
 		return this.value;
 
-	};
-	cIMLOG2.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -2655,11 +2515,6 @@
 
 		return this.value;
 
-	};
-	cIMPOWER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number, power )"
-		};
 	};
 
 	/**
@@ -2758,11 +2613,6 @@
 		return this.value;
 
 	};
-	cIMPRODUCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2802,11 +2652,6 @@
 
 		return this.value;
 
-	};
-	cIMREAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -2854,11 +2699,6 @@
 		return this.value;
 
 	};
-	cIMSEC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2904,11 +2744,6 @@
 
 		return this.value;
 
-	};
-	cIMSECH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 
@@ -2958,11 +2793,6 @@
 		return this.value;
 
 	};
-	cIMSIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3010,11 +2840,6 @@
 		return this.value;
 
 	};
-	cIMSINH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3056,11 +2881,6 @@
 
 		return this.value;
 
-	};
-	cIMSQRT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -3114,11 +2934,6 @@
 
 		return this.value;
 
-	};
-	cIMSUB.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number-1 , complex-number-2 )"
-		};
 	};
 
 	/**
@@ -3218,11 +3033,6 @@
 		return this.value;
 
 	};
-	cIMSUM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3269,11 +3079,6 @@
 
 		return this.value;
 
-	};
-	cIMTAN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
 	};
 
 	/**
@@ -3346,11 +3151,6 @@
 		return this.value;
 
 	};
-	cOCT2BIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3397,11 +3197,6 @@
 
 		return this.value;
 
-	};
-	cOCT2DEC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number )"
-		};
 	};
 
 	/**
@@ -3467,9 +3262,4 @@
 		return this.value;
 
 	};
-	cOCT2HEX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	}
 })(window);

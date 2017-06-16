@@ -1034,11 +1034,6 @@
 
 		return this.value = new cNumber(a / count);
 	};
-	cAVEDEV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1107,11 +1102,6 @@
 		}
 		return this.value = new cNumber(sum.getValue() / count);
 	};
-	cAVERAGE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1172,11 +1162,6 @@
 			}
 		}
 		return this.value = new cNumber(sum.getValue() / count);
-	};
-	cAVERAGEA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**
@@ -1258,11 +1243,6 @@
 		} else {
 			return this.value = new cNumber(_sum / _count);
 		}
-	};
-	cAVERAGEIF.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cell-range, selection-criteria [ , average-range ] )"
-		};
 	};
 
 	/**
@@ -1346,11 +1326,6 @@
 	cAVERAGEIFS.prototype.checkArguments = function () {
 		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
-	cAVERAGEIFS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(average_range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1408,9 +1383,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcBeta);
-	};
-	cBETADIST.prototype.getInfo = function () {
-		return {name: this.name, args: "( x, alpha, beta, a, b )"}
 	};
 
 	/**
@@ -1474,9 +1446,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcBeta);
 	};
-	cBETA_DIST.prototype.getInfo = function () {
-		return {name: this.name, args: "( x, alpha, beta, cumulative, a, b )"}
-	};
 
 	/**
 	 * @constructor
@@ -1534,9 +1503,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
-	};
-	cBETA_INV.prototype.getInfo = function () {
-		return {name: this.name, args: "( probability, alpha, beta, a, b )"}
 	};
 
 	/**
@@ -1619,11 +1585,6 @@
 			return this.value = new cNumber(binomdist(arg0.getValue(), arg1.getValue(), arg2.getValue()));
 		}
 	};
-	cBINOMDIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number-successes , number-trials , success-probability , cumulative-flag )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1662,11 +1623,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cCHIDIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(x, deg_freedom)"
-		};
 	};
 
 	/**
@@ -1714,11 +1670,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cCHIINV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(probability, deg_freedom)"
-		};
 	};
 
 	/**
@@ -1771,11 +1722,6 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cCHISQ_DIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(x, deg_freedom, cumulative)"
-		};
 	};
 
 	/**
@@ -1838,11 +1784,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
-	cCHISQ_INV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(probability, deg_freedom)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1890,11 +1831,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cCHISQ_INV_RT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(probability, deg_freedom)"
-		};
 	};
 
 	/**
@@ -1964,11 +1900,6 @@
 		return this.value =
 			new cNumber(gaussinv(1.0 - alpha.getValue() / 2.0) * stdev_sigma.getValue() / Math.sqrt(size.getValue()));
 
-	};
-	cCONFIDENCE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( alpha , standard-dev , size )"
-		};
 	};
 
 	/**
@@ -2051,11 +1982,6 @@
 		return this.value = correl(arr0, arr1);
 
 	};
-	cCORREL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array-1 , array-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2106,11 +2032,6 @@
 		}
 		return this.value = new cNumber(count);
 	};
-	cCOUNT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2156,11 +2077,6 @@
 		}
 		return this.value = new cNumber(count);
 	};
-	cCOUNTA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2186,11 +2102,6 @@
 		} else {
 			return this.value = new cError(cErrorType.bad_reference);
 		}
-	};
-	cCOUNTBLANK.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**
@@ -2244,11 +2155,6 @@
 		}
 
 		return this.value = new cNumber(_count);
-	};
-	cCOUNTIF.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cell-range, selection-criteria )"
-		};
 	};
 
 	/**
@@ -2321,11 +2227,6 @@
 	};
 	cCOUNTIFS.prototype.checkArguments = function () {
 		return 0 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
-	};
-	cCOUNTIFS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(criteria_range1, criteria1, [criteria_range2, criteria2], ...)"
-		};
 	};
 
 	/**
@@ -2401,11 +2302,6 @@
 
 		return this.value = covar(arr0, arr1);
 
-	};
-	cCOVAR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array-1 , array-2 )"
-		};
 	};
 
 	/**
@@ -2492,11 +2388,6 @@
 		return this.value = critbinom(n, p, alpha);
 
 	};
-	cCRITBINOM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number-trials , success-probability , alpha )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2571,11 +2462,6 @@
 		return this.value = devsq(arr0);
 
 	};
-	cDEVSQ.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2624,11 +2510,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
-	};
-	cEXPON_DIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , lambda , cumulative-flag )"
-		};
 	};
 
 	/**
@@ -2689,11 +2570,6 @@
 		} else {
 			return this.value = new cNumber(arg1.getValue() * Math.exp(-arg1.getValue() * arg0.getValue()));
 		}
-	};
-	cEXPONDIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , lambda , cumulative-flag )"
-		};
 	};
 
 	/**
@@ -2759,11 +2635,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
-	cF_DIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(x, deg_freedom1, deg_freedom2, cumulative)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2809,11 +2680,6 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
-	};
-	cF_DIST_RT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(x, deg_freedom1, deg_freedom2)"
-		};
 	};
 
 	/**
@@ -2869,11 +2735,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
-	cF_INV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(probability, deg_freedom1, deg_freedom2)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2926,11 +2787,6 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
-	};
-	cFINV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(probability, deg_freedom1, deg_freedom2)"
-		};
 	};
 
 	/**
@@ -2989,11 +2845,6 @@
 		return this.value = arg0;
 
 	};
-	cFISHER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3037,11 +2888,6 @@
 		}
 		return this.value = arg0;
 
-	};
-	cFISHERINV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number )"
-		};
 	};
 
 	/**
@@ -3136,11 +2982,6 @@
 		return this.value = forecast(arg0, arr0, arr1);
 
 	};
-	cFORECAST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , array-1 , array-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3225,11 +3066,6 @@
 		return this.value = frequency(arg0, arg1);
 
 	};
-	cFREQUENCY.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(  data-array , bins-array )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3277,9 +3113,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
-	};
-	cGAMMA.prototype.getInfo = function () {
-		return {name: this.name, args: "(number)"}
 	};
 
 	/**
@@ -3334,9 +3167,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
-	};
-	cGAMMA_DIST.prototype.getInfo = function () {
-		return {name: this.name, args: "(x, alpha, beta, cumulative )"}
 	};
 
 	/**
@@ -3409,9 +3239,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
-	cGAMMA_INV.prototype.getInfo = function () {
-		return {name: this.name, args: "(probability, alpha, beta )"}
-	};
 
 	/**
 	 * @constructor
@@ -3470,9 +3297,6 @@
 		}
 		return this.value = arg0;
 	};
-	cGAMMALN.prototype.getInfo = function () {
-		return {name: this.name, args: "(number)"}
-	};
 
 	/**
 	 * @constructor
@@ -3507,9 +3331,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
 	};
-	cGAMMALN_PRECISE.prototype.getInfo = function () {
-		return {name: this.name, args: "(number)"}
-	};
 
 	/**
 	 * @constructor
@@ -3543,9 +3364,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcGauss);
-	};
-	cGAUSS.prototype.getInfo = function () {
-		return {name: this.name, args: "(number)"}//в документации аргумент называется Z
 	};
 
 	/**
@@ -3618,11 +3436,6 @@
 		}
 		return this.value = geommean(arr0);
 
-	};
-	cGEOMEAN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**
@@ -3713,11 +3526,6 @@
 		return this.value = harmmean(arr0);
 
 	};
-	cHARMEAN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3790,11 +3598,6 @@
 			Math.binomCoeff(arg3.getValue() - arg2.getValue(), arg1.getValue() - arg0.getValue()) /
 			Math.binomCoeff(arg3.getValue(), arg1.getValue()));
 
-	};
-	cHYPGEOMDIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( sample-successes , number-sample , population-successes , number-population )"
-		};
 	};
 
 	/**
@@ -3876,11 +3679,6 @@
 
 		return this.value = intercept(arr0, arr1);
 
-	};
-	cINTERCEPT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array-1 , array-2 )"
-		};
 	};
 
 	/**
@@ -3968,11 +3766,6 @@
 		return this.value = kurt(arr0);
 
 	};
-	cKURT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4042,11 +3835,6 @@
 
 		arg1 = arg1.tocNumber();
 		return this.value = this._getValue(arg0, arg1);
-	};
-	cLARGE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(  array , k )"
-		};
 	};
 
 	/**
@@ -4131,11 +3919,6 @@
 
 		return this.value = loginv(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
-	cLOGINV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , mean , standard-deviation )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4197,9 +3980,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, normdist);
 	};
-	cLOGNORM_DIST.prototype.getInfo = function () {
-		return {name: this.name, args: "( x , mean , standard-deviation, cumulative )"}
-	};
 
 	/**
 	 * @constructor
@@ -4245,9 +4025,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, normdist);
-	};
-	cLOGNORM_INV.prototype.getInfo = function () {
-		return {name: this.name, args: "( probability , mean, standard_dev )"}
 	};
 
 	/**
@@ -4309,11 +4086,6 @@
 		}
 
 		return this.value = normdist(arg0.getValue(), arg1.getValue(), arg2.getValue());
-	};
-	cLOGNORMDIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , mean , standard-deviation )"
-		};
 	};
 
 	/**
@@ -4393,11 +4165,6 @@
 			}
 		}
 		return this.value = (max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max));
-	};
-	cMAX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number1, number2, ...)"
-		};
 	};
 
 	/**
@@ -4480,11 +4247,6 @@
 		}
 		return this.value = ( max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max) )
 	};
-	cMAXA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number1, number2, ...)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4557,11 +4319,6 @@
 		}
 		return this.value = median(arr0);
 
-	};
-	cMEDIAN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**
@@ -4642,11 +4399,6 @@
 			}
 		}
 		return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
-	};
-	cMIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number1, number2, ...)"
-		};
 	};
 
 	/**
@@ -4729,11 +4481,6 @@
 			}
 		}
 		return this.value = ( min === Number.POSITIVE_INFINITY ? new cNumber(0) : new cNumber(min) );
-	};
-	cMINA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number1, number2, ...)"
-		};
 	};
 
 	/**
@@ -4828,11 +4575,6 @@
 		return this.value = mode(arr0);
 
 	};
-	cMODE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4896,11 +4638,6 @@
 
 		return this.value = negbinomdist(arg0, arg1, arg2);
 
-	};
-	cNEGBINOMDIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number-failures , number-successes , success-probability )"
-		};
 	};
 
 	/**
@@ -4979,11 +4716,6 @@
 
 		return this.value = normdist(arg0.getValue(), arg1.getValue(), arg2.getValue(), arg3.toBool());
 	};
-	cNORMDIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , mean , standard-deviation , cumulative-flag )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5045,11 +4777,6 @@
 
 		return this.value = norminv(arg0.getValue(), arg1.getValue(), arg2.getValue());
 	};
-	cNORMINV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , mean , standard-deviation )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5087,11 +4814,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cNORMSDIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number)"
-		};
 	};
 
 	/**
@@ -5139,11 +4861,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_available) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cNORMSINV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( probability )"
-		};
 	};
 
 	/**
@@ -5227,11 +4944,6 @@
 		return this.value = pearson(arr0, arr1);
 
 	};
-	cPEARSON.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array-1 , array-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5293,11 +5005,6 @@
 
 		return this.value = percentile(arg0, arg1);
 
-	};
-	cPERCENTILE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(  array , k )"
-		};
 	};
 
 	/**
@@ -5410,11 +5117,6 @@
 		return this.value = percentrank(arr0, arg1, arg2);
 
 	};
-	cPERCENTRANK.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array , x [ , significance ]  )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5501,11 +5203,6 @@
 
 		return this.value = new cNumber(Math.permut(arg0.getValue(), arg1.getValue()));
 	};
-	cPERMUT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number , number-chosen )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5579,11 +5276,6 @@
 
 		return this.value = new cNumber(poisson(arg0, arg1, arg2));
 
-	};
-	cPOISSON.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , mean , cumulative-flag )"
-		};
 	};
 
 	/**
@@ -5695,11 +5387,6 @@
 		return this.value = prob(arg0, arg1, arg2, arg3);
 
 	};
-	cPROB.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x-range , probability-range , lower-limit [ , upper-limit ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5804,11 +5491,6 @@
 		return this.value = quartile(arg0, arg1);
 
 	};
-	cQUARTILE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(  array , result-category )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5903,11 +5585,6 @@
 		return this.value = rsq(arr0, arr1);
 
 	};
-	cRSQ.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array-1 , array-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5996,11 +5673,6 @@
 		}
 		return this.value = skew(arr0);
 	};
-	cSKEW.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6083,11 +5755,6 @@
 		return this.value = slope(arr0, arr1);
 
 	};
-	cSLOPE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array-1 , array-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6164,11 +5831,6 @@
 		return this.value = frequency(arg0, arg1);
 
 	};
-	cSMALL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(  array , k )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6229,11 +5891,6 @@
 		}
 
 		return this.value = standardize(arg0.getValue(), arg1.getValue(), arg2.getValue());
-	};
-	cSTANDARDIZE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , mean , standard-deviation )"
-		};
 	};
 
 	/**
@@ -6298,11 +5955,6 @@
 		}
 		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
 	};
-	cSTDEV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6362,11 +6014,6 @@
 			res += av * av;
 		}
 		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
-	};
-	cSTDEVA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**
@@ -6440,11 +6087,6 @@
 
 		}
 		return this.value = _var(arr0);
-	};
-	cSTDEVP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**
@@ -6533,11 +6175,6 @@
 		}
 		return this.value = _var(arr0);
 	};
-	cSTDEVPA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6623,11 +6260,6 @@
 		return this.value = steyx(arr0, arr1);
 
 	};
-	cSTEYX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( known-ys , known-xs )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6668,11 +6300,6 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cTDIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(x, deg_freedom, tails)"
-		};
 	};
 
 	/**
@@ -6716,11 +6343,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
-	cT_DIST.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(x, deg_freedom, cumulative)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6760,11 +6382,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cT_DIST_2T.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(x, deg_freedom)"
-		};
 	};
 
 	/**
@@ -6809,11 +6426,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cT_DIST_RT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(x, deg_freedom)"
-		};
 	};
 
 	/**
@@ -6873,11 +6485,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
-	cT_INV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(probability, deg_freedom)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6926,11 +6533,6 @@
 		};
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cT_INV_2T.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(probability, deg_freedom)"
-		};
 	};
 
 	/**
@@ -7056,11 +6658,6 @@
 		return this.value = _var(arr0);
 
 	};
-	cVAR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -7152,11 +6749,6 @@
 		}
 		return this.value = _var(arr0);
 	};
-	cVARA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -7235,11 +6827,6 @@
 		}
 		return this.value = _var(arr0);
 	};
-	cVARP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -7255,11 +6842,6 @@
 	cVARdotP.prototype.constructor = cVARdotP;
 	cVARdotP.prototype.argumentsMin = 1;
 	cVARdotP.prototype.Calculate = cVARP.prototype.Calculate;
-	cVARdotP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -7350,11 +6932,6 @@
 
 		}
 		return this.value = _var(arr0);
-	};
-	cVARPA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**

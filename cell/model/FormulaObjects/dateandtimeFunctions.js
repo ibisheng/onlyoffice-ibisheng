@@ -362,11 +362,6 @@
 		this.value.numFormat = 14;
 		return this.value;
 	};
-	cDATE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( year, month, day )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -483,11 +478,6 @@
 		}
 
 	};
-	cDATEDIF.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( start-date , end-date , unit )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -525,11 +515,6 @@
 		} else {
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
-	};
-	cDATEVALUE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( date-time-string )"
-		};
 	};
 
 	/**
@@ -600,11 +585,6 @@
 				new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay) ).getUTCDate()), 0);
 		}
 	};
-	cDAY.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( date-value )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -668,11 +648,6 @@
 
 		return this.value = new cNumber(days360(date1, date2, arg2.toBool()));
 
-	};
-	cDAYS360.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(  start-date , end-date [ , method-flag ] )"
-		};
 	};
 
 	/**
@@ -747,11 +722,6 @@
 		return this.value = new cNumber(Math.floor(( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay +
 			(AscCommonExcel.c_DateCorrectConst + 1)))
 	};
-	cEDATE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( start-date , month-offset )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -816,11 +786,6 @@
 		return this.value = new cNumber(Math.floor(( val.getTime() / 1000 - val.getTimezoneOffset() * 60 ) / c_sPerDay +
 			(AscCommonExcel.c_DateCorrectConst + 1)));
 	};
-	cEOMONTH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( start-date , month-offset )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -884,11 +849,6 @@
 				0);
 		}
 	};
-	cHOUR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( time-value )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -950,11 +910,6 @@
 			val = parseInt(( ( val * 24 - Math.floor(val * 24) ) * 60 ).toFixed(cExcelDateTimeDigits)) % 60;
 			return this.setCalcValue(new cNumber(val), 0);
 		}
-	};
-	cMINUTE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( time-value )"
-		};
 	};
 
 	/**
@@ -1022,11 +977,6 @@
 			return this.setCalcValue(new cNumber(( new Date(( (val == 0 ? 1 : val) - AscCommonExcel.c_DateCorrectConst ) *
 					c_msPerDay) ).getUTCMonth() + 1), 0);
 		}
-	};
-	cMONTH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( date-value )"
-		};
 	};
 
 	/**
@@ -1152,11 +1102,6 @@
 		}
 		return this.value = new cNumber((dif < 0 ? -1 : 1) * count);
 	};
-	cNETWORKDAYS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( start-date , end-date [ , holidays ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1189,11 +1134,6 @@
 			(d.getHours() * 60 * 60 + d.getMinutes() * 60 + d.getSeconds()) / c_sPerDay);
 		this.value.numFormat = 22;
 		return this.value;
-	};
-	cNOW.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "()"
-		};
 	};
 
 	/**
@@ -1257,11 +1197,6 @@
 			return this.setCalcValue(new cNumber(val), 0);
 		}
 	};
-	cSECOND.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( time-value )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1319,11 +1254,6 @@
 		this.value.numFormat = 18;
 		return this.value;
 	};
-	cTIME.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( hour, minute, second )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1363,11 +1293,6 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 	};
-	cTIMEVALUE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( date-time-string )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1387,11 +1312,6 @@
 		this.value = new cNumber(new Date().getExcelDate());
 		this.value.numFormat = 14;
 		return this.value;
-	};
-	cTODAY.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "()"
-		};
 	};
 
 	/**
@@ -1473,11 +1393,6 @@
 
 		return this.value = new cNumber(weekday[new Date((arg0.getValue() - (AscCommonExcel.c_DateCorrectConst + 1)) *
 			c_msPerDay).getUTCDay()]);
-	};
-	cWEEKDAY.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( serial-value [ , weekday-start-flag ] )"
-		};
 	};
 
 	/**
@@ -1592,11 +1507,6 @@
 		return this.value =
 			new cNumber(WeekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
 
-	};
-	cWEEKNUM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( serial-value [ , weekday-start-flag ] )"
-		};
 	};
 
 	/**
@@ -1719,11 +1629,6 @@
 
 		return this.setCalcValue(new cNumber(val), 14);
 	};
-	cWORKDAY.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( start-date , day-offset [ , holidays ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1796,11 +1701,6 @@
 				0);
 		}
 	};
-	cYEAR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( date-value )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1863,11 +1763,6 @@
 		return this.value = yearFrac(val0, val1, arg2.getValue());
 //    return this.value = diffDate2( val0, val1, arg2.getValue() );
 
-	};
-	cYEARFRAC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(  start-date , end-date [ , basis ] )"
-		};
 	};
 
 //----------------------------------------------------------export----------------------------------------------------

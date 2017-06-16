@@ -130,11 +130,6 @@
 
 		return this.value = new cString(String.fromCharCode(arg0.getValue()));
 	};
-	cCHAR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -171,11 +166,6 @@
 		}
 
 		return this.value = new cString(res);
-	};
-	cCLEAN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string )"
-		};
 	};
 
 	/**
@@ -222,11 +212,6 @@
 
 		return this.value = new cNumber(arg0.toString().charCodeAt());
 	};
-	cCODE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -271,11 +256,6 @@
 			}
 		}
 		return this.value = arg0;
-	};
-	cCONCATENATE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(text1, text2, ...)"
-		};
 	};
 
 	/**
@@ -331,11 +311,6 @@
 			}
 		}
 		return this.value = arg0;
-	};
-	cCONCAT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(text1, text2, ...)"
-		};
 	};
 
 	/**
@@ -536,11 +511,6 @@
 				AscCommon.gc_nMaxDigCount)[0].text);
 		return this.value;
 	};
-	cDOLLAR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-decimal ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -586,11 +556,6 @@
 
 		var arg0val = arg0.getValue(), arg1val = arg1.getValue();
 		return this.value = new cBool(arg0val === arg1val);
-	};
-	cEXACT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(text1, text2)"
-		};
 	};
 
 	/**
@@ -677,11 +642,6 @@
 
 		return this.value = new cNumber(res + 1);
 
-	};
-	cFIND.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string-1 , string-2 [ , start-pos ] )"
-		};
 	};
 
 	/**
@@ -891,11 +851,6 @@
 			.format(roundHelper(number, num_digits).getValue(), CellValueType.Number,
 				AscCommon.gc_nMaxDigCount)[0].text)
 	};
-	cFIXED.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , [ num-decimal ] [ , suppress-commas-flag ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -957,11 +912,6 @@
 		return this.value = new cString(arg0.getValue().substring(0, arg1.getValue()))
 
 	};
-	cLEFT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string [ , number-chars ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1008,11 +958,6 @@
 		return this.value = new cNumber(arg0.getValue().length)
 
 	};
-	cLEN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1057,11 +1002,6 @@
 		}
 
 		return this.value = new cString(arg0.getValue().toLowerCase());
-	};
-	cLOWER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(text)"
-		};
 	};
 
 	/**
@@ -1132,11 +1072,6 @@
 		return this.value =
 			new cString(arg0.getValue().substr(arg1.getValue() == 0 ? 0 : arg1.getValue() - 1, arg2.getValue()))
 
-	};
-	cMID.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string , start-pos , number-chars )"
-		};
 	};
 
 	/**
@@ -1273,11 +1208,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcText, true);
 	};
-	cNUMBERVALUE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(text, decimal_separator, group_separator )"
-		};
-	};
 
 
 	/**
@@ -1355,11 +1285,6 @@
 		}
 
 		return this.value = new cString(proper(arg0.toString()));
-	};
-	cPROPER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string )"
-		};
 	};
 
 	/**
@@ -1439,11 +1364,6 @@
 		return this.value = new cString(res);
 
 	};
-	cREPLACE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string-1, start-pos, number-chars, string-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1518,11 +1438,6 @@
 
 		return this.value = new cString(arg0.getValue().repeat(arg1.getValue()));
 	};
-	cREPT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(text, number_of_times)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1572,11 +1487,6 @@
 		var l = arg0.getValue().length, _number = l - arg1.getValue();
 		return this.value = new cString(arg0.getValue().substring(_number < 0 ? 0 : _number, l))
 
-	};
-	cRIGHT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string [ , number-chars ] )"
-		};
 	};
 
 	/**
@@ -1680,11 +1590,6 @@
 		return this.value = new cNumber(res + 1);
 
 	};
-	cSEARCH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string-1 , string-2 [ , start-pos ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1778,11 +1683,6 @@
 		return this.value = new cString(res);
 
 	};
-	cSUBSTITUTE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string , old-string , new-string [ , occurence ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1815,11 +1715,6 @@
 		} else {
 			return this.value = new AscCommonExcel.cEmpty();
 		}
-	};
-	cT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( value )"
-		};
 	};
 
 	/**
@@ -1892,11 +1787,6 @@
 		this.value.numFormat = AscCommonExcel.cNumFormatNone;
 		return this.value;
 	};
-	cTEXT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( value , format )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1933,11 +1823,6 @@
 			return res;
 		}).replace(/^\s|\s$/g, ""))
 	};
-	cTRIM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1968,11 +1853,6 @@
 			return this.value = arg0;
 		}
 		return this.value = new cString(arg0.getValue().toUpperCase());
-	};
-	cUPPER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(text)"
-		};
 	};
 
 	/**
@@ -2013,10 +1893,5 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
-	};
-	cVALUE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( string )"
-		};
 	};
 })(window);
