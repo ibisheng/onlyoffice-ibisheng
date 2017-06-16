@@ -7215,7 +7215,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
                     for (var j = 0; j < ascFunctions.length; ++j) {
                         _stream["WriteString2"](ascFunctions[j].asc_getName());
-                        _stream["WriteString2"](ascFunctions[j].asc_getArguments());
+                        _stream["WriteString2"]("");
                     }
                 }
             } else {
