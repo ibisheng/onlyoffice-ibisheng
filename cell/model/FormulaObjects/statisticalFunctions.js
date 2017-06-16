@@ -63,7 +63,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
 		cBETA_DIST, cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT,
 		cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ,
-		cEXPON_DIST, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
+		cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
 		cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS,
 		cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST,
 		cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV,
@@ -72,7 +72,7 @@
 		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFDIST, cFTEST, cGROWTH, cLINEST, cLOGEST, cRANK, cTREND,
+	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cRANK, cTREND,
 		cTRIMMEAN, cTTEST, cWEIBULL, cZTEST);
 
 	function isInteger(value) {
@@ -2576,17 +2576,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cFDIST() {
-		cBaseFunction.call(this, "FDIST");
-	}
-
-	cFDIST.prototype = Object.create(cBaseFunction.prototype);
-	cFDIST.prototype.constructor = cFDIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cF_DIST() {
 		cBaseFunction.call(this, "F.DIST");
 	}
@@ -2681,6 +2670,19 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cF_DIST_RT}
+	 */
+	function cFDIST() {
+		cF_DIST_RT.call(this);
+		this.name = "FDIST";
+	}
+
+	cFDIST.prototype = Object.create(cF_DIST_RT.prototype);
+	cFDIST.prototype.constructor = cFDIST;
+	cFDIST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor

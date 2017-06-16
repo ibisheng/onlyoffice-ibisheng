@@ -1009,6 +1009,16 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.01, "F.DIST.RT(A2,A3,A4)" );
 	} );
 
+	test( "Test: \"FDIST\"", function () {
+		ws.getRange2( "A2" ).setValue( "15.2069" );
+		ws.getRange2( "A3" ).setValue( "6" );
+		ws.getRange2( "A4" ).setValue( "4" );
+
+		oParser = new parserFormula( "FDIST(A2,A3,A4)", "A1", ws );
+		ok( oParser.parse(), "FDIST(A2,A3,A4)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.01, "FDIST(A2,A3,A4)" );
+	} );
+
 	test( "Test: \"FINV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.01" );
 		ws.getRange2( "A3" ).setValue( "6" );
