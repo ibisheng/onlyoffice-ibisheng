@@ -71,6 +71,9 @@
 	cFormulaFunctionGroup['LookupAndReference'].push(cADDRESS, cAREAS, cCHOOSE, cCOLUMN, cCOLUMNS, cGETPIVOTDATA,
 		cHLOOKUP, cHYPERLINK, cINDEX, cINDIRECT, cLOOKUP, cMATCH, cOFFSET, cROW, cROWS, cRTD, cTRANSPOSE, cVLOOKUP);
 
+	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
+	cFormulaFunctionGroup['NotRealised'].push(cAREAS, cGETPIVOTDATA, cHYPERLINK, cRTD);
+
 	function searchRegExp(str, flags) {
 		var vFS = str
 			.replace(/(\\)/g, "\\")

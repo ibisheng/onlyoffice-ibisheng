@@ -940,6 +940,9 @@
 		cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMCOSH, cIMCOT, cIMCSC, cIMCSCH, cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER,
 		cIMPRODUCT, cIMREAL, cIMSEC, cIMSECH, cIMSIN, cIMSINH, cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN, cOCT2DEC, cOCT2HEX);
 
+	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
+	cFormulaFunctionGroup['NotRealised'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cCONVERT);
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}

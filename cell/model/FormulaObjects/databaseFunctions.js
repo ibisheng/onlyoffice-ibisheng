@@ -44,6 +44,10 @@
 	cFormulaFunctionGroup['Database'].push(cDAVERAGE, cDCOUNT, cDCOUNTA, cDGET, cDMAX, cDMIN, cDPRODUCT, cDSTDEV,
 		cDSTDEVP, cDSUM, cDVAR, cDVARP);
 
+	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
+	cFormulaFunctionGroup['NotRealised'].push(cDAVERAGE, cDCOUNT, cDCOUNTA, cDGET, cDMAX, cDMIN, cDPRODUCT, cDSTDEV,
+		cDSTDEVP, cDSUM, cDVAR, cDVARP);
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}

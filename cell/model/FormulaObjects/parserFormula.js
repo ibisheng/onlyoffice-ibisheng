@@ -3140,8 +3140,9 @@ var cFormulaOperators = {
 			b = new AscCommon.asc_CFormulaGroup(type);
 			for (var i = 0; i < cFormulaFunctionGroup[type].length; ++i) {
 				a = new cFormulaFunctionGroup[type][i]();
-				if (a.getInfo) {
-					f = new AscCommon.asc_CFormula(a.getInfo());
+				//cFormulaFunctionGroup['NotRealised'] - массив ещё не реализованных формул
+				if (-1 === cFormulaFunctionGroup['NotRealised'].indexOf(cFormulaFunctionGroup[type][i])) {
+					f = new AscCommon.asc_CFormula(a);
 					b.asc_addFormulaElement(f);
 					cFormulaFunction[f.asc_getName()] = cFormulaFunctionGroup[type][i];
 				}

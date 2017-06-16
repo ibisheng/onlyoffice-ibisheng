@@ -61,6 +61,9 @@
 		cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cNUMBERVALUE, cPHONETIC, cPROPER, cREPLACE,
 		cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTRIM, cUPPER, cVALUE);
 
+	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
+	cFormulaFunctionGroup['NotRealised'].push(cASC, cBAHTTEXT, cJIS, cPHONETIC);
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
