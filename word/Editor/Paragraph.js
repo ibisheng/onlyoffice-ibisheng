@@ -1994,7 +1994,7 @@ Paragraph.prototype.Internal_Draw_4 = function(CurPage, pGraphics, Pr, BgColor, 
 						if (Pr.ParaPr.Ind.FirstLine < 0)
 							NumberingItem.Draw(X, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
 						else
-							NumberingItem.Draw(this.X + Pr.ParaPr.Ind.Left, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
+							NumberingItem.Draw(this.Pages[CurPage].X  + Pr.ParaPr.Ind.Left, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
 					}
 				}
 

@@ -2995,9 +2995,9 @@ CParagraphRecalculateStateWrap.prototype =
             if ( numbering_presentationnumfrmt_None != Bullet.Get_Type() )
             {
                 if ( ParaPr.Ind.FirstLine < 0 )
-                    NumberingItem.WidthVisible = Math.max( NumberingItem.Width, Para.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - X, Para.X + ParaPr.Ind.Left - X );
+                    NumberingItem.WidthVisible = Math.max( NumberingItem.Width, Para.Pages[CurPage].X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - X, Para.Pages[CurPage].X + ParaPr.Ind.Left - X );
                 else
-                    NumberingItem.WidthVisible = Math.max( Para.X + ParaPr.Ind.Left + NumberingItem.Width - X, Para.X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - X, Para.X + ParaPr.Ind.Left - X );
+                    NumberingItem.WidthVisible = Math.max(Para.Pages[CurPage].X + ParaPr.Ind.Left + NumberingItem.Width - X, Para.Pages[CurPage].X + ParaPr.Ind.Left + ParaPr.Ind.FirstLine - X, Para.Pages[CurPage].X + ParaPr.Ind.Left - X );
             }
 
             X += NumberingItem.WidthVisible;

@@ -440,7 +440,7 @@
 			settings.style = nStyleIndex;
 			settings.inColumns = !bInRows;
 			settings.range = sDataRange;
-			var oChart = AscFormat.DrawingObjectsController.prototype.getChartSpace(this.worksheet, settings);
+			var oChart = AscFormat.DrawingObjectsController.prototype.getChartSpace(this.worksheet, settings, true);
 			if(arguments.length === 8){//support old variant
 				oChart.setBDeleted(false);
 				oChart.setWorksheet(this.worksheet);
@@ -1200,6 +1200,23 @@
 	ApiChart.prototype.SetVertAxisLablesFontSize = function(nFontSize){
         AscFormat.builder_SetVerAxisFontSize(this.Chart, nFontSize);
 	};
+    /**
+	 * Apply set of visual settings for chart
+	 * @param {number} nStyleIndex
+    */
+	ApiChart.prototype.ApplyChartStyle = function(nStyleIndex){
+		if(this.Chart){
+            var chart = this.Chart.chart;
+            var plot_area = chart.plotArea;
+            var oCurChartSettings = AscFormat.DrawingObjectsController.prototype.getPropsFromChart.call(null, this.Chart);
+            var _cur_type = oCurChartSettings.type;
+            if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][nStyleIndex]){
+                plot_area.removeCharts(1, plot_area.charts.length - 1);
+                AscFormat.ApplyPresetToChartSpace(this.Chart, AscCommon.g_oChartPresets[_cur_type][nStyleIndex], false);
+                return;
+            }
+		}
+	};
 
 
 	/**
@@ -1284,8 +1301,9 @@
     ApiChart.prototype["SetMinorVerticalGridlines"]  =  ApiChart.prototype.SetMinorVerticalGridlines;
     ApiChart.prototype["SetMajorHorizontalGridlines"]  =  ApiChart.prototype.SetMajorHorizontalGridlines;
     ApiChart.prototype["SetMinorHorizontalGridlines"]  =  ApiChart.prototype.SetMinorHorizontalGridlines;
-    ApiChart.prototype["SetHorAxisLablesFontSize"]  =  ApiChart.prototype.SetHorAxisLablesFontSize;
+    ApiChart.prototype["SetHorAxisLablesFontSize"]   =  ApiChart.prototype.SetHorAxisLablesFontSize;
     ApiChart.prototype["SetVertAxisLablesFontSize"]  =  ApiChart.prototype.SetVertAxisLablesFontSize;
+    ApiChart.prototype["ApplyChartStyle"]            =  ApiChart.prototype.ApplyChartStyle;
 
 
     ApiColor.prototype["GetClassType"]                 =  ApiColor.prototype.GetClassType;
