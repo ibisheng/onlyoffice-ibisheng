@@ -1106,6 +1106,19 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.068094, "GAMMADIST(A2,A3,A4,TRUE)" );
 	} );
 
+	test( "Test: \"EXPON.DIST\"", function () {
+		ws.getRange2( "A2" ).setValue( "0.2" );
+		ws.getRange2( "A3" ).setValue( "10" );
+
+		oParser = new parserFormula( "EXPON.DIST(A2,A3,TRUE)", "A1", ws );
+		ok( oParser.parse(), "EXPON.DIST(A2,A3,TRUE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.86466472, "EXPON.DIST(A2,A3,TRUE)" );
+
+		oParser = new parserFormula( "EXPON.DIST(0.2,10,FALSE)", "A1", ws );
+		ok( oParser.parse(), "EXPON.DIST(0.2,10,FALSE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 1.35335283, "EXPON.DIST(0.2,10,FALSE)" );
+	} );
+
 	test( "Test: \"CHIDIST\"", function () {
 		ws.getRange2( "A2" ).setValue( "18.307" );
 		ws.getRange2( "A3" ).setValue( "10" );
@@ -1113,6 +1126,12 @@ $( function () {
 		oParser = new parserFormula( "CHIDIST(A2,A3)", "A1", ws );
 		ok( oParser.parse(), "CHIDIST(A2,A3)" );
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0500006, "CHIDIST(A2,A3)" );
+	} );
+
+	test( "Test: \"GAUSS\"", function () {
+		oParser = new parserFormula( "GAUSS(2)", "A1", ws );
+		ok( oParser.parse(), "GAUSS(2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 0.47725, "GAUSS(2)" );
 	} );
 
 	test( "Test: \"CHISQ.DIST.RT\"", function () {

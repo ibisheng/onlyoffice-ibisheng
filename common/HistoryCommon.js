@@ -1019,6 +1019,9 @@
 			case AscDFH.historydescription_Document_AddInlineLevelContentControl:
 				sString = "Document_AddInlineLevelContentControl";
 				break;
+			case AscDFH.historydescription_Document_RemoveContentControl:
+				sString = "Document_RemoveContentControl";
+				break;
 		}
 		return sString;
 	}
@@ -2907,6 +2910,7 @@
 	window['AscDFH'].historydescription_Document_InsertSignatureLine                = 0x0140;
 	window['AscDFH'].historydescription_Document_AddBlockLevelContentControl        = 0x0141;
 	window['AscDFH'].historydescription_Document_AddInlineLevelContentControl       = 0x0142;
+	window['AscDFH'].historydescription_Document_RemoveContentControl               = 0x0143;
 
 
 

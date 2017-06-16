@@ -52,6 +52,7 @@ function CBlockLevelSdt(oLogicDocument, oParent)
 	this.LogicDocument = oLogicDocument;
 	this.Content       = new CDocumentContent(this, oLogicDocument ? oLogicDocument.Get_DrawingDocument() : null, 0, 0, 0, 0, true, false, false);
 	this.Pr            = new CSdtPr();
+	this.Lock          = new AscCommon.CLock();
 
 	// Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
 	g_oTableId.Add(this, this.Id);
@@ -142,6 +143,12 @@ CBlockLevelSdt.prototype.Read_FromBinary2 = function(Reader)
 CBlockLevelSdt.prototype.Draw = function(CurPage, oGraphics)
 {
 	this.Content.Draw(CurPage, oGraphics);
+
+	if (AscCommon.locktype_None !== this.Lock.Get_Type())
+	{
+		var oBounds = this.GetContentBounds(CurPage);
+		oGraphics.DrawLockObjectRect(this.Lock.Get_Type(), oBounds.Left, oBounds.Top, oBounds.Right - oBounds.Left, oBounds.Bottom - oBounds.Top);
+	}
 };
 CBlockLevelSdt.prototype.Get_CurrentPage_Absolute = function()
 {
@@ -165,6 +172,20 @@ CBlockLevelSdt.prototype.IsTableBorder = function(X, Y, CurPage)
 };
 CBlockLevelSdt.prototype.UpdateCursorType = function(X, Y, CurPage)
 {
+	var oBounds = this.GetContentBounds(CurPage);
+	if (true === this.Lock.Is_Locked() && X < oBounds.Right && X > oBounds.Left && Y > oBounds.Top && Y < oBounds.Bottom)
+	{
+		var MMData              = new AscCommon.CMouseMoveData();
+		var Coords              = this.LogicDocument.DrawingDocument.ConvertCoordsToCursorWR(oBounds.Left, oBounds.Top, this.Get_AbsolutePage(CurPage), this.Get_ParentTextTransform());
+		MMData.X_abs            = Coords.X - 5;
+		MMData.Y_abs            = Coords.Y;
+		MMData.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
+		MMData.UserId           = this.Lock.Get_UserId();
+		MMData.HaveChanges      = this.Lock.Have_Changes();
+		MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
+		this.LogicDocument.Api.sync_MouseMoveCallback(MMData);
+	}
+
 	this.DrawContentControlsTrack(true);
 	return this.Content.UpdateCursorType(X, Y, CurPage);
 };
