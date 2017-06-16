@@ -1758,21 +1758,24 @@
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
-					curFilter.SortState.SortConditions[0].dxf = new AscCommonExcel.CellXfs();
-					
+					var styleManager = this.worksheet.workbook.oStyleManager;
+					var newDxf = new AscCommonExcel.CellXfs();
+
 					if(type === Asc.c_oAscSortOptions.ByColorFill)
 					{
-						curFilter.SortState.SortConditions[0].dxf.fill = new AscCommonExcel.Fill();
-						curFilter.SortState.SortConditions[0].dxf.fill.bg = color;
+						var newFill = new AscCommonExcel.Fill();
+						newFill.bg = color;
+						newDxf.fill = styleManager.addFill(newDxf);
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyCellColor;
 					}
 					else
 					{
-						curFilter.SortState.SortConditions[0].dxf.font = new AscCommonExcel.Font();
-						curFilter.SortState.SortConditions[0].dxf.font.setColor(color);
+						var newFont = new AscCommonExcel.Font();
+						newFont.setColor(color);
+						newDxf.font = styleManager.addFont(newFont);
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyFontColor;
 					}
-
+					curFilter.SortState.SortConditions[0].dxf = styleManager.addXf(newDxf);
 					if(curFilter.TableStyleInfo)
 					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
@@ -4457,63 +4460,11 @@
 						if(aNoHiddenCol[aNoHiddenCol.length - 1] != bbox.c2)
 							style.ShowLastColumn = false;
 					}
-					var aNoHiddenRow = [];
-					for(var i = bbox.r1; i <= bbox.r2; i++)
-					{
-						if (!worksheet.getRowHidden(i))
-							aNoHiddenRow.push(i);
-					}
-					aNoHiddenRow.sort(AscCommon.fSortAscending);
-					//если скрыты заголовок или итоги, то их не надо сдвигать и показывать
-					if(aNoHiddenRow.length > 0)
-					{
-						if(aNoHiddenRow[0] != bbox.r1)
-							headerRowCount = 0;
-						if(aNoHiddenRow[aNoHiddenRow.length - 1] != bbox.r2)
-							totalsRowCount = 0;
-					}
-					//изменяем bbox с учетом скрытых
-					bbox = {r1: 0, c1: 0, r2: aNoHiddenRow.length - 1, c2: aNoHiddenCol.length - 1};
-					for(var i = 0, length = aNoHiddenRow.length; i < length; i++)
-					{
-						var nRowIndexAbs = aNoHiddenRow[i];
-						for(var j = 0, length2 = aNoHiddenCol.length; j < length2; j++)
-						{
-							var nColIndexAbs = aNoHiddenCol[j];
-							var cell = worksheet.getRange3(nRowIndexAbs, nColIndexAbs, nRowIndexAbs, nColIndexAbs);
-							var dxf = styleForCurTable.getStyle(bbox, i, j, style, headerRowCount, totalsRowCount);
-							if(null != dxf)
-								cell.setTableStyle(dxf);
-						}
-					}
+					styleForCurTable.initStyle(worksheet.sheetMergedStyles, bbox, style, headerRowCount, totalsRowCount);
 				}
 				worksheet.workbook.dependencyFormulas.unlockRecal();
 			},
-			
-			getTableCellStyle: function(row, col)
-			{
-				var worksheet = this.worksheet;
-				var res = null;
-				
-				var tableIndex = this.searchRangeInTableParts(Asc.Range(col, row, col, row));
-				if(tableIndex > -1)
-				{
-					var table = worksheet.TableParts[tableIndex];
-					var style = table.TableStyleInfo;
-					var styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name];
-					
-					if(styleForCurTable)
-					{
-						var startCol = table.Ref.c1 - col;
-						var startRow = table.Ref.r1 - row;
-						var bbox = Asc.Range(startCol, startRow, startCol, startRow);
-						res = styleForCurTable.getStyle(bbox, startRow, startCol, style, /*headerRowCount*/0, /*totalsRowCount*/0);
-					}
-				}
-				
-				return res;
-			},
-			
+
 			_getFormatTableColumnRange: function(table, columnName)
 			{
 				var worksheet = this.worksheet;

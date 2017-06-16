@@ -961,6 +961,9 @@ var editor;
 			AscCommon.PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
 		}
 	}).catch(function(err) {
+		if (window.console && window.console.log) {
+			window.console.log(err);
+		}
 		t.sendEvent('asc_onError', c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 	});
   };

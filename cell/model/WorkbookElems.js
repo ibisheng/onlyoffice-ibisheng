@@ -1055,11 +1055,11 @@ function Fill(val)
 {
 	if(null == val)
 		val = g_oDefaultFormat.FillAbs;
-	this.Properties = g_oFillProperties;
 	this.bg = val.bg;
 }
 Fill.prototype =
 {
+	Properties: g_oFillProperties,
 	_mergeProperty : function(first, second, def)
 	{
 		if(def != first)
@@ -1210,12 +1210,11 @@ Fill.prototype =
 	};
 
 	function BorderProp() {
-		this.Properties = g_oBorderPropProperties;
 		this.s = c_oAscBorderStyles.None;
 		this.w = c_oAscBorderWidth.None;
 		this.c = g_oColorManager.getThemeColor(1);
 	}
-
+	BorderProp.prototype.Properties = g_oBorderPropProperties;
 	BorderProp.prototype.setStyle = function (style) {
 		this.s = style;
 		switch (this.s) {
@@ -1370,7 +1369,6 @@ var g_oBorderProperties = {
 		if (null == val) {
 			val = g_oDefaultFormat.BorderAbs;
 		}
-		this.Properties = g_oBorderProperties;
 		this.l = val.l.clone();
 		this.t = val.t.clone();
 		this.r = val.r.clone();
@@ -1382,6 +1380,7 @@ var g_oBorderProperties = {
 		this.du = val.du;
 	}
 
+	Border.prototype.Properties = g_oBorderProperties;
 	Border.prototype._mergeProperty = function (first, second, def) {
 		if ((null != def.isEqual && false == def.isEqual(first)) || (null == def.isEqual && def != first)) {
 			return first;
@@ -1657,12 +1656,12 @@ function Num(val)
 {
 	if(null == val)
 		val = g_oDefaultFormat.NumAbs;
-	this.Properties = g_oNumProperties;
 	this.f = val.f;
   this.id = val.id;
 }
 Num.prototype =
 {
+	Properties: g_oNumProperties,
   setFormat: function(f, opt_id) {
     this.f = f;
     this.id = opt_id;
@@ -1773,7 +1772,6 @@ var g_oCellXfsProperties = {
 	};
 /** @constructor */
 function CellXfs() {
-	this.Properties = g_oCellXfsProperties;
     this.border = null;
     this.fill = null;
     this.font = null;
@@ -1782,12 +1780,18 @@ function CellXfs() {
 	this.QuotePrefix = null;
 	this.PivotButton = null;
 	this.XfId = null;
-    // Является ли стиль ссылкой (При открытии все стили будут ссылками. Поэтому при смене свойств нужно делать копию)
-    this.isReference = false;
+
+	//inner
+	this.id = null;
+	this.mergeCache = {};
 }
 CellXfs.prototype =
 {
-	_mergeProperty : function(first, second, isTable)
+	Properties: g_oCellXfsProperties,
+	getId: function(){
+		return this.id;
+	},
+	_mergeProperty : function(styleManager, addFunc, first, second, isTable)
 	{
 		var res = null;
 		if(null != first || null != second)
@@ -1798,67 +1802,52 @@ CellXfs.prototype =
 				res = first;
 			else
 			{
-				if(null != first.merge)
-					res = first.merge(second, isTable);
-				else
+				if (null != first.merge) {
+					res = addFunc.call(styleManager, first.merge(second, isTable));
+				} else {
 					res = first;
+				}
 			}
 		}
 		return res;
 	},
-	merge : function(xfs, isTable)
+	merge : function(styleManager, xfs, isTable)
 	{
-		var oRes = new CellXfs();
-		oRes.border = this._mergeProperty(this.border, xfs.border);
-		oRes.fill = this._mergeProperty(this.fill, xfs.fill);
-		oRes.font = this._mergeProperty(this.font, xfs.font, isTable);
-		oRes.num = this._mergeProperty(this.num, xfs.num);
-		oRes.align = this._mergeProperty(this.align, xfs.align);
-		oRes.QuotePrefix = this._mergeProperty(this.QuotePrefix, xfs.QuotePrefix);
-		oRes.PivotButton = this._mergeProperty(this.PivotButton, xfs.PivotButton);
-		oRes.XfId = this._mergeProperty(this.XfId, xfs.XfId);
-		return oRes;
+		var xfId = xfs.getId();
+		var cache = this.mergeCache[xfId];
+		if (!cache) {
+			cache = new CellXfs();
+			cache.border = this._mergeProperty(styleManager, styleManager.addBorder, xfs.border, this.border);
+			cache.fill = this._mergeProperty(styleManager, styleManager.addFill, xfs.fill, this.fill);
+			cache.font = this._mergeProperty(styleManager, styleManager.addFont, xfs.font, this.font, isTable);
+			cache.num = this._mergeProperty(styleManager, styleManager.addNum, xfs.num, this.num);
+			cache.align = this._mergeProperty(styleManager, styleManager.addAlign, xfs.align, this.align);
+			cache.QuotePrefix = this._mergeProperty(null, null, xfs.QuotePrefix, this.QuotePrefix);
+			cache.PivotButton = this._mergeProperty(null, null, xfs.PivotButton, this.PivotButton);
+			cache.XfId = this._mergeProperty(null, null, xfs.XfId, this.XfId);
+			cache = styleManager.addXf(cache);
+			this.mergeCache[xfId] = cache;
+		}
+		return cache;
 	},
     clone : function()
     {
         var res = new CellXfs();
-        if(null != this.border)
-            res.border = this.border.clone();
-        if(null != this.fill)
-            res.fill = this.fill.clone();
-        if(null != this.font)
-            res.font = this.font.clone();
-        if(null != this.num)
-            res.num = this.num.clone();
-        if(null != this.align)
-            res.align = this.align.clone();
-        if(null != this.QuotePrefix)
-            res.QuotePrefix = this.QuotePrefix;
-		if(null != this.PivotButton)
-			res.PivotButton = this.PivotButton;
-		if (null !== this.XfId)
-			res.XfId = this.XfId;
+		res.border = this.border;
+		res.fill = this.fill;
+		res.font = this.font;
+		res.num = this.num;
+		res.align = this.align;
+		res.QuotePrefix = this.QuotePrefix;
+		res.PivotButton = this.PivotButton;
+		res.XfId = this.XfId;
         return res;
     },
 	isEqual : function(xfs)
 	{
-		if(false == ((null == this.border && null == xfs.border) || (null != this.border && null != xfs.border && this.border.isEqual(xfs.border))))
-			return false;
-		if(false == ((null == this.fill && null == xfs.fill) || (null != this.fill && null != xfs.fill && this.fill.isEqual(xfs.fill))))
-			return false;
-		if(false == ((null == this.font && null == xfs.font) || (null != this.font && null != xfs.font && this.font.isEqual(xfs.font))))
-			return false;
-		if(false == ((null == this.num && null == xfs.num) || (null != this.num && null != xfs.num && this.num.isEqual(xfs.num))))
-			return false;
-		if(false == ((null == this.align && null == xfs.align) || (null != this.align && null != xfs.align && this.align.isEqual(xfs.align))))
-			return false;
-		if(this.QuotePrefix != xfs.QuotePrefix)
-			return false;
-		if(this.PivotButton != xfs.PivotButton)
-			return false;
-		if (this.XfId != xfs.XfId)
-			return false;
-		return true;
+		return this.font === xfs.font && this.fill === xfs.fill && this.border === xfs.border && this.num === xfs.num &&
+			this.align === xfs.align && this.QuotePrefix === xfs.QuotePrefix && this.PivotButton === xfs.PivotButton &&
+			this.XfId === xfs.XfId;
 	},
 	getType : function()
 	{
@@ -1950,7 +1939,6 @@ function Align(val)
 {
 	if(null == val)
 		val = g_oDefaultFormat.AlignAbs;
-	this.Properties = g_oAlignProperties;
 	this.hor = val.hor;
 	this.indent = val.indent;
 	this.RelativeIndent = val.RelativeIndent;
@@ -1961,6 +1949,7 @@ function Align(val)
 }
 Align.prototype =
 {
+	Properties: g_oAlignProperties,
 	_mergeProperty : function(first, second, def)
 	{
 		if (def != first)
@@ -2297,6 +2286,12 @@ CCellStyle.prototype.getNumFormatStr = function () {
 function StyleManager(){
 	//стиль ячейки по умолчанию, может содержать не все свойства
 	this.oDefaultXfs = new CellXfs();
+	this.fonts = [];
+	this.fills = [];
+	this.borders = [];
+	this.nums = [];
+	this.aligns = [];
+	this.xfs = [];
 }
 StyleManager.prototype =
 {
@@ -2342,9 +2337,6 @@ StyleManager.prototype =
 	},
     _prepareSetReference : function (oItemWithXfs)
     {
-        // При открытии все стили будут ссылками. Поэтому при смене свойств нужно делать копию
-        if (oItemWithXfs.xfs.isReference)
-            oItemWithXfs.xfs = oItemWithXfs.xfs.clone();
         return oItemWithXfs.xfs;
     },
     _prepareSet : function(oItemWithXfs)
@@ -2797,8 +2789,202 @@ StyleManager.prototype =
 			return this.setAngle(oItemWithXfs, AscCommonExcel.g_nVerticalTextAngle);
 		else
 			return this.setAngle(oItemWithXfs, 0);
-    }
+    },
+	addFont: function(newFont, noCheck) {
+		return this._add(this.fonts, newFont, noCheck);
+	},
+	addFill: function(newFill, noCheck) {
+		return this._add(this.fills, newFill, noCheck);
+	},
+	addBorder: function(newBorder, noCheck) {
+		return this._add(this.borders, newBorder, noCheck);
+	},
+	addNum: function(newNum, noCheck) {
+		return this._add(this.nums, newNum, noCheck);
+	},
+	addAlign: function(newAlign, noCheck) {
+		return this._add(this.aligns, newAlign, noCheck);
+	},
+	addXf: function(newXf, noCheck) {
+		var res = this._add(this.xfs, newXf, noCheck);
+		if (null === res.id) {
+			res.id = this.xfs.length - 1;
+		}
+		return res;
+	},
+	_add: function(vals, newVal, noCheck){
+		var res = null;
+		if (!noCheck) {
+			for (var i = 0; i < vals.length; ++i) {
+				var val = vals[i];
+				if (newVal.isEqual(val)) {
+					res = val;
+					break;
+				}
+			}
+		}
+		if (!res) {
+			res = newVal;
+			vals.push(res);
+		}
+		return res;
+	}
 };
+
+	/** @constructor */
+	function SheetMergedStyles() {
+		this.stylesTablePivot = [];
+		this.stylesCondition = {};
+	}
+
+	SheetMergedStyles.prototype.setTablePivotStyle = function(range, xf, stripe) {
+		this.stylesTablePivot.push({xf: xf, range: range, stripe: stripe, borders: undefined});
+	};
+	SheetMergedStyles.prototype.clearTablePivotStyle = function(range) {
+		for (var i = this.stylesTablePivot.length - 1; i >= 0; --i) {
+			var style = this.stylesTablePivot[i];
+			if (style.range.isIntersect(range)) {
+				this.stylesTablePivot.splice(i, 1);
+			}
+		}
+	};
+	SheetMergedStyles.prototype.setConditionalStyle = function(row, col, xf) {
+		var conditionRow = this.stylesCondition[row];
+		if (!conditionRow) {
+			conditionRow = {};
+			this.stylesCondition[row] = conditionRow;
+		}
+		var conditionCell = conditionRow[col];
+		if (!conditionCell) {
+			conditionCell = [];
+			conditionRow[col] = conditionCell;
+		}
+		conditionCell.push(xf);
+	};
+	SheetMergedStyles.prototype.clearConditionalStyle = function(row, col) {
+		var conditionRow = this.stylesCondition[row];
+		if (conditionRow) {
+			var conditionCell = conditionRow[col];
+			if (conditionCell) {
+				conditionRow[col] = [];
+			}
+		}
+	};
+	SheetMergedStyles.prototype.getStyle = function(styleManager, row, col) {
+		var res = {table: [], conditional: []};
+		var conditionRow = this.stylesCondition[row];
+		if (conditionRow) {
+			var conditionCell = conditionRow[col];
+			if (conditionCell) {
+				res.conditional = conditionCell;
+			}
+		}
+		for (var i = 0; i < this.stylesTablePivot.length; ++i) {
+			var style = this.stylesTablePivot[i];
+			if (style.range.contains(col, row) && this._checkStripes(style.range, style.stripe, row, col)) {
+				var xf = style.xf;
+				var borderIndex = this._getBorderIndex(style.range, style.stripe, row, col, xf);
+				if (borderIndex > 0) {
+					if (!style.borders) {
+						style.borders = {};
+					}
+					var xfModified = style.borders[borderIndex];
+					if (!xfModified) {
+						xfModified = xf.clone();
+						var borderModified = xfModified.border.clone();
+						if (0 !== (1 & borderIndex)) {
+							borderModified.l = borderModified.iv;
+						}
+						if (0 !== (2 & borderIndex)) {
+							borderModified.t = borderModified.ih;
+						}
+						if (0 !== (4 & borderIndex)) {
+							borderModified.r = borderModified.iv;
+						}
+						if (0 !== (8 & borderIndex)) {
+							borderModified.b = borderModified.ih;
+						}
+						if (0 !== (16 & borderIndex)) {
+							borderModified.du = false;
+							borderModified.dd = false;
+						}
+						xfModified.border = styleManager.addBorder(borderModified);
+					}
+					xf = styleManager.addXf(xfModified);
+				}
+				res.table.push(xf);
+			}
+		}
+		return res;
+	};
+	SheetMergedStyles.prototype._checkStripes = function(bbox, stripe, row, col) {
+		if (stripe) {
+			if (stripe.row) {
+				if ((row - bbox.r1) % (stripe.size + stripe.offset) < stripe.size) {
+					return true;
+				}
+			} else {
+				if ((col - bbox.c1) % (stripe.size + stripe.offset) < stripe.size) {
+					return true;
+				}
+			}
+			return false;
+		}
+		return true;
+	};
+	SheetMergedStyles.prototype._getBorderIndex = function(bbox, stripe, row, col, xf) {
+		var borderIndex = 0;
+		if (xf.border) {
+			if (stripe) {
+				if (stripe.row) {
+					var rowIndex = (row - bbox.r1) % (stripe.size + stripe.offset);
+					if (bbox.c1 !== col && xf.border.l) {
+						borderIndex += 1;
+					}
+					if (0 != rowIndex && xf.border.t) {
+						borderIndex += 2;
+					}
+					if (bbox.c2 !== col && xf.border.r) {
+						borderIndex += 4;
+					}
+					if (stripe.size - 1 != rowIndex && xf.border.b) {
+						borderIndex += 8;
+					}
+				} else {
+					var colIndex = (col - bbox.c1) % (stripe.size + stripe.offset);
+					if (0 != colIndex && xf.border.l) {
+						borderIndex += 1;
+					}
+					if (bbox.r1 !== row && xf.border.t) {
+						borderIndex += 2;
+					}
+					if (stripe.size - 1 != colIndex && xf.border.r) {
+						borderIndex += 4;
+					}
+					if (bbox.r2 !== row && xf.border.b) {
+						borderIndex += 8;
+					}
+				}
+			} else {
+				if (bbox.c1 !== col && xf.border.l) {
+					borderIndex += 1;
+				}
+				if (bbox.r1 !== row && xf.border.t) {
+					borderIndex += 2;
+				}
+				if (bbox.c2 !== col && xf.border.r) {
+					borderIndex += 4;
+				}
+				if (bbox.r2 !== row && xf.border.b) {
+					borderIndex += 8;
+				}
+			}
+			if (xf.border.du || xf.border.dd) {
+				borderIndex += 16;
+			}
+		}
+		return borderIndex;
+	};
 var g_oHyperlinkProperties = {
 		Ref: 0,
 		Location: 1,
@@ -7893,6 +8079,7 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].CCellStyles = CCellStyles;
 	window['AscCommonExcel'].CCellStyle = CCellStyle;
 	window['AscCommonExcel'].StyleManager = StyleManager;
+	window['AscCommonExcel'].SheetMergedStyles = SheetMergedStyles;
 	window['AscCommonExcel'].Hyperlink = Hyperlink;
 	window['AscCommonExcel'].SheetFormatPr = SheetFormatPr;
 	window['AscCommonExcel'].Col = Col;

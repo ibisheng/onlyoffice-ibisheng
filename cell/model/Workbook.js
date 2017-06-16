@@ -146,6 +146,36 @@
 			return c_oRangeType.Range;
 	}
 
+	function getCompiledStyleWs(ws, row, col, opt_cell) {
+		return getCompiledStyle(ws.workbook.oStyleManager, ws.sheetMergedStyles, row, col, opt_cell);
+	}
+	function getCompiledStyle(styleManager, sheetMergedStyles, row, col, opt_cell) {
+		var styles = sheetMergedStyles.getStyle(styleManager, row, col);
+		var xfMerged = null;
+		for (var i = 0; i < styles.table.length; ++i) {
+			if (null == xfMerged) {
+				xfMerged = styles.table[i];
+			} else {
+				xfMerged = xfMerged.merge(styleManager, styles.table[i]);
+			}
+		}
+		if (opt_cell) {
+			if (null == xfMerged) {
+				xfMerged = opt_cell.xfs;
+			} else if (opt_cell.xfs) {
+				xfMerged = xfMerged.merge(styleManager, opt_cell.xfs);
+			}
+		}
+		for (var i = 0; i < styles.conditional.length; ++i) {
+			if (null == xfMerged) {
+				xfMerged = styles.conditional[i];
+			} else {
+				xfMerged = xfMerged.merge(styleManager, styles.conditional[i]);
+			}
+		}
+		return xfMerged;
+	};
+
 	function getDefNameIndex(name) {
 		//uniqueness is checked without capitalization
 		return name ? name.toLowerCase() : name;
@@ -2464,6 +2494,7 @@
 		this.aSparklineGroups = [];
 
 		this.selectionRange = new AscCommonExcel.SelectionRange(this);
+		this.sheetMergedStyles = new AscCommonExcel.SheetMergedStyles();
 		this.pivotTables = [];
 
 		/*handlers*/
@@ -2828,9 +2859,11 @@
 								v = value.v;
 								dxf = null;
 								if (null !== v) {
+									var styleManager = this.workbook.oStyleManager;
 									dxf = new AscCommonExcel.CellXfs();
 									tmp = (oGradient2 && v > oGradient1.max) ? oGradient2 : oGradient1;
-									dxf.fill = new AscCommonExcel.Fill({bg: tmp.calculateColor(v)});
+									dxf.fill = styleManager.addFill(new AscCommonExcel.Fill({bg: tmp.calculateColor(v)}));
+									dxf = styleManager.addXf(dxf);
 								}
 								value.c.setConditionalFormattingStyle(dxf);
 							}
@@ -4093,10 +4126,7 @@
 						if(copyRange)
 							oTempRow[j + offset.offsetCol] = cell.clone();
 						else
-						{
-							cell.setTableStyle(null);
 							oTempRow[j + offset.offsetCol] = cell;
-						}
 					}
 				}
 			}
@@ -4964,10 +4994,7 @@
 		return this.xfs;
 	};
 	Cell.prototype.getCompiledStyle = function () {
-		if (null == this.compiledXfs && (null != this.xfs || null != this.tableXfs || null != this.conditionalFormattingXfs)) {
-			this.compileXfs();
-		}
-		return this.compiledXfs;
+		return getCompiledStyleWs(this.ws, this.nRow, this.nCol, this);
 	};
 	Cell.prototype.compileXfs=function(){
 		this.compiledXfs = null;
@@ -5439,17 +5466,14 @@
 		this.oValue.cleanCache();
 	};
 	Cell.prototype.setConditionalFormattingStyle=function(xfs){
-		this.conditionalFormattingXfs = xfs || this.conditionalFormattingXfs;
-		this.compiledXfs = null;
-		this.oValue.cleanCache();
+		if (null == xfs) {
+			this.ws.sheetMergedStyles.clearConditionalStyle(this.nRow, this.nCol);
+		} else {
+			this.ws.sheetMergedStyles.setConditionalStyle(this.nRow, this.nCol, xfs);
+		}
 	};
 	Cell.prototype.getConditionalFormattingStyle = function (xfs) {
 		return this.conditionalFormattingXfs;
-	};
-	Cell.prototype.setTableStyle=function(xfs){
-		this.tableXfs = xfs;
-		this.compiledXfs = null;
-		this.oValue.cleanCache();
 	};
 	Cell.prototype.getTableStyle=function(){
 		return this.tableXfs;
@@ -6157,26 +6181,12 @@
 							  cell.setCellStyle(val);
 						  });
 	};
-	Range.prototype.setTableStyle=function(val){
-		this.createCellOnRowColCross();
-		var fSetProperty = this._setProperty;
-		var nRangeType = this._getRangeType();
-		if(c_oRangeType.All == nRangeType || null === val)
-		{
-			//this.worksheet.getAllCol().setCellStyle(val);
-			fSetProperty = this._setPropertyNoEmpty;
+	Range.prototype.setTableStyle = function(xf, stripe) {
+		if (null == xf) {
+			this.worksheet.sheetMergedStyles.clearTablePivotStyle(this.bbox);
+		} else {
+			this.worksheet.sheetMergedStyles.setTablePivotStyle(this.bbox, xf, stripe);
 		}
-		fSetProperty.call(this, function(row){
-							  if(c_oRangeType.All == nRangeType && null == row.xfs)
-								  return;
-							  //row.setCellStyle(val);
-						  },
-						  function(col){
-							  //col.setCellStyle(val);
-						  },
-						  function(cell){
-							  cell.setTableStyle(val);
-						  });
 	};
 	Range.prototype.setNumFormat=function(val){
 		History.Create_NewPoint();
@@ -6880,6 +6890,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.XfId)
 				return col.xfs.XfId;
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (xfs && null != xfs.XfId) {
+				return xfs.XfId;
+			}
 		}
 		return g_oDefaultFormat.XfId;
 	};
@@ -6915,6 +6929,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.num)
 				return col.xfs.num.getFormat();
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (null != xfs && null != xfs.num) {
+				return xfs.num.getFormat();
+			}
 		}
 		return g_oDefaultFormat.Num.getFormat();
 	};
@@ -6956,6 +6974,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.font)
 				return col.xfs.font;
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (null != xfs && null != xfs.font) {
+				return xfs.font;
+			}
 		}
 		return g_oDefaultFormat.Font;
 	};
@@ -6983,6 +7005,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.align)
 				return col.xfs.align.ver;
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (null != xfs && null != xfs.align) {
+				return xfs.align.ver;
+			}
 		}
 		return g_oDefaultFormat.Align.ver;
 	};
@@ -7010,6 +7036,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.align)
 				return col.xfs.align.hor;
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (null != xfs && null != xfs.align) {
+				return xfs.align.hor;
+			}
 		}
 		return g_oDefaultFormat.Align.hor;
 	};
@@ -7067,6 +7097,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.fill)
 				return col.xfs.fill.bg;
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (null != xfs && null != xfs.fill) {
+				return xfs.fill.bg;
+			}
 		}
 		return g_oDefaultFormat.Fill.bg;
 	};
@@ -7096,6 +7130,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.border)
 				return col.xfs.border;
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (null != xfs && null != xfs.border) {
+				return xfs.border;
+			}
 		}
 		return g_oDefaultFormat.Border;
 	};
@@ -7173,6 +7211,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.align)
 				return col.xfs.align.shrink;
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (null != xfs && null != xfs.align) {
+				return xfs.align.shrink;
+			}
 		}
 		return g_oDefaultFormat.Align.shrink;
 	};
@@ -7200,6 +7242,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.align)
 				return this.getWrapByAlign(col.xfs.align);
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (null != xfs && null != xfs.align) {
+				return this.getWrapByAlign(xfs.align);
+			}
 		}
 		return this.getWrapByAlign(g_oDefaultFormat.Align);
 	};
@@ -7228,6 +7274,10 @@
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.align)
 				return angleFormatToInterface(col.xfs.align.angle);
+			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
+			if (null != xfs && null != xfs.align) {
+				return angleFormatToInterface(xfs.align.angle);
+			}
 		}
 		return angleFormatToInterface(g_oDefaultFormat.Align.angle);
 	};
@@ -9495,4 +9545,6 @@
 	window['AscCommonExcel'].DependencyGraph = DependencyGraph;
 	window['AscCommonExcel'].preparePromoteFromTo = preparePromoteFromTo;
 	window['AscCommonExcel'].promoteFromTo = promoteFromTo;
+	window['AscCommonExcel'].getCompiledStyle = getCompiledStyle;
+	window['AscCommonExcel'].getCompiledStyleWs = getCompiledStyleWs;
 })(window);

@@ -2834,11 +2834,13 @@
 		ctx.closePath();
 	};
 	
-	var bbox = {c1: 0, r1: 0, c2: col - 1, r2: row - 1};
+	var bbox = new Asc.Range(0, 0, col - 1, row - 1);
+	var sheetMergedStyles = new AscCommonExcel.SheetMergedStyles();
+	style.initStyle(sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
 	for (var i = 0; i < row; i++) {
 		for (var j = 0; j < col; j++) {
 			var color = null;
-			var curStyle = style.getStyle(bbox, i, j, styleInfo, headerRowCount, totalsRowCount);
+			var curStyle = AscCommonExcel.getCompiledStyle(this.model.oStyleManager, sheetMergedStyles, i, j);
 			
 			//fill
 			if(curStyle && curStyle.fill && curStyle.fill.bg)

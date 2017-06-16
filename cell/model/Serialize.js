@@ -4919,6 +4919,51 @@
         };
         this.InitStyleManager = function (oStyleObject)
         {
+			for (var i = 0; i < oStyleObject.aFonts; ++i) {
+				this.wb.oStyleManager.addFont(oStyleObject.aFonts[i], true);
+			}
+			for (var i = 0; i < oStyleObject.aFills; ++i) {
+				this.wb.oStyleManager.addFill(oStyleObject.aFills[i], true);
+			}
+			for (var i = 0; i < oStyleObject.aBorders; ++i) {
+				this.wb.oStyleManager.addBorder(oStyleObject.aBorders[i], true);
+			}
+			for (var numFmt in oStyleObject.oNumFmts) {
+				this.wb.oStyleManager.addNum(oStyleObject.oNumFmts[numFmt], true);
+			}
+			for (var XfIdTmp in oStyleObject.aCellStyleXfs) {
+				var xf = oStyleObject.aCellStyleXfs[XfIdTmp];
+				if (xf.align) {
+					xf.align = this.wb.oStyleManager.addAlign(xf.align);
+				}
+			}
+			for (var i = 0; i < oStyleObject.aCellXfs; ++i) {
+				var xf = oStyleObject.aCellXfs[i];
+				if (xf.align) {
+					xf.align = this.wb.oStyleManager.addAlign(xf.align);
+				}
+			}
+			for (var i = 0; i < this.Dxfs.length; ++i) {
+				var xf = this.Dxfs[i];
+				if (xf.font) {
+					this.wb.oStyleManager.addFont(xf.font);
+				}
+				if (xf.fill) {
+					this.wb.oStyleManager.addFill(xf.fill);
+				}
+				if (xf.border) {
+					this.wb.oStyleManager.addBorder(xf.border);
+				}
+				//todo
+				if (xf.num) {
+					this.wb.oStyleManager.addNum(xf.num);
+				}
+				if (xf.align) {
+					xf.align = this.wb.oStyleManager.addAlign(xf.align);
+				}
+				this.Dxfs[i] = this.wb.oStyleManager.addXf(this.Dxfs[i]);
+			}
+
             // ToDo убрать - это заглушка
             var arrStyleMap = {};
             // Начнем с 1, т.к. 2 зарегистрировано для normal
@@ -4937,7 +4982,7 @@
                 if (null == oCellStyleXfs)
                     continue;
 
-                oCellStyle.xfs = new AscCommonExcel.CellXfs();
+                var newXf = new AscCommonExcel.CellXfs();
                 // XfId
                 XfIdTmp = oCellStyle.XfId;
                 if (null !== XfIdTmp) {
@@ -4952,37 +4997,37 @@
                 if (null != oCellStyleXfs.borderid) {
                     var borderCellStyle = oStyleObject.aBorders[oCellStyleXfs.borderid];
                     if(null != borderCellStyle)
-                        oCellStyle.xfs.border = borderCellStyle.clone();
+						newXf.border = borderCellStyle;
                 }
                 // Fill
                 if (null != oCellStyleXfs.fillid) {
                     var fillCellStyle = oStyleObject.aFills[oCellStyleXfs.fillid];
                     if(null != fillCellStyle)
-                        oCellStyle.xfs.fill = fillCellStyle.clone();
+						newXf.fill = fillCellStyle;
                 }
                 // Font
                 if(null != oCellStyleXfs.fontid) {
                     var fontCellStyle = oStyleObject.aFonts[oCellStyleXfs.fontid];
                     if(null != fontCellStyle)
-                        oCellStyle.xfs.font = fontCellStyle.clone();
+						newXf.font = fontCellStyle;
                 }
                 // NumFmt
                 if(null != oCellStyleXfs.numid) {
                     var oCurNumCellStyle = oStyleObject.oNumFmts[oCellStyleXfs.numid];
                     if(null != oCurNumCellStyle)
-                        oCellStyle.xfs.num = this.ParseNum(oCurNumCellStyle, oStyleObject.oNumFmts);
+						newXf.num = this.ParseNum(oCurNumCellStyle, oStyleObject.oNumFmts);
                     else
-                        oCellStyle.xfs.num = this.ParseNum({id: oCellStyleXfs.numid, f: null}, oStyleObject.oNumFmts);
+						newXf.num = this.ParseNum({id: oCellStyleXfs.numid, f: null}, oStyleObject.oNumFmts);
                 }
                 // QuotePrefix
                 if(null != oCellStyleXfs.QuotePrefix)
-                    oCellStyle.xfs.QuotePrefix = oCellStyleXfs.QuotePrefix;
+					newXf.QuotePrefix = oCellStyleXfs.QuotePrefix;
 				//PivotButton
 				if(null != oCellStyleXfs.PivotButton)
-					oCellStyle.xfs.PivotButton = oCellStyleXfs.PivotButton;
+					newXf.PivotButton = oCellStyleXfs.PivotButton;
                 // align
                 if(null != oCellStyleXfs.align)
-                    oCellStyle.xfs.align = oCellStyleXfs.align.clone();
+					newXf.align = oCellStyleXfs.align;
                 // ApplyBorder (ToDo возможно это свойство должно быть в xfs)
                 if (null !== oCellStyleXfs.ApplyBorder)
                     oCellStyle.ApplyBorder = oCellStyleXfs.ApplyBorder;
@@ -4996,6 +5041,7 @@
                 if (null !== oCellStyleXfs.ApplyNumberFormat)
                     oCellStyle.ApplyNumberFormat = oCellStyleXfs.ApplyNumberFormat;
 
+				oCellStyle.xfs = this.wb.oStyleManager.addXf(newXf);
                 // ToDo при отсутствии имени все не очень хорошо будет!
                 this.wb.CellStyles.CustomStyles.push(oCellStyle);
                 if (null !== oCellStyle.Name)
@@ -5018,52 +5064,51 @@
 
             for(var i = 0, length = oStyleObject.aCellXfs.length; i < length; ++i) {
                 var xfs = oStyleObject.aCellXfs[i];
-                var oNewXfs = new AscCommonExcel.CellXfs();
+                var newXf = new AscCommonExcel.CellXfs();
 
                 if(null != xfs.borderid)
                 {
                     var border = oStyleObject.aBorders[xfs.borderid];
                     if(null != border)
-                        oNewXfs.border = border.clone();
+						newXf.border = border;
                 }
                 if(null != xfs.fillid)
                 {
                     var fill = oStyleObject.aFills[xfs.fillid];
                     if(null != fill)
-                        oNewXfs.fill = fill.clone();
+						newXf.fill = fill;
                 }
                 if(null != xfs.fontid)
                 {
                     var font = oStyleObject.aFonts[xfs.fontid];
                     if(null != font)
-                        oNewXfs.font = font.clone();
+						newXf.font = font;
                 }
                 if(null != xfs.numid)
                 {
                     var oCurNum = oStyleObject.oNumFmts[xfs.numid];
+                    //todo
                     if(null != oCurNum)
-                        oNewXfs.num = this.ParseNum(oCurNum, oStyleObject.oNumFmts);
+						newXf.num = this.ParseNum(oCurNum, oStyleObject.oNumFmts);
                     else
-                        oNewXfs.num = this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts);
+						newXf.num = this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts);
                 }
                 if(null != xfs.QuotePrefix)
-                    oNewXfs.QuotePrefix = xfs.QuotePrefix;
+					newXf.QuotePrefix = xfs.QuotePrefix;
 				if(null != xfs.PivotButton)
-					oNewXfs.PivotButton = xfs.PivotButton;
+					newXf.PivotButton = xfs.PivotButton;
                 if(null != xfs.align)
-                    oNewXfs.align = xfs.align.clone();
+					newXf.align = xfs.align;
                 if (null !== xfs.XfId) {
                     XfIdTmp = arrStyleMap[xfs.XfId];
                     if (null == XfIdTmp)
                         XfIdTmp = 0;
-                    oNewXfs.XfId = XfIdTmp;
+					newXf.XfId = XfIdTmp;
                 }
 
                 if(0 == this.aCellXfs.length && !this.isCopyPaste)
-                    this.oStyleManager.init(oNewXfs, this.wb);
-                // При открытии стиль будет ссылкой
-                oNewXfs.isReference = true;
-                this.aCellXfs.push(oNewXfs);
+                    this.oStyleManager.init(newXf, this.wb);
+                this.aCellXfs.push(this.wb.oStyleManager.addXf(newXf));
             }
             for(var i in oStyleObject.oCustomTableStyles)
             {
@@ -7859,8 +7904,6 @@
         this.table = true;
         this.displayName = null; // Показываемое имя (для дефалтовых оно будет с пробелами, а для пользовательских совпадает с name)
 
-        this.compiled = null;
-
         this.blankRow = null;
         this.firstColumn = null;
         this.firstColumnStripe = null;
@@ -7890,789 +7933,80 @@
         this.totalRow = null;
         this.wholeTable = null;
     }
-
-	CTableStyle.prototype.getStyle = function (bbox, rowIndex, colIndex, options, headerRowCount, totalsRowCount) {
-		//todo есть проблемы при малых размерах таблиц
-		var res = null;
-		if (null === this.compiled) {
-			this._compile();
+	CTableStyle.prototype.initStyle = function (sheetMergedStyles, bbox, options, headerRowCount, totalsRowCount) {
+		var r1Data = bbox.r1 + headerRowCount;
+		var r2Data = bbox.r2 - totalsRowCount;
+		var bboxTmp;
+		var offsetStripe;
+		var stripe;
+		if (this.wholeTable) {
+			sheetMergedStyles.setTablePivotStyle(bbox, this.wholeTable.dxf);
 		}
-		var styles = this._getOption(options, headerRowCount, totalsRowCount);
-		if (headerRowCount > 0 && rowIndex === bbox.r1) {
-			if (colIndex === bbox.c1) {
-				res = styles.headerLeftTop;
-			} else if (colIndex === bbox.c2) {
-				res = styles.headerRightTop;
-			} else {
-				res = styles.header;
-			}
-		} else if (totalsRowCount > 0 && rowIndex === bbox.r2) {
-			if (colIndex === bbox.c1) {
-				res = styles.totalLeftBottom;
-			} else if (colIndex === bbox.c2) {
-				res = styles.totalRightBottom;
-			} else {
-				res = styles.total;
-			}
-		} else if (options.ShowFirstColumn && colIndex === bbox.c1) {
-			if (rowIndex === bbox.r1 + headerRowCount) {
-				res = styles.leftTopFC;
-			} else if (rowIndex === bbox.r2 - totalsRowCount) {
-				if (0 === (rowIndex - headerRowCount) % 2) {
-					res = styles.leftBottomRowBand1FC;
-				} else {
-					res = styles.leftBottomRowBand2FC;
+		if (r1Data <= r2Data) {
+			if (options.ShowColumnStripes) {
+				if (this.firstColumnStripe) {
+					offsetStripe = this.secondColumnStripe ? this.secondColumnStripe.size : 1;
+					stripe = {size: this.firstColumnStripe.size, offset: offsetStripe};
+					bboxTmp = new Asc.Range(bbox.c1, r1Data, bbox.c2, r2Data);
+					sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstColumnStripe.dxf, stripe);
 				}
-			} else {
-				if (0 === (rowIndex - headerRowCount) % 2) {
-					res = styles.leftRowBand1FC;
-				} else {
-					res = styles.leftRowBand2FC;
-				}
-			}
-		} else if (options.ShowLastColumn && colIndex === bbox.c2) {
-			if (rowIndex === bbox.r1 + headerRowCount) {
-				if (0 === colIndex % 2) {
-					res = styles.rightTopColBand1LC;
-				} else {
-					res = styles.rightTopColBand2LC;
-				}
-			} else if (rowIndex === bbox.r2 - totalsRowCount) {
-				if (0 === (rowIndex - headerRowCount) % 2) {
-					if (0 === colIndex % 2) {
-						res = styles.rightBottomRowBand1ColBand1LC;
-					} else {
-						res = styles.rightBottomRowBand1ColBand2LC;
-					}
-				} else {
-					if (0 === colIndex % 2) {
-						res = styles.rightBottomRowBand2ColBand1LC;
-					} else {
-						res = styles.rightBottomRowBand2ColBand2LC;
-					}
-				}
-			} else {
-				if (0 === (rowIndex - headerRowCount) % 2) {
-					if (0 === colIndex % 2) {
-						res = styles.rightRowBand1ColBand1LC;
-					} else {
-						res = styles.rightRowBand1ColBand2LC;
-					}
-				} else {
-					if (0 === colIndex % 2) {
-						res = styles.rightRowBand2ColBand1LC;
-					} else {
-						res = styles.rightRowBand2ColBand2LC;
+				if (this.secondColumnStripe) {
+					offsetStripe = this.firstColumnStripe ? this.firstColumnStripe.size : 1;
+					stripe = {size: this.secondColumnStripe.size, offset: offsetStripe};
+					if (bbox.c1 + offsetStripe <= bbox.c2) {
+						bboxTmp = new Asc.Range(bbox.c1 + offsetStripe, r1Data, bbox.c2, r2Data);
+						sheetMergedStyles.setTablePivotStyle(bboxTmp, this.secondColumnStripe.dxf, stripe);
 					}
 				}
 			}
-		} else if (options.ShowRowStripes || options.ShowColumnStripes) {
-			if (rowIndex === bbox.r1 + headerRowCount) {
-				if (colIndex === bbox.c1) {
-					res = styles.leftTop;
-				} else if (colIndex === bbox.c2) {
-					if (0 === colIndex % 2) {
-						res = styles.rightTopColBand1;
-					} else {
-						res = styles.rightTopColBand2;
-					}
-				} else {
-					if (0 === colIndex % 2) {
-						res = styles.topColBand1;
-					} else {
-						res = styles.topColBand2;
+			if (options.ShowRowStripes) {
+				if (this.firstRowStripe) {
+					offsetStripe = this.secondRowStripe ? this.secondRowStripe.size : 1;
+					stripe = {row: true, size: this.firstRowStripe.size, offset: offsetStripe};
+					bboxTmp = new Asc.Range(bbox.c1, r1Data, bbox.c2, r2Data);
+					sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstRowStripe.dxf, stripe);
+				}
+				if (this.secondRowStripe) {
+					offsetStripe = this.firstRowStripe ? this.firstRowStripe.size : 1;
+					stripe = {row: true, size: this.secondRowStripe.size, offset: offsetStripe};
+					if (r1Data + offsetStripe <= r2Data) {
+						bboxTmp = new Asc.Range(bbox.c1, r1Data, bbox.c2, r2Data);
+						sheetMergedStyles.setTablePivotStyle(bboxTmp, this.secondRowStripe.dxf, stripe);
 					}
 				}
-			} else if (rowIndex === bbox.r2 - totalsRowCount) {
-				if (colIndex === bbox.c1) {
-					if (0 === (rowIndex - headerRowCount) % 2) {
-						res = styles.leftBottomRowBand1;
-					} else {
-						res = styles.leftBottomRowBand2;
-					}
-				} else if (colIndex === bbox.c2) {
-					if (0 === (rowIndex - headerRowCount) % 2) {
-						if (0 === colIndex % 2) {
-							res = styles.rightBottomRowBand1ColBand1;
-						} else {
-							res = styles.rightBottomRowBand1ColBand2;
-						}
-					} else {
-						if (0 === colIndex % 2) {
-							res = styles.rightBottomRowBand2ColBand1;
-						} else {
-							res = styles.rightBottomRowBand2ColBand2;
-						}
-					}
-				} else {
-					if (0 === (rowIndex - headerRowCount) % 2) {
-						if (0 === colIndex % 2) {
-							res = styles.bottomRowBand1ColBand1;
-						} else {
-							res = styles.bottomRowBand1ColBand2;
-						}
-					} else {
-						if (0 === colIndex % 2) {
-							res = styles.bottomRowBand2ColBand1;
-						} else {
-							res = styles.bottomRowBand2ColBand2;
-						}
-					}
-				}
-			} else if (colIndex === bbox.c1) {
-				if (0 === (rowIndex - headerRowCount) % 2) {
-					res = styles.leftRowBand1;
-				} else {
-					res = styles.leftRowBand2;
-				}
-			} else if (colIndex === bbox.c2) {
-				if (0 === (rowIndex - headerRowCount) % 2) {
-					if (0 === colIndex % 2) {
-						res = styles.rightRowBand1ColBand1;
-					} else {
-						res = styles.rightRowBand1ColBand2;
-					}
-				} else {
-					if (0 === colIndex % 2) {
-						res = styles.rightRowBand2ColBand1;
-					} else {
-						res = styles.rightRowBand2ColBand2;
-					}
-				}
-			} else {
-				if (0 === (rowIndex - headerRowCount) % 2) {
-					if (0 === colIndex % 2) {
-						res = styles.innerRowBand1ColBand1;
-					} else {
-						res = styles.innerRowBand1ColBand2;
-					}
-				} else {
-					if (0 === colIndex % 2) {
-						res = styles.innerRowBand2ColBand1;
-					} else {
-						res = styles.innerRowBand2ColBand2;
-					}
-				}
-			}
-		} else {
-			if (rowIndex === bbox.r1 + headerRowCount) {
-				if (colIndex === bbox.c1) {
-					res = styles.leftTop;
-				} else if (colIndex === bbox.c2) {
-					res = styles.rightTopColBand1;
-				} else {
-					res = styles.topColBand1;
-				}
-			} else if (rowIndex === bbox.r2 - totalsRowCount) {
-				if (colIndex === bbox.c1) {
-					res = styles.leftBottomRowBand1;
-				} else if (colIndex === bbox.c2) {
-					res = styles.rightBottomRowBand1ColBand1;
-				} else {
-					res = styles.bottomRowBand1ColBand1;
-				}
-			} else if (colIndex === bbox.c1) {
-				res = styles.leftRowBand1;
-			} else if (colIndex === bbox.c2) {
-				res = styles.rightRowBand1ColBand1;
-			} else {
-				res = styles.innerRowBand1ColBand1;
 			}
 		}
-		return res;
-	};
-	CTableStyle.prototype.getPivotStyle = function (bbox, rowIndex, colIndex, options, headerRowCount, totalsRowCount) {
-		var res = null;
-		if (null === this.compiled) {
-			this._compile();
+		if (options.ShowLastColumn && this.lastColumn) {
+			bboxTmp = new Asc.Range(bbox.c2, bbox.r1, bbox.c2, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.lastColumn.dxf);
 		}
-		var styles = this._getOption(options, headerRowCount, totalsRowCount);
-	};
-	CTableStyle.prototype._getOption = function (options, headerRowCount, totalsRowCount) {
-		var nBitMask = 0;
-		if (options.ShowFirstColumn) {
-			nBitMask += 1;
+		if (options.ShowFirstColumn && this.firstColumn) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r1, bbox.c1, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstColumn.dxf);
 		}
-		if (options.ShowLastColumn) {
-			nBitMask += 1 << 1;
+		if (this.headerRow && headerRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r1);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.headerRow.dxf);
 		}
-		if (options.ShowRowStripes) {
-			nBitMask += 1 << 2;
+		if (this.totalRow && totalsRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r2, bbox.c2, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.totalRow.dxf);
 		}
-		if (options.ShowColumnStripes) {
-			nBitMask += 1 << 3;
+		if (this.firstHeaderCell && headerRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r1, bbox.c1, bbox.r1);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstHeaderCell.dxf);
 		}
-		if (headerRowCount > 0) {
-			nBitMask += 1 << 4;
+		if (this.lastHeaderCell && headerRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c2, bbox.r1, bbox.c2, bbox.r1);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.lastHeaderCell.dxf);
 		}
-		if (totalsRowCount > 0) {
-			nBitMask += 1 << 5;
+		if (this.firstTotalCell && totalsRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c1, bbox.r2, bbox.c1, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstTotalCell.dxf);
 		}
-		var styles = this.compiled.options[nBitMask];
-		if (null == styles) {
-			var configs = {
-				header: {header: true, top: true},
-				headerLeftTop: {header: true, left: true, top: true},
-				headerRightTop: {header: true, right: true, top: true},
-				total: {total: true, bottom: true},
-				totalLeftBottom: {total: true, left: true, bottom: true},
-				totalRightBottom: {total: true, right: true, bottom: true},
-				leftTop: {
-					ShowRowStripes: true, ShowColumnStripes: true, left: true, top: true, RowBand1: true, ColBand1: true
-				},
-				leftBottomRowBand1: {
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					left: true,
-					bottom: true,
-					RowBand1: true,
-					ColBand1: true
-				},
-				leftBottomRowBand2: {
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					left: true,
-					bottom: true,
-					RowBand2: true,
-					ColBand1: true
-				},
-				leftRowBand1: {
-					ShowRowStripes: true, ShowColumnStripes: true, left: true, RowBand1: true, ColBand1: true
-				},
-				leftRowBand2: {
-					ShowRowStripes: true, ShowColumnStripes: true, left: true, RowBand2: true, ColBand1: true
-				},
-				rightTopColBand1: {
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					top: true,
-					RowBand1: true,
-					ColBand1: true
-				},
-				rightTopColBand2: {
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					top: true,
-					RowBand1: true,
-					ColBand2: true
-				},
-				rightRowBand1ColBand1: {
-					ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand1: true, ColBand1: true
-				},
-				rightRowBand1ColBand2: {
-					ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand1: true, ColBand2: true
-				},
-				rightRowBand2ColBand1: {
-					ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand2: true, ColBand1: true
-				},
-				rightRowBand2ColBand2: {
-					ShowRowStripes: true, ShowColumnStripes: true, right: true, RowBand2: true, ColBand2: true
-				},
-				rightBottomRowBand1ColBand1: {
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					bottom: true,
-					RowBand1: true,
-					ColBand1: true
-				},
-				rightBottomRowBand1ColBand2: {
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					bottom: true,
-					RowBand1: true,
-					ColBand2: true
-				},
-				rightBottomRowBand2ColBand1: {
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					bottom: true,
-					RowBand2: true,
-					ColBand1: true
-				},
-				rightBottomRowBand2ColBand2: {
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					bottom: true,
-					RowBand2: true,
-					ColBand2: true
-				},
-				topColBand1: {ShowRowStripes: true, ShowColumnStripes: true, top: true, RowBand1: true, ColBand1: true},
-				topColBand2: {ShowRowStripes: true, ShowColumnStripes: true, top: true, RowBand1: true, ColBand2: true},
-				bottomRowBand1ColBand1: {
-					ShowRowStripes: true, ShowColumnStripes: true, bottom: true, RowBand1: true, ColBand1: true
-				},
-				bottomRowBand1ColBand2: {
-					ShowRowStripes: true, ShowColumnStripes: true, bottom: true, RowBand1: true, ColBand2: true
-				},
-				bottomRowBand2ColBand1: {
-					ShowRowStripes: true, ShowColumnStripes: true, bottom: true, RowBand2: true, ColBand1: true
-				},
-				bottomRowBand2ColBand2: {
-					ShowRowStripes: true, ShowColumnStripes: true, bottom: true, RowBand2: true, ColBand2: true
-				},
-				innerRowBand1ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, RowBand1: true, ColBand1: true},
-				innerRowBand1ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, RowBand1: true, ColBand2: true},
-				innerRowBand2ColBand1: {ShowRowStripes: true, ShowColumnStripes: true, RowBand2: true, ColBand1: true},
-				innerRowBand2ColBand2: {ShowRowStripes: true, ShowColumnStripes: true, RowBand2: true, ColBand2: true},
-				leftTopFC: {
-					ShowFirstColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					left: true,
-					top: true,
-					RowBand1: true,
-					ColBand1: true
-				},
-				leftBottomRowBand1FC: {
-					ShowFirstColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					left: true,
-					bottom: true,
-					RowBand1: true,
-					ColBand1: true
-				},
-				leftBottomRowBand2FC: {
-					ShowFirstColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					left: true,
-					bottom: true,
-					RowBand2: true,
-					ColBand1: true
-				},
-				leftRowBand1FC: {
-					ShowFirstColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					left: true,
-					RowBand1: true,
-					ColBand1: true
-				},
-				leftRowBand2FC: {
-					ShowFirstColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					left: true,
-					RowBand2: true,
-					ColBand1: true
-				},
-				rightTopColBand1LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					top: true,
-					RowBand1: true,
-					ColBand1: true
-				},
-				rightTopColBand2LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					top: true,
-					RowBand1: true,
-					ColBand2: true
-				},
-				rightRowBand1ColBand1LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					RowBand1: true,
-					ColBand1: true
-				},
-				rightRowBand1ColBand2LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					RowBand1: true,
-					ColBand2: true
-				},
-				rightRowBand2ColBand1LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					RowBand2: true,
-					ColBand1: true
-				},
-				rightRowBand2ColBand2LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					RowBand2: true,
-					ColBand2: true
-				},
-				rightBottomRowBand1ColBand1LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					bottom: true,
-					RowBand1: true,
-					ColBand1: true
-				},
-				rightBottomRowBand1ColBand2LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					bottom: true,
-					RowBand1: true,
-					ColBand2: true
-				},
-				rightBottomRowBand2ColBand1LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					bottom: true,
-					RowBand2: true,
-					ColBand1: true
-				},
-				rightBottomRowBand2ColBand2LC: {
-					ShowLastColumn: true,
-					ShowRowStripes: true,
-					ShowColumnStripes: true,
-					right: true,
-					bottom: true,
-					RowBand2: true,
-					ColBand2: true
-				}
-			};
-			var styles = {};
-			for (var i in configs) {
-				styles[i] = new AscCommonExcel.CellXfs();
-			}
-			this._compileOption(options, headerRowCount, totalsRowCount, styles, configs);
-			this.compiled.options[nBitMask] = styles;
-		}
-		return styles;
-	};
-	CTableStyle.prototype._compileSetBorder =
-		function (inputDxf, outputDxf, bLeft, bTop, bRight, bBottom, bInnerHor, bInnerVer) {
-			if (null != inputDxf && null != inputDxf.border) {
-				var oCurBorder = inputDxf.border;
-				var oNewBorder = new AscCommonExcel.Border();
-				if (bLeft) {
-					oNewBorder.l = oCurBorder.l;
-				} else if (bInnerVer) {
-					oNewBorder.l = oCurBorder.iv;
-				}
-				if (bTop) {
-					oNewBorder.t = oCurBorder.t;
-				} else if (bInnerHor) {
-					oNewBorder.t = oCurBorder.ih;
-				}
-				if (bRight) {
-					oNewBorder.r = oCurBorder.r;
-				} else if (bInnerVer) {
-					oNewBorder.r = oCurBorder.iv;
-				}
-				if (bBottom) {
-					oNewBorder.b = oCurBorder.b;
-				} else if (bInnerHor) {
-					oNewBorder.b = oCurBorder.ih;
-				}
-
-				if (null == outputDxf.border) {
-					outputDxf.border = oNewBorder;
-				} else {
-					outputDxf.border = outputDxf.border.merge(oNewBorder);
-				}
-			}
-		};
-	CTableStyle.prototype._compileSetHeaderBorder = function (inputDxf, outputDxf, bHeader) {
-		if (null != inputDxf && null != inputDxf.border) {
-			var oCurBorder = inputDxf.border;
-			var oNewBorder = new AscCommonExcel.Border();
-			if (bHeader) {
-				oNewBorder.t = oCurBorder.b;
-			} else {
-				oNewBorder.b = oCurBorder.t;
-			}
-			if (null == outputDxf.border) {
-				outputDxf.border = oNewBorder;
-			} else {
-				outputDxf.border = outputDxf.border.merge(oNewBorder);
-			}
-		}
-	};
-	CTableStyle.prototype._compileOption = function (options, headerRowCount, totalsRowCount, styles, configs) {
-		for (var i in styles) {
-			var xfs = styles[i];
-			var config = configs[i];
-			//заглушка для бордеров, чтобы при конфликте нижние бордеры не перекрывали бордеры заголовка
-			if (headerRowCount > 0 && config.top && true != config.header) {
-				if (options.ShowFirstColumn && null != this.firstHeaderCell && config.left) {
-					this._compileSetHeaderBorder(this.firstHeaderCell.dxf, xfs, true);
-				} else if (options.ShowLastColumn && null != this.lastHeaderCell && config.right) {
-					this._compileSetHeaderBorder(this.lastHeaderCell.dxf, xfs, true);
-				}
-				if (null != this.headerRow) {
-					this._compileSetHeaderBorder(this.headerRow.dxf, xfs, true);
-				}
-			}
-			if (totalsRowCount > 0 && config.bottom && true != config.total) {
-				if (options.ShowFirstColumn && null != this.firstTotalCell && config.left) {
-					this._compileSetHeaderBorder(this.firstTotalCell.dxf, xfs, false);
-				} else if (options.ShowLastColumn && null != this.lastTotalCell && config.right) {
-					this._compileSetHeaderBorder(this.lastTotalCell.dxf, xfs, false);
-				}
-				if (null != this.totalRow) {
-					this._compileSetHeaderBorder(this.totalRow.dxf, xfs, false);
-				}
-			}
-			if (headerRowCount > 0 && config.header) {
-				if (options.ShowFirstColumn && null != this.firstHeaderCell && config.left) {
-					xfs = xfs.merge(this.firstHeaderCell.dxf);
-				}
-				if (options.ShowLastColumn && null != this.lastHeaderCell && config.right) {
-					xfs = xfs.merge(this.lastHeaderCell.dxf);
-				}
-				if (null != this.headerRow) {
-					xfs = xfs.merge(this.compiled.headerRow.dxf);
-					//применяем бордер
-					if (config.left) {
-						this._compileSetBorder(this.headerRow.dxf, xfs, true, true, false, true, false, true);
-					} else if (config.right) {
-						this._compileSetBorder(this.headerRow.dxf, xfs, false, true, true, true, false, true);
-					} else {
-						this._compileSetBorder(this.headerRow.dxf, xfs, false, true, false, true, false, true);
-					}
-				}
-				if (options.ShowFirstColumn && null != this.firstColumn && config.left) {
-					xfs = xfs.merge(this.compiled.firstColumn.dxf);
-					//применяем бордер
-					this._compileSetBorder(this.firstColumn.dxf, xfs, true, true, true, false, true, false);
-				}
-				if (options.ShowLastColumn && null != this.lastColumn && config.right) {
-					xfs = xfs.merge(this.compiled.lastColumn.dxf);
-					//применяем бордер
-					this._compileSetBorder(this.lastColumn.dxf, xfs, true, true, true, false, true, false);
-				}
-			} else if (totalsRowCount > 0 && config.total) {
-				if (options.ShowFirstColumn && null != this.firstTotalCell && config.left) {
-					xfs = xfs.merge(this.firstTotalCell.dxf);
-				}
-				if (options.ShowLastColumn && null != this.lastTotalCell && config.right) {
-					xfs = xfs.merge(this.lastTotalCell.dxf);
-				}
-				if (null != this.totalRow) {
-					xfs = xfs.merge(this.compiled.totalRow.dxf);
-					//применяем бордер
-					if (config.left) {
-						this._compileSetBorder(this.totalRow.dxf, xfs, true, true, false, true, false, true);
-					} else if (config.right) {
-						this._compileSetBorder(this.totalRow.dxf, xfs, false, true, true, true, false, true);
-					} else {
-						this._compileSetBorder(this.totalRow.dxf, xfs, false, true, false, true, false, true);
-					}
-				}
-				if (options.ShowFirstColumn && null != this.firstColumn && config.left) {
-					xfs = xfs.merge(this.compiled.firstColumn.dxf);
-					//применяем бордер
-					this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, true, true, false);
-				}
-				if (options.ShowLastColumn && null != this.lastColumn && config.right) {
-					xfs = xfs.merge(this.compiled.lastColumn.dxf);
-					//применяем бордер
-					this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, true, true, false);
-				}
-			} else {
-				if (options.ShowFirstColumn && null != this.firstColumn && config.ShowFirstColumn) {
-					xfs = xfs.merge(this.compiled.firstColumn.dxf);
-					//применяем бордер
-					if (config.left && config.top) {
-						if (headerRowCount > 0) {
-							this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, false, true, false);
-						} else {
-							this._compileSetBorder(this.firstColumn.dxf, xfs, true, true, true, false, true, false);
-						}
-					} else if (config.left && config.bottom) {
-						if (totalsRowCount > 0) {
-							this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, false, true, false);
-						} else {
-							this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, true, true, false);
-						}
-					} else {
-						this._compileSetBorder(this.firstColumn.dxf, xfs, true, false, true, false, true, false);
-					}
-				} else if (options.ShowLastColumn && null != this.lastColumn && config.ShowLastColumn) {
-					xfs = xfs.merge(this.compiled.lastColumn.dxf);
-					//применяем бордер
-					if (config.right && config.top) {
-						if (headerRowCount > 0) {
-							this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, false, true, false);
-						} else {
-							this._compileSetBorder(this.lastColumn.dxf, xfs, true, true, true, false, true, false);
-						}
-					} else if (config.right && config.bottom) {
-						if (totalsRowCount > 0) {
-							this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, false, true, false);
-						} else {
-							this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, true, true, false);
-						}
-					} else {
-						this._compileSetBorder(this.lastColumn.dxf, xfs, true, false, true, false, true, false);
-					}
-				}
-				if (options.ShowRowStripes && config.ShowRowStripes) {
-					if (null != this.firstRowStripe && config.RowBand1) {
-						xfs = xfs.merge(this.compiled.firstRowStripe.dxf);
-						//применяем бордер
-						if (config.left) {
-							this._compileSetBorder(this.firstRowStripe.dxf, xfs, true, true, false, true, false, true);
-						} else if (config.right) {
-							this._compileSetBorder(this.firstRowStripe.dxf, xfs, false, true, true, true, false, true);
-						} else {
-							this._compileSetBorder(this.firstRowStripe.dxf, xfs, false, true, false, true, false, true);
-						}
-					} else if (null != this.secondRowStripe && config.RowBand2) {
-						xfs = xfs.merge(this.compiled.secondRowStripe.dxf);
-						//применяем бордер
-						if (config.left) {
-							this._compileSetBorder(this.secondRowStripe.dxf, xfs, true, true, false, true, false, true);
-						} else if (config.right) {
-							this._compileSetBorder(this.secondRowStripe.dxf, xfs, false, true, true, true, false, true);
-						} else {
-							this._compileSetBorder(this.secondRowStripe.dxf, xfs, false, true, false, true, false,
-								true);
-						}
-					}
-				}
-				if (options.ShowColumnStripes && config.ShowRowStripes) {
-					if (null != this.firstColumnStripe && config.ColBand1) {
-						xfs = xfs.merge(this.compiled.firstColumnStripe.dxf);
-						//применяем бордер
-						if (config.top) {
-							this._compileSetBorder(this.firstColumnStripe.dxf, xfs, true, true, true, false, true,
-								false);
-						} else if (config.bottom) {
-							this._compileSetBorder(this.firstColumnStripe.dxf, xfs, true, false, true, true, true,
-								false);
-						} else {
-							this._compileSetBorder(this.firstColumnStripe.dxf, xfs, true, false, true, false, true,
-								false);
-						}
-					} else if (null != this.secondColumnStripe && config.ColBand2) {
-						xfs = xfs.merge(this.compiled.secondColumnStripe.dxf);
-						//применяем бордер
-						if (config.top) {
-							this._compileSetBorder(this.secondColumnStripe.dxf, xfs, true, true, true, false, true,
-								false);
-						} else if (config.bottom) {
-							this._compileSetBorder(this.secondColumnStripe.dxf, xfs, true, false, true, true, true,
-								false);
-						} else {
-							this._compileSetBorder(this.secondColumnStripe.dxf, xfs, true, false, true, false, true,
-								false);
-						}
-					}
-				}
-			}
-			if (null != this.wholeTable) {
-				xfs = xfs.merge(this.compiled.wholeTable.dxf);
-				//применяем бордер
-				if (config.top) {
-					if (headerRowCount > 0 && true != config.header) {
-						if (config.left) {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, false, true, true);
-						} else if (config.right) {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, false, true, true);
-						} else {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, false, true, true);
-						}
-					} else {
-						if (config.left) {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, true, true, false, false, true, true);
-						} else if (config.right) {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, false, true, true, false, true, true);
-						} else {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, false, true, false, false, true, true);
-						}
-					}
-				} else if (config.bottom) {
-					if (totalsRowCount > 0 && true != config.total) {
-						if (config.left) {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, false, true, true);
-						} else if (config.right) {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, false, true, true);
-						} else {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, false, true, true);
-						}
-					} else {
-						if (config.left) {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, true, true, true);
-						} else if (config.right) {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, true, true, true);
-						} else {
-							this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, true, true, true);
-						}
-					}
-				} else if (config.left) {
-					this._compileSetBorder(this.wholeTable.dxf, xfs, true, false, false, false, true, true);
-				} else if (config.right) {
-					this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, true, false, true, true);
-				} else {
-					this._compileSetBorder(this.wholeTable.dxf, xfs, false, false, false, false, true, true);
-				}
-			}
-			styles[i] = xfs;
-		}
-	};
-	CTableStyle.prototype._compile = function () {
-		this.compiled = {
-			options: {},
-			blankRow: null,
-			firstColumn: null,
-			firstColumnStripe: null,
-			firstColumnSubheading: null,
-			firstHeaderCell: null,
-			firstRowStripe: null,
-			firstRowSubheading: null,
-			firstSubtotalColumn: null,
-			firstSubtotalRow: null,
-			firstTotalCell: null,
-			headerRow: null,
-			lastColumn: null,
-			lastHeaderCell: null,
-			lastTotalCell: null,
-			pageFieldLabels: null,
-			pageFieldValues: null,
-			secondColumnStripe: null,
-			secondColumnSubheading: null,
-			secondRowStripe: null,
-			secondRowSubheading: null,
-			secondSubtotalColumn: null,
-			secondSubtotalRow: null,
-			thirdColumnSubheading: null,
-			thirdRowSubheading: null,
-			thirdSubtotalColumn: null,
-			thirdSubtotalRow: null,
-			totalRow: null,
-			wholeTable: null
-		};
-		//копируем исходные стили только без border
-		for (var i in this) {
-			var elem = this[i];
-			if (null != elem && elem instanceof CTableStyleElement) {
-				var oNewElem = new CTableStyleElement();
-				oNewElem.size = elem.size;
-				oNewElem.dxf = elem.dxf.clone();
-				oNewElem.dxf.border = null;
-				this.compiled[i] = oNewElem;
-			}
+		if (this.lastTotalCell && totalsRowCount > 0) {
+			bboxTmp = new Asc.Range(bbox.c2, bbox.r2, bbox.c2, bbox.r2);
+			sheetMergedStyles.setTablePivotStyle(bboxTmp, this.lastTotalCell.dxf);
 		}
 	};
 	CTableStyle.prototype.readAttributes = function (attr, uq) {
@@ -8823,6 +8157,7 @@
         var oBinary_StylesTableReader = new Binary_StylesTableReader(stream, wb, [], []);
 
         var length = stream.GetULongLE();
+        var styleManager = wb.oStyleManager;
 
         var fReadStyle = function(type, length, oCellStyle, oStyleObject) {
             var res = c_oSerConstants.ReadOk;
@@ -8873,36 +8208,36 @@
                     return fReadStyle(t,l, oCellStyle, oStyleObject);
                 });
 
-                oCellStyle.xfs = new AscCommonExcel.CellXfs();
+                var newXf = new AscCommonExcel.CellXfs();
                 // Border
                 if (null !== oStyleObject.border)
-                    oCellStyle.xfs.border = oStyleObject.border.clone();
+					newXf.border = styleManager.addBorder(oStyleObject.border);
                 // Fill
                 if (null !== oStyleObject.fill)
-                    oCellStyle.xfs.fill = oStyleObject.fill.clone();
+					newXf.fill = styleManager.addFill(oStyleObject.fill);
                 // Font
                 if (null !== oStyleObject.font)
-                    oCellStyle.xfs.font = oStyleObject.font.clone();
+					newXf.font = styleManager.addFont(oStyleObject.font);
                 // NumFmt
                 if (null !== oStyleObject.xfs.numid) {
                     var oCurNum = oStyleObject.oNumFmts[oStyleObject.xfs.numid];
                     if(null != oCurNum)
-                        oCellStyle.xfs.num = oBinary_StylesTableReader.ParseNum(oCurNum, oStyleObject.oNumFmts);
+						newXf.num = oBinary_StylesTableReader.ParseNum(oCurNum, oStyleObject.oNumFmts);
                     else
-                        oCellStyle.xfs.num = oBinary_StylesTableReader.ParseNum({id: oStyleObject.xfs.numid, f: null}, oStyleObject.oNumFmts);
+						newXf.num = oBinary_StylesTableReader.ParseNum({id: oStyleObject.xfs.numid, f: null}, oStyleObject.oNumFmts);
                 }
                 // QuotePrefix
                 if(null != oStyleObject.xfs.QuotePrefix)
-                    oCellStyle.xfs.QuotePrefix = oStyleObject.xfs.QuotePrefix;
+					newXf.QuotePrefix = oStyleObject.xfs.QuotePrefix;
 				// PivotButton
 				if(null != oStyleObject.xfs.PivotButton)
-					oCellStyle.xfs.PivotButton = oStyleObject.xfs.PivotButton;
+					newXf.PivotButton = oStyleObject.xfs.PivotButton;
                 // align
                 if(null != oStyleObject.xfs.align)
-                    oCellStyle.xfs.align = oStyleObject.xfs.align.clone();
+					newXf.align = styleManager.addAlign(oStyleObject.xfs.align);
                 // XfId
                 if (null !== oStyleObject.xfs.XfId)
-                    oCellStyle.xfs.XfId = oStyleObject.xfs.XfId;
+					newXf.XfId = oStyleObject.xfs.XfId;
                 // ApplyBorder (ToDo возможно это свойство должно быть в xfs)
                 if (null !== oStyleObject.xfs.ApplyBorder)
                     oCellStyle.ApplyBorder = oStyleObject.xfs.ApplyBorder;
@@ -8915,6 +8250,7 @@
                 // ApplyNumberFormat (ToDo возможно это свойство должно быть в xfs)
                 if (null !== oStyleObject.xfs.ApplyNumberFormat)
                     oCellStyle.ApplyNumberFormat = oStyleObject.xfs.ApplyNumberFormat;
+                oCellStyle.xfs =styleManager.addXf(newXf);
 
                 oOutput.push(oCellStyle);
             } else
@@ -9042,13 +8378,33 @@
 			if (newContext.readAttributes) {
 				newContext.readAttributes(attr, uq);
 			}
-			this.dxfs.push(newContext.xf);
 		} else if ("tableStyles" === elem) {
 			newContext = this.tableStyles;
 		} else {
 			newContext = null;
 		}
 		return newContext;
+	};
+	CT_Stylesheet.prototype.onEndNode = function(prevContext, elem) {
+		if ("dxf" === elem) {
+			var dxf = prevContext.xf;
+			if(dxf.font){
+				dxf.font = openXml.SaxParserDataTransfer.wb.oStyleManager.addFont(dxf.font);
+			}
+			if(dxf.fill){
+				dxf.fill = openXml.SaxParserDataTransfer.wb.oStyleManager.addFill(dxf.fill);
+			}
+			if(dxf.border){
+				dxf.border = openXml.SaxParserDataTransfer.wb.oStyleManager.addBorder(dxf.border);
+			}
+			if(dxf.num){
+				dxf.num = openXml.SaxParserDataTransfer.wb.oStyleManager.addNum(dxf.num);
+			}
+			if(dxf.align){
+				dxf.align = openXml.SaxParserDataTransfer.wb.oStyleManager.addAlign(dxf.align);
+			}
+			this.dxfs.push(openXml.SaxParserDataTransfer.wb.oStyleManager.addXf(dxf));
+		}
 	};
 
 	function CT_Dxf() {
