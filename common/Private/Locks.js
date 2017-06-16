@@ -629,8 +629,10 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 
 	var nContentControlLock = this.GetContentControlLock();
 
-	if (AscCommon.changestype_ContentControl_Remove === CheckType
-		|| AscCommon.changestype_ContentControl_Properties === CheckType)
+	if (AscCommon.changestype_ContentControl_Properties === CheckType)
+		return this.Lock.Check(this.GetId());
+
+	if (AscCommon.changestype_ContentControl_Remove === CheckType)
 		this.Lock.Check(this.GetId());
 
 	if (isCheckContentControlLock

@@ -375,6 +375,31 @@ CInlineLevelSdt.prototype.GetContentControlLock = function()
 {
 	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
 };
+CInlineLevelSdt.prototype.SetContentControlPr = function(oPr)
+{
+	if (!oPr)
+		return;
+
+	if (undefined !== oPr.Tag)
+		this.SetTag(oPr.Tag);
+
+	if (undefined !== oPr.Id)
+		this.SetContentControlId(oPr.Id);
+
+	if (undefined !== oPr.Lock)
+		this.SetContentControlLock(oPr.Lock);
+};
+CInlineLevelSdt.prototype.GetContentControlPr = function()
+{
+	var oPr = new CContentControlPr();
+
+	oPr.Tag        = this.Pr.Tag;
+	oPr.Id         = this.Pr.Id;
+	oPr.Lock       = this.Pr.Lock;
+	oPr.InternalId = this.GetId();
+
+	return oPr;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
