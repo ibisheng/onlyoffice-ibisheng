@@ -63,7 +63,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST, cBETA_DIST,
 		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
 		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cF_INV, cF_INV_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
-		cFTEST, cGAMMA, cGAMMADIST, cGAMMAINV, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cFTEST, cGAMMA, cGAMMADIST, cGAMMAINV, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
@@ -3610,6 +3610,43 @@
 	};
 	cGAMMALN_PRECISE.prototype.getInfo = function () {
 		return {name: this.name, args: "(number)"}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cGAUSS() {
+		this.name = "GAUSS";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cGAUSS.prototype = Object.create(cBaseFunction.prototype);
+	cGAUSS.prototype.constructor = cGAUSS;
+	cGAUSS.prototype.argumentsMin = 1;
+	cGAUSS.prototype.argumentsMax = 1;
+	cGAUSS.prototype.isXLFN = true;
+	cGAUSS.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcGauss = function(argArray) {
+			var res = gauss(argArray[0]);
+			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcGauss);
+	};
+	cGAUSS.prototype.getInfo = function () {
+		return {name: this.name, args: "(number)"}//в документации аргумент называется Z
 	};
 
 	/**

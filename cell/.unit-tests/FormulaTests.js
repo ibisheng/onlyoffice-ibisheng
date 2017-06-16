@@ -1115,6 +1115,12 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0500006, "CHIDIST(A2,A3)" );
 	} );
 
+	test( "Test: \"GAUSS\"", function () {
+		oParser = new parserFormula( "GAUSS(2)", "A1", ws );
+		ok( oParser.parse(), "GAUSS(2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 0.47725, "GAUSS(2)" );
+	} );
+
 	test( "Test: \"CHISQ.DIST.RT\"", function () {
 		ws.getRange2( "A2" ).setValue( "18.307" );
 		ws.getRange2( "A3" ).setValue( "10" );
