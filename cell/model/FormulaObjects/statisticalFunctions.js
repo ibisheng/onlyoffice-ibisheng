@@ -1421,6 +1421,7 @@
 	cBETA_DIST.prototype.constructor = cBETA_DIST;
 	cBETA_DIST.prototype.argumentsMin = 4;
 	cBETA_DIST.prototype.argumentsMax = 6;
+	cBETA_DIST.prototype.isXLFN = true;
 	cBETA_DIST.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -1485,6 +1486,7 @@
 	cBETA_INV.prototype.constructor = cBETA_INV;
 	cBETA_INV.prototype.argumentsMin = 3;
 	cBETA_INV.prototype.argumentsMax = 5;
+	cBETA_INV.prototype.isXLFN = true;
 	cBETA_INV.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -1725,6 +1727,7 @@
 	cCHISQ_DIST.prototype.constructor = cCHISQ_DIST;
 	cCHISQ_DIST.prototype.argumentsMin = 3;
 	cCHISQ_DIST.prototype.argumentsMax = 3;
+	cCHISQ_DIST.prototype.isXLFN = true;
 	cCHISQ_DIST.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -1780,6 +1783,7 @@
 
 	cCHISQ_DIST_RT.prototype = Object.create(cCHIDIST.prototype);
 	cCHISQ_DIST_RT.prototype.constructor = cCHISQ_DIST_RT;
+	cCHISQ_DIST_RT.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
@@ -1793,6 +1797,7 @@
 	cCHISQ_INV.prototype.constructor = cCHISQ_INV;
 	cCHISQ_INV.prototype.argumentsMin = 2;
 	cCHISQ_INV.prototype.argumentsMax = 2;
+	cCHISQ_INV.prototype.isXLFN = true;
 	cCHISQ_INV.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -1845,6 +1850,7 @@
 	cCHISQ_INV_RT.prototype.constructor = cCHISQ_INV_RT;
 	cCHISQ_INV_RT.prototype.argumentsMin = 2;
 	cCHISQ_INV_RT.prototype.argumentsMax = 2;
+	cCHISQ_INV_RT.prototype.isXLFN = true;
 	cCHISQ_INV_RT.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -2707,6 +2713,7 @@
 	cF_DIST.prototype.constructor = cF_DIST;
 	cF_DIST.prototype.argumentsMin = 3;
 	cF_DIST.prototype.argumentsMax = 4;
+	cF_DIST.prototype.isXLFN = true;
 	cF_DIST.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -2764,6 +2771,7 @@
 	cF_DIST_RT.prototype.constructor = cF_DIST_RT;
 	cF_DIST_RT.prototype.argumentsMin = 3;
 	cF_DIST_RT.prototype.argumentsMax = 3;
+	cF_DIST_RT.prototype.isXLFN = true;
 	cF_DIST_RT.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -2814,6 +2822,7 @@
 	cF_INV.prototype.constructor = cF_INV;
 	cF_INV.prototype.argumentsMin = 3;
 	cF_INV.prototype.argumentsMax = 3;
+	cF_INV.prototype.isXLFN = true;
 	cF_INV.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -2929,6 +2938,7 @@
 
 	 cF_INV_RT.prototype = Object.create(cFINV.prototype);
 	 cF_INV_RT.prototype.constructor = cF_INV_RT;
+	 cF_INV_RT.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
@@ -3280,6 +3290,7 @@
 	cGAMMA_DIST.prototype.constructor = cGAMMA_DIST;
 	cGAMMA_DIST.prototype.argumentsMin = 4;
 	cGAMMA_DIST.prototype.argumentsMax = 4;
+	cGAMMA_DIST.prototype.isXLFN = true;
 	cGAMMA_DIST.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -3471,6 +3482,7 @@
 	cGAMMALN_PRECISE.prototype.constructor = cGAMMALN_PRECISE;
 	cGAMMALN_PRECISE.prototype.argumentsMin = 1;
 	cGAMMALN_PRECISE.prototype.argumentsMax = 1;
+	cGAMMALN_PRECISE.prototype.isXLFN = true;
 	cGAMMALN_PRECISE.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -4133,6 +4145,7 @@
 	cLOGNORM_DIST.prototype.constructor = cLOGNORM_DIST;
 	cLOGNORM_DIST.prototype.argumentsMin = 4;
 	cLOGNORM_DIST.prototype.argumentsMax = 4;
+	cLOGNORM_DIST.prototype.isXLFN = true;
 	cLOGNORM_DIST.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -4196,6 +4209,7 @@
 	cLOGNORM_INV.prototype.constructor = cLOGNORM_INV;
 	cLOGNORM_INV.prototype.argumentsMin = 3;
 	cLOGNORM_INV.prototype.argumentsMax = 3;
+	cLOGNORM_INV.prototype.isXLFN = true;
 	cLOGNORM_INV.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -6667,6 +6681,7 @@
 	cT_DIST.prototype.constructor = cT_DIST;
 	cT_DIST.prototype.argumentsMin = 3;
 	cT_DIST.prototype.argumentsMax = 3;
+	cT_DIST.prototype.isXLFN = true;
 	cT_DIST.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -6713,6 +6728,7 @@
 	cT_DIST_2T.prototype.constructor = cT_DIST_2T;
 	cT_DIST_2T.prototype.argumentsMin = 2;
 	cT_DIST_2T.prototype.argumentsMax = 2;
+	cT_DIST_2T.prototype.isXLFN = true;
 	cT_DIST_2T.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -6757,6 +6773,7 @@
 	cT_DIST_RT.prototype.constructor = cT_DIST_RT;
 	cT_DIST_RT.prototype.argumentsMin = 2;
 	cT_DIST_RT.prototype.argumentsMax = 2;
+	cT_DIST_RT.prototype.isXLFN = true;
 	cT_DIST_RT.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -6805,6 +6822,7 @@
 	cT_INV.prototype.constructor = cT_INV;
 	cT_INV.prototype.argumentsMin = 2;
 	cT_INV.prototype.argumentsMax = 2;
+	cT_INV.prototype.isXLFN = true;
 	cT_INV.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -6867,6 +6885,7 @@
 	cT_INV_2T.prototype.constructor = cT_INV_2T;
 	cT_INV_2T.prototype.argumentsMin = 2;
 	cT_INV_2T.prototype.argumentsMax = 2;
+	cT_INV_2T.prototype.isXLFN = true;
 	cT_INV_2T.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
