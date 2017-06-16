@@ -2612,6 +2612,7 @@
 	cEXPON_DIST.prototype.constructor = cEXPON_DIST;
 	cEXPON_DIST.prototype.argumentsMin = 3;
 	cEXPON_DIST.prototype.argumentsMax = 3;
+	cEXPON_DIST.prototype.isXLFN = true;
 	cEXPON_DIST.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
