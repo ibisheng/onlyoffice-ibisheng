@@ -62,8 +62,8 @@
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST, cBETA_DIST,
 		cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF,
-		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPON_DIST, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cF_INV, cF_INV_RT, cFINV, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
-		cFTEST, cGAMMA, cGAMMADIST, cGAMMAINV, cGAMMA_DIST, cGAMMA_INV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPON_DIST, cEXPONDIST, cFDIST, cF_DIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY,
+		cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
 		cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST,
 		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE,
 		cRANK, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
@@ -1771,48 +1771,15 @@
 
 	/**
 	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
+	 * @extends {cCHIDIST}
 	 */
-	//clone cCHIDIST function
 	function cCHISQ_DIST_RT() {
-		cBaseFunction.call(this, "CHISQ.DIST.RT");
+		cCHIDIST.call(this);
+		this.name = "CHISQ.DIST.RT";
 	}
 
-	cCHISQ_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
+	cCHISQ_DIST_RT.prototype = Object.create(cCHIDIST.prototype);
 	cCHISQ_DIST_RT.prototype.constructor = cCHISQ_DIST_RT;
-	cCHISQ_DIST_RT.prototype.argumentsMin = 2;
-	cCHISQ_DIST_RT.prototype.argumentsMax = 2;
-	cCHISQ_DIST_RT.prototype.Calculate = function (arg) {
-		var oArguments = this._prepareArguments(arg, arguments[1], true);
-		var argClone = oArguments.args;
-
-		argClone[0] = argClone[0].tocNumber();
-		argClone[1] = argClone[1].tocNumber();
-
-		var argError;
-		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
-		}
-
-		var calcTDist = function(argArray){
-			var fChi = argArray[0];
-			var fDF = parseInt(argArray[1]);
-
-			if ( fDF < 1 || fChi < 0 || fDF > Math.pow(10, 10)){
-				return  new cError(cErrorType.not_numeric);
-			}
-
-			var res = getChiDist( fChi, fDF);
-			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
-		};
-
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cCHISQ_DIST_RT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(x, deg_freedom)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2897,64 +2864,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cF_INV_RT() {
-		cBaseFunction.call(this, "F.INV.RT");
-	}
-	//clone cFINV formula
-	cF_INV_RT.prototype = Object.create(cBaseFunction.prototype);
-	cF_INV_RT.prototype.constructor = cF_INV_RT;
-	cF_INV_RT.prototype.argumentsMin = 3;
-	cF_INV_RT.prototype.argumentsMax = 3;
-	cF_INV_RT.prototype.Calculate = function (arg) {
-		var oArguments = this._prepareArguments(arg, arguments[1], true);
-		var argClone = oArguments.args;
-
-		argClone[0] = argClone[0].tocNumber();
-		argClone[1] = argClone[1].tocNumber();
-		argClone[2] = argClone[2].tocNumber();
-
-		var argError;
-		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
-		}
-
-		var calcFDist = function(argArray){
-			var fP = argArray[0];
-			var fF1 = parseInt(argArray[1]);
-			var fF2 = parseInt(argArray[2]);
-
-			if (fP <= 0 || fF1 < 1 || fF2 < 1 || fF1 >= 1.0E10 || fF2 >= 1.0E10 || fP > 1){
-				return new cError(cErrorType.not_numeric);
-			}
-
-			var aFunc = new FDISTFUNCTION(fP, fF1, fF2);
-			var oVal = iterateInverse( aFunc, fF1*0.5, fF1 );
-			var bConvError = oVal.bError;
-
-			if (bConvError){
-				return new cError(cErrorType.not_numeric);
-			}
-
-			var res = oVal.val;
-			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
-		};
-
-		if (argClone[1].getValue() < 1 ){
-			return this.value = new cError(cErrorType.not_numeric);
-		}
-
-		return this.value = this._findArrayInNumberArguments(oArguments, calcFDist);
-	};
-	cF_INV_RT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(probability, deg_freedom1, deg_freedom2)"
-		};
-	};
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cFINV() {
 		cBaseFunction.call(this, "FINV");
 	}
@@ -3008,6 +2917,18 @@
 			name: this.name, args: "(probability, deg_freedom1, deg_freedom2)"
 		};
 	};
+
+	/**
+	* @constructor
+	* @extends {cFINV}
+	*/
+	function cF_INV_RT() {
+		cFINV.call(this);
+		this.name = "F.INV.RT";
+	}
+
+	 cF_INV_RT.prototype = Object.create(cFINV.prototype);
+	 cF_INV_RT.prototype.constructor = cF_INV_RT;
 
 	/**
 	 * @constructor
@@ -3349,125 +3270,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	//CLONE cGAMMA_DIST FUNCTION
-	function cGAMMADIST() {
-		this.name = "GAMMADIST";
-		this.value = null;
-		this.argumentsCurrent = 0;
-	}
-
-	cGAMMADIST.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMADIST.prototype.constructor = cGAMMADIST;
-	cGAMMADIST.prototype.argumentsMin = 4;
-	cGAMMADIST.prototype.argumentsMax = 4;
-	cGAMMADIST.prototype.Calculate = function (arg) {
-		var oArguments = this._prepareArguments(arg, arguments[1], true);
-		var argClone = oArguments.args;
-
-		argClone[0] = argClone[0].tocNumber();
-		argClone[1] = argClone[1].tocNumber();
-		argClone[2] = argClone[2].tocNumber();
-		argClone[3] = argClone[3].tocNumber();
-
-		var argError;
-		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
-		}
-
-		var calcGamma = function(argArray){
-			var fX = argArray[0];
-			var fAlpha = argArray[1];
-			var fBeta = argArray[2];
-			var bCumulative = argArray[3];
-
-			var res = null;
-			if ((fX < 0) || fAlpha <= 0 || fBeta <= 0){
-				return new cError(cErrorType.not_numeric);
-			}
-			else
-			{
-				if (bCumulative) {
-					res = getGammaDist( fX, fAlpha, fBeta );
-				}else {
-					res = getGammaDistPDF( fX, fAlpha, fBeta );
-				}
-			}
-
-			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
-		};
-
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
-	};
-	cGAMMADIST.prototype.getInfo = function () {
-		return {name: this.name, args: "(x, alpha, beta, cumulative )"}
-	};
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	//CLONE cGAMMA_INV FUNCTION
-	function cGAMMAINV() {
-		this.name = "GAMMAINV";
-		this.value = null;
-		this.argumentsCurrent = 0;
-	}
-
-	cGAMMAINV.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMAINV.prototype.constructor = cGAMMAINV;
-	cGAMMAINV.prototype.argumentsMin = 3;
-	cGAMMAINV.prototype.argumentsMax = 3;
-	cGAMMAINV.prototype.Calculate = function (arg) {
-		var oArguments = this._prepareArguments(arg, arguments[1], true);
-		var argClone = oArguments.args;
-
-		argClone[0] = argClone[0].tocNumber();
-		argClone[1] = argClone[1].tocNumber();
-		argClone[2] = argClone[2].tocNumber();
-
-		var argError;
-		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
-		}
-
-		var calcGamma = function(argArray){
-			var fP = argArray[0];
-			var fAlpha = argArray[1];
-			var fBeta = argArray[2];
-
-			if (fAlpha <= 0 || fBeta <= 0 || fP < 0 || fP >= 1 ){
-				return new cError(cErrorType.not_numeric);
-			}
-
-			var res = null;
-			if (fP === 0){
-				res = 0;
-			}else {
-				var aFunc = new GAMMADISTFUNCTION(fP, fAlpha, fBeta);
-				var fStart = fAlpha * fBeta;
-				var oVal = iterateInverse(aFunc, fStart * 0.5, fStart);
-				var bConvError = oVal.bError;
-
-				if (bConvError){
-					return new cError(cErrorType.not_numeric);
-					//SetError(FormulaError::NoConvergence);
-				}
-				res = oVal.val;
-			}
-
-			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
-		};
-
-		return this.value = this._findArrayInNumberArguments(oArguments, calcGamma);
-	};
-	cGAMMAINV.prototype.getInfo = function () {
-		return {name: this.name, args: "(probability, alpha, beta )"}
-	};
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cGAMMA_DIST() {
 		this.name = "GAMMA.DIST";
 		this.value = null;
@@ -3522,6 +3324,18 @@
 
 	/**
 	 * @constructor
+	 * @extends {cGAMMA_DIST}
+	 */
+	function cGAMMADIST() {
+		cGAMMA_DIST.call(this);
+		this.name = "GAMMADIST";
+	}
+
+	cGAMMADIST.prototype = Object.create(cGAMMA_DIST.prototype);
+	cGAMMADIST.prototype.constructor = cGAMMADIST;
+
+	/**
+	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cGAMMA_INV() {
@@ -3534,6 +3348,7 @@
 	cGAMMA_INV.prototype.constructor = cGAMMA_INV;
 	cGAMMA_INV.prototype.argumentsMin = 3;
 	cGAMMA_INV.prototype.argumentsMax = 3;
+	cGAMMA_INV.prototype.isXLFN = true;
 	cGAMMA_INV.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
@@ -3580,6 +3395,18 @@
 	cGAMMA_INV.prototype.getInfo = function () {
 		return {name: this.name, args: "(probability, alpha, beta )"}
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cGAMMA_INV}
+	 */
+	function cGAMMAINV() {
+		cGAMMA_INV.call(this);
+		this.name = "GAMMAINV";
+	}
+
+	cGAMMAINV.prototype = Object.create(cGAMMA_INV.prototype);
+	cGAMMAINV.prototype.constructor = cGAMMAINV;
 
 	/**
 	 * @constructor
@@ -7083,56 +6910,15 @@
 
 	/**
 	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
+	 * @extends {cT_INV_2T}
 	 */
 	function cTINV() {
-		cBaseFunction.call(this, "TINV");
+		cT_INV_2T.call(this);
+		this.name = "TINV";
 	}
-	//clone T.INV.2T
-	cTINV.prototype = Object.create(cBaseFunction.prototype);
+
+	cTINV.prototype = Object.create(cT_INV_2T.prototype);
 	cTINV.prototype.constructor = cTINV;
-	cTINV.prototype.argumentsMin = 2;
-	cTINV.prototype.argumentsMax = 2;
-	cTINV.prototype.Calculate = function (arg) {
-		var oArguments = this._prepareArguments(arg, arguments[1], true);
-		var argClone = oArguments.args;
-
-		argClone[0] = argClone[0].tocNumber();
-		argClone[1] = argClone[1].tocNumber();
-
-		var argError;
-		if (argError = this._checkErrorArg(argClone)) {
-			return this.value = argError;
-		}
-
-		var calcTDist = function(argArray){
-			var fP = argArray[0];
-			var fDF = parseInt(argArray[1]);
-
-			//ms игнорирует услвие fP > 1. сделал как в документации
-			if ( fDF < 1.0 || fP <= 0 || fP > 1 ){
-				return  new cError(cErrorType.not_numeric);
-			}
-
-			var aFunc = new TDISTFUNCTION(fP, fDF, 2);
-			var oVal = iterateInverse(aFunc, fDF * 0.5, fDF);
-			var bConvError = oVal.bError;
-			var res = oVal.val;
-
-			if (bConvError){
-				return new cError(cErrorType.not_numeric);
-			}
-
-			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
-		};
-
-		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
-	};
-	cTINV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(probability, deg_freedom)"
-		};
-	};
 
 	/**
 	 * @constructor
