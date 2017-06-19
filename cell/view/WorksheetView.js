@@ -2979,7 +2979,8 @@
 
 			if (borderLeft && borderLeft.r.w) {
 				border = borderLeft.r;
-			} else if (borderRight && borderRight.l.w) {
+			}
+			if (borderRight && borderRight.l.w && (!border || border.w < borderRight.l.w)) {
 				border = borderRight.l;
 			}
 			if (!border || border.w < 1) {
@@ -3004,7 +3005,8 @@
 
 			if (borderTop && borderTop.b.w) {
 				border = borderTop.b;
-			} else if (borderBottom && borderBottom.t.w) {
+			}
+			if (borderBottom && borderBottom.t.w && (!border || border.w < borderBottom.t.w)) {
 				border = borderBottom.t;
 			}
 
