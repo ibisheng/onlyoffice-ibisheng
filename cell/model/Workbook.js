@@ -4866,7 +4866,7 @@
 				cells.setTableStyle(dxf);
 			}
 
-			pivotTable.forEachColItems((function (thisArg, _pivotRange, _style, _styleInfo, _countC, _countR) {
+			pivotTable.forEachColItems((function (thisArg, _pivotRange, _style, _styleInfo, _countC, startCol) {
 				return function (item, index) {
 					var _dxf, _cells, r, _col;
 					if (st_itemtypeGRAND === item.t) {
@@ -4885,18 +4885,18 @@
 					}
 					_dxf = _dxf && _dxf.dxf;
 					if (_dxf) {
-						_col = _pivotRange.c1 + Math.max(1, _countR) + index;
+						_col = startCol + index;
 						_cells = thisArg.getRange3(_pivotRange.r1 + 1, _col, _pivotRange.r2, _col);
 						_cells.setTableStyle(_dxf);
 					}
 				};
-			})(this, pivotRange, style, styleInfo, countC, countR));
-			pivotTable.forEachRowItems((function (thisArg, _pivotRange, _style, _countC, _countR) {
+			})(this, pivotRange, style, styleInfo, countC, pivotRange.c1 + Math.max(1, countR)));
+			pivotTable.forEachRowItems((function (thisArg, _pivotRange, _style, _styleInfo, _countR, startRow) {
 				return function (item, index) {
 					var _dxf, _cells, r, _row;
 					if (st_itemtypeGRAND === item.t) {
 						_dxf = _style.totalRow;
-					} else {
+					} else if (_styleInfo.showRowHeaders) {
 						r = item.r || 0;
 						if (r + 1 !== _countR) {
 							if (0 === r) {
@@ -4910,12 +4910,12 @@
 					}
 					_dxf = _dxf && _dxf.dxf;
 					if (_dxf) {
-						_row = _pivotRange.r1 + _countC + 1 + index;
+						_row = startRow + index;
 						_cells = thisArg.getRange3(_row, _pivotRange.c1, _row, _pivotRange.c2);
 						_cells.setTableStyle(_dxf);
 					}
 				};
-			})(this, pivotRange, style, countC, countR));
+			})(this, pivotRange, style, styleInfo, pivotTable.getRowFieldsCount(), pivotRange.r1 + countC + 1));
 		}
 	};
 	Worksheet.prototype.inPivotTable = function (range) {
