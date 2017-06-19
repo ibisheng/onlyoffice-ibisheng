@@ -4442,9 +4442,9 @@
             }
             isMerged = true;
         }
-
-        var angle = c.getAngle();
-        var va = c.getAlignVertical();
+        var align = c.getAlign();
+        var angle = align.getAngle();
+        var va = align.getAlignVertical();
         if (this._isCellEmptyTextString(c)) {
             if (!angle && c.isNotDefaultFont()) {
                 // Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
@@ -4530,7 +4530,7 @@
 
         // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
         str = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
-        var ha = c.getAlignHorizontalByValue();
+        var ha = c.getAlignHorizontalByValue(align.getAlignHorizontal());
         var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ?
           this._calcMaxWidth(col, row, mc) : undefined;
         tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
@@ -4838,10 +4838,11 @@
         var c = row !== undefined ? this._getCell(col, row) : col;
         var fl = new CellFlags();
         if (null !== c) {
-            fl.wrapText = c.getWrap();
-            fl.shrinkToFit = fl.wrapText ? false : c.getShrinkToFit();
+            var align = c.getAlign();
+            fl.wrapText = align.getWrap();
+            fl.shrinkToFit = fl.wrapText ? false : align.getShrinkToFit();
             fl.merged = c.hasMerged();
-            fl.textAlign = c.getAlignHorizontalByValue();
+            fl.textAlign = c.getAlignHorizontalByValue(align.getAlignHorizontal());
         }
         return fl;
     };
@@ -6949,6 +6950,7 @@
 		var fa = font.getVerticalAlign();
 		var fc = font.getColor();
         var bg = c.getFill();
+        var align = c.getAlign();
         var cellType = c.getType();
         var isNumberFormat = (!cellType || CellValueType.Number === cellType);
 
@@ -6958,8 +6960,8 @@
 
         cell_info.text = c.getValueForEdit();
 
-		cell_info.halign = AscCommonExcel.horizontalAlignToString(c.getAlignHorizontal());
-		cell_info.valign = AscCommonExcel.verticalAlignToString(c.getAlignVertical());
+		cell_info.halign = AscCommonExcel.horizontalAlignToString(align.getAlignHorizontal());
+		cell_info.valign = AscCommonExcel.verticalAlignToString(align.getAlignVertical());
 
         var tablePartsOptions = selectionRange.isSingleRange() ?
           this.model.autoFilters.searchRangeInTableParts(selectionRange.getLast()) : -2;
@@ -7001,11 +7003,11 @@
         }
 
         cell_info.styleName = c.getStyleName();
-        cell_info.angle = c.getAngle();
+        cell_info.angle = align.getAngle();
 
         cell_info.flags = new AscCommonExcel.asc_CCellFlag();
-        cell_info.flags.shrinkToFit = c.getShrinkToFit();
-        cell_info.flags.wrapText = c.getWrap();
+        cell_info.flags.shrinkToFit = align.getShrinkToFit();
+        cell_info.flags.wrapText = align.getWrap();
 
         // ToDo activeRange type
         cell_info.flags.selectionType = selectionRange.getLast().type;
@@ -9595,10 +9597,11 @@
 			
 			if (!isOneMerge)//settings for cell
 			{
+				var align = newVal.getAlign();
 				//vertical align
-				pastedRangeProps.alignVertical = newVal.getAlignVertical();
+				pastedRangeProps.alignVertical = align.getAlignVertical();
 				//horizontal align
-				pastedRangeProps.alignHorizontal = newVal.getAlignHorizontal();
+				pastedRangeProps.alignHorizontal = align.getAlignHorizontal();
 				
 				//borders
 				var fullBorders;
@@ -9625,9 +9628,9 @@
 				pastedRangeProps.fill = newVal.getFill();
 				//wrap
 				//range.setWrap(newVal.getWrap());
-				pastedRangeProps.wrap = newVal.getWrap();
+				pastedRangeProps.wrap = align.getWrap();
 				//angle
-				pastedRangeProps.angle = newVal.getAngle();
+				pastedRangeProps.angle = align.getAngle();
 				//hyperlink
 				pastedRangeProps.hyperlinkObj = newVal.getHyperlink();
 			}

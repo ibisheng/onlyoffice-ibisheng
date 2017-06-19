@@ -6973,72 +6973,9 @@
 		}
 		return g_oDefaultFormat.Font;
 	};
-	Range.prototype.getAlignVertical=function(){
-		var nRow = this.bbox.r1;
-		var nCol = this.bbox.c1;
-		var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-		if(null != cell)
-		{
-			var xfs = cell.getCompiledStyle();
-			if(null != xfs)
-			{
-				if(null != xfs.align)
-					return xfs.align.ver;
-				else
-					return g_oDefaultFormat.AlignAbs.ver;
-			}
-		}
-		else
-		{
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.align)
-				return row.xfs.align.ver;
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.align)
-				return col.xfs.align.ver;
-			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
-			if (null != xfs && null != xfs.align) {
-				return xfs.align.ver;
-			}
-		}
-		return g_oDefaultFormat.Align.ver;
-	};
-	Range.prototype.getAlignHorizontal=function(){
-		var nRow = this.bbox.r1;
-		var nCol = this.bbox.c1;
-		var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-		if(null != cell)
-		{
-			var xfs = cell.getCompiledStyle();
-			if(null != xfs)
-			{
-				if(null != xfs.align)
-					return xfs.align.hor;
-				else
-					return g_oDefaultFormat.AlignAbs.hor;
-			}
-		}
-		else
-		{
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.align)
-				return row.xfs.align.hor;
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.align)
-				return col.xfs.align.hor;
-			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
-			if (null != xfs && null != xfs.align) {
-				return xfs.align.hor;
-			}
-		}
-		return g_oDefaultFormat.Align.hor;
-	};
-	Range.prototype.getAlignHorizontalByValue=function(){
+	Range.prototype.getAlignHorizontalByValue=function(align){
 		//возвращает Align в зависимости от значния в ячейке
 		//values:  none, center, justify, left , right, null
-		var align = this.getAlignHorizontal();
 		if(null == align){
 			//пытаемся определить по значению
 			var nRow = this.bbox.r1;
@@ -7179,69 +7116,7 @@
 		}
 		return borders;
 	};
-	Range.prototype.getShrinkToFit=function(){
-		var nRow = this.bbox.r1;
-		var nCol = this.bbox.c1;
-		var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-		if(null != cell)
-		{
-			var xfs = cell.getCompiledStyle();
-			if(null != xfs)
-			{
-				if(null != xfs.align)
-					return xfs.align.shrink;
-				else
-					return g_oDefaultFormat.AlignAbs.shrink;
-			}
-		}
-		else
-		{
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.align)
-				return row.xfs.align.shrink;
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.align)
-				return col.xfs.align.shrink;
-			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
-			if (null != xfs && null != xfs.align) {
-				return xfs.align.shrink;
-			}
-		}
-		return g_oDefaultFormat.Align.shrink;
-	};
-	Range.prototype.getWrapByAlign = function (align) {
-		// Для justify wrap всегда true
-		return AscCommon.align_Justify === align.hor ? true : align.wrap;
-	};
-	Range.prototype.getWrap=function(){
-		var nRow = this.bbox.r1;
-		var nCol = this.bbox.c1;
-		var cell = this.worksheet._getCellNoEmpty(nRow, nCol);
-		if(null != cell) {
-			var xfs = cell.getCompiledStyle();
-			if(null != xfs) {
-				if(null != xfs.align)
-					return this.getWrapByAlign(xfs.align);
-				else
-					return this.getWrapByAlign(g_oDefaultFormat.AlignAbs);
-			}
-		} else {
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.align)
-				return this.getWrapByAlign(row.xfs.align);
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.align)
-				return this.getWrapByAlign(col.xfs.align);
-			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
-			if (null != xfs && null != xfs.align) {
-				return this.getWrapByAlign(xfs.align);
-			}
-		}
-		return this.getWrapByAlign(g_oDefaultFormat.Align);
-	};
-	Range.prototype.getAngle=function(){
+	Range.prototype.getAlign=function(){
 		//угол от -90 до 90 против часовой стрелки от оси OX
 		var nRow = this.bbox.r1;
 		var nCol = this.bbox.c1;
@@ -7252,9 +7127,9 @@
 			if(null != xfs)
 			{
 				if(null != xfs.align)
-					return angleFormatToInterface(xfs.align.angle);
+					return xfs.align;
 				else
-					return angleFormatToInterface(g_oDefaultFormat.AlignAbs.angle);
+					return g_oDefaultFormat.AlignAbs;
 			}
 		}
 		else
@@ -7262,16 +7137,16 @@
 			//стили столбов и колонок
 			var row = this.worksheet._getRowNoEmpty(nRow);
 			if(row && null != row.xfs && null != row.xfs.align)
-				return angleFormatToInterface(row.xfs.align.angle);
+				return row.xfs.align;
 			var col = this.worksheet._getColNoEmptyWithAll(nCol);
 			if(null != col && null != col.xfs && null != col.xfs.align)
-				return angleFormatToInterface(col.xfs.align.angle);
+				return col.xfs.align;
 			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
 			if (null != xfs && null != xfs.align) {
-				return angleFormatToInterface(xfs.align.angle);
+				return xfs.align;
 			}
 		}
-		return angleFormatToInterface(g_oDefaultFormat.Align.angle);
+		return g_oDefaultFormat.Align;
 	};
 	Range.prototype.hasMerged=function(){
 		var aMerged = this.worksheet.mergeManager.get(this.bbox);

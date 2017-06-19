@@ -1765,7 +1765,7 @@
 					{
 						var newFill = new AscCommonExcel.Fill();
 						newFill.bg = color;
-						newDxf.fill = styleManager.addFill(newDxf);
+						newDxf.fill = styleManager.addFill(newFill);
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyCellColor;
 					}
 					else

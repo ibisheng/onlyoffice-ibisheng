@@ -2036,6 +2036,26 @@ Align.prototype =
 			case this.Properties.wrap: return this.wrap;break;
 		}
 	},
+	getAngle: function() {
+		var nRes = 0;
+		if (0 <= this.angle && this.angle <= 180) {
+			nRes = this.angle <= 90 ? this.angle : 90 - this.angle;
+		}
+		return nRes;
+	},
+	getWrap: function() {
+		// Для justify wrap всегда true
+		return AscCommon.align_Justify === this.hor ? true : this.wrap;
+	},
+	getShrinkToFit: function() {
+		return this.shrink;
+	},
+	getAlignHorizontal: function() {
+		return this.hor;
+	},
+	getAlignVertical: function() {
+		return this.ver;
+	},
 	setProperty : function(nType, value)
 	{
 		switch(nType)
