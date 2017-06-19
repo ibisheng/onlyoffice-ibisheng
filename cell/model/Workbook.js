@@ -4804,12 +4804,17 @@
 			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
 				pos = pivotTable.pageFieldsPositions[j];
 				cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
-				cells.setTableStyle(dxfLabels || wholeStyle);
+				cells.clearTableStyle();
+				cells.setTableStyle(wholeStyle);
+				cells.setTableStyle(dxfLabels);
 				cells = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
-				cells.setTableStyle(dxfValues || wholeStyle);
+				cells.clearTableStyle();
+				cells.setTableStyle(wholeStyle);
+				cells.setTableStyle(dxfValues);
 			}
 
 			cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
+			cells.clearTableStyle();
 			cells.setTableStyle(wholeStyle);
 
 			countC = pivotTable.getColumnFieldsCount();
@@ -4854,25 +4859,23 @@
 				}
 			}
 
-			if (styleInfo.showRowHeaders && countR) {
+			dxf = style.firstColumn && style.firstColumn.dxf;
+			if (styleInfo.showRowHeaders && countR && dxf) {
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2,
 					pivotRange.c1 + Math.max(0, countR - 1));
-				dxf = style.firstColumn && style.firstColumn.dxf;
 				cells.setTableStyle(dxf);
 			}
 
-			if (styleInfo.showColHeaders) {
+			dxf = style.headerRow && style.headerRow.dxf;
+			if (styleInfo.showColHeaders && dxf) {
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC, pivotRange.c2);
-				dxf = style.headerRow && style.headerRow.dxf;
 				cells.setTableStyle(dxf);
-				if (styleInfo.showRowHeaders && countC) {
-					cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC - 1,
-						pivotRange.c1 + Math.max(0, countR - 1));
-					dxf = style.firstHeaderCell && style.firstHeaderCell.dxf;
-					if (dxf) {
-						cells.setTableStyle(dxf);
-					}
-				}
+			}
+			dxf = style.firstHeaderCell && style.firstHeaderCell.dxf;
+			if (styleInfo.showColHeaders && styleInfo.showRowHeaders && countC && dxf) {
+				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC - 1,
+					pivotRange.c1 + Math.max(0, countR - 1));
+				cells.setTableStyle(dxf);
 			}
 
 			pivotTable.forEachColItems((function (thisArg, _pivotRange, _style, _styleInfo, _countC, _countR) {
@@ -6181,10 +6184,11 @@
 							  cell.setCellStyle(val);
 						  });
 	};
+	Range.prototype.clearTableStyle = function() {
+		this.worksheet.sheetMergedStyles.clearTablePivotStyle(this.bbox);
+	};
 	Range.prototype.setTableStyle = function(xf, stripe) {
-		if (null == xf) {
-			this.worksheet.sheetMergedStyles.clearTablePivotStyle(this.bbox);
-		} else {
+		if (xf) {
 			this.worksheet.sheetMergedStyles.setTablePivotStyle(this.bbox, xf, stripe);
 		}
 	};
