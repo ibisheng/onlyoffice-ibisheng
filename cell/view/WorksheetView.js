@@ -3293,10 +3293,6 @@
 			}
 			ctx.stroke();
 
-			if (0 < row) {
-				ctx.drawImage(this.settings.frozenImageH, 0, 0, 1 * this.width_1px, 10 * this.height_1px, 0,
-					this.rows[row].top, ctx.getWidth(), this.height_1px * 10);
-			}
 		} else if (this.model.sheetViews[0].asc_getShowRowColHeaders()) {
 			fHorLine.apply(ctx, [0, this.headersHeight, this.headersWidth]);
 			fVerLine.apply(ctx, [this.headersWidth, 0, this.headersHeight]);
