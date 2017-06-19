@@ -4869,7 +4869,7 @@
 			pivotTable.forEachColItems((function (thisArg, _pivotRange, _style, _styleInfo, _countC, startCol) {
 				return function (item, index) {
 					var _dxf, _cells, r, _col;
-					if (st_itemtypeGRAND === item.t) {
+					if (st_itemtypeGRAND === item.t || 0 === _countC) {
 						_dxf = _style.lastColumn;
 					} else if (_styleInfo.showRowHeaders) {
 						r = item.r || 0;
@@ -4894,7 +4894,7 @@
 			pivotTable.forEachRowItems((function (thisArg, _pivotRange, _style, _styleInfo, _countR, startRow) {
 				return function (item, index) {
 					var _dxf, _cells, r, _row;
-					if (st_itemtypeGRAND === item.t) {
+					if (st_itemtypeGRAND === item.t || 0 === _countR) {
 						_dxf = _style.totalRow;
 					} else if (_styleInfo.showRowHeaders) {
 						r = item.r || 0;
