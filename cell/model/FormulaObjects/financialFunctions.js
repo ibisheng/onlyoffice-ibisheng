@@ -630,12 +630,6 @@
 		res *= par * rate / frequency;
 		return this.value = new cNumber(res);
 	};
-	cACCRINT.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( issue , first-interest , settlement , rate , [ par ] , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -725,11 +719,6 @@
 		res *= rate * par;
 
 		return this.value = new cNumber(res)
-	};
-	cACCRINTM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( issue , settlement , rate , [ [ par ] [ , [ basis ] ] ] )"
-		};
 	};
 
 	/**
@@ -924,11 +913,6 @@
 		return this.value;
 
 	};
-	cAMORDEGRC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , date-purchased , first-period , salvage , period , rate [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1060,11 +1044,6 @@
 		}
 
 	};
-	cAMORLINC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , date-purchased , first-period , salvage , period , rate [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1144,11 +1123,6 @@
 		return this.value = new cNumber(getcoupdaybs(settl, matur, frequency, basis));
 
 	};
-	cCOUPDAYBS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1227,11 +1201,6 @@
 		return this.value = new cNumber(getcoupdays(settl, matur, frequency, basis));
 
 	};
-	cCOUPDAYS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1309,11 +1278,6 @@
 
 		return this.value = new cNumber(getcoupdaysnc(new Date(settl), new Date(matur), frequency, basis));
 
-	};
-	cCOUPDAYSNC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
 	};
 
 	/**
@@ -1395,11 +1359,6 @@
 		return this.value;
 
 	};
-	cCOUPNCD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1479,11 +1438,6 @@
 
 		return this.value = new cNumber(res);
 
-	};
-	cCOUPNUM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
 	};
 
 	/**
@@ -1566,11 +1520,6 @@
 		this.value.numFormat = 14;
 		return this.value;
 
-	};
-	cCOUPPCD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
 	};
 
 	/**
@@ -1688,11 +1637,6 @@
 
 		return this.value = new cNumber(ipmt);
 
-	};
-	cCUMIPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pv , start-period , end-period , type )"
-		};
 	};
 
 	/**
@@ -1813,11 +1757,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cCUMPRINC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pv , start-period , end-period , type )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1930,11 +1869,6 @@
 		return this.value;
 
 	};
-	cDB.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , salvage , life , period [ , [ month ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2024,11 +1958,6 @@
 		this.value = new cNumber(getDDB(cost, salvage, life, period, factor));
 		return this.value;
 
-	};
-	cDDB.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , salvage , life , period [ , factor ] )"
-		};
 	};
 
 	/**
@@ -2121,11 +2050,6 @@
 		return this.value;
 
 	};
-	cDISC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , pr , redemption [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2189,11 +2113,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cDOLLARDE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( fractional-dollar , fraction )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2256,11 +2175,6 @@
 
 		return this.value = new cNumber(res);
 
-	};
-	cDOLLARFR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( decimal-dollar , fraction )"
-		};
 	};
 
 	/**
@@ -2362,11 +2276,6 @@
 		return this.value = new cNumber(getduration(settl, matur, coupon, yld, frequency, basis));
 
 	};
-	cDURATION.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , coupon , yld , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2416,11 +2325,6 @@
 		}
 
 		return this.value = new cNumber(Math.pow((1 + nominalRate / npery), npery) - 1);
-	};
-	cEFFECT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( nominal-rate , npery )"
-		};
 	};
 
 	/**
@@ -2509,11 +2413,6 @@
 
 		return this.value = new cNumber(res);
 	};
-	cFV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pmt [ , [ pv ] [ ,[ type ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2569,11 +2468,6 @@
 
 		return this.value = new cNumber(princ);
 
-	};
-	cFVSCHEDULE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( principal , schedule )"
-		};
 	};
 
 	/**
@@ -2666,11 +2560,6 @@
 		this.value.numFormat = 10;
 		return this.value;
 
-	};
-	cINTRATE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , pr , redemption [ , [ basis ] ] )"
-		};
 	};
 
 	/**
@@ -2772,11 +2661,6 @@
 		this.value = new cNumber(getIPMT(rate, per, pv, type, res));
 //    this.value.numFormat = 9;
 		return this.value;
-	};
-	cIPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , per , nper , pv [ , [ fv ] [ , [ type ] ] ] )"
-		};
 	};
 
 	/**
@@ -2909,11 +2793,6 @@
 		return this.value;
 
 	};
-	cIRR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( values [ , [ guess ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2980,11 +2859,6 @@
 		}
 
 		return this.value = new cNumber(pv.getValue() * rate.getValue() * (per.getValue() / nper.getValue() - 1));
-	};
-	cISPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , per , nper , pv )"
-		};
 	};
 
 	/**
@@ -3089,11 +2963,6 @@
 
 		return this.value = new cNumber(duration);
 
-	};
-	cMDURATION.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , coupon , yld , frequency [ , [ basis ] ] )"
-		};
 	};
 
 	/**
@@ -3204,11 +3073,6 @@
 		return this.value;
 
 	};
-	cMIRR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( values , finance-rate , reinvest-rate )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3262,11 +3126,6 @@
 //    this.value.numFormat = 9;
 		return this.value;
 
-	};
-	cNOMINAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( effect-rate , npery )"
-		};
 	};
 
 	/**
@@ -3359,11 +3218,6 @@
 
 		return this.value = new cNumber(res);
 	};
-	cNPER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , pmt , pv [ , [ fv ] [ , [ type ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3436,11 +3290,6 @@
 
 		return this.value = new cNumber(res);
 
-	};
-	cNPV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , argument-list )"
-		};
 	};
 
 	/**
@@ -3578,12 +3427,6 @@
 		this.value = new cNumber(oddFPrice(settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis));
 		return this.value;
 
-	};
-	cODDFPRICE.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( settlement , maturity , issue , first-coupon , rate , yld , redemption , frequency [ , [ basis ] ] )"
-		};
 	};
 
 	/**
@@ -3788,12 +3631,6 @@
 		return this.value;
 
 	};
-	cODDFYIELD.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( settlement , maturity , issue , first-coupon , rate , pr , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3926,12 +3763,6 @@
 		this.value = new cNumber(res);
 		return this.value;
 
-	};
-	cODDLPRICE.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( settlement , maturity , last-interest , rate , yld , redemption , frequency [ , [ basis ] ] )"
-		};
 	};
 
 	/**
@@ -4067,12 +3898,6 @@
 		return this.value;
 
 	};
-	cODDLYIELD.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( settlement , maturity , last-interest , rate , pr , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4164,11 +3989,6 @@
 		}
 
 		return this.value = new cNumber(res);
-	};
-	cPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pv [ , [ fv ] [ ,[ type ] ] ] )"
-		};
 	};
 
 	/**
@@ -4272,11 +4092,6 @@
 		this.value = new cNumber(res);
 //    this.value.numFormat = 9;
 		return this.value;
-	};
-	cPPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , per , nper , pv [ , [ fv ] [ , [ type ] ] ] )"
-		};
 	};
 
 	/**
@@ -4389,11 +4204,6 @@
 		return this.value = new cNumber(getprice(settl, matur, rate, yld, redemption, frequency, basis));
 
 	};
-	cPRICE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , rate , yld , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4483,11 +4293,6 @@
 
 		return this.value = new cNumber(res);
 
-	};
-	cPRICEDISC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , discount , redemption [ , [ basis ] ] )"
-		};
 	};
 
 	/**
@@ -4599,11 +4404,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cPRICEMAT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , issue , rate , yld [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4690,11 +4490,6 @@
 		}
 
 		return this.value = new cNumber(res);
-	};
-	cPV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pmt [ , [ fv ] [ ,[ type ] ] ] )"
-		};
 	};
 
 	/**
@@ -4794,11 +4589,6 @@
 		this.value.numFormat = 9;
 		return this.value;
 	};
-	cRATE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( nper , pmt , pv  [ , [ [ fv ] [ , [ [ type ] [ , [ guess ] ] ] ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4890,11 +4680,6 @@
 		return this.value;
 
 	};
-	cRECEIVED.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , investment , discount [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4957,11 +4742,6 @@
 		this.value = new cNumber(( cost - salvage ) / life);
 		return this.value;
 
-	};
-	cSLN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , salvage , life )"
-		};
 	};
 
 	/**
@@ -5039,11 +4819,6 @@
 		res /= (life + 1) * life;
 
 		return this.value = new cNumber(res);
-	};
-	cSYD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , salvage , life , per )"
-		};
 	};
 
 	/**
@@ -5123,11 +4898,6 @@
 		return this.value;
 
 	};
-	cTBILLEQ.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , discount )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5201,11 +4971,6 @@
 		this.value = new cNumber(100 * ( 1 - discount / 360 ));
 		return this.value;
 
-	};
-	cTBILLPRICE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , discount )"
-		};
 	};
 
 	/**
@@ -5281,11 +5046,6 @@
 		this.value.numFormat = 9;
 		return this.value;
 
-	};
-	cTBILLYIELD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , pr )"
-		};
 	};
 
 	/**
@@ -5459,12 +5219,6 @@
 		}
 
 		return this.value = new cNumber(res);
-	};
-	cVDB.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( cost , salvage , life , start-period , end-period [ , [ [ factor ] [ , [ no-switch-flag ] ] ] ] ] )"
-		};
 	};
 
 	/**
@@ -5716,11 +5470,6 @@
 		return this.value;
 
 	};
-	cXIRR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( values , dates [ , [ guess ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5849,11 +5598,6 @@
 		return this.value = xnpv(arg0, valueArray, dateArray);
 
 	};
-	cXNPV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , values , dates  )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5967,11 +5711,6 @@
 		return this.value;
 
 	};
-	cYIELD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , rate , pr , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6064,11 +5803,6 @@
 		this.value.numFormat = 10;
 		return this.value;
 
-	};
-	cYIELDDISC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , pr , redemption , [ , [ basis ] ] )"
-		};
 	};
 
 	/**
@@ -6173,11 +5907,6 @@
 		this.value.numFormat = 10;
 		return this.value;
 
-	};
-	cYIELDMAT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , issue , rate , pr [ , [ basis ] ] )"
-		};
 	};
 
 //----------------------------------------------------------export----------------------------------------------------

@@ -428,25 +428,9 @@ ParaField.prototype.Replace_MailMerge = function(_Value)
 
     return true;
 };
-ParaField.prototype.private_GetMappedRun = function(Value)
+ParaField.prototype.private_GetMappedRun = function(sValue)
 {
-    // Создаем ран и набиваем в него заданный текст.
-    var oRun = new ParaRun();
-
-    for (var Index = 0, Count = Value.length; Index < Count; Index++)
-    {
-        var Char = Value[Index], oText;
-        if (0x20 === Char)
-            oText = new ParaSpace();
-        else
-            oText = new ParaText(Value[Index]);
-
-        oRun.Add_ToContent(Index, oText);
-    }
-
-    oRun.Set_Pr(this.Get_FirstTextPr());
-
-    return oRun;
+	return this.CreateRunWithText(sValue);
 };
 ParaField.prototype.SetFormFieldName = function(sName)
 {
@@ -474,11 +458,7 @@ ParaField.prototype.GetValue = function()
 };
 ParaField.prototype.SetValue = function(sValue)
 {
-	var oRun = this.private_GetMappedRun(sValue);
-	oRun.Apply_TextPr(this.Get_TextPr(), undefined, true);
-	this.Remove_FromContent(0, this.Content.length);
-	this.Add_ToContent(0, oRun);
-	this.MoveCursorToStartPos();
+	this.ReplaceAllWithText(sValue);
 };
 ParaField.prototype.IsFillingForm = function()
 {

@@ -63,6 +63,9 @@
 		cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS, cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2,
 		cSUMXMY2, cTAN, cTANH, cTRUNC);
 
+	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
+	cFormulaFunctionGroup['NotRealised'].push(cECMA_CEILING);
+
 	var cSubTotalFunctionType = {
 		includes: {
 			AVERAGE: 1, COUNT: 2, COUNTA: 3, MAX: 4, MIN: 5, PRODUCT: 6, STDEV: 7, STDEVP: 8, SUM: 9, VAR: 10, VARP: 11
@@ -116,11 +119,6 @@
 		}
 		return this.value = arg0;
 	};
-	cABS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		}
-	};
 
 	/**
 	 * @constructor
@@ -159,11 +157,6 @@
 		}
 		return this.value = arg0;
 	};
-	cACOS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -201,11 +194,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cACOSH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -246,11 +234,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
-	cACOT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -289,11 +272,6 @@
 			var a = Math.atanh(1 / arg0.getValue());
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-	};
-	cACOTH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -357,11 +335,6 @@
 		var res = to_arabic(arg0.getValue());
 		return this.value = isNaN(res) ? new cError(cErrorType.wrong_value_type) : new cNumber(res);
 	};
-	cARABIC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( text )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -399,11 +372,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cASIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -443,11 +411,6 @@
 		}
 		return this.value = arg0;
 	};
-	cASINH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -485,11 +448,6 @@
 			var a = Math.atan(arg0.getValue());
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-	};
-	cATAN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -563,11 +521,6 @@
 						new cNumber(Math.atan2(arg1.getValue(), arg0.getValue()))
 		)
 	};
-	cATAN2.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, y )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -605,11 +558,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cATANH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -663,11 +611,6 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, base_math);
-	};
-	cBASE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number , radix [ , min_length ] )"
-		};
 	};
 
 	/**
@@ -765,11 +708,6 @@
 		return this.value = ceilingHelper(arg0.getValue(), arg1.getValue());
 
 	};
-	cCEILING.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, significance )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -822,11 +760,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, floor_math);
 	};
-	cCEILING_MATH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, significance, mode )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -868,11 +801,6 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, floorHelper);
-	};
-	cCEILING_PRECISE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, significance )"
-		};
 	};
 
 	/**
@@ -960,11 +888,6 @@
 
 		return this.value = new cNumber(Math.binomCoeff(arg0.getValue(), arg1.getValue()));
 	};
-	cCOMBIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number , number-chosen )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1008,11 +931,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, combinaCalculate);
 	};
-	cCOMBINA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number , number-chosen )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1051,11 +969,6 @@
 		}
 		return this.value = arg0;
 	};
-	cCOS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1093,11 +1006,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cCOSH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -1154,11 +1062,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
-	cCOT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1208,11 +1111,6 @@
 			var a = 1 / Math.tanh(arg0.getValue());
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-	};
-	cCOTH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -1269,11 +1167,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
-	cCSC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1323,11 +1216,6 @@
 			var a = 1 / Math.sinh(arg0.getValue());
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-	};
-	cCSCH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -1407,11 +1295,6 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, decimal_calculate, true);
 	};
-	cDECIMAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( text , radix )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1450,11 +1333,6 @@
 		}
 		return this.value = arg0;
 
-	};
-	cDEGREES.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( angle )"
-		};
 	};
 
 	/**
@@ -1528,11 +1406,6 @@
 		}
 		return this.value = new cError(cErrorType.wrong_value_type);
 	};
-	cEVEN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1572,11 +1445,6 @@
 			var a = Math.exp(arg0.getValue());
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-	};
-	cEXP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -1622,11 +1490,6 @@
 			return this.value = isNaN(a) || a == Infinity ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cFACT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -1691,11 +1554,6 @@
 			return this.value = isNaN(a) || a == Infinity ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cFACTDOUBLE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -1796,11 +1654,6 @@
 
 		return this.value = floorHelper(arg0.getValue(), arg1.getValue());
 	};
-	cFLOOR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, significance )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1842,11 +1695,6 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, floorHelper);
-	};
-	cFLOOR_PRECISE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, significance )"
-		};
 	};
 
 	/**
@@ -1899,11 +1747,6 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, floor_math);
-	};
-	cFLOOR_MATH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, significance, mode )"
-		};
 	};
 
 	/**
@@ -2000,11 +1843,6 @@
 		return this.value = new cNumber(_gcd);
 
 	};
-	cGCD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2046,11 +1884,6 @@
 		}
 
 		return this.value = new cNumber(Math.floor(arg0.getValue()));
-	};
-	cINT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -2094,11 +1927,6 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, floorHelper);
-	};
-	cISO_CEILING.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, significance )"
-		};
 	};
 
 	/**
@@ -2199,11 +2027,6 @@
 		return this.value = new cNumber(_lcm);
 
 	};
-	cLCM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2249,11 +2072,6 @@
 				return this.value = new cNumber(Math.log(arg0.getValue()));
 			}
 		}
-	};
-	cLN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -2346,11 +2164,6 @@
 
 		return this.value = new cNumber(Math.log(arg0.getValue()) / Math.log(arg1.getValue()));
 	};
-	cLOG.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x [ , base ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2396,11 +2209,6 @@
 				return this.value = new cNumber(Math.log10(arg0.getValue()));
 			}
 		}
-	};
-	cLOG10.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -2486,11 +2294,6 @@
 		} else {
 			return this.value = new cError(cErrorType.not_available);
 		}
-	};
-	cMDETERM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array )"
-		};
 	};
 
 	/**
@@ -2636,11 +2439,6 @@
 
 		return this.value = InverseMatrix(arg0);
 	};
-	cMINVERSE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2709,11 +2507,6 @@
 
 		return this.value = mult(arg0, arg1);
 
-	};
-	cMMULT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array1, array2 )"
-		};
 	};
 
 	/**
@@ -2800,11 +2593,6 @@
 		return this.value =
 			new cNumber((arg1.getValue() < 0 ? -1 : 1) * ( Math.abs(arg0.getValue()) % Math.abs(arg1.getValue()) ));
 
-	};
-	cMOD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, y )"
-		};
 	};
 
 	/**
@@ -2909,11 +2697,6 @@
 		multiple = arg1.getValue();
 		return this.value = new cNumber(mroundHelper(arg0.getValue() + arg1.getValue() / 2));
 	};
-	cMROUND.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, multiple )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3005,11 +2788,6 @@
 
 		return this.value = new cNumber(Math.fact(arg0.getValue()) / fact);
 	};
-	cMULTINOMIAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3071,11 +2849,6 @@
 		return this.value = new cError(cErrorType.wrong_value_type);
 
 	};
-	cODD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3092,11 +2865,6 @@
 	cPI.prototype.argumentsMax = 0;
 	cPI.prototype.Calculate = function () {
 		return new cNumber(Math.PI);
-	};
-	cPI.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "()"
-		}
 	};
 
 	/**
@@ -3179,11 +2947,6 @@
 		return this.value = powerHelper(arg0.getValue(), arg1.getValue());
 
 	};
-	cPOWER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x, y )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3233,11 +2996,6 @@
 
 		}
 		return this.value = arg0;
-	};
-	cPRODUCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**
@@ -3317,11 +3075,6 @@
 
 		return this.value = quotient(arg0, arg1);
 	};
-	cQUOTIENT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( dividend , divisor )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3364,11 +3117,6 @@
 		return this.value = arg0;
 
 	};
-	cRADIANS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( angle )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3386,11 +3134,6 @@
 	cRAND.prototype.ca = true;
 	cRAND.prototype.Calculate = function () {
 		return this.value = new cNumber(Math.random());
-	};
-	cRAND.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "()"
-		};
 	};
 
 	/**
@@ -3466,11 +3209,6 @@
 
 
 		return this.value = new cNumber(randBetween(arg0.getValue(), arg1.getValue()));
-	};
-	cRANDBETWEEN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( lower-bound , upper-bound )"
-		};
 	};
 
 	/**
@@ -3580,11 +3318,6 @@
 
 		return this.value = roman(arg0.getValue(), arg1.getValue());
 
-	};
-	cROMAN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number, form )"
-		};
 	};
 
 	/**
@@ -3733,11 +3466,6 @@
 		return this.value = roundHelper(number, num_digits);
 
 	};
-	cROUND.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , number-digits )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3860,11 +3588,6 @@
 		var number = arg0.getValue(), num_digits = arg1.getValue();
 		return this.value = rounddownHelper(number, num_digits);
 
-	};
-	cROUNDDOWN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , number-digits )"
-		};
 	};
 
 	/**
@@ -3989,11 +3712,6 @@
 		return this.value = roundupHelper(number, num_digits);
 
 	};
-	cROUNDUP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x , number-digits )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4043,11 +3761,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
-	cSEC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4089,11 +3802,6 @@
 			var a = 1 / Math.cosh(arg0.getValue());
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
-	};
-	cSECH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -4166,11 +3874,6 @@
 		return this.value = SERIESSUM(arg0, arg1, arg2, arg3);
 
 	};
-	cSERIESSUM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( input-value , initial-power , step , coefficients )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4222,11 +3925,6 @@
 		return this.value = arg0;
 
 	};
-	cSIGN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4264,11 +3962,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cSIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -4308,11 +4001,6 @@
 		}
 		return this.value = arg0;
 	};
-	cSINH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4351,11 +4039,6 @@
 		}
 		return this.value = arg0;
 	};
-	cSQRT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4393,11 +4076,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cSQRTPI.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -4493,11 +4171,6 @@
 
 		return this.value;
 	};
-	cSUBTOTAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( function-number , argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4551,11 +4224,6 @@
 		}
 
 		return this.value = arg0;
-	};
-	cSUM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**
@@ -4626,11 +4294,6 @@
 		}
 
 		return this.value = new cNumber(_sum);
-	};
-	cSUMIF.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cell-range, selection-criteria [ , sum-range ] )"
-		};
 	};
 
 	/**
@@ -4722,11 +4385,6 @@
 	cSUMIFS.prototype.checkArguments = function () {
 		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
-	cSUMIFS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(sum-range, criteria_range1, criteria1, [criteria_range2, criteria2], ...)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4797,11 +4455,6 @@
 
 		return this.value = new cNumber(res);
 	};
-	cSUMPRODUCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4856,11 +4509,6 @@
 		}
 
 		return this.value = arg0;
-	};
-	cSUMSQ.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
 	};
 
 	/**
@@ -4945,11 +4593,6 @@
 
 		return this.value = sumX2MY2(arg0, arg1, false);
 	};
-	cSUMX2MY2.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array-1 , array-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5032,11 +4675,6 @@
 		}
 
 		return this.value = sumX2MY2(arg0, arg1, false);
-	};
-	cSUMX2PY2.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array-1 , array-2 )"
-		};
 	};
 
 	/**
@@ -5121,11 +4759,6 @@
 
 		return this.value = sumX2MY2(arg0, arg1, false);
 	};
-	cSUMXMY2.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array-1 , array-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5164,11 +4797,6 @@
 		}
 		return this.value = arg0;
 	};
-	cTAN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5206,11 +4834,6 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
-	};
-	cTANH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x )"
-		};
 	};
 
 	/**
@@ -5321,10 +4944,5 @@
 		}
 
 		return this.value = truncHelper(arg0.getValue(), arg1.getValue());
-	};
-	cTRUNC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( x [ , number-digits ] )"
-		};
 	};
 })(window);

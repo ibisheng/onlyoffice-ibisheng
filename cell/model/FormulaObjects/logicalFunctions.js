@@ -124,11 +124,6 @@
 		}
 		return this.value = argResult;
 	};
-	cAND.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(logical1, logical2, ...)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -145,11 +140,6 @@
 	cFALSE.prototype.argumentsMax = 0;
 	cFALSE.prototype.Calculate = function () {
 		return this.value = new cBool(false);
-	};
-	cFALSE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "()"
-		};
 	};
 
 	/**
@@ -193,11 +183,6 @@
 			}
 		}
 	};
-	cIF.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(logical_test, value_if_true, value_if_false)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -230,11 +215,6 @@
 		} else {
 			return this.value = arg[0];
 		}
-	};
-	cIFERROR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value, value_if_error)"
-		};
 	};
 
 	/**
@@ -269,11 +249,6 @@
 		} else {
 			return this.value = arg[0];
 		}
-	};
-	cIFNA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value, value_if_na)"
-		};
 	};
 
 	/**
@@ -312,11 +287,6 @@
 		} else {
 			return this.value = new cBool(!arg0.tocBool().value);
 		}
-	};
-	cNOT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(logical)"
-		};
 	};
 
 	/**
@@ -388,11 +358,6 @@
 		}
 		return this.value = argResult;
 	};
-	cOR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(logical1, logical2, ...)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -409,11 +374,6 @@
 	cTRUE.prototype.argumentsMax = 0;
 	cTRUE.prototype.Calculate = function () {
 		return this.value = new cBool(true);
-	};
-	cTRUE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "()"
-		};
 	};
 
 	/**
@@ -499,10 +459,5 @@
 		}
 
 		return this.value = argResult;
-	};
-	cXOR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(logical1, logical2, ...)"
-		};
 	};
 })(window);

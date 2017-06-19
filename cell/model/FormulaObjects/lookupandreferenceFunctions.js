@@ -71,6 +71,9 @@
 	cFormulaFunctionGroup['LookupAndReference'].push(cADDRESS, cAREAS, cCHOOSE, cCOLUMN, cCOLUMNS, cGETPIVOTDATA,
 		cHLOOKUP, cHYPERLINK, cINDEX, cINDIRECT, cLOOKUP, cMATCH, cOFFSET, cROW, cROWS, cRTD, cTRANSPOSE, cVLOOKUP);
 
+	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
+	cFormulaFunctionGroup['NotRealised'].push(cAREAS, cGETPIVOTDATA, cHYPERLINK, cRTD);
+
 	function searchRegExp(str, flags) {
 		var vFS = str
 			.replace(/(\\)/g, "\\")
@@ -207,12 +210,6 @@
 
 		return abs ? (A1RefType ? '$' + val : val) : (A1RefType ? val : '[' + val + ']');
 	};
-	cADDRESS.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( row-number , col-number [ , [ ref-type ] [ , [ A1-ref-style-flag ] [ , sheet-name ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -261,11 +258,6 @@
 
 		return this.value = new cError(cErrorType.wrong_value_type);
 	};
-	cCHOOSE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( index , argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -291,11 +283,6 @@
 			range = arg0.getRange();
 		}
 		return this.value = (range ? new cNumber(range.bbox.c1 + 1) : new cError(cErrorType.bad_reference));
-	};
-	cCOLUMN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( [ reference ] )"
-		};
 	};
 
 	/**
@@ -323,11 +310,6 @@
 		}
 		return this.value = (range ? new cNumber(Math.abs(range.getBBox0().c1 - range.getBBox0().c2) + 1) :
 			new cError(cErrorType.wrong_value_type));
-	};
-	cCOLUMNS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array )"
-		};
 	};
 
 	/**
@@ -447,11 +429,6 @@
 		var v = arg1.getWS()._getCellNoEmpty(bb.r1 + numberRow, resC);
 		return this.value = checkTypeCell(v);
 	};
-	cHLOOKUP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( lookup-value  ,  table-array  ,  row-index-num  [  ,  [  range-lookup-flag  ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -544,13 +521,6 @@
 
 		return this.value = res ? res : new cError(cErrorType.bad_reference);
 	};
-	cINDEX.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( array , [ row-number ] [ , [ column-number ] ] ) " + this.name +
-			"( reference , [ row-number ] [ , [ column-number ] [ , [ area-number ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -625,11 +595,6 @@
 
 		return this.value = ret;
 
-	};
-	cINDIRECT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( ref-text [ , [ A1-ref-style-flag ] ] )"
-		};
 	};
 
 	/**
@@ -776,11 +741,6 @@
 			}
 		}
 	};
-	cLOOKUP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(  lookup-value  ,  lookup-vector  ,  result-vector  )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -886,11 +846,6 @@
 		return this.value = findMatch(arg0, arg1, arg2)
 
 	};
-	cMATCH.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(  lookup-value  ,  lookup-array [ , [ match-type ]] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -991,11 +946,6 @@
 		return this.value;
 
 	};
-	cOFFSET.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( reference , rows , cols [ , [ height ] [ , [ width ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1021,11 +971,6 @@
 			range = arg0.getRange();
 		}
 		return this.value = (range ? new cNumber(range.bbox.r1 + 1) : new cError(cErrorType.bad_reference));
-	};
-	cROW.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( [ reference ] )"
-		};
 	};
 
 	/**
@@ -1053,11 +998,6 @@
 		}
 		return this.value = (range ? new cNumber(Math.abs(range.getBBox0().r1 - range.getBBox0().r2) + 1) :
 			new cError(cErrorType.wrong_value_type));
-	};
-	cROWS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array )"
-		};
 	};
 
 	/**
@@ -1120,11 +1060,6 @@
 
 
 		return this.value = TransposeMatrix(arg0);
-	};
-	cTRANSPOSE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( array )"
-		};
 	};
 
 	/**
@@ -1317,11 +1252,6 @@
 
 		var v = arg1.getWS()._getCellNoEmpty(resR, bb.c1 + numberCol);
 		return this.value = checkTypeCell(v);
-	};
-	cVLOOKUP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( lookup-value  ,  table-array  ,  col-index-num  [  ,  [  range-lookup-flag  ] ] )"
-		};
 	};
 
 	var g_oVLOOKUPCache = new VHLOOKUPCache(false);

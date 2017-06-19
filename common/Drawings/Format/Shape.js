@@ -5388,7 +5388,7 @@ CShape.prototype.getColumnNumber = function(){
             var new_body_pr = this.getBodyPr();
             if (new_body_pr) {
                 new_body_pr = new_body_pr.createDuplicate();
-                new_body_pr.numCol = num;
+                new_body_pr.numCol = (num >> 0);
 
                 if(!this.txBody){
                     this.createTextBody();

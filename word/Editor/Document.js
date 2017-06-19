@@ -1890,7 +1890,7 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
             var Para = Run.Paragraph;
 
             var PageIndex = Para.Recalculate_FastRange(SimpleChanges);
-            if (-1 !== PageIndex)
+            if (-1 !== PageIndex && this.Pages[PageIndex])
             {
                 // Если за данным параграфом следовал пустой параграф с новой секцией, тогда его тоже надо пересчитать.
                 var NextElement = Para.Get_DocumentNext();
@@ -2239,7 +2239,7 @@ CDocument.prototype.Recalculate_Page = function()
         var MainStartPos = this.FullRecalc.MainStartPos;
         if (null !== OldPage && ( -1 === MainStartPos || MainStartPos > StartIndex ))
         {
-            if (OldPage.EndPos >= Count - 1 && PageIndex - this.Content[Count - 1].Get_StartPage_Absolute() >= this.Content[Count - 1].Pages.length - 1)
+            if (OldPage.EndPos >= Count - 1 && PageIndex - this.Content[Count - 1].Get_StartPage_Absolute() >= this.Content[Count - 1].GetPagesCount() - 1)
             {
                 //console.log( "HdrFtr Recalc " + PageIndex );
 
@@ -6199,13 +6199,18 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         else
 		{
+			var oSelectedInfo = this.GetSelectedElementsInfo();
 			var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : AscCommon.changestype_Document_Content_Add );
-			if (false === this.Document_Is_SelectionLocked(CheckType))
+
+			var bCanPerform = true;
+			if ((oSelectedInfo.GetInlineLevelSdt() && (!e.ShiftKey || e.CtrlKey)) || (oSelectedInfo.Get_Field() && oSelectedInfo.Get_Field().IsFillingForm()))
+				bCanPerform = false;
+
+			if (bCanPerform && false === this.Document_Is_SelectionLocked(CheckType, null, false, true !== e.CtrlKey && this.IsFormFieldEditing()))
 			{
 				this.Create_NewHistoryPoint(AscDFH.historydescription_Document_EnterButton);
 
-				var oSelectedInfo = this.GetSelectedElementsInfo();
-				var oMath         = oSelectedInfo.Get_Math();
+				var oMath = oSelectedInfo.Get_Math();
 				if (null !== oMath && oMath.Is_InInnerContent())
 				{
 					if (oMath.Handle_AddNewLine())
@@ -15125,11 +15130,13 @@ CDocument.prototype.IsInFormField = function()
 {
 	var oSelectedInfo = this.GetSelectedElementsInfo();
 	var oField        = oSelectedInfo.Get_Field();
+	var oInlineSdt    = oSelectedInfo.GetInlineLevelSdt();
+	var oBlockSdt     = oSelectedInfo.GetBlockLevelSdt();
 
-	if (oSelectedInfo.Is_MixedSelection() || !oField || fieldtype_FORMTEXT !== oField.Get_FieldType())
+	if (oSelectedInfo.Is_MixedSelection())
 		return false;
 
-	return true;
+	return (oBlockSdt || oInlineSdt || (oField && fieldtype_FORMTEXT === oField.Get_FieldType())) ? true : false;
 };
 CDocument.prototype.IsFormFieldEditing = function()
 {
