@@ -1124,7 +1124,7 @@ CopyProcessor.prototype =
 				this.oPresentationWriter.WriteULong(elements.length);
 				
 				pptx_content_writer.Start_UseFullUrl();
-                pptx_content_writer.ClearIdMap();
+                pptx_content_writer.BinaryFileWriter.ClearIdMap();
 				for(var i = 0; i < elements.length; ++i)
 				{
 					if(!(elements[i].Drawing instanceof CGraphicFrame))
@@ -1150,7 +1150,7 @@ CopyProcessor.prototype =
 						this.oPresentationWriter.WriteString2(elements[i].ImageUrl);
 					}
 				}
-                pptx_content_writer.ClearIdMap();
+                pptx_content_writer.BinaryFileWriter.ClearIdMap();
 				pptx_content_writer.End_UseFullUrl();
 			}
 			else if(elementsContent.SlideObjects && elementsContent.SlideObjects.length)//пишем слайды целиком
