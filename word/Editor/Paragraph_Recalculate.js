@@ -63,7 +63,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
         return [];
 
     // Если изменения происходят в специальном пустом параграфе-конце секции, тогда запускаем обычный пересчет
-    if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Pages[this.Get_StartPage_Absolute()].Check_EndSectionPara(this))
+    if (this.bFromDocument && this.LogicDocument && (!this.LogicDocument.Pages[this.Get_StartPage_Absolute()] || true === this.LogicDocument.Pages[this.Get_StartPage_Absolute()].Check_EndSectionPara(this)))
         return [];
 
     // Если параграф - рамка с автошириной, надо пересчитывать по обычному

@@ -1890,7 +1890,7 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
             var Para = Run.Paragraph;
 
             var PageIndex = Para.Recalculate_FastRange(SimpleChanges);
-            if (-1 !== PageIndex)
+            if (-1 !== PageIndex && this.Pages[PageIndex])
             {
                 // Если за данным параграфом следовал пустой параграф с новой секцией, тогда его тоже надо пересчитать.
                 var NextElement = Para.Get_DocumentNext();
