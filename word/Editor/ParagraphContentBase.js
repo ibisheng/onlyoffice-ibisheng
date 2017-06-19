@@ -2782,6 +2782,31 @@ CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls =
 			this.Content[this.State.ContentPos].GetSelectedContentControls(arrContentControls);
 	}
 };
+CParagraphContentWithParagraphLikeContent.prototype.CreateRunWithText = function(sValue)
+{
+	var oRun = new ParaRun();
+	for (var nIndex = 0, nCount = sValue.length; nIndex < nCount; ++nIndex)
+	{
+		var nChar = sValue.charCodeAt(nIndex), oText;
+
+		if (0x20 === nChar)
+			oText = new ParaSpace();
+		else
+			oText = new ParaText(sValue[nIndex]);
+
+		oRun.Add_ToContent(nIndex, oText);
+	}
+	oRun.Set_Pr(this.Get_FirstTextPr());
+	return oRun;
+};
+CParagraphContentWithParagraphLikeContent.prototype.ReplaceAllWithText = function(sValue)
+{
+	var oRun = this.CreateRunWithText(sValue);
+	oRun.Apply_TextPr(this.Get_TextPr(), undefined, true);
+	this.Remove_FromContent(0, this.Content.length);
+	this.Add_ToContent(0, oRun);
+	this.MoveCursorToStartPos();
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------

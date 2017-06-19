@@ -166,7 +166,7 @@ CInlineLevelSdt.prototype.Remove = function(nDirection, bOnAddText)
 	if (this.Is_Empty() && !bOnAddText && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
 		var sDefaultText = "     ";
-		this.SetValue(sDefaultText);
+		this.ReplaceAllWithText(sDefaultText);
 	}
 };
 CInlineLevelSdt.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)

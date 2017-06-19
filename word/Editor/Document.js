@@ -6199,13 +6199,18 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         else
 		{
+			var oSelectedInfo = this.GetSelectedElementsInfo();
 			var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : AscCommon.changestype_Document_Content_Add );
-			if (false === this.Document_Is_SelectionLocked(CheckType))
+
+			var bCanPerform = true;
+			if ((oSelectedInfo.GetInlineLevelSdt() && (!e.ShiftKey || e.CtrlKey)) || (oSelectedInfo.Get_Field() && oSelectedInfo.Get_Field().IsFillingForm()))
+				bCanPerform = false;
+
+			if (bCanPerform && false === this.Document_Is_SelectionLocked(CheckType, null, false, true !== e.CtrlKey && this.IsFormFieldEditing()))
 			{
 				this.Create_NewHistoryPoint(AscDFH.historydescription_Document_EnterButton);
 
-				var oSelectedInfo = this.GetSelectedElementsInfo();
-				var oMath         = oSelectedInfo.Get_Math();
+				var oMath = oSelectedInfo.Get_Math();
 				if (null !== oMath && oMath.Is_InInnerContent())
 				{
 					if (oMath.Handle_AddNewLine())
@@ -15125,11 +15130,13 @@ CDocument.prototype.IsInFormField = function()
 {
 	var oSelectedInfo = this.GetSelectedElementsInfo();
 	var oField        = oSelectedInfo.Get_Field();
+	var oInlineSdt    = oSelectedInfo.GetInlineLevelSdt();
+	var oBlockSdt     = oSelectedInfo.GetBlockLevelSdt();
 
-	if (oSelectedInfo.Is_MixedSelection() || !oField || fieldtype_FORMTEXT !== oField.Get_FieldType())
+	if (oSelectedInfo.Is_MixedSelection())
 		return false;
 
-	return true;
+	return (oBlockSdt || oInlineSdt || (oField && fieldtype_FORMTEXT === oField.Get_FieldType())) ? true : false;
 };
 CDocument.prototype.IsFormFieldEditing = function()
 {
