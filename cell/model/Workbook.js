@@ -4861,7 +4861,7 @@
 			}
 			dxf = style.firstHeaderCell && style.firstHeaderCell.dxf;
 			if (styleInfo.showColHeaders && styleInfo.showRowHeaders && countC && dxf) {
-				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC - 1,
+				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC - (countR ? 1 : 0),
 					pivotRange.c1 + Math.max(0, countR - 1));
 				cells.setTableStyle(dxf);
 			}
