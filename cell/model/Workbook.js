@@ -4782,8 +4782,8 @@
 		}
 	};
 	Worksheet.prototype._updatePivotTables = function (range) {
-		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, pos, countC, countR, stripes = [],
-			stripeIndex, stripeCount, emptyStripe = new Asc.CTableStyleElement();
+		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, pos, countC, countR, stripe1, stripe2,
+			start = 0, emptyStripe = new Asc.CTableStyleElement();
 		var dxf, dxfLabels, dxfValues;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			pivotTable = this.pivotTables[i];
@@ -4821,41 +4821,29 @@
 			countR = pivotTable.getRowFieldsCount(true);
 
 			if (styleInfo.showColStripes) {
-				stripeIndex = stripeCount = 0;
-				stripes[0] = style.firstColumnStripe || emptyStripe;
-				stripes[1] = style.secondColumnStripe || emptyStripe;
-				if (stripes[0].dxf || stripes[1].dxf) {
-					for (j = pivotRange.c1 + countR; j <= pivotRange.c2; ++j) {
-						if (!this.getColHidden()) {
-							if (dxf = stripes[stripeIndex].dxf) {
-								cells = this.getRange3(pivotRange.r1, j, pivotRange.r2, j);
-								cells.setTableStyle(dxf);
-							}
-							if (stripes[stripeIndex].size === ++stripeCount) {
-								stripeIndex = (stripeIndex + 1) % 2;
-								stripeCount = 0;
-							}
-						}
-					}
+				stripe1 = style.firstColumnStripe || emptyStripe;
+				stripe2 = style.secondColumnStripe || emptyStripe;
+				start = pivotRange.c1 + countR;
+				if (stripe1.dxf) {
+					cells = this.getRange3(pivotRange.r1, start, pivotRange.r2, pivotRange.c2);
+					cells.setTableStyle(stripe1.dxf, new Asc.CTableStyleStripe(stripe1.size, stripe2.size));
+				}
+				if (stripe2.dxf && start + stripe1.size <= pivotRange.c2) {
+					cells = this.getRange3(pivotRange.r1, start + stripe1.size, pivotRange.r2, pivotRange.c2);
+					cells.setTableStyle(stripe2.dxf, new Asc.CTableStyleStripe(stripe2.size, stripe1.size));
 				}
 			}
 			if (styleInfo.showRowStripes) {
-				stripeIndex = stripeCount = 0;
-				stripes[0] = style.firstRowStripe || emptyStripe;
-				stripes[1] = style.secondRowStripe || emptyStripe;
-				if (stripes[0].dxf || stripes[1].dxf) {
-					for (j = pivotRange.r1 + countC + 1; j <= pivotRange.r2; ++j) {
-						if (!this.getRowHidden()) {
-							if (dxf = stripes[stripeIndex].dxf) {
-								cells = this.getRange3(j, pivotRange.c1, j, pivotRange.c2);
-								cells.setTableStyle(dxf);
-							}
-							if (stripes[stripeIndex].size === ++stripeCount) {
-								stripeIndex = (stripeIndex + 1) % 2;
-								stripeCount = 0;
-							}
-						}
-					}
+				stripe1 = style.firstRowStripe || emptyStripe;
+				stripe2 = style.secondRowStripe || emptyStripe;
+				start = pivotRange.r1 + countC + 1;
+				if (stripe1.dxf) {
+					cells = this.getRange3(start, pivotRange.c1, pivotRange.r2, pivotRange.c2);
+					cells.setTableStyle(stripe1.dxf, new Asc.CTableStyleStripe(stripe1.size, stripe2.size, true));
+				}
+				if (stripe2.dxf && start + stripe1.size <= pivotRange.r2) {
+					cells = this.getRange3(start + stripe1.size, pivotRange.c1, pivotRange.r2, pivotRange.c2);
+					cells.setTableStyle(stripe1.dxf, new Asc.CTableStyleStripe(stripe2.size, stripe1.size, true));
 				}
 			}
 
