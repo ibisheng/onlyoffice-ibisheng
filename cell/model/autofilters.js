@@ -1073,7 +1073,7 @@
 
 								//чистим стиль от старой таблицы
 								var clearRange = new AscCommonExcel.Range(worksheet, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
-								clearRange.setTableStyle(null);
+								clearRange.clearTableStyle();
 								
 								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
 								
@@ -1266,7 +1266,7 @@
 					//смотрим находится ли фильтр(первая его строчка) внутри выделенного фрагмента
 					if ((activeCells.containsFirstLineRange(bbox) && !isTablePart) || (isTablePart && activeCells.containsRange(bbox))) {
 						if(isTablePart) {
-							oRange.setTableStyle(null);
+							oRange.clearTableStyle();
 							//write formulas history before filter history
 							worksheet.deleteTablePart(index, bConvertTableFormulaToRef);
 						} else
@@ -2799,7 +2799,7 @@
 			
 			_clearRange: function(range, isClearText)
 			{
-				range.setTableStyle(null);
+				range.clearTableStyle();
 				if(isClearText)
 				{
 					History.TurnOff();
@@ -4512,7 +4512,7 @@
 			_cleanStyleTable : function(sRef)
 			{
 				var oRange = new AscCommonExcel.Range(this.worksheet, sRef.r1, sRef.c1, sRef.r2, sRef.c2);
-				oRange.setTableStyle(null);
+				oRange.clearTableStyle();
 			},
 					
 			//TODO CHANGE!!!
