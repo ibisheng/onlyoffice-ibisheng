@@ -1236,7 +1236,7 @@ Slide.prototype =
         for(var i = 0; i < sp_tree.length; ++i)
         {
             var sp = sp_tree[i];
-            if(sp.getObjectType() === AscDFH.historyitem_type_Shape || sp.getObjectType() === AscDFH.historyitem_type_ImageShapee || sp.getObjectType() === AscDFH.historyitem_type_OleObject)
+            if(sp.getObjectType() === AscDFH.historyitem_type_Shape || sp.getObjectType() === AscDFH.historyitem_type_ImageShape || sp.getObjectType() === AscDFH.historyitem_type_OleObject)
             {
                 if(sp.isPlaceholder && sp.isPlaceholder())
                 {
@@ -1252,6 +1252,13 @@ Slide.prototype =
                         AscFormat.CheckSpPrXfrm(sp, true);
                     }
                 }
+                else if(sp.getObjectType() === AscDFH.historyitem_type_Shape){
+                    sp.handleUpdateTheme();
+                    sp.checkExtentsByDocContent();
+                }
+            }
+            else{
+
             }
         }
     },

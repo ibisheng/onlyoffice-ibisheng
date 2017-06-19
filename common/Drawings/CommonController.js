@@ -2634,10 +2634,14 @@ DrawingObjectsController.prototype =
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 objects_by_type.shapes[i].setColumnNumber(props.columnNumber);
+                objects_by_type.shapes[i].recalculate();
+                objects_by_type.shapes[i].checkExtentsByDocContent();
             }
             for(i = 0; i < objects_by_type.groups.length; ++i)
             {
                 objects_by_type.groups[i].setColumnNumber(props.columnNumber);
+                objects_by_type.groups[i].recalculate();
+                objects_by_type.groups[i].checkExtentsByDocContent();
             }
         }
 
@@ -2646,10 +2650,14 @@ DrawingObjectsController.prototype =
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 objects_by_type.shapes[i].setColumnSpace(props.columnSpace);
+                objects_by_type.shapes[i].recalculate();
+                objects_by_type.shapes[i].checkExtentsByDocContent();
             }
             for(i = 0; i < objects_by_type.groups.length; ++i)
             {
                 objects_by_type.groups[i].setColumnSpace(props.columnSpace);
+                objects_by_type.groups[i].recalculate();
+                objects_by_type.groups[i].checkExtentsByDocContent();
             }
         }
 
