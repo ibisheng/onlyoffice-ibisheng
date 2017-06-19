@@ -7897,6 +7897,11 @@
 			return newContext;
 		}
     };
+	function CTableStyleStripe(size, offset, opt_row){
+		this.size = size;
+		this.offset = offset;
+		this.row = opt_row;
+	}
     function CTableStyle()
     {
         this.name = null;
@@ -7946,13 +7951,13 @@
 			if (options.ShowColumnStripes) {
 				if (this.firstColumnStripe) {
 					offsetStripe = this.secondColumnStripe ? this.secondColumnStripe.size : 1;
-					stripe = {size: this.firstColumnStripe.size, offset: offsetStripe};
+					stripe = new CTableStyleStripe(this.firstColumnStripe.size, offsetStripe);
 					bboxTmp = new Asc.Range(bbox.c1, r1Data, bbox.c2, r2Data);
 					sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstColumnStripe.dxf, stripe);
 				}
 				if (this.secondColumnStripe) {
 					offsetStripe = this.firstColumnStripe ? this.firstColumnStripe.size : 1;
-					stripe = {size: this.secondColumnStripe.size, offset: offsetStripe};
+					stripe = new CTableStyleStripe(this.secondColumnStripe.size, offsetStripe);
 					if (bbox.c1 + offsetStripe <= bbox.c2) {
 						bboxTmp = new Asc.Range(bbox.c1 + offsetStripe, r1Data, bbox.c2, r2Data);
 						sheetMergedStyles.setTablePivotStyle(bboxTmp, this.secondColumnStripe.dxf, stripe);
@@ -7962,13 +7967,13 @@
 			if (options.ShowRowStripes) {
 				if (this.firstRowStripe) {
 					offsetStripe = this.secondRowStripe ? this.secondRowStripe.size : 1;
-					stripe = {row: true, size: this.firstRowStripe.size, offset: offsetStripe};
+					stripe = new CTableStyleStripe(this.firstRowStripe.size, offsetStripe, true);
 					bboxTmp = new Asc.Range(bbox.c1, r1Data, bbox.c2, r2Data);
 					sheetMergedStyles.setTablePivotStyle(bboxTmp, this.firstRowStripe.dxf, stripe);
 				}
 				if (this.secondRowStripe) {
 					offsetStripe = this.firstRowStripe ? this.firstRowStripe.size : 1;
-					stripe = {row: true, size: this.secondRowStripe.size, offset: offsetStripe};
+					stripe = new CTableStyleStripe(this.secondRowStripe.size, offsetStripe, true);
 					if (r1Data + offsetStripe <= r2Data) {
 						bboxTmp = new Asc.Range(bbox.c1, r1Data, bbox.c2, r2Data);
 						sheetMergedStyles.setTablePivotStyle(bboxTmp, this.secondRowStripe.dxf, stripe);
@@ -8475,6 +8480,7 @@
     window["Asc"].CTableStyles = CTableStyles;
     window["Asc"].CTableStyle = CTableStyle;
     window["Asc"].CTableStyleElement = CTableStyleElement;
+    window["Asc"].CTableStyleStripe = CTableStyleStripe;
     window["AscCommonExcel"].BinaryFileReader = BinaryFileReader;
     window["AscCommonExcel"].BinaryFileWriter = BinaryFileWriter;
 

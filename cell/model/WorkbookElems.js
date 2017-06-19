@@ -2909,8 +2909,10 @@ StyleManager.prototype =
 							borderModified.dd = false;
 						}
 						xfModified.border = styleManager.addBorder(borderModified);
+						xfModified = styleManager.addXf(xfModified);
+						style.borders[borderIndex] = xfModified;
 					}
-					xf = styleManager.addXf(xfModified);
+					xf = xfModified;
 				}
 				res.table.push(xf);
 			}
