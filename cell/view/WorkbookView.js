@@ -2687,6 +2687,99 @@
     this.model.paddingPlusBorder = this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
   };
 
+	WorkbookView.prototype.getPivotMergeStyle = function (range, styleInfo) {
+		var i, r, dxf, stripe1, stripe2, emptyStripe = new Asc.CTableStyleElement();
+		var mergedStyles = new AscCommonExcel.SheetMergedStyles();
+		var style = this.model.TableStyles.AllStyles[styleInfo.asc_getName()];
+		if (style) {
+			dxf = style.wholeTable && style.wholeTable.dxf;
+			mergedStyles.setTablePivotStyle(range, dxf);
+
+			if (styleInfo.showColStripes) {
+				stripe1 = style.firstColumnStripe || emptyStripe;
+				stripe2 = style.secondColumnStripe || emptyStripe;
+				if (stripe1.dxf) {
+					mergedStyles.setTablePivotStyle(range, stripe1.dxf,
+						new Asc.CTableStyleStripe(stripe1.size, stripe2.size));
+				}
+				if (stripe2.dxf && range.c1 + stripe1.size <= range.c2) {
+					mergedStyles.setTablePivotStyle(
+						new Asc.Range(range.c1 + stripe1.size, range.r1, range.c2, range.r2), stripe2.dxf,
+						new Asc.CTableStyleStripe(stripe2.size, stripe1.size));
+				}
+			}
+			if (styleInfo.showRowStripes) {
+				stripe1 = style.firstRowStripe || emptyStripe;
+				stripe2 = style.secondRowStripe || emptyStripe;
+				if (stripe1.dxf) {
+					mergedStyles.setTablePivotStyle(range, stripe1.dxf,
+						new Asc.CTableStyleStripe(stripe1.size, stripe2.size));
+				}
+				if (stripe2.dxf && range.r1 + stripe1.size <= pivotRange.r2) {
+					mergedStyles.setTablePivotStyle(
+						new Asc.Range(range.c1, range.r1 + stripe1.size, range.c2, range.r2), stripe2.dxf,
+						new Asc.CTableStyleStripe(stripe2.size, stripe1.size));
+				}
+			}
+
+			dxf = style.firstColumn && style.firstColumn.dxf;
+			if (styleInfo.showRowHeaders && dxf) {
+				mergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r1, range.c1, range.r2), dxf);
+			}
+
+			dxf = style.headerRow && style.headerRow.dxf;
+			if (styleInfo.showColHeaders && dxf) {
+				mergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r1, range.c2, range.r1), dxf);
+			}
+
+			dxf = style.firstHeaderCell && style.firstHeaderCell.dxf;
+			if (styleInfo.showColHeaders && styleInfo.showRowHeaders && dxf) {
+				mergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r1, range.c1, range.r1), dxf);
+			}
+
+			for (i = range.c1; i <= range.c2; ++i) {
+				if (i === range.c2) {
+					dxf = style.lastColumn;
+				} else if (showRowHeaders) {
+					r = i - range.r1;
+					if (0 === r) {
+						dxf = style.firstColumnSubheading;
+					} else if (1 === r % 2) {
+						dxf = style.secondColumnSubheading;
+					} else {
+						dxf = style.thirdColumnSubheading;
+					}
+				}
+
+				if (dxf = (dxf && dxf.dxf)) {
+					mergedStyles.setTablePivotStyle(new Asc.Range(i, range.r1, i, range.r2), dxf);
+				}
+			}
+
+			for (i = range.r1; i <= range.r2; ++i) {
+				if (i === range.r2) {
+					dxf = style.totalRow;
+				} else {
+					r = i - range.r1;
+					if (0 === r) {
+						dxf = style.firstRowSubheading;
+					} else if (1 === r % 2) {
+						dxf = style.secondRowSubheading;
+					} else {
+						dxf = style.thirdRowSubheading;
+					}
+				}
+
+				if (dxf = (dxf && dxf.dxf)) {
+					mergedStyles.setTablePivotStyle(new Asc.Range(range.c1, i, range.c2, i), dxf);
+				}
+			}
+			dxf = style.lastColumn && style.lastColumn.dxf;
+			mergedStyles.setTablePivotStyle(new Asc.Range(range.c2, range.r1, range.c2, range.r2), dxf);
+		}
+		return mergedStyles;
+	};
+
 	WorkbookView.prototype.af_getTablePictures = function (props, bPivotTable) {
 		var wb = this.model;
 		var t = this;

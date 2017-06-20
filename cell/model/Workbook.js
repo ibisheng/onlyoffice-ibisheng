@@ -4847,6 +4847,7 @@
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC, pivotRange.c2);
 				cells.setTableStyle(dxf);
 			}
+
 			dxf = style.firstHeaderCell && style.firstHeaderCell.dxf;
 			if (styleInfo.showColHeaders && styleInfo.showRowHeaders && countC && dxf) {
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC - (countR ? 1 : 0),
