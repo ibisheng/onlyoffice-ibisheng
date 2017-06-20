@@ -67,12 +67,13 @@
 		cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS,
 		cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST,
 		cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV,
-		cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE, cRANK, cRSQ,
-		cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
-		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+		cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE, cRANK,
+		cRANK_EQ, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST,
+		cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP,
+		cVARPA, cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cRANK, cTREND,
+	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
 		cTRIMMEAN, cTTEST, cWEIBULL, cZTEST);
 
 	function isInteger(value) {
@@ -5595,6 +5596,18 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cRANK}
+	 */
+	function cRANK_EQ() {
+		cRANK.call(this);
+		this.name = "RANK.EQ";
+	}
+
+	cRANK_EQ.prototype = Object.create(cRANK.prototype);
+	cRANK_EQ.prototype.constructor = cRANK_EQ;
 
 	/**
 	 * @constructor
