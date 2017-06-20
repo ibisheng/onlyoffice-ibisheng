@@ -5381,6 +5381,153 @@ function CSlideDrawer()
 	}
 }
 
+function CNotesDrawer(page)
+{
+	this.Width 	= 0;
+	this.Height = 0;
+
+	this.HtmlPage = page;
+	this.TargetHtmlElement = document.getElementById('id_notes_target_cursor');
+
+	this.IsRepaint = false;
+	this.Slide = -1;
+
+	this.m_oOverlayApi = new AscCommon.COverlay();
+	this.m_oOverlayApi.m_oControl  = this.HtmlPage.m_oNotesOverlay;
+	this.m_oOverlayApi.m_oHtmlPage = this.HtmlPage;
+	this.m_oOverlayApi.Clear();
+
+	this.OffsetX = 10;
+	this.OffsetY = 10;
+
+	this.fontManager = new AscFonts.CFontManager();
+	this.fontManager.Initialize(true);
+
+	var oThis = this;
+
+	this.Init = function()
+	{
+		var _elem = this.HtmlPage.m_oNotes;
+		var _elemOverlay = this.HtmlPage.m_oNotesOverlay;
+
+		_elem.HtmlElement.onmousedown = this.onMouseDown;
+		_elem.HtmlElement.onmousemove = this.onMouseMove;
+		_elem.HtmlElement.onmouseup   = this.onMouseUp;
+
+		_elemOverlay.HtmlElement.onmousedown = this.onMouseDown;
+		_elemOverlay.HtmlElement.onmousemove = this.onMouseMove;
+		_elemOverlay.HtmlElement.onmouseup   = this.onMouseUp;
+	};
+
+	this.OnUpdateOverlay = function()
+	{
+		var overlay = this.m_oOverlayApi;
+
+		overlay.SetBaseTransform();
+		overlay.Clear();
+
+		if (this.Slide == -1)
+			return;
+
+		var logicDocument = this.HtmlPage.m_oLogicDocument;
+
+		var ctx = overlay.m_oContext;
+		if (drDoc.m_bIsSelection)
+		{
+			ctx.fillStyle   = "rgba(51,102,204,255)";
+			ctx.strokeStyle = "#9ADBFE";
+			ctx.beginPath();
+
+			logicDocument.drawNotesSelect(1);
+
+			ctx.globalAlpha = 0.2;
+			ctx.fill();
+			ctx.globalAlpha = 1.0;
+		}
+
+		ctx.globalAlpha = 1.0;
+		ctx = null;
+	};
+
+	this.OnPaint = function()
+	{
+		var element = this.HtmlPage.m_oNotes.HtmlElement;
+		var ctx = element.getContext('2d');
+		ctx.clearRect(0, 0, element.width, element.height);
+
+		if (-1 == this.Slide)
+			return;
+
+		var dKoef = g_dKoef_mm_to_pix / 100;
+		if (this.HtmlPage.bIsRetinaSupport)
+			dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
+
+		var w_mm = this.Width;
+		var h_mm = this.Height;
+		var w_px = (w_mm * dKoef) >> 0;
+		var h_px = (h_mm * dKoef) >> 0;
+
+		var g = new AscCommon.CGraphics();
+		g.init(ctx, w_px, h_px, w_mm, h_mm);
+		g.m_oFontManager = this.fontManager;
+
+		if (this.HtmlPage.bIsRetinaSupport)
+			g.IsRetina = true;
+
+		g.m_oCoordTransform.tx = this.OffsetX;
+		g.m_oCoordTransform.ty = this.OffsetY;
+		g.transform(1, 0, 0, 1, 0, 0);
+
+		g.IsNoDrawingEmptyPlaceholderText = true;
+
+		this.HtmlPage.m_oLogicDocument.DrawNote(this.Slide, g);
+		this.IsRepaint = false;
+	};
+
+	this.OnRecalculateNote = function(slideNum, width, heigth)
+	{
+		this.Slide = slideNum;
+		this.IsRepaint = true;
+	};
+
+	this.CheckPaint = function()
+	{
+		if (this.IsRepaint)
+			this.OnPaint();
+	};
+
+	this.onMouseDown = function(e)
+	{
+		AscCommon.check_MouseDownEvent(e, true);
+		global_mouseEvent.LockMouse();
+
+		oThis.HtmlPage.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+
+		var _x = global_mouseEvent.X - oThis.HtmlPage.X - ((oThis.HtmlPage.m_oMainParent.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
+		var _y = global_mouseEvent.Y - oThis.HtmlPage.Y - ((oThis.HtmlPage.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
+
+		console.log(_x + ", " + _y);
+	};
+	this.onMouseMove = function(e)
+	{
+		AscCommon.check_MouseMoveEvent(e);
+	};
+	this.onMouseUp = function(e)
+	{
+		AscCommon.check_MouseUpEvent(e);
+
+		var _x = global_mouseEvent.X - oThis.HtmlPage.X - ((oThis.HtmlPage.m_oMainParent.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
+		var _y = global_mouseEvent.Y - oThis.HtmlPage.Y - ((oThis.HtmlPage.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
+
+		console.log(_x + ", " + _y);
+	};
+
+	this.onUpdateTarget = function()
+	{
+
+	};
+}
+
 window.g_comment_image = new Image();
 window.g_comment_image;
 window.g_comment_image.asc_complete = false;

@@ -142,6 +142,9 @@ function CEditorPage(api)
 	this.m_oNotesContainer = null;
 	this.m_oNotes          = null;
 	this.m_oNotes_scroll   = null;
+	this.m_oNotesOverlay   = null;
+
+	this.m_oNotesApi	   = null;
 
 	// main
 	this.m_oMainParent = null;
@@ -518,6 +521,11 @@ function CEditorPage(api)
 		this.m_oNotes.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
 		this.m_oNotesContainer.AddControl(this.m_oNotes);
 
+		this.m_oNotesOverlay = CreateControl("id_notes_overlay");
+		this.m_oNotesOverlay.Bounds.SetParams(0, 0, ScrollWidthMm, 1000, false, false, true, false, -1, -1);
+		this.m_oNotesOverlay.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
+		this.m_oNotesContainer.AddControl(this.m_oNotesOverlay);
+
 		this.m_oNotes_scroll = CreateControl("id_vertical_scroll_notes");
 		this.m_oNotes_scroll.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, ScrollWidthMm, -1);
 		this.m_oNotes_scroll.Anchor = (g_anchor_top | g_anchor_right | g_anchor_bottom);
@@ -577,6 +585,9 @@ function CEditorPage(api)
 		this.checkNeedRules();
 		this.initEvents();
 		this.OnResize(true);
+
+		this.m_oNotesApi = new CNotesDrawer(this);
+		this.m_oNotesApi.Init();
 	};
 
 	this.CheckRetinaDisplay = function()
@@ -658,10 +669,6 @@ function CEditorPage(api)
 		this.m_oOverlay.HtmlElement.onmousedown = this.onMouseDown;
 		this.m_oOverlay.HtmlElement.onmousemove = this.onMouseMove;
 		this.m_oOverlay.HtmlElement.onmouseup   = this.onMouseUp;
-
-		this.m_oNotes.HtmlElement.onmousedown = this.onMouseDownNotes;
-		this.m_oNotes.HtmlElement.onmousemove = this.onMouseMoveNotes;
-		this.m_oNotes.HtmlElement.onmouseup   = this.onMouseUpNotes;
 
 		var _cur         = document.getElementById('id_target_cursor');
 		_cur.onmousedown = this.onMouseDown;
@@ -1852,34 +1859,11 @@ function CEditorPage(api)
 		oWordControl.EndUpdateOverlay();
 	};
 
-	this.onMouseDownNotes = function(e)
-	{
-		AscCommon.check_MouseDownEvent(e, true);
-		global_mouseEvent.LockMouse();
-
-		oThis.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
-
-		var _x = global_mouseEvent.X - oThis.X - ((oThis.m_oNotesContainer.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
-		var _y = global_mouseEvent.Y - oThis.Y - ((oThis.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
-
-		console.log(_x + ", " + _y);
-	};
-	this.onMouseMoveNotes = function(e)
-	{
-		AscCommon.check_MouseMoveEvent(e);
-	};
-	this.onMouseUpNotes = function(e)
-	{
-		AscCommon.check_MouseUpEvent(e);
-
-		var _x = global_mouseEvent.X - oThis.X - ((oThis.m_oNotesContainer.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
-		var _y = global_mouseEvent.Y - oThis.Y - ((oThis.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
-
-		console.log(_x + ", " + _y);
-	};
-
 	this.setNodesEnable = function(bEnabled)
 	{
+		if (bEnabled == this.IsSupportNotes)
+			return;
+
 		GlobalSkin.SupportNotes = bEnabled;
 		this.IsSupportNotes = bEnabled;
 		this.Splitter2Pos = 0;
