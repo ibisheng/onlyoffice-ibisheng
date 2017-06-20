@@ -92,7 +92,7 @@ var GlobalSkinFlat    = {
 	STYLE_THUMBNAIL_WIDTH                 : 109,
 	STYLE_THUMBNAIL_HEIGHT                : 45,
 	BorderSplitterColor                   : "#CBCBCB",
-	SupportNotes                          : false,
+	SupportNotes                          : true,
 	SplitterWidthMM                       : 1,
 	ThumbnailScrollWidthNullIfNoScrolling : false
 };
@@ -120,7 +120,7 @@ function CEditorPage(api)
 {
 	// ------------------------------------------------------------------
 	this.Name           = "";
-	this.IsSupportNotes = false;
+	this.IsSupportNotes = true;
 
 	this.EditorType = "presentations";
 
@@ -381,7 +381,7 @@ function CEditorPage(api)
 
 		this.Splitter1PosMin = 20;
 		this.Splitter1PosMax = 80;
-		this.Splitter2PosMin = 0;
+		this.Splitter2PosMin = 20;
 		this.Splitter2PosMax = 100;
 
 		var ScrollWidthMm  = this.ScrollWidthPx * g_dKoef_pix_to_mm;
@@ -556,6 +556,12 @@ function CEditorPage(api)
 			this.MobileTouchManagerThumbnails.Init(this.m_oApi);
 		}
 
+		if (this.IsSupportNotes)
+		{
+			this.m_oNotes.HtmlElement.style.backgroundColor = GlobalSkin.BackgroundColor;
+			this.m_oNotes.HtmlElement.style.borderBottom = ("1px solid " + GlobalSkin.BorderSplitterColor);
+		}
+
 		this.m_oOverlayApi.m_oControl  = this.m_oOverlay;
 		this.m_oOverlayApi.m_oHtmlPage = this;
 		this.m_oOverlayApi.Clear();
@@ -650,6 +656,10 @@ function CEditorPage(api)
 		this.m_oOverlay.HtmlElement.onmousedown = this.onMouseDown;
 		this.m_oOverlay.HtmlElement.onmousemove = this.onMouseMove;
 		this.m_oOverlay.HtmlElement.onmouseup   = this.onMouseUp;
+
+		this.m_oNotes.HtmlElement.onmousedown = this.onMouseDownNotes;
+		this.m_oNotes.HtmlElement.onmousemove = this.onMouseMoveNotes;
+		this.m_oNotes.HtmlElement.onmouseup   = this.onMouseUpNotes;
 
 		var _cur         = document.getElementById('id_target_cursor');
 		_cur.onmousedown = this.onMouseDown;
@@ -871,8 +881,7 @@ function CEditorPage(api)
 		if (this.bIsRetinaSupport)
 			w /= AscCommon.AscBrowser.retinaPixelRatio;
 
-		var h = (((this.m_oBody.AbsolutePosition.B - this.m_oBody.AbsolutePosition.T) -
-			(this.m_oTopRuler.AbsolutePosition.B - this.m_oTopRuler.AbsolutePosition.T)) * g_dKoef_mm_to_pix) >> 0;
+		var h = ((this.m_oMainView.AbsolutePosition.B - this.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
 
 		var _pageWidth  = this.m_oLogicDocument.Width * g_dKoef_mm_to_pix;
 		var _pageHeight = this.m_oLogicDocument.Height * g_dKoef_mm_to_pix;
@@ -1522,10 +1531,13 @@ function CEditorPage(api)
 			{
 				var _max = oWordControl.Height - parseInt(oWordControl.Splitter2PosMin * g_dKoef_mm_to_pix);
 				var _min = oWordControl.Height - parseInt(oWordControl.Splitter2PosMax * g_dKoef_mm_to_pix);
-				if (_y < _min)
-					_y = _min;
+				var _c = parseInt(oWordControl.Splitter2PosMin * g_dKoef_mm_to_pix);
+				if (_y > (_max + (_c / 2)))
+					_y = oWordControl.Height;
 				else if (_y > _max)
 					_y = _max;
+				else if (_y < _min)
+					_y = _min;
 
 				oWordControl.m_oBody.HtmlElement.style.cursor = "s-resize";
 				oWordControl.SplitterDiv.style.top            = (_y - parseInt(GlobalSkin.SplitterWidthMM * g_dKoef_mm_to_pix)) + "px";
@@ -1557,6 +1569,8 @@ function CEditorPage(api)
 		{
 			this.m_oMainContent.Bounds.L = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
 			this.m_oMainContent.Bounds.B = GlobalSkin.SupportNotes ? this.Splitter2Pos + GlobalSkin.SplitterWidthMM : 1000;
+			this.m_oMainContent.Bounds.isAbsB = GlobalSkin.SupportNotes;
+
 
 			this.m_oNotesContainer.Bounds.L    = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
@@ -1569,6 +1583,7 @@ function CEditorPage(api)
 		{
 			this.m_oMainContent.Bounds.L = 0;
 			this.m_oMainContent.Bounds.B = GlobalSkin.SupportNotes ? this.Splitter2Pos + GlobalSkin.SplitterWidthMM : 1000;
+			this.m_oMainContent.Bounds.isAbsB = GlobalSkin.SupportNotes;
 
 			this.m_oNotesContainer.Bounds.L    = 0;
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
@@ -1577,6 +1592,11 @@ function CEditorPage(api)
 
 			this.m_oMainContent.HtmlElement.style.borderLeft = "1px" + GlobalSkin.BorderSplitterColor + " none";
 		}
+
+		if (this.Splitter2Pos < 1)
+			this.m_oNotesContainer.HtmlElement.style.display = "none";
+		else
+			this.m_oNotesContainer.HtmlElement.style.display = "block";
 
 		this.OnResize2(true);
 	};
@@ -1829,6 +1849,46 @@ function CEditorPage(api)
 		oWordControl.m_oLogicDocument.Document_UpdateRulersState();
 
 		oWordControl.EndUpdateOverlay();
+	};
+
+	this.onMouseDownNotes = function(e)
+	{
+		AscCommon.check_MouseDownEvent(e, true);
+		global_mouseEvent.LockMouse();
+
+		oThis.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+
+		var _x = global_mouseEvent.X - oThis.X - ((oThis.m_oNotesContainer.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
+		var _y = global_mouseEvent.Y - oThis.Y - ((oThis.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
+
+		console.log(_x + ", " + _y);
+	};
+	this.onMouseMoveNotes = function(e)
+	{
+		AscCommon.check_MouseMoveEvent(e);
+	};
+	this.onMouseUpNotes = function(e)
+	{
+		AscCommon.check_MouseUpEvent(e);
+
+		var _x = global_mouseEvent.X - oThis.X - ((oThis.m_oNotesContainer.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
+		var _y = global_mouseEvent.Y - oThis.Y - ((oThis.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
+
+		console.log(_x + ", " + _y);
+	};
+
+	this.setNodesEnable = function(bEnabled)
+	{
+		GlobalSkin.SupportNotes = bEnabled;
+		this.IsSupportNotes = bEnabled;
+		this.Splitter2Pos = 0;
+
+		if (bEnabled)
+			this.m_oMainContent.HtmlElement.style.borderBottom = ("1px solid " + GlobalSkin.BorderSplitterColor);
+		else
+			this.m_oMainContent.HtmlElement.style.borderBottom = "none";
+
+		this.OnResizeSplitter();
 	};
 
 	this.onMouseUpExternal = function(x, y)

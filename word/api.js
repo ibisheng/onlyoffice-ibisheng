@@ -430,6 +430,8 @@
 			if (0 == this.current)
 				LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
 
+			var _obj = null;
+
 			while (this.current < this.documents.length) // no recursion
 			{
 				if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
@@ -439,38 +441,39 @@
 					var _content_control_pr;
 					var _blockStd;
 
-					if (_current.Url !== undefined || _current.Script !== undefined)
+					if (_current["Url"] !== undefined || _current["Script"] !== undefined)
 					{
-						if (undefined !== _current.Props.InternalId)
+						if (undefined !== _current["Props"]["InternalId"])
 						{
 							// remove block sdt
-							LogicDocument.SelectContentControl(_current.Props.InternalId);
-							LogicDocument.RemoveContentControl(_current.Props.InternalId);
+							LogicDocument.SelectContentControl(_current["Props"]["InternalId"]);
+							LogicDocument.RemoveContentControl(_current["Props"]["InternalId"]);
 						}
 
 						_content_control_pr = new CContentControlPr();
-						_content_control_pr.Id = _current.Props.Id;
-						_content_control_pr.Tag = _current.Props.Tag;
+						_content_control_pr.Id = _current["Props"]["Id"];
+						_content_control_pr.Tag = _current["Props"]["Tag"];
 						_content_control_pr.Lock = sdtlock_Unlocked;
-						_content_control_pr.InternalId = _current.Props.InternalId;
+						_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
 						var _blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 						_blockStd.SetContentControlPr(_content_control_pr);
 
-						this.returnDocuments.push(_blockStd.GetContentControlPr());
+						_obj = _blockStd.GetContentControlPr();
+						this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
 					}
 
-					if (_current.Url !== undefined)
+					if (_current["Url"] !== undefined)
 					{
 						// insert/replace document
-						this.api.insertDocumentUrlsData = {imageMap: null, documents: [{url : _current.Url, format: _current.Format}], endCallback : function(_api) {
+						this.api.insertDocumentUrlsData = {imageMap: null, documents: [{url : _current["Url"], format: _current["Format"]}], endCallback : function(_api) {
 
 							_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1 , 1);
 							_blockStd.MoveCursorToEndPos(false, false);
 
 							var _worker = _api.__content_control_worker;
-							if (_worker.documents[_worker.current].Props)
-								_blockStd.SetContentControlPr({ Lock : _worker.documents[_worker.current].Props.Lock });
+							if (_worker.documents[_worker.current]["Props"])
+								_blockStd.SetContentControlPr({ Lock : _worker.documents[_worker.current]["Props"]["Lock"] });
 							_worker = null;
 
 							_blockStd = null;
@@ -482,10 +485,10 @@
 						this.api.asc_DownloadAs(Asc.c_oAscFileType.CANVAS_WORD);
 						return;
 					}
-					else if (_current.Script !== undefined)
+					else if (_current["Script"] !== undefined)
 					{
 						// insert/replace script
-						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current.Script + "\n})();";
+						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current["Script"] + "\n})();";
 						eval(_script);
 
 						if(_blockStd.Content.Get_ElementsCount() > 1)
@@ -496,8 +499,8 @@
 						LogicDocument.MoveCursorRight(false, false, true);
 
 						var _worker = _api.__content_control_worker;
-						if (_worker.documents[_worker.current].Props)
-							_blockStd.SetContentControlPr({ Lock : _worker.documents[_worker.current].Props.Lock });
+						if (_worker.documents[_worker.current]["Props"])
+							_blockStd.SetContentControlPr({ Lock : _worker.documents[_worker.current]["Props"]["Lock"] });
 						_worker = null;
 
 						var _fonts         = LogicDocument.Document_Get_AllFontNames();
@@ -530,7 +533,9 @@
 						// change properties
 						var _blockStd = LogicDocument.GetContentControl(_content_control_pr.InternalId);
 						_blockStd.SetContentControlPr(_content_control_pr);
-						this.returnDocuments.push(_blockStd.GetContentControlPr());
+
+						_obj = _blockStd.GetContentControlPr();
+						this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
 					}
 				}
 
@@ -551,11 +556,11 @@
 			var arrContentControl = [];
 			for (var i = 0; i < this.documents.length; i++)
 			{
-				var oContentControl = g_oTableId.Get_ById(this.documents[i].InternalId);
+				var oContentControl = g_oTableId.Get_ById(this.documents[i]["InternalId"]);
 				if (oContentControl
 					&& (oContentControl instanceof AscCommonWord.CBlockLevelSdt
 					|| oContentControl instanceof AscCommonWord.CInlineLevelSdt))
-					arrContentControl.push(g_oTableId.Get_ById(this.documents[i].InternalId));
+					arrContentControl.push(g_oTableId.Get_ById(this.documents[i]["InternalId"]));
 			}
 
 			LogicDocument.SetCheckContentControlsLock(false);
@@ -568,7 +573,7 @@
 				LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_InsertDocumentsByUrls);
 				for (var i = 0; i < this.documents.length; i++)
 				{
-					LogicDocument.RemoveContentControl(this.documents[i].InternalId);
+					LogicDocument.RemoveContentControl(this.documents[i]["InternalId"]);
 				}
 			}
 			LogicDocument.SetCheckContentControlsLock(true);
@@ -7981,9 +7986,11 @@ background-repeat: no-repeat;\
 	{
 		var _blocks = this.WordControl.m_oLogicDocument.GetAllContentControls();
 		var _ret = [];
+		var _obj = null;
 		for (var i = 0; i < _blocks.length; i++)
 		{
-			_ret.push(_blocks[i].GetContentControlPr());
+			_obj = _blocks[i].GetContentControlPr();
+			_ret.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
 		}
 		return _ret;
 	};
