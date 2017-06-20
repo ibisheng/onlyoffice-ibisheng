@@ -903,6 +903,61 @@
 		return (u < 0 && w > 0) || (u > 0 && w < 0);
 	}
 
+	function rank( fVal, aSortArray, bAscending, bAverage )
+	{
+		//sort array
+		aSortArray.sort (function sortArr(a, b) {
+			return  a.value - b.value;
+		});
+
+		var nSize = aSortArray.length;
+		var res;
+
+		if ( nSize == 0 /*|| nGlobalError != FormulaError::NONE*/ ){
+			res = null;
+		} else {
+			if ( fVal < aSortArray[ 0 ].value || fVal > aSortArray[ nSize - 1 ].value ){
+				res = null;
+			}else{
+				var fLastPos = 0;
+				var fFirstPos = -1.0;
+				var bFinished = false;
+				var i;
+				for ( i = 0; i < nSize && !bFinished /*&& nGlobalError == FormulaError::NONE*/; i++ ){
+					if ( aSortArray[ i ].value === fVal ){
+						if ( fFirstPos < 0 ){
+							fFirstPos = i + 1.0;
+						}
+					}else{
+						if ( aSortArray[ i ].value > fVal ){
+							fLastPos = i;
+							bFinished = true;
+						}
+					}
+				}
+
+				if ( !bFinished ){
+					fLastPos = i;
+				}
+				if ( !bAverage ){
+					if ( bAscending ){
+						res = fFirstPos;
+					}else{
+						res = nSize + 1.0 - fLastPos;
+					}
+				}else {
+					if ( bAscending ){
+						res = ( fFirstPos + fLastPos ) / 2.0 ;
+					}else{
+						res = nSize + 1.0 - ( fFirstPos + fLastPos ) / 2.0;
+					}
+				}
+			}
+		}
+
+		return res;
+	}
+
 	function GAMMADISTFUNCTION(fp, fAlpha, fBeta){
 		this.fp = fp;
 		this.fAlpha = fAlpha;
@@ -5504,6 +5559,42 @@
 
 	cRANK.prototype = Object.create(cBaseFunction.prototype);
 	cRANK.prototype.constructor = cRANK;
+	cRANK.prototype.argumentsMin = 2;
+	cRANK.prototype.argumentsMax = 3;
+	cRANK.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [null, cElementType.array]);
+		var argClone = oArguments.args;
+
+		//1 argument - array
+		argClone[0] = argClone[0].tocNumber();
+		argClone[2] = undefined !== argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var number = argArray[0];
+			var ref = argArray[1];
+			var order = argArray[2];
+
+			if(!ref.length){
+				return new cError(cErrorType.wrong_value_type);
+			}
+			var changedRef = [];
+			for(var i = 0; i < ref.length; i++){
+				if(cElementType.number === ref[i].type){
+					changedRef.push(ref[i]);
+				}
+			}
+
+			var res = rank(number, changedRef, order);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
 
 	/**
 	 * @constructor

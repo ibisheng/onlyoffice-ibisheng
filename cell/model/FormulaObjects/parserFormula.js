@@ -2417,14 +2417,18 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				if(cElementType.string === inputArguments[i].type && !dNotCheckNumberType){
 					return new cError(cErrorType.wrong_value_type);
 				}else{
-					argsArray[i] = inputArguments[i].getValue();
+					if(inputArguments[i].getValue){
+						argsArray[i] = inputArguments[i].getValue();
+					}else{
+						argsArray[i] = inputArguments[i];
+					}
 				}
 			}
 		}
 
 		return calculateFunc(argsArray);
 	};
-	cBaseFunction.prototype._prepareArguments = function (args, arg1, bAddFirstArrElem) {
+	cBaseFunction.prototype._prepareArguments = function (args, arg1, bAddFirstArrElem, typeArray) {
 		var newArgs = [];
 		var indexArr = null;
 
@@ -2432,10 +2436,21 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			var arg = args[i];
 
 			if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
-				newArgs[i] = arg.cross(arg1);
+				if(typeArray && cElementType.array === typeArray[i]){
+					newArgs[i] = arg;
+				}else{
+					newArgs[i] = arg.cross(arg1);
+				}
 			}else if(cElementType.array === arg.type){
 				if(bAddFirstArrElem){
-					newArgs[i] = arg.getElementRowCol(0,0);
+					if(typeArray && cElementType.array === typeArray[i]){
+						newArgs[i] = [];
+						arg.foreach(function (elem) {
+							newArgs[i].push(elem);
+						});
+					}else{
+						newArgs[i] = arg.getElementRowCol(0,0);
+					}
 				}else{
 					indexArr = i;
 					newArgs[i] = arg;
