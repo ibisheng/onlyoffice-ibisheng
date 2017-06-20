@@ -68,7 +68,7 @@
 		cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST,
 		cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV,
 		cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE, cRANK,
-		cRANK_EQ, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST,
+		cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST,
 		cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP,
 		cVARPA, cWEIBULL, cZTEST);
 
@@ -5599,6 +5599,54 @@
 
 	/**
 	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cRANK_AVG() {
+		cBaseFunction.call(this, "RANK.AVG");
+	}
+
+	cRANK_AVG.prototype = Object.create(cBaseFunction.prototype);
+	cRANK_AVG.prototype.constructor = cRANK_AVG;
+	cRANK_AVG.prototype.argumentsMin = 2;
+	cRANK_AVG.prototype.argumentsMax = 3;
+	cRANK_AVG.prototype.isXLFN = true;
+	cRANK_AVG.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [null, cElementType.array]);
+		var argClone = oArguments.args;
+
+		//1 argument - array
+		argClone[0] = argClone[0].tocNumber();
+		argClone[2] = undefined !== argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var number = argArray[0];
+			var ref = argArray[1];
+			var order = argArray[2];
+
+			if(!ref.length){
+				return new cError(cErrorType.wrong_value_type);
+			}
+			var changedRef = [];
+			for(var i = 0; i < ref.length; i++){
+				if(cElementType.number === ref[i].type){
+					changedRef.push(ref[i]);
+				}
+			}
+
+			var res = rank(number, changedRef, order, true);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+
+	/**
+	 * @constructor
 	 * @extends {cRANK}
 	 */
 	function cRANK_EQ() {
@@ -5608,6 +5656,7 @@
 
 	cRANK_EQ.prototype = Object.create(cRANK.prototype);
 	cRANK_EQ.prototype.constructor = cRANK_EQ;
+	cRANK_EQ.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
