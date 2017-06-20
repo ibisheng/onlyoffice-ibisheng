@@ -67,12 +67,13 @@
 		cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS,
 		cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST,
 		cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV,
-		cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE, cRANK, cRSQ,
-		cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
-		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+		cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE, cRANK,
+		cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST,
+		cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP,
+		cVARPA, cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cRANK, cTREND,
+	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
 		cTRIMMEAN, cTTEST, cWEIBULL, cZTEST);
 
 	function isInteger(value) {
@@ -901,6 +902,61 @@
 	function hasChangeOfSign( u, w )
 	{
 		return (u < 0 && w > 0) || (u > 0 && w < 0);
+	}
+
+	function rank( fVal, aSortArray, bAscending, bAverage )
+	{
+		//sort array
+		aSortArray.sort (function sortArr(a, b) {
+			return  a.value - b.value;
+		});
+
+		var nSize = aSortArray.length;
+		var res;
+
+		if ( nSize == 0 /*|| nGlobalError != FormulaError::NONE*/ ){
+			res = null;
+		} else {
+			if ( fVal < aSortArray[ 0 ].value || fVal > aSortArray[ nSize - 1 ].value ){
+				res = null;
+			}else{
+				var fLastPos = 0;
+				var fFirstPos = -1.0;
+				var bFinished = false;
+				var i;
+				for ( i = 0; i < nSize && !bFinished /*&& nGlobalError == FormulaError::NONE*/; i++ ){
+					if ( aSortArray[ i ].value === fVal ){
+						if ( fFirstPos < 0 ){
+							fFirstPos = i + 1.0;
+						}
+					}else{
+						if ( aSortArray[ i ].value > fVal ){
+							fLastPos = i;
+							bFinished = true;
+						}
+					}
+				}
+
+				if ( !bFinished ){
+					fLastPos = i;
+				}
+				if ( !bAverage ){
+					if ( bAscending ){
+						res = fFirstPos;
+					}else{
+						res = nSize + 1.0 - fLastPos;
+					}
+				}else {
+					if ( bAscending ){
+						res = ( fFirstPos + fLastPos ) / 2.0 ;
+					}else{
+						res = nSize + 1.0 - ( fFirstPos + fLastPos ) / 2.0;
+					}
+				}
+			}
+		}
+
+		return res;
 	}
 
 	function GAMMADISTFUNCTION(fp, fAlpha, fBeta){
@@ -5504,6 +5560,103 @@
 
 	cRANK.prototype = Object.create(cBaseFunction.prototype);
 	cRANK.prototype.constructor = cRANK;
+	cRANK.prototype.argumentsMin = 2;
+	cRANK.prototype.argumentsMax = 3;
+	cRANK.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [null, cElementType.array]);
+		var argClone = oArguments.args;
+
+		//1 argument - array
+		argClone[0] = argClone[0].tocNumber();
+		argClone[2] = undefined !== argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var number = argArray[0];
+			var ref = argArray[1];
+			var order = argArray[2];
+
+			if(!ref.length){
+				return new cError(cErrorType.wrong_value_type);
+			}
+			var changedRef = [];
+			for(var i = 0; i < ref.length; i++){
+				if(cElementType.number === ref[i].type){
+					changedRef.push(ref[i]);
+				}
+			}
+
+			var res = rank(number, changedRef, order);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cRANK_AVG() {
+		cBaseFunction.call(this, "RANK.AVG");
+	}
+
+	cRANK_AVG.prototype = Object.create(cBaseFunction.prototype);
+	cRANK_AVG.prototype.constructor = cRANK_AVG;
+	cRANK_AVG.prototype.argumentsMin = 2;
+	cRANK_AVG.prototype.argumentsMax = 3;
+	cRANK_AVG.prototype.isXLFN = true;
+	cRANK_AVG.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [null, cElementType.array]);
+		var argClone = oArguments.args;
+
+		//1 argument - array
+		argClone[0] = argClone[0].tocNumber();
+		argClone[2] = undefined !== argClone[2] ? argClone[2].tocNumber() : new cNumber(0);
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTDist = function(argArray){
+			var number = argArray[0];
+			var ref = argArray[1];
+			var order = argArray[2];
+
+			if(!ref.length){
+				return new cError(cErrorType.wrong_value_type);
+			}
+			var changedRef = [];
+			for(var i = 0; i < ref.length; i++){
+				if(cElementType.number === ref[i].type){
+					changedRef.push(ref[i]);
+				}
+			}
+
+			var res = rank(number, changedRef, order, true);
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTDist);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cRANK}
+	 */
+	function cRANK_EQ() {
+		cRANK.call(this);
+		this.name = "RANK.EQ";
+	}
+
+	cRANK_EQ.prototype = Object.create(cRANK.prototype);
+	cRANK_EQ.prototype.constructor = cRANK_EQ;
+	cRANK_EQ.prototype.isXLFN = true;
 
 	/**
 	 * @constructor

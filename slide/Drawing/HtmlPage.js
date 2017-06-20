@@ -142,8 +142,12 @@ function CEditorPage(api)
 	this.m_oNotesContainer = null;
 	this.m_oNotes          = null;
 	this.m_oNotes_scroll   = null;
+	this.m_oNotesOverlay   = null;
+
+	this.m_oNotesApi	   = null;
 
 	// main
+	this.m_oMainParent = null;
 	this.m_oMainContent = null;
 	// <-
 	// horizontal scroll
@@ -376,12 +380,12 @@ function CEditorPage(api)
 		this.m_oBody = CreateControlContainer(this.Name);
 
 		this.Splitter1Pos    = 70;
-		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 20 : 0;
+		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 10 : 0;
 		this.OldSplitter1Pos = this.Splitter1Pos;
 
 		this.Splitter1PosMin = 20;
 		this.Splitter1PosMax = 80;
-		this.Splitter2PosMin = 20;
+		this.Splitter2PosMin = 10;
 		this.Splitter2PosMax = 100;
 
 		var ScrollWidthMm  = this.ScrollWidthPx * g_dKoef_pix_to_mm;
@@ -417,15 +421,15 @@ function CEditorPage(api)
 		}
 
 		// main content -------------------------------------------------------------
-		this.m_oMainContent = CreateControlContainer("id_main");
+		this.m_oMainParent = CreateControlContainer("id_main_parent");
+		this.m_oMainParent.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM, 0, g_dKoef_pix_to_mm, 1000, true, false, true, false, -1, -1);
+		this.m_oBody.AddControl(this.m_oMainParent);
 
-		if (GlobalSkin.SupportNotes)
-			this.m_oMainContent.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM, 0, g_dKoef_pix_to_mm, this.Splitter2Pos + GlobalSkin.SplitterWidthMM, true, false, true, true, -1, -1);
-		else
-			this.m_oMainContent.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM, 0, g_dKoef_pix_to_mm, 1000, true, false, true, false, -1, -1);
+		this.m_oMainContent = CreateControlContainer("id_main");
+		this.m_oMainContent.Bounds.SetParams(0, 0, g_dKoef_pix_to_mm, this.Splitter2Pos + GlobalSkin.SplitterWidthMM, true, false, true, true, -1, -1);
 
 		this.m_oMainContent.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
-		this.m_oBody.AddControl(this.m_oMainContent);
+		this.m_oMainParent.AddControl(this.m_oMainContent);
 
 		// panel right --------------------------------------------------------------
 		this.m_oPanelRight = CreateControlContainer("id_panel_right");
@@ -508,14 +512,19 @@ function CEditorPage(api)
 
 		// notes ----
 		this.m_oNotesContainer = CreateControlContainer("id_panel_notes");
-		this.m_oNotesContainer.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM, 0, g_dKoef_pix_to_mm, 1000, true, true, true, false, -1, this.Splitter2Pos);
+		this.m_oNotesContainer.Bounds.SetParams(0, 0, g_dKoef_pix_to_mm, 1000, true, true, true, false, -1, this.Splitter2Pos);
 		this.m_oNotesContainer.Anchor = (g_anchor_left | g_anchor_right | g_anchor_bottom);
-		this.m_oBody.AddControl(this.m_oNotesContainer);
+		this.m_oMainParent.AddControl(this.m_oNotesContainer);
 
 		this.m_oNotes = CreateControl("id_notes");
 		this.m_oNotes.Bounds.SetParams(0, 0, ScrollWidthMm, 1000, false, false, true, false, -1, -1);
 		this.m_oNotes.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
 		this.m_oNotesContainer.AddControl(this.m_oNotes);
+
+		this.m_oNotesOverlay = CreateControl("id_notes_overlay");
+		this.m_oNotesOverlay.Bounds.SetParams(0, 0, ScrollWidthMm, 1000, false, false, true, false, -1, -1);
+		this.m_oNotesOverlay.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
+		this.m_oNotesContainer.AddControl(this.m_oNotesOverlay);
 
 		this.m_oNotes_scroll = CreateControl("id_vertical_scroll_notes");
 		this.m_oNotes_scroll.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, ScrollWidthMm, -1);
@@ -559,7 +568,8 @@ function CEditorPage(api)
 		if (this.IsSupportNotes)
 		{
 			this.m_oNotes.HtmlElement.style.backgroundColor = GlobalSkin.BackgroundColor;
-			this.m_oNotes.HtmlElement.style.borderBottom = ("1px solid " + GlobalSkin.BorderSplitterColor);
+			this.m_oNotesContainer.HtmlElement.style.backgroundColor = GlobalSkin.BackgroundColor;
+			this.m_oNotesContainer.HtmlElement.style.borderTop = ("1px solid " + GlobalSkin.BorderSplitterColor);
 		}
 
 		this.m_oOverlayApi.m_oControl  = this.m_oOverlay;
@@ -575,6 +585,9 @@ function CEditorPage(api)
 		this.checkNeedRules();
 		this.initEvents();
 		this.OnResize(true);
+
+		this.m_oNotesApi = new CNotesDrawer(this);
+		this.m_oNotesApi.Init();
 	};
 
 	this.CheckRetinaDisplay = function()
@@ -657,10 +670,6 @@ function CEditorPage(api)
 		this.m_oOverlay.HtmlElement.onmousemove = this.onMouseMove;
 		this.m_oOverlay.HtmlElement.onmouseup   = this.onMouseUp;
 
-		this.m_oNotes.HtmlElement.onmousedown = this.onMouseDownNotes;
-		this.m_oNotes.HtmlElement.onmousemove = this.onMouseMoveNotes;
-		this.m_oNotes.HtmlElement.onmouseup   = this.onMouseUpNotes;
-
 		var _cur         = document.getElementById('id_target_cursor');
 		_cur.onmousedown = this.onMouseDown;
 		_cur.onmousemove = this.onMouseMove;
@@ -693,6 +702,10 @@ function CEditorPage(api)
 
 		if (!this.m_oApi.isMobileVersion)
 		{
+			this.m_oMainParent.HtmlElement.onmousemove = this.onBodyMouseMove;
+			this.m_oMainParent.HtmlElement.onmousedown = this.onBodyMouseDown;
+			this.m_oMainParent.HtmlElement.onmouseup = this.onBodyMouseUp;
+
 			this.m_oBody.HtmlElement.onmousemove = this.onBodyMouseMove;
 			this.m_oBody.HtmlElement.onmousedown = this.onBodyMouseDown;
 			this.m_oBody.HtmlElement.onmouseup = this.onBodyMouseUp;
@@ -1466,12 +1479,7 @@ function CEditorPage(api)
 		}
 
 		if (_isCatch)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-		}
+			AscCommon.stopEvent(e);
 	};
 
 	this.onBodyMouseMove = function(e)
@@ -1547,12 +1555,7 @@ function CEditorPage(api)
 		}
 
 		if (_isCatch)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-		}
+			AscCommon.stopEvent(e);
 	};
 
 	this.OnResizeSplitter = function()
@@ -1564,39 +1567,49 @@ function CEditorPage(api)
 
 		if (!this.IsSupportNotes)
 			this.Splitter2Pos = 0;
+		else if (this.Splitter2Pos < 1)
+			this.Splitter2Pos = 1;
+
 
 		if (this.IsUseNullThumbnailsSplitter || (0 != this.Splitter1Pos))
 		{
-			this.m_oMainContent.Bounds.L = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
+			this.m_oMainParent.Bounds.L = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
 			this.m_oMainContent.Bounds.B = GlobalSkin.SupportNotes ? this.Splitter2Pos + GlobalSkin.SplitterWidthMM : 1000;
 			this.m_oMainContent.Bounds.isAbsB = GlobalSkin.SupportNotes;
 
-
-			this.m_oNotesContainer.Bounds.L    = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
 			this.m_oThumbnailsContainer.HtmlElement.style.display = "block";
-
-			this.m_oMainContent.HtmlElement.style.borderLeft = "1px" + GlobalSkin.BorderSplitterColor + " solid";
+			this.m_oMainParent.HtmlElement.style.borderLeft = ("1px solid " + GlobalSkin.BorderSplitterColor);
 		}
 		else
 		{
-			this.m_oMainContent.Bounds.L = 0;
+			this.m_oMainParent.Bounds.L = 0;
 			this.m_oMainContent.Bounds.B = GlobalSkin.SupportNotes ? this.Splitter2Pos + GlobalSkin.SplitterWidthMM : 1000;
 			this.m_oMainContent.Bounds.isAbsB = GlobalSkin.SupportNotes;
 
-			this.m_oNotesContainer.Bounds.L    = 0;
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
 			this.m_oThumbnailsContainer.HtmlElement.style.display = "none";
-
-			this.m_oMainContent.HtmlElement.style.borderLeft = "1px" + GlobalSkin.BorderSplitterColor + " none";
+			this.m_oMainParent.HtmlElement.style.borderLeft = "none";
 		}
 
-		if (this.Splitter2Pos < 1)
-			this.m_oNotesContainer.HtmlElement.style.display = "none";
+		if (this.IsSupportNotes)
+		{
+			if (this.m_oNotesContainer.Bounds.AbsH < 1)
+				this.m_oNotesContainer.Bounds.AbsH = 1;
+		}
+
+		if (this.Splitter2Pos <= 1)
+		{
+			this.m_oNotes.HtmlElement.style.display = "none";
+			this.m_oNotes_scroll.HtmlElement.style.display = "none";
+		}
 		else
-			this.m_oNotesContainer.HtmlElement.style.display = "block";
+		{
+			this.m_oNotes.HtmlElement.style.display = "block";
+			this.m_oNotes_scroll.HtmlElement.style.display = "block";
+		}
 
 		this.OnResize2(true);
 	};
@@ -1646,12 +1659,7 @@ function CEditorPage(api)
 		}
 
 		if (_isCatch)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-		}
+			AscCommon.stopEvent(e);
 	};
 
 	this.onMouseDown = function(e)
@@ -1851,42 +1859,14 @@ function CEditorPage(api)
 		oWordControl.EndUpdateOverlay();
 	};
 
-	this.onMouseDownNotes = function(e)
-	{
-		AscCommon.check_MouseDownEvent(e, true);
-		global_mouseEvent.LockMouse();
-
-		oThis.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
-
-		var _x = global_mouseEvent.X - oThis.X - ((oThis.m_oNotesContainer.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
-		var _y = global_mouseEvent.Y - oThis.Y - ((oThis.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
-
-		console.log(_x + ", " + _y);
-	};
-	this.onMouseMoveNotes = function(e)
-	{
-		AscCommon.check_MouseMoveEvent(e);
-	};
-	this.onMouseUpNotes = function(e)
-	{
-		AscCommon.check_MouseUpEvent(e);
-
-		var _x = global_mouseEvent.X - oThis.X - ((oThis.m_oNotesContainer.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
-		var _y = global_mouseEvent.Y - oThis.Y - ((oThis.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
-
-		console.log(_x + ", " + _y);
-	};
-
 	this.setNodesEnable = function(bEnabled)
 	{
+		if (bEnabled == this.IsSupportNotes)
+			return;
+
 		GlobalSkin.SupportNotes = bEnabled;
 		this.IsSupportNotes = bEnabled;
 		this.Splitter2Pos = 0;
-
-		if (bEnabled)
-			this.m_oMainContent.HtmlElement.style.borderBottom = ("1px solid " + GlobalSkin.BorderSplitterColor);
-		else
-			this.m_oMainContent.HtmlElement.style.borderBottom = "none";
 
 		this.OnResizeSplitter();
 	};

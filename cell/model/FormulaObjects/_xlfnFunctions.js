@@ -62,8 +62,8 @@
 		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cFORECAST_LINEAR,
 		cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL,
 		cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERCENTILE_EXC, cPERCENTILE_INC,
-		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC, cRANK_AVG,
-		cRANK_EQ, cSKEW_P, cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_P,
+		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC,
+		cSKEW_P, cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_P,
 		cVAR_S, cWEIBULL_DIST, cZ_TEST);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
@@ -80,8 +80,8 @@
 		cCONFIDENCE_NORM, cCONFIDENCE_T, cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cFORECAST_LINEAR, cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL,
 		cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERCENTILE_EXC, cPERCENTILE_INC,
-		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC, cRANK_AVG,
-		cRANK_EQ, cSKEW_P, cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_P, cVAR_S, cWEIBULL_DIST, cZ_TEST, cPDURATION, cRRI,
+		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC,
+		cSKEW_P, cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_P, cVAR_S, cWEIBULL_DIST, cZ_TEST, cPDURATION, cRRI,
 		cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
 
 	/**
@@ -671,30 +671,6 @@
 
 	cQUERYSTRING.prototype = Object.create(cBaseFunction.prototype);
 	cQUERYSTRING.prototype.constructor = cQUERYSTRING;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cRANK_AVG() {
-		cBaseFunction.call(this, "RANK.AVG");
-		this.isXLFN = true;
-	}
-
-	cRANK_AVG.prototype = Object.create(cBaseFunction.prototype);
-	cRANK_AVG.prototype.constructor = cRANK_AVG;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cRANK_EQ() {
-		cBaseFunction.call(this, "RANK.EQ");
-		this.isXLFN = true;
-	}
-
-	cRANK_EQ.prototype = Object.create(cBaseFunction.prototype);
-	cRANK_EQ.prototype.constructor = cRANK_EQ;
 
 	/**
 	 * @constructor

@@ -1316,22 +1316,15 @@ background-repeat: no-repeat;\
 	{
 		this.CreateCSS();
 
-		var _main_border_style     = "border-bottom-width: 1px;border-bottom-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-bottom-style: solid;";
-		var _thumbnail_style_right = "border-right-width: 1px;border-right-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-right-style: solid;";
-		if (!AscCommonSlide.GlobalSkin.SupportNotes)
-		{
-			_main_border_style     = "";
-			_thumbnail_style_right = "";
-		}
-
-		var _innerHTML = "<div id=\"id_panel_thumbnails\" class=\"block_elem\" style=\"background-color:" + AscCommonSlide.GlobalSkin.BackgroundColorThumbnails + ";" + _thumbnail_style_right + "\">\
+		var _innerHTML = "<div id=\"id_panel_thumbnails\" class=\"block_elem\" style=\"background-color:" + AscCommonSlide.GlobalSkin.BackgroundColorThumbnails + ";\">\
 		                            <canvas id=\"id_thumbnails_background\" class=\"block_elem\" style=\"-ms-touch-action: none;-webkit-user-select: none;background-color:#EBEBEB;z-index:1\"></canvas>\
 		                            <canvas id=\"id_thumbnails\" class=\"block_elem\" style=\"-ms-touch-action: none;-webkit-user-select: none;z-index:2\"></canvas>\
 		                            <div id=\"id_vertical_scroll_thmbnl\" style=\"left:0;top:0;width:1px;overflow:hidden;position:absolute;\">\
 									    <div id=\"panel_right_scroll_thmbnl\" class=\"block_elem\" style=\"left:0;top:0;width:1px;height:6000px;\"></div>\
 									</div>\
 		                        </div>\
-                            <div id=\"id_main\" class=\"block_elem\" style=\"-ms-touch-action: none;-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + AscCommonSlide.GlobalSkin.BackgroundColor + ";overflow:hidden;border-left-width: 1px;border-left-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-left-style: solid;" + _main_border_style + "\" UNSELECTABLE=\"on\">\
+		                    <div id=\"id_main_parent\" class=\"block_elem\" style=\"-ms-touch-action: none;-moz-user-select:none;-khtml-user-select:none;user-select:none;overflow:hidden;border-left-width: 1px;border-left-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-left-style: solid;\" UNSELECTABLE=\"on\">\
+                            <div id=\"id_main\" class=\"block_elem\" style=\"-ms-touch-action: none;-moz-user-select:none;-khtml-user-select:none;user-select:none;background-color:" + AscCommonSlide.GlobalSkin.BackgroundColor + ";overflow:hidden;\" UNSELECTABLE=\"on\">\
 								<div id=\"id_panel_left\" class=\"block_elem\">\
 									<canvas id=\"id_buttonTabs\" class=\"block_elem\"></canvas>\
 									<canvas id=\"id_vert_ruler\" class=\"block_elem\"></canvas>\
@@ -1361,11 +1354,14 @@ background-repeat: no-repeat;\
 
 		if (true)
 		{
-			_innerHTML += "<div id=\"id_panel_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;border-left-width: 1px;border-left-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-left-style: solid;border-top-width: 1px;border-top-color:" + AscCommonSlide.GlobalSkin.BorderSplitterColor + "; border-top-style: solid;\">\
-                                <canvas id=\"id_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;z-index:1\"></canvas>\
+			_innerHTML += "<div id=\"id_panel_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;\">\
+                                <canvas id=\"id_notes\" class=\"block_elem\" style=\"-ms-touch-action: none;-webkit-user-select: none;background-color:#FFFFFF;z-index:1\"></canvas>\
+                                <canvas id=\"id_notes_overlay\" class=\"block_elem\" style=\"-ms-touch-action: none;-webkit-user-select: none;z-index:2\"></canvas>\
+                                <canvas id=\"id_notes_target_cursor\" class=\"block_elem\" width=\"1\" height=\"1\" style=\"-ms-touch-action: none;-webkit-user-select: none;width:2px;height:13px;display:none;z-index:4;\"></canvas>\
                                 <div id=\"id_vertical_scroll_notes\" style=\"left:0;top:0;width:16px;overflow:hidden;position:absolute;\">\
                                     <div id=\"panel_right_scroll_notes\" class=\"block_elem\" style=\"left:0;top:0;width:16px;height:6000px;\"></div>\
                                 </div>\
+                            </div>\
                             </div>";
 		}
 
@@ -5545,6 +5541,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
+		this.WordControl.setNodesEnable((this.isViewMode || this.isMobileVersion) ? false : true);
 		if (isViewMode)
 		{
 			this.ShowParaMarks          = false;
