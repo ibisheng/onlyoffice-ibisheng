@@ -1610,8 +1610,8 @@ function CDrawingDocument()
 	this.ConvertCoordsFromCursor2 = function(x, y)
 	{
 		var _word_control = this.m_oWordControl;
-		var _x            = x - _word_control.X - (_word_control.m_oMainContent.AbsolutePosition.L + _word_control.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix;
-		var _y            = y - _word_control.Y - (_word_control.m_oMainContent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix;
+		var _x            = x - _word_control.X - (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix;
+		var _y            = y - _word_control.Y - (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix;
 
 		var dKoef = (100 * g_dKoef_pix_to_mm / this.m_oWordControl.m_nZoomValue);
 
@@ -1669,8 +1669,8 @@ function CDrawingDocument()
 			__y = transform.TransformPointY(x, y);
 		}
 
-		var x_pix = (this.SlideCurrectRect.left + __x * dKoef + (_word_control.m_oMainContent.AbsolutePosition.L + _word_control.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
-		var y_pix = (this.SlideCurrectRect.top + __y * dKoef + (_word_control.m_oMainContent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
+		var x_pix = (this.SlideCurrectRect.left + __x * dKoef + (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
+		var y_pix = (this.SlideCurrectRect.top + __y * dKoef + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
 
 		return {X : x_pix, Y : y_pix, Error : false};
 	}
@@ -1686,8 +1686,8 @@ function CDrawingDocument()
 			_x = this.m_oWordControl.X;
 			_y = this.m_oWordControl.Y;
 
-			_x += (this.m_oWordControl.m_oMainContent.AbsolutePosition.L + this.m_oWordControl.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix;
-			_y += (this.m_oWordControl.m_oMainContent.AbsolutePosition.T + this.m_oWordControl.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix;
+			_x += (this.m_oWordControl.m_oMainParent.AbsolutePosition.L + this.m_oWordControl.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix;
+			_y += (this.m_oWordControl.m_oMainParent.AbsolutePosition.T + this.m_oWordControl.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix;
 		}
 
 		var x_pix = (this.SlideCurrectRect.left + x * dKoef + _x) >> 0;
@@ -1701,8 +1701,8 @@ function CDrawingDocument()
 		var _word_control = this.m_oWordControl;
 		var dKoef         = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-		var x_pix = (this.SlideCurrectRect.left + x * dKoef + _word_control.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0;
-		var y_pix = (this.SlideCurrectRect.top + y * dKoef + _word_control.m_oMainContent.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0;
+		var x_pix = (this.SlideCurrectRect.left + x * dKoef + _word_control.m_oMainParent.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0;
+		var y_pix = (this.SlideCurrectRect.top + y * dKoef + _word_control.m_oMainParent.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0;
 
 		x_pix += _word_control.X;
 		y_pix += _word_control.Y;
