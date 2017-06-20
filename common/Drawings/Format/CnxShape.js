@@ -558,17 +558,31 @@
         var _xfrm = this.spPr.xfrm;
 
         if(oBeginDrawing && oEndDrawing){
-            _startConnectionParams = oBeginDrawing.getConnectionParams(this.getStCxnIdx(), this.group);
-            _endConnectionParams = oEndDrawing.getConnectionParams(this.getEndCxnIdx(), this.group);
+            _startConnectionParams = oBeginDrawing.getConnectionParams(this.getStCxnIdx(), null);
+            _endConnectionParams = oEndDrawing.getConnectionParams(this.getEndCxnIdx(), null);
             _spPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.spPr.geometry.preset, this.pen.w);
             _xfrm2 = _spPr.xfrm;
-            _xfrm.setOffX(_xfrm2.offX);
-            _xfrm.setOffY(_xfrm2.offY);
             _xfrm.setExtX(_xfrm2.extX);
             _xfrm.setExtY(_xfrm2.extY);
-            _xfrm.setFlipH(_xfrm2.flipH);
-            _xfrm.setFlipV(_xfrm2.flipV);
-            _xfrm.setRot(_xfrm2.rot);
+            if(!this.group){
+                _xfrm.setOffX(_xfrm2.offX);
+                _xfrm.setOffY(_xfrm2.offY);
+                _xfrm.setFlipH(_xfrm2.flipH);
+                _xfrm.setFlipV(_xfrm2.flipV);
+                _xfrm.setRot(_xfrm2.rot);
+            }
+            else{
+
+                var _xc = _xfrm2.offX + _xfrm2.extX / 2.0;
+                var _yc = _xfrm2.offY + _xfrm2.extY / 2.0;
+                var xc = this.group.invertTransform.TransformPointX(_xc, _yc);
+                var yc = this.group.invertTransform.TransformPointY(_xc, _yc);
+                _xfrm.setOffX(xc - _xfrm2.extX / 2.0);
+                _xfrm.setOffY(yc - _xfrm2.extY / 2.0);
+                _xfrm.setFlipH(this.group.getFullFlipH() ? !_xfrm2.flipH : _xfrm2.flipH);
+                _xfrm.setFlipV(this.group.getFullFlipV() ? !_xfrm2.flipV : _xfrm2.flipV);
+                _xfrm.setRot(AscFormat.normalizeRotate(_xfrm2.rot - this.group.getFullRotate()));
+            }
             this.spPr.setGeometry(_spPr.geometry.createDuplicate());
             this.checkDrawingBaseCoords();
             this.recalculate();
@@ -619,10 +633,10 @@
             }
             else{
                 if(oBeginDrawing){
-                    _startConnectionParams = oBeginDrawing.getConnectionParams(this.getStCxnIdx(), this.group);
+                    _startConnectionParams = oBeginDrawing.getConnectionParams(this.getStCxnIdx(), null);
                 }
                 if(oEndDrawing){
-                    _endConnectionParams = oEndDrawing.getConnectionParams(this.getEndCxnIdx(), this.group);
+                    _endConnectionParams = oEndDrawing.getConnectionParams(this.getEndCxnIdx(), null);
                 }
                 var _tx, _ty;
                 if(_startConnectionParams || _endConnectionParams){
@@ -639,13 +653,26 @@
                     }
                     _spPr = AscFormat.fCalculateSpPr(_startConnectionParams, _endConnectionParams, this.spPr.geometry.preset, this.pen && this.pen.w);
                     _xfrm2 = _spPr.xfrm;
-                    _xfrm.setOffX(_xfrm2.offX);
-                    _xfrm.setOffY(_xfrm2.offY);
                     _xfrm.setExtX(_xfrm2.extX);
                     _xfrm.setExtY(_xfrm2.extY);
-                    _xfrm.setFlipH(_xfrm2.flipH);
-                    _xfrm.setFlipV(_xfrm2.flipV);
-                    _xfrm.setRot(_xfrm2.rot);
+                    if(!this.group){
+                        _xfrm.setOffX(_xfrm2.offX);
+                        _xfrm.setOffY(_xfrm2.offY);
+                        _xfrm.setFlipH(_xfrm2.flipH);
+                        _xfrm.setFlipV(_xfrm2.flipV);
+                        _xfrm.setRot(_xfrm2.rot);
+                    }
+                    else{
+                        var _xc = _xfrm2.offX + _xfrm2.extX / 2.0;
+                        var _yc = _xfrm2.offY + _xfrm2.extY / 2.0;
+                        var xc = this.group.invertTransform.TransformPointX(_xc, _yc);
+                        var yc = this.group.invertTransform.TransformPointY(_xc, _yc);
+                        _xfrm.setOffX(xc - _xfrm2.extX / 2.0);
+                        _xfrm.setOffY(yc - _xfrm2.extY / 2.0);
+                        _xfrm.setFlipH(this.group.getFullFlipH() ? !_xfrm2.flipH : _xfrm2.flipH);
+                        _xfrm.setFlipV(this.group.getFullFlipV() ? !_xfrm2.flipV : _xfrm2.flipV);
+                        _xfrm.setRot(AscFormat.normalizeRotate(_xfrm2.rot - this.group.getFullRotate()));
+                    }
                     this.spPr.setGeometry(_spPr.geometry.createDuplicate());
                     this.checkDrawingBaseCoords();
                     this.recalculate();

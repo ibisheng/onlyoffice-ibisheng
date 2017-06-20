@@ -1258,7 +1258,10 @@ Slide.prototype =
                 }
             }
             else{
-
+                if(sp.getObjectType() === AscDFH.historyitem_type_GroupShape){
+                    sp.handleUpdateTheme();
+                    sp.checkExtentsByDocContent();
+                }
             }
         }
     },

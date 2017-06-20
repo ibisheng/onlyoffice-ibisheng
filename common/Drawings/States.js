@@ -701,9 +701,20 @@ RotateState.prototype =
                                 }
                             }
                             var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
+                            var oGroupMaps = {};
                             for(i = 0; i < aAllConnectors.length; ++i){
                                 if(!oMapOriginalsId[aAllConnectors[i].Get_Id()]){
                                     aAllConnectors[i].calculateTransform(((oThis instanceof MoveInGroupState) || (oThis instanceof MoveState)));
+                                    var oGroup = aAllConnectors[i].getMainGroup();
+                                    if(oGroup){
+
+                                    }
+                                    oGroupMaps[oGroup.Id] = oGroup;
+                                }
+                            }
+                            for(var key in oGroupMaps){
+                                if(oGroupMaps.hasOwnProperty(key)){
+                                    oGroupMaps[key].updateCoordinatesAfterInternalResize();
                                 }
                             }
                         }
