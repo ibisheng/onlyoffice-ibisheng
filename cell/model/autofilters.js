@@ -4445,21 +4445,6 @@
 					}
 					
 					//заполняем стили
-					var aNoHiddenCol = [];
-					for(var i = bbox.c1; i <= bbox.c2; i++)
-					{
-						if (!worksheet.getColHidden(i))
-							aNoHiddenCol.push(i);
-					}
-					aNoHiddenCol.sort(AscCommon.fSortAscending);
-					//если скрыт первый или последний столбец, то их не надо сдвигать и показывать
-					if(aNoHiddenCol.length > 0)
-					{
-						if(aNoHiddenCol[0] != bbox.c1)
-							style.ShowFirstColumn = false;
-						if(aNoHiddenCol[aNoHiddenCol.length - 1] != bbox.c2)
-							style.ShowLastColumn = false;
-					}
 					styleForCurTable.initStyle(worksheet.sheetMergedStyles, bbox, style, headerRowCount, totalsRowCount);
 				}
 				worksheet.workbook.dependencyFormulas.unlockRecal();

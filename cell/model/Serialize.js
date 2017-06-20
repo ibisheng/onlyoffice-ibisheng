@@ -3357,8 +3357,9 @@
                     var nXfsId;
                     var cellXfs = cell.xfs;
                     if (oThis.isCopyPaste && bIsTablePartContainActiveRange) {
-                        nXfsId = this.prepareXfs(cell.compiledXfs);
-                        cellXfs = cell.compiledXfs;
+                        var compiledXfs = cell.getCompiledStyle();
+                        nXfsId = this.prepareXfs(compiledXfs);
+                        cellXfs = compiledXfs;
                     } else {
                         nXfsId = this.prepareXfs(cell.xfs);
                     }
