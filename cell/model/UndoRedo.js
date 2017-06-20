@@ -926,8 +926,8 @@ function UndoRedoData_RowProp(row){
 	if(null != row)
 	{
 		this.h = row.h;
-		this.hd = 0 != (AscCommonExcel.g_nRowFlag_hd & row.flags);
-		this.CustomHeight = 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & row.flags);
+		this.hd = row.getHidden();
+		this.CustomHeight = row.getCustomHeight();
 	}
 	else
 	{

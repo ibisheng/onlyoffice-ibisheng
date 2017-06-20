@@ -2890,7 +2890,7 @@ StyleManager.prototype =
 			}
 		}
 	};
-	SheetMergedStyles.prototype.getStyle = function(styleManager, row, col) {
+	SheetMergedStyles.prototype.getStyle = function(styleManager, hiddenManager, row, col) {
 		var res = {table: [], conditional: []};
 		var conditionRow = this.stylesCondition[row];
 		if (conditionRow) {
@@ -2901,9 +2901,9 @@ StyleManager.prototype =
 		}
 		for (var i = 0; i < this.stylesTablePivot.length; ++i) {
 			var style = this.stylesTablePivot[i];
-			if (style.range.contains(col, row) && this._checkStripes(style.range, style.stripe, row, col)) {
-				var xf = style.xf;
-				var borderIndex = this._getBorderIndex(style.range, style.stripe, row, col, xf);
+			var borderIndex;
+			var xf = style.xf;
+			if (style.range.contains(col, row) && (borderIndex = this._getBorderIndex(hiddenManager, style.range, style.stripe, row, col, xf)) >= 0) {
 				if (borderIndex > 0) {
 					if (!style.borders) {
 						style.borders = {};
@@ -2939,71 +2939,69 @@ StyleManager.prototype =
 		}
 		return res;
 	};
-	SheetMergedStyles.prototype._checkStripes = function(bbox, stripe, row, col) {
+	SheetMergedStyles.prototype._getBorderIndex = function(hiddenManager, bbox, stripe, row, col, xf) {
+		var borderIndex = 0;
+		var hidden;
 		if (stripe) {
 			if (stripe.row) {
-				if ((row - bbox.r1) % (stripe.size + stripe.offset) < stripe.size) {
-					return true;
-				}
-			} else {
-				if ((col - bbox.c1) % (stripe.size + stripe.offset) < stripe.size) {
-					return true;
-				}
-			}
-			return false;
-		}
-		return true;
-	};
-	SheetMergedStyles.prototype._getBorderIndex = function(bbox, stripe, row, col, xf) {
-		var borderIndex = 0;
-		if (xf.border) {
-			if (stripe) {
-				if (stripe.row) {
-					var rowIndex = (row - bbox.r1) % (stripe.size + stripe.offset);
-					if (bbox.c1 !== col && xf.border.l) {
-						borderIndex += 1;
-					}
-					if (0 != rowIndex && xf.border.t) {
-						borderIndex += 2;
-					}
-					if (bbox.c2 !== col && xf.border.r) {
-						borderIndex += 4;
-					}
-					if (stripe.size - 1 != rowIndex && xf.border.b) {
-						borderIndex += 8;
+				hidden = hiddenManager.getHiddenRowsCount(bbox.r1, row);
+				var rowIndex = (row - bbox.r1 - hidden) % (stripe.size + stripe.offset);
+				if (rowIndex < stripe.size) {
+					if (xf.border) {
+						if (bbox.c1 !== col && xf.border.l) {
+							borderIndex += 1;
+						}
+						if (0 != rowIndex && xf.border.t) {
+							borderIndex += 2;
+						}
+						if (bbox.c2 !== col && xf.border.r) {
+							borderIndex += 4;
+						}
+						if (stripe.size - 1 != rowIndex && xf.border.b) {
+							borderIndex += 8;
+						}
 					}
 				} else {
-					var colIndex = (col - bbox.c1) % (stripe.size + stripe.offset);
-					if (0 != colIndex && xf.border.l) {
-						borderIndex += 1;
-					}
-					if (bbox.r1 !== row && xf.border.t) {
-						borderIndex += 2;
-					}
-					if (stripe.size - 1 != colIndex && xf.border.r) {
-						borderIndex += 4;
-					}
-					if (bbox.r2 !== row && xf.border.b) {
-						borderIndex += 8;
-					}
+					borderIndex = -1;
 				}
 			} else {
-				if (bbox.c1 !== col && xf.border.l) {
-					borderIndex += 1;
-				}
-				if (bbox.r1 !== row && xf.border.t) {
-					borderIndex += 2;
-				}
-				if (bbox.c2 !== col && xf.border.r) {
-					borderIndex += 4;
-				}
-				if (bbox.r2 !== row && xf.border.b) {
-					borderIndex += 8;
+				hidden = hiddenManager.getHiddenColsCount(bbox.c1, col);
+				var colIndex = (col - bbox.c1 - hidden) % (stripe.size + stripe.offset);
+				if (colIndex < stripe.size) {
+					if (xf.border) {
+						if (0 != colIndex && xf.border.l) {
+							borderIndex += 1;
+						}
+						if (bbox.r1 !== row && xf.border.t) {
+							borderIndex += 2;
+						}
+						if (stripe.size - 1 != colIndex && xf.border.r) {
+							borderIndex += 4;
+						}
+						if (bbox.r2 !== row && xf.border.b) {
+							borderIndex += 8;
+						}
+					}
+				} else {
+					borderIndex = -1;
 				}
 			}
-			if (xf.border.du || xf.border.dd) {
-				borderIndex += 16;
+		} else if (xf.border) {
+			if (bbox.c1 !== col && xf.border.l) {
+				borderIndex += 1;
 			}
+			if (bbox.r1 !== row && xf.border.t) {
+				borderIndex += 2;
+			}
+			if (bbox.c2 !== col && xf.border.r) {
+				borderIndex += 4;
+			}
+			if (bbox.r2 !== row && xf.border.b) {
+				borderIndex += 8;
+			}
+		}
+		if (xf.border && (xf.border.du || xf.border.dd)) {
+			borderIndex += 16;
 		}
 		return borderIndex;
 	};
@@ -3227,10 +3225,7 @@ Col.prototype =
 				this.width = prop.width;
 			else
 				this.width = null;
-			if(null != prop.hd)
-				this.hd = prop.hd;
-			else
-				this.hd = null;
+			this.setHidden(prop.hd);
 			if(null != prop.CustomWidth)
 				this.CustomWidth = prop.CustomWidth;
 			else
@@ -3419,6 +3414,15 @@ Col.prototype =
         var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
             History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+	},
+	setHidden: function(val) {
+		this.hd = val;
+		if (this.index >= 0) {
+			this.ws.hiddenManager.setDirty(true);
+		}
+	},
+	getHidden: function() {
+		return this.hd;
 	}
 };
 var g_nRowFlag_empty = 0;
@@ -3507,14 +3511,8 @@ Row.prototype =
 				this.h = prop.h;
 			else
 				this.h = null;
-			if(true == prop.hd)
-				this.flags |= g_nRowFlag_hd;
-			else
-				this.flags &= ~g_nRowFlag_hd;
-			if(true == prop.CustomHeight)
-				this.flags |= g_nRowFlag_CustomHeight;
-			else
-				this.flags &= ~g_nRowFlag_CustomHeight;
+			this.setHidden(prop.hd);
+			this.setCustomHeight(prop.CustomHeight);
 		}
 	},
 	copyProperty : function(otherRow)
@@ -3706,9 +3704,38 @@ Row.prototype =
             History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 
-	getHidden: function()
-	{
-		return 0 != (AscCommonExcel.g_nRowFlag_hd & this.flags);
+	setHidden: function(val) {
+		if (true === val) {
+			this.flags |= g_nRowFlag_hd;
+		} else {
+			this.flags &= ~g_nRowFlag_hd;
+		}
+		if (this.index >= 0) {
+			this.ws.hiddenManager.setDirty(true);
+		}
+	},
+	getHidden: function() {
+		return 0 != (g_nRowFlag_hd & this.flags);
+	},
+	setCustomHeight: function(val) {
+		if (true === val) {
+			this.flags |= g_nRowFlag_CustomHeight;
+		} else {
+			this.flags &= ~g_nRowFlag_CustomHeight;
+		}
+	},
+	getCustomHeight: function() {
+		return 0 != (g_nRowFlag_CustomHeight & this.flags);
+	},
+	setCalcHeight: function(val) {
+		if (true === val) {
+			this.flags |= g_nRowFlag_CalcHeight;
+		} else {
+			this.flags &= ~g_nRowFlag_CalcHeight;
+		}
+	},
+	getCalcHeight: function() {
+		return 0 != (g_nRowFlag_CalcHeight & this.flags);
 	}
 };
 var g_oCCellValueMultiTextProperties = {
@@ -8105,10 +8132,6 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].Hyperlink = Hyperlink;
 	window['AscCommonExcel'].SheetFormatPr = SheetFormatPr;
 	window['AscCommonExcel'].Col = Col;
-	window['AscCommonExcel'].g_nRowFlag_empty = g_nRowFlag_empty;
-	window['AscCommonExcel'].g_nRowFlag_hd = g_nRowFlag_hd;
-	window['AscCommonExcel'].g_nRowFlag_CustomHeight = g_nRowFlag_CustomHeight;
-	window['AscCommonExcel'].g_nRowFlag_CalcHeight = g_nRowFlag_CalcHeight;
 	window['AscCommonExcel'].Row = Row;
 	window['AscCommonExcel'].CCellValueMultiText = CCellValueMultiText;
 	window['AscCommonExcel'].CCellValue = CCellValue;

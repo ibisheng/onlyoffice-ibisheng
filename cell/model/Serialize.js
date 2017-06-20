@@ -2731,7 +2731,7 @@
                 aIndexes.push(i - 0);
             aIndexes.sort(AscCommon.fSortAscending);
             var fInitCol = function(col, nMin, nMax){
-                var oRes = {BestFit: col.BestFit, hd: col.hd, Max: nMax, Min: nMin, xfsid: null, width: col.width, CustomWidth: col.CustomWidth};
+                var oRes = {BestFit: col.BestFit, hd: col.getHidden(), Max: nMax, Min: nMin, xfsid: null, width: col.width, CustomWidth: col.CustomWidth};
                 if(null == oRes.width)
                 {
                     if(null != ws.oSheetFormatPr.dDefaultColWidth)
@@ -2938,13 +2938,13 @@
                     this.memory.WriteByte(c_oSerPropLenType.Double);
                     this.memory.WriteDouble2(oAllRow.h);
                 }
-                if(0 != (AscCommonExcel.g_nRowFlag_CustomHeight & oAllRow.flags))
+                if(oAllRow.getCustomHeight())
                 {
                     this.memory.WriteByte(c_oSerSheetFormatPrTypes.CustomHeight);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
                     this.memory.WriteBool(true);
                 }
-                if(0 != (AscCommonExcel.g_nRowFlag_hd & oAllRow.flags))
+                if(oAllRow.getHidden())
                 {
                     this.memory.WriteByte(c_oSerSheetFormatPrTypes.ZeroHeight);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -3315,13 +3315,13 @@
                 this.memory.WriteByte(c_oSerPropLenType.Double);
                 this.memory.WriteDouble2(oRow.h);
             }
-            if(0 != (AscCommonExcel.g_nRowFlag_CustomHeight & oRow.flags))
+            if(oRow.getCustomHeight())
             {
                 this.memory.WriteByte(c_oSerRowTypes.CustomHeight);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
                 this.memory.WriteBool(true);
             }
-            if(0 != (AscCommonExcel.g_nRowFlag_hd & oRow.flags))
+            if(oRow.getHidden())
             {
                 this.memory.WriteByte(c_oSerRowTypes.Hidden);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -6103,8 +6103,7 @@
                 {
                     if(null != oFrom.BestFit)
                         oTo.BestFit = oFrom.BestFit;
-                    if(null != oFrom.hd)
-                        oTo.hd = oFrom.hd;
+                    oTo.setHidden(oFrom.hd);
                     if(null != oFrom.xfs)
                         oTo.xfs = oFrom.xfs.clone();
                     else if(null != oFrom.xfsid)
@@ -6336,14 +6335,14 @@
                 var oAllRow = oWorksheet.getAllRow();
 				var CustomHeight = this.stream.GetBool();
 				if(CustomHeight)
-					oAllRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+					oAllRow.setCustomHeight(true);
             }
             else if ( c_oSerSheetFormatPrTypes.ZeroHeight == type )
             {
                 var oAllRow = oWorksheet.getAllRow();
 				var hd = this.stream.GetBool();
 				if(hd)
-					oAllRow.flags |= AscCommonExcel.g_nRowFlag_hd;
+					oAllRow.setHidden(true);
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -6491,7 +6490,7 @@
             {
                 oRow.h = this.stream.GetDoubleLE();
                 if(AscCommon.CurFileVersion < 2)
-                    oRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+					oRow.setCustomHeight(true);
 				if (oRow.h < 0) {
 					oRow.h = 0;
 				} else if (oRow.h > Asc.c_oAscMaxRowHeight) {
@@ -6502,13 +6501,13 @@
 			{
 				var CustomHeight = this.stream.GetBool();
 				if(CustomHeight)
-					oRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+					oRow.setCustomHeight(true);
 			}
             else if ( c_oSerRowTypes.Hidden == type )
 			{
 				var hd = this.stream.GetBool();
 				if(hd)
-					oRow.flags |= AscCommonExcel.g_nRowFlag_hd;
+					oRow.setHidden(true);
 			}
             else if ( c_oSerRowTypes.Cells == type )
             {

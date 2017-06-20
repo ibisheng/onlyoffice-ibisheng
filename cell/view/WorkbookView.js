@@ -2836,11 +2836,12 @@
 	
 	var bbox = new Asc.Range(0, 0, col - 1, row - 1);
 	var sheetMergedStyles = new AscCommonExcel.SheetMergedStyles();
+	var hiddenManager = new AscCommonExcel.HiddenManager(null);
 	style.initStyle(sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
 	for (var i = 0; i < row; i++) {
 		for (var j = 0; j < col; j++) {
 			var color = null;
-			var curStyle = AscCommonExcel.getCompiledStyle(this.model.oStyleManager, sheetMergedStyles, i, j);
+			var curStyle = AscCommonExcel.getCompiledStyle(this.model.oStyleManager, sheetMergedStyles, hiddenManager, i, j);
 			
 			//fill
 			if(curStyle && curStyle.fill && curStyle.fill.bg)

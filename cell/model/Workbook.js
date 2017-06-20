@@ -146,34 +146,34 @@
 			return c_oRangeType.Range;
 	}
 
-	function getCompiledStyleWs(ws, row, col, opt_cell) {
-		return getCompiledStyle(ws.workbook.oStyleManager, ws.sheetMergedStyles, row, col, opt_cell);
+	function getCompiledStyleWs(ws, row, col, opt_cell, opt_styleComponents) {
+		return getCompiledStyle(ws.workbook.oStyleManager, ws.sheetMergedStyles, ws.hiddenManager, row, col, opt_cell, opt_styleComponents);
 	}
-	function getCompiledStyle(styleManager, sheetMergedStyles, row, col, opt_cell) {
-		var styles = sheetMergedStyles.getStyle(styleManager, row, col);
-		var xfMerged = null;
-		for (var i = 0; i < styles.table.length; ++i) {
-			if (null == xfMerged) {
-				xfMerged = styles.table[i];
+	function getCompiledStyleComponentsWs(ws, row, col) {
+		return ws.sheetMergedStyles.getStyle(ws.workbook.oStyleManager, ws.hiddenManager, row, col);
+	}
+	function getCompiledStyleFromArray(styleManager, xf, xfs) {
+		for (var i = 0; i < xfs.length; ++i) {
+			if (null == xf) {
+				xf = xfs[i];
 			} else {
-				xfMerged = xfMerged.merge(styleManager, styles.table[i]);
+				xf = xf.merge(styleManager, xfs[i]);
 			}
 		}
+		return xf;
+	}
+	function getCompiledStyle(styleManager, sheetMergedStyles, hiddenManager, row, col, opt_cell, opt_styleComponents) {
+		var styleComponents = opt_styleComponents ? opt_styleComponents : sheetMergedStyles.getStyle(styleManager, hiddenManager, row, col);
+		var xf = getCompiledStyleFromArray(styleManager, null, styleComponents.table);
 		if (opt_cell) {
-			if (null == xfMerged) {
-				xfMerged = opt_cell.xfs;
+			if (null == xf) {
+				xf = opt_cell.xfs;
 			} else if (opt_cell.xfs) {
-				xfMerged = xfMerged.merge(styleManager, opt_cell.xfs);
+				xf = xf.merge(styleManager, opt_cell.xfs, true);
 			}
 		}
-		for (var i = 0; i < styles.conditional.length; ++i) {
-			if (null == xfMerged) {
-				xfMerged = styles.conditional[i];
-			} else {
-				xfMerged = xfMerged.merge(styleManager, styles.conditional[i]);
-			}
-		}
-		return xfMerged;
+		xf = getCompiledStyleFromArray(styleManager, xf, styleComponents.conditional);
+		return xf;
 	};
 
 	function getDefNameIndex(name) {
@@ -2424,6 +2424,7 @@
 		this.nColsCount = 0;
 		this.aGCells = {};// 0 based
 		this.aCols = [];// 0 based
+		this.hiddenManager = new HiddenManager(this);
 		this.Drawings = [];
 		this.TableParts = [];
 		this.AutoFilter = null;
@@ -3298,7 +3299,7 @@
 			{
 				var row = this._getRow(index + i);
 				row.copyProperty(oPrevRow);
-				row.flags &= ~AscCommonExcel.g_nRowFlag_hd;
+				row.setHidden(false);
 			}
 			History.LocalChange = false;
 		}
@@ -3455,7 +3456,7 @@
 			{
 				History.LocalChange = true;
 				oNewCol = oPrevCol.clone();
-				oNewCol.hd = null;
+				oNewCol.setHidden(null);
 				oNewCol.BestFit = null;
 				oNewCol.index = index + i;
 				History.LocalChange = false;
@@ -3528,7 +3529,7 @@
 				col.width = width;
 				col.CustomWidth = true;
 				col.BestFit = null;
-				col.hd = null;
+				col.setHidden(null);
 				var oNewProps = col.getWidthProp();
 				if(false == oOldProps.isEqual(oNewProps))
 					History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_ColProp, oThis.getId(),
@@ -3556,7 +3557,7 @@
 	};
 	Worksheet.prototype.getColHidden=function(index){
 		var col = this._getColNoEmptyWithAll(index);
-		return col ? col.hd : false;
+		return col ? col.getHidden() : false;
 	};
 	Worksheet.prototype.setColHidden=function(bHidden, start, stop){
 		//start, stop 0 based
@@ -3567,12 +3568,12 @@
 		History.Create_NewPoint();
 		var oThis = this;
 		var fProcessCol = function(col){
-			if(col.hd != bHidden)
+			if(col.getHidden() != bHidden)
 			{
 				var oOldProps = col.getWidthProp();
 				if(bHidden)
 				{
-					col.hd = bHidden;
+					col.setHidden(bHidden);
 					if(null == col.width || true != col.CustomWidth)
 						col.width = 0;
 					col.CustomWidth = true;
@@ -3580,7 +3581,7 @@
 				}
 				else
 				{
-					col.hd = null;
+					col.setHidden(null);
 					if(0 >= col.width)
 						col.width = null;
 				}
@@ -3632,7 +3633,7 @@
 			if(bBestFit)
 			{
 				col.BestFit = bBestFit;
-				col.hd = null;
+				col.setHidden(null);
 			}
 			else
 				col.BestFit = null;
@@ -3672,16 +3673,16 @@
 		}
 	};
 	Worksheet.prototype.isDefaultHeightHidden=function(){
-		return null != this.oSheetFormatPr.oAllRow && 0 != (AscCommonExcel.g_nRowFlag_hd & this.oSheetFormatPr.oAllRow.flags);
+		return null != this.oSheetFormatPr.oAllRow && this.oSheetFormatPr.oAllRow.getHidden();
 	};
 	Worksheet.prototype.isDefaultWidthHidden=function(){
-		return null != this.oAllCol && this.oAllCol.hd;
+		return null != this.oAllCol && this.oAllCol.getHidden();
 	};
 	Worksheet.prototype.getDefaultHeight=function(){
 		// ToDo http://bugzilla.onlyoffice.com/show_bug.cgi?id=19666 (флага CustomHeight нет)
 		var dRes = null;
 		// Нужно возвращать выставленную, только если флаг CustomHeight = true
-		if(null != this.oSheetFormatPr.oAllRow && 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & this.oSheetFormatPr.oAllRow.flags))
+		if(null != this.oSheetFormatPr.oAllRow && this.oSheetFormatPr.oAllRow.getCustomHeight())
 			dRes = this.oSheetFormatPr.oAllRow.h;
 		return dRes;
 	};
@@ -3718,10 +3719,10 @@
 				var oOldProps = row.getHeightProp();
 				row.h = height;
 				if (isCustom) {
-					row.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
+					row.setCustomHeight(true);
 				}
-				row.flags |= AscCommonExcel.g_nRowFlag_CalcHeight;
-				row.flags &= ~AscCommonExcel.g_nRowFlag_hd;
+				row.setCalcHeight(true);
+				row.setHidden(false);
 				var oNewProps = row.getHeightProp();
 				if(false === oOldProps.isEqual(oNewProps))
 					History.Add(AscCommonExcel.g_oUndoRedoWorksheet, AscCH.historyitem_Worksheet_RowProp, oThis.getId(), row._getUpdateRange(), new UndoRedoData_IndexSimpleProp(row.index, true, oOldProps, oNewProps));
@@ -3743,7 +3744,7 @@
 	};
 	Worksheet.prototype.getRowHidden=function(index){
 		var row = this._getRowNoEmptyWithAll(index);
-		return row ? 0 != (AscCommonExcel.g_nRowFlag_hd & row.flags) : false;
+		return row ? row.getHidden() : false;
 	};
 	Worksheet.prototype.setRowHidden=function(bHidden, start, stop){
 		//start, stop 0 based
@@ -3756,13 +3757,9 @@
 		var startIndex = null, endIndex = null, updateRange;
 
 		var fProcessRow = function(row){
-			if(row && bHidden != (0 != (AscCommonExcel.g_nRowFlag_hd & row.flags)))
+			if(row && bHidden != row.getHidden())
 			{
-				if(bHidden)
-					row.flags |= AscCommonExcel.g_nRowFlag_hd;
-				else
-					row.flags &= ~AscCommonExcel.g_nRowFlag_hd;
-
+				row.setHidden(bHidden);
 
 				if(row.index === endIndex + 1 && startIndex !== null)
 					endIndex++;
@@ -3808,11 +3805,8 @@
 			if(row)
 			{
 				var oOldProps = row.getHeightProp();
-				if(true == bBestFit)
-					row.flags &= ~AscCommonExcel.g_nRowFlag_CustomHeight;
-				else
-					row.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
-				row.flags |= AscCommonExcel.g_nRowFlag_CalcHeight;
+				row.setCustomHeight(!bBestFit);
+				row.setCalcHeight(true);
 				row.h = height;
 				var oNewProps = row.getHeightProp();
 				if(false == oOldProps.isEqual(oNewProps))
@@ -4984,30 +4978,11 @@
 	Cell.prototype.getStyle=function(){
 		return this.xfs;
 	};
-	Cell.prototype.getCompiledStyle = function () {
-		return getCompiledStyleWs(this.ws, this.nRow, this.nCol, this);
+	Cell.prototype.getCompiledStyle = function (opt_styleComponents) {
+		return getCompiledStyleWs(this.ws, this.nRow, this.nCol, this, opt_styleComponents);
 	};
-	Cell.prototype.compileXfs=function(){
-		this.compiledXfs = null;
-		if(null != this.xfs || null != this.tableXfs || null != this.conditionalFormattingXfs)
-		{
-			if(null != this.tableXfs)
-				this.compiledXfs = this.tableXfs;
-			if(null != this.xfs)
-			{
-				if(null != this.compiledXfs)
-					this.compiledXfs = this.xfs.merge(this.compiledXfs, true);
-				else
-					this.compiledXfs = this.xfs;
-			}
-			if(null != this.conditionalFormattingXfs)
-			{
-				if(null != this.compiledXfs)
-					this.compiledXfs = this.conditionalFormattingXfs.merge(this.compiledXfs);
-				else
-					this.compiledXfs = this.conditionalFormattingXfs;
-			}
-		}
+	Cell.prototype.getStyleComponents = function () {
+		return getCompiledStyleComponentsWs(this.ws, this.nRow, this.nCol);
 	};
 	Cell.prototype.clone=function(oNewWs, renameParams){
 		if(!oNewWs)
@@ -8059,7 +8034,7 @@
 			var row = oThis.worksheet._getRowNoEmpty(nRow0);
 			if(row)
 			{
-				if(0 != (AscCommonExcel.g_nRowFlag_hd & row.flags))
+				if(row.getHidden())
 					aHiddenRow[nRow0] = 1;
 				else
 				{
@@ -9352,7 +9327,66 @@
 	/**
 	 * @constructor
 	 */
+	function HiddenManager(ws) {
+		this.ws = ws;
+		this.hiddenRowsSum = [];
+		this.hiddenColsSum = [];
+		this.dirty = true;
+	}
 
+	HiddenManager.prototype.setDirty = function(val) {
+		this.dirty = val;
+	};
+	HiddenManager.prototype.getHiddenRowsCount = function(from, to) {
+		return this._getHiddenCount(true, from, to);
+	};
+	HiddenManager.prototype.getHiddenColsCount = function(from, to) {
+		return this._getHiddenCount(false, from, to);
+	};
+	HiddenManager.prototype._getHiddenCount = function(isRow, from, to) {
+		//todo wrong result if 'to' is hidden
+		if (this.dirty) {
+			this.dirty = false;
+			this._init();
+		}
+		var hiddenSum = isRow ? this.hiddenRowsSum : this.hiddenColsSum;
+		var toCount = to < hiddenSum.length ? hiddenSum[to] : 0;
+		var fromCount = from < hiddenSum.length ? hiddenSum[from] : 0;
+		return fromCount - toCount;
+	};
+	HiddenManager.prototype._init = function() {
+		if (this.ws) {
+			this.hiddenColsSum = this._initHiddenSum(this.ws.aCols);
+			this.hiddenRowsSum = this._initHiddenSum(this.ws.aGCells);
+		}
+	};
+	HiddenManager.prototype._initHiddenSum = function(elems) {
+		if (this.ws) {
+			var i;
+			var hiddenFlags = [];
+			for (i in elems) {
+				if (elems.hasOwnProperty(i)) {
+					var elem = elems[i];
+					if (null != elem && elem.getHidden()) {
+						hiddenFlags[i] = 1;
+					}
+				}
+			}
+			var hiddenSum = [];
+			var sum = 0;
+			for (i = hiddenFlags.length - 1; i >= 0; --i) {
+				if (hiddenFlags[i] > 0) {
+					sum++;
+				}
+				hiddenSum[i] = sum;
+			}
+		}
+		return hiddenSum;
+	};
+
+	/**
+	 * @constructor
+	 */
 	function DrawingObjectsManager(worksheet)
 	{
 		this.worksheet = worksheet;
@@ -9410,8 +9444,11 @@
 	window['AscCommonExcel'].DefName = DefName;
 	window['AscCommonExcel'].RangeTree = RangeTree;
 	window['AscCommonExcel'].DependencyGraph = DependencyGraph;
+	window['AscCommonExcel'].HiddenManager = HiddenManager;
 	window['AscCommonExcel'].preparePromoteFromTo = preparePromoteFromTo;
 	window['AscCommonExcel'].promoteFromTo = promoteFromTo;
 	window['AscCommonExcel'].getCompiledStyle = getCompiledStyle;
 	window['AscCommonExcel'].getCompiledStyleWs = getCompiledStyleWs;
+	window['AscCommonExcel'].getCompiledStyleComponentsWs = getCompiledStyleComponentsWs;
+	window['AscCommonExcel'].getCompiledStyleFromArray = getCompiledStyleFromArray;
 })(window);

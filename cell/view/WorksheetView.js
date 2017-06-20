@@ -1413,7 +1413,7 @@
             if (!column) {
                 w = defaultWidth; // Используем дефолтное значение
                 isBestFit = true; // Это уже оптимальная ширина
-            } else if (column.hd) {
+            } else if (column.getHidden()) {
                 w = 0;            // Если столбец скрытый, ширину выставляем 0
                 isBestFit = false;
                 hiddenW += this._calcColWidth(column.width).width;
@@ -1455,14 +1455,14 @@
             if (!row) {
                 h = -1; // Будет использоваться дефолтная высота строки
                 isCustomHeight = false;
-            } else if (0 != (AscCommonExcel.g_nRowFlag_hd & row.flags)) {
+            } else if (row.getHidden()) {
                 hR = h = 0;  // Скрытая строка, высоту выставляем 0
                 isCustomHeight = true;
                 hiddenH += row.h > 0 ? row.h - this.height_1px : defaultH;
             } else {
-                isCustomHeight = 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & row.flags);
+                isCustomHeight = row.getCustomHeight();
                 // Берем высоту из модели, если она custom(баг 15618), либо дефолтную
-                if (row.h > 0 && (isCustomHeight || (AscCommonExcel.g_nRowFlag_CalcHeight & row.flags))) {
+                if (row.h > 0 && (isCustomHeight || row.getCalcHeight())) {
                     hR = row.h;
                     h = hR / 0.75;
                     h = (h | h) * 0.75;			// 0.75 - это размер 1px в pt (можно было 96/72)
