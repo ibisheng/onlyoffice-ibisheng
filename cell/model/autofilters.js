@@ -56,8 +56,6 @@
 		var prot;
 
 		var maxIndividualValues = 10000;
-		var maxValCol = 20000;
-		var maxValRow = 100000;
 
 		var g_oAutoFiltersOptionsElementsProperties = {
 			val		    : 0,
@@ -899,6 +897,10 @@
 				if(userRange)
 				{
 					activeCells = AscCommonExcel.g_oRangeCache.getAscRange(userRange);
+				}
+
+				if(activeCells.getAllRange){
+					activeCells = activeCells.getAllRange();
 				}
 				
 				//данная функция возвращает false в двух случаях - при смене стиля ф/т или при поптыке добавить ф/т к части а/ф
@@ -2207,13 +2209,9 @@
 							{
 								cell = worksheet._getCell(i, j);
 								cellTo = worksheet._getCell(i + diffRow, j + diffCol);
-								
-								var xfsTo = cellTo.getCompiledStyle();
-								if(null === xfsTo)
-								{
-									var xfsFrom = cell.getCompiledStyle();
-									cellTo.setStyle(xfsFrom);
-								}
+
+								var xfsFrom = cell.getCompiledStyle();
+								cellTo.setStyle(xfsFrom);
 							}
 						}
 					}
@@ -4376,11 +4374,6 @@
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
 				
 				var bbox = range;
-				//ограничим количество строчек/столбцов				
-				if((bbox.r2 - bbox.r1) > maxValRow)
-					bbox.r2 = bbox.r1 + maxValRow;
-				if((bbox.c2 - bbox.c1) > maxValCol)
-					bbox.c2 = bbox.c1 + maxValCol;
 				
 				var style = options.TableStyleInfo ? options.TableStyleInfo.clone() : null;
 				var styleForCurTable;
