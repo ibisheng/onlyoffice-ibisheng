@@ -174,7 +174,7 @@
 		}
 		xf = getCompiledStyleFromArray(styleManager, xf, styleComponents.conditional);
 		return xf;
-	};
+	}
 
 	function getDefNameIndex(name) {
 		//uniqueness is checked without capitalization
