@@ -2214,7 +2214,7 @@ ScrollObject.prototype = {
 
             startColorFadeIn -= 2;
 
-            if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
+            if ( that._checkPiperImagesV() ) {
                 x = that.scroller.x + (that.settings.slimScroll ? 2 : 3);
                 y = (that.scroller.y >> 0) + Math.floor( that.scroller.h / 2 ) - 6;
 
@@ -2234,7 +2234,7 @@ ScrollObject.prototype = {
 
                 img = that.piperImgVert[0];
             }
-            else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
+            else if ( that._checkPiperImagesH() ) {
                 x = (that.scroller.x >> 0) + Math.floor( that.scroller.w / 2 ) - 6;
                 y = that.scroller.y + (that.settings.slimScroll ? 2 : 3);
 
@@ -2265,7 +2265,7 @@ ScrollObject.prototype = {
                 that.fadeInActive = false;
                 that.startColorFadeInOutStart = startColorFadeIn + 2;
 
-                if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
+                if ( that._checkPiperImagesV() ) {
 
                     ctx_piperImg = that.piperImgVert[0].getContext( '2d' );
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgVert[0].width, that.piperImgVert[0].height );
@@ -2284,7 +2284,7 @@ ScrollObject.prototype = {
                     img = that.piperImgVert[0];
 
                 }
-                else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
+                else if ( that._checkPiperImagesH() ) {
 
                     ctx_piperImg = that.piperImgHor[0].getContext( '2d' );
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgHor[0].width, that.piperImgHor[0].height );
@@ -2332,7 +2332,7 @@ ScrollObject.prototype = {
 
             startColorFadeOut += 2;
 
-            if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
+            if ( that._checkPiperImagesV() ) {
                 x = that.scroller.x + (that.settings.slimScroll ? 2 : 3);
                 y = (that.scroller.y >> 0) + Math.floor( that.scroller.h / 2 ) - 6;
 
@@ -2354,7 +2354,7 @@ ScrollObject.prototype = {
                 img = that.piperImgVert[0];
 
             }
-            else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
+            else if ( that._checkPiperImagesH() ) {
                 x = (that.scroller.x >> 0) + Math.floor( that.scroller.w / 2 ) - 6;
                 y = that.scroller.y + (that.settings.slimScroll ? 2 : 3);
 
@@ -2385,7 +2385,7 @@ ScrollObject.prototype = {
                 that.startColorFadeInOutStart = startColorFadeOut - 2;
                 that.fadeOutActive = false;
 
-                if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
+                if ( that._checkPiperImagesV() ) {
 
                     ctx_piperImg = that.piperImgVert[0].getContext( '2d' );
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgVert[0].width, that.piperImgVert[0].height );
@@ -2404,7 +2404,7 @@ ScrollObject.prototype = {
                     img = that.piperImgVert[0];
 
                 }
-                else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
+                else if ( that._checkPiperImagesH() ) {
                     x = (that.scroller.x >> 0) + Math.floor( that.scroller.w / 2 ) - 6;
                     y = that.scroller.y + 3;
 
@@ -2606,11 +2606,11 @@ ScrollObject.prototype = {
             this.context.fill();
             this.context.stroke();
 
-            if ( this.isVerticalScroll && this.maxScrollY != 0 ) {
+            if ( this._checkPiperImagesV() ) {
                 this.context.drawImage( this.piperImgVert[piperImgIndex], this.scroller.x + (this.settings.slimScroll ? 2 : 3), (this.scroller.y >> 0) + Math.floor( this.scroller.h / 2 ) - 6 );
             }
-            else if ( this.isHorizontalScroll && this.maxScrollX != 0 ) {
-                this.context.drawImage( this.piperImgHor[piperImgIndex], (this.scroller.x >> 0) + Math.floor( this.scroller.w / 2 ) - 6, this.scroller.y + (this.settings.slimScroll ? 2 : 3) );
+            else if ( this._checkPiperImagesH() ) {
+			    this.context.drawImage( this.piperImgHor[piperImgIndex], (this.scroller.x >> 0) + Math.floor( this.scroller.w / 2 ) - 6, this.scroller.y + (this.settings.slimScroll ? 2 : 3) );
             }
 
         }
@@ -2618,6 +2618,18 @@ ScrollObject.prototype = {
         this.lastScrollerStatus = this.scrollerStatus;
 
     },
+
+    _checkPiperImagesV : function() {
+		if ( this.isVerticalScroll && this.maxScrollY != 0 && this.scroller.h >= 13 )
+			return true;
+		return false;
+    },
+    _checkPiperImagesH : function() {
+        if ( this.isHorizontalScroll && this.maxScrollX != 0 && this.scroller.w >= 13 )
+            return true;
+        return false;
+    },
+
     _drawArrow:function ( type ) {
         if ( this.settings.showArrows ) {
             var w = this.canvasW;

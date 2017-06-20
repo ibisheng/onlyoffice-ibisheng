@@ -970,6 +970,9 @@ function CEditorPage(api)
 
 		if (this.MobileTouchManager)
 			this.MobileTouchManager.Resize_After();
+
+		if (this.IsSupportNotes && this.m_oNotesApi)
+			this.m_oNotesApi.OnResize();
 	};
 
 	this.zoom_Out = function()
@@ -2430,22 +2433,6 @@ function CEditorPage(api)
 			this.m_oScrollVerApi = this.m_oScrollVer_;
 		}
 
-		if (GlobalSkin.SupportNotes)
-		{
-			if (this.m_oScrollNotes_)
-			{
-				this.m_oScrollNotes_.Repos(settings);
-			}
-			else
-			{
-				this.m_oScrollNotes_ = new AscCommon.ScrollObject("id_vertical_scroll_notes", settings);
-				this.m_oScrollNotes_.bind("scrollvertical", function(evt)
-				{
-				});
-				this.m_oScrollNotesApi = this.m_oScrollNotes_;
-			}
-		}
-
 		this.m_oApi.sendEvent("asc_onUpdateScrolls", this.m_dDocumentWidth, this.m_dDocumentHeight);
 
 		this.m_dScrollX_max = this.m_bIsHorScrollVisible ? this.m_oScrollHorApi.getMaxScrolledX() : 0;
@@ -2544,6 +2531,9 @@ function CEditorPage(api)
 
 		if (this.MobileTouchManager)
 			this.MobileTouchManager.Resize_After();
+
+		if (this.IsSupportNotes && this.m_oNotesApi)
+			this.m_oNotesApi.OnResize();
 	};
 
 	this.OnResize2 = function(isAttack)
@@ -2592,6 +2582,9 @@ function CEditorPage(api)
 		this.onTimerScroll_sync(true);
 
 		this.DemonstrationManager.Resize();
+
+		if (this.IsSupportNotes && this.m_oNotesApi)
+			this.m_oNotesApi.OnResize();
 	};
 
 	this.checkNeedRules     = function()

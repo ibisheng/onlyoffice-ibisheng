@@ -5484,10 +5484,61 @@ function CNotesDrawer(page)
 		this.IsRepaint = false;
 	};
 
-	this.OnRecalculateNote = function(slideNum, width, heigth)
+	this.OnRecalculateNote = function(slideNum, width, height)
 	{
 		this.Slide = slideNum;
+		this.Width = width;
+		this.Height = height;
 		this.IsRepaint = true;
+
+		var element = this.HtmlPage.m_oNotes.HtmlElement;
+		var settings = {
+			showArrows    : true,
+			animateScroll : false,
+			screenW       : element.width,
+			screenH       : element.height,
+			screenAddW    : 0,
+			screenAddH    : 0,
+			vsscrollStep  : 45,
+			hsscrollStep  : 45,
+			contentW      : 2 * this.OffsetX + ((width * g_dKoef_mm_to_pix) >> 0),
+			contentH      : 2 * this.OffsetY + ((height * g_dKoef_mm_to_pix) >> 0),
+			scrollerMinHeight : 5
+		};
+
+		if (this.bIsRetinaSupport)
+		{
+			settings.screenW = AscCommon.AscBrowser.convertToRetinaValue(settings.screenW);
+			settings.screenH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenH);
+
+			settings.screenAddH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenAddH);
+		}
+
+		document.getElementById('panel_right_scroll_notes').style.height = settings.contentH + "px";
+
+		if (this.HtmlPage.m_oScrollNotes_)
+		{
+			this.HtmlPage.m_oScrollNotes_.Repos(settings, undefined, true);
+		}
+		else
+		{
+			this.HtmlPage.m_oScrollNotes_ = new AscCommon.ScrollObject("id_vertical_scroll_notes", settings);
+
+			this.HtmlPage.m_oScrollNotes_.onLockMouse  = function(evt)
+			{
+				AscCommon.check_MouseDownEvent(evt, true);
+				global_mouseEvent.LockMouse();
+			};
+			this.HtmlPage.m_oScrollNotes_.offLockMouse = function(evt)
+			{
+				AscCommon.check_MouseUpEvent(evt);
+			};
+
+			this.HtmlPage.m_oScrollNotes_.bind("scrollvertical", function(evt)
+			{
+				// TODO:
+			});
+		}
 	};
 
 	this.CheckPaint = function()
@@ -5525,6 +5576,11 @@ function CNotesDrawer(page)
 	this.onUpdateTarget = function()
 	{
 
+	};
+
+	this.OnResize = function()
+	{
+		this.OnRecalculateNote(this.Slide, this.Width, this.Height);
 	};
 }
 
