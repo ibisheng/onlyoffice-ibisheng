@@ -2608,7 +2608,14 @@ CT_pivotTableDefinition.prototype.getRange = function () {
 	return this.location && this.location.ref;
 };
 CT_pivotTableDefinition.prototype.getColumnFieldsCount = function () {
-	return this.colFields ? this.colFields.field.length : 0;
+	var res = 0;
+	if (this.colFields) {
+		res = this.colFields.field.length;
+		if (1 === res && -2 === this.colFields.field[0].x) {
+			res = 0;
+		}
+	}
+	return res;
 };
 CT_pivotTableDefinition.prototype.getRowFieldsCount = function (compact) {
 	var t = this, res = 0, l;
