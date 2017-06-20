@@ -450,10 +450,10 @@
 							LogicDocument.RemoveContentControl(_current["Props"]["InternalId"]);
 						}
 
-						_content_control_pr = new CContentControlPr();
+						_content_control_pr = new AscCommonWord.CContentControlPr();
 						_content_control_pr.Id = _current["Props"]["Id"];
 						_content_control_pr.Tag = _current["Props"]["Tag"];
-						_content_control_pr.Lock = sdtlock_Unlocked;
+						_content_control_pr.Lock = AscCommonWord.sdtlock_Unlocked;
 						_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
 						var _blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
