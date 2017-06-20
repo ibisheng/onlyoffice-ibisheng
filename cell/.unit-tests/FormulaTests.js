@@ -1064,6 +1064,56 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.606533, "T.INV.2T(A2,A3)" );
 	} );
 
+	test( "Test: \"RANK\"", function () {
+		ws.getRange2( "A2" ).setValue( "7" );
+		ws.getRange2( "A3" ).setValue( "3.5" );
+		ws.getRange2( "A4" ).setValue( "3.5" );
+		ws.getRange2( "A5" ).setValue( "1" );
+		ws.getRange2( "A6" ).setValue( "2" );
+
+		oParser = new parserFormula( "RANK(A3,A2:A6,1)", "A1", ws );
+		ok( oParser.parse(), "RANK(A3,A2:A6,1)" );
+		strictEqual( oParser.calculate().getValue(), 3, "RANK(A3,A2:A6,1)" );
+
+		oParser = new parserFormula( "RANK(A2,A2:A6,1)", "A1", ws );
+		ok( oParser.parse(), "RANK(A2,A2:A6,1)" );
+		strictEqual( oParser.calculate().getValue(), 5, "RANK(A2,A2:A6,1)" );
+	} );
+
+	test( "Test: \"RANK.EQ\"", function () {
+		ws.getRange2( "A2" ).setValue( "7" );
+		ws.getRange2( "A3" ).setValue( "3.5" );
+		ws.getRange2( "A4" ).setValue( "3.5" );
+		ws.getRange2( "A5" ).setValue( "1" );
+		ws.getRange2( "A6" ).setValue( "2" );
+
+		oParser = new parserFormula( "RANK.EQ(A2,A2:A6,1)", "A1", ws );
+		ok( oParser.parse(), "RANK.EQ(A2,A2:A6,1)" );
+		strictEqual( oParser.calculate().getValue(), 5, "RANK.EQ(A2,A2:A6,1)" );
+
+		oParser = new parserFormula( "RANK.EQ(A6,A2:A6)", "A1", ws );
+		ok( oParser.parse(), "RANK.EQ(A6,A2:A6)" );
+		strictEqual( oParser.calculate().getValue(), 4, "RANK.EQ(A6,A2:A6)" );
+
+		oParser = new parserFormula( "RANK.EQ(A3,A2:A6,1)", "A1", ws );
+		ok( oParser.parse(), "RANK.EQ(A3,A2:A6,1)" );
+		strictEqual( oParser.calculate().getValue(), 3, "RANK.EQ(A3,A2:A6,1)" );
+	} );
+
+	test( "Test: \"RANK.AVG\"", function () {
+		ws.getRange2( "A2" ).setValue( "89" );
+		ws.getRange2( "A3" ).setValue( "88" );
+		ws.getRange2( "A4" ).setValue( "92" );
+		ws.getRange2( "A5" ).setValue( "101" );
+		ws.getRange2( "A6" ).setValue( "94" );
+		ws.getRange2( "A7" ).setValue( "97" );
+		ws.getRange2( "A8" ).setValue( "95" );
+
+		oParser = new parserFormula( "RANK.AVG(94,A2:A8)", "A1", ws );
+		ok( oParser.parse(), "RANK.AVG(94,A2:A8)" );
+		strictEqual( oParser.calculate().getValue(), 4, "RANK.AVG(94,A2:A8)" );
+	} );
+
 	test( "Test: \"LOGNORM.DIST\"", function () {
 		ws.getRange2( "A2" ).setValue( "4" );
 		ws.getRange2( "A3" ).setValue( "3.5" );
