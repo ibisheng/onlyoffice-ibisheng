@@ -2734,23 +2734,9 @@
 				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r1, range.c1, range.r1), dxf);
 			}
 
-			for (i = range.c1 + 1; i <= range.c2; ++i) {
-				if (i === range.c2) {
-					dxf = style.lastColumn;
-				} else if (styleInfo.showRowHeaders) {
-					r = i - (range.c1 + 1);
-					if (0 === r % 3) {
-						dxf = style.firstColumnSubheading;
-					} else if (1 === r % 3) {
-						dxf = style.secondColumnSubheading;
-					} else {
-						dxf = style.thirdColumnSubheading;
-					}
-				}
-
-				if (dxf = (dxf && dxf.dxf)) {
-					sheetMergedStyles.setTablePivotStyle(new Asc.Range(i, range.r1, i, range.r2), dxf);
-				}
+			dxf = style.lastColumn && style.lastColumn.dxf;
+			if (dxf) {
+				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c2, range.r1, range.c2, range.r2), dxf);
 			}
 
 			for (i = range.r1 + 1; i <= range.r2; ++i) {
