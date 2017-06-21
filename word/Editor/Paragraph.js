@@ -2733,27 +2733,36 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 			{
 				this.Remove_PresentationNumbering();
 			}
-			else if (align_Right === Pr.Jc)
+			else if(this.bFromDocument)
 			{
-				this.Set_Align(align_Center);
-			}
-			else if (align_Center === Pr.Jc)
-			{
-				this.Set_Align(align_Left);
-			}
-			else if (Math.abs(Pr.Ind.FirstLine) > 0.001)
-			{
-				if (Pr.Ind.FirstLine > 0)
-					this.Set_Ind({FirstLine : 0}, false);
-				else
-					this.Set_Ind({Left : Pr.Ind.Left + Pr.Ind.FirstLine, FirstLine : 0}, false);
-			}
-			else if (Math.abs(Pr.Ind.Left) > 0.001)
-			{
-				this.Set_Ind({Left : 0}, false);
+             	if (align_Right === Pr.Jc)
+                {
+                    this.Set_Align(align_Center);
+                }
+                else if (align_Center === Pr.Jc)
+                {
+                    this.Set_Align(align_Left);
+                }
+                else if (Math.abs(Pr.Ind.FirstLine) > 0.001)
+                {
+                    if (Pr.Ind.FirstLine > 0)
+                        this.Set_Ind({FirstLine : 0}, false);
+                    else
+                        this.Set_Ind({Left : Pr.Ind.Left + Pr.Ind.FirstLine, FirstLine : 0}, false);
+                }
+                else if (Math.abs(Pr.Ind.Left) > 0.001)
+                {
+                    this.Set_Ind({Left : 0}, false);
+                }
+                else
+				{
+                    Result = false;
+				}
 			}
 			else
-				Result = false;
+			{
+                Result = false;
+			}
 		}
 	}
 
