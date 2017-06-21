@@ -981,8 +981,8 @@ CHistory.prototype =
             var Class = Items[0].Class;
             if (Class instanceof Paragraph)
                 Para = Class;
-            else if (Class.Get_Paragraph)
-                Para = Class.Get_Paragraph();
+            else if (Class.GetParagraph)
+                Para = Class.GetParagraph();
             else
                 return null;
 
@@ -995,9 +995,9 @@ CHistory.prototype =
                     if (Para != Class)
                         return null;
                 }
-                else if (Class.Get_Paragraph)
+                else if (Class.GetParagraph)
                 {
-                    if (Para != Class.Get_Paragraph())
+                    if (Para != Class.GetParagraph())
                         return null;
                 }
                 else

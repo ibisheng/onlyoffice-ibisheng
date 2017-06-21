@@ -54,16 +54,16 @@
 	cFormulaFunctionGroup['Engineering'].push(cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR, cERF_PRECISE,
 		cERFC_PRECISE);
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
-	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cNUMBERVALUE, cUNICHAR, cUNICODE);
+	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-	cFormulaFunctionGroup['Statistical'].push(cBETA_DIST, cBETA_INV, cBINOM_DIST, cBINOM_DIST_RANGE, cBINOM_INV,
-		cCHISQ_DIST, cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHISQ_TEST, cCONFIDENCE_NORM, cCONFIDENCE_T,
-		cCOVARIANCE_P, cCOVARIANCE_S, cEXPON_DIST, cF_DIST, cF_DIST_RT, cF_INV, cF_INV_RT, cF_TEST, cFORECAST_ETS,
-		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cFORECAST_LINEAR, cGAMMA, cGAMMA_DIST,
-		cGAMMA_INV, cGAMMALN_PRECISE, cGAUSS, cHYPGEOM_DIST, cLOGNORM_DIST, cLOGNORM_INV, cMODE_MULT, cMODE_SNGL,
+	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST, cBINOM_DIST_RANGE, cBINOM_INV,
+		cCHISQ_TEST, cCONFIDENCE_NORM, cCONFIDENCE_T,
+		cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS,
+		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cFORECAST_LINEAR,
+		cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL,
 		cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERCENTILE_EXC, cPERCENTILE_INC,
-		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC, cRANK_AVG,
-		cRANK_EQ, cSKEW_P, cSTDEV_P, cSTDEV_S, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cT_TEST, cVAR_P,
+		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC,
+		cSKEW_P, cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_P,
 		cVAR_S, cWEIBULL_DIST, cZ_TEST);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
@@ -73,6 +73,16 @@
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
 	cFormulaFunctionGroup['Information'].push(cISFORMULA, cSHEET, cSHEETS);
+
+	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
+	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
+		cERF_PRECISE, cERFC_PRECISE, cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST, cBINOM_DIST_RANGE, cBINOM_INV, cCHISQ_TEST,
+		cCONFIDENCE_NORM, cCONFIDENCE_T, cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
+		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cFORECAST_LINEAR, cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL,
+		cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERCENTILE_EXC, cPERCENTILE_INC,
+		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC,
+		cSKEW_P, cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_P, cVAR_S, cWEIBULL_DIST, cZ_TEST, cPDURATION, cRRI,
+		cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
 
 	/**
 	 * @constructor
@@ -85,30 +95,6 @@
 
 	cAGGREGATE.prototype = Object.create(cBaseFunction.prototype);
 	cAGGREGATE.prototype.constructor = cAGGREGATE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBETA_DIST() {
-		cBaseFunction.call(this, "BETA.DIST");
-		this.isXLFN = true;
-	}
-
-	cBETA_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cBETA_DIST.prototype.constructor = cBETA_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBETA_INV() {
-		cBaseFunction.call(this, "BETA.INV");
-		this.isXLFN = true;
-	}
-
-	cBETA_INV.prototype = Object.create(cBaseFunction.prototype);
-	cBETA_INV.prototype.constructor = cBETA_INV;
 
 	/**
 	 * @constructor
@@ -205,54 +191,6 @@
 
 	cBITXOR.prototype = Object.create(cBaseFunction.prototype);
 	cBITXOR.prototype.constructor = cBITXOR;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCHISQ_DIST() {
-		cBaseFunction.call(this, "CHISQ.DIST");
-		this.isXLFN = true;
-	}
-
-	cCHISQ_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cCHISQ_DIST.prototype.constructor = cCHISQ_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCHISQ_DIST_RT() {
-		cBaseFunction.call(this, "CHISQ.DIST.RT");
-		this.isXLFN = true;
-	}
-
-	cCHISQ_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
-	cCHISQ_DIST_RT.prototype.constructor = cCHISQ_DIST_RT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCHISQ_INV() {
-		cBaseFunction.call(this, "CHISQ.INV");
-		this.isXLFN = true;
-	}
-
-	cCHISQ_INV.prototype = Object.create(cBaseFunction.prototype);
-	cCHISQ_INV.prototype.constructor = cCHISQ_INV;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCHISQ_INV_RT() {
-		cBaseFunction.call(this, "CHISQ.INV.RT");
-		this.isXLFN = true;
-	}
-
-	cCHISQ_INV_RT.prototype = Object.create(cBaseFunction.prototype);
-	cCHISQ_INV_RT.prototype.constructor = cCHISQ_INV_RT;
 
 	/**
 	 * @constructor
@@ -378,66 +316,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cEXPON_DIST() {
-		cBaseFunction.call(this, "EXPON.DIST");
-		this.isXLFN = true;
-	}
-
-	cEXPON_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cEXPON_DIST.prototype.constructor = cEXPON_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cF_DIST() {
-		cBaseFunction.call(this, "F.DIST");
-		this.isXLFN = true;
-	}
-
-	cF_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cF_DIST.prototype.constructor = cF_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cF_DIST_RT() {
-		cBaseFunction.call(this, "F.DIST.RT");
-		this.isXLFN = true;
-	}
-
-	cF_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
-	cF_DIST_RT.prototype.constructor = cF_DIST_RT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cF_INV() {
-		cBaseFunction.call(this, "F.INV");
-		this.isXLFN = true;
-	}
-
-	cF_INV.prototype = Object.create(cBaseFunction.prototype);
-	cF_INV.prototype.constructor = cF_INV;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cF_INV_RT() {
-		cBaseFunction.call(this, "F.INV.RT");
-		this.isXLFN = true;
-	}
-
-	cF_INV_RT.prototype = Object.create(cBaseFunction.prototype);
-	cF_INV_RT.prototype.constructor = cF_INV_RT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cF_TEST() {
 		cBaseFunction.call(this, "F.TEST");
 		this.isXLFN = true;
@@ -534,66 +412,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cGAMMA() {
-		cBaseFunction.call(this, "GAMMA");
-		this.isXLFN = true;
-	}
-
-	cGAMMA.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMA.prototype.constructor = cGAMMA;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cGAMMA_DIST() {
-		cBaseFunction.call(this, "GAMMA.DIST");
-		this.isXLFN = true;
-	}
-
-	cGAMMA_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMA_DIST.prototype.constructor = cGAMMA_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cGAMMA_INV() {
-		cBaseFunction.call(this, "GAMMA.INV");
-		this.isXLFN = true;
-	}
-
-	cGAMMA_INV.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMA_INV.prototype.constructor = cGAMMA_INV;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cGAMMALN_PRECISE() {
-		cBaseFunction.call(this, "GAMMALN.PRECISE");
-		this.isXLFN = true;
-	}
-
-	cGAMMALN_PRECISE.prototype = Object.create(cBaseFunction.prototype);
-	cGAMMALN_PRECISE.prototype.constructor = cGAMMALN_PRECISE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cGAUSS() {
-		cBaseFunction.call(this, "GAUSS");
-		this.isXLFN = true;
-	}
-
-	cGAUSS.prototype = Object.create(cBaseFunction.prototype);
-	cGAUSS.prototype.constructor = cGAUSS;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cHYPGEOM_DIST() {
 		cBaseFunction.call(this, "HYPGEOM.DIST");
 		this.isXLFN = true;
@@ -625,30 +443,6 @@
 
 	cISOWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
 	cISOWEEKNUM.prototype.constructor = cISOWEEKNUM;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cLOGNORM_DIST() {
-		cBaseFunction.call(this, "LOGNORM.DIST");
-		this.isXLFN = true;
-	}
-
-	cLOGNORM_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cLOGNORM_DIST.prototype.constructor = cLOGNORM_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cLOGNORM_INV() {
-		cBaseFunction.call(this, "LOGNORM.INV");
-		this.isXLFN = true;
-	}
-
-	cLOGNORM_INV.prototype = Object.create(cBaseFunction.prototype);
-	cLOGNORM_INV.prototype.constructor = cLOGNORM_INV;
 
 	/**
 	 * @constructor
@@ -745,18 +539,6 @@
 
 	cNORM_S_INV.prototype = Object.create(cBaseFunction.prototype);
 	cNORM_S_INV.prototype.constructor = cNORM_S_INV;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cNUMBERVALUE() {
-		cBaseFunction.call(this, "NUMBERVALUE");
-		this.isXLFN = true;
-	}
-
-	cNUMBERVALUE.prototype = Object.create(cBaseFunction.prototype);
-	cNUMBERVALUE.prototype.constructor = cNUMBERVALUE;
 
 	/**
 	 * @constructor
@@ -894,30 +676,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cRANK_AVG() {
-		cBaseFunction.call(this, "RANK.AVG");
-		this.isXLFN = true;
-	}
-
-	cRANK_AVG.prototype = Object.create(cBaseFunction.prototype);
-	cRANK_AVG.prototype.constructor = cRANK_AVG;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cRANK_EQ() {
-		cBaseFunction.call(this, "RANK.EQ");
-		this.isXLFN = true;
-	}
-
-	cRANK_EQ.prototype = Object.create(cBaseFunction.prototype);
-	cRANK_EQ.prototype.constructor = cRANK_EQ;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cRRI() {
 		cBaseFunction.call(this, "RRI");
 		this.isXLFN = true;
@@ -985,66 +743,6 @@
 
 	cSTDEV_S.prototype = Object.create(cBaseFunction.prototype);
 	cSTDEV_S.prototype.constructor = cSTDEV_S;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cT_DIST() {
-		cBaseFunction.call(this, "T.DIST");
-		this.isXLFN = true;
-	}
-
-	cT_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cT_DIST.prototype.constructor = cT_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cT_DIST_2T() {
-		cBaseFunction.call(this, "T.DIST.2T");
-		this.isXLFN = true;
-	}
-
-	cT_DIST_2T.prototype = Object.create(cBaseFunction.prototype);
-	cT_DIST_2T.prototype.constructor = cT_DIST_2T;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cT_DIST_RT() {
-		cBaseFunction.call(this, "T.DIST.RT");
-		this.isXLFN = true;
-	}
-
-	cT_DIST_RT.prototype = Object.create(cBaseFunction.prototype);
-	cT_DIST_RT.prototype.constructor = cT_DIST_RT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cT_INV() {
-		cBaseFunction.call(this, "T.INV");
-		this.isXLFN = true;
-	}
-
-	cT_INV.prototype = Object.create(cBaseFunction.prototype);
-	cT_INV.prototype.constructor = cT_INV;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cT_INV_2T() {
-		cBaseFunction.call(this, "T.INV.2T");
-		this.isXLFN = true;
-	}
-
-	cT_INV_2T.prototype = Object.create(cBaseFunction.prototype);
-	cT_INV_2T.prototype.constructor = cT_INV_2T;
 
 	/**
 	 * @constructor

@@ -642,7 +642,7 @@ Paragraph.prototype.Internal_Content_Add = function(Pos, Item, bCorrectPos)
 
 	this.SpellChecker.Update_OnAdd(this, Pos, Item);
 
-	Item.Set_Paragraph(this);
+	Item.SetParagraph(this);
 };
 Paragraph.prototype.Add_ToContent = function(Pos, Item)
 {
@@ -666,7 +666,7 @@ Paragraph.prototype.Internal_Content_Concat = function(Items)
 	// Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
 	for (var CurPos = StartPos; CurPos < this.Content.length; CurPos++)
 	{
-		this.Content[CurPos].Set_Paragraph(this);
+		this.Content[CurPos].SetParagraph(this);
 		if (this.Content[CurPos].Recalc_RunsCompiledPr)
 			this.Content[CurPos].Recalc_RunsCompiledPr();
 	}
@@ -1237,7 +1237,7 @@ Paragraph.prototype.RecalculateMinMaxContentWidth = function(isRotated)
 	{
 		var Item = this.Content[Pos];
 
-		Item.Set_Paragraph(this);
+		Item.SetParagraph(this);
 		Item.RecalculateMinMaxContentWidth(MinMax);
 	}
 
@@ -1994,7 +1994,7 @@ Paragraph.prototype.Internal_Draw_4 = function(CurPage, pGraphics, Pr, BgColor, 
 						if (Pr.ParaPr.Ind.FirstLine < 0)
 							NumberingItem.Draw(X, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
 						else
-							NumberingItem.Draw(this.X + Pr.ParaPr.Ind.Left, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
+							NumberingItem.Draw(this.Pages[CurPage].X  + Pr.ParaPr.Ind.Left, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
 					}
 				}
 
@@ -2952,6 +2952,9 @@ Paragraph.prototype.Add = function(Item)
 {
 	// Выставляем родительский класс
 	Item.Parent = this;
+
+	if (Item.SetParagraph)
+		Item.SetParagraph(this);
 
 	switch (Item.Get_Type())
 	{
@@ -5211,7 +5214,7 @@ Paragraph.prototype.Correct_Content = function(_StartPos, _EndPos, bDoNotDeleteE
 	{
 		var CurElement = this.Content[CurPos];
 
-		if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
+		if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type || para_InlineLevelSdt === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
 		{
 			this.Internal_Content_Remove(CurPos);
 		}
@@ -5494,15 +5497,11 @@ Paragraph.prototype.Internal_ReplaceRun = function(Pos, NewRuns)
 
 	return CenterRunPos;
 };
-Paragraph.prototype.Check_Hyperlink = function(X, Y, PageIndex)
+Paragraph.prototype.CheckHyperlink = function(X, Y, CurPage)
 {
-	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, PageIndex, false, false);
-	var CurPos      = SearchPosXY.Pos.Get(0);
-
-	if (true === SearchPosXY.InText && para_Hyperlink === this.Content[CurPos].Type)
-		return this.Content[CurPos];
-
-	return null;
+	var oInfo = new CSelectedElementsInfo();
+	this.GetElementsInfoByXY(oInfo, X, Y, CurPage);
+	return oInfo.Get_Hyperlink();
 };
 Paragraph.prototype.AddHyperlink = function(HyperProps)
 {
@@ -6805,14 +6804,28 @@ Paragraph.prototype.GetSelectedText = function(bClearText, oPr)
 
 	return Str;
 };
-Paragraph.prototype.GetSelectedElementsInfo = function(Info)
+Paragraph.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
-	Info.Set_Paragraph(this);
+	Info.SetParagraph(this);
 
-	if (true === this.Selection.Use && this.Selection.StartPos === this.Selection.EndPos && this.Content[this.Selection.EndPos].GetSelectedElementsInfo)
-		this.Content[this.Selection.EndPos].GetSelectedElementsInfo(Info);
-	else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo)
-		this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo(Info);
+	if (ContentPos)
+	{
+		var Pos = ContentPos.Get(Depth);
+		if (this.Content[Pos].GetSelectedElementsInfo)
+			this.Content[Pos].GetSelectedElementsInfo(Info, ContentPos, Depth + 1);
+	}
+	else
+	{
+		if (true === this.Selection.Use && this.Selection.StartPos === this.Selection.EndPos && this.Content[this.Selection.EndPos].GetSelectedElementsInfo)
+			this.Content[this.Selection.EndPos].GetSelectedElementsInfo(Info);
+		else if (false === this.Selection.Use && this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo)
+			this.Content[this.CurPos.ContentPos].GetSelectedElementsInfo(Info);
+	}
+};
+Paragraph.prototype.GetElementsInfoByXY = function(oInfo, X, Y, CurPage)
+{
+	var SearchPosXY = this.Get_ParaContentPosByXY(X, Y, CurPage, false, false);
+	this.GetSelectedElementsInfo(oInfo, SearchPosXY.Pos, 0);
 };
 Paragraph.prototype.GetSelectedContent = function(DocContent)
 {
@@ -9138,13 +9151,21 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	MMData.X_abs       = Coords.X;
 	MMData.Y_abs       = Coords.Y;
 
-	var Hyperlink = this.Check_Hyperlink(X, Y, CurPage);
+	// TODO: Поиск гиперссылок и сносок нужно переделать через работу с SelectedElementsInfo
+	var oInfo = new CSelectedElementsInfo();
+	this.GetElementsInfoByXY(oInfo, X, Y, CurPage);
+
+	var oContentControl = oInfo.GetInlineLevelSdt();
+	var oHyperlink      = oInfo.Get_Hyperlink();
+	if (oContentControl)
+		oContentControl.DrawContentControlsTrack(true);
+
 	var Footnote  = this.CheckFootnote(X, Y, CurPage);
 
-	if (null != Hyperlink && (Y <= this.Pages[CurPage].Bounds.Bottom && Y >= this.Pages[CurPage].Bounds.Top))
+	if (null != oHyperlink && (Y <= this.Pages[CurPage].Bounds.Bottom && Y >= this.Pages[CurPage].Bounds.Top))
 	{
 		MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
-		MMData.Hyperlink = new Asc.CHyperlinkProperty(Hyperlink);
+		MMData.Hyperlink = new Asc.CHyperlinkProperty(oHyperlink);
 	}
 	else if (null !== Footnote && this.Parent instanceof CDocument)
 	{
@@ -9155,7 +9176,7 @@ Paragraph.prototype.UpdateCursorType = function(X, Y, CurPage)
 	else
 		MMData.Type = AscCommon.c_oAscMouseMoveDataTypes.Common;
 
-	if (null != Hyperlink && true === AscCommon.global_keyboardEvent.CtrlKey)
+	if (null != oHyperlink && true === AscCommon.global_keyboardEvent.CtrlKey)
 		this.DrawingDocument.SetCursorType("pointer", MMData);
 	else
 		this.DrawingDocument.SetCursorType("default", MMData);
@@ -10440,8 +10461,8 @@ Paragraph.prototype.Read_FromBinary2 = function(Reader)
 		if (null != Element)
 		{
 			this.Content.push(Element);
-			if (Element.Set_Paragraph)
-				Element.Set_Paragraph(this);
+			if (Element.SetParagraph)
+				Element.SetParagraph(this);
 		}
 	}
 
@@ -10835,6 +10856,65 @@ Paragraph.prototype.GetLastRangeVisibleBounds = function()
 	var XLimit = this.Pages[CurPage].XLimit - this.Get_CompiledPr2(false).ParaPr.Ind.Right
 
 	return {X : X, Y : Y, W : W, H : H, BaseLine : B, XLimit : XLimit};
+};
+Paragraph.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	var nCurPos = this.Selection.Use === true ? this.Selection.StartPos : this.CurPos.ContentPos;
+
+	var nStartPos = 0, nEndPos = 0;
+	if (isCurrent)
+	{
+		if (isStart)
+		{
+			nStartPos = nCurPos;
+			nEndPos   = isNext ? this.Content.length - 1 : 0;
+		}
+		else
+		{
+			nStartPos = isNext ? 0 : this.Content.length - 1;
+			nEndPos   = nCurPos;
+		}
+	}
+	else
+	{
+		if (isNext)
+		{
+			nStartPos = 0;
+			nEndPos   = this.Content.length - 1;
+		}
+		else
+		{
+			nStartPos = this.Content.length - 1;
+			nEndPos   = 0;
+		}
+	}
+
+	if (isNext)
+	{
+		for (var nIndex = nStartPos; nIndex <= nEndPos; ++nIndex)
+		{
+			if (this.Content[nIndex].FindNextFillingForm)
+			{
+				var oRes = this.Content[nIndex].FindNextFillingForm(true, isCurrent && nIndex === nCurPos ? true : false, isStart);
+				if (oRes)
+					return oRes;
+			}
+		}
+	}
+	else
+	{
+		for (var nIndex = nStartPos; nIndex >= nEndPos; --nIndex)
+		{
+			if (this.Content[nIndex].FindNextFillingForm)
+			{
+				var oRes = this.Content[nIndex].FindNextFillingForm(false, isCurrent && nIndex === nCurPos ? true : false, isStart);
+				if (oRes)
+					return oRes;
+			}
+		}
+	}
+
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 Paragraph.prototype.private_ResetSelection = function()
@@ -12085,7 +12165,14 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 	var oContentControl = new CInlineLevelSdt();
 	oContentControl.Add_ToContent(0, new ParaRun());
 	this.Add(oContentControl);
-	oContentControl.MoveCursorToStartPos();
+
+	var oContentControlPos = this.Get_PosByElement(oContentControl);
+	if (oContentControlPos)
+	{
+		oContentControl.Get_StartPos(oContentControlPos, oContentControlPos.Get_Depth() + 1);
+		this.Set_ParaContentPos(oContentControlPos, false, -1, -1);
+	}
+
 	return oContentControl;
 };
 

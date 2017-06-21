@@ -39,6 +39,8 @@ var GLOBAL_PATH_COUNT = 0;
 */
 function (window, undefined) {
 
+
+    var MAX_LABELS_COUNT = 300;
 // Import
     var oNonSpaceRegExp = new RegExp('' + String.fromCharCode(0x00A0),'g');
 var c_oAscChartType = AscCommon.c_oAscChartType;
@@ -678,6 +680,7 @@ function CChartSpace()
 
 
     this.bbox = null;
+    this.ptsCount = 0;
 
     this.selection =
     {
@@ -5701,7 +5704,11 @@ CChartSpace.prototype.recalculateAxis = function()
                 cat_ax.interval = point_interval;
 
                 var diagram_width = point_interval*intervals_count;//размер области с самой диаграммой позже будет корректироватся;
-                var tick_lbl_skip = AscFormat.isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip :  (string_pts.length < SKIP_LBL_LIMIT ?  1 :  Math.floor(string_pts.length/SKIP_LBL_LIMIT));
+
+
+
+                var bTickSkip =  AscFormat.isRealNumber(cat_ax.tickLblSkip);
+                var tick_lbl_skip = AscFormat.isRealNumber(cat_ax.tickLblSkip) ? cat_ax.tickLblSkip :  1;
                 var max_cat_label_width = diagram_width / string_pts.length; // максимальная ширина подписи горизонтальной оси;
 
 
@@ -5715,6 +5722,7 @@ CChartSpace.prototype.recalculateAxis = function()
                     var max_min_width = 0;
                     var max_max_width = 0;
                     var arr_max_contents = [];
+                    var fMaxContentStringH = 0;
                     for(i = 0; i < string_pts.length; ++i)
                     {
                         var dlbl = null;
@@ -5744,9 +5752,14 @@ CChartSpace.prototype.recalculateAxis = function()
                                 max_min_width = max_min_content_width;
                             if(min_max.Max > max_max_width)
                                 max_max_width = min_max.Max;
+                            if(dlbl.tx.rich.content.Content[0].Content[0].TextHeight > fMaxContentStringH){
+                                fMaxContentStringH = dlbl.tx.rich.content.Content[0].Content[0].TextHeight;
+                            }
                         }
                         cat_ax.labels.arrLabels.push(dlbl);
                     }
+
+                    fMaxContentStringH *= 1;
                     var stake_offset = AscFormat.isRealNumber(cat_ax.lblOffset) ? cat_ax.lblOffset/100 : 1;
                     var labels_offset = cat_ax.labels.arrLabels[0].tx.rich.content.Content[0].CompiledPr.Pr.TextPr.FontSize*(25.4/72)*stake_offset;
                     if(max_min_width < max_cat_label_width)//значит текст каждой из точек умещается в point_width
@@ -5862,11 +5875,29 @@ CChartSpace.prototype.recalculateAxis = function()
 
                         var max_rotated_height = 0;
                         cat_ax.labels.bRotated = true;
+                        var nMaxCount = 1;
+                        var nLblCount = 0;
+                        var nCount = 0;
+                        if(!bTickSkip && fMaxContentStringH > 0){
+                            nMaxCount = diagram_width/fMaxContentStringH;
+                        }
+                        else{
+                            bTickSkip = true;
+                        }
                         //смотрим на сколько подписи горизонтальной оси выходят влево за пределы области построения
                         for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
                         {
                             if(cat_ax.labels.arrLabels[i])
                             {
+                                if(!bTickSkip){
+                                    if(nLblCount > (nMaxCount*(nCount/cat_ax.labels.arrLabels.length))){
+                                        cat_ax.labels.arrLabels[i] = null;
+                                        arr_left_points[i] = arr_cat_labels_points[i];
+                                        arr_right_points[i] = arr_cat_labels_points[i];
+                                        nCount++;
+                                        continue;
+                                    }
+                                }
                                 //сначала расчитаем высоту и ширину подписи так чтобы она умещалась в одну строку
                                 var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();
                                 arr_left_points[i] = arr_cat_labels_points[i] - (wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4) - wh.h*Math.sin(Math.PI/4)/2);//вычитаем из точки привязки ширину получившейся подписи
@@ -5875,6 +5906,8 @@ CChartSpace.prototype.recalculateAxis = function()
                                 if(h2 > max_rotated_height)
                                     max_rotated_height = h2;
 
+                                nLblCount++;
+                                nCount++;
                                 cat_ax.labels.arrLabels[i].widthForTransform = wh.w;
                             }
                             else
@@ -9564,13 +9597,33 @@ CChartSpace.prototype.recalculateDLbls = function()
 
         var default_lbl = new AscFormat.CDLbl();
         default_lbl.initDefault(nDefaultPosition);
+        var bSkip = false;
+        var nSkiped = 0;
+        var n
+        if(this.ptsCount > MAX_LABELS_COUNT){
+            bSkip = true;
+            nSkiped = (this.ptsCount/(MAX_LABELS_COUNT) - 0.5) >> 0;
+        }
+        var nCount = 0;
+        var nLblCount = 0;
         for(var i = 0; i < series.length; ++i)
         {
             var ser = series[i];
             var pts = AscFormat.getPtsFromSeries(ser);
             for(var j = 0; j < pts.length; ++j)
             {
+
                 var pt = pts[j];
+
+                if(bSkip){
+
+                    if(nLblCount > (MAX_LABELS_COUNT*(nCount/this.ptsCount))){
+                        pt.compiledDlb = null;
+                        nCount++;
+                        continue;
+                    }
+
+                }
                 var compiled_dlb = new AscFormat.CDLbl();
                 compiled_dlb.merge(default_lbl);
                 compiled_dlb.merge(this.chart.plotArea.charts[0].dLbls);
@@ -9591,7 +9644,9 @@ CChartSpace.prototype.recalculateDLbls = function()
                     pt.compiledDlb.series = ser;
                     pt.compiledDlb.pt = pt;
                     pt.compiledDlb.recalculate();
+                    nLblCount++;
                 }
+                ++nCount;
             }
         }
     }
@@ -9623,6 +9678,7 @@ CChartSpace.prototype.recalculateHiLowLines = function()
 
 CChartSpace.prototype.recalculateSeriesColors = function()
 {
+    this.ptsCount = 0;
     if(this.chart && this.chart.plotArea && this.chart.plotArea.charts[0] && this.chart.plotArea.charts[0].series)
     {
         var style = CHART_STYLE_MANAGER.getStyleByIndex(this.style);
@@ -9635,6 +9691,7 @@ CChartSpace.prototype.recalculateSeriesColors = function()
             {
                 var ser = series[ii];
                 var pts = AscFormat.getPtsFromSeries(ser);
+                this.ptsCount += pts.length;
                 if(!(this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_LineChart || this.chart.plotArea.charts[0].getObjectType() === AscDFH.historyitem_type_ScatterChart))
                 {
                     var base_fills = getArrayFillsFromBase(style.fill2, getMaxIdx(pts));
@@ -9788,6 +9845,7 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                             var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
                             var ser = series[i];
                             var pts = AscFormat.getPtsFromSeries(ser);
+                            this.ptsCount += pts.length;
                             var compiled_line = new AscFormat.CLn();
                             compiled_line.merge(default_line);
                             compiled_line.Fill.merge(base_line_fills[ser.idx]);
@@ -9958,6 +10016,7 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                         var default_line = parents.theme.themeElements.fmtScheme.lnStyleLst[0];
                         var ser = series[i];
                         var pts = AscFormat.getPtsFromSeries(ser);
+                        this.ptsCount += pts.length;
                         if(this.chart.plotArea.charts[0].scatterStyle === AscFormat.SCATTER_STYLE_SMOOTH || this.chart.plotArea.charts[0].scatterStyle === AscFormat.SCATTER_STYLE_SMOOTH_MARKER)
                         {
                             if(!AscFormat.isRealBool(ser.smooth))
@@ -10158,6 +10217,7 @@ CChartSpace.prototype.recalculateSeriesColors = function()
                         }
                         ser.compiledSeriesBrush = compiled_brush.createDuplicate();
                         var pts = AscFormat.getPtsFromSeries(ser);
+                        this.ptsCount += pts.length;
                         for(var j = 0; j < pts.length; ++j)
                         {
                             var compiled_brush = new AscFormat.CUniFill();
@@ -12931,7 +12991,9 @@ function parseSeriesHeaders (ws, rangeBBox) {
     var nStartIndex;
 	if (rangeBBox) {
 		if (rangeBBox.c2 - rangeBBox.c1 > 0) {
-			for (i = rangeBBox.r1 + 1; i <= rangeBBox.r2; i++) {
+
+		    var nStartIndex = (rangeBBox.r1 === rangeBBox.r2) ? rangeBBox.r1 : (rangeBBox.r1 + 1);
+			for (i = nStartIndex; i <= rangeBBox.r2; i++) {
 				cell = ws.getCell3(i, rangeBBox.c1);
 				value = cell.getValue();
                 numFormatType = cell.getNumFormatType();
@@ -12948,7 +13010,8 @@ function parseSeriesHeaders (ws, rangeBBox) {
 		}
 
 		if (rangeBBox.r2 - rangeBBox.r1 > 0) {
-			for (i = rangeBBox.c1 + 1; i <= rangeBBox.c2; i++) {
+            var nStartIndex = (rangeBBox.c1 === rangeBBox.c2) ? rangeBBox.c1 : (rangeBBox.c1 + 1);
+			for (i = nStartIndex; i <= rangeBBox.c2; i++) {
 
 				cell = ws.getCell3(rangeBBox.r1, i);
 				value = cell.getValue();

@@ -2179,6 +2179,33 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
 
             break;
         }
+            
+        case 450:   // ASC_MENU_EVENT_TYPE_GET_CHART_DATA
+        {
+            var chart = _api.asc_getChartObject();
+            
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](JSON.stringify(new Asc.asc_CChartBinary(chart)));
+            _return = _stream;
+            
+            break;
+        }
+        
+        case 460:   // ASC_MENU_EVENT_TYPE_SET_CHART_DATA
+        {
+            if (undefined !== _params) {
+                var chartData = _params[0];
+                if (chartData && chartData.length > 0) {
+                    var json = JSON.parse(chartData);
+                    if (json) {
+                        _api.asc_editChartDrawingObject(json);
+                    }
+                }
+            }
+            break;
+        }
+            
         case 2415: // ASC_MENU_EVENT_TYPE_CHANGE_COLOR_SCHEME
         {
             if (undefined !== _params) {
@@ -5806,6 +5833,8 @@ function NativeOpenFile3(_params, documentInfo)
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         _api = new window["Asc"]["asc_docs_api"]("");
+        
+        AscCommon.g_clipboardBase.Init(_api);
 
         if (undefined !== _api.Native_Editor_Initialize_Settings)
         {

@@ -263,7 +263,7 @@ function CGroupShape()
         }
     };
 
-    CGroupShape.prototype.copy = function()
+    CGroupShape.prototype.copy = function(oIdMap)
     {
         var copy = new CGroupShape();
         if(this.nvGrpSpPr)
@@ -277,7 +277,17 @@ function CGroupShape()
         }
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            copy.addToSpTree(copy.spTree.length, this.spTree[i].copy());
+            var _copy;
+            if(this.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                _copy = this.spTree[i].copy(oIdMap);
+            }
+            else{
+                _copy = this.spTree[i].copy();
+            }
+            if(AscCommon.isRealObject(oIdMap)){
+                oIdMap[this.spTree[i].Id] = _copy.Id;
+            }
+            copy.addToSpTree(copy.spTree.length, _copy);
             copy.spTree[copy.spTree.length-1].setGroup(copy);
         }
         copy.setBDeleted(this.bDeleted);

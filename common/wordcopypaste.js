@@ -1124,6 +1124,7 @@ CopyProcessor.prototype =
 				this.oPresentationWriter.WriteULong(elements.length);
 				
 				pptx_content_writer.Start_UseFullUrl();
+                pptx_content_writer.BinaryFileWriter.ClearIdMap();
 				for(var i = 0; i < elements.length; ++i)
 				{
 					if(!(elements[i].Drawing instanceof CGraphicFrame))
@@ -1149,6 +1150,7 @@ CopyProcessor.prototype =
 						this.oPresentationWriter.WriteString2(elements[i].ImageUrl);
 					}
 				}
+                pptx_content_writer.BinaryFileWriter.ClearIdMap();
 				pptx_content_writer.End_UseFullUrl();
 			}
 			else if(elementsContent.SlideObjects && elementsContent.SlideObjects.length)//пишем слайды целиком
@@ -3175,15 +3177,20 @@ PasteProcessor.prototype =
 				{
 					if(false === oThis.bNested)
 					{
+                        var oIdMap = {};
+                        var aCopies = [];
 						for(var i = 0; i < arr_shapes.length; ++i)
 						{
 							shape = arr_shapes[i].graphicObject.copy();
-							
+                            aCopies.push(shape);
+                            oIdMap[arr_shapes[i].graphicObject.Id] = shape.Id;
 							shape.worksheet = null;
 							shape.drawingBase = null;
 							
 							arr_shapes[i] = new DrawingCopyObject(shape, 0, 0, 0, 0);
 						}
+
+                        AscFormat.fResetConnectorsIds(aCopies, oIdMap);
 						
 						var presentationSelectedContent = new PresentationSelectedContent();
 						presentationSelectedContent.Drawings = arr_shapes;
@@ -4612,7 +4619,7 @@ PasteProcessor.prototype =
 				if(hyperLink)
 				{
 					var oCurHyperlink = new ParaHyperlink();
-					oCurHyperlink.Set_Paragraph(this.oCurPar);
+					oCurHyperlink.SetParagraph(this.oCurPar);
 					oCurHyperlink.Set_Value( hyperLink.Hyperlink );
 					if(hyperLink.Tooltip)
 						oCurHyperlink.Set_ToolTip(hyperLink.Tooltip);
@@ -4894,7 +4901,9 @@ PasteProcessor.prototype =
 		Asc.getBinaryOtherTableGVar(tempWorkbook);
 		
 		pptx_content_loader.Start_UseFullUrl();
+        pptx_content_loader.Reader.ClearConnectorsMaps();
 		oBinaryFileReader.Read(base64, tempWorkbook);
+        pptx_content_loader.Reader.AssignConnectorsId();
 		
 		return {workbook: tempWorkbook, activeRange: oBinaryFileReader.copyPasteObj.activeRange, arrImages: pptx_content_loader.End_UseFullUrl()};
 	},
@@ -4939,7 +4948,7 @@ PasteProcessor.prototype =
     {
         var loader = new AscCommon.BinaryPPTYLoader();
         loader.Start_UseFullUrl();
-		
+        loader.ClearConnectorsMaps();
 		pptx_content_loader.Reader.Start_UseFullUrl();
 		
         loader.stream = stream;
@@ -5054,6 +5063,7 @@ PasteProcessor.prototype =
 		
 		var chartImages = pptx_content_loader.Reader.End_UseFullUrl();
 		var images = loader.End_UseFullUrl();
+        loader.AssignConnectorsId();
 		var allImages = chartImages.concat(images);
 		
         return {arrShapes: arr_shapes, arrImages: allImages, arrTransforms: arr_transforms};
@@ -5072,7 +5082,10 @@ PasteProcessor.prototype =
         for(var i = 0; i < count; ++i)
         {
             slide = new SlideCopyObject();
+
+            loader.ClearConnectorsMaps();
 			slide.Slide = loader.ReadSlide(0);
+            loader.AssignConnectorsId();
 			arr_slides.push(slide);
         }
         return arr_slides;
@@ -7481,7 +7494,7 @@ PasteProcessor.prototype =
 
 						bAddParagraph = this._Decide_AddParagraph(child, pPr, bAddParagraph);
 						oHyperlink = new ParaHyperlink();
-						oHyperlink.Set_Paragraph(this.oCurPar);
+						oHyperlink.SetParagraph(this.oCurPar);
 						oHyperlink.Set_Value( href );
 						if(null != title)
 							oHyperlink.Set_ToolTip(title);

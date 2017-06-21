@@ -761,3 +761,59 @@ CDocumentContentBase.prototype.GetLastRangeVisibleBounds = function()
 
 	return this.Content[this.Content.length - 1].GetLastRangeVisibleBounds();
 };
+CDocumentContentBase.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	var nCurPos = this.Selection.Use === true ? this.Selection.StartPos : this.CurPos.ContentPos;
+
+	var nStartPos = 0;
+	var nEndPos   = this.Content.length - 1;
+
+	if (isCurrent)
+	{
+		if (isStart)
+		{
+			nStartPos = nCurPos;
+			nEndPos   = isNext ? this.Content.length - 1 : 0;
+		}
+		else
+		{
+			nStartPos = isNext ? 0 : this.Content.length - 1;
+			nEndPos   = nCurPos;
+		}
+	}
+	else
+	{
+		if (isNext)
+		{
+			nStartPos = 0;
+			nEndPos   = this.Content.length - 1;
+		}
+		else
+		{
+			nStartPos = this.Content.length - 1;
+			nEndPos   = 0;
+		}
+	}
+
+	if (isNext)
+	{
+		for (var nIndex = nStartPos; nIndex <= nEndPos; ++nIndex)
+		{
+			var oRes = this.Content[nIndex].FindNextFillingForm(true, isCurrent && nIndex === nCurPos ? true : false, isStart);
+			if (oRes)
+				return oRes;
+		}
+	}
+	else
+	{
+		for (var nIndex = nStartPos; nIndex >= nEndPos; --nIndex)
+		{
+			var oRes = this.Content[nIndex].FindNextFillingForm(false, isCurrent && nIndex === nCurPos ? true : false, isStart);
+			if (oRes)
+				return oRes;
+
+		}
+	}
+
+	return null;
+};

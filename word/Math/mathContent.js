@@ -2213,7 +2213,7 @@ CMathContent.prototype.Add_ToContent = function(Pos, Item)
 {
     if (Item && para_Run === Item.Type)
     {
-        var MathRun = new ParaRun(Item.Get_Paragraph(), true);
+        var MathRun = new ParaRun(Item.GetParagraph(), true);
         this.Internal_Content_Add(Pos, MathRun);
     }
     else
@@ -3411,7 +3411,7 @@ CMathContent.prototype.Add_Function_1 = function(Pr, FName, BaseText)
     var MathFunc = new CMathFunc(Pr);
     this.Add_Element(MathFunc);
 
-    MathFunc.Set_Paragraph(this.Paragraph);
+    MathFunc.SetParagraph(this.Paragraph);
 
     var MathContent = MathFunc.getFName();
     var Script = MathContent.Add_Script(false, {ctrPrp : Pr.ctrPrp, type : DEGREE_SUPERSCRIPT}, null, "-1", null);
@@ -3428,7 +3428,7 @@ CMathContent.prototype.Add_FunctionWithLimit = function(Pr, FName, LimitText, Ba
     var MathFunc = new CMathFunc(Pr);
     this.Add_Element(MathFunc);
 
-    MathFunc.Set_Paragraph(this.Paragraph);
+    MathFunc.SetParagraph(this.Paragraph);
 
     var MathContent = MathFunc.getFName();
     var Limit = MathContent.Add_Limit({ctrPrp : Pr.ctrPrp, type : LIMIT_LOW}, null, LimitText);

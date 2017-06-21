@@ -1088,15 +1088,15 @@ ParaMath.prototype.CopyContent = function(Selected)
 {
     return [this.Copy(Selected)];
 };
-ParaMath.prototype.Set_Paragraph = function(Paragraph)
+ParaMath.prototype.SetParagraph = function(Paragraph)
 {
-    this.Paragraph = Paragraph;
-    this.Root.Set_Paragraph(Paragraph);
-    this.Root.Set_ParaMath(this, null);
+	this.Paragraph = Paragraph;
+	this.Root.SetParagraph(Paragraph);
+	this.Root.Set_ParaMath(this, null);
 };
-ParaMath.prototype.Get_Paragraph = function()
+ParaMath.prototype.GetParagraph = function()
 {
-    return this.Paragraph;
+	return this.Paragraph;
 };
 
 ParaMath.prototype.Get_Text = function(Text)
@@ -1648,7 +1648,7 @@ ParaMath.prototype.Get_AllFontNames = function(AllFonts)
     this.Root.Get_AllFontNames(AllFonts);
 };
 
-ParaMath.prototype.GetSelectedElementsInfo = function(Info)
+ParaMath.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
     Info.Set_Math(this);
 };
@@ -1825,7 +1825,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         // такая ситуация возможна  когда пришел пересчет заново и кол-во отрезков выравнивания 0 (либо меньше, чем нужно)
         // при этом если это первый Range данной формулы, то пришел еще Reset, то есть пересчитать придется, при этом не меняем max ширину, т.к. если мы уже пересчитали с учетом Range, она не должна поменяться
-        this.Root.Set_Paragraph(Para);
+        this.Root.SetParagraph(Para);
         this.Root.Set_ParaMath(this, null);
 
         this.PageInfo.Update_CurrentPage(Page, ParaLine);

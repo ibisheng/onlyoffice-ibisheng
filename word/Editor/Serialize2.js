@@ -9155,7 +9155,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 					var oField = this.aFields[i];
 					if (null != oField && para_Hyperlink == oField.Get_Type()) {
 						var oHyperlink = new ParaHyperlink();
-						oHyperlink.Set_Paragraph(paragraph);
+						oHyperlink.SetParagraph(paragraph);
 						oHyperlink.Set_Value(oField.Get_Value());
 						oHyperlink.Set_ToolTip(oField.Get_ToolTip());
 						oParStruct.addElem(oHyperlink);
@@ -9261,7 +9261,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 		else if (c_oSerParType.Hyperlink == type) {
 		    var oHyperlinkObj = {Link: null, Anchor: null, Tooltip: null, History: null, DocLocation: null, TgtFrame: null};
 		    var oNewHyperlink = new ParaHyperlink();
-		    oNewHyperlink.Set_Paragraph(oParStruct.paragraph);
+		    oNewHyperlink.SetParagraph(oParStruct.paragraph);
 		    res = this.bcr.Read1(length, function (t, l) {
 		        return oThis.ReadHyperlink(t, l, oHyperlinkObj, oNewHyperlink, oParStruct);
 		    });
@@ -9314,7 +9314,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
             }
 		} else if ( c_oSerParType.Sdt === type) {
 			var oSdt = new AscCommonWord.CInlineLevelSdt();
-			oSdt.Set_Paragraph(oParStruct.paragraph);
+			oSdt.SetParagraph(oParStruct.paragraph);
 			var oSdtStruct = new OpenParStruct(oSdt, oParStruct.paragraph);
 			res = this.bcr.Read1(length, function(t, l){
 				return oThis.ReadSdt(t,l, oSdt, 1, oSdtStruct);
@@ -9864,7 +9864,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 			}
 			if(!(null != sLocation && sLocation.length > 0)){
 				oRes = new ParaHyperlink();
-				oRes.Set_Paragraph(paragraph);
+				oRes.SetParagraph(paragraph);
 				if(null != sLink && sLink.length > 0)
 					oRes.Set_Value(sLink);
 				if(null != sTooltip && sTooltip.length > 0)

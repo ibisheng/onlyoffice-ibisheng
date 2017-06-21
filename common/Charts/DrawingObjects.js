@@ -39,6 +39,9 @@
 */
 function (window, undefined) {
 
+    
+    var sFrozenImageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAKCAYAAAB10jRKAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAJElEQVQYV2MAAjUQoQIiFECEDIiQABHCIIIPRHCBCDYgZmACABohANImre1SAAAAAElFTkSuQmCC';
+    var sFrozenImageRotUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAABCAYAAADn9T9+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAGklEQVQYV2NkYGBQA+J/QPwHCf+GYiif4Q8AnJAJBNqB9DYAAAAASUVORK5CYII='
 // Import
 var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
@@ -1905,6 +1908,12 @@ function DrawingObjects() {
             _this.showDrawingObjects(true);
         };
 
+        if(!Asc['editor'].ImageLoader.map_image_index[sFrozenImageUrl]){
+            aImagesSync.push(sFrozenImageUrl);
+        }
+        if(!Asc['editor'].ImageLoader.map_image_index[sFrozenImageRotUrl]){
+            aImagesSync.push(sFrozenImageRotUrl);
+        }
         if(aImagesSync.length > 0)
         {
             var old_val = api.ImageLoader.bIsAsyncLoadDocumentImages;
@@ -2196,8 +2205,8 @@ function DrawingObjects() {
         }
 
         if ( !printOptions ) {
-            if ( aObjects.length ) {
-                if ( _this.controller.selectedObjects.length )
+            if ( aObjects.length || _this.drawingArea.frozenPlaces.length > 1) {
+                if ( _this.controller.selectedObjects.length || _this.drawingArea.frozenPlaces.length > 1)
                 {
                     _this.OnUpdateOverlay();
                     _this.controller.updateSelectionState(true);
@@ -4762,4 +4771,6 @@ function CoordsManager(ws) {
     window["AscFormat"].ClickCounter = ClickCounter;
     window["AscFormat"].aSparklinesStyles = aSparklinesStyles;
     window["AscFormat"].CSparklineView = CSparklineView;
+    window["AscFormat"].sFrozenImageUrl = sFrozenImageUrl;
+    window["AscFormat"].sFrozenImageRotUrl = sFrozenImageRotUrl;
 })(window);

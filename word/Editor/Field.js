@@ -93,7 +93,7 @@ ParaField.prototype.Copy = function(Selected)
 
     return NewField;
 };
-ParaField.prototype.GetSelectedElementsInfo = function(Info)
+ParaField.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
 	Info.Set_Field(this);
 	CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo.apply(this, arguments);
@@ -295,29 +295,25 @@ ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseCon
 };
 ParaField.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
-	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+	CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
 
-	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	if (true !== SearchPos.Found && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
 		this.Get_StartPos(SearchPos.Pos, Depth);
-		SearchPos.Found = true;
-		return true;
+		SearchPos.UpdatePos = true;
+		SearchPos.Found     = true;
 	}
-
-	return bResult;
 };
 ParaField.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
-	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_WordEndPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+	CParagraphContentWithParagraphLikeContent.prototype.Get_WordEndPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
 
-	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	if (true !== SearchPos.Found && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
 		this.Get_EndPos(false, SearchPos.Pos, Depth);
-		SearchPos.Found = true;
-		return true;
+		SearchPos.UpdatePos = true;
+		SearchPos.Found     = true;
 	}
-
-	return bResult;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Работа с данными поля
@@ -428,25 +424,9 @@ ParaField.prototype.Replace_MailMerge = function(_Value)
 
     return true;
 };
-ParaField.prototype.private_GetMappedRun = function(Value)
+ParaField.prototype.private_GetMappedRun = function(sValue)
 {
-    // Создаем ран и набиваем в него заданный текст.
-    var oRun = new ParaRun();
-
-    for (var Index = 0, Count = Value.length; Index < Count; Index++)
-    {
-        var Char = Value[Index], oText;
-        if (0x20 === Char)
-            oText = new ParaSpace();
-        else
-            oText = new ParaText(Value[Index]);
-
-        oRun.Add_ToContent(Index, oText);
-    }
-
-    oRun.Set_Pr(this.Get_FirstTextPr());
-
-    return oRun;
+	return this.CreateRunWithText(sValue);
 };
 ParaField.prototype.SetFormFieldName = function(sName)
 {
@@ -474,11 +454,7 @@ ParaField.prototype.GetValue = function()
 };
 ParaField.prototype.SetValue = function(sValue)
 {
-	var oRun = this.private_GetMappedRun(sValue);
-	oRun.Apply_TextPr(this.Get_TextPr(), undefined, true);
-	this.Remove_FromContent(0, this.Content.length);
-	this.Add_ToContent(0, oRun);
-	this.MoveCursorToStartPos();
+	this.ReplaceAllWithText(sValue);
 };
 ParaField.prototype.IsFillingForm = function()
 {
@@ -486,6 +462,28 @@ ParaField.prototype.IsFillingForm = function()
 		return true;
 
 	return false;
+};
+ParaField.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	if (!this.IsFillingForm())
+		return CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+
+	if (isCurrent && true === this.IsSelectedAll())
+	{
+		if (isNext)
+			return CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+
+		return null;
+	}
+
+	if (!isCurrent && isNext)
+		return this;
+
+	var oRes = CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+	if (!oRes && !isNext)
+		return this;
+
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования

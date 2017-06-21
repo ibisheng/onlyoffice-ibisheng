@@ -4088,6 +4088,7 @@ CPresentation.prototype =
     {
         return AscFormat.ExecuteNoHistory(function()
         {
+            var oIdMap;
             var ret = new PresentationSelectedContent(), i;
             if(this.Slides.length > 0)
             {
@@ -4143,7 +4144,9 @@ CPresentation.prototype =
                             {
                                 var bRecursive = isRealObject(this.Slides[this.CurPage].graphicObjects.selection.groupSelection);
                                 var aSpTree = bRecursive ? this.Slides[this.CurPage].graphicObjects.selection.groupSelection.spTree : this.Slides[this.CurPage].cSld.spTree;
-                                collectSelectedObjects(aSpTree, ret.Drawings, bRecursive);
+                                oIdMap = {};
+                                collectSelectedObjects(aSpTree, ret.Drawings, bRecursive, oIdMap);
+                                AscFormat.fResetConnectorsIds(ret.Drawings, oIdMap);
                             }
                         }
                         break;
@@ -4153,6 +4156,7 @@ CPresentation.prototype =
                         var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
                         for(i = 0; i < selected_slides.length; ++i)
                         {
+
                             ret.SlideObjects.push(new SlideCopyObject(this.Slides[selected_slides[i]].createDuplicate(), this.Slides[selected_slides[i]].getBase64Img()));
                         }
                     }
@@ -5400,13 +5404,15 @@ CPresentation.prototype =
 };
 
 
-function collectSelectedObjects(aSpTree, aCollectArray, bRecursive)
+function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap)
 {
     for(var i = 0; i < aSpTree.length; ++i)
     {
         if(aSpTree[i].selected)
         {
-            aCollectArray.push(new DrawingCopyObject(aSpTree[i].copy(), aSpTree[i].x, aSpTree[i].y, aSpTree[i].extX, aSpTree[i].extY, aSpTree[i].getBase64Img()));
+            var oCopy = aSpTree[i].copy();
+            aCollectArray.push(new DrawingCopyObject(oCopy, aSpTree[i].x, aSpTree[i].y, aSpTree[i].extX, aSpTree[i].extY, aSpTree[i].getBase64Img()));
+            oIdMap[aSpTree[i].Id] = oCopy.Id;
         }
         if(bRecursive && aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape)
         {

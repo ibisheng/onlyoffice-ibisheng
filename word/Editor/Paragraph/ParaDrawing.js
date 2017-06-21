@@ -244,7 +244,7 @@ ParaDrawing.prototype.canRotate = function()
 {
 	return isRealObject(this.GraphicObj) && typeof this.GraphicObj.canRotate == "function" && this.GraphicObj.canRotate();
 };
-ParaDrawing.prototype.Get_Paragraph = function()
+ParaDrawing.prototype.GetParagraph = function()
 {
 	return this.Parent;
 };
@@ -2398,7 +2398,7 @@ ParaDrawing.prototype.Convert_ToMathObject = function(isOpen)
 };
 ParaDrawing.prototype.private_ConvertToMathObject = function(isOpen)
 {
-	var Para = this.Get_Paragraph();
+	var Para = this.GetParagraph();
 	if (undefined === Para || null === Para || !(Para instanceof Paragraph))
 		return;
 

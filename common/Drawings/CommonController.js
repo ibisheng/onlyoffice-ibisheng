@@ -1230,7 +1230,7 @@ DrawingObjectsController.prototype =
                     par = content.Content[hit_paragraph];
                     if(isRealObject(par))
                     {
-                        check_hyperlink = par.Check_Hyperlink(tx, ty, 0);
+                        check_hyperlink = par.CheckHyperlink(tx, ty, 0);
                         if(!isRealObject(check_hyperlink))
                         {
                             return this.handleMoveHit(object, e, x, y, group, false, pageIndex, bWord);
@@ -1298,7 +1298,7 @@ DrawingObjectsController.prototype =
                     par = content.Content[hit_paragraph];
                     if(isRealObject(par))
                     {
-                        check_hyperlink = par.Check_Hyperlink(tx, ty, 0);
+                        check_hyperlink = par.CheckHyperlink(tx, ty, 0);
                         if(isRealObject(check_hyperlink))
                         {
                             ret.hyperlink = check_hyperlink;
@@ -2634,10 +2634,14 @@ DrawingObjectsController.prototype =
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 objects_by_type.shapes[i].setColumnNumber(props.columnNumber);
+                objects_by_type.shapes[i].recalculate();
+                objects_by_type.shapes[i].checkExtentsByDocContent();
             }
             for(i = 0; i < objects_by_type.groups.length; ++i)
             {
                 objects_by_type.groups[i].setColumnNumber(props.columnNumber);
+                objects_by_type.groups[i].recalculate();
+                objects_by_type.groups[i].checkExtentsByDocContent();
             }
         }
 
@@ -2646,10 +2650,14 @@ DrawingObjectsController.prototype =
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 objects_by_type.shapes[i].setColumnSpace(props.columnSpace);
+                objects_by_type.shapes[i].recalculate();
+                objects_by_type.shapes[i].checkExtentsByDocContent();
             }
             for(i = 0; i < objects_by_type.groups.length; ++i)
             {
                 objects_by_type.groups[i].setColumnSpace(props.columnSpace);
+                objects_by_type.groups[i].recalculate();
+                objects_by_type.groups[i].checkExtentsByDocContent();
             }
         }
 
@@ -4879,10 +4887,10 @@ DrawingObjectsController.prototype =
 		return null;
 	},
 
-	getChartSpace: function(worksheet, options)
+	getChartSpace: function(worksheet, options, bUseCache)
 	{
 		var chartSeries = AscFormat.getChartSeries(worksheet, options);
-		return this._getChartSpace(chartSeries, options);
+		return this._getChartSpace(chartSeries, options, bUseCache);
 	},
 
     getChartSpace2: function(chart, options)
@@ -10393,15 +10401,35 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
     }
 
     var oChart = oPlotArea.charts[0], base_fills;
+    var ser, lit = null, val = null;
     ApplyDLblsProps(aPreset[10], oChart, oDrawingDocument, undefined, undefined, bCreate);
     for(i = 0; i < oChart.series.length; ++i){
-        var pts = AscFormat.getPtsFromSeries(oChart.series[i]);
-
+        lit = null;
+        ser = oChart.series[i];
+        val = ser.val || ser.yVal;
+        var pts = AscFormat.getPtsFromSeries(ser);
+        if(val){
+            if(val.numRef && val.numRef.numCache)
+            {
+                lit = val.numRef.numCache;
+            }
+            else if(val.numLit)
+            {
+                lit = val.numLit;
+            }
+        }
+        var ptCount;
+        if(lit && AscFormat.isRealNumber(lit.ptCount)){
+            ptCount = Math.max(lit.ptCount, AscFormat.getMaxIdx(pts));
+        }
+        else{
+            ptCount = AscFormat.getMaxIdx(pts);
+        }
 
         var oDPt;
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
-            base_fills = AscFormat.getArrayFillsFromBase(style.fill2, AscFormat.getMaxIdx(pts));
-            for(j = 0; j < pts.length; ++j){
+            base_fills = AscFormat.getArrayFillsFromBase(style.fill2, ptCount);
+            for(j = 0; j < ptCount; ++j){
                 oDPt = null;
                 if(oChart.series[i].getDptByIdx){
                     oDPt = oChart.series[i].getDptByIdx(j);
@@ -10417,7 +10445,7 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                 oChart.series[i].addDPt(oDPt);
             }
             for (j = 0; j < oChart.series[i].dPt.length; ++j ){
-                if(oChart.series[i].dPt[j].idx >= pts.length){
+                if(oChart.series[i].dPt[j].idx >= ptCount){
                     oChart.series[i].removeDPt(j);
                 }
             }
@@ -10432,12 +10460,12 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
         if(oChart.getObjectType() === AscDFH.historyitem_type_PieChart || oChart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
             ApplyDLblsProps(aPreset[12], oChart.series[i], oDrawingDocument, i, base_fills, true);
             if(oChart.series[i].dLbls){
-                for(var j = 0; j < pts.length; ++j){
-                    var oDLbl = oChart.series[i].dLbls.findDLblByIdx(pts[j].idx);
+                for(var j = 0; j < ptCount; ++j){
+                    var oDLbl = oChart.series[i].dLbls.findDLblByIdx(j);
                     if(!oDLbl){
                         oDLbl = new AscFormat.CDLbl();
                         oChart.series[i].dLbls.addDLbl(oDLbl);
-                        oDLbl.setIdx(pts[j].idx);
+                        oDLbl.setIdx(j);
                         ApplyTxPr(aPreset[12][0], oDLbl, oDrawingDocument, j, base_fills, bAccent1Background);
                         ApplySpPr(aPreset[12][1], oDLbl, j, base_fills, bAccent1Background);
                         oDLbl.setDLblPos(aPreset[12][2]);
@@ -11067,6 +11095,51 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
         }
         return bullet;
     }
+
+
+
+    function fResetConnectorsIds(aCopyObjects, oIdMaps){
+        for(var i = 0; i < aCopyObjects.length; ++i){
+            var oDrawing = aCopyObjects[i].Drawing ? aCopyObjects[i].Drawing : aCopyObjects[i];
+            if(oDrawing.getObjectType){
+                if(oDrawing.getObjectType() === AscDFH.historyitem_type_Cnx){
+                    var sStId = oDrawing.getStCxnId();
+                    var sEndId = oDrawing.getEndCxnId();
+                    var sStCnxId = null, sEndCnxId = null;
+                    if(oIdMaps[sStId]){
+                        sStCnxId = oIdMaps[sStId];
+                    }
+                    if(oIdMaps[sEndId]){
+                        sEndCnxId = oIdMaps[sEndId];
+                    }
+                    if(sStId !==  sStCnxId || sEndCnxId !== sEndId){
+
+                        var nvUniSpPr = oDrawing.nvSpPr.nvUniSpPr.copy();
+                        if(!sStCnxId){
+                            nvUniSpPr.stCnxIdx = null;
+                            nvUniSpPr.stCnxId  = null;
+                        }
+                        else{
+                            nvUniSpPr.stCnxId  = sStCnxId;
+                        }
+                        if(!sEndCnxId){
+                            nvUniSpPr.endCnxIdx = null;
+                            nvUniSpPr.endCnxId  = null;
+                        }
+                        else{
+                            nvUniSpPr.endCnxId  = sEndCnxId;
+                        }
+                        oDrawing.nvSpPr.setUniSpPr(nvUniSpPr);
+                    }
+                }
+                else if(oDrawing.getObjectType() === AscDFH.historyitem_type_GroupShape){
+                    fResetConnectorsIds(oDrawing.spTree, oIdMaps);
+                }
+            }
+        }
+    }
+
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].HANDLE_EVENT_MODE_HANDLE = HANDLE_EVENT_MODE_HANDLE;
@@ -11142,4 +11215,5 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
 	window['AscFormat'].fGetPresentationBulletByNumInfo = fGetPresentationBulletByNumInfo;
 	window['AscFormat'].fGetFontByNumInfo = fGetFontByNumInfo;
 	window['AscFormat'].CreateBlipFillRasterImageId = CreateBlipFillRasterImageId;
+	window['AscFormat'].fResetConnectorsIds = fResetConnectorsIds;
 })(window);

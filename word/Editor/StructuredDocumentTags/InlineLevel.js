@@ -144,7 +144,16 @@ CInlineLevelSdt.prototype.Get_LeftPos = function(SearchPos, ContentPos, Depth, U
 		return true;
 	}
 
-	CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_LeftPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_StartPos(SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
 };
 CInlineLevelSdt.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
@@ -157,7 +166,16 @@ CInlineLevelSdt.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, 
 		return true;
 	}
 
-	CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_RightPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+
+	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	{
+		this.Get_EndPos(false, SearchPos.Pos, Depth);
+		SearchPos.Found = true;
+		return true;
+	}
+
+	return bResult;
 };
 CInlineLevelSdt.prototype.Remove = function(nDirection, bOnAddText)
 {
@@ -166,7 +184,7 @@ CInlineLevelSdt.prototype.Remove = function(nDirection, bOnAddText)
 	if (this.Is_Empty() && !bOnAddText && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
 		var sDefaultText = "     ";
-		this.SetValue(sDefaultText);
+		this.ReplaceAllWithText(sDefaultText);
 	}
 };
 CInlineLevelSdt.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
@@ -182,32 +200,33 @@ CInlineLevelSdt.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 		oRangeBounds.X += Dx;
 		oRangeBounds.Y += Dy;
 	}
+
+	if (this.BoundsPaths)
+		this.BoundsPaths = null;
 };
 CInlineLevelSdt.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
-	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+	CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
 
-	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument)
+	if (true !== SearchPos.Found && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
 		this.Get_StartPos(SearchPos.Pos, Depth);
-		SearchPos.Found = true;
-		return true;
-	}
+		SearchPos.UpdatePos = true;
+		SearchPos.Found     = true;
 
-	return bResult;
+	}
 };
 CInlineLevelSdt.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
-	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_WordEndPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+	CParagraphContentWithParagraphLikeContent.prototype.Get_WordEndPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
 
-	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument)
+	if (true !== SearchPos.Found && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
 		this.Get_EndPos(false, SearchPos.Pos, Depth);
-		SearchPos.Found = true;
-		return true;
-	}
+		SearchPos.UpdatePos = true;
+		SearchPos.Found     = true;
 
-	return bResult;
+	}
 };
 CInlineLevelSdt.prototype.GetBoundingPolygon = function()
 {
@@ -251,6 +270,74 @@ CInlineLevelSdt.prototype.DrawContentControlsTrack = function(isHover)
 CInlineLevelSdt.prototype.SelectContentControl = function()
 {
 	this.SelectThisElement(1);
+};
+CInlineLevelSdt.prototype.RemoveContentControlWrapper = function()
+{
+	var oParent = this.Get_Parent();
+	if (!oParent)
+		return;
+
+	var nElementPos = this.Get_PosInParent(oParent);
+	if (-1 === nElementPos)
+		return;
+
+	var nParentCurPos            = oParent instanceof Paragraph ? oParent.CurPos.ContentPos : oParent.State.ContentPos;
+	var nParentSelectionStartPos = oParent.Selection.StartPos;
+	var nParentSelectionEndPos   = oParent.Selection.EndPos;
+
+	var nCount = this.Content.length;
+	oParent.Remove_FromContent(nElementPos, 1);
+	for (var nIndex = 0; nIndex < nCount; ++nIndex)
+	{
+		oParent.Add_ToContent(nElementPos + nIndex, this.Content[nIndex]);
+	}
+
+	if (nParentCurPos === nElementPos)
+	{
+		if (oParent instanceof Paragraph)
+			oParent.CurPos.ContentPos = nParentCurPos + this.State.ContentPos;
+		else
+			oParent.State.ContentPos = nParentCurPos + this.State.ContentPos;
+
+	}
+	else if (nParentCurPos > nElementPos)
+	{
+		if (oParent instanceof Paragraph)
+			oParent.CurPos.ContentPos = nParentCurPos + nCount - 1;
+		else
+			oParent.State.ContentPos = nParentCurPos + nCount - 1;
+	}
+
+	if (nParentSelectionStartPos === nElementPos)
+		oParent.Selection.StartPos = nParentSelectionStartPos + this.Selection.StartPos;
+	else if (nParentSelectionStartPos > nElementPos)
+		oParent.Selection.StartPos = nParentSelectionStartPos + nCount - 1;
+
+	if (nParentSelectionEndPos === nElementPos)
+		oParent.Selection.EndPos = nParentSelectionEndPos + this.Selection.EndPos;
+	else if (nParentSelectionEndPos > nElementPos)
+		oParent.Selection.EndPos = nParentSelectionEndPos + nCount - 1;
+
+	this.Remove_FromContent(0, this.Content.length);
+};
+CInlineLevelSdt.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	if (isCurrent && true === this.IsSelectedAll())
+	{
+		if (isNext)
+			return CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+
+		return null;
+	}
+
+	if (!isCurrent && isNext)
+		return this;
+
+	var oRes = CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+	if (!oRes && !isNext)
+		return this;
+
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
@@ -325,6 +412,31 @@ CInlineLevelSdt.prototype.SetContentControlLock = function(nLockType)
 CInlineLevelSdt.prototype.GetContentControlLock = function()
 {
 	return (undefined !== this.Pr.Lock ? this.Pr.Lock : sdtlock_Unlocked);
+};
+CInlineLevelSdt.prototype.SetContentControlPr = function(oPr)
+{
+	if (!oPr)
+		return;
+
+	if (undefined !== oPr.Tag)
+		this.SetTag(oPr.Tag);
+
+	if (undefined !== oPr.Id)
+		this.SetContentControlId(oPr.Id);
+
+	if (undefined !== oPr.Lock)
+		this.SetContentControlLock(oPr.Lock);
+};
+CInlineLevelSdt.prototype.GetContentControlPr = function()
+{
+	var oPr = new CContentControlPr();
+
+	oPr.Tag        = this.Pr.Tag;
+	oPr.Id         = this.Pr.Id;
+	oPr.Lock       = this.Pr.Lock;
+	oPr.InternalId = this.GetId();
+
+	return oPr;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования

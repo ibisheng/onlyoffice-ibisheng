@@ -964,9 +964,9 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 				mapDocumentContents[oClass.Get_Id()] = oClass;
 			else if (oClass instanceof AscCommonWord.Paragraph)
 				mapParagraphs[oClass.Get_Id()] = oClass;
-			else if (oClass.IsParagraphContentElement && true === oClass.IsParagraphContentElement() && true === oChange.IsContentChange() && oClass.Get_Paragraph())
+			else if (oClass.IsParagraphContentElement && true === oClass.IsParagraphContentElement() && true === oChange.IsContentChange() && oClass.GetParagraph())
             {
-                mapParagraphs[oClass.Get_Paragraph().Get_Id()] = oClass.Get_Paragraph();
+                mapParagraphs[oClass.GetParagraph().Get_Id()] = oClass.GetParagraph();
                 if (oClass instanceof AscCommonWord.ParaRun)
                     mapRuns[oClass.Get_Id()] = oClass;
             }
@@ -1417,7 +1417,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
     if (NewDocPos !== DocPos && NewDocPos.length === 1 && NewDocPos[0].Class instanceof AscCommonWord.ParaRun)
     {
         var Run = NewDocPos[0].Class;
-        var Para = Run.Get_Paragraph();
+        var Para = Run.GetParagraph();
         if (AscCommonWord.CanUpdatePosition(Para, Run))
         {
             DocPos.length = 0;
@@ -1430,7 +1430,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
     {
         var Run = DocPos[DocPos.length - 1].Class;
         var RunPos = DocPos[DocPos.length - 1].Position;
-        var Para = Run.Get_Paragraph();
+        var Para = Run.GetParagraph();
         if (AscCommonWord.CanUpdatePosition(Para, Run))
         {
             DocPos.length = 0;

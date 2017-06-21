@@ -131,14 +131,13 @@ ParaRun.prototype.Get_Id = function()
     return this.Id;
 };
 
-ParaRun.prototype.Get_Paragraph = function()
+ParaRun.prototype.GetParagraph = function()
 {
-    return this.Paragraph;
+	return this.Paragraph;
 };
-
-ParaRun.prototype.Set_Paragraph = function(Paragraph)
+ParaRun.prototype.SetParagraph = function(Paragraph)
 {
-    this.Paragraph = Paragraph;
+	this.Paragraph = Paragraph;
 };
 
 ParaRun.prototype.Set_ParaMath = function(ParaMath, Parent)

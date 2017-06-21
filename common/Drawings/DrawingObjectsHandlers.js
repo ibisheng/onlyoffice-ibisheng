@@ -488,7 +488,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         }
 
         var chart_titles = drawing.getAllTitles();
-        var oApi = editor || Asc.editor;
+        var oApi = editor || Asc['editor'];
         var bIsMobileVersion = oApi && oApi.isMobileVersion;
         for(i = 0; i < chart_titles.length; ++i)
         {

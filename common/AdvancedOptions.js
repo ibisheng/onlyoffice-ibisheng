@@ -157,16 +157,12 @@
 		/** @constructor */
 		function asc_CFormula(o){
 			this.name = o.name;
-			this.arg = o.args;
 		}
 		asc_CFormula.prototype.asc_getName = function () {
 			return this.name;
 		};
 		asc_CFormula.prototype.asc_getLocaleName = function () {
 			return AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale[this.name] : this.name;
-		};
-		asc_CFormula.prototype.asc_getArguments = function () {
-			return this.arg;
 		};
 
 		//----------------------------------------------------------export----------------------------------------------------
@@ -227,6 +223,5 @@
 		prot = asc_CFormula.prototype;
 		prot["asc_getName"]				= prot.asc_getName;
 		prot["asc_getLocaleName"]	= prot.asc_getLocaleName;
-		prot["asc_getArguments"]		= prot.asc_getArguments;
 	}
 )(window);

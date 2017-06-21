@@ -629,12 +629,19 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 
 	var nContentControlLock = this.GetContentControlLock();
 
+	if (AscCommon.changestype_ContentControl_Properties === CheckType)
+		return this.Lock.Check(this.GetId());
+
+	if (AscCommon.changestype_ContentControl_Remove === CheckType)
+		this.Lock.Check(this.GetId());
+
 	if (isCheckContentControlLock
 		&& (AscCommon.changestype_Paragraph_Content === CheckType
 		|| AscCommon.changestype_Remove === CheckType
 		|| AscCommon.changestype_Delete === CheckType
 		|| AscCommon.changestype_Document_Content === CheckType
-		|| AscCommon.changestype_Document_Content_Add === CheckType)
+		|| AscCommon.changestype_Document_Content_Add === CheckType
+		|| AscCommon.changestype_ContentControl_Remove === CheckType)
 		&& this.IsSelectionUse()
 		&& this.IsSelectedAll())
 	{

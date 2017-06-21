@@ -102,7 +102,7 @@
       }, padding: -1, /*px horizontal padding*/
       paddingPlusBorder: -1
     };
-    this.activeCellBorderColor = new CColor(126, 152, 63);
+    this.activeCellBorderColor = new CColor(72, 121, 92);
     this.activeCellBorderColor2 = new CColor(255, 255, 255, 1);
 
     // Цвет закрепленных областей

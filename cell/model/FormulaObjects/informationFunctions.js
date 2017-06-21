@@ -113,11 +113,6 @@
 		}
 		return this.value = typeError(arg0);
 	};
-	cERROR_TYPE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -145,11 +140,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISBLANK.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -182,11 +172,6 @@
 			return this.value = new cBool(false);
 		}
 	};
-	cISERR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -217,11 +202,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISERROR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -259,11 +239,6 @@
 			return this.value = new cBool((arg0.getValue() & 1) == 0);
 		}
 	};
-	cISEVEN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -294,11 +269,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISLOGICAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -331,11 +301,6 @@
 			return this.value = new cBool(false);
 		}
 	};
-	cISNA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -365,11 +330,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISNONTEXT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -401,11 +361,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISNUMBER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -443,11 +398,6 @@
 			return this.value = new cBool((arg0.getValue() & 1) == 1);
 		}
 	};
-	cISODD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -470,11 +420,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISREF.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -506,11 +451,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISTEXT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -557,11 +497,6 @@
 		}
 
 	};
-	cN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -578,11 +513,6 @@
 	cNA.prototype.argumentsMax = 0;
 	cNA.prototype.Calculate = function () {
 		return this.value = new cError(cErrorType.not_available);
-	};
-	cNA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "()"
-		};
 	};
 
 	/**
@@ -618,10 +548,5 @@
 		} else {
 			return this.value = new cNumber(64);
 		}
-	};
-	cTYPE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 })(window);

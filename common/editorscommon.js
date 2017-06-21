@@ -145,8 +145,13 @@
 
 	function getBaseUrl()
 	{
-		var index_html = window["location"]["href"];
-		return index_html.substring(0, index_html.lastIndexOf("/") + 1);
+		var indexHtml = window["location"]["href"];
+		var questInd = indexHtml.indexOf("?");
+    		if (questInd > 0)
+		{
+			indexHtml = indexHtml.substring(0, questInd);
+		}
+    		return indexHtml.substring(0, indexHtml.lastIndexOf("/") + 1);
 	}
 
 	function getEncodingParams()

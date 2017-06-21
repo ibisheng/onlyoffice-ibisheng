@@ -92,7 +92,7 @@ var GlobalSkinFlat    = {
 	STYLE_THUMBNAIL_WIDTH                 : 109,
 	STYLE_THUMBNAIL_HEIGHT                : 45,
 	BorderSplitterColor                   : "#CBCBCB",
-	SupportNotes                          : false,
+	SupportNotes                          : true,
 	SplitterWidthMM                       : 1,
 	ThumbnailScrollWidthNullIfNoScrolling : false
 };
@@ -120,7 +120,7 @@ function CEditorPage(api)
 {
 	// ------------------------------------------------------------------
 	this.Name           = "";
-	this.IsSupportNotes = false;
+	this.IsSupportNotes = true;
 
 	this.EditorType = "presentations";
 
@@ -142,8 +142,12 @@ function CEditorPage(api)
 	this.m_oNotesContainer = null;
 	this.m_oNotes          = null;
 	this.m_oNotes_scroll   = null;
+	this.m_oNotesOverlay   = null;
+
+	this.m_oNotesApi	   = null;
 
 	// main
+	this.m_oMainParent = null;
 	this.m_oMainContent = null;
 	// <-
 	// horizontal scroll
@@ -376,12 +380,12 @@ function CEditorPage(api)
 		this.m_oBody = CreateControlContainer(this.Name);
 
 		this.Splitter1Pos    = 70;
-		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 20 : 0;
+		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 10 : 0;
 		this.OldSplitter1Pos = this.Splitter1Pos;
 
 		this.Splitter1PosMin = 20;
 		this.Splitter1PosMax = 80;
-		this.Splitter2PosMin = 0;
+		this.Splitter2PosMin = 10;
 		this.Splitter2PosMax = 100;
 
 		var ScrollWidthMm  = this.ScrollWidthPx * g_dKoef_pix_to_mm;
@@ -417,15 +421,15 @@ function CEditorPage(api)
 		}
 
 		// main content -------------------------------------------------------------
-		this.m_oMainContent = CreateControlContainer("id_main");
+		this.m_oMainParent = CreateControlContainer("id_main_parent");
+		this.m_oMainParent.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM, 0, g_dKoef_pix_to_mm, 1000, true, false, true, false, -1, -1);
+		this.m_oBody.AddControl(this.m_oMainParent);
 
-		if (GlobalSkin.SupportNotes)
-			this.m_oMainContent.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM, 0, g_dKoef_pix_to_mm, this.Splitter2Pos + GlobalSkin.SplitterWidthMM, true, false, true, true, -1, -1);
-		else
-			this.m_oMainContent.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM, 0, g_dKoef_pix_to_mm, 1000, true, false, true, false, -1, -1);
+		this.m_oMainContent = CreateControlContainer("id_main");
+		this.m_oMainContent.Bounds.SetParams(0, 0, g_dKoef_pix_to_mm, this.Splitter2Pos + GlobalSkin.SplitterWidthMM, true, false, true, true, -1, -1);
 
 		this.m_oMainContent.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
-		this.m_oBody.AddControl(this.m_oMainContent);
+		this.m_oMainParent.AddControl(this.m_oMainContent);
 
 		// panel right --------------------------------------------------------------
 		this.m_oPanelRight = CreateControlContainer("id_panel_right");
@@ -508,14 +512,19 @@ function CEditorPage(api)
 
 		// notes ----
 		this.m_oNotesContainer = CreateControlContainer("id_panel_notes");
-		this.m_oNotesContainer.Bounds.SetParams(this.Splitter1Pos + GlobalSkin.SplitterWidthMM, 0, g_dKoef_pix_to_mm, 1000, true, true, true, false, -1, this.Splitter2Pos);
+		this.m_oNotesContainer.Bounds.SetParams(0, 0, g_dKoef_pix_to_mm, 1000, true, true, true, false, -1, this.Splitter2Pos);
 		this.m_oNotesContainer.Anchor = (g_anchor_left | g_anchor_right | g_anchor_bottom);
-		this.m_oBody.AddControl(this.m_oNotesContainer);
+		this.m_oMainParent.AddControl(this.m_oNotesContainer);
 
 		this.m_oNotes = CreateControl("id_notes");
 		this.m_oNotes.Bounds.SetParams(0, 0, ScrollWidthMm, 1000, false, false, true, false, -1, -1);
 		this.m_oNotes.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
 		this.m_oNotesContainer.AddControl(this.m_oNotes);
+
+		this.m_oNotesOverlay = CreateControl("id_notes_overlay");
+		this.m_oNotesOverlay.Bounds.SetParams(0, 0, ScrollWidthMm, 1000, false, false, true, false, -1, -1);
+		this.m_oNotesOverlay.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
+		this.m_oNotesContainer.AddControl(this.m_oNotesOverlay);
 
 		this.m_oNotes_scroll = CreateControl("id_vertical_scroll_notes");
 		this.m_oNotes_scroll.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, ScrollWidthMm, -1);
@@ -556,6 +565,13 @@ function CEditorPage(api)
 			this.MobileTouchManagerThumbnails.Init(this.m_oApi);
 		}
 
+		if (this.IsSupportNotes)
+		{
+			this.m_oNotes.HtmlElement.style.backgroundColor = GlobalSkin.BackgroundColor;
+			this.m_oNotesContainer.HtmlElement.style.backgroundColor = GlobalSkin.BackgroundColor;
+			this.m_oNotesContainer.HtmlElement.style.borderTop = ("1px solid " + GlobalSkin.BorderSplitterColor);
+		}
+
 		this.m_oOverlayApi.m_oControl  = this.m_oOverlay;
 		this.m_oOverlayApi.m_oHtmlPage = this;
 		this.m_oOverlayApi.Clear();
@@ -569,6 +585,10 @@ function CEditorPage(api)
 		this.checkNeedRules();
 		this.initEvents();
 		this.OnResize(true);
+
+		this.setNodesEnable(false);
+		//this.m_oNotesApi = new CNotesDrawer(this);
+		//this.m_oNotesApi.Init();
 	};
 
 	this.CheckRetinaDisplay = function()
@@ -683,6 +703,10 @@ function CEditorPage(api)
 
 		if (!this.m_oApi.isMobileVersion)
 		{
+			this.m_oMainParent.HtmlElement.onmousemove = this.onBodyMouseMove;
+			this.m_oMainParent.HtmlElement.onmousedown = this.onBodyMouseDown;
+			this.m_oMainParent.HtmlElement.onmouseup = this.onBodyMouseUp;
+
 			this.m_oBody.HtmlElement.onmousemove = this.onBodyMouseMove;
 			this.m_oBody.HtmlElement.onmousedown = this.onBodyMouseDown;
 			this.m_oBody.HtmlElement.onmouseup = this.onBodyMouseUp;
@@ -871,8 +895,7 @@ function CEditorPage(api)
 		if (this.bIsRetinaSupport)
 			w /= AscCommon.AscBrowser.retinaPixelRatio;
 
-		var h = (((this.m_oBody.AbsolutePosition.B - this.m_oBody.AbsolutePosition.T) -
-			(this.m_oTopRuler.AbsolutePosition.B - this.m_oTopRuler.AbsolutePosition.T)) * g_dKoef_mm_to_pix) >> 0;
+		var h = ((this.m_oMainView.AbsolutePosition.B - this.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
 
 		var _pageWidth  = this.m_oLogicDocument.Width * g_dKoef_mm_to_pix;
 		var _pageHeight = this.m_oLogicDocument.Height * g_dKoef_mm_to_pix;
@@ -948,6 +971,9 @@ function CEditorPage(api)
 
 		if (this.MobileTouchManager)
 			this.MobileTouchManager.Resize_After();
+
+		if (this.IsSupportNotes && this.m_oNotesApi)
+			this.m_oNotesApi.OnResize();
 	};
 
 	this.zoom_Out = function()
@@ -1457,12 +1483,7 @@ function CEditorPage(api)
 		}
 
 		if (_isCatch)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-		}
+			AscCommon.stopEvent(e);
 	};
 
 	this.onBodyMouseMove = function(e)
@@ -1522,10 +1543,13 @@ function CEditorPage(api)
 			{
 				var _max = oWordControl.Height - parseInt(oWordControl.Splitter2PosMin * g_dKoef_mm_to_pix);
 				var _min = oWordControl.Height - parseInt(oWordControl.Splitter2PosMax * g_dKoef_mm_to_pix);
-				if (_y < _min)
-					_y = _min;
+				var _c = parseInt(oWordControl.Splitter2PosMin * g_dKoef_mm_to_pix);
+				if (_y > (_max + (_c / 2)))
+					_y = oWordControl.Height;
 				else if (_y > _max)
 					_y = _max;
+				else if (_y < _min)
+					_y = _min;
 
 				oWordControl.m_oBody.HtmlElement.style.cursor = "s-resize";
 				oWordControl.SplitterDiv.style.top            = (_y - parseInt(GlobalSkin.SplitterWidthMM * g_dKoef_mm_to_pix)) + "px";
@@ -1535,12 +1559,7 @@ function CEditorPage(api)
 		}
 
 		if (_isCatch)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-		}
+			AscCommon.stopEvent(e);
 	};
 
 	this.OnResizeSplitter = function()
@@ -1552,30 +1571,48 @@ function CEditorPage(api)
 
 		if (!this.IsSupportNotes)
 			this.Splitter2Pos = 0;
+		else if (this.Splitter2Pos < 1)
+			this.Splitter2Pos = 1;
+
 
 		if (this.IsUseNullThumbnailsSplitter || (0 != this.Splitter1Pos))
 		{
-			this.m_oMainContent.Bounds.L = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
+			this.m_oMainParent.Bounds.L = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
 			this.m_oMainContent.Bounds.B = GlobalSkin.SupportNotes ? this.Splitter2Pos + GlobalSkin.SplitterWidthMM : 1000;
+			this.m_oMainContent.Bounds.isAbsB = GlobalSkin.SupportNotes;
 
-			this.m_oNotesContainer.Bounds.L    = this.Splitter1Pos + GlobalSkin.SplitterWidthMM;
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
 			this.m_oThumbnailsContainer.HtmlElement.style.display = "block";
-
-			this.m_oMainContent.HtmlElement.style.borderLeft = "1px" + GlobalSkin.BorderSplitterColor + " solid";
+			this.m_oMainParent.HtmlElement.style.borderLeft = ("1px solid " + GlobalSkin.BorderSplitterColor);
 		}
 		else
 		{
-			this.m_oMainContent.Bounds.L = 0;
+			this.m_oMainParent.Bounds.L = 0;
 			this.m_oMainContent.Bounds.B = GlobalSkin.SupportNotes ? this.Splitter2Pos + GlobalSkin.SplitterWidthMM : 1000;
+			this.m_oMainContent.Bounds.isAbsB = GlobalSkin.SupportNotes;
 
-			this.m_oNotesContainer.Bounds.L    = 0;
 			this.m_oNotesContainer.Bounds.AbsH = this.Splitter2Pos;
 
 			this.m_oThumbnailsContainer.HtmlElement.style.display = "none";
+			this.m_oMainParent.HtmlElement.style.borderLeft = "none";
+		}
 
-			this.m_oMainContent.HtmlElement.style.borderLeft = "1px" + GlobalSkin.BorderSplitterColor + " none";
+		if (this.IsSupportNotes)
+		{
+			if (this.m_oNotesContainer.Bounds.AbsH < 1)
+				this.m_oNotesContainer.Bounds.AbsH = 1;
+		}
+
+		if (this.Splitter2Pos <= 1)
+		{
+			this.m_oNotes.HtmlElement.style.display = "none";
+			this.m_oNotes_scroll.HtmlElement.style.display = "none";
+		}
+		else
+		{
+			this.m_oNotes.HtmlElement.style.display = "block";
+			this.m_oNotes_scroll.HtmlElement.style.display = "block";
 		}
 
 		this.OnResize2(true);
@@ -1626,12 +1663,7 @@ function CEditorPage(api)
 		}
 
 		if (_isCatch)
-		{
-			if (e.preventDefault)
-				e.preventDefault();
-			else
-				e.returnValue = false;
-		}
+			AscCommon.stopEvent(e);
 	};
 
 	this.onMouseDown = function(e)
@@ -1829,6 +1861,18 @@ function CEditorPage(api)
 		oWordControl.m_oLogicDocument.Document_UpdateRulersState();
 
 		oWordControl.EndUpdateOverlay();
+	};
+
+	this.setNodesEnable = function(bEnabled)
+	{
+		if (bEnabled == this.IsSupportNotes)
+			return;
+
+		GlobalSkin.SupportNotes = bEnabled;
+		this.IsSupportNotes = bEnabled;
+		this.Splitter2Pos = 0;
+
+		this.OnResizeSplitter();
 	};
 
 	this.onMouseUpExternal = function(x, y)
@@ -2390,22 +2434,6 @@ function CEditorPage(api)
 			this.m_oScrollVerApi = this.m_oScrollVer_;
 		}
 
-		if (GlobalSkin.SupportNotes)
-		{
-			if (this.m_oScrollNotes_)
-			{
-				this.m_oScrollNotes_.Repos(settings);
-			}
-			else
-			{
-				this.m_oScrollNotes_ = new AscCommon.ScrollObject("id_vertical_scroll_notes", settings);
-				this.m_oScrollNotes_.bind("scrollvertical", function(evt)
-				{
-				});
-				this.m_oScrollNotesApi = this.m_oScrollNotes_;
-			}
-		}
-
 		this.m_oApi.sendEvent("asc_onUpdateScrolls", this.m_dDocumentWidth, this.m_dDocumentHeight);
 
 		this.m_dScrollX_max = this.m_bIsHorScrollVisible ? this.m_oScrollHorApi.getMaxScrolledX() : 0;
@@ -2504,6 +2532,9 @@ function CEditorPage(api)
 
 		if (this.MobileTouchManager)
 			this.MobileTouchManager.Resize_After();
+
+		if (this.IsSupportNotes && this.m_oNotesApi)
+			this.m_oNotesApi.OnResize();
 	};
 
 	this.OnResize2 = function(isAttack)
@@ -2552,6 +2583,9 @@ function CEditorPage(api)
 		this.onTimerScroll_sync(true);
 
 		this.DemonstrationManager.Resize();
+
+		if (this.IsSupportNotes && this.m_oNotesApi)
+			this.m_oNotesApi.OnResize();
 	};
 
 	this.checkNeedRules     = function()

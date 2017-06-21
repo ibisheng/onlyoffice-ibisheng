@@ -3908,7 +3908,7 @@ function OfflineEditor () {
 
             this.asc_WriteAllWorksheets(true);
 
-			      _api.sendColorThemes(_api.wbModel.theme);
+			_api.sendColorThemes(_api.wbModel.theme);
             _api.asc_ApplyColorScheme(false);
             _api._applyFirstLoadChanges();
 
@@ -3920,6 +3920,39 @@ function OfflineEditor () {
             if (ws.topLeftFrozenCell) {
               this.row0 = ws.topLeftFrozenCell.getRow0();
               this.col0 = ws.topLeftFrozenCell.getCol0();
+            }
+            
+            var chartData = this.initSettings["chartData"];
+            if (chartData.length > 0) {
+                var json = JSON.parse(chartData);
+                if (json) {
+                    
+                    var nativeToEditor = 1.0 / deviceScale * (72.0 / 96.0);
+                   
+                    var screenWidth = this.initSettings["screenWidth"] * nativeToEditor / 2.54 - ws.headersWidth;
+                    var screenHeight = this.initSettings["screenHeight"] * nativeToEditor / 2.54 - ws.headersHeight;
+                    
+                    _api.asc_addChartDrawingObject(json);
+                    
+                    var objects = ws.objectRender.controller.drawingObjects.getDrawingObjects();
+                    if (objects.length > 0) {
+                        
+                        var gr = objects[0].graphicObject;
+                        
+                        var w = gr.spPr.xfrm.extX;
+                        var h = gr.spPr.xfrm.extY;
+                        
+                        var offX = Math.max(0, (screenWidth - w) * 0.5);
+                        var offY = Math.max(screenHeight * 0.2, (screenHeight - w) * 0.5);
+                        
+                        gr.spPr.xfrm.setOffX(offX);
+                        gr.spPr.xfrm.setOffY(offY);
+                        gr.checkDrawingBaseCoords();
+                        gr.recalculate();
+                    }
+                    
+                    //console.log(JSON.stringify(json));
+                }
             }
 
             // TODO: Implement frozen places
@@ -6705,6 +6738,17 @@ window["native"]["offline_apply_event"] = function(type,params) {
             _return = _s.offline_addChartDrawingObject(params);
             break;
         }
+        case 450:   // ASC_MENU_EVENT_TYPE_GET_CHART_DATA
+        {
+            var chart = _api.asc_getWordChartObject();
+            
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](JSON.stringify(chart));
+            _return = _stream;
+            
+            break;
+        }
 
         // Cell interface
 
@@ -7196,7 +7240,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
                     for (var j = 0; j < ascFunctions.length; ++j) {
                         _stream["WriteString2"](ascFunctions[j].asc_getName());
-                        _stream["WriteString2"](ascFunctions[j].asc_getArguments());
+                        _stream["WriteString2"]("");
                     }
                 }
             } else {

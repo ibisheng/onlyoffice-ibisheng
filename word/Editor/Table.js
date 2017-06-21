@@ -2968,6 +2968,83 @@ CTable.prototype.GetLastRangeVisibleBounds = function()
 
 	return {X : X_start, Y : Y, W : X_end - X_start, H : H, BaseLine : H, XLimit : Page.XLimit};
 };
+CTable.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	var nCurRow  = this.Selection.Use === true ? this.Selection.StartPos.Pos.Row  : this.CurCell.Row.Index;
+	var nCurCell = this.Selection.Use === true ? this.Selection.StartPos.Pos.Cell : this.CurCell.Index;
+
+	var nStartRow = 0, nStartCell = 0, nEndRow = 0, nEndCell = 0;
+
+	if (isCurrent)
+	{
+		if (isStart)
+		{
+			nStartRow  = nCurRow;
+			nStartCell = nCurCell;
+
+			nEndRow  = isNext ? this.Content.length - 1 : 0;
+			nEndCell = isNext ? this.Content[nEndRow].Get_CellsCount() - 1 : 0;
+		}
+		else
+		{
+			nStartRow  = isNext ? 0 : this.Content.length - 1;
+			nStartCell = isNext ? 0 : this.Content[nStartRow].Get_CellsCount() - 1;
+
+			nEndRow  = nCurRow;
+			nEndCell = nCurCell;
+		}
+	}
+	else
+	{
+		if (isNext)
+		{
+			nStartRow  = 0;
+			nStartCell = 0;
+			nEndRow    = this.Content.length - 1;
+			nEndCell   = this.Content[nEndRow].Get_CellsCount() - 1;
+		}
+		else
+		{
+			nStartRow  = this.Content.length - 1;
+			nStartCell = this.Content[nEndRow].Get_CellsCount() - 1;
+			nEndRow    = 0;
+			nEndCell   = 0;
+		}
+	}
+
+	if (isNext)
+	{
+		for (var nRowIndex = nStartRow; nRowIndex <= nEndRow; ++nRowIndex)
+		{
+			var _nStartCell = nRowIndex === nStartRow ? nStartCell : 0;
+			var _nEndCell   = nRowIndex === nEndRow ? nEndCell : this.Content[nRowIndex].Get_CellsCount() - 1;
+			for (var nCellIndex = _nStartCell; nCellIndex <= _nEndCell; ++nCellIndex)
+			{
+				var oCell = this.Content[nRowIndex].Get_Cell(nCellIndex);
+				var oRes  = oCell.Content.FindNextFillingForm(true, isCurrent && nCellIndex === nCurCell && nRowIndex === nCurRow ? true : false, isStart);
+				if (oRes)
+					return oRes;
+			}
+		}
+	}
+	else
+	{
+		for (var nRowIndex = nStartRow; nRowIndex >= nEndRow; --nRowIndex)
+		{
+			var _nStartCell = nRowIndex === nStartRow ? nStartCell : this.Content[nRowIndex].Get_CellsCount() - 1;
+			var _nEndCell   = nRowIndex === nEndRow ? nEndCell : 0;
+			for (var nCellIndex = _nStartCell; nCellIndex >= _nEndCell; --nCellIndex)
+			{
+				var oCell = this.Content[nRowIndex].Get_Cell(nCellIndex);
+				var oRes  = oCell.Content.FindNextFillingForm(false, isCurrent && nCellIndex === nCurCell && nRowIndex === nCurRow ? true : false, isStart);
+				if (oRes)
+					return oRes;
+			}
+		}
+	}
+
+	return null;
+};
 CTable.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawing)
 {
 	var Pos  = this.Internal_GetCellByXY(X, Y, CurPage);
