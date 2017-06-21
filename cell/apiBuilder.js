@@ -501,7 +501,7 @@
 	 */
 	ApiWorksheet.prototype.ReplaceCurrentImage = function(sImageUrl, Width, Height){
 
-        var oWorksheet = Asc.editor.wb.getWorksheet();
+        var oWorksheet = Asc['editor'].wb.getWorksheet();
         if(oWorksheet && oWorksheet.objectRender && oWorksheet.objectRender.controller){
 
             var oController = oWorksheet.objectRender.controller;

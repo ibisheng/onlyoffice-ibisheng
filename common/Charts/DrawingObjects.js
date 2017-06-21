@@ -1908,10 +1908,10 @@ function DrawingObjects() {
             _this.showDrawingObjects(true);
         };
 
-        if(!Asc.editor.ImageLoader.map_image_index[sFrozenImageUrl]){
+        if(!Asc['editor'].ImageLoader.map_image_index[sFrozenImageUrl]){
             aImagesSync.push(sFrozenImageUrl);
         }
-        if(!Asc.editor.ImageLoader.map_image_index[sFrozenImageRotUrl]){
+        if(!Asc['editor'].ImageLoader.map_image_index[sFrozenImageRotUrl]){
             aImagesSync.push(sFrozenImageRotUrl);
         }
         if(aImagesSync.length > 0)
