@@ -12991,7 +12991,9 @@ function parseSeriesHeaders (ws, rangeBBox) {
     var nStartIndex;
 	if (rangeBBox) {
 		if (rangeBBox.c2 - rangeBBox.c1 > 0) {
-			for (i = rangeBBox.r1 + 1; i <= rangeBBox.r2; i++) {
+
+		    var nStartIndex = (rangeBBox.r1 === rangeBBox.r2) ? rangeBBox.r1 : (rangeBBox.r1 + 1);
+			for (i = nStartIndex; i <= rangeBBox.r2; i++) {
 				cell = ws.getCell3(i, rangeBBox.c1);
 				value = cell.getValue();
                 numFormatType = cell.getNumFormatType();
@@ -13008,7 +13010,8 @@ function parseSeriesHeaders (ws, rangeBBox) {
 		}
 
 		if (rangeBBox.r2 - rangeBBox.r1 > 0) {
-			for (i = rangeBBox.c1 + 1; i <= rangeBBox.c2; i++) {
+            var nStartIndex = (rangeBBox.c1 === rangeBBox.c2) ? rangeBBox.c1 : (rangeBBox.c1 + 1);
+			for (i = nStartIndex; i <= rangeBBox.c2; i++) {
 
 				cell = ws.getCell3(rangeBBox.r1, i);
 				value = cell.getValue();
