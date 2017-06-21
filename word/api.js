@@ -7204,7 +7204,7 @@ background-repeat: no-repeat;\
 		if (!oLogicDocument)
 			return;
 
-		var sDefaultText = this.textArtTranslate ? this.textArtTranslate.DefaultText : "Your text here";
+		var sDefaultText = AscCommon.translateManager.getValue('Your text here');
 		if (AscCommonWord.sdttype_BlockLevel === nType)
 		{
 			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content))

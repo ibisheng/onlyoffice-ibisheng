@@ -111,7 +111,6 @@
 		this.translateManager = AscCommon.translateManager.init(config['translate']);
 
 		// Chart
-		this.textArtTranslate      = null;
 		this.chartPreviewManager   = null;
 		this.textArtPreviewManager = null;
 		this.shapeElementId        = null;
@@ -1061,7 +1060,6 @@
 		this.ImageLoader.put_Api(this);
 		this.FontLoader.SetStandartFonts();
 
-		this.textArtTranslate      = this.textArtTranslate ? this.textArtTranslate : new Asc.asc_TextArtTranslate();
 		this.chartPreviewManager   = new AscCommon.ChartPreviewManager();
 		this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();
 

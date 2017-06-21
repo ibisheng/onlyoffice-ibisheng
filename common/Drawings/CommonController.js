@@ -722,6 +722,10 @@ function CanStartEditText(oController)
 
 DrawingObjectsController.prototype =
 {
+    getDefaultText: function(){
+        return  AscCommon.translateManager.getValue('Your text here');
+    },
+
     getAllConnectors: function(aDrawings, allDrawings){
         var _ret = allDrawings;
         if(!_ret){
@@ -7966,7 +7970,7 @@ DrawingObjectsController.prototype =
             }
             else
             {
-                sText = oShape.getTextArtTranslate().DefaultText;
+                sText = this.getDefaultText();
                 AscFormat.AddToContentFromString(oContent, sText);
                 oShape.bSelectedText = false;
             }
@@ -7993,7 +7997,7 @@ DrawingObjectsController.prototype =
                 }
                 else
                 {
-                    sText = oShape.getTextArtTranslate().DefaultText;
+                    sText = this.getDefaultText();
                     AscFormat.AddToContentFromString(oContent, sText);
                     oShape.bSelectedText = false;
                 }
@@ -8001,13 +8005,13 @@ DrawingObjectsController.prototype =
             else
             {
                 oShape.bSelectedText = false;
-                sText = (typeof sStartString === "string") ? sStartString : oShape.getTextArtTranslate().DefaultText;
+                sText = (typeof sStartString === "string") ? sStartString : this.getDefaultText();
                 AscFormat.AddToContentFromString(oContent, sText);
             }
         }
         else
         {
-            sText = (typeof sStartString === "string") ? sStartString : oShape.getTextArtTranslate().DefaultText;
+            sText = (typeof sStartString === "string") ? sStartString : this.getDefaultText();
             AscFormat.AddToContentFromString(oContent, sText);
         }
         var oTextPr;
