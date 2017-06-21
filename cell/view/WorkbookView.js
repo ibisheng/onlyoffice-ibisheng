@@ -2739,7 +2739,7 @@
 			for (i = range.c1; i <= range.c2; ++i) {
 				if (i === range.c2) {
 					dxf = style.lastColumn;
-				} else if (showRowHeaders) {
+				} else if (styleInfo.showRowHeaders) {
 					r = i - range.r1;
 					if (0 === r) {
 						dxf = style.firstColumnSubheading;
@@ -2890,10 +2890,6 @@
 	
 	ctx.setFillStyle(whiteColor);
 	ctx.fillRect(0, 0, xSize + 2 * startX, ySize + 2 * startY);
-	if (style.wholeTable && style.wholeTable.dxf.fill && null != style.wholeTable.dxf.fill.bg) {
-		ctx.setFillStyle(style.wholeTable.dxf.fill.bg);
-		ctx.fillRect(startX, startY, xSize, ySize);
-	}
 	
 	var calculateLineVer = function(color, x, y1, y2)
 	{
@@ -2928,9 +2924,21 @@
 	var bbox = new Asc.Range(0, 0, col - 1, row - 1);
 	var sheetMergedStyles = new AscCommonExcel.SheetMergedStyles();
 	var hiddenManager = new AscCommonExcel.HiddenManager(null);
-	style.initStyle(sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
-	for (var i = 0; i < row; i++) {
-		for (var j = 0; j < col; j++) {
+
+	if(style.pivot)
+	{
+		var pivotTableStyle = new CT_PivotTableStyle();
+		pivotTableStyle.name = style.name;
+		this.getPivotMergeStyle(sheetMergedStyles, bbox, pivotTableStyle, headerRowCount, totalsRowCount);
+	}
+	else
+	{
+		style.initStyle(sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
+	}
+	for (var i = 0; i < row; i++)
+	{
+		for (var j = 0; j < col; j++)
+		{
 			var color = null;
 			var curStyle = AscCommonExcel.getCompiledStyle(this.model.oStyleManager, sheetMergedStyles, hiddenManager, i, j);
 			
