@@ -5541,7 +5541,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		//this.WordControl.setNodesEnable((this.isViewMode || this.isMobileVersion) ? false : true);
+		this.WordControl.setNodesEnable((this.isViewMode || this.isMobileVersion) ? false : true);
 		if (isViewMode)
 		{
 			this.ShowParaMarks          = false;

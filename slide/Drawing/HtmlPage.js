@@ -586,9 +586,8 @@ function CEditorPage(api)
 		this.initEvents();
 		this.OnResize(true);
 
-		this.setNodesEnable(false);
-		//this.m_oNotesApi = new CNotesDrawer(this);
-		//this.m_oNotesApi.Init();
+		this.m_oNotesApi = new CNotesDrawer(this);
+		this.m_oNotesApi.Init();
 	};
 
 	this.CheckRetinaDisplay = function()
@@ -3210,6 +3209,10 @@ function CEditorPage(api)
 		{
 			oWordControl.Thumbnails.onCheckUpdate();
 		}
+
+		if (oWordControl.IsSupportNotes && oWordControl.m_oNotesApi)
+			oWordControl.m_oNotesApi.CheckPaint();
+
 		if (null != oWordControl.m_oLogicDocument)
 		{
 			oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
