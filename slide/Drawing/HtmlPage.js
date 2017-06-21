@@ -586,8 +586,9 @@ function CEditorPage(api)
 		this.initEvents();
 		this.OnResize(true);
 
-		this.m_oNotesApi = new CNotesDrawer(this);
-		this.m_oNotesApi.Init();
+		this.setNodesEnable(false);
+		//this.m_oNotesApi = new CNotesDrawer(this);
+		//this.m_oNotesApi.Init();
 	};
 
 	this.CheckRetinaDisplay = function()
