@@ -67,7 +67,7 @@
 		cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS,
 		cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST,
 		cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV,
-		cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE, cRANK,
+		cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERMUT, cPOISSON, cPROB, cQUARTILE, cRANK,
 		cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST,
 		cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP,
 		cVARPA, cWEIBULL, cZTEST);
@@ -330,6 +330,26 @@
 					return new cNumber(values[nIndex] + fDiff * (values[nIndex + 1] - values[nIndex]));
 				}
 			}
+		}
+	}
+
+	function getPercentileExclusive(values, alpha) {
+		values.sort(fSortAscending);
+
+		var nSize1 = values.length + 1;
+		if ( nSize1 == 1){
+			return new cError(cErrorType.wrong_value_type);
+		}
+		if ( alpha * nSize1 < 1 || alpha * nSize1 > nSize1 - 1 ){
+			return new cError(cErrorType.not_numeric);
+		}
+
+		var nIndex = Math.floor(alpha * nSize1 - 1);
+		var fDiff = alpha * nSize1 - 1 - Math.floor(alpha * nSize1 - 1);
+		if (fDiff === 0.0) {
+			return new cNumber(values[nIndex]);
+		} else {
+			return new cNumber(values[nIndex] + fDiff * (values[nIndex + 1] - values[nIndex]));
 		}
 	}
 
@@ -5050,6 +5070,68 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, percentile);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cPERCENTILE_EXC() {
+		this.name = "PERCENTILE.EXC";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cPERCENTILE_EXC.prototype = Object.create(cBaseFunction.prototype);
+	cPERCENTILE_EXC.prototype.constructor = cPERCENTILE_EXC;
+	cPERCENTILE_EXC.prototype.argumentsMin = 2;
+	cPERCENTILE_EXC.prototype.argumentsMax = 2;
+	cPERCENTILE_EXC.prototype.isXLFN = true;
+	cPERCENTILE_EXC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cPERCENTILE_EXC.prototype.Calculate = function (arg) {
+		function percentile(argArray) {
+
+			var tA = [], A = argArray[0], alpha = argArray[1];
+
+			for (var i = 0; i < A.length; i++) {
+				for (var j = 0; j < A[i].length; j++) {
+					if (A[i][j] instanceof cError) {
+						return A[i][j];
+					} else if (A[i][j] instanceof cNumber) {
+						tA.push(A[i][j].getValue());
+					} else if (A[i][j] instanceof cBool) {
+						tA.push(A[i][j].tocNumber().getValue());
+					}
+				}
+			}
+
+			return getPercentileExclusive(tA, alpha);
+		}
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, percentile);
+	};
+
+	/**
+	* @constructor
+	* @extends {cPERCENTILE}
+	*/
+	function cPERCENTILE_INC() {
+		cPERCENTILE.call(this);
+		this.name = "PERCENTILE.INC";
+	}
+
+	cPERCENTILE_INC.prototype = Object.create(cPERCENTILE.prototype);
+	cPERCENTILE_INC.prototype.constructor = cPERCENTILE_INC;
+	cPERCENTILE_INC.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
