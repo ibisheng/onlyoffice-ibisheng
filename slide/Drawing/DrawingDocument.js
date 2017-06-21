@@ -5491,6 +5491,9 @@ function CNotesDrawer(page)
 		this.Height = height;
 		this.IsRepaint = true;
 
+		if (window["NATIVE_EDITOR_ENJINE"])
+			return;
+
 		var element = this.HtmlPage.m_oNotes.HtmlElement;
 		var settings = {
 			showArrows    : true,
