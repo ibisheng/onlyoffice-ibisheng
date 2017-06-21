@@ -3877,7 +3877,22 @@ function OfflineEditor () {
 
         window.g_file_path = "native_open_file";
         window.NATIVE_DOCUMENT_TYPE = "";
-        _api = new window["Asc"]["spreadsheet_api"]({});
+
+        var apiConfig = {};
+        if (this.translate) {
+            var t = JSON.parse(this.translate);
+            if (t) {
+                apiConfig['translate'] = {
+                    'Diagram Title' : t['diagrammtitle'],
+                    'X Axis' : t['xaxis'],
+                    'Y Axis' : t['yaxis'],
+                    'Series' : t['series'],
+                    'Your text here' : t['art']
+                };
+            }
+        }
+
+        _api = new window["Asc"]["spreadsheet_api"](apiConfig);
         
         AscCommon.g_clipboardBase.Init(_api);
 
@@ -5379,22 +5394,6 @@ function OfflineEditor () {
                 }
             }
         };
-
-        if (this.translate) {
-            var t = JSON.parse(this.translate);
-            if (t) {
-                var translateChart = new Asc.asc_CChartTranslate();
-                if (t['diagrammtitle']) translateChart.asc_setTitle(t['diagrammtitle']);
-                if (t['xaxis']) translateChart.asc_setXAxis(t['xaxis']);
-                if (t['yaxis']) translateChart.asc_setYAxis(t['yaxis']);
-                if (t['series']) translateChart.asc_setSeries(t['series']);
-                _api.asc_setChartTranslate(translateChart);
-
-                var translateArt = new Asc.asc_TextArtTranslate();
-                if (t['art'])translateArt.asc_setDefaultText(t['art']);
-                _api.asc_setTextArtTranslate(translateArt);
-            }
-        }
     };
     this.offline_afteInit = function () {window.AscAlwaysSaveAspectOnResizeTrack = true;};
 }
