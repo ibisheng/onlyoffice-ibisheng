@@ -2763,7 +2763,7 @@
 	WorkbookView.prototype.af_getTablePictures = function (props, bPivotTable) {
 		var wb = this.model;
 		var t = this;
-		bPivotTable = true;
+		
 		var result = [];
 		var canvas = document.createElement('canvas');
 
