@@ -711,6 +711,28 @@ CBlockLevelSdt.prototype.GetLastRangeVisibleBounds = function()
 {
 	return this.Content.GetLastRangeVisibleBounds();
 };
+CBlockLevelSdt.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	if (isCurrent && true === this.IsSelectedAll())
+	{
+		if (isNext)
+			return this.Content.FindNextFillingForm(isNext, isCurrent, isStart);
+
+		return null;
+	}
+
+	if (!isCurrent && isNext)
+		return this;
+
+	var oRes = this.Content.FindNextFillingForm(isNext, isCurrent, isStart);
+	if (oRes)
+		return oRes;
+
+	if (!isNext)
+		return this;
+
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

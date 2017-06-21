@@ -301,6 +301,25 @@ CInlineLevelSdt.prototype.RemoveContentControlWrapper = function()
 
 	this.Remove_FromContent(0, this.Content.length);
 };
+CInlineLevelSdt.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	if (isCurrent && true === this.IsSelectedAll())
+	{
+		if (isNext)
+			return CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+
+		return null;
+	}
+
+	if (!isCurrent && isNext)
+		return this;
+
+	var oRes = CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+	if (!oRes && !isNext)
+		return this;
+
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
 //----------------------------------------------------------------------------------------------------------------------

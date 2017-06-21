@@ -15145,55 +15145,25 @@ CDocument.prototype.IsFormFieldEditing = function()
 
 	return false;
 };
-CDocument.prototype.MoveToFillingForm = function(bNext)
+CDocument.prototype.MoveToFillingForm = function(isNext)
 {
-	var arrAllFields = this.GetAllFormTextFields();
-	if (arrAllFields.length <= 0)
-		return;
+	var oRes = this.FindNextFillingForm(isNext, true, true);
 
-	this.RemoveSelection();
+	if (!oRes)
+		oRes = this.FindNextFillingForm(isNext, true, false);
 
-	var oInfo  = this.GetSelectedElementsInfo();
-	var oField = oInfo.Get_Field();
-	var oForm  = null;
-	if (!oField || !oField.IsFillingForm())
+	if (oRes)
 	{
-		oForm = arrAllFields[0];
-	}
-	else
-	{
-		for (var nIndex = 0, nCount = arrAllFields.length; nIndex < nCount; ++nIndex)
+		this.RemoveSelection();
+
+		if (oRes instanceof CBlockLevelSdt || oRes instanceof CInlineLevelSdt)
 		{
-			if (oField === arrAllFields[nIndex])
-			{
-				if (bNext)
-				{
-					if (nIndex < nCount - 1)
-						oForm = arrAllFields[nIndex + 1];
-					else
-						oForm = arrAllFields[0];
-				}
-				else
-				{
-					if (nIndex > 0)
-						oForm = arrAllFields[0];
-					else
-						oForm = arrAllFields[nCount - 1];
-				}
-
-				break;
-			}
+			oRes.SelectContentControl();
 		}
-	}
-
-	if (oForm)
-	{
-		oForm.MoveCursorToStartPos();
-		if (oForm.Content.length >= 0 && para_Run === oForm.Content[0].Type)
-			oForm.Content[0].Make_ThisElementCurrent();
-
-		this.Document_UpdateInterfaceState();
-		this.Document_UpdateSelectionState();
+		else if (oRes instanceof ParaField)
+		{
+			oRes.SelectThisElement();
+		}
 	}
 };
 CDocument.prototype.SelectContentControl = function(Id)

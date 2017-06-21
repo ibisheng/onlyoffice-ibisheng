@@ -467,6 +467,28 @@ ParaField.prototype.IsFillingForm = function()
 
 	return false;
 };
+ParaField.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	if (!this.IsFillingForm())
+		return CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+
+	if (isCurrent && true === this.IsSelectedAll())
+	{
+		if (isNext)
+			return CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+
+		return null;
+	}
+
+	if (!isCurrent && isNext)
+		return this;
+
+	var oRes = CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+	if (!oRes && !isNext)
+		return this;
+
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
 //----------------------------------------------------------------------------------------------------------------------
