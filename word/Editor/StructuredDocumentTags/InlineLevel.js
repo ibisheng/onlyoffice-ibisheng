@@ -182,6 +182,9 @@ CInlineLevelSdt.prototype.Shift_Range = function(Dx, Dy, _CurLine, _CurRange)
 		oRangeBounds.X += Dx;
 		oRangeBounds.Y += Dy;
 	}
+
+	if (this.BoundsPaths)
+		this.BoundsPaths = null;
 };
 CInlineLevelSdt.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
