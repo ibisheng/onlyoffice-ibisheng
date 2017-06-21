@@ -6441,6 +6441,7 @@ CDocument.prototype.OnKeyDown = function(e)
             }
         }
 
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 34) // PgDn
@@ -6550,6 +6551,7 @@ CDocument.prototype.OnKeyDown = function(e)
             }
         }
 
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 35) // клавиша End
@@ -6566,6 +6568,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.Document_UpdateInterfaceState();
         this.Document_UpdateRulersState();
 
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 36) // клавиша Home
@@ -6582,6 +6585,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.Document_UpdateInterfaceState();
         this.Document_UpdateRulersState();
 
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 37) // Left Arrow
@@ -6592,6 +6596,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorLeft(true === e.ShiftKey, true === e.CtrlKey);
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 38) // Top Arrow
@@ -6603,6 +6608,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorUp(true === e.ShiftKey, true === e.CtrlKey);
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 39) // Right Arrow
@@ -6613,6 +6619,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorRight(true === e.ShiftKey, true === e.CtrlKey);
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 40) // Bottom Arrow
@@ -6624,6 +6631,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorDown(true === e.ShiftKey, true === e.CtrlKey);
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 46) // Delete
@@ -7317,6 +7325,8 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 			}
 		}
 	}
+
+	this.private_CheckCursorPosInFillingFormMode();
 
 	this.private_UpdateCursorXY(true, true);
 };
@@ -15133,9 +15143,6 @@ CDocument.prototype.IsInFormField = function()
 	var oInlineSdt    = oSelectedInfo.GetInlineLevelSdt();
 	var oBlockSdt     = oSelectedInfo.GetBlockLevelSdt();
 
-	if (oSelectedInfo.Is_MixedSelection())
-		return false;
-
 	return (oBlockSdt || oInlineSdt || (oField && fieldtype_FORMTEXT === oField.Get_FieldType())) ? true : false;
 };
 CDocument.prototype.IsFormFieldEditing = function()
@@ -15266,6 +15273,15 @@ CDocument.prototype.CanEdit = function()
 		return false;
 
 	return true;
+};
+CDocument.prototype.private_CheckCursorPosInFillingFormMode = function()
+{
+	if (this.IsFillingFormMode() && !this.IsInFormField())
+	{
+		this.MoveToFillingForm(true);
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+	}
 };
 
 function CDocumentSelectionState()

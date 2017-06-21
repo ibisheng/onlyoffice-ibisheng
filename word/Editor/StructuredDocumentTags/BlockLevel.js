@@ -276,7 +276,11 @@ CBlockLevelSdt.prototype.CanUpdateTarget = function(CurPage)
 };
 CBlockLevelSdt.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {
-	return this.Content.MoveCursorLeft(AddToSelect, Word);
+	var bResult = this.Content.MoveCursorLeft(AddToSelect, Word);
+	if (!bResult && this.LogicDocument.IsFillingFormMode())
+		return true;
+
+	return bResult;
 };
 CBlockLevelSdt.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
 {
@@ -284,7 +288,11 @@ CBlockLevelSdt.prototype.MoveCursorLeftWithSelectionFromEnd = function(Word)
 };
 CBlockLevelSdt.prototype.MoveCursorRight = function(AddToSelect, Word)
 {
-	return this.Content.MoveCursorRight(AddToSelect, Word, false);
+	var bResult = this.Content.MoveCursorRight(AddToSelect, Word, false);
+	if (!bResult && this.LogicDocument.IsFillingFormMode())
+		return true;
+
+	return bResult;
 };
 CBlockLevelSdt.prototype.MoveCursorRightWithSelectionFromStart = function(Word)
 {
