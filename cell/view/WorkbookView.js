@@ -2746,10 +2746,6 @@
 					r = i - (range.r1 + 1);
 					if (0 === r % 3) {
 						dxf = style.firstRowSubheading;
-					} else if (1 === r % 3) {
-						dxf = style.secondRowSubheading;
-					} else {
-						dxf = style.thirdRowSubheading;
 					}
 				}
 
