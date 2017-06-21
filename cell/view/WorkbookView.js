@@ -1546,10 +1546,6 @@
     }
   };
 
-  WorkbookView.prototype.getTablePictures = function(props) {
-      return this.af_getTablePictures(props);
-  };
-
   WorkbookView.prototype.getCellStyles = function(width, height) {
     var oStylesPainter = new asc_CSP(width, height);
     oStylesPainter.generateStylesAll(this.model.CellStyles, this.fmgrGraphics, this.m_oFont, this.stringRender);
@@ -2738,14 +2734,14 @@
 				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r1, range.c1, range.r1), dxf);
 			}
 
-			for (i = range.c1; i <= range.c2; ++i) {
+			for (i = range.c1 + 1; i <= range.c2; ++i) {
 				if (i === range.c2) {
 					dxf = style.lastColumn;
 				} else if (styleInfo.showRowHeaders) {
-					r = i - range.r1;
-					if (0 === r) {
+					r = i - (range.c1 + 1);
+					if (0 === r % 3) {
 						dxf = style.firstColumnSubheading;
-					} else if (1 === r % 2) {
+					} else if (1 === r % 3) {
 						dxf = style.secondColumnSubheading;
 					} else {
 						dxf = style.thirdColumnSubheading;
@@ -2757,14 +2753,14 @@
 				}
 			}
 
-			for (i = range.r1; i <= range.r2; ++i) {
+			for (i = range.r1 + 1; i <= range.r2; ++i) {
 				if (i === range.r2) {
 					dxf = style.totalRow;
 				} else {
-					r = i - range.r1;
-					if (0 === r) {
+					r = i - (range.r1 + 1);
+					if (0 === r % 3) {
 						dxf = style.firstRowSubheading;
-					} else if (1 === r % 2) {
+					} else if (1 === r % 3) {
 						dxf = style.secondRowSubheading;
 					} else {
 						dxf = style.thirdRowSubheading;
@@ -2929,6 +2925,8 @@
 	{
 		var pivotTableStyle = new CT_PivotTableStyle();
 		pivotTableStyle.name = style.name;
+		pivotTableStyle.showRowHeaders = true;
+		pivotTableStyle.showColHeaders = true;
 		this.getPivotMergeStyle(sheetMergedStyles, bbox, pivotTableStyle, headerRowCount, totalsRowCount);
 	}
 	else

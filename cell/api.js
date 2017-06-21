@@ -555,10 +555,9 @@ var editor;
     return ws.af_convertTableToRange(tableName);
   };
 
-  spreadsheet_api.prototype.asc_getTablePictures = function (props) 
-  { 
-	return this.wb.getTablePictures(props); 
-  };
+	spreadsheet_api.prototype.asc_getTablePictures = function (props, pivot) {
+		return this.wb.af_getTablePictures(props, pivot);
+	};
 
   spreadsheet_api.prototype.getViewMode = function() {
     return this.isViewMode;
