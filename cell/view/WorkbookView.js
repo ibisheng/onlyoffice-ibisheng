@@ -2692,7 +2692,9 @@
 		var style = this.model.TableStyles.AllStyles[styleInfo.asc_getName()];
 		if (style) {
 			dxf = style.wholeTable && style.wholeTable.dxf;
-			sheetMergedStyles.setTablePivotStyle(range, dxf);
+			if (dxf) {
+				sheetMergedStyles.setTablePivotStyle(range, dxf);
+			}
 
 			if (styleInfo.showColStripes) {
 				stripe1 = style.firstColumnStripe || emptyStripe;
@@ -2773,8 +2775,6 @@
 					sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, i, range.c2, i), dxf);
 				}
 			}
-			dxf = style.lastColumn && style.lastColumn.dxf;
-			sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c2, range.r1, range.c2, range.r2), dxf);
 		}
 	};
 
