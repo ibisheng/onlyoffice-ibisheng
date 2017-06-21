@@ -1976,128 +1976,133 @@
 		}
 
 
-    /** @constructor */
-    function asc_CStylesPainter(width, height) {
-      this.defaultStyles = null;
-      this.docStyles = null;
+		/** @constructor */
+		function asc_CStylesPainter(width, height) {
+			this.defaultStyles = null;
+			this.docStyles = null;
 
-      this.styleThumbnailWidth = width;
-      this.styleThumbnailHeight = height;
-      this.styleThumbnailWidthPt = this.styleThumbnailWidth * 72 / 96;
-      this.styleThumbnailHeightPt = this.styleThumbnailHeight * 72 / 96;
+			this.styleThumbnailWidth = width;
+			this.styleThumbnailHeight = height;
+			this.styleThumbnailWidthPt = this.styleThumbnailWidth * 72 / 96;
+			this.styleThumbnailHeightPt = this.styleThumbnailHeight * 72 / 96;
 
-      this.styleThumbnailWidthWithRetina = this.styleThumbnailWidth;
-      this.styleThumbnailHeightWithRetina = this.styleThumbnailHeight;
-      if (AscCommon.AscBrowser.isRetina) {
-        this.styleThumbnailWidthWithRetina = AscCommon.AscBrowser.convertToRetinaValue(this.styleThumbnailWidthWithRetina, true);
-        this.styleThumbnailHeightWithRetina = AscCommon.AscBrowser.convertToRetinaValue(this.styleThumbnailHeightWithRetina, true);
-      }
-    }
+			this.styleThumbnailWidthWithRetina = this.styleThumbnailWidth;
+			this.styleThumbnailHeightWithRetina = this.styleThumbnailHeight;
+			if (AscCommon.AscBrowser.isRetina) {
+				this.styleThumbnailWidthWithRetina =
+					AscCommon.AscBrowser.convertToRetinaValue(this.styleThumbnailWidthWithRetina, true);
+				this.styleThumbnailHeightWithRetina =
+					AscCommon.AscBrowser.convertToRetinaValue(this.styleThumbnailHeightWithRetina, true);
+			}
+		}
 
-    asc_CStylesPainter.prototype = {
-      constructor: asc_CStylesPainter,
-      asc_getStyleThumbnailWidth: function() {
-        return this.styleThumbnailWidthWithRetina;
-      },
-      asc_getStyleThumbnailHeight: function() {
-        return this.styleThumbnailHeightWithRetina;
-      },
-      asc_getDefaultStyles: function() {
-        return this.defaultStyles;
-      },
-      asc_getDocStyles: function() {
-        return this.docStyles;
-      },
-      generateStylesAll: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
-        this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
-        this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, stringRenderer);
-      },
-      generateDefaultStyles: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
-        var cellStyles = cellStylesAll.DefaultStyles;
+		asc_CStylesPainter.prototype.asc_getStyleThumbnailWidth = function () {
+			return this.styleThumbnailWidthWithRetina;
+		};
+		asc_CStylesPainter.prototype.asc_getStyleThumbnailHeight = function () {
+			return this.styleThumbnailHeightWithRetina;
+		};
+		asc_CStylesPainter.prototype.asc_getDefaultStyles = function () {
+			return this.defaultStyles;
+		};
+		asc_CStylesPainter.prototype.asc_getDocStyles = function () {
+			return this.docStyles;
+		};
+		asc_CStylesPainter.prototype.generateStylesAll = function (cellStylesAll, fmgrGraphics, oFont, sr) {
+			this.generateDefaultStyles(cellStylesAll, fmgrGraphics, oFont, sr);
+			this.generateDocumentStyles(cellStylesAll, fmgrGraphics, oFont, sr);
+		};
+		asc_CStylesPainter.prototype.generateDefaultStyles = function (cellStylesAll, fmgrGraphics, oFont, sr) {
+			var cellStyles = cellStylesAll.DefaultStyles;
 
-        var oCanvas = document.createElement('canvas');
-        oCanvas.width = this.styleThumbnailWidthWithRetina;
-        oCanvas.height = this.styleThumbnailHeightWithRetina;
-        var oGraphics = new Asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+			var oCanvas = document.createElement('canvas');
+			oCanvas.width = this.styleThumbnailWidthWithRetina;
+			oCanvas.height = this.styleThumbnailHeightWithRetina;
+			var oGraphics = new Asc.DrawingContext(
+				{canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
-        var oStyle, oCustomStyle;
-        this.defaultStyles = [];
-        for (var i = 0; i < cellStyles.length; ++i) {
-          oStyle = cellStyles[i];
-          if (oStyle.Hidden) {
-            continue;
-          }
-          // ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
-          oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
+			var oStyle, oCustomStyle;
+			this.defaultStyles = [];
+			for (var i = 0; i < cellStyles.length; ++i) {
+				oStyle = cellStyles[i];
+				if (oStyle.Hidden) {
+					continue;
+				}
+				// ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
+				oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
-          this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
-          this.defaultStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
-        }
-      },
-      generateDocumentStyles: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
-        var cellStyles = cellStylesAll.CustomStyles;
+				this.drawStyle(oGraphics, sr, oCustomStyle || oStyle, oStyle.Name);
+				this.defaultStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Default,
+					oCanvas.toDataURL("image/png")));
+			}
+		};
+		asc_CStylesPainter.prototype.generateDocumentStyles = function (cellStylesAll, fmgrGraphics, oFont, sr) {
+			var cellStyles = cellStylesAll.CustomStyles;
 
-        var oCanvas = document.createElement('canvas');
-        oCanvas.width = this.styleThumbnailWidthWithRetina;
-        oCanvas.height = this.styleThumbnailHeightWithRetina;
-        var oGraphics = new Asc.DrawingContext({canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
+			var oCanvas = document.createElement('canvas');
+			oCanvas.width = this.styleThumbnailWidthWithRetina;
+			oCanvas.height = this.styleThumbnailHeightWithRetina;
+			var oGraphics = new Asc.DrawingContext(
+				{canvas: oCanvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
-        var oStyle;
-        this.docStyles = [];
-        for (var i = 0; i < cellStyles.length && i < 1000; ++i) {
-          oStyle = cellStyles[i];
-          if (oStyle.Hidden || null != oStyle.BuiltinId) {
-            continue;
-          }
+			var oStyle;
+			this.docStyles = [];
+			for (var i = 0; i < cellStyles.length && i < 1000; ++i) {
+				oStyle = cellStyles[i];
+				if (oStyle.Hidden || null != oStyle.BuiltinId) {
+					continue;
+				}
 
-          this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name);
-          this.docStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
-        }
-      },
-      drawStyle: function(oGraphics, stringRenderer, oStyle, sStyleName) {
-        oGraphics.clear();
-        // Fill cell
-        var oColor = oStyle.getFill();
-        if (null !== oColor) {
-          oGraphics.setFillStyle(oColor);
-          oGraphics.fillRect(0, 0, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
-        }
+				this.drawStyle(oGraphics, sr, oStyle, oStyle.Name);
+				this.docStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Document,
+					oCanvas.toDataURL("image/png")));
+			}
+		};
+		asc_CStylesPainter.prototype.drawStyle = function (oGraphics, sr, oStyle, sStyleName) {
+			oGraphics.clear();
+			// Fill cell
+			var oColor = oStyle.getFill();
+			if (null !== oColor) {
+				oGraphics.setFillStyle(oColor);
+				oGraphics.fillRect(0, 0, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
+			}
 
-        var drawBorder = function(b, x1, y1, x2, y2) {
-          if (null != b && AscCommon.c_oAscBorderStyles.None !== b.s) {
-            oGraphics.setStrokeStyle(b.c);
+			var drawBorder = function (b, x1, y1, x2, y2) {
+				if (b && AscCommon.c_oAscBorderStyles.None !== b.s) {
+					oGraphics.setStrokeStyle(b.c);
 
-            // ToDo поправить
-            oGraphics.setLineWidth(b.w).beginPath().moveTo(x1, y1).lineTo(x2, y2).stroke();
-          }
-        };
+					// ToDo поправить
+					oGraphics.setLineWidth(b.w).beginPath().moveTo(x1, y1).lineTo(x2, y2).stroke();
+				}
+			};
 
-        // borders
-        var oBorders = oStyle.getBorder();
-        drawBorder(oBorders.l, 0, 0, 0, this.styleThumbnailHeightPt);
-        drawBorder(oBorders.r, this.styleThumbnailWidthPt, 0, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
-        drawBorder(oBorders.t, 0, 0, this.styleThumbnailWidthPt, 0);
-        drawBorder(oBorders.b, 0, this.styleThumbnailHeightPt, this.styleThumbnailWidthPt, this.styleThumbnailHeightPt);
+			// borders
+			var oBorders = oStyle.getBorder();
+			drawBorder(oBorders.l, 0, 0, 0, this.styleThumbnailHeightPt);
+			drawBorder(oBorders.r, this.styleThumbnailWidthPt, 0, this.styleThumbnailWidthPt,
+				this.styleThumbnailHeightPt);
+			drawBorder(oBorders.t, 0, 0, this.styleThumbnailWidthPt, 0);
+			drawBorder(oBorders.b, 0, this.styleThumbnailHeightPt, this.styleThumbnailWidthPt,
+				this.styleThumbnailHeightPt);
 
-        // Draw text
-        var fc = oStyle.getFontColor();
-        var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
-        var format = oStyle.getFont();
-        var fs = format.getSize();
-        // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
-		var oFont = new Asc.FontProperties(format.getName(), (16 < fs) ? 16 : fs,
-			format.getBold(), format.getItalic(), format.getUnderline(), format.getStrikeout());
+			// Draw text
+			var fc = oStyle.getFontColor();
+			var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
+			var format = oStyle.getFont();
+			var fs = format.getSize();
+			// Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
+			var oFont = new Asc.FontProperties(format.getName(), (16 < fs) ? 16 : fs, format.getBold(),
+				format.getItalic(), format.getUnderline(), format.getStrikeout());
 
-        var width_padding = 3; // 4 * 72 / 96
+			var width_padding = 3; // 4 * 72 / 96
 
-        var tm = stringRenderer.measureString(sStyleName);
-        // Текст будем рисовать по центру (в Excel чуть по другому реализовано, у них постоянный отступ снизу)
-        var textY = 0.5 * (this.styleThumbnailHeightPt - tm.height);
-        oGraphics.setFont(oFont);
-        oGraphics.setFillStyle(oFontColor);
-        oGraphics.fillText(sStyleName, width_padding, textY + tm.baseline);
-      }
-    };
+			var tm = sr.measureString(sStyleName);
+			// Текст будем рисовать по центру (в Excel чуть по другому реализовано, у них постоянный отступ снизу)
+			var textY = 0.5 * (this.styleThumbnailHeightPt - tm.height);
+			oGraphics.setFont(oFont);
+			oGraphics.setFillStyle(oFontColor);
+			oGraphics.fillText(sStyleName, width_padding, textY + tm.baseline);
+		};
 
 		/** @constructor */
 		function asc_CSheetPr() {
