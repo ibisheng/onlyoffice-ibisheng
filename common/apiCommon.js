@@ -121,6 +121,7 @@
 		View    : 4
 	};
 
+	/** @constructor */
 	function asc_CSignatureLine()
 	{
 		this.id = undefined;
@@ -1273,6 +1274,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CTextBorder(obj) {
 		if (obj) {
 			if (obj.Color instanceof asc_CColor) {
@@ -1324,6 +1326,7 @@
 		this.ForSelectedCells = v;
 	};
 
+	/** @constructor */
 	function asc_CParagraphBorders(obj) {
 
 		if (obj) {
@@ -1365,6 +1368,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CListType(obj) {
 
 		if (obj) {
@@ -1383,6 +1387,7 @@
 		return this.SubType;
 	};
 
+	/** @constructor */
 	function asc_CTextFontFamily(obj) {
 
 		if (obj) {
@@ -1475,6 +1480,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CParagraphFrame(obj) {
 		if (obj) {
 			this.FromDropCapMenu = false;
@@ -2027,6 +2033,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_TextArtProperties(obj) {
 		if (obj) {
 			this.Fill = obj.Fill;//asc_Fill
@@ -2572,6 +2579,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CShapeFill() {
 		this.type = null;
 		this.fill = null;
@@ -2600,8 +2608,9 @@
 			}
 			return false;
 		}
-	}
+	};
 
+	/** @constructor */
 	function asc_CFillBlip() {
 		this.type = c_oAscFillBlipType.STRETCH;
 		this.url = "";
@@ -2622,8 +2631,9 @@
 		}, asc_putTextureId: function (v) {
 			this.texture_id = v;
 		}
-	}
+	};
 
+	/** @constructor */
 	function asc_CFillHatch() {
 		this.PatternType = undefined;
 		this.fgClr = undefined;
@@ -2646,6 +2656,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CFillGrad() {
 		this.Colors = undefined;
 		this.Positions = undefined;
@@ -2685,6 +2696,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CFillSolid() {
 		this.color = new asc_CColor();
 	}
@@ -2697,6 +2709,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CStroke() {
 		this.type = null;
 		this.width = null;
@@ -3141,6 +3154,7 @@
 	};
 
 
+	/** @constructor */
     function asc_CSpellCheckProperty(Word, Checked, Variants, ParaId, ElemId)
     {
         this.Word     = Word;

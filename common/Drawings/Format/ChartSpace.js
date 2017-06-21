@@ -13164,7 +13164,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
     }
 
 	var bIsScatter = (Asc.c_oAscChartTypeSettings.scatter <= options.type && options.type <= Asc.c_oAscChartTypeSettings.scatterSmoothMarker);
-	var top_header_bbox, left_header_bbox, ser, startCell, endCell, formulaCell, seriaName, start, end, formula, numCache, sStartCellId, sEndCellId;
+	var top_header_bbox, left_header_bbox, ser, startCell, endCell, formulaCell, start, end, formula, numCache, sStartCellId, sEndCellId;
 	if (!options.getInColumns()) {
 		if(parsedHeaders.bTop)
 			top_header_bbox = {r1: bbox.r1, c1: data_bbox.c1, r2: bbox.r1, c2: data_bbox.c2};
@@ -13217,8 +13217,8 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 				}
 			}
 
-			seriaName = left_header_bbox ? (ws.getCell3(i, left_header_bbox.c1).getValue()) : (api.chartTranslate.series + " " + nameIndex);
-			ser.TxCache.Tx = seriaName;
+			ser.TxCache.Tx = left_header_bbox ? (ws.getCell3(i, left_header_bbox.c1).getValue()) :
+				(AscCommon.translateManager.getValue('Series') + " " + nameIndex);
 			series.push(ser);
 			nameIndex++;
 		}
@@ -13276,8 +13276,8 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 				ser.TxCache.Formula = parserHelp.get3DRef(ws.sName, formulaCell.getIDAbsolute());
 			}
 
-			seriaName = top_header_bbox ? (ws.getCell3(top_header_bbox.r1, i).getValue()) : (api.chartTranslate.series + " " + nameIndex);
-			ser.TxCache.Tx = seriaName;
+			ser.TxCache.Tx = top_header_bbox ? (ws.getCell3(top_header_bbox.r1, i).getValue()) :
+				(AscCommon.translateManager.getValue('Series') + " " + nameIndex);
 			series.push(ser);
 			nameIndex++;
 		}
