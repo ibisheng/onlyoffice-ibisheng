@@ -7463,6 +7463,7 @@ CStylesPainter.prototype =
 	},
 	GenerateDefaultStyles: function (_api, ds)
 	{
+		var translateName;
 		var styles = ds;
 
 		// добавили переводы => нельзя кэшировать
@@ -7494,8 +7495,10 @@ CStylesPainter.prototype =
 			var style = styles[i];
 			if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
 			{
-				this.drawStyle(graphics, style);
-				this.defaultStyles.push(new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Default, _canvas.toDataURL("image/png"), style.uiPriority));
+				translateName = AscCommon.translateManager.getValue(style.Name);
+				this.drawStyle(graphics, style, translateName);
+				this.defaultStyles.push(new AscCommon.CStyleImage(translateName, AscCommon.c_oAscStyleImage.Default,
+					_canvas.toDataURL("image/png"), style.uiPriority));
 			}
 		}
 	},
@@ -7557,7 +7560,7 @@ CStylesPainter.prototype =
 				_dr_style.Name = style.Name;
 				_dr_style.Id = i;
 
-				this.drawStyle(graphics, _dr_style);
+				this.drawStyle(graphics, _dr_style, style.Name);
 				this.docStyles[cur_index] = new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Document, _canvas.toDataURL("image/png"), style.uiPriority);
 
 				// алгоритм смены имени
@@ -7587,7 +7590,7 @@ CStylesPainter.prototype =
 			}
 		}
 	},
-	drawStyle: function (graphics, style)
+	drawStyle: function (graphics, style, styleName)
 	{
 		var ctx = graphics.m_oContext;
 		ctx.fillStyle = "#FFFFFF";
@@ -7683,9 +7686,9 @@ CStylesPainter.prototype =
 			var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, false);
 			var run = new ParaRun(par, false);
 
-			for (var i = 0; i < style.Name.length; i++)
+			for (var i = 0; i < styleName.length; i++)
 			{
-				run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
+				run.Add_ToContent(i, new ParaText(styleName.charAt(i)), false);
 			}
 
 			_dc.Internal_Content_Add(0, par, false);
