@@ -2777,18 +2777,31 @@
 	WorkbookView.prototype.af_getTablePictures = function (props, bPivotTable) {
 		var wb = this.model;
 		var t = this;
-
+		bPivotTable = true;
 		var result = [];
 		var canvas = document.createElement('canvas');
 
 		var styleThumbnailWidth = 61, styleThumbnailHeight = 46, row = 5, col = 5;
-		var customStyles = wb.TableStyles.CustomStyles, defaultStyles = wb.TableStyles.DefaultStyles;
+
+		var defaultStyles = wb.TableStyles.DefaultStyles;
 		if(bPivotTable)
 		{
 			styleThumbnailHeight = 49;
 			row = 8;
-			customStyles = null;
 			defaultStyles =  wb.TableStyles.DefaultStylesPivot;
+		}
+
+		var customStyles = {};
+		for(var i in wb.TableStyles.CustomStyles)
+		{
+			if(bPivotTable && wb.TableStyles.CustomStyles[i].pivot)
+			{
+				customStyles[i] = wb.TableStyles.CustomStyles[i];
+			}
+			else if(!bPivotTable && wb.TableStyles.CustomStyles[i].table)
+			{
+				customStyles[i] = wb.TableStyles.CustomStyles[i];
+			}
 		}
 
 		if (AscBrowser.isRetina)
