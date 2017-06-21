@@ -1177,7 +1177,7 @@
                 if (this.isCopyPaste)
                     rangeTable = aTables[i].Ref;
 
-                if(!this.isCopyPaste || (this.isCopyPaste && rangeTable && this.isCopyPaste.containsRange(rangeTable) && !ws.bExcludeHiddenRows))
+                if(!this.isCopyPaste || (this.isCopyPaste && rangeTable && this.isCopyPaste.isIntersect(rangeTable) && !ws.bExcludeHiddenRows))
                     this.bs.WriteItem(c_oSer_TablePart.Table, function(){oThis.WriteTable(aTables[i]);});
             }
         };

@@ -8885,6 +8885,8 @@
 
 		//добавляем форматированные таблицы
         var arnToRange = t.model.selectionRange.getLast();
+		var pasteRange = AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange;
+		var activeCellsPasteFragment = typeof pasteRange === "string" ? AscCommonExcel.g_oRangeCache.getAscRange(pasteRange) : pasteRange;
         var tablesMap = null;
         if (fromBinary && val.TableParts && val.TableParts.length && specialPasteProps.formatTable) {
             var range, tablePartRange, tables = val.TableParts, diffRow, diffCol, curTable, bIsAddTable;
@@ -8897,6 +8899,11 @@
                 diffCol = tablePartRange.c1 - refInsertBinary.c1 + arnToRange.c1;
                 range = t.model.getRange3(diffRow, diffCol, diffRow + (tablePartRange.r2 - tablePartRange.r1),
                     diffCol + (tablePartRange.c2 - tablePartRange.c1));
+
+                //если в активную область при записи попала лишь часть таблицы
+                if(activeCellsPasteFragment && !activeCellsPasteFragment.containsRange(tablePartRange)){
+					continue;
+				}
 
                 //если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
                 var intersectionRangeWithTableParts = t.model.autoFilters._intersectionRangeWithTableParts(range.bbox);
@@ -9542,27 +9549,56 @@
 				}
 			}
 		};
-		
-		var getTableDxf = function(pasteRow, pasteCol, newVal)
+
+		var getTableDxf = function (pasteRow, pasteCol, newVal)
 		{
 			var dxf = null;
+
 			var tables = val.autoFilters._intersectionRangeWithTableParts(newVal.bbox);
-			
-			if(tables && tables[0])
+			var blocalArea = true;
+			if (tables && tables[0])
 			{
 				var table = tables[0];
 				var styleInfo = table.TableStyleInfo;
 				var styleForCurTable = t.model.workbook.TableStyles.AllStyles[styleInfo.Name];
-				
-				var headerRowCount = !!(null === table.HeaderRowCount || table.HeaderRowCount > 0);
-				var bbox = {r1: 0, c1: 0, r2: table.Ref.r2 - table.Ref.r1, c2: table.Ref.c2 - table.Ref.c1};
-				pasteRow = pasteRow - table.Ref.r1;
-				pasteCol = pasteCol - table.Ref.c1;
-				//todo
-				//dxf = styleForCurTable.getStyle(bbox, pasteRow, pasteCol, styleInfo, headerRowCount, table.TotalsRowCount);
+
+				if (activeCellsPasteFragment.containsRange(table.Ref))
+				{
+					blocalArea = false;
+				}
+
+				if (!styleForCurTable)
+				{
+					return null;
+				}
+
+				var headerRowCount = 1;
+				var totalsRowCount = 0;
+				if (null != table.HeaderRowCount)
+				{
+					headerRowCount = table.HeaderRowCount;
+				}
+				if (null != table.TotalsRowCount)
+				{
+					totalsRowCount = table.TotalsRowCount;
+				}
+
+				var bbox = new Asc.Range(0, 0, table.Ref.c2 - table.Ref.c1, table.Ref.r2 - table.Ref.r1);
+				styleForCurTable.initStyle(val.sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
+				var cell = val._getCell(pasteRow, pasteCol);
+				if (cell)
+				{
+					dxf = cell.getCompiledStyle();
+				}
+				if (null === dxf)
+				{
+					pasteRow = pasteRow - table.Ref.r1;
+					pasteCol = pasteCol - table.Ref.c1;
+					dxf = AscCommonExcel.getCompiledStyleWs(val, pasteRow, pasteCol);
+				}
 			}
-			
-			return dxf;
+
+			return {dxf: dxf, blocalArea: blocalArea};
 		};
 		
 		var colsWidth = {};
@@ -9636,8 +9672,18 @@
 				//hyperlink
 				pastedRangeProps.hyperlinkObj = newVal.getHyperlink();
 			}
-			
-			pastedRangeProps.tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
+
+			var tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
+			if(tableDxf.blocalArea)
+			{
+				pastedRangeProps.tableDxfLocal = tableDxf.dxf;
+			}
+			else
+			{
+				pastedRangeProps.tableDxf = tableDxf.dxf;
+			}
+
+
 			if(undefined === colsWidth[nCol])
 			{
 				colsWidth[nCol] = val._getCol(pasteCol);
@@ -10017,7 +10063,16 @@
 		{
 			range.setAngle(rangeStyle.angle);
 		}
-		
+
+		if(rangeStyle.tableDxfLocal && specialPasteProps.format)
+		{
+			var cells = range.getCells();
+			if(cells && cells[0])
+			{
+				cells[0].setStyle(rangeStyle.tableDxfLocal);
+			}
+		}
+
 		//hyperLink
 		if (rangeStyle.hyperLink && specialPasteProps.hyperlink)
 		{
