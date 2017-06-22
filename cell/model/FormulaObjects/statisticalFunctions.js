@@ -62,7 +62,7 @@
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
 		cBETA_DIST, cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT,
-		cCHITEST, cCONFIDENCE, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ,
+		cCHITEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ,
 		cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
 		cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS,
 		cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST,
@@ -1995,46 +1995,97 @@
 	cCONFIDENCE.prototype.argumentsMax = 3;
 	cCONFIDENCE.prototype.Calculate = function (arg) {
 
-		var alpha = arg[0], stdev_sigma = arg[1], size = arg[2];
-		if (alpha instanceof cArea || alpha instanceof cArea3D) {
-			alpha = alpha.cross(arguments[1]);
-		} else if (alpha instanceof cArray) {
-			alpha = alpha.getElement(0);
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
 		}
 
-		if (stdev_sigma instanceof cArea || stdev_sigma instanceof cArea3D) {
-			stdev_sigma = stdev_sigma.cross(arguments[1]);
-		} else if (stdev_sigma instanceof cArray) {
-			stdev_sigma = stdev_sigma.getElement(0);
+		var calcConfidence = function(argArray){
+			var alpha = argArray[0];
+			var stdev_sigma = argArray[1];
+			var size = parseInt(argArray[2]);
+
+			if (alpha <= 0 || alpha >= 1 || stdev_sigma <= 0 || size < 1) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return new cNumber(gaussinv(1 - alpha / 2) * stdev_sigma / Math.sqrt(size));
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcConfidence);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cCONFIDENCE}
+	 */
+	function cCONFIDENCE_NORM() {
+		cCONFIDENCE.call(this);
+		this.name = "CONFIDENCE.NORM";
+	}
+
+	cCONFIDENCE_NORM.prototype = Object.create(cCONFIDENCE.prototype);
+	cCONFIDENCE_NORM.prototype.constructor = cCONFIDENCE_NORM;
+	cCONFIDENCE_NORM.prototype.isXLFN = true;
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCONFIDENCE_T() {
+		this.name = "CONFIDENCE.T";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cCONFIDENCE_T.prototype = Object.create(cBaseFunction.prototype);
+	cCONFIDENCE_T.prototype.constructor = cCONFIDENCE_T;
+	cCONFIDENCE_T.prototype.argumentsMin = 3;
+	cCONFIDENCE_T.prototype.argumentsMax = 3;
+	cCONFIDENCE_T.prototype.isXLFN = true;
+	cCONFIDENCE_T.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
 		}
 
-		if (size instanceof cArea || size instanceof cArea3D) {
-			size = size.cross(arguments[1]);
-		} else if (size instanceof cArray) {
-			size = size.getElement(0);
-		}
+		var calcConfidence = function(argArray){
+			var alpha = argArray[0];
+			var stdev_sigma = argArray[1];
+			var size = parseInt(argArray[2]);
 
-		alpha = alpha.tocNumber();
-		stdev_sigma = stdev_sigma.tocNumber();
-		size = size.tocNumber();
+			if (alpha <= 0 || alpha >= 1 || stdev_sigma <= 0 || size < 1) {
+				return new cError(cErrorType.not_numeric);
+			}
 
-		if (alpha instanceof cError) {
-			return this.value = alpha;
-		}
-		if (stdev_sigma instanceof cError) {
-			return this.value = stdev_sigma;
-		}
-		if (size instanceof cError) {
-			return this.value = size;
-		}
+			var aFunc = new TDISTFUNCTION(alpha, size - 1, 2);
+			var oVal = iterateInverse(aFunc, size * 0.5, size);
+			var bConvError = oVal.bError;
 
-		if (alpha.getValue() <= 0 || alpha.getValue() >= 1 || stdev_sigma.getValue <= 0 || size.getValue() < 1) {
-			return this.value = new cError(cErrorType.not_numeric);
-		}
+			if (bConvError){
+				return new cError(cErrorType.not_numeric);
+			}
 
-		return this.value =
-			new cNumber(gaussinv(1.0 - alpha.getValue() / 2.0) * stdev_sigma.getValue() / Math.sqrt(size.getValue()));
+			var res = (stdev_sigma * oVal.val) / Math.sqrt( size );
+			return new cNumber(res);
+		};
 
+		return this.value = this._findArrayInNumberArguments(oArguments, calcConfidence);
 	};
 
 	/**
@@ -5212,7 +5263,7 @@
 		var argClone = oArguments.args;
 
 		argClone[1] = argClone[1].tocNumber();
-		argClone[2] = argClone[2] ? argClone[2] : new cNumber(3);
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(3);
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
@@ -5262,7 +5313,7 @@
 		var argClone = oArguments.args;
 
 		argClone[1] = argClone[1].tocNumber();
-		argClone[2] = argClone[2] ? argClone[2] : new cNumber(3);
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new cNumber(3);
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {

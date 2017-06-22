@@ -6273,10 +6273,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         else if (docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ))
         {
-            this.DrawingObjects.resetSelection2();
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateSelectionState();
-            this.private_UpdateCursorXY(true, true);
+        	this.EndDrawingEditing();
         }
         else if (docpostype_HdrFtr == this.CurPos.Type)
         {
@@ -7859,6 +7856,16 @@ CDocument.prototype.EndFootnotesEditing = function()
 		this.Document_UpdateRulersState();
 		this.Document_UpdateInterfaceState();
 		this.Document_UpdateSelectionState();
+	}
+};
+CDocument.prototype.EndDrawingEditing = function()
+{
+	if (docpostype_DrawingObjects === this.Get_DocPosType() || (docpostype_HdrFtr === this.Get_DocPosType() && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ))
+	{
+		this.DrawingObjects.resetSelection2();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateSelectionState();
+		this.private_UpdateCursorXY(true, true);
 	}
 };
 CDocument.prototype.Document_Format_Paste = function()
@@ -15192,9 +15199,7 @@ CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
 };
 CDocument.prototype.AddContentControl = function(nContentControlType)
 {
-	if (true === this.IsSelectionUse())
-		this.RemoveBeforePaste();
-
+	this.EndDrawingEditing();
 	return this.Controller.AddContentControl(nContentControlType);
 };
 CDocument.prototype.GetAllContentControls = function()
