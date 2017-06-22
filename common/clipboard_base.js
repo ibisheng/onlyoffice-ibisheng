@@ -990,6 +990,9 @@
 		
 		SpecialPasteButton_Show : function(props)
 		{
+			if (!this.Api)
+				return;
+
 			//при быстром совместном редактировании отключаем возможность специальной вставки
 			if(this.CheckFastCoEditing())
 			{
@@ -1013,6 +1016,9 @@
 
 		SpecialPasteButtonById_Show: function()
 		{
+			if (!this.Api)
+				return;
+
 			//при быстром совместном редактировании отключаем возможность специальной вставки
 			if(this.CheckFastCoEditing())
 			{
@@ -1071,6 +1077,9 @@
 
 		SpecialPasteButton_Hide : function()
 		{
+			if (!this.Api)
+				return;
+
 			if(this.showSpecialPasteButton)
 			{
 				this.showSpecialPasteButton = false;
@@ -1080,6 +1089,9 @@
 		
 		SpecialPasteButton_Update_Position : function()
 		{
+			if (!this.Api)
+				return;
+
 			//TODO метод должен быть общий для всех редакторов
 			if(this.showSpecialPasteButton && this.specialPasteButtonProps.fixPosition)
 			{
@@ -1089,8 +1101,8 @@
 				var _X = this.specialPasteButtonProps.fixPosition.x;
 				var _PageNum = this.specialPasteButtonProps.fixPosition.pageNum;
 				
-				var _сoord = this.Api.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
-				var curCoord = new AscCommon.asc_CRect( _сoord.X, _сoord.Y, 0, 0 );
+				var _coord = this.Api.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
+				var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
 				specialPasteShowOptions.asc_setCellCoord(curCoord);
 				
 				this.Api.asc_ShowSpecialPasteButton(specialPasteShowOptions);
@@ -1099,6 +1111,9 @@
 
 		CheckFastCoEditing: function()
 		{
+			if (!this.Api)
+				return false;
+
 			var res = false;
 
 			var bFast = false;
