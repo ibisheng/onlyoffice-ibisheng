@@ -5383,6 +5383,23 @@ CShape.prototype.getColumnNumber = function(){
     };
 
 
+    CShape.prototype.checkWrap = function(){
+        if(!this.txBody){
+            return;
+        }
+        var new_body_pr = this.getBodyPr();
+        if (new_body_pr) {
+            if(new_body_pr.numCol > 1){
+                if(new_body_pr.wrap === AscFormat.nTWTNone){
+                    new_body_pr = new_body_pr.createDuplicate();
+                    new_body_pr.wrap =  AscFormat.nTWTSquare;
+                    this.txBody.setBodyPr(new_body_pr);
+                }
+            }
+        }
+    };
+
+
     CShape.prototype.setColumnNumber = function(num){
         if(!this.bWordShape && !CheckObjectLine(this)){
             var new_body_pr = this.getBodyPr();
@@ -5396,7 +5413,7 @@ CShape.prototype.getColumnNumber = function(){
                 if (this.txBody) {
                     this.txBody.setBodyPr(new_body_pr);
                 }
-
+                this.checkWrap();
             }
         }
 
@@ -5414,6 +5431,7 @@ CShape.prototype.getColumnNumber = function(){
                 if (this.txBody) {
                     this.txBody.setBodyPr(new_body_pr);
                 }
+                this.checkWrap();
             }
         }
     };
