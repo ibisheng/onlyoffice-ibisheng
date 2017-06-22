@@ -3879,6 +3879,45 @@ $( function () {
 
     } );
 
+	test( "Test: \"PERCENTILE.INC\"", function () {
+		ws.getRange2( "A2" ).setValue( "1" );
+		ws.getRange2( "A3" ).setValue( "2" );
+		ws.getRange2( "A4" ).setValue( "3" );
+		ws.getRange2( "A5" ).setValue( "4" );
+
+		oParser = new parserFormula( "PERCENTILE.INC(A2:A5,0.3)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1.9 );
+	} );
+
+	test( "Test: \"PERCENTILE.EXC\"", function () {
+		ws.getRange2( "A202" ).setValue( "1" );
+		ws.getRange2( "A203" ).setValue( "2" );
+		ws.getRange2( "A204" ).setValue( "3" );
+		ws.getRange2( "A205" ).setValue( "6" );
+		ws.getRange2( "A206" ).setValue( "6" );
+		ws.getRange2( "A207" ).setValue( "6" );
+		ws.getRange2( "A208" ).setValue( "7" );
+		ws.getRange2( "A209" ).setValue( "8" );
+		ws.getRange2( "A210" ).setValue( "9" );
+
+		oParser = new parserFormula( "PERCENTILE.EXC(A202:A210, 0.25)", "A1", ws );
+		ok( oParser.parse(), "PERCENTILE.EXC(A202:A210, 0.25)" );
+		strictEqual( oParser.calculate().getValue(), 2.5, "PERCENTILE.EXC(A202:A210, 0.25)" );
+
+		oParser = new parserFormula( "PERCENTILE.EXC(A202:A210, 0)", "A1", ws );
+		ok( oParser.parse(), "PERCENTILE.EXC(A202:A210, 0)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "PERCENTILE.EXC(A202:A210, 0)" );
+
+		oParser = new parserFormula( "PERCENTILE.EXC(A202:A210, 0.01)", "A1", ws );
+		ok( oParser.parse(), "PERCENTILE.EXC(A202:A210, 0.01)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "PERCENTILE.EXC(A202:A210, 0.01)" );
+
+		oParser = new parserFormula( "PERCENTILE.EXC(A202:A210, 2)", "A1", ws );
+		ok( oParser.parse(), "PERCENTILE.EXC(A202:A210, 2)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "PERCENTILE.EXC(A202:A210, 2)" );
+	} );
+
     test( "Test: \"PERCENTRANK\"", function () {
 
         function percentrank( A, x, k ) {
