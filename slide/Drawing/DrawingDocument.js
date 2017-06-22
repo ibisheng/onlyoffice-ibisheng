@@ -5502,7 +5502,7 @@ function CNotesDrawer(page)
 
 		g.IsNoDrawingEmptyPlaceholderText = true;
 
-		this.HtmlPage.m_oLogicDocument.DrawNote(this.Slide, g);
+		this.HtmlPage.m_oLogicDocument.Notes_Draw(this.Slide, g);
 		this.IsRepaint = false;
 	};
 
