@@ -2073,48 +2073,6 @@
 		return this.Style;
 	};
 
-	/** @constructor */
-	function asc_CChartTranslate() {
-		this.title = "Diagram Title";
-		this.xAxis = "X Axis";
-		this.yAxis = "Y Axis";
-		this.series = "Series";
-	}
-
-	asc_CChartTranslate.prototype = {
-		asc_getTitle: function () {
-			return this.title;
-		}, asc_setTitle: function (val) {
-			this.title = val;
-		},
-
-		asc_getXAxis: function () {
-			return this.xAxis;
-		}, asc_setXAxis: function (val) {
-			this.xAxis = val;
-		},
-
-		asc_getYAxis: function () {
-			return this.yAxis;
-		}, asc_setYAxis: function (val) {
-			this.yAxis = val;
-		},
-
-		asc_getSeries: function () {
-			return this.series;
-		}, asc_setSeries: function (val) {
-			this.series = val;
-		}
-	};
-
-	function asc_TextArtTranslate() {
-		this.DefaultText = "Your text here";
-	}
-
-	asc_TextArtTranslate.prototype.asc_setDefaultText = function (sText) {
-		this.DefaultText = sText;
-	};
-
 	function CImagePositionH(obj) {
 		if (obj) {
 			this.RelativeFrom = ( undefined === obj.RelativeFrom ) ? undefined : obj.RelativeFrom;
@@ -3635,21 +3593,6 @@
 	prot["asc_getForm"] = prot.asc_getForm;
 	prot["asc_putStyle"] = prot.asc_putStyle;
 	prot["asc_getStyle"] = prot.asc_getStyle;
-
-	window["Asc"]["asc_CChartTranslate"] = window["Asc"].asc_CChartTranslate = asc_CChartTranslate;
-	prot = asc_CChartTranslate.prototype;
-	prot["asc_getTitle"] = prot.asc_getTitle;
-	prot["asc_setTitle"] = prot.asc_setTitle;
-	prot["asc_getXAxis"] = prot.asc_getXAxis;
-	prot["asc_setXAxis"] = prot.asc_setXAxis;
-	prot["asc_getYAxis"] = prot.asc_getYAxis;
-	prot["asc_setYAxis"] = prot.asc_setYAxis;
-	prot["asc_getSeries"] = prot.asc_getSeries;
-	prot["asc_setSeries"] = prot.asc_setSeries;
-
-	window["Asc"]["asc_TextArtTranslate"] = window["Asc"].asc_TextArtTranslate = asc_TextArtTranslate;
-	prot = asc_TextArtTranslate.prototype;
-	prot["asc_setDefaultText"] = prot.asc_setDefaultText;
 
 	window['Asc']['CImagePositionH'] = window["Asc"].CImagePositionH = CImagePositionH;
 	prot = CImagePositionH.prototype;

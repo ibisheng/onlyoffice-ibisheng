@@ -6765,8 +6765,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['AddImageUrlActionCallback']           = asc_docs_api.prototype.AddImageUrlActionCallback;
 	asc_docs_api.prototype['AddImageUrlAction']                   = asc_docs_api.prototype.AddImageUrlAction;
 	asc_docs_api.prototype['ImgApply']                            = asc_docs_api.prototype.ImgApply;
-	asc_docs_api.prototype['asc_setChartTranslate']               = asc_docs_api.prototype.asc_setChartTranslate;
-	asc_docs_api.prototype['asc_setTextArtTranslate']             = asc_docs_api.prototype.asc_setTextArtTranslate;
 	asc_docs_api.prototype['ChartApply']                          = asc_docs_api.prototype.ChartApply;
 	asc_docs_api.prototype['set_Size']                            = asc_docs_api.prototype.set_Size;
 	asc_docs_api.prototype['set_ConstProportions']                = asc_docs_api.prototype.set_ConstProportions;

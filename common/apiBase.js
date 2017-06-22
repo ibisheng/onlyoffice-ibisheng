@@ -816,14 +816,6 @@
 	{
 	};
 	// Images & Charts & TextArts
-	baseEditorsApi.prototype.asc_setChartTranslate               = function(translate)
-	{
-		this.chartTranslate = translate;
-	};
-	baseEditorsApi.prototype.asc_setTextArtTranslate             = function(translate)
-	{
-		this.textArtTranslate = translate;
-	};
 	baseEditorsApi.prototype.asc_getChartPreviews                = function(chartType)
 	{
 		return this.chartPreviewManager.getChartPreviews(chartType);
