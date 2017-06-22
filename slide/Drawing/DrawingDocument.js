@@ -5422,6 +5422,9 @@ function CNotesDrawer(page)
 	this.OffsetX = 10;
 	this.OffsetY = 10;
 
+	this.Scroll = 0;
+	this.ScrollMax = 0;
+
 	this.fontManager = new AscFonts.CFontManager();
 	this.fontManager.Initialize(true);
 	this.fontManager.SetHintsProps(true, true);
@@ -5498,7 +5501,7 @@ function CNotesDrawer(page)
 			g.IsRetina = true;
 
 		g.m_oCoordTransform.tx = this.OffsetX;
-		g.m_oCoordTransform.ty = this.OffsetY - this.HtmlPage.m_oScrollNotes_.scroller.y;
+		g.m_oCoordTransform.ty = -this.Scroll;
 		g.transform(1, 0, 0, 1, 0, 0);
 
 		g.IsNoDrawingEmptyPlaceholderText = true;
@@ -5540,6 +5543,9 @@ function CNotesDrawer(page)
 			settings.screenAddH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenAddH);
 		}
 
+		this.Scroll = 0;
+		this.ScrollMax = Math.max(0, settings.contentH - settings.screenH);
+
 		document.getElementById('panel_right_scroll_notes').style.height = settings.contentH + "px";
 
 		if (this.HtmlPage.m_oScrollNotes_)
@@ -5562,6 +5568,7 @@ function CNotesDrawer(page)
 
 			this.HtmlPage.m_oScrollNotes_.bind("scrollvertical", function (evt)
 			{
+				oThis.Scroll = (oThis.ScrollMax * evt.scrollD / Math.max(evt.maxScrollY, 1)) >> 0;
 				oThis.IsRepaint = true;
 			});
 		}
@@ -5608,8 +5615,10 @@ function CNotesDrawer(page)
 	{
 		if (this.HtmlPage.m_oLogicDocument)
 		{
-            this.HtmlPage.m_oLogicDocument.Notes_OnResize();
-            this.IsRepaint = true;
+            if (!this.HtmlPage.m_oLogicDocument.Notes_OnResize())
+			{
+				this.OnRecalculateNote(this.Slide, this.Width, this.Height);
+			}
 		}
 	};
 

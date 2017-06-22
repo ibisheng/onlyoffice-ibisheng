@@ -3949,17 +3949,18 @@ CPresentation.prototype =
     ///NOTES
     Notes_OnResize: function(){
         if(!this.Slides[this.CurPage]){
-            return;
+            return false;
         }
         var newNotesWidth = this.DrawingDocument.Notes_GetWidth();
         if(AscFormat.fApproxEqual(this.NotesWidth, newNotesWidth)){
-            return;
+            return false;
         }
         this.NotesWidth = newNotesWidth;
         for(var i = 0; i < this.Slides.length; ++i){
             this.Slides[i].recalculateNotesShape();
         }
         this.DrawingDocument.Notes_OnRecalculate(this.CurPage, newNotesWidth, this.Slides[this.CurPage].getNotesHeight());
+        return true;
     },
 
 

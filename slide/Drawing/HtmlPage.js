@@ -2369,6 +2369,7 @@ function CEditorPage(api)
 
 		if (this.m_bIsHorScrollVisible)
 		{
+			settings.alwaysVisible = true;
 			if (this.m_oScrollHor_)
 				this.m_oScrollHor_.Repos(settings, true, undefined);//unbind("scrollhorizontal")
 			else
@@ -2391,6 +2392,7 @@ function CEditorPage(api)
 
 				this.m_oScrollHorApi = this.m_oScrollHor_;
 			}
+			settings.alwaysVisible = undefined;
 		}
 
 		if (this.m_oScrollVer_)
@@ -2481,8 +2483,13 @@ function CEditorPage(api)
 
 		this.DemonstrationManager.Resize();
 
+		this.m_bIsCheckHeedHorScrollRepeat++;
 		if (this.checkNeedHorScroll())
+		{
+			this.m_bIsCheckHeedHorScrollRepeat--;
 			return;
+		}
+		this.m_bIsCheckHeedHorScrollRepeat--;
 
 		// теперь проверим необходимость перезуммирования
 		if (1 == this.m_nZoomType && 0 != this.m_dDocumentPageWidth && 0 != this.m_dDocumentPageHeight)
@@ -2542,8 +2549,13 @@ function CEditorPage(api)
 		this.onButtonTabsDraw();
 		this.DemonstrationManager.Resize();
 
+		this.m_bIsCheckHeedHorScrollRepeat++;
 		if (this.checkNeedHorScroll())
+		{
+			this.m_bIsCheckHeedHorScrollRepeat--;
 			return;
+		}
+		this.m_bIsCheckHeedHorScrollRepeat--;
 
 		// теперь проверим необходимость перезуммирования
 		if (1 == this.m_nZoomType)
@@ -2642,7 +2654,7 @@ function CEditorPage(api)
 		}
 		else
 		{
-			if (this.m_bIsCheckHeedHorScrollRepeat && oldVisible == true)
+			if ((this.m_bIsCheckHeedHorScrollRepeat > 0) && oldVisible == true)
 			{
 				this.m_bIsHorScrollVisible = true;
 				this.m_dScrollX            = 0;
@@ -2662,7 +2674,6 @@ function CEditorPage(api)
 			this.OnResize(true);
 			return true;
 		}
-		this.m_bIsCheckHeedHorScrollRepeat = false;
 		return false;
 	};
 
@@ -3026,7 +3037,9 @@ function CEditorPage(api)
 
 		this.MainScrollLock();
 
+		this.m_bIsCheckHeedHorScrollRepeat++;
 		this.checkNeedHorScroll();
+		this.m_bIsCheckHeedHorScrollRepeat--;
 
 		document.getElementById('panel_right_scroll').style.height = this.m_dDocumentHeight + "px";
 
@@ -3123,7 +3136,9 @@ function CEditorPage(api)
 
 		this.MainScrollLock();
 
+		this.m_bIsCheckHeedHorScrollRepeat++;
 		var bIsResize = this.checkNeedHorScroll();
+		this.m_bIsCheckHeedHorScrollRepeat--;
 
 		document.getElementById('panel_right_scroll').style.height = this.m_dDocumentHeight + "px";
 
