@@ -2925,6 +2925,8 @@ var kPositionLength = -12;
 
 var deviceScale = 1;
 
+var sdkCheck = true;
+
 //--------------------------------------------------------------------------------
 // OfflineEditor
 //--------------------------------------------------------------------------------
@@ -3874,6 +3876,7 @@ function OfflineEditor () {
         window["CreateMainTextMeasurerWrapper"]();
 
         deviceScale = window["native"]["GetDeviceScale"]();
+        sdkCheck = settings["sdkCheck"];
 
         window.g_file_path = "native_open_file";
         window.NATIVE_DOCUMENT_TYPE = "";
@@ -7705,6 +7708,20 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                                                       window["_null_object"], window["_null_object"], t,
                                                       t.collaborativeEditing, t.fontRenderingMode);
                t.DocumentLoadComplete = true;
+               
+               if (!sdkCheck) {
+               
+                    console.log("OPEN FILE ONLINE");
+               
+                    t.wb.showWorksheet(undefined, false, true);
+               
+                    var ws = t.wb.getWorksheet();
+                    window["native"]["onEndLoadingFile"](ws.headersWidth, ws.headersHeight);
+               
+                    _s.asc_WriteAllWorksheets(true);
+               
+                    return;
+               }
 
                t.asc_CheckGuiControlColors();
                t.sendColorThemes(_api.wbModel.theme);
