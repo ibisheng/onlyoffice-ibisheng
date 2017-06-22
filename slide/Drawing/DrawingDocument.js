@@ -3176,6 +3176,28 @@ function CDrawingDocument()
 
 		return null;
 	};
+
+	this.Notes_GetWidth = function()
+	{
+		if (!this.m_oWordControl.IsSupportNotes)
+			return 0;
+
+		if (!this.m_oWordControl.m_oNotesApi)
+			return 0;
+
+		return this.m_oWordControl.m_oNotesApi.GetNotesWidth();
+	};
+
+	this.Notes_OnRecalculate = function(slideNum, width, height)
+	{
+		if (!this.m_oWordControl.IsSupportNotes)
+			return;
+
+		if (!this.m_oWordControl.m_oNotesApi)
+			return;
+
+		this.m_oWordControl.m_oNotesApi.OnRecalculateNote(slideNum, width, height);
+	};
 }
 
 function CThPage()
@@ -5383,7 +5405,7 @@ function CSlideDrawer()
 
 function CNotesDrawer(page)
 {
-	this.Width 	= 0;
+	this.Width = 0;
 	this.Height = 0;
 
 	this.HtmlPage = page;
@@ -5393,7 +5415,7 @@ function CNotesDrawer(page)
 	this.Slide = -1;
 
 	this.m_oOverlayApi = new AscCommon.COverlay();
-	this.m_oOverlayApi.m_oControl  = this.HtmlPage.m_oNotesOverlay;
+	this.m_oOverlayApi.m_oControl = this.HtmlPage.m_oNotesOverlay;
 	this.m_oOverlayApi.m_oHtmlPage = this.HtmlPage;
 	this.m_oOverlayApi.Clear();
 
@@ -5405,21 +5427,21 @@ function CNotesDrawer(page)
 
 	var oThis = this;
 
-	this.Init = function()
+	this.Init = function ()
 	{
 		var _elem = this.HtmlPage.m_oNotes;
 		var _elemOverlay = this.HtmlPage.m_oNotesOverlay;
 
 		_elem.HtmlElement.onmousedown = this.onMouseDown;
 		_elem.HtmlElement.onmousemove = this.onMouseMove;
-		_elem.HtmlElement.onmouseup   = this.onMouseUp;
+		_elem.HtmlElement.onmouseup = this.onMouseUp;
 
 		_elemOverlay.HtmlElement.onmousedown = this.onMouseDown;
 		_elemOverlay.HtmlElement.onmousemove = this.onMouseMove;
-		_elemOverlay.HtmlElement.onmouseup   = this.onMouseUp;
+		_elemOverlay.HtmlElement.onmouseup = this.onMouseUp;
 	};
 
-	this.OnUpdateOverlay = function()
+	this.OnUpdateOverlay = function ()
 	{
 		var overlay = this.m_oOverlayApi;
 
@@ -5434,7 +5456,7 @@ function CNotesDrawer(page)
 		var ctx = overlay.m_oContext;
 		if (drDoc.m_bIsSelection)
 		{
-			ctx.fillStyle   = "rgba(51,102,204,255)";
+			ctx.fillStyle = "rgba(51,102,204,255)";
 			ctx.strokeStyle = "#9ADBFE";
 			ctx.beginPath();
 
@@ -5449,7 +5471,7 @@ function CNotesDrawer(page)
 		ctx = null;
 	};
 
-	this.OnPaint = function()
+	this.OnPaint = function ()
 	{
 		var element = this.HtmlPage.m_oNotes.HtmlElement;
 		var ctx = element.getContext('2d');
@@ -5484,7 +5506,7 @@ function CNotesDrawer(page)
 		this.IsRepaint = false;
 	};
 
-	this.OnRecalculateNote = function(slideNum, width, height)
+	this.OnRecalculateNote = function (slideNum, width, height)
 	{
 		this.Slide = slideNum;
 		this.Width = width;
@@ -5496,17 +5518,17 @@ function CNotesDrawer(page)
 
 		var element = this.HtmlPage.m_oNotes.HtmlElement;
 		var settings = {
-			showArrows    : true,
-			animateScroll : false,
-			screenW       : element.width,
-			screenH       : element.height,
-			screenAddW    : 0,
-			screenAddH    : 0,
-			vsscrollStep  : 45,
-			hsscrollStep  : 45,
-			contentW      : 2 * this.OffsetX + ((width * g_dKoef_mm_to_pix) >> 0),
-			contentH      : 2 * this.OffsetY + ((height * g_dKoef_mm_to_pix) >> 0),
-			scrollerMinHeight : 5
+			showArrows:        true,
+			animateScroll:     false,
+			screenW:           element.width,
+			screenH:           element.height,
+			screenAddW:        0,
+			screenAddH:        0,
+			vsscrollStep:      45,
+			hsscrollStep:      45,
+			contentW:          1,
+			contentH:          2 * this.OffsetY + ((height * g_dKoef_mm_to_pix) >> 0),
+			scrollerMinHeight: 5
 		};
 
 		if (this.bIsRetinaSupport)
@@ -5527,30 +5549,30 @@ function CNotesDrawer(page)
 		{
 			this.HtmlPage.m_oScrollNotes_ = new AscCommon.ScrollObject("id_vertical_scroll_notes", settings);
 
-			this.HtmlPage.m_oScrollNotes_.onLockMouse  = function(evt)
+			this.HtmlPage.m_oScrollNotes_.onLockMouse = function (evt)
 			{
 				AscCommon.check_MouseDownEvent(evt, true);
 				global_mouseEvent.LockMouse();
 			};
-			this.HtmlPage.m_oScrollNotes_.offLockMouse = function(evt)
+			this.HtmlPage.m_oScrollNotes_.offLockMouse = function (evt)
 			{
 				AscCommon.check_MouseUpEvent(evt);
 			};
 
-			this.HtmlPage.m_oScrollNotes_.bind("scrollvertical", function(evt)
+			this.HtmlPage.m_oScrollNotes_.bind("scrollvertical", function (evt)
 			{
 				// TODO:
 			});
 		}
 	};
 
-	this.CheckPaint = function()
+	this.CheckPaint = function ()
 	{
 		if (this.IsRepaint)
 			this.OnPaint();
 	};
 
-	this.onMouseDown = function(e)
+	this.onMouseDown = function (e)
 	{
 		AscCommon.check_MouseDownEvent(e, true);
 		global_mouseEvent.LockMouse();
@@ -5562,11 +5584,11 @@ function CNotesDrawer(page)
 
 		console.log(_x + ", " + _y);
 	};
-	this.onMouseMove = function(e)
+	this.onMouseMove = function (e)
 	{
 		AscCommon.check_MouseMoveEvent(e);
 	};
-	this.onMouseUp = function(e)
+	this.onMouseUp = function (e)
 	{
 		AscCommon.check_MouseUpEvent(e);
 
@@ -5576,14 +5598,22 @@ function CNotesDrawer(page)
 		console.log(_x + ", " + _y);
 	};
 
-	this.onUpdateTarget = function()
+	this.onUpdateTarget = function ()
 	{
 
 	};
 
-	this.OnResize = function()
+	this.OnResize = function ()
 	{
-		this.OnRecalculateNote(this.Slide, this.Width, this.Height);
+		this.HtmlPage.m_oLogicDocument.Notes_OnResize();
+	};
+
+	this.GetNotesWidth = function()
+	{
+		var _pix_width = this.HtmlPage.m_oNotes.HtmlElement.width - 20;
+		if (_pix_width < 10)
+			_pix_width = 10;
+		return _pix_width / g_dKoef_mm_to_pix;
 	};
 }
 
