@@ -2940,6 +2940,24 @@ $( function () {
 
     } );
 
+	test( "Test: \"CONFIDENCE.NORM\"", function () {
+
+		ws.getRange2( "A2" ).setValue( "0.05" );
+		ws.getRange2( "A3" ).setValue( "2.5" );
+		ws.getRange2( "A4" ).setValue( "50" );
+
+		oParser = new parserFormula( "CONFIDENCE.NORM(A2,A3,A4)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 6 ) - 0, 0.692952);
+	} );
+
+	test( "Test: \"CONFIDENCE.T\"", function () {
+
+		oParser = new parserFormula( "CONFIDENCE.T(0.05,1,50)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 9 ) - 0, 0.284196855);
+	} );
+
     test( "Test: \"CORREL\"", function () {
 
         oParser = new parserFormula( "CORREL({2.532,5.621;2.1,3.4},{5.32,2.765;5.2,\"f\"})", "A1", ws );

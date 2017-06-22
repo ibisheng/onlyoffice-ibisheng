@@ -2073,9 +2073,6 @@
 				return new cError(cErrorType.not_numeric);
 			}
 
-			//ScTDistFunction aFunc( *this, fAlpha, fSize, nType );
-			//double fVal = lcl_IterateInverse( aFunc, fSize * 0.5, fSize, bConvError );
-
 			var aFunc = new TDISTFUNCTION(alpha, size - 1, 2);
 			var oVal = iterateInverse(aFunc, size * 0.5, size);
 			var bConvError = oVal.bError;
