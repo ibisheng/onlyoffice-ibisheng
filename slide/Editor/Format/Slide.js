@@ -1088,8 +1088,12 @@ Slide.prototype =
             }
         }
         return;
+    },
+
+    drawNotes: function (g) {
+
         if(this.notesShape){
-            this.notesShape.draw(graphics);
+            this.notesShape.draw(g);
         }
     },
 

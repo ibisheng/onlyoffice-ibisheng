@@ -3970,6 +3970,12 @@ CPresentation.prototype =
         return this.Slides[this.CurPage].getNotesHeight();
     },
 
+    Notes_Draw: function(SlideIndex, graphics){
+        if(this.Slides[SlideIndex]){
+            this.Slides[SlideIndex].drawNotes(graphics);
+        }
+    },
+
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
