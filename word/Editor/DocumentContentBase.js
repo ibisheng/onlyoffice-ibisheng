@@ -706,33 +706,83 @@ CDocumentContentBase.prototype.IsBlockLevelSdtContent = function()
 };
 CDocumentContentBase.prototype.private_AddContentControl = function(nContentControlType)
 {
-	// Селекта быть не должно при выполнении данной функции, поэтому не проверяем
 	var oElement = this.Content[this.CurPos.ContentPos];
 
-	if (type_Paragraph === oElement.GetType() && AscCommonWord.sdttype_BlockLevel === nContentControlType)
+	if (AscCommonWord.sdttype_BlockLevel === nContentControlType)
 	{
-		var oSdt = new CBlockLevelSdt(editor.WordControl.m_oLogicDocument, this);
-		if (oElement.IsCursorAtEnd())
+		if (true === this.IsSelectionUse())
 		{
-			this.Internal_Content_Add(this.CurPos.ContentPos + 1, oSdt);
-			this.CurPos.ContentPos = this.CurPos.ContentPos + 1;
-		}
-		else if (oElement.IsCursorAtBegin())
-		{
-			this.Internal_Content_Add(this.CurPos.ContentPos, oSdt);
+			if (this.Selection.StartPos === this.Selection.EndPos
+				&& ((type_BlockLevelSdt === this.Content[this.Selection.StartPos].GetType()
+				&& true !== this.Content[this.Selection.StartPos].IsSelectedAll())
+				|| (type_Table === this.Content[this.Selection.StartPos].GetType()
+				&& !this.Content[this.Selection.StartPos].IsCellSelection())))
+			{
+				return this.Content[this.Selection.StartPos].AddContentControl(nContentControlType);
+			}
+			else
+			{
+				var oSdt = new CBlockLevelSdt(editor.WordControl.m_oLogicDocument, this);
+
+				var nStartPos = this.Selection.StartPos;
+				var nEndPos   = this.Selection.EndPos;
+				if (nEndPos < nStartPos)
+				{
+					nEndPos   = this.Selection.StartPos;
+					nStartPos = this.Selection.EndPos;
+				}
+
+				for (var nIndex = nEndPos; nIndex >= nStartPos; --nIndex)
+				{
+					oSdt.Content.Add_ToContent(0, this.Content[nIndex]);
+					this.Remove_FromContent(nIndex, 1);
+				}
+
+				oSdt.Content.Remove_FromContent(oSdt.Content.Get_ElementsCount() - 1, 1);
+				oSdt.Content.Selection.Use      = true;
+				oSdt.Content.Selection.StartPos = 0;
+				oSdt.Content.Selection.EndPos   = oSdt.Content.Get_ElementsCount() - 1;
+
+				this.Add_ToContent(nStartPos, oSdt);
+				this.Selection.StartPos = nStartPos;
+				this.Selection.EndPos   = nStartPos;
+				this.CurPos.ContentPos  = nStartPos;
+				return oSdt;
+			}
 		}
 		else
 		{
-			var oNewParagraph = new Paragraph(this.DrawingDocument, this);
-			oElement.Split(oNewParagraph);
+			if (type_Paragraph === oElement.GetType())
+			{
+				var oSdt = new CBlockLevelSdt(editor.WordControl.m_oLogicDocument, this);
 
-			this.Internal_Content_Add(this.CurPos.ContentPos + 1, oSdt);
-			this.Internal_Content_Add(this.CurPos.ContentPos + 2, oNewParagraph);
+				if (oElement.IsCursorAtEnd())
+				{
+					this.Internal_Content_Add(this.CurPos.ContentPos + 1, oSdt);
+					this.CurPos.ContentPos = this.CurPos.ContentPos + 1;
+				}
+				else if (oElement.IsCursorAtBegin())
+				{
+					this.Internal_Content_Add(this.CurPos.ContentPos, oSdt);
+				}
+				else
+				{
+					var oNewParagraph = new Paragraph(this.DrawingDocument, this);
+					oElement.Split(oNewParagraph);
 
-			this.CurPos.ContentPos = this.CurPos.ContentPos + 1;
+					this.Internal_Content_Add(this.CurPos.ContentPos + 1, oSdt);
+					this.Internal_Content_Add(this.CurPos.ContentPos + 2, oNewParagraph);
+
+					this.CurPos.ContentPos = this.CurPos.ContentPos + 1;
+				}
+				oSdt.MoveCursorToStartPos(false);
+				return oSdt;
+			}
+			else
+			{
+				return oElement.AddContentControl(nContentControlType);
+			}
 		}
-		oSdt.MoveCursorToStartPos(false);
-		return oSdt;
 	}
 	else
 	{

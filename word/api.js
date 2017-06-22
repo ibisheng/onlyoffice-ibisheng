@@ -7215,11 +7215,17 @@ background-repeat: no-repeat;\
 				if (oContentControlPr)
 					oContentControl.SetContentControlPr(oContentControlPr);
 
-				for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+				if (oContentControl.IsEmpty())
 				{
-					oContentControl.AddToParagraph(new ParaText(sDefaultText.charAt(nIndex)));
+					// TODO: Разобраться с тем, чтобы пересчет не вызывался в фунции AddToParagraph
+					oLogicDocument.TurnOff_Recalculate();
+					for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+					{
+						oContentControl.AddToParagraph(new ParaText(sDefaultText.charAt(nIndex)));
+					}
+					oLogicDocument.SelectContentControl(oContentControl.GetId());
+					oLogicDocument.TurnOn_Recalculate();
 				}
-				oLogicDocument.SelectContentControl(oContentControl.GetId());
 
 				oLogicDocument.Recalculate();
 				oLogicDocument.Document_UpdateInterfaceState();
@@ -7234,18 +7240,29 @@ background-repeat: no-repeat;\
 
 				var oContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_InlineLevel);
 
-				for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+				if (!oContentControl)
 				{
-					oContentControl.Add(new ParaText(sDefaultText.charAt(nIndex)));
+					History.Remove_LastPoint();
+					return;
 				}
-				oContentControl.SelectThisElement();
+				else
+				{
+					if (oContentControl.IsEmpty())
+					{
+						for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+						{
+							oContentControl.Add(new ParaText(sDefaultText.charAt(nIndex)));
+						}
+						oContentControl.SelectThisElement();
+					}
 
-				if (oContentControlPr)
-					oContentControl.SetContentControlPr(oContentControlPr);
+					if (oContentControlPr)
+						oContentControl.SetContentControlPr(oContentControlPr);
 
-				oLogicDocument.Recalculate();
-				oLogicDocument.Document_UpdateInterfaceState();
-				oLogicDocument.Document_UpdateSelectionState();
+					oLogicDocument.Recalculate();
+					oLogicDocument.Document_UpdateInterfaceState();
+					oLogicDocument.Document_UpdateSelectionState();
+				}
 			}
 		}
 	};
