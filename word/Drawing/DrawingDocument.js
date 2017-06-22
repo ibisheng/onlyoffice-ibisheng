@@ -7463,7 +7463,6 @@ CStylesPainter.prototype =
 	},
 	GenerateDefaultStyles: function (_api, ds)
 	{
-		var translateName;
 		var styles = ds;
 
 		// добавили переводы => нельзя кэшировать
@@ -7495,9 +7494,8 @@ CStylesPainter.prototype =
 			var style = styles[i];
 			if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
 			{
-				translateName = AscCommon.translateManager.getValue(style.Name);
-				this.drawStyle(graphics, style, translateName);
-				this.defaultStyles.push(new AscCommon.CStyleImage(translateName, AscCommon.c_oAscStyleImage.Default,
+				this.drawStyle(graphics, style, AscCommon.translateManager.getValue(style.Name));
+				this.defaultStyles.push(new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Default,
 					_canvas.toDataURL("image/png"), style.uiPriority));
 			}
 		}
@@ -7505,7 +7503,7 @@ CStylesPainter.prototype =
 
 	GenerateDocumentStyles: function (_api)
 	{
-		if (_api.WordControl.m_oLogicDocument == null)
+		if (!_api.WordControl.m_oLogicDocument)
 		{
 			return;
 		}
@@ -7513,7 +7511,7 @@ CStylesPainter.prototype =
 		var __Styles = _api.WordControl.m_oLogicDocument.Get_Styles();
 		var styles = __Styles.Style;
 
-		if (styles == null)
+		if (!styles)
 		{
 			return;
 		}
@@ -7560,8 +7558,10 @@ CStylesPainter.prototype =
 				_dr_style.Name = style.Name;
 				_dr_style.Id = i;
 
-				this.drawStyle(graphics, _dr_style, style.Name);
-				this.docStyles[cur_index] = new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Document, _canvas.toDataURL("image/png"), style.uiPriority);
+				this.drawStyle(graphics, _dr_style,
+					styles.Is_StyleDefault(style.Name) ? AscCommon.translateManager.getValue(style.Name) : style.Name);
+				this.docStyles[cur_index] = new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Document,
+					_canvas.toDataURL("image/png"), style.uiPriority);
 
 				// алгоритм смены имени
 				if (style.Default)

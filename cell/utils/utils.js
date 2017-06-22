@@ -2015,7 +2015,6 @@
 		asc_CStylesPainter.prototype.generateDefaultStyles = function (cellStylesAll, fmgrGraphics, oFont, sr) {
 			var cellStyles = cellStylesAll.DefaultStyles;
 
-			var translateName;
 			var oCanvas = document.createElement('canvas');
 			oCanvas.width = this.styleThumbnailWidthWithRetina;
 			oCanvas.height = this.styleThumbnailHeightWithRetina;
@@ -2032,9 +2031,8 @@
 				// ToDo Возможно стоит переписать немного, чтобы не пробегать каждый раз по массиву custom-стилей (нужно генерировать AllStyles)
 				oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
-				translateName = AscCommon.translateManager.getValue(oStyle.Name);
-				this.drawStyle(oGraphics, sr, oCustomStyle || oStyle, translateName);
-				this.defaultStyles.push(new AscCommon.CStyleImage(translateName, AscCommon.c_oAscStyleImage.Default,
+				this.drawStyle(oGraphics, sr, oCustomStyle || oStyle, AscCommon.translateManager.getValue(oStyle.Name));
+				this.defaultStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Default,
 					oCanvas.toDataURL("image/png")));
 			}
 		};
