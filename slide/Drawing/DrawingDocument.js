@@ -5605,7 +5605,11 @@ function CNotesDrawer(page)
 
 	this.OnResize = function ()
 	{
-		this.HtmlPage.m_oLogicDocument.Notes_OnResize();
+		if(this.HtmlPage.m_oLogicDocument)
+		{
+            this.HtmlPage.m_oLogicDocument.Notes_OnResize();
+		}
+
 	};
 
 	this.GetNotesWidth = function()

@@ -518,6 +518,8 @@ function CPresentation(DrawingDocument)
     this.clrMru = [];
     this.prnPr  = null;
     this.showPr = null;
+
+    this.NotesWidth = -10;
 }
 
 CPresentation.prototype =
@@ -3941,6 +3943,33 @@ CPresentation.prototype =
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.resetSelection();
     },
+
+
+
+    ///NOTES
+    Notes_OnResize: function(){
+        if(!this.Slides[this.CurPage]){
+            return;
+        }
+        var newNotesWidth = this.DrawingDocument.Notes_GetWidth();
+        if(AscFormat.fApproxEqual(this.NotesWidth, newNotesWidth)){
+            return;
+        }
+        this.NotesWidth = newNotesWidth;
+        for(var i = 0; i < this.Slides.length; ++i){
+            this.Slides[i].recalculateNotesShape();
+        }
+        this.DrawingDocument.Notes_OnRecalculate(this.CurPage, newNotesWidth, this.Slides[this.CurPage].getNotesHeight());
+    },
+
+
+    Notes_GetHeight: function(){
+        if(!this.Slide[this.CurPage]){
+            return 0;
+        }
+        return this.Slides[this.CurPage].getNotesHeight();
+    },
+
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------

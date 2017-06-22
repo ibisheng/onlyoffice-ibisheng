@@ -1021,6 +1021,18 @@ Slide.prototype =
             this.cSld.spTree[i].recalculate();
     },
 
+    getNotesHeight: function(){
+        if(!this.notesShape){
+            return 0;
+        }
+
+        var oDocContent = this.notesShape.getDocContent();
+        if(oDocContent){
+            return oDocContent.Get_SummaryHeight();
+        }
+        return 0;
+    },
+
     recalculateNotesShape: function(){
         AscFormat.ExecuteNoHistory(function(){
             if(!this.notes){
