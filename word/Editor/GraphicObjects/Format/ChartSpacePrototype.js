@@ -36,11 +36,6 @@
 var CShape = AscFormat.CShape;
 var CChartSpace = AscFormat.CChartSpace;
 
-function getChartTranslateManager()
-{
-    return editor.chartTranslate;
-}
-
 CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransform;
 CChartSpace.prototype.recalculateBounds =  function()
 {
@@ -585,4 +580,3 @@ function CreateNoFillUniFill()
 window['AscFormat'].CreateUnifillSolidFillSchemeColor = CreateUnifillSolidFillSchemeColor;
 window['AscFormat'].CreateNoFillLine = CreateNoFillLine;
 window['AscFormat'].CreateNoFillUniFill = CreateNoFillUniFill;
-window['AscFormat'].getChartTranslateManager = getChartTranslateManager;

@@ -3879,6 +3879,45 @@ $( function () {
 
     } );
 
+	test( "Test: \"PERCENTILE.INC\"", function () {
+		ws.getRange2( "A2" ).setValue( "1" );
+		ws.getRange2( "A3" ).setValue( "2" );
+		ws.getRange2( "A4" ).setValue( "3" );
+		ws.getRange2( "A5" ).setValue( "4" );
+
+		oParser = new parserFormula( "PERCENTILE.INC(A2:A5,0.3)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1.9 );
+	} );
+
+	test( "Test: \"PERCENTILE.EXC\"", function () {
+		ws.getRange2( "A202" ).setValue( "1" );
+		ws.getRange2( "A203" ).setValue( "2" );
+		ws.getRange2( "A204" ).setValue( "3" );
+		ws.getRange2( "A205" ).setValue( "6" );
+		ws.getRange2( "A206" ).setValue( "6" );
+		ws.getRange2( "A207" ).setValue( "6" );
+		ws.getRange2( "A208" ).setValue( "7" );
+		ws.getRange2( "A209" ).setValue( "8" );
+		ws.getRange2( "A210" ).setValue( "9" );
+
+		oParser = new parserFormula( "PERCENTILE.EXC(A202:A210, 0.25)", "A1", ws );
+		ok( oParser.parse(), "PERCENTILE.EXC(A202:A210, 0.25)" );
+		strictEqual( oParser.calculate().getValue(), 2.5, "PERCENTILE.EXC(A202:A210, 0.25)" );
+
+		oParser = new parserFormula( "PERCENTILE.EXC(A202:A210, 0)", "A1", ws );
+		ok( oParser.parse(), "PERCENTILE.EXC(A202:A210, 0)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "PERCENTILE.EXC(A202:A210, 0)" );
+
+		oParser = new parserFormula( "PERCENTILE.EXC(A202:A210, 0.01)", "A1", ws );
+		ok( oParser.parse(), "PERCENTILE.EXC(A202:A210, 0.01)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "PERCENTILE.EXC(A202:A210, 0.01)" );
+
+		oParser = new parserFormula( "PERCENTILE.EXC(A202:A210, 2)", "A1", ws );
+		ok( oParser.parse(), "PERCENTILE.EXC(A202:A210, 2)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "PERCENTILE.EXC(A202:A210, 2)" );
+	} );
+
     test( "Test: \"PERCENTRANK\"", function () {
 
         function percentrank( A, x, k ) {
@@ -3935,7 +3974,61 @@ $( function () {
 
     } );
 
-    test( "Test: \"POISSON\"", function () {
+	test( "Test: \"PERCENTRANK.EXC\"", function () {
+		ws.getRange2( "A202" ).setValue( "1" );
+		ws.getRange2( "A203" ).setValue( "2" );
+		ws.getRange2( "A204" ).setValue( "3" );
+		ws.getRange2( "A205" ).setValue( "6" );
+		ws.getRange2( "A206" ).setValue( "6" );
+		ws.getRange2( "A207" ).setValue( "6" );
+		ws.getRange2( "A208" ).setValue( "7" );
+		ws.getRange2( "A209" ).setValue( "8" );
+		ws.getRange2( "A210" ).setValue( "9" );
+
+		oParser = new parserFormula( "PERCENTRANK.EXC(A202:A210, 7)", "A1", ws );
+		ok( oParser.parse(), "PERCENTRANK.EXC(A202:A210, 7)" );
+		strictEqual( oParser.calculate().getValue(), 0.7, "PERCENTRANK.EXC(A202:A210, 7)" );
+
+		oParser = new parserFormula( "PERCENTRANK.EXC(A202:A210, 5.43)", "A1", ws );
+		ok( oParser.parse(), "PERCENTRANK.EXC(A202:A210, 5.43)" );
+		strictEqual( oParser.calculate().getValue(), 0.381, "PERCENTRANK.EXC(A202:A210, 5.43)" );
+
+		oParser = new parserFormula( "PERCENTRANK.EXC(A202:A210, 5.43, 1)", "A1", ws );
+		ok( oParser.parse(), "PERCENTRANK.EXC(A202:A210, 5.43, 1)" );
+		strictEqual( oParser.calculate().getValue(), 0.3, "PERCENTRANK.EXC(A202:A210, 5.43, 1)" );
+	} );
+
+	test( "Test: \"PERCENTRANK.INC\"", function () {
+		ws.getRange2( "A202" ).setValue( "13" );
+		ws.getRange2( "A203" ).setValue( "12" );
+		ws.getRange2( "A204" ).setValue( "11" );
+		ws.getRange2( "A205" ).setValue( "8" );
+		ws.getRange2( "A206" ).setValue( "4" );
+		ws.getRange2( "A207" ).setValue( "3" );
+		ws.getRange2( "A208" ).setValue( "2" );
+		ws.getRange2( "A209" ).setValue( "1" );
+		ws.getRange2( "A210" ).setValue( "1" );
+		ws.getRange2( "A211" ).setValue( "1" );
+
+		oParser = new parserFormula( "PERCENTRANK.INC(A202:A211, 2)", "A1", ws );
+		ok( oParser.parse(), "PERCENTRANK.INC(A202:A211, 2)" );
+		strictEqual( oParser.calculate().getValue(), 0.333, "PERCENTRANK.INC(A202:A211, 2)" );
+
+		oParser = new parserFormula( "PERCENTRANK.INC(A202:A211, 4)", "A1", ws );
+		ok( oParser.parse(), "PERCENTRANK.INC(A202:A211, 4)" );
+		strictEqual( oParser.calculate().getValue(), 0.555, "PERCENTRANK.INC(A202:A211, 4)" );
+
+		oParser = new parserFormula( "PERCENTRANK.INC(A202:A211, 8)", "A1", ws );
+		ok( oParser.parse(), "PERCENTRANK.INC(A202:A211, 8)" );
+		strictEqual( oParser.calculate().getValue(), 0.666, "PERCENTRANK.INC(A202:A211, 8)" );
+
+		oParser = new parserFormula( "PERCENTRANK.INC(A202:A211, 5)", "A1", ws );
+		ok( oParser.parse(), "PERCENTRANK.INC(A202:A211, 5)" );
+		strictEqual( oParser.calculate().getValue(), 0.583, "PERCENTRANK.INC(A202:A211, 5)" );
+	} );
+
+
+	test( "Test: \"POISSON\"", function () {
 
         function poisson( x, l, cumulativeFlag ) {
             var _x = parseInt( x ), _l = l, f = cumulativeFlag;

@@ -61,8 +61,8 @@
 		cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS,
 		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cFORECAST_LINEAR,
 		cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL,
-		cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERCENTILE_EXC, cPERCENTILE_INC,
-		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC,
+		cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST, cNORM_S_INV,
+		cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC,
 		cSKEW_P, cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_P,
 		cVAR_S, cWEIBULL_DIST, cZ_TEST);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
@@ -79,8 +79,8 @@
 		cERF_PRECISE, cERFC_PRECISE, cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST, cBINOM_DIST_RANGE, cBINOM_INV, cCHISQ_TEST,
 		cCONFIDENCE_NORM, cCONFIDENCE_T, cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cFORECAST_LINEAR, cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL,
-		cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERCENTILE_EXC, cPERCENTILE_INC,
-		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC,
+		cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST, cNORM_S_INV,
+		cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC,
 		cSKEW_P, cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_P, cVAR_S, cWEIBULL_DIST, cZ_TEST, cPDURATION, cRRI,
 		cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
 
@@ -551,54 +551,6 @@
 
 	cPDURATION.prototype = Object.create(cBaseFunction.prototype);
 	cPDURATION.prototype.constructor = cPDURATION;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cPERCENTILE_EXC() {
-		cBaseFunction.call(this, "PERCENTILE.EXC");
-		this.isXLFN = true;
-	}
-
-	cPERCENTILE_EXC.prototype = Object.create(cBaseFunction.prototype);
-	cPERCENTILE_EXC.prototype.constructor = cPERCENTILE_EXC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cPERCENTILE_INC() {
-		cBaseFunction.call(this, "PERCENTILE.INC");
-		this.isXLFN = true;
-	}
-
-	cPERCENTILE_INC.prototype = Object.create(cBaseFunction.prototype);
-	cPERCENTILE_INC.prototype.constructor = cPERCENTILE_INC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cPERCENTRANK_EXC() {
-		cBaseFunction.call(this, "PERCENTRANK.EXC");
-		this.isXLFN = true;
-	}
-
-	cPERCENTRANK_EXC.prototype = Object.create(cBaseFunction.prototype);
-	cPERCENTRANK_EXC.prototype.constructor = cPERCENTRANK_EXC;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cPERCENTRANK_INC() {
-		cBaseFunction.call(this, "PERCENTRANK.INC");
-		this.isXLFN = true;
-	}
-
-	cPERCENTRANK_INC.prototype = Object.create(cBaseFunction.prototype);
-	cPERCENTRANK_INC.prototype.constructor = cPERCENTRANK_INC;
 
 	/**
 	 * @constructor

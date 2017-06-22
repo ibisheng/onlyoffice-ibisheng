@@ -2733,27 +2733,36 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 			{
 				this.Remove_PresentationNumbering();
 			}
-			else if (align_Right === Pr.Jc)
+			else if(this.bFromDocument)
 			{
-				this.Set_Align(align_Center);
-			}
-			else if (align_Center === Pr.Jc)
-			{
-				this.Set_Align(align_Left);
-			}
-			else if (Math.abs(Pr.Ind.FirstLine) > 0.001)
-			{
-				if (Pr.Ind.FirstLine > 0)
-					this.Set_Ind({FirstLine : 0}, false);
-				else
-					this.Set_Ind({Left : Pr.Ind.Left + Pr.Ind.FirstLine, FirstLine : 0}, false);
-			}
-			else if (Math.abs(Pr.Ind.Left) > 0.001)
-			{
-				this.Set_Ind({Left : 0}, false);
+             	if (align_Right === Pr.Jc)
+                {
+                    this.Set_Align(align_Center);
+                }
+                else if (align_Center === Pr.Jc)
+                {
+                    this.Set_Align(align_Left);
+                }
+                else if (Math.abs(Pr.Ind.FirstLine) > 0.001)
+                {
+                    if (Pr.Ind.FirstLine > 0)
+                        this.Set_Ind({FirstLine : 0}, false);
+                    else
+                        this.Set_Ind({Left : Pr.Ind.Left + Pr.Ind.FirstLine, FirstLine : 0}, false);
+                }
+                else if (Math.abs(Pr.Ind.Left) > 0.001)
+                {
+                    this.Set_Ind({Left : 0}, false);
+                }
+                else
+				{
+                    Result = false;
+				}
 			}
 			else
-				Result = false;
+			{
+                Result = false;
+			}
 		}
 	}
 
@@ -5214,7 +5223,7 @@ Paragraph.prototype.Correct_Content = function(_StartPos, _EndPos, bDoNotDeleteE
 	{
 		var CurElement = this.Content[CurPos];
 
-		if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
+		if ((para_Hyperlink === CurElement.Type || para_Math === CurElement.Type || para_Field === CurElement.Type || para_InlineLevelSdt === CurElement.Type) && true === CurElement.Is_Empty() && true !== CurElement.Is_CheckingNearestPos())
 		{
 			this.Internal_Content_Remove(CurPos);
 		}
@@ -10856,6 +10865,65 @@ Paragraph.prototype.GetLastRangeVisibleBounds = function()
 	var XLimit = this.Pages[CurPage].XLimit - this.Get_CompiledPr2(false).ParaPr.Ind.Right
 
 	return {X : X, Y : Y, W : W, H : H, BaseLine : B, XLimit : XLimit};
+};
+Paragraph.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	var nCurPos = this.Selection.Use === true ? this.Selection.StartPos : this.CurPos.ContentPos;
+
+	var nStartPos = 0, nEndPos = 0;
+	if (isCurrent)
+	{
+		if (isStart)
+		{
+			nStartPos = nCurPos;
+			nEndPos   = isNext ? this.Content.length - 1 : 0;
+		}
+		else
+		{
+			nStartPos = isNext ? 0 : this.Content.length - 1;
+			nEndPos   = nCurPos;
+		}
+	}
+	else
+	{
+		if (isNext)
+		{
+			nStartPos = 0;
+			nEndPos   = this.Content.length - 1;
+		}
+		else
+		{
+			nStartPos = this.Content.length - 1;
+			nEndPos   = 0;
+		}
+	}
+
+	if (isNext)
+	{
+		for (var nIndex = nStartPos; nIndex <= nEndPos; ++nIndex)
+		{
+			if (this.Content[nIndex].FindNextFillingForm)
+			{
+				var oRes = this.Content[nIndex].FindNextFillingForm(true, isCurrent && nIndex === nCurPos ? true : false, isStart);
+				if (oRes)
+					return oRes;
+			}
+		}
+	}
+	else
+	{
+		for (var nIndex = nStartPos; nIndex >= nEndPos; --nIndex)
+		{
+			if (this.Content[nIndex].FindNextFillingForm)
+			{
+				var oRes = this.Content[nIndex].FindNextFillingForm(false, isCurrent && nIndex === nCurPos ? true : false, isStart);
+				if (oRes)
+					return oRes;
+			}
+		}
+	}
+
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 Paragraph.prototype.private_ResetSelection = function()

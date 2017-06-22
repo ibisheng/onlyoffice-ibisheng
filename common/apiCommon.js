@@ -121,6 +121,7 @@
 		View    : 4
 	};
 
+	/** @constructor */
 	function asc_CSignatureLine()
 	{
 		this.id = undefined;
@@ -1273,6 +1274,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CTextBorder(obj) {
 		if (obj) {
 			if (obj.Color instanceof asc_CColor) {
@@ -1324,6 +1326,7 @@
 		this.ForSelectedCells = v;
 	};
 
+	/** @constructor */
 	function asc_CParagraphBorders(obj) {
 
 		if (obj) {
@@ -1365,6 +1368,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CListType(obj) {
 
 		if (obj) {
@@ -1383,6 +1387,7 @@
 		return this.SubType;
 	};
 
+	/** @constructor */
 	function asc_CTextFontFamily(obj) {
 
 		if (obj) {
@@ -1475,6 +1480,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CParagraphFrame(obj) {
 		if (obj) {
 			this.FromDropCapMenu = false;
@@ -2027,6 +2033,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_TextArtProperties(obj) {
 		if (obj) {
 			this.Fill = obj.Fill;//asc_Fill
@@ -2064,48 +2071,6 @@
 	};
 	asc_TextArtProperties.prototype.asc_getStyle = function () {
 		return this.Style;
-	};
-
-	/** @constructor */
-	function asc_CChartTranslate() {
-		this.title = "Diagram Title";
-		this.xAxis = "X Axis";
-		this.yAxis = "Y Axis";
-		this.series = "Series";
-	}
-
-	asc_CChartTranslate.prototype = {
-		asc_getTitle: function () {
-			return this.title;
-		}, asc_setTitle: function (val) {
-			this.title = val;
-		},
-
-		asc_getXAxis: function () {
-			return this.xAxis;
-		}, asc_setXAxis: function (val) {
-			this.xAxis = val;
-		},
-
-		asc_getYAxis: function () {
-			return this.yAxis;
-		}, asc_setYAxis: function (val) {
-			this.yAxis = val;
-		},
-
-		asc_getSeries: function () {
-			return this.series;
-		}, asc_setSeries: function (val) {
-			this.series = val;
-		}
-	};
-
-	function asc_TextArtTranslate() {
-		this.DefaultText = "Your text here";
-	}
-
-	asc_TextArtTranslate.prototype.asc_setDefaultText = function (sText) {
-		this.DefaultText = sText;
 	};
 
 	function CImagePositionH(obj) {
@@ -2572,6 +2537,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CShapeFill() {
 		this.type = null;
 		this.fill = null;
@@ -2600,8 +2566,9 @@
 			}
 			return false;
 		}
-	}
+	};
 
+	/** @constructor */
 	function asc_CFillBlip() {
 		this.type = c_oAscFillBlipType.STRETCH;
 		this.url = "";
@@ -2622,8 +2589,9 @@
 		}, asc_putTextureId: function (v) {
 			this.texture_id = v;
 		}
-	}
+	};
 
+	/** @constructor */
 	function asc_CFillHatch() {
 		this.PatternType = undefined;
 		this.fgClr = undefined;
@@ -2646,6 +2614,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CFillGrad() {
 		this.Colors = undefined;
 		this.Positions = undefined;
@@ -2685,6 +2654,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CFillSolid() {
 		this.color = new asc_CColor();
 	}
@@ -2697,6 +2667,7 @@
 		}
 	};
 
+	/** @constructor */
 	function asc_CStroke() {
 		this.type = null;
 		this.width = null;
@@ -3141,6 +3112,7 @@
 	};
 
 
+	/** @constructor */
     function asc_CSpellCheckProperty(Word, Checked, Variants, ParaId, ElemId)
     {
         this.Word     = Word;
@@ -3621,21 +3593,6 @@
 	prot["asc_getForm"] = prot.asc_getForm;
 	prot["asc_putStyle"] = prot.asc_putStyle;
 	prot["asc_getStyle"] = prot.asc_getStyle;
-
-	window["Asc"]["asc_CChartTranslate"] = window["Asc"].asc_CChartTranslate = asc_CChartTranslate;
-	prot = asc_CChartTranslate.prototype;
-	prot["asc_getTitle"] = prot.asc_getTitle;
-	prot["asc_setTitle"] = prot.asc_setTitle;
-	prot["asc_getXAxis"] = prot.asc_getXAxis;
-	prot["asc_setXAxis"] = prot.asc_setXAxis;
-	prot["asc_getYAxis"] = prot.asc_getYAxis;
-	prot["asc_setYAxis"] = prot.asc_setYAxis;
-	prot["asc_getSeries"] = prot.asc_getSeries;
-	prot["asc_setSeries"] = prot.asc_setSeries;
-
-	window["Asc"]["asc_TextArtTranslate"] = window["Asc"].asc_TextArtTranslate = asc_TextArtTranslate;
-	prot = asc_TextArtTranslate.prototype;
-	prot["asc_setDefaultText"] = prot.asc_setDefaultText;
 
 	window['Asc']['CImagePositionH'] = window["Asc"].CImagePositionH = CImagePositionH;
 	prot = CImagePositionH.prototype;

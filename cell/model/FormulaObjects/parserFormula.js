@@ -2435,22 +2435,21 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		for(var i = 0; i < args.length; i++){
 			var arg = args[i];
 
-			if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
-				if(typeArray && cElementType.array === typeArray[i]){
-					newArgs[i] = arg;
-				}else{
-					newArgs[i] = arg.cross(arg1);
+			//для массивов отдельная ветка
+			if(typeArray && cElementType.array === typeArray[i])
+			{
+				if (cElementType.cellsRange === arg.type || cElementType.array === arg.type) {
+					newArgs[i] = arg.getMatrix();
+				} else if (cElementType.cellsRange3D === arg.type) {
+					newArgs[i] = arg.getMatrix()[0];
+				} else {
+					newArgs[i] = new cError(cErrorType.not_available);
 				}
+			}else if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
+				newArgs[i] = arg.cross(arg1);
 			}else if(cElementType.array === arg.type){
 				if(bAddFirstArrElem){
-					if(typeArray && cElementType.array === typeArray[i]){
-						newArgs[i] = [];
-						arg.foreach(function (elem) {
-							newArgs[i].push(elem);
-						});
-					}else{
-						newArgs[i] = arg.getElementRowCol(0,0);
-					}
+					newArgs[i] = arg.getElementRowCol(0,0);
 				}else{
 					indexArr = i;
 					newArgs[i] = arg;

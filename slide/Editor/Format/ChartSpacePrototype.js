@@ -37,12 +37,6 @@ var CShape = AscFormat.CShape;
 var CChartSpace = AscFormat.CChartSpace;
 var CreateUnifillSolidFillSchemeColor = AscFormat.CreateUnifillSolidFillSchemeColor;
 
-function getChartTranslateManager()
-{
-    return editor.chartTranslate;
-}
-
-
 CChartSpace.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObjects;
 CChartSpace.prototype.setDrawingObjects = CShape.prototype.setDrawingObjects;
 CChartSpace.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
@@ -674,7 +668,3 @@ CTablePr.prototype.Init_Default = function()
     this.TableW                = new CTableMeasurement(tblwidth_Auto, 0);
     this.TableLayout           = tbllayout_AutoFit;
 };
-
-//----------------------------------------------------------export----------------------------------------------------
-window['AscFormat'] = window['AscFormat'] || {};
-window['AscFormat'].getChartTranslateManager = getChartTranslateManager;

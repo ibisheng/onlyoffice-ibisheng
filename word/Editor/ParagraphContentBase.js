@@ -2230,6 +2230,9 @@ CParagraphContentWithParagraphLikeContent.prototype.Selection_DrawRange = functi
 };
 CParagraphContentWithParagraphLikeContent.prototype.IsSelectionEmpty = function(CheckEnd)
 {
+	if (this.Content.length <= 0)
+		return true;
+
     var StartPos = this.State.Selection.StartPos;
     var EndPos   = this.State.Selection.EndPos;
 
@@ -2753,6 +2756,7 @@ CParagraphContentWithParagraphLikeContent.prototype.SelectThisElement = function
 
 	this.Paragraph.Selection.Use   = true;
 	this.Paragraph.Selection.Start = false;
+	this.Paragraph.Set_ParaContentPos(StartPos, true, -1, -1);
 	this.Paragraph.Set_SelectionContentPos(StartPos, EndPos, false);
 	this.Paragraph.Document_SetThisElementCurrent(false);
 
@@ -2806,6 +2810,65 @@ CParagraphContentWithParagraphLikeContent.prototype.ReplaceAllWithText = functio
 	this.Remove_FromContent(0, this.Content.length);
 	this.Add_ToContent(0, oRun);
 	this.MoveCursorToStartPos();
+};
+CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	var nCurPos = this.Selection.Use === true ? this.Selection.EndPos : this.State.ContentPos;
+
+	var nStartPos = 0, nEndPos = 0;
+	if (isCurrent)
+	{
+		if (isStart)
+		{
+			nStartPos = nCurPos;
+			nEndPos   = isNext ? this.Content.length - 1 : 0;
+		}
+		else
+		{
+			nStartPos = isNext ? 0 : this.Content.length - 1;
+			nEndPos   = nCurPos;
+		}
+	}
+	else
+	{
+		if (isNext)
+		{
+			nStartPos = 0;
+			nEndPos   = this.Content.length - 1;
+		}
+		else
+		{
+			nStartPos = this.Content.length - 1;
+			nEndPos   = 0;
+		}
+	}
+
+	if (isNext)
+	{
+		for (var nIndex = nStartPos; nIndex <= nEndPos; ++nIndex)
+		{
+			if (this.Content[nIndex].FindNextFillingForm)
+			{
+				var oRes = this.Content[nIndex].FindNextFillingForm(true, isCurrent && nIndex === nCurPos ? true : false, isStart);
+				if (oRes)
+					return oRes;
+			}
+		}
+	}
+	else
+	{
+		for (var nIndex = nStartPos; nIndex >= nEndPos; --nIndex)
+		{
+			if (this.Content[nIndex].FindNextFillingForm)
+			{
+				var oRes = this.Content[nIndex].FindNextFillingForm(false, isCurrent && nIndex === nCurPos ? true : false, isStart);
+				if (oRes)
+					return oRes;
+			}
+		}
+	}
+
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках

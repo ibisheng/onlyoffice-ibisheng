@@ -3380,7 +3380,7 @@ CAreaSeries.prototype =
                 return this.tx.strRef.strCache.pts[0].val;
             }
         }
-        return AscFormat.getChartTranslateManager().asc_getSeries() + " " + (this.idx + 1) ;
+        return AscCommon.translateManager.getValue('Series') + " " + (this.idx + 1);
     },
 
     getCatName: function(idx)
@@ -12396,6 +12396,7 @@ CTitle.prototype =
 
     getDefaultTextForTxBody: function()
     {
+        var key = 'Axis Title';
         if(this.parent)
         {
             if(this.parent.getObjectType() === AscDFH.historyitem_type_Chart)
@@ -12414,21 +12415,21 @@ CTitle.prototype =
                         return oTx.strRef.strCache.pts[0].val;
                     }
                 }
-                return AscFormat.getChartTranslateManager().asc_getTitle();
+				key = 'Diagram Title';
             }
             else
             {
                 if(this.parent.axPos === AX_POS_B || this.parent.axPos === AX_POS_T)
                 {
-                    return AscFormat.getChartTranslateManager().asc_getXAxis();
+                    key = 'X Axis';
                 }
                 else
                 {
-                    return AscFormat.getChartTranslateManager().asc_getYAxis();
+					key = 'Y Axis';
                 }
             }
         }
-        return "Axis Title";
+		return AscCommon.translateManager.getValue(key);
     },
 
     getStyles: CDLbl.prototype.getStyles,

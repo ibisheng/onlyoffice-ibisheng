@@ -719,9 +719,9 @@ CChartsDrawer.prototype =
 		var valAx = chartSpace.chart.plotArea.valAx;
 		if(chartSpace.chart.plotArea.valAx && /*chartSpace.chart.plotArea.valAx.labels &&*/ this.calcProp.widthCanvas != undefined)
 		{
-			if(isHBar)
+			if(isHBar && valAx.xPoints)
 			{
-				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX && valAx.xPoints)
+				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
 					calculateLeft  = valAx.xPoints[0].pos;
 					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[valAx.xPoints.length - 1].pos;

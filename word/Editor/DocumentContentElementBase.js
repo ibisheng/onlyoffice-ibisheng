@@ -654,6 +654,10 @@ CDocumentContentElementBase.prototype.GetLastRangeVisibleBounds = function()
 		XLimit   : 0
 	};
 };
+CDocumentContentElementBase.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

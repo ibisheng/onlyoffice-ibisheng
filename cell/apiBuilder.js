@@ -1208,7 +1208,7 @@
 		if(this.Chart){
             var chart = this.Chart.chart;
             var plot_area = chart.plotArea;
-            var oCurChartSettings = AscFormat.DrawingObjectsController.prototype.getPropsFromChart.call(null, this.Chart);
+            var oCurChartSettings = AscFormat.DrawingObjectsController.prototype.getPropsFromChart.call(AscFormat.DrawingObjectsController.prototype, this.Chart);
             var _cur_type = oCurChartSettings.type;
             if(AscCommon.g_oChartPresets[_cur_type] && AscCommon.g_oChartPresets[_cur_type][nStyleIndex]){
                 plot_area.removeCharts(1, plot_area.charts.length - 1);
