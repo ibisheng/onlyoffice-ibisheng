@@ -5424,6 +5424,7 @@ function CNotesDrawer(page)
 
 	this.fontManager = new AscFonts.CFontManager();
 	this.fontManager.Initialize(true);
+	this.fontManager.SetHintsProps(true, true);
 
 	var oThis = this;
 
@@ -5480,7 +5481,7 @@ function CNotesDrawer(page)
 		if (-1 == this.Slide)
 			return;
 
-		var dKoef = g_dKoef_mm_to_pix / 100;
+		var dKoef = g_dKoef_mm_to_pix;
 		if (this.HtmlPage.bIsRetinaSupport)
 			dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
 
@@ -5497,7 +5498,7 @@ function CNotesDrawer(page)
 			g.IsRetina = true;
 
 		g.m_oCoordTransform.tx = this.OffsetX;
-		g.m_oCoordTransform.ty = this.OffsetY;
+		g.m_oCoordTransform.ty = this.OffsetY - this.HtmlPage.m_oScrollNotes_.scroller.y;
 		g.transform(1, 0, 0, 1, 0, 0);
 
 		g.IsNoDrawingEmptyPlaceholderText = true;
@@ -5561,7 +5562,7 @@ function CNotesDrawer(page)
 
 			this.HtmlPage.m_oScrollNotes_.bind("scrollvertical", function (evt)
 			{
-				// TODO:
+				oThis.IsRepaint = true;
 			});
 		}
 	};
@@ -5605,11 +5606,11 @@ function CNotesDrawer(page)
 
 	this.OnResize = function ()
 	{
-		if(this.HtmlPage.m_oLogicDocument)
+		if (this.HtmlPage.m_oLogicDocument)
 		{
             this.HtmlPage.m_oLogicDocument.Notes_OnResize();
+            this.IsRepaint = true;
 		}
-
 	};
 
 	this.GetNotesWidth = function()
