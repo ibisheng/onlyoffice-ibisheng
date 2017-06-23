@@ -2498,9 +2498,24 @@
 	cCRITBINOM.prototype.argumentsMin = 3;
 	cCRITBINOM.prototype.argumentsMax = 3;
 	cCRITBINOM.prototype.Calculate = function (arg) {
-		var n = arg[0], p = arg[1], alpha = arg[2];                    // alpha
+		
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
 
-		function critbinom(n, p, alpha) {
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function critbinom(argArray) {
+			var n = argArray[0];
+			var p = argArray[1];
+			var alpha = argArray[2];
+
 			if (n < 0 || alpha <= 0 || alpha >= 1 || p < 0 || p > 1) {
 				return new cError(cErrorType.not_numeric);
 			} else {
@@ -2532,40 +2547,7 @@
 			}
 		}
 
-		if (alpha instanceof cArea || alpha instanceof cArea3D) {
-			alpha = alpha.cross(arguments[1]);
-		} else if (alpha instanceof cArray) {
-			alpha = alpha.getElement(0);
-		}
-
-		if (n instanceof cArea || n instanceof cArea3D) {
-			n = n.cross(arguments[1]);
-		} else if (n instanceof cArray) {
-			n = n.getElement(0);
-		}
-
-		if (p instanceof cArea || p instanceof cArea3D) {
-			p = p.cross(arguments[1]);
-		} else if (p instanceof cArray) {
-			p = p.getElement(0);
-		}
-
-		alpha = alpha.tocNumber();
-		n = n.tocNumber();
-		p = p.tocNumber();
-
-		if (alpha instanceof cError) {
-			return this.value = alpha;
-		}
-		if (n instanceof cError) {
-			return this.value = n;
-		}
-		if (p instanceof cError) {
-			return this.value = p;
-		}
-
-		return this.value = critbinom(n, p, alpha);
-
+		return this.value = this._findArrayInNumberArguments(oArguments, critbinom);
 	};
 
 	/**
