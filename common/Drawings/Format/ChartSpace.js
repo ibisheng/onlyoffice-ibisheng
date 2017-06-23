@@ -5165,7 +5165,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else
                             {
-                                string_pts.push({val: i + ""});
+                                string_pts.push({val: /*i + */""});
                             }
                         }
                     }
