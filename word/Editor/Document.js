@@ -8862,6 +8862,18 @@ CDocument.prototype.AddComment = function(CommentData)
 };
 CDocument.prototype.EditComment = function(Id, CommentData)
 {
+	if (!this.Comments.IsUseSolved() && this.Comments.Get_CurrentId() === Id)
+	{
+		var oComment = this.Comments.Get_ById(Id);
+		if (oComment && !oComment.IsSolved() && CommentData.IsSolved())
+		{
+			this.Comments.Set_Current(null);
+			this.Api.sync_HideComment();
+			this.DrawingDocument.ClearCachePages();
+			this.DrawingDocument.FirePaint();
+		}
+	}
+
 	this.Comments.Set_CommentData(Id, CommentData);
 	this.Document_UpdateInterfaceState();
 };
