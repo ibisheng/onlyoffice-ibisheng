@@ -53,6 +53,7 @@
       var c_oAscPageOrientation = Asc.c_oAscPageOrientation;
     
     var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
+	var g_StyleCache = AscCommonExcel.g_StyleCache;
 
 //dif:
 //Version:2 добавлены свойства колонок и строк CustomWidth, CustomHeight(раньше считались true)
@@ -4920,49 +4921,32 @@
         };
         this.InitStyleManager = function (oStyleObject)
         {
-			for (var i = 0; i < oStyleObject.aFonts; ++i) {
-				this.wb.oStyleManager.addFont(oStyleObject.aFonts[i], true);
+			for (var i = 0; i < oStyleObject.aFonts.length; ++i) {
+				oStyleObject.aFonts[i] = g_StyleCache.addFont(oStyleObject.aFonts[i]);
 			}
-			for (var i = 0; i < oStyleObject.aFills; ++i) {
-				this.wb.oStyleManager.addFill(oStyleObject.aFills[i], true);
+			for (var i = 0; i < oStyleObject.aFills.length; ++i) {
+				oStyleObject.aFills[i] = g_StyleCache.addFill(oStyleObject.aFills[i]);
 			}
-			for (var i = 0; i < oStyleObject.aBorders; ++i) {
-				this.wb.oStyleManager.addBorder(oStyleObject.aBorders[i], true);
+			for (var i = 0; i < oStyleObject.aBorders.length; ++i) {
+				oStyleObject.aBorders[i] = g_StyleCache.addBorder(oStyleObject.aBorders[i]);
 			}
 			for (var numFmt in oStyleObject.oNumFmts) {
-				this.wb.oStyleManager.addNum(oStyleObject.oNumFmts[numFmt], true);
+				oStyleObject.oNumFmts[i] = g_StyleCache.addNum(oStyleObject.oNumFmts[numFmt]);
 			}
 			for (var XfIdTmp in oStyleObject.aCellStyleXfs) {
 				var xf = oStyleObject.aCellStyleXfs[XfIdTmp];
 				if (xf.align) {
-					xf.align = this.wb.oStyleManager.addAlign(xf.align);
+					xf.align = g_StyleCache.addAlign(xf.align);
 				}
 			}
 			for (var i = 0; i < oStyleObject.aCellXfs; ++i) {
 				var xf = oStyleObject.aCellXfs[i];
 				if (xf.align) {
-					xf.align = this.wb.oStyleManager.addAlign(xf.align);
+					xf.align = g_StyleCache.addAlign(xf.align);
 				}
 			}
 			for (var i = 0; i < this.Dxfs.length; ++i) {
-				var xf = this.Dxfs[i];
-				if (xf.font) {
-					this.wb.oStyleManager.addFont(xf.font);
-				}
-				if (xf.fill) {
-					this.wb.oStyleManager.addFill(xf.fill);
-				}
-				if (xf.border) {
-					this.wb.oStyleManager.addBorder(xf.border);
-				}
-				//todo
-				if (xf.num) {
-					this.wb.oStyleManager.addNum(xf.num);
-				}
-				if (xf.align) {
-					xf.align = this.wb.oStyleManager.addAlign(xf.align);
-				}
-				this.Dxfs[i] = this.wb.oStyleManager.addXf(this.Dxfs[i]);
+				this.Dxfs[i] = g_StyleCache.addXf(this.Dxfs[i], true);
 			}
 
             // ToDo убрать - это заглушка
@@ -5042,7 +5026,7 @@
                 if (null !== oCellStyleXfs.ApplyNumberFormat)
                     oCellStyle.ApplyNumberFormat = oCellStyleXfs.ApplyNumberFormat;
 
-				oCellStyle.xfs = this.wb.oStyleManager.addXf(newXf);
+				oCellStyle.xfs = g_StyleCache.addXf(newXf);
                 // ToDo при отсутствии имени все не очень хорошо будет!
                 this.wb.CellStyles.CustomStyles.push(oCellStyle);
                 if (null !== oCellStyle.Name)
@@ -5109,7 +5093,7 @@
 
                 if(0 == this.aCellXfs.length && !this.isCopyPaste)
                     this.oStyleManager.init(newXf, this.wb);
-                this.aCellXfs.push(this.wb.oStyleManager.addXf(newXf));
+                this.aCellXfs.push(g_StyleCache.addXf(newXf));
             }
             for(var i in oStyleObject.oCustomTableStyles)
             {
@@ -8162,7 +8146,6 @@
         var oBinary_StylesTableReader = new Binary_StylesTableReader(stream, wb, [], []);
 
         var length = stream.GetULongLE();
-        var styleManager = wb.oStyleManager;
 
         var fReadStyle = function(type, length, oCellStyle, oStyleObject) {
             var res = c_oSerConstants.ReadOk;
@@ -8216,20 +8199,20 @@
                 var newXf = new AscCommonExcel.CellXfs();
                 // Border
                 if (null !== oStyleObject.border)
-					newXf.border = styleManager.addBorder(oStyleObject.border);
+					newXf.border = g_StyleCache.addBorder(oStyleObject.border);
                 // Fill
                 if (null !== oStyleObject.fill)
-					newXf.fill = styleManager.addFill(oStyleObject.fill);
+					newXf.fill = g_StyleCache.addFill(oStyleObject.fill);
                 // Font
                 if (null !== oStyleObject.font)
-					newXf.font = styleManager.addFont(oStyleObject.font);
+					newXf.font = g_StyleCache.addFont(oStyleObject.font);
                 // NumFmt
                 if (null !== oStyleObject.xfs.numid) {
                     var oCurNum = oStyleObject.oNumFmts[oStyleObject.xfs.numid];
                     if(null != oCurNum)
-						newXf.num = oBinary_StylesTableReader.ParseNum(oCurNum, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(oBinary_StylesTableReader.ParseNum(oCurNum, oStyleObject.oNumFmts));
                     else
-						newXf.num = oBinary_StylesTableReader.ParseNum({id: oStyleObject.xfs.numid, f: null}, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(oBinary_StylesTableReader.ParseNum({id: oStyleObject.xfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
                 // QuotePrefix
                 if(null != oStyleObject.xfs.QuotePrefix)
@@ -8239,7 +8222,7 @@
 					newXf.PivotButton = oStyleObject.xfs.PivotButton;
                 // align
                 if(null != oStyleObject.xfs.align)
-					newXf.align = styleManager.addAlign(oStyleObject.xfs.align);
+					newXf.align = g_StyleCache.addAlign(oStyleObject.xfs.align);
                 // XfId
                 if (null !== oStyleObject.xfs.XfId)
 					newXf.XfId = oStyleObject.xfs.XfId;
@@ -8255,7 +8238,7 @@
                 // ApplyNumberFormat (ToDo возможно это свойство должно быть в xfs)
                 if (null !== oStyleObject.xfs.ApplyNumberFormat)
                     oCellStyle.ApplyNumberFormat = oStyleObject.xfs.ApplyNumberFormat;
-                oCellStyle.xfs =styleManager.addXf(newXf);
+                oCellStyle.xfs = g_StyleCache.addXf(newXf);
 
                 oOutput.push(oCellStyle);
             } else
@@ -8392,23 +8375,7 @@
 	};
 	CT_Stylesheet.prototype.onEndNode = function(prevContext, elem) {
 		if ("dxf" === elem) {
-			var dxf = prevContext.xf;
-			if(dxf.font){
-				dxf.font = openXml.SaxParserDataTransfer.wb.oStyleManager.addFont(dxf.font);
-			}
-			if(dxf.fill){
-				dxf.fill = openXml.SaxParserDataTransfer.wb.oStyleManager.addFill(dxf.fill);
-			}
-			if(dxf.border){
-				dxf.border = openXml.SaxParserDataTransfer.wb.oStyleManager.addBorder(dxf.border);
-			}
-			if(dxf.num){
-				dxf.num = openXml.SaxParserDataTransfer.wb.oStyleManager.addNum(dxf.num);
-			}
-			if(dxf.align){
-				dxf.align = openXml.SaxParserDataTransfer.wb.oStyleManager.addAlign(dxf.align);
-			}
-			this.dxfs.push(openXml.SaxParserDataTransfer.wb.oStyleManager.addXf(dxf));
+			this.dxfs.push(g_StyleCache.addXf(prevContext.xf, true));
 		}
 	};
 

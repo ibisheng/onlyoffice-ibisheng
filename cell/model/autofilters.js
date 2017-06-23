@@ -1760,24 +1760,21 @@
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
-					var styleManager = this.worksheet.workbook.oStyleManager;
 					var newDxf = new AscCommonExcel.CellXfs();
 
 					if(type === Asc.c_oAscSortOptions.ByColorFill)
 					{
-						var newFill = new AscCommonExcel.Fill();
-						newFill.bg = color;
-						newDxf.fill = styleManager.addFill(newFill);
+						newDxf.fill = new AscCommonExcel.Fill();
+						newDxf.fill.bg = color;
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyCellColor;
 					}
 					else
 					{
-						var newFont = new AscCommonExcel.Font();
-						newFont.setColor(color);
-						newDxf.font = styleManager.addFont(newFont);
+						newDxf.font = new AscCommonExcel.Font();
+						newDxf.font.setColor(color);
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyFontColor;
 					}
-					curFilter.SortState.SortConditions[0].dxf = styleManager.addXf(newDxf);
+					curFilter.SortState.SortConditions[0].dxf = AscCommonExcel.g_StyleCache.addXf(newDxf, true);
 					if(curFilter.TableStyleInfo)
 					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);

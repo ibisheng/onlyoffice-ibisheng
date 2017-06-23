@@ -2933,7 +2933,7 @@
 		for (var j = 0; j < col; j++)
 		{
 			var color = null;
-			var curStyle = AscCommonExcel.getCompiledStyle(this.model.oStyleManager, sheetMergedStyles, hiddenManager, i, j);
+			var curStyle = AscCommonExcel.getCompiledStyle(sheetMergedStyles, hiddenManager, i, j);
 			
 			//fill
 			if(curStyle && curStyle.fill && curStyle.fill.bg)

@@ -60,6 +60,7 @@
 	var UndoRedoData_SheetAdd = AscCommonExcel.UndoRedoData_SheetAdd;
 	var UndoRedoData_DefinedNames = AscCommonExcel.UndoRedoData_DefinedNames;
 	var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
+	var g_StyleCache = AscCommonExcel.g_StyleCache;
 	var Border = AscCommonExcel.Border;
 	var RangeDataManagerElem = AscCommonExcel.RangeDataManagerElem;
 	var RangeDataManager = AscCommonExcel.RangeDataManager;
@@ -147,32 +148,32 @@
 	}
 
 	function getCompiledStyleWs(ws, row, col, opt_cell, opt_styleComponents) {
-		return getCompiledStyle(ws.workbook.oStyleManager, ws.sheetMergedStyles, ws.hiddenManager, row, col, opt_cell, opt_styleComponents);
+		return getCompiledStyle(ws.sheetMergedStyles, ws.hiddenManager, row, col, opt_cell, opt_styleComponents);
 	}
 	function getCompiledStyleComponentsWs(ws, row, col) {
-		return ws.sheetMergedStyles.getStyle(ws.workbook.oStyleManager, ws.hiddenManager, row, col);
+		return ws.sheetMergedStyles.getStyle(ws.hiddenManager, row, col);
 	}
-	function getCompiledStyleFromArray(styleManager, xf, xfs) {
+	function getCompiledStyleFromArray(xf, xfs) {
 		for (var i = 0; i < xfs.length; ++i) {
 			if (null == xf) {
 				xf = xfs[i];
 			} else {
-				xf = xf.merge(styleManager, xfs[i]);
+				xf = xf.merge(xfs[i]);
 			}
 		}
 		return xf;
 	}
-	function getCompiledStyle(styleManager, sheetMergedStyles, hiddenManager, row, col, opt_cell, opt_styleComponents) {
-		var styleComponents = opt_styleComponents ? opt_styleComponents : sheetMergedStyles.getStyle(styleManager, hiddenManager, row, col);
-		var xf = getCompiledStyleFromArray(styleManager, null, styleComponents.table);
+	function getCompiledStyle(sheetMergedStyles, hiddenManager, row, col, opt_cell, opt_styleComponents) {
+		var styleComponents = opt_styleComponents ? opt_styleComponents : sheetMergedStyles.getStyle(hiddenManager, row, col);
+		var xf = getCompiledStyleFromArray(null, styleComponents.table);
 		if (opt_cell) {
 			if (null == xf) {
 				xf = opt_cell.xfs;
 			} else if (opt_cell.xfs) {
-				xf = xf.merge(styleManager, opt_cell.xfs, true);
+				xf = xf.merge(opt_cell.xfs, true);
 			}
 		}
-		xf = getCompiledStyleFromArray(styleManager, xf, styleComponents.conditional);
+		xf = getCompiledStyleFromArray(xf, styleComponents.conditional);
 		return xf;
 	}
 
@@ -2860,11 +2861,10 @@
 								v = value.v;
 								dxf = null;
 								if (null !== v) {
-									var styleManager = this.workbook.oStyleManager;
 									dxf = new AscCommonExcel.CellXfs();
 									tmp = (oGradient2 && v > oGradient1.max) ? oGradient2 : oGradient1;
-									dxf.fill = styleManager.addFill(new AscCommonExcel.Fill({bg: tmp.calculateColor(v)}));
-									dxf = styleManager.addXf(dxf);
+									dxf.fill = new AscCommonExcel.Fill({bg: tmp.calculateColor(v)});
+									dxf = g_StyleCache.addXf(dxf, true);
 								}
 								value.c.setConditionalFormattingStyle(dxf);
 							}
@@ -4985,11 +4985,10 @@
 	};
 	Cell.prototype.getTableStyle = function () {
 		var wb = this.ws.workbook;
-		var styleManager = wb.oStyleManager;
 		var hiddenManager = this.ws.hiddenManager;
 		var sheetMergedStyles = this.ws.sheetMergedStyles;
-		var styleComponents = sheetMergedStyles.getStyle(styleManager, hiddenManager, this.nRow, this.nCol);
-		return getCompiledStyleFromArray(styleManager, null, styleComponents.table);
+		var styleComponents = sheetMergedStyles.getStyle(hiddenManager, this.nRow, this.nCol);
+		return getCompiledStyleFromArray(null, styleComponents.table);
 	};
 	Cell.prototype.clone=function(oNewWs, renameParams){
 		if(!oNewWs)
@@ -4998,7 +4997,7 @@
 		oNewCell.nRow = this.nRow;
 		oNewCell.nCol = this.nCol;
 		if(null != this.xfs)
-			oNewCell.xfs = this.xfs.clone();
+			oNewCell.xfs = this.xfs;
 		oNewCell.oValue = this.oValue.clone();
 		if (null != this.formulaParsed) {
 			var newFormula;

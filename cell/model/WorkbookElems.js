@@ -132,11 +132,19 @@ var g_oRgbColorProperties = {
 	};
 function RgbColor(rgb)
 {
-	this.Properties = g_oRgbColorProperties;
 	this.rgb = rgb;
+
+	this._hash;
 }
 RgbColor.prototype =
 {
+	Properties: g_oRgbColorProperties,
+	getHash: function() {
+		if (!this._hash) {
+			this._hash = this.rgb;
+		}
+		return this._hash;
+	},
 	clone : function()
 	{
 		return new RgbColor(this.rgb);
@@ -213,10 +221,18 @@ function ThemeColor()
 	this.rgb = null;
 	this.theme = null;
 	this.tint = null;
+
+	this._hash;
 }
 ThemeColor.prototype =
 {
 	Properties: g_oThemeColorProperties,
+	getHash: function() {
+		if (!this._hash) {
+			this._hash = this.theme + ';' + this.tint;
+		}
+		return this._hash;
+	},
 	clone : function()
 	{
 		//ThemeColor must be created by g_oColorManager for correct rebuild
@@ -528,8 +544,25 @@ var g_oFontProperties = {
 		this.va = null;
 		this.skip = null;
 		this.repeat = null;
+
+		this._hash;
+		this._index;
 	}
 	Font.prototype.Properties = g_oFontProperties;
+	Font.prototype.getHash = function() {
+		if(!this._hash){
+			var color = this.c ? this.c.getHash() : '';
+			this._hash = this.fn + '|' +this.scheme + '|' +this.fs + '|' +this.b + '|' +this.i + '|' +this.u + '|' +
+				this.s + '|' + color + '|' +this.va + '|' + this.skip + '|' +this.repeat;
+		}
+		return this._hash;
+	};
+	Font.prototype.getIndexNumber = function() {
+		return this._index;
+	};
+	Font.prototype.setIndexNumber = function(val) {
+		return this._index = val;
+	};
 	Font.prototype.assign = function(font) {
 		this.fn = font.fn;
 		this.scheme = font.scheme;
@@ -1056,10 +1089,25 @@ function Fill(val)
 	if(null == val)
 		val = g_oDefaultFormat.FillAbs;
 	this.bg = val.bg;
+
+	this._hash;
+	this._index;
 }
 Fill.prototype =
 {
 	Properties: g_oFillProperties,
+	getHash: function() {
+		if (!this._hash) {
+			this._hash = this.bg ? this.bg.getHash() : '';
+		}
+		return this._hash;
+	},
+	getIndexNumber: function() {
+		return this._index;
+	},
+	setIndexNumber: function(val) {
+		return this._index = val;
+	},
 	_mergeProperty : function(first, second, def)
 	{
 		if(def != first)
@@ -1215,6 +1263,13 @@ Fill.prototype =
 		this.c = g_oColorManager.getThemeColor(1);
 	}
 	BorderProp.prototype.Properties = g_oBorderPropProperties;
+	BorderProp.prototype.getHash = function() {
+		if (!this._hash) {
+			var color = this.c ? this.c.getHash() : '';
+			this._hash = this.s + ';' + this.w + ';' + color;
+		}
+		return this._hash;
+	},
 	BorderProp.prototype.setStyle = function (style) {
 		this.s = style;
 		switch (this.s) {
@@ -1378,9 +1433,32 @@ var g_oBorderProperties = {
 		this.iv = val.iv.clone();
 		this.dd = val.dd;
 		this.du = val.du;
+
+		this._hash;
+		this._index;
 	}
 
 	Border.prototype.Properties = g_oBorderProperties;
+	Border.prototype.getHash = function() {
+		if (!this._hash) {
+			this._hash = (this.l ? this.l.getHash() : '') + '|';
+			this._hash += (this.t ? this.t.getHash() : '') + '|';
+			this._hash += (this.r ? this.r.getHash() : '') + '|';
+			this._hash += (this.b ? this.b.getHash() : '') + '|';
+			this._hash += (this.d ? this.d.getHash() : '') + '|';
+			this._hash += (this.ih ? this.ih.getHash() : '') + '|';
+			this._hash += (this.iv ? this.iv.getHash() : '') + '|';
+			this._hash += this.dd + '|';
+			this._hash += this.du;
+		}
+		return this._hash;
+	};
+	Border.prototype.getIndexNumber = function() {
+		return this._index;
+	};
+	Border.prototype.setIndexNumber = function(val) {
+		return this._index = val;
+	};
 	Border.prototype._mergeProperty = function (first, second, def) {
 		if ((null != def.isEqual && false == def.isEqual(first)) || (null == def.isEqual && def != first)) {
 			return first;
@@ -1658,10 +1736,25 @@ function Num(val)
 		val = g_oDefaultFormat.NumAbs;
 	this.f = val.f;
   this.id = val.id;
+
+	this._hash;
+	this._index;
 }
 Num.prototype =
 {
 	Properties: g_oNumProperties,
+	getHash: function() {
+		if (!this._hash) {
+			this._hash = this.f + '|' + this.id;
+		}
+		return this._hash;
+	},
+	getIndexNumber: function() {
+		return this._index;
+	},
+	setIndexNumber: function(val) {
+		this._index = val;
+	},
   setFormat: function(f, opt_id) {
     this.f = f;
     this.id = opt_id;
@@ -1782,16 +1875,33 @@ function CellXfs() {
 	this.XfId = null;
 
 	//inner
-	this.id = null;
-	this.mergeCache = {};
+	this._hash;
+	this._index;
+	this.operationCache = {};
 }
 CellXfs.prototype =
 {
 	Properties: g_oCellXfsProperties,
-	getId: function(){
-		return this.id;
+	getHash: function() {
+		if (!this._hash) {
+			this._hash = (this.border ? this.border.getIndexNumber() : '') + '|';
+			this._hash += (this.fill ? this.fill.getIndexNumber() : '') + '|';
+			this._hash += (this.font ? this.font.getIndexNumber() : '') + '|';
+			this._hash += (this.num ? this.num.getIndexNumber() : '') + '|';
+			this._hash += (this.align ? this.align.getIndexNumber() : '') + '|';
+			this._hash += this.QuotePrefix + '|';
+			this._hash += this.PivotButton + '|';
+			this._hash += this.XfId + '|';
+		}
+		return this._hash;
 	},
-	_mergeProperty : function(styleManager, addFunc, first, second, isTable)
+	getIndexNumber: function() {
+		return this._index;
+	},
+	setIndexNumber: function(val) {
+		this._index = val;
+	},
+	_mergeProperty : function(addFunc, first, second, isTable)
 	{
 		var res = null;
 		if(null != first || null != second)
@@ -1803,7 +1913,7 @@ CellXfs.prototype =
 			else
 			{
 				if (null != first.merge) {
-					res = addFunc.call(styleManager, first.merge(second, isTable));
+					res = addFunc.call(g_StyleCache, first.merge(second, isTable));
 				} else {
 					res = first;
 				}
@@ -1811,22 +1921,22 @@ CellXfs.prototype =
 		}
 		return res;
 	},
-	merge : function(styleManager, xfs, isTable)
+	merge : function(xfs, isTable)
 	{
-		var xfId = xfs.getId();
-		var cache = this.mergeCache[xfId];
+		var xfIndexNumber = xfs.getIndexNumber();
+		var cache = this.getOperationCache("merge", xfIndexNumber);
 		if (!cache) {
 			cache = new CellXfs();
-			cache.border = this._mergeProperty(styleManager, styleManager.addBorder, xfs.border, this.border);
-			cache.fill = this._mergeProperty(styleManager, styleManager.addFill, xfs.fill, this.fill);
-			cache.font = this._mergeProperty(styleManager, styleManager.addFont, xfs.font, this.font, isTable);
-			cache.num = this._mergeProperty(styleManager, styleManager.addNum, xfs.num, this.num);
-			cache.align = this._mergeProperty(styleManager, styleManager.addAlign, xfs.align, this.align);
-			cache.QuotePrefix = this._mergeProperty(null, null, xfs.QuotePrefix, this.QuotePrefix);
-			cache.PivotButton = this._mergeProperty(null, null, xfs.PivotButton, this.PivotButton);
-			cache.XfId = this._mergeProperty(null, null, xfs.XfId, this.XfId);
-			cache = styleManager.addXf(cache);
-			this.mergeCache[xfId] = cache;
+			cache.border = this._mergeProperty(g_StyleCache.addBorder, xfs.border, this.border);
+			cache.fill = this._mergeProperty(g_StyleCache.addFill, xfs.fill, this.fill);
+			cache.font = this._mergeProperty(g_StyleCache.addFont, xfs.font, this.font, isTable);
+			cache.num = this._mergeProperty(g_StyleCache.addNum, xfs.num, this.num);
+			cache.align = this._mergeProperty(g_StyleCache.addAlign, xfs.align, this.align);
+			cache.QuotePrefix = this._mergeProperty(null, xfs.QuotePrefix, this.QuotePrefix);
+			cache.PivotButton = this._mergeProperty(null, xfs.PivotButton, this.PivotButton);
+			cache.XfId = this._mergeProperty(null, xfs.XfId, this.XfId);
+			cache = g_StyleCache.addXf(cache);
+			this.setOperationCache("merge", xfIndexNumber, cache);
 		}
 		return cache;
 	},
@@ -1884,6 +1994,22 @@ CellXfs.prototype =
 			case this.Properties.PivotButton: this.PivotButton = value;break;
 			case this.Properties.XfId: this.XfId = value; break;
 		}
+	},
+	getOperationCache: function(operation, val) {
+		var res = undefined;
+		var operation = this.operationCache[operation];
+		if (operation) {
+			res = operation[val];
+		}
+		return res;
+	},
+	setOperationCache: function(operation, val, xfs) {
+		var valCache = this.operationCache[operation];
+		if (!valCache) {
+			valCache = {};
+			this.operationCache[operation] = valCache;
+		}
+		valCache[val] = xfs;
 	}
 };
 
@@ -1946,10 +2072,26 @@ function Align(val)
 	this.angle = val.angle;
 	this.ver = val.ver;
 	this.wrap = val.wrap;
+
+	this._hash;
+	this._index;
 }
 Align.prototype =
 {
 	Properties: g_oAlignProperties,
+	getHash: function() {
+		if (!this._hash) {
+			this._hash = this.hor + '|' + this.indent + '|' + this.RelativeIndent + '|' + this.shrink + '|' +
+				this.angle + '|' + this.ver + '|' + this.wrap;
+		}
+		return this._hash;
+	},
+	getIndexNumber: function() {
+		return this._index;
+	},
+	setIndexNumber: function(val) {
+		this._index = val;
+	},
 	_mergeProperty : function(first, second, def)
 	{
 		if (def != first)
@@ -2036,26 +2178,6 @@ Align.prototype =
 			case this.Properties.wrap: return this.wrap;break;
 		}
 	},
-	getAngle: function() {
-		var nRes = 0;
-		if (0 <= this.angle && this.angle <= 180) {
-			nRes = this.angle <= 90 ? this.angle : 90 - this.angle;
-		}
-		return nRes;
-	},
-	getWrap: function() {
-		// Для justify wrap всегда true
-		return AscCommon.align_Justify === this.hor ? true : this.wrap;
-	},
-	getShrinkToFit: function() {
-		return this.shrink;
-	},
-	getAlignHorizontal: function() {
-		return this.hor;
-	},
-	getAlignVertical: function() {
-		return this.ver;
-	},
 	setProperty : function(nType, value)
 	{
 		switch(nType)
@@ -2068,6 +2190,41 @@ Align.prototype =
 			case this.Properties.ver: this.ver = value;break;
 			case this.Properties.wrap: this.wrap = value;break;
 		}
+	},
+	getAngle: function() {
+		var nRes = 0;
+		if (0 <= this.angle && this.angle <= 180) {
+			nRes = this.angle <= 90 ? this.angle : 90 - this.angle;
+		}
+		return nRes;
+	},
+	setAngle: function(val) {
+		this.angle = AscCommonExcel.angleInterfaceToFormat(val);;
+	},
+	getWrap: function() {
+		// Для justify wrap всегда true
+		return AscCommon.align_Justify === this.hor ? true : this.wrap;
+	},
+	setWrap: function(val) {
+		this.wrap = val;
+	},
+	getShrinkToFit: function() {
+		return this.shrink;
+	},
+	setShrinkToFit: function(val) {
+		this.shrink = val;
+	},
+	getAlignHorizontal: function() {
+		return this.hor;
+	},
+	setAlignHorizontal: function(val) {
+		this.hor = val;
+	},
+	getAlignVertical: function() {
+		return this.ver;
+	},
+	setAlignVertical: function(val) {
+		this.ver = val;
 	},
 	readAttributes : function(attr, uq) {
 	if(attr()){
@@ -2306,12 +2463,6 @@ CCellStyle.prototype.getNumFormatStr = function () {
 function StyleManager(){
 	//стиль ячейки по умолчанию, может содержать не все свойства
 	this.oDefaultXfs = new CellXfs();
-	this.fonts = [];
-	this.fills = [];
-	this.borders = [];
-	this.nums = [];
-	this.aligns = [];
-	this.xfs = [];
 }
 StyleManager.prototype =
 {
@@ -2355,453 +2506,95 @@ StyleManager.prototype =
 		}
 		this.oDefaultXfs = oDefaultXfs;
 	},
-    _prepareSetReference : function (oItemWithXfs)
-    {
-        return oItemWithXfs.xfs;
-    },
-    _prepareSet : function(oItemWithXfs)
-	{
-		if(null == oItemWithXfs.xfs)
-		{
-			if(oItemWithXfs.getDefaultXfs)
-				oItemWithXfs.xfs = oItemWithXfs.getDefaultXfs();
-			if(null == oItemWithXfs.xfs)
-				oItemWithXfs.xfs = this.oDefaultXfs.clone();
-		} else
-            this._prepareSetReference(oItemWithXfs);
-        return oItemWithXfs.xfs;
-	},
-    _prepareSetFont : function(oItemWithXfs)
-	{
-		var xfs = this._prepareSet(oItemWithXfs);
-		if(null == xfs.font)
-			xfs.font = g_oDefaultFormat.Font.clone();
-        return xfs;
-	},
-    _prepareSetAlign : function(oItemWithXfs)
-	{
-        var xfs = this._prepareSet(oItemWithXfs);
-		if(null == xfs.align)
-			xfs.align = g_oDefaultFormat.Align.clone();
-        return xfs;
-	},
-	_prepareSetCellStyle : function (oItemWithXfs) {
-		return this._prepareSet(oItemWithXfs);
-	},
 	setCellStyle : function(oItemWithXfs, val)
 	{
-		// ToDo add code
-		var xfs = oItemWithXfs.xfs;
-		var oRes = {newVal: val, oldVal: null};
-		if(null != xfs && null != xfs.XfId)
-			oRes.oldVal = xfs.XfId;
-		else
-			oRes.oldVal = g_oDefaultFormat.XfId;
-		if(null == val) {
-			if(null != xfs) {
-			    xfs = this._prepareSetReference(oItemWithXfs);
-				xfs.XfId = g_oDefaultFormat.XfId;
-            }
-		} else {
-			xfs = this._prepareSetCellStyle(oItemWithXfs);
-			xfs.XfId = val;
-		}
-		return oRes;
+		return this._setProperty(oItemWithXfs, val, "XfId");
 	},
 	setNum : function(oItemWithXfs, val)
 	{
-		var xfs = oItemWithXfs.xfs;
-		var oRes = {newVal: val, oldVal: null};
-		if(null != xfs && null != xfs.num)
-			oRes.oldVal = xfs.num;
-		else
-			oRes.oldVal = null;
-		if(null == val)
-		{
-			if(null != xfs) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-				xfs.num = null;
-			}
-		}
-		else
-		{
-			xfs = this._prepareSet(oItemWithXfs);
-			xfs.num = val.clone();
-		}
-		return oRes;
+		return this._setProperty(oItemWithXfs, val, "num", g_StyleCache.addNum);
 	},
-	setFont : function(oItemWithXfs, val, oHistoryObj, nHistoryId, sSheetId, oRange)
-    {
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.font)
-            oRes.oldVal = xfs.font;
-		else
-			oRes.oldVal = null;
-        if(null == val)
-        {
-            if(null != xfs) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.font = null;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetFont(oItemWithXfs);
-            xfs.font = val.clone();
-        }
-		return oRes;
-	},
-	setFontname : function(oItemWithXfs, val)
+	setFont : function(oItemWithXfs, val)
 	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.font)
-            oRes.oldVal = xfs.font.fn;
-		else
-			oRes.oldVal = null;
-		//todo undo для scheme
-		var isSetNull = (null == val);
-		if (!isSetNull || (null != xfs && null != xfs.font)) {
-			if (isSetNull) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-			} else {
-				xfs = this._prepareSetFont(oItemWithXfs);
-			}
-			xfs.font.setName(val);
-			xfs.font.setScheme(null);
-		}
-		return oRes;
-	},
-	setFontsize : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.font)
-            oRes.oldVal = xfs.font.fs;
-		else
-			oRes.oldVal = null;
-		var isSetNull = (null == val);
-		if (!isSetNull || (null != xfs && null != xfs.font)) {
-			if (isSetNull) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-			} else {
-				xfs = this._prepareSetFont(oItemWithXfs);
-			}
-			xfs.font.setSize(val);
-		}
-		return oRes;
-	},
-	setFontcolor : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.font)
-            oRes.oldVal = xfs.font.c;
-		else
-			oRes.oldVal = null;
-		var isSetNull = (null == val);
-		if (!isSetNull || (null != xfs && null != xfs.font)) {
-			if (isSetNull) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-			} else {
-				xfs = this._prepareSetFont(oItemWithXfs);
-			}
-			xfs.font.setColor(val);
-		}
-		return oRes;
-	},
-	setBold : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.font)
-            oRes.oldVal = xfs.font.b;
-		else
-			oRes.oldVal = null;
-		var isSetNull = (null == val || false == val);
-		if (!isSetNull || (null != xfs && null != xfs.font)) {
-			if (isSetNull) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-			} else {
-				xfs = this._prepareSetFont(oItemWithXfs);
-			}
-			xfs.font.setBold(val);
-		}
-		return oRes;
-	},
-	setItalic : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.font)
-            oRes.oldVal = xfs.font.i;
-		else
-			oRes.oldVal = null;
-		var isSetNull = (null == val || false == val);
-		if (!isSetNull || (null != xfs && null != xfs.font)) {
-			if (isSetNull) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-			} else {
-				xfs = this._prepareSetFont(oItemWithXfs);
-			}
-			xfs.font.setItalic(val);
-		}
-		return oRes;
-	},
-	setUnderline : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.font)
-            oRes.oldVal = xfs.font.u;
-		else
-			oRes.oldVal = null;
-		var isSetNull = (null == val || Asc.EUnderline.underlineNone == val);
-		if (!isSetNull || (null != xfs && null != xfs.font)) {
-			if (isSetNull) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-			} else {
-				xfs = this._prepareSetFont(oItemWithXfs);
-			}
-			xfs.font.setUnderline(val);
-		}
-		return oRes;
-	},
-	setStrikeout : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.font)
-            oRes.oldVal = xfs.font.s;
-		else
-			oRes.oldVal = null;
-		var isSetNull = (null == val || false == val);
-		if (!isSetNull || (null != xfs && null != xfs.font)) {
-			if (isSetNull) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-			} else {
-				xfs = this._prepareSetFont(oItemWithXfs);
-			}
-			xfs.font.setStrikeout(val);
-		}
-		return oRes;
-	},
-	setFontAlign : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.font)
-            oRes.oldVal = xfs.font.va;
-		else
-			oRes.oldVal = null;
-		var isSetNull = (null == val || AscCommon.vertalign_Baseline == val);
-		if (!isSetNull || (null != xfs && null != xfs.font)) {
-			if (isSetNull) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-			} else {
-				xfs = this._prepareSetFont(oItemWithXfs);
-			}
-			xfs.font.setVerticalAlign(val);
-		}
-		return oRes;
-	},
-	setAlignVertical : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.align)
-            oRes.oldVal = xfs.align.ver;
-		else
-			oRes.oldVal = g_oDefaultFormat.Align.ver;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.align) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.ver = g_oDefaultFormat.Align.ver;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetAlign(oItemWithXfs);
-            xfs.align.ver = val;
-        }
-		return oRes;
-	},
-	setAlignHorizontal : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.align)
-            oRes.oldVal = xfs.align.hor;
-		else
-			oRes.oldVal = g_oDefaultFormat.Align.hor;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.align) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.hor = g_oDefaultFormat.Align.hor;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetAlign(oItemWithXfs);
-            xfs.align.hor = val;
-        }
-		return oRes;
+		return this._setProperty(oItemWithXfs, val, "font", g_StyleCache.addFont);
 	},
 	setFill : function(oItemWithXfs, val)
 	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.fill)
-            oRes.oldVal = xfs.fill.bg;
-		else
-			oRes.oldVal = g_oDefaultFormat.Fill.bg;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.fill) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.fill.bg = g_oDefaultFormat.Fill.bg;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSet(oItemWithXfs);
-			if(null == xfs.fill)
-                xfs.fill = g_oDefaultFormat.Fill.clone();
-            xfs.fill.bg = val;
-        }
-		return oRes;
+		if(val){
+			var fill = new Fill();
+			fill.bg = val;
+			val = fill;
+		}
+		return this._setProperty(oItemWithXfs, val, "fill", g_StyleCache.addFill);
 	},
 	setBorder : function(oItemWithXfs, val)
 	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.border)
-            oRes.oldVal = xfs.border;
-		else
-			oRes.oldVal = g_oDefaultFormat.Border;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.border) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.border = val;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSet(oItemWithXfs);
-            xfs.border = val;
-        }
-		return oRes;
-	},
-	setShrinkToFit : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.align)
-            oRes.oldVal = xfs.align.shrink;
-		else
-			oRes.oldVal = g_oDefaultFormat.Align.shrink;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.align) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.shrink = g_oDefaultFormat.Align.shrink;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetAlign(oItemWithXfs);
-            xfs.align.shrink = val;
-        }
-		return oRes;
-	},
-	setWrap : function(oItemWithXfs, val)
-	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.align)
-            oRes.oldVal = xfs.align.wrap;
-		else
-			oRes.oldVal = g_oDefaultFormat.Align.wrap;
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.align) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.wrap = g_oDefaultFormat.Align.wrap;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetAlign(oItemWithXfs);
-            xfs.align.wrap = val;
-        }
-		return oRes;
+		return this._setProperty(oItemWithXfs, val, "border", g_StyleCache.addBorder);
 	},
 	setQuotePrefix : function(oItemWithXfs, val)
 	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.QuotePrefix)
-            oRes.oldVal = xfs.QuotePrefix;
-        if(null == val)
-        {
-            if(null != xfs) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.QuotePrefix = val;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSet(oItemWithXfs);
-            xfs.QuotePrefix = val;
-        }
-		return oRes;
+		return this._setProperty(oItemWithXfs, val, "quotePrefix");
 	},
 	setPivotButton : function(oItemWithXfs, val)
 	{
-		var xfs = oItemWithXfs.xfs;
-		var oRes = {newVal: val, oldVal: null};
-		if(null != xfs && null != xfs.PivotButton)
-			oRes.oldVal = xfs.PivotButton;
-		if(null == val)
-		{
-			if(null != xfs) {
-				xfs = this._prepareSetReference(oItemWithXfs);
-				xfs.PivotButton = val;
-			}
-		}
-		else
-		{
-			xfs = this._prepareSet(oItemWithXfs);
-			xfs.PivotButton = val;
-		}
-		return oRes;
+		return this._setProperty(oItemWithXfs, val, "pivotButton");
+	},
+	setFontname : function(oItemWithXfs, val)
+	{
+		return this._setFontProperty(oItemWithXfs, val, Font.prototype.getName, function(val){
+			this.setName(val);
+			this.setScheme(null);
+		}, "name");
+	},
+	setFontsize : function(oItemWithXfs, val)
+	{
+		return this._setFontProperty(oItemWithXfs, val, "size", Font.prototype.getSize, Font.prototype.setSize);
+	},
+	setFontcolor : function(oItemWithXfs, val)
+	{
+		return this._setFontProperty(oItemWithXfs, val, "color", Font.prototype.getColor, Font.prototype.setColor);
+	},
+	setBold : function(oItemWithXfs, val)
+	{
+		return this._setFontProperty(oItemWithXfs, val, "bold", Font.prototype.getBold, Font.prototype.setBold);
+	},
+	setItalic : function(oItemWithXfs, val)
+	{
+		return this._setFontProperty(oItemWithXfs, val, "italic", Font.prototype.getItalic, Font.prototype.setItalic);
+	},
+	setUnderline : function(oItemWithXfs, val)
+	{
+		return this._setFontProperty(oItemWithXfs, val, "underline", Font.prototype.getUnderline, Font.prototype.setUnderline);
+	},
+	setStrikeout : function(oItemWithXfs, val)
+	{
+		return this._setFontProperty(oItemWithXfs, val, "strikeout", Font.prototype.getStrikeout, Font.prototype.setStrikeout);
+	},
+	setFontAlign : function(oItemWithXfs, val)
+	{
+		return this._setFontProperty(oItemWithXfs, val, "fontAlign", Font.prototype.getVerticalAlign, Font.prototype.setVerticalAlign);
+	},
+	setAlignVertical : function(oItemWithXfs, val)
+	{
+		return this._setAlignProperty(oItemWithXfs, val, "alignVertical", Align.prototype.getAlignVertical, Align.prototype.setAlignVertical);
+	},
+	setAlignHorizontal : function(oItemWithXfs, val)
+	{
+		return this._setAlignProperty(oItemWithXfs, val, "alignHorizontal", Align.prototype.getAlignHorizontal, Align.prototype.setAlignHorizontal);
+	},
+	setShrinkToFit : function(oItemWithXfs, val)
+	{
+		return this._setAlignProperty(oItemWithXfs, val, "shrinkToFit", Align.prototype.getShrinkToFit, Align.prototype.setShrinkToFit);
+	},
+	setWrap : function(oItemWithXfs, val)
+	{
+		return this._setAlignProperty(oItemWithXfs, val, "wrap", Align.prototype.getWrap, Align.prototype.setWrap);
 	},
     setAngle : function(oItemWithXfs, val)
     {
-        var xfs = oItemWithXfs.xfs;
-		var oRes = {newVal: val, oldVal: null};
-		val = AscCommonExcel.angleInterfaceToFormat(val);
-        if(null != xfs && null != xfs.align)
-            oRes.oldVal = AscCommonExcel.angleFormatToInterface2(xfs.align.angle);
-		else
-			oRes.oldVal = AscCommonExcel.angleFormatToInterface2(g_oDefaultFormat.Align.angle);
-        if(null == val)
-        {
-            if(null != xfs && null != xfs.align) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.align.angle = g_oDefaultFormat.Align.angle;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSetAlign(oItemWithXfs);
-            xfs.align.angle = val;
-        }
-        return oRes;
+		return this._setAlignProperty(oItemWithXfs, val, "angle", function(){
+			return AscCommonExcel.angleFormatToInterface2(this.angle);
+		}, Align.prototype.setAngle);
     },
 	setVerticalText : function(oItemWithXfs, val)
     {
@@ -2810,46 +2603,162 @@ StyleManager.prototype =
 		else
 			return this.setAngle(oItemWithXfs, 0);
     },
-	addFont: function(newFont, noCheck) {
-		return this._add(this.fonts, newFont, noCheck);
-	},
-	addFill: function(newFill, noCheck) {
-		return this._add(this.fills, newFill, noCheck);
-	},
-	addBorder: function(newBorder, noCheck) {
-		return this._add(this.borders, newBorder, noCheck);
-	},
-	addNum: function(newNum, noCheck) {
-		return this._add(this.nums, newNum, noCheck);
-	},
-	addAlign: function(newAlign, noCheck) {
-		return this._add(this.aligns, newAlign, noCheck);
-	},
-	addXf: function(newXf, noCheck) {
-		var res = this._add(this.xfs, newXf, noCheck);
-		if (null === res.id) {
-			res.id = this.xfs.length - 1;
-		}
-		return res;
-	},
-	_add: function(vals, newVal, noCheck){
-		var res = null;
-		if (!noCheck) {
-			for (var i = 0; i < vals.length; ++i) {
-				var val = vals[i];
-				if (newVal.isEqual(val)) {
-					res = val;
-					break;
-				}
+	_initXf: function(oItemWithXfs){
+		var xfs = oItemWithXfs.xfs;
+		if (!xfs) {
+			if (oItemWithXfs.getDefaultXfs) {
+				xfs = oItemWithXfs.getDefaultXfs();
+			}
+			if (!xfs) {
+				xfs = this.oDefaultXfs;
 			}
 		}
-		if (!res) {
-			res = newVal;
-			vals.push(res);
+		return xfs;
+	},
+	_initXfFont: function(xfs){
+		xfs = xfs.clone();
+		if(null == xfs.font){
+			xfs.font = g_oDefaultFormat.Font;
 		}
-		return res;
+		xfs.font = xfs.font.clone();
+		return xfs;
+	},
+	_initXfAlign: function(xfs){
+		xfs = xfs.clone();
+		if(null == xfs.align){
+			xfs.align = g_oDefaultFormat.Align;
+		}
+		xfs.align = xfs.align.clone();
+		return xfs;
+	},
+	_setProperty: function(oItemWithXfs, val, prop, addFunc) {
+		var xfs = oItemWithXfs.xfs;
+		var oRes = {newVal: null, oldVal: xfs ? xfs[prop] : null};
+		xfs = this._initXf(oItemWithXfs);
+		var hash = val && val.getHash ? val.getHash() : val;
+		var xfsOperationCache = xfs;
+		var newXf = xfs.getOperationCache(prop, hash);
+		if (newXf) {
+			xfs = oItemWithXfs.xfs = newXf;
+		} else {
+			xfs = xfs.clone();
+			if (null != val) {
+				if (addFunc) {
+					xfs[prop] = addFunc.call(g_StyleCache, val);
+				} else {
+					xfs[prop] = val;
+				}
+			}
+			else if (null != xfs) {
+				xfs[prop] = null;
+			}
+
+			xfs = g_StyleCache.addXf(xfs);
+			xfsOperationCache.setOperationCache(prop, hash, xfs);
+			oItemWithXfs.xfs = xfs;
+		}
+		oRes.newVal = xfs ? xfs[prop] : null;
+		return oRes;
+	},
+	_setFontProperty : function(oItemWithXfs, val, prop, getFunc, setFunc)
+	{
+		var xfs = oItemWithXfs.xfs;
+		var oRes = {newVal: val, oldVal: xfs && xfs.font ? getFunc.call(xfs.font): null};
+		xfs = this._initXf(oItemWithXfs);
+		var xfsOperationCache = xfs;
+		var newXf = xfs.getOperationCache(prop, val);
+		if (newXf) {
+			oItemWithXfs.xfs = newXf;
+		} else {
+			xfs = this._initXfFont(xfs);
+
+			setFunc.call(xfs.font, val);
+			xfs.font = g_StyleCache.addFont(xfs.font);
+
+			xfs = g_StyleCache.addXf(xfs);
+			xfsOperationCache.setOperationCache(prop, val, xfs);
+			oItemWithXfs.xfs = xfs;
+		}
+		return oRes;
+	},
+	_setAlignProperty : function(oItemWithXfs, val, prop, getFunc, setFunc)
+	{
+		var xfs = oItemWithXfs.xfs;
+		var oRes = {newVal: val, oldVal: xfs && xfs.align ? getFunc.call(xfs.align): null};
+		xfs = this._initXf(oItemWithXfs);
+		var xfsOperationCache = xfs;
+		var newXf = xfs.getOperationCache(prop, val);
+		if (newXf) {
+			oItemWithXfs.xfs = newXf;
+		} else {
+			xfs = this._initXfAlign(xfs);
+
+			setFunc.call(xfs.align, val);
+			xfs.align = g_StyleCache.addAlign(xfs.align);
+
+			xfs = g_StyleCache.addXf(xfs);
+			xfsOperationCache.setOperationCache(prop, val, xfs);
+			oItemWithXfs.xfs = xfs;
+		}
+		return oRes;
 	}
 };
+
+	function StyleCache() {
+		this.fonts = {count: 0, vals: {}};
+		this.fills = {count: 0, vals: {}};
+		this.borders = {count: 0, vals: {}};
+		this.nums = {count: 0, vals: {}};
+		this.aligns = {count: 0, vals: {}};
+		this.xfs = {count: 0, vals: {}};
+	}
+
+	StyleCache.prototype.addFont = function(newFont) {
+		return this._add(this.fonts, newFont);
+	};
+	StyleCache.prototype.addFill = function(newFill) {
+		return this._add(this.fills, newFill);
+	};
+	StyleCache.prototype.addBorder = function(newBorder) {
+		return this._add(this.borders, newBorder);
+	};
+	StyleCache.prototype.addNum = function(newNum) {
+		return this._add(this.nums, newNum);
+	};
+	StyleCache.prototype.addAlign = function(newAlign) {
+		return this._add(this.aligns, newAlign);
+	};
+	StyleCache.prototype.addXf = function(newXf, recursively) {
+		if (recursively) {
+			if(newXf.font){
+				newXf.font = this.addFont(newXf.font);
+			}
+			if(newXf.fill){
+				newXf.fill = this.addFill(newXf.fill);
+			}
+			if(newXf.border){
+				newXf.border = this.addBorder(newXf.border);
+			}
+			if(newXf.num){
+				newXf.num = this.addNum(newXf.num);
+			}
+			if(newXf.align){
+				newXf.align = this.addAlign(newXf.align);
+			}
+		}
+		return this._add(this.xfs, newXf);
+	};
+	StyleCache.prototype._add = function(container, newVal) {
+		var hash = newVal.getHash();
+		var res = container.vals[hash];
+		if (!res) {
+			newVal.setIndexNumber(container.count++);
+			container.vals[hash] = newVal;
+			res = newVal;
+		}
+		return res;
+	};
+	var g_StyleCache = new StyleCache();
 
 	/** @constructor */
 	function SheetMergedStyles() {
@@ -2890,7 +2799,7 @@ StyleManager.prototype =
 			}
 		}
 	};
-	SheetMergedStyles.prototype.getStyle = function(styleManager, hiddenManager, row, col) {
+	SheetMergedStyles.prototype.getStyle = function(hiddenManager, row, col) {
 		var res = {table: [], conditional: []};
 		var conditionRow = this.stylesCondition[row];
 		if (conditionRow) {
@@ -2928,8 +2837,8 @@ StyleManager.prototype =
 							borderModified.du = false;
 							borderModified.dd = false;
 						}
-						xfModified.border = styleManager.addBorder(borderModified);
-						xfModified = styleManager.addXf(xfModified);
+						xfModified.border = g_StyleCache.addBorder(borderModified);
+						xfModified = g_StyleCache.addXf(xfModified);
 						style.borders[borderIndex] = xfModified;
 					}
 					xf = xfModified;
@@ -3210,7 +3119,7 @@ Col.prototype =
 		if(null != this.CustomWidth)
             oNewCol.CustomWidth = this.CustomWidth;
         if(null != this.xfs)
-            oNewCol.xfs = this.xfs.clone();
+			oNewCol.xfs = this.xfs;
         return oNewCol;
     },
 	getWidthProp : function()
@@ -3485,7 +3394,7 @@ Row.prototype =
 		oNewRow.index = this.index;
 		oNewRow.flags = this.flags;
 		if(null != this.xfs)
-			oNewRow.xfs = this.xfs.clone();
+			oNewRow.xfs = this.xfs;
 		if(null != this.h)
 			oNewRow.h = this.h;
 		for(var i in this.c)
@@ -8111,6 +8020,7 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].g_nColorTextDefault = g_nColorTextDefault;
 	window['AscCommonExcel'].g_nColorHyperlink = g_nColorHyperlink;
 	window['AscCommonExcel'].g_oThemeColorsDefaultModsSpreadsheet = g_oThemeColorsDefaultModsSpreadsheet;
+	window['AscCommonExcel'].g_StyleCache = g_StyleCache;
 	window['AscCommonExcel'].map_themeExcel_to_themePresentation = map_themeExcel_to_themePresentation;
 	window['AscCommonExcel'].shiftGetBBox = shiftGetBBox;
 	window['AscCommonExcel'].RgbColor = RgbColor;
