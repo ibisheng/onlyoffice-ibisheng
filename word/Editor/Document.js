@@ -1922,7 +1922,17 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
             var FastPages      = SimplePara.Recalculate_FastWholeParagraph();
             var FastPagesCount = FastPages.length;
 
-            if (FastPagesCount > 0)
+            var bCanRecalc = true;
+            for (var Index = 0; Index < FastPagesCount; Index++)
+			{
+				if (!this.Pages[FastPages[Index]])
+				{
+					bCanRecalc = false;
+					break;
+				}
+			}
+
+            if (FastPagesCount > 0 && true === bCanRecalc)
             {
                 // Если изменения произошли на последней странице параграфа, и за данным параграфом следовал
                 // пустой параграф с новой секцией, тогда его тоже надо пересчитать.

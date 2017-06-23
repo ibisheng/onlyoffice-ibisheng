@@ -113,7 +113,7 @@ CDocument.prototype.Add_NewStyle = function(oStyle)
     }
 };
 /**
- * Удалем заданный стиль по имени.
+ * Удаляем заданный стиль по имени.
  */
 CDocument.prototype.Remove_Style = function(sStyleName)
 {
@@ -131,7 +131,7 @@ CDocument.prototype.Remove_Style = function(sStyleName)
     }
 };
 /**
- * Удалем все недефолтовые стили в документе.
+ * Удаляем все недефолтовые стили в документе.
  */
 CDocument.prototype.Remove_AllCustomStyles = function()
 {
