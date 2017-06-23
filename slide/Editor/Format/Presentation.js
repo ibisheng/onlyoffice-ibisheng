@@ -560,6 +560,7 @@ CPresentation.prototype =
         }
         oTextStyle.levels[9].DefaultRunPr.Lang.Val = NewLangId;
         this.setDefaultTextStyle(oTextStyle);
+        this.Recalculate({Drawings: {All: true}});
         this.Restart_CheckSpelling();
         this.Document_UpdateInterfaceState();
     },
@@ -3717,6 +3718,9 @@ CPresentation.prototype =
                      HyperProps.put_Text( HyperText.Text );
                      editor.sync_HyperlinkPropCallback(HyperProps);
                      }*/
+                }
+                else{
+                    this.Api.sendEvent("asc_onTextLanguage", this.Get_DefaultLanguage());
                 }
             }
         }
