@@ -148,7 +148,7 @@
 	}
 
 	function getCompiledStyleWs(ws, row, col, opt_cell, opt_styleComponents) {
-		return getCompiledStyle(ws.sheetMergedStyles, ws.hiddenManager, row, col, opt_cell, opt_styleComponents);
+		return getCompiledStyle(ws.sheetMergedStyles, ws.hiddenManager, row, col, opt_cell, ws, opt_styleComponents);
 	}
 	function getCompiledStyleComponentsWs(ws, row, col) {
 		return ws.sheetMergedStyles.getStyle(ws.hiddenManager, row, col);
@@ -163,14 +163,24 @@
 		}
 		return xf;
 	}
-	function getCompiledStyle(sheetMergedStyles, hiddenManager, row, col, opt_cell, opt_styleComponents) {
+	function getCompiledStyle(sheetMergedStyles, hiddenManager, row, col, opt_cell, opt_ws, opt_styleComponents) {
 		var styleComponents = opt_styleComponents ? opt_styleComponents : sheetMergedStyles.getStyle(hiddenManager, row, col);
 		var xf = getCompiledStyleFromArray(null, styleComponents.table);
 		if (opt_cell) {
-			if (null == xf) {
+			if (null === xf) {
 				xf = opt_cell.xfs;
 			} else if (opt_cell.xfs) {
 				xf = xf.merge(opt_cell.xfs, true);
+			}
+		} else if (opt_ws) {
+			var row = opt_ws._getRowNoEmpty(row);
+			if(row && null != row.xfs){
+				xf = null === xf ? row.xfs : xf.merge(row.xfs, true);
+			} else {
+				var col = opt_ws._getColNoEmptyWithAll(col);
+				if(null != col && null != col.xfs){
+					xf = null === xf ? col.xfs : xf.merge(col.xfs, true);
+				}
 			}
 		}
 		xf = getCompiledStyleFromArray(xf, styleComponents.conditional);
@@ -6829,13 +6839,6 @@
 			if(null != xfs && null != xfs.XfId)
 				return xfs.XfId;
 		} else {
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.XfId)
-				return row.xfs.XfId;
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.XfId)
-				return col.xfs.XfId;
 			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
 			if (xfs && null != xfs.XfId) {
 				return xfs.XfId;
@@ -6868,13 +6871,6 @@
 		}
 		else
 		{
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.num)
-				return row.xfs.num.getFormat();
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.num)
-				return col.xfs.num.getFormat();
 			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
 			if (null != xfs && null != xfs.num) {
 				return xfs.num.getFormat();
@@ -6913,13 +6909,6 @@
 		}
 		else
 		{
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.font)
-				return row.xfs.font;
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.font)
-				return col.xfs.font;
 			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
 			if (null != xfs && null != xfs.font) {
 				return xfs.font;
@@ -6973,13 +6962,6 @@
 		}
 		else
 		{
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.fill)
-				return row.xfs.fill.bg;
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.fill)
-				return col.xfs.fill.bg;
 			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
 			if (null != xfs && null != xfs.fill) {
 				return xfs.fill.bg;
@@ -7006,13 +6988,6 @@
 		}
 		else
 		{
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.border)
-				return row.xfs.border;
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.border)
-				return col.xfs.border;
 			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
 			if (null != xfs && null != xfs.border) {
 				return xfs.border;
@@ -7088,13 +7063,6 @@
 		}
 		else
 		{
-			//стили столбов и колонок
-			var row = this.worksheet._getRowNoEmpty(nRow);
-			if(row && null != row.xfs && null != row.xfs.align)
-				return row.xfs.align;
-			var col = this.worksheet._getColNoEmptyWithAll(nCol);
-			if(null != col && null != col.xfs && null != col.xfs.align)
-				return col.xfs.align;
 			var xfs = getCompiledStyleWs(this.worksheet, nRow, nCol);
 			if (null != xfs && null != xfs.align) {
 				return xfs.align;
