@@ -2936,7 +2936,7 @@ $( function () {
 
 	    oParser = new parserFormula( "BINOM.DIST(A2,A3,A4,FALSE)", "A1", ws );
 		ok( oParser.parse() );
-		strictEqual( difBetween( oParser.calculate().getValue().toFixed( 7 ) - 0, 0.2050781 ), true );
+		strictEqual( oParser.calculate().getValue().toFixed( 7 ) - 0, 0.2050781);
 	} );
 
     test( "Test: \"CONFIDENCE\"", function () {
