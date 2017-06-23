@@ -206,6 +206,8 @@ function Slide(presentation, slideLayout, slideNum)
     this.lastLayoutMatchingName = null;
     this.lastLayoutName = null;
 
+    this.NotesWidth = -10.0;
+
     if(presentation)
     {
         this.Width = presentation.Width;

@@ -3929,6 +3929,9 @@ CPresentation.prototype =
             {
                 this.Slides[oldCurPage].graphicObjects.resetSelectionState();
             }
+            if(!this.Notes_OnResize()){
+                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+            }
             editor.asc_hideComments();
             this.Document_UpdateInterfaceState();
         }
@@ -3951,15 +3954,14 @@ CPresentation.prototype =
         if(!this.Slides[this.CurPage]){
             return false;
         }
+        var oCurSlide = this.Slides[this.CurPage];
         var newNotesWidth = this.DrawingDocument.Notes_GetWidth();
-        if(AscFormat.fApproxEqual(this.NotesWidth, newNotesWidth)){
+        if(AscFormat.fApproxEqual(oCurSlide.NotesWidth, newNotesWidth)){
             return false;
         }
-        this.NotesWidth = newNotesWidth;
-        for(var i = 0; i < this.Slides.length; ++i){
-            this.Slides[i].recalculateNotesShape();
-        }
-        this.DrawingDocument.Notes_OnRecalculate(this.CurPage, newNotesWidth, this.Slides[this.CurPage].getNotesHeight());
+        oCurSlide.NotesWidth = newNotesWidth;
+        oCurSlide.recalculateNotesShape();
+        this.DrawingDocument.Notes_OnRecalculate(this.CurPage, newNotesWidth, oCurSlide.getNotesHeight());
         return true;
     },
 
