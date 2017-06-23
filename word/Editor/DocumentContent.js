@@ -8475,7 +8475,7 @@ CDocumentContent.prototype.RemoveTextSelection = function()
 		this.RemoveSelection();
 	}
 };
-CDocumentContent.prototype.CanUpdateTatget = function(CurPage)
+CDocumentContent.prototype.CanUpdateTarget = function(CurPage)
 {
 	if (this.Pages.length <= 0)
 		return false;
