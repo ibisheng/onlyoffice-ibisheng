@@ -5171,6 +5171,7 @@ function CSlideDrawer()
 	this.CachedCanvasCtx = null;
 
 	this.BoundsChecker = new AscFormat.CSlideBoundsChecker();
+	this.BoundsChecker2 = new AscFormat.CSlideBoundsChecker();
 
 	this.CacheSlidePixW = 1;
 	this.CacheSlidePixH = 1;
@@ -5188,6 +5189,38 @@ function CSlideDrawer()
 			this.IsRecalculateSlide = false;
 			this.m_oWordControl.m_oDrawingDocument.FirePaint();
 		}
+	}
+
+	this.CheckSlideSize = function(zoom, slideNum)
+	{
+		if (-1 == slideNum)
+			this.bIsEmptyPresentation = true;
+
+		var dKoef = zoom * g_dKoef_mm_to_pix / 100;
+		if (this.m_oWordControl.bIsRetinaSupport)
+			dKoef *= AscCommon.AscBrowser.retinaPixelRatio;
+
+		var w_mm = this.m_oWordControl.m_oLogicDocument.Width;
+		var h_mm = this.m_oWordControl.m_oLogicDocument.Height;
+		var w_px = (w_mm * dKoef) >> 0;
+		var h_px = (h_mm * dKoef) >> 0;
+
+		this.BoundsChecker2.init(w_px, h_px, w_mm, h_mm);
+		this.BoundsChecker2.transform(1, 0, 0, 1, 0, 0);
+
+		if (this.bIsEmptyPresentation)
+		{
+			this.BoundsChecker2._s();
+			this.BoundsChecker2._m(0, 0);
+			this.BoundsChecker2._l(w_mm, 0);
+			this.BoundsChecker2._l(w_mm, h_mm);
+			this.BoundsChecker2._l(0, h_mm);
+			this.BoundsChecker2._z();
+
+			return;
+		}
+
+		this.m_oWordControl.m_oLogicDocument.DrawPage(slideNum, this.BoundsChecker2);
 	}
 
 	this.CheckSlide = function(slideNum)
@@ -5504,6 +5537,7 @@ function CNotesDrawer(page)
 		g.m_oCoordTransform.ty = -this.Scroll;
 		g.transform(1, 0, 0, 1, 0, 0);
 
+		g.IsNoDrawingEmptyPlaceholder = true;
 		g.IsNoDrawingEmptyPlaceholderText = true;
 
 		this.HtmlPage.m_oLogicDocument.Notes_Draw(this.Slide, g);
