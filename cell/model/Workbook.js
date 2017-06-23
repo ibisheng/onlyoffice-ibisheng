@@ -5427,10 +5427,11 @@
 			History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_SetPivotButton, this.ws.getId(), new Asc.Range(this.nCol, this.nRow, this.nCol, this.nRow), new UndoRedoData_CellSimpleData(this.nRow, this.nCol, oRes.oldVal, oRes.newVal));
 		this.oValue.cleanCache();
 	};
+	Cell.prototype.clearConditionalFormattingStyle=function(){
+		this.ws.sheetMergedStyles.clearConditionalStyle(this.nRow, this.nCol);
+	};
 	Cell.prototype.setConditionalFormattingStyle=function(xfs){
-		if (null == xfs) {
-			this.ws.sheetMergedStyles.clearConditionalStyle(this.nRow, this.nCol);
-		} else {
+		if (xfs) {
 			this.ws.sheetMergedStyles.setConditionalStyle(this.nRow, this.nCol, xfs);
 		}
 	};
