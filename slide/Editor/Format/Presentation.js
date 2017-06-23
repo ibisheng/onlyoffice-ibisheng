@@ -1928,6 +1928,9 @@ CPresentation.prototype =
                 }
             }
             this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
+            if(AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects) instanceof AscFormat.CGraphicFrame){
+                bRecalculate = false;
+            }
             if(oMathShape)
             {
 				//var  oContent = oMathShape.txBody.content;
