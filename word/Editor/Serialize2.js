@@ -6283,6 +6283,17 @@ function BinaryFileReader(doc, openParams)
 				stDefault.FootnoteTextChar = oNewId.id;
 			if(stDefault.FootnoteReference == stId || "footnotereference" == sNewStyleName)
 				stDefault.FootnoteReference = oNewId.id;
+			if (stDefault.NoSpacing == stId)
+				stDefault.NoSpacing = oNewId.id;
+			if (stDefault.Title == stId)
+				stDefault.Title = oNewId.id;
+			if (stDefault.Subtitle == stId)
+				stDefault.Subtitle = oNewId.id;
+			if (stDefault.Quote == stId)
+				stDefault.Quote = oNewId.id;
+			if (stDefault.IntenseQuote == stId)
+				stDefault.IntenseQuote = oNewId.id;
+
             if(true == oNewId.def)
             {
                 switch(oNewId.type)
