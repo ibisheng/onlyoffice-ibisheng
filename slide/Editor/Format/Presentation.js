@@ -560,7 +560,6 @@ CPresentation.prototype =
         }
         oTextStyle.levels[9].DefaultRunPr.Lang.Val = NewLangId;
         this.setDefaultTextStyle(oTextStyle);
-        this.Recalculate({Drawings: {All: true}});
         this.Restart_CheckSpelling();
         this.Document_UpdateInterfaceState();
     },
