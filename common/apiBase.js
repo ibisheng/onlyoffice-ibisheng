@@ -107,9 +107,10 @@
 
 		this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
+		// translate manager
+		this.translateManager = AscCommon.translateManager.init(config['translate']);
+
 		// Chart
-		this.chartTranslate        = null;
-		this.textArtTranslate      = null;
 		this.chartPreviewManager   = null;
 		this.textArtPreviewManager = null;
 		this.shapeElementId        = null;
@@ -815,14 +816,6 @@
 	{
 	};
 	// Images & Charts & TextArts
-	baseEditorsApi.prototype.asc_setChartTranslate               = function(translate)
-	{
-		this.chartTranslate = translate;
-	};
-	baseEditorsApi.prototype.asc_setTextArtTranslate             = function(translate)
-	{
-		this.textArtTranslate = translate;
-	};
 	baseEditorsApi.prototype.asc_getChartPreviews                = function(chartType)
 	{
 		return this.chartPreviewManager.getChartPreviews(chartType);
@@ -1059,8 +1052,6 @@
 		this.ImageLoader.put_Api(this);
 		this.FontLoader.SetStandartFonts();
 
-		this.chartTranslate        = this.chartTranslate ? this.chartTranslate : new Asc.asc_CChartTranslate();
-		this.textArtTranslate      = this.textArtTranslate ? this.textArtTranslate : new Asc.asc_TextArtTranslate();
 		this.chartPreviewManager   = new AscCommon.ChartPreviewManager();
 		this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();
 

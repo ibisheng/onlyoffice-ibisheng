@@ -2679,7 +2679,7 @@
 			return true;
 		}
 		this.skipTLUpdate = true;
-		this.replaceText(0, this.textRender.getEndOfLine(this.cursorPos), this.input.value);
+		this.replaceText(0, this.textRender.getEndOfText(), this.input.value);
 		this._updateCursorByTopLine();
 		return true;
 	};

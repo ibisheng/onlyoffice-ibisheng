@@ -3048,6 +3048,21 @@
 		};
 	}
 
+	/** @constructor */
+	function CTranslateManager()
+	{
+		this.mapTranslate = {};
+	}
+
+	CTranslateManager.prototype.init = function(map)
+	{
+		this.mapTranslate = map || {};
+	};
+	CTranslateManager.prototype.getValue = function(key)
+	{
+		return this.mapTranslate.hasOwnProperty(key) ? this.mapTranslate[key] : key;
+	};
+
 	//------------------------------------------------------------export---------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
 	window["AscCommon"].getBaseUrl = getBaseUrl;
@@ -3113,4 +3128,6 @@
 	prot["selectImage"] = prot.selectImage;
 	prot["isValid"] 	= prot.isValid;
 	prot["destroy"] 	= prot.destroy;
+
+	window["AscCommon"].translateManager = new CTranslateManager();
 })(window);

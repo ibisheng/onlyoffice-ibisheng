@@ -1922,7 +1922,17 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
             var FastPages      = SimplePara.Recalculate_FastWholeParagraph();
             var FastPagesCount = FastPages.length;
 
-            if (FastPagesCount > 0)
+            var bCanRecalc = true;
+            for (var Index = 0; Index < FastPagesCount; Index++)
+			{
+				if (!this.Pages[FastPages[Index]])
+				{
+					bCanRecalc = false;
+					break;
+				}
+			}
+
+            if (FastPagesCount > 0 && true === bCanRecalc)
             {
                 // Если изменения произошли на последней странице параграфа, и за данным параграфом следовал
                 // пустой параграф с новой секцией, тогда его тоже надо пересчитать.
@@ -6273,10 +6283,7 @@ CDocument.prototype.OnKeyDown = function(e)
         }
         else if (docpostype_DrawingObjects === this.CurPos.Type || (docpostype_HdrFtr === this.CurPos.Type && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ))
         {
-            this.DrawingObjects.resetSelection2();
-            this.Document_UpdateInterfaceState();
-            this.Document_UpdateSelectionState();
-            this.private_UpdateCursorXY(true, true);
+        	this.EndDrawingEditing();
         }
         else if (docpostype_HdrFtr == this.CurPos.Type)
         {
@@ -6441,6 +6448,7 @@ CDocument.prototype.OnKeyDown = function(e)
             }
         }
 
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 34) // PgDn
@@ -6550,6 +6558,7 @@ CDocument.prototype.OnKeyDown = function(e)
             }
         }
 
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 35) // клавиша End
@@ -6566,6 +6575,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.Document_UpdateInterfaceState();
         this.Document_UpdateRulersState();
 
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 36) // клавиша Home
@@ -6582,6 +6592,7 @@ CDocument.prototype.OnKeyDown = function(e)
         this.Document_UpdateInterfaceState();
         this.Document_UpdateRulersState();
 
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 37) // Left Arrow
@@ -6592,6 +6603,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorLeft(true === e.ShiftKey, true === e.CtrlKey);
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 38) // Top Arrow
@@ -6603,6 +6615,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorUp(true === e.ShiftKey, true === e.CtrlKey);
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 39) // Right Arrow
@@ -6613,6 +6626,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorRight(true === e.ShiftKey, true === e.CtrlKey);
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 40) // Bottom Arrow
@@ -6624,6 +6638,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
         this.DrawingDocument.UpdateTargetFromPaint = true;
         this.MoveCursorDown(true === e.ShiftKey, true === e.CtrlKey);
+		this.private_CheckCursorPosInFillingFormMode();
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 46) // Delete
@@ -6874,7 +6889,63 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-    else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
+    else if (e.KeyCode === 112 && true === e.ShiftKey)
+	{
+		this.Api.asc_AddContentControl(AscCommonWord.sdttype_InlineLevel);
+		bRetValue = keydownresult_PreventAll;
+	}
+	else if (e.KeyCode === 113 && true === e.ShiftKey)
+	{
+		this.Api.asc_AddContentControl(AscCommonWord.sdttype_BlockLevel);
+		bRetValue = keydownresult_PreventAll;
+	}
+	else if (e.KeyCode === 114 && true === e.ShiftKey)
+	{
+		this.Api.asc_RemoveContentControl();
+		bRetValue = keydownresult_PreventAll;
+	}
+	else if (e.KeyCode === 115 && true === e.ShiftKey)
+	{
+		this.Api.asc_RemoveContentControlWrapper();
+		bRetValue = keydownresult_PreventAll;
+	}
+	else if (e.KeyCode === 116 && true === e.ShiftKey)
+	{
+		var oContentControlPr = new AscCommonWord.CContentControlPr();
+		oContentControlPr.put_Lock(AscCommonWord.sdtlock_Unlocked);
+		this.Api.asc_SetContentControlProperties(oContentControlPr);
+		bRetValue = keydownresult_PreventAll;
+	}
+	else if (e.KeyCode === 117 && true === e.ShiftKey)
+	{
+		var oContentControlPr = new AscCommonWord.CContentControlPr();
+		oContentControlPr.put_Lock(AscCommonWord.sdtlock_ContentLocked);
+		this.Api.asc_SetContentControlProperties(oContentControlPr);
+		bRetValue = keydownresult_PreventAll;
+	}
+	else if (e.KeyCode === 118 && true === e.ShiftKey)
+	{
+		var oContentControlPr = new AscCommonWord.CContentControlPr();
+		oContentControlPr.put_Lock(AscCommonWord.sdtlock_SdtLocked);
+		this.Api.asc_SetContentControlProperties(oContentControlPr);
+		bRetValue = keydownresult_PreventAll;
+	}
+	else if (e.KeyCode === 119 && true === e.ShiftKey)
+	{
+		var oContentControlPr = new AscCommonWord.CContentControlPr();
+		oContentControlPr.put_Lock(AscCommonWord.sdtlock_SdtContentLocked);
+		this.Api.asc_SetContentControlProperties(oContentControlPr);
+		bRetValue = keydownresult_PreventAll;
+	}
+	else if (e.KeyCode === 120 && true === e.ShiftKey)
+	{
+		if (true !== e.CtrlKey)
+			this.Api.restrictions = Asc.c_oAscRestrictionType.OnlyForms;
+		else
+			this.Api.restrictions = Asc.c_oAscRestrictionType.None;
+		bRetValue = keydownresult_PreventAll;
+	}
+	else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;
         if (this.DrawingObjects.selectedObjects.length > 0)
@@ -7317,6 +7388,8 @@ CDocument.prototype.OnMouseUp = function(e, X, Y, PageIndex)
 			}
 		}
 	}
+
+	this.private_CheckCursorPosInFillingFormMode();
 
 	this.private_UpdateCursorXY(true, true);
 };
@@ -7849,6 +7922,16 @@ CDocument.prototype.EndFootnotesEditing = function()
 		this.Document_UpdateRulersState();
 		this.Document_UpdateInterfaceState();
 		this.Document_UpdateSelectionState();
+	}
+};
+CDocument.prototype.EndDrawingEditing = function()
+{
+	if (docpostype_DrawingObjects === this.Get_DocPosType() || (docpostype_HdrFtr === this.Get_DocPosType() && null != this.HdrFtr.CurHdrFtr && docpostype_DrawingObjects === this.HdrFtr.CurHdrFtr.Content.CurPos.Type ))
+	{
+		this.DrawingObjects.resetSelection2();
+		this.Document_UpdateInterfaceState();
+		this.Document_UpdateSelectionState();
+		this.private_UpdateCursorXY(true, true);
 	}
 };
 CDocument.prototype.Document_Format_Paste = function()
@@ -8779,6 +8862,18 @@ CDocument.prototype.AddComment = function(CommentData)
 };
 CDocument.prototype.EditComment = function(Id, CommentData)
 {
+	if (!this.Comments.IsUseSolved() && this.Comments.Get_CurrentId() === Id)
+	{
+		var oComment = this.Comments.Get_ById(Id);
+		if (oComment && !oComment.IsSolved() && CommentData.IsSolved())
+		{
+			this.Comments.Set_Current(null);
+			this.Api.sync_HideComment();
+			this.DrawingDocument.ClearCachePages();
+			this.DrawingDocument.FirePaint();
+		}
+	}
+
 	this.Comments.Set_CommentData(Id, CommentData);
 	this.Document_UpdateInterfaceState();
 };
@@ -15133,9 +15228,6 @@ CDocument.prototype.IsInFormField = function()
 	var oInlineSdt    = oSelectedInfo.GetInlineLevelSdt();
 	var oBlockSdt     = oSelectedInfo.GetBlockLevelSdt();
 
-	if (oSelectedInfo.Is_MixedSelection())
-		return false;
-
 	return (oBlockSdt || oInlineSdt || (oField && fieldtype_FORMTEXT === oField.Get_FieldType())) ? true : false;
 };
 CDocument.prototype.IsFormFieldEditing = function()
@@ -15185,9 +15277,7 @@ CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
 };
 CDocument.prototype.AddContentControl = function(nContentControlType)
 {
-	if (true === this.IsSelectionUse())
-		this.RemoveBeforePaste();
-
+	this.EndDrawingEditing();
 	return this.Controller.AddContentControl(nContentControlType);
 };
 CDocument.prototype.GetAllContentControls = function()
@@ -15266,6 +15356,15 @@ CDocument.prototype.CanEdit = function()
 		return false;
 
 	return true;
+};
+CDocument.prototype.private_CheckCursorPosInFillingFormMode = function()
+{
+	if (this.IsFillingFormMode() && !this.IsInFormField())
+	{
+		this.MoveToFillingForm(true);
+		this.Document_UpdateSelectionState();
+		this.Document_UpdateInterfaceState();
+	}
 };
 
 function CDocumentSelectionState()

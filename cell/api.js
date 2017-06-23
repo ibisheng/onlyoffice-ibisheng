@@ -3496,8 +3496,6 @@ var editor;
   // Drawing objects interface
 
   prot["asc_showDrawingObjects"] = prot.asc_showDrawingObjects;
-  prot["asc_setChartTranslate"] = prot.asc_setChartTranslate;
-  prot["asc_setTextArtTranslate"] = prot.asc_setTextArtTranslate;
   prot["asc_drawingObjectsExist"] = prot.asc_drawingObjectsExist;
   prot["asc_getChartObject"] = prot.asc_getChartObject;
   prot["asc_addChartDrawingObject"] = prot.asc_addChartDrawingObject;

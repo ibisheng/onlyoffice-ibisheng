@@ -2733,27 +2733,36 @@ Paragraph.prototype.Remove = function(nCount, bOnlyText, bRemoveOnlySelection, b
 			{
 				this.Remove_PresentationNumbering();
 			}
-			else if (align_Right === Pr.Jc)
+			else if(this.bFromDocument)
 			{
-				this.Set_Align(align_Center);
-			}
-			else if (align_Center === Pr.Jc)
-			{
-				this.Set_Align(align_Left);
-			}
-			else if (Math.abs(Pr.Ind.FirstLine) > 0.001)
-			{
-				if (Pr.Ind.FirstLine > 0)
-					this.Set_Ind({FirstLine : 0}, false);
-				else
-					this.Set_Ind({Left : Pr.Ind.Left + Pr.Ind.FirstLine, FirstLine : 0}, false);
-			}
-			else if (Math.abs(Pr.Ind.Left) > 0.001)
-			{
-				this.Set_Ind({Left : 0}, false);
+             	if (align_Right === Pr.Jc)
+                {
+                    this.Set_Align(align_Center);
+                }
+                else if (align_Center === Pr.Jc)
+                {
+                    this.Set_Align(align_Left);
+                }
+                else if (Math.abs(Pr.Ind.FirstLine) > 0.001)
+                {
+                    if (Pr.Ind.FirstLine > 0)
+                        this.Set_Ind({FirstLine : 0}, false);
+                    else
+                        this.Set_Ind({Left : Pr.Ind.Left + Pr.Ind.FirstLine, FirstLine : 0}, false);
+                }
+                else if (Math.abs(Pr.Ind.Left) > 0.001)
+                {
+                    this.Set_Ind({Left : 0}, false);
+                }
+                else
+				{
+                    Result = false;
+				}
 			}
 			else
-				Result = false;
+			{
+                Result = false;
+			}
 		}
 	}
 
@@ -12161,19 +12170,89 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 	if (AscCommonWord.sdttype_InlineLevel !== nContentControlType)
 		return null;
 
-	// Тут не должно быть селекта, поэтому мы просто вставляем в текущую позицию курсора
-	var oContentControl = new CInlineLevelSdt();
-	oContentControl.Add_ToContent(0, new ParaRun());
-	this.Add(oContentControl);
-
-	var oContentControlPos = this.Get_PosByElement(oContentControl);
-	if (oContentControlPos)
+	if (true === this.IsSelectionUse())
 	{
-		oContentControl.Get_StartPos(oContentControlPos, oContentControlPos.Get_Depth() + 1);
-		this.Set_ParaContentPos(oContentControlPos, false, -1, -1);
-	}
+		if (this.Selection.StartPos === this.Selection.EndPos && para_Run !== this.Content[this.Selection.StartPos].Type)
+		{
+			if (this.Content[this.Selection.StartPos].AddContentControl)
+				return this.Content[this.Selection.StartPos].AddContentControl();
 
-	return oContentControl;
+			return null;
+		}
+		else
+		{
+			var nStartPos = this.Selection.StartPos;
+			var nEndPos   = this.Selection.EndPos;
+			if (nEndPos < nStartPos)
+			{
+				nStartPos = this.Selection.EndPos;
+				nEndPos   = this.Selection.StartPos;
+			}
+
+			for (var nIndex = nStartPos; nIndex <= nEndPos; ++nIndex)
+			{
+				if (para_Run !== this.Content[nIndex].Type)
+				{
+					// TODO: Вывести сообщение, что в данном месте нельзя добавить Plain text content control
+					return null;
+				}
+			}
+
+			// TODO: ParaEnd
+			if (nEndPos === this.Content.length - 1)
+			{
+				nEndPos--;
+				this.Content[this.Content.length - 1].RemoveSelection();
+			}
+
+			var oContentControl = new CInlineLevelSdt();
+
+			if (nEndPos < nStartPos)
+			{
+				this.Add_ToContent(nStartPos, oContentControl);
+				oContentControl.Add_ToContent(0, new ParaRun(this));
+				this.Selection.StartPos = nStartPos;
+				this.Selection.EndPos   = nStartPos;
+			}
+			else
+			{
+				var oNewRun = this.Content[nEndPos].Split_Run(Math.max(this.Content[nEndPos].Selection.StartPos, this.Content[nEndPos].Selection.EndPos));
+				this.Add_ToContent(nEndPos + 1, oNewRun);
+
+				oNewRun = this.Content[nStartPos].Split_Run(Math.min(this.Content[nStartPos].Selection.StartPos, this.Content[nStartPos].Selection.EndPos));
+				this.Add_ToContent(nStartPos + 1, oNewRun);
+
+				for (var nIndex = nEndPos + 1; nIndex >= nStartPos + 1; --nIndex)
+				{
+					oContentControl.Add_ToContent(0, this.Content[nIndex]);
+					this.Remove_FromContent(nIndex, 1);
+				}
+				this.Add_ToContent(nStartPos + 1, oContentControl);
+				this.Selection.StartPos = nStartPos + 1;
+				this.Selection.EndPos   = nStartPos + 1;
+			}
+
+			oContentControl.MoveCursorToStartPos();
+			oContentControl.SelectAll(1);
+			return oContentControl;
+		}
+	}
+	else
+	{
+
+		var oContentControl = new CInlineLevelSdt();
+		oContentControl.Add_ToContent(0, new ParaRun());
+		this.Add(oContentControl);
+
+		var oContentControlPos = this.Get_PosByElement(oContentControl);
+		if (oContentControlPos)
+		{
+			oContentControl.Get_StartPos(oContentControlPos, oContentControlPos.Get_Depth() + 1);
+			this.Set_ParaContentPos(oContentControlPos, false, -1, -1);
+		}
+
+		return oContentControl;
+	}
 };
 
 var pararecalc_0_All  = 0;
