@@ -4931,7 +4931,7 @@
 				oStyleObject.aBorders[i] = g_StyleCache.addBorder(oStyleObject.aBorders[i]);
 			}
 			for (var numFmt in oStyleObject.oNumFmts) {
-				oStyleObject.oNumFmts[i] = g_StyleCache.addNum(oStyleObject.oNumFmts[numFmt]);
+				oStyleObject.oNumFmts[i] = oStyleObject.oNumFmts[numFmt];
 			}
 			for (var XfIdTmp in oStyleObject.aCellStyleXfs) {
 				var xf = oStyleObject.aCellStyleXfs[XfIdTmp];
@@ -5000,9 +5000,9 @@
                 if(null != oCellStyleXfs.numid) {
                     var oCurNumCellStyle = oStyleObject.oNumFmts[oCellStyleXfs.numid];
                     if(null != oCurNumCellStyle)
-						newXf.num = this.ParseNum(oCurNumCellStyle, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(this.ParseNum(oCurNumCellStyle, oStyleObject.oNumFmts));
                     else
-						newXf.num = this.ParseNum({id: oCellStyleXfs.numid, f: null}, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(this.ParseNum({id: oCellStyleXfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
                 // QuotePrefix
                 if(null != oCellStyleXfs.QuotePrefix)
@@ -5074,9 +5074,9 @@
                     var oCurNum = oStyleObject.oNumFmts[xfs.numid];
                     //todo
                     if(null != oCurNum)
-						newXf.num = this.ParseNum(oCurNum, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(this.ParseNum(oCurNum, oStyleObject.oNumFmts));
                     else
-						newXf.num = this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts);
+						newXf.num = g_StyleCache.addNum(this.ParseNum({id: xfs.numid, f: null}, oStyleObject.oNumFmts));
                 }
                 if(null != xfs.QuotePrefix)
 					newXf.QuotePrefix = xfs.QuotePrefix;
