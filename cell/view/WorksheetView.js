@@ -2974,15 +2974,10 @@
 		}
 
 		function drawVerticalBorder(borderLeftObject, borderRightObject, x, y1, y2) {
-			var border, borderLeft = borderLeftObject ? borderLeftObject.borders :
-				null, borderRight = borderRightObject ? borderRightObject.borders : null;
+			var borderLeft = borderLeftObject ? borderLeftObject.borders : null,
+				borderRight = borderRightObject ? borderRightObject.borders : null;
 
-			if (borderLeft && borderLeft.r.w) {
-				border = borderLeft.r;
-			}
-			if (borderRight && borderRight.l.w && (!border || border.w < borderRight.l.w)) {
-				border = borderRight.l;
-			}
+			var border = AscCommonExcel.getMatchingBorder(borderLeft && borderLeft.r, borderRight && borderRight.l);
 			if (!border || border.w < 1) {
 				return;
 			}
@@ -3000,16 +2995,10 @@
 		}
 
 		function drawHorizontalBorder(borderTopObject, borderBottomObject, x1, y, x2) {
-			var border, borderTop = borderTopObject ? borderTopObject.borders :
-				null, borderBottom = borderBottomObject ? borderBottomObject.borders : null;
+			var borderTop = borderTopObject ? borderTopObject.borders : null,
+				borderBottom = borderBottomObject ? borderBottomObject.borders : null;
 
-			if (borderTop && borderTop.b.w) {
-				border = borderTop.b;
-			}
-			if (borderBottom && borderBottom.t.w && (!border || border.w < borderBottom.t.w)) {
-				border = borderBottom.t;
-			}
-
+			var border = AscCommonExcel.getMatchingBorder(borderTop && borderTop.b, borderBottom && borderBottom.t);
 			if (border && border.w > 0) {
 				// ToDo переделать рассчет
 				var lbw = t._calcMaxBorderWidth(borderTopObject && borderTopObject.getLeftBorder(),

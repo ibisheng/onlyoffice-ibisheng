@@ -2912,34 +2912,6 @@
 		ctx.closePath();
 	};
 
-	var getWinBorderColor = function(border1, border2)
-	{
-		var res;
-
-		if(border1.w > border2.w)
-		{
-			res = border1.c;
-		}
-		else if(border1.w < border2.w)
-		{
-			res = border2.c;
-		}
-		else
-		{
-			res = border1.c;
-			/*var rgb1 = border1.c.getRgb();
-			var rgb2 = border2.c.getRgb();
-
-			res = border1.c;
-			if(rgb2 > rgb1)
-			{
-				res = border2.c;
-			}*/
-		}
-
-		return res;
-	};
-
 	var bbox = new Asc.Range(0, 0, col - 1, row - 1);
 	var sheetMergedStyles = new AscCommonExcel.SheetMergedStyles();
 	var hiddenManager = new AscCommonExcel.HiddenManager(null);
@@ -2961,7 +2933,7 @@
 	for (var i = 0; i < row; i++)
 	{
 		for (var j = 0; j < col; j++) {
-			var color = null, previousStyle;
+			var color = null, prevStyle;
 			var curStyle = AscCommonExcel.getCompiledStyle(sheetMergedStyles, hiddenManager, i, j);
 
 			if(!compiledStylesArr[i])
@@ -2971,60 +2943,42 @@
 			compiledStylesArr[i][j] = curStyle;
 			
 			//fill
-			if(curStyle && curStyle.fill && curStyle.fill.bg)
+			color = curStyle && curStyle.fill && curStyle.fill.bg;
+			if(color)
 			{
-				color = curStyle.fill.bg;
 				calculateRect(color, j * stepX, i * stepY, (j + 1) * stepX - j * stepX, (i + 1) * stepY - i * stepY);
 			}
 			
 			//borders
 			//left
-			if(curStyle && curStyle.border && curStyle.border.l && curStyle.border.l.w !== 0)
+			prevStyle = (j - 1 >= 0) ? compiledStylesArr[i][j - 1] : null;
+			color = AscCommonExcel.getMatchingBorder(prevStyle && prevStyle.border && prevStyle.border.r, curStyle && curStyle.border && curStyle.border.l);
+			if(color && color.w > 0)
 			{
-				color = curStyle.border.l.c;
-				if(j - 1 >= 0)
-				{
-					previousStyle = compiledStylesArr[i][j - 1];
-					if(previousStyle && previousStyle.border && previousStyle.border.r && previousStyle.border.r.w !== 0)
-					{
-						color = getWinBorderColor(curStyle.border.l, previousStyle.border.r);
-					}
-				}
-				calculateLineVer(color, j * lineStepX, i * stepY, (i + 1) * stepY);
+				calculateLineVer(color.c, j * lineStepX, i * stepY, (i + 1) * stepY);
 			}
 			//right
-			if(curStyle && curStyle.border && curStyle.border.r && curStyle.border.r.w !== 0)
+			color = curStyle && curStyle.border && curStyle.border.r;
+			if(color && color.w > 0)
 			{
-				color = curStyle.border.r.c;
-				calculateLineVer(color, (j + 1) * lineStepX, i * stepY, (i + 1) * stepY);
+				calculateLineVer(color.c, (j + 1) * lineStepX, i * stepY, (i + 1) * stepY);
 			}
 			//top
-			if(curStyle && curStyle.border && curStyle.border.t && curStyle.border.t.w !== 0)
+			prevStyle = (i - 1 >= 0) ? compiledStylesArr[i - 1][j] : null;
+			color = AscCommonExcel.getMatchingBorder(prevStyle && prevStyle.border && prevStyle.border.b, curStyle && curStyle.border && curStyle.border.t);
+			if(color && color.w > 0)
 			{
-				color = curStyle.border.t.c;
-				if(i - 1 >= 0)
-				{
-					previousStyle = compiledStylesArr[i - 1][j];
-					if(previousStyle && previousStyle.border && previousStyle.border.b && previousStyle.border.b.w !== 0)
-					{
-						color = getWinBorderColor(curStyle.border.t, previousStyle.border.b);
-					}
-				}
-				calculateLineHor(color, j * stepX, i * stepY, (j + 1) * stepX);
+				calculateLineHor(color.c, j * stepX, i * stepY, (j + 1) * stepX);
 			}
 			//bottom
-			if(curStyle && curStyle.border && curStyle.border.b && curStyle.border.b.w !== 0)
+			color = curStyle && curStyle.border && curStyle.border.b;
+			if(color && color.w > 0)
 			{
-				color = curStyle.border.b.c;
-				calculateLineHor(color, j * stepX, (i + 1) * stepY, (j + 1) * stepX);
+				calculateLineHor(color.c, j * stepX, (i + 1) * stepY, (j + 1) * stepX);
 			}
 			
 			//marks
-			color = defaultColor;
-			if(curStyle && curStyle.font && curStyle.font.c)
-			{
-				color = curStyle.font.c;
-			}
+			color = (curStyle && curStyle.font && curStyle.font.c) || defaultColor;
 			calculateLineHor(color, j * lineStepX + 3 * pxToMM, (i + 1) * stepY - stepY / 2, (j + 1) * lineStepX - 2 * pxToMM);
 		}
 	}

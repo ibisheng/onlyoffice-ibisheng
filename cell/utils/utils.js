@@ -224,6 +224,18 @@
 			return undefined;
 		}
 
+		function getMatchingBorder(border1, border2) {
+			var border;
+			if (border1 && border1.w) {
+				border = border1;
+			}
+			if (border2 && border2.w && (!border || border.w < border2.w)) {
+				border = border2;
+			}
+
+			return border;
+		}
+
 		var referenceType = {
 			A: 0,			// Absolute
 			ARRC: 1,	// Absolute row; relative column
@@ -2306,6 +2318,7 @@
 		window["Asc"].incDecFonSize = incDecFonSize;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].profileTime = profileTime;
+		window["AscCommonExcel"].getMatchingBorder = getMatchingBorder;
 		window["Asc"].isNumberInfinity = isNumberInfinity;
 		window["Asc"].trim = trim;
 		window["Asc"].arrayToLowerCase = arrayToLowerCase;
