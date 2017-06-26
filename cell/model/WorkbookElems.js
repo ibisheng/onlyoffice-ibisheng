@@ -2525,7 +2525,14 @@ StyleManager.prototype =
 			fill.bg = val;
 			val = fill;
 		}
-		return this._setProperty(oItemWithXfs, val, "fill", g_StyleCache.addFill);
+		var oRes = this._setProperty(oItemWithXfs, val, "fill", g_StyleCache.addFill);
+		if (oRes.oldVal) {
+			oRes.oldVal = oRes.oldVal.bg;
+		}
+		if (oRes.newVal) {
+			oRes.newVal = oRes.newVal.bg;
+		}
+		return oRes;
 	},
 	setBorder : function(oItemWithXfs, val)
 	{
@@ -2749,14 +2756,18 @@ StyleManager.prototype =
 		return this._add(this.xfs, newXf);
 	};
 	StyleCache.prototype._add = function(container, newVal) {
-		var hash = newVal.getHash();
-		var res = container.vals[hash];
-		if (!res) {
-			newVal.setIndexNumber(container.count++);
-			container.vals[hash] = newVal;
-			res = newVal;
+		if (undefined === newVal.getIndexNumber()) {
+			var hash = newVal.getHash();
+			var res = container.vals[hash];
+			if (!res) {
+				newVal.setIndexNumber(container.count++);
+				container.vals[hash] = newVal;
+				res = newVal;
+			}
+			return res;
+		} else {
+			return newVal;
 		}
-		return res;
 	};
 	var g_StyleCache = new StyleCache();
 
