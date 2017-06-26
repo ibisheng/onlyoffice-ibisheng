@@ -2010,7 +2010,7 @@ CPresentationBullet.prototype.Measure = function(Context, FirstTextPr, _Num, The
         }
         else
         {
-            this.Unifill = AscFormat.CreateUniColorRGB(FirstTextPr.Color.r, FirstTextPr.Color.g, FirstTextPr.Color.b);
+            this.Unifill = AscFormat.CreteSolidFillRGB(FirstTextPr.Color.r, FirstTextPr.Color.g, FirstTextPr.Color.b);
         }
     }
 

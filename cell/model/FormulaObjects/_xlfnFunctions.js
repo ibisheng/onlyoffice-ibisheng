@@ -56,7 +56,7 @@
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST, cBINOM_DIST_RANGE, cBINOM_INV, cCHISQ_TEST, cCOVARIANCE_P,
+	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cCHISQ_TEST, cCOVARIANCE_P,
 		cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
 		cFORECAST_LINEAR, cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL, cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST,
 		cNORM_S_INV, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC, cSKEW_P, cSTDEV_P, cSTDEV_S,
@@ -72,7 +72,7 @@
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
-		cERF_PRECISE, cERFC_PRECISE, cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST, cBINOM_DIST_RANGE, cBINOM_INV, cCHISQ_TEST,
+		cERF_PRECISE, cERFC_PRECISE, cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cCHISQ_TEST,
 		cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY,
 		cFORECAST_ETS_STAT, cFORECAST_LINEAR, cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL, cNEGBINOM_DIST, cNORM_DIST,
 		cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERMUTATIONA, cPHI, cPOISSON_DIST, cQUARTILE_EXC, cQUARTILE_INC, cSKEW_P,
@@ -95,18 +95,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cBINOM_DIST() {
-		cBaseFunction.call(this, "BINOM.DIST");
-		this.isXLFN = true;
-	}
-
-	cBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cBINOM_DIST.prototype.constructor = cBINOM_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cBINOM_DIST_RANGE() {
 		cBaseFunction.call(this, "BINOM.DIST.RANGE");
 		this.isXLFN = true;
@@ -114,18 +102,6 @@
 
 	cBINOM_DIST_RANGE.prototype = Object.create(cBaseFunction.prototype);
 	cBINOM_DIST_RANGE.prototype.constructor = cBINOM_DIST_RANGE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBINOM_INV() {
-		cBaseFunction.call(this, "BINOM.DIST.RANGE");
-		this.isXLFN = true;
-	}
-
-	cBINOM_INV.prototype = Object.create(cBaseFunction.prototype);
-	cBINOM_INV.prototype.constructor = cBINOM_INV;
 
 	/**
 	 * @constructor

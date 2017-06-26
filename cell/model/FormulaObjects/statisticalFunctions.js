@@ -61,16 +61,17 @@
 
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
-		cBETA_DIST, cBETA_INV, cBINOMDIST, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT,
-		cCHITEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T, cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ,
-		cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
-		cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS,
-		cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST,
-		cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV,
-		cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
-		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPROB, cQUARTILE, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSLOPE, cSMALL,
-		cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV,
-		cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+		cBETA_DIST, cBETA_INV, cBINOMDIST, cBINOM_DIST, cBINOM_INV, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT,
+		cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T, cCORREL, cCOUNT, cCOUNTA,
+		cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCRITBINOM, cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST,
+		cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST,
+		cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN,
+		cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST,
+		cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON,
+		cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT,
+		cPOISSON, cPROB, cQUARTILE, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV,
+		cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND,
+		cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
@@ -1655,7 +1656,18 @@
 	cBINOMDIST.prototype.argumentsMin = 4;
 	cBINOMDIST.prototype.argumentsMax = 4;
 	cBINOMDIST.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();//bool
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
 
 		function binomdist(x, n, p) {
 			x = parseInt(x);
@@ -1663,63 +1675,44 @@
 			return Math.binomCoeff(n, x) * Math.pow(p, x) * Math.pow(1 - p, n - x);
 		}
 
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]);
-		} else if (arg0 instanceof cArray) {
-			arg0 = arg0.getElement(0);
-		}
+		var calcBinom = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+			var arg2 = argArray[2];
+			var arg3 = argArray[3];
 
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
-		} else if (arg1 instanceof cArray) {
-			arg1 = arg1.getElement(0);
-		}
-
-		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1]);
-		} else if (arg2 instanceof cArray) {
-			arg2 = arg2.getElement(0);
-		}
-
-		if (arg3 instanceof cArea || arg3 instanceof cArea3D) {
-			arg3 = arg3.cross(arguments[1]);
-		} else if (arg3 instanceof cArray) {
-			arg3 = arg3.getElement(0);
-		}
-
-		arg0 = arg0.tocNumber();
-		arg1 = arg1.tocNumber();
-		arg2 = arg2.tocNumber();
-		arg3 = arg3.tocBool();
-
-		if (arg0 instanceof cError) {
-			return this.value = arg0;
-		}
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
-		}
-		if (arg2 instanceof cError) {
-			return this.value = arg2;
-		}
-		if (arg3 instanceof cError) {
-			return this.value = arg3;
-		}
-
-
-		if (arg0.getValue() < 0 || arg0.getValue() > arg1.getValue() || arg2.getValue() < 0 || arg2.getValue() > 1) {
-			return this.value = new cError(cErrorType.not_numeric);
-		}
-
-		if (arg3.toBool()) {
-			var x = parseInt(arg0.getValue()), n = parseInt(arg1.getValue()), p = arg2.getValue(), bm = 0;
-			for (var y = 0; y <= x; y++) {
-				bm += binomdist(y, n, p);
+			if (arg0 < 0 || arg0 > arg1 || arg2 < 0 || arg2 > 1) {
+				return new cError(cErrorType.not_numeric);
 			}
-			return this.value = new cNumber(bm);
-		} else {
-			return this.value = new cNumber(binomdist(arg0.getValue(), arg1.getValue(), arg2.getValue()));
-		}
+
+			if (arg3) {
+				var x = parseInt(arg0), n = parseInt(arg1), p = arg2, bm = 0;
+
+				for (var y = 0; y <= x; y++) {
+					bm += binomdist(y, n, p);
+				}
+
+				return new cNumber(bm);
+			} else {
+				return new cNumber(binomdist(arg0, arg1, arg2));
+			}
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcBinom);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cBINOMDIST}
+	 */
+	function cBINOM_DIST() {
+		cBINOMDIST.call(this);
+		this.name = "BINOM.DIST";
+	}
+
+	cBINOM_DIST.prototype = Object.create(cBINOMDIST.prototype);
+	cBINOM_DIST.prototype.constructor = cBINOM_DIST;
+	cBINOM_DIST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
@@ -2505,9 +2498,24 @@
 	cCRITBINOM.prototype.argumentsMin = 3;
 	cCRITBINOM.prototype.argumentsMax = 3;
 	cCRITBINOM.prototype.Calculate = function (arg) {
-		var n = arg[0], p = arg[1], alpha = arg[2];                    // alpha
+		
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
 
-		function critbinom(n, p, alpha) {
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function critbinom(argArray) {
+			var n = argArray[0];
+			var p = argArray[1];
+			var alpha = argArray[2];
+
 			if (n < 0 || alpha <= 0 || alpha >= 1 || p < 0 || p > 1) {
 				return new cError(cErrorType.not_numeric);
 			} else {
@@ -2539,41 +2547,21 @@
 			}
 		}
 
-		if (alpha instanceof cArea || alpha instanceof cArea3D) {
-			alpha = alpha.cross(arguments[1]);
-		} else if (alpha instanceof cArray) {
-			alpha = alpha.getElement(0);
-		}
-
-		if (n instanceof cArea || n instanceof cArea3D) {
-			n = n.cross(arguments[1]);
-		} else if (n instanceof cArray) {
-			n = n.getElement(0);
-		}
-
-		if (p instanceof cArea || p instanceof cArea3D) {
-			p = p.cross(arguments[1]);
-		} else if (p instanceof cArray) {
-			p = p.getElement(0);
-		}
-
-		alpha = alpha.tocNumber();
-		n = n.tocNumber();
-		p = p.tocNumber();
-
-		if (alpha instanceof cError) {
-			return this.value = alpha;
-		}
-		if (n instanceof cError) {
-			return this.value = n;
-		}
-		if (p instanceof cError) {
-			return this.value = p;
-		}
-
-		return this.value = critbinom(n, p, alpha);
-
+		return this.value = this._findArrayInNumberArguments(oArguments, critbinom);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cCRITBINOM}
+	 */
+	function cBINOM_INV() {
+		cCRITBINOM.call(this);
+		this.name = "BINOM.INV";
+	}
+
+	cBINOM_INV.prototype = Object.create(cCRITBINOM.prototype);
+	cBINOM_INV.prototype.constructor = cBINOM_INV;
+	cBINOM_INV.prototype.isXLFN = true;
 
 	/**
 	 * @constructor

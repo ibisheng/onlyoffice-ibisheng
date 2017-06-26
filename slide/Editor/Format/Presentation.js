@@ -1928,6 +1928,9 @@ CPresentation.prototype =
                 }
             }
             this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
+            if(AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects) instanceof AscFormat.CGraphicFrame){
+                bRecalculate = false;
+            }
             if(oMathShape)
             {
 				//var  oContent = oMathShape.txBody.content;
@@ -3717,6 +3720,9 @@ CPresentation.prototype =
                      HyperProps.put_Text( HyperText.Text );
                      editor.sync_HyperlinkPropCallback(HyperProps);
                      }*/
+                }
+                else{
+                    this.Api.sendEvent("asc_onTextLanguage", this.Get_DefaultLanguage());
                 }
             }
         }

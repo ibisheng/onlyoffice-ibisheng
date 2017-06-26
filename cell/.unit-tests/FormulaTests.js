@@ -2928,6 +2928,17 @@ $( function () {
 
     } );
 
+	test( "Test: \"BINOM.DIST\"", function () {
+
+		ws.getRange2( "A2" ).setValue( "6" );
+		ws.getRange2( "A3" ).setValue( "10" );
+		ws.getRange2( "A4" ).setValue( "0.5" );
+
+	    oParser = new parserFormula( "BINOM.DIST(A2,A3,A4,FALSE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 7 ) - 0, 0.2050781);
+	} );
+
     test( "Test: \"CONFIDENCE\"", function () {
 
         oParser = new parserFormula( "CONFIDENCE(0.4,5,12)", "A1", ws );
