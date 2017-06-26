@@ -3463,7 +3463,7 @@ CDocument.prototype.private_RecalculateHdrFtrPageCountUpdate = function()
 {
 	this.HdrFtrRecalc.Id = null;
 
-	var nPageAbs = this.HdrFtrRecalc.PageIndex;
+	var nPageAbs    = this.HdrFtrRecalc.PageIndex;
 	var nPagesCount = this.Pages.length;
 
 	while (nPageAbs < nPagesCount)
@@ -3484,7 +3484,7 @@ CDocument.prototype.private_RecalculateHdrFtrPageCountUpdate = function()
 			else
 			{
 				this.HdrFtrRecalc.PageIndex = nPageAbs + 1;
-				this.HdrFtrRecalc.Id = setTimeout(Document_Recalculate_HdrFtrPageCount, 20);
+				this.HdrFtrRecalc.Id        = setTimeout(Document_Recalculate_HdrFtrPageCount, 20);
 				return;
 			}
 		}
@@ -3505,11 +3505,9 @@ CDocument.prototype.private_RecalculateHdrFtrPageCountUpdate = function()
 			return;
 		}
 	}
-	
+
 	if (nPageAbs >= nPagesCount)
-	{
-		this.DrawingDocument.OnEndRecalculate(true);
-	}
+		this.DrawingDocument.OnEndRecalculate(false, true);
 };
 CDocument.prototype.OnColumnBreak_WhileRecalculate           = function()
 {
