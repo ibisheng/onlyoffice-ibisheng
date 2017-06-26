@@ -356,6 +356,9 @@ ParaRun.prototype.Is_StartFromNewLine = function()
 // Добавляем элемент в текущую позицию
 ParaRun.prototype.Add = function(Item, bMath)
 {
+	if (undefined !== Item.Parent)
+		Item.Parent = this;
+
 	if (this.Paragraph && this.Paragraph.LogicDocument && this.Paragraph.bFromDocument)
 	{
 		// Специальный код, связанный с обработкой изменения языка ввода при наборе.
@@ -3961,6 +3964,10 @@ ParaRun.prototype.Refresh_RecalcData = function(Data)
 
         Para.Refresh_RecalcData2(0);
     }
+};
+ParaRun.prototype.Refresh_RecalcData2 = function()
+{
+	this.Refresh_RecalcData();
 };
 ParaRun.prototype.SaveRecalculateObject = function(Copy)
 {
