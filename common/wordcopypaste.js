@@ -2061,7 +2061,7 @@ PasteProcessor.prototype =
 			//TODO пересмотреть pasteTypeContent
 			this.pasteTypeContent = null;
 			var oSelectedContent = new CSelectedContent();
-            for (var i = 0; i < aNewContent.length; ++i) {
+            for (var i = 0, length = aNewContent.length; i < length; ++i) {
 				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
 				{
 					var parseItem = this._specialPasteItemConvert(aNewContent[i]);
