@@ -7219,7 +7219,7 @@ background-repeat: no-repeat;\
 					oLogicDocument.TurnOff_Recalculate();
 					for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
 					{
-						oContentControl.AddToParagraph(new ParaText(sDefaultText.charAt(nIndex)));
+						oContentControl.AddToParagraph(new AscCommonWord.ParaText(sDefaultText.charAt(nIndex)));
 					}
 					oLogicDocument.SelectContentControl(oContentControl.GetId());
 					oLogicDocument.TurnOn_Recalculate();
@@ -7249,7 +7249,7 @@ background-repeat: no-repeat;\
 					{
 						for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
 						{
-							oContentControl.Add(new ParaText(sDefaultText.charAt(nIndex)));
+							oContentControl.Add(new AscCommonWord.ParaText(sDefaultText.charAt(nIndex)));
 						}
 						oContentControl.SelectThisElement();
 					}
