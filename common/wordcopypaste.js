@@ -5674,7 +5674,7 @@ PasteProcessor.prototype =
         if("always" === pNoHtmlPr["page-break-before"])
             Para.Set_PageBreakBefore(true);
         //Tabs
-        var tab_stops = pNoHtmlPr["tab-stops"]
+        var tab_stops = pNoHtmlPr["tab-stops"];
         if(tab_stops && "" != pNoHtmlPr["tab-stops"])
         {
             var aTabs = tab_stops.split(' ');
@@ -5774,6 +5774,11 @@ PasteProcessor.prototype =
 					
 					//get listId and level from mso-list property
 					var msoListIgnoreSymbol = this._getMsoListSymbol(node);
+					if(!msoListIgnoreSymbol)
+					{
+						msoListIgnoreSymbol = "ol" === node.parentElement.nodeName.toLowerCase() ? "1." : ".";
+					}
+
 					var listObj = this._getTypeMsoListSymbol(msoListIgnoreSymbol, (null === NumId));
 					var num = listObj.type;
 					var startPos = listObj.startPos;
