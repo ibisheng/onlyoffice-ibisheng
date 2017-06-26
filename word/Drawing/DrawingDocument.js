@@ -2110,7 +2110,6 @@ function CDrawingDocument()
 	this.CollaborativeTargetsUpdateTasks = [];
 
 	this.m_bIsBreakRecalculate = false;
-	this.m_bIsUpdateDocSize = false;
 
 	this.m_bIsSelection = false;
 	this.m_bIsSearching = false;
@@ -2351,7 +2350,7 @@ function CDrawingDocument()
 		}
 
 		this.m_bIsBreakRecalculate = (isFull === true) ? false : true;
-		if (((this.m_lPagesCount != this.m_lCountCalculatePages) && isFull) || this.m_bIsUpdateDocSize)
+		if (isFull)
 		{
 			if (this.m_lPagesCount > this.m_lCountCalculatePages)
 			{
@@ -2367,8 +2366,6 @@ function CDrawingDocument()
 			 this.m_oWordControl.OnUpdateSelection();
 			 }
 			 */
-
-			this.m_bIsUpdateDocSize = false;
 		}
 		else if ((this.m_lPagesCount + 50) < this.m_lCountCalculatePages)
 		{

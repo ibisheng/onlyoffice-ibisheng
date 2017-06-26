@@ -1407,8 +1407,7 @@ function CDrawingDocument(drawingObjects)
     this.TargetHtmlElement = null;
 
     this.m_bIsBreakRecalculate = false;
-    this.m_bIsUpdateDocSize = false;
-    
+
     this.m_bIsSelection = false;
     this.m_bIsSearching = false;
     this.m_lCountRect = 0;
@@ -1621,7 +1620,7 @@ function CDrawingDocument(drawingObjects)
         }
 
         this.m_bIsBreakRecalculate = (isFull === true) ? false : true;
-        if (((this.m_lPagesCount != this.m_lCountCalculatePages) && isFull) || this.m_bIsUpdateDocSize)
+        if (isFull)
         {
             if (this.m_lPagesCount > this.m_lCountCalculatePages)
             {
@@ -1637,8 +1636,6 @@ function CDrawingDocument(drawingObjects)
                 this.m_oWordControl.OnUpdateSelection();
             }
             */
-
-            this.m_bIsUpdateDocSize = false;
         }
         else if ((this.m_lPagesCount + 50) < this.m_lCountCalculatePages)
         {
