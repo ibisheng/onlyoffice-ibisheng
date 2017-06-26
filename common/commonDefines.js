@@ -1835,6 +1835,7 @@
 		this.isVisual     = false;      // визуальный ли
 		this.isModal      = false;      // модальное ли окно (используется только для визуального)
 		this.isInsideMode = false;      // отрисовка не в окне а внутри редактора (в панели) (используется только для визуального немодального)
+		this.isCustomWindow = false;	// ued only if this.isModal == true
 
 		this.initDataType = EPluginDataType.none;
 		this.initData     = "";
@@ -1915,6 +1916,14 @@
 	{
 		this.isInsideMode = value;
 	};
+	CPluginVariation.prototype["get_CustomWindow"] = function()
+	{
+		return this.isCustomWindow;
+	};
+	CPluginVariation.prototype["set_CustomWindow"] = function(value)
+	{
+		this.isCustomWindow = value;
+	};
 
 	CPluginVariation.prototype["get_InitDataType"] = function()
 	{
@@ -1980,6 +1989,7 @@
 		_object["isVisual"]     = this.isVisual;
 		_object["isModal"]      = this.isModal;
 		_object["isInsideMode"] = this.isInsideMode;
+		_object["isCustomWindow"] = this.isCustomWindow;
 
 		_object["initDataType"] = this.initDataType;
 		_object["initData"]     = this.initData;
@@ -2006,6 +2016,7 @@
 		this.isVisual     = (_object["isVisual"] != null) ? _object["isVisual"] : this.isVisual;
 		this.isModal      = (_object["isModal"] != null) ? _object["isModal"] : this.isModal;
 		this.isInsideMode = (_object["isInsideMode"] != null) ? _object["isInsideMode"] : this.isInsideMode;
+		this.isCustomWindow = (_object["isCustomWindow"] != null) ? _object["isCustomWindow"] : this.isCustomWindow;
 
 		this.initDataType = (_object["initDataType"] != null) ? _object["initDataType"] : this.initDataType;
 		this.initData     = (_object["initData"] != null) ? _object["initData"] : this.initData;

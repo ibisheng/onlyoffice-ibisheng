@@ -3448,7 +3448,9 @@ CChartSpace.prototype.checkEmptySeries = function()
         }
         return false;
     };
-    for(var i = 0; i < series.length; ++i)
+    var nChartType = chart_type.getObjectType();
+    var nSeriesLength = (nChartType === AscDFH.historyitem_type_PieChart || nChartType === AscDFH.historyitem_type_DoughnutChart) ? 1 : series.length;
+    for(var i = 0; i < nSeriesLength; ++i)
     {
         var ser = series[i];
         if(ser.val)
@@ -5163,7 +5165,7 @@ CChartSpace.prototype.recalculateAxis = function()
                             }
                             else
                             {
-                                string_pts.push({val: i + ""});
+                                string_pts.push({val: /*i + */""});
                             }
                         }
                     }
@@ -5919,8 +5921,8 @@ CChartSpace.prototype.recalculateAxis = function()
 
                         cat_ax.labels.extY = max_rotated_height + labels_offset;
                         //
-                        left_gap_point = Math.min.apply(Math, arr_left_points);
-                        right_gap_point = Math.max.apply(Math, arr_right_points);
+                        left_gap_point = Math.max(0, Math.min.apply(Math, arr_left_points));
+                        right_gap_point = Math.max(0, Math.max.apply(Math, arr_right_points));
 
                         if(!bWithoutLabels){
                             if(AscFormat.ORIENTATION_MIN_MAX === cat_ax_orientation)
@@ -8260,7 +8262,7 @@ CChartSpace.prototype.hitInTextRect = function()
                             legend_width = max_legend_width;
                         }
 
-                        var max_entry_height2 = Math.max.apply(Math, arr_heights);
+                        var max_entry_height2 = Math.max(0, Math.max.apply(Math, arr_heights));
                         for(i = 0; i < arr_heights.length; ++i)
                             arr_heights[i] = max_entry_height2;
 
@@ -8348,7 +8350,7 @@ CChartSpace.prototype.hitInTextRect = function()
                             b_reverse_order = true;
                         }
 
-                        var max_entry_height2 = Math.max.apply(Math, arr_heights);
+                        var max_entry_height2 = Math.max(0, Math.max.apply(Math, arr_heights));
                         for(i = 0; i < arr_heights.length; ++i)
                             arr_heights[i] = max_entry_height2;
                         if(max_content_width < max_legend_width - left_inset)
@@ -8480,7 +8482,7 @@ CChartSpace.prototype.hitInTextRect = function()
                             summ_width+=arr_width[arr_width.length-1];
                         }
 
-                        var max_entry_height = Math.max.apply(Math, arr_height);
+                        var max_entry_height = Math.max(0, Math.max.apply(Math, arr_height));
                         var cur_left_x = 0;
 
                         if(summ_width < max_legend_width)//значит все надписи убираются в одну строчку
@@ -8680,7 +8682,7 @@ CChartSpace.prototype.hitInTextRect = function()
                             summ_width += arr_width[arr_width.length-1];
                         }
 
-                        var max_entry_height = Math.max.apply(Math, arr_height);
+                        var max_entry_height = Math.max(0, Math.max.apply(Math, arr_height));
                         var cur_left_x = 0;
                         if(summ_width < max_legend_width)//значит все надписи убираются в одну строчку
                         {
@@ -8788,7 +8790,7 @@ CChartSpace.prototype.hitInTextRect = function()
                                     max_content_width = cur_content_width;
                                 arr_heights.push(calc_entry.txBody.getSummaryHeight());
                             }
-                            max_entry_height = Math.max.apply(Math, arr_heights);
+                            max_entry_height = Math.max(0, Math.max.apply(Math, arr_heights));
                             if(max_content_width < max_legend_width - left_inset && !bFixedSize)
                             {
                                 legend_width = max_content_width + left_inset;
@@ -13164,7 +13166,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
     }
 
 	var bIsScatter = (Asc.c_oAscChartTypeSettings.scatter <= options.type && options.type <= Asc.c_oAscChartTypeSettings.scatterSmoothMarker);
-	var top_header_bbox, left_header_bbox, ser, startCell, endCell, formulaCell, seriaName, start, end, formula, numCache, sStartCellId, sEndCellId;
+	var top_header_bbox, left_header_bbox, ser, startCell, endCell, formulaCell, start, end, formula, numCache, sStartCellId, sEndCellId;
 	if (!options.getInColumns()) {
 		if(parsedHeaders.bTop)
 			top_header_bbox = {r1: bbox.r1, c1: data_bbox.c1, r2: bbox.r1, c2: data_bbox.c2};
@@ -13217,8 +13219,8 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 				}
 			}
 
-			seriaName = left_header_bbox ? (ws.getCell3(i, left_header_bbox.c1).getValue()) : (api.chartTranslate.series + " " + nameIndex);
-			ser.TxCache.Tx = seriaName;
+			ser.TxCache.Tx = left_header_bbox ? (ws.getCell3(i, left_header_bbox.c1).getValue()) :
+				(AscCommon.translateManager.getValue('Series') + " " + nameIndex);
 			series.push(ser);
 			nameIndex++;
 		}
@@ -13276,8 +13278,8 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 				ser.TxCache.Formula = parserHelp.get3DRef(ws.sName, formulaCell.getIDAbsolute());
 			}
 
-			seriaName = top_header_bbox ? (ws.getCell3(top_header_bbox.r1, i).getValue()) : (api.chartTranslate.series + " " + nameIndex);
-			ser.TxCache.Tx = seriaName;
+			ser.TxCache.Tx = top_header_bbox ? (ws.getCell3(top_header_bbox.r1, i).getValue()) :
+				(AscCommon.translateManager.getValue('Series') + " " + nameIndex);
 			series.push(ser);
 			nameIndex++;
 		}

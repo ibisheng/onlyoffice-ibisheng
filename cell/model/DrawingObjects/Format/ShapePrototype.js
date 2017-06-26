@@ -67,11 +67,6 @@ CShape.prototype.Get_Numbering =  function()
     return new CNumbering();
 };
 
-CShape.prototype.getTextArtTranslate = function()
-{
-    return Asc["editor"].textArtTranslate;
-};
-
 CShape.prototype.Is_UseInDocument = function(){
     if(this.group)
     {

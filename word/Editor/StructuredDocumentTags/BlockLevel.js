@@ -272,7 +272,7 @@ CBlockLevelSdt.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Drawi
 };
 CBlockLevelSdt.prototype.CanUpdateTarget = function(CurPage)
 {
-	return this.Content.CanUpdateTatget(CurPage);
+	return this.Content.CanUpdateTarget(CurPage);
 };
 CBlockLevelSdt.prototype.MoveCursorLeft = function(AddToSelect, Word)
 {

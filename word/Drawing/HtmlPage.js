@@ -3624,14 +3624,6 @@ function CEditorPage(api)
             return;
 
 		var isRepaint                   = oWordControl.m_bIsScroll;
-		if (oWordControl.m_bIsScroll)
-		{
-			oWordControl.m_bIsScroll = false;
-			oWordControl.OnPaint();
-
-			if (null != oWordControl.m_oLogicDocument && oWordControl.m_oApi.bInit_word_control)
-				oWordControl.m_oLogicDocument.Viewer_OnChangePosition();
-		}
 		if (null != oWordControl.m_oLogicDocument && !oWordControl.m_oApi.isLockTargetUpdate)
 		{
 			oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
@@ -3641,6 +3633,14 @@ function CEditorPage(api)
 
 			oWordControl.CheckFontCache();
 			oWordControl.m_oDrawingDocument.CheckTrackTable();
+		}
+		if (oWordControl.m_bIsScroll)
+		{
+			oWordControl.m_bIsScroll = false;
+			oWordControl.OnPaint();
+
+			if (null != oWordControl.m_oLogicDocument && oWordControl.m_oApi.bInit_word_control)
+				oWordControl.m_oLogicDocument.Viewer_OnChangePosition();
 		}
 
 		oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);

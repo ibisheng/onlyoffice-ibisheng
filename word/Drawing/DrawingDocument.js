@@ -2110,7 +2110,6 @@ function CDrawingDocument()
 	this.CollaborativeTargetsUpdateTasks = [];
 
 	this.m_bIsBreakRecalculate = false;
-	this.m_bIsUpdateDocSize = false;
 
 	this.m_bIsSelection = false;
 	this.m_bIsSearching = false;
@@ -2351,7 +2350,7 @@ function CDrawingDocument()
 		}
 
 		this.m_bIsBreakRecalculate = (isFull === true) ? false : true;
-		if (((this.m_lPagesCount != this.m_lCountCalculatePages) && isFull) || this.m_bIsUpdateDocSize)
+		if (isFull)
 		{
 			if (this.m_lPagesCount > this.m_lCountCalculatePages)
 			{
@@ -2367,8 +2366,6 @@ function CDrawingDocument()
 			 this.m_oWordControl.OnUpdateSelection();
 			 }
 			 */
-
-			this.m_bIsUpdateDocSize = false;
 		}
 		else if ((this.m_lPagesCount + 50) < this.m_lCountCalculatePages)
 		{
@@ -7494,15 +7491,16 @@ CStylesPainter.prototype =
 			var style = styles[i];
 			if (true == style.qFormat && null === DocumentStyles.Get_StyleIdByName(style.Name, false))
 			{
-				this.drawStyle(graphics, style);
-				this.defaultStyles.push(new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Default, _canvas.toDataURL("image/png"), style.uiPriority));
+				this.drawStyle(graphics, style, AscCommon.translateManager.getValue(style.Name));
+				this.defaultStyles.push(new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Default,
+					_canvas.toDataURL("image/png"), style.uiPriority));
 			}
 		}
 	},
 
 	GenerateDocumentStyles: function (_api)
 	{
-		if (_api.WordControl.m_oLogicDocument == null)
+		if (!_api.WordControl.m_oLogicDocument)
 		{
 			return;
 		}
@@ -7510,7 +7508,7 @@ CStylesPainter.prototype =
 		var __Styles = _api.WordControl.m_oLogicDocument.Get_Styles();
 		var styles = __Styles.Style;
 
-		if (styles == null)
+		if (!styles)
 		{
 			return;
 		}
@@ -7557,8 +7555,10 @@ CStylesPainter.prototype =
 				_dr_style.Name = style.Name;
 				_dr_style.Id = i;
 
-				this.drawStyle(graphics, _dr_style);
-				this.docStyles[cur_index] = new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Document, _canvas.toDataURL("image/png"), style.uiPriority);
+				this.drawStyle(graphics, _dr_style,
+					__Styles.Is_StyleDefault(style.Name) ? AscCommon.translateManager.getValue(style.Name) : style.Name);
+				this.docStyles[cur_index] = new AscCommon.CStyleImage(style.Name, AscCommon.c_oAscStyleImage.Document,
+					_canvas.toDataURL("image/png"), style.uiPriority);
 
 				// алгоритм смены имени
 				if (style.Default)
@@ -7587,7 +7587,7 @@ CStylesPainter.prototype =
 			}
 		}
 	},
-	drawStyle: function (graphics, style)
+	drawStyle: function (graphics, style, styleName)
 	{
 		var ctx = graphics.m_oContext;
 		ctx.fillStyle = "#FFFFFF";
@@ -7683,9 +7683,9 @@ CStylesPainter.prototype =
 			var par = new Paragraph(editor.WordControl.m_oDrawingDocument, _dc, false);
 			var run = new ParaRun(par, false);
 
-			for (var i = 0; i < style.Name.length; i++)
+			for (var i = 0; i < styleName.length; i++)
 			{
-				run.Add_ToContent(i, new ParaText(style.Name.charAt(i)), false);
+				run.Add_ToContent(i, new ParaText(styleName.charAt(i)), false);
 			}
 
 			_dc.Internal_Content_Add(0, par, false);

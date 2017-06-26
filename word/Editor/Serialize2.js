@@ -274,7 +274,9 @@ var c_oSerProp_rPrType = {
 	TextFill : 32,
 	Del: 33,
 	Ins: 34,
-	rPrChange: 35
+	rPrChange: 35,
+	MoveFrom: 36,
+	MoveTo: 37
 };
 var c_oSerProp_rowPrType = {
     CantSplit:0,
@@ -360,7 +362,9 @@ var c_oSerParType = {
 	Del: 12,
 	Ins: 13,
 	Background: 14,
-	Sdt: 15
+	Sdt: 15,
+	MoveFrom: 16,
+	MoveTo: 17
 };
 var c_oSerDocTableType = {
     tblPr:0,
@@ -6283,6 +6287,17 @@ function BinaryFileReader(doc, openParams)
 				stDefault.FootnoteTextChar = oNewId.id;
 			if(stDefault.FootnoteReference == stId || "footnotereference" == sNewStyleName)
 				stDefault.FootnoteReference = oNewId.id;
+			if (stDefault.NoSpacing == stId)
+				stDefault.NoSpacing = oNewId.id;
+			if (stDefault.Title == stId)
+				stDefault.Title = oNewId.id;
+			if (stDefault.Subtitle == stId)
+				stDefault.Subtitle = oNewId.id;
+			if (stDefault.Quote == stId)
+				stDefault.Quote = oNewId.id;
+			if (stDefault.IntenseQuote == stId)
+				stDefault.IntenseQuote = oNewId.id;
+
             if(true == oNewId.def)
             {
                 switch(oNewId.type)
@@ -8076,6 +8091,18 @@ function Binary_rPrReader(doc, oReadResult, stream)
                     return ReadTrackRevision(t, l, oThis.stream, oThis.trackRevision.ins, null);
                 });
 				break;
+			case c_oSerProp_rPrType.MoveFrom:
+				this.trackRevision = {del: new CReviewInfo()};
+				res = this.bcr.Read1(length, function(t, l){
+					return ReadTrackRevision(t, l, oThis.stream, oThis.trackRevision.del, null);
+				});
+				break;
+			case c_oSerProp_rPrType.MoveTo:
+				this.trackRevision = {ins: new CReviewInfo()};
+				res = this.bcr.Read1(length, function(t, l){
+					return ReadTrackRevision(t, l, oThis.stream, oThis.trackRevision.ins, null);
+				});
+				break;
             case c_oSerProp_rPrType.rPrChange:
                 var rPrChange = new CTextPr();
                 var reviewInfo = new CReviewInfo();
@@ -9312,6 +9339,32 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
                     elem.Set_ReviewTypeWithInfo(reviewtype_Add, reviewInfo);
                 }
             }
+		} else if (c_oSerParType.MoveFrom == type) {
+			var reviewInfo = new CReviewInfo();
+			var startPos = oParStruct.getCurPos();
+			res = this.bcr.Read1(length, function(t, l){
+				return ReadTrackRevision(t, l, oThis.stream, reviewInfo, {parStruct: oParStruct, bdtr: oThis});
+			});
+			var endPos = oParStruct.getCurPos();
+			for(var i = startPos; i < endPos; ++i) {
+				var elem = oParStruct.GetFromContent(i);
+				if(elem && elem.Set_ReviewTypeWithInfo) {
+					elem.Set_ReviewTypeWithInfo(reviewtype_Remove, reviewInfo);
+				}
+			}
+		} else if (c_oSerParType.MoveTo == type) {
+			var reviewInfo = new CReviewInfo();
+			var startPos = oParStruct.getCurPos();
+			res = this.bcr.Read1(length, function(t, l){
+				return ReadTrackRevision(t, l, oThis.stream, reviewInfo, {parStruct: oParStruct, bdtr: oThis});
+			});
+			var endPos = oParStruct.getCurPos();
+			for(var i = startPos; i < endPos; ++i) {
+				var elem = oParStruct.GetFromContent(i);
+				if(elem && elem.Set_ReviewTypeWithInfo) {
+					elem.Set_ReviewTypeWithInfo(reviewtype_Add, reviewInfo);
+				}
+			}
 		} else if ( c_oSerParType.Sdt === type) {
 			var oSdt = new AscCommonWord.CInlineLevelSdt();
 			oSdt.SetParagraph(oParStruct.paragraph);

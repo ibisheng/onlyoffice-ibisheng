@@ -304,6 +304,7 @@ CGraphicObjects.prototype =
         }
     },
 
+	getDefaultText: DrawingObjectsController.prototype.getDefaultText,
     createImage: DrawingObjectsController.prototype.createImage,
     createOleObject: DrawingObjectsController.prototype.createOleObject,
     createTextArt: DrawingObjectsController.prototype.createTextArt,

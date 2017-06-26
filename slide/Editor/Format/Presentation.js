@@ -1928,6 +1928,9 @@ CPresentation.prototype =
                 }
             }
             this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
+            if(AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects) instanceof AscFormat.CGraphicFrame){
+                bRecalculate = false;
+            }
             if(oMathShape)
             {
 				//var  oContent = oMathShape.txBody.content;
@@ -3718,6 +3721,9 @@ CPresentation.prototype =
                      editor.sync_HyperlinkPropCallback(HyperProps);
                      }*/
                 }
+                else{
+                    this.Api.sendEvent("asc_onTextLanguage", this.Get_DefaultLanguage());
+                }
             }
         }
         editor.sync_EndCatchSelectedElements();
@@ -5292,6 +5298,22 @@ CPresentation.prototype =
     {
         if(this.Slides[this.CurPage])
         {
+            var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
+            if(oDrawingObjects.curState instanceof  AscFormat.StartAddNewShape
+                || oDrawingObjects.curState instanceof  AscFormat.SplineBezierState
+                || oDrawingObjects.curState instanceof  AscFormat.PolyLineAddState
+                || oDrawingObjects.curState instanceof  AscFormat.AddPolyLine2State
+                || oDrawingObjects.arrTrackObjects.length > 0)
+            {
+                oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
+                if( oDrawingObjects.arrTrackObjects.length > 0)
+                {
+                    oDrawingObjects.clearTrackObjects();
+                    oDrawingObjects.updateOverlay();
+                }
+                editor.sync_EndAddShape();
+            }
+
             History.Create_NewPoint(AscDFH.historydescription_Document_AddTextArt);
             var oTextArt = this.Slides[this.CurPage].graphicObjects.createTextArt(nStyle, false);
             oTextArt.addToDrawingObjects();

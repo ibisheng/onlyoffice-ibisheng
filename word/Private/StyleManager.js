@@ -113,7 +113,7 @@ CDocument.prototype.Add_NewStyle = function(oStyle)
     }
 };
 /**
- * Удалем заданный стиль по имени.
+ * Удаляем заданный стиль по имени.
  */
 CDocument.prototype.Remove_Style = function(sStyleName)
 {
@@ -131,7 +131,7 @@ CDocument.prototype.Remove_Style = function(sStyleName)
     }
 };
 /**
- * Удалем все недефолтовые стили в документе.
+ * Удаляем все недефолтовые стили в документе.
  */
 CDocument.prototype.Remove_AllCustomStyles = function()
 {
@@ -335,6 +335,31 @@ CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
         Style.Clear("Hyperlink", null, null, styletype_Character);
         Style.Create_Character_Hyperlink();
     }
+	else if (StyleId == this.Default.NoSpacing)
+	{
+		Style.Clear("No Spacing", this.Default.Paragraph, null, styletype_Paragraph);
+		Style.Create_NoSpacing();
+	}
+	else if (StyleId === this.Default.Title)
+	{
+		Style.Clear("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Title();
+	}
+	else if (StyleId === this.Default.Subtitle)
+	{
+		Style.Clear("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Subtitle();
+	}
+	else if (StyleId === this.Default.Quote)
+	{
+		Style.Clear("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Quote();
+	}
+	else if (StyleId === this.Default.IntenseQuote)
+	{
+		Style.Clear("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_IntenseQuote();
+	}
     else
     {
         this.Remove(StyleId);
@@ -386,7 +411,12 @@ CStyles.prototype.Is_StyleDefault = function(sStyleName)
         || StyleId == this.Default.ParaList
         || StyleId == this.Default.Header
         || StyleId == this.Default.Footer
-        || StyleId == this.Default.Hyperlink)
+        || StyleId == this.Default.Hyperlink
+		|| StyleId == this.Default.NoSpacing
+		|| StyleId == this.Default.Title
+		|| StyleId == this.Default.Subtitle
+		|| StyleId == this.Default.Quote
+		|| StyleId == this.Default.IntenseQuote)
     {
         return true;
     }
@@ -496,6 +526,31 @@ CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
         Style.Clear("Hyperlink", null, null, styletype_Character);
         Style.Create_Character_Hyperlink();
     }
+    else if (StyleId == this.Default.NoSpacing)
+	{
+		Style.Clear("No Spacing", this.Default.Paragraph, null, styletype_Paragraph);
+		Style.Create_NoSpacing();
+	}
+	else if (StyleId === this.Default.Title)
+	{
+		Style.Clear("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Title();
+	}
+	else if (StyleId === this.Default.Subtitle)
+	{
+		Style.Clear("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Subtitle();
+	}
+	else if (StyleId === this.Default.Quote)
+	{
+		Style.Clear("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Quote();
+	}
+	else if (StyleId === this.Default.IntenseQuote)
+	{
+		Style.Clear("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_IntenseQuote();
+	}
 
     this.LogicDocument.TurnOnHistory();
 

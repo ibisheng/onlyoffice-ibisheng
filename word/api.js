@@ -3756,7 +3756,6 @@ background-repeat: no-repeat;\
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
 		{
-			this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetPageOrientation);
 			if (isPortrait)
 			{
@@ -3782,7 +3781,6 @@ background-repeat: no-repeat;\
 			if (this.isMobileVersion && this.WordControl.MobileTouchManager)
 				this.WordControl.MobileTouchManager.BeginZoomCheck();
 
-			this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetPageSize);
 			if (this.DocumentOrientation)
 				this.WordControl.m_oLogicDocument.Set_DocumentPageSize(width, height);
@@ -7204,7 +7202,7 @@ background-repeat: no-repeat;\
 		if (!oLogicDocument)
 			return;
 
-		var sDefaultText = this.textArtTranslate ? this.textArtTranslate.DefaultText : "Your text here";
+		var sDefaultText = AscCommon.translateManager.getValue('Your text here');
 		if (AscCommonWord.sdttype_BlockLevel === nType)
 		{
 			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content))
@@ -7215,11 +7213,17 @@ background-repeat: no-repeat;\
 				if (oContentControlPr)
 					oContentControl.SetContentControlPr(oContentControlPr);
 
-				for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+				if (oContentControl.IsEmpty())
 				{
-					oContentControl.AddToParagraph(new ParaText(sDefaultText.charAt(nIndex)));
+					// TODO: Разобраться с тем, чтобы пересчет не вызывался в фунции AddToParagraph
+					oLogicDocument.TurnOff_Recalculate();
+					for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+					{
+						oContentControl.AddToParagraph(new AscCommonWord.ParaText(sDefaultText.charAt(nIndex)));
+					}
+					oLogicDocument.SelectContentControl(oContentControl.GetId());
+					oLogicDocument.TurnOn_Recalculate();
 				}
-				oLogicDocument.SelectContentControl(oContentControl.GetId());
 
 				oLogicDocument.Recalculate();
 				oLogicDocument.Document_UpdateInterfaceState();
@@ -7234,18 +7238,29 @@ background-repeat: no-repeat;\
 
 				var oContentControl = oLogicDocument.AddContentControl(AscCommonWord.sdttype_InlineLevel);
 
-				for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+				if (!oContentControl)
 				{
-					oContentControl.Add(new ParaText(sDefaultText.charAt(nIndex)));
+					History.Remove_LastPoint();
+					return;
 				}
-				oContentControl.SelectThisElement();
+				else
+				{
+					if (oContentControl.IsEmpty())
+					{
+						for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
+						{
+							oContentControl.Add(new AscCommonWord.ParaText(sDefaultText.charAt(nIndex)));
+						}
+						oContentControl.SelectThisElement();
+					}
 
-				if (oContentControlPr)
-					oContentControl.SetContentControlPr(oContentControlPr);
+					if (oContentControlPr)
+						oContentControl.SetContentControlPr(oContentControlPr);
 
-				oLogicDocument.Recalculate();
-				oLogicDocument.Document_UpdateInterfaceState();
-				oLogicDocument.Document_UpdateSelectionState();
+					oLogicDocument.Recalculate();
+					oLogicDocument.Document_UpdateInterfaceState();
+					oLogicDocument.Document_UpdateSelectionState();
+				}
 			}
 		}
 	};
@@ -8339,8 +8354,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['sync_MouseMoveStartCallback']               = asc_docs_api.prototype.sync_MouseMoveStartCallback;
 	asc_docs_api.prototype['sync_MouseMoveEndCallback']                 = asc_docs_api.prototype.sync_MouseMoveEndCallback;
 	asc_docs_api.prototype['sync_MouseMoveCallback']                    = asc_docs_api.prototype.sync_MouseMoveCallback;
-	asc_docs_api.prototype['asc_setChartTranslate']                     = asc_docs_api.prototype.asc_setChartTranslate;
-	asc_docs_api.prototype['asc_setTextArtTranslate']                   = asc_docs_api.prototype.asc_setTextArtTranslate;
 	asc_docs_api.prototype['can_AddHyperlink']                          = asc_docs_api.prototype.can_AddHyperlink;
 	asc_docs_api.prototype['add_Hyperlink']                             = asc_docs_api.prototype.add_Hyperlink;
 	asc_docs_api.prototype['change_Hyperlink']                          = asc_docs_api.prototype.change_Hyperlink;

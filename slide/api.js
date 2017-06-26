@@ -2285,7 +2285,7 @@ background-repeat: no-repeat;\
 	};
     asc_docs_api.prototype.put_TextPrLang = function(value)
     {
-        if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+        if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextLang);
             this.WordControl.m_oLogicDocument.AddToParagraph(new AscCommonWord.ParaTextPr({Lang : {Val : value}}));
@@ -6765,8 +6765,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['AddImageUrlActionCallback']           = asc_docs_api.prototype.AddImageUrlActionCallback;
 	asc_docs_api.prototype['AddImageUrlAction']                   = asc_docs_api.prototype.AddImageUrlAction;
 	asc_docs_api.prototype['ImgApply']                            = asc_docs_api.prototype.ImgApply;
-	asc_docs_api.prototype['asc_setChartTranslate']               = asc_docs_api.prototype.asc_setChartTranslate;
-	asc_docs_api.prototype['asc_setTextArtTranslate']             = asc_docs_api.prototype.asc_setTextArtTranslate;
 	asc_docs_api.prototype['ChartApply']                          = asc_docs_api.prototype.ChartApply;
 	asc_docs_api.prototype['set_Size']                            = asc_docs_api.prototype.set_Size;
 	asc_docs_api.prototype['set_ConstProportions']                = asc_docs_api.prototype.set_ConstProportions;
