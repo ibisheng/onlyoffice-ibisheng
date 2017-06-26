@@ -3103,6 +3103,10 @@ CCellValue.prototype =
 		    sResult = this.getStringFromMultiText();
 		return sResult;
 	},
+	getNumberValue : function()
+	{
+		return this.number;
+	},
 	getValue : function(cell)
 	{
 		if(null == this.textValue)
