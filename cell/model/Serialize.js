@@ -7959,7 +7959,7 @@
 					offsetStripe = this.firstRowStripe ? this.firstRowStripe.size : 1;
 					stripe = new CTableStyleStripe(this.secondRowStripe.size, offsetStripe, true);
 					if (r1Data + offsetStripe <= r2Data) {
-						bboxTmp = new Asc.Range(bbox.c1, r1Data, bbox.c2, r2Data);
+						bboxTmp = new Asc.Range(bbox.c1, r1Data + offsetStripe, bbox.c2, r2Data);
 						sheetMergedStyles.setTablePivotStyle(bboxTmp, this.secondRowStripe.dxf, stripe);
 					}
 				}
