@@ -373,6 +373,7 @@ CShowPr.prototype.Copy = function(){
 
 
 
+
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_SetShowPr] = AscDFH.CChangesDrawingsObjectNoId      ;
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_AddSlideMaster] = AscDFH.CChangesDrawingsContent         ;
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_ChangeTheme] = AscDFH.CChangesDrawingChangeTheme      ;
@@ -380,11 +381,11 @@ AscDFH.changesFactory[AscDFH.historyitem_Presentation_SlideSize] = AscDFH.CChang
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_ChangeColorScheme] = AscDFH.CChangesDrawingChangeTheme      ;
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_RemoveSlide] = AscDFH.CChangesDrawingsContentPresentation         ;
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_AddSlide] = AscDFH.CChangesDrawingsContentPresentation         ;
-AscDFH.changesFactory[AscDFH.historyitem_Presentation_SetDefaultTextStyle] = AscFormat.CChangesDrawingsObjectNoId;
+AscDFH.changesFactory[AscDFH.historyitem_Presentation_SetDefaultTextStyle] = AscDFH.CChangesDrawingsObjectNoId;
 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SetShowPr] = function(oClass, value){oClass.showPr  = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SlideSize] = function(oClass, value){oClass.Width = value.a; oClass.Height = value.b; oClass.changeSlideSizeFunction(oClass.Width, oClass.Height);};
-
+AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SetDefaultTextStyle] = function(oClass, value){oClass.defaultTextStyle = value;};
 
 AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_AddSlide] = function(oClass){return oClass.Slides;};
 AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_RemoveSlide] = function(oClass){return oClass.Slides;};
@@ -392,9 +393,10 @@ AscDFH.drawingContentChanges[AscDFH.historyitem_Presentation_AddSlideMaster] = f
 
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SetShowPr] = CShowPr;
 AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SlideSize] = AscFormat.CDrawingBaseCoordsWritable;
+AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SetDefaultTextStyle] = AscFormat.TextListStyle;
 
 
-AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Presentation_SetDefaultTextStyle] = function(oClass, value){oClass.defaultTextStyle = value;};
+
 
 function CPresentation(DrawingDocument)
 {
