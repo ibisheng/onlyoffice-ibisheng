@@ -225,15 +225,48 @@
 		}
 
 		function getMatchingBorder(border1, border2) {
-			var border;
-			if (border1 && border1.w) {
-				border = border1;
+			// ECMA-376 Part 1 17.4.67 tcBorders (Table Cell Borders)
+			if (!border1) {
+				return border2;
 			}
-			if (border2 && border2.w && (!border || border.w < border2.w)) {
-				border = border2;
+			if (!border2) {
+				return border1;
 			}
 
-			return border;
+			if (border1.w > border2.w) {
+				return border1;
+			} else if (border1.w < border2.w) {
+				return border2;
+			}
+
+			var r1 = border1.c.getR(), g1 = border1.c.getG(), b1 = border1.c.getB();
+			var r2 = border2.c.getR(), g2 = border2.c.getG(), b2 = border2.c.getB();
+			var Brightness_1_1 = r1 + b1 + 2 * g1;
+			var Brightness_1_2 = r2 + b2 + 2 * g2;
+			if (Brightness_1_1 < Brightness_1_2) {
+				return border1;
+			} else if (Brightness_1_1 > Brightness_1_2) {
+				return border2;
+			}
+
+			var Brightness_2_1 = Brightness_1_1 - r1;
+			var Brightness_2_2 = Brightness_1_2 - r2;
+			if (Brightness_2_1 < Brightness_2_2) {
+				return border1;
+			} else if (Brightness_2_1 > Brightness_2_2) {
+				return border2;
+			}
+
+			var Brightness_3_1 = g1;
+			var Brightness_3_2 = g2;
+			if (Brightness_3_1 < Brightness_3_2) {
+				return border1;
+			} else if (Brightness_3_1 > Brightness_3_2) {
+				return border2;
+			}
+
+			// borders equal
+			return border1;
 		}
 
 		var referenceType = {
