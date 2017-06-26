@@ -2985,9 +2985,9 @@
 				if(j - 1 >= 0)
 				{
 					previousStyle = compiledStylesArr[i][j - 1];
-					if(previousStyle && previousStyle.border && previousStyle.border.l && previousStyle.border.l.w !== 0)
+					if(previousStyle && previousStyle.border && previousStyle.border.r && previousStyle.border.r.w !== 0)
 					{
-						color = getWinBorderColor(curStyle.border.l, previousStyle.border.l);
+						color = getWinBorderColor(curStyle.border.l, previousStyle.border.r);
 					}
 				}
 				calculateLineVer(color, j * lineStepX, i * stepY, (i + 1) * stepY);
@@ -3005,9 +3005,9 @@
 				if(i - 1 >= 0)
 				{
 					previousStyle = compiledStylesArr[i - 1][j];
-					if(previousStyle && previousStyle.border && previousStyle.border.t && previousStyle.border.t.w !== 0)
+					if(previousStyle && previousStyle.border && previousStyle.border.b && previousStyle.border.b.w !== 0)
 					{
-						color = getWinBorderColor(curStyle.border.t, previousStyle.border.t);
+						color = getWinBorderColor(curStyle.border.t, previousStyle.border.b);
 					}
 				}
 				calculateLineHor(color, j * stepX, i * stepY, (j + 1) * stepX);
