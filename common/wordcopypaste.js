@@ -2375,7 +2375,7 @@ PasteProcessor.prototype =
 					for(var i = 0; i < parentContent.length; i++)
 					{
 						var tempParagraph = parentContent[i];
-						var numbering2 =  tempParagraph.Numbering_Get();
+						var numbering2 =  tempParagraph.Numbering_Get ? tempParagraph.Numbering_Get() : null;
 
 						if(numbering2)
 						{
