@@ -5434,7 +5434,14 @@ function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap)
     {
         if(aSpTree[i].selected)
         {
-            var oCopy = aSpTree[i].copy();
+            var oCopy;
+            if(aSpTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                oCopy = aSpTree[i].copy(oIdMap);
+            }
+            else{
+                oCopy = aSpTree[i].copy();
+            }
+
             aCollectArray.push(new DrawingCopyObject(oCopy, aSpTree[i].x, aSpTree[i].y, aSpTree[i].extX, aSpTree[i].extY, aSpTree[i].getBase64Img()));
             oIdMap[aSpTree[i].Id] = oCopy.Id;
         }
