@@ -32,6 +32,8 @@
 
 window.IS_NATIVE_EDITOR = true;
 
+var sdkCheck = true;
+
 window['SockJS'] = createSockJS();
 
 Asc['asc_docs_api'].prototype.Update_ParaInd = function( Ind )
@@ -5832,6 +5834,8 @@ function NativeOpenFile3(_params, documentInfo)
     var doc_bin = window.native.GetFileString(window.g_file_path);
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
+        sdkCheck = documentInfo["sdkCheck"];
+        
         _api = new window["Asc"]["asc_docs_api"]("");
         
         AscCommon.g_clipboardBase.Init(_api);
@@ -5854,7 +5858,8 @@ function NativeOpenFile3(_params, documentInfo)
         docInfo.put_Url(window.documentInfo["docURL"]);
         docInfo.put_Format("docx");
         docInfo.put_UserInfo(userInfo);
-
+        docInfo.put_Token(window.documentInfo["token"]);
+        
         _api.asc_setDocInfo(docInfo);
 
         _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {
@@ -5878,6 +5883,8 @@ function NativeOpenFile3(_params, documentInfo)
             _api.asc_setAutoSaveGap(1);
             _api._coAuthoringInit();
             _api.asc_SetFastCollaborative(true);
+            
+            window["native"]["onTokenJWT"](_api.CoAuthoringApi.get_jwt());
 
             _api.asc_registerCallback("asc_onAuthParticipantsChanged", function(users) {
                                       var stream = global_memory_stream_menu;
@@ -5920,7 +5927,7 @@ function NativeOpenFile3(_params, documentInfo)
 
             if (null != _api.WordControl.m_oLogicDocument)
             {
-			           _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
+                _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
             }
 
             if (_api.NativeAfterLoad)
@@ -6049,6 +6056,33 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, v
 Asc['asc_docs_api'].prototype.openDocument = function(sData)
 {
     _api.asc_nativeOpenFile2(sData.data);
+    
+    
+    if (!sdkCheck) {
+        
+        console.log("OPEN FILE ONLINE READ MODE");
+       
+        if (_api.NativeAfterLoad)
+            _api.NativeAfterLoad();
+     
+        this.ImageLoader.bIsLoadDocumentFirst = true;
+        
+        this.ParcedDocument = true;
+        if (this.isStartCoAuthoringOnEndLoad)
+        {
+            this.CoAuthoringApi.onStartCoAuthoring(true);
+            this.isStartCoAuthoringOnEndLoad = false;
+        }
+        
+        if (null != _api.WordControl.m_oLogicDocument)
+        {
+            _api.sendColorThemes(_api.WordControl.m_oLogicDocument.theme);
+        }
+        
+        window["native"]["onEndLoadingFile"]();
+        
+        return;
+    }
 
     var version;
     if (sData.changes && this.VersionHistory)
