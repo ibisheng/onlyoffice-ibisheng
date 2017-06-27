@@ -657,7 +657,7 @@ RotateState.prototype =
                 this.drawingObjects.checkSelectedObjectsAndCallback(
                     function()
                     {
-                        var i;
+                        var i, j;
                         if(e.CtrlKey && oThis instanceof MoveInGroupState)
                         {
 
@@ -698,6 +698,11 @@ RotateState.prototype =
                                 if(tracks[i].originalObject && !tracks[i].processor3D){
                                     oOriginalObjects.push(tracks[i].originalObject);
                                     oMapOriginalsId[tracks[i].originalObject.Get_Id()] = true;
+                                    if(Array.isArray(tracks[i].originalObject.arrGraphicObjects)){
+                                        for(j = 0; j < tracks[i].originalObject.arrGraphicObjects.length; ++j){
+                                            oMapOriginalsId[tracks[i].originalObject.arrGraphicObjects[j].Get_Id()] = true;
+                                        }
+                                    }
                                 }
                             }
                             var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
