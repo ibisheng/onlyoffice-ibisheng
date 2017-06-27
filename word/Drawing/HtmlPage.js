@@ -1589,7 +1589,12 @@ function CEditorPage(api)
 				// теперь проверить трек таблиц
 				var ret = oWordControl.m_oDrawingDocument.checkMouseDown_Drawing(pos);
 				if (ret === true)
+				{
+					if (-1 == oWordControl.m_oTimerScrollSelect)
+						oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
+
 					return;
+				}
 
 				if (-1 == oWordControl.m_oTimerScrollSelect)
 				{
