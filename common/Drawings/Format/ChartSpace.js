@@ -3072,7 +3072,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                         {
                             cell = source_worksheet.getCell3(range.r1, j);
                             var sCellValue = cell.getValue();
-                            var value = parseFloat(sCellValue);
+                            var value = cell.getNumberValue();
                             if(AscFormat.isRealNumber(value))
                             {
                                 hidden = false;
@@ -3150,7 +3150,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                         if(!col_hidden && !source_worksheet.getRowHidden(j) || (this.displayHidden === true))
                         {
                             cell = source_worksheet.getCell3(j, range.c1);
-                            var value = parseFloat(cell.getValue());
+                            var value = cell.getNumberValue();
                             if(AscFormat.isRealNumber(value))
                             {
                                 hidden = false;
@@ -3180,7 +3180,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                             }
                             else{
                                 cell = source_worksheet.getCell3(j, range.c1);
-                                var value = parseFloat(cell.getValue());
+                                var value = cell.getNumberValue();
                                 if(AscFormat.isRealNumber(value))
                                 {
                                     hidden = false;
