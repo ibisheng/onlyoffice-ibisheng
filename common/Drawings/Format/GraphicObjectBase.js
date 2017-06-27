@@ -669,11 +669,12 @@
     {
         if(this.drawingBase && this.spPr && this.spPr.xfrm && !this.group) {
             var oldX = this.x, oldY = this.y, oldExtX = this.extX, oldExtY = this.extY;
+            var oldRot = this.rot;
             this.x = this.spPr.xfrm.offX;
             this.y = this.spPr.xfrm.offY;
             this.extX = this.spPr.xfrm.extX;
             this.extY = this.spPr.xfrm.extY;
-
+            this.rot = AscFormat.isRealNumber(this.spPr.xfrm.rot) ? AscFormat.normalizeRotate(this.spPr.xfrm.rot) : 0;
 
             var oldFromCol = this.drawingBase.from.col,
                 oldFromColOff = this.drawingBase.from.colOff,
@@ -694,6 +695,7 @@
             this.y = oldY;
             this.extX = oldExtX;
             this.extY = oldExtY;
+            this.rot = oldRot;
             var from = this.drawingBase.from, to = this.drawingBase.to;
             History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors,
                 new CDrawingBasePosWritable({
