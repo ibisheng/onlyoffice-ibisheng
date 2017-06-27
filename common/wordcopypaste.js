@@ -2061,7 +2061,7 @@ PasteProcessor.prototype =
 			//TODO пересмотреть pasteTypeContent
 			this.pasteTypeContent = null;
 			var oSelectedContent = new CSelectedContent();
-            for (var i = 0, length = aNewContent.length; i < length; ++i) {
+            for (var i = 0; i < aNewContent.length; ++i) {
 				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
 				{
 					var parseItem = this._specialPasteItemConvert(aNewContent[i]);
@@ -2078,7 +2078,6 @@ PasteProcessor.prototype =
 								aNewContent.splice(i + j, 0, parseItem[j]);
 							}
 						}
-
 					}
 				}
 
@@ -2095,7 +2094,7 @@ PasteProcessor.prototype =
 					this.pasteTypeContent = null;
 				}
 
-                if (i === length - 1 && true != this.bInBlock && type_Paragraph === oSelectedElement.Element.GetType())
+                if (i === aNewContent.length - 1 && true != this.bInBlock && type_Paragraph === oSelectedElement.Element.GetType())
                     oSelectedElement.SelectedAll = false;
                 else
                     oSelectedElement.SelectedAll = true;
@@ -2853,7 +2852,7 @@ PasteProcessor.prototype =
 					Item.Set_CharCode(nUnicode);
 					bIsSpace = false;
 				}
-				else if(0x20 === nUnicode){
+				else if(0x2009 === nUnicode){
 					Item = new ParaTab();
 				}
 				else
