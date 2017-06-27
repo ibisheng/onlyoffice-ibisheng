@@ -475,34 +475,44 @@ CTable.prototype.private_RecalculateGrid = function()
                 else if (tblwidth_Pct === CellW.Type)
                     CellWW = PctWidth * CellW.W / 100 + Add;
 
-                // Если GridSpan > 1, тогда все равно маргины учитываются в первую колоноку спана
+				var CellMarginsLeftW = 0, CellMarginsRightW = 0;
+				if (null !== Spacing)
+				{
+					CellMarginsLeftW  = CellMargins.Left.W;
+					CellMarginsRightW = CellMargins.Right.W;
 
-                var CellMarginsW = 0;
-                if ( null !== Spacing )
-                {
-                    CellMarginsW = CellMargins.Left.W + CellMargins.Right.W;
+					if (border_None !== CellRBorder.Value)
+						CellMarginsRightW += CellRBorder.Size;
 
-                    if ( border_None !== CellRBorder.Value )
-                        CellMarginsW += CellRBorder.Size;
+					if (border_None !== CellLBorder.Value)
+						CellMarginsLeftW += CellLBorder.Size;
+				}
+				else
+				{
+					if (border_None !== CellRBorder.Value)
+						CellMarginsRightW += Math.max(CellRBorder.Size / 2, CellMargins.Right.W);
+					else
+						CellMarginsRightW += CellMargins.Right.W;
 
-                    if ( border_None !== CellLBorder.Value )
-                        CellMarginsW += CellLBorder.Size;
-                }
-                else
-                {
-                    if ( border_None !== CellRBorder.Value )
-                        CellMarginsW += Math.max( CellRBorder.Size / 2, CellMargins.Right.W );
-                    else
-                        CellMarginsW += CellMargins.Right.W;
+					if (border_None !== CellLBorder.Value)
+						CellMarginsLeftW += Math.max(CellLBorder.Size / 2, CellMargins.Left.W);
+					else
+						CellMarginsLeftW += CellMargins.Left.W;
+				}
 
-                    if ( border_None !== CellLBorder.Value )
-                        CellMarginsW += Math.max( CellLBorder.Size / 2, CellMargins.Left.W );
-                    else
-                        CellMarginsW += CellMargins.Left.W;
-                }
+				if (GridSpan <= 1)
+				{
+					if (MinMargin[CurGridCol] < CellMarginsLeftW + CellMarginsRightW)
+						MinMargin[CurGridCol] = CellMarginsLeftW + CellMarginsRightW;
+				}
+				else
+				{
+					if (MinMargin[CurGridCol] < CellMarginsLeftW)
+						MinMargin[CurGridCol] = CellMarginsLeftW;
 
-                if ( MinMargin[CurGridCol] < CellMarginsW )
-                    MinMargin[CurGridCol] = CellMarginsW;
+					if (MinMargin[CurGridCol + GridSpan - 1] < CellMarginsRightW)
+						MinMargin[CurGridCol + GridSpan - 1] = CellMarginsRightW;
+				}
 
                 // На самом деле, случай 1 === GridSpan нормально обработается и как случай GridSpan > 1,
                 // но поскольку он наиболее распространен, делаем его обработку максимально быстрой (без циклов)
@@ -514,17 +524,11 @@ CTable.prototype.private_RecalculateGrid = function()
                     if ( false === MaxFlags[CurGridCol] && MaxContent[CurGridCol] < CellMax )
                         MaxContent[CurGridCol] = CellMax;
 
-                    if (null !== CellWW)
+                    // Согласно спецификации, если где-то задана ширина, то используется только первое значение
+                    if (null !== CellWW && false === MaxFlags[CurGridCol])
                     {
-                        if (false === MaxFlags[CurGridCol])
-                        {
-                            MaxFlags[CurGridCol]   = true;
-                            MaxContent[CurGridCol] = CellWW;
-                        }
-                        else if (MaxContent[CurGridCol] < CellWW)
-                        {
-                            MaxContent[CurGridCol] = CellWW;
-                        }
+						MaxFlags[CurGridCol]   = true;
+						MaxContent[CurGridCol] = CellWW;
                     }
                 }
                 else
@@ -549,15 +553,32 @@ CTable.prototype.private_RecalculateGrid = function()
                     // перекрывает ширину ни одной из колонок, она всего лишь учавствует в определении
                     // максимальной ширины.
                     if (null !== CellWW && CellWW > CellMax)
-                        CellMax = CellWW;
-
-                    if ( SumSpanMaxContent < CellMax )
-                    {
-                        // TODO: На самом деле, распределение здесь идет в каком-то отношении.
-                        //       Неплохо было бы выяснить как именно.
-                        for ( var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++ )
-                            MaxContent[CurSpan] = CellMax * this.TableGridCalc[CurSpan] / SumSpanCurContent;
-                    }
+					{
+						CellMax = CellWW;
+						for (var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; ++CurSpan)
+						{
+							// Согласно спецификации, если где-то задана ширина, то используется только первое значение
+							if (false === MaxFlags[CurSpan])
+							{
+								MaxFlags[CurSpan]   = true;
+								MaxContent[CurSpan] = this.TableGridCalc[CurSpan];
+							}
+						}
+					}
+					else
+					{
+						if (SumSpanMaxContent < CellMax)
+						{
+							// TODO: На самом деле, распределение здесь идет в каком-то отношении.
+							//       Неплохо было бы выяснить как именно.
+							for (var CurSpan = CurGridCol; CurSpan < CurGridCol + GridSpan; CurSpan++)
+							{
+								// Согласно спецификации, если где-то задана ширина, то используется только первое значение
+								if (true !== MaxFlags[CurSpan])
+									MaxContent[CurSpan] = CellMax * this.TableGridCalc[CurSpan] / SumSpanCurContent;
+							}
+						}
+					}
                 }
 
                 if ( 0 === CurRow && 0 === CurCell )
