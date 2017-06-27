@@ -2426,28 +2426,40 @@ CPresentation.prototype =
             }
             else
             {
-                if ( e.ShiftKey )
+                if ( e.CtrlKey )
                 {
                     if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.selectedObjects.length !== 0) {
                         if (AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.AddToParagraph(new ParaNewLine(break_Line));
+                            this.addNextSlide();
                         }
                     }
                 }
-                else if ( e.CtrlKey )
+                else if ( e.ShiftKey )
                 {
                     if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.selectedObjects.length !== 0) {
                         if (AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
                             History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
-                            this.AddToParagraph(new ParaNewLine(break_Page));
+                            this.AddToParagraph(new ParaNewLine(AscCommonWord.break_Line));
                         }
                     }
                 }
                 else
                 {
                     if(this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects && this.Slides[this.CurPage].graphicObjects.selectedObjects.length !== 0) {
-                        this.AddNewParagraph();
+                        var aSelectedObjects = this.Slides[this.CurPage].graphicObjects.selectedObjects;
+                        if(aSelectedObjects.length === 1 && aSelectedObjects[0].isPlaceholder && aSelectedObjects[0].isPlaceholder()
+                        && aSelectedObjects[0].getPlaceholderType && (aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_ctrTitle || aSelectedObjects[0].getPlaceholderType() === AscFormat.phType_title)){
+                            if (AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
+                                History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
+                                this.AddToParagraph(new ParaNewLine(AscCommonWord.break_Line));
+                            }
+                        }
+                        else{
+                            this.AddNewParagraph();
+                        }
+
+
                     }
                 }
             }
