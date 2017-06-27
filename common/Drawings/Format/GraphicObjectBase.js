@@ -933,7 +933,19 @@
     CGraphicObjectBase.prototype.findConnector = function(x, y){
         var oConnGeom = this.findGeomConnector(x, y);
         if(oConnGeom){
-            return this.convertToConnectionParams(this.rot, this.flipH, this.flipV, this.transform, this.bounds, oConnGeom);
+            var _rot = this.rot;
+            var _flipH = this.flipH;
+            var _flipV = this.flipV;
+            if(this.group){
+                _rot = AscFormat.normalizeRotate(this.group.getFullRotate() + _rot);
+                if(this.group.getFullFlipH()){
+                    _flipH = !_flipH;
+                }
+                if(this.group.getFullFlipV()){
+                    _flipV = !_flipV;
+                }
+            }
+            return this.convertToConnectionParams(_rot, _flipH, _flipV, this.transform, this.bounds, oConnGeom);
         }
         return null;
     };
