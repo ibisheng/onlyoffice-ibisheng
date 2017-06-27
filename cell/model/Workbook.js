@@ -5250,6 +5250,10 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			dDigitsCount = AscCommon.gc_nMaxDigCountView;
 		return this.oValue.getValue2(this, dDigitsCount, fIsFitMeasurer);
 	};
+	Cell.prototype.getNumberValue = function() {
+		this._checkDirty();
+		return this.oValue.getNumberValue();
+	};
 	Cell.prototype.getNumFormatStr=function(){
 		if(null != this.xfs && null != this.xfs.num)
 			return this.xfs.num.getFormat();
@@ -6596,6 +6600,10 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 			oTempCell.create(xfs, this.bbox.r1, this.bbox.c1);
 			return oTempCell.getValue2(dDigitsCount, fIsFitMeasurer);
 		}
+	};
+	Range.prototype.getNumberValue = function() {
+		var cell = this.worksheet._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
+		return null != cell ? cell.getNumberValue() : null;
 	};
 	Range.prototype.getValueData=function(){
 		var res = null;

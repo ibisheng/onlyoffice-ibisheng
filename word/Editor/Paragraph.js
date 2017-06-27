@@ -1087,7 +1087,7 @@ Paragraph.prototype.Internal_Recalculate_CurPos = function(Pos, UpdateCurPos, Up
 
 	var LinePos = this.Get_CurrentParaPos();
 
-	if (-1 === LinePos.Line)
+	if (-1 === LinePos.Line || LinePos.Line >= this.Lines.length)
 		return {
 			X         : 0,
 			Y         : 0,

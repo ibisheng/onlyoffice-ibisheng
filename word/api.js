@@ -3756,7 +3756,6 @@ background-repeat: no-repeat;\
 	{
 		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
 		{
-			this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetPageOrientation);
 			if (isPortrait)
 			{
@@ -3782,7 +3781,6 @@ background-repeat: no-repeat;\
 			if (this.isMobileVersion && this.WordControl.MobileTouchManager)
 				this.WordControl.MobileTouchManager.BeginZoomCheck();
 
-			this.WordControl.m_oDrawingDocument.m_bIsUpdateDocSize = true;
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetPageSize);
 			if (this.DocumentOrientation)
 				this.WordControl.m_oLogicDocument.Set_DocumentPageSize(width, height);
@@ -7221,7 +7219,7 @@ background-repeat: no-repeat;\
 					oLogicDocument.TurnOff_Recalculate();
 					for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
 					{
-						oContentControl.AddToParagraph(new ParaText(sDefaultText.charAt(nIndex)));
+						oContentControl.AddToParagraph(new AscCommonWord.ParaText(sDefaultText.charAt(nIndex)));
 					}
 					oLogicDocument.SelectContentControl(oContentControl.GetId());
 					oLogicDocument.TurnOn_Recalculate();
@@ -7251,7 +7249,7 @@ background-repeat: no-repeat;\
 					{
 						for (var nIndex = 0, nLen = sDefaultText.length; nIndex < nLen; ++nIndex)
 						{
-							oContentControl.Add(new ParaText(sDefaultText.charAt(nIndex)));
+							oContentControl.Add(new AscCommonWord.ParaText(sDefaultText.charAt(nIndex)));
 						}
 						oContentControl.SelectThisElement();
 					}
