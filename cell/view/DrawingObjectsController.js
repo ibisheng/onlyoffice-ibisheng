@@ -411,7 +411,7 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
             options.showMarker = null;
             this.editChartCallback(options);
             options.style = 1;
-            options.bCreate = true;
+           // options.bCreate = true;
             this.editChartCallback(options);
             options.putRange(old_range);
         }
