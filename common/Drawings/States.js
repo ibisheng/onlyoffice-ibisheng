@@ -708,13 +708,15 @@ RotateState.prototype =
                             var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
                             var oGroupMaps = {};
                             for(i = 0; i < aAllConnectors.length; ++i){
-                                if(!oMapOriginalsId[aAllConnectors[i].Get_Id()]){
+
+                                var stSp = AscCommon.g_oTableId.Get_ById(aAllConnectors[i].getStCxnId());
+                                var endSp = AscCommon.g_oTableId.Get_ById(aAllConnectors[i].getEndCxnId());
+                                if((stSp && !oMapOriginalsId[stSp.Get_Id()]) || (endSp && !oMapOriginalsId[endSp.Get_Id()]) || !oMapOriginalsId[aAllConnectors[i].Get_Id()]){
                                     aAllConnectors[i].calculateTransform(((oThis instanceof MoveInGroupState) || (oThis instanceof MoveState)));
                                     var oGroup = aAllConnectors[i].getMainGroup();
                                     if(oGroup){
-
+                                        oGroupMaps[oGroup.Id] = oGroup;
                                     }
-                                    oGroupMaps[oGroup.Id] = oGroup;
                                 }
                             }
                             for(var key in oGroupMaps){
