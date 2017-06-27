@@ -9509,7 +9509,7 @@
 			else {
 				if (!isMerged) {
 					pastedRangeProps.offsetLast = {offsetCol: isMergedFirstCell.c2 - isMergedFirstCell.c1, offsetRow: isMergedFirstCell.r2 - isMergedFirstCell.r1};
-					mergeArr.push({r1: isMergedFirstCell.r1, r2: isMergedFirstCell.r2, 	c1: isMergedFirstCell.c1, c2: isMergedFirstCell.c2});
+					mergeArr.push(new Asc.Range(isMergedFirstCell.c1, isMergedFirstCell.r1, isMergedFirstCell.c2, isMergedFirstCell.r2));
 				}
 			}
 		};
