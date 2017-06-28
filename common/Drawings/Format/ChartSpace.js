@@ -13428,4 +13428,5 @@ function checkBlipFillRasterImages(sp)
     window['AscFormat'].CreateColorMapByIndex = CreateColorMapByIndex;
     window['AscFormat'].getArrayFillsFromBase = getArrayFillsFromBase;
     window['AscFormat'].getMaxIdx = getMaxIdx;
+    window['AscFormat'].CreateSurfaceChart = CreateSurfaceChart;
 })(window);
