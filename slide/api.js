@@ -5291,7 +5291,6 @@ background-repeat: no-repeat;\
 
     asc_docs_api.prototype.sync_SpellCheckVariantsFound = function()
     {
-    	console.log("asc_onSpellCheckVariantsFound");
         this.sendEvent("asc_onSpellCheckVariantsFound");
     };
 
@@ -5357,7 +5356,6 @@ background-repeat: no-repeat;\
 
     asc_docs_api.prototype.spellCheck = function(rdata)
     {
-        console.log("start - " + JSON.stringify(rdata));
         // ToDo проверка на подключение
         switch (rdata.type)
         {
