@@ -197,15 +197,19 @@ ParaHyperlink.prototype.CopyContent = function(Selected)
 ParaHyperlink.prototype.Draw_Elements = function(PDSE)
 {
     PDSE.VisitedHyperlink = this.Visited;
+    PDSE.Hyperlink = true;
     CParagraphContentWithParagraphLikeContent.prototype.Draw_Elements.apply(this, arguments);
     PDSE.VisitedHyperlink = false;
+    PDSE.Hyperlink = false;
 };
 
 ParaHyperlink.prototype.Draw_Lines = function(PDSL)
 {
     PDSL.VisitedHyperlink = this.Visited;
+    PDSL.Hyperlink = true;
     CParagraphContentWithParagraphLikeContent.prototype.Draw_Lines.apply(this, arguments);
     PDSL.VisitedHyperlink = false;
+    PDSL.Hyperlink = false;
 };
 //-----------------------------------------------------------------------------------
 // Работаем со значениями

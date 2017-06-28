@@ -12890,6 +12890,7 @@ function CParagraphDrawStateElements()
     this.CurPos = new CParagraphContentPos();
 
     this.VisitedHyperlink = false;
+    this.Hyperlink = false;
 
     this.Page   = 0;
     this.Line   = 0;
@@ -12914,6 +12915,7 @@ CParagraphDrawStateElements.prototype =
         this.ColorMap  = ColorMap;
 
         this.VisitedHyperlink = false;
+        this.Hyperlink = false;
 
         this.CurPos = new CParagraphContentPos();
     },
@@ -12945,6 +12947,7 @@ function CParagraphDrawStateLines()
     this.CurPos = new CParagraphContentPos();
 
     this.VisitedHyperlink = false;
+    this.Hyperlink = false;
 
     this.Strikeout  = new CParaDrawingRangeLines();
     this.DStrikeout = new CParaDrawingRangeLines();
@@ -12974,6 +12977,7 @@ CParagraphDrawStateLines.prototype =
         this.BgColor   = BgColor;
 
         this.VisitedHyperlink = false;
+        this.Hyperlink = false;
 
         this.CurPos = new CParagraphContentPos();
 
