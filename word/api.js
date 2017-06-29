@@ -8027,6 +8027,19 @@ background-repeat: no-repeat;\
 		}
 		return _ret;
 	};
+	window["asc_docs_api"].prototype["pluginMethod_AddContentControl"] = function(type)
+	{
+		return this.asc_AddContentControl(type);
+	};
+	window["asc_docs_api"].prototype["pluginMethod_RemoveContentControl"] = function(id)
+	{
+		return this.asc_RemoveContentControlWrapper(id);
+	};
+	window["asc_docs_api"].prototype["pluginMethod_GetCurrentContentControl"] = function()
+	{
+		return this.asc_GetCurrentContentControl();
+	};
+
 	/********************************************************************/
 
 	asc_docs_api.prototype.asc_OnHideContextMenu = function()
