@@ -196,7 +196,6 @@ function CEditorPage(api)
 
 	// properties
 	this.m_bIsHorScrollVisible          = false;
-	this.m_bIsCheckHeedHorScrollRepeat  = false;
 	this.m_bIsRuler                     = false;
 	this.m_bDocumentPlaceChangedEnabled = false;
 
@@ -847,13 +846,11 @@ function CEditorPage(api)
 		oThis.OnResize(true);
 	};
 
-	this.zoom_FitToWidth = function()
+	this.zoom_FitToWidth_value = function()
 	{
-		if (null == this.m_oLogicDocument)
-		{
-			this.m_nZoomType = 1;
-			return;
-		}
+		var _value = 100;
+		if (!this.m_oLogicDocument)
+			return _value;
 
 		var w = this.m_oEditor.HtmlElement.width;
 		if (this.bIsRetinaSupport)
@@ -868,9 +865,50 @@ function CEditorPage(api)
 			if (Zoom < 5)
 				Zoom = 5;
 		}
-		var _new_value = Zoom >> 0;
+		_value = Zoom >> 0;
+		return _value;
+	};
+	this.zoom_FitToPage_value  = function(_canvas_height)
+	{
+		var _value = 100;
+		if (!this.m_oLogicDocument)
+			return _value;
 
+		var w = this.m_oEditor.HtmlElement.width;
+		var h = (undefined == _canvas_height) ? this.m_oEditor.HtmlElement.height : _canvas_height;
+
+		if (this.bIsRetinaSupport)
+		{
+			w /= AscCommon.AscBrowser.retinaPixelRatio;
+			h /= AscCommon.AscBrowser.retinaPixelRatio;
+		}
+
+		var _pageWidth  = this.m_oLogicDocument.Width * g_dKoef_mm_to_pix;
+		var _pageHeight = this.m_oLogicDocument.Height * g_dKoef_mm_to_pix;
+
+		var _hor_Zoom = 100;
+		if (0 != _pageWidth)
+			_hor_Zoom = (100 * (w - 2 * this.SlideDrawer.CONST_BORDER)) / _pageWidth;
+		var _ver_Zoom = 100;
+		if (0 != _pageHeight)
+			_ver_Zoom = (100 * (h - 2 * this.SlideDrawer.CONST_BORDER)) / _pageHeight;
+
+		_value = (Math.min(_hor_Zoom, _ver_Zoom) - 0.5) >> 0;
+
+		if (_value < 5)
+			_value = 5;
+
+		return _value;
+	};
+
+	this.zoom_FitToWidth = function()
+	{
 		this.m_nZoomType = 1;
+		if (!this.m_oLogicDocument)
+			return;
+
+		var _new_value = this.zoom_FitToWidth_value();
+
 		if (_new_value != this.m_nZoomValue)
 		{
 			this.m_nZoomValue = _new_value;
@@ -885,34 +923,12 @@ function CEditorPage(api)
 	};
 	this.zoom_FitToPage  = function()
 	{
-		if (null == this.m_oLogicDocument)
-		{
-			this.m_nZoomType = 2;
-			return;
-		}
-
-		var w = this.m_oEditor.HtmlElement.width;
-		if (this.bIsRetinaSupport)
-			w /= AscCommon.AscBrowser.retinaPixelRatio;
-
-		var h = ((this.m_oMainView.AbsolutePosition.B - this.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
-
-		var _pageWidth  = this.m_oLogicDocument.Width * g_dKoef_mm_to_pix;
-		var _pageHeight = this.m_oLogicDocument.Height * g_dKoef_mm_to_pix;
-
-		var _hor_Zoom = 100;
-		if (0 != _pageWidth)
-			_hor_Zoom = (100 * (w - 2 * this.SlideDrawer.CONST_BORDER)) / _pageWidth;
-		var _ver_Zoom = 100;
-		if (0 != _pageHeight)
-			_ver_Zoom = (100 * (h - 2 * this.SlideDrawer.CONST_BORDER)) / _pageHeight;
-
-		var _new_value = (Math.min(_hor_Zoom, _ver_Zoom) - 0.5) >> 0;
-
-		if (_new_value < 5)
-			_new_value = 5;
-
 		this.m_nZoomType = 2;
+		if (!this.m_oLogicDocument)
+			return;
+
+		var _new_value = this.zoom_FitToPage_value();
+
 		if (_new_value != this.m_nZoomValue)
 		{
 			this.m_nZoomValue = _new_value;
@@ -2370,6 +2386,7 @@ function CEditorPage(api)
 
 		if (this.m_bIsHorScrollVisible)
 		{
+			settings.alwaysVisible = true;
 			if (this.m_oScrollHor_)
 				this.m_oScrollHor_.Repos(settings, true, undefined);//unbind("scrollhorizontal")
 			else
@@ -2392,6 +2409,7 @@ function CEditorPage(api)
 
 				this.m_oScrollHorApi = this.m_oScrollHor_;
 			}
+			settings.alwaysVisible = undefined;
 		}
 
 		if (this.m_oScrollVer_)
@@ -2483,7 +2501,9 @@ function CEditorPage(api)
 		this.DemonstrationManager.Resize();
 
 		if (this.checkNeedHorScroll())
+		{
 			return;
+		}
 
 		// теперь проверим необходимость перезуммирования
 		if (1 == this.m_nZoomType && 0 != this.m_dDocumentPageWidth && 0 != this.m_dDocumentPageHeight)
@@ -2544,7 +2564,9 @@ function CEditorPage(api)
 		this.DemonstrationManager.Resize();
 
 		if (this.checkNeedHorScroll())
+		{
 			return;
+		}
 
 		// теперь проверим необходимость перезуммирования
 		if (1 == this.m_nZoomType)
@@ -2607,20 +2629,46 @@ function CEditorPage(api)
 			this.m_oMainView.Bounds.T = 0;
 		}
 	};
-	this.checkNeedHorScroll = function()
+
+	this.checkNeedHorScrollValue = function(_width)
 	{
 		var w = this.m_oEditor.HtmlElement.width;
 		if (this.bIsRetinaSupport)
 			w /= AscCommon.AscBrowser.retinaPixelRatio;
 
+		return (_width <= w) ? false : true;
+	};
+
+	this.checkNeedHorScroll = function()
+	{
+		if (!this.m_oLogicDocument)
+			return false;
+
 		var oldVisible = this.m_bIsHorScrollVisible;
-		if (this.m_dDocumentWidth <= w)
+
+		if (this.m_nZoomType == 0 || this.m_nZoomType == 1)
 		{
-			this.m_bIsHorScrollVisible = false;
+			this.m_bIsHorScrollVisible = this.checkNeedHorScrollValue(this.m_dDocumentWidth);
 		}
 		else
 		{
-			this.m_bIsHorScrollVisible = true;
+			var canvas_height1 = this.m_oEditor.HtmlElement.height;
+			var addition = AscCommon.AscBrowser.convertToRetinaValue(this.ScrollWidthPx, true);
+			var canvas_height2 = this.m_bIsHorScrollVisible ? (canvas_height1 + addition) : (canvas_height1 - addition);
+
+			var zoom1 = this.zoom_FitToPage_value(canvas_height1);
+			var zoom2 = this.zoom_FitToPage_value(canvas_height2);
+
+			var size1 = this.CalculateDocumentSizeInternal(canvas_height1, zoom1, true);
+			var size2 = this.CalculateDocumentSizeInternal(canvas_height2, zoom2, true);
+
+			var needScroll1 = this.checkNeedHorScrollValue(size1.m_dDocumentWidth);
+			var needScroll2 = this.checkNeedHorScrollValue(size2.m_dDocumentWidth);
+
+			if (needScroll1 == needScroll2)
+				this.m_bIsHorScrollVisible = needScroll1;
+			else
+				this.m_bIsHorScrollVisible = true;
 		}
 
 		var hor_scroll         = document.getElementById('panel_hor_scroll');
@@ -2643,27 +2691,17 @@ function CEditorPage(api)
 		}
 		else
 		{
-			if (this.m_bIsCheckHeedHorScrollRepeat && oldVisible == true)
-			{
-				this.m_bIsHorScrollVisible = true;
-				this.m_dScrollX            = 0;
-			}
-			else
-			{
-				this.m_oPanelRight.Bounds.B                 = 0;
-				this.m_oMainView.Bounds.B                   = 0;
-				this.m_oScrollHor.HtmlElement.style.display = 'none';
-			}
+			this.m_oPanelRight.Bounds.B                 = 0;
+			this.m_oMainView.Bounds.B                   = 0;
+			this.m_oScrollHor.HtmlElement.style.display = 'none';
 		}
 
 		if (this.m_bIsHorScrollVisible != oldVisible)
 		{
-			this.m_bIsCheckHeedHorScrollRepeat = true;
 			this.m_dScrollX                    = 0;
 			this.OnResize(true);
 			return true;
 		}
-		this.m_bIsCheckHeedHorScrollRepeat = false;
 		return false;
 	};
 
@@ -2932,26 +2970,34 @@ function CEditorPage(api)
 			this.m_oDrawingDocument.ClearCachePages();
 	};
 
-	this.CalculateDocumentSize = function(bIsAttack)
+	this.CalculateDocumentSizeInternal = function(_canvas_height, _zoom_value, _check_bounds2)
 	{
-		if (false === oThis.m_oApi.bInit_word_control)
+		var size = {
+			m_dDocumentWidth		: 0,
+			m_dDocumentHeight		: 0,
+			m_dDocumentPageWidth	: 0,
+			m_dDocumentPageHeight	: 0,
+			SlideScrollMIN			: 0,
+			SlideScrollMAX			: 0
+		};
+
+		var _zoom = (undefined == _zoom_value) ? this.m_nZoomValue : _zoom_value;
+		var dKoef = (_zoom * g_dKoef_mm_to_pix / 100);
+
+		var _bounds_slide = this.SlideBoundsOnCalculateSize;
+		if (undefined == _check_bounds2)
 		{
-			oThis.UpdateScrolls();
-			return;
+			this.SlideBoundsOnCalculateSize.fromBounds(this.SlideDrawer.BoundsChecker.Bounds);
+		}
+		else
+		{
+			_bounds_slide = new AscFormat.CBoundsController();
+			this.SlideDrawer.CheckSlideSize(_zoom, this.m_oDrawingDocument.SlideCurrent);
+			_bounds_slide.fromBounds(this.SlideDrawer.BoundsChecker2.Bounds);
 		}
 
-		this.m_dDocumentWidth      = 0;
-		this.m_dDocumentHeight     = 0;
-		this.m_dDocumentPageWidth  = 0;
-		this.m_dDocumentPageHeight = 0;
-
-		var dKoef = (this.m_nZoomValue * g_dKoef_mm_to_pix / 100);
-
-		this.SlideBoundsOnCalculateSize.fromBounds(this.SlideDrawer.BoundsChecker.Bounds);
-		var _bounds_slide = this.SlideBoundsOnCalculateSize;
-
 		var _srcW = this.m_oEditor.HtmlElement.width;
-		var _srcH = this.m_oEditor.HtmlElement.height;
+		var _srcH = (undefined !== _canvas_height) ? _canvas_height : this.m_oEditor.HtmlElement.height;
 		if (this.bIsRetinaSupport)
 		{
 			_srcW = (_srcW / AscCommon.AscBrowser.retinaPixelRatio) >> 0;
@@ -2981,37 +3027,47 @@ function CEditorPage(api)
 		var one_slide_width  = lWSlide;
 		var one_slide_height = Math.max(lHSlide, _srcH);
 
-		this.m_dDocumentPageWidth  = one_slide_width;
-		this.m_dDocumentPageHeight = one_slide_height;
+		size.m_dDocumentPageWidth  = one_slide_width;
+		size.m_dDocumentPageHeight = one_slide_height;
 
-		this.m_dDocumentWidth  = one_slide_width;
-		this.m_dDocumentHeight = (one_slide_height * this.m_oDrawingDocument.SlidesCount) >> 0;
+		size.m_dDocumentWidth  = one_slide_width;
+		size.m_dDocumentHeight = (one_slide_height * this.m_oDrawingDocument.SlidesCount) >> 0;
 
 		if (0 == this.m_oDrawingDocument.SlidesCount)
-			this.m_dDocumentHeight = one_slide_height >> 0;
+			size.m_dDocumentHeight = one_slide_height >> 0;
 
-		if (!bIsAttack && this.OldDocumentWidth == this.m_dDocumentWidth && this.OldDocumentHeight == this.m_dDocumentHeight)
+		size.SlideScrollMIN = this.m_oDrawingDocument.SlideCurrent * one_slide_height;
+		size.SlideScrollMAX = size.SlideScrollMIN + one_slide_height - _srcH;
+
+		if (0 == this.m_oDrawingDocument.SlidesCount)
 		{
-			/*
-			 this.Thumbnails.SlideWidth = this.m_oLogicDocument.Width;
-			 this.Thumbnails.SlideHeight = this.m_oLogicDocument.Height;
-			 this.Thumbnails.SlidesCount = this.m_oDrawingDocument.SlidesCount;
-			 this.Thumbnails.CheckSizes();
-			 return;
-			 */
+			size.SlideScrollMIN = 0;
+			size.SlideScrollMAX = size.SlideScrollMIN + one_slide_height - _srcH;
 		}
+
+		return size;
+	};
+
+	this.CalculateDocumentSize = function(bIsAttack)
+	{
+		if (false === oThis.m_oApi.bInit_word_control)
+		{
+			oThis.UpdateScrolls();
+			return;
+		}
+
+		var size = this.CalculateDocumentSizeInternal();
+
+		this.m_dDocumentWidth      = size.m_dDocumentWidth;
+		this.m_dDocumentHeight     = size.m_dDocumentHeight;
+		this.m_dDocumentPageWidth  = size.m_dDocumentPageWidth;
+		this.m_dDocumentPageHeight = size.m_dDocumentPageHeight;
 
 		this.OldDocumentWidth  = this.m_dDocumentWidth;
 		this.OldDocumentHeight = this.m_dDocumentHeight;
 
-		this.SlideScrollMIN = this.m_oDrawingDocument.SlideCurrent * one_slide_height;
-		this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - _srcH;
-
-		if (0 == this.m_oDrawingDocument.SlidesCount)
-		{
-			this.SlideScrollMIN = 0;
-			this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - _srcH;
-		}
+		this.SlideScrollMIN = size.SlideScrollMIN;
+		this.SlideScrollMAX = size.SlideScrollMAX;
 
 		// теперь проверим необходимость перезуммирования
 		if (1 == this.m_nZoomType)
@@ -3052,75 +3108,18 @@ function CEditorPage(api)
 			return;
 		}
 
-		if ((Math.abs(_bounds.min_x - this.SlideBoundsOnCalculateSize.min_x) < 0.1) &&
-			(Math.abs(_bounds.min_y - this.SlideBoundsOnCalculateSize.min_y) < 0.1) &&
-			(Math.abs(_bounds.max_x - this.SlideBoundsOnCalculateSize.max_x) < 0.1) &&
-			(Math.abs(_bounds.max_y - this.SlideBoundsOnCalculateSize.max_y) < 0.1))
-		{
-			return;
-		}
+		var size = this.CalculateDocumentSizeInternal();
 
-		this.m_dDocumentWidth      = 0;
-		this.m_dDocumentHeight     = 0;
-		this.m_dDocumentPageWidth  = 0;
-		this.m_dDocumentPageHeight = 0;
-
-		var dKoef = (this.m_nZoomValue * g_dKoef_mm_to_pix / 100);
-
-		this.SlideBoundsOnCalculateSize.fromBounds(_bounds);
-		var _bounds_slide = this.SlideBoundsOnCalculateSize;
-
-		var _srcW = this.m_oEditor.HtmlElement.width;
-		var _srcH = this.m_oEditor.HtmlElement.height;
-		if (this.bIsRetinaSupport)
-		{
-			_srcW = (_srcW / AscCommon.AscBrowser.retinaPixelRatio) >> 0;
-			_srcH = (_srcH / AscCommon.AscBrowser.retinaPixelRatio) >> 0;
-
-			_bounds_slide = {
-				min_x : (_bounds_slide.min_x / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
-				min_y : (_bounds_slide.min_y / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
-				max_x : (_bounds_slide.max_x / AscCommon.AscBrowser.retinaPixelRatio) >> 0,
-				max_y : (_bounds_slide.max_y / AscCommon.AscBrowser.retinaPixelRatio) >> 0
-			};
-		}
-
-		var _centerX         = (_srcW / 2) >> 0;
-		var _centerSlideX    = (dKoef * this.m_oLogicDocument.Width / 2) >> 0;
-		var _hor_width_left  = Math.min(0, _centerX - (_centerSlideX - _bounds_slide.min_x) - this.SlideDrawer.CONST_BORDER);
-		var _hor_width_right = Math.max(_srcW - 1, _centerX + (_bounds_slide.max_x - _centerSlideX) + this.SlideDrawer.CONST_BORDER);
-
-		var _centerY           = (_srcH / 2) >> 0;
-		var _centerSlideY      = (dKoef * this.m_oLogicDocument.Height / 2) >> 0;
-		var _ver_height_top    = Math.min(0, _centerY - (_centerSlideY - _bounds_slide.min_y) - this.SlideDrawer.CONST_BORDER);
-		var _ver_height_bottom = Math.max(_srcH - 1, _centerY + (_bounds_slide.max_y - _centerSlideY) + this.SlideDrawer.CONST_BORDER);
-
-		var lWSlide = _hor_width_right - _hor_width_left + 1;
-		var lHSlide = _ver_height_bottom - _ver_height_top + 1;
-
-		var one_slide_width  = lWSlide;
-		var one_slide_height = Math.max(lHSlide, _srcH);
-
-		this.m_dDocumentPageWidth  = one_slide_width;
-		this.m_dDocumentPageHeight = one_slide_height;
-
-		this.m_dDocumentWidth  = one_slide_width;
-		this.m_dDocumentHeight = (one_slide_height * this.m_oDrawingDocument.SlidesCount) >> 0;
-
-		if (0 == this.m_oDrawingDocument.SlidesCount)
-			this.m_dDocumentHeight = one_slide_height >> 0;
+		this.m_dDocumentWidth      = size.m_dDocumentWidth;
+		this.m_dDocumentHeight     = size.m_dDocumentHeight;
+		this.m_dDocumentPageWidth  = size.m_dDocumentPageWidth;
+		this.m_dDocumentPageHeight = size.m_dDocumentPageHeight;
 
 		this.OldDocumentWidth  = this.m_dDocumentWidth;
 		this.OldDocumentHeight = this.m_dDocumentHeight;
 
-		this.SlideScrollMIN = this.m_oDrawingDocument.SlideCurrent * one_slide_height;
-		this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - _srcH;
-
-		if (0 == this.m_oDrawingDocument.SlidesCount)
-		{
-			this.SlideScrollMIN = 0;
-			this.SlideScrollMAX = this.SlideScrollMIN + one_slide_height - _srcH;
-		}
+		this.SlideScrollMIN = size.SlideScrollMIN;
+		this.SlideScrollMAX = size.SlideScrollMAX;
 
 		this.MainScrollLock();
 
@@ -3210,6 +3209,10 @@ function CEditorPage(api)
 		{
 			oWordControl.Thumbnails.onCheckUpdate();
 		}
+
+		if (oWordControl.IsSupportNotes && oWordControl.m_oNotesApi)
+			oWordControl.m_oNotesApi.CheckPaint();
+
 		if (null != oWordControl.m_oLogicDocument)
 		{
 			oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
