@@ -2355,7 +2355,18 @@ PasteProcessor.prototype =
 		if(curDocSelection && curDocSelection[1])
 		{
 			pasteIntoParagraphPr = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Pr;
-			pasteIntoParaRunPr =  this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Content[curDocSelection[0].CurPos.ContentPos.Data[0]].Pr;
+
+			var pasteIntoParaRun = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Content[curDocSelection[0].CurPos.ContentPos.Data[0]];
+			if(para_InlineLevelSdt === pasteIntoParaRun.Type)
+			{
+				var selectPos = curDocSelection[0].CurPos.ContentPos.Data[1];
+				if(pasteIntoParaRun.Content && null != selectPos && pasteIntoParaRun.Content[selectPos])
+				{
+					pasteIntoParaRun =  pasteIntoParaRun.Content[selectPos];
+				}
+			}
+
+			pasteIntoParaRunPr = pasteIntoParaRun ? pasteIntoParaRun.Pr : null;
 		}
 		
 		switch(props)
