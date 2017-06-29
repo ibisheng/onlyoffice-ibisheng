@@ -2034,6 +2034,7 @@ background-repeat: no-repeat;\
 		var t = this;
 		if (false == e["saveLock"])
 		{
+			History.CheckUnionLastPoints();
 			if (this.isLongAction())
 			{
 				// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа

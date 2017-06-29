@@ -218,7 +218,7 @@ CHistory.prototype =
 
     Undo : function(Options)
     {
-        this.Check_UninonLastPoints();
+        this.CheckUnionLastPoints();
 
         // Проверяем можно ли сделать Undo
         if (true !== this.Can_Undo())
@@ -336,7 +336,7 @@ CHistory.prototype =
 
         this.Clear_Additional();
 
-        this.Check_UninonLastPoints();
+        this.CheckUnionLastPoints();
         
         var State = this.Document.GetSelectionState();
         var Items = [];
@@ -693,7 +693,7 @@ CHistory.prototype =
         this.RecalculateData.Update = true;
     },
 
-    Check_UninonLastPoints : function()
+	CheckUnionLastPoints : function()
     {
         // Не объединяем точки в истории, когда отключается пересчет.
         // TODO: Неправильно изменяется RecalcIndex

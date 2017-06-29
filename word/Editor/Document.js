@@ -11117,7 +11117,7 @@ CDocument.prototype.Replace_CompositeText = function(arrCharCodes)
 	this.Document_UpdateSelectionState();
 	this.Document_UpdateUndoRedoState();
 
-	if (!this.History.Check_UninonLastPoints())
+	if (!this.History.CheckUnionLastPoints())
 		this.CompositeInput.CanUndo = false;
 };
 CDocument.prototype.Set_CursorPosInCompositeText = function(nPos)
