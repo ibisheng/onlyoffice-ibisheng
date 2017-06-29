@@ -2254,13 +2254,13 @@ var editor;
   spreadsheet_api.prototype.asc_AddMath2 = function(Type)
   {
     var ws = this.wb.getWorksheet();
-    var ret = ws.objectRender.addMath(Type);
+    ws.objectRender.addMath(Type);
   };
 
   spreadsheet_api.prototype.asc_SetMathProps = function(MathProps)
   {
     var ws = this.wb.getWorksheet();
-    var ret = ws.objectRender.setMathProps(MathProps);
+    ws.objectRender.setMathProps(MathProps);
   };
 
   spreadsheet_api.prototype.asc_showImageFileDialog = function() {
