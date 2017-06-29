@@ -15872,7 +15872,7 @@ CTrackRevisionsManager.prototype.Get_NextChange = function()
             return this.CurChange;
         }
 
-        NextPara = this.LogicDocument.Get_RevisionsChangeParagraph(1, this.CurPara);
+        NextPara = this.LogicDocument.GetRevisionsChangeParagraph(1, this.CurPara);
     }
     else
     {
@@ -15894,7 +15894,7 @@ CTrackRevisionsManager.prototype.Get_NextChange = function()
                         return this.CurChange;
                     }
                 }
-                NextPara = this.LogicDocument.Get_RevisionsChangeParagraph(1, NextPara);
+                NextPara = this.LogicDocument.GetRevisionsChangeParagraph(1, NextPara);
             }
         }
     }
@@ -15946,7 +15946,7 @@ CTrackRevisionsManager.prototype.Get_PrevChange = function()
             return this.CurChange;
         }
 
-        PrevPara = this.LogicDocument.Get_RevisionsChangeParagraph(-1, this.CurPara);
+        PrevPara = this.LogicDocument.GetRevisionsChangeParagraph(-1, this.CurPara);
     }
     else
     {
@@ -15969,7 +15969,7 @@ CTrackRevisionsManager.prototype.Get_PrevChange = function()
                     }
                 }
 
-                PrevPara = this.LogicDocument.Get_RevisionsChangeParagraph(-1, PrevPara);
+                PrevPara = this.LogicDocument.GetRevisionsChangeParagraph(-1, PrevPara);
             }
         }
     }

@@ -2620,7 +2620,7 @@ CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth
     if (reviewtype_Common !== ReviewType)
         Checker.End_CheckOnlyTextPr();
 };
-CMathBase.prototype.Accept_RevisionChanges = function(Type, bAll)
+CMathBase.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     var ReviewType = this.ReviewType;
     if (reviewtype_Add === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextAdd === Type))
@@ -2643,9 +2643,9 @@ CMathBase.prototype.Accept_RevisionChanges = function(Type, bAll)
         }
     }
 
-    CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.AcceptRevisionChanges.apply(this, arguments);
 };
-CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
+CMathBase.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     var ReviewType = this.ReviewType;
     if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type))
@@ -2668,7 +2668,7 @@ CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
         }
     }
 
-    CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.RejectRevisionChanges.apply(this, arguments);
 };
 CMathBase.prototype.Set_MenuProps = function(Props)
 {

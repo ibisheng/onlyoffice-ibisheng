@@ -1087,7 +1087,7 @@ function CGroupShape()
         return bRet;
     };
 
-    CGroupShape.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
+    CGroupShape.prototype.GetRevisionsChangeParagraph = function(SearchEngine){
         var i;
         if(this.selectedObjects.length === 0){
             if(SearchEngine.Get_Direction() > 0){
@@ -1120,8 +1120,8 @@ function CGroupShape()
             }
         }
         while(!SearchEngine.Is_Found()){
-            if(this.arrGraphicObjects[i].Get_RevisionsChangeParagraph){
-                this.arrGraphicObjects[i].Get_RevisionsChangeParagraph(SearchEngine);
+            if(this.arrGraphicObjects[i].GetRevisionsChangeParagraph){
+                this.arrGraphicObjects[i].GetRevisionsChangeParagraph(SearchEngine);
             }
             if(SearchEngine.Get_Direction() > 0){
                 if(i === this.arrGraphicObjects.length - 1){

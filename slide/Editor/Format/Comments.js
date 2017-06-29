@@ -496,8 +496,8 @@ ParaComment.prototype.Get_TextPr = function(ContentPos, Depth)
 ParaComment.prototype.Set_ReviewType = function(ReviewType, RemovePrChange){};
 ParaComment.prototype.Set_ReviewTypeWithInfo = function(ReviewType, ReviewInfo){};
 ParaComment.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth){};
-ParaComment.prototype.Accept_RevisionChanges = function(Type, bAll){};
-ParaComment.prototype.Reject_RevisionChanges = function(Type, bAll){};
+ParaComment.prototype.AcceptRevisionChanges = function(Type, bAll){};
+ParaComment.prototype.RejectRevisionChanges = function(Type, bAll){};
 
 function CWriteCommentData()
 {

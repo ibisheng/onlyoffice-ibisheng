@@ -1046,10 +1046,10 @@ CShape.prototype.getBodyPr = function () {
     }, this, []);
 };
 
-CShape.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
+CShape.prototype.GetRevisionsChangeParagraph = function(SearchEngine){
     var oContent = this.getDocContent();
     if(oContent){
-        oContent.Get_RevisionsChangeParagraph(SearchEngine);
+        oContent.GetRevisionsChangeParagraph(SearchEngine);
     }
 };
 

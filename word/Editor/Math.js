@@ -1434,7 +1434,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 if (reviewtype_Common === ElementReviewType)
                 {
                     if (para_Math_Run === oElement.Type !== oElement.Type)
-                        oElement.Reject_RevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
+                        oElement.RejectRevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
 
                     oElement.Set_ReviewType(reviewtype_Remove);
                 }
@@ -1486,7 +1486,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     if (reviewtype_Common === ElementReviewType)
                     {
                         if (para_Math_Run === Element.Type !== Element.Type)
-                            Element.Reject_RevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
+                            Element.RejectRevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
 
                         Element.Set_ReviewType(reviewtype_Remove);
                     }
@@ -3328,13 +3328,13 @@ ParaMath.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
 {
     return this.Root.Check_RevisionsChanges(Checker, ContentPos, Depth);
 };
-ParaMath.prototype.Accept_RevisionChanges = function(Type, bAll)
+ParaMath.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
-    return this.Root.Accept_RevisionChanges(Type, bAll);
+    return this.Root.AcceptRevisionChanges(Type, bAll);
 };
-ParaMath.prototype.Reject_RevisionChanges = function(Type, bAll)
+ParaMath.prototype.RejectRevisionChanges = function(Type, bAll)
 {
-    return this.Root.Reject_RevisionChanges(Type, bAll);
+    return this.Root.RejectRevisionChanges(Type, bAll);
 };
 ParaMath.prototype.Set_ReviewType = function(ReviewType, RemovePrChange)
 {

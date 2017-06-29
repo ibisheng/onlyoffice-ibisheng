@@ -741,6 +741,18 @@ CBlockLevelSdt.prototype.FindNextFillingForm = function(isNext, isCurrent, isSta
 
 	return null;
 };
+CBlockLevelSdt.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
+{
+	return this.Content.GetRevisionsChangeParagraph(SearchEngine);
+};
+CBlockLevelSdt.prototype.AcceptRevisionChanges = function(Type, bAll)
+{
+	this.Content.AcceptRevisionChanges(Type, bAll);
+};
+CBlockLevelSdt.prototype.RejectRevisionChanges = function(Type, bAll)
+{
+	this.Content.RejectRevisionChanges(Type, bAll);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {

@@ -8756,7 +8756,7 @@ ParaRun.prototype.private_UpdateTrackRevisions = function()
         RevisionsManager.Check_Paragraph(this.Paragraph);
     }
 };
-ParaRun.prototype.Accept_RevisionChanges = function(Type, bAll)
+ParaRun.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     var Parent = this.Get_Parent();
     var RunPos = this.private_GetPosInParent();
@@ -8828,7 +8828,7 @@ ParaRun.prototype.Accept_RevisionChanges = function(Type, bAll)
         }
     }
 };
-ParaRun.prototype.Reject_RevisionChanges = function(Type, bAll)
+ParaRun.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     var Parent = this.Get_Parent();
     var RunPos = this.private_GetPosInParent();

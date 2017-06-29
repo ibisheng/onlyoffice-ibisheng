@@ -10847,7 +10847,7 @@ CChartSpace.prototype.recalculateChart = function()
 
 
 
-CChartSpace.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
+CChartSpace.prototype.GetRevisionsChangeParagraph = function(SearchEngine){
     var titles = this.getAllTitles(), i;
     if(titles.length === 0){
         return;
@@ -10872,7 +10872,7 @@ CChartSpace.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
         }
     }
     while(!SearchEngine.Is_Found()){
-        titles[i].Get_RevisionsChangeParagraph(SearchEngine);
+        titles[i].GetRevisionsChangeParagraph(SearchEngine);
         if(SearchEngine.Get_Direction() > 0){
             if(i === titles.length - 1){
                 break;
