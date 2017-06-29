@@ -1521,7 +1521,7 @@ function CEditorPage(api)
 		oThis.m_oApi.checkLastWork();
 
 		//console.log("down: " + isTouch + ", " + AscCommon.isTouch);
-		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 
 		if (!oThis.m_bIsIE)
@@ -1630,7 +1630,7 @@ function CEditorPage(api)
 	{
 		oThis.m_oApi.checkLastWork();
 
-		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 
 		if (e.preventDefault)
@@ -1725,7 +1725,7 @@ function CEditorPage(api)
 		oThis.m_oApi.checkLastWork();
 
 		//console.log("up: " + isTouch + ", " + AscCommon.isTouch);
-		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 		//if (true == global_mouseEvent.IsLocked)
 		//    return;

@@ -478,6 +478,8 @@
 
 							_blockStd = null;
 
+							window.g_asc_plugins.api.asc_Recalculate();
+
 							setTimeout(function() {
 								window.g_asc_plugins.api.__content_control_worker.run();
 							}, 1);
