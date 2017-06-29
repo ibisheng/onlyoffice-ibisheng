@@ -3854,6 +3854,11 @@ function CEditorPage(api)
 		var dKoef = g_dKoef_mm_to_pix * this.m_nZoomValue / 100;
 		return 5 + dKoef * x;
 	};
+
+	this.GetMainContentBounds = function()
+	{
+		return this.m_oMainContent.AbsolutePosition;
+	};
 }
 
 var _message_update = "zero_delay_update";

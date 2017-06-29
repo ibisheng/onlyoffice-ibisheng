@@ -1096,7 +1096,7 @@ function CHorRuler()
         var hor_ruler = word_control.m_oTopRuler_horRuler;
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
 
-        var _x = global_mouseEvent.X - 5 * g_dKoef_mm_to_pix - left - word_control.X - word_control.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix;
+        var _x = global_mouseEvent.X - 5 * g_dKoef_mm_to_pix - left - word_control.X - word_control.GetMainContentBounds().L * g_dKoef_mm_to_pix;
         _x *= dKoefPxToMM;
         var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
 
@@ -1821,7 +1821,7 @@ function CHorRuler()
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
         var dKoef_mm_to_pix = g_dKoef_mm_to_pix * this.m_dZoom;
         
-        var _x = global_mouseEvent.X - 5 * g_dKoef_mm_to_pix - left - word_control.X - word_control.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix;
+        var _x = global_mouseEvent.X - 5 * g_dKoef_mm_to_pix - left - word_control.X - word_control.GetMainContentBounds().L * g_dKoef_mm_to_pix;
         _x *= dKoefPxToMM;
         var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
 
@@ -3478,7 +3478,7 @@ function CVerRuler()
 
         var _y = global_mouseEvent.Y - 7 * g_dKoef_mm_to_pix - top - word_control.Y;
         _y *= dKoefPxToMM;
-        var _x = (global_mouseEvent.X - word_control.X) * g_dKoef_pix_to_mm - word_control.m_oMainContent.AbsolutePosition.L;
+        var _x = (global_mouseEvent.X - word_control.X) * g_dKoef_pix_to_mm - word_control.GetMainContentBounds().L;
 
         this.DragType = this.CheckMouseType(_x, _y);
 

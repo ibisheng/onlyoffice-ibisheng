@@ -3551,6 +3551,11 @@ function CEditorPage(api)
 		return str;
 		//console.log(str);
 	};
+
+	this.GetMainContentBounds = function()
+	{
+		return this.m_oMainParent.AbsolutePosition;
+	};
 }
 
 //------------------------------------------------------------export----------------------------------------------------
