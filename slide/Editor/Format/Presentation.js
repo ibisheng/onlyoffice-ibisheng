@@ -563,6 +563,7 @@ CPresentation.prototype =
         oTextStyle.levels[9].DefaultRunPr.Lang.Val = NewLangId;
         this.setDefaultTextStyle(oTextStyle);
         this.Restart_CheckSpelling();
+        this.Recalculate();
         this.Document_UpdateInterfaceState();
     },
 
@@ -4366,6 +4367,14 @@ CPresentation.prototype =
             {
                 break;
             }
+            case AscDFH.historyitem_Presentation_SetDefaultTextStyle:{
+                for(key = 0; key < this.Slides.length; ++key)
+                {
+                    this.Slides[key].checkSlideSize();
+                }
+                this.Restart_CheckSpelling();
+                break;
+            }
             case AscDFH.historyitem_Presentation_SlideSize:
             {
                 recalculateMaps = this.GetRecalculateMaps();
@@ -4443,6 +4452,7 @@ CPresentation.prototype =
                 break;
             }
             case AscDFH.historyitem_Presentation_SlideSize:
+            case AscDFH.historyitem_Presentation_SetDefaultTextStyle:
             {
                 History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, All: true});
                 break;
