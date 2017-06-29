@@ -233,7 +233,7 @@ function ParaText(value)
     this.WidthVisible = 0x00000000 | 0;
     this.Flags        = 0x00000000 | 0;
     
-    this.Set_SpaceAfter(45 === this.Value); // charCode символа "-"
+    this.Set_SpaceAfter(this.private_IsSpaceAfter());
 }
 
 ParaText.prototype =
@@ -248,7 +248,7 @@ ParaText.prototype =
     Set_CharCode : function(CharCode)
     {
         this.Value = CharCode;
-        this.Set_SpaceAfter(45 === this.Value); // charCode символа "-"
+        this.Set_SpaceAfter(this.private_IsSpaceAfter());
     },
     
     Draw : function(X, Y, Context)
@@ -445,8 +445,16 @@ ParaText.prototype =
     Read_FromBinary : function(Reader)
     {
         this.Value = Reader.GetLong();
-        this.Set_SpaceAfter(45 === this.Value);
+        this.Set_SpaceAfter(this.private_IsSpaceAfter());
     }
+};
+ParaText.prototype.private_IsSpaceAfter = function()
+{
+	if (0x002D === this.Value
+		|| 0x2014 === this.Value)
+		return true;
+
+	return false;
 };
 
 // Класс ParaSpace
