@@ -2170,7 +2170,7 @@ Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS)
 	var SectionIndex = LogicDocument.GetSectionIndexByElementIndex(this.Get_Index());
 	var FirstElement = LogicDocument.GetFirstElementInSection(SectionIndex);
 
-	if (!FirstElement || FirstElement.Get_AbsolutePage(0) === PRS.GetPageAbs())
+	if (0 !== SectionIndex && (!FirstElement || FirstElement.Get_AbsolutePage(0) === PRS.GetPageAbs()))
 		return true;
 
 	return false;
