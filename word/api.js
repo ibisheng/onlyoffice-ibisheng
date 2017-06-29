@@ -7465,6 +7465,24 @@ background-repeat: no-repeat;\
 
 		return oContentControl ? oContentControl.GetContentControlPr() : null;
 	};
+	asc_docs_api.prototype.asc_GetCurrentContentControl = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return null;
+
+		var oInfo   = oLogicDocument.GetSelectedElementsInfo();
+		var oInline = oInfo.GetInlineLevelSdt();
+		var oBlock  = oInfo.GetBlockLevelSdt();
+
+		if (oInline)
+			return oInline.GetId();
+
+		if (oBlock)
+			return oBlock.GetId();
+
+		return null;
+	};
 
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()
