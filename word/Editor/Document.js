@@ -10720,66 +10720,114 @@ CDocument.prototype.Update_ColumnsMarkupFromRuler = function(NewMarkup)
 };
 CDocument.prototype.Set_ColumnsProps = function(ColumnsProps)
 {
-	var CurPos = this.CurPos.ContentPos;
-	var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
-
-	if (!SectPr)
-		return;
-
-	if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
+	if (this.IsSelectionUse())
 	{
+		if (docpostype_DrawingObjects === this.Get_DocPosType())
+			return;
+
+		// К селекту мы применяем колонки не так как ворд.
+		// Элементы попавшие в селект полностью входят в  новую секцию, даже если они выделены частично.
+		
+		var nStartPos  = this.Selection.StartPos;
+		var nEndPos    = this.Selection.EndPos;
+		var nDirection = 1;
+
+		if (nEndPos < nStartPos)
+		{
+			nStartPos  = this.Selection.EndPos;
+			nEndPos    = this.Selection.StartPos;
+			nDirection = -1;
+		}
+
+		var oStartSectPr = this.SectionsInfo.Get_SectPr(nStartPos).SectPr;
+		var oEndSectPr   = this.SectionsInfo.Get_SectPr(nEndPos).SectPr;
+		if (!oStartSectPr || !oEndSectPr)
+			return;
+
+		if (this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
+			return;
+
 		this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetColumnsProps);
 
-		var EqualWidth = ColumnsProps.get_EqualWidth();
-		SectPr.Set_Columns_EqualWidth(ColumnsProps.get_EqualWidth());
-		if (false === EqualWidth)
+		var oEndParagraph = null;
+		if (type_Paragraph !== this.Content[nEndPos].GetType())
 		{
-			var X      = SectPr.Get_PageMargin_Left();
-			var XLimit = SectPr.Get_PageWidth() - SectPr.Get_PageMargin_Right();
-
-			var Cols          = [];
-			var SectionColumn = null;
-			var Count         = ColumnsProps.get_ColsCount();
-			for (var Index = 0; Index < Count; ++Index)
-			{
-				var Col             = ColumnsProps.get_Col(Index);
-				SectionColumn       = new CSectionColumn();
-				SectionColumn.W     = Col.get_W();
-				SectionColumn.Space = Col.get_Space();
-
-				if (X + SectionColumn.W > XLimit)
-				{
-					SectionColumn.W = XLimit - X;
-					Cols.push(SectionColumn);
-					X += SectionColumn.W;
-					break;
-				}
-
-				X += SectionColumn.W;
-				if (Index != Count - 1)
-					X += SectionColumn.Space;
-
-				Cols.push(SectionColumn);
-			}
-
-			if (SectionColumn && X < XLimit - 0.001)
-			{
-				SectionColumn.W += XLimit - X;
-			}
-
-			SectPr.Set_Columns_Cols(Cols);
-			SectPr.Set_Columns_Num(Count);
+			oEndParagraph = new Paragraph(this.DrawingDocument, this);
+			this.Add_ToContent(nEndPos + 1, oEndParagraph);
 		}
 		else
 		{
-			SectPr.Set_Columns_Num(ColumnsProps.get_Num());
-			SectPr.Set_Columns_Space(ColumnsProps.get_Space());
+			oEndParagraph = this.Content[nEndPos];
+		}
+
+		if (nStartPos > 0
+			&& (type_Paragraph !== this.Content[nStartPos - 1].GetType()
+			|| !this.Content[nStartPos - 1].Get_SectionPr()))
+		{
+			var oSectPr = new CSectionPr(this);
+			oSectPr.Copy(oStartSectPr, false);
+
+			var oStartParagraph = new Paragraph(this.DrawingDocument, this);
+			this.Add_ToContent(nStartPos, oStartParagraph);
+			oStartParagraph.Set_SectionPr(oSectPr, true);
+
+			nStartPos++;
+			nEndPos++;
+		}
+
+		oEndSectPr.Set_Type(c_oAscSectionBreakType.Continuous);
+		var oSectPr = new CSectionPr(this);
+		oSectPr.Copy(oEndSectPr, false);
+		oEndParagraph.Set_SectionPr(oSectPr, true);
+
+		oSectPr.SetColumnProps(ColumnsProps);
+
+		for (var nIndex = nStartPos; nIndex < nEndPos; ++nIndex)
+		{
+			var oElement = this.Content[nIndex];
+			if (type_Paragraph === oElement.GetType())
+			{
+				var oCurSectPr = oElement.Get_SectionPr();
+				if (oCurSectPr)
+					oCurSectPr.SetColumnProps(ColumnsProps);
+			}
+		}
+
+		if (nDirection >= 0)
+		{
+			this.Selection.StartPos = nStartPos;
+			this.Selection.EndPos   = nEndPos;
+		}
+		else
+		{
+			this.Selection.StartPos = nEndPos;
+			this.Selection.EndPos   = nStartPos;
 		}
 
 		this.Recalculate();
 		this.Document_UpdateSelectionState();
 		this.Document_UpdateInterfaceState();
 		this.Document_UpdateRulersState();
+	}
+	else
+	{
+		var CurPos = this.CurPos.ContentPos;
+		var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
+
+		if (!SectPr)
+			return;
+
+		if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
+		{
+			this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetColumnsProps);
+
+			SectPr.SetColumnProps(ColumnsProps);
+
+			this.Recalculate();
+			this.Document_UpdateSelectionState();
+			this.Document_UpdateInterfaceState();
+			this.Document_UpdateRulersState();
+		}
 	}
 };
 CDocument.prototype.Get_TopDocumentContent = function()
