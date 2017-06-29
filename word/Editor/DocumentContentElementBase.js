@@ -658,6 +658,16 @@ CDocumentContentElementBase.prototype.FindNextFillingForm = function(isNext, isC
 {
 	return null;
 };
+CDocumentContentElementBase.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
+{
+	return null;
+};
+CDocumentContentElementBase.prototype.AcceptRevisionChanges = function(Type, bAll)
+{
+};
+CDocumentContentElementBase.prototype.RejectRevisionChanges = function(Type, bAll)
+{
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------

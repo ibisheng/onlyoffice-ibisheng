@@ -11375,7 +11375,7 @@ Paragraph.prototype.private_UpdateTrackRevisions = function()
         RevisionsManager.Check_Paragraph(this);
     }
 };
-Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
+Paragraph.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     if (true === this.Selection.Use || true === bAll)
     {
@@ -11404,8 +11404,8 @@ Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
         // Начинаем с конца, потому что при выполнении данной фунцкции, количество элементов может изменяться
         for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
         {
-            if (this.Content[CurPos].Accept_RevisionChanges)
-                this.Content[CurPos].Accept_RevisionChanges(Type, bAll);
+            if (this.Content[CurPos].AcceptRevisionChanges)
+                this.Content[CurPos].AcceptRevisionChanges(Type, bAll);
         }
 
         this.Correct_Content();
@@ -11413,7 +11413,7 @@ Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
         this.private_UpdateTrackRevisions();
     }
 };
-Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
+Paragraph.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     if (true === this.Selection.Use || true === bAll)
     {
@@ -11442,8 +11442,8 @@ Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
         // Начинаем с конца, потому что при выполнении данной фунцкции, количество элементов может изменяться
         for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
         {
-            if (this.Content[CurPos].Reject_RevisionChanges)
-                this.Content[CurPos].Reject_RevisionChanges(Type, bAll);
+            if (this.Content[CurPos].RejectRevisionChanges)
+                this.Content[CurPos].RejectRevisionChanges(Type, bAll);
         }
 
         this.Correct_Content();
@@ -11451,7 +11451,7 @@ Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
         this.private_UpdateTrackRevisions();
     }
 };
-Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+Paragraph.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
 {
     if (true === SearchEngine.Is_Found())
         return;
@@ -11462,7 +11462,7 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
         var DrawingObjects = this.GetAllDrawingObjects();
         for (var DrawingIndex = 0, Count = DrawingObjects.length; DrawingIndex < Count; DrawingIndex++)
         {
-            DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
+            DrawingObjects[DrawingIndex].GetRevisionsChangeParagraph(SearchEngine);
             if (true === SearchEngine.Is_Found())
                 return;
         }
@@ -11483,7 +11483,7 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
         var DrawingObjects = this.GetAllDrawingObjects();
         for (var DrawingIndex = DrawingObjects.length - 1; DrawingIndex >= 0; DrawingIndex--)
         {
-            DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
+            DrawingObjects[DrawingIndex].GetRevisionsChangeParagraph(SearchEngine);
             if (true === SearchEngine.Is_Found())
                 return;
         }

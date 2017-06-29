@@ -11324,7 +11324,7 @@ CTable.prototype.IsSelectedAll = function()
 
     return true;
 };
-CTable.prototype.Accept_RevisionChanges = function(Type, bAll)
+CTable.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
     {
@@ -11336,13 +11336,13 @@ CTable.prototype.Accept_RevisionChanges = function(Type, bAll)
             var Cell = Row.Get_Cell(Pos.Cell);
             var Cell_Content = Cell.Content;
 
-            Cell.Content.Accept_RevisionChanges(Type, true);
+            Cell.Content.AcceptRevisionChanges(Type, true);
         }
     }
     else
-        return this.CurCell.Content.Accept_RevisionChanges(Type, bAll);
+        return this.CurCell.Content.AcceptRevisionChanges(Type, bAll);
 };
-CTable.prototype.Reject_RevisionChanges = function(Type, bAll)
+CTable.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     if (true === this.ApplyToAll || (true === this.Selection.Use && table_Selection_Cell === this.Selection.Type && this.Selection.Data.length > 0))
     {
@@ -11354,13 +11354,13 @@ CTable.prototype.Reject_RevisionChanges = function(Type, bAll)
             var Cell = Row.Get_Cell(Pos.Cell);
             var Cell_Content = Cell.Content;
 
-            Cell_Content.Reject_RevisionChanges(Type, true);
+            Cell_Content.RejectRevisionChanges(Type, true);
         }
     }
     else
-        return this.CurCell.Content.Reject_RevisionChanges(Type, bAll);
+        return this.CurCell.Content.RejectRevisionChanges(Type, bAll);
 };
-CTable.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+CTable.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
 {
     if (true === SearchEngine.Is_Found())
         return;
@@ -11394,7 +11394,7 @@ CTable.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
     while (null != Cell && vmerge_Restart != Cell.Get_VMerge())
         Cell = this.private_GetPrevCell(CurRow, CurCell);
 
-    Cell.Content.Get_RevisionsChangeParagraph(SearchEngine);
+    Cell.Content.GetRevisionsChangeParagraph(SearchEngine);
     while (true !== SearchEngine.Is_Found())
     {
         if (SearchEngine.Get_Direction() > 0)
@@ -11413,7 +11413,7 @@ CTable.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
         if (null === Cell)
             break;
 
-        Cell.Content.Get_RevisionsChangeParagraph(SearchEngine);
+        Cell.Content.GetRevisionsChangeParagraph(SearchEngine);
     }
 };
 CTable.prototype.private_GetNextCell = function(RowIndex, CellIndex)
