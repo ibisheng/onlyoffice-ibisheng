@@ -11091,12 +11091,12 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                         }
                         case 5 :
                         {
-                            numberingType = 8;
+                            numberingType = 1;
                             break;
                         }
                         case 6 :
                         {
-                            numberingType = 40;
+                            numberingType = 2;
                             break;
                         }
                         case 7 :
