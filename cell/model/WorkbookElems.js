@@ -4733,11 +4733,7 @@ RangeDataManager.prototype = {
 				--i;
 			}
 		}
-
-		var bRemove = 0 === this.arrSparklines.length;
-		if (bRemove) {
-			History.Add(new AscDFH.CChangesDrawingsSparklinesRemove(this));
-		}
+		var bRemove = (0 === this.arrSparklines.length);
 		return bRemove;
 	};
 	sparklineGroup.prototype.getLocationRanges = function (onlySingle) {
