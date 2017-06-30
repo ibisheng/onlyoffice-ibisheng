@@ -69,9 +69,10 @@
 		cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV,
 		cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST,
 		cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
-		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPROB, cQUARTILE, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSLOPE, cSMALL,
-		cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV,
-		cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA, cWEIBULL, cZTEST);
+		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ,
+		cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
+		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA,
+		cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
@@ -5671,7 +5672,7 @@
 		function quartile(argArray) {
 
 			var A = argArray[0];
-			var fFlag = argArray[1];
+			var fFlag = Math.floor(argArray[1]);
 			var tA = [];
 
 			for (var i = 0; i < A.length; i++) {
@@ -5694,8 +5695,69 @@
 			}else if(nSize == 1){
 				return new cNumber(tA[0]);
 			}
-			
+
 			return fFlag === 2 ? getMedian( tA ) : getPercentile( tA, 0.25 * fFlag );
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, quartile);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cQUARTILE_EXC() {
+		this.name = "QUARTILE.EXC";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cQUARTILE_EXC.prototype = Object.create(cBaseFunction.prototype);
+	cQUARTILE_EXC.prototype.constructor = cQUARTILE_EXC;
+	cQUARTILE_EXC.prototype.argumentsMin = 2;
+	cQUARTILE_EXC.prototype.argumentsMax = 2;
+	cQUARTILE_EXC.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cQUARTILE_EXC.prototype.isXLFN = true;
+	cQUARTILE_EXC.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function quartile(argArray) {
+
+			var A = argArray[0];
+			var fFlag = Math.floor(argArray[1]);
+			var tA = [];
+
+			for (var i = 0; i < A.length; i++) {
+				for (var j = 0; j < A[i].length; j++) {
+					if (A[i][j] instanceof cError) {
+						return A[i][j];
+					} else if (A[i][j] instanceof cNumber) {
+						tA.push(A[i][j].getValue());
+					} else if (A[i][j] instanceof cBool) {
+						tA.push(A[i][j].tocNumber().getValue());
+					}
+				}
+			}
+
+			var nSize = tA.length;
+			if(tA.length < 1 || nSize === 0){
+				return new cError(cErrorType.not_available);
+			}else if(fFlag <= 0.0 || fFlag >= 4.0){
+				return new cError(cErrorType.not_numeric);
+			}else if(nSize == 1){
+				return new cNumber(tA[0]);
+			}
+
+			return fFlag === 2 ? getMedian( tA ) : getPercentileExclusive( tA, 0.25 * fFlag );
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, quartile);
