@@ -59,7 +59,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cCHISQ_TEST, cCOVARIANCE_P,
 		cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
 		cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL, cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST,
-		cNORM_S_INV, cPERMUTATIONA, cPHI, cPOISSON_DIST, cSKEW_P, cSTDEV_P, cSTDEV_S,
+		cNORM_S_INV, cPERMUTATIONA, cPHI, cSKEW_P, cSTDEV_P, cSTDEV_S,
 		cT_TEST, cVAR_P, cVAR_S, cWEIBULL_DIST, cZ_TEST);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
@@ -75,7 +75,7 @@
 		cERF_PRECISE, cERFC_PRECISE, cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cCHISQ_TEST,
 		cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY,
 		cFORECAST_ETS_STAT, cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL, cNEGBINOM_DIST, cNORM_DIST,
-		cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERMUTATIONA, cPHI, cPOISSON_DIST, cSKEW_P,
+		cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERMUTATIONA, cPHI, cSKEW_P,
 		cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_P, cVAR_S, cWEIBULL_DIST, cZ_TEST, cPDURATION, cRRI, cAGGREGATE, cMUNIT,
 		cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
 
@@ -510,18 +510,6 @@
 
 	cPHI.prototype = Object.create(cBaseFunction.prototype);
 	cPHI.prototype.constructor = cPHI;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cPOISSON_DIST() {
-		cBaseFunction.call(this, "POISSON.DIST");
-		this.isXLFN = true;
-	}
-
-	cPOISSON_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cPOISSON_DIST.prototype.constructor = cPOISSON_DIST;
 
 	/**
 	 * @constructor

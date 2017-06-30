@@ -69,7 +69,7 @@
 		cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV,
 		cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST,
 		cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
-		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ,
+		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ,
 		cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
 		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA,
 		cWEIBULL, cZTEST);
@@ -5524,13 +5524,26 @@
 			return this.value = arg2;
 		}
 
-		if (arg0.getValue() < 0 || arg1.getValue() <= 0) {
+		if (arg0.getValue() < 0 || arg1.getValue() < 0) {
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
 		return this.value = new cNumber(poisson(arg0, arg1, arg2));
 
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cPOISSON}
+	 */
+	function cPOISSON_DIST() {
+		cPOISSON.call(this);
+		this.name = "POISSON.DIST";
+	}
+
+	cPOISSON_DIST.prototype = Object.create(cPOISSON.prototype);
+	cPOISSON_DIST.prototype.constructor = cPOISSON_DIST;
+	cPOISSON_DIST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
