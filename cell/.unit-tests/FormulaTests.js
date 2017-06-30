@@ -4197,6 +4197,58 @@ $( function () {
 
     } );
 
+	test( "Test: \"QUARTILE\"", function () {
+		ws.getRange2( "A202" ).setValue( "1" );
+		ws.getRange2( "A203" ).setValue( "2" );
+		ws.getRange2( "A204" ).setValue( "4" );
+		ws.getRange2( "A205" ).setValue( "7" );
+		ws.getRange2( "A206" ).setValue( "8" );
+		ws.getRange2( "A207" ).setValue( "9" );
+		ws.getRange2( "A208" ).setValue( "10" );
+		ws.getRange2( "A209" ).setValue( "12" );
+
+		oParser = new parserFormula( "QUARTILE(A202:A209,1)", "A1", ws );
+		ok( oParser.parse(), "QUARTILE(A202:A209,1)" );
+		strictEqual( oParser.calculate().getValue(), 3.5, "QUARTILE(A202:A209,1)" );
+	} );
+
+    test( "Test: \"QUARTILE.INC\"", function () {
+		ws.getRange2( "A202" ).setValue( "1" );
+		ws.getRange2( "A203" ).setValue( "2" );
+		ws.getRange2( "A204" ).setValue( "4" );
+		ws.getRange2( "A205" ).setValue( "7" );
+		ws.getRange2( "A206" ).setValue( "8" );
+		ws.getRange2( "A207" ).setValue( "9" );
+		ws.getRange2( "A208" ).setValue( "10" );
+		ws.getRange2( "A209" ).setValue( "12" );
+
+		oParser = new parserFormula( "QUARTILE.INC(A202:A209,1)", "A1", ws );
+		ok( oParser.parse(), "QUARTILE.INC(A202:A209,1)" );
+		strictEqual( oParser.calculate().getValue(), 3.5, "QUARTILE.INC(A202:A209,1)" );
+	} );
+
+	test( "Test: \"QUARTILE.EXC\"", function () {
+		ws.getRange2( "A202" ).setValue( "6" );
+		ws.getRange2( "A203" ).setValue( "7" );
+		ws.getRange2( "A204" ).setValue( "15" );
+		ws.getRange2( "A205" ).setValue( "36" );
+		ws.getRange2( "A206" ).setValue( "39" );
+		ws.getRange2( "A207" ).setValue( "40" );
+		ws.getRange2( "A208" ).setValue( "41" );
+		ws.getRange2( "A209" ).setValue( "42" );
+		ws.getRange2( "A210" ).setValue( "43" );
+		ws.getRange2( "A211" ).setValue( "47" );
+		ws.getRange2( "A212" ).setValue( "49" );
+
+		oParser = new parserFormula( "QUARTILE.EXC(A202:A212,1)", "A1", ws );
+		ok( oParser.parse(), "QUARTILE.EXC(A202:A212,1)" );
+		strictEqual( oParser.calculate().getValue(), 15, "QUARTILE.EXC(A202:A212,1)" );
+
+		oParser = new parserFormula( "QUARTILE.EXC(A202:A212,3)", "A1", ws );
+		ok( oParser.parse(), "QUARTILE.EXC(A202:A212,3)" );
+		strictEqual( oParser.calculate().getValue(), 43, "QUARTILE.EXC(A202:A212,3)" );
+	} );
+
     test( "Test: \"RSQ\"", function () {
 
         function rsq( x, y ) {

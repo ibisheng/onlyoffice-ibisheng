@@ -5692,7 +5692,7 @@
 				return new cError(cErrorType.not_available);
 			}else if(fFlag < 0.0 || fFlag > 4.0){
 				return new cError(cErrorType.not_numeric);
-			}else if(nSize == 1){
+			}else if(nSize === 1){
 				return new cNumber(tA[0]);
 			}
 
@@ -5753,7 +5753,7 @@
 				return new cError(cErrorType.not_available);
 			}else if(fFlag <= 0.0 || fFlag >= 4.0){
 				return new cError(cErrorType.not_numeric);
-			}else if(nSize == 1){
+			}else if(nSize === 1){
 				return new cNumber(tA[0]);
 			}
 
