@@ -5026,6 +5026,8 @@ Paragraph.prototype.MoveCursorToStartPos = function(AddToSelect)
 		this.RemoveSelection();
 
 		this.CurPos.ContentPos = 0;
+		this.CurPos.Line       = -1;
+		this.CurPos.Range      = -1;
 		this.Content[0].MoveCursorToStartPos();
 		this.Correct_ContentPos(false);
 		this.Correct_ContentPos2();
@@ -5070,6 +5072,8 @@ Paragraph.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelectFromEn
 			this.RemoveSelection();
 
 			this.CurPos.ContentPos = this.Content.length - 1;
+			this.CurPos.Line       = -1;
+			this.CurPos.Range      = -1;
 			this.Content[this.CurPos.ContentPos].MoveCursorToEndPos();
 			this.Correct_ContentPos(false);
 			this.Correct_ContentPos2();
