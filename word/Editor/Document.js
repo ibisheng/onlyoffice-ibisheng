@@ -11501,7 +11501,7 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 	// Сначала удаляем заселекченую часть
 	if (true === this.Selection.Use)
 	{
-		this.Remove(1, true);
+		this.Remove(1, true, false, true);
 	}
 
 	// Добавляем новый параграф
