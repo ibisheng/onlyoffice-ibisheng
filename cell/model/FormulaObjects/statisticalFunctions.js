@@ -413,6 +413,21 @@
 		}
 	}
 
+	function getMedian(rArray){
+		rArray.sort(fSortAscending);
+
+		var nSize = rArray.length;
+		if (nSize == 0){
+			return new cError(cErrorType.wrong_value_type);
+		}
+
+		if (nSize % 2 === 0) {
+			return new cNumber((rArray[nSize / 2 - 1] + rArray[nSize / 2]) / 2);
+		} else {
+			return new cNumber(rArray[(nSize - 1) / 2]);
+		}
+	}
+
 	function getGamma(fZ) {
 		var fLogPi = Math.log(Math.PI);
 		var fLogDblMax = Math.log(2.22507e+308);
@@ -5643,9 +5658,21 @@
 	cQUARTILE.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cQUARTILE.prototype.Calculate = function (arg) {
 
-		function quartile(A, k) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array]);
+		var argClone = oArguments.args;
 
-			var tA = [], fFlag = k.getValue();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function quartile(argArray) {
+
+			var A = argArray[0];
+			var fFlag = argArray[1];
+			var tA = [];
 
 			for (var i = 0; i < A.length; i++) {
 				for (var j = 0; j < A[i].length; j++) {
@@ -5659,75 +5686,49 @@
 				}
 			}
 
-			tA.sort(fSortAscending);
-
-			var nSize = tA.length, nIndex, fDiff;
-			if (tA.length < 1 || nSize == 0) {
+			var nSize = tA.length;
+			if(tA.length < 1 || nSize === 0){
 				return new cError(cErrorType.not_available);
-			} else {
-				if (nSize == 1) {
-					return new cNumber(tA[0]);
-				} else {
-
-					if (fFlag < 0.0 || fFlag > 4) {
-						return new cError(cErrorType.not_numeric);
-					} else if (fFlag == 0.0) {
-						return new cNumber(tA[0]);
-					} else if (fFlag == 1.0) {
-						nIndex = Math.floor(0.25 * (nSize - 1));
-						fDiff = 0.25 * (nSize - 1) - Math.floor(0.25 * (nSize - 1));
-						if (fDiff == 0.0) {
-							return new cNumber(tA[nIndex]);
-						} else {
-							return new cNumber(tA[nIndex] + fDiff * (tA[nIndex + 1] - tA[nIndex]));
-						}
-					} else if (fFlag == 2.0) {
-						if (nSize % 2 == 0) {
-							return new cNumber((tA[nSize / 2 - 1] + tA[nSize / 2]) / 2.0);
-						} else {
-							return new cNumber(tA[(nSize - 1) / 2]);
-						}
-					} else if (fFlag == 3.0) {
-						nIndex = Math.floor(0.75 * (nSize - 1));
-						fDiff = 0.75 * (nSize - 1) - Math.floor(0.75 * (nSize - 1));
-						if (fDiff == 0.0) {
-							return new cNumber(tA[nIndex]);
-						} else {
-							return new cNumber(tA[nIndex] + fDiff * (tA[nIndex + 1] - tA[nIndex]));
-						}
-					} else {
-						return new cNumber(tA[nSize - 1]);
-					}
-
-				}
+			}else if(fFlag < 0.0 || fFlag > 4.0){
+				return new cError(cErrorType.not_numeric);
+			}else if(nSize == 1){
+				return new cNumber(tA[0]);
 			}
 
+			//tA.sort(fSortAscending);
+
+			return fFlag === 2 ? getMedian( tA ) : getPercentile( tA, 0.25 * fFlag );
+
+			/*if (fFlag == 0.0) {
+				return new cNumber(tA[0]);
+			} else if (fFlag == 1.0) {
+				nIndex = Math.floor(0.25 * (nSize - 1));
+				fDiff = 0.25 * (nSize - 1) - Math.floor(0.25 * (nSize - 1));
+				if (fDiff == 0.0) {
+					return new cNumber(tA[nIndex]);
+				} else {
+					return new cNumber(tA[nIndex] + fDiff * (tA[nIndex + 1] - tA[nIndex]));
+				}
+			} else if (fFlag == 2.0) {
+				if (nSize % 2 == 0) {
+					return new cNumber((tA[nSize / 2 - 1] + tA[nSize / 2]) / 2.0);
+				} else {
+					return new cNumber(tA[(nSize - 1) / 2]);
+				}
+			} else if (fFlag == 3.0) {
+				nIndex = Math.floor(0.75 * (nSize - 1));
+				fDiff = 0.75 * (nSize - 1) - Math.floor(0.75 * (nSize - 1));
+				if (fDiff == 0.0) {
+					return new cNumber(tA[nIndex]);
+				} else {
+					return new cNumber(tA[nIndex] + fDiff * (tA[nIndex + 1] - tA[nIndex]));
+				}
+			} else {
+				return new cNumber(tA[nSize - 1]);
+			}*/
 		}
 
-		var arg0 = arg[0], arg1 = arg[1];
-		if (arg0 instanceof cArea || arg0 instanceof cArray) {
-			arg0 = arg0.getMatrix();
-		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.getMatrix()[0];
-		} else {
-			return this.value = new cError(cErrorType.not_available);
-		}
-
-
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
-		} else if (arg1 instanceof cArray) {
-			arg1 = arg1.getElement(0);
-		}
-
-		arg1 = arg1.tocNumber();
-
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
-		}
-
-		return this.value = quartile(arg0, arg1);
-
+		return this.value = this._findArrayInNumberArguments(oArguments, quartile);
 	};
 
 	/**
