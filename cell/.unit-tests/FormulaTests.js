@@ -3372,6 +3372,12 @@ $( function () {
 
     } );
 
+	test( "Test: \"FORECAST.LINEAR\"", function () {
+		oParser = new parserFormula( "FORECAST(30,{6,7,9,15,21},{20,28,31,38,40})", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 13 ) - 0, 10.6072530864198);
+	} );
+
     test( "Test: \"FREQUENCY\"", function () {
 
         ws.getRange2( "A202" ).setValue( "79" );
