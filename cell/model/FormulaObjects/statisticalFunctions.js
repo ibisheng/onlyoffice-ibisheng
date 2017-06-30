@@ -5474,12 +5474,30 @@
 	cPOISSON.prototype.argumentsMax = 3;
 	cPOISSON.prototype.Calculate = function (arg) {
 
-		function poisson(x, l, cumulativeFlag) {
-			var _x = parseInt(x.getValue()), _l = l.getValue(), f = cumulativeFlag.toBool();
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function poisson(argArray) {
+			var _x = parseInt(argArray[0]);
+			var _l = argArray[1];
+			var f = argArray[2];
+
+			if (_x < 0 || _l < 0) {
+				return new cError(cErrorType.not_numeric);
+			}
 
 			if (f) {
 				var sum = 0;
-				for (var k = 0; k <= x; k++) {
+				for (var k = 0; k <= _x; k++) {
 					sum += Math.pow(_l, k) / Math.fact(k);
 				}
 				sum *= Math.exp(-_l);
@@ -5490,51 +5508,12 @@
 
 		}
 
-		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2], arg3 = arg[3];
-
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]);
-		} else if (arg0 instanceof cArray) {
-			arg0 = arg0.getElement(0);
-		}
-
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
-		} else if (arg1 instanceof cArray) {
-			arg1 = arg1.getElement(0);
-		}
-
-		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1]);
-		} else if (arg2 instanceof cArray) {
-			arg2 = arg2.getElement(0);
-		}
-
-		arg0 = arg0.tocNumber();
-		arg1 = arg1.tocNumber();
-		arg2 = arg2.tocBool();
-
-		if (arg0 instanceof cError) {
-			return this.value = arg0;
-		}
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
-		}
-		if (arg2 instanceof cError) {
-			return this.value = arg2;
-		}
-
-		if (arg0.getValue() < 0 || arg1.getValue() < 0) {
-			return this.value = new cError(cErrorType.not_numeric);
-		}
-
-		return this.value = new cNumber(poisson(arg0, arg1, arg2));
-
+		return this.value = this._findArrayInNumberArguments(oArguments, poisson);
 	};
 
 	/**
 	 * @constructor
-	 * @extends {cPOISSON}
+	 * @extends {cPERCENTRANK}
 	 */
 	function cPOISSON_DIST() {
 		cPOISSON.call(this);
