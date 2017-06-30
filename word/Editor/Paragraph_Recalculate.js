@@ -2160,7 +2160,12 @@ Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS)
 		return false;
 
 	if (!(PRS.Parent instanceof CDocument))
+	{
+		if (PRS.Parent instanceof AscFormat.CDrawingDocContent && 0 !== CurPage)
+			return false;
+
 		return true;
+	}
 
 	// Если дошли до этого места, то тут все зависит от того на какой мы странице. Если на первой странице данной секции
 	// тогда добавляем расстояние, а если нет - нет. Но подсчет первой страницы здесь не совпадает с тем, как она
