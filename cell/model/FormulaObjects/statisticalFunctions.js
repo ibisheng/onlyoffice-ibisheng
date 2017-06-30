@@ -70,7 +70,7 @@
 		cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST,
 		cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
 		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ,
-		cRSQ, cSKEW, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
+		cRSQ, cSKEW, cSKEW_P,cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
 		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA,
 		cWEIBULL, cZTEST);
 
@@ -1054,6 +1054,58 @@
 
 		return res;
 	}
+
+	function skew(x, bSkewp) {
+
+		var sumSQRDeltaX = 0, _x = 0, xLength = 0, sumSQRDeltaXDivstandDev = 0, i;
+		for (i = 0; i < x.length; i++) {
+
+			if (x[i] instanceof cNumber) {
+				_x += x[i].getValue();
+				xLength++;
+			}
+
+		}
+
+		if (xLength <= 2) {
+			return new cError(cErrorType.not_available);
+		}
+
+		_x /= xLength;
+
+		for (i = 0; i < x.length; i++) {
+
+			if (x[i] instanceof cNumber) {
+				sumSQRDeltaX += Math.pow(x[i].getValue() - _x, 2);
+			}
+
+		}
+
+		var standDev;
+		if(bSkewp){
+			standDev = Math.sqrt(sumSQRDeltaX / ( xLength ));
+		}else{
+			standDev = Math.sqrt(sumSQRDeltaX / ( xLength - 1 ));
+		}
+
+		for (i = 0; i < x.length; i++) {
+
+			if (x[i] instanceof cNumber) {
+				sumSQRDeltaXDivstandDev += Math.pow((x[i].getValue() - _x) / standDev, 3);
+			}
+
+		}
+
+		var res;
+		if(bSkewp){
+			res = sumSQRDeltaXDivstandDev / xLength;
+		}else{
+			res = xLength / (xLength - 1) / (xLength - 2) * sumSQRDeltaXDivstandDev;
+		}
+
+		return new cNumber(res);
+	}
+
 
 	function GAMMADISTFUNCTION(fp, fAlpha, fBeta){
 		this.fp = fp;
@@ -5988,46 +6040,6 @@
 	cSKEW.prototype.argumentsMin = 1;
 	cSKEW.prototype.Calculate = function (arg) {
 
-		function skew(x) {
-
-			var sumSQRDeltaX = 0, _x = 0, xLength = 0, sumSQRDeltaXDivstandDev = 0, i;
-			for (i = 0; i < x.length; i++) {
-
-				if (x[i] instanceof cNumber) {
-					_x += x[i].getValue();
-					xLength++;
-				}
-
-			}
-
-			if (xLength <= 2) {
-				return new cError(cErrorType.not_available);
-			}
-
-			_x /= xLength;
-
-			for (i = 0; i < x.length; i++) {
-
-				if (x[i] instanceof cNumber) {
-					sumSQRDeltaX += Math.pow(x[i].getValue() - _x, 2);
-				}
-
-			}
-
-			var standDev = Math.sqrt(sumSQRDeltaX / ( xLength - 1 ));
-
-			for (i = 0; i < x.length; i++) {
-
-				if (x[i] instanceof cNumber) {
-					sumSQRDeltaXDivstandDev += Math.pow((x[i].getValue() - _x) / standDev, 3);
-				}
-
-			}
-
-			return new cNumber(xLength / (xLength - 1) / (xLength - 2) * sumSQRDeltaXDivstandDev)
-
-		}
-
 		var arr0 = [];
 
 		for (var j = 0; j < this.getArguments(); j++) {
@@ -6059,6 +6071,55 @@
 
 		}
 		return this.value = skew(arr0);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSKEW_P() {
+		this.name = "SKEW.P";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cSKEW_P.prototype = Object.create(cBaseFunction.prototype);
+	cSKEW_P.prototype.constructor = cSKEW_P;
+	cSKEW_P.prototype.argumentsMin = 1;
+	cSKEW_P.prototype.isXLFN = true;
+	cSKEW_P.prototype.Calculate = function (arg) {
+
+		var arr0 = [];
+
+		for (var j = 0; j < this.getArguments(); j++) {
+
+			if (arg[j] instanceof cArea || arg[j] instanceof cArea3D) {
+				arg[j].foreach2(function (elem) {
+					if (elem instanceof cNumber) {
+						arr0.push(elem);
+					}
+				});
+			} else if (arg[j] instanceof cRef || arg[j] instanceof cRef3D) {
+				var a = arg[j].getValue();
+				if (a instanceof cNumber) {
+					arr0.push(a);
+				}
+			} else if (arg[j] instanceof cArray) {
+				arg[j].foreach(function (elem) {
+					if (elem instanceof cNumber) {
+						arr0.push(elem);
+					}
+				});
+			} else if (arg[j] instanceof cNumber || arg[j] instanceof cBool) {
+				arr0.push(arg[j].tocNumber());
+			} else if (arg[j] instanceof cString) {
+				continue;
+			} else {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+		}
+		return this.value = skew(arr0, true);
 	};
 
 	/**
