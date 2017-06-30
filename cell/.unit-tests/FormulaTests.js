@@ -4355,6 +4355,23 @@ $( function () {
 
     } );
 
+	test( "Test: \"SKEW.P\"", function () {
+		ws.getRange2( "A202" ).setValue( "3" );
+		ws.getRange2( "A203" ).setValue( "4" );
+		ws.getRange2( "A204" ).setValue( "5" );
+		ws.getRange2( "A205" ).setValue( "2" );
+		ws.getRange2( "A206" ).setValue( "3" );
+		ws.getRange2( "A207" ).setValue( "4" );
+		ws.getRange2( "A208" ).setValue( "5" );
+		ws.getRange2( "A209" ).setValue( "6" );
+		ws.getRange2( "A210" ).setValue( "4" );
+		ws.getRange2( "A211" ).setValue( "7" );
+
+		oParser = new parserFormula( "SKEW.P(A202:A211)", "A1", ws );
+		ok( oParser.parse(), "SKEW.P(A202:A211)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.303193, "SKEW.P(A202:A211)" );
+	} );
+
     test( "Test: \"SMALL\"", function () {
 
         oParser = new parserFormula( "SMALL({3,5,3,5,4;4,2,4,6,7},3)", "A1", ws );
