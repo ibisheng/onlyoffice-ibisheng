@@ -5694,38 +5694,8 @@
 			}else if(nSize == 1){
 				return new cNumber(tA[0]);
 			}
-
-			//tA.sort(fSortAscending);
-
+			
 			return fFlag === 2 ? getMedian( tA ) : getPercentile( tA, 0.25 * fFlag );
-
-			/*if (fFlag == 0.0) {
-				return new cNumber(tA[0]);
-			} else if (fFlag == 1.0) {
-				nIndex = Math.floor(0.25 * (nSize - 1));
-				fDiff = 0.25 * (nSize - 1) - Math.floor(0.25 * (nSize - 1));
-				if (fDiff == 0.0) {
-					return new cNumber(tA[nIndex]);
-				} else {
-					return new cNumber(tA[nIndex] + fDiff * (tA[nIndex + 1] - tA[nIndex]));
-				}
-			} else if (fFlag == 2.0) {
-				if (nSize % 2 == 0) {
-					return new cNumber((tA[nSize / 2 - 1] + tA[nSize / 2]) / 2.0);
-				} else {
-					return new cNumber(tA[(nSize - 1) / 2]);
-				}
-			} else if (fFlag == 3.0) {
-				nIndex = Math.floor(0.75 * (nSize - 1));
-				fDiff = 0.75 * (nSize - 1) - Math.floor(0.75 * (nSize - 1));
-				if (fDiff == 0.0) {
-					return new cNumber(tA[nIndex]);
-				} else {
-					return new cNumber(tA[nIndex] + fDiff * (tA[nIndex + 1] - tA[nIndex]));
-				}
-			} else {
-				return new cNumber(tA[nSize - 1]);
-			}*/
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, quartile);
