@@ -4107,6 +4107,19 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), "#NUM!" );
     } );
 
+	test( "Test: \"POISSON.DIST\"", function () {
+		ws.getRange2( "A202" ).setValue( "2" );
+		ws.getRange2( "A203" ).setValue( "5" );
+
+		oParser = new parserFormula( "POISSON.DIST(A202,A203,TRUE)", "A1", ws );
+		ok( oParser.parse(), "POISSON.DIST(A202,A203,TRUE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.124652, "POISSON.DIST(A202,A203,TRUE)" );
+
+		oParser = new parserFormula( "POISSON.DIST(A202,A203,FALSE)", "A1", ws );
+		ok( oParser.parse(), "POISSON.DIST(A202,A203,FALSE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.084224, "POISSON.DIST(A202,A203,FALSE)" );
+	} );
+
     test( "Test: \"PROB\"", function () {
 
         oParser = new parserFormula( "PROB({0,1,2,3},{0.2,0.3,0.1,0.4},2)", "A2", ws );
