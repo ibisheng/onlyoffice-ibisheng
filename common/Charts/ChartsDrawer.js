@@ -8968,7 +8968,7 @@ drawPieChart.prototype =
 		var fBisectAngle = AscFormat.normalizeRotate((fStartAngle + fEndAngle)/2.0);
 		
 		if(AscFormat.fApproxEqual(fBisectAngle, 0) || AscFormat.fApproxEqual(fBisectAngle, Math.PI/2) || AscFormat.fApproxEqual(fBisectAngle, Math.PI) || AscFormat.fApproxEqual(fBisectAngle, 3*Math.PI/2)){
-			return this._calculateInEndDLblPosition(fStartAngle, fStartAngle + fEndAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY);
+			return this._calculateInEndDLblPosition(fStartAngle, fEndAngle - fStartAngle, fPieRadius, fLabelWidth, fLabelHeight, fCenterX, fCenterY);
 		}
 		var fBisectAngle2 = AscFormat.normalizeRotate(fBisectAngle + Math.PI/4) - Math.PI/4; 
 		var nIndexArea = ((fBisectAngle2 + Math.PI/4)/(Math.PI/2)) >> 0;
