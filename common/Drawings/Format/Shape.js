@@ -1212,13 +1212,13 @@ CShape.prototype.getHierarchy = function()
                     case AscFormat.TYPE_KIND.SLIDE:
                     {
                         hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, true));
                         break;
                     }
 
                     case AscFormat.TYPE_KIND.LAYOUT:
                     {
-                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, true));
                         break;
                     }
                 }
