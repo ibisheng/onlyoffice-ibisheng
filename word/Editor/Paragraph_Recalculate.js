@@ -2990,7 +2990,7 @@ CParagraphRecalculateStateWrap.prototype =
             }
 
             // Найдем настройки для первого текстового элемента
-            var FirstTextPr = Para.Get_FirstTextPr();
+            var FirstTextPr = Para.Get_FirstTextPr2();
 
             NumberingItem.Bullet = Bullet;
             NumberingItem.BulletNum = BulletNum + 1;

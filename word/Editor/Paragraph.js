@@ -325,6 +325,29 @@ Paragraph.prototype.Get_FirstTextPr = function()
 
 	return this.Content[0].Get_CompiledPr();
 };
+Paragraph.prototype.Get_FirstTextPr2 = function()
+{
+	var HyperlinkPr;
+	for(var i = 0; i < this.Content.length; ++i)
+	{
+		if(!this.Content[i].Is_Empty())
+		{
+			if(para_Run === this.Content[i].Type)
+			{
+				return this.Content[i].Get_CompiledPr();
+			}
+			else if(para_Hyperlink === this.Content[i].Type)
+			{
+                HyperlinkPr =  this.Content[i].Get_FirstTextPr2();
+                if(HyperlinkPr)
+				{
+					return HyperlinkPr;
+				}
+			}
+		}
+	}
+    return this.Get_CompiledPr2(false).TextPr;
+};
 Paragraph.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
 	if (undefined === DrawingObjs)
@@ -1992,9 +2015,9 @@ Paragraph.prototype.Internal_Draw_4 = function(CurPage, pGraphics, Pr, BgColor, 
 					if (true != this.IsEmpty())
 					{
 						if (Pr.ParaPr.Ind.FirstLine < 0)
-							NumberingItem.Draw(X, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
+							NumberingItem.Draw(X, Y, pGraphics, this.Get_FirstTextPr2(), PDSE);
 						else
-							NumberingItem.Draw(this.Pages[CurPage].X  + Pr.ParaPr.Ind.Left, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
+							NumberingItem.Draw(this.Pages[CurPage].X  + Pr.ParaPr.Ind.Left, Y, pGraphics, this.Get_FirstTextPr2(), PDSE);
 					}
 				}
 
