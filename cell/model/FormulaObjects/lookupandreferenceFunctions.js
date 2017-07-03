@@ -869,14 +869,9 @@
 				bbox.r2 <= gc_nMaxRow0 && 0 <= bbox.c2 && bbox.c2 <= gc_nMaxCol0;
 		}
 
-		var arg0 = arg[0], arg1 = arg[1].tocNumber(), arg2 = arg[2].tocNumber(), arg3 = new cNumber(-1), arg4 = new cNumber(-1);
-
-		if (this.argumentsCurrent >= 4) {
-			arg3 = arg[3].tocNumber();
-		}
-		if (5 === this.argumentsCurrent) {
-			arg4 = arg[4].tocNumber();
-		}
+		var arg0 = arg[0], arg1 = arg[1].tocNumber(), arg2 = arg[2].tocNumber();
+		var arg3 = 3 < this.argumentsCurrent ? arg[3].tocNumber() : new cNumber(-1);
+		var arg4 = 5 === this.argumentsCurrent ? arg[4].tocNumber() : new cNumber(-1);
 
 		if (cElementType.error === arg1.type || cElementType.error === arg2.type || cElementType.error === arg3.type ||
 			arg4.type) {
