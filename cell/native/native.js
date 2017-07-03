@@ -1102,6 +1102,175 @@ function asc_menu_WriteAscValAxisSettings(_type, _settings, _stream){
 
     _stream["WriteByte"](255);
 }
+function asc_menu_ReadAscCatAxisSettings(_params, _cursor){
+    var _settings = new AscCommon.asc_CatAxisSettings();
+    
+    var _continue = true;
+    while (_continue)
+    {
+        var _attr = _params[_cursor.pos++];
+        switch (_attr)
+        {
+            case 0:
+            {
+                _settings.putInternalBetweenTick(_params[_cursor.pos++]);
+                break;
+            }
+            case 1:
+            {
+                _settings.putIntervalBetweenLabelsRule(_params[_cursor.pos++]);
+                break;
+            }
+            case 2:
+            {
+                _settings.putInternalBetweenLabels(_params[_cursor.pos++]);
+                break;
+            }
+            case 3:
+            {
+                _settings.putInvertCatOrder(_params[_cursor.pos++]);
+                break;
+            }
+            case 4:
+            {
+                _settings.putLabelsAxisDistance(_params[_cursor.pos++]);
+                break;
+            }
+            case 5:
+            {
+                _settings.putLabelsPosition(_params[_cursor.pos++]);
+                break;
+            }
+            case 6:
+            {
+                _settings.putMajorTickMark(_params[_cursor.pos++]);
+                break;
+            }
+            case 7:
+            {
+                _settings.putMinorTickMark(_params[_cursor.pos++]);
+                break;
+            }
+            case 8:
+            {
+                _settings.putTickLabelsPos(_params[_cursor.pos++]);
+                break;
+            }
+            case 9:
+            {
+                _settings.putCrossesRule(_params[_cursor.pos++]);
+                break;
+            }
+            case 10:
+            {
+                _settings.putCrosses(_params[_cursor.pos++]);
+                break;
+            }
+            case 11:
+            {
+                _settings.putAxisType(_params[_cursor.pos++]);
+                break;
+            }
+            case 12:
+            {
+                _settings.putCrossMinVal(_params[_cursor.pos++]);
+                break;
+            }
+            case 13:
+            {
+                _settings.putCrossMaxVal(_params[_cursor.pos++]);
+                break;
+            }
+            case 255:
+            default:
+            {
+                _continue = false;
+                break;
+            }
+        }
+    }
+    
+    return _settings;
+}
+function asc_menu_WriteAscCatAxisSettings(_type, _settings, _stream){
+    if (!_settings)
+        return;
+    
+    _stream["WriteByte"](_type);
+    
+    if (_settings.getInternalBetweenTick() !== undefined && _settings.getInternalBetweenTick() !== null)
+    {
+        _stream["WriteByte"](0);
+        _stream["WriteDouble2"](_settings.getInternalBetweenTick());
+    }
+    if (_settings.getIntervalBetweenLabelsRule() !== undefined && _settings.getIntervalBetweenLabelsRule() !== null)
+    {
+        _stream["WriteByte"](1);
+        _stream["WriteLong"](_settings.getIntervalBetweenLabelsRule());
+    }
+    if (_settings.getInternalBetweenLabels() !== undefined && _settings.getInternalBetweenLabels() !== null)
+    {
+        _stream["WriteByte"](2);
+        _stream["WriteDouble2"](_settings.getInternalBetweenLabels());
+    }
+    if (_settings.getInvertCatOrder() !== undefined && _settings.getInvertCatOrder() !== null)
+    {
+        _stream["WriteByte"](3);
+        _stream["WriteBool"](_settings.getInvertCatOrder());
+    }
+    if (_settings.getLabelsAxisDistance() !== undefined && _settings.getLabelsAxisDistance() !== null)
+    {
+        _stream["WriteByte"](4);
+        _stream["WriteDouble2"](_settings.getLabelsAxisDistance());
+    }
+    if (_settings.getTickLabelsPos() !== undefined && _settings.getTickLabelsPos() !== null)
+    {
+        _stream["WriteByte"](5);
+        _stream["WriteLong"](_settings.getTickLabelsPos());
+    }
+    if (_settings.getMajorTickMark() !== undefined && _settings.getMajorTickMark() !== null)
+    {
+        _stream["WriteByte"](6);
+        _stream["WriteLong"](_settings.getMajorTickMark());
+    }
+    if (_settings.getMinorTickMark() !== undefined && _settings.getMinorTickMark() !== null)
+    {
+        _stream["WriteByte"](7);
+        _stream["WriteLong"](_settings.getMinorTickMark());
+    }
+    if (_settings.getTickLabelsPos() !== undefined && _settings.getTickLabelsPos() !== null)
+    {
+        _stream["WriteByte"](8);
+        _stream["WriteLong"](_settings.getTickLabelsPos());
+    }
+    if (_settings.getCrossesRule() !== undefined && _settings.getCrossesRule() !== null)
+    {
+        _stream["WriteByte"](9);
+        _stream["WriteLong"](_settings.getCrossesRule());
+    }
+    if (_settings.getCrosses() !== undefined && _settings.getCrosses() !== null)
+    {
+        _stream["WriteByte"](10);
+        _stream["WriteLong"](_settings.getCrosses());
+    }
+    if (_settings.getAxisType() !== undefined && _settings.getAxisType() !== null)
+    {
+        _stream["WriteByte"](11);
+        _stream["WriteLong"](_settings.getAxisType());
+    }
+    if (_settings.getCrossMinVal() !== undefined && _settings.getCrossMinVal() !== null)
+    {
+        _stream["WriteByte"](12);
+        _stream["WriteLong"](_settings.getCrossMinVal());
+    }
+    if (_settings.getCrossMaxVal() !== undefined && _settings.getCrossMaxVal() !== null)
+    {
+        _stream["WriteByte"](13);
+        _stream["WriteLong"](_settings.getCrossMaxVal());
+    }
+    
+    _stream["WriteByte"](255);
+}
 function asc_menu_ReadChartPr(_params, _cursor){
     var _settings = new AscCommon.asc_ChartSettings();
 
@@ -1226,6 +1395,17 @@ function asc_menu_ReadChartPr(_params, _cursor){
                 _settings.smooth = _params[_cursor.pos++];
                 break;
             }
+            case 23:
+            {
+                _settings.horAxisProps = asc_menu_ReadAscCatAxisSettings(_params, _cursor);
+                break;
+            }
+            case 24:
+            {
+                _settings.vertAxisProps = asc_menu_ReadAscCatAxisSettings(_params, _cursor);
+                break;
+            }
+                
             case 255:
             default:
             {
@@ -1325,9 +1505,14 @@ function asc_menu_WriteChartPr(_type, _chartPr, _stream){
         _stream["WriteByte"](15);
         _stream["WriteString2"](_chartPr.separator);
     }
-
-    asc_menu_WriteAscValAxisSettings(16, _chartPr.horAxisProps, _stream);
-    asc_menu_WriteAscValAxisSettings(17, _chartPr.vertAxisProps, _stream);
+    
+    if (_chartPr.horAxisProps.getAxisType() == Asc.c_oAscAxisType.val) {
+        asc_menu_WriteAscValAxisSettings(16, _chartPr.horAxisProps, _stream);
+    }
+    
+    if (typeof _chartPr.vertAxisProps == Asc.c_oAscAxisType.val) {
+        asc_menu_WriteAscValAxisSettings(17, _chartPr.vertAxisProps, _stream);
+    }
 
     if (_chartPr.range !== undefined && _chartPr.range !== null)
     {
@@ -1354,6 +1539,14 @@ function asc_menu_WriteChartPr(_type, _chartPr, _stream){
     {
         _stream["WriteByte"](22);
         _stream["WriteBool"](_chartPr.showVal);
+    }
+    
+    if (_chartPr.horAxisProps.getAxisType() == Asc.c_oAscAxisType.cat) {
+        asc_menu_WriteAscCatAxisSettings(23, _chartPr.horAxisProps, _stream);
+    }
+    
+    if (typeof _chartPr.vertAxisProps == Asc.c_oAscAxisType.cat) {
+        asc_menu_WriteAscCatAxisSettings(24, _chartPr.vertAxisProps, _stream);
     }
 
     _stream["WriteByte"](255);
