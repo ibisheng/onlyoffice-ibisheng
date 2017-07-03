@@ -69,10 +69,10 @@
 		cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV,
 		cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST,
 		cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
-		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ,
-		cRSQ, cSKEW, cSKEW_P,cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
-		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVAR_P, cVARPA,
-		cWEIBULL, cZTEST);
+		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK,
+		cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA,
+		cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR,
+		cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
@@ -7289,6 +7289,83 @@
 	cVAR_P.prototype.constructor = cVAR_P;
 	cVAR_P.prototype.isXLFN = true;
 
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cVAR_S() {
+		this.name = "VAR.S";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cVAR_S.prototype = Object.create(cBaseFunction.prototype);
+	cVAR_S.prototype.constructor = cVAR_S;
+	cVAR_S.prototype.argumentsMin = 1;
+	cVAR_S.prototype.isXLFN = true;
+	cVAR_S.prototype.Calculate = function (arg) {
+		function _var(x) {
+			if (x.length <= 1) {
+				return new cError(cErrorType.division_by_zero);
+			}
+
+			var tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0, i;
+			for (i = 0; i < x.length; i++) {
+
+				if (cElementType.number === x[i].type) {
+					_x += x[i].getValue();
+					tA.push(x[i].getValue());
+					xLength++;
+				} else if (cElementType.error === x[i].type) {
+					return x[i];
+				}
+
+			}
+
+			_x /= xLength;
+
+			for (i = 0; i < x.length; i++) {
+				sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x);
+			}
+
+			return new cNumber(sumSQRDeltaX / (xLength - 1));
+		}
+
+		var element, arr0 = [];
+
+		for (var j = 0; j < arg.length; j++) {
+			element = arg[j];
+			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				_arrVal.forEach(function (elem) {
+					if (cElementType.number === elem.type || cElementType.error === elem.type) {
+						arr0.push(elem);
+					}
+				});
+			} else if (cElementType.cell === element.type || cElementType.cell3D === element.type) {
+				if (!this.checkExclude || !element.isHidden(this.excludeHiddenRows)) {
+					var a = element.getValue();
+					if (cElementType.number === a.type || cElementType.error === a.type) {
+						arr0.push(a);
+					}
+				}
+			} else if (cElementType.array === element.type) {
+				element.foreach(function (elem) {
+					if (cElementType.number === elem.type || cElementType.error === elem.type) {
+						arr0.push(elem);
+					}
+				});
+			} else if (cElementType.number === element.type || cElementType.bool === element.type) {
+				arr0.push(element.tocNumber());
+			} else if (cElementType.string === element.type || cElementType.empty === element.type) {
+				arr0.push(new cNumber(0));
+			} else {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+		}
+		return this.value = _var(arr0);
+	};
 
 	/**
 	 * @constructor

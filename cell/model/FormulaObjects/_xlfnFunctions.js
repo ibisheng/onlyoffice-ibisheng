@@ -60,7 +60,7 @@
 		cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
 		cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL, cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST,
 		cNORM_S_INV, cPERMUTATIONA, cPHI, cSTDEV_P, cSTDEV_S,
-		cT_TEST, cVAR_S, cWEIBULL_DIST, cZ_TEST);
+		cT_TEST, cWEIBULL_DIST, cZ_TEST);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
@@ -76,7 +76,7 @@
 		cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY,
 		cFORECAST_ETS_STAT, cHYPGEOM_DIST, cMODE_MULT, cMODE_SNGL, cNEGBINOM_DIST, cNORM_DIST,
 		cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERMUTATIONA, cPHI,
-		cSTDEV_P, cSTDEV_S, cT_TEST, cVAR_S, cWEIBULL_DIST, cZ_TEST, cPDURATION, cRRI, cAGGREGATE, cMUNIT,
+		cSTDEV_P, cSTDEV_S, cT_TEST, cWEIBULL_DIST, cZ_TEST, cPDURATION, cRRI, cAGGREGATE, cMUNIT,
 		cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
 
 	/**
@@ -618,18 +618,6 @@
 
 	cUNICODE.prototype = Object.create(cBaseFunction.prototype);
 	cUNICODE.prototype.constructor = cUNICODE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cVAR_S() {
-		cBaseFunction.call(this, "VAR.S");
-		this.isXLFN = true;
-	}
-
-	cVAR_S.prototype = Object.create(cBaseFunction.prototype);
-	cVAR_S.prototype.constructor = cVAR_S;
 
 	/**
 	 * @constructor
