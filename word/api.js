@@ -2083,8 +2083,14 @@ background-repeat: no-repeat;\
 			}
 			else
 			{
-				_Y = elem.Y + elem.AnchorPosition.H;
-				_X = elem.X + elem.AnchorPosition.W;
+				var w = 0, h = 0;
+				if(elem.AnchorPosition)
+				{
+					h = elem.AnchorPosition.H;
+					w = elem.AnchorPosition.W;
+				}
+				_Y = elem.Y + h;
+				_X = elem.X + w;
 			}
 
 			var _PageNum = this.WordControl.m_oLogicDocument.CurPage;
