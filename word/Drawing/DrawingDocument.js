@@ -5486,7 +5486,7 @@ function CDrawingDocument()
 
 		// вообще надо посмотреть... может и был параграф до этого.
 		// тогда вэкграунд перерисовывать не нужно. Только надо знать, на той же странице это было или нет
-		if (-1 != this.m_lCurrentPage)
+		if (-1 != this.m_lCurrentPage && this.m_arrPages[this.m_lCurrentPage])
 		{
 			if (margins)
 			{
