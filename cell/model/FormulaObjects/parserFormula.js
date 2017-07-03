@@ -1509,6 +1509,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cRef3D.prototype.getWS = function () {
 		return this.ws;
 	};
+	cRef3D.prototype.getMatrix = function () {
+		return [[this.getValue()]];
+	};
 	cRef3D.prototype.getBBox0 = function () {
 		var range = this.getRange();
 		if (range) {
