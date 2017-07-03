@@ -1077,6 +1077,10 @@ CBlockLevelSdt.prototype.GetContentControlPr = function()
 
 	return oPr;
 };
+CBlockLevelSdt.prototype.Restart_CheckSpelling = function()
+{
+	this.Content.Restart_CheckSpelling();
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CBlockLevelSdt = CBlockLevelSdt;

@@ -12159,7 +12159,7 @@ Paragraph.prototype.GetSelectedContentControls = function()
 	}
 	else
 	{
-		if (this.Content[this.CurPos.ContentPos].GetSelectedContentControls)
+		if (this.Content[this.CurPos.ContentPos] && this.Content[this.CurPos.ContentPos].GetSelectedContentControls)
 			this.Content[this.CurPos.ContentPos].GetSelectedContentControls(arrContentControls);
 	}
 
