@@ -3154,8 +3154,7 @@ function CDrawingDocument()
 			}
 		}
 
-		var _len_tasks = this.CollaborativeTargetsUpdateTasks.length;
-		for (i = 0; i < _len_tasks; i++)
+		for (i = 0; i < this.CollaborativeTargetsUpdateTasks.length; i++)
 		{
 			var _tmp = this.CollaborativeTargetsUpdateTasks[i];
 			if (_tmp[0] == _id)

@@ -11228,15 +11228,6 @@ CTable.prototype.GetTopElement = function()
 
     return this.Parent.GetTopElement();
 };
-CTable.prototype.Get_Index = function()
-{
-    if (!this.Parent)
-        return -1;
-
-    this.Parent.Update_ContentIndexing();
-
-    return this.Index;
-};
 CTable.prototype.Get_RowsCount = function()
 {
     return this.Content.length;
@@ -11467,19 +11458,6 @@ CTable.prototype.Get_Index = function()
 
     this.Parent.Update_ContentIndexing();
     return this.Index;
-};
-CTable.prototype.GetDocumentPositionFromObject = function(PosArray)
-{
-    if (!PosArray)
-        PosArray = [];
-
-    if (this.Parent)
-    {
-        PosArray.splice(0, 0, {Class : this.Parent, Position : this.Get_Index()});
-        this.Parent.GetDocumentPositionFromObject(PosArray);
-    }
-
-    return PosArray;
 };
 CTable.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
