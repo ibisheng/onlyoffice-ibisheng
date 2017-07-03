@@ -9977,7 +9977,7 @@
 			range.setWrap(rangeStyle.wrap);
 		}
 		//fill
-		if(specialPasteProps.fill && rangeStyle.fill)
+		if(specialPasteProps.fill && undefined !== rangeStyle.fill)
 		{
 			range.setFill(rangeStyle.fill);
 		}
