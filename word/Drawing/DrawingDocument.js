@@ -6686,6 +6686,9 @@ function CDrawingDocument()
 				var _rect = _object.getXY();
 
 				var _page = this.m_arrPages[_object.getPage()];
+				if (!_page)
+					return false;
+
 				var drPage = _page.drawingPage;
 
 				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
