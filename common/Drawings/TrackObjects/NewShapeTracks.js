@@ -142,7 +142,8 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             this.bConnector = AscFormat.isConnectorPreset(presetGeom);
             if(this.bConnector){
 
-                var aSpTree = this.drawingsController.getAllShapes(this.drawingsController.getDrawingArray());
+                var aSpTree = [];
+                this.drawingsController.getAllSingularDrawings(this.drawingsController.getDrawingArray(), aSpTree);
                 var oConnector = null;
                 for(var i = aSpTree.length - 1; i > -1; --i){
                     oConnector = aSpTree[i].findConnector(startX, startY);
