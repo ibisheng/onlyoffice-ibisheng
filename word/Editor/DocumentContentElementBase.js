@@ -668,6 +668,28 @@ CDocumentContentElementBase.prototype.AcceptRevisionChanges = function(Type, bAl
 CDocumentContentElementBase.prototype.RejectRevisionChanges = function(Type, bAll)
 {
 };
+CDocumentContentElementBase.prototype.GetDocumentPositionFromObject = function(PosArray)
+{
+	if (!PosArray)
+		PosArray = [];
+
+	if (this.Parent)
+	{
+		PosArray.splice(0, 0, {Class : this.Parent, Position : this.Get_Index()});
+		this.Parent.GetDocumentPositionFromObject(PosArray);
+	}
+
+	return PosArray;
+};
+CDocumentContentElementBase.prototype.Get_Index = function()
+{
+	if (!this.Parent)
+		return -1;
+
+	this.Parent.Update_ContentIndexing();
+
+	return this.Index;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с номерами страниц
 //----------------------------------------------------------------------------------------------------------------------
