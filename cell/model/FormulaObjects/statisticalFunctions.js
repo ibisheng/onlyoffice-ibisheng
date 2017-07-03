@@ -71,7 +71,7 @@
 		cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
 		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ,
 		cRSQ, cSKEW, cSKEW_P,cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
-		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVARPA,
+		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVAR_P, cVARPA,
 		cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
@@ -7275,6 +7275,20 @@
 		}
 		return this.value = _var(arr0);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cVARP}
+	 */
+	function cVAR_P() {
+		cVARP.call(this);
+		this.name = "VAR.P";
+	}
+
+	cVAR_P.prototype = Object.create(cVARP.prototype);
+	cVAR_P.prototype.constructor = cVAR_P;
+	cVAR_P.prototype.isXLFN = true;
+
 
 	/**
 	 * @constructor
