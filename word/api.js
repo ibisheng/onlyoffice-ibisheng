@@ -2014,7 +2014,66 @@ background-repeat: no-repeat;\
 		}
 	};
 	
-	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props) 
+	asc_docs_api.prototype.asc_specialPasteShowButton = function()
+	{
+		var gClipboardBase = window['AscCommon'].g_clipboardBase;
+		//при быстром совместном редактировании отключаем возможность специальной вставки
+		if(!gClipboardBase || gClipboardBase.CheckFastCoEditing())
+		{
+			return;
+		}
+
+		var specialPasteShowOptions = gClipboardBase.specialPasteButtonProps ? gClipboardBase.specialPasteButtonProps.props : null;
+		if(specialPasteShowOptions && null !== this.showButtonIdParagraph)
+		{
+			var isUpdate = specialPasteShowOptions.cellCoord;
+			var id = gClipboardBase.showButtonIdParagraph;
+			var elem = g_oTableId.Get_ById(id);
+
+			var _X, _Y;
+			if(elem.GetTargetPos)
+			{
+				var testPos = elem.GetTargetPos();
+				var diffX = 0;
+				var diffY = 0;
+				if(testPos.Transform)
+				{
+					diffX = testPos.Transform.tx;
+					diffY = testPos.Transform.ty;
+				}
+
+				_Y = testPos.Y + testPos.Height + diffY;
+				_X = testPos.X + diffX;
+			}
+			else
+			{
+				_Y = elem.Y + elem.AnchorPosition.H;
+				_X = elem.X + elem.AnchorPosition.W;
+			}
+
+			var _PageNum = this.WordControl.m_oLogicDocument.CurPage;
+
+			gClipboardBase.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum: _PageNum};
+
+			var _coord = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
+			var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
+			specialPasteShowOptions.asc_setCellCoord(curCoord);
+
+			if(isUpdate)
+			{
+				specialPasteShowOptions.options = [];
+				this.asc_UpdateSpecialPasteButton(specialPasteShowOptions);
+			}
+			else
+			{
+				this.asc_ShowSpecialPasteButton(specialPasteShowOptions);
+			}
+		}
+
+		gClipboardBase.showButtonIdParagraph = null;
+	};
+
+	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props)
 	{
 		this.sendEvent("asc_onShowSpecialPasteOptions", props);
 	};
@@ -6552,7 +6611,7 @@ background-repeat: no-repeat;\
 		if (isViewMode)
 		{
 			this.asc_SpellCheckDisconnect();
-			
+
 			this.ShowParaMarks                           = false;
 			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			//this.isShowTableEmptyLine = false;
