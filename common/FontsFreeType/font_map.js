@@ -316,7 +316,8 @@ function FD_FontDictionary()
         ["OpenSymbol"],
         ["Arial", "Liberation Sans", "Helvetica", "Nimbus Sans L"],
         ["Times New Roman", "Liberation Serif"],
-        ["Courier New", "Liberation Mono"]
+        ["Courier New", "Liberation Mono"],
+        ["Segoe", "Segoe UI"]
     ];
     this.FD_Ascii_Font_Like_Main = {
         "Cambria Math"  : 0,
@@ -336,7 +337,10 @@ function FD_FontDictionary()
         "Liberation Serif"  : 3,
 
         "Courier New"       : 4,
-        "Liberation Mono"   : 4
+        "Liberation Mono"   : 4,
+
+        "Segoe"             : 5,
+        "Segoe UI"          : 5
     };
 
     this.ChangeGlyphsMap = {
@@ -1165,7 +1169,11 @@ CFontSelect.prototype =
             return 0;
 
         if (-1 != sReqName.indexOf(this.m_wsFontName) || -1 != this.m_wsFontName.indexOf(sReqName))
-            return 1000;
+        {
+			if (g_fontApplication.g_fontDictionary.CheckLikeFonts(this.m_wsFontName, sReqName))
+				return 700;
+			return 1000;
+		}
 
         if (g_fontApplication.g_fontDictionary.CheckLikeFonts(this.m_wsFontName, sReqName))
             return 1000;

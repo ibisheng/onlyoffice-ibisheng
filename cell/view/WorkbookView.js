@@ -2228,7 +2228,7 @@
   // Поиск текста в листе
   WorkbookView.prototype.findCellText = function(options) {
     // Для поиска эта переменная не нужна (но она может остаться от replace)
-    options.activeCell = null;
+    options.selectionRange = null;
 
     var ws = this.getWorksheet();
     // Останавливаем ввод данных в редакторе ввода
@@ -2290,7 +2290,9 @@
     }
 
     if (result) {
-      return ws.setSelection(result);
+      var ac = ws.model.selectionRange.activeCell;
+      return options.findInSelection ? ws.changeSelectionActivePoint(result.c1 - ac.col, result.r1 - ac.row) :
+        ws.setSelection(result);
     }
     this._cleanFindResults();
     return null;

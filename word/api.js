@@ -456,6 +456,10 @@
 						_content_control_pr.Lock = AscCommonWord.sdtlock_Unlocked;
 						_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
+						var oCurPara = LogicDocument.GetCurrentParagraph();
+						if (oCurPara && !oCurPara.IsCursorAtBegin())
+							LogicDocument.AddNewParagraph(false, true);
+
 						var _blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 						_blockStd.SetContentControlPr(_content_control_pr);
 
@@ -477,6 +481,8 @@
 							_worker = null;
 
 							_blockStd = null;
+
+							window.g_asc_plugins.api.asc_Recalculate();
 
 							setTimeout(function() {
 								window.g_asc_plugins.api.__content_control_worker.run();
@@ -528,14 +534,44 @@
 
 						return;
 					}
-					else
+					else if (_current["Props"])
 					{
 						// change properties
-						var _blockStd = LogicDocument.GetContentControl(_content_control_pr.InternalId);
+						var _blockStd = LogicDocument.GetContentControl(_current["Props"]["InternalId"]);
+
+						_content_control_pr = new AscCommonWord.CContentControlPr();
+						_content_control_pr.Id = _current["Props"]["Id"];
+						_content_control_pr.Tag = _current["Props"]["Tag"];
+						_content_control_pr.Lock = _current["Props"]["Lock"];
+						_content_control_pr.InternalId = _current["Props"]["InternalId"];
+
 						_blockStd.SetContentControlPr(_content_control_pr);
 
 						_obj = _blockStd.GetContentControlPr();
 						this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
+					}
+				}
+				else
+				{
+					if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ContentControl_Properties))
+					{
+						var _current = this.documents[this.current];
+						if (_current["Props"] && _current["Url"] === undefined && _current["Script"] === undefined)
+						{
+							// change properties
+							var _blockStd = LogicDocument.GetContentControl(_current["Props"]["InternalId"]);
+
+							_content_control_pr = new AscCommonWord.CContentControlPr();
+							_content_control_pr.Id = _current["Props"]["Id"];
+							_content_control_pr.Tag = _current["Props"]["Tag"];
+							_content_control_pr.Lock = _current["Props"]["Lock"];
+							_content_control_pr.InternalId = _current["Props"]["InternalId"];
+
+							_blockStd.SetContentControlPr(_content_control_pr);
+
+							_obj = _blockStd.GetContentControlPr();
+							this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
+						}
 					}
 				}
 
@@ -8087,6 +8123,19 @@ background-repeat: no-repeat;\
 		}
 		return _ret;
 	};
+	window["asc_docs_api"].prototype["pluginMethod_AddContentControl"] = function(type)
+	{
+		return this.asc_AddContentControl(type);
+	};
+	window["asc_docs_api"].prototype["pluginMethod_RemoveContentControl"] = function(id)
+	{
+		return this.asc_RemoveContentControlWrapper(id);
+	};
+	window["asc_docs_api"].prototype["pluginMethod_GetCurrentContentControl"] = function()
+	{
+		return this.asc_GetCurrentContentControl();
+	};
+
 	/********************************************************************/
 
 	asc_docs_api.prototype.asc_OnHideContextMenu = function()

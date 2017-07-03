@@ -1199,8 +1199,14 @@
 	{
 		this.sendEvent("asc_onFocusObject", this.SelectedObjectsStack);
 	};
-	asc_docs_api.prototype.getSelectedElements             = function()
+	asc_docs_api.prototype.getSelectedElements             = function(bUpdate)
 	{
+        if (true === bUpdate){
+        	if(this.WordControl && this.WordControl.m_oLogicDocument){
+                this.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+			}
+		}
+
 		return this.SelectedObjectsStack;
 	};
 	asc_docs_api.prototype.sync_ChangeLastSelectedElement  = function(type, obj)
@@ -5350,7 +5356,6 @@ background-repeat: no-repeat;\
 
     asc_docs_api.prototype.spellCheck = function(rdata)
     {
-        //console.log("start - " + rdata);
         // ToDo проверка на подключение
         switch (rdata.type)
         {

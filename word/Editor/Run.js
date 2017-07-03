@@ -4616,6 +4616,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     var RGBA;
     var ReviewType  = this.Get_ReviewType();
     var ReviewColor = null;
+    var bPresentation = this.Paragraph && !this.Paragraph.bFromDocument;
     if (reviewtype_Add === ReviewType || reviewtype_Remove === ReviewType)
     {
         ReviewColor = this.Get_ReviewColor();
@@ -4626,7 +4627,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         CurTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
         RGBA = CurTextPr.Unifill.getRGBAColor();
 
-        if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
+        if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill || bPresentation) )
         {
             AscFormat.G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
             RGBA = AscFormat.G_O_VISITED_HLINK_COLOR.getRGBAColor();
@@ -4634,7 +4635,16 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         }
         else
         {
-            pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A);
+            if(bPresentation && PDSE.Hyperlink)
+            {
+                AscFormat.G_O_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
+                RGBA = AscFormat.G_O_HLINK_COLOR.getRGBAColor();
+                pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+            }
+            else
+            {
+                pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A);
+            }
         }
     }
     else

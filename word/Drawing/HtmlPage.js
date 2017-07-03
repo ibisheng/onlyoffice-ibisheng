@@ -1521,7 +1521,7 @@ function CEditorPage(api)
 		oThis.m_oApi.checkLastWork();
 
 		//console.log("down: " + isTouch + ", " + AscCommon.isTouch);
-		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 
 		if (!oThis.m_bIsIE)
@@ -1589,7 +1589,12 @@ function CEditorPage(api)
 				// теперь проверить трек таблиц
 				var ret = oWordControl.m_oDrawingDocument.checkMouseDown_Drawing(pos);
 				if (ret === true)
+				{
+					if (-1 == oWordControl.m_oTimerScrollSelect)
+						oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
+
 					return;
+				}
 
 				if (-1 == oWordControl.m_oTimerScrollSelect)
 				{
@@ -1625,7 +1630,7 @@ function CEditorPage(api)
 	{
 		oThis.m_oApi.checkLastWork();
 
-		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 
 		if (e.preventDefault)
@@ -1720,7 +1725,7 @@ function CEditorPage(api)
 		oThis.m_oApi.checkLastWork();
 
 		//console.log("up: " + isTouch + ", " + AscCommon.isTouch);
-		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 		//if (true == global_mouseEvent.IsLocked)
 		//    return;
@@ -3848,6 +3853,11 @@ function CEditorPage(api)
 	{
 		var dKoef = g_dKoef_mm_to_pix * this.m_nZoomValue / 100;
 		return 5 + dKoef * x;
+	};
+
+	this.GetMainContentBounds = function()
+	{
+		return this.m_oMainContent.AbsolutePosition;
 	};
 }
 

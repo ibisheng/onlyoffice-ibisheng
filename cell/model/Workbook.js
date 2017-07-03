@@ -4582,19 +4582,19 @@ Woorksheet.prototype.isApplyFilterBySheet = function(){
 		return null;
 	};
 	Woorksheet.prototype.removeSparklines = function (range) {
-		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+		for (var i = this.aSparklineGroups.length - 1; i > -1 ; --i) {
 			if (this.aSparklineGroups[i].remove(range)) {
-				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
-				this.aSparklineGroups.splice(i--, 1);
+				History.Add(new AscDFH.CChangesDrawingsSparklinesRemove(this.aSparklineGroups[i]));
+                this.aSparklineGroups.splice(i, 1);
 			}
 		}
 	};
 	Woorksheet.prototype.removeSparklineGroups = function (range) {
-		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+		for (var i = this.aSparklineGroups.length - 1; i > -1 ; --i) {
 			if (-1 !== this.aSparklineGroups[i].intersectionSimple(range)) {
-				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
-				this.aSparklineGroups.splice(i--, 1);
-			}
+                History.Add(new AscDFH.CChangesDrawingsSparklinesRemove(this.aSparklineGroups[i]));
+                this.aSparklineGroups.splice(i, 1);
+            }
 		}
 	};
 	Woorksheet.prototype.insertSparklineGroup = function (sparklineGroup) {

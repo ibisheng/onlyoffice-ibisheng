@@ -4927,6 +4927,8 @@ function CBinaryFileWriter()
                     var elem = spTree[i];
                     switch(elem.getObjectType())
                     {
+
+                        case AscDFH.historyitem_type_Cnx:
                         case AscDFH.historyitem_type_Shape:
                         {
                             if(elem.bWordShape)
