@@ -113,6 +113,7 @@
             _endConnectionParams = this.originalObject.convertToConnectionParams(_rot, _flipH, _flipV, _transform, _bounds, g_conn_info);
         }
         if(_startConnectionParams || _endConnectionParams){
+            var bMoveInGroup = false;
 
             if(!_startConnectionParams){
                 if(this.beginShape && oConnectorInfo.stCnxIdx !== null){
@@ -122,6 +123,7 @@
                     if((this.endTrack instanceof AscFormat.MoveShapeImageTrack)){
                         var _dx,_dy;
                         if(this.originalObject.group){
+                            bMoveInGroup = true;
                             var _oCopyMatrix = this.originalObject.group.invertTransform.CreateDublicate();
                             _oCopyMatrix.tx = 0;
                             _oCopyMatrix.ty = 0;
@@ -154,11 +156,12 @@
                     if((this.beginTrack instanceof AscFormat.MoveShapeImageTrack)){
                         var _dx,_dy;
                         if(this.originalObject.group){
-                           // var _oCopyMatrix = this.originalObject.group.invertTransform.CreateDublicate();
-                           // _oCopyMatrix.tx = 0;
-                           // _oCopyMatrix.ty = 0;
-                            _dx = this.beginTrack.lastDx; //_oCopyMatrix.TransformPointX(this.beginTrack.lastDx, this.beginTrack.lastDy);
-                            _dy = this.beginTrack.lastDy; //_oCopyMatrix.TransformPointY(this.beginTrack.lastDx, this.beginTrack.lastDy);
+                            bMoveInGroup = true;
+                             var _oCopyMatrix = this.originalObject.group.invertTransform.CreateDublicate();
+                             _oCopyMatrix.tx = 0;
+                             _oCopyMatrix.ty = 0;
+                            _dx = _oCopyMatrix.TransformPointX(this.beginTrack.lastDx, this.beginTrack.lastDy);
+                            _dy = _oCopyMatrix.TransformPointY(this.beginTrack.lastDx, this.beginTrack.lastDy);
                         }
                         else{
                             _dx = this.beginTrack.lastDx;
@@ -170,7 +173,7 @@
                         this.geometry = this.oSpPr.geometry;
                         this.overlayObject.geometry = this.geometry;
 
-                        if(!this.originalObject.group){
+                        if(!this.originalObject.group || bMoveInGroup){
                             this.oSpPr.xfrm.setOffX(this.oSpPr.xfrm.offX);
                             this.oSpPr.xfrm.setOffY(this.oSpPr.xfrm.offY);
                             this.oSpPr.xfrm.setFlipH(this.oSpPr.xfrm.flipH);
