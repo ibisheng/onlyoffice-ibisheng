@@ -522,6 +522,7 @@ function CPresentation(DrawingDocument)
     this.showPr = null;
 
     this.NotesWidth = -10;
+    this.FocusOnNotes = false;
 }
 
 CPresentation.prototype =
@@ -3175,6 +3176,8 @@ CPresentation.prototype =
         this.CurPage = PageIndex;
 
 
+
+        this.FocusOnNotes = false;
         if ( PageIndex < 0 )
             return;
 
@@ -3232,44 +3235,45 @@ CPresentation.prototype =
         editor.sync_MouseMoveEndCallback();
     },
 
+    IsFocusOnNotes : function () {
+        return this.FocusOnNotes;
+    },
 
-    notes_OnMouseDown : function(e, X, Y)
+    Notes_OnMouseDown : function(e, X, Y)
     {
+        this.FocusOnNotes = true;
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             oCurSlide.resetSelection(true, false);
             if(oCurSlide.notesShape){
                 oCurSlide.notesShape.selectionSetStart(e, X, Y, this.CurPage);
+                this.Notes_UpdateSelectionState();
             }
         }
     },
 
-    notes_OnMouseUp : function(e, X, Y)
+    Notes_OnMouseUp : function(e, X, Y)
     {
-        this.notes_OnMouseMove(e, X, Y);
+        this.Notes_OnMouseMove(e, X, Y);
     },
 
-    notes_OnMouseMove : function(e, X, Y)
+    Notes_OnMouseMove : function(e, X, Y)
     {
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             if(oCurSlide.notesShape){
                 oCurSlide.notesShape.selectionSetEnd(e, x, y, this.CurPage);
+                this.Notes_UpdateSelectionState();
             }
         }
     },
 
-    notes_OnKeyDown: function(e){
-        this.OnKeyDown(e);
-    },
-
-    notes_OnKeyPress: function(e){
-        this.OnKeyPress(e);
-    },
-
-    OnUpdateSize: function(){
-        if(this.Slides[this.CurPage]){
-            this.Slides[this.CurPage].recalculateNotesShape();
+    Notes_UpdateSelectionState: function(){
+        var oCurSlide = this.Slides[this.CurPage];
+        if(oCurSlide){
+            if(oCurSlide.notesShape){
+                oCurSlide.notesShape.updateSelectionState();
+            }
         }
     },
 
