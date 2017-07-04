@@ -4766,7 +4766,7 @@
 				}
 			}
 
-			medArr.sort(AscCommon.fSortDescending);
+			medArr.sort(fSortAscending);
 
 			if (medArr.length < 1) {
 				return new cError(cErrorType.wrong_value_type);
