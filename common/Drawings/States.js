@@ -694,7 +694,7 @@ RotateState.prototype =
                             var oMapOriginalsId = {};
                             for(i = 0; i < tracks.length; ++i)
                             {
-                                tracks[i].trackEnd(false, false);
+                                tracks[i].trackEnd(false, ((oThis instanceof MoveInGroupState) || (oThis instanceof MoveState)));
                                 if(tracks[i].originalObject && !tracks[i].processor3D){
                                     oOriginalObjects.push(tracks[i].originalObject);
                                     oMapOriginalsId[tracks[i].originalObject.Get_Id()] = true;
