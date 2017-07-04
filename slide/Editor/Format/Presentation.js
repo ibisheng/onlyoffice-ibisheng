@@ -1154,6 +1154,7 @@ CPresentation.prototype =
                         }
                         else{
                             if(oCurNotesShape && oCurNotesShape === oDrawingObject){
+                                this.Slides[this.CurPage].recalculateNotesShape();
                                 bRedrawNotes = true;
                             }
                         }

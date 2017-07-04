@@ -1114,6 +1114,18 @@ Slide.prototype =
             this.graphicObjects.drawSelect(0, this.presentation.DrawingDocument);
     },
 
+    drawNotesSelect: function(){
+
+        if(this.notesShape){
+            var content = this.notesShape.getDocContent();
+            if(content)
+            {
+                this.presentation.DrawingDocument.UpdateTargetTransform(this.notesShape.transformText);
+                content.DrawSelectionOnPage(0);
+            }
+        }
+    },
+
     removeAllCommentsToInterface: function()
     {
         if(this.slideComments)
