@@ -44,7 +44,7 @@
 
     //Temporary function
     function GetNotesWidth(){
-        return editor.WordControl.m_oNotes.HtmlElement.width/g_dKoef_mm_to_pix;
+        return editor.WordControl.m_oDrawingDocument.Notes_GetWidth();
     }
 
     function CNotes(){

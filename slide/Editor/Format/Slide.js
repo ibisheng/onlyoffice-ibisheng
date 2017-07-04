@@ -206,6 +206,8 @@ function Slide(presentation, slideLayout, slideNum)
     this.lastLayoutMatchingName = null;
     this.lastLayoutName = null;
 
+    this.NotesWidth = -10.0;
+
     if(presentation)
     {
         this.Width = presentation.Width;
@@ -1021,6 +1023,18 @@ Slide.prototype =
             this.cSld.spTree[i].recalculate();
     },
 
+    getNotesHeight: function(){
+        if(!this.notesShape){
+            return 0;
+        }
+
+        var oDocContent = this.notesShape.getDocContent();
+        if(oDocContent){
+            return oDocContent.Get_SummaryHeight();
+        }
+        return 0;
+    },
+
     recalculateNotesShape: function(){
         AscFormat.ExecuteNoHistory(function(){
             if(!this.notes){
@@ -1076,8 +1090,12 @@ Slide.prototype =
             }
         }
         return;
+    },
+
+    drawNotes: function (g) {
+
         if(this.notesShape){
-            this.notesShape.draw(graphics);
+            this.notesShape.draw(g);
         }
     },
 

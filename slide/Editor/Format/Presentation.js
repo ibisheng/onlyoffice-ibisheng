@@ -520,6 +520,8 @@ function CPresentation(DrawingDocument)
     this.clrMru = [];
     this.prnPr  = null;
     this.showPr = null;
+
+    this.NotesWidth = -10;
 }
 
 CPresentation.prototype =
@@ -3948,6 +3950,9 @@ CPresentation.prototype =
             {
                 this.Slides[oldCurPage].graphicObjects.resetSelectionState();
             }
+            if(!this.Notes_OnResize()){
+                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+            }
             editor.asc_hideComments();
             this.Document_UpdateInterfaceState();
         }
@@ -3962,6 +3967,39 @@ CPresentation.prototype =
     {
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.resetSelection();
     },
+
+
+
+    ///NOTES
+    Notes_OnResize: function(){
+        if(!this.Slides[this.CurPage]){
+            return false;
+        }
+        var oCurSlide = this.Slides[this.CurPage];
+        var newNotesWidth = this.DrawingDocument.Notes_GetWidth();
+        if(AscFormat.fApproxEqual(oCurSlide.NotesWidth, newNotesWidth)){
+            return false;
+        }
+        oCurSlide.NotesWidth = newNotesWidth;
+        oCurSlide.recalculateNotesShape();
+        this.DrawingDocument.Notes_OnRecalculate(this.CurPage, newNotesWidth, oCurSlide.getNotesHeight());
+        return true;
+    },
+
+
+    Notes_GetHeight: function(){
+        if(!this.Slide[this.CurPage]){
+            return 0;
+        }
+        return this.Slides[this.CurPage].getNotesHeight();
+    },
+
+    Notes_Draw: function(SlideIndex, graphics){
+        if(this.Slides[SlideIndex]){
+            this.Slides[SlideIndex].drawNotes(graphics);
+        }
+    },
+
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------

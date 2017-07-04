@@ -585,9 +585,8 @@ function CEditorPage(api)
 		this.initEvents();
 		this.OnResize(true);
 
-		this.setNodesEnable(false);
-		//this.m_oNotesApi = new CNotesDrawer(this);
-		//this.m_oNotesApi.Init();
+		this.m_oNotesApi = new CNotesDrawer(this);
+		this.m_oNotesApi.Init();
 	};
 
 	this.CheckRetinaDisplay = function()
@@ -897,7 +896,6 @@ function CEditorPage(api)
 
 		if (_value < 5)
 			_value = 5;
-
 		return _value;
 	};
 
@@ -908,7 +906,6 @@ function CEditorPage(api)
 			return;
 
 		var _new_value = this.zoom_FitToWidth_value();
-
 		if (_new_value != this.m_nZoomValue)
 		{
 			this.m_nZoomValue = _new_value;
