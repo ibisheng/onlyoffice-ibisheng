@@ -3298,8 +3298,10 @@ CPresentation.prototype =
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             if(oCurSlide.notesShape){
-                oCurSlide.notesShape.selectionSetEnd(e, X, Y, this.CurPage);
-                this.Notes_UpdateSelectionState();
+                if(e.IsLocked){
+                    oCurSlide.notesShape.selectionSetEnd(e, X, Y, this.CurPage);
+                    this.Notes_UpdateSelectionState();
+                }
             }
         }
     },
