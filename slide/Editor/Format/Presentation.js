@@ -3291,7 +3291,13 @@ CPresentation.prototype =
 
     Notes_OnMouseUp : function(e, X, Y)
     {
-        this.Notes_OnMouseMove(e, X, Y);
+        var oCurSlide = this.Slides[this.CurPage];
+        if(oCurSlide){
+            if(oCurSlide.notesShape){
+                oCurSlide.notesShape.selectionSetEnd(e, X, Y, this.CurPage);
+                this.Notes_UpdateSelectionState();
+            }
+        }
     },
 
     Notes_OnMouseMove : function(e, X, Y)
@@ -3299,7 +3305,7 @@ CPresentation.prototype =
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             if(oCurSlide.notesShape){
-                if(e.IsLocked){
+                if(e.IsPressed){
                     oCurSlide.notesShape.selectionSetEnd(e, X, Y, this.CurPage);
                     this.Notes_UpdateSelectionState();
                 }

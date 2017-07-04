@@ -438,7 +438,8 @@ CShape.prototype.getParentObjects = function ()
                     slide: null,
                     layout: null,
                     master: this.parent.Master,
-                    theme: this.themeOverride ? this.themeOverride : (this.parent.Master ? this.parent.Master.Theme : null)
+                    theme: this.themeOverride ? this.themeOverride : (this.parent.Master ? this.parent.Master.Theme : null),
+                    notes: this.parent
                 }
             }
         }

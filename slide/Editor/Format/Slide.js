@@ -1044,6 +1044,7 @@ Slide.prototype =
                 this.notesShape = this.notes.getBodyShape();
             }
             if(this.notesShape){
+                this.notes.slide = this;
                 this.notes.graphicObjects.selectObject(this.notesShape, 0);
                 this.notes.graphicObjects.selection.textSelection = this.notesShape;
                 var oDocContent = this.notesShape.getDocContent();
@@ -1475,6 +1476,9 @@ AscFormat.CTextBody.prototype.Get_StartPage_Absolute = function()
             if(parent_objects.slide)
             {
                 return parent_objects.slide.num;
+            }
+            if(parent_objects.notes && parent_objects.notes.slide){
+                return parent_objects.notes.slide.num;
             }
         }
     }
