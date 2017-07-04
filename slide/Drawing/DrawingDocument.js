@@ -5621,9 +5621,11 @@ function CNotesDrawer(page)
 		_x *= g_dKoef_pix_to_mm;
 		_y *= g_dKoef_pix_to_mm;
 
+		oThis.HtmlPage.StartUpdateOverlay();
 		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseDown(global_mouseEvent, _x, _y);
+		oThis.HtmlPage.EndUpdateOverlay();
 	};
-	this.onMouseMove = function (e)
+	this.onMouseMove = function (e, is_overlay_attack)
 	{
 		if (e)
 			AscCommon.check_MouseMoveEvent(e);
@@ -5635,7 +5637,12 @@ function CNotesDrawer(page)
 		_y += oThis.Scroll;
 		_x *= g_dKoef_pix_to_mm;
 		_y *= g_dKoef_pix_to_mm;
+
+		oThis.HtmlPage.StartUpdateOverlay();
+		if ((-1 != oThis.m_oTimerScrollSelect) || (is_overlay_attack === true))
+			oThis.HtmlPage.OnUpdateOverlay();
 		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseMove(global_mouseEvent, _x, _y);
+		oThis.HtmlPage.EndUpdateOverlay();
 	};
 	this.onMouseUp = function (e)
 	{
@@ -5654,7 +5661,10 @@ function CNotesDrawer(page)
 		_y += oThis.Scroll;
 		_x *= g_dKoef_pix_to_mm;
 		_y *= g_dKoef_pix_to_mm;
+
+		oThis.HtmlPage.StartUpdateOverlay();
 		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseUp(global_mouseEvent, _x, _y);
+		oThis.HtmlPage.EndUpdateOverlay();
 	};
 
 	this.onMouseWhell = function(e)
@@ -5711,7 +5721,7 @@ function CNotesDrawer(page)
 
 		_e.srcElement = global_mouseEvent.Sender;
 
-		oThis.onMouseMove(_e);
+		oThis.onMouseMove(_e, true);
 		// ------------------------------------------------------
 
 		AscCommon.stopEvent(e);
