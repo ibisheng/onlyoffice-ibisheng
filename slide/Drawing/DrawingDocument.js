@@ -5462,6 +5462,8 @@ function CNotesDrawer(page)
 	this.fontManager.Initialize(true);
 	this.fontManager.SetHintsProps(true, true);
 
+	this.m_oTimerScrollSelect = -1;
+
 	var oThis = this;
 
 	this.Init = function ()
@@ -5476,6 +5478,12 @@ function CNotesDrawer(page)
 		_elemOverlay.HtmlElement.onmousedown = this.onMouseDown;
 		_elemOverlay.HtmlElement.onmousemove = this.onMouseMove;
 		_elemOverlay.HtmlElement.onmouseup = this.onMouseUp;
+
+		this.HtmlPage.m_oNotesContainer.HtmlElement.onmousewheel = this.onMouseWhell;
+		if (this.HtmlPage.m_oNotesContainer.HtmlElement.addEventListener)
+		{
+			this.HtmlPage.m_oNotesContainer.HtmlElement.addEventListener("DOMMouseScroll", this.onMouseWhell, false);
+		}
 	};
 
 	this.OnUpdateOverlay = function ()
@@ -5624,11 +5632,29 @@ function CNotesDrawer(page)
 		var _x = global_mouseEvent.X - oThis.HtmlPage.X - ((oThis.HtmlPage.m_oMainParent.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
 		var _y = global_mouseEvent.Y - oThis.HtmlPage.Y - ((oThis.HtmlPage.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
 
-		console.log(_x + ", " + _y);
+		if (-1 == oThis.m_oTimerScrollSelect)
+		{
+			oThis.m_oTimerScrollSelect = setInterval(oThis.onSelectWheel, 20);
+		}
+
+		_x -= oThis.OffsetX;
+		_x *= g_dKoef_pix_to_mm;
+		_y *= g_dKoef_pix_to_mm;
+
+		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseDown(global_mouseEvent, _x, _y);
 	};
 	this.onMouseMove = function (e)
 	{
-		AscCommon.check_MouseMoveEvent(e);
+		if (e)
+			AscCommon.check_MouseMoveEvent(e);
+
+		var _x = global_mouseEvent.X - oThis.HtmlPage.X - ((oThis.HtmlPage.m_oMainParent.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
+		var _y = global_mouseEvent.Y - oThis.HtmlPage.Y - ((oThis.HtmlPage.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
+
+		_x -= oThis.OffsetX;
+		_x *= g_dKoef_pix_to_mm;
+		_y *= g_dKoef_pix_to_mm;
+		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseMove(global_mouseEvent, _x, _y);
 	};
 	this.onMouseUp = function (e)
 	{
@@ -5637,7 +5663,112 @@ function CNotesDrawer(page)
 		var _x = global_mouseEvent.X - oThis.HtmlPage.X - ((oThis.HtmlPage.m_oMainParent.AbsolutePosition.L * g_dKoef_mm_to_pix + 0.5) >> 0);
 		var _y = global_mouseEvent.Y - oThis.HtmlPage.Y - ((oThis.HtmlPage.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
 
-		console.log(_x + ", " + _y);
+		if (-1 != oThis.m_oTimerScrollSelect)
+		{
+			clearInterval(oThis.m_oTimerScrollSelect);
+			oThis.m_oTimerScrollSelect = -1;
+		}
+
+		_x -= oThis.OffsetX;
+		_x *= g_dKoef_pix_to_mm;
+		_y *= g_dKoef_pix_to_mm;
+		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseUp(global_mouseEvent, _x, _y);
+	};
+
+	this.onMouseWhell = function(e)
+	{
+		if (false === oThis.HtmlPage.m_oApi.bInit_word_control)
+			return;
+
+		var _ctrl = false;
+		if (e.metaKey !== undefined)
+			_ctrl = e.ctrlKey || e.metaKey;
+		else
+			_ctrl = e.ctrlKey;
+
+		if (true === _ctrl)
+		{
+			AscCommon.stopEvent(e);
+			return false;
+		}
+
+		var delta  = 0;
+		var deltaX = 0;
+		var deltaY = 0;
+
+		if (undefined != e.wheelDelta && e.wheelDelta != 0)
+		{
+			//delta = (e.wheelDelta > 0) ? -45 : 45;
+			delta = -45 * e.wheelDelta / 120;
+		}
+		else if (undefined != e.detail && e.detail != 0)
+		{
+			//delta = (e.detail > 0) ? 45 : -45;
+			delta = 45 * e.detail / 3;
+		}
+
+		// New school multidimensional scroll (touchpads) deltas
+		deltaY = delta;
+		deltaY >>= 0;
+
+		if (0 != deltaY)
+			oThis.HtmlPage.m_oScrollNotes_.scrollBy(0, deltaY, false);
+
+		// здесь - имитируем моус мув ---------------------------
+		var _e   = {};
+		_e.pageX = global_mouseEvent.X;
+		_e.pageY = global_mouseEvent.Y;
+
+		_e.clientX = global_mouseEvent.X;
+		_e.clientY = global_mouseEvent.Y;
+
+		_e.altKey   = global_mouseEvent.AltKey;
+		_e.shiftKey = global_mouseEvent.ShiftKey;
+		_e.ctrlKey  = global_mouseEvent.CtrlKey;
+		_e.metaKey  = global_mouseEvent.CtrlKey;
+
+		_e.srcElement = global_mouseEvent.Sender;
+
+		oThis.onMouseMove(_e);
+		// ------------------------------------------------------
+
+		AscCommon.stopEvent(e);
+		return false;
+	};
+
+	this.onSelectWheel = function()
+	{
+		if (false === oThis.HtmlPage.m_oApi.bInit_word_control)
+			return;
+
+		var _y = global_mouseEvent.Y - oThis.HtmlPage.Y - ((oThis.HtmlPage.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
+
+		var positionMinY = 0;
+		var positionMaxY = oThis.HtmlPage.m_oNotes.AbsolutePosition.B * g_dKoef_mm_to_pix;
+
+		var scrollYVal = 0;
+		if (_y < positionMinY)
+		{
+			var delta = 30;
+			if (20 > (positionMinY - _y))
+				delta = 10;
+
+			scrollYVal = -delta;
+		}
+		else if (_y > positionMaxY)
+		{
+			var delta = 30;
+			if (20 > (_y - positionMaxY))
+				delta = 10;
+
+			scrollYVal = delta;
+		}
+
+		if (0 != scrollYVal)
+		{
+			oThis.HtmlPage.m_oScrollNotes_.scrollByY(scrollYVal, false);
+			oThis.onMouseMove();
+		}
 	};
 
 	this.onUpdateTarget = function ()

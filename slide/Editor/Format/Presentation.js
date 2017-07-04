@@ -3262,7 +3262,7 @@ CPresentation.prototype =
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             if(oCurSlide.notesShape){
-                oCurSlide.notesShape.selectionSetEnd(e, x, y, this.CurPage);
+                oCurSlide.notesShape.selectionSetEnd(e, X, Y, this.CurPage);
                 this.Notes_UpdateSelectionState();
             }
         }
