@@ -67,12 +67,12 @@
 		cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST, cFORECAST_LINEAR, cFREQUENCY, cFTEST,
 		cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH,
 		cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV,
-		cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST,
-		cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
-		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK,
-		cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA,
-		cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR,
-		cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cZTEST);
+		cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST,
+		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK,
+		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC,
+		cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA,
+		cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN,
+		cTTEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
@@ -4832,6 +4832,33 @@
 		return this.value = mode(arr0);
 
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cPERCENTILE}
+	 */
+	//TODO разницы в работе функций cMODE_MULT и cMODE не нашёл, но в LO обработки немного разные. проверить!
+	function cMODE_MULT() {
+		cMODE.call(this);
+		this.name = "MODE.MULT";
+	}
+
+	cMODE_MULT.prototype = Object.create(cMODE.prototype);
+	cMODE_MULT.prototype.constructor = cMODE_MULT;
+	cMODE_MULT.prototype.isXLFN = true;
+
+	/**
+	 * @constructor
+	 * @extends {cPERCENTILE}
+	 */
+	function cMODE_SNGL() {
+		cMODE.call(this);
+		this.name = "MODE.SNGL";
+	}
+
+	cMODE_SNGL.prototype = Object.create(cMODE.prototype);
+	cMODE_SNGL.prototype.constructor = cMODE_SNGL;
+	cMODE_SNGL.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
