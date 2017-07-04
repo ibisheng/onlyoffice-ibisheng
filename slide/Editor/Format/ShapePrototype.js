@@ -458,6 +458,10 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted || !this.parent)
         return;
+
+    if(this.parent.getObjectType() === AscDFH.historyitem_type_Notes){
+        return;
+    }
     var check_slide_placeholder = !this.isPlaceholder() || (this.parent && (this.parent.getObjectType() === AscDFH.historyitem_type_Slide));
     AscFormat.ExecuteNoHistory(function(){
 

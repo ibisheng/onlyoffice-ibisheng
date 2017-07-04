@@ -3283,7 +3283,7 @@ CPresentation.prototype =
                 oCurSlide.graphicObjects.resetSelection(true, false);
             }
             if(oCurSlide.notesShape){
-                oCurSlide.notesShape.selectionSetStart(e, X, Y, this.CurPage);
+                oCurSlide.notesShape.selectionSetStart(e, X, Y, 0);
                 this.Notes_UpdateSelectionState();
             }
         }
@@ -3294,7 +3294,7 @@ CPresentation.prototype =
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             if(oCurSlide.notesShape){
-                oCurSlide.notesShape.selectionSetEnd(e, X, Y, this.CurPage);
+                oCurSlide.notesShape.selectionSetEnd(e, X, Y, 0);
                 this.Notes_UpdateSelectionState();
             }
         }
@@ -3305,8 +3305,8 @@ CPresentation.prototype =
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             if(oCurSlide.notesShape){
-                if(e.IsPressed){
-                    oCurSlide.notesShape.selectionSetEnd(e, X, Y, this.CurPage);
+                if(e.IsLocked){
+                    oCurSlide.notesShape.selectionSetEnd(e, X, Y, 0);
                     this.Notes_UpdateSelectionState();
                 }
             }
