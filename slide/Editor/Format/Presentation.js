@@ -1029,10 +1029,16 @@ CPresentation.prototype =
                 var Res  = Para.Recalculate_FastRange( SimpleChanges );
                 if ( -1 !== Res )
                 {
-                    if( this.Slides[this.CurPage])
-                    {
-                        this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
-                        this.DrawingDocument.OnEndRecalculate();
+                    var oCurSlide = this.Slides[this.CurPage];
+                    if( oCurSlide){
+                        if(!this.FocusOnNotes){
+                            this.DrawingDocument.OnRecalculatePage(this.CurPage, oCurSlide);
+                            this.DrawingDocument.OnEndRecalculate();
+                        }
+                        else{
+                            this.DrawingDocument.Notes_OnRecalculate(this.CurPage, oCurSlide.NotesWidth, oCurSlide.getNotesHeight());
+                        }
+
                     }
                     History.Get_RecalcData();
                     History.Reset_RecalcIndex();
@@ -1054,6 +1060,7 @@ CPresentation.prototype =
         var _RecalcData = RecalcData ? RecalcData : History.Get_RecalcData(), key, recalcMap, bSync = true, i, bRedrawAllSlides = false, aToRedrawSlides = [], redrawSlideIndexMap = {}, slideIndex;
         this.updateSlideIndexes();
         var b_check_layout = false;
+        var bRedrawNotes = false;
         if(_RecalcData.Drawings.All || _RecalcData.Drawings.ThemeInfo)
         {
             b_check_layout = true;
@@ -1124,20 +1131,30 @@ CPresentation.prototype =
         }
         else
         {
+            var oCurNotesShape = null;
+            if(this.Slides[this.CurPage]){
+                oCurNotesShape = this.Slides[this.CurPage].notesShape;
+            }
             for(key in _RecalcData.Drawings.Map)
             {
                 if(_RecalcData.Drawings.Map.hasOwnProperty(key))
                 {
-                    _RecalcData.Drawings.Map[key].recalculate();
-                    if(_RecalcData.Drawings.Map[key].getSlideIndex)
+                    var oDrawingObject = _RecalcData.Drawings.Map[key];
+                    oDrawingObject.recalculate();
+                    if(oDrawingObject.getSlideIndex)
                     {
-                        slideIndex = _RecalcData.Drawings.Map[key].getSlideIndex();
+                        slideIndex = oDrawingObject.getSlideIndex();
                         if(slideIndex !== null)
                         {
                             if(redrawSlideIndexMap[slideIndex] !== true )
                             {
                                 redrawSlideIndexMap[slideIndex] = true;
                                 aToRedrawSlides.push(slideIndex);
+                            }
+                        }
+                        else{
+                            if(oCurNotesShape && oCurNotesShape === oDrawingObject){
+                                bRedrawNotes = true;
                             }
                         }
                     }
@@ -1164,6 +1181,9 @@ CPresentation.prototype =
                 }
             }
             this.DrawingDocument.OnEndRecalculate();
+            if(bRedrawNotes){
+                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+            }
         }
         if(!this.Slides[this.CurPage])
         {
@@ -1196,8 +1216,17 @@ CPresentation.prototype =
                 this.bNeedUpdateTh = false;
             }
         }
-        if(this.Slides[this.CurPage])
-            this.Slides[this.CurPage].graphicObjects.updateSelectionState();
+        if(this.Slides[this.CurPage]){
+            if(!this.FocusOnNotes){
+                this.Slides[this.CurPage].graphicObjects.updateSelectionState();
+            }
+            else{
+                if(this.Slides[this.CurPage].notesShape){
+                    this.Slides[this.CurPage].notesShape.updateSelectionState();
+                }
+            }
+        }
+
         for(i = 0; i < this.slidesToUnlock.length; ++i)
         {
             this.DrawingDocument.UnLockSlide(this.slidesToUnlock[i]);
@@ -1933,26 +1962,24 @@ CPresentation.prototype =
                     oMathShape.txBody.content.MoveCursorToStartPos(false);
                 }
             }
-            this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
-            if(AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects) instanceof AscFormat.CGraphicFrame){
-                bRecalculate = false;
+            if(this.FocusOnNotes){
+                var oCurSlide = this.Slides[this.CurPage];
+                if(oCurSlide.notesShape){
+                    oCurSlide.notesShape.paragraphAdd(ParaItem, bRecalculate);
+                    bRecalculate = false;
+                }
             }
-            if(oMathShape)
-            {
-				//var  oContent = oMathShape.txBody.content;
-				//var oTextPr = new CTextPr();
-				//oTextPr.RFonts.Ascii = {Name: "Cambria Math", Index: -1};
-				//oTextPr.RFonts.HAnsi = {Name: "Cambria Math", Index: -1};
-				//oTextPr.RFonts.CS = {Name: "Cambria Math", Index: -1};
-				//oTextPr.RFonts.EastAsia = {Name: "Cambria Math", Index: -1};
-				//oContent.Set_ApplyToAll(true);
-				//oContent.AddToParagraph(new ParaTextPr(oTextPr));
-				//oContent.Set_ApplyToAll(false);
-				
-                oMathShape.checkExtentsByDocContent();
-                oMathShape.spPr.xfrm.setOffX((this.Slides[this.CurPage].Width - oMathShape.spPr.xfrm.extX)/2);
-                oMathShape.spPr.xfrm.setOffY((this.Slides[this.CurPage].Height - oMathShape.spPr.xfrm.extY)/2);
-                
+            else{
+                this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
+                if(AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects) instanceof AscFormat.CGraphicFrame){
+                    bRecalculate = false;
+                }
+                if(oMathShape)
+                {
+                    oMathShape.checkExtentsByDocContent();
+                    oMathShape.spPr.xfrm.setOffX((this.Slides[this.CurPage].Width - oMathShape.spPr.xfrm.extX)/2);
+                    oMathShape.spPr.xfrm.setOffY((this.Slides[this.CurPage].Height - oMathShape.spPr.xfrm.extY)/2);
+                }
             }
             if(false === bRecalculate){
                 this.Recalculate();
@@ -3112,8 +3139,14 @@ CPresentation.prototype =
         if ( true === editor.isViewMode )
             return false;
 
-        if(!this.Slides[this.CurPage] || !this.Slides[this.CurPage].graphicObjects || this.Slides[this.CurPage].graphicObjects.selectedObjects.length === 0)
-        {
+        var oCurSlide = this.Slides[this.CurPage];
+        if(!oCurSlide || !oCurSlide.graphicObjects){
+            return;
+        }
+        if(!this.FocusOnNotes && oCurSlide.graphicObjects.selectedObjects.length === 0){
+            return;
+        }
+        if(this.FocusOnNotes && !oCurSlide.notesShape){
             return;
         }
         var Code;
@@ -3241,10 +3274,13 @@ CPresentation.prototype =
 
     Notes_OnMouseDown : function(e, X, Y)
     {
+        var bFocusOnSlide = !this.FocusOnNotes;
         this.FocusOnNotes = true;
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
-            oCurSlide.resetSelection(true, false);
+            if(bFocusOnSlide){
+                oCurSlide.graphicObjects.resetSelection(true, false);
+            }
             if(oCurSlide.notesShape){
                 oCurSlide.notesShape.selectionSetStart(e, X, Y, this.CurPage);
                 this.Notes_UpdateSelectionState();

@@ -1044,6 +1044,8 @@ Slide.prototype =
                 this.notesShape = this.notes.getBodyShape();
             }
             if(this.notesShape){
+                this.notes.graphicObjects.selectObject(this.notesShape, 0);
+                this.notes.graphicObjects.selection.textSelection = this.notesShape;
                 var oDocContent = this.notesShape.getDocContent();
                 if(oDocContent){
                     this.notesShape.transformText.tx = 3;
