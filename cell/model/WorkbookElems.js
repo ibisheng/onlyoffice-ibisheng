@@ -4805,7 +4805,7 @@ RangeDataManager.prototype = {
 		return null !== this.minAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getMaxAxisType = function () {
-		return null !== this.maxAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
+		return null !== this.maxAxisType ? this.maxAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getRightToLeft = function () {
 		return this.rightToLeft;
