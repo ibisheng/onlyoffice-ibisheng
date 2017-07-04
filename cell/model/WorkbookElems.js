@@ -5029,11 +5029,14 @@ RangeDataManager.prototype = {
 			equalColors(this.colorHigh, oSparklineGroup.colorHigh) && equalColors(this.colorLow, oSparklineGroup.colorLow);
 	};
 
-	sparklineGroup.prototype.asc_getStyles = function () {
+	sparklineGroup.prototype.asc_getStyles = function (type) {
 		History.TurnOff();
 		var aRet = [];
 		var nStyleIndex = -1;
 		var oSparklineGroup = this.clone(true);
+		if ('undefined' !== typeof type) {
+			oSparklineGroup.asc_setType(type);
+		}
 
 		var canvas = document.createElement('canvas');
 		canvas.width = 50;
