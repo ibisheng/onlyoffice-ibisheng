@@ -2725,6 +2725,18 @@ function CEditorPage(api)
 		this.m_oApi.checkLastWork();
 
 		var overlay = this.m_oOverlayApi;
+		var overlayNotes = null;
+
+		var isDrawNotes = false;
+		if (this.IsSupportNotes && this.m_oNotesApi)
+		{
+			overlayNotes = this.m_oNotesApi.m_oOverlayApi;
+			overlayNotes.SetBaseTransform();
+			overlayNotes.Clear();
+
+			if (this.m_oLogicDocument.IsFocusOnNotes())
+				isDrawNotes = true;
+		}
 
 		overlay.SetBaseTransform();
 		overlay.Clear();
@@ -2773,8 +2785,7 @@ function CEditorPage(api)
 		{
 			ctx.fillStyle   = "rgba(51,102,204,255)";
 			ctx.strokeStyle = "#9ADBFE";
-			//ctx.strokeStyle = "rgba(206,238,255,255)";
-			//ctx.strokeStyle = "#FFFFFF";
+
 			ctx.beginPath();
 
 			if (drDoc.SlideCurrent != -1)
@@ -2789,6 +2800,25 @@ function CEditorPage(api)
 
 			if (this.MobileTouchManager)
 				this.MobileTouchManager.CheckSelect(overlay);
+		}
+
+		if (isDrawNotes && drDoc.m_bIsSelection)
+		{
+			var ctxOverlay = overlayNotes.m_oContext;
+			ctxOverlay.fillStyle   = "rgba(51,102,204,255)";
+			ctxOverlay.strokeStyle = "#9ADBFE";
+
+			ctxOverlay.beginPath();
+
+			if (drDoc.SlideCurrent != -1)
+				this.m_oLogicDocument.Slides[drDoc.SlideCurrent].drawNotesSelect();
+
+			ctxOverlay.globalAlpha = 0.2;
+			ctxOverlay.fill();
+			ctxOverlay.globalAlpha = 1.0;
+			ctxOverlay.stroke();
+			ctxOverlay.beginPath();
+			ctxOverlay.globalAlpha = 1.0;
 		}
 
 		if (this.MobileTouchManager)

@@ -2132,6 +2132,15 @@ function CDrawingDocument()
 		var dKoefY = hDst / this.m_oLogicDocument.Height;
 
 		var overlay = this.m_oWordControl.m_oOverlayApi;
+		if (this.m_oWordControl.IsSupportNotes && this.m_oWordControl.m_oNotesApi && this.m_oLogicDocument.IsFocusOnNotes())
+		{
+			overlay = this.m_oWordControl.m_oNotesApi.m_oOverlayApi;
+			xDst = this.m_oWordControl.m_oNotesApi.OffsetX;
+			yDst = -this.m_oWordControl.m_oNotesApi.Scroll;
+			dKoefX = g_dKoef_mm_to_pix;
+			dKoefY = g_dKoef_mm_to_pix;
+		}
+
 		if (null == this.TextMatrix || global_MatrixTransformer.IsIdentity(this.TextMatrix))
 		{
 			var _x = ((xDst + dKoefX * x + 0.5) >> 0) - 0.5;
@@ -5486,36 +5495,6 @@ function CNotesDrawer(page)
 		}
 	};
 
-	this.OnUpdateOverlay = function ()
-	{
-		var overlay = this.m_oOverlayApi;
-
-		overlay.SetBaseTransform();
-		overlay.Clear();
-
-		if (this.Slide == -1)
-			return;
-
-		var logicDocument = this.HtmlPage.m_oLogicDocument;
-
-		var ctx = overlay.m_oContext;
-		if (drDoc.m_bIsSelection)
-		{
-			ctx.fillStyle = "rgba(51,102,204,255)";
-			ctx.strokeStyle = "#9ADBFE";
-			ctx.beginPath();
-
-			logicDocument.drawNotesSelect(1);
-
-			ctx.globalAlpha = 0.2;
-			ctx.fill();
-			ctx.globalAlpha = 1.0;
-		}
-
-		ctx.globalAlpha = 1.0;
-		ctx = null;
-	};
-
 	this.OnPaint = function ()
 	{
 		var element = this.HtmlPage.m_oNotes.HtmlElement;
@@ -5638,6 +5617,7 @@ function CNotesDrawer(page)
 		}
 
 		_x -= oThis.OffsetX;
+		_y += oThis.Scroll;
 		_x *= g_dKoef_pix_to_mm;
 		_y *= g_dKoef_pix_to_mm;
 
@@ -5652,6 +5632,7 @@ function CNotesDrawer(page)
 		var _y = global_mouseEvent.Y - oThis.HtmlPage.Y - ((oThis.HtmlPage.m_oNotesContainer.AbsolutePosition.T * g_dKoef_mm_to_pix + 0.5) >> 0);
 
 		_x -= oThis.OffsetX;
+		_y += oThis.Scroll;
 		_x *= g_dKoef_pix_to_mm;
 		_y *= g_dKoef_pix_to_mm;
 		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseMove(global_mouseEvent, _x, _y);
@@ -5670,6 +5651,7 @@ function CNotesDrawer(page)
 		}
 
 		_x -= oThis.OffsetX;
+		_y += oThis.Scroll;
 		_x *= g_dKoef_pix_to_mm;
 		_y *= g_dKoef_pix_to_mm;
 		oThis.HtmlPage.m_oLogicDocument.Notes_OnMouseUp(global_mouseEvent, _x, _y);
