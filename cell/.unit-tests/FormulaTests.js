@@ -3620,7 +3620,7 @@ $( function () {
 
         function mode( x ) {
 
-            x.sort(AscCommon.fSortDescending);
+            x.sort(AscCommon.fSortAscending);
 
             if ( x.length < 1 )
                 return "#VALUE!";
@@ -3665,6 +3665,42 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), mode( [1, 9, 5, 5, 9, 5, 6, 6] ) );
 
     } );
+
+	test( "Test: \"MODE.MULT \"", function () {
+
+		ws.getRange2( "F202" ).setValue( "1" );
+		ws.getRange2( "F203" ).setValue( "2" );
+		ws.getRange2( "F204" ).setValue( "3" );
+		ws.getRange2( "F205" ).setValue( "4" );
+		ws.getRange2( "F206" ).setValue( "3" );
+		ws.getRange2( "F207" ).setValue( "2" );
+		ws.getRange2( "F208" ).setValue( "1" );
+		ws.getRange2( "F209" ).setValue( "2" );
+		ws.getRange2( "F210" ).setValue( "3" );
+		ws.getRange2( "F211" ).setValue( "5" );
+		ws.getRange2( "F212" ).setValue( "6" );
+		ws.getRange2( "F213" ).setValue( "1" );
+
+		oParser = new parserFormula( "MODE.MULT(F202:F213)", "F1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+	} );
+
+	test( "Test: \"MODE.SNGL \"", function () {
+
+		ws.getRange2( "F202" ).setValue( "5.6" );
+		ws.getRange2( "F203" ).setValue( "4" );
+		ws.getRange2( "F204" ).setValue( "4" );
+		ws.getRange2( "F205" ).setValue( "3" );
+		ws.getRange2( "F206" ).setValue( "2" );
+		ws.getRange2( "F207" ).setValue( "4" );
+
+		oParser = new parserFormula( "MODE.SNGL(F202:F207)", "F1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 4 );
+
+	} );
 
 	test( "Test: \"NUMBERVALUE\"", function () {
 		oParser = new parserFormula( 'NUMBERVALUE("2.500,27",",",".")', "A1", ws );
