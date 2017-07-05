@@ -135,6 +135,12 @@
                         window.Asc.plugin.onMethodReturn(pluginData.methodReturnData);
                     break;
                 }
+				case "onCommandCallback":
+				{
+					if (window.Asc.plugin.onCommandCallback)
+						window.Asc.plugin.onCommandCallback();
+					break;
+				}
                 case "onExternalPluginMessage":
                 {
 					if (window.Asc.plugin.onExternalPluginMessage && pluginData.data && pluginData.data.type)

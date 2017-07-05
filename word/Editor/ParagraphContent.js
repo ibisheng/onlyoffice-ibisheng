@@ -105,6 +105,7 @@ var para_FootnoteRef               = 0x0040; // Номер сноски (дол�
 var para_Separator                 = 0x0041; // Разделить, который используется для сносок
 var para_ContinuationSeparator     = 0x0042; // Большой разделитель, который используется для сносок
 var para_PageCount                 = 0x0043; // Количество страниц
+var para_InlineLevelSdt            = 0x0044; // Внутристроковый контейнер
 
 var break_Line   = 0x01;
 var break_Page   = 0x02;
@@ -1099,14 +1100,6 @@ ParaNewLine.prototype =
 
         if (break_Page === this.BreakType || break_Column === this.BreakType)
             this.Flags = { NewLine : Reader.GetBool() };
-    },
-
-    Is_PageOrColumnBreak : function()
-    {
-        if (break_Page === this.BreakType || break_Column === this.BreakType)
-            return true;
-
-        return false;
     }
 };
 ParaNewLine.prototype.IsPageOrColumnBreak = function()
@@ -1387,21 +1380,21 @@ ParaPageNum.prototype =
         this.WidthVisible = RealWidth;
     },
 
-    Save_RecalculateObject : function(Copy)
-    {
-        return new CPageNumRecalculateObject(this.Type, this.Widths, this.String, this.Width, Copy);
-    },
+	SaveRecalculateObject : function(Copy)
+	{
+		return new CPageNumRecalculateObject(this.Type, this.Widths, this.String, this.Width, Copy);
+	},
 
-    Load_RecalculateObject : function(RecalcObj)
-    {
-        this.Widths = RecalcObj.Widths;
-        this.String = RecalcObj.String;
+	LoadRecalculateObject : function(RecalcObj)
+	{
+		this.Widths = RecalcObj.Widths;
+		this.String = RecalcObj.String;
 
-        this.Width  = RecalcObj.Width;
-        this.WidthVisible = this.Width;
-    },
+		this.Width        = RecalcObj.Width;
+		this.WidthVisible = this.Width;
+	},
 
-    Prepare_RecalculateObject : function()
+	PrepareRecalculateObject : function()
     {
         this.Widths = [];
         this.String = "";
@@ -1588,10 +1581,11 @@ ParaFootnoteReference.prototype.Draw = function(X, Y, Context, PDSE)
 		_X += this.Widths[nPos];
 	}
 
-	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect)
+	if (editor && editor.ShowParaMarks && Context.DrawFootnoteRect && this.Run)
 	{
-	    Context.p_color(0, 0, 0, 255);
-	    Context.DrawFootnoteRect(X, PDSE.LineTop, this.Get_Width(), PDSE.BaseLine - PDSE.LineTop);
+		var TextAscent = this.Run.TextAscent;
+		Context.p_color(0, 0, 0, 255);
+		Context.DrawFootnoteRect(X, PDSE.BaseLine - TextAscent, this.Get_Width(), TextAscent);
 	}
 };
 ParaFootnoteReference.prototype.Measure = function(Context, TextPr, MathInfo, Run)
@@ -1683,7 +1677,7 @@ ParaFootnoteReference.prototype.private_Measure = function()
 	var oMeasurer = g_oTextMeasurer;
 
 	var TextPr = this.Run.Get_CompiledPr(false);
-	var Theme  = this.Run.Get_Paragraph().Get_Theme();
+	var Theme  = this.Run.GetParagraph().Get_Theme();
 
     var FontKoef = 1;
     if (TextPr.VertAlign !== AscCommon.vertalign_Baseline)
@@ -1730,6 +1724,16 @@ ParaFootnoteReference.prototype.IsCustomMarkFollows = function()
 ParaFootnoteReference.prototype.GetCustomText = function()
 {
 	return this.CustomMark;
+};
+ParaFootnoteReference.prototype.CreateDocumentFontMap = function(FontMap)
+{
+	if (this.Footnote)
+		this.Footnote.Document_CreateFontMap(FontMap);
+};
+ParaFootnoteReference.prototype.GetAllContentControls = function(arrContentControls)
+{
+	if (this.Footnote)
+		this.Footnote.GetAllContentControls(arrContentControls);
 };
 
 /**
@@ -1983,9 +1987,10 @@ function ParagraphContent_Read_FromBinary(Reader)
 	var Element = null;
 	switch (ElementType)
 	{
-		case para_TextPr                :
-		case para_Drawing               :
-		case para_HyperlinkStart        :
+		case para_TextPr:
+		case para_Drawing:
+		case para_HyperlinkStart:
+		case para_InlineLevelSdt:
 		{
 			var ElementId = Reader.GetString2();
 			Element       = g_oTableId.Get_ById(ElementId);
@@ -2020,6 +2025,7 @@ function ParagraphContent_Read_FromBinary(Reader)
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].ParaNewLine = ParaNewLine;
+window['AscCommonWord'].ParaText    = ParaText;
 
 window['AscCommonWord'].break_Page = break_Page;
 window['AscCommonWord'].break_Column = break_Column;

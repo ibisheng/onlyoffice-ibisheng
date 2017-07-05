@@ -414,10 +414,10 @@
 
 		checkFocus : function()
 		{
-			if (oThis.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
+			if (this.Api.asc_IsFocus() && !AscCommon.g_clipboardBase.IsFocus() && !AscCommon.g_clipboardBase.IsWorking())
 			{
-				if (document.activeElement != oThis.HtmlArea)
-					oThis.HtmlArea.focus();
+				if (document.activeElement != this.HtmlArea)
+					this.HtmlArea.focus();
 			}
 		},
 
@@ -988,7 +988,7 @@
 			}
 			else
 			{
-				var _textPr = this.Api.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
+				var _textPr = this.Api.WordControl.m_oLogicDocument.GetCalculatedTextPr();
 
 				var _check_obj = _fontSelections.checkPasteText(_textPr, _language);
 				if (_check_obj.is_async)

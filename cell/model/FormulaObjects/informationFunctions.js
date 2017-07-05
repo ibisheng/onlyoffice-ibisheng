@@ -100,7 +100,7 @@
 		if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			var ret = new cArray();
 			arg0.foreach(function (elem, r, c) {
@@ -112,11 +112,6 @@
 			return this.value = ret;
 		}
 		return this.value = typeError(arg0);
-	};
-	cERROR_TYPE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -136,7 +131,7 @@
 	cISBLANK.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -145,11 +140,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISBLANK.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -171,7 +161,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -181,11 +171,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISERR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -207,7 +192,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -217,11 +202,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISERROR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -243,7 +223,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -258,11 +238,6 @@
 		} else {
 			return this.value = new cBool((arg0.getValue() & 1) == 0);
 		}
-	};
-	cISEVEN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number)"
-		};
 	};
 
 	/**
@@ -284,7 +259,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -294,11 +269,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISLOGICAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -320,7 +290,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -330,11 +300,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISNA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -356,7 +321,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -365,11 +330,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISNONTEXT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -391,7 +351,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -401,11 +361,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISNUMBER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -427,7 +382,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -442,11 +397,6 @@
 		} else {
 			return this.value = new cBool((arg0.getValue() & 1) == 1);
 		}
-	};
-	cISODD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(number)"
-		};
 	};
 
 	/**
@@ -471,11 +421,6 @@
 			return this.value = new cBool(false);
 		}
 	};
-	cISREF.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -496,7 +441,7 @@
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -506,11 +451,6 @@
 		} else {
 			return this.value = new cBool(false);
 		}
-	};
-	cISTEXT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -543,7 +483,7 @@
 			});
 			return this.value = arr;
 		} else if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -556,11 +496,6 @@
 			return this.value = new cNumber(0);
 		}
 
-	};
-	cN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 
 	/**
@@ -578,11 +513,6 @@
 	cNA.prototype.argumentsMax = 0;
 	cNA.prototype.Calculate = function () {
 		return this.value = new cError(cErrorType.not_available);
-	};
-	cNA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "()"
-		};
 	};
 
 	/**
@@ -602,7 +532,7 @@
 	cTYPE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0];
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cRef || arg0 instanceof cRef3D) {
 			arg0 = arg0.getValue();
 		}
@@ -618,10 +548,5 @@
 		} else {
 			return this.value = new cNumber(64);
 		}
-	};
-	cTYPE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "(value)"
-		};
 	};
 })(window);

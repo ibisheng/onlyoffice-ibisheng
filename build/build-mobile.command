@@ -1,5 +1,8 @@
 #!/bin/bash
 
+PRODUCT_VERSION="4.4.0"
+BUILD_NUMBER="219"
+
 echo "----------------------------------------"
 echo "Building for mobile"
 echo "----------------------------------------"
@@ -9,7 +12,7 @@ cd $BASEDIR
 
 echo npm install
 
-grunt --level=WHITESPACE_ONLY --mobile=true --noclosure=true --formatting=PRETTY_PRINT
+PRODUCT_VERSION=$PRODUCT_VERSION BUILD_NUMBER=$BUILD_NUMBER grunt --level=WHITESPACE_ONLY --mobile=true --noclosure=true --formatting=PRETTY_PRINT
 echo grunt --level=ADVANCED --mobile=true  --noclosure=true
 
 echo -n $'\r' > temp.txt
@@ -26,3 +29,7 @@ cat "banners.js" "../cell/sdk-all-min.js" "../cell/sdk-all.js" > "../../mobile-a
 
 rm -f -r "banners.js"
 rm -f -r "temp.txt"
+
+echo -n $PRODUCT_VERSION.$BUILD_NUMBER > "../../mobile-apps/ios/Vendor/ONLYOFFICE/SDKData/documents/sdk.version"
+
+echo -n $PRODUCT_VERSION.$BUILD_NUMBER > "../../mobile-apps/ios/Vendor/ONLYOFFICE/SDKData/spreadsheets/sdk.version"

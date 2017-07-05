@@ -55,6 +55,8 @@ function StartAddNewShape(drawingObjects, preset)
     this.startX = null;
     this.startY = null;
 
+    this.oldConnector = null;
+
 }
 
 StartAddNewShape.prototype =
@@ -77,7 +79,7 @@ StartAddNewShape.prototype =
                 slide = oParentObjects.slide;
             }
         }
-        this.drawingObjects.arrPreTrackObjects.push(new AscFormat.NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), master, layout, slide, 0));
+        this.drawingObjects.arrPreTrackObjects.push(new AscFormat.NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), master, layout, slide, 0, this.drawingObjects));
         this.bStart = true;
         this.drawingObjects.swapTrackObjects();
     },
@@ -90,6 +92,30 @@ StartAddNewShape.prototype =
                 this.bMoved = true;
             this.drawingObjects.arrTrackObjects[0].track(e, x, y);
             this.drawingObjects.updateOverlay();
+        }
+        else
+        {
+            if(AscFormat.isConnectorPreset(this.preset)){
+                var oOldState = this.drawingObjects.curState;
+                this.drawingObjects.connector = null;
+                this.drawingObjects.changeCurrentState(new AscFormat.NullState(this.drawingObjects));
+                var oResult;
+                this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
+                oResult = this.drawingObjects.curState.onMouseDown(e, x, y, 0);
+                this.drawingObjects.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
+                this.drawingObjects.changeCurrentState(oOldState);
+
+                if(oResult){
+                    var oObject = AscCommon.g_oTableId.Get_ById(oResult.objectId);
+                    if(oObject.getObjectType() === AscDFH.historyitem_type_Shape){
+                        this.drawingObjects.connector = oObject;
+                    }
+                }
+                if(this.drawingObjects.connector !== this.oldConnector){
+                    this.drawingObjects.updateOverlay();
+                }
+                this.oldConnector = this.drawingObjects.connector;
+            }
         }
     },
 
@@ -150,7 +176,7 @@ StartAddNewShape.prototype =
                         shape.setParent(oThis.drawingObjects.drawingObjects);
                         shape.setRecalculateInfo();
                     }
-                    shape.addToDrawingObjects();
+                    shape.addToDrawingObjects(undefined, AscCommon.c_oAscCellAnchorType.cellanchorTwoCell);
                     shape.checkDrawingBaseCoords();
                     oThis.drawingObjects.checkChartTextSelection();
                     oThis.drawingObjects.resetSelection();
@@ -462,7 +488,9 @@ ChangeAdjState.prototype =
             return;
         }
         var t = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
-        this.drawingObjects.arrTrackObjects[0].track(t.x, t.y);
+        for(var i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i){
+            this.drawingObjects.arrTrackObjects[i].track(t.x, t.y);
+        }
         this.drawingObjects.updateOverlay();
     },
 
@@ -470,11 +498,26 @@ ChangeAdjState.prototype =
     {
         if(this.drawingObjects.isViewMode() === false)
         {
-            var track = this.drawingObjects.arrTrackObjects[0];
+            var trackObjects = this.drawingObjects.arrTrackObjects;
             var drawingObjects = this.drawingObjects;
             this.drawingObjects.checkSelectedObjectsAndCallback(function()
             {
-                track.trackEnd();
+                var oOriginalObjects = [];
+                var oMapOriginalsIds = {};
+                for(var i = 0; i < trackObjects.length; ++i){
+                    trackObjects[i].trackEnd();
+                    if(trackObjects[i].originalObject && !trackObjects[i].processor3D){
+                        oOriginalObjects.push(trackObjects[i].originalObject);
+                        oMapOriginalsIds[trackObjects[i].originalObject.Get_Id()] = true;
+                    }
+                }
+                var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
+                for(i = 0; i < aAllConnectors.length; ++i){
+                    if(!oMapOriginalsIds[aAllConnectors.Get_Id()]){
+                        aAllConnectors[i].calculateTransform();
+                    }
+                }
+
                 drawingObjects.startRecalculate();
             },[], false, AscDFH.historydescription_CommonDrawings_ChangeAdj);
 
@@ -561,10 +604,20 @@ RotateState.prototype =
             {
                 var i, copy;
                 this.drawingObjects.resetSelection();
+                var oIdMap = {};
+                var aCopies = [];
                 History.Create_NewPoint(AscDFH.historydescription_CommonDrawings_CopyCtrl);
                 for(i = 0; i < tracks.length; ++i)
                 {
-                    copy = tracks[i].originalObject.copy();
+                    if(tracks[i].originalObject.getObjectType() === AscDFH.historyitem_type_GroupShape){
+
+                        copy = tracks[i].originalObject.copy(oIdMap);
+                    }
+                    else{
+
+                        copy = tracks[i].originalObject.copy();
+                    }
+                    oIdMap[tracks[i].originalObject.Id] = copy.Id;
                     this.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
                     if(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld)
                     {
@@ -582,9 +635,10 @@ RotateState.prototype =
                         AscFormat.SetXfrmFromMetrics(copy, metrics);
                     }
                     copy.addToDrawingObjects();
+                    aCopies.push(copy);
 
                     tracks[i].originalObject = copy;
-                    tracks[i].trackEnd(false);
+                    tracks[i].trackEnd(false, false);
                     this.drawingObjects.selectObject(copy, 0);
                     if(!(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld))
                     {
@@ -596,19 +650,31 @@ RotateState.prototype =
                         this.drawingObjects.drawingObjects.sendGraphicObjectProps();
                     }
                 }
+                AscFormat.fResetConnectorsIds(aCopies, oIdMap);
             }
             else
             {
                 this.drawingObjects.checkSelectedObjectsAndCallback(
                     function()
                     {
-                        var i;
+                        var i, j;
                         if(e.CtrlKey && oThis instanceof MoveInGroupState)
                         {
+
+                            var oIdMap = {};
+                            var aCopies = [];
                             group.resetSelection();
                             for(i = 0; i < tracks.length; ++i)
                             {
-                                var copy = tracks[i].originalObject.copy();
+                                if(tracks[i].originalObject.getObjectType() === AscDFH.historyitem_type_GroupShape){
+
+                                    copy = tracks[i].originalObject.copy(oIdMap);
+                                }
+                                else{
+
+                                    copy = tracks[i].originalObject.copy();
+                                }
+                                aCopies.push(copy);
                                 oThis.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
                                 if(oThis.drawingObjects.drawingObjects && oThis.drawingObjects.drawingObjects.cSld)
                                 {
@@ -620,12 +686,43 @@ RotateState.prototype =
                                 tracks[i].trackEnd(false);
                                 group.selectObject(copy, 0);
                             }
+                            AscFormat.fResetConnectorsIds(aCopies, oIdMap);
                         }
                         else
                         {
+                            var oOriginalObjects = [];
+                            var oMapOriginalsId = {};
                             for(i = 0; i < tracks.length; ++i)
                             {
-                                tracks[i].trackEnd(false);
+                                tracks[i].trackEnd(false, false);
+                                if(tracks[i].originalObject && !tracks[i].processor3D){
+                                    oOriginalObjects.push(tracks[i].originalObject);
+                                    oMapOriginalsId[tracks[i].originalObject.Get_Id()] = true;
+                                    if(Array.isArray(tracks[i].originalObject.arrGraphicObjects)){
+                                        for(j = 0; j < tracks[i].originalObject.arrGraphicObjects.length; ++j){
+                                            oMapOriginalsId[tracks[i].originalObject.arrGraphicObjects[j].Get_Id()] = true;
+                                        }
+                                    }
+                                }
+                            }
+                            var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
+                            var oGroupMaps = {};
+                            for(i = 0; i < aAllConnectors.length; ++i){
+
+                                var stSp = AscCommon.g_oTableId.Get_ById(aAllConnectors[i].getStCxnId());
+                                var endSp = AscCommon.g_oTableId.Get_ById(aAllConnectors[i].getEndCxnId());
+                                if((stSp && !oMapOriginalsId[stSp.Get_Id()]) || (endSp && !oMapOriginalsId[endSp.Get_Id()]) || !oMapOriginalsId[aAllConnectors[i].Get_Id()]){
+                                    aAllConnectors[i].calculateTransform(((oThis instanceof MoveInGroupState) || (oThis instanceof MoveState)));
+                                    var oGroup = aAllConnectors[i].getMainGroup();
+                                    if(oGroup){
+                                        oGroupMaps[oGroup.Id] = oGroup;
+                                    }
+                                }
+                            }
+                            for(var key in oGroupMaps){
+                                if(oGroupMaps.hasOwnProperty(key)){
+                                    oGroupMaps[key].updateCoordinatesAfterInternalResize();
+                                }
                             }
                         }
                         if(group)
@@ -755,7 +852,7 @@ ResizeState.prototype =
         }
         var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.getDrawingDocument());
         var resize_coef = this.majorObject.getResizeCoefficients(this.handleNum, coords.x, coords.y);
-        this.drawingObjects.trackResizeObjects(resize_coef.kd1, resize_coef.kd2, e);
+        this.drawingObjects.trackResizeObjects(resize_coef.kd1, resize_coef.kd2, e, x, y);
         this.drawingObjects.updateOverlay();
     },
 

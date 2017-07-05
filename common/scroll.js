@@ -199,10 +199,13 @@ CArrowDrawer.prototype.InitSize = function ( sizeW, sizeH, is_retina ) {
         this.SizeNaturalH <<= 1;
     }
 
-    this.ImageLeft = [document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' )];
-    this.ImageTop = [document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' )];
-    this.ImageRight = [document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' )];
-    this.ImageBottom = [document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' ), document.createElement( 'canvas' )];
+    if (null == this.ImageLeft || null == this.ImageTop || null == this.ImageRight || null == this.ImageBottom)
+	{
+		this.ImageLeft = [document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas')];
+		this.ImageTop = [document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas')];
+		this.ImageRight = [document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas')];
+		this.ImageBottom = [document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas'), document.createElement('canvas')];
+	}
 
     this.ImageLeft[ScrollOverType.NONE].width = this.SizeW;
     this.ImageLeft[ScrollOverType.NONE].height = this.SizeH;
@@ -1551,7 +1554,8 @@ function ScrollObject( elemID, settings, dbg ) {
         arrowSizeW: 13,
         arrowSizeH: 13,
         cornerRadius: 0,
-        slimScroll: false
+        slimScroll: false,
+        alwaysVisible: false
     };
 
     this.settings = extendSettings( settings, scrollSettings );
@@ -1619,8 +1623,7 @@ function ScrollObject( elemID, settings, dbg ) {
     this.startColorFadeOutStart = _HEXTORGB_(this.settings.scrollerColorOver).R;
     this.startColorFadeInOutStart = -1;
 
-    if ( window.devicePixelRatio == 2 )
-        this.IsRetina = true;
+    this.IsRetina = AscCommon.AscBrowser.isRetina;
 
     this.piperImgVert = [document.createElement( 'canvas' ), document.createElement( 'canvas' )];
     this.piperImgHor = [document.createElement( 'canvas' ), document.createElement( 'canvas' )];
@@ -1851,6 +1854,12 @@ ScrollObject.prototype = {
     },
     Repos:function ( settings, bIsHorAttack, bIsVerAttack )
     {
+		if (this.IsRetina != AscCommon.AscBrowser.isRetina)
+        {
+            this.IsRetina = AscCommon.AscBrowser.isRetina;
+            this.ArrowDrawer.InitSize(this.settings.arrowSizeH, this.settings.arrowSizeW, this.IsRetina);
+        }
+
         if (bIsVerAttack)
         {
             var _canvasH = settings.screenH;
@@ -1891,7 +1900,7 @@ ScrollObject.prototype = {
         this.paneHeight = this.canvasH - this.arrowPosition * 2;
         this.paneWidth = this.canvasW - this.arrowPosition * 2;
         this.RecalcScroller();
-        if ( this.isVerticalScroll ) {
+        if ( this.isVerticalScroll && !this.settings.alwaysVisible) {
 
             if (this.scrollVCurrentY > this.maxScrollY)
                 this.scrollVCurrentY = this.maxScrollY;
@@ -1910,7 +1919,7 @@ ScrollObject.prototype = {
                 this.scrollHCurrentX = this.maxScrollX;
 
             this.scrollToX( this.scrollHCurrentX );
-            if(this.maxScrollX == 0){
+            if(this.maxScrollX == 0 && !this.settings.alwaysVisible){
                 this.canvas.style.display = "none";
             }
             else{
@@ -2206,7 +2215,7 @@ ScrollObject.prototype = {
 
             startColorFadeIn -= 2;
 
-            if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
+            if ( that._checkPiperImagesV() ) {
                 x = that.scroller.x + (that.settings.slimScroll ? 2 : 3);
                 y = (that.scroller.y >> 0) + Math.floor( that.scroller.h / 2 ) - 6;
 
@@ -2226,7 +2235,7 @@ ScrollObject.prototype = {
 
                 img = that.piperImgVert[0];
             }
-            else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
+            else if ( that._checkPiperImagesH() ) {
                 x = (that.scroller.x >> 0) + Math.floor( that.scroller.w / 2 ) - 6;
                 y = that.scroller.y + (that.settings.slimScroll ? 2 : 3);
 
@@ -2257,7 +2266,7 @@ ScrollObject.prototype = {
                 that.fadeInActive = false;
                 that.startColorFadeInOutStart = startColorFadeIn + 2;
 
-                if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
+                if ( that._checkPiperImagesV() ) {
 
                     ctx_piperImg = that.piperImgVert[0].getContext( '2d' );
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgVert[0].width, that.piperImgVert[0].height );
@@ -2276,7 +2285,7 @@ ScrollObject.prototype = {
                     img = that.piperImgVert[0];
 
                 }
-                else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
+                else if ( that._checkPiperImagesH() ) {
 
                     ctx_piperImg = that.piperImgHor[0].getContext( '2d' );
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgHor[0].width, that.piperImgHor[0].height );
@@ -2324,7 +2333,7 @@ ScrollObject.prototype = {
 
             startColorFadeOut += 2;
 
-            if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
+            if ( that._checkPiperImagesV() ) {
                 x = that.scroller.x + (that.settings.slimScroll ? 2 : 3);
                 y = (that.scroller.y >> 0) + Math.floor( that.scroller.h / 2 ) - 6;
 
@@ -2346,7 +2355,7 @@ ScrollObject.prototype = {
                 img = that.piperImgVert[0];
 
             }
-            else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
+            else if ( that._checkPiperImagesH() ) {
                 x = (that.scroller.x >> 0) + Math.floor( that.scroller.w / 2 ) - 6;
                 y = that.scroller.y + (that.settings.slimScroll ? 2 : 3);
 
@@ -2377,7 +2386,7 @@ ScrollObject.prototype = {
                 that.startColorFadeInOutStart = startColorFadeOut - 2;
                 that.fadeOutActive = false;
 
-                if ( that.isVerticalScroll && that.maxScrollY != 0 ) {
+                if ( that._checkPiperImagesV() ) {
 
                     ctx_piperImg = that.piperImgVert[0].getContext( '2d' );
                     _data = ctx_piperImg.getImageData( 0, 0, that.piperImgVert[0].width, that.piperImgVert[0].height );
@@ -2396,7 +2405,7 @@ ScrollObject.prototype = {
                     img = that.piperImgVert[0];
 
                 }
-                else if ( that.isHorizontalScroll && that.maxScrollX != 0 ) {
+                else if ( that._checkPiperImagesH() ) {
                     x = (that.scroller.x >> 0) + Math.floor( that.scroller.w / 2 ) - 6;
                     y = that.scroller.y + 3;
 
@@ -2424,7 +2433,6 @@ ScrollObject.prototype = {
         }
 
         function drawScroller() {
-
 
             that.context.beginPath();
 
@@ -2599,11 +2607,11 @@ ScrollObject.prototype = {
             this.context.fill();
             this.context.stroke();
 
-            if ( this.isVerticalScroll && this.maxScrollY != 0 ) {
+            if ( this._checkPiperImagesV() ) {
                 this.context.drawImage( this.piperImgVert[piperImgIndex], this.scroller.x + (this.settings.slimScroll ? 2 : 3), (this.scroller.y >> 0) + Math.floor( this.scroller.h / 2 ) - 6 );
             }
-            else if ( this.isHorizontalScroll && this.maxScrollX != 0 ) {
-                this.context.drawImage( this.piperImgHor[piperImgIndex], (this.scroller.x >> 0) + Math.floor( this.scroller.w / 2 ) - 6, this.scroller.y + (this.settings.slimScroll ? 2 : 3) );
+            else if ( this._checkPiperImagesH() ) {
+			    this.context.drawImage( this.piperImgHor[piperImgIndex], (this.scroller.x >> 0) + Math.floor( this.scroller.w / 2 ) - 6, this.scroller.y + (this.settings.slimScroll ? 2 : 3) );
             }
 
         }
@@ -2611,6 +2619,18 @@ ScrollObject.prototype = {
         this.lastScrollerStatus = this.scrollerStatus;
 
     },
+
+    _checkPiperImagesV : function() {
+		if ( this.isVerticalScroll && this.maxScrollY != 0 && this.scroller.h >= 13 )
+			return true;
+		return false;
+    },
+    _checkPiperImagesH : function() {
+        if ( this.isHorizontalScroll && this.maxScrollX != 0 && this.scroller.w >= 13 )
+            return true;
+        return false;
+    },
+
     _drawArrow:function ( type ) {
         if ( this.settings.showArrows ) {
             var w = this.canvasW;
@@ -3252,7 +3272,7 @@ ScrollObject.prototype = {
         this.that.scrollByY( delta )
     },
     evt_click:function ( e ) {
-        var evt = e || windows.event;
+        var evt = e || window.event;
         var mousePos = this.that.getMousePosition( evt );
         if ( this.that.isHorizontalScroll ) {
             if ( mousePos.x > this.arrowPosition && mousePos.x < this.that.canvasW - this.that.arrowPosition ) {

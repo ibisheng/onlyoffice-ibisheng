@@ -44,7 +44,8 @@ function CHistory(Document)
     this.Document   = Document;
     this.Api                  = null;
     this.CollaborativeEditing = null;
-    this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
+    this.CanNotAddChanges = false; // флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
+	this.CollectChanges   = false;
 
 	this.RecalculateData =
 	{
@@ -211,7 +212,7 @@ CHistory.prototype =
                 oItem.Data.Undo();
             }
             oPoint.Items.length = _bottomIndex + 1;
-            this.Document.Set_SelectionState( oPoint.State );
+            this.Document.SetSelectionState( oPoint.State );
         }
     },
 
@@ -225,9 +226,9 @@ CHistory.prototype =
 
         // Запоминаем самое последнее состояние документа для Redo
         if ( this.Index === this.Points.length - 1 )
-            this.LastState = this.Document.Get_SelectionState();
+            this.LastState = this.Document.GetSelectionState();
         
-        this.Document.Selection_Remove(true);
+        this.Document.RemoveSelection(true);
 
         this.Internal_RecalcData_Clear();
 
@@ -270,8 +271,13 @@ CHistory.prototype =
         }
 
         if (null != Point)
-            this.Document.Set_SelectionState( Point.State );
-
+            this.Document.SetSelectionState( Point.State );
+		
+		if(!window['AscCommon'].g_clipboardBase.pasteStart)
+		{
+			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+		}
+		
         return this.RecalculateData;
     },
 
@@ -281,7 +287,7 @@ CHistory.prototype =
         if ( true != this.Can_Redo() )
             return null;
 
-        this.Document.Selection_Remove(true);
+        this.Document.RemoveSelection(true);
         
         var Point = this.Points[++this.Index];
 
@@ -307,8 +313,13 @@ CHistory.prototype =
         else
             State = this.Points[this.Index + 1].State;
 
-        this.Document.Set_SelectionState( State );
-
+        this.Document.SetSelectionState( State );
+		
+		if(!window['AscCommon'].g_clipboardBase.pasteStart)
+		{
+			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+		}
+		
         return this.RecalculateData;
     },
 
@@ -318,15 +329,16 @@ CHistory.prototype =
 			return;
 
         this.CanNotAddChanges = false;
+		this.CollectChanges   = false;
 
-        if (null !== this.SavedIndex && this.Index < this.SavedIndex)
+		if (null !== this.SavedIndex && this.Index < this.SavedIndex)
             this.Set_SavedIndex(this.Index);
 
         this.Clear_Additional();
 
         this.Check_UninonLastPoints();
         
-        var State = this.Document.Get_SelectionState();
+        var State = this.Document.GetSelectionState();
         var Items = [];
         var Time  = new Date().getTime();
 
@@ -342,6 +354,11 @@ CHistory.prototype =
 
         // Удаляем ненужные точки
         this.Points.length = this.Index + 1;
+		
+		if(!window['AscCommon'].g_clipboardBase.pasteStart)
+		{
+			window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+		}
     },
 
 	/**
@@ -358,11 +375,13 @@ CHistory.prototype =
 			Description : -1
 		};
 
-		this.Points.length = this.Index + 1;
+		this.Points.length  = this.Index + 1;
+		this.CollectChanges = true;
 	},
     
     Remove_LastPoint : function()
     {
+		this.CollectChanges = false;
         this.Index--;
         this.Points.length = this.Index + 1;
     },
@@ -661,7 +680,7 @@ CHistory.prototype =
             for (var Lvl = 0; Lvl < 9; ++Lvl)
             {
                 NumPr.Lvl = Lvl;
-                var AllParagraphs = this.Document.Get_AllParagraphsByNumbering(NumPr);
+                var AllParagraphs = this.Document.GetAllParagraphsByNumbering(NumPr);
                 var Count = AllParagraphs.length;
                 for (var Index = 0; Index < Count; ++Index)
                 {
@@ -962,8 +981,8 @@ CHistory.prototype =
             var Class = Items[0].Class;
             if (Class instanceof Paragraph)
                 Para = Class;
-            else if (Class.Get_Paragraph)
-                Para = Class.Get_Paragraph();
+            else if (Class.GetParagraph)
+                Para = Class.GetParagraph();
             else
                 return null;
 
@@ -976,9 +995,9 @@ CHistory.prototype =
                     if (Para != Class)
                         return null;
                 }
-                else if (Class.Get_Paragraph)
+                else if (Class.GetParagraph)
                 {
-                    if (Para != Class.Get_Paragraph())
+                    if (Para != Class.GetParagraph())
                         return null;
                 }
                 else
@@ -1077,7 +1096,7 @@ CHistory.prototype =
 
     _CheckCanNotAddChanges : function() {
         try {
-            if (this.CanNotAddChanges && this.Api) {
+            if (this.CanNotAddChanges && this.Api && !this.CollectChanges) {
                 var tmpErr = new Error();
                 if (tmpErr.stack) {
                     this.Api.CoAuthoringApi.sendChangesError(tmpErr.stack);
@@ -1153,7 +1172,7 @@ CHistory.prototype.GetAllParagraphsForRecalcData = function(Props)
 	if (!this.RecalculateData.AllParagraphs)
 	{
 		if (this.Document)
-			this.RecalculateData.AllParagraphs = this.Document.Get_AllParagraphs({All : true});
+			this.RecalculateData.AllParagraphs = this.Document.GetAllParagraphs({All : true});
 		else
 			this.RecalculateData.AllParagraphs = [];
 	}

@@ -206,6 +206,12 @@
 		Save : 2
 	};
 
+	var c_oAscRestrictionType = {
+		None : 0,
+		OnlyForms : 1,
+		OnlyComments : 2
+	};
+
 	// Режимы отрисовки
 	var c_oAscFontRenderingModeType = {
 		noHinting             : 1,
@@ -841,7 +847,8 @@
 		Change: 1,
 		ChangeFormula: 2,
 		EndCalculate: 3,
-		GetRangeCell: 4
+		GetRangeCell: 4,
+		IsDefName: 5
 	};
 
 	var c_oDashType = {
@@ -1033,34 +1040,37 @@
 	var locktype_Other2 = 4; // данный объект залочен другим(не текущим) пользователем (обновления уже пришли)
 	var locktype_Other3 = 5; // данный объект был залочен (обновления пришли) и снова стал залочен
 
-	var changestype_None                 = 0; // Ничего не происходит с выделенным элементом (проверка идет через дополнительный параметр)
-	var changestype_Paragraph_Content    = 1; // Добавление/удаление элементов в параграф
-	var changestype_Paragraph_Properties = 2; // Изменение свойств параграфа
-	var changestype_Document_Content     = 10; // Добавление/удаление элементов в Document или в DocumentContent
-	var changestype_Document_Content_Add = 11; // Добавление элемента в класс Document или в класс DocumentContent
-	var changestype_Document_SectPr      = 12; // Изменения свойств данной секции (размер страницы, поля и ориентация)
-	var changestype_Document_Styles      = 13; // Изменяем стили документа (добавление/удаление/модифицирование)
-	var changestype_Table_Properties     = 20; // Любые изменения в таблице
-	var changestype_Table_RemoveCells    = 21; // Удаление ячеек (строк или столбцов)
-	var changestype_Image_Properties     = 23; // Изменения настроек картинки
-	var changestype_HdrFtr               = 30; // Изменения в колонтитуле (любые изменения)
-	var changestype_Remove               = 40; // Удаление, через кнопку backspace (Удаление назад)
-	var changestype_Delete               = 41; // Удаление, через кнопку delete (Удаление вперед)
-	var changestype_Drawing_Props        = 51; // Изменение свойств фигуры
-	var changestype_ColorScheme          = 60; // Изменение свойств фигуры
-	var changestype_Text_Props           = 61; // Изменение свойств фигуры
-	var changestype_RemoveSlide          = 62; // Изменение свойств фигуры
-	var changestype_PresentationProps    = 63; // Изменение темы, цветовой схемы, размера слайда;
-	var changestype_Theme                = 64; // Изменение темы;
-	var changestype_SlideSize            = 65; // Изменение цветовой схемы;
-	var changestype_SlideBg              = 66; // Изменение цветовой схемы;
-	var changestype_SlideTiming          = 67; // Изменение цветовой схемы;
-	var changestype_MoveComment          = 68;
-	var changestype_AddSp                = 69;
-	var changestype_AddComment           = 70;
-	var changestype_Layout               = 71;
-	var changestype_AddShape             = 72;
-	var changestype_AddShapes            = 73;
+	var changestype_None                      = 0; // Ничего не происходит с выделенным элементом (проверка идет через дополнительный параметр)
+	var changestype_Paragraph_Content         = 1; // Добавление/удаление элементов в параграф
+	var changestype_Paragraph_Properties      = 2; // Изменение свойств параграфа
+	var changestype_Document_Content          = 10; // Добавление/удаление элементов в Document или в DocumentContent
+	var changestype_Document_Content_Add      = 11; // Добавление элемента в класс Document или в класс DocumentContent
+	var changestype_Document_SectPr           = 12; // Изменения свойств данной секции (размер страницы, поля и ориентация)
+	var changestype_Document_Styles           = 13; // Изменяем стили документа (добавление/удаление/модифицирование)
+	var changestype_Table_Properties          = 20; // Любые изменения в таблице
+	var changestype_Table_RemoveCells         = 21; // Удаление ячеек (строк или столбцов)
+	var changestype_Image_Properties          = 23; // Изменения настроек картинки
+	var changestype_ContentControl_Remove     = 24; // Удаление контейнера целиком
+	var changestype_ContentControl_Properties = 25; // Изменение свойств контейнера
+	var changestype_HdrFtr                    = 30; // Изменения в колонтитуле (любые изменения)
+	var changestype_Remove                    = 40; // Удаление, через кнопку backspace (Удаление назад)
+	var changestype_Delete                    = 41; // Удаление, через кнопку delete (Удаление вперед)
+	var changestype_Drawing_Props             = 51; // Изменение свойств фигуры
+	var changestype_ColorScheme               = 60; // Изменение свойств фигуры
+	var changestype_Text_Props                = 61; // Изменение свойств фигуры
+	var changestype_RemoveSlide               = 62; // Изменение свойств фигуры
+	var changestype_PresentationProps         = 63; // Изменение темы, цветовой схемы, размера слайда;
+	var changestype_Theme                     = 64; // Изменение темы;
+	var changestype_SlideSize                 = 65; // Изменение цветовой схемы;
+	var changestype_SlideBg                   = 66; // Изменение цветовой схемы;
+	var changestype_SlideTiming               = 67; // Изменение цветовой схемы;
+	var changestype_MoveComment               = 68;
+	var changestype_AddSp                     = 69;
+	var changestype_AddComment                = 70;
+	var changestype_Layout                    = 71;
+	var changestype_AddShape                  = 72;
+	var changestype_AddShapes                 = 73;
+	var changestype_PresDefaultLang           = 74;
 
 	var changestype_2_InlineObjectMove       = 1; // Передвигаем объект в заданную позцию (проверяем место, в которое пытаемся передвинуть)
 	var changestype_2_HdrFtr                 = 2; // Изменения с колонтитулом
@@ -1074,7 +1084,38 @@
 
 
 	var offlineMode = '_offline_';
+	
+	var c_oSpecialPasteProps = {
+		paste: 0,
+		pasteOnlyFormula: 1,
+		formulaNumberFormat: 2,
+		formulaAllFormatting: 3,
+		formulaWithoutBorders: 4, 
+		formulaColumnWidth: 5,
+		mergeConditionalFormating: 6, 
+		pasteOnlyValues: 7,
+		valueNumberFormat: 8,
+		valueAllFormating: 9,
+		pasteOnlyFormating: 10,
+		transpose: 11,
+		link: 12,
+		picture: 13,
+		linkedPicture: 14,
 
+		sourceformatting: 15,
+		destinationFormatting: 16,
+		
+		mergeFormatting: 17,
+
+		uniteList: 18,
+		doNotUniteList: 19,
+
+		insertAsNestedTable: 20,
+		uniteIntoTable: 21,
+		insertAsNewRows: 22,
+		keepTextOnly: 23
+	};
+	
 	//------------------------------------------------------------export--------------------------------------------------
 	var prot;
 	window['Asc']                          = window['Asc'] || {};
@@ -1645,6 +1686,11 @@
 	prot['Top']    = c_oAscMathInterfaceGroupCharPos.Top;
 	prot['Bottom'] = c_oAscMathInterfaceGroupCharPos.Bottom;
 
+	prot = window['Asc']['c_oAscRestrictionType'] = window['Asc'].c_oAscRestrictionType = c_oAscRestrictionType;
+	prot['None'] = c_oAscRestrictionType.None;
+	prot['OnlyForms'] = c_oAscRestrictionType.OnlyForms;
+	prot['OnlyComments'] = c_oAscRestrictionType.OnlyComments;
+
     window['AscCommon']                             = window['AscCommon'] || {};
 	window["AscCommon"].g_cCharDelimiter            = g_cCharDelimiter;
 	window["AscCommon"].g_cGeneralFormat            = g_cGeneralFormat;
@@ -1693,43 +1739,70 @@
 	window["AscCommon"].locktype_Other2 = locktype_Other2;
 	window["AscCommon"].locktype_Other3 = locktype_Other3;
 
-	window["AscCommon"].changestype_None                     = changestype_None;
-	window["AscCommon"].changestype_Paragraph_Content        = changestype_Paragraph_Content;
-	window["AscCommon"].changestype_Paragraph_Properties     = changestype_Paragraph_Properties;
-	window["AscCommon"].changestype_Document_Content         = changestype_Document_Content;
-	window["AscCommon"].changestype_Document_Content_Add     = changestype_Document_Content_Add;
-	window["AscCommon"].changestype_Document_SectPr          = changestype_Document_SectPr;
-	window["AscCommon"].changestype_Document_Styles          = changestype_Document_Styles;
-	window["AscCommon"].changestype_Table_Properties         = changestype_Table_Properties;
-	window["AscCommon"].changestype_Table_RemoveCells        = changestype_Table_RemoveCells;
-	window["AscCommon"].changestype_Image_Properties         = changestype_Image_Properties;
-	window["AscCommon"].changestype_HdrFtr                   = changestype_HdrFtr;
-	window["AscCommon"].changestype_Remove                   = changestype_Remove;
-	window["AscCommon"].changestype_Delete                   = changestype_Delete;
-	window["AscCommon"].changestype_Drawing_Props            = changestype_Drawing_Props;
-	window["AscCommon"].changestype_ColorScheme              = changestype_ColorScheme;
-	window["AscCommon"].changestype_Text_Props               = changestype_Text_Props;
-	window["AscCommon"].changestype_RemoveSlide              = changestype_RemoveSlide;
-	window["AscCommon"].changestype_Theme                    = changestype_Theme;
-	window["AscCommon"].changestype_SlideSize                = changestype_SlideSize;
-	window["AscCommon"].changestype_SlideBg                  = changestype_SlideBg;
-	window["AscCommon"].changestype_SlideTiming              = changestype_SlideTiming;
-	window["AscCommon"].changestype_MoveComment              = changestype_MoveComment;
-	window["AscCommon"].changestype_AddComment               = changestype_AddComment;
-	window["AscCommon"].changestype_Layout                   = changestype_Layout;
-	window["AscCommon"].changestype_AddShape                 = changestype_AddShape;
-	window["AscCommon"].changestype_AddShapes                = changestype_AddShapes;
-	window["AscCommon"].changestype_2_InlineObjectMove       = changestype_2_InlineObjectMove;
-	window["AscCommon"].changestype_2_HdrFtr                 = changestype_2_HdrFtr;
-	window["AscCommon"].changestype_2_Comment                = changestype_2_Comment;
-	window["AscCommon"].changestype_2_Element_and_Type       = changestype_2_Element_and_Type;
-	window["AscCommon"].changestype_2_ElementsArray_and_Type = changestype_2_ElementsArray_and_Type;
-	window["AscCommon"].changestype_2_AdditionalTypes        = changestype_2_AdditionalTypes;
-	window["AscCommon"].contentchanges_Add                   = contentchanges_Add;
-	window["AscCommon"].contentchanges_Remove                = contentchanges_Remove;
+	window["AscCommon"].changestype_None                      = changestype_None;
+	window["AscCommon"].changestype_Paragraph_Content         = changestype_Paragraph_Content;
+	window["AscCommon"].changestype_Paragraph_Properties      = changestype_Paragraph_Properties;
+	window["AscCommon"].changestype_Document_Content          = changestype_Document_Content;
+	window["AscCommon"].changestype_Document_Content_Add      = changestype_Document_Content_Add;
+	window["AscCommon"].changestype_Document_SectPr           = changestype_Document_SectPr;
+	window["AscCommon"].changestype_Document_Styles           = changestype_Document_Styles;
+	window["AscCommon"].changestype_Table_Properties          = changestype_Table_Properties;
+	window["AscCommon"].changestype_Table_RemoveCells         = changestype_Table_RemoveCells;
+	window["AscCommon"].changestype_Image_Properties          = changestype_Image_Properties;
+	window["AscCommon"].changestype_ContentControl_Remove     = changestype_ContentControl_Remove;
+	window["AscCommon"].changestype_ContentControl_Properties = changestype_ContentControl_Properties;
+	window["AscCommon"].changestype_HdrFtr                    = changestype_HdrFtr;
+	window["AscCommon"].changestype_Remove                    = changestype_Remove;
+	window["AscCommon"].changestype_Delete                    = changestype_Delete;
+	window["AscCommon"].changestype_Drawing_Props             = changestype_Drawing_Props;
+	window["AscCommon"].changestype_ColorScheme               = changestype_ColorScheme;
+	window["AscCommon"].changestype_Text_Props                = changestype_Text_Props;
+	window["AscCommon"].changestype_RemoveSlide               = changestype_RemoveSlide;
+	window["AscCommon"].changestype_Theme                     = changestype_Theme;
+	window["AscCommon"].changestype_SlideSize                 = changestype_SlideSize;
+	window["AscCommon"].changestype_SlideBg                   = changestype_SlideBg;
+	window["AscCommon"].changestype_SlideTiming               = changestype_SlideTiming;
+	window["AscCommon"].changestype_MoveComment               = changestype_MoveComment;
+	window["AscCommon"].changestype_AddComment                = changestype_AddComment;
+	window["AscCommon"].changestype_Layout                    = changestype_Layout;
+	window["AscCommon"].changestype_AddShape                  = changestype_AddShape;
+	window["AscCommon"].changestype_AddShapes                 = changestype_AddShapes;
+	window["AscCommon"].changestype_PresDefaultLang           = changestype_PresDefaultLang;
+	window["AscCommon"].changestype_2_InlineObjectMove        = changestype_2_InlineObjectMove;
+	window["AscCommon"].changestype_2_HdrFtr                  = changestype_2_HdrFtr;
+	window["AscCommon"].changestype_2_Comment                 = changestype_2_Comment;
+	window["AscCommon"].changestype_2_Element_and_Type        = changestype_2_Element_and_Type;
+	window["AscCommon"].changestype_2_ElementsArray_and_Type  = changestype_2_ElementsArray_and_Type;
+	window["AscCommon"].changestype_2_AdditionalTypes         = changestype_2_AdditionalTypes;
+	window["AscCommon"].contentchanges_Add                    = contentchanges_Add;
+	window["AscCommon"].contentchanges_Remove                 = contentchanges_Remove;
 
 	window["AscCommon"].offlineMode = offlineMode;
-
+	
+	window['Asc']['c_oSpecialPasteProps'] = window['Asc'].c_oSpecialPasteProps = c_oSpecialPasteProps;
+	prot = c_oSpecialPasteProps;
+	prot['paste'] = prot.paste;
+	prot['pasteOnlyFormula'] = prot.pasteOnlyFormula;
+	prot['formulaNumberFormat'] = prot.formulaNumberFormat;
+	prot['formulaAllFormatting'] = prot.formulaAllFormatting;
+	prot['formulaWithoutBorders'] = prot.formulaWithoutBorders;
+	prot['formulaColumnWidth'] = prot.formulaColumnWidth;
+	prot['mergeConditionalFormating'] = prot.mergeConditionalFormating;
+	prot['pasteOnlyValues'] = prot.pasteOnlyValues;
+	prot['valueNumberFormat'] = prot.valueNumberFormat;
+	prot['valueAllFormating'] = prot.valueAllFormating;
+	prot['pasteOnlyFormating'] = prot.pasteOnlyFormating;
+	prot['transpose'] = prot.transpose;
+	prot['link'] = prot.link;
+	prot['picture'] = prot.picture;
+	prot['linkedPicture'] = prot.linkedPicture;
+	prot['sourceformatting'] = prot.sourceformatting;
+	prot['destinationFormatting'] = prot.destinationFormatting;
+	prot['mergeFormatting'] = prot.mergeFormatting;
+	prot['uniteList'] = prot.uniteList;
+	prot['doNotUniteList'] = prot.doNotUniteList;
+	prot['keepTextOnly'] = prot.keepTextOnly;
+	
 	// ----------------------------- plugins ------------------------------- //
 	var EPluginDataType =
 		{
@@ -1760,6 +1833,7 @@
 		this.isVisual     = false;      // визуальный ли
 		this.isModal      = false;      // модальное ли окно (используется только для визуального)
 		this.isInsideMode = false;      // отрисовка не в окне а внутри редактора (в панели) (используется только для визуального немодального)
+		this.isCustomWindow = false;	// ued only if this.isModal == true
 
 		this.initDataType = EPluginDataType.none;
 		this.initData     = "";
@@ -1840,6 +1914,14 @@
 	{
 		this.isInsideMode = value;
 	};
+	CPluginVariation.prototype["get_CustomWindow"] = function()
+	{
+		return this.isCustomWindow;
+	};
+	CPluginVariation.prototype["set_CustomWindow"] = function(value)
+	{
+		this.isCustomWindow = value;
+	};
 
 	CPluginVariation.prototype["get_InitDataType"] = function()
 	{
@@ -1905,6 +1987,7 @@
 		_object["isVisual"]     = this.isVisual;
 		_object["isModal"]      = this.isModal;
 		_object["isInsideMode"] = this.isInsideMode;
+		_object["isCustomWindow"] = this.isCustomWindow;
 
 		_object["initDataType"] = this.initDataType;
 		_object["initData"]     = this.initData;
@@ -1931,6 +2014,7 @@
 		this.isVisual     = (_object["isVisual"] != null) ? _object["isVisual"] : this.isVisual;
 		this.isModal      = (_object["isModal"] != null) ? _object["isModal"] : this.isModal;
 		this.isInsideMode = (_object["isInsideMode"] != null) ? _object["isInsideMode"] : this.isInsideMode;
+		this.isCustomWindow = (_object["isCustomWindow"] != null) ? _object["isCustomWindow"] : this.isCustomWindow;
 
 		this.initDataType = (_object["initDataType"] != null) ? _object["initDataType"] : this.initDataType;
 		this.initData     = (_object["initData"] != null) ? _object["initData"] : this.initData;

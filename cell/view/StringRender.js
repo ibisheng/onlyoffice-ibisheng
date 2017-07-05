@@ -147,7 +147,6 @@
 			this.charWidths = [];
 			this.charProps = [];
 			this.lines = [];
-			this.ratio = 1;
             this.angle = 0;
 
             this.fontNeedUpdate = false;
@@ -159,8 +158,6 @@
 			this.reSpace = /[\n\r\u2028\u2029\t\v\f\u0020\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2008\u2009\u200A\u200B\u205F\u3000]/;
 			/** @type RegExp */
 			this.reReplaceNL =  /\r?\n|\r/g;
-			/** @type RegExp */
-			this.reReplaceTab = /[\t\v\f]/g;
 
 				// For hyphenation
 			/** @type RegExp */
@@ -201,7 +198,7 @@
 		/**
 		 * Setups one or more strings to process on
 		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
-		 * @param {Object} flags  Optional. Text flags {wrapText, shrinkToFit, isMerged, textAlign}
+		 * @param {AscCommonExcel.CellFlags} flags  Optional.
 		 * @return {StringRender}  Returns 'this' to allow chaining
 		 */
 		StringRender.prototype.setString = function(str, flags) {
@@ -465,7 +462,7 @@
 		/**
 		 * Measures string
 		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
-		 * @param {Object} [flags]      Optional. Text flags {wrapText, shrinkToFit, isMerged, textAlign}
+		 * @param {AscCommonExcel.CellFlags} [flags]      Optional.
 		 * @param {Number} [maxWidth]   Optional. Text width restriction
 		 * @return {Asc.TextMetrics}  Returns text metrics or null. @see Asc.TextMetrics
 		 */
@@ -479,7 +476,7 @@
 		/**
 		 * Draw string
 		 * @param {String|Array} str  A simple string or array of formatted strings {text:"", format:{}}
-		 * @param {Object} flags  Optional. Text flags {wrapText, shrinkToFit, isMerged, textAlign}
+		 * @param {AscCommonExcel.CellFlags} flags  Optional.
 		 * @param {Number} x  Left of the text rect
 		 * @param {Number} y  Top of the text rect
 		 * @param {Number} maxWidth  Text width restriction
@@ -510,7 +507,6 @@
 			this.charWidths = [];
 			this.charProps = [];
 			this.lines = [];
-			this.ratio = 1;
 		};
 
 		/**
@@ -547,7 +543,7 @@
 			for (var w = 0, i = startCh; i <= endCh; ++i) {
 				w += this.charWidths[i];
 			}
-			return w * this.ratio;
+			return w;
 		};
 
 		/**
@@ -577,7 +573,7 @@
 				tw += this.charWidths[j];
 			}
 
-			return tw * this.ratio;
+			return tw;
 		};
 
 		StringRender.prototype._calcLineMetrics = function (f, va, fm) {
@@ -963,10 +959,20 @@
 		 * @return {Asc.TextMetrics}
 		 */
 		StringRender.prototype._doMeasure = function(maxWidth) {
+			var ratio, format, size, canReduce = true, minSize = 2.5;
 			var tm = this._measureChars(maxWidth);
-			if (this.flags && this.flags.shrinkToFit && tm.width > maxWidth) {
-				this.ratio = maxWidth / tm.width;
-				tm.width = maxWidth;
+			while (this.flags && this.flags.shrinkToFit && tm.width > maxWidth && canReduce) {
+				canReduce = false;
+				ratio = maxWidth / tm.width;
+				for (var i = 0; i < this.fragments.length; ++i) {
+					format = this.fragments[i].format = this.fragments[i].format.clone();
+					size = Math.max(minSize, Math.floor(format.getSize() * ratio * 2) / 2);
+					format.setSize(size);
+					if (minSize < size) {
+						canReduce = true;
+					}
+				}
+				tm = this._measureChars(maxWidth);
 			}
 			return tm;
 		};
@@ -983,7 +989,6 @@
 			var ctx = (undefined !== drawingCtx) ? drawingCtx : this.drawingCtx;
 			var ppix = ctx.getPPIX();
 			var ppiy = ctx.getPPIY();
-			var shrink = this.flags && this.flags.shrinkToFit;
 			var align  = this.flags ? this.flags.textAlign : null;
 			var i, j, p, p_, f, f_, strBeg;
 			var n = 0, l = this.lines[0], x1 = l ? initX(0) : 0, y1 = y, dx = l ? computeWordDeltaX() : 0;
@@ -1035,7 +1040,7 @@
 
 				if (isSO || ul) {
 					x2 = asc_calcnpt(x1 + dw, ppix);
-					fsz = prop.font.FontSize * self.ratio;
+					fsz = prop.font.FontSize;
 					lw = asc_round(fsz * ppiy / 72 / 18) || 1;
 					ctx.setStrokeStyle(prop.c || textColor)
 					   .setLineWidth(lw)
@@ -1074,8 +1079,6 @@
 					if (p.font) {
 						// change canvas font style
 						f = p.font.clone();
-						// ToDo не особо правильно работает shrink
-						if (shrink) {f.FontSize *= this.ratio;}
 
                         if (!f.isEqual(f_) || this.fontNeedUpdate) {
                             ctx.setFont(f, this.angle);
@@ -1125,8 +1128,7 @@
                 chars       : this.chars,
                 charWidths  : this.charWidths,
                 charProps   : this.charProps,
-                lines       : this.lines,
-                ratio       : this.ratio
+                lines       : this.lines
             };
         };
 
@@ -1138,7 +1140,6 @@
 			this.charWidths  = state.charWidths;
 			this.charProps   = state.charProps;
 			this.lines       = state.lines;
-			this.ratio       = state.ratio;
 			return this;
 		};
 

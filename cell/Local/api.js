@@ -73,6 +73,8 @@ var c_oAscError = Asc.c_oAscError;
 		AscCommon.History.UserSaveMode = true;
 		
 		DesktopOfflineUpdateLocalName(this);
+
+		window["DesktopAfterOpen"](this);
 		
 		this.onUpdateDocumentModified(AscCommon.History.Have_Changes());
 	};
@@ -114,9 +116,16 @@ var c_oAscError = Asc.c_oAscError;
 window["Asc"]['spreadsheet_api'].prototype.asc_setAdvancedOptions = function(idOption, option) 
 {
 	if (window["Asc"].c_oAscAdvancedOptionsID.CSV === idOption) {
+		var delimiter = option.asc_getDelimiter();
+		var delimiterChar = option.asc_getDelimiterChar();
         var _param = "";
 	    _param += ("<m_nCsvTxtEncoding>" + option.asc_getCodePage() + "</m_nCsvTxtEncoding>");
-	    _param += ("<m_nCsvDelimiter>" + option.asc_getDelimiter() + "</m_nCsvDelimiter>");
+		if (null != delimiter) {
+			_param += ("<m_nCsvDelimiter>" + delimiter + "</m_nCsvDelimiter>");
+		}
+		if (null != delimiterChar) {
+			_param += ("<m_nCsvDelimiterChar>" + delimiterChar + "</m_nCsvDelimiterChar>");
+		}
 
 		window["AscDesktopEditor"]["SetAdvancedOptions"](_param);
 	}
@@ -264,6 +273,16 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	
 	if (2 == error)
 		window["Asc"]["editor"].sendEvent("asc_onError", c_oAscError.ID.ConvertationSaveError, c_oAscError.Level.NoCritical);
+
+	if (0 == error)
+	{
+		if (window.SaveQuestionObjectBeforeSign)
+		{
+			var _obj = window.SaveQuestionObjectBeforeSign;
+			editor.sendEvent("asc_onSignatureClick", _obj.guid, _obj.width, _obj.height);
+			window.SaveQuestionObjectBeforeSign = null;
+		}
+	}
 };
 
 window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;

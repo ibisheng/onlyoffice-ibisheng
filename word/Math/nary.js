@@ -537,7 +537,7 @@ CNary.prototype.raw_HideUpperIterator = function(Value)
         this.RecalcInfo.bProps = true;
 
         this.CurPos = 2;
-        this.Arg.Cursor_MoveToStartPos();
+        this.Arg.MoveCursorToStartPos();
     }
 };
 CNary.prototype.raw_HideLowerIterator = function(Value)
@@ -548,7 +548,7 @@ CNary.prototype.raw_HideLowerIterator = function(Value)
         this.RecalcInfo.bProps = true;
 
         this.CurPos = 2;
-        this.Arg.Cursor_MoveToStartPos();
+        this.Arg.MoveCursorToStartPos();
     }
 };
 CNary.prototype.Is_ContentUse = function(MathContent)

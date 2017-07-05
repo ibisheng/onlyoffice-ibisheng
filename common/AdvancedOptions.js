@@ -94,12 +94,15 @@
 		asc_CTXTOptions.prototype.asc_getRecommendedSettings = function () { return this.recommendedSettings; };
 
 		/** @constructor */
-		function asc_CCSVAdvancedOptions(codepage,delimiter){
+		function asc_CCSVAdvancedOptions(codepage, delimiter, delimiterChar){
 			this.codePage = codepage;
 			this.delimiter = delimiter;
+			this.delimiterChar = delimiterChar;
 		}
 		asc_CCSVAdvancedOptions.prototype.asc_getDelimiter = function(){return this.delimiter;};
 		asc_CCSVAdvancedOptions.prototype.asc_setDelimiter = function(v){this.delimiter = v;};
+		asc_CCSVAdvancedOptions.prototype.asc_getDelimiterChar = function(){return this.delimiterChar;};
+		asc_CCSVAdvancedOptions.prototype.asc_setDelimiterChar = function(v){this.delimiterChar = v;};
 		asc_CCSVAdvancedOptions.prototype.asc_getCodePage = function(){return this.codePage;};
 		asc_CCSVAdvancedOptions.prototype.asc_setCodePage = function(v){this.codePage = v;};
 		
@@ -154,16 +157,12 @@
 		/** @constructor */
 		function asc_CFormula(o){
 			this.name = o.name;
-			this.arg = o.args;
 		}
 		asc_CFormula.prototype.asc_getName = function () {
 			return this.name;
 		};
 		asc_CFormula.prototype.asc_getLocaleName = function () {
 			return AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale[this.name] : this.name;
-		};
-		asc_CFormula.prototype.asc_getArguments = function () {
-			return this.arg;
 		};
 
 		//----------------------------------------------------------export----------------------------------------------------
@@ -187,6 +186,8 @@
 		prot = asc_CCSVAdvancedOptions.prototype;
 		prot["asc_getDelimiter"] = prot.asc_getDelimiter;
 		prot["asc_setDelimiter"] = prot.asc_setDelimiter;
+		prot["asc_getDelimiterChar"] = prot.asc_getDelimiterChar;
+		prot["asc_setDelimiterChar"] = prot.asc_setDelimiterChar;
 		prot["asc_getCodePage"] = prot.asc_getCodePage;
 		prot["asc_setCodePage"] = prot.asc_setCodePage;
 
@@ -222,6 +223,5 @@
 		prot = asc_CFormula.prototype;
 		prot["asc_getName"]				= prot.asc_getName;
 		prot["asc_getLocaleName"]	= prot.asc_getLocaleName;
-		prot["asc_getArguments"]		= prot.asc_getArguments;
 	}
 )(window);

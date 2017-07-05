@@ -1078,6 +1078,41 @@ Geometry.prototype=
         this.rectS.b = b;
     },
 
+    findConnector: function(x, y, distanse){
+        var dx, dy;
+        for(var i = 0; i < this.cnxLst.length; i++)
+        {
+            dx=x-this.cnxLst[i].x;
+            dy=y-this.cnxLst[i].y;
+
+            if(Math.sqrt(dx*dx+dy*dy) < distanse)
+            {
+                return {idx: i, ang: this.cnxLst[i].ang, x: this.cnxLst[i].x, y: this.cnxLst[i].y};
+            }
+        }
+        return null;
+    },
+
+
+    drawConnectors: function(overlay, transform){
+
+        var dOldAlpha;
+
+        var oGraphics = overlay.Graphics ? overlay.Graphics : overlay;
+        if(AscFormat.isRealNumber(oGraphics.globalAlpha) && oGraphics.put_GlobalAlpha){
+            dOldAlpha = oGraphics.globalAlpha;
+            oGraphics.put_GlobalAlpha(false, 1);
+        }
+        for(var i = 0; i < this.cnxLst.length; i++)
+        {
+            overlay.DrawEditWrapPointsPolygon([{x: this.cnxLst[i].x, y: this.cnxLst[i].y}], transform);
+        }
+        if(AscFormat.isRealNumber(dOldAlpha) && oGraphics.put_GlobalAlpha){
+            oGraphics.put_GlobalAlpha(true, dOldAlpha);
+        }
+
+    },
+
     Recalculate: function(w, h, bResetPathsInfo)
     {
         this.gdLst["_3cd4"]= 16200000;

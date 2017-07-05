@@ -1629,7 +1629,7 @@
 				for(var i = 0; i < tableParts.length; i++)
 					changeFilter(tableParts[i], true);
 				
-				if(displayNameFormatTable && type == 'insCell')
+				if(displayNameFormatTable && type === 'insCell')
 				{
 					redrawTablesArr = redrawTablesArr.concat(this.insertLastTableRow(displayNameFormatTable, activeRange));
 				}
@@ -2523,6 +2523,21 @@
 					{	
 						if(val === false)//снимаем галку - удаляем строку итогов
 						{
+							//TODO раскомментировать и протестить(для бага 34740)
+							/*var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
+							this._clearRange(clearRange, true);
+
+							if(!this._isPartTablePartsUnderRange(tablePart.Ref))
+							{
+								worksheet.getRange3(tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2).deleteCellsShiftUp();
+								bAddHistoryPoint = false;
+							}
+							else
+							{
+								tablePart.changeRef(null, -1, null, true);
+								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+							}*/
+
 							var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
 							this._clearRange(clearRange, true);
 							
@@ -2531,9 +2546,36 @@
 						}
 						else
 						{
-							//если сверху пустая строка, то просто увеличиваем диапазон и меняем флаг
-							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1); 
-							if(this._isEmptyRange(rangeUpTable, 0) && this.searchRangeInTableParts(rangeUpTable) === -1)
+							//TODO раскомментировать и протестить(для бага 34740)
+							/*var partTableUnderRange = this._isPartTablePartsUnderRange(tablePart.Ref);
+							var rangeUnderTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+							if(!partTableUnderRange)
+							{
+								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
+
+								isSetValue = true;
+								isSetType = true;
+
+								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+								tablePart.changeRef(null, 1, null, true);
+							}
+							else if(partTableUnderRange && this._isEmptyRange(rangeUnderTable, 0))
+							{
+								isSetValue = true;
+								isSetType = true;
+
+								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+								tablePart.changeRef(null, 1, null, true);
+							}
+							else
+							{
+								alert("error");
+							}*/
+
+
+							//если снизу пустая строка, то просто увеличиваем диапазон и меняем флаг
+							var rangeUnderTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1);
+							if(this._isEmptyRange(rangeUnderTable, 0) && this.searchRangeInTableParts(rangeUnderTable) === -1)
 							{
 								isSetValue = true;
 								isSetType = true;
@@ -4393,14 +4435,10 @@
 							}
 						}
 					}
-					
-					if(!style.Name || (style.Name && !worksheet.workbook.TableStyles.AllStyles[style.Name]))
-					{
+
+					styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name];
+					if (!styleForCurTable) {
 						return;
-					}
-					else
-					{
-						styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name]
 					}
 					
 					//заполняем стили
@@ -5024,7 +5062,49 @@
 				
 				return result;
 			},
-			
+
+			bIsExcludeHiddenRows: function(range, activeCell)
+			{
+				var worksheet = this.worksheet;
+				var result = false;
+
+				//если есть общий фильтр со скрытыми строками, чтобы мы не удаляли на странице, данные в скрытых строках не трогаем
+				if(worksheet.AutoFilter && worksheet.AutoFilter.isApplyAutoFilter())
+				{
+					result = true;
+				}
+				else if(this._getTableIntersectionWithActiveCell(activeCell, true))//если activeCell лежит внутри таблицы c примененным фильтром
+				{
+					result = true;
+				}
+
+				return result;
+			},
+
+			_getTableIntersectionWithActiveCell: function(activeCell, checkApplyFiltering)
+			{
+				var result = false;
+
+				var worksheet = this.worksheet;
+				if(worksheet.TableParts && worksheet.TableParts.length > 0)
+				{
+					for(var i = 0; i < worksheet.TableParts.length; i++)
+					{
+						var ref = worksheet.TableParts[i].Ref;
+						if(ref.contains(activeCell.col, activeCell.row))
+						{
+							if(checkApplyFiltering && worksheet.TableParts[i].isApplyAutoFilter())
+							{
+								result = worksheet.TableParts[i];
+								break;
+							}
+						}
+					}
+				}
+
+				return result;
+			},
+
 			_isPartAutoFilterUnderRange: function(range)
 			{
 				var worksheet = this.worksheet;

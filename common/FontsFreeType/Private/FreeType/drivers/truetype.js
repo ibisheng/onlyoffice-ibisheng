@@ -1094,7 +1094,7 @@ function TT_Vary_Get_Glyph_Deltas(face, glyph_index, n_points)
         stream.cur = here;
     }
 
-    for ( i = 0; i < ( tupleCount & GX_TC_TUPLE_COUNT_MASK ); ++i )
+    for ( i = 0; i < ( tupleCount & FT_Common.GX_TC_TUPLE_COUNT_MASK ); ++i )
     {
         var tupleDataSize = stream.GetUShort();
         var tupleIndex    = stream.GetUShort();

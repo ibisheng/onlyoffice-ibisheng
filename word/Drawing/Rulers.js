@@ -1096,7 +1096,7 @@ function CHorRuler()
         var hor_ruler = word_control.m_oTopRuler_horRuler;
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
 
-        var _x = global_mouseEvent.X - 5 * g_dKoef_mm_to_pix - left - word_control.X - word_control.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix;
+        var _x = global_mouseEvent.X - 5 * g_dKoef_mm_to_pix - left - word_control.X - word_control.GetMainContentBounds().L * g_dKoef_mm_to_pix;
         _x *= dKoefPxToMM;
         var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
 
@@ -1821,7 +1821,7 @@ function CHorRuler()
         var dKoefPxToMM = 100 * g_dKoef_pix_to_mm / word_control.m_nZoomValue;
         var dKoef_mm_to_pix = g_dKoef_mm_to_pix * this.m_dZoom;
         
-        var _x = global_mouseEvent.X - 5 * g_dKoef_mm_to_pix - left - word_control.X - word_control.m_oMainContent.AbsolutePosition.L * g_dKoef_mm_to_pix;
+        var _x = global_mouseEvent.X - 5 * g_dKoef_mm_to_pix - left - word_control.X - word_control.GetMainContentBounds().L * g_dKoef_mm_to_pix;
         _x *= dKoefPxToMM;
         var _y = (global_mouseEvent.Y - word_control.Y) * g_dKoef_pix_to_mm;
 
@@ -2223,7 +2223,7 @@ function CHorRuler()
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphTabs);
-            this.m_oWordControl.m_oLogicDocument.Set_ParagraphTabs(_arr);
+            this.m_oWordControl.m_oLogicDocument.SetParagraphTabs(_arr);
         }
     }
 
@@ -2232,7 +2232,7 @@ function CHorRuler()
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphIndentFromRulers);
-            this.m_oWordControl.m_oLogicDocument.Set_ParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
+            this.m_oWordControl.m_oLogicDocument.SetParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
                 FirstLine: (this.m_dIndentLeftFirst - this.m_dIndentLeft) } );
             this.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
         }
@@ -2244,7 +2244,7 @@ function CHorRuler()
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetDocumentMargin_Hor);
             this.m_oWordControl.m_oLogicDocument.Set_DocumentMargin( { Left : this.m_dMarginLeft, Right : this.m_dMarginRight });
         }
-        //oWordControl.m_oLogicDocument.Set_ParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
+        //oWordControl.m_oLogicDocument.SetParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
         //    FirstLine: (this.m_dIndentLeftFirst - this.m_dIndentLeft) } );
     }
 
@@ -3478,7 +3478,7 @@ function CVerRuler()
 
         var _y = global_mouseEvent.Y - 7 * g_dKoef_mm_to_pix - top - word_control.Y;
         _y *= dKoefPxToMM;
-        var _x = (global_mouseEvent.X - word_control.X) * g_dKoef_pix_to_mm - word_control.m_oMainContent.AbsolutePosition.L;
+        var _x = (global_mouseEvent.X - word_control.X) * g_dKoef_pix_to_mm - word_control.GetMainContentBounds().L;
 
         this.DragType = this.CheckMouseType(_x, _y);
 

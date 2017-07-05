@@ -97,13 +97,13 @@ function CGroupShape()
         return AscDFH.historyitem_type_GroupShape;
     };
 
-    CGroupShape.prototype.Get_AllDrawingObjects = function(DrawingObjects)
+    CGroupShape.prototype.GetAllDrawingObjects = function(DrawingObjects)
     {
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            if(this.spTree[i].Get_AllDrawingObjects)
+            if(this.spTree[i].GetAllDrawingObjects)
             {
-                this.spTree[i].Get_AllDrawingObjects(DrawingObjects);
+                this.spTree[i].GetAllDrawingObjects(DrawingObjects);
             }
         }
     };
@@ -181,7 +181,7 @@ function CGroupShape()
                 oMatrix = this.selection.textSelection.transformText.CreateDublicate();
             }
             this.getDrawingDocument().UpdateTargetTransform(oMatrix);
-            this.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+            this.selection.textSelection.getDocContent().DrawSelectionOnPage(pageIndex);
         }
         else if(this.selection.chartSelection && this.selection.chartSelection.selection.textSelection)
         {
@@ -190,7 +190,7 @@ function CGroupShape()
                 oMatrix = this.selection.chartSelection.selection.textSelection.transformText.CreateDublicate();
             }
             this.getDrawingDocument().UpdateTargetTransform(oMatrix);
-            this.selection.chartSelection.selection.textSelection.getDocContent().Selection_Draw_Page(pageIndex);
+            this.selection.chartSelection.selection.textSelection.getDocContent().DrawSelectionOnPage(pageIndex);
         }
     };
 
@@ -263,7 +263,7 @@ function CGroupShape()
         }
     };
 
-    CGroupShape.prototype.copy = function()
+    CGroupShape.prototype.copy = function(oIdMap)
     {
         var copy = new CGroupShape();
         if(this.nvGrpSpPr)
@@ -277,7 +277,17 @@ function CGroupShape()
         }
         for(var i = 0; i < this.spTree.length; ++i)
         {
-            copy.addToSpTree(copy.spTree.length, this.spTree[i].copy());
+            var _copy;
+            if(this.spTree[i].getObjectType() === AscDFH.historyitem_type_GroupShape){
+                _copy = this.spTree[i].copy(oIdMap);
+            }
+            else{
+                _copy = this.spTree[i].copy();
+            }
+            if(AscCommon.isRealObject(oIdMap)){
+                oIdMap[this.spTree[i].Id] = _copy.Id;
+            }
+            copy.addToSpTree(copy.spTree.length, _copy);
             copy.spTree[copy.spTree.length-1].setGroup(copy);
         }
         copy.setBDeleted(this.bDeleted);
@@ -598,11 +608,6 @@ function CGroupShape()
         return this.scaleCoefficients;
     };
 
-    CGroupShape.prototype.getType = function()
-    {
-        return DRAWING_OBJECT_TYPE_GROUP;
-    };
-
     CGroupShape.prototype.getCompiledTransparent = function()
     {
         return null;
@@ -749,7 +754,7 @@ function CGroupShape()
             var i;
             if(paraItem.Type === para_TextPr)
             {
-                AscFormat.DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.Paragraph_Add, [paraItem, bRecalculate], CTable.prototype.Paragraph_Add);
+                AscFormat.DrawingObjectsController.prototype.applyDocContentFunction.call(this, CDocumentContent.prototype.AddToParagraph, [paraItem, bRecalculate], CTable.prototype.AddToParagraph);
             }
             else if(this.selectedObjects.length === 1
                 && this.selectedObjects[0].getObjectType() === AscDFH.historyitem_type_Shape
@@ -834,17 +839,6 @@ function CGroupShape()
             }
         }
         return bRet;
-    };
-
-    CGroupShape.prototype.Paragraph_IncDecFontSizeAll = function(val)
-    {
-        for(var i = 0; i < this.spTree.length; ++i)
-        {
-            if(typeof this.spTree[i].Paragraph_IncDecFontSizeAll === "function")
-            {
-                this.spTree[i].Paragraph_IncDecFontSizeAll(val);
-            }
-        }
     };
 
     CGroupShape.prototype.changeSize = function(kw, kh)
@@ -982,7 +976,7 @@ function CGroupShape()
         {
             selection_state.textObject = this.selection.textSelection;
             selection_state.selectStartPage = this.selection.textSelection.selectStartPage;
-            selection_state.textSelection = this.selection.textSelection.getDocContent().Get_SelectionState();
+            selection_state.textSelection = this.selection.textSelection.getDocContent().GetSelectionState();
         }
         else if(this.selection.chartSelection)
         {
@@ -1008,7 +1002,7 @@ function CGroupShape()
         {
             this.selectObject(selection_state.textObject, selection_state.selectStartPage);
             this.selection.textSelection = selection_state.textObject;
-            selection_state.textObject.getDocContent().Set_SelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
+            selection_state.textObject.getDocContent().SetSelectionState(selection_state.textSelection, selection_state.textSelection.length-1);
         }
         else if(selection_state.chartSelection)
         {
@@ -1093,7 +1087,7 @@ function CGroupShape()
         return bRet;
     };
 
-    CGroupShape.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
+    CGroupShape.prototype.GetRevisionsChangeParagraph = function(SearchEngine){
         var i;
         if(this.selectedObjects.length === 0){
             if(SearchEngine.Get_Direction() > 0){
@@ -1126,8 +1120,8 @@ function CGroupShape()
             }
         }
         while(!SearchEngine.Is_Found()){
-            if(this.arrGraphicObjects[i].Get_RevisionsChangeParagraph){
-                this.arrGraphicObjects[i].Get_RevisionsChangeParagraph(SearchEngine);
+            if(this.arrGraphicObjects[i].GetRevisionsChangeParagraph){
+                this.arrGraphicObjects[i].GetRevisionsChangeParagraph(SearchEngine);
             }
             if(SearchEngine.Get_Direction() > 0){
                 if(i === this.arrGraphicObjects.length - 1){
@@ -1291,6 +1285,26 @@ function CGroupShape()
         }
     };
 
+    CGroupShape.prototype.setColumnNumber = function(num){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setColumnNumber)
+            {
+                this.spTree[i].setColumnNumber(num);
+            }
+        }
+    };
+
+    CGroupShape.prototype.setColumnSpace = function(spcCol){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            if(this.spTree[i].setColumnSpace)
+            {
+                this.spTree[i].setColumnSpace(spcCol);
+            }
+        }
+    };
+
     CGroupShape.prototype.getResizeCoefficients = function(numHandle, x, y)
     {
         var cx, cy;
@@ -1327,7 +1341,7 @@ function CGroupShape()
     {
         for(var _shape_index = 0; _shape_index < this.spTree.length; ++_shape_index)
         {
-            if(this.spTree[_shape_index].changePresetGeom)
+            if(this.spTree[_shape_index].getObjectType() === AscDFH.historyitem_type_Shape)
             {
                 this.spTree[_shape_index].changePresetGeom(preset);
             }
@@ -1354,13 +1368,6 @@ function CGroupShape()
                 this.spTree[_shape_index].changeLine(line);
             }
         }
-    };
-
-    CGroupShape.prototype.getMainGroup = function()
-    {
-        if(!isRealObject(this.group))
-            return this;
-        return this.group.getMainGroup();
     };
 
     CGroupShape.prototype.canUnGroup = function()
@@ -1668,6 +1675,8 @@ function CGroupShape()
     CGroupShape.prototype.recalculateCurPos = AscFormat.DrawingObjectsController.prototype.recalculateCurPos;
 
     CGroupShape.prototype.loadDocumentStateAfterLoadChanges = AscFormat.DrawingObjectsController.prototype.loadDocumentStateAfterLoadChanges;
+    CGroupShape.prototype.getAllConnectors = AscFormat.DrawingObjectsController.prototype.getAllConnectors;
+    CGroupShape.prototype.getAllShapes = AscFormat.DrawingObjectsController.prototype.getAllShapes;
 
     CGroupShape.prototype.checkDrawingBaseCoords = CShape.prototype.checkDrawingBaseCoords;
 
@@ -1822,6 +1831,33 @@ function CGroupShape()
             if(this.spTree[i].group !== this){
                 this.spTree[i].setGroup(this);
             }
+        }
+    };
+
+    CGroupShape.prototype.findConnector = function(x, y){
+        for(var i = this.spTree.length - 1; i > -1; --i ){
+            var oConInfo = this.spTree[i].findConnector(x, y);
+            if(oConInfo){
+                return oConInfo;
+            }
+        }
+        return null;
+    };
+
+    CGroupShape.prototype.findConnectionShape = function(x, y){
+        for(var i = this.spTree.length - 1; i > -1; --i){
+            var _ret = this.spTree[i].findConnectionShape(x, y);
+            if(_ret){
+                return _ret;
+            }
+        }
+        return null;
+    };
+
+    CGroupShape.prototype.GetAllContentControls = function(arrContentControls){
+        for(var i = 0; i < this.spTree.length; ++i)
+        {
+            this.spTree[i].GetAllContentControls(arrContentControls);
         }
     };
 

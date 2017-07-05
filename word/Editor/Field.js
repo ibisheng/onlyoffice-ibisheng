@@ -93,10 +93,10 @@ ParaField.prototype.Copy = function(Selected)
 
     return NewField;
 };
-ParaField.prototype.Get_SelectedElementsInfo = function(Info)
+ParaField.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
-    Info.Set_Field(this);
-    CParagraphContentWithParagraphLikeContent.prototype.Get_SelectedElementsInfo.apply(this, arguments);
+	Info.Set_Field(this);
+	CParagraphContentWithParagraphLikeContent.prototype.GetSelectedElementsInfo.apply(this, arguments);
 };
 ParaField.prototype.Get_Bounds = function()
 {
@@ -123,92 +123,33 @@ ParaField.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 };
 ParaField.prototype.Add = function(Item)
 {
-    switch (Item.Type)
-    {
-        case para_Run      :
-        case para_Hyperlink:
-        {
-            var TextPr = this.Get_FirstTextPr();
-            Item.Select_All();
-            Item.Apply_TextPr(TextPr);
-            Item.Selection_Remove();
+	if (para_Field === Item.Type)
+	{
+		// Вместо добавления самого элемента добавляем его содержимое
+		var Count = Item.Content.length;
 
-            var CurPos = this.State.ContentPos;
-            var CurItem = this.Content[CurPos];
-            if (para_Run === CurItem.Type)
-            {
-                var NewRun = CurItem.Split2(CurItem.State.ContentPos);
-                this.Add_ToContent(CurPos + 1, Item);
-                this.Add_ToContent(CurPos + 2, NewRun);
+		if (Count > 0)
+		{
+			var CurPos  = this.State.ContentPos;
+			var CurItem = this.Content[CurPos];
 
-                this.State.ContentPos = CurPos + 2;
-                this.Content[this.State.ContentPos].Cursor_MoveToStartPos();
-            }
-            else
-                CurItem.Add(Item);
+			var CurContentPos = new CParagraphContentPos();
+			CurItem.Get_ParaContentPos(false, false, CurContentPos);
 
-            break;
-        }
-        case para_Math :
-        {
-            var ContentPos = new CParagraphContentPos();
-            this.Get_ParaContentPos(false, false, ContentPos);
-            var CurPos = ContentPos.Get(0);
-
-            // Ран формула делит на части, а в остальные элементы добавляется целиком
-            if (para_Run === this.Content[CurPos].Type)
-            {
-                // Разделяем текущий элемент (возвращается правая часть)
-                var NewElement = this.Content[CurPos].Split(ContentPos, 1);
-
-                if (null !== NewElement)
-                    this.Add_ToContent(CurPos + 1, NewElement, true);
-
-                var Elem = new ParaMath();
-                Elem.Root.Load_FromMenu(Item.Menu, this.Get_Paragraph());
-                Elem.Root.Correct_Content(true);
-                this.Add_ToContent(CurPos + 1, Elem, true);
-
-                // Перемещаем кусор в конец формулы
-                this.State.ContentPos = CurPos + 1;
-                this.Content[this.State.ContentPos].Cursor_MoveToEndPos(false);
-            }
-            else
-                this.Content[CurPos].Add(Item);
-
-            break;
-        }
-        case para_Field:
-        {
-            // Вместо добавления самого элемента добавляем его содержимое
-            var Count = Item.Content.length;
-
-            if (Count > 0)
-            {
-                var CurPos  = this.State.ContentPos;
-                var CurItem = this.Content[CurPos];
-
-                var CurContentPos = new CParagraphContentPos();
-                CurItem.Get_ParaContentPos(false, false, CurContentPos);
-
-                var NewItem = CurItem.Split(CurContentPos, 0);
-                for (var Index = 0; Index < Count; Index++)
-                {
-                    this.Add_ToContent(CurPos + Index + 1, Item.Content[Index], false);
-                }
-                this.Add_ToContent(CurPos + Count + 1, NewItem, false);
-                this.State.ContentPos = CurPos + Count;
-                this.Content[this.State.ContentPos].Cursor_MoveToEndPos();
-            }
-
-            break;
-        }
-        default :
-        {
-            this.Content[this.State.ContentPos].Add(Item);
-            break;
-        }
-    }
+			var NewItem = CurItem.Split(CurContentPos, 0);
+			for (var Index = 0; Index < Count; Index++)
+			{
+				this.Add_ToContent(CurPos + Index + 1, Item.Content[Index], false);
+			}
+			this.Add_ToContent(CurPos + Count + 1, NewItem, false);
+			this.State.ContentPos = CurPos + Count;
+			this.Content[this.State.ContentPos].MoveCursorToEndPos();
+		}
+	}
+	else
+	{
+		CParagraphContentWithParagraphLikeContent.prototype.Add.apply(this, arguments);
+	}
 };
 ParaField.prototype.Split = function (ContentPos, Depth)
 {
@@ -240,7 +181,7 @@ ParaField.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRang
 		X1        : X1,
 		Y0        : Y0,
 		Y1        : Y1,
-		PageIndex : _CurPage + PRSA.Paragraph.Get_StartPage_Absolute()
+		PageIndex : PRSA.Paragraph.Get_AbsolutePage(_CurPage)
 	};
 };
 ParaField.prototype.Draw_HighLights = function(PDSH)
@@ -354,29 +295,25 @@ ParaField.prototype.Get_RightPos = function(SearchPos, ContentPos, Depth, UseCon
 };
 ParaField.prototype.Get_WordStartPos = function(SearchPos, ContentPos, Depth, UseContentPos)
 {
-	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
+	CParagraphContentWithParagraphLikeContent.prototype.Get_WordStartPos.call(this, SearchPos, ContentPos, Depth, UseContentPos);
 
-	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	if (true !== SearchPos.Found && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
 		this.Get_StartPos(SearchPos.Pos, Depth);
-		SearchPos.Found = true;
-		return true;
+		SearchPos.UpdatePos = true;
+		SearchPos.Found     = true;
 	}
-
-	return bResult;
 };
 ParaField.prototype.Get_WordEndPos = function(SearchPos, ContentPos, Depth, UseContentPos, StepEnd)
 {
-	var bResult = CParagraphContentWithParagraphLikeContent.prototype.Get_WordEndPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
+	CParagraphContentWithParagraphLikeContent.prototype.Get_WordEndPos.call(this, SearchPos, ContentPos, Depth, UseContentPos, StepEnd);
 
-	if (true !== bResult && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
+	if (true !== SearchPos.Found && this.Paragraph && this.Paragraph.LogicDocument && true === this.Paragraph.LogicDocument.IsFillingFormMode())
 	{
 		this.Get_EndPos(false, SearchPos.Pos, Depth);
-		SearchPos.Found = true;
-		return true;
+		SearchPos.UpdatePos = true;
+		SearchPos.Found     = true;
 	}
-
-	return bResult;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Работа с данными поля
@@ -404,7 +341,7 @@ ParaField.prototype.Map_MailMerge = function(_Value)
     this.Content = [];
     this.Content[0] = oRun;
 
-    this.Cursor_MoveToStartPos();
+    this.MoveCursorToStartPos();
 
     History.TurnOn();
 };
@@ -418,7 +355,7 @@ ParaField.prototype.Restore_StandardTemplate = function()
         var oRun = this.private_GetMappedRun("«" + this.Arguments[0] + "»");
         this.Remove_FromContent(0, this.Content.length);
         this.Add_ToContent(0, oRun);
-        this.Cursor_MoveToStartPos();
+        this.MoveCursorToStartPos();
 
         this.TemplateContent = this.Content;
     }
@@ -427,7 +364,7 @@ ParaField.prototype.Restore_Template = function()
 {
     // Восстанавливаем содержимое поля.
     this.Content = this.TemplateContent;
-    this.Cursor_MoveToStartPos();
+    this.MoveCursorToStartPos();
 };
 ParaField.prototype.Is_NeedRestoreTemplate = function()
 {
@@ -487,25 +424,9 @@ ParaField.prototype.Replace_MailMerge = function(_Value)
 
     return true;
 };
-ParaField.prototype.private_GetMappedRun = function(Value)
+ParaField.prototype.private_GetMappedRun = function(sValue)
 {
-    // Создаем ран и набиваем в него заданный текст.
-    var oRun = new ParaRun();
-
-    for (var Index = 0, Count = Value.length; Index < Count; Index++)
-    {
-        var Char = Value[Index], oText;
-        if (0x20 === Char)
-            oText = new ParaSpace();
-        else
-            oText = new ParaText(Value[Index]);
-
-        oRun.Add_ToContent(Index, oText);
-    }
-
-    oRun.Set_Pr(this.Get_FirstTextPr());
-
-    return oRun;
+	return this.CreateRunWithText(sValue);
 };
 ParaField.prototype.SetFormFieldName = function(sName)
 {
@@ -533,11 +454,7 @@ ParaField.prototype.GetValue = function()
 };
 ParaField.prototype.SetValue = function(sValue)
 {
-	var oRun = this.private_GetMappedRun(sValue);
-	oRun.Apply_TextPr(this.Get_TextPr(), undefined, true);
-	this.Remove_FromContent(0, this.Content.length);
-	this.Add_ToContent(0, oRun);
-	this.Cursor_MoveToStartPos();
+	this.ReplaceAllWithText(sValue);
 };
 ParaField.prototype.IsFillingForm = function()
 {
@@ -545,6 +462,28 @@ ParaField.prototype.IsFillingForm = function()
 		return true;
 
 	return false;
+};
+ParaField.prototype.FindNextFillingForm = function(isNext, isCurrent, isStart)
+{
+	if (!this.IsFillingForm())
+		return CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+
+	if (isCurrent && true === this.IsSelectedAll())
+	{
+		if (isNext)
+			return CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+
+		return null;
+	}
+
+	if (!isCurrent && isNext)
+		return this;
+
+	var oRes = CParagraphContentWithParagraphLikeContent.prototype.FindNextFillingForm.apply(this, arguments);
+	if (!oRes && !isNext)
+		return this;
+
+	return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции совместного редактирования
@@ -618,7 +557,11 @@ ParaField.prototype.Read_FromBinary2 = function(Reader)
     if (editor)
         editor.WordControl.m_oLogicDocument.Register_Field(this);
 };
-
+//----------------------------------------------------------------------------------------------------------------------
+ParaField.prototype.IsStopCursorOnEntryExit = function()
+{
+	return true;
+};
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].ParaField = ParaField;

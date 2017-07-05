@@ -1201,7 +1201,8 @@ var g_oBorderProperties = {
 			(this.dd && c_oAscBorderStyles.None !== this.dd.s) || (this.du && c_oAscBorderStyles.None !== this.du.s);
 	};
 var g_oNumProperties = {
-		f: 0
+		f: 0,
+		id: 1
 	};
 /** @constructor */
 function Num(val)
@@ -1219,78 +1220,7 @@ Num.prototype =
     this.id = opt_id;
   },
   getFormat: function() {
-    var res = this.f;
-    if (null != this.id) {
-      if (15 <= this.id && this.id <= 17) {
-        switch (this.id) {
-          case 15:
-            res = AscCommon.getShortDateMonthFormat(true, true, null);
-            break;
-          case 16:
-            res = AscCommon.getShortDateMonthFormat(true, false, null);
-            break;
-          case 17:
-            res = AscCommon.getShortDateMonthFormat(false, true, null);
-            break;
-        }
-      } else {
-		//todo currencyLocale true/false?
-		var currencyLocale = true;
-        switch (this.id) {
-          case 5:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, true, currencyLocale, false);
-            break;
-          case 6:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, true, currencyLocale, true);
-            break;
-          case 7:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, true, currencyLocale, false);
-            break;
-          case 8:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, true, currencyLocale, true);
-            break;
-          case 14:
-            res = AscCommon.getShortDateFormat(null);
-            break;
-          case 22:
-            res = AscCommon.getShortDateFormat(null) + " h:mm";
-            break;
-          case 27:
-          case 28:
-          case 29:
-          case 30:
-          case 31:
-          case 36:
-            res = AscCommon.getShortDateFormat(null);
-            break;
-          case 37:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, false, currencyLocale, false);
-            break;
-          case 38:
-            res = AscCommon.getCurrencyFormatSimple(null, 0, false, currencyLocale, true);
-            break;
-          case 39:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, false, currencyLocale, false);
-            break;
-          case 40:
-            res = AscCommon.getCurrencyFormatSimple(null, 2, false, currencyLocale, true);
-            break;
-          case 41:
-            res = AscCommon.getCurrencyFormat(null, 0, false, currencyLocale);
-            break;
-          case 42:
-            res = AscCommon.getCurrencyFormat(null, 0, true, currencyLocale);
-            break;
-          case 43:
-            res = AscCommon.getCurrencyFormat(null, 2, false, currencyLocale);
-            break;
-          case 44:
-            res = AscCommon.getCurrencyFormat(null, 2, true, currencyLocale);
-            break;
-        }
-      }
-    }
-    return res;
+    return (null != this.id) ? (AscCommon.getFormatByStandardId(this.id) || this.f) : this.f;
   },
   _mergeProperty : function(first, second, def)
   {
@@ -1349,14 +1279,16 @@ Num.prototype =
 	{
 		switch(nType)
 		{
-			case this.Properties.f: return this.getFormat();break;
+			case this.Properties.f: return this.f;break;
+			case this.Properties.id: return this.id;break;
 		}
 	},
 	setProperty : function(nType, value)
 	{
 		switch(nType)
 		{
-			case this.Properties.f: this.setFormat(value);break;
+			case this.Properties.f: this.f = value;break;
+			case this.Properties.id: this.id = value;break;
 		}
 	}
 };
@@ -1907,28 +1839,26 @@ StyleManager.prototype =
 		}
 		return oRes;
 	},
-	setNumFormat : function(oItemWithXfs, val)
+	setNum : function(oItemWithXfs, val)
 	{
-        var xfs = oItemWithXfs.xfs;
-        var oRes = {newVal: val, oldVal: null};
-        if(null != xfs && null != xfs.num)
-            oRes.oldVal = xfs.num.getFormat();
+		var xfs = oItemWithXfs.xfs;
+		var oRes = {newVal: val, oldVal: null};
+		if(null != xfs && null != xfs.num)
+			oRes.oldVal = xfs.num;
 		else
-			oRes.oldVal = g_oDefaultFormat.Num.getFormat();
-        if(null == val)
-        {
-            if(null != xfs) {
-                xfs = this._prepareSetReference(oItemWithXfs);
-                xfs.num = null;
-            }
-        }
-        else
-        {
-            xfs = this._prepareSet(oItemWithXfs);
-            if(null == xfs.num)
-                xfs.num = g_oDefaultFormat.Num.clone();
-            xfs.num.setFormat(val);
-        }
+			oRes.oldVal = null;
+		if(null == val)
+		{
+			if(null != xfs) {
+				xfs = this._prepareSetReference(oItemWithXfs);
+				xfs.num = null;
+			}
+		}
+		else
+		{
+			xfs = this._prepareSet(oItemWithXfs);
+			xfs.num = val.clone();
+		}
 		return oRes;
 	},
 	setFont : function(oItemWithXfs, val, oHistoryObj, nHistoryId, sSheetId, oRange)
@@ -2577,9 +2507,15 @@ Col.prototype =
 	},
 	setNumFormat : function(val)
 	{
-		var oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, new Num({f:val}));
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_NumFormat, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+	},
+	setNum : function(val)
+	{
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, val);
+		if(History.Is_On() && oRes.oldVal != oRes.newVal)
+			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFont : function(val)
     {
@@ -2856,9 +2792,15 @@ Row.prototype =
 	},
 	setNumFormat : function(val)
 	{
-		var oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, new Num({f:val}));
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_NumFormat, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+	},
+	setNum : function(val)
+	{
+		var oRes = this.ws.workbook.oStyleManager.setNum(this, val);
+		if(History.Is_On() && oRes.oldVal != oRes.newVal)
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Num, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFont : function(val)
     {
@@ -2977,6 +2919,11 @@ Row.prototype =
         var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
             History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+	},
+
+	getHidden: function()
+	{
+		return 0 != (AscCommonExcel.g_nRowFlag_hd & this.flags);
 	}
 };
 var g_oCCellValueMultiTextProperties = {
@@ -3155,6 +3102,10 @@ CCellValue.prototype =
 		else if(null != this.multiText)
 		    sResult = this.getStringFromMultiText();
 		return sResult;
+	},
+	getNumberValue : function()
+	{
+		return this.number;
 	},
 	getValue : function(cell)
 	{
@@ -4554,166 +4505,6 @@ RangeDataManager.prototype = {
 	}
 };
 
-function CellAreaElem(row, col, data)
-{
-	this.row = row;
-	this.col = col;
-	this.data = data;
-}
-function CellArea(fChange)
-{
-	this.rows = new TreeRB();
-	this.fChange = fChange;
-}
-CellArea.prototype = {
-	add : function(row, col, value)
-	{
-		var oNewNode = new TreeRBNode(row, null);
-		var oStoredNode = this.rows.insertOrGet(oNewNode);
-		if(oStoredNode == oNewNode)
-			oStoredNode.storedValue = new TreeRB();
-		var oNewRow = oStoredNode.storedValue;
-		var oNewColNode = new TreeRBNode(col, null);
-		var oStoredColNode = oNewRow.insertOrGet(oNewColNode);
-		var storedValue = new RangeDataManagerElem(new Asc.Range(col, row, col, row), value);
-		oNewColNode.storedValue = storedValue;
-		if(null != this.fChange)
-			this.fChange.call(this, storedValue.data, null, storedValue.bbox);
-	},
-	get : function(bbox)
-	{
-		var aRes = [];
-		var aRows = this.rows.enumerate(bbox.r1, bbox.r2);
-		for(var i = 0, length = aRows.length; i < length; i++)
-		{
-			var row = aRows[i];
-			var aCells = row.storedValue.enumerate(bbox.c1, bbox.c2);
-			for(var j = 0, length2 = aCells.length; j < length2; j++)
-				aRes.push(aCells[j].storedValue);
-		}
-		return aRes;
-	},
-	remove : function(bbox)
-	{
-		var aElems = this.get(bbox);
-		for(var i = 0, length = aElems.length; i < length; ++i)
-		{
-			var elem = aElems[i];
-			this.removeElement(elem);
-		}
-	},
-	removeElement : function(elem)
-	{
-		var rowElem = this.rows.getElem(elem.bbox.r1);
-		if(rowElem)
-		{
-			var row = rowElem.storedValue;
-			var cellElem = row.getElem(elem.bbox.c1);
-			if(cellElem)
-			{
-				row.deleteNode(cellElem);
-				if(row.isEmpty())
-					this.rows.deleteNode(rowElem);
-				if(null != this.fChange)
-					this.fChange.call(this, cellElem.storedValue.data, cellElem.storedValue.bbox, null);
-			}
-		}
-	},
-	removeAll : function()
-	{
-		this.remove(new Asc.Range(0, 0, gc_nMaxCol0, gc_nMaxRow0));
-		//todo
-		this.oIntervalTreeRB = new IntervalTreeRB();
-	},
-	shiftGet : function(bbox, bHor)
-	{
-		var bboxGet = shiftGetBBox(bbox, bHor);
-		return {bbox: bboxGet, elems: this.get(bboxGet)};
-	},
-	shift: function (bbox, bAdd, bHor, oGetRes)
-	{
-	    var _this = this;
-	    if (null == oGetRes)
-	        oGetRes = this.shiftGet(bbox, bHor);
-	    var offset;
-	    if (bHor)
-	        offset = { offsetRow: 0, offsetCol: bbox.c2 - bbox.c1 + 1 };
-	    else
-	        offset = { offsetRow: bbox.r2 - bbox.r1 + 1, offsetCol: 0 };
-	    if (!bAdd) {
-	        offset.offsetRow = -offset.offsetRow;
-	        offset.offsetCol = -offset.offsetCol;
-	    }
-	    this._shiftmove(true, bbox, offset, oGetRes.elems);
-	},
-	move: function (from, to)
-	{
-	    var offset = { offsetRow: to.r1 - from.r1, offsetCol: to.c1 - from.c1 };
-	    var oGetRes = this.get(from);
-	    this._shiftmove(false, from, offset, oGetRes);
-	},
-    _shiftmove: function (bShift, bbox, offset, elems) {
-	    var aToChange = [];
-	    //сдвигаем inner
-	    if (elems.length > 0) {
-	        var bboxAsc = Asc.Range(bbox.c1, bbox.r1, bbox.c2, bbox.r2);
-	        var bAdd = offset.offsetRow > 0 || offset.offsetCol > 0;
-	        for (var i = 0, length = elems.length; i < length; i++) {
-	            var elem = elems[i];
-	            var to = null;
-	            if (!bShift || bAdd || !bboxAsc.containsRange(elem.bbox)) {
-	                to = elem.bbox.clone();
-	                to.setOffset(offset);
-	            }
-	            aToChange.push({ elem: elem, to: to });
-	        }
-	    }
-        //сначала сортируем чтобы не было конфликтов при сдвиге
-	    aToChange.sort(function (a, b) { return shiftSort(a, b, offset); });
-
-	    if (null != this.fChange) {
-	        for (var i = 0, length = aToChange.length; i < length; ++i) {
-	            var item = aToChange[i];
-	            this.fChange.call(this, item.elem.data, item.elem.bbox, item.to);
-	        }
-	    }
-	    //убираем fChange, чтобы потом послать его только на одну операцию, а не 2
-	    var fOldChange = this.fChange;
-	    this.fChange = null;
-	    //сначала удаляем все чтобы не было конфликтов
-	    for (var i = 0, length = aToChange.length; i < length; ++i) {
-	        var item = aToChange[i];
-	        var elem = item.elem;
-	        this.removeElement(elem);
-	    }
-	    //добавляем измененные ячейки
-	    for (var i = 0, length = aToChange.length; i < length; ++i) {
-	        var item = aToChange[i];
-	        if (null != item.to)
-	            this.add(item.to.r1, item.to.c1, item.elem.data);
-	    }
-	    this.fChange = fOldChange;
-	},
-	getAll : function(){
-		var aRes = [];
-		var oRows = this.rows.getNodeAll();
-		for(var i = 0, length = oRows.length; i < length; i++)
-		{
-			var row = oRows[i];
-			if(row.storedValue)
-			{
-				var cells = row.storedValue.getNodeAll();
-				for(var j = 0, length2 = cells.length; j < length2; j++)
-				{
-					var elem = cells[j];
-					aRes.push(elem.storedValue);
-				}
-			}
-		}
-		return aRes;
-	}
-};
-
 	/** @constructor */
 	function sparklineGroup(addId) {
 		// attributes
@@ -4942,11 +4733,7 @@ CellArea.prototype = {
 				--i;
 			}
 		}
-
-		var bRemove = 0 === this.arrSparklines.length;
-		if (bRemove) {
-			History.Add(new AscDFH.CChangesDrawingsSparklinesRemove(this));
-		}
+		var bRemove = (0 === this.arrSparklines.length);
 		return bRemove;
 	};
 	sparklineGroup.prototype.getLocationRanges = function (onlySingle) {
@@ -5642,7 +5429,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		{
 			if(this.HeaderRowCount === null) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
-			} else if(!objectParam.toRef) {
+			} else if(!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
 				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			}
 			break;
@@ -5651,7 +5438,7 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 		{
 			if(this.TotalsRowCount) {
 				res = new Asc.Range(this.Ref.c1, this.Ref.r2, this.Ref.c2, this.Ref.r2);
-			} else if(!objectParam.toRef) {
+			} else if(!objectParam.toRef || objectParam.bConvertTableFormulaToRef) {
 				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 			}
 			break;
@@ -5661,9 +5448,15 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 			if (objectParam.cell) {
 				if (startRow <= objectParam.cell.r1 && objectParam.cell.r1 <= endRow) {
 					res = new Asc.Range(this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1);
+				} else if (objectParam.bConvertTableFormulaToRef) {
+					res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
 				}
 			} else {
-				res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+				if (objectParam.bConvertTableFormulaToRef) {
+					res = new Asc.Range(this.Ref.c1, 0, this.Ref.c2, 0);
+				} else {
+					res = new Asc.Range(this.Ref.c1, startRow, this.Ref.c2, endRow);
+				}
 			}
 			break;
 		}
@@ -5679,6 +5472,13 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 
 			res = new Asc.Range(this.Ref.c1 + startCol, startRow, this.Ref.c1 + endCol, endRow);
 			break;
+		}
+	}
+	if (res) {
+		if (objectParam.param === FormulaTablePartInfo.thisRow) {
+			res.setAbs(false, true, false, true);
+		} else {
+			res.setAbs(true, true, true, true);
 		}
 	}
 	return res;
@@ -7528,7 +7328,6 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].CCellValue = CCellValue;
 	window['AscCommonExcel'].RangeDataManagerElem = RangeDataManagerElem;
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
-	window['AscCommonExcel'].CellArea = CellArea;
 	window["Asc"]["sparklineGroup"] = window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	prot = sparklineGroup.prototype;
 	prot["asc_getId"]							= prot.asc_getId;

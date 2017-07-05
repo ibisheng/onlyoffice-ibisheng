@@ -108,10 +108,13 @@ function SlideLayout()
 
     this.Master = null;
     this.maxId = 1000;
+
+    this.bounds = new AscFormat.CGraphicBounds(0.0, 0.0, 0.0, 0.0);
     this.recalcInfo =
     {
         recalculateBackground: true,
-        recalculateSpTree: true
+        recalculateSpTree: true,
+        recalculateBounds: true
     };
 
 
@@ -294,11 +297,32 @@ SlideLayout.prototype =
         var _shapes = this.cSld.spTree;
         var _shape_index;
         var _shape_count = _shapes.length;
+        var bRecalculateBounds = this.recalcInfo.recalculateBounds;
+        if(bRecalculateBounds){
+            this.bounds.reset(this.Width + 100.0, this.Height + 100.0, -100.0, -100.0);
+        }
+        var bChecked = false;
         for(_shape_index = 0; _shape_index < _shape_count; ++_shape_index)
         {
-            if(!_shapes[_shape_index].isPlaceholder())
+            if(!_shapes[_shape_index].isPlaceholder()){
                 _shapes[_shape_index].recalculate();
+                if(bRecalculateBounds){
+                    this.bounds.checkByOther(_shapes[_shape_index].bounds);
+                }
+                bChecked = true;
+            }
         }
+        if(bRecalculateBounds){
+            if(bChecked){
+                this.bounds.checkWH();
+            }
+            else{
+                this.bounds.reset(0.0, 0.0, 0.0, 0.0);
+            }
+            this.recalcInfo.recalculateBounds = false;
+        }
+
+
     },
 
     recalculate2: function()

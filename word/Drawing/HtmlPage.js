@@ -815,7 +815,7 @@ function CEditorPage(api)
 
 				this.TextBoxBackground.HtmlElement["onselectstart"] = function(e)
 				{
-					oThis.m_oLogicDocument.Select_All();
+					oThis.m_oLogicDocument.SelectAll();
 
 					if (e.preventDefault)
 						e.preventDefault();
@@ -1521,7 +1521,7 @@ function CEditorPage(api)
 		oThis.m_oApi.checkLastWork();
 
 		//console.log("down: " + isTouch + ", " + AscCommon.isTouch);
-		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 
 		if (!oThis.m_bIsIE)
@@ -1589,7 +1589,12 @@ function CEditorPage(api)
 				// теперь проверить трек таблиц
 				var ret = oWordControl.m_oDrawingDocument.checkMouseDown_Drawing(pos);
 				if (ret === true)
+				{
+					if (-1 == oWordControl.m_oTimerScrollSelect)
+						oWordControl.m_oTimerScrollSelect = setInterval(oWordControl.SelectWheel, 20);
+
 					return;
+				}
 
 				if (-1 == oWordControl.m_oTimerScrollSelect)
 				{
@@ -1625,7 +1630,7 @@ function CEditorPage(api)
 	{
 		oThis.m_oApi.checkLastWork();
 
-		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 
 		if (e.preventDefault)
@@ -1674,6 +1679,12 @@ function CEditorPage(api)
 			oWordControl.OnUpdateOverlay();
 		}
 
+		if (!oWordControl.IsUpdateOverlayOnEndCheck)
+		{
+			if (oWordControl.m_oDrawingDocument.ContentControlsCheckLast())
+				oWordControl.OnUpdateOverlay();
+		}
+
 		oWordControl.EndUpdateOverlay();
 	};
 	this.onMouseMove2 = function()
@@ -1714,7 +1725,7 @@ function CEditorPage(api)
 		oThis.m_oApi.checkLastWork();
 
 		//console.log("up: " + isTouch + ", " + AscCommon.isTouch);
-		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch))
+		if (false === oThis.m_oApi.bInit_word_control || (AscCommon.isTouch && undefined === isTouch) || oThis.m_oApi.isLongAction())
 			return;
 		//if (true == global_mouseEvent.IsLocked)
 		//    return;
@@ -2694,6 +2705,12 @@ function CEditorPage(api)
 		this.m_bIsUpdateHorRuler = true;
 		this.m_bIsUpdateVerRuler = true;
 
+		if (this.m_bIsRuler)
+		{
+			this.UpdateHorRulerBack(true);
+			this.UpdateVerRulerBack(true);
+		}
+
 		this.m_oHorRuler.RepaintChecker.BlitAttack = true;
 		this.m_oVerRuler.RepaintChecker.BlitAttack = true;
 
@@ -2890,7 +2907,7 @@ function CEditorPage(api)
 					for (var i = drDoc.m_lDrawingFirst; i <= drDoc.m_lDrawingEnd; i++)
 					{
 						if (!drDoc.IsFreezePage(i))
-							this.m_oLogicDocument.Selection_Draw_Page(i);
+							this.m_oLogicDocument.DrawSelectionOnPage(i);
 					}
 				}
 				else
@@ -2898,7 +2915,7 @@ function CEditorPage(api)
 					for (var i = 0; i <= drDoc.m_lPagesCount; i++)
 					{
 						if (!drDoc.IsFreezePage(i))
-							this.m_oLogicDocument.Selection_Draw_Page(i);
+							this.m_oLogicDocument.DrawSelectionOnPage(i);
 					}
 				}
 
@@ -2942,6 +2959,8 @@ function CEditorPage(api)
 					this.m_oDrawingDocument.AutoShapesTrack.CorrectOverlayBounds();
 				}
 			}
+
+			drDoc.DrawContentControlsTrack(overlay);
 
 			if (drDoc.TableOutlineDr.bIsTracked)
 			{
@@ -3171,6 +3190,9 @@ function CEditorPage(api)
 
 	this.OnPaint = function()
 	{
+		if (this.m_oApi.isLongAction())
+			return;
+
 		if (this.DrawingFreeze || true === window["DisableVisibleComponents"])
 		{
 			this.m_oApi.checkLastWork();
@@ -3607,14 +3629,6 @@ function CEditorPage(api)
             return;
 
 		var isRepaint                   = oWordControl.m_bIsScroll;
-		if (oWordControl.m_bIsScroll)
-		{
-			oWordControl.m_bIsScroll = false;
-			oWordControl.OnPaint();
-
-			if (null != oWordControl.m_oLogicDocument && oWordControl.m_oApi.bInit_word_control)
-				oWordControl.m_oLogicDocument.Viewer_OnChangePosition();
-		}
 		if (null != oWordControl.m_oLogicDocument && !oWordControl.m_oApi.isLockTargetUpdate)
 		{
 			oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = true;
@@ -3624,6 +3638,14 @@ function CEditorPage(api)
 
 			oWordControl.CheckFontCache();
 			oWordControl.m_oDrawingDocument.CheckTrackTable();
+		}
+		if (oWordControl.m_bIsScroll)
+		{
+			oWordControl.m_bIsScroll = false;
+			oWordControl.OnPaint();
+
+			if (null != oWordControl.m_oLogicDocument && oWordControl.m_oApi.bInit_word_control)
+				oWordControl.m_oLogicDocument.Viewer_OnChangePosition();
 		}
 
 		oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
@@ -3800,7 +3822,7 @@ function CEditorPage(api)
 			{
 				this.m_oLogicDocument.Set_DocPosType(docpostype_Content);
 				this.m_oLogicDocument.Set_CurPage(drDoc.m_lCurrentPage);
-				this.m_oLogicDocument.Cursor_MoveAt(0, 0, false);
+				this.m_oLogicDocument.MoveCursorToXY(0, 0, false);
 				this.m_oLogicDocument.RecalculateCurPos();
 				this.m_oLogicDocument.Document_UpdateSelectionState();
 
@@ -3831,6 +3853,11 @@ function CEditorPage(api)
 	{
 		var dKoef = g_dKoef_mm_to_pix * this.m_nZoomValue / 100;
 		return 5 + dKoef * x;
+	};
+
+	this.GetMainContentBounds = function()
+	{
+		return this.m_oMainContent.AbsolutePosition;
 	};
 }
 

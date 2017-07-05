@@ -121,42 +121,42 @@ function CEditorPage(api)
     }
 
     this.CheckRetinaDisplay = function()
-    {        
+    {
     }
 
     this.ShowOverlay = function()
-    {        
+    {
     }
     this.UnShowOverlay = function()
-    {        
+    {
     }
     this.CheckUnShowOverlay = function()
-    {        
+    {
     }
     this.CheckShowOverlay = function()
-    {        
+    {
     }
 
     this.initEvents2 = function()
-    {        
+    {
     }
 
     this.initEvents2MobileAdvances = function()
-    {        
+    {
     }
     this.onButtonRulersClick = function()
-    {        
+    {
     }
 
     this.HideRulers = function()
-    {        
+    {
     }
 
     this.zoom_FitToWidth = function()
-    {        
+    {
     }
     this.zoom_FitToPage = function()
-    {        
+    {
     }
 
     this.zoom_Fire = function(type, old_zoom)
@@ -225,34 +225,38 @@ function CEditorPage(api)
     {
     }
     this.onMouseUp = function(e, bIsWindow)
-    {        
+    {
+    }
+
+    this.onMouseUpMainSimple = function()
+    {
     }
 
     this.onMouseUpExternal = function(x, y)
-    {        
+    {
     }
 
     this.onMouseWhell = function(e)
-    {        
+    {
     }
 
     this.checkViewerModeKeys = function(e)
-    {        
+    {
     }
 
     this.ChangeReaderMode = function()
-    {        
+    {
     }
 
     this.IncreaseReaderFontSize = function()
-    {        
+    {
     }
     this.DecreaseReaderFontSize = function()
-    {        
+    {
     }
 
     this.EnableReaderMode = function()
-    {        
+    {
     }
 
     this.DisableReaderMode = function()
@@ -264,7 +268,7 @@ function CEditorPage(api)
     }
 
     this.TransformDivUseAnimation = function(_div, topPos)
-    {     
+    {
     }
 
     this.onKeyDown = function(e)

@@ -2764,11 +2764,11 @@ CStyle.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 
@@ -3107,12 +3107,12 @@ CStyle.prototype =
             if (this.Id != Styles.Default.Paragraph)
             {
                 var AllStylesId = Styles.private_GetAllBasedStylesId(this.Id);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
                 LogicDocument.Add_ChangedStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
                 LogicDocument.Add_ChangedStyle([this.Id]);
             }
 
@@ -3194,7 +3194,12 @@ function CStyles(bCreateDefault)
 			Hyperlink         : null,
 			FootnoteText      : null,
 			FootnoteTextChar  : null,
-			FootnoteReference : null
+			FootnoteReference : null,
+			NoSpacing         : null,
+			Title             : null,
+			Subtitle          : null,
+			Quote             : null,
+			IntenseQuote      : null
 		};
 
         // Заполняем значения по умолчанию
@@ -3208,115 +3213,115 @@ function CStyles(bCreateDefault)
 
         // Создадим стандартные стили
 
-        // Дефолтовый стиль для параграфа
-        var Style_Para_Def = new CStyle( "Normal", null, null, styletype_Paragraph );
-        Style_Para_Def.Create_Default_Paragraph();
-        this.Default.Paragraph = this.Add( Style_Para_Def );
+		// Дефолтовый стиль для параграфа
+		var Style_Para_Def = new CStyle("Normal", null, null, styletype_Paragraph);
+		Style_Para_Def.Create_Default_Paragraph();
+		this.Default.Paragraph = this.Add(Style_Para_Def);
 
-        // Дефолтовый стиль для текста
-        var Style_Char_Def = new CStyle( "Default Paragraph Font", null, null, styletype_Character );
-        Style_Char_Def.Create_Default_Character();
-        this.Default.Character = this.Add( Style_Char_Def );
+		// Дефолтовый стиль для текста
+		var Style_Char_Def = new CStyle("Default Paragraph Font", null, null, styletype_Character);
+		Style_Char_Def.Create_Default_Character();
+		this.Default.Character = this.Add(Style_Char_Def);
 
-        // Дефолтовый стиль для нумерации в списках
-        var Style_Num_Def = new CStyle( "No List", null, null, styletype_Numbering );
-        Style_Num_Def.Create_Default_Numbering();
-        this.Default.Numbering = this.Add( Style_Num_Def );
+		// Дефолтовый стиль для нумерации в списках
+		var Style_Num_Def = new CStyle("No List", null, null, styletype_Numbering);
+		Style_Num_Def.Create_Default_Numbering();
+		this.Default.Numbering = this.Add(Style_Num_Def);
 
-        // Создаем стандартные стили для заголовков
-        var Style_H1 = new CStyle("Heading 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_H1.Create_Heading1();
-        this.Default.Headings[0] = this.Add( Style_H1 );
+		// Создаем стандартные стили для заголовков
+		var Style_H1 = new CStyle("Heading 1", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_H1.Create_Heading1();
+		this.Default.Headings[0] = this.Add(Style_H1);
 
-        // Создаем стандартные стили для заголовков
-        var Style_H2 = new CStyle("Heading 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_H2.Create_Heading2();
-        this.Default.Headings[1] = this.Add( Style_H2 );
+		// Создаем стандартные стили для заголовков
+		var Style_H2 = new CStyle("Heading 2", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_H2.Create_Heading2();
+		this.Default.Headings[1] = this.Add(Style_H2);
 
-        // Создаем стандартные стили для заголовков
-        var Style_H3 = new CStyle("Heading 3", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_H3.Create_Heading3();
-        this.Default.Headings[2] = this.Add( Style_H3 );
+		// Создаем стандартные стили для заголовков
+		var Style_H3 = new CStyle("Heading 3", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_H3.Create_Heading3();
+		this.Default.Headings[2] = this.Add(Style_H3);
 
-        // Создаем стандартные стили для заголовков
-        var Style_H4 = new CStyle("Heading 4", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_H4.Create_Heading4();
-        this.Default.Headings[3] = this.Add( Style_H4 );
+		// Создаем стандартные стили для заголовков
+		var Style_H4 = new CStyle("Heading 4", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_H4.Create_Heading4();
+		this.Default.Headings[3] = this.Add(Style_H4);
 
-        // Создаем стандартные стили для заголовков
-        var Style_H5 = new CStyle("Heading 5", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_H5.Create_Heading5();
-        this.Default.Headings[4] = this.Add( Style_H5 );
+		// Создаем стандартные стили для заголовков
+		var Style_H5 = new CStyle("Heading 5", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_H5.Create_Heading5();
+		this.Default.Headings[4] = this.Add(Style_H5);
 
-        // Создаем стандартные стили для заголовков
-        var Style_H6 = new CStyle("Heading 6", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_H6.Create_Heading6();
-        this.Default.Headings[5] = this.Add( Style_H6 );
+		// Создаем стандартные стили для заголовков
+		var Style_H6 = new CStyle("Heading 6", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_H6.Create_Heading6();
+		this.Default.Headings[5] = this.Add(Style_H6);
 
-        // Создаем стандартные стили для заголовков
-        var Style_H7 = new CStyle("Heading 7", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_H7.Create_Heading7();
-        this.Default.Headings[6] = this.Add( Style_H7 );
+		// Создаем стандартные стили для заголовков
+		var Style_H7 = new CStyle("Heading 7", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_H7.Create_Heading7();
+		this.Default.Headings[6] = this.Add(Style_H7);
 
-        // Создаем стандартные стили для заголовков
-        var Style_H8 = new CStyle("Heading 8", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_H8.Create_Heading8();
-        this.Default.Headings[7] = this.Add( Style_H8 );
+		// Создаем стандартные стили для заголовков
+		var Style_H8 = new CStyle("Heading 8", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_H8.Create_Heading8();
+		this.Default.Headings[7] = this.Add(Style_H8);
 
-        // Создаем стандартные стили для заголовков
-        var Style_H9 = new CStyle("Heading 9", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_H9.Create_Heading9();
-        this.Default.Headings[8] = this.Add( Style_H9 );
+		// Создаем стандартные стили для заголовков
+		var Style_H9 = new CStyle("Heading 9", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_H9.Create_Heading9();
+		this.Default.Headings[8] = this.Add(Style_H9);
 
-        // Создаем стандартный стиль для нумерованных параграфов
-        var Style_Para_List = new CStyle("List Paragraph", this.Default.Paragraph, null, styletype_Paragraph );
-        Style_Para_List.Create_ListParagraph();
-        this.Default.ParaList = this.Add( Style_Para_List );
+		// Создаем стандартный стиль для нумерованных параграфов
+		var Style_Para_List = new CStyle("List Paragraph", this.Default.Paragraph, null, styletype_Paragraph);
+		Style_Para_List.Create_ListParagraph();
+		this.Default.ParaList = this.Add(Style_Para_List);
 
-        // Создаем стандартный стиль для таблиц
-        var Style_Table = new CStyle("Normal Table", null, null, styletype_Table );
-        Style_Table.Create_NormalTable();
-        this.Default.Table = this.Add( Style_Table );
+		// Создаем стандартный стиль для таблиц
+		var Style_Table = new CStyle("Normal Table", null, null, styletype_Table);
+		Style_Table.Create_NormalTable();
+		this.Default.Table = this.Add(Style_Table);
 
-        // Создаем стиль "Без интервала"
-        var Style_NoSpacing = new CStyle("No Spacing", this.Default.Paragraph, null, styletype_Paragraph );
-        Style_NoSpacing.Create_NoSpacing();
-        this.Add( Style_NoSpacing );
+		// Создаем стиль "Без интервала"
+		var Style_NoSpacing = new CStyle("No Spacing", this.Default.Paragraph, null, styletype_Paragraph);
+		Style_NoSpacing.Create_NoSpacing();
+		this.Default.NoSpacing = this.Add(Style_NoSpacing);
 
-        // Создаем стиль "Заголовок"
-        var Style_Title = new CStyle("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_Title.Create_Title();
-        this.Add( Style_Title );
+		// Создаем стиль "Заголовок"
+		var Style_Title = new CStyle("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_Title.Create_Title();
+		this.Default.Title = this.Add(Style_Title);
 
-        // Создаем стиль "Подзаголовок"
-        var Style_Subtitle = new CStyle("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_Subtitle.Create_Subtitle();
-        this.Add( Style_Subtitle );
+		// Создаем стиль "Подзаголовок"
+		var Style_Subtitle = new CStyle("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_Subtitle.Create_Subtitle();
+		this.Default.Subtitle = this.Add(Style_Subtitle);
 
-        // Создаем стиль "Цитата"
-        var Style_Quote = new CStyle("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_Quote.Create_Quote();
-        this.Add( Style_Quote );
+		// Создаем стиль "Цитата"
+		var Style_Quote = new CStyle("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_Quote.Create_Quote();
+		this.Default.Quote = this.Add(Style_Quote);
 
-        // Создаем стиль "Выделенная цитата"
-        var Style_IntenseQuote = new CStyle("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph );
-        Style_IntenseQuote.Create_IntenseQuote();
-        this.Add( Style_IntenseQuote );
+		// Создаем стиль "Выделенная цитата"
+		var Style_IntenseQuote = new CStyle("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style_IntenseQuote.Create_IntenseQuote();
+		this.Default.IntenseQuote = this.Add(Style_IntenseQuote);
 
-        // Создаем стандартный стиль верхнего колонтитула
-        var Style_Header = new CStyle("Header", this.Default.Paragraph, null, styletype_Paragraph );
-        Style_Header.Create_Header();
-        this.Default.Header = this.Add( Style_Header );
+		// Создаем стандартный стиль верхнего колонтитула
+		var Style_Header = new CStyle("Header", this.Default.Paragraph, null, styletype_Paragraph);
+		Style_Header.Create_Header();
+		this.Default.Header = this.Add(Style_Header);
 
-        // Создаем стандартный стиль нижнего колонтитула
-        var Style_Footer = new CStyle("Footer", this.Default.Paragraph, null, styletype_Paragraph );
-        Style_Footer.Create_Footer();
-        this.Default.Footer = this.Add( Style_Footer );
+		// Создаем стандартный стиль нижнего колонтитула
+		var Style_Footer = new CStyle("Footer", this.Default.Paragraph, null, styletype_Paragraph);
+		Style_Footer.Create_Footer();
+		this.Default.Footer = this.Add(Style_Footer);
 
-        // Создаем стиль для таблиц, который будет применяться к новым таблицам
-        var Style_TableGrid = new CStyle("Table Grid", this.Default.Table, null, styletype_Table );
-        Style_TableGrid.Create_TableGrid();
-        this.Default.TableGrid = this.Add( Style_TableGrid );
+		// Создаем стиль для таблиц, который будет применяться к новым таблицам
+		var Style_TableGrid = new CStyle("Table Grid", this.Default.Table, null, styletype_Table);
+		Style_TableGrid.Create_TableGrid();
+		this.Default.TableGrid = this.Add(Style_TableGrid);
 
         /*
          // Создаем стандартный стиль для таблиц
@@ -3626,6 +3631,51 @@ CStyles.prototype =
 		}
 	},
 
+	SetDefaultNoSpacing : function(Id)
+	{
+		if (Id !== this.Default.NoSpacing)
+		{
+			History.Add(new CChangesStylesChangeDefaultNoSpacingId(this, this.Default.NoSpacing, Id));
+			this.Default.NoSpacing = Id;
+		}
+	},
+
+	SetDefaultTitle : function(Id)
+	{
+		if (Id !== this.Default.Title)
+		{
+			History.Add(new CChangesStylesChangeDefaultTitleId(this, this.Default.Title, Id));
+			this.Default.Title = Id;
+		}
+	},
+
+	SetDefaultSubtitle : function(Id)
+	{
+		if (Id !== this.Default.Subtitle)
+		{
+			History.Add(new CChangesStylesChangeDefaultSubtitleId(this, this.Default.Subtitle, Id));
+			this.Default.Subtitle = Id;
+		}
+	},
+
+	SetDefaultQuote : function(Id)
+	{
+		if (Id !== this.Default.Quote)
+		{
+			History.Add(new CChangesStylesChangeDefaultQuoteId(this, this.Default.Quote, Id));
+			this.Default.Quote = Id;
+		}
+	},
+
+	SetDefaultIntenseQuote : function(Id)
+	{
+		if (Id !== this.Default.IntenseQuote)
+		{
+			History.Add(new CChangesStylesChangeDefaultIntenseQuoteId(this, this.Default.IntenseQuote, Id));
+			this.Default.IntenseQuote = Id;
+		}
+	},
+
 	RemapIdReferences : function(OldId, NewId)
 	{
 		if (OldId === this.Default.Paragraph)
@@ -3670,6 +3720,21 @@ CStyles.prototype =
 				this.SetDefaultHeading(NewId, nIndex);
 		}
 
+		if (OldId === this.Default.NoSpacing)
+			this.SetDefaultNoSpacing(NewId);
+
+		if (OldId === this.Default.Title)
+			this.SetDefaultTitle(NewId);
+
+		if (OldId === this.Default.Subtitle)
+			this.SetDefaultSubtitle(NewId);
+
+		if (OldId === this.Default.Quote)
+			this.SetDefaultQuote(NewId);
+
+		if (OldId === this.Default.IntenseQuote)
+			this.SetDefaultIntenseQuote(NewId);
+
 		for (var Id in this.Style)
 		{
 			this.Style[Id].RemapIdReferences(OldId, NewId);
@@ -3687,15 +3752,20 @@ CStyles.prototype =
         Styles.Default.TableCellPr = this.Default.TableCellPr.Copy();
 
         // Тут можно копировать напрямую, т.к. это либо null, либо StyleId, который мы повторяем
-        Styles.Default.Paragraph   = this.Default.Paragraph;
-        Styles.Default.Character   = this.Default.Character;
-        Styles.Default.Numbering   = this.Default.Numbering;
-        Styles.Default.Table       = this.Default.Table    ;
-        Styles.Default.TableGrid   = this.Default.TableGrid;
-        Styles.Default.ParaList    = this.Default.ParaList ;
-        Styles.Default.Header      = this.Default.Header   ;
-        Styles.Default.Footer      = this.Default.Footer   ;
-        Styles.Default.Hyperlink   = this.Default.Hyperlink;
+		Styles.Default.Paragraph    = this.Default.Paragraph;
+		Styles.Default.Character    = this.Default.Character;
+		Styles.Default.Numbering    = this.Default.Numbering;
+		Styles.Default.Table        = this.Default.Table;
+		Styles.Default.TableGrid    = this.Default.TableGrid;
+		Styles.Default.ParaList     = this.Default.ParaList;
+		Styles.Default.Header       = this.Default.Header;
+		Styles.Default.Footer       = this.Default.Footer;
+		Styles.Default.Hyperlink    = this.Default.Hyperlink;
+		Styles.Default.NoSpacing    = this.Default.NoSpacing;
+		Styles.Default.Title        = this.Default.Title;
+		Styles.Default.Subtitle     = this.Default.Subtitle;
+		Styles.Default.Quote        = this.Default.Quote;
+		Styles.Default.IntenseQuote = this.Default.IntenseQuote;
 
         for (var Index = 0, Count = this.Default.Headings.length; Index < Count; Index++)
         {
@@ -4303,11 +4373,11 @@ CStyles.prototype =
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
 //-----------------------------------------------------------------------------------
-    Get_SelectionState : function()
+	GetSelectionState : function()
     {
     },
 
-    Set_SelectionState : function(State, StateIndex)
+	SetSelectionState : function(State, StateIndex)
     {
     },
 
@@ -4351,11 +4421,11 @@ CStyles.prototype =
             if (StyleId != this.Default.Paragraph)
             {
                 var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
             }
 
             var Count = AllParagraphs.length;
@@ -4384,11 +4454,11 @@ CStyles.prototype =
             if (StyleId != this.Default.Paragraph)
             {
                 var AllStylesId = this.private_GetAllBasedStylesId(StyleId);
-                AllParagraphs = LogicDocument.Get_AllParagraphsByStyle(AllStylesId);
+                AllParagraphs = LogicDocument.GetAllParagraphsByStyle(AllStylesId);
             }
             else
             {
-                AllParagraphs = LogicDocument.Get_AllParagraphs({All : true});
+                AllParagraphs = LogicDocument.GetAllParagraphs({All : true});
             }
 
             var Count = AllParagraphs.length;
@@ -9340,8 +9410,27 @@ CParaPr.prototype =
             this.DefaultRunPr.Merge(ParaPr.DefaultRunPr);
         }
 
-        if( undefined != ParaPr.Bullet && ParaPr.Bullet.isBullet())
-            this.Bullet = ParaPr.Bullet.createDuplicate();
+        if(undefined != ParaPr.Bullet)
+        {
+            if(ParaPr.Bullet.isBullet())
+            {
+                this.Bullet = ParaPr.Bullet.createDuplicate();
+            }
+            else
+            {
+                if(this.Bullet && this.Bullet.isBullet()){
+                    if(ParaPr.Bullet.bulletColor){
+                        this.Bullet.bulletColor = ParaPr.Bullet.bulletColor.createDuplicate();
+                    }
+                    if(ParaPr.Bullet.bulletSize){
+                        this.Bullet.bulletSize = ParaPr.Bullet.bulletSize.createDuplicate();
+                    }
+                    if(ParaPr.Bullet.bulletTypeface){
+                        this.Bullet.bulletTypeface = ParaPr.Bullet.bulletTypeface.createDuplicate();
+                    }
+                }
+            }
+        }
 
         if(undefined != ParaPr.Lvl)
             this.Lvl = ParaPr.Lvl;
@@ -9938,7 +10027,7 @@ CParaPr.prototype =
         return true;
     },
 
-    Get_PresentationBullet: function()
+    Get_PresentationBullet: function(theme, colorMap)
     {
         var Bullet = new CPresentationBullet();
         if(this.Bullet && this.Bullet.isBullet())
@@ -9956,11 +10045,6 @@ CParaPr.prototype =
                     {
                         Bullet.m_sChar = "•";
                     }
-                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
-                    {
-                        Bullet.m_bFontTx = false;
-                        Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
-                    }
                     break;
                 }
 
@@ -9968,11 +10052,6 @@ CParaPr.prototype =
                 {
                     Bullet.m_nType = g_NumberingArr[this.Bullet.bulletType.AutoNumType];
                     Bullet.m_nStartAt = this.Bullet.bulletType.startAt;
-                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
-                    {
-                        Bullet.m_bFontTx = false;
-                        Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
-                    }
                     break;
                 }
                 case AscFormat.BULLET_TYPE_BULLET_NONE :
@@ -9984,6 +10063,48 @@ CParaPr.prototype =
                     Bullet.m_nType = numbering_presentationnumfrmt_Char;
                     Bullet.m_sChar = "•";
                     break;
+                }
+            }
+
+            if(this.Bullet.bulletColor){
+                if(this.Bullet.bulletColor.type === AscFormat.BULLET_TYPE_COLOR_NONE){
+                    Bullet.m_bColorTx = false;
+                    Bullet.m_oColor.a = 0;
+                }
+                if(this.Bullet.bulletColor.type === AscFormat.BULLET_TYPE_COLOR_CLR){
+                    if(this.Bullet.bulletColor.UniColor && this.Bullet.bulletColor.UniColor.color && theme && colorMap){
+                        Bullet.m_bColorTx = false;
+                        Bullet.Unifill = AscFormat.CreateUniFillByUniColor(this.Bullet.bulletColor.UniColor);
+                    }
+                }
+            }
+            if(this.Bullet.bulletTypeface)
+            {
+                if(this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT){
+                    Bullet.m_bFontTx = false;
+                    Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
+                }
+
+            }
+            if(this.Bullet.bulletSize)
+            {
+                switch (this.Bullet.bulletSize.type){
+                    case AscFormat.BULLET_TYPE_SIZE_TX:{
+                        Bullet.m_bSizeTx = true;
+                        break;
+                    }
+                    case AscFormat.BULLET_TYPE_SIZE_PCT:{
+                        Bullet.m_bSizeTx = false;
+                        Bullet.m_bSizePct = true;
+                        Bullet.m_dSize = this.Bullet.bulletSize.val/100000.0;
+                        break;
+                    }
+                    case AscFormat.BULLET_TYPE_SIZE_PCT:{
+                        Bullet.m_bSizeTx = false;
+                        Bullet.m_bSizePct = false;
+                        Bullet.m_dSize = this.Bullet.bulletSize.val/100000.0;
+                        break;
+                    }
                 }
             }
         }

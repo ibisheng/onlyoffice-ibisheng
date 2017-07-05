@@ -1399,7 +1399,7 @@ CMathBase.prototype.Get_Width = function(_CurLine, _CurRange)
 
     return this.Bounds.Get_Width(CurLine, CurRange);
 };
-CMathBase.prototype.Save_RecalculateObject = function(Copy)
+CMathBase.prototype.SaveRecalculateObject = function(Copy)
 {
     var RecalcObj;
     if(this.bOneLine)
@@ -1418,7 +1418,7 @@ CMathBase.prototype.Save_RecalculateObject = function(Copy)
         {
             if(Pos == Num)
             {
-                RecalcObj.Content[Pos] = this.Content[Pos].Save_RecalculateObject(Copy);
+                RecalcObj.Content[Pos] = this.Content[Pos].SaveRecalculateObject(Copy);
             }
             else
             {
@@ -1429,10 +1429,10 @@ CMathBase.prototype.Save_RecalculateObject = function(Copy)
 
     return RecalcObj;
 };
-CMathBase.prototype.Load_RecalculateObject = function(RecalcObj)
+CMathBase.prototype.LoadRecalculateObject = function(RecalcObj)
 {
-    if(this.bOneLine == false)
-        CParagraphContentWithParagraphLikeContent.prototype.Load_RecalculateObject.call(this, RecalcObj);
+	if (this.bOneLine == false)
+		CParagraphContentWithParagraphLikeContent.prototype.LoadRecalculateObject.call(this, RecalcObj);
 
 };
 CMathBase.prototype.Fill_LogicalContent = function(nCount)
@@ -1715,12 +1715,12 @@ CMathBase.prototype.Set_ParaContentPos = function(ContentPos, Depth)
     if (undefined === CurPos || this.CurPos < 0)
     {
         this.CurPos = 0;
-        this.Content[this.CurPos].Cursor_MoveToStartPos();
+        this.Content[this.CurPos].MoveCursorToStartPos();
     }
     else if (CurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+        this.Content[this.CurPos].MoveCursorToEndPos(false);
     }
     else
     {
@@ -1773,13 +1773,13 @@ CMathBase.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selectio
     }
 
 };
-CMathBase.prototype.Selection_IsEmpty = function()
+CMathBase.prototype.IsSelectionEmpty = function()
 {
     if (true !== this.Selection.Use)
         return true;
 
     if (this.Selection.StartPos === this.Selection.EndPos)
-        return this.Content[this.Selection.StartPos].Selection_IsEmpty();
+        return this.Content[this.Selection.StartPos].IsSelectionEmpty();
 
     return false;
 };
@@ -2202,7 +2202,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
     return Wrap;
 };*/
-CMathBase.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+CMathBase.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     var bOneLine = MinMax.bMath_OneLine;
 
@@ -2228,7 +2228,7 @@ CMathBase.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 }
                 else
                 {
-                    Item.Recalculate_MinMaxContentWidth(MinMax);
+                    Item.RecalculateMinMaxContentWidth(MinMax);
                 }
             }
         }
@@ -2274,7 +2274,7 @@ CMathBase.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
             var Item = this.Content[Pos];
 
             MinMax.bMath_OneLine = Pos !== Numb;
-            Item.Recalculate_MinMaxContentWidth(MinMax);
+            Item.RecalculateMinMaxContentWidth(MinMax);
 
             if(Pos !== Numb)
             {
@@ -2620,7 +2620,7 @@ CMathBase.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth
     if (reviewtype_Common !== ReviewType)
         Checker.End_CheckOnlyTextPr();
 };
-CMathBase.prototype.Accept_RevisionChanges = function(Type, bAll)
+CMathBase.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     var ReviewType = this.ReviewType;
     if (reviewtype_Add === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextAdd === Type))
@@ -2643,9 +2643,9 @@ CMathBase.prototype.Accept_RevisionChanges = function(Type, bAll)
         }
     }
 
-    CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.AcceptRevisionChanges.apply(this, arguments);
 };
-CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
+CMathBase.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     var ReviewType = this.ReviewType;
     if (reviewtype_Remove === ReviewType && (undefined === Type || c_oAscRevisionsChangeType.TextRem === Type))
@@ -2668,7 +2668,7 @@ CMathBase.prototype.Reject_RevisionChanges = function(Type, bAll)
         }
     }
 
-    CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges.apply(this, arguments);
+    CParagraphContentWithParagraphLikeContent.prototype.RejectRevisionChanges.apply(this, arguments);
 };
 CMathBase.prototype.Set_MenuProps = function(Props)
 {
@@ -2814,13 +2814,13 @@ CMathBase.prototype.private_CorrectCurPos = function()
     if (this.CurPos > this.Content.length - 1)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToEndPos(false);
+        this.Content[this.CurPos].MoveCursorToEndPos(false);
     }
 
     if (this.CurPos < 0)
     {
         this.CurPos = this.Content.length - 1;
-        this.Content[this.CurPos].Cursor_MoveToStartPos();
+        this.Content[this.CurPos].MoveCursorToStartPos();
     }
 };
 CMathBase.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, bStart, bEnd)

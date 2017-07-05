@@ -485,7 +485,6 @@
 		if (null == canvas) {return;}
 		this.canvas = canvas;
 		this.ctx = this.canvas.getContext("2d");
-		//this.initContextSmoothing();
 	};
 
 	/**
@@ -628,25 +627,6 @@
 		}
 		return this;
 	};
-
-	/**
-	 * Delete smoothing
-	 */
-	/*DrawingContext.prototype.initContextSmoothing = function () {
-		var ctx = this.ctx;
-		if (!AscBrowser.isMobileVersion || null === ctx)
-			return;
-
-		// Не убирать. Баг на android при scroll!!!
-		if (ctx.imageSmoothingEnabled)
-			ctx.imageSmoothingEnabled = false;
-		if (ctx.mozImageSmoothingEnabled)
-			ctx.mozImageSmoothingEnabled = false;
-		if (ctx.oImageSmoothingEnabled)
-			ctx.oImageSmoothingEnabled = false;
-		if (ctx.webkitImageSmoothingEnabled)
-			ctx.webkitImageSmoothingEnabled = false;
-	};*/
 
 	// Canvas methods
 

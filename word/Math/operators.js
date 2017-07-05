@@ -3095,7 +3095,7 @@ COperator.prototype.IsArrow = function()
 
     var bArrow = this.typeOper == ARROW_LEFT || this.typeOper == ARROW_RIGHT || this.typeOper == ARROW_LR,
         bDoubleArrow = this.typeOper == DOUBLE_LEFT_ARROW || this.typeOper == DOUBLE_RIGHT_ARROW || this.typeOper == DOUBLE_ARROW_LR,
-        bAccentArrow = his.typeOper == ACCENT_ARROW_LEFT || this.typeOper == ACCENT_ARROW_RIGHT || this.typeOper == ACCENT_ARROW_LR || this.typeOper == ACCENT_HALF_ARROW_LEFT || this.typeOper == ACCENT_HALF_ARROW_RIGHT;
+        bAccentArrow = this.typeOper == ACCENT_ARROW_LEFT || this.typeOper == ACCENT_ARROW_RIGHT || this.typeOper == ACCENT_ARROW_LR || this.typeOper == ACCENT_HALF_ARROW_LEFT || this.typeOper == ACCENT_HALF_ARROW_RIGHT;
 
     return bArrow || bDoubleArrow;
 };
@@ -3456,12 +3456,12 @@ CDelimiter.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
         this.BrGapRight = this.GapRight + this.endOper.size.width;
     }
 };
-CDelimiter.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+CDelimiter.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     this.BrGapLeft  = this.GapLeft  + this.begOper.size.width;
     this.BrGapRight = this.GapRight + this.endOper.size.width;
 
-    CMathBase.prototype.Recalculate_MinMaxContentWidth.call(this, MinMax);
+    CMathBase.prototype.RecalculateMinMaxContentWidth.call(this, MinMax);
 };
 CDelimiter.prototype.Is_EmptyGaps = function()
 {

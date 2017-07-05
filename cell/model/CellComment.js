@@ -522,7 +522,7 @@ CCellCommentator.prototype.getCommentsXY = function(x, y) {
 
 	CCellCommentator.prototype.drawCommentCells = function () {
 
-		if (this.isViewerMode() || this.model.workbook.handlers.trigger('hiddenComments')) {
+		if (this.isViewerMode() || this.hiddenComments()) {
 			return;
 		}
 
@@ -531,7 +531,8 @@ CCellCommentator.prototype.getCommentsXY = function(x, y) {
 		var aComments = this.model.aComments;
 		for (var i = 0; i < aComments.length; ++i) {
 			commentCell = aComments[i];
-			if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() || commentCell.asc_getSolved()) {
+			if (commentCell.asc_getDocumentFlag() || commentCell.asc_getHiddenFlag() ||
+				(commentCell.asc_getSolved() && !this.showSolved())) {
 				continue;
 			}
 
@@ -944,15 +945,16 @@ CCellCommentator.prototype.getCommentsCoords = function(comments) {
 	return coords;
 };
 
-CCellCommentator.prototype.cleanSelectedComment = function() {
-	var metrics;
-	if ( this.lastSelectedId ) {
-		var comment = this.findComment(this.lastSelectedId);
-		if (comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved() &&
-			(metrics = this.worksheet.getCellMetrics(comment.asc_getCol(), comment.asc_getRow())))
-			this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
-	}
-};
+	CCellCommentator.prototype.cleanSelectedComment = function () {
+		var metrics;
+		if (this.lastSelectedId) {
+			var comment = this.findComment(this.lastSelectedId);
+			if (comment && !comment.asc_getDocumentFlag() && (this.showSolved() || !comment.asc_getSolved()) &&
+				(metrics = this.worksheet.getCellMetrics(comment.asc_getCol(), comment.asc_getRow()))) {
+				this.overlayCtx.clearRect(metrics.left, metrics.top, metrics.width, metrics.height);
+			}
+		}
+	};
 
 //-----------------------------------------------------------------------------------
 // Misc methods
@@ -1010,7 +1012,7 @@ CCellCommentator.prototype.selectComment = function(id, bMove) {
 	this.cleanLastSelection();
 	this.lastSelectedId = null;
 
-	if (comment && !comment.asc_getDocumentFlag() && !comment.asc_getSolved()) {
+	if (comment && !comment.asc_getDocumentFlag() && (this.showSolved() || !comment.asc_getSolved())) {
 
 		this.lastSelectedId = id;
 
@@ -1150,14 +1152,13 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 // Extra functions
 
 	CCellCommentator.prototype.getComments = function (col, row) {
-
 		// Array of root items
 		var comments = [];
 		var _col = col, _row = row, mergedRange = null;
 		var aComments = this.model.aComments;
 		var length = aComments.length;
 
-		if (this.model.workbook.handlers.trigger('hiddenComments')) {
+		if (this.hiddenComments()) {
 			return comments;
 		}
 
@@ -1172,11 +1173,10 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 
 			for (var i = 0; i < length; i++) {
 				var commentCell = aComments[i];
-
-				if (!commentCell.asc_getDocumentFlag() /*&& !commentCell.asc_getSolved()*/ &&
-					!commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0)) {
+				if (!commentCell.asc_getDocumentFlag() && !commentCell.asc_getHiddenFlag() &&
+					(!commentCell.asc_getSolved() || this.showSolved()) && 0 === commentCell.nLevel) {
 					if (!mergedRange) {
-						if ((_col == commentCell.nCol) && (_row == commentCell.nRow)) {
+						if (_col === commentCell.nCol && _row === commentCell.nRow) {
 							comments.push(commentCell);
 						}
 					} else {
@@ -1192,7 +1192,7 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 
 	CCellCommentator.prototype.getRangeComments = function (range) {
 		var oComments = {};
-		if (this.model.workbook.handlers.trigger('hiddenComments')) {
+		if (this.hiddenComments()) {
 			return null;
 		}
 
@@ -1445,6 +1445,13 @@ CCellCommentator.prototype.Redo = function(type, data) {
 			break;
 	}
 };
+
+	CCellCommentator.prototype.hiddenComments = function () {
+		return this.model.workbook.handlers.trigger('hiddenComments');
+	};
+	CCellCommentator.prototype.showSolved = function () {
+		return this.model.workbook.handlers.trigger('showSolved');
+	};
 
 	//----------------------------------------------------------export----------------------------------------------------
 	var prot;

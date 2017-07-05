@@ -907,6 +907,7 @@ FT_Stream.prototype =
                 case 24:  /* read a byte sequence */
                 case 25:   /* skip some bytes      */
                 {
+					var len = fields[ind].size;
                     if ( cursor + fsize > this.size )
                     {
                         error = 85;
@@ -918,7 +919,7 @@ FT_Stream.prototype =
                     if ( fval == 24 )
                     {
                         data = structure.data;
-                        pos = structure.pos + arrayFields[ind].offset;
+                        pos = structure.pos + fields[ind].offset;
 
                         for (var i=0;i<len;i++)
                             data[i] = this.data[cursor+i];
@@ -985,8 +986,8 @@ FT_Stream.prototype =
             /* finally, store the value in the object */
 
             data = structure.data;
-            pos = structure.pos + arrayFields[ind].offset;
-            switch (arrayFields[ind])
+            pos = structure.pos + fields[ind].offset;
+            switch (fields[ind])
             {
                 case 1:
                     data[pos] = value & 0xFF;
@@ -8895,6 +8896,16 @@ function AFM_StreamRec()
     this.status = 0;
 }
 
+function AFM_ParserRec()
+{
+	this.memory = null;
+	this.stream = null;
+
+	this.FontInfo = null;
+	this.get_index = null;
+	this.user_data = null;
+}
+
 function AFM_IS_NEWLINE(ch)
 {
     if (ch == 13 || ch == 10)
@@ -10455,7 +10466,7 @@ function ps_tocoordarray(cur, limit, max_coords, coords)
 
         var old_cur = cur.pos;
 
-        if ( coords != NULL && count >= max_coords )
+        if ( coords != null && count >= max_coords )
             break;
 
         /* call PS_Conv_ToFixed() even if coords == NULL */
@@ -12861,7 +12872,7 @@ function sfnt_get_charset_id(face,acharset_encoding,acharset_registry)
         FT_Error = tt_face_find_bdf_prop(face, "CHARSET_ENCODING", encoding);
         if (FT_Error == 0)
         {
-            if (registry.type == BDF_PROPERTY_TYPE_ATOM && encoding.type == BDF_PROPERTY_TYPE_ATOM)
+            if (registry.type == 1 && encoding.type == 1)
             {
                 return {enc:encoding.u,reg:registry.u};
             }
@@ -15473,7 +15484,7 @@ function tt_cmap4_char_map_linear(cmap, _charcode, next)
     if (next != 0 && gindex != 0)
         return {gindex:gindex,char_code:charcode};
 
-    return {gindex:gindex,char_code:_char_code};
+    return {gindex:gindex,char_code:_charcode};
 }
 function tt_cmap4_char_map_binary(cmap, _charcode, next)
 {
@@ -16292,7 +16303,7 @@ function tt_cmap12_char_map_binary(cmap, _char_code, next)
 
         cmap.valid = 1;
         cmap.cur_charcode = char_code;
-        cmap12.cur_group = mid;
+        cmap.cur_group = mid;
 
         if (gindex == 0)
         {
@@ -16322,7 +16333,7 @@ function tt_cmap12_char_next(cmap, _char_code)
     if (cmap.cur_charcode >= 0xFFFFFFFF)
         return {gindex:gindex,char_code:__char_code};
 
-    if (cmap12.valid == 1 && cmap.cur_charcode == _char_code)
+    if (cmap.valid == 1 && cmap.cur_charcode == _char_code)
     {
         tt_cmap12_next(cmap);
         if (1 == cmap.valid)
@@ -16502,7 +16513,7 @@ function tt_cmap13_char_map_binary(cmap, _char_code, next)
 
         if (gindex == 0)
         {
-            tt_cmap13_next( cmap13 );
+            tt_cmap13_next( cmap );
             if (cmap.valid == 1)
                 gindex = cmap.cur_gindex;
         }
@@ -16539,7 +16550,7 @@ function tt_cmap13_char_next(cmap, _char_code)
             gindex = 0;
     }
     else
-        return tt_cmap13_char_map_binary( cmap, pchar_code, 1 );
+        return tt_cmap13_char_map_binary( cmap, _char_code, 1 );
 
     return {gindex:gindex,char_code:__char_code};
 }
@@ -16552,7 +16563,7 @@ function tt_cmap13_class_rec()
         var p = dublicate_pointer(table);
         var base = p.pos;
 
-        if (bae + 16 > valid.limit)
+        if (base + 16 > valid.limit)
             return 8;
 
         p.pos = base + 4;
@@ -16913,13 +16924,13 @@ function tt_cmap14_variant_chars(cmap, memory, variantSelector)
     {
         var __pp = dublicate_pointer(_cmap_data);
         __pp += defOff;
-        return tt_cmap14_get_def_chars(cmap, _p, memory);
+        return tt_cmap14_get_def_chars(cmap, __pp, memory);
     }
     if (dcnt == 0)
     {
         var __pp = dublicate_pointer(_cmap_data);
         __pp += nondefOff;
-        return tt_cmap14_get_nondef_chars(cmap, __p, memory);
+        return tt_cmap14_get_nondef_chars(cmap, __pp, memory);
     }
 
     if (0 != tt_cmap14_ensure(cmap, (dcnt + numMappings + 1), memory))
@@ -21784,7 +21795,7 @@ function Ins_SxVTL(exc, aIdx1, aIdx2, aOpc, Vec)
     if ((aIdx1 >= exc.zp2.n_points) || (aIdx2 >= exc.zp1.n_points))
     {
         if (exc.pedantic_hinting)
-            exc.error = FT_Err_Invalid_Reference;
+            exc.error = 0x86;
         return 1;
     }
 
@@ -28167,7 +28178,7 @@ function TT_Vary_Get_Glyph_Deltas(face, glyph_index, n_points)
         stream.cur = here;
     }
 
-    for ( i = 0; i < ( tupleCount & GX_TC_TUPLE_COUNT_MASK ); ++i )
+    for ( i = 0; i < ( tupleCount & 0x0FFF ); ++i )
     {
         var tupleDataSize = stream.GetUShort();
         var tupleIndex    = stream.GetUShort();
@@ -33571,12 +33582,12 @@ function cff_size_done(cffsize)
     var internal = cffsize.internal;
     if (internal != null)
     {
-        var funcs = cff_size_get_globals_funcs(size);
+        var funcs = cff_size_get_globals_funcs(cffsize);
         if (funcs != null)
         {
             funcs.destroy(internal.topfont);
 
-            for (var i = font.num_subfonts; i > 0; i--)
+            for (var i = internal.topfont.num_subfonts; i > 0; i--)
                 funcs.destroy(internal.subfonts[i - 1]);
         }
         /* `internal' is freed by destroy_size (in ftobjs.c) */
@@ -34061,7 +34072,7 @@ function cff_face_init(stream, face, face_index, num_params, params)
             var cid_font_name = cff_index_get_sid_string(cff, dict.cid_font_name);
             /* do we have a `/FontName' for a CID-keyed font? */
             if (cid_font_name != null)
-                face.family_name = cff_strcpy(memory, cid_font_name);
+                face.family_name = cff_strcpy(face.memory, cid_font_name);
         }
 
         if (style_name != null)
@@ -35868,7 +35879,7 @@ function cff_decoder_parse_charstrings(decoder, charstring_base, charstring_len)
                 }
 
                 case 32:
-                    topsargs[0] = FT_MulFix( args[0], args[1] );
+                    tops[args] = FT_MulFix( args[0], args[1] );
                     args++;
                     break;
 
@@ -36609,7 +36620,7 @@ function cff_get_glyph_name(face, glyph_index, buffer, buffer_max)
 function cff_get_name_index(face, glyph_name)
 {
     var cff = face.extra.data;
-    var charset = cf.charset;
+    var charset = cff.charset;
 
     var psnames = FT_FACE_FIND_GLOBAL_SERVICE(face, FT_SERVICE_ID_POSTSCRIPT_CMAPS);
     if (psnames == null)
@@ -36729,7 +36740,7 @@ function cff_get_ros(face, registry, ordering, supplement)
         ret.supplement = dict.cid_supplement;
     }
 
-    return error;
+    return ret;
 }
 
 function cff_get_is_cid(face)
@@ -37843,7 +37854,7 @@ function T1_Get_Private_Dict(parser, psaux)
             parser.private_len = ret.num_bytes;
 
             /* put a safeguard */
-            parser.private_dict[len] = 0;
+            parser.private_dict[ret.num_bytes] = 0;
         }
         else
         {
@@ -38430,7 +38441,7 @@ function T1_Get_MM_Var(face)
     if (error != 0)
         return { err: error, mm : null };
 
-    var _num_axis = master.num_axis;
+    var _num_axis = mmaster.num_axis;
     mmvar.axis = new Array(_num_axis);
     for (var i = 0; i < _num_axis; i++)
         mmvar.axis[i] = new FT_Var_Axis();
@@ -41875,4 +41886,6 @@ function FT_CMap_New(clazz, init_data, charmap)
   window['AscFonts'].FT_Render_Glyph = FT_Render_Glyph;
   window['AscFonts'].raster_memory = raster_memory;
   window['AscFonts'].FT_Get_Charmap_Index = FT_Get_Charmap_Index;
+  window['AscFonts'].FT_Vector = FT_Vector;
+  window['AscFonts'].FT_Get_Kerning = FT_Get_Kerning;
 })(window);

@@ -39,6 +39,9 @@
 */
 function (window, undefined) {
 
+    
+    var sFrozenImageUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAKCAYAAAB10jRKAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAJElEQVQYV2MAAjUQoQIiFECEDIiQABHCIIIPRHCBCDYgZmACABohANImre1SAAAAAElFTkSuQmCC';
+    var sFrozenImageRotUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAABCAYAAADn9T9+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTZEaa/1AAAAGklEQVQYV2NkYGBQA+J/QPwHCf+GYiif4Q8AnJAJBNqB9DYAAAAASUVORK5CYII='
 // Import
 var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
 var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
@@ -1905,6 +1908,12 @@ function DrawingObjects() {
             _this.showDrawingObjects(true);
         };
 
+        if(!Asc['editor'].ImageLoader.map_image_index[sFrozenImageUrl]){
+            aImagesSync.push(sFrozenImageUrl);
+        }
+        if(!Asc['editor'].ImageLoader.map_image_index[sFrozenImageRotUrl]){
+            aImagesSync.push(sFrozenImageRotUrl);
+        }
         if(aImagesSync.length > 0)
         {
             var old_val = api.ImageLoader.bIsAsyncLoadDocumentImages;
@@ -2196,8 +2205,8 @@ function DrawingObjects() {
         }
 
         if ( !printOptions ) {
-            if ( aObjects.length ) {
-                if ( _this.controller.selectedObjects.length )
+            if ( aObjects.length || _this.drawingArea.frozenPlaces.length > 1) {
+                if ( _this.controller.selectedObjects.length || _this.drawingArea.frozenPlaces.length > 1)
                 {
                     _this.OnUpdateOverlay();
                     _this.controller.updateSelectionState(true);
@@ -2560,8 +2569,8 @@ function DrawingObjects() {
 
                 var oContent = oTextArt.getDocContent();
                 if(oContent){
-                    oContent.Cursor_MoveToStartPos(false);
-                    oContent.Paragraph_Add(new AscCommonWord.MathMenu(Type), false);
+                    oContent.MoveCursorToStartPos(false);
+                    oContent.AddToParagraph(new AscCommonWord.MathMenu(Type), false);
                 }
                 oTextArt.checkExtentsByDocContent();
                 oTextArt.spPr.xfrm.setOffX(pxToMm(coordsFrom.x) + MOVE_DELTA);
@@ -2571,7 +2580,7 @@ function DrawingObjects() {
                 _this.controller.selectObject(oTextArt, 0);
                 var oContent = oTextArt.getDocContent();
                 _this.controller.selection.textSelection = oTextArt;
-                //oContent.Select_All();
+                //oContent.SelectAll();
                 oTextArt.addToRecalculate();
                 _this.controller.startRecalculate();
                 worksheet.setSelectionShape(true);
@@ -2584,6 +2593,19 @@ function DrawingObjects() {
     {
         _this.controller.setMathProps(MathProps);
     }
+
+    _this.setListType = function(type, subtype)
+    {
+        var NumberInfo =
+            {
+                Type    : 0,
+                SubType : -1
+            };
+
+        NumberInfo.Type    = type;
+        NumberInfo.SubType = subtype;
+        _this.controller.checkSelectedObjectsAndCallback(_this.controller.setParagraphNumbering, [AscFormat.fGetPresentationBulletByNumInfo(NumberInfo)], false, AscDFH.historydescription_Presentation_SetParagraphNumbering);
+    };
 
     _this.editImageDrawingObject = function(imageUrl) {
 
@@ -4107,7 +4129,11 @@ function DrawingObjects() {
                 var box = selectedRange.getBBox0();
                 settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
             }
-            settings.putRange(worksheet.getSelectionRangeValue());
+            var oRangeValue = worksheet.getSelectionRangeValue();
+            if(oRangeValue){
+                settings.putRange(oRangeValue.asc_getName());
+            }
+
             settings.putStyle(2);
             settings.putType(Asc.c_oAscChartTypeSettings.lineNormal);
             settings.putTitle(Asc.c_oAscChartTitleShowSettings.noOverlay);
@@ -4295,11 +4321,11 @@ function DrawingObjects() {
         if (!oContent) {
             return false;
         }
-        var oPara = oContent.Get_CurrentParagraph();
+        var oPara = oContent.GetCurrentParagraph();
         if (!oPara) {
             return false;
         }
-        if (true === oContent.Is_SelectionUse())
+        if (true === oContent.IsSelectionUse())
             oContent.Remove(1, true, false, true);
         var oRun = oPara.Get_ElementByPos(oPara.Get_ParaContentPos(false, false));
         if (!oRun || !(oRun instanceof ParaRun)) {
@@ -4745,4 +4771,6 @@ function CoordsManager(ws) {
     window["AscFormat"].ClickCounter = ClickCounter;
     window["AscFormat"].aSparklinesStyles = aSparklinesStyles;
     window["AscFormat"].CSparklineView = CSparklineView;
+    window["AscFormat"].sFrozenImageUrl = sFrozenImageUrl;
+    window["AscFormat"].sFrozenImageRotUrl = sFrozenImageRotUrl;
 })(window);

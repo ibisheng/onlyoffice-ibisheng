@@ -358,8 +358,8 @@ CChangesParagraphAddItem.prototype.Load = function(Color)
 				}
 			}
 
-			if (Element.Set_Paragraph)
-				Element.Set_Paragraph(oParagraph);
+			if (Element.SetParagraph)
+				Element.SetParagraph(oParagraph);
 
 			oParagraph.Content.splice(Pos, 0, Element);
 			AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(oParagraph, Pos);

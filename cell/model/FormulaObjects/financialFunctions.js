@@ -483,49 +483,49 @@
 			arg[7] : new cBool(true);
 
 		if (issue instanceof cArea || issue instanceof cArea3D) {
-			issue = issue.cross(arguments[1].bbox);
+			issue = issue.cross(arguments[1]);
 		} else if (issue instanceof cArray) {
 			issue = issue.getElementRowCol(0, 0);
 		}
 
 		if (firstInterest instanceof cArea || firstInterest instanceof cArea3D) {
-			firstInterest = firstInterest.cross(arguments[1].bbox);
+			firstInterest = firstInterest.cross(arguments[1]);
 		} else if (firstInterest instanceof cArray) {
 			firstInterest = firstInterest.getElementRowCol(0, 0);
 		}
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (par instanceof cArea || par instanceof cArea3D) {
-			par = par.cross(arguments[1].bbox);
+			par = par.cross(arguments[1]);
 		} else if (par instanceof cArray) {
 			par = par.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
 
 		if (calcMethod instanceof cArea || calcMethod instanceof cArea3D) {
-			calcMethod = calcMethod.cross(arguments[1].bbox);
+			calcMethod = calcMethod.cross(arguments[1]);
 		} else if (calcMethod instanceof cArray) {
 			calcMethod = calcMethod.getElementRowCol(0, 0);
 		}
@@ -630,12 +630,6 @@
 		res *= par * rate / frequency;
 		return this.value = new cNumber(res);
 	};
-	cACCRINT.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( issue , first-interest , settlement , rate , [ par ] , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -657,31 +651,31 @@
 			new cNumber(1000), basis = arg[4] && !(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0);
 
 		if (issue instanceof cArea || issue instanceof cArea3D) {
-			issue = issue.cross(arguments[1].bbox);
+			issue = issue.cross(arguments[1]);
 		} else if (issue instanceof cArray) {
 			issue = issue.getElementRowCol(0, 0);
 		}
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (par instanceof cArea || par instanceof cArea3D) {
-			par = par.cross(arguments[1].bbox);
+			par = par.cross(arguments[1]);
 		} else if (par instanceof cArray) {
 			par = par.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -726,11 +720,6 @@
 
 		return this.value = new cNumber(res)
 	};
-	cACCRINTM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( issue , settlement , rate , [ [ par ] [ , [ basis ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -752,43 +741,43 @@
 		!(arg[6] instanceof cEmpty) ? arg[6] : new cNumber(0);
 
 		if (cost instanceof cArea || cost instanceof cArea3D) {
-			cost = cost.cross(arguments[1].bbox);
+			cost = cost.cross(arguments[1]);
 		} else if (cost instanceof cArray) {
 			cost = cost.getElementRowCol(0, 0);
 		}
 
 		if (datePurch instanceof cArea || datePurch instanceof cArea3D) {
-			datePurch = datePurch.cross(arguments[1].bbox);
+			datePurch = datePurch.cross(arguments[1]);
 		} else if (datePurch instanceof cArray) {
 			datePurch = datePurch.getElementRowCol(0, 0);
 		}
 
 		if (firstPer instanceof cArea || firstPer instanceof cArea3D) {
-			firstPer = firstPer.cross(arguments[1].bbox);
+			firstPer = firstPer.cross(arguments[1]);
 		} else if (firstPer instanceof cArray) {
 			firstPer = firstPer.getElementRowCol(0, 0);
 		}
 
 		if (salvage instanceof cArea || salvage instanceof cArea3D) {
-			salvage = salvage.cross(arguments[1].bbox);
+			salvage = salvage.cross(arguments[1]);
 		} else if (salvage instanceof cArray) {
 			salvage = salvage.getElementRowCol(0, 0);
 		}
 
 		if (period instanceof cArea || period instanceof cArea3D) {
-			period = period.cross(arguments[1].bbox);
+			period = period.cross(arguments[1]);
 		} else if (period instanceof cArray) {
 			period = period.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -924,11 +913,6 @@
 		return this.value;
 
 	};
-	cAMORDEGRC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , date-purchased , first-period , salvage , period , rate [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -950,43 +934,43 @@
 		!(arg[6] instanceof cEmpty) ? arg[6] : new cNumber(0);
 
 		if (cost instanceof cArea || cost instanceof cArea3D) {
-			cost = cost.cross(arguments[1].bbox);
+			cost = cost.cross(arguments[1]);
 		} else if (cost instanceof cArray) {
 			cost = cost.getElementRowCol(0, 0);
 		}
 
 		if (datePurch instanceof cArea || datePurch instanceof cArea3D) {
-			datePurch = datePurch.cross(arguments[1].bbox);
+			datePurch = datePurch.cross(arguments[1]);
 		} else if (datePurch instanceof cArray) {
 			datePurch = datePurch.getElementRowCol(0, 0);
 		}
 
 		if (firstPer instanceof cArea || firstPer instanceof cArea3D) {
-			firstPer = firstPer.cross(arguments[1].bbox);
+			firstPer = firstPer.cross(arguments[1]);
 		} else if (firstPer instanceof cArray) {
 			firstPer = firstPer.getElementRowCol(0, 0);
 		}
 
 		if (salvage instanceof cArea || salvage instanceof cArea3D) {
-			salvage = salvage.cross(arguments[1].bbox);
+			salvage = salvage.cross(arguments[1]);
 		} else if (salvage instanceof cArray) {
 			salvage = salvage.getElementRowCol(0, 0);
 		}
 
 		if (period instanceof cArea || period instanceof cArea3D) {
-			period = period.cross(arguments[1].bbox);
+			period = period.cross(arguments[1]);
 		} else if (period instanceof cArray) {
 			period = period.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -1060,11 +1044,6 @@
 		}
 
 	};
-	cAMORLINC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , date-purchased , first-period , salvage , period , rate [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1086,25 +1065,25 @@
 			arg[3] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -1144,11 +1123,6 @@
 		return this.value = new cNumber(getcoupdaybs(settl, matur, frequency, basis));
 
 	};
-	cCOUPDAYBS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1170,25 +1144,25 @@
 			arg[3] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -1227,11 +1201,6 @@
 		return this.value = new cNumber(getcoupdays(settl, matur, frequency, basis));
 
 	};
-	cCOUPDAYS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1253,25 +1222,25 @@
 			arg[3] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -1310,11 +1279,6 @@
 		return this.value = new cNumber(getcoupdaysnc(new Date(settl), new Date(matur), frequency, basis));
 
 	};
-	cCOUPDAYSNC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1336,25 +1300,25 @@
 			arg[3] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -1395,11 +1359,6 @@
 		return this.value;
 
 	};
-	cCOUPNCD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1421,25 +1380,25 @@
 			arg[3] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -1480,11 +1439,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cCOUPNUM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1506,25 +1460,25 @@
 			arg[3] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -1567,11 +1521,6 @@
 		return this.value;
 
 	};
-	cCOUPPCD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1592,37 +1541,37 @@
 		var rate = arg[0], nper = arg[1], pv = arg[2], startPeriod = arg[3], endPeriod = arg[4], type = arg[5];
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (nper instanceof cArea || nper instanceof cArea3D) {
-			nper = nper.cross(arguments[1].bbox);
+			nper = nper.cross(arguments[1]);
 		} else if (nper instanceof cArray) {
 			nper = nper.getElementRowCol(0, 0);
 		}
 
 		if (pv instanceof cArea || pv instanceof cArea3D) {
-			pv = pv.cross(arguments[1].bbox);
+			pv = pv.cross(arguments[1]);
 		} else if (pv instanceof cArray) {
 			pv = pv.getElementRowCol(0, 0);
 		}
 
 		if (startPeriod instanceof cArea || startPeriod instanceof cArea3D) {
-			startPeriod = startPeriod.cross(arguments[1].bbox);
+			startPeriod = startPeriod.cross(arguments[1]);
 		} else if (startPeriod instanceof cArray) {
 			startPeriod = startPeriod.getElementRowCol(0, 0);
 		}
 
 		if (endPeriod instanceof cArea || endPeriod instanceof cArea3D) {
-			endPeriod = endPeriod.cross(arguments[1].bbox);
+			endPeriod = endPeriod.cross(arguments[1]);
 		} else if (endPeriod instanceof cArray) {
 			endPeriod = endPeriod.getElementRowCol(0, 0);
 		}
 
 		if (type instanceof cArea || type instanceof cArea3D) {
-			type = type.cross(arguments[1].bbox);
+			type = type.cross(arguments[1]);
 		} else if (type instanceof cArray) {
 			type = type.getElementRowCol(0, 0);
 		}
@@ -1689,11 +1638,6 @@
 		return this.value = new cNumber(ipmt);
 
 	};
-	cCUMIPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pv , start-period , end-period , type )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1716,37 +1660,37 @@
 			new cNumber(0);
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (nper instanceof cArea || nper instanceof cArea3D) {
-			nper = nper.cross(arguments[1].bbox);
+			nper = nper.cross(arguments[1]);
 		} else if (nper instanceof cArray) {
 			nper = nper.getElementRowCol(0, 0);
 		}
 
 		if (pv instanceof cArea || pv instanceof cArea3D) {
-			pv = pv.cross(arguments[1].bbox);
+			pv = pv.cross(arguments[1]);
 		} else if (pv instanceof cArray) {
 			pv = pv.getElementRowCol(0, 0);
 		}
 
 		if (startPeriod instanceof cArea || startPeriod instanceof cArea3D) {
-			startPeriod = startPeriod.cross(arguments[1].bbox);
+			startPeriod = startPeriod.cross(arguments[1]);
 		} else if (startPeriod instanceof cArray) {
 			startPeriod = startPeriod.getElementRowCol(0, 0);
 		}
 
 		if (endPeriod instanceof cArea || endPeriod instanceof cArea3D) {
-			endPeriod = endPeriod.cross(arguments[1].bbox);
+			endPeriod = endPeriod.cross(arguments[1]);
 		} else if (endPeriod instanceof cArray) {
 			endPeriod = endPeriod.getElementRowCol(0, 0);
 		}
 
 		if (type instanceof cArea || type instanceof cArea3D) {
-			type = type.cross(arguments[1].bbox);
+			type = type.cross(arguments[1]);
 		} else if (type instanceof cArray) {
 			type = type.getElementRowCol(0, 0);
 		}
@@ -1813,11 +1757,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cCUMPRINC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pv , start-period , end-period , type )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1839,31 +1778,31 @@
 		!(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(12);
 
 		if (cost instanceof cArea || cost instanceof cArea3D) {
-			cost = cost.cross(arguments[1].bbox);
+			cost = cost.cross(arguments[1]);
 		} else if (cost instanceof cArray) {
 			cost = cost.getElementRowCol(0, 0);
 		}
 
 		if (salvage instanceof cArea || salvage instanceof cArea3D) {
-			salvage = salvage.cross(arguments[1].bbox);
+			salvage = salvage.cross(arguments[1]);
 		} else if (salvage instanceof cArray) {
 			salvage = salvage.getElementRowCol(0, 0);
 		}
 
 		if (life instanceof cArea || life instanceof cArea3D) {
-			life = life.cross(arguments[1].bbox);
+			life = life.cross(arguments[1]);
 		} else if (life instanceof cArray) {
 			life = life.getElementRowCol(0, 0);
 		}
 
 		if (period instanceof cArea || period instanceof cArea3D) {
-			period = period.cross(arguments[1].bbox);
+			period = period.cross(arguments[1]);
 		} else if (period instanceof cArray) {
 			period = period.getElementRowCol(0, 0);
 		}
 
 		if (month instanceof cArea || month instanceof cArea3D) {
-			month = month.cross(arguments[1].bbox);
+			month = month.cross(arguments[1]);
 		} else if (month instanceof cArray) {
 			month = month.getElementRowCol(0, 0);
 		}
@@ -1930,11 +1869,6 @@
 		return this.value;
 
 	};
-	cDB.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , salvage , life , period [ , [ month ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1956,31 +1890,31 @@
 		!(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(2);
 
 		if (cost instanceof cArea || cost instanceof cArea3D) {
-			cost = cost.cross(arguments[1].bbox);
+			cost = cost.cross(arguments[1]);
 		} else if (cost instanceof cArray) {
 			cost = cost.getElementRowCol(0, 0);
 		}
 
 		if (salvage instanceof cArea || salvage instanceof cArea3D) {
-			salvage = salvage.cross(arguments[1].bbox);
+			salvage = salvage.cross(arguments[1]);
 		} else if (salvage instanceof cArray) {
 			salvage = salvage.getElementRowCol(0, 0);
 		}
 
 		if (life instanceof cArea || life instanceof cArea3D) {
-			life = life.cross(arguments[1].bbox);
+			life = life.cross(arguments[1]);
 		} else if (life instanceof cArray) {
 			life = life.getElementRowCol(0, 0);
 		}
 
 		if (period instanceof cArea || period instanceof cArea3D) {
-			period = period.cross(arguments[1].bbox);
+			period = period.cross(arguments[1]);
 		} else if (period instanceof cArray) {
 			period = period.getElementRowCol(0, 0);
 		}
 
 		if (factor instanceof cArea || factor instanceof cArea3D) {
-			factor = factor.cross(arguments[1].bbox);
+			factor = factor.cross(arguments[1]);
 		} else if (factor instanceof cArray) {
 			factor = factor.getElementRowCol(0, 0);
 		}
@@ -2025,11 +1959,6 @@
 		return this.value;
 
 	};
-	cDDB.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , salvage , life , period [ , factor ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2051,31 +1980,31 @@
 		!(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (pr instanceof cArea || pr instanceof cArea3D) {
-			pr = pr.cross(arguments[1].bbox);
+			pr = pr.cross(arguments[1]);
 		} else if (pr instanceof cArray) {
 			pr = pr.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -2121,11 +2050,6 @@
 		return this.value;
 
 	};
-	cDISC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , pr , redemption [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2146,13 +2070,13 @@
 		var fractionalDollar = arg[0], fraction = arg[1];
 
 		if (fractionalDollar instanceof cArea || fractionalDollar instanceof cArea3D) {
-			fractionalDollar = fractionalDollar.cross(arguments[1].bbox);
+			fractionalDollar = fractionalDollar.cross(arguments[1]);
 		} else if (fractionalDollar instanceof cArray) {
 			fractionalDollar = fractionalDollar.getElementRowCol(0, 0);
 		}
 
 		if (fraction instanceof cArea || fraction instanceof cArea3D) {
-			fraction = fraction.cross(arguments[1].bbox);
+			fraction = fraction.cross(arguments[1]);
 		} else if (fraction instanceof cArray) {
 			fraction = fraction.getElementRowCol(0, 0);
 		}
@@ -2189,11 +2113,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cDOLLARDE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( fractional-dollar , fraction )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2214,13 +2133,13 @@
 		var decimalDollar = arg[0], fraction = arg[1];
 
 		if (decimalDollar instanceof cArea || decimalDollar instanceof cArea3D) {
-			decimalDollar = decimalDollar.cross(arguments[1].bbox);
+			decimalDollar = decimalDollar.cross(arguments[1]);
 		} else if (decimalDollar instanceof cArray) {
 			decimalDollar = decimalDollar.getElementRowCol(0, 0);
 		}
 
 		if (fraction instanceof cArea || fraction instanceof cArea3D) {
-			fraction = fraction.cross(arguments[1].bbox);
+			fraction = fraction.cross(arguments[1]);
 		} else if (fraction instanceof cArray) {
 			fraction = fraction.getElementRowCol(0, 0);
 		}
@@ -2257,11 +2176,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cDOLLARFR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( decimal-dollar , fraction )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2283,37 +2197,37 @@
 		!(arg[5] instanceof cEmpty) ? arg[5] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (coupon instanceof cArea || coupon instanceof cArea3D) {
-			coupon = coupon.cross(arguments[1].bbox);
+			coupon = coupon.cross(arguments[1]);
 		} else if (coupon instanceof cArray) {
 			coupon = coupon.getElementRowCol(0, 0);
 		}
 
 		if (yld instanceof cArea || yld instanceof cArea3D) {
-			yld = yld.cross(arguments[1].bbox);
+			yld = yld.cross(arguments[1]);
 		} else if (yld instanceof cArray) {
 			yld = yld.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -2362,11 +2276,6 @@
 		return this.value = new cNumber(getduration(settl, matur, coupon, yld, frequency, basis));
 
 	};
-	cDURATION.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , coupon , yld , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2387,13 +2296,13 @@
 		var nominalRate = arg[0], npery = arg[1];
 
 		if (nominalRate instanceof cArea || nominalRate instanceof cArea3D) {
-			nominalRate = nominalRate.cross(arguments[1].bbox);
+			nominalRate = nominalRate.cross(arguments[1]);
 		} else if (nominalRate instanceof cArray) {
 			nominalRate = nominalRate.getElementRowCol(0, 0);
 		}
 
 		if (npery instanceof cArea || npery instanceof cArea3D) {
-			npery = npery.cross(arguments[1].bbox);
+			npery = npery.cross(arguments[1]);
 		} else if (npery instanceof cArray) {
 			npery = npery.getElementRowCol(0, 0);
 		}
@@ -2417,11 +2326,6 @@
 
 		return this.value = new cNumber(Math.pow((1 + nominalRate / npery), npery) - 1);
 	};
-	cEFFECT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( nominal-rate , npery )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2443,31 +2347,31 @@
 			new cNumber(0);
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (nper instanceof cArea || nper instanceof cArea3D) {
-			nper = nper.cross(arguments[1].bbox);
+			nper = nper.cross(arguments[1]);
 		} else if (nper instanceof cArray) {
 			nper = nper.getElementRowCol(0, 0);
 		}
 
 		if (pmt instanceof cArea || pmt instanceof cArea3D) {
-			pmt = pmt.cross(arguments[1].bbox);
+			pmt = pmt.cross(arguments[1]);
 		} else if (pmt instanceof cArray) {
 			pmt = pmt.getElementRowCol(0, 0);
 		}
 
 		if (pv instanceof cArea || pv instanceof cArea3D) {
-			pv = pv.cross(arguments[1].bbox);
+			pv = pv.cross(arguments[1]);
 		} else if (pv instanceof cArray) {
 			pv = pv.getElementRowCol(0, 0);
 		}
 
 		if (type instanceof cArea || type instanceof cArea3D) {
-			type = type.cross(arguments[1].bbox);
+			type = type.cross(arguments[1]);
 		} else if (type instanceof cArray) {
 			type = type.getElementRowCol(0, 0);
 		}
@@ -2509,11 +2413,6 @@
 
 		return this.value = new cNumber(res);
 	};
-	cFV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pmt [ , [ pv ] [ ,[ type ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2534,7 +2433,7 @@
 		var principal = arg[0], schedule = arg[1], shedList = [];
 
 		if (principal instanceof cArea || principal instanceof cArea3D) {
-			principal = principal.cross(arguments[1].bbox);
+			principal = principal.cross(arguments[1]);
 		} else if (principal instanceof cArray) {
 			principal = principal.getElementRowCol(0, 0);
 		}
@@ -2570,11 +2469,6 @@
 		return this.value = new cNumber(princ);
 
 	};
-	cFVSCHEDULE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( principal , schedule )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2596,31 +2490,31 @@
 		!(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (investment instanceof cArea || investment instanceof cArea3D) {
-			investment = investment.cross(arguments[1].bbox);
+			investment = investment.cross(arguments[1]);
 		} else if (investment instanceof cArray) {
 			investment = investment.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -2667,11 +2561,6 @@
 		return this.value;
 
 	};
-	cINTRATE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , pr , redemption [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2693,37 +2582,37 @@
 			new cNumber(0), type = arg[5] ? arg[5] : new cNumber(0);
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (per instanceof cArea || per instanceof cArea3D) {
-			per = per.cross(arguments[1].bbox);
+			per = per.cross(arguments[1]);
 		} else if (per instanceof cArray) {
 			per = per.getElementRowCol(0, 0);
 		}
 
 		if (nper instanceof cArea || nper instanceof cArea3D) {
-			nper = nper.cross(arguments[1].bbox);
+			nper = nper.cross(arguments[1]);
 		} else if (nper instanceof cArray) {
 			nper = nper.getElementRowCol(0, 0);
 		}
 
 		if (pv instanceof cArea || pv instanceof cArea3D) {
-			pv = pv.cross(arguments[1].bbox);
+			pv = pv.cross(arguments[1]);
 		} else if (pv instanceof cArray) {
 			pv = pv.getElementRowCol(0, 0);
 		}
 
 		if (fv instanceof cArea || fv instanceof cArea3D) {
-			fv = fv.cross(arguments[1].bbox);
+			fv = fv.cross(arguments[1]);
 		} else if (fv instanceof cArray) {
 			fv = fv.getElementRowCol(0, 0);
 		}
 
 		if (type instanceof cArea || type instanceof cArea3D) {
-			type = type.cross(arguments[1].bbox);
+			type = type.cross(arguments[1]);
 		} else if (type instanceof cArray) {
 			type = type.getElementRowCol(0, 0);
 		}
@@ -2772,11 +2661,6 @@
 		this.value = new cNumber(getIPMT(rate, per, pv, type, res));
 //    this.value.numFormat = 9;
 		return this.value;
-	};
-	cIPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , per , nper , pv [ , [ fv ] [ , [ type ] ] ] )"
-		};
 	};
 
 	/**
@@ -2909,11 +2793,6 @@
 		return this.value;
 
 	};
-	cIRR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( values [ , [ guess ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2934,25 +2813,25 @@
 		var rate = arg[0], per = arg[1], nper = arg[2], pv = arg[3];
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (per instanceof cArea || per instanceof cArea3D) {
-			per = per.cross(arguments[1].bbox);
+			per = per.cross(arguments[1]);
 		} else if (per instanceof cArray) {
 			per = per.getElementRowCol(0, 0);
 		}
 
 		if (nper instanceof cArea || nper instanceof cArea3D) {
-			nper = nper.cross(arguments[1].bbox);
+			nper = nper.cross(arguments[1]);
 		} else if (nper instanceof cArray) {
 			nper = nper.getElementRowCol(0, 0);
 		}
 
 		if (pv instanceof cArea || pv instanceof cArea3D) {
-			pv = pv.cross(arguments[1].bbox);
+			pv = pv.cross(arguments[1]);
 		} else if (pv instanceof cArray) {
 			pv = pv.getElementRowCol(0, 0);
 		}
@@ -2981,11 +2860,6 @@
 
 		return this.value = new cNumber(pv.getValue() * rate.getValue() * (per.getValue() / nper.getValue() - 1));
 	};
-	cISPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , per , nper , pv )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3007,37 +2881,37 @@
 		!(arg[5] instanceof cEmpty) ? arg[5] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (coupon instanceof cArea || coupon instanceof cArea3D) {
-			coupon = coupon.cross(arguments[1].bbox);
+			coupon = coupon.cross(arguments[1]);
 		} else if (coupon instanceof cArray) {
 			coupon = coupon.getElementRowCol(0, 0);
 		}
 
 		if (yld instanceof cArea || yld instanceof cArea3D) {
-			yld = yld.cross(arguments[1].bbox);
+			yld = yld.cross(arguments[1]);
 		} else if (yld instanceof cArray) {
 			yld = yld.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -3090,11 +2964,6 @@
 		return this.value = new cNumber(duration);
 
 	};
-	cMDURATION.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , coupon , yld , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3144,13 +3013,13 @@
 		}
 
 		if (invest instanceof cArea || invest instanceof cArea3D) {
-			invest = invest.cross(arguments[1].bbox);
+			invest = invest.cross(arguments[1]);
 		} else if (invest instanceof cArray) {
 			invest = invest.getElementRowCol(0, 0);
 		}
 
 		if (reinvest instanceof cArea || reinvest instanceof cArea3D) {
-			reinvest = reinvest.cross(arguments[1].bbox);
+			reinvest = reinvest.cross(arguments[1]);
 		} else if (reinvest instanceof cArray) {
 			reinvest = reinvest.getElementRowCol(0, 0);
 		}
@@ -3204,11 +3073,6 @@
 		return this.value;
 
 	};
-	cMIRR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( values , finance-rate , reinvest-rate )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3229,13 +3093,13 @@
 		var effectRate = arg[0], npery = arg[1];
 
 		if (effectRate instanceof cArea || effectRate instanceof cArea3D) {
-			effectRate = effectRate.cross(arguments[1].bbox);
+			effectRate = effectRate.cross(arguments[1]);
 		} else if (effectRate instanceof cArray) {
 			effectRate = effectRate.getElementRowCol(0, 0);
 		}
 
 		if (npery instanceof cArea || npery instanceof cArea3D) {
-			npery = npery.cross(arguments[1].bbox);
+			npery = npery.cross(arguments[1]);
 		} else if (npery instanceof cArray) {
 			npery = npery.getElementRowCol(0, 0);
 		}
@@ -3263,11 +3127,6 @@
 		return this.value;
 
 	};
-	cNOMINAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( effect-rate , npery )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3289,31 +3148,31 @@
 			new cNumber(0);
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (pmt instanceof cArea || pmt instanceof cArea3D) {
-			pmt = pmt.cross(arguments[1].bbox);
+			pmt = pmt.cross(arguments[1]);
 		} else if (pmt instanceof cArray) {
 			pmt = pmt.getElementRowCol(0, 0);
 		}
 
 		if (pv instanceof cArea || pv instanceof cArea3D) {
-			pv = pv.cross(arguments[1].bbox);
+			pv = pv.cross(arguments[1]);
 		} else if (pv instanceof cArray) {
 			pv = pv.getElementRowCol(0, 0);
 		}
 
 		if (fv instanceof cArea || fv instanceof cArea3D) {
-			fv = fv.cross(arguments[1].bbox);
+			fv = fv.cross(arguments[1]);
 		} else if (fv instanceof cArray) {
 			fv = fv.getElementRowCol(0, 0);
 		}
 
 		if (type instanceof cArea || type instanceof cArea3D) {
-			type = type.cross(arguments[1].bbox);
+			type = type.cross(arguments[1]);
 		} else if (type instanceof cArray) {
 			type = type.getElementRowCol(0, 0);
 		}
@@ -3359,11 +3218,6 @@
 
 		return this.value = new cNumber(res);
 	};
-	cNPER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , pmt , pv [ , [ fv ] [ , [ type ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3387,7 +3241,7 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -3437,11 +3291,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cNPV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3463,55 +3312,55 @@
 		!(arg[8] instanceof cEmpty) ? arg[8] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (issue instanceof cArea || issue instanceof cArea3D) {
-			issue = issue.cross(arguments[1].bbox);
+			issue = issue.cross(arguments[1]);
 		} else if (issue instanceof cArray) {
 			issue = issue.getElementRowCol(0, 0);
 		}
 
 		if (first_coupon instanceof cArea || first_coupon instanceof cArea3D) {
-			first_coupon = first_coupon.cross(arguments[1].bbox);
+			first_coupon = first_coupon.cross(arguments[1]);
 		} else if (first_coupon instanceof cArray) {
 			first_coupon = first_coupon.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (yld instanceof cArea || yld instanceof cArea3D) {
-			yld = yld.cross(arguments[1].bbox);
+			yld = yld.cross(arguments[1]);
 		} else if (yld instanceof cArray) {
 			yld = yld.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -3579,12 +3428,6 @@
 		return this.value;
 
 	};
-	cODDFPRICE.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( settlement , maturity , issue , first-coupon , rate , yld , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3606,55 +3449,55 @@
 		!(arg[8] instanceof cEmpty) ? arg[8] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (issue instanceof cArea || issue instanceof cArea3D) {
-			issue = issue.cross(arguments[1].bbox);
+			issue = issue.cross(arguments[1]);
 		} else if (issue instanceof cArray) {
 			issue = issue.getElementRowCol(0, 0);
 		}
 
 		if (first_coupon instanceof cArea || first_coupon instanceof cArea3D) {
-			first_coupon = first_coupon.cross(arguments[1].bbox);
+			first_coupon = first_coupon.cross(arguments[1]);
 		} else if (first_coupon instanceof cArray) {
 			first_coupon = first_coupon.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (pr instanceof cArea || pr instanceof cArea3D) {
-			pr = pr.cross(arguments[1].bbox);
+			pr = pr.cross(arguments[1]);
 		} else if (pr instanceof cArray) {
 			pr = pr.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -3788,12 +3631,6 @@
 		return this.value;
 
 	};
-	cODDFYIELD.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( settlement , maturity , issue , first-coupon , rate , pr , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3815,49 +3652,49 @@
 		!(arg[7] instanceof cEmpty) ? arg[7] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (last_interest instanceof cArea || last_interest instanceof cArea3D) {
-			last_interest = last_interest.cross(arguments[1].bbox);
+			last_interest = last_interest.cross(arguments[1]);
 		} else if (last_interest instanceof cArray) {
 			last_interest = last_interest.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (yld instanceof cArea || yld instanceof cArea3D) {
-			yld = yld.cross(arguments[1].bbox);
+			yld = yld.cross(arguments[1]);
 		} else if (yld instanceof cArray) {
 			yld = yld.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -3927,12 +3764,6 @@
 		return this.value;
 
 	};
-	cODDLPRICE.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( settlement , maturity , last-interest , rate , yld , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -3954,49 +3785,49 @@
 		!(arg[7] instanceof cEmpty) ? arg[7] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (last_interest instanceof cArea || last_interest instanceof cArea3D) {
-			last_interest = last_interest.cross(arguments[1].bbox);
+			last_interest = last_interest.cross(arguments[1]);
 		} else if (last_interest instanceof cArray) {
 			last_interest = last_interest.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (pr instanceof cArea || pr instanceof cArea3D) {
-			pr = pr.cross(arguments[1].bbox);
+			pr = pr.cross(arguments[1]);
 		} else if (pr instanceof cArray) {
 			pr = pr.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -4067,12 +3898,6 @@
 		return this.value;
 
 	};
-	cODDLYIELD.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( settlement , maturity , last-interest , rate , pr , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4094,31 +3919,31 @@
 			new cNumber(0);
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (nper instanceof cArea || nper instanceof cArea3D) {
-			nper = nper.cross(arguments[1].bbox);
+			nper = nper.cross(arguments[1]);
 		} else if (nper instanceof cArray) {
 			nper = nper.getElementRowCol(0, 0);
 		}
 
 		if (pv instanceof cArea || pv instanceof cArea3D) {
-			pv = pv.cross(arguments[1].bbox);
+			pv = pv.cross(arguments[1]);
 		} else if (pv instanceof cArray) {
 			pv = pv.getElementRowCol(0, 0);
 		}
 
 		if (fv instanceof cArea || fv instanceof cArea3D) {
-			fv = fv.cross(arguments[1].bbox);
+			fv = fv.cross(arguments[1]);
 		} else if (fv instanceof cArray) {
 			fv = fv.getElementRowCol(0, 0);
 		}
 
 		if (type instanceof cArea || type instanceof cArea3D) {
-			type = type.cross(arguments[1].bbox);
+			type = type.cross(arguments[1]);
 		} else if (type instanceof cArray) {
 			type = type.getElementRowCol(0, 0);
 		}
@@ -4165,11 +3990,6 @@
 
 		return this.value = new cNumber(res);
 	};
-	cPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pv [ , [ fv ] [ ,[ type ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4191,37 +4011,37 @@
 			new cNumber(0), type = arg[5] ? arg[5] : new cNumber(0);
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (per instanceof cArea || per instanceof cArea3D) {
-			per = per.cross(arguments[1].bbox);
+			per = per.cross(arguments[1]);
 		} else if (per instanceof cArray) {
 			per = per.getElementRowCol(0, 0);
 		}
 
 		if (nper instanceof cArea || nper instanceof cArea3D) {
-			nper = nper.cross(arguments[1].bbox);
+			nper = nper.cross(arguments[1]);
 		} else if (nper instanceof cArray) {
 			nper = nper.getElementRowCol(0, 0);
 		}
 
 		if (pv instanceof cArea || pv instanceof cArea3D) {
-			pv = pv.cross(arguments[1].bbox);
+			pv = pv.cross(arguments[1]);
 		} else if (pv instanceof cArray) {
 			pv = pv.getElementRowCol(0, 0);
 		}
 
 		if (fv instanceof cArea || fv instanceof cArea3D) {
-			fv = fv.cross(arguments[1].bbox);
+			fv = fv.cross(arguments[1]);
 		} else if (fv instanceof cArray) {
 			fv = fv.getElementRowCol(0, 0);
 		}
 
 		if (type instanceof cArea || type instanceof cArea3D) {
-			type = type.cross(arguments[1].bbox);
+			type = type.cross(arguments[1]);
 		} else if (type instanceof cArray) {
 			type = type.getElementRowCol(0, 0);
 		}
@@ -4273,11 +4093,6 @@
 //    this.value.numFormat = 9;
 		return this.value;
 	};
-	cPPMT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , per , nper , pv [ , [ fv ] [ , [ type ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4299,43 +4114,43 @@
 		!(arg[6] instanceof cEmpty) ? arg[6] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (yld instanceof cArea || yld instanceof cArea3D) {
-			yld = yld.cross(arguments[1].bbox);
+			yld = yld.cross(arguments[1]);
 		} else if (yld instanceof cArray) {
 			yld = yld.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -4389,11 +4204,6 @@
 		return this.value = new cNumber(getprice(settl, matur, rate, yld, redemption, frequency, basis));
 
 	};
-	cPRICE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , rate , yld , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4415,31 +4225,31 @@
 		!(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (discount instanceof cArea || discount instanceof cArea3D) {
-			discount = discount.cross(arguments[1].bbox);
+			discount = discount.cross(arguments[1]);
 		} else if (discount instanceof cArray) {
 			discount = discount.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -4484,11 +4294,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cPRICEDISC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , discount , redemption [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4510,37 +4315,37 @@
 		!(arg[5] instanceof cEmpty) ? arg[5] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (issue instanceof cArea || issue instanceof cArea3D) {
-			issue = issue.cross(arguments[1].bbox);
+			issue = issue.cross(arguments[1]);
 		} else if (issue instanceof cArray) {
 			issue = issue.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (yld instanceof cArea || yld instanceof cArea3D) {
-			yld = yld.cross(arguments[1].bbox);
+			yld = yld.cross(arguments[1]);
 		} else if (yld instanceof cArray) {
 			yld = yld.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -4599,11 +4404,6 @@
 		return this.value = new cNumber(res);
 
 	};
-	cPRICEMAT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , issue , rate , yld [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4625,31 +4425,31 @@
 			new cNumber(0);
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (nper instanceof cArea || nper instanceof cArea3D) {
-			nper = nper.cross(arguments[1].bbox);
+			nper = nper.cross(arguments[1]);
 		} else if (nper instanceof cArray) {
 			nper = nper.getElementRowCol(0, 0);
 		}
 
 		if (pmt instanceof cArea || pmt instanceof cArea3D) {
-			pmt = pmt.cross(arguments[1].bbox);
+			pmt = pmt.cross(arguments[1]);
 		} else if (pmt instanceof cArray) {
 			pmt = pmt.getElementRowCol(0, 0);
 		}
 
 		if (fv instanceof cArea || fv instanceof cArea3D) {
-			fv = fv.cross(arguments[1].bbox);
+			fv = fv.cross(arguments[1]);
 		} else if (fv instanceof cArray) {
 			fv = fv.getElementRowCol(0, 0);
 		}
 
 		if (type instanceof cArea || type instanceof cArea3D) {
-			type = type.cross(arguments[1].bbox);
+			type = type.cross(arguments[1]);
 		} else if (type instanceof cArray) {
 			type = type.getElementRowCol(0, 0);
 		}
@@ -4691,11 +4491,6 @@
 
 		return this.value = new cNumber(res);
 	};
-	cPV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , nper , pmt [ , [ fv ] [ ,[ type ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4718,37 +4513,37 @@
 			new cNumber(0), quess = arg[5] ? arg[5] : new cNumber(0.1);
 
 		if (nper instanceof cArea || nper instanceof cArea3D) {
-			nper = nper.cross(arguments[1].bbox);
+			nper = nper.cross(arguments[1]);
 		} else if (nper instanceof cArray) {
 			nper = nper.getElementRowCol(0, 0);
 		}
 
 		if (pmt instanceof cArea || pmt instanceof cArea3D) {
-			pmt = pmt.cross(arguments[1].bbox);
+			pmt = pmt.cross(arguments[1]);
 		} else if (pmt instanceof cArray) {
 			pmt = pmt.getElementRowCol(0, 0);
 		}
 
 		if (pv instanceof cArea || pv instanceof cArea3D) {
-			pv = pv.cross(arguments[1].bbox);
+			pv = pv.cross(arguments[1]);
 		} else if (pv instanceof cArray) {
 			pv = pv.getElementRowCol(0, 0);
 		}
 
 		if (fv instanceof cArea || fv instanceof cArea3D) {
-			fv = fv.cross(arguments[1].bbox);
+			fv = fv.cross(arguments[1]);
 		} else if (fv instanceof cArray) {
 			fv = fv.getElementRowCol(0, 0);
 		}
 
 		if (type instanceof cArea || type instanceof cArea3D) {
-			type = type.cross(arguments[1].bbox);
+			type = type.cross(arguments[1]);
 		} else if (type instanceof cArray) {
 			type = type.getElementRowCol(0, 0);
 		}
 
 		if (quess instanceof cArea || quess instanceof cArea3D) {
-			quess = quess.cross(arguments[1].bbox);
+			quess = quess.cross(arguments[1]);
 		} else if (quess instanceof cArray) {
 			quess = quess.getElementRowCol(0, 0);
 		}
@@ -4794,11 +4589,6 @@
 		this.value.numFormat = 9;
 		return this.value;
 	};
-	cRATE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( nper , pmt , pv  [ , [ [ fv ] [ , [ [ type ] [ , [ guess ] ] ] ] ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4820,31 +4610,31 @@
 		!(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (investment instanceof cArea || investment instanceof cArea3D) {
-			investment = investment.cross(arguments[1].bbox);
+			investment = investment.cross(arguments[1]);
 		} else if (investment instanceof cArray) {
 			investment = investment.getElementRowCol(0, 0);
 		}
 
 		if (discount instanceof cArea || discount instanceof cArea3D) {
-			discount = discount.cross(arguments[1].bbox);
+			discount = discount.cross(arguments[1]);
 		} else if (discount instanceof cArray) {
 			discount = discount.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -4890,11 +4680,6 @@
 		return this.value;
 
 	};
-	cRECEIVED.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , investment , discount [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4915,19 +4700,19 @@
 		var cost = arg[0], salvage = arg[1], life = arg[2];
 
 		if (cost instanceof cArea || cost instanceof cArea3D) {
-			cost = cost.cross(arguments[1].bbox);
+			cost = cost.cross(arguments[1]);
 		} else if (cost instanceof cArray) {
 			cost = cost.getElementRowCol(0, 0);
 		}
 
 		if (salvage instanceof cArea || salvage instanceof cArea3D) {
-			salvage = salvage.cross(arguments[1].bbox);
+			salvage = salvage.cross(arguments[1]);
 		} else if (salvage instanceof cArray) {
 			salvage = salvage.getElementRowCol(0, 0);
 		}
 
 		if (life instanceof cArea || life instanceof cArea3D) {
-			life = life.cross(arguments[1].bbox);
+			life = life.cross(arguments[1]);
 		} else if (life instanceof cArray) {
 			life = life.getElementRowCol(0, 0);
 		}
@@ -4958,11 +4743,6 @@
 		return this.value;
 
 	};
-	cSLN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , salvage , life )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -4983,25 +4763,25 @@
 		var cost = arg[0], salvage = arg[1], life = arg[2], per = arg[3];
 
 		if (cost instanceof cArea || cost instanceof cArea3D) {
-			cost = cost.cross(arguments[1].bbox);
+			cost = cost.cross(arguments[1]);
 		} else if (cost instanceof cArray) {
 			cost = cost.getElementRowCol(0, 0);
 		}
 
 		if (salvage instanceof cArea || salvage instanceof cArea3D) {
-			salvage = salvage.cross(arguments[1].bbox);
+			salvage = salvage.cross(arguments[1]);
 		} else if (salvage instanceof cArray) {
 			salvage = salvage.getElementRowCol(0, 0);
 		}
 
 		if (life instanceof cArea || life instanceof cArea3D) {
-			life = life.cross(arguments[1].bbox);
+			life = life.cross(arguments[1]);
 		} else if (life instanceof cArray) {
 			life = life.getElementRowCol(0, 0);
 		}
 
 		if (per instanceof cArea || per instanceof cArea3D) {
-			per = per.cross(arguments[1].bbox);
+			per = per.cross(arguments[1]);
 		} else if (per instanceof cArray) {
 			per = per.getElementRowCol(0, 0);
 		}
@@ -5040,11 +4820,6 @@
 
 		return this.value = new cNumber(res);
 	};
-	cSYD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( cost , salvage , life , per )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5065,19 +4840,19 @@
 		var settlement = arg[0], maturity = arg[1], discount = arg[2];
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (discount instanceof cArea || discount instanceof cArea3D) {
-			discount = discount.cross(arguments[1].bbox);
+			discount = discount.cross(arguments[1]);
 		} else if (discount instanceof cArray) {
 			discount = discount.getElementRowCol(0, 0);
 		}
@@ -5123,11 +4898,6 @@
 		return this.value;
 
 	};
-	cTBILLEQ.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , discount )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5148,19 +4918,19 @@
 		var settlement = arg[0], maturity = arg[1], discount = arg[2];
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (discount instanceof cArea || discount instanceof cArea3D) {
-			discount = discount.cross(arguments[1].bbox);
+			discount = discount.cross(arguments[1]);
 		} else if (discount instanceof cArray) {
 			discount = discount.getElementRowCol(0, 0);
 		}
@@ -5202,11 +4972,6 @@
 		return this.value;
 
 	};
-	cTBILLPRICE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , discount )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5227,19 +4992,19 @@
 		var settlement = arg[0], maturity = arg[1], pr = arg[2];
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (pr instanceof cArea || pr instanceof cArea3D) {
-			pr = pr.cross(arguments[1].bbox);
+			pr = pr.cross(arguments[1]);
 		} else if (pr instanceof cArray) {
 			pr = pr.getElementRowCol(0, 0);
 		}
@@ -5281,11 +5046,6 @@
 		this.value.numFormat = 9;
 		return this.value;
 
-	};
-	cTBILLYIELD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , pr )"
-		};
 	};
 
 	/**
@@ -5340,43 +5100,43 @@
 
 
 		if (cost instanceof cArea || cost instanceof cArea3D) {
-			cost = cost.cross(arguments[1].bbox);
+			cost = cost.cross(arguments[1]);
 		} else if (cost instanceof cArray) {
 			cost = cost.getElementRowCol(0, 0);
 		}
 
 		if (salvage instanceof cArea || salvage instanceof cArea3D) {
-			salvage = salvage.cross(arguments[1].bbox);
+			salvage = salvage.cross(arguments[1]);
 		} else if (salvage instanceof cArray) {
 			salvage = salvage.getElementRowCol(0, 0);
 		}
 
 		if (life instanceof cArea || life instanceof cArea3D) {
-			life = life.cross(arguments[1].bbox);
+			life = life.cross(arguments[1]);
 		} else if (life instanceof cArray) {
 			life = life.getElementRowCol(0, 0);
 		}
 
 		if (startPeriod instanceof cArea || startPeriod instanceof cArea3D) {
-			startPeriod = startPeriod.cross(arguments[1].bbox);
+			startPeriod = startPeriod.cross(arguments[1]);
 		} else if (startPeriod instanceof cArray) {
 			startPeriod = startPeriod.getElementRowCol(0, 0);
 		}
 
 		if (endPeriod instanceof cArea || endPeriod instanceof cArea3D) {
-			endPeriod = endPeriod.cross(arguments[1].bbox);
+			endPeriod = endPeriod.cross(arguments[1]);
 		} else if (endPeriod instanceof cArray) {
 			endPeriod = endPeriod.getElementRowCol(0, 0);
 		}
 
 		if (factor instanceof cArea || factor instanceof cArea3D) {
-			factor = factor.cross(arguments[1].bbox);
+			factor = factor.cross(arguments[1]);
 		} else if (factor instanceof cArray) {
 			factor = factor.getElementRowCol(0, 0);
 		}
 
 		if (flag instanceof cArea || flag instanceof cArea3D) {
-			flag = flag.cross(arguments[1].bbox);
+			flag = flag.cross(arguments[1]);
 		} else if (flag instanceof cArray) {
 			flag = flag.getElementRowCol(0, 0);
 		}
@@ -5459,12 +5219,6 @@
 		}
 
 		return this.value = new cNumber(res);
-	};
-	cVDB.prototype.getInfo = function () {
-		return {
-			name: this.name,
-			args: "( cost , salvage , life , start-period , end-period [ , [ [ factor ] [ , [ no-switch-flag ] ] ] ] ] )"
-		};
 	};
 
 	/**
@@ -5694,7 +5448,7 @@
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
 		} else if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1].bbox);
+			arg2 = arg2.cross(arguments[1]);
 			if (!(arg2 instanceof cNumber)) {
 				return this.value = new cError(cErrorType.wrong_value_type);
 			}
@@ -5715,11 +5469,6 @@
 		this.value.numFormat = 9;
 		return this.value;
 
-	};
-	cXIRR.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( values , dates [ , [ guess ] ] )"
-		};
 	};
 
 	/**
@@ -5767,7 +5516,7 @@
 		}
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		}
 		if (arg0 instanceof cArray) {
 			arg0 = arg0.getElement(0);
@@ -5849,11 +5598,6 @@
 		return this.value = xnpv(arg0, valueArray, dateArray);
 
 	};
-	cXNPV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( rate , values , dates  )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5875,43 +5619,43 @@
 		!(arg[6] instanceof cEmpty) ? arg[6] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (pr instanceof cArea || pr instanceof cArea3D) {
-			pr = pr.cross(arguments[1].bbox);
+			pr = pr.cross(arguments[1]);
 		} else if (pr instanceof cArray) {
 			pr = pr.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (frequency instanceof cArea || frequency instanceof cArea3D) {
-			frequency = frequency.cross(arguments[1].bbox);
+			frequency = frequency.cross(arguments[1]);
 		} else if (frequency instanceof cArray) {
 			frequency = frequency.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -5967,11 +5711,6 @@
 		return this.value;
 
 	};
-	cYIELD.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , rate , pr , redemption , frequency [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -5993,31 +5732,31 @@
 		!(arg[4] instanceof cEmpty) ? arg[4] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (pr instanceof cArea || pr instanceof cArea3D) {
-			pr = pr.cross(arguments[1].bbox);
+			pr = pr.cross(arguments[1]);
 		} else if (pr instanceof cArray) {
 			pr = pr.getElementRowCol(0, 0);
 		}
 
 		if (redemption instanceof cArea || redemption instanceof cArea3D) {
-			redemption = redemption.cross(arguments[1].bbox);
+			redemption = redemption.cross(arguments[1]);
 		} else if (redemption instanceof cArray) {
 			redemption = redemption.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -6065,11 +5804,6 @@
 		return this.value;
 
 	};
-	cYIELDDISC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , pr , redemption , [ , [ basis ] ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -6091,37 +5825,37 @@
 		!(arg[5] instanceof cEmpty) ? arg[5] : new cNumber(0);
 
 		if (settlement instanceof cArea || settlement instanceof cArea3D) {
-			settlement = settlement.cross(arguments[1].bbox);
+			settlement = settlement.cross(arguments[1]);
 		} else if (settlement instanceof cArray) {
 			settlement = settlement.getElementRowCol(0, 0);
 		}
 
 		if (maturity instanceof cArea || maturity instanceof cArea3D) {
-			maturity = maturity.cross(arguments[1].bbox);
+			maturity = maturity.cross(arguments[1]);
 		} else if (maturity instanceof cArray) {
 			maturity = maturity.getElementRowCol(0, 0);
 		}
 
 		if (issue instanceof cArea || issue instanceof cArea3D) {
-			issue = issue.cross(arguments[1].bbox);
+			issue = issue.cross(arguments[1]);
 		} else if (issue instanceof cArray) {
 			issue = issue.getElementRowCol(0, 0);
 		}
 
 		if (rate instanceof cArea || rate instanceof cArea3D) {
-			rate = rate.cross(arguments[1].bbox);
+			rate = rate.cross(arguments[1]);
 		} else if (rate instanceof cArray) {
 			rate = rate.getElementRowCol(0, 0);
 		}
 
 		if (pr instanceof cArea || pr instanceof cArea3D) {
-			pr = pr.cross(arguments[1].bbox);
+			pr = pr.cross(arguments[1]);
 		} else if (pr instanceof cArray) {
 			pr = pr.getElementRowCol(0, 0);
 		}
 
 		if (basis instanceof cArea || basis instanceof cArea3D) {
-			basis = basis.cross(arguments[1].bbox);
+			basis = basis.cross(arguments[1]);
 		} else if (basis instanceof cArray) {
 			basis = basis.getElementRowCol(0, 0);
 		}
@@ -6173,11 +5907,6 @@
 		this.value.numFormat = 10;
 		return this.value;
 
-	};
-	cYIELDMAT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( settlement , maturity , issue , rate , pr [ , [ basis ] ] )"
-		};
 	};
 
 //----------------------------------------------------------export----------------------------------------------------

@@ -474,7 +474,63 @@
 				this.img = -( Math.sin(this.real) * Math.sinh(this.img) );
 				this.real = a;
 			} else {
-				this.real = cos(this.real);
+				this.real = Math.cos(this.real);
+			}
+		}, Tan: function () {
+			if (this.img) {
+				var a = Math.sin(2 * this.real) / (Math.cos(2 * this.real) + Math.cosh(2 * this.img));
+				this.img = Math.sinh(2 * this.img) / (Math.cos(2 * this.real) + Math.cosh(2 * this.img));
+				this.real = a;
+			} else {
+				this.real = Math.tan(this.real);
+			}
+		}, Cot: function () {
+			if (this.img) {
+				var a = Math.sin(2 * this.real) / (Math.cosh(2 * this.img) - Math.cos(2 * this.real));
+				this.img = -(Math.sinh(2 * this.img) / (Math.cosh(2 * this.img) - Math.cos(2 * this.real)));
+				this.real = a;
+			} else {
+				this.real = 1 / Math.tan(this.real);
+			}
+		}, Cosh: function () {
+			if (this.img) {
+				var a = Math.cosh(this.real) * Math.cos(this.img);
+				this.img = Math.sinh(this.real) * Math.sin(this.img);
+				this.real = a;
+			} else {
+				this.real = Math.cosh(this.real);
+			}
+		}, Csc: function () {
+			if (this.img) {
+				var a = (2 * Math.sin(this.real) * Math.cosh(this.img)) / (Math.cosh(2 * this.img) - Math.cos(2 *this.real));
+				this.img = (-2 * Math.cos(this.real) * Math.sinh(this.img)) / (Math.cosh(2 * this.img) - Math.cos(2 *this.real));
+				this.real = a;
+			} else {
+				this.real = 1 / Math.sin(this.real);
+			}
+		}, Csch: function () {
+			if (this.img) {
+				var a = (2 * Math.sinh(this.real) * Math.cos(this.img)) / (Math.cosh(2 * this.real) - Math.cos(2 *this.img));
+				this.img = (-2 * Math.cosh(this.real) * Math.sin(this.img)) / (Math.cosh(2 * this.real) - Math.cos(2 *this.img));
+				this.real = a;
+			} else {
+				this.real = 1 / Math.sinh(this.real);
+			}
+		}, Sec: function () {
+			if (this.img) {
+				var a = (2 * Math.cos(this.real) * Math.cosh(this.img)) / (Math.cosh(2 * this.img) + Math.cos(2 *this.real));
+				this.img = (2 * Math.sin(this.real) * Math.sinh(this.img)) / (Math.cosh(2 * this.img) + Math.cos(2 *this.real));
+				this.real = a;
+			} else {
+				this.real = 1 / Math.cos(this.real);
+			}
+		}, Sech: function () {
+			if (this.img) {
+				var a = (2 * Math.cosh(this.real) * Math.cos(this.img)) / (Math.cosh(2 * this.real) + Math.cos(2 *this.img));
+				this.img = (-2 * Math.sinh(this.real) * Math.sin(this.img)) / (Math.cosh(2 * this.real) + Math.cos(2 *this.img));
+				this.real = a;
+			} else {
+				this.real = 1 / Math.cosh(this.real);
 			}
 		}, Sin: function () {
 			if (this.img) {
@@ -483,6 +539,14 @@
 				this.real = a;
 			} else {
 				this.real = Math.sin(this.real);
+			}
+		}, Sinh: function () {
+			if (this.img) {
+				var a = Math.sinh(this.real) * Math.cos(this.img);
+				this.img = Math.cosh(this.real) * Math.sin(this.img);
+				this.real = a;
+			} else {
+				this.real = Math.sinh(this.real);
 			}
 		}, Div: function (comp) {
 
@@ -873,8 +937,11 @@
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
 	cFormulaFunctionGroup['Engineering'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cBIN2DEC, cBIN2HEX, cBIN2OCT,
 		cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA, cERF, cERFC, cGESTEP, cHEX2BIN, cHEX2DEC, cHEX2OCT,
-		cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER,
-		cIMPRODUCT, cIMREAL, cIMSIN, cIMSQRT, cIMSUB, cIMSUM, cOCT2BIN, cOCT2DEC, cOCT2HEX);
+		cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMCOSH, cIMCOT, cIMCSC, cIMCSCH, cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER,
+		cIMPRODUCT, cIMREAL, cIMSEC, cIMSECH, cIMSIN, cIMSINH, cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN, cOCT2DEC, cOCT2HEX);
+
+	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
+	cFormulaFunctionGroup['NotRealised'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cCONVERT);
 
 	/**
 	 * @constructor
@@ -893,14 +960,14 @@
 	 n = arg[1];
 
 	 if ( x instanceof cArea || x instanceof cArea3D ) {
-	 x = x.cross( arguments[1].bbox );
+	 x = x.cross( arguments[1] );
 	 }
 	 else if ( x instanceof cArray ) {
 	 x = x.getElementRowCol( 0, 0 );
 	 }
 
 	 if ( n instanceof cArea || n instanceof cArea3D ) {
-	 n = n.cross( arguments[1].bbox );
+	 n = n.cross( arguments[1] );
 	 }
 	 else if ( n instanceof cArray ) {
 	 n = n.getElementRowCol( 0, 0 );
@@ -982,7 +1049,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1013,11 +1080,6 @@
 		return this.value;
 
 	};
-	cBIN2DEC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1036,13 +1098,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1082,11 +1144,6 @@
 		return this.value;
 
 	};
-	cBIN2HEX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1105,13 +1162,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1151,11 +1208,6 @@
 		return this.value;
 
 	};
-	cBIN2OCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1174,19 +1226,19 @@
 		var real = arg[0], img = arg[1], suf = !arg[2] || arg[2] instanceof AscCommonExcel.cEmpty ? new cString("i") :
 			arg[2];
 		if (real instanceof cArea || img instanceof cArea3D) {
-			real = real.cross(arguments[1].bbox);
+			real = real.cross(arguments[1]);
 		} else if (real instanceof cArray) {
 			real = real.getElement(0);
 		}
 
 		if (img instanceof cArea || img instanceof cArea3D) {
-			img = img.cross(arguments[1].bbox);
+			img = img.cross(arguments[1]);
 		} else if (img instanceof cArray) {
 			img = img.getElement(0);
 		}
 
 		if (suf instanceof cArea || suf instanceof cArea3D) {
-			suf = suf.cross(arguments[1].bbox);
+			suf = suf.cross(arguments[1]);
 		} else if (suf instanceof cArray) {
 			suf = suf.getElement(0);
 		}
@@ -1220,11 +1272,6 @@
 		return this.value;
 
 	};
-	cCOMPLEX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( real-number , imaginary-number [ , suffix ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1253,13 +1300,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1295,11 +1342,6 @@
 		return this.value;
 
 	};
-	cDEC2BIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1317,13 +1359,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1358,11 +1400,6 @@
 		return this.value;
 
 	};
-	cDEC2HEX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1380,13 +1417,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1421,11 +1458,6 @@
 		return this.value;
 
 	};
-	cDEC2OCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1444,13 +1476,13 @@
 		var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
 
 		if (number1 instanceof cArea || number2 instanceof cArea3D) {
-			number1 = number1.cross(arguments[1].bbox);
+			number1 = number1.cross(arguments[1]);
 		} else if (number1 instanceof cArray) {
 			number1 = number1.getElement(0);
 		}
 
 		if (number2 instanceof cArea || number2 instanceof cArea3D) {
-			number2 = number2.cross(arguments[1].bbox);
+			number2 = number2.cross(arguments[1]);
 		} else if (number2 instanceof cArray) {
 			number2 = number2.getElement(0);
 		}
@@ -1473,11 +1505,6 @@
 		return this.value;
 
 	};
-	cDELTA.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number-1 [ , number-2 ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1495,13 +1522,13 @@
 
 		var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
 		if (a instanceof cArea || a instanceof cArea3D) {
-			a = a.cross(arguments[1].bbox);
+			a = a.cross(arguments[1]);
 		} else if (a instanceof cArray) {
 			a = a.getElement(0);
 		}
 
 		if (b instanceof cArea || b instanceof cArea3D) {
-			b = b.cross(arguments[1].bbox);
+			b = b.cross(arguments[1]);
 		} else if (b instanceof cArray) {
 			b = b.getElement(0);
 		}
@@ -1530,11 +1557,6 @@
 		return this.value;
 
 	};
-	cERF.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( lower-bound [ , upper-bound ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1552,7 +1574,7 @@
 
 		var a = arg[0];
 		if (a instanceof cArea || a instanceof cArea3D) {
-			a = a.cross(arguments[1].bbox);
+			a = a.cross(arguments[1]);
 		} else if (a instanceof cArray) {
 			a = a.getElement(0);
 		}
@@ -1568,11 +1590,6 @@
 
 		return this.value;
 
-	};
-	cERFC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( lower-bound )"
-		};
 	};
 
 	/**
@@ -1592,13 +1609,13 @@
 		var number1 = arg[0], number2 = !arg[1] ? new cNumber(0) : arg[1];
 
 		if (number1 instanceof cArea || number2 instanceof cArea3D) {
-			number1 = number1.cross(arguments[1].bbox);
+			number1 = number1.cross(arguments[1]);
 		} else if (number1 instanceof cArray) {
 			number1 = number1.getElement(0);
 		}
 
 		if (number2 instanceof cArea || number2 instanceof cArea3D) {
-			number2 = number2.cross(arguments[1].bbox);
+			number2 = number2.cross(arguments[1]);
 		} else if (number2 instanceof cArray) {
 			number2 = number2.getElement(0);
 		}
@@ -1621,11 +1638,6 @@
 		return this.value;
 
 	};
-	cGESTEP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , step ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1644,13 +1656,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1697,11 +1709,6 @@
 		return this.value;
 
 	};
-	cHEX2BIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1720,7 +1727,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1749,11 +1756,6 @@
 		return this.value;
 
 	};
-	cHEX2DEC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1772,13 +1774,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -1824,11 +1826,6 @@
 		return this.value;
 
 	};
-	cHEX2OCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1847,7 +1844,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1869,11 +1866,6 @@
 		return this.value;
 
 	};
-	cIMABS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1892,7 +1884,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1914,11 +1906,6 @@
 		return this.value;
 
 	};
-	cIMAGINARY.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1937,7 +1924,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -1959,11 +1946,6 @@
 		return this.value;
 
 	};
-	cIMARGUMENT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -1982,7 +1964,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2004,11 +1986,6 @@
 		return this.value;
 
 	};
-	cIMCONJUGATE.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2027,7 +2004,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2051,10 +2028,204 @@
 		return this.value;
 
 	};
-	cIMCOS.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMCOSH() {
+		cBaseFunction.call(this, "IMCOSH");
+	}
+
+	cIMCOSH.prototype = Object.create(cBaseFunction.prototype);
+	cIMCOSH.prototype.constructor = cIMCOSH;
+	cIMCOSH.prototype.argumentsMin = 1;
+	cIMCOSH.prototype.argumentsMax = 1;
+	cIMCOSH.prototype.isXLFN = true;
+	cIMCOSH.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Cosh();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMCOT() {
+		cBaseFunction.call(this, "IMCOT");
+	}
+
+	cIMCOT.prototype = Object.create(cBaseFunction.prototype);
+	cIMCOT.prototype.constructor = cIMCOT;
+	cIMCOT.prototype.argumentsMin = 1;
+	cIMCOT.prototype.argumentsMax = 1;
+	cIMCOT.prototype.isXLFN = true;
+	cIMCOT.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+		if(0 == arg0.value){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Cot();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMCSC() {
+		cBaseFunction.call(this, "IMCSC");
+	}
+	//TODO проверить!!!
+	cIMCSC.prototype = Object.create(cBaseFunction.prototype);
+	cIMCSC.prototype.constructor = cIMCSC;
+	cIMCSC.prototype.argumentsMin = 1;
+	cIMCSC.prototype.argumentsMax = 1;
+	cIMCSC.prototype.isXLFN = true;
+	cIMCSC.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		if(0 == arg0.value){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Csc();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMCSCH() {
+		cBaseFunction.call(this, "IMCSCH");
+	}
+	//TODO проверить!!!
+	cIMCSCH.prototype = Object.create(cBaseFunction.prototype);
+	cIMCSCH.prototype.constructor = cIMCSCH;
+	cIMCSCH.prototype.argumentsMin = 1;
+	cIMCSCH.prototype.argumentsMax = 1;
+	cIMCSCH.prototype.isXLFN = true;
+	cIMCSCH.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		if(0 == arg0.value){
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Csch();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
 	};
 
 	/**
@@ -2074,14 +2245,14 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -2109,11 +2280,6 @@
 		return this.value;
 
 	};
-	cIMDIV.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number-1 , complex-number-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2132,7 +2298,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2156,11 +2322,6 @@
 		return this.value;
 
 	};
-	cIMEXP.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2179,7 +2340,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2207,11 +2368,6 @@
 		return this.value;
 
 	};
-	cIMLN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2230,7 +2386,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2258,11 +2414,6 @@
 		return this.value;
 
 	};
-	cIMLOG10.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2281,7 +2432,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2309,11 +2460,6 @@
 		return this.value;
 
 	};
-	cIMLOG2.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2332,13 +2478,13 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -2370,11 +2516,6 @@
 		return this.value;
 
 	};
-	cIMPOWER.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number, power )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2391,7 +2532,7 @@
 		var arg0 = arg[0], t = this;
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2472,11 +2613,6 @@
 		return this.value;
 
 	};
-	cIMPRODUCT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2495,7 +2631,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2517,11 +2653,100 @@
 		return this.value;
 
 	};
-	cIMREAL.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMSEC() {
+		cBaseFunction.call(this, "IMSEC");
+	}
+	cIMSEC.prototype = Object.create(cBaseFunction.prototype);
+	cIMSEC.prototype.constructor = cIMSEC;
+	cIMSEC.prototype.argumentsMin = 1;
+	cIMSEC.prototype.argumentsMax = 1;
+	cIMSEC.prototype.isXLFN = true;
+	cIMSEC.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Sec();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
 	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMSECH() {
+		cBaseFunction.call(this, "IMSECH");
+	}
+	cIMSECH.prototype = Object.create(cBaseFunction.prototype);
+	cIMSECH.prototype.constructor = cIMSECH;
+	cIMSECH.prototype.argumentsMin = 1;
+	cIMSECH.prototype.argumentsMax = 1;
+	cIMSECH.prototype.isXLFN = true;
+	cIMSECH.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Sech();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
+	};
+
+
 
 	/**
 	 * @constructor
@@ -2540,9 +2765,13 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
 		arg0 = arg0.tocString();
@@ -2564,10 +2793,52 @@
 		return this.value;
 
 	};
-	cIMSIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMSINH() {
+		cBaseFunction.call(this, "IMSINH");
+	}
+
+	cIMSINH.prototype = Object.create(cBaseFunction.prototype);
+	cIMSINH.prototype.constructor = cIMSINH;
+	cIMSINH.prototype.argumentsMin = 1;
+	cIMSINH.prototype.argumentsMax = 1;
+	cIMSINH.prototype.isXLFN = true;
+	cIMSINH.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Sinh();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
 	};
 
 	/**
@@ -2587,7 +2858,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2611,11 +2882,6 @@
 		return this.value;
 
 	};
-	cIMSQRT.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2634,14 +2900,14 @@
 		var arg0 = arg[0], arg1 = arg[1];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -2669,11 +2935,6 @@
 		return this.value;
 
 	};
-	cIMSUB.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( complex-number-1 , complex-number-2 )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2691,7 +2952,7 @@
 		var arg0 = arg[0], t = this;
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2772,10 +3033,52 @@
 		return this.value;
 
 	};
-	cIMSUM.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( argument-list )"
-		};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cIMTAN() {
+		cBaseFunction.call(this, "IMTAN");
+	}
+	//TODO проверить!!!
+	cIMTAN.prototype = Object.create(cBaseFunction.prototype);
+	cIMTAN.prototype.constructor = cIMTAN;
+	cIMTAN.prototype.argumentsMin = 1;
+	cIMTAN.prototype.argumentsMax = 1;
+	cIMTAN.prototype.isXLFN = true;
+	cIMTAN.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		arg0 = arg0.tocString();
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		if(arg0.value === true || arg0.value === false){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		var c = new Complex(arg0.toString());
+
+		if (c instanceof cError) {
+			return this.value = c;
+		}
+
+		c.Tan();
+
+		this.value = new cString(c.toString());
+		this.value.numFormat = 0;
+
+		return this.value;
+
 	};
 
 	/**
@@ -2795,13 +3098,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -2848,11 +3151,6 @@
 		return this.value;
 
 	};
-	cOCT2BIN.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2871,7 +3169,7 @@
 		var arg0 = arg[0];
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
@@ -2900,11 +3198,6 @@
 		return this.value;
 
 	};
-	cOCT2DEC.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number )"
-		};
-	};
 
 	/**
 	 * @constructor
@@ -2923,13 +3216,13 @@
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cUndefined();
 
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1].bbox);
+			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
 			arg0 = arg0.getElementRowCol(0, 0);
 		}
 
 		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1].bbox);
+			arg1 = arg1.cross(arguments[1]);
 		} else if (arg1 instanceof cArray) {
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
@@ -2969,9 +3262,4 @@
 		return this.value;
 
 	};
-	cOCT2HEX.prototype.getInfo = function () {
-		return {
-			name: this.name, args: "( number [ , num-hex-digits ] )"
-		};
-	}
 })(window);

@@ -43,7 +43,7 @@ var pHText = [];
 pHText[0] = [];//rus         ""                                                          ;
 pHText[0][AscFormat.phType_body]  =    "Slide text";             //"Текст слайда" ;                              ;
 pHText[0][AscFormat.phType_chart]    = "Chart";         // "Диаграмма" ;                                     ;
-pHText[0][AscFormat.phType_clipArt]  = "ClipArt";// "Текст слайда" ; //(Clip Art)                   ;
+pHText[0][AscFormat.phType_clipArt]  = "Clip Art";// "Текст слайда" ; //(Clip Art)                   ;
 pHText[0][AscFormat.phType_ctrTitle] = "Slide title";// "Заголовок слайда" ; //(Centered Title)     ;
 pHText[0][AscFormat.phType_dgm]      = "Diagram";// "Диаграмма";// (Diagram)                        ;
 pHText[0][AscFormat.phType_dt]       = "Date and time";// "Дата и время";// (Date and Time)         ;
@@ -227,10 +227,6 @@ CShape.prototype.getDrawingDocument = function()
     return editor.WordControl.m_oLogicDocument.DrawingDocument;
 };
 
-CShape.prototype.getTextArtTranslate = function()
-{
-    return editor.textArtTranslate;
-};
 CShape.prototype.getTextArtPreviewManager = function()
 {
     return editor.textArtPreviewManager;
@@ -434,6 +430,17 @@ CShape.prototype.getParentObjects = function ()
                     theme: this.themeOverride ? this.themeOverride : this.parent.Theme
                 };
             }
+            case AscDFH.historyitem_type_Notes:
+            {
+                return {
+
+                    presentation: editor.WordControl.m_oLogicDocument,
+                    slide: null,
+                    layout: null,
+                    master: this.parent.Master,
+                    theme: this.themeOverride ? this.themeOverride : (this.parent.Master ? this.parent.Master.Theme : null)
+                }
+            }
         }
     }
     return { slide: null, layout: null, master: null, theme: null};
@@ -450,9 +457,8 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted || !this.parent)
         return;
-    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && this.parent.getObjectType() === AscDFH.historyitem_type_Slide);
+    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && (this.parent.getObjectType() === AscDFH.historyitem_type_Slide || this.parent.getObjectType() === AscDFH.historyitem_type_Notes));
     AscFormat.ExecuteNoHistory(function(){
-
 
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
@@ -573,8 +579,9 @@ CShape.prototype.recalculateContent2 = function()
                 return;
             }
             var text = typeof pHText[0][this.nvSpPr.nvPr.ph.type] === "string" && pHText[0][this.nvSpPr.nvPr.ph.type].length > 0 ?  pHText[0][this.nvSpPr.nvPr.ph.type] : pHText[0][AscFormat.phType_body];
-            if (!this.txBody.content2)
-                this.txBody.content2 = AscFormat.CreateDocContentFromString(text, this.getDrawingDocument(), this.txBody);
+            if (!this.txBody.content2){
+                this.txBody.content2 = AscFormat.CreateDocContentFromString(AscCommon.translateManager.getValue(text), this.getDrawingDocument(), this.txBody);
+            }
             else
             {
                 this.txBody.content2.Recalc_AllParagraphs_CompiledPr();
@@ -669,15 +676,15 @@ CShape.prototype.recalculateContent2 = function()
             var content_ = this.getDocContent();
             if(content_ && content_.Content[0])
             {
-                content.Content[0].Pr  = content_.Content[0].Pr;
-                var para_text_pr = new ParaTextPr(content_.Content[0].Get_FirstRunPr());
-                content.Set_ApplyToAll(true);
-                content.Paragraph_Add(para_text_pr);
-                content.Set_ApplyToAll(false);
+                content.Content[0].Pr  = content_.Content[0].Pr.Copy();
+                if(!content.Content[0].Pr.DefaultRunPr){
+                    content.Content[0].Pr.DefaultRunPr = new AscCommonWord.CTextPr();
+                }
+                content.Content[0].Pr.DefaultRunPr.Merge(content_.Content[0].Get_FirstRunPr());
             }
             content.Set_StartPage(0);
             content.Reset(0, 0, w, 20000);
-            content.Recalculate_Page(content.StartPage, true);
+            content.RecalculateContent(this.txBody.contentWidth2, this.txBody.contentHeight2, 0);
 
             var oTextWarpContent = this.checkTextWarp(content, body_pr, this.txBody.contentWidth2, this.txBody.contentHeight2, false, true);
             this.txWarpStructParamarks2 = oTextWarpContent.oTxWarpStructParamarks;
@@ -743,7 +750,8 @@ CShape.prototype.getIsSingleBody = function(x, y)
 {
     if(!this.isPlaceholder())
         return false;
-    if(this.getPlaceholderType() !== AscFormat.phType_body)
+    var ph_type = this.getPlaceholderType();
+    if(this.getPlaceholderType() !== AscFormat.phType_body && ph_type !== null)
         return false;
     if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
     {
@@ -783,6 +791,12 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
             editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
             editor.WordControl.GoToPage(this.parent.num);
         }
+    }
+};
+
+CShape.prototype.OnContentReDraw = function(){
+    if(AscCommonSlide && this.parent instanceof AscCommonSlide.Slide){
+        editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(this.parent.num, editor.WordControl.m_oLogicDocument.Slides[this.parent.num]);
     }
 };
 

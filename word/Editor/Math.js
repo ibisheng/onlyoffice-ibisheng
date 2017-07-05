@@ -1088,15 +1088,15 @@ ParaMath.prototype.CopyContent = function(Selected)
 {
     return [this.Copy(Selected)];
 };
-ParaMath.prototype.Set_Paragraph = function(Paragraph)
+ParaMath.prototype.SetParagraph = function(Paragraph)
 {
-    this.Paragraph = Paragraph;
-    this.Root.Set_Paragraph(Paragraph);
-    this.Root.Set_ParaMath(this, null);
+	this.Paragraph = Paragraph;
+	this.Root.SetParagraph(Paragraph);
+	this.Root.Set_ParaMath(this, null);
 };
-ParaMath.prototype.Get_Paragraph = function()
+ParaMath.prototype.GetParagraph = function()
 {
-    return this.Paragraph;
+	return this.Paragraph;
 };
 
 ParaMath.prototype.Get_Text = function(Text)
@@ -1208,7 +1208,7 @@ ParaMath.prototype.Add = function(Item)
         oContent.Internal_Content_Add(StartPos + 1, RightRun, false);
         // Выставляем позицию в начало этого рана
         oContent.CurPos = StartPos + 1;
-        RightRun.Cursor_MoveToStartPos();
+        RightRun.MoveCursorToStartPos();
 
         var lng = oContent.Content.length;
         oContent.Load_FromMenu(Item.Menu, this.Paragraph);
@@ -1372,7 +1372,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     {
                         // Здесь мы не проверяем результат Remove, потому что ран не должен быть пустым после
                         // Correct_Content
-                        oNextElement.Cursor_MoveToStartPos();
+                        oNextElement.MoveCursorToStartPos();
                         oNextElement.Remove(1);
 
                         if (oNextElement.Is_Empty())
@@ -1381,7 +1381,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                             oContent.Correct_ContentPos(1);
                         }
 
-                        this.Selection_Remove();
+                        this.RemoveSelection();
                     }
                     else
                     {
@@ -1395,7 +1395,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     {
                         // Здесь мы не проверяем результат Remove, потому что ран не должен быть пустым после
                         // Correct_Content
-                        oPrevElement.Cursor_MoveToEndPos();
+                        oPrevElement.MoveCursorToEndPos();
                         oPrevElement.Remove(-1);
 
                         if (oPrevElement.Is_Empty())
@@ -1404,7 +1404,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                             oContent.Correct_ContentPos(-1);
                         }
 
-                        this.Selection_Remove();
+                        this.RemoveSelection();
                     }
                     else
                     {
@@ -1421,20 +1421,20 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     oContent.Correct_ContentPos(-1); // -1, потому что нам надо встать перед элементом, а не после
                 }
 
-                this.Selection_Remove();
+                this.RemoveSelection();
             }
 
             return true;
         }
         else
         {
-            this.Selection_Remove();
+            this.RemoveSelection();
             if (true === TrackRevisions)
             {
                 if (reviewtype_Common === ElementReviewType)
                 {
                     if (para_Math_Run === oElement.Type !== oElement.Type)
-                        oElement.Reject_RevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
+                        oElement.RejectRevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
 
                     oElement.Set_ReviewType(reviewtype_Remove);
                 }
@@ -1442,14 +1442,14 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 {
                     oContent.Remove_FromContent(nStartPos, 1);
                     if (para_Math_Run === oContent.Content[nStartPos].Type)
-                        oContent.Content[nStartPos].Cursor_MoveToStartPos();
+                        oContent.Content[nStartPos].MoveCursorToStartPos();
                 }
             }
             else
             {
                 oContent.Remove_FromContent(nStartPos, 1);
                 if (para_Math_Run === oContent.Content[nStartPos].Type)
-                    oContent.Content[nStartPos].Cursor_MoveToStartPos();
+                    oContent.Content[nStartPos].MoveCursorToStartPos();
             }
             oContent.CurPos = nStartPos;
             oContent.Correct_Content();
@@ -1486,7 +1486,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                     if (reviewtype_Common === ElementReviewType)
                     {
                         if (para_Math_Run === Element.Type !== Element.Type)
-                            Element.Reject_RevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
+                            Element.RejectRevisionChanges(c_oAscRevisionsChangeType.TextAdd, true);
 
                         Element.Set_ReviewType(reviewtype_Remove);
                     }
@@ -1498,7 +1498,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
                 }
             }
 
-            this.Selection_Remove();
+            this.RemoveSelection();
             if (Direction < 0)
             {
                 oContent.CurPos = nStartPos;
@@ -1507,7 +1507,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
             {
                 oContent.CurPos = nEndPos;
                 if (para_Math_Run === oContent.Content[nEndPos].Type)
-                    oContent.Content[nEndPos].Cursor_MoveToStartPos();
+                    oContent.Content[nEndPos].MoveCursorToStartPos();
             }
         }
         else
@@ -1527,7 +1527,7 @@ ParaMath.prototype.Remove = function(Direction, bOnAddText)
             else
                 oContent.Remove_FromContent(nStartPos, 1);
 
-            this.Selection_Remove();
+            this.RemoveSelection();
             oContent.CurPos = nStartPos;
         }
         oContent.Correct_Content();
@@ -1627,9 +1627,9 @@ ParaMath.prototype.Get_PrevRunElements = function(RunElements, UseContentPos, De
 {
 };
 
-ParaMath.prototype.Collect_DocumentStatistics = function(ParaStats)
+ParaMath.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-    // TODO: ParaMath.Collect_DocumentStatistics
+    // TODO: ParaMath.CollectDocumentStatistics
 };
 
 ParaMath.prototype.Create_FontMap = function(Map)
@@ -1648,22 +1648,22 @@ ParaMath.prototype.Get_AllFontNames = function(AllFonts)
     this.Root.Get_AllFontNames(AllFonts);
 };
 
-ParaMath.prototype.Get_SelectedElementsInfo = function(Info)
+ParaMath.prototype.GetSelectedElementsInfo = function(Info, ContentPos, Depth)
 {
     Info.Set_Math(this);
 };
 
-ParaMath.prototype.Get_SelectedText = function(bAll, bClearText, oPr)
+ParaMath.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 {
-    if ( true === bAll || true === this.Selection_IsUse() )
-    {
-        if ( true === bClearText )
-            return null;
+	if (true === bAll || true === this.IsSelectionUse())
+	{
+		if (true === bClearText)
+			return null;
 
-        return "";
-    }
+		return "";
+	}
 
-    return "";
+	return "";
 };
 
 ParaMath.prototype.Get_SelectionDirection = function()
@@ -1825,7 +1825,7 @@ ParaMath.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     {
         // такая ситуация возможна  когда пришел пересчет заново и кол-во отрезков выравнивания 0 (либо меньше, чем нужно)
         // при этом если это первый Range данной формулы, то пришел еще Reset, то есть пересчитать придется, при этом не меняем max ширину, т.к. если мы уже пересчитали с учетом Range, она не должна поменяться
-        this.Root.Set_Paragraph(Para);
+        this.Root.SetParagraph(Para);
         this.Root.Set_ParaMath(this, null);
 
         this.PageInfo.Update_CurrentPage(Page, ParaLine);
@@ -2360,21 +2360,21 @@ ParaMath.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
 
 };
-ParaMath.prototype.Save_RecalculateObject = function(Copy)
+ParaMath.prototype.SaveRecalculateObject = function(Copy)
 {
-    var RecalcObj = this.Root.Save_RecalculateObject(Copy);
-    RecalcObj.Save_MathInfo(this, Copy);
+	var RecalcObj = this.Root.SaveRecalculateObject(Copy);
+	RecalcObj.Save_MathInfo(this, Copy);
 
-    return RecalcObj;
+	return RecalcObj;
 };
-ParaMath.prototype.Load_RecalculateObject = function(RecalcObj)
+ParaMath.prototype.LoadRecalculateObject = function(RecalcObj)
 {
     RecalcObj.Load_MathInfo(this);
-    this.Root.Load_RecalculateObject(RecalcObj);
+    this.Root.LoadRecalculateObject(RecalcObj);
 };
-ParaMath.prototype.Prepare_RecalculateObject = function()
+ParaMath.prototype.PrepareRecalculateObject = function()
 {
-    this.Root.Prepare_RecalculateObject();
+	this.Root.PrepareRecalculateObject();
 };
 ParaMath.prototype.Is_EmptyRange = function(_CurLine, _CurRange)
 {
@@ -2426,13 +2426,13 @@ ParaMath.prototype.Refresh_RecalcData2 = function(Data)
     this.Paragraph.Refresh_RecalcData2(0);
 };
 
-ParaMath.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
+ParaMath.prototype.RecalculateMinMaxContentWidth = function(MinMax)
 {
     var RPI = new CRPI();
     RPI.MergeMathInfo(this.ParaMathRPI);
 
     this.Root.PreRecalc(null, this, new CMathArgSize(), RPI);
-    this.Root.Recalculate_MinMaxContentWidth(MinMax);
+    this.Root.RecalculateMinMaxContentWidth(MinMax);
 };
 
 ParaMath.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
@@ -2826,18 +2826,14 @@ ParaMath.prototype.Cursor_Is_End = function()
     return this.Root.Cursor_Is_End();
 };
 
-ParaMath.prototype.Cursor_MoveToStartPos = function()
+ParaMath.prototype.MoveCursorToStartPos = function()
 {
-    // TODO: ParaMath.Cursor_MoveToStartPos
-
-    this.Root.Cursor_MoveToStartPos();
+	this.Root.MoveCursorToStartPos();
 };
 
-ParaMath.prototype.Cursor_MoveToEndPos = function(SelectFromEnd)
+ParaMath.prototype.MoveCursorToEndPos = function(SelectFromEnd)
 {
-    // TODO: ParaMath.Cursor_MoveToEndPos
-
-    this.Root.Cursor_MoveToEndPos(SelectFromEnd);
+	this.Root.MoveCursorToEndPos(SelectFromEnd);
 };
 
 ParaMath.prototype.Get_ParaContentPosByXY = function(SearchPos, Depth, _CurLine, _CurRange, StepEnd, Flag) // получить логическую позицию по XY
@@ -2977,25 +2973,21 @@ ParaMath.prototype.Set_SelectionContentPos = function(StartContentPos, EndConten
     this.bSelectionUse = true;
 };
 
-ParaMath.prototype.Selection_IsUse = function()
+ParaMath.prototype.IsSelectionUse = function()
 {
     return this.bSelectionUse;
 };
 
-ParaMath.prototype.Selection_Stop = function()
-{
-};
-
-ParaMath.prototype.Selection_Remove = function()
+ParaMath.prototype.RemoveSelection = function()
 {
     this.bSelectionUse = false;
-    this.Root.Selection_Remove();
+    this.Root.RemoveSelection();
 };
 
-ParaMath.prototype.Select_All = function(Direction)
+ParaMath.prototype.SelectAll = function(Direction)
 {
     this.bSelectionUse = true;
-    this.Root.Select_All();
+    this.Root.SelectAll(Direction);
 };
 
 ParaMath.prototype.Selection_DrawRange = function(_CurLine, _CurRange, SelectionDraw)
@@ -3003,9 +2995,9 @@ ParaMath.prototype.Selection_DrawRange = function(_CurLine, _CurRange, Selection
     this.Root.Selection_DrawRange(_CurLine, _CurRange, SelectionDraw);
 };
 
-ParaMath.prototype.Selection_IsEmpty = function(CheckEnd)
+ParaMath.prototype.IsSelectionEmpty = function(CheckEnd)
 {
-    return this.Root.Selection_IsEmpty();
+    return this.Root.IsSelectionEmpty();
 };
 
 ParaMath.prototype.Selection_IsPlaceholder = function()
@@ -3034,9 +3026,9 @@ ParaMath.prototype.Selection_CheckParaContentPos = function(ContentPos, Depth, b
     return this.Root.Selection_CheckParaContentPos(ContentPos, Depth, bStart, bEnd);
 };
 
-ParaMath.prototype.Is_SelectedAll = function(Props)
+ParaMath.prototype.IsSelectedAll = function(Props)
 {
-    return this.Root.Is_SelectedAll(Props);
+	return this.Root.IsSelectedAll(Props);
 };
 
 ParaMath.prototype.Selection_CorrectLeftPos = function(Direction)
@@ -3177,7 +3169,7 @@ ParaMath.prototype.Handle_AddNewLine = function()
         this.Set_ParaContentPos(RightContentPos.Pos, 0);
 
         EqArray.CurPos = 1;
-        SecondContent.Cursor_MoveToStartPos();
+        SecondContent.MoveCursorToStartPos();
 
         NeedRecalculate = true;
     }
@@ -3336,13 +3328,13 @@ ParaMath.prototype.Check_RevisionsChanges = function(Checker, ContentPos, Depth)
 {
     return this.Root.Check_RevisionsChanges(Checker, ContentPos, Depth);
 };
-ParaMath.prototype.Accept_RevisionChanges = function(Type, bAll)
+ParaMath.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
-    return this.Root.Accept_RevisionChanges(Type, bAll);
+    return this.Root.AcceptRevisionChanges(Type, bAll);
 };
-ParaMath.prototype.Reject_RevisionChanges = function(Type, bAll)
+ParaMath.prototype.RejectRevisionChanges = function(Type, bAll)
 {
-    return this.Root.Reject_RevisionChanges(Type, bAll);
+    return this.Root.RejectRevisionChanges(Type, bAll);
 };
 ParaMath.prototype.Set_ReviewType = function(ReviewType, RemovePrChange)
 {
@@ -3357,13 +3349,17 @@ ParaMath.prototype.Handle_Tab = function(isForward)
         this.Root.Displace_BreakOperator(isForward, bBrkBefore, CountOperators);
     }
 };
-ParaMath.prototype.Set_ContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
+ParaMath.prototype.SetContentSelection = function(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag)
 {
-    return this.Root.Set_ContentSelection(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag);
+    return this.Root.SetContentSelection(StartDocPos, EndDocPos, Depth, StartFlag, EndFlag);
 };
-ParaMath.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
+ParaMath.prototype.SetContentPosition = function(DocPos, Depth, Flag)
 {
-    return this.Root.Set_ContentPosition(DocPos, Depth, Flag);
+    return this.Root.SetContentPosition(DocPos, Depth, Flag);
+};
+ParaMath.prototype.IsStopCursorOnEntryExit = function()
+{
+	return true;
 };
 
 function MatGetKoeffArgSize(FontSize, ArgSize)

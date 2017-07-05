@@ -711,34 +711,68 @@ DrawingArea.prototype.drawSelection = function(drawingDocument) {
         // Clip
         this.frozenPlaces[i].clip(shapeOverlayCtx);
 
-        if (true) {
-            if (drawingDocument.m_bIsSelection) {
-				drawingDocument.SelectionMatrix = null;
-				trackOverlay.m_oControl.HtmlElement.style.display = "block";
+		if (drawingDocument.m_bIsSelection) {
+			drawingDocument.SelectionMatrix = null;
+			trackOverlay.m_oControl.HtmlElement.style.display = "block";
 
-				if (null == trackOverlay.m_oContext)
-					trackOverlay.m_oContext = trackOverlay.m_oControl.HtmlElement.getContext('2d');
+			if (null == trackOverlay.m_oContext)
+				trackOverlay.m_oContext = trackOverlay.m_oControl.HtmlElement.getContext('2d');
 
-                drawingDocument.private_StartDrawSelection(trackOverlay);
-                this.worksheet.objectRender.controller.drawTextSelection();
-                drawingDocument.private_EndDrawSelection();
+			drawingDocument.private_StartDrawSelection(trackOverlay);
+			this.worksheet.objectRender.controller.drawTextSelection();
+			drawingDocument.private_EndDrawSelection();
 
-				this.worksheet.handlers.trigger("drawMobileSelection");
-            }
+			this.worksheet.handlers.trigger("drawMobileSelection");
+		}
 
-            ctx.globalAlpha = 1.0;
+		ctx.globalAlpha = 1.0;
 
-            this.worksheet.objectRender.controller.drawSelection(drawingDocument);
-            if ( this.worksheet.objectRender.controller.needUpdateOverlay() ) {
-                trackOverlay.Show();
-                shapeOverlayCtx.put_GlobalAlpha(true, 0.5);
-                this.worksheet.objectRender.controller.drawTracks(shapeOverlayCtx);
-                shapeOverlayCtx.put_GlobalAlpha(true, 1);
-            }
-        }
+		this.worksheet.objectRender.controller.drawSelection(drawingDocument);
+
+
+		if ( this.worksheet.objectRender.controller.needUpdateOverlay() ) {
+			trackOverlay.Show();
+			autoShapeTrack.Graphics.put_GlobalAlpha(true, 0.5);
+			this.worksheet.objectRender.controller.drawTracks(autoShapeTrack);
+			autoShapeTrack.Graphics.put_GlobalAlpha(true, 1);
+			this.frozenPlaces[i].restore(autoShapeTrack);
+		}
+
 
         // Restore
-        this.frozenPlaces[i].restore(shapeOverlayCtx);
+        this.frozenPlaces[i].restore(autoShapeTrack);
+
+
+		if(this.frozenPlaces[i].type === FrozenAreaType.Bottom){
+			//autoShapeTrack.Graphics.put_GlobalAlpha(true, 1);
+			var fTop = this.worksheet.getCellTop(this.frozenPlaces[i].frozenCell.row, 0);
+			var fLeft = 0;//this.worksheet.getCellLeft(0, 0);
+			autoShapeTrack.drawImage(AscFormat.sFrozenImageUrl, fLeft, fTop, autoShapeTrack.Graphics.m_lWidthPix, 10);
+		}
+		else if(this.frozenPlaces[i].type === FrozenAreaType.Right){
+
+			var fTop = 0;//this.worksheet.getCellTop(0, 0);
+			var fLeft = this.worksheet.getCellLeft(this.frozenPlaces[i].frozenCell.col, 0);
+			autoShapeTrack.drawImage(AscFormat.sFrozenImageRotUrl, fLeft, fTop, 10, autoShapeTrack.Graphics.m_lHeightPix);
+		}
+		else if(this.frozenPlaces[i].type === FrozenAreaType.RightBottom){
+			//autoShapeTrack.Graphics.put_GlobalAlpha(true, 1);
+			var fTop = this.worksheet.getCellTop(this.frozenPlaces[i].frozenCell.row, 0);
+			var fLeft = this.worksheet.getCellLeft(this.frozenPlaces[i].frozenCell.col, 0);
+			autoShapeTrack.drawImage(AscFormat.sFrozenImageUrl, fLeft, fTop, autoShapeTrack.Graphics.m_lWidthPix, 10);
+			autoShapeTrack.drawImage(AscFormat.sFrozenImageRotUrl, fLeft, fTop, 10, autoShapeTrack.Graphics.m_lHeightPix);
+		}
+		else if(this.frozenPlaces[i].type === FrozenAreaType.LeftBottom){
+			var fTop = this.worksheet.getCellTop(this.frozenPlaces[i].frozenCell.row, 0);
+			var fLeft = 0;//this.worksheet.getCellLeft(0, 0);
+			autoShapeTrack.drawImage(AscFormat.sFrozenImageUrl, fLeft, fTop, autoShapeTrack.Graphics.m_lWidthPix, 10);
+		}
+		else if(this.frozenPlaces[i].type === FrozenAreaType.RightTop){
+			var fTop = 0;//this.worksheet.getCellTop(0, 0);
+			var fLeft = this.worksheet.getCellLeft(this.frozenPlaces[i].frozenCell.col, 0);
+			autoShapeTrack.drawImage(AscFormat.sFrozenImageRotUrl, fLeft, fTop, 10, autoShapeTrack.Graphics.m_lHeightPix);
+		}
+
     }
 };
 

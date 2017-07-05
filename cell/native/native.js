@@ -2925,6 +2925,8 @@ var kPositionLength = -12;
 
 var deviceScale = 1;
 
+var sdkCheck = true;
+
 //--------------------------------------------------------------------------------
 // OfflineEditor
 //--------------------------------------------------------------------------------
@@ -3874,10 +3876,28 @@ function OfflineEditor () {
         window["CreateMainTextMeasurerWrapper"]();
 
         deviceScale = window["native"]["GetDeviceScale"]();
+        sdkCheck = settings["sdkCheck"];
 
         window.g_file_path = "native_open_file";
         window.NATIVE_DOCUMENT_TYPE = "";
-        _api = new window["Asc"]["spreadsheet_api"]({});
+
+        var apiConfig = {};
+        if (this.translate) {
+            var t = JSON.parse(this.translate);
+            if (t) {
+                apiConfig['translate'] = {
+                    'Diagram Title' : t['diagrammtitle'],
+                    'X Axis' : t['xaxis'],
+                    'Y Axis' : t['yaxis'],
+                    'Series' : t['series'],
+                    'Your text here' : t['art']
+                };
+            }
+        }
+
+        _api = new window["Asc"]["spreadsheet_api"](apiConfig);
+        
+        AscCommon.g_clipboardBase.Init(_api);
 
         var userInfo = new Asc.asc_CUserInfo();
         userInfo.asc_putId(this.initSettings["docUserId"]);
@@ -3887,6 +3907,8 @@ function OfflineEditor () {
 
         var docInfo = new Asc.asc_CDocInfo();
         docInfo.put_Id(this.initSettings["docKey"]);
+        docInfo.put_Url(this.initSettings["docURL"]);
+        docInfo.put_Format("xlsx");
         docInfo.put_UserInfo(userInfo);
 
         _api.asc_setDocInfo(docInfo);
@@ -3914,8 +3936,41 @@ function OfflineEditor () {
             ws._fixSelectionOfMergedCells();
 
             if (ws.topLeftFrozenCell) {
-                this.row0 = ws.topLeftFrozenCell.getRow0();
-                this.col0 = ws.topLeftFrozenCell.getCol0();
+              this.row0 = ws.topLeftFrozenCell.getRow0();
+              this.col0 = ws.topLeftFrozenCell.getCol0();
+            }
+            
+            var chartData = this.initSettings["chartData"];
+            if (chartData.length > 0) {
+                var json = JSON.parse(chartData);
+                if (json) {
+                    
+                    var nativeToEditor = 1.0 / deviceScale * (72.0 / 96.0);
+                   
+                    var screenWidth = this.initSettings["screenWidth"] * nativeToEditor / 2.54 - ws.headersWidth;
+                    var screenHeight = this.initSettings["screenHeight"] * nativeToEditor / 2.54 - ws.headersHeight;
+                    
+                    _api.asc_addChartDrawingObject(json);
+                    
+                    var objects = ws.objectRender.controller.drawingObjects.getDrawingObjects();
+                    if (objects.length > 0) {
+                        
+                        var gr = objects[0].graphicObject;
+                        
+                        var w = gr.spPr.xfrm.extX;
+                        var h = gr.spPr.xfrm.extY;
+                        
+                        var offX = Math.max(0, (screenWidth - w) * 0.5);
+                        var offY = Math.max(screenHeight * 0.2, (screenHeight - w) * 0.5);
+                        
+                        gr.spPr.xfrm.setOffX(offX);
+                        gr.spPr.xfrm.setOffY(offY);
+                        gr.checkDrawingBaseCoords();
+                        gr.recalculate();
+                    }
+                    
+                    //console.log(JSON.stringify(json));
+                }
             }
 
             // TODO: Implement frozen places
@@ -4066,8 +4121,7 @@ function OfflineEditor () {
                          "format"        : "xlsx",
                          "vkey"          : undefined,
                          "url"           : t.initSettings["docURL"],
-                         "title"         : this.documentTitle,
-                         "embeddedfonts" : false};
+                         "title"         : this.documentTitle};
 
                          _api.CoAuthoringApi.auth(t.initSettings["viewmode"], rData);
         });
@@ -4076,6 +4130,13 @@ function OfflineEditor () {
                                   var me = this;
                                   me.needToUpdateVersion = true;
                                   if (callback) callback.call(me);
+                                  });
+
+        _api.asc_registerCallback("asc_onAdvancedOptions", function(options) {
+                                  var stream = global_memory_stream_menu;
+                                  stream["ClearNoAttack"]();
+                                  stream["WriteLong"](options.asc_getOptionId());
+                                  window["native"]["OnCallMenuEvent"](22000, stream); // ASC_MENU_EVENT_TYPE_ADVANCED_OPTIONS
                                   });
     };
     this.updateFrozen = function () {
@@ -4722,9 +4783,16 @@ function OfflineEditor () {
             var box = selectedRange.getBBox0();
             settings.putInColumns(!(box.r2 - box.r1 < box.c2 - box.c1));
         }
-        settings.putRange(ws.getSelectionRangeValue());
-        //settings.putShowHorAxis(true);
-        //settings.putShowVerAxis(true);
+
+        var oRangeValue = ws.getSelectionRangeValue();
+        if (oRangeValue) {
+          settings.putRange(oRangeValue.asc_getName());
+        }
+
+        settings.putStyle(2);
+        settings.putTitle(Asc.c_oAscChartTitleShowSettings.noOverlay);
+        settings.putShowHorAxis(true);
+        settings.putShowVerAxis(true);
         var series = AscFormat.getChartSeries(ws.model, settings);
         if(series && series.series.length > 1)
         {
@@ -4734,11 +4802,15 @@ function OfflineEditor () {
         {
             settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
         }
-        // settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
-        // settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);
-        // settings.putDataLabelsPos(c_oAscChartDataLabelsPos.none);
-        // settings.putHorGridLines(c_oAscGridLinesSettings.major);
-        // settings.putVertGridLines(c_oAscGridLinesSettings.none);
+        settings.putHorAxisLabel(Asc.c_oAscChartHorAxisLabelShowSettings.none);
+        settings.putVertAxisLabel(Asc.c_oAscChartVertAxisLabelShowSettings.none);
+        settings.putDataLabelsPos(Asc.c_oAscChartDataLabelsPos.none);
+        settings.putHorGridLines(Asc.c_oAscGridLinesSettings.major);
+        settings.putVertGridLines(Asc.c_oAscGridLinesSettings.none);
+        //settings.putInColumns(false);
+        settings.putSeparator(",");
+        settings.putLine(true);
+        settings.putShowMarker(false);
 
         var vert_axis_settings = new AscCommon.asc_ValAxisSettings();
         settings.putVertAxisProps(vert_axis_settings);
@@ -5325,22 +5397,6 @@ function OfflineEditor () {
                 }
             }
         };
-
-        if (this.translate) {
-            var t = JSON.parse(this.translate);
-            if (t) {
-                var translateChart = new Asc.asc_CChartTranslate();
-                if (t['diagrammtitle']) translateChart.asc_setTitle(t['diagrammtitle']);
-                if (t['xaxis']) translateChart.asc_setXAxis(t['xaxis']);
-                if (t['yaxis']) translateChart.asc_setYAxis(t['yaxis']);
-                if (t['series']) translateChart.asc_setSeries(t['series']);
-                _api.asc_setChartTranslate(translateChart);
-
-                var translateArt = new Asc.asc_TextArtTranslate();
-                if (t['art'])translateArt.asc_setDefaultText(t['art']);
-                _api.asc_setTextArtTranslate(translateArt);
-            }
-        }
     };
     this.offline_afteInit = function () {window.AscAlwaysSaveAspectOnResizeTrack = true;};
 }
@@ -5688,8 +5744,8 @@ window["native"]["offline_keyboard_down"] = function(inputKeys) {
 
                 var content = ws.objectRender.controller.getTargetDocContent();
 
-                content.Cursor_MoveLeft(false, true);
-                content.Cursor_MoveRight(true, true);
+                content.MoveCursorLeft(false, true);
+                content.MoveCursorRight(true, true);
 
                 ws.objectRender.controller.updateSelectionState();
                 ws.objectRender.controller.drawingObjects.sendGraphicObjectProps();
@@ -6684,6 +6740,17 @@ window["native"]["offline_apply_event"] = function(type,params) {
             _return = _s.offline_addChartDrawingObject(params);
             break;
         }
+        case 450:   // ASC_MENU_EVENT_TYPE_GET_CHART_DATA
+        {
+            var chart = _api.asc_getWordChartObject();
+            
+            var _stream = global_memory_stream_menu;
+            _stream["ClearNoAttack"]();
+            _stream["WriteStringA"](JSON.stringify(chart));
+            _return = _stream;
+            
+            break;
+        }
 
         // Cell interface
 
@@ -6993,7 +7060,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
                     {
                         var isLines = _api.asc_getSheetViewSettings();
                         isLines.asc_setShowGridLines(params[_current.pos++]);
-                        _api.asc_setSheetViewSettings(isLines);
+                        _api.asc_setDisplayGridlines(isLines.showGridLines);
                         _s.asc_WriteAllWorksheets(true);
                         break;
                     }
@@ -7002,7 +7069,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
                     {
                         var isHeaders = _api.asc_getSheetViewSettings();
                         isHeaders.asc_setShowRowColHeaders(params[_current.pos++]);
-                        _api.asc_setSheetViewSettings(isHeaders);
+                        _api.asc_setDisplayHeadings(isHeaders.showRowColHeaders);
                         _s.asc_WriteAllWorksheets(true);
                         break;
                     }
@@ -7070,16 +7137,12 @@ window["native"]["offline_apply_event"] = function(type,params) {
         }
         case 2205: // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEET_SHOW_LINES
         {
-            var gridLines = _api.asc_getSheetViewSettings();
-            gridLines.asc_setShowGridLines(params > 0);
-            _api.asc_setSheetViewSettings(gridLines);
+            _api.asc_setDisplayGridlines(params > 0);
             break;
         }
         case 2210: // ASC_SPREADSHEETS_EVENT_TYPE_WORKSHEET_SHOW_HEADINGS
         {
-            var colRowHeaders = _api.asc_getSheetViewSettings();
-            colRowHeaders.asc_setShowRowColHeaders(params > 0);
-            _api.asc_setSheetViewSettings(colRowHeaders);
+            _api.asc_setDisplayHeadings(params > 0);
             break;
         }
         case 2215: // ASC_SPREADSHEETS_EVENT_TYPE_SET_PAGE_OPTIONS
@@ -7179,7 +7242,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
 
                     for (var j = 0; j < ascFunctions.length; ++j) {
                         _stream["WriteString2"](ascFunctions[j].asc_getName());
-                        _stream["WriteString2"](ascFunctions[j].asc_getArguments());
+                        _stream["WriteString2"]("");
                     }
                 }
             } else {
@@ -7362,60 +7425,66 @@ window["native"]["offline_apply_event"] = function(type,params) {
             // console.log("JS - " + dataObject['type']);
 
             switch (dataObject['type']) {
-                case 'auth'        :
-                    t._onAuth(dataObject);
-                    break;
-                case 'message'      :
-                    t._onMessages(dataObject, false);
-                    break;
-                case 'cursor'       :
-                    t._onCursor(dataObject);
-                    break;
-                case 'meta' :
-                    t._onMeta(dataObject);
-                    break;
-                case 'getLock'      :
-                    t._onGetLock(dataObject);
-                    break;
-                case 'releaseLock'    :
-                    t._onReleaseLock(dataObject);
-                    break;
-                case 'connectState'    :
-                    t._onConnectionStateChanged(dataObject);
-                    break;
-                case 'saveChanges'    :
-                    t._onSaveChanges(dataObject);
-                    break;
-                case 'saveLock'      :
-                    t._onSaveLock(dataObject);
-                    break;
-                case 'unSaveLock'    :
-                    t._onUnSaveLock(dataObject);
-                    break;
-                case 'savePartChanges'  :
-                    t._onSavePartChanges(dataObject);
-                    break;
-                case 'drop'        :
-                    t._onDrop(dataObject);
-                    break;
-                case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
-                    break;
-                case 'error'      : /*Старая версия sdk*/
-                    t._onDrop(dataObject);
-                    break;
-                case 'documentOpen'    :
-                    t._documentOpen(dataObject);
-                    break;
-                case 'warning':
-                    t._onWarning(dataObject);
-                    break;
-                case 'license':
-                    t._onLicense(dataObject);
-                    break;
-                case 'session' :
-                    t._onSession(dataObject);
-                    break;
-            }
+              case 'auth'        :
+                t._onAuth(dataObject);
+                break;
+              case 'message'      :
+                t._onMessages(dataObject, false);
+                break;
+              case 'cursor'       :
+                t._onCursor(dataObject);
+                break;
+              case 'meta' :
+                t._onMeta(dataObject);
+                break;
+              case 'getLock'      :
+                t._onGetLock(dataObject);
+                break;
+              case 'releaseLock'    :
+                t._onReleaseLock(dataObject);
+                break;
+              case 'connectState'    :
+                t._onConnectionStateChanged(dataObject);
+                break;
+              case 'saveChanges'    :
+                t._onSaveChanges(dataObject);
+                break;
+              case 'saveLock'      :
+                t._onSaveLock(dataObject);
+                break;
+              case 'unSaveLock'    :
+                t._onUnSaveLock(dataObject);
+                break;
+              case 'savePartChanges'  :
+                t._onSavePartChanges(dataObject);
+                break;
+              case 'drop'        :
+                t._onDrop(dataObject);
+                break;
+              case 'waitAuth'      : /*Ждем, когда придет auth, документ залочен*/
+                break;
+              case 'error'      : /*Старая версия sdk*/
+                t._onDrop(dataObject);
+                break;
+              case 'documentOpen'    :
+                t._documentOpen(dataObject);
+                break;
+              case 'warning':
+                t._onWarning(dataObject);
+                break;
+              case 'license':
+                t._onLicense(dataObject);
+                break;
+              case 'session' :
+                t._onSession(dataObject);
+                break;
+              case 'refreshToken' :
+                t._onRefreshToken(dataObject["messages"]);
+                break;
+              case 'expiredToken' :
+                t._onExpiredToken();
+                break;
+              }
 
             break;
         }
@@ -7451,12 +7520,33 @@ window["native"]["offline_apply_event"] = function(type,params) {
             break;
         }
 
+        case 22001: // ASC_MENU_EVENT_TYPE_SET_PASSWORD
+        {
+          _api.asc_setDocumentPassword(params[0]);
+          break;
+        }
+
         default:
             break;
     }
 
     return _return;
 }
+
+window["Asc"]["spreadsheet_api"].prototype.asc_setDocumentPassword = function(password)
+{
+    var v = {
+      "id": this.documentId,
+      "userid": this.documentUserId,
+      "format": this.documentFormat,
+      "c": "reopen",
+      "url": this.documentUrl,
+      "title": this.documentTitle,
+      "password": password
+    };
+
+    AscCommon.sendCommand(this, null, v);
+};
 
 function testLockedObjects () {
 
@@ -7617,6 +7707,20 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                                                       window["_null_object"], window["_null_object"], t,
                                                       t.collaborativeEditing, t.fontRenderingMode);
                t.DocumentLoadComplete = true;
+               
+               if (!sdkCheck) {
+               
+                    console.log("OPEN FILE ONLINE");
+               
+                    t.wb.showWorksheet(undefined, false, true);
+               
+                    var ws = t.wb.getWorksheet();
+                    window["native"]["onEndLoadingFile"](ws.headersWidth, ws.headersHeight);
+               
+                    _s.asc_WriteAllWorksheets(true);
+               
+                    return;
+               }
 
                t.asc_CheckGuiControlColors();
                t.sendColorThemes(_api.wbModel.theme);
@@ -7689,3 +7793,14 @@ window["AscCommon"].getFullImageSrc2 = function (src) {
     }
     return src;
 }
+
+
+
+
+
+
+
+
+
+
+

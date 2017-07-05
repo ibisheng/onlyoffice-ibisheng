@@ -37,7 +37,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 Asc['asc_docs_api'].prototype.asc_GetStyleFromFormatting = function()
 {
-    return this.WordControl.m_oLogicDocument.Get_StyleFromFormatting();
+    return this.WordControl.m_oLogicDocument.GetStyleFromFormatting();
 };
 Asc['asc_docs_api'].prototype.asc_AddNewStyle = function(oStyle)
 {
@@ -72,28 +72,28 @@ Asc['asc_docs_api'].prototype['asc_IsDefaultStyleChanged']  = Asc['asc_docs_api'
 /**
  * Получаем стиль по выделенному фрагменту.
  */
-CDocument.prototype.Get_StyleFromFormatting = function()
+CDocument.prototype.GetStyleFromFormatting = function()
 {
     if (docpostype_HdrFtr === this.CurPos.Type)
     {
-        return this.HdrFtr.Get_StyleFromFormatting();
+        return this.HdrFtr.GetStyleFromFormatting();
     }
     else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        return this.DrawingObjects.Get_StyleFromFormatting();
+        return this.DrawingObjects.GetStyleFromFormatting();
     }
     else //if (docpostype_Content === this.CurPos.Type)
     {
         if (true == this.Selection.Use)
         {
             if (this.Selection.StartPos > this.Selection.EndPos)
-                return this.Content[this.Selection.EndPos].Get_StyleFromFormatting();
+                return this.Content[this.Selection.EndPos].GetStyleFromFormatting();
             else
-                return this.Content[this.Selection.StartPos].Get_StyleFromFormatting();
+                return this.Content[this.Selection.StartPos].GetStyleFromFormatting();
         }
         else
         {
-            return this.Content[this.CurPos.ContentPos].Get_StyleFromFormatting();
+            return this.Content[this.CurPos.ContentPos].GetStyleFromFormatting();
         }
     }
 };
@@ -107,13 +107,13 @@ CDocument.prototype.Add_NewStyle = function(oStyle)
     {
         AscCommon.History.Create_NewPoint(AscDFH.historydescription_Document_AddNewStyle);
         var NewStyle = this.Styles.Create_StyleFromInterface(oStyle);
-        this.Set_ParagraphStyle(NewStyle.Get_Name());
+        this.SetParagraphStyle(NewStyle.Get_Name());
         this.Recalculate();
         this.Document_UpdateInterfaceState();
     }
 };
 /**
- * Удалем заданный стиль по имени.
+ * Удаляем заданный стиль по имени.
  */
 CDocument.prototype.Remove_Style = function(sStyleName)
 {
@@ -131,7 +131,7 @@ CDocument.prototype.Remove_Style = function(sStyleName)
     }
 };
 /**
- * Удалем все недефолтовые стили в документе.
+ * Удаляем все недефолтовые стили в документе.
  */
 CDocument.prototype.Remove_AllCustomStyles = function()
 {
@@ -335,13 +335,38 @@ CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
         Style.Clear("Hyperlink", null, null, styletype_Character);
         Style.Create_Character_Hyperlink();
     }
+	else if (StyleId == this.Default.NoSpacing)
+	{
+		Style.Clear("No Spacing", this.Default.Paragraph, null, styletype_Paragraph);
+		Style.Create_NoSpacing();
+	}
+	else if (StyleId === this.Default.Title)
+	{
+		Style.Clear("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Title();
+	}
+	else if (StyleId === this.Default.Subtitle)
+	{
+		Style.Clear("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Subtitle();
+	}
+	else if (StyleId === this.Default.Quote)
+	{
+		Style.Clear("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Quote();
+	}
+	else if (StyleId === this.Default.IntenseQuote)
+	{
+		Style.Clear("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_IntenseQuote();
+	}
     else
     {
         this.Remove(StyleId);
 
         if (this.LogicDocument)
         {
-            var AllParagraphs = this.LogicDocument.Get_AllParagraphsByStyle([StyleId]);
+            var AllParagraphs = this.LogicDocument.GetAllParagraphsByStyle([StyleId]);
             var Count = AllParagraphs.length;
             for (var Index = 0; Index < Count; Index++)
             {
@@ -386,7 +411,12 @@ CStyles.prototype.Is_StyleDefault = function(sStyleName)
         || StyleId == this.Default.ParaList
         || StyleId == this.Default.Header
         || StyleId == this.Default.Footer
-        || StyleId == this.Default.Hyperlink)
+        || StyleId == this.Default.Hyperlink
+		|| StyleId == this.Default.NoSpacing
+		|| StyleId == this.Default.Title
+		|| StyleId == this.Default.Subtitle
+		|| StyleId == this.Default.Quote
+		|| StyleId == this.Default.IntenseQuote)
     {
         return true;
     }
@@ -496,6 +526,31 @@ CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
         Style.Clear("Hyperlink", null, null, styletype_Character);
         Style.Create_Character_Hyperlink();
     }
+    else if (StyleId == this.Default.NoSpacing)
+	{
+		Style.Clear("No Spacing", this.Default.Paragraph, null, styletype_Paragraph);
+		Style.Create_NoSpacing();
+	}
+	else if (StyleId === this.Default.Title)
+	{
+		Style.Clear("Title", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Title();
+	}
+	else if (StyleId === this.Default.Subtitle)
+	{
+		Style.Clear("Subtitle", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Subtitle();
+	}
+	else if (StyleId === this.Default.Quote)
+	{
+		Style.Clear("Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_Quote();
+	}
+	else if (StyleId === this.Default.IntenseQuote)
+	{
+		Style.Clear("Intense Quote", this.Default.Paragraph, this.Default.Paragraph, styletype_Paragraph);
+		Style.Create_IntenseQuote();
+	}
 
     this.LogicDocument.TurnOnHistory();
 

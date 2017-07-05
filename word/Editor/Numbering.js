@@ -321,7 +321,7 @@ CAbstractNum.prototype =
 		}
 
 		var LogicDocument = editor.WordControl.m_oLogicDocument;
-		var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering({NumId : this.Id, Lvl : undefined});
+		var AllParagraphs = LogicDocument.GetAllParagraphsByNumbering({NumId : this.Id, Lvl : undefined});
 
 		var Count = AllParagraphs.length;
 		for (var Index = 0; Index < Count; Index++)
@@ -1444,7 +1444,7 @@ CAbstractNum.prototype =
         }
     },
 
-    DocumentStatistics : function(Lvl, Stats)
+	CollectDocumentStatistics : function(Lvl, Stats)
     {
         var Text = this.Lvl[Lvl].LvlText;
 
@@ -1679,7 +1679,7 @@ CAbstractNum.prototype =
         NumPr.Lvl   = iLvl;
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
-        var AllParagraphs = LogicDocument.Get_AllParagraphsByNumbering( NumPr );
+        var AllParagraphs = LogicDocument.GetAllParagraphsByNumbering( NumPr );
 
         var Count = AllParagraphs.length;
         for ( var Index = 0; Index < Count; Index++ )
@@ -1882,14 +1882,14 @@ var numbering_presentationnumfrmt_AlphaUcPeriod =   107;  // A., B., C., ...
 var g_NumberingArr = [];
 g_NumberingArr[0] = numbering_presentationnumfrmt_AlphaLcParenR;
 g_NumberingArr[1] = numbering_presentationnumfrmt_AlphaLcParenR;
-g_NumberingArr[2] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[2] = numbering_presentationnumfrmt_AlphaLcPeriod;
 g_NumberingArr[3] = numbering_presentationnumfrmt_AlphaUcParenR;
 g_NumberingArr[4] = numbering_presentationnumfrmt_AlphaUcParenR;
 g_NumberingArr[5] = numbering_presentationnumfrmt_AlphaUcPeriod;
 g_NumberingArr[6] = numbering_presentationnumfrmt_ArabicPeriod;
 g_NumberingArr[7] = numbering_presentationnumfrmt_ArabicPeriod;
-g_NumberingArr[8] = numbering_presentationnumfrmt_AlphaLcParenR;
-g_NumberingArr[9] = numbering_presentationnumfrmt_AlphaLcParenR;
+g_NumberingArr[8] = numbering_presentationnumfrmt_ArabicPeriod;
+g_NumberingArr[9] = numbering_presentationnumfrmt_ArabicPeriod;
 g_NumberingArr[10] = numbering_presentationnumfrmt_ArabicParenR;
 g_NumberingArr[11] = numbering_presentationnumfrmt_ArabicParenR;
 g_NumberingArr[12] = numbering_presentationnumfrmt_ArabicPeriod;
@@ -1929,8 +1929,9 @@ function CPresentationBullet()
     this.m_nStartAt = null;                                // Стартовое значение для нумерованных списков
     this.m_sChar    = null;                                // Значение для символьных списков
 
-    this.m_oColor   = { r : 0, g : 0, b : 0 };             // Цвет
+    this.m_oColor   = { r : 0, g : 0, b : 0, a: 255 };     // Цвет
     this.m_bColorTx = true;                                // Использовать ли цвет первого рана в параграфе
+    this.Unifill    = null;
 
     this.m_sFont    = "Arial";                             // Шрифт
     this.m_bFontTx  = true;                                // Использовать ли шрифт первого рана в параграфе
@@ -1942,313 +1943,259 @@ function CPresentationBullet()
     this.m_oTextPr = null;
     this.m_nNum    = null;
     this.m_sString = null;
+}
 
-    this.Get_Type = function()
-    {
-        return this.m_nType;
-    };
 
-    this.Get_StartAt = function()
-    {
-        return this.m_nStartAt;
-    };
 
-    this.Measure = function(Context, FirstTextPr, _Num, Theme)
+CPresentationBullet.prototype.Get_Type = function()
+{
+    return this.m_nType;
+};
+
+CPresentationBullet.prototype.Get_StartAt = function()
+{
+    return this.m_nStartAt;
+};
+
+CPresentationBullet.prototype.Measure = function(Context, FirstTextPr, _Num, Theme, ColorMap)
+{
+    var dFontSize = FirstTextPr.FontSize;
+    if ( false === this.m_bSizeTx )
     {
-        var dFontSize = FirstTextPr.FontSize;
-        if ( false === this.m_bSizeTx )
+        if ( true === this.m_bSizePct )
+            dFontSize *= this.m_dSize;
+        else
+            dFontSize = this.m_dSize;
+    }
+
+    var RFonts;
+    if(!this.m_bFontTx)
+    {
+        RFonts = {
+            Ascii: {
+                Name: this.m_sFont,
+                Index: -1
+            },
+            EastAsia: {
+                Name: this.m_sFont,
+                Index: -1
+            },
+            CS: {
+                Name: this.m_sFont,
+                Index: -1
+            },
+            HAnsi: {
+                Name: this.m_sFont,
+                Index: -1
+            }
+        };
+    }
+    else
+    {
+        RFonts = FirstTextPr.RFonts;
+    }
+
+
+    var FirstTextPr_ = FirstTextPr.Copy();
+    if(FirstTextPr_.Underline)
+    {
+        FirstTextPr_.Underline = false;
+    }
+
+    if ( true === this.m_bColorTx || !this.Unifill)
+    {
+        if(FirstTextPr.Unifill)
         {
-            if ( true === this.m_bSizePct )
-                dFontSize *= this.m_dSize;
-            else
-                dFontSize = this.m_dSize;
-        }
-
-        var RFonts;
-        if(!this.m_bFontTx)
-        {
-            RFonts = {
-                Ascii: {
-                    Name: this.m_sFont,
-                        Index: -1
-                },
-                EastAsia: {
-                    Name: this.m_sFont,
-                        Index: -1
-                },
-                CS: {
-                    Name: this.m_sFont,
-                        Index: -1
-                },
-                HAnsi: {
-                    Name: this.m_sFont,
-                        Index: -1
-                }
-            };
+            this.Unifill = FirstTextPr_.Unifill;
         }
         else
         {
-            RFonts = FirstTextPr.RFonts;
+            this.Unifill = AscFormat.CreteSolidFillRGB(FirstTextPr.Color.r, FirstTextPr.Color.g, FirstTextPr.Color.b);
         }
+    }
+
+    var TextPr_ = new CTextPr();
+    TextPr_.Set_FromObject({
+        RFonts: RFonts,
+        Unifill: this.Unifill,
+        FontSize : dFontSize,
+        Bold     : ( this.m_nType >= numbering_presentationnumfrmt_ArabicPeriod ? FirstTextPr.Bold   : false ),
+        Italic   : ( this.m_nType >= numbering_presentationnumfrmt_ArabicPeriod ? FirstTextPr.Italic : false )
+    });
+    FirstTextPr_.Merge(TextPr_);
+    this.m_oTextPr = FirstTextPr_;
+
+    var Num = _Num + this.m_nStartAt - 1;
+    this.m_nNum = Num;
+
+    var X = 0;
 
 
-        var FirstTextPr_ = FirstTextPr.Copy();
-        if(FirstTextPr_.Underline)
-        {
-            FirstTextPr_.Underline = false;
-        }
-
-        var TextPr_ = new CTextPr();
-        TextPr_.Set_FromObject({
-            RFonts: RFonts,
-
-            FontSize : dFontSize,
-            Bold     : ( this.m_nType >= numbering_presentationnumfrmt_ArabicPeriod ? FirstTextPr.Bold   : false ),
-            Italic   : ( this.m_nType >= numbering_presentationnumfrmt_ArabicPeriod ? FirstTextPr.Italic : false )
-        });
-        FirstTextPr_.Merge(TextPr_);
-        this.m_oTextPr = FirstTextPr_;
-
-        var Num = _Num + this.m_nStartAt - 1;
-        this.m_nNum = Num;
-
-        var X = 0;
 
 
-        var OldTextPr = Context.GetTextPr();
+    var OldTextPr = Context.GetTextPr();
 
 
-        var sT = "";
+    var sT = "";
 
-        switch ( this.m_nType )
-        {
-            case numbering_presentationnumfrmt_Char:
-            {
-                if ( null != this.m_sChar )
-                    sT = this.m_sChar;
-
-                break;
-            }
-
-            case numbering_presentationnumfrmt_AlphaLcParenR:
-            {
-                sT = Numbering_Number_To_Alpha( Num, true ) + ")";
-                break;
-            }
-
-            case numbering_presentationnumfrmt_AlphaLcPeriod:
-            {
-                sT = Numbering_Number_To_Alpha( Num, true ) + ".";
-                break;
-            }
-
-            case numbering_presentationnumfrmt_AlphaUcParenR:
-            {
-                sT = Numbering_Number_To_Alpha( Num, false ) + ")";
-                break;
-            }
-
-            case numbering_presentationnumfrmt_AlphaUcPeriod:
-            {
-                sT = Numbering_Number_To_Alpha( Num, false ) + ".";
-                break;
-            }
-
-            case numbering_presentationnumfrmt_ArabicParenR:
-            {
-                sT += Numbering_Number_To_String(Num) + ")";
-                break;
-            }
-
-            case numbering_presentationnumfrmt_ArabicPeriod:
-            {
-                sT += Numbering_Number_To_String(Num) + ".";
-                break;
-            }
-
-            case numbering_presentationnumfrmt_RomanLcPeriod:
-            {
-                sT += Numbering_Number_To_Roman(Num, true) + ".";
-                break;
-            }
-
-            case numbering_presentationnumfrmt_RomanUcPeriod:
-            {
-                sT += Numbering_Number_To_Roman(Num, false) + ".";
-                break;
-            }
-        }
-
-        this.m_sString = sT;
-
-        var Hint =  this.m_oTextPr.RFonts.Hint;
-        var bCS  =  this.m_oTextPr.CS;
-        var bRTL =  this.m_oTextPr.RTL;
-        var lcid =  this.m_oTextPr.Lang.EastAsia;
-
-        var FontSlot = g_font_detector.Get_FontClass( sT.charCodeAt(0), Hint, lcid, bCS, bRTL );
-        Context.SetTextPr( this.m_oTextPr, Theme );
-        Context.SetFontSlot( FontSlot );
-        for ( var Index2 = 0; Index2 < sT.length; Index2++ )
-        {
-            var Char = sT.charAt(Index2);
-            X += Context.Measure( Char ).Width;
-        }
-
-        if(OldTextPr)
-        {
-            Context.SetTextPr( OldTextPr, Theme );
-        }
-        return { Width : X };
-    };
-
-    this.Copy = function()
+    switch ( this.m_nType )
     {
-        var Bullet = new CPresentationBullet();
+        case numbering_presentationnumfrmt_Char:
+        {
+            if ( null != this.m_sChar )
+                sT = this.m_sChar;
 
-        Bullet.m_nType    = this.m_nType;
-        Bullet.m_nStartAt = this.m_nStartAt;
-        Bullet.m_sChar    = this.m_sChar;
+            break;
+        }
 
-        Bullet.m_oColor.r = this.m_oColor.r;
-        Bullet.m_oColor.g = this.m_oColor.g;
-        Bullet.m_oColor.b = this.m_oColor.b;
-        Bullet.m_bColorTx = this.m_bColorTx;
+        case numbering_presentationnumfrmt_AlphaLcParenR:
+        {
+            sT = Numbering_Number_To_Alpha( Num, true ) + ")";
+            break;
+        }
 
-        Bullet.m_sFont    = this.m_sFont;
-        Bullet.m_bFontTx  = this.m_bFontTx;
+        case numbering_presentationnumfrmt_AlphaLcPeriod:
+        {
+            sT = Numbering_Number_To_Alpha( Num, true ) + ".";
+            break;
+        }
 
-        Bullet.m_dSize    = this.m_dSize;
-        Bullet.m_bSizeTx  = this.m_bSizeTx;
-        Bullet.m_bSizePct = this.m_bSizePct;
+        case numbering_presentationnumfrmt_AlphaUcParenR:
+        {
+            sT = Numbering_Number_To_Alpha( Num, false ) + ")";
+            break;
+        }
 
-        return Bullet;
-    };
+        case numbering_presentationnumfrmt_AlphaUcPeriod:
+        {
+            sT = Numbering_Number_To_Alpha( Num, false ) + ".";
+            break;
+        }
 
-    this.Draw = function(X, Y, Context, FirstTextPr, PDSE)
+        case numbering_presentationnumfrmt_ArabicParenR:
+        {
+            sT += Numbering_Number_To_String(Num) + ")";
+            break;
+        }
+
+        case numbering_presentationnumfrmt_ArabicPeriod:
+        {
+            sT += Numbering_Number_To_String(Num) + ".";
+            break;
+        }
+
+        case numbering_presentationnumfrmt_RomanLcPeriod:
+        {
+            sT += Numbering_Number_To_Roman(Num, true) + ".";
+            break;
+        }
+
+        case numbering_presentationnumfrmt_RomanUcPeriod:
+        {
+            sT += Numbering_Number_To_Roman(Num, false) + ".";
+            break;
+        }
+    }
+
+    this.m_sString = sT;
+
+    var Hint =  this.m_oTextPr.RFonts.Hint;
+    var bCS  =  this.m_oTextPr.CS;
+    var bRTL =  this.m_oTextPr.RTL;
+    var lcid =  this.m_oTextPr.Lang.EastAsia;
+
+    var FontSlot = g_font_detector.Get_FontClass( sT.charCodeAt(0), Hint, lcid, bCS, bRTL );
+    Context.SetTextPr( this.m_oTextPr, Theme );
+    Context.SetFontSlot( FontSlot );
+    for ( var Index2 = 0; Index2 < sT.length; Index2++ )
     {
-        if ( null === this.m_oTextPr || null === this.m_nNum || null == this.m_sString || this.m_sString.length == 0)
-            return;
+        var Char = sT.charAt(Index2);
+        X += Context.Measure( Char ).Width;
+    }
 
-        var oColor = { r : this.m_oColor.r, g : this.m_oColor.g, b : this.m_oColor.b };
-        if ( true === this.m_bColorTx )
-        {
-            if(FirstTextPr.Unifill)
-            {
-                FirstTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
-                var RGBA = FirstTextPr.Unifill.getRGBAColor();
-                oColor.r = RGBA.R;
-                oColor.g = RGBA.G;
-                oColor.b = RGBA.B;
-            }
-            else
-            {
-                oColor.r = FirstTextPr.Color.r;
-                oColor.g = FirstTextPr.Color.g;
-                oColor.b = FirstTextPr.Color.b;
-            }
-        }
-
-
-        var OldTextPr  = Context.GetTextPr();
-        var OldTextPr2 = g_oTextMeasurer.GetTextPr();
-
-        var Hint =  this.m_oTextPr.RFonts.Hint;
-        var bCS  =  this.m_oTextPr.CS;
-        var bRTL =  this.m_oTextPr.RTL;
-        var lcid =  this.m_oTextPr.Lang.EastAsia;
-
-        var sT = this.m_sString;
-        var FontSlot = g_font_detector.Get_FontClass( sT.charCodeAt(0), Hint, lcid, bCS, bRTL );
-        Context.SetTextPr( this.m_oTextPr, PDSE.Theme );
-        Context.SetFontSlot( FontSlot );
-        Context.p_color( oColor.r, oColor.g, oColor.b, 255 );
-        Context.b_color1( oColor.r, oColor.g, oColor.b, 255 );
-        g_oTextMeasurer.SetTextPr( this.m_oTextPr, PDSE.Theme  );
-        g_oTextMeasurer.SetFontSlot( FontSlot );
-
-
-        for ( var Index2 = 0; Index2 < sT.length; Index2++ )
-        {
-            var Char = sT.charAt(Index2);
-            Context.FillText( X, Y, Char );
-            X += g_oTextMeasurer.Measure( Char ).Width;
-        }
-
-        if(OldTextPr)
-        {
-            Context.SetTextPr( OldTextPr, PDSE.Theme );
-        }
-        if(OldTextPr2)
-        {
-            g_oTextMeasurer.SetTextPr( OldTextPr2, PDSE.Theme  );
-        }
-    };
-
-    this.Write_ToBinary = function(Writer)
+    if(OldTextPr)
     {
-        // Long   : m_nType
-        // Long   : m_nStartAt (-1 == null)
-        // String : m_sChar  ("" == null)
-        // Byte   : m_oColor.r
-        // Byte   : m_oColor.g
-        // Byte   : m_oColor.b
-        // Bool   : m_bColorTx
-        // String : m_sFont
-        // Bool   : m_bFont
-        // Double : m_dSize
-        // Bool   : m_bSizeTx
-        // Bool   : m_bSizePct
+        Context.SetTextPr( OldTextPr, Theme );
+    }
+    return { Width : X };
+};
 
-        Writer.WriteLong( this.m_nType );
-        Writer.WriteLong( ( null != this.m_nStartAt ? this.m_nStartAt : -1 ) );
-        Writer.WriteString2( ( null != this.m_sChar ? this.m_sChar : "" ) );
-        Writer.WriteByte( this.m_oColor.r );
-        Writer.WriteByte( this.m_oColor.g );
-        Writer.WriteByte( this.m_oColor.b );
-        Writer.WriteBool( this.m_bColorTx );
-        Writer.WriteString2( this.m_sFont );
-        Writer.WriteBool( this.m_bFontTx );
-        Writer.WriteDouble( this.m_dSize );
-        Writer.WriteBool( this.m_bSizeTx );
-        Writer.WriteBool( this.m_bSizePct );
-    };
+CPresentationBullet.prototype.Copy = function()
+{
+    var Bullet = new CPresentationBullet();
 
-    this.Read_FromBinary = function(Reader)
+    Bullet.m_nType    = this.m_nType;
+    Bullet.m_nStartAt = this.m_nStartAt;
+    Bullet.m_sChar    = this.m_sChar;
+
+    Bullet.m_oColor.r = this.m_oColor.r;
+    Bullet.m_oColor.g = this.m_oColor.g;
+    Bullet.m_oColor.b = this.m_oColor.b;
+    Bullet.m_bColorTx = this.m_bColorTx;
+
+    Bullet.m_sFont    = this.m_sFont;
+    Bullet.m_bFontTx  = this.m_bFontTx;
+
+    Bullet.m_dSize    = this.m_dSize;
+    Bullet.m_bSizeTx  = this.m_bSizeTx;
+    Bullet.m_bSizePct = this.m_bSizePct;
+
+    return Bullet;
+};
+
+CPresentationBullet.prototype.Draw = function(X, Y, Context, FirstTextPr, PDSE)
+{
+    if ( null === this.m_oTextPr || null === this.m_nNum || null == this.m_sString || this.m_sString.length == 0)
+        return;
+
+
+
+    var OldTextPr  = Context.GetTextPr();
+    var OldTextPr2 = g_oTextMeasurer.GetTextPr();
+
+    var Hint =  this.m_oTextPr.RFonts.Hint;
+    var bCS  =  this.m_oTextPr.CS;
+    var bRTL =  this.m_oTextPr.RTL;
+    var lcid =  this.m_oTextPr.Lang.EastAsia;
+
+    var sT = this.m_sString;
+    var FontSlot = g_font_detector.Get_FontClass( sT.charCodeAt(0), Hint, lcid, bCS, bRTL );
+
+    if(this.m_oTextPr.Unifill){
+        this.m_oTextPr.Unifill.check(PDSE.Theme, PDSE.ColorMap);
+    }
+    Context.SetTextPr( this.m_oTextPr, PDSE.Theme );
+    Context.SetFontSlot( FontSlot );
+    if(!Context.Start_Command){
+        if(this.m_oTextPr.Unifill){
+            var RGBA = this.m_oTextPr.Unifill.getRGBAColor();
+            this.m_oColor.r = RGBA.R;
+            this.m_oColor.g = RGBA.G;
+            this.m_oColor.b = RGBA.B;
+        }
+        Context.p_color( this.m_oColor.r, this.m_oColor.g, this.m_oColor.b, 255 );
+        Context.b_color1( this.m_oColor.r, this.m_oColor.g, this.m_oColor.b, 255 );
+    }
+    g_oTextMeasurer.SetTextPr( this.m_oTextPr, PDSE.Theme  );
+    g_oTextMeasurer.SetFontSlot( FontSlot );
+
+
+    for ( var Index2 = 0; Index2 < sT.length; Index2++ )
     {
-        // Long   : m_nType
-        // Long   : m_nStartAt (-1 == null)
-        // String : m_sChar  ("" == null)
-        // Byte   : m_oColor.r
-        // Byte   : m_oColor.g
-        // Byte   : m_oColor.b
-        // Bool   : m_bColorTx
-        // String : m_sFont
-        // Bool   : m_bFont
-        // Double : m_dSize
-        // Bool   : m_bSizeTx
-        // Bool   : m_bSizePct
+        var Char = sT.charAt(Index2);
+        Context.FillText( X, Y, Char );
+        X += g_oTextMeasurer.Measure( Char ).Width;
+    }
 
-        this.m_nType    = Reader.GetLong();
-        this.m_nStartAt = Reader.GetLong();
-        if ( -1 === this.m_nStartAt )
-            this.m_nStartAt = null;
-
-        this.m_sChar = Reader.GetString2();
-        if ( "" === this.m_sChar )
-            this.m_sChar = null;
-
-        this.m_oColor.r = Reader.GetByte();
-        this.m_oColor.g = Reader.GetByte();
-        this.m_oColor.b = Reader.GetByte();
-        this.m_bColorTx = Reader.GetBool();
-        this.m_sFont    = Reader.GetString2();
-        this.m_bFontTx  = Reader.GetBool();
-        this.m_dSize    = Reader.GetDouble();
-        this.m_bSizeTx  = Reader.GetBool();
-        this.m_bSizePct = Reader.GetBool();
-    };
-}
+    if(OldTextPr)
+    {
+        Context.SetTextPr( OldTextPr, PDSE.Theme );
+    }
+    if(OldTextPr2)
+    {
+        g_oTextMeasurer.SetTextPr( OldTextPr2, PDSE.Theme  );
+    }
+};
 
 function getNumInfoLvl(Lvl) {
     var NumType    = -1;

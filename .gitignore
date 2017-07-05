@@ -8,7 +8,7 @@ slide/sdk-all.cache
 word/sdk-all-min.js
 word/sdk-all.js
 word/sdk-all.cache
-**/node_modules
+build/node_modules
 common/AllFonts.js
 common/Images/fonts_thumbnail.png
 common/Images/fonts_thumbnail@2x.png

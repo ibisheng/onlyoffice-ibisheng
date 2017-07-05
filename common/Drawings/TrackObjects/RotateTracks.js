@@ -167,7 +167,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
                 && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.pen.Fill.fill.type != c_oAscFill.FILL_TYPE_NONE)
                 || (this.brush && this.brush.fill && this.brush.fill
                 && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.brush.fill.type != c_oAscFill.FILL_TYPE_NONE) );
-    }
+    };
 
 
     this.check_bounds = function(boundsChecker)
@@ -186,7 +186,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
             boundsChecker._z();
             boundsChecker._e();
         }
-    }
+    };
 }
 
 function ObjectToDraw(brush, pen, extX, extY, geometry, transform, x, y, oComment)
@@ -350,6 +350,7 @@ ObjectToDraw.prototype =
 };
 function RotateTrackShapeImage(originalObject)
 {
+    this.bIsTracked = false;
     this.originalObject = originalObject;
     this.transform = new CMatrix();
     var brush;
@@ -362,7 +363,7 @@ function RotateTrackShapeImage(originalObject)
     {
         brush = originalObject.brush;
     }
-    this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, brush, originalObject.pen, this.transform);
+    this.overlayObject = new OverlayObject(originalObject.getGeom(), originalObject.extX, originalObject.extY, brush, originalObject.pen, this.transform);
 
     this.angle = originalObject.rot;
     var full_flip_h = this.originalObject.getFullFlipH();
@@ -379,6 +380,7 @@ function RotateTrackShapeImage(originalObject)
 
     this.track = function(angle, e)
     {
+        this.bIsTracked = true;
         var new_rot = angle + this.originalObject.rot;
         while(new_rot < 0)
             new_rot += 2*Math.PI;
@@ -429,6 +431,9 @@ function RotateTrackShapeImage(originalObject)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         AscFormat.CheckSpPrXfrm(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     };
@@ -480,6 +485,7 @@ function RotateTrackShapeImage(originalObject)
 
 function RotateTrackGroup(originalObject)
 {
+    this.bIsTracked = false;
     this.originalObject = originalObject;
     this.transform = new CMatrix();
 
@@ -495,7 +501,7 @@ function RotateTrackGroup(originalObject)
         var gr_obj_transform_copy = arr_graphic_objects[i].getTransformMatrix().CreateDublicate();
         global_MatrixTransformer.MultiplyAppend(gr_obj_transform_copy, group_invert_transform);
         this.arrTransforms2[i] = gr_obj_transform_copy;
-        this.overlayObjects[i] = new OverlayObject(arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
+        this.overlayObjects[i] = new OverlayObject(arr_graphic_objects[i].getGeom(), arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
             arr_graphic_objects[i].brush,  arr_graphic_objects[i].pen, new CMatrix());
     }
 
@@ -548,6 +554,7 @@ function RotateTrackGroup(originalObject)
 
     this.track = function(angle, e)
     {
+        this.bIsTracked = true;
         var new_rot = angle + this.originalObject.rot;
         while(new_rot < 0)
             new_rot += 2*Math.PI;
@@ -591,6 +598,9 @@ function RotateTrackGroup(originalObject)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         AscFormat.CheckSpPrXfrm(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
@@ -598,6 +608,7 @@ function RotateTrackGroup(originalObject)
 
 function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 {
+    this.bIsTracked = false;
     this.chartSpace = oChartSpace;
 
 
@@ -808,6 +819,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 
     this.track = function(x, y)
     {
+        this.bIsTracked = true;
 
         var tx = this.chartSpace.invertTransform.TransformPointX(x, y);
         var ty = this.chartSpace.invertTransform.TransformPointY(x, y);
@@ -858,6 +870,9 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 
     this.trackEnd = function()
     {
+        if(!this.bIsTracked){
+            return;
+        }
         oChartSpace.chart.setView3D(this.view3D.createDuplicate());
         oChartSpace.setRecalculateInfo();
     }

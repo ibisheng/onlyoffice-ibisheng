@@ -67,11 +67,6 @@ CShape.prototype.Get_Numbering =  function()
     return new CNumbering();
 };
 
-CShape.prototype.getTextArtTranslate = function()
-{
-    return Asc["editor"].textArtTranslate;
-};
-
 CShape.prototype.Is_UseInDocument = function(){
     if(this.group)
     {
@@ -258,9 +253,9 @@ function CChangesDrawingObjectsRemoveFromDrawingObjects(Class, Pos){
 
     AscDFH.changesFactory[AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects] = CChangesDrawingObjectsRemoveFromDrawingObjects;
 
-CShape.prototype.addToDrawingObjects =  function(pos)
+CShape.prototype.addToDrawingObjects =  function(pos, type)
 {
-    var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
+    var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, type);
     //var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
     History.Add(new CChangesDrawingObjectsAddToDrawingObjects(this, position));
     //this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
