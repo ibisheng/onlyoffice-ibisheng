@@ -1423,6 +1423,9 @@ background-repeat: no-repeat;\
 					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
 					t.asc_setDrawCollaborationMarks(true);
 					t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
+					if(window['AscCommon'].g_clipboardBase && AscCommon.CollaborativeEditing.m_bFast){
+						window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+					}
 				} else {
 					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
 					t.canUnlockDocument = true;
@@ -7120,8 +7123,12 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_SetFastCollaborative = function(isOn)
 	{
-		if (AscCommon.CollaborativeEditing)
+		if (AscCommon.CollaborativeEditing){
 			AscCommon.CollaborativeEditing.Set_Fast(isOn);
+			if(window['AscCommon'].g_clipboardBase && isOn && !AscCommon.CollaborativeEditing.Is_SingleUser()){
+				window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+			}
+		}
 	};
 
 	asc_docs_api.prototype._onEndLoadSdk = function()
