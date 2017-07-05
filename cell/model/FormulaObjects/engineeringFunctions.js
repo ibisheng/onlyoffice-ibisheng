@@ -936,7 +936,7 @@
 
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
 	cFormulaFunctionGroup['Engineering'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cBIN2DEC, cBIN2HEX, cBIN2OCT,
-		cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA, cERF, cERFC, cERFC_PRECISE, cGESTEP, cHEX2BIN,
+		cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA, cERF, cERF_PRECISE, cERFC, cERFC_PRECISE, cGESTEP, cHEX2BIN,
 		cHEX2DEC, cHEX2OCT, cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMCOSH, cIMCOT, cIMCSC, cIMCSCH,
 		cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER, cIMPRODUCT, cIMREAL, cIMSEC, cIMSECH, cIMSIN, cIMSINH,
 		cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN, cOCT2DEC, cOCT2HEX);
@@ -1521,42 +1521,65 @@
 	cERF.prototype.argumentsMax = 2;
 	cERF.prototype.Calculate = function (arg) {
 
-		var a = arg[0], b = arg[1] ? arg[1] : new cUndefined();
-		if (a instanceof cArea || a instanceof cArea3D) {
-			a = a.cross(arguments[1]);
-		} else if (a instanceof cArray) {
-			a = a.getElement(0);
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1] ? argClone[1].tocNumber() : new cUndefined();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
 		}
 
-		if (b instanceof cArea || b instanceof cArea3D) {
-			b = b.cross(arguments[1]);
-		} else if (b instanceof cArray) {
-			b = b.getElement(0);
-		}
+		var calcErf = function(argArray) {
+			var a = argArray[0];
+			var b = argArray[1];
 
-		a = a.tocNumber();
-		if (a instanceof cError) {
-			return this.value = a;
-		}
-
-		a = a.getValue();
-
-		if (!( b instanceof cUndefined )) {
-			b = b.tocNumber();
-			if (b instanceof cError) {
-				return this.value = b
+			var res;
+			if(undefined !== b){
+				res = new cNumber(rtl_math_erf(b) - rtl_math_erf(a));
+			}else{
+				res = new cNumber(rtl_math_erf(a));
 			}
 
-			b = b.getValue();
+			return res;
+		};
 
-			this.value = new cNumber(rtl_math_erf(b) - rtl_math_erf(a));
+		return this.value = this._findArrayInNumberArguments(oArguments, calcErf);
+	};
 
-		} else {
-			this.value = new cNumber(rtl_math_erf(a));
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cERF_PRECISE() {
+		cBaseFunction.call(this, "ERF.PRECISE");
+	}
+
+	cERF_PRECISE.prototype = Object.create(cBaseFunction.prototype);
+	cERF_PRECISE.prototype.constructor = cERF_PRECISE;
+	cERF_PRECISE.prototype.argumentsMin = 1;
+	cERF_PRECISE.prototype.argumentsMax = 1;
+	cERF_PRECISE.prototype.isXLFN = true;
+	cERF_PRECISE.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
 		}
 
-		return this.value;
+		var calcErf = function(argArray) {
+			var a = argArray[0];
+			return new cNumber(rtl_math_erf(a));
+		};
 
+		return this.value = this._findArrayInNumberArguments(oArguments, calcErf);
 	};
 
 	/**

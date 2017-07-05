@@ -7165,6 +7165,26 @@ $( function () {
 
     });
 
+	test( "Test: \"ERF.PRECISE\"", function () {
+
+		oParser = new parserFormula( "ERF.PRECISE(1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(14)-0, 0.8427007929497149.toFixed(14)-0 );
+
+		oParser = new parserFormula( "ERF.PRECISE(1.234)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(14)-0, 0.9190394169576684.toFixed(14)-0 );
+
+		oParser = new parserFormula( "ERF.PRECISE(0.745)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.70792892 );
+
+		oParser = new parserFormula( "ERF.PRECISE(1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.84270079 );
+
+	});
+
     test( "Test: \"ERFC\"", function () {
 
         oParser = new parserFormula( "ERFC(1.234)", "A2", ws );
