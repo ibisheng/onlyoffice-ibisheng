@@ -4224,7 +4224,7 @@
     WorksheetView.prototype._cleanCellsTextMetricsCache = function () {
         var s = this.cache.sectors = [];
         var vr = this.visibleRange;
-        var h = vr.r2 + 1 - vr.r1;
+        var h = Math.max(Math.min(40, this.rows.length), vr.r2 + 1 - vr.r1);
         var rl = this.rows.length;
         var rc = asc_floor(rl / h) + (rl % h > 0 ? 1 : 0);
         var range = new asc_Range(0, 0, this.cols.length - 1, h - 1);
