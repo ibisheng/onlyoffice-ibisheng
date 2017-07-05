@@ -44,6 +44,10 @@
 	cFormulaFunctionGroup['Cube'].push(cCUBEKPIMEMBER, cCUBEMEMBER, cCUBEMEMBERPROPERTY, cCUBERANKEDMEMBER, cCUBESET,
 		cCUBESETCOUNT, cCUBEVALUE);
 
+	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
+	cFormulaFunctionGroup['NotRealised'].push(cCUBEKPIMEMBER, cCUBEMEMBER, cCUBEMEMBERPROPERTY, cCUBERANKEDMEMBER,
+		cCUBESET, cCUBESETCOUNT, cCUBEVALUE);
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
