@@ -559,6 +559,10 @@ var editor;
 		return this.wb.af_getTablePictures(props, pivot);
 	};
 
+	  spreadsheet_api.prototype.asc_changePivotStyle = function (props, pivot) {
+
+	  };
+
   spreadsheet_api.prototype.getViewMode = function() {
     return this.isViewMode;
   };
@@ -3595,6 +3599,9 @@ var editor;
   prot["asc_changeTableRange"] = prot.asc_changeTableRange;
   prot["asc_convertTableToRange"] = prot.asc_convertTableToRange;
   prot["asc_getTablePictures"] = prot.asc_getTablePictures;
+
+  // Pivot Table
+	prot["asc_changePivotStyle"] = prot.asc_changePivotStyle;
 
   // Drawing objects interface
 
