@@ -4992,14 +4992,11 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 			this._endCalculate();
 			return this.value;
 		}
-		var bbox = null;
-		if (opt_bbox) {
-			bbox = opt_bbox;
-		} else if (this.parent && this.parent.onFormulaEvent) {
-			bbox = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
+		if (!opt_bbox && this.parent && this.parent.onFormulaEvent) {
+			opt_bbox = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
 		}
-		if (!bbox) {
-			bbox = new Asc.Range(0, 0, 0, 0);
+		if (!opt_bbox) {
+			opt_bbox = new Asc.Range(0, 0, 0, 0);
 		}
 
 		var elemArr = [], _tmp, numFormat = -1, currentElement = null;
@@ -5019,7 +5016,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 					for (var ind = 0; ind < currentElement.getArguments(); ind++) {
 						arg.unshift(elemArr.pop());
 					}
-					_tmp = currentElement.Calculate(arg, bbox, opt_defName, this.ws);
+					_tmp = currentElement.Calculate(arg, opt_bbox, opt_defName, this.ws);
 					if (null != _tmp.numFormat) {
 						numFormat = _tmp.numFormat;
 					} else if (0 > numFormat || cNumFormatNone === currentElement.numFormat) {
@@ -5028,9 +5025,9 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 					elemArr.push(_tmp);
 				}
 			} else if (currentElement.type === cElementType.name || currentElement.type === cElementType.name3D) {
-				elemArr.push(currentElement.Calculate(arg, bbox));
+				elemArr.push(currentElement.Calculate(arg, opt_bbox));
 			} else if (currentElement.type === cElementType.table) {
-				elemArr.push(currentElement.toRef(bbox));
+				elemArr.push(currentElement.toRef(opt_bbox));
 			} else if (opt_offset) {
 				var cloneElem = null;
 				var bbox = null;
