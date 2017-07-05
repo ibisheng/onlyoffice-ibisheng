@@ -51,8 +51,7 @@
 	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
 	cFormulaFunctionGroup['DateAndTime'].push(cDAYS, cISOWEEKNUM);
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
-	cFormulaFunctionGroup['Engineering'].push(cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR, cERF_PRECISE,
-		cERFC_PRECISE);
+	cFormulaFunctionGroup['Engineering'].push(cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR, cERF_PRECISE);
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
@@ -72,7 +71,7 @@
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
-		cERF_PRECISE, cERFC_PRECISE, cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cCHISQ_TEST,
+		cERF_PRECISE, cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cCHISQ_TEST,
 		cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY,
 		cFORECAST_ETS_STAT, cHYPGEOM_DIST, cNEGBINOM_DIST, cNORM_DIST,
 		cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERMUTATIONA, cPHI,
@@ -246,18 +245,6 @@
 
 	cERF_PRECISE.prototype = Object.create(cBaseFunction.prototype);
 	cERF_PRECISE.prototype.constructor = cERF_PRECISE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cERFC_PRECISE() {
-		cBaseFunction.call(this, "ERFC.PRECISE");
-		this.isXLFN = true;
-	}
-
-	cERFC_PRECISE.prototype = Object.create(cBaseFunction.prototype);
-	cERFC_PRECISE.prototype.constructor = cERFC_PRECISE;
 
 	/**
 	 * @constructor

@@ -936,9 +936,10 @@
 
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
 	cFormulaFunctionGroup['Engineering'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cBIN2DEC, cBIN2HEX, cBIN2OCT,
-		cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA, cERF, cERFC, cGESTEP, cHEX2BIN, cHEX2DEC, cHEX2OCT,
-		cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMCOSH, cIMCOT, cIMCSC, cIMCSCH, cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER,
-		cIMPRODUCT, cIMREAL, cIMSEC, cIMSECH, cIMSIN, cIMSINH, cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN, cOCT2DEC, cOCT2HEX);
+		cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA, cERF, cERFC, cERFC_PRECISE, cGESTEP, cHEX2BIN,
+		cHEX2DEC, cHEX2OCT, cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMCOSH, cIMCOT, cIMCSC, cIMCSCH,
+		cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER, cIMPRODUCT, cIMREAL, cIMSEC, cIMSECH, cIMSIN, cIMSINH,
+		cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN, cOCT2DEC, cOCT2HEX);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cCONVERT);
@@ -1591,6 +1592,19 @@
 		return this.value;
 
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cERFC}
+	 */
+	function cERFC_PRECISE() {
+		cERFC.call(this);
+		this.name = "ERFC.PRECISE";
+	}
+
+	cERFC_PRECISE.prototype = Object.create(cERFC.prototype);
+	cERFC_PRECISE.prototype.constructor = cERFC_PRECISE;
+	cERFC_PRECISE.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
