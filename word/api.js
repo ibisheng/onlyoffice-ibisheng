@@ -2130,6 +2130,9 @@ background-repeat: no-repeat;\
 					t.CoAuthoringApi.disconnect(t.disconnectOnSave.code, t.disconnectOnSave.reason);
 					t.disconnectOnSave = null;
 				}
+				if(AscCommon.g_clipboardBase && !AscCommon.CollaborativeEditing.Is_SingleUser()){
+					AscCommon.g_clipboardBase.SpecialPasteButton_Hide();
+				}
 			};
 
 			var CursorInfo = null;
