@@ -1062,6 +1062,7 @@ background-repeat: no-repeat;\
 	{
 		this.WordControl.m_oDrawingDocument.m_oDocumentRenderer = new AscCommonWord.CDocMeta();
 		this.WordControl.m_oDrawingDocument.showTarget(false);
+		this.WordControl.HideRulers();
 	};
 
 	asc_docs_api.prototype.OpenDocument = function(url, gObject)
