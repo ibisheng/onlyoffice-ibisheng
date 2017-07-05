@@ -1931,7 +1931,8 @@ CPresentation.prototype =
                 }
             }
             this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
-            if(AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects) instanceof AscFormat.CGraphicFrame){
+            var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
+            if(!oTargetTextObject || (oTargetTextObject instanceof AscFormat.CGraphicFrame)){
                 bRecalculate = false;
             }
             if(oMathShape)
