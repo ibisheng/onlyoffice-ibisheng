@@ -11049,15 +11049,6 @@ Paragraph.prototype.GetTopElement = function()
 
     return this.Parent.GetTopElement();
 };
-Paragraph.prototype.Get_Index = function()
-{
-    if (!this.Parent)
-        return -1;
-
-    this.Parent.Update_ContentIndexing();
-
-    return this.Index;
-};
 Paragraph.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
     var Run1 = this.Get_DrawingObjectRun(CompareObject.Drawing1.Get_Id());
@@ -11697,19 +11688,6 @@ Paragraph.prototype.SetContentPosition = function(DocPos, Depth, Flag)
     else
         this.Correct_ContentPos2();
 };
-Paragraph.prototype.GetDocumentPositionFromObject = function(PosArray)
-{
-    if (!PosArray)
-        PosArray = [];
-
-    if (this.Parent)
-    {
-        PosArray.splice(0, 0, {Class : this.Parent, Position : this.Get_Index()});
-        this.Parent.GetDocumentPositionFromObject(PosArray);
-    }
-
-    return PosArray;
-};
 Paragraph.prototype.Get_XYByContentPos = function(ContentPos)
 {
 	var ParaContentPos = this.Get_ParaContentPos(false, false);
@@ -12186,7 +12164,7 @@ Paragraph.prototype.GetSelectedContentControls = function()
 	}
 	else
 	{
-		if (this.Content[this.CurPos.ContentPos].GetSelectedContentControls)
+		if (this.Content[this.CurPos.ContentPos] && this.Content[this.CurPos.ContentPos].GetSelectedContentControls)
 			this.Content[this.CurPos.ContentPos].GetSelectedContentControls(arrContentControls);
 	}
 

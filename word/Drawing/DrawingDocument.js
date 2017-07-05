@@ -1869,6 +1869,7 @@ function CDrawingCollaborativeTarget()
 	this.Color = null;
 
 	this.Style = "";
+	this.IsInsertToDOM = false;
 }
 CDrawingCollaborativeTarget.prototype =
 {
@@ -2034,12 +2035,17 @@ CDrawingCollaborativeTarget.prototype =
 		if (bIsHtmlElementCreate)
 		{
 			_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.HtmlElement);
+			this.IsInsertToDOM = true;
 		}
 	},
 
 	Remove: function (_drawing_doc)
 	{
-		_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
+		if (this.IsInsertToDOM)
+		{
+			_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
+			this.IsInsertToDOM = false;
+		}
 	},
 
 	Update: function (_drawing_doc)
@@ -5480,7 +5486,7 @@ function CDrawingDocument()
 
 		// вообще надо посмотреть... может и был параграф до этого.
 		// тогда вэкграунд перерисовывать не нужно. Только надо знать, на той же странице это было или нет
-		if (-1 != this.m_lCurrentPage)
+		if (-1 != this.m_lCurrentPage && this.m_arrPages[this.m_lCurrentPage])
 		{
 			if (margins)
 			{
@@ -6680,6 +6686,9 @@ function CDrawingDocument()
 				var _rect = _object.getXY();
 
 				var _page = this.m_arrPages[_object.getPage()];
+				if (!_page)
+					return false;
+
 				var drPage = _page.drawingPage;
 
 				var dKoefX = (drPage.right - drPage.left) / _page.width_mm;
@@ -7319,12 +7328,24 @@ function CDrawingDocument()
 	};
 	this.Collaborative_RemoveTarget = function (_id)
 	{
-		for (var i = 0; i < this.CollaborativeTargets.length; i++)
+		var i = 0;
+		for (i = 0; i < this.CollaborativeTargets.length; i++)
 		{
 			if (_id == this.CollaborativeTargets[i].Id)
 			{
 				this.CollaborativeTargets[i].Remove(this);
 				this.CollaborativeTargets.splice(i, 1);
+				i--;
+			}
+		}
+
+		for (i = 0; i < this.CollaborativeTargetsUpdateTasks.length; i++)
+		{
+			var _tmp = this.CollaborativeTargetsUpdateTasks[i];
+			if (_tmp[0] == _id)
+			{
+				this.CollaborativeTargetsUpdateTasks.splice(i, 1);
+				i--;
 			}
 		}
 	};

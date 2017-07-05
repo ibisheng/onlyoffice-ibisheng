@@ -777,6 +777,9 @@ CShape.prototype.convertToWord = function (document) {
     }
     if (this.spPr) {
         c.setSpPr(this.spPr.createDuplicate());
+        if(!c.spPr.geometry){
+            c.spPr.setGeometry(AscFormat.CreateGeometry("rect"));
+        }
         c.spPr.setParent(c);
     }
     if (this.style) {

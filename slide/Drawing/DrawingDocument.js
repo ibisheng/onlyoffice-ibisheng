@@ -691,6 +691,7 @@ function CDrawingCollaborativeTarget()
 	this.HtmlElementY = 0;
 
 	this.Style = "";
+	this.IsInsertToDOM = false;
 }
 CDrawingCollaborativeTarget.prototype =
 {
@@ -844,6 +845,7 @@ CDrawingCollaborativeTarget.prototype =
 		if (bIsHtmlElementCreate)
 		{
 			_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.HtmlElement);
+			this.IsInsertToDOM = true;
 		}
 
 		if (this.HtmlElement.style.display != "block")
@@ -854,7 +856,11 @@ CDrawingCollaborativeTarget.prototype =
 
 	Remove : function(_drawing_doc)
 	{
-		_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
+		if (this.IsInsertToDOM)
+		{
+			_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
+			this.IsInsertToDOM = false;
+		}
 	},
 
 	Update : function(_drawing_doc)
@@ -3146,12 +3152,24 @@ function CDrawingDocument()
 	};
 	this.Collaborative_RemoveTarget      = function(_id)
 	{
-		for (var i = 0; i < this.CollaborativeTargets.length; i++)
+		var i = 0;
+		for (i = 0; i < this.CollaborativeTargets.length; i++)
 		{
 			if (_id == this.CollaborativeTargets[i].Id)
 			{
 				this.CollaborativeTargets[i].Remove(this);
 				this.CollaborativeTargets.splice(i, 1);
+				i--;
+			}
+		}
+
+		for (i = 0; i < this.CollaborativeTargetsUpdateTasks.length; i++)
+		{
+			var _tmp = this.CollaborativeTargetsUpdateTasks[i];
+			if (_tmp[0] == _id)
+			{
+				this.CollaborativeTargetsUpdateTasks.splice(i, 1);
+				i--;
 			}
 		}
 	};
