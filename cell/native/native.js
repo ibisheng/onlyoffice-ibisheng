@@ -1198,20 +1198,20 @@ function asc_menu_WriteAscCatAxisSettings(_type, _settings, _stream){
     
     _stream["WriteByte"](_type);
     
-    if (_settings.getInternalBetweenTick() !== undefined && _settings.getInternalBetweenTick() !== null)
+    if (_settings.getIntervalBetweenTick() !== undefined && _settings.getIntervalBetweenTick() !== null)
     {
         _stream["WriteByte"](0);
-        _stream["WriteDouble2"](_settings.getInternalBetweenTick());
+        _stream["WriteDouble2"](_settings.getIntervalBetweenTick());
     }
     if (_settings.getIntervalBetweenLabelsRule() !== undefined && _settings.getIntervalBetweenLabelsRule() !== null)
     {
         _stream["WriteByte"](1);
         _stream["WriteLong"](_settings.getIntervalBetweenLabelsRule());
     }
-    if (_settings.getInternalBetweenLabels() !== undefined && _settings.getInternalBetweenLabels() !== null)
+    if (_settings.getIntervalBetweenLabels() !== undefined && _settings.getIntervalBetweenLabels() !== null)
     {
         _stream["WriteByte"](2);
-        _stream["WriteDouble2"](_settings.getInternalBetweenLabels());
+        _stream["WriteDouble2"](_settings.getIntervalBetweenLabels());
     }
     if (_settings.getInvertCatOrder() !== undefined && _settings.getInvertCatOrder() !== null)
     {
@@ -1506,11 +1506,15 @@ function asc_menu_WriteChartPr(_type, _chartPr, _stream){
         _stream["WriteString2"](_chartPr.separator);
     }
     
-    if (_chartPr.horAxisProps.getAxisType() == Asc.c_oAscAxisType.val) {
+    if (undefined != _chartPr.horAxisProps
+        && null != _chartPr.horAxisProps
+        && _chartPr.horAxisProps.getAxisType() == Asc.c_oAscAxisType.val) {
         asc_menu_WriteAscValAxisSettings(16, _chartPr.horAxisProps, _stream);
     }
     
-    if (typeof _chartPr.vertAxisProps == Asc.c_oAscAxisType.val) {
+    if (undefined != _chartPr.vertAxisProps
+        && null != _chartPr.vertAxisProps
+        && typeof _chartPr.vertAxisProps == Asc.c_oAscAxisType.val) {
         asc_menu_WriteAscValAxisSettings(17, _chartPr.vertAxisProps, _stream);
     }
 
@@ -1541,11 +1545,15 @@ function asc_menu_WriteChartPr(_type, _chartPr, _stream){
         _stream["WriteBool"](_chartPr.showVal);
     }
     
-    if (_chartPr.horAxisProps.getAxisType() == Asc.c_oAscAxisType.cat) {
+    if (undefined != _chartPr.horAxisProps
+        && null != _chartPr.horAxisProps
+        && _chartPr.horAxisProps.getAxisType() == Asc.c_oAscAxisType.cat) {
         asc_menu_WriteAscCatAxisSettings(23, _chartPr.horAxisProps, _stream);
     }
     
-    if (typeof _chartPr.vertAxisProps == Asc.c_oAscAxisType.cat) {
+    if (undefined != _chartPr.vertAxisProps
+        && null != _chartPr.vertAxisProps
+        && typeof _chartPr.vertAxisProps == Asc.c_oAscAxisType.cat) {
         asc_menu_WriteAscCatAxisSettings(24, _chartPr.vertAxisProps, _stream);
     }
 
