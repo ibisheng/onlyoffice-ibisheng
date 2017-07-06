@@ -110,9 +110,12 @@ StartAddNewShape.prototype =
                     this.drawingObjects.connector = oObject;
                 }
                 if(this.drawingObjects.connector !== this.oldConnector){
+                    this.oldConnector = this.drawingObjects.connector;
                     this.drawingObjects.updateOverlay();
                 }
-                this.oldConnector = this.drawingObjects.connector;
+                else{
+                    this.oldConnector = this.drawingObjects.connector;
+                }
             }
         }
     },
