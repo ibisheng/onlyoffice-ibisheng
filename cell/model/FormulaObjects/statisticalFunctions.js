@@ -63,16 +63,17 @@
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
 		cBETA_DIST, cBETA_INV, cBINOMDIST, cBINOM_DIST, cBINOM_INV, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT,
 		cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T, cCORREL, cCOUNT, cCOUNTA,
-		cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCRITBINOM, cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST,
-		cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST, cFORECAST_LINEAR, cFREQUENCY, cFTEST,
-		cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH,
-		cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV,
-		cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST,
-		cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK,
-		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC,
-		cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA,
-		cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN,
-		cTTEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cZTEST);
+		cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM, cDEVSQ, cEXPON_DIST,
+		cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
+		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
+		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
+		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE,
+		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE,
+		cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPOISSON,
+		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
+		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
+		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA,
+		cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
@@ -2641,6 +2642,105 @@
 			}
 
 			return new cNumber(sumXDeltaYDelta / xLength);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, pearson);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cCOVARIANCE_S() {
+		this.name = "COVARIANCE.S";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cCOVARIANCE_S.prototype = Object.create(cBaseFunction.prototype);
+	cCOVARIANCE_S.prototype.constructor = cCOVARIANCE_S;
+	cCOVARIANCE_S.prototype.argumentsMin = 2;
+	cCOVARIANCE_S.prototype.argumentsMax = 2;
+	cCOVARIANCE_S.prototype.isXLFN = true;
+	cCOVARIANCE_S.prototype.Calculate = function (arg) {
+
+		var arg2 = [arg[0], arg[1]];
+		//если первое или второе значение строка
+		if(cElementType.string === arg[0].type || cElementType.bool === arg[0].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		if(cElementType.string === arg[1].type || cElementType.bool === arg[1].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		//если первое или второе значение число
+		if(cElementType.number === arg[0].type){
+			arg2[0] = new cArray();
+			arg2[0].addElement(arg[0]);
+		}
+		if(cElementType.number === arg[1].type){
+			arg2[1] = new cArray();
+			arg2[1].addElement(arg[1]);
+		}
+
+		var oArguments = this._prepareArguments(arg2, arguments[1], true, [cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function pearson(argArray) {
+
+			var arg1 = argArray[0];
+			var arg2 = argArray[1];
+			var x = [];
+			var y = [];
+
+			for (var i = 0; i < arg1.length; i++) {
+				for (var j = 0; j < arg1[i].length; j++) {
+					x.push(arg1[i][j]);
+				}
+			}
+			for (var i = 0; i < arg2.length; i++) {
+				for (var j = 0; j < arg2[i].length; j++) {
+					y.push(arg2[i][j]);
+				}
+			}
+
+			var sumXDeltaYDelta = 0, sqrXDelta = 0, sqrYDelta = 0, _x = 0, _y = 0, xLength = 0, i;
+
+			if (x.length !== y.length) {
+				return new cError(cErrorType.not_available);
+			}
+			for (i = 0; i < x.length; i++) {
+
+				if (!( x[i] instanceof cNumber && y[i] instanceof cNumber )) {
+					continue;
+				}
+
+				_x += x[i].getValue();
+				_y += y[i].getValue();
+				xLength++;
+			}
+
+			if (xLength < 2.0){
+				return new cError(cErrorType.division_by_zero);
+			}
+
+			_x /= xLength;
+			_y /= xLength;
+
+			for (i = 0; i < x.length; i++) {
+
+				if (!( x[i] instanceof cNumber && y[i] instanceof cNumber )) {
+					continue;
+				}
+
+				sumXDeltaYDelta += (x[i].getValue() - _x) * (y[i].getValue() - _y);
+			}
+
+			return new cNumber(sumXDeltaYDelta / (xLength - 1));
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, pearson);
