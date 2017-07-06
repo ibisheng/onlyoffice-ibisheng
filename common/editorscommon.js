@@ -792,25 +792,26 @@
 		columns: 6
 	};
 
-	var cStrucTableLocalColumns = null,
-		cBoolLocal              = {},
-		cErrorOrigin            = {
-			"nil":     "#NULL!",
-			"div":     "#DIV\/0!",
-			"value":   "#VALUE!",
-			"ref":     "#REF!",
-			"name":    "#NAME?",
-			"num":     "#NUM!",
-			"na":      "#N\/A",
-			"getdata": "#GETTING_DATA",
-			"uf":      "#UNSUPPORTED_FUNCTION!"
-		},
-		cErrorLocal             = {};
+	var cStrucTableLocalColumns = null;
+	var cBoolOrigin = {'t': 'TRUE', 'f': 'FALSE'};
+	var cBoolLocal = {};
+	var cErrorOrigin = {
+		"nil": "#NULL!",
+		"div": "#DIV\/0!",
+		"value": "#VALUE!",
+		"ref": "#REF!",
+		"name": "#NAME?",
+		"num": "#NUM!",
+		"na": "#N\/A",
+		"getdata": "#GETTING_DATA",
+		"uf": "#UNSUPPORTED_FUNCTION!"
+	};
+	var cErrorLocal = {};
 
 	function build_local_rx(data)
 	{
 		rx_table_local = build_rx_table(data ? data["StructureTables"] : null);
-		rx_bool_local = build_rx_bool(data ? data["CONST_TRUE_FALSE"] : null);
+		rx_bool_local = build_rx_bool((data && data["CONST_TRUE_FALSE"]) || cBoolOrigin);
 		rx_error_local = build_rx_error(data ? data["CONST_ERROR"] : null);
 	}
 
@@ -858,12 +859,9 @@
 
 	function build_rx_bool(local)
 	{
-		// ToDo переделать на более правильную реализацию. Не особо правильное копирование
-		local = local ? local : {"t": "TRUE", "f": "FALSE"};
-		var t = cBoolLocal['t'] = local['t'];
-		var f = cBoolLocal['f'] = local['f'];
+		var t = cBoolLocal.t = local['t'].toUpperCase();
+		var f = cBoolLocal.f = local['f'].toUpperCase();
 
-		build_rx_array_local(local);
 		return new RegExp("^(" + t + "|" + f + ")([-+*\\/^&%<=>: ;),]|$)", "i");
 	}
 
@@ -900,20 +898,6 @@
 			cErrorLocal["na"] + "|" +
 			cErrorLocal["getdata"] + "|" +
 			cErrorLocal["uf"] + ")", "i");
-	}
-
-	function build_rx_array_local(localBool, digitSepar, localError)
-	{
-		var localBool = ( localBool ? localBool : {"t": "TRUE", "f": "FALSE"} );
-		rx_array_local = build_rx_array(localBool, digitSepar, localError);
-	}
-
-	function build_rx_array(localBool, digitSepar, localError)
-	{
-		return new RegExp("^\\{(([+-]?\\d*(\\d|\\" + digitSepar + ")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?" +
-			"(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|" +
-			localBool["t"] + "|" + localBool["f"] + ")?[" + FormulaSeparators.arrayRowSeparator + "\\" + FormulaSeparators.arrayColSeparator + "]?)*\\}", "i");
-
 	}
 
 	var PostMessageType = {
@@ -1416,7 +1400,7 @@
 		rx_error              = build_rx_error(null),
 		rx_error_local        = build_rx_error(null),
 
-		rx_bool               = build_rx_bool(null),
+		rx_bool               = build_rx_bool(cBoolOrigin),
 		rx_bool_local         = rx_bool,
 		rx_string             = /^\"((\"\"|[^\"])*)\"/,
 		rx_test_ws_name       = new test_ws_name2(),
@@ -1429,9 +1413,6 @@
 		rx_arraySeparatorsDef = /^ *[,;] */,
 		rx_numberDef          = /^ *[+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?/,
 		rx_CommaDef           = /^ *[,;] */,
-
-		rx_array_local        = /^\{(([+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?[,;]?)*\}/i,
-		rx_array              = /^\{(([+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?[,;]?)*\}/i,
 
 		rx_ControlSymbols     = /^ *[\u0000-\u001F\u007F-\u009F] */,
 
@@ -1866,7 +1847,7 @@
 		if (match != null)
 		{
 			var name = match["name"];
-			if (name && name.length != 0 && name != cBoolLocal["t"] && name != cBoolLocal["f"]/*&& wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null )*/)
+			if (name && 0 !== name.length && name.toUpperCase() !== cBoolLocal.t && name.toUpperCase() !== cBoolLocal.f/*&& wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null )*/)
 			{
 				this.pCurrPos += name.length;
 				this.operand_str = name;
@@ -1875,24 +1856,6 @@
 			this.operand_str = name;
 		}
 		return [false];
-	};
-	parserHelper.prototype.isArray = function (formula, start_pos, digitDelim)
-	{
-		if (this instanceof parserHelper)
-		{
-			this._reset();
-		}
-
-		var match = (formula.substring(start_pos)).match(digitDelim ? rx_array_local : rx_array);
-
-		if (match != null)
-		{
-			this.operand_str = match[0].substring(1, match[0].length - 1);
-			this.pCurrPos += match[0].length;
-			return true;
-		}
-
-		return false;
 	};
 	parserHelper.prototype.isLeftBrace = function (formula, start_pos)
 	{
@@ -2140,7 +2103,6 @@
 			FormulaSeparators.functionArgumentSeparator = ";";
 			rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\" + FormulaSeparators.digitSeparator + ")\\d*([eE][+-]?\\d+)?");
 			rx_Comma = new RegExp("^ *[" + FormulaSeparators.functionArgumentSeparator + "] *");
-//		build_rx_array_local( cBoolLocal, digitSeparator, null);
 			rx_arraySeparators = new RegExp("^ *[" + FormulaSeparators.arrayRowSeparator + "\\" + FormulaSeparators.arrayColSeparator + "] *");
 		}
 		else
@@ -2151,7 +2113,6 @@
 			FormulaSeparators.functionArgumentSeparator = FormulaSeparators.functionArgumentSeparatorDef;
 			rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\" + FormulaSeparators.digitSeparatorDef + ")\\d*([eE][+-]?\\d+)?");
 			rx_Comma = new RegExp("^ *[" + FormulaSeparators.functionArgumentSeparatorDef + "] *");
-//		build_rx_array_local( cBoolLocal, digitSeparatorDef, null);
 			rx_arraySeparators = new RegExp("^ *[" + FormulaSeparators.arrayRowSeparatorDef + "\\" + FormulaSeparators.arrayColSeparatorDef + "] *");
 		}
 		rx_table_local = build_rx_table_cur();

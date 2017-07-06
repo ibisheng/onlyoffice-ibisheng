@@ -3092,8 +3092,8 @@ CCellValue.prototype =
 		var sResult = "";
 		if(null != this.number)
 		{
-			if(CellValueType.Bool == this.type)
-				sResult = this.number == 1 ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase();
+			if(CellValueType.Bool === this.type)
+				sResult = this.number == 1 ? cBoolLocal.t : cBoolLocal.f;
 			else
 				sResult = this.number.toString();
 		}
@@ -3256,11 +3256,11 @@ CCellValue.prototype =
 					}
 				}
 			}
-		} else if (CellValueType.Bool == this.type) {
+		} else if (CellValueType.Bool === this.type) {
 			if (null != this.number) {
-				sText = (0 != this.number) ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase();
+				sText = (0 != this.number) ? cBoolLocal.t : cBoolLocal.f;
 			}
-		} else if (CellValueType.Error == this.type) {
+		} else if (CellValueType.Error === this.type) {
 			if (null != this.text) {
 				sText = this._getValueTypeError(this.text);
 			}
@@ -3299,13 +3299,13 @@ CCellValue.prototype =
 			{
 				if(null != this.text || null != this.number)
 				{
-					if (CellValueType.Bool == this.type && null != this.number)
-						oValueText = (this.number == 1) ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase();
+					if (CellValueType.Bool === this.type && null != this.number)
+						oValueText = (this.number == 1) ? cBoolLocal.t : cBoolLocal.f;
 					else
 					{
 						if(null != this.text)
 							oValueText = this.text;
-						if(CellValueType.Number == this.type || CellValueType.String == this.type)
+						if(CellValueType.Number === this.type || CellValueType.String === this.type)
 						{
 							var oNumFormat;
 							if(null != xfs && null != xfs.num)
@@ -3511,13 +3511,11 @@ CCellValue.prototype =
 			else
 			{
 				var sUpText = val.toUpperCase();
-				if(cBoolLocal["t"].toUpperCase() == sUpText || cBoolLocal["f"].toUpperCase() == sUpText)
+				if(cBoolLocal.t === sUpText || cBoolLocal.f === sUpText)
 				{
 					this.type = CellValueType.Bool;
-					this.number = (cBoolLocal["t"].toUpperCase() == sUpText) ? 1 : 0;
+					this.number = (cBoolLocal.t === sUpText) ? 1 : 0;
 				}
-//				else if( "#NULL!" == sUpText || "#DIV/0!" == sUpText || "#NAME?" == sUpText || "#NUM!" == sUpText ||
-//					"#N/A" == sUpText || "#REF!" == sUpText || "#VALUE!" == sUpText )
 				else if(checkCellValueTypeError(sUpText))
 				{
 					this.type = CellValueType.Error;

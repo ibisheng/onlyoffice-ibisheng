@@ -2615,7 +2615,7 @@
     for (var f in oFormulaList) {
       this.formulasList.push(f);
     }
-    this.arrExcludeFormulas = [cBoolLocal["t"].toUpperCase(), cBoolLocal["f"].toUpperCase()];
+    this.arrExcludeFormulas = [cBoolLocal.t, cBoolLocal.f];
   };
 
   WorkbookView.prototype._setHintsProps = function(bIsHinting, bIsSubpixHinting) {
