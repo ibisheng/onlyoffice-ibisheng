@@ -809,15 +809,9 @@
 
 	function build_local_rx(data)
 	{
-		build_rx_table_local(data ? data["StructureTables"] : null);
-		build_rx_bool_local(data ? data["CONST_TRUE_FALSE"] : null);
-		build_rx_error_local(data ? data["CONST_ERROR"] : null);
-
-	}
-
-	function build_rx_table_local(local)
-	{
-		rx_table_local = build_rx_table(local);
+		rx_table_local = build_rx_table(data ? data["StructureTables"] : null);
+		rx_bool_local = build_rx_bool(data ? data["CONST_TRUE_FALSE"] : null);
+		rx_error_local = build_rx_error(data ? data["CONST_ERROR"] : null);
 	}
 
 	function build_rx_table(local)
@@ -862,11 +856,6 @@
 		}, 'i');
 	}
 
-	function build_rx_bool_local(local)
-	{
-		rx_bool_local = build_rx_bool(local);
-	}
-
 	function build_rx_bool(local)
 	{
 		// ToDo переделать на более правильную реализацию. Не особо правильное копирование
@@ -876,11 +865,6 @@
 
 		build_rx_array_local(local);
 		return new RegExp("^(" + t + "|" + f + ")([-+*\\/^&%<=>: ;),]|$)", "i");
-	}
-
-	function build_rx_error_local(local)
-	{
-		rx_error_local = build_rx_error(local);
 	}
 
 	function build_rx_error(local)
@@ -1433,7 +1417,7 @@
 		rx_error_local        = build_rx_error(null),
 
 		rx_bool               = build_rx_bool(null),
-		rx_bool_local         = build_rx_bool(null),
+		rx_bool_local         = rx_bool,
 		rx_string             = /^\"((\"\"|[^\"])*)\"/,
 		rx_test_ws_name       = new test_ws_name2(),
 		rx_space_g            = /\s/g,
