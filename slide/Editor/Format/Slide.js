@@ -1102,6 +1102,10 @@ Slide.prototype =
         }
     },
 
+    getTheme: function(){
+        return this.Layout.Master.Theme;
+    },
+
     drawSelect: function(_type)
     {
         if (_type === undefined)

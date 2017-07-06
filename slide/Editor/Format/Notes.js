@@ -178,6 +178,15 @@
         }
     };
 
+    CNotes.prototype.getDrawingDocument = function()
+    {
+        return editor.WordControl.m_oDrawingDocument;
+    };
+
+    CNotes.prototype.getTheme = function(){
+        return this.Master.Theme;
+    };
+
     function CreateNotes(){
         var oN = new CNotes();
         var oSp = new AscFormat.CShape();
