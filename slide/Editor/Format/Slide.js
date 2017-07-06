@@ -303,13 +303,15 @@ Slide.prototype =
     },
 
 
-    Search: function( Str, Props, Engine, Type )
-    {
+    Search: function( Str, Props, Engine, Type ){
         var sp_tree = this.cSld.spTree;
-        for(var i = 0; i < sp_tree.length; ++i)
-        {
-            if (sp_tree[i].Search)
+        for(var i = 0; i < sp_tree.length; ++i){
+            if (sp_tree[i].Search){
                 sp_tree[i].Search(Str, Props, Engine, Type);
+            }
+        }
+        if(this.notesShape){
+            this.notesShape.Search(Str, Props, Engine, Type);
         }
     },
 

@@ -770,31 +770,42 @@ CShape.prototype.getIsSingleBody = function(x, y)
     return true;
 };
 
-CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
-{
-    if(this.parent)
-    {
+CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex){
+    if(this.parent){
         var drawing_objects = this.parent.graphicObjects;
         drawing_objects.resetSelection(true);
-        if(this.group)
-        {
+        if(this.group){
             var main_group = this.group.getMainGroup();
             drawing_objects.selectObject(main_group, 0);
             main_group.selectObject(this, 0);
             main_group.selection.textSelection = this;
             drawing_objects.selection.groupSelection = main_group;
         }
-        else
-        {
+        else{
             drawing_objects.selectObject(this, 0);
             drawing_objects.selection.textSelection = this;
         }
-        //var content = this.getDocContent();
-        //content && content.Set_StartPage(this.parent.num);
-        if(editor.WordControl.m_oLogicDocument.CurPage !== this.parent.num)
-        {
-            editor.WordControl.m_oLogicDocument.Set_CurPage(this.parent.num);
-            editor.WordControl.GoToPage(this.parent.num);
+        var nSlideNum;
+        if(this.parent instanceof AscCommonSlide.CNotes){
+            editor.WordControl.m_oLogicDocument.FocusOnNotes = true;
+            if(this.parent.slide){
+                nSlideNum = this.parent.slide.num;
+                this.parent.slide.graphicObjects.resetSelection();
+            }
+            else{
+                nSlideNum = 0;
+            }
+        }
+        else{
+            nSlideNum = this.parent.num;
+            editor.WordControl.m_oLogicDocument.FocusOnNotes = false;
+        }
+        if(editor.WordControl.m_oLogicDocument.CurPage !== nSlideNum){
+            editor.WordControl.m_oLogicDocument.Set_CurPage(nSlideNum);
+            editor.WordControl.GoToPage(nSlideNum);
+            if(this.parent instanceof AscCommonSlide.CNotes){
+                editor.WordControl.m_oLogicDocument.FocusOnNotes = true;
+            }
         }
     }
 };

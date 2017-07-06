@@ -1423,7 +1423,11 @@ CPresentation.prototype =
         if(this.Slides.length > 0)
         {
             var i, Id, content, start_index;
-            var target_text_object = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
+            var target_text_object;
+            var oCommonController = this.GetCurrentController();
+            if(oCommonController){
+                target_text_object = AscFormat.getTargetTextObject(oCommonController);
+            }
             if(target_text_object)
             {
                 if(target_text_object.getObjectType() === AscDFH.historyitem_type_GraphicFrame)
@@ -1448,6 +1452,7 @@ CPresentation.prototype =
                 }
             }
             var sp_tree = this.Slides[this.CurPage].cSld.spTree, group_shapes, group_start_index;
+            var bSkipCurNotes = false;
             if(isNext)
             {
                 if(this.Slides[this.CurPage].graphicObjects.selection.groupSelection)
@@ -1501,6 +1506,10 @@ CPresentation.prototype =
                 else if(this.Slides[this.CurPage].graphicObjects.selectedObjects.length === 0)
                 {
                     start_index = 0;
+                    if(this.FocusOnNotes){
+                        start_index = sp_tree.length;
+                        bSkipCurNotes = true;
+                    }
                 }
                 else
                 {
@@ -1522,12 +1531,27 @@ CPresentation.prototype =
                 {
                     return Id;
                 }
+                var oCurSlide = this.Slides[this.CurPage];
+                if(oCurSlide.notesShape && !bSkipCurNotes){
+                    Id = oCurSlide.notesShape.Search_GetId(isNext, false);
+                    if(Id !== null)
+                    {
+                        return Id;
+                    }
+                }
                 for(i = this.CurPage + 1; i < this.Slides.length; ++i)
                 {
                     Id = this.Slides[i].Search_GetId(isNext, 0);
                     if(Id !== null)
                     {
                         return Id;
+                    }
+                    if(this.Slides[i].notesShape){
+                        Id = this.Slides[i].notesShape.Search_GetId(isNext, false);
+                        if(Id !== null)
+                        {
+                            return Id;
+                        }
                     }
                 }
                 for(i = 0; i < this.CurPage; ++i)
@@ -1537,7 +1561,15 @@ CPresentation.prototype =
                     {
                         return Id;
                     }
+                    if(this.Slides[i].notesShape){
+                        Id = this.Slides[i].notesShape.Search_GetId(isNext, false);
+                        if(Id !== null)
+                        {
+                            return Id;
+                        }
+                    }
                 }
+
             }
             else
             {
@@ -1586,7 +1618,7 @@ CPresentation.prototype =
                     }
                     if(i === sp_tree.length)
                     {
-                        start_index = sp_tree.length;
+                        start_index = -1;
                     }
                 }
                 else if(this.Slides[this.CurPage].graphicObjects.selectedObjects.length === 0)
@@ -1615,6 +1647,13 @@ CPresentation.prototype =
                 }
                 for(i = this.CurPage - 1; i > -1; --i)
                 {
+                    if(this.Slides[i].notesShape){
+                        Id = this.Slides[i].notesShape.Search_GetId(isNext, false);
+                        if(Id !== null)
+                        {
+                            return Id;
+                        }
+                    }
                     Id = this.Slides[i].Search_GetId(isNext, this.Slides[i].cSld.spTree.length - 1);
                     if(Id !== null)
                     {
@@ -1623,6 +1662,13 @@ CPresentation.prototype =
                 }
                 for(i = this.Slides.length - 1; i > this.CurPage; --i)
                 {
+                    if(this.Slides[i].notesShape){
+                        Id = this.Slides[i].notesShape.Search_GetId(isNext, false);
+                        if(Id !== null)
+                        {
+                            return Id;
+                        }
+                    }
                     Id = this.Slides[i].Search_GetId(isNext, this.Slides[i].cSld.spTree.length - 1);
                     if(Id !== null)
                     {
