@@ -76,7 +76,7 @@
 		cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
+	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
 		cTRIMMEAN, cTTEST, cWEIBULL, cZTEST);
 
 	function isInteger(value) {
@@ -655,6 +655,71 @@
 			}
 		}
 		return fValue;
+	}
+
+	function chiTest(pMat1, pMat2){
+		if (!pMat1 || !pMat2){
+			return new cError(cErrorType.not_available);
+		}
+
+		var nC1 = pMat1.length;
+		var nC2 = pMat2.length;
+		var nR1 = pMat1[0].length;
+		var nR2 = pMat2[0].length;
+
+		if (nR1 !== nR2 || nC1 !== nC2){
+			return new cError(cErrorType.not_available);
+		}
+
+		var fChi = 0.0;
+		var bEmpty = true;
+		for (var i = 0; i < nC1; i++){
+			for (var j = 0; j < nR1; j++){
+				if (pMat1[i][j] && pMat2[i][j]){
+					bEmpty = false;
+
+					//MS выдает ошибку только если первый элемент строка. LO - если любой.
+					if (i === 0 && j === 0 && cElementType.string === pMat1[i][j].type){
+						return new cError(cErrorType.division_by_zero);
+					}
+
+					if(cElementType.number !== pMat1[i][j].type || cElementType.number !== pMat2[i][j].type){
+						continue;
+					}
+
+					var fValX = pMat1[i][j].getValue();
+					var fValE = pMat2[i][j].getValue();
+					if ( fValE === 0.0 ){
+						return new cError(cErrorType.division_by_zero);
+					}
+
+					var fTemp1 = (fValX - fValE) * (fValX - fValE);
+					var fTemp2 = fTemp1;
+					fChi += fTemp2 / fValE;
+				}
+			}
+		}
+
+		if ( bEmpty ){
+			return new cError(cErrorType.wrong_value_type);
+		}
+
+		var fDF;
+		if (nC1 === 1 || nR1 === 1){
+			fDF = nC1*nR1 - 1;
+			if (fDF === 0){
+				return new cError(cErrorType.not_available);
+			}
+		}else{
+			fDF = (nC1 - 1)*(nR1 - 1);
+		}
+
+		if ( fDF < 1 || fChi < 0 || fDF > Math.pow(10, 10)){
+			return  new cError(cErrorType.not_numeric);
+		}
+
+		var res = getChiDist(fChi, fDF);
+		return  null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 	}
 
 	//BETA DISTRIBUTION
@@ -2035,11 +2100,53 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHITEST() {
-		cBaseFunction.call(this, "CHITEST");
+		this.name = "CHITEST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCHITEST.prototype = Object.create(cBaseFunction.prototype);
 	cCHITEST.prototype.constructor = cCHITEST;
+	cCHITEST.prototype.argumentsMin = 2;
+	cCHITEST.prototype.argumentsMax = 2;
+	cCHITEST.prototype.Calculate = function (arg) {
+
+		var arg2 = [arg[0], arg[1]];
+		//если первое или второе значение строка
+		if(cElementType.string === arg[0].type || cElementType.bool === arg[0].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		if(cElementType.string === arg[1].type || cElementType.bool === arg[1].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		//если первое или второе значение число
+		if(cElementType.number === arg[0].type){
+			arg2[0] = new cArray();
+			arg2[0].addElement(arg[0]);
+		}
+		if(cElementType.number === arg[1].type){
+			arg2[1] = new cArray();
+			arg2[1].addElement(arg[1]);
+		}
+
+		var oArguments = this._prepareArguments(arg2, arguments[1], true, [cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function calcChitest(argArray) {
+
+			var arg1 = argArray[0];
+			var arg2 = argArray[1];
+
+			return chiTest(arg1, arg2);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcChitest);
+	};
 
 	/**
 	 * @constructor
