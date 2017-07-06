@@ -325,6 +325,29 @@ Paragraph.prototype.Get_FirstTextPr = function()
 
 	return this.Content[0].Get_CompiledPr();
 };
+Paragraph.prototype.Get_FirstTextPr2 = function()
+{
+	var HyperlinkPr;
+	for(var i = 0; i < this.Content.length; ++i)
+	{
+		if(!this.Content[i].Is_Empty())
+		{
+			if(para_Run === this.Content[i].Type)
+			{
+				return this.Content[i].Get_CompiledPr();
+			}
+			else if(para_Hyperlink === this.Content[i].Type)
+			{
+                HyperlinkPr =  this.Content[i].Get_FirstTextPr2();
+                if(HyperlinkPr)
+				{
+					return HyperlinkPr;
+				}
+			}
+		}
+	}
+    return this.Get_CompiledPr2(false).TextPr;
+};
 Paragraph.prototype.GetAllDrawingObjects = function(DrawingObjs)
 {
 	if (undefined === DrawingObjs)
@@ -1087,7 +1110,7 @@ Paragraph.prototype.Internal_Recalculate_CurPos = function(Pos, UpdateCurPos, Up
 
 	var LinePos = this.Get_CurrentParaPos();
 
-	if (-1 === LinePos.Line)
+	if (-1 === LinePos.Line || LinePos.Line >= this.Lines.length)
 		return {
 			X         : 0,
 			Y         : 0,
@@ -1992,9 +2015,9 @@ Paragraph.prototype.Internal_Draw_4 = function(CurPage, pGraphics, Pr, BgColor, 
 					if (true != this.IsEmpty())
 					{
 						if (Pr.ParaPr.Ind.FirstLine < 0)
-							NumberingItem.Draw(X, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
+							NumberingItem.Draw(X, Y, pGraphics, this.Get_FirstTextPr2(), PDSE);
 						else
-							NumberingItem.Draw(this.Pages[CurPage].X  + Pr.ParaPr.Ind.Left, Y, pGraphics, this.Get_FirstTextPr(), PDSE);
+							NumberingItem.Draw(this.Pages[CurPage].X  + Pr.ParaPr.Ind.Left, Y, pGraphics, this.Get_FirstTextPr2(), PDSE);
 					}
 				}
 
@@ -2169,7 +2192,7 @@ Paragraph.prototype.Internal_Draw_5 = function(CurPage, pGraphics, Pr, BgColor)
 				}
 			}
             // Рисуем подчеркивание орфографии
-            if (this.LogicDocument && true === this.LogicDocument.Spelling.Use)
+            if (this.LogicDocument && true === this.LogicDocument.Spelling.Use && !(pGraphics.IsThumbnail === true))
             {
                 pGraphics.p_color(255, 0, 0, 255);
                 var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
@@ -5026,6 +5049,8 @@ Paragraph.prototype.MoveCursorToStartPos = function(AddToSelect)
 		this.RemoveSelection();
 
 		this.CurPos.ContentPos = 0;
+		this.CurPos.Line       = -1;
+		this.CurPos.Range      = -1;
 		this.Content[0].MoveCursorToStartPos();
 		this.Correct_ContentPos(false);
 		this.Correct_ContentPos2();
@@ -5070,6 +5095,8 @@ Paragraph.prototype.MoveCursorToEndPos = function(AddToSelect, StartSelectFromEn
 			this.RemoveSelection();
 
 			this.CurPos.ContentPos = this.Content.length - 1;
+			this.CurPos.Line       = -1;
+			this.CurPos.Range      = -1;
 			this.Content[this.CurPos.ContentPos].MoveCursorToEndPos();
 			this.Correct_ContentPos(false);
 			this.Correct_ContentPos2();
@@ -11022,15 +11049,6 @@ Paragraph.prototype.GetTopElement = function()
 
     return this.Parent.GetTopElement();
 };
-Paragraph.prototype.Get_Index = function()
-{
-    if (!this.Parent)
-        return -1;
-
-    this.Parent.Update_ContentIndexing();
-
-    return this.Index;
-};
 Paragraph.prototype.CompareDrawingsLogicPositions = function(CompareObject)
 {
     var Run1 = this.Get_DrawingObjectRun(CompareObject.Drawing1.Get_Id());
@@ -11375,7 +11393,7 @@ Paragraph.prototype.private_UpdateTrackRevisions = function()
         RevisionsManager.Check_Paragraph(this);
     }
 };
-Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
+Paragraph.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     if (true === this.Selection.Use || true === bAll)
     {
@@ -11404,8 +11422,8 @@ Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
         // Начинаем с конца, потому что при выполнении данной фунцкции, количество элементов может изменяться
         for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
         {
-            if (this.Content[CurPos].Accept_RevisionChanges)
-                this.Content[CurPos].Accept_RevisionChanges(Type, bAll);
+            if (this.Content[CurPos].AcceptRevisionChanges)
+                this.Content[CurPos].AcceptRevisionChanges(Type, bAll);
         }
 
         this.Correct_Content();
@@ -11413,7 +11431,7 @@ Paragraph.prototype.Accept_RevisionChanges = function(Type, bAll)
         this.private_UpdateTrackRevisions();
     }
 };
-Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
+Paragraph.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     if (true === this.Selection.Use || true === bAll)
     {
@@ -11442,8 +11460,8 @@ Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
         // Начинаем с конца, потому что при выполнении данной фунцкции, количество элементов может изменяться
         for (var CurPos = EndPos; CurPos >= StartPos; CurPos--)
         {
-            if (this.Content[CurPos].Reject_RevisionChanges)
-                this.Content[CurPos].Reject_RevisionChanges(Type, bAll);
+            if (this.Content[CurPos].RejectRevisionChanges)
+                this.Content[CurPos].RejectRevisionChanges(Type, bAll);
         }
 
         this.Correct_Content();
@@ -11451,7 +11469,7 @@ Paragraph.prototype.Reject_RevisionChanges = function(Type, bAll)
         this.private_UpdateTrackRevisions();
     }
 };
-Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+Paragraph.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
 {
     if (true === SearchEngine.Is_Found())
         return;
@@ -11462,7 +11480,7 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
         var DrawingObjects = this.GetAllDrawingObjects();
         for (var DrawingIndex = 0, Count = DrawingObjects.length; DrawingIndex < Count; DrawingIndex++)
         {
-            DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
+            DrawingObjects[DrawingIndex].GetRevisionsChangeParagraph(SearchEngine);
             if (true === SearchEngine.Is_Found())
                 return;
         }
@@ -11483,7 +11501,7 @@ Paragraph.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
         var DrawingObjects = this.GetAllDrawingObjects();
         for (var DrawingIndex = DrawingObjects.length - 1; DrawingIndex >= 0; DrawingIndex--)
         {
-            DrawingObjects[DrawingIndex].Get_RevisionsChangeParagraph(SearchEngine);
+            DrawingObjects[DrawingIndex].GetRevisionsChangeParagraph(SearchEngine);
             if (true === SearchEngine.Is_Found())
                 return;
         }
@@ -11669,19 +11687,6 @@ Paragraph.prototype.SetContentPosition = function(DocPos, Depth, Flag)
     	this.Content[Pos].SetContentPosition(_DocPos, Depth + 1, _Flag);
     else
         this.Correct_ContentPos2();
-};
-Paragraph.prototype.GetDocumentPositionFromObject = function(PosArray)
-{
-    if (!PosArray)
-        PosArray = [];
-
-    if (this.Parent)
-    {
-        PosArray.splice(0, 0, {Class : this.Parent, Position : this.Get_Index()});
-        this.Parent.GetDocumentPositionFromObject(PosArray);
-    }
-
-    return PosArray;
 };
 Paragraph.prototype.Get_XYByContentPos = function(ContentPos)
 {
@@ -12159,7 +12164,7 @@ Paragraph.prototype.GetSelectedContentControls = function()
 	}
 	else
 	{
-		if (this.Content[this.CurPos.ContentPos].GetSelectedContentControls)
+		if (this.Content[this.CurPos.ContentPos] && this.Content[this.CurPos.ContentPos].GetSelectedContentControls)
 			this.Content[this.CurPos.ContentPos].GetSelectedContentControls(arrContentControls);
 	}
 
@@ -12890,6 +12895,7 @@ function CParagraphDrawStateElements()
     this.CurPos = new CParagraphContentPos();
 
     this.VisitedHyperlink = false;
+    this.Hyperlink = false;
 
     this.Page   = 0;
     this.Line   = 0;
@@ -12914,6 +12920,7 @@ CParagraphDrawStateElements.prototype =
         this.ColorMap  = ColorMap;
 
         this.VisitedHyperlink = false;
+        this.Hyperlink = false;
 
         this.CurPos = new CParagraphContentPos();
     },
@@ -12945,6 +12952,7 @@ function CParagraphDrawStateLines()
     this.CurPos = new CParagraphContentPos();
 
     this.VisitedHyperlink = false;
+    this.Hyperlink = false;
 
     this.Strikeout  = new CParaDrawingRangeLines();
     this.DStrikeout = new CParaDrawingRangeLines();
@@ -12974,6 +12982,7 @@ CParagraphDrawStateLines.prototype =
         this.BgColor   = BgColor;
 
         this.VisitedHyperlink = false;
+        this.Hyperlink = false;
 
         this.CurPos = new CParagraphContentPos();
 

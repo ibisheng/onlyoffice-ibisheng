@@ -741,6 +741,18 @@ CBlockLevelSdt.prototype.FindNextFillingForm = function(isNext, isCurrent, isSta
 
 	return null;
 };
+CBlockLevelSdt.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
+{
+	return this.Content.GetRevisionsChangeParagraph(SearchEngine);
+};
+CBlockLevelSdt.prototype.AcceptRevisionChanges = function(Type, bAll)
+{
+	this.Content.AcceptRevisionChanges(Type, bAll);
+};
+CBlockLevelSdt.prototype.RejectRevisionChanges = function(Type, bAll)
+{
+	this.Content.RejectRevisionChanges(Type, bAll);
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -911,16 +923,6 @@ CBlockLevelSdt.prototype.GetTopElement = function()
 
 	return this.Parent.GetTopElement();
 };
-CBlockLevelSdt.prototype.GetDocumentPositionFromObject = function(PosArray)
-{
-	if (!PosArray)
-		PosArray = [];
-
-	if (this.Parent && this.Parent.GetDocumentPositionFromObject)
-		this.Parent.GetDocumentPositionFromObject(PosArray);
-
-	return PosArray;
-};
 CBlockLevelSdt.prototype.GetMargins = function()
 {
 	return this.Parent.GetMargins();
@@ -1064,6 +1066,10 @@ CBlockLevelSdt.prototype.GetContentControlPr = function()
 	oPr.InternalId = this.GetId();
 
 	return oPr;
+};
+CBlockLevelSdt.prototype.Restart_CheckSpelling = function()
+{
+	this.Content.Restart_CheckSpelling();
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

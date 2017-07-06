@@ -2222,7 +2222,8 @@
 			this.isReplaceAll = false;					// заменить все (если у нас замена)
 
 			// внутренние переменные
-			this.activeCell = null;
+			this.findInSelection = false;
+			this.selectionRange = null;
 			this.indexInArray = 0;
 			this.countFind = 0;
 			this.countReplace = 0;
@@ -2244,7 +2245,8 @@
 			result.replaceWith = this.replaceWith;
 			result.isReplaceAll = this.isReplaceAll;
 
-			result.activeCell = this.activeCell ? this.activeCell.clone() : null;
+			result.findInSelection = this.findInSelection;
+			result.selectionRange = this.selectionRange ? this.selectionRange.clone() : null;
 			result.indexInArray = this.indexInArray;
 			result.countFind = this.countFind;
 			result.countReplace = this.countReplace;
@@ -2255,7 +2257,7 @@
 			return result;
 		};
 		asc_CFindOptions.prototype.isEqual = function (obj) {
-			return null != obj && this.findWhat === obj.findWhat && this.scanByRows === obj.scanByRows &&
+			return obj && this.findWhat === obj.findWhat && this.scanByRows === obj.scanByRows &&
 				this.scanForward === obj.scanForward && this.isMatchCase === obj.isMatchCase &&
 				this.isWholeCell === obj.isWholeCell && this.scanOnOnlySheet === obj.scanOnOnlySheet &&
 				this.lookIn === obj.lookIn;

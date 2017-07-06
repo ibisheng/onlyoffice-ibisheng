@@ -507,6 +507,10 @@ function CBinaryFileWriter()
         for (var i = 0; i < _slide_count; i++)
         {
             _dst_slides[i] = _slides[i];
+            if(_slides[i].notes)
+            {
+                _dst_notes.push(_slides[i].notes);
+            }
             var _m = _slides[i].Layout.Master;
 
             var is_found = false;
@@ -545,6 +549,22 @@ function CBinaryFileWriter()
                 {
                     _slides_rels[i] = ii;
                 }
+            }
+        }
+
+
+        for(var i = 0; i < _dst_notes.length; ++i)
+        {
+            for(var j = 0; j < _dst_notesMasters.length; ++j)
+            {
+                if(_dst_notesMasters[j] === _dst_notes[i].Master)
+                {
+                    break;
+                }
+            }
+            if(j === _dst_notesMasters.length)
+            {
+                _dst_notesMasters.push(_dst_notes[i].Master);
             }
         }
 
@@ -589,6 +609,18 @@ function CBinaryFileWriter()
             {
                 _dst_themes[_len_dst] = _t;
                 _master_rels[i].ThemeIndex = _len_dst;
+            }
+        }
+
+        var i, j;
+        for(i = 0; i < _dst_notesMasters.length; ++i){
+            for(j = 0; j < _dst_themes.length; ++j){
+                if(_dst_themes[j] === _dst_notesMasters[i].Theme){
+                    break;
+                }
+            }
+            if(j === _dst_themes.length){
+                _dst_themes.push(_dst_notesMasters[i].Theme);
             }
         }
 
@@ -658,6 +690,72 @@ function CBinaryFileWriter()
         this.WriteUChar(g_nodeAttributeEnd);
         this.EndRecord();
 
+        this.StartMainRecord(c_oMainTables.SlideNotesRels);
+        this.StartRecord(c_oMainTables.SlideNotesRels);
+        this.WriteUChar(g_nodeAttributeStart);
+        var _rels, slideNotes, i, j;
+        var _notes = _dst_notes;
+        var _notes_count = _notes.length;
+        for(var  i = 0; i < _slide_count; ++i){
+            slideNotes = presentation.Slides[i].notes;
+            _rels = -1;
+            if(slideNotes){
+                for(j = 0; j < _notes_count; ++j){
+                    if(_notes[j] === slideNotes){
+                        _rels = j;
+                        break;
+                    }
+                }
+            }
+            this._WriteInt1(0, _rels);
+        }
+        this.WriteUChar(g_nodeAttributeEnd);
+        this.EndRecord();
+
+
+        this.StartMainRecord(c_oMainTables.NotesMastersRels);
+        this.StartRecord(c_oMainTables.NotesMastersRels);
+        this.WriteUChar(g_nodeAttributeStart);
+        var _notes_masters = _dst_notesMasters;
+        var _notes_masters_count = _notes_masters.length;
+        var _themes = _dst_themes;
+        var _thems_count = _themes.length;
+        var _theme;
+        for(i = 0; i < _notes_masters_count; ++i){
+            _theme = _notes_masters[i].Theme;
+            _rels = -1;
+            for(j = 0; j < _thems_count; ++j){
+                if(_theme === _themes[j]){
+                    _rels = j;
+                    break;
+                }
+            }
+            this._WriteInt1(0, _rels);
+        }
+        this.WriteUChar(g_nodeAttributeEnd);
+        this.EndRecord();
+
+        this.StartMainRecord(c_oMainTables.NotesRels);
+        this.StartRecord(c_oMainTables.NotesRels);
+        this.WriteUChar(g_nodeAttributeStart);
+        var _notes_count = _notes.length;
+        for(i = 0; i < _notes_count; ++i){
+            slideNotes = _notes[i];
+            _rels = -1;
+            for(j = 0; j < _notes_masters_count; ++j){
+                if(slideNotes.Master === _notes_masters[j]){
+                    _rels = j;
+                    break;
+                }
+            }
+            this._WriteInt1(0, _rels);
+        }
+        this.WriteUChar(g_nodeAttributeEnd);
+        this.EndRecord();
+
+
+
+
         this.StartMainRecord(c_oMainTables.ThemeRels);
         this.StartRecord(c_oMainTables.ThemeRels);
         var _master_count = _dst_masters.length;
@@ -691,6 +789,7 @@ function CBinaryFileWriter()
             this.EndRecord();
         }
         this.EndRecord();
+
 
         var _count_arr = 0;
 
@@ -1458,7 +1557,7 @@ function CBinaryFileWriter()
         this.WriteRecord1(0, _master.cSld, this.WriteCSld);
         this.WriteRecord1(1, _master.clrMap, this.WriteClrMap);
         this.WriteRecord2(2, _master.hf, this.WriteHF);
-        this.WriteRecord2(3, _master.notesStyle, this.WriteTextListStyle);
+        this.WriteRecord2(3, _master.txStyles, this.WriteTextListStyle);
 
         this.EndRecord();
     }
@@ -4927,6 +5026,8 @@ function CBinaryFileWriter()
                     var elem = spTree[i];
                     switch(elem.getObjectType())
                     {
+
+                        case AscDFH.historyitem_type_Cnx:
                         case AscDFH.historyitem_type_Shape:
                         {
                             if(elem.bWordShape)

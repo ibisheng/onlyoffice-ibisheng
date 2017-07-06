@@ -1017,62 +1017,15 @@
 		SpecialPasteButtonById_Show: function()
 		{
 			if (!this.Api)
+			{
 				return;
-
-			//при быстром совместном редактировании отключаем возможность специальной вставки
-			if(this.CheckFastCoEditing())
+			}
+			if(!this.Api.asc_specialPasteShowButton)
 			{
 				return;
 			}
 
-			var specialPasteShowOptions = this.specialPasteButtonProps ? this.specialPasteButtonProps.props : null;
-			if(specialPasteShowOptions && null !== this.showButtonIdParagraph)
-			{
-				var isUpdate = specialPasteShowOptions.cellCoord;
-				var id = this.showButtonIdParagraph;
-				var elem = g_oTableId.Get_ById(id);
-
-				var _X, _Y;
-				if(elem.GetTargetPos)
-				{
-					var testPos = elem.GetTargetPos();
-					var diffX = 0;
-					var diffY = 0;
-					if(testPos.Transform)
-					{
-						diffX = testPos.Transform.tx;
-						diffY = testPos.Transform.ty;
-					}
-
-					_Y = testPos.Y + testPos.Height + diffY;
-					_X = testPos.X + diffX;
-				}
-				else
-				{
-					_Y = elem.Y + elem.AnchorPosition.H;
-					_X = elem.X + elem.AnchorPosition.W;
-				}
-
-				var _PageNum = this.Api.WordControl.m_oLogicDocument.CurPage;
-
-				this.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum: _PageNum};
-
-				var _coord = this.Api.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
-				var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
-				specialPasteShowOptions.asc_setCellCoord(curCoord);
-
-				if(isUpdate)
-				{
-					specialPasteShowOptions.options = [];
-					this.Api.asc_UpdateSpecialPasteButton(specialPasteShowOptions);
-				}
-				else
-				{
-					this.Api.asc_ShowSpecialPasteButton(specialPasteShowOptions);
-				}
-			}
-
-			this.showButtonIdParagraph = null;
+			this.Api.asc_specialPasteShowButton();
 		},
 
 		SpecialPasteButton_Hide : function()

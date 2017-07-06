@@ -383,7 +383,20 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                 if(oEndShape){
                     var oConectionObject = oEndShape.getGeom().cnxLst[oConnectorInfo.endCnxIdx];
                     var g_conn_info =  {idx: oConnectorInfo.endCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _endConnectionInfo = oEndShape.convertToConnectionParams(oEndShape.rot, oEndShape.flipH, oEndShape.flipV, oEndShape.transform, oEndShape.bounds, g_conn_info);
+                    var _flipH = oEndShape.flipH;
+                    var _flipV = oEndShape.flipV;
+                    var _rot   = oEndShape.rot;
+
+                    if(oEndShape.group){
+                        _rot = AscFormat.normalizeRotate(oEndShape.group.getFullRotate() + _rot);
+                        if(oEndShape.group.getFullFlipH()){
+                            _flipH = !_flipH;
+                        }
+                        if(oEndShape.group.getFullFlipV()){
+                            _flipV = !_flipV;
+                        }
+                    }
+                    _endConnectionInfo = oEndShape.convertToConnectionParams(_rot, _flipH, _flipV, oEndShape.transform, oEndShape.bounds, g_conn_info);
                 }
                 _beginConnectionInfo = oConnectionInfo;
                 if(_beginConnectionInfo){
@@ -395,7 +408,19 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                 if(oBeginShape){
                     var oConectionObject = oBeginShape.getGeom().cnxLst[oConnectorInfo.stCnxIdx];
                     var g_conn_info =  {idx: oConnectorInfo.stCnxIdx, ang: oConectionObject.ang, x: oConectionObject.x, y: oConectionObject.y};
-                    _beginConnectionInfo = oBeginShape.convertToConnectionParams(oBeginShape.rot, oBeginShape.flipH, oBeginShape.flipV, oBeginShape.transform, oBeginShape.bounds, g_conn_info);
+                    var _flipH = oBeginShape.flipH;
+                    var _flipV = oBeginShape.flipV;
+                    var _rot   = oBeginShape.rot;
+                    if(oBeginShape.group){
+                        _rot = AscFormat.normalizeRotate(oBeginShape.group.getFullRotate() + _rot);
+                        if(oBeginShape.group.getFullFlipH()){
+                            _flipH = !_flipH;
+                        }
+                        if(oBeginShape.group.getFullFlipV()){
+                            _flipV = !_flipV;
+                        }
+                    }
+                    _beginConnectionInfo = oBeginShape.convertToConnectionParams(_rot, _flipH, _flipV, oBeginShape.transform, oBeginShape.bounds, g_conn_info);
                 }
                 _endConnectionInfo = oConnectionInfo;
 
@@ -432,6 +457,18 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
 
             if(_beginConnectionInfo && _endConnectionInfo){
                 this.oSpPr = AscFormat.fCalculateSpPr(_beginConnectionInfo, _endConnectionInfo, this.originalObject.spPr.geometry.preset, this.overlayObject.pen.w);
+
+                if(this.originalObject.group){
+                    var _xc = this.oSpPr.xfrm.offX + this.oSpPr.xfrm.extX / 2.0;
+                    var _yc = this.oSpPr.xfrm.offY + this.oSpPr.xfrm.extY / 2.0;
+                    var xc = this.originalObject.group.invertTransform.TransformPointX(_xc, _yc);
+                    var yc = this.originalObject.group.invertTransform.TransformPointY(_xc, _yc);
+                    this.oSpPr.xfrm.setOffX(xc - this.oSpPr.xfrm.extX / 2.0);
+                    this.oSpPr.xfrm.setOffY(yc - this.oSpPr.xfrm.extY / 2.0);
+                    this.oSpPr.xfrm.setFlipH(this.originalObject.group.getFullFlipH() ? !this.oSpPr.xfrm.flipH : this.oSpPr.xfrm.flipH);
+                    this.oSpPr.xfrm.setFlipV(this.originalObject.group.getFullFlipV() ? !this.oSpPr.xfrm.flipV : this.oSpPr.xfrm.flipV);
+                    this.oSpPr.xfrm.setRot(AscFormat.normalizeRotate(this.oSpPr.xfrm.rot - this.originalObject.group.getFullRotate()));
+                }
 
                 var _xfrm = this.oSpPr.xfrm;
                 this.resizedExtX = _xfrm.extX;

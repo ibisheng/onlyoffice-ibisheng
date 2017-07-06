@@ -4796,6 +4796,25 @@ DrawingObjectsController.prototype =
                 ret.putSmooth(b_smooth);
             }
         }
+        else if(chart_type_object_type === AscDFH.historyitem_type_SurfaceChart){
+            var oView3D = chart_space.chart.view3D;
+            if(chart_type.isWireframe()){
+                if(oView3D && oView3D.rotX === 90 && oView3D.rotY === 0 && oView3D.rAngAx === false && oView3D.perspective === 0){
+                    calc_chart_type = c_oAscChartTypeSettings.contourWireframe;
+                }
+                else{
+                    calc_chart_type = c_oAscChartTypeSettings.surfaceWireframe;
+                }
+            }
+            else{
+                if(oView3D && oView3D.rotX === 90 && oView3D.rotY === 0 && oView3D.rAngAx === false && oView3D.perspective === 0){
+                    calc_chart_type = c_oAscChartTypeSettings.contourNormal;
+                }
+                else{
+                    calc_chart_type = c_oAscChartTypeSettings.surfaceNormal;
+                }
+            }
+        }
         else
         {
             calc_chart_type = c_oAscChartTypeSettings.unknown;
@@ -11072,12 +11091,12 @@ function ApplyPresetToChartSpace(oChartSpace, aPreset, bCreate){
                         }
                         case 5 :
                         {
-                            numberingType = 8;
+                            numberingType = 1;
                             break;
                         }
                         case 6 :
                         {
-                            numberingType = 40;
+                            numberingType = 2;
                             break;
                         }
                         case 7 :

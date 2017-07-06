@@ -10099,7 +10099,7 @@ CParaPr.prototype =
                         Bullet.m_dSize = this.Bullet.bulletSize.val/100000.0;
                         break;
                     }
-                    case AscFormat.BULLET_TYPE_SIZE_PCT:{
+                    case AscFormat.BULLET_TYPE_SIZE_PTS:{
                         Bullet.m_bSizeTx = false;
                         Bullet.m_bSizePct = false;
                         Bullet.m_dSize = this.Bullet.bulletSize.val/100000.0;

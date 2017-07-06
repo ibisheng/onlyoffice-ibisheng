@@ -777,6 +777,9 @@ CShape.prototype.convertToWord = function (document) {
     }
     if (this.spPr) {
         c.setSpPr(this.spPr.createDuplicate());
+        if(!c.spPr.geometry){
+            c.spPr.setGeometry(AscFormat.CreateGeometry("rect"));
+        }
         c.spPr.setParent(c);
     }
     if (this.style) {
@@ -1046,10 +1049,10 @@ CShape.prototype.getBodyPr = function () {
     }, this, []);
 };
 
-CShape.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
+CShape.prototype.GetRevisionsChangeParagraph = function(SearchEngine){
     var oContent = this.getDocContent();
     if(oContent){
-        oContent.Get_RevisionsChangeParagraph(SearchEngine);
+        oContent.GetRevisionsChangeParagraph(SearchEngine);
     }
 };
 
@@ -1212,13 +1215,13 @@ CShape.prototype.getHierarchy = function()
                     case AscFormat.TYPE_KIND.SLIDE:
                     {
                         hierarchy.push(this.parent.Layout.getMatchingShape(ph_type, ph_index, b_is_single_body));
-                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Layout.Master.getMatchingShape(ph_type, ph_index, true));
                         break;
                     }
 
                     case AscFormat.TYPE_KIND.LAYOUT:
                     {
-                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, b_is_single_body));
+                        hierarchy.push(this.parent.Master.getMatchingShape(ph_type, ph_index, true));
                         break;
                     }
                 }

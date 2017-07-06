@@ -364,6 +364,7 @@ function checkFiniteNumber(num)
 }
 
 var G_O_VISITED_HLINK_COLOR = CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(10), 0);
+var G_O_HLINK_COLOR = CreateUniFillSolidFillWidthTintOrShade(CreateUnifillSolidFillSchemeColorByIndex(11), 0);
 var G_O_NO_ACTIVE_COMMENT_BRUSH = AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(248, 231, 195));
 var G_O_ACTIVE_COMMENT_BRUSH = AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(240, 200, 120));
 /*function addPointToMap(map, worksheet, row, col, pt)
@@ -3072,7 +3073,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                         {
                             cell = source_worksheet.getCell3(range.r1, j);
                             var sCellValue = cell.getValue();
-                            var value = parseFloat(sCellValue);
+                            var value = cell.getNumberValue();
                             if(AscFormat.isRealNumber(value))
                             {
                                 hidden = false;
@@ -3150,7 +3151,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                         if(!col_hidden && !source_worksheet.getRowHidden(j) || (this.displayHidden === true))
                         {
                             cell = source_worksheet.getCell3(j, range.c1);
-                            var value = parseFloat(cell.getValue());
+                            var value = cell.getNumberValue();
                             if(AscFormat.isRealNumber(value))
                             {
                                 hidden = false;
@@ -3180,7 +3181,7 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                             }
                             else{
                                 cell = source_worksheet.getCell3(j, range.c1);
-                                var value = parseFloat(cell.getValue());
+                                var value = cell.getNumberValue();
                                 if(AscFormat.isRealNumber(value))
                                 {
                                     hidden = false;
@@ -10847,7 +10848,7 @@ CChartSpace.prototype.recalculateChart = function()
 
 
 
-CChartSpace.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
+CChartSpace.prototype.GetRevisionsChangeParagraph = function(SearchEngine){
     var titles = this.getAllTitles(), i;
     if(titles.length === 0){
         return;
@@ -10872,7 +10873,7 @@ CChartSpace.prototype.Get_RevisionsChangeParagraph = function(SearchEngine){
         }
     }
     while(!SearchEngine.Is_Found()){
-        titles[i].Get_RevisionsChangeParagraph(SearchEngine);
+        titles[i].GetRevisionsChangeParagraph(SearchEngine);
         if(SearchEngine.Get_Direction() > 0){
             if(i === titles.length - 1){
                 break;
@@ -13385,6 +13386,7 @@ function checkBlipFillRasterImages(sp)
     window['AscFormat'].CreateUnifillSolidFillSchemeColorByIndex = CreateUnifillSolidFillSchemeColorByIndex;
     window['AscFormat'].CreateUniFillSchemeColorWidthTint = CreateUniFillSchemeColorWidthTint;
     window['AscFormat'].G_O_VISITED_HLINK_COLOR = G_O_VISITED_HLINK_COLOR;
+    window['AscFormat'].G_O_HLINK_COLOR = G_O_HLINK_COLOR;
     window['AscFormat'].G_O_NO_ACTIVE_COMMENT_BRUSH = G_O_NO_ACTIVE_COMMENT_BRUSH;
     window['AscFormat'].G_O_ACTIVE_COMMENT_BRUSH = G_O_ACTIVE_COMMENT_BRUSH;
     window['AscFormat'].CChartSpace = CChartSpace;
@@ -13426,4 +13428,5 @@ function checkBlipFillRasterImages(sp)
     window['AscFormat'].CreateColorMapByIndex = CreateColorMapByIndex;
     window['AscFormat'].getArrayFillsFromBase = getArrayFillsFromBase;
     window['AscFormat'].getMaxIdx = getMaxIdx;
+    window['AscFormat'].CreateSurfaceChart = CreateSurfaceChart;
 })(window);

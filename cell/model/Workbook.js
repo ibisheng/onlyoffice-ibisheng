@@ -4675,19 +4675,19 @@
 		return null;
 	};
 	Worksheet.prototype.removeSparklines = function (range) {
-		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+		for (var i = this.aSparklineGroups.length - 1; i > -1 ; --i) {
 			if (this.aSparklineGroups[i].remove(range)) {
-				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
-				this.aSparklineGroups.splice(i--, 1);
+				History.Add(new AscDFH.CChangesDrawingsSparklinesRemove(this.aSparklineGroups[i]));
+                this.aSparklineGroups.splice(i, 1);
 			}
 		}
 	};
 	Worksheet.prototype.removeSparklineGroups = function (range) {
-		for (var i = 0; i < this.aSparklineGroups.length; ++i) {
+		for (var i = this.aSparklineGroups.length - 1; i > -1 ; --i) {
 			if (-1 !== this.aSparklineGroups[i].intersectionSimple(range)) {
-				History.Add(this.aSparklineGroups[i], {Type: AscCH.historyitem_Sparkline_RemoveSparkline, oldPr: null, newPr: null});
-				this.aSparklineGroups.splice(i--, 1);
-			}
+                History.Add(new AscDFH.CChangesDrawingsSparklinesRemove(this.aSparklineGroups[i]));
+                this.aSparklineGroups.splice(i, 1);
+            }
 		}
 	};
 	Worksheet.prototype.insertSparklineGroup = function (sparklineGroup) {
@@ -5489,6 +5489,10 @@
 		if(null == dDigitsCount)
 			dDigitsCount = AscCommon.gc_nMaxDigCountView;
 		return this.oValue.getValue2(this, dDigitsCount, fIsFitMeasurer);
+	};
+	Cell.prototype.getNumberValue = function() {
+		this._checkDirty();
+		return this.oValue.getNumberValue();
 	};
 	Cell.prototype.getNumFormatStr=function(){
 		if(null != this.xfs && null != this.xfs.num)
@@ -6823,6 +6827,10 @@
 			oTempCell.create(xfs, this.bbox.r1, this.bbox.c1);
 			return oTempCell.getValue2(dDigitsCount, fIsFitMeasurer);
 		}
+	};
+	Range.prototype.getNumberValue = function() {
+		var cell = this.worksheet._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
+		return null != cell ? cell.getNumberValue() : null;
 	};
 	Range.prototype.getValueData=function(){
 		var res = null;

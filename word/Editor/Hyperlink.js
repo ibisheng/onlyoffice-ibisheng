@@ -63,6 +63,19 @@ ParaHyperlink.prototype.Get_Id = function()
     return this.Id;
 };
 
+
+ParaHyperlink.prototype.Get_FirstTextPr2 = function()
+{
+    for(var i = 0; i < this.Content.length; ++i)
+    {
+        if(this.Content[i].Type === para_Run && !this.Content[i].Is_Empty())
+        {
+            return this.Content[i].Get_CompiledPr();
+        }
+    }
+    return null;
+};
+
 ParaHyperlink.prototype.Copy = function(Selected)
 {
     var NewHyperlink = CParagraphContentWithParagraphLikeContent.prototype.Copy.apply(this, arguments);
@@ -197,15 +210,19 @@ ParaHyperlink.prototype.CopyContent = function(Selected)
 ParaHyperlink.prototype.Draw_Elements = function(PDSE)
 {
     PDSE.VisitedHyperlink = this.Visited;
+    PDSE.Hyperlink = true;
     CParagraphContentWithParagraphLikeContent.prototype.Draw_Elements.apply(this, arguments);
     PDSE.VisitedHyperlink = false;
+    PDSE.Hyperlink = false;
 };
 
 ParaHyperlink.prototype.Draw_Lines = function(PDSL)
 {
     PDSL.VisitedHyperlink = this.Visited;
+    PDSL.Hyperlink = true;
     CParagraphContentWithParagraphLikeContent.prototype.Draw_Lines.apply(this, arguments);
     PDSL.VisitedHyperlink = false;
+    PDSL.Hyperlink = false;
 };
 //-----------------------------------------------------------------------------------
 // Работаем со значениями

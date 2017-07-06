@@ -322,11 +322,9 @@
 		var opt = this.options;
 
 		if (saveValue) {
-			var isFormula = this.isFormula();
-			// Для формул делаем пересчет всегда. Для остального - только если мы изменили что-то. http://bugzilla.onlyoffice.com/show_bug.cgi?id=31889
-			// Сюда же добавляется и ячейка с wrap-текстом, у которой выключен wrap.
-			// Иначе F2 по ячейке с '\n', у которой выключен wrap, не станет снова wrap. http://bugzilla.onlyoffice.com/show_bug.cgi?id=17590
-			if (0 < this.undoList.length || isFormula || this.textFlags.wrapOnlyNL) {
+			// Пересчет делаем всегда для не пустой ячейки или если были изменения. http://bugzilla.onlyoffice.com/show_bug.cgi?id=34864
+			if (0 < this.undoList.length || 0 < this._getFragmentsLength(this.options.fragments)) {
+				var isFormula = this.isFormula();
 				// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
 				if (this.sAutoComplete && !isFormula) {
 					this.selectionBegin = this.textRender.getBeginOfText();

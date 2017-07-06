@@ -1152,7 +1152,6 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 // Extra functions
 
 	CCellCommentator.prototype.getComments = function (col, row) {
-
 		// Array of root items
 		var comments = [];
 		var _col = col, _row = row, mergedRange = null;
@@ -1174,11 +1173,10 @@ CCellCommentator.prototype.removeComment = function(id, bNoEvent, bNoAscLock, bN
 
 			for (var i = 0; i < length; i++) {
 				var commentCell = aComments[i];
-
-				if (!commentCell.asc_getDocumentFlag() /*&& !commentCell.asc_getSolved()*/ &&
-					!commentCell.asc_getHiddenFlag() && (commentCell.nLevel == 0)) {
+				if (!commentCell.asc_getDocumentFlag() && !commentCell.asc_getHiddenFlag() &&
+					(!commentCell.asc_getSolved() || this.showSolved()) && 0 === commentCell.nLevel) {
 					if (!mergedRange) {
-						if ((_col == commentCell.nCol) && (_row == commentCell.nRow)) {
+						if (_col === commentCell.nCol && _row === commentCell.nRow) {
 							comments.push(commentCell);
 						}
 					} else {

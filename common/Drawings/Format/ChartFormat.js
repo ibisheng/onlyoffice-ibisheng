@@ -12052,10 +12052,10 @@ CTitle.prototype =
         }
     },
 
-    Get_RevisionsChangeParagraph: function(SearchEngine){
+    GetRevisionsChangeParagraph: function(SearchEngine){
         var oContent = this.getDocContent();
         if(oContent){
-            oContent.Get_RevisionsChangeParagraph(SearchEngine);
+            oContent.GetRevisionsChangeParagraph(SearchEngine);
         }
     },
 

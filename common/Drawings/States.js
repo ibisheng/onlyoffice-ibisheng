@@ -107,9 +107,7 @@ StartAddNewShape.prototype =
 
                 if(oResult){
                     var oObject = AscCommon.g_oTableId.Get_ById(oResult.objectId);
-                    if(oObject.getObjectType() === AscDFH.historyitem_type_Shape){
-                        this.drawingObjects.connector = oObject;
-                    }
+                    this.drawingObjects.connector = oObject;
                 }
                 if(this.drawingObjects.connector !== this.oldConnector){
                     this.drawingObjects.updateOverlay();
@@ -176,7 +174,7 @@ StartAddNewShape.prototype =
                         shape.setParent(oThis.drawingObjects.drawingObjects);
                         shape.setRecalculateInfo();
                     }
-                    shape.addToDrawingObjects(undefined, AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
+                    shape.addToDrawingObjects(undefined, AscCommon.c_oAscCellAnchorType.cellanchorTwoCell);
                     shape.checkDrawingBaseCoords();
                     oThis.drawingObjects.checkChartTextSelection();
                     oThis.drawingObjects.resetSelection();
@@ -657,7 +655,7 @@ RotateState.prototype =
                 this.drawingObjects.checkSelectedObjectsAndCallback(
                     function()
                     {
-                        var i;
+                        var i, j;
                         if(e.CtrlKey && oThis instanceof MoveInGroupState)
                         {
 
@@ -698,18 +696,25 @@ RotateState.prototype =
                                 if(tracks[i].originalObject && !tracks[i].processor3D){
                                     oOriginalObjects.push(tracks[i].originalObject);
                                     oMapOriginalsId[tracks[i].originalObject.Get_Id()] = true;
+                                    if(Array.isArray(tracks[i].originalObject.arrGraphicObjects)){
+                                        for(j = 0; j < tracks[i].originalObject.arrGraphicObjects.length; ++j){
+                                            oMapOriginalsId[tracks[i].originalObject.arrGraphicObjects[j].Get_Id()] = true;
+                                        }
+                                    }
                                 }
                             }
                             var aAllConnectors = drawingObjects.getAllConnectorsByDrawings(oOriginalObjects, [],  undefined, true);
                             var oGroupMaps = {};
                             for(i = 0; i < aAllConnectors.length; ++i){
-                                if(!oMapOriginalsId[aAllConnectors[i].Get_Id()]){
+
+                                var stSp = AscCommon.g_oTableId.Get_ById(aAllConnectors[i].getStCxnId());
+                                var endSp = AscCommon.g_oTableId.Get_ById(aAllConnectors[i].getEndCxnId());
+                                if((stSp && !oMapOriginalsId[stSp.Get_Id()]) || (endSp && !oMapOriginalsId[endSp.Get_Id()]) || !oMapOriginalsId[aAllConnectors[i].Get_Id()]){
                                     aAllConnectors[i].calculateTransform(((oThis instanceof MoveInGroupState) || (oThis instanceof MoveState)));
                                     var oGroup = aAllConnectors[i].getMainGroup();
                                     if(oGroup){
-
+                                        oGroupMaps[oGroup.Id] = oGroup;
                                     }
-                                    oGroupMaps[oGroup.Id] = oGroup;
                                 }
                             }
                             for(var key in oGroupMaps){

@@ -68,14 +68,14 @@ Asc['asc_docs_api'].prototype.asc_AcceptChanges = function(Change)
     if (undefined !== Change)
         this.WordControl.m_oLogicDocument.Accept_RevisionChange(Change);
     else
-        this.WordControl.m_oLogicDocument.Accept_RevisionChangesBySelection();
+        this.WordControl.m_oLogicDocument.AcceptRevisionChangesBySelection();
 };
 Asc['asc_docs_api'].prototype.asc_RejectChanges = function(Change)
 {
     if (undefined !== Change)
         this.WordControl.m_oLogicDocument.Reject_RevisionChange(Change);
     else
-        this.WordControl.m_oLogicDocument.Reject_RevisionChangesBySelection();
+        this.WordControl.m_oLogicDocument.RejectRevisionChangesBySelection();
 };
 Asc['asc_docs_api'].prototype.asc_HaveRevisionsChanges = function()
 {
@@ -200,7 +200,7 @@ CDocument.prototype.Get_PrevRevisionChange = function()
         this.Document_UpdateInterfaceState(true);
     }
 };
-CDocument.prototype.Get_RevisionsChangeParagraph = function(Direction, CurrentPara)
+CDocument.prototype.GetRevisionsChangeParagraph = function(Direction, CurrentPara)
 {
     return this.private_GetRevisionsChangeParagraph(Direction, CurrentPara).Get_FoundedParagraph();
 };
@@ -304,14 +304,14 @@ CDocument.prototype.private_GetRevisionsChangeParagraph = function(Direction, Cu
 CDocument.prototype.private_GetRevisionsChangeParagraphInDocument = function(SearchEngine, Pos)
 {
     var Direction = SearchEngine.Get_Direction();
-    this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+    this.Content[Pos].GetRevisionsChangeParagraph(SearchEngine);
     while (true !== SearchEngine.Is_Found())
     {
         Pos = (Direction > 0 ? Pos + 1 : Pos - 1);
         if (Pos >= this.Content.length || Pos < 0)
             break;
 
-        this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+        this.Content[Pos].GetRevisionsChangeParagraph(SearchEngine);
     }
 };
 CDocument.prototype.private_GetRevisionsChangeParagraphInHdrFtr = function(SearchEngine, HdrFtr)
@@ -344,14 +344,14 @@ CDocument.prototype.private_GetRevisionsChangeParagraphInHdrFtr = function(Searc
             Pos = Count - 1;
     }
 
-    AllHdrFtrs[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+    AllHdrFtrs[Pos].GetRevisionsChangeParagraph(SearchEngine);
     while (true !== SearchEngine.Is_Found())
     {
         Pos = (Direction > 0 ? Pos + 1 : Pos - 1);
         if (Pos >= Count || Pos < 0)
             break;
 
-        AllHdrFtrs[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+        AllHdrFtrs[Pos].GetRevisionsChangeParagraph(SearchEngine);
     }
 };
 CDocument.prototype.private_GetRevisionsChangeParagraphInFooters = function(SearchEngine, oFootnote)
@@ -383,14 +383,14 @@ CDocument.prototype.private_GetRevisionsChangeParagraphInFooters = function(Sear
 			nPos = nCount - 1;
 	}
 
-	arrFootnotes[nPos].Get_RevisionsChangeParagraph(SearchEngine);
+	arrFootnotes[nPos].GetRevisionsChangeParagraph(SearchEngine);
 	while (true !== SearchEngine.Is_Found())
 	{
 		nPos = (nDirection > 0 ? nPos + 1 : nPos - 1);
 		if (nPos >= nCount || nPos < 0)
 			break;
 
-		arrFootnotes[nPos].Get_RevisionsChangeParagraph(SearchEngine);
+		arrFootnotes[nPos].GetRevisionsChangeParagraph(SearchEngine);
 	}
 };
 CDocument.prototype.private_SelectRevisionChange = function(Change)
@@ -414,7 +414,7 @@ CDocument.prototype.Accept_RevisionChange = function(Change)
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AcceptRevisionChange);
             this.private_SelectRevisionChange(Change);
-            this.Accept_RevisionChanges(Change.get_Type(), false);
+            this.AcceptRevisionChanges(Change.get_Type(), false);
         }
     }
 };
@@ -427,11 +427,11 @@ CDocument.prototype.Reject_RevisionChange = function(Change)
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RejectRevisionChange);
             this.private_SelectRevisionChange(Change);
-            this.Reject_RevisionChanges(Change.get_Type(), false);
+            this.RejectRevisionChanges(Change.get_Type(), false);
         }
     }
 };
-CDocument.prototype.Accept_RevisionChangesBySelection = function()
+CDocument.prototype.AcceptRevisionChangesBySelection = function()
 {
     var CurrentChange = this.TrackRevisionsManager.Get_CurrentChange();
     if (null !== CurrentChange)
@@ -443,7 +443,7 @@ CDocument.prototype.Accept_RevisionChangesBySelection = function()
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AcceptRevisionChangesBySelection);
-            this.Accept_RevisionChanges(undefined, false);
+            this.AcceptRevisionChanges(undefined, false);
 
             if (true === this.History.Is_LastPointEmpty())
                 this.History.Remove_LastPoint();
@@ -452,7 +452,7 @@ CDocument.prototype.Accept_RevisionChangesBySelection = function()
 
     this.Get_NextRevisionChange();
 };
-CDocument.prototype.Reject_RevisionChangesBySelection = function()
+CDocument.prototype.RejectRevisionChangesBySelection = function()
 {
     var CurrentChange = this.TrackRevisionsManager.Get_CurrentChange();
     if (null !== CurrentChange)
@@ -464,7 +464,7 @@ CDocument.prototype.Reject_RevisionChangesBySelection = function()
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
             this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AcceptRevisionChangesBySelection);
-            this.Reject_RevisionChanges(undefined, false);
+            this.RejectRevisionChanges(undefined, false);
 
             if (true === this.History.Is_LastPointEmpty())
                 this.History.Remove_LastPoint();
@@ -485,7 +485,7 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
             var LogicDoc = AscCommon.g_oTableId.Get_ById(LogicDocId);
             if (LogicDoc)
             {
-                LogicDoc.Accept_RevisionChanges(undefined, true);
+                LogicDoc.AcceptRevisionChanges(undefined, true);
             }
         }
 
@@ -514,7 +514,7 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
             var LogicDoc = AscCommon.g_oTableId.Get_ById(LogicDocId);
             if (LogicDoc)
             {
-                LogicDoc.Reject_RevisionChanges(undefined, true);
+                LogicDoc.RejectRevisionChanges(undefined, true);
             }
         }
 
@@ -531,7 +531,7 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
         this.Document_UpdateInterfaceState();
     }
 };
-CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
+CDocument.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     // Принимаем все изменения, которые попали в селект.
     // Принимаем изменения в следующей последовательности:
@@ -576,7 +576,7 @@ CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
             for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
             {
                 var Element = this.Content[CurPos];
-                Element.Accept_RevisionChanges(Type, bAll);
+                Element.AcceptRevisionChanges(Type, bAll);
             }
 
             if (undefined === Type || c_oAscRevisionsChangeType.ParaAdd === Type || c_oAscRevisionsChangeType.ParaRem === Type)
@@ -604,15 +604,15 @@ CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
     }
     else if (docpostype_HdrFtr === this.CurPos.Type)
     {
-        this.HdrFtr.Accept_RevisionChanges(Type, bAll);
+        this.HdrFtr.AcceptRevisionChanges(Type, bAll);
     }
     else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
+        this.DrawingObjects.AcceptRevisionChanges(Type, bAll);
     }
     else if (docpostype_Footnotes === this.CurPos.Type)
 	{
-		this.Footnotes.Accept_RevisionChanges(Type, bAll);
+		this.Footnotes.AcceptRevisionChanges(Type, bAll);
 	}
 
     if (true !== bAll)
@@ -622,7 +622,7 @@ CDocument.prototype.Accept_RevisionChanges = function(Type, bAll)
         this.Document_UpdateSelectionState();
     }
 };
-CDocument.prototype.Reject_RevisionChanges = function(Type, bAll)
+CDocument.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     // Отменяем все изменения, которые попали в селект.
     // Отменяем изменения в следующей последовательности:
@@ -668,7 +668,7 @@ CDocument.prototype.Reject_RevisionChanges = function(Type, bAll)
             for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
             {
                 var Element = this.Content[CurPos];
-                Element.Reject_RevisionChanges(Type, bAll);
+                Element.RejectRevisionChanges(Type, bAll);
             }
 
             if (undefined === Type || c_oAscRevisionsChangeType.ParaAdd === Type || c_oAscRevisionsChangeType.ParaRem === Type)
@@ -696,15 +696,15 @@ CDocument.prototype.Reject_RevisionChanges = function(Type, bAll)
     }
     else if (docpostype_HdrFtr === this.CurPos.Type)
     {
-        this.HdrFtr.Reject_RevisionChanges(Type, bAll);
+        this.HdrFtr.RejectRevisionChanges(Type, bAll);
     }
     else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
+        this.DrawingObjects.RejectRevisionChanges(Type, bAll);
     }
     else if (docpostype_Footnotes === this.CurPos.Type)
 	{
-		this.Footnotes.Reject_RevisionChanges(Type, bAll);
+		this.Footnotes.RejectRevisionChanges(Type, bAll);
 	}
 
     if (true !== bAll)
@@ -722,20 +722,20 @@ CDocument.prototype.Have_RevisionChanges = function()
 //----------------------------------------------------------------------------------------------------------------------
 // CHeaderFooterController
 //----------------------------------------------------------------------------------------------------------------------
-CHeaderFooterController.prototype.Accept_RevisionChanges = function(Type, bAll)
+CHeaderFooterController.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     if (null !== this.CurHdrFtr)
-        this.CurHdrFtr.Content.Accept_RevisionChanges(Type, bAll);
+        this.CurHdrFtr.Content.AcceptRevisionChanges(Type, bAll);
 };
-CHeaderFooterController.prototype.Reject_RevisionChanges = function(Type, bAll)
+CHeaderFooterController.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     if (null !== this.CurHdrFtr)
-        this.CurHdrFtr.Content.Reject_RevisionChanges(Type, bAll);
+        this.CurHdrFtr.Content.RejectRevisionChanges(Type, bAll);
 };
 //----------------------------------------------------------------------------------------------------------------------
 // CDocumentContent
 //----------------------------------------------------------------------------------------------------------------------
-CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
+CDocumentContent.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
@@ -773,7 +773,7 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
             for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
             {
                 var Element = this.Content[CurPos];
-                Element.Accept_RevisionChanges(Type, bAll);
+                Element.AcceptRevisionChanges(Type, bAll);
             }
 
             if (undefined === Type || c_oAscRevisionsChangeType.ParaAdd === Type || c_oAscRevisionsChangeType.ParaRem === Type)
@@ -801,10 +801,10 @@ CDocumentContent.prototype.Accept_RevisionChanges = function(Type, bAll)
     }
     else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        this.DrawingObjects.Accept_RevisionChanges(Type, bAll);
+        this.DrawingObjects.AcceptRevisionChanges(Type, bAll);
     }
 };
-CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
+CDocumentContent.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     if (docpostype_Content === this.CurPos.Type || true === bAll)
     {
@@ -842,7 +842,7 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
             for (var CurPos = StartPos; CurPos <= EndPos; CurPos++)
             {
                 var Element = this.Content[CurPos];
-                Element.Reject_RevisionChanges(Type, bAll);
+                Element.RejectRevisionChanges(Type, bAll);
             }
 
             if (undefined === Type || c_oAscRevisionsChangeType.ParaAdd === Type || c_oAscRevisionsChangeType.ParaRem === Type)
@@ -870,10 +870,10 @@ CDocumentContent.prototype.Reject_RevisionChanges = function(Type, bAll)
     }
     else if (docpostype_DrawingObjects === this.CurPos.Type)
     {
-        this.DrawingObjects.Reject_RevisionChanges(Type, bAll);
+        this.DrawingObjects.RejectRevisionChanges(Type, bAll);
     }
 };
-CDocumentContent.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+CDocumentContent.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
 {
     if (true === SearchEngine.Is_Found())
         return;
@@ -896,26 +896,26 @@ CDocumentContent.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
         }
     }
 
-    this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+    this.Content[Pos].GetRevisionsChangeParagraph(SearchEngine);
     while (true !== SearchEngine.Is_Found())
     {
         Pos = (Direction > 0 ? Pos + 1 : Pos - 1);
         if (Pos >= this.Content.length || Pos < 0)
             break;
 
-        this.Content[Pos].Get_RevisionsChangeParagraph(SearchEngine);
+        this.Content[Pos].GetRevisionsChangeParagraph(SearchEngine);
     }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // CFootnotesController
 //----------------------------------------------------------------------------------------------------------------------
-CFootnotesController.prototype.Accept_RevisionChanges = function(Type, bAll)
+CFootnotesController.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
 	if (null !== this.CurFootnote)
-		this.CurFootnote.Accept_RevisionChanges(Type, bAll);
+		this.CurFootnote.AcceptRevisionChanges(Type, bAll);
 };
-CFootnotesController.prototype.Reject_RevisionChanges = function(Type, bAll)
+CFootnotesController.prototype.RejectRevisionChanges = function(Type, bAll)
 {
 	if (null !== this.CurFootnote)
-		this.CurFootnote.Reject_RevisionChanges(Type, bAll);
+		this.CurFootnote.RejectRevisionChanges(Type, bAll);
 };

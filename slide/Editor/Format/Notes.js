@@ -44,7 +44,7 @@
 
     //Temporary function
     function GetNotesWidth(){
-        return editor.WordControl.m_oNotes.HtmlElement.width/g_dKoef_mm_to_pix;
+        return editor.WordControl.m_oDrawingDocument.Notes_GetWidth();
     }
 
     function CNotes(){
@@ -176,6 +176,15 @@
             if(typeof  this.cSld.spTree[i].getAllFonts === "function")
                 this.cSld.spTree[i].getAllFonts(fonts);
         }
+    };
+
+    CNotes.prototype.getDrawingDocument = function()
+    {
+        return editor.WordControl.m_oDrawingDocument;
+    };
+
+    CNotes.prototype.getTheme = function(){
+        return this.Master.Theme;
     };
 
     function CreateNotes(){

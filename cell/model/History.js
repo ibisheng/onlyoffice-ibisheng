@@ -591,7 +591,7 @@ CHistory.prototype.Set_Additional_ExtendDocumentToPos = function()
 };
 
 
-CHistory.prototype.Check_UninonLastPoints = function()
+CHistory.prototype.CheckUnionLastPoints = function()
 {
 	// Не объединяем точки истории, если на предыдущей точке произошло сохранение
 	if ( this.Points.length < 2)

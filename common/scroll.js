@@ -1554,7 +1554,8 @@ function ScrollObject( elemID, settings, dbg ) {
         arrowSizeW: 13,
         arrowSizeH: 13,
         cornerRadius: 0,
-        slimScroll: false
+        slimScroll: false,
+        alwaysVisible: false
     };
 
     this.settings = extendSettings( settings, scrollSettings );
@@ -1899,7 +1900,7 @@ ScrollObject.prototype = {
         this.paneHeight = this.canvasH - this.arrowPosition * 2;
         this.paneWidth = this.canvasW - this.arrowPosition * 2;
         this.RecalcScroller();
-        if ( this.isVerticalScroll ) {
+        if ( this.isVerticalScroll && !this.settings.alwaysVisible) {
 
             if (this.scrollVCurrentY > this.maxScrollY)
                 this.scrollVCurrentY = this.maxScrollY;
@@ -1918,7 +1919,7 @@ ScrollObject.prototype = {
                 this.scrollHCurrentX = this.maxScrollX;
 
             this.scrollToX( this.scrollHCurrentX );
-            if(this.maxScrollX == 0){
+            if(this.maxScrollX == 0 && !this.settings.alwaysVisible){
                 this.canvas.style.display = "none";
             }
             else{

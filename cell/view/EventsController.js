@@ -755,11 +755,11 @@
 					return true;
 
 				case 46: // Del
-					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {
+					if (isViewerMode || this.handlers.trigger("getCellEditMode") || this.isSelectionDialogMode || shiftKey) {
 						return true;
 					}
 					// Удаляем содержимое
-					t.handlers.trigger("empty");
+					this.handlers.trigger("empty");
 					return result;
 
 				case 9: // tab
@@ -924,8 +924,6 @@
 					}
 
 				case 65: // select all      Ctrl + a
-				//if (t.handlers.trigger("getCellEditMode")) { return true; }
-
 				case 80: // print           Ctrl + p
 					if (t.handlers.trigger("getCellEditMode")) {
 						return true;

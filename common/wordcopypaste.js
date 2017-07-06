@@ -2061,7 +2061,7 @@ PasteProcessor.prototype =
 			//TODO пересмотреть pasteTypeContent
 			this.pasteTypeContent = null;
 			var oSelectedContent = new CSelectedContent();
-            for (var i = 0, length = aNewContent.length; i < length; ++i) {
+            for (var i = 0; i < aNewContent.length; ++i) {
 				if(window['AscCommon'].g_clipboardBase.specialPasteStart)
 				{
 					var parseItem = this._specialPasteItemConvert(aNewContent[i]);
@@ -2078,7 +2078,6 @@ PasteProcessor.prototype =
 								aNewContent.splice(i + j, 0, parseItem[j]);
 							}
 						}
-
 					}
 				}
 
@@ -2095,7 +2094,7 @@ PasteProcessor.prototype =
 					this.pasteTypeContent = null;
 				}
 
-                if (i === length - 1 && true != this.bInBlock && type_Paragraph === oSelectedElement.Element.GetType())
+                if (i === aNewContent.length - 1 && true != this.bInBlock && type_Paragraph === oSelectedElement.Element.GetType())
                     oSelectedElement.SelectedAll = false;
                 else
                     oSelectedElement.SelectedAll = true;
@@ -2356,7 +2355,18 @@ PasteProcessor.prototype =
 		if(curDocSelection && curDocSelection[1])
 		{
 			pasteIntoParagraphPr = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Pr;
-			pasteIntoParaRunPr =  this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Content[curDocSelection[0].CurPos.ContentPos.Data[0]].Pr;
+
+			var pasteIntoParaRun = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Content[curDocSelection[0].CurPos.ContentPos.Data[0]];
+			if(para_InlineLevelSdt === pasteIntoParaRun.Type)
+			{
+				var selectPos = curDocSelection[0].CurPos.ContentPos.Data[1];
+				if(pasteIntoParaRun.Content && null != selectPos && pasteIntoParaRun.Content[selectPos])
+				{
+					pasteIntoParaRun =  pasteIntoParaRun.Content[selectPos];
+				}
+			}
+
+			pasteIntoParaRunPr = pasteIntoParaRun ? pasteIntoParaRun.Pr : null;
 		}
 		
 		switch(props)
@@ -2375,7 +2385,7 @@ PasteProcessor.prototype =
 					for(var i = 0; i < parentContent.length; i++)
 					{
 						var tempParagraph = parentContent[i];
-						var numbering2 =  tempParagraph.Numbering_Get();
+						var numbering2 =  tempParagraph.Numbering_Get ? tempParagraph.Numbering_Get() : null;
 
 						if(numbering2)
 						{
@@ -2853,7 +2863,7 @@ PasteProcessor.prototype =
 					Item.Set_CharCode(nUnicode);
 					bIsSpace = false;
 				}
-				else if(0x20 === nUnicode){
+				else if(0x2009 === nUnicode){
 					Item = new ParaTab();
 				}
 				else
@@ -5674,7 +5684,7 @@ PasteProcessor.prototype =
         if("always" === pNoHtmlPr["page-break-before"])
             Para.Set_PageBreakBefore(true);
         //Tabs
-        var tab_stops = pNoHtmlPr["tab-stops"]
+        var tab_stops = pNoHtmlPr["tab-stops"];
         if(tab_stops && "" != pNoHtmlPr["tab-stops"])
         {
             var aTabs = tab_stops.split(' ');
@@ -5774,6 +5784,11 @@ PasteProcessor.prototype =
 					
 					//get listId and level from mso-list property
 					var msoListIgnoreSymbol = this._getMsoListSymbol(node);
+					if(!msoListIgnoreSymbol)
+					{
+						msoListIgnoreSymbol = "ol" === node.parentElement.nodeName.toLowerCase() ? "1." : ".";
+					}
+
 					var listObj = this._getTypeMsoListSymbol(msoListIgnoreSymbol, (null === NumId));
 					var num = listObj.type;
 					var startPos = listObj.startPos;

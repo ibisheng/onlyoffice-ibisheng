@@ -3835,6 +3835,10 @@ CCellValue.prototype =
 		    sResult = this.getStringFromMultiText();
 		return sResult;
 	},
+	getNumberValue : function()
+	{
+		return this.number;
+	},
 	getValue : function(cell)
 	{
 		if(null == this.textValue)
@@ -5461,11 +5465,7 @@ RangeDataManager.prototype = {
 				--i;
 			}
 		}
-
-		var bRemove = 0 === this.arrSparklines.length;
-		if (bRemove) {
-			History.Add(new AscDFH.CChangesDrawingsSparklinesRemove(this));
-		}
+		var bRemove = (0 === this.arrSparklines.length);
 		return bRemove;
 	};
 	sparklineGroup.prototype.getLocationRanges = function (onlySingle) {
@@ -5537,7 +5537,7 @@ RangeDataManager.prototype = {
 		return null !== this.minAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getMaxAxisType = function () {
-		return null !== this.maxAxisType ? this.minAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
+		return null !== this.maxAxisType ? this.maxAxisType : Asc.c_oAscSparklineAxisMinMax.Individual;
 	};
 	sparklineGroup.prototype.asc_getRightToLeft = function () {
 		return this.rightToLeft;
@@ -5702,10 +5702,9 @@ RangeDataManager.prototype = {
 
 	sparklineGroup.prototype._drawThumbBySparklineGroup = function (oSparkline, oSparklineGroup, oSparklineView, oGraphics) {
 		oSparklineView.initFromSparkline(oSparkline, oSparklineGroup, null, true);
-		var api_sheet = Asc['editor'];
-
+		var t = this;
 		AscFormat.ExecuteNoHistory(function () {
-			oSparklineView.chartSpace.setWorksheet(api_sheet.wb.getWorksheet().model);
+			oSparklineView.chartSpace.setWorksheet(t.worksheet);
 		}, this, []);
 
 		oSparklineView.chartSpace.extX = 100;
@@ -5762,11 +5761,14 @@ RangeDataManager.prototype = {
 			equalColors(this.colorHigh, oSparklineGroup.colorHigh) && equalColors(this.colorLow, oSparklineGroup.colorLow);
 	};
 
-	sparklineGroup.prototype.asc_getStyles = function () {
+	sparklineGroup.prototype.asc_getStyles = function (type) {
 		History.TurnOff();
 		var aRet = [];
 		var nStyleIndex = -1;
 		var oSparklineGroup = this.clone(true);
+		if ('undefined' !== typeof type) {
+			oSparklineGroup.asc_setType(type);
+		}
 
 		var canvas = document.createElement('canvas');
 		canvas.width = 50;
@@ -8060,58 +8062,58 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
 	window["Asc"]["sparklineGroup"] = window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	prot = sparklineGroup.prototype;
-	prot["asc_getId"]							= prot.asc_getId;
-	prot["asc_getType"]						= prot.asc_getType;
-	prot["asc_getLineWeight"]			= prot.asc_getLineWeight;
-	prot["asc_getDisplayEmpty"]		= prot.asc_getDisplayEmpty;
-	prot["asc_getMarkersPoint"]		= prot.asc_getMarkersPoint;
-	prot["asc_getHighPoint"]			= prot.asc_getHighPoint;
-	prot["asc_getLowPoint"]				= prot.asc_getLowPoint;
-	prot["asc_getFirstPoint"]			= prot.asc_getFirstPoint;
-	prot["asc_getLastPoint"]			= prot.asc_getLastPoint;
-	prot["asc_getNegativePoint"]	= prot.asc_getNegativePoint;
-	prot["asc_getDisplayXAxis"]		= prot.asc_getDisplayXAxis;
-	prot["asc_getDisplayHidden"]	= prot.asc_getDisplayHidden;
-	prot["asc_getMinAxisType"]		= prot.asc_getMinAxisType;
-	prot["asc_getMaxAxisType"]		= prot.asc_getMaxAxisType;
-	prot["asc_getRightToLeft"]		= prot.asc_getRightToLeft;
-	prot["asc_getManualMax"]			= prot.asc_getManualMax;
-	prot["asc_getManualMin"]			= prot.asc_getManualMin;
-	prot["asc_getColorSeries"]		= prot.asc_getColorSeries;
-	prot["asc_getColorNegative"]	= prot.asc_getColorNegative;
-	prot["asc_getColorAxis"]			= prot.asc_getColorAxis;
-	prot["asc_getColorMarkers"]		= prot.asc_getColorMarkers;
-	prot["asc_getColorFirst"]			= prot.asc_getColorFirst;
-	prot["asc_getColorLast"]			= prot.asc_getColorLast;
-	prot["asc_getColorHigh"]			= prot.asc_getColorHigh;
-	prot["asc_getColorLow"]				= prot.asc_getColorLow;
-	prot["asc_getDataRanges"]			= prot.asc_getDataRanges;
-	prot["asc_setType"]					= prot.asc_setType;
-	prot["asc_setLineWeight"]			= prot.asc_setLineWeight;
-	prot["asc_setDisplayEmpty"]		= prot.asc_setDisplayEmpty;
-	prot["asc_setMarkersPoint"]		= prot.asc_setMarkersPoint;
-	prot["asc_setHighPoint"]			= prot.asc_setHighPoint;
-	prot["asc_setLowPoint"]				= prot.asc_setLowPoint;
-	prot["asc_setFirstPoint"]			= prot.asc_setFirstPoint;
-	prot["asc_setLastPoint"]			= prot.asc_setLastPoint;
-	prot["asc_setNegativePoint"]	= prot.asc_setNegativePoint;
-	prot["asc_setDisplayXAxis"]		= prot.asc_setDisplayXAxis;
-	prot["asc_setDisplayHidden"]	= prot.asc_setDisplayHidden;
-	prot["asc_setMinAxisType"]		= prot.asc_setMinAxisType;
-	prot["asc_setMaxAxisType"]		= prot.asc_setMaxAxisType;
-	prot["asc_setRightToLeft"]		= prot.asc_setRightToLeft;
-	prot["asc_setManualMax"]			= prot.asc_setManualMax;
-	prot["asc_setManualMin"]			= prot.asc_setManualMin;
-	prot["asc_setColorSeries"]		= prot.asc_setColorSeries;
-	prot["asc_setColorNegative"]	= prot.asc_setColorNegative;
-	prot["asc_setColorAxis"]			= prot.asc_setColorAxis;
-	prot["asc_setColorMarkers"]		= prot.asc_setColorMarkers;
-	prot["asc_setColorFirst"]			= prot.asc_setColorFirst;
-	prot["asc_setColorLast"]			= prot.asc_setColorLast;
-	prot["asc_setColorHigh"]			= prot.asc_setColorHigh;
-	prot["asc_setColorLow"]				= prot.asc_setColorLow;
-	prot["asc_getStyles"]				= prot.asc_getStyles;
-	prot["asc_setStyle"]				= prot.asc_setStyle;
+	prot["asc_getId"] = prot.asc_getId;
+	prot["asc_getType"] = prot.asc_getType;
+	prot["asc_getLineWeight"] = prot.asc_getLineWeight;
+	prot["asc_getDisplayEmpty"] = prot.asc_getDisplayEmpty;
+	prot["asc_getMarkersPoint"] = prot.asc_getMarkersPoint;
+	prot["asc_getHighPoint"] = prot.asc_getHighPoint;
+	prot["asc_getLowPoint"] = prot.asc_getLowPoint;
+	prot["asc_getFirstPoint"] = prot.asc_getFirstPoint;
+	prot["asc_getLastPoint"] = prot.asc_getLastPoint;
+	prot["asc_getNegativePoint"] = prot.asc_getNegativePoint;
+	prot["asc_getDisplayXAxis"] = prot.asc_getDisplayXAxis;
+	prot["asc_getDisplayHidden"] = prot.asc_getDisplayHidden;
+	prot["asc_getMinAxisType"] = prot.asc_getMinAxisType;
+	prot["asc_getMaxAxisType"] = prot.asc_getMaxAxisType;
+	prot["asc_getRightToLeft"] = prot.asc_getRightToLeft;
+	prot["asc_getManualMax"] = prot.asc_getManualMax;
+	prot["asc_getManualMin"] = prot.asc_getManualMin;
+	prot["asc_getColorSeries"] = prot.asc_getColorSeries;
+	prot["asc_getColorNegative"] = prot.asc_getColorNegative;
+	prot["asc_getColorAxis"] = prot.asc_getColorAxis;
+	prot["asc_getColorMarkers"] = prot.asc_getColorMarkers;
+	prot["asc_getColorFirst"] = prot.asc_getColorFirst;
+	prot["asc_getColorLast"] = prot.asc_getColorLast;
+	prot["asc_getColorHigh"] = prot.asc_getColorHigh;
+	prot["asc_getColorLow"] = prot.asc_getColorLow;
+	prot["asc_getDataRanges"] = prot.asc_getDataRanges;
+	prot["asc_setType"] = prot.asc_setType;
+	prot["asc_setLineWeight"] = prot.asc_setLineWeight;
+	prot["asc_setDisplayEmpty"] = prot.asc_setDisplayEmpty;
+	prot["asc_setMarkersPoint"] = prot.asc_setMarkersPoint;
+	prot["asc_setHighPoint"] = prot.asc_setHighPoint;
+	prot["asc_setLowPoint"] = prot.asc_setLowPoint;
+	prot["asc_setFirstPoint"] = prot.asc_setFirstPoint;
+	prot["asc_setLastPoint"] = prot.asc_setLastPoint;
+	prot["asc_setNegativePoint"] = prot.asc_setNegativePoint;
+	prot["asc_setDisplayXAxis"] = prot.asc_setDisplayXAxis;
+	prot["asc_setDisplayHidden"] = prot.asc_setDisplayHidden;
+	prot["asc_setMinAxisType"] = prot.asc_setMinAxisType;
+	prot["asc_setMaxAxisType"] = prot.asc_setMaxAxisType;
+	prot["asc_setRightToLeft"] = prot.asc_setRightToLeft;
+	prot["asc_setManualMax"] = prot.asc_setManualMax;
+	prot["asc_setManualMin"] = prot.asc_setManualMin;
+	prot["asc_setColorSeries"] = prot.asc_setColorSeries;
+	prot["asc_setColorNegative"] = prot.asc_setColorNegative;
+	prot["asc_setColorAxis"] = prot.asc_setColorAxis;
+	prot["asc_setColorMarkers"] = prot.asc_setColorMarkers;
+	prot["asc_setColorFirst"] = prot.asc_setColorFirst;
+	prot["asc_setColorLast"] = prot.asc_setColorLast;
+	prot["asc_setColorHigh"] = prot.asc_setColorHigh;
+	prot["asc_setColorLow"] = prot.asc_setColorLow;
+	prot["asc_getStyles"] = prot.asc_getStyles;
+	prot["asc_setStyle"] = prot.asc_setStyle;
 	window['AscCommonExcel'].sparkline = sparkline;
 	window['AscCommonExcel'].TablePart = TablePart;
 	window['AscCommonExcel'].AutoFilter = AutoFilter;

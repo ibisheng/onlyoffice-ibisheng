@@ -42,7 +42,7 @@ var History = AscCommon.History;
 
 DrawingObjectsController.prototype.getTheme = function()
 {
-    return this.drawingObjects.Layout.Master.Theme;
+    return this.drawingObjects.getTheme();
 };
 
 DrawingObjectsController.prototype.getDrawingArray = function()
@@ -79,6 +79,13 @@ DrawingObjectsController.prototype.getColorMap = function()
                 {
                     return this.drawingObjects.Layout.Master.clrMap;
                 }
+            }
+        }
+        else if(this.drawingObjects.Master )
+        {
+            if(this.drawingObjects.Master.clrMap)
+            {
+                return this.drawingObjects.Master.clrMap;
             }
         }
     }
@@ -157,11 +164,6 @@ DrawingObjectsController.prototype.getDrawingDocument = function()
 {
     return editor.WordControl.m_oDrawingDocument;
 };
-DrawingObjectsController.prototype.getTheme = function()
-{
-    return this.drawingObjects.Layout.Master.Theme;
-};
-
 
 DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
 {
@@ -299,6 +301,9 @@ DrawingObjectsController.prototype.editChart = function(binary)
 DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pageIndex)
 {
 
+    if(!this.drawingObjects.slideComments){
+        return;
+    }
     var comments = this.drawingObjects.slideComments.comments, i, index_selected = -1;
     var ret = {result: null, selectedIndex: -1};
     if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)

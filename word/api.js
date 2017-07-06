@@ -456,6 +456,10 @@
 						_content_control_pr.Lock = AscCommonWord.sdtlock_Unlocked;
 						_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
+						var oCurPara = LogicDocument.GetCurrentParagraph();
+						if (oCurPara && !oCurPara.IsCursorAtBegin())
+							LogicDocument.AddNewParagraph(false, true);
+
 						var _blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
 						_blockStd.SetContentControlPr(_content_control_pr);
 
@@ -477,6 +481,8 @@
 							_worker = null;
 
 							_blockStd = null;
+
+							window.g_asc_plugins.api.asc_Recalculate();
 
 							setTimeout(function() {
 								window.g_asc_plugins.api.__content_control_worker.run();
@@ -528,14 +534,44 @@
 
 						return;
 					}
-					else
+					else if (_current["Props"])
 					{
 						// change properties
-						var _blockStd = LogicDocument.GetContentControl(_content_control_pr.InternalId);
+						var _blockStd = LogicDocument.GetContentControl(_current["Props"]["InternalId"]);
+
+						_content_control_pr = new AscCommonWord.CContentControlPr();
+						_content_control_pr.Id = _current["Props"]["Id"];
+						_content_control_pr.Tag = _current["Props"]["Tag"];
+						_content_control_pr.Lock = _current["Props"]["Lock"];
+						_content_control_pr.InternalId = _current["Props"]["InternalId"];
+
 						_blockStd.SetContentControlPr(_content_control_pr);
 
 						_obj = _blockStd.GetContentControlPr();
 						this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
+					}
+				}
+				else
+				{
+					if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ContentControl_Properties))
+					{
+						var _current = this.documents[this.current];
+						if (_current["Props"] && _current["Url"] === undefined && _current["Script"] === undefined)
+						{
+							// change properties
+							var _blockStd = LogicDocument.GetContentControl(_current["Props"]["InternalId"]);
+
+							_content_control_pr = new AscCommonWord.CContentControlPr();
+							_content_control_pr.Id = _current["Props"]["Id"];
+							_content_control_pr.Tag = _current["Props"]["Tag"];
+							_content_control_pr.Lock = _current["Props"]["Lock"];
+							_content_control_pr.InternalId = _current["Props"]["InternalId"];
+
+							_blockStd.SetContentControlPr(_content_control_pr);
+
+							_obj = _blockStd.GetContentControlPr();
+							this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
+						}
 					}
 				}
 
@@ -2014,7 +2050,72 @@ background-repeat: no-repeat;\
 		}
 	};
 	
-	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props) 
+	asc_docs_api.prototype.asc_specialPasteShowButton = function()
+	{
+		var gClipboardBase = window['AscCommon'].g_clipboardBase;
+		//при быстром совместном редактировании отключаем возможность специальной вставки
+		if(!gClipboardBase || gClipboardBase.CheckFastCoEditing())
+		{
+			return;
+		}
+
+		var specialPasteShowOptions = gClipboardBase.specialPasteButtonProps ? gClipboardBase.specialPasteButtonProps.props : null;
+		if(specialPasteShowOptions && null !== this.showButtonIdParagraph)
+		{
+			var isUpdate = specialPasteShowOptions.cellCoord;
+			var id = gClipboardBase.showButtonIdParagraph;
+			var elem = g_oTableId.Get_ById(id);
+
+			var _X, _Y;
+			if(elem.GetTargetPos)
+			{
+				var testPos = elem.GetTargetPos();
+				var diffX = 0;
+				var diffY = 0;
+				if(testPos.Transform)
+				{
+					diffX = testPos.Transform.tx;
+					diffY = testPos.Transform.ty;
+				}
+
+				_Y = testPos.Y + testPos.Height + diffY;
+				_X = testPos.X + diffX;
+			}
+			else
+			{
+				var w = 0, h = 0;
+				if(elem.AnchorPosition)
+				{
+					h = elem.AnchorPosition.H;
+					w = elem.AnchorPosition.W;
+				}
+				_Y = elem.Y + h;
+				_X = elem.X + w;
+			}
+
+			var _PageNum = this.WordControl.m_oLogicDocument.CurPage;
+
+			gClipboardBase.specialPasteButtonProps.fixPosition = {x: _X, y: _Y, pageNum: _PageNum};
+
+			var _coord = this.WordControl.m_oLogicDocument.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, _PageNum);
+			var curCoord = new AscCommon.asc_CRect( _coord.X, _coord.Y, 0, 0 );
+			specialPasteShowOptions.asc_setCellCoord(curCoord);
+
+			if(isUpdate)
+			{
+				specialPasteShowOptions.options = [];
+				this.asc_UpdateSpecialPasteButton(specialPasteShowOptions);
+			}
+			else
+			{
+				this.asc_ShowSpecialPasteButton(specialPasteShowOptions);
+			}
+		}
+
+		gClipboardBase.showButtonIdParagraph = null;
+	};
+
+	asc_docs_api.prototype.asc_ShowSpecialPasteButton = function(props)
 	{
 		this.sendEvent("asc_onShowSpecialPasteOptions", props);
 	};
@@ -2034,6 +2135,7 @@ background-repeat: no-repeat;\
 		var t = this;
 		if (false == e["saveLock"])
 		{
+			History.CheckUnionLastPoints();
 			if (this.isLongAction())
 			{
 				// Мы не можем в этот момент сохранять, т.к. попали в ситуацию, когда мы залочили сохранение и успели нажать вставку до ответа
@@ -6551,7 +6653,7 @@ background-repeat: no-repeat;\
 		if (isViewMode)
 		{
 			this.asc_SpellCheckDisconnect();
-			
+
 			this.ShowParaMarks                           = false;
 			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			//this.isShowTableEmptyLine = false;
@@ -7465,6 +7567,24 @@ background-repeat: no-repeat;\
 
 		return oContentControl ? oContentControl.GetContentControlPr() : null;
 	};
+	asc_docs_api.prototype.asc_GetCurrentContentControl = function()
+	{
+		var oLogicDocument = this.WordControl.m_oLogicDocument;
+		if (!oLogicDocument)
+			return null;
+
+		var oInfo   = oLogicDocument.GetSelectedElementsInfo();
+		var oInline = oInfo.GetInlineLevelSdt();
+		var oBlock  = oInfo.GetBlockLevelSdt();
+
+		if (oInline)
+			return oInline.GetId();
+
+		if (oBlock)
+			return oBlock.GetId();
+
+		return null;
+	};
 
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()
@@ -8009,6 +8129,19 @@ background-repeat: no-repeat;\
 		}
 		return _ret;
 	};
+	window["asc_docs_api"].prototype["pluginMethod_AddContentControl"] = function(type)
+	{
+		return this.asc_AddContentControl(type);
+	};
+	window["asc_docs_api"].prototype["pluginMethod_RemoveContentControl"] = function(id)
+	{
+		return this.asc_RemoveContentControlWrapper(id);
+	};
+	window["asc_docs_api"].prototype["pluginMethod_GetCurrentContentControl"] = function()
+	{
+		return this.asc_GetCurrentContentControl();
+	};
+
 	/********************************************************************/
 
 	asc_docs_api.prototype.asc_OnHideContextMenu = function()

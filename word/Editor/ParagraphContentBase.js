@@ -2511,7 +2511,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Check_RevisionsChanges = fun
         this.Content[CurPos].Check_RevisionsChanges(Checker, ContentPos, Depth + 1);
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges = function(Type, bAll)
+CParagraphContentWithParagraphLikeContent.prototype.AcceptRevisionChanges = function(Type, bAll)
 {
     if (true === this.Selection.Use || true === bAll)
     {
@@ -2530,8 +2530,8 @@ CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges = fun
         }
 
         // Начинаем с конца, потому что при выполнении данной функции, количество элементов может изменяться
-        if (this.Content[EndPos].Accept_RevisionChanges)
-            this.Content[EndPos].Accept_RevisionChanges(Type, bAll);
+        if (this.Content[EndPos].AcceptRevisionChanges)
+            this.Content[EndPos].AcceptRevisionChanges(Type, bAll);
 
         if (StartPos < EndPos)
         {
@@ -2558,18 +2558,18 @@ CParagraphContentWithParagraphLikeContent.prototype.Accept_RevisionChanges = fun
                     isGoInside = true;
                 }
 
-                if (true === isGoInside && Element.Accept_RevisionChanges)
-                    Element.Accept_RevisionChanges(Type, true);
+                if (true === isGoInside && Element.AcceptRevisionChanges)
+                    Element.AcceptRevisionChanges(Type, true);
             }
 
-            if (this.Content[StartPos].Accept_RevisionChanges)
-                this.Content[StartPos].Accept_RevisionChanges(Type, bAll);
+            if (this.Content[StartPos].AcceptRevisionChanges)
+                this.Content[StartPos].AcceptRevisionChanges(Type, bAll);
         }
 
         this.Correct_Content();
     }
 };
-CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges = function(Type, bAll)
+CParagraphContentWithParagraphLikeContent.prototype.RejectRevisionChanges = function(Type, bAll)
 {
     if (true === this.Selection.Use || true === bAll)
     {
@@ -2588,8 +2588,8 @@ CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges = fun
         }
 
         // Начинаем с конца, потому что при выполнении данной функции, количество элементов может изменяться
-        if (this.Content[EndPos].Reject_RevisionChanges)
-            this.Content[EndPos].Reject_RevisionChanges(Type, bAll);
+        if (this.Content[EndPos].RejectRevisionChanges)
+            this.Content[EndPos].RejectRevisionChanges(Type, bAll);
 
         if (StartPos < EndPos)
         {
@@ -2616,12 +2616,12 @@ CParagraphContentWithParagraphLikeContent.prototype.Reject_RevisionChanges = fun
                     isGoInside = true;
                 }
 
-                if (true === isGoInside && Element.Reject_RevisionChanges)
-                    Element.Reject_RevisionChanges(Type, true);
+                if (true === isGoInside && Element.RejectRevisionChanges)
+                    Element.RejectRevisionChanges(Type, true);
             }
 
-            if (this.Content[StartPos].Reject_RevisionChanges)
-                this.Content[StartPos].Reject_RevisionChanges(Type, bAll);
+            if (this.Content[StartPos].RejectRevisionChanges)
+                this.Content[StartPos].RejectRevisionChanges(Type, bAll);
         }
 
         this.Correct_Content();

@@ -1230,9 +1230,9 @@ CHeaderFooter.prototype.SetParagraphFramePr = function(FramePr, bDelete)
 {
     return this.Content.SetParagraphFramePr(FramePr, bDelete);
 };
-CHeaderFooter.prototype.Get_RevisionsChangeParagraph = function(SearchEngine)
+CHeaderFooter.prototype.GetRevisionsChangeParagraph = function(SearchEngine)
 {
-    return this.Content.Get_RevisionsChangeParagraph(SearchEngine);
+    return this.Content.GetRevisionsChangeParagraph(SearchEngine);
 };
 CHeaderFooter.prototype.GetSelectionBounds = function()
 {
