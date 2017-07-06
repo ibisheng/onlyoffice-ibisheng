@@ -55,7 +55,7 @@
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cCHISQ_TEST,
+	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE,
 		cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
 		cHYPGEOM_DIST, cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST,
 		cNORM_S_INV, cPERMUTATIONA, cPHI, cSTDEV_P, cSTDEV_S,
@@ -71,7 +71,7 @@
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
-		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cCHISQ_TEST,
+		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE,
 		cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY,
 		cFORECAST_ETS_STAT, cHYPGEOM_DIST, cNEGBINOM_DIST, cNORM_DIST,
 		cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERMUTATIONA, cPHI,
@@ -161,18 +161,6 @@
 
 	cBITXOR.prototype = Object.create(cBaseFunction.prototype);
 	cBITXOR.prototype.constructor = cBITXOR;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCHISQ_TEST() {
-		cBaseFunction.call(this, "CHISQ.TEST");
-		this.isXLFN = true;
-	}
-
-	cCHISQ_TEST.prototype = Object.create(cBaseFunction.prototype);
-	cCHISQ_TEST.prototype.constructor = cCHISQ_TEST;
 
 	/**
 	 * @constructor
