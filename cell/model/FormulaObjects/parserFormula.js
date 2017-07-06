@@ -1012,7 +1012,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.getValue()[0].tocString();
 	};
 	cArea.prototype.tocBool = function () {
-		return this.getValue()[0].tocBool();
+		return new cError(cErrorType.wrong_value_type);
 	};
 	cArea.prototype.toString = function () {
 		var _c;
@@ -1256,7 +1256,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.getValue()[0].tocString();
 	};
 	cArea3D.prototype.tocBool = function () {
-		return this.getValue()[0].tocBool();
+		return new cError(cErrorType.wrong_value_type);
 	};
 	cArea3D.prototype.tocArea = function () {
 		var wsR = this.wsRange();

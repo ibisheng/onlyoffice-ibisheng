@@ -170,17 +170,15 @@
 			arg2 = arg2.getElement(0);
 		}
 
+		arg0 = arg0.tocBool();
 		if (arg0 instanceof cError) {
 			return this.value = arg0;
+		} else if (arg0 instanceof cString) {
+			return this.value = new cError(cErrorType.wrong_value_type);
+		} else if (arg0.value) {
+			return this.value = arg1 ? arg1 instanceof cEmpty ? new cNumber(0) : arg1 : new cBool(true);
 		} else {
-			arg0 = arg0.tocBool();
-			if (arg0 instanceof cString) {
-				return this.value = new cError(cErrorType.wrong_value_type);
-			} else if (arg0.value) {
-				return this.value = arg1 ? arg1 instanceof cEmpty ? new cNumber(0) : arg1 : new cBool(true);
-			} else {
-				return this.value = arg2 ? arg2 instanceof cEmpty ? new cNumber(0) : arg2 : new cBool(false);
-			}
+			return this.value = arg2 ? arg2 instanceof cEmpty ? new cNumber(0) : arg2 : new cBool(false);
 		}
 	};
 
