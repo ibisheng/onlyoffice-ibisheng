@@ -55,7 +55,7 @@
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cCHISQ_TEST, cCOVARIANCE_P,
+	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cCHISQ_TEST,
 		cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
 		cHYPGEOM_DIST, cNEGBINOM_DIST, cNORM_DIST, cNORM_INV, cNORM_S_DIST,
 		cNORM_S_INV, cPERMUTATIONA, cPHI, cSTDEV_P, cSTDEV_S,
@@ -72,7 +72,7 @@
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
 		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cCHISQ_TEST,
-		cCOVARIANCE_P, cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY,
+		cCOVARIANCE_S, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY,
 		cFORECAST_ETS_STAT, cHYPGEOM_DIST, cNEGBINOM_DIST, cNORM_DIST,
 		cNORM_INV, cNORM_S_DIST, cNORM_S_INV, cPERMUTATIONA, cPHI,
 		cSTDEV_P, cSTDEV_S, cT_TEST, cWEIBULL_DIST, cZ_TEST, cPDURATION, cRRI, cAGGREGATE, cMUNIT,
@@ -185,18 +185,6 @@
 
 	cCOMBINA.prototype = Object.create(cBaseFunction.prototype);
 	cCOMBINA.prototype.constructor = cCOMBINA;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cCOVARIANCE_P() {
-		cBaseFunction.call(this, "COVARIANCE.P");
-		this.isXLFN = true;
-	}
-
-	cCOVARIANCE_P.prototype = Object.create(cBaseFunction.prototype);
-	cCOVARIANCE_P.prototype.constructor = cCOVARIANCE_P;
 
 	/**
 	 * @constructor
