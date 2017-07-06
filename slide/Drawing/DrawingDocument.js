@@ -1775,11 +1775,13 @@ function CDrawingDocument()
 			{
 				this.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.appendChild(this.TargetHtmlElement);
+				this.TargetHtmlElement.style.zIndex = 4;
 			}
 			else
 			{
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.TargetHtmlElement);
+				this.TargetHtmlElement.style.zIndex = 9;
 			}
 
 			this.TargetHtmlElementOnSlide = isFocusOnSlide;
@@ -5635,8 +5637,9 @@ function CNotesDrawer(page)
 			settings.screenAddH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenAddH);
 		}
 
-		this.Scroll = 0;
 		this.ScrollMax = Math.max(0, settings.contentH - settings.screenH);
+		if (this.Scroll > this.ScrollMax)
+			this.Scroll = this.ScrollMax;
 
 		document.getElementById('panel_right_scroll_notes').style.height = settings.contentH + "px";
 
@@ -5661,6 +5664,7 @@ function CNotesDrawer(page)
 			this.HtmlPage.m_oScrollNotes_.bind("scrollvertical", function (evt)
 			{
 				oThis.Scroll = (oThis.ScrollMax * evt.scrollD / Math.max(evt.maxScrollY, 1)) >> 0;
+				oThis.HtmlPage.m_bIsUpdateTargetNoAttack = true;
 				oThis.IsRepaint = true;
 			});
 		}

@@ -670,9 +670,9 @@ function CEditorPage(api)
 		this.m_oOverlay.HtmlElement.onmouseup   = this.onMouseUp;
 
 		var _cur         = document.getElementById('id_target_cursor');
-		_cur.onmousedown = this.onMouseDown;
-		_cur.onmousemove = this.onMouseMove;
-		_cur.onmouseup   = this.onMouseUp;
+		_cur.onmousedown = this.onMouseDownTarget;
+		_cur.onmousemove = this.onMouseMoveTarget;
+		_cur.onmouseup   = this.onMouseUpTarget;
 
 		this.m_oMainContent.HtmlElement.onmousewheel = this.onMouseWhell;
 		if (this.m_oMainContent.HtmlElement.addEventListener)
@@ -1679,6 +1679,28 @@ function CEditorPage(api)
 			AscCommon.stopEvent(e);
 	};
 
+	this.onMouseDownTarget = function(e)
+	{
+		if (oThis.m_oDrawingDocument.TargetHtmlElementOnSlide)
+			return oThis.onMouseDown(e);
+		else
+			return oThis.m_oNotesApi.onMouseDown(e);
+	};
+	this.onMouseMoveTarget = function(e)
+	{
+		if (oThis.m_oDrawingDocument.TargetHtmlElementOnSlide)
+			return oThis.onMouseMove(e);
+		else
+			return oThis.m_oNotesApi.onMouseMove(e);
+	};
+	this.onMouseUpTarget = function(e)
+	{
+		if (oThis.m_oDrawingDocument.TargetHtmlElementOnSlide)
+			return oThis.onMouseUp(e);
+		else
+			return oThis.m_oNotesApi.onMouseUp(e);
+	};
+
 	this.onMouseDown = function(e)
 	{
 		oThis.m_oApi.checkLastWork();
@@ -1768,6 +1790,9 @@ function CEditorPage(api)
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
 
+		if (!oThis.m_oDrawingDocument.TargetHtmlElementOnSlide)
+			return oThis.m_oNotesApi.onMouseMove(e);
+
 		var oWordControl = oThis;
 
 		if (e.preventDefault)
@@ -1816,8 +1841,9 @@ function CEditorPage(api)
 
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
-		//if (true == global_mouseEvent.IsLocked)
-		//    return;
+
+		if (!oThis.m_oDrawingDocument.TargetHtmlElementOnSlide)
+			return oThis.m_oNotesApi.onMouseUp(e);
 
 		var oWordControl = oThis;
 		if (!global_mouseEvent.IsLocked)
@@ -3248,6 +3274,12 @@ function CEditorPage(api)
 			oWordControl.m_oDrawingDocument.UpdateTargetFromPaint = false;
 
 			oWordControl.CheckFontCache();
+
+			if (oWordControl.m_bIsUpdateTargetNoAttack)
+			{
+				oWordControl.m_oDrawingDocument.UpdateTargetNoAttack();
+				oWordControl.m_bIsUpdateTargetNoAttack = false;
+			}
 		}
 
 		oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
