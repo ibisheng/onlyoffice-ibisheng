@@ -3190,6 +3190,27 @@ $( function () {
         strictEqual( difBetween( oParser.calculate().getValue(), 0.25 ), true );
 
     } );
+    
+	test( "Test: \"COVARIANCE.P\"", function () {
+
+		ws.getRange2( "AA1" ).setValue( "3" );
+		ws.getRange2( "AA2" ).setValue( "2" );
+		ws.getRange2( "AA4" ).setValue( "4" );
+		ws.getRange2( "AA5" ).setValue( "5" );
+		ws.getRange2( "AA6" ).setValue( "6" );
+
+		ws.getRange2( "BB1" ).setValue( "9" );
+		ws.getRange2( "BB2" ).setValue( "7" );
+		ws.getRange2( "BB4" ).setValue( "12" );
+		ws.getRange2( "BB5" ).setValue( "15" );
+		ws.getRange2( "BB6" ).setValue( "17" );
+
+
+		oParser = new parserFormula( "COVARIANCE.P(AA1:AA6, BB1:BB6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual(oParser.calculate().getValue(), 5.2 );
+
+	} );
 
     test( "Test: \"CRITBINOM\"", function () {
 
