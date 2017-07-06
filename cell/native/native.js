@@ -1514,7 +1514,7 @@ function asc_menu_WriteChartPr(_type, _chartPr, _stream){
     
     if (undefined != _chartPr.vertAxisProps
         && null != _chartPr.vertAxisProps
-        && typeof _chartPr.vertAxisProps == Asc.c_oAscAxisType.val) {
+        && _chartPr.vertAxisProps.getAxisType() == Asc.c_oAscAxisType.val) {
         asc_menu_WriteAscValAxisSettings(17, _chartPr.vertAxisProps, _stream);
     }
 
@@ -1553,7 +1553,7 @@ function asc_menu_WriteChartPr(_type, _chartPr, _stream){
     
     if (undefined != _chartPr.vertAxisProps
         && null != _chartPr.vertAxisProps
-        && typeof _chartPr.vertAxisProps == Asc.c_oAscAxisType.cat) {
+        && _chartPr.vertAxisProps.getAxisType() == Asc.c_oAscAxisType.cat) {
         asc_menu_WriteAscCatAxisSettings(24, _chartPr.vertAxisProps, _stream);
     }
 
