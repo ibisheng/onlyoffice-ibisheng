@@ -293,6 +293,9 @@ Slide.prototype =
         copy.applyTiming(this.timing.createDuplicate());
         copy.setSlideSize(this.Width, this.Height);
 
+        if(this.notes){
+            copy.setNotes(this.notes.createDuplicate());
+        }
 
         if(!this.recalcInfo.recalculateBackground && !this.recalcInfo.recalculateSpTree)
         {

@@ -1776,6 +1776,7 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             editor.WordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+            this.FocusOnNotes = false;
             var oController = this.Slides[this.CurPage].graphicObjects;
             History.Create_NewPoint(AscDFH.historydescription_Presentation_AddFlowImage);
             var Image = oController.createImage(Img, (this.Slides[this.CurPage].Width - W)/2, (this.Slides[this.CurPage].Height - H)/2, W, H);
@@ -1828,6 +1829,7 @@ CPresentation.prototype =
         _this.Slides[_this.CurPage] && _this.Slides[_this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(function()
         {
             editor.WordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+            this.FocusOnNotes = false;
             var Image = _this.Slides[_this.CurPage].graphicObjects.getChartSpace2(binary, null);
             Image.setParent(_this.Slides[_this.CurPage]);
             Image.addToDrawingObjects();
@@ -1901,6 +1903,7 @@ CPresentation.prototype =
         if(this.Document_Is_SelectionLocked(AscCommon.changestype_AddShape, graphic_frame) === false)
         {
             editor.WordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
+            this.FocusOnNotes = false;
             //this.Slides[this.CurPage].graphicObjects.resetSelection();
             //this.Slides[this.CurPage].graphicObjects.selectObject(graphic_frame, 0);
             this.Check_GraphicFrameRowHeight(graphic_frame);
