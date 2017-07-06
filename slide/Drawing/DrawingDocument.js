@@ -891,6 +891,7 @@ function CDrawingDocument()
 	this.TargetHtmlElement     = null;
 	this.TargetHtmlElementLeft = 0;
 	this.TargetHtmlElementTop  = 0;
+	this.TargetHtmlElementOnSlide = true;
 
 	this.CollaborativeTargets            = [];
 	this.CollaborativeTargetsUpdateTasks = [];
@@ -1763,16 +1764,34 @@ function CDrawingDocument()
 		if (null == this.m_oWordControl)
 			return;
 
-		this.CheckTargetDraw(this.m_dTargetX, this.m_dTargetY);
+		this.CheckTargetDraw(this.m_dTargetX, this.m_dTargetY, !this.m_oLogicDocument.IsFocusOnNotes());
 	}
 
-	this.CheckTargetDraw = function(x, y)
+	this.CheckTargetDraw = function(x, y, isFocusOnSlide)
 	{
+		if (this.TargetHtmlElementOnSlide != isFocusOnSlide)
+		{
+			if (this.TargetHtmlElementOnSlide)
+			{
+				this.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.TargetHtmlElement);
+				this.m_oWordControl.m_oNotesContainer.HtmlElement.appendChild(this.TargetHtmlElement);
+			}
+			else
+			{
+				this.m_oWordControl.m_oNotesContainer.HtmlElement.removeChild(this.TargetHtmlElement);
+				this.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.TargetHtmlElement);
+			}
+
+			this.TargetHtmlElementOnSlide = isFocusOnSlide;
+		}
+
 		var _oldW = this.TargetHtmlElement.width;
 		var _oldH = this.TargetHtmlElement.height;
 
+		var targetZoom = isFocusOnSlide ? this.m_oWordControl.m_nZoomValue : 100;
+
 		var _newW = 2;
-		var _newH = (this.m_dTargetSize * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100) >> 0;
+		var _newH = (this.m_dTargetSize * targetZoom * g_dKoef_mm_to_pix / 100) >> 0;
 
 		if (null != this.TextMatrix && !global_MatrixTransformer.IsIdentity2(this.TextMatrix))
 		{
@@ -1870,6 +1889,12 @@ function CDrawingDocument()
 
 			var pos = this.ConvertCoordsToCursor(x, y);
 
+			if (!isFocusOnSlide)
+			{
+				pos.X = x * g_dKoef_mm_to_pix + this.m_oWordControl.m_oNotesApi.OffsetX;
+				pos.Y = y * g_dKoef_mm_to_pix - this.m_oWordControl.m_oNotesApi.Scroll;
+			}
+
 			this.TargetHtmlElementLeft        = pos.X >> 0;
 			this.TargetHtmlElementTop         = pos.Y >> 0;
 			this.TargetHtmlElement.style.left = this.TargetHtmlElementLeft + "px";
@@ -1897,103 +1922,131 @@ function CDrawingDocument()
 			return;
 		}
 
+		var isTargetOnNotes = this.m_oLogicDocument.IsFocusOnNotes();
+		var targetZoom = isTargetOnNotes ? 100 : this.m_oWordControl.m_nZoomValue;
+
 		/// detect need scrolling
-		var targetSize = Number(this.m_dTargetSize * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
-		var pos        = null;
-		var __x        = x;
-		var __y        = y;
-		if (!this.TextMatrix)
+		var targetSize 	= Number(this.m_dTargetSize * targetZoom * g_dKoef_mm_to_pix / 100);
+		var pos        	= null;
+		var _x        	= x;
+		var _y        	= y;
+		if (this.TextMatrix)
 		{
-			pos = this.ConvertCoordsToCursor(x, y);
+			_x = this.TextMatrix.TransformPointX(x, y);
+			_y = this.TextMatrix.TransformPointY(x, y);
 		}
-		else
-		{
-			__x = this.TextMatrix.TransformPointX(x, y);
-			__y = this.TextMatrix.TransformPointY(x, y);
-
-			pos = this.ConvertCoordsToCursor(__x, __y);
-		}
-
-		var _ww = this.m_oWordControl.m_oEditor.HtmlElement.width;
-		var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
-		if (this.m_oWordControl.bIsRetinaSupport)
-		{
-			_ww /= AscCommon.AscBrowser.retinaPixelRatio;
-			_hh /= AscCommon.AscBrowser.retinaPixelRatio;
-		}
-
-		var boxX = 0;
-		var boxY = 0;
-		var boxR = _ww - 2;
-		var boxB = _hh - targetSize;
-
-		var nValueScrollHor = 0;
-		if (pos.X < boxX)
-		{
-			nValueScrollHor = (this.m_oWordControl.m_dScrollX + pos.X - boxX) >> 0;
-		}
-		if (pos.X > boxR)
-		{
-			nValueScrollHor = (this.m_oWordControl.m_dScrollX + pos.X - boxR) >> 0;
-		}
-
-		var nValueScrollVer = 0;
-		if (pos.Y < boxY)
-		{
-			nValueScrollVer = (this.m_oWordControl.m_dScrollY + pos.Y - boxY) >> 0;
-		}
-		if (pos.Y > boxB)
-		{
-			nValueScrollVer = (this.m_oWordControl.m_dScrollY + pos.Y - boxB) >> 0;
-		}
-		/// ---------------------
 
 		this.m_dTargetX = x;
 		this.m_dTargetY = y;
 
-		/// check scroll
-		var isNeedScroll = false;
-		if (0 != nValueScrollHor)
+		if (!isTargetOnNotes)
 		{
-			isNeedScroll                                  = true;
-			this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
+			// focus ton slide
+			pos = this.ConvertCoordsToCursor(_x, _y);
 
-			if (nValueScrollHor > this.m_oWordControl.m_dScrollX_max)
-				nValueScrollHor = this.m_oWordControl.m_dScrollX_max;
-			if (0 > nValueScrollHor)
-				nValueScrollHor = 0;
+			var _ww = this.m_oWordControl.m_oEditor.HtmlElement.width;
+			var _hh = this.m_oWordControl.m_oEditor.HtmlElement.height;
+			if (this.m_oWordControl.bIsRetinaSupport)
+			{
+				_ww /= AscCommon.AscBrowser.retinaPixelRatio;
+				_hh /= AscCommon.AscBrowser.retinaPixelRatio;
+			}
 
-			this.m_oWordControl.m_oScrollHorApi.scrollToX(nValueScrollHor, false);
+			var boxX = 0;
+			var boxY = 0;
+			var boxR = _ww - 2;
+			var boxB = _hh - targetSize;
+
+			var nValueScrollHor = 0;
+			if (pos.X < boxX)
+			{
+				nValueScrollHor = (this.m_oWordControl.m_dScrollX + pos.X - boxX) >> 0;
+			}
+			if (pos.X > boxR)
+			{
+				nValueScrollHor = (this.m_oWordControl.m_dScrollX + pos.X - boxR) >> 0;
+			}
+
+			var nValueScrollVer = 0;
+			if (pos.Y < boxY)
+			{
+				nValueScrollVer = (this.m_oWordControl.m_dScrollY + pos.Y - boxY) >> 0;
+			}
+			if (pos.Y > boxB)
+			{
+				nValueScrollVer = (this.m_oWordControl.m_dScrollY + pos.Y - boxB) >> 0;
+			}
+
+			/// check scroll
+			var isNeedScroll = false;
+			if (0 != nValueScrollHor)
+			{
+				isNeedScroll                                  = true;
+				this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
+
+				if (nValueScrollHor > this.m_oWordControl.m_dScrollX_max)
+					nValueScrollHor = this.m_oWordControl.m_dScrollX_max;
+				if (0 > nValueScrollHor)
+					nValueScrollHor = 0;
+
+				this.m_oWordControl.m_oScrollHorApi.scrollToX(nValueScrollHor, false);
+			}
+			if (0 != nValueScrollVer)
+			{
+				isNeedScroll                                  = true;
+				this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
+
+				if (nValueScrollVer > this.m_oWordControl.SlideScrollMAX)
+					nValueScrollVer = this.m_oWordControl.SlideScrollMAX - 1;
+				if (this.m_oWordControl.SlideScrollMIN > nValueScrollVer)
+					nValueScrollVer = this.m_oWordControl.SlideScrollMIN;
+
+				this.m_oWordControl.m_oScrollVerApi.scrollToY(nValueScrollVer, false);
+			}
+
+			if (true == isNeedScroll)
+			{
+				this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
+				this.m_oWordControl.OnScroll();
+				return;
+			}
 		}
-		if (0 != nValueScrollVer)
+		else if (this.m_oWordControl.m_oNotesApi)
 		{
-			isNeedScroll                                  = true;
-			this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
+			var yPos = _y * g_dKoef_mm_to_pix - this.m_oWordControl.m_oNotesApi.Scroll;
+			var _hh = this.m_oWordControl.m_oNotes.HtmlElement.height;
+			if (this.m_oWordControl.bIsRetinaSupport)
+				_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 
-			if (nValueScrollVer > this.m_oWordControl.SlideScrollMAX)
-				nValueScrollVer = this.m_oWordControl.SlideScrollMAX - 1;
-			if (this.m_oWordControl.SlideScrollMIN > nValueScrollVer)
-				nValueScrollVer = this.m_oWordControl.SlideScrollMIN;
+			var boxY = 0;
+			var boxB = _hh - targetSize;
 
-			this.m_oWordControl.m_oScrollVerApi.scrollToY(nValueScrollVer, false);
+			var nValueScrollVer = 0;
+			if (yPos < boxY)
+			{
+				nValueScrollVer = (this.m_oWordControl.m_oNotesApi.Scroll + yPos - boxY) >> 0;
+			}
+			if (yPos > boxB)
+			{
+				nValueScrollVer = (this.m_oWordControl.m_oNotesApi.Scroll + yPos - boxB) >> 0;
+			}
+
+			/// check scroll
+			if (0 != nValueScrollVer)
+			{
+				this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
+				this.m_oWordControl.m_oScrollNotes_.scrollToY(nValueScrollVer, false);
+				this.m_oWordControl.OnScroll();
+				return;
+			}
 		}
 
-		if (true == isNeedScroll)
-		{
-			this.m_oWordControl.m_bIsUpdateTargetNoAttack = true;
-			this.m_oWordControl.OnScroll();
-			return;
-		}
-		/// ------------
-
-		this.CheckTargetDraw(x, y);
+		this.CheckTargetDraw(x, y, !isTargetOnNotes);
 	}
 
 	this.SetTargetSize   = function(size)
 	{
 		this.m_dTargetSize = size;
-		//this.TargetHtmlElement.style.height = Number(this.m_dTargetSize * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100) + "px";
-		//this.TargetHtmlElement.style.width = "2px";
 	}
 	this.DrawTarget      = function()
 	{
@@ -5779,11 +5832,6 @@ function CNotesDrawer(page)
 			oThis.HtmlPage.m_oScrollNotes_.scrollByY(scrollYVal, false);
 			oThis.onMouseMove();
 		}
-	};
-
-	this.onUpdateTarget = function ()
-	{
-
 	};
 
 	this.OnResize = function ()
