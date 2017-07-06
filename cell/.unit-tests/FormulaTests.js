@@ -1180,6 +1180,28 @@ $( function () {
 	} );
 
 	test( "Test: \"CHIDIST\"", function () {
+		ws.getRange2( "A2" ).setValue( "58" );
+		ws.getRange2( "A3" ).setValue( "11" );
+		ws.getRange2( "A4" ).setValue( "10" );
+		ws.getRange2( "A5" ).setValue( "x" );
+		ws.getRange2( "A6" ).setValue( "45.35" );
+		ws.getRange2( "A7" ).setValue( "17.56" );
+		ws.getRange2( "A8" ).setValue( "16.09" );
+
+		ws.getRange2( "B2" ).setValue( "35" );
+		ws.getRange2( "B3" ).setValue( "25" );
+		ws.getRange2( "B4" ).setValue( "23" );
+		ws.getRange2( "B5" ).setValue( "x" );
+		ws.getRange2( "B6" ).setValue( "47.65" );
+		ws.getRange2( "B7" ).setValue( "18.44" );
+		ws.getRange2( "B8" ).setValue( "16.91" );
+
+		oParser = new parserFormula( "CHITEST(A2:B4,A6:B8)", "A1", ws );
+		ok( oParser.parse(), "CHITEST(A2:B4,A6:B8)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0003082, "CHITEST(A2:B4,A6:B8)" );
+	} );
+
+	test( "Test: \"CHITEST\"", function () {
 		ws.getRange2( "A2" ).setValue( "18.307" );
 		ws.getRange2( "A3" ).setValue( "10" );
 
