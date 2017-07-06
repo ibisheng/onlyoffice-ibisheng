@@ -3375,7 +3375,10 @@ CPresentation.prototype =
         editor.sync_MouseMoveStartCallback();
         this.CurPage = PageIndex;
         this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.onMouseMove(e, X, Y);
+        var bOldFocus = this.FocusOnNotes;
+        this.FocusOnNotes = false;
         this.UpdateCursorType(X, Y,  e );
+        this.FocusOnNotes = bOldFocus;
         editor.sync_MouseMoveEndCallback();
     },
 
@@ -3390,7 +3393,19 @@ CPresentation.prototype =
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             if(bFocusOnSlide){
+                var bNeedRedraw = false;
+                if(AscFormat.checkEmptyPlaceholderContent(oCurSlide.graphicObjects.getTargetDocContent(false, false))){
+                    bNeedRedraw = true;
+                }
                 oCurSlide.graphicObjects.resetSelection(true, false);
+                oCurSlide.graphicObjects.clearPreTrackObjects();
+                oCurSlide.graphicObjects.clearTrackObjects();
+                oCurSlide.graphicObjects.changeCurrentState(new AscFormat.NullState(oCurSlide.graphicObjects));
+                if(bNeedRedraw){
+                    this.DrawingDocument.OnRecalculatePage(this.CurPage, oCurSlide);
+                    this.DrawingDocument.OnEndRecalculate();
+                }
+
             }
             if(oCurSlide.notesShape){
                 oCurSlide.notesShape.selectionSetStart(e, X, Y, 0);
@@ -4223,7 +4238,6 @@ CPresentation.prototype =
                     oSlide.graphicObjects.resetSelection();
                     oSlide.graphicObjects.clearPreTrackObjects();
                     oSlide.graphicObjects.clearTrackObjects();
-                    oSlide.graphicObjects.resetSelection();
                     oSlide.graphicObjects.changeCurrentState(new AscFormat.NullState(oSlide.graphicObjects));
                     if(oSlide.notes){
                         this.FocusOnNotes = true;
