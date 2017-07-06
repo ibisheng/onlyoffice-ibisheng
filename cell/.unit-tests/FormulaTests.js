@@ -3212,6 +3212,26 @@ $( function () {
 
 	} );
 
+	test( "Test: \"COVARIANCE.S\"", function () {
+
+		ws.getRange2( "AAA1" ).setValue( "2" );
+		ws.getRange2( "AAA2" ).setValue( "4" );
+		ws.getRange2( "AAA3" ).setValue( "8" );
+
+		ws.getRange2( "BBB1" ).setValue( "5" );
+		ws.getRange2( "BBB2" ).setValue( "11" );
+		ws.getRange2( "BBB3" ).setValue( "12" );
+
+		oParser = new parserFormula( "COVARIANCE.S({2,4,8},{5,11,12})", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual(oParser.calculate().getValue().toFixed(9) - 0, 9.666666667 );
+
+		oParser = new parserFormula( "COVARIANCE.S(AAA1:AAA3,BBB1:BBB3)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual(oParser.calculate().getValue().toFixed(9) - 0, 9.666666667 );
+
+	} );
+
     test( "Test: \"CRITBINOM\"", function () {
 
         oParser = new parserFormula( "CRITBINOM(6,0.5,0.75)", "A1", ws );
