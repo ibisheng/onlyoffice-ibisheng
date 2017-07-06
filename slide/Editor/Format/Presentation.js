@@ -3769,6 +3769,9 @@ CPresentation.prototype =
 
             {
                 var graphic_objects = this.GetCurrentController();
+                if(!graphic_objects){
+                    editor.sync_EndCatchSelectedElements();
+                }
                 var target_content = graphic_objects.getTargetDocContent(undefined, true), drawing_props = graphic_objects.getDrawingProps(), i;
                 var para_pr = graphic_objects.getParagraphParaPr(), text_pr = graphic_objects.getParagraphTextPr();
                 var flag = undefined;
@@ -4466,6 +4469,7 @@ CPresentation.prototype =
             this.CurPage = las_slide_index + 1;
             this.bGoToPage = true;
             this.bNeedUpdateTh = true;
+            this.FocusOnNotes = false;
 
         }
         else if(this.Slides[this.CurPage])
