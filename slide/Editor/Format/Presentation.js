@@ -3789,6 +3789,7 @@ CPresentation.prototype =
                 var graphic_objects = this.GetCurrentController();
                 if(!graphic_objects){
                     editor.sync_EndCatchSelectedElements();
+                    return;
                 }
                 var target_content = graphic_objects.getTargetDocContent(undefined, true), drawing_props = graphic_objects.getDrawingProps(), i;
                 var para_pr = graphic_objects.getParagraphParaPr(), text_pr = graphic_objects.getParagraphTextPr();
@@ -4133,7 +4134,22 @@ CPresentation.prototype =
 
     resetStateCurSlide: function()
     {
-        this.Slides[this.CurPage] && this.Slides[this.CurPage].graphicObjects.resetSelection();
+        var oCurSlide = this.Slides[this.CurPage];
+        if(oCurSlide){
+            var bNeedRedraw = false;
+            if(AscFormat.checkEmptyPlaceholderContent(oCurSlide.graphicObjects.getTargetDocContent(false, false))){
+                bNeedRedraw = true;
+            }
+            oCurSlide.graphicObjects.resetSelection(true, false);
+            oCurSlide.graphicObjects.clearPreTrackObjects();
+            oCurSlide.graphicObjects.clearTrackObjects();
+            oCurSlide.graphicObjects.changeCurrentState(new AscFormat.NullState(oCurSlide.graphicObjects));
+            if(bNeedRedraw){
+                this.DrawingDocument.OnRecalculatePage(this.CurPage, oCurSlide);
+                this.DrawingDocument.OnEndRecalculate();
+            }
+        }
+
     },
 
 
