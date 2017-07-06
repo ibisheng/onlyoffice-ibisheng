@@ -1790,9 +1790,6 @@ function CEditorPage(api)
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
 
-		if (!oThis.m_oDrawingDocument.TargetHtmlElementOnSlide)
-			return oThis.m_oNotesApi.onMouseMove(e);
-
 		var oWordControl = oThis;
 
 		if (e.preventDefault)
@@ -1841,9 +1838,6 @@ function CEditorPage(api)
 
 		if (false === oThis.m_oApi.bInit_word_control)
 			return;
-
-		if (!oThis.m_oDrawingDocument.TargetHtmlElementOnSlide)
-			return oThis.m_oNotesApi.onMouseUp(e);
 
 		var oWordControl = oThis;
 		if (!global_mouseEvent.IsLocked)
