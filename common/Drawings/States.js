@@ -107,14 +107,15 @@ StartAddNewShape.prototype =
 
                 if(oResult){
                     var oObject = AscCommon.g_oTableId.Get_ById(oResult.objectId);
-                    if(oObject.getObjectType() === AscDFH.historyitem_type_Shape){
-                        this.drawingObjects.connector = oObject;
-                    }
+                    this.drawingObjects.connector = oObject;
                 }
                 if(this.drawingObjects.connector !== this.oldConnector){
+                    this.oldConnector = this.drawingObjects.connector;
                     this.drawingObjects.updateOverlay();
                 }
-                this.oldConnector = this.drawingObjects.connector;
+                else{
+                    this.oldConnector = this.drawingObjects.connector;
+                }
             }
         }
     },
