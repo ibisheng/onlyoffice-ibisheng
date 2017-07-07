@@ -985,6 +985,33 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.027322, "T.DIST.RT(A2,A3)" );
 	} );
 
+	test( "Test: \"TTEST\"", function () {
+		ws.getRange2( "A2" ).setValue( "3" );
+		ws.getRange2( "A3" ).setValue( "4" );
+		ws.getRange2( "A4" ).setValue( "5" );
+		ws.getRange2( "A5" ).setValue( "8" );
+		ws.getRange2( "A6" ).setValue( "9" );
+		ws.getRange2( "A7" ).setValue( "1" );
+		ws.getRange2( "A8" ).setValue( "2" );
+		ws.getRange2( "A9" ).setValue( "4" );
+		ws.getRange2( "A10" ).setValue( "5" );
+
+		ws.getRange2( "B2" ).setValue( "6" );
+		ws.getRange2( "B3" ).setValue( "19" );
+		ws.getRange2( "B4" ).setValue( "3" );
+		ws.getRange2( "B5" ).setValue( "2" );
+		ws.getRange2( "B6" ).setValue( "14" );
+		ws.getRange2( "B7" ).setValue( "4" );
+		ws.getRange2( "B8" ).setValue( "5" );
+		ws.getRange2( "B9" ).setValue( "17" );
+		ws.getRange2( "B10" ).setValue( "1" );
+
+	    oParser = new parserFormula( "TTEST(A2:A10,B2:B10,2,1)", "A1", ws );
+		ok( oParser.parse(), "TTEST(A2:A10,B2:B10,2,1)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.196016, "TTEST(A2:A10,B2:B10,2,1)" );
+	} );
+
+
 	test( "Test: \"F.DIST\"", function () {
 		ws.getRange2( "A2" ).setValue( "15.2069" );
 		ws.getRange2( "A3" ).setValue( "6" );
