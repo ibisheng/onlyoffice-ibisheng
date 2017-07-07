@@ -3738,7 +3738,13 @@ CPresentation.prototype =
                      }*/
                 }
                 else{
-                    this.Api.sendEvent("asc_onTextLanguage", this.Get_DefaultLanguage());
+                    if(text_pr){
+                        var lang = text_pr && text_pr.Lang.Val ? text_pr.Lang.Val :  this.Get_DefaultLanguage();
+                        this.Api.sendEvent("asc_onTextLanguage", lang);
+                    }
+                    else{
+                        this.Api.sendEvent("asc_onTextLanguage", this.Get_DefaultLanguage());
+                    }
                 }
             }
         }
