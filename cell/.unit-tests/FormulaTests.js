@@ -1037,6 +1037,36 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 0.19602, "T.TEST(A2:A10,B2:B10,2,1)" );
 	} );
 
+	test( "Test: \"ZTEST\"", function () {
+		ws.getRange2( "A2" ).setValue( "3" );
+		ws.getRange2( "A3" ).setValue( "6" );
+		ws.getRange2( "A4" ).setValue( "7" );
+		ws.getRange2( "A5" ).setValue( "8" );
+		ws.getRange2( "A6" ).setValue( "6" );
+		ws.getRange2( "A7" ).setValue( "5" );
+		ws.getRange2( "A8" ).setValue( "4" );
+		ws.getRange2( "A9" ).setValue( "2" );
+		ws.getRange2( "A10" ).setValue( "1" );
+		ws.getRange2( "A11" ).setValue( "9" );
+
+		oParser = new parserFormula( "ZTEST(A2:A11,4)", "A1", ws );
+		ok( oParser.parse(), "ZTEST(A2:A11,4)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.090574, "ZTEST(A2:A11,4)" );
+
+		oParser = new parserFormula( "2 * MIN(ZTEST(A2:A11,4), 1 - ZTEST(A2:A11,4))", "A1", ws );
+		ok( oParser.parse(), "2 * MIN(ZTEST(A2:A11,4), 1 - ZTEST(A2:A11,4))" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.181148, "2 * MIN(ZTEST(A2:A11,4), 1 - ZTEST(A2:A11,4))" );
+
+		oParser = new parserFormula( "ZTEST(A2:A11,6)", "A1", ws );
+		ok( oParser.parse(), "ZTEST(A2:A11,6)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.863043, "ZTEST(A2:A11,6)" );
+
+		oParser = new parserFormula( "2 * MIN(ZTEST(A2:A11,6), 1 - ZTEST(A2:A11,6))", "A1", ws );
+		ok( oParser.parse(), "2 * MIN(ZTEST(A2:A11,6), 1 - ZTEST(A2:A11,6))" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.273913, "2 * MIN(ZTEST(A2:A11,6), 1 - ZTEST(A2:A11,6))" );
+	} );
+
+
 
 	test( "Test: \"F.DIST\"", function () {
 		ws.getRange2( "A2" ).setValue( "15.2069" );
