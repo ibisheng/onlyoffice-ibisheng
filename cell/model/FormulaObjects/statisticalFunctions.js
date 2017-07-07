@@ -77,7 +77,7 @@
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
-		cTRIMMEAN, cWEIBULL, cZTEST);
+		cTRIMMEAN, cWEIBULL);
 
 	function isInteger(value) {
 		return typeof value === 'number' && isFinite(value) && 	Math.floor(value) === value;
@@ -8021,11 +8021,88 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cZTEST() {
-		cBaseFunction.call(this, "ZTEST");
+		this.name = "ZTEST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cZTEST.prototype = Object.create(cBaseFunction.prototype);
 	cZTEST.prototype.constructor = cZTEST;
+	cZTEST.prototype.argumentsMin = 2;
+	cZTEST.prototype.argumentsMax = 3;
+	cZTEST.prototype.Calculate = function (arg) {
+
+		var arg2 = arg[2] ? [arg[0], arg[1], arg[2]] : [arg[0], arg[1]];
+		//если первое или второе значение строка
+		if(cElementType.string === arg[0].type || cElementType.bool === arg[0].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		//если первое или второе значение число
+		if(cElementType.number === arg[0].type){
+			arg2[0] = new cArray();
+			arg2[0].addElement(arg[0]);
+		}
+
+		var oArguments = this._prepareArguments(arg2, arguments[1], true, [cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new AscCommonExcel.cUndefined();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function calcZTest(argArray) {
+
+			var arg0 = argArray[0];
+			var x = argArray[1];
+			var sigma = argArray[2];
+
+			if ( sigma !== undefined && sigma <= 0 ){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var nC1 = arg0.length;
+			var nR1 = arg0[0].length;
+
+			var fSum    = 0.0;
+			var fSumSqr = 0.0;
+			var fVal;
+			var rValCount = 0.0;
+			for (var i = 0; i < nC1; i++){
+				for (var j = 0; j < nR1; j++){
+					if(cElementType.number !== arg0[i][j].type || cElementType.number !== arg0[i][j].type){
+						continue;
+					}
+
+					fVal = arg0[i][j].getValue();
+					fSum += fVal;
+					fSumSqr += fVal*fVal;
+					rValCount++;
+				}
+			}
+
+			var res;
+			if (rValCount <= 1.0){
+				return  new cError(cErrorType.division_by_zero);
+			}else{
+				var mue = fSum / rValCount;
+
+				if (undefined === sigma){
+					sigma = (fSumSqr - fSum * fSum / rValCount) / (rValCount - 1.0);
+					res = 0.5 - gauss((mue - x) / Math.sqrt(sigma / rValCount));
+				}else{
+					res = 0.5 - gauss((mue - x) * Math.sqrt(rValCount) / sigma);
+				}
+			}
+
+			return new cNumber(res);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcZTest);
+	};
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
