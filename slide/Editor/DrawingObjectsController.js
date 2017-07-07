@@ -47,7 +47,7 @@ DrawingObjectsController.prototype.getTheme = function()
 
 DrawingObjectsController.prototype.getDrawingArray = function()
 {
-    return this.drawingObjects.cSld.spTree;
+    return this.drawingObjects.getDrawingsForController();
 };
 
 DrawingObjectsController.prototype.recalculateCurPos = function(){

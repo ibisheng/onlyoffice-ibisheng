@@ -256,6 +256,29 @@
         return oBodyShape.isEmptyPlaceholder();
     };
 
+    CNotes.prototype.showDrawingObjects = function(){
+        if(this.slide){
+            editor.WordControl.m_oDrawingDocument.Notes_OnRecalculate(this.slide.num, this.slide.NotesWidth, this.slide.getNotesHeight());
+        }
+    };
+
+    CNotes.prototype.OnUpdateOverlay = function()
+    {
+        editor.WordControl.OnUpdateOverlay();
+    };
+    CNotes.prototype.getDrawingsForController = function()
+    {
+        var _ret = [];
+        var oBodyShape = this.getBodyShape();
+        if(oBodyShape){
+            _ret.push(oBodyShape);
+        }
+        return _ret;
+    };
+    CNotes.prototype.sendGraphicObjectProps = function()
+    {
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    };
 
     function CreateNotes(){
         var oN = new CNotes();

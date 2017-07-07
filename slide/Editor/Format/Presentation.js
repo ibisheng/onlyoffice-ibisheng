@@ -3331,18 +3331,11 @@ CPresentation.prototype =
         this.CurPage = PageIndex;
         e.ctrlKey = e.CtrlKey;
         e.shiftKey = e.ShiftKey;
-       //if(e.Button === 0)
+        var ret = this.Slides[this.CurPage].graphicObjects.onMouseDown(e, X, Y);
+        if(!ret)
         {
-            var ret = this.Slides[this.CurPage].graphicObjects.onMouseDown(e, X, Y);
-            if(!ret)
-            {
-                this.Document_UpdateSelectionState();
-            }
+            this.Document_UpdateSelectionState();
         }
-        //else if(e.Button === 2 && this.viewMode === false )
-        //{
-        //    this.Slides[this.CurPage].graphicObjects.onMouseDown2(e, X, Y);
-        //}
         this.Document_UpdateInterfaceState();
     },
 
@@ -3410,9 +3403,12 @@ CPresentation.prototype =
                 }
 
             }
-            if(oCurSlide.notesShape){
-                oCurSlide.notesShape.selectionSetStart(e, X, Y, 0);
-                if(e.ClickCount < 2){
+            if(oCurSlide.notes){
+                e.ctrlKey = e.CtrlKey;
+                e.shiftKey = e.ShiftKey;
+                var ret = oCurSlide.notes.graphicObjects.onMouseDown(e, X, Y);
+                if(!ret)
+                {
                     this.Document_UpdateSelectionState();
                 }
                 this.Document_UpdateInterfaceState();
@@ -3423,13 +3419,22 @@ CPresentation.prototype =
     Notes_OnMouseUp : function(e, X, Y)
     {
         var oCurSlide = this.Slides[this.CurPage];
-        if(oCurSlide){
-            if(oCurSlide.notesShape){
-                oCurSlide.notesShape.selectionSetEnd(e, X, Y, 0);
-                this.Document_UpdateSelectionState();
-                this.Document_UpdateInterfaceState();
-                this.Api.sendEvent("asc_onSelectionEnd");
+        if(oCurSlide && oCurSlide.notes){
+            e.ctrlKey = e.CtrlKey;
+            e.shiftKey = e.ShiftKey;
+            oCurSlide.notes.graphicObjects.onMouseUp(e, X, Y);
+            if(e.Button === AscCommon.g_mouse_button_right && !this.noShowContextMenu)
+            {
+                var ContextData = new AscCommonSlide.CContextMenuData();
+                var ConvertedPos = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, this.CurPage );
+                ContextData.X_abs = ConvertedPos.X;
+                ContextData.Y_abs = ConvertedPos.Y;
+                ContextData.IsSlideSelect = false;
+                editor.sync_ContextMenuCallback( ContextData );
             }
+            this.noShowContextMenu = false;
+            this.Document_UpdateInterfaceState();
+            this.Api.sendEvent("asc_onSelectionEnd");
         }
     },
 
@@ -3437,13 +3442,16 @@ CPresentation.prototype =
     {
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
-            if(oCurSlide.notesShape){
-                if(e.IsLocked){
-                    oCurSlide.notesShape.selectionSetEnd(e, X, Y, 0);
-                    this.Document_UpdateSelectionState();
-                    this.UpdateCursorType(X, Y,  e );
-                    editor.sync_MouseMoveEndCallback();
-                }
+            if(oCurSlide.notes){
+                e.ctrlKey = e.CtrlKey;
+                e.shiftKey = e.ShiftKey;
+                editor.sync_MouseMoveStartCallback();
+                oCurSlide.notes.graphicObjects.onMouseMove(e, X, Y);
+                var bOldFocus = this.FocusOnNotes;
+                this.FocusOnNotes = true;
+                this.UpdateCursorType(X, Y,  e );
+                this.FocusOnNotes = bOldFocus;
+                editor.sync_MouseMoveEndCallback();
             }
         }
     },

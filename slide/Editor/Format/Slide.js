@@ -1060,6 +1060,8 @@ Slide.prototype =
                     var Width = AscCommonSlide.GetNotesWidth();
                     oDocContent.Reset(0, 0, Width, 2000);
                     oDocContent.Recalculate_Page(0, true);
+                    this.notesShape.contentWidth = Width;
+                    this.notesShape.contentHeight = 2000;
                 }
             }
         }, this, []);
@@ -1427,6 +1429,10 @@ Slide.prototype =
                 spTree[i].Restart_CheckSpelling();
             }
         }
+    },
+
+    getDrawingsForController: function(){
+        return this.cSld.spTree;
     }
 };
 
