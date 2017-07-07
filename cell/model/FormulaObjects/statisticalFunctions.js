@@ -72,8 +72,8 @@
 		cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPOISSON,
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
 		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
-		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA,
-		cWEIBULL, cZTEST);
+		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S,
+		cVARPA, cWEIBULL, cZTEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
@@ -7546,6 +7546,19 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcTTest);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cTTEST}
+	 */
+	function cT_TEST() {
+		cTTEST.call(this);
+		this.name = "T.TEST";
+	}
+
+	cT_TEST.prototype = Object.create(cTTEST.prototype);
+	cT_TEST.prototype.constructor = cT_TEST;
+	cT_TEST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
