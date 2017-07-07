@@ -77,7 +77,7 @@
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
-		cTRIMMEAN, cTTEST, cWEIBULL, cZTEST);
+		cTRIMMEAN, cWEIBULL, cZTEST);
 
 	function isInteger(value) {
 		return typeof value === 'number' && isFinite(value) && 	Math.floor(value) === value;
@@ -720,6 +720,133 @@
 
 		var res = getChiDist(fChi, fDF);
 		return  null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+	}
+
+	function tTest(pMat1, pMat2, fTails, fTyp){
+		var fT, fF;
+		var nC1 = pMat1.length;
+		var nC2 = pMat2.length;
+		var nR1 = pMat1[0].length;
+		var nR2 = pMat2[0].length;
+
+		var calcTest = null;
+		if (fTyp === 1.0){
+			if (nC1 !== nC2 || nR1 !== nR2){
+				return new cError(cErrorType.not_available);
+			}
+
+			var fCount   = 0.0;
+			var fSum1    = 0.0;
+			var fSum2    = 0.0;
+			var fSumSqrD = 0.0;
+			var fVal1, fVal2;
+			for (var i = 0; i < nC1; i++){
+				for (var j = 0; j < nR1; j++){
+					if(cElementType.number !== pMat1[i][j].type || cElementType.number !== pMat2[i][j].type){
+						continue;
+					}
+
+					fVal1 = pMat1[i][j].getValue();
+					fVal2 = pMat2[i][j].getValue();
+					fSum1    += fVal1;
+					fSum2    += fVal2;
+					fSumSqrD += (fVal1 - fVal2)*(fVal1 - fVal2);
+					fCount++;
+				}
+			}
+
+			if (fCount < 1.0){
+				return new cError(cErrorType.wrong_value_type);
+			}
+			var fSumD = fSum1 - fSum2;
+			var fDivider = (fCount*fSumSqrD - fSumD*fSumD);
+			if ( fDivider === 0.0 ){
+				return new cError(cErrorType.division_by_zero);
+			}
+
+			fT = Math.abs(fSumD) * Math.sqrt((fCount-1.0) / fDivider);
+			fF = fCount - 1.0;
+		}
+		else if (fTyp === 2.0){
+			calcTest = CalculateTest(false, nC1, nC2, nR1, nR2, pMat1, pMat2, fT, fF);
+		}
+		else if (fTyp === 3.0){
+			calcTest = CalculateTest(true, nC1, nC2, nR1, nR2, pMat1, pMat2, fT, fF);
+		}else{
+			return new cError(cErrorType.not_numeric);
+		}
+
+		if(null !== calcTest){
+			if(false === calcTest){
+				return new cError(cErrorType.wrong_value_type);
+			}else{
+				fT = calcTest.fT;
+				fF = calcTest.fF;
+			}
+		}
+
+		var res = getTDist(fT, fF, fTails);
+		return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+	}
+
+	function CalculateTest( bTemplin, nC1, nC2, nR1, nR2, pMat1, pMat2 , fT, fF)
+	{
+		var fCount1  = 0.0;
+		var fCount2  = 0.0;
+		var fSum1    = 0.0;
+		var fSumSqr1 = 0.0;
+		var fSum2    = 0.0;
+		var fSumSqr2 = 0.0;
+		var fVal;
+
+		for (var i = 0; i < nC1; i++){
+			for (var j = 0; j < nR1; j++)
+			{
+				if (cElementType.string !== pMat1[i][j].type)
+				{
+					fVal = pMat1[i][j].getValue();
+					fSum1    += fVal;
+					fSumSqr1 += fVal * fVal;
+					fCount1++;
+				}
+			}
+		}
+
+		for (var i = 0; i < nC2; i++){
+			for (var j = 0; j < nR2; j++)
+			{
+				if (cElementType.string !== pMat2[i][j].type)
+				{
+					fVal = pMat2[i][j].getValue();
+					fSum2    += fVal;
+					fSumSqr2 += fVal * fVal;
+					fCount2++;
+				}
+			}
+		}
+
+		if (fCount1 < 2.0 || fCount2 < 2.0){
+			return false;
+		}
+		if ( bTemplin ){
+			var fS1 = (fSumSqr1 - fSum1 * fSum1 / fCount1) / (fCount1 - 1.0) / fCount1;
+			var fS2 = (fSumSqr2 - fSum2 * fSum2 / fCount2) / (fCount2 - 1.0) / fCount2;
+			if (fS1 + fS2 === 0.0){
+				return false;
+			}
+
+			var c = fS1 / (fS1 + fS2);
+			fT = Math.abs(fSum1 / fCount1 - fSum2 / fCount2) / Math.sqrt(fS1 + fS2);
+			fF = 1.0 / (c * c / (fCount1 - 1.0) + (1.0 - c) * (1.0 - c) / (fCount2 - 1.0));
+		}else{
+			var fS1 = (fSumSqr1 - fSum1 * fSum1 / fCount1) / (fCount1 - 1.0);
+			var fS2 = (fSumSqr2 - fSum2 * fSum2 / fCount2) / (fCount2 - 1.0);
+
+			fT = Math.abs( fSum1 / fCount1 - fSum2 / fCount2 ) / Math.sqrt( (fCount1-1.0)*fS1 + (fCount2-1.0)*fS2 ) * Math.sqrt( fCount1*fCount2*(fCount1+fCount2-2)/(fCount1+fCount2) );
+			fF = fCount1 + fCount2 - 2;
+		}
+
+		return {fT: fT, fF: fF};
 	}
 
 	//BETA DISTRIBUTION
@@ -7364,11 +7491,61 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTTEST() {
-		cBaseFunction.call(this, "TTEST");
+		this.name = "TTEST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cTTEST.prototype = Object.create(cBaseFunction.prototype);
 	cTTEST.prototype.constructor = cTTEST;
+	cTTEST.prototype.argumentsMin = 4;
+	cTTEST.prototype.argumentsMax = 4;
+	cTTEST.prototype.Calculate = function (arg) {
+
+		var arg2 = [arg[0], arg[1], arg[2], arg[3]];
+		//если первое или второе значение строка
+		if(cElementType.string === arg[0].type || cElementType.bool === arg[0].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		if(cElementType.string === arg[1].type || cElementType.bool === arg[1].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		//если первое или второе значение число
+		if(cElementType.number === arg[0].type){
+			arg2[0] = new cArray();
+			arg2[0].addElement(arg[0]);
+		}
+		if(cElementType.number === arg[1].type){
+			arg2[1] = new cArray();
+			arg2[1].addElement(arg[1]);
+		}
+
+		var oArguments = this._prepareArguments(arg2, arguments[1], true, [cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();//bool
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTTest = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+			var arg2 = parseInt(argArray[2]);
+			var arg3 = parseInt(argArray[3]);
+
+			if(!(arg2 === 1 || arg2 === 2)){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return tTest(arg0, arg1, arg2, arg3);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTTest);
+	};
 
 	/**
 	 * @constructor
