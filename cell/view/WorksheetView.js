@@ -11129,13 +11129,14 @@
 			.replace(/(\+)/g, "\\+").replace(/(\[)/g, "\\[")
 			.replace(/(\])/g, "\\]").replace(/(\{)/g, "\\{")
 			.replace(/(\})/g, "\\}").replace(/(\$)/g, "\\$")
+			.replace(/(\.)/g, "\\.")
 			.replace(/(~)?\*/g, function ($0, $1) {
 				return $1 ? $0 : '(.*)';
 			})
 			.replace(/(~)?\?/g, function ($0, $1) {
 				return $1 ? $0 : '.';
 			})
-			.replace(/(~\*)/g, "\\*").replace(/(~\?)/g, "\\?").replace(/(\.)/g, "\\.");
+			.replace(/(~\*)/g, "\\*").replace(/(~\?)/g, "\\?");
 		valueForSearching = new RegExp(valueForSearching, findFlags);
 
 		options.indexInArray = 0;
