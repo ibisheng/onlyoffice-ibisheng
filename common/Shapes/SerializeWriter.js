@@ -507,7 +507,7 @@ function CBinaryFileWriter()
         for (var i = 0; i < _slide_count; i++)
         {
             _dst_slides[i] = _slides[i];
-            if(_slides[i].notes)
+            if(_slides[i].notes && !_slides[i].notes.isEmptyBody())
             {
                 _dst_notes.push(_slides[i].notes);
             }

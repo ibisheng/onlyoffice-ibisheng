@@ -2038,8 +2038,8 @@ CPresentation.prototype =
             }
             if(this.FocusOnNotes){
                 var oCurSlide = this.Slides[this.CurPage];
-                if(oCurSlide.notesShape){
-                    oCurSlide.notesShape.paragraphAdd(ParaItem, bRecalculate);
+                if(oCurSlide.notes){
+                    oCurSlide.notes.graphicObjects.paragraphAdd(ParaItem, bRecalculate);
                     bRecalculate = false;
                 }
             }
@@ -2639,7 +2639,7 @@ CPresentation.prototype =
                 var oTargetTextObject = AscFormat.getTargetTextObject(oDrawingObjects);
 
                 var bNeedRedraw;
-                if(oTargetTextObject && oTargetTextObject.isEmptyPlaceholder && oTargetTextObject.isEmptyPlaceholder())
+                if(oTargetTextObject.isEmptyPlaceholder())
                 {
                     bNeedRedraw = true;
                 }
@@ -5045,7 +5045,7 @@ CPresentation.prototype =
                 slide.setLayout(layout);
                 for(var j = slide.cSld.spTree.length-1; j  > -1 ; --j)
                 {
-                    if(slide.cSld.spTree[j].isEmptyPlaceholder && slide.cSld.spTree[j].isEmptyPlaceholder())
+                    if(slide.cSld.spTree[j].isEmptyPlaceholder())
                     {
                         slide.removeFromSpTreeById(slide.cSld.spTree[j].Get_Id());
                     }

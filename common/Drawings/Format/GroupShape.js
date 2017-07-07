@@ -1200,11 +1200,6 @@ function CGroupShape()
         return null;
     };
 
-    CGroupShape.prototype.isEmptyPlaceholder = function ()
-    {
-        return false;
-    };
-
     CGroupShape.prototype.getCompiledFill = function()
     {
         this.compiledFill = null;

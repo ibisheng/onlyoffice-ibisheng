@@ -853,6 +853,10 @@
     {
         return 1;
     };
+    CGraphicObjectBase.prototype.isEmptyPlaceholder = function()
+    {
+        return false;
+    };
 
     CGraphicObjectBase.prototype.Restart_CheckSpelling = function()
     {

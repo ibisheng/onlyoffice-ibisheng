@@ -161,6 +161,7 @@
         oNM.changeBackground(oBG);
 
         var oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         var oNvSpPr = new AscFormat.UniNvPr();
         var oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(2);
@@ -173,8 +174,8 @@
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
         oSp.setSpPr(new AscFormat.CSpPr());
         oSp.spPr.setParent(oSp);
-        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.setXfrm(new AscFormat.CXfrm());
+        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.xfrm.setOffX(0);
         oSp.spPr.xfrm.setOffY(0);
         oSp.spPr.xfrm.setExtX(2971800/36000);
@@ -202,6 +203,7 @@
         //endParaPr
 
         oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         oNvSpPr = new AscFormat.UniNvPr();
         oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(3);
@@ -214,8 +216,8 @@
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
         oSp.setSpPr(new AscFormat.CSpPr());
         oSp.spPr.setParent(oSp);
-        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.setXfrm(new AscFormat.CXfrm());
+        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.xfrm.setOffX(3884613/36000);
         oSp.spPr.xfrm.setOffY(0);
         oSp.spPr.xfrm.setExtX(2971800/36000);
@@ -243,6 +245,7 @@
         oNM.addToSpTreeToPos(1, oSp);
 
         oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         oNvSpPr = new AscFormat.UniNvPr();
         oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(3);
@@ -255,8 +258,8 @@
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
         oSp.setSpPr(new AscFormat.CSpPr());
         oSp.spPr.setParent(oSp);
-        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.setXfrm(new AscFormat.CXfrm());
+        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.xfrm.setOffX(3884613/36000);
         oSp.spPr.xfrm.setOffY(0);
         oSp.spPr.xfrm.setExtX(2971800/36000);
@@ -284,6 +287,7 @@
         oNM.addToSpTreeToPos(2, oSp);
 
         oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         oNvSpPr = new AscFormat.UniNvPr();
         oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(5);
@@ -297,8 +301,8 @@
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
         oSp.setSpPr(new AscFormat.CSpPr());
         oSp.spPr.setParent(oSp);
-        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.setXfrm(new AscFormat.CXfrm());
+        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.xfrm.setOffX(685800/36000);
         oSp.spPr.xfrm.setOffY(4400550/36000);
         oSp.spPr.xfrm.setExtX(5486400/36000);
@@ -322,6 +326,7 @@
         oNM.addToSpTreeToPos(3, oSp);
 
         oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         oNvSpPr = new AscFormat.UniNvPr();
         oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(6);
@@ -335,8 +340,8 @@
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
         oSp.setSpPr(new AscFormat.CSpPr());
         oSp.spPr.setParent(oSp);
-        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.setXfrm(new AscFormat.CXfrm());
+        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.xfrm.setOffX(0);
         oSp.spPr.xfrm.setOffY(8685213/36000);
         oSp.spPr.xfrm.setExtX(2971800/36000);
@@ -364,6 +369,7 @@
         oNM.addToSpTreeToPos(4, oSp);
 
         oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         oNvSpPr = new AscFormat.UniNvPr();
         oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(7);
@@ -377,8 +383,8 @@
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
         oSp.setSpPr(new AscFormat.CSpPr());
         oSp.spPr.setParent(oSp);
-        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.setXfrm(new AscFormat.CXfrm());
+        oSp.spPr.xfrm.setParent(oSp.spPr);
         oSp.spPr.xfrm.setOffX(3884613/36000);
         oSp.spPr.xfrm.setOffY(8685213/36000);
         oSp.spPr.xfrm.setExtX(2971800/36000);
@@ -430,9 +436,9 @@
         oTxLstStyle.levels[0].DefaultRunPr.FontSize = 12;
         oTxLstStyle.levels[0].DefaultRunPr.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(15, 0);
 
-        oTxLstStyle.levels[0].DefaultRunPr.RFonts.Ascii.Name = "+mn-lt";
-        oTxLstStyle.levels[0].DefaultRunPr.RFonts.EastAsia.Name = "+mn-ea";
-        oTxLstStyle.levels[0].DefaultRunPr.RFonts.CS.Name = "+mn-cd";
+        oTxLstStyle.levels[0].DefaultRunPr.RFonts.Ascii = {Name :"+mn-lt", Index: -1};
+        oTxLstStyle.levels[0].DefaultRunPr.RFonts.EastAsia =  {Name :"+mn-ea", Index: -1};
+        oTxLstStyle.levels[0].DefaultRunPr.RFonts.CS  = {Name :"+mn-cs", Index: -1};
 
         oTxLstStyle.levels[1] = oTxLstStyle.levels[0].Copy();
         oTxLstStyle.levels[1].Ind.Left = 457200/36000;

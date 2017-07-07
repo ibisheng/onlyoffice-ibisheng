@@ -248,9 +248,19 @@
     };
 
 
+    CNotes.prototype.isEmptyBody = function(){
+        var oBodyShape = this.getBodyShape();
+        if(!oBodyShape){
+            return true;
+        }
+        return oBodyShape.isEmptyPlaceholder();
+    };
+
+
     function CreateNotes(){
         var oN = new CNotes();
         var oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         var oNvSpPr = new AscFormat.UniNvPr();
         var oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(2);
@@ -268,6 +278,7 @@
         oN.addToSpTreeToPos(0, oSp);
 
         oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         oNvSpPr = new AscFormat.UniNvPr();
         oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(3);
@@ -289,6 +300,7 @@
         oN.addToSpTreeToPos(1, oSp);
 
         oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         oNvSpPr = new AscFormat.UniNvPr();
         oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(4);
