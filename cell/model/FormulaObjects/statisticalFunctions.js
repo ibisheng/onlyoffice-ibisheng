@@ -73,7 +73,7 @@
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
 		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
 		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S,
-		cVARPA, cWEIBULL, cZTEST);
+		cVARPA, cWEIBULL, cZTEST, cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
@@ -8103,6 +8103,19 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcZTest);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cZTEST}
+	 */
+	function cZ_TEST() {
+		cZTEST.call(this);
+		this.name = "Z.TEST";
+	}
+
+	cZ_TEST.prototype = Object.create(cZTEST.prototype);
+	cZ_TEST.prototype.constructor = cZ_TEST;
+	cZ_TEST.prototype.isXLFN = true;
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
