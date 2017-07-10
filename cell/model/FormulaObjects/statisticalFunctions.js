@@ -76,8 +76,7 @@
 		cVARPA, cWEIBULL, cZTEST, cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
-		cWEIBULL);
+	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
 
 	function isInteger(value) {
 		return typeof value === 'number' && isFinite(value) && 	Math.floor(value) === value;
@@ -8077,11 +8076,49 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEIBULL() {
-		cBaseFunction.call(this, "WEIBULL");
+		this.name = "WEIBULL";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cWEIBULL.prototype = Object.create(cBaseFunction.prototype);
 	cWEIBULL.prototype.constructor = cWEIBULL;
+	cWEIBULL.prototype.argumentsMin = 4;
+	cWEIBULL.prototype.argumentsMax = 4;
+	cWEIBULL.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcWeibull = function(argArray){
+			var x = argArray[0];
+			var alpha = argArray[1];
+			var beta = argArray[2];
+			var kum = argArray[3];
+
+			var res;
+			if (alpha <= 0 || beta <= 0 || x < 0){
+				return  new cError(cErrorType.not_numeric);
+			} else if (kum === 0){
+				res = alpha / Math.pow(beta,alpha) * Math.pow(x,alpha-1.0) * Math.exp(-Math.pow(x/beta,alpha));
+			}else{
+				res = 1.0 - Math.exp(-Math.pow(x  / beta, alpha));
+			}
+
+			return new cNumber(res);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcWeibull);
+	};
 
 	/**
 	 * @constructor
