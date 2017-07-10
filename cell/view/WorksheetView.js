@@ -9788,7 +9788,7 @@
 					{
 						offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
 					}
-					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, val);
+					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, t.model);
 
 					if (_p_.parse()) {
 						
