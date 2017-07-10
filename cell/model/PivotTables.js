@@ -2599,10 +2599,19 @@ CT_pivotTableDefinition.prototype.init = function () {
 	}
 };
 CT_pivotTableDefinition.prototype.intersection = function (range) {
-	return this.location && this.location.intersection(range);
+	return (this.location && this.location.intersection(range)) || this.pageFieldsIntersection(range);
+};
+CT_pivotTableDefinition.prototype.pageFieldsIntersection = function (range) {
+	return this.pageFieldsPositions && this.pageFieldsPositions.some(function (element) {
+			return Array.isArray(range) ? range.some(function (elementRange) {
+				return (elementRange.contains(element.col, element.row) ||
+				elementRange.contains(element.col + 1, element.row));
+			}) : (range.contains(element.col, element.row) || range.contains(element.col + 1, element.row));
+		});
 };
 CT_pivotTableDefinition.prototype.contains = function (col, row) {
-	return this.location && this.location.contains(col, row);
+	return (this.location && this.location.contains(col, row)) ||
+		this.pageFieldsIntersection(new Asc.Range(col, row, col, row));
 };
 CT_pivotTableDefinition.prototype.getRange = function () {
 	return this.location && this.location.ref;

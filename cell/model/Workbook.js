@@ -4794,7 +4794,7 @@
 			pivotTable = this.pivotTables[i];
 			pivotRange = pivotTable.getRange();
 			styleInfo = pivotTable.asc_getStyleInfo();
-			if (!pivotRange || !styleInfo || (range && !range.isIntersect(pivotRange))) {
+			if (!styleInfo || !pivotTable.intersection(pivotRange)) {
 				continue;
 			}
 			style = this.workbook.TableStyles.AllStyles[styleInfo.asc_getName()];
@@ -4944,20 +4944,19 @@
 		var pivotTable, pivotRange, j, pos, countC, countR;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			pivotTable = this.pivotTables[i];
-			pivotRange = pivotTable.getRange();
+			if (!pivotTable.intersection(range)) {
+				continue;
+			}
 
 			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
 				pos = pivotTable.pageFieldsPositions[j];
 				res.push(new AscCommon.CellBase(pos.row, pos.col + 1));
 			}
 
-			if (!pivotRange || (range && !range.isIntersect(pivotRange))) {
-				continue;
-			}
-
 			if (false !== pivotTable.showHeaders) {
 				countC = pivotTable.getColumnFieldsCount();
 				countR = pivotTable.getRowFieldsCount(true);
+				pivotRange = pivotTable.getRange();
 
 				if (countR) {
 					res.push(new AscCommon.CellBase(pivotRange.r1 + countC, pivotRange.c1));
