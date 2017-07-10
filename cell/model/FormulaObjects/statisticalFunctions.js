@@ -77,7 +77,7 @@
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
-		cTRIMMEAN, cWEIBULL);
+		cWEIBULL);
 
 	function isInteger(value) {
 		return typeof value === 'number' && isFinite(value) && 	Math.floor(value) === value;
@@ -7480,11 +7480,78 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTRIMMEAN() {
-		cBaseFunction.call(this, "TRIMMEAN");
+		this.name = "TRIMMEAN";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cTRIMMEAN.prototype = Object.create(cBaseFunction.prototype);
 	cTRIMMEAN.prototype.constructor = cTRIMMEAN;
+	cTRIMMEAN.prototype.argumentsMin = 2;
+	cTRIMMEAN.prototype.argumentsMax = 2;
+	cTRIMMEAN.prototype.Calculate = function (arg) {
+
+		var arg2 = [arg[0], arg[1]];
+		//если первое значение строка
+		if(cElementType.string === arg[0].type || cElementType.bool === arg[0].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		//если первое значение число
+		if(cElementType.number === arg[0].type){
+			arg2[0] = new cArray();
+			arg2[0].addElement(arg[0]);
+		}
+
+		var oArguments = this._prepareArguments(arg2, arguments[1], true, [cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTrimMean = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+
+			if (arg1 < 0.0 || arg1 >= 1.0){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var arr = [];
+			for (var i = 0; i < arg0.length; i++) {
+				for (var j = 0; j < arg0[i].length; j++) {
+					if (cElementType.number === arg0[i][j].type) {
+						arr.push(arg0[i][j].getValue());
+					}
+				}
+			}
+
+			var aSortArray = arr.sort(fSortAscending);
+			var nSize = aSortArray.length;
+			if (nSize == 0){
+				return  new cError(cErrorType.not_numeric);
+			}else{
+
+				var nIndex = Math.floor(arg1 * nSize);
+				if (nIndex % 2 !== 0){
+					nIndex--;
+				}
+				nIndex /= 2;
+
+				var fSum = 0.0;
+				for (var i = nIndex; i < nSize-nIndex; i++){
+					fSum += aSortArray[i];
+				}
+
+				return  new cNumber(fSum / (nSize - 2*nIndex));
+			}
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTrimMean);
+	};
 
 	/**
 	 * @constructor
