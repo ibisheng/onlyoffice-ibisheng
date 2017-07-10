@@ -1994,6 +1994,24 @@ $( function () {
 
     } );
 
+	test( "Test: \"TRIMMEAN\"", function () {
+		ws.getRange2( "A2" ).setValue( "4" );
+		ws.getRange2( "A3" ).setValue( "5" );
+		ws.getRange2( "A4" ).setValue( "6" );
+		ws.getRange2( "A5" ).setValue( "7" );
+		ws.getRange2( "A6" ).setValue( "2" );
+		ws.getRange2( "A7" ).setValue( "3" );
+		ws.getRange2( "A8" ).setValue( "4" );
+		ws.getRange2( "A9" ).setValue( "5" );
+		ws.getRange2( "A10" ).setValue( "1" );
+		ws.getRange2( "A11" ).setValue( "2" );
+		ws.getRange2( "A12" ).setValue( "3" );
+
+		oParser = new parserFormula( "TRIMMEAN(A2:A12,0.2)", "A1", ws );
+		ok( oParser.parse(), "TRIMMEAN(A2:A12,0.2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 3.778, "TRIMMEAN(A2:A12,0.2)" );
+	} );
+
     test( "Test: \"DOLLAR\"", function () {
 
         oParser = new parserFormula( "DOLLAR(1234.567)", "A2", ws );
