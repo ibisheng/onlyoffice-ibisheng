@@ -2470,6 +2470,21 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.035589 );
 	} );
 
+	test( "Test: \"WEIBULL.DIST\"", function () {
+
+		ws.getRange2( "A2" ).setValue( "105" );
+		ws.getRange2( "A3" ).setValue( "20" );
+		ws.getRange2( "A4" ).setValue( "100" );
+
+		oParser = new parserFormula( "WEIBULL.DIST(A2,A3,A4,TRUE)", "A20", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.929581 );
+
+		oParser = new parserFormula( "WEIBULL.DIST(A2,A3,A4,FALSE)", "A20", ws );
+		ok( oParser.parse(), "WEIBULL.DIST(A2,A3,A4,FALSE)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.035589 );
+	} );
+
     test( "Test: \"YEARFRAC\"", function () {
         function okWrapper( a, b ) {
             ok( Math.abs( a - b ) < dif );

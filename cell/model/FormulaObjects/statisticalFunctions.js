@@ -73,7 +73,7 @@
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
 		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
 		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S,
-		cVARPA, cWEIBULL, cZTEST, cZ_TEST);
+		cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST, cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
@@ -8119,6 +8119,19 @@
 
 		return this.value = this._findArrayInNumberArguments(oArguments, calcWeibull);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cRANK}
+	 */
+	function cWEIBULL_DIST() {
+		cWEIBULL.call(this);
+		this.name = "WEIBULL.DIST";
+	}
+
+	cWEIBULL_DIST.prototype = Object.create(cWEIBULL.prototype);
+	cWEIBULL_DIST.prototype.constructor = cWEIBULL_DIST;
+	cWEIBULL_DIST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
