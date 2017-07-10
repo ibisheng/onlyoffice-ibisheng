@@ -5358,8 +5358,6 @@ RangeDataManager.prototype = {
     };
 
 	sparklineGroup.prototype.set = function (val) {
-		var t = this;
-
 		var getColor = function (color) {
 			return color instanceof Asc.asc_CColor ? CorrectAscColor(color) : color ? color.clone(): color;
 		};
