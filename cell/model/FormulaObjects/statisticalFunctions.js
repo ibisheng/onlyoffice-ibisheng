@@ -68,7 +68,7 @@
 		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
 		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
 		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE,
-		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE,
+		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE,
 		cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPOISSON,
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
 		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
@@ -5442,6 +5442,20 @@
 		return this.value = normdist(arg0.getValue(), arg1.getValue(), arg2.getValue(), arg3.toBool());
 	};
 
+
+	/**
+	 * @constructor
+	 * @extends {cPERCENTILE}
+	 */
+	function cNORM_DIST() {
+		cNORMDIST.call(this);
+		this.name = "NORM.DIST";
+	}
+
+	cNORM_DIST.prototype = Object.create(cNORMDIST.prototype);
+	cNORM_DIST.prototype.constructor = cNORM_DIST;
+	cNORM_DIST.prototype.isXLFN = true;
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
@@ -6883,6 +6897,7 @@
 
 	cSTDEV_S.prototype = Object.create(cSTDEV.prototype);
 	cSTDEV_S.prototype.constructor = cSTDEV_S;
+	cSTDEV_S.prototype.isXLFN = true;
 
 
 	/**
@@ -7029,6 +7044,7 @@
 
 	cSTDEV_P.prototype = Object.create(cSTDEVP.prototype);
 	cSTDEV_P.prototype.constructor = cSTDEV_P;
+	cSTDEV_P.prototype.isXLFN = true;
 
 	/**
 	 * @constructor

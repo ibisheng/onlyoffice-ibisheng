@@ -3996,6 +3996,22 @@ $( function () {
 
     } );
 
+	test( "Test: \"NORM.DIST \"", function () {
+
+		ws.getRange2( "F202" ).setValue( "42" );
+		ws.getRange2( "F203" ).setValue( "40" );
+		ws.getRange2( "F204" ).setValue( "1.5" );
+
+		oParser = new parserFormula( "NORM.DIST(F202,F203,F204,TRUE)", "F1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.9087888 );
+
+		oParser = new parserFormula( "NORM.DIST(F202,F203,F204,FALSE)", "F1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(5) - 0, 0.10934 );
+
+	} );
+
     test( "Test: \"NORMSDIST\"", function () {
 
         function normsdist( x ) {
