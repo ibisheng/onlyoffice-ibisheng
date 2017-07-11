@@ -253,6 +253,8 @@ var st_datetimegroupingHOUR = 3;
 var st_datetimegroupingMINUTE = 4;
 var st_datetimegroupingSECOND = 5;
 
+var st_VALUES = -2;
+
 function FromXml_ST_SourceType(val) {
 	var res = -1;
 	if ("worksheet" === val) {
@@ -1679,8 +1681,8 @@ CT_PivotCacheDefinition.prototype.toXml = function(writer) {
 	}
 	writer.WriteXmlNodeEnd("pivotCacheDefinition");
 };
-CT_PivotCacheDefinition.prototype.getField = function (index) {
-	return this.cacheFields && this.cacheFields.cacheField && this.cacheFields.cacheField[index];
+CT_PivotCacheDefinition.prototype.getFields = function () {
+	return this.cacheFields && this.cacheFields.cacheField;
 };
 function CT_PivotCacheRecords() {
 //Attributes
@@ -2620,7 +2622,7 @@ CT_pivotTableDefinition.prototype.getColumnFieldsCount = function () {
 	var res = 0;
 	if (this.colFields) {
 		res = this.colFields.field.length;
-		if (1 === res && -2 === this.colFields.field[0].x) {
+		if (1 === res && st_VALUES === this.colFields.field[0].x) {
 			res = 0;
 		}
 	}
@@ -2650,30 +2652,23 @@ CT_pivotTableDefinition.prototype.asc_getName = function () {
 CT_pivotTableDefinition.prototype.asc_getStyleInfo = function () {
 	return this.pivotTableStyleInfo;
 };
-CT_pivotTableDefinition.prototype.asc_getFields = function () {
-	return this.pivotFields && this.getField(this.pivotFields.pivotField, function (element, index) {
-		return element.name || this.cacheDefinition.getField(index).name;
-	});
+CT_pivotTableDefinition.prototype.asc_getCacheFields = function () {
+	return this.cacheDefinition.getFields();
+};
+CT_pivotTableDefinition.prototype.asc_getPivotFields = function () {
+	return this.pivotFields && this.pivotFields.pivotField;
 };
 CT_pivotTableDefinition.prototype.asc_getPageFields = function () {
-	return this.pageFields && this.getField(this.pageFields.pageField, function (element) {
-		return element.name || this.cacheDefinition.getField(element.fld).name;
-	});
+	return this.pageFields && this.pageFields.pageField;
 };
 CT_pivotTableDefinition.prototype.asc_getColumnFields = function () {
-	return this.colFields && this.getField(this.colFields.field, function (element) {
-		return this.cacheDefinition.getField(element.x).name;
-	});
+	return this.colFields && this.colFields.field;
 };
 CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
-	return this.rowFields && this.getField(this.rowFields.field, function (element) {
-		return this.cacheDefinition.getField(element.x).name;
-	});
+	return this.rowFields && this.rowFields.field;
 };
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
-	return this.dataFields && this.getField(this.dataFields.dataField, function (element) {
-		return element.name || this.cacheDefinition.getField(element.fld).name;
-	});
+	return this.dataFields && this.dataFields.dataField;
 };
 CT_pivotTableDefinition.prototype.forEachColItems = function (callback, thisArg) {
 	return this.colItems && this.colItems.i.forEach(callback, thisArg);
@@ -6192,6 +6187,9 @@ CT_PivotField.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
+CT_PivotField.prototype.asc_getName = function () {
+	return this.name;
+};
 function CT_Field() {
 //Attributes
 	this.x = null;
@@ -6212,6 +6210,9 @@ CT_Field.prototype.toXml = function(writer, name) {
 		writer.WriteXmlAttributeNumber("x", this.x);
 	}
 	writer.WriteXmlNodeEnd(name, true, true);
+};
+CT_Field.prototype.asc_getIndex = function () {
+	return this.x;
 };
 function CT_I() {
 //Attributes
@@ -6345,6 +6346,12 @@ CT_PageField.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
+CT_PageField.prototype.asc_getName = function () {
+	return this.name;
+};
+CT_PageField.prototype.asc_getIndex = function () {
+	return this.fld;
+};
 function CT_DataField() {
 //Attributes
 	this.name = null;
@@ -6438,6 +6445,12 @@ CT_DataField.prototype.toXml = function(writer, name) {
 		this.extLst.toXml(writer, "extLst");
 	}
 	writer.WriteXmlNodeEnd(name);
+};
+CT_DataField.prototype.asc_getName = function () {
+	return this.name;
+};
+CT_DataField.prototype.asc_getIndex = function () {
+	return this.fld;
 };
 function CT_Format() {
 //Attributes
@@ -9648,7 +9661,8 @@ var prot;
 
 prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
-prot["asc_getFields"] = prot.asc_getFields;
+prot["asc_getCacheFields"] = prot.asc_getCacheFields;
+prot["asc_getPivotFields"] = prot.asc_getPivotFields;
 prot["asc_getStyleInfo"] = prot.asc_getStyleInfo;
 prot["asc_getPageFields"] = prot.asc_getPageFields;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
@@ -9663,4 +9677,18 @@ prot["asc_getShowRowStripes"] = prot.asc_getShowRowStripes;
 prot["asc_getShowColStripes"] = prot.asc_getShowColStripes;
 
 prot = CT_CacheField.prototype;
+prot["asc_getName"] = prot.asc_getName;
+
+prot = CT_PivotField.prototype;
+prot["asc_getName"] = prot.asc_getName;
+
+prot = CT_Field.prototype;
+prot["asc_getIndex"] = prot.asc_getIndex;
+
+prot = CT_PageField.prototype;
+prot["asc_getIndex"] = prot.asc_getIndex;
+prot["asc_getName"] = prot.asc_getName;
+
+prot = CT_DataField.prototype;
+prot["asc_getIndex"] = prot.asc_getIndex;
 prot["asc_getName"] = prot.asc_getName;
