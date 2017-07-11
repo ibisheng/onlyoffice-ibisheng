@@ -55,10 +55,8 @@
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE,
-		cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
-		cHYPGEOM_DIST, cNEGBINOM_DIST, cNORM_S_DIST,
-		cPERMUTATIONA, cPHI);
+	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
+		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cNEGBINOM_DIST, cPERMUTATIONA, cPHI);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
@@ -71,9 +69,8 @@
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
 		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
-		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cNEGBINOM_DIST,
-		cNORM_S_DIST, cPERMUTATIONA, cPHI, cPDURATION, cRRI, cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA,
-		cSHEET, cSHEETS);
+		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cNEGBINOM_DIST, cPERMUTATIONA, cPHI, cPDURATION,
+		cRRI, cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
 
 	/**
 	 * @constructor
@@ -338,18 +335,6 @@
 
 	cNEGBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cNEGBINOM_DIST.prototype.constructor = cNEGBINOM_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cNORM_S_DIST() {
-		cBaseFunction.call(this, "NORM.S.DIST");
-		this.isXLFN = true;
-	}
-
-	cNORM_S_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cNORM_S_DIST.prototype.constructor = cNORM_S_DIST;
 
 	/**
 	 * @constructor

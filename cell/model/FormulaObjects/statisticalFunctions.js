@@ -68,8 +68,8 @@
 		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
 		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
 		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE,
-		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST, cNORMSINV,
-		cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
+		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST, cNORM_S_DIST,
+		cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
 		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK,
 		cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP,
 		cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND,
@@ -5567,6 +5567,50 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cNORM_S_DIST() {
+		this.name = "NORM.S.DIST";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cNORM_S_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cNORM_S_DIST.prototype.constructor = cNORM_S_DIST;
+	cNORM_S_DIST.prototype.argumentsMin = 2;
+	cNORM_S_DIST.prototype.argumentsMax = 2;
+	cNORM_S_DIST.prototype.isXLFN = true;
+	cNORM_S_DIST.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cNORM_S_DIST.prototype.Calculate = function (arg) {
+		function normDistCalc(argArray) {
+
+			var arg0 = argArray[0], arg1 = argArray[1];
+			var res;
+			if(arg1){
+				res = 0.5 + gauss(arg0);
+			}else{
+				res = Math.exp( - Math.pow( arg0, 2 ) / 2 ) / Math.sqrt( 2 * Math.PI );
+			}
+
+			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
+		}
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, normDistCalc);
 	};
 
 	/**

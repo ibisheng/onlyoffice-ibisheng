@@ -4028,7 +4028,19 @@ $( function () {
 
     } );
 
-    test( "Test: \"NEGBINOMDIST\"", function () {
+	test( "Test: \"NORM.S.DIST\"", function () {
+
+		oParser = new parserFormula( "NORM.S.DIST(1.333333,TRUE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.908788726 );
+
+		oParser = new parserFormula( "NORM.S.DIST(1.333333,FALSE)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.164010148 );
+
+	} );
+	
+	test( "Test: \"NEGBINOMDIST\"", function () {
 
         function negbinomdist( x, r, p ) {
             x = parseInt( x );
