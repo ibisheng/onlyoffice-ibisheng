@@ -4761,7 +4761,25 @@ $( function () {
 
     } );
 
-    test( "Test: \"STDEVA\"", function () {
+	test( "Test: \"STDEV.S\"", function () {
+		ws.getRange2( "A202" ).setValue( "1345" );
+		ws.getRange2( "A203" ).setValue( "1301" );
+		ws.getRange2( "A204" ).setValue( "1368" );
+		ws.getRange2( "A205" ).setValue( "1322" );
+		ws.getRange2( "A206" ).setValue( "1310" );
+		ws.getRange2( "A207" ).setValue( "1370" );
+		ws.getRange2( "A208" ).setValue( "1318" );
+		ws.getRange2( "A209" ).setValue( "1350" );
+		ws.getRange2( "A210" ).setValue( "1303" );
+		ws.getRange2( "A211" ).setValue( "1299" );
+
+		oParser = new parserFormula( "STDEV.S(A202:A211)", "A1", ws );
+		ok( oParser.parse(), "STDEV.S(A202:A211)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 27.46391572, "STDEV.S(A202:A211)" );
+	} );
+
+
+	test( "Test: \"STDEVA\"", function () {
 
         ws.getRange2( "E400" ).setValue( "\"123\"" );
         ws.getRange2( "E401" ).setValue( "134" );

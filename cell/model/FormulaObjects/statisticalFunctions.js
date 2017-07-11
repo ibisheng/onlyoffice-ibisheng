@@ -71,7 +71,7 @@
 		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE,
 		cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPOISSON,
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
-		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
+		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
 		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S,
 		cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST, cZ_TEST);
 
@@ -6871,6 +6871,19 @@
 		}
 		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cSTDEV}
+	 */
+	function cSTDEV_S() {
+		cSTDEV.call(this);
+		this.name = "STDEV.S";
+	}
+
+	cSTDEV_S.prototype = Object.create(cSTDEV.prototype);
+	cSTDEV_S.prototype.constructor = cSTDEV_S;
+
 
 	/**
 	 * @constructor
