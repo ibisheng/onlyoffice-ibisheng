@@ -4084,6 +4084,14 @@ $( function () {
 
     } );
 
+	test( "Test: \"NORM.S.INV \"", function () {
+
+		oParser = new parserFormula( "NORM.S.INV(0.908789)", "F1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 1.3333347 );
+
+	} );
+
     test( "Test: \"LOGINV\"", function () {
 
         function loginv( x, mue, sigma ) {

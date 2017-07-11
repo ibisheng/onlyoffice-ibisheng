@@ -58,7 +58,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE,
 		cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT,
 		cHYPGEOM_DIST, cNEGBINOM_DIST, cNORM_S_DIST,
-		cNORM_S_INV, cPERMUTATIONA, cPHI);
+		cPERMUTATIONA, cPHI);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
@@ -72,7 +72,7 @@
 	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
 		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cNEGBINOM_DIST,
-		cNORM_S_DIST, cNORM_S_INV, cPERMUTATIONA, cPHI, cPDURATION, cRRI, cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA,
+		cNORM_S_DIST, cPERMUTATIONA, cPHI, cPDURATION, cRRI, cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA,
 		cSHEET, cSHEETS);
 
 	/**
@@ -350,18 +350,6 @@
 
 	cNORM_S_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cNORM_S_DIST.prototype.constructor = cNORM_S_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cNORM_S_INV() {
-		cBaseFunction.call(this, "NORM.S.INV");
-		this.isXLFN = true;
-	}
-
-	cNORM_S_INV.prototype = Object.create(cBaseFunction.prototype);
-	cNORM_S_INV.prototype.constructor = cNORM_S_INV;
 
 	/**
 	 * @constructor
