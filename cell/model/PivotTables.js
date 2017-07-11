@@ -2651,27 +2651,27 @@ CT_pivotTableDefinition.prototype.asc_getStyleInfo = function () {
 	return this.pivotTableStyleInfo;
 };
 CT_pivotTableDefinition.prototype.asc_getFields = function () {
-	return this.getField(this.pivotFields.pivotField, function (element, index) {
+	return this.pivotFields && this.getField(this.pivotFields.pivotField, function (element, index) {
 		return element.name || this.cacheDefinition.getField(index).name;
 	});
 };
 CT_pivotTableDefinition.prototype.asc_getPageFields = function () {
-	return this.getField(this.pageFields.pageField, function (element) {
+	return this.pageFields && this.getField(this.pageFields.pageField, function (element) {
 		return element.name || this.cacheDefinition.getField(element.fld).name;
 	});
 };
 CT_pivotTableDefinition.prototype.asc_getColumnFields = function () {
-	return this.getField(this.colFields.field, function (element) {
+	return this.colFields && this.getField(this.colFields.field, function (element) {
 		return this.cacheDefinition.getField(element.x).name;
 	});
 };
 CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
-	return this.getField(this.rowFields.field, function (element) {
+	return this.rowFields && this.getField(this.rowFields.field, function (element) {
 		return this.cacheDefinition.getField(element.x).name;
 	});
 };
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
-	return this.getField(this.dataFields.dataField, function (element) {
+	return this.dataFields && this.getField(this.dataFields.dataField, function (element) {
 		return element.name || this.cacheDefinition.getField(element.fld).name;
 	});
 };
