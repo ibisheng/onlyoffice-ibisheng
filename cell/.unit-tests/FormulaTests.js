@@ -4137,6 +4137,17 @@ $( function () {
 
     } );
 
+	test( "Test: \"NORM.INV \"", function () {
+
+		ws.getRange2( "F202" ).setValue( "0.908789" );
+		ws.getRange2( "F203" ).setValue( "40" );
+		ws.getRange2( "F204" ).setValue( "1.5" );
+
+		oParser = new parserFormula( "NORM.INV(F202,F203,F204)", "F1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 42.000002 );
+	} );
+
     test( "Test: \"PEARSON\"", function () {
 
         function pearson( x, y ) {
