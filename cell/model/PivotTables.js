@@ -2691,6 +2691,12 @@ CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.dataFields && this.dataFields.dataField;
 };
+CT_pivotTableDefinition.prototype.asc_getPageOverThenDown = function () {
+	return this.pageOverThenDown;
+};
+CT_pivotTableDefinition.prototype.asc_getPageWrap = function () {
+	return this.pageWrap;
+};
 CT_pivotTableDefinition.prototype.forEachColItems = function (callback, thisArg) {
 	return this.colItems && this.colItems.i.forEach(callback, thisArg);
 };
@@ -6476,6 +6482,9 @@ CT_DataField.prototype.asc_getIndex = function () {
 CT_DataField.prototype.asc_getSubtotal = function () {
 	return null !== this.subtotal ? this.subtotal : c_oAscDataConsolidateFunction.Sum;
 };
+CT_DataField.prototype.asc_getShowDataAs = function () {
+	return null !== this.showDataAs ? this.showDataAs : c_oAscShowDataAs.Normal;
+};
 function CT_Format() {
 //Attributes
 	this.action = null;//formatting
@@ -9982,6 +9991,8 @@ prot["asc_getPageFields"] = prot.asc_getPageFields;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
 prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
+prot["asc_getPageOverThenDown"] = prot.asc_getPageOverThenDown;
+prot["asc_getPageWrap"] = prot.asc_getPageWrap;
 
 prot = CT_PivotTableStyle.prototype;
 prot["asc_getName"] = prot.asc_getName;
@@ -10007,3 +10018,4 @@ prot = CT_DataField.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getIndex"] = prot.asc_getIndex;
 prot["asc_getSubtotal"] = prot.asc_getSubtotal;
+prot["asc_getShowDataAs"] = prot.asc_getShowDataAs;
