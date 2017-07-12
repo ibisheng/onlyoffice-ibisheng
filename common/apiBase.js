@@ -1216,6 +1216,11 @@
 		this.pluginsManager.sendMessage(_pluginData);
 	};
 
+    baseEditorsApi.prototype["pluginMethod_GetFontList"] = function()
+    {
+    	return window.g_fontApplication.g_fontSelections.List;
+    };
+
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()
 	{
