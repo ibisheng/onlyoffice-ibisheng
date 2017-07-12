@@ -556,7 +556,7 @@ CChartsDrawer.prototype =
 	
 	
 	//****calculate margins****
-	_calculateMarginsChart: function(chartSpace) {
+	_calculateMarginsChart: function(chartSpace, dNotPutResult) {
 		this.calcProp.chartGutter = {};
 		
 		if(this._isSwitchCurrent3DChart(chartSpace))
@@ -566,8 +566,9 @@ CChartsDrawer.prototype =
 			this.calcProp.pxToMM = 1 / AscCommon.g_dKoef_pix_to_mm;
 		
 		var pxToMM = this.calcProp.pxToMM;
+		var plotArea = chartSpace.chart.plotArea;
 		
-		var isHBar = !!(chartSpace.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_BarChart && chartSpace.chart.plotArea.chart.barDir === AscFormat.BAR_DIR_BAR);
+		var isHBar = plotArea.chart.getObjectType() === AscDFH.historyitem_type_BarChart && plotArea.chart.barDir === AscFormat.BAR_DIR_BAR;
 		
 		//если точки рассчитаны - ставим маргин в зависимости от них
 		var marginOnPoints = this._calculateMarginOnPoints(chartSpace, isHBar);
@@ -577,8 +578,7 @@ CChartsDrawer.prototype =
 		var labelsMargin = this._calculateMarginLabels(chartSpace);
 		var left = labelsMargin.left, right = labelsMargin.right, top = labelsMargin.top, bottom = labelsMargin.bottom;
 		
-		
-		
+
 		var leftTextLabels = 0;
 		var rightTextLabels = 0;
 		var topTextLabels = 0;
@@ -586,18 +586,18 @@ CChartsDrawer.prototype =
 		
 		//добавляем размеры подписей осей + размеры названия
 		//***left***
-		if(chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null && !isHBar)
-			leftTextLabels += chartSpace.chart.plotArea.valAx.title.extX;
-		else if(isHBar && chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null)
-			leftTextLabels += chartSpace.chart.plotArea.catAx.title.extX;
+		if(plotArea.valAx && plotArea.valAx.title != null && !isHBar)
+			leftTextLabels += plotArea.valAx.title.extX;
+		else if(isHBar && plotArea.catAx && plotArea.catAx.title != null)
+			leftTextLabels += plotArea.catAx.title.extX;
 
 		//пока ориентацию добавляю без hbar
-		var orientationValAx = chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.scaling.orientation == ORIENTATION_MIN_MAX ? true : false;
+		var orientationValAx = plotArea.valAx && plotArea.valAx.scaling.orientation === ORIENTATION_MIN_MAX;
 		//***bottom***
-		if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar && orientationValAx)
-			bottomTextLabels += chartSpace.chart.plotArea.catAx.title.extY;
-		else if(isHBar && chartSpace.chart.plotArea.valAx && chartSpace.chart.plotArea.valAx.title != null)
-			bottomTextLabels += chartSpace.chart.plotArea.valAx.title.extY;
+		if(plotArea.catAx && plotArea.catAx.title != null && !isHBar && orientationValAx)
+			bottomTextLabels += plotArea.catAx.title.extY;
+		else if(isHBar && plotArea.valAx && plotArea.valAx.title != null)
+			bottomTextLabels += plotArea.valAx.title.extY;
 
 		
 		
@@ -606,8 +606,8 @@ CChartsDrawer.prototype =
 		if(chartSpace.chart.title !== null && !chartSpace.chart.title.overlay)
 			topMainTitle += chartSpace.chart.title.extY;
 			
-		if(chartSpace.chart.plotArea.catAx && chartSpace.chart.plotArea.catAx.title != null && !isHBar && !orientationValAx)
-			topTextLabels += chartSpace.chart.plotArea.catAx.title.extY;
+		if(plotArea.catAx && plotArea.catAx.title != null && !isHBar && !orientationValAx)
+			topTextLabels += plotArea.catAx.title.extY;
 		
 
 		var leftKey = 0, rightKey = 0, topKey = 0, bottomKey = 0;
@@ -662,28 +662,43 @@ CChartsDrawer.prototype =
 		right  += this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
 		
 		
-		this.calcProp.chartGutter._left = calculateLeft ? calculateLeft * pxToMM : left * pxToMM;
-		this.calcProp.chartGutter._right = calculateRight ? calculateRight * pxToMM : right * pxToMM;
-		this.calcProp.chartGutter._top = calculateTop ? calculateTop * pxToMM : top * pxToMM;
-		this.calcProp.chartGutter._bottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
+		var pxLeft = calculateLeft ? calculateLeft * pxToMM : left * pxToMM;
+		var pxRight = calculateRight ? calculateRight * pxToMM : right * pxToMM;
+		var pxTop = calculateTop ? calculateTop * pxToMM : top * pxToMM;
+		var pxBottom = calculateBottom ? calculateBottom * pxToMM : bottom * pxToMM;
 
-        if(chartSpace.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart || chartSpace.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_DoughnutChart){
-            if(chartSpace.chart.plotArea.layout){
-                var oLayout = chartSpace.chart.plotArea.layout;
-                this.calcProp.chartGutter._left = chartSpace.calculatePosByLayout(this.calcProp.chartGutter._left/pxToMM, oLayout.xMode, oLayout.x,
-                    (this.calcProp.chartGutter._right - this.calcProp.chartGutter._left)/pxToMM, chartSpace.extX)*pxToMM;
-                this.calcProp.chartGutter._top = chartSpace.calculatePosByLayout(this.calcProp.chartGutter._top/pxToMM, oLayout.yMode, oLayout.y,
-                    (this.calcProp.chartGutter._bottom - this.calcProp.chartGutter._top)/pxToMM, chartSpace.extY)*pxToMM;
-                var fWidthPlotArea = chartSpace.calculateSizeByLayout(this.calcProp.chartGutter._left/pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode );
-                if(fWidthPlotArea > 0){
-                    this.calcProp.chartGutter._right = chartSpace.extX*pxToMM - (this.calcProp.chartGutter._left + fWidthPlotArea*pxToMM);
+        if(plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart || plotArea.chart.getObjectType() === AscDFH.historyitem_type_DoughnutChart)
+        {
+            if(plotArea.layout)
+            {
+                var oLayout = plotArea.layout;
+				pxLeft = chartSpace.calculatePosByLayout(pxLeft/pxToMM, oLayout.xMode, oLayout.x, (pxRight - pxLeft)/pxToMM, chartSpace.extX)*pxToMM;
+				pxTop = chartSpace.calculatePosByLayout(pxTop/pxToMM, oLayout.yMode, oLayout.y, (pxBottom - pxTop)/pxToMM, chartSpace.extY)*pxToMM;
+
+                var fWidthPlotArea = chartSpace.calculateSizeByLayout(pxLeft/pxToMM, chartSpace.extX, oLayout.w, oLayout.wMode );
+                if(fWidthPlotArea > 0)
+                {
+					pxRight = chartSpace.extX*pxToMM - (pxLeft + fWidthPlotArea*pxToMM);
                 }
-                var fHeightPlotArea = chartSpace.calculateSizeByLayout(this.calcProp.chartGutter._top/pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode );
-                if(fHeightPlotArea > 0){
-                    this.calcProp.chartGutter._bottom = chartSpace.extY*pxToMM - (this.calcProp.chartGutter._top + fHeightPlotArea*pxToMM);
+                var fHeightPlotArea = chartSpace.calculateSizeByLayout(pxTop/pxToMM, chartSpace.extY, oLayout.h, oLayout.hMode );
+                if(fHeightPlotArea > 0)
+                {
+					pxBottom = chartSpace.extY*pxToMM - (pxTop + fHeightPlotArea*pxToMM);
                 }
             }
         }
+
+        if(dNotPutResult)
+		{
+			return {left: pxLeft, right: pxRight, top: pxTop, bottom: pxBottom};
+		}
+		else
+		{
+			this.calcProp.chartGutter._left = pxLeft;
+			this.calcProp.chartGutter._right = pxRight;
+			this.calcProp.chartGutter._top = pxTop;
+			this.calcProp.chartGutter._bottom = pxBottom;
+		}
 
 		this._checkMargins();
 	},
@@ -719,7 +734,7 @@ CChartsDrawer.prototype =
 		var valAx = chartSpace.chart.plotArea.valAx;
 		if(chartSpace.chart.plotArea.valAx && /*chartSpace.chart.plotArea.valAx.labels &&*/ this.calcProp.widthCanvas != undefined)
 		{
-			if(isHBar && valAx.xPoints)
+			if(isHBar && valAx.xPoints && valAx.xPoints.length)
 			{
 				if(valAx.scaling.orientation == ORIENTATION_MIN_MAX)
 				{
@@ -732,7 +747,7 @@ CChartsDrawer.prototype =
 					calculateRight = this.calcProp.widthCanvas / pxToMM - valAx.xPoints[0].pos;
 				}
 			}
-			else if(this.calcProp.heightCanvas != undefined && valAx.yPoints)
+			else if(this.calcProp.heightCanvas != undefined && valAx.yPoints && valAx.yPoints.length)
 			{
 				if(valAx.scaling.orientation === ORIENTATION_MIN_MAX)
 				{
@@ -1393,12 +1408,7 @@ CChartsDrawer.prototype =
 		else
 			this.calcProp.data = arrValues
 	},
-	
-	_getAxisData2: function (isOx, minVal, maxVal, chartProp)
-    {
-		return this._getAxisValues(isOx, minVal, maxVal, chartProp);
-	},
-	
+
 	_getAxisValues : function(isOx, yMin, yMax, chartProp)
 	{
 		//chartProp.chart.plotArea.valAx.scaling.logBase
@@ -1470,10 +1480,12 @@ CChartsDrawer.prototype =
 		firstDegree = this._getFirstDegree((Math.abs(axisMax - axisMin)) / 10);
 
 		var axis = c_oChartTypes.Scatter === this.calcProp.type && isOx ? chartProp.chart.plotArea.catAx : chartProp.chart.plotArea.valAx;
+		var bIsManualStep = false;
 		//находим шаг
 		if(axis && axis.majorUnit !== null)
 		{
 			step = axis.majorUnit;
+			bIsManualStep = true;
 			if(this.calcProp.subType === 'stackedPer')
 			{
 				step = step * 100;
@@ -1481,13 +1493,11 @@ CChartsDrawer.prototype =
 		}
 		else
 		{
-			var firstStep;
 			if(isOx || c_oChartTypes.HBar === this.calcProp.type)
 				step = this._getStep(firstDegree.val + (firstDegree.val / 10) * 3);
 			else
 				step = this._getStep(firstDegree.val);
-				
-			firstStep = step;
+
 			step = step * firstDegree.numPow;
 		}
 		
@@ -1502,19 +1512,13 @@ CChartsDrawer.prototype =
 		}
 		else
 			arrayValues = this._getArrayDataValues(step, axisMin, axisMax, manualMin, manualMax);
-		
+
 		//проверка на переход в другой диапазон из-за ограничения по высоте
-		/*if(!isOx)
+		if(!bIsManualStep)
 		{
-			var trueHeight = this.calcProp.heightCanvas - this.calcProp.chartGutter._top - this.calcProp.chartGutter._bottom;
-			var newStep;
-			
-			while(Math.round(trueHeight / arrayValues.length) < 16)
-			{
-				newStep = this._getNextStep(firstStep);
-				arrayValues = this._getArrayDataValues(newStep, axisMin, axisMax, manualMin, manualMax);
-			};	
-		};*/
+			var props = {arrayValues: arrayValues, step: step, axisMin: axisMin, axisMax: axisMax, manualMin: manualMin, manualMax: manualMax};
+			arrayValues = this._correctDataValuesFromHeight(props, chartProp, isOx);
+		}
 
 		//TODO для 3d диаграмм. пересмотреть!
 		if(this._isSwitchCurrent3DChart(chartProp))
@@ -1548,7 +1552,93 @@ CChartsDrawer.prototype =
 
 		return arrayValues;
 	},
-	
+
+	_correctDataValuesFromHeight: function(props, chartProp, isOxAxis)
+	{
+		var res = props.arrayValues;
+		var heightCanvas = chartProp.extY * this.calcProp.pxToMM;
+		var margins = this._calculateMarginsChart(chartProp, true);
+		var trueHeight = heightCanvas - margins.top - margins.bottom;
+
+		var axisMin = props.axisMin;
+		var axisMax = props.axisMax;
+		var manualMin = props.manualMin;
+		var manualMax = props.manualMax;
+		var newStep = props.step;
+
+
+		if(isOxAxis)
+		{
+
+		}
+		else
+		{
+			if(axisMin < 0 && axisMax > 0)
+			{
+				/*var limitArr = [0, 0, 0, 28, 20, 20, 18, 20, 18, 18, 17, 16];
+				var limit = limitArr[res.length - 1];
+				var heightGrid = Math.round((trueHeight / (res.length - 1)));
+				while(heightGrid <= limit)
+				{
+					var firstDegreeStep = this._getFirstDegree(newStep);
+					var tempStep = this._getNextStep(firstDegreeStep.val);
+					newStep = tempStep * firstDegreeStep.numPow;
+					res = this._getArrayDataValues(newStep, axisMin, axisMax, manualMin, manualMax);
+
+					if(res.length <= 3)
+					{
+						break;
+					}
+
+					limit = limitArr[res.length - 1];
+					heightGrid = Math.round((trueHeight / (res.length - 1)));
+				}*/
+			}
+			else
+			{
+				var limitArr = [0, 0, 32, 26, 24, 22, 21, 19, 18, 17, 16];
+				var limit = limitArr[res.length - 1];
+				var heightGrid = Math.round((trueHeight / (res.length - 1)));
+				while(heightGrid <= limit)
+				{
+					var firstDegreeStep = this._getFirstDegree(newStep);
+					var tempStep = this._getNextStep(firstDegreeStep.val);
+					newStep = tempStep * firstDegreeStep.numPow;
+					res = this._getArrayDataValues(newStep, axisMin, axisMax, manualMin, manualMax);
+
+					if(res.length <= 2)
+					{
+						break;
+					}
+
+					limit = limitArr[res.length - 1];
+					heightGrid = Math.round((trueHeight / (res.length - 1)));
+				}
+			}
+		}
+
+
+		return res;
+	},
+
+	_getNextStep: function(step)
+	{
+		if(step === 1)
+		{
+			step = 2;
+		}
+		else if(step === 2)
+		{
+			step = 5;
+		}
+		else if(step === 5)
+		{
+			step = 10;
+		}
+
+		return step;
+	},
+
 	_getArrayDataValues: function(step, axisMin, axisMax, manualMin, manualMax)
 	{
 		var arrayValues;
@@ -1995,11 +2085,11 @@ CChartsDrawer.prototype =
 		
 		if(this.calcProp.type === c_oChartTypes.Scatter)
 		{
-			this.calcProp.scale = this._roundValues(this._getAxisData2(false, this.calcProp.ymin, this.calcProp.ymax, chartProp));	
-			this.calcProp.xScale = this._roundValues(this._getAxisData2(true, this.calcProp.min, this.calcProp.max, chartProp));
+			this.calcProp.scale = this._roundValues(this._getAxisValues(false, this.calcProp.ymin, this.calcProp.ymax, chartProp));
+			this.calcProp.xScale = this._roundValues(this._getAxisValues(true, this.calcProp.min, this.calcProp.max, chartProp));
 		}
 		else
-			this.calcProp.scale = this._roundValues(this._getAxisData2(false, this.calcProp.min, this.calcProp.max, chartProp));	
+			this.calcProp.scale = this._roundValues(this._getAxisValues(false, this.calcProp.min, this.calcProp.max, chartProp));
 		
 		if(this.calcProp.scale && this.calcProp.scale.length >= 2)
 		{
