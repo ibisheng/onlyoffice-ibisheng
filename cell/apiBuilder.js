@@ -1246,6 +1246,7 @@
 	ApiWorksheet.prototype["AddChart"] = ApiWorksheet.prototype.AddChart;
 	ApiWorksheet.prototype["AddShape"] = ApiWorksheet.prototype.AddShape;
 	ApiWorksheet.prototype["AddImage"] = ApiWorksheet.prototype.AddImage;
+	ApiWorksheet.prototype["ReplaceCurrentImage"] = ApiWorksheet.prototype.ReplaceCurrentImage;
 
 	ApiRange.prototype["GetRow"] = ApiRange.prototype.GetRow;
 	ApiRange.prototype["GetCol"] = ApiRange.prototype.GetCol;
