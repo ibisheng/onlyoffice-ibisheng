@@ -6452,6 +6452,9 @@ CT_DataField.prototype.asc_getName = function () {
 CT_DataField.prototype.asc_getIndex = function () {
 	return this.fld;
 };
+CT_DataField.prototype.asc_getSubtotal = function () {
+	return null !== this.subtotal ? this.subtotal : st_dataconsolidatefunctionSUM;
+};
 function CT_Format() {
 //Attributes
 	this.action = null;//formatting
@@ -9686,9 +9689,10 @@ prot = CT_Field.prototype;
 prot["asc_getIndex"] = prot.asc_getIndex;
 
 prot = CT_PageField.prototype;
-prot["asc_getIndex"] = prot.asc_getIndex;
 prot["asc_getName"] = prot.asc_getName;
+prot["asc_getIndex"] = prot.asc_getIndex;
 
 prot = CT_DataField.prototype;
-prot["asc_getIndex"] = prot.asc_getIndex;
 prot["asc_getName"] = prot.asc_getName;
+prot["asc_getIndex"] = prot.asc_getIndex;
+prot["asc_getSubtotal"] = prot.asc_getSubtotal;
