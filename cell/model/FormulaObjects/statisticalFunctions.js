@@ -5307,9 +5307,7 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNEGBINOMDIST() {
-		this.name = "NEGBINOMDIST";
-		this.value = null;
-		this.argumentsCurrent = 0;
+		cBaseFunction.call(this, "NEGBINOMDIST");
 	}
 
 	cNEGBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -5317,12 +5315,22 @@
 	cNEGBINOMDIST.prototype.argumentsMin = 3;
 	cNEGBINOMDIST.prototype.argumentsMax = 3;
 	cNEGBINOMDIST.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
 
-		function negbinomdist(x, r, p) {
-			x = parseInt(x.getValue());
-			r = parseInt(r.getValue());
-			p = p.getValue();
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function negbinomdist(argArray) {
+			var x = argArray[0];
+			var r = argArray[1];
+			var p = argArray[2];
 			if (x < 0 || r < 1 || p < 0 || p > 1) {
 				return new cError(cErrorType.not_numeric);
 			} else {
@@ -5330,40 +5338,7 @@
 			}
 		}
 
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]);
-		} else if (arg0 instanceof cArray) {
-			arg0 = arg0.getElement(0);
-		}
-
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
-		} else if (arg1 instanceof cArray) {
-			arg1 = arg1.getElement(0);
-		}
-
-		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1]);
-		} else if (arg2 instanceof cArray) {
-			arg2 = arg2.getElement(0);
-		}
-
-		arg0 = arg0.tocNumber();
-		arg1 = arg1.tocNumber();
-		arg2 = arg2.tocNumber();
-
-		if (arg0 instanceof cError) {
-			return this.value = arg0;
-		}
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
-		}
-		if (arg2 instanceof cError) {
-			return this.value = arg2;
-		}
-
-		return this.value = negbinomdist(arg0, arg1, arg2);
-
+		return this.value = this._findArrayInNumberArguments(oArguments, negbinomdist);
 	};
 
 	/**

@@ -4080,6 +4080,17 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0550487 );
 	} );
 
+	test( "Test: \"NEGBINOMDIST \"", function () {
+
+		ws.getRange2( "F202" ).setValue( "10" );
+		ws.getRange2( "F203" ).setValue( "5" );
+		ws.getRange2( "F204" ).setValue( "0.25" );
+
+		oParser = new parserFormula( "NEGBINOMDIST(F202,F203,F204)", "F1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 0.05504866 );
+	} );
+
     test( "Test: \"NORMSINV\"", function () {
 
         function normsinv( x ) {
