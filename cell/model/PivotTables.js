@@ -2670,6 +2670,21 @@ CT_pivotTableDefinition.prototype.getField = function (arrFields, callback) {
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
 };
+CT_pivotTableDefinition.prototype.asc_getPageWrap = function () {
+	return this.pageWrap || 0;
+};
+CT_pivotTableDefinition.prototype.asc_getPageOverThenDown = function () {
+	return !!this.pageOverThenDown;
+};
+CT_pivotTableDefinition.prototype.asc_getRowGrandTotals = function () {
+	return null !== this.rowGrandTotals ? this.rowGrandTotals : true;
+};
+CT_pivotTableDefinition.prototype.asc_getColGrandTotals = function () {
+	return null !== this.colGrandTotals ? this.colGrandTotals : true;
+};
+CT_pivotTableDefinition.prototype.asc_getShowHeaders = function () {
+	return null !== this.showHeaders ? this.showHeaders : true;
+};
 CT_pivotTableDefinition.prototype.asc_getStyleInfo = function () {
 	return this.pivotTableStyleInfo;
 };
@@ -2690,18 +2705,6 @@ CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
 };
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.dataFields && this.dataFields.dataField;
-};
-CT_pivotTableDefinition.prototype.asc_getPageOverThenDown = function () {
-	return !!this.pageOverThenDown;
-};
-CT_pivotTableDefinition.prototype.asc_getPageWrap = function () {
-	return this.pageWrap || 0;
-};
-CT_pivotTableDefinition.prototype.asc_getRowGrandTotals = function () {
-	return null !== this.rowGrandTotals ? this.rowGrandTotals : true;
-};
-CT_pivotTableDefinition.prototype.asc_getColGrandTotals = function () {
-	return null !== this.colGrandTotals ? this.colGrandTotals : true;
 };
 CT_pivotTableDefinition.prototype.forEachColItems = function (callback, thisArg) {
 	return this.colItems && this.colItems.i.forEach(callback, thisArg);
@@ -9990,17 +9993,18 @@ prot['Second'] = prot.Second;
 
 prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
+prot["asc_getPageWrap"] = prot.asc_getPageWrap;
+prot["asc_getPageOverThenDown"] = prot.asc_getPageOverThenDown;
+prot["asc_getRowGrandTotals"] = prot.asc_getRowGrandTotals;
+prot["asc_getColGrandTotals"] = prot.asc_getColGrandTotals;
+prot["asc_getShowHeaders"] = prot.asc_getShowHeaders;
+prot["asc_getStyleInfo"] = prot.asc_getStyleInfo;
 prot["asc_getCacheFields"] = prot.asc_getCacheFields;
 prot["asc_getPivotFields"] = prot.asc_getPivotFields;
-prot["asc_getStyleInfo"] = prot.asc_getStyleInfo;
 prot["asc_getPageFields"] = prot.asc_getPageFields;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
 prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
-prot["asc_getPageOverThenDown"] = prot.asc_getPageOverThenDown;
-prot["asc_getPageWrap"] = prot.asc_getPageWrap;
-prot["asc_getRowGrandTotals"] = prot.asc_getRowGrandTotals;
-prot["asc_getColGrandTotals"] = prot.asc_getColGrandTotals;
 
 prot = CT_PivotTableStyle.prototype;
 prot["asc_getName"] = prot.asc_getName;
