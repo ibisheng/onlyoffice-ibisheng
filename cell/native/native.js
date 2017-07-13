@@ -4111,6 +4111,7 @@ function OfflineEditor () {
         docInfo.put_Url(this.initSettings["docURL"]);
         docInfo.put_Format("xlsx");
         docInfo.put_UserInfo(userInfo);
+        docInfo.put_Token(this.initSettings["token"]);
 
         _api.asc_setDocInfo(docInfo);
 
@@ -4122,6 +4123,9 @@ function OfflineEditor () {
             _api.asc_setAutoSaveGap(1);
             _api._coAuthoringInit();
             _api.asc_SetFastCollaborative(true);
+            
+            window["native"]["onTokenJWT"](_api.CoAuthoringApi.get_jwt());
+
         } else {
             _api.asc_nativeOpenFile(window["native"]["GetFileString"](), undefined, true);
 
@@ -7911,7 +7915,7 @@ window["Asc"]["spreadsheet_api"].prototype.openDocument = function(sData) {
                
                if (!sdkCheck) {
                
-                    console.log("OPEN FILE ONLINE");
+                    //console.log("OPEN FILE ONLINE");
                
                     t.wb.showWorksheet(undefined, false, true);
                
