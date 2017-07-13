@@ -4502,6 +4502,9 @@ CT_PivotTableStyle.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name, true, true);
 };
+CT_PivotTableStyle.prototype.set = function() {
+
+};
 CT_PivotTableStyle.prototype.asc_getName = function() {
 	return this.name;
 };
@@ -4516,6 +4519,42 @@ CT_PivotTableStyle.prototype.asc_getShowRowStripes = function() {
 };
 CT_PivotTableStyle.prototype.asc_getShowColStripes = function() {
 	return this.showColStripes;
+};
+CT_PivotTableStyle.prototype.asc_setShowRowHeaders = function(api, pivot, newVal) {
+	if (newVal !== this.showRowHeaders) {
+		var t = this;
+		api._changePivotStyle(pivot, function() {t._setShowRowHeaders()});
+	}
+};
+CT_PivotTableStyle.prototype.asc_setShowColHeaders = function(api, pivot, newVal) {
+	if (newVal !== this.showColHeaders) {
+		var t = this;
+		api._changePivotStyle(pivot, function() {t._setShowColHeaders()});
+	}
+};
+CT_PivotTableStyle.prototype.asc_setShowRowStripes = function(api, pivot, newVal) {
+	if (newVal !== this.showRowStripes) {
+		var t = this;
+		api._changePivotStyle(pivot, function() {t._setShowRowStripes()});
+	}
+};
+CT_PivotTableStyle.prototype.asc_setShowColStripes = function(api, pivot, newVal) {
+	if (newVal !== this.showColStripes) {
+		var t = this;
+		api._changePivotStyle(pivot, function() {t._setShowColStripes()});
+	}
+};
+CT_PivotTableStyle.prototype._setShowRowHeaders = function(newVal) {
+	this.showRowHeaders = newVal;
+};
+CT_PivotTableStyle.prototype._setShowColHeaders = function(newVal) {
+	this.showColHeaders = newVal;
+};
+CT_PivotTableStyle.prototype._setShowRowStripes = function(newVal) {
+	this.showRowStripes = newVal;
+};
+CT_PivotTableStyle.prototype._setShowColStripes = function(newVal) {
+	this.showColStripes = newVal;
 };
 function CT_PivotFilters() {
 //Attributes
@@ -10012,6 +10051,10 @@ prot["asc_getShowRowHeaders"] = prot.asc_getShowRowHeaders;
 prot["asc_getShowColHeaders"] = prot.asc_getShowColHeaders;
 prot["asc_getShowRowStripes"] = prot.asc_getShowRowStripes;
 prot["asc_getShowColStripes"] = prot.asc_getShowColStripes;
+prot["asc_setShowRowHeaders"] = prot.asc_setShowRowHeaders;
+prot["asc_setShowColHeaders"] = prot.asc_setShowColHeaders;
+prot["asc_setShowRowStripes"] = prot.asc_setShowRowStripes;
+prot["asc_setShowColStripes"] = prot.asc_setShowColStripes;
 
 prot = CT_CacheField.prototype;
 prot["asc_getName"] = prot.asc_getName;

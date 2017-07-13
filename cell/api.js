@@ -312,6 +312,7 @@ var editor;
     AscCommonExcel.g_oUndoRedoComment = new AscCommonExcel.UndoRedoComment(wbModel);
     AscCommonExcel.g_oUndoRedoAutoFilters = new AscCommonExcel.UndoRedoAutoFilters(wbModel);
     AscCommonExcel.g_oUndoRedoSparklines = new AscCommonExcel.UndoRedoSparklines(wbModel);
+    AscCommonExcel.g_oUndoRedoPivotTables = new AscCommonExcel.UndoRedoPivotTables(wbModel);
     AscCommonExcel.g_DefNameWorksheet = new AscCommonExcel.Worksheet(wbModel, -1);
   };
 
@@ -558,10 +559,6 @@ var editor;
 	spreadsheet_api.prototype.asc_getTablePictures = function (props, pivot) {
 		return this.wb.af_getTablePictures(props, pivot);
 	};
-
-	  spreadsheet_api.prototype.asc_changePivotStyle = function (props, pivot) {
-
-	  };
 
   spreadsheet_api.prototype.getViewMode = function() {
     return this.isViewMode;
@@ -1717,6 +1714,30 @@ var editor;
     this.collaborativeEditing.addCheckLock(lockInfo);
     this.collaborativeEditing.onEndCheckLock(callback);
   };
+
+	spreadsheet_api.prototype._isLockedPivot = function (pivotName, callback) {
+		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null,
+			this.asc_getActiveWorksheetId(), pivotName);
+		if (false === this.collaborativeEditing.getCollaborativeEditing()) {
+			// Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
+			AscCommonExcel.applyFunction(callback, true);
+			callback = undefined;
+		}
+		if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, false)) {
+			// Редактируем сами
+			AscCommonExcel.applyFunction(callback, true);
+			return;
+		} else if (false !==
+			this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false)) {
+			// Уже ячейку кто-то редактирует
+			AscCommonExcel.applyFunction(callback, false);
+			return;
+		}
+
+		this.collaborativeEditing.onStartCheckLock();
+		this.collaborativeEditing.addCheckLock(lockInfo);
+		this.collaborativeEditing.onEndCheckLock(callback);
+	};
 
   spreadsheet_api.prototype._addWorksheet = function (name, i) {
     var t = this;
@@ -3457,6 +3478,21 @@ var editor;
 	  this.asc_closeCellEditor();
     };
 
+	spreadsheet_api.prototype._changePivotStyle = function (pivot, callback) {
+		var t = this;
+		var changePivotStyle = function (res) {
+			if (res) {
+				History.Create_NewPoint();
+				History.StartTransaction();
+				callback();
+				History.EndTransaction();
+				t.wb._onWSSelectionChanged();
+				t.wb.getWorksheet().draw();
+			}
+		};
+		this._isLockedPivot(pivot.asc_getName(), changePivotStyle);
+	};
+
   /*
    * Export
    * -----------------------------------------------------------------------------
@@ -3599,9 +3635,6 @@ var editor;
   prot["asc_changeTableRange"] = prot.asc_changeTableRange;
   prot["asc_convertTableToRange"] = prot.asc_convertTableToRange;
   prot["asc_getTablePictures"] = prot.asc_getTablePictures;
-
-  // Pivot Table
-	prot["asc_changePivotStyle"] = prot.asc_changePivotStyle;
 
   // Drawing objects interface
 
