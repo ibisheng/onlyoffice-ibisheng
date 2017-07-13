@@ -68,12 +68,12 @@
 		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
 		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
 		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE,
-		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST, cNORM_S_DIST,
-		cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC,
-		cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK,
-		cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP,
-		cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND,
-		cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST,
+		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST,
+		cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK,
+		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC,
+		cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S,
+		cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV,
+		cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST,
 		cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
@@ -5364,6 +5364,56 @@
 
 		return this.value = negbinomdist(arg0, arg1, arg2);
 
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cNEGBINOM_DIST() {
+		cBaseFunction.call(this, "NEGBINOM.DIST");
+	}
+
+	cNEGBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cNEGBINOM_DIST.prototype.constructor = cNEGBINOM_DIST;
+	cNEGBINOM_DIST.prototype.argumentsMin = 4;
+	cNEGBINOM_DIST.prototype.argumentsMax = 4;
+	cNEGBINOM_DIST.prototype.isXLFN = true;
+	cNEGBINOM_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function negbinomdist(argArray) {
+			var x = parseInt(argArray[0]);
+			var r = parseInt(argArray[1]);
+			var p = argArray[2];
+			var bCumulative = argArray[3];
+
+			if (x < 0 || r < 1 || p < 0 || p > 1) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res;
+			if ( bCumulative ){
+				res = 1 - getBetaDist( 1 - p, x + 1, r );
+			}else{
+				res = Math.binomCoeff(x + r - 1, r - 1) * Math.pow(p, r) * Math.pow(1 - p, x);
+			}
+
+			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, negbinomdist);
 	};
 
 	/**

@@ -56,7 +56,7 @@
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
-		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cNEGBINOM_DIST, cPERMUTATIONA, cPHI);
+		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPERMUTATIONA, cPHI);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
@@ -69,7 +69,7 @@
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
 		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
-		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cNEGBINOM_DIST, cPERMUTATIONA, cPHI, cPDURATION,
+		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPERMUTATIONA, cPHI, cPDURATION,
 		cRRI, cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
 
 	/**
@@ -323,18 +323,6 @@
 
 	cMUNIT.prototype = Object.create(cBaseFunction.prototype);
 	cMUNIT.prototype.constructor = cMUNIT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cNEGBINOM_DIST() {
-		cBaseFunction.call(this, "NEGBINOM.DIST");
-		this.isXLFN = true;
-	}
-
-	cNEGBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
-	cNEGBINOM_DIST.prototype.constructor = cNEGBINOM_DIST;
 
 	/**
 	 * @constructor
