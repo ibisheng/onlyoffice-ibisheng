@@ -1032,6 +1032,7 @@
 		if (this.isLoadFullApi && this.openResult)
 		{
 			this.openDocument(this.openResult);
+			this.openResult = null;
 		}
 
 	};
