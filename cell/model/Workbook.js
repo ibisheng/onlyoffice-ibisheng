@@ -4794,7 +4794,7 @@
 			pivotTable = this.pivotTables[i];
 			pivotRange = pivotTable.getRange();
 			styleInfo = pivotTable.asc_getStyleInfo();
-			if (!styleInfo || !pivotTable.intersection(pivotRange)) {
+			if (!styleInfo || (range && !pivotTable.intersection(range))) {
 				continue;
 			}
 			style = this.workbook.TableStyles.AllStyles[styleInfo.asc_getName()];
