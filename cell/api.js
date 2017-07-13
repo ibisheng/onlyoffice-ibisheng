@@ -3486,7 +3486,7 @@ var editor;
 				History.StartTransaction();
 				callback();
 				History.EndTransaction();
-				t.wbModel.getActiveWs()._updatePivotTables(null);
+				t.wbModel.getActiveWs()._updatePivotTables(pivot.getRange());
 				t.wb._onWSSelectionChanged();
 				t.wb.getWorksheet().draw();
 			}
