@@ -2692,10 +2692,16 @@ CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.dataFields && this.dataFields.dataField;
 };
 CT_pivotTableDefinition.prototype.asc_getPageOverThenDown = function () {
-	return this.pageOverThenDown;
+	return !!this.pageOverThenDown;
 };
 CT_pivotTableDefinition.prototype.asc_getPageWrap = function () {
-	return this.pageWrap;
+	return this.pageWrap || 0;
+};
+CT_pivotTableDefinition.prototype.asc_getRowGrandTotals = function () {
+	return null !== this.rowGrandTotals ? this.rowGrandTotals : true;
+};
+CT_pivotTableDefinition.prototype.asc_getColGrandTotals = function () {
+	return null !== this.colGrandTotals ? this.colGrandTotals : true;
 };
 CT_pivotTableDefinition.prototype.forEachColItems = function (callback, thisArg) {
 	return this.colItems && this.colItems.i.forEach(callback, thisArg);
@@ -9993,6 +9999,8 @@ prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
 prot["asc_getPageOverThenDown"] = prot.asc_getPageOverThenDown;
 prot["asc_getPageWrap"] = prot.asc_getPageWrap;
+prot["asc_getRowGrandTotals"] = prot.asc_getRowGrandTotals;
+prot["asc_getColGrandTotals"] = prot.asc_getColGrandTotals;
 
 prot = CT_PivotTableStyle.prototype;
 prot["asc_getName"] = prot.asc_getName;
