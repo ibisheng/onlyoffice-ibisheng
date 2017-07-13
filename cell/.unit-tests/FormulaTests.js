@@ -4065,6 +4065,21 @@ $( function () {
 
     } );
 
+	test( "Test: \"NEGBINOM.DIST \"", function () {
+
+		ws.getRange2( "F202" ).setValue( "10" );
+		ws.getRange2( "F203" ).setValue( "5" );
+		ws.getRange2( "F204" ).setValue( "0.25" );
+
+		oParser = new parserFormula( "NEGBINOM.DIST(F202,F203,F204,TRUE)", "F1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.3135141 );
+
+		oParser = new parserFormula( "NEGBINOM.DIST(F202,F203,F204,FALSE)", "F1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0550487 );
+	} );
+
     test( "Test: \"NORMSINV\"", function () {
 
         function normsinv( x ) {
