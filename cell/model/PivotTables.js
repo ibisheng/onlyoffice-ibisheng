@@ -4523,31 +4523,31 @@ CT_PivotTableStyle.prototype.asc_getShowColStripes = function() {
 CT_PivotTableStyle.prototype.asc_setName = function(api, pivot, newVal) {
 	if (newVal !== this.name) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setName()});
+		api._changePivotStyle(pivot, function() {t._setName(newVal)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowRowHeaders = function(api, pivot, newVal) {
 	if (newVal !== this.showRowHeaders) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowRowHeaders()});
+		api._changePivotStyle(pivot, function() {t._setShowRowHeaders(newVal)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowColHeaders = function(api, pivot, newVal) {
 	if (newVal !== this.showColHeaders) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowColHeaders()});
+		api._changePivotStyle(pivot, function() {t._setShowColHeaders(newVal)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowRowStripes = function(api, pivot, newVal) {
 	if (newVal !== this.showRowStripes) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowRowStripes()});
+		api._changePivotStyle(pivot, function() {t._setShowRowStripes(newVal)});
 	}
 };
 CT_PivotTableStyle.prototype.asc_setShowColStripes = function(api, pivot, newVal) {
 	if (newVal !== this.showColStripes) {
 		var t = this;
-		api._changePivotStyle(pivot, function() {t._setShowColStripes()});
+		api._changePivotStyle(pivot, function() {t._setShowColStripes(newVal)});
 	}
 };
 CT_PivotTableStyle.prototype._setName = function(newVal) {
