@@ -4520,6 +4520,12 @@ CT_PivotTableStyle.prototype.asc_getShowRowStripes = function() {
 CT_PivotTableStyle.prototype.asc_getShowColStripes = function() {
 	return this.showColStripes;
 };
+CT_PivotTableStyle.prototype.asc_setName = function(api, pivot, newVal) {
+	if (newVal !== this.name) {
+		var t = this;
+		api._changePivotStyle(pivot, function() {t._setName()});
+	}
+};
 CT_PivotTableStyle.prototype.asc_setShowRowHeaders = function(api, pivot, newVal) {
 	if (newVal !== this.showRowHeaders) {
 		var t = this;
@@ -4543,6 +4549,9 @@ CT_PivotTableStyle.prototype.asc_setShowColStripes = function(api, pivot, newVal
 		var t = this;
 		api._changePivotStyle(pivot, function() {t._setShowColStripes()});
 	}
+};
+CT_PivotTableStyle.prototype._setName = function(newVal) {
+	this.name = newVal;
 };
 CT_PivotTableStyle.prototype._setShowRowHeaders = function(newVal) {
 	this.showRowHeaders = newVal;
@@ -10051,6 +10060,7 @@ prot["asc_getShowRowHeaders"] = prot.asc_getShowRowHeaders;
 prot["asc_getShowColHeaders"] = prot.asc_getShowColHeaders;
 prot["asc_getShowRowStripes"] = prot.asc_getShowRowStripes;
 prot["asc_getShowColStripes"] = prot.asc_getShowColStripes;
+prot["asc_setName"] = prot.asc_setName;
 prot["asc_setShowRowHeaders"] = prot.asc_setShowRowHeaders;
 prot["asc_setShowColHeaders"] = prot.asc_setShowColHeaders;
 prot["asc_setShowRowStripes"] = prot.asc_setShowRowStripes;
