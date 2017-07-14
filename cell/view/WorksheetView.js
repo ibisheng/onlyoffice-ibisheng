@@ -2566,6 +2566,8 @@
 	/** Рисует текст ячейки */
 	WorksheetView.prototype._drawCellText =
 		function (drawingCtx, col, row, colStart, colEnd, offsetX, offsetY, drawMergedCells) {
+			var c = this._getVisibleCell(col, row);
+			var color = c.getFont().getColor();
 			var ct = this._getCellTextCache(col, row);
 			if (!ct) {
 				return null;
@@ -2717,7 +2719,7 @@
 					}
 				}
 
-				this.stringRender.render(drawingCtx, 0, 0, textW, ct.color);
+				this.stringRender.render(drawingCtx, 0, 0, textW, color);
 				this.stringRender.resetTransform(drawingCtx);
 
 				if (clipUse) {
@@ -2725,7 +2727,7 @@
 				}
 			} else {
 				ctx.AddClipRect(x1, y1, w, h);
-				this.stringRender.restoreInternalState(ct.state).render(drawingCtx, textX, textY, textW, ct.color);
+				this.stringRender.restoreInternalState(ct.state).render(drawingCtx, textX, textY, textW, color);
 				ctx.RemoveClipRect();
 			}
 
