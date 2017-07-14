@@ -4439,6 +4439,12 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), 4, "PERMUTATIONA(2,2)" );
 	} );
 
+	test( "Test: \"PHI\"", function () {
+		oParser = new parserFormula( "PHI(0.75)", "A1", ws );
+		ok( oParser.parse(), "PHI(0.75)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.301137432, "PHI(0.75)" );
+	} );
+
 	test( "Test: \"POISSON\"", function () {
 
         function poisson( x, l, cumulativeFlag ) {

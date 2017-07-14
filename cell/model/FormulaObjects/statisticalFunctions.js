@@ -70,7 +70,7 @@
 		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE,
 		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST,
 		cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK,
-		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC,
+		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC,
 		cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S,
 		cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV,
 		cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST,
@@ -6115,7 +6115,7 @@
 	}
 
 	cPERMUTATIONA.prototype = Object.create(cBaseFunction.prototype);
-	cPERMUTATIONA.prototype.constructor = cQUARTILE;
+	cPERMUTATIONA.prototype.constructor = cPERMUTATIONA;
 	cPERMUTATIONA.prototype.argumentsMin = 2;
 	cPERMUTATIONA.prototype.argumentsMax = 2;
 	cPERMUTATIONA.prototype.isXLFN = true;
@@ -6143,6 +6143,42 @@
 		}
 
 		return this.value = this._findArrayInNumberArguments(oArguments, permutationa);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cPHI() {
+		this.name = "PHI";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cPHI.prototype = Object.create(cBaseFunction.prototype);
+	cPHI.prototype.constructor = cPHI;
+	cPHI.prototype.argumentsMin = 1;
+	cPHI.prototype.argumentsMax = 1;
+	cPHI.prototype.isXLFN = true;
+	cPHI.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function calcPhi(argArray) {
+			var res = phi(argArray[0]);
+
+			return isNaN(res) ? new cError(cErrorType.not_available) : new cNumber(res);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcPhi);
 	};
 
 
