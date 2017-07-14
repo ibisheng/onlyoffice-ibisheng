@@ -4809,16 +4809,19 @@
 			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
 				pos = pivotTable.pageFieldsPositions[j];
 				cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
+				cells.cleanCache();
 				cells.clearTableStyle();
 				cells.setTableStyle(wholeStyle);
 				cells.setTableStyle(dxfLabels);
 				cells = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
+				cells.cleanCache();
 				cells.clearTableStyle();
 				cells.setTableStyle(wholeStyle);
 				cells.setTableStyle(dxfValues);
 			}
 
 			cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
+			cells.cleanCache();
 			cells.clearTableStyle();
 			cells.setTableStyle(wholeStyle);
 
