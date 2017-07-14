@@ -2816,27 +2816,28 @@
   	var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
 
 
-	//по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
 	var styleInfo;
-	if (props) {
-		styleInfo = {
-			ShowColumnStripes: props.asc_getBandVer(),
-			ShowFirstColumn: props.asc_getFirstCol(),
-			ShowLastColumn: props.asc_getLastCol(),
-			ShowRowStripes: props.asc_getBandHor(),
-			HeaderRowCount: props.asc_getFirstRow(),
-			TotalsRowCount: props.asc_getLastRow()
-		};
-	} else {
-		styleInfo = {
-			ShowColumnStripes: false,
-			ShowFirstColumn: false,
-			ShowLastColumn: false,
-			ShowRowStripes: true,
-			HeaderRowCount: true,
-			TotalsRowCount: false
-		};
+	if(style.pivot)
+	{
+		styleInfo = new CT_PivotTableStyle();
+		styleInfo.name = style.name;
+		styleInfo.showColHeaders = props.showColHeaders;
+		styleInfo.showColStripes = props.showColStripes;
+		styleInfo.showLastColumn = props.showLastColumn;
+		styleInfo.showRowHeaders = props.showRowHeaders;
+		styleInfo.showRowStripes = props.showRowStripes;
 	}
+	else
+	{
+		styleInfo = {};
+		styleInfo.ShowColumnStripes = props ? props.asc_getBandVer() : false;
+		styleInfo.ShowFirstColumn = props ? props.asc_getFirstCol() : false;
+		styleInfo.ShowLastColumn = props ? props.asc_getLastCol() : false;
+		styleInfo.ShowRowStripes = props ? props.asc_getBandHor() : true;
+		styleInfo.HeaderRowCount = props ? props.asc_getFirstRow() : true;
+		styleInfo.TotalsRowCount = props ? props.asc_getLastRow() : false;
+	}
+
 
 	var w = size.w;
 	var h = size.h;
@@ -2910,11 +2911,7 @@
 
 	if(style.pivot)
 	{
-		var pivotTableStyle = new CT_PivotTableStyle();
-		pivotTableStyle.name = style.name;
-		pivotTableStyle.showRowHeaders = true;
-		pivotTableStyle.showColHeaders = true;
-		this.getPivotMergeStyle(sheetMergedStyles, bbox, pivotTableStyle, headerRowCount, totalsRowCount);
+		this.getPivotMergeStyle(sheetMergedStyles, bbox, styleInfo);
 	}
 	else
 	{
