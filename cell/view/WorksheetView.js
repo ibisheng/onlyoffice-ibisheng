@@ -2212,7 +2212,7 @@
             }
         }
 
-        var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
+        var ctx = drawingCtx || this.drawingCtx;
         var st = this.settings.header.style[style];
         var x2 = x + w;
         var y2 = y + h;
@@ -2257,19 +2257,17 @@
         var bl = y2WithoutBorder - (isColHeader ? this.defaultRowDescender : this.rows[index].descender);
         var textX = this._calcTextHorizPos(x, x2WithoutBorder, tm, tm.width < w ? AscCommon.align_Center : AscCommon.align_Left);
         var textY = this._calcTextVertPos(y, y2WithoutBorder, bl, tm, Asc.c_oAscVAlign.Bottom);
-        if (drawingCtx) {
-            ctx.AddClipRect(x, y, w, h);
-            ctx.setFillStyle(st.color)
-              .fillText(text, textX, textY + tm.baseline, undefined, sr.charWidths);
-            ctx.RemoveClipRect();
+
+		if (drawingCtx) {
+			ctx.AddClipRect(x, y, w, h);
+		} else {
+			ctx.save().beginPath().rect(x, y, w, h).clip();
+		}
+		ctx.setFillStyle(st.color).fillText(text, textX, textY + tm.baseline, undefined, sr.charWidths);
+		if (drawingCtx) {
+			ctx.RemoveClipRect();
         } else {
-            ctx.save()
-              .beginPath()
-              .rect(x, y, w, h)
-              .clip()
-              .setFillStyle(st.color)
-              .fillText(text, textX, textY + tm.baseline, undefined, sr.charWidths)
-              .restore();
+		    ctx.restore();
         }
     };
 
@@ -2352,7 +2350,7 @@
         if ( range === undefined ) {
             range = this.visibleRange;
         }
-        var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
+        var ctx = drawingCtx || this.drawingCtx;
         var c = this.cols;
         var r = this.rows;
         var widthCtx = (width) ? width : ctx.getWidth();
@@ -2437,8 +2435,8 @@
 
     /** Рисует спарклайны */
     WorksheetView.prototype._drawSparklines = function(drawingCtx, range, offsetX, offsetY) {
-        var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
-        this.objectRender.drawSparkLineGroups(ctx, this.model.aSparklineGroups, range, offsetX, offsetY);
+		this.objectRender.drawSparkLineGroups(drawingCtx || this.drawingCtx, this.model.aSparklineGroups, range,
+			offsetX, offsetY);
     };
 
     /** Рисует ячейки таблицы */
@@ -2470,7 +2468,7 @@
             return mergedCells;
         }
 
-        var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
+        var ctx = drawingCtx || this.drawingCtx;
         for ( var col = colStart; col <= colEnd; ++col ) {
             if ( this.cols[col].width < this.width_1px && null === oMergedCell ) {
                 continue;
@@ -2581,7 +2579,7 @@
         }
 
         var isMerged = ct.flags.isMerged(), range = undefined, isWrapped = ct.flags.wrapText;
-        var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
+        var ctx = drawingCtx || this.drawingCtx;
 
         if ( isMerged ) {
             range = ct.flags.merged;
@@ -2889,7 +2887,7 @@
             return;
         }
         var nextCell = -1;
-        var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
+        var ctx = drawingCtx || this.drawingCtx;
         ctx.setFillStyle( this.settings.cells.defaultState.background );
         for ( var col = colBeg; col < colEnd; ++col ) {
             var c = -1 !== nextCell ? nextCell : this._getCell( col, row );
@@ -2912,7 +2910,7 @@
 	WorksheetView.prototype._drawCellsBorders = function (drawingCtx, range, offsetX, offsetY, mergedCells) {
 		//TODO: использовать стили линий при рисовании границ
 		var t = this;
-		var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
+		var ctx = drawingCtx || this.drawingCtx;
 		var c = this.cols;
 		var r = this.rows;
 
@@ -3261,7 +3259,7 @@
 	/** Рисует закрепление областей */
 	WorksheetView.prototype._drawFrozenPaneLines = function (drawingCtx) {
 		// Возможно стоит отрисовывать на overlay, а не на основной канве
-		var ctx = drawingCtx ? drawingCtx : this.drawingCtx;
+		var ctx = drawingCtx || this.drawingCtx;
 		var lockInfo = this.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, null, this.model.getId(),
 			AscCommonExcel.c_oAscLockNameFrozenPane);
 		var isLocked = this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, false);
@@ -5128,7 +5126,7 @@
     };
 
     WorksheetView.prototype._setFont = function (drawingCtx, name, size) {
-        var ctx = (drawingCtx) ? drawingCtx : this.drawingCtx;
+        var ctx = drawingCtx || this.drawingCtx;
         ctx.setFont(new asc.FontProperties(name, size));
     };
 

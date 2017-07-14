@@ -973,7 +973,7 @@
 		 */
 		StringRender.prototype._doRender = function(drawingCtx, x, y, maxWidth, textColor) {
 			var self = this;
-			var ctx = (undefined !== drawingCtx) ? drawingCtx : this.drawingCtx;
+			var ctx = drawingCtx || this.drawingCtx;
 			var ppix = ctx.getPPIX();
 			var ppiy = ctx.getPPIY();
 			var align  = this.flags ? this.flags.textAlign : null;
