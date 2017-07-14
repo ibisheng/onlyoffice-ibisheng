@@ -551,6 +551,7 @@
                         isTablePartsContainsRange.TableStyleInfo = new AscCommonExcel.TableStyleInfo();
 					isTablePartsContainsRange.TableStyleInfo.Name = styleName;
 
+					t._cleanStyleTable(isTablePartsContainsRange.Ref);
 					t._setColorStyleTable(isTablePartsContainsRange.Ref, isTablePartsContainsRange);
 					
 					//history
