@@ -2685,9 +2685,9 @@
     this.model.paddingPlusBorder = this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
   };
 
-	WorkbookView.prototype.getPivotMergeStyle = function (sheetMergedStyles, range, styleInfo) {
+	WorkbookView.prototype.getPivotMergeStyle = function (sheetMergedStyles, range, style, pivot) {
+		var styleInfo = pivot.asc_getStyleInfo();
 		var i, r, dxf, stripe1, stripe2, emptyStripe = new Asc.CTableStyleElement();
-		var style = this.model.TableStyles.AllStyles[styleInfo.asc_getName()];
 		if (style) {
 			dxf = style.wholeTable && style.wholeTable.dxf;
 			if (dxf) {
@@ -2736,9 +2736,11 @@
 				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r1, range.c1, range.r1), dxf);
 			}
 
-			dxf = style.lastColumn && style.lastColumn.dxf;
-			if (dxf) {
-				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c2, range.r1, range.c2, range.r2), dxf);
+			if (pivot.asc_getColGrandTotals()) {
+				dxf = style.lastColumn && style.lastColumn.dxf;
+				if (dxf) {
+					sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c2, range.r1, range.c2, range.r2), dxf);
+				}
 			}
 
 			if (styleInfo.showRowHeaders) {
@@ -2753,9 +2755,11 @@
 				}
 			}
 
-			dxf = style.totalRow && style.totalRow.dxf;
-			if (dxf) {
-				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r2, range.c2, range.r2), dxf);
+			if (pivot.asc_getRowGrandTotals()) {
+				dxf = style.totalRow && style.totalRow.dxf;
+				if (dxf) {
+					sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r2, range.c2, range.r2), dxf);
+				}
 			}
 		}
 	};
@@ -2766,6 +2770,7 @@
 		
 		var result = [];
 		var canvas = document.createElement('canvas');
+		var styleInfo;
 
 		var defaultStyles, styleThumbnailWidth = 61, styleThumbnailHeight, row, col = 5;
 		if(bPivotTable)
@@ -2773,12 +2778,29 @@
 			styleThumbnailHeight = 49;
 			row = 8;
 			defaultStyles =  wb.TableStyles.DefaultStylesPivot;
+			styleInfo = props;
 		}
 		else
 		{
 			styleThumbnailHeight = 46;
 			row = 5;
 			defaultStyles = wb.TableStyles.DefaultStyles;
+			styleInfo = new AscCommonExcel.TableStyleInfo();
+			if (props) {
+				styleInfo.ShowColumnStripes = props.asc_getBandVer();
+				styleInfo.ShowFirstColumn = props.asc_getFirstCol();
+				styleInfo.ShowLastColumn = props.asc_getLastCol();
+				styleInfo.ShowRowStripes = props.asc_getBandHor();
+				styleInfo.HeaderRowCount = props.asc_getFirstRow();
+				styleInfo.TotalsRowCount = props.asc_getLastRow();
+			} else {
+				styleInfo.ShowColumnStripes = false;
+				styleInfo.ShowFirstColumn = false;
+				styleInfo.ShowLastColumn = false;
+				styleInfo.ShowRowStripes = true;
+				styleInfo.HeaderRowCount = true;
+				styleInfo.TotalsRowCount = false;
+			}
 		}
 
 		if (AscBrowser.isRetina)
@@ -2799,7 +2821,7 @@
 					options.name = i;
 					options.displayName = styles[i].displayName;
 					options.type = type;
-					options.image = t.af_getSmallIconTable(canvas, styles[i], props, {w: styleThumbnailWidth, h: styleThumbnailHeight, row: row, col: col});
+					options.image = t.af_getSmallIconTable(canvas, styles[i], styleInfo, {w: styleThumbnailWidth, h: styleThumbnailHeight, row: row, col: col});
 					result.push(options);
 				}
 			}
@@ -2811,35 +2833,11 @@
 		return result;
 	};
 
-  WorkbookView.prototype.af_getSmallIconTable = function (canvas, style, props, size) {
+  WorkbookView.prototype.af_getSmallIconTable = function (canvas, style, styleInfo, size) {
 
     var fmgrGraphics = this.fmgrGraphics;
     var oFont = this.m_oFont;
   	var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
-
-
-	var styleInfo;
-	if(style.pivot)
-	{
-		styleInfo = new CT_PivotTableStyle();
-		styleInfo.name = style.name;
-		styleInfo.showColHeaders = props.showColHeaders;
-		styleInfo.showColStripes = props.showColStripes;
-		styleInfo.showLastColumn = props.showLastColumn;
-		styleInfo.showRowHeaders = props.showRowHeaders;
-		styleInfo.showRowStripes = props.showRowStripes;
-	}
-	else
-	{
-		styleInfo = {};
-		styleInfo.ShowColumnStripes = props ? props.asc_getBandVer() : false;
-		styleInfo.ShowFirstColumn = props ? props.asc_getFirstCol() : false;
-		styleInfo.ShowLastColumn = props ? props.asc_getLastCol() : false;
-		styleInfo.ShowRowStripes = props ? props.asc_getBandHor() : true;
-		styleInfo.HeaderRowCount = props ? props.asc_getFirstRow() : true;
-		styleInfo.TotalsRowCount = props ? props.asc_getLastRow() : false;
-	}
-
 
 	var w = size.w;
 	var h = size.h;
@@ -2867,13 +2865,6 @@
 		defaultColor = style.wholeTable.dxf.font.getColor();
 	}
 
-	var headerRowCount = 1;
-	var totalsRowCount = 0;
-	if(null != styleInfo.HeaderRowCount)
-		headerRowCount = styleInfo.HeaderRowCount;
-	if(null != styleInfo.TotalsRowCount)
-		totalsRowCount = styleInfo.TotalsRowCount;
-	
 	ctx.setFillStyle(whiteColor);
 	ctx.fillRect(0, 0, xSize + 2 * startX, ySize + 2 * startY);
 	
@@ -2913,11 +2904,13 @@
 
 	if(style.pivot)
 	{
-		this.getPivotMergeStyle(sheetMergedStyles, bbox, styleInfo);
+		this.getPivotMergeStyle(sheetMergedStyles, bbox, style, styleInfo);
 	}
 	else
 	{
-		style.initStyle(sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
+		style.initStyle(sheetMergedStyles, bbox, styleInfo,
+			null !== styleInfo.HeaderRowCount ? styleInfo.HeaderRowCount : 1,
+			null !== styleInfo.TotalsRowCount ? styleInfo.TotalsRowCount : 0);
 	}
 
 	var compiledStylesArr = [];
