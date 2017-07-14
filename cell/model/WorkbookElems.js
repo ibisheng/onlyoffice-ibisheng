@@ -2773,7 +2773,7 @@ StyleManager.prototype =
 	/** @constructor */
 	function SheetMergedStyles() {
 		this.stylesTablePivot = [];
-		this.stylesCondition = {};
+		this.stylesConditional = [];
 	}
 
 	SheetMergedStyles.prototype.setTablePivotStyle = function(range, xf, stripe) {
@@ -2787,35 +2787,29 @@ StyleManager.prototype =
 			}
 		}
 	};
-	SheetMergedStyles.prototype.setConditionalStyle = function(row, col, xf) {
-		var conditionRow = this.stylesCondition[row];
-		if (!conditionRow) {
-			conditionRow = {};
-			this.stylesCondition[row] = conditionRow;
-		}
-		var conditionCell = conditionRow[col];
-		if (!conditionCell) {
-			conditionCell = [];
-			conditionRow[col] = conditionCell;
-		}
-		conditionCell.push(xf);
+	SheetMergedStyles.prototype.setConditionalStyle = function(multiplyRange, formula) {
+		this.stylesConditional.push({multiplyRange: multiplyRange, formula: formula});
 	};
-	SheetMergedStyles.prototype.clearConditionalStyle = function(row, col) {
-		var conditionRow = this.stylesCondition[row];
-		if (conditionRow) {
-			var conditionCell = conditionRow[col];
-			if (conditionCell) {
-				conditionRow[col] = [];
+	SheetMergedStyles.prototype.clearConditionalStyle = function(multiplyRange) {
+		for (var i = this.stylesConditional.length - 1; i >= 0; --i) {
+			var style = this.stylesConditional[i];
+			if (style.multiplyRange.isIntersect(multiplyRange)) {
+				this.stylesConditional.splice(i, 1);
 			}
 		}
 	};
-	SheetMergedStyles.prototype.getStyle = function(hiddenManager, row, col) {
+	SheetMergedStyles.prototype.getStyle = function(hiddenManager, row, col, opt_ws) {
 		var res = {table: [], conditional: []};
-		var conditionRow = this.stylesCondition[row];
-		if (conditionRow) {
-			var conditionCell = conditionRow[col];
-			if (conditionCell) {
-				res.conditional = conditionCell;
+		if (opt_ws) {
+			opt_ws._updateConditionalFormatting();
+		}
+		for (var i = 0; i < this.stylesConditional.length; ++i) {
+			var style = this.stylesConditional[i];
+			if (style.multiplyRange.contains(col, row)) {
+				var xf = style.formula(row, col);
+				if (xf) {
+					res.conditional.push(xf);
+				}
 			}
 		}
 		for (var i = 0; i < this.stylesTablePivot.length; ++i) {

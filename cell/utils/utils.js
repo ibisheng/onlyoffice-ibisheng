@@ -1406,9 +1406,23 @@
 		function MultiplyRange(ranges) {
 			this.ranges = ranges;
 		}
+		MultiplyRange.prototype.clone = function() {
+			return new MultiplyRange(this.ranges.slice());
+		};
+		MultiplyRange.prototype.union2 = function(multiplyRange) {
+			this.ranges = this.ranges.concat(multiplyRange.ranges);
+		};
 		MultiplyRange.prototype.isIntersect = function(range) {
 			for (var i = 0; i < this.ranges.length; ++i) {
 				if (range.isIntersect(this.ranges[i])) {
+					return true;
+				}
+			}
+			return false;
+		};
+		MultiplyRange.prototype.contains = function(c, r) {
+			for (var i = 0; i < this.ranges.length; ++i) {
+				if (this.ranges[i].contains(c, r)) {
 					return true;
 				}
 			}

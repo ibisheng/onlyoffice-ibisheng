@@ -1181,7 +1181,7 @@
         this._initPane();
         this._initCellsArea(AscCommonExcel.recalcType.full);
         this.model.setTableStyleAfterOpen();
-		this.model._updateConditionalFormatting(null);
+		this.model.setDirtyConditionalFormatting(null);
 		this.model._initPivotTables();
 		this.model._updatePivotTables(null);
         this._cleanCellsTextMetricsCache();
