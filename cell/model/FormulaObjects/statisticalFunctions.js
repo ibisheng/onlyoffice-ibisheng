@@ -4303,6 +4303,68 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
+	function cHYPGEOM_DIST() {
+		cBaseFunction.call(this, "HYPGEOM.DIST");
+	}
+
+	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
+	cHYPGEOM_DIST.prototype.argumentsMin = 5;
+	cHYPGEOM_DIST.prototype.argumentsMax = 5;
+	cHYPGEOM_DIST.prototype.isXLFN = true;
+	cHYPGEOM_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+		argClone[4] = argClone[4].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function hypgeomdist(argArray) {
+			var arg0 = Math.floor(argArray[0]);
+			var arg1 = Math.floor(argArray[1]);
+			var arg2 = Math.floor(argArray[2]);
+			var arg3 =  Math.floor(argArray[3]);
+			var bCumulative = argArray[4];
+
+			if (arg0 < 0 || arg0 > Math.min(arg1, arg2) || arg0 < Math.max(0, arg1 - arg3 + arg2) || arg1 <= 0 || arg1 > arg3 || arg2 <= 0 || arg2 > arg3 || arg3 <= 0) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res;
+			if(bCumulative){
+				var fVal = 0.0;
+
+				//TODO значения неверные для этой ветки! пересчитать
+				for ( var i = 0; i <= arg0; i++ ){
+					var temp = Math.binomCoeff(arg2, i) * Math.binomCoeff(arg3 - arg2, arg1 - i) / Math.binomCoeff(arg3, arg1);
+					if(!isNaN(temp)){
+						fVal += temp;
+					}
+				}
+
+				res = fVal;
+			}else{
+				res = Math.binomCoeff(arg2, arg0) * Math.binomCoeff(arg3 - arg2, arg1 - arg0) / Math.binomCoeff(arg3, arg1);
+			}
+
+			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, hypgeomdist);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cINTERCEPT() {
 		this.name = "INTERCEPT";
 		this.value = null;
