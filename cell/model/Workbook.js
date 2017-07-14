@@ -4877,7 +4877,7 @@
 					var _dxf, _cells, r, _col;
 					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === _countC) {
 						_dxf = _style.lastColumn;
-					} else if (_styleInfo.showRowHeaders) {
+					} else {
 						r = item.r || 0;
 						if (r + 1 !== _countC) {
 							if (0 === r) {

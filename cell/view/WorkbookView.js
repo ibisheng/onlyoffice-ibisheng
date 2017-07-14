@@ -2712,12 +2712,12 @@
 				stripe2 = style.secondRowStripe || emptyStripe;
 				if (stripe1.dxf) {
 					sheetMergedStyles.setTablePivotStyle(range, stripe1.dxf,
-						new Asc.CTableStyleStripe(stripe1.size, stripe2.size));
+						new Asc.CTableStyleStripe(stripe1.size, stripe2.size, true));
 				}
 				if (stripe2.dxf && range.r1 + stripe1.size <= range.r2) {
 					sheetMergedStyles.setTablePivotStyle(
 						new Asc.Range(range.c1, range.r1 + stripe1.size, range.c2, range.r2), stripe2.dxf,
-						new Asc.CTableStyleStripe(stripe2.size, stripe1.size));
+						new Asc.CTableStyleStripe(stripe2.size, stripe1.size, true));
 				}
 			}
 
@@ -2741,19 +2741,21 @@
 				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c2, range.r1, range.c2, range.r2), dxf);
 			}
 
-			for (i = range.r1 + 1; i <= range.r2; ++i) {
-				if (i === range.r2) {
-					dxf = style.totalRow;
-				} else {
+			if (styleInfo.showRowHeaders) {
+				for (i = range.r1 + 1; i < range.r2; ++i) {
 					r = i - (range.r1 + 1);
 					if (0 === r % 3) {
 						dxf = style.firstRowSubheading;
 					}
+					if (dxf = (dxf && dxf.dxf)) {
+						sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, i, range.c2, i), dxf);
+					}
 				}
+			}
 
-				if (dxf = (dxf && dxf.dxf)) {
-					sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, i, range.c2, i), dxf);
-				}
+			dxf = style.totalRow && style.totalRow.dxf;
+			if (dxf) {
+				sheetMergedStyles.setTablePivotStyle(new Asc.Range(range.c1, range.r2, range.c2, range.r2), dxf);
 			}
 		}
 	};
