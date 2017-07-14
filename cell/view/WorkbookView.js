@@ -2765,27 +2765,18 @@
 		var result = [];
 		var canvas = document.createElement('canvas');
 
-		var styleThumbnailWidth = 61, styleThumbnailHeight = 46, row = 5, col = 5;
-
-		var defaultStyles = wb.TableStyles.DefaultStyles;
+		var defaultStyles, styleThumbnailWidth = 61, styleThumbnailHeight, row, col = 5;
 		if(bPivotTable)
 		{
 			styleThumbnailHeight = 49;
 			row = 8;
 			defaultStyles =  wb.TableStyles.DefaultStylesPivot;
 		}
-
-		var customStyles = {};
-		for(var i in wb.TableStyles.CustomStyles)
+		else
 		{
-			if(bPivotTable && wb.TableStyles.CustomStyles[i].pivot)
-			{
-				customStyles[i] = wb.TableStyles.CustomStyles[i];
-			}
-			else if(!bPivotTable && wb.TableStyles.CustomStyles[i].table)
-			{
-				customStyles[i] = wb.TableStyles.CustomStyles[i];
-			}
+			styleThumbnailHeight = 46;
+			row = 5;
+			defaultStyles = wb.TableStyles.DefaultStyles;
 		}
 
 		if (AscBrowser.isRetina)
@@ -2798,22 +2789,21 @@
 
 		var addStyles = function(styles, type)
 		{
-			if(styles)
+			for (var i in styles)
 			{
-				for (var i in styles)
+				if ((bPivotTable && styles[i].pivot) || (!bPivotTable && styles[i].table))
 				{
-					var bIsAddNeedStyle = (bPivotTable && styles[i].pivot) || (!bPivotTable && styles[i].table);
-					if (bIsAddNeedStyle)
-					{
-						var image = t.af_getSmallIconTable(canvas, styles[i], props, {w: styleThumbnailWidth, h: styleThumbnailHeight, row: row, col: col});
-						var options = {name: i, displayName: styles[i].displayName, type: type, image: image};
-						result.push(new AscCommonExcel.formatTablePictures(options));
-					}
+					var options = new AscCommonExcel.formatTablePictures();
+					options.name = i;
+					options.displayName = styles[i].displayName;
+					options.type = type;
+					options.image = t.af_getSmallIconTable(canvas, styles[i], props, {w: styleThumbnailWidth, h: styleThumbnailHeight, row: row, col: col});
+					result.push(options);
 				}
 			}
 		};
 
-		addStyles(customStyles, "custom");
+		addStyles(wb.TableStyles.CustomStyles, "custom");
 		addStyles(defaultStyles, "default");
 
 		return result;

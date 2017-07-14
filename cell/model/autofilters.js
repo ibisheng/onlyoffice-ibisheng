@@ -126,22 +126,17 @@
 		};
 
 		/** @constructor */
-		function formatTablePictures (options) {
-			if ( !(this instanceof formatTablePictures) ) {return new formatTablePictures(options);}
-
-			this.name = options.name;
-			this.displayName = options.displayName;
-			this.type = options.type;
-			this.image = options.image;
+		function formatTablePictures () {
+			this.name = null;
+			this.displayName = null;
+			this.type = null;
+			this.image = null;
 		}
-		formatTablePictures.prototype = {
-			constructor: formatTablePictures,
 
-			asc_getName: function () { return this.name; },
-			asc_getDisplayName: function () { return this.displayName; },
-			asc_getType: function () { return this.type; },
-			asc_getImage: function () { return this.image; }
-		};
+		formatTablePictures.prototype.asc_getName = function () { return this.name; };
+		formatTablePictures.prototype.asc_getDisplayName = function () { return this.displayName; };
+		formatTablePictures.prototype.asc_getType = function () { return this.type; };
+		formatTablePictures.prototype.asc_getImage = function () { return this.image; };
 		
 		var g_oAutoFiltersOptionsProperties = {
 			cellId		: 0,
