@@ -1941,10 +1941,10 @@
 		this.handlers.trigger("checkLastWork");
         this._clean();
         this._drawCorner();
-        this._drawColumnHeaders(/*drawingCtx*/ undefined);
-        this._drawRowHeaders(/*drawingCtx*/ undefined);
-        this._drawGrid(/*drawingCtx*/ undefined);
-        this._drawCellsAndBorders(/*drawingCtx*/undefined);
+        this._drawColumnHeaders(null);
+        this._drawRowHeaders(null);
+        this._drawGrid(null);
+        this._drawCellsAndBorders(null);
         this._drawFrozenPane();
         this._drawFrozenPaneLines();
         this._fixSelectionOfMergedCells();
@@ -1972,11 +1972,11 @@
         if (col >= 0 && col !== this.highlightedCol) {
             this._doCleanHighlightedHeaders();
             this.highlightedCol = col;
-            this._drawColumnHeaders(/*drawingCtx*/ undefined, col, col, kHeaderHighlighted);
+            this._drawColumnHeaders(null, col, col, kHeaderHighlighted);
         } else if (row >= 0 && row !== this.highlightedRow) {
             this._doCleanHighlightedHeaders();
             this.highlightedRow = row;
-            this._drawRowHeaders(/*drawingCtx*/ undefined, row, row, kHeaderHighlighted);
+            this._drawRowHeaders(null, row, row, kHeaderHighlighted);
         }
         this._deactivateOverlayCtx();
         return this;
@@ -2003,26 +2003,26 @@
         var hStyle = this.objectRender.selectedGraphicObjectsExists() ? kHeaderDefault : kHeaderActive;
         if (hlc >= 0) {
             if (hlc >= arn.c1 && hlc <= arn.c2) {
-                this._drawColumnHeaders(/*drawingCtx*/ undefined, hlc, hlc, hStyle);
+                this._drawColumnHeaders(null, hlc, hlc, hStyle);
             } else {
                 this._cleanColumnHeaders(hlc);
                 if (hlc + 1 === arn.c1) {
-                    this._drawColumnHeaders(/*drawingCtx*/ undefined, hlc + 1, hlc + 1, kHeaderActive);
+                    this._drawColumnHeaders(null, hlc + 1, hlc + 1, kHeaderActive);
                 } else if (hlc - 1 === arn.c2) {
-                    this._drawColumnHeaders(/*drawingCtx*/ undefined, hlc - 1, hlc - 1, hStyle);
+                    this._drawColumnHeaders(null, hlc - 1, hlc - 1, hStyle);
                 }
             }
             this.highlightedCol = -1;
         }
         if (hlr >= 0) {
             if (hlr >= arn.r1 && hlr <= arn.r2) {
-                this._drawRowHeaders(/*drawingCtx*/ undefined, hlr, hlr, hStyle);
+                this._drawRowHeaders(null, hlr, hlr, hStyle);
             } else {
                 this._cleanRowHeaders(hlr);
                 if (hlr + 1 === arn.r1) {
-                    this._drawRowHeaders(/*drawingCtx*/ undefined, hlr + 1, hlr + 1, kHeaderActive);
+                    this._drawRowHeaders(null, hlr + 1, hlr + 1, kHeaderActive);
                 } else if (hlr - 1 === arn.r2) {
-                    this._drawRowHeaders(/*drawingCtx*/ undefined, hlr - 1, hlr - 1, hStyle);
+                    this._drawRowHeaders(null, hlr - 1, hlr - 1, hStyle);
                 }
             }
             this.highlightedRow = -1;
@@ -2039,20 +2039,20 @@
             c2 = Math.min(vr.c2, range.c2);
             r1 = Math.max(vr.r1, range.r1);
             r2 = Math.min(vr.r2, range.r2);
-            this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
-            this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
+            this._drawColumnHeaders(null, c1, c2, kHeaderActive);
+            this._drawRowHeaders(null, r1, r2, kHeaderActive);
             if (this.topLeftFrozenCell) {
                 var cFrozen = this.topLeftFrozenCell.getCol0() - 1;
                 var rFrozen = this.topLeftFrozenCell.getRow0() - 1;
                 if (0 <= cFrozen) {
                     c1 = Math.max(0, range.c1);
                     c2 = Math.min(cFrozen, range.c2);
-                    this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2, kHeaderActive);
+                    this._drawColumnHeaders(null, c1, c2, kHeaderActive);
                 }
                 if (0 <= rFrozen) {
                     r1 = Math.max(0, range.r1);
                     r2 = Math.min(rFrozen, range.r2);
-                    this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2, kHeaderActive);
+                    this._drawRowHeaders(null, r1, r2, kHeaderActive);
                 }
             }
         }
@@ -2071,7 +2071,7 @@
         var dx = 4 * this.width_1px;
         var dy = 4 * this.height_1px;
 
-        this._drawHeader(/*drawingCtx*/ undefined, this.headersLeft, this.headersTop, this.headersWidth,
+        this._drawHeader(null, this.headersLeft, this.headersTop, this.headersWidth,
           this.headersHeight, kHeaderDefault, true, -1);
         this.drawingCtx.beginPath()
           .moveTo(x2 - dx, y1 + dy)
@@ -3227,8 +3227,8 @@
                 offsetY = this.rows[0].top - this.cellsTop;
                 tmpRange = new asc_Range( 0, 0, col - 1, row - 1 );
                 if ( !noCells ) {
-                    this._drawGrid( /*drawingCtx*/ undefined, tmpRange, offsetX, offsetY );
-                    this._drawCellsAndBorders( /*drawingCtx*/undefined, tmpRange, offsetX, offsetY );
+                    this._drawGrid( null, tmpRange, offsetX, offsetY );
+                    this._drawCellsAndBorders(null, tmpRange, offsetX, offsetY );
                 }
             }
             if ( 0 < row ) {
@@ -3236,10 +3236,10 @@
                 offsetX = undefined;
                 offsetY = this.rows[0].top - this.cellsTop;
                 tmpRange = new asc_Range( this.visibleRange.c1, 0, this.visibleRange.c2, row );
-                this._drawRowHeaders( /*drawingCtx*/ undefined, 0, row, kHeaderDefault, offsetX, offsetY );
+                this._drawRowHeaders( null, 0, row, kHeaderDefault, offsetX, offsetY );
                 if ( !noCells ) {
-                    this._drawGrid( /*drawingCtx*/ undefined, tmpRange, offsetX, offsetY );
-                    this._drawCellsAndBorders( /*drawingCtx*/undefined, tmpRange, offsetX, offsetY );
+                    this._drawGrid( null, tmpRange, offsetX, offsetY );
+                    this._drawCellsAndBorders(null, tmpRange, offsetX, offsetY );
                 }
             }
             if ( 0 < col ) {
@@ -3247,10 +3247,10 @@
                 offsetX = this.cols[0].left - this.cellsLeft;
                 offsetY = undefined;
                 tmpRange = new asc_Range( 0, this.visibleRange.r1, col, this.visibleRange.r2 );
-                this._drawColumnHeaders( /*drawingCtx*/ undefined, 0, col, kHeaderDefault, offsetX, offsetY );
+                this._drawColumnHeaders( null, 0, col, kHeaderDefault, offsetX, offsetY );
                 if ( !noCells ) {
-                    this._drawGrid( /*drawingCtx*/ undefined, tmpRange, offsetX, offsetY );
-                    this._drawCellsAndBorders( /*drawingCtx*/undefined, tmpRange, offsetX, offsetY );
+                    this._drawGrid( null, tmpRange, offsetX, offsetY );
+                    this._drawCellsAndBorders(null, tmpRange, offsetX, offsetY );
                 }
             }
         }
@@ -5464,7 +5464,7 @@
             this._calcVisibleColumns();
             this._drawCorner();
             this._cleanColumnHeadersRect();
-            this._drawColumnHeaders(/*drawingCtx*/ undefined);
+            this._drawColumnHeaders(null);
 
             dx = this.cellsLeft - x;
             oldW = ctxW - x - Math.abs(dx);
@@ -5522,10 +5522,10 @@
             }
             var range = new asc_Range(vr.c1, r1, vr.c2, r2);
             if (dx === 0) {
-                this._drawRowHeaders(/*drawingCtx*/ undefined, r1, r2);
+                this._drawRowHeaders(null, r1, r2);
             } else {
                 // redraw all headres, because number of decades in row index has been changed
-                this._drawRowHeaders(/*drawingCtx*/ undefined);
+                this._drawRowHeaders(null);
                 if (dx < 0) {
                     // draw last column
                     var r_;
@@ -5533,21 +5533,21 @@
                     var r2_ = vr.r2;
                     if (r2_ >= r1_) {
                         r_ = new asc_Range(vr.c2, r1_, vr.c2, r2_);
-                        this._drawGrid(/*drawingCtx*/ undefined, r_);
-                        this._drawCellsAndBorders(/*drawingCtx*/undefined, r_);
+                        this._drawGrid(null, r_);
+                        this._drawCellsAndBorders(null, r_);
                     }
                     if (0 < rFrozen) {
                         r_ = new asc_Range(vr.c2, 0, vr.c2, rFrozen - 1);
                         offsetY = this.rows[0].top - this.cellsTop;
-                        this._drawGrid(/*drawingCtx*/ undefined, r_, /*offsetXForDraw*/undefined, offsetY);
-                        this._drawCellsAndBorders(/*drawingCtx*/undefined, r_, /*offsetXForDraw*/undefined, offsetY);
+                        this._drawGrid(null, r_, /*offsetXForDraw*/undefined, offsetY);
+                        this._drawCellsAndBorders(null, r_, /*offsetXForDraw*/undefined, offsetY);
                     }
                 }
             }
             offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
-            this._drawGrid(/*drawingCtx*/ undefined, range);
-            this._drawCellsAndBorders(/*drawingCtx*/undefined, range);
+            this._drawGrid(null, range);
+            this._drawCellsAndBorders(null, range);
             this.af_drawButtons(range, offsetX, offsetY);
             this.objectRender.showDrawingObjectsEx(false,
               new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollVertical, range, {
@@ -5557,8 +5557,8 @@
                 range.c1 = 0;
                 range.c2 = cFrozen - 1;
                 offsetX = this.cols[0].left - this.cellsLeft;
-                this._drawGrid(/*drawingCtx*/ undefined, range, offsetX);
-                this._drawCellsAndBorders(/*drawingCtx*/undefined, range, offsetX);
+                this._drawGrid(null, range, offsetX);
+                this._drawCellsAndBorders(null, range, offsetX);
                 this.af_drawButtons(range, offsetX, offsetY);
                 this.objectRender.showDrawingObjectsEx(false,
                   new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollVertical, range, {
@@ -5709,9 +5709,9 @@
             var range = new asc_Range(c1, vr.r1, c2, vr.r2);
             offsetX = this.cols[this.visibleRange.c1].left - this.cellsLeft - diffWidth;
             offsetY = this.rows[this.visibleRange.r1].top - this.cellsTop - diffHeight;
-            this._drawColumnHeaders(/*drawingCtx*/ undefined, c1, c2);
-            this._drawGrid(/*drawingCtx*/ undefined, range);
-            this._drawCellsAndBorders(/*drawingCtx*/undefined, range);
+            this._drawColumnHeaders(null, c1, c2);
+            this._drawGrid(null, range);
+            this._drawCellsAndBorders(null, range);
             this.af_drawButtons(range, offsetX, offsetY);
             this.objectRender.showDrawingObjectsEx(false,
               new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range, {
@@ -5721,8 +5721,8 @@
                 range.r1 = 0;
                 range.r2 = rFrozen - 1;
                 offsetY = this.rows[0].top - this.cellsTop;
-                this._drawGrid(/*drawingCtx*/ undefined, range, undefined, offsetY);
-                this._drawCellsAndBorders(/*drawingCtx*/undefined, range, undefined, offsetY);
+                this._drawGrid(null, range, undefined, offsetY);
+                this._drawCellsAndBorders(null, range, undefined, offsetY);
                 this.af_drawButtons(range, offsetX, offsetY);
                 this.objectRender.showDrawingObjectsEx(false,
                   new AscFormat.GraphicOption(this, c_oAscGraphicOption.ScrollHorizontal, range, {
