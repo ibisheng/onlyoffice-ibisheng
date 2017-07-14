@@ -62,22 +62,22 @@
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
 		cBETA_DIST, cBETA_INV, cBINOMDIST, cBINOM_DIST, cBINOM_INV, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT,
-		cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T, cCORREL, cCOUNT, cCOUNTA,
-		cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM, cDEVSQ, cEXPON_DIST,
-		cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
+		cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T, cCORREL, cCOUNT,
+		cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM, cDEVSQ,
+		cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
 		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
 		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
 		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE,
-		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNORMDIST, cNORMINV, cNORMSDIST, cNORMSINV, cPEARSON, cPERCENTILE,
-		cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPOISSON,
-		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
-		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEVA, cSTDEVP, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T,
-		cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA,
-		cWEIBULL, cZTEST);
+		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST,
+		cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK,
+		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC,
+		cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S,
+		cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV,
+		cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST,
+		cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cCHITEST, cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND,
-		cTRIMMEAN, cTTEST, cWEIBULL, cZTEST);
+	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
 
 	function isInteger(value) {
 		return typeof value === 'number' && isFinite(value) && 	Math.floor(value) === value;
@@ -655,6 +655,198 @@
 			}
 		}
 		return fValue;
+	}
+
+	function chiTest(pMat1, pMat2){
+		if (!pMat1 || !pMat2){
+			return new cError(cErrorType.not_available);
+		}
+
+		var nC1 = pMat1.length;
+		var nC2 = pMat2.length;
+		var nR1 = pMat1[0].length;
+		var nR2 = pMat2[0].length;
+
+		if (nR1 !== nR2 || nC1 !== nC2){
+			return new cError(cErrorType.not_available);
+		}
+
+		var fChi = 0.0;
+		var bEmpty = true;
+		for (var i = 0; i < nC1; i++){
+			for (var j = 0; j < nR1; j++){
+				if (pMat1[i][j] && pMat2[i][j]){
+					bEmpty = false;
+
+					//MS выдает ошибку только если первый элемент строка. LO - если любой.
+					if (i === 0 && j === 0 && cElementType.string === pMat1[i][j].type){
+						return new cError(cErrorType.division_by_zero);
+					}
+
+					if(cElementType.number !== pMat1[i][j].type || cElementType.number !== pMat2[i][j].type){
+						continue;
+					}
+
+					var fValX = pMat1[i][j].getValue();
+					var fValE = pMat2[i][j].getValue();
+					if ( fValE === 0.0 ){
+						return new cError(cErrorType.division_by_zero);
+					}
+
+					var fTemp1 = (fValX - fValE) * (fValX - fValE);
+					var fTemp2 = fTemp1;
+					fChi += fTemp2 / fValE;
+				}
+			}
+		}
+
+		if ( bEmpty ){
+			return new cError(cErrorType.wrong_value_type);
+		}
+
+		var fDF;
+		if (nC1 === 1 || nR1 === 1){
+			fDF = nC1*nR1 - 1;
+			if (fDF === 0){
+				return new cError(cErrorType.not_available);
+			}
+		}else{
+			fDF = (nC1 - 1)*(nR1 - 1);
+		}
+
+		if ( fDF < 1 || fChi < 0 || fDF > Math.pow(10, 10)){
+			return  new cError(cErrorType.not_numeric);
+		}
+
+		var res = getChiDist(fChi, fDF);
+		return  null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+	}
+
+	function tTest(pMat1, pMat2, fTails, fTyp){
+		var fT, fF;
+		var nC1 = pMat1.length;
+		var nC2 = pMat2.length;
+		var nR1 = pMat1[0].length;
+		var nR2 = pMat2[0].length;
+
+		var calcTest = null;
+		if (fTyp === 1.0){
+			if (nC1 !== nC2 || nR1 !== nR2){
+				return new cError(cErrorType.not_available);
+			}
+
+			var fCount   = 0.0;
+			var fSum1    = 0.0;
+			var fSum2    = 0.0;
+			var fSumSqrD = 0.0;
+			var fVal1, fVal2;
+			for (var i = 0; i < nC1; i++){
+				for (var j = 0; j < nR1; j++){
+					if(cElementType.number !== pMat1[i][j].type || cElementType.number !== pMat2[i][j].type){
+						continue;
+					}
+
+					fVal1 = pMat1[i][j].getValue();
+					fVal2 = pMat2[i][j].getValue();
+					fSum1    += fVal1;
+					fSum2    += fVal2;
+					fSumSqrD += (fVal1 - fVal2)*(fVal1 - fVal2);
+					fCount++;
+				}
+			}
+
+			if (fCount < 1.0){
+				return new cError(cErrorType.wrong_value_type);
+			}
+			var fSumD = fSum1 - fSum2;
+			var fDivider = (fCount*fSumSqrD - fSumD*fSumD);
+			if ( fDivider === 0.0 ){
+				return new cError(cErrorType.division_by_zero);
+			}
+
+			fT = Math.abs(fSumD) * Math.sqrt((fCount-1.0) / fDivider);
+			fF = fCount - 1.0;
+		}
+		else if (fTyp === 2.0){
+			calcTest = CalculateTest(false, nC1, nC2, nR1, nR2, pMat1, pMat2, fT, fF);
+		}
+		else if (fTyp === 3.0){
+			calcTest = CalculateTest(true, nC1, nC2, nR1, nR2, pMat1, pMat2, fT, fF);
+		}else{
+			return new cError(cErrorType.not_numeric);
+		}
+
+		if(null !== calcTest){
+			if(false === calcTest){
+				return new cError(cErrorType.wrong_value_type);
+			}else{
+				fT = calcTest.fT;
+				fF = calcTest.fF;
+			}
+		}
+
+		var res = getTDist(fT, fF, fTails);
+		return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+	}
+
+	function CalculateTest( bTemplin, nC1, nC2, nR1, nR2, pMat1, pMat2 , fT, fF)
+	{
+		var fCount1  = 0.0;
+		var fCount2  = 0.0;
+		var fSum1    = 0.0;
+		var fSumSqr1 = 0.0;
+		var fSum2    = 0.0;
+		var fSumSqr2 = 0.0;
+		var fVal;
+
+		for (var i = 0; i < nC1; i++){
+			for (var j = 0; j < nR1; j++)
+			{
+				if (cElementType.string !== pMat1[i][j].type)
+				{
+					fVal = pMat1[i][j].getValue();
+					fSum1    += fVal;
+					fSumSqr1 += fVal * fVal;
+					fCount1++;
+				}
+			}
+		}
+
+		for (var i = 0; i < nC2; i++){
+			for (var j = 0; j < nR2; j++)
+			{
+				if (cElementType.string !== pMat2[i][j].type)
+				{
+					fVal = pMat2[i][j].getValue();
+					fSum2    += fVal;
+					fSumSqr2 += fVal * fVal;
+					fCount2++;
+				}
+			}
+		}
+
+		if (fCount1 < 2.0 || fCount2 < 2.0){
+			return false;
+		}
+		if ( bTemplin ){
+			var fS1 = (fSumSqr1 - fSum1 * fSum1 / fCount1) / (fCount1 - 1.0) / fCount1;
+			var fS2 = (fSumSqr2 - fSum2 * fSum2 / fCount2) / (fCount2 - 1.0) / fCount2;
+			if (fS1 + fS2 === 0.0){
+				return false;
+			}
+
+			var c = fS1 / (fS1 + fS2);
+			fT = Math.abs(fSum1 / fCount1 - fSum2 / fCount2) / Math.sqrt(fS1 + fS2);
+			fF = 1.0 / (c * c / (fCount1 - 1.0) + (1.0 - c) * (1.0 - c) / (fCount2 - 1.0));
+		}else{
+			var fS1 = (fSumSqr1 - fSum1 * fSum1 / fCount1) / (fCount1 - 1.0);
+			var fS2 = (fSumSqr2 - fSum2 * fSum2 / fCount2) / (fCount2 - 1.0);
+
+			fT = Math.abs( fSum1 / fCount1 - fSum2 / fCount2 ) / Math.sqrt( (fCount1-1.0)*fS1 + (fCount2-1.0)*fS2 ) * Math.sqrt( fCount1*fCount2*(fCount1+fCount2-2)/(fCount1+fCount2) );
+			fF = fCount1 + fCount2 - 2;
+		}
+
+		return {fT: fT, fF: fF};
 	}
 
 	//BETA DISTRIBUTION
@@ -2035,11 +2227,66 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cCHITEST() {
-		cBaseFunction.call(this, "CHITEST");
+		this.name = "CHITEST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cCHITEST.prototype = Object.create(cBaseFunction.prototype);
 	cCHITEST.prototype.constructor = cCHITEST;
+	cCHITEST.prototype.argumentsMin = 2;
+	cCHITEST.prototype.argumentsMax = 2;
+	cCHITEST.prototype.Calculate = function (arg) {
+
+		var arg2 = [arg[0], arg[1]];
+		//если первое или второе значение строка
+		if(cElementType.string === arg[0].type || cElementType.bool === arg[0].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		if(cElementType.string === arg[1].type || cElementType.bool === arg[1].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		//если первое или второе значение число
+		if(cElementType.number === arg[0].type){
+			arg2[0] = new cArray();
+			arg2[0].addElement(arg[0]);
+		}
+		if(cElementType.number === arg[1].type){
+			arg2[1] = new cArray();
+			arg2[1].addElement(arg[1]);
+		}
+
+		var oArguments = this._prepareArguments(arg2, arguments[1], true, [cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function calcChitest(argArray) {
+
+			var arg1 = argArray[0];
+			var arg2 = argArray[1];
+
+			return chiTest(arg1, arg2);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcChitest);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cCHITEST}
+	 */
+	function cCHISQ_TEST() {
+		cCHITEST.call(this);
+		this.name = "CHISQ.TEST";
+	}
+
+	cCHISQ_TEST.prototype = Object.create(cCHITEST.prototype);
+	cCHISQ_TEST.prototype.constructor = cCHISQ_TEST;
+	cCHISQ_TEST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
@@ -4056,6 +4303,68 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
+	function cHYPGEOM_DIST() {
+		cBaseFunction.call(this, "HYPGEOM.DIST");
+	}
+
+	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
+	cHYPGEOM_DIST.prototype.argumentsMin = 5;
+	cHYPGEOM_DIST.prototype.argumentsMax = 5;
+	cHYPGEOM_DIST.prototype.isXLFN = true;
+	cHYPGEOM_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+		argClone[4] = argClone[4].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function hypgeomdist(argArray) {
+			var arg0 = Math.floor(argArray[0]);
+			var arg1 = Math.floor(argArray[1]);
+			var arg2 = Math.floor(argArray[2]);
+			var arg3 =  Math.floor(argArray[3]);
+			var bCumulative = argArray[4];
+
+			if (arg0 < 0 || arg0 > Math.min(arg1, arg2) || arg0 < Math.max(0, arg1 - arg3 + arg2) || arg1 <= 0 || arg1 > arg3 || arg2 <= 0 || arg2 > arg3 || arg3 <= 0) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res;
+			if(bCumulative){
+				var fVal = 0.0;
+
+				//TODO значения неверные для этой ветки! пересчитать
+				for ( var i = 0; i <= arg0; i++ ){
+					var temp = Math.binomCoeff(arg2, i) * Math.binomCoeff(arg3 - arg2, arg1 - i) / Math.binomCoeff(arg3, arg1);
+					if(!isNaN(temp)){
+						fVal += temp;
+					}
+				}
+
+				res = fVal;
+			}else{
+				res = Math.binomCoeff(arg2, arg0) * Math.binomCoeff(arg3 - arg2, arg1 - arg0) / Math.binomCoeff(arg3, arg1);
+			}
+
+			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, hypgeomdist);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cINTERCEPT() {
 		this.name = "INTERCEPT";
 		this.value = null;
@@ -5060,9 +5369,7 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNEGBINOMDIST() {
-		this.name = "NEGBINOMDIST";
-		this.value = null;
-		this.argumentsCurrent = 0;
+		cBaseFunction.call(this, "NEGBINOMDIST");
 	}
 
 	cNEGBINOMDIST.prototype = Object.create(cBaseFunction.prototype);
@@ -5070,12 +5377,22 @@
 	cNEGBINOMDIST.prototype.argumentsMin = 3;
 	cNEGBINOMDIST.prototype.argumentsMax = 3;
 	cNEGBINOMDIST.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
 
-		function negbinomdist(x, r, p) {
-			x = parseInt(x.getValue());
-			r = parseInt(r.getValue());
-			p = p.getValue();
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function negbinomdist(argArray) {
+			var x = argArray[0];
+			var r = argArray[1];
+			var p = argArray[2];
 			if (x < 0 || r < 1 || p < 0 || p > 1) {
 				return new cError(cErrorType.not_numeric);
 			} else {
@@ -5083,40 +5400,57 @@
 			}
 		}
 
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]);
-		} else if (arg0 instanceof cArray) {
-			arg0 = arg0.getElement(0);
+		return this.value = this._findArrayInNumberArguments(oArguments, negbinomdist);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cNEGBINOM_DIST() {
+		cBaseFunction.call(this, "NEGBINOM.DIST");
+	}
+
+	cNEGBINOM_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cNEGBINOM_DIST.prototype.constructor = cNEGBINOM_DIST;
+	cNEGBINOM_DIST.prototype.argumentsMin = 4;
+	cNEGBINOM_DIST.prototype.argumentsMax = 4;
+	cNEGBINOM_DIST.prototype.isXLFN = true;
+	cNEGBINOM_DIST.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
 		}
 
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
-		} else if (arg1 instanceof cArray) {
-			arg1 = arg1.getElement(0);
+		function negbinomdist(argArray) {
+			var x = parseInt(argArray[0]);
+			var r = parseInt(argArray[1]);
+			var p = argArray[2];
+			var bCumulative = argArray[3];
+
+			if (x < 0 || r < 1 || p < 0 || p > 1) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var res;
+			if ( bCumulative ){
+				res = 1 - getBetaDist( 1 - p, x + 1, r );
+			}else{
+				res = Math.binomCoeff(x + r - 1, r - 1) * Math.pow(p, r) * Math.pow(1 - p, x);
+			}
+
+			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
 		}
 
-		if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-			arg2 = arg2.cross(arguments[1]);
-		} else if (arg2 instanceof cArray) {
-			arg2 = arg2.getElement(0);
-		}
-
-		arg0 = arg0.tocNumber();
-		arg1 = arg1.tocNumber();
-		arg2 = arg2.tocNumber();
-
-		if (arg0 instanceof cError) {
-			return this.value = arg0;
-		}
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
-		}
-		if (arg2 instanceof cError) {
-			return this.value = arg2;
-		}
-
-		return this.value = negbinomdist(arg0, arg1, arg2);
-
+		return this.value = this._findArrayInNumberArguments(oArguments, negbinomdist);
 	};
 
 	/**
@@ -5196,6 +5530,20 @@
 		return this.value = normdist(arg0.getValue(), arg1.getValue(), arg2.getValue(), arg3.toBool());
 	};
 
+
+	/**
+	 * @constructor
+	 * @extends {cPERCENTILE}
+	 */
+	function cNORM_DIST() {
+		cNORMDIST.call(this);
+		this.name = "NORM.DIST";
+	}
+
+	cNORM_DIST.prototype = Object.create(cNORMDIST.prototype);
+	cNORM_DIST.prototype.constructor = cNORM_DIST;
+	cNORM_DIST.prototype.isXLFN = true;
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
@@ -5259,6 +5607,19 @@
 
 	/**
 	 * @constructor
+	 * @extends {cNORMINV}
+	 */
+	function cNORM_INV() {
+		cNORMINV.call(this);
+		this.name = "NORM.INV";
+	}
+
+	cNORM_INV.prototype = Object.create(cNORMINV.prototype);
+	cNORM_INV.prototype.constructor = cNORM_INV;
+	cNORM_INV.prototype.isXLFN = true;
+
+	/**
+	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNORMSDIST() {
@@ -5293,6 +5654,50 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 		return this.value = arg0;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cNORM_S_DIST() {
+		this.name = "NORM.S.DIST";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cNORM_S_DIST.prototype = Object.create(cBaseFunction.prototype);
+	cNORM_S_DIST.prototype.constructor = cNORM_S_DIST;
+	cNORM_S_DIST.prototype.argumentsMin = 2;
+	cNORM_S_DIST.prototype.argumentsMax = 2;
+	cNORM_S_DIST.prototype.isXLFN = true;
+	cNORM_S_DIST.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cNORM_S_DIST.prototype.Calculate = function (arg) {
+		function normDistCalc(argArray) {
+
+			var arg0 = argArray[0], arg1 = argArray[1];
+			var res;
+			if(arg1){
+				res = 0.5 + gauss(arg0);
+			}else{
+				res = Math.exp( - Math.pow( arg0, 2 ) / 2 ) / Math.sqrt( 2 * Math.PI );
+			}
+
+			return isNaN(res) ? new cError(cErrorType.not_numeric) : new cNumber(res);
+		}
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, normDistCalc);
 	};
 
 	/**
@@ -5341,6 +5746,19 @@
 		}
 		return this.value = arg0;
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cNORMSINV}
+	 */
+	function cNORM_S_INV() {
+		cNORMSINV.call(this);
+		this.name = "NORM.S.INV";
+	}
+
+	cNORM_S_INV.prototype = Object.create(cNORMSINV.prototype);
+	cNORM_S_INV.prototype.constructor = cNORM_S_INV;
+	cNORM_S_INV.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
@@ -5661,76 +6079,108 @@
 	cPERMUT.prototype.argumentsMin = 2;
 	cPERMUT.prototype.argumentsMax = 2;
 	cPERMUT.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1];
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]);
-		}
-		arg0 = arg0.tocNumber();
 
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
-		}
-		arg1 = arg1.tocNumber();
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
 
-		if (arg0 instanceof cError) {
-			return this.value = arg0;
-		}
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
 		}
 
-		if (arg0 instanceof cArray && arg1 instanceof cArray) {
-			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
-			} else {
-				arg0.foreach(function (elem, r, c) {
-					var a = elem, b = arg1.getElementRowCol(r, c);
-					if (a instanceof cNumber && b instanceof cNumber) {
-						this.array[r][c] = new cNumber(Math.permut(a.getValue(), b.getValue()));
-					} else {
-						this.array[r][c] = new cError(cErrorType.wrong_value_type);
-					}
-				});
-				return this.value = arg0;
+		function permut(argArray) {
+			var n = Math.floor(argArray[0]);
+			var k = Math.floor(argArray[1]);
+			if (n <= 0 || k <= 0 || n < k) {
+				return new cError(cErrorType.not_numeric);
 			}
-		} else if (arg0 instanceof cArray) {
-			arg0.foreach(function (elem, r, c) {
-				var a = elem, b = arg1;
-				if (a instanceof cNumber && b instanceof cNumber) {
 
-					if (a.getValue() <= 0 || b.getValue() <= 0 || a.getValue() < b.getValue()) {
-						this.array[r][c] = new cError(cErrorType.not_numeric);
-					}
-
-					this.array[r][c] = new cNumber(Math.permut(a.getValue(), b.getValue()));
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg0;
-		} else if (arg1 instanceof cArray) {
-			arg1.foreach(function (elem, r, c) {
-				var a = arg0, b = elem;
-				if (a instanceof cNumber && b instanceof cNumber) {
-
-					if (a.getValue() <= 0 || b.getValue() <= 0 || a.getValue() < b.getValue()) {
-						this.array[r][c] = new cError(cErrorType.not_numeric);
-					}
-
-					this.array[r][c] = new cNumber(Math.permut(a.getValue(), b.getValue()));
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg1;
+			return new cNumber(Math.permut(n, k));
 		}
 
-		if (arg0.getValue() <= 0 || arg1.getValue() <= 0 || arg0.getValue() < arg1.getValue()) {
-			return this.value = new cError(cErrorType.not_numeric);
-		}
-
-		return this.value = new cNumber(Math.permut(arg0.getValue(), arg1.getValue()));
+		return this.value = this._findArrayInNumberArguments(oArguments, permut);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cPERMUTATIONA() {
+		this.name = "PERMUTATIONA";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cPERMUTATIONA.prototype = Object.create(cBaseFunction.prototype);
+	cPERMUTATIONA.prototype.constructor = cPERMUTATIONA;
+	cPERMUTATIONA.prototype.argumentsMin = 2;
+	cPERMUTATIONA.prototype.argumentsMax = 2;
+	cPERMUTATIONA.prototype.isXLFN = true;
+	cPERMUTATIONA.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function permutationa(argArray) {
+			var n = Math.floor(argArray[0]);
+			var k = Math.floor(argArray[1]);
+			if (n < 0.0 || k < 0.0){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return new cNumber(Math.pow(n,k));
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, permutationa);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cPHI() {
+		this.name = "PHI";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cPHI.prototype = Object.create(cBaseFunction.prototype);
+	cPHI.prototype.constructor = cPHI;
+	cPHI.prototype.argumentsMin = 1;
+	cPHI.prototype.argumentsMax = 1;
+	cPHI.prototype.isXLFN = true;
+	cPHI.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function calcPhi(argArray) {
+			var res = phi(argArray[0]);
+
+			return isNaN(res) ? new cError(cErrorType.not_available) : new cNumber(res);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcPhi);
+	};
+
 
 	/**
 	 * @constructor
@@ -6628,6 +7078,20 @@
 
 	/**
 	 * @constructor
+	 * @extends {cSTDEV}
+	 */
+	function cSTDEV_S() {
+		cSTDEV.call(this);
+		this.name = "STDEV.S";
+	}
+
+	cSTDEV_S.prototype = Object.create(cSTDEV.prototype);
+	cSTDEV_S.prototype.constructor = cSTDEV_S;
+	cSTDEV_S.prototype.isXLFN = true;
+
+
+	/**
+	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cSTDEVA() {
@@ -6758,6 +7222,19 @@
 		}
 		return this.value = _var(arr0);
 	};
+
+	/**
+	 * @constructor
+	 * @extends {cSTDEVP}
+	 */
+	function cSTDEV_P() {
+		cSTDEVP.call(this);
+		this.name = "STDEV.P";
+	}
+
+	cSTDEV_P.prototype = Object.create(cSTDEVP.prototype);
+	cSTDEV_P.prototype.constructor = cSTDEV_P;
+	cSTDEV_P.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
@@ -7233,22 +7710,152 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTRIMMEAN() {
-		cBaseFunction.call(this, "TRIMMEAN");
+		this.name = "TRIMMEAN";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cTRIMMEAN.prototype = Object.create(cBaseFunction.prototype);
 	cTRIMMEAN.prototype.constructor = cTRIMMEAN;
+	cTRIMMEAN.prototype.argumentsMin = 2;
+	cTRIMMEAN.prototype.argumentsMax = 2;
+	cTRIMMEAN.prototype.Calculate = function (arg) {
+
+		var arg2 = [arg[0], arg[1]];
+		//если первое значение строка
+		if(cElementType.string === arg[0].type || cElementType.bool === arg[0].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		//если первое значение число
+		if(cElementType.number === arg[0].type){
+			arg2[0] = new cArray();
+			arg2[0].addElement(arg[0]);
+		}
+
+		var oArguments = this._prepareArguments(arg2, arguments[1], true, [cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTrimMean = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+
+			if (arg1 < 0.0 || arg1 >= 1.0){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var arr = [];
+			for (var i = 0; i < arg0.length; i++) {
+				for (var j = 0; j < arg0[i].length; j++) {
+					if (cElementType.number === arg0[i][j].type) {
+						arr.push(arg0[i][j].getValue());
+					}
+				}
+			}
+
+			var aSortArray = arr.sort(fSortAscending);
+			var nSize = aSortArray.length;
+			if (nSize == 0){
+				return  new cError(cErrorType.not_numeric);
+			}else{
+
+				var nIndex = Math.floor(arg1 * nSize);
+				if (nIndex % 2 !== 0){
+					nIndex--;
+				}
+				nIndex /= 2;
+
+				var fSum = 0.0;
+				for (var i = nIndex; i < nSize-nIndex; i++){
+					fSum += aSortArray[i];
+				}
+
+				return  new cNumber(fSum / (nSize - 2*nIndex));
+			}
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTrimMean);
+	};
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cTTEST() {
-		cBaseFunction.call(this, "TTEST");
+		this.name = "TTEST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cTTEST.prototype = Object.create(cBaseFunction.prototype);
 	cTTEST.prototype.constructor = cTTEST;
+	cTTEST.prototype.argumentsMin = 4;
+	cTTEST.prototype.argumentsMax = 4;
+	cTTEST.prototype.Calculate = function (arg) {
+
+		var arg2 = [arg[0], arg[1], arg[2], arg[3]];
+		//если первое или второе значение строка
+		if(cElementType.string === arg[0].type || cElementType.bool === arg[0].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		if(cElementType.string === arg[1].type || cElementType.bool === arg[1].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		//если первое или второе значение число
+		if(cElementType.number === arg[0].type){
+			arg2[0] = new cArray();
+			arg2[0].addElement(arg[0]);
+		}
+		if(cElementType.number === arg[1].type){
+			arg2[1] = new cArray();
+			arg2[1].addElement(arg[1]);
+		}
+
+		var oArguments = this._prepareArguments(arg2, arguments[1], true, [cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();//bool
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcTTest = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+			var arg2 = parseInt(argArray[2]);
+			var arg3 = parseInt(argArray[3]);
+
+			if(!(arg2 === 1 || arg2 === 2)){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return tTest(arg0, arg1, arg2, arg3);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcTTest);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cTTEST}
+	 */
+	function cT_TEST() {
+		cTTEST.call(this);
+		this.name = "T.TEST";
+	}
+
+	cT_TEST.prototype = Object.create(cTTEST.prototype);
+	cT_TEST.prototype.constructor = cT_TEST;
+	cT_TEST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
@@ -7700,22 +8307,163 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cWEIBULL() {
-		cBaseFunction.call(this, "WEIBULL");
+		this.name = "WEIBULL";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cWEIBULL.prototype = Object.create(cBaseFunction.prototype);
 	cWEIBULL.prototype.constructor = cWEIBULL;
+	cWEIBULL.prototype.argumentsMin = 4;
+	cWEIBULL.prototype.argumentsMax = 4;
+	cWEIBULL.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcWeibull = function(argArray){
+			var x = argArray[0];
+			var alpha = argArray[1];
+			var beta = argArray[2];
+			var kum = argArray[3];
+
+			var res;
+			if (alpha <= 0 || beta <= 0 || x < 0){
+				return  new cError(cErrorType.not_numeric);
+			} else if (kum === 0){
+				res = alpha / Math.pow(beta,alpha) * Math.pow(x,alpha-1.0) * Math.exp(-Math.pow(x/beta,alpha));
+			}else{
+				res = 1.0 - Math.exp(-Math.pow(x  / beta, alpha));
+			}
+
+			return new cNumber(res);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcWeibull);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cRANK}
+	 */
+	function cWEIBULL_DIST() {
+		cWEIBULL.call(this);
+		this.name = "WEIBULL.DIST";
+	}
+
+	cWEIBULL_DIST.prototype = Object.create(cWEIBULL.prototype);
+	cWEIBULL_DIST.prototype.constructor = cWEIBULL_DIST;
+	cWEIBULL_DIST.prototype.isXLFN = true;
 
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cZTEST() {
-		cBaseFunction.call(this, "ZTEST");
+		this.name = "ZTEST";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cZTEST.prototype = Object.create(cBaseFunction.prototype);
 	cZTEST.prototype.constructor = cZTEST;
+	cZTEST.prototype.argumentsMin = 2;
+	cZTEST.prototype.argumentsMax = 3;
+	cZTEST.prototype.Calculate = function (arg) {
+
+		var arg2 = arg[2] ? [arg[0], arg[1], arg[2]] : [arg[0], arg[1]];
+		//если первое или второе значение строка
+		if(cElementType.string === arg[0].type || cElementType.bool === arg[0].type){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+		//если первое или второе значение число
+		if(cElementType.number === arg[0].type){
+			arg2[0] = new cArray();
+			arg2[0].addElement(arg[0]);
+		}
+
+		var oArguments = this._prepareArguments(arg2, arguments[1], true, [cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2] ? argClone[2].tocNumber() : new AscCommonExcel.cUndefined();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function calcZTest(argArray) {
+
+			var arg0 = argArray[0];
+			var x = argArray[1];
+			var sigma = argArray[2];
+
+			if ( sigma !== undefined && sigma <= 0 ){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var nC1 = arg0.length;
+			var nR1 = arg0[0].length;
+
+			var fSum    = 0.0;
+			var fSumSqr = 0.0;
+			var fVal;
+			var rValCount = 0.0;
+			for (var i = 0; i < nC1; i++){
+				for (var j = 0; j < nR1; j++){
+					if(cElementType.number !== arg0[i][j].type || cElementType.number !== arg0[i][j].type){
+						continue;
+					}
+
+					fVal = arg0[i][j].getValue();
+					fSum += fVal;
+					fSumSqr += fVal*fVal;
+					rValCount++;
+				}
+			}
+
+			var res;
+			if (rValCount <= 1.0){
+				return  new cError(cErrorType.division_by_zero);
+			}else{
+				var mue = fSum / rValCount;
+
+				if (undefined === sigma){
+					sigma = (fSumSqr - fSum * fSum / rValCount) / (rValCount - 1.0);
+					res = 0.5 - gauss((mue - x) / Math.sqrt(sigma / rValCount));
+				}else{
+					res = 0.5 - gauss((mue - x) * Math.sqrt(rValCount) / sigma);
+				}
+			}
+
+			return new cNumber(res);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcZTest);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {cZTEST}
+	 */
+	function cZ_TEST() {
+		cZTEST.call(this);
+		this.name = "Z.TEST";
+	}
+
+	cZ_TEST.prototype = Object.create(cZTEST.prototype);
+	cZ_TEST.prototype.constructor = cZ_TEST;
+	cZ_TEST.prototype.isXLFN = true;
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};

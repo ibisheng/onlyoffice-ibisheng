@@ -4426,6 +4426,7 @@
 
 					styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name];
 					if (!styleForCurTable) {
+						worksheet.workbook.dependencyFormulas.unlockRecal();
 						return;
 					}
 					

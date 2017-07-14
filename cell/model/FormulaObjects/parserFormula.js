@@ -751,7 +751,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cString.prototype.tocBool = function () {
 		var res;
 		if (parserHelp.isBoolean(this.value, 0)) {
-			res = new cBool(parserHelp.operand_str.toUpperCase() === cBoolLocal["t"].toUpperCase());
+			res = new cBool(parserHelp.operand_str.toUpperCase() === cBoolLocal.t);
 		} else {
 			res = this;
 		}
@@ -769,7 +769,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		var v = false;
 		switch (val.toString().toUpperCase()) {
 			case "TRUE":
-			case cBoolLocal["t"].toUpperCase():
+			case cBoolLocal.t:
 				v = true;
 		}
 		cBaseType.call(this, v);
@@ -791,7 +791,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return new cString(this.value ? "TRUE" : "FALSE");
 	};
 	cBool.prototype.toLocaleString = function () {
-		return new cString(this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase());
+		return new cString(this.value ? cBoolLocal.t : cBoolLocal.f);
 	};
 	cBool.prototype.tocBool = function () {
 		return this;
@@ -881,10 +881,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cError.prototype = Object.create(cBaseType.prototype);
 	cError.prototype.constructor = cError;
 	cError.prototype.type = cElementType.error;
-	cError.prototype.tocNumber =
-		cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function () {
-			return this;
-		};
+	cError.prototype.tocNumber = cError.prototype.tocString = cError.prototype.tocBool = function () {
+		return this;
+	};
 	cError.prototype.toLocaleString = function () {
 		switch (this.value) {
 			case cErrorOrigin["value"]:
@@ -941,9 +940,6 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		return cErrorLocal["na"];
 	};
-	/*cError.prototype.toString = function () {
-	 return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
-	 };*/
 
 	/**
 	 * @constructor
@@ -1016,7 +1012,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.getValue()[0].tocString();
 	};
 	cArea.prototype.tocBool = function () {
-		return this.getValue()[0].tocBool();
+		return new cError(cErrorType.wrong_value_type);
 	};
 	cArea.prototype.toString = function () {
 		var _c;
@@ -1260,7 +1256,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.getValue()[0].tocString();
 	};
 	cArea3D.prototype.tocBool = function () {
-		return this.getValue()[0].tocBool();
+		return new cError(cErrorType.wrong_value_type);
 	};
 	cArea3D.prototype.tocArea = function () {
 		var wsR = this.wsRange();

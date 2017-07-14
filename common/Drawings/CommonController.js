@@ -6827,6 +6827,9 @@ DrawingObjectsController.prototype =
 
     setSelectionState: function( state, stateIndex )
     {
+        if(!Array.isArray(state)){
+            return;
+        }
         var _state_index = AscFormat.isRealNumber(stateIndex) ? stateIndex : state.length-1;
         var selection_state = state[_state_index];
         this.clearPreTrackObjects();
@@ -6865,11 +6868,13 @@ DrawingObjectsController.prototype =
         }
         else
         {
-            for(var i = 0; i < selection_state.selection.length; ++i)
-            {
-                if(!selection_state.selection[i].object.bDeleted)
+            if(Array.isArray(selection_state.selection)){
+                for(var i = 0; i < selection_state.selection.length; ++i)
                 {
-                    this.selectObject(selection_state.selection[i].object, selection_state.selection[i].pageIndex);
+                    if(!selection_state.selection[i].object.bDeleted)
+                    {
+                        this.selectObject(selection_state.selection[i].object, selection_state.selection[i].pageIndex);
+                    }
                 }
             }
         }

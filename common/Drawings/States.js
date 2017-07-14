@@ -878,6 +878,9 @@ PreMoveState.prototype =
         {
             return {objectId: this.majorObject.Get_Id(), cursorType: "move", bMarker: true};
         }
+        else{
+            this.onMouseUp(e, x, y, pageIndex);
+        }
     },
 
     onMouseMove: function(e, x, y, pageIndex)
@@ -2237,4 +2240,5 @@ AddPolyLine2State3.prototype =
     window['AscFormat'].SplineBezierState = SplineBezierState;
     window['AscFormat'].PolyLineAddState = PolyLineAddState;
     window['AscFormat'].AddPolyLine2State = AddPolyLine2State;
+    window['AscFormat'].checkEmptyPlaceholderContent = checkEmptyPlaceholderContent;
 })(window);

@@ -3801,6 +3801,9 @@ CShape.prototype.hitInTextRectWord = function(x, y)
 
 CShape.prototype.hitInTextRect = function (x, y) {
     var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
+    if(this.parent && this.parent.kind === AscFormat.TYPE_KIND.NOTES){
+        return true;
+    }
     if(!this.txWarpStruct || !this.recalcInfo.warpGeometry ||
         this.recalcInfo.warpGeometry.preset === "textNoShape" ||
         oController && (AscFormat.getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))

@@ -98,7 +98,7 @@
     };
     this.cells = {
       defaultState: {
-        background: new CColor(255, 255, 255), border: new CColor(212, 212, 212), color: new CColor(0, 0, 0)
+        background: new CColor(255, 255, 255), border: new CColor(212, 212, 212)
       }, padding: -1, /*px horizontal padding*/
       paddingPlusBorder: -1
     };
@@ -2623,7 +2623,7 @@
     for (var f in oFormulaList) {
       this.formulasList.push(f);
     }
-    this.arrExcludeFormulas = [cBoolLocal["t"].toUpperCase(), cBoolLocal["f"].toUpperCase()];
+    this.arrExcludeFormulas = [cBoolLocal.t, cBoolLocal.f];
   };
 
   WorkbookView.prototype._setHintsProps = function(bIsHinting, bIsSubpixHinting) {

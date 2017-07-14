@@ -87,11 +87,6 @@ CShape.prototype.Is_UseInDocument = function(){
     return false;
 };
 
-CShape.prototype.isEmptyPlaceholder = function()
-{
-    return false;
-};
-
 CShape.prototype.getTextArtPreviewManager = function()
 {
     return Asc["editor"].textArtPreviewManager;

@@ -68,6 +68,23 @@
         return AscDFH.historyitem_type_Notes;
     };
 
+    CNotes.prototype.Get_Id = function () {
+        return this.Id;
+    };
+
+    CNotes.prototype.Clear_ContentChanges = function()
+    {
+    };
+
+    CNotes.prototype.Add_ContentChanges = function(Changes)
+    {
+    };
+
+    CNotes.prototype.Refresh_ContentChanges = function()
+    {
+    };
+
+
     CNotes.prototype.Write_ToBinary2 = function(w){
         w.WriteLong(this.getObjectType());
         w.WriteString2(this.Id);
@@ -187,9 +204,86 @@
         return this.Master.Theme;
     };
 
+    CNotes.prototype.Refresh_RecalcData = function(){
+
+    };
+
+    CNotes.prototype.Refresh_RecalcData2 = function(){
+
+    };
+
+    CNotes.prototype.createDuplicate = function(){
+
+        var copy = new CNotes();
+        if(this.clrMap){
+            copy.setClrMap(this.clrMap.createDuplicate());
+        }
+
+        if(typeof this.cSld.name === "string" && this.cSld.name.length > 0)
+        {
+            copy.setCSldName(this.cSld.name);
+        }
+        if(this.cSld.Bg)
+        {
+            copy.changeBackground(this.cSld.Bg.createFullCopy());
+        }
+        for(var i = 0; i < this.cSld.spTree.length; ++i)
+        {
+            var _copy;
+            _copy = this.cSld.spTree[i].copy();
+            copy.addToSpTreeToPos(copy.cSld.spTree.length, _copy);
+            copy.cSld.spTree[copy.cSld.spTree.length - 1].setParent2(copy);
+        }
+        if(AscFormat.isRealBool(this.showMasterPhAnim))
+        {
+            copy.setShowPhAnim(this.showMasterPhAnim);
+        }
+        if(AscFormat.isRealBool(this.showMasterSp))
+        {
+            copy.setShowMasterSp(this.showMasterSp);
+        }
+        copy.setNotesMaster(this.Master);
+
+        return copy;
+    };
+
+
+    CNotes.prototype.isEmptyBody = function(){
+        var oBodyShape = this.getBodyShape();
+        if(!oBodyShape){
+            return true;
+        }
+        return oBodyShape.isEmptyPlaceholder();
+    };
+
+    CNotes.prototype.showDrawingObjects = function(){
+        if(this.slide){
+            editor.WordControl.m_oDrawingDocument.Notes_OnRecalculate(this.slide.num, this.slide.NotesWidth, this.slide.getNotesHeight());
+        }
+    };
+
+    CNotes.prototype.OnUpdateOverlay = function()
+    {
+        editor.WordControl.OnUpdateOverlay();
+    };
+    CNotes.prototype.getDrawingsForController = function()
+    {
+        var _ret = [];
+        var oBodyShape = this.getBodyShape();
+        if(oBodyShape){
+            _ret.push(oBodyShape);
+        }
+        return _ret;
+    };
+    CNotes.prototype.sendGraphicObjectProps = function()
+    {
+        editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
+    };
+
     function CreateNotes(){
         var oN = new CNotes();
         var oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         var oNvSpPr = new AscFormat.UniNvPr();
         var oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(2);
@@ -207,6 +301,7 @@
         oN.addToSpTreeToPos(0, oSp);
 
         oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         oNvSpPr = new AscFormat.UniNvPr();
         oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(3);
@@ -228,6 +323,7 @@
         oN.addToSpTreeToPos(1, oSp);
 
         oSp = new AscFormat.CShape();
+        oSp.setBDeleted(false);
         oNvSpPr = new AscFormat.UniNvPr();
         oCNvPr = oNvSpPr.cNvPr;
         oCNvPr.setId(4);

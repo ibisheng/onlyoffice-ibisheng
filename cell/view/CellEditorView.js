@@ -1326,7 +1326,7 @@
 		}
 
 		if (opt.fragments.length > 0) {
-			t.textRender.render(t._getContentLeft(), dy || 0, t._getContentWidth(), opt.textColor);
+			t.textRender.render(undefined, t._getContentLeft(), dy || 0, t._getContentWidth(), opt.textColor);
 		}
 	};
 

@@ -279,11 +279,6 @@ CGraphicFrame.prototype.copy= function()
         return ret;
 };
 
-CGraphicFrame.prototype.isEmptyPlaceholder= function()
-    {
-        return false;
-};
-
 CGraphicFrame.prototype.getAllFonts= function(fonts)
     {
         if(this.graphicObject)

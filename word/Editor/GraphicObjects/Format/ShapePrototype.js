@@ -108,10 +108,6 @@ CShape.prototype.recalcBrush = function()
     this.recalcInfo.recalculateBrush = true;
 };
 
-CShape.prototype.isEmptyPlaceholder = function()
-{
-    return false;
-};
 
 CShape.prototype.recalcPen = function()
 {

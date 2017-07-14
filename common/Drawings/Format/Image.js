@@ -195,11 +195,6 @@ CImageShape.prototype.isPlaceholder  = function()
     return this.nvPicPr != null && this.nvPicPr.nvPr != undefined && this.nvPicPr.nvPr.ph != undefined;
 };
 
-CImageShape.prototype.isEmptyPlaceholder = function ()
-{
-    return false;
-};
-
 CImageShape.prototype.isShape = function()
 {
     return false;

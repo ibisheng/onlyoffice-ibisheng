@@ -773,11 +773,15 @@ if(typeof CPresentation !== "undefined")
 
         AscCommon.CollaborativeEditing.OnStart_CheckLock();
 
+        var oController = this.GetCurrentController();
+        if(!oController){
+            return false;
+        }
         if(CheckType === AscCommon.changestype_Drawing_Props)
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
                 return true;
-            var selected_objects = cur_slide.graphicObjects.selectedObjects;
+            var selected_objects = oController.selectedObjects;
             for(var i = 0; i < selected_objects.length; ++i)
             {
                 var check_obj =
@@ -919,7 +923,7 @@ if(typeof CPresentation !== "undefined")
         {
             if(cur_slide.deleteLock.Lock.Type !== locktype_Mine && cur_slide.deleteLock.Lock.Type !== locktype_None)
                 return true;
-            var selected_objects = cur_slide.graphicObjects.selectedObjects;
+            var selected_objects = oController.selectedObjects;
             for(var i = 0; i < selected_objects.length; ++i)
             {
                 var check_obj =
