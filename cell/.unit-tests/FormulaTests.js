@@ -4416,6 +4416,15 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), 0.583, "PERCENTRANK.INC(A202:A211, 5)" );
 	} );
 
+	test( "Test: \"PERMUTATIONA\"", function () {
+		oParser = new parserFormula( "PERMUTATIONA(3,2)", "A1", ws );
+		ok( oParser.parse(), "PERMUTATIONA(3,2)" );
+		strictEqual( oParser.calculate().getValue(), 9, "PERMUTATIONA(3,2)" );
+
+		oParser = new parserFormula( "PERMUTATIONA(2,2)", "A1", ws );
+		ok( oParser.parse(), "PERMUTATIONA(2,2)" );
+		strictEqual( oParser.calculate().getValue(), 4, "PERMUTATIONA(2,2)" );
+	} );
 
 	test( "Test: \"POISSON\"", function () {
 

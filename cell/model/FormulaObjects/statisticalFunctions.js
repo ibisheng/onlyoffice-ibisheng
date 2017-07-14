@@ -70,7 +70,7 @@
 		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE,
 		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST,
 		cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK,
-		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC,
+		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC,
 		cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S,
 		cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV,
 		cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST,
@@ -6149,6 +6149,48 @@
 
 		return this.value = new cNumber(Math.permut(arg0.getValue(), arg1.getValue()));
 	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cPERMUTATIONA() {
+		this.name = "PERMUTATIONA";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cPERMUTATIONA.prototype = Object.create(cBaseFunction.prototype);
+	cPERMUTATIONA.prototype.constructor = cQUARTILE;
+	cPERMUTATIONA.prototype.argumentsMin = 2;
+	cPERMUTATIONA.prototype.argumentsMax = 2;
+	cPERMUTATIONA.prototype.isXLFN = true;
+	cPERMUTATIONA.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function permutationa(argArray) {
+			var n = Math.floor(argArray[0]);
+			var k = Math.floor(argArray[1]);
+			if (n < 0.0 || k < 0.0){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return new cNumber(Math.pow(n,k));
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, permutationa);
+	};
+
 
 	/**
 	 * @constructor
