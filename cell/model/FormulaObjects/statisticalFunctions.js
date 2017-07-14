@@ -6079,75 +6079,29 @@
 	cPERMUT.prototype.argumentsMin = 2;
 	cPERMUT.prototype.argumentsMax = 2;
 	cPERMUT.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1];
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]);
-		}
-		arg0 = arg0.tocNumber();
 
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
-		}
-		arg1 = arg1.tocNumber();
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
 
-		if (arg0 instanceof cError) {
-			return this.value = arg0;
-		}
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
 		}
 
-		if (arg0 instanceof cArray && arg1 instanceof cArray) {
-			if (arg0.getCountElement() != arg1.getCountElement() || arg0.getRowCount() != arg1.getRowCount()) {
-				return this.value = new cError(cErrorType.not_available);
-			} else {
-				arg0.foreach(function (elem, r, c) {
-					var a = elem, b = arg1.getElementRowCol(r, c);
-					if (a instanceof cNumber && b instanceof cNumber) {
-						this.array[r][c] = new cNumber(Math.permut(a.getValue(), b.getValue()));
-					} else {
-						this.array[r][c] = new cError(cErrorType.wrong_value_type);
-					}
-				});
-				return this.value = arg0;
+		function permut(argArray) {
+			var n = Math.floor(argArray[0]);
+			var k = Math.floor(argArray[1]);
+			if (n <= 0 || k <= 0 || n < k) {
+				return new cError(cErrorType.not_numeric);
 			}
-		} else if (arg0 instanceof cArray) {
-			arg0.foreach(function (elem, r, c) {
-				var a = elem, b = arg1;
-				if (a instanceof cNumber && b instanceof cNumber) {
 
-					if (a.getValue() <= 0 || b.getValue() <= 0 || a.getValue() < b.getValue()) {
-						this.array[r][c] = new cError(cErrorType.not_numeric);
-					}
-
-					this.array[r][c] = new cNumber(Math.permut(a.getValue(), b.getValue()));
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg0;
-		} else if (arg1 instanceof cArray) {
-			arg1.foreach(function (elem, r, c) {
-				var a = arg0, b = elem;
-				if (a instanceof cNumber && b instanceof cNumber) {
-
-					if (a.getValue() <= 0 || b.getValue() <= 0 || a.getValue() < b.getValue()) {
-						this.array[r][c] = new cError(cErrorType.not_numeric);
-					}
-
-					this.array[r][c] = new cNumber(Math.permut(a.getValue(), b.getValue()));
-				} else {
-					this.array[r][c] = new cError(cErrorType.wrong_value_type);
-				}
-			});
-			return this.value = arg1;
+			return new cNumber(Math.permut(n, k));
 		}
 
-		if (arg0.getValue() <= 0 || arg1.getValue() <= 0 || arg0.getValue() < arg1.getValue()) {
-			return this.value = new cError(cErrorType.not_numeric);
-		}
-
-		return this.value = new cNumber(Math.permut(arg0.getValue(), arg1.getValue()));
+		return this.value = this._findArrayInNumberArguments(oArguments, permut);
 	};
 
 	/**
