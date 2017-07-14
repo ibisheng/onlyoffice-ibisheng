@@ -2714,7 +2714,7 @@
 					sheetMergedStyles.setTablePivotStyle(range, stripe1.dxf,
 						new Asc.CTableStyleStripe(stripe1.size, stripe2.size));
 				}
-				if (stripe2.dxf && range.r1 + stripe1.size <= pivotRange.r2) {
+				if (stripe2.dxf && range.r1 + stripe1.size <= range.r2) {
 					sheetMergedStyles.setTablePivotStyle(
 						new Asc.Range(range.c1, range.r1 + stripe1.size, range.c2, range.r2), stripe2.dxf,
 						new Asc.CTableStyleStripe(stripe2.size, stripe1.size));
