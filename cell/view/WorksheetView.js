@@ -2087,14 +2087,14 @@
     /** Рисует заголовки видимых колонок */
     WorksheetView.prototype._drawColumnHeaders =
       function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
-          if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
+          if (null === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
               return;
           }
           var vr = this.visibleRange;
           var c = this.cols;
           var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : c[vr.c1].left - this.cellsLeft;
           var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : this.headersTop;
-          if (undefined === drawingCtx && this.topLeftFrozenCell && undefined === offsetXForDraw) {
+          if (null === drawingCtx && this.topLeftFrozenCell && undefined === offsetXForDraw) {
               var cFrozen = this.topLeftFrozenCell.getCol0();
               if (start < vr.c1) {
                   offsetX = c[0].left - this.cellsLeft;
@@ -2124,14 +2124,14 @@
 
     /** Рисует заголовки видимых строк */
     WorksheetView.prototype._drawRowHeaders = function (drawingCtx, start, end, style, offsetXForDraw, offsetYForDraw) {
-        if (undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
+        if (null === drawingCtx && false === this.model.sheetViews[0].asc_getShowRowColHeaders()) {
             return;
         }
         var vr = this.visibleRange;
         var r = this.rows;
         var offsetX = (undefined !== offsetXForDraw) ? offsetXForDraw : this.headersLeft;
         var offsetY = (undefined !== offsetYForDraw) ? offsetYForDraw : r[vr.r1].top - this.cellsTop;
-        if (undefined === drawingCtx && this.topLeftFrozenCell && undefined === offsetYForDraw) {
+        if (null === drawingCtx && this.topLeftFrozenCell && undefined === offsetYForDraw) {
             var rFrozen = this.topLeftFrozenCell.getRow0();
             if (start < vr.r1) {
                 offsetY = r[0].top - this.cellsTop;
@@ -2337,7 +2337,7 @@
     /** Рисует сетку таблицы */
     WorksheetView.prototype._drawGrid = function ( drawingCtx, range, leftFieldInPt, topFieldInPt, width, height ) {
         // Возможно сетку не нужно рисовать (при печати свои проверки)
-        if ( undefined === drawingCtx && false === this.model.sheetViews[0].asc_getShowGridLines() ) {
+        if ( null === drawingCtx && false === this.model.sheetViews[0].asc_getShowGridLines() ) {
             return;
         }
 
@@ -2351,7 +2351,7 @@
         var heightCtx = (height) ? height : ctx.getHeight();
         var offsetX = (undefined !== leftFieldInPt) ? leftFieldInPt : c[this.visibleRange.c1].left - this.cellsLeft;
         var offsetY = (undefined !== topFieldInPt) ? topFieldInPt : r[this.visibleRange.r1].top - this.cellsTop;
-        if ( undefined === drawingCtx && this.topLeftFrozenCell ) {
+        if ( null === drawingCtx && this.topLeftFrozenCell ) {
             if ( undefined === leftFieldInPt ) {
                 var cFrozen = this.topLeftFrozenCell.getCol0();
                 offsetX -= c[cFrozen].left - c[0].left;
@@ -2397,7 +2397,7 @@
         var left, top, cFrozen, rFrozen;
         var offsetX = (undefined === offsetXForDraw) ? this.cols[this.visibleRange.c1].left - this.cellsLeft : offsetXForDraw;
         var offsetY = (undefined === offsetYForDraw) ? this.rows[this.visibleRange.r1].top - this.cellsTop : offsetYForDraw;
-        if ( undefined === drawingCtx && this.topLeftFrozenCell ) {
+        if ( null === drawingCtx && this.topLeftFrozenCell ) {
             if ( undefined === offsetXForDraw ) {
                 cFrozen = this.topLeftFrozenCell.getCol0();
                 offsetX -= this.cols[cFrozen].left - this.cols[0].left;
@@ -2568,6 +2568,8 @@
 	/** Рисует текст ячейки */
 	WorksheetView.prototype._drawCellText =
 		function (drawingCtx, col, row, colStart, colEnd, offsetX, offsetY, drawMergedCells) {
+			var c = this._getVisibleCell(col, row);
+			var color = c.getFont().getColor();
 			var ct = this._getCellTextCache(col, row);
 			if (!ct) {
 				return null;
@@ -2719,7 +2721,7 @@
 					}
 				}
 
-				this.stringRender.render(drawingCtx, 0, 0, textW, ct.color);
+				this.stringRender.render(drawingCtx, 0, 0, textW, color);
 				this.stringRender.resetTransform(drawingCtx);
 
 				if (clipUse) {
@@ -2727,7 +2729,7 @@
 				}
 			} else {
 				ctx.AddClipRect(x1, y1, w, h);
-				this.stringRender.restoreInternalState(ct.state).render(drawingCtx, textX, textY, textW, ct.color);
+				this.stringRender.restoreInternalState(ct.state).render(drawingCtx, textX, textY, textW, color);
 				ctx.RemoveClipRect();
 			}
 
