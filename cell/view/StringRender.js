@@ -434,19 +434,6 @@
 
 		/**
 		 * Draw string that was setup by methods 'setString' or 'measureString'
-		 * @param {Number} x  Left of the text rect
-		 * @param {Number} y  Top of the text rect
-		 * @param {Number} maxWidth  Text width restriction
-		 * @param {String} textColor  Default text color for formatless string
-		 * @return {StringRender}  Returns 'this' to allow chaining
-		 */
-		StringRender.prototype.render = function(x, y, maxWidth, textColor) {
-			this._doRender(undefined, x, y, maxWidth, textColor);
-			return this;
-		};
-
-		/**
-		 * Draw string that was setup by methods 'setString' or 'measureString'
 		 * @param {drawingCtx} drawingCtx
 		 * @param {Number} x  Left of the text rect
 		 * @param {Number} y  Top of the text rect
@@ -454,7 +441,7 @@
 		 * @param {String} textColor  Default text color for formatless string
 		 * @return {StringRender}  Returns 'this' to allow chaining
 		 */
-		StringRender.prototype.renderForPrint = function(drawingCtx, x, y, maxWidth, textColor) {
+		StringRender.prototype.render = function(drawingCtx, x, y, maxWidth, textColor) {
 			this._doRender(drawingCtx, x, y, maxWidth, textColor);
 			return this;
 		};

@@ -2707,7 +2707,7 @@
                 }
 
                 this.stringRender.rotateAtPoint( drawingCtx, ct.angle, xb1, yb1, ct.textBound.dx, ct.textBound.dy );
-                this.stringRender.restoreInternalState( ct.state ).renderForPrint( drawingCtx, 0, 0, textW, ct.color );
+                this.stringRender.restoreInternalState( ct.state ).render( drawingCtx, 0, 0, textW, ct.color );
 
                 textAlign = this.stringRender.flags.textAlign;
                 if (isWrapped) {
@@ -2737,7 +2737,7 @@
             }
             else {
                 ctx.AddClipRect( x1, y1, w, h );
-                this.stringRender.restoreInternalState( ct.state ).renderForPrint( drawingCtx, textX, textY, textW, ct.color );
+                this.stringRender.restoreInternalState( ct.state ).render( drawingCtx, textX, textY, textW, ct.color );
                 ctx.RemoveClipRect();
             }
         }
@@ -2849,7 +2849,7 @@
                     }
                 }
 
-                this.stringRender.render(0, 0, textW, ct.color);
+                this.stringRender.render(drawingCtx, 0, 0, textW, ct.color);
 
 //                var color = new CColor(0, 0, 255, 0.5);
 //
@@ -2875,7 +2875,7 @@
             }
             else {
                 ctx.save().beginPath().rect( x1, y1, w, h ).clip();
-                this.stringRender.restoreInternalState( ct.state ).render( textX, textY, textW, ct.color );
+                this.stringRender.restoreInternalState( ct.state ).render( drawingCtx, textX, textY, textW, ct.color );
                 ctx.restore();
             }
         }
