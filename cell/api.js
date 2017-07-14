@@ -3481,14 +3481,18 @@ var editor;
 	spreadsheet_api.prototype._changePivotStyle = function (pivot, callback) {
 		var t = this;
 		var changePivotStyle = function (res) {
+		  var ws, pivotRange;
 			if (res) {
 				History.Create_NewPoint();
 				History.StartTransaction();
 				callback();
 				History.EndTransaction();
-				t.wbModel.getActiveWs()._updatePivotTables(pivot.getRange());
+				pivotRange = pivot.getRange();
+				t.wbModel.getActiveWs()._updatePivotTables(pivotRange);
+				ws = t.wb.getWorksheet();
+				ws._onUpdateFormatTable(pivotRange);
 				t.wb._onWSSelectionChanged();
-				t.wb.getWorksheet().draw();
+				ws.draw();
 			}
 		};
 		this._isLockedPivot(pivot.asc_getName(), changePivotStyle);
