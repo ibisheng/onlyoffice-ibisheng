@@ -98,7 +98,7 @@
     };
     this.cells = {
       defaultState: {
-        background: new CColor(255, 255, 255), border: new CColor(212, 212, 212), color: new CColor(0, 0, 0)
+        background: new CColor(255, 255, 255), border: new CColor(212, 212, 212)
       }, padding: -1, /*px horizontal padding*/
       paddingPlusBorder: -1
     };

@@ -4598,7 +4598,6 @@
         this._fetchCellCache(col, row).text = {
             state: this.stringRender.getInternalState(),
             flags: fl,
-            color: (c.getFont().getColor() || this.settings.cells.defaultState.color),
             metrics: tm,
             cellW: cto.maxWidth,
             cellHA: ha,
@@ -6936,7 +6935,6 @@
         var c = this._getVisibleCell(c1, r1);
 		var font = c.getFont();
 		var fa = font.getVerticalAlign();
-		var fc = font.getColor();
         var bg = c.getFill();
         var cellType = c.getType();
         var isNumberFormat = (!cellType || CellValueType.Number === cellType);
@@ -7012,7 +7010,7 @@
 		cell_info.font.strikeout = font.getStrikeout();
 		cell_info.font.subscript = fa === AscCommon.vertalign_SubScript;
 		cell_info.font.superscript = fa === AscCommon.vertalign_SuperScript;
-        cell_info.font.color = (fc ? asc_obj2Color(fc) : new Asc.asc_CColor(c_opt.defaultState.color));
+        cell_info.font.color = asc_obj2Color(font.getColor());
 
         cell_info.fill = new asc_CFill((null != bg) ? asc_obj2Color(bg) : bg);
 
@@ -11515,7 +11513,7 @@
 				flags: fl,
 				font: new asc.FontProperties(font.getName(), font.getSize()),
 				background: bg || this.settings.cells.defaultState.background,
-				textColor: font.getColor() || this.settings.cells.defaultState.color,
+				textColor: font.getColor(),
 				cursorPos: cursorPos,
 				zoom: this.getZoom(),
 				focus: isFocus,
