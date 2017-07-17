@@ -1222,6 +1222,24 @@
     	return window.g_fontApplication.g_fontSelections.List;
     };
 
+	baseEditorsApi.prototype["pluginMethod_PasteHtml"] = function(htmlText)
+	{
+		if (!AscCommon.g_clipboardBase)
+			return null;
+
+		var _elem = document.createElement("div");
+		_elem.innerHTML = htmlText;
+		document.body.appendChild(_elem);
+		this.incrementCounterLongAction();
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem);
+		this.decrementCounterLongAction();
+
+		this.checkLongActionCallback(function(){
+			document.body.removeChild(_elem);
+			_elem = null;
+		}, null);
+	};
+
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()
 	{
