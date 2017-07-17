@@ -1229,6 +1229,19 @@
 
 		var _elem = document.createElement("div");
 
+		if (this.editorId == c_oEditorId.Word || this.editorId == c_oEditorId.Presentation)
+		{
+			// get default props (method!!!)
+			if (this.LastTextPr)
+			{
+				if (undefined !== this.LastTextPr.FontSize)
+					_elem.style.fontSize = this.LastTextPr.FontSize + "pt";
+
+				_elem.style.fontWeight = (true === this.LastTextPr.Bold) ? "bold" : "normal";
+				_elem.style.fontStyle = (true === this.LastTextPr.Italic) ? "italic" : "normal";
+			}
+		}
+
 		_elem.innerHTML = htmlText;
 		document.body.appendChild(_elem);
 		this.incrementCounterLongAction();
