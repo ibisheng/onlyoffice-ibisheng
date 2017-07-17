@@ -7939,8 +7939,11 @@ CDocument.prototype.Document_Format_Paste = function()
 	this.Document_UpdateInterfaceState();
 	this.Document_UpdateSelectionState();
 };
-CDocument.prototype.Is_TableCellContent = function()
+CDocument.prototype.IsTableCellContent = function(isReturnCell)
 {
+	if (true === isReturnCell)
+		return null;
+
 	return false;
 };
 CDocument.prototype.Check_AutoFit = function()

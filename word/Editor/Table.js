@@ -2279,7 +2279,7 @@ CTable.prototype.Get_TableOffsetCorrection = function()
 {
 	var X = 0;
 
-	if (true === this.Parent.Is_TableCellContent())
+	if (true === this.Parent.IsTableCellContent())
 		return 0;
 
 	var Row     = this.Content[0];
@@ -2319,7 +2319,7 @@ CTable.prototype.Get_RightTableOffsetCorrection = function()
 {
 	var X = 0;
 
-	if (true === this.Parent.Is_TableCellContent())
+	if (true === this.Parent.IsTableCellContent())
 		return 0;
 
 	var Row         = this.Content[0];
@@ -11744,7 +11744,7 @@ CTable.prototype.IsTableFirstRowOnNewPage = function(CurRow)
     {
         if (CurRow === this.Pages[CurPage].FirstRow && CurRow <= this.Pages[CurPage].LastRow)
         {
-            if (0 === CurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())))
+            if (0 === CurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())))
                 return false;
 
             return true;

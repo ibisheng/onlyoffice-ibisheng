@@ -479,9 +479,12 @@ CTableCell.prototype =
         return this.Row.Table.Get_Numbering();
     },
 
-    Is_Cell : function()
+    IsCell : function(isReturnCell)
     {
-        return true;
+    	if (true === isReturnCell)
+    		return this;
+
+    	return true;
     },
 
 	IsTableFirstRowOnNewPage : function()

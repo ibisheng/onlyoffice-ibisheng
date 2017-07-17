@@ -157,8 +157,11 @@ CDocumentControllerBase.prototype.Get_TextBackGroundColor = function()
  * Является ли данный класс ячейкой.
  * @returns {false}
  */
-CDocumentControllerBase.prototype.Is_Cell = function()
+CDocumentControllerBase.prototype.IsCell = function(isReturnCell)
 {
+	if (true === isReturnCell)
+		return null;
+
 	return false;
 };
 /**

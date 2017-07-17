@@ -659,10 +659,13 @@ CGraphicFrame.prototype.Is_HdrFtr = function(bool)
         return false;
 };
 
-CGraphicFrame.prototype.Is_TableCellContent = function()
-    {
-        return false;
-};
+	CGraphicFrame.prototype.IsTableCellContent = function(isReturnCell)
+	{
+		if (true === isReturnCell)
+			return null;
+
+		return false;
+	};
 
 CGraphicFrame.prototype.Check_AutoFit = function()
     {

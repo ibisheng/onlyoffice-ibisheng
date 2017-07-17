@@ -563,8 +563,11 @@ CTextBody.prototype =
         }, this, []);
     },
 
-    Is_Cell: function()
+    IsCell: function(isReturnCell)
     {
+    	if (true === isReturnCell)
+    		return null;
+
         return false;
     },
 

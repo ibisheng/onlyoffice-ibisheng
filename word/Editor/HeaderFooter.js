@@ -445,8 +445,11 @@ CHeaderFooter.prototype =
         this.Content.HdrFtr_AddPageNum( Align, StyleId );
     },
 
-    Is_Cell : function()
+    IsCell : function(isReturnCell)
     {
+    	if (true === isReturnCell)
+    		return null;
+
         return false;
     },
 

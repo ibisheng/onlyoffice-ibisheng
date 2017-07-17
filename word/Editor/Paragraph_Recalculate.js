@@ -59,7 +59,7 @@ Paragraph.prototype.Recalculate_FastWholeParagraph = function()
 
     // TODO: Отключаем это ускорение в таблицах, т.к. в таблицах и так есть свое ускорение. Но можно и это ускорение
     // подключить, для этого надо проверять изменились ли MinMax ширины и набираем ли мы в строке заголовков.
-    if (undefined === this.Parent || true === this.Parent.Is_TableCellContent())
+    if (undefined === this.Parent || true === this.Parent.IsTableCellContent())
         return [];
 
     // Если изменения происходят в специальном пустом параграфе-конце секции, тогда запускаем обычный пересчет
@@ -211,7 +211,7 @@ Paragraph.prototype.Recalculate_FastRange = function(SimpleChanges)
 
     // TODO: Отключаем это ускорение в таблицах, т.к. в таблицах и так есть свое ускорение. Но можно и это ускорение
     // подключить, для этого надо проверять изменились ли MinMax ширины и набираем ли мы в строке заголовков.
-    if ( undefined === this.Parent || true === this.Parent.Is_TableCellContent() )
+    if ( undefined === this.Parent || true === this.Parent.IsTableCellContent() )
         return -1;
 
     //Не запускаемм быстрый пересчет, когда параграф находится в автофигуре с выставленным флагом подбора размера по размеру контента,
@@ -880,7 +880,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
     }
 
     //// Эта проверка на случай, если предыдущий параграф закончился PageBreak
-    //if (PRS.YStart > PRS.YLimit - 0.001 && (CurLine != this.Pages[CurPage].FirstLine || (0 === CurPage && (null != this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent()))) && true === this.Use_YLimit())
+    //if (PRS.YStart > PRS.YLimit - 0.001 && (CurLine != this.Pages[CurPage].FirstLine || (0 === CurPage && (null != this.Get_DocumentPrev() || true === this.Parent.IsTableCellContent()))) && true === this.Use_YLimit())
     //{
     //    this.Pages[CurPage].Set_EndLine(CurLine - 1);
     //    if ( 0 === CurLine )
@@ -1339,7 +1339,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 		// TODO: Здесь нужно сделать корректировку YLimit с учетом сносок. Надо разобраться почему вообще здесь
 		// используется this.YLimit вместо Page.YLimit
 
-        if ( false === this.Parent.Is_TableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
+        if ( false === this.Parent.IsTableCellContent() && Bottom > this.YLimit && Bottom - this.YLimit <= ParaPr.Spacing.After )
             Bottom = this.YLimit;
     }
 
@@ -1365,7 +1365,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
     var Bottom2 = PRS.LineBottom2;
 
     // В ячейке перенос страницы происходит по нижней границе, т.е. с учетом Spacing.After и границы
-    if ( true === this.Parent.Is_TableCellContent() )
+    if ( true === this.Parent.IsTableCellContent() )
         Bottom2 = PRS.LineBottom;
 
     // Переносим строку по PageBreak. Если в строке ничего нет кроме PageBreak, и это не конец параграфа, тогда нам не надо проверять высоту строки и обтекание.
@@ -1402,7 +1402,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 
     // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
     // Перенос не делаем, если это первая строка на новой странице
-    if (true === this.Use_YLimit() && (Top > YLimit || Bottom2 > YLimit) && (CurLine != this.Pages[CurPage].FirstLine || false === bNoFootnotes || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
+    if (true === this.Use_YLimit() && (Top > YLimit || Bottom2 > YLimit) && (CurLine != this.Pages[CurPage].FirstLine || false === bNoFootnotes || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
     {
 		this.private_RecalculateMoveLineToNextPage(CurLine, CurPage, PRS, ParaPr);
 		return false;
@@ -2127,7 +2127,7 @@ Paragraph.prototype.private_RecalculateMoveLineToNextPage = function(CurLine, Cu
 			var CompatibilityMode = this.LogicDocument.Get_CompatibilityMode();
 			if (CompatibilityMode <= document_compatibility_mode_Word14)
 			{
-				if (null != this.Get_DocumentPrev() && true != this.Parent.Is_TableCellContent() && 0 === CurPage)
+				if (null != this.Get_DocumentPrev() && true != this.Parent.IsTableCellContent() && 0 === CurPage)
 					CurLine = 0;
 			}
 			else if (CompatibilityMode >= document_compatibility_mode_Word15)
@@ -2715,7 +2715,7 @@ CParagraphRecalculateStateWrap.prototype =
 		this.TopDocument = Paragraph.Parent.Get_TopDocumentContent();
 		this.PageAbs     = Paragraph.Get_AbsolutePage(CurPage);
 		this.ColumnAbs   = Paragraph.Get_AbsoluteColumn(CurPage);
-		this.InTable     = Paragraph.Parent.Is_TableCellContent();
+		this.InTable     = Paragraph.Parent.IsTableCellContent();
         this.SectPr      = null;
 
 		this.Page               = CurPage;
