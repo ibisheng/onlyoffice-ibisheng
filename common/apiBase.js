@@ -1231,14 +1231,27 @@
 
 		if (this.editorId == c_oEditorId.Word || this.editorId == c_oEditorId.Presentation)
 		{
-			// get default props (method!!!)
-			if (this.LastTextPr)
+			var textPr = this.get_TextProps();
+			if (textPr)
 			{
-				if (undefined !== this.LastTextPr.FontSize)
-					_elem.style.fontSize = this.LastTextPr.FontSize + "pt";
+				if (undefined !== textPr.TextPr.FontSize)
+					_elem.style.fontSize = textPr.TextPr.FontSize + "pt";
 
-				_elem.style.fontWeight = (true === this.LastTextPr.Bold) ? "bold" : "normal";
-				_elem.style.fontStyle = (true === this.LastTextPr.Italic) ? "italic" : "normal";
+				_elem.style.fontWeight = (true === textPr.TextPr.Bold) ? "bold" : "normal";
+				_elem.style.fontStyle = (true === textPr.TextPr.Italic) ? "italic" : "normal";
+			}
+		}
+		else if (this.editorId == c_oEditorId.Spreadsheet)
+		{
+			var props = this.asc_getCellInfo();
+
+			if (props && props.font)
+			{
+				if (undefined != props.font.size)
+					_elem.style.fontSize = props.font.size + "pt";
+
+				_elem.style.fontWeight = (true === props.font.bold) ? "bold" : "normal";
+				_elem.style.fontStyle = (true === props.font.italic) ? "italic" : "normal";
 			}
 		}
 

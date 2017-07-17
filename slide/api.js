@@ -1536,8 +1536,6 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 	{
-		this.LastTextPr = TextPr;
-
 		if ("undefined" != typeof(TextPr))
 		{
 			if (TextPr.Color !== undefined)
