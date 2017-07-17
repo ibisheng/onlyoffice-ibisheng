@@ -454,7 +454,7 @@ CDocumentContent.prototype.Get_NearestPos = function(CurPage, X, Y, bAnchor, Dra
 	var ContentPos = this.Internal_GetContentPosByXY(X, Y, CurPage);
 
 	// Делаем логику как в ворде
-	if (true != bAnchor && (0 < ContentPos || CurPage > 0) && ContentPos === this.Pages[CurPage].Pos && this.Pages[CurPage].EndPos > this.Pages[CurPage].Pos && type_Paragraph === this.Content[ContentPos].GetType() && true === this.Content[ContentPos].Is_ContentOnFirstPage())
+	if (true != bAnchor && (0 < ContentPos || CurPage > 0) && ContentPos === this.Pages[CurPage].Pos && this.Pages[CurPage].EndPos > this.Pages[CurPage].Pos && type_Paragraph === this.Content[ContentPos].GetType() && true === this.Content[ContentPos].IsContentOnFirstPage())
 		ContentPos++;
 
 	var ElementPageIndex = this.private_GetElementPageIndexByXY(ContentPos, X, Y, CurPage);
@@ -465,12 +465,12 @@ CDocumentContent.prototype.Is_TableCellContent = function()
 {
 	return this.Parent.Is_Cell();
 };
-CDocumentContent.prototype.Is_TableFirstRowOnNewPage = function()
+CDocumentContent.prototype.IsTableFirstRowOnNewPage = function()
 {
 	if (false === this.Parent.Is_Cell())
 		return false;
 
-	return this.Parent.Is_TableFirstRowOnNewPage();
+	return this.Parent.IsTableFirstRowOnNewPage();
 };
 CDocumentContent.prototype.Check_AutoFit = function()
 {
@@ -1610,11 +1610,13 @@ CDocumentContent.prototype.GetCurrentParagraph = function()
 
 	return null;
 };
-// Проверяем есть ли хоть какой-либо контент на первой странице
-CDocumentContent.prototype.Is_ContentOnFirstPage         = function()
+CDocumentContent.prototype.IsContentOnFirstPage = function()
 {
-    var Element = this.Content[0];
-    return Element.Is_ContentOnFirstPage();
+	if (this.Content.length <= 0)
+		return false;
+
+	var Element = this.Content[0];
+	return Element.IsContentOnFirstPage();
 };
 CDocumentContent.prototype.StartFromNewPage = function()
 {

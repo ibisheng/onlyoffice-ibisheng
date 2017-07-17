@@ -9098,7 +9098,7 @@ Paragraph.prototype.Get_AnchorPos = function(Drawing)
 
 	return Result;
 };
-Paragraph.prototype.Is_ContentOnFirstPage = function()
+Paragraph.prototype.IsContentOnFirstPage = function()
 {
 	// Если параграф сразу переносится на новую страницу, тогда это значение обычно -1
 	if (this.Pages[0].EndLine < 0)

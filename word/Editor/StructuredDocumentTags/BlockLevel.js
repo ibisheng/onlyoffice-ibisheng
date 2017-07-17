@@ -753,6 +753,10 @@ CBlockLevelSdt.prototype.RejectRevisionChanges = function(Type, bAll)
 {
 	this.Content.RejectRevisionChanges(Type, bAll);
 };
+CBlockLevelSdt.prototype.IsContentOnFirstPage = function()
+{
+	return this.Content.IsContentOnFirstPage();
+};
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.Is_HdrFtr = function(bReturnHdrFtr)
 {
@@ -969,6 +973,22 @@ CBlockLevelSdt.prototype.RemoveContentControlWrapper = function()
 		this.Parent.Selection.EndPos = nParentSelectionEndPos + nCount - 1;
 
 	this.Content.Remove_FromContent(0, this.Content.Content.length - 1);
+};
+CBlockLevelSdt.prototype.GetDocumentPositionFromObject = function(PosArray)
+{
+	if (!PosArray)
+		PosArray = [];
+
+	if (this.Parent)
+	{
+		this.Parent.GetDocumentPositionFromObject(PosArray);
+	}
+
+	return PosArray;
+};
+CBlockLevelSdt.prototype.IsTableFirstRowOnNewPage = function()
+{
+	return this.Parent.IsTableFirstRowOnNewPage();
 };
 //----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.GetContentControlType = function()

@@ -1402,7 +1402,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 
     // Сначала проверяем не нужно ли сделать перенос страницы в данном месте
     // Перенос не делаем, если это первая строка на новой странице
-    if (true === this.Use_YLimit() && (Top > YLimit || Bottom2 > YLimit) && (CurLine != this.Pages[CurPage].FirstLine || false === bNoFootnotes || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.Is_TableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
+    if (true === this.Use_YLimit() && (Top > YLimit || Bottom2 > YLimit) && (CurLine != this.Pages[CurPage].FirstLine || false === bNoFootnotes || (0 === RealCurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())))) && false === BreakPageLineEmpty)
     {
 		this.private_RecalculateMoveLineToNextPage(CurLine, CurPage, PRS, ParaPr);
 		return false;
