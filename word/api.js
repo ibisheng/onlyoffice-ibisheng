@@ -5986,9 +5986,9 @@ background-repeat: no-repeat;\
 			{
 				this.isPasteFonts_Images = false;
 				this.pasteImageMap       = null;
-				this.decrementCounterLongAction();
 				this.pasteCallback();
 				this.pasteCallback            = null;
+				this.decrementCounterLongAction();
 			}
 			else if (this.isSaveFonts_Images)
 			{
