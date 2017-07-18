@@ -539,16 +539,24 @@
 						// change properties
 						var _blockStd = LogicDocument.GetContentControl(_current["Props"]["InternalId"]);
 
-						_content_control_pr = new AscCommonWord.CContentControlPr();
-						_content_control_pr.Id = _current["Props"]["Id"];
-						_content_control_pr.Tag = _current["Props"]["Tag"];
-						_content_control_pr.Lock = _current["Props"]["Lock"];
-						_content_control_pr.InternalId = _current["Props"]["InternalId"];
+						if (_blockStd)
+						{
+							_content_control_pr = new AscCommonWord.CContentControlPr();
+							_content_control_pr.Id = _current["Props"]["Id"];
+							_content_control_pr.Tag = _current["Props"]["Tag"];
+							_content_control_pr.Lock = _current["Props"]["Lock"];
+							_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
-						_blockStd.SetContentControlPr(_content_control_pr);
+							_blockStd.SetContentControlPr(_content_control_pr);
 
-						_obj = _blockStd.GetContentControlPr();
-						this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
+							_obj = _blockStd.GetContentControlPr();
+							this.returnDocuments.push({
+								"Tag":        _obj.Tag,
+								"Id":         _obj.Id,
+								"Lock":       _obj.Lock,
+								"InternalId": _obj.InternalId
+							});
+						}
 					}
 				}
 				else
@@ -561,16 +569,24 @@
 							// change properties
 							var _blockStd = LogicDocument.GetContentControl(_current["Props"]["InternalId"]);
 
-							_content_control_pr = new AscCommonWord.CContentControlPr();
-							_content_control_pr.Id = _current["Props"]["Id"];
-							_content_control_pr.Tag = _current["Props"]["Tag"];
-							_content_control_pr.Lock = _current["Props"]["Lock"];
-							_content_control_pr.InternalId = _current["Props"]["InternalId"];
+							if (_blockStd)
+							{
+								_content_control_pr = new AscCommonWord.CContentControlPr();
+								_content_control_pr.Id = _current["Props"]["Id"];
+								_content_control_pr.Tag = _current["Props"]["Tag"];
+								_content_control_pr.Lock = _current["Props"]["Lock"];
+								_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
-							_blockStd.SetContentControlPr(_content_control_pr);
+								_blockStd.SetContentControlPr(_content_control_pr);
 
-							_obj = _blockStd.GetContentControlPr();
-							this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
+								_obj = _blockStd.GetContentControlPr();
+								this.returnDocuments.push({
+									"Tag":        _obj.Tag,
+									"Id":         _obj.Id,
+									"Lock":       _obj.Lock,
+									"InternalId": _obj.InternalId
+								});
+							}
 						}
 					}
 				}
