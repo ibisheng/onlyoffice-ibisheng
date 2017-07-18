@@ -2060,7 +2060,7 @@ background-repeat: no-repeat;\
 		}
 
 		var specialPasteShowOptions = gClipboardBase.specialPasteButtonProps ? gClipboardBase.specialPasteButtonProps.props : null;
-		if(specialPasteShowOptions && null !== this.showButtonIdParagraph)
+		if(specialPasteShowOptions && null !== gClipboardBase.showButtonIdParagraph)
 		{
 			var isUpdate = specialPasteShowOptions.cellCoord;
 			var id = gClipboardBase.showButtonIdParagraph;

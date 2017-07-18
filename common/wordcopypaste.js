@@ -2348,26 +2348,9 @@ PasteProcessor.prototype =
 		var res = paragraph;
 		var props = window['AscCommon'].g_clipboardBase.specialPasteProps;
 
-		var curDocSelection = this.curDocSelection;
-
 		//стиль текущего параграфа/рана, в который вставляем
-		var pasteIntoParagraphPr, pasteIntoParaRunPr;
-		if(curDocSelection && curDocSelection[1])
-		{
-			pasteIntoParagraphPr = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Pr;
-
-			var pasteIntoParaRun = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Content[curDocSelection[0].CurPos.ContentPos.Data[0]];
-			if(para_InlineLevelSdt === pasteIntoParaRun.Type)
-			{
-				var selectPos = curDocSelection[0].CurPos.ContentPos.Data[1];
-				if(pasteIntoParaRun.Content && null != selectPos && pasteIntoParaRun.Content[selectPos])
-				{
-					pasteIntoParaRun =  pasteIntoParaRun.Content[selectPos];
-				}
-			}
-
-			pasteIntoParaRunPr = pasteIntoParaRun ? pasteIntoParaRun.Pr : null;
-		}
+		var pasteIntoParagraphPr = this.oDocument.GetDirectParaPr();
+		var pasteIntoParaRunPr = this.oDocument.GetDirectTextPr();
 		
 		switch(props)
 		{
@@ -2412,7 +2395,8 @@ PasteProcessor.prototype =
 				if(pasteIntoParagraphPr)
 				{
 					paragraph.Set_Pr(pasteIntoParagraphPr);
-					if(paragraph.TextPr)
+
+					if(paragraph.TextPr && pasteIntoParaRunPr)
 					{
 						paragraph.TextPr.Value = pasteIntoParaRunPr;
 					}
