@@ -3136,6 +3136,187 @@
         return this.Variants;
     };
 
+    function CWatermarkOnDraw(htmlContent, api)
+	{
+		this.inputContentSrc = htmlContent;
+		this.replaceMap = {};
+
+		this.image = null;
+		this.width = 0;
+		this.height = 0;
+		this.zoom = 1;
+
+		this.shapeW = 100;
+		this.shapeH = 100;
+
+		this.Generate = function(w, h)
+		{
+			this.shapeW = w;
+			this.shapeH = h;
+
+			this.width = AscCommon.AscBrowser.convertToRetinaValue(w * g_dKoef_mm_to_pix * this.zoom, true);
+			this.height = AscCommon.AscBrowser.convertToRetinaValue(h * g_dKoef_mm_to_pix * this.zoom, true);
+
+			if (!this.image)
+				this.image = document.createElement("canvas");
+
+			this.image.width = this.width;
+			this.image.height = this.height;
+
+			var content = this.inputContentSrc;
+			for (var key in this.replaceMap)
+			{
+				if (!this.replaceMap.hasOwnProperty(key))
+					continue;
+
+				content = content.replace(new RegExp(key, 'g'), this.replaceMap[key]);
+			}
+
+			var _obj = {};
+			try
+			{
+				var _objTmp = JSON.parse(content);
+				_obj = _objTmp;
+			}
+			catch (err)
+			{
+
+			}
+
+			this.privateGenerateShape();
+
+			var _data = this.image.toDataURL("image/png");
+			console.log(_data);
+		};
+
+		this.Draw = function(context, w, h)
+		{
+			if (!this.image)
+				return;
+
+			var x = (w - this.width) >> 2;
+			var y = (h - this.height) >> 2;
+			context.drawImage(this.image, x, y);
+		};
+
+		this.privateGetShape = function()
+		{
+			var oShape = new AscFormat.CShape();
+			var oParent = null, oWorkSheet = null;
+			var bWord = true;
+			if (Asc['editor'] && AscCommon.c_oEditorId.Spreadsheet === Asc['editor'].getEditorId())
+			{
+				var api_sheet = Asc['editor'];
+				oShape.setWorksheet(api_sheet.wb.getWorksheet().model);
+				oWorkSheet = api_sheet.wb.getWorksheet().model;
+				bWord = false;
+			}
+			else
+			{
+				if (editor && editor.WordControl && Array.isArray(editor.WordControl.m_oLogicDocument.Slides))
+				{
+					if (editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
+					{
+						oShape.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
+						oParent = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
+						bWord = false;
+					}
+					else
+					{
+						return null;
+					}
+				}
+			}
+
+			var oParentObjects = oShape.getParentObjects();
+			var oTrack = new AscFormat.NewShapeTrack("textRect", 0, 0, oParentObjects.theme, oParentObjects.master, oParentObjects.layout, oParentObjects.slide, 0);
+			oTrack.track({}, this.shapeW, this.shapeH);
+			oShape = oTrack.getShape(bWord, oShape.getDrawingDocument(), oShape.drawingObjects);
+
+			oShape.setStyle(null);
+			oShape.spPr.setFill(AscFormat.CreateUnfilFromRGB(255, 0, 0));
+			var oBodypr = oShape.getBodyPr().createDuplicate();
+			oBodypr.lIns = 0;
+			oBodypr.tIns = 0;
+			oBodypr.rIns = 0;
+			oBodypr.bIns = 0;
+			oBodypr.anchor = 1;
+			if(!bWord)
+			{
+				oShape.txBody.setBodyPr(oBodypr);
+			}
+			else
+			{
+				oShape.setBodyPr(oBodypr);
+			}
+			oShape.spPr.setLn(AscFormat.CreatePenFromParams(CreateNoFillUniFill(), null, null, null, 2, null));
+			if(oWorkSheet)
+			{
+				oShape.setWorksheet(oWorkSheet);
+			}
+			if(oParent)
+			{
+				oShape.setParent(oParent);
+			}
+			oShape.spPr.xfrm.setOffX(0);
+			oShape.spPr.xfrm.setOffY(0);
+			oShape.spPr.xfrm.setExtX(this.shapeW);
+			oShape.spPr.xfrm.setExtY(this.shapeH);
+			return oShape;
+		};
+
+		this.privateGenerateShape = function()
+		{
+			AscFormat.ExecuteNoHistory(function() {
+
+				var oShape = this.privateGetShape();
+				var oContent = oShape.getDocContent();
+				var sText = "Oleg";
+				var oParagraph = oContent.Content[0];
+				for(var i = 0; i < sText.length; ++i)
+				{
+					oContent.AddToParagraph(new ParaText(sText[i]), false);
+				}
+				oContent.Set_ApplyToAll(true);
+				oContent.AddToParagraph(new ParaTextPr({FontSize: 20, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
+				oContent.SetParagraphAlign(AscCommon.align_Center);
+				oContent.SetParagraphIndent({FirstLine: 0, Left: 0, Right: 0});
+				oContent.Set_ApplyToAll(false);
+
+				oShape.recalculate();
+				if (oShape.bWordShape)
+				{
+					oShape.recalculateText();
+				}
+
+				var oldShowParaMarks;
+				if (window.editor)
+				{
+					oldShowParaMarks = editor.ShowParaMarks;
+					editor.ShowParaMarks = false;
+				}
+
+				var graphics = new AscCommon.CGraphics();
+				graphics.m_oFontManager = AscCommon.g_fontManager;
+
+				graphics.init(this.image.getContext('2d'), this.width, this.height, this.shapeW, this.shapeH);
+				graphics.transform(1,0,0,1,0,0);
+
+				oShape.draw(graphics);
+
+				if (window.editor)
+				{
+					window.editor.ShowParaMarks = oldShowParaMarks;
+				}
+
+			}, this, []);
+		};
+	}
+	window.TEST_FUNCTION_WATERMARK = function()
+	{
+		var _t = new CWatermarkOnDraw("{}", null);
+		_t.Generate(100, 100);
+	};
 
     /*
      * Export
