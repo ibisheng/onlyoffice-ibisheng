@@ -146,60 +146,65 @@
 	CConditionalFormattingRule.prototype.getTimePeriod = function() {
 		var start, end;
 		var now = new Date();
+		now.setUTCHours(0, 0, 0, 0);
 		switch (this.timePeriod) {
 			case AscCommonExcel.ST_TimePeriod.last7Days:
+				now.setUTCDate(now.getUTCDate() + 1);
 				end = now.getExcelDate();
-				now.setDate(now.getDate() - 7);
+				now.setUTCDate(now.getUTCDate() - 7);
 				start = now.getExcelDate();
 				break;
 			case AscCommonExcel.ST_TimePeriod.lastMonth:
+				now.setUTCDate(1);
 				end = now.getExcelDate();
-				now.setMonth(now.getMonth() - 1);
+				now.setUTCMonth(now.getUTCMonth() - 1);
 				start = now.getExcelDate();
 				break;
 			case AscCommonExcel.ST_TimePeriod.thisMonth:
+				now.setUTCDate(1);
 				start = now.getExcelDate();
-				now.setMonth(now.getMonth() + 1);
+				now.setUTCMonth(now.getUTCMonth() + 1);
 				end = now.getExcelDate();
 				break;
 			case AscCommonExcel.ST_TimePeriod.nextMonth:
-				now.setMonth(now.getMonth() + 1);
+				now.setUTCDate(1);
+				now.setUTCMonth(now.getUTCMonth() + 1);
 				start = now.getExcelDate();
-				now.setMonth(now.getMonth() + 1);
+				now.setUTCMonth(now.getUTCMonth() + 1);
 				end = now.getExcelDate();
 				break;
 			case AscCommonExcel.ST_TimePeriod.lastWeek:
-				now.setDate(now.getDate() - now.getDay());
+				now.setUTCDate(now.getUTCDate() - now.getUTCDay());
 				end = now.getExcelDate();
-				now.setDate(now.getDate() - 7);
+				now.setUTCDate(now.getUTCDate() - 7);
 				start = now.getExcelDate();
 				break;
 			case AscCommonExcel.ST_TimePeriod.thisWeek:
-				now.setDate(now.getDate() - now.getDay());
+				now.setUTCDate(now.getUTCDate() - now.getUTCDay());
 				start = now.getExcelDate();
-				now.setDate(now.getDate() + 7);
+				now.setUTCDate(now.getUTCDate() + 7);
 				end = now.getExcelDate();
 				break;
 			case AscCommonExcel.ST_TimePeriod.nextWeek:
-				now.setDate(now.getDate() - now.getDay() + 7);
+				now.setUTCDate(now.getUTCDate() - now.getUTCDay() + 7);
 				start = now.getExcelDate();
-				now.setDate(now.getDate() + 7);
+				now.setUTCDate(now.getUTCDate() + 7);
 				end = now.getExcelDate();
 				break;
 			case AscCommonExcel.ST_TimePeriod.yesterday:
 				end = now.getExcelDate();
-				now.setDate(now.getDate() - 1);
+				now.setUTCDate(now.getUTCDate() - 1);
 				start = now.getExcelDate();
 				break;
 			case AscCommonExcel.ST_TimePeriod.today:
 				start = now.getExcelDate();
-				now.setDate(now.getDate() + 1);
+				now.setUTCDate(now.getUTCDate() + 1);
 				end = now.getExcelDate();
 				break;
 			case AscCommonExcel.ST_TimePeriod.tomorrow:
-				now.setDate(now.getDate() + 1);
+				now.setUTCDate(now.getUTCDate() + 1);
 				start = now.getExcelDate();
-				now.setDate(now.getDate() + 1);
+				now.setUTCDate(now.getUTCDate() + 1);
 				end = now.getExcelDate();
 				break;
 		}

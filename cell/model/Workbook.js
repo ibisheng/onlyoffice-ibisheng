@@ -2899,7 +2899,7 @@
 									compareFunction = (function(period) {
 										return function(val, c) {
 											var n = parseFloat(val);
-											return period.start <= n && n <= period.end;
+											return period.start <= n && n < period.end;
 										};
 									})(oRule.getTimePeriod());
 								} else {
