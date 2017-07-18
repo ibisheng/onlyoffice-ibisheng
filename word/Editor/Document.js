@@ -15302,8 +15302,26 @@ CDocument.prototype.RemoveContentControl = function(Id)
 		var oDocContent = oContentControl.Parent;
 		oDocContent.Update_ContentIndexing();
 		var nIndex = oContentControl.GetIndex();
+
+		var nCurPos = oDocContent.CurPos.ContentPos;
 		oDocContent.Remove_FromContent(nIndex, 1);
-		oDocContent.MoveCursorToStartPos();
+
+		if (nIndex === nCurPos)
+		{
+			if (nIndex >= oDocContent.Get_ElementsCount())
+			{
+				oDocContent.MoveCursorToEndPos();
+			}
+			else
+			{
+				oDocContent.CurPos.ContentPos = Math.max(0, Math.min(oDocContent.Get_ElementsCount() - 1, nIndex));;
+				oDocContent.Content[oDocContent.CurPos.ContentPos].MoveCursorToStartPos();
+			}
+		}
+		else if (nIndex < nCurPos)
+		{
+			oDocContent.CurPos.ContentPos = Math.max(0, Math.min(oDocContent.Get_ElementsCount() - 1, nCurPos - 1));
+		}
 	}
 	else if (AscCommonWord.sdttype_InlineLevel === oContentControl.GetContentControlType())
 	{
