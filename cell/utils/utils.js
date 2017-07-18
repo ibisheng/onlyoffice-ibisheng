@@ -551,6 +551,7 @@
 			var temp;
 			var offsetRow = offset.offsetRow;
 			var offsetCol = offset.offsetCol;
+			//todo offset A1048576:A1 (offsetRow = 1 -> A1:A2; offsetRow = -1 -> A1048575:A1048576)
 			if (0 === this.r1 && gc_nMaxRow0 === this.r2) {
 				//full sheet is 1:1048576 but offsetRow is valid for it
 				offsetRow = 0;
@@ -1500,7 +1501,7 @@
 			if (null == oRes && null != oCacheVal.first && null != oCacheVal.last) {
 				var r1 = oCacheVal.first.getRow0(), r2 = oCacheVal.last.getRow0(), c1 = oCacheVal.first.getCol0(), c2 = oCacheVal.last.getCol0();
 				var r1Abs = oCacheVal.first.getRowAbs(), r2Abs = oCacheVal.last.getRowAbs(),
-					c1Abs = oCacheVal.first.getColAbs(), c2Abs = oCacheVal.first.getColAbs();
+					c1Abs = oCacheVal.first.getColAbs(), c2Abs = oCacheVal.last.getColAbs();
 				if (oCacheVal.first.getIsRow() && oCacheVal.last.getIsRow()) {
 					c1 = 0;
 					c2 = gc_nMaxCol0;
