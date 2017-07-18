@@ -15328,6 +15328,25 @@ CDocument.prototype.GetContentControl = function(Id)
 {
 	return this.TableId.Get_ById(Id);
 };
+CDocument.prototype.ClearContentControl = function(Id)
+{
+	var oContentControl = this.TableId.Get_ById(Id);
+	if (!oContentControl)
+		return null;
+
+	this.RemoveSelection();
+
+	if (oContentControl.GetContentControlType
+		&& (AscCommonWord.sdttype_BlockLevel === oContentControl.GetContentControlType()
+		|| AscCommonWord.sdttype_InlineLevel === oContentControl.GetContentControlType()))
+	{
+		oContentControl.ClearContentControl();
+		oContentControl.SetThisElementCurrent();
+		oContentControl.MoveCursorToStartPos();
+	}
+
+	return oContentControl;
+};
 CDocument.prototype.GetAllSignatures = function()
 {
     return this.DrawingObjects.getAllSignatures();

@@ -434,20 +434,36 @@
 
 			while (this.current < this.documents.length) // no recursion
 			{
-				if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
+				var _current = this.documents[this.current];
+				var _isLocked = false;
+				if ((_current["Url"] !== undefined || _current["Script"] !== undefined) && undefined !== _current["Props"]["InternalId"])
 				{
-					var _current = this.documents[this.current];
+					var _internalId     = _current["Props"]["InternalId"];
+					var _contentControl = g_oTableId.Get_ById(_internalId);
+					_isLocked = LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+						Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+						Elements  : [_contentControl],
+						CheckType : AscCommon.changestype_Document_Content_Add
+					});
+				}
+				else
+				{
+					_isLocked = LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add);
+				}
 
+				if (false === _isLocked)
+				{
 					var _content_control_pr;
 					var _blockStd;
+					var _isReplaced = false;
 
 					if (_current["Url"] !== undefined || _current["Script"] !== undefined)
 					{
+						_blockStd = null;
 						if (undefined !== _current["Props"]["InternalId"])
 						{
-							// remove block sdt
-							LogicDocument.SelectContentControl(_current["Props"]["InternalId"]);
-							LogicDocument.RemoveContentControl(_current["Props"]["InternalId"]);
+							_blockStd   = LogicDocument.ClearContentControl(_current["Props"]["InternalId"]);
+							_isReplaced = true;
 						}
 
 						_content_control_pr = new AscCommonWord.CContentControlPr();
@@ -456,11 +472,15 @@
 						_content_control_pr.Lock = AscCommonWord.sdtlock_Unlocked;
 						_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
-						var oCurPara = LogicDocument.GetCurrentParagraph();
-						if (oCurPara && !oCurPara.IsCursorAtBegin())
-							LogicDocument.AddNewParagraph(false, true);
+						if (null === _blockStd)
+						{
+							var oCurPara = LogicDocument.GetCurrentParagraph();
+							if (oCurPara && !oCurPara.IsCursorAtBegin())
+								LogicDocument.AddNewParagraph(false, true);
 
-						var _blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+							_blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+						}
+
 						_blockStd.SetContentControlPr(_content_control_pr);
 
 						_obj = _blockStd.GetContentControlPr();
@@ -497,12 +517,22 @@
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current["Script"] + "\n})();";
 						eval(_script);
 
-						if(_blockStd.Content.Get_ElementsCount() > 1)
+						if (_isReplaced)
 						{
-							_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1 , 1);
-							_blockStd.MoveCursorToEndPos(false, false);
+							if (_blockStd.Content.Get_ElementsCount() > 1)
+								_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+
+							_blockStd.MoveCursorToStartPos(false);
 						}
-						LogicDocument.MoveCursorRight(false, false, true);
+						else
+						{
+							if (_blockStd.Content.Get_ElementsCount() > 1)
+							{
+								_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+								_blockStd.MoveCursorToEndPos(false, false);
+							}
+							LogicDocument.MoveCursorRight(false, false, true);
+						}
 
 						var _worker = _api.__content_control_worker;
 						if (_worker.documents[_worker.current]["Props"])
