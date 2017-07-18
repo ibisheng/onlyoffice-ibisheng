@@ -4358,7 +4358,9 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             }
         }
     }
-    if(!this.group)
+
+    var bNotes = !!(this.parent && this.parent.kind === AscFormat.TYPE_KIND.NOTES);
+    if(!this.group && !bNotes)
     {
         var oLock;
         if(this.parent instanceof ParaDrawing)

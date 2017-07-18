@@ -1144,7 +1144,8 @@ CPresentation.prototype =
                 for(key = 0; key < this.Slides.length; ++key)
                 {
                     this.Slides[key].recalcText();
-                    this.Slides[key].recalculate()
+                    this.Slides[key].recalculate();
+                    this.Slides[key].recalculateNotesShape();
                 }
             }
         }
@@ -1191,6 +1192,7 @@ CPresentation.prototype =
                 {
                     this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
                 }
+                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
             }
             else
             {

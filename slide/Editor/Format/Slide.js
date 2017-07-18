@@ -1106,6 +1106,20 @@ Slide.prototype =
 
         if(this.notesShape){
             this.notesShape.draw(g);
+            var oLock = this.notesShape.Lock;
+            if(oLock && AscCommon.locktype_None != oLock.Get_Type())
+            {
+                var bCoMarksDraw = true;
+                if(typeof editor !== "undefined" && editor && AscFormat.isRealBool(editor.isCoMarksDraw)){
+                    bCoMarksDraw = editor.isCoMarksDraw;
+                }
+                if(bCoMarksDraw){
+                    g.transform3(this.notesShape.transformText);
+                    var Width = this.notesShape.txBody.content.XLimit;
+                    var Height = this.notesShape.txBody.content.Get_SummaryHeight();
+                    g.DrawLockObjectRect(oLock.Get_Type(), 0, 0, Width, Height);
+                }
+            }
         }
     },
 
