@@ -479,14 +479,17 @@ CTableCell.prototype =
         return this.Row.Table.Get_Numbering();
     },
 
-    Is_Cell : function()
+    IsCell : function(isReturnCell)
     {
-        return true;
+    	if (true === isReturnCell)
+    		return this;
+
+    	return true;
     },
 
-    Is_TableFirstRowOnNewPage : function()
+	IsTableFirstRowOnNewPage : function()
     {
-        return this.Row.Table.Is_TableFirstRowOnNewPage(this.Row.Index);
+        return this.Row.Table.IsTableFirstRowOnNewPage(this.Row.Index);
     },
 
     Check_AutoFit : function()
@@ -985,7 +988,7 @@ CTableCell.prototype =
 
     Content_Is_ContentOnFirstPage : function()
     {
-        return this.Content.Is_ContentOnFirstPage();
+        return this.Content.IsContentOnFirstPage();
     },
 
     Content_Set_StartPage : function(PageNum)

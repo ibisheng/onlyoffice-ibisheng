@@ -1225,6 +1225,60 @@
     	return window.g_fontApplication.g_fontSelections.List;
     };
 
+	baseEditorsApi.prototype["pluginMethod_PasteHtml"] = function(htmlText)
+	{
+		if (!AscCommon.g_clipboardBase)
+			return null;
+
+		var _elem = document.createElement("div");
+
+		if (this.editorId == c_oEditorId.Word || this.editorId == c_oEditorId.Presentation)
+		{
+			var textPr = this.get_TextProps();
+			if (textPr)
+			{
+				if (undefined !== textPr.TextPr.FontSize)
+					_elem.style.fontSize = textPr.TextPr.FontSize + "pt";
+
+				_elem.style.fontWeight = (true === textPr.TextPr.Bold) ? "bold" : "normal";
+				_elem.style.fontStyle = (true === textPr.TextPr.Italic) ? "italic" : "normal";
+			}
+		}
+		else if (this.editorId == c_oEditorId.Spreadsheet)
+		{
+			var props = this.asc_getCellInfo();
+
+			if (props && props.font)
+			{
+				if (undefined != props.font.size)
+					_elem.style.fontSize = props.font.size + "pt";
+
+				_elem.style.fontWeight = (true === props.font.bold) ? "bold" : "normal";
+				_elem.style.fontStyle = (true === props.font.italic) ? "italic" : "normal";
+			}
+		}
+
+		_elem.innerHTML = htmlText;
+		document.body.appendChild(_elem);
+		this.incrementCounterLongAction();
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem);
+		this.decrementCounterLongAction();
+
+		if (true)
+		{
+			this.checkLongActionCallback(function ()
+			{
+				document.body.removeChild(_elem);
+				_elem = null;
+			}, null);
+		}
+		else
+		{
+			document.body.removeChild(_elem);
+			_elem = null;
+		}
+	};
+
 	// Builder
 	baseEditorsApi.prototype.asc_nativeInitBuilder = function()
 	{

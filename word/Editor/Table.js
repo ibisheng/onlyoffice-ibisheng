@@ -2279,7 +2279,7 @@ CTable.prototype.Get_TableOffsetCorrection = function()
 {
 	var X = 0;
 
-	if (true === this.Parent.Is_TableCellContent())
+	if (true === this.Parent.IsTableCellContent())
 		return 0;
 
 	var Row     = this.Content[0];
@@ -2319,7 +2319,7 @@ CTable.prototype.Get_RightTableOffsetCorrection = function()
 {
 	var X = 0;
 
-	if (true === this.Parent.Is_TableCellContent())
+	if (true === this.Parent.IsTableCellContent())
 		return 0;
 
 	var Row         = this.Content[0];
@@ -3066,7 +3066,7 @@ CTable.prototype.IsStartFromNewPage = function()
 
 	return false;
 };
-CTable.prototype.Is_ContentOnFirstPage = function()
+CTable.prototype.IsContentOnFirstPage = function()
 {
 	if (this.Pages.length >= 1 && true === this.RowsInfo[0].FirstPage)
 		return true;
@@ -11738,13 +11738,13 @@ CTable.prototype.GetNumberingInfo = function(NumberingEngine)
         }
     }
 };
-CTable.prototype.Is_TableFirstRowOnNewPage = function(CurRow)
+CTable.prototype.IsTableFirstRowOnNewPage = function(CurRow)
 {
     for (var CurPage = 0, PagesCount = this.Pages.length; CurPage < PagesCount; ++CurPage)
     {
         if (CurRow === this.Pages[CurPage].FirstRow && CurRow <= this.Pages[CurPage].LastRow)
         {
-            if (0 === CurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.Is_TableCellContent() && true !== this.Parent.Is_TableFirstRowOnNewPage())))
+            if (0 === CurPage && (null != this.Get_DocumentPrev() || (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())))
                 return false;
 
             return true;

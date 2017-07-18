@@ -1841,7 +1841,7 @@ ParaDrawing.prototype.isShapeChild = function(bRetShape)
 		return bRetShape ? null : false;
 
 	var cur_doc_content = this.DocumentContent;
-	while (cur_doc_content.Is_TableCellContent())
+	while (cur_doc_content.IsTableCellContent())
 	{
 		cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
 	}
@@ -1869,10 +1869,10 @@ ParaDrawing.prototype.checkShapeChildAndGetTopParagraph = function(paragraph)
 			return top_group.parent.Get_ParentParagraph();
 		}
 	}
-	else if (parent_doc_content.Is_TableCellContent())
+	else if (parent_doc_content.IsTableCellContent())
 	{
 		var top_doc_content = parent_doc_content;
-		while (top_doc_content.Is_TableCellContent())
+		while (top_doc_content.IsTableCellContent())
 		{
 			top_doc_content = top_doc_content.Parent.Row.Table.Parent;
 		}

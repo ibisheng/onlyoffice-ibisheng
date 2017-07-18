@@ -2283,8 +2283,11 @@ CPresentation.prototype =
         return {styles: styles, lastId: styles.Get_Default_Paragraph()}
     },
 
-    Is_TableCellContent: function()
+    IsTableCellContent: function(isReturnCell)
     {
+    	if (true === isReturnCell)
+    		return null;
+
         return false;
     },
 
@@ -2320,8 +2323,11 @@ CPresentation.prototype =
     },
 
 
-    Is_Cell: function()
+    IsCell: function(isReturnCell)
     {
+    	if (isReturnCell)
+    		return null;
+
         return false;
     },
 

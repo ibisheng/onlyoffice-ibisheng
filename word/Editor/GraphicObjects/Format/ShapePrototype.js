@@ -644,8 +644,11 @@ CShape.prototype.Get_TableStyleForPara = function()
 {
     return null;
 };
-CShape.prototype.Is_Cell = function()
+CShape.prototype.IsCell = function(isReturnCell)
 {
+	if (true === isReturnCell)
+		return null;
+
     return false;
 };
 
@@ -910,11 +913,6 @@ CShape.prototype.Get_Numbering = function()
 CShape.prototype.Get_TableStyleForPara = function()
 {
     return editor.WordControl.m_oLogicDocument.Get_TableStyleForPara();
-};
-
-CShape.prototype.Is_Cell = function()
-{
-    return false;
 };
 
 CShape.prototype.Is_DrawingShape = function(bRetShape)

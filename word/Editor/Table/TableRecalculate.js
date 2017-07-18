@@ -1467,7 +1467,7 @@ CTable.prototype.private_RecalculateHeader = function()
 {
     // Если у нас таблица внутри таблицы, тогда в ней заголовочных строк не должно быть,
     // потому что так делает Word.
-    if ( true === this.Parent.Is_TableCellContent() )
+    if ( true === this.Parent.IsTableCellContent() )
     {
         this.HeaderInfo.Count = 0;
         return;
@@ -1574,7 +1574,7 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
             {
                 var TableWidth = this.TableSumGrid[this.TableSumGrid.length - 1];
 
-                if (false === this.Parent.Is_TableCellContent())
+                if (false === this.Parent.IsTableCellContent())
                     Page.X = Page.XLimit - TableWidth + 1.9; // 1.9мм всегда добавляется справа от таблицы
                 else
                     Page.X = Page.XLimit - TableWidth;
@@ -1641,7 +1641,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
     if ( true === this.TurnOffRecalc )
         return;
 
-	var isInnerTable       = this.Parent.Is_TableCellContent();
+	var isInnerTable       = this.Parent.IsTableCellContent();
 	var oTopDocument       = this.Parent.Is_TopDocument(true);
 	var isTopLogicDocument = (oTopDocument instanceof CDocument ? true : false);
 	var oFootnotes         = (isTopLogicDocument && !isInnerTable ? oTopDocument.Footnotes : null);
@@ -2445,7 +2445,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         if (true === bAllCellsVertical && Asc.linerule_Auto === RowH.HRule)
             this.TableRowsBottom[CurRow][CurPage] = Y + 4.5 + this.MaxBotMargin[CurRow] + MaxTopMargin;
 
-        if ((Asc.linerule_AtLeast === RowH.HRule || Asc.linerule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent())) || CurRow != FirstRow))
+        if ((Asc.linerule_AtLeast === RowH.HRule || Asc.linerule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.IsTableCellContent())) || CurRow != FirstRow))
         {
             bNextPage = true;
 

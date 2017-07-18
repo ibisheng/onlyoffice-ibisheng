@@ -1807,7 +1807,7 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 			{
 				if (Pr.ParaPr.Brd.Top.Value === border_Single || Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value)
 				{
-					if (( true === Pr.ParaPr.Brd.First && ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === Pr.ParaPr.PageBreakBefore ) ) ||
+					if (( true === Pr.ParaPr.Brd.First && ( 0 === CurPage || true === this.Parent.IsTableCellContent() || true === Pr.ParaPr.PageBreakBefore ) ) ||
 						( true !== Pr.ParaPr.Brd.First && ( ( 0 === CurPage && null === this.Get_DocumentPrev() ) || ( 1 === CurPage && true === this.IsStartFromNewPage() )  ) ))
 						TempTop += Pr.ParaPr.Spacing.Before;
 				}
@@ -2313,7 +2313,7 @@ Paragraph.prototype.Internal_Draw_6 = function(CurPage, pGraphics, Pr)
 	if (bDrawTop)
 	{
 		var Y_top = this.Pages[CurPage].Y;
-		if (0 === CurPage || true === this.Parent.Is_TableCellContent() || true === Pr.ParaPr.PageBreakBefore)
+		if (0 === CurPage || true === this.Parent.IsTableCellContent() || true === Pr.ParaPr.PageBreakBefore)
 			Y_top += Pr.ParaPr.Spacing.Before;
 
 		RGBA = Pr.ParaPr.Brd.Top.Get_Color(this);
@@ -7721,14 +7721,16 @@ Paragraph.prototype.Get_CompiledPr = function()
 	}
 	else if (null === PrevEl)
 	{
-		if (true === this.Parent.Is_TableCellContent() && true === Pr.ParaPr.ContextualSpacing)
+		if (true === this.Parent.IsTableCellContent() && true === Pr.ParaPr.ContextualSpacing)
 		{
-			var Cell   = this.Parent.Parent;
-			var PrevEl = Cell.Get_LastParagraphPrevCell();
-
-			if ((null !== PrevEl && type_Paragraph === PrevEl.GetType() && PrevEl.Style_Get() === StyleId) || (null === PrevEl && undefined === StyleId))
+			var Cell = this.Parent.IsTableCellContent(true);
+			if (Cell)
 			{
-				Pr.ParaPr.Spacing.Before = 0;
+				var PrevEl = Cell.Get_LastParagraphPrevCell();
+				if ((null !== PrevEl && type_Paragraph === PrevEl.GetType() && PrevEl.Style_Get() === StyleId) || (null === PrevEl && undefined === StyleId))
+				{
+					Pr.ParaPr.Spacing.Before = 0;
+				}
 			}
 		}
 		else if (true === Pr.ParaPr.Spacing.BeforeAutoSpacing || !(this.bFromDocument === true))
@@ -7801,17 +7803,19 @@ Paragraph.prototype.Get_CompiledPr = function()
 	}
 	else
 	{
-		if (true === this.Parent.Is_TableCellContent() && true === Pr.ParaPr.ContextualSpacing)
+		if (true === this.Parent.IsTableCellContent() && true === Pr.ParaPr.ContextualSpacing)
 		{
-			var Cell   = this.Parent.Parent;
-			var NextEl = Cell.Get_FirstParagraphNextCell();
-
-			if ((null !== NextEl && type_Paragraph === NextEl.GetType() && NextEl.Style_Get() === StyleId) || (null === NextEl && StyleId === undefined))
+			var Cell = this.Parent.IsTableCellContent(true);
+			if (Cell)
 			{
-				Pr.ParaPr.Spacing.After = 0;
+				var NextEl = Cell.Get_FirstParagraphNextCell();
+				if ((null !== NextEl && type_Paragraph === NextEl.GetType() && NextEl.Style_Get() === StyleId) || (null === NextEl && StyleId === undefined))
+				{
+					Pr.ParaPr.Spacing.After = 0;
+				}
 			}
 		}
-		else if (true === this.Parent.Is_TableCellContent() && true === Pr.ParaPr.Spacing.AfterAutoSpacing)
+		else if (true === this.Parent.IsTableCellContent() && true === Pr.ParaPr.Spacing.AfterAutoSpacing)
 		{
 			Pr.ParaPr.Spacing.After = 0;
 		}
@@ -9045,7 +9049,7 @@ Paragraph.prototype.Get_Layout = function(ContentPos, Drawing)
 			var Bottom_Margin = Y_Bottom_Margin;
 			var Page_H        = Page_Height;
 
-			if (true === this.Parent.Is_TableCellContent() && undefined != Drawing && true == Drawing.Use_TextWrap())
+			if (true === this.Parent.IsTableCellContent() && undefined != Drawing && true == Drawing.Use_TextWrap())
 			{
 				Top_Margin    = 0;
 				Bottom_Margin = 0;
@@ -9053,7 +9057,7 @@ Paragraph.prototype.Get_Layout = function(ContentPos, Drawing)
 			}
 
 			var PageLimitsOrigin = this.Parent.Get_PageLimits(PageRel);
-			if (true === this.Parent.Is_TableCellContent() && false === Drawing.Is_LayoutInCell())
+			if (true === this.Parent.IsTableCellContent() && false === Drawing.Is_LayoutInCell())
 			{
 				PageLimitsOrigin     = LogicDocument.Get_PageLimits(PageAbs);
 				var PageFieldsOrigin = LogicDocument.Get_PageFields(PageAbs);
@@ -9098,7 +9102,7 @@ Paragraph.prototype.Get_AnchorPos = function(Drawing)
 
 	return Result;
 };
-Paragraph.prototype.Is_ContentOnFirstPage = function()
+Paragraph.prototype.IsContentOnFirstPage = function()
 {
 	// Если параграф сразу переносится на новую страницу, тогда это значение обычно -1
 	if (this.Pages[0].EndLine < 0)
@@ -9157,7 +9161,7 @@ Paragraph.prototype.Get_ParentTextTransform = function()
 Paragraph.prototype.Get_ParentTextInvertTransform = function()
 {
 	var CurDocContent = this.Parent;
-	while (CurDocContent.Is_TableCellContent())
+	while (CurDocContent.IsTableCellContent())
 	{
 		CurDocContent = CurDocContent.Parent.Row.Table.Parent;
 	}

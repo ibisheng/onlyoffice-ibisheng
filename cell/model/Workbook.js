@@ -3092,7 +3092,7 @@
 											var cell = t._getCellNoEmpty(row, col);
 											var val = cell ? cell.getValueWithoutFormat() : "";
 											var n = parseFloat(val);
-											return period.start <= n && n <= period.end;
+											return period.start <= n && n < period.end;
 										};
 									})(oRule.getTimePeriod()));
 								} else {

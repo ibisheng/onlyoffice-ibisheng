@@ -2120,7 +2120,7 @@ ParaRun.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 			{
 				if (oPr && true === oPr.NewLineParagraph)
 				{
-					Str += '\n';
+					Str += '\r\n';
 				}
 
 				break;
@@ -2944,7 +2944,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             // Добавляем разрыв страницы. Если это первая страница, тогда ставим разрыв страницы в начале параграфа,
                             // если нет, тогда в начале текущей строки.
 
-                            if (null != Para.Get_DocumentPrev() && true != Para.Parent.Is_TableCellContent() && 0 === CurPage)
+                            if (null != Para.Get_DocumentPrev() && true != Para.Parent.IsTableCellContent() && 0 === CurPage)
                             {
                                 Para.Recalculate_Drawing_AddPageBreak(0, 0, true);
                                 PRS.RecalcResult = recalcresult_NextPage | recalcresultflags_Page;
@@ -3668,7 +3668,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 var X_Right_Margin  = PageLimits.XLimit - PageFields.XLimit;
                 var Y_Bottom_Margin = PageLimits.YLimit - PageFields.YLimit;
 
-                if (true === Para.Parent.Is_TableCellContent() && (true !== Item.Use_TextWrap() || false === Item.Is_LayoutInCell()))
+                if (true === Para.Parent.IsTableCellContent() && (true !== Item.Use_TextWrap() || false === Item.Is_LayoutInCell()))
                 {
                     X_Left_Field   = LD_PageFields.X;
                     Y_Top_Field    = LD_PageFields.Y;
@@ -3692,7 +3692,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 var Bottom_Margin = Y_Bottom_Margin;
                 var Page_H        = Page_Height;
 
-                if ( true === Para.Parent.Is_TableCellContent() && true == Item.Use_TextWrap() )
+                if ( true === Para.Parent.IsTableCellContent() && true == Item.Use_TextWrap() )
                 {
                     Top_Margin    = 0;
                     Bottom_Margin = 0;
@@ -3700,7 +3700,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                 }
 
                 var PageLimitsOrigin = Para.Parent.Get_PageLimits(PageRel);
-                if (true === Para.Parent.Is_TableCellContent() && false === Item.Is_LayoutInCell())
+                if (true === Para.Parent.IsTableCellContent() && false === Item.Is_LayoutInCell())
                 {
                     PageLimitsOrigin = LogicDocument.Get_PageLimits(PageAbs);
                     var PageFieldsOrigin = LogicDocument.Get_PageFields(PageAbs);
@@ -3795,7 +3795,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                                 LDRecalcInfo.Reset();
                                 Item.Reset_SavedPosition();
                             }
-                            else if ( true === Para.Parent.Is_TableCellContent() )
+                            else if ( true === Para.Parent.IsTableCellContent() )
                             {
                                 // Картинка не на нужной странице, но так как это таблица
                                 // мы пересчитываем заново текущую страницу, а не предыдущую
@@ -4784,7 +4784,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
                     }
 
                     var bEndCell = false;
-                    if (null === Para.Get_DocumentNext() && true === Para.Parent.Is_TableCellContent())
+                    if (null === Para.Get_DocumentNext() && true === Para.Parent.IsTableCellContent())
                         bEndCell = true;
 
                     Item.Draw(X, Y - this.YOffset, pGraphics, bEndCell, reviewtype_Common !== ReviewType ?  true : false);
