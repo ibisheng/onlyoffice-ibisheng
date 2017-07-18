@@ -280,7 +280,7 @@
 				(AscCommon.c_oNotifyType.Shift === type || AscCommon.c_oNotifyType.Move === type ||
 				AscCommon.c_oNotifyType.Delete === type));
 			} else if (AscCommon.c_oNotifyParentType.IsDefName === type) {
-				return true;
+				return null;
 			} else if (AscCommon.c_oNotifyParentType.Change === type) {
 				this.wb.dependencyFormulas.addToChangedDefName(this);
 			} else if (AscCommon.c_oNotifyParentType.ChangeFormula === type) {
