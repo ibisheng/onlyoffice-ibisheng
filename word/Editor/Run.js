@@ -2120,7 +2120,7 @@ ParaRun.prototype.GetSelectedText = function(bAll, bClearText, oPr)
 			{
 				if (oPr && true === oPr.NewLineParagraph)
 				{
-					Str += '\n';
+					Str += '\r\n';
 				}
 
 				break;
