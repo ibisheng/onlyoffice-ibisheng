@@ -2645,7 +2645,7 @@ CPresentation.prototype =
                 var oTargetTextObject = AscFormat.getTargetTextObject(oDrawingObjects);
 
                 var bNeedRedraw;
-                if(oTargetTextObject.isEmptyPlaceholder())
+                if(oTargetTextObject && oTargetTextObject.isEmptyPlaceholder())
                 {
                     bNeedRedraw = true;
                 }
