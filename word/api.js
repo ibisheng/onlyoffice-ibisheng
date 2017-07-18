@@ -7330,6 +7330,8 @@ background-repeat: no-repeat;\
 				oLogicDocument.Recalculate();
 				oLogicDocument.Document_UpdateInterfaceState();
 				oLogicDocument.Document_UpdateSelectionState();
+
+				return oContentControl.GetContentControlPr();
 			}
 		}
 		else if (AscCommonWord.sdttype_InlineLevel === nType)
@@ -7363,6 +7365,8 @@ background-repeat: no-repeat;\
 					oLogicDocument.Document_UpdateInterfaceState();
 					oLogicDocument.Document_UpdateSelectionState();
 				}
+
+				return oContentControl.GetContentControlPr();
 			}
 		}
 	};
@@ -8129,9 +8133,19 @@ background-repeat: no-repeat;\
 		}
 		return _ret;
 	};
-	window["asc_docs_api"].prototype["pluginMethod_AddContentControl"] = function(type)
+	window["asc_docs_api"].prototype["pluginMethod_AddContentControl"] = function(type, pr)
 	{
-		return this.asc_AddContentControl(type);
+		var _content_control_pr;
+		if (pr)
+		{
+			_content_control_pr = new AscCommonWord.CContentControlPr();
+			_content_control_pr.Id = pr["Id"];
+			_content_control_pr.Tag = pr["Tag"];
+			_content_control_pr.Lock = pr["Lock"];
+		}
+
+		var _obj = this.asc_AddContentControl(type, _content_control_pr);
+		return {"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId};
 	};
 	window["asc_docs_api"].prototype["pluginMethod_RemoveContentControl"] = function(id)
 	{
