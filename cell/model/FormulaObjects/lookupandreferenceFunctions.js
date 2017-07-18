@@ -1164,6 +1164,7 @@
 	cVLOOKUP.prototype.constructor = cVLOOKUP;
 	cVLOOKUP.prototype.argumentsMin = 3;
 	cVLOOKUP.prototype.argumentsMax = 4;
+	cVLOOKUP.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cVLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;
