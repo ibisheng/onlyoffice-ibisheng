@@ -3238,89 +3238,132 @@
 			context.drawImage(this.image, x, y);
 		};
 
-		this.privateGetShape = function(obj)
-		{
-			var oShape = new AscFormat.CShape();
-			var oParent = null, oWorkSheet = null;
-			var bWord = true;
-			if (Asc['editor'] && AscCommon.c_oEditorId.Spreadsheet === Asc['editor'].getEditorId())
-			{
-				var api_sheet = Asc['editor'];
-				oShape.setWorksheet(api_sheet.wb.getWorksheet().model);
-				oWorkSheet = api_sheet.wb.getWorksheet().model;
-				bWord = false;
-			}
-			else
-			{
-				if (editor && editor.WordControl && Array.isArray(editor.WordControl.m_oLogicDocument.Slides))
-				{
-					if (editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
-					{
-						oShape.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
-						oParent = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
-						bWord = false;
-					}
-					else
-					{
-						return null;
-					}
-				}
-			}
-
-			var oParentObjects = oShape.getParentObjects();
-			var oTrack = new AscFormat.NewShapeTrack("textRect", 0, 0, oParentObjects.theme, oParentObjects.master, oParentObjects.layout, oParentObjects.slide, 0);
-			oTrack.track({}, this.shapeW, this.shapeH);
-			oShape = oTrack.getShape(bWord, oShape.getDrawingDocument(), oShape.drawingObjects);
-
-			oShape.setStyle(null);
-			oShape.spPr.setFill(AscFormat.CreateUnfilFromRGB(255, 0, 0));
-			var oBodypr = oShape.getBodyPr().createDuplicate();
-			oBodypr.lIns = 0;
-			oBodypr.tIns = 0;
-			oBodypr.rIns = 0;
-			oBodypr.bIns = 0;
-			oBodypr.anchor = 1;
-			if(!bWord)
-			{
-				oShape.txBody.setBodyPr(oBodypr);
-			}
-			else
-			{
-				oShape.setBodyPr(oBodypr);
-			}
-			oShape.spPr.setLn(AscFormat.CreatePenFromParams(CreateNoFillUniFill(), null, null, null, 2, null));
-			if(oWorkSheet)
-			{
-				oShape.setWorksheet(oWorkSheet);
-			}
-			if(oParent)
-			{
-				oShape.setParent(oParent);
-			}
-			oShape.spPr.xfrm.setOffX(0);
-			oShape.spPr.xfrm.setOffY(0);
-			oShape.spPr.xfrm.setExtX(this.shapeW);
-			oShape.spPr.xfrm.setExtY(this.shapeH);
-			return oShape;
-		};
-
 		this.privateGenerateShape = function(obj)
 		{
 			AscFormat.ExecuteNoHistory(function(obj) {
 
-				var oShape = this.privateGetShape();
-				var oContent = oShape.getDocContent();
-				var sText = "Oleg";
-				var oParagraph = oContent.Content[0];
-				for(var i = 0; i < sText.length; ++i)
-				{
-					oContent.AddToParagraph(new ParaText(sText[i]), false);
+                var oShape = new AscFormat.CShape();
+                var bWord = false;
+                var oApi = Asc['editor'] || editor;
+                if(!oApi){
+                    return null;
+                }
+                switch(oApi.getEditorId()){
+                    case AscCommon.c_oEditorId.Word:{
+                        oShape.setWordShape(true);
+                        bWord = true;
+                        break;
+                    }
+                    case AscCommon.c_oEditorId.Presentation:{
+                        oShape.setWordShape(false);
+                        oShape.setParent(oApi.WordControl.m_oLogicDocument.Slides[oApi.WordControl.m_oLogicDocument.CurPage]);
+                        break;
+                    }
+					case AscCommon.c_oEditorId.Spreadsheet:{
+                        oShape.setWordShape(false);
+                        oShape.setWorksheet(oApi.wb.getWorksheet().model);
+						break;
+					}
 				}
-				oContent.Set_ApplyToAll(true);
-				oContent.AddToParagraph(new ParaTextPr({FontSize: 20, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
-				oContent.SetParagraphAlign(AscCommon.align_Center);
-				oContent.SetParagraphIndent({FirstLine: 0, Left: 0, Right: 0});
-				oContent.Set_ApplyToAll(false);
+
+                oShape.setBDeleted(false);
+                    oShape.spPr = new AscFormat.CSpPr();
+                    oShape.spPr.setParent(oShape);
+                    oShape.spPr.setXfrm(new AscFormat.CXfrm());
+                    oShape.spPr.xfrm.setParent(oShape.spPr);
+                    oShape.spPr.xfrm.setOffX(0);
+                    oShape.spPr.xfrm.setOffY(0);
+                    oShape.spPr.xfrm.setExtX(obj['width']);
+                    oShape.spPr.xfrm.setExtY(obj['height']);
+                    oShape.spPr.xfrm.setRot(AscFormat.normalizeRotate(obj['rotate'] ? obj['rotate']*60000 : 0));
+					oShape.spPr.setGeometry(AscFormat.CreateGeometry(obj['type']));
+					if(obj['fill'] && obj['fill'].length === 3){
+						oShape.spPr.setFill(AscFormat.CreteSolidFillRGB(obj['fill'][0], obj['fill'][1], obj['fill'][2]));
+					}
+					if(AscFormat.isRealNumber(obj['stroke-width']) || Array.isArray(obj['stroke']) && obj['stroke'].length === 3){
+						var oUnifill;
+                        if(Array.isArray(obj['stroke']) && obj['stroke'].length === 3){
+                        	oUnifill = AscFormat.CreteSolidFillRGB(obj['stroke'][0], obj['stroke'][1], obj['stroke'][2]);
+						}
+						else{
+                            oUnifill = AscFormat.CreteSolidFillRGB(0, 0, 0);
+						}
+						oShape.spPr.setLn(AscFormat.CreatePenFromParams(oUnifill, undefined, undefined, undefined, undefined, AscFormat.isRealNumber(obj['stroke-width']) ? obj['stroke-width'] : 12700.0/36000.0))
+					}
+
+					if(bWord){
+						oShape.createTextBoxContent();
+					}
+					else{
+						oShape.createTextBody();
+					}
+					var align = parseInt(obj['align'], 10);
+					if(!isNaN(align)){
+                        oShape.setVerticalAlign();
+					}
+
+					if(Array.isArray(obj['margins']) && obj['margins'].length === 4){
+						oShape.setPaddings({Left: obj['margins'][0], Top: obj['margins'][1], Right: obj['margins'][2], Bottom: obj['margins'][3]});
+					}
+					var oContent = oShape.getDocContent();
+					var aParagraphsS = obj['paragraphs'];
+					for(var i = 0; i < aParagraphsS.length; ++i){
+						var oCurParS = aParagraphsS[i];
+                        var oNewParagraph = new Paragraph(oContent.DrawingDocument, oContent);
+						if(AscFormat.isRealNumber(oCurParS['align'])){
+							oNewParagraph.Set_Align(oCurParS['align'])
+						}
+						if(Array.isArray(oCurParS['fill']) && oCurParS['fill'].length === 3){
+							var oShd = new CDocumentShd();
+							oShd.Value = Asc.c_oAscShdClear;
+							oShd.Color.r = oCurParS['fill'][0];
+							oShd.Color.g = oCurParS['fill'][1];
+							oShd.Color.b = oCurParS['fill'][2];
+							oNewParagraph.Set_Shd(oShd, true);
+						}
+                        if(AscFormat.isRealNumber(oCurParS['linespacing'])){
+                            oNewParagraph.Set_Spacing({Line: oCurParS['linespacing'], LineRule: Asc.linerule_Exact});
+                        }
+                        var aRunsS = oCurParS['runs'];
+                        for(var j = 0; j < aRunsS.length; ++j){
+                        	var oRunS = aRunsS[j];
+                        	var oRun = new ParaRun(oNewParagraph, false);
+                            if(Array.isArray(oRunS['fill']) && oRunS['fill'].length === 3){
+                                oRun.Set_Unifill(AscFormat.CreteSolidFillRGB(oRunS['fill'][0], oRunS['fill'][1], oRunS['fill'][2]));
+                            }
+                            if(oRunS['font-family']){
+                                oRun.Set_RFonts_Ascii({Name : oRunS['font-family'], Index : -1});
+                                oRun.Set_RFonts_CS({Name : oRunS['font-family'], Index : -1});
+                                oRun.Set_RFonts_EastAsia({Name : oRunS['font-family'], Index : -1});
+                                oRun.Set_RFonts_HAnsi({Name : oRunS['font-family'], Index : -1});
+							}
+                            if(oRunS['font-size']){
+                                oRun.Set_FontSize(oRunS['font-size']);
+							}
+							oRun.Set_Bold(oRunS['bold'] === true);
+							oRun.Set_Italic(oRunS['italic'] === true);
+							oRun.Set_Strikeout(oRunS['strikeout'] === true);
+							oRun.Set_Underline(oRunS['underline'] === true);
+
+                            var sCustomText = oRunS['text'];
+                            if(sCustomText === "<%br%>"){
+                                oRun.Add_ToContent(0, new ParaNewLine(AscCommonWord.break_Line), false);
+							}
+							else{
+                                for (var nIndex = 0, nLen = sCustomText.length; nIndex < nLen; ++nIndex)
+                                {
+                                    var nChar = sCustomText.charAt(nIndex);
+                                    if (" " === nChar)
+                                        oRun.Add_ToContent(nIndex, new ParaSpace(), true);
+                                    else
+                                        oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
+                                }
+							}
+
+                            oNewParagraph.Internal_Content_Add(i, oRun, false);
+						}
+                        oContent.Internal_Content_Add(oContent.Content.length, oNewParagraph);
+					}
 
 				oShape.recalculate();
 				if (oShape.bWordShape)
@@ -3338,7 +3381,7 @@
 				var graphics = new AscCommon.CGraphics();
 				graphics.m_oFontManager = AscCommon.g_fontManager;
 
-				graphics.init(this.image.getContext('2d'), this.width, this.height, this.shapeW, this.shapeH);
+				graphics.init(this.image.getContext('2d'), this.width, this.height, oShape.bounds.w, oShape.bounds.h);
 				graphics.transform(1,0,0,1,0,0);
 
 				oShape.draw(graphics);

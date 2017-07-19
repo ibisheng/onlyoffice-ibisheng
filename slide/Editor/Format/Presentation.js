@@ -297,7 +297,7 @@ CShowPr.prototype.Write_ToBinary = function(w){
     w.Seek(nStartPos);
     w.WriteLong(Flags);
     w.Seek(nEndPos);
-}
+};
 
 CShowPr.prototype.Read_FromBinary = function(r){
     var Flags = r.GetLong();
@@ -339,7 +339,7 @@ CShowPr.prototype.Read_FromBinary = function(r){
     if(Flags & 1024){
         this.useTimings = r.GetBool();
     }
-}
+};
 
 CShowPr.prototype.Copy = function(){
     var oCopy = new CShowPr();
@@ -369,7 +369,8 @@ CShowPr.prototype.Copy = function(){
     oCopy.showNarration = this.showNarration;
     oCopy.useTimings    = this.useTimings;
     return oCopy;
-}
+};
+
 
 
 
