@@ -6542,6 +6542,37 @@ CT_DataField.prototype.asc_getSubtotal = function () {
 CT_DataField.prototype.asc_getShowDataAs = function () {
 	return null !== this.showDataAs ? this.showDataAs : c_oAscShowDataAs.Normal;
 };
+CT_DataField.prototype.asc_clone = function () {
+	var res = new CT_DataField();
+	//Attributes
+	res.name = this.name;
+	res.fld = this.fld;
+	res.subtotal = this.subtotal;
+	res.showDataAs = this.showDataAs;
+	res.baseField = this.baseField;
+	res.baseItem = this.baseItem;
+	res.numFmtId = this.numFmtId;
+//Members
+	res.extLst = this.extLst;
+	return res;
+};
+CT_DataField.prototype.asc_set = function (api, pivot, newVal) {
+	var t = this;
+	api._changePivotStyle(pivot, function () {
+		if (t.name !== newVal.name) {
+			t.asc_setName(newVal.name);
+		}
+		if (t.subtotal !== newVal.subtotal) {
+			t.asc_setSubtotal(newVal.subtotal);
+		}
+	});
+};
+CT_PivotTableStyle.prototype.asc_setName = function(newVal) {
+	this.name = newVal;
+};
+CT_PivotTableStyle.prototype.asc_setSubtotal = function(newVal) {
+	this.subtotal = newVal;
+};
 function CT_Format() {
 //Attributes
 	this.action = null;//formatting
@@ -10084,3 +10115,7 @@ prot["asc_getName"] = prot.asc_getName;
 prot["asc_getIndex"] = prot.asc_getIndex;
 prot["asc_getSubtotal"] = prot.asc_getSubtotal;
 prot["asc_getShowDataAs"] = prot.asc_getShowDataAs;
+prot["asc_clone"] = prot.asc_clone;
+prot["asc_set"] = prot.asc_set;
+prot["asc_setName"] = prot.asc_setName;
+prot["asc_setSubtotal"] = prot.asc_setSubtotal;
