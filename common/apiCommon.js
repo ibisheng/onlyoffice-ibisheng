@@ -3222,7 +3222,7 @@
 
 			}
 
-			this.privateGenerateShape();
+			this.privateGenerateShape(_obj);
 
 			var _data = this.image.toDataURL("image/png");
 			console.log(_data);
@@ -3238,7 +3238,7 @@
 			context.drawImage(this.image, x, y);
 		};
 
-		this.privateGetShape = function()
+		this.privateGetShape = function(obj)
 		{
 			var oShape = new AscFormat.CShape();
 			var oParent = null, oWorkSheet = null;
@@ -3304,9 +3304,9 @@
 			return oShape;
 		};
 
-		this.privateGenerateShape = function()
+		this.privateGenerateShape = function(obj)
 		{
-			AscFormat.ExecuteNoHistory(function() {
+			AscFormat.ExecuteNoHistory(function(obj) {
 
 				var oShape = this.privateGetShape();
 				var oContent = oShape.getDocContent();
@@ -3348,7 +3348,7 @@
 					window.editor.ShowParaMarks = oldShowParaMarks;
 				}
 
-			}, this, []);
+			}, this, [obj]);
 		};
 	}
 	window.TEST_FUNCTION_WATERMARK = function()
