@@ -6567,10 +6567,10 @@ CT_DataField.prototype.asc_set = function (api, pivot, newVal) {
 		}
 	});
 };
-CT_PivotTableStyle.prototype.asc_setName = function(newVal) {
+CT_DataField.prototype.asc_setName = function(newVal) {
 	this.name = newVal;
 };
-CT_PivotTableStyle.prototype.asc_setSubtotal = function(newVal) {
+CT_DataField.prototype.asc_setSubtotal = function(newVal) {
 	this.subtotal = newVal;
 };
 function CT_Format() {
