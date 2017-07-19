@@ -167,6 +167,10 @@
 
 		this.signatures = [];
 
+		//config['watermark_on_draw'] = window.TEST_WATERMARK_STRING;
+		this.watermarkDraw = ((config['watermark_on_draw'] !== undefined) && (config['watermark_on_draw'] != "")) ?
+			new AscCommon.CWatermarkOnDraw(config['watermark_on_draw']) : null;
+
 		return this;
 	}
 
@@ -272,6 +276,9 @@
 
 			//чтобы в versionHistory был один documentId для auth и open
 			this.CoAuthoringApi.setDocId(this.documentId);
+
+			if (this.watermarkDraw)
+				this.watermarkDraw.CheckParams(this);
 		}
 
 		if (undefined !== window["AscDesktopEditor"] && offlineMode != this.documentUrl)

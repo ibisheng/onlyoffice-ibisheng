@@ -3136,7 +3136,7 @@
         return this.Variants;
     };
 
-    function CWatermarkOnDraw(htmlContent, api)
+    function CWatermarkOnDraw(htmlContent)
 	{
 		// example content:
 		/*
@@ -3184,9 +3184,15 @@
 		this.width = 0;
 		this.height = 0;
 
+		this.transparent = 0.3;
 		this.zoom = 1;
 
-		this.Generate = function(w, h)
+		this.CheckParams = function(api)
+		{
+			this.replaceMap["%user_name%"] = api.User.userName;
+		};
+
+		this.Generate = function()
 		{
 			var content = this.inputContentSrc;
 			for (var key in this.replaceMap)
@@ -3208,10 +3214,12 @@
 
 			}
 
+			this.transparent = (undefined == _obj['transparent']) ? 0.3 : _obj['transparent'];
+
 			this.privateGenerateShape(_obj);
 
-			var _data = this.image.toDataURL("image/png");
-			console.log(_data);
+			//var _data = this.image.toDataURL("image/png");
+			//console.log(_data);
 		};
 
 		this.Draw = function(context, w, h)
@@ -3219,9 +3227,12 @@
 			if (!this.image)
 				return;
 
-			var x = (w - this.width) >> 2;
-			var y = (h - this.height) >> 2;
+			var x = (w - this.width) >> 1;
+			var y = (h - this.height) >> 1;
+			var oldGlobalAlpha = context.globalAlpha;
+			context.globalAlpha = this.transparent;
 			context.drawImage(this.image, x, y);
+			context.globalAlpha = oldGlobalAlpha;
 		};
 
 		this.privateGenerateShape = function(obj)
@@ -3364,7 +3375,6 @@
 					editor.ShowParaMarks = false;
 				}
 
-				//
 				AscCommon.IsShapeToImageConverter = true;
 				var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
 
@@ -3417,46 +3427,46 @@
 			}, this, [obj]);
 		};
 	}
+	window.TEST_WATERMARK_STRING = "\
+	{\
+		\"transparent\" : 0.3,\
+		\"type\" : \"rect\",\
+		\"width\" : 100,\
+		\"height\" : 100,\
+		\"rotate\" : -45,\
+		\"margins\" : [ 10, 10, 10, 10 ],\
+		\"fill\" : [255, 0, 0],\
+		\"stroke-width\" : 1,\
+		\"stroke\" : [0, 0, 255],\
+		\"align\" : 1,\
+		\
+		\"paragraphs\" : [\
+		{\
+			\"align\" : 2,\
+			\"fill\" : [255, 0, 0],\
+			\"linespacing\" : 0,\
+			\
+			\"runs\" : [\
+				{\
+					\"text\" : \"Do not steal, %user_name%!\",\
+					\"fill\" : [0, 0, 0],\
+					\"font-family\" : \"Arial\",\
+					\"font-size\" : 40,\
+					\"bold\" : true,\
+					\"italic\" : false,\
+					\"strikeout\" : false,\
+					\"underline\" : false\
+				},\
+				{\
+					\"text\" : \"<%br%>\"\
+				}\
+			]\
+		}\
+	]\
+	}";
 	window.TEST_FUNCTION_WATERMARK = function()
 	{
-		var _json = "\
-		{\
-			\"type\" : \"rect\",\
-			\"width\" : 100,\
-			\"height\" : 100,\
-			\"rotate\" : -45,\
-			\"margins\" : [ 10, 10, 10, 10 ],\
-			\"fill\" : [255, 0, 0],\
-			\"stroke-width\" : 1,\
-			\"stroke\" : [0, 0, 255],\
-			\"align\" : 1,\
-			\
-			\"paragraphs\" : [\
-			{\
-				\"align\" : 2,\
-				\"fill\" : [255, 0, 0],\
-				\"linespacing\" : 0,\
-				\
-				\"runs\" : [\
-					{\
-						\"text\" : \"some text\",\
-						\"fill\" : [0, 255, 0],\
-						\"font-family\" : \"Arial\",\
-						\"font-size\" : 24,\
-						\"bold\" : true,\
-						\"italic\" : false,\
-						\"strikeout\" : false,\
-						\"underline\" : false\
-					},\
-					{\
-						\"text\" : \"<%br%>\"\
-					}\
-				]\
-			}\
-		]\
-		}";
-
-		var _t = new CWatermarkOnDraw(_json, null);
+		var _t = new CWatermarkOnDraw(window.TEST_WATERMARK_STRING, null);
 		_t.Generate(100, 100);
 	};
 
@@ -4193,4 +4203,6 @@
     prot["get_Word"] = prot.get_Word;
     prot["get_Checked"] = prot.get_Checked;
     prot["get_Variants"] = prot.get_Variants;
+
+    window["AscCommon"].CWatermarkOnDraw = CWatermarkOnDraw;
 })(window);
