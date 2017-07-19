@@ -1627,6 +1627,19 @@ $( function () {
             strictEqual( oParser.calculate().getValue(), 5 );
     } );
 
+	test( "Test: DAYS", function () {
+		ws.getRange2( "A2" ).setValue( "12/31/2011" );
+		ws.getRange2( "A3" ).setValue( "1/1/2011" );
+
+	    oParser = new parserFormula( 'DAYS("3/15/11","2/1/11")', "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 42 );
+
+		oParser = new parserFormula( "DAYS(A2,A3)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 364 );
+	} );
+
     test( "Test: DAY 2", function () {
         oParser = new parserFormula( "DAY(\"20 may 2045\")", "A1", ws );
         ok( oParser.parse() );
