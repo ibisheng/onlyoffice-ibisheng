@@ -3181,6 +3181,7 @@
 		this.replaceMap = {};
 
 		this.image = null;
+		this.imageBase64 = undefined;
 		this.width = 0;
 		this.height = 0;
 
@@ -3233,6 +3234,27 @@
 			context.globalAlpha = this.transparent;
 			context.drawImage(this.image, x, y);
 			context.globalAlpha = oldGlobalAlpha;
+		};
+
+		this.StartRenderer = function()
+		{
+			this.imageBase64 = this.image.toDataURL("image/png");
+		};
+		this.EndRenderer = function()
+		{
+			delete this.imageBase64;
+			this.imageBase64 = undefined;
+		};
+		this.DrawOnRenderer = function(renderer, w, h)
+		{
+			var wMM = this.width * g_dKoef_pix_to_mm / this.zoom;
+			var hMM = this.height * g_dKoef_pix_to_mm / this.zoom;
+			var x = (w - wMM) / 2;
+			var y = (h - hMM) / 2;
+
+			renderer.UseOriginImageUrl = true;
+			renderer.drawImage(this.imageBase64, x, y, wMM, hMM);
+			renderer.UseOriginImageUrl = false;
 		};
 
 		this.privateGenerateShape = function(obj)
