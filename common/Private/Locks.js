@@ -891,6 +891,20 @@ if(typeof CPresentation !== "undefined")
                 this.Slides[selected_slides[i]].backgroundLock.Lock.Check(check_obj);
             }
         }
+        if(CheckType === AscCommon.changestype_SlideHide)
+        {
+            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            for(var i = 0; i < selected_slides.length; ++i)
+            {
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.Slides[selected_slides[i]].showLock.Get_Id(),
+                    "guid": this.Slides[selected_slides[i]].showLock.Get_Id()
+                };
+                this.Slides[selected_slides[i]].showLock.Lock.Check(check_obj);
+            }
+        }
 
         if(CheckType === AscCommon.changestype_SlideTiming)
         {

@@ -5917,6 +5917,11 @@ background-repeat: no-repeat;\
 		_tr.Start(true);
 	};
 
+	asc_docs_api.prototype.asc_HideSlides   = function(isHide)
+	{
+		this.WordControl.m_oLogicDocument.hideSlides(isHide);
+	};
+
 	asc_docs_api.prototype.sync_EndAddShape = function()
 	{
 		editor.sendEvent("asc_onEndAddShape");
@@ -5983,6 +5988,7 @@ background-repeat: no-repeat;\
 			this.X_abs         = oData.X_abs;
 			this.Y_abs         = oData.Y_abs;
 			this.IsSlideSelect = oData.IsSlideSelect;
+			this.IsSlideHidden = oData.IsSlideHidden;
 		}
 		else
 		{
@@ -5990,6 +5996,7 @@ background-repeat: no-repeat;\
 			this.X_abs         = 0;
 			this.Y_abs         = 0;
 			this.IsSlideSelect = true;
+            this.IsSlideHidden = false;
 		}
 	}
 
@@ -6921,6 +6928,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['ApplySlideTiming']                    = asc_docs_api.prototype.ApplySlideTiming;
 	asc_docs_api.prototype['SlideTimingApplyToAll']               = asc_docs_api.prototype.SlideTimingApplyToAll;
 	asc_docs_api.prototype['SlideTransitionPlay']                 = asc_docs_api.prototype.SlideTransitionPlay;
+	asc_docs_api.prototype['asc_HideSlides']                      = asc_docs_api.prototype.asc_HideSlides;
 	asc_docs_api.prototype['SetTextBoxInputMode']                 = asc_docs_api.prototype.SetTextBoxInputMode;
 	asc_docs_api.prototype['GetTextBoxInputMode']                 = asc_docs_api.prototype.GetTextBoxInputMode;
 	asc_docs_api.prototype['sync_EndAddShape']                    = asc_docs_api.prototype.sync_EndAddShape;

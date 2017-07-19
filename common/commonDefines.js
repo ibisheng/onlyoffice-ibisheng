@@ -1071,6 +1071,7 @@
 	var changestype_AddShape                  = 72;
 	var changestype_AddShapes                 = 73;
 	var changestype_PresDefaultLang           = 74;
+	var changestype_SlideHide                 = 75;
 
 	var changestype_2_InlineObjectMove       = 1; // Передвигаем объект в заданную позцию (проверяем место, в которое пытаемся передвинуть)
 	var changestype_2_HdrFtr                 = 2; // Изменения с колонтитулом
@@ -1768,6 +1769,7 @@
 	window["AscCommon"].changestype_AddShape                  = changestype_AddShape;
 	window["AscCommon"].changestype_AddShapes                 = changestype_AddShapes;
 	window["AscCommon"].changestype_PresDefaultLang           = changestype_PresDefaultLang;
+	window["AscCommon"].changestype_SlideHide                 = changestype_SlideHide;
 	window["AscCommon"].changestype_2_InlineObjectMove        = changestype_2_InlineObjectMove;
 	window["AscCommon"].changestype_2_HdrFtr                  = changestype_2_HdrFtr;
 	window["AscCommon"].changestype_2_Comment                 = changestype_2_Comment;

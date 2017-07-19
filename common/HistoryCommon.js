@@ -2924,6 +2924,7 @@
 	window['AscDFH'].historydescription_Document_RemoveContentControl               = 0x0143;
 	window['AscDFH'].historydescription_Document_RemoveContentControlWrapper        = 0x0144;
 	window['AscDFH'].historydescription_Document_ChangeContentControlProperties     = 0x0145;
+    window['AscDFH'].historydescription_Presentation_HideSlides                     = 0x0146;
 
 
 

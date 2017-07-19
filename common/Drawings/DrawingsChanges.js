@@ -595,13 +595,14 @@
     window['AscDFH'].CChangesDrawingChangeTheme = CChangesDrawingChangeTheme;
 
 
-    function CChangesDrawingTimingLocks(Class, deleteLock, backgroundLock, timingLock, transitionLock, layoutLock){
+    function CChangesDrawingTimingLocks(Class, deleteLock, backgroundLock, timingLock, transitionLock, layoutLock, showLock){
         this.Type = AscDFH.historyitem_SlideSetLocks;
         this.deleteLock = deleteLock;
         this.backgroundLock = backgroundLock;
         this.timingLock = timingLock;
         this.transitionLock = transitionLock;
         this.layoutLock = layoutLock;
+        this.showLock = showLock;
 		AscDFH.CChangesBase.call(this, Class);
     }
 
@@ -614,6 +615,7 @@
         AscFormat.writeObject(Writer, this.timingLock);
         AscFormat.writeObject(Writer, this.transitionLock);
         AscFormat.writeObject(Writer, this.layoutLock);
+        AscFormat.writeObject(Writer, this.showLock);
     };
 
     CChangesDrawingTimingLocks.prototype.ReadFromBinary = function(Reader){
@@ -622,6 +624,7 @@
         this.timingLock = AscFormat.readObject(Reader);
         this.transitionLock = AscFormat.readObject(Reader);
         this.layoutLock = AscFormat.readObject(Reader);
+        this.showLock = AscFormat.readObject(Reader);
     };
 
     CChangesDrawingTimingLocks.prototype.Undo = function(){
@@ -631,6 +634,7 @@
         oSlide.timingLock = null;
         oSlide.transitionLock = null;
         oSlide.layoutLock = null;
+        oSlide.showLock = null;
     };
 
     CChangesDrawingTimingLocks.prototype.Redo = function(){
@@ -640,6 +644,7 @@
          oSlide.timingLock = this.timingLock;
          oSlide.transitionLock = this.transitionLock;
          oSlide.layoutLock = this.layoutLock;
+         oSlide.showLock = this.showLock;
     };
     CChangesDrawingTimingLocks.prototype.Load = function(){
         this.Redo();

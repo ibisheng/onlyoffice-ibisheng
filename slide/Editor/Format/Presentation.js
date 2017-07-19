@@ -2479,6 +2479,35 @@ CPresentation.prototype =
         return this.globalTableStyles;
     },
 
+    IsVisibleSlide: function (nIndex) {
+        var oSlide = this.Slides[nIndex];
+        if(!oSlide){
+            return false;
+        }
+        return oSlide.isVisible();
+    },
+
+
+    hideSlides: function(isHide){
+        var aSelectedArray = editor.WordControl.Thumbnails.GetSelectedArray();
+	    if(false === this.Document_Is_SelectionLocked(AscCommon.changestype_SlideHide, aSelectedArray)){
+            History.Create_NewPoint(AscDFH.historydescription_Presentation_HideSlides);
+            var bShow = !isHide;
+            var oSlide;
+            var nIndex;
+            for(var i = 0; i < aSelectedArray.length; ++i){
+                nIndex = aSelectedArray[i];
+                oSlide = this.Slides[nIndex];
+                if(oSlide){
+                    oSlide.setShow(bShow);
+                    this.DrawingDocument.OnRecalculatePage(nIndex, oSlide);//need only for update index label in thumbnails; TODO: remove it
+                }
+            }
+            this.DrawingDocument.OnEndRecalculate(false, false);
+            this.Document_UpdateUndoRedoState();
+        }
+    },
+
 
 	SelectAll : function()
     {

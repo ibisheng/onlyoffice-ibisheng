@@ -3518,6 +3518,16 @@ function CThumbnailsManager()
 		return _MinPositionPage;
 	}
 
+	this.IsSlideHidden = function(aSelected){
+        var oPresentation = oThis.m_oWordControl.m_oLogicDocument;
+        for(var i = 0; i < aSelected.length; ++i){
+        	if(oPresentation.IsVisibleSlide(aSelected[i])){
+        		return false;
+			}
+		}
+		return true;
+	};
+
 	this.onMouseDown = function(e)
 	{
 		if (oThis.m_oWordControl)
@@ -3561,6 +3571,7 @@ function CThumbnailsManager()
 				_data.X_abs         = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
 				_data.Y_abs         = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
 				_data.IsSlideSelect = false;
+				_data.IsSlideHidden = oThis.IsSlideHidden(oThis.GetSelectedArray());
 				oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
 			}
 			return false;
@@ -3647,6 +3658,7 @@ function CThumbnailsManager()
 				{
 					var _data   = new AscCommonSlide.CContextMenuData();
 					_data.Type  = Asc.c_oAscContextMenuTypes.Thumbnails;
+                    _data.IsSlideHidden = oThis.IsSlideHidden(oThis.GetSelectedArray());
 					_data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
 					_data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
 					oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
@@ -3676,6 +3688,7 @@ function CThumbnailsManager()
 		{
 			var _data   = new AscCommonSlide.CContextMenuData();
 			_data.Type  = Asc.c_oAscContextMenuTypes.Thumbnails;
+            _data.IsSlideHidden = oThis.IsSlideHidden(oThis.GetSelectedArray());
 			_data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
 			_data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
 			oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
@@ -5153,7 +5166,9 @@ function CThumbnailsManager()
 				var ConvertedPos = this.GetThumbnailPagePosition(nSlideIndex);
 				if (ConvertedPos)
 				{
-					editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({Type : Asc.c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect : true}));
+					var bIsSlideHidden = this.IsSlideHidden(aSelected);
+					editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({Type : Asc.c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect : true,
+                        IsSlideHidden: bIsSlideHidden}));
 				}
 				return false;
 			}
@@ -5167,7 +5182,9 @@ function CThumbnailsManager()
 					var ConvertedPos = this.GetThumbnailPagePosition(nSlideIndex);
 					if (ConvertedPos)
 					{
-						editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({Type : Asc.c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect : true}));
+                        var bIsSlideHidden = this.IsSlideHidden(aSelected);
+						editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({Type : Asc.c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect : true,
+                            IsSlideHidden: bIsSlideHidden}));
 					}
 					return false;
 				}
