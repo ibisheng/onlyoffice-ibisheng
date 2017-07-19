@@ -5910,6 +5910,30 @@ $( function () {
 
     } );
 
+	test( "Test: \"RRI\"", function () {
+
+		oParser = new parserFormula( "RRI(96, 10000, 11000)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0009933 );
+
+		oParser = new parserFormula( "RRI(0, 10000, 11000)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+		oParser = new parserFormula( "RRI(-10, 10000, 11000)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+		oParser = new parserFormula( "RRI(10, 10000, -11000)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+		oParser = new parserFormula( "RRI(1, 1, -1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), -2 );
+
+	} );
+
     test( "Test: \"INTRATE\"", function () {
 
         function intrate( settlement, maturity, investment, redemption, basis ){
