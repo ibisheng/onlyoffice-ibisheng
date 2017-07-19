@@ -5398,6 +5398,31 @@ $( function () {
 
     } );
 
+	test( "Test: \"ISFORMULA\"", function () {
+
+		ws.getRange2( "C150" ).setValue( "=TODAY()" );
+		ws.getRange2( "C151" ).setValue( "7" );
+		ws.getRange2( "C152" ).setValue( "Hello, world!" );
+		ws.getRange2( "C153" ).setValue( "=3/0" );
+
+		oParser = new parserFormula( "ISFORMULA(C150)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "TRUE" );
+
+		oParser = new parserFormula( "ISFORMULA(C151)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "FALSE" );
+
+		oParser = new parserFormula( "ISFORMULA(C152)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "FALSE" );
+
+		oParser = new parserFormula( "ISFORMULA(C153)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().toString(), "TRUE" );
+	} );
+
+
 	test( "Test: \"IFNA\"", function () {
 
 		oParser = new parserFormula( 'IFNA(MATCH(30,B1:B5,0),"Not found")', "A2", ws );

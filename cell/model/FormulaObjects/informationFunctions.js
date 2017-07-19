@@ -254,6 +254,7 @@
 	cISFORMULA.prototype.constructor = cISFORMULA;
 	cISFORMULA.prototype.argumentsMin = 1;
 	cISFORMULA.prototype.argumentsMax = 1;
+	cISFORMULA.prototype.isXLFN = true;
 	cISFORMULA.prototype.Calculate = function (arg) {
 		//есть различия в поведении этой формулы для ms и lo(для нескольких ячеек с данными)
 		var arg0 = arg[0];
