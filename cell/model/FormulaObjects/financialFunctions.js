@@ -459,7 +459,7 @@
 		cCOUPDAYSNC, cCOUPNCD, cCOUPNUM, cCOUPPCD, cCUMIPMT, cCUMPRINC, cDB, cDDB, cDISC, cDOLLARDE, cDOLLARFR,
 		cDURATION, cEFFECT, cFV, cFVSCHEDULE, cINTRATE, cIPMT, cIRR, cISPMT, cMDURATION, cMIRR, cNOMINAL, cNPER, cNPV,
 		cODDFPRICE, cODDFYIELD, cODDLPRICE, cODDLYIELD, cPMT, cPPMT, cPRICE, cPRICEDISC, cPRICEMAT, cPV, cRATE,
-		cRECEIVED, cSLN, cSYD, cTBILLEQ, cTBILLPRICE, cTBILLYIELD, cVDB, cXIRR, cXNPV, cYIELD, cYIELDDISC, cYIELDMAT);
+		cRECEIVED, cRRI, cSLN, cSYD, cTBILLEQ, cTBILLPRICE, cTBILLYIELD, cVDB, cXIRR, cXNPV, cYIELD, cYIELDDISC, cYIELDMAT);
 
 	/**
 	 * @constructor
@@ -4679,6 +4679,49 @@
 //    this.value.numFormat = 9;
 		return this.value;
 
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cRRI() {
+		this.name = "RRI";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cRRI.prototype = Object.create(cBaseFunction.prototype);
+	cRRI.prototype.constructor = cRRI;
+	cRRI.prototype.argumentsMin = 3;
+	cRRI.prototype.argumentsMax = 3;
+	cRRI.prototype.isXLFN = true;
+	cRRI.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcrpi = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+			var arg2 = argArray[2];
+
+			if ( arg0 <= 0.0  || arg1 === 0.0 ){
+				return new cError(cErrorType.not_numeric);
+			}
+
+			return new cNumber(Math.pow(arg2 / arg1, 1.0 / arg0) - 1.0);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcrpi);
 	};
 
 	/**

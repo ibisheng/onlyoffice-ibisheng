@@ -58,7 +58,7 @@
 	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
-	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
+	cFormulaFunctionGroup['Financial'].push(cPDURATION);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
@@ -70,7 +70,7 @@
 	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
 		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
-		cRRI, cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
+		cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
 
 	/**
 	 * @constructor
@@ -347,18 +347,6 @@
 
 	cQUERYSTRING.prototype = Object.create(cBaseFunction.prototype);
 	cQUERYSTRING.prototype.constructor = cQUERYSTRING;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cRRI() {
-		cBaseFunction.call(this, "RRI");
-		this.isXLFN = true;
-	}
-
-	cRRI.prototype = Object.create(cBaseFunction.prototype);
-	cRRI.prototype.constructor = cRRI;
 
 	/**
 	 * @constructor
