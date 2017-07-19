@@ -3149,11 +3149,11 @@
 			"fill" : [255, 0, 0], // [] => none
 			"stroke-width" : 1, // mm
 			"stroke" : [0, 0, 255], // [] => none
-			"align" : "1", // vertical text align (0 - top, 1 - center, 2 - bottom)
+			"align" : 1, // vertical text align (4 - top, 1 - center, 0 - bottom)
 
 			"paragraphs" : [
 				{
-					"align" : 4, // horizontal text align [0 - left, 1 - center, 2 - right, 3 - justify]
+					"align" : 4, // horizontal text align [1 - left, 2 - center, 0 - right, 3 - justify]
 					"fill" : [255, 0, 0], // paragraph highlight. [] => none
 					"linespacing" : 0,
 
@@ -3183,25 +3183,11 @@
 		this.image = null;
 		this.width = 0;
 		this.height = 0;
-		this.zoom = 1;
 
-		this.shapeW = 100;
-		this.shapeH = 100;
+		this.zoom = 1;
 
 		this.Generate = function(w, h)
 		{
-			this.shapeW = w;
-			this.shapeH = h;
-
-			this.width = AscCommon.AscBrowser.convertToRetinaValue(w * g_dKoef_mm_to_pix * this.zoom, true);
-			this.height = AscCommon.AscBrowser.convertToRetinaValue(h * g_dKoef_mm_to_pix * this.zoom, true);
-
-			if (!this.image)
-				this.image = document.createElement("canvas");
-
-			this.image.width = this.width;
-			this.image.height = this.height;
-
 			var content = this.inputContentSrc;
 			for (var key in this.replaceMap)
 			{
@@ -3267,103 +3253,103 @@
 				}
 
                 oShape.setBDeleted(false);
-                    oShape.spPr = new AscFormat.CSpPr();
-                    oShape.spPr.setParent(oShape);
-                    oShape.spPr.setXfrm(new AscFormat.CXfrm());
-                    oShape.spPr.xfrm.setParent(oShape.spPr);
-                    oShape.spPr.xfrm.setOffX(0);
-                    oShape.spPr.xfrm.setOffY(0);
-                    oShape.spPr.xfrm.setExtX(obj['width']);
-                    oShape.spPr.xfrm.setExtY(obj['height']);
-                    oShape.spPr.xfrm.setRot(AscFormat.normalizeRotate(obj['rotate'] ? obj['rotate']*60000 : 0));
-					oShape.spPr.setGeometry(AscFormat.CreateGeometry(obj['type']));
-					if(obj['fill'] && obj['fill'].length === 3){
-						oShape.spPr.setFill(AscFormat.CreteSolidFillRGB(obj['fill'][0], obj['fill'][1], obj['fill'][2]));
-					}
-					if(AscFormat.isRealNumber(obj['stroke-width']) || Array.isArray(obj['stroke']) && obj['stroke'].length === 3){
-						var oUnifill;
-                        if(Array.isArray(obj['stroke']) && obj['stroke'].length === 3){
-                        	oUnifill = AscFormat.CreteSolidFillRGB(obj['stroke'][0], obj['stroke'][1], obj['stroke'][2]);
-						}
-						else{
-                            oUnifill = AscFormat.CreteSolidFillRGB(0, 0, 0);
-						}
-						oShape.spPr.setLn(AscFormat.CreatePenFromParams(oUnifill, undefined, undefined, undefined, undefined, AscFormat.isRealNumber(obj['stroke-width']) ? obj['stroke-width'] : 12700.0/36000.0))
-					}
-
-					if(bWord){
-						oShape.createTextBoxContent();
+				oShape.spPr = new AscFormat.CSpPr();
+				oShape.spPr.setParent(oShape);
+				oShape.spPr.setXfrm(new AscFormat.CXfrm());
+				oShape.spPr.xfrm.setParent(oShape.spPr);
+				oShape.spPr.xfrm.setOffX(0);
+				oShape.spPr.xfrm.setOffY(0);
+				oShape.spPr.xfrm.setExtX(obj['width']);
+				oShape.spPr.xfrm.setExtY(obj['height']);
+				oShape.spPr.xfrm.setRot(AscFormat.normalizeRotate(obj['rotate'] ? (obj['rotate'] * Math.PI / 180) : 0));
+				oShape.spPr.setGeometry(AscFormat.CreateGeometry(obj['type']));
+				if(obj['fill'] && obj['fill'].length === 3){
+					oShape.spPr.setFill(AscFormat.CreteSolidFillRGB(obj['fill'][0], obj['fill'][1], obj['fill'][2]));
+				}
+				if(AscFormat.isRealNumber(obj['stroke-width']) || Array.isArray(obj['stroke']) && obj['stroke'].length === 3){
+					var oUnifill;
+					if(Array.isArray(obj['stroke']) && obj['stroke'].length === 3){
+						oUnifill = AscFormat.CreteSolidFillRGB(obj['stroke'][0], obj['stroke'][1], obj['stroke'][2]);
 					}
 					else{
-						oShape.createTextBody();
+						oUnifill = AscFormat.CreteSolidFillRGB(0, 0, 0);
 					}
-					var align = parseInt(obj['align'], 10);
-					if(!isNaN(align)){
-                        oShape.setVerticalAlign();
-					}
+					oShape.spPr.setLn(AscFormat.CreatePenFromParams(oUnifill, undefined, undefined, undefined, undefined, AscFormat.isRealNumber(obj['stroke-width']) ? obj['stroke-width'] : 12700.0/36000.0))
+				}
 
-					if(Array.isArray(obj['margins']) && obj['margins'].length === 4){
-						oShape.setPaddings({Left: obj['margins'][0], Top: obj['margins'][1], Right: obj['margins'][2], Bottom: obj['margins'][3]});
-					}
-					var oContent = oShape.getDocContent();
-					var aParagraphsS = obj['paragraphs'];
-					for(var i = 0; i < aParagraphsS.length; ++i){
-						var oCurParS = aParagraphsS[i];
-                        var oNewParagraph = new Paragraph(oContent.DrawingDocument, oContent);
-						if(AscFormat.isRealNumber(oCurParS['align'])){
-							oNewParagraph.Set_Align(oCurParS['align'])
-						}
-						if(Array.isArray(oCurParS['fill']) && oCurParS['fill'].length === 3){
-							var oShd = new CDocumentShd();
-							oShd.Value = Asc.c_oAscShdClear;
-							oShd.Color.r = oCurParS['fill'][0];
-							oShd.Color.g = oCurParS['fill'][1];
-							oShd.Color.b = oCurParS['fill'][2];
-							oNewParagraph.Set_Shd(oShd, true);
-						}
-                        if(AscFormat.isRealNumber(oCurParS['linespacing'])){
-                            oNewParagraph.Set_Spacing({Line: oCurParS['linespacing'], LineRule: Asc.linerule_Exact});
-                        }
-                        var aRunsS = oCurParS['runs'];
-                        for(var j = 0; j < aRunsS.length; ++j){
-                        	var oRunS = aRunsS[j];
-                        	var oRun = new ParaRun(oNewParagraph, false);
-                            if(Array.isArray(oRunS['fill']) && oRunS['fill'].length === 3){
-                                oRun.Set_Unifill(AscFormat.CreteSolidFillRGB(oRunS['fill'][0], oRunS['fill'][1], oRunS['fill'][2]));
-                            }
-                            if(oRunS['font-family']){
-                                oRun.Set_RFonts_Ascii({Name : oRunS['font-family'], Index : -1});
-                                oRun.Set_RFonts_CS({Name : oRunS['font-family'], Index : -1});
-                                oRun.Set_RFonts_EastAsia({Name : oRunS['font-family'], Index : -1});
-                                oRun.Set_RFonts_HAnsi({Name : oRunS['font-family'], Index : -1});
-							}
-                            if(oRunS['font-size']){
-                                oRun.Set_FontSize(oRunS['font-size']);
-							}
-							oRun.Set_Bold(oRunS['bold'] === true);
-							oRun.Set_Italic(oRunS['italic'] === true);
-							oRun.Set_Strikeout(oRunS['strikeout'] === true);
-							oRun.Set_Underline(oRunS['underline'] === true);
+				if(bWord){
+					oShape.createTextBoxContent();
+				}
+				else{
+					oShape.createTextBody();
+				}
+				var align = obj['align'];
+				if(undefined != align){
+					oShape.setVerticalAlign(align);
+				}
 
-                            var sCustomText = oRunS['text'];
-                            if(sCustomText === "<%br%>"){
-                                oRun.Add_ToContent(0, new ParaNewLine(AscCommonWord.break_Line), false);
-							}
-							else{
-                                for (var nIndex = 0, nLen = sCustomText.length; nIndex < nLen; ++nIndex)
-                                {
-                                    var nChar = sCustomText.charAt(nIndex);
-                                    if (" " === nChar)
-                                        oRun.Add_ToContent(nIndex, new ParaSpace(), true);
-                                    else
-                                        oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
-                                }
-							}
-
-                            oNewParagraph.Internal_Content_Add(i, oRun, false);
-						}
-                        oContent.Internal_Content_Add(oContent.Content.length, oNewParagraph);
+				if(Array.isArray(obj['margins']) && obj['margins'].length === 4){
+					oShape.setPaddings({Left: obj['margins'][0], Top: obj['margins'][1], Right: obj['margins'][2], Bottom: obj['margins'][3]});
+				}
+				var oContent = oShape.getDocContent();
+				var aParagraphsS = obj['paragraphs'];
+				for(var i = 0; i < aParagraphsS.length; ++i){
+					var oCurParS = aParagraphsS[i];
+					var oNewParagraph = new Paragraph(oContent.DrawingDocument, oContent);
+					if(AscFormat.isRealNumber(oCurParS['align'])){
+						oNewParagraph.Set_Align(oCurParS['align'])
 					}
+					if(Array.isArray(oCurParS['fill']) && oCurParS['fill'].length === 3){
+						var oShd = new CDocumentShd();
+						oShd.Value = Asc.c_oAscShdClear;
+						oShd.Color.r = oCurParS['fill'][0];
+						oShd.Color.g = oCurParS['fill'][1];
+						oShd.Color.b = oCurParS['fill'][2];
+						oNewParagraph.Set_Shd(oShd, true);
+					}
+					if(AscFormat.isRealNumber(oCurParS['linespacing'])){
+						oNewParagraph.Set_Spacing({Line: oCurParS['linespacing'], LineRule: Asc.linerule_Exact});
+					}
+					var aRunsS = oCurParS['runs'];
+					for(var j = 0; j < aRunsS.length; ++j){
+						var oRunS = aRunsS[j];
+						var oRun = new ParaRun(oNewParagraph, false);
+						if(Array.isArray(oRunS['fill']) && oRunS['fill'].length === 3){
+							oRun.Set_Unifill(AscFormat.CreteSolidFillRGB(oRunS['fill'][0], oRunS['fill'][1], oRunS['fill'][2]));
+						}
+						if(oRunS['font-family']){
+							oRun.Set_RFonts_Ascii({Name : oRunS['font-family'], Index : -1});
+							oRun.Set_RFonts_CS({Name : oRunS['font-family'], Index : -1});
+							oRun.Set_RFonts_EastAsia({Name : oRunS['font-family'], Index : -1});
+							oRun.Set_RFonts_HAnsi({Name : oRunS['font-family'], Index : -1});
+						}
+						if(oRunS['font-size']){
+							oRun.Set_FontSize(oRunS['font-size']);
+						}
+						oRun.Set_Bold(oRunS['bold'] === true);
+						oRun.Set_Italic(oRunS['italic'] === true);
+						oRun.Set_Strikeout(oRunS['strikeout'] === true);
+						oRun.Set_Underline(oRunS['underline'] === true);
+
+						var sCustomText = oRunS['text'];
+						if(sCustomText === "<%br%>"){
+							oRun.Add_ToContent(0, new ParaNewLine(AscCommonWord.break_Line), false);
+						}
+						else{
+							for (var nIndex = 0, nLen = sCustomText.length; nIndex < nLen; ++nIndex)
+							{
+								var nChar = sCustomText.charAt(nIndex);
+								if (" " === nChar)
+									oRun.Add_ToContent(nIndex, new ParaSpace(), true);
+								else
+									oRun.Add_ToContent(nIndex, new ParaText(nChar), true);
+							}
+						}
+
+						oNewParagraph.Internal_Content_Add(i, oRun, false);
+					}
+					oContent.Internal_Content_Add(oContent.Content.length, oNewParagraph);
+				}
 
 				oShape.recalculate();
 				if (oShape.bWordShape)
@@ -3378,13 +3364,50 @@
 					editor.ShowParaMarks = false;
 				}
 
-				var graphics = new AscCommon.CGraphics();
-				graphics.m_oFontManager = AscCommon.g_fontManager;
+				//
+				AscCommon.IsShapeToImageConverter = true;
+				var _bounds_cheker = new AscFormat.CSlideBoundsChecker();
 
-				graphics.init(this.image.getContext('2d'), this.width, this.height, oShape.bounds.w, oShape.bounds.h);
-				graphics.transform(1,0,0,1,0,0);
+				var w_mm = 210;
+				var h_mm = 297;
+				var w_px = AscCommon.AscBrowser.convertToRetinaValue(w_mm * g_dKoef_mm_to_pix * this.zoom, true);
+				var h_px = AscCommon.AscBrowser.convertToRetinaValue(h_mm * g_dKoef_mm_to_pix * this.zoom, true);
 
-				oShape.draw(graphics);
+				_bounds_cheker.init(w_px, h_px, w_mm, h_mm);
+				_bounds_cheker.transform(1,0,0,1,0,0);
+
+				_bounds_cheker.AutoCheckLineWidth = true;
+				_bounds_cheker.CheckLineWidth(oShape);
+				oShape.draw(_bounds_cheker, 0);
+				_bounds_cheker.CorrectBounds2();
+
+				var _need_pix_width     = _bounds_cheker.Bounds.max_x - _bounds_cheker.Bounds.min_x + 1;
+				var _need_pix_height    = _bounds_cheker.Bounds.max_y - _bounds_cheker.Bounds.min_y + 1;
+
+				if (_need_pix_width <= 0 || _need_pix_height <= 0)
+					return;
+
+				if (!this.image)
+					this.image = document.createElement("canvas");
+
+				this.image.width = _need_pix_width;
+				this.image.height = _need_pix_height;
+				this.width = _need_pix_width;
+				this.height = _need_pix_height;
+
+				var _ctx = this.image.getContext('2d');
+
+				var g = new AscCommon.CGraphics();
+				g.init(_ctx, w_px, h_px, w_mm, h_mm);
+				g.m_oFontManager = AscCommon.g_fontManager;
+
+				g.m_oCoordTransform.tx = -_bounds_cheker.Bounds.min_x;
+				g.m_oCoordTransform.ty = -_bounds_cheker.Bounds.min_y;
+				g.transform(1,0,0,1,0,0);
+
+				oShape.draw(g, 0);
+
+				AscCommon.IsShapeToImageConverter = false;
 
 				if (window.editor)
 				{
@@ -3406,18 +3429,18 @@
 			\"fill\" : [255, 0, 0],\
 			\"stroke-width\" : 1,\
 			\"stroke\" : [0, 0, 255],\
-			\"align\" : \"1\",\
+			\"align\" : 1,\
 			\
 			\"paragraphs\" : [\
 			{\
-				\"align\" : 4,\
+				\"align\" : 2,\
 				\"fill\" : [255, 0, 0],\
 				\"linespacing\" : 0,\
 				\
 				\"runs\" : [\
 					{\
 						\"text\" : \"some text\",\
-						\"fill\" : [255, 255, 255],\
+						\"fill\" : [0, 255, 0],\
 						\"font-family\" : \"Arial\",\
 						\"font-size\" : 24,\
 						\"bold\" : true,\
