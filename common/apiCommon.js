@@ -3138,6 +3138,45 @@
 
     function CWatermarkOnDraw(htmlContent, api)
 	{
+		// example content:
+		/*
+		{
+			"type" : "rect",
+			"width" : 100, // mm
+			"height" : 100, // mm
+			"rotate" : -45, // degrees
+			"margins" : [ 10, 10, 10, 10 ], // text margins
+			"fill" : [255, 0, 0], // [] => none
+			"stroke-width" : 1, // mm
+			"stroke" : [0, 0, 255], // [] => none
+			"align" : "1", // vertical text align (0 - top, 1 - center, 2 - bottom)
+
+			"paragraphs" : [
+				{
+					"align" : 4, // horizontal text align [0 - left, 1 - center, 2 - right, 3 - justify]
+					"fill" : [255, 0, 0], // paragraph highlight. [] => none
+					"linespacing" : 0,
+
+					"runs" : [
+						{
+							"text" : "some text",
+							"fill" : [255, 255, 255], // text highlight. [] => none,
+							"font-family" : "Arial",
+							"font-size" : 24, // pt
+							"bold" : true,
+							"italic" : false,
+							"strikeout" : "false",
+							"underline" : "false"
+						},
+						{
+							"text" : "<%br%>"
+						}
+					]
+				}
+			]
+		}
+		*/
+
 		this.inputContentSrc = htmlContent;
 		this.replaceMap = {};
 
@@ -3314,7 +3353,44 @@
 	}
 	window.TEST_FUNCTION_WATERMARK = function()
 	{
-		var _t = new CWatermarkOnDraw("{}", null);
+		var _json = "\
+		{\
+			\"type\" : \"rect\",\
+			\"width\" : 100,\
+			\"height\" : 100,\
+			\"rotate\" : -45,\
+			\"margins\" : [ 10, 10, 10, 10 ],\
+			\"fill\" : [255, 0, 0],\
+			\"stroke-width\" : 1,\
+			\"stroke\" : [0, 0, 255],\
+			\"align\" : \"1\",\
+			\
+			\"paragraphs\" : [\
+			{\
+				\"align\" : 4,\
+				\"fill\" : [255, 0, 0],\
+				\"linespacing\" : 0,\
+				\
+				\"runs\" : [\
+					{\
+						\"text\" : \"some text\",\
+						\"fill\" : [255, 255, 255],\
+						\"font-family\" : \"Arial\",\
+						\"font-size\" : 24,\
+						\"bold\" : true,\
+						\"italic\" : false,\
+						\"strikeout\" : false,\
+						\"underline\" : false\
+					},\
+					{\
+						\"text\" : \"<%br%>\"\
+					}\
+				]\
+			}\
+		]\
+		}";
+
+		var _t = new CWatermarkOnDraw(_json, null);
 		_t.Generate(100, 100);
 	};
 
