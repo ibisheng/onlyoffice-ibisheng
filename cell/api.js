@@ -3487,7 +3487,13 @@ var editor;
 				History.StartTransaction();
 				callback();
 				History.EndTransaction();
-				pivotRange = pivot.getRange();
+				pivotRange = pivot.getRange().clone();
+				// ToDo update ranges, not big range
+                var pos;
+				for (var j = 0; j < pivot.pageFieldsPositions.length; ++j) {
+					pos = pivot.pageFieldsPositions[j];
+					pivotRange.union3(pos.col + 1, pos.row);
+				}
 				t.wbModel.getActiveWs()._updatePivotTables(pivotRange);
 				ws = t.wb.getWorksheet();
 				ws._onUpdateFormatTable(pivotRange);
