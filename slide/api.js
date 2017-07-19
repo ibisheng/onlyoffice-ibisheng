@@ -6017,6 +6017,11 @@ background-repeat: no-repeat;\
 		return this.IsSlideSelect;
 	};
 
+	CContextMenuData.prototype.get_IsSlideHidden = function()
+	{
+		return this.IsSlideHidden;
+	};
+
 	asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
 	{
 		this.sendEvent("asc_onContextMenu", Data);
@@ -7008,6 +7013,7 @@ background-repeat: no-repeat;\
 	CContextMenuData.prototype['get_X']               = CContextMenuData.prototype.get_X;
 	CContextMenuData.prototype['get_Y']               = CContextMenuData.prototype.get_Y;
 	CContextMenuData.prototype['get_IsSlideSelect']   = CContextMenuData.prototype.get_IsSlideSelect;
+	CContextMenuData.prototype['get_IsSlideHidden']   = CContextMenuData.prototype.get_IsSlideHidden;
 	window['Asc']['CAscSlideProps']                   = CAscSlideProps;
 	CAscSlideProps.prototype['get_background']        = CAscSlideProps.prototype.get_background;
 	CAscSlideProps.prototype['put_background']        = CAscSlideProps.prototype.put_background;
