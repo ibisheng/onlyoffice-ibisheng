@@ -3326,6 +3326,9 @@
 				}
 				var oContent = oShape.getDocContent();
 				var aParagraphsS = obj['paragraphs'];
+				if(aParagraphsS.length > 0){
+                    oContent.Content.length = 0;
+				}
 				for(var i = 0; i < aParagraphsS.length; ++i){
 					var oCurParS = aParagraphsS[i];
 					var oNewParagraph = new Paragraph(oContent.DrawingDocument, oContent);
@@ -3341,7 +3344,7 @@
 						oNewParagraph.Set_Shd(oShd, true);
 					}
 					if(AscFormat.isRealNumber(oCurParS['linespacing'])){
-						oNewParagraph.Set_Spacing({Line: oCurParS['linespacing'], LineRule: Asc.linerule_Exact});
+						oNewParagraph.Set_Spacing({Line: oCurParS['linespacing'], LineRule: Asc.linerule_Auto}, true);
 					}
 					var aRunsS = oCurParS['runs'];
 					for(var j = 0; j < aRunsS.length; ++j){
