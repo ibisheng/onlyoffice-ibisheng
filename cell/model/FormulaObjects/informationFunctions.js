@@ -51,7 +51,7 @@
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
-	cFormulaFunctionGroup['Information'].push(cERROR_TYPE, cISBLANK, cISERR, cISERROR, cISEVEN, cISLOGICAL, cISNA,
+	cFormulaFunctionGroup['Information'].push(cERROR_TYPE, cISBLANK, cISERR, cISERROR, cISEVEN, cISFORMULA, cISLOGICAL, cISNA,
 		cISNONTEXT, cISNUMBER, cISODD, cISREF, cISTEXT, cN, cNA, cTYPE);
 
 	/**
@@ -238,6 +238,37 @@
 		} else {
 			return this.value = new cBool((arg0.getValue() & 1) == 0);
 		}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cISFORMULA() {
+		this.name = "ISFORMULA";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cISFORMULA.prototype = Object.create(cBaseFunction.prototype);
+	cISFORMULA.prototype.constructor = cISFORMULA;
+	cISFORMULA.prototype.argumentsMin = 1;
+	cISFORMULA.prototype.argumentsMax = 1;
+	cISFORMULA.prototype.Calculate = function (arg) {
+		//есть различия в поведении этой формулы для ms и lo(для нескольких ячеек с данными)
+		var arg0 = arg[0];
+		var res = false;
+		if ((arg0 instanceof cArea || arg0 instanceof cArea3D) && arg0.range) {
+			res = arg0.range.isFormula();
+		}else if ((arg0 instanceof cRef || arg0 instanceof cRef3D) && arg0.range) {
+			res = arg0.range.isFormula();
+		}
+
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+
+		return this.value = new cBool(res);
 	};
 
 	/**

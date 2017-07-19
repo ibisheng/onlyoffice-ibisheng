@@ -64,13 +64,13 @@
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
-	cFormulaFunctionGroup['Information'].push(cISFORMULA, cSHEET, cSHEETS);
+	cFormulaFunctionGroup['Information'].push(cSHEET, cSHEETS);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
 		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
-		cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
+		cAGGREGATE, cMUNIT, cFORMULATEXT, cSHEET, cSHEETS);
 
 	/**
 	 * @constructor
@@ -287,18 +287,6 @@
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cISFORMULA() {
-		cBaseFunction.call(this, "ISFORMULA");
-		this.isXLFN = true;
-	}
-
-	cISFORMULA.prototype = Object.create(cBaseFunction.prototype);
-	cISFORMULA.prototype.constructor = cISFORMULA;
 
 	/**
 	 * @constructor
