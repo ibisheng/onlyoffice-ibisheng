@@ -3469,7 +3469,7 @@
 		{\
 			\"align\" : 2,\
 			\"fill\" : [255, 0, 0],\
-			\"linespacing\" : 0,\
+			\"linespacing\" : 1,\
 			\
 			\"runs\" : [\
 				{\
