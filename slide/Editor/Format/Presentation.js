@@ -230,6 +230,46 @@ function CreatePresentationTableStyles(Styles, IdMap)
 }
 
 
+
+function CPrSection(){
+    this.name = null;
+    this.startIndex = null;
+    this.guid = null;
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    AscCommon.g_oTableId.Add(this, this.Id);
+}
+
+CPrSection.prototype.getObjectType = function () {
+    return AscDFH.historyitem_type_PresentationSection;
+};
+
+CPrSection.prototype.Get_Id = function () {
+    return this.Id;
+};
+
+CPrSection.prototype.Write_ToBinary2 = function(w){
+    w.WriteLong(this.getObjectType());
+    w.WriteString2(this.Get_Id());
+};
+CPrSection.prototype.Read_FromBinary2 = function(r){
+    this.Id = r.GetString2();
+};
+CPrSection.prototype.setName = function(pr){
+    History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_PresentationSectionSetName, this.name, pr));
+    this.name = pr;
+};
+CPrSection.prototype.setStartIndex = function(pr){
+    History.Add(new AscDFH.CChangesDrawingsLong(this, AscDFH.historyitem_PresentationSectionSetStartIndex, this.startIndex, pr));
+    this.startIndex = pr;
+};
+CPrSection.prototype.setGuid = function(pr){
+    History.Add(new AscDFH.CChangesDrawingsString(this, AscDFH.historyitem_PresentationSectionSetGuid, this.guid, pr));
+    this.guid = pr;
+};
+CPrSection.prototype.Read_FromBinary2 = function(r){
+    this.Id = r.GetString2();
+};
+
 function CShowPr(){
     this.browse        = undefined;
     this.kiosk         = undefined; //{restart: uInt}
@@ -384,6 +424,14 @@ AscDFH.changesFactory[AscDFH.historyitem_Presentation_RemoveSlide] = AscDFH.CCha
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_AddSlide] = AscDFH.CChangesDrawingsContentPresentation         ;
 AscDFH.changesFactory[AscDFH.historyitem_Presentation_SetDefaultTextStyle] = AscDFH.CChangesDrawingsObjectNoId;
 
+AscDFH.changesFactory[AscDFH.historyitem_PresentationSectionSetName] = AscDFH.CChangesDrawingsString;
+AscDFH.changesFactory[AscDFH.historyitem_PresentationSectionSetStartIndex] = AscDFH.CChangesDrawingsLong;
+AscDFH.changesFactory[AscDFH.historyitem_PresentationSectionSetGuid] = AscDFH.CChangesDrawingsString;
+
+AscDFH.drawingsChangesMap[AscDFH.historyitem_PresentationSectionSetName] = function(oClass, value){oClass.name  = value;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_PresentationSectionSetStartIndex] = function(oClass, value){oClass.startIndex  = value;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_PresentationSectionSetGuid] = function(oClass, value){oClass.guid  = value;};
+
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SetShowPr] = function(oClass, value){oClass.showPr  = value;};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SlideSize] = function(oClass, value){oClass.Width = value.a; oClass.Height = value.b; oClass.changeSlideSizeFunction(oClass.Width, oClass.Height);};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Presentation_SetDefaultTextStyle] = function(oClass, value){oClass.defaultTextStyle = value;};
@@ -503,6 +551,8 @@ function CPresentation(DrawingDocument)
 
     this.Spelling = new CDocumentSpelling();
 
+    this.Sections = [];//array of CPrSection
+
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
@@ -551,6 +601,17 @@ CPresentation.prototype =
     {
         History.Add(new AscDFH.CChangesDrawingsObjectNoId(this, AscDFH.historyitem_Presentation_SetDefaultTextStyle, this.defaultTextStyle, oStyle));
         this.defaultTextStyle = oStyle;
+    },
+
+
+    addSection: function(pos, pr){
+        History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_Presentation_AddSection, pos, [pr], true));
+        this.Sections.splice(pos, 0, pr);
+    },
+
+    removeSection: function(pos){
+        History.Add(new AscDFH.CChangesDrawingsContent(this, AscDFH.historyitem_Presentation_AddSection, pos, [pr], true));
+        this.Sections.splice(pos, 0, pr);
     },
 
     Set_DefaultLanguage: function(NewLangId)
@@ -5794,3 +5855,4 @@ function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap)
 //------------------------------------------------------------export----------------------------------------------------
 window['AscCommonSlide'] = window['AscCommonSlide'] || {};
 window['AscCommonSlide'].CPresentation = CPresentation;
+window['AscCommonSlide'].CPrSection = CPrSection;
