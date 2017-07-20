@@ -4861,12 +4861,12 @@
 		}
 		
 	};
-	Worksheet.prototype._initPivotTables = function () {
+	Worksheet.prototype.initPivotTables = function () {
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			this.pivotTables[i].init();
 		}
 	};
-	Worksheet.prototype._updatePivotTables = function (range) {
+	Worksheet.prototype.updatePivotTables = function (range) {
 		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, pos, countC, countR, stripe1, stripe2,
 			start = 0, emptyStripe = new Asc.CTableStyleElement();
 		var dxf, dxfLabels, dxfValues;

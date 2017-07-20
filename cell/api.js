@@ -3494,7 +3494,7 @@ var editor;
 					pos = pivot.pageFieldsPositions[j];
 					pivotRange.union3(pos.col + 1, pos.row);
 				}
-				t.wbModel.getActiveWs()._updatePivotTables(pivotRange);
+				t.wbModel.getActiveWs().updatePivotTables(pivotRange);
 				ws = t.wb.getWorksheet();
 				ws._onUpdateFormatTable(pivotRange);
 				t.wb._onWSSelectionChanged();
