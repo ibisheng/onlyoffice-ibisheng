@@ -74,6 +74,7 @@
 		this.lockBackground = null;
 		this.lockTranzition = null;
 		this.lockRemove     = null;
+		this.isHidden       = false;
 	}
 
 	CAscSlideProps.prototype.get_background     = function()
@@ -139,6 +140,10 @@
 	CAscSlideProps.prototype.put_LockRemove     = function(v)
 	{
 		this.lockRemove = v;
+	};
+	CAscSlideProps.prototype.get_IsHidden     = function()
+	{
+		return this.isHidden;
 	};
 
 	function CAscChartProp(obj)
@@ -5452,7 +5457,8 @@ background-repeat: no-repeat;\
 			obj.lockTranzition ||
 			obj.lockBackground || slide.isLockedObject();
 
-
+		var oTh = editor.WordControl.Thumbnails;
+		obj.isHidden = oTh.IsSlideHidden(oTh.GetSelectedArray());
 		var _len = this.SelectedObjectsStack.length;
 		if (_len > 0)
 		{
@@ -7031,6 +7037,7 @@ background-repeat: no-repeat;\
 	CAscSlideProps.prototype['put_LockTranzition']    = CAscSlideProps.prototype.put_LockTranzition;
 	CAscSlideProps.prototype['get_LockRemove']        = CAscSlideProps.prototype.get_LockRemove;
 	CAscSlideProps.prototype['put_LockRemove']        = CAscSlideProps.prototype.put_LockRemove;
+	CAscSlideProps.prototype['get_IsHidden']          = CAscSlideProps.prototype.get_IsHidden;
 	window['Asc']['CAscChartProp']                    = CAscChartProp;
 	CAscChartProp.prototype['get_ChangeLevel']        = CAscChartProp.prototype.get_ChangeLevel;
 	CAscChartProp.prototype['put_ChangeLevel']        = CAscChartProp.prototype.put_ChangeLevel;
