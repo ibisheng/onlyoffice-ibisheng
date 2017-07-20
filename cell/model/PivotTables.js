@@ -2667,6 +2667,12 @@ CT_pivotTableDefinition.prototype.getRowFieldsCount = function (compact) {
 CT_pivotTableDefinition.prototype.getField = function (arrFields, callback) {
 	return arrFields && arrFields.map(callback, this);
 };
+CT_pivotTableDefinition.prototype.forEachColItems = function (callback, thisArg) {
+	return this.colItems && this.colItems.i.forEach(callback, thisArg);
+};
+CT_pivotTableDefinition.prototype.forEachRowItems = function (callback, thisArg) {
+	return this.rowItems && this.rowItems.i.forEach(callback, thisArg);
+};
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
 };
@@ -2706,11 +2712,22 @@ CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.dataFields && this.dataFields.dataField;
 };
-CT_pivotTableDefinition.prototype.forEachColItems = function (callback, thisArg) {
-	return this.colItems && this.colItems.i.forEach(callback, thisArg);
+CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
+	var t = this;
+	api._changePivotStyle(this, function () {
+		if (t.rowGrandTotals !== newVal.rowGrandTotals) {
+			t.asc_setRowGrandTotals(newVal.rowGrandTotals);
+		}
+		if (t.colGrandTotals !== newVal.colGrandTotals) {
+			t.asc_setColGrandTotals(newVal.colGrandTotals);
+		}
+	});
 };
-CT_pivotTableDefinition.prototype.forEachRowItems = function (callback, thisArg) {
-	return this.rowItems && this.rowItems.i.forEach(callback, thisArg);
+CT_pivotTableDefinition.prototype.asc_setRowGrandTotals = function(newVal) {
+	this.rowGrandTotals = newVal;
+};
+CT_pivotTableDefinition.prototype.asc_setColGrandTotals = function(newVal) {
+	this.colGrandTotals = newVal;
 };
 function CT_CacheSource() {
 //Attributes
@@ -10084,6 +10101,9 @@ prot["asc_getPageFields"] = prot.asc_getPageFields;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
 prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
+prot["asc_set"] = prot.asc_set;
+prot["asc_setRowGrandTotals"] = prot.asc_setRowGrandTotals;
+prot["asc_setColGrandTotals"] = prot.asc_setColGrandTotals;
 
 prot = CT_PivotTableStyle.prototype;
 prot["asc_getName"] = prot.asc_getName;
