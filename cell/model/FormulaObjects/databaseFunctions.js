@@ -40,6 +40,7 @@
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 	var cElementType = AscCommonExcel.cElementType;
+	var cNumber = AscCommonExcel.cNumber;
 
 	cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
 	cFormulaFunctionGroup['Database'].push(cDAVERAGE, cDCOUNT, cDCOUNTA, cDGET, cDMAX, cDMIN, cDPRODUCT, cDSTDEV,
@@ -188,11 +189,19 @@
 		}
 
 		var isTrueCondition = function(condition, val){
-			return true;
+			var res = false;
+			var condition  = condition.getValue();
+
+			if("" === condition){
+				res = true;
+			}else{
+				res = window['AscCommonExcel'].matching(val, AscCommonExcel.matchingValue(condition));
+			}
+			return res;
 		};
 
-		var winElems = [];
 		var previousWinArray;
+		var winElems = [];
 		for(var i = 1; i < conditionBaseRowsCount; i++){
 			previousWinArray = null;
 			for(var j = 0; j < conditionBaseColsCount; j++){
@@ -204,11 +213,11 @@
 
 				var winColumnArray = [];
 				for(var n = 0; n < databaseData.length; n++){
-					if(previousWinArray && previousWinArray[0]){
+					if(previousWinArray && previousWinArray[n]){
 						if(isTrueCondition(condition, databaseData[n])){
 							winColumnArray[n] = true;
 						}
-					}else if(isTrueCondition(condition, databaseData[n])){
+					}else if(!previousWinArray && isTrueCondition(condition, databaseData[n])){
 						winColumnArray[n] = true;
 					}
 				}
@@ -216,6 +225,20 @@
 			}
 			winElems[i - 1] = previousWinArray;
 		}
+
+		var needDataColumn = headersDataMap[field];
+		var resArr = [];
+		for(var i = 0; i < winElems.length; i++){
+			for(var j in winElems[i]){
+				resArr.push(needDataColumn[j].getValue());
+			}
+		}
+
+		resArr.sort(function(a, b) {
+			return a - b;
+		});
+		
+		return this.value = new cNumber(resArr[0]);
 	};
 
 
