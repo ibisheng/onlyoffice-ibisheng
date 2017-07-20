@@ -3229,13 +3229,24 @@
 			//console.log(_data);
 		};
 
-		this.Draw = function(context, w, h)
+		this.Draw = function(context, dw_or_dx, dh_or_dy, dw, dh)
 		{
 			if (!this.image)
 				return;
 
-			var x = (w - this.width) >> 1;
-			var y = (h - this.height) >> 1;
+			var x = 0;
+			var y = 0;
+
+			if (undefined == dw)
+			{
+				x = (dw_or_dx - this.width) >> 1;
+				y = (dh_or_dy - this.height) >> 1;
+			}
+			else
+			{
+				x = (dw_or_dx + ((dw - this.width) / 2)) >> 0;
+				y = (dh_or_dy + ((dh - this.height) / 2)) >> 0;
+			}
 			var oldGlobalAlpha = context.globalAlpha;
 			context.globalAlpha = this.transparent;
 			context.drawImage(this.image, x, y);
