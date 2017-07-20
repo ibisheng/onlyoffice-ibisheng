@@ -433,7 +433,7 @@ MoveCommentState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(!this.drawingObjects.isViewMode() && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, this.comment.Get_Id()) === false)
+        if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, this.comment.Get_Id(), editor.WordControl.m_oLogicDocument.IsEditCommentsMode()) === false)
         {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveComments);
             var tracks = this.drawingObjects.arrTrackObjects;

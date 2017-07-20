@@ -658,9 +658,15 @@ CPresentation.prototype =
         return this.Api.isViewMode;
     },
 
+
+    IsEditCommentsMode: function()
+    {
+        return (this.Api.restrictions === Asc.c_oAscRestrictionType.OnlyComments);
+    },
+
     CanEdit: function()
     {
-        if (this.IsViewMode())
+        if (this.IsViewMode() ||this.IsEditCommentsMode())
             return false;
 
         return true;
@@ -3225,14 +3231,19 @@ CPresentation.prototype =
                 }
             }
         }
-        else if ( e.KeyCode == 89 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Y - Redo
+        else if ( e.KeyCode == 89 && true === e.CtrlKey ) // Ctrl + Y - Redo
         {
-            this.Document_Redo();
+            if(this.CanEdit() || this.IsEditCommentsMode()){
+                this.Document_Redo();
+            }
+
             bRetValue = keydownresult_PreventAll;
         }
-        else if ( e.KeyCode == 90 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Z - Undo
+        else if ( e.KeyCode == 90 &&  true === e.CtrlKey ) // Ctrl + Z - Undo
         {
-            this.Document_Undo();
+            if(this.CanEdit() || this.IsEditCommentsMode()){
+                this.Document_Undo();
+            }
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 93 || 57351 == e.KeyCode /*в Opera такой код*/  || (e.KeyCode == 121 && true === e.ShiftKey /*shift + f10*/)) // контекстное меню
@@ -3348,7 +3359,7 @@ CPresentation.prototype =
 
     OnKeyPress : function(e)
     {
-        if ( true === editor.isViewMode )
+        if (!this.CanEdit())
             return false;
 
         var oCurSlide = this.Slides[this.CurPage];
@@ -5425,7 +5436,7 @@ CPresentation.prototype =
             this.Slides[this.CurPage].commentX += W;
             this.Slides[this.CurPage].commentY += H;
 
-            if(this.Document_Is_SelectionLocked(AscCommon.changestype_AddComment, Comment) === false)
+            if(this.Document_Is_SelectionLocked(AscCommon.changestype_AddComment, Comment, this.IsEditCommentsMode()) === false)
             {
                 for(var i = this.Slides[this.CurPage].slideComments.comments.length - 1; i > -1; --i)
                 {
@@ -5452,7 +5463,7 @@ CPresentation.prototype =
 
 	EditComment : function(Id, CommentData)
     {
-        if(this.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id) === false)
+        if(this.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id, this.IsEditCommentsMode()) === false)
         {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_ChangeComment);
             var comment = g_oTableId.Get_ById(Id);
@@ -5530,6 +5541,8 @@ CPresentation.prototype =
 
 	CanAddComment : function()
     {
+        if (!this.CanEdit() && !this.IsEditCommentsMode())
+            return false;
         return true;
     },
 

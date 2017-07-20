@@ -750,8 +750,11 @@ if(typeof CComments !== "undefined")
 
 if(typeof CPresentation !== "undefined")
 {
-    CPresentation.prototype.Document_Is_SelectionLocked =  function(CheckType, AdditionalData)
+    CPresentation.prototype.Document_Is_SelectionLocked =  function(CheckType, AdditionalData, isIgnoreCanEditFlag)
     {
+        if (!this.CanEdit() && true !== isIgnoreCanEditFlag)
+            return true;
+
         if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
             return true;
         if(this.Slides.length === 0)
