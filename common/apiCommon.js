@@ -3513,11 +3513,6 @@
 		}\
 	]\
 	}";
-	window.TEST_FUNCTION_WATERMARK = function()
-	{
-		var _t = new CWatermarkOnDraw(window.TEST_WATERMARK_STRING, null);
-		_t.Generate(100, 100);
-	};
 
     /*
      * Export
