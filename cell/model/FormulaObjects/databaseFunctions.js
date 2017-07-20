@@ -42,57 +42,72 @@
 	var cElementType = AscCommonExcel.cElementType;
 	var cNumber = AscCommonExcel.cNumber;
 
+	function checkValueByCondition(condition, val){
+		var res = false;
+		var condition  = condition.getValue();
+
+		if("" === condition){
+			res = true;
+		}else{
+			res = AscCommonExcel.matching(val, AscCommonExcel.matchingValue(condition));
+		}
+		return res;
+	}
+
+	function convertDatabase(dataBase, bIsCondition) {
+		var arr = [];
+		var map = {};
+
+		for(var i = 0; i < dataBase.length; i++){
+			for(var j = 0; j < dataBase[0].length; j++){
+				var header = dataBase[0][j].getValue();
+				if(bIsCondition){
+					if(0 === i){
+						arr[j] = header;
+						if(map.hasOwnProperty(header)){//если находим такой же заголовок, пропускаем
+							continue;
+						}else{
+							map[header] = [];
+						}
+					}else{
+						map[header].push(dataBase[i][j]);
+					}
+				}else{
+					if(0 === i){
+						if(map.hasOwnProperty(header)){//если находим такой же заголовок, пропускаем
+							continue;
+						}else{
+							map[header] = [];
+							arr[j] = header;
+						}
+					}else{
+						if(!map[header][i - 1]){
+							map[header][i - 1] = dataBase[i][j];
+						}
+					}
+				}
+			}
+		}
+
+		return {arr: arr, map: map};
+	}
+
 	function getNeedValuesFromDataBase(dataBase, field, conditionData){
 
 		//заполняем map название столбца-> его содержимое(из базы данных)
-		var headersArr = [];
-		var headersDataMap = {};
-		var dataBaseRowsCount = dataBase.length;
-		var dataBaseColsCount = dataBase[0].length;
-		for(var i = 0; i < dataBaseRowsCount; i++){
-			for(var j = 0; j < dataBaseColsCount; j++){
-				var header = dataBase[0][j].getValue();
-				if(0 === i){
-					if(headersDataMap.hasOwnProperty(header)){//если находим такой же заголовок, пропускаем
-						continue;
-					}else{
-						headersDataMap[header] = [];
-						headersArr[j] = header;
-					}
-				}else{
-					if(!headersDataMap[header][i - 1]){
-						headersDataMap[header][i - 1] = dataBase[i][j];
-					}
-				}
-			}
-		}
+		var databaseObj = convertDatabase(dataBase);
+		var headersArr = databaseObj.arr, headersDataMap = databaseObj.map;
 
 		//заполняем map название столбца-> его содержимое(из условий)
-		var headersConditionArr = [];
-		var headersConditionMap = {};
-		var conditionBaseRowsCount = conditionData.length;
-		var conditionBaseColsCount = conditionData[0].length;
-		for(var i = 0; i < conditionBaseRowsCount; i++){
-			for(var j = 0; j < conditionBaseColsCount; j++){
-				var header = conditionData[0][j].getValue();
-				if(0 === i){
-					headersConditionArr[j] = header;
-					if(headersConditionMap.hasOwnProperty(header)){//если находим такой же заголовок, пропускаем
-						continue;
-					}else{
-						headersConditionMap[header] = [];
-					}
-				}else{
-					headersConditionMap[header].push(conditionData[i][j]);
-				}
-			}
-		}
+		var databaseObj = convertDatabase(conditionData, true);
+		var headersConditionArr = databaseObj.arr, headersConditionMap = databaseObj.map;
 
-		//если поле задано числом, то выбираем заголовок столбца с данным именем
+		//преобразуем аргумент поле
 		var isNumberField = field.tocNumber();
 		if(cElementType.error === isNumberField.type){
 			field = field.getValue();
 		}else{
+			//если поле задано числом, то выбираем заголовок столбца с данным именем
 			var number = isNumberField.getValue();
 			if(headersArr[number - 1]){
 				field = headersArr[number - 1];
@@ -101,36 +116,32 @@
 			}
 		}
 
-		var isTrueCondition = function(condition, val){
-			var res = false;
-			var condition  = condition.getValue();
-
-			if("" === condition){
-				res = true;
-			}else{
-				res = window['AscCommonExcel'].matching(val, AscCommonExcel.matchingValue(condition));
-			}
-			return res;
-		};
+		if(null === field){
+			return false;
+		}
 
 		var previousWinArray;
 		var winElems = [];
-		for(var i = 1; i < conditionBaseRowsCount; i++){
+		for(var i = 1; i < conditionData.length; i++){
 			previousWinArray = null;
-			for(var j = 0; j < conditionBaseColsCount; j++){
+			for(var j = 0; j < conditionData[0].length; j++){
 				var condition = conditionData[i][j];
 				var header = headersConditionArr[j];
 
 				//проходимся по всем строкам данного столбца из базы и смотрим что нам подходит по условию
 				var databaseData = headersDataMap[header];
 
+				if(!databaseData){
+					continue;
+				}
+
 				var winColumnArray = [];
 				for(var n = 0; n < databaseData.length; n++){
 					if(previousWinArray && previousWinArray[n]){
-						if(isTrueCondition(condition, databaseData[n])){
+						if(checkValueByCondition(condition, databaseData[n])){
 							winColumnArray[n] = true;
 						}
-					}else if(!previousWinArray && isTrueCondition(condition, databaseData[n])){
+					}else if(!previousWinArray && checkValueByCondition(condition, databaseData[n])){
 						winColumnArray[n] = true;
 					}
 				}
