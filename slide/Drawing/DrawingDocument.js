@@ -1161,10 +1161,15 @@ function CDrawingDocument()
 	}
 	this.ToRendererPart = function()
 	{
+		var watermark = this.m_oWordControl.m_oApi.watermarkDraw;
+
 		var pagescount = this.SlidesCount;
 
 		if (-1 == this.m_lCurrentRendererPage)
 		{
+			if (watermark)
+				watermark.StartRenderer();
+
 			this.m_oDocRenderer                             = new AscCommon.CDocumentRenderer();
 			this.m_oDocRenderer.VectorMemoryForPrint        = new AscCommon.CMemory();
 			this.m_lCurrentRendererPage                     = 0;
@@ -1185,6 +1190,9 @@ function CDrawingDocument()
 			renderer.BeginPage(this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
 			this.m_oLogicDocument.DrawPage(i, renderer);
 			renderer.EndPage();
+
+			if (watermark)
+				watermark.DrawOnRenderer(renderer, this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
 		}
 
 		if (end == -1)
@@ -1197,6 +1205,9 @@ function CDrawingDocument()
 
 		if (this.m_lCurrentRendererPage >= pagescount)
 		{
+			if (watermark)
+				watermark.EndRenderer();
+
 			this.m_lCurrentRendererPage              = -1;
 			this.m_oDocRenderer                      = null;
 			this.m_oWordControl.m_oApi.ShowParaMarks = this.m_bOldShowMarks;
@@ -5489,6 +5500,9 @@ function CSlideDrawer()
 					h_px = this.CachedCanvas.height;
 
 				outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px, h_px, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
+
+				if (this.m_oWordControl.m_oApi.watermarkDraw)
+					this.m_oWordControl.m_oApi.watermarkDraw.Draw(outputCtx, w_px, h_px);
 			}
 			else
 			{
@@ -5503,6 +5517,9 @@ function CSlideDrawer()
 					h_px_src = this.CachedCanvas.height;
 
 				outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px_src, h_px_src, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
+
+				if (this.m_oWordControl.m_oApi.watermarkDraw)
+					this.m_oWordControl.m_oApi.watermarkDraw.Draw(outputCtx, w_px, h_px);
 			}
 		}
 		else
@@ -5531,6 +5548,9 @@ function CSlideDrawer()
 				g.IsNoDrawingEmptyPlaceholderText = true;
 
 			this.m_oWordControl.m_oLogicDocument.DrawPage(slideNum, g);
+
+			if (this.m_oWordControl.m_oApi.watermarkDraw)
+				this.m_oWordControl.m_oApi.watermarkDraw.Draw(outputCtx, w_px, h_px);
 		}
 	}
 }

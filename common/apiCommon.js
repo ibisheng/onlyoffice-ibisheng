@@ -3187,6 +3187,7 @@
 
 		this.transparent = 0.3;
 		this.zoom = 1;
+		this.calculatezoom = -1;
 
 		this.CheckParams = function(api)
 		{
@@ -3195,6 +3196,11 @@
 
 		this.Generate = function()
 		{
+			if (this.zoom == this.calculatezoom)
+				return;
+
+			this.calculatezoom = this.zoom;
+
 			var content = this.inputContentSrc;
 			for (var key in this.replaceMap)
 			{
@@ -3238,7 +3244,14 @@
 
 		this.StartRenderer = function()
 		{
-			this.imageBase64 = this.image.toDataURL("image/png");
+			var canvasTransparent = document.createElement("canvas");
+			canvasTransparent.width = this.image.width;
+			canvasTransparent.height = this.image.height;
+			var ctx = canvasTransparent.getContext("2d");
+			ctx.globalAlpha = this.transparent;
+			ctx.drawImage(this.image, 0, 0);
+			this.imageBase64 = canvasTransparent.toDataURL("image/png");
+			canvasTransparent = null;
 		};
 		this.EndRenderer = function()
 		{
