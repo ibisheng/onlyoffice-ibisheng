@@ -5500,9 +5500,6 @@ function CSlideDrawer()
 					h_px = this.CachedCanvas.height;
 
 				outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px, h_px, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
-
-				if (this.m_oWordControl.m_oApi.watermarkDraw)
-					this.m_oWordControl.m_oApi.watermarkDraw.Draw(outputCtx, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
 			}
 			else
 			{
@@ -5517,9 +5514,6 @@ function CSlideDrawer()
 					h_px_src = this.CachedCanvas.height;
 
 				outputCtx.drawImage(this.CachedCanvas, 0, 0, w_px_src, h_px_src, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
-
-				if (this.m_oWordControl.m_oApi.watermarkDraw)
-					this.m_oWordControl.m_oApi.watermarkDraw.Draw(outputCtx, (_x >> 0) - this.SlideEps, (_y >> 0) - this.SlideEps, w_px, h_px);
 			}
 		}
 		else
@@ -5548,11 +5542,15 @@ function CSlideDrawer()
 				g.IsNoDrawingEmptyPlaceholderText = true;
 
 			this.m_oWordControl.m_oLogicDocument.DrawPage(slideNum, g);
+		}
 
-			if (this.m_oWordControl.m_oApi.watermarkDraw)
-			{
-				this.m_oWordControl.m_oApi.watermarkDraw.Draw(outputCtx, _x, _y, w_px, h_px);
-			}
+		if (this.m_oWordControl.m_oApi.watermarkDraw)
+		{
+			this.m_oWordControl.m_oApi.watermarkDraw.Draw(outputCtx,
+				AscCommon.AscBrowser.convertToRetinaValue(_rect.left, true),
+				AscCommon.AscBrowser.convertToRetinaValue(_rect.top, true),
+				AscCommon.AscBrowser.convertToRetinaValue(_rect.right - _rect.left, true),
+				AscCommon.AscBrowser.convertToRetinaValue(_rect.bottom - _rect.top, true));
 		}
 	}
 }
