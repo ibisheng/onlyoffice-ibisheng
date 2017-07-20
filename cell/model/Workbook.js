@@ -4900,10 +4900,15 @@
 
 			cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
 			cells.clearTableStyle();
-			cells.setTableStyle(wholeStyle);
 
 			countC = pivotTable.getColumnFieldsCount();
 			countR = pivotTable.getRowFieldsCount(true);
+
+			if (0 === countC + countR) {
+				continue;
+			}
+
+			cells.setTableStyle(wholeStyle);
 
 			if (styleInfo.showColStripes) {
 				stripe1 = style.firstColumnStripe || emptyStripe;
