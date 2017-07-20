@@ -2736,6 +2736,26 @@ CT_pivotTableDefinition.prototype.asc_setRowGrandTotals = function(newVal) {
 CT_pivotTableDefinition.prototype.asc_setColGrandTotals = function(newVal) {
 	this.colGrandTotals = newVal;
 };
+CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
+	var t = this;
+	api._changePivotStyle(this, function () {
+		var pivotField = t.asc_getPivotFields()[index];
+		if (pivotField) {
+			// ToDo delete from other axis type
+
+			if (!t.pageFields) {
+				t.pageFields = new CT_PageFields();
+			}
+			var newField = new CT_PageField();
+			newField.fld = index;
+			newField.hier = -1;
+			t.pageFields.add(newField);
+
+			pivotField.axis = c_oAscAxis.AxisPage;
+			t.location.addColPage();
+		}
+	});
+};
 function CT_CacheSource() {
 //Attributes
 	this.type = null;
@@ -4014,6 +4034,18 @@ CT_Location.prototype.intersection = function (range) {
 CT_Location.prototype.contains = function (col, row) {
 	return this.ref && this.ref.contains(col, row);
 };
+CT_Location.prototype.addRowPage = function () {
+	if (null === this.rowPageCount) {
+		this.rowPageCount = 0;
+	}
+	++this.rowPageCount;
+};
+CT_Location.prototype.addColPage = function () {
+	if (null === this.colPageCount) {
+		this.colPageCount = 0;
+	}
+	++this.colPageCount;
+};
 function CT_PivotFields() {
 //Attributes
 	this.count = null;
@@ -4259,6 +4291,10 @@ CT_PageFields.prototype.toXml = function(writer, name) {
 		elem.toXml(writer, "pageField");
 	}
 	writer.WriteXmlNodeEnd(name);
+};
+CT_PageFields.prototype.add = function(newContext) {
+	this.pageField.push(newContext);
+	this.count = this.pageField.length;
 };
 function CT_DataFields() {
 //Attributes
@@ -10112,6 +10148,7 @@ prot["asc_clone"] = prot.asc_clone;
 prot["asc_set"] = prot.asc_set;
 prot["asc_setRowGrandTotals"] = prot.asc_setRowGrandTotals;
 prot["asc_setColGrandTotals"] = prot.asc_setColGrandTotals;
+prot["asc_addPageField"] = prot.asc_addPageField;
 
 prot = CT_PivotTableStyle.prototype;
 prot["asc_getName"] = prot.asc_getName;
