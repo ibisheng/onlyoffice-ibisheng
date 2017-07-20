@@ -2465,9 +2465,9 @@ CChartsDrawer.prototype =
 	calculatePositionLabelsCatAxFromAngle: function(chartSpace)
 	{
 		var res = null;
-
-		var angleOy = chartSpace.chart.view3D && chartSpace.chart.view3D.rotY ? (- chartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
-		if(chartSpace.chart.view3D && !chartSpace.chart.view3D.getRAngAx() && angleOy !== 0)
+		var oView3D = chartSpace.chart.getView3d();
+		var angleOy = oView3D && oView3D.rotY ? (- oView3D.rotY / 360) * (Math.PI * 2) : 0;
+		if(oView3D && !oView3D.getRAngAx() && angleOy !== 0)
 		{
 			angleOy = Math.abs(angleOy);
 
@@ -3505,10 +3505,10 @@ CChartsDrawer.prototype =
 
 		var chart = chartSpace && chartSpace.chart ? chartSpace.chart.plotArea.charts[0]: null;
 		var typeChart = chart ? chart.getObjectType() : null;
-		
-		if(isTurnOn3DCharts && chartSpace && chartSpace.chart.view3D)
+		var oView3D = chartSpace && chartSpace.chart && chartSpace.chart.getView3d();
+		if(isTurnOn3DCharts && oView3D)
 		{
-			var isPerspective = !chartSpace.chart.view3D.getRAngAx();
+			var isPerspective = !oView3D.getRAngAx();
 			
 			var isBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir !== AscFormat.BAR_DIR_BAR;
 			var isHBar = typeChart === AscDFH.historyitem_type_BarChart && chart && chart.barDir === AscFormat.BAR_DIR_BAR;
@@ -8375,8 +8375,9 @@ drawPieChart.prototype =
 		
 		var startAngle = Math.PI / 2;
 		var newStartAngle = startAngle;
-		
-		var firstAngle = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.rotY ? (- this.cChartSpace.chart.view3D.rotY / 360) * (Math.PI * 2) : 0;
+
+        var oView3D = this.cChartSpace.chart.getView3d();
+		var firstAngle = oView3D && oView3D.rotY ? (- oView3D.rotY / 360) * (Math.PI * 2) : 0;
 		
 		
 		var getAngleByCoordsSidesTriangle = function(aC, bC, cC)
@@ -12209,7 +12210,7 @@ gridChart.prototype =
 		var path;
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			var view3DProp = this.cChartSpace.chart.view3D;
+			var view3DProp = this.cChartSpace.chart.getView3d();
 			var angleOx = view3DProp && view3DProp.rotX ? (- view3DProp.rotX / 360) * (Math.PI * 2) : 0;
 			var angleOy = view3DProp && view3DProp.rotY ? (- view3DProp.rotY / 360) * (Math.PI * 2) : 0;
 			var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
@@ -12726,7 +12727,7 @@ catAxisChart.prototype =
 	
 		if(this.cChartDrawer.nDimensionCount === 3)
 		{
-			var view3DProp = this.cChartSpace.chart.view3D;
+			var view3DProp = this.cChartSpace.chart.getView3d();
 			
 			var z = this.cChartDrawer.processor3D.calculateZPositionCatAxis();
 			
@@ -13095,7 +13096,7 @@ serAxisChart.prototype =
 	{
 		var nullPositionOx = this.chartProp.nullPositionOX;
 		
-		var view3DProp = this.cChartSpace.chart.view3D;
+		var view3DProp = this.cChartSpace.chart.getView3d();
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
 		//var z = this.cChartDrawer.processor3D.calculateZPositionValAxis();
@@ -13655,7 +13656,7 @@ areaChart.prototype =
 		var topMargin = this.chartProp.chartGutter._top;
 		var bottomMargin = this.chartProp.chartGutter._bottom;
 		
-		var view3DProp = this.cChartSpace.chart.view3D;
+		var view3DProp = this.cChartSpace.chart.getView3d();
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
 		var convertResult = this.cChartDrawer._convertAndTurnPoint(leftMargin, heightGraph - bottomMargin, perspectiveDepth);

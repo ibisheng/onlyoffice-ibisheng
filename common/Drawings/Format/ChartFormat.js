@@ -13061,6 +13061,37 @@ CChart.prototype =
         return null;
     },
 
+
+    getView3d: function(){
+        return AscFormat.ExecuteNoHistory(function(){
+
+            if(this.view3D){
+                var _ret = this.view3D.createDuplicate();
+                var oChart = this.plotArea &&  this.plotArea.charts[0];
+                if(oChart){
+                    if(oChart.getObjectType() === AscDFH.historyitem_type_SurfaceChart){
+                        if(!AscFormat.isRealNumber(_ret.rotX)){
+                            _ret.rotX = 15;
+                        }
+                        if(!AscFormat.isRealNumber(_ret.rotY)){
+                            _ret.rotY = 20;
+                        }
+                    }
+                    else{
+                        if(!AscFormat.isRealNumber(_ret.rotX)){
+                            _ret.rotX = 0;
+                        }
+                        if(!AscFormat.isRealNumber(_ret.rotY)){
+                            _ret.rotY = 0;
+                        }
+                    }
+                    return _ret;
+                }
+            }
+            return null;
+        }, this, []);
+    },
+
     getObjectType: function()
     {
         return  AscDFH.historyitem_type_Chart;

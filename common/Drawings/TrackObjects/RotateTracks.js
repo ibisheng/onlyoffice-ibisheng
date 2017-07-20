@@ -646,7 +646,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
 
 
     AscFormat.ExecuteNoHistory(function(){
-        this.view3D = oChartSpace.chart.view3D.createDuplicate();
+        this.view3D = oChartSpace.chart.getView3d();
         this.chartSizes = this.chartSpace.getChartSizes();
 
         this.cX = this.chartSizes.startX + this.chartSizes.w/2;
@@ -824,7 +824,8 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
         var tx = this.chartSpace.invertTransform.TransformPointX(x, y);
         var ty = this.chartSpace.invertTransform.TransformPointY(x, y);
         var deltaAng = 0;
-        var StratRotY = oChartSpace.chart.view3D && oChartSpace.chart.view3D.rotY ? oChartSpace.chart.view3D.rotY : 0;
+        var _view3d = oChartSpace.chart.getView3d();
+        var StratRotY = _view3d && _view3d.rotY ? _view3d.rotY : 0;
         deltaAng = -90*(tx - this.startX)/(this.chartSizes.w/2);
         this.view3D.rotY = StratRotY + deltaAng;
         while(this.view3D.rotY < 0){
@@ -834,7 +835,7 @@ function Chart3dAdjustTrack(oChartSpace, numHandle, startX, startY)
             this.view3D.rotY -= 360;
         }
 
-        var StratRotX = oChartSpace.chart.view3D && oChartSpace.chart.view3D.rotX ? oChartSpace.chart.view3D.rotX : 0;
+        var StratRotX = _view3d && _view3d.rotX ? _view3d.rotX : 0;
         deltaAng = 90*(ty - this.startY)/(this.chartSizes.h/2);
         this.view3D.rotX = StratRotX + deltaAng;
 
