@@ -647,6 +647,9 @@
 				editor = window.editor;
 		}
 
+		this.reporterWindow 		= null;
+		this.reporterStartObject 	= null;
+
 		this._init();
 	}
 
@@ -5810,14 +5813,74 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onDemonstrationSlideChanged", slideNum);
 	};
 
-	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num)
+	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num, reporterStartObject)
 	{
+		if (reporterStartObject)
+			this.DemonstrationReporterStart(reporterStartObject);
+
 		this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
 	};
 
 	asc_docs_api.prototype.EndDemonstration = function(isNoUseFullScreen)
 	{
+		if (this.windowReporter)
+			this.windowReporter.close();
+
 		this.WordControl.DemonstrationManager.End(isNoUseFullScreen);
+	};
+
+	asc_docs_api.prototype.DemonstrationReporterStart = function(startObject)
+	{
+		this.reporterStartObject = startObject;
+
+		var dualScreenLeft = (window.screenLeft != undefined) ? window.screenLeft : screen.left;
+		var dualScreenTop = (window.screenTop != undefined) ? window.screenTop : screen.top;
+
+		var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+		var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+		var w = 800;
+		var h = 600;
+		var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+		var top = ((height / 2) - (h / 2)) + dualScreenTop;
+
+		var _windowPos = "width=" + w + ",height=" + h + ",left=" + left + ",top=" + top;
+		this.reporterWindow = window.open("index.reporter.html", "_blank", "resizable=0,status=0,toolbar=0,location=0,menubar=0,directories=0,scrollbars=0," + _windowPos);
+
+		if ( this.reporterWindow.attachEvent )
+			this.reporterWindow.attachEvent('onmessage', this.DemonstrationReporterMessages);
+		else
+			this.reporterWindow.addEventListener('message', this.DemonstrationReporterMessages, false);
+	};
+
+	asc_docs_api.prototype.DemonstrationReporterEnd = function()
+	{
+		if (!this.reporterWindow)
+			return;
+
+		if ( this.reporterWindow.attachEvent )
+			this.reporterWindow.detachEvent('onmessage', this.DemonstrationReporterMessages);
+		else
+			this.reporterWindow.removeEventListener('message', this.DemonstrationReporterMessages, false);
+
+		this.reporterWindow.close();
+		this.reporterWindow = null;
+		this.reporterStartObject = null;
+	};
+
+	asc_docs_api.prototype.DemonstrationReporterMessages = function(e)
+	{
+		var _this = window.editor;
+		if ( e.data == 'i:am:ready' )
+		{
+			var _msg_ = {
+				type: 'file:open',
+				data: _this.reporterStartObject
+			};
+
+			this.reporterStartObject = null;
+			_this.reporterWindow.postMessage(JSON.stringify(_msg_), '*');
+		}
 	};
 
 	asc_docs_api.prototype.DemonstrationPlay = function()

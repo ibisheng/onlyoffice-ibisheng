@@ -3113,6 +3113,8 @@ function CDemonstrationManager(htmlpage)
 
     this.End = function(isNoUseFullScreen)
     {
+		this.HtmlPage.m_oApi.DemonstrationReporterEnd();
+
         if (this.HtmlPage.m_oApi.isOnlyDemonstration)
             return;
 
