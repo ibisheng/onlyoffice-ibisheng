@@ -2712,6 +2712,13 @@ CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.dataFields && this.dataFields.dataField;
 };
+CT_pivotTableDefinition.prototype.asc_clone = function () {
+	var res = new CT_pivotTableDefinition();
+	res.name = this.name;
+	res.rowGrandTotals = this.rowGrandTotals;
+	res.colGrandTotals = this.colGrandTotals;
+	return res;
+};
 CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
 	var t = this;
 	api._changePivotStyle(this, function () {
@@ -10101,6 +10108,7 @@ prot["asc_getPageFields"] = prot.asc_getPageFields;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
 prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
+prot["asc_clone"] = prot.asc_clone;
 prot["asc_set"] = prot.asc_set;
 prot["asc_setRowGrandTotals"] = prot.asc_setRowGrandTotals;
 prot["asc_setColGrandTotals"] = prot.asc_setColGrandTotals;
