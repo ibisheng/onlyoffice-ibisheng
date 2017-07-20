@@ -3355,7 +3355,7 @@
 				}
 				for(var i = 0; i < aParagraphsS.length; ++i){
 					var oCurParS = aParagraphsS[i];
-					var oNewParagraph = new Paragraph(oContent.DrawingDocument, oContent);
+					var oNewParagraph = new Paragraph(oContent.DrawingDocument, oContent, !bWord);
 					if(AscFormat.isRealNumber(oCurParS['align'])){
 						oNewParagraph.Set_Align(oCurParS['align'])
 					}
