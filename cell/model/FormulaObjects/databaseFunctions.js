@@ -258,6 +258,38 @@
 
 	cDCOUNT.prototype = Object.create(cBaseFunction.prototype);
 	cDCOUNT.prototype.constructor = cDCOUNT;
+	cDCOUNT.prototype.argumentsMin = 3;
+	cDCOUNT.prototype.argumentsMax = 3;
+	cDCOUNT.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocString();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
+		if(cElementType.error === resArr.type){
+			return resArr;
+		}
+
+		var summ = 0;
+		var count = 0;
+		for(var i = 0; i < resArr.length; i++){
+			var val = parseFloat(resArr[i]);
+			if(!isNaN(val)){
+				summ += val;
+				count++;
+			}
+		}
+
+		return this.value = new cNumber(count);
+	};
+
 
 	/**
 	 * @constructor
