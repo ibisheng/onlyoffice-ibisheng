@@ -338,6 +338,31 @@
 
 	cDGET.prototype = Object.create(cBaseFunction.prototype);
 	cDGET.prototype.constructor = cDGET;
+	cDGET.prototype.argumentsMin = 3;
+	cDGET.prototype.argumentsMax = 3;
+	cDGET.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocString();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
+		if(cElementType.error === resArr.type){
+			return resArr;
+		}
+		if(1 !== resArr.length){
+			return this.value =  new cError(cErrorType.not_numeric);
+		}
+
+		var res = new cNumber(resArr[0]);
+		return this.value = cElementType.error === res.type ? new cNumber(0) : res;
+	};
 
 	/**
 	 * @constructor
