@@ -154,11 +154,13 @@
 		var resArr = [];
 		for(var i = 0; i < winElems.length; i++){
 			for(var j in winElems[i]){
+				if(cElementType.empty === needDataColumn[j].type){
+					continue;
+				}
 				resArr.push(needDataColumn[j].getValue());
 			}
 		}
-
-		return resArr;
+		return resArr.length ? resArr : false;
 	}
 
 	cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
@@ -166,7 +168,7 @@
 		cDSTDEVP, cDSUM, cDVAR, cDVARP);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cDAVERAGE, cDCOUNT, cDCOUNTA, cDGET, cDMAX, cDPRODUCT, cDSTDEV,
+	cFormulaFunctionGroup['NotRealised'].push(cDAVERAGE, cDCOUNT, cDCOUNTA, cDGET, cDMAX, cDMIN, cDPRODUCT, cDSTDEV,
 		cDSTDEVP, cDSUM, cDVAR, cDVARP);
 
 	/**
@@ -236,9 +238,11 @@
 
 	cDMIN.prototype = Object.create(cBaseFunction.prototype);
 	cDMIN.prototype.constructor = cDMIN;
-	cDMIN.prototype.argumentsMin = 3;
+	//TODO пока не добавляю в список формул, нужно протестировать
+	/*cDMIN.prototype.argumentsMin = 3;
 	cDMIN.prototype.argumentsMax = 3;
 	cDMIN.prototype.Calculate = function (arg) {
+
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
 
@@ -250,13 +254,17 @@
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
+		if(false === resArr){
+			return new cNumber(0);
+		}
 
 		resArr.sort(function(a, b) {
 			return a - b;
 		});
 
-		return this.value = new cNumber(resArr[0]);
-	};
+		var res = new cNumber(resArr[0]);
+		return this.value = cElementType.error === res.type ? new cNumber(0) : res;
+	};*/
 
 
 	/**
