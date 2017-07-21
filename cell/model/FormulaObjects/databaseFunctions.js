@@ -40,11 +40,18 @@
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 	var cElementType = AscCommonExcel.cElementType;
+	var cErrorType = AscCommonExcel.cErrorType;
 	var cNumber = AscCommonExcel.cNumber;
+	var cError = AscCommonExcel.cError;
 
 	function checkValueByCondition(condition, val){
 		var res = false;
-		var condition  = condition.getValue();
+		condition = condition.tocString();
+		if(cElementType.error === condition.type){
+			return false;
+		}
+
+		condition  = condition.getValue();
 
 		if("" === condition){
 			res = true;
@@ -171,6 +178,7 @@
 	cFormulaFunctionGroup['NotRealised'].push(cDAVERAGE, cDCOUNT, cDCOUNTA, cDGET, cDMAX, cDMIN, cDPRODUCT, cDSTDEV,
 		cDSTDEVP, cDSUM, cDVAR, cDVARP);
 
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
@@ -181,6 +189,44 @@
 
 	cDAVERAGE.prototype = Object.create(cBaseFunction.prototype);
 	cDAVERAGE.prototype.constructor = cDAVERAGE;
+	//TODO пока не добавляю в список формул, нужно протестировать
+	cDAVERAGE.prototype.argumentsMin = 3;
+	cDAVERAGE.prototype.argumentsMax = 3;
+	cDAVERAGE.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocString();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
+		if(false === resArr){
+			return new cError(cErrorType.division_by_zero);
+		}
+
+		var summ = 0;
+		var count = 0;
+		for(var i = 0; i < resArr.length; i++){
+			var val = parseFloat(resArr[i]);
+			if(!isNaN(val)){
+				summ += val;
+				count++;
+			}
+		}
+
+		if(0 === count){
+			return new cError(cErrorType.division_by_zero);
+		}
+
+		 var res = new cNumber(summ / count);
+		 return this.value = cElementType.error === res.type ? new cNumber(0) : res;
+	 };
+
 
 	/**
 	 * @constructor
@@ -226,7 +272,7 @@
 	cDMAX.prototype = Object.create(cBaseFunction.prototype);
 	cDMAX.prototype.constructor = cDMAX;
 	//TODO пока не добавляю в список формул, нужно протестировать
-	/*cDMAX.prototype.argumentsMin = 3;
+	cDMAX.prototype.argumentsMin = 3;
 	cDMAX.prototype.argumentsMax = 3;
 	cDMAX.prototype.Calculate = function (arg) {
 
@@ -242,7 +288,7 @@
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
 		if(false === resArr){
-			return new cNumber(0);
+			return this.value = new cNumber(0);
 		}
 
 		resArr.sort(function(a, b) {
@@ -251,7 +297,7 @@
 
 		var res = new cNumber(resArr[0]);
 		return this.value = cElementType.error === res.type ? new cNumber(0) : res;
-	};*/
+	};
 
 	/**
 	 * @constructor
@@ -280,7 +326,7 @@
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
 		if(false === resArr){
-			return new cNumber(0);
+			return this.value = new cNumber(0);
 		}
 
 		resArr.sort(function(a, b) {
