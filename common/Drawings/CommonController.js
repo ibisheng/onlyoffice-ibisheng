@@ -8191,24 +8191,17 @@ DrawingObjectsController.prototype =
         }
     },
 
-    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType, bCheckConnectors)
+    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType, aAdditionalObjects)
     {
         var selection_state = this.getSelectionState();
         this.drawingObjects.objectLocker.reset();
-        var oMapId = {};
         for(var i = 0; i < this.selectedObjects.length; ++i)
         {
             this.drawingObjects.objectLocker.addObjectId(this.selectedObjects[i].Get_Id());
-            oMapId[this.selectedObjects[i].Get_Id()] = true;
         }
-        if(bCheckConnectors){
-            var _aDrawings = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
-            var _aConnectors = [];
-            this.getAllConnectorsByDrawings(_aDrawings, _aConnectors, undefined, true);
-            for(var i = 0; i < _aConnectors.length; ++i){
-                if(!oMapId[_aConnectors[i].Get_Id()]){
-                    this.drawingObjects.objectLocker.addObjectId(_aConnectors[i].Get_Id());
-                }
+        if(aAdditionalObjects){
+            for(var i = 0; i < aAdditionalObjects.length; ++i){
+                this.drawingObjects.objectLocker.addObjectId(aAdditionalObjects[i].Get_Id());
             }
         }
         var _this = this;

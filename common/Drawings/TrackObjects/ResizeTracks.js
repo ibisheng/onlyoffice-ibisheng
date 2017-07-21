@@ -310,7 +310,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
         this.resizedRot = originalObject.rot;
 
         this.transform = originalObject.transform.CreateDublicate();
-        this.geometry = (function(){ return originalObject.getGeom();})();
+        this.geometry = AscFormat.ExecuteNoHistory(function(){ return originalObject.getGeom().createDuplicate();}, this, []);
 
         if(!originalObject.isChart())
         {

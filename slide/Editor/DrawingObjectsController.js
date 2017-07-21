@@ -115,7 +115,7 @@ DrawingObjectsController.prototype.handleOleObjectDoubleClick = function(drawing
     oPresentation.OnMouseUp(e, x, y, pageIndex);
 };
 
-DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType)
+DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType, aAdditionaObjects)
 {
     var check_type = AscCommon.changestype_Drawing_Props, comment;
     if(this.drawingObjects.slideComments)
@@ -127,7 +127,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(ca
             comment = comment.Get_Id();
         }
     }
-    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment) === false)
+    if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment, undefined, aAdditionaObjects) === false)
     {
         var nPointType = AscFormat.isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
         History.Create_NewPoint(nPointType);

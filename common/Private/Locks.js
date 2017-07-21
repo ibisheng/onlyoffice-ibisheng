@@ -750,7 +750,7 @@ if(typeof CComments !== "undefined")
 
 if(typeof CPresentation !== "undefined")
 {
-    CPresentation.prototype.Document_Is_SelectionLocked =  function(CheckType, AdditionalData, isIgnoreCanEditFlag)
+    CPresentation.prototype.Document_Is_SelectionLocked =  function(CheckType, AdditionalData, isIgnoreCanEditFlag, aAdditionaObjects)
     {
         if (!this.CanEdit() && true !== isIgnoreCanEditFlag)
             return true;
@@ -795,6 +795,19 @@ if(typeof CPresentation !== "undefined")
                     "guid": selected_objects[i].Get_Id()
                 };
                 selected_objects[i].Lock.Check(check_obj);
+            }
+            if(Array.isArray(aAdditionaObjects)){
+                for(var i = 0; i < aAdditionaObjects.length; ++i)
+                {
+                    var check_obj =
+                        {
+                            "type": c_oAscLockTypeElemPresentation.Object,
+                            "slideId": slide_id,
+                            "objId": aAdditionaObjects[i].Get_Id(),
+                            "guid": aAdditionaObjects[i].Get_Id()
+                        };
+                    aAdditionaObjects[i].Lock.Check(check_obj);
+                }
             }
         }
 
