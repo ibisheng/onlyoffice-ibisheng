@@ -649,6 +649,10 @@
 
 		this.reporterWindow 		= null;
 		this.reporterStartObject 	= null;
+		this.isReporterMode = ("reporter" == config['using']) ? true : false;
+
+		if (this.isReporterMode)
+			this.watermarkDraw = null;
 
 		this._init();
 	}
@@ -5846,6 +5850,9 @@ background-repeat: no-repeat;\
 
 		var _windowPos = "width=" + w + ",height=" + h + ",left=" + left + ",top=" + top;
 		this.reporterWindow = window.open("index.reporter.html", "_blank", "resizable=0,status=0,toolbar=0,location=0,menubar=0,directories=0,scrollbars=0," + _windowPos);
+
+		if (!this.reporterWindow)
+			return;
 
 		if ( this.reporterWindow.attachEvent )
 			this.reporterWindow.attachEvent('onmessage', this.DemonstrationReporterMessages);
