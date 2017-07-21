@@ -371,6 +371,48 @@
 
 	cDSTDEV.prototype = Object.create(cBaseFunction.prototype);
 	cDSTDEV.prototype.constructor = cDSTDEV;
+	cDSTDEV.prototype.argumentsMin = 3;
+	cDSTDEV.prototype.argumentsMax = 3;
+	cDSTDEV.prototype.Calculate = function (arg) {
+
+		 var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
+		 var argClone = oArguments.args;
+
+		 argClone[1] = argClone[1].tocString();
+
+		 var argError;
+		 if (argError = this._checkErrorArg(argClone)) {
+			 return this.value = argError;
+		 }
+
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
+		if(false === resArr){
+			return new cError(cErrorType.division_by_zero);
+		}
+
+		var sum = 0;
+		var count = 0;
+		var member = [];
+		for(var i = 0; i < resArr.length; i++){
+			var val = parseFloat(resArr[i]);
+			if(!isNaN(val)){
+				member[count] = val;
+				sum += val;
+				count++;
+			}
+		}
+
+		if(0 === count){
+			return new cError(cErrorType.division_by_zero);
+		}
+
+		var average = sum / count, res = 0, av;
+		for (i = 0; i < member.length; i++) {
+			av = member[i] - average;
+			res += av * av;
+		}
+		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
+	 };
 
 	/**
 	 * @constructor
