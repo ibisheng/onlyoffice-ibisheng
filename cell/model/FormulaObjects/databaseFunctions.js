@@ -106,7 +106,7 @@
 		return {arr: arr, map: map};
 	}
 
-	function getNeedValuesFromDataBase(dataBase, field, conditionData){
+	function getNeedValuesFromDataBase(dataBase, field, conditionData, bIsGetObjArray){
 
 		//заполняем map название столбца-> его содержимое(из базы данных)
 		var databaseObj = convertDatabase(dataBase);
@@ -131,7 +131,7 @@
 		}
 
 		if(null === field){
-			return false;
+			return new cError(cErrorType.wrong_value_type);
 		}
 
 		var previousWinArray;
@@ -167,19 +167,27 @@
 		var needDataColumn = headersDataMap[field];
 		var resArr = [];
 		var usuallyAddElems = [];
-		if(needDataColumn){
-			for(var i = 0; i < winElems.length; i++){
-				for(var j in winElems[i]){
-					if(true === usuallyAddElems[j] || cElementType.empty === needDataColumn[j].type){
-						continue;
-					}
-					resArr.push(needDataColumn[j].getValue());
-					usuallyAddElems[j] = true;
+		if(!needDataColumn){
+			return new cError(cErrorType.wrong_value_type);
+		}
+
+		for(var i = 0; i < winElems.length; i++){
+			for(var j in winElems[i]){
+				if(true === usuallyAddElems[j] || cElementType.empty === needDataColumn[j].type){
+					continue;
 				}
+
+				if(bIsGetObjArray){
+					resArr.push(needDataColumn[j]);
+				}else{
+					resArr.push(needDataColumn[j].getValue());
+				}
+
+				usuallyAddElems[j] = true;
 			}
 		}
 
-		return resArr.length ? resArr : false;
+		return resArr.length ? resArr : new cError(cErrorType.division_by_zero);
 	}
 
 	cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
@@ -217,8 +225,8 @@
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
-		if(false === resArr){
-			return new cError(cErrorType.division_by_zero);
+		if(cElementType.error === resArr.type){
+			return resArr;
 		}
 
 		var summ = 0;
@@ -299,8 +307,8 @@
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
-		if(false === resArr){
-			return this.value = new cNumber(0);
+		if(cElementType.error === resArr.type){
+			return resArr;
 		}
 
 		resArr.sort(function(a, b) {
@@ -337,9 +345,9 @@
 		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
-		if(false === resArr){
-			return this.value = new cNumber(0);
-		}
+		 if(cElementType.error === resArr.type){
+			return resArr;
+		 }
 
 		resArr.sort(function(a, b) {
 			return a - b;
@@ -386,8 +394,8 @@
 		 }
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
-		if(false === resArr){
-			return new cError(cErrorType.division_by_zero);
+		if(cElementType.error === resArr.type){
+			return resArr;
 		}
 
 		var sum = 0;
@@ -424,6 +432,49 @@
 
 	cDSTDEVP.prototype = Object.create(cBaseFunction.prototype);
 	cDSTDEVP.prototype.constructor = cDSTDEVP;
+	cDSTDEVP.prototype.argumentsMin = 3;
+	cDSTDEVP.prototype.argumentsMax = 3;
+	cDSTDEVP.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocString();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true);
+		if(cElementType.error === resArr.type){
+			return resArr;
+		}
+
+		function _var(x) {
+			var i, tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
+			for (i = 0; i < x.length; i++) {
+				if (cElementType.number === x[i].type) {
+					_x += x[i].getValue();
+					tA.push(x[i].getValue());
+					xLength++;
+				} else if (cElementType.error === x[i].type) {
+					return x[i];
+				}
+			}
+
+			_x /= xLength;
+
+			for (i = 0; i < tA.length; i++) {
+				sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x)
+			}
+
+			return new cNumber(isNaN(_x) ? new cError(cErrorType.division_by_zero) : Math.sqrt(sumSQRDeltaX / xLength));
+		}
+
+		return this.value = _var(resArr);
+	};
+
 
 	/**
 	 * @constructor
