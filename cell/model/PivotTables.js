@@ -2742,7 +2742,7 @@ CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 		var pivotField = t.asc_getPivotFields()[index];
 		if (pivotField) {
 			if (c_oAscAxis.AxisPage !== pivotField.axis) {
-				t.removeField(t.pageFields.getField(index));
+				t.removeField(index);
 			} else {
 				// ToDo move to end ?
 			}
@@ -2760,14 +2760,14 @@ CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 		}
 	});
 };
-CT_pivotTableDefinition.prototype.asc_removeField = function (api, field) {
+CT_pivotTableDefinition.prototype.asc_removeField = function (api, index) {
 	var t = this;
 	api._changePivotStyle(this, function () {
-		t.removeField(field);
+		t.removeField(index);
 	});
 };
-CT_pivotTableDefinition.prototype.removeField = function (field) {
-	var pivotField = this.asc_getPivotFields()[field.asc_getIndex()];
+CT_pivotTableDefinition.prototype.removeField = function (index) {
+	var pivotField = this.asc_getPivotFields()[index];
 	switch(pivotField.axis) {
 		case c_oAscAxis.AxisRow:
 			break;
@@ -4333,16 +4333,13 @@ CT_PageFields.prototype.add = function (newContext) {
 	this.count = this.pageField.length;
 };
 CT_PageFields.prototype.remove = function (field) {
-	var index = this.pageField.indexOf(field);
+	var index = this.pageField.findIndex(function (element) {
+		return element.asc_getIndex() === index;
+	});
 	if (-1 !== index) {
 		this.pageField.splice(index, 1);
 	}
 	this.count = this.pageField.length;
-};
-CT_PageFields.prototype.getField = function (index) {
-	return this.pageField.find(function (element) {
-		return element.asc_getIndex() === index;
-	});
 };
 function CT_DataFields() {
 //Attributes
