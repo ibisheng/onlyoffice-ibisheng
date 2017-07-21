@@ -2779,12 +2779,12 @@ CT_pivotTableDefinition.prototype.removeField = function (index) {
 			} else {
 				this.pageFields.remove(field);
 			}
-			pivotField.axis = null;
 			this.location.removeColPage();
 			break;
 		case c_oAscAxis.AxisValues:
 			break;
 	}
+	pivotField.axis = null;
 };
 function CT_CacheSource() {
 //Attributes
@@ -4332,12 +4332,12 @@ CT_PageFields.prototype.add = function (newContext) {
 	this.pageField.push(newContext);
 	this.count = this.pageField.length;
 };
-CT_PageFields.prototype.remove = function (field) {
-	var index = this.pageField.findIndex(function (element) {
+CT_PageFields.prototype.remove = function (index) {
+	var deleteIndex = this.pageField.findIndex(function (element) {
 		return element.asc_getIndex() === index;
 	});
-	if (-1 !== index) {
-		this.pageField.splice(index, 1);
+	if (-1 !== deleteIndex) {
+		this.pageField.splice(deleteIndex, 1);
 	}
 	this.count = this.pageField.length;
 };
