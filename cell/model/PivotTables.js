@@ -2741,7 +2741,11 @@ CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 	api._changePivotStyle(this, function () {
 		var pivotField = t.asc_getPivotFields()[index];
 		if (pivotField) {
-			// ToDo delete from other axis type
+			if (c_oAscAxis.AxisPage !== pivotField.axis) {
+				t.removeField(t.pageFields.getField(index));
+			} else {
+				// ToDo move to end ?
+			}
 
 			if (!t.pageFields) {
 				t.pageFields = new CT_PageFields();
@@ -2759,17 +2763,28 @@ CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 CT_pivotTableDefinition.prototype.asc_removeField = function (api, field) {
 	var t = this;
 	api._changePivotStyle(this, function () {
-		var pivotField = t.asc_getPivotFields()[field.asc_getIndex()];
-		if (c_oAscAxis.AxisPage === pivotField.axis) {
-			if (1 === t.pageFields.count) {
-				t.pageFields = null;
+		t.removeField(field);
+	});
+};
+CT_pivotTableDefinition.prototype.removeField = function (field) {
+	var pivotField = this.asc_getPivotFields()[field.asc_getIndex()];
+	switch(pivotField.axis) {
+		case c_oAscAxis.AxisRow:
+			break;
+		case c_oAscAxis.AxisCol:
+			break;
+		case c_oAscAxis.AxisPage:
+			if (1 === this.pageFields.count) {
+				this.pageFields = null;
 			} else {
-				t.pageFields.remove(field);
+				this.pageFields.remove(field);
 			}
 			pivotField.axis = null;
-			t.location.removeColPage();
-		}
-	});
+			this.location.removeColPage();
+			break;
+		case c_oAscAxis.AxisValues:
+			break;
+	}
 };
 function CT_CacheSource() {
 //Attributes
@@ -4313,16 +4328,21 @@ CT_PageFields.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_PageFields.prototype.add = function(newContext) {
+CT_PageFields.prototype.add = function (newContext) {
 	this.pageField.push(newContext);
 	this.count = this.pageField.length;
 };
-CT_PageFields.prototype.remove = function(field) {
+CT_PageFields.prototype.remove = function (field) {
 	var index = this.pageField.indexOf(field);
 	if (-1 !== index) {
 		this.pageField.splice(index, 1);
 	}
 	this.count = this.pageField.length;
+};
+CT_PageFields.prototype.getField = function (index) {
+	return this.pageField.find(function (element) {
+		return element.asc_getIndex() === index;
+	});
 };
 function CT_DataFields() {
 //Attributes
