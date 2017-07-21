@@ -5881,8 +5881,10 @@ CChartSpace.prototype.recalculateAxis = function()
                         var nMaxCount = 1;
                         var nLblCount = 0;
                         var nCount = 0;
+                        var nSkip = 1;
                         if(!bTickSkip && fMaxContentStringH > 0){
                             nMaxCount = diagram_width/fMaxContentStringH;
+                            nSkip = ((cat_ax.labels.arrLabels.length/nMaxCount + 1) >> 0);
                         }
                         else{
                             bTickSkip = true;
@@ -5892,14 +5894,12 @@ CChartSpace.prototype.recalculateAxis = function()
                         {
                             if(cat_ax.labels.arrLabels[i])
                             {
-                                if(!bTickSkip){
-                                    if(nLblCount > (nMaxCount*(nCount/cat_ax.labels.arrLabels.length))){
-                                        cat_ax.labels.arrLabels[i] = null;
-                                        arr_left_points[i] = arr_cat_labels_points[i];
-                                        arr_right_points[i] = arr_cat_labels_points[i];
-                                        nCount++;
-                                        continue;
-                                    }
+                                if(i%nSkip !== 0){
+                                    cat_ax.labels.arrLabels[i] = null;
+                                    arr_left_points[i] = arr_cat_labels_points[i];
+                                    arr_right_points[i] = arr_cat_labels_points[i];
+                                    nCount++;
+                                    continue;
                                 }
                                 //сначала расчитаем высоту и ширину подписи так чтобы она умещалась в одну строку
                                 var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();
