@@ -2756,6 +2756,21 @@ CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 		}
 	});
 };
+CT_pivotTableDefinition.prototype.asc_removeField = function (api, field) {
+	var t = this;
+	api._changePivotStyle(this, function () {
+		var pivotField = t.asc_getPivotFields()[field.asc_getIndex()];
+		if (c_oAscAxis.AxisPage === pivotField.axis) {
+			if (1 === t.pageFields.count) {
+				t.pageFields = null;
+			} else {
+				t.pageFields.remove(field);
+			}
+			pivotField.axis = null;
+			t.location.removeColPage();
+		}
+	});
+};
 function CT_CacheSource() {
 //Attributes
 	this.type = null;
@@ -4046,6 +4061,12 @@ CT_Location.prototype.addColPage = function () {
 	}
 	++this.colPageCount;
 };
+CT_Location.prototype.removeColPage = function () {
+	--this.colPageCount;
+	if (0 === this.colPageCount) {
+		this.colPageCount = null;
+	}
+};
 function CT_PivotFields() {
 //Attributes
 	this.count = null;
@@ -4294,6 +4315,13 @@ CT_PageFields.prototype.toXml = function(writer, name) {
 };
 CT_PageFields.prototype.add = function(newContext) {
 	this.pageField.push(newContext);
+	this.count = this.pageField.length;
+};
+CT_PageFields.prototype.remove = function(field) {
+	var index = this.pageField.indexOf(field);
+	if (-1 !== index) {
+		this.pageField.splice(index, 1);
+	}
 	this.count = this.pageField.length;
 };
 function CT_DataFields() {
@@ -10149,6 +10177,7 @@ prot["asc_set"] = prot.asc_set;
 prot["asc_setRowGrandTotals"] = prot.asc_setRowGrandTotals;
 prot["asc_setColGrandTotals"] = prot.asc_setColGrandTotals;
 prot["asc_addPageField"] = prot.asc_addPageField;
+prot["asc_removeField"] = prot.asc_removeField;
 
 prot = CT_PivotTableStyle.prototype;
 prot["asc_getName"] = prot.asc_getName;
