@@ -56,7 +56,14 @@
 		if("" === condition){
 			res = true;
 		}else{
-			res = AscCommonExcel.matching(val, AscCommonExcel.matchingValue(condition));
+			var conditionObj = AscCommonExcel.matchingValue(condition);
+			//если строка, без операторов, добавляем * для поиска совпадений начинающихся с данной строки
+			//так делает MS. lo ищет строгие совпадения
+			if(null === conditionObj.op && cElementType.string === conditionObj.val.type){
+				conditionObj.val.value += "*";
+			}
+
+			res = AscCommonExcel.matching(val, conditionObj);
 		}
 		return res;
 	}
@@ -159,14 +166,19 @@
 
 		var needDataColumn = headersDataMap[field];
 		var resArr = [];
-		for(var i = 0; i < winElems.length; i++){
-			for(var j in winElems[i]){
-				if(cElementType.empty === needDataColumn[j].type){
-					continue;
+		var usuallyAddElems = [];
+		if(needDataColumn){
+			for(var i = 0; i < winElems.length; i++){
+				for(var j in winElems[i]){
+					if(true === usuallyAddElems[j] || cElementType.empty === needDataColumn[j].type){
+						continue;
+					}
+					resArr.push(needDataColumn[j].getValue());
+					usuallyAddElems[j] = true;
 				}
-				resArr.push(needDataColumn[j].getValue());
 			}
 		}
+
 		return resArr.length ? resArr : false;
 	}
 
