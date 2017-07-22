@@ -4897,7 +4897,13 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
         CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
     else
     {
-        if(CurTextPr.Unifill)
+        if(bPresentation && PDSL.Hyperlink)
+        {
+            AscFormat.G_O_HLINK_COLOR.check(Theme, ColorMap);
+            RGBA = AscFormat.G_O_HLINK_COLOR.getRGBAColor();
+            CurColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+        }
+        else if(CurTextPr.Unifill)
         {
             CurTextPr.Unifill.check(Theme, ColorMap);
             RGBA = CurTextPr.Unifill.getRGBAColor();
