@@ -6571,11 +6571,15 @@ CDLbls.prototype =
     },
     Refresh_RecalcData2: function()
     {
-        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent )
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent )
         {
-            if(this.parent.parent.parent.parent.parent.handleUpdateDataLabels)
-            {
-                this.parent.parent.parent.parent.parent.handleUpdateDataLabels();
+            if(this.parent.parent.parent.parent.handleUpdateDataLabels){
+                this.parent.parent.parent.parent.handleUpdateDataLabels();
+            }
+            else{
+                if(this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateDataLabels){
+                    this.parent.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
             }
         }
     },
