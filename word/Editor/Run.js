@@ -4885,8 +4885,14 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
     var ReviewColor = this.Get_ReviewColor();
 
     // Выставляем цвет обводки
-    if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
-        CurColor = new CDocumentColor( 128, 0, 151 );
+
+    var bPresentation = this.Paragraph && !this.Paragraph.bFromDocument;
+    if ( true === PDSL.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill || bPresentation) )
+    {
+        AscFormat.G_O_VISITED_HLINK_COLOR.check(Theme, ColorMap);
+        RGBA = AscFormat.G_O_VISITED_HLINK_COLOR.getRGBAColor();
+        CurColor = new CDocumentColor( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
+    }
     else if ( true === CurTextPr.Color.Auto && !CurTextPr.Unifill)
         CurColor = new CDocumentColor( AutoColor.r, AutoColor.g, AutoColor.b );
     else
