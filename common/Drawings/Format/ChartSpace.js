@@ -3074,6 +3074,12 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                             cell = source_worksheet.getCell3(range.r1, j);
                             var sCellValue = cell.getValue();
                             var value = cell.getNumberValue();
+                            if(!AscFormat.isRealNumber(value) && (!AscFormat.isRealNumber(this.displayEmptyCellsAs) || this.displayEmptyCellsAs === 1)){
+                                var sVal = cell.getValueForEdit();
+                                if((typeof sVal === "string") && sVal.length > 0){
+                                    value = 0;
+                                }
+                            }
                             if(AscFormat.isRealNumber(value))
                             {
                                 hidden = false;
@@ -3152,6 +3158,13 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                         {
                             cell = source_worksheet.getCell3(j, range.c1);
                             var value = cell.getNumberValue();
+                            var sCellValue = cell.getValue();
+                            if(!AscFormat.isRealNumber(value) && !AscFormat.isRealNumber(this.displayEmptyCellsAs)){
+                                var sVal = cell.getValueForEdit();
+                                if((typeof sVal === "string") && sVal.length > 0){
+                                    value = 0;
+                                }
+                            }
                             if(AscFormat.isRealNumber(value))
                             {
                                 hidden = false;
@@ -3163,7 +3176,42 @@ CChartSpace.prototype.checkValByNumRef = function(workbook, ser, val, bVertical)
                                     pt.setFormatCode(cell.getNumFormatStr());
                                 }
                                 num_cache.addPt(pt);
-
+                            }
+                            else
+                            {
+                                if(AscFormat.isRealNumber(this.displayEmptyCellsAs) && this.displayEmptyCellsAs !== 1)
+                                {
+                                    if(this.displayEmptyCellsAs === 2 || ((typeof sCellValue === "string") && sCellValue.length > 0))
+                                    {
+                                        pt = new AscFormat.CNumericPoint();
+                                        pt.setIdx(pt_index);
+                                        pt.setVal(0);
+                                        num_cache.addPt(pt);
+                                        if(aSpanPoints.length > 0 )
+                                        {
+                                            if(AscFormat.isRealNumber(nLastNoEmptyIndex))
+                                            {
+                                                var oStartPoint = num_cache.getPtByIndex(nLastNoEmptyIndex);
+                                                for(t = 0; t < aSpanPoints.length; ++t)
+                                                {
+                                                    aSpanPoints[t].val = oStartPoint.val + ((pt.val - oStartPoint.val)/(aSpanPoints.length + 1))*(t+1);
+                                                    num_cache.pts.splice(nSpliceIndex + t, 0, aSpanPoints[t]);
+                                                }
+                                            }
+                                            aSpanPoints.length = 0;
+                                        }
+                                        nLastNoEmptyIndex = pt_index;
+                                        nSpliceIndex = num_cache.pts.length;
+                                        dLastNoEmptyVal = pt.val;
+                                    }
+                                    else if(this.displayEmptyCellsAs === 0 && ser.getObjectType() === AscDFH.historyitem_type_LineSeries)
+                                    {
+                                        pt = new AscFormat.CNumericPoint();
+                                        pt.setIdx(pt_index);
+                                        pt.setVal(0);
+                                        aSpanPoints.push(pt);
+                                    }
+                                }
                             }
                         }
                         pt_index++;
