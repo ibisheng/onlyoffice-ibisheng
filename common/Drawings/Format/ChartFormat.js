@@ -245,7 +245,7 @@ function (window, undefined) {
     drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetDLbls]             = function(oClass, value){oClass.dLbls         = value;};
     drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetFirstSliceAng]     = function(oClass, value){oClass.firstSliceAng = value;};
     drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetHoleSize]          = function(oClass, value){oClass.holeSize     = value;};
-    drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetVaryColor]         = function(oClass, value){oClass.varyColor = value;};
+    drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetVaryColor]         = function(oClass, value){oClass.varyColors = value;};
     drawingsChangesMap[AscDFH.historyitem_ErrBars_SetErrBarType]              = function(oClass, value){oClass.errBarType   = value;};
     drawingsChangesMap[AscDFH.historyitem_ErrBars_SetErrDir]                  = function(oClass, value){oClass.errDir       = value;};
     drawingsChangesMap[AscDFH.historyitem_ErrBars_SetErrValType]              = function(oClass, value){oClass.errValType   = value;};
