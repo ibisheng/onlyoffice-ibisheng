@@ -1435,6 +1435,11 @@ CopyProcessor.prototype =
 
             //записываем slide
 			this.oPresentationWriter.WriteSlide(slide);
+            var oNotes = slide.notes;
+            this.oPresentationWriter.WriteBool(AscCommon.isRealObject(oNotes));
+            if(AscCommon.isRealObject(oNotes)){
+                this.oPresentationWriter.WriteSlideNote(oNotes);
+            }
 
             //записываем sp_tree параметры
 			this.oPresentationWriter.WriteULong(sp_tree.length);
@@ -3901,6 +3906,11 @@ PasteProcessor.prototype =
 								table_styles_ids.push(-1);
 						}
 						arr_slides[i] = loader.ReadSlide(0);
+						if(stream.GetBool()){
+						    var oNotes = loader.ReadNote();
+						    oNotes.setNotesMaster(loader.presentation.notesMasters[0]);
+						    arr_slides[i].setNotes(oNotes);
+                        }
 						var sp_tree = arr_slides[i].cSld.spTree;
 						var t = 0;
 						for(var s = 0; s < sp_tree.length; ++s)

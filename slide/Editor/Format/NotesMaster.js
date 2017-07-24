@@ -57,8 +57,14 @@
     }
 
 
+
     CNotesMaster.prototype.getObjectType = function(){
         return AscDFH.historyitem_type_NotesMaster;
+    };
+
+
+    CNotesMaster.prototype.Get_Id = function(){
+        return this.Id;
     };
 
 
