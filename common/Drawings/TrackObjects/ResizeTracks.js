@@ -823,6 +823,17 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             this.overlayObject.updateExtents(this.resizedExtX, this.resizedExtY);
 
             this.recalculateTransform();
+
+            if(this.bConnector){
+                if(this.numberHandle === 0){
+                    this.beginShapeIdx = null;
+                    this.beginShapeId = null;
+                }
+                else{
+                    this.endShapeIdx = null;
+                    this.endShapeId = null;
+                }
+            }
         };
 
         this.resizeRelativeCenter = function(kd1, kd2, ShiftKey)
@@ -1051,6 +1062,20 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                         pluginData.setAttribute("height", xfrm.extY);
                         pluginData.setAttribute("objectId", this.originalObject.Get_Id());
                         api.asc_pluginResize(pluginData);
+                    }
+                }
+
+                if(this.bConnector){
+                    var nvUniSpPr = this.originalObject.nvSpPr.nvUniSpPr.copy();
+                    if(this.numberHandle === 0){
+                        nvUniSpPr.stCnxIdx = this.beginShapeIdx;
+                        nvUniSpPr.stCnxId  = this.beginShapeId;
+                        this.originalObject.nvSpPr.setUniSpPr(nvUniSpPr);
+                    }
+                    else{
+                        nvUniSpPr.endCnxIdx = this.endShapeIdx;
+                        nvUniSpPr.endCnxId  = this.endShapeId;
+                        this.originalObject.nvSpPr.setUniSpPr(nvUniSpPr);
                     }
                 }
 

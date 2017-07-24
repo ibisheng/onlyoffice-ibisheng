@@ -434,20 +434,36 @@
 
 			while (this.current < this.documents.length) // no recursion
 			{
-				if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add))
+				var _current = this.documents[this.current];
+				var _isLocked = false;
+				if ((_current["Url"] !== undefined || _current["Script"] !== undefined) && undefined !== _current["Props"]["InternalId"])
 				{
-					var _current = this.documents[this.current];
+					var _internalId     = _current["Props"]["InternalId"];
+					var _contentControl = g_oTableId.Get_ById(_internalId);
+					_isLocked = LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+						Type      : AscCommon.changestype_2_ElementsArray_and_Type,
+						Elements  : [_contentControl],
+						CheckType : AscCommon.changestype_Document_Content_Add
+					});
+				}
+				else
+				{
+					_isLocked = LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content_Add);
+				}
 
+				if (false === _isLocked)
+				{
 					var _content_control_pr;
 					var _blockStd;
+					var _isReplaced = false;
 
 					if (_current["Url"] !== undefined || _current["Script"] !== undefined)
 					{
+						_blockStd = null;
 						if (undefined !== _current["Props"]["InternalId"])
 						{
-							// remove block sdt
-							LogicDocument.SelectContentControl(_current["Props"]["InternalId"]);
-							LogicDocument.RemoveContentControl(_current["Props"]["InternalId"]);
+							_blockStd   = LogicDocument.ClearContentControl(_current["Props"]["InternalId"]);
+							_isReplaced = true;
 						}
 
 						_content_control_pr = new AscCommonWord.CContentControlPr();
@@ -456,11 +472,15 @@
 						_content_control_pr.Lock = AscCommonWord.sdtlock_Unlocked;
 						_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
-						var oCurPara = LogicDocument.GetCurrentParagraph();
-						if (oCurPara && !oCurPara.IsCursorAtBegin())
-							LogicDocument.AddNewParagraph(false, true);
+						if (null === _blockStd)
+						{
+							var oCurPara = LogicDocument.GetCurrentParagraph();
+							if (oCurPara && !oCurPara.IsCursorAtBegin())
+								LogicDocument.AddNewParagraph(false, true);
 
-						var _blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+							_blockStd = LogicDocument.AddContentControl(AscCommonWord.sdttype_BlockLevel);
+						}
+
 						_blockStd.SetContentControlPr(_content_control_pr);
 
 						_obj = _blockStd.GetContentControlPr();
@@ -497,12 +517,22 @@
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current["Script"] + "\n})();";
 						eval(_script);
 
-						if(_blockStd.Content.Get_ElementsCount() > 1)
+						if (_isReplaced)
 						{
-							_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1 , 1);
-							_blockStd.MoveCursorToEndPos(false, false);
+							if (_blockStd.Content.Get_ElementsCount() > 1)
+								_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+
+							_blockStd.MoveCursorToStartPos(false);
 						}
-						LogicDocument.MoveCursorRight(false, false, true);
+						else
+						{
+							if (_blockStd.Content.Get_ElementsCount() > 1)
+							{
+								_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+								_blockStd.MoveCursorToEndPos(false, false);
+							}
+							LogicDocument.MoveCursorRight(false, false, true);
+						}
 
 						var _worker = _api.__content_control_worker;
 						if (_worker.documents[_worker.current]["Props"])
@@ -539,16 +569,24 @@
 						// change properties
 						var _blockStd = LogicDocument.GetContentControl(_current["Props"]["InternalId"]);
 
-						_content_control_pr = new AscCommonWord.CContentControlPr();
-						_content_control_pr.Id = _current["Props"]["Id"];
-						_content_control_pr.Tag = _current["Props"]["Tag"];
-						_content_control_pr.Lock = _current["Props"]["Lock"];
-						_content_control_pr.InternalId = _current["Props"]["InternalId"];
+						if (_blockStd)
+						{
+							_content_control_pr = new AscCommonWord.CContentControlPr();
+							_content_control_pr.Id = _current["Props"]["Id"];
+							_content_control_pr.Tag = _current["Props"]["Tag"];
+							_content_control_pr.Lock = _current["Props"]["Lock"];
+							_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
-						_blockStd.SetContentControlPr(_content_control_pr);
+							_blockStd.SetContentControlPr(_content_control_pr);
 
-						_obj = _blockStd.GetContentControlPr();
-						this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
+							_obj = _blockStd.GetContentControlPr();
+							this.returnDocuments.push({
+								"Tag":        _obj.Tag,
+								"Id":         _obj.Id,
+								"Lock":       _obj.Lock,
+								"InternalId": _obj.InternalId
+							});
+						}
 					}
 				}
 				else
@@ -561,16 +599,24 @@
 							// change properties
 							var _blockStd = LogicDocument.GetContentControl(_current["Props"]["InternalId"]);
 
-							_content_control_pr = new AscCommonWord.CContentControlPr();
-							_content_control_pr.Id = _current["Props"]["Id"];
-							_content_control_pr.Tag = _current["Props"]["Tag"];
-							_content_control_pr.Lock = _current["Props"]["Lock"];
-							_content_control_pr.InternalId = _current["Props"]["InternalId"];
+							if (_blockStd)
+							{
+								_content_control_pr = new AscCommonWord.CContentControlPr();
+								_content_control_pr.Id = _current["Props"]["Id"];
+								_content_control_pr.Tag = _current["Props"]["Tag"];
+								_content_control_pr.Lock = _current["Props"]["Lock"];
+								_content_control_pr.InternalId = _current["Props"]["InternalId"];
 
-							_blockStd.SetContentControlPr(_content_control_pr);
+								_blockStd.SetContentControlPr(_content_control_pr);
 
-							_obj = _blockStd.GetContentControlPr();
-							this.returnDocuments.push({"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId});
+								_obj = _blockStd.GetContentControlPr();
+								this.returnDocuments.push({
+									"Tag":        _obj.Tag,
+									"Id":         _obj.Id,
+									"Lock":       _obj.Lock,
+									"InternalId": _obj.InternalId
+								});
+							}
 						}
 					}
 				}
@@ -1062,6 +1108,7 @@ background-repeat: no-repeat;\
 	{
 		this.WordControl.m_oDrawingDocument.m_oDocumentRenderer = new AscCommonWord.CDocMeta();
 		this.WordControl.m_oDrawingDocument.showTarget(false);
+		this.WordControl.HideRulers();
 	};
 
 	asc_docs_api.prototype.OpenDocument = function(url, gObject)
@@ -1423,6 +1470,9 @@ background-repeat: no-repeat;\
 					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
 					t.asc_setDrawCollaborationMarks(true);
 					t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
+					if(window['AscCommon'].g_clipboardBase && AscCommon.CollaborativeEditing.m_bFast){
+						window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+					}
 				} else {
 					// Сохранять теперь должны на таймере автосохранения. Иначе могли два раза запустить сохранение, не дожидаясь окончания
 					t.canUnlockDocument = true;
@@ -2191,6 +2241,9 @@ background-repeat: no-repeat;\
 				if (t.disconnectOnSave) {
 					t.CoAuthoringApi.disconnect(t.disconnectOnSave.code, t.disconnectOnSave.reason);
 					t.disconnectOnSave = null;
+				}
+				if(AscCommon.g_clipboardBase && !AscCommon.CollaborativeEditing.Is_SingleUser()){
+					AscCommon.g_clipboardBase.SpecialPasteButton_Hide();
 				}
 			};
 
@@ -7186,8 +7239,12 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_SetFastCollaborative = function(isOn)
 	{
-		if (AscCommon.CollaborativeEditing)
+		if (AscCommon.CollaborativeEditing){
 			AscCommon.CollaborativeEditing.Set_Fast(isOn);
+			if(window['AscCommon'].g_clipboardBase && isOn && !AscCommon.CollaborativeEditing.Is_SingleUser()){
+				window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
+			}
+		}
 	};
 
 	asc_docs_api.prototype._onEndLoadSdk = function()

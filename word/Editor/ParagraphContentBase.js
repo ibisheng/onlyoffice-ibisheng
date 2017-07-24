@@ -2762,6 +2762,18 @@ CParagraphContentWithParagraphLikeContent.prototype.SelectThisElement = function
 
 	return true;
 };
+CParagraphContentWithParagraphLikeContent.prototype.SetThisElementCurrent = function()
+{
+	var ContentPos = this.Paragraph.Get_PosByElement(this);
+	if (!ContentPos)
+		return;
+
+	var StartPos = ContentPos.Copy();
+	this.Get_StartPos(StartPos, StartPos.Get_Depth() + 1);
+
+	this.Paragraph.Set_ParaContentPos(StartPos, true, -1, -1);
+	this.Paragraph.Document_SetThisElementCurrent(false);
+};
 CParagraphContentWithParagraphLikeContent.prototype.GetSelectedContentControls = function(arrContentControls)
 {
 	if (true === this.Selection.Use)

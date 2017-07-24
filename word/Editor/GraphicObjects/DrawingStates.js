@@ -698,9 +698,10 @@ RotateState.prototype =
             }
             else
             {
-                var bNoNeedCheck = true;
+                var bNoNeedCheck = false;
                 if(bMoveState)
                 {
+                    bNoNeedCheck = true;
                     for(i = 0; i < aNearestPos.length; ++i)
                     {
                         if(aNearestPos[i].Paragraph !== aParentParagraphs[i] && aDrawings[i].Locked !== true)
