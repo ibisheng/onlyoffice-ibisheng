@@ -7662,11 +7662,11 @@ ColorFilter.prototype.isHideValue = function(cell) {
 	if(this.dxf && this.dxf.fill && cell)
 	{
 		var filterColor = this.dxf.fill.bg;
-		cell = cell.getCells()[0];
+		cell = cell.getLeftTopCellNoEmpty();
 		
 		if(false === this.CellColor)//font color
 		{
-			if(cell.oValue.multiText !== null)
+			if(cell && cell.oValue.multiText !== null)
 			{
 				for(var j = 0; j < cell.oValue.multiText.length; j++)
 				{
@@ -7680,7 +7680,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 			}
 			else
 			{
-				var fontColor =  cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
+				var fontColor = cell && cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
 				if(isEqualColors(filterColor,fontColor))
 				{
 					res = false;
@@ -7689,7 +7689,7 @@ ColorFilter.prototype.isHideValue = function(cell) {
 		}
 		else
 		{
-			var color = cell.getStyle();
+			var color = cell ? cell.getStyle() : null;
 			var cellColor =  color !== null && color.fill && color.fill.bg ? color.fill.bg : null;
 			
 			if(isEqualColors(filterColor, cellColor))

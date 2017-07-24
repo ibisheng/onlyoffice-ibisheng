@@ -8989,6 +8989,14 @@
 			}, null);
 		}
 	};
+
+	Range.prototype.getLeftTopCell = function() {
+		return this.worksheet._getCell(this.bbox.r1, this.bbox.c1);
+	};
+
+	Range.prototype.getLeftTopCellNoEmpty = function() {
+		return this.worksheet._getCellNoEmpty(this.bbox.r1, this.bbox.c1);
+	};
 //-------------------------------------------------------------------------------------------------
 	/**
 	 * @constructor

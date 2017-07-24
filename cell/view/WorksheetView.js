@@ -9644,7 +9644,6 @@
 		//set formula - for paste from binary
 		var calculateValueAndBinaryFormula = function(newVal, firstRange, range)
 		{
-			var numFormula = null;
 			var skipFormat = null;
 			var noSkipVal = null;
 			
@@ -9668,9 +9667,10 @@
 			}
 			
 			var value2 = newVal.getValue2();
+			var isFromula = false;
 			for (var nF = 0; nF < value2.length; nF++) {
 				if (value2[nF] && value2[nF].sId) {
-					numFormula = nF;
+					isFromula = true;
 					break;
 				} else if (value2[nF] && value2[nF].format && value2[nF].format.getSkip()) {
 					skipFormat = true;
@@ -9681,10 +9681,7 @@
 			
 			//TODO вместо range где возможно использовать cell
 			var cellFrom, cellTo;
-			if (value2.length == 1 || numFormula != null || (skipFormat != null && noSkipVal != null)) {
-				if (numFormula == null) {
-					numFormula = 0;
-				}
+			if (value2.length === 1 || isFromula !== false || (skipFormat != null && noSkipVal != null)) {
 				var numStyle = 0;
 				if (skipFormat != null && noSkipVal != null) {
 					numStyle = noSkipVal;
@@ -9692,18 +9689,21 @@
 
 				//formula
 				if (newVal.getFormula() && !isOneMerge) {
-					var offset;
+
+					var offset, callAdress;
 					if(specialPasteProps.transpose && transposeRange)
 					{
 						//для transpose необходимо брать offset перевернутого range
-						offset = transposeRange.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+						callAdress = new AscCommon.CellAddress(value2[0].sId);
+						offset = new AscCommonExcel.CRangeOffset((transposeRange.bbox.c1 - callAdress.col + 1), (transposeRange.bbox.r1 - callAdress.row + 1));
 					}
 					else
 					{
-						offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+						callAdress = new AscCommon.CellAddress(value2[0].sId);
+						offset = new AscCommonExcel.CRangeOffset((range.bbox.c1 - callAdress.col + 1), (range.bbox.r1 - callAdress.row + 1));
 					}
-					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, val);
 
+					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[0].sFormula, null, val);
 					if (_p_.parse()) {
 						
 						if(specialPasteProps.transpose)
@@ -9730,16 +9730,15 @@
 						//arrFormula.push({range: range, val: "=" + assemb});
 					}
 				} else {
-					cellFrom = newVal.getCells();
+					cellFrom = newVal.getLeftTopCellNoEmpty();
 					if (isOneMerge && range && range.bbox) {
-						cellTo = t._getCell(range.bbox.c1, range.bbox.r1).getCells();
+						cellTo = t._getCell(range.bbox.c1, range.bbox.r1).getLeftTopCell();
 					} else {
-						cellTo = firstRange.getCells();
+						cellTo = firstRange.getLeftTopCell();
 					}
 
-					if (cellFrom && cellTo && cellFrom[0] && cellTo[0]) {
-						//cellTo[0].setValueData(cellFrom[0].getValueData());
-						rangeStyle.cellValueData2 = {valueData: cellFrom[0].getValueData(), cell: cellTo[0]};
+					if (cellFrom && cellTo) {
+						rangeStyle.cellValueData2 = {valueData: cellFrom.getValueData(), cell: cellTo};
 					}
 				}
 				
@@ -9806,10 +9805,10 @@
 		//если не вставляем форматированную таблицу, но формат необходимо вставить
 		if(specialPasteProps.format && !specialPasteProps.formatTable && rangeStyle.tableDxf)
 		{
-			var cells = range.getCells();
-			if(cells && cells[0])
+			var firstCell = range.getLeftTopCell();
+			if(firstCell)
 			{
-				cells[0].setStyle(rangeStyle.tableDxf);
+				firstCell.setStyle(rangeStyle.tableDxf);
 			}
 		}
 		
@@ -9903,10 +9902,10 @@
 
 		if(rangeStyle.tableDxfLocal && specialPasteProps.format)
 		{
-			var cells = range.getCells();
-			if(cells && cells[0])
+			var firstCell = range.getLeftTopCell();
+			if(firstCell)
 			{
-				cells[0].setStyle(rangeStyle.tableDxfLocal);
+				firstCell.setStyle(rangeStyle.tableDxfLocal);
 			}
 		}
 
