@@ -692,6 +692,8 @@ function CEditorPage(api)
 			{
 				window.editor.sync_endDemonstration();
 			};
+
+			window.onkeydown = this.onKeyDown;
 		}
 		// --------------------------------------------------------------------------
 
@@ -3421,6 +3423,9 @@ function CEditorPage(api)
 
 			if (this.m_oApi.isMobileVersion)
 				this.initEventsMobile();
+
+			if (this.m_oApi.isReporterMode)
+				AscCommon.g_inputContext.HtmlArea.style.display = "none";
 		}
 	};
 
@@ -3703,7 +3708,7 @@ function CEditorPage(api)
 			{
 				this.m_oApi.DemonstrationGoToSlide(lPageNum);
 			}
-			return;
+			//return;
 		}
 
 		var drDoc = this.m_oDrawingDocument;
