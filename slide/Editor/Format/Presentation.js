@@ -1931,7 +1931,8 @@ CPresentation.prototype =
                 }
             }
             this.Slides[this.CurPage].graphicObjects.paragraphAdd(ParaItem, bRecalculate);
-            if(AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects) instanceof AscFormat.CGraphicFrame){
+            var oTargetTextObject = AscFormat.getTargetTextObject(this.Slides[this.CurPage].graphicObjects);
+            if(!oTargetTextObject || (oTargetTextObject instanceof AscFormat.CGraphicFrame)){
                 bRecalculate = false;
             }
             if(oMathShape)
@@ -2853,12 +2854,7 @@ CPresentation.prototype =
             var ParaPr = this.GetCalculatedParaPr();
             if ( null != ParaPr )
             {
-                if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-                {
-                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
-                    this.SetParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
-                    this.Document_UpdateInterfaceState();
-                }
+                this.SetParagraphAlign( ParaPr.Jc === align_Justify ? align_Left : align_Justify );
                 bRetValue = keydownresult_PreventAll;
             }
         }
@@ -2873,12 +2869,7 @@ CPresentation.prototype =
         {
             if ( true === e.ShiftKey ) // Ctrl + Shift + L - добавляем список к данному параграфу
             {
-                if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
-                {
-                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphNumberingHotKey);
-                    this.SetParagraphNumbering( { Type : 0, SubType : 1 } );
-                    this.Document_UpdateInterfaceState();
-                }
+                this.SetParagraphNumbering( { Type : 0, SubType : 1 } );
                 bRetValue = keydownresult_PreventAll;
             }
             else // Ctrl + L - переключение прилегания параграфа между left и justify
@@ -2886,12 +2877,7 @@ CPresentation.prototype =
                 var ParaPr = this.GetCalculatedParaPr();
                 if ( null != ParaPr )
                 {
-                    if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-                    {
-                        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphNumberingHotKey);
-                        this.SetParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
-                        this.Document_UpdateInterfaceState();
-                    }
+                    this.SetParagraphAlign( ParaPr.Jc === align_Left ? align_Justify : align_Left );
                     bRetValue = keydownresult_PreventAll;
                 }
             }
@@ -2934,12 +2920,7 @@ CPresentation.prototype =
             var ParaPr = this.GetCalculatedParaPr();
             if ( null != ParaPr )
             {
-                if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
-                {
-                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey4);
-                    this.SetParagraphAlign( ParaPr.Jc === AscCommon.align_Right ? align_Left : AscCommon.align_Right );
-                    this.Document_UpdateInterfaceState();
-                }
+                this.SetParagraphAlign( ParaPr.Jc === AscCommon.align_Right ? align_Left : AscCommon.align_Right );
                 bRetValue = keydownresult_PreventAll;
             }
         }
@@ -2974,13 +2955,10 @@ CPresentation.prototype =
         }
         else if ( e.KeyCode == 86 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + V - paste
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Drawing_Props) )
+            if ( true === e.ShiftKey ) // Ctrl + Shift + V - вставляем по образцу
             {
-                if ( true === e.ShiftKey ) // Ctrl + Shift + V - вставляем по образцу
-                {
-                    this.Document_Format_Paste();
-                    bRetValue = keydownresult_PreventAll;
-                }
+                this.Document_Format_Paste();
+                bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 89 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + Y - Redo
@@ -3737,7 +3715,13 @@ CPresentation.prototype =
                      }*/
                 }
                 else{
-                    this.Api.sendEvent("asc_onTextLanguage", this.Get_DefaultLanguage());
+                    if(text_pr){
+                        var lang = text_pr && text_pr.Lang.Val ? text_pr.Lang.Val :  this.Get_DefaultLanguage();
+                        this.Api.sendEvent("asc_onTextLanguage", lang);
+                    }
+                    else{
+                        this.Api.sendEvent("asc_onTextLanguage", this.Get_DefaultLanguage());
+                    }
                 }
             }
         }

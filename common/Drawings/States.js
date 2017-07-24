@@ -107,14 +107,15 @@ StartAddNewShape.prototype =
 
                 if(oResult){
                     var oObject = AscCommon.g_oTableId.Get_ById(oResult.objectId);
-                    if(oObject.getObjectType() === AscDFH.historyitem_type_Shape){
-                        this.drawingObjects.connector = oObject;
-                    }
+                    this.drawingObjects.connector = oObject;
                 }
                 if(this.drawingObjects.connector !== this.oldConnector){
+                    this.oldConnector = this.drawingObjects.connector;
                     this.drawingObjects.updateOverlay();
                 }
-                this.oldConnector = this.drawingObjects.connector;
+                else{
+                    this.oldConnector = this.drawingObjects.connector;
+                }
             }
         }
     },
@@ -694,7 +695,7 @@ RotateState.prototype =
                             var oMapOriginalsId = {};
                             for(i = 0; i < tracks.length; ++i)
                             {
-                                tracks[i].trackEnd(false, false);
+                                tracks[i].trackEnd(false, ((oThis instanceof MoveInGroupState) || (oThis instanceof MoveState)));
                                 if(tracks[i].originalObject && !tracks[i].processor3D){
                                     oOriginalObjects.push(tracks[i].originalObject);
                                     oMapOriginalsId[tracks[i].originalObject.Get_Id()] = true;

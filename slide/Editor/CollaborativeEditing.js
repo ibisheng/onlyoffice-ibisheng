@@ -336,7 +336,7 @@ CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
         editor.CoAuthoringApi.askLock( aIds, this.OnCallback_AskLock );
 
         // Ставим глобальный лок, только во время совместного редактирования
-        if ( true === this.m_bUse )
+        if ( -1 === this.m_nUseType )
 		{
 			this.Set_GlobalLock(true);
 		}

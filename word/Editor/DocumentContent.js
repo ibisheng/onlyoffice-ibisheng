@@ -1344,7 +1344,7 @@ CDocumentContent.prototype.RecalculateCurPos = function()
 CDocumentContent.prototype.Get_PageBounds = function(CurPage, Height, bForceCheckDrawings)
 {
 	if (this.Pages.length <= 0)
-		return {Top : 0, Left : 0, Right : 0, Bottom : 0};
+		return new CDocumentBounds(0, 0, 0, 0);
 
 	if (CurPage < 0)
 		CurPage = 0;

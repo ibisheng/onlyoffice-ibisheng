@@ -292,6 +292,10 @@
 			_ret = false;
 		return _ret;
 	};
+	baseEditorsApi.prototype.isCopyOutEnabled                = function()
+	{
+		return true;
+	};
 	// target pos
 	baseEditorsApi.prototype.asc_LockTargetUpdate		     = function(isLock)
 	{
