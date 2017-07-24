@@ -7668,4 +7668,142 @@ $( function () {
 
 	});
 
+	function putDataForDatabase(){
+		ws.getRange2( "A1" ).setValue( "Tree" );
+		ws.getRange2( "A2" ).setValue( "Apple" );
+		ws.getRange2( "A3" ).setValue( "Pear" );
+
+		ws.getRange2( "A4" ).setValue( "Tree" );
+
+		ws.getRange2( "A5" ).setValue( "Apple" );
+		ws.getRange2( "A6" ).setValue( "Pear" );
+		ws.getRange2( "A7" ).setValue( "Cherry" );
+		ws.getRange2( "A8" ).setValue( "Apple" );
+		ws.getRange2( "A9" ).setValue( "Pear" );
+		ws.getRange2( "A10" ).setValue( "Apple" );
+
+
+		ws.getRange2( "B1" ).setValue( "Height" );
+		ws.getRange2( "B2" ).setValue( ">10" );
+		ws.getRange2( "B3" ).setValue( "" );
+
+		ws.getRange2( "B4" ).setValue( "Height" );
+
+		ws.getRange2( "B5" ).setValue( "18" );
+		ws.getRange2( "B6" ).setValue( "12" );
+		ws.getRange2( "B7" ).setValue( "13" );
+		ws.getRange2( "B8" ).setValue( "14" );
+		ws.getRange2( "B9" ).setValue( "9" );
+		ws.getRange2( "B10" ).setValue( "8" );
+
+
+		ws.getRange2( "C1" ).setValue( "Age" );
+		ws.getRange2( "C2" ).setValue( "" );
+		ws.getRange2( "C3" ).setValue( "" );
+
+		ws.getRange2( "C4" ).setValue( "Age" );
+
+		ws.getRange2( "C5" ).setValue( "20" );
+		ws.getRange2( "C6" ).setValue( "12" );
+		ws.getRange2( "C7" ).setValue( "14" );
+		ws.getRange2( "C8" ).setValue( "15" );
+		ws.getRange2( "C9" ).setValue( "8" );
+		ws.getRange2( "C10" ).setValue( "9" );
+
+
+		ws.getRange2( "C1" ).setValue( "Age" );
+		ws.getRange2( "C2" ).setValue( "" );
+		ws.getRange2( "C3" ).setValue( "" );
+
+		ws.getRange2( "C4" ).setValue( "Age" );
+
+		ws.getRange2( "C5" ).setValue( "20" );
+		ws.getRange2( "C6" ).setValue( "12" );
+		ws.getRange2( "C7" ).setValue( "14" );
+		ws.getRange2( "C8" ).setValue( "15" );
+		ws.getRange2( "C9" ).setValue( "8" );
+		ws.getRange2( "C10" ).setValue( "9" );
+
+
+		ws.getRange2( "D1" ).setValue( "Yield" );
+		ws.getRange2( "D2" ).setValue( "" );
+		ws.getRange2( "D3" ).setValue( "" );
+
+		ws.getRange2( "D4" ).setValue( "Yield" );
+
+		ws.getRange2( "D5" ).setValue( "14" );
+		ws.getRange2( "D6" ).setValue( "10" );
+		ws.getRange2( "D7" ).setValue( "9" );
+		ws.getRange2( "D8" ).setValue( "10" );
+		ws.getRange2( "D9" ).setValue( "8" );
+		ws.getRange2( "D10" ).setValue( "6" );
+
+
+		ws.getRange2( "E1" ).setValue( "Profit" );
+		ws.getRange2( "E2" ).setValue( "" );
+		ws.getRange2( "E3" ).setValue( "" );
+
+		ws.getRange2( "E4" ).setValue( "Profit" );
+
+		ws.getRange2( "E5" ).setValue( "105" );
+		ws.getRange2( "E6" ).setValue( "96" );
+		ws.getRange2( "E7" ).setValue( "105" );
+		ws.getRange2( "E8" ).setValue( "75" );
+		ws.getRange2( "E9" ).setValue( "76.8" );
+		ws.getRange2( "E10" ).setValue( "45" );
+
+		ws.getRange2( "F1" ).setValue( "Height" );
+		ws.getRange2( "F2" ).setValue( "<16" );
+		ws.getRange2( "F3" ).setValue( "" );
+    }
+
+	//database formulas
+	test( "Test: \"DAVERAGE\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DAVERAGE(A4:E10, "Yield", A1:B2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 12 );
+
+		oParser = new parserFormula( 'DAVERAGE(A4:E10, 3, A4:E10)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 13 );
+
+	});
+
+	test( "Test: \"DCOUNT\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DCOUNT(A4:E10, "Age", A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+	});
+
+	test( "Test: \"DCOUNTA\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DCOUNTA(A4:E10, "Profit", A1:F2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+	});
+
+	test( "Test: \"DGET\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DGET(A4:E10, "Yield", A1:A3)', "AA2", ws );
+		ok( oParser.parse(), 'DGET(A4:E10, "Yield", A1:A3)' );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", 'DGET(A4:E10, "Yield", A1:A3)' );
+
+		oParser = new parserFormula( 'DGET(A4:E10, "Yield", A1:F2)', "AA2", ws );
+		ok( oParser.parse(), 'DGET(A4:E10, "Yield", A1:F2)' );
+		strictEqual( oParser.calculate().getValue(), 10, 'DGET(A4:E10, "Yield", A1:F2)' );
+
+	});
+
 } );
