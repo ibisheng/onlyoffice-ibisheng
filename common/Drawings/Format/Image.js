@@ -643,29 +643,7 @@ CImageShape.prototype.draw = function(graphics, transform)
     this.brush = oldBrush;
     this.pen = oldPen;
 
-    if(!this.group)
-    {
-        var oLock;
-        if(this.parent instanceof ParaDrawing)
-        {
-            oLock = this.parent.Lock;
-        }
-        else if(this.Lock)
-        {
-            oLock = this.Lock;
-        }
-        if(oLock && AscCommon.locktype_None != oLock.Get_Type())
-        {
-            var bCoMarksDraw = true;
-            if(typeof editor !== "undefined" && editor && AscFormat.isRealBool(editor.isCoMarksDraw)){
-                bCoMarksDraw = editor.isCoMarksDraw;
-            }
-            if(bCoMarksDraw){
-                graphics.transform3(_transform);
-                graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
-            }
-        }
-    }
+    this.drawLocks(_transform, graphics);
     graphics.reset();
     graphics.SetIntegerGrid(true);
 };
