@@ -5912,6 +5912,45 @@ background-repeat: no-repeat;\
 
 			this.reporterStartObject = null;
 			_this.reporterWindow.postMessage(JSON.stringify(_msg_), '*');
+
+			return;
+		}
+
+		try
+		{
+			var _obj = JSON.parse(e.data);
+
+			if (undefined == _obj["reporter_command"])
+				return;
+
+			switch (_obj["reporter_command"])
+			{
+				case "end":
+				{
+					_this.EndDemonstration();
+					break;
+				}
+				case "next":
+				{
+					_this.DemonstrationNextSlide();
+					break;
+				}
+				case "prev":
+				{
+					_this.DemonstrationPrevSlide();
+					break;
+				}
+				case "slide":
+				{
+					_this.DemonstrationGoToSlide(_obj["slide"]);
+					break;
+				}
+				default:
+					break;
+			}
+		}
+		catch (err)
+		{
 		}
 	};
 
@@ -5951,6 +5990,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
 	{
 		this.WordControl.DemonstrationManager.GoToSlide(slideNum);
+
+		if (this.isReporterMode)
+			window.postMessage("{ \"reporter_command\" : \"slide\", \"slide\" : " + slideNum + " }", "*");
 	};
 
 	asc_docs_api.prototype.SetDemonstrationModeOnly = function()

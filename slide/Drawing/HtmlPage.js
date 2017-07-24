@@ -642,9 +642,56 @@ function CEditorPage(api)
 
 			_buttonsContent += "<div class=\"separator block_elem_no_select\" id=\"dem_id_sep\" style=\"left: 185px; bottom: 3px;\"></div>";
 
-			_buttonsContent += "<label class=\"block_elem_no_select\" id=\"dem_id_slides\" style=\"color:#666666;text-shadow: none;white-space: nowrap;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; position:absolute; left:207px; bottom: 7px;\">Slide 1 of 3</label>";
+			_buttonsContent += "<label class=\"block_elem_no_select\" id=\"dem_id_slides\" style=\"color:#666666;text-shadow: none;white-space: nowrap;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; position:absolute; left:207px; bottom: 7px;\"></label>";
 
 			demBottonsDiv.innerHTML = _buttonsContent;
+
+			// events
+			this.m_oApi.asc_registerCallback("asc_onDemonstrationSlideChanged", function (slideNum)
+			{
+				var _elem = document.getElementById("dem_id_slides");
+				if (!_elem)
+					return;
+
+				var _count = window.editor.getCountPages();
+				var _current = slideNum + 1;
+				if (_current > _count)
+					_current = _count;
+
+				_elem.innerHTML = "Slide " + _current + " of " + _count;
+			});
+
+			this.m_oApi.asc_registerCallback("asc_onEndDemonstration", function ()
+			{
+				try
+				{
+					window.postMessage("{ \"reporter_command\" : \"end\" }", "*");
+				}
+				catch (err)
+				{
+				}
+			});
+
+			document.getElementById("dem_id_end").onclick = function() {
+
+				window.editor.EndDemonstration();
+
+			};
+			document.getElementById("dem_id_prev").onclick = function() {
+
+				window.editor.DemonstrationPrevSlide();
+
+			};
+			document.getElementById("dem_id_next").onclick = function() {
+
+				window.editor.DemonstrationNextSlide();
+
+			};
+
+			window.onbeforeunload = function(e)
+			{
+				window.editor.sync_endDemonstration();
+			};
 		}
 		// --------------------------------------------------------------------------
 
@@ -3645,9 +3692,17 @@ function CEditorPage(api)
 
 	this.GoToPage = function(lPageNum, isFromZoom, bIsAttack)
 	{
-		if (this.m_oApi.isReporterMode && !this.DemonstrationManager.Mode)
+		if (this.m_oApi.isReporterMode)
 		{
-			this.m_oApi.StartDemonstration("id_reporter_dem", 0);
+			if (!this.DemonstrationManager.Mode)
+			{
+				// first run
+				this.m_oApi.StartDemonstration("id_reporter_dem", 0);
+			}
+			else
+			{
+				this.m_oApi.DemonstrationGoToSlide(lPageNum);
+			}
 			return;
 		}
 
