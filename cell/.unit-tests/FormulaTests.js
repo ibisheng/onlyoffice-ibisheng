@@ -7668,6 +7668,18 @@ $( function () {
 
 	});
 
+	test( "Test: \"BITAND\"", function () {
+
+		oParser = new parserFormula( 'BITAND(1,5)', "AA2", ws );
+		ok( oParser.parse(), 'BITAND(1,5)' );
+		strictEqual( oParser.calculate().getValue(), 1, 'BITAND(1,5)' );
+
+		oParser = new parserFormula( 'BITAND(13,25)', "AA2", ws );
+		ok( oParser.parse(), 'BITAND(13,25)' );
+		strictEqual( oParser.calculate().getValue(), 9, 'BITAND(13,25)' );
+
+	});
+
 	function putDataForDatabase(){
 		ws.getRange2( "A1" ).setValue( "Tree" );
 		ws.getRange2( "A2" ).setValue( "Apple" );
