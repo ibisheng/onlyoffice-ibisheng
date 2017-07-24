@@ -2309,21 +2309,42 @@ CPresentation.prototype =
 	SetImageProps : function(Props)
     {
         var oController = this.GetCurrentController();
-        oController && oController.checkSelectedObjectsAndCallback(oController.applyDrawingProps, [Props], false, AscDFH.historydescription_Presentation_SetImageProps);
+        if(!oController){
+            return;
+        }
+        var aAdditionalObjects = null;
+        if(AscFormat.isRealNumber(Props.Width) && AscFormat.isRealNumber(Props.Height)){
+            aAdditionalObjects = oController.getConnectorsForCheck2();
+        }
+        oController.checkSelectedObjectsAndCallback(oController.applyDrawingProps, [Props], false, AscDFH.historydescription_Presentation_SetImageProps, aAdditionalObjects);
         this.Document_UpdateInterfaceState();
     },
 
     ShapeApply: function(shapeProps)
     {
         var oController = this.GetCurrentController();
-        oController && oController.checkSelectedObjectsAndCallback(oController.applyDrawingProps, [shapeProps], false, AscDFH.historydescription_Presentation_SetShapeProps);
+        if(!oController){
+            return;
+        }
+        var aAdditionalObjects = null;
+        if(AscFormat.isRealNumber(shapeProps.Width) && AscFormat.isRealNumber(shapeProps.Height)){
+            aAdditionalObjects = oController.getConnectorsForCheck2();
+        }
+        oController.checkSelectedObjectsAndCallback(oController.applyDrawingProps, [shapeProps], false, AscDFH.historydescription_Presentation_SetShapeProps, aAdditionalObjects);
         this.Document_UpdateInterfaceState();
     },
 
     ChartApply: function(chartProps)
     {
         var oController = this.GetCurrentController();
-        oController && oController.checkSelectedObjectsAndCallback(oController.applyDrawingProps, [chartProps], false, AscDFH.historydescription_Presentation_ChartApply);
+        if(!oController){
+            return;
+        }
+        var aAdditionalObjects = null;
+        if(AscFormat.isRealNumber(chartProps.Width) && AscFormat.isRealNumber(chartProps.Height)){
+            aAdditionalObjects = oController.getConnectorsForCheck2();
+        }
+        oController.checkSelectedObjectsAndCallback(oController.applyDrawingProps, [chartProps], false, AscDFH.historydescription_Presentation_ChartApply, aAdditionalObjects);
         this.Document_UpdateInterfaceState();
     },
 

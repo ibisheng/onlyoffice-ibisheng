@@ -201,6 +201,8 @@ CGraphicObjects.prototype =
     trackResizeObjects: DrawingObjectsController.prototype.trackResizeObjects,
     resetInternalSelection: DrawingObjectsController.prototype.resetInternalSelection,
     handleTextHit: DrawingObjectsController.prototype.handleTextHit,
+    getConnectorsForCheck: DrawingObjectsController.prototype.getConnectorsForCheck,
+    getConnectorsForCheck2: DrawingObjectsController.prototype.getConnectorsForCheck2,
 
     AddContentControl: function(nContentControlType)
     {
