@@ -644,6 +644,55 @@
 
 	cDVAR.prototype = Object.create(cBaseFunction.prototype);
 	cDVAR.prototype.constructor = cDVAR;
+	cDVAR.prototype.argumentsMin = 3;
+	cDVAR.prototype.argumentsMax = 3;
+	cDVAR.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[1] = argClone[1].tocString();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2], true);
+		if(cElementType.error === resArr.type){
+			return resArr;
+		}
+
+		function _var(x) {
+			if (x.length < 1) {
+				return new cError(cErrorType.division_by_zero);
+			}
+
+			var i, tA = [], sumSQRDeltaX = 0, _x = 0, xLength = 0;
+			for (i = 0; i < x.length; i++) {
+
+				if (cElementType.number === x[i].type) {
+					_x += x[i].getValue();
+					tA.push(x[i].getValue());
+					xLength++;
+				} else if (cElementType.error === x[i].type) {
+					return x[i];
+				}
+
+			}
+
+			_x /= xLength;
+
+			for (i = 0; i < x.length; i++) {
+				sumSQRDeltaX += (tA[i] - _x) * (tA[i] - _x)
+			}
+
+			return new cNumber(sumSQRDeltaX / (xLength - 1));
+		}
+
+		var res = _var(resArr);
+		return this.value = /*cElementType.error === res.type ? new cNumber(0) :*/ res;
+	};
 
 	/**
 	 * @constructor
