@@ -7680,6 +7680,14 @@ $( function () {
 
 	});
 
+	test( "Test: \"BITOR\"", function () {
+
+		oParser = new parserFormula( 'BITOR(23,10)', "AA2", ws );
+		ok( oParser.parse());
+		strictEqual( oParser.calculate().getValue(), 31 );
+
+	});
+
 	function putDataForDatabase(){
 		ws.getRange2( "A1" ).setValue( "Tree" );
 		ws.getRange2( "A2" ).setValue( "Apple" );

@@ -935,11 +935,11 @@
 	};
 
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
-	cFormulaFunctionGroup['Engineering'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cBIN2DEC, cBIN2HEX, cBIN2OCT, cBITAND,
-		cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA, cERF, cERF_PRECISE, cERFC, cERFC_PRECISE, cGESTEP, cHEX2BIN,
-		cHEX2DEC, cHEX2OCT, cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS, cIMCOSH, cIMCOT, cIMCSC, cIMCSCH,
-		cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER, cIMPRODUCT, cIMREAL, cIMSEC, cIMSECH, cIMSIN, cIMSINH,
-		cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN, cOCT2DEC, cOCT2HEX);
+	cFormulaFunctionGroup['Engineering'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cBIN2DEC, cBIN2HEX, cBIN2OCT,
+		cBITAND, cBITOR, cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA, cERF, cERF_PRECISE, cERFC,
+		cERFC_PRECISE, cGESTEP, cHEX2BIN, cHEX2DEC, cHEX2OCT, cIMABS, cIMAGINARY, cIMARGUMENT, cIMCONJUGATE, cIMCOS,
+		cIMCOSH, cIMCOT, cIMCSC, cIMCSCH, cIMDIV, cIMEXP, cIMLN, cIMLOG10, cIMLOG2, cIMPOWER, cIMPRODUCT, cIMREAL,
+		cIMSEC, cIMSECH, cIMSIN, cIMSINH, cIMSQRT, cIMSUB, cIMSUM, cIMTAN, cOCT2BIN, cOCT2DEC, cOCT2HEX);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cCONVERT);
@@ -1244,6 +1244,46 @@
 			}
 
 			var res = arg0 & arg1;
+			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cBITOR() {
+		cBaseFunction.call(this, "BITOR");
+	}
+
+	cBITOR.prototype = Object.create(cBaseFunction.prototype);
+	cBITOR.prototype.constructor = cBITOR;
+	cBITOR.prototype.argumentsMin = 2;
+	cBITOR.prototype.argumentsMax = 2;
+	cBITOR.prototype.isXLFN = true;
+	cBITOR.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFunc = function(argArray){
+			var arg0 = Math.floor(argArray[0]);
+			var arg1 = Math.floor(argArray[1]);
+
+			if ( arg0 < 0 || arg1 < 0 /*|| arg0 > 2^48 || arg1 > 2^48*/){
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			var res = arg0 | arg1;
 			return null !== res && !isNaN(res) ? new cNumber(res) : new cError(cErrorType.wrong_value_type);
 		};
 
