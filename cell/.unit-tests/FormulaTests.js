@@ -7806,4 +7806,88 @@ $( function () {
 
 	});
 
+	test( "Test: \"DMAX\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DMAX(A4:E10, "Profit", A1:F3)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 96 );
+
+	});
+
+	test( "Test: \"DMIN\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DMIN(A4:E10, "Profit", A1:F3)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 75 );
+
+	});
+
+	test( "Test: \"DPRODUCT\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DPRODUCT(A4:E10, "Yield", A1:F3)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 800 );
+
+	});
+
+	test( "Test: \"DSTDEV\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DSTDEV(A4:E10, "Yield", A1:F3)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(4) - 0, 1.1547);
+
+	});
+
+	test( "Test: \"DSTDEVP\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DSTDEVP(A4:E10, "Yield", A1:F3)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.942809);
+
+	});
+
+	test( "Test: \"DSUM\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DSUM(A4:E10,"Profit",A1:A2)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 225);
+
+		oParser = new parserFormula( 'DSUM(A4:E10,"Profit", A1:F3)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 247.8);
+
+	});
+
+	test( "Test: \"DVAR\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DVAR(A4:E10, "Yield", A1:A3)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(1) - 0, 8.8);
+
+	});
+
+	test( "Test: \"DVARP\"", function () {
+
+		putDataForDatabase();
+
+		oParser = new parserFormula( 'DVARP(A4:E10, "Yield", A1:A3)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(2) - 0, 7.04);
+
+	});
+
 } );

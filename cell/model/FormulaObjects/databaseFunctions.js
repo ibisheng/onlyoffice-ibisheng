@@ -412,8 +412,7 @@
 
 	cDMIN.prototype = Object.create(cBaseFunction.prototype);
 	cDMIN.prototype.constructor = cDMIN;
-	//TODO пока не добавляю в список формул, нужно протестировать
-	/*cDMIN.prototype.argumentsMin = 3;
+	cDMIN.prototype.argumentsMin = 3;
 	cDMIN.prototype.argumentsMax = 3;
 	cDMIN.prototype.Calculate = function (arg) {
 
@@ -438,7 +437,7 @@
 
 		var res = new cNumber(resArr[0]);
 		return this.value = cElementType.error === res.type ? new cNumber(0) : res;
-	};*/
+	};
 
 
 	/**
