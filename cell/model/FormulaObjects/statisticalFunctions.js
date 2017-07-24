@@ -52,6 +52,7 @@
 	var cEmpty = AscCommonExcel.cEmpty;
 	var cArray = AscCommonExcel.cArray;
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
+	var checkTypeCell = AscCommonExcel.checkTypeCell;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	var _func = AscCommonExcel._func;
@@ -1597,45 +1598,39 @@
 		}
 
 		arg1 = arg1.toString();
-		var val;
+		var r = arg0.getRange();
+		var r2 = arg2.getRange();
+		ws = arg0.getWS();
 		matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
 		if (cElementType.cellsRange === arg0.type) {
-			ws = arg0.getWS();
-			var tmpCellArg0 = arg0.getRange().getCells()[0], tmpCellArg2 = arg2.getRange(), offset, bbox, r2;
 			arg0.foreach2(function (v, cell) {
 				if (matching(v, matchingInfo)) {
-					offset = cell.getOffset(tmpCellArg0);
-					tmpCellArg2 = arg2.getRange();
-					tmpCellArg2.setOffset(offset);
-					bbox = tmpCellArg2.getBBox0();
+					var offset = cell.getOffset3(r.bbox.c1 + 1, r.bbox.r1 + 1);
+					r2.setOffset(offset);
+
+					var val = checkTypeCell(ws._getCellNoEmpty(r2.bbox.r1, r2.bbox.c1));
+
 					offset.offsetCol *= -1;
 					offset.offsetRow *= -1;
+					r2.setOffset(offset);
 
-					r2 = new cRef(ws.getRange3(bbox.r1, bbox.c1, bbox.r1, bbox.c1).getName(), ws);
-
-					tmpCellArg2.setOffset(offset);
-
-					if (cElementType.number === r2.getValue().type) {
-						_sum += r2.getValue().getValue();
+					if (cElementType.number === val.type) {
+						_sum += val.getValue();
 						_count++;
 					}
 				}
 			})
 		} else {
-			val = arg0.getValue();
-			if (matching(val, matchingInfo)) {
-				var r = arg0.getRange();
-				ws = arg0.getWS();
-				var r1 = r.bbox.r1, c1 = arg2.getRange().bbox.c1;
-				r = new cRef(ws.getRange3(r1, c1, r1, c1).getName(), ws);
-				if (cElementType.number === r.getValue().type) {
-					_sum += r.getValue().getValue();
+			if (matching(arg0.getValue(), matchingInfo)) {
+				var val = checkTypeCell(ws._getCellNoEmpty(r.bbox.r1, r2.bbox.c1));
+				if (cElementType.number === val.type) {
+					_sum += val.getValue();
 					_count++;
 				}
 			}
 		}
 
-		if (_count == 0) {
+		if (0 === _count) {
 			return new cError(cErrorType.division_by_zero);
 		} else {
 			return this.value = new cNumber(_sum / _count);
