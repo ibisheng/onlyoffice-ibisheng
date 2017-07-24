@@ -177,7 +177,11 @@ function CEditorPage(api)
 	this.m_oOverlay                             = null;
 	this.m_oOverlayApi                          = new AscCommon.COverlay();
 	this.m_oOverlayApi.m_bIsAlwaysUpdateOverlay = true;
-	// ->
+
+	// reporter mode
+	this.m_oDemonstrationDivParent = null;
+	this.m_oDemonstrationDivId = null;
+	// TODO: buttons
 	// ------------------------------------------------------------------
 
 	// scrolls api
@@ -376,16 +380,30 @@ function CEditorPage(api)
 
 	this.Init = function()
 	{
+		if (this.m_oApi.isReporterMode)
+		{
+			var _elem = document.getElementById(this.Name);
+			if (_elem)
+				_elem.style.overflow = "hidden";
+		}
+
 		this.m_oBody = CreateControlContainer(this.Name);
 
 		this.Splitter1Pos    = 70;
 		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 10 : 0;
+
 		this.OldSplitter1Pos = this.Splitter1Pos;
 
 		this.Splitter1PosMin = 20;
 		this.Splitter1PosMax = 80;
 		this.Splitter2PosMin = 10;
 		this.Splitter2PosMax = 100;
+
+		if (this.m_oApi.isReporterMode)
+		{
+			this.Splitter2Pos = 90;
+			this.Splitter2PosMax = 200;
+		}
 
 		var ScrollWidthMm  = this.ScrollWidthPx * g_dKoef_pix_to_mm;
 		var ScrollWidthMm9 = 10 * g_dKoef_pix_to_mm;
@@ -538,7 +556,7 @@ function CEditorPage(api)
 		// ----------
 
 		this.m_oMainView = CreateControlContainer("id_main_view");
-		this.m_oMainView.Bounds.SetParams(5, 7, this.m_oApi.isMobileVersion ? 0 : ScrollWidthMm, 0, true, true, true, true, -1, -1);
+		this.m_oMainView.Bounds.SetParams(5, 7, (this.m_oApi.isMobileVersion || this.m_oApi.isReporterMode) ? 0 : ScrollWidthMm, 0, true, true, true, true, -1, -1);
 		this.m_oMainView.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
 		this.m_oMainContent.AddControl(this.m_oMainView);
 
@@ -551,6 +569,83 @@ function CEditorPage(api)
 		this.m_oOverlay.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
 		this.m_oOverlay.Anchor = (g_anchor_left | g_anchor_top | g_anchor_right | g_anchor_bottom);
 		this.m_oMainView.AddControl(this.m_oOverlay);
+
+		if (this.m_oApi.isReporterMode)
+		{
+			var _documentParent = document.createElement("div");
+			_documentParent.setAttribute("id", "id_reporter_dem_parent");
+			_documentParent.setAttribute("class", "block_elem");
+			_documentParent.style.overflow = "hidden";
+			_documentParent.style.zIndex = 11;
+			_documentParent.style.backgroundColor = GlobalSkin.BackgroundColor;
+			this.m_oMainView.HtmlElement.appendChild(_documentParent);
+
+			this.m_oDemonstrationDivParent = CreateControlContainer("id_reporter_dem_parent");
+			this.m_oDemonstrationDivParent.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, -1);
+			this.m_oDemonstrationDivParent.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
+			this.m_oMainView.AddControl(this.m_oDemonstrationDivParent);
+
+			var _documentDem = document.createElement("div");
+			_documentDem.setAttribute("id", "id_reporter_dem");
+			_documentDem.setAttribute("class", "block_elem");
+			_documentDem.style.overflow = "hidden";
+			_documentDem.style.backgroundColor = GlobalSkin.BackgroundColor;
+			_documentParent.appendChild(_documentDem);
+
+			this.m_oDemonstrationDivId = CreateControlContainer("id_reporter_dem");
+			this.m_oDemonstrationDivId.Bounds.SetParams(0, 0, 1000, 8, false, false, false, true, -1, -1);
+			this.m_oDemonstrationDivId.Anchor = (g_anchor_left | g_anchor_right | g_anchor_top | g_anchor_bottom);
+			this.m_oDemonstrationDivParent.AddControl(this.m_oDemonstrationDivId);
+
+			// bottons
+			var demBottonsDiv = document.createElement("div");
+			demBottonsDiv.setAttribute("id", "id_reporter_dem_controller");
+			demBottonsDiv.setAttribute("class", "block_elem");
+			demBottonsDiv.style.overflow = "hidden";
+			demBottonsDiv.style.backgroundColor = GlobalSkin.BackgroundColor;
+			_documentParent.appendChild(demBottonsDiv);
+
+			var _ctrl = CreateControlContainer("id_reporter_dem_controller");
+			_ctrl.Bounds.SetParams(0, 0, 1000, 1000, false, false, false, false, -1, 8);
+			_ctrl.Anchor = (g_anchor_left | g_anchor_right | g_anchor_bottom);
+			this.m_oDemonstrationDivParent.AddControl(_ctrl);
+
+			var _head = document.getElementsByTagName('head')[0];
+
+			var styleContent = ".block_elem_no_select { -khtml-user-select: none; user-select: none; -moz-user-select: none; -webkit-user-select: none; }";
+			styleContent += ".back_image_buttons1 { position:absolute; left: 0px; top: 0px; background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAABkCAQAAABwKJtjAAADqklEQVR42u2ZwUtUXRiHP4ecVFJwvqG+Lyj6+FpZCmhBhArYExlWYJuaJHcO0LZ9MwGt3Akhhvuo2rRyqUD/hTASukn/heTX5eVCB7zzngsxBXGey728B37wcI73Hs/L/PVLSSQYYwvFcxrTlkrkGOUuzViozmuOeB4Tq67XOtLzmJgBpllmwhVTzYRHmbie1XKk1Ux4lImznCemwgTLTDOQ1d3FLLLLFmP5SNhVoF3UrraU52QU6bnEY+4ymo+adp3U84ZjGlYGnBTrjY51IndSzCwrXLYyoEg8xBr7zEfFQ1rTvuaj4lPcZIkLMbHBHHtsMOwstaE57WlDw85SG5ynwQz93lLnMMImHWZtrg4a0aY6ynJyc1SZpcG/NtcYLHDAqis2tKADrSqa4yJL3DBxDGq8M3EE1fROJXKcBhMnEonEnwTiLbV4TtJblcjR5Bany4lXOWChhHhVB1ooIb7BEhdLiLN7hg6bjPji7J5RR5sa8cXZ/Q8NZql2VWKX1cNssMdcoTLH6mFtaE+FufAfP/3M0OB817mGMM8+awzGTlea177WNBg7XXGBJW5yyhcbNDhm3RUbauhY667Y4DIrTLtLnfcSuyz6S533Erta9Jc67yUec8l5uYJeouq9XEEv4eRoBr1Exf+cnnFovYSLpGc6tF7ChSZjeS/hg6yXiCL96CV8sfUSPSORSCQQ6/SX2rfWVSJHk2kq5cSf2KFeQvxJO6qXEN/hPgNlxBVe0WEiKq7olTqaiIr7uE6DWlRsz0d85aEvtucjfdVDX2zP/3nKfzGxwSRfaNHniA1N6ota6nPEBnWeMBUTG5zlMx8544gNndVnfdQZR2wwyANu0++LDc5xyAdXbOicDvUhJjb1Mnji8Iw55IjDM+aQK3bOmDneqTrEO1WHOKfq391H/P7Oiff8XWrLfC/LRcXYvtUzEolEgivOOEBXnHEAo/44h3G+8SIYt7LxeIF2XN8U5NTKxgU5aqwwGYynWKFWrH6JTG1aRLvLjF9KpjatpC45rtHE1KZtOscfU7dCraNuhVpHPRXTGrQR267WUFvStqs1THnPtDFMu22li2lL5Ex7Lx5rIXZswV1skXdsweMzvu/OOHylaDvq4JVS29S+Nv43pm1aw1ObznKeOtR5avuOQxVt5zsOcmo73/FUue/4asmdK8x5O1fN37l+nkQikUAIhVUxMsKqmOAnL6scsd155YntzitPbHdQ9V6cxEmcxD3fQHpPIvEdp1IcZyrRbHYAAAAASUVORK5CYII=') }";
+			styleContent += ".back_image_buttons2 { position:absolute; left: 0px; top: 0px; background-image: url('data:image/png;base64,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') }";
+			styleContent += ".btn-text-default { position: absolute; background: #fff; border: 1px solid #cfcfcf; border-radius: 2px; color: #444444; font-size: 11px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; height: 20px; cursor: pointer; }";
+			styleContent += ".btn-text-default-img { background-repeat: no-repeat; position: absolute; background: transparent; border: none; color: #444444; font-size: 11px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; height: 22px; cursor: pointer; }";
+			styleContent += ".btn-text-default-img:focus { outline: 0; outline-offset: 0; } .btn-text-default-img:hover { background-color: #d8dadc; }";
+			styleContent += ".btn-text-default-img:active, .btn-text-default.active { background-color: #7d858c !important; color: white; -webkit-box-shadow: none; box-shadow: none; }";
+			styleContent += ".btn-text-default:focus { outline: 0; outline-offset: 0; } .btn-text-default:hover { background-color: #d8dadc; }";
+			styleContent += ".btn-text-default:active, .btn-text-default.active { background-color: #7d858c !important; color: white; -webkit-box-shadow: none; box-shadow: none; }";
+			styleContent += ".separator { margin: 0px 10px; height: 19px; display: inline-block; position: absolute; border-left: 1px solid #cbcbcb; vertical-align: top; padding: 0; width: 0; box-sizing: border-box; }";
+			styleContent += ".btn-play { background-position: 0px -40px; } .btn-play:active { background-position: -20px -40px; }";
+			styleContent += ".btn-prev { background-position: 0px 0px; } .btn-prev:active { background-position: -20px 0px; }";
+			styleContent += ".btn-next { background-position: 0px -20px; } .btn-next:active { background-position: -20px -20px; }";
+
+			var style		 = document.createElement('style');
+			style.type 	 = 'text/css';
+			style.innerHTML = styleContent;
+			_head.appendChild(style);
+
+			var _buttonsContent = "";
+			_buttonsContent += "<label class=\"block_elem_no_select\" id=\"dem_id_time\" style=\"color:#666666;text-shadow: none;white-space: nowrap;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; position:absolute; left:10px; bottom: 7px;\">00:00:00</label>";
+			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_play\" style=\"left: 60px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-play back_image_buttons1\" style=\"width:100%;height:100%;\"></span></button>";
+			_buttonsContent += "<button class=\"btn-text-default\"     id=\"dem_id_reset\" style=\"left: 85px; bottom: 3px; \">Reset</button>";
+			_buttonsContent += "<button class=\"btn-text-default\"     id=\"dem_id_end\" style=\"right: 10px; bottom: 3px; \">End slideshow</button>";
+
+			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_prev\"  style=\"left: 150px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-prev back_image_buttons1\" style=\"width:100%;height:100%;\"></span></button>";
+			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_next\"  style=\"left: 170px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-next back_image_buttons1\" style=\"width:100%;height:100%;\"></span></button>";
+
+			_buttonsContent += "<div class=\"separator block_elem_no_select\" id=\"dem_id_sep\" style=\"left: 185px; bottom: 3px;\"></div>";
+
+			_buttonsContent += "<label class=\"block_elem_no_select\" id=\"dem_id_slides\" style=\"color:#666666;text-shadow: none;white-space: nowrap;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; position:absolute; left:207px; bottom: 7px;\">Slide 1 of 3</label>";
+
+			demBottonsDiv.innerHTML = _buttonsContent;
+		}
 		// --------------------------------------------------------------------------
 
 		this.m_oDrawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
@@ -587,6 +682,9 @@ function CEditorPage(api)
 
 		this.m_oNotesApi = new CNotesDrawer(this);
 		this.m_oNotesApi.Init();
+
+		if (this.m_oApi.isReporterMode)
+			this.m_oApi.StartDemonstration(this.Name, 0);
 	};
 
 	this.CheckRetinaDisplay = function()
@@ -1540,11 +1638,15 @@ function CEditorPage(api)
 
 			if (1 == oWordControl.SplitterType)
 			{
+				var isCanUnShowThumbnails = true;
+				if (oWordControl.m_oApi.isReporterMode)
+					isCanUnShowThumbnails = false;
+
 				var _min = parseInt(oWordControl.Splitter1PosMin * g_dKoef_mm_to_pix);
 				var _max = parseInt(oWordControl.Splitter1PosMax * g_dKoef_mm_to_pix);
 				if (_x > _max)
 					_x = _max;
-				else if (_x < (_min / 2))
+				else if ((_x < (_min / 2)) && isCanUnShowThumbnails)
 					_x = 0;
 				else if (_x < _min)
 					_x = _min;
@@ -2510,6 +2612,8 @@ function CEditorPage(api)
 		//console.log("resize");
 		this.CheckRetinaDisplay();
 		this.m_oBody.Resize(this.Width * g_dKoef_pix_to_mm, this.Height * g_dKoef_pix_to_mm, this);
+		if (this.m_oApi.isReporterMode)
+			this.OnResizeReporter();
 		this.onButtonTabsDraw();
 
 		if (AscCommon.g_inputContext)
@@ -2572,6 +2676,45 @@ function CEditorPage(api)
 
 		if (this.IsSupportNotes && this.m_oNotesApi)
 			this.m_oNotesApi.OnResize();
+	};
+
+	this.OnResizeReporter = function()
+	{
+		if (this.m_oApi.isReporterMode)
+		{
+			var _label1 = document.getElementById("dem_id_time");
+			if (!_label1)
+				return;
+
+			var _buttonPlay = document.getElementById("dem_id_play");
+			var _buttonReset = document.getElementById("dem_id_reset");
+			var _buttonPrev = document.getElementById("dem_id_prev");
+			var _buttonNext = document.getElementById("dem_id_next");
+			var _buttonSeparator = document.getElementById("dem_id_sep");
+			var _labelMain = document.getElementById("dem_id_slides");
+
+			var _width = parseInt(this.m_oMainView.HtmlElement.style.width);
+			var _posStart = 10;
+			if (_width >= 340)
+			{
+				_label1.style.display = "block";
+				_buttonPlay.style.display = "block";
+				_buttonReset.style.display = "block";
+
+				_posStart = (_width >> 1) - 40;
+			}
+			else
+			{
+				_label1.style.display = "none";
+				_buttonPlay.style.display = "none";
+				_buttonReset.style.display = "none";
+			}
+
+			_buttonPrev.style.left = _posStart + "px";
+			_buttonNext.style.left = _posStart + 20 + "px";
+			_buttonSeparator.style.left = _posStart + 35 + "px";
+			_labelMain.style.left = _posStart + 57 + "px";
+		}
 	};
 
 	this.OnResize2 = function(isAttack)
@@ -2659,6 +2802,9 @@ function CEditorPage(api)
 	this.checkNeedHorScroll = function()
 	{
 		if (!this.m_oLogicDocument)
+			return false;
+
+		if (this.m_oApi.isReporterMode)
 			return false;
 
 		var oldVisible = this.m_bIsHorScrollVisible;
@@ -3499,6 +3645,12 @@ function CEditorPage(api)
 
 	this.GoToPage = function(lPageNum, isFromZoom, bIsAttack)
 	{
+		if (this.m_oApi.isReporterMode && !this.DemonstrationManager.Mode)
+		{
+			this.m_oApi.StartDemonstration("id_reporter_dem", 0);
+			return;
+		}
+
 		var drDoc = this.m_oDrawingDocument;
 
 		if (!this.m_oScrollVerApi)

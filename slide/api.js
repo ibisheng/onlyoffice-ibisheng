@@ -652,6 +652,31 @@
 		this.isReporterMode = ("reporter" == config['using']) ? true : false;
 
 		if (this.isReporterMode)
+		{
+			var _windowOnResize = function() {
+				if (undefined != window._resizeTimeout && -1 != window._resizeTimeout)
+					clearTimeout(window._resizeTimeout);
+				window._resizeTimeout = setTimeout(function() {
+					window.editor.Resize();
+					window._resizeTimeout = -1;
+				}, 50);
+			};
+
+			if (window.addEventListener)
+			{
+				window.addEventListener("resize", _windowOnResize, false);
+			}
+			else if (window.attachEvent)
+			{
+				window.attachEvent("onresize", _windowOnResize);
+			}
+			else
+			{
+				window["onresize"] = _windowOnResize;
+			}
+		}
+
+		if (this.isReporterMode)
 			this.watermarkDraw = null;
 
 		this._init();
@@ -5558,7 +5583,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		this.WordControl.setNodesEnable((this.isViewMode || this.isMobileVersion) ? false : true);
+		this.WordControl.setNodesEnable(((this.isViewMode || this.isMobileVersion) && !this.isReporterMode) ? false : true);
 		if (isViewMode)
 		{
 			this.ShowParaMarks          = false;
@@ -5819,7 +5844,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num, reporterStartObject)
 	{
-		if (reporterStartObject)
+		if (reporterStartObject && !this.isReporterMode)
 			this.DemonstrationReporterStart(reporterStartObject);
 
 		this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);

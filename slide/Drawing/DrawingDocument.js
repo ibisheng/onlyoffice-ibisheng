@@ -5335,6 +5335,9 @@ function CSlideDrawer()
 
 	this.CheckSlide = function(slideNum)
 	{
+		if (this.m_oWordControl.m_oApi.isReporterMode)
+			return;
+
 		if (this.m_oWordControl.m_oApi.isSaveFonts_Images)
 		{
 			this.IsRecalculateSlide = true;
@@ -5460,6 +5463,9 @@ function CSlideDrawer()
 
 	this.DrawSlide = function(outputCtx, scrollX, scrollX_max, scrollY, scrollY_max, slideNum)
 	{
+		if (this.m_oWordControl.m_oApi.isReporterMode)
+			return;
+
 		var _rect   = this.m_oWordControl.m_oDrawingDocument.SlideCurrectRect;
 		var _bounds = this.BoundsChecker.Bounds;
 
