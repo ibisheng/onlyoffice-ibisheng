@@ -3943,7 +3943,7 @@ CPresentation.prototype =
                     editor.UpdateTextPr(text_pr);
                 }
 
-                if(drawing_props.imageProps)
+                if(drawing_props.imageProps && !this.FocusOnNotes)
                 {
                     drawing_props.imageProps.Width = drawing_props.imageProps.w;
                     drawing_props.imageProps.Height = drawing_props.imageProps.h;
@@ -3955,14 +3955,14 @@ CPresentation.prototype =
                     editor.sync_ImgPropCallback(drawing_props.imageProps);
                 }
 
-                if(drawing_props.shapeProps)
+                if(drawing_props.shapeProps && !this.FocusOnNotes)
                 {
                     editor.sync_shapePropCallback(drawing_props.shapeProps);
                     editor.sync_VerticalTextAlign(drawing_props.shapeProps.verticalTextAlign);
                     editor.sync_Vert(drawing_props.shapeProps.vert);
                 }
 
-                if(drawing_props.chartProps && drawing_props.chartProps.chartProps)
+                if(drawing_props.chartProps && drawing_props.chartProps.chartProps && !this.FocusOnNotes)
                 {
                     if(this.bNeedUpdateChartPreview)
                     {
@@ -3973,7 +3973,7 @@ CPresentation.prototype =
                     editor.sync_ImgPropCallback(drawing_props.chartProps);
                 }
 
-                if(drawing_props.tableProps)
+                if(drawing_props.tableProps && !this.FocusOnNotes)
                 {
                     this.CheckTableStyles(this.Slides[this.CurPage], drawing_props.tableProps.TableLook);
                     editor.sync_TblPropCallback(drawing_props.tableProps);
