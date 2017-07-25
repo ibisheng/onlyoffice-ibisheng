@@ -1274,11 +1274,14 @@
 
 		if (true)
 		{
-			this.checkLongActionCallback(function ()
-			{
-				document.body.removeChild(_elem);
-				_elem = null;
-			}, null);
+			var fCallback = function ()
+            {
+                document.body.removeChild(_elem);
+                _elem = null;
+            };
+			if(this.checkLongActionCallback(fCallback, null)){
+                fCallback();
+			}
 		}
 		else
 		{
