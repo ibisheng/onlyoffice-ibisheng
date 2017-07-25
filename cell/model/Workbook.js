@@ -6149,19 +6149,6 @@
 	Range.prototype.getName=function(){
 		return this.bbox.getName();
 	};
-	Range.prototype.getCells=function(){
-		var aResult = [];
-		var oBBox = this.bbox;
-		if(!((0 == oBBox.c1 && gc_nMaxCol0 == oBBox.c2) || (0 == oBBox.r1 && gc_nMaxRow0 == oBBox.r2)))
-		{
-			for(var i = oBBox.r1; i <= oBBox.r2; i++){
-				for(var j = oBBox.c1; j <= oBBox.c2; j++){
-					aResult.push(this.worksheet._getCell(i, j));
-				}
-			}
-		}
-		return aResult;
-	};
 	Range.prototype.setValue=function(val,callback, isCopyPaste){
 		History.Create_NewPoint();
 		History.StartTransaction();
