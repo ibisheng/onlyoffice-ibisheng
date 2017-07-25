@@ -1653,6 +1653,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.updateSize = function(kw, kh)
         {
+            this.bIsTracked = true;
             var _kw, _kh;
             if(this.bSwapCoef)
             {
@@ -1807,7 +1808,8 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.bSwapCoef = !(AscFormat.checkNormalRotate(this.rot));
         this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
         this.centerDistY = this.y + this.extY*0.5 - this.parentTrack.extY*0.5;
-        this.geometry = originalObject.getGeom();
+
+        this.geometry = AscFormat.ExecuteNoHistory(function(){ return originalObject.getGeom().createDuplicate();}, this, []);
         if(this.geometry)
         {
             this.geometry.Recalculate(this.extX, this.extY);
