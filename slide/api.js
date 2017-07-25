@@ -5847,7 +5847,10 @@ background-repeat: no-repeat;\
 		if (reporterStartObject && !this.isReporterMode)
 			this.DemonstrationReporterStart(reporterStartObject);
 
-		this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
+		if (this.reporterWindow)
+			this.WordControl.DemonstrationManager.StartWaitReporter(div_id, slidestart_num, true);
+		else
+			this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
 	};
 
 	asc_docs_api.prototype.EndDemonstration = function(isNoUseFullScreen)
@@ -5948,6 +5951,10 @@ background-repeat: no-repeat;\
 				case "go_to_slide":
 				{
 					_this.WordControl.DemonstrationManager.GoToSlide(_obj["slide"]);
+				}
+				case "start_show":
+				{
+					_this.WordControl.DemonstrationManager.EndWaitReporter();
 				}
 				default:
 					break;
@@ -6285,6 +6292,14 @@ background-repeat: no-repeat;\
 		this.asc_setViewMode(this.isViewMode);
 
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
+
+		var _onbeforeunload = function() {
+			window.editor.EndDemonstration();
+		};
+		if ( window.attachEvent )
+			window.attachEvent('onbeforeunload', _onbeforeunload);
+		else
+			window.addEventListener('beforeunload', _onbeforeunload, false);
 	};
 
 	asc_docs_api.prototype._downloadAs = function(filetype, actionType, options)

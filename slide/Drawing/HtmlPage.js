@@ -3809,6 +3809,7 @@ function CEditorPage(api)
 				// first run
 				this.m_oApi.StartDemonstration("id_reporter_dem", 0);
 				this.m_oApi.sendEvent("asc_onDemonstrationFirstRun");
+				window.postMessage("{ \"reporter_command\" : \"start_show\" }", "*");
 			}
 			else
 			{

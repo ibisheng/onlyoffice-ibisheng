@@ -2700,6 +2700,8 @@ function CDemonstrationManager(htmlpage)
     this.SlideIndexes[0] = -1;
     this.SlideIndexes[1] = -1;
 
+    this.waitReporterObject = null;
+
     var oThis = this;
 
     this.CacheSlide = function(slide_num, slide_index)
@@ -2875,6 +2877,37 @@ function CDemonstrationManager(htmlpage)
         this.SlidesCount = this.HtmlPage.m_oDrawingDocument.SlidesCount;
         if (this.SlideNum > this.SlidesCount)
             this.SlideNum = this.SlidesCount;
+    }
+
+    this.StartWaitReporter = function(main_div_id, start_slide_num, is_play_mode)
+    {
+		var _parent = document.getElementById(main_div_id);
+		if (_parent)
+		{
+			var _elem = document.createElement('div');
+			_elem.setAttribute("id", "dem_id_wait_reporter");
+			_elem.setAttribute("style", "line-height:100%;overflow:hidden;position:absolute;margin:0px;padding:25% 0px 0px 0px;left:0px;top:0px;width:100%;height:100%;z-index:4;background-color:#000000;text-align:center;font-family:monospace;font-size:12pt;color:#FFFFFF;");
+			_elem.innerHTML = "WAITING...";
+			_parent.appendChild(_elem);
+		}
+
+		this.waitReporterObject = [main_div_id, start_slide_num, is_play_mode];
+    }
+
+    this.EndWaitReporter = function()
+    {
+		var _parent = document.getElementById(this.waitReporterObject[0]);
+		var _elem = document.getElementById("dem_id_wait_reporter");
+		try
+        {
+		    _parent.removeChild(_elem);
+        }
+        catch (err)
+        {
+        }
+
+        this.Start(this.waitReporterObject[0], this.waitReporterObject[1], this.waitReporterObject[2]);
+        this.waitReporterObject = null;
     }
 
     this.Start = function(main_div_id, start_slide_num, is_play_mode)
