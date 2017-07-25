@@ -8940,6 +8940,9 @@ function GenerateDefaultSlide(layout)
     var slide = new Slide(layout.Master.presentation, layout, 0);
     slide.Master = layout.Master;
     slide.Theme = layout.Master.Theme;
+    slide.setNotes(AscCommonSlide.CreateNotes());
+    slide.notes.setNotesMaster(layout.Master.presentation.notesMasters[0]);
+    slide.notes.setSlide(slide);
     return slide;
 }
 

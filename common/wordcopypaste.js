@@ -3910,6 +3910,12 @@ PasteProcessor.prototype =
 						    var oNotes = loader.ReadNote();
 						    oNotes.setNotesMaster(loader.presentation.notesMasters[0]);
 						    arr_slides[i].setNotes(oNotes);
+                            arr_slides[i].notes.setSlide(arr_slides[i]);
+                        }
+                        else{
+                            arr_slides[i].setNotes(AscCommonSlide.CreateNotes());
+                            arr_slides[i].notes.setNotesMaster(loader.presentation.notesMasters[0]);
+                            arr_slides[i].notes.setSlide(arr_slides[i]);
                         }
 						var sp_tree = arr_slides[i].cSld.spTree;
 						var t = 0;

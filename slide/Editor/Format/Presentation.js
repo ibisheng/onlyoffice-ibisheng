@@ -5009,6 +5009,9 @@ CPresentation.prototype =
 
             layout = AscFormat.isRealNumber(layoutIndex) ? (cur_slide.Layout.Master.sldLayoutLst[layoutIndex] ?  cur_slide.Layout.Master.sldLayoutLst[layoutIndex]:  cur_slide.Layout) : cur_slide.Layout.Master.getMatchingLayout(cur_slide.Layout.type, cur_slide.Layout.matchingName, cur_slide.Layout.cSld.name);
             new_slide = new Slide(this, layout, this.CurPage + 1);
+            new_slide.setNotes(AscCommonSlide.CreateNotes());
+            new_slide.notes.setNotesMaster(this.notesMasters[0]);
+            new_slide.notes.setSlide(new_slide);
             for(i = 0; i < layout.cSld.spTree.length; ++i)
             {
                 if(layout.cSld.spTree[i].isPlaceholder())
@@ -5041,6 +5044,9 @@ CPresentation.prototype =
 
 
             new_slide = new Slide(this, layout, this.CurPage + 1);
+            new_slide.setNotes(AscCommonSlide.CreateNotes());
+            new_slide.notes.setNotesMaster(this.notesMasters[0]);
+            new_slide.notes.setSlide(new_slide);
             for(i = 0; i < layout.cSld.spTree.length; ++i)
             {
                 if(layout.cSld.spTree[i].isPlaceholder())
