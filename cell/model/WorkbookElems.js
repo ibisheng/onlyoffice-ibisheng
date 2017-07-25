@@ -2547,7 +2547,7 @@ StyleManager.prototype =
 	},
 	setFontname : function(oItemWithXfs, val)
 	{
-		return this._setFontProperty(oItemWithXfs, val, Font.prototype.getName, function(val){
+		return this._setFontProperty(oItemWithXfs, val, "name", Font.prototype.getName, function(val){
 			this.setName(val);
 			this.setScheme(null);
 		}, "name");
