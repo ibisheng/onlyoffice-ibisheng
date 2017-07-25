@@ -7696,6 +7696,14 @@ $( function () {
 
 	});
 
+	test( "Test: \"BITRSHIFT\"", function () {
+
+		oParser = new parserFormula( 'BITRSHIFT(13,2)', "AA2", ws );
+		ok( oParser.parse());
+		strictEqual( oParser.calculate().getValue(), 3 );
+
+	});
+
 	test( "Test: \"BITLSHIFT\"", function () {
 
 		oParser = new parserFormula( 'BITLSHIFT(4,2)', "AA2", ws );
