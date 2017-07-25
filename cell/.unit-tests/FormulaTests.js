@@ -7696,6 +7696,14 @@ $( function () {
 
 	});
 
+	test( "Test: \"BITLSHIFT\"", function () {
+
+		oParser = new parserFormula( 'BITLSHIFT(4,2)', "AA2", ws );
+		ok( oParser.parse());
+		strictEqual( oParser.calculate().getValue(), 16 );
+
+	});
+
 	function putDataForDatabase(){
 		ws.getRange2( "A1" ).setValue( "Tree" );
 		ws.getRange2( "A2" ).setValue( "Apple" );
