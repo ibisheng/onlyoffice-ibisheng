@@ -811,8 +811,17 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex){
 };
 
 CShape.prototype.OnContentReDraw = function(){
-    if(AscCommonSlide && this.parent instanceof AscCommonSlide.Slide){
-        editor.WordControl.m_oLogicDocument.DrawingDocument.OnRecalculatePage(this.parent.num, editor.WordControl.m_oLogicDocument.Slides[this.parent.num]);
+    if(AscCommonSlide){
+        var oPresentation = editor.WordControl.m_oLogicDocument;
+        if(this.parent instanceof AscCommonSlide.Slide) {
+            oPresentation.DrawingDocument.OnRecalculatePage(this.parent.num, this.parent);
+        }
+        else if(this.parent instanceof AscCommonSlide.CNotes) {
+            var oCurSlide = oPresentation.Slides[oPresentation.CurPage];
+            if(oCurSlide && oCurSlide.notes === this.parent){
+                oPresentation.DrawingDocument.Notes_OnRecalculate(oPresentation.CurPage, oCurSlide.NotesWidth, oCurSlide.getNotesHeight());
+            }
+        }
     }
 };
 
