@@ -412,6 +412,12 @@ $( function () {
         return duration / p / frequency ;
     }
 
+	function numDivFact(num, fact){
+		var res = num / Math.fact(fact);
+		res = res.toString();
+		return res;
+	}
+
     var c_msPerDay = AscCommonExcel.c_msPerDay;
     var parserFormula = AscCommonExcel.parserFormula;
     var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
@@ -448,6 +454,8 @@ $( function () {
     /*QUnit.log( function ( details ) {
         console.log( "Log: " + details.name + ", result - " + details.result );
     } );*/
+
+	wb.dependencyFormulas.lockRecal();
 
     module( "Formula" );
 
@@ -1508,12 +1516,13 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), "#DIV/0!" );
     } );
 
-    test( "Test: \"ISNA(A1)\"", function () {
-        var r = ws.getRange2( "K1" );
-        ws.getRange2( "A1" ).setValue( "#N/A" );
-        r.setValue( "=ISNA(A1)" );
-        strictEqual( ws.getCell2( "K1" ).getValueWithFormat(), "TRUE" );
-    } );
+	test( "Test: \"ISNA(A1)\"", function () {
+		ws.getRange2( "A1" ).setValue( "#N/A" );
+
+		oParser = new parserFormula( "ISNA(A1)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "TRUE" );
+	} );
 
     test( "Test: \"ROUNDUP(31415.92654,-2)\"", function () {
         oParser = new parserFormula( "ROUNDUP(31415.92654,-2)", "A1", ws );
@@ -1672,10 +1681,10 @@ $( function () {
 
     test( "Test: \"SUM\"", function () {
 
-        ws.getRange2( "S5" ).setValue( "=1" );
-        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
-        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
-        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+		ws.getRange2( "S5" ).setValue( "1" );
+		ws.getRange2( "S6" ).setValue( numDivFact(-1, 2) );
+		ws.getRange2( "S7" ).setValue( numDivFact(1, 4) );
+		ws.getRange2( "S8" ).setValue( numDivFact(-1, 6) );
 
         oParser = new parserFormula( "SUM(S5:S8)", "A1", ws );
         ok( oParser.parse() );
@@ -1685,10 +1694,10 @@ $( function () {
 
     test( "Test: \"MAX\"", function () {
 
-        ws.getRange2( "S5" ).setValue( "=1" );
-        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
-        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
-        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+		ws.getRange2( "S5" ).setValue( "1" );
+		ws.getRange2( "S6" ).setValue( numDivFact(-1, 2) );
+		ws.getRange2( "S7" ).setValue( numDivFact(1, 4) );
+		ws.getRange2( "S8" ).setValue( numDivFact(-1, 6) );
 
         oParser = new parserFormula( "MAX(S5:S8)", "A1", ws );
         ok( oParser.parse() );
@@ -1724,10 +1733,10 @@ $( function () {
 
     test( "Test: \"MAXA\"", function () {
 
-        ws.getRange2( "S5" ).setValue( "=1" );
-        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
-        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
-        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+		ws.getRange2( "S5" ).setValue( "1" );
+		ws.getRange2( "S6" ).setValue( numDivFact(-1, 2) );
+		ws.getRange2( "S7" ).setValue( numDivFact(1, 4) );
+		ws.getRange2( "S8" ).setValue( numDivFact(-1, 6) );
 
         oParser = new parserFormula( "MAXA(S5:S8)", "A1", ws );
         ok( oParser.parse() );
@@ -1763,10 +1772,10 @@ $( function () {
 
     test( "Test: \"MIN\"", function () {
 
-        ws.getRange2( "S5" ).setValue( "=1" );
-        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
-        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
-        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+		ws.getRange2( "S5" ).setValue( "1" );
+		ws.getRange2( "S6" ).setValue( numDivFact(-1, 2) );
+		ws.getRange2( "S7" ).setValue( numDivFact(1, 4) );
+		ws.getRange2( "S8" ).setValue( numDivFact(-1, 6) );
 
         oParser = new parserFormula( "MIN(S5:S8)", "A1", ws );
         ok( oParser.parse() );
@@ -1802,10 +1811,10 @@ $( function () {
 
     test( "Test: \"MINA\"", function () {
 
-        ws.getRange2( "S5" ).setValue( "=1" );
-        ws.getRange2( "S6" ).setValue( "=-1/Fact(2)" );
-        ws.getRange2( "S7" ).setValue( "=1/Fact(4)" );
-        ws.getRange2( "S8" ).setValue( "=-1/Fact(6)" );
+		ws.getRange2( "S5" ).setValue( "1" );
+		ws.getRange2( "S6" ).setValue( numDivFact(-1, 2) );
+		ws.getRange2( "S7" ).setValue( numDivFact(1, 4) );
+		ws.getRange2( "S8" ).setValue( numDivFact(-1, 6) );
 
         oParser = new parserFormula( "MINA(S5:S8)", "A1", ws );
         ok( oParser.parse() );
@@ -1843,8 +1852,10 @@ $( function () {
         ws.getRange2( "S7" ).setValue( "1" );
         ws.getRange2( "S8" ).setValue( "2" );
         ws.getRange2( "S9" ).setValue( "3" );
-        ws.getRange2( "S10" ).setValue( "=SUM(S7:S9,{1,2,3})" );
-        strictEqual( ws.getCell2( "S10" ).getValueWithFormat(), "12" );
+
+		oParser = new parserFormula( "SUM(S7:S9,{1,2,3})", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 12 );
     } );
 
     test( "Test: ISREF", function () {
@@ -1860,6 +1871,7 @@ $( function () {
     } );
 
     test( "Test: rename sheet #1", function () {
+		wb.dependencyFormulas.unlockRecal();
         ws = wb.getWorksheet( 0 );
         ws.getRange2( "S95" ).setValue( "2" );
         ws = wb.getWorksheet( 1 );
@@ -1869,7 +1881,7 @@ $( function () {
         wb.getWorksheet( 0 ).setName( "ЛистTEMP" );
 
         strictEqual( ws.getCell2( "S100" ).getFormula(), wb.getWorksheet( 0 ).getName() + "!S95" );
-
+		wb.dependencyFormulas.lockRecal();
     } );
 
     test( "Test: wrong ref", function () {
@@ -2952,19 +2964,20 @@ $( function () {
 
     test( "Test: \"SERIESSUM\"", function () {
 
-        ws.getRange2( "A2" ).setValue( "=1" );
-        ws.getRange2( "A3" ).setValue( "=-1/Fact(2)" );
-        ws.getRange2( "A4" ).setValue( "=1/Fact(4)" );
-        ws.getRange2( "A5" ).setValue( "=-1/Fact(6)" );
+
+		ws.getRange2( "A2" ).setValue( "1" );
+		ws.getRange2( "A3" ).setValue( numDivFact(-1, 2) );
+		ws.getRange2( "A4" ).setValue( numDivFact(1, 4) );
+		ws.getRange2( "A5" ).setValue( numDivFact(-1, 6) );
 
         oParser = new parserFormula( "SERIESSUM(PI()/4,0,2,A2:A5)", "A7", ws );
         ok( oParser.parse() );
         ok( Math.abs( oParser.calculate().getValue() - (1 - 1 / 2 * Math.pow( Math.PI / 4, 2 ) + 1 / Math.fact( 4 ) * Math.pow( Math.PI / 4, 4 ) - 1 / Math.fact( 6 ) * Math.pow( Math.PI / 4, 6 )) ) < dif );
 
-        ws.getRange2( "B2" ).setValue( "=1" );
-        ws.getRange2( "B3" ).setValue( "=-1/Fact(3)" );
-        ws.getRange2( "B4" ).setValue( "=1/Fact(5)" );
-        ws.getRange2( "B5" ).setValue( "=-1/Fact(7)" );
+		ws.getRange2( "B2" ).setValue( "1" );
+		ws.getRange2( "B3" ).setValue( numDivFact(-1, 3) );
+		ws.getRange2( "B4" ).setValue( numDivFact(1, 5) );
+		ws.getRange2( "B5" ).setValue( numDivFact(-1, 7) );
 
         oParser = new parserFormula( "SERIESSUM(PI()/4,1,2,B2:B5)", "B7", ws );
         ok( oParser.parse() );
@@ -7934,4 +7947,5 @@ $( function () {
 
 	});
 
+	wb.dependencyFormulas.unlockRecal();
 } );
