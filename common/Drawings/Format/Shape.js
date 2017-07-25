@@ -3809,6 +3809,12 @@ CShape.prototype.hitInTextRect = function (x, y) {
     if(this.parent && this.parent.kind === AscFormat.TYPE_KIND.NOTES){
         return true;
     }
+
+
+    var bForceWord = ((this.isEmptyPlaceholder && this.isEmptyPlaceholder()) || (this.isPlaceholder && this.isPlaceholder() && oController && (AscFormat.getTargetTextObject(oController) === this)));
+    if(bForceWord){
+        return this.hitInTextRectWord(x, y);
+    }
     if(!this.txWarpStruct || !this.recalcInfo.warpGeometry ||
         this.recalcInfo.warpGeometry.preset === "textNoShape" ||
         oController && (AscFormat.getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
