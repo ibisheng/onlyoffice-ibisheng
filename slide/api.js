@@ -6293,13 +6293,17 @@ background-repeat: no-repeat;\
 
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
 
-		var _onbeforeunload = function() {
-			window.editor.EndDemonstration();
-		};
-		if ( window.attachEvent )
-			window.attachEvent('onbeforeunload', _onbeforeunload);
-		else
-			window.addEventListener('beforeunload', _onbeforeunload, false);
+		if (this.isReporterMode)
+		{
+			var _onbeforeunload = function ()
+			{
+				window.editor.EndDemonstration();
+			};
+			if (window.attachEvent)
+				window.attachEvent('onbeforeunload', _onbeforeunload);
+			else
+				window.addEventListener('beforeunload', _onbeforeunload, false);
+		}
 	};
 
 	asc_docs_api.prototype._downloadAs = function(filetype, actionType, options)
