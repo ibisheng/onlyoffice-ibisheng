@@ -2777,7 +2777,7 @@ CT_pivotTableDefinition.prototype.removeField = function (index) {
 			if (1 === this.pageFields.count) {
 				this.pageFields = null;
 			} else {
-				this.pageFields.remove(field);
+				this.pageFields.remove(index);
 			}
 			this.location.removeColPage();
 			break;
