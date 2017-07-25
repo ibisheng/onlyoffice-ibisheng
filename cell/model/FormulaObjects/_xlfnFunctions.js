@@ -51,7 +51,7 @@
 	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
 	cFormulaFunctionGroup['DateAndTime'].push(cDAYS, cISOWEEKNUM);
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
-	cFormulaFunctionGroup['Engineering'].push(cBITLSHIFT, cBITRSHIFT, cBITXOR);
+	cFormulaFunctionGroup['Engineering'].push(cBITLSHIFT, cBITRSHIFT);
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
@@ -67,7 +67,7 @@
 	cFormulaFunctionGroup['Information'].push(cSHEET, cSHEETS);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITLSHIFT, cBITRSHIFT, cBITXOR,
+	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITLSHIFT, cBITRSHIFT,
 		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
 		cAGGREGATE, cMUNIT, cFORMULATEXT, cSHEET, cSHEETS);
@@ -119,18 +119,6 @@
 
 	cBITRSHIFT.prototype = Object.create(cBaseFunction.prototype);
 	cBITRSHIFT.prototype.constructor = cBITRSHIFT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBITXOR() {
-		cBaseFunction.call(this, "BITXOR");
-		this.isXLFN = true;
-	}
-
-	cBITXOR.prototype = Object.create(cBaseFunction.prototype);
-	cBITXOR.prototype.constructor = cBITXOR;
 
 	/**
 	 * @constructor

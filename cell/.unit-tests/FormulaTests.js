@@ -7688,6 +7688,14 @@ $( function () {
 
 	});
 
+	test( "Test: \"BITXOR\"", function () {
+
+		oParser = new parserFormula( 'BITXOR(5,3)', "AA2", ws );
+		ok( oParser.parse());
+		strictEqual( oParser.calculate().getValue(), 6 );
+
+	});
+
 	function putDataForDatabase(){
 		ws.getRange2( "A1" ).setValue( "Tree" );
 		ws.getRange2( "A2" ).setValue( "Apple" );
