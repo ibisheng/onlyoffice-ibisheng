@@ -338,8 +338,41 @@ function CEditorPage(api)
 
 	this.NoneRepaintPages = false;
 
+	this.reporterTimer = -1;
+	this.reporterTimerAdd = 0;
+	this.reporterTimerLastStart = -1;
+
 	this.m_oApi = api;
 	var oThis   = this;
+
+	this.reporterTimerFunc = function(isReturn)
+	{
+		var _curTime = new Date().getTime();
+		_curTime -= oThis.reporterTimerLastStart;
+		_curTime += oThis.reporterTimerAdd;
+
+		if (isReturn)
+			return _curTime;
+
+		_curTime = (_curTime / 1000) >> 0;
+		var _sec = _curTime % 60;
+		_curTime = (_curTime / 60) >> 0;
+		var _min = _curTime % 60;
+		var _hrs = (_curTime / 60) >> 0;
+
+		if (100 >= _hrs)
+			_hrs = 0;
+
+		var _value = (_hrs > 9) ? ("" + _hrs) : ("0" + _hrs);
+		_value += ":";
+		_value += ((_min > 9) ? ("" + _min) : ("0" + _min));
+		_value += ":";
+		_value += ((_sec > 9) ? ("" + _sec) : ("0" + _sec));
+
+		var _elem = document.getElementById("dem_id_time");
+		if (_elem)
+			_elem.innerHTML = _value;
+	};
 
 	this.MainScrollLock   = function()
 	{
@@ -625,6 +658,7 @@ function CEditorPage(api)
 			styleContent += ".btn-play { background-position: 0px -40px; } .btn-play:active { background-position: -20px -40px; }";
 			styleContent += ".btn-prev { background-position: 0px 0px; } .btn-prev:active { background-position: -20px 0px; }";
 			styleContent += ".btn-next { background-position: 0px -20px; } .btn-next:active { background-position: -20px -20px; }";
+			styleContent += ".btn-pause { background-position: 0px -80px; } .btn-pause:active { background-position: -20px -80px; }";
 
 			var style		 = document.createElement('style');
 			style.type 	 = 'text/css';
@@ -633,7 +667,7 @@ function CEditorPage(api)
 
 			var _buttonsContent = "";
 			_buttonsContent += "<label class=\"block_elem_no_select\" id=\"dem_id_time\" style=\"color:#666666;text-shadow: none;white-space: nowrap;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; position:absolute; left:10px; bottom: 7px;\">00:00:00</label>";
-			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_play\" style=\"left: 60px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-play back_image_buttons1\" style=\"width:100%;height:100%;\"></span></button>";
+			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_play\" style=\"left: 60px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-play back_image_buttons1\" id=\"dem_id_play_span\" style=\"width:100%;height:100%;\"></span></button>";
 			_buttonsContent += "<button class=\"btn-text-default\"     id=\"dem_id_reset\" style=\"left: 85px; bottom: 3px; \">Reset</button>";
 			_buttonsContent += "<button class=\"btn-text-default\"     id=\"dem_id_end\" style=\"right: 10px; bottom: 3px; \">End slideshow</button>";
 
@@ -672,6 +706,18 @@ function CEditorPage(api)
 				}
 			});
 
+			this.m_oApi.asc_registerCallback("asc_onDemonstrationFirstRun", function ()
+			{
+				var _elem = document.getElementById("dem_id_play_span");
+				_elem.classList.remove("btn-play");
+				_elem.classList.add("btn-pause");
+
+				var _wordControl = window.editor.WordControl;
+				_wordControl.reporterTimerLastStart = new Date().getTime();
+				_wordControl.reporterTimer = setInterval(_wordControl.reporterTimerFunc, 1000);
+
+			});
+
 			document.getElementById("dem_id_end").onclick = function() {
 
 				window.editor.EndDemonstration();
@@ -685,6 +731,48 @@ function CEditorPage(api)
 			document.getElementById("dem_id_next").onclick = function() {
 
 				window.editor.DemonstrationNextSlide();
+
+			};
+			document.getElementById("dem_id_play").onclick = function() {
+
+				var _wordControl = window.editor.WordControl;
+				var _isNowPlaying = _wordControl.DemonstrationManager.IsPlayMode;
+				var _elem = document.getElementById("dem_id_play_span");
+
+				if (_isNowPlaying)
+				{
+					window.editor.DemonstrationPause();
+
+					_elem.classList.remove("btn-pause");
+					_elem.classList.add("btn-play");
+
+					if (-1 != _wordControl.reporterTimer)
+					{
+						clearInterval(_wordControl.reporterTimer);
+						_wordControl.reporterTimer = -1;
+					}
+
+					_wordControl.reporterTimerAdd = _wordControl.reporterTimerFunc(true);
+				}
+				else
+				{
+					window.editor.DemonstrationPlay();
+
+					_elem.classList.remove("btn-play");
+					_elem.classList.add("btn-pause");
+
+					_wordControl.reporterTimerLastStart = new Date().getTime();
+
+					_wordControl.reporterTimer = setInterval(_wordControl.reporterTimerFunc, 1000);
+				}
+			};
+
+			document.getElementById("dem_id_reset").onclick = function() {
+
+				var _wordControl = window.editor.WordControl;
+				_wordControl.reporterTimerAdd = 0;
+				_wordControl.reporterTimerLastStart = new Date().getTime();
+				_wordControl.reporterTimerFunc();
 
 			};
 
@@ -3713,6 +3801,7 @@ function CEditorPage(api)
 			{
 				// first run
 				this.m_oApi.StartDemonstration("id_reporter_dem", 0);
+				this.m_oApi.sendEvent("asc_onDemonstrationFirstRun");
 			}
 			else
 			{
