@@ -666,7 +666,7 @@ CPresentation.prototype =
 
     CanEdit: function()
     {
-        if (this.IsViewMode() ||this.IsEditCommentsMode())
+        if (this.IsViewMode() || this.IsEditCommentsMode())
             return false;
 
         return true;
@@ -5073,6 +5073,9 @@ CPresentation.prototype =
 
     shiftSlides: function(pos, array, bCopy)
     {
+        if(!this.CanEdit()){
+            return;
+        }
         History.Create_NewPoint(AscDFH.historydescription_Presentation_ShiftSlides);
         array.sort(AscCommon.fSortAscending);
         var deleted = [], i;
