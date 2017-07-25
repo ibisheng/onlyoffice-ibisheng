@@ -5945,8 +5945,45 @@ background-repeat: no-repeat;\
 					_this.DemonstrationGoToSlide(_obj["slide"]);
 					break;
 				}
+				case "go_to_slide":
+				{
+					_this.WordControl.DemonstrationManager.GoToSlide(_obj["slide"]);
+				}
 				default:
 					break;
+			}
+		}
+		catch (err)
+		{
+		}
+	};
+
+	asc_docs_api.prototype.DemonstrationToReporterMessages = function(e)
+	{
+		var _this = window.editor;
+
+		try
+		{
+			var _obj = JSON.parse(e.data);
+
+			if (undefined == _obj["main_command"])
+				return;
+
+			if (undefined !== _obj["keyCode"])
+			{
+				_this.WordControl.DemonstrationManager.onKeyDownCode(_obj["keyCode"]);
+			}
+			else if (undefined !== _obj["mouseUp"])
+			{
+				_this.WordControl.DemonstrationManager.onMouseUp({});
+			}
+			else if (undefined !== _obj["mouseWhell"])
+			{
+				_this.WordControl.DemonstrationManager.onMouseWheelDelta(_obj["mouseWhell"]);
+			}
+			else if (undefined !== _obj["resize"])
+			{
+				_this.WordControl.DemonstrationManager.Resize();
 			}
 		}
 		catch (err)

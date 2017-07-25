@@ -3215,6 +3215,9 @@ function CDemonstrationManager(htmlpage)
         if (!this.Mode)
             return;
 
+		if (this.HtmlPage.m_oApi.isReporterMode)
+			window.postMessage("{ \"reporter_command\" : \"go_to_slide\", \"slide\" : " + slideNum + " }", "*");
+
         this.CorrectSlideNum();
 
         if ((slideNum == this.SlideNum) || (slideNum < 0) || (slideNum >= this.SlidesCount))
@@ -3242,46 +3245,63 @@ function CDemonstrationManager(htmlpage)
     }
 
     // manipulators
+    this.onKeyDownCode = function(code)
+    {
+		switch (code)
+		{
+			case 13:    // enter
+			case 32:    // space
+			case 34:    // PgDn
+			case 39:    // right arrow
+			case 40:    // bottom arrow
+			{
+				oThis.NextSlide();
+				break;
+			}
+			case 33:
+			case 37:
+			case 38:
+			{
+				oThis.PrevSlide();
+				break;
+			}
+			case 36:    // home
+			{
+				oThis.GoToSlide(0);
+				break;
+			}
+			case 35:    // end
+			{
+				oThis.GoToSlide(this.SlidesCount - 1);
+				break;
+			}
+			case 27:    // escape
+			{
+				oThis.End();
+				break;
+			}
+			default:
+				break;
+		}
+    }
+
     this.onKeyDown = function(e)
     {
         AscCommon.check_KeyboardEvent(e);
 
-        switch (AscCommon.global_keyboardEvent.KeyCode)
+        if (oThis.HtmlPage.m_oApi.reporterWindow)
         {
-            case 13:    // enter
-            case 32:    // space
-            case 34:    // PgDn
-            case 39:    // right arrow
-            case 40:    // bottom arrow
-            {
-                oThis.NextSlide();
-                break;
-            }
-            case 33:
-            case 37:
-            case 38:
-            {
-                oThis.PrevSlide();
-                break;
-            }
-            case 36:    // home
-            {
-                oThis.GoToSlide(0);
-                break;
-            }
-            case 35:    // end
-            {
-                oThis.GoToSlide(this.SlidesCount - 1);
-                break;
-            }
-            case 27:    // escape
-            {
-                oThis.End();
-                break;
-            }
-            default:
-                break;
+			var _msg_ = {
+				"main_command"  : true,
+				"keyCode"       : AscCommon.global_keyboardEvent.KeyCode
+			};
+
+			oThis.HtmlPage.m_oApi.reporterWindow.postMessage(JSON.stringify(_msg_), "*");
+			oThis.HtmlPage.IsKeyDownButNoPress = true;
+			return false;
         }
+
+        this.onKeyDownCode(AscCommon.global_keyboardEvent.KeyCode);
 
         oThis.HtmlPage.IsKeyDownButNoPress = true;
         return false;
@@ -3301,6 +3321,19 @@ function CDemonstrationManager(htmlpage)
 
     this.onMouseUp = function(e)
     {
+		if (oThis.HtmlPage.m_oApi.reporterWindow)
+		{
+			var _msg_ = {
+				"main_command"  : true,
+				"mouseUp"       : true
+			};
+
+			oThis.HtmlPage.m_oApi.reporterWindow.postMessage(JSON.stringify(_msg_), "*");
+
+			AscCommon.stopEvent(e);
+			return false;
+		}
+
         // next slide
         oThis.CorrectSlideNum();
 
@@ -3327,8 +3360,20 @@ function CDemonstrationManager(htmlpage)
             }
         }
 
-        e.preventDefault();
+		AscCommon.stopEvent(e);
         return false;
+    }
+
+    this.onMouseWheelDelta = function(delta)
+    {
+		if (delta > 0)
+		{
+			this.NextSlide();
+		}
+		else
+		{
+			this.PrevSlide();
+		}
     }
 
     this.onMouseWhell = function(e)
@@ -3345,21 +3390,36 @@ function CDemonstrationManager(htmlpage)
         else
             delta = (e.detail > 0) ? 1 : -1;
 
-        if (delta > 0)
-        {
-            oThis.NextSlide();
-        }
-        else
-        {
-            oThis.PrevSlide();
-        }
+		if (oThis.HtmlPage.m_oApi.reporterWindow)
+		{
+			var _msg_ = {
+				"main_command"  : true,
+				"mouseWhell"    : delta
+			};
 
-        e.preventDefault();
+			oThis.HtmlPage.m_oApi.reporterWindow.postMessage(JSON.stringify(_msg_), "*");
+			AscCommon.stopEvent(e);
+			return false;
+		}
+
+        oThis.onMouseWheelDelta(delta);
+
+        AscCommon.stopEvent(e);
         return false;
     }
 
     this.Resize = function()
     {
+		if (oThis.HtmlPage.m_oApi.reporterWindow)
+		{
+			var _msg_ = {
+				"main_command"  : true,
+				"resize"        : true
+			};
+
+			oThis.HtmlPage.m_oApi.reporterWindow.postMessage(JSON.stringify(_msg_), "*");
+		}
+
         if (!this.Mode)
             return;
 

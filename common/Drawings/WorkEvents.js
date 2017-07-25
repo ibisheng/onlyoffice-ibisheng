@@ -56,6 +56,8 @@
 
 	AscCommon.stopEvent = function(e)
 	{
+		if (!e)
+			return;
 		if (e.preventDefault)
 			e.preventDefault();
 		if (e.stopPropagation)
