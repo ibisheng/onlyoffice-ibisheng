@@ -4215,8 +4215,8 @@ PasteProcessor.prototype =
 				arrShapes[arrShapes.length] = new DrawingCopyObject(shape, 0, 0, w, h);
 			}
 			var presentation = editor.WordControl.m_oLogicDocument;
-			var slide = presentation.Slides[presentation.CurPage];
-			var targetDocContent = slide.graphicObjects.getTargetDocContent();
+			var oController = presentation.GetCurrentController();
+			var targetDocContent =  oController  && oController.getTargetDocContent();
 			if(targetDocContent && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
 			{
 				if(presentation.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
