@@ -9915,5 +9915,6 @@ function CPres()
     window['AscCommon'].c_dScalePPTXSizes = c_dScalePPTXSizes;
     window['AscCommon'].CBuilderImages = CBuilderImages;
     window['AscCommon'].BinaryPPTYLoader = BinaryPPTYLoader;
+    window['AscCommon'].IsHiddenObj = IsHiddenObj;
     window['AscCommon'].pptx_content_loader = new CPPTXContentLoader();
 })(window);

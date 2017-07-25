@@ -74,6 +74,7 @@
 		this.lockBackground = null;
 		this.lockTranzition = null;
 		this.lockRemove     = null;
+		this.isHidden       = false;
 	}
 
 	CAscSlideProps.prototype.get_background     = function()
@@ -139,6 +140,10 @@
 	CAscSlideProps.prototype.put_LockRemove     = function(v)
 	{
 		this.lockRemove = v;
+	};
+	CAscSlideProps.prototype.get_IsHidden     = function()
+	{
+		return this.isHidden;
 	};
 
 	function CAscChartProp(obj)
@@ -641,6 +646,38 @@
 			if (window["NATIVE_EDITOR_ENJINE"])
 				editor = window.editor;
 		}
+
+		this.reporterWindow 		= null;
+		this.reporterStartObject 	= null;
+		this.isReporterMode = ("reporter" == config['using']) ? true : false;
+
+		if (this.isReporterMode)
+		{
+			var _windowOnResize = function() {
+				if (undefined != window._resizeTimeout && -1 != window._resizeTimeout)
+					clearTimeout(window._resizeTimeout);
+				window._resizeTimeout = setTimeout(function() {
+					window.editor.Resize();
+					window._resizeTimeout = -1;
+				}, 50);
+			};
+
+			if (window.addEventListener)
+			{
+				window.addEventListener("resize", _windowOnResize, false);
+			}
+			else if (window.attachEvent)
+			{
+				window.attachEvent("onresize", _windowOnResize);
+			}
+			else
+			{
+				window["onresize"] = _windowOnResize;
+			}
+		}
+
+		if (this.isReporterMode)
+			this.watermarkDraw = null;
 
 		this._init();
 	}
@@ -4377,7 +4414,7 @@ background-repeat: no-repeat;\
 		if (null == this.WordControl.m_oLogicDocument)
 			return;
 
-		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id))
+		if (false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id, this.WordControl.m_oLogicDocument.IsEditCommentsMode()))
 		{
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_RemoveComment);
 			this.WordControl.m_oLogicDocument.RemoveComment(Id, true);
@@ -5452,7 +5489,8 @@ background-repeat: no-repeat;\
 			obj.lockTranzition ||
 			obj.lockBackground || slide.isLockedObject();
 
-
+		var oTh = editor.WordControl.Thumbnails;
+		obj.isHidden = oTh.IsSlideHidden(oTh.GetSelectedArray());
 		var _len = this.SelectedObjectsStack.length;
 		if (_len > 0)
 		{
@@ -5545,7 +5583,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
-		this.WordControl.setNodesEnable((this.isViewMode || this.isMobileVersion) ? false : true);
+		this.WordControl.setNodesEnable(((this.isViewMode || this.isMobileVersion) && !this.isReporterMode) ? false : true);
 		if (isViewMode)
 		{
 			this.ShowParaMarks          = false;
@@ -5804,14 +5842,116 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onDemonstrationSlideChanged", slideNum);
 	};
 
-	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num)
+	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num, reporterStartObject)
 	{
+		if (reporterStartObject && !this.isReporterMode)
+			this.DemonstrationReporterStart(reporterStartObject);
+
 		this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
 	};
 
 	asc_docs_api.prototype.EndDemonstration = function(isNoUseFullScreen)
 	{
+		if (this.windowReporter)
+			this.windowReporter.close();
+
 		this.WordControl.DemonstrationManager.End(isNoUseFullScreen);
+	};
+
+	asc_docs_api.prototype.DemonstrationReporterStart = function(startObject)
+	{
+		this.reporterStartObject = startObject;
+
+		var dualScreenLeft = (window.screenLeft != undefined) ? window.screenLeft : screen.left;
+		var dualScreenTop = (window.screenTop != undefined) ? window.screenTop : screen.top;
+
+		var width = window.innerWidth ? window.innerWidth : document.documentElement.clientWidth ? document.documentElement.clientWidth : screen.width;
+		var height = window.innerHeight ? window.innerHeight : document.documentElement.clientHeight ? document.documentElement.clientHeight : screen.height;
+
+		var w = 800;
+		var h = 600;
+		var left = ((width / 2) - (w / 2)) + dualScreenLeft;
+		var top = ((height / 2) - (h / 2)) + dualScreenTop;
+
+		var _windowPos = "width=" + w + ",height=" + h + ",left=" + left + ",top=" + top;
+		this.reporterWindow = window.open("index.reporter.html", "_blank", "resizable=0,status=0,toolbar=0,location=0,menubar=0,directories=0,scrollbars=0," + _windowPos);
+
+		if (!this.reporterWindow)
+			return;
+
+		if ( this.reporterWindow.attachEvent )
+			this.reporterWindow.attachEvent('onmessage', this.DemonstrationReporterMessages);
+		else
+			this.reporterWindow.addEventListener('message', this.DemonstrationReporterMessages, false);
+	};
+
+	asc_docs_api.prototype.DemonstrationReporterEnd = function()
+	{
+		if (!this.reporterWindow)
+			return;
+
+		if ( this.reporterWindow.attachEvent )
+			this.reporterWindow.detachEvent('onmessage', this.DemonstrationReporterMessages);
+		else
+			this.reporterWindow.removeEventListener('message', this.DemonstrationReporterMessages, false);
+
+		this.reporterWindow.close();
+		this.reporterWindow = null;
+		this.reporterStartObject = null;
+	};
+
+	asc_docs_api.prototype.DemonstrationReporterMessages = function(e)
+	{
+		var _this = window.editor;
+		if ( e.data == 'i:am:ready' )
+		{
+			var _msg_ = {
+				type: 'file:open',
+				data: _this.reporterStartObject
+			};
+
+			this.reporterStartObject = null;
+			_this.reporterWindow.postMessage(JSON.stringify(_msg_), '*');
+
+			return;
+		}
+
+		try
+		{
+			var _obj = JSON.parse(e.data);
+
+			if (undefined == _obj["reporter_command"])
+				return;
+
+			switch (_obj["reporter_command"])
+			{
+				case "end":
+				{
+					_this.EndDemonstration();
+					break;
+				}
+				case "next":
+				{
+					_this.DemonstrationNextSlide();
+					break;
+				}
+				case "prev":
+				{
+					_this.DemonstrationPrevSlide();
+					break;
+				}
+				case "slide":
+				{
+					_this.DemonstrationGoToSlide(_obj["slide"]);
+					break;
+				}
+				default:
+					break;
+			}
+		}
+		catch (err)
+		{
+		}
 	};
 
 	asc_docs_api.prototype.DemonstrationPlay = function()
@@ -5850,6 +5990,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
 	{
 		this.WordControl.DemonstrationManager.GoToSlide(slideNum);
+
+		if (this.isReporterMode)
+			window.postMessage("{ \"reporter_command\" : \"slide\", \"slide\" : " + slideNum + " }", "*");
 	};
 
 	asc_docs_api.prototype.SetDemonstrationModeOnly = function()
@@ -5915,6 +6058,11 @@ background-repeat: no-repeat;\
 		_tr.Duration = _timing.TransitionDuration;
 
 		_tr.Start(true);
+	};
+
+	asc_docs_api.prototype.asc_HideSlides   = function(isHide)
+	{
+		this.WordControl.m_oLogicDocument.hideSlides(isHide);
 	};
 
 	asc_docs_api.prototype.sync_EndAddShape = function()
@@ -5983,6 +6131,7 @@ background-repeat: no-repeat;\
 			this.X_abs         = oData.X_abs;
 			this.Y_abs         = oData.Y_abs;
 			this.IsSlideSelect = oData.IsSlideSelect;
+			this.IsSlideHidden = oData.IsSlideHidden;
 		}
 		else
 		{
@@ -5990,6 +6139,7 @@ background-repeat: no-repeat;\
 			this.X_abs         = 0;
 			this.Y_abs         = 0;
 			this.IsSlideSelect = true;
+            this.IsSlideHidden = false;
 		}
 	}
 
@@ -6008,6 +6158,11 @@ background-repeat: no-repeat;\
 	CContextMenuData.prototype.get_IsSlideSelect = function()
 	{
 		return this.IsSlideSelect;
+	};
+
+	CContextMenuData.prototype.get_IsSlideHidden = function()
+	{
+		return this.IsSlideHidden;
 	};
 
 	asc_docs_api.prototype.sync_ContextMenuCallback = function(Data)
@@ -6921,6 +7076,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['ApplySlideTiming']                    = asc_docs_api.prototype.ApplySlideTiming;
 	asc_docs_api.prototype['SlideTimingApplyToAll']               = asc_docs_api.prototype.SlideTimingApplyToAll;
 	asc_docs_api.prototype['SlideTransitionPlay']                 = asc_docs_api.prototype.SlideTransitionPlay;
+	asc_docs_api.prototype['asc_HideSlides']                      = asc_docs_api.prototype.asc_HideSlides;
 	asc_docs_api.prototype['SetTextBoxInputMode']                 = asc_docs_api.prototype.SetTextBoxInputMode;
 	asc_docs_api.prototype['GetTextBoxInputMode']                 = asc_docs_api.prototype.GetTextBoxInputMode;
 	asc_docs_api.prototype['sync_EndAddShape']                    = asc_docs_api.prototype.sync_EndAddShape;
@@ -7000,6 +7156,7 @@ background-repeat: no-repeat;\
 	CContextMenuData.prototype['get_X']               = CContextMenuData.prototype.get_X;
 	CContextMenuData.prototype['get_Y']               = CContextMenuData.prototype.get_Y;
 	CContextMenuData.prototype['get_IsSlideSelect']   = CContextMenuData.prototype.get_IsSlideSelect;
+	CContextMenuData.prototype['get_IsSlideHidden']   = CContextMenuData.prototype.get_IsSlideHidden;
 	window['Asc']['CAscSlideProps']                   = CAscSlideProps;
 	CAscSlideProps.prototype['get_background']        = CAscSlideProps.prototype.get_background;
 	CAscSlideProps.prototype['put_background']        = CAscSlideProps.prototype.put_background;
@@ -7017,6 +7174,7 @@ background-repeat: no-repeat;\
 	CAscSlideProps.prototype['put_LockTranzition']    = CAscSlideProps.prototype.put_LockTranzition;
 	CAscSlideProps.prototype['get_LockRemove']        = CAscSlideProps.prototype.get_LockRemove;
 	CAscSlideProps.prototype['put_LockRemove']        = CAscSlideProps.prototype.put_LockRemove;
+	CAscSlideProps.prototype['get_IsHidden']          = CAscSlideProps.prototype.get_IsHidden;
 	window['Asc']['CAscChartProp']                    = CAscChartProp;
 	CAscChartProp.prototype['get_ChangeLevel']        = CAscChartProp.prototype.get_ChangeLevel;
 	CAscChartProp.prototype['put_ChangeLevel']        = CAscChartProp.prototype.put_ChangeLevel;

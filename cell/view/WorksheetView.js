@@ -4068,7 +4068,7 @@
     WorksheetView.prototype._cleanCellsTextMetricsCache = function () {
         var s = this.cache.sectors = [];
         var vr = this.visibleRange;
-        var h = vr.r2 + 1 - vr.r1;
+        var h = Math.max(Math.min(40, this.rows.length), vr.r2 + 1 - vr.r1);
         var rl = this.rows.length;
         var rc = asc_floor(rl / h) + (rl % h > 0 ? 1 : 0);
         var range = new asc_Range(0, 0, this.cols.length - 1, h - 1);
@@ -9702,8 +9702,7 @@
 						callAdress = new AscCommon.CellAddress(value2[0].sId);
 						offset = new AscCommonExcel.CRangeOffset((range.bbox.c1 - callAdress.col + 1), (range.bbox.r1 - callAdress.row + 1));
 					}
-
-					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[0].sFormula, null, val);
+					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, t.model);
 					if (_p_.parse()) {
 						
 						if(specialPasteProps.transpose)
@@ -11091,13 +11090,14 @@
 			.replace(/(\+)/g, "\\+").replace(/(\[)/g, "\\[")
 			.replace(/(\])/g, "\\]").replace(/(\{)/g, "\\{")
 			.replace(/(\})/g, "\\}").replace(/(\$)/g, "\\$")
+			.replace(/(\.)/g, "\\.")
 			.replace(/(~)?\*/g, function ($0, $1) {
 				return $1 ? $0 : '(.*)';
 			})
 			.replace(/(~)?\?/g, function ($0, $1) {
 				return $1 ? $0 : '.';
 			})
-			.replace(/(~\*)/g, "\\*").replace(/(~\?)/g, "\\?").replace(/(\.)/g, "\\.");
+			.replace(/(~\*)/g, "\\*").replace(/(~\?)/g, "\\?");
 		valueForSearching = new RegExp(valueForSearching, findFlags);
 
 		options.indexInArray = 0;

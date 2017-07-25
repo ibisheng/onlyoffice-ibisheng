@@ -211,6 +211,10 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     {
         editor.WordControl.m_oDrawingDocument.OnEndRecalculate();
     }
+    var oSlide = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
+    if(oSlide && oSlide.notesShape){
+        editor.WordControl.m_oDrawingDocument.Notes_OnRecalculate(editor.WordControl.m_oLogicDocument.CurPage, oSlide.NotesWidth, oSlide.getNotesHeight());
+    }
     editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     editor.WordControl.m_oLogicDocument.Document_UpdateUndoRedoState();
 
@@ -336,7 +340,7 @@ CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
         editor.CoAuthoringApi.askLock( aIds, this.OnCallback_AskLock );
 
         // Ставим глобальный лок, только во время совместного редактирования
-        if ( true === this.m_bUse )
+        if ( -1 === this.m_nUseType )
 		{
 			this.Set_GlobalLock(true);
 		}

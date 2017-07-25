@@ -50,27 +50,25 @@
 	/*new funcions with _xlnf-prefix*/
 	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
 	cFormulaFunctionGroup['DateAndTime'].push(cDAYS, cISOWEEKNUM);
-	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
-	cFormulaFunctionGroup['Engineering'].push(cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR);
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
-	cFormulaFunctionGroup['Financial'].push(cPDURATION, cRRI);
+	cFormulaFunctionGroup['Financial'].push(cPDURATION);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cAGGREGATE, cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
-	cFormulaFunctionGroup['Information'].push(cISFORMULA, cSHEET, cSHEETS);
+	cFormulaFunctionGroup['Information'].push(cSHEET, cSHEETS);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM, cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR,
+	cFormulaFunctionGroup['NotRealised'].push(cDAYS, cISOWEEKNUM,
 		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
-		cRRI, cAGGREGATE, cMUNIT, cFORMULATEXT, cISFORMULA, cSHEET, cSHEETS);
+		cAGGREGATE, cMUNIT, cFORMULATEXT, cSHEET, cSHEETS);
 
 	/**
 	 * @constructor
@@ -95,66 +93,6 @@
 
 	cBINOM_DIST_RANGE.prototype = Object.create(cBaseFunction.prototype);
 	cBINOM_DIST_RANGE.prototype.constructor = cBINOM_DIST_RANGE;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBITAND() {
-		cBaseFunction.call(this, "BITAND");
-		this.isXLFN = true;
-	}
-
-	cBITAND.prototype = Object.create(cBaseFunction.prototype);
-	cBITAND.prototype.constructor = cBITAND;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBITLSHIFT() {
-		cBaseFunction.call(this, "BITLSHIFT");
-		this.isXLFN = true;
-	}
-
-	cBITLSHIFT.prototype = Object.create(cBaseFunction.prototype);
-	cBITLSHIFT.prototype.constructor = cBITLSHIFT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBITOR() {
-		cBaseFunction.call(this, "BITOR");
-		this.isXLFN = true;
-	}
-
-	cBITOR.prototype = Object.create(cBaseFunction.prototype);
-	cBITOR.prototype.constructor = cBITOR;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBITRSHIFT() {
-		cBaseFunction.call(this, "BITRSHIFT");
-		this.isXLFN = true;
-	}
-
-	cBITRSHIFT.prototype = Object.create(cBaseFunction.prototype);
-	cBITRSHIFT.prototype.constructor = cBITRSHIFT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBITXOR() {
-		cBaseFunction.call(this, "BITXOR");
-		this.isXLFN = true;
-	}
-
-	cBITXOR.prototype = Object.create(cBaseFunction.prototype);
-	cBITXOR.prototype.constructor = cBITXOR;
 
 	/**
 	 * @constructor
@@ -292,18 +230,6 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
-	function cISFORMULA() {
-		cBaseFunction.call(this, "ISFORMULA");
-		this.isXLFN = true;
-	}
-
-	cISFORMULA.prototype = Object.create(cBaseFunction.prototype);
-	cISFORMULA.prototype.constructor = cISFORMULA;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
 	function cISOWEEKNUM() {
 		cBaseFunction.call(this, "ISOWEEKNUM");
 		this.isXLFN = true;
@@ -347,18 +273,6 @@
 
 	cQUERYSTRING.prototype = Object.create(cBaseFunction.prototype);
 	cQUERYSTRING.prototype.constructor = cQUERYSTRING;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cRRI() {
-		cBaseFunction.call(this, "RRI");
-		this.isXLFN = true;
-	}
-
-	cRRI.prototype = Object.create(cBaseFunction.prototype);
-	cRRI.prototype.constructor = cRRI;
 
 	/**
 	 * @constructor

@@ -56,6 +56,8 @@
 
         this.Master      = null;
 
+
+        this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
         this.kind = AscFormat.TYPE_KIND.NOTES;
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
         AscCommon.g_oTableId.Add(this, this.Id);
@@ -63,6 +65,23 @@
 
         this.graphicObjects = new AscFormat.DrawingObjectsController(this);
     }
+
+
+    CNotes.prototype.Clear_ContentChanges = function()
+    {
+        this.m_oContentChanges.Clear();
+    };
+
+    CNotes.prototype.Add_ContentChanges = function(Changes)
+    {
+        this.m_oContentChanges.Add( Changes );
+    };
+
+    CNotes.prototype.Refresh_ContentChanges = function()
+    {
+        this.m_oContentChanges.Refresh();
+    };
+
 
     CNotes.prototype.getObjectType = function(){
         return AscDFH.historyitem_type_Notes;

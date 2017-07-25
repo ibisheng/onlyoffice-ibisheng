@@ -2589,6 +2589,39 @@ DrawingObjectsController.prototype =
         }
     },
 
+    getConnectorsForCheck: function(){
+        var aSelectedObjects = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
+        var aAllConnectors = this.getAllConnectorsByDrawings(aSelectedObjects, [],  undefined, true);
+        var _ret = [];
+        for(var i = 0;  i < aAllConnectors.length; ++i){
+            if(!aAllConnectors[i].selected){
+                _ret.push(aAllConnectors[i]);
+            }
+        }
+        return _ret;
+    },
+    
+    getConnectorsForCheck2: function(){
+        var aConnectors = this.getConnectorsForCheck();
+        var oGroupMaps = {};
+        var _ret = [];
+        for(var i = 0; i < aConnectors.length; ++i){
+            var oGroup = aConnectors[i].getMainGroup();
+            if(oGroup){
+                oGroupMaps[oGroup.Id] = oGroup;
+            }
+            else{
+                _ret.push(aConnectors[i]);
+            }
+        }
+        for(i in oGroupMaps){
+            if(oGroupMaps.hasOwnProperty(i)){
+                _ret.push(oGroupMaps[i]);
+            }
+        }
+        return _ret;
+    },
+
     applyDrawingProps: function(props)
     {
         var objects_by_type = this.getSelectedObjectsByTypes(true);
@@ -2787,6 +2820,10 @@ DrawingObjectsController.prototype =
         }
 
         var aGroups = [];
+        var bCheckConnectors = false;
+        var oApi = editor || Asc['editor'];
+        var editorId = oApi.getEditorId();
+        var bMoveFlag = true;
         if(AscFormat.isRealNumber(props.Width) || AscFormat.isRealNumber(props.Height))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
@@ -2797,7 +2834,7 @@ DrawingObjectsController.prototype =
                     objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
                     if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
                     {
-                        objects_by_type.shapes[i].parent.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+                        objects_by_type.shapes[i].parent.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0});
                     }
                 }
                 if(!props.SizeRelV && AscFormat.isRealNumber(props.Height))
@@ -2817,7 +2854,7 @@ DrawingObjectsController.prototype =
                     }
                     if (oDrawing.SizeRelV && !oDrawing.SizeRelH)
                     {
-                        oDrawing.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+                        oDrawing.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0});
                     }
                 }
                 CheckShapeBodyAutoFitReset(objects_by_type.shapes[i], true);
@@ -2875,6 +2912,11 @@ DrawingObjectsController.prototype =
                     objects_by_type.oleObjects[i].checkDrawingBaseCoords();
                 }
             }
+
+            if(editorId === AscCommon.c_oEditorId.Presentation || editorId === AscCommon.c_oEditorId.Spreadsheet){
+                bCheckConnectors = true;
+                bMoveFlag = false;
+            }
         }
 
         if(AscFormat.isRealBool(props.lockAspect))
@@ -2927,7 +2969,23 @@ DrawingObjectsController.prototype =
                 }
                 objects_by_type.charts[i].checkDrawingBaseCoords();
             }
+
+            if(editorId === AscCommon.c_oEditorId.Presentation || editorId === AscCommon.c_oEditorId.Spreadsheet){
+                bCheckConnectors = true;
+            }
         }
+
+        if(bCheckConnectors){
+            var aConnectors = this.getConnectorsForCheck();
+            for(i = 0; i < aConnectors.length; ++i){
+                aConnectors[i].calculateTransform(bMoveFlag);
+                var oGroup = aConnectors[i].getMainGroup();
+                if(oGroup){
+                    checkObjectInArray(aGroups, oGroup);
+                }
+            }
+        }
+
         for(i = 0; i < aGroups.length; ++i)
         {
             aGroups[i].updateCoordinatesAfterInternalResize();
@@ -8167,7 +8225,13 @@ DrawingObjectsController.prototype =
                     return;
                 }
             }
-            this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props], false, AscDFH.historydescription_Spreadsheet_SetGraphicObjectsProps);
+
+            var aAdditionalObjects = null;
+            if(AscFormat.isRealNumber(props.Width) && AscFormat.isRealNumber(props.Height)){
+                aAdditionalObjects = this.getConnectorsForCheck2();
+            }
+
+            this.checkSelectedObjectsAndCallback(this.setGraphicObjectPropsCallBack, [props], false, AscDFH.historydescription_Spreadsheet_SetGraphicObjectsProps, aAdditionalObjects);
             var oApplyProps = null;
             if(props)
             {
@@ -8191,24 +8255,17 @@ DrawingObjectsController.prototype =
         }
     },
 
-    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType, bCheckConnectors)
+    checkSelectedObjectsAndCallback: function(callback, args, bNoSendProps, nHistoryPointType, aAdditionalObjects)
     {
         var selection_state = this.getSelectionState();
         this.drawingObjects.objectLocker.reset();
-        var oMapId = {};
         for(var i = 0; i < this.selectedObjects.length; ++i)
         {
             this.drawingObjects.objectLocker.addObjectId(this.selectedObjects[i].Get_Id());
-            oMapId[this.selectedObjects[i].Get_Id()] = true;
         }
-        if(bCheckConnectors){
-            var _aDrawings = this.selection.groupSelection ? this.selection.groupSelection.selectedObjects : this.selectedObjects;
-            var _aConnectors = [];
-            this.getAllConnectorsByDrawings(_aDrawings, _aConnectors, undefined, true);
-            for(var i = 0; i < _aConnectors.length; ++i){
-                if(!oMapId[_aConnectors[i].Get_Id()]){
-                    this.drawingObjects.objectLocker.addObjectId(_aConnectors[i].Get_Id());
-                }
+        if(aAdditionalObjects){
+            for(var i = 0; i < aAdditionalObjects.length; ++i){
+                this.drawingObjects.objectLocker.addObjectId(aAdditionalObjects[i].Get_Id());
             }
         }
         var _this = this;
@@ -8224,6 +8281,11 @@ DrawingObjectsController.prototype =
                     for(var i = 0; i < _this.selectedObjects.length; ++i)
                     {
                         _this.selectedObjects[i].lockType = c_oAscLockTypes.kLockTypeMine;
+                    }
+                    if(aAdditionalObjects){
+                        for(var i = 0; i < aAdditionalObjects.length; ++i){
+                            aAdditionalObjects[i].lockType = c_oAscLockTypes.kLockTypeMine;
+                        }
                     }
                 }
                 callback.apply(_this, args);

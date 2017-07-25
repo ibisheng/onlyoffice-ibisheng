@@ -5835,7 +5835,7 @@ function NativeOpenFile3(_params, documentInfo)
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
         sdkCheck = documentInfo["sdkCheck"];
-        
+
         _api = new window["Asc"]["asc_docs_api"]("");
         
         AscCommon.g_clipboardBase.Init(_api);
@@ -5883,7 +5883,7 @@ function NativeOpenFile3(_params, documentInfo)
             _api.asc_setAutoSaveGap(1);
             _api._coAuthoringInit();
             _api.asc_SetFastCollaborative(true);
-            
+           
             window["native"]["onTokenJWT"](_api.CoAuthoringApi.get_jwt());
 
             _api.asc_registerCallback("asc_onAuthParticipantsChanged", function(users) {

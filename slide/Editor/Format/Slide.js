@@ -194,6 +194,7 @@ function Slide(presentation, slideLayout, slideNum)
     this.timingLock     = null;
     this.transitionLock = null;
     this.layoutLock     = null;
+    this.showLock       = null;
 
     this.Lock = new AscCommon.CLock();
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
@@ -213,7 +214,7 @@ function Slide(presentation, slideLayout, slideNum)
         this.Width = presentation.Width;
         this.Height = presentation.Height;
         this.setSlideComments(new SlideComments(this));
-        this.setLocks(new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id));
+        this.setLocks(new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id), new PropLocker(this.Id));
     }
 
     if(slideLayout)
@@ -633,14 +634,15 @@ Slide.prototype =
         this.cSld.Bg = bg;
     },
 
-    setLocks: function(deleteLock, backgroundLock, timingLock, transitionLock, layoutLock)
+    setLocks: function(deleteLock, backgroundLock, timingLock, transitionLock, layoutLock, showLock)
     {
         this.deleteLock = deleteLock;
         this.backgroundLock = backgroundLock;
         this.timingLock = timingLock;
         this.transitionLock = transitionLock;
         this.layoutLock = layoutLock;
-       History.Add(new AscDFH.CChangesDrawingTimingLocks(this, deleteLock, backgroundLock, timingLock, transitionLock, layoutLock));
+        this.showLock = showLock;
+       History.Add(new AscDFH.CChangesDrawingTimingLocks(this, deleteLock, backgroundLock, timingLock, transitionLock, layoutLock, showLock));
     },
 
     shapeAdd: function(pos, item)
@@ -649,6 +651,10 @@ Slide.prototype =
         var _pos = (AscFormat.isRealNumber(pos) && pos > -1 && pos <= this.cSld.spTree.length) ? pos : this.cSld.spTree.length;
        History.Add(new AscDFH.CChangesDrawingsContentPresentation(this, AscDFH.historyitem_SlideAddToSpTree, _pos, [item], true));
         this.cSld.spTree.splice(_pos, 0, item);
+    },
+
+    isVisible: function(){
+        return this.show !== false;
     },
 
     checkDrawingUniNvPr: function(drawing)
@@ -1106,6 +1112,20 @@ Slide.prototype =
 
         if(this.notesShape){
             this.notesShape.draw(g);
+            var oLock = this.notesShape.Lock;
+            if(oLock && AscCommon.locktype_None != oLock.Get_Type())
+            {
+                var bCoMarksDraw = true;
+                if(typeof editor !== "undefined" && editor && AscFormat.isRealBool(editor.isCoMarksDraw)){
+                    bCoMarksDraw = editor.isCoMarksDraw;
+                }
+                if(bCoMarksDraw){
+                    g.transform3(this.notesShape.transformText);
+                    var Width = this.notesShape.txBody.content.XLimit;
+                    var Height = this.notesShape.txBody.content.Get_SummaryHeight();
+                    g.DrawLockObjectRect(oLock.Get_Type(), 0, 0, Width, Height);
+                }
+            }
         }
     },
 

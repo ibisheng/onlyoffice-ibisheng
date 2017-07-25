@@ -3113,6 +3113,8 @@ function CDemonstrationManager(htmlpage)
 
     this.End = function(isNoUseFullScreen)
     {
+		this.HtmlPage.m_oApi.DemonstrationReporterEnd();
+
         if (this.HtmlPage.m_oApi.isOnlyDemonstration)
             return;
 
@@ -3157,6 +3159,9 @@ function CDemonstrationManager(htmlpage)
         if (!this.Mode)
             return;
 
+        if (this.HtmlPage.m_oApi.isReporterMode)
+			window.postMessage("{ \"reporter_command\" : \"next\" }", "*");
+
         this.CorrectSlideNum();
 
         var _is_transition = this.Transition.IsPlaying();
@@ -3184,6 +3189,9 @@ function CDemonstrationManager(htmlpage)
     {
         if (!this.Mode)
             return;
+
+		if (this.HtmlPage.m_oApi.isReporterMode)
+			window.postMessage("{ \"reporter_command\" : \"prev\" }", "*");
 
         if (0 != this.SlideNum)
         {

@@ -2716,7 +2716,7 @@ function CBinaryFileWriter()
                         {
                             case para_Text:
                             {
-                                _run_text += String.fromCharCode(_elem.Content[j].Value);
+                                _run_text += AscCommon.encodeSurrogateChar(_elem.Content[j].Value);
                                 break;
                             }
                             case para_Space :
@@ -2782,7 +2782,7 @@ function CBinaryFileWriter()
                                     {
                                         case para_Text:
                                         {
-                                            _run_text += String.fromCharCode(_elem_h.Content[j].Value);
+                                            _run_text += AscCommon.encodeSurrogateChar(_elem_h.Content[j].Value);
                                             break;
                                         }
                                         case para_Space :

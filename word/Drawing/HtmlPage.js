@@ -1001,6 +1001,12 @@ function CEditorPage(api)
 
 		if (this.MobileTouchManager)
 			this.MobileTouchManager.Resize_After();
+
+		if (this.m_oApi.watermarkDraw)
+		{
+			this.m_oApi.watermarkDraw.zoom = this.m_nZoomValue / 100;
+			this.m_oApi.watermarkDraw.Generate();
+		}
 	};
 
 	this.zoom_Out = function()

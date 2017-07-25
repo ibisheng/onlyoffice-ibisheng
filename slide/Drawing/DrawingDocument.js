@@ -703,7 +703,7 @@ CDrawingCollaborativeTarget.prototype =
 		{
 			bIsHtmlElementCreate           = true;
 			this.HtmlElement               = document.createElement('canvas');
-			this.HtmlElement.style.cssText = "pointer-events: none;position:absolute;padding:0;margin:0;-webkit-user-select:none;width:1px;height:1px;display:none;z-index:3;";
+			this.HtmlElement.style.cssText = "pointer-events: none;position:absolute;padding:0;margin:0;-webkit-user-select:none;width:1px;height:1px;display:none;z-index:9;";
 			this.HtmlElement.width         = 1;
 			this.HtmlElement.height        = 1;
 
@@ -1161,10 +1161,15 @@ function CDrawingDocument()
 	}
 	this.ToRendererPart = function()
 	{
+		var watermark = this.m_oWordControl.m_oApi.watermarkDraw;
+
 		var pagescount = this.SlidesCount;
 
 		if (-1 == this.m_lCurrentRendererPage)
 		{
+			if (watermark)
+				watermark.StartRenderer();
+
 			this.m_oDocRenderer                             = new AscCommon.CDocumentRenderer();
 			this.m_oDocRenderer.VectorMemoryForPrint        = new AscCommon.CMemory();
 			this.m_lCurrentRendererPage                     = 0;
@@ -1185,6 +1190,9 @@ function CDrawingDocument()
 			renderer.BeginPage(this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
 			this.m_oLogicDocument.DrawPage(i, renderer);
 			renderer.EndPage();
+
+			if (watermark)
+				watermark.DrawOnRenderer(renderer, this.m_oLogicDocument.Width, this.m_oLogicDocument.Height);
 		}
 
 		if (end == -1)
@@ -1197,6 +1205,9 @@ function CDrawingDocument()
 
 		if (this.m_lCurrentRendererPage >= pagescount)
 		{
+			if (watermark)
+				watermark.EndRenderer();
+
 			this.m_lCurrentRendererPage              = -1;
 			this.m_oDocRenderer                      = null;
 			this.m_oWordControl.m_oApi.ShowParaMarks = this.m_bOldShowMarks;
@@ -3518,6 +3529,16 @@ function CThumbnailsManager()
 		return _MinPositionPage;
 	}
 
+	this.IsSlideHidden = function(aSelected){
+        var oPresentation = oThis.m_oWordControl.m_oLogicDocument;
+        for(var i = 0; i < aSelected.length; ++i){
+        	if(oPresentation.IsVisibleSlide(aSelected[i])){
+        		return false;
+			}
+		}
+		return true;
+	};
+
 	this.onMouseDown = function(e)
 	{
 		if (oThis.m_oWordControl)
@@ -3561,6 +3582,7 @@ function CThumbnailsManager()
 				_data.X_abs         = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
 				_data.Y_abs         = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
 				_data.IsSlideSelect = false;
+				_data.IsSlideHidden = oThis.IsSlideHidden(oThis.GetSelectedArray());
 				oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
 			}
 			return false;
@@ -3647,6 +3669,7 @@ function CThumbnailsManager()
 				{
 					var _data   = new AscCommonSlide.CContextMenuData();
 					_data.Type  = Asc.c_oAscContextMenuTypes.Thumbnails;
+                    _data.IsSlideHidden = oThis.IsSlideHidden(oThis.GetSelectedArray());
 					_data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
 					_data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
 					oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
@@ -3676,6 +3699,7 @@ function CThumbnailsManager()
 		{
 			var _data   = new AscCommonSlide.CContextMenuData();
 			_data.Type  = Asc.c_oAscContextMenuTypes.Thumbnails;
+            _data.IsSlideHidden = oThis.IsSlideHidden(oThis.GetSelectedArray());
 			_data.X_abs = global_mouseEvent.X - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.L * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.X;
 			_data.Y_abs = global_mouseEvent.Y - ((oThis.m_oWordControl.m_oThumbnails.AbsolutePosition.T * g_dKoef_mm_to_pix) >> 0) - oThis.m_oWordControl.Y;
 			oThis.m_oWordControl.m_oApi.sync_ContextMenuCallback(_data);
@@ -5153,7 +5177,9 @@ function CThumbnailsManager()
 				var ConvertedPos = this.GetThumbnailPagePosition(nSlideIndex);
 				if (ConvertedPos)
 				{
-					editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({Type : Asc.c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect : true}));
+					var bIsSlideHidden = this.IsSlideHidden(aSelected);
+					editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({Type : Asc.c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect : true,
+                        IsSlideHidden: bIsSlideHidden}));
 				}
 				return false;
 			}
@@ -5167,7 +5193,9 @@ function CThumbnailsManager()
 					var ConvertedPos = this.GetThumbnailPagePosition(nSlideIndex);
 					if (ConvertedPos)
 					{
-						editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({Type : Asc.c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect : true}));
+                        var bIsSlideHidden = this.IsSlideHidden(aSelected);
+						editor.sync_ContextMenuCallback(new AscCommonSlide.CContextMenuData({Type : Asc.c_oAscContextMenuTypes.Thumbnails, X_abs : ConvertedPos.X, Y_abs : ConvertedPos.Y, IsSlideSelect : true,
+                            IsSlideHidden: bIsSlideHidden}));
 					}
 					return false;
 				}
@@ -5307,6 +5335,9 @@ function CSlideDrawer()
 
 	this.CheckSlide = function(slideNum)
 	{
+		if (this.m_oWordControl.m_oApi.isReporterMode)
+			return;
+
 		if (this.m_oWordControl.m_oApi.isSaveFonts_Images)
 		{
 			this.IsRecalculateSlide = true;
@@ -5432,6 +5463,9 @@ function CSlideDrawer()
 
 	this.DrawSlide = function(outputCtx, scrollX, scrollX_max, scrollY, scrollY_max, slideNum)
 	{
+		if (this.m_oWordControl.m_oApi.isReporterMode)
+			return;
+
 		var _rect   = this.m_oWordControl.m_oDrawingDocument.SlideCurrectRect;
 		var _bounds = this.BoundsChecker.Bounds;
 
@@ -5514,6 +5548,15 @@ function CSlideDrawer()
 				g.IsNoDrawingEmptyPlaceholderText = true;
 
 			this.m_oWordControl.m_oLogicDocument.DrawPage(slideNum, g);
+		}
+
+		if (this.m_oWordControl.m_oApi.watermarkDraw)
+		{
+			this.m_oWordControl.m_oApi.watermarkDraw.Draw(outputCtx,
+				AscCommon.AscBrowser.convertToRetinaValue(_rect.left, true),
+				AscCommon.AscBrowser.convertToRetinaValue(_rect.top, true),
+				AscCommon.AscBrowser.convertToRetinaValue(_rect.right - _rect.left, true),
+				AscCommon.AscBrowser.convertToRetinaValue(_rect.bottom - _rect.top, true));
 		}
 	}
 }

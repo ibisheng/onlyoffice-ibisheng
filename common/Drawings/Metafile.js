@@ -1462,7 +1462,7 @@
 		},
 
 		// images
-		drawImage : function(img, x, y, w, h)
+		drawImage : function(img, x, y, w, h, isUseOriginUrl)
 		{
 			var isLocalUse = true;
 			if (window["AscDesktopEditor"] && window["AscDesktopEditor"]["IsLocalFile"] && window["AscDesktopEditor"]["IsFilePrinting"])
@@ -1474,7 +1474,7 @@
 				this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
 
 				var imgLocal = AscCommon.g_oDocumentUrls.getLocal(img);
-				if (imgLocal && isLocalUse)
+				if (imgLocal && isLocalUse && (true !== isUseOriginUrl))
 				{
 					this.Memory.WriteString2(imgLocal);
 				}
@@ -1491,7 +1491,7 @@
 			}
 
 			var _src = "";
-			if (!window["NATIVE_EDITOR_ENJINE"])
+			if (!window["NATIVE_EDITOR_ENJINE"] && (true !== isUseOriginUrl))
 			{
 				var _img = window.editor.ImageLoader.map_image_index[img];
 				if (_img == undefined || _img.Image == null)
@@ -1784,6 +1784,8 @@
 		this._restoreDumpedVectors = null;
 
 		this.m_oBaseTransform = null;
+
+		this.UseOriginImageUrl = false;
 	}
 
 	CDocumentRenderer.prototype =
@@ -1962,7 +1964,7 @@
 			if (0 != this.m_lPagesCount)
 			{
 				if (!srcRect)
-					this.m_arrayPages[this.m_lPagesCount - 1].drawImage(img, x, y, w, h);
+					this.m_arrayPages[this.m_lPagesCount - 1].drawImage(img, x, y, w, h, this.UseOriginImageUrl);
 				else
 				{
 					/*

@@ -655,10 +655,14 @@
 				ElemToSelect.style["-o-user-select"]      = "text";
 				ElemToSelect.style["user-select"]         = "text";
 				ElemToSelect.style["-webkit-user-select"] = "text";
-				ElemToSelect.setAttribute("contentEditable", true);
+				ElemToSelect.setAttribute("contentEditable", this.isCopyOutEnabled());
 
 				var _parent = ("" == this.CommonDivIdParent) ? document.body : document.getElementById(this.CommonDivIdParent);
 				_parent.appendChild(ElemToSelect);
+			}
+			else
+			{
+				ElemToSelect.setAttribute("contentEditable", this.isCopyOutEnabled());
 			}
 			return ElemToSelect;
 		},
@@ -869,7 +873,7 @@
 					break;
 			}
 
-			if (_data_format != "" && _data !== null)
+			if (_data_format != "" && _data !== null && this.isCopyOutEnabled())
 			{
 				if (_data_format == "text/x-custom")
 					this.ClosureParams.setData(_data_format, "asc_internalData;" + _data);
@@ -1088,6 +1092,13 @@
 			}
 
 			return res;
+		},
+
+		isCopyOutEnabled : function()
+		{
+			if (this.Api && this.Api.isCopyOutEnabled)
+				return this.Api.isCopyOutEnabled();
+			return true;
 		}
 	};
 

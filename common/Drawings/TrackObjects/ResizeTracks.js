@@ -310,7 +310,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
         this.resizedRot = originalObject.rot;
 
         this.transform = originalObject.transform.CreateDublicate();
-        this.geometry = (function(){ return originalObject.getGeom();})();
+        this.geometry = AscFormat.ExecuteNoHistory(function(){ return originalObject.getGeom().createDuplicate();}, this, []);
 
         if(!originalObject.isChart())
         {
@@ -823,6 +823,17 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             this.overlayObject.updateExtents(this.resizedExtX, this.resizedExtY);
 
             this.recalculateTransform();
+
+            if(this.bConnector){
+                if(this.numberHandle === 0){
+                    this.beginShapeIdx = null;
+                    this.beginShapeId = null;
+                }
+                else{
+                    this.endShapeIdx = null;
+                    this.endShapeId = null;
+                }
+            }
         };
 
         this.resizeRelativeCenter = function(kd1, kd2, ShiftKey)
@@ -1051,6 +1062,20 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
                         pluginData.setAttribute("height", xfrm.extY);
                         pluginData.setAttribute("objectId", this.originalObject.Get_Id());
                         api.asc_pluginResize(pluginData);
+                    }
+                }
+
+                if(this.bConnector){
+                    var nvUniSpPr = this.originalObject.nvSpPr.nvUniSpPr.copy();
+                    if(this.numberHandle === 0){
+                        nvUniSpPr.stCnxIdx = this.beginShapeIdx;
+                        nvUniSpPr.stCnxId  = this.beginShapeId;
+                        this.originalObject.nvSpPr.setUniSpPr(nvUniSpPr);
+                    }
+                    else{
+                        nvUniSpPr.endCnxIdx = this.endShapeIdx;
+                        nvUniSpPr.endCnxId  = this.endShapeId;
+                        this.originalObject.nvSpPr.setUniSpPr(nvUniSpPr);
                     }
                 }
 
@@ -1628,6 +1653,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.updateSize = function(kw, kh)
         {
+            this.bIsTracked = true;
             var _kw, _kh;
             if(this.bSwapCoef)
             {
@@ -1782,7 +1808,8 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.bSwapCoef = !(AscFormat.checkNormalRotate(this.rot));
         this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
         this.centerDistY = this.y + this.extY*0.5 - this.parentTrack.extY*0.5;
-        this.geometry = originalObject.getGeom();
+
+        this.geometry = AscFormat.ExecuteNoHistory(function(){ return originalObject.getGeom().createDuplicate();}, this, []);
         if(this.geometry)
         {
             this.geometry.Recalculate(this.extX, this.extY);

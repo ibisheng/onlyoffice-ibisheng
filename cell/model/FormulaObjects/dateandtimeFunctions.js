@@ -289,7 +289,7 @@
 	}
 
 	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
-	cFormulaFunctionGroup['DateAndTime'].push(cDATE, cDATEDIF, cDATEVALUE, cDAY, cDAYS360, cEDATE, cEOMONTH, cHOUR,
+	cFormulaFunctionGroup['DateAndTime'].push(cDATE, cDATEDIF, cDATEVALUE, cDAY, cDAYS, cDAYS360, cEDATE, cEOMONTH, cHOUR,
 		cMINUTE, cMONTH, cNETWORKDAYS, cNETWORKDAYS_INTL, cNOW, cSECOND, cTIME, cTIMEVALUE, cTODAY, cWEEKDAY, cWEEKNUM,
 		cWORKDAY, cWORKDAY_INTL, cYEAR, cYEARFRAC);
 
@@ -584,6 +584,46 @@
 			return this.setCalcValue(
 				new cNumber(( new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay) ).getUTCDate()), 0);
 		}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cDAYS() {
+		this.name = "DAYS";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cDAYS.prototype = Object.create(cBaseFunction.prototype);
+	cDAYS.prototype.constructor = cDAYS;
+	cDAYS.prototype.argumentsMin = 2;
+	cDAYS.prototype.argumentsMax = 2;
+	cDAYS.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cDAYS.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calulateDays = function(argArray){
+			var val = argArray[0];
+			var val1 = argArray[1];
+			if (val < 0 || val1 < 0) {
+				return new cError(cErrorType.not_numeric);
+			}else{
+				return new cNumber(val - val1);
+			}
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calulateDays);
 	};
 
 	/**

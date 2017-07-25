@@ -273,16 +273,18 @@
 	cCOLUMN.prototype.constructor = cCOLUMN;
 	cCOLUMN.prototype.argumentsMax = 1;
 	cCOLUMN.prototype.Calculate = function (arg) {
-		if (this.argumentsCurrent == 0) {
-			return this.value = new cNumber(arguments[1].c1 + 1);
+		var bbox;
+		if (0 === this.argumentsCurrent) {
+			bbox = arguments[1];
+		} else {
+			var arg0 = arg[0];
+			if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
+				cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+				bbox = arg0.getRange();
+				bbox = bbox && bbox.bbox;
+			}
 		}
-		var arg0 = arg[0];
-		var range;
-		if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
-			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
-			range = arg0.getRange();
-		}
-		return this.value = (range ? new cNumber(range.bbox.c1 + 1) : new cError(cErrorType.bad_reference));
+		return this.value = (bbox ? new cNumber(bbox.c1 + 1) : new cError(cErrorType.bad_reference));
 	};
 
 	/**
@@ -934,16 +936,18 @@
 	cROW.prototype.constructor = cROW;
 	cROW.prototype.argumentsMax = 1;
 	cROW.prototype.Calculate = function (arg) {
-		if (this.argumentsCurrent == 0) {
-			return this.value = new cNumber(arguments[1].r1 + 1);
+		var bbox;
+		if (0 === this.argumentsCurrent) {
+			bbox = arguments[1];
+		} else {
+			var arg0 = arg[0];
+			if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
+				cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+				bbox = arg0.getRange();
+				bbox = bbox && bbox.bbox;
+			}
 		}
-		var arg0 = arg[0];
-		var range;
-		if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
-			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
-			range = arg0.getRange();
-		}
-		return this.value = (range ? new cNumber(range.bbox.r1 + 1) : new cError(cErrorType.bad_reference));
+		return this.value = (bbox ? new cNumber(bbox.r1 + 1) : new cError(cErrorType.bad_reference));
 	};
 
 	/**
@@ -1133,6 +1137,7 @@
 	cVLOOKUP.prototype.constructor = cVLOOKUP;
 	cVLOOKUP.prototype.argumentsMin = 3;
 	cVLOOKUP.prototype.argumentsMax = 4;
+	cVLOOKUP.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cVLOOKUP.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
 		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;

@@ -750,8 +750,11 @@ if(typeof CComments !== "undefined")
 
 if(typeof CPresentation !== "undefined")
 {
-    CPresentation.prototype.Document_Is_SelectionLocked =  function(CheckType, AdditionalData)
+    CPresentation.prototype.Document_Is_SelectionLocked =  function(CheckType, AdditionalData, isIgnoreCanEditFlag, aAdditionaObjects)
     {
+        if (!this.CanEdit() && true !== isIgnoreCanEditFlag)
+            return true;
+
         if ( true === AscCommon.CollaborativeEditing.Get_GlobalLock() )
             return true;
         if(this.Slides.length === 0)
@@ -792,6 +795,19 @@ if(typeof CPresentation !== "undefined")
                     "guid": selected_objects[i].Get_Id()
                 };
                 selected_objects[i].Lock.Check(check_obj);
+            }
+            if(Array.isArray(aAdditionaObjects)){
+                for(var i = 0; i < aAdditionaObjects.length; ++i)
+                {
+                    var check_obj =
+                        {
+                            "type": c_oAscLockTypeElemPresentation.Object,
+                            "slideId": slide_id,
+                            "objId": aAdditionaObjects[i].Get_Id(),
+                            "guid": aAdditionaObjects[i].Get_Id()
+                        };
+                    aAdditionaObjects[i].Lock.Check(check_obj);
+                }
             }
         }
 
@@ -889,6 +905,20 @@ if(typeof CPresentation !== "undefined")
                     "guid": this.Slides[selected_slides[i]].backgroundLock.Get_Id()
                 };
                 this.Slides[selected_slides[i]].backgroundLock.Lock.Check(check_obj);
+            }
+        }
+        if(CheckType === AscCommon.changestype_SlideHide)
+        {
+            var selected_slides = editor.WordControl.Thumbnails.GetSelectedArray();
+            for(var i = 0; i < selected_slides.length; ++i)
+            {
+                var check_obj =
+                {
+                    "type": c_oAscLockTypeElemPresentation.Slide,
+                    "val": this.Slides[selected_slides[i]].showLock.Get_Id(),
+                    "guid": this.Slides[selected_slides[i]].showLock.Get_Id()
+                };
+                this.Slides[selected_slides[i]].showLock.Lock.Check(check_obj);
             }
         }
 

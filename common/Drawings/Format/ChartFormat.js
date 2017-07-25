@@ -245,7 +245,7 @@ function (window, undefined) {
     drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetDLbls]             = function(oClass, value){oClass.dLbls         = value;};
     drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetFirstSliceAng]     = function(oClass, value){oClass.firstSliceAng = value;};
     drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetHoleSize]          = function(oClass, value){oClass.holeSize     = value;};
-    drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetVaryColor]         = function(oClass, value){oClass.varyColor = value;};
+    drawingsChangesMap[AscDFH.historyitem_DoughnutChart_SetVaryColor]         = function(oClass, value){oClass.varyColors = value;};
     drawingsChangesMap[AscDFH.historyitem_ErrBars_SetErrBarType]              = function(oClass, value){oClass.errBarType   = value;};
     drawingsChangesMap[AscDFH.historyitem_ErrBars_SetErrDir]                  = function(oClass, value){oClass.errDir       = value;};
     drawingsChangesMap[AscDFH.historyitem_ErrBars_SetErrValType]              = function(oClass, value){oClass.errValType   = value;};
@@ -6571,11 +6571,15 @@ CDLbls.prototype =
     },
     Refresh_RecalcData2: function()
     {
-        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent && this.parent.parent.parent.parent.parent )
+        if(this.parent && this.parent.parent && this.parent.parent.parent && this.parent.parent.parent.parent )
         {
-            if(this.parent.parent.parent.parent.parent.handleUpdateDataLabels)
-            {
-                this.parent.parent.parent.parent.parent.handleUpdateDataLabels();
+            if(this.parent.parent.parent.parent.handleUpdateDataLabels){
+                this.parent.parent.parent.parent.handleUpdateDataLabels();
+            }
+            else{
+                if(this.parent.parent.parent.parent.parent && this.parent.parent.parent.parent.parent.handleUpdateDataLabels){
+                    this.parent.parent.parent.parent.parent.handleUpdateDataLabels();
+                }
             }
         }
     },
@@ -13059,6 +13063,37 @@ CChart.prototype =
             }
         }
         return null;
+    },
+
+
+    getView3d: function(){
+        return AscFormat.ExecuteNoHistory(function(){
+
+            if(this.view3D){
+                var _ret = this.view3D.createDuplicate();
+                var oChart = this.plotArea &&  this.plotArea.charts[0];
+                if(oChart){
+                    if(oChart.getObjectType() === AscDFH.historyitem_type_SurfaceChart){
+                        if(!AscFormat.isRealNumber(_ret.rotX)){
+                            _ret.rotX = 15;
+                        }
+                        if(!AscFormat.isRealNumber(_ret.rotY)){
+                            _ret.rotY = 20;
+                        }
+                    }
+                    else{
+                        if(!AscFormat.isRealNumber(_ret.rotX)){
+                            _ret.rotX = 0;
+                        }
+                        if(!AscFormat.isRealNumber(_ret.rotY)){
+                            _ret.rotY = 0;
+                        }
+                    }
+                    return _ret;
+                }
+            }
+            return null;
+        }, this, []);
     },
 
     getObjectType: function()

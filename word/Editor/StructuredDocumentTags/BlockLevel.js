@@ -936,6 +936,10 @@ CBlockLevelSdt.prototype.SelectContentControl = function()
 	this.SelectAll(1);
 	this.Set_CurrentElement(false, 0, this.Content);
 };
+CBlockLevelSdt.prototype.SetThisElementCurrent = function()
+{
+	this.Set_CurrentElement(false, 0, this.Content);
+};
 CBlockLevelSdt.prototype.RemoveContentControlWrapper = function()
 {
 	if (!this.Parent)
@@ -1090,6 +1094,15 @@ CBlockLevelSdt.prototype.GetContentControlPr = function()
 CBlockLevelSdt.prototype.Restart_CheckSpelling = function()
 {
 	this.Content.Restart_CheckSpelling();
+};
+CBlockLevelSdt.prototype.ClearContentControl = function()
+{
+	var oPara = new Paragraph(this.LogicDocument.Get_DrawingDocument(), this.Content);
+	oPara.Correct_Content();
+
+	this.Content.Add_ToContent(0, oPara);
+	this.Content.Remove_FromContent(1, this.Content.Get_ElementsCount() - 1);
+	this.Content.MoveCursorToStartPos(false);
 };
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};

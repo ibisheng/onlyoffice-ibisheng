@@ -78,7 +78,7 @@ function Processor3D(width, height, left, right, bottom, top, chartSpace, charts
 	
 	this.specialStandardScaleX = 1;
 	
-	this.view3D = chartSpace.chart.view3D;
+	this.view3D = chartSpace.chart.getView3d();
 	this.chartSpace = chartSpace;
 	this.chartsDrawer = chartsDrawer;
 	

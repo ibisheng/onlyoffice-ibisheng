@@ -1893,6 +1893,7 @@ function DrawingObjects() {
         _this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
         _this.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
         _this.controller = new AscFormat.DrawingObjectsController(_this);
+        _this.lasteForzenPlaseNum = 0;
 
         _this.isViewerMode = function() { return worksheet.handlers.trigger("getViewerMode"); };
 
@@ -2239,14 +2240,14 @@ function DrawingObjects() {
         }
 
         if ( !printOptions ) {
-            if ( aObjects.length || _this.drawingArea.frozenPlaces.length > 1) {
-                if ( _this.controller.selectedObjects.length || _this.drawingArea.frozenPlaces.length > 1)
-                {
-                    _this.OnUpdateOverlay();
-                    _this.controller.updateSelectionState(true);
-                }
+
+            var bChangedFrozen = _this.lasteForzenPlaseNum !== _this.drawingArea.frozenPlaces.length;
+            if ( _this.controller.selectedObjects.length || _this.drawingArea.frozenPlaces.length > 1 || bChangedFrozen) {
+                _this.OnUpdateOverlay();
+                _this.controller.updateSelectionState(true);
             }
         }
+        _this.lasteForzenPlaseNum = _this.drawingArea.frozenPlaces.length;
     };
 
     _this.getDrawingDocument = function()

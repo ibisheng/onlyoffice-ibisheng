@@ -2386,31 +2386,36 @@ CShape.prototype.recalculateTextStyles = function (level) {
         if (isRealObject(parent_objects.master) && isRealObject(parent_objects.master.txStyles)) {
             var master_ppt_styles;
             master_style = new CStyle("masterStyle", null, null, null, true);
-            if (this.isPlaceholder()) {
-                switch (this.getPlaceholderType()) {
-                    case AscFormat.phType_ctrTitle:
-                    case AscFormat.phType_title:
-                    {
-                        master_ppt_styles = parent_objects.master.txStyles.titleStyle;
-                        break;
-                    }
-                    case AscFormat.phType_body:
-                    case AscFormat.phType_subTitle:
-                    case AscFormat.phType_obj:
-                    case null:
-                    {
-                        master_ppt_styles = parent_objects.master.txStyles.bodyStyle;
-                        break;
-                    }
-                    default:
-                    {
-                        master_ppt_styles = parent_objects.master.txStyles.otherStyle;
-                        break;
+            if(parent_objects.master.kind === AscFormat.TYPE_KIND.NOTES_MASTER){
+                master_ppt_styles = parent_objects.master.txStyles;
+            }
+            else{
+                if (this.isPlaceholder()) {
+                    switch (this.getPlaceholderType()) {
+                        case AscFormat.phType_ctrTitle:
+                        case AscFormat.phType_title:
+                        {
+                            master_ppt_styles = parent_objects.master.txStyles.titleStyle;
+                            break;
+                        }
+                        case AscFormat.phType_body:
+                        case AscFormat.phType_subTitle:
+                        case AscFormat.phType_obj:
+                        case null:
+                        {
+                            master_ppt_styles = parent_objects.master.txStyles.bodyStyle;
+                            break;
+                        }
+                        default:
+                        {
+                            master_ppt_styles = parent_objects.master.txStyles.otherStyle;
+                            break;
+                        }
                     }
                 }
-            }
-            else {
-                master_ppt_styles = parent_objects.master.txStyles.otherStyle;
+                else {
+                    master_ppt_styles = parent_objects.master.txStyles.otherStyle;
+                }
             }
 
             if (isRealObject(master_ppt_styles) && isRealObject(master_ppt_styles.levels) && isRealObject(master_ppt_styles.levels[level])) {
@@ -3804,6 +3809,12 @@ CShape.prototype.hitInTextRect = function (x, y) {
     if(this.parent && this.parent.kind === AscFormat.TYPE_KIND.NOTES){
         return true;
     }
+
+
+    var bForceWord = ((this.isEmptyPlaceholder && this.isEmptyPlaceholder()) || (this.isPlaceholder && this.isPlaceholder() && oController && (AscFormat.getTargetTextObject(oController) === this)));
+    if(bForceWord){
+        return this.hitInTextRectWord(x, y);
+    }
     if(!this.txWarpStruct || !this.recalcInfo.warpGeometry ||
         this.recalcInfo.warpGeometry.preset === "textNoShape" ||
         oController && (AscFormat.getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
@@ -4358,29 +4369,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
             }
         }
     }
-    if(!this.group)
-    {
-        var oLock;
-        if(this.parent instanceof ParaDrawing)
-        {
-            oLock = this.parent.Lock;
-        }
-        else if(this.Lock)
-        {
-            oLock = this.Lock;
-        }
-        if(oLock && AscCommon.locktype_None != oLock.Get_Type())
-        {
-            var bCoMarksDraw = true;
-            if(typeof editor !== "undefined" && editor && AscFormat.isRealBool(editor.isCoMarksDraw)){
-                bCoMarksDraw = editor.isCoMarksDraw;
-            }
-            if(bCoMarksDraw){
-                graphics.transform3(_transform);
-                graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
-            }
-        }
-    }
+    this.drawLocks && this.drawLocks(_transform, graphics);
     graphics.SetIntegerGrid(true);
     graphics.reset();
 };

@@ -1253,6 +1253,7 @@
 	window['AscDFH'].historyitem_type_NotesMaster            = 1128 << 16;
 	window['AscDFH'].historyitem_type_Notes                  = 1129 << 16;
 	window['AscDFH'].historyitem_type_Cnx                    = 1130 << 16;
+	window['AscDFH'].historyitem_type_PresentationSection    = 1131 << 16;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//
@@ -1711,6 +1712,8 @@
 	window['AscDFH'].historyitem_Presentation_ChangeColorScheme   = window['AscDFH'].historyitem_type_Presentation | 6;
 	window['AscDFH'].historyitem_Presentation_SetShowPr           = window['AscDFH'].historyitem_type_Presentation | 7;
 	window['AscDFH'].historyitem_Presentation_SetDefaultTextStyle = window['AscDFH'].historyitem_type_Presentation | 8;
+	window['AscDFH'].historyitem_Presentation_AddSection          = window['AscDFH'].historyitem_type_Presentation | 9;
+	window['AscDFH'].historyitem_Presentation_RemoveSection       = window['AscDFH'].historyitem_type_Presentation | 10;
 
 	window['AscDFH'].historyitem_ColorMod_SetName = window['AscDFH'].historyitem_type_ColorMod | 1;
 	window['AscDFH'].historyitem_ColorMod_SetVal  = window['AscDFH'].historyitem_type_ColorMod | 2;
@@ -2587,6 +2590,10 @@
     window['AscDFH'].historyitem_NotesSetSlide            = window['AscDFH'].historyitem_type_Notes | 8;
     window['AscDFH'].historyitem_NotesSetNotesMaster      = window['AscDFH'].historyitem_type_Notes | 9;
 
+    window['AscDFH'].historyitem_PresentationSectionSetName       = window['AscDFH'].historyitem_type_PresentationSection | 1;
+    window['AscDFH'].historyitem_PresentationSectionSetGuid       = window['AscDFH'].historyitem_type_PresentationSection | 2;
+    window['AscDFH'].historyitem_PresentationSectionSetStartIndex = window['AscDFH'].historyitem_type_PresentationSection | 3;
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2924,6 +2931,7 @@
 	window['AscDFH'].historydescription_Document_RemoveContentControl               = 0x0143;
 	window['AscDFH'].historydescription_Document_RemoveContentControlWrapper        = 0x0144;
 	window['AscDFH'].historydescription_Document_ChangeContentControlProperties     = 0x0145;
+    window['AscDFH'].historydescription_Presentation_HideSlides                     = 0x0146;
 
 
 
