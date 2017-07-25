@@ -1065,7 +1065,10 @@ Slide.prototype =
                     this.notesShape.invertTransformText = AscCommon.global_MatrixTransformer.Invert(this.notesShape.transformText);
                     var Width = AscCommonSlide.GetNotesWidth();
                     oDocContent.Reset(0, 0, Width, 2000);
-                    oDocContent.Recalculate_Page(0, true);
+                    var CurPage = 0;
+                    var RecalcResult = recalcresult2_NextPage;
+                    while ( recalcresult2_End !== RecalcResult  )
+                        RecalcResult = oDocContent.Recalculate_Page( CurPage++, true );
                     this.notesShape.contentWidth = Width;
                     this.notesShape.contentHeight = 2000;
                 }
