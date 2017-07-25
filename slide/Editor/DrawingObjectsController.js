@@ -442,6 +442,7 @@ MoveCommentState.prototype =
                 tracks[i].trackEnd();
             }
             this.drawingObjects.startRecalculate();
+            this.drawingObjects.drawingObjects.showDrawingObjects();
         }
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.updateOverlay();

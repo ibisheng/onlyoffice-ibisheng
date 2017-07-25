@@ -5430,9 +5430,9 @@ CPresentation.prototype =
         if(this.Slides[this.CurPage])
         {
             History.Create_NewPoint(AscDFH.historydescription_Presentation_AddComment);
-            var Comment = new CComment( this.Comments, CommentData );
-            Comment.selected = true;
             var slide = this.Slides[this.CurPage];
+            var Comment = new CComment( slide.slideComments, CommentData );
+            Comment.selected = true;
             var selected_objects = slide.graphicObjects.selection.groupSelection ? slide.graphicObjects.selection.groupSelection.selectedObjects : slide.graphicObjects.selectedObjects;
             if(selected_objects.length  > 0)
             {

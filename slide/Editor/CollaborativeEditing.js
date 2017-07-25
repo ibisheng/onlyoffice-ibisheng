@@ -154,6 +154,18 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
                     "guid": Class.Get_Id()
                 };
             }
+            else if(Class instanceof AscCommon.CComment){
+                if(Class.Parent && Class.Parent.slide){
+                    check_obj =
+                        {
+                            "type": c_oAscLockTypeElemPresentation.Object,
+                            "slideId": Class.Parent.slide.deleteLock.Get_Id(),
+                            "objId": Class.Get_Id(),
+                            "guid": Class.Get_Id()
+                        };
+                    map[Class.Parent.slide.num] = true;
+                }
+            }
             if(check_obj)
                 editor.CoAuthoringApi.releaseLocks( check_obj );
         }
@@ -275,6 +287,9 @@ CCollaborativeEditing.prototype.Release_Locks = function()
             if(Class instanceof AscCommon.CComment)
             {
                 editor.sync_UnLockComment(Class.Get_Id());
+                if(Class.Parent && Class.Parent.slide){
+                    map_redraw[Class.Parent.slide.num] = true;
+                }
             }
         }
         else if ( AscCommon.locktype_Other3 === CurLockType )

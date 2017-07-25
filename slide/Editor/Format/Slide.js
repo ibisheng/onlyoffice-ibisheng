@@ -1386,7 +1386,7 @@ Slide.prototype =
 
                     _wc.ParceAdditionalData(commentData);
 
-                    var comment = new CComment(undefined, new CCommentData());
+                    var comment = new CComment(this.slideComments, new CCommentData());
                     comment.setPosition(_wc.x / 25.4, _wc.y / 25.4);
                     _comments.push(comment);
                 }

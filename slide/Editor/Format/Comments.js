@@ -918,7 +918,23 @@ CComment.prototype =
             Flags |= 2;
         }
         var dd = editor.WordControl.m_oDrawingDocument;
-        graphics.DrawPresentationComment(Flags, this.x, this.y, dd.GetCommentWidth(), dd.GetCommentHeight())
+        var w = dd.GetCommentWidth();
+        var h = dd.GetCommentHeight();
+        graphics.DrawPresentationComment(Flags, this.x, this.y, w, h);
+
+        var oLock = this.Lock;
+        if(oLock && AscCommon.locktype_None !== oLock.Get_Type())
+        {
+            var bCoMarksDraw = true;
+            var oApi = editor || Asc['editor'];
+            if(oApi){
+                bCoMarksDraw = (!AscCommon.CollaborativeEditing.Is_Fast() || AscCommon.locktype_Mine !== oLock.Get_Type());
+            }
+            if(bCoMarksDraw){
+                graphics.DrawLockObjectRect(oLock.Get_Type(), this.x, this.y, w, h);
+                return true;
+            }
+        }
     },
 
     Set_StartInfo: function(PageNum, X, Y, H, ParaId)
@@ -1055,6 +1071,7 @@ CComment.prototype =
         //    String : Id колонтитула
 
         Writer.WriteString2( this.Id );
+        AscFormat.writeObject(Writer, this.Parent);
         this.Data.Write_ToBinary2(Writer);
         Writer.WriteLong( this.m_oTypeInfo.Type );
 
@@ -1072,6 +1089,7 @@ CComment.prototype =
         //    String : Id колонтитула
 
         this.Id = Reader.GetString2();
+        this.Parent = AscFormat.readObject(Reader);
         this.Data = new CCommentData();
         this.Data.Read_FromBinary2(Reader);
         this.m_oTypeInfo.Type = Reader.GetLong();
