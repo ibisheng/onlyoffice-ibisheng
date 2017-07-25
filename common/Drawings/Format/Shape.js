@@ -3813,7 +3813,9 @@ CShape.prototype.hitInTextRect = function (x, y) {
 
     var bForceWord = ((this.isEmptyPlaceholder && this.isEmptyPlaceholder()) || (this.isPlaceholder && this.isPlaceholder() && oController && (AscFormat.getTargetTextObject(oController) === this)));
     if(bForceWord){
-        return this.hitInTextRectWord(x, y);
+        if(this.hitInTextRectWord(x, y)){
+            return true;
+        }
     }
     if(!this.txWarpStruct || !this.recalcInfo.warpGeometry ||
         this.recalcInfo.warpGeometry.preset === "textNoShape" ||
