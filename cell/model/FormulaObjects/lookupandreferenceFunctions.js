@@ -491,28 +491,24 @@
 		} else if (cElementType.cellsRange === arg0.type) {
 			var ws = arg0.getWS(), bbox = arg0.getBBox0();
 
-			if (bbox.r1 == bbox.r2) {/*одна строка*/
-				res = ws.getRange3(bbox.r1, bbox.c1 + arg1 - 1, bbox.r1, bbox.c1 + arg1 - 1).getCells()[0].getName();
-				res = new cRef(res, ws);
+			if (bbox.r1 === bbox.r2) {/*одна строка*/
+				res = new Asc.Range(bbox.c1 + arg1 - 1, bbox.r1, bbox.c1 + arg1 - 1, bbox.r1);
+				res = new cRef(res.getName(), ws);
 			} else {
-				if (arg1 == 0 && arg2 > 0) {
-					var _a1 = ws.getRange3(bbox.r1, bbox.c1 + arg2 - 1, bbox.r1, bbox.c2 + arg2 - 1)
-						.getCells()[0].getName(), _a2 = ws.getRange3(bbox.r2, bbox.c1 + arg2 - 1, bbox.r2,
-						bbox.c2 + arg2 - 1)
-						.getCells()[0].getName();
-					res = new cArea(_a1.toString() + ":" + _a2.toString(), ws);
+				if (0 === arg1 && arg2 > 0) {
+					res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1, bbox.c1 + arg2 - 1, bbox.r2);
+					res = new cArea(res.getName(), ws);
 				} else {
 					if (arg1 > Math.abs(bbox.r1 - bbox.r2) + 1 || arg2 > Math.abs(bbox.c1 - bbox.c2) + 1) {
 						res = new cError(cErrorType.bad_reference);
 					} else {
-						res = new cRef(ws.getRange3(bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1,
-							bbox.c1 + arg2 - 1)
-							.getCells()[0].getName(), ws);
+						res = new Asc.Range(bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1, bbox.c1 + arg2 - 1, bbox.r1 + arg1 - 1)
+						res = new cRef(res.getName(), ws);
 					}
 				}
 			}
 		} else if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type) {
-			if ((arg1 == 0 || arg1 == 1) && (arg2 == 0 || arg2 == 1)) {
+			if ((0 === arg1 || 1 === arg1) && (0 === arg2 || 1 === arg2)) {
 				res = arg0.getValue();
 			}
 		} else {
