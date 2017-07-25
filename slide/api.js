@@ -2481,9 +2481,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.paraApply = function(Props)
 	{
 		var _presentation = editor.WordControl.m_oLogicDocument;
-		if (_presentation.Slides[_presentation.CurPage])
+        var graphicObjects = _presentation.GetCurrentController();
+		if (graphicObjects)
 		{
-			var graphicObjects = _presentation.Slides[_presentation.CurPage].graphicObjects;
 			graphicObjects.checkSelectedObjectsAndCallback(function()
 			{
 
