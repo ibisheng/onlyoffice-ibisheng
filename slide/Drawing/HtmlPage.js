@@ -694,6 +694,7 @@ function CEditorPage(api)
 			};
 
 			window.onkeydown = this.onKeyDown;
+			window.onkeyup = this.onKeyUp;
 		}
 		// --------------------------------------------------------------------------
 
@@ -2208,11 +2209,20 @@ function CEditorPage(api)
 		global_keyboardEvent.CtrlKey  = false;
 		global_keyboardEvent.ShiftKey = false;
 		global_keyboardEvent.AltGr    = false;
+
+		if (oThis.m_oApi.isReporterMode)
+		{
+			AscCommon.stopEvent(e);
+			return false;
+		}
 	};
 
 	this.onKeyDown = function(e)
 	{
 		oThis.m_oApi.checkLastWork();
+
+		if (oThis.m_oApi.isReporterMode)
+			AscCommon.stopEvent(e);
 
 		if (oThis.m_oApi.isLongAction())
 		{
