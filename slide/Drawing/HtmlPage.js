@@ -693,6 +693,8 @@ function CEditorPage(api)
 					_current = _count;
 
 				_elem.innerHTML = "Slide " + _current + " of " + _count;
+
+				window.editor.WordControl.Thumbnails.SelectPage(_current - 1);
 			});
 
 			this.m_oApi.asc_registerCallback("asc_onEndDemonstration", function ()
