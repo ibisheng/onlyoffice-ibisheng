@@ -2738,33 +2738,40 @@ CT_pivotTableDefinition.prototype.asc_setColGrandTotals = function(newVal) {
 };
 CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 	var t = this;
-	api._changePivotStyle(this, function () {
-		var pivotField = t.asc_getPivotFields()[index];
-		if (pivotField) {
-			if (c_oAscAxis.AxisPage !== pivotField.axis) {
-				t.removeField(index);
-			} else {
-				// ToDo move to end ?
-			}
-
-			if (!t.pageFields) {
-				t.pageFields = new CT_PageFields();
-			}
-			var newField = new CT_PageField();
-			newField.fld = index;
-			newField.hier = -1;
-			t.pageFields.add(newField);
-
-			pivotField.axis = c_oAscAxis.AxisPage;
-			t.location.addColPage();
-		}
+	api._changePivotStyle(this, function (ws) {
+		ws.clearPivotRable(t);
+		t.addPageField(index);
+		ws.updatePivotTable(t);
 	});
 };
 CT_pivotTableDefinition.prototype.asc_removeField = function (api, index) {
 	var t = this;
-	api._changePivotStyle(this, function () {
+	api._changePivotStyle(this, function (ws) {
+		ws.clearPivotRable(t);
 		t.removeField(index);
+		ws.updatePivotTable(t);
 	});
+};
+CT_pivotTableDefinition.prototype.addPageField = function (index) {
+	var pivotField = this.asc_getPivotFields()[index];
+	if (pivotField) {
+		if (c_oAscAxis.AxisPage !== pivotField.axis) {
+			this.removeField(index);
+		} else {
+			// ToDo move to end ?
+		}
+
+		if (!this.pageFields) {
+			this.pageFields = new CT_PageFields();
+		}
+		var newField = new CT_PageField();
+		newField.fld = index;
+		newField.hier = -1;
+		this.pageFields.add(newField);
+
+		pivotField.axis = c_oAscAxis.AxisPage;
+		this.location.addColPage();
+	}
 };
 CT_pivotTableDefinition.prototype.removeField = function (index) {
 	var pivotField = this.asc_getPivotFields()[index];

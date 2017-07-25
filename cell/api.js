@@ -3481,20 +3481,25 @@ var editor;
 	spreadsheet_api.prototype._changePivotStyle = function (pivot, callback) {
 		var t = this;
 		var changePivotStyle = function (res) {
-		  var ws, pivotRange;
+		  var ws, wsModel, pivotRange, pos, i;
 			if (res) {
-				History.Create_NewPoint();
-				History.StartTransaction();
-				callback();
-				History.EndTransaction();
+				wsModel = t.wbModel.getActiveWs();
 				pivotRange = pivot.getRange().clone();
-				// ToDo update ranges, not big range
-                var pos;
-				for (var j = 0; j < pivot.pageFieldsPositions.length; ++j) {
-					pos = pivot.pageFieldsPositions[j];
+				for (i = 0; i < pivot.pageFieldsPositions.length; ++i) {
+					pos = pivot.pageFieldsPositions[i];
 					pivotRange.union3(pos.col + 1, pos.row);
 				}
-				t.wbModel.getActiveWs().updatePivotTablesStyle(pivotRange);
+				History.Create_NewPoint();
+				History.StartTransaction();
+				callback(wsModel);
+				History.EndTransaction();
+				pivotRange.union2(pivot.getRange());
+				// ToDo update ranges, not big range
+				for (i = 0; i < pivot.pageFieldsPositions.length; ++i) {
+					pos = pivot.pageFieldsPositions[i];
+					pivotRange.union3(pos.col + 1, pos.row);
+				}
+				wsModel.updatePivotTablesStyle(pivotRange);
 				ws = t.wb.getWorksheet();
 				ws._onUpdateFormatTable(pivotRange);
 				t.wb._onWSSelectionChanged();

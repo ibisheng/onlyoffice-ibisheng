@@ -4866,6 +4866,33 @@
 			this.pivotTables[i].init();
 		}
 	};
+	Worksheet.prototype.clearPivotRable = function (pivotTable) {
+		var pos, cells;
+		for (var i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
+			pos = pivotTable.pageFieldsPositions[i];
+			cells = this.getRange3(pos.row, pos.col, pos.row, pos.col + 1);
+			cells.clearTableStyle();
+			cells.cleanAll();
+		}
+	};
+	Worksheet.prototype.updatePivotTable = function (pivotTable) {
+		pivotTable.init();
+		var pos, cells, index;
+		var cacheFields = pivotTable.asc_getCacheFields();
+		var pivotFields = pivotTable.asc_getPivotFields();
+		var pageFields = pivotTable.asc_getPageFields();
+		for (var i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
+			pos = pivotTable.pageFieldsPositions[i];
+			cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
+			index = pageFields[i].asc_getIndex();
+			cells.setValue(pageFields[i].asc_getName() || pivotFields[index].asc_getName() ||
+				cacheFields[index].asc_getName());
+
+			cells = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
+			cells.setValue('(All)');
+		}
+	};
+
 	Worksheet.prototype.updatePivotTablesStyle = function (range) {
 		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, pos, countC, countR, stripe1, stripe2,
 			start = 0, emptyStripe = new Asc.CTableStyleElement();
