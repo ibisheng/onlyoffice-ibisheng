@@ -1339,7 +1339,10 @@ CDocumentPositionsManager.prototype.Update_DocumentPositionsOnAdd = function(Cla
         for (var ClassPos = 0, ClassLen = DocPos.length; ClassPos < ClassLen; ++ClassPos)
         {
             var _Pos = DocPos[ClassPos];
-            if (Class === _Pos.Class && _Pos.Position && _Pos.Position >= Pos)
+            if (Class === _Pos.Class
+				&& undefined !== _Pos.Position
+				&& (_Pos.Position > Pos
+				|| (_Pos.Position === Pos && !(Class instanceof ParaRun))))
             {
                 _Pos.Position++;
                 break;
