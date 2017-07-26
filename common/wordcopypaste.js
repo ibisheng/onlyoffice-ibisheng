@@ -7881,7 +7881,13 @@ PasteProcessor.prototype =
 					}
                 }
             }
-			
+
+			//TODO временная правка. пересмотреть обработку тега math
+			if(!child.style && Node.TEXT_NODE !== child.nodeType)
+			{
+				child.style = {};
+			}
+
 			if(!isPasteHyperlink)
 				bAddParagraph = this._ExecutePresentation(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock, arrShapes, arrImages, arrTables);
 			
