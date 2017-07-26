@@ -341,6 +341,7 @@ function CEditorPage(api)
 	this.reporterTimer = -1;
 	this.reporterTimerAdd = 0;
 	this.reporterTimerLastStart = -1;
+	this.reporterPointer = false;
 
 	this.m_oApi = api;
 	var oThis   = this;
@@ -659,6 +660,11 @@ function CEditorPage(api)
 			styleContent += ".btn-prev { background-position: 0px 0px; } .btn-prev:active { background-position: -20px 0px; }";
 			styleContent += ".btn-next { background-position: 0px -20px; } .btn-next:active { background-position: -20px -20px; }";
 			styleContent += ".btn-pause { background-position: 0px -80px; } .btn-pause:active { background-position: -20px -80px; }";
+			styleContent += ".btn-pointer { background-position: 0px -100px; } .btn-pointer-active { background-position: -20px -100px; }";
+			styleContent += ".btn-pointer:active { background-position: -20px -100px; }";
+			styleContent += ".btn-text-default-img2 { background-repeat: no-repeat; position: absolute; background-color: #7d858c; border: none; color: #7d858c; font-size: 11px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; height: 22px; cursor: pointer; }";
+			styleContent += ".btn-text-default-img2:focus { outline: 0; outline-offset: 0; }";
+
 
 			var style		 = document.createElement('style');
 			style.type 	 = 'text/css';
@@ -677,6 +683,10 @@ function CEditorPage(api)
 			_buttonsContent += "<div class=\"separator block_elem_no_select\" id=\"dem_id_sep\" style=\"left: 185px; bottom: 3px;\"></div>";
 
 			_buttonsContent += "<label class=\"block_elem_no_select\" id=\"dem_id_slides\" style=\"color:#666666;text-shadow: none;white-space: nowrap;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; position:absolute; left:207px; bottom: 7px;\"></label>";
+
+			_buttonsContent += "<div class=\"separator block_elem_no_select\" id=\"dem_id_sep2\" style=\"left: 350px; bottom: 3px;\"></div>";
+
+			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_pointer\"  style=\"left: 365px; bottom: 3px; width: 20px; height: 20px;\"><span id=\"dem_id_pointer_span\" class=\"btn-pointer back_image_buttons1\" style=\"width:100%;height:100%;\"></span></button>";
 
 			demBottonsDiv.innerHTML = _buttonsContent;
 
@@ -776,6 +786,35 @@ function CEditorPage(api)
 				_wordControl.reporterTimerLastStart = new Date().getTime();
 				_wordControl.reporterTimerFunc();
 
+			};
+
+			document.getElementById("dem_id_pointer").onclick = function() {
+
+				var _wordControl = window.editor.WordControl;
+				var _elem1 = document.getElementById("dem_id_pointer");
+				var _elem2 = document.getElementById("dem_id_pointer_span");
+
+				if (_wordControl.reporterPointer)
+				{
+					_elem1.classList.remove("btn-text-default-img2");
+					_elem1.classList.add("btn-text-default-img");
+
+					_elem2.classList.remove("btn-pointer-active");
+					_elem2.classList.add("btn-pointer");
+				}
+				else
+				{
+					_elem1.classList.remove("btn-text-default-img");
+					_elem1.classList.add("btn-text-default-img2");
+
+					_elem2.classList.remove("btn-pointer");
+					_elem2.classList.add("btn-pointer-active");
+				}
+
+				_wordControl.reporterPointer = !_wordControl.reporterPointer;
+
+				if (!_wordControl.reporterPointer)
+					_wordControl.DemonstrationManager.PointerRemove();
 			};
 
 			window.onbeforeunload = function(e)
@@ -2846,6 +2885,8 @@ function CEditorPage(api)
 			var _buttonNext = document.getElementById("dem_id_next");
 			var _buttonSeparator = document.getElementById("dem_id_sep");
 			var _labelMain = document.getElementById("dem_id_slides");
+			var _buttonSeparator2 = document.getElementById("dem_id_sep2");
+			var _buttonPointer = document.getElementById("dem_id_pointer");
 
 			var _width = parseInt(this.m_oMainView.HtmlElement.style.width);
 			var _posStart = 10;
@@ -2855,7 +2896,7 @@ function CEditorPage(api)
 				_buttonPlay.style.display = "block";
 				_buttonReset.style.display = "block";
 
-				_posStart = (_width >> 1) - 40;
+				_posStart = (_width >> 1) - 60;
 			}
 			else
 			{
@@ -2868,6 +2909,12 @@ function CEditorPage(api)
 			_buttonNext.style.left = _posStart + 20 + "px";
 			_buttonSeparator.style.left = _posStart + 35 + "px";
 			_labelMain.style.left = _posStart + 57 + "px";
+			var _mainW = _labelMain.offsetWidth;
+			if (_mainW == 0)
+				_mainW = 55;
+			var _leftPos = _posStart + 57 + _mainW + 2;
+			_buttonSeparator2.style.left = _leftPos + "px";
+			_buttonPointer.style.left = _leftPos + 15 + "px";
 		}
 	};
 

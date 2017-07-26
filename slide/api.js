@@ -5951,10 +5951,22 @@ background-repeat: no-repeat;\
 				case "go_to_slide":
 				{
 					_this.WordControl.DemonstrationManager.GoToSlide(_obj["slide"]);
+					break;
 				}
 				case "start_show":
 				{
 					_this.WordControl.DemonstrationManager.EndWaitReporter();
+					break;
+				}
+				case "pointer_move":
+				{
+					_this.WordControl.DemonstrationManager.PointerMove(_obj["x"], _obj["y"], _obj["w"], _obj["h"]);
+					break;
+				}
+				case "pointer_remove":
+				{
+					_this.WordControl.DemonstrationManager.PointerRemove();
+					break;
 				}
 				default:
 					break;

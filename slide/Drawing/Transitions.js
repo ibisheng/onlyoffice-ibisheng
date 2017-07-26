@@ -2702,6 +2702,8 @@ function CDemonstrationManager(htmlpage)
 
     this.waitReporterObject = null;
 
+    this.PointerDiv = null;
+
     var oThis = this;
 
     this.CacheSlide = function(slide_num, slide_index)
@@ -2937,9 +2939,10 @@ function CDemonstrationManager(htmlpage)
 
         this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
 
-        //this.DemonstrationCanvas.onmousedown  = this.onMouseDownDemonstration;
-        //this.DemonstrationCanvas.onmousemove  = this.onMouseMoveDemonstration;
+		this.Canvas.onmousedown  = this.onMouseDown;
+		this.Canvas.onmousemove  = this.onMouseMove;
         this.Canvas.onmouseup    = this.onMouseUp;
+		this.Canvas.onmouseleave = this.onMouseLeave;
 
         this.Canvas.onmousewheel = this.onMouseWhell;
         if (this.Canvas.addEventListener)
@@ -3067,9 +3070,10 @@ function CDemonstrationManager(htmlpage)
             oThis.Overlay.width = oThis.Canvas.width;
             oThis.Overlay.height = oThis.Canvas.height;
 
-            //oThis.Overlay.onmousedown  = oThis.onMouseDownDemonstration;
-            //oThis.Overlay.onmousemove  = oThis.onMouseMoveDemonstration;
+            oThis.Overlay.onmousedown  = oThis.onMouseDown;
+            oThis.Overlay.onmousemove  = oThis.onMouseMove;
             oThis.Overlay.onmouseup    = oThis.onMouseUp;
+			oThis.Overlay.onmouseleave = oThis.onMouseLeave;
 
             oThis.Overlay.onmousewheel = oThis.onMouseWhell;
             if (oThis.Overlay.addEventListener)
@@ -3348,8 +3352,50 @@ function CDemonstrationManager(htmlpage)
         return false;
     }
 
+    this.onMouseLeave = function(e)
+    {
+		if (!oThis.HtmlPage.m_oApi.isReporterMode)
+			return;
+		if (!oThis.HtmlPage.reporterPointer)
+			return;
+
+		oThis.PointerRemove();
+
+        e.preventDefault();
+        return false;
+    }
+
     this.onMouseMove = function(e)
     {
+        if (!oThis.HtmlPage.m_oApi.isReporterMode)
+            return;
+		if (!oThis.HtmlPage.reporterPointer)
+			return;
+
+        var _x = 0;
+        var _y = 0;
+		if (e.pageX || e.pageY)
+		{
+			_x = e.pageX;
+			_y = e.pageY;
+		}
+		else if (e.clientX || e.clientY)
+		{
+			_x = e.clientX;
+			_y = e.clientY;
+		}
+
+		_x -= parseInt(oThis.HtmlPage.m_oMainParent.HtmlElement.style.left);
+		_y -= parseInt(oThis.HtmlPage.m_oMainParent.HtmlElement.style.top);
+
+		var _rect = oThis.Transition.Rect;
+		_x -= _rect.x;
+		_y -= _rect.y;
+		_x /= _rect.w;
+		_y /= _rect.h;
+
+		oThis.PointerMove(_x, _y);
+
         e.preventDefault();
         return false;
     }
@@ -3483,5 +3529,50 @@ function CDemonstrationManager(htmlpage)
 
         if (this.SlideNum < this.SlidesCount)
             this.StartSlide(this.Transition.IsPlaying(), false);
+    }
+
+    this.PointerMove = function(x, y, w, h)
+    {
+        if (!this.PointerDiv)
+        {
+            this.PointerDiv = document.createElement("div");
+            this.PointerDiv.setAttribute("style", "position:absolute;z-index:100;pointer-events:none;width:10px;height:10px;margin:0;padding:0;border:none;background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAX0lEQVR42mOAgTcyylFAfAqIf4MwlB0FkUUomgrE/3Hgqcgm/SeAoxhAVsAEPucW/f/38SMIg9jICk+BFP6GcsAKoADMfiOrAlP4m2iFRFuN6RlZFRDG8AzRwUN0gAMAjHbNbQMjzBIAAAAASUVORK5CYII=')");
+			this.DemonstrationDiv.appendChild(this.PointerDiv);
+        }
+        var _rect = this.Transition.Rect;
+		this.PointerDiv.style.left = ((_rect.x + x * _rect.w - 5) >> 0) + "px";
+		this.PointerDiv.style.top = ((_rect.y + y * _rect.h - 5) >> 0) + "px";
+
+		if (this.HtmlPage.m_oApi.isReporterMode)
+        {
+			this.Canvas.style.cursor = "none";
+			if (this.Overlay)
+				this.Overlay.style.cursor = "none";
+
+            var _msg_ = {
+                "reporter_command" : "pointer_move",
+                "x" : x,
+                "y" : y
+            };
+			window.postMessage(JSON.stringify(_msg_), "*");
+        }
+    }
+
+    this.PointerRemove = function()
+    {
+        if (!this.PointerDiv)
+            return;
+
+		this.DemonstrationDiv.removeChild(this.PointerDiv);
+		this.PointerDiv = null;
+
+		if (this.HtmlPage.m_oApi.isReporterMode)
+		{
+			this.Canvas.style.cursor = "default";
+			if (this.Overlay)
+				this.Overlay.style.cursor = "default";
+
+			window.postMessage("{ \"reporter_command\" : \"pointer_remove\" }", "*");
+		}
     }
 }
