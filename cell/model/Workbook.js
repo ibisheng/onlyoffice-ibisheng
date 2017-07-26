@@ -4881,6 +4881,12 @@
 		var cacheFields = pivotTable.asc_getCacheFields();
 		var pivotFields = pivotTable.asc_getPivotFields();
 		var pageFields = pivotTable.asc_getPageFields();
+		pos = 0 < pivotTable.pageFieldsPositions.length && pivotTable.pageFieldsPositions[0];
+		if (pos && 0 > pos.row) {
+			// ToDo add check exist data in cells
+			pivotTable.getRange().setOffset(new AscCommonExcel.CRangeOffset(0, -1 * pos.row));
+			pivotTable.init();
+		}
 		for (var i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
 			pos = pivotTable.pageFieldsPositions[i];
 			cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
