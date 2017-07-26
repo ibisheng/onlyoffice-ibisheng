@@ -951,8 +951,23 @@ Paragraph.prototype.Check_MathPara = function(MathPos)
 	}
 
 	// Нумерация привязанная к формуле делает ее inline.
-	if (true !== MathParaChecker.Found && undefined !== this.Numbering_Get())
-		return false;
+	if (true !== MathParaChecker.Found)
+	{
+		if(this.bFromDocument)
+		{
+            if(undefined !== this.Numbering_Get())
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if(undefined !== this.Get_CompiledPr2(false).ParaPr.Bullet)
+			{
+				return false;
+			}
+		}
+	}
 
 	if (true !== MathParaChecker.Result)
 		return false;
