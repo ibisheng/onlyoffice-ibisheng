@@ -2585,6 +2585,8 @@ CT_pivotTableDefinition.prototype.toXml = function(writer) {
 CT_pivotTableDefinition.prototype.init = function () {
 	this.pageFieldsPositions = [];
 
+	var rowPageCount = null, colPageCount = null;
+
 	if (this.pageFields) {
 		var wrap, pageOverThenDown;
 		var l = this.pageFields.pageField.length;
@@ -2599,9 +2601,12 @@ CT_pivotTableDefinition.prototype.init = function () {
 			var _c = range.c1;
 			var _r = range.r1 - 1 - dr;
 			var c = _c, r = _r;
+			var minC = _c, minR = _r, maxC = _c, maxR = _r;
 
 			for (var i = 0; i < l; ++i) {
 				this.pageFieldsPositions.push(new AscCommon.CellBase(r, c));
+				maxR = Math.max(maxR, r);
+				maxC = Math.max(maxC, c);
 
 				wrap = (this.pageWrap && 0 === (i + 1) % this.pageWrap);
 				pageOverThenDown = this.pageOverThenDown;
@@ -2618,8 +2623,12 @@ CT_pivotTableDefinition.prototype.init = function () {
 					c = _c;
 				}
 			}
+			rowPageCount = maxR - minR + 1;
+			colPageCount = (maxC - minC) / 3 + 1;
 		}
 	}
+
+	this.location.setPageCount(rowPageCount, colPageCount);
 };
 CT_pivotTableDefinition.prototype.intersection = function (range) {
 	return (this.location && this.location.intersection(range)) || this.pageFieldsIntersection(range);
@@ -2770,7 +2779,6 @@ CT_pivotTableDefinition.prototype.addPageField = function (index) {
 		this.pageFields.add(newField);
 
 		pivotField.axis = c_oAscAxis.AxisPage;
-		this.location.addColPage();
 	}
 };
 CT_pivotTableDefinition.prototype.removeField = function (index) {
@@ -2786,7 +2794,6 @@ CT_pivotTableDefinition.prototype.removeField = function (index) {
 			} else {
 				this.pageFields.remove(index);
 			}
-			this.location.removeColPage();
 			break;
 		case c_oAscAxis.AxisValues:
 			break;
@@ -4071,23 +4078,9 @@ CT_Location.prototype.intersection = function (range) {
 CT_Location.prototype.contains = function (col, row) {
 	return this.ref && this.ref.contains(col, row);
 };
-CT_Location.prototype.addRowPage = function () {
-	if (null === this.rowPageCount) {
-		this.rowPageCount = 0;
-	}
-	++this.rowPageCount;
-};
-CT_Location.prototype.addColPage = function () {
-	if (null === this.colPageCount) {
-		this.colPageCount = 0;
-	}
-	++this.colPageCount;
-};
-CT_Location.prototype.removeColPage = function () {
-	--this.colPageCount;
-	if (0 === this.colPageCount) {
-		this.colPageCount = null;
-	}
+CT_Location.prototype.setPageCount = function (row, col) {
+	this.rowPageCount = row;
+	this.colPageCount = col;
 };
 function CT_PivotFields() {
 //Attributes
