@@ -954,6 +954,8 @@ function CDrawingDocument()
 	this.AutoShapesTrack = null;
 	this.TransitionSlide = new CTransitionAnimation(null);
 
+	this.isDrawingNotes = false;
+
 	this.MoveTargetInInputContext = function()
 	{
 		if (AscCommon.g_inputContext)
@@ -2561,7 +2563,9 @@ function CDrawingDocument()
 	}
 	this.GetDotsPerMM     = function(value)
 	{
-		return value * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
+		if (!this.isDrawingNotes)
+			return value * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
+		return value * g_dKoef_mm_to_pix;
 	}
 
 	this.GetMMPerDot        = function(value)
@@ -5662,7 +5666,9 @@ function CNotesDrawer(page)
 		g.IsNoDrawingEmptyPlaceholder = true;
 		g.IsNoDrawingEmptyPlaceholderText = true;
 
+		this.HtmlPage.m_oDrawingDocument.isDrawingNotes = true;
 		this.HtmlPage.m_oLogicDocument.Notes_Draw(this.Slide, g);
+		this.HtmlPage.m_oDrawingDocument.isDrawingNotes = false;
 		this.IsRepaint = false;
 	};
 
