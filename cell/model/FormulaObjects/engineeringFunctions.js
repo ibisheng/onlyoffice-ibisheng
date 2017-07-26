@@ -958,48 +958,46 @@
 	cBESSELI.prototype.argumentsMin = 2;
 	cBESSELI.prototype.argumentsMax = 2;
 	/*cBESSELI.prototype.Calculate = function ( arg ) {
-	 var x = arg[0],
-	 n = arg[1];
+		 var x = arg[0],
+		 n = arg[1];
 
-	 if ( x instanceof cArea || x instanceof cArea3D ) {
-	 x = x.cross( arguments[1] );
-	 }
-	 else if ( x instanceof cArray ) {
-	 x = x.getElementRowCol( 0, 0 );
-	 }
+		 if ( x instanceof cArea || x instanceof cArea3D ) {
+		 	x = x.cross( arguments[1] );
+		 }
+		 else if ( x instanceof cArray ) {
+		 	x = x.getElementRowCol( 0, 0 );
+		 }
 
-	 if ( n instanceof cArea || n instanceof cArea3D ) {
-	 n = n.cross( arguments[1] );
-	 }
-	 else if ( n instanceof cArray ) {
-	 n = n.getElementRowCol( 0, 0 );
-	 }
+		 if ( n instanceof cArea || n instanceof cArea3D ) {
+		 	n = n.cross( arguments[1] );
+		 }
+		 else if ( n instanceof cArray ) {
+		 	n = n.getElementRowCol( 0, 0 );
+		 }
 
-	 x = x.tocNumber();
-	 n = n.tocNumber();
+		 x = x.tocNumber();
+		 n = n.tocNumber();
 
-	 if ( x instanceof cError ) {
-	 return this.value = x;
-	 }
-	 if ( n instanceof cError ) {
-	 return this.value = n;
-	 }
+		 if ( x instanceof cError ) {
+			 return this.value = x;
+		 }
+		 if ( n instanceof cError ) {
+		 	return this.value = n;
+		 }
 
-	 x = x.getValue();
-	 n = n.getValue();
+		 x = x.getValue();
+		 n = n.getValue();
 
-	 if ( n < 0 ){
-	 return this.value = new cError( cErrorType.not_numeric );
-	 }
-	 this.value = BesselI( x, n );
-	 return this.value;
+		 if ( n < 0 ){
+			 return this.value = new cError( cErrorType.not_numeric );
+		 }
+		 if(x < 0){
+		 	x = Math.abs(x);
+		 }
+		 n = Math.floor(n);
 
-	 };
-	 cBESSELI.prototype.getInfo = function () {
-	 return {
-	 name:this.name,
-	 args:"( effect-rate , npery )"
-	 };
+		 this.value = BesselI( x, n );
+		 return this.value;
 	 };*/
 
 	/**
