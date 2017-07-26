@@ -1677,20 +1677,39 @@ function CDrawingDocument()
 	this.ConvertCoordsToCursorWR = function(x, y, pageIndex, transform)
 	{
 		var _word_control = this.m_oWordControl;
-		var dKoef         = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-		var __x = x;
-		var __y = y;
-		if (transform)
+		if (!_word_control.m_oLogicDocument.IsFocusOnNotes())
 		{
-			__x = transform.TransformPointX(x, y);
-			__y = transform.TransformPointY(x, y);
+			var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
+			var __x = x;
+			var __y = y;
+			if (transform)
+			{
+				__x = transform.TransformPointX(x, y);
+				__y = transform.TransformPointY(x, y);
+			}
+
+			var x_pix = (this.SlideCurrectRect.left + __x * dKoef + (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
+			var y_pix = (this.SlideCurrectRect.top + __y * dKoef + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
+
+			return {X: x_pix, Y: y_pix, Error: false};
 		}
+		else
+		{
+			var __x = x;
+			var __y = y;
+			if (transform)
+			{
+				__x = transform.TransformPointX(x, y);
+				__y = transform.TransformPointY(x, y);
+			}
 
-		var x_pix = (this.SlideCurrectRect.left + __x * dKoef + (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
-		var y_pix = (this.SlideCurrectRect.top + __y * dKoef + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
+			var x_pix = (__x * g_dKoef_mm_to_pix + 10 + (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oNotesContainer.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
+			var y_pix = (__y * g_dKoef_mm_to_pix + 10 + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oNotesContainer.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
 
-		return {X : x_pix, Y : y_pix, Error : false};
+			return {X: x_pix, Y: y_pix, Error: false};
+		}
 	}
 
 	this.ConvertCoordsToCursor3 = function (x, y, isGlobal)
