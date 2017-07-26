@@ -2355,6 +2355,38 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), 0 );
 	} );
 
+	test( "Test: \"MINIFS\"", function () {
+
+		ws.getRange2( "AAA2" ).setValue( "10" );
+		ws.getRange2( "AAA3" ).setValue( "1" );
+		ws.getRange2( "AAA4" ).setValue( "100" );
+		ws.getRange2( "AAA5" ).setValue( "1" );
+		ws.getRange2( "AAA6" ).setValue( "1" );
+		ws.getRange2( "AAA7" ).setValue( "50" );
+
+		ws.getRange2( "BBB2" ).setValue( "b" );
+		ws.getRange2( "BBB3" ).setValue( "a" );
+		ws.getRange2( "BBB4" ).setValue( "a" );
+		ws.getRange2( "BBB5" ).setValue( "b" );
+		ws.getRange2( "BBB6" ).setValue( "a" );
+		ws.getRange2( "BBB7" ).setValue( "b" );
+
+		ws.getRange2( "DDD2" ).setValue( "100" );
+		ws.getRange2( "DDD3" ).setValue( "100" );
+		ws.getRange2( "DDD4" ).setValue( "200" );
+		ws.getRange2( "DDD5" ).setValue( "300" );
+		ws.getRange2( "DDD6" ).setValue( "100" );
+		ws.getRange2( "DDD7" ).setValue( "400" );
+
+		oParser = new parserFormula( 'MINIFS(AAA2:AAA7,BBB2:BBB7,"b",DDD2:DDD7,">100")', "A22", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 1 );
+
+		oParser = new parserFormula( 'MINIFS(AAA2:AAA6,BBB2:BBB6,"a",DDD2:DDD6,">200")', "A22", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 0 );
+	} );
+
     test( "Test: \"TEXT\"", function () {
 
         oParser = new parserFormula( "TEXT(1234.567,\"$0.00\")", "A2", ws );
