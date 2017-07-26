@@ -3613,6 +3613,9 @@ function CEditorPage(api)
 			oWordControl.Thumbnails.onCheckUpdate();
 		}
 
+		if (!isRepaint && oWordControl.m_oNotesApi.IsRepaint)
+			isRepaint = true;
+
 		if (oWordControl.IsSupportNotes && oWordControl.m_oNotesApi)
 			oWordControl.m_oNotesApi.CheckPaint();
 

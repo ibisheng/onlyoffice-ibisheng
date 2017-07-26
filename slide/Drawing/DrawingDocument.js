@@ -691,7 +691,8 @@ function CDrawingCollaborativeTarget()
 	this.HtmlElementY = 0;
 
 	this.Style = "";
-	this.IsInsertToDOM = false;
+	this.HtmlParentId = -1; // 0 - main, 1 - notes
+	this.HtmlParent = null;
 }
 CDrawingCollaborativeTarget.prototype =
 {
@@ -732,8 +733,12 @@ CDrawingCollaborativeTarget.prototype =
 		var _oldW = this.HtmlElement.width;
 		var _oldH = this.HtmlElement.height;
 
+		var isNotes = _drawing_doc.m_oWordControl.m_oLogicDocument.IsFocusOnNotes();
+
 		var _newW = 2;
 		var _newH = (this.Size * _drawing_doc.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100) >> 0;
+		if (isNotes)
+			_newH = (this.Size * g_dKoef_mm_to_pix) >> 0;
 
 		if (null != this.Transform && !global_MatrixTransformer.IsIdentity2(this.Transform))
 		{
@@ -829,7 +834,15 @@ CDrawingCollaborativeTarget.prototype =
 				_y += this.Transform.ty;
 			}
 
-			var pos = _drawing_doc.ConvertCoordsToCursor(_x, _y);
+			var pos = null;
+			if (!isNotes)
+			{
+				pos = _drawing_doc.ConvertCoordsToCursor(_x, _y);
+			}
+			else
+			{
+				pos = { X : (10 + _x * g_dKoef_mm_to_pix), Y : (_y * g_dKoef_mm_to_pix - _drawing_doc.m_oWordControl.m_oNotesApi.Scroll) };
+			}
 
 			this.HtmlElementX           = pos.X >> 0;
 			this.HtmlElementY           = pos.Y >> 0;
@@ -842,10 +855,19 @@ CDrawingCollaborativeTarget.prototype =
 			AscCommon.CollaborativeEditing.Update_ForeignCursorLabelPosition(this.Id, this.HtmlElementX, this.HtmlElementY, this.Color);
 
 		// 3) добавить, если нужно
-		if (bIsHtmlElementCreate)
+		var HtmlParentIdNew = isNotes ? 1 : 0;
+		if (this.HtmlParent && (HtmlParentIdNew != this.HtmlParentId))
 		{
-			_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.HtmlElement);
-			this.IsInsertToDOM = true;
+			this.HtmlParent.removeChild(this.HtmlElement);
+			this.HtmlParent = null;
+			this.HtmlParentId = -1;
+		}
+
+		if (bIsHtmlElementCreate || (-1 == this.HtmlParentId))
+		{
+			this.HtmlParent = (0 == HtmlParentIdNew) ? _drawing_doc.m_oWordControl.m_oMainView.HtmlElement : _drawing_doc.m_oWordControl.m_oNotesContainer.HtmlElement;
+			this.HtmlParentId = HtmlParentIdNew;
+			this.HtmlParent.appendChild(this.HtmlElement);
 		}
 
 		if (this.HtmlElement.style.display != "block")
@@ -856,10 +878,12 @@ CDrawingCollaborativeTarget.prototype =
 
 	Remove : function(_drawing_doc)
 	{
-		if (this.IsInsertToDOM)
+		if (this.HtmlParent)
 		{
-			_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
-			this.IsInsertToDOM = false;
+			//_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
+			this.HtmlParent.removeChild(this.HtmlElement);
+			this.HtmlParent = null;
+			this.HtmlParentId = -1;
 		}
 	},
 
