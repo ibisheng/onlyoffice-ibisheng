@@ -11286,17 +11286,17 @@ drawSurfaceChart.prototype =
 		var xPoints = this.cChartSpace.chart.plotArea.catAx.xPoints;
 		var perspectiveDepth = this.cChartDrawer.processor3D.depthPerspective;
 		
-		var roundInt = 1;
+		/*var roundInt = 1;
 		if(this.chartProp.axisStep)
 		{
 			var roundProps = this.cChartDrawer._getFirstDegree(this.chartProp.axisStep);
 			var roundProp = roundProps.numPow.toString().split('.');
 			var roundCount = roundProp && roundProp[1] ? roundProp[1].length : 0;
 			roundInt = Math.pow(10, roundCount + 1);
-		}
+		}*/
 		
 		//var roundKF = this.chartProp.axisStep;
-		var y, x, z, val, seria, dataSeries, compiledMarkerSize, compiledMarkerSymbol, idx, numCache, idxPoint, points = [], points3d = [];
+		var y, x, z, val, seria, dataSeries, idx, numCache, idxPoint, points = [], points3d = [], idx2, val2;
 		for (var i = 0; i < this.chartProp.series.length; i++) {
 			seria = this.chartProp.series[i];
 			numCache = seria.val.numRef ? seria.val.numRef.numCache : seria.val.numLit;
@@ -11311,18 +11311,26 @@ drawSurfaceChart.prototype =
 			{	
 				//рассчитываем значения
 				idx = dataSeries[n] && dataSeries[n].idx != null ? dataSeries[n].idx : n;
-				//TODO временно заменил idx на n. позже нужно использовать idx
-				val = Math.round(this._getYVal(n, i) * roundInt) / roundInt;
-				//val = this._getYVal(idx, i);
+
+				//TODO временно заменил idx на n. позже нужно использовать idx  -> val = this._getYVal(idx, i);
+				val = this._getYVal(n, i);
+				if(null === val){
+					val = 0;
+				}
 				
 				x  = xPoints[n].pos * this.chartProp.pxToMM;
 				y  = this.cChartDrawer.getYPosition(val, yPoints) * this.chartProp.pxToMM;
 				z = (perspectiveDepth / (this.chartProp.series.length - 1)) * (i);
 				
 				//рассчитываем значения
-				var idx2 = dataSeries[n + 1] && dataSeries[n + 1].idx != null ? dataSeries[n + 1].idx : null;
+				idx2 = dataSeries[n + 1] && dataSeries[n + 1].idx != null ? dataSeries[n + 1].idx : null;
+
 				//TODO временно заменил idx на n. позже нужно использовать idx
-				var val2 = Math.round(this._getYVal(n + 1, i) * roundInt) / roundInt;
+				//var val2 = Math.round(this._getYVal(n + 1, i) * roundInt) / roundInt;
+				val2 = this._getYVal(n + 1, i);
+				if(null === val2){
+					val2 = 0;
+				}
 				
 				if(idx2 !== null)
 				{	
