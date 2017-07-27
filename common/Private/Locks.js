@@ -206,6 +206,7 @@ CAbstractNum.prototype.Document_Is_SelectionLocked = function(CheckType)
     {
         case AscCommon.changestype_Paragraph_Content:
         case AscCommon.changestype_Paragraph_Properties:
+		case AscCommon.changestype_Paragraph_AddText:
         {
             this.Lock.Check( this.Get_Id() );
             break;
@@ -240,6 +241,7 @@ if(typeof CGraphicObjects !== "undefined")
             || AscCommon.changestype_Delete === CheckType
             || AscCommon.changestype_Remove === CheckType
             || AscCommon.changestype_Paragraph_Content === CheckType
+			|| AscCommon.changestype_Paragraph_AddText === CheckType
             || AscCommon.changestype_Paragraph_Properties === CheckType
             || AscCommon.changestype_Document_Content_Add === CheckType)
         {
@@ -269,6 +271,7 @@ CStyle.prototype.Document_Is_SelectionLocked = function(CheckType)
     {
         case AscCommon.changestype_Paragraph_Content:
         case AscCommon.changestype_Paragraph_Properties:
+		case AscCommon.changestype_Paragraph_AddText:
         case AscCommon.changestype_Document_Content:
         case AscCommon.changestype_Document_Content_Add:
         case AscCommon.changestype_Image_Properties:
@@ -290,6 +293,7 @@ CStyles.prototype.Document_Is_SelectionLocked = function(CheckType)
     {
         case AscCommon.changestype_Paragraph_Content:
         case AscCommon.changestype_Paragraph_Properties:
+		case AscCommon.changestype_Paragraph_AddText:
         case AscCommon.changestype_Document_Content:
         case AscCommon.changestype_Document_Content_Add:
         case AscCommon.changestype_Image_Properties:
@@ -415,6 +419,7 @@ Paragraph.prototype.Document_Is_SelectionLocked = function(CheckType)
     {
         case AscCommon.changestype_Paragraph_Content:
 		case AscCommon.changestype_Paragraph_Properties:
+		case AscCommon.changestype_Paragraph_AddText:
         case AscCommon.changestype_Document_Content:
         case AscCommon.changestype_Document_Content_Add:
         case AscCommon.changestype_Image_Properties:
@@ -522,6 +527,7 @@ CTable.prototype.Document_Is_SelectionLocked = function(CheckType, bCheckInner)
     {
         case AscCommon.changestype_Paragraph_Content:
         case AscCommon.changestype_Paragraph_Properties:
+		case AscCommon.changestype_Paragraph_AddText:
         case AscCommon.changestype_Document_Content:
         case AscCommon.changestype_Document_Content_Add:
         case AscCommon.changestype_Delete:
@@ -640,6 +646,7 @@ CBlockLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType, bChec
 
 	if (isCheckContentControlLock
 		&& (AscCommon.changestype_Paragraph_Content === CheckType
+		|| AscCommon.changestype_Paragraph_AddText === CheckType
 		|| AscCommon.changestype_Remove === CheckType
 		|| AscCommon.changestype_Delete === CheckType
 		|| AscCommon.changestype_Document_Content === CheckType
@@ -708,6 +715,7 @@ CInlineLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType)
 	var nContentControlLock = this.GetContentControlLock();
 
 	if ((AscCommon.changestype_Paragraph_Content === CheckType
+		|| AscCommon.changestype_Paragraph_AddText === CheckType
 		|| AscCommon.changestype_Remove === CheckType
 		|| AscCommon.changestype_Delete === CheckType
 		|| AscCommon.changestype_Document_Content === CheckType
@@ -715,12 +723,23 @@ CInlineLevelSdt.prototype.Document_Is_SelectionLocked = function(CheckType)
 		&& this.IsSelectionUse()
 		&& this.IsSelectedAll())
 	{
-		if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock || AscCommonWord.sdtlock_SdtLocked === nContentControlLock)
+		var bSelectedOnlyThis = false;
+		// Если это происходит на добавлении текста, тогда проверяем, что выделен только данный элемент
+		if (AscCommon.changestype_Paragraph_AddText === CheckType && this.Paragraph && this.Paragraph.LogicDocument)
+		{
+			var oInfo = this.Paragraph.LogicDocument.GetSelectedElementsInfo();
+			bSelectedOnlyThis = oInfo.GetInlineLevelSdt() === this ? true : false;
+		}
+
+		if (AscCommonWord.sdtlock_SdtContentLocked === nContentControlLock
+			|| (AscCommonWord.sdtlock_SdtLocked === nContentControlLock && true !== bSelectedOnlyThis)
+			|| (AscCommonWord.sdtlock_ContentLocked === nContentControlLock && true === bSelectedOnlyThis))
 		{
 			return AscCommon.CollaborativeEditing.Add_CheckLock(true);
 		}
 	}
 	else if ((AscCommon.changestype_Paragraph_Content === CheckType
+		|| AscCommon.changestype_Paragraph_AddText === CheckType
 		|| AscCommon.changestype_Remove === CheckType
 		|| AscCommon.changestype_Delete === CheckType
 		|| AscCommon.changestype_Document_Content === CheckType

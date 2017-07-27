@@ -7106,7 +7106,7 @@ CDocument.prototype.OnKeyPress = function(e)
 
 	if (Code > 0x20)
 	{
-		if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, this.IsFormFieldEditing()))
+		if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_AddText, null, true, this.IsFormFieldEditing()))
 		{
 			this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddLetter);
 
