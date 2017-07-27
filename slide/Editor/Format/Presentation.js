@@ -3438,6 +3438,7 @@ CPresentation.prototype =
 
     CheckEmptyPlaceholderNotes: function(){
 	    var oCurSlide = this.Slides[this.CurPage];
+	    this.DrawingDocument.CheckGuiControlColors();
 	    if(oCurSlide && oCurSlide.notesShape){
 	        var oContent = oCurSlide.notesShape.getDocContent();
 	        if(oContent && oContent.Is_Empty()){
@@ -3538,7 +3539,9 @@ CPresentation.prototype =
                 e.ctrlKey = e.CtrlKey;
                 e.shiftKey = e.ShiftKey;
                 var ret = oCurSlide.notes.graphicObjects.onMouseDown(e, X, Y);
-                this.CheckEmptyPlaceholderNotes();
+                if(bFocusOnSlide){
+                    this.CheckEmptyPlaceholderNotes();
+                }
                 if(!ret)
                 {
                     this.Document_UpdateSelectionState();

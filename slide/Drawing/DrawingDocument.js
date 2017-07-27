@@ -2724,8 +2724,19 @@ function CDrawingDocument()
 		if (-1 != this.SlideCurrent)
 		{
 			_slide  = this.m_oWordControl.m_oLogicDocument.Slides[this.SlideCurrent];
-			_layout = _slide.Layout;
-			_master = _layout.Master;
+			if(!_slide){
+				return;
+			}
+			if( this.m_oWordControl.m_oLogicDocument.FocusOnNotes){
+				if(!_slide.notes){
+					return;
+				}
+                _master = _slide.notes.Master;
+			}
+			else{
+                _layout = _slide.Layout;
+                _master = _layout.Master;
+			}
 		}
 		else if ((0 < this.m_oWordControl.m_oLogicDocument.slideMasters.length) &&
 			(0 < this.m_oWordControl.m_oLogicDocument.slideMasters[0].sldLayoutLst.length))
