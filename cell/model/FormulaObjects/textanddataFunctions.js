@@ -59,7 +59,7 @@
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cASC, cBAHTTEXT, cCHAR, cCLEAN, cCODE, cCONCATENATE, cCONCAT, cDOLLAR, cEXACT,
 		cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cNUMBERVALUE, cPHONETIC, cPROPER, cREPLACE,
-		cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTRIM, cUPPER, cVALUE);
+		cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTEXTJOIN, cTRIM, cUPPER, cVALUE);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cASC, cBAHTTEXT, cJIS, cPHONETIC);
@@ -1787,6 +1787,80 @@
 		this.value = new cString(text);
 		this.value.numFormat = AscCommonExcel.cNumFormatNone;
 		return this.value;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cTEXTJOIN() {
+		this.name = "TEXTJOIN";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cTEXTJOIN.prototype = Object.create(cBaseFunction.prototype);
+	cTEXTJOIN.prototype.constructor = cTEXTJOIN;
+	cTEXTJOIN.prototype.argumentsMin = 3;
+	cTEXTJOIN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cTEXTJOIN.prototype.isXLFN = true;
+	cTEXTJOIN.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments([arg[0], arg[1]], arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocString();
+		argClone[1] = argClone[1].tocBool();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var delimiter = argClone[0].toString();
+		var ignore_empty = argClone[1].toBool();
+
+		var concatString = function(string1, string2){
+			var res = string1;
+			var delimeterStr = string1 === "" ? "" : delimiter;
+			if("" === string2 && ignore_empty){
+				return res;
+			}
+			res += delimeterStr + string2;
+			return res;
+		};
+
+		var arg0 = new cString(""), argI;
+		for (var i = 2; i < this.argumentsCurrent; i++) {
+			argI = arg[i];
+			if (argI instanceof cArea || argI instanceof cArea3D) {
+				argI.foreach2(function (elem) {
+					arg0 = new cString(concatString(arg0.toString(), elem.toString()));
+				});
+			}else{
+				argI = argI.tocString();
+
+				if (argI instanceof cError) {
+					return this.value = argI;
+				} else if (argI instanceof cArray) {
+					argI.foreach(function (elem) {
+						if (elem instanceof cError) {
+							arg0 = elem;
+							return true;
+						}
+						arg0 = new cString(concatString(arg0.toString(), elem.toString()));
+					});
+
+					if (arg0 instanceof cError) {
+						return this.value = arg0;
+					}
+				} else {
+					arg0 = new cString(concatString(arg0.toString(), argI.toString()));
+				}
+			}
+		}
+
+		return this.value = arg0;
 	};
 
 	/**
