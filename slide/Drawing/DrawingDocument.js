@@ -5687,8 +5687,8 @@ function CNotesDrawer(page)
 		g.m_oCoordTransform.ty = -this.Scroll;
 		g.transform(1, 0, 0, 1, 0, 0);
 
-		g.IsNoDrawingEmptyPlaceholder = true;
-		g.IsNoDrawingEmptyPlaceholderText = true;
+		//g.IsNoDrawingEmptyPlaceholder = true;
+//		g.IsNoDrawingEmptyPlaceholderText = true;
 
 		this.HtmlPage.m_oDrawingDocument.isDrawingNotes = true;
 		this.HtmlPage.m_oLogicDocument.Notes_Draw(this.Slide, g);

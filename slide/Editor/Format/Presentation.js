@@ -1856,6 +1856,7 @@ CPresentation.prototype =
             oController.selectObject(Image, 0);
             this.Recalculate();
             this.Document_UpdateInterfaceState();
+            this.CheckEmptyPlaceholderNotes();
         }
     },
 
@@ -1908,6 +1909,7 @@ CPresentation.prototype =
             _this.Slides[_this.CurPage].graphicObjects.resetSelection();
             _this.Slides[_this.CurPage].graphicObjects.selectObject(Image, 0);
             _this.Document_UpdateInterfaceState();
+            this.CheckEmptyPlaceholderNotes();
         }, [], false, AscDFH.historydescription_Presentation_AddChart);
     },
 
@@ -1983,6 +1985,7 @@ CPresentation.prototype =
             this.Recalculate();
             this.Document_UpdateInterfaceState();
             this.Document_UpdateSelectionState();
+            this.CheckEmptyPlaceholderNotes();
         }
         else
         {
@@ -3427,6 +3430,19 @@ CPresentation.prototype =
         return bRetValue;
     },
 
+
+    CheckEmptyPlaceholderNotes: function(){
+	    var oCurSlide = this.Slides[this.CurPage];
+	    if(oCurSlide && oCurSlide.notesShape){
+	        var oContent = oCurSlide.notesShape.getDocContent();
+	        if(oContent && oContent.Is_Empty()){
+	            this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+	            return true;
+            }
+        }
+        return false;
+    },
+
     OnMouseDown : function(e, X, Y, PageIndex)
     {
         this.CurPage = PageIndex;
@@ -3446,6 +3462,7 @@ CPresentation.prototype =
             this.Document_UpdateSelectionState();
         }
         this.Document_UpdateInterfaceState();
+        this.CheckEmptyPlaceholderNotes();
     },
 
     OnMouseUp : function(e, X, Y, PageIndex)
@@ -3516,6 +3533,7 @@ CPresentation.prototype =
                 e.ctrlKey = e.CtrlKey;
                 e.shiftKey = e.ShiftKey;
                 var ret = oCurSlide.notes.graphicObjects.onMouseDown(e, X, Y);
+                this.CheckEmptyPlaceholderNotes();
                 if(!ret)
                 {
                     this.Document_UpdateSelectionState();
@@ -4629,6 +4647,7 @@ CPresentation.prototype =
             this.bGoToPage = true;
             this.bNeedUpdateTh = true;
             this.FocusOnNotes = false;
+            this.CheckEmptyPlaceholderNotes();
 
         }
         else if(this.Slides[this.CurPage])

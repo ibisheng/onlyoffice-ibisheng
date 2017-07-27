@@ -1072,6 +1072,15 @@ Slide.prototype =
                     this.notesShape.contentWidth = Width;
                     this.notesShape.contentHeight = 2000;
                 }
+                this.notesShape.transformText2 = this.notesShape.transformText;
+                this.notesShape.invertTransformText2 = this.notesShape.invertTransformText;
+                var oOldGeometry = this.notesShape.spPr.geometry;
+                this.notesShape.spPr.geometry = null;
+                this.notesShape.extX = Width;
+                this.notesShape.extX = 2000;
+                this.notesShape.recalculateContent2();
+                this.notesShape.spPr.geometry = oOldGeometry;
+                this.notesShape.pen = AscFormat.CreateNoFillLine();
             }
         }, this, []);
     },
@@ -1533,10 +1542,10 @@ AscFormat.CTextBody.prototype.Get_AbsoluteColumn = function(CurPage)
 AscFormat.CTextBody.prototype.checkCurrentPlaceholder = function()
 {
     var presentation = editor.WordControl.m_oLogicDocument;
-
-    if(presentation.Slides[presentation.CurPage])
+    var oCurController = presentation.GetCurrentController();
+    if(oCurController)
     {
-        return presentation.Slides[presentation.CurPage].graphicObjects.getTargetDocContent() === this.content;
+        return oCurController.getTargetDocContent() === this.content;
     }
     return false;
 };
