@@ -724,6 +724,9 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 			{
 				var oSdt = new CBlockLevelSdt(editor.WordControl.m_oLogicDocument, this);
 
+				var oLogicDocument = this instanceof CDocument ? this : this.LogicDocument;
+				oLogicDocument.RemoveCommentsOnPreDelete = false;
+
 				var nStartPos = this.Selection.StartPos;
 				var nEndPos   = this.Selection.EndPos;
 				if (nEndPos < nStartPos)
@@ -747,6 +750,8 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				this.Selection.StartPos = nStartPos;
 				this.Selection.EndPos   = nStartPos;
 				this.CurPos.ContentPos  = nStartPos;
+
+				oLogicDocument.RemoveCommentsOnPreDelete = false;
 				return oSdt;
 			}
 		}

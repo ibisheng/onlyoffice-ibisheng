@@ -9439,6 +9439,9 @@ Paragraph.prototype.PreDelete = function()
 	// Кроме этого, если тут начинались или заканчивались комметарии, то их тоже
 	// удаляем.
 
+	if (this.LogicDocument && true !== this.LogicDocument.RemoveCommentsOnPreDelete)
+		return;
+
 	for (var Index = 0; Index < this.Content.length; Index++)
 	{
 		var Item = this.Content[Index];

@@ -1516,10 +1516,11 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.Spelling = new CDocumentSpelling();
 
     // Дополнительные настройки
-    this.UseTextShd             = true;  // Использовать ли заливку текста
-    this.ForceCopySectPr        = false; // Копировать ли настройки секции, если родительский класс параграфа не документ
-    this.CopyNumberingMap       = null;  // Мап старый индекс -> новый индекс для копирования нумерации
-    this.CheckLanguageOnTextAdd = false; // Проверять ли язык при добавлении текста в ран
+    this.UseTextShd                = true;  // Использовать ли заливку текста
+    this.ForceCopySectPr           = false; // Копировать ли настройки секции, если родительский класс параграфа не документ
+    this.CopyNumberingMap          = null;  // Мап старый индекс -> новый индекс для копирования нумерации
+    this.CheckLanguageOnTextAdd    = false; // Проверять ли язык при добавлении текста в ран
+	this.RemoveCommentsOnPreDelete = false; // Удалять ли комментарий при удалением объекта
 
     // Мап для рассылки
     this.MailMergeMap             = null;
