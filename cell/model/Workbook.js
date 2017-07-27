@@ -4877,17 +4877,46 @@
 	};
 	Worksheet.prototype.updatePivotTable = function (pivotTable) {
 		pivotTable.init();
-		var pos, cells, index;
-		var cacheFields = pivotTable.asc_getCacheFields();
-		var pivotFields = pivotTable.asc_getPivotFields();
-		var pageFields = pivotTable.asc_getPageFields();
-		pos = 0 < pivotTable.pageFieldsPositions.length && pivotTable.pageFieldsPositions[0];
+		var pos, cells, bWarning;
+		var l = pivotTable.pageFieldsPositions.length;
+		pos = 0 < l && pivotTable.pageFieldsPositions[0];
 		if (pos && 0 > pos.row) {
 			// ToDo add check exist data in cells
 			pivotTable.getRange().setOffset(new AscCommonExcel.CRangeOffset(0, -1 * pos.row));
 			pivotTable.init();
 		}
-		for (var i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
+		var cleanRanges = [];
+		pivotTable.pageFieldsPositions.forEach(function (pageFieldPos) {
+			cells = this.getRange3(pageFieldPos.row, pageFieldPos.col, pageFieldPos.row, pageFieldPos.col + 1);
+			if (!bWarning) {
+				cells._foreachNoEmpty(function (cell) {
+					return (bWarning = !cell.isEmptyText()) ? null : cell;
+				});
+			}
+			cleanRanges.push(cells);
+		}, this);
+		var t = this;
+		function callback(res) {
+			if (res) {
+				t._updatePivotTable(pivotTable, cleanRanges);
+			}
+		}
+		if (bWarning) {
+			// ToDo add confirm event
+			callback(true);
+		} else {
+			callback(true);
+		}
+	};
+	Worksheet.prototype._updatePivotTable = function (pivotTable, cleanRanges) {
+		cleanRanges.forEach(function (element) {
+			element.cleanAll();
+		});
+		var pos, cells, index, i;
+		var cacheFields = pivotTable.asc_getCacheFields();
+		var pivotFields = pivotTable.asc_getPivotFields();
+		var pageFields = pivotTable.asc_getPageFields();
+		for (i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
 			pos = pivotTable.pageFieldsPositions[i];
 			cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
 			index = pageFields[i].asc_getIndex();
