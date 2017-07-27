@@ -11413,10 +11413,9 @@ drawSurfaceChart.prototype =
 		
 		
 		var pointsValue = [p1, p2, p21, p];
-		var res = this.cChartDrawer.isPointsLieIntoOnePlane3(p3d, p13d, p213d, p23d);
 		if(this.cChartDrawer.isPointsLieIntoOnePlane(p3d, p13d, p213d, p23d))//не делим диагональю данный сегмент
 		{
-			var pointsFace = this._getIntersectionPlanesAndLines(lines, pointsValue, true);
+			this._getIntersectionPlanesAndLines(lines, pointsValue, true);
 		}
 		else//делим диагональю данный сегмент
 		{
