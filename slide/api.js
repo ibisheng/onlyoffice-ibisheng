@@ -2050,7 +2050,8 @@ background-repeat: no-repeat;\
 					"c": "reopen",
 					"url": this.documentUrl,
 					"title": this.documentTitle,
-					"password": option.asc_getPassword()
+					"password": option.asc_getPassword(),
+					"nobase64": Asc.c_nNoBase64
 				};
 
 				sendCommand(this, null, v);
@@ -6340,6 +6341,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
+		oAdditionalData["nobase64"]     = Asc.c_nNoBase64;
 		if (DownloadType.Print === options.downloadType)
 		{
 			oAdditionalData["inline"] = 1;
@@ -6347,10 +6349,10 @@ background-repeat: no-repeat;\
 		if (c_oAscFileType.PDF == filetype)
 		{
 			var dd             = this.WordControl.m_oDrawingDocument;
-			dataContainer.data = dd.ToRendererPart();
+			dataContainer.data = dd.ToRendererPart(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
 		}
 		else
-			dataContainer.data = this.WordControl.SaveDocument();
+			dataContainer.data = this.WordControl.SaveDocument(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
 		var fCallback     = function(input)
 		{
 			var error = c_oAscError.ID.Unknown;

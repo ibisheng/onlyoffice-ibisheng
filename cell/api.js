@@ -594,7 +594,9 @@ var editor;
             "title": this.documentTitle,
             "delimiter": option.asc_getDelimiter(),
             "delimiterChar": option.asc_getDelimiterChar(),
-            "codepage": option.asc_getCodePage()};
+            "codepage": option.asc_getCodePage(),
+            "nobase64": Asc.c_nNoBase64
+          };
 
           sendCommand(this, null, v);
         } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
@@ -613,7 +615,8 @@ var editor;
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
-            "password": option.asc_getPassword()
+            "password": option.asc_getPassword(),
+            "nobase64": Asc.c_nNoBase64
           };
 
           sendCommand(this, null, v);
@@ -646,12 +649,12 @@ var editor;
     if (opt_isPassword) {
       t.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.DRM), this.advancedOptionsAction);
     } else if (data) {
-      AscCommon.loadFileContent(data, function(result) {
-        if (null === result) {
+      AscCommon.loadFileContent(data, function(httpRequest) {
+        if (null === httpRequest) {
           t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
           return;
         }
-        var cp = JSON.parse(result);
+        var cp = JSON.parse(httpRequest.responseText);
         cp['encodings'] = AscCommon.getEncodingParams();
         t.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
       });
@@ -694,6 +697,7 @@ var editor;
     oAdditionalData["title"] =
         AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
     oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
+    oAdditionalData["nobase64"] = Asc.c_nNoBase64;
     var t = this;
     t.fCurCallback = function (incomeObject) {
       if (null != input && "save" == input["type"]) {
@@ -739,6 +743,7 @@ var editor;
     oAdditionalData["jwt"] = this.CoAuthoringApi.get_jwt();
     oAdditionalData["outputformat"] = sFormat;
     oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(sFormat), Asc.c_nMaxDownloadTitleLen);
+    oAdditionalData["nobase64"] = Asc.c_nNoBase64;
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
     }
@@ -747,7 +752,11 @@ var editor;
       var pdf_writer = new AscCommonExcel.CPdfPrinter();
       this.wb.printSheets(pdf_writer, printPagesData);
 
-      dataContainer.data = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
+      if (Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined') {
+        dataContainer.data = pdf_writer.DocumentRenderer.Memory.GetData();
+      } else {
+        dataContainer.data = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
+      }
     } else if (c_oAscFileType.CSV === sFormat && !options.CSVOptions) {
       // Мы открывали команду, надо ее закрыть.
       if (actionType) {
@@ -766,7 +775,7 @@ var editor;
           oAdditionalData["delimiterChar"] = options.CSVOptions.asc_getDelimiterChar();
         }
       }
-      dataContainer.data = oBinaryFileWriter.Write();
+      dataContainer.data = oBinaryFileWriter.Write(undefined, Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
     }
     var fCallback = function(input) {
       var error = c_oAscError.ID.Unknown;

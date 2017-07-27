@@ -230,14 +230,15 @@ function BinaryPPTYLoader()
         this.presentation = presentation;
         this.ImageMapChecker = {};
 
-        var srcLen = base64_ppty.length;
+		var isBase64 = typeof base64_ppty === 'string';
+		var srcLen = isBase64 ? base64_ppty.length : base64_ppty.data.length;
         var nWritten = 0;
 
         var index = 0;
         var read_main_prop = "";
         while (true)
         {
-            var _c = base64_ppty.charCodeAt(index);
+            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty.data[index];
             if (_c == ";".charCodeAt(0))
                 break;
 
@@ -252,7 +253,7 @@ function BinaryPPTYLoader()
         read_main_prop = "";
         while (true)
         {
-            var _c = base64_ppty.charCodeAt(index);
+            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty.data[index];
             if (_c == ";".charCodeAt(0))
                 break;
 
@@ -262,11 +263,15 @@ function BinaryPPTYLoader()
         index++;
 
         var _version_num_str = read_main_prop.substring(1);
-
+		var version = 1;
+		if(_version_num_str.length > 0)
+        {
+            version = _version_num_str - 0;
+        }
         read_main_prop = "";
         while (true)
         {
-            var _c = base64_ppty.charCodeAt(index);
+            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty.data[index];
             if (_c == ";".charCodeAt(0))
                 break;
 
@@ -275,78 +280,88 @@ function BinaryPPTYLoader()
         }
         index++;
 
-        var dstLen_str = read_main_prop;
+		if (Asc.c_nVersionNoBase64 !== version) {
+			var dstLen_str = read_main_prop;
 
-        var dstLen = parseInt(dstLen_str);
+			var dstLen = parseInt(dstLen_str);
 
-        var pointer = g_memory.Alloc(dstLen);
-        this.stream = new AscCommon.FileStream(pointer.data, dstLen);
-        this.stream.obj = pointer.obj;
+			var pointer = g_memory.Alloc(dstLen);
+			this.stream = new AscCommon.FileStream(pointer.data, dstLen);
+			this.stream.obj = pointer.obj;
 
-        var dstPx = this.stream.data;
+			var dstPx = this.stream.data;
 
-        if (window.chrome)
-        {
-            while (index < srcLen)
-            {
-                var dwCurr = 0;
-                var i;
-                var nBits = 0;
-                for (i=0; i<4; i++)
-                {
-                    if (index >= srcLen)
-                        break;
-                    var nCh = DecodeBase64Char(base64_ppty.charCodeAt(index++));
-                    if (nCh == -1)
-                    {
-                        i--;
-                        continue;
-                    }
-                    dwCurr <<= 6;
-                    dwCurr |= nCh;
-                    nBits += 6;
-                }
+			if (window.chrome)
+			{
+				while (index < srcLen)
+				{
+					var dwCurr = 0;
+					var i;
+					var nBits = 0;
+					for (i=0; i<4; i++)
+					{
+						if (index >= srcLen)
+							break;
+						var nCh = DecodeBase64Char(isBase64 ? base64_ppty.charCodeAt(index++) : base64_ppty.data[index++]);
+						if (nCh == -1)
+						{
+							i--;
+							continue;
+						}
+						dwCurr <<= 6;
+						dwCurr |= nCh;
+						nBits += 6;
+					}
 
-                dwCurr <<= 24-nBits;
-                for (i=0; i<nBits/8; i++)
-                {
-                    dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                    dwCurr <<= 8;
-                }
-            }
-        }
-        else
-        {
-            var p = b64_decode;
-            while (index < srcLen)
-            {
-                var dwCurr = 0;
-                var i;
-                var nBits = 0;
-                for (i=0; i<4; i++)
-                {
-                    if (index >= srcLen)
-                        break;
-                    var nCh = p[base64_ppty.charCodeAt(index++)];
-                    if (nCh == undefined)
-                    {
-                        i--;
-                        continue;
-                    }
-                    dwCurr <<= 6;
-                    dwCurr |= nCh;
-                    nBits += 6;
-                }
+					dwCurr <<= 24-nBits;
+					for (i=0; i<nBits/8; i++)
+					{
+						dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+						dwCurr <<= 8;
+					}
+				}
+			}
+			else
+			{
+				var p = b64_decode;
+				while (index < srcLen)
+				{
+					var dwCurr = 0;
+					var i;
+					var nBits = 0;
+					for (i=0; i<4; i++)
+					{
+						if (index >= srcLen)
+							break;
+						var nCh = p[isBase64 ? base64_ppty.charCodeAt(index++) : base64_ppty.data[index++]];
+						if (nCh == undefined)
+						{
+							i--;
+							continue;
+						}
+						dwCurr <<= 6;
+						dwCurr |= nCh;
+						nBits += 6;
+					}
 
-                dwCurr <<= 24-nBits;
-                for (i=0; i<nBits/8; i++)
-                {
-                    dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                    dwCurr <<= 8;
-                }
-            }
-        }
-
+					dwCurr <<= 24-nBits;
+					for (i=0; i<nBits/8; i++)
+					{
+						dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+						dwCurr <<= 8;
+					}
+				}
+			}
+		} else {
+			this.stream = new AscCommon.FileStream();
+			this.stream.obj    = base64_ppty.obj;
+			this.stream.data   = base64_ppty.data;
+			this.stream.size   = base64_ppty.size;
+			//skip header
+			this.stream.EnterFrame(index);
+			this.stream.Seek2(index);
+		}
+		
         this.presentation.ImageMap = {};
         this.presentation.Fonts = [];
 
@@ -724,7 +739,7 @@ function BinaryPPTYLoader()
             }
             if (this.presentation.Slides.length == 0)
             {
-                this.presentation.Slides[0] = AscCommonSlide.GenerateDefaultSlide(this.presentation.slideLayouts[0]);
+                this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.presentation.slideLayouts[0]);
             }
             if(this.presentation.notesMasters.length === 0)
             {

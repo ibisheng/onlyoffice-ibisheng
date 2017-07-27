@@ -290,7 +290,11 @@
 			{
 				oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.Complete;
 			}
-			dataContainer.part = dataContainer.data.substring(index * nMaxRequestLength, (index + 1) * nMaxRequestLength);
+			if(typeof dataContainer.data === 'string') {
+				dataContainer.part = dataContainer.data.substring(index * nMaxRequestLength, (index + 1) * nMaxRequestLength);
+			} else {
+				dataContainer.part = dataContainer.data.subarray(index * nMaxRequestLength, (index + 1) * nMaxRequestLength);
+			}
 		}
 		dataContainer.index++;
 		oAdditionalData["saveindex"] = dataContainer.index;
@@ -315,11 +319,12 @@
 		}, oAdditionalData, dataContainer);
 	}
 
-	function loadFileContent(url, callback)
+	function loadFileContent(url, callback, opt_responseType)
 	{
 		asc_ajax({
 			url:      url,
 			dataType: "text",
+			responseType: opt_responseType,
 			success:  callback,
 			error:    function ()
 					  {
@@ -344,6 +349,74 @@
 		return null;
 	}
 
+	function initStreamFromResponse(httpRequest) {
+		var stream;
+		if (typeof ArrayBuffer !== 'undefined') {
+			var _uintData = new Uint8Array(httpRequest.response);
+			stream = new AscCommon.FT_Stream2(_uintData, _uintData.length);
+		} else if (AscCommon.AscBrowser.isIE){
+			var _response = new VBArray(httpRequest["responseBody"]).toArray();
+
+			var srcLen = _response.length;
+			var pointer = g_memory.Alloc(srcLen);
+			stream = new AscCommon.FT_Stream2(pointer.data, srcLen);
+			stream.obj = pointer.obj;
+
+			var dstPx = stream.data;
+			var index = 0;
+
+			while (index < srcLen)
+			{
+				dstPx[index] = _response[index];
+				index++;
+			}
+		}
+		return stream;
+	}
+	function checkStreamSignature(stream, Signature) {
+		if (stream.data.length > Signature.length) {
+			for(var i = 0 ; i < Signature.length; ++i){
+				if(stream.data[i] !== Signature.charCodeAt(i)){
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+	function Utf8ArrayToStr(array) {
+		var out, i, len, c;
+		var char2, char3;
+
+		out = "";
+		len = array.length;
+		i = 0;
+		while(i < len) {
+		c = array[i++];
+		switch(c >> 4)
+		{ 
+		  case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+			// 0xxxxxxx
+			out += String.fromCharCode(c);
+			break;
+		  case 12: case 13:
+			// 110x xxxx   10xx xxxx
+			char2 = array[i++];
+			out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
+			break;
+		  case 14:
+			// 1110 xxxx  10xx xxxx  10xx xxxx
+			char2 = array[i++];
+			char3 = array[i++];
+			out += String.fromCharCode(((c & 0x0F) << 12) |
+						   ((char2 & 0x3F) << 6) |
+						   ((char3 & 0x3F) << 0));
+			break;
+		}
+		}
+
+		return out;
+	}
 	function openFileCommand(binUrl, changesUrl, Signature, callback)
 	{
 		var bError = false, oResult = new OpenFileResult(), bEndLoadFile = false, bEndLoadChanges = false;
@@ -362,18 +435,31 @@
 
 		if (!window['IS_NATIVE_EDITOR'])
 		{
-			asc_ajax({
-				url:      sFileUrl, dataType: "text", success: function (result)
-				{
+			loadFileContent(sFileUrl, function (httpRequest) {
 					//получаем url к папке с файлом
 					var url;
 					var nIndex = sFileUrl.lastIndexOf("/");
 					url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
-					if (0 < result.length)
+					if (httpRequest)
 					{
-						oResult.bSerFormat = Signature === result.substring(0, Signature.length);
-						oResult.data = result;
-						oResult.url = url;
+						if (Asc.c_nNoBase64) {
+							var stream = initStreamFromResponse(httpRequest);
+							if (stream) {
+								oResult.bSerFormat = checkStreamSignature(stream, Signature);
+								if (oResult.bSerFormat) {
+									oResult.data = stream;
+								} else {
+									//todo arraybuffer
+									oResult.data = Utf8ArrayToStr(stream.data);
+								}
+							} else {
+								bError = true;
+							}
+						} else {
+							oResult.bSerFormat = Signature === httpRequest.responseText.substring(0, Signature.length);
+							oResult.data = httpRequest.responseText;
+							oResult.url = url;
+						}
 					}
 					else
 					{
@@ -381,13 +467,7 @@
 					}
 					bEndLoadFile = true;
 					onEndOpen();
-				}, error: function ()
-						  {
-							  bEndLoadFile = true;
-							  bError = true;
-							  onEndOpen();
-						  }
-			});
+				}, Asc.c_nNoBase64 ? "arraybuffer" : undefined);
 		}
 
 		if (changesUrl)
@@ -489,11 +569,11 @@
 								 fCallback(null, true);
 							 }
 						 },
-			success:     function (msg)
+			success:     function (httpRequest)
 						 {
 							 if (fCallback)
 							 {
-								 fCallback(JSON.parse(msg), true);
+								 fCallback(JSON.parse(httpRequest.responseText), true);
 							 }
 						 }
 		});
@@ -2215,6 +2295,7 @@
 			async                                     = true, data                        = null, dataType = "text/xml",
 			error = null, success = null, httpRequest = null,
 			contentType                               = "application/x-www-form-urlencoded",
+			responseType = '',
 
 			init                                      = function (obj)
 			{
@@ -2249,6 +2330,10 @@
 				if (typeof (obj.contentType) !== 'undefined')
 				{
 					contentType = obj.contentType;
+				}
+				if (typeof (obj.responseType) !== 'undefined')
+				{
+					responseType = obj.responseType;
 				}
 
 				if (window.XMLHttpRequest)
@@ -2289,6 +2374,8 @@
 				httpRequest.open(type, url, async);
 				if (type === "POST")
 					httpRequest.setRequestHeader("Content-Type", contentType);
+				if (responseType)
+					httpRequest.responseType = responseType;
 				httpRequest.send(data);
 			},
 
@@ -2312,7 +2399,7 @@
 						if (httpRequest.status === 200 || httpRequest.status === 1223)
 						{
 							if (typeof success === "function")
-								success(httpRequest.responseText);
+								success(httpRequest);
 						}
 						else
 						{

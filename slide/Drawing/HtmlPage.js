@@ -3974,15 +3974,19 @@ function CEditorPage(api)
 		return 5 + dKoef * x;
 	};
 
-	this.SaveDocument = function()
+	this.SaveDocument = function(noBase64)
 	{
 		var writer = new AscCommon.CBinaryFileWriter();
 		this.m_oLogicDocument.CalculateComments();
-		var str = writer.WriteDocument(this.m_oLogicDocument);
-		return str;
-		//console.log(str);
+		if (noBase64) {
+			return writer.WriteDocument3(this.m_oLogicDocument);;
+		} else {
+			var str = writer.WriteDocument(this.m_oLogicDocument);
+			return str;
+			//console.log(str);
+		}
 	};
-
+	
 	this.GetMainContentBounds = function()
 	{
 		return this.m_oMainParent.AbsolutePosition;

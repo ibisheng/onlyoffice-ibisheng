@@ -2434,7 +2434,8 @@ background-repeat: no-repeat;\
 						"c"             : "reopen",
 						"url"           : this.documentUrl,
 						"title"         : this.documentTitle,
-						"codepage"      : option.asc_getCodePage()
+						"codepage"      : option.asc_getCodePage(),
+						"nobase64"      : Asc.c_nNoBase64
 					};
 					sendCommand(this, null, rData);
 				}
@@ -2454,7 +2455,8 @@ background-repeat: no-repeat;\
 						"c": "reopen",
 						"url": this.documentUrl,
 						"title": this.documentTitle,
-						"password": option.asc_getPassword()
+						"password": option.asc_getPassword(),
+						"nobase64": Asc.c_nNoBase64
 					};
 
 					sendCommand(this, null, v);
@@ -2492,16 +2494,16 @@ background-repeat: no-repeat;\
 		if (this.mailMergeFileData)
 		{
 			this.mailMergeFileData = null;
-			AscCommon.loadFileContent(url, function(result)
+			AscCommon.loadFileContent(url, function(httpRequest)
 			{
-				if (null === result)
+				if (null === httpRequest)
 				{
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
 				try
 				{
-					t.asc_StartMailMergeByList(JSON.parse(result));
+					t.asc_StartMailMergeByList(JSON.parse(httpRequest.responseText));
 				} catch (e)
 				{
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
@@ -2511,15 +2513,15 @@ background-repeat: no-repeat;\
 		else if (this.insertDocumentUrlsData)
 		{
 			t.insertDocumentUrlsData.imageMap = url;
-			AscCommon.loadFileContent(url['output.bin'], function(result)
+			AscCommon.loadFileContent(url['output.bin'], function(httpRequest)
 			{
-				if (null === result)
+				if (null === httpRequest)
 				{
 					t.endInsertDocumentUrls();
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
-				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + result, undefined, undefined, true);
+				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + httpRequest.responseText, undefined, undefined, true);
 			});
 		}
 		else
@@ -6842,6 +6844,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
+		oAdditionalData["nobase64"]     = Asc.c_nNoBase64;
 		if ('savefromorigin' === command)
 		{
 			oAdditionalData["format"] = this.documentFormat;
@@ -6857,7 +6860,7 @@ background-repeat: no-repeat;\
 		else if (null == options.oDocumentMailMerge && c_oAscFileType.PDF === filetype)
 		{
 			var dd             = this.WordControl.m_oDrawingDocument;
-			dataContainer.data = dd.ToRendererPart();
+			dataContainer.data = dd.ToRendererPart(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
 			//console.log(oAdditionalData["data"]);
 		}
 		else if (c_oAscFileType.JSON === filetype)
@@ -6916,7 +6919,7 @@ background-repeat: no-repeat;\
 				oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(oLogicDocument, false, true);
 			else
 				oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(oLogicDocument);
-			dataContainer.data = oBinaryFileWriter.Write();
+			dataContainer.data = oBinaryFileWriter.Write(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
 		}
 		if (null != options.oMailMergeSendData)
 		{

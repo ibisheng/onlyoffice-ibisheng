@@ -1154,12 +1154,19 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 		oUsedStyleMap: null
 	};
 	this.saveParams = new DocSaveParams(bMailMergeDocx, bMailMergeHtml);
-    this.Write = function()
+    this.Write = function(noBase64)
     {
         pptx_content_writer._Start();
+		if (noBase64) {
+			this.memory.WriteXmlString(this.WriteFileHeader(0, Asc.c_nVersionNoBase64));
+		}
         this.WriteMainTable();
         pptx_content_writer._End();
-        return this.GetResult();
+		if (noBase64) {
+			return this.memory.GetData();
+		} else {
+			return this.GetResult();
+		}
     }
     this.Write2 = function()
     {
@@ -1169,11 +1176,11 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
     }
 	this.GetResult = function()
 	{
-		return this.WriteFileHeader(this.memory.GetCurPosition()) + this.memory.GetBase64Memory();
+		return this.WriteFileHeader(this.memory.GetCurPosition(), AscCommon.c_oSerFormat.Version) + this.memory.GetBase64Memory();
 	}
-    this.WriteFileHeader = function(nDataSize)
+    this.WriteFileHeader = function(nDataSize, version)
     {
-        return AscCommon.c_oSerFormat.Signature + ";v" + AscCommon.c_oSerFormat.Version + ";" + nDataSize  + ";";
+        return AscCommon.c_oSerFormat.Signature + ";v" + version + ";" + nDataSize  + ";";
     }
     this.WriteMainTable = function()
     {
@@ -5870,7 +5877,8 @@ function BinaryFileReader(doc, openParams)
     
     this.getbase64DecodedData = function(szSrc)
     {
-        var srcLen = szSrc.length;
+		var isBase64 = typeof szSrc === 'string';
+        var srcLen = isBase64 ? szSrc.length : szSrc.data.length;
         var nWritten = 0;
 
         var nType = 0;
@@ -5880,7 +5888,7 @@ function BinaryFileReader(doc, openParams)
         while (true)
         {
             index++;
-            var _c = szSrc.charCodeAt(index);
+            var _c = isBase64 ? szSrc.charCodeAt(index) : szSrc.data[index];
             if (_c == ";".charCodeAt(0))
             {
                 
@@ -5900,82 +5908,89 @@ function BinaryFileReader(doc, openParams)
             else
                 dst_len += String.fromCharCode(_c);
         }
-        
-        var dstLen = parseInt(dst_len);
-
-        var pointer = g_memory.Alloc(dstLen);
-        var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
-        stream.obj = pointer.obj;
-
-        var dstPx = stream.data;
-
-        if (window.chrome)
-        {
-            while (index < srcLen)
-            {
-                var dwCurr = 0;
-                var i;
-                var nBits = 0;
-                for (i=0; i<4; i++)
-                {
-                    if (index >= srcLen)
-                        break;
-                    var nCh = DecodeBase64Char(szSrc.charCodeAt(index++));
-                    if (nCh == -1)
-                    {
-                        i--;
-                        continue;
-                    }
-                    dwCurr <<= 6;
-                    dwCurr |= nCh;
-                    nBits += 6;
-                }
-
-                dwCurr <<= 24-nBits;
-                for (i=0; i<nBits/8; i++)
-                {
-                    dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                    dwCurr <<= 8;
-                }
-            }
-        }
-        else
-        {
-            var p = b64_decode;
-            while (index < srcLen)
-            {
-                var dwCurr = 0;
-                var i;
-                var nBits = 0;
-                for (i=0; i<4; i++)
-                {
-                    if (index >= srcLen)
-                        break;
-                    var nCh = p[szSrc.charCodeAt(index++)];
-                    if (nCh == undefined)
-                    {
-                        i--;
-                        continue;
-                    }
-                    dwCurr <<= 6;
-                    dwCurr |= nCh;
-                    nBits += 6;
-                }
-
-                dwCurr <<= 24-nBits;
-                for (i=0; i<nBits/8; i++)
-                {
-                    dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
-                    dwCurr <<= 8;
-                }
-            }
-        }
-        if(version.length > 1)
+		if(version.length > 1)
         {
             var nTempVersion = version.substring(1) - 0;
             if(nTempVersion)
               AscCommon.CurFileVersion = nTempVersion;
         }
+		var stream;
+		if (Asc.c_nVersionNoBase64 !== AscCommon.CurFileVersion) {
+			var dstLen = parseInt(dst_len);
+
+			var pointer = g_memory.Alloc(dstLen);
+			stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
+			stream.obj = pointer.obj;
+
+			var dstPx = stream.data;
+
+			if (window.chrome)
+			{
+				while (index < srcLen)
+				{
+					var dwCurr = 0;
+					var i;
+					var nBits = 0;
+					for (i=0; i<4; i++)
+					{
+						if (index >= srcLen)
+							break;
+						var nCh = DecodeBase64Char(isBase64 ? szSrc.charCodeAt(index++) : szSrc.data[index++]);
+						if (nCh == -1)
+						{
+							i--;
+							continue;
+						}
+						dwCurr <<= 6;
+						dwCurr |= nCh;
+						nBits += 6;
+					}
+
+					dwCurr <<= 24-nBits;
+					for (i=0; i<nBits/8; i++)
+					{
+						dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+						dwCurr <<= 8;
+					}
+				}
+			}
+			else
+			{
+				var p = b64_decode;
+				while (index < srcLen)
+				{
+					var dwCurr = 0;
+					var i;
+					var nBits = 0;
+					for (i=0; i<4; i++)
+					{
+						if (index >= srcLen)
+							break;
+						var nCh = p[isBase64 ? szSrc.charCodeAt(index++) : szSrc.data[index++]];
+						if (nCh == undefined)
+						{
+							i--;
+							continue;
+						}
+						dwCurr <<= 6;
+						dwCurr |= nCh;
+						nBits += 6;
+					}
+
+					dwCurr <<= 24-nBits;
+					for (i=0; i<nBits/8; i++)
+					{
+						dstPx[nWritten++] = ((dwCurr & 0x00ff0000) >>> 16);
+						dwCurr <<= 8;
+					}
+				}
+			}
+		} else {
+			stream = szSrc;
+			//skip header
+			stream.EnterFrame(index);
+			stream.Seek(index);
+		}
         return stream;
     };
     this.Read = function(data)

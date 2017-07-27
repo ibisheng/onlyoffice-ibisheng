@@ -568,6 +568,21 @@
 		{
 			return Base64Encode(this.data, nLen, nPos);
 		}
+		this.GetData   = function(nPos, nLen)
+		{
+			var _canvas = document.createElement('canvas');
+			var _ctx    = _canvas.getContext('2d');
+
+			var len = this.GetCurPosition();
+
+			//todo ImData.data.length multiple of 4
+			var ImData = _ctx.createImageData(Math.ceil(len / 4), 1);
+			var res = ImData.data;
+
+			for (var i = 0; i < len; i++)
+				res[i] = this.data[i];
+			return res;
+		}
 		this.GetCurPosition     = function()
 		{
 			return this.pos;
@@ -759,6 +774,59 @@
 			for (var i = 0; i < count; i++)
 			{
 				this.data[this.pos++] = data[_pos + i];
+			}
+		}
+		
+		this.WriteUtf8Char = function(code)
+		{
+			this.CheckSize(1);
+			if (code < 0x80) {
+				this.data[this.pos++] = code;
+			}
+			else if (code < 0x0800) {
+				this.data[this.pos++] = (0xC0 | (code >> 6));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+			else if (code < 0x10000) {
+				this.data[this.pos++] = (0xE0 | (code >> 12));
+				this.data[this.pos++] = (0x80 | ((code >> 6) & 0x3F));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+			else if (code < 0x1FFFFF) {
+				this.data[this.pos++] = (0xF0 | (code >> 18));
+				this.data[this.pos++] = (0x80 | ((code >> 12) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 6) & 0x3F));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+			else if (code < 0x3FFFFFF) {
+				this.data[this.pos++] = (0xF8 | (code >> 24));
+				this.data[this.pos++] = (0x80 | ((code >> 18) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 12) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 6) & 0x3F));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+			else if (code < 0x7FFFFFFF) {
+				this.data[this.pos++] = (0xFC | (code >> 30));
+				this.data[this.pos++] = (0x80 | ((code >> 24) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 18) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 12) & 0x3F));
+				this.data[this.pos++] = (0x80 | ((code >> 6) & 0x3F));
+				this.data[this.pos++] = (0x80 | (code & 0x3F));
+			}
+		}
+		
+		this.WriteXmlString = function(val)
+		{
+			var pCur = 0;
+			var pEnd = val.length;
+			while (pCur < pEnd)
+			{
+				var code = val.charCodeAt(pCur++);
+				if (code >= 0xD800 && code <= 0xDFFF && pCur < pEnd)
+				{
+					code = 0x10000 + (((code & 0x3FF) << 10) | (0x03FF & val.charCodeAt(pCur++)));
+				}
+				this.WriteUtf8Char(code);
 			}
 		}
 	}

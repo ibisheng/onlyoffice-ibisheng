@@ -437,7 +437,8 @@
 				"userid"        : this.documentUserId,
 				"format"        : this.documentFormat,
 				"url"           : this.documentUrl,
-				"title"         : this.documentTitle
+				"title"         : this.documentTitle,
+				"nobase64"      : Asc.c_nNoBase64
 			};
 			if (versionHistory)
 			{
