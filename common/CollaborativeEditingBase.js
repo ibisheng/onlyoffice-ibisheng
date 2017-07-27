@@ -1342,7 +1342,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPositionsOnAdd = function(Cla
             if (Class === _Pos.Class
 				&& undefined !== _Pos.Position
 				&& (_Pos.Position > Pos
-				|| (_Pos.Position === Pos && !(Class instanceof ParaRun))))
+				|| (_Pos.Position === Pos && !(Class instanceof AscCommonWord.ParaRun))))
             {
                 _Pos.Position++;
                 break;
