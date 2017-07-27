@@ -438,7 +438,7 @@
             else{
                 selectedObjects = oController.selectedObjects;
             }
-            if(selectedObjects.length > 0){
+            if(selectedObjects.length > 0 && !oController.getTargetDocContent()){
                 if(selectedObjects[0].group){
                     spTree = selectedObjects[0].group.spTree;
                 }
