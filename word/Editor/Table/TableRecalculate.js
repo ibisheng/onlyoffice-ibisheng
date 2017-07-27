@@ -2247,6 +2247,10 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 		// В данном значении не учитываются маргины
 		RowHValue = RowH.Value + this.MaxBotMargin[CurRow] + MaxTopMargin;
 
+		// В таблице с отступами размер отступа входит в значение высоты строки
+		if (null !== CellSpacing)
+			RowHValue -= CellSpacing;
+
 		if (oFootnotes && (Asc.linerule_AtLeast === RowH.HRule || Asc.linerule_Exact == RowH.HRule))
 		{
 			oFootnotes.PushCellLimit(Y + RowHValue);
