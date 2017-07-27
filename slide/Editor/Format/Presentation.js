@@ -1435,7 +1435,7 @@ CPresentation.prototype =
 
         if (true === Show){
 
-            var oTargetDocContentOrTable, oCurSlide = this.Slides[this.CurPage];
+            var oTargetDocContentOrTable;
             var oController = this.GetCurrentController();
             if(oController){
                 oTargetDocContentOrTable = oController.getTargetDocContent(undefined, true);
@@ -4303,6 +4303,9 @@ CPresentation.prototype =
 
     Notes_Draw: function(SlideIndex, graphics){
         if(this.Slides[SlideIndex]){
+            if(!graphics.IsSlideBoundsCheckerType){
+                AscCommon.CollaborativeEditing.Update_ForeignCursorsPositions();
+            }
             this.Slides[SlideIndex].drawNotes(graphics);
         }
     },

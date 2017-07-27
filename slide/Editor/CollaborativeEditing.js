@@ -526,10 +526,10 @@ CCollaborativeEditing.prototype.Update_ForeignCursorsPositions = function()
 {
     var DrawingDocument = editor.WordControl.m_oDrawingDocument;
     var oPresentation = editor.WordControl.m_oLogicDocument;
-    var oCurSlide = oPresentation.Slides[oPresentation.CurPage];
     var oTargetDocContentOrTable;
-    if(oCurSlide){
-        oTargetDocContentOrTable = oCurSlide.graphicObjects.getTargetDocContent(undefined, true);
+    var oCurController = oPresentation.GetCurrentController();
+    if(oCurController){
+        oTargetDocContentOrTable = oCurController.getTargetDocContent(undefined, true);
     }
     if(!oTargetDocContentOrTable){
         for (var UserId in this.m_aForeignCursors){
