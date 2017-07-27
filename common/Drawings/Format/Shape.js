@@ -4930,6 +4930,9 @@ CShape.prototype.hitInInnerArea = function (x, y) {
 };
 
 CShape.prototype.hitInBoundingRect = function (x, y) {
+    if(this.parent && this.parent.kind === AscFormat.TYPE_KIND.NOTES){
+        return false;
+    }
     var invert_transform = this.getInvertTransform();
     var x_t = invert_transform.TransformPointX(x, y);
     var y_t = invert_transform.TransformPointY(x, y);

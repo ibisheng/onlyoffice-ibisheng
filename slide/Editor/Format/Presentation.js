@@ -1254,12 +1254,14 @@ CPresentation.prototype =
         this.RecalculateCurPos();
         if(bSync)
         {
+            var bEndRecalc = false;
             if(bRedrawAllSlides)
             {
                 for(i = 0; i < this.Slides.length; ++i)
                 {
                     this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
                 }
+                bEndRecalc = (this.Slides.length > 0);
                 this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
             }
             else
@@ -1269,10 +1271,13 @@ CPresentation.prototype =
                 {
                     this.DrawingDocument.OnRecalculatePage(aToRedrawSlides[i], this.Slides[aToRedrawSlides[i]]);
                 }
+                bEndRecalc = (aToRedrawSlides.length > 0);
             }
-            this.DrawingDocument.OnEndRecalculate();
             if(bRedrawNotes){
                 this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+            }
+            if(bEndRecalc){
+                this.DrawingDocument.OnEndRecalculate();
             }
         }
         if(!this.Slides[this.CurPage])

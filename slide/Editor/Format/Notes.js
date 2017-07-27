@@ -298,6 +298,14 @@
     {
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
     };
+    CNotes.prototype.isViewerMode = function()
+    {
+        editor.WordControl.m_oLogicDocument.IsViewMode();
+    };
+    CNotes.prototype.convertPixToMM = function(pix)
+    {
+        return editor.WordControl.m_oDrawingDocument.GetMMPerDot(pix);
+    };
 
     function CreateNotes(){
         var oN = new CNotes();
