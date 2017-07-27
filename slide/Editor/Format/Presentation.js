@@ -2096,7 +2096,7 @@ CPresentation.prototype =
             if(ParaItem.Type === para_Math)
             {
                 var oController = this.Slides[this.CurPage].graphicObjects;
-                if(!(oController.selection.textSelection || (oController.selection.groupSelection && oController.selection.groupSelection.selection.textSelection)))
+                if(!this.FocusOnNotes && !(oController.selection.textSelection || (oController.selection.groupSelection && oController.selection.groupSelection.selection.textSelection)))
                 {
 					this.Slides[this.CurPage].graphicObjects.resetSelection();
                     var oMathShape = oController.createTextArt(0, false, null, "");
