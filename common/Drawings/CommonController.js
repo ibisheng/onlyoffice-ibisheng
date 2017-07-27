@@ -4265,7 +4265,7 @@ DrawingObjectsController.prototype =
                 }
                 for(var j = 0; j < chart_type.series.length; ++j)
                 {
-                    if(chart_type.series[j].marker)
+                    if(chart_type.series[j].marker && chart_type.series[j].marker.symbol === AscFormat.SYMBOL_NONE)
                     {
                         chart_type.series[j].setMarker(null);
                     }
