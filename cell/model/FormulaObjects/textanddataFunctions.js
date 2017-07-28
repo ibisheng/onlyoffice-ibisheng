@@ -1802,6 +1802,7 @@
 	cTEXTJOIN.prototype = Object.create(cBaseFunction.prototype);
 	cTEXTJOIN.prototype.constructor = cTEXTJOIN;
 	cTEXTJOIN.prototype.argumentsMin = 3;
+	cTEXTJOIN.prototype.argumentsMax = 255;
 	cTEXTJOIN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cTEXTJOIN.prototype.isXLFN = true;
 	cTEXTJOIN.prototype.Calculate = function (arg) {
@@ -1817,7 +1818,9 @@
 		var ignore_empty = argClone[1].toBool();
 		var delimiter = argClone[0];
 		var delimiterIter = 0;
+		//разделитель может быть в виде массива, где используются все его элементы
 		var delimiterArr = this._getOneDimensionalArray(delimiter);
+		//если хотя бы один элемент ошибка, то возвращаем ошибку
 		if(delimiterArr instanceof cError){
 			return this.value = delimiterArr;
 		}
@@ -1828,16 +1831,17 @@
 				return res;
 			}
 			var isStartStr = string1 === "";
-			var delimeterStr = isStartStr ? "" : delimiterArr[delimiterIter];
-			if(undefined === delimeterStr){
+			//выбираем разделитель из массива по порядку
+			var delimiterStr = isStartStr ? "" : delimiterArr[delimiterIter];
+			if(undefined === delimiterStr){
 				delimiterIter = 0;
-				delimeterStr = delimiterArr[delimiterIter];
+				delimiterStr = delimiterArr[delimiterIter];
 			}
 			if(!isStartStr){
 				delimiterIter++;
 			}
 			
-			res += delimeterStr + string2;
+			res += delimiterStr + string2;
 			return res;
 		};
 
@@ -1845,30 +1849,27 @@
 		for (var i = 2; i < this.argumentsCurrent; i++) {
 			argI = arg[i];
 
-			if(argI instanceof cArea || argI instanceof cArray || argI instanceof cArea3D){
-				if (argI instanceof cArea || argI instanceof cArray) {
-					argI = argI.getMatrix();
-				} else if (argI instanceof cArea3D) {
-					argI = argI.getMatrix()[0];
+			var type = argI.type;
+			if(cElementType.cellsRange === type || cElementType.cellsRange3D === type || cElementType.array === type){
+				//получаем одномерный массив
+				argI = this._getOneDimensionalArray(argI);
+
+				//если хотя бы один элемент с ошибкой, возвращаем ошибку
+				if (argI instanceof cError) {
+					return this.value = argI;
 				}
 
 				for (var n = 0; n < argI.length; n++) {
-					for (var j = 0; j < argI[n].length; j++) {
-						if(cElementType.error === argI[n][j].type){
-							return this.value = argI[n][j];
-						}else{
-							arg0 = new cString(concatString(arg0.toString(), argI[n][j].toString()));
-						}
-					}
+					arg0 = new cString(concatString(arg0.toString(), argI[n].toString()));
 				}
 
 			}else{
 				argI = argI.tocString();
-				if (arg0 instanceof cError) {
-					return this.value = arg0;
-				}else{
-					arg0 = new cString(concatString(arg0.toString(), argI.toString()));
+				if (argI instanceof cError) {
+					return this.value = argI;
 				}
+
+				arg0 = new cString(concatString(arg0.toString(), argI.toString()));
 			}
 		}
 

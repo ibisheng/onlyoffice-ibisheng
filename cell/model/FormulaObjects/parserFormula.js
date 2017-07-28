@@ -2479,31 +2479,26 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			}
 		};
 
-		if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
-			arg = arg.getMatrix();
+		if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type || cElementType.array === arg.type) {
+
+			if (cElementType.cellsRange === arg.type || cElementType.array === arg.type) {
+				arg = arg.getMatrix();
+			} else if (cElementType.cellsRange3D === arg.type) {
+				arg = arg.getMatrix()[0];
+			}
+
 			for (var i = 0; i < arg.length; i++) {
 				for (var j = 0; j < arg[i].length; j++) {
 					if(cElementType.error === arg[i][j].type){
-						res = arg[i][j];
-						break;
+						return arg[i][j];
 					}else{
 						res.push(getValue(arg[i][j]));
 					}
 				}
 			}
-		}else if(cElementType.array === arg.type){
-			arg.foreach(function (elem) {
-				if(cElementType.error === elem.type){
-					res = elem;
-					return;
-				}else{
-					res.push(getValue(elem));
-				}
-			})
 		}else{
 			if(cElementType.error === arg.type){
-				res = elem;
-				return;
+				return arg;
 			}else{
 				res.push(getValue(arg));
 			}
