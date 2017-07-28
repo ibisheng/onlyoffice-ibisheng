@@ -3952,6 +3952,9 @@
 		}
 		return new Range(this, nRowMin, nColMin, nRowMax, nColMax);
 	};
+	Worksheet.prototype.getRange4=function(r, c){
+		return new Range(this, r, c, r, c);
+	};
 	Worksheet.prototype._getRows=function(){
 		return this.aGCells;
 	};
@@ -4932,12 +4935,12 @@
 		var rowFields = pivotTable.asc_getRowFields();
 		for (i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
 			pos = pivotTable.pageFieldsPositions[i];
-			cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
+			cells = this.getRange4(pos.row, pos.col);
 			index = pageFields[i].asc_getIndex();
 			cells.setValue(pageFields[i].asc_getName() || pivotFields[index].asc_getName() ||
 				cacheFields[index].asc_getName());
 
-			cells = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
+			cells = this.getRange4(pos.row, pos.col + 1);
 			cells.setValue('(All)');
 		}
 
@@ -4945,7 +4948,7 @@
 		var countR = pivotTable.getRowFieldsCount(true);
 		var c1 = pivotRange.c1;
 		var start = pivotRange.r1 + countC;
-		cells = this.getRange3(start, c1, start, c1);
+		cells = this.getRange4(start, c1);
 		cells.setValue('Row Labels');
 		++start;
 		var rowItem, rowItems = pivotTable.getRowItems();
@@ -4961,7 +4964,7 @@
 						sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
 						v = sharedItem.v;
 					}
-					cells = this.getRange3(start + i, c1 + j, start + i, c1 + j);
+					cells = this.getRange4(start + i, c1 + j);
 					cells.setValue(v);
 				}
 			}
@@ -4990,11 +4993,11 @@
 			dxfValues = style.pageFieldValues && style.pageFieldValues.dxf;
 			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
 				pos = pivotTable.pageFieldsPositions[j];
-				cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
+				cells = this.getRange4(pos.row, pos.col);
 				cells.clearTableStyle();
 				cells.setTableStyle(wholeStyle);
 				cells.setTableStyle(dxfLabels);
-				cells = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
+				cells = this.getRange4(pos.row, pos.col + 1);
 				cells.clearTableStyle();
 				cells.setTableStyle(wholeStyle);
 				cells.setTableStyle(dxfValues);
