@@ -5698,17 +5698,21 @@ function CNotesDrawer(page)
 		if (this.HtmlPage.bIsRetinaSupport)
 			g.IsRetina = true;
 
+		g.SaveGrState();
+
 		g.m_oCoordTransform.tx = this.OffsetX;
 		g.m_oCoordTransform.ty = -this.Scroll;
 		g.transform(1, 0, 0, 1, 0, 0);
 
 		//g.IsNoDrawingEmptyPlaceholder = true;
-//		g.IsNoDrawingEmptyPlaceholderText = true;
+		//g.IsNoDrawingEmptyPlaceholderText = true;
 
 		this.HtmlPage.m_oDrawingDocument.isDrawingNotes = true;
 		this.HtmlPage.m_oLogicDocument.Notes_Draw(this.Slide, g);
 		this.HtmlPage.m_oDrawingDocument.isDrawingNotes = false;
 		this.IsRepaint = false;
+
+		g.RestoreGrState();
 	};
 
 	this.OnRecalculateNote = function (slideNum, width, height)
