@@ -841,7 +841,8 @@ CDrawingCollaborativeTarget.prototype =
 			}
 			else
 			{
-				pos = { X : (10 + _x * g_dKoef_mm_to_pix), Y : (_y * g_dKoef_mm_to_pix - _drawing_doc.m_oWordControl.m_oNotesApi.Scroll) };
+				var _offsetX = _drawing_doc.m_oWordControl.m_oNotesApi.OffsetX;
+				pos = { X : (AscCommon.AscBrowser.convertToRetinaValue(_offsetX) + _x * g_dKoef_mm_to_pix), Y : (_y * g_dKoef_mm_to_pix - _drawing_doc.m_oWordControl.m_oNotesApi.Scroll) };
 			}
 
 			this.HtmlElementX           = pos.X >> 0;
@@ -1953,7 +1954,7 @@ function CDrawingDocument()
 
 			if (!isFocusOnSlide)
 			{
-				pos.X = x * g_dKoef_mm_to_pix + this.m_oWordControl.m_oNotesApi.OffsetX;
+				pos.X = x * g_dKoef_mm_to_pix + AscCommon.AscBrowser.convertToRetinaValue(this.m_oWordControl.m_oNotesApi.OffsetX);
 				pos.Y = y * g_dKoef_mm_to_pix - this.m_oWordControl.m_oNotesApi.Scroll;
 			}
 
