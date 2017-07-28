@@ -2468,6 +2468,34 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		return null;
 	};
+	cBaseFunction.prototype._getOneDimensionalArray = function (arg, type) {
+		var res = [];
+
+		var getValue = function(curArg){
+			if(undefined === type || cElementType.string === type){
+				return curArg.tocString().getValue();
+			}else if( cElementType.number === type){
+				return curArg.tocNumber().getValue();
+			}
+		};
+
+		if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
+			arg = arg.getMatrix();
+			for (var i = 0; i < arg.length; i++) {
+				for (var j = 0; j < arg[i].length; j++) {
+					res.push(getValue(arg[i][j]));
+				}
+			}
+		}else if(cElementType.array === arg.type){
+			arg.foreach(function (elem) {
+				res.push(getValue(elem));
+			})
+		}else{
+			res.push(getValue(arg));
+		}
+
+		return res;
+	};
 
 	/** @constructor */
 	function parentLeft() {

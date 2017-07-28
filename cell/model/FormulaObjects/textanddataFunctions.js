@@ -1806,26 +1806,34 @@
 	cTEXTJOIN.prototype.isXLFN = true;
 	cTEXTJOIN.prototype.Calculate = function (arg) {
 
-		var oArguments = this._prepareArguments([arg[0], arg[1]], arguments[1], true);
-		var argClone = oArguments.args;
-
-		argClone[0] = argClone[0].tocString();
-		argClone[1] = argClone[1].tocBool();
+		var argClone = [arg[0], arg[1]];
+		argClone[1] = arg[1].tocBool();
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
 			return this.value = argError;
 		}
 
-		var delimiter = argClone[0].toString();
 		var ignore_empty = argClone[1].toBool();
+		var delimiter = argClone[0];
+		var delimiterArr = this._getOneDimensionalArray(delimiter);
+		var delimiterIter = 0;
 
 		var concatString = function(string1, string2){
 			var res = string1;
-			var delimeterStr = string1 === "" ? "" : delimiter;
 			if("" === string2 && ignore_empty){
 				return res;
 			}
+			var isStartStr = string1 === "";
+			var delimeterStr = isStartStr ? "" : delimiterArr[delimiterIter];
+			if(undefined === delimeterStr){
+				delimiterIter = 0;
+				delimeterStr = delimiterArr[delimiterIter];
+			}
+			if(!isStartStr){
+				delimiterIter++;
+			}
+			
 			res += delimeterStr + string2;
 			return res;
 		};
