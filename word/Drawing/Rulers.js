@@ -1814,6 +1814,13 @@ function CHorRuler()
     this.OnMouseDown = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
+
+        if (true === word_control.m_oApi.isStartAddShape)
+        {
+			word_control.m_oApi.sync_EndAddShape();
+			word_control.m_oApi.sync_StartAddShapeCallback(false);
+        }
+
         AscCommon.check_MouseDownEvent(e);
         global_mouseEvent.LockMouse();
 
@@ -3470,6 +3477,13 @@ function CVerRuler()
     this.OnMouseDown = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
+
+		if (true === word_control.m_oApi.isStartAddShape)
+		{
+			word_control.m_oApi.sync_EndAddShape();
+			word_control.m_oApi.sync_StartAddShapeCallback(false);
+		}
+
         AscCommon.check_MouseDownEvent(e);
 
         this.SimpleChanges.Reinit();
