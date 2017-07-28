@@ -5059,6 +5059,9 @@ CT_CacheField.prototype.toXml = function(writer, name) {
 CT_CacheField.prototype.asc_getName = function () {
 	return this.name;
 };
+CT_CacheField.prototype.getSharedItem = function (index) {
+	return this.sharedItems && this.sharedItems.Items[index];
+};
 function CT_CacheHierarchy() {
 //Attributes
 	this.uniqueName = null;
@@ -5893,6 +5896,9 @@ CT_X.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name, true, true);
 };
+CT_X.prototype.getV = function () {
+	return this.v || 0;
+};
 function CT_Tuples() {
 //Attributes
 	this.c = null;
@@ -6379,6 +6385,9 @@ CT_PivotField.prototype.toXml = function(writer, name) {
 CT_PivotField.prototype.asc_getName = function () {
 	return this.name;
 };
+CT_PivotField.prototype.getItem = function (index) {
+	return this.items && this.items.item[index];
+};
 function CT_Field() {
 //Attributes
 	this.x = null;
@@ -6463,6 +6472,9 @@ CT_I.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
+CT_I.prototype.getR = function (writer, name) {
+	return this.r || 0;
+}
 function CT_PageField() {
 //Attributes
 	this.fld = null;

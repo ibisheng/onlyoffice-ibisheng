@@ -4874,18 +4874,29 @@
 			cells.clearTableStyle();
 			cells.cleanAll();
 		}
+
+		var pivotRange = pivotTable.getRange();
+		cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
+		cells.clearTableStyle();
+		cells.cleanAll();
 	};
 	Worksheet.prototype.updatePivotTable = function (pivotTable) {
 		pivotTable.init();
-		var pos, cells, bWarning;
+		var cleanRanges = [];
+		var pos, cells, bWarning, pivotRange;
 		var l = pivotTable.pageFieldsPositions.length;
 		pos = 0 < l && pivotTable.pageFieldsPositions[0];
 		if (pos && 0 > pos.row) {
 			// ToDo add check exist data in cells
-			pivotTable.getRange().setOffset(new AscCommonExcel.CRangeOffset(0, -1 * pos.row));
+			pivotRange = pivotTable.getRange();
+			pivotRange.setOffset(new AscCommonExcel.CRangeOffset(0, -1 * pos.row));
 			pivotTable.init();
+			cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2, pivotRange.c2);
+			cells._foreachNoEmpty(function (cell) {
+				return (bWarning = !cell.isEmptyText()) ? null : cell;
+			});
+			cleanRanges.push(cells);
 		}
-		var cleanRanges = [];
 		pivotTable.pageFieldsPositions.forEach(function (pageFieldPos) {
 			cells = this.getRange3(pageFieldPos.row, pageFieldPos.col, pageFieldPos.row, pageFieldPos.col + 1);
 			if (!bWarning) {
@@ -4913,9 +4924,11 @@
 			element.cleanAll();
 		});
 		var pos, cells, index, i;
+		var pivotRange = pivotTable.getRange();
 		var cacheFields = pivotTable.asc_getCacheFields();
 		var pivotFields = pivotTable.asc_getPivotFields();
 		var pageFields = pivotTable.asc_getPageFields();
+		var rowFields = pivotTable.asc_getRowFields();
 		for (i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
 			pos = pivotTable.pageFieldsPositions[i];
 			cells = this.getRange3(pos.row, pos.col, pos.row, pos.col);
@@ -4926,6 +4939,29 @@
 			cells = this.getRange3(pos.row, pos.col + 1, pos.row, pos.col + 1);
 			cells.setValue('(All)');
 		}
+
+		var countC = pivotTable.getColumnFieldsCount();
+		var countR = pivotTable.getRowFieldsCount(true);
+		var c1 = pivotRange.c1;
+		var start = pivotRange.r1 + countC;
+		cells = this.getRange3(start, c1, start, c1);
+		cells.setValue('Row Labels');
+		++start;
+		pivotTable.forEachRowItems(function (rowItem, rIndex) {
+			rowItem.x.forEach(function (x, i) {
+				var v;
+				if (AscCommonExcel.c_oAscItemType.Grand === rowItem.t) {
+					v = 'Grand Total';
+				} else {
+					var indexField = rowFields[rowItem.getR()].asc_getIndex();
+					var cacheIndex = pivotFields[indexField].getItem(x.getV());
+					var sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
+					v = sharedItem.v;
+				}
+				cells = this.getRange3(start + rIndex, c1 + i, start + rIndex, c1 + i);
+				cells.setValue(v);
+			}, this);
+		}, this);
 	};
 
 	Worksheet.prototype.updatePivotTablesStyle = function (range) {
@@ -5025,7 +5061,7 @@
 					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === _countC) {
 						_dxf = _style.lastColumn;
 					} else {
-						r = item.r || 0;
+						r = item.getR();
 						if (r + 1 !== _countC) {
 							if (0 === r) {
 								_dxf = item.t ? _style.firstSubtotalColumn : _style.firstColumnSubheading;
@@ -5050,7 +5086,7 @@
 					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === _countR) {
 						_dxf = _style.totalRow;
 					} else if (_styleInfo.showRowHeaders) {
-						r = item.r || 0;
+						r = item.getR();
 						if (r + 1 !== _countR) {
 							if (0 === r) {
 								_dxf = item.t ? _style.firstSubtotalRow : _style.firstRowSubheading;
