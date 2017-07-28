@@ -355,7 +355,7 @@ CDocumentContentBase.prototype.private_Remove = function(Count, bOnlyText, bRemo
 			// Если есть параграфы, которые были добавлены во время рецензирования, тогда мы их удаляем
 			for (var Index = StartPos; Index <= EndPos; Index++)
 			{
-				this.Content[Index].Remove(1, true);
+				this.Content[Index].Remove(1, true, bRemoveOnlySelection, bOnTextAdd);
 			}
 
 			this.RemoveSelection();
