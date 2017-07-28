@@ -2665,7 +2665,7 @@ CT_pivotTableDefinition.prototype.getRowFieldsCount = function (compact) {
 		if (compact) {
 			this.getField(this.rowFields.field, function (element, i) {
 				if (i !== l - 1) {
-					var field = t.pivotFields.pivotField[element.x || 0];
+					var field = t.pivotFields.pivotField[element.asc_getIndex()];
 					res -= (field && false !== field.compact) ? 1 : 0;
 				}
 			});
@@ -6410,7 +6410,7 @@ CT_Field.prototype.toXml = function(writer, name) {
 	writer.WriteXmlNodeEnd(name, true, true);
 };
 CT_Field.prototype.asc_getIndex = function () {
-	return this.x;
+	return this.x || 0;
 };
 function CT_I() {
 //Attributes

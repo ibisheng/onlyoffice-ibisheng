@@ -4924,7 +4924,7 @@
 		}
 	};
 	Worksheet.prototype._updatePivotTable = function (pivotTable, cleanRanges) {
-		var pos, cells, index, i, j, v, indexField, cacheIndex, sharedItem;
+		var pos, cells, index, i, j, v, field, indexField, cacheIndex, sharedItem;
 		for (i = 0; i < cleanRanges.length; ++i) {
 			cleanRanges[i].cleanAll();
 		}
@@ -4933,6 +4933,7 @@
 		var pivotFields = pivotTable.asc_getPivotFields();
 		var pageFields = pivotTable.asc_getPageFields();
 		var rowFields = pivotTable.asc_getRowFields();
+		var rowFieldsPos = [];
 		for (i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
 			pos = pivotTable.pageFieldsPositions[i];
 			cells = this.getRange4(pos.row, pos.col);
@@ -4943,7 +4944,6 @@
 			cells = this.getRange4(pos.row, pos.col + 1);
 			cells.setValue('(All)');
 		}
-
 		var countC = pivotTable.getColumnFieldsCount();
 		var countR = pivotTable.getRowFieldsCount(true);
 		var c1 = pivotRange.c1;
@@ -4951,6 +4951,15 @@
 		cells = this.getRange4(start, c1);
 		cells.setValue('Row Labels');
 		++start;
+
+		for (i = 0; i < rowFields.length; ++i) {
+			rowFieldsPos[i] = c1;
+			field = pivotFields[rowFields[i].asc_getIndex()];
+			if (field && false === field.compact) {
+				++c1;
+			}
+		}
+
 		var rowItem, rowItems = pivotTable.getRowItems();
 		if (rowItems) {
 			for (i = 0; i < rowItems.length; ++i) {
@@ -4964,7 +4973,7 @@
 						sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
 						v = sharedItem.v;
 					}
-					cells = this.getRange4(start + i, c1 + j);
+					cells = this.getRange4(start + i, rowFieldsPos[rowItem.getR()]);
 					cells.setValue(v);
 				}
 			}
