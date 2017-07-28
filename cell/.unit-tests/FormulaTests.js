@@ -2399,6 +2399,57 @@ $( function () {
 
     } );
 
+	test( "Test: \"TEXTJOIN\"", function () {
+
+		ws.getRange2( "A2" ).setValue( "Tulsa" );
+		ws.getRange2( "A3" ).setValue( "Seattle" );
+		ws.getRange2( "A4" ).setValue( "Iselin" );
+		ws.getRange2( "A5" ).setValue( "Fort Lauderdale" );
+		ws.getRange2( "A6" ).setValue( "Tempe" );
+		ws.getRange2( "A7" ).setValue( "end" );
+
+		ws.getRange2( "B2" ).setValue( "OK" );
+		ws.getRange2( "B3" ).setValue( "WA" );
+		ws.getRange2( "B4" ).setValue( "NJ" );
+		ws.getRange2( "B5" ).setValue( "FL" );
+		ws.getRange2( "B6" ).setValue( "AZ" );
+		ws.getRange2( "B7" ).setValue( "" );
+
+		ws.getRange2( "C2" ).setValue( "74133" );
+		ws.getRange2( "C3" ).setValue( "98109" );
+		ws.getRange2( "C4" ).setValue( "8830" );
+		ws.getRange2( "C5" ).setValue( "33309" );
+		ws.getRange2( "C6" ).setValue( "85285" );
+		ws.getRange2( "C7" ).setValue( "" );
+
+		ws.getRange2( "D2" ).setValue( "US" );
+		ws.getRange2( "D3" ).setValue( "US" );
+		ws.getRange2( "D4" ).setValue( "US" );
+		ws.getRange2( "D5" ).setValue( "US" );
+		ws.getRange2( "D6" ).setValue( "US" );
+		ws.getRange2( "D7" ).setValue( "" );
+
+		ws.getRange2( "A9" ).setValue( "," );
+		ws.getRange2( "B9" ).setValue( "," );
+		ws.getRange2( "C9" ).setValue( "," );
+		ws.getRange2( "D9" ).setValue( ";" );
+
+
+		oParser = new parserFormula( "TEXTJOIN(A9:D9, TRUE, A2:D7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "Tulsa,OK,74133,US;Seattle,WA,98109,US;Iselin,NJ,8830,US;Fort Lauderdale,FL,33309,US;Tempe,AZ,85285,US;end" );
+
+		oParser = new parserFormula( "TEXTJOIN(A9:D9, FALSE, A2:D7)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "Tulsa,OK,74133,US;Seattle,WA,98109,US;Iselin,NJ,8830,US;Fort Lauderdale,FL,33309,US;Tempe,AZ,85285,US;end,,," );
+
+		oParser = new parserFormula( "TEXTJOIN(A2:D5, 1, B6:D6)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "AZTulsa85285OKUS" );
+	} );
+
+
+
     test( "Test: \"WORKDAY\"", function () {
 
         oParser = new parserFormula( "WORKDAY(DATE(2006,1,1),0)", "A2", ws );
