@@ -5182,7 +5182,10 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_ShowForeignCursorLabel = function(UserId, X, Y, Color)
 	{
-
+		if (this.WordControl.m_oLogicDocument.IsFocusOnNotes())
+		{
+			Y += parseInt(this.WordControl.m_oNotesContainer.HtmlElement.style.top);
+		}
 		this.sendEvent("asc_onShowForeignCursorLabel", UserId, X, Y, new AscCommon.CColor(Color.r, Color.g, Color.b, 255));
 	};
 	asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
