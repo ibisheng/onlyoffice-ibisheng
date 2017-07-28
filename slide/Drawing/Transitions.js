@@ -3156,6 +3156,7 @@ function CDemonstrationManager(htmlpage)
         if (this.waitReporterObject)
         {
             this.EndWaitReporter(true);
+			this.HtmlPage.m_oApi.sync_endDemonstration();
         }
 		this.HtmlPage.m_oApi.DemonstrationReporterEnd();
 
