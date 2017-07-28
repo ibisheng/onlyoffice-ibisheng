@@ -2896,7 +2896,7 @@ function CDemonstrationManager(htmlpage)
 		this.waitReporterObject = [main_div_id, start_slide_num, is_play_mode];
     }
 
-    this.EndWaitReporter = function()
+    this.EndWaitReporter = function(isNoStart)
     {
 		var _parent = document.getElementById(this.waitReporterObject[0]);
 		var _elem = document.getElementById("dem_id_wait_reporter");
@@ -2908,7 +2908,8 @@ function CDemonstrationManager(htmlpage)
         {
         }
 
-        this.Start(this.waitReporterObject[0], this.waitReporterObject[1], this.waitReporterObject[2]);
+        if (true !== isNoStart)
+            this.Start(this.waitReporterObject[0], this.waitReporterObject[1], this.waitReporterObject[2]);
         this.waitReporterObject = null;
     }
 
@@ -3152,6 +3153,10 @@ function CDemonstrationManager(htmlpage)
 
     this.End = function(isNoUseFullScreen)
     {
+        if (this.waitReporterObject)
+        {
+            this.EndWaitReporter(true);
+        }
 		this.HtmlPage.m_oApi.DemonstrationReporterEnd();
 
         if (this.HtmlPage.m_oApi.isOnlyDemonstration)
