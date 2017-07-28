@@ -11969,7 +11969,7 @@ drawSurfaceChart.prototype =
 				var pen = style && style.spPr ? style.spPr.ln : null;
 				
 				//линии пока делаю по цвету как и заливку
-				if(!pen)
+				if(!pen || (pen && 0 === pen.w))
 				{
 					pen = AscFormat.CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0.13);
 				}
