@@ -4947,18 +4947,29 @@
 		var countC = pivotTable.getColumnFieldsCount();
 		var countR = pivotTable.getRowFieldsCount(true);
 		var c1 = pivotRange.c1;
-		var start = pivotRange.r1 + countC;
-		cells = this.getRange4(start, c1);
-		cells.setValue('Row Labels');
-		++start;
+		var r1 = pivotRange.r1 + countC;
 
+		var setRow = false;
 		for (i = 0; i < rowFields.length; ++i) {
+			if (0 === i) {
+				cells = this.getRange4(r1, c1);
+				cells.setValue('Row Labels');
+			}
+			index = rowFields[i].asc_getIndex();
+			field = pivotFields[index];
+			if (setRow) {
+				cells = this.getRange4(r1, c1);
+				cells.setValue(pivotFields[index].asc_getName() || cacheFields[index].asc_getName());
+				setRow = false;
+			}
 			rowFieldsPos[i] = c1;
-			field = pivotFields[rowFields[i].asc_getIndex()];
 			if (field && false === field.compact) {
 				++c1;
+				setRow = true;
 			}
 		}
+
+		++r1;
 
 		var rowItem, rowItems = pivotTable.getRowItems();
 		if (rowItems) {
@@ -4973,7 +4984,7 @@
 						sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
 						v = sharedItem.v;
 					}
-					cells = this.getRange4(start + i, rowFieldsPos[rowItem.getR()]);
+					cells = this.getRange4(r1 + i, rowFieldsPos[rowItem.getR()]);
 					cells.setValue(v);
 				}
 			}
