@@ -2483,15 +2483,30 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			arg = arg.getMatrix();
 			for (var i = 0; i < arg.length; i++) {
 				for (var j = 0; j < arg[i].length; j++) {
-					res.push(getValue(arg[i][j]));
+					if(cElementType.error === arg[i][j].type){
+						res = arg[i][j];
+						break;
+					}else{
+						res.push(getValue(arg[i][j]));
+					}
 				}
 			}
 		}else if(cElementType.array === arg.type){
 			arg.foreach(function (elem) {
-				res.push(getValue(elem));
+				if(cElementType.error === elem.type){
+					res = elem;
+					return;
+				}else{
+					res.push(getValue(elem));
+				}
 			})
 		}else{
-			res.push(getValue(arg));
+			if(cElementType.error === arg.type){
+				res = elem;
+				return;
+			}else{
+				res.push(getValue(arg));
+			}
 		}
 
 		return res;

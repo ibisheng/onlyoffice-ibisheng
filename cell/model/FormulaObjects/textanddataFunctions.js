@@ -1816,8 +1816,11 @@
 
 		var ignore_empty = argClone[1].toBool();
 		var delimiter = argClone[0];
-		var delimiterArr = this._getOneDimensionalArray(delimiter);
 		var delimiterIter = 0;
+		var delimiterArr = this._getOneDimensionalArray(delimiter);
+		if(delimiterArr instanceof cError){
+			return this.value = delimiterArr;
+		}
 
 		var concatString = function(string1, string2){
 			var res = string1;
@@ -1841,28 +1844,29 @@
 		var arg0 = new cString(""), argI;
 		for (var i = 2; i < this.argumentsCurrent; i++) {
 			argI = arg[i];
-			if (argI instanceof cArea || argI instanceof cArea3D) {
-				argI.foreach2(function (elem) {
-					arg0 = new cString(concatString(arg0.toString(), elem.toString()));
-				});
+
+			if(argI instanceof cArea || argI instanceof cArray || argI instanceof cArea3D){
+				if (argI instanceof cArea || argI instanceof cArray) {
+					argI = argI.getMatrix();
+				} else if (argI instanceof cArea3D) {
+					argI = argI.getMatrix()[0];
+				}
+
+				for (var n = 0; n < argI.length; n++) {
+					for (var j = 0; j < argI[n].length; j++) {
+						if(cElementType.error === argI[n][j].type){
+							return this.value = argI[n][j];
+						}else{
+							arg0 = new cString(concatString(arg0.toString(), argI[n][j].toString()));
+						}
+					}
+				}
+
 			}else{
 				argI = argI.tocString();
-
-				if (argI instanceof cError) {
-					return this.value = argI;
-				} else if (argI instanceof cArray) {
-					argI.foreach(function (elem) {
-						if (elem instanceof cError) {
-							arg0 = elem;
-							return true;
-						}
-						arg0 = new cString(concatString(arg0.toString(), elem.toString()));
-					});
-
-					if (arg0 instanceof cError) {
-						return this.value = arg0;
-					}
-				} else {
+				if (arg0 instanceof cError) {
+					return this.value = arg0;
+				}else{
 					arg0 = new cString(concatString(arg0.toString(), argI.toString()));
 				}
 			}
