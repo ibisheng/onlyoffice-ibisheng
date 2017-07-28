@@ -1017,13 +1017,13 @@
 		SelectionRange.prototype.getUnion = function () {
 			var result = new SelectionRange();
 			var unionRanges = function (ranges, res) {
-				ranges.forEach(function (item, i) {
+				for (var i = 0; i < ranges.length; ++i) {
 					if (0 === i) {
-						res.assign2(item);
+						res.assign2(ranges[i]);
 					} else {
-						res.union(item);
+						res.union(ranges[i]);
 					}
-				});
+				}
 			};
 			unionRanges(this.ranges, result);
 

@@ -2676,11 +2676,11 @@ CT_pivotTableDefinition.prototype.getRowFieldsCount = function (compact) {
 CT_pivotTableDefinition.prototype.getField = function (arrFields, callback) {
 	return arrFields && arrFields.map(callback, this);
 };
-CT_pivotTableDefinition.prototype.forEachColItems = function (callback, thisArg) {
-	return this.colItems && this.colItems.i.forEach(callback, thisArg);
+CT_pivotTableDefinition.prototype.getRowItems = function () {
+	return this.rowItems && this.rowItems.i;
 };
-CT_pivotTableDefinition.prototype.forEachRowItems = function (callback, thisArg) {
-	return this.rowItems && this.rowItems.i.forEach(callback, thisArg);
+CT_pivotTableDefinition.prototype.getColItems = function () {
+	return this.colItems && this.colItems.i;
 };
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
