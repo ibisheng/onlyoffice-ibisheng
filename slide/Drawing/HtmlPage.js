@@ -704,7 +704,8 @@ function CEditorPage(api)
 
 				_elem.innerHTML = "Slide " + _current + " of " + _count;
 
-				window.editor.WordControl.Thumbnails.SelectPage(_current - 1);
+				//window.editor.WordControl.Thumbnails.SelectPage(_current - 1);
+				window.editor.WordControl.GoToPage(_current - 1, false, false, true);
 			});
 
 			this.m_oApi.asc_registerCallback("asc_onEndDemonstration", function ()
@@ -878,11 +879,17 @@ function CEditorPage(api)
 		{
 			this.bIsRetinaSupport       = AscCommon.AscBrowser.isRetina;
 			this.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
+
+			if (this.m_oNotesApi && this.m_oNotesApi.m_oOverlayApi)
+				this.m_oNotesApi.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
 		}
 		else
 		{
 			this.bIsRetinaSupport = false;
 			this.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
+
+			if (this.m_oNotesApi && this.m_oNotesApi.m_oOverlayApi)
+				this.m_oNotesApi.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
 		}
 
 		if (old != this.bIsRetinaSupport)
@@ -900,7 +907,9 @@ function CEditorPage(api)
 				(htmlElem.id == "id_viewer_overlay" && this.m_oOverlayApi.IsRetina) ||
 				htmlElem.id == "id_hor_ruler" ||
 				htmlElem.id == "id_vert_ruler" ||
-				htmlElem.id == "id_buttonTabs")
+				htmlElem.id == "id_buttonTabs" ||
+				htmlElem.id == "id_notes" ||
+				(htmlElem.id == "id_notes_overlay" && this.m_oOverlayApi.IsRetina))
 				return true;
 		}
 		return false;
@@ -3850,7 +3859,7 @@ function CEditorPage(api)
 		this.m_oDrawingDocument.CheckGuiControlColors(bIsAttack);
 	};
 
-	this.GoToPage = function(lPageNum, isFromZoom, bIsAttack)
+	this.GoToPage = function(lPageNum, isFromZoom, bIsAttack, isReporterUpdateSlide)
 	{
 		if (this.m_oApi.isReporterMode)
 		{
@@ -3861,7 +3870,7 @@ function CEditorPage(api)
 				this.m_oApi.sendEvent("asc_onDemonstrationFirstRun");
 				window.postMessage("{ \"reporter_command\" : \"start_show\" }", "*");
 			}
-			else
+			else if (true !== isReporterUpdateSlide)
 			{
 				this.m_oApi.DemonstrationGoToSlide(lPageNum);
 			}
