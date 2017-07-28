@@ -3036,8 +3036,12 @@ CPresentation.prototype =
         else if ( e.KeyCode == 56 && true === e.CtrlKey && true === e.ShiftKey ) // Ctrl + Shift + 8 - showParaMarks
         {
             editor.ShowParaMarks = !editor.ShowParaMarks;
-            if(this.Slides[this.CurPage])
+            if(this.Slides[this.CurPage]){
                 this.DrawingDocument.OnRecalculatePage(this.CurPage, this.Slides[this.CurPage]);
+                if(this.Slides[this.CurPage].notes){
+                    this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+                }
+            }
             bRetValue = keydownresult_PreventAll;
         }
         else if ( e.KeyCode == 65 && true === e.CtrlKey ) // Ctrl + A - выделяем все
