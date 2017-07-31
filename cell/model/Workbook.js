@@ -4971,20 +4971,20 @@
 
 		++r1;
 
-		var rowItem, rowItems = pivotTable.getRowItems();
-		if (rowItems) {
-			for (i = 0; i < rowItems.length; ++i) {
-				rowItem = rowItems[i];
-				for (j = 0; j < rowItem.x.length; ++j) {
-					if (AscCommonExcel.c_oAscItemType.Grand === rowItem.t) {
+		var item, items = pivotTable.getRowItems();
+		if (items) {
+			for (i = 0; i < items.length; ++i) {
+				item = items[i];
+				for (j = 0; j < item.x.length; ++j) {
+					if (AscCommonExcel.c_oAscItemType.Grand === item.t) {
 						v = 'Grand Total';
 					} else {
-						indexField = rowFields[rowItem.getR()].asc_getIndex();
-						cacheIndex = pivotFields[indexField].getItem(rowItem.x[j].getV());
+						indexField = rowFields[item.getR()].asc_getIndex();
+						cacheIndex = pivotFields[indexField].getItem(item.x[j].getV());
 						sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
 						v = sharedItem.v;
 					}
-					cells = this.getRange4(r1 + i, rowFieldsPos[rowItem.getR()]);
+					cells = this.getRange4(r1 + i, rowFieldsPos[item.getR()]);
 					cells.setValue(v);
 				}
 			}
