@@ -943,7 +943,7 @@
 		cOCT2DEC, cOCT2HEX);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cBESSELI, cBESSELK, cBESSELY, cCONVERT);
+	cFormulaFunctionGroup['NotRealised'].push(cBESSELI, cBESSELY, cCONVERT);
 
 	/**
 	 * @constructor
@@ -1054,6 +1054,39 @@
 
 	cBESSELK.prototype = Object.create(cBaseFunction.prototype);
 	cBESSELK.prototype.constructor = cBESSELK;
+	cBESSELK.prototype.argumentsMin = 2;
+	cBESSELK.prototype.argumentsMax = 2;
+	cBESSELK.prototype.Calculate = function ( arg ) {
+		//результаты вычислений как в LO
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFunc = function(argArray){
+			var x = argArray[0];
+			var n = argArray[1];
+
+			if ( n < 0 || x < 0){
+				return new cError( cErrorType.not_numeric );
+			}
+			/*if(x < 0){
+				x = Math.abs(x);
+			}*/
+			n = Math.floor(n);
+
+			return BesselK( x, n );
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+	};
+
 
 	/**
 	 * @constructor
