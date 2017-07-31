@@ -3635,6 +3635,15 @@ CUniFill.prototype =
             if(unifill.fill!=null)
             {
                 this.fill = unifill.fill.createDuplicate();
+                if(this.fill.type === c_oAscFill.FILL_TYPE_PATT){
+                    var _patt_fill = this.fill;
+                    if(!_patt_fill.fgClr){
+                        _patt_fill.setFgColor(CreateUniColorRGB(0, 0, 0));
+                    }
+                    if(!_patt_fill.bgClr){
+                        _patt_fill.bgClr = CreateUniColorRGB(255, 255, 255);
+                    }
+                }
             }
             if(unifill.transparent != null)
             {
