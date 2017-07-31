@@ -260,6 +260,8 @@
 		}
 	}
 
+	// See #i31656# for a commented version of this implementation, attachment #desc6
+	// http://www.openoffice.org/nonav/issues/showattachment.cgi/63609/Comments%20to%20the%20implementation%20of%20the%20Bessel%20functions.odt
 	function Bessely0(fX) {
 		if (fX <= 0) {
 			return new cError(cErrorType.not_numeric);
@@ -300,8 +302,8 @@
 		}
 	}
 
-// See #i31656# for a commented version of this implementation, attachment #desc6
-// http://www.openoffice.org/nonav/issues/showattachment.cgi/63609/Comments%20to%20the%20implementation%20of%20the%20Bessel%20functions.odt
+	// See #i31656# for a commented version of this implementation, attachment #desc6
+	// http://www.openoffice.org/nonav/issues/showattachment.cgi/63609/Comments%20to%20the%20implementation%20of%20the%20Bessel%20functions.odt
 	function Bessely1(fX) {
 		if (fX <= 0) {
 			return new cError(cErrorType.not_numeric);
@@ -367,20 +369,21 @@
 		return new cNumber(fRet);
 	}
 
-// See #i31656# for a commented version of this implementation, attachment #desc6
-// http://www.openoffice.org/nonav/issues/showattachment.cgi/63609/Comments%20to%20the%20implementation%20of%20the%20Bessel%20functions.odt
-	function _Bessely1(fNum) {
 
+	function _Bessely1(fNum) {
+		var z, xx , y, fRet, ans1, ans2;
 		if (fNum < 8.0) {
-			var y = (fNum * fNum);
-			var f1 = fNum * (-0.4900604943e13 + y * (0.1275274390e13 + y * (-0.5153438139e11 + y * (0.7349264551e9 + y *
-				(-0.4237922726e7 + y * 0.8511937935e4)))));
-			var f2 = 0.2499580570e14 + y * (0.4244419664e12 + y * (0.3733650367e10 + y * (0.2245904002e8 + y *
-				(0.1020426050e6 + y * (0.3549632885e3 + y)))));
-			var fRet = f1 / f2 + 0.636619772 * (BesselJ(fNum, 1) * Math.log(fNum) - 1 / fNum);
-		}
-		else {
-			var fRet = Math.sqrt(0.636619772 / fNum) * Math.sin(fNum - 2.356194491);
+			y = fNum * fNum;
+			ans1 = fNum *(-0.4900604943e13 + y * (0.1275274390e13 + y * (-0.5153438139e11 + y * (0.7349264551e9 + y * (-0.4237922726e7 + y * 0.8511937935e4)))));
+			ans2 = 0.2499580570e14 + y * (0.4244419664e12 + y * (0.3733650367e10 + y * (0.2245904002e8 + y * (0.1020426050e6 + y * (0.3549632885e3 + y)))));
+			fRet=(ans1 / ans2) + 0.636619772 * (BesselJ(fNum) * Math.log(fNum) - 1.0 / fNum);
+		} else {
+			z = 8.0 / fNum;
+			y = z * z;
+			xx = fNum - 2.356194491;
+			ans1 = 1.0 + y * (0.183105e-2 + y * (-0.3516396496e-4 + y * (0.2457520174e-5 + y * (-0.240337019e-6))));
+			ans2 = 0.04687499995 + y * (-0.2002690873e-3 + y * (0.8449199096e-5 + y * (-0.88228987e-6 + y * 0.105787412e-6)));
+			fRet = Math.sqrt(0.636619772 / fNum) * (Math.sin(xx) * ans1 + z * Math.cos(xx) * ans2);
 		}
 
 		return new cNumber(fRet);
