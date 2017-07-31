@@ -1453,6 +1453,25 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), 1, "BETADIST(6,2,3,1,6)" );
 	} );
 
+	test( "Test: \"BESSELJ\"", function () {
+
+		oParser = new parserFormula( "BESSELJ(1.9, 2)", "A1", ws );
+		ok( oParser.parse(), "BESSELJ(1.9, 2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.329925728, "BESSELJ(1.9, 2)" );
+
+		oParser = new parserFormula( "BESSELJ(1.9, 2.4)", "A1", ws );
+		ok( oParser.parse(), "BESSELJ(1.9, 2.4)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.329925728, "BESSELJ(1.9, 2.4)" );
+
+		oParser = new parserFormula( "BESSELJ(-1.9, 2.4)", "A1", ws );
+		ok( oParser.parse(), "BESSELJ(-1.9, 2.4)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.329925728, "BESSELJ(-1.9, 2.4)" );
+
+		oParser = new parserFormula( "BESSELJ(-1.9, -2.4)", "A1", ws );
+		ok( oParser.parse(), "BESSELJ(-1.9, -2.4)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+	} );
+
 	test( "Test: \"GAMMA.INV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.068094" );
 		ws.getRange2( "A3" ).setValue( "9" );
