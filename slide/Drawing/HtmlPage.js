@@ -423,7 +423,7 @@ function CEditorPage(api)
 
 		this.m_oBody = CreateControlContainer(this.Name);
 
-		this.Splitter1Pos    = 70;
+		this.Splitter1Pos    = 67.5;
 		this.Splitter2Pos    = (this.IsSupportNotes === true) ? 10 : 0;
 
 		this.OldSplitter1Pos = this.Splitter1Pos;
