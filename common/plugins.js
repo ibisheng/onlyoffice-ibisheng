@@ -493,6 +493,7 @@
 											window.g_asc_plugins.api.asc_Recalculate();
 											if(AscCommon.c_oEditorId.Word === editorId) {
 												oLogicDocument.UnlockPanelStyles(true);
+												oLogicDocument.OnEndLoadScript();
 											}
 
 											var pluginData = new CPluginData();
