@@ -347,14 +347,53 @@
 		}
 	}
 
+	function _Bessely0(fNum) {
+
+		if (fNum < 8.0) {
+			var y = (fNum * fNum);
+			var f1 = -2957821389.0 + y * (7062834065.0 + y * (-512359803.6 + y * (10879881.29 + y * (-86327.92757 + y * 228.4622733))));
+			var f2 = 40076544269.0 + y * (745249964.8 + y * (7189466.438 + y * (47447.26470 + y * (226.1030244 + y))));
+			var fRet = f1 / f2 + 0.636619772 * BesselJ(fNum, 0) * Math.log(fNum);
+		}
+		else {
+			var z = 8.0 / fNum;
+			var y = (z * z);
+			var xx = fNum - 0.785398164;
+			var f1 = 1 + y * (-0.1098628627e-2 + y * (0.2734510407e-4 + y * (-0.2073370639e-5 + y * 0.2093887211e-6)));
+			var f2 = -0.1562499995e-1 + y * (0.1430488765e-3 + y * (-0.6911147651e-5 + y * (0.7621095161e-6 + y * (-0.934945152e-7))));
+			var fRet = Math.sqrt(0.636619772 / fNum) * (Math.sin(xx) * f1 + z * Math.cos(xx) * f2);
+		}
+
+		return new cNumber(fRet);
+	}
+
+// See #i31656# for a commented version of this implementation, attachment #desc6
+// http://www.openoffice.org/nonav/issues/showattachment.cgi/63609/Comments%20to%20the%20implementation%20of%20the%20Bessel%20functions.odt
+	function _Bessely1(fNum) {
+
+		if (fNum < 8.0) {
+			var y = (fNum * fNum);
+			var f1 = fNum * (-0.4900604943e13 + y * (0.1275274390e13 + y * (-0.5153438139e11 + y * (0.7349264551e9 + y *
+				(-0.4237922726e7 + y * 0.8511937935e4)))));
+			var f2 = 0.2499580570e14 + y * (0.4244419664e12 + y * (0.3733650367e10 + y * (0.2245904002e8 + y *
+				(0.1020426050e6 + y * (0.3549632885e3 + y)))));
+			var fRet = f1 / f2 + 0.636619772 * (BesselJ(fNum, 1) * Math.log(fNum) - 1 / fNum);
+		}
+		else {
+			var fRet = Math.sqrt(0.636619772 / fNum) * Math.sin(fNum - 2.356194491);
+		}
+
+		return new cNumber(fRet);
+	}
+
 	function BesselY(fNum, nOrder) {
 		switch (nOrder) {
 			case 0:
-				return Bessely0(fNum);
+				return _Bessely0(fNum);
 			case 1:
-				return Bessely1(fNum);
+				return _Bessely1(fNum);
 			default: {
-				var fByp, fTox = 2 / fNum, fBym = Bessely0(fNum), fBy = Bessely1(fNum);
+				var fByp, fTox = 2 / fNum, fBym = _Bessely0(fNum), fBy = _Bessely1(fNum);
 
 				if (fBym instanceof cError) {
 					return fBym;
@@ -945,7 +984,7 @@
 		cOCT2DEC, cOCT2HEX);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cBESSELI, cBESSELY, cCONVERT);
+	cFormulaFunctionGroup['NotRealised'].push(cBESSELI, cCONVERT);
 
 	/**
 	 * @constructor
@@ -1078,9 +1117,7 @@
 			if ( n < 0 || x < 0){
 				return new cError( cErrorType.not_numeric );
 			}
-			/*if(x < 0){
-				x = Math.abs(x);
-			}*/
+
 			n = Math.floor(n);
 
 			return BesselK( x, n );
@@ -1100,6 +1137,37 @@
 
 	cBESSELY.prototype = Object.create(cBaseFunction.prototype);
 	cBESSELY.prototype.constructor = cBESSELY;
+	cBESSELY.prototype.argumentsMin = 2;
+	cBESSELY.prototype.argumentsMax = 2;
+	cBESSELY.prototype.Calculate = function ( arg ) {
+		//результаты вычислений как в LO
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFunc = function(argArray){
+			var x = argArray[0];
+			var n = argArray[1];
+
+			if ( n < 0 || x < 0){
+				return new cError( cErrorType.not_numeric );
+			}
+
+			n = Math.floor(n);
+
+			return BesselY( x, n );
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+	};
+
 
 	/**
 	 * @constructor
