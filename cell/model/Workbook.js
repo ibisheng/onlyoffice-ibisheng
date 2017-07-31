@@ -5108,10 +5108,10 @@
 					}
 				}
 			}
+			countR = pivotTable.getRowFieldsCount();
 			items = pivotTable.getRowItems();
-			if (items) {
+			if (countR && items) {
 				start = pivotRange.r1 + countC + 1;
-				countR = pivotTable.getRowFieldsCount();
 				for (j = 0; j < items.length; ++j) {
 					item = items[j];
 					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === countR) {
