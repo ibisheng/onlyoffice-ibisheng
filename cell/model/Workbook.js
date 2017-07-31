@@ -4924,7 +4924,7 @@
 		}
 	};
 	Worksheet.prototype._updatePivotTable = function (pivotTable, cleanRanges) {
-		var pos, cells, index, i, j, v, field, indexField, cacheIndex, sharedItem;
+		var pos, cells, index, i, j, v, r, c1, r1, field, indexField, cacheIndex, sharedItem, item, items, setName;
 		for (i = 0; i < cleanRanges.length; ++i) {
 			cleanRanges[i].cleanAll();
 		}
@@ -4932,6 +4932,7 @@
 		var cacheFields = pivotTable.asc_getCacheFields();
 		var pivotFields = pivotTable.asc_getPivotFields();
 		var pageFields = pivotTable.asc_getPageFields();
+		var colFields = pivotTable.asc_getColumnFields();
 		var rowFields = pivotTable.asc_getRowFields();
 		var rowFieldsPos = [];
 		for (i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
@@ -4946,46 +4947,86 @@
 		}
 		var countC = pivotTable.getColumnFieldsCount();
 		var countR = pivotTable.getRowFieldsCount(true);
-		var c1 = pivotRange.c1;
-		var r1 = pivotRange.r1 + countC;
 
-		var setRow = false;
-		for (i = 0; i < rowFields.length; ++i) {
-			if (0 === i) {
-				cells = this.getRange4(r1, c1);
-				cells.setValue('Row Labels');
-			}
-			index = rowFields[i].asc_getIndex();
-			field = pivotFields[index];
-			if (setRow) {
-				cells = this.getRange4(r1, c1);
-				cells.setValue(pivotFields[index].asc_getName() || cacheFields[index].asc_getName());
-				setRow = false;
-			}
-			rowFieldsPos[i] = c1;
-			if (field && false === field.compact) {
-				++c1;
-				setRow = true;
+		if (countC) {
+			c1 = pivotRange.c1 + countR;
+			r1 = pivotRange.r1;
+
+			cells = this.getRange4(r1, c1);
+			cells.setValue('Column Labels');
+
+			++r1;
+
+			items = pivotTable.getColItems();
+			if (items && countC) {
+				for (i = 0; i < items.length; ++i) {
+					item = items[i];
+					r = item.getR();
+					for (j = 0; j < item.x.length; ++j) {
+						if (AscCommonExcel.c_oAscItemType.Grand === item.t) {
+							v = 'Grand Total';
+						} else {
+							indexField = colFields[r + j].asc_getIndex();
+							cacheIndex = pivotFields[indexField].getItem(item.x[j].getV());
+							sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
+							v = sharedItem.v;
+						}
+
+						if (AscCommonExcel.c_oAscItemType.Default === item.t) {
+							// ToDo add other names by type
+							v += ' Total';
+						}
+
+						cells = this.getRange4(r1 + r + j, c1 + i);
+						cells.setValue(v);
+					}
+				}
 			}
 		}
 
-		++r1;
+		if (countR) {
+			c1 = pivotRange.c1;
+			r1 = pivotRange.r1 + countC;
+			setName = false;
+			for (i = 0; i < rowFields.length; ++i) {
+				if (0 === i) {
+					cells = this.getRange4(r1, c1);
+					cells.setValue('Row Labels');
+				}
+				index = rowFields[i].asc_getIndex();
+				field = pivotFields[index];
+				if (setName) {
+					cells = this.getRange4(r1, c1);
+					cells.setValue(pivotFields[index].asc_getName() || cacheFields[index].asc_getName());
+					setName = false;
+				}
+				rowFieldsPos[i] = c1;
+				if (field && false === field.compact) {
+					++c1;
+					setName = true;
+				}
+			}
 
-		var item, items = pivotTable.getRowItems();
-		if (items) {
-			for (i = 0; i < items.length; ++i) {
-				item = items[i];
-				for (j = 0; j < item.x.length; ++j) {
-					if (AscCommonExcel.c_oAscItemType.Grand === item.t) {
-						v = 'Grand Total';
-					} else {
-						indexField = rowFields[item.getR()].asc_getIndex();
-						cacheIndex = pivotFields[indexField].getItem(item.x[j].getV());
-						sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
-						v = sharedItem.v;
+			++r1;
+
+			items = pivotTable.getRowItems();
+			if (items) {
+				for (i = 0; i < items.length; ++i) {
+					item = items[i];
+					r = item.getR();
+					for (j = 0; j < item.x.length; ++j) {
+						if (AscCommonExcel.c_oAscItemType.Grand === item.t) {
+							v = 'Grand Total';
+						} else {
+							indexField = rowFields[r].asc_getIndex();
+							cacheIndex = pivotFields[indexField].getItem(item.x[j].getV());
+							sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
+							v = sharedItem.v;
+						}
+
+						cells = this.getRange4(r1 + i, rowFieldsPos[item.getR()]);
+						cells.setValue(v);
 					}
-					cells = this.getRange4(r1 + i, rowFieldsPos[item.getR()]);
-					cells.setValue(v);
 				}
 			}
 		}
@@ -5108,9 +5149,9 @@
 					}
 				}
 			}
-			countR = pivotTable.getRowFieldsCount();
 			items = pivotTable.getRowItems();
-			if (countR && items) {
+			if (items && countR) {
+				countR = pivotTable.getRowFieldsCount();
 				start = pivotRange.r1 + countC + 1;
 				for (j = 0; j < items.length; ++j) {
 					item = items[j];
