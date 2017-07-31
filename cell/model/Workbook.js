@@ -5199,7 +5199,8 @@
 					}
 					dxf = dxf && dxf.dxf;
 					if (dxf) {
-						cells = this.getRange3(start + j, pivotRange.c1, start + j, pivotRange.c2);
+						cells = this.getRange3(start + j, pivotRange.c1 + pivotTable.getRowFieldPos(r), start + j,
+							pivotRange.c2);
 						cells.setTableStyle(dxf);
 					}
 				}

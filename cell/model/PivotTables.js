@@ -2673,6 +2673,18 @@ CT_pivotTableDefinition.prototype.getRowFieldsCount = function (compact) {
 	}
 	return res;
 };
+CT_pivotTableDefinition.prototype.getRowFieldPos = function (index) {
+	var res = 0;
+	if (this.rowFields) {
+		var field, fields = this.rowFields.field;
+		for (var i = 0; i < index && i < fields.length; ++i) {
+			field = this.pivotFields.pivotField[fields[i].asc_getIndex()];
+			res += (field && false === field.compact && 1);
+		}
+	}
+
+	return res;
+};
 CT_pivotTableDefinition.prototype.getDataFieldsCount = function () {
 	return (this.dataFields && this.dataFields.dataField.length) || 0;
 };
