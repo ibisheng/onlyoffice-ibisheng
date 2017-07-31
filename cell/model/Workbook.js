@@ -6439,25 +6439,27 @@
 		}
 	};
 	Range.prototype.setNumFormat=function(val){
+		this.setNum(new AscCommonExcel.Num({f:val}));
+	};
+	Range.prototype.setNum = function(val) {
 		History.Create_NewPoint();
 		this.createCellOnRowColCross();
 		var fSetProperty = this._setProperty;
 		var nRangeType = this._getRangeType();
-		if(c_oRangeType.All == nRangeType)
-		{
-			this.worksheet.getAllCol().setNumFormat(val);
+		if (c_oRangeType.All == nRangeType) {
+			this.worksheet.getAllCol().setNum(val);
 			fSetProperty = this._setPropertyNoEmpty;
 		}
-		fSetProperty.call(this, function(row){
-							  if(c_oRangeType.All == nRangeType && null == row.xfs)
+		fSetProperty.call(this, function(row) {
+							  if (c_oRangeType.All == nRangeType && null == row.xfs)
 								  return;
-							  row.setNumFormat(val);
+							  row.setNum(val);
 						  },
-						  function(col){
-							  col.setNumFormat(val);
+						  function(col) {
+							  col.setNum(val);
 						  },
-						  function(cell){
-							  cell.setNumFormat(val);
+						  function(cell) {
+							  cell.setNum(val);
 						  });
 	};
 	Range.prototype.shiftNumFormat=function(nShift, aDigitsCount){
