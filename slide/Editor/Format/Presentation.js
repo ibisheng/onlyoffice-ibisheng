@@ -1902,10 +1902,11 @@ CPresentation.prototype =
     addChart: function(binary)
     {
         var _this = this;
-        _this.Slides[_this.CurPage] && _this.Slides[_this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(function()
-        {
+      //  _this.Slides[_this.CurPage] && _this.Slides[_this.CurPage].graphicObjects.checkSelectedObjectsAndCallback(function()
+      //  {
+            History.Create_NewPoint(AscDFH.historydescription_Presentation_AddChart);
             editor.WordControl.Thumbnails.SetFocusElement(FOCUS_OBJECT_MAIN);
-            this.FocusOnNotes = false;
+            _this.FocusOnNotes = false;
             var Image = _this.Slides[_this.CurPage].graphicObjects.getChartSpace2(binary, null);
             Image.setParent(_this.Slides[_this.CurPage]);
             Image.addToDrawingObjects();
@@ -1913,9 +1914,10 @@ CPresentation.prototype =
             Image.spPr.xfrm.setOffY((_this.Slides[_this.CurPage].Height - Image.spPr.xfrm.extY)/2);
             _this.Slides[_this.CurPage].graphicObjects.resetSelection();
             _this.Slides[_this.CurPage].graphicObjects.selectObject(Image, 0);
+            _this.Recalculate();
             _this.Document_UpdateInterfaceState();
-            this.CheckEmptyPlaceholderNotes();
-        }, [], false, AscDFH.historydescription_Presentation_AddChart);
+            _this.CheckEmptyPlaceholderNotes();
+      //  }, [], false, AscDFH.historydescription_Presentation_AddChart);
     },
 
 	RemoveSelection: function(bNoResetChartSelection)
