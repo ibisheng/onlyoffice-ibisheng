@@ -5035,8 +5035,9 @@
 	Worksheet.prototype.updatePivotTablesStyle = function (range) {
 		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, r, pos, countC, countR, countD, stripe1,
 			stripe2, items, item, start = 0, emptyStripe = new Asc.CTableStyleElement();
-		var dxf, dxfLabels, dxfValues;
+		var dxf, dxfLabels, dxfValues, grandColumn;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
+			grandColumn = 0;
 			pivotTable = this.pivotTables[i];
 			pivotRange = pivotTable.getRange();
 			styleInfo = pivotTable.asc_getStyleInfo();
@@ -5050,6 +5051,7 @@
 
 			wholeStyle = style.wholeTable && style.wholeTable.dxf;
 
+			// Page Field Labels, Page Field Values
 			dxfLabels = style.pageFieldLabels && style.pageFieldLabels.dxf;
 			dxfValues = style.pageFieldValues && style.pageFieldValues.dxf;
 			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
@@ -5075,8 +5077,10 @@
 				continue;
 			}
 
+			// Whole Table
 			cells.setTableStyle(wholeStyle);
 
+			// First Column Stripe, Second Column Stripe
 			if (styleInfo.showColStripes) {
 				stripe1 = style.firstColumnStripe || emptyStripe;
 				stripe2 = style.secondColumnStripe || emptyStripe;
@@ -5090,6 +5094,7 @@
 					cells.setTableStyle(stripe2.dxf, new Asc.CTableStyleStripe(stripe2.size, stripe1.size));
 				}
 			}
+			// First Row Stripe, Second Row Stripe
 			if (styleInfo.showRowStripes) {
 				stripe1 = style.firstRowStripe || emptyStripe;
 				stripe2 = style.secondRowStripe || emptyStripe;
@@ -5104,6 +5109,7 @@
 				}
 			}
 
+			// First Column
 			dxf = style.firstColumn && style.firstColumn.dxf;
 			if (styleInfo.showRowHeaders && countR && dxf) {
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r2,
@@ -5111,12 +5117,14 @@
 				cells.setTableStyle(dxf);
 			}
 
+			// Header Row
 			dxf = style.headerRow && style.headerRow.dxf;
 			if (styleInfo.showColHeaders && dxf) {
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC, pivotRange.c2);
 				cells.setTableStyle(dxf);
 			}
 
+			// First Header Cell
 			dxf = style.firstHeaderCell && style.firstHeaderCell.dxf;
 			if (styleInfo.showColHeaders && styleInfo.showRowHeaders && countC && dxf) {
 				cells = this.getRange3(pivotRange.r1, pivotRange.c1, pivotRange.r1 + countC - (countR ? 1 : 0),
@@ -5124,17 +5132,19 @@
 				cells.setTableStyle(dxf);
 			}
 
+			// Subtotal Column
 			items = pivotTable.getColItems();
 			if (items) {
 				start = pivotRange.c1 + countR;
 				for (j = 0; j < items.length; ++j) {
+					dxf = null;
 					item = items[j];
+					r = item.getR();
 					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === countC) {
 						dxf = style.lastColumn;
+						grandColumn = 1;
 					} else {
-						r = item.getR();
 						if (r + 1 !== countC) {
-							//ToDo subheading
 							if (countD && item.t) {
 								if (0 === r) {
 									dxf = style.firstSubtotalColumn;
@@ -5153,11 +5163,13 @@
 					}
 				}
 			}
+			// Subtotal Row
 			items = pivotTable.getRowItems();
 			if (items && countR) {
 				countR = pivotTable.getRowFieldsCount();
 				start = pivotRange.r1 + countC + 1;
 				for (j = 0; j < items.length; ++j) {
+					dxf = null;
 					item = items[j];
 					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === countR) {
 						dxf = style.totalRow;
@@ -5177,6 +5189,46 @@
 					if (dxf) {
 						cells = this.getRange3(start + j, pivotRange.c1, start + j, pivotRange.c2);
 						cells.setTableStyle(dxf);
+					}
+				}
+			}
+
+			// Column Subheading
+			items = pivotTable.getColItems();
+			if (items) {
+				start = pivotRange.c1 + countR;
+				for (j = 0; j < countC; ++j) {
+					if (0 === j) {
+						dxf = style.firstColumnSubheading;
+					} else if (1 === j % 2) {
+						dxf = style.secondColumnSubheading;
+					} else {
+						dxf = style.thirdColumnSubheading;
+					}
+					dxf = dxf && dxf.dxf;
+					if (dxf) {
+						cells = this.getRange3(pivotRange.r1 + 1 + j, start, pivotRange.r1 + 1 + j, pivotRange.c2 -
+							grandColumn);
+						cells.setTableStyle(dxf);
+					}
+				}
+				for (j = 0; j < items.length; ++j) {
+					item = items[j];
+					if (item.t && AscCommonExcel.c_oAscItemType.Grand !== item.t) {
+						r = item.getR();
+						if (0 === r) {
+							dxf = style.firstColumnSubheading;
+						} else if (1 === r % 2) {
+							dxf = style.secondColumnSubheading;
+						} else {
+							dxf = style.thirdColumnSubheading;
+						}
+						dxf = dxf && dxf.dxf;
+						if (dxf) {
+							cells = this.getRange3(pivotRange.r1 + 1 + r, start + j, pivotRange.r1 + 1 + countC -
+								(countR ? 1 : 0), start + j);
+							cells.setTableStyle(dxf);
+						}
 					}
 				}
 			}
