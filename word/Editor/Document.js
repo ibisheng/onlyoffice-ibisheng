@@ -15452,6 +15452,12 @@ CDocument.prototype.private_CheckCursorPosInFillingFormMode = function()
 		this.Document_UpdateInterfaceState();
 	}
 };
+CDocument.prototype.OnEndLoadScript = function()
+{
+	this.Update_SectionsInfo();
+	this.Check_SectionLastParagraph();
+	this.Styles.Check_StyleNumberingOnLoad(this.Numbering);
+};
 
 function CDocumentSelectionState()
 {
