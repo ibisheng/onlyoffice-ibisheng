@@ -5084,7 +5084,7 @@
 
 			items = pivotTable.getColItems();
 			if (items) {
-				start = pivotRange.c1 + Math.max(1, countR);
+				start = pivotRange.c1 + countR;
 				for (j = 0; j < items.length; ++j) {
 					item = items[j];
 					if (AscCommonExcel.c_oAscItemType.Grand === item.t || 0 === countC) {
@@ -5175,7 +5175,7 @@
 					res.push(new AscCommon.CellBase(pivotRange.r1 + countC, pivotRange.c1));
 				}
 				if (countC) {
-					res.push(new AscCommon.CellBase(pivotRange.r1, pivotRange.c1 + Math.max(1, countR)));
+					res.push(new AscCommon.CellBase(pivotRange.r1, pivotRange.c1 + countR));
 				}
 			}
 		}
