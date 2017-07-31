@@ -5918,7 +5918,7 @@ background-repeat: no-repeat;\
 			};
 
 			this.reporterStartObject = null;
-			_this.reporterWindow.postMessage(JSON.stringify(_msg_), '*');
+			_this.sendToReporter(JSON.stringify(_msg_));
 
 			return;
 		}
@@ -5979,6 +5979,17 @@ background-repeat: no-repeat;\
 		catch (err)
 		{
 		}
+	};
+
+	asc_docs_api.prototype.sendToReporter = function(value)
+	{
+		if (this.reporterWindow)
+			this.reporterWindow.postMessage(value, "*");
+	};
+
+	asc_docs_api.prototype.sendFromReporter = function(value)
+	{
+		window.postMessage(value, "*");
 	};
 
 	asc_docs_api.prototype.DemonstrationToReporterMessages = function(e)
@@ -6052,7 +6063,7 @@ background-repeat: no-repeat;\
 		this.WordControl.DemonstrationManager.GoToSlide(slideNum);
 
 		if (this.isReporterMode)
-			window.postMessage("{ \"reporter_command\" : \"slide\", \"slide\" : " + slideNum + " }", "*");
+			this.sendFromReporter("{ \"reporter_command\" : \"slide\", \"slide\" : " + slideNum + " }");
 	};
 
 	asc_docs_api.prototype.SetDemonstrationModeOnly = function()

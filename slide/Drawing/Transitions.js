@@ -3205,7 +3205,7 @@ function CDemonstrationManager(htmlpage)
             return;
 
         if (this.HtmlPage.m_oApi.isReporterMode)
-			window.postMessage("{ \"reporter_command\" : \"next\" }", "*");
+			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"next\" }");
 
         this.CorrectSlideNum();
 
@@ -3236,7 +3236,7 @@ function CDemonstrationManager(htmlpage)
             return;
 
 		if (this.HtmlPage.m_oApi.isReporterMode)
-			window.postMessage("{ \"reporter_command\" : \"prev\" }", "*");
+			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"prev\" }");
 
         if (0 != this.SlideNum)
         {
@@ -3261,7 +3261,7 @@ function CDemonstrationManager(htmlpage)
             return;
 
 		if (this.HtmlPage.m_oApi.isReporterMode)
-			window.postMessage("{ \"reporter_command\" : \"go_to_slide\", \"slide\" : " + slideNum + " }", "*");
+			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"go_to_slide\", \"slide\" : " + slideNum + " }");
 
         this.CorrectSlideNum();
 
@@ -3341,7 +3341,7 @@ function CDemonstrationManager(htmlpage)
 				"keyCode"       : AscCommon.global_keyboardEvent.KeyCode
 			};
 
-			oThis.HtmlPage.m_oApi.reporterWindow.postMessage(JSON.stringify(_msg_), "*");
+			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
 			oThis.HtmlPage.IsKeyDownButNoPress = true;
 			return false;
         }
@@ -3415,7 +3415,7 @@ function CDemonstrationManager(htmlpage)
 				"mouseUp"       : true
 			};
 
-			oThis.HtmlPage.m_oApi.reporterWindow.postMessage(JSON.stringify(_msg_), "*");
+			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
 
 			AscCommon.stopEvent(e);
 			return false;
@@ -3484,7 +3484,7 @@ function CDemonstrationManager(htmlpage)
 				"mouseWhell"    : delta
 			};
 
-			oThis.HtmlPage.m_oApi.reporterWindow.postMessage(JSON.stringify(_msg_), "*");
+			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
 			AscCommon.stopEvent(e);
 			return false;
 		}
@@ -3504,7 +3504,7 @@ function CDemonstrationManager(htmlpage)
 				"resize"        : true
 			};
 
-			oThis.HtmlPage.m_oApi.reporterWindow.postMessage(JSON.stringify(_msg_), "*");
+			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
 		}
 
         if (!this.Mode)
@@ -3567,7 +3567,7 @@ function CDemonstrationManager(htmlpage)
                 "x" : x,
                 "y" : y
             };
-			window.postMessage(JSON.stringify(_msg_), "*");
+			this.HtmlPage.m_oApi.sendFromReporter(JSON.stringify(_msg_));
         }
     }
 
@@ -3585,7 +3585,7 @@ function CDemonstrationManager(htmlpage)
 			if (this.Overlay)
 				this.Overlay.style.cursor = "default";
 
-			window.postMessage("{ \"reporter_command\" : \"pointer_remove\" }", "*");
+			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"pointer_remove\" }");
 		}
     }
 }
