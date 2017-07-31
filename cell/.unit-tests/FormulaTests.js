@@ -1492,6 +1492,22 @@ $( function () {
 
 	} );
 
+	test( "Test: \"BESSELY\"", function () {
+
+		oParser = new parserFormula( "BESSELY(2.5, 1)", "A1", ws );
+		ok( oParser.parse(), "BESSELY(2.5, 1)" );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.1459181, "BESSELY(2.5, 1)" );
+
+		oParser = new parserFormula( "BESSELY(1,-2)", "A1", ws );
+		ok( oParser.parse(), "BESSELY(1,-2)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "BESSELY(1,-2)" );
+
+		oParser = new parserFormula( "BESSELY(-1,2)", "A1", ws );
+		ok( oParser.parse(), "BESSELY(-1,2)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "BESSELY(-1,2)" );
+
+	} );
+
 	test( "Test: \"GAMMA.INV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.068094" );
 		ws.getRange2( "A3" ).setValue( "9" );
