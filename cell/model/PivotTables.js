@@ -3439,6 +3439,18 @@ CT_DateTime.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
+CT_DateTime.prototype.getCellValue = function (subtotal) {
+	var res = new AscCommonExcel.CCellValue();
+	var v = new Date(this.v).getExcelDateWithTime();
+	if (subtotal) {
+		res.text = v + subtotal;
+		res.type = AscCommon.CellValueType.String;
+	} else {
+		res.number = v;
+		res.type = AscCommon.CellValueType.Number;
+	}
+	return res;
+};
 function CT_Error() {
 //Attributes
 	this.v = null;
@@ -3850,6 +3862,17 @@ CT_Number.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
+CT_Number.prototype.getCellValue = function (subtotal) {
+	var res = new AscCommonExcel.CCellValue();
+	if (subtotal) {
+		res.text = this.v + subtotal;
+		res.type = AscCommon.CellValueType.String;
+	} else {
+		res.number = this.v;
+		res.type = AscCommon.CellValueType.Number;
+	}
+	return res;
+};
 function CT_String() {
 //Attributes
 	this.v = null;
@@ -3989,6 +4012,12 @@ CT_String.prototype.toXml = function(writer, name) {
 		elem.toXml(writer, "x");
 	}
 	writer.WriteXmlNodeEnd(name);
+};
+CT_String.prototype.getCellValue = function (subtotal) {
+	var res = new AscCommonExcel.CCellValue();
+	res.text = this.v + (subtotal ? subtotal : '');
+	res.type = AscCommon.CellValueType.String;
+	return res;
 };
 function CT_Index() {
 //Attributes
