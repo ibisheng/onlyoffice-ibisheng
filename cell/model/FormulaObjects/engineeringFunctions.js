@@ -1013,46 +1013,34 @@
 	cBESSELJ.prototype.argumentsMin = 2;
 	cBESSELJ.prototype.argumentsMax = 2;
 	cBESSELJ.prototype.Calculate = function ( arg ) {
-		var x = arg[0],
-			n = arg[1];
+		//результаты вычислений как в LO
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
 
-		if ( x instanceof cArea || x instanceof cArea3D ) {
-			x = x.cross( arguments[1] );
-		}
-		else if ( x instanceof cArray ) {
-			x = x.getElementRowCol( 0, 0 );
-		}
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
 
-		if ( n instanceof cArea || n instanceof cArea3D ) {
-			n = n.cross( arguments[1] );
-		}
-		else if ( n instanceof cArray ) {
-			n = n.getElementRowCol( 0, 0 );
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
 		}
 
-		x = x.tocNumber();
-		n = n.tocNumber();
+		var calcFunc = function(argArray){
+			var x = argArray[0];
+			var n = argArray[1];
 
-		if ( x instanceof cError ) {
-			return this.value = x;
-		}
-		if ( n instanceof cError ) {
-			return this.value = n;
-		}
+			if ( n < 0 ){
+				return new cError( cErrorType.not_numeric );
+			}
+			if(x < 0){
+				x = Math.abs(x);
+			}
+			n = Math.floor(n);
 
-		x = x.getValue();
-		n = n.getValue();
+			return BesselJ( x, n );
+		};
 
-		if ( n < 0 ){
-			return this.value = new cError( cErrorType.not_numeric );
-		}
-		if(x < 0){
-			x = Math.abs(x);
-		}
-		n = Math.floor(n);
-
-		this.value = BesselJ( x, n );
-		return this.value;
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
 	};
 
 
