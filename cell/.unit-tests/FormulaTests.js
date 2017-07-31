@@ -1472,6 +1472,26 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), "#NUM!" );
 	} );
 
+	test( "Test: \"BESSELK\"", function () {
+
+		oParser = new parserFormula( "BESSELK(1.5, 1)", "A1", ws );
+		ok( oParser.parse(), "BESSELK(1.5, 1)" );
+		strictEqual( oParser.calculate().getValue().toFixed(9) - 0, 0.277387804, "BESSELK(1.5, 1)" );
+
+		oParser = new parserFormula( "BESSELK(1, 3)", "A1", ws );
+		ok( oParser.parse(), "BESSELK(1, 3)" );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 7.10126281, "BESSELK(1, 3)" );
+
+		oParser = new parserFormula( "BESSELK(-1.123,2)", "A1", ws );
+		ok( oParser.parse(), "BESSELK(-1.123,2)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+		oParser = new parserFormula( "BESSELK(1,-2)", "A1", ws );
+		ok( oParser.parse(), "BESSELK(1,-2)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+	} );
+
 	test( "Test: \"GAMMA.INV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.068094" );
 		ws.getRange2( "A3" ).setValue( "9" );
