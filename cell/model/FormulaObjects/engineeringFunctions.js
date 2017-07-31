@@ -196,10 +196,12 @@
 		var fRet, y;
 
 		if (fNum <= 2) {
-			var fNum2 = fNum * 0.5;
-			y = fNum2 * fNum2;
-			fRet = -Math.log10(fNum2) * BesselI(fNum, 0) + ( -0.57721566 + y * ( 0.42278420 +
-				y * ( 0.23069756 + y * ( 0.3488590e-1 + y * ( 0.262698e-2 + y * ( 0.10750e-3 + y * 0.74e-5 ) ) ) ) ) );
+
+			y = fNum * fNum / 4.0;
+			fRet=(-Math.log(fNum / 2.0) * BesselI(fNum, 0)) + (-0.57721566 + y * (0.42278420
+				+y * (0.23069756 + y * (0.3488590e-1 + y * (0.262698e-2
+				+y * (0.10750e-3 + y * 0.74e-5))))));
+
 		} else {
 			y = 2 / fNum;
 			fRet = Math.exp(-fNum) / Math.sqrt(fNum) * ( 1.25331414 + y * ( -0.7832358e-1 + y * ( 0.2189568e-1 +
@@ -213,10 +215,10 @@
 		var fRet, y;
 
 		if (fNum <= 2) {
-			var fNum2 = fNum * 0.5;
-			y = fNum2 * fNum2;
-			fRet = Math.log10(fNum2) * BesselI(fNum, 1) + ( 1 + y * ( 0.15443144 + y * ( -0.67278579 +
-				y * ( -0.18156897 + y * ( -0.1919402e-1 + y * ( -0.110404e-2 + y * ( -0.4686e-4 ) ) ) ) ) ) ) / fNum;
+			y = fNum * fNum / 4.0;
+			fRet=(Math.log(fNum / 2.0) * BesselI(fNum, 1))+(1.0 / fNum)*(1.0 + y * (0.15443144
+				+ y * (-0.67278579 + y * (-0.18156897 + y * (-0.1919402e-1
+				+ y * (-0.110404e-2 + y * (-0.4686e-4)))))));
 		} else {
 			y = 2 / fNum;
 			fRet = Math.exp(-fNum) / Math.sqrt(fNum) * ( 1.25331414 + y * ( 0.23498619 + y * ( -0.3655620e-1 +
