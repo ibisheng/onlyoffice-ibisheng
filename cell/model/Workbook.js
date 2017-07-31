@@ -5033,8 +5033,8 @@
 	};
 
 	Worksheet.prototype.updatePivotTablesStyle = function (range) {
-		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, r, pos, countC, countR, stripe1, stripe2,
-			items, item, start = 0, emptyStripe = new Asc.CTableStyleElement();
+		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, r, pos, countC, countR, countD, stripe1,
+			stripe2, items, item, start = 0, emptyStripe = new Asc.CTableStyleElement();
 		var dxf, dxfLabels, dxfValues;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			pivotTable = this.pivotTables[i];
@@ -5069,6 +5069,7 @@
 
 			countC = pivotTable.getColumnFieldsCount();
 			countR = pivotTable.getRowFieldsCount(true);
+			countD = pivotTable.getDataFieldsCount();
 
 			if (0 === countC + countR) {
 				continue;
@@ -5133,12 +5134,15 @@
 					} else {
 						r = item.getR();
 						if (r + 1 !== countC) {
-							if (0 === r) {
-								dxf = item.t ? style.firstSubtotalColumn : style.firstColumnSubheading;
-							} else if (1 === r % 2) {
-								dxf = item.t ? style.secondSubtotalColumn : style.secondColumnSubheading;
-							} else {
-								dxf = item.t ? style.thirdSubtotalColumn : style.thirdColumnSubheading;
+							//ToDo subheading
+							if (countD && item.t) {
+								if (0 === r) {
+									dxf = style.firstSubtotalColumn;
+								} else if (1 === r % 2) {
+									dxf = style.secondSubtotalColumn;
+								} else {
+									dxf = style.thirdSubtotalColumn;
+								}
 							}
 						}
 					}

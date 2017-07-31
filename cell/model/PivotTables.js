@@ -2673,6 +2673,9 @@ CT_pivotTableDefinition.prototype.getRowFieldsCount = function (compact) {
 	}
 	return res;
 };
+CT_pivotTableDefinition.prototype.getDataFieldsCount = function () {
+	return (this.dataFields && this.dataFields.dataField.length) || 0;
+};
 CT_pivotTableDefinition.prototype.getField = function (arrFields, callback) {
 	return arrFields && arrFields.map(callback, this);
 };
