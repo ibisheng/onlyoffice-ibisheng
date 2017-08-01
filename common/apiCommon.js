@@ -3373,7 +3373,7 @@
 					var aRunsS = oCurParS['runs'];
 					for(var j = 0; j < aRunsS.length; ++j){
 						var oRunS = aRunsS[j];
-						var oRun = new ParaRun(oNewParagraph, false);
+						var oRun = new AscCommonWord.ParaRun(oNewParagraph, false);
 						if(Array.isArray(oRunS['fill']) && oRunS['fill'].length === 3){
 							oRun.Set_Unifill(AscFormat.CreteSolidFillRGB(oRunS['fill'][0], oRunS['fill'][1], oRunS['fill'][2]));
 						}
