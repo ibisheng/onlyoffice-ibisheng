@@ -294,7 +294,7 @@
 		cWORKDAY, cWORKDAY_INTL, cYEAR, cYEARFRAC);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cNETWORKDAYS_INTL, cWORKDAY_INTL);
+	cFormulaFunctionGroup['NotRealised'].push(cWORKDAY_INTL);
 
 	/**
 	 * @constructor
@@ -1132,11 +1132,20 @@
 			return true;
 		}
 
-		dif = ( val1 - val0 );
-		dif = ( dif + (dif >= 0 ? c_msPerDay : 0 ) ) / c_msPerDay;
-		for (i = 0; i < Math.abs(dif); i++) {
-			var date = new Date(val0);
-			date.setUTCDate(val0.getUTCDate() + i);
+		var start = val0;
+		var end = val1;
+		dif = val1 - val0;
+		if(dif < 0){
+			start = val1;
+			end = val0;
+		}
+
+		var difAbs = ( end - start );
+		difAbs = ( difAbs + (c_msPerDay) ) / c_msPerDay;
+
+		for (i = 0; i < difAbs; i++) {
+			var date = new Date(start);
+			date.setUTCDate(start.getUTCDate() + i);
 			if (date.getUTCDay() != 6 && date.getUTCDay() != 0 && includeInHolidays(date)) {
 				count++;
 			}
@@ -1149,11 +1158,133 @@
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
 	function cNETWORKDAYS_INTL() {
-		cBaseFunction.call(this, "NETWORKDAYS.INTL");
+		this.name = "NETWORKDAYS.INTL";
+		this.value = null;
+		this.argumentsCurrent = 0;
 	}
 
 	cNETWORKDAYS_INTL.prototype = Object.create(cBaseFunction.prototype);
 	cNETWORKDAYS_INTL.prototype.constructor = cNETWORKDAYS_INTL;
+	cNETWORKDAYS_INTL.prototype.argumentsMin = 2;
+	cNETWORKDAYS_INTL.prototype.argumentsMax = 4;
+	cNETWORKDAYS_INTL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cNETWORKDAYS_INTL.prototype.Calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+
+		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
+			arg0 = arg0.cross(arguments[1]);
+		} else if (arg0 instanceof cArray) {
+			arg0 = arg0.getElementRowCol(0, 0);
+		}
+
+		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
+			arg1 = arg1.cross(arguments[1]);
+		} else if (arg1 instanceof cArray) {
+			arg1 = arg1.getElementRowCol(0, 0);
+		}
+
+		arg0 = arg0.tocNumber();
+		arg1 = arg1.tocNumber();
+
+		if (arg0 instanceof cError) {
+			return this.value = arg0;
+		}
+		if (arg1 instanceof cError) {
+			return this.value = arg1;
+		}
+
+		var val0 = arg0.getValue(), val1 = arg1.getValue(), dif, count = 0;
+
+		if (val0 < 0) {
+			return this.value = new cError(cErrorType.not_numeric);
+		} else if (!AscCommon.bDate1904) {
+			if (val0 < 60) {
+				val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
+			} else if (val0 == 60) {
+				val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
+			} else {
+				val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
+			}
+		} else {
+			val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
+		}
+
+		if (val1 < 0) {
+			return this.value = new cError(cErrorType.not_numeric);
+		} else if (!AscCommon.bDate1904) {
+			if (val1 < 60) {
+				val1 = new Date((val1 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
+			} else if (val1 == 60) {
+				val1 = new Date((val1 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
+			} else {
+				val1 = new Date((val1 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
+			}
+		} else {
+			val1 = new Date((val1 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
+		}
+
+		var holidays = [], i;
+
+		if (arg2) {
+			if (arg2 instanceof cRef) {
+				var a = arg2.getValue();
+				if (a instanceof cNumber && a.getValue() >= 0) {
+					holidays.push(a);
+				}
+			} else if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
+				var arr = arg2.getValue();
+				for (i = 0; i < arr.length; i++) {
+					if (arr[i] instanceof cNumber && arr[i].getValue() >= 0) {
+						holidays.push(arr[i]);
+					}
+				}
+			} else if (arg2 instanceof cArray) {
+				arg2.foreach(function (elem, r, c) {
+					if (elem instanceof cNumber) {
+						holidays.push(elem);
+					} else if (elem instanceof cString) {
+						var res = g_oFormatParser.parse(elem.getValue());
+						if (res && res.bDateTime && res.value >= 0) {
+							holidays.push(new cNumber(parseInt(res.value)));
+						}
+					}
+				})
+			}
+		}
+
+		for (i = 0; i < holidays.length; i++) {
+			holidays[i] = Date.prototype.getDateFromExcel(holidays[i].getValue());
+		}
+
+		function includeInHolidays(date) {
+			for (var i = 0; i < holidays.length; i++) {
+				if (date.getTime() == holidays[i].getTime()) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		var start = val0;
+		var end = val1;
+		dif = val1 - val0;
+		if(dif < 0){
+			start = val1;
+			end = val0;
+		}
+
+		var difAbs = ( end - start );
+		difAbs = ( difAbs + (c_msPerDay) ) / c_msPerDay;
+
+		for (i = 0; i < difAbs; i++) {
+			var date = new Date(start);
+			date.setUTCDate(start.getUTCDate() + i);
+			if (date.getUTCDay() != 6 && date.getUTCDay() != 0 && includeInHolidays(date)) {
+				count++;
+			}
+		}
+		return this.value = new cNumber((dif < 0 ? -1 : 1) * count);
+	};
 
 	/**
 	 * @constructor
