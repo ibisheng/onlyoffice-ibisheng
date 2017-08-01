@@ -15457,6 +15457,13 @@ CDocument.prototype.OnEndLoadScript = function()
 	this.Update_SectionsInfo();
 	this.Check_SectionLastParagraph();
 	this.Styles.Check_StyleNumberingOnLoad(this.Numbering);
+
+	var arrParagraphs = this.GetAllParagraphs({All : true});
+	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		arrParagraphs[nIndex].Recalc_CompiledPr();
+		arrParagraphs[nIndex].Recalc_RunsCompiledPr();
+	}
 };
 
 function CDocumentSelectionState()
