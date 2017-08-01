@@ -228,6 +228,53 @@
 		return new cNumber(fRet);
 	}
 
+	function bessi0(x){
+		var ax = Math.abs(x), fRet, y;
+
+		if (ax < 3.75) {
+			y = x / 3.75;
+			y *= y;
+			fRet = 1.0 + y*(3.5156229 + y*(3.0899424 + y*(1.2067492 + y*(0.2659732 + y*(0.360768e-1 + y*0.45813e-2)))));
+		} else {
+			y = 3.75 / ax;
+			fRet = (Math.exp(ax) / Math.sqrt(ax))*(0.39894228 + y*(0.1328592e-1
+				+ y*(0.225319e-2 + y*(-0.157565e-2 + y*(0.916281e-2
+				+ y*(-0.2057706e-1 + y*(0.2635537e-1 + y*(-0.1647633e-1
+				+ y*0.392377e-2))))))));
+		}
+		return fRet;
+	}
+
+	function bessi(x, n){
+		var max = 1.0e10;
+		var min = 1.0e-10;
+		var ACC  = 40.0;
+
+		var bi, bim, bip, tox, res;
+		if (x === 0.0){
+			return new cNumber(0.0);
+		} else {
+			tox = 2.0 / Math.abs(x);
+			bip = res = 0.0;
+			bi = 1.0;
+			for (var j = 2 * (n + parseInt(Math.sqrt(ACC * n))); j>0; j--) {
+				bim = bip + j * tox * bi;
+				bip = bi;
+				bi = bim;
+				if (Math.abs(bi) > max) {
+					res *= min;
+					bi *= min;
+					bip *= min;
+				}
+				if (j === n){
+					res = bip;
+				}
+			}
+			res *= bessi0(x) / bi;
+			return x < 0.0 && (n & 1) ? new cNumber(-res) : new cNumber(res);
+		}
+	}
+
 	function BesselK(fNum, nOrder) {
 		switch (nOrder) {
 			case 0:
@@ -987,7 +1034,7 @@
 		cOCT2DEC, cOCT2HEX);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cBESSELI, cCONVERT);
+	cFormulaFunctionGroup['NotRealised'].push(cCONVERT);
 
 	/**
 	 * @constructor
@@ -1001,48 +1048,35 @@
 	cBESSELI.prototype.constructor = cBESSELI;
 	cBESSELI.prototype.argumentsMin = 2;
 	cBESSELI.prototype.argumentsMax = 2;
-	/*cBESSELI.prototype.Calculate = function ( arg ) {
-		 var x = arg[0],
-		 n = arg[1];
+	cBESSELI.prototype.Calculate = function ( arg ) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
 
-		 if ( x instanceof cArea || x instanceof cArea3D ) {
-		 	x = x.cross( arguments[1] );
-		 }
-		 else if ( x instanceof cArray ) {
-		 	x = x.getElementRowCol( 0, 0 );
-		 }
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
 
-		 if ( n instanceof cArea || n instanceof cArea3D ) {
-		 	n = n.cross( arguments[1] );
-		 }
-		 else if ( n instanceof cArray ) {
-		 	n = n.getElementRowCol( 0, 0 );
-		 }
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
 
-		 x = x.tocNumber();
-		 n = n.tocNumber();
+		var calcFunc = function(argArray){
+			var x = argArray[0];
+			var n = argArray[1];
 
-		 if ( x instanceof cError ) {
-			 return this.value = x;
-		 }
-		 if ( n instanceof cError ) {
-		 	return this.value = n;
-		 }
+			if ( n < 0 ){
+				return new cError( cErrorType.not_numeric );
+			}
+			if(x < 0){
+				x = Math.abs(x);
+			}
+			n = Math.floor(n);
 
-		 x = x.getValue();
-		 n = n.getValue();
+			return bessi( x, n );
+		};
 
-		 if ( n < 0 ){
-			 return this.value = new cError( cErrorType.not_numeric );
-		 }
-		 if(x < 0){
-		 	x = Math.abs(x);
-		 }
-		 n = Math.floor(n);
-
-		 this.value = BesselI( x, n );
-		 return this.value;
-	 };*/
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
+	};
 
 	/**
 	 * @constructor
