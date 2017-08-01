@@ -1508,6 +1508,26 @@ $( function () {
 
 	} );
 
+	test( "Test: \"BESSELI\"", function () {
+		//есть различия excel в некоторых формулах(неточности в 7 цифре после точки)
+		oParser = new parserFormula( "BESSELI(1.5, 1)", "A1", ws );
+		ok( oParser.parse(), "BESSELI(1.5, 1)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.981666, "BESSELI(1.5, 1)" );
+
+		oParser = new parserFormula( "BESSELI(1,2)", "A1", ws );
+		ok( oParser.parse(), "BESSELI(1,2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.135748, "BESSELI(1,2)" );
+
+		oParser = new parserFormula( "BESSELI(1,-2)", "A1", ws );
+		ok( oParser.parse(), "BESSELI(1,-2)" );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", "BESSELI(1,-2)" );
+
+		oParser = new parserFormula( "BESSELI(-1,2)", "A1", ws );
+		ok( oParser.parse(), "BESSELI(-1,2)" );
+		strictEqual( oParser.calculate().getValue().toFixed(6) - 0, 0.135748, "BESSELI(-1,2)" );
+
+	} );
+
 	test( "Test: \"GAMMA.INV\"", function () {
 		ws.getRange2( "A2" ).setValue( "0.068094" );
 		ws.getRange2( "A3" ).setValue( "9" );
