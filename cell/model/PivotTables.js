@@ -3453,7 +3453,9 @@ CT_DateTime.prototype.toXml = function(writer, name) {
 };
 CT_DateTime.prototype.getCellValue = function (subtotal) {
 	var res = new AscCommonExcel.CCellValue();
-	var v = new Date(this.v).getExcelDateWithTime();
+	var d = new Date(this.v);
+	var v = new Date(Date.UTC(d.getYear(), d.getMonth(), d.getDay(), d.getHours(), d.getMinutes(), d.getSeconds(),
+		d.getMilliseconds())).getExcelDateWithTime();
 	if (subtotal) {
 		res.text = v + subtotal;
 		res.type = AscCommon.CellValueType.String;
