@@ -4948,46 +4948,7 @@
 		}
 		var countC = pivotTable.getColumnFieldsCount();
 		var countR = pivotTable.getRowFieldsCount(true);
-
-		if (countC) {
-			c1 = pivotRange.c1 + countR;
-			r1 = pivotRange.r1;
-
-			cells = this.getRange4(r1, c1);
-			cells.setValue('Column Labels');
-
-			++r1;
-
-			items = pivotTable.getColItems();
-			if (items && countC) {
-				for (i = 0; i < items.length; ++i) {
-					item = items[i];
-					r = item.getR();
-					for (j = 0; j < item.x.length; ++j) {
-						if (AscCommonExcel.c_oAscItemType.Grand === item.t) {
-							field = null;
-							oCellValue = new AscCommonExcel.CCellValue();
-							oCellValue.text = 'Grand Total';
-							oCellValue.type = AscCommon.CellValueType.String;
-						} else {
-							indexField = colFields[r + j].asc_getIndex();
-							field = pivotFields[indexField];
-							cacheIndex = field.getItem(item.x[j].getV());
-							sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
-							// ToDo add other names by type
-							oCellValue = sharedItem.getCellValue(
-								AscCommonExcel.c_oAscItemType.Default === item.t ? ' Total' : null);
-						}
-
-						cells = this.getRange4(r1 + r + j, c1 + i);
-						if (field && null !== field.numFmtId) {
-							cells.setNum(new AscCommonExcel.Num({id: field.numFmtId}));
-						}
-						cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
-					}
-				}
-			}
-		}
+		var countD = pivotTable.getDataFieldsCount();
 
 		if (countR) {
 			c1 = pivotRange.c1;
@@ -5042,8 +5003,47 @@
 				}
 			}
 		}
-	};
 
+		if (countC) {
+			c1 = pivotRange.c1 + countR;
+			r1 = pivotRange.r1;
+
+			cells = this.getRange4(r1, c1);
+			cells.setValue('Column Labels');
+
+			++r1;
+
+			items = pivotTable.getColItems();
+			if (items && countC) {
+				for (i = 0; i < items.length; ++i) {
+					item = items[i];
+					r = item.getR();
+					for (j = 0; j < item.x.length; ++j) {
+						if (AscCommonExcel.c_oAscItemType.Grand === item.t) {
+							field = null;
+							oCellValue = new AscCommonExcel.CCellValue();
+							oCellValue.text = 'Grand Total';
+							oCellValue.type = AscCommon.CellValueType.String;
+						} else {
+							indexField = colFields[r + j].asc_getIndex();
+							field = pivotFields[indexField];
+							cacheIndex = field.getItem(item.x[j].getV());
+							sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
+							// ToDo add other names by type
+							oCellValue = sharedItem.getCellValue(
+								AscCommonExcel.c_oAscItemType.Default === item.t ? ' Total' : null);
+						}
+
+						cells = this.getRange4(r1 + r + j, c1 + i);
+						if (field && null !== field.numFmtId) {
+							cells.setNum(new AscCommonExcel.Num({id: field.numFmtId}));
+						}
+						cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
+					}
+				}
+			}
+		}
+	};
 	Worksheet.prototype.updatePivotTablesStyle = function (range) {
 		var pivotTable, pivotRange, styleInfo, style, wholeStyle, cells, j, r, pos, countC, countR, countD, stripe1,
 			stripe2, items, item, start = 0, emptyStripe = new Asc.CTableStyleElement();
