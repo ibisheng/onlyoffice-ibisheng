@@ -601,6 +601,7 @@
 	cDAYS.prototype.argumentsMin = 2;
 	cDAYS.prototype.argumentsMax = 2;
 	cDAYS.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cDAYS.prototype.isXLFN = true;
 	cDAYS.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
