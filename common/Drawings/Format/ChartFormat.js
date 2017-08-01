@@ -2228,6 +2228,7 @@ function CPlotArea()
     //ТоDo
     this.valAx = null;
     this.catAx = null;
+    this.serAx = null;
     this.dateAx = null;
     this.chart = null;
 
@@ -2306,7 +2307,6 @@ CPlotArea.prototype =
             }
         }
     },
-
 
     getContentChangesByType: function(type){
         switch(type){
@@ -2552,7 +2552,7 @@ CPlotArea.prototype =
 
     getAxisByTypes: function()
     {
-        var  ret = {valAx:[], catAx: [], dateAx: []};
+        var  ret = {valAx:[], catAx: [], dateAx: [], serAx: []};
         for(var i = 0; i < this.axId.length; ++i)
         {
             var axis = this.axId[i];
@@ -2560,7 +2560,6 @@ CPlotArea.prototype =
             {
                 case AscDFH.historyitem_type_CatAx:
                 case AscDFH.historyitem_type_DateAx:
-                case AscDFH.historyitem_type_SerAx:
                 {
                     ret.catAx.push(axis);
                     break;
@@ -2570,7 +2569,11 @@ CPlotArea.prototype =
                     ret.valAx.push(axis);
                     break;
                 }
-                //TODO DATE Axis
+                case AscDFH.historyitem_type_SerAx:
+                {
+                    ret.serAx.push(axis);
+                    break;
+                }
             }
         }
         return ret;

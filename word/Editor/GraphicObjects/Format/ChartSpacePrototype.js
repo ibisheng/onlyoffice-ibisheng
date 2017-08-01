@@ -102,7 +102,6 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculateTransform: true,
         recalculateBounds:    true,
         recalculateChart:     true,
-        recalculateBaseColors: true,
         recalculateSeriesColors: true,
         recalculateMarkers: true,
         recalculateGridLines: true,
@@ -124,7 +123,6 @@ CChartSpace.prototype.setRecalculateInfo = function()
         recalculatePenBrush: true,
         recalculateTextPr: true
     };
-    this.baseColors = [];
 
     this.chartObj = null;
     this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);
@@ -145,10 +143,6 @@ CChartSpace.prototype.recalcWrapPolygon = function()
 CChartSpace.prototype.recalcChart = function()
 {
     this.recalcInfo.recalculateChart = true;
-};
-CChartSpace.prototype.recalcBaseColors = function()
-{
-    this.recalcInfo.recalculateBaseColors = true;
 };
 CChartSpace.prototype.recalcSeriesColors = function()
 {
@@ -303,11 +297,6 @@ CChartSpace.prototype.recalculate = function()
             this.recalculateTransform();
             this.rectGeometry.Recalculate(this.extX, this.extY);
             this.recalcInfo.recalculateTransform = false;
-        }
-        if(this.recalcInfo.recalculateBaseColors)
-        {
-            this.recalculateBaseColors();
-            this.recalcInfo.recalculateBaseColors = false;
         }
         if(this.recalcInfo.recalculateMarkers)
         {
