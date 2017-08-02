@@ -53,6 +53,7 @@
 	var cArray = AscCommonExcel.cArray;
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+	var cElementType = AscCommonExcel.cElementType;
 
 	var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
 
@@ -287,6 +288,22 @@
 				return new cError(cErrorType.not_numeric);
 		}
 	}
+
+	function getCorrectDate(val){
+		if (!AscCommon.bDate1904) {
+			if (val < 60) {
+				val = new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
+			} else if (val == 60) {
+				val = new Date((val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
+			} else {
+				val = new Date((val - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
+			}
+		} else {
+			val = new Date((val - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
+		}
+		return val;
+	}
+
 
 	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
 	cFormulaFunctionGroup['DateAndTime'].push(cDATE, cDATEDIF, cDATEVALUE, cDAY, cDAYS, cDAYS360, cEDATE, cEOMONTH, cHOUR,
@@ -1169,77 +1186,99 @@
 	cNETWORKDAYS_INTL.prototype.argumentsMax = 4;
 	cNETWORKDAYS_INTL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cNETWORKDAYS_INTL.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+		var tempArgs = arg[2] ? [arg[0], arg[1], arg[2]] : [arg[0], arg[1]];
+		var oArguments = this._prepareArguments(tempArgs, arguments[1]);
+		var argClone = oArguments.args;
 
-		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
-			arg0 = arg0.cross(arguments[1]);
-		} else if (arg0 instanceof cArray) {
-			arg0 = arg0.getElementRowCol(0, 0);
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
 		}
 
-		if (arg1 instanceof cArea || arg1 instanceof cArea3D) {
-			arg1 = arg1.cross(arguments[1]);
-		} else if (arg1 instanceof cArray) {
-			arg1 = arg1.getElementRowCol(0, 0);
-		}
-
-		arg0 = arg0.tocNumber();
-		arg1 = arg1.tocNumber();
-
-		if (arg0 instanceof cError) {
-			return this.value = arg0;
-		}
-		if (arg1 instanceof cError) {
-			return this.value = arg1;
-		}
-
+		var arg0 = argClone[0], arg1 = argClone[1], arg2 = argClone[2], arg3 = arg[3];
 		var val0 = arg0.getValue(), val1 = arg1.getValue(), dif, count = 0;
 
 		if (val0 < 0) {
 			return this.value = new cError(cErrorType.not_numeric);
-		} else if (!AscCommon.bDate1904) {
-			if (val0 < 60) {
-				val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
-			} else if (val0 == 60) {
-				val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
-			} else {
-				val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
-			}
-		} else {
-			val0 = new Date((val0 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
+		} else{
+			val0 = getCorrectDate(val0);
 		}
-
 		if (val1 < 0) {
 			return this.value = new cError(cErrorType.not_numeric);
-		} else if (!AscCommon.bDate1904) {
-			if (val1 < 60) {
-				val1 = new Date((val1 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
-			} else if (val1 == 60) {
-				val1 = new Date((val1 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
-			} else {
-				val1 = new Date((val1 - AscCommonExcel.c_DateCorrectConst - 1) * c_msPerDay);
-			}
-		} else {
-			val1 = new Date((val1 - AscCommonExcel.c_DateCorrectConst) * c_msPerDay);
+		} else{
+			val1 = getCorrectDate(val1);
 		}
 
-		var holidays = [], i;
-
+		//Weekend
+		var weekends = [];
 		if (arg2) {
-			if (arg2 instanceof cRef) {
-				var a = arg2.getValue();
+			if(cElementType.number === arg2.type){
+				//0 - SUNDAY, 1 - MONDAY, 2 - TUESDAY, 3 - WEDNESDAY, 4 - THURSDAY, 5 - FRIDAY, 6 - SATURDAY
+				var numberVal = arg2.getValue();
+				switch ( numberVal )
+				{
+					case 1 : weekends[ 6 ] = true; weekends[ 0 ] = true; break;
+					case 2 : weekends[ 0 ] = true; weekends[ 1 ] = true; break;
+					case 3 : weekends[ 1 ] = true; weekends[ 2 ] = true; break;
+					case 4 : weekends[ 2 ] = true; weekends[ 3 ] = true; break;
+					case 5 : weekends[ 3 ] = true; weekends[ 4 ] = true; break;
+					case 6 : weekends[ 4 ] = true; weekends[ 5 ] = true; break;
+					case 7 : weekends[ 5 ] = true; weekends[ 6 ] = true; break;
+
+					case 11 : weekends[ 0 ] = true; break;
+					case 12 : weekends[ 1 ] = true; break;
+					case 13 : weekends[ 2 ] = true; break;
+					case 14 : weekends[ 3 ] = true; break;
+					case 15 : weekends[ 4 ] = true; break;
+					case 16 : weekends[ 5 ] = true; break;
+					case 17 : weekends[ 6 ] = true; break;
+
+					default : return this.value = new cError(cErrorType.not_numeric);
+				}
+			}else if(cElementType.string === arg2.type){
+				var stringVal = arg2.getValue();
+				if(stringVal.length !== 7){
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+				//start with monday
+				for ( var i = 0; i < 7; i++ )
+				{
+					var num = 6 === i ? 0 : i + 1;
+					switch ( stringVal[ i ] )
+					{
+						case '0' : weekends[ num ] = false; break;
+						case '1' : weekends[ num ] = true;  break;
+						default  : return this.value = new cError(cErrorType.wrong_value_type);
+					}
+				}
+			}else{
+				return this.value = new cError(cErrorType.not_numeric);
+			}
+		}else{
+			weekends[ 6 ] = true;
+			weekends[ 0 ] = true;
+		}
+
+		//Holidays
+		var holidays = [], i;
+		if (arg3) {
+			if (arg3 instanceof cRef) {
+				var a = arg3.getValue();
 				if (a instanceof cNumber && a.getValue() >= 0) {
 					holidays.push(a);
 				}
-			} else if (arg2 instanceof cArea || arg2 instanceof cArea3D) {
-				var arr = arg2.getValue();
+			} else if (arg3 instanceof cArea || arg3 instanceof cArea3D) {
+				var arr = arg3.getValue();
 				for (i = 0; i < arr.length; i++) {
 					if (arr[i] instanceof cNumber && arr[i].getValue() >= 0) {
 						holidays.push(arr[i]);
 					}
 				}
-			} else if (arg2 instanceof cArray) {
-				arg2.foreach(function (elem, r, c) {
+			} else if (arg3 instanceof cArray) {
+				arg3.foreach(function (elem, r, c) {
 					if (elem instanceof cNumber) {
 						holidays.push(elem);
 					} else if (elem instanceof cString) {
@@ -1279,7 +1318,7 @@
 		for (i = 0; i < difAbs; i++) {
 			var date = new Date(start);
 			date.setUTCDate(start.getUTCDate() + i);
-			if (date.getUTCDay() != 6 && date.getUTCDay() != 0 && includeInHolidays(date)) {
+			if (includeInHolidays(date) && !weekends[date.getUTCDay()]) {
 				count++;
 			}
 		}
