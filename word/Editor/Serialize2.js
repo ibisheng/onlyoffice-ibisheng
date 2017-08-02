@@ -8825,9 +8825,6 @@ function Binary_NumberingTableReader(doc, oReadResult, stream)
 				res = this.bcr.Read2(length, function(t, l){
 					return oThis.ReadLevel(t, l, oNewLvl);
 				});
-				//для bullet списков надо выставлять шрифт, для number шрифт возьмется из символа параграфа.
-				if(numbering_numfmt_Bullet == oNewLvl.Format && null == oNewLvl.TextPr.RFonts.Ascii)
-					oNewLvl.TextPr.RFonts.Set_All( "Symbol", -1 );
 				oNewNum.Lvl[nLevelNum] = oNewLvl;
 				this.oReadResult.aPostOpenStyleNumCallbacks.push(function(){
 					oNewNum.Set_Lvl(nLevelNum, oNewLvl);
