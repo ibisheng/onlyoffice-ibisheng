@@ -1771,6 +1771,77 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
+	function cWORKDAY_INTL() {
+		this.name = "WORKDAY.INTL";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cWORKDAY_INTL.prototype = Object.create(cBaseFunction.prototype);
+	cWORKDAY_INTL.prototype.constructor = cWORKDAY_INTL;
+	cWORKDAY_INTL.prototype.argumentsMin = 2;
+	cWORKDAY_INTL.prototype.argumentsMax = 4;
+	cWORKDAY_INTL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cWORKDAY_INTL.prototype.Calculate = function (arg) {
+		var t = this;
+		var tempArgs = arg[2] ? [arg[0], arg[1], arg[2]] : [arg[0], arg[1]];
+		var oArguments = this._prepareArguments(tempArgs, arguments[1]);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var arg0 = argClone[0], arg1 = argClone[1], arg2 = argClone[2], arg3 = arg[3];
+
+		var val0 = arg0.getValue();
+		if (val0 < 0) {
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+		val0 = getCorrectDate(val0);
+
+		//Weekend
+		var weekends = getWeekends(arg2);
+		if (weekends instanceof cError) {
+			return this.value = weekends;
+		}
+
+		//Holidays
+		var holidays = getHolidays(arg3);
+		if (holidays instanceof cError) {
+			return this.value = holidays;
+		}
+
+		var calcDate = function(){
+			var dif = arg1.getValue(), count = 1, dif1 = dif > 0 ? 1 : dif < 0 ? -1 : 0, val, date = val0;
+			while (Math.abs(dif) > count) {
+				date = new Date(val0.getTime() + dif1 * c_msPerDay);
+				if (_includeInHolidays(date, holidays) && !weekends[date.getUTCDay()]) {
+					count++;
+				}
+				dif >= 0 ? dif1++ : dif1--;
+			}
+			date = new Date(val0.getTime() + dif1 * c_msPerDay);
+			val = date.getExcelDate();
+
+			if (val < 0) {
+				return  new cError(cErrorType.not_numeric);
+			}
+
+			return t.setCalcValue(new cNumber(val), 14);
+		};
+
+		return this.value = calcDate();
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cYEAR() {
 		this.name = "YEAR";
 		this.value = null;
