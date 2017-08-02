@@ -304,6 +304,112 @@
 		return val;
 	}
 
+	function getWeekends(val){
+		var res = [];
+		if (val) {
+			if(cElementType.number === val.type){
+				//0 - SUNDAY, 1 - MONDAY, 2 - TUESDAY, 3 - WEDNESDAY, 4 - THURSDAY, 5 - FRIDAY, 6 - SATURDAY
+				var numberVal = val.getValue();
+				switch ( numberVal )
+				{
+					case 1 : res[ 6 ] = true; res[ 0 ] = true; break;
+					case 2 : res[ 0 ] = true; res[ 1 ] = true; break;
+					case 3 : res[ 1 ] = true; res[ 2 ] = true; break;
+					case 4 : res[ 2 ] = true; res[ 3 ] = true; break;
+					case 5 : res[ 3 ] = true; res[ 4 ] = true; break;
+					case 6 : res[ 4 ] = true; res[ 5 ] = true; break;
+					case 7 : res[ 5 ] = true; res[ 6 ] = true; break;
+
+					case 11 : res[ 0 ] = true; break;
+					case 12 : res[ 1 ] = true; break;
+					case 13 : res[ 2 ] = true; break;
+					case 14 : res[ 3 ] = true; break;
+					case 15 : res[ 4 ] = true; break;
+					case 16 : res[ 5 ] = true; break;
+					case 17 : res[ 6 ] = true; break;
+
+					default : return new cError(cErrorType.not_numeric);
+				}
+			}else if(cElementType.string === val.type){
+				var stringVal = val.getValue();
+				if(stringVal.length !== 7){
+					return new cError(cErrorType.wrong_value_type);
+				}
+				//start with monday
+				for ( var i = 0; i < 7; i++ )
+				{
+					var num = 6 === i ? 0 : i + 1;
+					switch ( stringVal[ i ] )
+					{
+						case '0' : res[ num ] = false; break;
+						case '1' : res[ num ] = true;  break;
+						default  : return new cError(cErrorType.wrong_value_type);
+					}
+				}
+			}else{
+				return new cError(cErrorType.not_numeric);
+			}
+		}else{
+			res[ 6 ] = true;
+			res[ 0 ] = true;
+		}
+
+		return res;
+	}
+
+	function getHolidays(val){
+		var holidays = [];
+		if (val) {
+			if (val instanceof cRef) {
+				var a = val.getValue();
+				if (a instanceof cNumber && a.getValue() >= 0) {
+					holidays.push(a);
+				}
+			} else if (val instanceof cArea || val instanceof cArea3D) {
+				var arr = val.getValue();
+				for (var i = 0; i < arr.length; i++) {
+					if (arr[i] instanceof cNumber && arr[i].getValue() >= 0) {
+						holidays.push(arr[i]);
+					}
+				}
+			} else if (val instanceof cArray) {
+				var bIsError = false;
+
+				val.foreach(function (elem, r, c) {
+					if (elem instanceof cNumber) {
+						holidays.push(elem);
+					} else if (elem instanceof cString) {
+						var res = g_oFormatParser.parse(elem.getValue());
+						if (res && res.bDateTime && res.value >= 0) {
+							holidays.push(new cNumber(parseInt(res.value)));
+						}else{
+							return bIsError = new cError(cErrorType.wrong_value_type);
+						}
+					}
+				});
+
+				if (bIsError) {
+					return bIsError;
+				}
+			}
+		}
+
+		for (var i = 0; i < holidays.length; i++) {
+			holidays[i] = Date.prototype.getDateFromExcel(holidays[i].getValue());
+		}
+
+		return holidays;
+	}
+
+	function _includeInHolidays(date, holidays) {
+		for (var i = 0; i < holidays.length; i++) {
+			if (date.getTime() == holidays[i].getTime()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 
 	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
 	cFormulaFunctionGroup['DateAndTime'].push(cDATE, cDATEDIF, cDATEVALUE, cDAY, cDAYS, cDAYS360, cEDATE, cEOMONTH, cHOUR,
@@ -1186,6 +1292,7 @@
 	cNETWORKDAYS_INTL.prototype.argumentsMax = 4;
 	cNETWORKDAYS_INTL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cNETWORKDAYS_INTL.prototype.Calculate = function (arg) {
+		var t = this;
 		var tempArgs = arg[2] ? [arg[0], arg[1], arg[2]] : [arg[0], arg[1]];
 		var oArguments = this._prepareArguments(tempArgs, arguments[1]);
 		var argClone = oArguments.args;
@@ -1199,130 +1306,55 @@
 		}
 
 		var arg0 = argClone[0], arg1 = argClone[1], arg2 = argClone[2], arg3 = arg[3];
-		var val0 = arg0.getValue(), val1 = arg1.getValue(), dif, count = 0;
+		var val0 = arg0.getValue(), val1 = arg1.getValue();
 
 		if (val0 < 0) {
 			return this.value = new cError(cErrorType.not_numeric);
-		} else{
-			val0 = getCorrectDate(val0);
 		}
 		if (val1 < 0) {
 			return this.value = new cError(cErrorType.not_numeric);
-		} else{
-			val1 = getCorrectDate(val1);
 		}
 
+		val0 = getCorrectDate(val0);
+		val1 = getCorrectDate(val1);
+
 		//Weekend
-		var weekends = [];
-		if (arg2) {
-			if(cElementType.number === arg2.type){
-				//0 - SUNDAY, 1 - MONDAY, 2 - TUESDAY, 3 - WEDNESDAY, 4 - THURSDAY, 5 - FRIDAY, 6 - SATURDAY
-				var numberVal = arg2.getValue();
-				switch ( numberVal )
-				{
-					case 1 : weekends[ 6 ] = true; weekends[ 0 ] = true; break;
-					case 2 : weekends[ 0 ] = true; weekends[ 1 ] = true; break;
-					case 3 : weekends[ 1 ] = true; weekends[ 2 ] = true; break;
-					case 4 : weekends[ 2 ] = true; weekends[ 3 ] = true; break;
-					case 5 : weekends[ 3 ] = true; weekends[ 4 ] = true; break;
-					case 6 : weekends[ 4 ] = true; weekends[ 5 ] = true; break;
-					case 7 : weekends[ 5 ] = true; weekends[ 6 ] = true; break;
-
-					case 11 : weekends[ 0 ] = true; break;
-					case 12 : weekends[ 1 ] = true; break;
-					case 13 : weekends[ 2 ] = true; break;
-					case 14 : weekends[ 3 ] = true; break;
-					case 15 : weekends[ 4 ] = true; break;
-					case 16 : weekends[ 5 ] = true; break;
-					case 17 : weekends[ 6 ] = true; break;
-
-					default : return this.value = new cError(cErrorType.not_numeric);
-				}
-			}else if(cElementType.string === arg2.type){
-				var stringVal = arg2.getValue();
-				if(stringVal.length !== 7){
-					return this.value = new cError(cErrorType.wrong_value_type);
-				}
-				//start with monday
-				for ( var i = 0; i < 7; i++ )
-				{
-					var num = 6 === i ? 0 : i + 1;
-					switch ( stringVal[ i ] )
-					{
-						case '0' : weekends[ num ] = false; break;
-						case '1' : weekends[ num ] = true;  break;
-						default  : return this.value = new cError(cErrorType.wrong_value_type);
-					}
-				}
-			}else{
-				return this.value = new cError(cErrorType.not_numeric);
-			}
-		}else{
-			weekends[ 6 ] = true;
-			weekends[ 0 ] = true;
+		var weekends = getWeekends(arg2);
+		if (weekends instanceof cError) {
+			return this.value = weekends;
 		}
 
 		//Holidays
-		var holidays = [], i;
-		if (arg3) {
-			if (arg3 instanceof cRef) {
-				var a = arg3.getValue();
-				if (a instanceof cNumber && a.getValue() >= 0) {
-					holidays.push(a);
-				}
-			} else if (arg3 instanceof cArea || arg3 instanceof cArea3D) {
-				var arr = arg3.getValue();
-				for (i = 0; i < arr.length; i++) {
-					if (arr[i] instanceof cNumber && arr[i].getValue() >= 0) {
-						holidays.push(arr[i]);
-					}
-				}
-			} else if (arg3 instanceof cArray) {
-				arg3.foreach(function (elem, r, c) {
-					if (elem instanceof cNumber) {
-						holidays.push(elem);
-					} else if (elem instanceof cString) {
-						var res = g_oFormatParser.parse(elem.getValue());
-						if (res && res.bDateTime && res.value >= 0) {
-							holidays.push(new cNumber(parseInt(res.value)));
-						}
-					}
-				})
+		var holidays = getHolidays(arg3);
+		if (holidays instanceof cError) {
+			return this.value = holidays;
+		}
+
+		var calcDate = function() {
+			var count = 0;
+			var start = val0;
+			var end = val1;
+			var dif = val1 - val0;
+			if(dif < 0){
+				start = val1;
+				end = val0;
 			}
-		}
 
-		for (i = 0; i < holidays.length; i++) {
-			holidays[i] = Date.prototype.getDateFromExcel(holidays[i].getValue());
-		}
+			var difAbs = ( end - start );
+			difAbs = ( difAbs + (c_msPerDay) ) / c_msPerDay;
 
-		function includeInHolidays(date) {
-			for (var i = 0; i < holidays.length; i++) {
-				if (date.getTime() == holidays[i].getTime()) {
-					return false;
+			for (var i = 0; i < difAbs; i++) {
+				var date = new Date(start);
+				date.setUTCDate(start.getUTCDate() + i);
+				if (_includeInHolidays(date, holidays) && !weekends[date.getUTCDay()]) {
+					count++;
 				}
 			}
-			return true;
-		}
 
-		var start = val0;
-		var end = val1;
-		dif = val1 - val0;
-		if(dif < 0){
-			start = val1;
-			end = val0;
-		}
+			return new cNumber((dif < 0 ? -1 : 1) * count);
+		};
 
-		var difAbs = ( end - start );
-		difAbs = ( difAbs + (c_msPerDay) ) / c_msPerDay;
-
-		for (i = 0; i < difAbs; i++) {
-			var date = new Date(start);
-			date.setUTCDate(start.getUTCDate() + i);
-			if (includeInHolidays(date) && !weekends[date.getUTCDay()]) {
-				count++;
-			}
-		}
-		return this.value = new cNumber((dif < 0 ? -1 : 1) * count);
+		return this.value = calcDate();
 	};
 
 	/**
