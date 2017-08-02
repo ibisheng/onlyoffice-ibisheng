@@ -2773,20 +2773,30 @@ CT_pivotTableDefinition.prototype.asc_clone = function () {
 };
 CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
 	var t = this;
-	api._changePivotStyle(this, function () {
+	api._changePivotStyle(this, function (ws) {
+		ws.clearPivotRable(t);
 		if (t.rowGrandTotals !== newVal.rowGrandTotals) {
 			t.asc_setRowGrandTotals(newVal.rowGrandTotals);
 		}
 		if (t.colGrandTotals !== newVal.colGrandTotals) {
 			t.asc_setColGrandTotals(newVal.colGrandTotals);
 		}
+		ws.updatePivotTable(t);
 	});
 };
 CT_pivotTableDefinition.prototype.asc_setRowGrandTotals = function(newVal) {
+	var res;
 	this.rowGrandTotals = newVal;
+	if (res = this.changeGrandTotals(this.colItems, newVal)) {
+		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(res, 0));
+	}
 };
 CT_pivotTableDefinition.prototype.asc_setColGrandTotals = function(newVal) {
+	var res;
 	this.colGrandTotals = newVal;
+	if (res = this.changeGrandTotals(this.rowItems, newVal)) {
+		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(0, res));
+	}
 };
 CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
 	var t = this;
@@ -2842,6 +2852,32 @@ CT_pivotTableDefinition.prototype.removeField = function (index) {
 			break;
 	}
 	pivotField.axis = null;
+};
+CT_pivotTableDefinition.prototype.changeGrandTotals = function (items, newVal) {
+	var res = 0, last, i;
+	var l = items && items.i.length;
+	if (items && 0 < l) {
+		i = items.i;
+		last = i[l - 1];
+		if (newVal) {
+			// Add
+			if (AscCommonExcel.c_oAscItemType.Grand !== last.t) {
+				last = new CT_I();
+				last.t = AscCommonExcel.c_oAscItemType.Grand;
+				last.x.push(new CT_X());
+				i.push(last);
+				res = 1;
+			}
+		} else {
+			// Remove
+			if (AscCommonExcel.c_oAscItemType.Grand === last.t) {
+				i.pop();
+				res = -1;
+			}
+		}
+		items.count = i.length;
+	}
+	return res;
 };
 function CT_CacheSource() {
 //Attributes
