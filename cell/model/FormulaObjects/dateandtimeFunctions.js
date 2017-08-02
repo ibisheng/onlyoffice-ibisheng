@@ -1734,7 +1734,7 @@
 		}
 
 		var calcDate = function(){
-			var dif = arg1.getValue(), count = 1, dif1 = 1, val, date = val0;
+			var dif = arg1.getValue(), count = 1, dif1 = dif > 0 ? 1 : dif < 0 ? -1 : 0, val, date = val0;
 
 			while (Math.abs(dif) > count) {
 				date = new Date(val0.getTime() + dif1 * c_msPerDay);
