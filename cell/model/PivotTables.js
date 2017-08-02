@@ -1705,6 +1705,9 @@ CT_PivotCacheDefinition.prototype.toXml = function(writer) {
 CT_PivotCacheDefinition.prototype.getFields = function () {
 	return this.cacheFields && this.cacheFields.cacheField;
 };
+CT_PivotCacheDefinition.prototype.getRecords = function () {
+	return this.cacheRecords && this.cacheRecords.r;
+};
 function CT_PivotCacheRecords() {
 //Attributes
 	this.count = null;
@@ -2696,6 +2699,31 @@ CT_pivotTableDefinition.prototype.getRowItems = function () {
 };
 CT_pivotTableDefinition.prototype.getColItems = function () {
 	return this.colItems && this.colItems.i;
+};
+CT_pivotTableDefinition.prototype.getRecords = function () {
+	return this.cacheDefinition.getRecords();
+};
+CT_pivotTableDefinition.prototype.getValues = function (records, index, value) {
+	var res = [];
+	var elem;
+	for (var i = 0; i < records.length; ++i) {
+		elem = records[i][index];
+		if (elem && 0 === elem.type && value === elem.v) {
+			res.push(records[i]);
+		}
+	}
+	return res;
+};
+CT_pivotTableDefinition.prototype.getValue = function (records, index) {
+	var res = 0;
+	var elem;
+	for (var i = 0; i < records.length; ++i) {
+		elem = records[i][index];
+		if (elem) {
+			res += elem.v;
+		}
+	}
+	return res;
 };
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
@@ -4037,6 +4065,7 @@ function CT_Index() {
 //Attributes
 	this.v = null;
 }
+CT_Index.prototype.type = 0;
 CT_Index.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
 		var vals = attr();

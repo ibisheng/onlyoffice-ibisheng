@@ -4924,17 +4924,19 @@
 		}
 	};
 	Worksheet.prototype._updatePivotTable = function (pivotTable, cleanRanges) {
-		var pos, cells, index, i, j, v, r, c1, r1, field, indexField, cacheIndex, sharedItem, item, items, setName,
-			oCellValue;
+		var pos, cells, index, i, j, k, r, c1, r1, field, indexField, cacheIndex, sharedItem, item, items, setName,
+			oCellValue, cacheRecord;
 		for (i = 0; i < cleanRanges.length; ++i) {
 			cleanRanges[i].cleanAll();
 		}
 		var pivotRange = pivotTable.getRange();
+		var cacheRecords = pivotTable.getRecords();
 		var cacheFields = pivotTable.asc_getCacheFields();
 		var pivotFields = pivotTable.asc_getPivotFields();
 		var pageFields = pivotTable.asc_getPageFields();
 		var colFields = pivotTable.asc_getColumnFields();
 		var rowFields = pivotTable.asc_getRowFields();
+		var dataFields = pivotTable.asc_getDataFields();
 		var rowFieldsPos = [];
 		for (i = 0; i < pivotTable.pageFieldsPositions.length; ++i) {
 			pos = pivotTable.pageFieldsPositions[i];
@@ -4949,6 +4951,56 @@
 		var countC = pivotTable.getColumnFieldsCount();
 		var countR = pivotTable.getRowFieldsCount(true);
 		var countD = pivotTable.getDataFieldsCount();
+		var cacheValuesCol = [];
+		var cacheValuesRow = [];
+
+		if (countC) {
+			c1 = pivotRange.c1 + countR;
+			r1 = pivotRange.r1;
+
+			cells = this.getRange4(r1, c1);
+			cells.setValue('Column Labels');
+
+			++r1;
+
+			items = pivotTable.getColItems();
+			if (items && countC) {
+				for (i = 0; i < items.length; ++i) {
+					item = items[i];
+					r = item.getR();
+					cacheRecord = cacheRecords;
+					for (j = 0; j < item.x.length; ++j) {
+						if (AscCommonExcel.c_oAscItemType.Grand === item.t) {
+							field = null;
+							oCellValue = new AscCommonExcel.CCellValue();
+							oCellValue.text = 'Grand Total';
+							oCellValue.type = AscCommon.CellValueType.String;
+						} else {
+							indexField = colFields[r + j].asc_getIndex();
+							field = pivotFields[indexField];
+							cacheIndex = field.getItem(item.x[j].getV());
+							sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
+							// ToDo add other names by type
+							oCellValue = sharedItem.getCellValue(
+								AscCommonExcel.c_oAscItemType.Default === item.t ? ' Total' : null);
+
+							if (countD) {
+								cacheRecord = pivotTable.getValues(cacheRecord, indexField, cacheIndex.x);
+							}
+						}
+
+						cells = this.getRange4(r1 + r + j, c1 + i);
+						if (field && null !== field.numFmtId) {
+							cells.setNum(new AscCommonExcel.Num({id: field.numFmtId}));
+						}
+						cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
+					}
+					if (countD) {
+						cacheValuesCol.push(cacheRecord);
+					}
+				}
+			}
+		}
 
 		if (countR) {
 			c1 = pivotRange.c1;
@@ -4992,53 +5044,34 @@
 							cacheIndex = field.getItem(item.x[j].getV());
 							sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
 							oCellValue = sharedItem.getCellValue();
+							if (countD) {
+								cacheValuesRow.push(indexField, cacheIndex.x);
+							}
 						}
 
-						cells = this.getRange4(r1 + i, rowFieldsPos[item.getR()]);
+						cells = this.getRange4(r1 + i, rowFieldsPos[r]);
 						if (field && null !== field.numFmtId) {
 							cells.setNum(new AscCommonExcel.Num({id: field.numFmtId}));
 						}
 						cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
 					}
-				}
-			}
-		}
-
-		if (countC) {
-			c1 = pivotRange.c1 + countR;
-			r1 = pivotRange.r1;
-
-			cells = this.getRange4(r1, c1);
-			cells.setValue('Column Labels');
-
-			++r1;
-
-			items = pivotTable.getColItems();
-			if (items && countC) {
-				for (i = 0; i < items.length; ++i) {
-					item = items[i];
-					r = item.getR();
-					for (j = 0; j < item.x.length; ++j) {
-						if (AscCommonExcel.c_oAscItemType.Grand === item.t) {
-							field = null;
-							oCellValue = new AscCommonExcel.CCellValue();
-							oCellValue.text = 'Grand Total';
-							oCellValue.type = AscCommon.CellValueType.String;
-						} else {
-							indexField = colFields[r + j].asc_getIndex();
-							field = pivotFields[indexField];
-							cacheIndex = field.getItem(item.x[j].getV());
-							sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
-							// ToDo add other names by type
-							oCellValue = sharedItem.getCellValue(
-								AscCommonExcel.c_oAscItemType.Default === item.t ? ' Total' : null);
+					if (countD && r === countR - 1) {
+						for (j = 0; j < cacheValuesCol.length; ++j) {
+							if (cacheRecord = cacheValuesCol[j]) {
+								for (k = 0; k < cacheValuesRow.length && 0 !== cacheRecord.length; k += 2) {
+									cacheRecord =
+										pivotTable.getValues(cacheRecord, cacheValuesRow[k], cacheValuesRow[k + 1]);
+								}
+								if (0 !== cacheRecord.length) {
+									cells = this.getRange4(r1 + i, rowFieldsPos[r] + 1 + j);
+									oCellValue = new AscCommonExcel.CCellValue();
+									oCellValue.number = pivotTable.getValue(cacheRecord, dataFields[0].asc_getIndex());
+									oCellValue.type = AscCommon.CellValueType.Number;
+									cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
+								}
+							}
 						}
-
-						cells = this.getRange4(r1 + r + j, c1 + i);
-						if (field && null !== field.numFmtId) {
-							cells.setNum(new AscCommonExcel.Num({id: field.numFmtId}));
-						}
-						cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
+						cacheValuesRow = [];
 					}
 				}
 			}
