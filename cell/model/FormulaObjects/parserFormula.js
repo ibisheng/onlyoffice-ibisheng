@@ -5601,7 +5601,7 @@ parserFormula.prototype.assembleLocale = function(locale, digitDelim) {
 		}
 	};
 	parserFormula.prototype.extendBBoxDefName = function(isDefName, bbox) {
-		if (null == isDefName && !bbox.isAbsAll()) {
+		if (null === isDefName && !bbox.isAbsAll()) {
 			bbox = bbox.clone();
 			if (!bbox.isAbsR1() || !bbox.isAbsR2()) {
 				bbox.r1 = 0;
