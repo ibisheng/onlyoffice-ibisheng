@@ -3479,18 +3479,12 @@ CT_DateTime.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_DateTime.prototype.getCellValue = function (subtotal) {
+CT_DateTime.prototype.getCellValue = function () {
 	var res = new AscCommonExcel.CCellValue();
 	var d = new Date(this.v);
-	var v = new Date(Date.UTC(d.getYear(), d.getMonth(), d.getDay(), d.getHours(), d.getMinutes(), d.getSeconds(),
+	res.number = new Date(Date.UTC(d.getYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), d.getSeconds(),
 		d.getMilliseconds())).getExcelDateWithTime();
-	if (subtotal) {
-		res.text = v + subtotal;
-		res.type = AscCommon.CellValueType.String;
-	} else {
-		res.number = v;
-		res.type = AscCommon.CellValueType.Number;
-	}
+	res.type = AscCommon.CellValueType.Number;
 	return res;
 };
 function CT_Error() {
@@ -3904,15 +3898,10 @@ CT_Number.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_Number.prototype.getCellValue = function (subtotal) {
+CT_Number.prototype.getCellValue = function () {
 	var res = new AscCommonExcel.CCellValue();
-	if (subtotal) {
-		res.text = this.v + subtotal;
-		res.type = AscCommon.CellValueType.String;
-	} else {
-		res.number = this.v;
-		res.type = AscCommon.CellValueType.Number;
-	}
+	res.number = this.v;
+	res.type = AscCommon.CellValueType.Number;
 	return res;
 };
 function CT_String() {
@@ -4055,9 +4044,9 @@ CT_String.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_String.prototype.getCellValue = function (subtotal) {
+CT_String.prototype.getCellValue = function () {
 	var res = new AscCommonExcel.CCellValue();
-	res.text = this.v + (subtotal ? subtotal : '');
+	res.text = this.v;
 	res.type = AscCommon.CellValueType.String;
 	return res;
 };

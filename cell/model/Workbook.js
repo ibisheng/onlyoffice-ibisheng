@@ -4951,6 +4951,7 @@
 		var countC = pivotTable.getColumnFieldsCount();
 		var countR = pivotTable.getRowFieldsCount(true);
 		var countD = pivotTable.getDataFieldsCount();
+		var valuesWithFormat = [];
 		var cacheValuesCol = [];
 		var cacheValuesRow = [];
 
@@ -4981,8 +4982,13 @@
 							cacheIndex = field.getItem(item.x[j].getV());
 							sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
 							// ToDo add other names by type
-							oCellValue = sharedItem.getCellValue(
-								AscCommonExcel.c_oAscItemType.Default === item.t ? ' Total' : null);
+							if (null !== item.t) {
+								oCellValue = new AscCommonExcel.CCellValue();
+								oCellValue.text = valuesWithFormat[r1 + r + j] + ' Total';
+								oCellValue.type = AscCommon.CellValueType.String;
+							} else {
+								oCellValue = sharedItem.getCellValue();
+							}
 
 							if (countD) {
 								cacheRecord = pivotTable.getValues(cacheRecord, indexField, cacheIndex.x);
@@ -4994,6 +5000,9 @@
 							cells.setNum(new AscCommonExcel.Num({id: field.numFmtId}));
 						}
 						cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
+						if (null === item.t) {
+							valuesWithFormat[r1 + r + j] = cells.getValueWithFormat();
+						}
 					}
 					if (countD) {
 						cacheValuesCol.push(cacheRecord);
