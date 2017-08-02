@@ -2289,6 +2289,55 @@ $( function () {
 
     } );
 
+	test( "Test: \"NETWORKDAYS.INTL\"", function () {
+
+		var formulaStr = "NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,1,31))";
+	    oParser = new parserFormula( formulaStr, "A2", ws );
+		ok( oParser.parse(), formulaStr );
+		strictEqual( oParser.calculate().getValue(), 22, formulaStr );
+
+		formulaStr = "NETWORKDAYS.INTL(DATE(2006,2,28),DATE(2006,1,31))";
+		oParser = new parserFormula( formulaStr, "A2", ws );
+		ok( oParser.parse(), formulaStr );
+		strictEqual( oParser.calculate().getValue(), -21, formulaStr );
+
+		formulaStr = 'NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,2,1),7,{"1/2/2006","1/16/2006"})';
+		oParser = new parserFormula( formulaStr, "A2", ws );
+		ok( oParser.parse(), formulaStr );
+		strictEqual( oParser.calculate().getValue(), 22, formulaStr );
+
+		formulaStr = 'NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,2,1),17,{"1/2/2006","1/16/2006"})';
+		oParser = new parserFormula( formulaStr, "A2", ws );
+		ok( oParser.parse(), formulaStr );
+		strictEqual( oParser.calculate().getValue(), 26, formulaStr );
+
+		formulaStr = 'NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,2,1),"1111111",{"1/2/2006","1/16/2006"})';
+		oParser = new parserFormula( formulaStr, "A2", ws );
+		ok( oParser.parse(), formulaStr );
+		strictEqual( oParser.calculate().getValue(), 0, formulaStr );
+
+		formulaStr = 'NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,2,1),"0010001",{"1/2/2006","1/16/2006"})';
+		oParser = new parserFormula( formulaStr, "A2", ws );
+		ok( oParser.parse(), formulaStr );
+		strictEqual( oParser.calculate().getValue(), 20, formulaStr );
+
+		formulaStr = 'NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,2,1),"0000000",{"1/2/2006","1/16/2006"})';
+		oParser = new parserFormula( formulaStr, "A2", ws );
+		ok( oParser.parse(), formulaStr );
+		strictEqual( oParser.calculate().getValue(), 30, formulaStr );
+
+		formulaStr = 'NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,2,1),"19",{"1/2/2006","1/16/2006"})';
+		oParser = new parserFormula( formulaStr, "A2", ws );
+		ok( oParser.parse(), formulaStr );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!", formulaStr );
+
+		formulaStr = 'NETWORKDAYS.INTL(DATE(2006,1,1),DATE(2006,2,1),19,{"1/2/2006","1/16/2006"})';
+		oParser = new parserFormula( formulaStr, "A2", ws );
+		ok( oParser.parse(), formulaStr );
+		strictEqual( oParser.calculate().getValue(), "#NUM!", formulaStr );
+
+	} );
+
     test( "Test: \"SUMIF\"", function () {
 
         ws.getRange2( "A2" ).setValue( "100000" );
