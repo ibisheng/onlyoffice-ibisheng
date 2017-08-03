@@ -4961,8 +4961,8 @@
 		if (countC) {
 			cells = this.getRange4(r1, c1);
 			cells.setValue('Column Labels');
+			++r1;
 		}
-		++r1;
 
 		items = pivotTable.getColItems();
 		if (items) {
@@ -5005,6 +5005,12 @@
 							valuesWithFormat[r1 + r + j] = cells.getValueWithFormat();
 						}
 					}
+				} else if (countR && countD) {
+					// add header for data
+					cells = this.getRange4(r1, c1 + i);
+					index = dataFields[i].asc_getIndex();
+					cells.setValue(dataFields[i].asc_getName() || pivotFields[index].asc_getName() ||
+						cacheFields[index].asc_getName());
 				}
 				if (countD) {
 					cacheValuesCol.push(cacheRecord);
