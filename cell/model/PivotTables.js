@@ -2775,11 +2775,11 @@ CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
 	var t = this;
 	api._changePivotStyle(this, function (ws) {
 		ws.clearPivotRable(t);
-		if (t.rowGrandTotals !== newVal.rowGrandTotals) {
-			t.asc_setRowGrandTotals(newVal.rowGrandTotals);
+		if (t.asc_getRowGrandTotals() !== newVal.rowGrandTotals) {
+			t.asc_setRowGrandTotals(newVal.rowGrandTotals ? null : false);
 		}
-		if (t.colGrandTotals !== newVal.colGrandTotals) {
-			t.asc_setColGrandTotals(newVal.colGrandTotals);
+		if (t.asc_getColGrandTotals() !== newVal.colGrandTotals) {
+			t.asc_setColGrandTotals(newVal.colGrandTotals ? null : false);
 		}
 		ws.updatePivotTable(t);
 	});
@@ -2787,14 +2787,14 @@ CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
 CT_pivotTableDefinition.prototype.asc_setRowGrandTotals = function(newVal) {
 	var res;
 	this.rowGrandTotals = newVal;
-	if (res = this.changeGrandTotals(this.colItems, newVal)) {
+	if (res = this.changeGrandTotals(this.rowItems, newVal)) {
 		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(res, 0));
 	}
 };
 CT_pivotTableDefinition.prototype.asc_setColGrandTotals = function(newVal) {
 	var res;
 	this.colGrandTotals = newVal;
-	if (res = this.changeGrandTotals(this.rowItems, newVal)) {
+	if (res = this.changeGrandTotals(this.colItems, newVal)) {
 		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(0, res));
 	}
 };
@@ -2859,7 +2859,7 @@ CT_pivotTableDefinition.prototype.changeGrandTotals = function (items, newVal) {
 	if (items && 0 < l) {
 		i = items.i;
 		last = i[l - 1];
-		if (newVal) {
+		if (null === newVal) {
 			// Add
 			if (AscCommonExcel.c_oAscItemType.Grand !== last.t) {
 				last = new CT_I();
