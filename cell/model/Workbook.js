@@ -5013,6 +5013,7 @@
 		}
 
 		// rows
+		countR = pivotTable.getRowFieldsCount();
 		if (countR) {
 			c1 = pivotRange.c1;
 			r1 = pivotRange.r1 + countC;
@@ -5066,7 +5067,7 @@
 						}
 						cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
 					}
-					if (countD && r === countR - 1) {
+					if (countD && (r === countR - 1 || AscCommonExcel.c_oAscItemType.Grand === item.t)) {
 						for (j = 0; j < cacheValuesCol.length; ++j) {
 							if (cacheRecord = cacheValuesCol[j]) {
 								for (k = 0; k < cacheValuesRow.length && 0 !== cacheRecord.length; k += 2) {
