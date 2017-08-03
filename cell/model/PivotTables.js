@@ -2708,18 +2708,22 @@ CT_pivotTableDefinition.prototype.getValues = function (records, index, value) {
 	var elem;
 	for (var i = 0; i < records.length; ++i) {
 		elem = records[i][index];
-		if (elem && 0 === elem.type && value === elem.v) {
+		if (elem && elem instanceof CT_Index && value === elem.v) {
 			res.push(records[i]);
 		}
 	}
 	return res;
 };
 CT_pivotTableDefinition.prototype.getValue = function (records, index) {
+	var cacheFields = this.asc_getCacheFields();
 	var res = 0;
 	var elem;
 	for (var i = 0; i < records.length; ++i) {
 		elem = records[i][index];
-		if (elem) {
+		if (elem instanceof CT_Index) {
+			elem = cacheFields[index].getSharedItem(elem.v);
+		}
+		if (elem instanceof CT_Number) {
 			res += elem.v;
 		}
 	}
@@ -4090,7 +4094,6 @@ function CT_Index() {
 //Attributes
 	this.v = null;
 }
-CT_Index.prototype.type = 0;
 CT_Index.prototype.readAttributes = function(attr, uq) {
 	if (attr()) {
 		var vals = attr();
