@@ -40,6 +40,7 @@ function CCommentData()
 {
     this.m_sText      = "";
     this.m_sTime      = "";
+	this.m_sOOTime      = "";
     this.m_sUserId    = "";
     this.m_sUserName  = "";
     this.m_sQuoteText = null;
@@ -52,6 +53,7 @@ function CCommentData()
         
         NewData.m_sText      = this.m_sText;
         NewData.m_sTime      = this.m_sTime;
+		NewData.m_sOOTime    = this.m_sOOTime;
         NewData.m_sUserId    = this.m_sUserId;
         NewData.m_sUserName  = this.m_sUserName;
         NewData.m_sQuoteText = this.m_sQuoteText;
@@ -128,6 +130,7 @@ function CCommentData()
     {
         this.m_sText      = AscCommentData.asc_getText();
         this.m_sTime      = AscCommentData.asc_getTime();
+		this.m_sOOTime    = AscCommentData.asc_getOnlyOfficeTime();
         this.m_sUserId    = AscCommentData.asc_getUserId();
         this.m_sQuoteText = AscCommentData.asc_getQuoteText();
         this.m_bSolved    = AscCommentData.asc_getSolved();
@@ -146,6 +149,7 @@ function CCommentData()
     {
         // String            : m_sText
         // String            : m_sTime
+		// String            : m_sOOTime
         // String            : m_sUserId
         // String            : m_sUserName
         // Bool              : Null ли QuoteText
@@ -157,6 +161,7 @@ function CCommentData()
         var Count = this.m_aReplies.length;
         Writer.WriteString2( this.m_sText );
         Writer.WriteString2( this.m_sTime );
+		Writer.WriteString2( this.m_sOOTime );
         Writer.WriteString2( this.m_sUserId );
         Writer.WriteString2( this.m_sUserName );
 
@@ -180,6 +185,7 @@ function CCommentData()
     {
         // String            : m_sText
         // String            : m_sTime
+		// String            : m_sOOTime
         // String            : m_sUserId
         // Bool              : Null ли QuoteText
         // String            : (Если предыдущий параметр false) QuoteText
@@ -189,6 +195,7 @@ function CCommentData()
 
         this.m_sText     = Reader.GetString2();
         this.m_sTime     = Reader.GetString2();
+		this.m_sOOTime   = Reader.GetString2();
         this.m_sUserId   = Reader.GetString2();
         this.m_sUserName = Reader.GetString2();
 

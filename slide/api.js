@@ -4289,6 +4289,7 @@ background-repeat: no-repeat;\
 		{
 			this.m_sText      = (undefined != obj.m_sText     ) ? obj.m_sText : "";
 			this.m_sTime      = (undefined != obj.m_sTime     ) ? obj.m_sTime : "";
+			this.m_sOOTime    = (undefined != obj.m_sOOTime   ) ? obj.m_sOOTime : "";
 			this.m_sUserId    = (undefined != obj.m_sUserId   ) ? obj.m_sUserId : "";
 			this.m_sQuoteText = (undefined != obj.m_sQuoteText) ? obj.m_sQuoteText : null;
 			this.m_bSolved    = (undefined != obj.m_bSolved   ) ? obj.m_bSolved : false;
@@ -4308,6 +4309,7 @@ background-repeat: no-repeat;\
 		{
 			this.m_sText      = "";
 			this.m_sTime      = "";
+			this.m_sOOTime    = "";
 			this.m_sUserId    = "";
 			this.m_sQuoteText = null;
 			this.m_bSolved    = false;
@@ -4331,6 +4333,14 @@ background-repeat: no-repeat;\
 	asc_CCommentData.prototype.asc_putTime         = function(v)
 	{
 		this.m_sTime = v;
+	};
+	asc_CCommentData.prototype.asc_getOnlyOfficeTime         = function()
+	{
+		return this.m_sOOTime;
+	};
+	asc_CCommentData.prototype.asc_putOnlyOfficeTime         = function(v)
+	{
+		this.m_sOOTime = v;
 	};
 	asc_CCommentData.prototype.asc_getUserId       = function()
 	{
@@ -7211,6 +7221,8 @@ background-repeat: no-repeat;\
 	asc_CCommentData.prototype['asc_putText']         = asc_CCommentData.prototype.asc_putText;
 	asc_CCommentData.prototype['asc_getTime']         = asc_CCommentData.prototype.asc_getTime;
 	asc_CCommentData.prototype['asc_putTime']         = asc_CCommentData.prototype.asc_putTime;
+	asc_CCommentData.prototype['asc_getOnlyOfficeTime']         = asc_CCommentData.prototype.asc_getOnlyOfficeTime;
+	asc_CCommentData.prototype['asc_putOnlyOfficeTime']         = asc_CCommentData.prototype.asc_putOnlyOfficeTime;
 	asc_CCommentData.prototype['asc_getUserId']       = asc_CCommentData.prototype.asc_getUserId;
 	asc_CCommentData.prototype['asc_putUserId']       = asc_CCommentData.prototype.asc_putUserId;
 	asc_CCommentData.prototype['asc_getUserName']     = asc_CCommentData.prototype.asc_getUserName;

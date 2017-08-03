@@ -183,7 +183,8 @@ function asc_CCommentData(obj) {
 		bDocument: 11,
 		bSolved: 12,
 		aReplies: 13,
-		bHidden: 14
+		bHidden: 14,
+		sOOTime: 15
 	};
 
 	this.bHidden = false;
@@ -197,6 +198,7 @@ function asc_CCommentData(obj) {
 	// Common
 	this.sText = "";
 	this.sTime = "";
+	this.sOOTime = "";
 	this.sUserId = "";
 	this.sUserName = "";
 	this.bDocument = true; 	// For compatibility with 'Word Comment Control'
@@ -215,6 +217,7 @@ function asc_CCommentData(obj) {
 		// Common
 		this.sText = obj.sText;
 		this.sTime = obj.sTime;
+		this.sOOTime = obj.sOOTime;
 		this.sUserId = obj.sUserId;
 		this.sUserName = obj.sUserName;
 		this.bDocument = obj.bDocument;
@@ -266,6 +269,9 @@ asc_CCommentData.prototype = {
 
 	asc_putTime: function(val) { this.sTime = val; },
 	asc_getTime: function() { return this.sTime; },
+	
+	asc_putOnlyOfficeTime: function(val) { this.sOOTime = val; },
+	asc_getOnlyOfficeTime: function() { return this.sOOTime; },
 
 	asc_putUserId: function(val) { this.sUserId = val; },
 	asc_getUserId: function() { return this.sUserId; },
@@ -321,6 +327,7 @@ asc_CCommentData.prototype = {
 			case this.Properties.nLevel: return this.nLevel; break;
 			case this.Properties.sText: return this.sText; break;
 			case this.Properties.sTime: return this.sTime; break;
+			case this.Properties.sOOTime: return this.sOOTime; break;
 			case this.Properties.sUserId: return this.sUserId; break;
 			case this.Properties.sUserName: return this.sUserName; break;
 			case this.Properties.bDocument: return this.bDocument; break;
@@ -340,6 +347,7 @@ asc_CCommentData.prototype = {
 			case this.Properties.nLevel: this.nLevel = value; break;
 			case this.Properties.sText: this.sText = value; break;
 			case this.Properties.sTime: this.sTime = value; break;
+			case this.Properties.sOOTime: this.sOOTime = value; break;
 			case this.Properties.sUserId: this.sUserId = value; break;
 			case this.Properties.sUserName: this.sUserName = value; break;
 			case this.Properties.bDocument: this.bDocument = value; break;
@@ -1479,6 +1487,8 @@ CCellCommentator.prototype.Redo = function(type, data) {
 	prot["asc_getQuoteText"] = prot.asc_getQuoteText;
 	prot["asc_putTime"] = prot.asc_putTime;
 	prot["asc_getTime"] = prot.asc_getTime;
+	prot["asc_putOnlyOfficeTime"] = prot.asc_putOnlyOfficeTime;
+	prot["asc_getOnlyOfficeTime"] = prot.asc_getOnlyOfficeTime;
 	prot["asc_putUserId"] = prot.asc_putUserId;
 	prot["asc_getUserId"] = prot.asc_getUserId;
 	prot["asc_putUserName"] = prot.asc_putUserName;

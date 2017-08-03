@@ -547,7 +547,8 @@
         Solved : 5,
         Document : 6,
         Replies : 7,
-        Reply : 8
+        Reply : 8,
+        OOTime : 9
     };
     var c_oSer_ConditionalFormatting = {
         Pivot						: 0,
@@ -3822,6 +3823,14 @@
                 this.memory.WriteByte(c_oSer_CommentData.Time);
                 this.memory.WriteString2(this.DateToISO8601(oDate));
             }
+            var sOOTime = oCommentData.asc_getOnlyOfficeTime();
+            if(null != sOOTime && "" !== sOOTime)
+            {
+                var oDate = new Date(sOOTime - 0);
+
+                this.memory.WriteByte(c_oSer_CommentData.OOTime);
+                this.memory.WriteString2(this.DateToISO8601(oDate));
+            }
             var sUserId = oCommentData.asc_getUserId();
             if(null != sUserId)
             {
@@ -6830,6 +6839,12 @@
                 var oDate = this.Iso8601ToDate(this.stream.GetString2LE(length));
                 if(null != oDate)
                     oCommentData.asc_putTime(oDate.getTime() + "");
+            }
+            else if ( c_oSer_CommentData.OOTime == type )
+            {
+                var oDate = this.Iso8601ToDate(this.stream.GetString2LE(length));
+                if(null != oDate)
+                    oCommentData.asc_putOnlyOfficeTime(oDate.getTime() + "");
             }
             else if ( c_oSer_CommentData.UserId == type )
                 oCommentData.asc_putUserId(this.stream.GetString2LE(length));

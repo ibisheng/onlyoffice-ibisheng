@@ -541,7 +541,8 @@ var c_oSer_CommentsType = {
 	Text: 6,
 	QuoteText: 7,
 	Solved: 8,
-	Replies: 9
+	Replies: 9,
+	OOData: 10
 };
 
 var c_oSer_StyleType = {
@@ -1013,6 +1014,72 @@ var c_oAscBrkBinSub = {
 var g_sErrorCharCountMessage = "g_sErrorCharCountMessage";
 var g_nErrorCharCount = 30000;
 var g_nErrorParagraphCount = 1000;
+
+	function getCommentAdditionalData (comment) {
+		var AdditionalData = "";
+		if(null != comment.m_sOOTime && "" != comment.m_sOOTime)
+		{
+			AdditionalData += "teamlab_data:";
+			var dateStr = new Date(comment.m_sOOTime - 0).toISOString().slice(0, 19) + 'Z';
+			AdditionalData += "0;" + dateStr.length + ";" + dateStr + ";";
+		}
+		return AdditionalData;
+	};
+	function ReadNextInteger(_parsed)
+	{
+		var _len = _parsed.data.length;
+		var _found = -1;
+
+		var _Found = ";".charCodeAt(0);
+		for (var i = _parsed.pos; i < _len; i++)
+		{
+			if (_Found == _parsed.data.charCodeAt(i))
+			{
+				_found = i;
+				break;
+			}
+		}
+
+		if (-1 == _found)
+			return -1;
+
+		var _ret = parseInt(_parsed.data.substr(_parsed.pos, _found - _parsed.pos));
+		if (isNaN(_ret))
+			return -1;
+
+		_parsed.pos = _found + 1;
+		return _ret;
+	};
+
+	function ParceAdditionalData(AdditionalData, _comment_data)
+	{
+		if (AdditionalData.indexOf("teamlab_data:") != 0)
+			return;
+
+		var _parsed = { data : AdditionalData, pos : "teamlab_data:".length };
+
+		while (true)
+		{
+			var _attr = ReadNextInteger(_parsed);
+			if (-1 == _attr)
+				break;
+
+			var _len = ReadNextInteger(_parsed);
+			if (-1 == _len)
+				break;
+
+			var _value = _parsed.data.substr(_parsed.pos, _len);
+			_parsed.pos += (_len + 1);
+
+			if (0 == _attr){
+				var dateMs = Date.parse(_value);
+				if (isNaN(dateMs)) {
+					dateMs = new Date().getTime();
+				}
+				_comment_data.OODate = dateMs + "";
+			}
+		}
+	}
 
 function CreateThemeUnifill(color, tint, shade){
 	var ret = null;
@@ -5563,6 +5630,12 @@ function BinaryCommentsTableWriter(memory, doc, oMapCommentId)
 		{
 			this.bs.WriteItem(c_oSer_CommentsType.Replies, function(){oThis.WriteReplies(comment.m_aReplies);});
 		}
+		var dataStr = getCommentAdditionalData(comment);
+		if (dataStr)
+		{
+			this.memory.WriteByte(c_oSer_CommentsType.OOData);
+			this.memory.WriteString2(dataStr);
+		}
     };
 	this.WriteReplies = function(aComments)
 	{
@@ -6467,6 +6540,8 @@ function BinaryFileReader(doc, openParams)
 				oCommentObj.m_sUserId = comment.UserId;
 			if(null != comment.Date)
 				oCommentObj.m_sTime = comment.Date;
+			if(null != comment.OODate)
+				oCommentObj.m_sOOTime = comment.OODate;
 			if(null != comment.Text)
 				oCommentObj.m_sText = comment.Text;
 			if(null != comment.Solved)
@@ -13499,6 +13574,10 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 			res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadReplies(t,l,oNewImage.Replies);
                 });
+		}
+		else if ( c_oSer_CommentsType.OOData === type )
+		{
+			ParceAdditionalData(this.stream.GetString2LE(length), oNewImage);
 		}
         else
             res = c_oSerConstants.ReadUnknown;
