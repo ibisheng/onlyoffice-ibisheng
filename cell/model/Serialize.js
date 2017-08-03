@@ -4939,7 +4939,7 @@
 					xf.align = g_StyleCache.addAlign(xf.align);
 				}
 			}
-			for (var i = 0; i < oStyleObject.aCellXfs; ++i) {
+			for (var i = 0; i < oStyleObject.aCellXfs.length; ++i) {
 				var xf = oStyleObject.aCellXfs[i];
 				if (xf.align) {
 					xf.align = g_StyleCache.addAlign(xf.align);
