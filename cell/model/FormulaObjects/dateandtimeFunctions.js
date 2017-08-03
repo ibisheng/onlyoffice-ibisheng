@@ -416,9 +416,6 @@
 		cMINUTE, cMONTH, cNETWORKDAYS, cNETWORKDAYS_INTL, cNOW, cSECOND, cTIME, cTIMEVALUE, cTODAY, cWEEKDAY, cWEEKNUM,
 		cWORKDAY, cWORKDAY_INTL, cYEAR, cYEARFRAC);
 
-	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cWORKDAY_INTL);
-
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
