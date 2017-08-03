@@ -2594,6 +2594,54 @@ $( function () {
 
     } );
 
+	test( "Test: \"WORKDAY.INTL\"", function () {
+
+		oParser = new parserFormula( "WORKDAY.INTL(DATE(2012,1,1),30,0)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+		oParser = new parserFormula( "WORKDAY.INTL(DATE(2012,1,1),90,11)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 41013 );
+
+		oParser = new parserFormula( 'TEXT(WORKDAY.INTL(DATE(2012,1,1),30,17),"m/dd/yyyy")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "2/05/2012" );
+
+		oParser = new parserFormula( 'WORKDAY.INTL(151,8,"0000000")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 159 );
+
+		oParser = new parserFormula( 'WORKDAY.INTL(151,8,"0000000")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 159 );
+
+		oParser = new parserFormula( 'WORKDAY.INTL(159,8,"0011100")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 171 );
+
+		oParser = new parserFormula( 'WORKDAY.INTL(151,-18,"0000000")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 133 );
+
+		oParser = new parserFormula( 'WORKDAY.INTL(151,8,"1111111")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( 'WORKDAY.INTL(DATE(2006,1,1),20,1,{"1/2/2006","1/16/2006"})', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 38748 );
+
+		oParser = new parserFormula( 'WORKDAY.INTL(DATE(2006,1,1),20,{"1/2/2006","1/16/2006"})', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+		oParser = new parserFormula( 'WORKDAY.INTL(DATE(2006,1,1),-20,1,{"1/2/2006",,"1/16/2006"})', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 38691 );
+
+	} );
+
     test( "Test: \"TIMEVALUE\"", function () {
         oParser = new parserFormula( "timevalue(\"10:02:34\")", "A2", ws );
         ok( oParser.parse() );

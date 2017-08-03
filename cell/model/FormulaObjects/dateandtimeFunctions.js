@@ -1760,7 +1760,7 @@
 				return  new cError(cErrorType.not_numeric);
 			}
 
-			return t.setCalcValue(new cNumber(val));
+			return t.setCalcValue(new cNumber(val), 14);
 		};
 
 
@@ -1783,6 +1783,7 @@
 	cWORKDAY_INTL.prototype.argumentsMax = 4;
 	cWORKDAY_INTL.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cWORKDAY_INTL.prototype.Calculate = function (arg) {
+		//TODO проблема с формулами следующего типа - WORKDAY.INTL(8,60,"0000000")
 		var t = this;
 		var tempArgs = arg[2] ? [arg[0], arg[1], arg[2]] : [arg[0], arg[1]];
 		var oArguments = this._prepareArguments(tempArgs, arguments[1]);
@@ -1805,6 +1806,9 @@
 		val0 = getCorrectDate(val0);
 
 		//Weekend
+		if(arg2 && "1111111" === arg2.getValue()){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
 		var weekends = getWeekends(arg2);
 		if (weekends instanceof cError) {
 			return this.value = weekends;
@@ -1831,7 +1835,7 @@
 					date = new Date(val0.getTime() + dif1 * c_msPerDay);
 					for(var i = 0; i < 7; i++){
 						if(weekends[date.getUTCDay()]){
-							dif1++;
+							dif >= 0 ? dif1++ : dif1--;
 							date = new Date(val0.getTime() + (dif1) * c_msPerDay);
 						}else{
 							break;
@@ -1846,7 +1850,7 @@
 				return  new cError(cErrorType.not_numeric);
 			}
 
-			return t.setCalcValue(new cNumber(val));
+			return t.setCalcValue(new cNumber(val), 14);
 		};
 
 		return this.value = calcDate();
