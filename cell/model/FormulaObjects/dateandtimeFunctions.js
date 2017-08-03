@@ -1721,7 +1721,7 @@
 
 		var arg0 = argClone[0], arg1 = argClone[1], arg2 = arg[2];
 
-		var val0 = arg0.getValue(), holidays = [], i;
+		var val0 = arg0.getValue();
 		if (val0 < 0) {
 			return this.value = new cError(cErrorType.not_numeric);
 		}
@@ -1824,6 +1824,20 @@
 					count++;
 				}
 				dif >= 0 ? dif1++ : dif1--;
+
+				//если последняя итерация
+				if(!(Math.abs(dif) > count)){
+					//проверяем не оказалось ли следом выходных. если оказались - прибавляем
+					date = new Date(val0.getTime() + dif1 * c_msPerDay);
+					for(var i = 0; i < 7; i++){
+						if(weekends[date.getUTCDay()]){
+							dif1++;
+							date = new Date(val0.getTime() + (dif1) * c_msPerDay);
+						}else{
+							break;
+						}
+					}
+				}
 			}
 			date = new Date(val0.getTime() + dif1 * c_msPerDay);
 			val = date.getExcelDate();
@@ -1832,7 +1846,7 @@
 				return  new cError(cErrorType.not_numeric);
 			}
 
-			return t.setCalcValue(new cNumber(val), 14);
+			return t.setCalcValue(new cNumber(val));
 		};
 
 		return this.value = calcDate();
