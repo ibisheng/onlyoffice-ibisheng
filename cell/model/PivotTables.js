@@ -2788,14 +2788,14 @@ CT_pivotTableDefinition.prototype.asc_setRowGrandTotals = function(newVal) {
 	var res;
 	this.rowGrandTotals = newVal;
 	if (res = this.changeGrandTotals(this.rowItems, newVal)) {
-		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(res, 0));
+		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(0, res));
 	}
 };
 CT_pivotTableDefinition.prototype.asc_setColGrandTotals = function(newVal) {
 	var res;
 	this.colGrandTotals = newVal;
 	if (res = this.changeGrandTotals(this.colItems, newVal)) {
-		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(0, res));
+		this.getRange().setOffsetLast(new AscCommonExcel.CRangeOffset(res, 0));
 	}
 };
 CT_pivotTableDefinition.prototype.asc_addPageField = function (api, index) {
