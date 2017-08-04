@@ -4981,10 +4981,10 @@
 							indexField = colFields[r + j].asc_getIndex();
 							field = pivotFields[indexField];
 							cacheIndex = field.getItem(item.x[j].getV());
-							// ToDo add other names by type
 							if (null !== item.t) {
 								oCellValue = new AscCommonExcel.CCellValue();
-								oCellValue.text = valuesWithFormat[r1 + r + j] + ' Total';
+								oCellValue.text =
+									valuesWithFormat[r1 + r + j] + AscCommonExcel.ToName_ST_ItemType(item.t);
 								oCellValue.type = AscCommon.CellValueType.String;
 							} else {
 								sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
@@ -5060,8 +5060,16 @@
 							indexField = rowFields[r].asc_getIndex();
 							field = pivotFields[indexField];
 							cacheIndex = field.getItem(item.x[j].getV());
-							sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
-							oCellValue = sharedItem.getCellValue();
+							if (null !== item.t) {
+								oCellValue = new AscCommonExcel.CCellValue();
+								oCellValue.text =
+									valuesWithFormat[r1 + r + j] + AscCommonExcel.ToName_ST_ItemType(item.t);
+								oCellValue.type = AscCommon.CellValueType.String;
+							} else {
+								sharedItem = cacheFields[indexField].getSharedItem(cacheIndex.x);
+								oCellValue = sharedItem.getCellValue();
+							}
+
 							if (countD) {
 								cacheValuesRow.push(indexField, cacheIndex.x);
 							}
@@ -5072,6 +5080,10 @@
 							cells.setNum(new AscCommonExcel.Num({id: field.numFmtId}));
 						}
 						cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
+
+						if (null === item.t) {
+							valuesWithFormat[r1 + r + j] = cells.getValueWithFormat();
+						}
 					}
 					last = r === countR - 1 || AscCommonExcel.c_oAscItemType.Grand === item.t;
 					if (countD && (last || (field && field.asc_getSubtotalTop()))) {
