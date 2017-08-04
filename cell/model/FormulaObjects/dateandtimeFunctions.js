@@ -412,9 +412,9 @@
 
 
 	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
-	cFormulaFunctionGroup['DateAndTime'].push(cDATE, cDATEDIF, cDATEVALUE, cDAY, cDAYS, cDAYS360, cEDATE, cEOMONTH, cHOUR,
-		cMINUTE, cMONTH, cNETWORKDAYS, cNETWORKDAYS_INTL, cNOW, cSECOND, cTIME, cTIMEVALUE, cTODAY, cWEEKDAY, cWEEKNUM,
-		cWORKDAY, cWORKDAY_INTL, cYEAR, cYEARFRAC);
+	cFormulaFunctionGroup['DateAndTime'].push(cDATE, cDATEDIF, cDATEVALUE, cDAY, cDAYS, cDAYS360, cEDATE, cEOMONTH,
+		cHOUR, cISOWEEKNUM, cMINUTE, cMONTH, cNETWORKDAYS, cNETWORKDAYS_INTL, cNOW, cSECOND, cTIME, cTIMEVALUE, cTODAY,
+		cWEEKDAY, cWEEKNUM, cWORKDAY, cWORKDAY_INTL, cYEAR, cYEARFRAC);
 
 	/**
 	 * @constructor
@@ -1009,6 +1009,73 @@
 			return this.setCalcValue(new cNumber(parseInt(( ( val - Math.floor(val) ) * 24 ).toFixed(cExcelDateTimeDigits))),
 				0);
 		}
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cISOWEEKNUM() {
+		this.name = "ISOWEEKNUM";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cISOWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
+	cISOWEEKNUM.prototype.constructor = cISOWEEKNUM;
+	cISOWEEKNUM.prototype.argumentsMin = 1;
+	cISOWEEKNUM.prototype.argumentsMax = 1;
+	cISOWEEKNUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cISOWEEKNUM.prototype.isXLFN = true;
+	cISOWEEKNUM.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var arg0 = argClone[0];
+		if (arg0.getValue() < 0) {
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		function WeekNumber(dt, iso, type) {
+			dt.setUTCHours(0, 0, 0);
+			var startOfYear = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
+			var endOfYear = new Date(dt);
+			endOfYear.setUTCMonth(11);
+			endOfYear.setUTCDate(31);
+			var wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()]) / 7);
+			if (type) {
+				switch (wk) {
+					case 0:
+						// Возвращаем номер недели от 31 декабря предыдущего года
+						startOfYear.setUTCDate(0);
+						return WeekNumber(startOfYear, iso, type);
+					case 53:
+						// Если 31 декабря выпадает до четверга 1 недели следующего года
+						if (endOfYear.getUTCDay() < 4) {
+							return new cNumber(1);
+						} else {
+							return new cNumber(wk);
+						}
+					default:
+						return new cNumber(wk);
+				}
+			} else {
+				wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()] + 7) / 7);
+				return new cNumber(wk);
+			}
+		}
+
+		var weekdayStartDay = [0, 1, 2, 3, 4, 5, 6];
+		var type = 0;
+		return this.value =
+			new cNumber(WeekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
 	};
 
 	/**
