@@ -2767,9 +2767,9 @@ CT_pivotTableDefinition.prototype.getValue = function (records, index, subtotal)
 		}
 	}
 
-	var f = new AscCommonExcel.cSUBTOTAL();
+	var res = (new AscCommonExcel.cSUBTOTAL()).Calculate(arg);
 
-	return f.Calculate(arg);
+	return res ? res.value : null;
 };
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;
