@@ -4925,7 +4925,7 @@
 	};
 	Worksheet.prototype._updatePivotTable = function (pivotTable, cleanRanges) {
 		var pos, cells, index, i, j, k, r, c1, r1, field, indexField, cacheIndex, sharedItem, item, items, setName,
-			oCellValue, cacheRecord;
+			oCellValue, cacheRecord, last;
 		for (i = 0; i < cleanRanges.length; ++i) {
 			cleanRanges[i].cleanAll();
 		}
@@ -5073,7 +5073,8 @@
 						}
 						cells.setValueData(new AscCommonExcel.UndoRedoData_CellValueData(null, oCellValue));
 					}
-					if (countD && (r === countR - 1 || AscCommonExcel.c_oAscItemType.Grand === item.t)) {
+					last = r === countR - 1 || AscCommonExcel.c_oAscItemType.Grand === item.t;
+					if (countD && (last || (field && field.asc_getSubtotalTop()))) {
 						for (j = 0; j < cacheValuesCol.length; ++j) {
 							if (cacheRecord = cacheValuesCol[j]) {
 								for (k = 0; k < cacheValuesRow.length && 0 !== cacheRecord.length; k += 2) {
@@ -5089,7 +5090,9 @@
 								}
 							}
 						}
-						cacheValuesRow = [];
+						if (last) {
+							cacheValuesRow = [];
+						}
 					}
 				}
 			}
