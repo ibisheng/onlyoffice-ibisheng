@@ -21,34 +21,34 @@ var c_oAscFieldSortType = {
 	Descending: 2
 };
 var c_oAscItemType = {
-	Data: 0,
-	Default: 1,
-	Sum: 2,
+	Default: 0,
+	Avg: 1,
+	Count: 2,
 	CountA: 3,
-	Avg: 4,
-	Max: 5,
-	Min: 6,
-	Product: 7,
-	Count: 8,
-	StdDev: 9,
-	StdDevP: 10,
-	Var: 11,
-	VarP: 12,
+	Max: 4,
+	Min: 5,
+	Product: 6,
+	StdDev: 7,
+	StdDevP: 8,
+	Sum: 9,
+	Var: 10,
+	VarP: 11,
+	Data: 12,
 	Grand: 13,
 	Blank: 14
 };
 var c_oAscDataConsolidateFunction = {
-	Average: 0,
-	Count: 1,
-	CountNums: 2,
-	Max: 3,
-	Min: 4,
-	Product: 5,
-	StdDev: 6,
-	StdDevp: 7,
-	Sum: 8,
-	Var: 9,
-	Varp: 10
+	Average: 1,
+	Count: 2,
+	CountNums: 3,
+	Max: 4,
+	Min: 5,
+	Product: 6,
+	StdDev: 7,
+	StdDevp: 8,
+	Sum: 9,
+	Var: 10,
+	Varp: 11
 };
 var c_oAscShowDataAs = {
 	Normal: 0,
@@ -426,36 +426,36 @@ function ToXml_ST_ItemType(val) {
 
 function ToName_ST_ItemType(val) {
 	var res = ' ';
-	if (c_oAscItemType.Data === val) {
-		res += "data";
-	} else if (c_oAscItemType.Default === val) {
+	if (c_oAscItemType.Default === val) {
 		res += 'Total';
-	} else if (c_oAscItemType.Sum === val) {
-		res = 'Sum';
-	} else if (c_oAscItemType.CountA === val) {
-		res = 'Count';
 	} else if (c_oAscItemType.Avg === val) {
-		res = 'Average';
-	} else if (c_oAscItemType.Max === val) {
-		res = 'Max';
-	} else if (c_oAscItemType.Min === val) {
-		res = 'Min';
-	} else if (c_oAscItemType.Product === val) {
-		res = 'Product';
+		res += 'Average';
 	} else if (c_oAscItemType.Count === val) {
-		res = 'Count';
+		res += 'Count';
+	} else if (c_oAscItemType.CountA === val) {
+		res += 'Count';
+	} else if (c_oAscItemType.Max === val) {
+		res += 'Max';
+	} else if (c_oAscItemType.Min === val) {
+		res += 'Min';
+	} else if (c_oAscItemType.Product === val) {
+		res += 'Product';
 	} else if (c_oAscItemType.StdDev === val) {
-		res = 'StdDev';
+		res += 'StdDev';
 	} else if (c_oAscItemType.StdDevP === val) {
-		res = 'StdDevp';
+		res += 'StdDevp';
+	} else if (c_oAscItemType.Sum === val) {
+		res += 'Sum';
 	} else if (c_oAscItemType.Var === val) {
-		res = 'Var';
+		res += 'Var';
 	} else if (c_oAscItemType.VarP === val) {
-		res = 'Varp';
+		res += 'Varp';
+	} else if (c_oAscItemType.Data === val) {
+		res += 'Data';
 	} else if (c_oAscItemType.Grand === val) {
 		res += 'Total';
 	} else if (c_oAscItemType.Blank === val) {
-		res = "blank";
+		res += 'Blank';
 	}
 	return res;
 }
@@ -2750,9 +2750,12 @@ CT_pivotTableDefinition.prototype.getValues = function (records, index, value) {
 	}
 	return res;
 };
-CT_pivotTableDefinition.prototype.getValue = function (records, index) {
+CT_pivotTableDefinition.prototype.getValue = function (records, index, subtotal) {
 	var cacheFields = this.asc_getCacheFields();
-	var res = 0;
+	if (c_oAscItemType.Default === subtotal || c_oAscItemType.Data === subtotal || c_oAscItemType.Blank === subtotal) {
+		subtotal = c_oAscItemType.Sum;
+	}
+	var arg = [new AscCommonExcel.cNumber(subtotal)];
 	var elem;
 	for (var i = 0; i < records.length; ++i) {
 		elem = records[i][index];
@@ -2760,10 +2763,13 @@ CT_pivotTableDefinition.prototype.getValue = function (records, index) {
 			elem = cacheFields[index].getSharedItem(elem.v);
 		}
 		if (elem instanceof CT_Number) {
-			res += elem.v;
+			arg.push(new AscCommonExcel.cNumber(elem.v));
 		}
 	}
-	return res;
+
+	var f = new AscCommonExcel.cSUBTOTAL();
+
+	return f.Calculate(arg);
 };
 CT_pivotTableDefinition.prototype.asc_getName = function () {
 	return this.name;

@@ -4945,4 +4945,8 @@
 
 		return this.value = truncHelper(arg0.getValue(), arg1.getValue());
 	};
+
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].cSUBTOTAL = cSUBTOTAL;
 })(window);
