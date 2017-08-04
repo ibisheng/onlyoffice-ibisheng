@@ -411,6 +411,13 @@
 	}
 
 	function weekNumber(dt, iso, type) {
+		if(undefined === iso){
+			iso = [0, 1, 2, 3, 4, 5, 6];
+		}
+		if(undefined === type){
+			type = 0;
+		}
+
 		dt.setUTCHours(0, 0, 0);
 		var startOfYear = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
 		var endOfYear = new Date(dt);
@@ -1071,10 +1078,8 @@
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
-		var weekdayStartDay = [0, 1, 2, 3, 4, 5, 6];
-		var type = 0;
 		return this.value =
-			new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
+			new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue())));
 	};
 
 	/**
