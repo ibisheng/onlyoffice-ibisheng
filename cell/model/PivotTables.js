@@ -6823,13 +6823,16 @@ CT_DataField.prototype.asc_clone = function () {
 };
 CT_DataField.prototype.asc_set = function (api, pivot, newVal) {
 	var t = this;
-	api._changePivotStyle(pivot, function () {
+	api._changePivotStyle(pivot, function (ws) {
 		if (t.name !== newVal.name) {
 			t.asc_setName(newVal.name);
 		}
 		if (t.subtotal !== newVal.subtotal) {
 			t.asc_setSubtotal(newVal.subtotal);
 		}
+
+		ws.clearPivotRable(pivot);
+		ws.updatePivotTable(pivot);
 	});
 };
 CT_DataField.prototype.asc_setName = function(newVal) {
