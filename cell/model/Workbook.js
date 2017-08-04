@@ -5085,7 +5085,7 @@
 							valuesWithFormat[r1 + r + j] = cells.getValueWithFormat();
 						}
 					}
-					last = r === countR - 1 || AscCommonExcel.c_oAscItemType.Grand === item.t;
+					last = r === countR - 1 || null !== item.t;
 					if (countD && (last || (field && field.asc_getSubtotalTop()))) {
 						for (j = 0; j < cacheValuesCol.length; ++j) {
 							if (cacheRecord = cacheValuesCol[j]) {
