@@ -2434,7 +2434,8 @@ background-repeat: no-repeat;\
 						"c"             : "reopen",
 						"url"           : this.documentUrl,
 						"title"         : this.documentTitle,
-						"codepage"      : option.asc_getCodePage()
+						"codepage"      : option.asc_getCodePage(),
+						"nobase64"      : Asc.c_nNoBase64
 					};
 					sendCommand(this, null, rData);
 				}
@@ -2454,7 +2455,8 @@ background-repeat: no-repeat;\
 						"c": "reopen",
 						"url": this.documentUrl,
 						"title": this.documentTitle,
-						"password": option.asc_getPassword()
+						"password": option.asc_getPassword(),
+						"nobase64": Asc.c_nNoBase64
 					};
 
 					sendCommand(this, null, v);
@@ -2492,16 +2494,16 @@ background-repeat: no-repeat;\
 		if (this.mailMergeFileData)
 		{
 			this.mailMergeFileData = null;
-			AscCommon.loadFileContent(url, function(result)
+			AscCommon.loadFileContent(url, function(httpRequest)
 			{
-				if (null === result)
+				if (null === httpRequest)
 				{
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
 				try
 				{
-					t.asc_StartMailMergeByList(JSON.parse(result));
+					t.asc_StartMailMergeByList(JSON.parse(httpRequest.responseText));
 				} catch (e)
 				{
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
@@ -2511,15 +2513,15 @@ background-repeat: no-repeat;\
 		else if (this.insertDocumentUrlsData)
 		{
 			t.insertDocumentUrlsData.imageMap = url;
-			AscCommon.loadFileContent(url['output.bin'], function(result)
+			AscCommon.loadFileContent(url['output.bin'], function(httpRequest)
 			{
-				if (null === result)
+				if (null === httpRequest)
 				{
 					t.endInsertDocumentUrls();
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
-				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + result, undefined, undefined, true);
+				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + httpRequest.responseText, undefined, undefined, true);
 			});
 		}
 		else
@@ -5378,6 +5380,7 @@ background-repeat: no-repeat;\
 		{
 			this.m_sText      = (undefined != obj.m_sText     ) ? obj.m_sText : "";
 			this.m_sTime      = (undefined != obj.m_sTime     ) ? obj.m_sTime : "";
+			this.m_sOOTime    = (undefined != obj.m_sOOTime   ) ? obj.m_sOOTime : "";
 			this.m_sUserId    = (undefined != obj.m_sUserId   ) ? obj.m_sUserId : "";
 			this.m_sQuoteText = (undefined != obj.m_sQuoteText) ? obj.m_sQuoteText : null;
 			this.m_bSolved    = (undefined != obj.m_bSolved   ) ? obj.m_bSolved : false;
@@ -5397,6 +5400,7 @@ background-repeat: no-repeat;\
 		{
 			this.m_sText      = "";
 			this.m_sTime      = "";
+			this.m_sOOTime    = "";
 			this.m_sUserId    = "";
 			this.m_sQuoteText = null;
 			this.m_bSolved    = false;
@@ -5420,6 +5424,14 @@ background-repeat: no-repeat;\
 	asc_CCommentDataWord.prototype.asc_putTime         = function(v)
 	{
 		this.m_sTime = v;
+	};
+	asc_CCommentDataWord.prototype.asc_getOnlyOfficeTime         = function()
+	{
+		return this.m_sOOTime;
+	};
+	asc_CCommentDataWord.prototype.asc_putOnlyOfficeTime         = function(v)
+	{
+		this.m_sOOTime = v;
 	};
 	asc_CCommentDataWord.prototype.asc_getUserId       = function()
 	{
@@ -6842,6 +6854,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
+		oAdditionalData["nobase64"]     = Asc.c_nNoBase64;
 		if ('savefromorigin' === command)
 		{
 			oAdditionalData["format"] = this.documentFormat;
@@ -6857,7 +6870,7 @@ background-repeat: no-repeat;\
 		else if (null == options.oDocumentMailMerge && c_oAscFileType.PDF === filetype)
 		{
 			var dd             = this.WordControl.m_oDrawingDocument;
-			dataContainer.data = dd.ToRendererPart();
+			dataContainer.data = dd.ToRendererPart(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
 			//console.log(oAdditionalData["data"]);
 		}
 		else if (c_oAscFileType.JSON === filetype)
@@ -6916,7 +6929,7 @@ background-repeat: no-repeat;\
 				oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(oLogicDocument, false, true);
 			else
 				oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(oLogicDocument);
-			dataContainer.data = oBinaryFileWriter.Write();
+			dataContainer.data = oBinaryFileWriter.Write(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
 		}
 		if (null != options.oMailMergeSendData)
 		{
@@ -8786,6 +8799,8 @@ background-repeat: no-repeat;\
 	asc_CCommentDataWord.prototype['asc_putText']         = asc_CCommentDataWord.prototype.asc_putText;
 	asc_CCommentDataWord.prototype['asc_getTime']         = asc_CCommentDataWord.prototype.asc_getTime;
 	asc_CCommentDataWord.prototype['asc_putTime']         = asc_CCommentDataWord.prototype.asc_putTime;
+	asc_CCommentDataWord.prototype['asc_getOnlyOfficeTime']         = asc_CCommentDataWord.prototype.asc_getOnlyOfficeTime;
+	asc_CCommentDataWord.prototype['asc_putOnlyOfficeTime']         = asc_CCommentDataWord.prototype.asc_putOnlyOfficeTime;
 	asc_CCommentDataWord.prototype['asc_getUserId']       = asc_CCommentDataWord.prototype.asc_getUserId;
 	asc_CCommentDataWord.prototype['asc_putUserId']       = asc_CCommentDataWord.prototype.asc_putUserId;
 	asc_CCommentDataWord.prototype['asc_getUserName']     = asc_CCommentDataWord.prototype.asc_getUserName;

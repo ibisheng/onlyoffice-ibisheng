@@ -1516,10 +1516,11 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     this.Spelling = new CDocumentSpelling();
 
     // Дополнительные настройки
-    this.UseTextShd             = true;  // Использовать ли заливку текста
-    this.ForceCopySectPr        = false; // Копировать ли настройки секции, если родительский класс параграфа не документ
-    this.CopyNumberingMap       = null;  // Мап старый индекс -> новый индекс для копирования нумерации
-    this.CheckLanguageOnTextAdd = false; // Проверять ли язык при добавлении текста в ран
+    this.UseTextShd                = true;  // Использовать ли заливку текста
+    this.ForceCopySectPr           = false; // Копировать ли настройки секции, если родительский класс параграфа не документ
+    this.CopyNumberingMap          = null;  // Мап старый индекс -> новый индекс для копирования нумерации
+    this.CheckLanguageOnTextAdd    = false; // Проверять ли язык при добавлении текста в ран
+	this.RemoveCommentsOnPreDelete = false; // Удалять ли комментарий при удалением объекта
 
     // Мап для рассылки
     this.MailMergeMap             = null;
@@ -7105,7 +7106,7 @@ CDocument.prototype.OnKeyPress = function(e)
 
 	if (Code > 0x20)
 	{
-		if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true, this.IsFormFieldEditing()))
+		if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_AddText, null, true, this.IsFormFieldEditing()))
 		{
 			this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddLetter);
 
@@ -8572,6 +8573,11 @@ CDocument.prototype.GetSelectionState = function()
 	else
 	{
 		State = this.Controller.GetSelectionState();
+	}
+
+	if (null != this.Selection.Data && true === this.Selection.Data.TableBorder)
+	{
+		DocState.Selection.Data = null;
 	}
 
 	State.push(DocState);
@@ -15326,7 +15332,6 @@ CDocument.prototype.OnContentControlTrackEnd = function(Id, NearestPos, isCopy)
 };
 CDocument.prototype.AddContentControl = function(nContentControlType)
 {
-	this.EndDrawingEditing();
 	return this.Controller.AddContentControl(nContentControlType);
 };
 CDocument.prototype.GetAllContentControls = function()
@@ -15450,6 +15455,19 @@ CDocument.prototype.private_CheckCursorPosInFillingFormMode = function()
 		this.MoveToFillingForm(true);
 		this.Document_UpdateSelectionState();
 		this.Document_UpdateInterfaceState();
+	}
+};
+CDocument.prototype.OnEndLoadScript = function()
+{
+	this.Update_SectionsInfo();
+	this.Check_SectionLastParagraph();
+	this.Styles.Check_StyleNumberingOnLoad(this.Numbering);
+
+	var arrParagraphs = this.GetAllParagraphs({All : true});
+	for (var nIndex = 0, nCount = arrParagraphs.length; nIndex < nCount; ++nIndex)
+	{
+		arrParagraphs[nIndex].Recalc_CompiledPr();
+		arrParagraphs[nIndex].Recalc_RunsCompiledPr();
 	}
 };
 

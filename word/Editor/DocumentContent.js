@@ -7469,6 +7469,11 @@ CDocumentContent.prototype.GetSelectionState = function()
 		}
 	}
 
+	if (null != this.Selection.Data && true === this.Selection.Data.TableBorder)
+	{
+		DocState.Selection.Data = null;
+	}
+
 	State.push(DocState);
 	return State;
 };

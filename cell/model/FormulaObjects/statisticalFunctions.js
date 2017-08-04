@@ -68,14 +68,15 @@
 		cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
 		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
 		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
-		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMEDIAN, cMIN, cMINA, cMODE,
-		cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV, cNORM_INV, cNORMSDIST,
-		cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC, cPERCENTILE_INC, cPERCENTRANK,
-		cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON, cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC,
-		cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P, cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S,
-		cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST, cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV,
-		cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP, cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST,
-		cZ_TEST);
+		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN, cMINA,
+		cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
+		cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
+		cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON,
+		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
+		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
+		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP,
+		cVAR_P, cVAR_S, cVARPA, cWEIBULL,
+		cWEIBULL_DIST, cZTEST, cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
@@ -5002,6 +5003,216 @@
 			}
 		}
 		return this.value = ( max === Number.NEGATIVE_INFINITY ? new cNumber(0) : new cNumber(max) )
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cMAXIFS() {
+		this.name = "MAXIFS";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cMAXIFS.prototype = Object.create(cBaseFunction.prototype);
+	cMAXIFS.prototype.constructor = cMAXIFS;
+	cMAXIFS.prototype.argumentsMin = 3;
+	cMAXIFS.prototype.isXLFN = true;
+	cMAXIFS.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
+			cElementType.cellsRange !== arg0.type) {
+			if (cElementType.cellsRange3D === arg0.type) {
+				arg0 = arg0.tocArea();
+				if (!arg0) {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+			} else {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+		}
+
+		var arg0Matrix = arg0.getMatrix();
+		var i, j, arg1, arg2, matchingInfo;
+		for (var k = 1; k < arg.length; k += 2) {
+			arg1 = arg[k];
+			arg2 = arg[k + 1];
+
+			if (cElementType.cell !== arg1.type && cElementType.cell3D !== arg1.type &&
+				cElementType.cellsRange !== arg1.type) {
+				if (cElementType.cellsRange3D === arg1.type) {
+					arg1 = arg1.tocArea();
+					if (!arg1) {
+						return this.value = new cError(cErrorType.wrong_value_type);
+					}
+				} else {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+			}
+
+			if (cElementType.cellsRange === arg2.type || cElementType.cellsRange3D === arg2.type) {
+				arg2 = arg2.cross(arguments[1]);
+			} else if (cElementType.array === arg2.type) {
+				arg2 = arg2.getElementRowCol(0, 0);
+			}
+
+			arg2 = arg2.tocString();
+
+			if (cElementType.string !== arg2.type) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			matchingInfo = AscCommonExcel.matchingValue(arg2.toString());
+
+			var arg1Matrix = arg1.getMatrix();
+			if (arg0Matrix.length !== arg1Matrix.length) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			//compare
+			for (i = 0; i < arg1Matrix.length; ++i) {
+				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+				for (j = 0; j < arg1Matrix[i].length; ++j) {
+					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
+						//MS считает в данном случае, что значение 0 (из диапазона условий) соответсвует условию = ""
+						if(!(null === matchingInfo.op && "" === matchingInfo.val.value && 0 === arg1Matrix[i][j].value)){
+							arg0Matrix[i][j] = null;
+						}
+					}
+				}
+			}
+		}
+
+		var resArr = [];
+		var valMatrix0;
+		for (i = 0; i < arg0Matrix.length; ++i) {
+			for (j = 0; j < arg0Matrix[i].length; ++j) {
+				if ((valMatrix0 = arg0Matrix[i][j]) && cElementType.number === valMatrix0.type) {
+					resArr.push(valMatrix0.getValue());
+				}
+			}
+		}
+
+		if(0 === resArr.length){
+			return this.value = new cNumber(0);
+		}
+
+		resArr.sort(function(a, b) {
+			return b - a;
+		});
+
+		return this.value = new cNumber(resArr[0]);
+	};
+	cMAXIFS.prototype.checkArguments = function () {
+		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cMINIFS() {
+		this.name = "MINIFS";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cMINIFS.prototype = Object.create(cBaseFunction.prototype);
+	cMINIFS.prototype.constructor = cMINIFS;
+	cMINIFS.prototype.argumentsMin = 3;
+	cMINIFS.prototype.isXLFN = true;
+	cMINIFS.prototype.Calculate = function (arg) {
+		var arg0 = arg[0];
+		if (cElementType.cell !== arg0.type && cElementType.cell3D !== arg0.type &&
+			cElementType.cellsRange !== arg0.type) {
+			if (cElementType.cellsRange3D === arg0.type) {
+				arg0 = arg0.tocArea();
+				if (!arg0) {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+			} else {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+		}
+
+		var arg0Matrix = arg0.getMatrix();
+		var i, j, arg1, arg2, matchingInfo;
+		for (var k = 1; k < arg.length; k += 2) {
+			arg1 = arg[k];
+			arg2 = arg[k + 1];
+
+			if (cElementType.cell !== arg1.type && cElementType.cell3D !== arg1.type &&
+				cElementType.cellsRange !== arg1.type) {
+				if (cElementType.cellsRange3D === arg1.type) {
+					arg1 = arg1.tocArea();
+					if (!arg1) {
+						return this.value = new cError(cErrorType.wrong_value_type);
+					}
+				} else {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+			}
+
+			if (cElementType.cellsRange === arg2.type || cElementType.cellsRange3D === arg2.type) {
+				arg2 = arg2.cross(arguments[1]);
+			} else if (cElementType.array === arg2.type) {
+				arg2 = arg2.getElementRowCol(0, 0);
+			}
+
+			arg2 = arg2.tocString();
+
+			if (cElementType.string !== arg2.type) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			matchingInfo = AscCommonExcel.matchingValue(arg2.toString());
+
+			var arg1Matrix = arg1.getMatrix();
+			if (arg0Matrix.length !== arg1Matrix.length) {
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
+			//compare
+			for (i = 0; i < arg1Matrix.length; ++i) {
+				if (arg0Matrix[i].length !== arg1Matrix[i].length) {
+					return this.value = new cError(cErrorType.wrong_value_type);
+				}
+				for (j = 0; j < arg1Matrix[i].length; ++j) {
+					if (arg0Matrix[i][j] && !AscCommonExcel.matching(arg1Matrix[i][j], matchingInfo)) {
+						//MS считает в данном случае, что значение 0 (из диапазона условий) соответсвует условию = ""
+						if(!(null === matchingInfo.op && "" === matchingInfo.val.value && 0 === arg1Matrix[i][j].value)){
+							arg0Matrix[i][j] = null;
+						}
+					}
+				}
+			}
+		}
+
+		var resArr = [];
+		var valMatrix0;
+		for (i = 0; i < arg0Matrix.length; ++i) {
+			for (j = 0; j < arg0Matrix[i].length; ++j) {
+				if ((valMatrix0 = arg0Matrix[i][j]) && cElementType.number === valMatrix0.type) {
+					resArr.push(valMatrix0.getValue());
+				}
+			}
+		}
+
+		if(0 === resArr.length){
+			return this.value = new cNumber(0);
+		}
+
+		resArr.sort(function(a, b) {
+			return a - b;
+		});
+
+		return this.value = new cNumber(resArr[0]);
+	};
+	cMINIFS.prototype.checkArguments = function () {
+		return 1 === this.argumentsCurrent % 2 && cBaseFunction.prototype.checkArguments.apply(this, arguments);
 	};
 
 	/**

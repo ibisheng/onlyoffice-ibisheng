@@ -1789,14 +1789,14 @@ CHeaderFooterController.prototype =
 		return false;
 	},
 
-    Is_UseInDocument : function(Id)
-    {
-        var HdrFtr = g_oTableId.Get_ById( Id );
-        if ( -1 === this.LogicDocument.SectionsInfo.Find_ByHdrFtr( HdrFtr ) )
-            return false;        
+	Is_UseInDocument : function(Id)
+	{
+		var HdrFtr = g_oTableId.Get_ById(Id);
+		if (-1 === this.LogicDocument.SectionsInfo.Find_ByHdrFtr(HdrFtr))
+			return false;
 
-        return true;                
-    },
+		return true;
+	},
 
     Check_Page : function(HdrFtr, PageIndex)
     {

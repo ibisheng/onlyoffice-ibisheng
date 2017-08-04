@@ -2724,7 +2724,8 @@
 							oCell.formulaParsed.parse();
 							formulaShared[oFormulaExt.si] = {
 								fVal: oCell.formulaParsed,
-								fRef: AscCommonExcel.g_oRangeCache.getAscRange(oFormulaExt.ref)
+								fRef: AscCommonExcel.g_oRangeCache.getAscRange(oFormulaExt.ref),
+								fCell: oCell
 							};
 							if (!bNoBuildDep) {
 								oCell._BuildDependencies(false);
@@ -2734,7 +2735,7 @@
 						var fs = formulaShared[oFormulaExt.si];
 						if (fs && fs.fRef.contains(oCell.nCol, oCell.nRow)) {
 							if (fs.fVal.isParsed) {
-								var off = oCell.getOffset3(fs.fRef.c1 + 1, fs.fRef.r1 + 1);
+								var off = oCell.getOffset(fs.fCell);
 
 								oCell.formulaParsed = fs.fVal.clone(null, oCell, this);
 								oCell.formulaParsed.ca = oFormulaExt.ca;

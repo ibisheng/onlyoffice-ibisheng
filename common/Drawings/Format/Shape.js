@@ -3813,7 +3813,9 @@ CShape.prototype.hitInTextRect = function (x, y) {
 
     var bForceWord = ((this.isEmptyPlaceholder && this.isEmptyPlaceholder()) || (this.isPlaceholder && this.isPlaceholder() && oController && (AscFormat.getTargetTextObject(oController) === this)));
     if(bForceWord){
-        return this.hitInTextRectWord(x, y);
+        if(this.hitInTextRectWord(x, y)){
+            return true;
+        }
     }
     if(!this.txWarpStruct || !this.recalcInfo.warpGeometry ||
         this.recalcInfo.warpGeometry.preset === "textNoShape" ||
@@ -4147,7 +4149,7 @@ CShape.prototype.draw = function (graphics, transform, transformText, pageIndex)
         shape_drawer.fromShape2(this, graphics, this.spPr.geometry);
         shape_drawer.draw(this.spPr.geometry);
     }
-    if (this.isEmptyPlaceholder() && graphics.IsNoDrawingEmptyPlaceholder !== true)
+    if (!this.bWordShape && this.isEmptyPlaceholder() && !(this.pen && this.pen.Fill && this.pen.Fill.fill) && graphics.IsNoDrawingEmptyPlaceholder !== true)
     {
         var drawingObjects = this.getDrawingObjectsController();
         if (graphics.m_oContext !== undefined && graphics.IsTrack === undefined && (!drawingObjects || AscFormat.getTargetTextObject(drawingObjects) !== this ))
@@ -4928,6 +4930,9 @@ CShape.prototype.hitInInnerArea = function (x, y) {
 };
 
 CShape.prototype.hitInBoundingRect = function (x, y) {
+    if(this.parent && this.parent.kind === AscFormat.TYPE_KIND.NOTES){
+        return false;
+    }
     var invert_transform = this.getInvertTransform();
     var x_t = invert_transform.TransformPointX(x, y);
     var y_t = invert_transform.TransformPointY(x, y);

@@ -437,7 +437,8 @@
 				"userid"        : this.documentUserId,
 				"format"        : this.documentFormat,
 				"url"           : this.documentUrl,
-				"title"         : this.documentTitle
+				"title"         : this.documentTitle,
+				"nobase64"      : Asc.c_nNoBase64
 			};
 			if (versionHistory)
 			{
@@ -1277,11 +1278,14 @@
 
 		if (true)
 		{
-			this.checkLongActionCallback(function ()
-			{
-				document.body.removeChild(_elem);
-				_elem = null;
-			}, null);
+			var fCallback = function ()
+            {
+                document.body.removeChild(_elem);
+                _elem = null;
+            };
+			if(this.checkLongActionCallback(fCallback, null)){
+                fCallback();
+			}
 		}
 		else
 		{

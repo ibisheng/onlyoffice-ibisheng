@@ -2624,7 +2624,7 @@ function CDrawingDocument()
 		//console.log(ret);
 		return ret;
 	}
-	this.ToRendererPart = function ()
+	this.ToRendererPart = function (noBase64)
 	{
 		var watermark = this.m_oWordControl.m_oApi.watermarkDraw;
 
@@ -2673,7 +2673,11 @@ function CDrawingDocument()
 			this.m_oWordControl.m_oApi.ShowParaMarks = this.m_bOldShowMarks;
 		}
 
-		return renderer.Memory.GetBase64Memory();
+		if (noBase64) {
+			return renderer.Memory.GetData();
+		} else {
+			return renderer.Memory.GetBase64Memory();
+		}
 	}
 
 	this.StopRenderingPage = function (pageIndex)

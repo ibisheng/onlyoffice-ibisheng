@@ -499,7 +499,7 @@ ChangeAdjState.prototype =
     {
         if(this.drawingObjects.isViewMode() === false)
         {
-            var trackObjects = this.drawingObjects.arrTrackObjects;
+            var trackObjects = [].concat(this.drawingObjects.arrTrackObjects);
             var drawingObjects = this.drawingObjects;
             this.drawingObjects.checkSelectedObjectsAndCallback(function()
             {

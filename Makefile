@@ -11,12 +11,17 @@ GRUNT_ENV += PRODUCT_VERSION=$(PRODUCT_VERSION)
 GRUNT_ENV += BUILD_NUMBER=$(BUILD_NUMBER)
 
 WEBAPPS_DIR = web-apps
+
+ifeq ($(PRODUCT_NAME),documentserver-integration)
+WEBAPPS_DIR = web-apps-pro
+endif
+
 WEBAPPS = $(OUTPUT)/$(WEBAPPS_DIR)
-NODE_MODULES = build/node_modules ../web-apps/build/node_modules
-WEBAPPS_FILES += ../web-apps/deploy/web-apps/apps/api/documents/api.js
-WEBAPPS_FILES += ../web-apps/deploy/web-apps/apps/documenteditor/main/app.js
-WEBAPPS_FILES += ../web-apps/deploy/web-apps/apps/presentationeditor/main/app.js
-WEBAPPS_FILES += ../web-apps/deploy/web-apps/apps/spreadsheeteditor/main/app.js
+NODE_MODULES = build/node_modules ../$(WEBAPPS_DIR)/build/node_modules
+WEBAPPS_FILES += ../$(WEBAPPS_DIR)/deploy/web-apps/apps/api/documents/api.js
+WEBAPPS_FILES += ../$(WEBAPPS_DIR)/deploy/web-apps/apps/documenteditor/main/app.js
+WEBAPPS_FILES += ../$(WEBAPPS_DIR)/deploy/web-apps/apps/presentationeditor/main/app.js
+WEBAPPS_FILES += ../$(WEBAPPS_DIR)/deploy/web-apps/apps/spreadsheeteditor/main/app.js
 SDKJS_FILES += word/sdk-all.js
 SDKJS_FILES += cell/sdk-all.js
 SDKJS_FILES += slide/sdk-all.js

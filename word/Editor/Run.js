@@ -427,6 +427,38 @@ ParaRun.prototype.Add = function(Item, bMath)
 				return;
 			}
 		}
+
+		// Специальный код с обработкой выделения (highlight)
+		// Текст, который пишем до или после выделенного текста делаем без выделения.
+		if (!this.Is_Empty() && (0 === this.State.ContentPos || this.Content.length === this.State.ContentPos) && highlight_None !== this.Get_CompiledPr(false).HighLight)
+		{
+			var Parent = this.Get_Parent();
+			var RunPos = this.private_GetPosInParent(Parent);
+			if (null !== Parent && -1 !== RunPos)
+			{
+				if ((0 === this.State.ContentPos
+					&& (0 === RunPos
+					|| Parent.Content[RunPos - 1].Type !== para_Run
+					|| highlight_None === Parent.Content[RunPos - 1].Get_CompiledPr(false).HighLight))
+					|| (this.Content.length === this.State.ContentPos
+					&& (RunPos === Parent.Content.length - 1
+					|| para_Run !== Parent.Content[RunPos + 1].Type
+					|| highlight_None === Parent.Content[RunPos + 1].Get_CompiledPr(false).HighLight)
+					|| (RunPos === Parent.Content.length - 2
+					&& Parent instanceof Paragraph)))
+				{
+					var NewRun = this.private_SplitRunInCurPos();
+					if (NewRun)
+					{
+						NewRun.Set_HighLight(highlight_None);
+						NewRun.MoveCursorToStartPos();
+						NewRun.Add(Item, bMath);
+						NewRun.Make_ThisElementCurrent();
+						return;
+					}
+				}
+			}
+		}
 	}
 
     var TrackRevisions = false;

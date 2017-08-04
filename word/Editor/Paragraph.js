@@ -951,8 +951,23 @@ Paragraph.prototype.Check_MathPara = function(MathPos)
 	}
 
 	// Нумерация привязанная к формуле делает ее inline.
-	if (true !== MathParaChecker.Found && undefined !== this.Numbering_Get())
-		return false;
+	if (true !== MathParaChecker.Found)
+	{
+		if(this.bFromDocument)
+		{
+            if(undefined !== this.Numbering_Get())
+			{
+				return false;
+			}
+		}
+		else
+		{
+			if(undefined !== this.Get_CompiledPr2(false).ParaPr.Bullet)
+			{
+				return false;
+			}
+		}
+	}
 
 	if (true !== MathParaChecker.Result)
 		return false;
@@ -9423,6 +9438,9 @@ Paragraph.prototype.PreDelete = function()
 	// inline объектах в родительском классе, используемых в данном параграфе.
 	// Кроме этого, если тут начинались или заканчивались комметарии, то их тоже
 	// удаляем.
+
+	if (this.LogicDocument && true !== this.LogicDocument.RemoveCommentsOnPreDelete)
+		return;
 
 	for (var Index = 0; Index < this.Content.length; Index++)
 	{

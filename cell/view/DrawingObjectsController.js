@@ -509,7 +509,11 @@ DrawingObjectsController.prototype.getDrawingDocument = function()
 };
 DrawingObjectsController.prototype.convertPixToMM = function(pix)
 {
-    return this.drawingObjects ? this.drawingObjects.convertMetric(pix, 0, 3) : 0;
+    var _ret = this.drawingObjects ? this.drawingObjects.convertMetric(pix, 0, 3) : 0;
+    if(AscCommon.AscBrowser.isRetina){
+        _ret *= 2;
+    }
+    return _ret;
 };
 
 DrawingObjectsController.prototype.setParagraphNumbering = function(Bullet)

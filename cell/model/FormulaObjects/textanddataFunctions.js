@@ -59,7 +59,7 @@
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cASC, cBAHTTEXT, cCHAR, cCLEAN, cCODE, cCONCATENATE, cCONCAT, cDOLLAR, cEXACT,
 		cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cNUMBERVALUE, cPHONETIC, cPROPER, cREPLACE,
-		cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTRIM, cUPPER, cVALUE);
+		cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTEXTJOIN, cTRIM, cUPPER, cVALUE);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cASC, cBAHTTEXT, cJIS, cPHONETIC);
@@ -1787,6 +1787,93 @@
 		this.value = new cString(text);
 		this.value.numFormat = AscCommonExcel.cNumFormatNone;
 		return this.value;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cTEXTJOIN() {
+		this.name = "TEXTJOIN";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cTEXTJOIN.prototype = Object.create(cBaseFunction.prototype);
+	cTEXTJOIN.prototype.constructor = cTEXTJOIN;
+	cTEXTJOIN.prototype.argumentsMin = 3;
+	cTEXTJOIN.prototype.argumentsMax = 255;
+	cTEXTJOIN.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cTEXTJOIN.prototype.isXLFN = true;
+	cTEXTJOIN.prototype.Calculate = function (arg) {
+
+		var argClone = [arg[0], arg[1]];
+		argClone[1] = arg[1].tocBool();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var ignore_empty = argClone[1].toBool();
+		var delimiter = argClone[0];
+		var delimiterIter = 0;
+		//разделитель может быть в виде массива, где используются все его элементы
+		var delimiterArr = this._getOneDimensionalArray(delimiter);
+		//если хотя бы один элемент ошибка, то возвращаем ошибку
+		if(delimiterArr instanceof cError){
+			return this.value = delimiterArr;
+		}
+
+		var concatString = function(string1, string2){
+			var res = string1;
+			if("" === string2 && ignore_empty){
+				return res;
+			}
+			var isStartStr = string1 === "";
+			//выбираем разделитель из массива по порядку
+			var delimiterStr = isStartStr ? "" : delimiterArr[delimiterIter];
+			if(undefined === delimiterStr){
+				delimiterIter = 0;
+				delimiterStr = delimiterArr[delimiterIter];
+			}
+			if(!isStartStr){
+				delimiterIter++;
+			}
+			
+			res += delimiterStr + string2;
+			return res;
+		};
+
+		var arg0 = new cString(""), argI;
+		for (var i = 2; i < this.argumentsCurrent; i++) {
+			argI = arg[i];
+
+			var type = argI.type;
+			if(cElementType.cellsRange === type || cElementType.cellsRange3D === type || cElementType.array === type){
+				//получаем одномерный массив
+				argI = this._getOneDimensionalArray(argI);
+
+				//если хотя бы один элемент с ошибкой, возвращаем ошибку
+				if (argI instanceof cError) {
+					return this.value = argI;
+				}
+
+				for (var n = 0; n < argI.length; n++) {
+					arg0 = new cString(concatString(arg0.toString(), argI[n].toString()));
+				}
+
+			}else{
+				argI = argI.tocString();
+				if (argI instanceof cError) {
+					return this.value = argI;
+				}
+
+				arg0 = new cString(concatString(arg0.toString(), argI.toString()));
+			}
+		}
+
+		return this.value = arg0;
 	};
 
 	/**

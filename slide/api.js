@@ -1397,7 +1397,7 @@ background-repeat: no-repeat;\
 
 		if (true)
 		{
-			_innerHTML += "<div id=\"id_panel_notes\" class=\"block_elem\" style=\"background-color:#FFFFFF;\">\
+			_innerHTML += "<div id=\"id_panel_notes\" class=\"block_elem\" style=\"overflow:hidden;background-color:#FFFFFF;\">\
                                 <canvas id=\"id_notes\" class=\"block_elem\" style=\"-ms-touch-action: none;-webkit-user-select: none;background-color:#FFFFFF;z-index:1\"></canvas>\
                                 <canvas id=\"id_notes_overlay\" class=\"block_elem\" style=\"-ms-touch-action: none;-webkit-user-select: none;z-index:2\"></canvas>\
                                 <div id=\"id_vertical_scroll_notes\" style=\"left:0;top:0;width:16px;overflow:hidden;position:absolute;\">\
@@ -2050,7 +2050,8 @@ background-repeat: no-repeat;\
 					"c": "reopen",
 					"url": this.documentUrl,
 					"title": this.documentTitle,
-					"password": option.asc_getPassword()
+					"password": option.asc_getPassword(),
+					"nobase64": Asc.c_nNoBase64
 				};
 
 				sendCommand(this, null, v);
@@ -2481,9 +2482,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.paraApply = function(Props)
 	{
 		var _presentation = editor.WordControl.m_oLogicDocument;
-		if (_presentation.Slides[_presentation.CurPage])
+        var graphicObjects = _presentation.GetCurrentController();
+		if (graphicObjects)
 		{
-			var graphicObjects = _presentation.Slides[_presentation.CurPage].graphicObjects;
 			graphicObjects.checkSelectedObjectsAndCallback(function()
 			{
 
@@ -4288,6 +4289,7 @@ background-repeat: no-repeat;\
 		{
 			this.m_sText      = (undefined != obj.m_sText     ) ? obj.m_sText : "";
 			this.m_sTime      = (undefined != obj.m_sTime     ) ? obj.m_sTime : "";
+			this.m_sOOTime    = (undefined != obj.m_sOOTime   ) ? obj.m_sOOTime : "";
 			this.m_sUserId    = (undefined != obj.m_sUserId   ) ? obj.m_sUserId : "";
 			this.m_sQuoteText = (undefined != obj.m_sQuoteText) ? obj.m_sQuoteText : null;
 			this.m_bSolved    = (undefined != obj.m_bSolved   ) ? obj.m_bSolved : false;
@@ -4307,6 +4309,7 @@ background-repeat: no-repeat;\
 		{
 			this.m_sText      = "";
 			this.m_sTime      = "";
+			this.m_sOOTime    = "";
 			this.m_sUserId    = "";
 			this.m_sQuoteText = null;
 			this.m_bSolved    = false;
@@ -4330,6 +4333,14 @@ background-repeat: no-repeat;\
 	asc_CCommentData.prototype.asc_putTime         = function(v)
 	{
 		this.m_sTime = v;
+	};
+	asc_CCommentData.prototype.asc_getOnlyOfficeTime         = function()
+	{
+		return this.m_sOOTime;
+	};
+	asc_CCommentData.prototype.asc_putOnlyOfficeTime         = function(v)
+	{
+		this.m_sOOTime = v;
 	};
 	asc_CCommentData.prototype.asc_getUserId       = function()
 	{
@@ -5181,7 +5192,10 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sync_ShowForeignCursorLabel = function(UserId, X, Y, Color)
 	{
-
+		if (this.WordControl.m_oLogicDocument.IsFocusOnNotes())
+		{
+			Y += parseInt(this.WordControl.m_oNotesContainer.HtmlElement.style.top);
+		}
 		this.sendEvent("asc_onShowForeignCursorLabel", UserId, X, Y, new AscCommon.CColor(Color.r, Color.g, Color.b, 255));
 	};
 	asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
@@ -5847,7 +5861,10 @@ background-repeat: no-repeat;\
 		if (reporterStartObject && !this.isReporterMode)
 			this.DemonstrationReporterStart(reporterStartObject);
 
-		this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
+		if (this.reporterWindow)
+			this.WordControl.DemonstrationManager.StartWaitReporter(div_id, slidestart_num, true);
+		else
+			this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
 	};
 
 	asc_docs_api.prototype.EndDemonstration = function(isNoUseFullScreen)
@@ -5911,7 +5928,7 @@ background-repeat: no-repeat;\
 			};
 
 			this.reporterStartObject = null;
-			_this.reporterWindow.postMessage(JSON.stringify(_msg_), '*');
+			_this.sendToReporter(JSON.stringify(_msg_));
 
 			return;
 		}
@@ -5945,8 +5962,72 @@ background-repeat: no-repeat;\
 					_this.DemonstrationGoToSlide(_obj["slide"]);
 					break;
 				}
+				case "go_to_slide":
+				{
+					_this.WordControl.DemonstrationManager.GoToSlide(_obj["slide"]);
+					break;
+				}
+				case "start_show":
+				{
+					_this.WordControl.DemonstrationManager.EndWaitReporter();
+					break;
+				}
+				case "pointer_move":
+				{
+					_this.WordControl.DemonstrationManager.PointerMove(_obj["x"], _obj["y"], _obj["w"], _obj["h"]);
+					break;
+				}
+				case "pointer_remove":
+				{
+					_this.WordControl.DemonstrationManager.PointerRemove();
+					break;
+				}
 				default:
 					break;
+			}
+		}
+		catch (err)
+		{
+		}
+	};
+
+	asc_docs_api.prototype.sendToReporter = function(value)
+	{
+		if (this.reporterWindow)
+			this.reporterWindow.postMessage(value, "*");
+	};
+
+	asc_docs_api.prototype.sendFromReporter = function(value)
+	{
+		window.postMessage(value, "*");
+	};
+
+	asc_docs_api.prototype.DemonstrationToReporterMessages = function(e)
+	{
+		var _this = window.editor;
+
+		try
+		{
+			var _obj = JSON.parse(e.data);
+
+			if (undefined == _obj["main_command"])
+				return;
+
+			if (undefined !== _obj["keyCode"])
+			{
+				_this.WordControl.DemonstrationManager.onKeyDownCode(_obj["keyCode"]);
+			}
+			else if (undefined !== _obj["mouseUp"])
+			{
+				_this.WordControl.DemonstrationManager.onMouseUp({});
+			}
+			else if (undefined !== _obj["mouseWhell"])
+			{
+				_this.WordControl.DemonstrationManager.onMouseWheelDelta(_obj["mouseWhell"]);
+			}
+			else if (undefined !== _obj["resize"])
+			{
+				_this.WordControl.DemonstrationManager.Resize();
 			}
 		}
 		catch (err)
@@ -5992,7 +6073,7 @@ background-repeat: no-repeat;\
 		this.WordControl.DemonstrationManager.GoToSlide(slideNum);
 
 		if (this.isReporterMode)
-			window.postMessage("{ \"reporter_command\" : \"slide\", \"slide\" : " + slideNum + " }", "*");
+			this.sendFromReporter("{ \"reporter_command\" : \"slide\", \"slide\" : " + slideNum + " }");
 	};
 
 	asc_docs_api.prototype.SetDemonstrationModeOnly = function()
@@ -6248,6 +6329,18 @@ background-repeat: no-repeat;\
 		this.asc_setViewMode(this.isViewMode);
 
 		AscCommon.baseEditorsApi.prototype._onEndLoadSdk.call(this);
+
+		if (this.isReporterMode)
+		{
+			var _onbeforeunload = function ()
+			{
+				window.editor.EndDemonstration();
+			};
+			if (window.attachEvent)
+				window.attachEvent('onbeforeunload', _onbeforeunload);
+			else
+				window.addEventListener('beforeunload', _onbeforeunload, false);
+		}
 	};
 
 	asc_docs_api.prototype._downloadAs = function(filetype, actionType, options)
@@ -6272,6 +6365,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
+		oAdditionalData["nobase64"]     = Asc.c_nNoBase64;
 		if (DownloadType.Print === options.downloadType)
 		{
 			oAdditionalData["inline"] = 1;
@@ -6279,10 +6373,10 @@ background-repeat: no-repeat;\
 		if (c_oAscFileType.PDF == filetype)
 		{
 			var dd             = this.WordControl.m_oDrawingDocument;
-			dataContainer.data = dd.ToRendererPart();
+			dataContainer.data = dd.ToRendererPart(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
 		}
 		else
-			dataContainer.data = this.WordControl.SaveDocument();
+			dataContainer.data = this.WordControl.SaveDocument(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
 		var fCallback     = function(input)
 		{
 			var error = c_oAscError.ID.Unknown;
@@ -7127,6 +7221,8 @@ background-repeat: no-repeat;\
 	asc_CCommentData.prototype['asc_putText']         = asc_CCommentData.prototype.asc_putText;
 	asc_CCommentData.prototype['asc_getTime']         = asc_CCommentData.prototype.asc_getTime;
 	asc_CCommentData.prototype['asc_putTime']         = asc_CCommentData.prototype.asc_putTime;
+	asc_CCommentData.prototype['asc_getOnlyOfficeTime']         = asc_CCommentData.prototype.asc_getOnlyOfficeTime;
+	asc_CCommentData.prototype['asc_putOnlyOfficeTime']         = asc_CCommentData.prototype.asc_putOnlyOfficeTime;
 	asc_CCommentData.prototype['asc_getUserId']       = asc_CCommentData.prototype.asc_getUserId;
 	asc_CCommentData.prototype['asc_putUserId']       = asc_CCommentData.prototype.asc_putUserId;
 	asc_CCommentData.prototype['asc_getUserName']     = asc_CCommentData.prototype.asc_getUserName;

@@ -1065,10 +1065,22 @@ Slide.prototype =
                     this.notesShape.invertTransformText = AscCommon.global_MatrixTransformer.Invert(this.notesShape.transformText);
                     var Width = AscCommonSlide.GetNotesWidth();
                     oDocContent.Reset(0, 0, Width, 2000);
-                    oDocContent.Recalculate_Page(0, true);
+                    var CurPage = 0;
+                    var RecalcResult = recalcresult2_NextPage;
+                    while ( recalcresult2_End !== RecalcResult  )
+                        RecalcResult = oDocContent.Recalculate_Page( CurPage++, true );
                     this.notesShape.contentWidth = Width;
                     this.notesShape.contentHeight = 2000;
                 }
+                this.notesShape.transformText2 = this.notesShape.transformText;
+                this.notesShape.invertTransformText2 = this.notesShape.invertTransformText;
+                var oOldGeometry = this.notesShape.spPr.geometry;
+                this.notesShape.spPr.geometry = null;
+                this.notesShape.extX = Width;
+                this.notesShape.extX = 2000;
+                this.notesShape.recalculateContent2();
+                this.notesShape.spPr.geometry = oOldGeometry;
+                this.notesShape.pen = AscFormat.CreateNoFillLine();
             }
         }, this, []);
     },
@@ -1383,7 +1395,7 @@ Slide.prototype =
 
                     _wc.ParceAdditionalData(commentData);
 
-                    var comment = new CComment(undefined, new CCommentData());
+                    var comment = new CComment(this.slideComments, new CCommentData());
                     comment.setPosition(_wc.x / 25.4, _wc.y / 25.4);
                     _comments.push(comment);
                 }
@@ -1530,10 +1542,10 @@ AscFormat.CTextBody.prototype.Get_AbsoluteColumn = function(CurPage)
 AscFormat.CTextBody.prototype.checkCurrentPlaceholder = function()
 {
     var presentation = editor.WordControl.m_oLogicDocument;
-
-    if(presentation.Slides[presentation.CurPage])
+    var oCurController = presentation.GetCurrentController();
+    if(oCurController)
     {
-        return presentation.Slides[presentation.CurPage].graphicObjects.getTargetDocContent() === this.content;
+        return oCurController.getTargetDocContent() === this.content;
     }
     return false;
 };

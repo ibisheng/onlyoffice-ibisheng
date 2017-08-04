@@ -361,6 +361,9 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             this.endShapeId = null;
             this.endShapeIdx = null;
             for(var i = aDrawings.length-1; i > -1; --i) {
+                if(aDrawings[i] === this.originalObject){
+                    continue;
+                }
                 oConnectionInfo = aDrawings[i].findConnector(x, y);
                 if (oConnectionInfo) {
                     oNewShape = aDrawings[i];
@@ -370,6 +373,9 @@ function ResizeTrackShapeImage(originalObject, cardDirection, drawingsController
             }
             if(!this.oNewShape){
                 for(var i = aDrawings.length - 1; i > -1; --i){
+                    if(aDrawings[i] === this.originalObject){
+                        continue;
+                    }
                     var oCs = aDrawings[i].findConnectionShape(x, y);
                     if(oCs ){
                         this.oNewShape = oCs;

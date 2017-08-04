@@ -45,6 +45,8 @@
 	var c_oAscMaxRowHeight    = 409;
 	var c_nMaxConversionTime  = 900000;//depends on config
 	var c_nMaxDownloadTitleLen= 255;
+	var c_nNoBase64 = false;
+	var c_nVersionNoBase64 = 10;
 
 	//files type for Saving & DownloadAs
 	var c_oAscFileType = {
@@ -1045,6 +1047,7 @@
 	var changestype_None                      = 0; // Ничего не происходит с выделенным элементом (проверка идет через дополнительный параметр)
 	var changestype_Paragraph_Content         = 1; // Добавление/удаление элементов в параграф
 	var changestype_Paragraph_Properties      = 2; // Изменение свойств параграфа
+	var changestype_Paragraph_AddText         = 3; // Добавление текста
 	var changestype_Document_Content          = 10; // Добавление/удаление элементов в Document или в DocumentContent
 	var changestype_Document_Content_Add      = 11; // Добавление элемента в класс Document или в класс DocumentContent
 	var changestype_Document_SectPr           = 12; // Изменения свойств данной секции (размер страницы, поля и ориентация)
@@ -1127,6 +1130,8 @@
 	window['Asc']['c_oAscMaxRowHeight'] = window['Asc'].c_oAscMaxRowHeight = c_oAscMaxRowHeight;
     window['Asc']['c_nMaxConversionTime'] = window['Asc'].c_nMaxConversionTime = c_nMaxConversionTime;
 	window['Asc']['c_nMaxDownloadTitleLen'] = window['Asc'].c_nMaxDownloadTitleLen = c_nMaxDownloadTitleLen;
+	window['Asc']['c_nNoBase64'] = window['Asc'].c_nNoBase64 = c_nNoBase64;
+	window['Asc']['c_nVersionNoBase64'] = window['Asc'].c_nVersionNoBase64 = c_nVersionNoBase64;
 	window['Asc']['c_oAscFileType'] = window['Asc'].c_oAscFileType = c_oAscFileType;
 	prot                         = c_oAscFileType;
 	prot['UNKNOWN']              = prot.UNKNOWN;
@@ -1745,6 +1750,7 @@
 	window["AscCommon"].changestype_None                      = changestype_None;
 	window["AscCommon"].changestype_Paragraph_Content         = changestype_Paragraph_Content;
 	window["AscCommon"].changestype_Paragraph_Properties      = changestype_Paragraph_Properties;
+	window["AscCommon"].changestype_Paragraph_AddText         = changestype_Paragraph_AddText;
 	window["AscCommon"].changestype_Document_Content          = changestype_Document_Content;
 	window["AscCommon"].changestype_Document_Content_Add      = changestype_Document_Content_Add;
 	window["AscCommon"].changestype_Document_SectPr           = changestype_Document_SectPr;

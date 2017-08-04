@@ -307,11 +307,11 @@ function CBinaryFileWriter()
         this.pos += lCount;
     };
 
-    this.WriteMainPart = function()
+    this.WriteMainPart = function(startPos)
     {
         var _pos = this.pos;
 
-        this.pos = 0;
+        this.pos = startPos;
         var _count = this.m_arMainTables.length;
 
         for (var i = 0; i < _count; i++)
@@ -466,6 +466,7 @@ function CBinaryFileWriter()
         this.font_map = {};
         this.image_map = {};
 
+        var startPos = this.GetCurPosition();
         this.WriteReserved(5 * 30);
 
         // main
@@ -859,7 +860,7 @@ function CBinaryFileWriter()
         this.EndRecord();
 
         // теперь запишем информацию о главных таблицах
-        this.WriteMainPart();
+        this.WriteMainPart(startPos);
     }
 
     this.WriteDocument = function(presentation)
@@ -870,6 +871,30 @@ function CBinaryFileWriter()
         var ret = "PPTY;v1;" + this.pos + ";";
         return ret + this.GetBase64Memory();
     }
+	
+	this.WriteDocument3 = function(presentation) {
+		var _memory = new AscCommon.CMemory(true);
+		_memory.ImData = this.ImData;
+		_memory.data = this.data;
+		_memory.len = this.len;
+		_memory.pos = this.pos;
+
+		_memory.WriteXmlString("PPTY;v" + Asc.c_nVersionNoBase64 + ";0;");
+
+		this.ImData = _memory.ImData;
+		this.data = _memory.data;
+		this.len = _memory.len;
+		this.pos = _memory.pos;
+		
+		this.WriteDocument2(presentation);
+		
+		_memory.ImData = this.ImData;
+		_memory.data = this.data;
+		_memory.len = this.len;
+		_memory.pos = this.pos;
+		
+		return _memory.GetData();
+	}
 
     this.WriteApp = function(app)
     {

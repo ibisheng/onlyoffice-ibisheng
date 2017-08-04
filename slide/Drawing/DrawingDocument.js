@@ -691,7 +691,8 @@ function CDrawingCollaborativeTarget()
 	this.HtmlElementY = 0;
 
 	this.Style = "";
-	this.IsInsertToDOM = false;
+	this.HtmlParentId = -1; // 0 - main, 1 - notes
+	this.HtmlParent = null;
 }
 CDrawingCollaborativeTarget.prototype =
 {
@@ -732,8 +733,12 @@ CDrawingCollaborativeTarget.prototype =
 		var _oldW = this.HtmlElement.width;
 		var _oldH = this.HtmlElement.height;
 
+		var isNotes = _drawing_doc.m_oWordControl.m_oLogicDocument.IsFocusOnNotes();
+
 		var _newW = 2;
 		var _newH = (this.Size * _drawing_doc.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100) >> 0;
+		if (isNotes)
+			_newH = (this.Size * g_dKoef_mm_to_pix) >> 0;
 
 		if (null != this.Transform && !global_MatrixTransformer.IsIdentity2(this.Transform))
 		{
@@ -829,7 +834,16 @@ CDrawingCollaborativeTarget.prototype =
 				_y += this.Transform.ty;
 			}
 
-			var pos = _drawing_doc.ConvertCoordsToCursor(_x, _y);
+			var pos = null;
+			if (!isNotes)
+			{
+				pos = _drawing_doc.ConvertCoordsToCursor(_x, _y);
+			}
+			else
+			{
+				var _offsetX = _drawing_doc.m_oWordControl.m_oNotesApi.OffsetX;
+				pos = { X : (AscCommon.AscBrowser.convertToRetinaValue(_offsetX) + _x * g_dKoef_mm_to_pix), Y : (_y * g_dKoef_mm_to_pix - _drawing_doc.m_oWordControl.m_oNotesApi.Scroll) };
+			}
 
 			this.HtmlElementX           = pos.X >> 0;
 			this.HtmlElementY           = pos.Y >> 0;
@@ -842,10 +856,19 @@ CDrawingCollaborativeTarget.prototype =
 			AscCommon.CollaborativeEditing.Update_ForeignCursorLabelPosition(this.Id, this.HtmlElementX, this.HtmlElementY, this.Color);
 
 		// 3) добавить, если нужно
-		if (bIsHtmlElementCreate)
+		var HtmlParentIdNew = isNotes ? 1 : 0;
+		if (this.HtmlParent && (HtmlParentIdNew != this.HtmlParentId))
 		{
-			_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.HtmlElement);
-			this.IsInsertToDOM = true;
+			this.HtmlParent.removeChild(this.HtmlElement);
+			this.HtmlParent = null;
+			this.HtmlParentId = -1;
+		}
+
+		if (bIsHtmlElementCreate || (-1 == this.HtmlParentId))
+		{
+			this.HtmlParent = (0 == HtmlParentIdNew) ? _drawing_doc.m_oWordControl.m_oMainView.HtmlElement : _drawing_doc.m_oWordControl.m_oNotesContainer.HtmlElement;
+			this.HtmlParentId = HtmlParentIdNew;
+			this.HtmlParent.appendChild(this.HtmlElement);
 		}
 
 		if (this.HtmlElement.style.display != "block")
@@ -856,10 +879,12 @@ CDrawingCollaborativeTarget.prototype =
 
 	Remove : function(_drawing_doc)
 	{
-		if (this.IsInsertToDOM)
+		if (this.HtmlParent)
 		{
-			_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
-			this.IsInsertToDOM = false;
+			//_drawing_doc.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.HtmlElement);
+			this.HtmlParent.removeChild(this.HtmlElement);
+			this.HtmlParent = null;
+			this.HtmlParentId = -1;
 		}
 	},
 
@@ -953,6 +978,8 @@ function CDrawingDocument()
 
 	this.AutoShapesTrack = null;
 	this.TransitionSlide = new CTransitionAnimation(null);
+
+	this.isDrawingNotes = false;
 
 	this.MoveTargetInInputContext = function()
 	{
@@ -1159,7 +1186,7 @@ function CDrawingDocument()
 		this.m_oWordControl.m_oApi.ShowParaMarks = old_marks;
 		return ret;
 	}
-	this.ToRendererPart = function()
+	this.ToRendererPart = function(noBase64)
 	{
 		var watermark = this.m_oWordControl.m_oApi.watermarkDraw;
 
@@ -1213,7 +1240,11 @@ function CDrawingDocument()
 			this.m_oWordControl.m_oApi.ShowParaMarks = this.m_bOldShowMarks;
 		}
 
-		return renderer.Memory.GetBase64Memory();
+		if (noBase64) {
+			return renderer.Memory.GetData();
+		} else {
+			return renderer.Memory.GetBase64Memory();
+		}
 	}
 
 	this.SendChangeDocumentToApi = function(bIsAttack)
@@ -1677,20 +1708,39 @@ function CDrawingDocument()
 	this.ConvertCoordsToCursorWR = function(x, y, pageIndex, transform)
 	{
 		var _word_control = this.m_oWordControl;
-		var dKoef         = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
 
-		var __x = x;
-		var __y = y;
-		if (transform)
+		if (!_word_control.m_oLogicDocument.IsFocusOnNotes())
 		{
-			__x = transform.TransformPointX(x, y);
-			__y = transform.TransformPointY(x, y);
+			var dKoef = (this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+
+			var __x = x;
+			var __y = y;
+			if (transform)
+			{
+				__x = transform.TransformPointX(x, y);
+				__y = transform.TransformPointY(x, y);
+			}
+
+			var x_pix = (this.SlideCurrectRect.left + __x * dKoef + (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
+			var y_pix = (this.SlideCurrectRect.top + __y * dKoef + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
+
+			return {X: x_pix, Y: y_pix, Error: false};
 		}
+		else
+		{
+			var __x = x;
+			var __y = y;
+			if (transform)
+			{
+				__x = transform.TransformPointX(x, y);
+				__y = transform.TransformPointY(x, y);
+			}
 
-		var x_pix = (this.SlideCurrectRect.left + __x * dKoef + (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oMainView.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
-		var y_pix = (this.SlideCurrectRect.top + __y * dKoef + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oMainView.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
+			var x_pix = (__x * g_dKoef_mm_to_pix + 10 + (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oNotesContainer.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
+			var y_pix = (__y * g_dKoef_mm_to_pix + 10 + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oNotesContainer.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
 
-		return {X : x_pix, Y : y_pix, Error : false};
+			return {X: x_pix, Y: y_pix, Error: false};
+		}
 	}
 
 	this.ConvertCoordsToCursor3 = function (x, y, isGlobal)
@@ -1904,7 +1954,7 @@ function CDrawingDocument()
 
 			if (!isFocusOnSlide)
 			{
-				pos.X = x * g_dKoef_mm_to_pix + this.m_oWordControl.m_oNotesApi.OffsetX;
+				pos.X = x * g_dKoef_mm_to_pix + AscCommon.AscBrowser.convertToRetinaValue(this.m_oWordControl.m_oNotesApi.OffsetX);
 				pos.Y = y * g_dKoef_mm_to_pix - this.m_oWordControl.m_oNotesApi.Scroll;
 			}
 
@@ -2207,7 +2257,7 @@ function CDrawingDocument()
 		if (this.m_oWordControl.IsSupportNotes && this.m_oWordControl.m_oNotesApi && this.m_oLogicDocument.IsFocusOnNotes())
 		{
 			overlay = this.m_oWordControl.m_oNotesApi.m_oOverlayApi;
-			xDst = this.m_oWordControl.m_oNotesApi.OffsetX;
+			xDst = AscCommon.AscBrowser.convertToRetinaValue(this.m_oWordControl.m_oNotesApi.OffsetX);
 			yDst = -this.m_oWordControl.m_oNotesApi.Scroll;
 			dKoefX = g_dKoef_mm_to_pix;
 			dKoefY = g_dKoef_mm_to_pix;
@@ -2542,7 +2592,9 @@ function CDrawingDocument()
 	}
 	this.GetDotsPerMM     = function(value)
 	{
-		return value * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
+		if (!this.isDrawingNotes)
+			return value * this.m_oWordControl.m_nZoomValue * g_dKoef_mm_to_pix / 100;
+		return value * g_dKoef_mm_to_pix;
 	}
 
 	this.GetMMPerDot        = function(value)
@@ -2673,8 +2725,19 @@ function CDrawingDocument()
 		if (-1 != this.SlideCurrent)
 		{
 			_slide  = this.m_oWordControl.m_oLogicDocument.Slides[this.SlideCurrent];
-			_layout = _slide.Layout;
-			_master = _layout.Master;
+			if(!_slide){
+				return;
+			}
+			if( this.m_oWordControl.m_oLogicDocument.FocusOnNotes){
+				if(!_slide.notes){
+					return;
+				}
+                _master = _slide.notes.Master;
+			}
+			else{
+                _layout = _slide.Layout;
+                _master = _layout.Master;
+			}
 		}
 		else if ((0 < this.m_oWordControl.m_oLogicDocument.slideMasters.length) &&
 			(0 < this.m_oWordControl.m_oLogicDocument.slideMasters[0].sldLayoutLst.length))
@@ -5636,15 +5699,21 @@ function CNotesDrawer(page)
 		if (this.HtmlPage.bIsRetinaSupport)
 			g.IsRetina = true;
 
+		g.SaveGrState();
+
 		g.m_oCoordTransform.tx = this.OffsetX;
-		g.m_oCoordTransform.ty = -this.Scroll;
+		g.m_oCoordTransform.ty = AscCommon.AscBrowser.convertToRetinaValue(-this.Scroll, true);
 		g.transform(1, 0, 0, 1, 0, 0);
 
-		g.IsNoDrawingEmptyPlaceholder = true;
-		g.IsNoDrawingEmptyPlaceholderText = true;
+		//g.IsNoDrawingEmptyPlaceholder = true;
+		//g.IsNoDrawingEmptyPlaceholderText = true;
 
+		this.HtmlPage.m_oDrawingDocument.isDrawingNotes = true;
 		this.HtmlPage.m_oLogicDocument.Notes_Draw(this.Slide, g);
+		this.HtmlPage.m_oDrawingDocument.isDrawingNotes = false;
 		this.IsRepaint = false;
+
+		g.RestoreGrState();
 	};
 
 	this.OnRecalculateNote = function (slideNum, width, height)
@@ -5672,7 +5741,7 @@ function CNotesDrawer(page)
 			scrollerMinHeight: 5
 		};
 
-		if (this.bIsRetinaSupport)
+		if (this.HtmlPage.bIsRetinaSupport)
 		{
 			settings.screenW = AscCommon.AscBrowser.convertToRetinaValue(settings.screenW);
 			settings.screenH = AscCommon.AscBrowser.convertToRetinaValue(settings.screenH);
@@ -5894,9 +5963,10 @@ function CNotesDrawer(page)
 
 	this.GetNotesWidth = function()
 	{
-		var _pix_width = this.HtmlPage.m_oNotes.HtmlElement.width - 20;
+		var _pix_width = this.HtmlPage.m_oNotes.HtmlElement.width - AscCommon.AscBrowser.convertToRetinaValue(20, true);
 		if (_pix_width < 10)
 			_pix_width = 10;
+		_pix_width = AscCommon.AscBrowser.convertToRetinaValue(_pix_width);
 		return _pix_width / g_dKoef_mm_to_pix;
 	};
 }

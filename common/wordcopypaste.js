@@ -3910,6 +3910,12 @@ PasteProcessor.prototype =
 						    var oNotes = loader.ReadNote();
 						    oNotes.setNotesMaster(loader.presentation.notesMasters[0]);
 						    arr_slides[i].setNotes(oNotes);
+                            arr_slides[i].notes.setSlide(arr_slides[i]);
+                        }
+                        else{
+                            arr_slides[i].setNotes(AscCommonSlide.CreateNotes());
+                            arr_slides[i].notes.setNotesMaster(loader.presentation.notesMasters[0]);
+                            arr_slides[i].notes.setSlide(arr_slides[i]);
                         }
 						var sp_tree = arr_slides[i].cSld.spTree;
 						var t = 0;
@@ -4209,8 +4215,8 @@ PasteProcessor.prototype =
 				arrShapes[arrShapes.length] = new DrawingCopyObject(shape, 0, 0, w, h);
 			}
 			var presentation = editor.WordControl.m_oLogicDocument;
-			var slide = presentation.Slides[presentation.CurPage];
-			var targetDocContent = slide.graphicObjects.getTargetDocContent();
+			var oController = presentation.GetCurrentController();
+			var targetDocContent =  oController  && oController.getTargetDocContent();
 			if(targetDocContent && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
 			{
 				if(presentation.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
@@ -7875,7 +7881,13 @@ PasteProcessor.prototype =
 					}
                 }
             }
-			
+
+			//TODO временная правка. пересмотреть обработку тега math
+			if(!child.style && Node.TEXT_NODE !== child.nodeType)
+			{
+				child.style = {};
+			}
+
 			if(!isPasteHyperlink)
 				bAddParagraph = this._ExecutePresentation(child, Common_CopyObj(pPr), false, bAddParagraph, bIsBlockChild || bInBlock, arrShapes, arrImages, arrTables);
 			

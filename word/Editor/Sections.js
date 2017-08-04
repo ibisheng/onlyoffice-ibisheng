@@ -1040,6 +1040,8 @@ CSectionPr.prototype.SetColumnProps = function(ColumnsProps)
 		this.Set_Columns_Num(ColumnsProps.get_Num());
 		this.Set_Columns_Space(ColumnsProps.get_Space());
 	}
+
+	this.Set_Columns_Sep(ColumnsProps.get_Sep());
 };
 
 function CSectionPageSize()

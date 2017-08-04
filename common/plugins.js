@@ -490,10 +490,13 @@
 													window.g_asc_plugins.images_rename);
 											}
 											delete window.g_asc_plugins.images_rename;
-											window.g_asc_plugins.api.asc_Recalculate();
+
 											if(AscCommon.c_oEditorId.Word === editorId) {
 												oLogicDocument.UnlockPanelStyles(true);
+												oLogicDocument.OnEndLoadScript();
 											}
+
+											window.g_asc_plugins.api.asc_Recalculate();
 
 											var pluginData = new CPluginData();
 											pluginData.setAttribute("guid", guid);
