@@ -6488,6 +6488,9 @@ CT_PivotField.prototype.toXml = function(writer, name) {
 CT_PivotField.prototype.asc_getName = function () {
 	return this.name;
 };
+CT_PivotField.prototype.asc_getSubtotalTop = function () {
+	return null !== this.subtotalTop ? this.subtotalTop : true;
+};
 CT_PivotField.prototype.getItem = function (index) {
 	return this.items && this.items.item[index];
 };
@@ -10328,6 +10331,7 @@ prot["asc_getName"] = prot.asc_getName;
 
 prot = CT_PivotField.prototype;
 prot["asc_getName"] = prot.asc_getName;
+prot["asc_getSubtotalTop"] = prot.asc_getSubtotalTop;
 
 prot = CT_Field.prototype;
 prot["asc_getIndex"] = prot.asc_getIndex;
