@@ -424,6 +424,42 @@ function ToXml_ST_ItemType(val) {
 	return res;
 }
 
+function ToName_ST_ItemType(val) {
+	var res = ' ';
+	if (c_oAscItemType.Data === val) {
+		res += "data";
+	} else if (c_oAscItemType.Default === val) {
+		res += 'Total';
+	} else if (c_oAscItemType.Sum === val) {
+		res = 'Sum';
+	} else if (c_oAscItemType.CountA === val) {
+		res = 'Count';
+	} else if (c_oAscItemType.Avg === val) {
+		res = 'Average';
+	} else if (c_oAscItemType.Max === val) {
+		res = 'Max';
+	} else if (c_oAscItemType.Min === val) {
+		res = 'Min';
+	} else if (c_oAscItemType.Product === val) {
+		res = 'Product';
+	} else if (c_oAscItemType.Count === val) {
+		res = 'Count';
+	} else if (c_oAscItemType.StdDev === val) {
+		res = 'StdDev';
+	} else if (c_oAscItemType.StdDevP === val) {
+		res = 'StdDevp';
+	} else if (c_oAscItemType.Var === val) {
+		res = 'Var';
+	} else if (c_oAscItemType.VarP === val) {
+		res = 'Varp';
+	} else if (c_oAscItemType.Grand === val) {
+		res += 'Total';
+	} else if (c_oAscItemType.Blank === val) {
+		res = "blank";
+	}
+	return res;
+}
+
 function FromXml_ST_DataConsolidateFunction(val) {
 	var res = -1;
 	if ("average" === val) {
@@ -10292,6 +10328,8 @@ prot['Day'] = prot.Day;
 prot['Hour'] = prot.Hour;
 prot['Minute'] = prot.Minute;
 prot['Second'] = prot.Second;
+
+window['AscCommonExcel'].ToName_ST_ItemType = ToName_ST_ItemType;
 
 prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
