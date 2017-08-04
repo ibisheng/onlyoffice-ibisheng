@@ -50,7 +50,7 @@
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
-	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cIFNA, cNOT, cOR, cTRUE, cXOR);
+	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cIFNA, cNOT, cOR, cSWITCH, cTRUE, cXOR);
 
 	/**
 	 * @constructor
@@ -355,6 +355,52 @@
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 		return this.value = argResult;
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSWITCH() {
+		this.name = "SWITCH";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cSWITCH.prototype = Object.create(cBaseFunction.prototype);
+	cSWITCH.prototype.constructor = cSWITCH;
+	cSWITCH.prototype.argumentsMin = 3;
+	cSWITCH.prototype.argumentsMax = 126;
+	cSWITCH.prototype.isXLFN = true;
+	cSWITCH.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var arg0 = argClone[0].getValue();
+		var res = null;
+		for(var i = 1; i < this.argumentsCurrent; i++){
+			var argN = argClone[i].getValue();
+			if(arg0 === argN){
+				if(!argClone[i + 1]){
+					return this.value = cErrorType.not_available;
+				}else{
+					res = argClone[i + 1];
+					break;
+				}
+			}
+			i++;
+		}
+
+		if(null === res){
+			return this.value = new cError(cErrorType.not_available);
+		}
+
+		return this.value = res;
 	};
 
 	/**
