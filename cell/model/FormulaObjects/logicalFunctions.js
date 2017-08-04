@@ -48,6 +48,7 @@
 	var cArray = AscCommonExcel.cArray;
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+	var cElementType = AscCommonExcel.cElementType;
 
 	cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
 	cFormulaFunctionGroup['Logical'].push(cAND, cFALSE, cIF, cIFERROR, cIFNA, cNOT, cOR, cSWITCH, cTRUE, cXOR);
@@ -382,6 +383,10 @@
 		}
 
 		var arg0 = argClone[0].getValue();
+		if(cElementType.cell === argClone[0].type || cElementType.cell3D === argClone[0].type){
+			arg0 = arg0.getValue()
+		}
+		
 		var res = null;
 		for(var i = 1; i < this.argumentsCurrent; i++){
 			var argN = argClone[i].getValue();
@@ -392,6 +397,9 @@
 					res = argClone[i + 1];
 					break;
 				}
+			}
+			if(i === this.argumentsCurrent - 1){
+				res = argClone[i];
 			}
 			i++;
 		}
