@@ -410,6 +410,34 @@
 		return true;
 	}
 
+	function weekNumber(dt, iso, type) {
+		dt.setUTCHours(0, 0, 0);
+		var startOfYear = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
+		var endOfYear = new Date(dt);
+		endOfYear.setUTCMonth(11);
+		endOfYear.setUTCDate(31);
+		var wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()]) / 7);
+		if (type) {
+			switch (wk) {
+				case 0:
+					// Возвращаем номер недели от 31 декабря предыдущего года
+					startOfYear.setUTCDate(0);
+					return weekNumber(startOfYear, iso, type);
+				case 53:
+					// Если 31 декабря выпадает до четверга 1 недели следующего года
+					if (endOfYear.getUTCDay() < 4) {
+						return new cNumber(1);
+					} else {
+						return new cNumber(wk);
+					}
+				default:
+					return new cNumber(wk);
+			}
+		} else {
+			wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()] + 7) / 7);
+			return new cNumber(wk);
+		}
+	}
 
 	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
 	cFormulaFunctionGroup['DateAndTime'].push(cDATE, cDATEDIF, cDATEVALUE, cDAY, cDAYS, cDAYS360, cEDATE, cEOMONTH,
@@ -1043,39 +1071,10 @@
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
-		function WeekNumber(dt, iso, type) {
-			dt.setUTCHours(0, 0, 0);
-			var startOfYear = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
-			var endOfYear = new Date(dt);
-			endOfYear.setUTCMonth(11);
-			endOfYear.setUTCDate(31);
-			var wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()]) / 7);
-			if (type) {
-				switch (wk) {
-					case 0:
-						// Возвращаем номер недели от 31 декабря предыдущего года
-						startOfYear.setUTCDate(0);
-						return WeekNumber(startOfYear, iso, type);
-					case 53:
-						// Если 31 декабря выпадает до четверга 1 недели следующего года
-						if (endOfYear.getUTCDay() < 4) {
-							return new cNumber(1);
-						} else {
-							return new cNumber(wk);
-						}
-					default:
-						return new cNumber(wk);
-				}
-			} else {
-				wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()] + 7) / 7);
-				return new cNumber(wk);
-			}
-		}
-
 		var weekdayStartDay = [0, 1, 2, 3, 4, 5, 6];
 		var type = 0;
 		return this.value =
-			new cNumber(WeekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
+			new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
 	};
 
 	/**
@@ -1659,35 +1658,6 @@
 	cWEEKNUM.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(1), type = 0;
 
-		function WeekNumber(dt, iso, type) {
-			dt.setUTCHours(0, 0, 0);
-			var startOfYear = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
-			var endOfYear = new Date(dt);
-			endOfYear.setUTCMonth(11);
-			endOfYear.setUTCDate(31);
-			var wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()]) / 7);
-			if (type) {
-				switch (wk) {
-					case 0:
-						// Возвращаем номер недели от 31 декабря предыдущего года
-						startOfYear.setUTCDate(0);
-						return WeekNumber(startOfYear, iso, type);
-					case 53:
-						// Если 31 декабря выпадает до четверга 1 недели следующего года
-						if (endOfYear.getUTCDay() < 4) {
-							return new cNumber(1);
-						} else {
-							return new cNumber(wk);
-						}
-					default:
-						return new cNumber(wk);
-				}
-			} else {
-				wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()] + 7) / 7);
-				return new cNumber(wk);
-			}
-		}
-
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
@@ -1751,7 +1721,7 @@
 		}
 
 		return this.value =
-			new cNumber(WeekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
+			new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
 
 	};
 
