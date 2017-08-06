@@ -3346,7 +3346,6 @@ function CDrawingDocument()
 
 	this.Notes_OnRecalculate = function(slideNum, width, height)
 	{
-		console.log('Notes_OnRecalculate: ' +  slideNum);
 		if (!this.m_oWordControl.IsSupportNotes)
 			return;
 
