@@ -546,6 +546,7 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
     var Page    = this.Pages[CurPage];
     var PageAbs = this.private_GetAbsolutePageIndex(CurPage);
 
+    var H;
     switch (this.Selection.Type)
     {
         case table_Selection_Cell:
@@ -556,8 +557,6 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
                 var Row      = this.Content[Pos.Row];
                 var Cell     = Row.Get_Cell(Pos.Cell);
                 var CellInfo = Row.Get_CellInfo(Pos.Cell);
-                var CellMar  = Cell.GetMargins();
-
                 var X_start = Page.X + CellInfo.X_cell_start;
                 var X_end   = Page.X + CellInfo.X_cell_end;
 
@@ -565,9 +564,6 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
                 var Cell_PageRel = CurPage - Cell.Content.Get_StartPage_Relative();
                 if (Cell_PageRel < 0 || Cell_PageRel >= Cell_Pages)
                     continue;
-
-                var Bounds   = Cell.Content_Get_PageBounds(Cell_PageRel);
-                var Y_offset = Cell.Temp.Y_VAlign_offset[Cell_PageRel];
 
                 if (0 != Cell_PageRel)
                 {
@@ -577,7 +573,23 @@ CTable.prototype.DrawSelectionOnPage = function(CurPage)
                 }
                 else
                 {
-                    this.DrawingDocument.AddPageSelection(PageAbs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage], X_end - X_start, this.RowsInfo[Pos.Row].H[CurPage] );
+                    H = this.RowsInfo[Pos.Row].H[CurPage];
+                    for(var i = Pos.Row + 1; i < this.Content.length; ++i){
+                        var Row2      = this.Content[i];
+                        var Cell2     = Row2.Get_Cell(Pos.Cell);
+
+                        if(!Cell2){
+                            break;
+                        }
+                        var VMerge = Cell2.Get_VMerge();
+                        if (vmerge_Continue === VMerge){
+                            H += this.RowsInfo[i].H[CurPage];
+                        }
+                        else{
+                            break;
+                        }
+                    }
+                    this.DrawingDocument.AddPageSelection(PageAbs, X_start, this.RowsInfo[Pos.Row].Y[CurPage] + this.RowsInfo[Pos.Row].TopDy[CurPage], X_end - X_start, H );
                 }
 
 
