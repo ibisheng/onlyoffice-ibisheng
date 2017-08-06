@@ -3559,6 +3559,9 @@ CPresentation.prototype =
 
     Notes_OnMouseUp : function(e, X, Y)
     {
+        if(!this.FocusOnNotes){
+            return;
+        }
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide && oCurSlide.notes){
             e.ctrlKey = e.CtrlKey;
@@ -3581,6 +3584,9 @@ CPresentation.prototype =
 
     Notes_OnMouseMove : function(e, X, Y)
     {
+       // if(!this.FocusOnNotes){
+       //     return;
+       // }
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             if(oCurSlide.notes){
@@ -4265,18 +4271,17 @@ CPresentation.prototype =
             return;
         }
 
-        var oldCurPage = this.CurPage;
-        this.CurPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
-        if(oldCurPage != this.CurPage && this.CurPage < this.Slides.length)
+        var nNewCurrentPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
+        if(nNewCurrentPage !== this.CurPage && this.CurPage < this.Slides.length)
         {
+            var oCurrentController = this.GetCurrentController();
+            if(oCurrentController){
+                oCurrentController.resetSelectionState();
+            }
+            this.CurPage = nNewCurrentPage;
             this.FocusOnNotes = false;
-            if(this.Slides[oldCurPage])
-            {
-                this.Slides[oldCurPage].graphicObjects.resetSelectionState();
-            }
-            if(!this.Notes_OnResize()){
-                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
-            }
+            this.Notes_OnResize();
+            this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
             editor.asc_hideComments();
             this.Document_UpdateInterfaceState();
         }
