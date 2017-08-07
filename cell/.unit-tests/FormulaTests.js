@@ -2767,6 +2767,36 @@ $( function () {
 
     } );
 
+	test( "Test: \"ISOWEEKNUM\"", function () {
+
+		ws.getRange2( "A2" ).setValue( "3/9/2012" );
+
+	    oParser = new parserFormula( "ISOWEEKNUM(A2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 10 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(123)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 18 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(120003)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(120003)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(-100)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+		oParser = new parserFormula( "ISOWEEKNUM(1203)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 16 );
+
+	} );
+
 	test( "Test: \"WEIBULL\"", function () {
 
 		ws.getRange2( "A2" ).setValue( "105" );

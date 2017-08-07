@@ -1063,6 +1063,7 @@
 	cISOWEEKNUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cISOWEEKNUM.prototype.isXLFN = true;
 	cISOWEEKNUM.prototype.Calculate = function (arg) {
+		//TODO есть различия в результатах с формулой ISOWEEKNUM(1)
 		var oArguments = this._prepareArguments(arg, arguments[1], true);
 		var argClone = oArguments.args;
 
@@ -1078,8 +1079,7 @@
 			return this.value = new cError(cErrorType.not_numeric);
 		}
 
-		return this.value =
-			new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue())));
+		return this.value = new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue())));
 	};
 
 	/**
