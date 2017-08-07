@@ -52,6 +52,7 @@
 	var cBoolLocal = AscCommon.cBoolLocal;
 	var cErrorLocal = AscCommon.cErrorLocal;
 	var cErrorOrigin = AscCommon.cErrorOrigin;
+	var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
 	var UndoRedoItemSerializable = AscCommonExcel.UndoRedoItemSerializable;
 	var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
@@ -2520,6 +2521,7 @@
 		}
 	};
 	SheetMemory.prototype.fill = function(value, start, end) {
+		this.checkSize(end - 1);
 		var startOffset = start * this.structSize;
 		var endOffset = end * this.structSize;
 		this.data.fill(value, startOffset, endOffset);
@@ -6207,11 +6209,11 @@
 			switch (res.type) {
 				case cElementType.number:
 					this.setTypeInternal(CellValueType.Number);
-					this.setTypeInternal(res.getValue());
+					this.setValueNumberInternal(res.getValue());
 					break;
 				case cElementType.bool:
 					this.setTypeInternal(CellValueType.Bool);
-					this.setTypeInternal(res.value ? 1 : 0);
+					this.setValueNumberInternal(res.value ? 1 : 0);
 					break;
 				case cElementType.error:
 					this.setTypeInternal(CellValueType.Error);
@@ -6440,7 +6442,7 @@
 				if(cBoolLocal.t === sUpText || cBoolLocal.f === sUpText)
 				{
 					this.setTypeInternal(CellValueType.Bool);
-					this.setTypeInternal((cBoolLocal.t === sUpText) ? 1 : 0);
+					this.setValueNumberInternal((cBoolLocal.t === sUpText) ? 1 : 0);
 				}
 				else if(checkCellValueTypeError(sUpText))
 				{
@@ -6462,7 +6464,7 @@
 							this.setNumFormat(res.format);
 						}
 						this.setTypeInternal(CellValueType.Number);
-						this.setTypeInternal(res.value);
+						this.setValueNumberInternal(res.value);
 					}
 					else
 					{
@@ -9145,7 +9147,8 @@
 		return oRes;
 	};
 	Range.prototype._sortByArray=function(oBBox, aSortData, bUndo){
-		var rec = {length:0};
+		var t = this;
+		var height = oBBox.r2 - oBBox.r1 + 1;
 		var oSortedIndexes = {};
 		for(var i = 0, length = aSortData.length; i < length; ++i)
 		{
@@ -9187,49 +9190,21 @@
 			}
 			History.LocalChange = false;
 		}
-		//окончательно устанавливаем ячейки
-		var nColFirst0 = oBBox.c1;
-		var nLastCol0 = oBBox.c2;
-		for(var i = nColFirst0; i <= nLastCol0; ++i)
-		{
-			//запоминаем ячейки в которые уже что-то передвинули, чтобы не потерять их
-			var oTempCellsTo = {};
-			for(var j in oSortedIndexes)
-			{
-				var nIndexFrom = j - 0;
-				var nIndexTo = oSortedIndexes[j];
-				var shift = nIndexTo - nIndexFrom;
-				var rowFrom = this.worksheet._getRow(nIndexFrom);
-				var rowTo = this.worksheet._getRow(nIndexTo);
+		//todo
+		//oCurCell.changeOffset({offsetCol: 0, offsetRow: shift}, true, true);
+		//this.worksheet.workbook.dependencyFormulas.addToChangedCell(oCurCell);
 
-				var oCurCell;
-				if(oTempCellsTo.hasOwnProperty(nIndexFrom))
-					oCurCell = oTempCellsTo[nIndexFrom];
-				else{
-					oCurCell = rowFrom.c[i];
-					delete rowFrom.c[i];
+		var tempSheetMemory = new SheetMemory(g_nCellStructSize, height);
+		for (var i = oBBox.c1; i <= oBBox.c2; ++i) {
+			var sheetMemory = this.worksheet.getColDataNoEmpty(i);
+			if (sheetMemory) {
+				tempSheetMemory.copyRange(sheetMemory, oBBox.r1, 0, height);
+				for (var j in oSortedIndexes) {
+					var nIndexFrom = j - 0;
+					var nIndexTo = oSortedIndexes[j];
+					tempSheetMemory.copyRange(sheetMemory, nIndexFrom, nIndexTo - oBBox.r1, 1);
 				}
-				oTempCellsTo[nIndexTo] = rowTo.c[i];
-				if(null != oCurCell)
-				{
-					if (oCurCell.formulaParsed) {
-						oCurCell.changeOffset({offsetCol: 0, offsetRow: shift}, true, true);
-					}
-					oCurCell.moveVer(shift);
-					rowTo.c[i] = oCurCell;
-					if (oCurCell && oCurCell.getFormula()) {
-						//for #Ref
-						this.worksheet.workbook.dependencyFormulas.addToChangedCell(oCurCell);
-					}
-				}
-				else
-				{
-					if(null != rowTo.c[i])
-					{
-						//здесь достаточно простого delete, потому что на самом деле в функции ячейки только меняются местами, удаления не происходит
-						delete rowTo.c[i];
-					}
-				}
+				sheetMemory.copyRange(tempSheetMemory, 0, oBBox.r1, height);
 			}
 		}
 		this.worksheet.workbook.dependencyFormulas.addToChangedRange(this.worksheet.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, oBBox.r2));
@@ -10299,7 +10274,7 @@
 				if (row.getHidden()) {
 					sum++;
 				}
-				hiddenSum[i] = sum;
+				hiddenSum[row] = sum;
 			});
 		}
 		return hiddenSum;
