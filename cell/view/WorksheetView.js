@@ -1435,6 +1435,7 @@
      * @param {AscCommonExcel.recalcType} type
      */
     WorksheetView.prototype._calcHeightRows = function (type) {
+        var t = this;
         var y = this.cellsTop;
         var visibleH = this.drawingCtx.getHeight();
         var maxRowObjects = this.objectRender ? this.objectRender.getMaxColRow().row : -1;
@@ -1451,25 +1452,26 @@
         // ToDo calc all rows (not visible)
         for (; ((AscCommonExcel.recalcType.recalc !== type) ? i < l || y + hiddenH < visibleH : i < this.rows.length) &&
                i < gc_nMaxRow; ++i) {
-            row = this.model._getRowNoEmptyWithAll(i);
-            if (!row) {
-                h = -1; // Будет использоваться дефолтная высота строки
-                isCustomHeight = false;
-            } else if (row.getHidden()) {
-                hR = h = 0;  // Скрытая строка, высоту выставляем 0
-                isCustomHeight = true;
-                hiddenH += row.h > 0 ? row.h - this.height_1px : defaultH;
-            } else {
-                isCustomHeight = row.getCustomHeight();
-                // Берем высоту из модели, если она custom(баг 15618), либо дефолтную
-                if (row.h > 0 && (isCustomHeight || row.getCalcHeight())) {
-                    hR = row.h;
-                    h = hR / 0.75;
-                    h = (h | h) * 0.75;			// 0.75 - это размер 1px в pt (можно было 96/72)
-                } else {
-                    h = -1;
-                }
-            }
+            this.model._getRowNoEmptyWithAll(i, function(row){
+				if (!row) {
+					h = -1; // Будет использоваться дефолтная высота строки
+					isCustomHeight = false;
+				} else if (row.getHidden()) {
+					hR = h = 0;  // Скрытая строка, высоту выставляем 0
+					isCustomHeight = true;
+					hiddenH += row.h > 0 ? row.h - t.height_1px : defaultH;
+				} else {
+					isCustomHeight = row.getCustomHeight();
+					// Берем высоту из модели, если она custom(баг 15618), либо дефолтную
+					if (row.h > 0 && (isCustomHeight || row.getCalcHeight())) {
+						hR = row.h;
+						h = hR / 0.75;
+						h = (h | h) * 0.75;			// 0.75 - это размер 1px в pt (можно было 96/72)
+					} else {
+						h = -1;
+					}
+				}
+            });
             h = h < 0 ? (hR = defaultH) : h;
             this.rows[i] = {
                 top: y,
@@ -1599,6 +1601,7 @@
 
     // ----- Drawing for print -----
     WorksheetView.prototype.calcPagesPrint = function(pageOptions, printOnlySelection, indexWorksheet, arrPages) {
+		var t = this;
         var range;
         var maxCols = this.model.getColsCount();
         var maxRows = this.model.getRowsCount();
@@ -1612,43 +1615,35 @@
             range = new asc_Range(0, 0, maxCols, maxRows);
             this._prepareCellTextMetricsCache(range);
 
-            var rowModel, rowCells, rowCache, rightSide, c;
-            for (var r = 0; r < maxRows; ++r) {
-                if (this.height_1px > this.rows[r].height) {
-                    continue;
-                }
-                // Теперь получаем только не пустые ячейки для строки
-                rowModel = this.model._getRowNoEmpty(r);
-                if (!rowModel) {
-                    continue;
-                }
-                rowCache = this._getRowCache(r);
-                rowCells = rowModel.getCells();
-                for (c in rowCells) {
-                    c = c - 0;
-                    if (this.width_1px > this.cols[c].width) {
-                        continue;
-                    }
+			var rowCache, rightSide, curRow = -1, skipRow = false;
+			this.model._forEachCell(function(cell) {
+				var c = cell.nCol;
+				var r = cell.nRow;
+				if (curRow !== r) {
+					curRow = r;
+					skipRow = t.height_1px > t.rows[r].height;
+					rowCache = t._getRowCache(r);
+				}
+				if(!skipRow && !(t.width_1px > t.cols[c].width)){
+					var style = cell.getStyle();
+					if (style && (null !== style.fill || (null !== style.border && style.border.notEmpty()))) {
+						lastC = Math.max(lastC, c);
+						lastR = Math.max(lastR, r);
+					}
+					if (rowCache && rowCache.columnsWithText[c]) {
+						rightSide = 0;
+						var ct = this._getCellTextCache(c, r);
+						if (ct !== undefined) {
+							if (!ct.flags.isMerged() && !ct.flags.wrapText) {
+								rightSide = ct.sideR;
+							}
 
-                    var style = rowCells[c].getStyle();
-                    if (style && (null !== style.fill || (null !== style.border && style.border.notEmpty()))) {
-                        lastC = Math.max(lastC, c);
-                        lastR = Math.max(lastR, r);
-                    }
-                    if (rowCache && rowCache.columnsWithText[c]) {
-                        rightSide = 0;
-                        var ct = this._getCellTextCache(c, r);
-                        if (ct !== undefined) {
-                            if (!ct.flags.isMerged() && !ct.flags.wrapText) {
-                                rightSide = ct.sideR;
-                            }
-
-                        lastC = Math.max(lastC, c + rightSide);
-                        lastR = Math.max(lastR, r);
-                    }
+							lastC = Math.max(lastC, c + rightSide);
+							lastR = Math.max(lastR, r);
+						}
+					}
                 }
-            }
-            }
+			});
             var maxCell = this.model.autoFilters.getMaxColRow();
             lastC = Math.max(lastC, maxCell.col);
             lastR = Math.max(lastR, maxCell.row);
@@ -4149,26 +4144,17 @@
         if (range === undefined) {
             range = new Asc.Range(0, 0, colsLength - 1, this.rows.length - 1);
         }
-        var rowModel, rowCells, cellColl;
-        for (var row = range.r1; row <= range.r2; ++row) {
-            if (this.height_1px > this.rows[row].height) {
-                continue;
+        var t = this;
+        var curRow = -1, skipRow = false;
+		this.model.getRange3(range.r1, range.c1, range.r2, range.c2)._foreachNoEmpty(function(cell, row, col) {
+            if (curRow !== row) {
+                curRow = row;
+                skipRow = t.height_1px > t.rows[row].height;
             }
-            // Теперь получаем только не пустые ячейки для строки
-            rowModel = this.model._getRowNoEmpty(row);
-            if (!rowModel) {
-                continue;
+            if(!skipRow && !(colsLength <= col || t.width_1px > t.cols[col].width)) {
+                t._addCellTextToCache(col, row);
             }
-            rowCells = rowModel.getCells();
-            for (cellColl in rowCells) {
-                cellColl = cellColl - 0;
-                if (colsLength <= cellColl || this.width_1px > this.cols[cellColl].width) {
-                    continue;
-                }
-
-                this._addCellTextToCache(cellColl, row);
-            }
-        }
+		});
         this.isChanged = false;
     };
 
@@ -8823,7 +8809,9 @@
                 rangeF.setValue(valF, null, true);
             } else {
                 var oBBox = rangeF.getBBox0();
-                t.model._getCell(oBBox.r1, oBBox.c1).setValue(valF, null, true);
+                t.model._getCell(oBBox.r1, oBBox.c1, function(cell) {
+                    cell.setValue(valF, null, true);
+                });
             }
         }
 
@@ -9422,17 +9410,18 @@
 
 				var bbox = new Asc.Range(0, 0, table.Ref.c2 - table.Ref.c1, table.Ref.r2 - table.Ref.r1);
 				styleForCurTable.initStyle(val.sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
-				var cell = val._getCell(pasteRow, pasteCol);
-				if (cell)
-				{
-					dxf = cell.getCompiledStyle();
-				}
-				if (null === dxf)
-				{
-					pasteRow = pasteRow - table.Ref.r1;
-					pasteCol = pasteCol - table.Ref.c1;
-					dxf = AscCommonExcel.getCompiledStyleWs(val, pasteRow, pasteCol);
-				}
+                val._getCell(pasteRow, pasteCol, function(cell) {
+                    if (cell)
+                    {
+                        dxf = cell.getCompiledStyle();
+                    }
+                    if (null === dxf)
+                    {
+                        pasteRow = pasteRow - table.Ref.r1;
+                        pasteCol = pasteCol - table.Ref.c1;
+                        dxf = AscCommonExcel.getCompiledStyleWs(val, pasteRow, pasteCol);
+                    }
+                });
 			}
 
 			return {dxf: dxf, blocalArea: blocalArea};
@@ -9729,6 +9718,7 @@
 						//arrFormula.push({range: range, val: "=" + assemb});
 					}
 				} else {
+					//todo
 					cellFrom = newVal.getLeftTopCellNoEmpty();
 					if (isOneMerge && range && range.bbox) {
 						cellTo = t._getCell(range.bbox.c1, range.bbox.r1).getLeftTopCell();
@@ -9804,11 +9794,12 @@
 		//если не вставляем форматированную таблицу, но формат необходимо вставить
 		if(specialPasteProps.format && !specialPasteProps.formatTable && rangeStyle.tableDxf)
 		{
-			var firstCell = range.getLeftTopCell();
-			if(firstCell)
-			{
-				firstCell.setStyle(rangeStyle.tableDxf);
-			}
+			range.getLeftTopCell(function(firstCell){
+				if(firstCell)
+				{
+					firstCell.setStyle(rangeStyle.tableDxf);
+				}
+            });
 		}
 		
 		//numFormat
@@ -9901,11 +9892,11 @@
 
 		if(rangeStyle.tableDxfLocal && specialPasteProps.format)
 		{
-			var firstCell = range.getLeftTopCell();
-			if(firstCell)
-			{
-				firstCell.setStyle(rangeStyle.tableDxfLocal);
-			}
+			range.getLeftTopCell(function(firstCell) {
+				if (firstCell) {
+					firstCell.setStyle(rangeStyle.tableDxfLocal);
+				}
+			});
 		}
 
 		//hyperLink
@@ -12202,25 +12193,27 @@
 
                 var filter = autoFilterObject.filter;
                 if (c_oAscAutoFilterTypes.CustomFilters === filter.type) {
-                    var cell = t.model._getCell(activeCell.row, activeCell.col);
-                    var val = cell.getValueWithoutFormat();
-                    filter.filter.CustomFilters[0].Val = val;
+                    t.model._getCell(activeCell.row, activeCell.col, function(cell) {
+                        var val = cell.getValueWithoutFormat();
+                        filter.filter.CustomFilters[0].Val = val;
+                    });
                 } else if (c_oAscAutoFilterTypes.ColorFilter === filter.type) {
-                    var cell = t.model._getCell(activeCell.row, activeCell.col);
-                    if (filter.filter && filter.filter.dxf && filter.filter.dxf.fill) {
-                        if (false === filter.filter.CellColor) {
-                            var fontColor = cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
-                            //TODO добавлять дефолтовый цвет шрифта в случае, если цвет шрифта не указан
-                            if (null !== fontColor) {
-                                filter.filter.dxf.fill.bg = fontColor;
+                    t.model._getCell(activeCell.row, activeCell.col, function(cell) {
+                        if (filter.filter && filter.filter.dxf && filter.filter.dxf.fill) {
+                            if (false === filter.filter.CellColor) {
+                                var fontColor = cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
+                                //TODO добавлять дефолтовый цвет шрифта в случае, если цвет шрифта не указан
+                                if (null !== fontColor) {
+                                    filter.filter.dxf.fill.bg = fontColor;
+                                }
+                            } else {
+                                //TODO просмотерть ситуации без заливки
+                                var color = cell.getStyle();
+                                var cellColor = null !== color && color.fill && color.fill.bg ? color.fill.bg : null;
+                                filter.filter.dxf.fill.bg = null !== cellColor ? new AscCommonExcel.RgbColor(cellColor.rgb) : new AscCommonExcel.RgbColor(null);
                             }
-                        } else {
-                            //TODO просмотерть ситуации без заливки
-                            var color = cell.getStyle();
-                            var cellColor = null !== color && color.fill && color.fill.bg ? color.fill.bg : null;
-                            filter.filter.dxf.fill.bg = null !== cellColor ? new AscCommonExcel.RgbColor(cellColor.rgb) : new AscCommonExcel.RgbColor(null);
                         }
-                    }
+                    });
                 }
 
                 var applyFilterProps = t.model.autoFilters.applyAutoFilter(autoFilterObject, ar);
@@ -13109,42 +13102,41 @@
         };
 
         var tempText = 0, tempDigit = 0;
-        for (var i = columnRange.r1; i <= columnRange.r2; i++) {
-            var cell = ws._getCellNoEmpty(i, columnRange.c1);
+		ws.getRange3(columnRange.r1, columnRange.c1, columnRange.r2, columnRange.c1)._foreachNoEmpty(function(cell) {
+			//добавляем без цвета ячейку
+			if (!cell) {
+				if (true !== alreadyAddColors[null]) {
+					alreadyAddColors[null] = true;
+					res.colors.push(null);
+				}
+				return;
+			}
 
-            //добавляем без цвета ячейку
-            if (!cell) {
-                if (true !== alreadyAddColors[null]) {
-                    alreadyAddColors[null] = true;
-                    res.colors.push(null);
-                }
-                continue;
-            }
+			if (false === cell.isEmptyText()) {
+				var type = cell.getType();
 
-            if (false === cell.isEmptyText()) {
-                var type = cell.getType();
+				if (type === 0) {
+					tempDigit++;
+				} else {
+					tempText++;
+				}
+			}
 
-                if (type === 0) {
-                    tempDigit++;
-                } else {
-                    tempText++;
-                }
-            }
+			//font colors
+			var multiText = cell.getValueMultiText();
+			if (null !== multiText) {
+				for (var j = 0; j < multiText.length; j++) {
+					var fontColor = multiText.multiText[j].format ? multiText.multiText[j].format.getColor() : null;
+					addFontColorsToArray(fontColor);
+				}
+			} else {
+				var fontColor = cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
+				addFontColorsToArray(fontColor);
+			}
 
-            //font colors
-            if (null !== cell.oValue.multiText) {
-                for (var j = 0; j < cell.oValue.multiText.length; j++) {
-                    var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.getColor() : null;
-                    addFontColorsToArray(fontColor);
-                }
-            } else {
-                var fontColor = cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
-                addFontColorsToArray(fontColor);
-            }
-
-            //cell colors
-            addCellColorsToArray(cell.getStyle());
-        }
+			//cell colors
+			addCellColorsToArray(cell.getStyle());
+        });
 
         //если один элемент в массиве, не отправляем его в меню
         if (res.colors.length === 1) {

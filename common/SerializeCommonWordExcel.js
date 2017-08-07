@@ -616,9 +616,22 @@ FT_Stream2.prototype.GetLongLE = function() {
 FT_Stream2.prototype.GetLong = function() {
 	return this.GetULongLE();
 };
+	var tempHelp = new ArrayBuffer(8);
+	var tempHelpUnit = new Uint8Array(tempHelp);
+	var tempHelpFloat = new Float64Array(tempHelp);
 FT_Stream2.prototype.GetDoubleLE = function() {
 	if (this.cur + 7 >= this.size)
 		return 0;
+	tempHelpUnit[0] = this.GetUChar();
+	tempHelpUnit[1] = this.GetUChar();
+	tempHelpUnit[2] = this.GetUChar();
+	tempHelpUnit[3] = this.GetUChar();
+	tempHelpUnit[4] = this.GetUChar();
+	tempHelpUnit[5] = this.GetUChar();
+	tempHelpUnit[6] = this.GetUChar();
+	tempHelpUnit[7] = this.GetUChar();
+	return tempHelpFloat[0];
+
 	var arr = [];
 	for(var i = 0; i < 8; ++i)
 		arr.push(this.GetUChar());

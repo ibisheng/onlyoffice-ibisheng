@@ -65,11 +65,6 @@ function (window, undefined) {
 	window['AscCH'].historyitem_Worksheet_MoveRange = 13;
 	window['AscCH'].historyitem_Worksheet_Rename = 18;
 	window['AscCH'].historyitem_Worksheet_Hide = 19;
-//не добавляем в историю события historyitem_Worksheet_CreateRow, CreateCol, CreateCell - потому что появляется много ошибок(например удаление строк, если снизу были данные и undo)
-//они решают только одну проблему, что когда есть стиль колонки, а мы создаем ячейку, при полном undo не отменится стиль ячейки.
-	window['AscCH'].historyitem_Worksheet_CreateRow = 20;
-	window['AscCH'].historyitem_Worksheet_CreateCol = 21;
-	window['AscCH'].historyitem_Worksheet_CreateCell = 22;
 
 	window['AscCH'].historyitem_Worksheet_ChangeMerge = 25;
 	window['AscCH'].historyitem_Worksheet_ChangeHyperlink = 26;
