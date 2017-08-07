@@ -6660,7 +6660,7 @@ CT_I.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_I.prototype.getR = function (writer, name) {
+CT_I.prototype.getR = function () {
 	return this.r || 0;
 };
 function CT_PageField() {
