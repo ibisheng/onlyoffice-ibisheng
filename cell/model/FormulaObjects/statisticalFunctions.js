@@ -8692,4 +8692,17 @@
 	window['AscCommonExcel'].cSTDEVP = cSTDEVP;
 	window['AscCommonExcel'].cVAR = cVAR;
 	window['AscCommonExcel'].cVARP = cVARP;
+	window['AscCommonExcel'].cLARGE = cLARGE;
+	window['AscCommonExcel'].cSMALL = cSMALL;
+	window['AscCommonExcel'].cMEDIAN = cMEDIAN;
+	window['AscCommonExcel'].cSTDEV_S = cSTDEV_S;
+	window['AscCommonExcel'].cSTDEV_P = cSTDEV_P;
+	window['AscCommonExcel'].cVAR_S = cVAR_S;
+	window['AscCommonExcel'].cVAR_P = cVAR_P;
+	window['AscCommonExcel'].cMODE_SNGL = cMODE_SNGL;
+	window['AscCommonExcel'].cPERCENTILE_INC = cPERCENTILE_INC;
+	window['AscCommonExcel'].cQUARTILE_INC = cQUARTILE_INC;
+	window['AscCommonExcel'].cPERCENTILE_EXC = cPERCENTILE_EXC;
+	window['AscCommonExcel'].cQUARTILE_EXC = cQUARTILE_EXC;
+
 })(window);
