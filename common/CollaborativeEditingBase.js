@@ -806,7 +806,8 @@ CCollaborativeEditingBase.prototype.private_RestoreDocumentState = function(DocS
 //----------------------------------------------------------------------------------------------------------------------
     CCollaborativeEditingBase.prototype.private_ClearChanges = function()
     {
-        this.m_aChanges = [];
+        this.m_aChanges    = [];
+        this.m_oOwnChanges = [];
     };
     CCollaborativeEditingBase.prototype.private_CollectOwnChanges = function()
     {
