@@ -7154,7 +7154,7 @@ ParaRun.prototype.Get_Spacing = function()
 
 ParaRun.prototype.Set_DStrikeout = function(Value)
 {
-    if ( Value !== this.Pr.Value )
+    if ( Value !== this.Pr.DStrikeout )
     {
         var OldValue = this.Pr.DStrikeout;
         this.Pr.DStrikeout = Value;
