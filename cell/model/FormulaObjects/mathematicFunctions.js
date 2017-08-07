@@ -324,35 +324,96 @@
 
 		var nFunc = argClone[0].getValue();
 		var f;
-		switch ( nFunc )
-		{
-			case AGGREGATE_FUNC_AVE     : f = new AscCommonExcel.cAVERAGE(); break;
-			case AGGREGATE_FUNC_CNT     : f = new AscCommonExcel.cCOUNT(); break;
-			case AGGREGATE_FUNC_CNTA    : f = new AscCommonExcel.cCOUNTA(); break;
-			case AGGREGATE_FUNC_MAX     : f = new AscCommonExcel.cMAX(); break;
-			case AGGREGATE_FUNC_MIN     : f = new AscCommonExcel.cMIN(); break;
-			case AGGREGATE_FUNC_PROD    : f = new AscCommonExcel.cPRODUCT(); break;
-			case AGGREGATE_FUNC_STD     : f = new AscCommonExcel.cSTDEV_S(); break;
-			case AGGREGATE_FUNC_STDP    : f = new AscCommonExcel.cSTDEV_P(); break;
-			case AGGREGATE_FUNC_SUM     : f = new AscCommonExcel.cSUM(); break;
-			case AGGREGATE_FUNC_VAR     : f = new AscCommonExcel.cVAR_S(); break;
-			case AGGREGATE_FUNC_VARP    : f = new AscCommonExcel.cVAR_P(); break;
-			case AGGREGATE_FUNC_MEDIAN  : f = new AscCommonExcel.cMEDIAN(); break;
-			case AGGREGATE_FUNC_MODSNGL : f = new AscCommonExcel.cMODE_SNGL(); break;
-			case AGGREGATE_FUNC_LARGE   : f = new AscCommonExcel.cLARGE(); break;
-			case AGGREGATE_FUNC_SMALL   : f = new AscCommonExcel.cSMALL(); break;
-			case AGGREGATE_FUNC_PERCINC : f = new AscCommonExcel.cPERCENTILE_INC(); break;
-			case AGGREGATE_FUNC_QRTINC  : f = new AscCommonExcel.cQUARTILE_INC(); break;
-			case AGGREGATE_FUNC_PERCEXC : f = new AscCommonExcel.cPERCENTILE_EXC(); break;
-			case AGGREGATE_FUNC_QRTEXC  : f = new AscCommonExcel.cQUARTILE_EXC; break;
-			default : this.value = new cError(cErrorType.not_numeric); break;
+		var newArgs = [arg[2]];
+		switch ( nFunc ) {
+			case AGGREGATE_FUNC_AVE:
+				f = new AscCommonExcel.cAVERAGE();
+				break;
+			case AGGREGATE_FUNC_CNT:
+				f = new AscCommonExcel.cCOUNT();
+				break;
+			case AGGREGATE_FUNC_CNTA:
+				f = new AscCommonExcel.cCOUNTA();
+				break;
+			case AGGREGATE_FUNC_MAX:
+				f = new AscCommonExcel.cMAX();
+				break;
+			case AGGREGATE_FUNC_MIN:
+				f = new AscCommonExcel.cMIN();
+				break;
+			case AGGREGATE_FUNC_PROD:
+				f = new AscCommonExcel.cPRODUCT();
+				break;
+			case AGGREGATE_FUNC_STD:
+				f = new AscCommonExcel.cSTDEV_S();
+				break;
+			case AGGREGATE_FUNC_STDP:
+				f = new AscCommonExcel.cSTDEV_P();
+				break;
+			case AGGREGATE_FUNC_SUM:
+				f = new AscCommonExcel.cSUM();
+				break;
+			case AGGREGATE_FUNC_VAR:
+				f = new AscCommonExcel.cVAR_S();
+				break;
+			case AGGREGATE_FUNC_VARP:
+				f = new AscCommonExcel.cVAR_P();
+				break;
+			case AGGREGATE_FUNC_MEDIAN:
+				f = new AscCommonExcel.cMEDIAN();
+				break;
+			case AGGREGATE_FUNC_MODSNGL:
+				f = new AscCommonExcel.cMODE_SNGL();
+				break;
+			case AGGREGATE_FUNC_LARGE:
+				if(arg[3]){
+					f = new AscCommonExcel.cLARGE();
+					newArgs.push(arg[3]);
+				}
+				break;
+			case AGGREGATE_FUNC_SMALL:
+				if(arg[3]){
+					f = new AscCommonExcel.cSMALL();
+					newArgs.push(arg[3]);
+				}
+				break;
+			case AGGREGATE_FUNC_PERCINC:
+				if(arg[3]){
+					f = new AscCommonExcel.cPERCENTILE_INC();
+					newArgs.push(arg[3]);
+				}
+				break;
+			case AGGREGATE_FUNC_QRTINC:
+				if(arg[3]){
+					f = new AscCommonExcel.cQUARTILE_INC();
+					newArgs.push(arg[3]);
+				}
+				break;
+			case AGGREGATE_FUNC_PERCEXC:
+				if(arg[3]){
+					f = new AscCommonExcel.cPERCENTILE_EXC();
+					newArgs.push(arg[3]);
+				}
+				break;
+			case AGGREGATE_FUNC_QRTEXC:
+				if(arg[3]){
+					f = new AscCommonExcel.cQUARTILE_EXC();
+					newArgs.push(arg[3]);
+				}
+				break;
+			default:
+				return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		if(undefined === f){
+			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
 		if (f) {
 			f.checkExclude = true;
 			f.excludeHiddenRows = true;
-			f.setArgumentsCount(1);
-			this.value = f.Calculate(arg.slice(2));
+			f.setArgumentsCount(newArgs.length);
+			this.value = f.Calculate(newArgs);
 		}
 
 		return this.value;
