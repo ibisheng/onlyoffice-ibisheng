@@ -45,7 +45,7 @@
 	var c_oAscMaxRowHeight    = 409;
 	var c_nMaxConversionTime  = 900000;//depends on config
 	var c_nMaxDownloadTitleLen= 255;
-	var c_nNoBase64 = false;
+	var c_nNoBase64 = true;
 	var c_nVersionNoBase64 = 10;
 
 	//files type for Saving & DownloadAs
