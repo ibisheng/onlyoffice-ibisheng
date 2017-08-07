@@ -837,10 +837,13 @@ function CEditorPage(api)
 			window.onkeydown = this.onKeyDown;
 			window.onkeyup = this.onKeyUp;
 
-			if ( window.attachEvent )
-				window.attachEvent('onmessage', this.m_oApi.DemonstrationToReporterMessages);
-			else
-				window.addEventListener('message', this.m_oApi.DemonstrationToReporterMessages, false);
+			if (!window["AscDesktopEditor"])
+			{
+				if (window.attachEvent)
+					window.attachEvent('onmessage', this.m_oApi.DemonstrationToReporterMessages);
+				else
+					window.addEventListener('message', this.m_oApi.DemonstrationToReporterMessages, false);
+			}
 		}
 		// --------------------------------------------------------------------------
 

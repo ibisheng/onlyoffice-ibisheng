@@ -283,3 +283,27 @@ Asc['asc_docs_api'].prototype.asc_setAdvancedOptions = function(idOption, option
     }
 };
 Asc['asc_docs_api'].prototype["asc_setAdvancedOptions"] = Asc['asc_docs_api'].prototype.asc_setAdvancedOptions;
+
+Asc['asc_docs_api'].prototype.DemonstrationReporterStart = function(startObject)
+{
+	this.reporterStartObject = startObject;
+
+	window["AscDesktopEditor"]["startReporter"](window.location.ref);
+};
+
+Asc['asc_docs_api'].prototype.DemonstrationReporterEnd = function()
+{
+	window["AscDesktopEditor"]["endReporter"]();
+};
+
+Asc['asc_docs_api'].prototype.sendToReporter = function(value)
+{
+	window["AscDesktopEditor"]["sendToReporter"](value);
+};
+
+Asc['asc_docs_api'].prototype.sendFromReporter = function(value)
+{
+	window["AscDesktopEditor"]["sendFromReporter"](value);
+};
+
+Asc['asc_docs_api'].prototype["sendFromReporter"] = Asc['asc_docs_api'].prototype.sendFromReporter;
