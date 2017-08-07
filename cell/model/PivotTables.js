@@ -6533,6 +6533,46 @@ CT_PivotField.prototype.asc_getName = function () {
 CT_PivotField.prototype.asc_getSubtotalTop = function () {
 	return null !== this.subtotalTop ? this.subtotalTop : true;
 };
+CT_PivotField.prototype.asc_getSubtotals = function () {
+	var res = null;
+	if (this.defaultSubtotal) {
+		res = [];
+		if (this.sumSubtotal) {
+			res.push(c_oAscItemType.Sum);
+		}
+		if (this.countASubtotal) {
+			res.push(c_oAscItemType.CountA);
+		}
+		if (this.avgSubtotal) {
+			res.push(c_oAscItemType.Avg);
+		}
+		if (this.maxSubtotal) {
+			res.push(c_oAscItemType.Max);
+		}
+		if (this.minSubtotal) {
+			res.push(c_oAscItemType.Min);
+		}
+		if (this.productSubtotal) {
+			res.push(c_oAscItemType.Product);
+		}
+		if (this.countSubtotal) {
+			res.push(c_oAscItemType.Count);
+		}
+		if (this.stdDevSubtotal) {
+			res.push(c_oAscItemType.StdDev);
+		}
+		if (this.stdDevPSubtotal) {
+			res.push(c_oAscItemType.StdDevP);
+		}
+		if (this.varSubtotal) {
+			res.push(c_oAscItemType.Var);
+		}
+		if (this.varPSubtotal) {
+			res.push(c_oAscItemType.VarP);
+		}
+	}
+	return res;
+};
 CT_PivotField.prototype.getItem = function (index) {
 	return this.items && this.items.item[index];
 };
@@ -10379,6 +10419,7 @@ prot["asc_getName"] = prot.asc_getName;
 prot = CT_PivotField.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getSubtotalTop"] = prot.asc_getSubtotalTop;
+prot["asc_getSubtotals"] = prot.asc_getSubtotals;
 
 prot = CT_Field.prototype;
 prot["asc_getIndex"] = prot.asc_getIndex;
