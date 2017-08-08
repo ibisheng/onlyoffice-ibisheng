@@ -449,6 +449,10 @@
 				newArgs.push(arg[i]);
 			}
 
+			if(f.argumentsMax && newArgs.length > f.argumentsMax){
+				return this.value = new cError(cErrorType.wrong_value_type);
+			}
+
 			f.setArgumentsCount(newArgs.length);
 			this.value = f.Calculate(newArgs);
 		}
@@ -3149,7 +3153,7 @@
 		for (var i = 0; i < arg.length; i++) {
 			element = arg[i];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _arrVal.length; j++) {
 					arg0 = _func[arg0.type][_arrVal[j].type](arg0, _arrVal[j], "*");
 					if (cElementType.error === arg0.type) {
@@ -4373,7 +4377,7 @@
 		for (var i = 0; i < arg.length; i++) {
 			element = arg[i];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _arrVal.length; j++) {
 					if (cElementType.bool !== _arrVal[j].type && cElementType.string !== _arrVal[j].type) {
 						arg0 = _func[arg0.type][_arrVal[j].type](arg0, _arrVal[j], "+");

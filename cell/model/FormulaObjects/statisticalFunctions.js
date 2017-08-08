@@ -4574,13 +4574,13 @@
 	cLARGE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.getValuesNoEmpty();
+			arg0 = arg0.getValuesNoEmpty(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 		} else if (cElementType.array === arg0.type) {
 			arg0 = arg0.getMatrix();
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			arg0 = arg0.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return this.value = new cError(cErrorType.not_numeric);
 		}
 
 
@@ -7138,11 +7138,11 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArray) {
-			arg0 = arg0.getMatrix();
+			arg0 = arg0.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.getMatrix()[0];
+			arg0 = arg0.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg)[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return this.value = new cError(cErrorType.not_numeric);
 		}
 
 
@@ -7279,6 +7279,11 @@
 			av = member[i] - average;
 			res += av * av;
 		}
+
+		if(1 === count){
+			return new cError(cErrorType.division_by_zero);
+		}
+
 		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
 	};
 

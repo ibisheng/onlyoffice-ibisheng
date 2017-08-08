@@ -1091,21 +1091,58 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			});
 		}
 	};
-	cArea.prototype.getMatrix = function () {
+	cArea.prototype.getMatrix = function (excludeHiddenRows, excludeErrorsVal, excludeNestedStAg) {
 		var arr = [], r = this.getRange();
 		r._foreach2(function (cell, i, j, r1, c1) {
 			if (!arr[i - r1]) {
 				arr[i - r1] = [];
 			}
-			arr[i - r1][j - c1] = checkTypeCell(cell);
+
+			var bIsFoundNestedStAg = false;
+			var resValue = new cNumber(0);
+			if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+				var outStack = cell.formulaParsed.outStack;
+				for(var n = 0; n < outStack.length; n++){
+					if(outStack[n] instanceof AscCommonExcel.cAGGREGATE || outStack[n] instanceof AscCommonExcel.cSUBTOTAL){
+						bIsFoundNestedStAg = true;
+						break;
+					}
+				}
+			}
+			if(!bIsFoundNestedStAg){
+				var checkTypeVal = checkTypeCell(cell);
+				if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
+					resValue = checkTypeVal;
+				}
+			}
+
+			arr[i - r1][j - c1] = resValue;
 		});
 		return arr;
 	};
-	cArea.prototype.getValuesNoEmpty = function () {
+	cArea.prototype.getValuesNoEmpty = function (checkExclude, excludeHiddenRows, excludeErrorsVal, excludeNestedStAg) {
 		var arr = [], r = this.getRange();
+
 		r._foreachNoEmpty(function (cell) {
-			arr.push(checkTypeCell(cell));
-		});
+			var bIsFoundNestedStAg = false;
+			if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+				var outStack = cell.formulaParsed.outStack;
+				for(var i = 0; i < outStack.length; i++){
+					if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+						bIsFoundNestedStAg = true;
+						break;
+					}
+				}
+			}
+			if(!bIsFoundNestedStAg){
+				var checkTypeVal = checkTypeCell(cell);
+				if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
+					arr.push(checkTypeVal);
+				}
+			}
+
+		}, excludeHiddenRows);
+
 		return [arr];
 	};
 	cArea.prototype.getRefMatrix = function () {
@@ -2482,11 +2519,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			if(typeArray && cElementType.array === typeArray[i])
 			{
 				if (cElementType.cellsRange === arg.type || cElementType.array === arg.type) {
-					newArgs[i] = arg.getMatrix();
+					newArgs[i] = arg.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				} else if (cElementType.cellsRange3D === arg.type) {
-					newArgs[i] = arg.getMatrix()[0];
+					newArgs[i] = arg.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg)[0];
 				} else {
-					newArgs[i] = new cError(cErrorType.not_available);
+					newArgs[i] = new cError(cErrorType.not_numeric);
 				}
 			}else if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
 				newArgs[i] = arg.cross(arg1);
