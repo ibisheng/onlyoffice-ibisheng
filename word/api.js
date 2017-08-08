@@ -1467,9 +1467,8 @@ background-repeat: no-repeat;\
 			}
 			if (t.ParcedDocument) {
 				if (isStartEvent) {
-					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
+					t.WordControl.m_oLogicDocument.StartCollaborationEditing();
 					t.asc_setDrawCollaborationMarks(true);
-					t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 					if(window['AscCommon'].g_clipboardBase && AscCommon.CollaborativeEditing.m_bFast){
 						window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
 					}
@@ -1491,7 +1490,7 @@ background-repeat: no-repeat;\
 			if (t.canUnlockDocument) {
 				t.canStartCoAuthoring = false;
 			} else {
-				AscCommon.CollaborativeEditing.End_CollaborationEditing();
+				t.WordControl.m_oLogicDocument.EndCollaborationEditing();
 				t.asc_setDrawCollaborationMarks(false);
 			}
 		};
