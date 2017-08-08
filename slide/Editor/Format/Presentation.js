@@ -768,6 +768,9 @@ CPresentation.prototype =
         return false;
     },
 
+    IsViewModeInReview: function(){
+        return false;
+    },
 
     IsFillingFormMode: function()
     {
