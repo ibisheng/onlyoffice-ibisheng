@@ -5333,7 +5333,7 @@
 	};
 	Worksheet.prototype.getPivotTableButtons = function (range) {
 		var res = [];
-		var pivotTable, pivotRange, j, pos, countC, countR;
+		var pivotTable, pivotRange, j, pos, countC, countR, cell;
 		for (var i = 0; i < this.pivotTables.length; ++i) {
 			pivotTable = this.pivotTables[i];
 			if (!pivotTable.intersection(range)) {
@@ -5342,7 +5342,10 @@
 
 			for (j = 0; j < pivotTable.pageFieldsPositions.length; ++j) {
 				pos = pivotTable.pageFieldsPositions[j];
-				res.push(new AscCommon.CellBase(pos.row, pos.col + 1));
+				cell = new AscCommon.CellBase(pos.row, pos.col + 1);
+				if (range.contains2(cell)) {
+					res.push(cell);
+				}
 			}
 
 			if (false !== pivotTable.showHeaders) {
@@ -5351,10 +5354,16 @@
 				pivotRange = pivotTable.getRange();
 
 				if (countR) {
-					res.push(new AscCommon.CellBase(pivotRange.r1 + countC, pivotRange.c1));
+					cell = new AscCommon.CellBase(pivotRange.r1 + countC, pivotRange.c1);
+					if (range.contains2(cell)) {
+						res.push(cell);
+					}
 				}
 				if (countC) {
-					res.push(new AscCommon.CellBase(pivotRange.r1, pivotRange.c1 + countR));
+					cell = new AscCommon.CellBase(pivotRange.r1, pivotRange.c1 + countR);
+					if (range.contains2(cell)) {
+						res.push(cell);
+					}
 				}
 			}
 		}
