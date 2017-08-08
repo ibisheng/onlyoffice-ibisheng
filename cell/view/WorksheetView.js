@@ -289,7 +289,7 @@
     /**
      * Widget for displaying and editing Worksheet object
      * -----------------------------------------------------------------------------
-     * @param {AscCommonExcel.Woorksheet} model  Worksheet
+     * @param {Worksheet} model  Worksheet
      * @param {AscCommonExcel.asc_CHandlersList} handlers  Event handlers
      * @param {Object} buffers    DrawingContext + Overlay
      * @param {AscCommonExcel.StringRender} stringRender    StringRender
@@ -1181,7 +1181,9 @@
         this._initPane();
         this._initCellsArea(AscCommonExcel.recalcType.full);
         this.model.setTableStyleAfterOpen();
-		this.model._updateConditionalFormatting(null);
+		this.model.setDirtyConditionalFormatting(null);
+		this.model.initPivotTables();
+		this.model.updatePivotTablesStyle(null);
         this._cleanCellsTextMetricsCache();
         this._prepareCellTextMetricsCache();
 
@@ -1411,7 +1413,7 @@
             if (!column) {
                 w = defaultWidth; // Используем дефолтное значение
                 isBestFit = true; // Это уже оптимальная ширина
-            } else if (column.hd) {
+            } else if (column.getHidden()) {
                 w = 0;            // Если столбец скрытый, ширину выставляем 0
                 isBestFit = false;
                 hiddenW += this._calcColWidth(column.width).width;
@@ -1453,14 +1455,14 @@
             if (!row) {
                 h = -1; // Будет использоваться дефолтная высота строки
                 isCustomHeight = false;
-            } else if (0 != (AscCommonExcel.g_nRowFlag_hd & row.flags)) {
+            } else if (row.getHidden()) {
                 hR = h = 0;  // Скрытая строка, высоту выставляем 0
                 isCustomHeight = true;
                 hiddenH += row.h > 0 ? row.h - this.height_1px : defaultH;
             } else {
-                isCustomHeight = 0 != (AscCommonExcel.g_nRowFlag_CustomHeight & row.flags);
+                isCustomHeight = row.getCustomHeight();
                 // Берем высоту из модели, если она custom(баг 15618), либо дефолтную
-                if (row.h > 0 && (isCustomHeight || (AscCommonExcel.g_nRowFlag_CalcHeight & row.flags))) {
+                if (row.h > 0 && (isCustomHeight || row.getCalcHeight())) {
                     hR = row.h;
                     h = hR / 0.75;
                     h = (h | h) * 0.75;			// 0.75 - это размер 1px в pt (можно было 96/72)
@@ -2823,14 +2825,10 @@
 		}
 
 		function drawVerticalBorder(borderLeftObject, borderRightObject, x, y1, y2) {
-			var border, borderLeft = borderLeftObject ? borderLeftObject.borders :
-				null, borderRight = borderRightObject ? borderRightObject.borders : null;
+			var borderLeft = borderLeftObject ? borderLeftObject.borders : null,
+				borderRight = borderRightObject ? borderRightObject.borders : null;
 
-			if (borderLeft && borderLeft.r.w) {
-				border = borderLeft.r;
-			} else if (borderRight && borderRight.l.w) {
-				border = borderRight.l;
-			}
+			var border = AscCommonExcel.getMatchingBorder(borderLeft && borderLeft.r, borderRight && borderRight.l);
 			if (!border || border.w < 1) {
 				return;
 			}
@@ -2848,15 +2846,10 @@
 		}
 
 		function drawHorizontalBorder(borderTopObject, borderBottomObject, x1, y, x2) {
-			var border, borderTop = borderTopObject ? borderTopObject.borders :
-				null, borderBottom = borderBottomObject ? borderBottomObject.borders : null;
+			var borderTop = borderTopObject ? borderTopObject.borders : null,
+				borderBottom = borderBottomObject ? borderBottomObject.borders : null;
 
-			if (borderTop && borderTop.b.w) {
-				border = borderTop.b;
-			} else if (borderBottom && borderBottom.t.w) {
-				border = borderBottom.t;
-			}
-
+			var border = AscCommonExcel.getMatchingBorder(borderTop && borderTop.b, borderBottom && borderBottom.t);
 			if (border && border.w > 0) {
 				// ToDo переделать рассчет
 				var lbw = t._calcMaxBorderWidth(borderTopObject && borderTopObject.getLeftBorder(),
@@ -4290,9 +4283,9 @@
             }
             isMerged = true;
         }
-
-        var angle = c.getAngle();
-        var va = c.getAlignVertical();
+        var align = c.getAlign();
+        var angle = align.getAngle();
+        var va = align.getAlignVertical();
         if (this._isCellEmptyTextString(c)) {
             if (!angle && c.isNotDefaultFont()) {
                 // Пустая ячейка с измененной гарнитурой или размером, учитвается в высоте
@@ -4378,7 +4371,7 @@
 
         // ToDo dDigitsCount нужно рассчитывать исходя не из дефалтового шрифта и размера, а исходя из текущего шрифта и размера ячейки
         str = c.getValue2(dDigitsCount, makeFnIsGoodNumFormat(fl, colWidth));
-        var ha = c.getAlignHorizontalByValue();
+        var ha = c.getAlignHorizontalByValue(align.getAlignHorizontal());
         var maxW = fl.wrapText || fl.shrinkToFit || isMerged || asc.isFixedWidthCell(str) ?
           this._calcMaxWidth(col, row, mc) : undefined;
         tm = this._roundTextMetrics(this.stringRender.measureString(str, fl, maxW));
@@ -4685,10 +4678,11 @@
         var c = row !== undefined ? this._getCell(col, row) : col;
         var fl = new CellFlags();
         if (null !== c) {
-            fl.wrapText = c.getWrap();
-            fl.shrinkToFit = fl.wrapText ? false : c.getShrinkToFit();
+            var align = c.getAlign();
+            fl.wrapText = align.getWrap();
+            fl.shrinkToFit = fl.wrapText ? false : align.getShrinkToFit();
             fl.merged = c.hasMerged();
-            fl.textAlign = c.getAlignHorizontalByValue();
+            fl.textAlign = c.getAlignHorizontalByValue(align.getAlignHorizontal());
         }
         return fl;
     };
@@ -6123,17 +6117,25 @@
 				}
 			}
 
-			var autoFilterInfo = this.af_checkCursor(x, y, offsetX, offsetY, {
-				cFrozen: cFrozen, rFrozen: rFrozen
-			}, r, c);
-			if (autoFilterInfo && !isViewerMode) {
-				return {
-					cursor: kCurAutoFilter,
-					target: c_oTargetType.FilterObject,
-					col: -1,
-					row: -1,
-					idFilter: autoFilterInfo.id
-				};
+			if (!isViewerMode) {
+				var pivotButtons = this.model.getPivotTableButtons(new asc_Range(c.col, r.row, c.col, r.row));
+				var isPivot = pivotButtons.some(function (element) {
+					return element.row === r.row && element.col === c.col;
+				});
+				this._drawElements(function (_vr, _offsetX, _offsetY) {
+					if (isPivot) {
+						if (_vr.contains(c.col, r.row) &&
+							this._hitCursorFilterButton(x + _offsetX, y + _offsetY, c.col, r.row)) {
+							res = {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1};
+						}
+					} else {
+						res = this.af_checkCursor(x, y, _vr, _offsetX, _offsetY, r, c);
+					}
+					return (null === res);
+				});
+				if (res) {
+					return res;
+				}
 			}
 
 			// Проверим есть ли комменты
@@ -6787,6 +6789,7 @@
 		var font = c.getFont();
 		var fa = font.getVerticalAlign();
         var bg = c.getFill();
+        var align = c.getAlign();
         var cellType = c.getType();
         var isNumberFormat = (!cellType || CellValueType.Number === cellType);
 
@@ -6796,8 +6799,8 @@
 
         cell_info.text = c.getValueForEdit();
 
-		cell_info.halign = AscCommonExcel.horizontalAlignToString(c.getAlignHorizontal());
-		cell_info.valign = AscCommonExcel.verticalAlignToString(c.getAlignVertical());
+		cell_info.halign = AscCommonExcel.horizontalAlignToString(align.getAlignHorizontal());
+		cell_info.valign = AscCommonExcel.verticalAlignToString(align.getAlignVertical());
 
         var tablePartsOptions = selectionRange.isSingleRange() ?
           this.model.autoFilters.searchRangeInTableParts(selectionRange.getLast()) : -2;
@@ -6839,11 +6842,11 @@
         }
 
         cell_info.styleName = c.getStyleName();
-        cell_info.angle = c.getAngle();
+        cell_info.angle = align.getAngle();
 
         cell_info.flags = new AscCommonExcel.asc_CCellFlag();
-        cell_info.flags.shrinkToFit = c.getShrinkToFit();
-        cell_info.flags.wrapText = c.getWrap();
+        cell_info.flags.shrinkToFit = align.getShrinkToFit();
+        cell_info.flags.wrapText = align.getWrap();
 
         // ToDo activeRange type
         cell_info.flags.selectionType = selectionRange.getLast().type;
@@ -6925,6 +6928,8 @@
 				cell_info.isLockedSparkline = true;
 			}
 		}
+
+		cell_info.pivotTableInfo = this.model.getPivotTable(c1, r1);
 
         return cell_info;
 	};
@@ -8199,6 +8204,12 @@
             this._cleanSelectionMoveRange();
         } else if (resmove === -1) {
             var t = this;
+			if (this.model.inPivotTable([arnFrom, arnTo])) {
+				this._cleanSelectionMoveRange();
+				this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot, c_oAscError.Level.NoCritical);
+				return;
+			}
+
             this.model.workbook.handlers.trigger("asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmReplaceRange,
               function (can) {
                   if (can) {
@@ -8399,7 +8410,7 @@
                         range.setFontcolor(val);
                         break;
                     case "bc":
-                        range.setFill((val) ? (val) : null);
+                        range.setFill(val || null);
                         break; // ToDo можно делать просто отрисовку
                     case "wrap":
                         range.setWrap(val);
@@ -8635,6 +8646,12 @@
 			});
 		}
 
+		if (("merge" === prop || "paste" === prop || "sort" === prop || "empty" === prop || "hyperlink" === prop ||
+			"rh" === prop) && this.model.inPivotTable(checkRange)) {
+			this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+				c_oAscError.Level.NoCritical);
+			return;
+		}
 		this._isLockedCells(checkRange, /*subType*/null, onSelectionCallback);
     };
 
@@ -8705,6 +8722,8 @@
 
 		//добавляем форматированные таблицы
         var arnToRange = t.model.selectionRange.getLast();
+		var pasteRange = AscCommonExcel.g_clipboardExcel.pasteProcessor.activeRange;
+		var activeCellsPasteFragment = typeof pasteRange === "string" ? AscCommonExcel.g_oRangeCache.getAscRange(pasteRange) : pasteRange;
         var tablesMap = null;
         if (fromBinary && val.TableParts && val.TableParts.length && specialPasteProps.formatTable) {
             var range, tablePartRange, tables = val.TableParts, diffRow, diffCol, curTable, bIsAddTable;
@@ -8717,6 +8736,11 @@
                 diffCol = tablePartRange.c1 - refInsertBinary.c1 + arnToRange.c1;
                 range = t.model.getRange3(diffRow, diffCol, diffRow + (tablePartRange.r2 - tablePartRange.r1),
                     diffCol + (tablePartRange.c2 - tablePartRange.c1));
+
+                //если в активную область при записи попала лишь часть таблицы
+                if(activeCellsPasteFragment && !activeCellsPasteFragment.containsRange(tablePartRange)){
+					continue;
+				}
 
                 //если область вставки содержит форматированную таблицу, которая пересекается с вставляемой форматированной таблицей
                 var intersectionRangeWithTableParts = t.model.autoFilters._intersectionRangeWithTableParts(range.bbox);
@@ -9362,26 +9386,56 @@
 				}
 			}
 		};
-		
-		var getTableDxf = function(pasteRow, pasteCol, newVal)
+
+		var getTableDxf = function (pasteRow, pasteCol, newVal)
 		{
 			var dxf = null;
+
 			var tables = val.autoFilters._intersectionRangeWithTableParts(newVal.bbox);
-			
-			if(tables && tables[0])
+			var blocalArea = true;
+			if (tables && tables[0])
 			{
 				var table = tables[0];
 				var styleInfo = table.TableStyleInfo;
 				var styleForCurTable = t.model.workbook.TableStyles.AllStyles[styleInfo.Name];
-				
-				var headerRowCount = !!(null === table.HeaderRowCount || table.HeaderRowCount > 0);
-				var bbox = {r1: 0, c1: 0, r2: table.Ref.r2 - table.Ref.r1, c2: table.Ref.c2 - table.Ref.c1};
-				pasteRow = pasteRow - table.Ref.r1;
-				pasteCol = pasteCol - table.Ref.c1;
-				dxf = styleForCurTable.getStyle(bbox, pasteRow, pasteCol, styleInfo, headerRowCount, table.TotalsRowCount);
+
+				if (activeCellsPasteFragment.containsRange(table.Ref))
+				{
+					blocalArea = false;
+				}
+
+				if (!styleForCurTable)
+				{
+					return null;
+				}
+
+				var headerRowCount = 1;
+				var totalsRowCount = 0;
+				if (null != table.HeaderRowCount)
+				{
+					headerRowCount = table.HeaderRowCount;
+				}
+				if (null != table.TotalsRowCount)
+				{
+					totalsRowCount = table.TotalsRowCount;
+				}
+
+				var bbox = new Asc.Range(0, 0, table.Ref.c2 - table.Ref.c1, table.Ref.r2 - table.Ref.r1);
+				styleForCurTable.initStyle(val.sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
+				var cell = val._getCell(pasteRow, pasteCol);
+				if (cell)
+				{
+					dxf = cell.getCompiledStyle();
+				}
+				if (null === dxf)
+				{
+					pasteRow = pasteRow - table.Ref.r1;
+					pasteCol = pasteCol - table.Ref.c1;
+					dxf = AscCommonExcel.getCompiledStyleWs(val, pasteRow, pasteCol);
+				}
 			}
-			
-			return dxf;
+
+			return {dxf: dxf, blocalArea: blocalArea};
 		};
 		
 		var colsWidth = {};
@@ -9418,10 +9472,11 @@
 			
 			if (!isOneMerge)//settings for cell
 			{
+				var align = newVal.getAlign();
 				//vertical align
-				pastedRangeProps.alignVertical = newVal.getAlignVertical();
+				pastedRangeProps.alignVertical = align.getAlignVertical();
 				//horizontal align
-				pastedRangeProps.alignHorizontal = newVal.getAlignHorizontal();
+				pastedRangeProps.alignHorizontal = align.getAlignHorizontal();
 				
 				//borders
 				var fullBorders;
@@ -9448,14 +9503,24 @@
 				pastedRangeProps.fill = newVal.getFill();
 				//wrap
 				//range.setWrap(newVal.getWrap());
-				pastedRangeProps.wrap = newVal.getWrap();
+				pastedRangeProps.wrap = align.getWrap();
 				//angle
-				pastedRangeProps.angle = newVal.getAngle();
+				pastedRangeProps.angle = align.getAngle();
 				//hyperlink
 				pastedRangeProps.hyperlinkObj = newVal.getHyperlink();
 			}
-			
-			pastedRangeProps.tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
+
+			var tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
+			if(tableDxf.blocalArea)
+			{
+				pastedRangeProps.tableDxfLocal = tableDxf.dxf;
+			}
+			else
+			{
+				pastedRangeProps.tableDxf = tableDxf.dxf;
+			}
+
+
 			if(undefined === colsWidth[nCol])
 			{
 				colsWidth[nCol] = val._getCol(pasteCol);
@@ -9579,7 +9644,6 @@
 		//set formula - for paste from binary
 		var calculateValueAndBinaryFormula = function(newVal, firstRange, range)
 		{
-			var numFormula = null;
 			var skipFormat = null;
 			var noSkipVal = null;
 			
@@ -9603,9 +9667,10 @@
 			}
 			
 			var value2 = newVal.getValue2();
+			var isFromula = false;
 			for (var nF = 0; nF < value2.length; nF++) {
 				if (value2[nF] && value2[nF].sId) {
-					numFormula = nF;
+					isFromula = true;
 					break;
 				} else if (value2[nF] && value2[nF].format && value2[nF].format.getSkip()) {
 					skipFormat = true;
@@ -9616,10 +9681,7 @@
 			
 			//TODO вместо range где возможно использовать cell
 			var cellFrom, cellTo;
-			if (value2.length == 1 || numFormula != null || (skipFormat != null && noSkipVal != null)) {
-				if (numFormula == null) {
-					numFormula = 0;
-				}
+			if (value2.length === 1 || isFromula !== false || (skipFormat != null && noSkipVal != null)) {
 				var numStyle = 0;
 				if (skipFormat != null && noSkipVal != null) {
 					numStyle = noSkipVal;
@@ -9627,18 +9689,20 @@
 
 				//formula
 				if (newVal.getFormula() && !isOneMerge) {
-					var offset;
+
+					var offset, callAdress;
 					if(specialPasteProps.transpose && transposeRange)
 					{
 						//для transpose необходимо брать offset перевернутого range
-						offset = transposeRange.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+						callAdress = new AscCommon.CellAddress(value2[0].sId);
+						offset = new AscCommonExcel.CRangeOffset((transposeRange.bbox.c1 - callAdress.col + 1), (transposeRange.bbox.r1 - callAdress.row + 1));
 					}
 					else
 					{
-						offset = range.getCells()[numFormula].getOffset2(value2[numFormula].sId);
+						callAdress = new AscCommon.CellAddress(value2[0].sId);
+						offset = new AscCommonExcel.CRangeOffset((range.bbox.c1 - callAdress.col + 1), (range.bbox.r1 - callAdress.row + 1));
 					}
 					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, t.model);
-
 					if (_p_.parse()) {
 						
 						if(specialPasteProps.transpose)
@@ -9665,16 +9729,15 @@
 						//arrFormula.push({range: range, val: "=" + assemb});
 					}
 				} else {
-					cellFrom = newVal.getCells();
+					cellFrom = newVal.getLeftTopCellNoEmpty();
 					if (isOneMerge && range && range.bbox) {
-						cellTo = t._getCell(range.bbox.c1, range.bbox.r1).getCells();
+						cellTo = t._getCell(range.bbox.c1, range.bbox.r1).getLeftTopCell();
 					} else {
-						cellTo = firstRange.getCells();
+						cellTo = firstRange.getLeftTopCell();
 					}
 
-					if (cellFrom && cellTo && cellFrom[0] && cellTo[0]) {
-						//cellTo[0].setValueData(cellFrom[0].getValueData());
-						rangeStyle.cellValueData2 = {valueData: cellFrom[0].getValueData(), cell: cellTo[0]};
+					if (cellFrom && cellTo) {
+						rangeStyle.cellValueData2 = {valueData: cellFrom.getValueData(), cell: cellTo};
 					}
 				}
 				
@@ -9741,10 +9804,10 @@
 		//если не вставляем форматированную таблицу, но формат необходимо вставить
 		if(specialPasteProps.format && !specialPasteProps.formatTable && rangeStyle.tableDxf)
 		{
-			var cells = range.getCells();
-			if(cells && cells[0])
+			var firstCell = range.getLeftTopCell();
+			if(firstCell)
 			{
-				cells[0].setStyle(rangeStyle.tableDxf);
+				firstCell.setStyle(rangeStyle.tableDxf);
 			}
 		}
 		
@@ -9835,7 +9898,16 @@
 		{
 			range.setAngle(rangeStyle.angle);
 		}
-		
+
+		if(rangeStyle.tableDxfLocal && specialPasteProps.format)
+		{
+			var firstCell = range.getLeftTopCell();
+			if(firstCell)
+			{
+				firstCell.setStyle(rangeStyle.tableDxfLocal);
+			}
+		}
+
 		//hyperLink
 		if (rangeStyle.hyperLink && specialPasteProps.hyperlink)
 		{
@@ -10198,353 +10270,393 @@
         return true;
     };
 
-    WorksheetView.prototype.changeWorksheet = function (prop, val) {
-        // Проверка глобального лока
-        if (this.collaborativeEditing.getGlobalLock()) {
-            return;
-        }
+	WorksheetView.prototype.changeWorksheet = function (prop, val) {
+		// Проверка глобального лока
+		if (this.collaborativeEditing.getGlobalLock()) {
+			return;
+		}
 
-        var t = this;
-        var arn = this.model.selectionRange.getLast().clone();
-        var checkRange = arn.getAllRange();
+		var t = this;
+		var arn = this.model.selectionRange.getLast().clone();
+		var checkRange = arn.getAllRange();
 
-        var range;
+		var range;
 		var oRecalcType = AscCommonExcel.recalcType.recalc;
-        var reinitRanges = false;
-        var updateDrawingObjectsInfo = null;
-        var updateDrawingObjectsInfo2 = null;//{bInsert: false, operType: c_oAscInsertOptions.InsertColumns, updateRange: arn}
-        var isUpdateCols = false, isUpdateRows = false;
-        var isCheckChangeAutoFilter;
-        var functionModelAction = null;
-        var lockDraw = false;	// Параметр, при котором не будет отрисовки (т.к. мы просто обновляем информацию на неактивном листе)
+		var reinitRanges = false;
+		var updateDrawingObjectsInfo = null;
+		var updateDrawingObjectsInfo2 = null;//{bInsert: false, operType: c_oAscInsertOptions.InsertColumns, updateRange: arn}
+		var isUpdateCols = false, isUpdateRows = false;
+		var isCheckChangeAutoFilter;
+		var functionModelAction = null;
+		var lockDraw = false;	// Параметр, при котором не будет отрисовки (т.к. мы просто обновляем информацию на неактивном листе)
 		var lockRange, arrChangedRanges = [];
 
-        var onChangeWorksheetCallback = function (isSuccess) {
-            if (false === isSuccess) {
-                return;
-            }
+		var onChangeWorksheetCallback = function (isSuccess) {
+			if (false === isSuccess) {
+				return;
+			}
 
-            asc_applyFunction(functionModelAction);
+			asc_applyFunction(functionModelAction);
 
 			t._initCellsArea(oRecalcType);
 			if (oRecalcType) {
-                t.cache.reset();
-            }
-            t._cleanCellsTextMetricsCache();
-            t._prepareCellTextMetricsCache();
+				t.cache.reset();
+			}
+			t._cleanCellsTextMetricsCache();
+			t._prepareCellTextMetricsCache();
 
-            if (t.objectRender) {
-                if (reinitRanges && t.objectRender.drawingArea) {
-                    t.objectRender.drawingArea.reinitRanges();
-                }
-                if (null !== updateDrawingObjectsInfo) {
-                    t.objectRender.updateSizeDrawingObjects(updateDrawingObjectsInfo);
-                }
-                if (null !== updateDrawingObjectsInfo2) {
-                    t.objectRender.updateDrawingObject(updateDrawingObjectsInfo2.bInsert,
-                      updateDrawingObjectsInfo2.operType, updateDrawingObjectsInfo2.updateRange);
-                }
+			if (t.objectRender) {
+				if (reinitRanges && t.objectRender.drawingArea) {
+					t.objectRender.drawingArea.reinitRanges();
+				}
+				if (null !== updateDrawingObjectsInfo) {
+					t.objectRender.updateSizeDrawingObjects(updateDrawingObjectsInfo);
+				}
+				if (null !== updateDrawingObjectsInfo2) {
+					t.objectRender.updateDrawingObject(updateDrawingObjectsInfo2.bInsert,
+						updateDrawingObjectsInfo2.operType, updateDrawingObjectsInfo2.updateRange);
+				}
 				t.model.onUpdateRanges(arrChangedRanges);
 				t.objectRender.rebuildChartGraphicObjects(arrChangedRanges);
-            }
-            t.draw(lockDraw);
+			}
+			t.draw(lockDraw);
 
-            t.handlers.trigger("reinitializeScroll");
+			t.handlers.trigger("reinitializeScroll");
 
-            if (isUpdateCols) {
-                t._updateVisibleColsCount();
-            }
-            if (isUpdateRows) {
-                t._updateVisibleRowsCount();
-            }
+			if (isUpdateCols) {
+				t._updateVisibleColsCount();
+			}
+			if (isUpdateRows) {
+				t._updateVisibleRowsCount();
+			}
 
-            t.handlers.trigger("selectionChanged");
-            t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
-        };
+			t.handlers.trigger("selectionChanged");
+			t.handlers.trigger("selectionMathInfoChanged", t.getSelectionMathInfo());
+		};
 
-        switch (prop) {
-            case "colWidth":
-                functionModelAction = function () {
-                    t.model.setColWidth(val, checkRange.c1, checkRange.c2);
-                    isUpdateCols = true;
+		switch (prop) {
+			case "colWidth":
+				functionModelAction = function () {
+					t.model.setColWidth(val, checkRange.c1, checkRange.c2);
+					isUpdateCols = true;
 					oRecalcType = AscCommonExcel.recalcType.full;
-                    reinitRanges = true;
-                    updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: checkRange.c1};
-                };
-                this._isLockedAll(onChangeWorksheetCallback);
-                break;
-            case "showCols":
-                functionModelAction = function () {
-                    t.model.setColHidden(/*bHidden*/false, arn.c1, arn.c2);
+					reinitRanges = true;
+					updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: checkRange.c1};
+				};
+				this._isLockedAll(onChangeWorksheetCallback);
+				break;
+			case "showCols":
+				functionModelAction = function () {
+					t.model.setColHidden(/*bHidden*/false, arn.c1, arn.c2);
 					oRecalcType = AscCommonExcel.recalcType.full;
-                    reinitRanges = true;
-                    updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
-                };
+					reinitRanges = true;
+					updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
+				};
 				arrChangedRanges.push(new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0));
-                this._isLockedAll(onChangeWorksheetCallback);
-                break;
-            case "hideCols":
-                functionModelAction = function () {
-                    t.model.setColHidden(/*bHidden*/true, arn.c1, arn.c2);
+				this._isLockedAll(onChangeWorksheetCallback);
+				break;
+			case "hideCols":
+				functionModelAction = function () {
+					t.model.setColHidden(/*bHidden*/true, arn.c1, arn.c2);
 					oRecalcType = AscCommonExcel.recalcType.full;
-                    reinitRanges = true;
-                    updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
-                };
+					reinitRanges = true;
+					updateDrawingObjectsInfo = {target: c_oTargetType.ColumnResize, col: arn.c1};
+				};
 				arrChangedRanges.push(new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0));
-                this._isLockedAll(onChangeWorksheetCallback);
-                break;
-            case "rowHeight":
-                functionModelAction = function () {
-                    // Приводим к px (чтобы было ровно)
-                    val = val / 0.75;
-                    val = (val | val) * 0.75;		// 0.75 - это размер 1px в pt (можно было 96/72)
-                    t.model.setRowHeight(Math.min(val, t.maxRowHeight), checkRange.r1, checkRange.r2, true);
-                    isUpdateRows = true;
+				this._isLockedAll(onChangeWorksheetCallback);
+				break;
+			case "rowHeight":
+				functionModelAction = function () {
+					// Приводим к px (чтобы было ровно)
+					val = val / 0.75;
+					val = (val | val) * 0.75;		// 0.75 - это размер 1px в pt (можно было 96/72)
+					t.model.setRowHeight(Math.min(val, t.maxRowHeight), checkRange.r1, checkRange.r2, true);
+					isUpdateRows = true;
 					oRecalcType = AscCommonExcel.recalcType.full;
-                    reinitRanges = true;
-                    updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: checkRange.r1};
-                };
-                return this._isLockedAll(onChangeWorksheetCallback);
-            case "showRows":
-                functionModelAction = function () {
-                    t.model.setRowHidden(/*bHidden*/false, arn.r1, arn.r2);
-                    t.model.autoFilters.reDrawFilter(arn);
+					reinitRanges = true;
+					updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: checkRange.r1};
+				};
+				return this._isLockedAll(onChangeWorksheetCallback);
+			case "showRows":
+				functionModelAction = function () {
+					t.model.setRowHidden(/*bHidden*/false, arn.r1, arn.r2);
+					t.model.autoFilters.reDrawFilter(arn);
 					oRecalcType = AscCommonExcel.recalcType.full;
-                    reinitRanges = true;
-                    updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
-                };
+					reinitRanges = true;
+					updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
+				};
 				arrChangedRanges.push(new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2));
-                this._isLockedAll(onChangeWorksheetCallback);
-                break;
-            case "hideRows":
-                functionModelAction = function () {
-                    t.model.setRowHidden(/*bHidden*/true, arn.r1, arn.r2);
-                    t.model.autoFilters.reDrawFilter(arn);
+				this._isLockedAll(onChangeWorksheetCallback);
+				break;
+			case "hideRows":
+				functionModelAction = function () {
+					t.model.setRowHidden(/*bHidden*/true, arn.r1, arn.r2);
+					t.model.autoFilters.reDrawFilter(arn);
 					oRecalcType = AscCommonExcel.recalcType.full;
-                    reinitRanges = true;
-                    updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
-                };
+					reinitRanges = true;
+					updateDrawingObjectsInfo = {target: c_oTargetType.RowResize, row: arn.r1};
+				};
 				arrChangedRanges.push(new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2));
-                this._isLockedAll(onChangeWorksheetCallback);
-                break;
-            case "insCell":
-                range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
-                switch (val) {
-                    case c_oAscInsertOptions.InsertCellsAndShiftRight:
-                        isCheckChangeAutoFilter =
-                          t.af_checkInsDelCells(arn, c_oAscInsertOptions.InsertCellsAndShiftRight, prop);
-                        if (isCheckChangeAutoFilter === false) {
-                            return;
-                        }
+				this._isLockedAll(onChangeWorksheetCallback);
+				break;
+			case "insCell":
+				range = t.model.getRange3(arn.r1, arn.c1, arn.r2, arn.c2);
+				switch (val) {
+					case c_oAscInsertOptions.InsertCellsAndShiftRight:
+						isCheckChangeAutoFilter =
+							t.af_checkInsDelCells(arn, c_oAscInsertOptions.InsertCellsAndShiftRight, prop);
+						if (isCheckChangeAutoFilter === false) {
+							return;
+						}
 
-                        functionModelAction = function () {
-                            History.Create_NewPoint();
-                            History.StartTransaction();
-                            if (range.addCellsShiftRight()) {
+						functionModelAction = function () {
+							History.Create_NewPoint();
+							History.StartTransaction();
+							if (range.addCellsShiftRight()) {
 								oRecalcType = AscCommonExcel.recalcType.full;
-                                reinitRanges = true;
-                                t.cellCommentator.updateCommentsDependencies(true, val, arn);
-                                updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
-                            }
-                            History.EndTransaction();
-                        };
+								reinitRanges = true;
+								t.cellCommentator.updateCommentsDependencies(true, val, arn);
+								updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
+							}
+							History.EndTransaction();
+						};
 
 						arrChangedRanges.push(lockRange = new asc_Range(arn.c1, arn.r1, gc_nMaxCol0, arn.r2));
+						if (this.model.inPivotTable(lockRange)) {
+							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+								c_oAscError.Level.NoCritical);
+							return;
+						}
 						this._isLockedCells(lockRange, null, onChangeWorksheetCallback);
-                        break;
-                    case c_oAscInsertOptions.InsertCellsAndShiftDown:
-                        isCheckChangeAutoFilter =
-                          t.af_checkInsDelCells(arn, c_oAscInsertOptions.InsertCellsAndShiftDown, prop);
-                        if (isCheckChangeAutoFilter === false) {
-                            return;
-                        }
+						break;
+					case c_oAscInsertOptions.InsertCellsAndShiftDown:
+						isCheckChangeAutoFilter =
+							t.af_checkInsDelCells(arn, c_oAscInsertOptions.InsertCellsAndShiftDown, prop);
+						if (isCheckChangeAutoFilter === false) {
+							return;
+						}
 
-                        functionModelAction = function () {
-                            History.Create_NewPoint();
-                            History.StartTransaction();
-                            if (range.addCellsShiftBottom()) {
+						functionModelAction = function () {
+							History.Create_NewPoint();
+							History.StartTransaction();
+							if (range.addCellsShiftBottom()) {
 								oRecalcType = AscCommonExcel.recalcType.full;
-                                reinitRanges = true;
-                                t.cellCommentator.updateCommentsDependencies(true, val, arn);
-                                updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
-                            }
-                            History.EndTransaction();
-                        };
+								reinitRanges = true;
+								t.cellCommentator.updateCommentsDependencies(true, val, arn);
+								updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
+							}
+							History.EndTransaction();
+						};
 
 						arrChangedRanges.push(lockRange = new asc_Range(arn.c1, arn.r1, arn.c2, gc_nMaxRow0));
+						if (this.model.inPivotTable(lockRange)) {
+							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+								c_oAscError.Level.NoCritical);
+							return;
+						}
 						this._isLockedCells(lockRange, null, onChangeWorksheetCallback);
-                        break;
-                    case c_oAscInsertOptions.InsertColumns:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isRangeIntersectionSeveralTableParts(arn);
-                        if (isCheckChangeAutoFilter === true) {
-                            this.model.workbook.handlers.trigger("asc_onError",
-                              c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
-                            return;
-                        }
+						break;
+					case c_oAscInsertOptions.InsertColumns:
+						isCheckChangeAutoFilter = t.model.autoFilters.isRangeIntersectionSeveralTableParts(arn);
+						if (isCheckChangeAutoFilter === true) {
+							this.model.workbook.handlers.trigger("asc_onError",
+								c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+							return;
+						}
 
-                        functionModelAction = function () {
-                            History.Create_NewPoint();
-                            History.StartTransaction();
+						functionModelAction = function () {
+							History.Create_NewPoint();
+							History.StartTransaction();
 							oRecalcType = AscCommonExcel.recalcType.full;
-                            reinitRanges = true;
-                            t.model.insertColsBefore(arn.c1, arn.c2 - arn.c1 + 1);
-                            updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
-                            t.cellCommentator.updateCommentsDependencies(true, val, arn);
-                            History.EndTransaction();
-                        };
+							reinitRanges = true;
+							t.model.insertColsBefore(arn.c1, arn.c2 - arn.c1 + 1);
+							updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
+							t.cellCommentator.updateCommentsDependencies(true, val, arn);
+							History.EndTransaction();
+						};
 
 						arrChangedRanges.push(lockRange = new asc_Range(arn.c1, 0, arn.c2, gc_nMaxRow0));
+						if (this.model.inPivotTable(lockRange)) {
+							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+								c_oAscError.Level.NoCritical);
+							return;
+						}
 						this._isLockedCells(lockRange, c_oAscLockTypeElemSubType.InsertColumns,
-                          onChangeWorksheetCallback);
-                        break;
-                    case c_oAscInsertOptions.InsertRows:
-                        functionModelAction = function () {
+							onChangeWorksheetCallback);
+						break;
+					case c_oAscInsertOptions.InsertRows:
+						functionModelAction = function () {
 							oRecalcType = AscCommonExcel.recalcType.full;
-                            reinitRanges = true;
-                            t.model.insertRowsBefore(arn.r1, arn.r2 - arn.r1 + 1);
-                            updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
-                            t.cellCommentator.updateCommentsDependencies(true, val, arn);
-                        };
+							reinitRanges = true;
+							t.model.insertRowsBefore(arn.r1, arn.r2 - arn.r1 + 1);
+							updateDrawingObjectsInfo2 = {bInsert: true, operType: val, updateRange: arn};
+							t.cellCommentator.updateCommentsDependencies(true, val, arn);
+						};
 
 						arrChangedRanges.push(lockRange = new asc_Range(0, arn.r1, gc_nMaxCol0, arn.r2));
+						if (this.model.inPivotTable(lockRange)) {
+							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+								c_oAscError.Level.NoCritical);
+							return;
+						}
 						this._isLockedCells(lockRange, c_oAscLockTypeElemSubType.InsertRows, onChangeWorksheetCallback);
-                        break;
-                }
-                break;
-            case "delCell":
-                range = t.model.getRange3(checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2);
-                switch (val) {
-                    case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
-                        isCheckChangeAutoFilter =
-                          t.af_checkInsDelCells(arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop);
-                        if (isCheckChangeAutoFilter === false) {
-                            return;
-                        }
+						break;
+				}
+				break;
+			case "delCell":
+				range = t.model.getRange3(checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2);
+				switch (val) {
+					case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
+						isCheckChangeAutoFilter =
+							t.af_checkInsDelCells(arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop);
+						if (isCheckChangeAutoFilter === false) {
+							return;
+						}
 
-                        functionModelAction = function () {
-                            History.Create_NewPoint();
-                            History.StartTransaction();
-                            if (isCheckChangeAutoFilter === true) {
-                                t.model.autoFilters.isEmptyAutoFilters(arn,
-                                  c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
-                            }
-                            if (range.deleteCellsShiftLeft(function () {
+						functionModelAction = function () {
+							History.Create_NewPoint();
+							History.StartTransaction();
+							if (isCheckChangeAutoFilter === true) {
+								t.model.autoFilters.isEmptyAutoFilters(arn,
+									c_oAscDeleteOptions.DeleteCellsAndShiftLeft);
+							}
+							if (range.deleteCellsShiftLeft(function () {
 									t._cleanCache(lockRange);
-                                  t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
-                              })) {
-                                updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
-                            }
-                            History.EndTransaction();
-                            reinitRanges = true;
-                        };
+									t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+								})) {
+								updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
+							}
+							History.EndTransaction();
+							reinitRanges = true;
+						};
 
 						arrChangedRanges.push(
 							lockRange = new asc_Range(checkRange.c1, checkRange.r1, gc_nMaxCol0, checkRange.r2));
+						if (this.model.inPivotTable(lockRange)) {
+							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+								c_oAscError.Level.NoCritical);
+							return;
+						}
 						this._isLockedCells(lockRange, null, onChangeWorksheetCallback);
-                        break;
-                    case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
-                        isCheckChangeAutoFilter =
-                          t.af_checkInsDelCells(arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop);
-                        if (isCheckChangeAutoFilter === false) {
-                            return;
-                        }
+						break;
+					case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
+						isCheckChangeAutoFilter =
+							t.af_checkInsDelCells(arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop);
+						if (isCheckChangeAutoFilter === false) {
+							return;
+						}
 
-                        functionModelAction = function () {
-                            History.Create_NewPoint();
-                            History.StartTransaction();
-                            if (isCheckChangeAutoFilter === true) {
-                                t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
-                            }
-                            if (range.deleteCellsShiftUp(function () {
+						functionModelAction = function () {
+							History.Create_NewPoint();
+							History.StartTransaction();
+							if (isCheckChangeAutoFilter === true) {
+								t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop);
+							}
+							if (range.deleteCellsShiftUp(function () {
 									t._cleanCache(lockRange);
-                                  t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
-                              })) {
-                                updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
-                            }
-                            History.EndTransaction();
+									t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+								})) {
+								updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
+							}
+							History.EndTransaction();
 
-                            reinitRanges = true;
-                        };
+							reinitRanges = true;
+						};
 
 						arrChangedRanges.push(
 							lockRange = new asc_Range(checkRange.c1, checkRange.r1, checkRange.c2, gc_nMaxRow0));
+						if (this.model.inPivotTable(lockRange)) {
+							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+								c_oAscError.Level.NoCritical);
+							return;
+						}
 						this._isLockedCells(lockRange, null, onChangeWorksheetCallback);
-                        break;
-                    case c_oAscDeleteOptions.DeleteColumns:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable(checkRange,
-                          c_oAscDeleteOptions.DeleteColumns, prop);
-                        if (isCheckChangeAutoFilter === false) {
-                            return;
-                        }
+						break;
+					case c_oAscDeleteOptions.DeleteColumns:
+						isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable(checkRange,
+							c_oAscDeleteOptions.DeleteColumns, prop);
+						if (isCheckChangeAutoFilter === false) {
+							return;
+						}
 
-                        functionModelAction = function () {
+						functionModelAction = function () {
 							oRecalcType = AscCommonExcel.recalcType.full;
-                            reinitRanges = true;
-                            History.Create_NewPoint();
-                            History.StartTransaction();
-                            t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
-                            t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteColumns);
-                            t.model.removeCols(checkRange.c1, checkRange.c2);
-                            updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
-                            History.EndTransaction();
-                        };
+							reinitRanges = true;
+							History.Create_NewPoint();
+							History.StartTransaction();
+							t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+							t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteColumns);
+							t.model.removeCols(checkRange.c1, checkRange.c2);
+							updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
+							History.EndTransaction();
+						};
 
 						arrChangedRanges.push(lockRange = new asc_Range(checkRange.c1, 0, checkRange.c2, gc_nMaxRow0));
+						if (this.model.inPivotTable(lockRange)) {
+							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+								c_oAscError.Level.NoCritical);
+							return;
+						}
 						this._isLockedCells(lockRange, c_oAscLockTypeElemSubType.DeleteColumns,
-                          onChangeWorksheetCallback);
-                        break;
-                    case c_oAscDeleteOptions.DeleteRows:
-                        isCheckChangeAutoFilter =
-                          t.model.autoFilters.isActiveCellsCrossHalfFTable(checkRange, c_oAscDeleteOptions.DeleteRows,
-                            prop);
-                        if (isCheckChangeAutoFilter === false) {
-                            return;
-                        }
+							onChangeWorksheetCallback);
+						break;
+					case c_oAscDeleteOptions.DeleteRows:
+						isCheckChangeAutoFilter =
+							t.model.autoFilters.isActiveCellsCrossHalfFTable(checkRange, c_oAscDeleteOptions.DeleteRows,
+								prop);
+						if (isCheckChangeAutoFilter === false) {
+							return;
+						}
 
-                        functionModelAction = function () {
+						functionModelAction = function () {
 							oRecalcType = AscCommonExcel.recalcType.full;
-                            reinitRanges = true;
-                            History.Create_NewPoint();
-                            History.StartTransaction();
+							reinitRanges = true;
+							History.Create_NewPoint();
+							History.StartTransaction();
 							checkRange = t.model.autoFilters.checkDeleteAllRowsFormatTable(checkRange, true);
-                            t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
-                            t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteRows);
-                            t.model.removeRows(checkRange.r1, checkRange.r2);
-                            updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
-                            History.EndTransaction();
-                        };
+							t.cellCommentator.updateCommentsDependencies(false, val, checkRange);
+							t.model.autoFilters.isEmptyAutoFilters(arn, c_oAscDeleteOptions.DeleteRows);
+							t.model.removeRows(checkRange.r1, checkRange.r2);
+							updateDrawingObjectsInfo2 = {bInsert: false, operType: val, updateRange: arn};
+							History.EndTransaction();
+						};
 
 						arrChangedRanges.push(lockRange = new asc_Range(0, checkRange.r1, gc_nMaxCol0, checkRange.r2));
+						if (this.model.inPivotTable(lockRange)) {
+							this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.LockedCellPivot,
+								c_oAscError.Level.NoCritical);
+							return;
+						}
 						this._isLockedCells(lockRange, c_oAscLockTypeElemSubType.DeleteRows, onChangeWorksheetCallback);
-                        break;
-                }
-                this.handlers.trigger("selectionNameChanged", t.getSelectionName(/*bRangeText*/false));
-                break;
-            case "sheetViewSettings":
-                functionModelAction = function () {
-				    if (AscCH.historyitem_Worksheet_SetDisplayGridlines === val.type) {
+						break;
+				}
+				this.handlers.trigger("selectionNameChanged", t.getSelectionName(/*bRangeText*/false));
+				break;
+			case "sheetViewSettings":
+				functionModelAction = function () {
+					if (AscCH.historyitem_Worksheet_SetDisplayGridlines === val.type) {
 						t.model.setDisplayGridlines(val.value);
-                    } else {
+					} else {
 						t.model.setDisplayHeadings(val.value);
-                    }
+					}
 
-                    isUpdateCols = true;
-                    isUpdateRows = true;
+					isUpdateCols = true;
+					isUpdateRows = true;
 					oRecalcType = AscCommonExcel.recalcType.full;
-                    reinitRanges = true;
-                };
+					reinitRanges = true;
+				};
 
-                this._isLockedAll(onChangeWorksheetCallback);
-                break;
-            case "update":
-                if (val !== undefined) {
-                    lockDraw = true === val.lockDraw;
-                    reinitRanges = !!val.reinitRanges;
-                }
-                onChangeWorksheetCallback(true);
-                break;
-        }
-    };
+				this._isLockedAll(onChangeWorksheetCallback);
+				break;
+			case "update":
+				if (val !== undefined) {
+					lockDraw = true === val.lockDraw;
+					reinitRanges = !!val.reinitRanges;
+				}
+				onChangeWorksheetCallback(true);
+				break;
+		}
+	};
 
     WorksheetView.prototype.expandColsOnScroll = function (isNotActive, updateColsCount, newColsCount) {
         var maxColObjects = this.objectRender ? this.objectRender.getMaxColRow().col : -1;
@@ -11063,7 +11175,7 @@
 			if (defName) {
 				this._isLockedDefNames(null, defName.getNodeId());
 			} else {
-				this.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName,
+				this.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.InvalidReferenceOrName,
 					c_oAscError.Level.NoCritical);
 			}
 		}
@@ -12351,7 +12463,7 @@
     };
 
     WorksheetView.prototype.af_drawButtons = function (updatedRange, offsetX, offsetY) {
-        var aWs = this.model;
+        var i, aWs = this.model;
         var t = this;
 
         if (aWs.workbook.bUndoChanges || aWs.workbook.bRedoChanges) {
@@ -12421,11 +12533,17 @@
             drawCurrentFilterButtons(aWs.AutoFilter);
         }
         if (aWs.TableParts && aWs.TableParts.length) {
-            for (var i = 0; i < aWs.TableParts.length; i++) {
+            for (i = 0; i < aWs.TableParts.length; i++) {
                 if (aWs.TableParts[i].AutoFilter && aWs.TableParts[i].HeaderRowCount !== 0) {
                     drawCurrentFilterButtons(aWs.TableParts[i], true);
                 }
             }
+        }
+
+        var pivotButtons = this.model.getPivotTableButtons(updatedRange);
+        for (i = 0; i < pivotButtons.length; ++i) {
+			this.af_drawCurrentButton(offsetX, offsetY,
+				{isSortState: null, isSetFilter: false, row: pivotButtons[i].row, col: pivotButtons[i].col});
         }
 
         return true;
@@ -12659,113 +12777,93 @@
 
 		_drawButton(x1 + diffX, y1 + diffY);
 	};
-	
-    WorksheetView.prototype.af_checkCursor = function (x, y, offsetX, offsetY, frozenObj, r, c) {
-        var ws = this;
-        var aWs = this.model;
-        var result = false;
-        var t = this;
 
-        var _checkClickFrozenArea = function (x, y, offsetX, offsetY, frozenObj) {
-            var frosenPosX = frozenObj && frozenObj.cFrozen != undefined && ws.cols[frozenObj.cFrozen] ?
-              ws.cols[frozenObj.cFrozen].left : null;
-            var frosenPosY = frozenObj && frozenObj.rFrozen != undefined && ws.rows[frozenObj.rFrozen] ?
-              ws.rows[frozenObj.rFrozen].top : null;
-            var result;
+	WorksheetView.prototype.af_checkCursor = function (x, y, _vr, offsetX, offsetY, r, c) {
+		var aWs = this.model;
+		var t = this;
+		var result = null;
 
-            if (frosenPosX != null && frosenPosY != null && x < frosenPosX && y < frosenPosY) {
-                result = {x: x, y: y};
-            } else if (frosenPosX != null && x < frosenPosX) {
-                result = {x: x, y: y + offsetY};
-            } else if (frosenPosY != null && y < frosenPosY) {
-                result = {x: x + offsetX, y: y};
-            } else {
-                result = {x: x + offsetX, y: y + offsetY};
-            }
+		var _isShowButtonInFilter = function (col, filter) {
+			var result = true;
+			var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
 
-            return result;
-        };
+			if (filter.HeaderRowCount === 0) {
+				result = null;
+			} else if (autoFilter && autoFilter.FilterColumns)//проверяем скрытые ячейки
+			{
+				var colId = col - autoFilter.Ref.c1;
+				for (var i = 0; i < autoFilter.FilterColumns.length; i++) {
+					if (autoFilter.FilterColumns[i].ColId === colId) {
+						if (autoFilter.FilterColumns[i].ShowButton === false) {
+							result = null;
+						}
 
-        var _isShowButtonInFilter = function (col, filter) {
-            var result = true;
-            var autoFilter = filter.isAutoFilter() ? filter : filter.AutoFilter;
+						break;
+					}
+				}
+			} else if (!filter.isAutoFilter() && autoFilter === null)//если форматированная таблица и отсутсвует а/ф
+			{
+				result = null;
+			}
 
-            if (filter.HeaderRowCount === 0) {
-                result = false;
-            } else if (autoFilter && autoFilter.FilterColumns)//проверяем скрытые ячейки
-            {
-                var colId = col - autoFilter.Ref.c1;
-                for (var i = 0; i < autoFilter.FilterColumns.length; i++) {
-                    if (autoFilter.FilterColumns[i].ColId === colId) {
-                        if (autoFilter.FilterColumns[i].ShowButton === false) {
-                            result = false;
-                        }
+			return result;
+		};
 
-                        break;
-                    }
-                }
-            } else if (!filter.isAutoFilter() && autoFilter === null)//если форматированная таблица и отсутсвует а/ф
-            {
-                result = false;
-            }
+		var checkCurrentFilter = function (filter, num) {
+			var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
+			if (range.contains(c.col, r.row) && _isShowButtonInFilter(c.col, filter)) {
+				var row = range.r1;
+				for (var col = range.c1; col <= range.c2; col++) {
+					if (col === c.col) {
 
-            return result;
-        };
+						if(t._hitCursorFilterButton(x, y, col, row)){
+							result = {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: -1, row: -1, idFilter: {id: num, colId: col - range.c1}};
+							break;
+						}
+					}
+				}
+			}
+		};
 
-        var checkCurrentFilter = function (filter, num) {
-            var range = new Asc.Range(filter.Ref.c1, filter.Ref.r1, filter.Ref.c2, filter.Ref.r1);
-            if (range.contains(c.col, r.row) && _isShowButtonInFilter(c.col, filter)) {
-                var row = range.r1;
-                for (var col = range.c1; col <= range.c2; col++) {
-                    if (col === c.col) {
-                        var width = 13;
-                        var height = 13;
-                        var rowHeight = ws.rows[row].height;
-                        if (rowHeight < height) {
-                            width = width * (rowHeight / height);
-                            height = rowHeight;
-                        }
+		if(_vr.contains(c.col, r.row))
+		{
+			x = x + offsetX;
+			y = y + offsetY;
 
-                        var x1 = ws.cols[col].left + ws.cols[col].width - width - 0.5;
-                        var y1 = ws.rows[row].top + ws.rows[row].height - height - 0.5;
-                        var x2 = ws.cols[col].left + ws.cols[col].width - 0.5;
-                        var y2 = ws.rows[row].top + ws.rows[row].height - 0.5;
+			if (aWs.AutoFilter && aWs.AutoFilter.Ref) {
+				checkCurrentFilter(aWs.AutoFilter, null);
+			}
 
-                        if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-                            result = {
-                                id: {id: num, colId: col - range.c1},
-                                target: c_oTargetType.FilterObject,
-                                col: -1,
-                                row: -1
-                            };
-                            return;
-                        }
-                    }
-                }
-            }
-        };
+			if (aWs.TableParts && aWs.TableParts.length && !result) {
+				for (var i = 0; i < aWs.TableParts.length; i++) {
+					if (aWs.TableParts[i].AutoFilter) {
+						checkCurrentFilter(aWs.TableParts[i], i);
+					}
+				}
+			}
+		}
 
+		return result;
+	};
 
-        var checkFrozenArea = _checkClickFrozenArea(x, y, offsetX, offsetY, frozenObj);
-        if (checkFrozenArea) {
-            x = checkFrozenArea.x;
-            y = checkFrozenArea.y;
-        }
+	WorksheetView.prototype._hitCursorFilterButton = function(x, y, col, row)
+	{
+		var ws = this;
+		var width = 13;
+		var height = 13;
+		var rowHeight = ws.rows[row].height;
+		if (rowHeight < height) {
+			width = width * (rowHeight / height);
+			height = rowHeight;
+		}
 
-        if (aWs.AutoFilter && aWs.AutoFilter.Ref) {
-            checkCurrentFilter(aWs.AutoFilter, null);
-        }
+		var x1 = ws.cols[col].left + ws.cols[col].width - width - 0.5;
+		var y1 = ws.rows[row].top + ws.rows[row].height - height - 0.5;
+		var x2 = ws.cols[col].left + ws.cols[col].width - 0.5;
+		var y2 = ws.rows[row].top + ws.rows[row].height - 0.5;
 
-        if (aWs.TableParts && aWs.TableParts.length && !result) {
-            for (var i = 0; i < aWs.TableParts.length; i++) {
-                if (aWs.TableParts[i].AutoFilter) {
-                    checkCurrentFilter(aWs.TableParts[i], i);
-                }
-            }
-        }
-
-        return result;
-    };
+		return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
+	};
 
     WorksheetView.prototype._checkAddAutoFilter = function (activeRange, styleName, addFormatTableOptionsObj, filterByCellContextMenu) {
         //write error, if not add autoFilter and return false

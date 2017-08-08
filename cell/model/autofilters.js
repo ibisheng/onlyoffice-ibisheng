@@ -56,8 +56,6 @@
 		var prot;
 
 		var maxIndividualValues = 10000;
-		var maxValCol = 20000;
-		var maxValRow = 100000;
 
 		var g_oAutoFiltersOptionsElementsProperties = {
 			val		    : 0,
@@ -128,22 +126,17 @@
 		};
 
 		/** @constructor */
-		function formatTablePictures (options) {
-			if ( !(this instanceof formatTablePictures) ) {return new formatTablePictures(options);}
-
-			this.name = options.name;
-			this.displayName = options.displayName;
-			this.type = options.type;
-			this.image = options.image;
+		function formatTablePictures () {
+			this.name = null;
+			this.displayName = null;
+			this.type = null;
+			this.image = null;
 		}
-		formatTablePictures.prototype = {
-			constructor: formatTablePictures,
 
-			asc_getName: function () { return this.name; },
-			asc_getDisplayName: function () { return this.displayName; },
-			asc_getType: function () { return this.type; },
-			asc_getImage: function () { return this.image; }
-		};
+		formatTablePictures.prototype.asc_getName = function () { return this.name; };
+		formatTablePictures.prototype.asc_getDisplayName = function () { return this.displayName; };
+		formatTablePictures.prototype.asc_getType = function () { return this.type; };
+		formatTablePictures.prototype.asc_getImage = function () { return this.image; };
 		
 		var g_oAutoFiltersOptionsProperties = {
 			cellId		: 0,
@@ -558,6 +551,7 @@
                         isTablePartsContainsRange.TableStyleInfo = new AscCommonExcel.TableStyleInfo();
 					isTablePartsContainsRange.TableStyleInfo.Name = styleName;
 
+					t._cleanStyleTable(isTablePartsContainsRange.Ref);
 					t._setColorStyleTable(isTablePartsContainsRange.Ref, isTablePartsContainsRange);
 					
 					//history
@@ -900,6 +894,10 @@
 				{
 					activeCells = AscCommonExcel.g_oRangeCache.getAscRange(userRange);
 				}
+
+				if(activeCells.getAllRange){
+					activeCells = activeCells.getAllRange();
+				}
 				
 				//данная функция возвращает false в двух случаях - при смене стиля ф/т или при поптыке добавить ф/т к части а/ф
 				
@@ -1073,7 +1071,7 @@
 
 								//чистим стиль от старой таблицы
 								var clearRange = new AscCommonExcel.Range(worksheet, cloneData.newFilterRef.r1, cloneData.newFilterRef.c1, cloneData.newFilterRef.r2, cloneData.newFilterRef.c2);
-								clearRange.setTableStyle(null);
+								clearRange.clearTableStyle();
 								
 								this._setColorStyleTable(cloneData.oldFilter.Ref, cloneData.oldFilter, null, true);
 								
@@ -1266,7 +1264,7 @@
 					//смотрим находится ли фильтр(первая его строчка) внутри выделенного фрагмента
 					if ((activeCells.containsFirstLineRange(bbox) && !isTablePart) || (isTablePart && activeCells.containsRange(bbox))) {
 						if(isTablePart) {
-							oRange.setTableStyle(null);
+							oRange.clearTableStyle();
 							//write formulas history before filter history
 							worksheet.deleteTablePart(index, bConvertTableFormulaToRef);
 						} else
@@ -1758,21 +1756,21 @@
 					var cellIdRange = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r1);
 					
 					curFilter.SortState.SortConditions[0].Ref = new Asc.Range(startCol, filterRef.r1, startCol, filterRef.r2);
-					curFilter.SortState.SortConditions[0].dxf = new AscCommonExcel.CellXfs();
-					
+					var newDxf = new AscCommonExcel.CellXfs();
+
 					if(type === Asc.c_oAscSortOptions.ByColorFill)
 					{
-						curFilter.SortState.SortConditions[0].dxf.fill = new AscCommonExcel.Fill();
-						curFilter.SortState.SortConditions[0].dxf.fill.bg = color;
+						newDxf.fill = new AscCommonExcel.Fill();
+						newDxf.fill.bg = color;
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyCellColor;
 					}
 					else
 					{
-						curFilter.SortState.SortConditions[0].dxf.font = new AscCommonExcel.Font();
-						curFilter.SortState.SortConditions[0].dxf.font.setColor(color);
+						newDxf.font = new AscCommonExcel.Font();
+						newDxf.font.setColor(color);
 						curFilter.SortState.SortConditions[0].ConditionSortBy = Asc.ESortBy.sortbyFontColor;
 					}
-
+					curFilter.SortState.SortConditions[0].dxf = AscCommonExcel.g_StyleCache.addXf(newDxf, true);
 					if(curFilter.TableStyleInfo)
 					{
 						t._setColorStyleTable(curFilter.Ref, curFilter);
@@ -2204,13 +2202,9 @@
 							{
 								cell = worksheet._getCell(i, j);
 								cellTo = worksheet._getCell(i + diffRow, j + diffCol);
-								
-								var xfsTo = cellTo.getCompiledStyle();
-								if(null === xfsTo)
-								{
-									var xfsFrom = cell.getCompiledStyle();
-									cellTo.setStyle(xfsFrom);
-								}
+
+								var xfsFrom = cell.getCompiledStyle();
+								cellTo.setStyle(xfsFrom);
 							}
 						}
 					}
@@ -2796,7 +2790,7 @@
 			
 			_clearRange: function(range, isClearText)
 			{
-				range.setTableStyle(null);
+				range.clearTableStyle();
 				if(isClearText)
 				{
 					History.TurnOff();
@@ -4373,11 +4367,6 @@
 				var bRedoChanges = worksheet.workbook.bRedoChanges;
 				
 				var bbox = range;
-				//ограничим количество строчек/столбцов				
-				if((bbox.r2 - bbox.r1) > maxValRow)
-					bbox.r2 = bbox.r1 + maxValRow;
-				if((bbox.c2 - bbox.c1) > maxValCol)
-					bbox.c2 = bbox.c1 + maxValCol;
 				
 				var style = options.TableStyleInfo ? options.TableStyleInfo.clone() : null;
 				var styleForCurTable;
@@ -4443,78 +4432,11 @@
 					}
 					
 					//заполняем стили
-					var aNoHiddenCol = [];
-					for(var i = bbox.c1; i <= bbox.c2; i++)
-					{
-						if (!worksheet.getColHidden(i))
-							aNoHiddenCol.push(i);
-					}
-					aNoHiddenCol.sort(AscCommon.fSortAscending);
-					//если скрыт первый или последний столбец, то их не надо сдвигать и показывать
-					if(aNoHiddenCol.length > 0)
-					{
-						if(aNoHiddenCol[0] != bbox.c1)
-							style.ShowFirstColumn = false;
-						if(aNoHiddenCol[aNoHiddenCol.length - 1] != bbox.c2)
-							style.ShowLastColumn = false;
-					}
-					var aNoHiddenRow = [];
-					for(var i = bbox.r1; i <= bbox.r2; i++)
-					{
-						if (!worksheet.getRowHidden(i))
-							aNoHiddenRow.push(i);
-					}
-					aNoHiddenRow.sort(AscCommon.fSortAscending);
-					//если скрыты заголовок или итоги, то их не надо сдвигать и показывать
-					if(aNoHiddenRow.length > 0)
-					{
-						if(aNoHiddenRow[0] != bbox.r1)
-							headerRowCount = 0;
-						if(aNoHiddenRow[aNoHiddenRow.length - 1] != bbox.r2)
-							totalsRowCount = 0;
-					}
-					//изменяем bbox с учетом скрытых
-					bbox = {r1: 0, c1: 0, r2: aNoHiddenRow.length - 1, c2: aNoHiddenCol.length - 1};
-					for(var i = 0, length = aNoHiddenRow.length; i < length; i++)
-					{
-						var nRowIndexAbs = aNoHiddenRow[i];
-						for(var j = 0, length2 = aNoHiddenCol.length; j < length2; j++)
-						{
-							var nColIndexAbs = aNoHiddenCol[j];
-							var cell = worksheet.getRange3(nRowIndexAbs, nColIndexAbs, nRowIndexAbs, nColIndexAbs);
-							var dxf = styleForCurTable.getStyle(bbox, i, j, style, headerRowCount, totalsRowCount);
-							if(null != dxf)
-								cell.setTableStyle(dxf);
-						}
-					}
+					styleForCurTable.initStyle(worksheet.sheetMergedStyles, bbox, style, headerRowCount, totalsRowCount);
 				}
 				worksheet.workbook.dependencyFormulas.unlockRecal();
 			},
-			
-			getTableCellStyle: function(row, col)
-			{
-				var worksheet = this.worksheet;
-				var res = null;
-				
-				var tableIndex = this.searchRangeInTableParts(Asc.Range(col, row, col, row));
-				if(tableIndex > -1)
-				{
-					var table = worksheet.TableParts[tableIndex];
-					var style = table.TableStyleInfo;
-					var styleForCurTable = worksheet.workbook.TableStyles.AllStyles[style.Name];
-					
-					if(styleForCurTable)
-					{
-						var startCol = table.Ref.c1 - col;
-						var startRow = table.Ref.r1 - row;
-						var bbox = Asc.Range(startCol, startRow, startCol, startRow);
-						res = styleForCurTable.getStyle(bbox, startRow, startCol, style, /*headerRowCount*/0, /*totalsRowCount*/0);
-					}
-				}
-				
-				return res;
-			},
-			
+
 			_getFormatTableColumnRange: function(table, columnName)
 			{
 				var worksheet = this.worksheet;
@@ -4562,7 +4484,7 @@
 			_cleanStyleTable : function(sRef)
 			{
 				var oRange = new AscCommonExcel.Range(this.worksheet, sRef.r1, sRef.c1, sRef.r2, sRef.c2);
-				oRange.setTableStyle(null);
+				oRange.clearTableStyle();
 			},
 					
 			//TODO CHANGE!!!

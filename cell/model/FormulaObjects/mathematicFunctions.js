@@ -5129,9 +5129,10 @@
 		return this.value = truncHelper(arg0.getValue(), arg1.getValue());
 	};
 
-	window['AscCommonExcel'].cPRODUCT = cPRODUCT;
-	window['AscCommonExcel'].cSUM = cSUM;
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window['AscCommonExcel'].cAGGREGATE = cAGGREGATE;
+	window['AscCommonExcel'].cPRODUCT = cPRODUCT;
 	window['AscCommonExcel'].cSUBTOTAL = cSUBTOTAL;
-
+	window['AscCommonExcel'].cSUM = cSUM;
 })(window);

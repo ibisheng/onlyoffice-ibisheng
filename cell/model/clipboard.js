@@ -814,16 +814,16 @@
 							} else {
 								td.style.width = worksheet.getColumnWidth(col, 1/*pt*/) + "pt";
 							}
-
-							if (!cell.getWrap()) {td.style.whiteSpace = "nowrap";}else {td.style.whiteSpace = "normal";} 
+							var align = cell.getAlign();
+							if (!align.getWrap()) {td.style.whiteSpace = "nowrap";}else {td.style.whiteSpace = "normal";}
 							
-							switch (cell.getAlignHorizontal()) {
+							switch (align.getAlignHorizontal()) {
 								case AscCommon.align_Left: td.style.textAlign = "left"; break;
 								case AscCommon.align_Right: td.style.textAlign = "right"; break;
 								case AscCommon.align_Center: td.style.textAlign = "center"; break;
 								case AscCommon.align_Justify: td.style.textAlign = "justify"; break;
 							}
-							switch (cell.getAlignVertical()) {
+							switch (align.getAlignVertical()) {
 								case Asc.c_oAscVAlign.Bottom: td.style.verticalAlign = "bottom"; break;
 								case Asc.c_oAscVAlign.Center:
 								case Asc.c_oAscVAlign.Dist:

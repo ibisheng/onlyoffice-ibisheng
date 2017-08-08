@@ -170,6 +170,8 @@
 			InvalidReferenceOrName : -310,
 			LockCreateDefName      : -311,
 
+			LockedCellPivot				: -312,
+
 			OpenWarning : 500
 		}
 	};

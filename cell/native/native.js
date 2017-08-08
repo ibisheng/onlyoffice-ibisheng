@@ -6815,7 +6815,7 @@ window["native"]["offline_apply_event"] = function(type,params) {
         {
             var props = asc_ReadFormatTableInfo(params, _current);
             // console.log(JSON.stringify(props));
-            _api.wb.getTablePictures(props);
+            _api.wb.af_getTablePictures(props);
             break;
         }
 

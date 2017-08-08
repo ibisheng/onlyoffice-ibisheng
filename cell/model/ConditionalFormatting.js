@@ -94,10 +94,9 @@
 		if (AscCommon.c_oNotifyParentType.CanDo === type) {
 			return true;
 		} else if (AscCommon.c_oNotifyParentType.IsDefName === type) {
-			return true;
+			return {bbox: this.cf.getBBox(), ranges: this.cf.ranges};
 		} else if (AscCommon.c_oNotifyParentType.Change === type) {
-			//todo collect
-			this.ws._updateConditionalFormatting(new AscCommonExcel.MultiplyRange(this.cf.ranges));
+			this.ws.setDirtyConditionalFormatting(new AscCommonExcel.MultiplyRange(this.cf.ranges));
 		}
 	};
 

@@ -133,6 +133,7 @@
         "../cell/model/DrawingObjects/Format/ImagePrototype.js",
         "../cell/model/DrawingObjects/Format/GroupPrototype.js",
         "../cell/model/DrawingObjects/Format/ChartSpacePrototype.js",
+		"../cell/model/PivotTables.js",
 		
 		"../word/Editor/DocumentContentElementBase.js",
         "../word/Editor/Comments.js",
@@ -213,6 +214,8 @@
 		"../common/text_input.js",
 		"../common/Drawings/Format/OleObject.js",
 		"../common/Drawings/Format/DrawingContent.js",
+		"../common/easysax.js",
+		"../common/openxml.js",
 		"../common/plugins.js"
       ],
       "private": [

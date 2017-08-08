@@ -442,6 +442,7 @@ $( function () {
         AscCommonExcel.g_oUndoRedoRow = new AscCommonExcel.UndoRedoRowCol(wb, true);
         AscCommonExcel.g_oUndoRedoComment = new AscCommonExcel.UndoRedoComment(wb);
         AscCommonExcel.g_oUndoRedoAutoFilters = new AscCommonExcel.UndoRedoAutoFilters(wb);
+		AscCommonExcel.g_DefNameWorksheet = new AscCommonExcel.Worksheet(wb, -1);
 //        g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
         g_oIdCounter.Set_Load(false);
 
@@ -495,6 +496,26 @@ $( function () {
 		strictEqual( oParser.calculate().cross(new Asc.Range(0, 9, 0, 9), ws.getId()).getValue(), "#VALUE!" );
 
 	} );
+
+	test( "Test: \"Defined names cycle\"", function () {
+
+		var newNameQ = new Asc.asc_CDefName("q", "SUM('"+ws.getName()+"'!A2)");
+		wb.editDefinesNames(null, newNameQ);
+		ws.getRange2( "Q1" ).setValue( "=q" );
+		ws.getRange2( "Q2" ).setValue( "=q" );
+		ws.getRange2( "Q3" ).setValue( "1" );
+		strictEqual( ws.getRange2( "Q1" ).getValueWithFormat(), "1" );
+		strictEqual( ws.getRange2( "Q2" ).getValueWithFormat(), "1" );
+
+		var newNameW = new Asc.asc_CDefName("w", "'"+ws.getName()+"'!A1");
+		wb.editDefinesNames(null, newNameW);
+		ws.getRange2( "Q4" ).setValue( "=w" );
+		strictEqual( ws.getRange2( "Q4" ).getValueWithFormat(), "#REF!" );
+		//clean up
+		ws.getRange2( "Q1:Q4" ).cleanAll();
+		wb.delDefinesNames(newNameW);
+		wb.delDefinesNames(newNameQ);
+	});
 
 	test( "Test: \"Parse intersection\"", function () {
 

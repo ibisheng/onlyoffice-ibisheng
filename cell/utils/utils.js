@@ -224,6 +224,51 @@
 			return undefined;
 		}
 
+		function getMatchingBorder(border1, border2) {
+			// ECMA-376 Part 1 17.4.67 tcBorders (Table Cell Borders)
+			if (!border1) {
+				return border2;
+			}
+			if (!border2) {
+				return border1;
+			}
+
+			if (border1.w > border2.w) {
+				return border1;
+			} else if (border1.w < border2.w) {
+				return border2;
+			}
+
+			var r1 = border1.c.getR(), g1 = border1.c.getG(), b1 = border1.c.getB();
+			var r2 = border2.c.getR(), g2 = border2.c.getG(), b2 = border2.c.getB();
+			var Brightness_1_1 = r1 + b1 + 2 * g1;
+			var Brightness_1_2 = r2 + b2 + 2 * g2;
+			if (Brightness_1_1 < Brightness_1_2) {
+				return border1;
+			} else if (Brightness_1_1 > Brightness_1_2) {
+				return border2;
+			}
+
+			var Brightness_2_1 = Brightness_1_1 - r1;
+			var Brightness_2_2 = Brightness_1_2 - r2;
+			if (Brightness_2_1 < Brightness_2_2) {
+				return border1;
+			} else if (Brightness_2_1 > Brightness_2_2) {
+				return border2;
+			}
+
+			var Brightness_3_1 = g1;
+			var Brightness_3_2 = g2;
+			if (Brightness_3_1 < Brightness_3_2) {
+				return border1;
+			} else if (Brightness_3_1 > Brightness_3_2) {
+				return border2;
+			}
+
+			// borders equal
+			return border1;
+		}
+
 		var referenceType = {
 			A: 0,			// Absolute
 			ARRC: 1,	// Absolute row; relative column
@@ -506,6 +551,7 @@
 			var temp;
 			var offsetRow = offset.offsetRow;
 			var offsetCol = offset.offsetCol;
+			//todo offset A1048576:A1 (offsetRow = 1 -> A1:A2; offsetRow = -1 -> A1048575:A1048576)
 			if (0 === this.r1 && gc_nMaxRow0 === this.r2) {
 				//full sheet is 1:1048576 but offsetRow is valid for it
 				offsetRow = 0;
@@ -971,13 +1017,13 @@
 		SelectionRange.prototype.getUnion = function () {
 			var result = new SelectionRange();
 			var unionRanges = function (ranges, res) {
-				ranges.forEach(function (item, i) {
+				for (var i = 0; i < ranges.length; ++i) {
 					if (0 === i) {
-						res.assign2(item);
+						res.assign2(ranges[i]);
 					} else {
-						res.union(item);
+						res.union(ranges[i]);
 					}
-				});
+				}
 			};
 			unionRanges(this.ranges, result);
 
@@ -1361,9 +1407,23 @@
 		function MultiplyRange(ranges) {
 			this.ranges = ranges;
 		}
+		MultiplyRange.prototype.clone = function() {
+			return new MultiplyRange(this.ranges.slice());
+		};
+		MultiplyRange.prototype.union2 = function(multiplyRange) {
+			this.ranges = this.ranges.concat(multiplyRange.ranges);
+		};
 		MultiplyRange.prototype.isIntersect = function(range) {
 			for (var i = 0; i < this.ranges.length; ++i) {
 				if (range.isIntersect(this.ranges[i])) {
+					return true;
+				}
+			}
+			return false;
+		};
+		MultiplyRange.prototype.contains = function(c, r) {
+			for (var i = 0; i < this.ranges.length; ++i) {
+				if (this.ranges[i].contains(c, r)) {
 					return true;
 				}
 			}
@@ -1441,7 +1501,7 @@
 			if (null == oRes && null != oCacheVal.first && null != oCacheVal.last) {
 				var r1 = oCacheVal.first.getRow0(), r2 = oCacheVal.last.getRow0(), c1 = oCacheVal.first.getCol0(), c2 = oCacheVal.last.getCol0();
 				var r1Abs = oCacheVal.first.getRowAbs(), r2Abs = oCacheVal.last.getRowAbs(),
-					c1Abs = oCacheVal.first.getColAbs(), c2Abs = oCacheVal.first.getColAbs();
+					c1Abs = oCacheVal.first.getColAbs(), c2Abs = oCacheVal.last.getColAbs();
 				if (oCacheVal.first.getIsRow() && oCacheVal.last.getIsRow()) {
 					c1 = 0;
 					c2 = gc_nMaxCol0;
@@ -2308,6 +2368,7 @@
 		window["Asc"].incDecFonSize = incDecFonSize;
 		window["Asc"].outputDebugStr = outputDebugStr;
 		window["Asc"].profileTime = profileTime;
+		window["AscCommonExcel"].getMatchingBorder = getMatchingBorder;
 		window["Asc"].isNumberInfinity = isNumberInfinity;
 		window["Asc"].trim = trim;
 		window["Asc"].arrayToLowerCase = arrayToLowerCase;
