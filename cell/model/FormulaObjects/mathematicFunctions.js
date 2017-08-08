@@ -308,9 +308,9 @@
 	cAGGREGATE.prototype = Object.create(cBaseFunction.prototype);
 	cAGGREGATE.prototype.constructor = cAGGREGATE;
 	cAGGREGATE.prototype.argumentsMin = 3;
-	cAGGREGATE.prototype.argumentsMax = 100;
+	cAGGREGATE.prototype.argumentsMax = 253;
 	cAGGREGATE.prototype.isXLFN = true;
-	/*cAGGREGATE.prototype.Calculate = function (arg) {
+	cAGGREGATE.prototype.Calculate = function (arg) {
 		var oArguments = this._prepareArguments([arg[0], arg[1]], arguments[1]);
 		var argClone = oArguments.args;
 
@@ -323,8 +323,7 @@
 		}
 
 		var nFunc = argClone[0].getValue();
-		var f;
-		var newArgs = [arg[2]];
+		var f = null;
 		switch ( nFunc ) {
 			case AGGREGATE_FUNC_AVE:
 				f = new AscCommonExcel.cAVERAGE();
@@ -368,56 +367,91 @@
 			case AGGREGATE_FUNC_LARGE:
 				if(arg[3]){
 					f = new AscCommonExcel.cLARGE();
-					newArgs.push(arg[3]);
 				}
 				break;
 			case AGGREGATE_FUNC_SMALL:
 				if(arg[3]){
 					f = new AscCommonExcel.cSMALL();
-					newArgs.push(arg[3]);
 				}
 				break;
 			case AGGREGATE_FUNC_PERCINC:
 				if(arg[3]){
 					f = new AscCommonExcel.cPERCENTILE_INC();
-					newArgs.push(arg[3]);
 				}
 				break;
 			case AGGREGATE_FUNC_QRTINC:
 				if(arg[3]){
 					f = new AscCommonExcel.cQUARTILE_INC();
-					newArgs.push(arg[3]);
 				}
 				break;
 			case AGGREGATE_FUNC_PERCEXC:
 				if(arg[3]){
 					f = new AscCommonExcel.cPERCENTILE_EXC();
-					newArgs.push(arg[3]);
 				}
 				break;
 			case AGGREGATE_FUNC_QRTEXC:
 				if(arg[3]){
 					f = new AscCommonExcel.cQUARTILE_EXC();
-					newArgs.push(arg[3]);
 				}
 				break;
 			default:
 				return this.value = new cError(cErrorType.not_numeric);
 		}
 
-		if(undefined === f){
+		if(null === f){
 			return this.value = new cError(cErrorType.wrong_value_type);
 		}
 
+		var nOption = argClone[1].getValue();
+		var ignoreHiddenRows = false;
+		var ignoreErrors = false;
+		var ignoreNestedStAg = false;
+		switch ( nOption) {
+			case 0 : // ignore nested SUBTOTAL and AGGREGATE functions
+				ignoreNestedStAg = true;
+				break;
+			case 1 : // ignore hidden rows, nested SUBTOTAL and AGGREGATE functions
+				ignoreNestedStAg = true;
+				ignoreHiddenRows = true;
+				break;
+			case 2 : // ignore error values, nested SUBTOTAL and AGGREGATE functions
+				ignoreNestedStAg = true;
+				ignoreErrors = true;
+				break;
+			case 3 : // ignore hidden rows, error values, nested SUBTOTAL and AGGREGATE functions
+				ignoreNestedStAg = true;
+				ignoreHiddenRows = true;
+				ignoreErrors = true;
+				break;
+			case 4 : // ignore nothing
+				break;
+			case 5 : // ignore hidden rows
+				ignoreHiddenRows = true;
+				break;
+			case 6 : // ignore error values
+				ignoreErrors = true;
+				break;
+			case 7 : // ignore hidden rows and error values
+				ignoreHiddenRows = true;
+				ignoreErrors = true;
+				break;
+			default :
+				return this.value = new cError(cErrorType.not_numeric);
+		}
+
 		if (f) {
-			f.checkExclude = true;
-			f.excludeHiddenRows = true;
+			//f.checkExclude = true;
+			f.excludeHiddenRows = ignoreHiddenRows;
+			var newArgs = [];
+			for(var i = 2; i < arg.length; i++){
+				newArgs.push(arg[i]);
+			}
 			f.setArgumentsCount(newArgs.length);
 			this.value = f.Calculate(newArgs);
 		}
 
 		return this.value;
-	};*/
+	};
 
 
 	/**
