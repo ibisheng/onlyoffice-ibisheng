@@ -473,10 +473,10 @@ CDocument.prototype.RejectRevisionChangesBySelection = function()
 
     this.Get_NextRevisionChange();
 };
-CDocument.prototype.Accept_AllRevisionChanges = function()
+CDocument.prototype.Accept_AllRevisionChanges = function(isSkipCheckLock)
 {
     var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphs(true);
-    if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
+    if (true === isSkipCheckLock || false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
     {
         this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AcceptAllRevisionChanges);
         var LogicDocuments = this.TrackRevisionsManager.Get_AllChangesLogicDocuments();
@@ -489,7 +489,7 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
             }
         }
 
-        if (true === this.History.Is_LastPointEmpty())
+        if (true !== isSkipCheckLock && true === this.History.Is_LastPointEmpty())
         {
             this.History.Remove_LastPoint();
             return;
@@ -502,10 +502,10 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
         this.Document_UpdateInterfaceState();
     }
 };
-CDocument.prototype.Reject_AllRevisionChanges = function()
+CDocument.prototype.Reject_AllRevisionChanges = function(isSkipCheckLock)
 {
     var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphs(false);
-    if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
+    if (true === isSkipCheckLock || false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
     {
         this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RejectAllRevisionChanges);
         var LogicDocuments = this.TrackRevisionsManager.Get_AllChangesLogicDocuments();
@@ -518,7 +518,7 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
             }
         }
 
-        if (true === this.History.Is_LastPointEmpty())
+        if (true !== isSkipCheckLock && true === this.History.Is_LastPointEmpty())
         {
             this.History.Remove_LastPoint();
             return;

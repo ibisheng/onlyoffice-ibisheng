@@ -595,6 +595,7 @@
 		this.isKeepLinesTogether  = false;
 		this.isPresentationEditor = true;
 		this.bAlignBySelected     = false;
+		this.bSelectedSlidesTheme = false;
 
 		this.isPaintFormat              = false;
 		this.isShowTableEmptyLine       = false;//true;
@@ -5706,7 +5707,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asyncImageEndLoaded2 = null;
 
-	asc_docs_api.prototype.ChangeTheme = function(indexTheme)
+	asc_docs_api.prototype.ChangeTheme = function(indexTheme, bSelectedSlides)
 	{
 		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
 			return;
@@ -5715,6 +5716,7 @@ background-repeat: no-repeat;\
 		{
 			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_ChangeTheme);
+            this.bSelectedSlidesTheme = (bSelectedSlides === true);
 			this.ThemeLoader.StartLoadTheme(indexTheme);
 		}
 	};
@@ -5728,7 +5730,7 @@ background-repeat: no-repeat;\
 
 		// применение темы
 		var _array = this.WordControl.Thumbnails.GetSelectedArray();
-		this.WordControl.m_oLogicDocument.changeTheme(theme_load_info, _array.length <= 1 ? null : _array);
+		this.WordControl.m_oLogicDocument.changeTheme(theme_load_info, (_array.length <= 1 && !this.bSelectedSlidesTheme) ? null : _array);
 		this.WordControl.ThemeGenerateThumbnails(theme_load_info.Master);
 		// меняем шаблоны в меню
 		this.WordControl.CheckLayouts();

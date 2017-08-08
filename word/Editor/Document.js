@@ -1548,6 +1548,11 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 	// Нужно ли проверять тип лока у ContentControl при проверке залоченности выделенных объектов
 	this.CheckContentControlsLock = true;
 
+	this.ViewModeInReview = {
+		mode                : 0,     // -1 - исходный, 0 - со всеми изменениями, 1 - результат
+		isFastCollaboration : false
+	};
+
 	// Класс для работы со сносками
 	this.Footnotes               = new CFootnotesController(this);
 	this.LogicDocumentController = new CLogicDocumentController(this);
@@ -6829,7 +6834,7 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode == 83 && false === this.IsViewMode() && true === e.CtrlKey) // Ctrl + S - save
     {
-		this.DrawingDocument.m_oWordControl.m_oApi.asc_Save(false);
+		this.Api.asc_Save(false);
         bRetValue = keydownresult_PreventAll;
     }
     else if (e.KeyCode == 85 && true === e.CtrlKey) // Ctrl + U - делаем текст подчеркнутым
@@ -6890,17 +6895,38 @@ CDocument.prototype.OnKeyDown = function(e)
     }
     else if (e.KeyCode === 112 && true === e.ShiftKey)
 	{
-		this.Api.asc_AddContentControl(AscCommonWord.sdttype_InlineLevel);
+		if (true === e.CtrlKey)
+		{
+			this.BeginViewModeInReview(true);
+		}
+		else
+		{
+			this.Api.asc_AddContentControl(AscCommonWord.sdttype_InlineLevel);
+		}
 		bRetValue = keydownresult_PreventAll;
 	}
 	else if (e.KeyCode === 113 && true === e.ShiftKey)
 	{
-		this.Api.asc_AddContentControl(AscCommonWord.sdttype_BlockLevel);
+		if (true === e.CtrlKey)
+		{
+			this.BeginViewModeInReview(false);
+		}
+		else
+		{
+			this.Api.asc_AddContentControl(AscCommonWord.sdttype_BlockLevel);
+		}
 		bRetValue = keydownresult_PreventAll;
 	}
 	else if (e.KeyCode === 114 && true === e.ShiftKey)
 	{
-		this.Api.asc_RemoveContentControl();
+		if (true === e.CtrlKey)
+		{
+			this.EndViewModeInReview();
+		}
+		else
+		{
+			this.Api.asc_RemoveContentControl();
+		}
 		bRetValue = keydownresult_PreventAll;
 	}
 	else if (e.KeyCode === 115 && true === e.ShiftKey)
@@ -8277,13 +8303,21 @@ CDocument.prototype.Document_UpdateUndoRedoState = function()
 
 	// Проверяем состояние Undo/Redo
 
-	var bCanUndo = this.History.Can_Undo();
-	if (true !== bCanUndo && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
-		bCanUndo = this.CollaborativeEditing.CanUndo();
+	if (this.IsViewModeInReview())
+	{
+		this.Api.sync_CanUndoCallback(false);
+		this.Api.sync_CanRedoCallback(false);
+	}
+	else
+	{
+		var bCanUndo = this.History.Can_Undo();
+		if (true !== bCanUndo && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+			bCanUndo = this.CollaborativeEditing.CanUndo();
 
-	this.Api.sync_CanUndoCallback(bCanUndo);
-	this.Api.sync_CanRedoCallback(this.History.Can_Redo());
-	this.Api.CheckChangedDocument();
+		this.Api.sync_CanUndoCallback(bCanUndo);
+		this.Api.sync_CanRedoCallback(this.History.Can_Redo());
+		this.Api.CheckChangedDocument();
+	}
 };
 CDocument.prototype.Document_UpdateCopyCutState = function()
 {
@@ -15469,6 +15503,54 @@ CDocument.prototype.OnEndLoadScript = function()
 		arrParagraphs[nIndex].Recalc_CompiledPr();
 		arrParagraphs[nIndex].Recalc_RunsCompiledPr();
 	}
+};
+CDocument.prototype.BeginViewModeInReview = function(isResult)
+{
+	if (0 !== this.ViewModeInReview.mode)
+		this.EndViewModeInReview();
+
+	this.ViewModeInReview.mode = isResult ? 1 : -1;
+
+	this.ViewModeInReview.isFastCollaboration = this.CollaborativeEditing.Is_Fast();
+	this.CollaborativeEditing.Set_Fast(false);
+
+	this.History.SaveRedoPoints();
+	if (isResult)
+		this.Accept_AllRevisionChanges(true);
+	else
+		this.Reject_AllRevisionChanges(true);
+
+	this.CollaborativeEditing.Set_GlobalLock(true);
+};
+CDocument.prototype.EndViewModeInReview = function()
+{
+	if (0 === this.ViewModeInReview.mode)
+		return;
+
+	this.ViewModeInReview.mode = 0;
+
+	this.CollaborativeEditing.Set_GlobalLock(false);
+
+	this.Document_Undo();
+	this.History.Clear_Redo();
+	this.History.PopRedoPoints();
+
+	if (this.ViewModeInReview.isFastCollaboration)
+		this.CollaborativeEditing.Set_Fast(true);
+};
+CDocument.prototype.StartCollaborationEditing = function()
+{
+	this.CollaborativeEditing.Start_CollaborationEditing();
+	this.DrawingDocument.Start_CollaborationEditing();
+	this.EndViewModeInReview();
+};
+CDocument.prototype.EndCollaborationEditing = function()
+{
+	this.CollaborativeEditing.End_CollaborationEditing();
+};
+CDocument.prototype.IsViewModeInReview = function()
+{
+	return 0 !== this.ViewModeInReview.mode ? true : false;
 };
 
 function CDocumentSelectionState()

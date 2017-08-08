@@ -48,8 +48,6 @@
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	/*new funcions with _xlnf-prefix*/
-	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
-	cFormulaFunctionGroup['DateAndTime'].push(cISOWEEKNUM);
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
@@ -65,10 +63,9 @@
 	cFormulaFunctionGroup['Information'].push(cSHEET, cSHEETS);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cISOWEEKNUM,
-		cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
-		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
-		cAGGREGATE, cMUNIT, cFORMULATEXT, cSHEET, cSHEETS);
+	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS,
+		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION, cAGGREGATE,
+		cMUNIT, cFORMULATEXT, cSHEET, cSHEETS);
 
 	/**
 	 * @constructor
@@ -201,18 +198,6 @@
 
 	cHYPGEOM_DIST.prototype = Object.create(cBaseFunction.prototype);
 	cHYPGEOM_DIST.prototype.constructor = cHYPGEOM_DIST;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cISOWEEKNUM() {
-		cBaseFunction.call(this, "ISOWEEKNUM");
-		this.isXLFN = true;
-	}
-
-	cISOWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
-	cISOWEEKNUM.prototype.constructor = cISOWEEKNUM;
 
 	/**
 	 * @constructor

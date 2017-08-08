@@ -2788,6 +2788,36 @@ $( function () {
 
     } );
 
+	test( "Test: \"ISOWEEKNUM\"", function () {
+
+		ws.getRange2( "A2" ).setValue( "3/9/2012" );
+
+	    oParser = new parserFormula( "ISOWEEKNUM(A2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 10 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(123)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 18 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(120003)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(120003)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(-100)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+		oParser = new parserFormula( "ISOWEEKNUM(1203)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 16 );
+
+	} );
+
 	test( "Test: \"WEIBULL\"", function () {
 
 		ws.getRange2( "A2" ).setValue( "105" );
@@ -5262,6 +5292,47 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), stdeva( 123, 134, 143, 173, 112, 109 ) );
 
     } );
+
+	test( "Test: \"SWITCH\"", function () {
+		ws.getRange2( "A2" ).setValue( "2" );
+		ws.getRange2( "A3" ).setValue( "99" );
+		ws.getRange2( "A4" ).setValue( "99" );
+		ws.getRange2( "A5" ).setValue( "2" );
+		ws.getRange2( "A6" ).setValue( "3" );
+
+		oParser = new parserFormula( 'SWITCH(WEEKDAY(A2),1,"Sunday",2,"Monday",3,"Tuesday","No match")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(WEEKDAY(A2),1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+		strictEqual( oParser.calculate().getValue(), "Monday", 'SWITCH(WEEKDAY(A2),1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+
+		oParser = new parserFormula( 'SWITCH(A3,1,"Sunday",2,"Monday",3,"Tuesday")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(A3,1,"Sunday",2,"Monday",3,"Tuesday")' );
+		strictEqual( oParser.calculate().getValue(), "#N/A", 'SWITCH(A3,1,"Sunday",2,"Monday",3,"Tuesday")' );
+
+		oParser = new parserFormula( 'SWITCH(A4,1,"Sunday",2,"Monday",3,"Tuesday","No match")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(A4,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+		strictEqual( oParser.calculate().getValue(), "No match", 'SWITCH(A4,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+
+		oParser = new parserFormula( 'SWITCH(A5,1,"Sunday",7,"Saturday","weekday")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(A5,1,"Sunday",7,"Saturday","weekday")' );
+		strictEqual( oParser.calculate().getValue(), "weekday", 'SWITCH(A5,1,"Sunday",7,"Saturday","weekday")' );
+
+		oParser = new parserFormula( 'SWITCH(A6,1,"Sunday",2,"Monday",3,"Tuesday","No match")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(A6,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+		strictEqual( oParser.calculate().getValue(), "Tuesday", 'SWITCH(A6,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+
+		oParser = new parserFormula( 'SWITCH(122,1,"Sunday",2,"Monday",3,"Tuesday","No match")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(122,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+		strictEqual( oParser.calculate().getValue(), "No match", 'SWITCH(122,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+
+		oParser = new parserFormula( 'SWITCH({1,"2asd",3},{12,2,3},{"asd",2,3,4})', "A1", ws );
+		ok( oParser.parse(), 'SWITCH({1,"2asd",3},{12,2,3},{"asd",2,3,4})' );
+		strictEqual( oParser.calculate().getValue(), "#N/A", 'SWITCH({1,"2asd",3},{12,2,3},{"asd",2,3,4})' );
+
+		oParser = new parserFormula( 'SWITCH({"asd1","2asd",3},{"asd1",1,3},"sdf")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH({"asd1","2asd",3},{"asd1",1,3},"sdf")' );
+		strictEqual( oParser.calculate().getValue(), "sdf", 'SWITCH({"asd1","2asd",3},{"asd1",1,3},"sdf")' );
+
+	} );
 
     test( "Test: \"VAR\"", function () {
 

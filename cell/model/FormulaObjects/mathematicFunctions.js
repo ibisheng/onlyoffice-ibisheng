@@ -55,13 +55,34 @@
 
 	var _func = AscCommonExcel._func;
 
+	var AGGREGATE_FUNC_AVE     = 1;
+	var AGGREGATE_FUNC_CNT     = 2;
+	var AGGREGATE_FUNC_CNTA    = 3;
+	var AGGREGATE_FUNC_MAX     = 4;
+	var AGGREGATE_FUNC_MIN     = 5;
+	var AGGREGATE_FUNC_PROD    = 6;
+	var AGGREGATE_FUNC_STD     = 7;
+	var AGGREGATE_FUNC_STDP    = 8;
+	var AGGREGATE_FUNC_SUM     = 9;
+	var AGGREGATE_FUNC_VAR     = 10;
+	var AGGREGATE_FUNC_VARP    = 11;
+	var AGGREGATE_FUNC_MEDIAN  = 12;
+	var AGGREGATE_FUNC_MODSNGL = 13;
+	var AGGREGATE_FUNC_LARGE   = 14;
+	var AGGREGATE_FUNC_SMALL   = 15;
+	var AGGREGATE_FUNC_PERCINC = 16;
+	var AGGREGATE_FUNC_QRTINC  = 17;
+	var AGGREGATE_FUNC_PERCEXC = 18;
+	var AGGREGATE_FUNC_QRTEXC  = 19;
+
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
-	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cARABIC, cASIN, cASINH, cATAN, cATAN2, cATANH, cBASE, cCEILING, cCEILING_MATH, cCEILING_PRECISE,
-		cCOMBIN, cCOMBINA, cCOS, cCOSH, cCOT, cCOTH, cCSC, cCSCH, cDECIMAL, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE, cFLOOR_MATH, cGCD, cINT,
-		cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND, cMULTINOMIAL, cODD, cPI,
-		cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN, cROUNDUP, cSEC, cSECH, cSERIESSUM,
-		cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS, cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2,
-		cSUMXMY2, cTAN, cTANH, cTRUNC);
+	cFormulaFunctionGroup['Mathematic'].push(cABS, cACOS, cACOSH, cACOT, cACOTH, cAGGREGATE, cARABIC, cASIN, cASINH,
+		cATAN, cATAN2, cATANH, cBASE, cCEILING, cCEILING_MATH, cCEILING_PRECISE, cCOMBIN, cCOMBINA, cCOS, cCOSH, cCOT,
+		cCOTH, cCSC, cCSCH, cDECIMAL, cDEGREES, cECMA_CEILING, cEVEN, cEXP, cFACT, cFACTDOUBLE, cFLOOR, cFLOOR_PRECISE,
+		cFLOOR_MATH, cGCD, cINT, cISO_CEILING, cLCM, cLN, cLOG, cLOG10, cMDETERM, cMINVERSE, cMMULT, cMOD, cMROUND,
+		cMULTINOMIAL, cODD, cPI, cPOWER, cPRODUCT, cQUOTIENT, cRADIANS, cRAND, cRANDBETWEEN, cROMAN, cROUND, cROUNDDOWN,
+		cROUNDUP, cSEC, cSECH, cSERIESSUM, cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS,
+		cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2, cSUMXMY2, cTAN, cTANH, cTRUNC);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cECMA_CEILING);
@@ -273,6 +294,168 @@
 			return this.value = isNaN(a) ? new cError(cErrorType.not_numeric) : new cNumber(a);
 		}
 	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cAGGREGATE() {
+		this.name = "AGGREGATE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cAGGREGATE.prototype = Object.create(cBaseFunction.prototype);
+	cAGGREGATE.prototype.constructor = cAGGREGATE;
+	cAGGREGATE.prototype.argumentsMin = 3;
+	cAGGREGATE.prototype.argumentsMax = 253;
+	cAGGREGATE.prototype.isXLFN = true;
+	cAGGREGATE.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments([arg[0], arg[1]], arguments[1]);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var nFunc = argClone[0].getValue();
+		var f = null;
+		switch ( nFunc ) {
+			case AGGREGATE_FUNC_AVE:
+				f = new AscCommonExcel.cAVERAGE();
+				break;
+			case AGGREGATE_FUNC_CNT:
+				f = new AscCommonExcel.cCOUNT();
+				break;
+			case AGGREGATE_FUNC_CNTA:
+				f = new AscCommonExcel.cCOUNTA();
+				break;
+			case AGGREGATE_FUNC_MAX:
+				f = new AscCommonExcel.cMAX();
+				break;
+			case AGGREGATE_FUNC_MIN:
+				f = new AscCommonExcel.cMIN();
+				break;
+			case AGGREGATE_FUNC_PROD:
+				f = new AscCommonExcel.cPRODUCT();
+				break;
+			case AGGREGATE_FUNC_STD:
+				f = new AscCommonExcel.cSTDEV_S();
+				break;
+			case AGGREGATE_FUNC_STDP:
+				f = new AscCommonExcel.cSTDEV_P();
+				break;
+			case AGGREGATE_FUNC_SUM:
+				f = new AscCommonExcel.cSUM();
+				break;
+			case AGGREGATE_FUNC_VAR:
+				f = new AscCommonExcel.cVAR_S();
+				break;
+			case AGGREGATE_FUNC_VARP:
+				f = new AscCommonExcel.cVAR_P();
+				break;
+			case AGGREGATE_FUNC_MEDIAN:
+				f = new AscCommonExcel.cMEDIAN();
+				break;
+			case AGGREGATE_FUNC_MODSNGL:
+				f = new AscCommonExcel.cMODE_SNGL();
+				break;
+			case AGGREGATE_FUNC_LARGE:
+				if(arg[3]){
+					f = new AscCommonExcel.cLARGE();
+				}
+				break;
+			case AGGREGATE_FUNC_SMALL:
+				if(arg[3]){
+					f = new AscCommonExcel.cSMALL();
+				}
+				break;
+			case AGGREGATE_FUNC_PERCINC:
+				if(arg[3]){
+					f = new AscCommonExcel.cPERCENTILE_INC();
+				}
+				break;
+			case AGGREGATE_FUNC_QRTINC:
+				if(arg[3]){
+					f = new AscCommonExcel.cQUARTILE_INC();
+				}
+				break;
+			case AGGREGATE_FUNC_PERCEXC:
+				if(arg[3]){
+					f = new AscCommonExcel.cPERCENTILE_EXC();
+				}
+				break;
+			case AGGREGATE_FUNC_QRTEXC:
+				if(arg[3]){
+					f = new AscCommonExcel.cQUARTILE_EXC();
+				}
+				break;
+			default:
+				return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		if(null === f){
+			return this.value = new cError(cErrorType.wrong_value_type);
+		}
+
+		var nOption = argClone[1].getValue();
+		var ignoreHiddenRows = false;
+		var ignoreErrorsVal = false;
+		var ignoreNestedStAg = false;
+		switch ( nOption) {
+			case 0 : // ignore nested SUBTOTAL and AGGREGATE functions
+				ignoreNestedStAg = true;
+				break;
+			case 1 : // ignore hidden rows, nested SUBTOTAL and AGGREGATE functions
+				ignoreNestedStAg = true;
+				ignoreHiddenRows = true;
+				break;
+			case 2 : // ignore error values, nested SUBTOTAL and AGGREGATE functions
+				ignoreNestedStAg = true;
+				ignoreHiddenRows = true;
+				break;
+			case 3 : // ignore hidden rows, error values, nested SUBTOTAL and AGGREGATE functions
+				ignoreNestedStAg = true;
+				ignoreHiddenRows = true;
+				ignoreHiddenRows = true;
+				break;
+			case 4 : // ignore nothing
+				break;
+			case 5 : // ignore hidden rows
+				ignoreHiddenRows = true;
+				break;
+			case 6 : // ignore error values
+				ignoreHiddenRows = true;
+				break;
+			case 7 : // ignore hidden rows and error values
+				ignoreHiddenRows = true;
+				ignoreHiddenRows = true;
+				break;
+			default :
+				return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		if (f) {
+			f.excludeHiddenRows = ignoreHiddenRows;
+			f.excludeErrorsVal = ignoreErrorsVal;
+			f.excludeNestedStAg = ignoreNestedStAg;
+
+			var newArgs = [];
+			for(var i = 2; i < arg.length; i++){
+				newArgs.push(arg[i]);
+			}
+
+			f.setArgumentsCount(newArgs.length);
+			this.value = f.Calculate(newArgs);
+		}
+
+		return this.value;
+	};
+
 
 	/**
 	 * @constructor
@@ -4948,5 +5131,8 @@
 
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].cAGGREGATE = cAGGREGATE;
+	window['AscCommonExcel'].cPRODUCT = cPRODUCT;
 	window['AscCommonExcel'].cSUBTOTAL = cSUBTOTAL;
+	window['AscCommonExcel'].cSUM = cSUM;
 })(window);

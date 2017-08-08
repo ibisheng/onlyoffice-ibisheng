@@ -1465,7 +1465,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
-				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					var __arg = _argAreaValue[j];
 					if (cElementType.string === __arg.type || cElementType.empty === __arg.type ||
@@ -2500,7 +2500,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
-				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					if (cElementType.number === _argAreaValue[j].type) {
 						count++;
@@ -2550,7 +2550,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					if (cElementType.empty !== _argAreaValue[j].type) {
 						count++;
@@ -4876,7 +4876,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < argArr.length; j++) {
 					if (cElementType.number === argArr[j].type) {
 						v = argArr[j].tocNumber();
@@ -5319,7 +5319,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < argArr.length; j++) {
 					if (cElementType.number === argArr[j].type) {
 						v = argArr[j].tocNumber();
@@ -7247,7 +7247,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					var __arg = _argAreaValue[j];
 					if (cElementType.number === __arg.type) {
@@ -7398,7 +7398,7 @@
 		for (var j = 0; j < arg.length; j++) {
 			element = arg[j];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
@@ -8110,7 +8110,7 @@
 		for (var j = 0; j < arg.length; j++) {
 			element = arg[j];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
@@ -8280,7 +8280,7 @@
 		for (var j = 0; j < arg.length; j++) {
 			element = arg[j];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
@@ -8371,7 +8371,7 @@
 		for (var j = 0; j < arg.length; j++) {
 			element = arg[j];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
@@ -8687,4 +8687,17 @@
 	window['AscCommonExcel'].cSTDEVP = cSTDEVP;
 	window['AscCommonExcel'].cVAR = cVAR;
 	window['AscCommonExcel'].cVARP = cVARP;
+	window['AscCommonExcel'].cLARGE = cLARGE;
+	window['AscCommonExcel'].cSMALL = cSMALL;
+	window['AscCommonExcel'].cMEDIAN = cMEDIAN;
+	window['AscCommonExcel'].cSTDEV_S = cSTDEV_S;
+	window['AscCommonExcel'].cSTDEV_P = cSTDEV_P;
+	window['AscCommonExcel'].cVAR_S = cVAR_S;
+	window['AscCommonExcel'].cVAR_P = cVAR_P;
+	window['AscCommonExcel'].cMODE_SNGL = cMODE_SNGL;
+	window['AscCommonExcel'].cPERCENTILE_INC = cPERCENTILE_INC;
+	window['AscCommonExcel'].cQUARTILE_INC = cQUARTILE_INC;
+	window['AscCommonExcel'].cPERCENTILE_EXC = cPERCENTILE_EXC;
+	window['AscCommonExcel'].cQUARTILE_EXC = cQUARTILE_EXC;
+
 })(window);

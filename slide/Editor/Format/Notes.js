@@ -276,8 +276,11 @@
     };
 
     CNotes.prototype.showDrawingObjects = function(){
+        var oPresentation = editor.WordControl.m_oLogicDocument;
         if(this.slide){
-            editor.WordControl.m_oDrawingDocument.Notes_OnRecalculate(this.slide.num, this.slide.NotesWidth, this.slide.getNotesHeight());
+            if(oPresentation.CurPage === this.slide.num){
+                editor.WordControl.m_oDrawingDocument.Notes_OnRecalculate(this.slide.num, this.slide.NotesWidth, this.slide.getNotesHeight());
+            }
         }
     };
 
