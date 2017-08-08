@@ -6528,7 +6528,7 @@ CT_PivotField.prototype.asc_getSubtotalTop = function () {
 };
 CT_PivotField.prototype.asc_getSubtotals = function () {
 	var res = null;
-	if (this.defaultSubtotal) {
+	if (null === this.defaultSubtotal || this.defaultSubtotal) {
 		res = [];
 		if (this.sumSubtotal) {
 			res.push(c_oAscItemType.Sum);
