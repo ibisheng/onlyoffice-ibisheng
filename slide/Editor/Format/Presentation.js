@@ -5931,6 +5931,10 @@ CPresentation.prototype =
         return false;
     }
 };
+CPresentation.prototype.IsViewModeInReview = function()
+{
+	return false;
+};
 
 
 function collectSelectedObjects(aSpTree, aCollectArray, bRecursive, oIdMap)
