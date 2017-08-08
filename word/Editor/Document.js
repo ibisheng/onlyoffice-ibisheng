@@ -8303,13 +8303,21 @@ CDocument.prototype.Document_UpdateUndoRedoState = function()
 
 	// Проверяем состояние Undo/Redo
 
-	var bCanUndo = this.History.Can_Undo();
-	if (true !== bCanUndo && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
-		bCanUndo = this.CollaborativeEditing.CanUndo();
+	if (this.IsViewModeInReview())
+	{
+		this.Api.sync_CanUndoCallback(false);
+		this.Api.sync_CanRedoCallback(false);
+	}
+	else
+	{
+		var bCanUndo = this.History.Can_Undo();
+		if (true !== bCanUndo && this.Api && this.CollaborativeEditing && true === this.CollaborativeEditing.Is_Fast() && true !== this.CollaborativeEditing.Is_SingleUser())
+			bCanUndo = this.CollaborativeEditing.CanUndo();
 
-	this.Api.sync_CanUndoCallback(bCanUndo);
-	this.Api.sync_CanRedoCallback(this.History.Can_Redo());
-	this.Api.CheckChangedDocument();
+		this.Api.sync_CanUndoCallback(bCanUndo);
+		this.Api.sync_CanRedoCallback(this.History.Can_Redo());
+		this.Api.CheckChangedDocument();
+	}
 };
 CDocument.prototype.Document_UpdateCopyCutState = function()
 {
