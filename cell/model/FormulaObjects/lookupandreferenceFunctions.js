@@ -340,96 +340,7 @@
 	cHLOOKUP.prototype.argumentsMin = 3;
 	cHLOOKUP.prototype.argumentsMax = 4;
 	cHLOOKUP.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
-		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;
-		var numberRow = arg2.getValue() - 1, valueForSearching = arg0.getValue(), resC = -1, min, regexp;
-
-		if (isNaN(numberRow)) {
-			return this.value = new cError(cErrorType.bad_reference);
-		}
-		if (numberRow < 0) {
-			return this.value = new cError(cErrorType.wrong_value_type);
-		}
-
-		if (cElementType.cell3D === arg0.type || cElementType.cell === arg0.type) {
-			arg0 = arg0.getValue();
-		}
-
-		if (cElementType.string === arg0.type) {
-			valueForSearching = arg0.getValue();
-			regexp = searchRegExp(valueForSearching);
-		} else if (cElementType.error === arg0.type) {
-			return this.value = arg0;
-		} else {
-			valueForSearching = arg0.getValue();
-		}
-
-		var found = false;
-		if (cElementType.array === arg1.type) {
-			arg1.foreach(function (elem, r, c) {
-				if (c == 0) {
-					min = elem.getValue();
-				}
-
-				if (arg3 === true) {
-					if (valueForSearching == elem.getValue()) {
-						resC = c;
-						found = true;
-					} else if (valueForSearching > elem.getValue() && !found) {
-						resC = c;
-					}
-				} else {
-					if (cElementType.string === arg0.type) {
-						if (regexp.test(elem.getValue())) {
-							resC = c;
-						}
-					} else if (valueForSearching == elem.getValue()) {
-						resC = c;
-					}
-				}
-
-				min = Math.min(min, elem.getValue());
-			});
-
-			if (min > valueForSearching) {
-				return this.value = new cError(cErrorType.not_available);
-			}
-
-			if (resC == -1) {
-				return this.value = new cError(cErrorType.not_available);
-			}
-
-			if (numberRow > arg1.getRowCount() - 1) {
-				return this.value = new cError(cErrorType.bad_reference);
-			}
-
-			return this.value = arg1.getElementRowCol(numberRow, resC);
-
-		}
-
-		var range;
-		if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type ||
-			cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
-			range = arg1.getRange();
-		}
-		if (!range) {
-			return this.value = new cError(cErrorType.bad_reference);
-		}
-
-		var bb = range.getBBox0();
-		if (numberRow > bb.r2 - bb.r1) {
-			return this.value = new cError(cErrorType.bad_reference);
-		}
-		var ws = arg1.getWS();
-		var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r1, bb.c2);
-
-		resC = g_oHLOOKUPCache.get(oSearchRange, valueForSearching, arg3);
-		if (-1 === resC) {
-			return this.value = new cError(cErrorType.not_available);
-		}
-
-		var v = arg1.getWS()._getCellNoEmpty(bb.r1 + numberRow, resC);
-		return this.value = checkTypeCell(v);
+		return this.value = g_oHLOOKUPCache.calculate(arg);
 	};
 
 	/**
@@ -614,7 +525,7 @@
 	cLOOKUP.prototype.argumentsMin = 2;
 	cLOOKUP.prototype.argumentsMax = 3;
 	cLOOKUP.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = this.argumentsCurrent == 2 ? arg1 : arg[2], resC = -1, resR = -1;
+		var arg0 = arg[0], arg1 = arg[1], arg2 = 2 === this.argumentsCurrent ? arg1 : arg[2], resC = -1, resR = -1;
 
 		if (cElementType.error === arg0.type) {
 			return this.value = arg0;
@@ -645,8 +556,8 @@
 		}
 
 		if (cElementType.array === arg1.type && cElementType.array === arg2.type) {
-			if (arg1.getRowCount() != arg2.getRowCount() &&
-				arg1.getCountElementInRow() != arg2.getCountElementInRow()) {
+			if (arg1.getRowCount() !== arg2.getRowCount() &&
+				arg1.getCountElementInRow() !== arg2.getCountElementInRow()) {
 				return this.value = new cError(cErrorType.not_available);
 			}
 
@@ -668,7 +579,7 @@
 
 			var BBox = _arg2.getBBox0();
 
-			if (_arg1.getRowCount() != (BBox.r2 - BBox.r1) && _arg1.getCountElementInRow() != (BBox.c2 - BBox.c1)) {
+			if (_arg1.getRowCount() !== (BBox.r2 - BBox.r1) && _arg1.getCountElementInRow() !== (BBox.c2 - BBox.c1)) {
 				return this.value = new cError(cErrorType.not_available);
 			}
 
@@ -728,14 +639,14 @@
 			}
 
 			var b = arg2.getBBox0();
-			if (this.argumentsCurrent == 2) {
+			if (2 === this.argumentsCurrent) {
 				if (arg1Range[0].length >= 2) {
 					return this.value = new cRef(ws.getCell3(b.r1 + index, b.c2 + 0).getName(), ws);
 				} else {
 					return this.value = new cRef(ws.getCell3(b.r1 + 0, b.c1 + index).getName(), ws);
 				}
 			} else {
-				if (arg2Range.length == 1) {
+				if (1 === arg2Range.length) {
 					return this.value = new cRef(ws.getCell3(b.r1 + 0, b.c1 + index).getName(), ws);
 				} else {
 					return this.value = new cRef(ws.getCell3(b.r1 + index, b.c1 + 0).getName(), ws);
@@ -1075,18 +986,113 @@
 		this.bHor = bHor;
 	}
 
-	VHLOOKUPCache.prototype.get = function (range, valueForSearching, arg3Value) {
+	VHLOOKUPCache.prototype.calculate = function (arg) {
+		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
+		var arg3 = arg[3] ? arg[3].tocBool().value : true;
+		var t = this, number = arg2.getValue() - 1, valueForSearching, r, c, res = -1, min, regexp, count;
+
+		if (isNaN(number)) {
+			return new cError(cErrorType.bad_reference);
+		}
+		if (number < 0) {
+			return new cError(cErrorType.wrong_value_type);
+		}
+
+		if (cElementType.cell3D === arg0.type || cElementType.cell === arg0.type) {
+			arg0 = arg0.getValue();
+		}
+
+		if (cElementType.error === arg0.type) {
+			return arg0;
+		}
+		valueForSearching = ('' + arg0.getValue()).toLowerCase();
+
+		var found = false;
+		if (cElementType.array === arg1.type) {
+			// ToDo
+			if (cElementType.string === arg0.type) {
+				regexp = searchRegExp(valueForSearching);
+			}
+			arg1.foreach(function (elem, r, c) {
+				var v = ('' + elem.getValue()).toLowerCase();
+				var i = t.bHor ? c : r;
+				if (0 === i) {
+					min = v;
+				}
+
+				if (arg3) {
+					if (valueForSearching === v) {
+						res = i;
+						found = true;
+					} else if (valueForSearching > v && !found) {
+						res = i;
+					}
+				} else {
+					if (cElementType.string === arg0.type) {
+						if (regexp.test(v)) {
+							res = i;
+						}
+					} else if (valueForSearching === v) {
+						res = i;
+					}
+				}
+
+				min = Math.min(min, v);
+			});
+
+			if (min > valueForSearching || -1 === res) {
+				return new cError(cErrorType.not_available);
+			}
+
+			count = this.bHor ? arg1.getRowCount() : arg1.getCountElementInRow();
+			if (number > count - 1) {
+				return new cError(cErrorType.bad_reference);
+			}
+
+			r = this.bHor ? number : res;
+			c = this.bHor ? res : number;
+			return arg1.getElementRowCol(r, c);
+		}
+
+		var range;
+		if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type ||
+			cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
+			range = arg1.getRange();
+		}
+		if (!range) {
+			return new cError(cErrorType.bad_reference);
+		}
+
+		var bb = range.getBBox0();
+		count = this.bHor ? (bb.r2 - bb.r1) : (bb.c2 - bb.c1);
+		if (number > count) {
+			return new cError(cErrorType.bad_reference);
+		}
+		var ws = arg1.getWS();
+		r = this.bHor ? bb.r1 : bb.r2;
+		c = this.bHor ? bb.c2 : bb.c1;
+		var oSearchRange = ws.getRange3(bb.r1, bb.c1, r, c);
+
+		res = this._get(oSearchRange, valueForSearching, arg3);
+		if (-1 === res) {
+			return new cError(cErrorType.not_available);
+		}
+
+		r = this.bHor ? bb.r1 + number : res;
+		c = this.bHor ? res : bb.c1 + number;
+		return checkTypeCell(arg1.getWS()._getCellNoEmpty(r, c));
+	};
+	VHLOOKUPCache.prototype._get = function (range, valueForSearching, arg3Value) {
 		var res, _this = this, wsId = range.getWorksheet().getId(), sRangeName = wsId + g_cCharDelimiter +
 			range.getName(), cacheElem = this.cacheId[sRangeName];
-		if (null == cacheElem) {
+		if (!cacheElem) {
 			cacheElem = {elements: [], results: {}};
 			range._foreachNoEmpty(function (cell, r, c) {
-				var v = cell.getValueWithoutFormat();
-				cacheElem.elements.push({v: v, i: (_this.bHor ? c : r)});
+				cacheElem.elements.push({v: cell.getValueWithoutFormat().toLowerCase(), i: (_this.bHor ? c : r)});
 			});
 			this.cacheId[sRangeName] = cacheElem;
 			var cacheRange = this.cacheRanges[wsId];
-			if (null == cacheRange) {
+			if (!cacheRange) {
 				cacheRange = new AscCommonExcel.RangeDataManager(null);
 				this.cacheRanges[wsId] = cacheRange;
 			}
@@ -1094,25 +1100,24 @@
 		}
 		var sInputKey = valueForSearching + g_cCharDelimiter + arg3Value;
 		res = cacheElem.results[sInputKey];
-		if (null == res) {
-			res = this._calculate(cacheElem.elements, valueForSearching, arg3Value);
-			cacheElem.results[sInputKey] = res;
+		if (!res) {
+			cacheElem.results[sInputKey] = res = this._calculate(cacheElem.elements, valueForSearching, arg3Value);
 		}
 		return res;
 	};
 	VHLOOKUPCache.prototype._calculate = function (cacheArray, valueForSearching, lookup) {
 		var res = -1, i = 0, j, length = cacheArray.length, k, elem, val;
-
 		if ('' === valueForSearching && 0 !== length) {
 			return cacheArray[0].i;
 		}
+
 		if (lookup) {
 			j = length - 1;
 			while (i <= j) {
 				k = Math.floor((i + j) / 2);
 				elem = cacheArray[k];
 				val = elem.v;
-				if (valueForSearching == val) {
+				if (valueForSearching === val) {
 					return elem.i;
 				} else if (valueForSearching < val) {
 					j = k - 1;
@@ -1127,7 +1132,7 @@
 			for (; i < length; i++) {
 				elem = cacheArray[i];
 				val = elem.v;
-				if (valueForSearching == val) {
+				if (valueForSearching === val) {
 					return elem.i;
 				}
 			}
@@ -1137,7 +1142,7 @@
 	VHLOOKUPCache.prototype.remove = function (cell) {
 		var wsId = cell.ws.getId();
 		var cacheRange = this.cacheRanges[wsId];
-		if (null != cacheRange) {
+		if (cacheRange) {
 			var oGetRes = cacheRange.get(new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow));
 			for (var i = 0, length = oGetRes.all.length; i < length; ++i) {
 				var elem = oGetRes.all[i];
@@ -1166,97 +1171,7 @@
 	cVLOOKUP.prototype.argumentsMax = 4;
 	cVLOOKUP.prototype.numFormat = AscCommonExcel.cNumFormatNone;
 	cVLOOKUP.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = arg[2];
-		var arg3 = this.argumentsCurrent == 4 ? arg[3].tocBool().value : true;
-		var numberCol = arg2.getValue() - 1, valueForSearching, resR = -1, min, regexp;
-
-		if (isNaN(numberCol)) {
-			return this.value = new cError(cErrorType.bad_reference);
-		}
-
-		if (numberCol < 0) {
-			return this.value = new cError(cErrorType.wrong_value_type);
-		}
-
-		if (cElementType.cell3D === arg0.type || cElementType.cell === arg0.type) {
-			arg0 = arg0.getValue();
-		}
-
-		if (cElementType.error === arg0.type) {
-			return this.value = arg0;
-		} else {
-			valueForSearching = arg0.getValue();
-		}
-
-		var found = false;
-		if (cElementType.array === arg1.type) {
-			// ToDo
-			if (cElementType.string === arg0.type) {
-				regexp = searchRegExp(valueForSearching);
-			}
-			arg1.foreach(function (elem, r) {
-				if (r == 0) {
-					min = elem.getValue();
-				}
-
-				if (arg3) {
-					if (valueForSearching == elem.getValue()) {
-						resR = r;
-						found = true;
-					} else if (valueForSearching > elem.getValue() && !found) {
-						resR = r;
-					}
-				} else {
-					if (cElementType.string === arg0.type) {
-						if (regexp.test(elem.getValue())) {
-							resR = r;
-						}
-					} else if (valueForSearching == elem.getValue()) {
-						resR = r;
-					}
-				}
-
-				min = Math.min(min, elem.getValue());
-			});
-
-			if (min > valueForSearching) {
-				return this.value = new cError(cErrorType.not_available);
-			}
-
-			if (resR == -1) {
-				return this.value = new cError(cErrorType.not_available);
-			}
-
-			if (numberCol > arg1.getCountElementInRow() - 1) {
-				return this.value = new cError(cErrorType.bad_reference);
-			}
-
-			return this.value = arg1.getElementRowCol(resR, numberCol);
-		}
-
-		var range;
-		if (cElementType.cell === arg1.type || cElementType.cell3D === arg1.type ||
-			cElementType.cellsRange === arg1.type || cElementType.cellsRange3D === arg1.type) {
-			range = arg1.getRange();
-		}
-		if (!range) {
-			return this.value = new cError(cErrorType.bad_reference);
-		}
-
-		var bb = range.getBBox0();
-		if (numberCol > bb.c2 - bb.c1) {
-			return this.value = new cError(cErrorType.bad_reference);
-		}
-		var ws = arg1.getWS();
-		var oSearchRange = ws.getRange3(bb.r1, bb.c1, bb.r2, bb.c1);
-
-		resR = g_oVLOOKUPCache.get(oSearchRange, valueForSearching, arg3);
-		if (-1 === resR) {
-			return this.value = new cError(cErrorType.not_available);
-		}
-
-		var v = arg1.getWS()._getCellNoEmpty(resR, bb.c1 + numberCol);
-		return this.value = checkTypeCell(v);
+		return this.value = g_oVLOOKUPCache.calculate(arg);
 	};
 
 	var g_oVLOOKUPCache = new VHLOOKUPCache(false);
