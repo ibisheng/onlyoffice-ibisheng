@@ -404,7 +404,7 @@
 
 		var nOption = argClone[1].getValue();
 		var ignoreHiddenRows = false;
-		var ignoreErrors = false;
+		var ignoreErrorsVal = false;
 		var ignoreNestedStAg = false;
 		switch ( nOption) {
 			case 0 : // ignore nested SUBTOTAL and AGGREGATE functions
@@ -416,12 +416,12 @@
 				break;
 			case 2 : // ignore error values, nested SUBTOTAL and AGGREGATE functions
 				ignoreNestedStAg = true;
-				ignoreErrors = true;
+				ignoreHiddenRows = true;
 				break;
 			case 3 : // ignore hidden rows, error values, nested SUBTOTAL and AGGREGATE functions
 				ignoreNestedStAg = true;
 				ignoreHiddenRows = true;
-				ignoreErrors = true;
+				ignoreHiddenRows = true;
 				break;
 			case 4 : // ignore nothing
 				break;
@@ -429,23 +429,26 @@
 				ignoreHiddenRows = true;
 				break;
 			case 6 : // ignore error values
-				ignoreErrors = true;
+				ignoreHiddenRows = true;
 				break;
 			case 7 : // ignore hidden rows and error values
 				ignoreHiddenRows = true;
-				ignoreErrors = true;
+				ignoreHiddenRows = true;
 				break;
 			default :
 				return this.value = new cError(cErrorType.not_numeric);
 		}
 
 		if (f) {
-			//f.checkExclude = true;
 			f.excludeHiddenRows = ignoreHiddenRows;
+			f.excludeErrorsVal = ignoreErrorsVal;
+			f.excludeNestedStAg = ignoreNestedStAg;
+
 			var newArgs = [];
 			for(var i = 2; i < arg.length; i++){
 				newArgs.push(arg[i]);
 			}
+
 			f.setArgumentsCount(newArgs.length);
 			this.value = f.Calculate(newArgs);
 		}
@@ -5128,5 +5131,7 @@
 
 	window['AscCommonExcel'].cPRODUCT = cPRODUCT;
 	window['AscCommonExcel'].cSUM = cSUM;
+	window['AscCommonExcel'].cAGGREGATE = cAGGREGATE;
+	window['AscCommonExcel'].cSUBTOTAL = cSUBTOTAL;
 
 })(window);

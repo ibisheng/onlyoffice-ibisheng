@@ -970,7 +970,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cArea.prototype.getWsId = function () {
 		return this.ws.Id;
 	};
-	cArea.prototype.getValue = function (checkExclude, excludeHiddenRows) {
+	cArea.prototype.getValue = function (checkExclude, excludeHiddenRows, excludeErrorsVal, excludeNestedStAg) {
 		var val = [], r = this.getRange();
 		if (!r) {
 			val.push(new cError(cErrorType.bad_reference));
@@ -979,7 +979,23 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				excludeHiddenRows = this.ws.isApplyFilterBySheet();
 			}
 			r._foreachNoEmpty(function (cell) {
-				val.push(checkTypeCell(cell));
+				var bIsFoundNestedStAg = false;
+				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+					var outStack = cell.formulaParsed.outStack;
+					for(var i = 0; i < outStack.length; i++){
+						if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+							bIsFoundNestedStAg = true;
+							break;
+						}
+					}
+				}
+				if(!bIsFoundNestedStAg){
+					var checkTypeVal = checkTypeCell(cell);
+					if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
+						val.push(checkTypeVal);
+					}
+				}
+
 			}, excludeHiddenRows);
 		}
 		return val;
@@ -1179,7 +1195,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cArea3D.prototype.getRanges = function () {
 		return (this.range(this.wsRange()));
 	};
-	cArea3D.prototype.getValue = function (checkExclude, excludeHiddenRows) {
+	cArea3D.prototype.getValue = function (checkExclude, excludeHiddenRows, excludeErrorsVal, excludeNestedStAg) {
 		var i, _wsA = this.wsRange();
 		var _val = [];
 		if (_wsA.length < 1) {
@@ -1203,8 +1219,25 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			if (checkExclude && !(_exclude = excludeHiddenRows)) {
 				_exclude = _wsA[i].isApplyFilterBySheet();
 			}
+
 			_r[i]._foreachNoEmpty(function (cell) {
-				_val.push(checkTypeCell(cell));
+				var bIsFoundNestedStAg = false;
+				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+					var outStack = cell.formulaParsed.outStack;
+					for(var i = 0; i < outStack.length; i++){
+						if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+							bIsFoundNestedStAg = true;
+							break;
+						}
+					}
+				}
+				if(!bIsFoundNestedStAg){
+					var checkTypeVal = checkTypeCell(cell);
+					if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
+						_val.push(checkTypeVal);
+					}
+				}
+
 			}, _exclude);
 		}
 		return _val;
