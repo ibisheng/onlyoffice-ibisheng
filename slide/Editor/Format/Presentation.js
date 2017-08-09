@@ -5379,7 +5379,7 @@ CPresentation.prototype =
             slides_array[i].checkNoTransformPlaceholder();
         }
         History.Add(new AscDFH.CChangesDrawingChangeTheme(this, AscDFH.historyitem_Presentation_ChangeTheme, arr_ind));
-        this.resetStateCurSlide();
+        ///this.resetStateCurSlide();
         this.Recalculate();
         this.Document_UpdateInterfaceState();
     },
