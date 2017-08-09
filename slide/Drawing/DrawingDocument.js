@@ -913,6 +913,7 @@ function CDrawingDocument()
 	this.m_dTargetX            = -1;
 	this.m_dTargetY            = -1;
 	this.m_dTargetSize         = 1;
+	this.m_dTargetAscent	   = 0;
 	this.TargetHtmlElement     = null;
 	this.TargetHtmlElementLeft = 0;
 	this.TargetHtmlElementTop  = 0;
@@ -2083,6 +2084,11 @@ function CDrawingDocument()
 
 			var boxY = 0;
 			var boxB = _hh - targetSize;
+			if (boxB < 0)
+				boxB = _hh;
+
+			var targetSizeAscent = 2 + (this.m_dTargetAscent * g_dKoef_mm_to_pix) >> 0;
+			yPos += targetSizeAscent;
 
 			var nValueScrollVer = 0;
 			if (yPos < boxY)
@@ -2107,9 +2113,10 @@ function CDrawingDocument()
 		this.CheckTargetDraw(x, y, !isTargetOnNotes);
 	}
 
-	this.SetTargetSize   = function(size)
+	this.SetTargetSize   = function(size, ascent)
 	{
 		this.m_dTargetSize = size;
+		this.m_dTargetAscent = (undefined === ascent) ? 0 : ascent;
 	}
 	this.DrawTarget      = function()
 	{
@@ -5957,6 +5964,7 @@ function CNotesDrawer(page)
             if (!this.HtmlPage.m_oLogicDocument.Notes_OnResize())
 			{
 				this.OnRecalculateNote(this.Slide, this.Width, this.Height);
+				this.HtmlPage.m_oLogicDocument.RecalculateCurPos();
 			}
 		}
 	};
