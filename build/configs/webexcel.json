@@ -91,6 +91,9 @@
 		"../common/Scrolls/mobileTouchManagerBase.js",
 
         "../common/wordcopypaste.js",
+		
+		"../common/easysax.js",
+		"../common/openxml.js",
 
         "../cell/document/empty-workbook.js",
         "../cell/model/UndoRedo.js",
@@ -214,8 +217,6 @@
 		"../common/text_input.js",
 		"../common/Drawings/Format/OleObject.js",
 		"../common/Drawings/Format/DrawingContent.js",
-		"../common/easysax.js",
-		"../common/openxml.js",
 		"../common/plugins.js"
       ],
       "private": [

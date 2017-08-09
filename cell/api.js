@@ -41,8 +41,6 @@ var editor;
   var asc = window["Asc"];
   var prot;
 
-  var openXml = AscCommon.openXml;
-
   var c_oAscAdvancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction;
   var DownloadType = AscCommon.DownloadType;
   var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
@@ -973,6 +971,7 @@ var editor;
 	spreadsheet_api.prototype.openDocumentFromZip = function (wb) {
 		var t = this;
 		return new Promise(function (resolve, reject) {
+			var openXml = AscCommon.openXml;
 			if (t.isChartEditor) {
 				resolve();
 				return;
