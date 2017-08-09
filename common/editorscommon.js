@@ -333,11 +333,6 @@
 		});
 	}
 
-	function getJSZipUtils()
-	{
-		return window['JSZipUtils'] ? window['JSZipUtils'] : require('jsziputils');
-	}
-
 	function getImageFromChanges(name)
 	{
 		var content;
@@ -439,7 +434,7 @@
 		if (changesUrl)
 		{
 			oZipImages = {};
-			getJSZipUtils().getBinaryContent(changesUrl, function (err, data)
+			require('jsziputils').getBinaryContent(changesUrl, function (err, data)
 			{
 				if (err)
 				{
@@ -3095,7 +3090,6 @@
 	window["AscCommon"].prepareUrl = prepareUrl;
 	window["AscCommon"].getUserColorById = getUserColorById;
 	window["AscCommon"].isNullOrEmptyString = isNullOrEmptyString;
-	window["AscCommon"].getJSZipUtils = getJSZipUtils;
 
 	window["AscCommon"].DocumentUrls = DocumentUrls;
 	window["AscCommon"].CLock = CLock;

@@ -977,7 +977,7 @@ var editor;
 				return;
 			}
 
-			AscCommon.getJSZipUtils().getBinaryContent(t.documentUrl, function (err, data) {
+			require('jsziputils').getBinaryContent(t.documentUrl, function (err, data) {
 				if (err) {
 					reject(err); // or handle err
 				} else {
