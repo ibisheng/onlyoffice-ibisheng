@@ -7959,7 +7959,7 @@ background-repeat: no-repeat;\
 		var oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(this.WordControl.m_oLogicDocument);
 		var _memory           = oBinaryFileWriter.memory;
 
-		oBinaryFileWriter.Write2();
+		oBinaryFileWriter.Write(true);
 
 		var _header = AscCommon.c_oSerFormat.Signature + ";v" + Asc.c_nVersionNoBase64 + ";" + _memory.GetCurPosition() + ";";
 		window["native"]["Save_End"](_header, _memory.GetCurPosition());
