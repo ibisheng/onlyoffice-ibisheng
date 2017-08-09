@@ -4701,6 +4701,7 @@ CPresentation.prototype =
                     var PresentSelContent = new PresentationSelectedContent();
                     PresentSelContent.DocContent = oSelectedContent;
                     this.Insert_Content(PresentSelContent);
+                    this.Check_CursorMoveRight();
                     return;
                 }
                 else{
