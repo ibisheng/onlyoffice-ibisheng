@@ -256,7 +256,7 @@
         "../common/externs/global.js",
         "../common/externs/jquery-3.2.js",
         "../common/externs/xregexp-3.0.0.js",
-        "../../web-apps/vendor/sockjs/sockjs.min.js",
+        "../common/externs/sockjs.js",
         "../common/externs/jszip.min.js",
         "../common/externs/jszip-utils.js"
       ],
