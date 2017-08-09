@@ -765,6 +765,9 @@
 	};
 
 	DrawingContext.prototype.setLineDash = function (segments) {
+		if (!this.ctx.setLineDash) {
+			return;
+		}
 		this.ctx.setLineDash(segments);
 		return this;
 	};
