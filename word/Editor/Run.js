@@ -1373,7 +1373,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 				var Descender = Math.abs(g_oTextMeasurer.GetDescender());
 				var Ascender  = Height - Descender;
 
-                Para.DrawingDocument.SetTargetSize( Height );
+				Para.DrawingDocument.SetTargetSize(Height, Ascender);
 
                 var RGBA;
                 Para.DrawingDocument.UpdateTargetTransform(Para.Get_ParentTextTransform());
@@ -1465,7 +1465,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                     __Y0 = Math.max( __Y0, ___Y0 );
                     __Y1 = Math.min( __Y1, ___Y1 );
 
-                    Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+					Para.DrawingDocument.SetTargetSize(__Y1 - __Y0, Ascender);
                     Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
                 }
                 else if ( undefined != Para.Get_FramePr() )
@@ -1477,7 +1477,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                     __Y0 = Math.max( __Y0, ___Y0 );
                     __Y1 = Math.min( __Y1, ___Y1 );
 
-                    Para.DrawingDocument.SetTargetSize( __Y1 - __Y0 );
+					Para.DrawingDocument.SetTargetSize(__Y1 - __Y0, Ascender);
                     Para.DrawingDocument.UpdateTarget( X, __Y0, PageAbs );
                 }
                 else
