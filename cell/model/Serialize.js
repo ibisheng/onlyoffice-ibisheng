@@ -34,6 +34,8 @@
 (function(window, undefined) {
 
       // Import
+	var openXml = AscCommon.openXml;
+
       var g_memory = AscFonts.g_memory;
       var DecodeBase64Char = AscFonts.DecodeBase64Char;
       var b64_decode = AscFonts.b64_decode;

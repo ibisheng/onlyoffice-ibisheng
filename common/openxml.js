@@ -32,7 +32,7 @@
 
 "use strict";
 
-(function(root) {
+(function(window) {
 	var openXml = {};
 
 	function SaxParserBase() {
@@ -691,6 +691,9 @@
 		xmlSignature: "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/signature",
 	};
 
-	root.openXml = openXml;
+	window.openXml = openXml;
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommon'] = window['AscCommon'] || {};
+	window['AscCommon'].openXml = openXml;
 
-}(this));
+}(window));

@@ -41,6 +41,8 @@ var editor;
   var asc = window["Asc"];
   var prot;
 
+  var openXml = AscCommon.openXml;
+
   var c_oAscAdvancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction;
   var DownloadType = AscCommon.DownloadType;
   var c_oAscLockTypes = AscCommon.c_oAscLockTypes;

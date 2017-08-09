@@ -1200,7 +1200,7 @@ Fill.prototype =
 		else if("patternFill" === elem) {
 			if(st_patterntypeNONE !== prevContext.patternType)
 			{
-				if(openXml.SaxParserDataTransfer.priorityBg)
+				if(AscCommon.openXml.SaxParserDataTransfer.priorityBg)
 				{
 					if(prevContext.bgColor)
 						this.bg = prevContext.bgColor;
