@@ -6037,6 +6037,12 @@ background-repeat: no-repeat;\
 		{
 			var _obj = JSON.parse(e.data);
 
+			if (window["AscDesktopEditor"] && (_obj["type"] == "file:open"))
+			{
+				window.postMessage(e.data, "*");
+				return;
+			}
+
 			if (undefined == _obj["main_command"])
 				return;
 
@@ -6673,7 +6679,7 @@ background-repeat: no-repeat;\
 		this.WordControl.m_oLogicDocument.CalculateComments();
 		writer.WriteDocument2(this.WordControl.m_oLogicDocument);
 
-		var _header = "PPTY;v1;" + writer.pos + ";";
+		var _header = "PPTY;v10;" + writer.pos + ";";
 		window["native"]["Save_End"](_header, writer.pos);
 
 		return writer.ImData.data;

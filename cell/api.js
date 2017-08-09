@@ -3338,7 +3338,7 @@ var editor;
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     oBinaryFileWriter.Write2();
 
-    var _header = oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition());
+    var _header = oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition(), Asc.c_nVersionNoBase64);
     window["native"]["Save_End"](_header, oBinaryFileWriter.Memory.GetCurPosition());
 
     return oBinaryFileWriter.Memory.ImData.data;
