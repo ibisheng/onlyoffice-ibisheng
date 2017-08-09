@@ -5860,10 +5860,11 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num, reporterStartObject)
 	{
-		if (reporterStartObject && !this.isReporterMode)
+		var is_reporter = (reporterStartObject && !this.isReporterMode);
+		if (is_reporter)
 			this.DemonstrationReporterStart(reporterStartObject);
 
-		if (this.reporterWindow)
+		if (is_reporter && (this.reporterWindow || window["AscDesktopEditor"]))
 			this.WordControl.DemonstrationManager.StartWaitReporter(div_id, slidestart_num, true);
 		else
 			this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
@@ -5880,6 +5881,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.DemonstrationReporterStart = function(startObject)
 	{
 		this.reporterStartObject = startObject;
+
+		if (window["AscDesktopEditor"])
+		{
+			window["AscDesktopEditor"]["startReporter"](window.location.href);
+			return;
+		}
 
 		var dualScreenLeft = (window.screenLeft != undefined) ? window.screenLeft : screen.left;
 		var dualScreenTop = (window.screenTop != undefined) ? window.screenTop : screen.top;
@@ -5906,6 +5913,12 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.DemonstrationReporterEnd = function()
 	{
+		if (window["AscDesktopEditor"])
+		{
+			window["AscDesktopEditor"]["endReporter"]();
+			return;
+		}
+
 		if (!this.reporterWindow)
 			return;
 
@@ -5995,12 +6008,24 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sendToReporter = function(value)
 	{
+		if (window["AscDesktopEditor"])
+		{
+			window["AscDesktopEditor"]["sendToReporter"](value);
+			return;
+		}
+
 		if (this.reporterWindow)
 			this.reporterWindow.postMessage(value, "*");
 	};
 
 	asc_docs_api.prototype.sendFromReporter = function(value)
 	{
+		if (window["AscDesktopEditor"])
+		{
+			window["AscDesktopEditor"]["sendFromReporter"](value);
+			return;
+		}
+
 		window.postMessage(value, "*");
 	};
 
@@ -7216,6 +7241,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype["asc_OnHideContextMenu"] 				= asc_docs_api.prototype.asc_OnHideContextMenu;
 	asc_docs_api.prototype["asc_OnShowContextMenu"] 				= asc_docs_api.prototype.asc_OnShowContextMenu;
+
+	asc_docs_api.prototype["DemonstrationReporterMessages"] 		= asc_docs_api.prototype.DemonstrationReporterMessages;
+	asc_docs_api.prototype["DemonstrationToReporterMessages"] 		= asc_docs_api.prototype.DemonstrationToReporterMessages;
 
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;

@@ -1737,7 +1737,7 @@ function CDrawingDocument()
 			}
 
 			var x_pix = (__x * g_dKoef_mm_to_pix + 10 + (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oNotesContainer.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
-			var y_pix = (__y * g_dKoef_mm_to_pix + 10 + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oNotesContainer.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
+			var y_pix = (__y * g_dKoef_mm_to_pix + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oNotesContainer.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
 
 			return {X: x_pix, Y: y_pix, Error: false};
 		}
