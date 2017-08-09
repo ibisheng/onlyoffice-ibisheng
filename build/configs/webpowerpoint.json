@@ -258,7 +258,7 @@
         "../common/externs/xregexp-3.0.0.js",
         "../../web-apps/vendor/sockjs/sockjs.min.js",
         "../../web-apps/vendor/jszip/jszip.min.js",
-        "../../web-apps/vendor/jszip-utils/jszip-utils.min.js"
+        "../common/externs/jszip-utils.js"
       ],
       "map": "sdk-all.js.map",
       "log": "../slide/Build/Log"
