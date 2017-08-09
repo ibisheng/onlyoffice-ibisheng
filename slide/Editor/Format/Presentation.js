@@ -2662,22 +2662,20 @@ CPresentation.prototype =
                 var target_content = graphicObjects.getTargetDocContent(undefined, true);
                 if(target_content)
                 {
-                    if(target_content instanceof CTable)
-                    {
+                    if(target_content instanceof CTable){
                         target_content.MoveCursorToCell( true === e.ShiftKey ? false : true );
                     }
-                    else
-                    {
+                    else{
                         if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
-
                             if(target_content.Selection.StartPos === target_content.Selection.EndPos &&
-                                target_content.Content[target_content.CurPos.ContentPos].IsEmpty() &&
+                                target_content.Content[target_content.CurPos.ContentPos].IsCursorAtBegin() &&
                                 target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr &&
                                 target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet &&
                                 target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.isBullet() &&
-                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.bulletType.type !== AscFormat.BULLET_TYPE_BULLET_NONE &&
-                                this.Can_IncreaseParagraphLevel(!e.ShiftKey)){
-                                this.IncreaseDecreaseIndent(!e.ShiftKey);
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.bulletType.type !== AscFormat.BULLET_TYPE_BULLET_NONE) {
+                                if(this.Can_IncreaseParagraphLevel(!e.ShiftKey)){
+                                    this.IncreaseDecreaseIndent(!e.ShiftKey);
+                                }
                             }
                             else{
                                 History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
