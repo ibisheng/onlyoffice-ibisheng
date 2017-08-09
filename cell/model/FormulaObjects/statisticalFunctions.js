@@ -2623,26 +2623,37 @@
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
 
-		arg1 = arg1.tocString();
+		/*arg1 = arg1.tocString();
 
 		if (cElementType.string !== arg1.type) {
 			return this.value = new cError(cErrorType.wrong_value_type);
-		}
+		}*/
+
+		var compareValues = function(val, matchingInfo){
+			var res;
+
+			if(val.type === arg1.type && val.value === arg1.value){
+				return true;
+			}
+
+			res = matching(val, matchingInfo);
+			return res;
+		};
 
 		var val;
 		matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
 		if (cElementType.cellsRange === arg0.type) {
 			arg0.foreach2(function (_val) {
-				_count += matching(_val, matchingInfo);
+				_count += compareValues(_val, matchingInfo);
 			})
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			val = arg0.getValue();
 			for (var i = 0; i < val.length; i++) {
-				_count += matching(val[i], matchingInfo);
+				_count += compareValues(val[i], matchingInfo);
 			}
 		} else {
 			val = arg0.getValue();
-			_count += matching(val, matchingInfo);
+			_count += compareValues(val, matchingInfo);
 		}
 
 		return this.value = new cNumber(_count);

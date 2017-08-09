@@ -5797,7 +5797,11 @@ function parseNum( str ) {
 		var res = false, rS;
 		if (cElementType.string === y.type) {
 			if ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator) {
-				return _func[x.type][y.type](x, y, operator).toBool();
+				var _funcVal = _func[x.type][y.type](x, y, operator);
+				if(cElementType.error === _funcVal.type){
+					return false;
+				}
+				return _funcVal.toBool();
 			}
 
 			y = y.toString();
@@ -5838,7 +5842,7 @@ function parseNum( str ) {
 					break;
 				case "=":
 				default:
-					res = (x.value == y.value);
+					res = (x.value === y.value);
 					break;
 			}
 		}
