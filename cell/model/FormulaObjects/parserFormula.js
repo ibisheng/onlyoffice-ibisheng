@@ -1099,7 +1099,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			}
 
 			var bIsFoundNestedStAg = false;
-			var resValue = new cNumber(0);
+			var resValue = new cEmpty();
 			if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
 				var outStack = cell.formulaParsed.outStack;
 				for(var n = 0; n < outStack.length; n++){

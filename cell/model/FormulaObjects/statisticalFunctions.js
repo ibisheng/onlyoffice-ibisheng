@@ -6601,7 +6601,7 @@
 				for (var j = 0; j < A[i].length; j++) {
 					if (A[i][j] instanceof cError) {
 						return A[i][j];
-					} else if (A[i][j] instanceof cNumber) {
+					} else if (A[i][j] instanceof cNumber || A[i][j] instanceof cEmpty) {
 						tA.push(A[i][j].getValue());
 					} else if (A[i][j] instanceof cBool) {
 						tA.push(A[i][j].tocNumber().getValue());
