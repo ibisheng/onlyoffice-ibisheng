@@ -8205,6 +8205,8 @@ background-repeat: no-repeat;\
 		}
 
 		var _obj = this.asc_AddContentControl(type, _content_control_pr);
+		if (!_obj)
+			return undefined;
 		return {"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId};
 	};
 	window["asc_docs_api"].prototype["pluginMethod_RemoveContentControl"] = function(id)
