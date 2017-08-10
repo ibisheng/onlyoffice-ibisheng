@@ -51,7 +51,7 @@
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
 	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
-	cFormulaFunctionGroup['Statistical'].push(cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
+	cFormulaFunctionGroup['Statistical'].push(cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST);
 	cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
 	cFormulaFunctionGroup['Financial'].push(cPDURATION);
@@ -63,21 +63,9 @@
 	cFormulaFunctionGroup['Information'].push(cSHEET, cSHEETS);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cUNICHAR, cUNICODE, cBINOM_DIST_RANGE, cF_TEST, cFORECAST_ETS,
+	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cUNICHAR, cUNICODE, cF_TEST, cFORECAST_ETS,
 		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
 		cMUNIT, cFORMULATEXT, cSHEET, cSHEETS);
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cBINOM_DIST_RANGE() {
-		cBaseFunction.call(this, "BINOM.DIST.RANGE");
-		this.isXLFN = true;
-	}
-
-	cBINOM_DIST_RANGE.prototype = Object.create(cBaseFunction.prototype);
-	cBINOM_DIST_RANGE.prototype.constructor = cBINOM_DIST_RANGE;
 
 	/**
 	 * @constructor
