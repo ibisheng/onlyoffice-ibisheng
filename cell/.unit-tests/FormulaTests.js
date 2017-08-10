@@ -913,6 +913,54 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), -4, 'ISO.CEILING(-4.3,-2)' );
 	} );
 
+	test( "Test: \"CEILING\"", function () {
+
+		oParser = new parserFormula( 'CEILING(2.5, 1)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(2.5, 1)' );
+		strictEqual( oParser.calculate().getValue(), 3, 'CEILING(2.5, 1)' );
+
+		oParser = new parserFormula( 'CEILING(-2.5, -2)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(-2.5, -2)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'CEILING(-2.5, -2)' );
+
+		oParser = new parserFormula( 'CEILING(-2.5, 2)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(-2.5, 2)' );
+		strictEqual( oParser.calculate().getValue(), -2, 'CEILING(-2.5, 2)' );
+
+		oParser = new parserFormula( 'CEILING(1.5, 0.1)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(1.5, 0.1)' );
+		strictEqual( oParser.calculate().getValue(), 1.5, 'CEILING(1.5, 0.1)' );
+
+		oParser = new parserFormula( 'CEILING(0.234, 0.01)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(0.234, 0.01)' );
+		strictEqual( oParser.calculate().getValue(), 0.24, 'CEILING(0.234, 0.01)' );
+
+	} );
+
+	test( "Test: \"ECMA.CEILING\"", function () {
+
+		oParser = new parserFormula( 'ECMA.CEILING(2.5, 1)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(2.5, 1)' );
+		strictEqual( oParser.calculate().getValue(), 3, 'ECMA.CEILING(2.5, 1)' );
+
+		oParser = new parserFormula( 'ECMA.CEILING(-2.5, -2)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(-2.5, -2)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'ECMA.CEILING(-2.5, -2)' );
+
+		oParser = new parserFormula( 'ECMA.CEILING(-2.5, 2)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(-2.5, 2)' );
+		strictEqual( oParser.calculate().getValue(), -2, 'ECMA.CEILING(-2.5, 2)' );
+
+		oParser = new parserFormula( 'ECMA.CEILING(1.5, 0.1)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(1.5, 0.1)' );
+		strictEqual( oParser.calculate().getValue(), 1.5, 'ECMA.CEILING(1.5, 0.1)' );
+
+		oParser = new parserFormula( 'ECMA.CEILING(0.234, 0.01)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(0.234, 0.01)' );
+		strictEqual( oParser.calculate().getValue(), 0.24, 'ECMA.CEILING(0.234, 0.01)' );
+
+	} );
+
 	test( "Test: \"COMBINA\"", function () {
 		oParser = new parserFormula( 'COMBINA(4,3)', "A1", ws );
 		ok( oParser.parse(), 'COMBINA(4,3)' );

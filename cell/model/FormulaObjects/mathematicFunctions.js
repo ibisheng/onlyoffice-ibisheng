@@ -84,9 +84,6 @@
 		cROUNDUP, cSEC, cSECH, cSERIESSUM, cSIGN, cSIN, cSINH, cSQRT, cSQRTPI, cSUBTOTAL, cSUM, cSUMIF, cSUMIFS,
 		cSUMPRODUCT, cSUMSQ, cSUMX2MY2, cSUMX2PY2, cSUMXMY2, cTAN, cTANH, cTRUNC);
 
-	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cECMA_CEILING);
-
 	var cSubTotalFunctionType = {
 		includes: {
 			AVERAGE: 1, COUNT: 2, COUNTA: 3, MAX: 4, MIN: 5, PRODUCT: 6, STDEV: 7, STDEVP: 8, SUM: 9, VAR: 10, VARP: 11
@@ -1524,13 +1521,15 @@
 
 	/**
 	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
+	 * @extends {cCEILING}
 	 */
+	//TODO нигде нет отписания к этой функции! работает так же как и cCEILING на всех примерах.
 	function cECMA_CEILING() {
-		cBaseFunction.call(this, "ECMA_CEILING");
+		cCEILING.call(this);
+		this.name = "ECMA.CEILING";
 	}
 
-	cECMA_CEILING.prototype = Object.create(cBaseFunction.prototype);
+	cECMA_CEILING.prototype = Object.create(cCEILING.prototype);
 	cECMA_CEILING.prototype.constructor = cECMA_CEILING;
 
 	/**
