@@ -416,11 +416,11 @@
 				break;
 			case 2 : // ignore error values, nested SUBTOTAL and AGGREGATE functions
 				ignoreNestedStAg = true;
-				ignoreHiddenRows = true;
+				ignoreErrorsVal = true;
 				break;
 			case 3 : // ignore hidden rows, error values, nested SUBTOTAL and AGGREGATE functions
 				ignoreNestedStAg = true;
-				ignoreHiddenRows = true;
+				ignoreErrorsVal = true;
 				ignoreHiddenRows = true;
 				break;
 			case 4 : // ignore nothing
@@ -429,11 +429,11 @@
 				ignoreHiddenRows = true;
 				break;
 			case 6 : // ignore error values
-				ignoreHiddenRows = true;
+				ignoreErrorsVal = true;
 				break;
 			case 7 : // ignore hidden rows and error values
 				ignoreHiddenRows = true;
-				ignoreHiddenRows = true;
+				ignoreErrorsVal = true;
 				break;
 			default :
 				return this.value = new cError(cErrorType.not_numeric);
