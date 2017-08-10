@@ -3632,6 +3632,18 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed( 7 ) - 0, 0.2050781);
 	} );
 
+	test( "Test: \"BINOM.DIST.RANGE\"", function () {
+
+		oParser = new parserFormula( "BINOM.DIST.RANGE(60,0.75,48)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 3 ) - 0, 0.084);
+
+		oParser = new parserFormula( "BINOM.DIST.RANGE(60,0.75,45,50)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 3 ) - 0, 0.524);
+
+	} );
+
     test( "Test: \"CONFIDENCE\"", function () {
 
         oParser = new parserFormula( "CONFIDENCE(0.4,5,12)", "A1", ws );
