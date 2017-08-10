@@ -2434,7 +2434,7 @@ background-repeat: no-repeat;\
 						"url"           : this.documentUrl,
 						"title"         : this.documentTitle,
 						"codepage"      : option.asc_getCodePage(),
-						"nobase64"      : Asc.c_nNoBase64
+						"nobase64"      : true
 					};
 					sendCommand(this, null, rData);
 				}
@@ -2455,7 +2455,7 @@ background-repeat: no-repeat;\
 						"url": this.documentUrl,
 						"title": this.documentTitle,
 						"password": option.asc_getPassword(),
-						"nobase64": Asc.c_nNoBase64
+						"nobase64": true
 					};
 
 					sendCommand(this, null, v);
@@ -6843,6 +6843,7 @@ background-repeat: no-repeat;\
 		}
 		// Меняем тип состояния (на сохранение)
 		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
+		var isNoBase64 = typeof ArrayBuffer !== 'undefined';
 
 		var dataContainer               = {data : null, part : null, index : 0, count : 0};
 		var oAdditionalData             = {};
@@ -6853,7 +6854,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
-		oAdditionalData["nobase64"]     = Asc.c_nNoBase64;
+		oAdditionalData["nobase64"]     = isNoBase64;
 		if ('savefromorigin' === command)
 		{
 			oAdditionalData["format"] = this.documentFormat;
@@ -6869,7 +6870,7 @@ background-repeat: no-repeat;\
 		else if (null == options.oDocumentMailMerge && c_oAscFileType.PDF === filetype)
 		{
 			var dd             = this.WordControl.m_oDrawingDocument;
-			dataContainer.data = dd.ToRendererPart(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
+			dataContainer.data = dd.ToRendererPart(isNoBase64);
 			//console.log(oAdditionalData["data"]);
 		}
 		else if (c_oAscFileType.JSON === filetype)
@@ -6928,7 +6929,7 @@ background-repeat: no-repeat;\
 				oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(oLogicDocument, false, true);
 			else
 				oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(oLogicDocument);
-			dataContainer.data = oBinaryFileWriter.Write(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
+			dataContainer.data = oBinaryFileWriter.Write(isNoBase64);
 		}
 		if (null != options.oMailMergeSendData)
 		{
@@ -7748,31 +7749,18 @@ background-repeat: no-repeat;\
 		var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
 		var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
 
-		if (undefined === version)
+		if (undefined !== version)
+			AscCommon.CurFileVersion = version;
+		
+		if (oBinaryFileReader.Read(base64File))
 		{
-			if (oBinaryFileReader.Read(base64File))
-			{
-				g_oIdCounter.Set_Load(false);
-				this.LoadedObject = 1;
+			g_oIdCounter.Set_Load(false);
+			this.LoadedObject = 1;
 
-				this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-			}
-			else
-				this.sendEvent("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
+			this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		}
 		else
-		{
-			AscCommon.CurFileVersion = version;
-			if (oBinaryFileReader.ReadData(base64File))
-			{
-				g_oIdCounter.Set_Load(false);
-				this.LoadedObject = 1;
-
-				this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-			}
-			else
-				this.sendEvent("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
-		}
+			this.sendEvent("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
 
 		if (window["NATIVE_EDITOR_ENJINE"] === true && undefined != window["native"])
 		{

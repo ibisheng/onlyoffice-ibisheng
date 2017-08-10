@@ -2052,7 +2052,7 @@ background-repeat: no-repeat;\
 					"url": this.documentUrl,
 					"title": this.documentTitle,
 					"password": option.asc_getPassword(),
-					"nobase64": Asc.c_nNoBase64
+					"nobase64": true
 				};
 
 				sendCommand(this, null, v);
@@ -6387,6 +6387,7 @@ background-repeat: no-repeat;\
 		{
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 		}
+		var isNoBase64 = typeof ArrayBuffer !== 'undefined';
 
 		var dataContainer               = {data : null, part : null, index : 0, count : 0};
 		var command                     = "save";
@@ -6398,7 +6399,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
-		oAdditionalData["nobase64"]     = Asc.c_nNoBase64;
+		oAdditionalData["nobase64"]     = isNoBase64;
 		if (DownloadType.Print === options.downloadType)
 		{
 			oAdditionalData["inline"] = 1;
@@ -6406,10 +6407,10 @@ background-repeat: no-repeat;\
 		if (c_oAscFileType.PDF == filetype)
 		{
 			var dd             = this.WordControl.m_oDrawingDocument;
-			dataContainer.data = dd.ToRendererPart(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
+			dataContainer.data = dd.ToRendererPart(isNoBase64);
 		}
 		else
-			dataContainer.data = this.WordControl.SaveDocument(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
+			dataContainer.data = this.WordControl.SaveDocument(isNoBase64);
 		var fCallback     = function(input)
 		{
 			var error = c_oAscError.ID.Unknown;
@@ -6554,16 +6555,8 @@ background-repeat: no-repeat;\
 		var _loader = new AscCommon.BinaryPPTYLoader();
 		_loader.Api = this;
 
-		if (version === undefined)
-		{
-			_loader.Load(base64File, this.WordControl.m_oLogicDocument);
-			_loader.Check_TextFit();
-		}
-		else
-		{
-			_loader.Load2(base64File, this.WordControl.m_oLogicDocument);
-			_loader.Check_TextFit();
-		}
+		_loader.Load(base64File, this.WordControl.m_oLogicDocument);
+		_loader.Check_TextFit();
 
 		this.LoadedObject = 1;
 		g_oIdCounter.Set_Load(false);
@@ -6677,7 +6670,7 @@ background-repeat: no-repeat;\
 	{
 		var writer = new AscCommon.CBinaryFileWriter();
 		this.WordControl.m_oLogicDocument.CalculateComments();
-		writer.WriteDocument2(this.WordControl.m_oLogicDocument);
+		writer.WriteDocument3(this.WordControl.m_oLogicDocument);
 
 		var _header = "PPTY;v10;" + writer.pos + ";";
 		window["native"]["Save_End"](_header, writer.pos);

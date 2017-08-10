@@ -4227,13 +4227,6 @@
 				return this.WriteFileHeader(this.Memory.GetCurPosition(), AscCommon.c_oSerFormat.Version) + this.Memory.GetBase64Memory();
 			}
         };
-        this.Write2 = function(idWorksheet)
-        {
-            //если idWorksheet не null, то надо серализовать только его.
-            pptx_content_writer._Start();
-            this.WriteMainTable(idWorksheet);
-            pptx_content_writer._End();
-        };
         this.WriteFileHeader = function(nDataSize, version)
         {
             return AscCommon.c_oSerFormat.Signature + ";v" + version + ";" + nDataSize  + ";";
@@ -7596,7 +7589,7 @@
         this.getbase64DecodedData = function(szSrc)
         {
 			var isBase64 = typeof szSrc === 'string';
-			var srcLen = isBase64 ? szSrc.length : szSrc.data.length;
+			var srcLen = szSrc.length;
 			var nWritten = 0;
 			
             var nType = 0;
@@ -7606,7 +7599,7 @@
             while (true)
             {
                 index++;
-                var _c = isBase64 ? szSrc.charCodeAt(index) : szSrc.data[index];
+                var _c = isBase64 ? szSrc.charCodeAt(index) : szSrc[index];
                 if (_c == ";".charCodeAt(0))
                 {
 
@@ -7654,7 +7647,7 @@
 						{
 							if (index >= srcLen)
 								break;
-							var nCh = DecodeBase64Char(isBase64 ? szSrc.charCodeAt(index++) : szSrc.data[index++]);
+							var nCh = DecodeBase64Char(isBase64 ? szSrc.charCodeAt(index++) : szSrc[index++]);
 							if (nCh == -1)
 							{
 								i--;
@@ -7685,7 +7678,7 @@
 						{
 							if (index >= srcLen)
 								break;
-							var nCh = p[isBase64 ? szSrc.charCodeAt(index++) : szSrc.data[index++]];
+							var nCh = p[isBase64 ? szSrc.charCodeAt(index++) : szSrc[index++]];
 							if (nCh == undefined)
 							{
 								i--;
@@ -7705,7 +7698,7 @@
 					}
 				}
 			} else {
-				stream = szSrc;
+				stream = new AscCommon.FT_Stream2(szSrc, szSrc.length);
 				//skip header
 				stream.EnterFrame(index);
 				stream.Seek(index);
@@ -7807,20 +7800,6 @@
 				History.TurnOn();
 			//чтобы удалялся stream с бинарником
 			pptx_content_loader.Clear(true);
-        };
-        this.ReadData = function(data, wb)
-        {
-            History.TurnOff();
-
-            this.stream = new AscCommon.FT_Stream2(data, data.length);
-            this.ReadFile(wb);
-
-            ReadDefCellStyles(wb, wb.CellStyles.DefaultStyles);
-            //todo
-            //ReadDefTableStyles(wb, wb.TableStyles.DefaultStyles);
-            //wb.TableStyles.concatStyles();
-
-            History.TurnOn();
         };
         this.ReadFile = function(wb)
         {

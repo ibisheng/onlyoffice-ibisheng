@@ -438,7 +438,7 @@
 				"format"        : this.documentFormat,
 				"url"           : this.documentUrl,
 				"title"         : this.documentTitle,
-				"nobase64"      : Asc.c_nNoBase64
+				"nobase64"      : true
 			};
 			if (versionHistory)
 			{

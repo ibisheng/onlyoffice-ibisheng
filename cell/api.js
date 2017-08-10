@@ -595,7 +595,7 @@ var editor;
             "delimiter": option.asc_getDelimiter(),
             "delimiterChar": option.asc_getDelimiterChar(),
             "codepage": option.asc_getCodePage(),
-            "nobase64": Asc.c_nNoBase64
+            "nobase64": true
           };
 
           sendCommand(this, null, v);
@@ -616,7 +616,7 @@ var editor;
             "url": this.documentUrl,
             "title": this.documentTitle,
             "password": option.asc_getPassword(),
-            "nobase64": Asc.c_nNoBase64
+            "nobase64": true
           };
 
           sendCommand(this, null, v);
@@ -697,7 +697,7 @@ var editor;
     oAdditionalData["title"] =
         AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype));
     oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
-    oAdditionalData["nobase64"] = Asc.c_nNoBase64;
+    oAdditionalData["nobase64"] = true;
     var t = this;
     t.fCurCallback = function (incomeObject) {
       if (null != input && "save" == input["type"]) {
@@ -732,7 +732,7 @@ var editor;
     }
     // Меняем тип состояния (на сохранение)
     this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
-    
+    var isNoBase64 = typeof ArrayBuffer !== 'undefined';
     //sFormat: xlsx, xls, ods, csv, html
     var dataContainer = {data: null, part: null, index: 0, count: 0};
     var command = "save";
@@ -743,7 +743,7 @@ var editor;
     oAdditionalData["jwt"] = this.CoAuthoringApi.get_jwt();
     oAdditionalData["outputformat"] = sFormat;
     oAdditionalData["title"] = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(sFormat), Asc.c_nMaxDownloadTitleLen);
-    oAdditionalData["nobase64"] = Asc.c_nNoBase64;
+    oAdditionalData["nobase64"] = isNoBase64;
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
     }
@@ -752,7 +752,7 @@ var editor;
       var pdf_writer = new AscCommonExcel.CPdfPrinter();
       this.wb.printSheets(pdf_writer, printPagesData);
 
-      if (Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined') {
+      if (isNoBase64) {
         dataContainer.data = pdf_writer.DocumentRenderer.Memory.GetData();
       } else {
         dataContainer.data = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
@@ -775,7 +775,7 @@ var editor;
           oAdditionalData["delimiterChar"] = options.CSVOptions.asc_getDelimiterChar();
         }
       }
-      dataContainer.data = oBinaryFileWriter.Write(undefined, Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
+      dataContainer.data = oBinaryFileWriter.Write(undefined, isNoBase64);
     }
     var fCallback = function(input) {
       var error = c_oAscError.ID.Unknown;
@@ -3297,12 +3297,10 @@ var editor;
 
     var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
 
-    if (undefined === version) {
-      oBinaryFileReader.Read(base64File, this.wbModel);
-    } else {
-      AscCommon.CurFileVersion = version;
-      oBinaryFileReader.ReadData(base64File, this.wbModel);
-    }
+    if (undefined !== version) {
+		AscCommon.CurFileVersion = version;
+	}
+    oBinaryFileReader.Read(base64File, this.wbModel);
     g_oIdCounter.Set_Load(false);
 
     this._coAuthoringInit();
@@ -3336,7 +3334,7 @@ var editor;
   };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
-    oBinaryFileWriter.Write2();
+    oBinaryFileWriter.Write(true);
 
     var _header = oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition(), Asc.c_nVersionNoBase64);
     window["native"]["Save_End"](_header, oBinaryFileWriter.Memory.GetCurPosition());

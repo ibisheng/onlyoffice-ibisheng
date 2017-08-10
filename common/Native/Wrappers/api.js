@@ -6005,7 +6005,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile2"] = function(base64File, v
     else
     {
         AscCommon.CurFileVersion = version;
-        if (oBinaryFileReader.ReadData(base64File))
+        if (oBinaryFileReader.Read(base64File))
         {
             AscCommon.g_oIdCounter.Set_Load(false);
             this.LoadedObject = 1;

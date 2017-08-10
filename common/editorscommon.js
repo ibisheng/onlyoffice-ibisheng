@@ -347,31 +347,30 @@
 	function initStreamFromResponse(httpRequest) {
 		var stream;
 		if (typeof ArrayBuffer !== 'undefined') {
-			var _uintData = new Uint8Array(httpRequest.response);
-			stream = new AscCommon.FT_Stream2(_uintData, _uintData.length);
-		} else if (AscCommon.AscBrowser.isIE){
+			stream = new Uint8Array(httpRequest.response);
+		} else if (AscCommon.AscBrowser.isIE) {
 			var _response = new VBArray(httpRequest["responseBody"]).toArray();
 
 			var srcLen = _response.length;
 			var pointer = g_memory.Alloc(srcLen);
-			stream = new AscCommon.FT_Stream2(pointer.data, srcLen);
-			stream.obj = pointer.obj;
+			var tempStream = new AscCommon.FT_Stream2(pointer.data, srcLen);
+			tempStream.obj = pointer.obj;
 
-			var dstPx = stream.data;
+			stream = tempStream.data;
 			var index = 0;
 
 			while (index < srcLen)
 			{
-				dstPx[index] = _response[index];
+				stream[index] = _response[index];
 				index++;
 			}
 		}
 		return stream;
 	}
 	function checkStreamSignature(stream, Signature) {
-		if (stream.data.length > Signature.length) {
+		if (stream.length > Signature.length) {
 			for(var i = 0 ; i < Signature.length; ++i){
-				if(stream.data[i] !== Signature.charCodeAt(i)){
+				if(stream[i] !== Signature.charCodeAt(i)){
 					return false;
 				}
 			}
@@ -404,22 +403,16 @@
 					url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
 					if (httpRequest)
 					{
-						if (Asc.c_nNoBase64) {
-							var stream = initStreamFromResponse(httpRequest);
-							if (stream) {
-								oResult.bSerFormat = checkStreamSignature(stream, Signature);
-								if (oResult.bSerFormat) {
-									oResult.data = stream;
-								} else {
-									oResult.data = stream;
-								}
+						var stream = initStreamFromResponse(httpRequest);
+						if (stream) {
+							oResult.bSerFormat = checkStreamSignature(stream, Signature);
+							if (oResult.bSerFormat) {
+								oResult.data = stream;
 							} else {
-								bError = true;
+								oResult.data = stream;
 							}
 						} else {
-							oResult.bSerFormat = Signature === httpRequest.responseText.substring(0, Signature.length);
-							oResult.data = httpRequest.responseText;
-							oResult.url = url;
+							bError = true;
 						}
 					}
 					else
@@ -428,7 +421,7 @@
 					}
 					bEndLoadFile = true;
 					onEndOpen();
-				}, Asc.c_nNoBase64 ? "arraybuffer" : undefined);
+				}, "arraybuffer");
 		}
 
 		if (changesUrl)
