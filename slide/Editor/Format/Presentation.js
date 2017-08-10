@@ -1265,7 +1265,10 @@ CPresentation.prototype =
                     this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
                 }
                 bEndRecalc = (this.Slides.length > 0);
-                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+                if(this.Slides[this.CurPage]){
+                    this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+                }
+
             }
             else
             {
@@ -1277,7 +1280,9 @@ CPresentation.prototype =
                 bEndRecalc = (aToRedrawSlides.length > 0);
             }
             if(bRedrawNotes){
-                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+                if(this.Slides[this.CurPage]){
+                    this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+                }
             }
             if(bEndRecalc){
                 this.DrawingDocument.OnEndRecalculate();
