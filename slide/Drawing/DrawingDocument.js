@@ -5785,6 +5785,10 @@ function CNotesDrawer(page)
 				oThis.Scroll = (oThis.ScrollMax * evt.scrollD / Math.max(evt.maxScrollY, 1)) >> 0;
 				oThis.HtmlPage.m_bIsUpdateTargetNoAttack = true;
 				oThis.IsRepaint = true;
+
+				oThis.HtmlPage.StartUpdateOverlay();
+				oThis.HtmlPage.OnUpdateOverlay();
+				oThis.HtmlPage.EndUpdateOverlay();
 			});
 		}
 	};
