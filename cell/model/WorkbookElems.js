@@ -1994,6 +1994,54 @@ CellXfs.prototype =
 			case this.Properties.XfId: this.XfId = value; break;
 		}
 	},
+	getBorder: function() {
+		return this.border;
+	},
+	setBorder: function(val) {
+		this.border = val;
+	},
+	getFill: function() {
+		return this.fill;
+	},
+	setFill: function(val) {
+		this.fill = val;
+	},
+	getFont: function() {
+		return this.font;
+	},
+	setFont: function(val) {
+		this.font = val;
+	},
+	getNum: function() {
+		return this.num;
+	},
+	setNum: function(val) {
+		this.num = val;
+	},
+	getAlign: function() {
+		return this.align;
+	},
+	setAlign: function(val) {
+		this.align = val;
+	},
+	getQuotePrefix: function() {
+		return this.QuotePrefix;
+	},
+	setQuotePrefix: function(val) {
+		this.QuotePrefix = val;
+	},
+	getPivotButton: function() {
+		return this.PivotButton;
+	},
+	setPivotButton: function(val) {
+		this.PivotButton = val;
+	},
+	getXfId: function() {
+		return this.XfId;
+	},
+	setXfId: function(val) {
+		this.XfId = val;
+	},
 	getOperationCache: function(operation, val) {
 		var res = undefined;
 		var operation = this.operationCache[operation];
@@ -2507,15 +2555,15 @@ StyleManager.prototype =
 	},
 	setCellStyle : function(oItemWithXfs, val)
 	{
-		return this._setProperty(oItemWithXfs, val, "XfId");
+		return this._setProperty(oItemWithXfs, val, "XfId", CellXfs.prototype.getXfId, CellXfs.prototype.setXfId);
 	},
 	setNum : function(oItemWithXfs, val)
 	{
-		return this._setProperty(oItemWithXfs, val, "num", g_StyleCache.addNum);
+		return this._setProperty(oItemWithXfs, val, "num", CellXfs.prototype.getNum, CellXfs.prototype.setNum, g_StyleCache.addNum);
 	},
 	setFont : function(oItemWithXfs, val)
 	{
-		return this._setProperty(oItemWithXfs, val, "font", g_StyleCache.addFont);
+		return this._setProperty(oItemWithXfs, val, "font", CellXfs.prototype.getFont, CellXfs.prototype.setFont, g_StyleCache.addFont);
 	},
 	setFill : function(oItemWithXfs, val)
 	{
@@ -2524,7 +2572,7 @@ StyleManager.prototype =
 			fill.bg = val;
 			val = fill;
 		}
-		var oRes = this._setProperty(oItemWithXfs, val, "fill", g_StyleCache.addFill);
+		var oRes = this._setProperty(oItemWithXfs, val, "fill", CellXfs.prototype.getFill, CellXfs.prototype.setFill, g_StyleCache.addFill);
 		if (oRes.oldVal) {
 			oRes.oldVal = oRes.oldVal.bg;
 		}
@@ -2535,15 +2583,15 @@ StyleManager.prototype =
 	},
 	setBorder : function(oItemWithXfs, val)
 	{
-		return this._setProperty(oItemWithXfs, val, "border", g_StyleCache.addBorder);
+		return this._setProperty(oItemWithXfs, val, "border", CellXfs.prototype.getBorder, CellXfs.prototype.setBorder, g_StyleCache.addBorder);
 	},
 	setQuotePrefix : function(oItemWithXfs, val)
 	{
-		return this._setProperty(oItemWithXfs, val, "quotePrefix");
+		return this._setProperty(oItemWithXfs, val, "quotePrefix", CellXfs.prototype.getQuotePrefix, CellXfs.prototype.setQuotePrefix);
 	},
 	setPivotButton : function(oItemWithXfs, val)
 	{
-		return this._setProperty(oItemWithXfs, val, "pivotButton");
+		return this._setProperty(oItemWithXfs, val, "pivotButton", CellXfs.prototype.getPivotButton, CellXfs.prototype.setPivotButton);
 	},
 	setFontname : function(oItemWithXfs, val)
 	{
@@ -2637,9 +2685,9 @@ StyleManager.prototype =
 		xfs.align = xfs.align.clone();
 		return xfs;
 	},
-	_setProperty: function(oItemWithXfs, val, prop, addFunc) {
+	_setProperty: function(oItemWithXfs, val, prop, getFunc, setFunc, addFunc) {
 		var xfs = oItemWithXfs.xfs;
-		var oRes = {newVal: null, oldVal: xfs ? xfs[prop] : null};
+		var oRes = {newVal: null, oldVal: xfs ? getFunc.call(xfs) : null};
 		xfs = this._initXf(oItemWithXfs);
 		var hash = val && val.getHash ? val.getHash() : val;
 		var xfsOperationCache = xfs;
@@ -2650,20 +2698,20 @@ StyleManager.prototype =
 			xfs = xfs.clone();
 			if (null != val) {
 				if (addFunc) {
-					xfs[prop] = addFunc.call(g_StyleCache, val);
+					setFunc.call(xfs, addFunc.call(g_StyleCache, val));
 				} else {
-					xfs[prop] = val;
+					setFunc.call(xfs, val);
 				}
 			}
 			else if (null != xfs) {
-				xfs[prop] = null;
+				setFunc.call(xfs, null);
 			}
 
 			xfs = g_StyleCache.addXf(xfs);
 			xfsOperationCache.setOperationCache(prop, hash, xfs);
 			oItemWithXfs.xfs = xfs;
 		}
-		oRes.newVal = xfs ? xfs[prop] : null;
+		oRes.newVal = xfs ? getFunc.call(xfs) : null;
 		return oRes;
 	},
 	_setFontProperty : function(oItemWithXfs, val, prop, getFunc, setFunc)
