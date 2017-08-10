@@ -435,6 +435,9 @@
 			while (this.current < this.documents.length) // no recursion
 			{
 				var _current = this.documents[this.current];
+				if (undefined === _current["Props"])
+					_current["Props"] = {};
+
 				var _isLocked = false;
 				if ((_current["Url"] !== undefined || _current["Script"] !== undefined) && undefined !== _current["Props"]["InternalId"])
 				{
