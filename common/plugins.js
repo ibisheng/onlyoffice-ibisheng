@@ -81,6 +81,7 @@
 	{
 		this.plugins          = [];
 		this.current          = null;
+		this.currentInit      = false;
 		this.currentVariation = 0;
 		this.path             = "../../../../sdkjs-plugins/";
 		this.api              = null;
@@ -153,7 +154,7 @@
 		},
 		close     : function()
 		{
-			if (this.startData.getAttribute("resize") === true)
+			if (this.startData && this.startData.getAttribute("resize") === true)
 				this.endLongAction();
 			this.startData = null;
 
@@ -207,6 +208,8 @@
 				if (this.startData.getAttribute("resize") !== true)
 					this.api.sendEvent("asc_onPluginShow", this.current, this.currentVariation);
 			}
+
+			this.currentInit = false;
 		},
 
 		buttonClick : function(id)
@@ -219,6 +222,12 @@
 
 			if (-1 == id)
 			{
+				if (!this.currentInit)
+				{
+					window.g_asc_plugins.close();
+					this.close();
+				}
+
 				// защита от плохого плагина
 				this.closeAttackTimer = setTimeout(function()
 				{
@@ -285,6 +294,8 @@
 				this.startData.setAttribute("type", "init");
 				_iframe.contentWindow.postMessage(this.startData.serialize(), "*");
 			}
+
+			this.currentInit = true;
 		},
 		correctData          : function(pluginData)
 		{
