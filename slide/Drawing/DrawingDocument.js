@@ -2083,11 +2083,12 @@ function CDrawingDocument()
 				_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 
 			var boxY = 0;
-			var boxB = _hh - targetSize;
+			var targetSizeAscent = (this.m_dTargetAscent * g_dKoef_mm_to_pix) >> 0;
+
+			var boxB = _hh - (targetSize - targetSizeAscent);
 			if (boxB < 0)
 				boxB = _hh;
 
-			var targetSizeAscent = 2 + (this.m_dTargetAscent * g_dKoef_mm_to_pix) >> 0;
 			yPos += targetSizeAscent;
 
 			var nValueScrollVer = 0;
