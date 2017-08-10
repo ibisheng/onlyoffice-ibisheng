@@ -62,21 +62,20 @@
 
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
-		cBETA_DIST, cBETA_INV, cBINOMDIST, cBINOM_DIST, cBINOM_INV, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT,
-		cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T, cCORREL, cCOUNT,
-		cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM, cDEVSQ,
-		cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
-		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
-		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
-		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN, cMINA,
-		cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
+		cBETA_DIST, cBETA_INV, cBINOMDIST, cBINOM_DIST, cBINOM_DIST_RANGE, cBINOM_INV, cCHIDIST, cCHIINV, cCHISQ_DIST,
+		cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T,
+		cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM,
+		cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV,
+		cFORECAST, cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV,
+		cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN,
+		cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
 		cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
 		cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON,
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
 		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
 		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP,
-		cVAR_P, cVAR_S, cVARPA, cWEIBULL,
-		cWEIBULL_DIST, cZTEST, cZ_TEST);
+		cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST, cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
@@ -1970,6 +1969,62 @@
 	cBINOM_DIST.prototype = Object.create(cBINOMDIST.prototype);
 	cBINOM_DIST.prototype.constructor = cBINOM_DIST;
 	cBINOM_DIST.prototype.isXLFN = true;
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cBINOM_DIST_RANGE() {
+		this.name = "BINOM.DIST.RANGE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cBINOM_DIST_RANGE.prototype = Object.create(cBaseFunction.prototype);
+	cBINOM_DIST_RANGE.prototype.constructor = cBINOM_DIST_RANGE;
+	cBINOM_DIST_RANGE.prototype.argumentsMin = 3;
+	cBINOM_DIST_RANGE.prototype.argumentsMax = 4;
+	cBINOM_DIST_RANGE.prototype.isXLFN = true;
+	cBINOM_DIST_RANGE.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : argClone[2];
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function binomdist(x, n, p) {
+			x = parseInt(x);
+			n = parseInt(n);
+			return Math.binomCoeff(n, x) * Math.pow(p, x) * Math.pow(1 - p, n - x);
+		}
+
+		var calcBinom = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+			var arg2 = argArray[2];
+			var arg3 = argArray[3];
+
+			if (arg0 < 0 || arg1 < 0 || arg1 > 1 || arg2 < 0 || arg2 > arg0 || arg3 < arg2 || arg3 > arg0) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var summ = 0;
+			for(var i = arg2; i <= arg3; i++){
+				summ += binomdist(i, arg0, arg1);
+			}
+			return new cNumber(summ);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcBinom);
+	};
+
 
 	/**
 	 * @constructor
