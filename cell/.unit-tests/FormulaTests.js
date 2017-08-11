@@ -2155,6 +2155,14 @@ $( function () {
 
     } );
 
+	test( "Test: \"SHEET\"", function () {
+
+		oParser = new parserFormula( "SHEET(Hi_Temps)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NAME?" );
+
+	} );
+
     test( "Test: \"TRIM\"", function () {
 
         oParser = new parserFormula( "TRIM(\"     abc         def      \")", "A2", ws );
