@@ -6006,6 +6006,23 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.preloadReporter = function(data)
+	{
+		this.reporterTranslates = [data["translations"]["reset"], data["translations"]["slideOf"], data["translations"]["endSlideshow"]];
+		this.WordControl.reporterTranslates = this.reporterTranslates;
+
+		var _button1 = document.getElementById("dem_id_reset");
+		var _button2 = document.getElementById("dem_id_end");
+
+		if (_button1)
+			_button1.innerHTML = this.reporterTranslates[0];
+		if (_button2)
+		{
+			_button2.innerHTML = this.reporterTranslates[2];
+			this.WordControl.OnResizeReporter();
+		}
+	};
+
 	asc_docs_api.prototype.sendToReporter = function(value)
 	{
 		if (window["AscDesktopEditor"])

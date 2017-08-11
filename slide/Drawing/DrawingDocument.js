@@ -4461,6 +4461,7 @@ function CThumbnailsManager()
 
 		var _digit_distance = this.const_offset_x * g_dKoef_pix_to_mm;
 
+		var _logicDocument = word_control.m_oLogicDocument;
 		for (var i = 0; i < this.SlidesCount; i++)
 		{
 			var page = this.m_arrPages[i];
@@ -4509,7 +4510,17 @@ function CThumbnailsManager()
 			else
 				g.b_color1(211, 79, 79, 255);
 
-			g.t("" + (i + 1), (_digit_distance - num_slide_text_width) / 2, (page.top * g_dKoef_pix_to_mm + 3));
+			var _bounds = g.t("" + (i + 1), (_digit_distance - num_slide_text_width) / 2, (page.top * g_dKoef_pix_to_mm + 3), true);
+			if (!_logicDocument.Slides[i].isVisible())
+			{
+				context.lineWidth = 1;
+				context.strokeStyle = "#000000";
+				context.beginPath();
+				context.moveTo(_bounds.x - 3, _bounds.y);
+				context.lineTo(_bounds.r + 3, _bounds.b);
+				context.stroke();
+				context.beginPath();
+			}
 		}
 
 		this.OnUpdateOverlay();
