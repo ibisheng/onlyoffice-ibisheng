@@ -7260,6 +7260,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype["DemonstrationReporterMessages"] 		= asc_docs_api.prototype.DemonstrationReporterMessages;
 	asc_docs_api.prototype["DemonstrationToReporterMessages"] 		= asc_docs_api.prototype.DemonstrationToReporterMessages;
+	asc_docs_api.prototype["preloadReporter"]						= asc_docs_api.prototype.preloadReporter;
 
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;
