@@ -551,12 +551,6 @@ Slide.prototype =
                     }
                     break;
                 }
-                case AscDFH.historyitem_SlideSetShow:
-                {
-                    var oDrawingDocument = this.getDrawingDocument();
-                    //oDrawingDocument.OnShowSlide(this.num, this.isVisible());
-                    break;
-                }
             }
             this.addToRecalculate();
         }
