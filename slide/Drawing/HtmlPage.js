@@ -3925,6 +3925,9 @@ function CEditorPage(api)
 		if (-1 == lPageNum)
 		{
 			this.m_oDrawingDocument.IsEmptyPresentation = true;
+
+			if (this.IsSupportNotes && this.m_oNotesApi)
+				this.m_oNotesApi.OnRecalculateNote(-1, 0, 0);
 		}
 
 		if (this.m_oDrawingDocument.TransitionSlide.IsPlaying())
