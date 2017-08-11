@@ -59,13 +59,11 @@
 	cFormulaFunctionGroup['Mathematic'].push(cMUNIT);
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
-	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
-	cFormulaFunctionGroup['Information'].push(cSHEETS);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cUNICHAR, cUNICODE, cF_TEST, cFORECAST_ETS,
 		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
-		cMUNIT, cFORMULATEXT, cSHEETS);
+		cMUNIT, cFORMULATEXT);
 
 	/**
 	 * @constructor
@@ -210,18 +208,6 @@
 
 	cQUERYSTRING.prototype = Object.create(cBaseFunction.prototype);
 	cQUERYSTRING.prototype.constructor = cQUERYSTRING;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cSHEETS() {
-		cBaseFunction.call(this, "SHEETS");
-		this.isXLFN = true;
-	}
-
-	cSHEETS.prototype = Object.create(cBaseFunction.prototype);
-	cSHEETS.prototype.constructor = cSHEETS;
 
 	/**
 	 * @constructor
