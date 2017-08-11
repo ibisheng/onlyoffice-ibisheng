@@ -57,9 +57,10 @@
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
-	cFormulaFunctionGroup['TextAndData'].push(cASC, cBAHTTEXT, cCHAR, cCLEAN, cCODE, cCONCATENATE, cCONCAT, cDOLLAR, cEXACT,
-		cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cNUMBERVALUE, cPHONETIC, cPROPER, cREPLACE,
-		cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTEXTJOIN, cTRIM, cUPPER, cVALUE);
+	cFormulaFunctionGroup['TextAndData'].push(cASC, cBAHTTEXT, cCHAR, cCLEAN, cCODE, cCONCATENATE, cCONCAT, cDOLLAR,
+		cEXACT, cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cNUMBERVALUE, cPHONETIC,
+		cPROPER, cREPLACE, cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTEXTJOIN,
+		cTRIM, cUNICODE, cUPPER, cVALUE);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cASC, cBAHTTEXT, cJIS, cPHONETIC);
@@ -1910,6 +1911,41 @@
 			AscCommon.rx_space.test($2[$1 + 1]) ? res = "" : res = $2[$1];
 			return res;
 		}).replace(/^\s|\s$/g, ""))
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cUNICODE() {
+		this.name = "UNICODE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cUNICODE.prototype = Object.create(cBaseFunction.prototype);
+	cUNICODE.prototype.constructor = cUNICODE;
+	cUNICODE.prototype.argumentsMin = 1;
+	cUNICODE.prototype.argumentsMax = 1;
+	cUNICODE.prototype.isXLFN = true;
+	cUNICODE.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocString();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function _func(argArray) {
+			var str = argArray[0].toString();
+			var res = str.charCodeAt(0);
+			return new cNumber(res);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, _func, true);
 	};
 
 	/**

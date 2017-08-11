@@ -410,11 +410,46 @@
 		return true;
 	}
 
+	function weekNumber(dt, iso, type) {
+		if(undefined === iso){
+			iso = [0, 1, 2, 3, 4, 5, 6];
+		}
+		if(undefined === type){
+			type = 0;
+		}
+
+		dt.setUTCHours(0, 0, 0);
+		var startOfYear = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
+		var endOfYear = new Date(dt);
+		endOfYear.setUTCMonth(11);
+		endOfYear.setUTCDate(31);
+		var wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()]) / 7);
+		if (type) {
+			switch (wk) {
+				case 0:
+					// Возвращаем номер недели от 31 декабря предыдущего года
+					startOfYear.setUTCDate(0);
+					return weekNumber(startOfYear, iso, type);
+				case 53:
+					// Если 31 декабря выпадает до четверга 1 недели следующего года
+					if (endOfYear.getUTCDay() < 4) {
+						return new cNumber(1);
+					} else {
+						return new cNumber(wk);
+					}
+				default:
+					return new cNumber(wk);
+			}
+		} else {
+			wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()] + 7) / 7);
+			return new cNumber(wk);
+		}
+	}
 
 	cFormulaFunctionGroup['DateAndTime'] = cFormulaFunctionGroup['DateAndTime'] || [];
-	cFormulaFunctionGroup['DateAndTime'].push(cDATE, cDATEDIF, cDATEVALUE, cDAY, cDAYS, cDAYS360, cEDATE, cEOMONTH, cHOUR,
-		cMINUTE, cMONTH, cNETWORKDAYS, cNETWORKDAYS_INTL, cNOW, cSECOND, cTIME, cTIMEVALUE, cTODAY, cWEEKDAY, cWEEKNUM,
-		cWORKDAY, cWORKDAY_INTL, cYEAR, cYEARFRAC);
+	cFormulaFunctionGroup['DateAndTime'].push(cDATE, cDATEDIF, cDATEVALUE, cDAY, cDAYS, cDAYS360, cEDATE, cEOMONTH,
+		cHOUR, cISOWEEKNUM, cMINUTE, cMONTH, cNETWORKDAYS, cNETWORKDAYS_INTL, cNOW, cSECOND, cTIME, cTIMEVALUE, cTODAY,
+		cWEEKDAY, cWEEKNUM, cWORKDAY, cWORKDAY_INTL, cYEAR, cYEARFRAC);
 
 	/**
 	 * @constructor
@@ -1015,6 +1050,42 @@
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
 	 */
+	function cISOWEEKNUM() {
+		this.name = "ISOWEEKNUM";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cISOWEEKNUM.prototype = Object.create(cBaseFunction.prototype);
+	cISOWEEKNUM.prototype.constructor = cISOWEEKNUM;
+	cISOWEEKNUM.prototype.argumentsMin = 1;
+	cISOWEEKNUM.prototype.argumentsMax = 1;
+	cISOWEEKNUM.prototype.numFormat = AscCommonExcel.cNumFormatNone;
+	cISOWEEKNUM.prototype.isXLFN = true;
+	cISOWEEKNUM.prototype.Calculate = function (arg) {
+		//TODO есть различия в результатах с формулой ISOWEEKNUM(1)
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var arg0 = argClone[0];
+		if (arg0.getValue() < 0) {
+			return this.value = new cError(cErrorType.not_numeric);
+		}
+
+		return this.value = new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue())));
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
 	function cMINUTE() {
 		this.name = "MINUTE";
 		this.value = null;
@@ -1592,35 +1663,6 @@
 	cWEEKNUM.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1] ? arg[1] : new cNumber(1), type = 0;
 
-		function WeekNumber(dt, iso, type) {
-			dt.setUTCHours(0, 0, 0);
-			var startOfYear = new Date(Date.UTC(dt.getUTCFullYear(), 0, 1));
-			var endOfYear = new Date(dt);
-			endOfYear.setUTCMonth(11);
-			endOfYear.setUTCDate(31);
-			var wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()]) / 7);
-			if (type) {
-				switch (wk) {
-					case 0:
-						// Возвращаем номер недели от 31 декабря предыдущего года
-						startOfYear.setUTCDate(0);
-						return WeekNumber(startOfYear, iso, type);
-					case 53:
-						// Если 31 декабря выпадает до четверга 1 недели следующего года
-						if (endOfYear.getUTCDay() < 4) {
-							return new cNumber(1);
-						} else {
-							return new cNumber(wk);
-						}
-					default:
-						return new cNumber(wk);
-				}
-			} else {
-				wk = parseInt(((dt - startOfYear) / c_msPerDay + iso[startOfYear.getUTCDay()] + 7) / 7);
-				return new cNumber(wk);
-			}
-		}
-
 		if (arg0 instanceof cArea || arg0 instanceof cArea3D) {
 			arg0 = arg0.cross(arguments[1]);
 		} else if (arg0 instanceof cArray) {
@@ -1684,7 +1726,7 @@
 		}
 
 		return this.value =
-			new cNumber(WeekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
+			new cNumber(weekNumber(Date.prototype.getDateFromExcel(arg0.getValue()), weekdayStartDay, type));
 
 	};
 

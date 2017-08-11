@@ -62,21 +62,20 @@
 
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cAVEDEV, cAVERAGE, cAVERAGEA, cAVERAGEIF, cAVERAGEIFS, cBETADIST,
-		cBETA_DIST, cBETA_INV, cBINOMDIST, cBINOM_DIST, cBINOM_INV, cCHIDIST, cCHIINV, cCHISQ_DIST, cCHISQ_DIST_RT,
-		cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T, cCORREL, cCOUNT,
-		cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM, cDEVSQ,
-		cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV, cFORECAST,
-		cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV, cGAMMALN,
-		cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE, cLINEST,
-		cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN, cMINA,
-		cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
+		cBETA_DIST, cBETA_INV, cBINOMDIST, cBINOM_DIST, cBINOM_DIST_RANGE, cBINOM_INV, cCHIDIST, cCHIINV, cCHISQ_DIST,
+		cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T,
+		cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM,
+		cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV,
+		cFORECAST, cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV,
+		cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
+		cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN,
+		cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
 		cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
 		cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON,
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
 		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
 		cT_DIST_2T, cT_DIST_RT, cT_INV, cT_INV_2T, cTINV, cTREND, cTRIMMEAN, cTTEST, cT_TEST, cVAR, cVARA, cVARP,
-		cVAR_P, cVAR_S, cVARPA, cWEIBULL,
-		cWEIBULL_DIST, cZTEST, cZ_TEST);
+		cVAR_P, cVAR_S, cVARPA, cWEIBULL, cWEIBULL_DIST, cZTEST, cZ_TEST);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cFTEST, cGROWTH, cLINEST, cLOGEST, cTREND);
@@ -1465,7 +1464,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
-				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					var __arg = _argAreaValue[j];
 					if (cElementType.string === __arg.type || cElementType.empty === __arg.type ||
@@ -1970,6 +1969,62 @@
 	cBINOM_DIST.prototype = Object.create(cBINOMDIST.prototype);
 	cBINOM_DIST.prototype.constructor = cBINOM_DIST;
 	cBINOM_DIST.prototype.isXLFN = true;
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cBINOM_DIST_RANGE() {
+		this.name = "BINOM.DIST.RANGE";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cBINOM_DIST_RANGE.prototype = Object.create(cBaseFunction.prototype);
+	cBINOM_DIST_RANGE.prototype.constructor = cBINOM_DIST_RANGE;
+	cBINOM_DIST_RANGE.prototype.argumentsMin = 3;
+	cBINOM_DIST_RANGE.prototype.argumentsMax = 4;
+	cBINOM_DIST_RANGE.prototype.isXLFN = true;
+	cBINOM_DIST_RANGE.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocNumber();
+		argClone[2] = argClone[2].tocNumber();
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : argClone[2];
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function binomdist(x, n, p) {
+			x = parseInt(x);
+			n = parseInt(n);
+			return Math.binomCoeff(n, x) * Math.pow(p, x) * Math.pow(1 - p, n - x);
+		}
+
+		var calcBinom = function(argArray){
+			var arg0 = argArray[0];
+			var arg1 = argArray[1];
+			var arg2 = argArray[2];
+			var arg3 = argArray[3];
+
+			if (arg0 < 0 || arg1 < 0 || arg1 > 1 || arg2 < 0 || arg2 > arg0 || arg3 < arg2 || arg3 > arg0) {
+				return new cError(cErrorType.not_numeric);
+			}
+
+			var summ = 0;
+			for(var i = arg2; i <= arg3; i++){
+				summ += binomdist(i, arg0, arg1);
+			}
+			return new cNumber(summ);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcBinom);
+	};
+
 
 	/**
 	 * @constructor
@@ -2500,7 +2555,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === _arg.type || cElementType.cellsRange3D === _arg.type) {
-				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _argAreaValue = _arg.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					if (cElementType.number === _argAreaValue[j].type) {
 						count++;
@@ -2550,7 +2605,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					if (cElementType.empty !== _argAreaValue[j].type) {
 						count++;
@@ -2623,26 +2678,37 @@
 			arg1 = arg1.getElementRowCol(0, 0);
 		}
 
-		arg1 = arg1.tocString();
+		/*arg1 = arg1.tocString();
 
 		if (cElementType.string !== arg1.type) {
 			return this.value = new cError(cErrorType.wrong_value_type);
-		}
+		}*/
+
+		var compareValues = function(val, matchingInfo){
+			var res;
+
+			if(val.type === arg1.type && val.value === arg1.value){
+				return true;
+			}
+
+			res = matching(val, matchingInfo);
+			return res;
+		};
 
 		var val;
 		matchingInfo = AscCommonExcel.matchingValue(arg1.toString());
 		if (cElementType.cellsRange === arg0.type) {
 			arg0.foreach2(function (_val) {
-				_count += matching(_val, matchingInfo);
+				_count += compareValues(_val, matchingInfo);
 			})
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			val = arg0.getValue();
 			for (var i = 0; i < val.length; i++) {
-				_count += matching(val[i], matchingInfo);
+				_count += compareValues(val[i], matchingInfo);
 			}
 		} else {
 			val = arg0.getValue();
-			_count += matching(val, matchingInfo);
+			_count += compareValues(val, matchingInfo);
 		}
 
 		return this.value = new cNumber(_count);
@@ -4574,13 +4640,13 @@
 	cLARGE.prototype.Calculate = function (arg) {
 		var arg0 = arg[0], arg1 = arg[1];
 		if (cElementType.cellsRange === arg0.type) {
-			arg0 = arg0.getValuesNoEmpty();
+			arg0 = arg0.getValuesNoEmpty(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 		} else if (cElementType.array === arg0.type) {
 			arg0 = arg0.getMatrix();
 		} else if (cElementType.cellsRange3D === arg0.type) {
 			arg0 = arg0.getMatrix()[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return this.value = new cError(cErrorType.not_numeric);
 		}
 
 
@@ -4876,7 +4942,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < argArr.length; j++) {
 					if (cElementType.number === argArr[j].type) {
 						v = argArr[j].tocNumber();
@@ -5319,7 +5385,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var argArr = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < argArr.length; j++) {
 					if (cElementType.number === argArr[j].type) {
 						v = argArr[j].tocNumber();
@@ -6601,7 +6667,7 @@
 				for (var j = 0; j < A[i].length; j++) {
 					if (A[i][j] instanceof cError) {
 						return A[i][j];
-					} else if (A[i][j] instanceof cNumber) {
+					} else if (A[i][j] instanceof cNumber || A[i][j] instanceof cEmpty) {
 						tA.push(A[i][j].getValue());
 					} else if (A[i][j] instanceof cBool) {
 						tA.push(A[i][j].tocNumber().getValue());
@@ -7138,11 +7204,11 @@
 
 		var arg0 = arg[0], arg1 = arg[1];
 		if (arg0 instanceof cArea || arg0 instanceof cArray) {
-			arg0 = arg0.getMatrix();
+			arg0 = arg0.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 		} else if (arg0 instanceof cArea3D) {
-			arg0 = arg0.getMatrix()[0];
+			arg0 = arg0.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg)[0];
 		} else {
-			return this.value = new cError(cErrorType.not_available);
+			return this.value = new cError(cErrorType.not_numeric);
 		}
 
 
@@ -7247,7 +7313,7 @@
 					}
 				}
 			} else if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _argAreaValue = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				for (var j = 0; j < _argAreaValue.length; j++) {
 					var __arg = _argAreaValue[j];
 					if (cElementType.number === __arg.type) {
@@ -7279,6 +7345,11 @@
 			av = member[i] - average;
 			res += av * av;
 		}
+
+		if(1 === count){
+			return new cError(cErrorType.division_by_zero);
+		}
+
 		return this.value = new cNumber(Math.sqrt(res / (count - 1)));
 	};
 
@@ -7398,7 +7469,7 @@
 		for (var j = 0; j < arg.length; j++) {
 			element = arg[j];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
@@ -8110,7 +8181,7 @@
 		for (var j = 0; j < arg.length; j++) {
 			element = arg[j];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
@@ -8280,7 +8351,7 @@
 		for (var j = 0; j < arg.length; j++) {
 			element = arg[j];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
@@ -8371,7 +8442,7 @@
 		for (var j = 0; j < arg.length; j++) {
 			element = arg[j];
 			if (cElementType.cellsRange === element.type || cElementType.cellsRange3D === element.type) {
-				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows);
+				var _arrVal = element.getValue(this.checkExclude, this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				_arrVal.forEach(function (elem) {
 					if (cElementType.number === elem.type || cElementType.error === elem.type) {
 						arr0.push(elem);
@@ -8687,4 +8758,17 @@
 	window['AscCommonExcel'].cSTDEVP = cSTDEVP;
 	window['AscCommonExcel'].cVAR = cVAR;
 	window['AscCommonExcel'].cVARP = cVARP;
+	window['AscCommonExcel'].cLARGE = cLARGE;
+	window['AscCommonExcel'].cSMALL = cSMALL;
+	window['AscCommonExcel'].cMEDIAN = cMEDIAN;
+	window['AscCommonExcel'].cSTDEV_S = cSTDEV_S;
+	window['AscCommonExcel'].cSTDEV_P = cSTDEV_P;
+	window['AscCommonExcel'].cVAR_S = cVAR_S;
+	window['AscCommonExcel'].cVAR_P = cVAR_P;
+	window['AscCommonExcel'].cMODE_SNGL = cMODE_SNGL;
+	window['AscCommonExcel'].cPERCENTILE_INC = cPERCENTILE_INC;
+	window['AscCommonExcel'].cQUARTILE_INC = cQUARTILE_INC;
+	window['AscCommonExcel'].cPERCENTILE_EXC = cPERCENTILE_EXC;
+	window['AscCommonExcel'].cQUARTILE_EXC = cQUARTILE_EXC;
+
 })(window);

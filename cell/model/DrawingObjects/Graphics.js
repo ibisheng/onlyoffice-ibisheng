@@ -1788,8 +1788,17 @@ CGraphics.prototype =
     },
     drawHorLine2 : function(align, y, x, r, penW)
     {
-        if (!this.m_bIntegerGrid)
+        var _check_transform = global_MatrixTransformer.IsIdentity2(this.m_oTransform);
+        if (!this.m_bIntegerGrid || !_check_transform)
         {
+            if (_check_transform)
+            {
+                this.SetIntegerGrid(true);
+                this.drawHorLine2(align, y, x, r, penW);
+                this.SetIntegerGrid(false);
+                return;
+            }
+
             var _y1 = y - penW / 2;
             var _y2 = _y1 + 2 * penW;
 

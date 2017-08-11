@@ -1235,12 +1235,6 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 			return this.GetResult();
 		}
     }
-    this.Write2 = function()
-    {
-        pptx_content_writer._Start();
-        this.WriteMainTable();
-        pptx_content_writer._End();
-    }
 	this.GetResult = function()
 	{
 		return this.WriteFileHeader(this.memory.GetCurPosition(), AscCommon.c_oSerFormat.Version) + this.memory.GetBase64Memory();
@@ -5951,7 +5945,7 @@ function BinaryFileReader(doc, openParams)
     this.getbase64DecodedData = function(szSrc)
     {
 		var isBase64 = typeof szSrc === 'string';
-        var srcLen = isBase64 ? szSrc.length : szSrc.data.length;
+        var srcLen = isBase64 ? szSrc.length : szSrc.length;
         var nWritten = 0;
 
         var nType = 0;
@@ -5961,7 +5955,7 @@ function BinaryFileReader(doc, openParams)
         while (true)
         {
             index++;
-            var _c = isBase64 ? szSrc.charCodeAt(index) : szSrc.data[index];
+            var _c = isBase64 ? szSrc.charCodeAt(index) : szSrc[index];
             if (_c == ";".charCodeAt(0))
             {
                 
@@ -6008,7 +6002,7 @@ function BinaryFileReader(doc, openParams)
 					{
 						if (index >= srcLen)
 							break;
-						var nCh = DecodeBase64Char(isBase64 ? szSrc.charCodeAt(index++) : szSrc.data[index++]);
+						var nCh = DecodeBase64Char(isBase64 ? szSrc.charCodeAt(index++) : szSrc[index++]);
 						if (nCh == -1)
 						{
 							i--;
@@ -6039,7 +6033,7 @@ function BinaryFileReader(doc, openParams)
 					{
 						if (index >= srcLen)
 							break;
-						var nCh = p[isBase64 ? szSrc.charCodeAt(index++) : szSrc.data[index++]];
+						var nCh = p[isBase64 ? szSrc.charCodeAt(index++) : szSrc[index++]];
 						if (nCh == undefined)
 						{
 							i--;
@@ -6059,7 +6053,7 @@ function BinaryFileReader(doc, openParams)
 				}
 			}
 		} else {
-			stream = szSrc;
+			stream = new AscCommon.FT_Stream2(szSrc, szSrc.length);
 			//skip header
 			stream.EnterFrame(index);
 			stream.Seek(index);
@@ -6082,23 +6076,6 @@ function BinaryFileReader(doc, openParams)
 				throw e;
 		}
 		return true;
-    };
-    this.ReadData = function(data)
-    {
-        //try{
-        this.stream = new AscCommon.FT_Stream2(data, data.length);        
-        this.PreLoadPrepare();
-        this.ReadMainTable();
-        this.PostLoadPrepare();
-        //}
-        //catch(e)
-        //{
-        //	if(e.message == g_sErrorCharCountMessage)
-        //		return false;
-        //	else
-        //		throw e;
-        //}
-        return true;
     };
 	this.PreLoadPrepare = function()
 	{

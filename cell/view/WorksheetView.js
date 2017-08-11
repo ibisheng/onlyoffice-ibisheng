@@ -9691,7 +9691,7 @@
 						callAdress = new AscCommon.CellAddress(value2[0].sId);
 						offset = new AscCommonExcel.CRangeOffset((range.bbox.c1 - callAdress.col + 1), (range.bbox.r1 - callAdress.row + 1));
 					}
-					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[numFormula].sFormula, null, t.model);
+					var assemb, _p_ = new AscCommonExcel.parserFormula(value2[0].sFormula, null, t.model);
 					if (_p_.parse()) {
 						
 						if(specialPasteProps.transpose)

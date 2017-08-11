@@ -595,6 +595,7 @@
 		this.isKeepLinesTogether  = false;
 		this.isPresentationEditor = true;
 		this.bAlignBySelected     = false;
+		this.bSelectedSlidesTheme = false;
 
 		this.isPaintFormat              = false;
 		this.isShowTableEmptyLine       = false;//true;
@@ -2051,7 +2052,7 @@ background-repeat: no-repeat;\
 					"url": this.documentUrl,
 					"title": this.documentTitle,
 					"password": option.asc_getPassword(),
-					"nobase64": Asc.c_nNoBase64
+					"nobase64": true
 				};
 
 				sendCommand(this, null, v);
@@ -5706,7 +5707,7 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.asyncImageEndLoaded2 = null;
 
-	asc_docs_api.prototype.ChangeTheme = function(indexTheme)
+	asc_docs_api.prototype.ChangeTheme = function(indexTheme, bSelectedSlides)
 	{
 		if (true === AscCommon.CollaborativeEditing.Get_GlobalLock())
 			return;
@@ -5715,6 +5716,7 @@ background-repeat: no-repeat;\
 		{
 			AscCommon.CollaborativeEditing.Set_GlobalLock(true);
 			this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Presentation_ChangeTheme);
+            this.bSelectedSlidesTheme = (bSelectedSlides === true);
 			this.ThemeLoader.StartLoadTheme(indexTheme);
 		}
 	};
@@ -5728,7 +5730,7 @@ background-repeat: no-repeat;\
 
 		// применение темы
 		var _array = this.WordControl.Thumbnails.GetSelectedArray();
-		this.WordControl.m_oLogicDocument.changeTheme(theme_load_info, _array.length <= 1 ? null : _array);
+		this.WordControl.m_oLogicDocument.changeTheme(theme_load_info, (_array.length <= 1 && !this.bSelectedSlidesTheme) ? null : _array);
 		this.WordControl.ThemeGenerateThumbnails(theme_load_info.Master);
 		// меняем шаблоны в меню
 		this.WordControl.CheckLayouts();
@@ -5858,10 +5860,11 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.StartDemonstration = function(div_id, slidestart_num, reporterStartObject)
 	{
-		if (reporterStartObject && !this.isReporterMode)
+		var is_reporter = (reporterStartObject && !this.isReporterMode);
+		if (is_reporter)
 			this.DemonstrationReporterStart(reporterStartObject);
 
-		if (this.reporterWindow)
+		if (is_reporter && (this.reporterWindow || window["AscDesktopEditor"]))
 			this.WordControl.DemonstrationManager.StartWaitReporter(div_id, slidestart_num, true);
 		else
 			this.WordControl.DemonstrationManager.Start(div_id, slidestart_num, true);
@@ -5878,6 +5881,12 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.DemonstrationReporterStart = function(startObject)
 	{
 		this.reporterStartObject = startObject;
+
+		if (window["AscDesktopEditor"])
+		{
+			window["AscDesktopEditor"]["startReporter"](window.location.href);
+			return;
+		}
 
 		var dualScreenLeft = (window.screenLeft != undefined) ? window.screenLeft : screen.left;
 		var dualScreenTop = (window.screenTop != undefined) ? window.screenTop : screen.top;
@@ -5904,6 +5913,12 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.DemonstrationReporterEnd = function()
 	{
+		if (window["AscDesktopEditor"])
+		{
+			window["AscDesktopEditor"]["endReporter"]();
+			return;
+		}
+
 		if (!this.reporterWindow)
 			return;
 
@@ -5991,14 +6006,43 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.preloadReporter = function(data)
+	{
+		this.reporterTranslates = [data["translations"]["reset"], data["translations"]["slideOf"], data["translations"]["endSlideshow"]];
+		this.WordControl.reporterTranslates = this.reporterTranslates;
+
+		var _button1 = document.getElementById("dem_id_reset");
+		var _button2 = document.getElementById("dem_id_end");
+
+		if (_button1)
+			_button1.innerHTML = this.reporterTranslates[0];
+		if (_button2)
+		{
+			_button2.innerHTML = this.reporterTranslates[2];
+			this.WordControl.OnResizeReporter();
+		}
+	};
+
 	asc_docs_api.prototype.sendToReporter = function(value)
 	{
+		if (window["AscDesktopEditor"])
+		{
+			window["AscDesktopEditor"]["sendToReporter"](value);
+			return;
+		}
+
 		if (this.reporterWindow)
 			this.reporterWindow.postMessage(value, "*");
 	};
 
 	asc_docs_api.prototype.sendFromReporter = function(value)
 	{
+		if (window["AscDesktopEditor"])
+		{
+			window["AscDesktopEditor"]["sendFromReporter"](value);
+			return;
+		}
+
 		window.postMessage(value, "*");
 	};
 
@@ -6009,6 +6053,12 @@ background-repeat: no-repeat;\
 		try
 		{
 			var _obj = JSON.parse(e.data);
+
+			if (window["AscDesktopEditor"] && (_obj["type"] == "file:open"))
+			{
+				window.postMessage(e.data, "*");
+				return;
+			}
 
 			if (undefined == _obj["main_command"])
 				return;
@@ -6354,6 +6404,7 @@ background-repeat: no-repeat;\
 		{
 			this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 		}
+		var isNoBase64 = typeof ArrayBuffer !== 'undefined';
 
 		var dataContainer               = {data : null, part : null, index : 0, count : 0};
 		var command                     = "save";
@@ -6365,7 +6416,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
-		oAdditionalData["nobase64"]     = Asc.c_nNoBase64;
+		oAdditionalData["nobase64"]     = isNoBase64;
 		if (DownloadType.Print === options.downloadType)
 		{
 			oAdditionalData["inline"] = 1;
@@ -6373,10 +6424,10 @@ background-repeat: no-repeat;\
 		if (c_oAscFileType.PDF == filetype)
 		{
 			var dd             = this.WordControl.m_oDrawingDocument;
-			dataContainer.data = dd.ToRendererPart(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
+			dataContainer.data = dd.ToRendererPart(isNoBase64);
 		}
 		else
-			dataContainer.data = this.WordControl.SaveDocument(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
+			dataContainer.data = this.WordControl.SaveDocument(isNoBase64);
 		var fCallback     = function(input)
 		{
 			var error = c_oAscError.ID.Unknown;
@@ -6521,16 +6572,8 @@ background-repeat: no-repeat;\
 		var _loader = new AscCommon.BinaryPPTYLoader();
 		_loader.Api = this;
 
-		if (version === undefined)
-		{
-			_loader.Load(base64File, this.WordControl.m_oLogicDocument);
-			_loader.Check_TextFit();
-		}
-		else
-		{
-			_loader.Load2(base64File, this.WordControl.m_oLogicDocument);
-			_loader.Check_TextFit();
-		}
+		_loader.Load(base64File, this.WordControl.m_oLogicDocument);
+		_loader.Check_TextFit();
 
 		this.LoadedObject = 1;
 		g_oIdCounter.Set_Load(false);
@@ -6644,9 +6687,9 @@ background-repeat: no-repeat;\
 	{
 		var writer = new AscCommon.CBinaryFileWriter();
 		this.WordControl.m_oLogicDocument.CalculateComments();
-		writer.WriteDocument2(this.WordControl.m_oLogicDocument);
+		writer.WriteDocument3(this.WordControl.m_oLogicDocument);
 
-		var _header = "PPTY;v1;" + writer.pos + ";";
+		var _header = "PPTY;v10;" + writer.pos + ";";
 		window["native"]["Save_End"](_header, writer.pos);
 
 		return writer.ImData.data;
@@ -7214,6 +7257,10 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype["asc_OnHideContextMenu"] 				= asc_docs_api.prototype.asc_OnHideContextMenu;
 	asc_docs_api.prototype["asc_OnShowContextMenu"] 				= asc_docs_api.prototype.asc_OnShowContextMenu;
+
+	asc_docs_api.prototype["DemonstrationReporterMessages"] 		= asc_docs_api.prototype.DemonstrationReporterMessages;
+	asc_docs_api.prototype["DemonstrationToReporterMessages"] 		= asc_docs_api.prototype.DemonstrationToReporterMessages;
+	asc_docs_api.prototype["preloadReporter"]						= asc_docs_api.prototype.preloadReporter;
 
 
 	window['Asc']['asc_CCommentData'] = window['Asc'].asc_CCommentData = asc_CCommentData;

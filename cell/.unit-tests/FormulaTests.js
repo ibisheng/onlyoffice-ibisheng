@@ -913,6 +913,54 @@ $( function () {
 		strictEqual( oParser.calculate().getValue(), -4, 'ISO.CEILING(-4.3,-2)' );
 	} );
 
+	test( "Test: \"CEILING\"", function () {
+
+		oParser = new parserFormula( 'CEILING(2.5, 1)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(2.5, 1)' );
+		strictEqual( oParser.calculate().getValue(), 3, 'CEILING(2.5, 1)' );
+
+		oParser = new parserFormula( 'CEILING(-2.5, -2)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(-2.5, -2)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'CEILING(-2.5, -2)' );
+
+		oParser = new parserFormula( 'CEILING(-2.5, 2)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(-2.5, 2)' );
+		strictEqual( oParser.calculate().getValue(), -2, 'CEILING(-2.5, 2)' );
+
+		oParser = new parserFormula( 'CEILING(1.5, 0.1)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(1.5, 0.1)' );
+		strictEqual( oParser.calculate().getValue(), 1.5, 'CEILING(1.5, 0.1)' );
+
+		oParser = new parserFormula( 'CEILING(0.234, 0.01)', "A1", ws );
+		ok( oParser.parse(), 'CEILING(0.234, 0.01)' );
+		strictEqual( oParser.calculate().getValue(), 0.24, 'CEILING(0.234, 0.01)' );
+
+	} );
+
+	test( "Test: \"ECMA.CEILING\"", function () {
+
+		oParser = new parserFormula( 'ECMA.CEILING(2.5, 1)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(2.5, 1)' );
+		strictEqual( oParser.calculate().getValue(), 3, 'ECMA.CEILING(2.5, 1)' );
+
+		oParser = new parserFormula( 'ECMA.CEILING(-2.5, -2)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(-2.5, -2)' );
+		strictEqual( oParser.calculate().getValue(), -4, 'ECMA.CEILING(-2.5, -2)' );
+
+		oParser = new parserFormula( 'ECMA.CEILING(-2.5, 2)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(-2.5, 2)' );
+		strictEqual( oParser.calculate().getValue(), -2, 'ECMA.CEILING(-2.5, 2)' );
+
+		oParser = new parserFormula( 'ECMA.CEILING(1.5, 0.1)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(1.5, 0.1)' );
+		strictEqual( oParser.calculate().getValue(), 1.5, 'ECMA.CEILING(1.5, 0.1)' );
+
+		oParser = new parserFormula( 'ECMA.CEILING(0.234, 0.01)', "A1", ws );
+		ok( oParser.parse(), 'ECMA.CEILING(0.234, 0.01)' );
+		strictEqual( oParser.calculate().getValue(), 0.24, 'ECMA.CEILING(0.234, 0.01)' );
+
+	} );
+
 	test( "Test: \"COMBINA\"", function () {
 		oParser = new parserFormula( 'COMBINA(4,3)', "A1", ws );
 		ok( oParser.parse(), 'COMBINA(4,3)' );
@@ -2107,6 +2155,25 @@ $( function () {
 
     } );
 
+	test( "Test: \"SHEET\"", function () {
+
+		oParser = new parserFormula( "SHEET(Hi_Temps)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NAME?" );
+
+	} );
+
+	test( "Test: \"SHEETS\"", function () {
+
+		oParser = new parserFormula( "SHEETS(Hi_Temps)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NAME?" );
+
+		oParser = new parserFormula( "SHEETS()", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+	} );
+
     test( "Test: \"TRIM\"", function () {
 
         oParser = new parserFormula( "TRIM(\"     abc         def      \")", "A2", ws );
@@ -2788,6 +2855,36 @@ $( function () {
 
     } );
 
+	test( "Test: \"ISOWEEKNUM\"", function () {
+
+		ws.getRange2( "A2" ).setValue( "3/9/2012" );
+
+	    oParser = new parserFormula( "ISOWEEKNUM(A2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 10 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(123)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 18 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(120003)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(120003)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30 );
+
+		oParser = new parserFormula( "ISOWEEKNUM(-100)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NUM!" );
+
+		oParser = new parserFormula( "ISOWEEKNUM(1203)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 16 );
+
+	} );
+
 	test( "Test: \"WEIBULL\"", function () {
 
 		ws.getRange2( "A2" ).setValue( "105" );
@@ -3438,6 +3535,131 @@ $( function () {
 
 	} );
 
+	test( "Test: \"AGGREGATE\"", function () {
+
+		ws.getRange2( "A101" ).setValue( "TEST" );
+		ws.getRange2( "A102" ).setValue( "72" );
+		ws.getRange2( "A103" ).setValue( "30" );
+		ws.getRange2( "A104" ).setValue( "TEST2" );
+		ws.getRange2( "A105" ).setValue( "31" );
+		ws.getRange2( "A106" ).setValue( "96" );
+		ws.getRange2( "A107" ).setValue( "32" );
+		ws.getRange2( "A108" ).setValue( "81" );
+		ws.getRange2( "A109" ).setValue( "33" );
+		ws.getRange2( "A110" ).setValue( "53" );
+		ws.getRange2( "A111" ).setValue( "34" );
+
+		ws.getRange2( "B101" ).setValue( "82" );
+		ws.getRange2( "B102" ).setValue( "65" );
+		ws.getRange2( "B103" ).setValue( "95" );
+		ws.getRange2( "B104" ).setValue( "63" );
+		ws.getRange2( "B105" ).setValue( "53" );
+		ws.getRange2( "B106" ).setValue( "71" );
+		ws.getRange2( "B107" ).setValue( "55" );
+		ws.getRange2( "B108" ).setValue( "83" );
+		ws.getRange2( "B109" ).setValue( "100" );
+		ws.getRange2( "B110" ).setValue( "91" );
+		ws.getRange2( "B111" ).setValue( "89" );
+
+
+		oParser = new parserFormula( "AGGREGATE(4, 6, A101:A111)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 96 );
+
+		oParser = new parserFormula( "AGGREGATE(14, 6, A101:A111, 3)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 72 );
+
+		oParser = new parserFormula( "AGGREGATE(15, 6, A101:A111)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( "AGGREGATE(12, 6, A101:A111, B101:B111)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 68 );
+
+		oParser = new parserFormula( "AGGREGATE(12, 6, A101:A111, B101:B111)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 68 );
+
+		oParser = new parserFormula( "AGGREGATE(1,1,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 61.375);
+
+		oParser = new parserFormula( "AGGREGATE(2,1,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 8);
+
+		oParser = new parserFormula( "AGGREGATE(3,1,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 10);
+
+		oParser = new parserFormula( "AGGREGATE(4,1,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 95);
+
+		oParser = new parserFormula( "AGGREGATE(5,3,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30);
+
+		oParser = new parserFormula( "AGGREGATE(6,1,100)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 100);
+
+		oParser = new parserFormula( "AGGREGATE(7,3,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 22.87192602);
+
+		oParser = new parserFormula( "AGGREGATE(8,3,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(8) - 0, 21.39472774);
+
+		oParser = new parserFormula( "AGGREGATE(9,3,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 491);
+
+		oParser = new parserFormula( "AGGREGATE(10,3,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 523.125);
+
+		oParser = new parserFormula( "AGGREGATE(11,3,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 457.734375);
+
+		oParser = new parserFormula( "AGGREGATE(12,3,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 64);
+
+		oParser = new parserFormula( "AGGREGATE(13,3,A101:B105,A101:B105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30);
+
+		oParser = new parserFormula( "AGGREGATE(14,3,A101:B105,2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 82);
+
+		oParser = new parserFormula( "AGGREGATE(15,3,A101:B105,2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 31);
+
+		oParser = new parserFormula( "AGGREGATE(16,3,A101:B105,1)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 95);
+
+		oParser = new parserFormula( "AGGREGATE(17,3,A101:B105,3)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 74.5);
+
+		oParser = new parserFormula( "AGGREGATE(18,3,A101:B105,0.2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 30.8);
+
+		oParser = new parserFormula( "AGGREGATE(19,3,A101:B105,2)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 64);
+
+	} );
+
     test( "Test: \"BINOMDIST\"", function () {
 
         function binomdist( x, n, p ) {
@@ -3475,6 +3697,18 @@ $( function () {
 	    oParser = new parserFormula( "BINOM.DIST(A2,A3,A4,FALSE)", "A1", ws );
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed( 7 ) - 0, 0.2050781);
+	} );
+
+	test( "Test: \"BINOM.DIST.RANGE\"", function () {
+
+		oParser = new parserFormula( "BINOM.DIST.RANGE(60,0.75,48)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 3 ) - 0, 0.084);
+
+		oParser = new parserFormula( "BINOM.DIST.RANGE(60,0.75,45,50)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed( 3 ) - 0, 0.524);
+
 	} );
 
     test( "Test: \"CONFIDENCE\"", function () {
@@ -5262,6 +5496,47 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), stdeva( 123, 134, 143, 173, 112, 109 ) );
 
     } );
+
+	test( "Test: \"SWITCH\"", function () {
+		ws.getRange2( "A2" ).setValue( "2" );
+		ws.getRange2( "A3" ).setValue( "99" );
+		ws.getRange2( "A4" ).setValue( "99" );
+		ws.getRange2( "A5" ).setValue( "2" );
+		ws.getRange2( "A6" ).setValue( "3" );
+
+		oParser = new parserFormula( 'SWITCH(WEEKDAY(A2),1,"Sunday",2,"Monday",3,"Tuesday","No match")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(WEEKDAY(A2),1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+		strictEqual( oParser.calculate().getValue(), "Monday", 'SWITCH(WEEKDAY(A2),1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+
+		oParser = new parserFormula( 'SWITCH(A3,1,"Sunday",2,"Monday",3,"Tuesday")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(A3,1,"Sunday",2,"Monday",3,"Tuesday")' );
+		strictEqual( oParser.calculate().getValue(), "#N/A", 'SWITCH(A3,1,"Sunday",2,"Monday",3,"Tuesday")' );
+
+		oParser = new parserFormula( 'SWITCH(A4,1,"Sunday",2,"Monday",3,"Tuesday","No match")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(A4,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+		strictEqual( oParser.calculate().getValue(), "No match", 'SWITCH(A4,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+
+		oParser = new parserFormula( 'SWITCH(A5,1,"Sunday",7,"Saturday","weekday")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(A5,1,"Sunday",7,"Saturday","weekday")' );
+		strictEqual( oParser.calculate().getValue(), "weekday", 'SWITCH(A5,1,"Sunday",7,"Saturday","weekday")' );
+
+		oParser = new parserFormula( 'SWITCH(A6,1,"Sunday",2,"Monday",3,"Tuesday","No match")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(A6,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+		strictEqual( oParser.calculate().getValue(), "Tuesday", 'SWITCH(A6,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+
+		oParser = new parserFormula( 'SWITCH(122,1,"Sunday",2,"Monday",3,"Tuesday","No match")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH(122,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+		strictEqual( oParser.calculate().getValue(), "No match", 'SWITCH(122,1,"Sunday",2,"Monday",3,"Tuesday","No match")' );
+
+		oParser = new parserFormula( 'SWITCH({1,"2asd",3},{12,2,3},{"asd",2,3,4})', "A1", ws );
+		ok( oParser.parse(), 'SWITCH({1,"2asd",3},{12,2,3},{"asd",2,3,4})' );
+		strictEqual( oParser.calculate().getValue(), "#N/A", 'SWITCH({1,"2asd",3},{12,2,3},{"asd",2,3,4})' );
+
+		oParser = new parserFormula( 'SWITCH({"asd1","2asd",3},{"asd1",1,3},"sdf")', "A1", ws );
+		ok( oParser.parse(), 'SWITCH({"asd1","2asd",3},{"asd1",1,3},"sdf")' );
+		strictEqual( oParser.calculate().getValue(), "sdf", 'SWITCH({"asd1","2asd",3},{"asd1",1,3},"sdf")' );
+
+	} );
 
     test( "Test: \"VAR\"", function () {
 
@@ -8254,6 +8529,35 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed(2) - 0, 7.04);
 
 	});
+
+	test( "Test: \"UNICODE\"", function () {
+
+		oParser = new parserFormula( 'UNICODE(" ")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 32);
+
+		oParser = new parserFormula( 'UNICODE("B")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 66);
+
+		oParser = new parserFormula( 'UNICODE(0)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 48);
+
+		oParser = new parserFormula( 'UNICODE(1)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 49);
+
+		oParser = new parserFormula( 'UNICODE("true")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 116);
+
+		oParser = new parserFormula( 'UNICODE(#N/A)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#N/A");
+
+	});
+
 
 	wb.dependencyFormulas.unlockRecal();
 } );

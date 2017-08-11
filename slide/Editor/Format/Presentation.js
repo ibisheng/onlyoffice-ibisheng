@@ -768,6 +768,9 @@ CPresentation.prototype =
         return false;
     },
 
+    IsViewModeInReview: function(){
+        return false;
+    },
 
     IsFillingFormMode: function()
     {
@@ -1262,7 +1265,10 @@ CPresentation.prototype =
                     this.DrawingDocument.OnRecalculatePage(i, this.Slides[i]);
                 }
                 bEndRecalc = (this.Slides.length > 0);
-                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+                if(this.Slides[this.CurPage]){
+                    this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+                }
+
             }
             else
             {
@@ -1274,7 +1280,9 @@ CPresentation.prototype =
                 bEndRecalc = (aToRedrawSlides.length > 0);
             }
             if(bRedrawNotes){
-                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+                if(this.Slides[this.CurPage]){
+                    this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
+                }
             }
             if(bEndRecalc){
                 this.DrawingDocument.OnEndRecalculate();
@@ -2659,22 +2667,20 @@ CPresentation.prototype =
                 var target_content = graphicObjects.getTargetDocContent(undefined, true);
                 if(target_content)
                 {
-                    if(target_content instanceof CTable)
-                    {
+                    if(target_content instanceof CTable){
                         target_content.MoveCursorToCell( true === e.ShiftKey ? false : true );
                     }
-                    else
-                    {
+                    else{
                         if(AscCommon.CollaborativeEditing.Is_Fast() || editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Drawing_Props) === false) {
-
                             if(target_content.Selection.StartPos === target_content.Selection.EndPos &&
-                                target_content.Content[target_content.CurPos.ContentPos].IsEmpty() &&
+                                target_content.Content[target_content.CurPos.ContentPos].IsCursorAtBegin() &&
                                 target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr &&
                                 target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet &&
                                 target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.isBullet() &&
-                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.bulletType.type !== AscFormat.BULLET_TYPE_BULLET_NONE &&
-                                this.Can_IncreaseParagraphLevel(!e.ShiftKey)){
-                                this.IncreaseDecreaseIndent(!e.ShiftKey);
+                                target_content.Content[target_content.CurPos.ContentPos].CompiledPr.Pr.ParaPr.Bullet.bulletType.type !== AscFormat.BULLET_TYPE_BULLET_NONE) {
+                                if(this.Can_IncreaseParagraphLevel(!e.ShiftKey)){
+                                    this.IncreaseDecreaseIndent(!e.ShiftKey);
+                                }
                             }
                             else{
                                 History.Create_NewPoint(AscDFH.historydescription_Presentation_ParagraphAdd);
@@ -3559,6 +3565,9 @@ CPresentation.prototype =
 
     Notes_OnMouseUp : function(e, X, Y)
     {
+        if(!this.FocusOnNotes){
+            return;
+        }
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide && oCurSlide.notes){
             e.ctrlKey = e.CtrlKey;
@@ -3581,6 +3590,9 @@ CPresentation.prototype =
 
     Notes_OnMouseMove : function(e, X, Y)
     {
+       // if(!this.FocusOnNotes){
+       //     return;
+       // }
         var oCurSlide = this.Slides[this.CurPage];
         if(oCurSlide){
             if(oCurSlide.notes){
@@ -4265,18 +4277,17 @@ CPresentation.prototype =
             return;
         }
 
-        var oldCurPage = this.CurPage;
-        this.CurPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
-        if(oldCurPage != this.CurPage && this.CurPage < this.Slides.length)
+        var nNewCurrentPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
+        if(nNewCurrentPage !== this.CurPage && this.CurPage < this.Slides.length)
         {
+            var oCurrentController = this.GetCurrentController();
+            if(oCurrentController){
+                oCurrentController.resetSelectionState();
+            }
+            this.CurPage = nNewCurrentPage;
             this.FocusOnNotes = false;
-            if(this.Slides[oldCurPage])
-            {
-                this.Slides[oldCurPage].graphicObjects.resetSelectionState();
-            }
-            if(!this.Notes_OnResize()){
-                this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
-            }
+            this.Notes_OnResize();
+            this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
             editor.asc_hideComments();
             this.Document_UpdateInterfaceState();
         }
@@ -4695,6 +4706,7 @@ CPresentation.prototype =
                     var PresentSelContent = new PresentationSelectedContent();
                     PresentSelContent.DocContent = oSelectedContent;
                     this.Insert_Content(PresentSelContent);
+                    this.Check_CursorMoveRight();
                     return;
                 }
                 else{
@@ -5373,7 +5385,7 @@ CPresentation.prototype =
             slides_array[i].checkNoTransformPlaceholder();
         }
         History.Add(new AscDFH.CChangesDrawingChangeTheme(this, AscDFH.historyitem_Presentation_ChangeTheme, arr_ind));
-        this.resetStateCurSlide();
+        ///this.resetStateCurSlide();
         this.Recalculate();
         this.Document_UpdateInterfaceState();
     },
@@ -5922,6 +5934,10 @@ CPresentation.prototype =
     {
         return false;
     }
+};
+CPresentation.prototype.IsViewModeInReview = function()
+{
+	return false;
 };
 
 

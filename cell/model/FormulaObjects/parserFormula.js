@@ -970,7 +970,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cArea.prototype.getWsId = function () {
 		return this.ws.Id;
 	};
-	cArea.prototype.getValue = function (checkExclude, excludeHiddenRows) {
+	cArea.prototype.getValue = function (checkExclude, excludeHiddenRows, excludeErrorsVal, excludeNestedStAg) {
 		var val = [], r = this.getRange();
 		if (!r) {
 			val.push(new cError(cErrorType.bad_reference));
@@ -979,7 +979,23 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				excludeHiddenRows = this.ws.isApplyFilterBySheet();
 			}
 			r._foreachNoEmpty(function (cell) {
-				val.push(checkTypeCell(cell));
+				var bIsFoundNestedStAg = false;
+				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+					var outStack = cell.formulaParsed.outStack;
+					for(var i = 0; i < outStack.length; i++){
+						if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+							bIsFoundNestedStAg = true;
+							break;
+						}
+					}
+				}
+				if(!bIsFoundNestedStAg){
+					var checkTypeVal = checkTypeCell(cell);
+					if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
+						val.push(checkTypeVal);
+					}
+				}
+
 			}, excludeHiddenRows);
 		}
 		return val;
@@ -1075,21 +1091,58 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			});
 		}
 	};
-	cArea.prototype.getMatrix = function () {
+	cArea.prototype.getMatrix = function (excludeHiddenRows, excludeErrorsVal, excludeNestedStAg) {
 		var arr = [], r = this.getRange();
 		r._foreach2(function (cell, i, j, r1, c1) {
 			if (!arr[i - r1]) {
 				arr[i - r1] = [];
 			}
-			arr[i - r1][j - c1] = checkTypeCell(cell);
+
+			var bIsFoundNestedStAg = false;
+			var resValue = new cEmpty();
+			if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+				var outStack = cell.formulaParsed.outStack;
+				for(var n = 0; n < outStack.length; n++){
+					if(outStack[n] instanceof AscCommonExcel.cAGGREGATE || outStack[n] instanceof AscCommonExcel.cSUBTOTAL){
+						bIsFoundNestedStAg = true;
+						break;
+					}
+				}
+			}
+			if(!bIsFoundNestedStAg){
+				var checkTypeVal = checkTypeCell(cell);
+				if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
+					resValue = checkTypeVal;
+				}
+			}
+
+			arr[i - r1][j - c1] = resValue;
 		});
 		return arr;
 	};
-	cArea.prototype.getValuesNoEmpty = function () {
+	cArea.prototype.getValuesNoEmpty = function (checkExclude, excludeHiddenRows, excludeErrorsVal, excludeNestedStAg) {
 		var arr = [], r = this.getRange();
+
 		r._foreachNoEmpty(function (cell) {
-			arr.push(checkTypeCell(cell));
-		});
+			var bIsFoundNestedStAg = false;
+			if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+				var outStack = cell.formulaParsed.outStack;
+				for(var i = 0; i < outStack.length; i++){
+					if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+						bIsFoundNestedStAg = true;
+						break;
+					}
+				}
+			}
+			if(!bIsFoundNestedStAg){
+				var checkTypeVal = checkTypeCell(cell);
+				if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
+					arr.push(checkTypeVal);
+				}
+			}
+
+		}, excludeHiddenRows);
+
 		return [arr];
 	};
 	cArea.prototype.index = function (r, c) {
@@ -1165,7 +1218,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	cArea3D.prototype.getRanges = function () {
 		return (this.range(this.wsRange()));
 	};
-	cArea3D.prototype.getValue = function (checkExclude, excludeHiddenRows) {
+	cArea3D.prototype.getValue = function (checkExclude, excludeHiddenRows, excludeErrorsVal, excludeNestedStAg) {
 		var i, _wsA = this.wsRange();
 		var _val = [];
 		if (_wsA.length < 1) {
@@ -1189,8 +1242,25 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			if (checkExclude && !(_exclude = excludeHiddenRows)) {
 				_exclude = _wsA[i].isApplyFilterBySheet();
 			}
+
 			_r[i]._foreachNoEmpty(function (cell) {
-				_val.push(checkTypeCell(cell));
+				var bIsFoundNestedStAg = false;
+				if(excludeNestedStAg && cell.formulaParsed && cell.formulaParsed.outStack){
+					var outStack = cell.formulaParsed.outStack;
+					for(var i = 0; i < outStack.length; i++){
+						if(outStack[i] instanceof AscCommonExcel.cAGGREGATE || outStack[i] instanceof AscCommonExcel.cSUBTOTAL){
+							bIsFoundNestedStAg = true;
+							break;
+						}
+					}
+				}
+				if(!bIsFoundNestedStAg){
+					var checkTypeVal = checkTypeCell(cell);
+					if(!(excludeErrorsVal && CellValueType.Error === checkTypeVal.type)){
+						_val.push(checkTypeVal);
+					}
+				}
+
 			}, _exclude);
 		}
 		return _val;
@@ -2435,11 +2505,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 			if(typeArray && cElementType.array === typeArray[i])
 			{
 				if (cElementType.cellsRange === arg.type || cElementType.array === arg.type) {
-					newArgs[i] = arg.getMatrix();
+					newArgs[i] = arg.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg);
 				} else if (cElementType.cellsRange3D === arg.type) {
-					newArgs[i] = arg.getMatrix()[0];
+					newArgs[i] = arg.getMatrix(this.excludeHiddenRows, this.excludeErrorsVal, this.excludeNestedStAg)[0];
 				} else {
-					newArgs[i] = new cError(cErrorType.not_available);
+					newArgs[i] = new cError(cErrorType.not_numeric);
 				}
 			}else if (cElementType.cellsRange === arg.type || cElementType.cellsRange3D === arg.type) {
 				newArgs[i] = arg.cross(arg1);
@@ -5713,7 +5783,11 @@ function parseNum( str ) {
 		var res = false, rS;
 		if (cElementType.string === y.type) {
 			if ('<' === operator || '>' === operator || '<=' === operator || '>=' === operator) {
-				return _func[x.type][y.type](x, y, operator).toBool();
+				var _funcVal = _func[x.type][y.type](x, y, operator);
+				if(cElementType.error === _funcVal.type){
+					return false;
+				}
+				return _funcVal.toBool();
 			}
 
 			y = y.toString();
@@ -5754,7 +5828,7 @@ function parseNum( str ) {
 					break;
 				case "=":
 				default:
-					res = (x.value == y.value);
+					res = (x.value === y.value);
 					break;
 			}
 		}

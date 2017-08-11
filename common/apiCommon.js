@@ -943,9 +943,12 @@
 		},
 
 		changeType: function (type) {
-        if (this.type === type) {
-            return;
-        }
+			if(null === this.type){
+				return;
+			}
+			if (this.type === type) {
+				return;
+			}
 
 			var bSwapGridLines = ((this.type === c_oAscChartTypeSettings.hBarNormal ||
 			this.type === c_oAscChartTypeSettings.hBarStacked || this.type === c_oAscChartTypeSettings.hBarStackedPer

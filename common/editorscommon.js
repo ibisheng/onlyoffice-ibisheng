@@ -333,11 +333,6 @@
 		});
 	}
 
-	function getJSZipUtils()
-	{
-		return window['JSZipUtils'] ? window['JSZipUtils'] : require('jsziputils');
-	}
-
 	function getImageFromChanges(name)
 	{
 		var content;
@@ -352,70 +347,36 @@
 	function initStreamFromResponse(httpRequest) {
 		var stream;
 		if (typeof ArrayBuffer !== 'undefined') {
-			var _uintData = new Uint8Array(httpRequest.response);
-			stream = new AscCommon.FT_Stream2(_uintData, _uintData.length);
-		} else if (AscCommon.AscBrowser.isIE){
+			stream = new Uint8Array(httpRequest.response);
+		} else if (AscCommon.AscBrowser.isIE) {
 			var _response = new VBArray(httpRequest["responseBody"]).toArray();
 
 			var srcLen = _response.length;
 			var pointer = g_memory.Alloc(srcLen);
-			stream = new AscCommon.FT_Stream2(pointer.data, srcLen);
-			stream.obj = pointer.obj;
+			var tempStream = new AscCommon.FT_Stream2(pointer.data, srcLen);
+			tempStream.obj = pointer.obj;
 
-			var dstPx = stream.data;
+			stream = tempStream.data;
 			var index = 0;
 
 			while (index < srcLen)
 			{
-				dstPx[index] = _response[index];
+				stream[index] = _response[index];
 				index++;
 			}
 		}
 		return stream;
 	}
 	function checkStreamSignature(stream, Signature) {
-		if (stream.data.length > Signature.length) {
+		if (stream.length > Signature.length) {
 			for(var i = 0 ; i < Signature.length; ++i){
-				if(stream.data[i] !== Signature.charCodeAt(i)){
+				if(stream[i] !== Signature.charCodeAt(i)){
 					return false;
 				}
 			}
 			return true;
 		}
 		return false;
-	}
-	function Utf8ArrayToStr(array) {
-		var out, i, len, c;
-		var char2, char3;
-
-		out = "";
-		len = array.length;
-		i = 0;
-		while(i < len) {
-		c = array[i++];
-		switch(c >> 4)
-		{ 
-		  case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-			// 0xxxxxxx
-			out += String.fromCharCode(c);
-			break;
-		  case 12: case 13:
-			// 110x xxxx   10xx xxxx
-			char2 = array[i++];
-			out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F));
-			break;
-		  case 14:
-			// 1110 xxxx  10xx xxxx  10xx xxxx
-			char2 = array[i++];
-			char3 = array[i++];
-			out += String.fromCharCode(((c & 0x0F) << 12) |
-						   ((char2 & 0x3F) << 6) |
-						   ((char3 & 0x3F) << 0));
-			break;
-		}
-		}
-
-		return out;
 	}
 	function openFileCommand(binUrl, changesUrl, Signature, callback)
 	{
@@ -442,23 +403,16 @@
 					url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
 					if (httpRequest)
 					{
-						if (Asc.c_nNoBase64) {
-							var stream = initStreamFromResponse(httpRequest);
-							if (stream) {
-								oResult.bSerFormat = checkStreamSignature(stream, Signature);
-								if (oResult.bSerFormat) {
-									oResult.data = stream;
-								} else {
-									//todo arraybuffer
-									oResult.data = Utf8ArrayToStr(stream.data);
-								}
+						var stream = initStreamFromResponse(httpRequest);
+						if (stream) {
+							oResult.bSerFormat = checkStreamSignature(stream, Signature);
+							if (oResult.bSerFormat) {
+								oResult.data = stream;
 							} else {
-								bError = true;
+								oResult.data = stream;
 							}
 						} else {
-							oResult.bSerFormat = Signature === httpRequest.responseText.substring(0, Signature.length);
-							oResult.data = httpRequest.responseText;
-							oResult.url = url;
+							bError = true;
 						}
 					}
 					else
@@ -467,13 +421,13 @@
 					}
 					bEndLoadFile = true;
 					onEndOpen();
-				}, Asc.c_nNoBase64 ? "arraybuffer" : undefined);
+				}, "arraybuffer");
 		}
 
 		if (changesUrl)
 		{
 			oZipImages = {};
-			getJSZipUtils().getBinaryContent(changesUrl, function (err, data)
+			require('jsziputils').getBinaryContent(changesUrl, function (err, data)
 			{
 				if (err)
 				{
@@ -2478,6 +2432,14 @@
 			oDrawingDocument.ClearCachePages();
 			oDrawingDocument.FirePaint();
 
+			if(oApi.editorId === AscCommon.c_oEditorId.Presentation)
+			{
+				var oCurSlide = oLogicDocument.Slides[oLogicDocument.CurPage];
+				if(oCurSlide && oCurSlide.notesShape && oCurSlide.notesShape.Lock === this)
+				{
+                    oDrawingDocument.Notes_OnRecalculate(oLogicDocument.CurPage, oCurSlide.NotesWidth, oCurSlide.getNotesHeight());
+				}
+			}
 			// TODO: Обновлять интерфейс нужно, потому что мы можем стоять изначально в незалоченном объекте, а тут он
 			//       может быть залочен.
 			var oRevisionsStack = oApi.asc_GetRevisionsChangesStack();
@@ -3129,7 +3091,7 @@
 	window["AscCommon"].prepareUrl = prepareUrl;
 	window["AscCommon"].getUserColorById = getUserColorById;
 	window["AscCommon"].isNullOrEmptyString = isNullOrEmptyString;
-	window["AscCommon"].getJSZipUtils = getJSZipUtils;
+	window["AscCommon"].initStreamFromResponse = initStreamFromResponse;
 
 	window["AscCommon"].DocumentUrls = DocumentUrls;
 	window["AscCommon"].CLock = CLock;

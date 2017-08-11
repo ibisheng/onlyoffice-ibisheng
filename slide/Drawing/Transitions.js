@@ -2889,7 +2889,7 @@ function CDemonstrationManager(htmlpage)
 			var _elem = document.createElement('div');
 			_elem.setAttribute("id", "dem_id_wait_reporter");
 			_elem.setAttribute("style", "line-height:100%;overflow:hidden;position:absolute;margin:0px;padding:25% 0px 0px 0px;left:0px;top:0px;width:100%;height:100%;z-index:4;background-color:#000000;text-align:center;font-family:monospace;font-size:12pt;color:#FFFFFF;");
-			_elem.innerHTML = "WAITING...";
+			_elem.innerHTML = AscCommon.translateManager.getValue("Loading");
 			_parent.appendChild(_elem);
 		}
 

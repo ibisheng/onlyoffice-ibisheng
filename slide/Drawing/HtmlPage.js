@@ -682,6 +682,15 @@ function CEditorPage(api)
 			style.innerHTML = styleContent;
 			_head.appendChild(style);
 
+			this.reporterTranslates = ["Reset", "Slide {0} of {1}", "End slideshow"];
+			var _translates = this.m_oApi.reporterTranslates;
+			if (_translates)
+			{
+				this.reporterTranslates[0] = _translates[0];
+				this.reporterTranslates[1] = _translates[1];
+				this.reporterTranslates[2] = _translates[2];
+			}
+
 			var _buttonsContent = "";
 			_buttonsContent += "<label class=\"block_elem_no_select\" id=\"dem_id_time\" style=\"color:#666666;text-shadow: none;white-space: nowrap;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; position:absolute; left:10px; bottom: 7px;\">00:00:00</label>";
 			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_play\" style=\"left: 60px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-play back_image_buttons\" id=\"dem_id_play_span\" style=\"width:100%;height:100%;\"></span></button>";
@@ -713,10 +722,18 @@ function CEditorPage(api)
 				if (_current > _count)
 					_current = _count;
 
-				_elem.innerHTML = "Slide " + _current + " of " + _count;
+				var _text = "Slide {0} of {1}";
+				if (window.editor.WordControl.reporterTranslates)
+					_text = window.editor.WordControl.reporterTranslates[1];
+				_text = _text.replace("{0}", _current);
+				_text = _text.replace("{1}", _count);
+
+				_elem.innerHTML = _text;
 
 				//window.editor.WordControl.Thumbnails.SelectPage(_current - 1);
 				window.editor.WordControl.GoToPage(_current - 1, false, false, true);
+
+				window.editor.WordControl.OnResizeReporter();
 			});
 
 			this.m_oApi.asc_registerCallback("asc_onEndDemonstration", function ()
@@ -837,10 +854,13 @@ function CEditorPage(api)
 			window.onkeydown = this.onKeyDown;
 			window.onkeyup = this.onKeyUp;
 
-			if ( window.attachEvent )
-				window.attachEvent('onmessage', this.m_oApi.DemonstrationToReporterMessages);
-			else
-				window.addEventListener('message', this.m_oApi.DemonstrationToReporterMessages, false);
+			if (!window["AscDesktopEditor"])
+			{
+				if (window.attachEvent)
+					window.attachEvent('onmessage', this.m_oApi.DemonstrationToReporterMessages);
+				else
+					window.addEventListener('message', this.m_oApi.DemonstrationToReporterMessages, false);
+			}
 		}
 		// --------------------------------------------------------------------------
 
@@ -2549,6 +2569,9 @@ function CEditorPage(api)
 		if (0 != this.MainScrollsEnabledFlag)
 			return;
 
+		if (oThis.m_oApi.isReporterMode)
+			return;
+
 		if (!this.m_oDrawingDocument.IsEmptyPresentation)
 		{
 			if (this.StartVerticalScroll)
@@ -3902,6 +3925,9 @@ function CEditorPage(api)
 		if (-1 == lPageNum)
 		{
 			this.m_oDrawingDocument.IsEmptyPresentation = true;
+
+			if (this.IsSupportNotes && this.m_oNotesApi)
+				this.m_oNotesApi.OnRecalculateNote(-1, 0, 0);
 		}
 
 		if (this.m_oDrawingDocument.TransitionSlide.IsPlaying())

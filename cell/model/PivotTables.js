@@ -2810,21 +2810,14 @@ CT_pivotTableDefinition.prototype.asc_getRowFields = function () {
 CT_pivotTableDefinition.prototype.asc_getDataFields = function () {
 	return this.dataFields && this.dataFields.dataField;
 };
-CT_pivotTableDefinition.prototype.asc_clone = function () {
-	var res = new CT_pivotTableDefinition();
-	res.name = this.name;
-	res.rowGrandTotals = this.rowGrandTotals;
-	res.colGrandTotals = this.colGrandTotals;
-	return res;
-};
 CT_pivotTableDefinition.prototype.asc_set = function (api, newVal) {
 	var t = this;
 	api._changePivotStyle(this, function (ws) {
 		ws.clearPivotRable(t);
-		if (t.asc_getRowGrandTotals() !== newVal.rowGrandTotals) {
+		if (null !== newVal.rowGrandTotals && t.asc_getRowGrandTotals() !== newVal.rowGrandTotals) {
 			t.asc_setRowGrandTotals(newVal.rowGrandTotals ? null : false);
 		}
-		if (t.asc_getColGrandTotals() !== newVal.colGrandTotals) {
+		if (null !== newVal.colGrandTotals && t.asc_getColGrandTotals() !== newVal.colGrandTotals) {
 			t.asc_setColGrandTotals(newVal.colGrandTotals ? null : false);
 		}
 		ws.updatePivotTable(t);
@@ -6533,6 +6526,46 @@ CT_PivotField.prototype.asc_getName = function () {
 CT_PivotField.prototype.asc_getSubtotalTop = function () {
 	return null !== this.subtotalTop ? this.subtotalTop : true;
 };
+CT_PivotField.prototype.asc_getSubtotals = function () {
+	var res = null;
+	if (null === this.defaultSubtotal || this.defaultSubtotal) {
+		res = [];
+		if (this.sumSubtotal) {
+			res.push(c_oAscItemType.Sum);
+		}
+		if (this.countASubtotal) {
+			res.push(c_oAscItemType.CountA);
+		}
+		if (this.avgSubtotal) {
+			res.push(c_oAscItemType.Avg);
+		}
+		if (this.maxSubtotal) {
+			res.push(c_oAscItemType.Max);
+		}
+		if (this.minSubtotal) {
+			res.push(c_oAscItemType.Min);
+		}
+		if (this.productSubtotal) {
+			res.push(c_oAscItemType.Product);
+		}
+		if (this.countSubtotal) {
+			res.push(c_oAscItemType.Count);
+		}
+		if (this.stdDevSubtotal) {
+			res.push(c_oAscItemType.StdDev);
+		}
+		if (this.stdDevPSubtotal) {
+			res.push(c_oAscItemType.StdDevP);
+		}
+		if (this.varSubtotal) {
+			res.push(c_oAscItemType.Var);
+		}
+		if (this.varPSubtotal) {
+			res.push(c_oAscItemType.VarP);
+		}
+	}
+	return res;
+};
 CT_PivotField.prototype.getItem = function (index) {
 	return this.items && this.items.item[index];
 };
@@ -6620,7 +6653,7 @@ CT_I.prototype.toXml = function(writer, name) {
 	}
 	writer.WriteXmlNodeEnd(name);
 };
-CT_I.prototype.getR = function (writer, name) {
+CT_I.prototype.getR = function () {
 	return this.r || 0;
 };
 function CT_PageField() {
@@ -6807,27 +6840,13 @@ CT_DataField.prototype.asc_getSubtotal = function () {
 CT_DataField.prototype.asc_getShowDataAs = function () {
 	return null !== this.showDataAs ? this.showDataAs : c_oAscShowDataAs.Normal;
 };
-CT_DataField.prototype.asc_clone = function () {
-	var res = new CT_DataField();
-	//Attributes
-	res.name = this.name;
-	res.fld = this.fld;
-	res.subtotal = this.subtotal;
-	res.showDataAs = this.showDataAs;
-	res.baseField = this.baseField;
-	res.baseItem = this.baseItem;
-	res.numFmtId = this.numFmtId;
-//Members
-	res.extLst = this.extLst;
-	return res;
-};
 CT_DataField.prototype.asc_set = function (api, pivot, newVal) {
 	var t = this;
 	api._changePivotStyle(pivot, function (ws) {
-		if (t.name !== newVal.name) {
+		if (null !== newVal.name && t.name !== newVal.name) {
 			t.asc_setName(newVal.name);
 		}
-		if (t.subtotal !== newVal.subtotal) {
+		if (null !== newVal.subtotal && t.subtotal !== newVal.subtotal) {
 			t.asc_setSubtotal(newVal.subtotal);
 		}
 
@@ -10340,6 +10359,7 @@ prot['Second'] = prot.Second;
 
 window['AscCommonExcel'].ToName_ST_ItemType = ToName_ST_ItemType;
 
+window["Asc"]["CT_pivotTableDefinition"] = CT_pivotTableDefinition;
 prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getPageWrap"] = prot.asc_getPageWrap;
@@ -10354,7 +10374,6 @@ prot["asc_getPageFields"] = prot.asc_getPageFields;
 prot["asc_getColumnFields"] = prot.asc_getColumnFields;
 prot["asc_getRowFields"] = prot.asc_getRowFields;
 prot["asc_getDataFields"] = prot.asc_getDataFields;
-prot["asc_clone"] = prot.asc_clone;
 prot["asc_set"] = prot.asc_set;
 prot["asc_setRowGrandTotals"] = prot.asc_setRowGrandTotals;
 prot["asc_setColGrandTotals"] = prot.asc_setColGrandTotals;
@@ -10379,6 +10398,7 @@ prot["asc_getName"] = prot.asc_getName;
 prot = CT_PivotField.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getSubtotalTop"] = prot.asc_getSubtotalTop;
+prot["asc_getSubtotals"] = prot.asc_getSubtotals;
 
 prot = CT_Field.prototype;
 prot["asc_getIndex"] = prot.asc_getIndex;
@@ -10387,12 +10407,12 @@ prot = CT_PageField.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getIndex"] = prot.asc_getIndex;
 
+window["Asc"]["CT_DataField"] = CT_DataField;
 prot = CT_DataField.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getIndex"] = prot.asc_getIndex;
 prot["asc_getSubtotal"] = prot.asc_getSubtotal;
 prot["asc_getShowDataAs"] = prot.asc_getShowDataAs;
-prot["asc_clone"] = prot.asc_clone;
 prot["asc_set"] = prot.asc_set;
 prot["asc_setName"] = prot.asc_setName;
 prot["asc_setSubtotal"] = prot.asc_setSubtotal;

@@ -913,6 +913,7 @@ function CDrawingDocument()
 	this.m_dTargetX            = -1;
 	this.m_dTargetY            = -1;
 	this.m_dTargetSize         = 1;
+	this.m_dTargetAscent	   = 0;
 	this.TargetHtmlElement     = null;
 	this.TargetHtmlElementLeft = 0;
 	this.TargetHtmlElementTop  = 0;
@@ -1737,7 +1738,7 @@ function CDrawingDocument()
 			}
 
 			var x_pix = (__x * g_dKoef_mm_to_pix + 10 + (_word_control.m_oMainParent.AbsolutePosition.L + _word_control.m_oNotesContainer.AbsolutePosition.L) * g_dKoef_mm_to_pix) >> 0;
-			var y_pix = (__y * g_dKoef_mm_to_pix + 10 + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oNotesContainer.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
+			var y_pix = (__y * g_dKoef_mm_to_pix + (_word_control.m_oMainParent.AbsolutePosition.T + _word_control.m_oNotesContainer.AbsolutePosition.T) * g_dKoef_mm_to_pix) >> 0;
 
 			return {X: x_pix, Y: y_pix, Error: false};
 		}
@@ -2082,7 +2083,13 @@ function CDrawingDocument()
 				_hh /= AscCommon.AscBrowser.retinaPixelRatio;
 
 			var boxY = 0;
-			var boxB = _hh - targetSize;
+			var targetSizeAscent = (this.m_dTargetAscent * g_dKoef_mm_to_pix) >> 0;
+
+			var boxB = _hh - (targetSize - targetSizeAscent);
+			if (boxB < 0)
+				boxB = _hh;
+
+			yPos += targetSizeAscent;
 
 			var nValueScrollVer = 0;
 			if (yPos < boxY)
@@ -2107,9 +2114,10 @@ function CDrawingDocument()
 		this.CheckTargetDraw(x, y, !isTargetOnNotes);
 	}
 
-	this.SetTargetSize   = function(size)
+	this.SetTargetSize   = function(size, ascent)
 	{
 		this.m_dTargetSize = size;
+		this.m_dTargetAscent = (undefined === ascent) ? 0 : ascent;
 	}
 	this.DrawTarget      = function()
 	{
@@ -4453,6 +4461,7 @@ function CThumbnailsManager()
 
 		var _digit_distance = this.const_offset_x * g_dKoef_pix_to_mm;
 
+		var _logicDocument = word_control.m_oLogicDocument;
 		for (var i = 0; i < this.SlidesCount; i++)
 		{
 			var page = this.m_arrPages[i];
@@ -4501,7 +4510,17 @@ function CThumbnailsManager()
 			else
 				g.b_color1(211, 79, 79, 255);
 
-			g.t("" + (i + 1), (_digit_distance - num_slide_text_width) / 2, (page.top * g_dKoef_pix_to_mm + 3));
+			var _bounds = g.t("" + (i + 1), (_digit_distance - num_slide_text_width) / 2, (page.top * g_dKoef_pix_to_mm + 3), true);
+			if (_logicDocument.Slides[i] && !_logicDocument.Slides[i].isVisible())
+			{
+				context.lineWidth = 1;
+				context.strokeStyle = "#000000";
+				context.beginPath();
+				context.moveTo(_bounds.x - 3, _bounds.y);
+				context.lineTo(_bounds.r + 3, _bounds.b);
+				context.stroke();
+				context.beginPath();
+			}
 		}
 
 		this.OnUpdateOverlay();
@@ -5778,6 +5797,10 @@ function CNotesDrawer(page)
 				oThis.Scroll = (oThis.ScrollMax * evt.scrollD / Math.max(evt.maxScrollY, 1)) >> 0;
 				oThis.HtmlPage.m_bIsUpdateTargetNoAttack = true;
 				oThis.IsRepaint = true;
+
+				oThis.HtmlPage.StartUpdateOverlay();
+				oThis.HtmlPage.OnUpdateOverlay();
+				oThis.HtmlPage.EndUpdateOverlay();
 			});
 		}
 	};
@@ -5957,6 +5980,7 @@ function CNotesDrawer(page)
             if (!this.HtmlPage.m_oLogicDocument.Notes_OnResize())
 			{
 				this.OnRecalculateNote(this.Slide, this.Width, this.Height);
+				this.HtmlPage.m_oLogicDocument.RecalculateCurPos();
 			}
 		}
 	};

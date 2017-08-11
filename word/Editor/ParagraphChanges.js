@@ -325,6 +325,15 @@ CChangesParagraphAddItem.prototype.Redo = function()
 	oParagraph.Content = Array_start.concat(this.Items, Array_end);
 	oParagraph.private_UpdateTrackRevisions();
 	private_ParagraphChangesOnSetValue(this.Class);
+
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Items[nIndex];
+
+		oItem.Parent = this.Class;
+		if (oItem.SetParagraph)
+			oItem.SetParagraph(this.Class);
+	}
 };
 CChangesParagraphAddItem.prototype.private_WriteItem = function(Writer, Item)
 {
@@ -405,6 +414,15 @@ CChangesParagraphRemoveItem.prototype.Undo = function()
 	oParagraph.Content = Array_start.concat(this.Items, Array_end);
 	oParagraph.private_UpdateTrackRevisions();
 	private_ParagraphChangesOnSetValue(this.Class);
+
+	for (var nIndex = 0, nCount = this.Items.length; nIndex < nCount; ++nIndex)
+	{
+		var oItem = this.Items[nIndex];
+
+		oItem.Parent = this.Class;
+		if (oItem.SetParagraph)
+			oItem.SetParagraph(this.Class);
+	}
 };
 CChangesParagraphRemoveItem.prototype.Redo = function()
 {

@@ -231,14 +231,14 @@ function BinaryPPTYLoader()
         this.ImageMapChecker = {};
 
 		var isBase64 = typeof base64_ppty === 'string';
-		var srcLen = isBase64 ? base64_ppty.length : base64_ppty.data.length;
+		var srcLen = isBase64 ? base64_ppty.length : base64_ppty.length;
         var nWritten = 0;
 
         var index = 0;
         var read_main_prop = "";
         while (true)
         {
-            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty.data[index];
+            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty[index];
             if (_c == ";".charCodeAt(0))
                 break;
 
@@ -253,7 +253,7 @@ function BinaryPPTYLoader()
         read_main_prop = "";
         while (true)
         {
-            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty.data[index];
+            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty[index];
             if (_c == ";".charCodeAt(0))
                 break;
 
@@ -271,7 +271,7 @@ function BinaryPPTYLoader()
         read_main_prop = "";
         while (true)
         {
-            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty.data[index];
+            var _c = isBase64 ? base64_ppty.charCodeAt(index) : base64_ppty[index];
             if (_c == ";".charCodeAt(0))
                 break;
 
@@ -302,7 +302,7 @@ function BinaryPPTYLoader()
 					{
 						if (index >= srcLen)
 							break;
-						var nCh = DecodeBase64Char(isBase64 ? base64_ppty.charCodeAt(index++) : base64_ppty.data[index++]);
+						var nCh = DecodeBase64Char(isBase64 ? base64_ppty.charCodeAt(index++) : base64_ppty[index++]);
 						if (nCh == -1)
 						{
 							i--;
@@ -333,7 +333,7 @@ function BinaryPPTYLoader()
 					{
 						if (index >= srcLen)
 							break;
-						var nCh = p[isBase64 ? base64_ppty.charCodeAt(index++) : base64_ppty.data[index++]];
+						var nCh = p[isBase64 ? base64_ppty.charCodeAt(index++) : base64_ppty[index++]];
 						if (nCh == undefined)
 						{
 							i--;
@@ -354,33 +354,14 @@ function BinaryPPTYLoader()
 			}
 		} else {
 			this.stream = new AscCommon.FileStream();
-			this.stream.obj    = base64_ppty.obj;
-			this.stream.data   = base64_ppty.data;
-			this.stream.size   = base64_ppty.size;
+			this.stream.obj    = null;
+			this.stream.data   = base64_ppty;
+			this.stream.size   = base64_ppty.length;
 			//skip header
 			this.stream.EnterFrame(index);
 			this.stream.Seek2(index);
 		}
 		
-        this.presentation.ImageMap = {};
-        this.presentation.Fonts = [];
-
-        if (presentation.globalTableStyles)
-            this.NextTableStyleId = this.presentation.globalTableStyles.length;
-
-        this.LoadDocument();
-
-        this.ImageMapChecker = null;
-    }
-
-    this.Load2 = function(data, presentation)
-    {
-        this.presentation = presentation;
-        this.ImageMapChecker = {};
-
-        this.stream = new AscCommon.FileStream(data, data.length);
-        this.stream.obj = null;
-
         this.presentation.ImageMap = {};
         this.presentation.Fonts = [];
 

@@ -49,10 +49,11 @@
 	var cArray = AscCommonExcel.cArray;
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+	var cElementType = AscCommonExcel.cElementType;
 
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
-	cFormulaFunctionGroup['Information'].push(cERROR_TYPE, cISBLANK, cISERR, cISERROR, cISEVEN, cISFORMULA, cISLOGICAL, cISNA,
-		cISNONTEXT, cISNUMBER, cISODD, cISREF, cISTEXT, cN, cNA, cTYPE);
+	cFormulaFunctionGroup['Information'].push(cERROR_TYPE, cISBLANK, cISERR, cISERROR, cISEVEN, cISFORMULA, cISLOGICAL,
+		cISNA, cISNONTEXT, cISNUMBER, cISODD, cISREF, cISTEXT, cN, cNA, cSHEET, cSHEETS, cTYPE);
 
 	/**
 	 * @constructor
@@ -545,6 +546,82 @@
 	cNA.prototype.argumentsMax = 0;
 	cNA.prototype.Calculate = function () {
 		return this.value = new cError(cErrorType.not_available);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSHEET() {
+		this.name = "SHEET";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cSHEET.prototype = Object.create(cBaseFunction.prototype);
+	cSHEET.prototype.constructor = cSHEET;
+	cSHEET.prototype.argumentsMin = 0;
+	cSHEET.prototype.argumentsMax = 1;
+	cSHEET.prototype.isXLFN = true;
+	cSHEET.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws) {
+
+		var res;
+		if(0 === arg.length){
+			res = new cNumber(ws.nSheetId);
+		}else{
+			var arg0 = arg[0];
+			if(cElementType.error === arg0.type){
+				res = arg0;
+			}else{
+				if(arg0.ws){
+					res = new cNumber(arg0.ws.nSheetId);
+				}else if(arg0.wsFrom){
+					var sheet1 = arg0.wsFrom.index;
+					var sheet2 = arg0.wsTo.index;
+					res = new cNumber(Math.min(sheet1, sheet2));
+				}
+			}
+		}
+		return this.value = res;
+
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSHEETS() {
+		this.name = "SHEETS";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cSHEETS.prototype = Object.create(cBaseFunction.prototype);
+	cSHEETS.prototype.constructor = cSHEETS;
+	cSHEETS.prototype.argumentsMin = 0;
+	cSHEETS.prototype.argumentsMax = 1;
+	cSHEETS.prototype.isXLFN = true;
+	cSHEETS.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws) {
+
+		var res;
+		if(0 === arg.length){
+			res = new cNumber(ws.workbook.aWorksheets.length);
+		}else{
+			var arg0 = arg[0];
+			if(cElementType.error === arg0.type){
+				res = arg0;
+			}else if(cElementType.cellsRange === arg0.type || cElementType.cell === arg0.type || cElementType.cell3D === arg0.type){
+				res = new cNumber(1);
+			}else if(cElementType.cellsRange3D === arg0.type){
+				var sheet1 = arg0.wsFrom.index;
+				var sheet2 = arg0.wsTo.index;
+				res = new cNumber(Math.abs(sheet2 - sheet1) + 1);
+			}else{
+				res = new cError(cErrorType.not_available);
+			}
+		}
+		return this.value = res;
+
 	};
 
 	/**

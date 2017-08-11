@@ -3156,8 +3156,12 @@ function DrawingObjects() {
 
     _this.rebuildChartGraphicObjects = function(data)
     {
-        if(!worksheet)
+        if(!worksheet){
             return;
+        }
+        if(data.length === 0){
+            return;
+        }
         AscFormat.ExecuteNoHistory(function(){
             var wsViews = Asc["editor"].wb.wsViews;
             var changedArr = [];

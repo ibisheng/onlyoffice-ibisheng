@@ -339,6 +339,11 @@ CInlineLevelSdt.prototype.FindNextFillingForm = function(isNext, isCurrent, isSt
 
 	return null;
 };
+CInlineLevelSdt.prototype.GetAllContentControls = function(arrContentControls)
+{
+	arrContentControls.push(this);
+	CParagraphContentWithParagraphLikeContent.prototype.GetAllContentControls.apply(this, arguments);
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Выставление настроек
 //----------------------------------------------------------------------------------------------------------------------

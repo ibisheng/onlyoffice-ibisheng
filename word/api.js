@@ -435,6 +435,9 @@
 			while (this.current < this.documents.length) // no recursion
 			{
 				var _current = this.documents[this.current];
+				if (undefined === _current["Props"])
+					_current["Props"] = {};
+
 				var _isLocked = false;
 				if ((_current["Url"] !== undefined || _current["Script"] !== undefined) && undefined !== _current["Props"]["InternalId"])
 				{
@@ -517,21 +520,45 @@
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current["Script"] + "\n})();";
 						eval(_script);
 
-						if (_isReplaced)
+						if (AscCommonWord.sdttype_BlockLevel === _blockStd.GetContentControlType())
 						{
-							if (_blockStd.Content.Get_ElementsCount() > 1)
-								_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+							if (_isReplaced)
+							{
+								if (_blockStd.Content.Get_ElementsCount() > 1)
+									_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
 
-							_blockStd.MoveCursorToStartPos(false);
+								_blockStd.MoveCursorToStartPos(false);
+							}
+							else
+							{
+								if (_blockStd.Content.Get_ElementsCount() > 1)
+								{
+									_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+									_blockStd.MoveCursorToEndPos(false, false);
+								}
+								LogicDocument.MoveCursorRight(false, false, true);
+							}
 						}
 						else
 						{
-							if (_blockStd.Content.Get_ElementsCount() > 1)
+							if (_isReplaced)
 							{
-								_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
-								_blockStd.MoveCursorToEndPos(false, false);
+								if (_blockStd.GetElementsCount() > 1)
+									_blockStd.Remove_FromContent(_blockStd.GetElementsCount() - 1, 1);
+
+								_blockStd.MoveCursorToStartPos();
+								_blockStd.SetThisElementCurrent();
 							}
-							LogicDocument.MoveCursorRight(false, false, true);
+							else
+							{
+								if (_blockStd.Content.GetElementsCount() > 1)
+								{
+									_blockStd.Remove_FromContent(_blockStd.GetElementsCount() - 1, 1);
+									_blockStd.MoveCursorToEndPos();
+									_blockStd.SetThisElementCurrent();
+								}
+								LogicDocument.MoveCursorRight(false, false, true);
+							}
 						}
 
 						var _worker = _api.__content_control_worker;
@@ -1467,9 +1494,8 @@ background-repeat: no-repeat;\
 			}
 			if (t.ParcedDocument) {
 				if (isStartEvent) {
-					AscCommon.CollaborativeEditing.Start_CollaborationEditing();
+					t.WordControl.m_oLogicDocument.StartCollaborationEditing();
 					t.asc_setDrawCollaborationMarks(true);
-					t.WordControl.m_oLogicDocument.DrawingDocument.Start_CollaborationEditing();
 					if(window['AscCommon'].g_clipboardBase && AscCommon.CollaborativeEditing.m_bFast){
 						window['AscCommon'].g_clipboardBase.SpecialPasteButton_Hide();
 					}
@@ -1491,7 +1517,7 @@ background-repeat: no-repeat;\
 			if (t.canUnlockDocument) {
 				t.canStartCoAuthoring = false;
 			} else {
-				AscCommon.CollaborativeEditing.End_CollaborationEditing();
+				t.WordControl.m_oLogicDocument.EndCollaborationEditing();
 				t.asc_setDrawCollaborationMarks(false);
 			}
 		};
@@ -2435,7 +2461,7 @@ background-repeat: no-repeat;\
 						"url"           : this.documentUrl,
 						"title"         : this.documentTitle,
 						"codepage"      : option.asc_getCodePage(),
-						"nobase64"      : Asc.c_nNoBase64
+						"nobase64"      : true
 					};
 					sendCommand(this, null, rData);
 				}
@@ -2456,7 +2482,7 @@ background-repeat: no-repeat;\
 						"url": this.documentUrl,
 						"title": this.documentTitle,
 						"password": option.asc_getPassword(),
-						"nobase64": Asc.c_nNoBase64
+						"nobase64": true
 					};
 
 					sendCommand(this, null, v);
@@ -2515,14 +2541,15 @@ background-repeat: no-repeat;\
 			t.insertDocumentUrlsData.imageMap = url;
 			AscCommon.loadFileContent(url['output.bin'], function(httpRequest)
 			{
-				if (null === httpRequest)
+				var stream;
+				if (null === httpRequest || !(stream = AscCommon.initStreamFromResponse(httpRequest)))
 				{
 					t.endInsertDocumentUrls();
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
-				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + httpRequest.responseText, undefined, undefined, true);
-			});
+				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, undefined, undefined, undefined, true, stream);
+			}, "arraybuffer");
 		}
 		else
 		{
@@ -6844,6 +6871,7 @@ background-repeat: no-repeat;\
 		}
 		// Меняем тип состояния (на сохранение)
 		this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Save;
+		var isNoBase64 = typeof ArrayBuffer !== 'undefined';
 
 		var dataContainer               = {data : null, part : null, index : 0, count : 0};
 		var oAdditionalData             = {};
@@ -6854,7 +6882,7 @@ background-repeat: no-repeat;\
 		oAdditionalData["outputformat"] = filetype;
 		oAdditionalData["title"]        = AscCommon.changeFileExtention(this.documentTitle, AscCommon.getExtentionByFormat(filetype), Asc.c_nMaxDownloadTitleLen);
 		oAdditionalData["savetype"]     = AscCommon.c_oAscSaveTypes.CompleteAll;
-		oAdditionalData["nobase64"]     = Asc.c_nNoBase64;
+		oAdditionalData["nobase64"]     = isNoBase64;
 		if ('savefromorigin' === command)
 		{
 			oAdditionalData["format"] = this.documentFormat;
@@ -6870,7 +6898,7 @@ background-repeat: no-repeat;\
 		else if (null == options.oDocumentMailMerge && c_oAscFileType.PDF === filetype)
 		{
 			var dd             = this.WordControl.m_oDrawingDocument;
-			dataContainer.data = dd.ToRendererPart(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
+			dataContainer.data = dd.ToRendererPart(isNoBase64);
 			//console.log(oAdditionalData["data"]);
 		}
 		else if (c_oAscFileType.JSON === filetype)
@@ -6929,7 +6957,7 @@ background-repeat: no-repeat;\
 				oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(oLogicDocument, false, true);
 			else
 				oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(oLogicDocument);
-			dataContainer.data = oBinaryFileWriter.Write(Asc.c_nNoBase64 && typeof ArrayBuffer !== 'undefined');
+			dataContainer.data = oBinaryFileWriter.Write(isNoBase64);
 		}
 		if (null != options.oMailMergeSendData)
 		{
@@ -7556,7 +7584,9 @@ background-repeat: no-repeat;\
 			oLogicDocument.Recalculate();
 			oLogicDocument.Document_UpdateInterfaceState();
 			oLogicDocument.Document_UpdateSelectionState();
+			return true;
 		}
+		return false;
 	};
 	asc_docs_api.prototype.asc_SetContentControlProperties = function(oContentControlPr, Id)
 	{
@@ -7749,31 +7779,18 @@ background-repeat: no-repeat;\
 		var openParams        = {checkFileSize : /*this.isMobileVersion*/false, charCount : 0, parCount : 0};
 		var oBinaryFileReader = new AscCommonWord.BinaryFileReader(this.WordControl.m_oLogicDocument, openParams);
 
-		if (undefined === version)
+		if (undefined !== version)
+			AscCommon.CurFileVersion = version;
+		
+		if (oBinaryFileReader.Read(base64File))
 		{
-			if (oBinaryFileReader.Read(base64File))
-			{
-				g_oIdCounter.Set_Load(false);
-				this.LoadedObject = 1;
+			g_oIdCounter.Set_Load(false);
+			this.LoadedObject = 1;
 
-				this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-			}
-			else
-				this.sendEvent("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
+			this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
 		}
 		else
-		{
-			AscCommon.CurFileVersion = version;
-			if (oBinaryFileReader.ReadData(base64File))
-			{
-				g_oIdCounter.Set_Load(false);
-				this.LoadedObject = 1;
-
-				this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-			}
-			else
-				this.sendEvent("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
-		}
+			this.sendEvent("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
 
 		if (window["NATIVE_EDITOR_ENJINE"] === true && undefined != window["native"])
 		{
@@ -7960,9 +7977,9 @@ background-repeat: no-repeat;\
 		var oBinaryFileWriter = new AscCommonWord.BinaryFileWriter(this.WordControl.m_oLogicDocument);
 		var _memory           = oBinaryFileWriter.memory;
 
-		oBinaryFileWriter.Write2();
+		oBinaryFileWriter.Write(true);
 
-		var _header = AscCommon.c_oSerFormat.Signature + ";v" + AscCommon.c_oSerFormat.Version + ";" + _memory.GetCurPosition() + ";";
+		var _header = AscCommon.c_oSerFormat.Signature + ";v" + Asc.c_nVersionNoBase64 + ";" + _memory.GetCurPosition() + ";";
 		window["native"]["Save_End"](_header, _memory.GetCurPosition());
 
 		return _memory.ImData.data;
@@ -8215,6 +8232,8 @@ background-repeat: no-repeat;\
 		}
 
 		var _obj = this.asc_AddContentControl(type, _content_control_pr);
+		if (!_obj)
+			return undefined;
 		return {"Tag" : _obj.Tag, "Id" : _obj.Id, "Lock" : _obj.Lock, "InternalId" : _obj.InternalId};
 	};
 	window["asc_docs_api"].prototype["pluginMethod_RemoveContentControl"] = function(id)

@@ -244,7 +244,20 @@ window["DesktopOfflineAppDocumentSignatures"] = function(_json)
 
 	_editor.signatures = [];
 
-	var _signatures = JSON.parse(_json);
+	var _signatures = null;
+
+	try
+	{
+		_signatures = JSON.parse(_json);
+	}
+	catch (err)
+	{
+		return;
+	}
+
+	if (!_signatures)
+		return;
+
 	var _count = _signatures["count"];
 	var _data = _signatures["data"];
 	var _sign;

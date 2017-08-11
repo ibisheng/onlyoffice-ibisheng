@@ -199,13 +199,8 @@
 		{
 			t.isLoadFullApi = true;
 
-			if (t.DocInfo && t.DocInfo.get_OfflineApp())
-			{
-				t._OfflineAppDocumentStartLoad();
-			}
-
 			t._onEndLoadSdk();
-			t.onEndLoadFile(null);
+			t.onEndLoadDocInfo();
 		});
 
 		var oldOnError = window.onerror;
@@ -252,6 +247,7 @@
 	};
 	baseEditorsApi.prototype.asc_setDocInfo                  = function(oDocInfo)
 	{
+		var oldInfo = this.DocInfo;
 		if (oDocInfo)
 		{
 			this.DocInfo = oDocInfo;
@@ -284,6 +280,10 @@
 		if (undefined !== window["AscDesktopEditor"] && offlineMode != this.documentUrl)
 		{
 			window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
+		}
+
+		if (!oldInfo) {
+			this.onEndLoadDocInfo();
 		}
 	};
 	baseEditorsApi.prototype.asc_enableKeyEvents             = function(isEnabled, isFromInput)
@@ -438,7 +438,7 @@
 				"format"        : this.documentFormat,
 				"url"           : this.documentUrl,
 				"title"         : this.documentTitle,
-				"nobase64"      : Asc.c_nNoBase64
+				"nobase64"      : true
 			};
 			if (versionHistory)
 			{
@@ -1038,13 +1038,24 @@
 	baseEditorsApi.prototype.openDocumentFromZip  = function()
 	{
 	};
+	baseEditorsApi.prototype.onEndLoadDocInfo = function()
+	{
+		if (this.isLoadFullApi && this.DocInfo)
+		{
+			if (this.DocInfo.get_OfflineApp())
+			{
+				this._OfflineAppDocumentStartLoad();
+			}
+			this.onEndLoadFile(null);
+		}
+	};
 	baseEditorsApi.prototype.onEndLoadFile = function(result)
 	{
 		if (result)
 		{
 			this.openResult = result;
 		}
-		if (this.isLoadFullApi && this.openResult)
+		if (this.isLoadFullApi && this.DocInfo && this.openResult)
 		{
 			this.openDocument(this.openResult);
 			this.openResult = null;

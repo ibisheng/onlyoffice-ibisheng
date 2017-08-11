@@ -10183,8 +10183,11 @@ Paragraph.prototype.Split = function(NewParagraph, Pos)
 	NewParagraph.Correct_Content();
 
 	// Копируем все настройки в новый параграф. Делаем это после того как определили контент параграфов.
-	NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
+	// У нового параграфа настройки конца параграфа делаем, как у старого (происходит в функции CopyPr), а у старого
+	// меняем их на настройки текущего рана.
 	this.CopyPr(NewParagraph);
+	this.TextPr.Clear_Style();
+	this.TextPr.Apply_TextPr(TextPr);
 
 	// Если на данном параграфе заканчивалась секция, тогда переносим конец секции на новый параграф
 	var SectPr = this.Get_SectionPr();
@@ -10256,18 +10259,26 @@ Paragraph.prototype.Concat = function(Para)
  */
 Paragraph.prototype.Continue = function(NewParagraph)
 {
-	// Копируем настройки параграфа
-	this.CopyPr(NewParagraph);
-
 	var TextPr;
-	if (this.bFromDocument)
+	if (this.Is_Empty())
 	{
 		TextPr = this.Get_TextPr(this.Get_EndPos(false));
 	}
 	else
 	{
-		TextPr = this.Get_TextPr(this.Get_EndPos2(false));
+		var EndPos = this.Get_EndPos2(false);
+		var CurPos = this.Get_ParaContentPos(false, false);
+		this.Set_ParaContentPos(EndPos, true, -1, -1);
+		TextPr = this.Get_TextPr(this.Get_ParaContentPos(false, false));
+		this.Set_ParaContentPos(CurPos, false, -1, -1, false);
 	}
+
+	// Копируем настройки параграфа
+	// У нового параграфа настройки конца параграфа делаем, как у старого (происходит в функции CopyPr), а у старого
+	// меняем их на настройки текущего рана.
+	this.CopyPr(NewParagraph);
+	this.TextPr.Clear_Style();
+	this.TextPr.Apply_TextPr(TextPr);
 
 	NewParagraph.Internal_Content_Add(0, new ParaRun(NewParagraph));
 	NewParagraph.Correct_Content();
@@ -10282,8 +10293,6 @@ Paragraph.prototype.Continue = function(NewParagraph)
 			NewParagraph.Content[Pos].Set_Pr(TextPr.Copy());
 	}
 
-	// Копируем настройки знака конца параграфа
-	NewParagraph.TextPr.Value = this.TextPr.Value.Copy();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Undo/Redo функции
