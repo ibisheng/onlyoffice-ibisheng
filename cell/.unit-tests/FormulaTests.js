@@ -2163,6 +2163,17 @@ $( function () {
 
 	} );
 
+	test( "Test: \"SHEETS\"", function () {
+
+		oParser = new parserFormula( "SHEETS(Hi_Temps)", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#NAME?" );
+
+		oParser = new parserFormula( "SHEETS()", "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3 );
+	} );
+
     test( "Test: \"TRIM\"", function () {
 
         oParser = new parserFormula( "TRIM(\"     abc         def      \")", "A2", ws );
