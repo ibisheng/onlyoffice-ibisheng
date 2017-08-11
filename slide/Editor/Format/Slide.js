@@ -1133,7 +1133,8 @@ Slide.prototype =
                 }
                 if(bCoMarksDraw){
                     g.transform3(this.notesShape.transformText);
-                    var Width = this.notesShape.txBody.content.XLimit;
+                    var Width = this.notesShape.txBody.content.XLimit - 2;
+                    Width = Math.max(Width, 1);
                     var Height = this.notesShape.txBody.content.Get_SummaryHeight();
                     g.DrawLockObjectRect(oLock.Get_Type(), 0, 0, Width, Height);
                 }
