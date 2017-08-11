@@ -2432,6 +2432,14 @@
 			oDrawingDocument.ClearCachePages();
 			oDrawingDocument.FirePaint();
 
+			if(oApi.editorId === AscCommon.c_oEditorId.Presentation)
+			{
+				var oCurSlide = oLogicDocument.Slides[oLogicDocument.CurPage];
+				if(oCurSlide && oCurSlide.notesShape && oCurSlide.notesShape.Lock === this)
+				{
+                    oDrawingDocument.Notes_OnRecalculate(oLogicDocument.CurPage, oCurSlide.NotesWidth, oCurSlide.getNotesHeight());
+				}
+			}
 			// TODO: Обновлять интерфейс нужно, потому что мы можем стоять изначально в незалоченном объекте, а тут он
 			//       может быть залочен.
 			var oRevisionsStack = oApi.asc_GetRevisionsChangesStack();
