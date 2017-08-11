@@ -2541,14 +2541,15 @@ background-repeat: no-repeat;\
 			t.insertDocumentUrlsData.imageMap = url;
 			AscCommon.loadFileContent(url['output.bin'], function(httpRequest)
 			{
-				if (null === httpRequest)
+				var stream;
+				if (null === httpRequest || !(stream = AscCommon.initStreamFromResponse(httpRequest)))
 				{
 					t.endInsertDocumentUrls();
 					t.sendEvent("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
 					return;
 				}
-				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, 'docData;' + httpRequest.responseText, undefined, undefined, true);
-			});
+				t.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.Internal, undefined, undefined, undefined, true, stream);
+			}, "arraybuffer");
 		}
 		else
 		{
