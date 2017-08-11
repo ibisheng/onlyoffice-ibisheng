@@ -2608,7 +2608,7 @@ CPresentation.prototype =
                 oSlide = this.Slides[nIndex];
                 if(oSlide){
                     oSlide.setShow(bShow);
-                    this.DrawingDocument.OnRecalculatePage(nIndex, oSlide);//need only for update index label in thumbnails; TODO: remove it
+                    //this.DrawingDocument.OnShowSlide(nIndex, oSlide.isVisible());
                 }
             }
             this.DrawingDocument.OnEndRecalculate(false, false);
