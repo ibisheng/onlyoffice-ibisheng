@@ -4511,7 +4511,7 @@ function CThumbnailsManager()
 				g.b_color1(211, 79, 79, 255);
 
 			var _bounds = g.t("" + (i + 1), (_digit_distance - num_slide_text_width) / 2, (page.top * g_dKoef_pix_to_mm + 3), true);
-			if (!_logicDocument.Slides[i].isVisible())
+			if (_logicDocument.Slides[i] && !_logicDocument.Slides[i].isVisible())
 			{
 				context.lineWidth = 1;
 				context.strokeStyle = "#000000";

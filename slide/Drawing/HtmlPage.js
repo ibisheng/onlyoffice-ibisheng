@@ -2569,6 +2569,9 @@ function CEditorPage(api)
 		if (0 != this.MainScrollsEnabledFlag)
 			return;
 
+		if (oThis.m_oApi.isReporterMode)
+			return;
+
 		if (!this.m_oDrawingDocument.IsEmptyPresentation)
 		{
 			if (this.StartVerticalScroll)
