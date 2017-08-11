@@ -2770,7 +2770,7 @@
 				{
 					return;
 				}
-				var tempRange = worksheet.getRange3(table.Ref.r1, table.Ref.c1, table.Ref.r2, table.Ref.c2);
+				var tempRange = this.worksheet.getRange3(table.Ref.r1, table.Ref.c1, table.Ref.r2, table.Ref.c2);
 				tempRange._foreach(function(cell){
 					cell.setStyle(cell.getCompiledStyle());
 				});

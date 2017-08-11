@@ -6549,11 +6549,12 @@
             }
             else if( c_oSerCellTypes.Formula == type )
             {
-				var oFormulaExt = {aca: null, bx: null, ca: null, del1: null, del2: null, dt2d: null, dtr: null, r1: null, r2: null, ref: null, si: null, t: null, v: null};
+                var cellWithFormula = new AscCommonExcel.CCellWithFormula(ws, oCell.nRow, oCell.nCol);
+				var oFormulaExt = {cell: cellWithFormula, aca: null, bx: null, ca: null, del1: null, del2: null, dt2d: null, dtr: null, r1: null, r2: null, ref: null, si: null, t: null, v: null};
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadFormula(t,l, oFormulaExt);
                 });
-				ws.aFormulaExt.push({cell: oCell, ext: oFormulaExt});
+				ws.aFormulaExt.push(oFormulaExt);
             }
 			else if (c_oSerCellTypes.Value == type) {
 				var val = this.stream.GetDoubleLE();

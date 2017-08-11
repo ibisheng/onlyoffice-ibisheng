@@ -4179,6 +4179,7 @@ function parserFormula( formula, parent, _ws ) {
 	this.isTable = false;
 	this.isInDependencies = false;
 	this.parent = parent;
+	this._index = undefined;
 }
   parserFormula.prototype.getWs = function() {
     return this.ws;
@@ -4293,6 +4294,9 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
   oRes.isParsed = this.isParsed;
   return oRes;
 };
+	parserFormula.prototype.getParent = function() {
+		return this.parent;
+	};
 	parserFormula.prototype.getFormula = function() {
 		return this.Formula;
 	};
@@ -5752,6 +5756,12 @@ parserFormula.prototype.getElementByPos = function(pos) {
   }
   return null;
 };
+	parserFormula.prototype.getIndexNumber = function() {
+		return this._index;
+	};
+	parserFormula.prototype.setIndexNumber = function(val) {
+		this._index = val;
+	};
 
 function parseNum( str ) {
     if ( str.indexOf( "x" ) > -1 || str == "" || str.match( /\s+/ ) )//исключаем запись числа в 16-ричной форме из числа.

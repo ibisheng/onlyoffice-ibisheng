@@ -3433,6 +3433,7 @@ Row.prototype =
 	},
 	saveContent: function(opt_inCaseOfChange) {
 		if (this.index >= 0 && (!opt_inCaseOfChange || this._hasChanged)) {
+			this._hasChanged = false;
 			var sheetMemory = this.ws.rowsData;
 			sheetMemory.checkSize(this.index);
 			var xfSave = this.xfs ? this.xfs.getIndexNumber() : 0;
@@ -3457,6 +3458,9 @@ Row.prototype =
 			}
 		}
 		return res;
+	},
+	setChanged: function(val) {
+		this._hasChanged = val;
 	},
 	isEmpty : function()
 	{
@@ -7447,6 +7451,30 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 		return this.all.length;
 	};
 
+	/**
+	 * @constructor
+	 * @memberOf AscCommonExcel
+	 */
+	function CWorkbookFormulas () {
+		this.all = [];
+	}
+
+	CWorkbookFormulas.prototype.add = function(formula) {
+		var index = formula.getIndexNumber();
+		if (undefined === index) {
+			this.all.push(formula);
+			index = this.all.length;
+			formula.setIndexNumber(index);
+		}
+		return formula;
+	};
+	CWorkbookFormulas.prototype.get = function(index) {
+		return 1 <= index && index <= this.all.length ? this.all[index - 1] : null;
+	};
+	CWorkbookFormulas.prototype.getCount = function() {
+		return this.all.length;
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	var prot;
 	window['Asc'] = window['Asc'] || {};
@@ -7488,6 +7516,7 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].RangeDataManagerElem = RangeDataManagerElem;
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
 	window['AscCommonExcel'].CSharedStrings = CSharedStrings;
+	window['AscCommonExcel'].CWorkbookFormulas = CWorkbookFormulas;
 	window["Asc"]["sparklineGroup"] = window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	prot = sparklineGroup.prototype;
 	prot["asc_getId"] = prot.asc_getId;
