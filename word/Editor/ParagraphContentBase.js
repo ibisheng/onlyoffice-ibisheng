@@ -2946,6 +2946,10 @@ CParagraphContentWithParagraphLikeContent.prototype.AddContentControl = function
 		return oContentControl;
 	}
 };
+CParagraphContentWithParagraphLikeContent.prototype.GetElementsCount = function()
+{
+	return this.Content.length;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------

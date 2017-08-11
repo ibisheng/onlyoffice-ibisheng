@@ -520,21 +520,45 @@
 						var _script = "(function(){ var Api = window.g_asc_plugins.api;\n" + _current["Script"] + "\n})();";
 						eval(_script);
 
-						if (_isReplaced)
+						if (AscCommonWord.sdttype_BlockLevel === _blockStd.GetContentControlType())
 						{
-							if (_blockStd.Content.Get_ElementsCount() > 1)
-								_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+							if (_isReplaced)
+							{
+								if (_blockStd.Content.Get_ElementsCount() > 1)
+									_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
 
-							_blockStd.MoveCursorToStartPos(false);
+								_blockStd.MoveCursorToStartPos(false);
+							}
+							else
+							{
+								if (_blockStd.Content.Get_ElementsCount() > 1)
+								{
+									_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
+									_blockStd.MoveCursorToEndPos(false, false);
+								}
+								LogicDocument.MoveCursorRight(false, false, true);
+							}
 						}
 						else
 						{
-							if (_blockStd.Content.Get_ElementsCount() > 1)
+							if (_isReplaced)
 							{
-								_blockStd.Content.Remove_FromContent(_blockStd.Content.Get_ElementsCount() - 1, 1);
-								_blockStd.MoveCursorToEndPos(false, false);
+								if (_blockStd.GetElementsCount() > 1)
+									_blockStd.Remove_FromContent(_blockStd.GetElementsCount() - 1, 1);
+
+								_blockStd.MoveCursorToStartPos();
+								_blockStd.SetThisElementCurrent();
 							}
-							LogicDocument.MoveCursorRight(false, false, true);
+							else
+							{
+								if (_blockStd.Content.GetElementsCount() > 1)
+								{
+									_blockStd.Remove_FromContent(_blockStd.GetElementsCount() - 1, 1);
+									_blockStd.MoveCursorToEndPos();
+									_blockStd.SetThisElementCurrent();
+								}
+								LogicDocument.MoveCursorRight(false, false, true);
+							}
 						}
 
 						var _worker = _api.__content_control_worker;
