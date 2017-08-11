@@ -7559,7 +7559,9 @@ background-repeat: no-repeat;\
 			oLogicDocument.Recalculate();
 			oLogicDocument.Document_UpdateInterfaceState();
 			oLogicDocument.Document_UpdateSelectionState();
+			return true;
 		}
+		return false;
 	};
 	asc_docs_api.prototype.asc_SetContentControlProperties = function(oContentControlPr, Id)
 	{
