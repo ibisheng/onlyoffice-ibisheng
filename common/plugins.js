@@ -160,7 +160,7 @@
 
 			if (true)
 			{
-				this.api.sendEvent("asc_onPluginClose");
+				this.api.sendEvent("asc_onPluginClose", this.current, this.currentVariation);
 				var _div = document.getElementById("plugin_iframe");
 				if (_div)
 					_div.parentNode.removeChild(_div);
