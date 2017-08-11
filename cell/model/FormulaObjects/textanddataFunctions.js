@@ -1932,7 +1932,7 @@
 		var oArguments = this._prepareArguments(arg, arguments[1]);
 		var argClone = oArguments.args;
 
-		var arg0 = argClone[0].tocString();
+		argClone[0] = argClone[0].tocString();
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {

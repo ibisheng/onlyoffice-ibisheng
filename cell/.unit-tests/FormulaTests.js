@@ -8530,5 +8530,34 @@ $( function () {
 
 	});
 
+	test( "Test: \"UNICODE\"", function () {
+
+		oParser = new parserFormula( 'UNICODE(" ")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 32);
+
+		oParser = new parserFormula( 'UNICODE("B")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 66);
+
+		oParser = new parserFormula( 'UNICODE(0)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 48);
+
+		oParser = new parserFormula( 'UNICODE(1)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 49);
+
+		oParser = new parserFormula( 'UNICODE("true")', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 116);
+
+		oParser = new parserFormula( 'UNICODE(#N/A)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#N/A");
+
+	});
+
+
 	wb.dependencyFormulas.unlockRecal();
 } );

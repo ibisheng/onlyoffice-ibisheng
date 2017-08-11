@@ -49,7 +49,7 @@
 
 	/*new funcions with _xlnf-prefix*/
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
-	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR, cUNICODE);
+	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST);
@@ -61,7 +61,7 @@
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cUNICHAR, cUNICODE, cF_TEST, cFORECAST_ETS,
+	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cUNICHAR, cF_TEST, cFORECAST_ETS,
 		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
 		cMUNIT, cFORMULATEXT);
 
@@ -220,18 +220,6 @@
 
 	cUNICHAR.prototype = Object.create(cBaseFunction.prototype);
 	cUNICHAR.prototype.constructor = cUNICHAR;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cUNICODE() {
-		cBaseFunction.call(this, "UNICODE");
-		this.isXLFN = true;
-	}
-
-	cUNICODE.prototype = Object.create(cBaseFunction.prototype);
-	cUNICODE.prototype.constructor = cUNICODE;
 
 	/**
 	 * @constructor
