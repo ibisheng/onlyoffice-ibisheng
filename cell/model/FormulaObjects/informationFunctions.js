@@ -49,10 +49,11 @@
 	var cArray = AscCommonExcel.cArray;
 	var cBaseFunction = AscCommonExcel.cBaseFunction;
 	var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+	var cElementType = AscCommonExcel.cElementType;
 
 	cFormulaFunctionGroup['Information'] = cFormulaFunctionGroup['Information'] || [];
 	cFormulaFunctionGroup['Information'].push(cERROR_TYPE, cISBLANK, cISERR, cISERROR, cISEVEN, cISFORMULA, cISLOGICAL, cISNA,
-		cISNONTEXT, cISNUMBER, cISODD, cISREF, cISTEXT, cN, cNA, cTYPE);
+		cISNONTEXT, cISNUMBER, cISODD, cISREF, cISTEXT, cN, cNA, cSHEET, cTYPE);
 
 	/**
 	 * @constructor
@@ -545,6 +546,38 @@
 	cNA.prototype.argumentsMax = 0;
 	cNA.prototype.Calculate = function () {
 		return this.value = new cError(cErrorType.not_available);
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cSHEET() {
+		this.name = "SHEET";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cSHEET.prototype = Object.create(cBaseFunction.prototype);
+	cSHEET.prototype.constructor = cSHEET;
+	cSHEET.prototype.argumentsMin = 0;
+	cSHEET.prototype.argumentsMax = 1;
+	cSHEET.prototype.isXLFN = true;
+	cSHEET.prototype.Calculate = function (arg, opt_bbox, opt_defName, ws) {
+
+		var res;
+		if(0 === arg.length){
+			res = new cNumber(ws.nSheetId);
+		}else{
+			var arg0 = arg[0];
+			if(cElementType.error === arg0.type){
+				res = arg0;
+			}else{
+				res = new cNumber(arg[0].ws.nSheetId);
+			}
+		}
+		return this.value = res;
+
 	};
 
 	/**
