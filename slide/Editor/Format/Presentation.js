@@ -3466,7 +3466,7 @@ CPresentation.prototype =
         this.CurPage = PageIndex;
 
 
-
+        var _old_focus = this.FocusOnNotes;
         this.FocusOnNotes = false;
         if ( PageIndex < 0 )
             return;
@@ -3480,7 +3480,9 @@ CPresentation.prototype =
             this.Document_UpdateSelectionState();
         }
         this.Document_UpdateInterfaceState();
-        this.CheckEmptyPlaceholderNotes();
+        if(_old_focus){
+            this.CheckEmptyPlaceholderNotes();
+        }
     },
 
     OnMouseUp : function(e, X, Y, PageIndex)
