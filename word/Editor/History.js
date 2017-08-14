@@ -848,7 +848,7 @@ CHistory.prototype =
 
 	Have_Changes : function(IsNotUserSave)
 	{
-		if (this.Document.IsViewModeInReview())
+		if (!this.Document || this.Document.IsViewModeInReview())
 			return false;
 
 		var checkIndex = (this.Is_UserSaveMode() && !IsNotUserSave) ? this.UserSavedIndex : this.SavedIndex;
