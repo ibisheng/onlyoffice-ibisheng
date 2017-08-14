@@ -3099,6 +3099,11 @@ PasteProcessor.prototype =
 				this._pasteBinaryFromPresentation(base64FromPresentation, bDuplicate);
 				bInsertFromBinary = true;
 			}
+			else if(typeof fromBinary === "object")
+			{
+				this._pasteBinaryFromWord(fromBinary, true);
+				bInsertFromBinary = true;
+			}
 			
 			if(fromBinary)
 			{
