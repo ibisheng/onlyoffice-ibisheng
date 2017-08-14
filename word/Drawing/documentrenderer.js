@@ -202,7 +202,7 @@ function CreateDocumentData(szSrc)
 	var stream = null;
 	if (!isBase64)
     {
-		stream = new CStream(szSrc.data, szSrc.size);
+		stream = new CStream(szSrc, szSrc.length);
 		return stream;
     }
 
