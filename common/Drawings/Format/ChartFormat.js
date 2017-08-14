@@ -1626,11 +1626,21 @@ CDLbl.prototype =
 
     Get_Theme: function()
     {
-        return this.chart.Get_Theme();
+        if(this.chart){
+            return this.chart.Get_Theme();
+        }
+        return null;
+
     },
     Get_ColorMap: function()
     {
-        return this.chart.Get_ColorMap();
+        if(this.chart){
+            return this.chart.Get_ColorMap();
+        }
+        else {
+            return AscFormat.G_O_DEFAULT_COLOR_MAP;
+        }
+
     },
 
     Get_AbsolutePage: function()

@@ -52,7 +52,12 @@ AscDFH.drawingsConstructorsMap[AscDFH.historyitem_Comment_Change] = CCommentData
 
 
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Comment_Position] = function(oClass, value){oClass.x = value.a; oClass.y = value.b;};
-AscDFH.drawingsChangesMap[AscDFH.historyitem_Comment_Change]   = function(oClass, value){oClass.Data = value;};
+AscDFH.drawingsChangesMap[AscDFH.historyitem_Comment_Change]   = function(oClass, value){
+    oClass.Data = value;
+    if(value){
+        editor.sync_ChangeCommentData(oClass.Id, value);
+    }
+};
 AscDFH.drawingsChangesMap[AscDFH.historyitem_Comment_TypeInfo] = function(oClass, value){oClass.m_oTypeInfo = value;};
 
 function ParaComment(Start, Id)
