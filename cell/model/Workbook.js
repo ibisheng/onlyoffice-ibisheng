@@ -4187,6 +4187,7 @@
 		History.Create_NewPoint();
 		History.StartTransaction();
 
+		this.workbook.dependencyFormulas.lockRecal();
 		var offset = { offsetRow : oBBoxTo.r1 - oBBoxFrom.r1, offsetCol : oBBoxTo.c1 - oBBoxFrom.c1 };
 		var intersection = oBBoxFrom.intersectionSimple(oBBoxTo);
 		var oRangeIntersection = null;
@@ -4355,7 +4356,7 @@
 		if(oBBoxTo.c2 >= this.nColsCount)
 			this.nColsCount = oBBoxTo.c2 + 1;
 
-		this.workbook.sortDependency();
+		this.workbook.dependencyFormulas.unlockRecal();
 
 		if(true == this.workbook.bUndoChanges || true == this.workbook.bRedoChanges)
 		{
