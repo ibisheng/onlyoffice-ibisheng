@@ -60,7 +60,7 @@
 	cFormulaFunctionGroup['TextAndData'].push(cASC, cBAHTTEXT, cCHAR, cCLEAN, cCODE, cCONCATENATE, cCONCAT, cDOLLAR,
 		cEXACT, cFIND, cFINDB, cFIXED, cJIS, cLEFT, cLEFTB, cLEN, cLENB, cLOWER, cMID, cMIDB, cNUMBERVALUE, cPHONETIC,
 		cPROPER, cREPLACE, cREPLACEB, cREPT, cRIGHT, cRIGHTB, cSEARCH, cSEARCHB, cSUBSTITUTE, cT, cTEXT, cTEXTJOIN,
-		cTRIM, cUNICODE, cUPPER, cVALUE);
+		cTRIM, cUNICHAR, cUNICODE, cUPPER, cVALUE);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cASC, cBAHTTEXT, cJIS, cPHONETIC);
@@ -1911,6 +1911,50 @@
 			AscCommon.rx_space.test($2[$1 + 1]) ? res = "" : res = $2[$1];
 			return res;
 		}).replace(/^\s|\s$/g, ""))
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cUNICHAR() {
+		this.name = "UNICHAR";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cUNICHAR.prototype = Object.create(cBaseFunction.prototype);
+	cUNICHAR.prototype.constructor = cUNICHAR;
+	cUNICHAR.prototype.argumentsMin = 1;
+	cUNICHAR.prototype.argumentsMax = 1;
+	cUNICHAR.prototype.isXLFN = true;
+	cUNICHAR.prototype.Calculate = function (arg) {
+		var oArguments = this._prepareArguments(arg, arguments[1]);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		function _func(argArray) {
+			var num = parseInt(argArray[0]);
+			if(isNaN(num) || num <= 0 || num > 1114111){
+				return new cError(cErrorType.wrong_value_type);
+			}
+
+			var res = String.fromCharCode(num);
+			if("" === res){
+				return new cError(cErrorType.wrong_value_type);
+			}
+
+
+			return new cString(res);
+		}
+
+		return this.value = this._findArrayInNumberArguments(oArguments, _func, true);
 	};
 
 	/**

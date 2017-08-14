@@ -1242,7 +1242,7 @@ Slide.prototype =
 
     showComment: function(Id, x, y)
     {
-        editor.sync_HideComment();
+        //editor.sync_HideComment();
         editor.sync_ShowComment(Id, x, y );
     },
 

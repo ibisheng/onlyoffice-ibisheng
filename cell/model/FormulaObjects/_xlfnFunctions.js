@@ -49,7 +49,7 @@
 
 	/*new funcions with _xlnf-prefix*/
 	cFormulaFunctionGroup['TextAndData'] = cFormulaFunctionGroup['TextAndData'] || [];
-	cFormulaFunctionGroup['TextAndData'].push(cDBCS, cUNICHAR);
+	cFormulaFunctionGroup['TextAndData'].push(cDBCS);
 	cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 	cFormulaFunctionGroup['Statistical'].push(cF_TEST, cFORECAST_ETS, cFORECAST_ETS_CONFINT,
 		cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST);
@@ -61,7 +61,7 @@
 	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
-	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cUNICHAR, cF_TEST, cFORECAST_ETS,
+	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cF_TEST, cFORECAST_ETS,
 		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
 		cMUNIT, cFORMULATEXT);
 
@@ -208,18 +208,6 @@
 
 	cQUERYSTRING.prototype = Object.create(cBaseFunction.prototype);
 	cQUERYSTRING.prototype.constructor = cQUERYSTRING;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cUNICHAR() {
-		cBaseFunction.call(this, "UNICHAR");
-		this.isXLFN = true;
-	}
-
-	cUNICHAR.prototype = Object.create(cBaseFunction.prototype);
-	cUNICHAR.prototype.constructor = cUNICHAR;
 
 	/**
 	 * @constructor

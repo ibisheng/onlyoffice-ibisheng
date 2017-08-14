@@ -4320,17 +4320,37 @@ PasteProcessor.prototype =
 		
 		if(onlyBinary)
 		{
-			if(onlyBinary.indexOf("pptData;") > -1)
+			if(typeof onlyBinary === "object")
 			{
-				base64FromPresentation = onlyBinary.split('pptData;')[1];
+				var prefix = String.fromCharCode(onlyBinary[0], onlyBinary[1], onlyBinary[2], onlyBinary[3])
+
+				if("PPTY" === prefix)
+				{
+					base64FromPresentation = onlyBinary;
+				}
+				else if("DOCY" === prefix)
+				{
+					base64FromWord = onlyBinary;
+				}
+				else if("XLSY" === prefix)
+				{
+					base64FromExcel = onlyBinary;
+				}
 			}
-			else if(onlyBinary.indexOf("docData;") > -1)
+			else
 			{
-				base64FromWord = onlyBinary.split('docData;')[1];
-			}
-			else if(onlyBinary.indexOf("xslData;") > -1)
-			{
-				base64FromExcel = onlyBinary.split('xslData;')[1];
+				if(onlyBinary.indexOf("pptData;") > -1)
+				{
+					base64FromPresentation = onlyBinary.split('pptData;')[1];
+				}
+				else if(onlyBinary.indexOf("docData;") > -1)
+				{
+					base64FromWord = onlyBinary.split('docData;')[1];
+				}
+				else if(onlyBinary.indexOf("xslData;") > -1)
+				{
+					base64FromExcel = onlyBinary.split('xslData;')[1];
+				}
 			}
 		}
 		else if(node)
