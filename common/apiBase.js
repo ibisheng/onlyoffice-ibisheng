@@ -838,6 +838,9 @@
 	};
 	baseEditorsApi.prototype.asc_onOpenChartFrame                = function()
 	{
+		if(this.isMobileVersion){
+			return;
+		}
 		this.isOpenedChartFrame = true;
 	};
 	baseEditorsApi.prototype.asc_onCloseChartFrame               = function()
