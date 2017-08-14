@@ -7405,7 +7405,7 @@ background-repeat: no-repeat;\
 		var sDefaultText = AscCommon.translateManager.getValue('Your text here');
 		if (AscCommonWord.sdttype_BlockLevel === nType)
 		{
-			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_Content))
+			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ContentControl_Add))
 			{
 				oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddBlockLevelContentControl);
 
@@ -7434,7 +7434,7 @@ background-repeat: no-repeat;\
 		}
 		else if (AscCommonWord.sdttype_InlineLevel === nType)
 		{
-			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
+			if (false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_ContentControl_Add))
 			{
 				oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddInlineLevelContentControl);
 
