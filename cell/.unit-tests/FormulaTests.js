@@ -8558,6 +8558,30 @@ $( function () {
 
 	});
 
+	test( "Test: \"UNICHAR\"", function () {
+
+		oParser = new parserFormula( 'UNICHAR(66)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "B");
+
+		oParser = new parserFormula( 'UNICHAR(32)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), " ");
+
+		oParser = new parserFormula( 'UNICHAR(0)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!");
+
+		oParser = new parserFormula( 'UNICHAR(48)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "0");
+
+		oParser = new parserFormula( 'UNICHAR(49)', "AA2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "1");
+
+	});
+
 
 	wb.dependencyFormulas.unlockRecal();
 } );
