@@ -725,7 +725,10 @@ function BinaryPPTYLoader()
             if(this.presentation.notesMasters.length === 0)
             {
                 this.presentation.notesMasters[0] = AscCommonSlide.CreateNotesMaster();
-                this.presentation.notesMasters[0].setTheme(this.presentation.themes[0]);
+                var oNotesTheme = this.presentation.themes[0].createDuplicate();
+                oNotesTheme.presentation = this.presentation;
+                this.presentation.themes.push(oNotesTheme);
+                this.presentation.notesMasters[0].setTheme(oNotesTheme);
             }
             var _slides = this.presentation.Slides;
             var _slide;

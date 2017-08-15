@@ -216,7 +216,7 @@
         oCNvPr.setName("Date Placeholder 2");
         oPh = new AscFormat.Ph();
         oPh.setType(AscFormat.phType_dt);
-        oPh.setIdx(1);
+        oPh.setIdx(2 + "");
         oNvSpPr.nvPr.setPh(oPh);
         oSp.setNvSpPr(oNvSpPr);
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
@@ -258,7 +258,7 @@
         oCNvPr.setName("Date Placeholder 2");
         oPh = new AscFormat.Ph();
         oPh.setType(AscFormat.phType_dt);
-        oPh.setIdx(1);
+        oPh.setIdx(3 + "");
         oNvSpPr.nvPr.setPh(oPh);
         oSp.setNvSpPr(oNvSpPr);
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
@@ -300,7 +300,7 @@
         oCNvPr.setName("Notes Placeholder 4");
         oPh = new AscFormat.Ph();
         oPh.setType(AscFormat.phType_body);
-        oPh.setIdx(1);
+        oPh.setIdx(1 + "");
         oPh.setSz(2);
         oNvSpPr.nvPr.setPh(oPh);
         oSp.setNvSpPr(oNvSpPr);
@@ -339,7 +339,7 @@
         oCNvPr.setName("Footer Placeholder 5");
         oPh = new AscFormat.Ph();
         oPh.setType(AscFormat.phType_ftr);
-        oPh.setIdx(4);
+        oPh.setIdx(4 + "");
         oPh.setSz(2);
         oNvSpPr.nvPr.setPh(oPh);
         oSp.setNvSpPr(oNvSpPr);
@@ -382,7 +382,7 @@
         oCNvPr.setName("Slide Number Placeholder 6");
         oPh = new AscFormat.Ph();
         oPh.setType(AscFormat.phType_sldNum);
-        oPh.setIdx(5);
+        oPh.setIdx(10 + "");
         oPh.setSz(2);
         oNvSpPr.nvPr.setPh(oPh);
         oSp.setNvSpPr(oNvSpPr);
