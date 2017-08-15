@@ -1744,6 +1744,9 @@ CT_PivotCacheDefinition.prototype.getFields = function () {
 CT_PivotCacheDefinition.prototype.getRecords = function () {
 	return this.cacheRecords && this.cacheRecords.r;
 };
+CT_PivotCacheDefinition.prototype.isValidCacheSource = function () {
+	return this.cacheSource && this.cacheSource.type === c_oAscSourceType.Worksheet;
+};
 function CT_PivotCacheRecords() {
 //Attributes
 	this.count = null;

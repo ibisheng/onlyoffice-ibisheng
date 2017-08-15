@@ -12561,6 +12561,12 @@
 
 		var widthButtonPx = 17;
 		var heightButtonPx = 17;
+		if (AscBrowser.isRetina)
+		{
+			widthButtonPx = AscCommon.AscBrowser.convertToRetinaValue(widthButtonPx, true);
+			heightButtonPx = AscCommon.AscBrowser.convertToRetinaValue(heightButtonPx, true);
+		}
+
 		var widthBorder = 1;
 
 		var scaleIndex = 1;
@@ -12613,7 +12619,7 @@
 				var x = Math.round(r.x);
 				var y = Math.round(r.y);
 				
-				var heightArrow1 = Math.round(heightArrow * scaleFactor - 1);
+				var heightArrow1 = Math.round(heightArrow * scaleFactor * scaleIndex - 1);
 				var height = Math.round(3 * scaleIndex * scaleFactor);
 				var diffY = 0;
 				for(var i = 0; i < height; i++)
@@ -12653,7 +12659,7 @@
             x = Math.round((x) / width_1px) * width_1px;
             y = Math.round((y) / height_1px) * height_1px;
             var heightLine = Math.round(height);
-			var heightCleanLine = heightLine - 4 + 2;
+			var heightCleanLine = heightLine - 2;
 
 			ctx.beginPath();
 
@@ -12773,6 +12779,11 @@
 			scaleIndex = rowHeight / height;
 			width = width * scaleIndex;
 			height = rowHeight;
+		}
+
+		if(AscBrowser.isRetina)
+		{
+			scaleIndex *= 2;
 		}
 
 		_drawButton(x1 + diffX, y1 + diffY);
