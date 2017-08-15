@@ -4191,6 +4191,36 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed( 13 ) - 0, 10.6072530864198);
 	} );
 
+	test( "FORMULATEXT", function () {
+		wb.dependencyFormulas.unlockRecal();
+
+		ws.getRange2( "S101" ).setValue( "=TODAY()" );
+		ws.getRange2( "S102" ).setValue( "" );
+		ws.getRange2( "S103" ).setValue( "=1+1" );
+
+		oParser = new parserFormula( "FORMULATEXT(S101)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "=TODAY()" );
+
+		oParser = new parserFormula( "FORMULATEXT(S101:S102)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "=TODAY()" );
+
+		oParser = new parserFormula( "FORMULATEXT(S102)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#N/A" );
+
+		oParser = new parserFormula( "FORMULATEXT(S100:105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( "FORMULATEXT(S103)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "=1+1" );
+
+		wb.dependencyFormulas.lockRecal();
+	} );
+
     test( "Test: \"FREQUENCY\"", function () {
 
         ws.getRange2( "A202" ).setValue( "79" );
