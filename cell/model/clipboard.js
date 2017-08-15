@@ -2960,8 +2960,17 @@
 				var coverDocument = documentContentBounds.getBounds(0,0, documentContent);
 				this._parseChildren(coverDocument);
 				
-				
-				this.aResult.props.fontsNew = this.fontsNew;
+				var newFonts = this.fontsNew;
+				if(pasteData.fonts && pasteData.fonts.length)
+				{
+					newFonts = {};
+					for(var i = 0; i < pasteData.fonts.length; i++)
+					{
+						newFonts[pasteData.fonts[i].name] = 1;
+					}
+				}
+
+				this.aResult.props.fontsNew = newFonts;
 				this.aResult.props.rowSpanSpCount = 0;
 				this.aResult.props.cellCount = coverDocument.width;
 				this.aResult.props._images = pasteData.images && pasteData.images.length ? pasteData.images : this.aResult.props._images;
