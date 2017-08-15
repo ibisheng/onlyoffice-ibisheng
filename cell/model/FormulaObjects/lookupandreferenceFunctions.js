@@ -329,6 +329,7 @@
 	cFORMULATEXT.prototype.constructor = cFORMULATEXT;
 	cFORMULATEXT.prototype.argumentsMin = 1;
 	cFORMULATEXT.prototype.argumentsMax = 1;
+	cFORMULATEXT.prototype.isXLFN = true;
 	cFORMULATEXT.prototype.Calculate = function (arg) {
 
 		var arg0 = arg[0];
