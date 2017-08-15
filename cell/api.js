@@ -1006,11 +1006,13 @@ var editor;
 									if (content) {
 										pivotTableCacheDefinition = new CT_PivotCacheDefinition();
 										new openXml.SaxParserBase().parse(content, pivotTableCacheDefinition);
-										wb.pivotCaches[wbPivotCacheXml.cacheId] = pivotTableCacheDefinition;
-										if (pivotTableCacheDefinition.id) {
-											var partPivotTableCacheRecords = pivotTableCacheDefinitionPart.getPartById(
-												pivotTableCacheDefinition.id);
-											return partPivotTableCacheRecords.getDocumentContent();
+										if (pivotTableCacheDefinition.isValidCacheSource()) {
+											wb.pivotCaches[wbPivotCacheXml.cacheId] = pivotTableCacheDefinition;
+											if (pivotTableCacheDefinition.id) {
+												var partPivotTableCacheRecords = pivotTableCacheDefinitionPart.getPartById(
+													pivotTableCacheDefinition.id);
+												return partPivotTableCacheRecords.getDocumentContent();
+											}
 										}
 									}
 								}).then(function (content) {
@@ -1047,8 +1049,8 @@ var editor;
 											var cacheDefinition = wb.pivotCaches[pivotTable.cacheId];
 											if (cacheDefinition) {
 												pivotTable.cacheDefinition = cacheDefinition;
+												ws.pivotTables.push(pivotTable);
 											}
-											ws.pivotTables.push(pivotTable);
 										}
 									}
 									wsIndex++;
