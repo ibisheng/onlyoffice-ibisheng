@@ -2767,9 +2767,9 @@
 		if(null != wsFrom.oAllCol)
 			this.oAllCol = wsFrom.oAllCol.clone(this);
 
-		//todo renameParams
+		//copy row/cell data
 		this.rowsData = wsFrom.rowsData.clone();
-		this._forEachColData(function(sheetMemory, index){
+		wsFrom._forEachColData(function(sheetMemory, index){
 			t.cellsByCol[index] = sheetMemory.clone();
 		});
 
@@ -2805,6 +2805,19 @@
 			this.sheetPr = wsFrom.sheetPr.clone();
 
 		this.selectionRange = wsFrom.selectionRange.clone(this);
+
+		//change cell formulas
+		this._forEachCell(function(cell) {
+			var formula = cell.getFormulaParsed();
+			if (formula) {
+				var tempFormula = formula.clone(null, null, t);
+				tempFormula.renameSheetCopy(renameParams);
+				var newFormulaParent = new CCellWithFormula(t, cell.nRow, cell.nCol);
+				var newFormula = new parserFormula(tempFormula.assemble(true), newFormulaParent, t);
+				cell.setFormulaInternal(newFormula);
+				t.workbook.dependencyFormulas.addToBuildDependencyCell(cell);
+			}
+		});
 
 		return renameParams;
 	};
@@ -3479,7 +3492,6 @@
 		var offset = {offsetRow: nDif, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
-		this._updateFormulasParents(start, 0, gc_nMaxRow0, gc_nMaxCol0, offset);
 		var redrawTablesArr = this.autoFilters.insertRows( "delCell", new Asc.Range(0, start, gc_nMaxCol0, stop), c_oAscDeleteOptions.DeleteRows );
 
 		var oDefRowPr = new AscCommonExcel.UndoRedoData_RowProp();
@@ -3492,7 +3504,8 @@
 		}, function(cell){
 			t._removeCell(null, null, cell);
 		});
-		
+
+		this._updateFormulasParents(start, 0, gc_nMaxRow0, gc_nMaxCol0, offset);
 		this.rowsData.deleteRange(start, (-nDif));
 		this._forEachColData(function(sheetMemory) {
 			sheetMemory.deleteRange(start, (-nDif));
@@ -3578,7 +3591,7 @@
 		var offset = { offsetRow: 0, offsetCol: nDif };
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
-		this._updateFormulasParents(0, start, gc_nMaxRow0, gc_nMaxCol0, offset);
+		
 		var redrawTablesArr = this.autoFilters.insertColumn( "delCell",  new Asc.Range(start, 0, stop, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
 
 		var oDefColPr = new AscCommonExcel.UndoRedoData_ColProp();
@@ -3591,6 +3604,7 @@
 		}, function(cell){
 			t._removeCell(null, null, cell);
 		});
+		this._updateFormulasParents(0, start, gc_nMaxRow0, gc_nMaxCol0, offset);
 		this.cellsByCol.splice(start, stop - start + 1);
 		this.aCols.splice(start, stop - start + 1);
 		for(i = start, length = this.aCols.length; i < length; ++i)
@@ -3624,6 +3638,7 @@
 		this._updateFormulasParents(0, index + count, gc_nMaxRow0, gc_nMaxCol0, offset);
 		var redrawTablesArr = this.autoFilters.insertColumn( "insCells",  new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
 
+		this._updateFormulasParents(0, index + count, gc_nMaxRow0, gc_nMaxCol0, offset);
 		var prevCellsByCol = index > 0 ? this.cellsByCol[index - 1] : null;
 		for(var i = 0; i < count; ++i) {
 			var sheetMemory = prevCellsByCol ? prevCellsByCol.clone() : undefined;
@@ -4123,7 +4138,7 @@
 	Worksheet.prototype._initCell=function(cell, nRow, nCol){
 		var t = this;
 		cell.setChanged(true);
-		this._getRow(nRow, function(row) {
+		this._getRowNoEmpty(nRow, function(row) {
 			var oCol = t._getColNoEmptyWithAll(nCol);
 			var xfs = null;
 			if (row && null != row.xfs)
@@ -4365,14 +4380,32 @@
 		if(!copyRange){
 			this.workbook.dependencyFormulas.move(this.Id, oBBoxFrom, offset);
 		}
+		//modify nRowsCount/nColsCount for correct foreach functions
+		if(oBBoxFrom.r2 >= this.nRowsCount)
+			this.nRowsCount = oBBoxFrom.r2 + 1;
+		if(oBBoxFrom.c2 >= this.nColsCount)
+			this.nColsCount = oBBoxFrom.c2 + 1;
+		if(oBBoxTo.r2 >= this.nRowsCount)
+			this.nRowsCount = oBBoxTo.r2 + 1;
+		if(oBBoxTo.c2 >= this.nColsCount)
+			this.nColsCount = oBBoxTo.c2 + 1;
+		
 		var moveCells = function(copyRange, from, to, r1From, r1To, count){
 			var fromData = oThis.getColDataNoEmpty(from);
 			var toData;
 			if(fromData){
 				toData = oThis.getColData(to);
 				toData.copyRange(fromData, r1From, r1To, count);
-				if(!copyRange){
-					fromData.fill(0, r1From, r1From + count);
+				if(!copyRange|| (copyRange && oThis.workbook.bUndoChanges)){
+					if(from !== to) {
+						fromData.fill(0, r1From, r1From + count);
+					} else {
+						if (r1From < r1To) {
+							fromData.fill(0, r1From, Math.min(r1From + count, r1To));
+						} else {
+							fromData.fill(0, Math.max(r1From, r1To + count), r1From + count);
+						}
+					}
 				}
 			} else {
 				toData = oThis.getColDataNoEmpty(to);
@@ -4449,15 +4482,6 @@
 			}
 			History.LocalChange = false;
 		}
-		//расширяем границы
-		if(oBBoxFrom.r2 >= this.nRowsCount)
-			this.nRowsCount = oBBoxFrom.r2 + 1;
-		if(oBBoxFrom.c2 >= this.nColsCount)
-			this.nColsCount = oBBoxFrom.c2 + 1;
-		if(oBBoxTo.r2 >= this.nRowsCount)
-			this.nRowsCount = oBBoxTo.r2 + 1;
-		if(oBBoxTo.c2 >= this.nColsCount)
-			this.nColsCount = oBBoxTo.c2 + 1;
 
 		this.workbook.dependencyFormulas.unlockRecal();
 
@@ -4486,13 +4510,13 @@
 		var offset = {offsetRow: 0, offsetCol: dif};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
-		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		var redrawTablesArr = this.autoFilters.insertColumn( "delCell",  oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftLeft );
 
 		this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell){
 			t._removeCell(null, null, cell);
 		});
 
+		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		var cellsByColLength = this.cellsByCol.length;
 		for (var i = nRight + 1; i < cellsByColLength; ++i) {
 			var sheetMemoryFrom = this.getColDataNoEmpty(i);
@@ -4522,12 +4546,12 @@
 		var offset = {offsetRow: dif, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
-		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		var redrawTablesArr = this.autoFilters.insertRows( "delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
 
 		this.getRange3(oBBox.r1, oBBox.c1, oBBox.r2, oBBox.c2)._foreachNoEmpty(function(cell){
 			t._removeCell(null, null, cell);
 		});
+		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		for (var i = oBBox.c1; i <= oBBox.c2; ++i) {
 			var sheetMemory = this.getColDataNoEmpty(i);
 			if(sheetMemory){
@@ -4551,9 +4575,9 @@
 		var offset = {offsetRow: 0, offsetCol: dif};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
-		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		var redrawTablesArr = this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight, displayNameFormatTable );
 
+		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		var cellsByColLength = this.cellsByCol.length;
 		for (var i = cellsByColLength - 1; i >= nLeft; --i) {
 			var sheetMemoryFrom = this.getColDataNoEmpty(i);
@@ -4601,12 +4625,12 @@
 		var offset = {offsetRow: dif, offsetCol: 0};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oBBox);
-		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		var redrawTablesArr;
 		if (!this.workbook.bUndoChanges && undefined === displayNameFormatTable) {
 			redrawTablesArr = this.autoFilters.insertRows("insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown,
 				displayNameFormatTable);
 		}
+		this._updateFormulasParents(oActualRange.r1, oActualRange.c1, oActualRange.r2, oActualRange.c2, offset);
 		//rowcount
 		for (var i = oBBox.c1; i <= oBBox.c2; ++i) {
 			var sheetMemory = this.getColDataNoEmpty(i);
@@ -6886,6 +6910,7 @@
 				if (cell.formulaParsed) {
 					var DataOld = cell.getValueData();
 					cell.formulaParsed.Formula = eventData.assemble;
+					t.ws.workbook.dependencyFormulas.addToChangedCell(cell);
 					var DataNew = cell.getValueData();
 					if (false == DataOld.isEqual(DataNew)) {
 						History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValueUndo, t.ws.getId(),
@@ -9132,56 +9157,50 @@
 		var aHiddenRow = {};
 		var fAddSortElems = function(oCell, nRow0, nCol0,nRowStart0, nColStart0){
 			//не сортируем сткрытие строки
-			oThis.worksheet._getRowNoEmpty(nRow0, function(row){
-				if(row)
+			if (oThis.worksheet.getRowHidden(nRow0)) {
+				aHiddenRow[nRow0] = 1;
+			} else {
+				if(nLastRow0 < nRow0)
+					nLastRow0 = nRow0;
+				var val = oCell.getValueWithoutFormat();
+
+				//for sort color
+				var colorFillCell, colorsTextCell = null;
+				if(colorFill)
 				{
-					if(row.getHidden())
-						aHiddenRow[nRow0] = 1;
-					else
+					var styleCell = oCell.getStyle();
+					colorFillCell = styleCell !== null && styleCell.fill ? styleCell.fill.bg : null;
+				}
+				else if(colorText)
+				{
+					var value2 = oCell.getValue2();
+					for(var n = 0; n < value2.length; n++)
 					{
-						if(nLastRow0 < nRow0)
-							nLastRow0 = nRow0;
-						var val = oCell.getValueWithoutFormat();
-
-						//for sort color
-						var colorFillCell, colorsTextCell = null;
-						if(colorFill)
+						if(null === colorsTextCell)
 						{
-							var styleCell = oCell.getStyle();
-							colorFillCell = styleCell !== null && styleCell.fill ? styleCell.fill.bg : null;
-						}
-						else if(colorText)
-						{
-							var value2 = oCell.getValue2();
-							for(var n = 0; n < value2.length; n++)
-							{
-								if(null === colorsTextCell)
-								{
-									colorsTextCell = [];
-								}
-
-								colorsTextCell.push(value2[n].format.getColor());
-							}
+							colorsTextCell = [];
 						}
 
-						var nNumber = null;
-						var sText = null;
-						if("" != val)
-						{
-							var nVal = val - 0;
-							if(nVal == val)
-								nNumber = nVal;
-							else
-								sText = val;
-							aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
-						}
-						else if(isSortColor)
-						{
-							aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
-						}
+						colorsTextCell.push(value2[n].format.getColor());
 					}
 				}
-			});
+
+				var nNumber = null;
+				var sText = null;
+				if("" != val)
+				{
+					var nVal = val - 0;
+					if(nVal == val)
+						nNumber = nVal;
+					else
+						sText = val;
+					aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
+				}
+				else if(isSortColor)
+				{
+					aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
+				}
+			}
 		};
 		if(nColFirst0 == nStartCol)
 		{
