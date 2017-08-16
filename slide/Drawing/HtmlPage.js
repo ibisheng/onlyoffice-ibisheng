@@ -854,10 +854,6 @@ function CEditorPage(api)
 				window.editor.sync_endDemonstration();
 			};
 
-			window.addEventListener("beforeunload", function (e) {
-				window.editor.sync_endDemonstration();
-			});
-
 			window.onkeydown = this.onKeyDown;
 			window.onkeyup = this.onKeyUp;
 
@@ -867,6 +863,16 @@ function CEditorPage(api)
 					window.attachEvent('onmessage', this.m_oApi.DemonstrationToReporterMessages);
 				else
 					window.addEventListener('message', this.m_oApi.DemonstrationToReporterMessages, false);
+			}
+		}
+		else
+		{
+			if (window.addEventListener)
+			{
+				window.addEventListener("beforeunload", function (e)
+				{
+					window.editor.EndDemonstration();
+				});
 			}
 		}
 		// --------------------------------------------------------------------------
@@ -2876,6 +2882,12 @@ function CEditorPage(api)
 			{
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
+
+				if (this.m_bIsRuler)
+				{
+					this.UpdateHorRulerBack(true);
+					this.UpdateVerRulerBack(true);
+				}
 				return;
 			}
 		}
@@ -2885,6 +2897,12 @@ function CEditorPage(api)
 			{
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
+
+				if (this.m_bIsRuler)
+				{
+					this.UpdateHorRulerBack(true);
+					this.UpdateVerRulerBack(true);
+				}
 				return;
 			}
 		}
