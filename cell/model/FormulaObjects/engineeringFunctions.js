@@ -1220,11 +1220,507 @@
 				unitConverterArr["LTON"] = {};//Стандартная тонна
 
 				unitConverterArr["LTON"]["brton"] = 0.999999971945867;
+			};
+
+			var generateDistance = function(){
+				/*unitConverterArr["m"] = {};
+
+				unitConverterArr["m"]["mi"] = ;
+				unitConverterArr["m"]["Nmi"] = ;
+				unitConverterArr["m"]["in"] = ;
+				unitConverterArr["m"]["ft"] = ;
+				unitConverterArr["m"]["yd"] = ;
+				unitConverterArr["m"]["ang"] = ;
+				unitConverterArr["m"]["ell"] = ;
+				unitConverterArr["m"]["ly"] = ;
+				unitConverterArr["m"]["parsec"] = ;
+				unitConverterArr["m"]["pc"] = ;
+				unitConverterArr["m"]["Picapt"] = ;
+				unitConverterArr["m"]["Pica"] = ;
+				unitConverterArr["m"]["pica"] = ;
+				unitConverterArr["m"]["survey_mi"] = ;
+
+
+				unitConverterArr["mi"] = {};
+
+				unitConverterArr["mi"]["Nmi"] = ;
+				unitConverterArr["mi"]["in"] = ;
+				unitConverterArr["mi"]["ft"] = ;
+				unitConverterArr["mi"]["yd"] = ;
+				unitConverterArr["mi"]["ang"] = ;
+				unitConverterArr["mi"]["ell"] = ;
+				unitConverterArr["mi"]["ly"] = ;
+				unitConverterArr["mi"]["parsec"] = ;
+				unitConverterArr["mi"]["pc"] = ;
+				unitConverterArr["mi"]["Picapt"] = ;
+				unitConverterArr["mi"]["Pica"] = ;
+				unitConverterArr["mi"]["pica"] = ;
+				unitConverterArr["mi"]["survey_mi"] = ;
+
+
+				unitConverterArr["Nmi"] = {};
+
+				unitConverterArr["Nmi"]["in"] = ;
+				unitConverterArr["Nmi"]["ft"] = ;
+				unitConverterArr["Nmi"]["yd"] = ;
+				unitConverterArr["Nmi"]["ang"] = ;
+				unitConverterArr["Nmi"]["ell"] = ;
+				unitConverterArr["Nmi"]["ly"] = ;
+				unitConverterArr["Nmi"]["parsec"] = ;
+				unitConverterArr["Nmi"]["pc"] = ;
+				unitConverterArr["Nmi"]["Picapt"] = ;
+				unitConverterArr["Nmi"]["Pica"] = ;
+				unitConverterArr["Nmi"]["pica"] = ;
+				unitConverterArr["Nmi"]["survey_mi"] = ;
+
+
+				unitConverterArr["in"] = {};
+
+				unitConverterArr["in"]["ft"] = ;
+				unitConverterArr["in"]["yd"] = ;
+				unitConverterArr["in"]["ang"] = ;
+				unitConverterArr["in"]["ell"] = ;
+				unitConverterArr["in"]["ly"] = ;
+				unitConverterArr["in"]["parsec"] = ;
+				unitConverterArr["in"]["pc"] = ;
+				unitConverterArr["in"]["Picapt"] = ;
+				unitConverterArr["in"]["Pica"] = ;
+				unitConverterArr["in"]["pica"] = ;
+				unitConverterArr["in"]["survey_mi"] = ;
+
+
+				unitConverterArr["ft"] = {};
+
+				unitConverterArr["ft"]["yd"] = ;
+				unitConverterArr["ft"]["ang"] = ;
+				unitConverterArr["ft"]["ell"] = ;
+				unitConverterArr["ft"]["ly"] = ;
+				unitConverterArr["ft"]["parsec"] = ;
+				unitConverterArr["ft"]["pc"] = ;
+				unitConverterArr["ft"]["Picapt"] = ;
+				unitConverterArr["ft"]["Pica"] = ;
+				unitConverterArr["ft"]["pica"] = ;
+				unitConverterArr["ft"]["survey_mi"] = ;
+
+
+				unitConverterArr["yd"] = {};
+
+				unitConverterArr["yd"]["ang"] = ;
+				unitConverterArr["yd"]["ell"] = ;
+				unitConverterArr["yd"]["ly"] = ;
+				unitConverterArr["yd"]["parsec"] = ;
+				unitConverterArr["yd"]["pc"] = ;
+				unitConverterArr["yd"]["Picapt"] = ;
+				unitConverterArr["yd"]["Pica"] = ;
+				unitConverterArr["yd"]["pica"] = ;
+				unitConverterArr["yd"]["survey_mi"] = ;
+
+
+				unitConverterArr["ang"] = {};
+
+				unitConverterArr["ang"]["ell"] = ;
+				unitConverterArr["ang"]["ly"] = ;
+				unitConverterArr["ang"]["parsec"] = ;
+				unitConverterArr["ang"]["pc"] = ;
+				unitConverterArr["ang"]["Picapt"] = ;
+				unitConverterArr["ang"]["Pica"] = ;
+				unitConverterArr["ang"]["pica"] = ;
+				unitConverterArr["ang"]["survey_mi"] = ;
+
+
+				unitConverterArr["ell"] = {};
+
+				unitConverterArr["ell"]["ly"] = ;
+				unitConverterArr["ell"]["parsec"] = ;
+				unitConverterArr["ell"]["pc"] = ;
+				unitConverterArr["ell"]["Picapt"] = ;
+				unitConverterArr["ell"]["Pica"] = ;
+				unitConverterArr["ell"]["pica"] = ;
+				unitConverterArr["ell"]["survey_mi"] = ;
+
+
+				unitConverterArr["ly"] = {};
+
+				unitConverterArr["ly"]["parsec"] = ;
+				unitConverterArr["ly"]["pc"] = ;
+				unitConverterArr["ly"]["Picapt"] = ;
+				unitConverterArr["ly"]["Pica"] = ;
+				unitConverterArr["ly"]["pica"] = ;
+				unitConverterArr["ly"]["survey_mi"] = ;
+
+
+				unitConverterArr["parsec"] = {};
+
+				unitConverterArr["parsec"]["pc"] = ;
+				unitConverterArr["parsec"]["Picapt"] = ;
+				unitConverterArr["parsec"]["Pica"] = ;
+				unitConverterArr["parsec"]["pica"] = ;
+				unitConverterArr["parsec"]["survey_mi"] = ;
+
+
+				unitConverterArr["pc"] = {};
+
+				unitConverterArr["pc"]["Picapt"] = ;
+				unitConverterArr["pc"]["Pica"] = ;
+				unitConverterArr["pc"]["pica"] = ;
+				unitConverterArr["pc"]["survey_mi"] = ;
+
+
+				unitConverterArr["Picapt"] = {};
+
+				unitConverterArr["Picapt"]["Pica"] = ;
+				unitConverterArr["Picapt"]["pica"] = ;
+				unitConverterArr["Picapt"]["survey_mi"] = ;
+
+
+				unitConverterArr["Pica"] = {};
+
+				unitConverterArr["Pica"]["pica"] = ;
+				unitConverterArr["Pica"]["survey_mi"] = ;
+
+
+				unitConverterArr["pica"] = {};
+
+				unitConverterArr["pica"]["survey_mi"] = ;*/
+
+
+				//Picapt parameter do not support by LO
+				unitConverterArr["m"] = {};
+
+				unitConverterArr["m"]["mi"] = 0.000621371192237334;
+				unitConverterArr["m"]["Nmi"] = 0.000539956803455724;
+				unitConverterArr["m"]["in"] = 39.3700787401575;
+				unitConverterArr["m"]["ft"] = 3.28083989501312;
+				unitConverterArr["m"]["yd"] = 1.09361329833771;
+				unitConverterArr["m"]["ang"] = 10000000000;
+				unitConverterArr["m"]["ell"] = 0.8748906;
+				unitConverterArr["m"]["ly"] = 1.05702345577329E-016;
+				unitConverterArr["m"]["parsec"] = 3.240779E-017;
+				unitConverterArr["m"]["pc"] = 3.240779E-017;
+				//unitConverterArr["m"]["Picapt"] = ;
+				unitConverterArr["m"]["Pica"] = 2834.64566929134;
+				unitConverterArr["m"]["pica"] = 236.220472441;
+				unitConverterArr["m"]["survey_mi"] = 0.000621369949494949;
+
+
+				unitConverterArr["mi"] = {};
+
+				unitConverterArr["mi"]["Nmi"] = 0.868976241900648;
+				unitConverterArr["mi"]["in"] = 63360;
+				unitConverterArr["mi"]["ft"] = 5280;
+				unitConverterArr["mi"]["yd"] = 1760;
+				unitConverterArr["mi"]["ang"] = 16093440000000;
+				unitConverterArr["mi"]["ell"] = 1407.9999377664;
+				unitConverterArr["mi"]["ly"] = 0.000000000000170111435640801;
+				unitConverterArr["mi"]["parsec"] = 0.00000000000005215528238976;
+				unitConverterArr["mi"]["pc"] = 0.00000000000005215528238976;
+				unitConverterArr["mi"]["Pica"] = 4561920;
+				unitConverterArr["mi"]["pica"] = 380160.000000089;
+				unitConverterArr["mi"]["survey_mi"] = 0.999998;
+
+
+				unitConverterArr["Nmi"] = {};
+
+				unitConverterArr["Nmi"]["in"] = 72913.3858267717;
+				unitConverterArr["Nmi"]["ft"] = 6076.1154855643;
+				unitConverterArr["Nmi"]["yd"] = 2025.37182852143;
+				unitConverterArr["Nmi"]["ang"] = 18520000000000;
+				unitConverterArr["Nmi"]["ell"] = 1620.2973912;
+				unitConverterArr["Nmi"]["ly"] = 0.000000000000195760744009214;
+				unitConverterArr["Nmi"]["parsec"] = 0.00000000000006001922708;
+				unitConverterArr["Nmi"]["pc"] = 0.00000000000006001922708;
+				unitConverterArr["Nmi"]["Pica"] = 5249763.77952756;
+				unitConverterArr["Nmi"]["pica"] = 437480.314960732;
+				unitConverterArr["Nmi"]["survey_mi"] = 1.15077714646465;
+
+				unitConverterArr["in"] = {};
+
+				unitConverterArr["in"]["ft"] = 0.0833333333333333;
+				unitConverterArr["in"]["yd"] = 0.0277777777777778;
+				unitConverterArr["in"]["ang"] = 254000000;
+				unitConverterArr["in"]["ell"] = 0.02222222124;
+				unitConverterArr["in"]["ly"] = 2.68483957766416E-018;
+				unitConverterArr["in"]["parsec"] = 8.23157866E-019;
+				unitConverterArr["in"]["pc"] = 8.23157866E-019;
+				unitConverterArr["in"]["Pica"] = 72;
+				unitConverterArr["in"]["pica"] = 6.0000000000014;
+				unitConverterArr["in"]["survey_mi"] = 0.0000157827967171717;
+
+
+				unitConverterArr["ft"] = {};
+
+				unitConverterArr["ft"]["yd"] = 0.333333333333333;
+				unitConverterArr["ft"]["ang"] = 3048000000;
+				unitConverterArr["ft"]["ell"] = 0.26666665488;
+				unitConverterArr["ft"]["ly"] = 3.221807493197E-017;
+				unitConverterArr["ft"]["parsec"] = 9.877894392E-018;
+				unitConverterArr["ft"]["pc"] = 9.877894392E-018;
+				unitConverterArr["ft"]["Pica"] = 864;
+				unitConverterArr["ft"]["pica"] = 72.0000000000168;
+				unitConverterArr["ft"]["survey_mi"] = 0.000189393560606061;
+
+
+				unitConverterArr["yd"] = {};
+
+				unitConverterArr["yd"]["ang"] = 9144000000;
+				unitConverterArr["yd"]["ell"] = 0.79999996464;
+				unitConverterArr["yd"]["ly"] = 9.66542247959099E-017;
+				unitConverterArr["yd"]["parsec"] = 2.9633683176E-017;
+				unitConverterArr["yd"]["pc"] = 2.9633683176E-017;
+				unitConverterArr["yd"]["Pica"] = 2592;
+				unitConverterArr["yd"]["pica"] = 216.00000000005;
+				unitConverterArr["yd"]["survey_mi"] = 0.000568180681818182;
+
+
+				unitConverterArr["ang"] = {};
+
+				unitConverterArr["ang"]["ell"] = 0.00000000008748906;
+				unitConverterArr["ang"]["ly"] = 1.05702345577329E-026;
+				unitConverterArr["ang"]["parsec"] = 3.240779E-027;
+				unitConverterArr["ang"]["pc"] = 3.240779E-027;
+				unitConverterArr["ang"]["Pica"] = 0.000000283464566929134;
+				unitConverterArr["ang"]["pica"] = 0.0000000236220472441;
+				unitConverterArr["ang"]["survey_mi"] = 0.000000000000062136994949495;
+
+
+				unitConverterArr["ell"] = {};
+
+				unitConverterArr["ell"]["ly"] = 1.20817786335034E-016;
+				unitConverterArr["ell"]["parsec"] = 3.70421056072611E-017;
+				unitConverterArr["ell"]["pc"] = 3.70421056072611E-017;
+				unitConverterArr["ell"]["Pica"] = 3240.00014320801;
+				unitConverterArr["ell"]["pica"] = 270.000011934064;
+				unitConverterArr["ell"]["survey_mi"] = 0.000710225883664711;
+
+
+				unitConverterArr["ly"] = {};
+
+				unitConverterArr["ly"]["parsec"] = 0.30659480471312;
+				unitConverterArr["ly"]["pc"] = 0.30659480471312;
+				unitConverterArr["ly"]["Pica"] = 2.68172447244094E+019;
+				unitConverterArr["ly"]["pica"] = 2.23477039370131E+018;
+				unitConverterArr["ly"]["survey_mi"] = 5878487805555.55;
+
+
+				unitConverterArr["parsec"] = {};
+
+				unitConverterArr["parsec"]["pc"] = 1;
+				unitConverterArr["parsec"]["Pica"] = 8.74680337440886E+019;
+				unitConverterArr["parsec"]["pica"] = 7.28900281200909E+018;
+				unitConverterArr["parsec"]["survey_mi"] = 19173474942134.3;
+
+
+				unitConverterArr["pc"] = {};
+				unitConverterArr["pc"]["Pica"] = 8.74680337440886E+019;
+				unitConverterArr["pc"]["pica"] = 7.28900281200909E+018;
+				unitConverterArr["pc"]["survey_mi"] = 19173474942134.3;
+
+
+				unitConverterArr["Pica"] = {};
+				unitConverterArr["Pica"]["pica"] = 0.0833333333333528;
+				unitConverterArr["Pica"]["survey_mi"] = 0.000000219205509960718;
+
+
+				unitConverterArr["pica"] = {};
+				unitConverterArr["pica"]["survey_mi"] = 0.00000263046611952801;
 
 			};
 
-			generateWeightAndMass();
+			var generateTime = function(){
+				/*unitConverterArr["yr"] = {};//Год
 
+				unitConverterArr["yr"]["day"] = ;
+				unitConverterArr["yr"]["d"] = ;
+				unitConverterArr["yr"]["hr"] = ;
+				unitConverterArr["yr"]["mn"] = ;
+				unitConverterArr["yr"]["min"] = ;
+				unitConverterArr["yr"]["sec"] = ;
+				unitConverterArr["yr"]["s"] = ;
+
+
+				unitConverterArr["day"] = {};//День
+
+				unitConverterArr["day"]["d"] = ;
+				unitConverterArr["day"]["hr"] = ;
+				unitConverterArr["day"]["mn"] = ;
+				unitConverterArr["day"]["min"] = ;
+				unitConverterArr["day"]["sec"] = ;
+				unitConverterArr["day"]["s"] = ;
+
+
+				unitConverterArr["d"] = {};//День
+
+				unitConverterArr["d"]["hr"] = ;
+				unitConverterArr["d"]["mn"] = ;
+				unitConverterArr["d"]["min"] = ;
+				unitConverterArr["d"]["sec"] = ;
+				unitConverterArr["d"]["s"] = ;
+
+				unitConverterArr["hr"] = {};//Час
+
+				unitConverterArr["hr"]["mn"] = ;
+				unitConverterArr["hr"]["min"] = ;
+				unitConverterArr["hr"]["sec"] = ;
+				unitConverterArr["hr"]["s"] = ;
+
+
+				unitConverterArr["mn"] = {};//Минуты
+
+				unitConverterArr["mn"]["min"] = ;
+				unitConverterArr["mn"]["sec"] = ;
+				unitConverterArr["mn"]["s"] = ;
+
+
+				unitConverterArr["min"] = {};//Минуты
+
+				unitConverterArr["min"]["sec"] = ;
+				unitConverterArr["min"]["s"] = ;
+
+
+				unitConverterArr["sec"] = {};//Секунды
+
+				unitConverterArr["sec"]["s"] = ;*/
+
+				unitConverterArr["yr"]["day"] = 365.25;
+				unitConverterArr["yr"]["d"] = 365.25;
+				unitConverterArr["yr"]["hr"] = 8766;
+				unitConverterArr["yr"]["mn"] = 525960;
+				unitConverterArr["yr"]["min"] = 525960;
+				unitConverterArr["yr"]["sec"] = 31557600;
+				unitConverterArr["yr"]["s"] = 31557600;
+
+
+				unitConverterArr["day"] = {};//День
+
+				unitConverterArr["day"]["d"] = 1;
+				unitConverterArr["day"]["hr"] = 24;
+				unitConverterArr["day"]["mn"] = 1440;
+				unitConverterArr["day"]["min"] = 1440;
+				unitConverterArr["day"]["sec"] = 86400;
+				unitConverterArr["day"]["s"] = 86400;
+
+
+				unitConverterArr["d"] = {};//День
+
+				unitConverterArr["d"]["hr"] = 24;
+				unitConverterArr["d"]["mn"] = 1440;
+				unitConverterArr["d"]["min"] = 1440;
+				unitConverterArr["d"]["sec"] = 86400;
+				unitConverterArr["d"]["s"] = 86400;
+
+
+				unitConverterArr["hr"] = {};//Час
+
+				unitConverterArr["hr"]["mn"] = 60;
+				unitConverterArr["hr"]["min"] = 60;
+				unitConverterArr["hr"]["sec"] = 3600;
+				unitConverterArr["hr"]["s"] = 3600;
+
+
+				unitConverterArr["mn"] = {};//Минуты
+
+				unitConverterArr["mn"]["min"] = 1;
+				unitConverterArr["mn"]["sec"] = 60;
+				unitConverterArr["mn"]["s"] = 60;
+
+
+				unitConverterArr["min"] = {};//Минуты
+
+				unitConverterArr["min"]["sec"] = 60;
+				unitConverterArr["min"]["s"] = 60;
+
+
+				unitConverterArr["sec"] = {};//Секунды
+
+				unitConverterArr["sec"]["s"] = 1;
+			};
+
+			var generatePressure = function(){
+				/*unitConverterArr["Pa"] = {};//Паскаль
+
+				unitConverterArr["Pa"]["p"] = ;
+				unitConverterArr["Pa"]["atm"] = ;
+				unitConverterArr["Pa"]["at"] = ;
+				unitConverterArr["Pa"]["mmHg"] = ;
+				unitConverterArr["Pa"]["psi"] = ;
+				unitConverterArr["Pa"]["Torr"] = ;
+
+
+				unitConverterArr["p"] = {};//Паскаль
+
+				unitConverterArr["p"]["atm"] = ;
+				unitConverterArr["p"]["at"] = ;
+				unitConverterArr["p"]["mmHg"] = ;
+				unitConverterArr["p"]["psi"] = ;
+				unitConverterArr["p"]["Torr"] = ;
+
+
+				unitConverterArr["atm"] = {};//Атмосфера
+
+				unitConverterArr["atm"]["at"] = ;
+				unitConverterArr["atm"]["mmHg"] = ;
+				unitConverterArr["atm"]["psi"] = ;
+				unitConverterArr["atm"]["Torr"] = ;
+
+
+				unitConverterArr["at"] = {};//Атмосфера
+
+				unitConverterArr["at"]["mmHg"] = ;
+				unitConverterArr["at"]["psi"] = ;
+				unitConverterArr["at"]["Torr"] = ;
+
+
+				unitConverterArr["mmHg"] = {};//Миллиметр ртутного столба
+
+				unitConverterArr["mmHg"]["psi"] = ;
+				unitConverterArr["mmHg"]["Torr"] = ;
+
+
+				unitConverterArr["psi"] = {};//Фунт на квадратный дюйм
+
+				unitConverterArr["psi"]["Torr"] = ;*/
+
+
+				//p parameter do not support by LO(p === Pa in MS DOC)
+				unitConverterArr["Pa"] = {};//Паскаль
+
+				//unitConverterArr["Pa"]["p"] = ;
+				unitConverterArr["Pa"]["atm"] = 0.00000986923299998193;
+				unitConverterArr["Pa"]["at"] = 0.00000986923299998193;
+				unitConverterArr["Pa"]["mmHg"] = 0.00750061707998627;
+				unitConverterArr["Pa"]["psi"] = 0.0001450377;
+				unitConverterArr["Pa"]["Torr"] = 0.007500638;
+
+				unitConverterArr["atm"] = {};//Атмосфера
+
+				unitConverterArr["atm"]["at"] = 1;
+				unitConverterArr["atm"]["mmHg"] = 760;
+				unitConverterArr["atm"]["psi"] = 14.6959444569062;
+				unitConverterArr["atm"]["Torr"] = 760.00211972032;
+
+
+				unitConverterArr["at"] = {};//Атмосфера
+
+				unitConverterArr["at"]["mmHg"] = 760;
+				unitConverterArr["at"]["psi"] = 14.6959444569062;
+				unitConverterArr["at"]["Torr"] = 760.00211972032;
+
+
+				unitConverterArr["mmHg"] = {};//Миллиметр ртутного столба
+
+				unitConverterArr["mmHg"]["psi"] = 0.019336769022245;
+				unitConverterArr["mmHg"]["Torr"] = 1.00000278910568;
+
+
+				unitConverterArr["psi"] = {};//Фунт на квадратный дюйм
+
+				unitConverterArr["psi"]["Torr"] = 51.7150920071126;
+			};
+
+			generateWeightAndMass();
+			generateDistance();
+			generateTime();
+			generatePressure();
 		}
 
 		return unitConverterArr;
