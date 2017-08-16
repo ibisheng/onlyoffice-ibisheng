@@ -1717,17 +1717,6 @@
 				unitConverterArr["psi"]["Torr"] = 51.7150920071126;
 			};
 
-			Energy	From_unit or to_unit
-			Joule	"J"
-			Erg	"e"
-			Thermodynamic calorie	"c"
-			IT calorie	"cal"
-			Electron volt	"eV" (or "ev")
-			Horsepower-hour	"HPh" (or "hh")
-			Watt-hour	"Wh" (or "wh")
-			Foot-pound	"flb"
-			BTU	"BTU" (or "btu")
-
 			var generateForceAndEnergy = function(){
 				/*//Force
 				unitConverterArr["N"] = {};//Newton
