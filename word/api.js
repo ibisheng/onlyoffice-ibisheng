@@ -760,6 +760,7 @@
 
 		this.isImageChangeUrl      = false;
 		this.isShapeImageChangeUrl = false;
+		this.textureType           = null;
 
 		this.tmpFontRenderingMode = null;
 		this.FontAsyncLoadType    = 0;
@@ -4476,9 +4477,10 @@ background-repeat: no-repeat;\
 		this.isImageChangeUrl = true;
 		this.asc_addImage();
 	};
-	asc_docs_api.prototype.ChangeShapeImageFromFile = function()
+	asc_docs_api.prototype.ChangeShapeImageFromFile = function(type)
 	{
 		this.isShapeImageChangeUrl = true;
+		this.textureType = type;
 		this.asc_addImage();
 	};
 
@@ -4584,8 +4586,12 @@ background-repeat: no-repeat;\
 				AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
 				AscShapeProp.fill.fill = new asc_CFillBlip();
 				AscShapeProp.fill.fill.asc_putUrl(src);
+				if(this.textureType !== null && this.textureType !== undefined){
+                    AscShapeProp.fill.fill.asc_putType(this.textureType);
+				}
 				this.ImgApply(new asc_CImgProperty({ShapeProperties : AscShapeProp}));
 				this.isShapeImageChangeUrl = false;
+				this.textureType = null;
 			}
 			else if (this.isImageChangeUrl)
 			{
@@ -4637,6 +4643,11 @@ background-repeat: no-repeat;\
 					AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
 					AscShapeProp.fill.fill = new asc_CFillBlip();
 					AscShapeProp.fill.fill.asc_putUrl(src);
+
+                    if(this.textureType !== null && this.textureType !== undefined){
+                        AscShapeProp.fill.fill.asc_putType(this.textureType);
+                    }
+                    this.textureType = null;
 					this.ImgApply(new asc_CImgProperty({ShapeProperties : AscShapeProp}));
 					this.isShapeImageChangeUrl = false;
 				}

@@ -120,6 +120,7 @@ var editor;
     this.isImageChangeUrl = false;
     this.isShapeImageChangeUrl = false;
     this.isTextArtChangeUrl = false;
+    this.textureType = null;
 
 
 	  // Styles sizes
@@ -2704,13 +2705,15 @@ var editor;
     this.asc_addImage();
   };
 
-  spreadsheet_api.prototype.asc_changeShapeImageFromFile = function() {
+  spreadsheet_api.prototype.asc_changeShapeImageFromFile = function(type) {
     this.isShapeImageChangeUrl = true;
+    this.textureType = type;
     this.asc_addImage();
   };
 
-  spreadsheet_api.prototype.asc_changeArtImageFromFile = function() {
+  spreadsheet_api.prototype.asc_changeArtImageFromFile = function(type) {
     this.isTextArtChangeUrl = true;
+    this.textureType = type;
     this.asc_addImage();
   };
 
