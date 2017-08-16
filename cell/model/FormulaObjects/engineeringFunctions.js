@@ -1025,6 +1025,413 @@
 
 	};
 
+	var unitConverterArr = null;
+	function getUnitConverter(){
+		if(null === unitConverterArr){
+
+			unitConverterArr = {};
+			var generateWeightAndMass = function(){
+				//Вес и масса
+				/*unitConverterArr["g"] = {};//грамм
+				unitConverterArr["g"]["sg"] = ;
+				unitConverterArr["g"]["lbm"] = ;
+				unitConverterArr["g"]["u"] = ;
+				unitConverterArr["g"]["ozm"] = ;
+				unitConverterArr["g"]["grain"] = ;
+				unitConverterArr["g"]["cwt"] = ;
+				unitConverterArr["g"]["shweight"] = ;
+				unitConverterArr["g"]["uk_cwt"] = ;
+				unitConverterArr["g"]["lcwt"] = ;
+				unitConverterArr["g"]["hweight"] = ;
+				unitConverterArr["g"]["stone"] = ;
+				unitConverterArr["g"]["ton"] = ;
+				unitConverterArr["g"]["uk_ton"] = ;
+				unitConverterArr["g"]["LTON"] = ;
+				unitConverterArr["g"]["brton"] = ;
+				unitConverterArr["g"]["pica"] = ;
+				unitConverterArr["g"]["survey_mi"] = ;
+
+				unitConverterArr["sg"] = {};//Слэг
+				unitConverterArr["sg"]["lbm"] = ;
+				unitConverterArr["sg"]["u"] = ;
+				unitConverterArr["sg"]["ozm"] = ;
+				unitConverterArr["sg"]["grain"] = ;
+				unitConverterArr["sg"]["cwt"] = ;
+				unitConverterArr["sg"]["shweight"] = ;
+				unitConverterArr["sg"]["uk_cwt"] = ;
+				unitConverterArr["sg"]["lcwt"] = ;
+				unitConverterArr["sg"]["hweight"] = ;
+				unitConverterArr["sg"]["stone"] = ;
+				unitConverterArr["sg"]["ton"] = ;
+				unitConverterArr["sg"]["uk_ton"] = ;
+				unitConverterArr["sg"]["LTON"] = ;
+				unitConverterArr["sg"]["brton"] = ;
+				unitConverterArr["sg"]["pica"] = ;
+				unitConverterArr["sg"]["survey_mi"] = ;
+
+				unitConverterArr["lbm"] = {};//Фунт массы (эвердьюпойс)
+				unitConverterArr["lbm"]["u"] = ;
+				unitConverterArr["lbm"]["ozm"] = ;
+				unitConverterArr["lbm"]["grain"] = ;
+				unitConverterArr["lbm"]["cwt"] = ;
+				unitConverterArr["lbm"]["shweight"] = ;
+				unitConverterArr["lbm"]["uk_cwt"] = ;
+				unitConverterArr["lbm"]["lcwt"] = ;
+				unitConverterArr["lbm"]["hweight"] = ;
+				unitConverterArr["lbm"]["stone"] = ;
+				unitConverterArr["lbm"]["ton"] = ;
+				unitConverterArr["lbm"]["uk_ton"] = ;
+				unitConverterArr["lbm"]["LTON"] = ;
+				unitConverterArr["lbm"]["brton"] = ;
+				unitConverterArr["lbm"]["pica"] = ;
+				unitConverterArr["lbm"]["survey_mi"] = ;
+
+				unitConverterArr["u"] = {};//атомная единица массы
+				unitConverterArr["u"]["ozm"] = ;
+				unitConverterArr["u"]["grain"] = ;
+				unitConverterArr["u"]["cwt"] = ;
+				unitConverterArr["u"]["shweight"] = ;
+				unitConverterArr["u"]["uk_cwt"] = ;
+				unitConverterArr["u"]["lcwt"] = ;
+				unitConverterArr["u"]["hweight"] = ;
+				unitConverterArr["u"]["stone"] = ;
+				unitConverterArr["u"]["ton"] = ;
+				unitConverterArr["u"]["uk_ton"] = ;
+				unitConverterArr["u"]["LTON"] = ;
+				unitConverterArr["u"]["brton"] = ;
+				unitConverterArr["u"]["pica"] = ;
+				unitConverterArr["u"]["survey_mi"] = ;
+
+				unitConverterArr["ozm"] = {};//Унция
+				unitConverterArr["ozm"]["grain"] = ;
+				unitConverterArr["ozm"]["cwt"] = ;
+				unitConverterArr["ozm"]["shweight"] = ;
+				unitConverterArr["ozm"]["uk_cwt"] = ;
+				unitConverterArr["ozm"]["lcwt"] = ;
+				unitConverterArr["ozm"]["hweight"] = ;
+				unitConverterArr["ozm"]["stone"] = ;
+				unitConverterArr["ozm"]["ton"] = ;
+				unitConverterArr["ozm"]["uk_ton"] = ;
+				unitConverterArr["ozm"]["LTON"] = ;
+				unitConverterArr["ozm"]["brton"] = ;
+				unitConverterArr["ozm"]["pica"] = ;
+				unitConverterArr["ozm"]["survey_mi"] = ;
+
+				unitConverterArr["grain"] = {};//Гран
+				unitConverterArr["grain"]["cwt"] = ;
+				unitConverterArr["grain"]["shweight"] = ;
+				unitConverterArr["grain"]["uk_cwt"] = ;
+				unitConverterArr["grain"]["lcwt"] = ;
+				unitConverterArr["grain"]["hweight"] = ;
+				unitConverterArr["grain"]["stone"] = ;
+				unitConverterArr["grain"]["ton"] = ;
+				unitConverterArr["grain"]["uk_ton"] = ;
+				unitConverterArr["grain"]["LTON"] = ;
+				unitConverterArr["grain"]["brton"] = ;
+				unitConverterArr["grain"]["pica"] = ;
+				unitConverterArr["grain"]["survey_mi"] = ;
+
+				unitConverterArr["cwt"] = {};//Американский (короткий) центнер
+				unitConverterArr["cwt"]["shweight"] = ;
+				unitConverterArr["cwt"]["uk_cwt"] = ;
+				unitConverterArr["cwt"]["lcwt"] = ;
+				unitConverterArr["cwt"]["hweight"] = ;
+				unitConverterArr["cwt"]["stone"] = ;
+				unitConverterArr["cwt"]["ton"] = ;
+				unitConverterArr["cwt"]["uk_ton"] = ;
+				unitConverterArr["cwt"]["LTON"] = ;
+				unitConverterArr["cwt"]["brton"] = ;
+				unitConverterArr["cwt"]["pica"] = ;
+				unitConverterArr["cwt"]["survey_mi"] = ;
+
+				unitConverterArr["shweight"] = {};//Американский (короткий) центнер
+				unitConverterArr["shweight"]["uk_cwt"] = ;
+				unitConverterArr["shweight"]["lcwt"] = ;
+				unitConverterArr["shweight"]["hweight"] = ;
+				unitConverterArr["shweight"]["stone"] = ;
+				unitConverterArr["shweight"]["ton"] = ;
+				unitConverterArr["shweight"]["uk_ton"] = ;
+				unitConverterArr["shweight"]["LTON"] = ;
+				unitConverterArr["shweight"]["brton"] = ;
+				unitConverterArr["shweight"]["pica"] = ;
+				unitConverterArr["shweight"]["survey_mi"] = ;
+
+				unitConverterArr["uk_cwt"] = {};//Английский (длинный) центнер
+				unitConverterArr["uk_cwt"]["lcwt"] = ;
+				unitConverterArr["uk_cwt"]["hweight"] = ;
+				unitConverterArr["uk_cwt"]["stone"] = ;
+				unitConverterArr["uk_cwt"]["ton"] = ;
+				unitConverterArr["uk_cwt"]["uk_ton"] = ;
+				unitConverterArr["uk_cwt"]["LTON"] = ;
+				unitConverterArr["uk_cwt"]["brton"] = ;
+				unitConverterArr["uk_cwt"]["pica"] = ;
+				unitConverterArr["uk_cwt"]["survey_mi"] = ;
+
+				unitConverterArr["lcwt"] = {};//Английский (длинный) центнер
+				unitConverterArr["lcwt"]["hweight"] = ;
+				unitConverterArr["lcwt"]["stone"] = ;
+				unitConverterArr["lcwt"]["ton"] = ;
+				unitConverterArr["lcwt"]["uk_ton"] = ;
+				unitConverterArr["lcwt"]["LTON"] = ;
+				unitConverterArr["lcwt"]["brton"] = ;
+				unitConverterArr["lcwt"]["pica"] = ;
+				unitConverterArr["lcwt"]["survey_mi"] = ;
+
+				unitConverterArr["lcwt"] = {};//Английский (длинный) центнер
+				unitConverterArr["lcwt"]["hweight"] = ;
+				unitConverterArr["lcwt"]["stone"] = ;
+				unitConverterArr["lcwt"]["ton"] = ;
+				unitConverterArr["lcwt"]["uk_ton"] = ;
+				unitConverterArr["lcwt"]["LTON"] = ;
+				unitConverterArr["lcwt"]["brton"] = ;
+				unitConverterArr["lcwt"]["pica"] = ;
+				unitConverterArr["lcwt"]["survey_mi"] = ;
+
+				unitConverterArr["hweight"] = {};//Английский (длинный) центнер
+				unitConverterArr["hweight"]["stone"] = ;
+				unitConverterArr["hweight"]["ton"] = ;
+				unitConverterArr["hweight"]["uk_ton"] = ;
+				unitConverterArr["hweight"]["LTON"] = ;
+				unitConverterArr["hweight"]["brton"] = ;
+				unitConverterArr["hweight"]["pica"] = ;
+				unitConverterArr["hweight"]["survey_mi"] = ;
+
+				unitConverterArr["stone"] = {};//Стоун
+				unitConverterArr["stone"]["ton"] = ;
+				unitConverterArr["stone"]["uk_ton"] = ;
+				unitConverterArr["stone"]["LTON"] = ;
+				unitConverterArr["stone"]["brton"] = ;
+				unitConverterArr["stone"]["pica"] = ;
+				unitConverterArr["stone"]["survey_mi"] = ;
+
+				unitConverterArr["ton"] = {};//Тонна
+				unitConverterArr["ton"]["uk_ton"] = ;
+				unitConverterArr["ton"]["LTON"] = ;
+				unitConverterArr["ton"]["brton"] = ;
+				unitConverterArr["ton"]["pica"] = ;
+				unitConverterArr["ton"]["survey_mi"] = ;
+
+				unitConverterArr["uk_ton"] = {};//Стандартная тонна
+				unitConverterArr["uk_ton"]["LTON"] = ;
+				unitConverterArr["uk_ton"]["brton"] = ;
+				unitConverterArr["uk_ton"]["pica"] = ;
+				unitConverterArr["uk_ton"]["survey_mi"] = ;
+
+				unitConverterArr["LTON"] = {};//Стандартная тонна
+				unitConverterArr["LTON"]["brton"] = ;
+				unitConverterArr["LTON"]["pica"] = ;
+				unitConverterArr["LTON"]["survey_mi"] = ;
+
+				unitConverterArr["brton"] = {};//Стандартная тонна
+				unitConverterArr["brton"]["pica"] = ;
+				unitConverterArr["brton"]["survey_mi"] = ;
+
+				unitConverterArr["pica"] = {};//пика
+				unitConverterArr["pica"]["survey_mi"] = ;*/
+
+				unitConverterArr["g"] = {};//грамм
+
+				unitConverterArr["g"]["sg"] = 0.0000685220500053478;
+				unitConverterArr["g"]["lbm"] = 0.00220462291469134;
+				unitConverterArr["g"]["u"] = 6.022137E+023;
+				unitConverterArr["g"]["ozm"] = 0.0352739718003627;
+				unitConverterArr["g"]["grain"] = 15.43236;
+				unitConverterArr["g"]["cwt"] = 0.0000220462262184878;
+				unitConverterArr["g"]["shweight"] = 0.00002204623;
+				unitConverterArr["g"]["uk_cwt"] = 0.0000196841305522212;
+				unitConverterArr["g"]["lcwt"] = 0.0000196841305522212;
+				unitConverterArr["g"]["hweight"] = 0.00001968413;
+				unitConverterArr["g"]["stone"] = 0.000157473;
+				unitConverterArr["g"]["ton"] = 0.000001102311;
+				unitConverterArr["g"]["uk_ton"] = 0.000000984206527611061;
+				unitConverterArr["g"]["LTON"] = 0.000000984206527611061;
+				unitConverterArr["g"]["brton"] = 0.0000009842065;
+
+
+				unitConverterArr["sg"] = {};//Слэг
+
+				unitConverterArr["sg"]["lbm"] = 32.1739194101648;
+				unitConverterArr["sg"]["u"] = 8.78861184032002E+027;
+				unitConverterArr["sg"]["ozm"] = 514.782785944229;
+				unitConverterArr["sg"]["grain"] = 225217.429992179;
+				unitConverterArr["sg"]["cwt"] = 0.321739151364665;
+				unitConverterArr["sg"]["shweight"] = 0.321739206551459;
+				unitConverterArr["sg"]["uk_cwt"] = 0.287267099432737;
+				unitConverterArr["sg"]["lcwt"] = 0.287267099432737;
+				unitConverterArr["sg"]["hweight"] = 0.287267091373707;
+				unitConverterArr["sg"]["stone"] = 2.29813614723596;
+				unitConverterArr["sg"]["ton"] = 0.0160869530306517;
+				unitConverterArr["sg"]["uk_ton"] = 0.0143633549716368;
+				unitConverterArr["sg"]["LTON"] = 0.0143633549716368;
+				unitConverterArr["sg"]["brton"] = 0.0143633545686854;
+
+
+				unitConverterArr["lbm"] = {};//Фунт массы (эвердьюпойс)
+
+				unitConverterArr["lbm"]["u"] = 2.73159503145377E+026;
+				unitConverterArr["lbm"]["ozm"] = 16.0000023429409;
+				unitConverterArr["lbm"]["grain"] = 6999.99981727516;
+				unitConverterArr["lbm"]["cwt"] = 0.00999999867168865;
+				unitConverterArr["lbm"]["shweight"] = 0.0100000003869535;
+				unitConverterArr["lbm"]["uk_cwt"] = 0.00892857024257915;
+				unitConverterArr["lbm"]["lcwt"] = 0.00892857024257915;
+				unitConverterArr["lbm"]["hweight"] = 0.00892856999209586;
+				unitConverterArr["lbm"]["stone"] = 0.0714285417930745;
+				unitConverterArr["lbm"]["ton"] = 0.000499999792551521;
+				unitConverterArr["lbm"]["uk_ton"] = 0.000446428512128958;
+				unitConverterArr["lbm"]["LTON"] = 0.000446428512128958;
+				unitConverterArr["lbm"]["brton"] = 0.000446428499604793;
+
+
+				unitConverterArr["u"] = {};//атомная единица массы
+
+				unitConverterArr["u"]["ozm"] = 5.85738448002141E-026;
+				unitConverterArr["u"]["grain"] = 2.56260526786422E-023;
+				unitConverterArr["u"]["cwt"] = 3.66086427766219E-029;
+				unitConverterArr["u"]["shweight"] = 3.66086490559747E-029;
+				unitConverterArr["u"]["uk_cwt"] = 3.26862881934124E-029;
+				unitConverterArr["u"]["lcwt"] = 3.26862881934124E-029;
+				unitConverterArr["u"]["hweight"] = 3.2686287276427E-029;
+				unitConverterArr["u"]["stone"] = 2.61490231789811E-028;
+				unitConverterArr["u"]["ton"] = 1.83043162252868E-030;
+				unitConverterArr["u"]["uk_ton"] = 1.63431440967062E-030;
+				unitConverterArr["u"]["LTON"] = 1.63431440967062E-030;
+				unitConverterArr["u"]["brton"] = 1.63431436382135E-030;
+
+
+				unitConverterArr["ozm"] = {};//Унция
+
+				unitConverterArr["ozm"]["grain"] = 437.499924514917;
+				unitConverterArr["ozm"]["cwt"] = 0.000624999825459436;
+				unitConverterArr["ozm"]["shweight"] = 0.000624999932663475;
+				unitConverterArr["ozm"]["uk_cwt"] = 0.000558035558445925;
+				unitConverterArr["ozm"]["lcwt"] = 0.000558035558445925;
+				unitConverterArr["ozm"]["hweight"] = 0.000558035542790721;
+				unitConverterArr["ozm"]["stone"] = 0.00446428320834516;
+				unitConverterArr["ozm"]["ton"] = 0.0000312499824584161;
+				unitConverterArr["ozm"]["uk_ton"] = 0.0000279017779222963;
+				unitConverterArr["ozm"]["LTON"] = 0.0000279017779222963;
+				unitConverterArr["ozm"]["brton"] = 0.0000279017771395361;
+
+
+				unitConverterArr["grain"] = {};//Гран
+
+				unitConverterArr["grain"]["cwt"] = 0.00000142857127610345;
+				unitConverterArr["grain"]["shweight"] = 0.00000142857152114129;
+				unitConverterArr["grain"]["uk_cwt"] = 0.0000012755100679495;
+				unitConverterArr["grain"]["lcwt"] = 0.0000012755100679495;
+				unitConverterArr["grain"]["hweight"] = 0.00000127551003216618;
+				unitConverterArr["grain"]["stone"] = 0.0000102040776653733;
+				unitConverterArr["grain"]["ton"] = 0.000000071428543657613;
+				unitConverterArr["grain"]["uk_ton"] = 0.0000000637755033974752;
+				unitConverterArr["grain"]["LTON"] = 0.0000000637755033974752;
+				unitConverterArr["grain"]["brton"] = 0.0000000637755016083088;
+
+
+				unitConverterArr["cwt"] = {};//Американский (короткий) центнер
+
+				unitConverterArr["cwt"]["shweight"] = 1.00000017152651;
+				unitConverterArr["cwt"]["uk_cwt"] = 0.892857142857143;
+				unitConverterArr["cwt"]["lcwt"] = 0.892857142857143;
+				unitConverterArr["cwt"]["hweight"] = 0.89285711780881;
+				unitConverterArr["cwt"]["stone"] = 7.142855128101;
+				unitConverterArr["cwt"]["ton"] = 0.049999985896707;
+				unitConverterArr["cwt"]["uk_ton"] = 0.0446428571428571;
+				unitConverterArr["cwt"]["LTON"] = 0.0446428571428571;
+				unitConverterArr["cwt"]["brton"] = 0.0446428558904405;
+
+
+				unitConverterArr["shweight"] = {};//Американский (короткий) центнер
+
+				unitConverterArr["shweight"]["uk_cwt"] = 0.892856989708499;
+				unitConverterArr["shweight"]["lcwt"] = 0.892856989708499;
+				unitConverterArr["shweight"]["hweight"] = 0.892856964660171;
+				unitConverterArr["shweight"]["stone"] = 7.1428539029122;
+				unitConverterArr["shweight"]["ton"] = 0.0499999773203854;
+				unitConverterArr["shweight"]["uk_ton"] = 0.044642849485425;
+				unitConverterArr["shweight"]["LTON"] = 0.044642849485425;
+				unitConverterArr["shweight"]["brton"] = 0.0446428482330085;
+
+
+				unitConverterArr["uk_cwt"] = {};//Английский (длинный) центнер
+
+				unitConverterArr["uk_cwt"]["lcwt"] = 1;
+				unitConverterArr["uk_cwt"]["hweight"] = 0.999999971945867;
+				unitConverterArr["uk_cwt"]["stone"] = 7.99999774347312;
+				unitConverterArr["uk_cwt"]["ton"] = 0.0559999842043118;
+				unitConverterArr["uk_cwt"]["uk_ton"] = 0.05;
+				unitConverterArr["uk_cwt"]["LTON"] = 0.05;
+				unitConverterArr["uk_cwt"]["brton"] = 0.0499999985972934;
+
+
+				unitConverterArr["lcwt"] = {};//Английский (длинный) центнер
+
+				unitConverterArr["lcwt"]["hweight"] = 0.999999971945867;
+				unitConverterArr["lcwt"]["stone"] = 7.99999774347312;
+				unitConverterArr["lcwt"]["ton"] = 0.0559999842043118;
+				unitConverterArr["lcwt"]["uk_ton"] = 0.05;
+				unitConverterArr["lcwt"]["LTON"] = 0.05;
+				unitConverterArr["lcwt"]["brton"] = 0.0499999985972934;
+
+
+				unitConverterArr["lcwt"] = {};//Английский (длинный) центнер
+
+				unitConverterArr["lcwt"]["hweight"] = 0.999999971945867;
+				unitConverterArr["lcwt"]["stone"] = 7.99999774347312;
+				unitConverterArr["lcwt"]["ton"] = 0.0559999842043118;
+				unitConverterArr["lcwt"]["uk_ton"] = 0.05;
+				unitConverterArr["lcwt"]["LTON"] = 0.05;
+				unitConverterArr["lcwt"]["brton"] = 0.0499999985972934;
+
+
+				unitConverterArr["hweight"] = {};//Английский (длинный) центнер
+
+				unitConverterArr["hweight"]["stone"] = 7.99999796790613;
+				unitConverterArr["hweight"]["ton"] = 0.0559999857753429;
+				unitConverterArr["hweight"]["uk_ton"] = 0.0500000014027067;
+				unitConverterArr["hweight"]["LTON"] = 0.0500000014027067;
+				unitConverterArr["hweight"]["brton"] = 0.05;
+
+
+				unitConverterArr["stone"] = {};//Стоун
+
+				unitConverterArr["stone"]["ton"] = 0.007;
+				unitConverterArr["stone"]["uk_ton"] = 0.00625000176291212;
+				unitConverterArr["stone"]["LTON"] = 0.00625000176291212;
+				unitConverterArr["stone"]["brton"] = 0.00625000158757374;
+
+
+				unitConverterArr["ton"] = {};//Тонна
+
+				unitConverterArr["ton"]["uk_ton"] = 0.892857394701732;
+				unitConverterArr["ton"]["LTON"] = 0.892857394701732;
+				unitConverterArr["ton"]["brton"] = 0.892857369653392;
+
+
+				unitConverterArr["uk_ton"] = {};//Стандартная тонна
+
+				unitConverterArr["uk_ton"]["LTON"] = 1;
+				unitConverterArr["uk_ton"]["brton"] = 0.999999971945867;
+
+
+				unitConverterArr["LTON"] = {};//Стандартная тонна
+
+				unitConverterArr["LTON"]["brton"] = 0.999999971945867;
+
+			};
+
+			generateWeightAndMass();
+
+		}
+
+		return unitConverterArr;
+	}
+
+	function getUnitConverterCoeff(from, to){
+		var uniteArr = getUnitConverter();
+		return uniteArr[from][to];
+	}
+
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
 	cFormulaFunctionGroup['Engineering'].push(cBESSELI, cBESSELJ, cBESSELK, cBESSELY, cBIN2DEC, cBIN2HEX, cBIN2OCT,
 		cBITAND, cBITLSHIFT, cBITOR, cBITRSHIFT, cBITXOR, cCOMPLEX, cCONVERT, cDEC2BIN, cDEC2HEX, cDEC2OCT, cDELTA,
