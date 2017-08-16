@@ -12956,6 +12956,10 @@
     WorksheetView.prototype.af_setDialogProp = function (filterProp, isReturnProps) {
         var ws = this.model;
 
+        if(!filterProp){
+            return;
+        }
+
         //get filter
         var filter, autoFilter, displayName = null;
         if (filterProp.id === null) {
