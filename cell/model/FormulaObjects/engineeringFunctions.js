@@ -2026,11 +2026,2273 @@
 
 			};
 
+
+			var generatePowerMagnetismTemperature = function(){
+				/*//Power
+				unitConverterArr["HP"] = {};//Horsepower
+
+				unitConverterArr["HP"]["h"] = ;
+				unitConverterArr["HP"]["PS"] = ;
+				unitConverterArr["HP"]["W"] = ;
+				unitConverterArr["HP"]["w"] = ;
+
+
+				unitConverterArr["h"] = {};//Horsepower
+
+				unitConverterArr["h"]["PS"] = ;
+				unitConverterArr["h"]["W"] = ;
+				unitConverterArr["h"]["w"] = ;
+
+
+				unitConverterArr["PS"] = {};//Pferdestärke
+
+				unitConverterArr["PS"]["W"] = ;
+				unitConverterArr["PS"]["w"] = ;
+
+				unitConverterArr["W"] = {};//Watt
+
+				unitConverterArr["W"]["w"] = ;
+
+
+				//Magnetism
+				unitConverterArr["T"] = {};//Tesla
+
+				unitConverterArr["T"]["ga"] = ;
+
+
+				//Temperature
+				unitConverterArr["C"] = {};//Degree Celsius
+
+				unitConverterArr["C"]["cel"] = ;
+				unitConverterArr["C"]["F"] = ;
+				unitConverterArr["C"]["fah"] = ;
+				unitConverterArr["C"]["K"] = ;
+				unitConverterArr["C"]["kel"] = ;
+				unitConverterArr["C"]["Rank"] = ;
+				unitConverterArr["C"]["Reau"] = ;
+
+
+				unitConverterArr["cel"] = {};//Degree Celsius
+
+				unitConverterArr["cel"]["F"] = ;
+				unitConverterArr["cel"]["fah"] = ;
+				unitConverterArr["cel"]["K"] = ;
+				unitConverterArr["cel"]["kel"] = ;
+				unitConverterArr["cel"]["Rank"] = ;
+				unitConverterArr["cel"]["Reau"] = ;
+
+
+				unitConverterArr["F"] = {};//Degree Fahrenheit
+
+				unitConverterArr["F"]["fah"] = ;
+				unitConverterArr["F"]["K"] = ;
+				unitConverterArr["F"]["kel"] = ;
+				unitConverterArr["F"]["Rank"] = ;
+				unitConverterArr["F"]["Reau"] = ;
+
+
+				unitConverterArr["fah"] = {};//Degree Fahrenheit
+
+				unitConverterArr["fah"]["K"] = ;
+				unitConverterArr["fah"]["kel"] = ;
+				unitConverterArr["fah"]["Rank"] = ;
+				unitConverterArr["fah"]["Reau"] = ;
+
+
+				unitConverterArr["K"] = {};//Kelvin
+
+				unitConverterArr["K"]["kel"] = ;
+				unitConverterArr["K"]["Rank"] = ;
+				unitConverterArr["K"]["Reau"] = ;
+
+
+				unitConverterArr["kel"] = {};//Kelvin
+
+				unitConverterArr["kel"]["Rank"] = ;
+				unitConverterArr["kel"]["Reau"] = ;
+
+				unitConverterArr["Rank"] = {};//Degrees Rankine
+
+				unitConverterArr["Rank"]["Reau"] = ;*/
+
+
+				//Power
+				unitConverterArr["HP"] = {};//Horsepower
+
+				unitConverterArr["HP"]["h"] = 1;
+				unitConverterArr["HP"]["PS"] = 1.0138700185381;
+				unitConverterArr["HP"]["W"] = 745.699921403228;
+				unitConverterArr["HP"]["w"] = 745.699921403228;
+
+
+				unitConverterArr["h"] = {};//Horsepower
+
+				unitConverterArr["h"]["PS"] = 1.0138700185381;
+				unitConverterArr["h"]["W"] = 745.699921403228;
+				unitConverterArr["h"]["w"] = 745.699921403228;
+
+
+				unitConverterArr["PS"] = {};//Pferdestärke
+
+				unitConverterArr["PS"]["W"] = 735.498542977386;
+				unitConverterArr["PS"]["w"] = 735.498542977386;
+
+				unitConverterArr["W"] = {};//Watt ;
+
+				unitConverterArr["W"]["w"] = 1;
+
+
+				//Magnetism
+				unitConverterArr["T"] = {};//Tesla
+
+				unitConverterArr["T"]["ga"] = 10000;
+
+				//***TODO пересмотреть коэфиициэнты у температуры!!!!!***
+				//Temperature
+				unitConverterArr["C"] = {};//Degree Celsius
+
+				unitConverterArr["C"]["cel"] = 1;
+				unitConverterArr["C"]["F"] = 33.8;
+				unitConverterArr["C"]["fah"] = 33.8;
+				unitConverterArr["C"]["K"] = 274.15;
+				unitConverterArr["C"]["kel"] = 274.15;
+				unitConverterArr["C"]["Rank"] = 493.47;
+				unitConverterArr["C"]["Reau"] = 0.8;
+
+
+				unitConverterArr["cel"] = {};//Degree Celsius
+
+				unitConverterArr["cel"]["F"] = 33.8;
+				unitConverterArr["cel"]["fah"] = 33.8;
+				unitConverterArr["cel"]["K"] = 274.15;
+				unitConverterArr["cel"]["kel"] = 274.15;
+				unitConverterArr["cel"]["Rank"] = 493.47;
+				unitConverterArr["cel"]["Reau"] = 0.8;
+
+
+				unitConverterArr["F"] = {};//Degree Fahrenheit
+
+				unitConverterArr["F"]["fah"] = 0.999999999999977;
+				unitConverterArr["F"]["K"] = 255.927777777778;
+				unitConverterArr["F"]["kel"] = 255.927777777778;
+				unitConverterArr["F"]["Rank"] = 460.67;
+				unitConverterArr["F"]["Reau"] = -13.7777777777778;
+
+
+				unitConverterArr["fah"] = {};//Degree Fahrenheit
+
+				unitConverterArr["fah"]["K"] = 255.927777777778;
+				unitConverterArr["fah"]["kel"] = 255.927777777778;
+				unitConverterArr["fah"]["Rank"] = 460.67;
+				unitConverterArr["fah"]["Reau"] = -13.7777777777778;
+
+
+				unitConverterArr["K"] = {};//Kelvin
+
+				unitConverterArr["K"]["kel"] = 1;
+				unitConverterArr["K"]["Rank"] = 1.8;
+				unitConverterArr["K"]["Reau"] = -217.72;
+
+
+				unitConverterArr["kel"] = {};//Kelvin
+
+				unitConverterArr["kel"]["Rank"] = 1.8;
+				unitConverterArr["kel"]["Reau"] = -217.72;
+
+				unitConverterArr["Rank"] = {};//Degrees Rankine
+
+				unitConverterArr["Rank"]["Reau"] = -218.075555555556;
+
+			};
+
+
+			var generateVolume = function(){
+				/*unitConverterArr["tsp"] = {};//Teaspoon
+
+				unitConverterArr["tsp"]["tspm"] = ;
+				unitConverterArr["tsp"]["tbs"] = ;
+				unitConverterArr["tsp"]["oz"] = ;
+				unitConverterArr["tsp"]["cup"] = ;
+				unitConverterArr["tsp"]["pt"] = ;
+				unitConverterArr["tsp"]["us_pt"] = ;
+				unitConverterArr["tsp"]["uk_pt"] = ;
+				unitConverterArr["tsp"]["qt"] = ;
+				unitConverterArr["tsp"]["uk_qt"] = ;
+				unitConverterArr["tsp"]["gal"] = ;
+				unitConverterArr["tsp"]["uk_gal"] = ;
+				unitConverterArr["tsp"]["l"] = ;
+				unitConverterArr["tsp"]["L"] = ;
+				unitConverterArr["tsp"]["lt"] = ;
+				unitConverterArr["tsp"]["ang3"] = ;
+				unitConverterArr["tsp"]["ang^3"] = ;
+				unitConverterArr["tsp"]["barrel"] = ;
+				unitConverterArr["tsp"]["bushel"] = ;
+				unitConverterArr["tsp"]["ft3"] = ;
+				unitConverterArr["tsp"]["ft^3"] = ;
+
+				unitConverterArr["tsp"]["in3"] = ;
+				unitConverterArr["tsp"]["in^3"] = ;
+				unitConverterArr["tsp"]["ly3"] = ;
+				unitConverterArr["tsp"]["ly^3"] = ;
+				unitConverterArr["tsp"]["ang^3"] = ;
+				unitConverterArr["tsp"]["m3"] = ;
+				unitConverterArr["tsp"]["m^3"] = ;
+				unitConverterArr["tsp"]["mi3"] = ;
+				unitConverterArr["tsp"]["mi^3"] = ;
+
+				unitConverterArr["tsp"]["yd3"] = ;
+				unitConverterArr["tsp"]["yd^3"] = ;
+				unitConverterArr["tsp"]["Nmi3"] = ;
+				unitConverterArr["tsp"]["Nmi^3"] = ;
+				unitConverterArr["tsp"]["Picapt3"] = ;
+				unitConverterArr["tsp"]["Picapt^3"] = ;
+				unitConverterArr["tsp"]["Pica3"] = ;
+				unitConverterArr["tsp"]["Pica^3"] = ;
+				unitConverterArr["tsp"]["GRT"] = ;
+				unitConverterArr["tsp"]["regton"] = ;
+				unitConverterArr["tsp"]["MTON"] = ;
+
+
+				unitConverterArr["tspm"] = {};//Modern teaspoon
+				
+				unitConverterArr["tspm"]["tbs"] = ;
+				unitConverterArr["tspm"]["oz"] = ;
+				unitConverterArr["tspm"]["cup"] = ;
+				unitConverterArr["tspm"]["pt"] = ;
+				unitConverterArr["tspm"]["us_pt"] = ;
+				unitConverterArr["tspm"]["uk_pt"] = ;
+				unitConverterArr["tspm"]["qt"] = ;
+				unitConverterArr["tspm"]["uk_qt"] = ;
+				unitConverterArr["tspm"]["gal"] = ;
+				unitConverterArr["tspm"]["uk_gal"] = ;
+				unitConverterArr["tspm"]["l"] = ;
+				unitConverterArr["tspm"]["L"] = ;
+				unitConverterArr["tspm"]["lt"] = ;
+				unitConverterArr["tspm"]["ang3"] = ;
+				unitConverterArr["tspm"]["ang^3"] = ;
+				unitConverterArr["tspm"]["barrel"] = ;
+				unitConverterArr["tspm"]["bushel"] = ;
+				unitConverterArr["tspm"]["ft3"] = ;
+				unitConverterArr["tspm"]["ft^3"] = ;
+
+				unitConverterArr["tspm"]["in3"] = ;
+				unitConverterArr["tspm"]["in^3"] = ;
+				unitConverterArr["tspm"]["ly3"] = ;
+				unitConverterArr["tspm"]["ly^3"] = ;
+				unitConverterArr["tspm"]["ang^3"] = ;
+				unitConverterArr["tspm"]["m3"] = ;
+				unitConverterArr["tspm"]["m^3"] = ;
+				unitConverterArr["tspm"]["mi3"] = ;
+				unitConverterArr["tspm"]["mi^3"] = ;
+
+				unitConverterArr["tspm"]["yd3"] = ;
+				unitConverterArr["tspm"]["yd^3"] = ;
+				unitConverterArr["tspm"]["Nmi3"] = ;
+				unitConverterArr["tspm"]["Nmi^3"] = ;
+				unitConverterArr["tspm"]["Picapt3"] = ;
+				unitConverterArr["tspm"]["Picapt^3"] = ;
+				unitConverterArr["tspm"]["Pica3"] = ;
+				unitConverterArr["tspm"]["Pica^3"] = ;
+				unitConverterArr["tspm"]["GRT"] = ;
+				unitConverterArr["tspm"]["regton"] = ;
+				unitConverterArr["tspm"]["MTON"] = ;
+
+				
+				unitConverterArr["tbs"] = {};
+				
+				unitConverterArr["tbs"]["oz"] = ;
+				unitConverterArr["tbs"]["cup"] = ;
+				unitConverterArr["tbs"]["pt"] = ;
+				unitConverterArr["tbs"]["us_pt"] = ;
+				unitConverterArr["tbs"]["uk_pt"] = ;
+				unitConverterArr["tbs"]["qt"] = ;
+				unitConverterArr["tbs"]["uk_qt"] = ;
+				unitConverterArr["tbs"]["gal"] = ;
+				unitConverterArr["tbs"]["uk_gal"] = ;
+				unitConverterArr["tbs"]["l"] = ;
+				unitConverterArr["tbs"]["L"] = ;
+				unitConverterArr["tbs"]["lt"] = ;
+				unitConverterArr["tbs"]["ang3"] = ;
+				unitConverterArr["tbs"]["ang^3"] = ;
+				unitConverterArr["tbs"]["barrel"] = ;
+				unitConverterArr["tbs"]["bushel"] = ;
+				unitConverterArr["tbs"]["ft3"] = ;
+				unitConverterArr["tbs"]["ft^3"] = ;
+
+				unitConverterArr["tbs"]["in3"] = ;
+				unitConverterArr["tbs"]["in^3"] = ;
+				unitConverterArr["tbs"]["ly3"] = ;
+				unitConverterArr["tbs"]["ly^3"] = ;
+				unitConverterArr["tbs"]["ang^3"] = ;
+				unitConverterArr["tbs"]["m3"] = ;
+				unitConverterArr["tbs"]["m^3"] = ;
+				unitConverterArr["tbs"]["mi3"] = ;
+				unitConverterArr["tbs"]["mi^3"] = ;
+
+				unitConverterArr["tbs"]["yd3"] = ;
+				unitConverterArr["tbs"]["yd^3"] = ;
+				unitConverterArr["tbs"]["Nmi3"] = ;
+				unitConverterArr["tbs"]["Nmi^3"] = ;
+				unitConverterArr["tbs"]["Picapt3"] = ;
+				unitConverterArr["tbs"]["Picapt^3"] = ;
+				unitConverterArr["tbs"]["Pica3"] = ;
+				unitConverterArr["tbs"]["Pica^3"] = ;
+				unitConverterArr["tbs"]["GRT"] = ;
+				unitConverterArr["tbs"]["regton"] = ;
+				unitConverterArr["tbs"]["MTON"] = ;
+
+
+				unitConverterArr["oz"] = {};
+				
+				unitConverterArr["oz"]["cup"] = ;
+				unitConverterArr["oz"]["pt"] = ;
+				unitConverterArr["oz"]["us_pt"] = ;
+				unitConverterArr["oz"]["uk_pt"] = ;
+				unitConverterArr["oz"]["qt"] = ;
+				unitConverterArr["oz"]["uk_qt"] = ;
+				unitConverterArr["oz"]["gal"] = ;
+				unitConverterArr["oz"]["uk_gal"] = ;
+				unitConverterArr["oz"]["l"] = ;
+				unitConverterArr["oz"]["L"] = ;
+				unitConverterArr["oz"]["lt"] = ;
+				unitConverterArr["oz"]["ang3"] = ;
+				unitConverterArr["oz"]["ang^3"] = ;
+				unitConverterArr["oz"]["barrel"] = ;
+				unitConverterArr["oz"]["bushel"] = ;
+				unitConverterArr["oz"]["ft3"] = ;
+				unitConverterArr["oz"]["ft^3"] = ;
+
+				unitConverterArr["oz"]["in3"] = ;
+				unitConverterArr["oz"]["in^3"] = ;
+				unitConverterArr["oz"]["ly3"] = ;
+				unitConverterArr["oz"]["ly^3"] = ;
+				unitConverterArr["oz"]["ang^3"] = ;
+				unitConverterArr["oz"]["m3"] = ;
+				unitConverterArr["oz"]["m^3"] = ;
+				unitConverterArr["oz"]["mi3"] = ;
+				unitConverterArr["oz"]["mi^3"] = ;
+
+				unitConverterArr["oz"]["yd3"] = ;
+				unitConverterArr["oz"]["yd^3"] = ;
+				unitConverterArr["oz"]["Nmi3"] = ;
+				unitConverterArr["oz"]["Nmi^3"] = ;
+				unitConverterArr["oz"]["Picapt3"] = ;
+				unitConverterArr["oz"]["Picapt^3"] = ;
+				unitConverterArr["oz"]["Pica3"] = ;
+				unitConverterArr["oz"]["Pica^3"] = ;
+				unitConverterArr["oz"]["GRT"] = ;
+				unitConverterArr["oz"]["regton"] = ;
+				unitConverterArr["oz"]["MTON"] = ;
+
+
+				unitConverterArr["cup"] = {};
+				
+				unitConverterArr["cup"]["pt"] = ;
+				unitConverterArr["cup"]["us_pt"] = ;
+				unitConverterArr["cup"]["uk_pt"] = ;
+				unitConverterArr["cup"]["qt"] = ;
+				unitConverterArr["cup"]["uk_qt"] = ;
+				unitConverterArr["cup"]["gal"] = ;
+				unitConverterArr["cup"]["uk_gal"] = ;
+				unitConverterArr["cup"]["l"] = ;
+				unitConverterArr["cup"]["L"] = ;
+				unitConverterArr["cup"]["lt"] = ;
+				unitConverterArr["cup"]["ang3"] = ;
+				unitConverterArr["cup"]["ang^3"] = ;
+				unitConverterArr["cup"]["barrel"] = ;
+				unitConverterArr["cup"]["bushel"] = ;
+				unitConverterArr["cup"]["ft3"] = ;
+				unitConverterArr["cup"]["ft^3"] = ;
+
+				unitConverterArr["cup"]["in3"] = ;
+				unitConverterArr["cup"]["in^3"] = ;
+				unitConverterArr["cup"]["ly3"] = ;
+				unitConverterArr["cup"]["ly^3"] = ;
+				unitConverterArr["cup"]["ang^3"] = ;
+				unitConverterArr["cup"]["m3"] = ;
+				unitConverterArr["cup"]["m^3"] = ;
+				unitConverterArr["cup"]["mi3"] = ;
+				unitConverterArr["cup"]["mi^3"] = ;
+
+				unitConverterArr["cup"]["yd3"] = ;
+				unitConverterArr["cup"]["yd^3"] = ;
+				unitConverterArr["cup"]["Nmi3"] = ;
+				unitConverterArr["cup"]["Nmi^3"] = ;
+				unitConverterArr["cup"]["Picapt3"] = ;
+				unitConverterArr["cup"]["Picapt^3"] = ;
+				unitConverterArr["cup"]["Pica3"] = ;
+				unitConverterArr["cup"]["Pica^3"] = ;
+				unitConverterArr["cup"]["GRT"] = ;
+				unitConverterArr["cup"]["regton"] = ;
+				unitConverterArr["cup"]["MTON"] = ;
+
+
+				unitConverterArr["pt"] = {};
+
+				unitConverterArr["pt"]["us_pt"] = ;
+				unitConverterArr["pt"]["uk_pt"] = ;
+				unitConverterArr["pt"]["qt"] = ;
+				unitConverterArr["pt"]["uk_qt"] = ;
+				unitConverterArr["pt"]["gal"] = ;
+				unitConverterArr["pt"]["uk_gal"] = ;
+				unitConverterArr["pt"]["l"] = ;
+				unitConverterArr["pt"]["L"] = ;
+				unitConverterArr["pt"]["lt"] = ;
+				unitConverterArr["pt"]["ang3"] = ;
+				unitConverterArr["pt"]["ang^3"] = ;
+				unitConverterArr["pt"]["barrel"] = ;
+				unitConverterArr["pt"]["bushel"] = ;
+				unitConverterArr["pt"]["ft3"] = ;
+				unitConverterArr["pt"]["ft^3"] = ;
+
+				unitConverterArr["pt"]["in3"] = ;
+				unitConverterArr["pt"]["in^3"] = ;
+				unitConverterArr["pt"]["ly3"] = ;
+				unitConverterArr["pt"]["ly^3"] = ;
+				unitConverterArr["pt"]["ang^3"] = ;
+				unitConverterArr["pt"]["m3"] = ;
+				unitConverterArr["pt"]["m^3"] = ;
+				unitConverterArr["pt"]["mi3"] = ;
+				unitConverterArr["pt"]["mi^3"] = ;
+
+				unitConverterArr["pt"]["yd3"] = ;
+				unitConverterArr["pt"]["yd^3"] = ;
+				unitConverterArr["pt"]["Nmi3"] = ;
+				unitConverterArr["pt"]["Nmi^3"] = ;
+				unitConverterArr["pt"]["Picapt3"] = ;
+				unitConverterArr["pt"]["Picapt^3"] = ;
+				unitConverterArr["pt"]["Pica3"] = ;
+				unitConverterArr["pt"]["Pica^3"] = ;
+				unitConverterArr["pt"]["GRT"] = ;
+				unitConverterArr["pt"]["regton"] = ;
+				unitConverterArr["pt"]["MTON"] = ;
+
+
+				unitConverterArr["us_pt"] = {};
+				
+				unitConverterArr["us_pt"]["uk_pt"] = ;
+				unitConverterArr["us_pt"]["qt"] = ;
+				unitConverterArr["us_pt"]["uk_qt"] = ;
+				unitConverterArr["us_pt"]["gal"] = ;
+				unitConverterArr["us_pt"]["uk_gal"] = ;
+				unitConverterArr["us_pt"]["l"] = ;
+				unitConverterArr["us_pt"]["L"] = ;
+				unitConverterArr["us_pt"]["lt"] = ;
+				unitConverterArr["us_pt"]["ang3"] = ;
+				unitConverterArr["us_pt"]["ang^3"] = ;
+				unitConverterArr["us_pt"]["barrel"] = ;
+				unitConverterArr["us_pt"]["bushel"] = ;
+				unitConverterArr["us_pt"]["ft3"] = ;
+				unitConverterArr["us_pt"]["ft^3"] = ;
+
+				unitConverterArr["us_pt"]["in3"] = ;
+				unitConverterArr["us_pt"]["in^3"] = ;
+				unitConverterArr["us_pt"]["ly3"] = ;
+				unitConverterArr["us_pt"]["ly^3"] = ;
+				unitConverterArr["us_pt"]["ang^3"] = ;
+				unitConverterArr["us_pt"]["m3"] = ;
+				unitConverterArr["us_pt"]["m^3"] = ;
+				unitConverterArr["us_pt"]["mi3"] = ;
+				unitConverterArr["us_pt"]["mi^3"] = ;
+
+				unitConverterArr["us_pt"]["yd3"] = ;
+				unitConverterArr["us_pt"]["yd^3"] = ;
+				unitConverterArr["us_pt"]["Nmi3"] = ;
+				unitConverterArr["us_pt"]["Nmi^3"] = ;
+				unitConverterArr["us_pt"]["Picapt3"] = ;
+				unitConverterArr["us_pt"]["Picapt^3"] = ;
+				unitConverterArr["us_pt"]["Pica3"] = ;
+				unitConverterArr["us_pt"]["Pica^3"] = ;
+				unitConverterArr["us_pt"]["GRT"] = ;
+				unitConverterArr["us_pt"]["regton"] = ;
+				unitConverterArr["us_pt"]["MTON"] = ;
+
+
+				unitConverterArr["uk_pt"] = {};
+				
+				unitConverterArr["uk_pt"]["qt"] = ;
+				unitConverterArr["uk_pt"]["uk_qt"] = ;
+				unitConverterArr["uk_pt"]["gal"] = ;
+				unitConverterArr["uk_pt"]["uk_gal"] = ;
+				unitConverterArr["uk_pt"]["l"] = ;
+				unitConverterArr["uk_pt"]["L"] = ;
+				unitConverterArr["uk_pt"]["lt"] = ;
+				unitConverterArr["uk_pt"]["ang3"] = ;
+				unitConverterArr["uk_pt"]["ang^3"] = ;
+				unitConverterArr["uk_pt"]["barrel"] = ;
+				unitConverterArr["uk_pt"]["bushel"] = ;
+				unitConverterArr["uk_pt"]["ft3"] = ;
+				unitConverterArr["uk_pt"]["ft^3"] = ;
+
+				unitConverterArr["uk_pt"]["in3"] = ;
+				unitConverterArr["uk_pt"]["in^3"] = ;
+				unitConverterArr["uk_pt"]["ly3"] = ;
+				unitConverterArr["uk_pt"]["ly^3"] = ;
+				unitConverterArr["uk_pt"]["ang^3"] = ;
+				unitConverterArr["uk_pt"]["m3"] = ;
+				unitConverterArr["uk_pt"]["m^3"] = ;
+				unitConverterArr["uk_pt"]["mi3"] = ;
+				unitConverterArr["uk_pt"]["mi^3"] = ;
+
+				unitConverterArr["uk_pt"]["yd3"] = ;
+				unitConverterArr["uk_pt"]["yd^3"] = ;
+				unitConverterArr["uk_pt"]["Nmi3"] = ;
+				unitConverterArr["uk_pt"]["Nmi^3"] = ;
+				unitConverterArr["uk_pt"]["Picapt3"] = ;
+				unitConverterArr["uk_pt"]["Picapt^3"] = ;
+				unitConverterArr["uk_pt"]["Pica3"] = ;
+				unitConverterArr["uk_pt"]["Pica^3"] = ;
+				unitConverterArr["uk_pt"]["GRT"] = ;
+				unitConverterArr["uk_pt"]["regton"] = ;
+				unitConverterArr["uk_pt"]["MTON"] = ;
+
+
+				unitConverterArr["qt"] = {};
+				
+				unitConverterArr["qt"]["uk_qt"] = ;
+				unitConverterArr["qt"]["gal"] = ;
+				unitConverterArr["qt"]["uk_gal"] = ;
+				unitConverterArr["qt"]["l"] = ;
+				unitConverterArr["qt"]["L"] = ;
+				unitConverterArr["qt"]["lt"] = ;
+				unitConverterArr["qt"]["ang3"] = ;
+				unitConverterArr["qt"]["ang^3"] = ;
+				unitConverterArr["qt"]["barrel"] = ;
+				unitConverterArr["qt"]["bushel"] = ;
+				unitConverterArr["qt"]["ft3"] = ;
+				unitConverterArr["qt"]["ft^3"] = ;
+
+				unitConverterArr["qt"]["in3"] = ;
+				unitConverterArr["qt"]["in^3"] = ;
+				unitConverterArr["qt"]["ly3"] = ;
+				unitConverterArr["qt"]["ly^3"] = ;
+				unitConverterArr["qt"]["ang^3"] = ;
+				unitConverterArr["qt"]["m3"] = ;
+				unitConverterArr["qt"]["m^3"] = ;
+				unitConverterArr["qt"]["mi3"] = ;
+				unitConverterArr["qt"]["mi^3"] = ;
+
+				unitConverterArr["qt"]["yd3"] = ;
+				unitConverterArr["qt"]["yd^3"] = ;
+				unitConverterArr["qt"]["Nmi3"] = ;
+				unitConverterArr["qt"]["Nmi^3"] = ;
+				unitConverterArr["qt"]["Picapt3"] = ;
+				unitConverterArr["qt"]["Picapt^3"] = ;
+				unitConverterArr["qt"]["Pica3"] = ;
+				unitConverterArr["qt"]["Pica^3"] = ;
+				unitConverterArr["qt"]["GRT"] = ;
+				unitConverterArr["qt"]["regton"] = ;
+				unitConverterArr["qt"]["MTON"] = ;
+
+
+				unitConverterArr["uk_qt"] = {};
+				
+				unitConverterArr["uk_qt"]["gal"] = ;
+				unitConverterArr["uk_qt"]["uk_gal"] = ;
+				unitConverterArr["uk_qt"]["l"] = ;
+				unitConverterArr["uk_qt"]["L"] = ;
+				unitConverterArr["uk_qt"]["lt"] = ;
+				unitConverterArr["uk_qt"]["ang3"] = ;
+				unitConverterArr["uk_qt"]["ang^3"] = ;
+				unitConverterArr["uk_qt"]["barrel"] = ;
+				unitConverterArr["uk_qt"]["bushel"] = ;
+				unitConverterArr["uk_qt"]["ft3"] = ;
+				unitConverterArr["uk_qt"]["ft^3"] = ;
+
+				unitConverterArr["uk_qt"]["in3"] = ;
+				unitConverterArr["uk_qt"]["in^3"] = ;
+				unitConverterArr["uk_qt"]["ly3"] = ;
+				unitConverterArr["uk_qt"]["ly^3"] = ;
+				unitConverterArr["uk_qt"]["ang^3"] = ;
+				unitConverterArr["uk_qt"]["m3"] = ;
+				unitConverterArr["uk_qt"]["m^3"] = ;
+				unitConverterArr["uk_qt"]["mi3"] = ;
+				unitConverterArr["uk_qt"]["mi^3"] = ;
+
+				unitConverterArr["uk_qt"]["yd3"] = ;
+				unitConverterArr["uk_qt"]["yd^3"] = ;
+				unitConverterArr["uk_qt"]["Nmi3"] = ;
+				unitConverterArr["uk_qt"]["Nmi^3"] = ;
+				unitConverterArr["uk_qt"]["Picapt3"] = ;
+				unitConverterArr["uk_qt"]["Picapt^3"] = ;
+				unitConverterArr["uk_qt"]["Pica3"] = ;
+				unitConverterArr["uk_qt"]["Pica^3"] = ;
+				unitConverterArr["uk_qt"]["GRT"] = ;
+				unitConverterArr["uk_qt"]["regton"] = ;
+				unitConverterArr["uk_qt"]["MTON"] = ;
+
+
+				unitConverterArr["gal"] = {};
+
+				unitConverterArr["gal"]["uk_gal"] = ;
+				unitConverterArr["gal"]["l"] = ;
+				unitConverterArr["gal"]["L"] = ;
+				unitConverterArr["gal"]["lt"] = ;
+				unitConverterArr["gal"]["ang3"] = ;
+				unitConverterArr["gal"]["ang^3"] = ;
+				unitConverterArr["gal"]["barrel"] = ;
+				unitConverterArr["gal"]["bushel"] = ;
+				unitConverterArr["gal"]["ft3"] = ;
+				unitConverterArr["gal"]["ft^3"] = ;
+
+				unitConverterArr["gal"]["in3"] = ;
+				unitConverterArr["gal"]["in^3"] = ;
+				unitConverterArr["gal"]["ly3"] = ;
+				unitConverterArr["gal"]["ly^3"] = ;
+				unitConverterArr["gal"]["ang^3"] = ;
+				unitConverterArr["gal"]["m3"] = ;
+				unitConverterArr["gal"]["m^3"] = ;
+				unitConverterArr["gal"]["mi3"] = ;
+				unitConverterArr["gal"]["mi^3"] = ;
+
+				unitConverterArr["gal"]["yd3"] = ;
+				unitConverterArr["gal"]["yd^3"] = ;
+				unitConverterArr["gal"]["Nmi3"] = ;
+				unitConverterArr["gal"]["Nmi^3"] = ;
+				unitConverterArr["gal"]["Picapt3"] = ;
+				unitConverterArr["gal"]["Picapt^3"] = ;
+				unitConverterArr["gal"]["Pica3"] = ;
+				unitConverterArr["gal"]["Pica^3"] = ;
+				unitConverterArr["gal"]["GRT"] = ;
+				unitConverterArr["gal"]["regton"] = ;
+				unitConverterArr["gal"]["MTON"] = ;
+
+
+				unitConverterArr["uk_gal"] = {};
+				
+				unitConverterArr["uk_gal"]["l"] = ;
+				unitConverterArr["uk_gal"]["L"] = ;
+				unitConverterArr["uk_gal"]["lt"] = ;
+				unitConverterArr["uk_gal"]["ang3"] = ;
+				unitConverterArr["uk_gal"]["ang^3"] = ;
+				unitConverterArr["uk_gal"]["barrel"] = ;
+				unitConverterArr["uk_gal"]["bushel"] = ;
+				unitConverterArr["uk_gal"]["ft3"] = ;
+				unitConverterArr["uk_gal"]["ft^3"] = ;
+
+				unitConverterArr["uk_gal"]["in3"] = ;
+				unitConverterArr["uk_gal"]["in^3"] = ;
+				unitConverterArr["uk_gal"]["ly3"] = ;
+				unitConverterArr["uk_gal"]["ly^3"] = ;
+				unitConverterArr["uk_gal"]["ang^3"] = ;
+				unitConverterArr["uk_gal"]["m3"] = ;
+				unitConverterArr["uk_gal"]["m^3"] = ;
+				unitConverterArr["uk_gal"]["mi3"] = ;
+				unitConverterArr["uk_gal"]["mi^3"] = ;
+
+				unitConverterArr["uk_gal"]["yd3"] = ;
+				unitConverterArr["uk_gal"]["yd^3"] = ;
+				unitConverterArr["uk_gal"]["Nmi3"] = ;
+				unitConverterArr["uk_gal"]["Nmi^3"] = ;
+				unitConverterArr["uk_gal"]["Picapt3"] = ;
+				unitConverterArr["uk_gal"]["Picapt^3"] = ;
+				unitConverterArr["uk_gal"]["Pica3"] = ;
+				unitConverterArr["uk_gal"]["Pica^3"] = ;
+				unitConverterArr["uk_gal"]["GRT"] = ;
+				unitConverterArr["uk_gal"]["regton"] = ;
+				unitConverterArr["uk_gal"]["MTON"] = ;
+
+
+				unitConverterArr["l"] = {};
+				
+				unitConverterArr["l"]["L"] = ;
+				unitConverterArr["l"]["lt"] = ;
+				unitConverterArr["l"]["ang3"] = ;
+				unitConverterArr["l"]["ang^3"] = ;
+				unitConverterArr["l"]["barrel"] = ;
+				unitConverterArr["l"]["bushel"] = ;
+				unitConverterArr["l"]["ft3"] = ;
+				unitConverterArr["l"]["ft^3"] = ;
+
+				unitConverterArr["l"]["in3"] = ;
+				unitConverterArr["l"]["in^3"] = ;
+				unitConverterArr["l"]["ly3"] = ;
+				unitConverterArr["l"]["ly^3"] = ;
+				unitConverterArr["l"]["ang^3"] = ;
+				unitConverterArr["l"]["m3"] = ;
+				unitConverterArr["l"]["m^3"] = ;
+				unitConverterArr["l"]["mi3"] = ;
+				unitConverterArr["l"]["mi^3"] = ;
+
+				unitConverterArr["l"]["yd3"] = ;
+				unitConverterArr["l"]["yd^3"] = ;
+				unitConverterArr["l"]["Nmi3"] = ;
+				unitConverterArr["l"]["Nmi^3"] = ;
+				unitConverterArr["l"]["Picapt3"] = ;
+				unitConverterArr["l"]["Picapt^3"] = ;
+				unitConverterArr["l"]["Pica3"] = ;
+				unitConverterArr["l"]["Pica^3"] = ;
+				unitConverterArr["l"]["GRT"] = ;
+				unitConverterArr["l"]["regton"] = ;
+				unitConverterArr["l"]["MTON"] = ;
+
+
+				unitConverterArr["L"] = {};
+				
+				unitConverterArr["L"]["lt"] = ;
+				unitConverterArr["L"]["ang3"] = ;
+				unitConverterArr["L"]["ang^3"] = ;
+				unitConverterArr["L"]["barrel"] = ;
+				unitConverterArr["L"]["bushel"] = ;
+				unitConverterArr["L"]["ft3"] = ;
+				unitConverterArr["L"]["ft^3"] = ;
+
+				unitConverterArr["L"]["in3"] = ;
+				unitConverterArr["L"]["in^3"] = ;
+				unitConverterArr["L"]["ly3"] = ;
+				unitConverterArr["L"]["ly^3"] = ;
+				unitConverterArr["L"]["ang^3"] = ;
+				unitConverterArr["L"]["m3"] = ;
+				unitConverterArr["L"]["m^3"] = ;
+				unitConverterArr["L"]["mi3"] = ;
+				unitConverterArr["L"]["mi^3"] = ;
+
+				unitConverterArr["L"]["yd3"] = ;
+				unitConverterArr["L"]["yd^3"] = ;
+				unitConverterArr["L"]["Nmi3"] = ;
+				unitConverterArr["L"]["Nmi^3"] = ;
+				unitConverterArr["L"]["Picapt3"] = ;
+				unitConverterArr["L"]["Picapt^3"] = ;
+				unitConverterArr["L"]["Pica3"] = ;
+				unitConverterArr["L"]["Pica^3"] = ;
+				unitConverterArr["L"]["GRT"] = ;
+				unitConverterArr["L"]["regton"] = ;
+				unitConverterArr["L"]["MTON"] = ;
+
+
+				unitConverterArr["lt"] = {};
+				
+				unitConverterArr["lt"]["ang3"] = ;
+				unitConverterArr["lt"]["ang^3"] = ;
+				unitConverterArr["lt"]["barrel"] = ;
+				unitConverterArr["lt"]["bushel"] = ;
+				unitConverterArr["lt"]["ft3"] = ;
+				unitConverterArr["lt"]["ft^3"] = ;
+
+				unitConverterArr["lt"]["in3"] = ;
+				unitConverterArr["lt"]["in^3"] = ;
+				unitConverterArr["lt"]["ly3"] = ;
+				unitConverterArr["lt"]["ly^3"] = ;
+				unitConverterArr["lt"]["ang^3"] = ;
+				unitConverterArr["lt"]["m3"] = ;
+				unitConverterArr["lt"]["m^3"] = ;
+				unitConverterArr["lt"]["mi3"] = ;
+				unitConverterArr["lt"]["mi^3"] = ;
+
+				unitConverterArr["lt"]["yd3"] = ;
+				unitConverterArr["lt"]["yd^3"] = ;
+				unitConverterArr["lt"]["Nmi3"] = ;
+				unitConverterArr["lt"]["Nmi^3"] = ;
+				unitConverterArr["lt"]["Picapt3"] = ;
+				unitConverterArr["lt"]["Picapt^3"] = ;
+				unitConverterArr["lt"]["Pica3"] = ;
+				unitConverterArr["lt"]["Pica^3"] = ;
+				unitConverterArr["lt"]["GRT"] = ;
+				unitConverterArr["lt"]["regton"] = ;
+				unitConverterArr["lt"]["MTON"] = ;
+
+
+				unitConverterArr["ang3"] = {};
+				
+				unitConverterArr["ang3"]["ang^3"] = ;
+				unitConverterArr["ang3"]["barrel"] = ;
+				unitConverterArr["ang3"]["bushel"] = ;
+				unitConverterArr["ang3"]["ft3"] = ;
+				unitConverterArr["ang3"]["ft^3"] = ;
+
+				unitConverterArr["ang3"]["in3"] = ;
+				unitConverterArr["ang3"]["in^3"] = ;
+				unitConverterArr["ang3"]["ly3"] = ;
+				unitConverterArr["ang3"]["ly^3"] = ;
+				unitConverterArr["ang3"]["ang^3"] = ;
+				unitConverterArr["ang3"]["m3"] = ;
+				unitConverterArr["ang3"]["m^3"] = ;
+				unitConverterArr["ang3"]["mi3"] = ;
+				unitConverterArr["ang3"]["mi^3"] = ;
+
+				unitConverterArr["ang3"]["yd3"] = ;
+				unitConverterArr["ang3"]["yd^3"] = ;
+				unitConverterArr["ang3"]["Nmi3"] = ;
+				unitConverterArr["ang3"]["Nmi^3"] = ;
+				unitConverterArr["ang3"]["Picapt3"] = ;
+				unitConverterArr["ang3"]["Picapt^3"] = ;
+				unitConverterArr["ang3"]["Pica3"] = ;
+				unitConverterArr["ang3"]["Pica^3"] = ;
+				unitConverterArr["ang3"]["GRT"] = ;
+				unitConverterArr["ang3"]["regton"] = ;
+				unitConverterArr["ang3"]["MTON"] = ;
+
+
+				unitConverterArr["ang^3"] = {};
+				
+				unitConverterArr["ang^3"]["barrel"] = ;
+				unitConverterArr["ang^3"]["bushel"] = ;
+				unitConverterArr["ang^3"]["ft3"] = ;
+				unitConverterArr["ang^3"]["ft^3"] = ;
+
+				unitConverterArr["ang^3"]["in3"] = ;
+				unitConverterArr["ang^3"]["in^3"] = ;
+				unitConverterArr["ang^3"]["ly3"] = ;
+				unitConverterArr["ang^3"]["ly^3"] = ;
+				unitConverterArr["ang^3"]["ang^3"] = ;
+				unitConverterArr["ang^3"]["m3"] = ;
+				unitConverterArr["ang^3"]["m^3"] = ;
+				unitConverterArr["ang^3"]["mi3"] = ;
+				unitConverterArr["ang^3"]["mi^3"] = ;
+
+				unitConverterArr["ang^3"]["yd3"] = ;
+				unitConverterArr["ang^3"]["yd^3"] = ;
+				unitConverterArr["ang^3"]["Nmi3"] = ;
+				unitConverterArr["ang^3"]["Nmi^3"] = ;
+				unitConverterArr["ang^3"]["Picapt3"] = ;
+				unitConverterArr["ang^3"]["Picapt^3"] = ;
+				unitConverterArr["ang^3"]["Pica3"] = ;
+				unitConverterArr["ang^3"]["Pica^3"] = ;
+				unitConverterArr["ang^3"]["GRT"] = ;
+				unitConverterArr["ang^3"]["regton"] = ;
+				unitConverterArr["ang^3"]["MTON"] = ;
+
+
+				unitConverterArr["ang^3"] = {};
+
+				unitConverterArr["ang^3"]["barrel"] = ;
+				unitConverterArr["ang^3"]["bushel"] = ;
+				unitConverterArr["ang^3"]["ft3"] = ;
+				unitConverterArr["ang^3"]["ft^3"] = ;
+
+				unitConverterArr["ang^3"]["in3"] = ;
+				unitConverterArr["ang^3"]["in^3"] = ;
+				unitConverterArr["ang^3"]["ly3"] = ;
+				unitConverterArr["ang^3"]["ly^3"] = ;
+				unitConverterArr["ang^3"]["ang^3"] = ;
+				unitConverterArr["ang^3"]["m3"] = ;
+				unitConverterArr["ang^3"]["m^3"] = ;
+				unitConverterArr["ang^3"]["mi3"] = ;
+				unitConverterArr["ang^3"]["mi^3"] = ;
+
+				unitConverterArr["ang^3"]["yd3"] = ;
+				unitConverterArr["ang^3"]["yd^3"] = ;
+				unitConverterArr["ang^3"]["Nmi3"] = ;
+				unitConverterArr["ang^3"]["Nmi^3"] = ;
+				unitConverterArr["ang^3"]["Picapt3"] = ;
+				unitConverterArr["ang^3"]["Picapt^3"] = ;
+				unitConverterArr["ang^3"]["Pica3"] = ;
+				unitConverterArr["ang^3"]["Pica^3"] = ;
+				unitConverterArr["ang^3"]["GRT"] = ;
+				unitConverterArr["ang^3"]["regton"] = ;
+				unitConverterArr["ang^3"]["MTON"] = ;
+
+				
+				unitConverterArr["barrel"] = {};
+				
+				unitConverterArr["barrel"]["bushel"] = ;
+				unitConverterArr["barrel"]["ft3"] = ;
+				unitConverterArr["barrel"]["ft^3"] = ;
+
+				unitConverterArr["barrel"]["in3"] = ;
+				unitConverterArr["barrel"]["in^3"] = ;
+				unitConverterArr["barrel"]["ly3"] = ;
+				unitConverterArr["barrel"]["ly^3"] = ;
+				unitConverterArr["barrel"]["barrel"] = ;
+				unitConverterArr["barrel"]["m3"] = ;
+				unitConverterArr["barrel"]["m^3"] = ;
+				unitConverterArr["barrel"]["mi3"] = ;
+				unitConverterArr["barrel"]["mi^3"] = ;
+
+				unitConverterArr["barrel"]["yd3"] = ;
+				unitConverterArr["barrel"]["yd^3"] = ;
+				unitConverterArr["barrel"]["Nmi3"] = ;
+				unitConverterArr["barrel"]["Nmi^3"] = ;
+				unitConverterArr["barrel"]["Picapt3"] = ;
+				unitConverterArr["barrel"]["Picapt^3"] = ;
+				unitConverterArr["barrel"]["Pica3"] = ;
+				unitConverterArr["barrel"]["Pica^3"] = ;
+				unitConverterArr["barrel"]["GRT"] = ;
+				unitConverterArr["barrel"]["regton"] = ;
+				unitConverterArr["barrel"]["MTON"] = ;
+
+
+				unitConverterArr["bushel"] = {};
+				
+				unitConverterArr["bushel"]["ft3"] = ;
+				unitConverterArr["bushel"]["ft^3"] = ;
+
+				unitConverterArr["bushel"]["in3"] = ;
+				unitConverterArr["bushel"]["in^3"] = ;
+				unitConverterArr["bushel"]["ly3"] = ;
+				unitConverterArr["bushel"]["ly^3"] = ;
+				unitConverterArr["bushel"]["bushel"] = ;
+				unitConverterArr["bushel"]["m3"] = ;
+				unitConverterArr["bushel"]["m^3"] = ;
+				unitConverterArr["bushel"]["mi3"] = ;
+				unitConverterArr["bushel"]["mi^3"] = ;
+
+				unitConverterArr["bushel"]["yd3"] = ;
+				unitConverterArr["bushel"]["yd^3"] = ;
+				unitConverterArr["bushel"]["Nmi3"] = ;
+				unitConverterArr["bushel"]["Nmi^3"] = ;
+				unitConverterArr["bushel"]["Picapt3"] = ;
+				unitConverterArr["bushel"]["Picapt^3"] = ;
+				unitConverterArr["bushel"]["Pica3"] = ;
+				unitConverterArr["bushel"]["Pica^3"] = ;
+				unitConverterArr["bushel"]["GRT"] = ;
+				unitConverterArr["bushel"]["regton"] = ;
+				unitConverterArr["bushel"]["MTON"] = ;
+
+
+				unitConverterArr["ft3"] = {};
+				
+				unitConverterArr["ft3"]["ft^3"] = ;
+
+				unitConverterArr["ft3"]["in3"] = ;
+				unitConverterArr["ft3"]["in^3"] = ;
+				unitConverterArr["ft3"]["ly3"] = ;
+				unitConverterArr["ft3"]["ly^3"] = ;
+				unitConverterArr["ft3"]["ft3"] = ;
+				unitConverterArr["ft3"]["m3"] = ;
+				unitConverterArr["ft3"]["m^3"] = ;
+				unitConverterArr["ft3"]["mi3"] = ;
+				unitConverterArr["ft3"]["mi^3"] = ;
+
+				unitConverterArr["ft3"]["yd3"] = ;
+				unitConverterArr["ft3"]["yd^3"] = ;
+				unitConverterArr["ft3"]["Nmi3"] = ;
+				unitConverterArr["ft3"]["Nmi^3"] = ;
+				unitConverterArr["ft3"]["Picapt3"] = ;
+				unitConverterArr["ft3"]["Picapt^3"] = ;
+				unitConverterArr["ft3"]["Pica3"] = ;
+				unitConverterArr["ft3"]["Pica^3"] = ;
+				unitConverterArr["ft3"]["GRT"] = ;
+				unitConverterArr["ft3"]["regton"] = ;
+				unitConverterArr["ft3"]["MTON"] = ;
+				
+				
+				unitConverterArr["ft^3"] = {};
+
+				unitConverterArr["ft^3"]["in3"] = ;
+				unitConverterArr["ft^3"]["in^3"] = ;
+				unitConverterArr["ft^3"]["ly3"] = ;
+				unitConverterArr["ft^3"]["ly^3"] = ;
+				unitConverterArr["ft^3"]["ft^3"] = ;
+				unitConverterArr["ft^3"]["m3"] = ;
+				unitConverterArr["ft^3"]["m^3"] = ;
+				unitConverterArr["ft^3"]["mi3"] = ;
+				unitConverterArr["ft^3"]["mi^3"] = ;
+
+				unitConverterArr["ft^3"]["yd3"] = ;
+				unitConverterArr["ft^3"]["yd^3"] = ;
+				unitConverterArr["ft^3"]["Nmi3"] = ;
+				unitConverterArr["ft^3"]["Nmi^3"] = ;
+				unitConverterArr["ft^3"]["Picapt3"] = ;
+				unitConverterArr["ft^3"]["Picapt^3"] = ;
+				unitConverterArr["ft^3"]["Pica3"] = ;
+				unitConverterArr["ft^3"]["Pica^3"] = ;
+				unitConverterArr["ft^3"]["GRT"] = ;
+				unitConverterArr["ft^3"]["regton"] = ;
+				unitConverterArr["ft^3"]["MTON"] = ;
+
+
+				unitConverterArr["in3"] = {};
+				
+				unitConverterArr["in3"]["in^3"] = ;
+				unitConverterArr["in3"]["ly3"] = ;
+				unitConverterArr["in3"]["ly^3"] = ;
+				unitConverterArr["in3"]["in3"] = ;
+				unitConverterArr["in3"]["m3"] = ;
+				unitConverterArr["in3"]["m^3"] = ;
+				unitConverterArr["in3"]["mi3"] = ;
+				unitConverterArr["in3"]["mi^3"] = ;
+
+				unitConverterArr["in3"]["yd3"] = ;
+				unitConverterArr["in3"]["yd^3"] = ;
+				unitConverterArr["in3"]["Nmi3"] = ;
+				unitConverterArr["in3"]["Nmi^3"] = ;
+				unitConverterArr["in3"]["Picapt3"] = ;
+				unitConverterArr["in3"]["Picapt^3"] = ;
+				unitConverterArr["in3"]["Pica3"] = ;
+				unitConverterArr["in3"]["Pica^3"] = ;
+				unitConverterArr["in3"]["GRT"] = ;
+				unitConverterArr["in3"]["regton"] = ;
+				unitConverterArr["in3"]["MTON"] = ;
+
+				
+				unitConverterArr["in^3"] = {};
+				
+				unitConverterArr["in^3"]["ly3"] = ;
+				unitConverterArr["in^3"]["ly^3"] = ;
+				unitConverterArr["in^3"]["in^3"] = ;
+				unitConverterArr["in^3"]["m3"] = ;
+				unitConverterArr["in^3"]["m^3"] = ;
+				unitConverterArr["in^3"]["mi3"] = ;
+				unitConverterArr["in^3"]["mi^3"] = ;
+
+				unitConverterArr["in^3"]["yd3"] = ;
+				unitConverterArr["in^3"]["yd^3"] = ;
+				unitConverterArr["in^3"]["Nmi3"] = ;
+				unitConverterArr["in^3"]["Nmi^3"] = ;
+				unitConverterArr["in^3"]["Picapt3"] = ;
+				unitConverterArr["in^3"]["Picapt^3"] = ;
+				unitConverterArr["in^3"]["Pica3"] = ;
+				unitConverterArr["in^3"]["Pica^3"] = ;
+				unitConverterArr["in^3"]["GRT"] = ;
+				unitConverterArr["in^3"]["regton"] = ;
+				unitConverterArr["in^3"]["MTON"] = ;
+
+
+				unitConverterArr["ly3"] = {};
+				
+				unitConverterArr["ly3"]["ly^3"] = ;
+				unitConverterArr["ly3"]["ly3"] = ;
+				unitConverterArr["ly3"]["m3"] = ;
+				unitConverterArr["ly3"]["m^3"] = ;
+				unitConverterArr["ly3"]["mi3"] = ;
+				unitConverterArr["ly3"]["mi^3"] = ;
+
+				unitConverterArr["ly3"]["yd3"] = ;
+				unitConverterArr["ly3"]["yd^3"] = ;
+				unitConverterArr["ly3"]["Nmi3"] = ;
+				unitConverterArr["ly3"]["Nmi^3"] = ;
+				unitConverterArr["ly3"]["Picapt3"] = ;
+				unitConverterArr["ly3"]["Picapt^3"] = ;
+				unitConverterArr["ly3"]["Pica3"] = ;
+				unitConverterArr["ly3"]["Pica^3"] = ;
+				unitConverterArr["ly3"]["GRT"] = ;
+				unitConverterArr["ly3"]["regton"] = ;
+				unitConverterArr["ly3"]["MTON"] = ;
+
+
+				unitConverterArr["ly^3"] = {};
+				
+				unitConverterArr["ly^3"]["m3"] = ;
+				unitConverterArr["ly^3"]["m^3"] = ;
+				unitConverterArr["ly^3"]["mi3"] = ;
+				unitConverterArr["ly^3"]["mi^3"] = ;
+
+				unitConverterArr["ly^3"]["yd3"] = ;
+				unitConverterArr["ly^3"]["yd^3"] = ;
+				unitConverterArr["ly^3"]["Nmi3"] = ;
+				unitConverterArr["ly^3"]["Nmi^3"] = ;
+				unitConverterArr["ly^3"]["Picapt3"] = ;
+				unitConverterArr["ly^3"]["Picapt^3"] = ;
+				unitConverterArr["ly^3"]["Pica3"] = ;
+				unitConverterArr["ly^3"]["Pica^3"] = ;
+				unitConverterArr["ly^3"]["GRT"] = ;
+				unitConverterArr["ly^3"]["regton"] = ;
+				unitConverterArr["ly^3"]["MTON"] = ;
+
+
+				unitConverterArr["m3"] = {};
+				
+				unitConverterArr["m3"]["m^3"] = ;
+				unitConverterArr["m3"]["mi3"] = ;
+				unitConverterArr["m3"]["mi^3"] = ;
+
+				unitConverterArr["m3"]["yd3"] = ;
+				unitConverterArr["m3"]["yd^3"] = ;
+				unitConverterArr["m3"]["Nmi3"] = ;
+				unitConverterArr["m3"]["Nmi^3"] = ;
+				unitConverterArr["m3"]["Picapt3"] = ;
+				unitConverterArr["m3"]["Picapt^3"] = ;
+				unitConverterArr["m3"]["Pica3"] = ;
+				unitConverterArr["m3"]["Pica^3"] = ;
+				unitConverterArr["m3"]["GRT"] = ;
+				unitConverterArr["m3"]["regton"] = ;
+				unitConverterArr["m3"]["MTON"] = ;
+
+
+				unitConverterArr["m^3"] = {};
+				
+				unitConverterArr["m^3"]["mi3"] = ;
+				unitConverterArr["m^3"]["mi^3"] = ;
+
+				unitConverterArr["m^3"]["yd3"] = ;
+				unitConverterArr["m^3"]["yd^3"] = ;
+				unitConverterArr["m^3"]["Nmi3"] = ;
+				unitConverterArr["m^3"]["Nmi^3"] = ;
+				unitConverterArr["m^3"]["Picapt3"] = ;
+				unitConverterArr["m^3"]["Picapt^3"] = ;
+				unitConverterArr["m^3"]["Pica3"] = ;
+				unitConverterArr["m^3"]["Pica^3"] = ;
+				unitConverterArr["m^3"]["GRT"] = ;
+				unitConverterArr["m^3"]["regton"] = ;
+				unitConverterArr["m^3"]["MTON"] = ;
+
+
+				unitConverterArr["mi3"] = {};
+				
+				unitConverterArr["mi3"]["mi^3"] = ;
+
+				unitConverterArr["mi3"]["yd3"] = ;
+				unitConverterArr["mi3"]["yd^3"] = ;
+				unitConverterArr["mi3"]["Nmi3"] = ;
+				unitConverterArr["mi3"]["Nmi^3"] = ;
+				unitConverterArr["mi3"]["Picapt3"] = ;
+				unitConverterArr["mi3"]["Picapt^3"] = ;
+				unitConverterArr["mi3"]["Pica3"] = ;
+				unitConverterArr["mi3"]["Pica^3"] = ;
+				unitConverterArr["mi3"]["GRT"] = ;
+				unitConverterArr["mi3"]["regton"] = ;
+				unitConverterArr["mi3"]["MTON"] = ;
+
+
+				unitConverterArr["mi^3"] = {};
+
+				unitConverterArr["mi3"]["yd3"] = ;
+				unitConverterArr["mi3"]["yd^3"] = ;
+				unitConverterArr["mi3"]["Nmi3"] = ;
+				unitConverterArr["mi3"]["Nmi^3"] = ;
+				unitConverterArr["mi3"]["Picapt3"] = ;
+				unitConverterArr["mi3"]["Picapt^3"] = ;
+				unitConverterArr["mi3"]["Pica3"] = ;
+				unitConverterArr["mi3"]["Pica^3"] = ;
+				unitConverterArr["mi3"]["GRT"] = ;
+				unitConverterArr["mi3"]["regton"] = ;
+				unitConverterArr["mi3"]["MTON"] = ;
+
+
+				unitConverterArr["yd3"] = {};
+				
+				unitConverterArr["yd3"]["yd^3"] = ;
+				unitConverterArr["yd3"]["Nmi3"] = ;
+				unitConverterArr["yd3"]["Nmi^3"] = ;
+				unitConverterArr["yd3"]["Picapt3"] = ;
+				unitConverterArr["yd3"]["Picapt^3"] = ;
+				unitConverterArr["yd3"]["Pica3"] = ;
+				unitConverterArr["yd3"]["Pica^3"] = ;
+				unitConverterArr["yd3"]["GRT"] = ;
+				unitConverterArr["yd3"]["regton"] = ;
+				unitConverterArr["yd3"]["MTON"] = ;
+
+
+				unitConverterArr["yd^3"] = {};
+				
+				unitConverterArr["yd^3"]["Nmi3"] = ;
+				unitConverterArr["yd^3"]["Nmi^3"] = ;
+				unitConverterArr["yd^3"]["Picapt3"] = ;
+				unitConverterArr["yd^3"]["Picapt^3"] = ;
+				unitConverterArr["yd^3"]["Pica3"] = ;
+				unitConverterArr["yd^3"]["Pica^3"] = ;
+				unitConverterArr["yd^3"]["GRT"] = ;
+				unitConverterArr["yd^3"]["regton"] = ;
+				unitConverterArr["yd^3"]["MTON"] = ;
+
+
+				unitConverterArr["Nmi3"] = {};
+				
+				unitConverterArr["Nmi3"]["Nmi^3"] = ;
+				unitConverterArr["Nmi3"]["Picapt3"] = ;
+				unitConverterArr["Nmi3"]["Picapt^3"] = ;
+				unitConverterArr["Nmi3"]["Pica3"] = ;
+				unitConverterArr["Nmi3"]["Pica^3"] = ;
+				unitConverterArr["Nmi3"]["GRT"] = ;
+				unitConverterArr["Nmi3"]["regton"] = ;
+				unitConverterArr["Nmi3"]["MTON"] = ;
+
+
+				unitConverterArr["Nmi^3"] = {};
+
+				unitConverterArr["Nmi^3"]["Picapt3"] = ;
+				unitConverterArr["Nmi^3"]["Picapt^3"] = ;
+				unitConverterArr["Nmi^3"]["Pica3"] = ;
+				unitConverterArr["Nmi^3"]["Pica^3"] = ;
+				unitConverterArr["Nmi^3"]["GRT"] = ;
+				unitConverterArr["Nmi^3"]["regton"] = ;
+				unitConverterArr["Nmi^3"]["MTON"] = ;
+
+
+				unitConverterArr["Picapt3"] = {};
+				
+				unitConverterArr["Picapt3"]["Picapt^3"] = ;
+				unitConverterArr["Picapt3"]["Pica3"] = ;
+				unitConverterArr["Picapt3"]["Pica^3"] = ;
+				unitConverterArr["Picapt3"]["GRT"] = ;
+				unitConverterArr["Picapt3"]["regton"] = ;
+				unitConverterArr["Picapt3"]["MTON"] = ;
+
+
+				unitConverterArr["Picapt^3"] = {};
+				
+				unitConverterArr["Picapt^3"]["Pica3"] = ;
+				unitConverterArr["Picapt^3"]["Pica^3"] = ;
+				unitConverterArr["Picapt^3"]["GRT"] = ;
+				unitConverterArr["Picapt^3"]["regton"] = ;
+				unitConverterArr["Picapt^3"]["MTON"] = ;
+
+
+				unitConverterArr["Pica3"] = {};
+				
+				unitConverterArr["Pica3"]["Pica^3"] = ;
+				unitConverterArr["Pica3"]["GRT"] = ;
+				unitConverterArr["Pica3"]["regton"] = ;
+				unitConverterArr["Pica3"]["MTON"] = ;
+
+
+				unitConverterArr["Pica^3"] = {};
+				
+				unitConverterArr["Pica^3"]["GRT"] = ;
+				unitConverterArr["Pica^3"]["regton"] = ;
+				unitConverterArr["Pica^3"]["MTON"] = ;
+
+
+				unitConverterArr["GRT"] = {};
+
+				unitConverterArr["GRT"]["regton"] = ;
+				unitConverterArr["GRT"]["MTON"] = ;
+
+
+				unitConverterArr["regton"] = {};
+
+				unitConverterArr["regton"]["MTON"] = ;*/
+
+
+
+
+				//Picapt3/Picapt^3 do not support by LO
+				unitConverterArr["tsp"] = {};//Teaspoon
+
+				unitConverterArr["tsp"]["tspm"] = 0.98578431875;
+				unitConverterArr["tsp"]["tbs"] = 0.333333333333333;
+				unitConverterArr["tsp"]["oz"] = 0.166666666666667;
+				unitConverterArr["tsp"]["cup"] = 0.0208333333333333;
+				unitConverterArr["tsp"]["pt"] = 0.0104166666666667;
+				unitConverterArr["tsp"]["us_pt"] = 0.0104166666666667;
+				unitConverterArr["tsp"]["uk_pt"] = 0.00867368942321863;
+				unitConverterArr["tsp"]["qt"] = 0.00520833333333333;
+				unitConverterArr["tsp"]["uk_qt"] = 0.00433684471160932;
+				unitConverterArr["tsp"]["gal"] = 0.00130208333333333;
+				unitConverterArr["tsp"]["uk_gal"] = 0.00108421117790233;
+				unitConverterArr["tsp"]["l"] = 0.00492892159375;
+				unitConverterArr["tsp"]["L"] = 0.00492892159375;
+				unitConverterArr["tsp"]["lt"] = 0.00492892159375;
+				unitConverterArr["tsp"]["ang3"] = 4.92892159375E+024;
+				unitConverterArr["tsp"]["ang^3"] = 4.92892159375E+024;
+				unitConverterArr["tsp"]["barrel"] = 0.0000310019841269841;
+				unitConverterArr["tsp"]["bushel"] = 0.000139870916129584;
+				unitConverterArr["tsp"]["ft3"] = 0.00017406322337963;
+				unitConverterArr["tsp"]["ft^3"] = 0.00017406322337963;
+
+				unitConverterArr["tsp"]["in3"] = 0.30078125;
+				unitConverterArr["tsp"]["in^3"] = 0.30078125;
+				unitConverterArr["tsp"]["ly3"] = 5.82110969649095E-054;
+				unitConverterArr["tsp"]["ly^3"] = 5.82110969649095E-054;
+				unitConverterArr["tsp"]["ang^3"] = 4.92892159375E+024;
+				unitConverterArr["tsp"]["m3"] = 0.00000492892159375;
+				unitConverterArr["tsp"]["m^3"] = 0.00000492892159375;
+				unitConverterArr["tsp"]["mi3"] = 1.18251117637581E-015;
+				unitConverterArr["tsp"]["mi^3"] = 1.18251117637581E-015;
+
+				unitConverterArr["tsp"]["yd3"] = 0.0000064467860510974;
+				unitConverterArr["tsp"]["yd^3"] = 0.0000064467860510974;
+				unitConverterArr["tsp"]["Nmi3"] = 7.7594146898722E-016;
+				unitConverterArr["tsp"]["Nmi^3"] = 7.7594146898722E-016;
+				//unitConverterArr["tsp"]["Picapt3"] = ;
+				//unitConverterArr["tsp"]["Picapt^3"] = ;
+				unitConverterArr["tsp"]["Pica3"] = 112266;
+				unitConverterArr["tsp"]["Pica^3"] = 112266;
+				unitConverterArr["tsp"]["GRT"] = 0.00000174063239539155;
+				unitConverterArr["tsp"]["regton"] = 0.00000174063239539155;
+				unitConverterArr["tsp"]["MTON"] = 0.00696252893518519;
+
+
+				unitConverterArr["tspm"] = {};//Modern teaspoon
+
+				unitConverterArr["tspm"]["tbs"] = 0.33814022701843;
+				unitConverterArr["tspm"]["oz"] = 0.169070113509215;
+				unitConverterArr["tspm"]["cup"] = 0.0211337641886519;
+				unitConverterArr["tspm"]["pt"] = 0.0105668820943259;
+				unitConverterArr["tspm"]["us_pt"] = 0.0105668820943259;
+				unitConverterArr["tspm"]["uk_pt"] = 0.00879876993196351;
+				unitConverterArr["tspm"]["qt"] = 0.00528344104716297;
+				unitConverterArr["tspm"]["uk_qt"] = 0.00439938496598176;
+				unitConverterArr["tspm"]["gal"] = 0.00132086026179074;
+				unitConverterArr["tspm"]["uk_gal"] = 0.00109984624149544;
+				unitConverterArr["tspm"]["l"] = 0.005;
+				unitConverterArr["tspm"]["L"] = 0.005;
+				unitConverterArr["tspm"]["lt"] = 0.005;
+				unitConverterArr["tspm"]["ang3"] = 5E+024;
+				unitConverterArr["tspm"]["ang^3"] = 5E+024;
+				unitConverterArr["tspm"]["barrel"] = 0.0000314490538521605;
+				unitConverterArr["tspm"]["bushel"] = 0.00014188795;
+				unitConverterArr["tspm"]["ft3"] = 0.000176573333607443;
+				unitConverterArr["tspm"]["ft^3"] = 0.000176573333607443;
+
+				unitConverterArr["tspm"]["in3"] = 0.305118720473661;
+				unitConverterArr["tspm"]["in^3"] = 0.305118720473661;
+				unitConverterArr["tspm"]["ly3"] = 5.9050540628119E-054;
+				unitConverterArr["tspm"]["ly^3"] = 5.9050540628119E-054;
+				unitConverterArr["tspm"]["ang^3"] = 5E+024;
+				unitConverterArr["tspm"]["m3"] = 0.000005;
+				unitConverterArr["tspm"]["m^3"] = 0.000005;
+				unitConverterArr["tspm"]["mi3"] = 1.19956379289464E-015;
+				unitConverterArr["tspm"]["mi^3"] = 1.19956379289464E-015;
+
+				unitConverterArr["tspm"]["yd3"] = 0.00000653975309657196;
+				unitConverterArr["tspm"]["yd^3"] = 0.00000653975309657196;
+				unitConverterArr["tspm"]["Nmi3"] = 7.87131073429058E-016;
+				unitConverterArr["tspm"]["Nmi^3"] = 7.87131073429058E-016;
+				//unitConverterArr["tspm"]["Picapt3"] = ;
+				//unitConverterArr["tspm"]["Picapt^3"] = ;
+				unitConverterArr["tspm"]["Pica3"] = 113884.952179353;
+				unitConverterArr["tspm"]["Pica^3"] = 113884.952179353;
+				unitConverterArr["tspm"]["GRT"] = 0.0000017657335;
+				unitConverterArr["tspm"]["regton"] = 0.0000017657335;
+				unitConverterArr["tspm"]["MTON"] = 0.00706293334429772;
+
+
+				unitConverterArr["tbs"] = {};
+
+				unitConverterArr["tbs"]["oz"] = 0.5;
+				unitConverterArr["tbs"]["cup"] = 0.0625;
+				unitConverterArr["tbs"]["pt"] = 0.03125;
+				unitConverterArr["tbs"]["us_pt"] = 0.03125;
+				unitConverterArr["tbs"]["uk_pt"] = 0.0260210682696559;
+				unitConverterArr["tbs"]["qt"] = 0.015625;
+				unitConverterArr["tbs"]["uk_qt"] = 0.013010534134828;
+				unitConverterArr["tbs"]["gal"] = 0.00390625;
+				unitConverterArr["tbs"]["uk_gal"] = 0.00325263353370699;
+				unitConverterArr["tbs"]["l"] = 0.01478676478125;
+				unitConverterArr["tbs"]["L"] = 0.01478676478125;
+				unitConverterArr["tbs"]["lt"] = 0.01478676478125;
+				unitConverterArr["tbs"]["ang3"] = 1.478676478125E+025;
+				unitConverterArr["tbs"]["ang^3"] = 1.478676478125E+025;
+				unitConverterArr["tbs"]["barrel"] = 0.0000930059523809524;
+				unitConverterArr["tbs"]["bushel"] = 0.000419612748388752;
+				unitConverterArr["tbs"]["ft3"] = 0.000522189670138889;
+				unitConverterArr["tbs"]["ft^3"] = 0.000522189670138889;
+
+				unitConverterArr["tbs"]["in3"] = 0.90234375;
+				unitConverterArr["tbs"]["in^3"] = 0.90234375;
+				unitConverterArr["tbs"]["ly3"] = 1.74633290894728E-053;
+				unitConverterArr["tbs"]["ly^3"] = 1.74633290894728E-053;
+				unitConverterArr["tbs"]["ang^3"] = 1.478676478125E+025;
+				unitConverterArr["tbs"]["m3"] = 0.00001478676478125;
+				unitConverterArr["tbs"]["m^3"] = 0.00001478676478125;
+				unitConverterArr["tbs"]["mi3"] = 3.54753352912742E-015;
+				unitConverterArr["tbs"]["mi^3"] = 3.54753352912742E-015;
+
+				unitConverterArr["tbs"]["yd3"] = 0.0000193403581532922;
+				unitConverterArr["tbs"]["yd^3"] = 0.0000193403581532922;
+				unitConverterArr["tbs"]["Nmi3"] = 2.32782440696166E-015;
+				unitConverterArr["tbs"]["Nmi^3"] = 2.32782440696166E-015;
+				//unitConverterArr["tbs"]["Picapt3"] = ;
+				//unitConverterArr["tbs"]["Picapt^3"] = ;
+				unitConverterArr["tbs"]["Pica3"] = 336798;
+				unitConverterArr["tbs"]["Pica^3"] = 336798;
+				unitConverterArr["tbs"]["GRT"] = 0.00000522189718617466;
+				unitConverterArr["tbs"]["regton"] = 0.00000522189718617466;
+				unitConverterArr["tbs"]["MTON"] = 0.0208875868055556;
+
+
+				unitConverterArr["oz"] = {};
+
+				unitConverterArr["oz"]["cup"] = 0.125;
+				unitConverterArr["oz"]["pt"] = 0.0625;
+				unitConverterArr["oz"]["us_pt"] = 0.0625;
+				unitConverterArr["oz"]["uk_pt"] = 0.0520421365393118;
+				unitConverterArr["oz"]["qt"] = 0.03125;
+				unitConverterArr["oz"]["uk_qt"] = 0.0260210682696559;
+				unitConverterArr["oz"]["gal"] = 0.0078125;
+				unitConverterArr["oz"]["uk_gal"] = 0.00650526706741398;
+				unitConverterArr["oz"]["l"] = 0.0295735295625;
+				unitConverterArr["oz"]["L"] = 0.0295735295625;
+				unitConverterArr["oz"]["lt"] = 0.0295735295625;
+				unitConverterArr["oz"]["ang3"] = 2.95735295625E+025;
+				unitConverterArr["oz"]["ang^3"] = 2.95735295625E+025;
+				unitConverterArr["oz"]["barrel"] = 0.000186011904761905;
+				unitConverterArr["oz"]["bushel"] = 0.000839225496777505;
+				unitConverterArr["oz"]["ft3"] = 0.00104437934027778;
+				unitConverterArr["oz"]["ft^3"] = 0.00104437934027778;
+
+				unitConverterArr["oz"]["in3"] = 1.8046875;
+				unitConverterArr["oz"]["in^3"] = 1.8046875;
+				unitConverterArr["oz"]["ly3"] = 3.49266581789457E-053;
+				unitConverterArr["oz"]["ly^3"] = 3.49266581789457E-053;
+				unitConverterArr["oz"]["ang^3"] = 2.95735295625E+025;
+				unitConverterArr["oz"]["m3"] = 0.0000295735295625;
+				unitConverterArr["oz"]["m^3"] = 0.0000295735295625;
+				unitConverterArr["oz"]["mi3"] = 7.09506705825485E-015;
+				unitConverterArr["oz"]["mi^3"] = 7.09506705825485E-015;
+
+				unitConverterArr["oz"]["yd3"] = 0.0000386807163065844;
+				unitConverterArr["oz"]["yd^3"] = 0.0000386807163065844;
+				unitConverterArr["oz"]["Nmi3"] = 4.65564881392332E-015;
+				unitConverterArr["oz"]["Nmi^3"] = 4.65564881392332E-015;
+				//unitConverterArr["oz"]["Picapt3"] = ;
+				//unitConverterArr["oz"]["Picapt^3"] = ;
+				unitConverterArr["oz"]["Pica3"] = 673596;
+				unitConverterArr["oz"]["Pica^3"] = 673596;
+				unitConverterArr["oz"]["GRT"] = 0.0000104437943723493;
+				unitConverterArr["oz"]["regton"] = 0.0000104437943723493;
+				unitConverterArr["oz"]["MTON"] = 0.0417751736111111;
+
+
+				unitConverterArr["cup"] = {};
+
+				unitConverterArr["cup"]["pt"] = 0.5;
+				unitConverterArr["cup"]["us_pt"] = 0.5;
+				unitConverterArr["cup"]["uk_pt"] = 0.416337092314494;
+				unitConverterArr["cup"]["qt"] = 0.25;
+				unitConverterArr["cup"]["uk_qt"] = 0.208168546157247;
+				unitConverterArr["cup"]["gal"] = 0.0625;
+				unitConverterArr["cup"]["uk_gal"] = 0.0520421365393118;
+				unitConverterArr["cup"]["l"] = 0.2365882365;
+				unitConverterArr["cup"]["L"] = 0.2365882365;
+				unitConverterArr["cup"]["lt"] = 0.2365882365;
+				unitConverterArr["cup"]["ang3"] = 2.365882365E+026;
+				unitConverterArr["cup"]["ang^3"] = 2.365882365E+026;
+				unitConverterArr["cup"]["barrel"] = 0.00148809523809524;
+				unitConverterArr["cup"]["bushel"] = 0.00671380397422004;
+				unitConverterArr["cup"]["ft3"] = 0.00835503472222222;
+				unitConverterArr["cup"]["ft^3"] = 0.00835503472222222;
+
+				unitConverterArr["cup"]["in3"] = 14.4375;
+				unitConverterArr["cup"]["in^3"] = 14.4375;
+				unitConverterArr["cup"]["ly3"] = 2.79413265431566E-052;
+				unitConverterArr["cup"]["ly^3"] = 2.79413265431566E-052;
+				unitConverterArr["cup"]["ang^3"] = 2.365882365E+026;
+				unitConverterArr["cup"]["m3"] = 0.0002365882365;
+				unitConverterArr["cup"]["m^3"] = 0.0002365882365;
+				unitConverterArr["cup"]["mi3"] = 0.0000000000000567605364660388;
+				unitConverterArr["cup"]["mi^3"] = 0.0000000000000567605364660388;
+
+				unitConverterArr["cup"]["yd3"] = 0.000309445730452675;
+				unitConverterArr["cup"]["yd^3"] = 0.000309445730452675;
+				unitConverterArr["cup"]["Nmi3"] = 0.0000000000000372451905113865;
+				unitConverterArr["cup"]["Nmi^3"] = 0.0000000000000372451905113865;
+				//unitConverterArr["cup"]["Picapt3"] = ;
+				//unitConverterArr["cup"]["Picapt^3"] = ;
+				unitConverterArr["cup"]["Pica3"] = 5388768;
+				unitConverterArr["cup"]["Pica^3"] = 5388768;
+				unitConverterArr["cup"]["GRT"] = 0.0000835503549787945;
+				unitConverterArr["cup"]["regton"] = 0.0000835503549787945;
+				unitConverterArr["cup"]["MTON"] = 0.334201388888889;
+
+
+				unitConverterArr["pt"] = {};
+
+				unitConverterArr["pt"]["us_pt"] = 1;
+				unitConverterArr["pt"]["uk_pt"] = 0.832674184628989;
+				unitConverterArr["pt"]["qt"] = 0.5;
+				unitConverterArr["pt"]["uk_qt"] = 0.416337092314494;
+				unitConverterArr["pt"]["gal"] = 0.125;
+				unitConverterArr["pt"]["uk_gal"] = 0.104084273078624;
+				unitConverterArr["pt"]["l"] = 0.473176473;
+				unitConverterArr["pt"]["L"] = 0.473176473;
+				unitConverterArr["pt"]["lt"] = 0.473176473;
+				unitConverterArr["pt"]["ang3"] = 4.73176473E+026;
+				unitConverterArr["pt"]["ang^3"] = 4.73176473E+026;
+				unitConverterArr["pt"]["barrel"] = 0.00297619047619048;
+				unitConverterArr["pt"]["bushel"] = 0.0134276079484401;
+				unitConverterArr["pt"]["ft3"] = 0.0167100694444444;
+				unitConverterArr["pt"]["ft^3"] = 0.0167100694444444;
+
+				unitConverterArr["pt"]["in3"] = 28.875;
+				unitConverterArr["pt"]["in^3"] = 28.875;
+				unitConverterArr["pt"]["ly3"] = 5.58826530863131E-052;
+				unitConverterArr["pt"]["ly^3"] = 5.58826530863131E-052;
+				unitConverterArr["pt"]["ang^3"] = 4.73176473E+026;
+				unitConverterArr["pt"]["m3"] = 0.000473176473;
+				unitConverterArr["pt"]["m^3"] = 0.000473176473;
+				unitConverterArr["pt"]["mi3"] = 0.000000000000113521072932078;
+				unitConverterArr["pt"]["mi^3"] = 0.000000000000113521072932078;
+
+				unitConverterArr["pt"]["yd3"] = 0.00061889146090535;
+				unitConverterArr["pt"]["yd^3"] = 0.00061889146090535;
+				unitConverterArr["pt"]["Nmi3"] = 0.0000000000000744903810227731;
+				unitConverterArr["pt"]["Nmi^3"] = 0.0000000000000744903810227731;
+				//unitConverterArr["pt"]["Picapt3"] = ;
+				//unitConverterArr["pt"]["Picapt^3"] = ;
+				unitConverterArr["pt"]["Pica3"] = 10777536;
+				unitConverterArr["pt"]["Pica^3"] = 10777536;
+				unitConverterArr["pt"]["GRT"] = 0.000167100709957589;
+				unitConverterArr["pt"]["regton"] = 0.000167100709957589;
+				unitConverterArr["pt"]["MTON"] = 0.668402777777778;
+
+
+				unitConverterArr["us_pt"] = {};
+
+				unitConverterArr["us_pt"]["uk_pt"] = 0.832674184628989;
+				unitConverterArr["us_pt"]["qt"] = 0.5;
+				unitConverterArr["us_pt"]["uk_qt"] = 0.416337092314494;
+				unitConverterArr["us_pt"]["gal"] = 0.125;
+				unitConverterArr["us_pt"]["uk_gal"] = 0.104084273078624;
+				unitConverterArr["us_pt"]["l"] = 0.473176473;
+				unitConverterArr["us_pt"]["L"] = 0.473176473;
+				unitConverterArr["us_pt"]["lt"] = 0.473176473;
+				unitConverterArr["us_pt"]["ang3"] = 4.73176473E+026;
+				unitConverterArr["us_pt"]["ang^3"] = 4.73176473E+026;
+				unitConverterArr["us_pt"]["barrel"] = 0.00297619047619048;
+				unitConverterArr["us_pt"]["bushel"] = 0.0134276079484401;
+				unitConverterArr["us_pt"]["ft3"] = 0.0167100694444444;
+				unitConverterArr["us_pt"]["ft^3"] = 0.0167100694444444;
+
+				unitConverterArr["us_pt"]["in3"] = 28.875;
+				unitConverterArr["us_pt"]["in^3"] = 28.875;
+				unitConverterArr["us_pt"]["ly3"] = 5.58826530863131E-052;
+				unitConverterArr["us_pt"]["ly^3"] = 5.58826530863131E-052;
+				unitConverterArr["us_pt"]["ang^3"] = 4.73176473E+026;
+				unitConverterArr["us_pt"]["m3"] = 0.000473176473;
+				unitConverterArr["us_pt"]["m^3"] = 0.000473176473;
+				unitConverterArr["us_pt"]["mi3"] = 0.000000000000113521072932078;
+				unitConverterArr["us_pt"]["mi^3"] = 0.000000000000113521072932078;
+
+				unitConverterArr["us_pt"]["yd3"] = 0.00061889146090535;
+				unitConverterArr["us_pt"]["yd^3"] = 0.00061889146090535;
+				unitConverterArr["us_pt"]["Nmi3"] = 0.0000000000000744903810227731;
+				unitConverterArr["us_pt"]["Nmi^3"] = 0.0000000000000744903810227731;
+				//unitConverterArr["us_pt"]["Picapt3"] = ;
+				//unitConverterArr["us_pt"]["Picapt^3"] = ;
+				unitConverterArr["us_pt"]["Pica3"] = 10777536;
+				unitConverterArr["us_pt"]["Pica^3"] = 10777536;
+				unitConverterArr["us_pt"]["GRT"] = 0.000167100709957589;
+				unitConverterArr["us_pt"]["regton"] = 0.000167100709957589;
+				unitConverterArr["us_pt"]["MTON"] = 0.668402777777778;
+
+
+				unitConverterArr["uk_pt"] = {};
+
+				unitConverterArr["uk_pt"]["qt"] = 0.600474962752427;
+				unitConverterArr["uk_pt"]["uk_qt"] = 0.5;
+				unitConverterArr["uk_pt"]["gal"] = 0.150118740688107;
+				unitConverterArr["uk_pt"]["uk_gal"] = 0.125;
+				unitConverterArr["uk_pt"]["l"] = 0.56826125;
+				unitConverterArr["uk_pt"]["L"] = 0.56826125;
+				unitConverterArr["uk_pt"]["lt"] = 0.56826125;
+				unitConverterArr["uk_pt"]["ang3"] = 5.6826125E+026;
+				unitConverterArr["uk_pt"]["ang^3"] = 5.6826125E+026;
+				unitConverterArr["uk_pt"]["barrel"] = 0.00357425573066921;
+				unitConverterArr["uk_pt"]["bushel"] = 0.0161258847653875;
+				unitConverterArr["uk_pt"]["ft3"] = 0.0200679566544865;
+				unitConverterArr["uk_pt"]["ft^3"] = 0.0200679566544865;
+
+				unitConverterArr["uk_pt"]["in3"] = 34.6774290989527;
+				unitConverterArr["uk_pt"]["in^3"] = 34.6774290989527;
+				unitConverterArr["uk_pt"]["ly3"] = 6.71122680610214E-052;
+				unitConverterArr["uk_pt"]["ly^3"] = 6.71122680610214E-052;
+				unitConverterArr["uk_pt"]["ang^3"] = 5.6826125E+026;
+				unitConverterArr["uk_pt"]["m3"] = 0.00056826125;
+				unitConverterArr["uk_pt"]["m^3"] = 0.00056826125;
+				unitConverterArr["uk_pt"]["mi3"] = 0.00000000000013633312408101;
+				unitConverterArr["uk_pt"]["mi^3"] = 0.00000000000013633312408101;
+
+				unitConverterArr["uk_pt"]["yd3"] = 0.000743257653869871;
+				unitConverterArr["uk_pt"]["yd^3"] = 0.000743257653869871;
+				unitConverterArr["uk_pt"]["Nmi3"] = 0.0000000000000894592175401276;
+				unitConverterArr["uk_pt"]["Nmi^3"] = 0.0000000000000894592175401276;
+				//unitConverterArr["uk_pt"]["Picapt3"] = ;
+				//unitConverterArr["uk_pt"]["Picapt^3"] = ;
+				unitConverterArr["uk_pt"]["Pica3"] = 12943281.0563259;
+				unitConverterArr["uk_pt"]["Pica^3"] = 12943281.0563259;
+				unitConverterArr["uk_pt"]["GRT"] = 0.000200679585175375;
+				unitConverterArr["uk_pt"]["regton"] = 0.000200679585175375;
+				unitConverterArr["uk_pt"]["MTON"] = 0.80271826617946;
+
+
+				unitConverterArr["qt"] = {};
+
+				unitConverterArr["qt"]["uk_qt"] = 0.832674184628989;
+				unitConverterArr["qt"]["gal"] = 0.25;
+				unitConverterArr["qt"]["uk_gal"] = 0.208168546157247;
+				unitConverterArr["qt"]["l"] = 0.946352946;
+				unitConverterArr["qt"]["L"] = 0.946352946;
+				unitConverterArr["qt"]["lt"] = 0.946352946;
+				unitConverterArr["qt"]["ang3"] = 9.46352946E+026;
+				unitConverterArr["qt"]["ang^3"] = 9.46352946E+026;
+				unitConverterArr["qt"]["barrel"] = 0.00595238095238095;
+				unitConverterArr["qt"]["bushel"] = 0.0268552158968801;
+				unitConverterArr["qt"]["ft3"] = 0.0334201388888889;
+				unitConverterArr["qt"]["ft^3"] = 0.0334201388888889;
+
+				unitConverterArr["qt"]["in3"] = 57.75;
+				unitConverterArr["qt"]["in^3"] = 57.75;
+				unitConverterArr["qt"]["ly3"] = 1.11765306172626E-051;
+				unitConverterArr["qt"]["ly^3"] = 1.11765306172626E-051;
+				unitConverterArr["qt"]["ang^3"] = 9.46352946E+026;
+				unitConverterArr["qt"]["m3"] = 0.000946352946;
+				unitConverterArr["qt"]["m^3"] = 0.000946352946;
+				unitConverterArr["qt"]["mi3"] = 0.000000000000227042145864155;
+				unitConverterArr["qt"]["mi^3"] = 0.000000000000227042145864155;
+
+				unitConverterArr["qt"]["yd3"] = 0.0012377829218107;
+				unitConverterArr["qt"]["yd^3"] = 0.0012377829218107;
+				unitConverterArr["qt"]["Nmi3"] = 0.000000000000148980762045546;
+				unitConverterArr["qt"]["Nmi^3"] = 0.000000000000148980762045546;
+				//unitConverterArr["qt"]["Picapt3"] = ;
+				//unitConverterArr["qt"]["Picapt^3"] = ;
+				unitConverterArr["qt"]["Pica3"] = 21555072;
+				unitConverterArr["qt"]["Pica^3"] = 21555072;
+				unitConverterArr["qt"]["GRT"] = 0.000334201419915178;
+				unitConverterArr["qt"]["regton"] = 0.000334201419915178;
+				unitConverterArr["qt"]["MTON"] = 1.33680555555556;
+
+
+				unitConverterArr["uk_qt"] = {};
+
+				unitConverterArr["uk_qt"]["gal"] = 0.300237481376214;
+				unitConverterArr["uk_qt"]["uk_gal"] = 0.25;
+				unitConverterArr["uk_qt"]["l"] = 1.1365225;
+				unitConverterArr["uk_qt"]["L"] = 1.1365225;
+				unitConverterArr["uk_qt"]["lt"] = 1.1365225;
+				unitConverterArr["uk_qt"]["ang3"] = 1.1365225E+027;
+				unitConverterArr["uk_qt"]["ang^3"] = 1.1365225E+027;
+				unitConverterArr["uk_qt"]["barrel"] = 0.00714851146133842;
+				unitConverterArr["uk_qt"]["bushel"] = 0.032251769530775;
+				unitConverterArr["uk_qt"]["ft3"] = 0.040135913308973;
+				unitConverterArr["uk_qt"]["ft^3"] = 0.040135913308973;
+
+				unitConverterArr["uk_qt"]["in3"] = 69.3548581979054;
+				unitConverterArr["uk_qt"]["in^3"] = 69.3548581979054;
+				unitConverterArr["uk_qt"]["ly3"] = 1.34224536122043E-051;
+				unitConverterArr["uk_qt"]["ly^3"] = 1.34224536122043E-051;
+				unitConverterArr["uk_qt"]["ang^3"] = 1.1365225E+027;
+				unitConverterArr["uk_qt"]["m3"] = 0.0011365225;
+				unitConverterArr["uk_qt"]["m^3"] = 0.0011365225;
+				unitConverterArr["uk_qt"]["mi3"] = 0.000000000000272666248162019;
+				unitConverterArr["uk_qt"]["mi^3"] = 0.000000000000272666248162019;
+
+				unitConverterArr["uk_qt"]["yd3"] = 0.00148651530773974;
+				unitConverterArr["uk_qt"]["yd^3"] = 0.00148651530773974;
+				unitConverterArr["uk_qt"]["Nmi3"] = 0.000000000000178918435080255;
+				unitConverterArr["uk_qt"]["Nmi^3"] = 0.000000000000178918435080255;
+				//unitConverterArr["uk_qt"]["Picapt3"] = ;
+				//unitConverterArr["uk_qt"]["Picapt^3"] = ;
+				unitConverterArr["uk_qt"]["Pica3"] = 25886562.1126518;
+				unitConverterArr["uk_qt"]["Pica^3"] = 25886562.1126518;
+				unitConverterArr["uk_qt"]["GRT"] = 0.00040135917035075;
+				unitConverterArr["uk_qt"]["regton"] = 0.00040135917035075;
+				unitConverterArr["uk_qt"]["MTON"] = 1.60543653235892;
+
+
+				unitConverterArr["gal"] = {};
+
+				unitConverterArr["gal"]["uk_gal"] = 0.832674184628989;
+				unitConverterArr["gal"]["l"] = 3.785411784;
+				unitConverterArr["gal"]["L"] = 3.785411784;
+				unitConverterArr["gal"]["lt"] = 3.785411784;
+				unitConverterArr["gal"]["ang3"] = 3.785411784E+027;
+				unitConverterArr["gal"]["ang^3"] = 3.785411784E+027;
+				unitConverterArr["gal"]["barrel"] = 0.0238095238095238;
+				unitConverterArr["gal"]["bushel"] = 0.107420863587521;
+				unitConverterArr["gal"]["ft3"] = 0.133680555555556;
+				unitConverterArr["gal"]["ft^3"] = 0.133680555555556;
+
+				unitConverterArr["gal"]["in3"] = 231;
+				unitConverterArr["gal"]["in^3"] = 231;
+				unitConverterArr["gal"]["ly3"] = 4.47061224690505E-051;
+				unitConverterArr["gal"]["ly^3"] = 4.47061224690505E-051;
+				unitConverterArr["gal"]["ang^3"] = 3.785411784E+027;
+				unitConverterArr["gal"]["m3"] = 0.003785411784;
+				unitConverterArr["gal"]["m^3"] = 0.003785411784;
+				unitConverterArr["gal"]["mi3"] = 0.00000000000090816858345662;
+				unitConverterArr["gal"]["mi^3"] = 0.00000000000090816858345662;
+
+				unitConverterArr["gal"]["yd3"] = 0.0049511316872428;
+				unitConverterArr["gal"]["yd^3"] = 0.0049511316872428;
+				unitConverterArr["gal"]["Nmi3"] = 0.000000000000595923048182185;
+				unitConverterArr["gal"]["Nmi^3"] = 0.000000000000595923048182185;
+				//unitConverterArr["gal"]["Picapt3"] = ;
+				//unitConverterArr["gal"]["Picapt^3"] = ;
+				unitConverterArr["gal"]["Pica3"] = 86220288;
+				unitConverterArr["gal"]["Pica^3"] = 86220288;
+				unitConverterArr["gal"]["GRT"] = 0.00133680567966071;
+				unitConverterArr["gal"]["regton"] = 0.00133680567966071;
+				unitConverterArr["gal"]["MTON"] = 5.34722222222222;
+
+
+				unitConverterArr["uk_gal"] = {};
+
+				unitConverterArr["uk_gal"]["l"] = 4.54609;
+				unitConverterArr["uk_gal"]["L"] = 4.54609;
+				unitConverterArr["uk_gal"]["lt"] = 4.54609;
+				unitConverterArr["uk_gal"]["ang3"] = 4.54609E+027;
+				unitConverterArr["uk_gal"]["ang^3"] = 4.54609E+027;
+				unitConverterArr["uk_gal"]["barrel"] = 0.0285940458453537;
+				unitConverterArr["uk_gal"]["bushel"] = 0.1290070781231;
+				unitConverterArr["uk_gal"]["ft3"] = 0.160543653235892;
+				unitConverterArr["uk_gal"]["ft^3"] = 0.160543653235892;
+
+				unitConverterArr["uk_gal"]["in3"] = 277.419432791621;
+				unitConverterArr["uk_gal"]["in^3"] = 277.419432791621;
+				unitConverterArr["uk_gal"]["ly3"] = 5.36898144488171E-051;
+				unitConverterArr["uk_gal"]["ly^3"] = 5.36898144488171E-051;
+				unitConverterArr["uk_gal"]["ang^3"] = 4.54609E+027;
+				unitConverterArr["uk_gal"]["m3"] = 0.00454609;
+				unitConverterArr["uk_gal"]["m^3"] = 0.00454609;
+				unitConverterArr["uk_gal"]["mi3"] = 0.00000000000109066499264808;
+				unitConverterArr["uk_gal"]["mi^3"] = 0.00000000000109066499264808;
+
+				unitConverterArr["uk_gal"]["yd3"] = 0.00594606123095897;
+				unitConverterArr["uk_gal"]["yd^3"] = 0.00594606123095897;
+				unitConverterArr["uk_gal"]["Nmi3"] = 0.000000000000715673740321021;
+				unitConverterArr["uk_gal"]["Nmi^3"] = 0.000000000000715673740321021;
+				//unitConverterArr["uk_gal"]["Picapt3"] = ;
+				//unitConverterArr["uk_gal"]["Picapt^3"] = ;
+				unitConverterArr["uk_gal"]["Pica3"] = 103546248.450607;
+				unitConverterArr["uk_gal"]["Pica^3"] = 103546248.450607;
+				unitConverterArr["uk_gal"]["GRT"] = 0.001605436681403;
+				unitConverterArr["uk_gal"]["regton"] = 0.001605436681403;
+				unitConverterArr["uk_gal"]["MTON"] = 6.42174612943568;
+
+
+				unitConverterArr["l"] = {};
+
+				unitConverterArr["l"]["L"] = 1;
+				unitConverterArr["l"]["lt"] = 1;
+				unitConverterArr["l"]["ang3"] = 1E+027;
+				unitConverterArr["l"]["ang^3"] = 1E+027;
+				unitConverterArr["l"]["barrel"] = 0.00628981077043211;
+				unitConverterArr["l"]["bushel"] = 0.02837759;
+				unitConverterArr["l"]["ft3"] = 0.0353146667214886;
+				unitConverterArr["l"]["ft^3"] = 0.0353146667214886;
+
+				unitConverterArr["l"]["in3"] = 61.0237440947323;
+				unitConverterArr["l"]["in^3"] = 61.0237440947323;
+				unitConverterArr["l"]["ly3"] = 1.18101081256238E-051;
+				unitConverterArr["l"]["ly^3"] = 1.18101081256238E-051;
+				unitConverterArr["l"]["ang^3"] = 1E+027;
+				unitConverterArr["l"]["m3"] = 0.001;
+				unitConverterArr["l"]["m^3"] = 0.001;
+				unitConverterArr["l"]["mi3"] = 0.000000000000239912758578928;
+				unitConverterArr["l"]["mi^3"] = 0.000000000000239912758578928;
+
+				unitConverterArr["l"]["yd3"] = 0.00130795061931439;
+				unitConverterArr["l"]["yd^3"] = 0.00130795061931439;
+				unitConverterArr["l"]["Nmi3"] = 0.000000000000157426214685811;
+				unitConverterArr["l"]["Nmi^3"] = 0.000000000000157426214685811;
+				//unitConverterArr["l"]["Picapt3"] = ;
+				//unitConverterArr["l"]["Picapt^3"] = ;
+				unitConverterArr["l"]["Pica3"] = 22776990.4358706;
+				unitConverterArr["l"]["Pica^3"] = 22776990.4358706;
+				unitConverterArr["l"]["GRT"] = 0.0003531467;
+				unitConverterArr["l"]["regton"] = 0.0003531467;
+				unitConverterArr["l"]["MTON"] = 1.41258666885954;
+
+
+				unitConverterArr["L"] = {};
+
+				unitConverterArr["L"]["lt"] = 1;
+				unitConverterArr["L"]["ang3"] = 1E+027;
+				unitConverterArr["L"]["ang^3"] = 1E+027;
+				unitConverterArr["L"]["barrel"] = 0.00628981077043211;
+				unitConverterArr["L"]["bushel"] = 0.02837759;
+				unitConverterArr["L"]["ft3"] = 0.0353146667214886;
+				unitConverterArr["L"]["ft^3"] = 0.0353146667214886;
+
+				unitConverterArr["L"]["in3"] = 61.0237440947323;
+				unitConverterArr["L"]["in^3"] = 61.0237440947323;
+				unitConverterArr["L"]["ly3"] = 1.18101081256238E-051;
+				unitConverterArr["L"]["ly^3"] = 1.18101081256238E-051;
+				unitConverterArr["L"]["ang^3"] = 1E+027;
+				unitConverterArr["L"]["m3"] = 0.001;
+				unitConverterArr["L"]["m^3"] = 0.001;
+				unitConverterArr["L"]["mi3"] = 0.000000000000239912758578928;
+				unitConverterArr["L"]["mi^3"] = 0.000000000000239912758578928;
+
+				unitConverterArr["L"]["yd3"] = 0.00130795061931439;
+				unitConverterArr["L"]["yd^3"] = 0.00130795061931439;
+				unitConverterArr["L"]["Nmi3"] = 0.000000000000157426214685811;
+				unitConverterArr["L"]["Nmi^3"] = 0.000000000000157426214685811;
+				//unitConverterArr["L"]["Picapt3"] = ;
+				//unitConverterArr["L"]["Picapt^3"] = ;
+				unitConverterArr["L"]["Pica3"] = 22776990.4358706;
+				unitConverterArr["L"]["Pica^3"] = 22776990.4358706;
+				unitConverterArr["L"]["GRT"] = 0.0003531467;
+				unitConverterArr["L"]["regton"] = 0.0003531467;
+				unitConverterArr["L"]["MTON"] = 1.41258666885954;
+
+
+				unitConverterArr["lt"] = {};
+
+				unitConverterArr["lt"]["ang3"] = 1E+027;
+				unitConverterArr["lt"]["ang^3"] = 1E+027;
+				unitConverterArr["lt"]["barrel"] = 0.00628981077043211;
+				unitConverterArr["lt"]["bushel"] = 0.02837759;
+				unitConverterArr["lt"]["ft3"] = 0.0353146667214886;
+				unitConverterArr["lt"]["ft^3"] = 0.0353146667214886;
+
+				unitConverterArr["lt"]["in3"] = 61.0237440947323;
+				unitConverterArr["lt"]["in^3"] = 61.0237440947323;
+				unitConverterArr["lt"]["ly3"] = 1.18101081256238E-051;
+				unitConverterArr["lt"]["ly^3"] = 1.18101081256238E-051;
+				unitConverterArr["lt"]["ang^3"] = 1E+027;
+				unitConverterArr["lt"]["m3"] = 0.001;
+				unitConverterArr["lt"]["m^3"] = 0.001;
+				unitConverterArr["lt"]["mi3"] = 0.000000000000239912758578928;
+				unitConverterArr["lt"]["mi^3"] = 0.000000000000239912758578928;
+
+				unitConverterArr["lt"]["yd3"] = 0.00130795061931439;
+				unitConverterArr["lt"]["yd^3"] = 0.00130795061931439;
+				unitConverterArr["lt"]["Nmi3"] = 0.000000000000157426214685811;
+				unitConverterArr["lt"]["Nmi^3"] = 0.000000000000157426214685811;
+				//unitConverterArr["lt"]["Picapt3"] = ;
+				//unitConverterArr["lt"]["Picapt^3"] = ;
+				unitConverterArr["lt"]["Pica3"] = 22776990.4358706;
+				unitConverterArr["lt"]["Pica^3"] = 22776990.4358706;
+				unitConverterArr["lt"]["GRT"] = 0.0003531467;
+				unitConverterArr["lt"]["regton"] = 0.0003531467;
+				unitConverterArr["lt"]["MTON"] = 1.41258666885954;
+
+
+				unitConverterArr["ang3"] = {};
+
+				unitConverterArr["ang3"]["ang^3"] = 1;
+				unitConverterArr["ang3"]["barrel"] = 6.28981077043211E-030;
+				unitConverterArr["ang3"]["bushel"] = 2.837759E-029;
+				unitConverterArr["ang3"]["ft3"] = 3.53146667214886E-029;
+				unitConverterArr["ang3"]["ft^3"] = 3.53146667214886E-029;
+
+				unitConverterArr["ang3"]["in3"] = 6.10237440947323E-026;
+				unitConverterArr["ang3"]["in^3"] = 6.10237440947323E-026;
+				unitConverterArr["ang3"]["ly3"] = 1.18101081256238E-078;
+				unitConverterArr["ang3"]["ly^3"] = 1.18101081256238E-078;
+				unitConverterArr["ang3"]["ang^3"] = 1;
+				unitConverterArr["ang3"]["m3"] = 1E-030;
+				unitConverterArr["ang3"]["m^3"] = 1E-030;
+				unitConverterArr["ang3"]["mi3"] = 2.39912758578928E-040;
+				unitConverterArr["ang3"]["mi^3"] = 2.39912758578928E-040;
+
+				unitConverterArr["ang3"]["yd3"] = 1.30795061931439E-030;
+				unitConverterArr["ang3"]["yd^3"] = 1.30795061931439E-030;
+				unitConverterArr["ang3"]["Nmi3"] = 1.57426214685812E-040;
+				unitConverterArr["ang3"]["Nmi^3"] = 1.57426214685812E-040;
+				//unitConverterArr["ang3"]["Picapt3"] = ;
+				//unitConverterArr["ang3"]["Picapt^3"] = ;
+				unitConverterArr["ang3"]["Pica3"] = 2.27769904358706E-020;
+				unitConverterArr["ang3"]["Pica^3"] = 2.27769904358706E-020;
+				unitConverterArr["ang3"]["GRT"] = 3.531467E-031;
+				unitConverterArr["ang3"]["regton"] = 3.531467E-031;
+				unitConverterArr["ang3"]["MTON"] = 1.41258666885954E-027;
+
+
+				unitConverterArr["ang^3"] = {};
+
+				unitConverterArr["ang^3"]["barrel"] = 6.28981077043211E-030;
+				unitConverterArr["ang^3"]["bushel"] = 2.837759E-029;
+				unitConverterArr["ang^3"]["ft3"] = 3.53146667214886E-029;
+				unitConverterArr["ang^3"]["ft^3"] = 3.53146667214886E-029;
+
+				unitConverterArr["ang^3"]["in3"] = 6.10237440947323E-026;
+				unitConverterArr["ang^3"]["in^3"] = 6.10237440947323E-026;
+				unitConverterArr["ang^3"]["ly3"] = 1.18101081256238E-078;
+				unitConverterArr["ang^3"]["ly^3"] = 1.18101081256238E-078;
+				unitConverterArr["ang^3"]["ang^3"] = 1;
+				unitConverterArr["ang^3"]["m3"] = 1E-030;
+				unitConverterArr["ang^3"]["m^3"] = 1E-030;
+				unitConverterArr["ang^3"]["mi3"] = 2.39912758578928E-040;
+				unitConverterArr["ang^3"]["mi^3"] = 2.39912758578928E-040;
+
+				unitConverterArr["ang^3"]["yd3"] = 1.30795061931439E-030;
+				unitConverterArr["ang^3"]["yd^3"] = 1.30795061931439E-030;
+				unitConverterArr["ang^3"]["Nmi3"] = 1.57426214685812E-040;
+				unitConverterArr["ang^3"]["Nmi^3"] = 1.57426214685812E-040;
+				//unitConverterArr["ang^3"]["Picapt3"] = ;
+				//unitConverterArr["ang^3"]["Picapt^3"] = ;
+				unitConverterArr["ang^3"]["Pica3"] = 2.27769904358706E-020;
+				unitConverterArr["ang^3"]["Pica^3"] = 2.27769904358706E-020;
+				unitConverterArr["ang^3"]["GRT"] = 3.531467E-031;
+				unitConverterArr["ang^3"]["regton"] = 3.531467E-031;
+				unitConverterArr["ang^3"]["MTON"] = 1.41258666885954E-027;
+
+
+				unitConverterArr["ang^3"] = {};
+
+				unitConverterArr["ang^3"]["barrel"] = 6.28981077043211E-030;
+				unitConverterArr["ang^3"]["bushel"] = 2.837759E-029;
+				unitConverterArr["ang^3"]["ft3"] = 3.53146667214886E-029;
+				unitConverterArr["ang^3"]["ft^3"] = 3.53146667214886E-029;
+
+				unitConverterArr["ang^3"]["in3"] = 6.10237440947323E-026;
+				unitConverterArr["ang^3"]["in^3"] = 6.10237440947323E-026;
+				unitConverterArr["ang^3"]["ly3"] = 1.18101081256238E-078;
+				unitConverterArr["ang^3"]["ly^3"] = 1.18101081256238E-078;
+				unitConverterArr["ang^3"]["ang^3"] = 1;
+				unitConverterArr["ang^3"]["m3"] = 1E-030;
+				unitConverterArr["ang^3"]["m^3"] = 1E-030;
+				unitConverterArr["ang^3"]["mi3"] = 2.39912758578928E-040;
+				unitConverterArr["ang^3"]["mi^3"] = 2.39912758578928E-040;
+
+				unitConverterArr["ang^3"]["yd3"] = 1.30795061931439E-030;
+				unitConverterArr["ang^3"]["yd^3"] = 1.30795061931439E-030;
+				unitConverterArr["ang^3"]["Nmi3"] = 1.57426214685812E-040;
+				unitConverterArr["ang^3"]["Nmi^3"] = 1.57426214685812E-040;
+				//unitConverterArr["ang^3"]["Picapt3"] = ;
+				//unitConverterArr["ang^3"]["Picapt^3"] = ;
+				unitConverterArr["ang^3"]["Pica3"] = 2.27769904358706E-020;
+				unitConverterArr["ang^3"]["Pica^3"] = 2.27769904358706E-020;
+				unitConverterArr["ang^3"]["GRT"] = 3.531467E-031;
+				unitConverterArr["ang^3"]["regton"] = 3.531467E-031;
+				unitConverterArr["ang^3"]["MTON"] = 1.41258666885954E-027;
+
+
+				unitConverterArr["barrel"] = {};
+
+				unitConverterArr["barrel"]["bushel"] = 4.51167627067586;
+				unitConverterArr["barrel"]["ft3"] = 5.61458333333333;
+				unitConverterArr["barrel"]["ft^3"] = 5.61458333333333;
+
+				unitConverterArr["barrel"]["in3"] = 9702;
+				unitConverterArr["barrel"]["in^3"] = 9702;
+				unitConverterArr["barrel"]["ly3"] = 1.87765714370012E-049;
+				unitConverterArr["barrel"]["ly^3"] = 1.87765714370012E-049;
+				unitConverterArr["barrel"]["barrel"] = 1;
+				unitConverterArr["barrel"]["m3"] = 0.158987294928;
+				unitConverterArr["barrel"]["m^3"] = 0.158987294928;
+				unitConverterArr["barrel"]["mi3"] = 0.000000000038143080505178;
+				unitConverterArr["barrel"]["mi^3"] = 0.000000000038143080505178;
+
+				unitConverterArr["barrel"]["yd3"] = 0.207947530864197;
+				unitConverterArr["barrel"]["yd^3"] = 0.207947530864197;
+				unitConverterArr["barrel"]["Nmi3"] = 0.0000000000250287680236518;
+				unitConverterArr["barrel"]["Nmi^3"] = 0.0000000000250287680236518;
+				//unitConverterArr["barrel"]["Picapt3"] = ;
+				//unitConverterArr["barrel"]["Picapt^3"] = ;
+				unitConverterArr["barrel"]["Pica3"] = 3621252096;
+				unitConverterArr["barrel"]["Pica^3"] = 3621252096;
+				unitConverterArr["barrel"]["GRT"] = 0.0561458385457499;
+				unitConverterArr["barrel"]["regton"] = 0.0561458385457499;
+				unitConverterArr["barrel"]["MTON"] = 224.583333333333;
+
+
+				unitConverterArr["bushel"] = {};
+
+				unitConverterArr["bushel"]["ft3"] = 1.24445616141077;
+				unitConverterArr["bushel"]["ft^3"] = 1.24445616141077;
+
+				unitConverterArr["bushel"]["in3"] = 2150.42024691781;
+				unitConverterArr["bushel"]["in^3"] = 2150.42024691781;
+				unitConverterArr["bushel"]["ly3"] = 4.1617727670404E-050;
+				unitConverterArr["bushel"]["ly^3"] = 4.1617727670404E-050;
+				unitConverterArr["bushel"]["bushel"] = 1;
+				unitConverterArr["bushel"]["m3"] = 0.0352390742131379;
+				unitConverterArr["bushel"]["m^3"] = 0.0352390742131379;
+				unitConverterArr["bushel"]["mi3"] = 0.00000000000845430350424147;
+				unitConverterArr["bushel"]["mi^3"] = 0.00000000000845430350424147;
+
+				unitConverterArr["bushel"]["yd3"] = 0.0460909689411396;
+				unitConverterArr["bushel"]["yd^3"] = 0.0460909689411396;
+				unitConverterArr["bushel"]["Nmi3"] = 0.00000000000554755406240669;
+				unitConverterArr["bushel"]["Nmi^3"] = 0.00000000000554755406240669;
+				//unitConverterArr["bushel"]["Picapt3"] = ;
+				//unitConverterArr["bushel"]["Picapt^3"] = ;
+				unitConverterArr["bushel"]["Pica3"] = 802640056.321578;
+				unitConverterArr["bushel"]["Pica^3"] = 802640056.321578;
+				unitConverterArr["bushel"]["GRT"] = 0.0124445627694247;
+				unitConverterArr["bushel"]["regton"] = 0.0124445627694247;
+				unitConverterArr["bushel"]["MTON"] = 49.7782464564307;
+
+
+				unitConverterArr["ft3"] = {};
+
+				unitConverterArr["ft3"]["ft^3"] = 1;
+
+				unitConverterArr["ft3"]["in3"] = 1728;
+				unitConverterArr["ft3"]["in^3"] = 1728;
+				unitConverterArr["ft3"]["ly3"] = 3.34425020028222E-050;
+				unitConverterArr["ft3"]["ly^3"] = 3.34425020028222E-050;
+				unitConverterArr["ft3"]["ft3"] = 1;
+				unitConverterArr["ft3"]["m3"] = 0.028316846592;
+				unitConverterArr["ft3"]["m^3"] = 0.028316846592;
+				unitConverterArr["ft3"]["mi3"] = 0.00000000000679357278014303;
+				unitConverterArr["ft3"]["mi^3"] = 0.00000000000679357278014303;
+
+				unitConverterArr["ft3"]["yd3"] = 0.037037037037037;
+				unitConverterArr["ft3"]["yd^3"] = 0.037037037037037;
+				unitConverterArr["ft3"]["Nmi3"] = 0.00000000000445781397081738;
+				unitConverterArr["ft3"]["Nmi^3"] = 0.00000000000445781397081738;
+				//unitConverterArr["ft3"]["Picapt3"] = ;
+				//unitConverterArr["ft3"]["Picapt^3"] = ;
+				unitConverterArr["ft3"]["Pica3"] = 644972544;
+				unitConverterArr["ft3"]["Pica^3"] = 644972544;
+				unitConverterArr["ft3"]["GRT"] = 0.010000000928371;
+				unitConverterArr["ft3"]["regton"] = 0.010000000928371;
+				unitConverterArr["ft3"]["MTON"] = 40;
+
+
+				unitConverterArr["ft^3"] = {};
+
+				unitConverterArr["ft^3"]["in3"] = 1728;
+				unitConverterArr["ft^3"]["in^3"] = 1728;
+				unitConverterArr["ft^3"]["ly3"] = 3.34425020028222E-050;
+				unitConverterArr["ft^3"]["ly^3"] = 3.34425020028222E-050;
+				unitConverterArr["ft^3"]["ft^3"] = 1;
+				unitConverterArr["ft^3"]["m3"] = 0.028316846592;
+				unitConverterArr["ft^3"]["m^3"] = 0.028316846592;
+				unitConverterArr["ft^3"]["mi3"] = 0.00000000000679357278014303;
+				unitConverterArr["ft^3"]["mi^3"] = 0.00000000000679357278014303;
+
+				unitConverterArr["ft^3"]["yd3"] = 0.037037037037037;
+				unitConverterArr["ft^3"]["yd^3"] = 0.037037037037037;
+				unitConverterArr["ft^3"]["Nmi3"] = 0.00000000000445781397081738;
+				unitConverterArr["ft^3"]["Nmi^3"] = 0.00000000000445781397081738;
+				//unitConverterArr["ft^3"]["Picapt3"] = ;
+				//unitConverterArr["ft^3"]["Picapt^3"] = ;
+				unitConverterArr["ft^3"]["Pica3"] = 644972544;
+				unitConverterArr["ft^3"]["Pica^3"] = 644972544;
+				unitConverterArr["ft^3"]["GRT"] = 0.010000000928371;
+				unitConverterArr["ft^3"]["regton"] = 0.010000000928371;
+				unitConverterArr["ft^3"]["MTON"] = 40;
+
+
+				unitConverterArr["in3"] = {};
+
+				unitConverterArr["in3"]["in^3"] = 1;
+				unitConverterArr["in3"]["ly3"] = 1.93532997701517E-053;
+				unitConverterArr["in3"]["ly^3"] = 1.93532997701517E-053;
+				unitConverterArr["in3"]["in3"] = 1;
+				unitConverterArr["in3"]["m3"] = 0.000016387064;
+				unitConverterArr["in3"]["m^3"] = 0.000016387064;
+				unitConverterArr["in3"]["mi3"] = 3.93146572924944E-015;
+				unitConverterArr["in3"]["mi^3"] = 3.93146572924944E-015;
+
+				unitConverterArr["in3"]["yd3"] = 0.0000214334705075446;
+				unitConverterArr["in3"]["yd^3"] = 0.0000214334705075446;
+				unitConverterArr["in3"]["Nmi3"] = 2.57975345533413E-015;
+				unitConverterArr["in3"]["Nmi^3"] = 2.57975345533413E-015;
+				//unitConverterArr["in3"]["Picapt3"] = ;
+				//unitConverterArr["in3"]["Picapt^3"] = ;
+				unitConverterArr["in3"]["Pica3"] = 373248;
+				unitConverterArr["in3"]["Pica^3"] = 373248;
+				unitConverterArr["in3"]["GRT"] = 0.0000057870375742888;
+				unitConverterArr["in3"]["regton"] = 0.0000057870375742888;
+				unitConverterArr["in3"]["MTON"] = 0.0231481481481481;
+
+
+				unitConverterArr["in^3"] = {};
+
+				unitConverterArr["in^3"]["ly3"] = 1.93532997701517E-053;
+				unitConverterArr["in^3"]["ly^3"] = 1.93532997701517E-053;
+				unitConverterArr["in^3"]["in^3"] = 1;
+				unitConverterArr["in^3"]["m3"] = 0.000016387064;
+				unitConverterArr["in^3"]["m^3"] = 0.000016387064;
+				unitConverterArr["in^3"]["mi3"] = 3.93146572924944E-015;
+				unitConverterArr["in^3"]["mi^3"] = 3.93146572924944E-015;
+				//picapt
+				unitConverterArr["in^3"]["yd3"] = 0.0000214334705075446;
+				unitConverterArr["in^3"]["yd^3"] = 0.0000214334705075446;
+				unitConverterArr["in^3"]["Nmi3"] = 2.57975345533413E-015;
+				unitConverterArr["in^3"]["Nmi^3"] = 2.57975345533413E-015;
+
+				unitConverterArr["in^3"]["Pica3"] = 373248;
+				unitConverterArr["in^3"]["Pica^3"] = 373248;
+				unitConverterArr["in^3"]["GRT"] = 0.0000057870375742888;
+				unitConverterArr["in^3"]["regton"] = 0.0000057870375742888;
+				unitConverterArr["in^3"]["MTON"] = 0.0231481481481481;
+
+
+				unitConverterArr["ly3"] = {};
+
+				unitConverterArr["ly3"]["ly^3"] = 1;
+				unitConverterArr["ly3"]["ly3"] = 1;
+				unitConverterArr["ly3"]["m3"] = 8.46732298606437E+047;
+				unitConverterArr["ly3"]["m^3"] = 8.46732298606437E+047;
+				unitConverterArr["ly3"]["mi3"] = 2.03141881536547E+038;
+				unitConverterArr["ly3"]["mi^3"] = 2.03141881536547E+038;
+
+				unitConverterArr["ly3"]["yd3"] = 1.10748403435579E+048;
+				unitConverterArr["ly3"]["yd^3"] = 1.10748403435579E+048;
+				unitConverterArr["ly3"]["Nmi3"] = 1.33297860621828E+038;
+				unitConverterArr["ly3"]["Nmi^3"] = 1.33297860621828E+038;
+				//unitConverterArr["ly3"]["Picapt3"] = ;
+				//unitConverterArr["ly3"]["Picapt^3"] = ;
+				unitConverterArr["ly3"]["Pica3"] = 1.92860134671016E+058;
+				unitConverterArr["ly3"]["Pica^3"] = 1.92860134671016E+058;
+				unitConverterArr["ly3"]["GRT"] = 2.99020717036278E+047;
+				unitConverterArr["ly3"]["regton"] = 2.99020717036278E+047;
+				unitConverterArr["ly3"]["MTON"] = 1.19608275710425E+051;
+
+
+				unitConverterArr["ly^3"] = {};
+
+				unitConverterArr["ly^3"]["m3"] = 8.46732298606437E+047;
+				unitConverterArr["ly^3"]["m^3"] = 8.46732298606437E+047;
+				unitConverterArr["ly^3"]["mi3"] = 2.03141881536547E+038;
+				unitConverterArr["ly^3"]["mi^3"] = 2.03141881536547E+038;
+
+				unitConverterArr["ly^3"]["yd3"] = 1.10748403435579E+048;
+				unitConverterArr["ly^3"]["yd^3"] = 1.10748403435579E+048;
+				unitConverterArr["ly^3"]["Nmi3"] = 1.33297860621828E+038;
+				unitConverterArr["ly^3"]["Nmi^3"] = 1.33297860621828E+038;
+				//unitConverterArr["ly^3"]["Picapt3"] = ;
+				//unitConverterArr["ly^3"]["Picapt^3"] = ;
+				unitConverterArr["ly^3"]["Pica3"] = 1.92860134671016E+058;
+				unitConverterArr["ly^3"]["Pica^3"] = 1.92860134671016E+058;
+				unitConverterArr["ly^3"]["GRT"] = 2.99020717036278E+047;
+				unitConverterArr["ly^3"]["regton"] = 2.99020717036278E+047;
+				unitConverterArr["ly^3"]["MTON"] = 1.19608275710425E+051;
+
+
+				unitConverterArr["m3"] = {};
+
+				unitConverterArr["m3"]["m^3"] = 1;
+				unitConverterArr["m3"]["mi3"] = 0.000000000239912758578928;
+				unitConverterArr["m3"]["mi^3"] = 0.000000000239912758578928;
+
+				unitConverterArr["m3"]["yd3"] = 1.30795061931439;
+				unitConverterArr["m3"]["yd^3"] = 1.30795061931439;
+				unitConverterArr["m3"]["Nmi3"] = 0.000000000157426214685811;
+				unitConverterArr["m3"]["Nmi^3"] = 0.000000000157426214685811;
+				//unitConverterArr["m3"]["Picapt3"] = ;
+				//unitConverterArr["m3"]["Picapt^3"] = ;
+				unitConverterArr["m3"]["Pica3"] = 22776990435.8706;
+				unitConverterArr["m3"]["Pica^3"] = 22776990435.8706;
+				unitConverterArr["m3"]["GRT"] = 0.3531467;
+				unitConverterArr["m3"]["regton"] = 0.3531467;
+				unitConverterArr["m3"]["MTON"] = 1412.58666885954;
+
+
+				unitConverterArr["m^3"] = {};
+
+				unitConverterArr["m^3"]["mi3"] = 0.000000000239912758578928;
+				unitConverterArr["m^3"]["mi^3"] = 0.000000000239912758578928;
+
+				unitConverterArr["m^3"]["yd3"] = 1.30795061931439;
+				unitConverterArr["m^3"]["yd^3"] = 1.30795061931439;
+				unitConverterArr["m^3"]["Nmi3"] = 0.000000000157426214685811;
+				unitConverterArr["m^3"]["Nmi^3"] = 0.000000000157426214685811;
+				//unitConverterArr["m^3"]["Picapt3"] = ;
+				//unitConverterArr["m^3"]["Picapt^3"] = ;
+				unitConverterArr["m^3"]["Pica3"] = 22776990435.8706;
+				unitConverterArr["m^3"]["Pica^3"] = 22776990435.8706;
+				unitConverterArr["m^3"]["GRT"] = 0.3531467;
+				unitConverterArr["m^3"]["regton"] = 0.3531467;
+				unitConverterArr["m^3"]["MTON"] = 1412.58666885954;
+
+
+				unitConverterArr["mi3"] = {};
+
+				unitConverterArr["mi3"]["mi^3"] = 1;
+
+				unitConverterArr["mi3"]["yd3"] = 5451776000;
+				unitConverterArr["mi3"]["yd^3"] = 5451776000;
+				unitConverterArr["mi3"]["Nmi3"] = 0.656181086901306;
+				unitConverterArr["mi3"]["Nmi^3"] = 0.656181086901306;
+				//unitConverterArr["mi3"]["Picapt3"] = ;
+				//unitConverterArr["mi3"]["Picapt^3"] = ;
+				unitConverterArr["mi3"]["Pica3"] = 9.49386375730299E+019;
+				unitConverterArr["mi3"]["Pica^3"] = 9.49386375730299E+019;
+				unitConverterArr["mi3"]["GRT"] = 1471979656.65432;
+				unitConverterArr["mi3"]["regton"] = 1471979656.65432;
+				unitConverterArr["mi3"]["MTON"] = 5887918080000;
+
+
+				unitConverterArr["mi^3"] = {};
+
+				unitConverterArr["mi3"]["yd3"] = 5451776000;
+				unitConverterArr["mi3"]["yd^3"] = 5451776000;
+				unitConverterArr["mi3"]["Nmi3"] = 0.656181086901306;
+				unitConverterArr["mi3"]["Nmi^3"] = 0.656181086901306;
+				//unitConverterArr["mi3"]["Picapt3"] = ;
+				//unitConverterArr["mi3"]["Picapt^3"] = ;
+				unitConverterArr["mi3"]["Pica3"] = 9.49386375730299E+019;
+				unitConverterArr["mi3"]["Pica^3"] = 9.49386375730299E+019;
+				unitConverterArr["mi3"]["GRT"] = 1471979656.65432;
+				unitConverterArr["mi3"]["regton"] = 1471979656.65432;
+				unitConverterArr["mi3"]["MTON"] = 5887918080000;
+
+
+				unitConverterArr["yd3"] = {};
+
+				unitConverterArr["yd3"]["yd^3"] = 1;
+				unitConverterArr["yd3"]["Nmi3"] = 0.000000000120360977212069;
+				unitConverterArr["yd3"]["Nmi^3"] = 0.000000000120360977212069;
+				//unitConverterArr["yd3"]["Picapt3"] = ;
+				//unitConverterArr["yd3"]["Picapt^3"] = ;
+				unitConverterArr["yd3"]["Pica3"] = 17414258688;
+				unitConverterArr["yd3"]["Pica^3"] = 17414258688;
+				unitConverterArr["yd3"]["GRT"] = 0.270000025066018;
+				unitConverterArr["yd3"]["regton"] = 0.270000025066018;
+				unitConverterArr["yd3"]["MTON"] = 1080;
+
+
+				unitConverterArr["yd^3"] = {};
+
+				unitConverterArr["yd^3"]["Nmi3"] = 0.000000000120360977212069;
+				unitConverterArr["yd^3"]["Nmi^3"] = 0.000000000120360977212069;
+				//unitConverterArr["yd^3"]["Picapt3"] = ;
+				//unitConverterArr["yd^3"]["Picapt^3"] = ;
+				unitConverterArr["yd^3"]["Pica3"] = 17414258688;
+				unitConverterArr["yd^3"]["Pica^3"] = 17414258688;
+				unitConverterArr["yd^3"]["GRT"] = 0.270000025066018;
+				unitConverterArr["yd^3"]["regton"] = 0.270000025066018;
+				unitConverterArr["yd^3"]["MTON"] = 1080;
+
+
+				unitConverterArr["Nmi3"] = {};
+
+				unitConverterArr["Nmi3"]["Nmi^3"] = 1;
+				//unitConverterArr["Nmi3"]["Picapt3"] = ;
+				//unitConverterArr["Nmi3"]["Picapt^3"] = ;
+				unitConverterArr["Nmi3"]["Pica3"] = 1.44683593398524E+020;
+				unitConverterArr["Nmi3"]["Pica^3"] = 1.44683593398524E+020;
+				unitConverterArr["Nmi3"]["GRT"] = 2243252184.55391;
+				unitConverterArr["Nmi3"]["regton"] = 2243252184.55391;
+				unitConverterArr["Nmi3"]["MTON"] = 8973007905187.58;
+
+
+				unitConverterArr["Nmi^3"] = {};
+
+				//unitConverterArr["Nmi^3"]["Picapt3"] = ;
+				//unitConverterArr["Nmi^3"]["Picapt^3"] = ;
+				unitConverterArr["Nmi^3"]["Pica3"] = 1.44683593398524E+020;
+				unitConverterArr["Nmi^3"]["Pica^3"] = 1.44683593398524E+020;
+				unitConverterArr["Nmi^3"]["GRT"] = 2243252184.55391;
+				unitConverterArr["Nmi^3"]["regton"] = 2243252184.55391;
+				unitConverterArr["Nmi^3"]["MTON"] = 8973007905187.58;
+
+
+				/*unitConverterArr["Picapt3"] = {};
+
+				unitConverterArr["Picapt3"]["Picapt^3"] = ;
+				unitConverterArr["Picapt3"]["Pica3"] = ;
+				unitConverterArr["Picapt3"]["Pica^3"] = ;
+				unitConverterArr["Picapt3"]["GRT"] = ;
+				unitConverterArr["Picapt3"]["regton"] = ;
+				unitConverterArr["Picapt3"]["MTON"] = ;
+
+
+				unitConverterArr["Picapt^3"] = {}; ;
+
+				unitConverterArr["Picapt^3"]["Pica3"] = ;
+				unitConverterArr["Picapt^3"]["Pica^3"] = ;
+				unitConverterArr["Picapt^3"]["GRT"] = ;
+				unitConverterArr["Picapt^3"]["regton"] = ;
+				unitConverterArr["Picapt^3"]["MTON"] = ;*/
+
+
+				unitConverterArr["Pica3"] = {};
+
+				unitConverterArr["Pica3"]["Pica^3"] = 1;
+				unitConverterArr["Pica3"]["GRT"] = 0.0000000000155045373968214;
+				unitConverterArr["Pica3"]["regton"] = 0.0000000000155045373968214;
+				unitConverterArr["Pica3"]["MTON"] = 0.0000000620181438297008;
+
+
+				unitConverterArr["Pica^3"] = {};
+
+				unitConverterArr["Pica^3"]["GRT"] = 0.0000000000155045373968214;
+				unitConverterArr["Pica^3"]["regton"] = 0.0000000000155045373968214;
+				unitConverterArr["Pica^3"]["MTON"] = 0.0000000620181438297008;
+
+
+				unitConverterArr["GRT"] = {};
+
+				unitConverterArr["GRT"]["regton"] = 1;
+				unitConverterArr["GRT"]["MTON"] = 3999.99962865162;
+
+
+				unitConverterArr["regton"] = {};
+
+				unitConverterArr["regton"]["MTON"] = 3999.99962865162;
+
+			};
+
 			generateWeightAndMass();
 			generateDistance();
 			generateTime();
 			generatePressure();
 			generateForceAndEnergy();
+			generatePowerMagnetismTemperature();
+			generateVolume();
 		}
 
 		return unitConverterArr;
