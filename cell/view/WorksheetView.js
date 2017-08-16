@@ -9669,7 +9669,6 @@
 			}
 			
 			//TODO вместо range где возможно использовать cell
-			var cellFrom, cellTo;
 			if (value2.length === 1 || isFromula !== false || (skipFormat != null && noSkipVal != null)) {
 				var numStyle = 0;
 				if (skipFormat != null && noSkipVal != null) {
@@ -9719,16 +9718,22 @@
 					}
 				} else {
 					//todo
-					cellFrom = newVal.getLeftTopCellNoEmpty();
-					if (isOneMerge && range && range.bbox) {
-						cellTo = t._getCell(range.bbox.c1, range.bbox.r1).getLeftTopCell();
-					} else {
-						cellTo = firstRange.getLeftTopCell();
-					}
+					newVal.getLeftTopCellNoEmpty(function(cellFrom) {
+						if (cellFrom) {
+							var range;
+							if (isOneMerge && range && range.bbox) {
+								range = t._getCell(range.bbox.c1, range.bbox.r1);
+							} else {
+								range = firstRange;
+							}
+							range.getLeftTopCell(function(cellTo) {
+								if(cellTo) {
+									rangeStyle.cellValueData2 = {valueData: cellFrom.getValueData(), cell: cellTo.duplicate()};
+								}
+							});
+						}
+					});
 
-					if (cellFrom && cellTo) {
-						rangeStyle.cellValueData2 = {valueData: cellFrom.getValueData(), cell: cellTo};
-					}
 				}
 				
 				if (!isOneMerge)//settings for text
@@ -11192,20 +11197,26 @@
         if (!maxCount) {
             maxCount = Number.MAX_VALUE;
         }
-        var count = 0, cell, end = 0 < step ? this.model.getRowsCount() - 1 :
+        var count = 0, isBreak, end = 0 < step ? this.model.getRowsCount() - 1 :
           0, isEnd = true, colsCount = this.model.getColsCount(), range = new asc_Range(col, row, col, row);
         for (; row * step <= end && count < maxCount; row += step, isEnd = true, ++count) {
             for (col = range.c1; col <= range.c2; ++col) {
-                cell = this.model._getCellNoEmpty(row, col);
-                if (cell && false === cell.isEmptyText()) {
-                    isEnd = false;
-                    break;
-                }
+				this.model._getCellNoEmpty(row, col, function(cell) {
+					if (cell && false === cell.isEmptyText()) {
+						isEnd = false;
+						isBreak = true;
+					}
+				});
+				if (isBreak) {
+					break;
+				}
             }
             // Идем влево по колонкам
             for (col = range.c1 - 1; col >= 0; --col) {
-                cell = this.model._getCellNoEmpty(row, col);
-                if (null === cell || cell.isEmptyText()) {
+				this.model._getCellNoEmpty(row, col, function(cell) {
+					isBreak = (null === cell || cell.isEmptyText());
+				});
+				if (isBreak) {
                     break;
                 }
                 isEnd = false;
@@ -11213,8 +11224,10 @@
             range.c1 = col + 1;
             // Идем вправо по колонкам
             for (col = range.c2 + 1; col < colsCount; ++col) {
-                cell = this.model._getCellNoEmpty(row, col);
-                if (null === cell || cell.isEmptyText()) {
+				this.model._getCellNoEmpty(row, col, function(cell) {
+					isBreak = (null === cell || cell.isEmptyText());
+				});
+				if (isBreak) {
                     break;
                 }
                 isEnd = false;
@@ -11238,19 +11251,20 @@
         if (null === range) {
             return;
         }
-        var row, cell, value, valueLowCase;
+        var row, value, valueLowCase;
         for (row = range.r1; row <= range.r2; ++row) {
-            cell = this.model._getCellNoEmpty(row, col);
-            if (cell) {
-                value = cell.getValue();
-                if (!AscCommon.isNumber(value)) {
-                    valueLowCase = value.toLowerCase();
-                    if (!objValues.hasOwnProperty(valueLowCase)) {
-                        arrValues.push(value);
-                        objValues[valueLowCase] = 1;
-                    }
-                }
-            }
+			this.model._getCellNoEmpty(row, col, function(cell){
+				if (cell) {
+					value = cell.getValue();
+					if (!AscCommon.isNumber(value)) {
+						valueLowCase = value.toLowerCase();
+						if (!objValues.hasOwnProperty(valueLowCase)) {
+							arrValues.push(value);
+							objValues[valueLowCase] = 1;
+						}
+					}
+				}
+			});
         }
     };
 
@@ -12426,20 +12440,21 @@
         this._updateCellsRange(oAllRange.bbox); // ToDo Стоит обновить nRowsCount и nColsCount
     };
     WorksheetView.prototype.getData = function () {
-        var arrResult, arrCells = [], cell, c, r, row, lastC = -1, lastR = -1, val;
+        var arrResult, arrCells = [], c, r, row, lastC = -1, lastR = -1, val;
         var maxCols = Math.min(this.model.getColsCount(), gc_nMaxCol);
         var maxRows = Math.min(this.model.getRowsCount(), gc_nMaxRow);
 
         for (r = 0; r < maxRows; ++r) {
             row = [];
             for (c = 0; c < maxCols; ++c) {
-                cell = this.model._getCellNoEmpty(r, c);
-                if (cell && '' !== (val = cell.getValue())) {
-                    lastC = Math.max(lastC, c);
-                    lastR = Math.max(lastR, r);
-                } else {
-                    val = '';
-                }
+				this.model._getCellNoEmpty(r, c, function(cell) {
+					if (cell && '' !== (val = cell.getValue())) {
+						lastC = Math.max(lastC, c);
+						lastR = Math.max(lastR, r);
+					} else {
+						val = '';
+					}
+				});
                 row.push(val);
             }
             arrCells.push(row);

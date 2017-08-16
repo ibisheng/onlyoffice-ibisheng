@@ -1608,7 +1608,10 @@
 					var offset = cell.getOffset3(r.bbox.c1 + 1, r.bbox.r1 + 1);
 					r2.setOffset(offset);
 
-					var val = checkTypeCell(ws._getCellNoEmpty(r2.bbox.r1, r2.bbox.c1));
+					var val;
+					ws._getCellNoEmpty(r2.bbox.r1, r2.bbox.c1, function(cell) {
+						val = checkTypeCell(cell);
+					});
 
 					offset.offsetCol *= -1;
 					offset.offsetRow *= -1;
@@ -1622,7 +1625,10 @@
 			})
 		} else {
 			if (matching(arg0.getValue(), matchingInfo)) {
-				var val = checkTypeCell(ws._getCellNoEmpty(r.bbox.r1, r2.bbox.c1));
+				var val;
+				ws._getCellNoEmpty(r.bbox.r1, r2.bbox.c1, function(cell) {
+					val = checkTypeCell(cell);
+				});
 				if (cElementType.number === val.type) {
 					_sum += val.getValue();
 					_count++;

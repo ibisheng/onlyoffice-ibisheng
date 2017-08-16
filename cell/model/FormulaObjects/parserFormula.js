@@ -1001,11 +1001,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return val;
 	};
 	cArea.prototype.getValue2 = function (i, j) {
-		var res = this.index(i + 1, j + 1), r, cell;
+		var res = this.index(i + 1, j + 1), r;
 		if (!res) {
 			r = this.getRange();
-			cell = r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j);
-			res = checkTypeCell(cell);
+			r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j, function(cell) {
+				res = checkTypeCell(cell);
+			});
 		}
 		return res;
 	};
