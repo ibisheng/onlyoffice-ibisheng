@@ -944,6 +944,7 @@
 
 		changeType: function (type) {
 			if(null === this.type){
+				this.putType(type);
 				return;
 			}
 			if (this.type === type) {
