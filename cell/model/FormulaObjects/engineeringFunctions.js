@@ -1717,10 +1717,331 @@
 				unitConverterArr["psi"]["Torr"] = 51.7150920071126;
 			};
 
+			Energy	From_unit or to_unit
+			Joule	"J"
+			Erg	"e"
+			Thermodynamic calorie	"c"
+			IT calorie	"cal"
+			Electron volt	"eV" (or "ev")
+			Horsepower-hour	"HPh" (or "hh")
+			Watt-hour	"Wh" (or "wh")
+			Foot-pound	"flb"
+			BTU	"BTU" (or "btu")
+
+			var generateForceAndEnergy = function(){
+				/*//Force
+				unitConverterArr["N"] = {};//Newton
+
+				unitConverterArr["N"]["dyn"] = ;
+				unitConverterArr["N"]["dy"] = ;
+				unitConverterArr["N"]["lbf"] = ;
+				unitConverterArr["N"]["pond"] = ;
+
+
+				unitConverterArr["dyn"] = {};//Dyne
+
+				unitConverterArr["dyn"]["dy"] = ;
+				unitConverterArr["dyn"]["lbf"] = ;
+				unitConverterArr["dyn"]["pond"] = ;
+
+
+				unitConverterArr["dy"] = {};//Dyne
+
+				unitConverterArr["dy"]["lbf"] = ;
+				unitConverterArr["dy"]["pond"] = ;
+
+
+				unitConverterArr["lbf"] = {};//Pound force
+
+				unitConverterArr["lbf"]["pond"] = ;
+
+
+				//Energy
+				unitConverterArr["J"] = {};//Joule
+
+				unitConverterArr["J"]["e"] = ;
+				unitConverterArr["J"]["c"] = ;
+				unitConverterArr["J"]["cal"] = ;
+				unitConverterArr["J"]["eV"] = ;
+				unitConverterArr["J"]["ev"] = ;
+				unitConverterArr["J"]["HPh"] = ;
+				unitConverterArr["J"]["hh"] = ;
+				unitConverterArr["J"]["Wh"] = ;
+				unitConverterArr["J"]["wh"] = ;
+				unitConverterArr["J"]["flb"] = ;
+				unitConverterArr["J"]["BTU"] = ;
+				unitConverterArr["J"]["btu"] = ;
+
+
+				unitConverterArr["e"] = {};//Erg
+
+				unitConverterArr["e"]["c"] = ;
+				unitConverterArr["e"]["cal"] = ;
+				unitConverterArr["e"]["eV"] = ;
+				unitConverterArr["e"]["ev"] = ;
+				unitConverterArr["e"]["HPh"] = ;
+				unitConverterArr["e"]["hh"] = ;
+				unitConverterArr["e"]["Wh"] = ;
+				unitConverterArr["e"]["wh"] = ;
+				unitConverterArr["e"]["flb"] = ;
+				unitConverterArr["e"]["BTU"] = ;
+				unitConverterArr["e"]["btu"] = ;
+
+
+				unitConverterArr["c"] = {};//Thermodynamic calorie
+
+				unitConverterArr["c"]["cal"] = ;
+				unitConverterArr["c"]["eV"] = ;
+				unitConverterArr["c"]["ev"] = ;
+				unitConverterArr["c"]["HPh"] = ;
+				unitConverterArr["c"]["hh"] = ;
+				unitConverterArr["c"]["Wh"] = ;
+				unitConverterArr["c"]["wh"] = ;
+				unitConverterArr["c"]["flb"] = ;
+				unitConverterArr["c"]["BTU"] = ;
+				unitConverterArr["c"]["btu"] = ;
+
+
+				unitConverterArr["cal"] = {};//IT calorie
+
+				unitConverterArr["cal"]["eV"] = ;
+				unitConverterArr["cal"]["ev"] = ;
+				unitConverterArr["cal"]["HPh"] = ;
+				unitConverterArr["cal"]["hh"] = ;
+				unitConverterArr["cal"]["Wh"] = ;
+				unitConverterArr["cal"]["wh"] = ;
+				unitConverterArr["cal"]["flb"] = ;
+				unitConverterArr["cal"]["BTU"] = ;
+				unitConverterArr["cal"]["btu"] = ;
+
+
+				unitConverterArr["eV"] = {};//Electron volt
+
+				unitConverterArr["eV"]["ev"] = ;
+				unitConverterArr["eV"]["HPh"] = ;
+				unitConverterArr["eV"]["hh"] = ;
+				unitConverterArr["eV"]["Wh"] = ;
+				unitConverterArr["eV"]["wh"] = ;
+				unitConverterArr["eV"]["flb"] = ;
+				unitConverterArr["eV"]["BTU"] = ;
+				unitConverterArr["eV"]["btu"] = ;
+
+
+				unitConverterArr["ev"] = {};//Electron volt
+
+				unitConverterArr["ev"]["HPh"] = ;
+				unitConverterArr["ev"]["hh"] = ;
+				unitConverterArr["ev"]["Wh"] = ;
+				unitConverterArr["ev"]["wh"] = ;
+				unitConverterArr["ev"]["flb"] = ;
+				unitConverterArr["ev"]["BTU"] = ;
+				unitConverterArr["ev"]["btu"] = ;
+
+
+				unitConverterArr["HPh"] = {};//Horsepower-hour
+
+				unitConverterArr["HPh"]["hh"] = ;
+				unitConverterArr["HPh"]["Wh"] = ;
+				unitConverterArr["HPh"]["wh"] = ;
+				unitConverterArr["HPh"]["flb"] = ;
+				unitConverterArr["HPh"]["BTU"] = ;
+				unitConverterArr["HPh"]["btu"] = ;
+
+
+				unitConverterArr["hh"] = {};//Horsepower-hour
+
+				unitConverterArr["hh"]["Wh"] = ;
+				unitConverterArr["hh"]["wh"] = ;
+				unitConverterArr["hh"]["flb"] = ;
+				unitConverterArr["hh"]["BTU"] = ;
+				unitConverterArr["hh"]["btu"] = ;
+
+
+				unitConverterArr["Wh"] = {};//Watt-hour
+
+				unitConverterArr["Wh"]["wh"] = ;
+				unitConverterArr["Wh"]["flb"] = ;
+				unitConverterArr["Wh"]["BTU"] = ;
+				unitConverterArr["Wh"]["btu"] = ;
+
+
+				unitConverterArr["wh"] = {};//Watt-hour
+
+				unitConverterArr["wh"]["flb"] = ;
+				unitConverterArr["wh"]["BTU"] = ;
+				unitConverterArr["wh"]["btu"] = ;
+
+
+				unitConverterArr["flb"] = {};//Foot-pound
+
+				unitConverterArr["flb"]["BTU"] = ;
+				unitConverterArr["flb"]["btu"] = ;
+
+
+				unitConverterArr["BTU"] = {};//BTU
+
+				unitConverterArr["BTU"]["btu"] = ;*/
+
+				//Force
+				unitConverterArr["N"] = {};//Newton
+
+				unitConverterArr["N"]["dyn"] = 100000;
+				unitConverterArr["N"]["dy"] = 100000;
+				unitConverterArr["N"]["lbf"] = 0.224808923655339;
+				unitConverterArr["N"]["pond"] = 101.9716;
+
+
+				unitConverterArr["dyn"] = {};//Dyne
+
+				unitConverterArr["dyn"]["dy"] = 1;
+				unitConverterArr["dyn"]["lbf"] = 0.00000224808923655339;
+				unitConverterArr["dyn"]["pond"] = 0.001019716;
+
+
+				unitConverterArr["dy"] = {};//Dyne
+
+				unitConverterArr["dy"]["lbf"] = 0.00000224808923655339;
+				unitConverterArr["dy"]["pond"] = 0.001019716;
+
+
+				unitConverterArr["lbf"] = {};//Pound force
+
+				unitConverterArr["lbf"]["pond"] = 453.5923144952;
+
+
+				//Energy
+				unitConverterArr["J"] = {};//Joule
+
+				unitConverterArr["J"]["e"] = 10000000;
+				unitConverterArr["J"]["c"] = 0.239006249473467;
+				unitConverterArr["J"]["cal"] = 0.238846190642017;
+				unitConverterArr["J"]["eV"] = 6.241457E+018;
+				unitConverterArr["J"]["ev"] = 6.241457E+018;
+				unitConverterArr["J"]["HPh"] = 0.000000372506111111111;
+				unitConverterArr["J"]["hh"] = 0.000000372506111111111;
+				unitConverterArr["J"]["Wh"] = 0.000277777777777778;
+				unitConverterArr["J"]["wh"] = 0.000277777777777778;
+				unitConverterArr["J"]["flb"] = 23.7304222192651;
+				unitConverterArr["J"]["BTU"] = 0.000947815067349015;
+				unitConverterArr["J"]["btu"] = 0.000947815067349015;
+
+
+				unitConverterArr["e"] = {};//Erg
+
+				unitConverterArr["e"]["c"] = 0.0000000239006249473467;
+				unitConverterArr["e"]["cal"] = 0.0000000238846190642017;
+				unitConverterArr["e"]["eV"] = 624145700000;
+				unitConverterArr["e"]["ev"] = 624145700000;
+				unitConverterArr["e"]["HPh"] = 0.0000000000000372506111111111;
+				unitConverterArr["e"]["hh"] = 0.0000000000000372506111111111;
+				unitConverterArr["e"]["Wh"] = 0.0000000000277777777777778;
+				unitConverterArr["e"]["wh"] = 0.0000000000277777777777778;
+				unitConverterArr["e"]["flb"] = 0.00000237304222192651;
+				unitConverterArr["e"]["BTU"] = 0.0000000000947815067349015;
+				unitConverterArr["e"]["btu"] = 0.0000000000947815067349015;
+
+
+				unitConverterArr["c"] = {};//Thermodynamic calorie
+
+				unitConverterArr["c"]["cal"] = 0.99933031528756;
+				unitConverterArr["c"]["eV"] = 2.61141999999999E+019;
+				unitConverterArr["c"]["ev"] = 2.61141999999999E+019;
+				unitConverterArr["c"]["HPh"] = 0.00000155856222141365;
+				unitConverterArr["c"]["hh"] = 0.00000155856222141365;
+				unitConverterArr["c"]["Wh"] = 0.0011622197260102;
+				unitConverterArr["c"]["wh"] = 0.0011622197260102;
+				unitConverterArr["c"]["flb"] = 99.2878733152101;
+				unitConverterArr["c"]["BTU"] = 0.00396564972437775;
+				unitConverterArr["c"]["btu"] = 0.00396564972437775;
+
+
+				unitConverterArr["cal"] = {};//IT calorie
+
+				unitConverterArr["cal"]["eV"] = 2.61317E+019;
+				unitConverterArr["cal"]["ev"] = 2.61317E+019;
+				unitConverterArr["cal"]["HPh"] = 0.00000155960666615539;
+				unitConverterArr["cal"]["hh"] = 0.00000155960666615539;
+				unitConverterArr["cal"]["Wh"] = 0.00116299856837203;
+				unitConverterArr["cal"]["wh"] = 0.00116299856837203;
+				unitConverterArr["cal"]["flb"] = 99.3544094443285;
+				unitConverterArr["cal"]["BTU"] = 0.00396830723907002;
+				unitConverterArr["cal"]["btu"] = 0.00396830723907002;
+
+
+				unitConverterArr["eV"] = {};//Electron volt
+
+				unitConverterArr["eV"]["ev"] = 1;
+				unitConverterArr["eV"]["HPh"] = 5.968255667084E-026;
+				unitConverterArr["eV"]["hh"] = 5.968255667084E-026;
+				unitConverterArr["eV"]["Wh"] = 4.45052778185891E-023;
+				unitConverterArr["eV"]["wh"] = 4.45052778185891E-023;
+				unitConverterArr["eV"]["flb"] = 3.80206452103493E-018;
+				unitConverterArr["eV"]["BTU"] = 1.51857982414846E-022;
+				unitConverterArr["eV"]["btu"] = 1.51857982414846E-022;
+
+
+				unitConverterArr["ev"] = {};//Electron volt
+
+				unitConverterArr["ev"]["HPh"] = 5.968255667084E-026;
+				unitConverterArr["ev"]["hh"] = 5.968255667084E-026;
+				unitConverterArr["ev"]["Wh"] = 4.45052778185891E-023;
+				unitConverterArr["ev"]["wh"] = 4.45052778185891E-023;
+				unitConverterArr["ev"]["flb"] = 3.80206452103493E-018;
+				unitConverterArr["ev"]["BTU"] = 1.51857982414846E-022;
+				unitConverterArr["ev"]["btu"] = 1.51857982414846E-022;
+
+
+				unitConverterArr["HPh"] = {};//Horsepower-hour
+
+				unitConverterArr["HPh"]["hh"] = 1;
+				unitConverterArr["HPh"]["Wh"] = 745.699921403228;
+				unitConverterArr["HPh"]["wh"] = 745.699921403228;
+				unitConverterArr["HPh"]["flb"] = 63704786.3415771;
+				unitConverterArr["HPh"]["BTU"] = 2544.42823641704;
+				unitConverterArr["HPh"]["btu"] = 2544.42823641704;
+
+
+				unitConverterArr["hh"] = {};//Horsepower-hour
+
+				unitConverterArr["hh"]["Wh"] = 745.699921403228;
+				unitConverterArr["hh"]["wh"] = 745.699921403228;
+				unitConverterArr["hh"]["flb"] = 63704786.3415771;
+				unitConverterArr["hh"]["BTU"] = 2544.42823641704;
+				unitConverterArr["hh"]["btu"] = 2544.42823641704;
+
+
+				unitConverterArr["Wh"] = {};//Watt-hour
+
+				unitConverterArr["Wh"]["wh"] = 1;
+				unitConverterArr["Wh"]["flb"] = 85429.5199893544;
+				unitConverterArr["Wh"]["BTU"] = 3.41213424245645;
+				unitConverterArr["Wh"]["btu"] = 3.41213424245645;
+
+
+				unitConverterArr["wh"] = {};//Watt-hour
+
+				unitConverterArr["wh"]["flb"] = 85429.5199893544;
+				unitConverterArr["wh"]["BTU"] = 3.41213424245645;
+				unitConverterArr["wh"]["btu"] = 3.41213424245645;
+
+
+				unitConverterArr["flb"] = {};//Foot-pound
+
+				unitConverterArr["flb"]["BTU"] = 0.0000399409272448405;
+				unitConverterArr["flb"]["btu"] = 0.0000399409272448405;
+
+
+				unitConverterArr["BTU"] = {};//BTU
+
+				unitConverterArr["BTU"]["btu"] = 1;
+
+			};
+
 			generateWeightAndMass();
 			generateDistance();
 			generateTime();
 			generatePressure();
+			generateForceAndEnergy();
 		}
 
 		return unitConverterArr;
