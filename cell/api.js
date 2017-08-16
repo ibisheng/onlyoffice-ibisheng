@@ -962,8 +962,8 @@ var editor;
 			AscCommon.PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
 		}
 	}).catch(function(err) {
-		if (window.console && window.console.error) {
-			window.console.error(err);
+		if (window.console && window.console.log) {
+			window.console.log(err);
 		}
 		t.sendEvent('asc_onError', c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 	});
@@ -1059,8 +1059,8 @@ var editor;
 						}
 					}).catch(function (err) {
 						//don't show error.(case of open xls, ods, csv)
-						if (window.console && window.console.error) {
-							window.console.error(err);
+						if (window.console && window.console.log) {
+							window.console.log(err);
 						}
 					}).then(function (err) {
 						//clean up
