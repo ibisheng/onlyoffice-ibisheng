@@ -5997,6 +5997,16 @@ background-repeat: no-repeat;\
 					_this.WordControl.DemonstrationManager.PointerRemove();
 					break;
 				}
+				case "pause":
+				{
+					_this.WordControl.DemonstrationManager.Pause();
+					break;
+				}
+				case "play":
+				{
+					_this.WordControl.DemonstrationManager.Play();
+					break;
+				}
 				default:
 					break;
 			}

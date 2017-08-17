@@ -795,6 +795,8 @@ function CEditorPage(api)
 					}
 
 					_wordControl.reporterTimerAdd = _wordControl.reporterTimerFunc(true);
+
+					window.editor.sendFromReporter("{ \"reporter_command\" : \"pause\" }");
 				}
 				else
 				{
@@ -806,6 +808,8 @@ function CEditorPage(api)
 					_wordControl.reporterTimerLastStart = new Date().getTime();
 
 					_wordControl.reporterTimer = setInterval(_wordControl.reporterTimerFunc, 1000);
+
+					window.editor.sendFromReporter("{ \"reporter_command\" : \"play\" }");
 				}
 			};
 
