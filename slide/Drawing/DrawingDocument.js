@@ -5727,6 +5727,9 @@ function CNotesDrawer(page)
 		//g.IsNoDrawingEmptyPlaceholder = true;
 		//g.IsNoDrawingEmptyPlaceholderText = true;
 
+        if (this.HtmlPage.m_oApi.isViewMode)
+            g.IsNoDrawingEmptyPlaceholderText = true;
+
 		this.HtmlPage.m_oDrawingDocument.isDrawingNotes = true;
 		this.HtmlPage.m_oLogicDocument.Notes_Draw(this.Slide, g);
 		this.HtmlPage.m_oDrawingDocument.isDrawingNotes = false;
