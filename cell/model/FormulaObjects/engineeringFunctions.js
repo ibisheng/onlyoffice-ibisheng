@@ -1680,17 +1680,17 @@
 				unitConverterArr["F"] = {};//Degree Fahrenheit
 
 				unitConverterArr["F"]["fah"] = 1;
-				unitConverterArr["F"]["K"] = [{type: 1, val: -32}, {type: 0, val: 1.8}, {type: 1, val: 273.15}];
-				unitConverterArr["F"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 1.8}, {type: 1, val: 273.15}];
-				unitConverterArr["F"]["Rank"] = [{type: 1, val: -459.67}];
+				unitConverterArr["F"]["K"] = [{type: 1, val: -32}, {type: 0, val: 5/9}, {type: 1, val: 273.15}];
+				unitConverterArr["F"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 5/9}, {type: 1, val: 273.15}];
+				unitConverterArr["F"]["Rank"] = [{type: 1, val: 459.67}];
 				unitConverterArr["F"]["Reau"] = [{type: 1, val: -32}, {type: 0, val: 0.444444}];
 
 
 				unitConverterArr["fah"] = {};//Degree Fahrenheit
 
-				unitConverterArr["fah"]["K"] = [{type: 1, val: -32}, {type: 0, val: 1.8}, {type: 1, val: 273.15}];
-				unitConverterArr["fah"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 1.8}, {type: 1, val: 273.15}];
-				unitConverterArr["fah"]["Rank"] = [{type: 1, val: -459.67}];
+				unitConverterArr["fah"]["K"] = [{type: 1, val: -32}, {type: 0, val: 5/9}, {type: 1, val: 273.15}];
+				unitConverterArr["fah"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 5/9}, {type: 1, val: 273.15}];
+				unitConverterArr["fah"]["Rank"] = [{type: 1, val: 459.67}];
 				unitConverterArr["fah"]["Reau"] = [{type: 1, val: -32}, {type: 0, val: 0.444444}];
 
 
@@ -1708,7 +1708,7 @@
 
 				unitConverterArr["Rank"] = {};//Degrees Rankine
 
-				unitConverterArr["Rank"]["Reau"] =  [{type: 1, val: -491.67}, {type: 0, val: 2.25}];
+				unitConverterArr["Rank"]["Reau"] = [{type: 0, val: 0.4444444}, {type: 1, val: -218.52}];
 
 			};
 
@@ -3918,9 +3918,9 @@
 					res = num;
 					for(var i = coeff.length - 1; i >= 0; i--){
 						if(0 === coeff[i].type){
-							res *= coeff[i].val;
+							res /= coeff[i].val;
 						}else{
-							res += coeff[i].val;
+							res -= coeff[i].val;
 						}
 					}
 				}else{
