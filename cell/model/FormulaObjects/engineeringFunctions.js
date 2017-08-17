@@ -1655,59 +1655,60 @@
 
 				//***TODO пересмотреть коэфиициэнты у температуры!!!!!***
 				//Temperature
+				//type 0 - умножение, 1 - сложение
 				unitConverterArr["C"] = {};//Degree Celsius
 
 				unitConverterArr["C"]["cel"] = 1;
-				unitConverterArr["C"]["F"] = 33.8;
-				unitConverterArr["C"]["fah"] = 33.8;
-				unitConverterArr["C"]["K"] = 274.15;
-				unitConverterArr["C"]["kel"] = 274.15;
-				unitConverterArr["C"]["Rank"] = 493.47;
+				unitConverterArr["C"]["F"] = [{type: 0, val: 1.8}, {type: 1, val: 32}];
+				unitConverterArr["C"]["fah"] = [{type: 0, val: 1.8}, {type: 1, val: 32}];
+				unitConverterArr["C"]["K"] = [{type: 1, val: 273.15}];
+				unitConverterArr["C"]["kel"] = [{type: 1, val: 273.15}];
+				unitConverterArr["C"]["Rank"] = [{type: 1, val: 273.15}, {type: 0, val: 1.8}];
 				unitConverterArr["C"]["Reau"] = 0.8;
 
 
 				unitConverterArr["cel"] = {};//Degree Celsius
 
-				unitConverterArr["cel"]["F"] = 33.8;
-				unitConverterArr["cel"]["fah"] = 33.8;
-				unitConverterArr["cel"]["K"] = 274.15;
-				unitConverterArr["cel"]["kel"] = 274.15;
-				unitConverterArr["cel"]["Rank"] = 493.47;
+				unitConverterArr["cel"]["F"] = [{type: 0, val: 1.8}, {type: 1, val: 32}];
+				unitConverterArr["cel"]["fah"] = [{type: 0, val: 1.8}, {type: 1, val: 32}];
+				unitConverterArr["cel"]["K"] = [{type: 1, val: 273.15}];
+				unitConverterArr["cel"]["kel"] = [{type: 1, val: 273.15}];
+				unitConverterArr["cel"]["Rank"] = [{type: 1, val: 273.15}, {type: 0, val: 1.8}];
 				unitConverterArr["cel"]["Reau"] = 0.8;
 
 
 				unitConverterArr["F"] = {};//Degree Fahrenheit
 
-				unitConverterArr["F"]["fah"] = 0.999999999999977;
-				unitConverterArr["F"]["K"] = 255.927777777778;
-				unitConverterArr["F"]["kel"] = 255.927777777778;
-				unitConverterArr["F"]["Rank"] = 460.67;
-				unitConverterArr["F"]["Reau"] = -13.7777777777778;
+				unitConverterArr["F"]["fah"] = 1;
+				unitConverterArr["F"]["K"] = [{type: 1, val: -32}, {type: 0, val: 1.8}, {type: 1, val: 273.15}];
+				unitConverterArr["F"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 1.8}, {type: 1, val: 273.15}];
+				unitConverterArr["F"]["Rank"] = [{type: 1, val: -459.67}];
+				unitConverterArr["F"]["Reau"] = [{type: 1, val: -32}, {type: 0, val: 0.444444}];
 
 
 				unitConverterArr["fah"] = {};//Degree Fahrenheit
 
-				unitConverterArr["fah"]["K"] = 255.927777777778;
-				unitConverterArr["fah"]["kel"] = 255.927777777778;
-				unitConverterArr["fah"]["Rank"] = 460.67;
-				unitConverterArr["fah"]["Reau"] = -13.7777777777778;
+				unitConverterArr["fah"]["K"] = [{type: 1, val: -32}, {type: 0, val: 1.8}, {type: 1, val: 273.15}];
+				unitConverterArr["fah"]["kel"] = [{type: 1, val: -32}, {type: 0, val: 1.8}, {type: 1, val: 273.15}];
+				unitConverterArr["fah"]["Rank"] = [{type: 1, val: -459.67}];
+				unitConverterArr["fah"]["Reau"] = [{type: 1, val: -32}, {type: 0, val: 0.444444}];
 
 
 				unitConverterArr["K"] = {};//Kelvin
 
 				unitConverterArr["K"]["kel"] = 1;
 				unitConverterArr["K"]["Rank"] = 1.8;
-				unitConverterArr["K"]["Reau"] = -217.72;
+				unitConverterArr["K"]["Reau"] = [{type: 1, val: -273.15}, {type: 0, val: 0.8}];
 
 
 				unitConverterArr["kel"] = {};//Kelvin
 
 				unitConverterArr["kel"]["Rank"] = 1.8;
-				unitConverterArr["kel"]["Reau"] = -217.72;
+				unitConverterArr["kel"]["Reau"] = [{type: 1, val: -273.15}, {type: 0, val: 0.8}];
 
 				unitConverterArr["Rank"] = {};//Degrees Rankine
 
-				unitConverterArr["Rank"]["Reau"] = -218.075555555556;
+				unitConverterArr["Rank"]["Reau"] =  [{type: 1, val: -491.67}, {type: 0, val: 2.25}];
 
 			};
 
@@ -3900,9 +3901,31 @@
 			var coeff;
 			var res;
 			if(null !== (coeff = getUnitConverterCoeff(from, to))){
-				res = num * coeff;
+				if(coeff.length){
+					res = num;
+					for(var i = 0; i < coeff.length; i++){
+						if(0 === coeff[i].type){
+							res *= coeff[i].val;
+						}else{
+							res += coeff[i].val;
+						}
+					}
+				}else{
+					res = num * coeff;
+				}
 			}else if(null !== (coeff = getUnitConverterCoeff(to, from))){
-				res = num / coeff;
+				if(coeff.length){
+					res = num;
+					for(var i = coeff.length - 1; i >= 0; i--){
+						if(0 === coeff[i].type){
+							res *= coeff[i].val;
+						}else{
+							res += coeff[i].val;
+						}
+					}
+				}else{
+					res = num / coeff;
+				}
 			}else{
 				return new cError(cErrorType.not_available);
 			}
