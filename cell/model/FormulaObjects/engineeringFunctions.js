@@ -2909,7 +2909,7 @@
 				unitConverterArr["ft2"]["yd^2"] = 0.111111111111111;
 
 
-				unitConverterArr["ft2"] = {};
+				unitConverterArr["ft^2"] = {};
 
 				unitConverterArr["ft^2"]["ha"] = 0.000009290304;
 				unitConverterArr["ft^2"]["in2"] = 144;
@@ -3009,7 +3009,7 @@
 				unitConverterArr["ly2"]["yd^2"] = 1.07043010814506E+032;
 
 
-				unitConverterArr["ly2"] = {};
+				unitConverterArr["ly^2"] = {};
 
 				unitConverterArr["ly^2"]["m2"] = 8.9501590038784E+031;
 				unitConverterArr["ly^2"]["m^2"] = 8.9501590038784E+031;
@@ -3155,6 +3155,11 @@
 
 			var generateInformationAndSpeed = function(){
 
+				unitConverterArr["bit"] = {};
+
+				unitConverterArr["bit"]["byte"] = 0.125;
+
+
 				//Speed
 				unitConverterArr["admkn"] = {};
 
@@ -3199,7 +3204,7 @@
 				unitConverterArr["m/sec"] = {};
 
 				unitConverterArr["m/sec"]["mph"] = 2.2369362920544;
-				
+
 			};
 
 			generateWeightAndMass();
@@ -3218,7 +3223,11 @@
 
 	function getUnitConverterCoeff(from, to){
 		var uniteArr = getUnitConverter();
-		return uniteArr[from][to];
+		var res = null;
+		if(uniteArr[from] && undefined !== uniteArr[from][to]){
+			res = uniteArr[from][to];
+		}
+		return res;
 	}
 
 	cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
@@ -3868,6 +3877,41 @@
 
 	cCONVERT.prototype = Object.create(cBaseFunction.prototype);
 	cCONVERT.prototype.constructor = cCONVERT;
+	cCONVERT.prototype.argumentsMin = 3;
+	cCONVERT.prototype.argumentsMax = 3;
+	cCONVERT.prototype.Calculate = function ( arg ) {
+		var oArguments = this._prepareArguments(arg, arguments[1], true);
+		var argClone = oArguments.args;
+
+		argClone[0] = argClone[0].tocNumber();
+		argClone[1] = argClone[1].tocString();
+		argClone[2] = argClone[2].tocString();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
+
+		var calcFunc = function(argArray){
+			var num = argArray[0];
+			var from = argArray[1];
+			var to = argArray[2];
+
+			var coeff;
+			var res;
+			if(null !== (coeff = getUnitConverterCoeff(from, to))){
+				res = num * coeff;
+			}else if(null !== (coeff = getUnitConverterCoeff(to, from))){
+				res = num / coeff;
+			}else{
+				return new cError(cErrorType.not_available);
+			}
+
+			return new cNumber(res);
+		};
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc, true);
+	};
 
 	/**
 	 * @constructor
