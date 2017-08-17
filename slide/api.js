@@ -5885,6 +5885,7 @@ background-repeat: no-repeat;\
 		if (window["AscDesktopEditor"])
 		{
 			window["AscDesktopEditor"]["startReporter"](window.location.href);
+			this.reporterWindow = {};
 			return;
 		}
 
@@ -5905,6 +5906,11 @@ background-repeat: no-repeat;\
 		if (!this.reporterWindow)
 			return;
 
+		this.reporterWindow.onbeforeunload = function()
+		{
+			window.editor.EndDemonstration();
+		};
+
 		if ( this.reporterWindow.attachEvent )
 			this.reporterWindow.attachEvent('onmessage', this.DemonstrationReporterMessages);
 		else
@@ -5916,6 +5922,7 @@ background-repeat: no-repeat;\
 		if (window["AscDesktopEditor"])
 		{
 			window["AscDesktopEditor"]["endReporter"]();
+			this.reporterWindow = null;
 			return;
 		}
 
@@ -5964,17 +5971,12 @@ background-repeat: no-repeat;\
 				}
 				case "next":
 				{
-					_this.DemonstrationNextSlide();
+					_this.WordControl.DemonstrationManager.NextSlide();
 					break;
 				}
 				case "prev":
 				{
-					_this.DemonstrationPrevSlide();
-					break;
-				}
-				case "slide":
-				{
-					_this.DemonstrationGoToSlide(_obj["slide"]);
+					_this.WordControl.DemonstrationManager.PrevSlide();
 					break;
 				}
 				case "go_to_slide":
@@ -6092,6 +6094,52 @@ background-repeat: no-repeat;\
 			{
 				_this.WordControl.DemonstrationManager.Resize();
 			}
+			else if (true === _obj["next"])
+			{
+				_this.WordControl.DemonstrationManager.NextSlide(true);
+			}
+			else if (true === _obj["prev"])
+			{
+				_this.WordControl.DemonstrationManager.PrevSlide(true);
+			}
+			else if (undefined !== _obj["go_to_slide"])
+			{
+				_this.WordControl.DemonstrationManager.GoToSlide(_obj["go_to_slide"], true);
+			}
+			else if (true === _obj["play"])
+			{
+				var _isNowPlaying = _this.WordControl.DemonstrationManager.IsPlayMode;
+				_this.WordControl.DemonstrationManager.Play(true);
+				var _elem = document.getElementById("dem_id_play_span");
+				if (_elem && !_isNowPlaying)
+				{
+					_elem.classList.remove("btn-play");
+					_elem.classList.add("btn-pause");
+
+					_this.WordControl.reporterTimerLastStart = new Date().getTime();
+
+					_this.WordControl.reporterTimer = setInterval(_this.WordControl.reporterTimerFunc, 1000);
+				}
+			}
+			else if (true === _obj["pause"])
+			{
+				var _isNowPlaying = _this.WordControl.DemonstrationManager.IsPlayMode;
+				_this.WordControl.DemonstrationManager.Pause();
+				var _elem = document.getElementById("dem_id_play_span");
+				if (_elem && _isNowPlaying)
+				{
+					_elem.classList.remove("btn-pause");
+					_elem.classList.add("btn-play");
+
+					if (-1 != _this.WordControl.reporterTimer)
+					{
+						clearInterval(_this.WordControl.reporterTimer);
+						_this.WordControl.reporterTimer = -1;
+					}
+
+					_this.WordControl.reporterTimerAdd = _this.WordControl.reporterTimerFunc(true);
+				}
+			}
 		}
 		catch (err)
 		{
@@ -6106,11 +6154,16 @@ background-repeat: no-repeat;\
 			this.EndShowMessage = undefined;
 		}
 		this.WordControl.DemonstrationManager.Play();
+
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"play\" : true }");
 	};
 
 	asc_docs_api.prototype.DemonstrationPause = function()
 	{
 		this.WordControl.DemonstrationManager.Pause();
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"pause\" : true }");
 	};
 
 	asc_docs_api.prototype.DemonstrationEndShowMessage = function(message)
@@ -6124,11 +6177,15 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.DemonstrationNextSlide = function()
 	{
 		this.WordControl.DemonstrationManager.NextSlide();
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"next\" : true }");
 	};
 
 	asc_docs_api.prototype.DemonstrationPrevSlide = function()
 	{
 		this.WordControl.DemonstrationManager.PrevSlide();
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"prev\" : true }");
 	};
 
 	asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
@@ -6136,7 +6193,10 @@ background-repeat: no-repeat;\
 		this.WordControl.DemonstrationManager.GoToSlide(slideNum);
 
 		if (this.isReporterMode)
-			this.sendFromReporter("{ \"reporter_command\" : \"slide\", \"slide\" : " + slideNum + " }");
+			this.sendFromReporter("{ \"reporter_command\" : \"go_to_slide\", \"slide\" : " + slideNum + " }");
+
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"go_to_slide\" : " + slideNum + " }");
 	};
 
 	asc_docs_api.prototype.SetDemonstrationModeOnly = function()

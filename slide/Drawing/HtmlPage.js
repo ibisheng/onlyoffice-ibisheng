@@ -853,11 +853,6 @@ function CEditorPage(api)
 					_wordControl.DemonstrationManager.PointerRemove();
 			};
 
-			window.onbeforeunload = function(e)
-			{
-				window.editor.sync_endDemonstration();
-			};
-
 			window.onkeydown = this.onKeyDown;
 			window.onkeyup = this.onKeyUp;
 

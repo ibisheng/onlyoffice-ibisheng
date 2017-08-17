@@ -3153,6 +3153,7 @@ function CDemonstrationManager(htmlpage)
 
     this.End = function(isNoUseFullScreen)
     {
+		this.PointerRemove();
         if (this.waitReporterObject)
         {
             this.EndWaitReporter(true);
@@ -3199,12 +3200,12 @@ function CDemonstrationManager(htmlpage)
         this.HtmlPage.m_oApi.sync_endDemonstration();
     }
 
-    this.NextSlide = function()
+    this.NextSlide = function(isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
 
-        if (this.HtmlPage.m_oApi.isReporterMode)
+        if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
 			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"next\" }");
 
         this.CorrectSlideNum();
@@ -3230,12 +3231,12 @@ function CDemonstrationManager(htmlpage)
         return (this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode() || this.HtmlPage.m_oApi.isEmbedVersion);
     }
 
-    this.PrevSlide = function()
+    this.PrevSlide = function(isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
 
-		if (this.HtmlPage.m_oApi.isReporterMode)
+		if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
 			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"prev\" }");
 
         if (0 != this.SlideNum)
@@ -3255,12 +3256,12 @@ function CDemonstrationManager(htmlpage)
         }
     }
 
-    this.GoToSlide = function(slideNum)
+    this.GoToSlide = function(slideNum, isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
 
-		if (this.HtmlPage.m_oApi.isReporterMode)
+		if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
 			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"go_to_slide\", \"slide\" : " + slideNum + " }");
 
         this.CorrectSlideNum();
@@ -3274,13 +3275,13 @@ function CDemonstrationManager(htmlpage)
         this.StartSlide(true, false);
     }
 
-    this.Play = function()
+    this.Play = function(isNoSendFormReporter)
     {
         this.IsPlayMode = true;
 
         if (-1 == this.CheckSlideDuration)
         {
-            this.NextSlide();
+            this.NextSlide(isNoSendFormReporter);
         }
     }
 
