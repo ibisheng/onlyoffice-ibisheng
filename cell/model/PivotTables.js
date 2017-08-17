@@ -10362,7 +10362,11 @@ prot['Second'] = prot.Second;
 
 window['AscCommonExcel'].ToName_ST_ItemType = ToName_ST_ItemType;
 
-window["Asc"]["CT_pivotTableDefinition"] = CT_pivotTableDefinition;
+window['Asc']['CT_PivotCacheDefinition'] = window['Asc'].CT_PivotCacheDefinition = CT_PivotCacheDefinition;
+
+window['Asc']['CT_PivotCacheRecords'] = window['Asc'].CT_PivotCacheRecords = CT_PivotCacheRecords;
+
+window["Asc"]["CT_pivotTableDefinition"] = window['Asc'].CT_pivotTableDefinition = CT_pivotTableDefinition;
 prot = CT_pivotTableDefinition.prototype;
 prot["asc_getName"] = prot.asc_getName;
 prot["asc_getPageWrap"] = prot.asc_getPageWrap;

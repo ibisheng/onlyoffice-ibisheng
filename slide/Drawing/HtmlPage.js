@@ -759,22 +759,23 @@ function CEditorPage(api)
 
 			});
 
-			document.getElementById("dem_id_end").onclick = function() {
-
+			this.elementReporter1 = document.getElementById("dem_id_end");
+			this.elementReporter1.onclick = function() {
 				window.editor.EndDemonstration();
-
 			};
-			document.getElementById("dem_id_prev").onclick = function() {
 
+			this.elementReporter2 = document.getElementById("dem_id_prev");
+			this.elementReporter2.onclick = function() {
 				window.editor.DemonstrationPrevSlide();
-
 			};
-			document.getElementById("dem_id_next").onclick = function() {
 
+			this.elementReporter3 = document.getElementById("dem_id_next");
+			this.elementReporter3.onclick = function() {
 				window.editor.DemonstrationNextSlide();
-
 			};
-			document.getElementById("dem_id_play").onclick = function() {
+
+			this.elementReporter4 = document.getElementById("dem_id_play");
+			this.elementReporter4.onclick = function() {
 
 				var _wordControl = window.editor.WordControl;
 				var _isNowPlaying = _wordControl.DemonstrationManager.IsPlayMode;
@@ -808,7 +809,8 @@ function CEditorPage(api)
 				}
 			};
 
-			document.getElementById("dem_id_reset").onclick = function() {
+			this.elementReporter5 = document.getElementById("dem_id_reset");
+			this.elementReporter5.onclick = function() {
 
 				var _wordControl = window.editor.WordControl;
 				_wordControl.reporterTimerAdd = 0;
@@ -817,7 +819,8 @@ function CEditorPage(api)
 
 			};
 
-			document.getElementById("dem_id_pointer").onclick = function() {
+			this.elementReporter6 = document.getElementById("dem_id_pointer");
+			this.elementReporter6.onclick = function() {
 
 				var _wordControl = window.editor.WordControl;
 				var _elem1 = document.getElementById("dem_id_pointer");
@@ -860,6 +863,16 @@ function CEditorPage(api)
 					window.attachEvent('onmessage', this.m_oApi.DemonstrationToReporterMessages);
 				else
 					window.addEventListener('message', this.m_oApi.DemonstrationToReporterMessages, false);
+			}
+		}
+		else
+		{
+			if (window.addEventListener)
+			{
+				window.addEventListener("beforeunload", function (e)
+				{
+					window.editor.EndDemonstration();
+				});
 			}
 		}
 		// --------------------------------------------------------------------------
@@ -2869,6 +2882,12 @@ function CEditorPage(api)
 			{
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
+
+				if (this.m_bIsRuler)
+				{
+					this.UpdateHorRulerBack(true);
+					this.UpdateVerRulerBack(true);
+				}
 				return;
 			}
 		}
@@ -2878,6 +2897,12 @@ function CEditorPage(api)
 			{
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
+
+				if (this.m_bIsRuler)
+				{
+					this.UpdateHorRulerBack(true);
+					this.UpdateVerRulerBack(true);
+				}
 				return;
 			}
 		}

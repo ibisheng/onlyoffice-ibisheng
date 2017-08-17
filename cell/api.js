@@ -1005,7 +1005,7 @@ var editor;
 									}
 								}).then(function (content) {
 									if (content) {
-										pivotTableCacheDefinition = new CT_PivotCacheDefinition();
+										pivotTableCacheDefinition = new Asc.CT_PivotCacheDefinition();
 										new openXml.SaxParserBase().parse(content, pivotTableCacheDefinition);
 										if (pivotTableCacheDefinition.isValidCacheSource()) {
 											wb.pivotCaches[wbPivotCacheXml.cacheId] = pivotTableCacheDefinition;
@@ -1018,7 +1018,7 @@ var editor;
 									}
 								}).then(function (content) {
 									if (content) {
-										var pivotTableCacheRecords = new CT_PivotCacheRecords();
+										var pivotTableCacheRecords = new Asc.CT_PivotCacheRecords();
 										new openXml.SaxParserBase().parse(content, pivotTableCacheRecords);
 										pivotTableCacheDefinition.cacheRecords = pivotTableCacheRecords;
 									}
@@ -1045,7 +1045,7 @@ var editor;
 									if (res) {
 										var ws = wb.getWorksheet(wsIndex);
 										for (var i = 0; i < res.length; ++i) {
-											var pivotTable = new CT_pivotTableDefinition();
+											var pivotTable = new Asc.CT_pivotTableDefinition();
 											new openXml.SaxParserBase().parse(res[i], pivotTable);
 											var cacheDefinition = wb.pivotCaches[pivotTable.cacheId];
 											if (cacheDefinition) {
@@ -1058,14 +1058,16 @@ var editor;
 								});
 							}, Promise.resolve());
 						}
-					});
-					Promise.all([loadAsyncFile, Asc.ReadDefTableStyles(wb)]).then(function () {
+					}).catch(function (err) {
+						//don't show error.(case of open xls, ods, csv)
+						if (window.console && window.console.log) {
+							window.console.log(err);
+						}
+					}).then(function (err) {
 						//clean up
 						openXml.SaxParserDataTransfer = {};
-						resolve();
-					}).catch(function (err) {
-						reject(err);
-					});
+						return Asc.ReadDefTableStyles(wb);
+					}).then(resolve, reject);
 				}
 			});
 		});

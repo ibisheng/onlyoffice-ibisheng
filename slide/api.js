@@ -6025,6 +6025,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.preloadReporter = function(data)
 	{
 		this.reporterTranslates = [data["translations"]["reset"], data["translations"]["slideOf"], data["translations"]["endSlideshow"]];
+		if (!this.WordControl)
+			return;
+
 		this.WordControl.reporterTranslates = this.reporterTranslates;
 
 		var _button1 = document.getElementById("dem_id_reset");
