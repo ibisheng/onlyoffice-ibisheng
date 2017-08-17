@@ -1248,7 +1248,7 @@
 
     baseEditorsApi.prototype["pluginMethod_GetFontList"] = function()
     {
-    	return AscFonts.g_fontApplication.g_fontSelections.List;
+    	return AscFonts.g_fontApplication.g_fontSelections.SerializeList();
     };
 
 	baseEditorsApi.prototype["pluginMethod_PasteHtml"] = function(htmlText)

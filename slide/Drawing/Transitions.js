@@ -3409,6 +3409,12 @@ function CDemonstrationManager(htmlpage)
 
     this.onMouseUp = function(e)
     {
+		if (oThis.PointerDiv)
+        {
+			AscCommon.stopEvent(e);
+			return false;
+        }
+
 		if (oThis.HtmlPage.m_oApi.reporterWindow)
 		{
 			var _msg_ = {

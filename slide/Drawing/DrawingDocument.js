@@ -1831,19 +1831,20 @@ function CDrawingDocument()
 
 	this.CheckTargetDraw = function(x, y, isFocusOnSlide)
 	{
+		var isReporter = this.m_oWordControl.m_oApi.isReporterMode;
 		if (this.TargetHtmlElementOnSlide != isFocusOnSlide)
 		{
 			if (this.TargetHtmlElementOnSlide)
 			{
 				this.m_oWordControl.m_oMainView.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.appendChild(this.TargetHtmlElement);
-				this.TargetHtmlElement.style.zIndex = 4;
+				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 4;
 			}
 			else
 			{
 				this.m_oWordControl.m_oNotesContainer.HtmlElement.removeChild(this.TargetHtmlElement);
 				this.m_oWordControl.m_oMainView.HtmlElement.appendChild(this.TargetHtmlElement);
-				this.TargetHtmlElement.style.zIndex = 9;
+				this.TargetHtmlElement.style.zIndex = isReporter ? 0 : 9;
 			}
 
 			this.TargetHtmlElementOnSlide = isFocusOnSlide;
