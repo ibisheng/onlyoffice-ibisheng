@@ -10959,9 +10959,6 @@
 		var inc = options.scanForward ? +1 : -1;
 		var isEqual;
 
-		// ToDo стоит переделать это место, т.к. для поиска не нужны измерения, а нужен только сам текст (http://bugzilla.onlyoffice.com/show_bug.cgi?id=26136)
-		this._prepareCellTextMetricsCache(new Asc.Range(0, 0, this.model.getColsCount(), this.model.getRowsCount()));
-
 		function findNextCell() {
 			var ct = undefined;
 			do {
@@ -10981,7 +10978,10 @@
 				if (c < minC || c > maxC || r < minR || r > maxR) {
 					return undefined;
 				}
-				ct = self._getCellTextCache(c, r, true);
+				var cell = self.model._getCellNoEmpty(r, c);
+				if (cell && !cell.isEmptyTextString()) {
+					ct = true;
+				}
 			} while (!ct);
 			return ct;
 		}
