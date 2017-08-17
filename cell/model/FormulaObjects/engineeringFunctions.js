@@ -3153,6 +3153,54 @@
 
 			};
 
+			var generateInformationAndSpeed = function(){
+
+				//Speed
+				unitConverterArr["admkn"] = {};
+
+				unitConverterArr["admkn"]["kn"] = 0.999999913606911;
+				unitConverterArr["admkn"]["m/h"] = 1851.99984;
+				unitConverterArr["admkn"]["m/hr"] = 1851.99984;
+				unitConverterArr["admkn"]["m/s"] = 0.5144444;
+				unitConverterArr["admkn"]["m/sec"] = 0.5144444;
+				unitConverterArr["admkn"]["mph"] = 1.15077934860415;
+
+
+				unitConverterArr["kn"] = {};
+
+				unitConverterArr["kn"]["m/h"] = 1852;
+				unitConverterArr["kn"]["m/hr"] = 1852;
+				unitConverterArr["kn"]["m/s"] = 0.514444444444444;
+				unitConverterArr["kn"]["m/sec"] = 0.514444444444444;
+				unitConverterArr["kn"]["mph"] = 1.15077944802354;
+
+
+				unitConverterArr["m/h"] = {};
+
+				unitConverterArr["m/h"]["m/hr"] = 1;
+				unitConverterArr["m/h"]["m/s"] = 0.000277777777777778;
+				unitConverterArr["m/h"]["m/sec"] = 0.000277777777777778;
+				unitConverterArr["m/h"]["mph"] = 0.000621371192237334;
+
+
+				unitConverterArr["m/hr"] = {};
+
+				unitConverterArr["m/hr"]["m/s"] = 0.000277777777777778;
+				unitConverterArr["m/hr"]["m/sec"] = 0.000277777777777778;
+				unitConverterArr["m/hr"]["mph"] = 0.000621371192237334;
+
+
+				unitConverterArr["m/s"] = {};
+
+				unitConverterArr["m/s"]["m/sec"] = 1;
+				unitConverterArr["m/s"]["mph"] = 2.2369362920544;
+
+
+				unitConverterArr["m/sec"] = {};
+
+				unitConverterArr["m/sec"]["mph"] = 2.2369362920544;
+				
+			};
 
 			generateWeightAndMass();
 			generateDistance();
@@ -3162,6 +3210,7 @@
 			generatePowerMagnetismTemperature();
 			generateVolume();
 			generateArea();
+			generateInformationAndSpeed();
 		}
 
 		return unitConverterArr;
