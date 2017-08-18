@@ -975,19 +975,18 @@ var editor;
 		return new Promise(function (resolve, reject) {
 			var openXml = AscCommon.openXml;
 			//open cache xlsx instead of documentUrl, to support pivot in xls, ods... and don't send jwt signature
-			if (t.isChartEditor && url) {
+			if (t.isChartEditor) {
 				resolve();
 				return;
 			}
 			var processData = function (err, data) {
-				if (err) {
-					reject(err); // or handle err
-				} else {
+				var nextPromise;
+				if (!err && data) {
 					openXml.SaxParserDataTransfer.wb = wb;
 					var doc = new openXml.OpenXmlPackage();
 					var wbPart = null;
 					var wbXml = null;
-					var loadAsyncFile = require('jszip').loadAsync(data).then(function (zip) {
+					nextPromise = require('jszip').loadAsync(data).then(function (zip) {
 						return doc.openFromZip(zip);
 					}).then(function () {
 						wbPart = doc.getPartByRelationshipType(openXml.relationshipTypes.workbook);
@@ -1064,12 +1063,20 @@ var editor;
 						if (window.console && window.console.log) {
 							window.console.log(err);
 						}
-					}).then(function (err) {
-						//clean up
-						openXml.SaxParserDataTransfer = {};
-						return Asc.ReadDefTableStyles(wb);
-					}).then(resolve, reject);
+					});
+				} else {
+					if (err) {
+						if (window.console && window.console.log) {
+							window.console.log(err);
+						}
+					}
+					nextPromise = Promise.resolve();
 				}
+				nextPromise.then(function (err) {
+					//clean up
+					openXml.SaxParserDataTransfer = {};
+					return Asc.ReadDefTableStyles(wb);
+				}).then(resolve, reject);
 			};
 			if (typeof url === "string") {
 				require('jsziputils').getBinaryContent(url, processData);
