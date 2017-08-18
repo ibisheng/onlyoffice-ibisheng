@@ -649,6 +649,7 @@
 		}
 
 		this.reporterWindow 		= null;
+		this.reporterWindowCounter 	= 0;
 		this.reporterStartObject 	= null;
 		this.isReporterMode = ("reporter" == config['using']) ? true : false;
 		this.disableReporterEvents = false;
@@ -5912,6 +5913,19 @@ background-repeat: no-repeat;\
 			window.editor.EndDemonstration();
 		};
 
+		this.reporterWindowCounter = 0;
+		this.reporterWindow.onbeforeunload = function()
+		{
+			window.editor.EndDemonstration();
+		};
+		this.reporterWindow.onunload = function () {
+			window.editor.reporterWindowCounter++;
+			if (1 < window.editor.reporterWindowCounter)
+			{
+				window.editor.EndDemonstration();
+			}
+		};
+
 		if ( this.reporterWindow.attachEvent )
 			this.reporterWindow.attachEvent('onmessage', this.DemonstrationReporterMessages);
 		else
@@ -5927,6 +5941,7 @@ background-repeat: no-repeat;\
 			return;
 		}
 
+		this.reporterWindowCounter = 0;
 		if (!this.reporterWindow)
 			return;
 
