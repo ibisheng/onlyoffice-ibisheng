@@ -3502,9 +3502,9 @@ function CDemonstrationManager(htmlpage)
         return false;
     }
 
-    this.Resize = function()
+    this.Resize = function(isNoSend)
     {
-		if (oThis.HtmlPage.m_oApi.reporterWindow)
+		if (isNoSend !== true && oThis.HtmlPage.m_oApi.reporterWindow)
 		{
 			var _msg_ = {
 				"main_command"  : true,
@@ -3513,6 +3513,14 @@ function CDemonstrationManager(htmlpage)
 
 			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
 		}
+		else if (isNoSend !== true && oThis.HtmlPage.m_oApi.isReporterMode)
+        {
+			var _msg_ = {
+				"reporter_command"  : "resize"
+			};
+
+			oThis.HtmlPage.m_oApi.sendFromReporter(JSON.stringify(_msg_));
+        }
 
         if (!this.Mode)
             return;
@@ -3520,8 +3528,10 @@ function CDemonstrationManager(htmlpage)
         var _width  = this.DemonstrationDiv.clientWidth;
         var _height = this.DemonstrationDiv.clientHeight;
 
-        if (_width == this.DivWidth && _height == this.DivHeight)
+        if (_width == this.DivWidth && _height == this.DivHeight && true !== isNoSend)
             return;
+
+		oThis.HtmlPage.m_oApi.disableReporterEvents = true;
 
         this.DivWidth = _width;
         this.DivHeight = _height;
@@ -3542,6 +3552,8 @@ function CDemonstrationManager(htmlpage)
 
         if (this.SlideNum < this.SlidesCount)
             this.StartSlide(this.Transition.IsPlaying(), false);
+
+		oThis.HtmlPage.m_oApi.disableReporterEvents = false;
     }
 
     this.PointerMove = function(x, y, w, h)

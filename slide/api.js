@@ -651,6 +651,7 @@
 		this.reporterWindow 		= null;
 		this.reporterStartObject 	= null;
 		this.isReporterMode = ("reporter" == config['using']) ? true : false;
+		this.disableReporterEvents = false;
 
 		if (this.isReporterMode)
 		{
@@ -6009,6 +6010,11 @@ background-repeat: no-repeat;\
 					_this.WordControl.DemonstrationManager.Play();
 					break;
 				}
+				case "resize":
+				{
+					_this.WordControl.DemonstrationManager.Resize(true);
+					break;
+				}
 				default:
 					break;
 			}
@@ -6040,6 +6046,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sendToReporter = function(value)
 	{
+		if (this.disableReporterEvents)
+			return;
+
 		if (window["AscDesktopEditor"])
 		{
 			window["AscDesktopEditor"]["sendToReporter"](value);
@@ -6052,6 +6061,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sendFromReporter = function(value)
 	{
+		if (this.disableReporterEvents)
+			return;
+
 		if (window["AscDesktopEditor"])
 		{
 			window["AscDesktopEditor"]["sendFromReporter"](value);
@@ -6092,7 +6104,7 @@ background-repeat: no-repeat;\
 			}
 			else if (undefined !== _obj["resize"])
 			{
-				_this.WordControl.DemonstrationManager.Resize();
+				_this.WordControl.DemonstrationManager.Resize(true);
 			}
 			else if (true === _obj["next"])
 			{
@@ -6153,7 +6165,7 @@ background-repeat: no-repeat;\
 			this.WordControl.DemonstrationManager.EndShowMessage = this.EndShowMessage;
 			this.EndShowMessage = undefined;
 		}
-		this.WordControl.DemonstrationManager.Play();
+		this.WordControl.DemonstrationManager.Play(true);
 
 		if (this.reporterWindow)
 			this.sendToReporter("{ \"main_command\" : true, \"play\" : true }");
