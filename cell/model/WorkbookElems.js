@@ -3415,7 +3415,6 @@ var g_nInt16InitVal = 1<<15;
 function Row(worksheet)
 {
 	this.ws = worksheet;
-	this.c = {};
 	this.index = null;
     this.xfs = null;
     this.h = null;
@@ -3464,22 +3463,12 @@ Row.prototype =
 	},
 	isEmpty : function()
 	{
-		if(!this.isEmptyProp())
-			return false;
-		var bEmptyCells = true;
-		for(var i in this.c)
-		{
-			bEmptyCells = false;
-			break;
-		}
-		if(false == bEmptyCells)
-			return false;
-		return true;
+		return this.isEmptyProp();
 	},
 	isEmptyProp : function()
 	{
 		//todo
-		return null == this.xfs && null == this.h && g_nRowFlag_empty == this.flags;
+		return null == this.xfs && null == this.h && g_nRowFlag_init == this.flags;
 	},
 	clone : function(oNewWs, renameParams)
 	{
@@ -3540,7 +3529,6 @@ Row.prototype =
 	{
 		var oldVal = this.xfs;
 		this.xfs = xfs;
-		this.flags |= g_nRowFlag_init;
 		this._hasChanged = true;
 		if (History.Is_On() && oldVal != this.xfs) {
 			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, this.xfs));
@@ -3708,7 +3696,6 @@ Row.prototype =
 		} else {
 			this.flags &= ~g_nRowFlag_hd;
 		}
-		this.flags |= g_nRowFlag_init;
 		this._hasChanged = true;
 		if (this.index >= 0) {
 			this.ws.hiddenManager.setDirty(true);
@@ -3723,7 +3710,6 @@ Row.prototype =
 		} else {
 			this.flags &= ~g_nRowFlag_CustomHeight;
 		}
-		this.flags |= g_nRowFlag_init;
 		this._hasChanged = true;
 	},
 	getCustomHeight: function() {
@@ -3735,7 +3721,6 @@ Row.prototype =
 		} else {
 			this.flags &= ~g_nRowFlag_CalcHeight;
 		}
-		this.flags |= g_nRowFlag_init;
 		this._hasChanged = true;
 	},
 	getCalcHeight: function() {
@@ -3754,7 +3739,6 @@ Row.prototype =
 			val = Asc.c_oAscMaxRowHeight;
 		}
 		this.h = this._prepareHeight(val);
-		this.flags |= g_nRowFlag_init;
 		this._hasChanged = true;
 	},
 	getHeight: function() {

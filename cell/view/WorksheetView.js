@@ -1632,7 +1632,7 @@
 					}
 					if (rowCache && rowCache.columnsWithText[c]) {
 						rightSide = 0;
-						var ct = this._getCellTextCache(c, r);
+						var ct = t._getCellTextCache(c, r);
 						if (ct !== undefined) {
 							if (!ct.flags.isMerged() && !ct.flags.wrapText) {
 								rightSide = ct.sideR;
@@ -10974,10 +10974,11 @@
 				if (c < minC || c > maxC || r < minR || r > maxR) {
 					return undefined;
 				}
-				var cell = self.model._getCellNoEmpty(r, c);
-				if (cell && !cell.isEmptyTextString()) {
-					ct = true;
-				}
+				self.model._getCellNoEmpty(r, c, function(cell){
+					if (cell && !cell.isEmptyTextString()) {
+						ct = true;
+					}
+				});
 			} while (!ct);
 			return ct;
 		}
