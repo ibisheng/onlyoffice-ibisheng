@@ -595,6 +595,7 @@ var editor;
             "delimiter": option.asc_getDelimiter(),
             "delimiterChar": option.asc_getDelimiterChar(),
             "codepage": option.asc_getCodePage(),
+			"savexfile": true,
             "nobase64": true
           };
 
@@ -616,6 +617,7 @@ var editor;
             "url": this.documentUrl,
             "title": this.documentTitle,
             "password": option.asc_getPassword(),
+			"savexfile": true,
             "nobase64": true
           };
 
@@ -972,12 +974,14 @@ var editor;
 		var t = this;
 		return new Promise(function (resolve, reject) {
 			var openXml = AscCommon.openXml;
-			if (t.isChartEditor) {
+			//open cache xlsx instead of documentUrl, to support pivot in xls, ods... and don't send jwt signature
+			var url = AscCommon.g_oDocumentUrls.getUrl('Editor.xlsx');
+			if (t.isChartEditor && url) {
 				resolve();
 				return;
 			}
 
-			require('jsziputils').getBinaryContent(t.documentUrl, function (err, data) {
+			require('jsziputils').getBinaryContent(url, function (err, data) {
 				if (err) {
 					reject(err); // or handle err
 				} else {

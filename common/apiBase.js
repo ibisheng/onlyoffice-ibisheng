@@ -440,6 +440,9 @@
 				"title"         : this.documentTitle,
 				"nobase64"      : true
 			};
+			if (this.editorId == c_oEditorId.Spreadsheet) {
+				rData["savexfile"] = true;
+			}
 			if (versionHistory)
 			{
                 rData["closeonerror"] = versionHistory.isRequested;
