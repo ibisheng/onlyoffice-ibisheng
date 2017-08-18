@@ -954,7 +954,7 @@ var editor;
       }
     }
 	this.wbModel = this._openDocument(sData);
-	this.openDocumentFromZip(this.wbModel).then(function() {
+	this.openDocumentFromZip(this.wbModel, AscCommon.g_oDocumentUrls.getUrl('Editor.xlsx')).then(function() {
 		t.FontLoader.LoadDocumentFonts(t.wbModel.generateFontMap2());
 
 		// Какая-то непонятная заглушка, чтобы не падало в ipad
@@ -970,18 +970,16 @@ var editor;
 		t.sendEvent('asc_onError', c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 	});
   };
-	spreadsheet_api.prototype.openDocumentFromZip = function (wb) {
+	spreadsheet_api.prototype.openDocumentFromZip = function (wb, url) {
 		var t = this;
 		return new Promise(function (resolve, reject) {
 			var openXml = AscCommon.openXml;
 			//open cache xlsx instead of documentUrl, to support pivot in xls, ods... and don't send jwt signature
-			var url = AscCommon.g_oDocumentUrls.getUrl('Editor.xlsx');
 			if (t.isChartEditor && url) {
 				resolve();
 				return;
 			}
-
-			require('jsziputils').getBinaryContent(url, function (err, data) {
+			var processData = function (err, data) {
 				if (err) {
 					reject(err); // or handle err
 				} else {
@@ -1072,7 +1070,12 @@ var editor;
 						return Asc.ReadDefTableStyles(wb);
 					}).then(resolve, reject);
 				}
-			});
+			};
+			if (typeof url === "string") {
+				require('jsziputils').getBinaryContent(url, processData);
+			} else {
+				processData(undefined, url);
+			}
 		});
 	};
 
@@ -3289,7 +3292,7 @@ var editor;
 		}
 	};
 
-  spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version, isUser) {
+  spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version, isUser, xlsxFile) {
     asc["editor"] = this;
 
     this.SpellCheckUrl = '';
@@ -3310,9 +3313,10 @@ var editor;
 	}
     oBinaryFileReader.Read(base64File, this.wbModel);
     g_oIdCounter.Set_Load(false);
-
-    this._coAuthoringInit();
-    this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
+	this.openDocumentFromZip(this.wbModel, xlsxFile).then(function() {
+		this._coAuthoringInit();
+		this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
+	});
   };
 
   spreadsheet_api.prototype.asc_nativeCalculateFile = function() {
