@@ -1810,10 +1810,6 @@ function CEditorPage(api)
 
 		var oWordControl = oThis;
 
-		if (oWordControl.m_oApi.isReporterMode && oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
-			oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "none";
-
-
 		var x1 = oWordControl.Splitter1Pos * g_dKoef_mm_to_pix;
 		var x2 = (oWordControl.Splitter1Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix;
 		var y1 = oWordControl.Height - ((oWordControl.Splitter2Pos + GlobalSkin.SplitterWidthMM) * g_dKoef_mm_to_pix);
@@ -1840,7 +1836,11 @@ function CEditorPage(api)
 		}
 
 		if (_isCatch)
+		{
+			if (oWordControl.m_oApi.isReporterMode && oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
+				oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "none";
 			AscCommon.stopEvent(e);
+		}
 	};
 
 	this.onBodyMouseMove = function(e)
