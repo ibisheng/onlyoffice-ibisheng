@@ -3153,6 +3153,7 @@ function CDemonstrationManager(htmlpage)
 
     this.End = function(isNoUseFullScreen)
     {
+		this.PointerRemove();
         if (this.waitReporterObject)
         {
             this.EndWaitReporter(true);
@@ -3199,12 +3200,12 @@ function CDemonstrationManager(htmlpage)
         this.HtmlPage.m_oApi.sync_endDemonstration();
     }
 
-    this.NextSlide = function()
+    this.NextSlide = function(isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
 
-        if (this.HtmlPage.m_oApi.isReporterMode)
+        if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
 			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"next\" }");
 
         this.CorrectSlideNum();
@@ -3230,12 +3231,12 @@ function CDemonstrationManager(htmlpage)
         return (this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode() || this.HtmlPage.m_oApi.isEmbedVersion);
     }
 
-    this.PrevSlide = function()
+    this.PrevSlide = function(isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
 
-		if (this.HtmlPage.m_oApi.isReporterMode)
+		if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
 			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"prev\" }");
 
         if (0 != this.SlideNum)
@@ -3255,12 +3256,12 @@ function CDemonstrationManager(htmlpage)
         }
     }
 
-    this.GoToSlide = function(slideNum)
+    this.GoToSlide = function(slideNum, isNoSendFormReporter)
     {
         if (!this.Mode)
             return;
 
-		if (this.HtmlPage.m_oApi.isReporterMode)
+		if (this.HtmlPage.m_oApi.isReporterMode && !isNoSendFormReporter)
 			this.HtmlPage.m_oApi.sendFromReporter("{ \"reporter_command\" : \"go_to_slide\", \"slide\" : " + slideNum + " }");
 
         this.CorrectSlideNum();
@@ -3274,13 +3275,13 @@ function CDemonstrationManager(htmlpage)
         this.StartSlide(true, false);
     }
 
-    this.Play = function()
+    this.Play = function(isNoSendFormReporter)
     {
         this.IsPlayMode = true;
 
         if (-1 == this.CheckSlideDuration)
         {
-            this.NextSlide();
+            this.NextSlide(isNoSendFormReporter);
         }
     }
 
@@ -3408,6 +3409,12 @@ function CDemonstrationManager(htmlpage)
 
     this.onMouseUp = function(e)
     {
+		if (oThis.PointerDiv)
+        {
+			AscCommon.stopEvent(e);
+			return false;
+        }
+
 		if (oThis.HtmlPage.m_oApi.reporterWindow)
 		{
 			var _msg_ = {
@@ -3495,9 +3502,9 @@ function CDemonstrationManager(htmlpage)
         return false;
     }
 
-    this.Resize = function()
+    this.Resize = function(isNoSend)
     {
-		if (oThis.HtmlPage.m_oApi.reporterWindow)
+		if (isNoSend !== true && oThis.HtmlPage.m_oApi.reporterWindow)
 		{
 			var _msg_ = {
 				"main_command"  : true,
@@ -3506,6 +3513,14 @@ function CDemonstrationManager(htmlpage)
 
 			oThis.HtmlPage.m_oApi.sendToReporter(JSON.stringify(_msg_));
 		}
+		else if (isNoSend !== true && oThis.HtmlPage.m_oApi.isReporterMode)
+        {
+			var _msg_ = {
+				"reporter_command"  : "resize"
+			};
+
+			oThis.HtmlPage.m_oApi.sendFromReporter(JSON.stringify(_msg_));
+        }
 
         if (!this.Mode)
             return;
@@ -3513,8 +3528,10 @@ function CDemonstrationManager(htmlpage)
         var _width  = this.DemonstrationDiv.clientWidth;
         var _height = this.DemonstrationDiv.clientHeight;
 
-        if (_width == this.DivWidth && _height == this.DivHeight)
+        if (_width == this.DivWidth && _height == this.DivHeight && true !== isNoSend)
             return;
+
+		oThis.HtmlPage.m_oApi.disableReporterEvents = true;
 
         this.DivWidth = _width;
         this.DivHeight = _height;
@@ -3535,6 +3552,8 @@ function CDemonstrationManager(htmlpage)
 
         if (this.SlideNum < this.SlidesCount)
             this.StartSlide(this.Transition.IsPlaying(), false);
+
+		oThis.HtmlPage.m_oApi.disableReporterEvents = false;
     }
 
     this.PointerMove = function(x, y, w, h)

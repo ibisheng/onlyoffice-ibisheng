@@ -68,8 +68,9 @@
 	var _func = AscCommonExcel._func;
 
 	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
-	cFormulaFunctionGroup['LookupAndReference'].push(cADDRESS, cAREAS, cCHOOSE, cCOLUMN, cCOLUMNS, cGETPIVOTDATA,
-		cHLOOKUP, cHYPERLINK, cINDEX, cINDIRECT, cLOOKUP, cMATCH, cOFFSET, cROW, cROWS, cRTD, cTRANSPOSE, cVLOOKUP);
+	cFormulaFunctionGroup['LookupAndReference'].push(cADDRESS, cAREAS, cCHOOSE, cCOLUMN, cCOLUMNS, cFORMULATEXT,
+		cGETPIVOTDATA, cHLOOKUP, cHYPERLINK, cINDEX, cINDIRECT, cLOOKUP, cMATCH, cOFFSET, cROW, cROWS, cRTD, cTRANSPOSE,
+		cVLOOKUP);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cAREAS, cGETPIVOTDATA, cHYPERLINK, cRTD);
@@ -312,6 +313,39 @@
 		}
 		return this.value = (range ? new cNumber(Math.abs(range.getBBox0().c1 - range.getBBox0().c2) + 1) :
 			new cError(cErrorType.wrong_value_type));
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cFORMULATEXT() {
+		this.name = "FORMULATEXT";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cFORMULATEXT.prototype = Object.create(cBaseFunction.prototype);
+	cFORMULATEXT.prototype.constructor = cFORMULATEXT;
+	cFORMULATEXT.prototype.argumentsMin = 1;
+	cFORMULATEXT.prototype.argumentsMax = 1;
+	cFORMULATEXT.prototype.isXLFN = true;
+	cFORMULATEXT.prototype.Calculate = function (arg) {
+
+		var arg0 = arg[0];
+		var res = null;
+		if (cElementType.cell === arg0.type || cElementType.cell3D === arg0.type ||
+			cElementType.cellsRange === arg0.type || cElementType.cellsRange3D === arg0.type) {
+			var bbox = arg0.getRange();
+			var formula = bbox.getFormula();
+			if("" === formula){
+				return this.value = new cError(cErrorType.not_available);
+			}else{
+				res = new cString("=" + formula);
+			}
+		}
+
+		return this.value = (null !== res ? res : new cError(cErrorType.wrong_value_type));
 	};
 
 	/**

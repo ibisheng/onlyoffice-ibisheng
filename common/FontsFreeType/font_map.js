@@ -1376,6 +1376,49 @@ CFontSelect.prototype =
             return 3000;
 
         return 10000;
+    },
+
+    Serialize : function()
+    {
+        var _obj = {};
+
+		_obj["m_wsFontName"] = this.m_wsFontName;
+
+		_obj["m_wsFontPath"] = this.m_wsFontPath;
+		_obj["m_lIndex"] = this.m_lIndex;
+
+		_obj["m_bBold"] = this.m_bBold;
+		_obj["m_bItalic"] = this.m_bItalic;
+		_obj["m_bIsFixed"] = this.m_bIsFixed;
+
+		_obj["m_aPanose"] = new Array(10);
+		for (var i = 0; i < 10; i++)
+        {
+			_obj["m_aPanose"][i] = this.m_aPanose[i];
+        }
+
+		_obj["m_ulUnicodeRange1"] = this.m_ulUnicodeRange1;
+		_obj["m_ulUnicodeRange2"] = this.m_ulUnicodeRange2;
+		_obj["m_ulUnicodeRange3"] = this.m_ulUnicodeRange3;
+		_obj["m_ulUnicodeRange4"] = this.m_ulUnicodeRange4;
+
+		_obj["m_ulCodePageRange1"] = this.m_ulCodePageRange1;
+		_obj["m_ulCodePageRange2"] = this.m_ulCodePageRange2;
+
+		_obj["m_usWeigth"] = this.m_usWeigth;
+		_obj["m_usWidth"] = this.m_usWidth;
+
+		_obj["m_sFamilyClass"] = this.m_sFamilyClass;
+		_obj["m_eFontFormat"] = this.m_eFontFormat;
+
+		_obj["m_shAvgCharWidth"] = this.m_shAvgCharWidth;
+		_obj["m_shAscent"] = this.m_shAscent;
+		_obj["m_shDescent"] = this.m_shDescent;
+		_obj["m_shLineGap"] = this.m_shLineGap;
+		_obj["m_shXHeight"] = this.m_shXHeight;
+		_obj["m_shCapHeight"] = this.m_shCapHeight;
+
+		return _obj;
     }
 };
 
@@ -1439,6 +1482,15 @@ function memset(p, start, val, count)
 
 CFontSelectList.prototype =
 {
+    SerializeList : function()
+    {
+        var _list = [];
+        var _len = this.List.length;
+        for (var k = 0; k < _len; k++)
+            _list.push(this.List[k].Serialize());
+        return _list;
+    },
+
     Init : function()
     {
         if (true == this.IsInit)

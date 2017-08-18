@@ -106,6 +106,8 @@ var para_Separator                 = 0x0041; // Разделить, которы
 var para_ContinuationSeparator     = 0x0042; // Большой разделитель, который используется для сносок
 var para_PageCount                 = 0x0043; // Количество страниц
 var para_InlineLevelSdt            = 0x0044; // Внутристроковый контейнер
+var para_FieldChar                 = 0x0045;
+var para_InstrText                 = 0x0046;
 
 var break_Line   = 0x01;
 var break_Page   = 0x02;
@@ -2022,6 +2024,8 @@ function ParagraphContent_Read_FromBinary(Reader)
 		case para_Separator             : Element = new ParaSeparator(); break;
 		case para_ContinuationSeparator : Element = new ParaContinuationSeparator(); break;
 		case para_PageCount             : Element = new ParaPageCount(); break;
+		case para_FieldChar             : Element = new ParaFieldChar(); break;
+		case para_InstrText             : Element = new ParaInstrText(); break;
 	}
 
 	if (null != Element)

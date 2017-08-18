@@ -607,6 +607,7 @@
 		this.isImageChangeUrl      = false;
 		this.isShapeImageChangeUrl = false;
 		this.isSlideImageChangeUrl = false;
+		this.textureType = null;
 
 		this.isPasteFonts_Images = false;
 
@@ -649,8 +650,10 @@
 		}
 
 		this.reporterWindow 		= null;
+		this.reporterWindowCounter 	= 0;
 		this.reporterStartObject 	= null;
 		this.isReporterMode = ("reporter" == config['using']) ? true : false;
+		this.disableReporterEvents = false;
 
 		if (this.isReporterMode)
 		{
@@ -3664,19 +3667,22 @@ background-repeat: no-repeat;\
 		this.isImageChangeUrl = true;
 		this.asc_addImage();
 	};
-	asc_docs_api.prototype.ChangeShapeImageFromFile = function()
+	asc_docs_api.prototype.ChangeShapeImageFromFile = function(type)
 	{
 		this.isShapeImageChangeUrl = true;
+		this.textureType = type;
 		this.asc_addImage();
 	};
-	asc_docs_api.prototype.ChangeSlideImageFromFile = function()
+	asc_docs_api.prototype.ChangeSlideImageFromFile = function(type)
 	{
 		this.isSlideImageChangeUrl = true;
+        this.textureType = type;
 		this.asc_addImage();
 	};
-	asc_docs_api.prototype.ChangeArtImageFromFile   = function()
+	asc_docs_api.prototype.ChangeArtImageFromFile   = function(type)
 	{
 		this.isTextArtChangeUrl = true;
+        this.textureType = type;
 		this.asc_addImage();
 	};
 
@@ -3826,8 +3832,12 @@ background-repeat: no-repeat;\
 			AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
 			AscShapeProp.fill.fill = new asc_CFillBlip();
 			AscShapeProp.fill.fill.asc_putUrl(src);
+			if(this.textureType !== null && this.textureType !== undefined){
+                AscShapeProp.fill.fill.asc_putType(this.textureType);
+			}
 			this.ShapeApply(AscShapeProp);
 			this.isShapeImageChangeUrl = false;
+			this.textureType = null;
 		}
 		else if (this.isSlideImageChangeUrl)
 		{
@@ -3836,8 +3846,12 @@ background-repeat: no-repeat;\
 			AscSlideProp.Background.type = c_oAscFill.FILL_TYPE_BLIP;
 			AscSlideProp.Background.fill = new asc_CFillBlip();
 			AscSlideProp.Background.fill.asc_putUrl(src);
+			if(this.textureType !== null && this.textureType !== undefined){
+                AscSlideProp.Background.fill.asc_putType(this.textureType);
+			}
 			this.SetSlideProps(AscSlideProp);
 			this.isSlideImageChangeUrl = false;
+			this.textureType = null;
 		}
 		else if (this.isImageChangeUrl)
 		{
@@ -3853,10 +3867,14 @@ background-repeat: no-repeat;\
 			oFill.type       = c_oAscFill.FILL_TYPE_BLIP;
 			oFill.fill       = new asc_CFillBlip();
 			oFill.fill.asc_putUrl(src);
+            if(this.textureType !== null && this.textureType !== undefined){
+				oFill.fill.asc_putType(this.textureType);
+            }
 			AscShapeProp.textArtProperties = new Asc.asc_TextArtProperties();
 			AscShapeProp.textArtProperties.asc_putFill(oFill);
 			this.ShapeApply(AscShapeProp);
 			this.isTextArtChangeUrl = false;
+			this.textureType = null;
 		}
 		else
 		{
@@ -5885,6 +5903,7 @@ background-repeat: no-repeat;\
 		if (window["AscDesktopEditor"])
 		{
 			window["AscDesktopEditor"]["startReporter"](window.location.href);
+			this.reporterWindow = {};
 			return;
 		}
 
@@ -5905,6 +5924,24 @@ background-repeat: no-repeat;\
 		if (!this.reporterWindow)
 			return;
 
+		this.reporterWindow.onbeforeunload = function()
+		{
+			window.editor.EndDemonstration();
+		};
+
+		this.reporterWindowCounter = 0;
+		this.reporterWindow.onbeforeunload = function()
+		{
+			window.editor.EndDemonstration();
+		};
+		this.reporterWindow.onunload = function () {
+			window.editor.reporterWindowCounter++;
+			if (1 < window.editor.reporterWindowCounter)
+			{
+				window.editor.EndDemonstration();
+			}
+		};
+
 		if ( this.reporterWindow.attachEvent )
 			this.reporterWindow.attachEvent('onmessage', this.DemonstrationReporterMessages);
 		else
@@ -5916,9 +5953,11 @@ background-repeat: no-repeat;\
 		if (window["AscDesktopEditor"])
 		{
 			window["AscDesktopEditor"]["endReporter"]();
+			this.reporterWindow = null;
 			return;
 		}
 
+		this.reporterWindowCounter = 0;
 		if (!this.reporterWindow)
 			return;
 
@@ -5964,17 +6003,12 @@ background-repeat: no-repeat;\
 				}
 				case "next":
 				{
-					_this.DemonstrationNextSlide();
+					_this.WordControl.DemonstrationManager.NextSlide();
 					break;
 				}
 				case "prev":
 				{
-					_this.DemonstrationPrevSlide();
-					break;
-				}
-				case "slide":
-				{
-					_this.DemonstrationGoToSlide(_obj["slide"]);
+					_this.WordControl.DemonstrationManager.PrevSlide();
 					break;
 				}
 				case "go_to_slide":
@@ -5997,6 +6031,21 @@ background-repeat: no-repeat;\
 					_this.WordControl.DemonstrationManager.PointerRemove();
 					break;
 				}
+				case "pause":
+				{
+					_this.WordControl.DemonstrationManager.Pause();
+					break;
+				}
+				case "play":
+				{
+					_this.WordControl.DemonstrationManager.Play();
+					break;
+				}
+				case "resize":
+				{
+					_this.WordControl.DemonstrationManager.Resize(true);
+					break;
+				}
 				default:
 					break;
 			}
@@ -6009,6 +6058,9 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.preloadReporter = function(data)
 	{
 		this.reporterTranslates = [data["translations"]["reset"], data["translations"]["slideOf"], data["translations"]["endSlideshow"]];
+		if (!this.WordControl)
+			return;
+
 		this.WordControl.reporterTranslates = this.reporterTranslates;
 
 		var _button1 = document.getElementById("dem_id_reset");
@@ -6025,6 +6077,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sendToReporter = function(value)
 	{
+		if (this.disableReporterEvents)
+			return;
+
 		if (window["AscDesktopEditor"])
 		{
 			window["AscDesktopEditor"]["sendToReporter"](value);
@@ -6037,6 +6092,9 @@ background-repeat: no-repeat;\
 
 	asc_docs_api.prototype.sendFromReporter = function(value)
 	{
+		if (this.disableReporterEvents)
+			return;
+
 		if (window["AscDesktopEditor"])
 		{
 			window["AscDesktopEditor"]["sendFromReporter"](value);
@@ -6077,7 +6135,53 @@ background-repeat: no-repeat;\
 			}
 			else if (undefined !== _obj["resize"])
 			{
-				_this.WordControl.DemonstrationManager.Resize();
+				_this.WordControl.DemonstrationManager.Resize(true);
+			}
+			else if (true === _obj["next"])
+			{
+				_this.WordControl.DemonstrationManager.NextSlide(true);
+			}
+			else if (true === _obj["prev"])
+			{
+				_this.WordControl.DemonstrationManager.PrevSlide(true);
+			}
+			else if (undefined !== _obj["go_to_slide"])
+			{
+				_this.WordControl.DemonstrationManager.GoToSlide(_obj["go_to_slide"], true);
+			}
+			else if (true === _obj["play"])
+			{
+				var _isNowPlaying = _this.WordControl.DemonstrationManager.IsPlayMode;
+				_this.WordControl.DemonstrationManager.Play(true);
+				var _elem = document.getElementById("dem_id_play_span");
+				if (_elem && !_isNowPlaying)
+				{
+					_elem.classList.remove("btn-play");
+					_elem.classList.add("btn-pause");
+
+					_this.WordControl.reporterTimerLastStart = new Date().getTime();
+
+					_this.WordControl.reporterTimer = setInterval(_this.WordControl.reporterTimerFunc, 1000);
+				}
+			}
+			else if (true === _obj["pause"])
+			{
+				var _isNowPlaying = _this.WordControl.DemonstrationManager.IsPlayMode;
+				_this.WordControl.DemonstrationManager.Pause();
+				var _elem = document.getElementById("dem_id_play_span");
+				if (_elem && _isNowPlaying)
+				{
+					_elem.classList.remove("btn-pause");
+					_elem.classList.add("btn-play");
+
+					if (-1 != _this.WordControl.reporterTimer)
+					{
+						clearInterval(_this.WordControl.reporterTimer);
+						_this.WordControl.reporterTimer = -1;
+					}
+
+					_this.WordControl.reporterTimerAdd = _this.WordControl.reporterTimerFunc(true);
+				}
 			}
 		}
 		catch (err)
@@ -6092,12 +6196,17 @@ background-repeat: no-repeat;\
 			this.WordControl.DemonstrationManager.EndShowMessage = this.EndShowMessage;
 			this.EndShowMessage = undefined;
 		}
-		this.WordControl.DemonstrationManager.Play();
+		this.WordControl.DemonstrationManager.Play(true);
+
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"play\" : true }");
 	};
 
 	asc_docs_api.prototype.DemonstrationPause = function()
 	{
 		this.WordControl.DemonstrationManager.Pause();
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"pause\" : true }");
 	};
 
 	asc_docs_api.prototype.DemonstrationEndShowMessage = function(message)
@@ -6111,11 +6220,15 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.DemonstrationNextSlide = function()
 	{
 		this.WordControl.DemonstrationManager.NextSlide();
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"next\" : true }");
 	};
 
 	asc_docs_api.prototype.DemonstrationPrevSlide = function()
 	{
 		this.WordControl.DemonstrationManager.PrevSlide();
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"prev\" : true }");
 	};
 
 	asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
@@ -6123,7 +6236,10 @@ background-repeat: no-repeat;\
 		this.WordControl.DemonstrationManager.GoToSlide(slideNum);
 
 		if (this.isReporterMode)
-			this.sendFromReporter("{ \"reporter_command\" : \"slide\", \"slide\" : " + slideNum + " }");
+			this.sendFromReporter("{ \"reporter_command\" : \"go_to_slide\", \"slide\" : " + slideNum + " }");
+
+		if (this.reporterWindow)
+			this.sendToReporter("{ \"main_command\" : true, \"go_to_slide\" : " + slideNum + " }");
 	};
 
 	asc_docs_api.prototype.SetDemonstrationModeOnly = function()
@@ -7209,6 +7325,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['DemonstrationNextSlide']              = asc_docs_api.prototype.DemonstrationNextSlide;
 	asc_docs_api.prototype['DemonstrationPrevSlide']              = asc_docs_api.prototype.DemonstrationPrevSlide;
 	asc_docs_api.prototype['DemonstrationGoToSlide']              = asc_docs_api.prototype.DemonstrationGoToSlide;
+	asc_docs_api.prototype['sendFromReporter']              	  = asc_docs_api.prototype.sendFromReporter;
 	asc_docs_api.prototype['SetDemonstrationModeOnly']            = asc_docs_api.prototype.SetDemonstrationModeOnly;
 	asc_docs_api.prototype['ApplySlideTiming']                    = asc_docs_api.prototype.ApplySlideTiming;
 	asc_docs_api.prototype['SlideTimingApplyToAll']               = asc_docs_api.prototype.SlideTimingApplyToAll;

@@ -114,12 +114,18 @@
                 }
                 case "button":
                 {
-                    window.Asc.plugin.button(parseInt(pluginData.button));
+                    var _buttonId = parseInt(pluginData.button);
+                    if (!window.Asc.plugin.button && -1 == _buttonId)
+						window.Asc.plugin.executeCommand("close", "");
+                    else
+                        window.Asc.plugin.button(_buttonId);
                     break;
                 }
                 case "enableMouseEvent":
                 {
                     g_isMouseSendEnabled = pluginData.isEnabled;
+					if (window.Asc.plugin.onEnableMouseEvent)
+						window.Asc.plugin.onEnableMouseEvent(g_isMouseSendEnabled);
                     break;
                 }
                 case "onExternalMouseUp":

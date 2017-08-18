@@ -338,7 +338,7 @@
         oCNvPr.setName("Notes Placeholder 2");
         oPh = new AscFormat.Ph();
         oPh.setType(AscFormat.phType_body);
-        oPh.setIdx(1);
+        oPh.setIdx(1 + "");
         oNvSpPr.nvPr.setPh(oPh);
         oSp.setNvSpPr(oNvSpPr);
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);
@@ -361,7 +361,7 @@
         oPh = new AscFormat.Ph();
         oPh.setType(AscFormat.phType_sldNum);
         oPh.setSz(2);
-        oPh.setIdx(10);
+        oPh.setIdx(10 + "");
         oNvSpPr.nvPr.setPh(oPh);
         oSp.setNvSpPr(oNvSpPr);
         oSp.setLockValue(AscFormat.LOCKS_MASKS.noGrp, true);

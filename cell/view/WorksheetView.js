@@ -10955,9 +10955,6 @@
 		var inc = options.scanForward ? +1 : -1;
 		var isEqual;
 
-		// ToDo стоит переделать это место, т.к. для поиска не нужны измерения, а нужен только сам текст (http://bugzilla.onlyoffice.com/show_bug.cgi?id=26136)
-		this._prepareCellTextMetricsCache(new Asc.Range(0, 0, this.model.getColsCount(), this.model.getRowsCount()));
-
 		function findNextCell() {
 			var ct = undefined;
 			do {
@@ -10977,7 +10974,10 @@
 				if (c < minC || c > maxC || r < minR || r > maxR) {
 					return undefined;
 				}
-				ct = self._getCellTextCache(c, r, true);
+				var cell = self.model._getCellNoEmpty(r, c);
+				if (cell && !cell.isEmptyTextString()) {
+					ct = true;
+				}
 			} while (!ct);
 			return ct;
 		}
@@ -12569,6 +12569,12 @@
 
 		var widthButtonPx = 17;
 		var heightButtonPx = 17;
+		if (AscBrowser.isRetina)
+		{
+			widthButtonPx = AscCommon.AscBrowser.convertToRetinaValue(widthButtonPx, true);
+			heightButtonPx = AscCommon.AscBrowser.convertToRetinaValue(heightButtonPx, true);
+		}
+
 		var widthBorder = 1;
 
 		var scaleIndex = 1;
@@ -12621,7 +12627,7 @@
 				var x = Math.round(r.x);
 				var y = Math.round(r.y);
 				
-				var heightArrow1 = Math.round(heightArrow * scaleFactor - 1);
+				var heightArrow1 = Math.round(heightArrow * scaleFactor * scaleIndex - 1);
 				var height = Math.round(3 * scaleIndex * scaleFactor);
 				var diffY = 0;
 				for(var i = 0; i < height; i++)
@@ -12661,7 +12667,7 @@
             x = Math.round((x) / width_1px) * width_1px;
             y = Math.round((y) / height_1px) * height_1px;
             var heightLine = Math.round(height);
-			var heightCleanLine = heightLine - 4 + 2;
+			var heightCleanLine = heightLine - 2;
 
 			ctx.beginPath();
 
@@ -12781,6 +12787,11 @@
 			scaleIndex = rowHeight / height;
 			width = width * scaleIndex;
 			height = rowHeight;
+		}
+
+		if(AscBrowser.isRetina)
+		{
+			scaleIndex *= 2;
 		}
 
 		_drawButton(x1 + diffX, y1 + diffY);
@@ -12952,6 +12963,10 @@
 
     WorksheetView.prototype.af_setDialogProp = function (filterProp, isReturnProps) {
         var ws = this.model;
+
+        if(!filterProp){
+            return;
+        }
 
         //get filter
         var filter, autoFilter, displayName = null;

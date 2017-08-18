@@ -2803,6 +2803,9 @@
 			}
 		}
 
+		var originSizeW = styleThumbnailWidth;
+		var originSizeH = styleThumbnailHeight;
+
 		if (AscBrowser.isRetina)
 		{
 			styleThumbnailWidth = AscCommon.AscBrowser.convertToRetinaValue(styleThumbnailWidth, true);
@@ -2821,7 +2824,7 @@
 					options.name = i;
 					options.displayName = styles[i].displayName;
 					options.type = type;
-					options.image = t.af_getSmallIconTable(canvas, styles[i], styleInfo, {w: styleThumbnailWidth, h: styleThumbnailHeight, row: row, col: col});
+					options.image = t.af_getSmallIconTable(canvas, styles[i], styleInfo, {w: originSizeW, h: originSizeH, row: row, col: col});
 					result.push(options);
 				}
 			}

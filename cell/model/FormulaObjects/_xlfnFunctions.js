@@ -57,13 +57,11 @@
 	cFormulaFunctionGroup['Financial'].push(cPDURATION);
 	cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 	cFormulaFunctionGroup['Mathematic'].push(cMUNIT);
-	cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
-	cFormulaFunctionGroup['LookupAndReference'].push(cFORMULATEXT);
 
 	cFormulaFunctionGroup['NotRealised'] = cFormulaFunctionGroup['NotRealised'] || [];
 	cFormulaFunctionGroup['NotRealised'].push(cDBCS, cF_TEST, cFORECAST_ETS,
 		cFORECAST_ETS_CONFINT, cFORECAST_ETS_SEASONALITY, cFORECAST_ETS_STAT, cHYPGEOM_DIST, cPDURATION,
-		cMUNIT, cFORMULATEXT);
+		cMUNIT);
 
 	/**
 	 * @constructor
@@ -148,18 +146,6 @@
 
 	cFORECAST_ETS_STAT.prototype = Object.create(cBaseFunction.prototype);
 	cFORECAST_ETS_STAT.prototype.constructor = cFORECAST_ETS_STAT;
-
-	/**
-	 * @constructor
-	 * @extends {AscCommonExcel.cBaseFunction}
-	 */
-	function cFORMULATEXT() {
-		cBaseFunction.call(this, "FORMULATEXT");
-		this.isXLFN = true;
-	}
-
-	cFORMULATEXT.prototype = Object.create(cBaseFunction.prototype);
-	cFORMULATEXT.prototype.constructor = cFORMULATEXT;
 
 	/**
 	 * @constructor

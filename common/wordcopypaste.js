@@ -2124,8 +2124,10 @@ PasteProcessor.prototype =
 			if(oSelectedContent.Elements.length === 1)
 			{
 				var curDocSelection = this.curDocSelection;
-
-				window['AscCommon'].g_clipboardBase.showButtonIdParagraph =this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Id;
+				if(curDocSelection)
+				{
+					window['AscCommon'].g_clipboardBase.showButtonIdParagraph = this.oDocument.Content[curDocSelection[1].CurPos.ContentPos].Id;
+				}
 			}
 			else
 			{

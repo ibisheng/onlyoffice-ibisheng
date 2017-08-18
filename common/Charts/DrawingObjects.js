@@ -2667,6 +2667,10 @@ function DrawingObjects() {
                         shapeProp.fill.type = Asc.c_oAscFill.FILL_TYPE_BLIP;
                         shapeProp.fill.fill = new Asc.asc_CFillBlip();
                         shapeProp.fill.fill.asc_putUrl(_image.src);
+                        if(api.textureType !== null && api.textureType !== undefined){
+                            shapeProp.fill.fill.asc_putType(api.textureType);
+                        }
+                        api.textureType = null;
                         _this.setGraphicObjectProps(imgProps);
                         api.isShapeImageChangeUrl = false;
                     }
@@ -2680,8 +2684,13 @@ function DrawingObjects() {
                         oFill.type = Asc.c_oAscFill.FILL_TYPE_BLIP;
                         oFill.fill = new Asc.asc_CFillBlip();
                         oFill.fill.asc_putUrl(imageUrl);
+                        if(api.textureType !== null && api.textureType !== undefined){
+                            oFill.fill.asc_putType(api.textureType);
+                        }
+                        api.textureType = null;
                         AscShapeProp.textArtProperties = new Asc.asc_TextArtProperties();
                         AscShapeProp.textArtProperties.asc_putFill(oFill);
+
                         _this.setGraphicObjectProps(imgProps);
                         api.isTextArtChangeUrl = false;
                     }

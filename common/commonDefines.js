@@ -1056,6 +1056,7 @@
 	var changestype_Image_Properties          = 23; // Изменения настроек картинки
 	var changestype_ContentControl_Remove     = 24; // Удаление контейнера целиком
 	var changestype_ContentControl_Properties = 25; // Изменение свойств контейнера
+	var changestype_ContentControl_Add        = 26; // Добавление контейнера
 	var changestype_HdrFtr                    = 30; // Изменения в колонтитуле (любые изменения)
 	var changestype_Remove                    = 40; // Удаление, через кнопку backspace (Удаление назад)
 	var changestype_Delete                    = 41; // Удаление, через кнопку delete (Удаление вперед)
@@ -1758,6 +1759,7 @@
 	window["AscCommon"].changestype_Image_Properties          = changestype_Image_Properties;
 	window["AscCommon"].changestype_ContentControl_Remove     = changestype_ContentControl_Remove;
 	window["AscCommon"].changestype_ContentControl_Properties = changestype_ContentControl_Properties;
+	window["AscCommon"].changestype_ContentControl_Add        = changestype_ContentControl_Add;
 	window["AscCommon"].changestype_HdrFtr                    = changestype_HdrFtr;
 	window["AscCommon"].changestype_Remove                    = changestype_Remove;
 	window["AscCommon"].changestype_Delete                    = changestype_Delete;
