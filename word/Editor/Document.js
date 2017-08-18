@@ -15552,6 +15552,38 @@ CDocument.prototype.IsViewModeInReview = function()
 {
 	return 0 !== this.ViewModeInReview.mode ? true : false;
 };
+CDocument.prototype.AddField = function(nType, oPr)
+{
+	if (fieldtype_PAGENUM === nType)
+	{
+		var oParagraph = this.GetCurrentParagraph();
+		if (!oParagraph)
+			return false;
+
+		var oField = new CComplexField();
+		var oRun   = new ParaRun();
+		var oInstr = new ParaInstrText(fieldtype_PAGENUM, oPr);
+
+		oRun.Add_ToContent(0, oField.GetBeginChar());
+		oRun.Add_ToContent(1, oInstr);
+		oRun.Add_ToContent(2, oField.GetSeparateChar());
+		oRun.Add_ToContent(3, new ParaText("1"));
+		oRun.Add_ToContent(3, oField.GetEndChar());
+		oParagraph.Add(oRun);
+		return true;
+	}
+
+	return false;
+};
+
+function TEST_ADDFIELD()
+{
+	var oDocument = editor.WordControl.m_oLogicDocument;
+
+	oDocument.Create_NewHistoryPoint();
+	oDocument.AddField(fieldtype_PAGENUM);
+	oDocument.Recalculate();
+}
 
 function CDocumentSelectionState()
 {

@@ -3156,39 +3156,35 @@ function CParagraphRecalculateStateAlign()
 function CParagraphRecalculateStateInfo()
 {
     this.Comments = [];
+    this.Fields   = {};
 }
 
-CParagraphRecalculateStateInfo.prototype =
+CParagraphRecalculateStateInfo.prototype.Reset = function(PrevInfo)
 {
-    Reset : function(PrevInfo)
-    {
-        if ( null !== PrevInfo && undefined !== PrevInfo )
-        {
-            this.Comments = PrevInfo.Comments;
-        }
-        else
-        {
-            this.Comments = [];
-        }
-    },
-
-	AddComment : function(Id)
-    {
-        this.Comments.push( Id );
-    },
-
-	RemoveComment : function(Id)
-    {
-        var CommentsLen = this.Comments.length;
-        for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
-        {
-            if ( this.Comments[CurPos] === Id )
-            {
-                this.Comments.splice( CurPos, 1 );
-                break;
-            }
-        }
-    }
+	if (null !== PrevInfo && undefined !== PrevInfo)
+	{
+		this.Comments = PrevInfo.Comments;
+	}
+	else
+	{
+		this.Comments = [];
+	}
+};
+CParagraphRecalculateStateInfo.prototype.AddComment = function(Id)
+{
+	this.Comments.push(Id);
+};
+CParagraphRecalculateStateInfo.prototype.RemoveComment = function(Id)
+{
+	var CommentsLen = this.Comments.length;
+	for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
+	{
+		if (this.Comments[CurPos] === Id)
+		{
+			this.Comments.splice(CurPos, 1);
+			break;
+		}
+	}
 };
 
 function CParagraphRecalculateObject()
