@@ -10269,8 +10269,9 @@ Paragraph.prototype.Continue = function(NewParagraph)
 		var EndPos = this.Get_EndPos2(false);
 		var CurPos = this.Get_ParaContentPos(false, false);
 		this.Set_ParaContentPos(EndPos, true, -1, -1);
-		TextPr = this.Get_TextPr(this.Get_ParaContentPos(false, false));
+		TextPr = this.Get_TextPr(this.Get_ParaContentPos(false, false)).Copy();
 		this.Set_ParaContentPos(CurPos, false, -1, -1, false);
+		TextPr.HighLight = highlight_None;
 	}
 
 	// Копируем настройки параграфа
