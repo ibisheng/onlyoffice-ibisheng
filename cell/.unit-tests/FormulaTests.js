@@ -6784,6 +6784,22 @@ $( function () {
 
     } );
 
+	test( "Test: \"CONVERT\"", function () {
+
+		oParser = new parserFormula( 'CONVERT(68, "F", "C")', "A2", ws );
+		ok( oParser.parse(), 'CONVERT(68, "F", "C")' );
+		strictEqual( oParser.calculate().getValue(), 20, 'CONVERT(68, "F", "C")' );
+
+		oParser = new parserFormula( 'CONVERT(2.5, "ft", "sec")', "A2", ws );
+		ok( oParser.parse(), 'CONVERT(2.5, "ft", "sec")' );
+		strictEqual( oParser.calculate().getValue(), "#N/A", 'CONVERT(2.5, "ft", "sec")' );
+
+		oParser = new parserFormula( 'CONVERT(CONVERT(100,"ft","m"),"ft","m")', "A2", ws );
+		ok( oParser.parse(), 'CONVERT(CONVERT(100,"ft","m"),"ft","m")' );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 9.290304, 'CONVERT(CONVERT(100,"ft","m"),"ft","m")' );
+
+	} );
+
     test( "Test: \"PRICE\"", function () {
 
         oParser = new parserFormula( "PRICE(DATE(2008,2,15),DATE(2017,11,15),0.0575,0.065,100,2,0)", "A2", ws );
