@@ -3751,24 +3751,24 @@ function CEditorPage(api)
 		oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
 	};
 
-	this.UpdateHorRuler = function()
+	this.UpdateHorRuler = function(isattack)
 	{
 		if (!this.m_bIsRuler)
 			return;
 
-		if (this.m_oDrawingDocument.SlideCurrent == -1)
+		if (!isattack && this.m_oDrawingDocument.SlideCurrent == -1)
 			return;
 
 		var drawRect = this.m_oDrawingDocument.SlideCurrectRect;
 		var _left    = drawRect.left;
 		this.m_oHorRuler.BlitToMain(_left, 0, this.m_oTopRuler_horRuler.HtmlElement);
 	};
-	this.UpdateVerRuler = function()
+	this.UpdateVerRuler = function(isattack)
 	{
 		if (!this.m_bIsRuler)
 			return;
 
-		if (this.m_oDrawingDocument.SlideCurrent == -1)
+		if (!isattack && this.m_oDrawingDocument.SlideCurrent == -1)
 			return;
 
 		var drawRect = this.m_oDrawingDocument.SlideCurrectRect;
@@ -3800,7 +3800,7 @@ function CEditorPage(api)
 		{
 			this.CreateBackgroundHorRuler(undefined, isattack);
 		}
-		this.UpdateHorRuler();
+		this.UpdateHorRuler(isattack);
 	};
 	this.UpdateVerRulerBack = function(isattack)
 	{
@@ -3809,7 +3809,7 @@ function CEditorPage(api)
 		{
 			this.CreateBackgroundVerRuler(undefined, isattack);
 		}
-		this.UpdateVerRuler();
+		this.UpdateVerRuler(isattack);
 	};
 
 	this.CreateBackgroundHorRuler = function(margins, isattack)
