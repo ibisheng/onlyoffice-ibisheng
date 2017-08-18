@@ -440,6 +440,9 @@
 				"title"         : this.documentTitle,
 				"nobase64"      : true
 			};
+			if (this.editorId == c_oEditorId.Spreadsheet) {
+				rData["savexfile"] = true;
+			}
 			if (versionHistory)
 			{
                 rData["closeonerror"] = versionHistory.isRequested;
@@ -1248,7 +1251,7 @@
 
     baseEditorsApi.prototype["pluginMethod_GetFontList"] = function()
     {
-    	return window.g_fontApplication.g_fontSelections.List;
+    	return AscFonts.g_fontApplication.g_fontSelections.SerializeList();
     };
 
 	baseEditorsApi.prototype["pluginMethod_PasteHtml"] = function(htmlText)

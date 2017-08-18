@@ -596,6 +596,7 @@ var editor;
             "delimiter": option.asc_getDelimiter(),
             "delimiterChar": option.asc_getDelimiterChar(),
             "codepage": option.asc_getCodePage(),
+			"savexfile": true,
             "nobase64": true
           };
 
@@ -617,6 +618,7 @@ var editor;
             "url": this.documentUrl,
             "title": this.documentTitle,
             "password": option.asc_getPassword(),
+			"savexfile": true,
             "nobase64": true
           };
 
@@ -953,7 +955,7 @@ var editor;
       }
     }
 	this.wbModel = this._openDocument(sData);
-	this.openDocumentFromZip(this.wbModel).then(function() {
+	this.openDocumentFromZip(this.wbModel, AscCommon.g_oDocumentUrls.getUrl('Editor.xlsx')).then(function() {
 		t.FontLoader.LoadDocumentFonts(t.wbModel.generateFontMap2());
 
 		// Какая-то непонятная заглушка, чтобы не падало в ipad
@@ -969,24 +971,23 @@ var editor;
 		t.sendEvent('asc_onError', c_oAscError.ID.Unknown, c_oAscError.Level.Critical);
 	});
   };
-	spreadsheet_api.prototype.openDocumentFromZip = function (wb) {
+	spreadsheet_api.prototype.openDocumentFromZip = function (wb, url) {
 		var t = this;
 		return new Promise(function (resolve, reject) {
 			var openXml = AscCommon.openXml;
+			//open cache xlsx instead of documentUrl, to support pivot in xls, ods... and don't send jwt signature
 			if (t.isChartEditor) {
 				resolve();
 				return;
 			}
-
-			require('jsziputils').getBinaryContent(t.documentUrl, function (err, data) {
-				if (err) {
-					reject(err); // or handle err
-				} else {
+			var processData = function (err, data) {
+				var nextPromise;
+				if (!err && data) {
 					openXml.SaxParserDataTransfer.wb = wb;
 					var doc = new openXml.OpenXmlPackage();
 					var wbPart = null;
 					var wbXml = null;
-					var loadAsyncFile = require('jszip').loadAsync(data).then(function (zip) {
+					nextPromise = require('jszip').loadAsync(data).then(function (zip) {
 						return doc.openFromZip(zip);
 					}).then(function () {
 						wbPart = doc.getPartByRelationshipType(openXml.relationshipTypes.workbook);
@@ -1063,13 +1064,26 @@ var editor;
 						if (window.console && window.console.log) {
 							window.console.log(err);
 						}
-					}).then(function (err) {
-						//clean up
-						openXml.SaxParserDataTransfer = {};
-						return Asc.ReadDefTableStyles(wb);
-					}).then(resolve, reject);
+					});
+				} else {
+					if (err) {
+						if (window.console && window.console.log) {
+							window.console.log(err);
+						}
+					}
+					nextPromise = Promise.resolve();
 				}
-			});
+				nextPromise.then(function (err) {
+					//clean up
+					openXml.SaxParserDataTransfer = {};
+					return Asc.ReadDefTableStyles(wb);
+				}).then(resolve, reject);
+			};
+			if (typeof url === "string") {
+				require('jsziputils').getBinaryContent(url, processData);
+			} else {
+				processData(undefined, url);
+			}
 		});
 	};
 
@@ -3288,7 +3302,8 @@ var editor;
 		}
 	};
 
-  spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version, isUser) {
+  spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version, isUser, xlsxFile) {
+	var t = this;
     asc["editor"] = this;
 
     this.SpellCheckUrl = '';
@@ -3309,9 +3324,10 @@ var editor;
 	}
     oBinaryFileReader.Read(base64File, this.wbModel);
     g_oIdCounter.Set_Load(false);
-
-    this._coAuthoringInit();
-    this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
+	this.openDocumentFromZip(this.wbModel, xlsxFile).then(function() {
+	});
+	t._coAuthoringInit();
+	t.wb = new AscCommonExcel.WorkbookView(t.wbModel, t.controller, t.handlers, window["_null_object"], window["_null_object"], t, t.collaborativeEditing, t.fontRenderingMode);
   };
 
   spreadsheet_api.prototype.asc_nativeCalculateFile = function() {

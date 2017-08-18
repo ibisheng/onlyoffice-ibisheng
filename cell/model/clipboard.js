@@ -387,6 +387,10 @@
 				var t = this;
 				t.pasteProcessor.clean();
 
+				if(!window['AscCommon'].g_clipboardBase.specialPasteStart)
+				{
+					ws.model.workbook.handlers.trigger("hideSpecialPasteOptions");
+				}
 				window['AscCommon'].g_clipboardBase.Paste_Process_Start();
 				
 				if(!bIsSpecialPaste)
@@ -1407,6 +1411,11 @@
 				History.EndTransaction();
 				
 				//for special paste
+				this._setShapeSpecialPasteProperties(worksheet, isIntoShape);
+			},
+
+			_setShapeSpecialPasteProperties: function(worksheet, isIntoShape)
+			{
 				//TODO пока выключаю специальную ставку внутри math, позже доработать и включить
 				var oInfo = new CSelectedElementsInfo();
 				var selectedElementsInfo = isIntoShape.GetSelectedElementsInfo(oInfo);
@@ -1415,30 +1424,30 @@
 				{
 					var sProps = Asc.c_oSpecialPasteProps;
 					var curShape = isIntoShape.Parent.parent;
-					
+
 					var asc_getcvt = Asc.getCvtRatio;
 					var mmToPx = asc_getcvt(3/*px*/, 0/*pt*/, worksheet._getPPIX());
 					var ptToPx = asc_getcvt(1/*px*/, 0/*pt*/, worksheet._getPPIX());
-					
+
 					var cellsLeft = worksheet.cellsLeft * ptToPx;
 					var cellsTop = worksheet.cellsTop * ptToPx;
-					
-					var cursorPos = target_doc_content.GetCursorPosXY();
+
+					var cursorPos = isIntoShape.GetCursorPosXY();
 					var offsetX = worksheet.cols[worksheet.visibleRange.c1].left * ptToPx - cellsLeft;
 					var offsetY = worksheet.rows[worksheet.visibleRange.r1].top * ptToPx - cellsTop;
 					var posX = curShape.transformText.TransformPointX(cursorPos.X, cursorPos.Y) * mmToPx - offsetX + cellsLeft;
 					var posY = curShape.transformText.TransformPointY(cursorPos.X, cursorPos.Y) * mmToPx - offsetY + cellsTop;
 					var position = {x: posX, y: posY};
-					
+
 					var allowedSpecialPasteProps = [sProps.sourceformatting, sProps.destinationFormatting];
-					
+
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.props = {props: allowedSpecialPasteProps, position: position};
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.range = cursorPos;
 					window['AscCommon'].g_clipboardBase.specialPasteButtonProps.shapeId = isIntoShape.Id;
 				}
 			},
-			
+
 			_convertBeforeInsertIntoShapeContent: function(worksheet, content, isConvertToPPTX, target_doc_content)
 			{
 				var elements = [], selectedElement, element;
@@ -1699,6 +1708,7 @@
                     });
                 }
 
+				window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
 				window['AscCommon'].g_clipboardBase.Paste_Process_End();
 			},
 			
@@ -1906,9 +1916,13 @@
 					var callback = function(isSuccess)
 					{
 						if(isSuccess)
+						{
 							t._pasteInShape(worksheet, node, isIntoShape);
-
-						window['AscCommon'].g_clipboardBase.Paste_Process_End();
+						}
+						else
+						{
+							window['AscCommon'].g_clipboardBase.Paste_Process_End();
+						}
 					};
 					
 					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
@@ -2368,6 +2382,7 @@
 			
 			_pasteInShape: function(worksheet, node, targetDocContent)
 			{
+				var t = this;
 				targetDocContent.DrawingDocument.m_oLogicDocument = null;
 				
 				var oPasteProcessor = new AscCommon.PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
@@ -2394,6 +2409,7 @@
 				if(!oPasteProcessor.aContent || !oPasteProcessor.aContent.length) 
 				{
 					History.EndTransaction();
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 					return false;
 				}
 
@@ -2401,12 +2417,26 @@
                 targetContent.Remove(1, true, true);
 					
 				worksheet._loadFonts(newFonts, function () {
+
+					//TODO конвертирую в текст без форматирую. пеесмотреть!
+					var specialPasteProps = window['AscCommon'].g_clipboardBase.specialPasteProps;
+					if(specialPasteProps && !specialPasteProps.format)
+					{
+						for(var i = 0; i < oPasteProcessor.aContent.length; i++)
+						{
+							oPasteProcessor.aContent[i].Clear_TextFormatting();
+						}
+					}
+
 					oPasteProcessor.InsertInPlace(targetContent , oPasteProcessor.aContent);
                     var oTargetTextObject = AscFormat.getTargetTextObject(worksheet.objectRender.controller);
                     oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
 					worksheet.objectRender.controller.startRecalculate();
                     worksheet.objectRender.controller.cursorMoveRight(false, false);
 					History.EndTransaction();
+
+					t._setShapeSpecialPasteProperties(worksheet, targetContent);
+					window['AscCommon'].g_clipboardBase.Paste_Process_End();
 				});
 				
  				return true;
@@ -2634,6 +2664,7 @@
 								isIntoShape.AddToParagraph(new ParaText(_char));
 						}
 
+						window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
 						window['AscCommon'].g_clipboardBase.Paste_Process_End();
 						
 						//for special paste

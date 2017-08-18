@@ -795,6 +795,8 @@ function CEditorPage(api)
 					}
 
 					_wordControl.reporterTimerAdd = _wordControl.reporterTimerFunc(true);
+
+					window.editor.sendFromReporter("{ \"reporter_command\" : \"pause\" }");
 				}
 				else
 				{
@@ -806,6 +808,8 @@ function CEditorPage(api)
 					_wordControl.reporterTimerLastStart = new Date().getTime();
 
 					_wordControl.reporterTimer = setInterval(_wordControl.reporterTimerFunc, 1000);
+
+					window.editor.sendFromReporter("{ \"reporter_command\" : \"play\" }");
 				}
 			};
 
@@ -849,11 +853,6 @@ function CEditorPage(api)
 					_wordControl.DemonstrationManager.PointerRemove();
 			};
 
-			window.onbeforeunload = function(e)
-			{
-				window.editor.sync_endDemonstration();
-			};
-
 			window.onkeydown = this.onKeyDown;
 			window.onkeyup = this.onKeyUp;
 
@@ -864,6 +863,12 @@ function CEditorPage(api)
 				else
 					window.addEventListener('message', this.m_oApi.DemonstrationToReporterMessages, false);
 			}
+
+			document.oncontextmenu = function(e)
+			{
+				AscCommon.stopEvent(e);
+				return false;
+			};
 		}
 		else
 		{
@@ -1831,7 +1836,11 @@ function CEditorPage(api)
 		}
 
 		if (_isCatch)
+		{
+			if (oWordControl.m_oApi.isReporterMode && oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
+				oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "none";
 			AscCommon.stopEvent(e);
+		}
 	};
 
 	this.onBodyMouseMove = function(e)
@@ -1981,6 +1990,9 @@ function CEditorPage(api)
 
 		var oWordControl = oThis;
 		oWordControl.m_oDrawingDocument.UnlockCursorType();
+
+		if (oWordControl.m_oApi.isReporterMode && oWordControl.m_oMainParent && oWordControl.m_oMainParent.HtmlElement)
+			oWordControl.m_oMainParent.HtmlElement.style.pointerEvents = "";
 
 		if (null != oWordControl.SplitterDiv)
 		{
@@ -3739,24 +3751,24 @@ function CEditorPage(api)
 		oWordControl.m_oDrawingDocument.Collaborative_TargetsUpdate(isRepaint);
 	};
 
-	this.UpdateHorRuler = function()
+	this.UpdateHorRuler = function(isattack)
 	{
 		if (!this.m_bIsRuler)
 			return;
 
-		if (this.m_oDrawingDocument.SlideCurrent == -1)
+		if (!isattack && this.m_oDrawingDocument.SlideCurrent == -1)
 			return;
 
 		var drawRect = this.m_oDrawingDocument.SlideCurrectRect;
 		var _left    = drawRect.left;
 		this.m_oHorRuler.BlitToMain(_left, 0, this.m_oTopRuler_horRuler.HtmlElement);
 	};
-	this.UpdateVerRuler = function()
+	this.UpdateVerRuler = function(isattack)
 	{
 		if (!this.m_bIsRuler)
 			return;
 
-		if (this.m_oDrawingDocument.SlideCurrent == -1)
+		if (!isattack && this.m_oDrawingDocument.SlideCurrent == -1)
 			return;
 
 		var drawRect = this.m_oDrawingDocument.SlideCurrectRect;
@@ -3788,7 +3800,7 @@ function CEditorPage(api)
 		{
 			this.CreateBackgroundHorRuler(undefined, isattack);
 		}
-		this.UpdateHorRuler();
+		this.UpdateHorRuler(isattack);
 	};
 	this.UpdateVerRulerBack = function(isattack)
 	{
@@ -3797,7 +3809,7 @@ function CEditorPage(api)
 		{
 			this.CreateBackgroundVerRuler(undefined, isattack);
 		}
-		this.UpdateVerRuler();
+		this.UpdateVerRuler(isattack);
 	};
 
 	this.CreateBackgroundHorRuler = function(margins, isattack)
