@@ -1708,6 +1708,7 @@
                     });
                 }
 
+				window['AscCommon'].g_clipboardBase.specialPasteButtonProps = {};
 				window['AscCommon'].g_clipboardBase.Paste_Process_End();
 			},
 			
