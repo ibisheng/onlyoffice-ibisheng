@@ -3293,6 +3293,7 @@ var editor;
 	};
 
   spreadsheet_api.prototype.asc_nativeOpenFile = function(base64File, version, isUser, xlsxFile) {
+	var t = this;
     asc["editor"] = this;
 
     this.SpellCheckUrl = '';
@@ -3314,9 +3315,9 @@ var editor;
     oBinaryFileReader.Read(base64File, this.wbModel);
     g_oIdCounter.Set_Load(false);
 	this.openDocumentFromZip(this.wbModel, xlsxFile).then(function() {
-		this._coAuthoringInit();
-		this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
 	});
+	t._coAuthoringInit();
+	t.wb = new AscCommonExcel.WorkbookView(t.wbModel, t.controller, t.handlers, window["_null_object"], window["_null_object"], t, t.collaborativeEditing, t.fontRenderingMode);
   };
 
   spreadsheet_api.prototype.asc_nativeCalculateFile = function() {
