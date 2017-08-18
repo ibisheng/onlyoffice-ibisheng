@@ -1201,7 +1201,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
         if (0 === CurLine)
         {
 			// Добавляем расстояние до параграфа (Pr.Spacing.Before)
-			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
 				BaseLineOffset += ParaPr.Spacing.Before;
 
             // Добавляем толщину границы параграфа (если граница задана)
@@ -1233,7 +1233,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 
         if ( 0 === CurLine )
         {
-			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -1288,7 +1288,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
             Top  = PRS.Y;
             Top2 = PRS.Y;
 
-			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -2151,13 +2151,16 @@ Paragraph.prototype.private_RecalculateMoveLineToNextPage = function(CurLine, Cu
 	}
 };
 
-Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS)
+Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS, ParaPr)
 {
 	if (CurPage <= 0)
 		return true;
 
 	if (!this.Check_FirstPage(CurPage))
 		return false;
+
+	if (true === ParaPr.PageBreakBefore)
+		return true;
 
 	if (!(PRS.Parent instanceof CDocument))
 	{
