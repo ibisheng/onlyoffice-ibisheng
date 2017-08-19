@@ -2420,9 +2420,6 @@ function CEditorPage(api)
 	{
 		oThis.m_oApi.checkLastWork();
 
-		if (oThis.m_oApi.isReporterMode)
-			AscCommon.stopEvent(e);
-
 		if (oThis.m_oApi.isLongAction())
 		{
 			e.preventDefault();
