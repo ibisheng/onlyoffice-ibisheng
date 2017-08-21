@@ -6773,6 +6773,9 @@ CChartSpace.prototype.recalculateAxis = function()
                 cat_ax.xPoints.sort(function(a, b){return a.val - b.val});
                 val_ax.yPoints.sort(function(a, b){return a.val - b.val});
             }
+            else{
+                this.bEmptySeries = true;
+            }
         }
         else if(chart_type === AscDFH.historyitem_type_BarChart && chart_object.barDir === AscFormat.BAR_DIR_BAR)
         {
@@ -7791,6 +7794,9 @@ CChartSpace.prototype.recalculateAxis = function()
 
                 cat_ax.yPoints.sort(function(a, b){return a.val - b.val});
                 val_ax.xPoints.sort(function(a, b){return a.val - b.val});
+            }
+            else{
+                this.bEmptySeries = true;
             }
         }
         this.plotAreaRect = rect;

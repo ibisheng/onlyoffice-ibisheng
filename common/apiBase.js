@@ -1488,6 +1488,10 @@
 		return "";
     };
 
+	baseEditorsApi.prototype.asc_getSessionToken = function () {
+		return this.CoAuthoringApi.get_jwt()
+	};
+
 	baseEditorsApi.prototype.asc_InputClearKeyboardElement = function()
 	{
 		if (AscCommon.g_inputContext)

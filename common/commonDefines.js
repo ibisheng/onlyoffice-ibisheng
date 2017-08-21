@@ -1227,6 +1227,7 @@
 	prot['FrmlWrongReferences']              = prot.FrmlWrongReferences;
 	prot['InvalidReferenceOrName']           = prot.InvalidReferenceOrName;
 	prot['LockCreateDefName']                = prot.LockCreateDefName;
+	prot['LockedCellPivot']                  = prot.LockedCellPivot;
 	prot['OpenWarning']                      = prot.OpenWarning;
 	window['Asc']['c_oAscAsyncAction']       = window['Asc'].c_oAscAsyncAction = c_oAscAsyncAction;
 	prot                                     = c_oAscAsyncAction;

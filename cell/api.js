@@ -987,7 +987,7 @@ var editor;
 					var doc = new openXml.OpenXmlPackage();
 					var wbPart = null;
 					var wbXml = null;
-					nextPromise = require('jszip').loadAsync(data).then(function (zip) {
+					nextPromise = JSZip.loadAsync(data).then(function (zip) {
 						return doc.openFromZip(zip);
 					}).then(function () {
 						wbPart = doc.getPartByRelationshipType(openXml.relationshipTypes.workbook);
@@ -1080,7 +1080,7 @@ var editor;
 				}).then(resolve, reject);
 			};
 			if (typeof url === "string") {
-				require('jsziputils').getBinaryContent(url, processData);
+				JSZipUtils.getBinaryContent(url, processData);
 			} else {
 				processData(undefined, url);
 			}
@@ -3829,6 +3829,7 @@ var editor;
   prot['asc_isOffline'] = prot.asc_isOffline;
   prot['asc_getUrlType'] = prot.asc_getUrlType;
 
+  prot['asc_getSessionToken'] = prot.asc_getSessionToken;
   // Builder
   prot['asc_nativeInitBuilder'] = prot.asc_nativeInitBuilder;
   prot['asc_SetSilentMode'] = prot.asc_SetSilentMode;

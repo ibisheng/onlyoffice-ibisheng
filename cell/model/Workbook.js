@@ -2954,13 +2954,13 @@
 								}
 							})(oRule.bottom ? -1 : 1));
 
-							nc = oRule.percent ? Math.floor(nc * oRule.rank / 100) : oRule.rank;
+							nc = Math.max(1, oRule.percent ? Math.floor(nc * oRule.rank / 100) : oRule.rank);
 							var threshold = values.length >= nc ? values[nc - 1].v : o;
 							compareFunction = (function(rule, threshold) {
 								return function(row, col) {
 									var cell = t._getCellNoEmpty(row, col);
 									var val = cell ? cell.getNumberValue() : null;
-									return (null !== val && (oRule.bottom ? val <= threshold : val >= threshold)) ? rule.dxf : null;
+									return (null !== val && (rule.bottom ? val <= threshold : val >= threshold)) ? rule.dxf : null;
 								};
 							})(oRule, threshold);
 						}

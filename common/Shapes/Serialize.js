@@ -718,10 +718,7 @@ function BinaryPPTYLoader()
                 this.presentation.slideMasters[0].sldLayoutLst[0] = AscFormat.GenerateDefaultSlideLayout(this.presentation.slideMasters[0]);
                 this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
             }
-            if (this.presentation.Slides.length == 0)
-            {
-                this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.presentation.slideLayouts[0]);
-            }
+
             if(this.presentation.notesMasters.length === 0)
             {
                 this.presentation.notesMasters[0] = AscCommonSlide.CreateNotesMaster();
@@ -729,6 +726,10 @@ function BinaryPPTYLoader()
                 oNotesTheme.presentation = this.presentation;
                 this.presentation.themes.push(oNotesTheme);
                 this.presentation.notesMasters[0].setTheme(oNotesTheme);
+            }
+            if (this.presentation.Slides.length == 0)
+            {
+                this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.presentation.slideLayouts[0]);
             }
             var _slides = this.presentation.Slides;
             var _slide;

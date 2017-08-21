@@ -1972,6 +1972,7 @@ CUniColor.prototype =
             }
             case c_oAscColor.COLOR_TYPE_SYS:
             {
+                _ret.color = new CSysColor();
                 if(unicolor.color.id == this.color.id)
                 {
                     _ret.color.id = this.color.id;

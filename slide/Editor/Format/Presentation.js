@@ -1284,7 +1284,7 @@ CPresentation.prototype =
                     this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
                 }
             }
-            if(bEndRecalc){
+            if(bEndRecalc || this.Slides.length === 0){
                 this.DrawingDocument.OnEndRecalculate();
             }
         }
@@ -4280,7 +4280,7 @@ CPresentation.prototype =
         }
 
         var nNewCurrentPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
-        if(nNewCurrentPage !== this.CurPage && this.CurPage < this.Slides.length)
+        if(nNewCurrentPage !== this.CurPage && nNewCurrentPage < this.Slides.length)
         {
             var oCurrentController = this.GetCurrentController();
             if(oCurrentController){
