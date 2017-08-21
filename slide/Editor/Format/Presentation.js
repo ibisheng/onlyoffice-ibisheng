@@ -1284,7 +1284,7 @@ CPresentation.prototype =
                     this.DrawingDocument.Notes_OnRecalculate(this.CurPage, this.Slides[this.CurPage].NotesWidth, this.Slides[this.CurPage].getNotesHeight());
                 }
             }
-            if(bEndRecalc){
+            if(bEndRecalc || this.Slides.length === 0){
                 this.DrawingDocument.OnEndRecalculate();
             }
         }
