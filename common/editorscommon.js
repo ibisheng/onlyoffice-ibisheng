@@ -51,7 +51,7 @@
 
 	var c_oAscFileType = Asc.c_oAscFileType;
 
-	if (typeof String.prototype.startsWith != 'function')
+	if (typeof String.prototype.startsWith !== 'function')
 	{
 		String.prototype.startsWith = function (str)
 		{
@@ -132,9 +132,20 @@
 		return false;
 	};
 
-	if (typeof require === "function" && !window["XRegExp"])
+	if (typeof require === 'function')
 	{
-		window["XRegExp"] = require("xregexp");
+		if (!window['XRegExp'])
+		{
+			window['XRegExp'] = require('xregexp');
+		}
+		if (!window['JSZipUtils'])
+		{
+			window['JSZipUtils'] = require('jsziputils');
+		}
+		if (!window['JSZip'])
+		{
+			window['JSZip'] = require('jszip');
+		}
 	}
 
 	var oZipImages = null;
@@ -427,7 +438,7 @@
 		if (changesUrl)
 		{
 			oZipImages = {};
-			require('jsziputils').getBinaryContent(changesUrl, function (err, data)
+			JSZipUtils.getBinaryContent(changesUrl, function (err, data)
 			{
 				if (err)
 				{
@@ -438,7 +449,7 @@
 				}
 
 				oResult.changes = [];
-				require('jszip').loadAsync(data).then(function (zipChanges)
+				JSZip.loadAsync(data).then(function (zipChanges)
 				{
 					var relativePaths = [];
 					var promises = [];

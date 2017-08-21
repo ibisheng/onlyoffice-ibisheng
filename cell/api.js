@@ -973,6 +973,9 @@ var editor;
 	spreadsheet_api.prototype.openDocumentFromZip = function (wb, url) {
 		var t = this;
 		return new Promise(function (resolve, reject) {
+			resolve();
+		});
+		return new Promise(function (resolve, reject) {
 			var openXml = AscCommon.openXml;
 			//open cache xlsx instead of documentUrl, to support pivot in xls, ods... and don't send jwt signature
 			if (t.isChartEditor) {
@@ -986,7 +989,7 @@ var editor;
 					var doc = new openXml.OpenXmlPackage();
 					var wbPart = null;
 					var wbXml = null;
-					nextPromise = require('jszip').loadAsync(data).then(function (zip) {
+					nextPromise = JSZip.loadAsync(data).then(function (zip) {
 						return doc.openFromZip(zip);
 					}).then(function () {
 						wbPart = doc.getPartByRelationshipType(openXml.relationshipTypes.workbook);
@@ -1079,7 +1082,7 @@ var editor;
 				}).then(resolve, reject);
 			};
 			if (typeof url === "string") {
-				require('jsziputils').getBinaryContent(url, processData);
+				JSZipUtils.getBinaryContent(url, processData);
 			} else {
 				processData(undefined, url);
 			}
