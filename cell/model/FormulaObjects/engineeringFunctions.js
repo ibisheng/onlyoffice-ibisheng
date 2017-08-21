@@ -4984,7 +4984,9 @@
 
 			var coeff;
 			var res;
-			if(null !== (coeff = getUnitConverterCoeff(from, to))){
+			if(from === to){
+				res = num;
+			} else if(null !== (coeff = getUnitConverterCoeff(from, to))){
 				if(coeff.length){
 					res = num;
 					for(var i = 0; i < coeff.length; i++){
