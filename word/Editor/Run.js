@@ -3918,6 +3918,20 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
 
 ParaRun.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
+	var CurLine  = _CurLine - this.StartLine;
+	var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+	var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+	var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+	for (var Pos = StartPos; Pos < EndPos; ++Pos)
+	{
+		var Item = this.Content[Pos];
+		if (para_FieldChar === Item.Type)
+		{
+			PRSI.ProcessFieldChar(Item);
+		}
+	}
 };
 
 ParaRun.prototype.private_RecalculateNumbering = function(PRS, Item, ParaPr, _X)
@@ -4425,6 +4439,13 @@ ParaRun.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
 
                 break;
             }
+			default:
+			{
+				if (Item.Get_WidthVisible())
+					RangeW.W += Item.Get_WidthVisible();
+
+				break;
+			}
         }
     }
 };

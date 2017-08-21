@@ -43,6 +43,8 @@ var fldchartype_End      = 2;
 
 function ParaFieldChar(Type, ComplexField)
 {
+	CRunElementBase.call(this);
+
 	this.CharType     = undefined === Type ? fldchartype_Begin : Type;
 	this.ComplexField = ComplexField;
 }
@@ -67,15 +69,27 @@ ParaFieldChar.prototype.IsSeparate = function()
 {
 	return (this.CharType === fldchartype_Separate ? true : false);
 };
+ParaFieldChar.prototype.GetComplexField = function()
+{
+	return this.ComplexField;
+};
 ParaFieldChar.prototype.Write_ToBinary = function(Writer)
 {
+	// Long : Type
+	// Long : CharType
+	Writer.WriteLong(this.Type);
+	Writer.WriteLong(this.CharType);
 };
 ParaFieldChar.prototype.Read_FromBinary = function(Reader)
 {
+	// Long : CharType
+	this.CharType = Reader.GetLong();
 };
 
 function ParaInstrText(nType, nFlags)
 {
+	CRunElementBase.call(this);
+
 	this.FieldCode = nType;
 	this.Flags     = nFlags;
 }
@@ -90,9 +104,15 @@ ParaInstrText.prototype.Draw = function(X, Y, Context)
 };
 ParaInstrText.prototype.Write_ToBinary = function(Writer)
 {
+	// Long : Type
+	// Long : FieldCode
+	Writer.WriteLong(this.Type);
+	Writer.WriteLong(this.FieldCode);
 };
 ParaInstrText.prototype.Read_FromBinary = function(Reader)
 {
+	// Long : FieldCode
+	this.FieldCode = Reader.GetLong();
 };
 ParaInstrText.prototype.GetFieldCode = function()
 {

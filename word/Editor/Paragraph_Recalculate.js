@@ -3159,18 +3159,26 @@ function CParagraphRecalculateStateAlign()
 function CParagraphRecalculateStateInfo()
 {
     this.Comments = [];
-    this.Fields   = {};
+    this.Fields   = [];
 }
-
 CParagraphRecalculateStateInfo.prototype.Reset = function(PrevInfo)
 {
 	if (null !== PrevInfo && undefined !== PrevInfo)
 	{
 		this.Comments = PrevInfo.Comments;
+		this.Fields = [];
+		for (var nIndex = 0, nCount = PrevInfo.Fields.length; nIndex < nCount; ++nIndex)
+		{
+			this.Fields[nIndex] = {
+				Field     : PrevInfo.Fields[nIndex].Field,
+				FieldCode : PrevInfo.Fields[nIndex].FieldCode
+			}
+		}
 	}
 	else
 	{
 		this.Comments = [];
+		this.Fields   = [];
 	}
 };
 CParagraphRecalculateStateInfo.prototype.AddComment = function(Id)
@@ -3186,6 +3194,40 @@ CParagraphRecalculateStateInfo.prototype.RemoveComment = function(Id)
 		{
 			this.Comments.splice(CurPos, 1);
 			break;
+		}
+	}
+};
+CParagraphRecalculateStateInfo.prototype.ProcessFieldChar = function(oFieldChar)
+{
+	if (!oFieldChar)
+		return;
+
+	var oComplexField = oFieldChar.GetComplexField();
+
+	if (oFieldChar.IsBegin())
+	{
+		this.Fields.push({Field : oComplexField, FieldCode : true});
+	}
+	else if (oFieldChar.IsSeparate())
+	{
+		for (var nIndex = 0, nCount = this.Fields.length; nIndex < nCount; ++nIndex)
+		{
+			if (oComplexField === this.Fields[nIndex].Field)
+			{
+				this.Fields[nIndex].FieldCode = false;
+				break;
+			}
+		}
+	}
+	else if (oFieldChar.IsEnd())
+	{
+		for (var nIndex = 0, nCount = this.Fields.length; nIndex < nCount; ++nIndex)
+		{
+			if (oComplexField === this.Fields[nIndex].Field)
+			{
+				this.Fields.splice(nIndex, 1);
+				break;
+			}
 		}
 	}
 };
