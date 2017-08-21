@@ -973,9 +973,6 @@ var editor;
 	spreadsheet_api.prototype.openDocumentFromZip = function (wb, url) {
 		var t = this;
 		return new Promise(function (resolve, reject) {
-			resolve();
-		});
-		return new Promise(function (resolve, reject) {
 			var openXml = AscCommon.openXml;
 			//open cache xlsx instead of documentUrl, to support pivot in xls, ods... and don't send jwt signature
 			if (t.isChartEditor) {
