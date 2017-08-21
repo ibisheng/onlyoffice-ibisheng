@@ -4280,7 +4280,7 @@ CPresentation.prototype =
         }
 
         var nNewCurrentPage = Math.min( this.Slides.length - 1, Math.max( 0, PageNum ) );
-        if(nNewCurrentPage !== this.CurPage && this.CurPage < this.Slides.length)
+        if(nNewCurrentPage !== this.CurPage && nNewCurrentPage < this.Slides.length)
         {
             var oCurrentController = this.GetCurrentController();
             if(oCurrentController){
