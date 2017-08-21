@@ -2960,7 +2960,7 @@
 								return function(row, col) {
 									var cell = t._getCellNoEmpty(row, col);
 									var val = cell ? cell.getNumberValue() : null;
-									return (null !== val && (oRule.bottom ? val <= threshold : val >= threshold)) ? rule.dxf : null;
+									return (null !== val && (rule.bottom ? val <= threshold : val >= threshold)) ? rule.dxf : null;
 								};
 							})(oRule, threshold);
 						}
