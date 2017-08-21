@@ -3250,6 +3250,15 @@
 			availablePrefixMap['z'] = {};
 			availablePrefixMap['y'] = {};
 
+			availablePrefixMap["Yi"] = {};
+			availablePrefixMap["Zi"] = {};
+			availablePrefixMap["Ei"] = {};
+			availablePrefixMap["Pi"] = {};
+			availablePrefixMap["Ti"] = {};
+			availablePrefixMap["Gi"] = {};
+			availablePrefixMap["Mi"] = {};
+			availablePrefixMap["ki"] = {};
+
 			availablePrefixMap['Y']['g'] = 1;
 			availablePrefixMap['Z']['g'] = 1;
 			availablePrefixMap['E']['g'] = 1;
@@ -4238,6 +4247,24 @@
 			availablePrefixMap['z']['m/sec'] = 1;
 			availablePrefixMap['y']['m/sec'] = 1;
 
+			availablePrefixMap["Yi"]["bit"] = 1;
+			availablePrefixMap["Zi"]["bit"] = 1;
+			availablePrefixMap["Ei"]["bit"] = 1;
+			availablePrefixMap["Pi"]["bit"] = 1;
+			availablePrefixMap["Ti"]["bit"] = 1;
+			availablePrefixMap["Gi"]["bit"] = 1;
+			availablePrefixMap["Mi"]["bit"] = 1;
+			availablePrefixMap["ki"]["bit"] = 1;
+
+			availablePrefixMap["Yi"]["byte"] = 1;
+			availablePrefixMap["Zi"]["byte"] = 1;
+			availablePrefixMap["Ei"]["byte"] = 1;
+			availablePrefixMap["Pi"]["byte"] = 1;
+			availablePrefixMap["Ti"]["byte"] = 1;
+			availablePrefixMap["Gi"]["byte"] = 1;
+			availablePrefixMap["Mi"]["byte"] = 1;
+			availablePrefixMap["ki"]["byte"] = 1;
+
 
 			prefixValueMap = {};
 			prefixValueMap["Y"] = 1.00E+24;
@@ -4261,6 +4288,15 @@
 			prefixValueMap["a"] = 1.00E-18;
 			prefixValueMap["z"] = 1.00E-21;
 			prefixValueMap["y"] = 1.00E-24;
+
+			prefixValueMap["Yi"] = 1.20892581961463E+024;
+			prefixValueMap["Zi"] = 1.18059162071741E+021;
+			prefixValueMap["Ei"] = 1.15292150460685E+018;
+			prefixValueMap["Pi"] = 1125899906842624;
+			prefixValueMap["Ti"] = 1099511627776;
+			prefixValueMap["Gi"] = 1073741824;
+			prefixValueMap["Mi"] = 1048576;
+			prefixValueMap["ki"] = 1024;
 
 		}
 		return availablePrefixMap;
