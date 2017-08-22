@@ -2279,8 +2279,9 @@ PasteProcessor.prototype =
 			//SpecialPasteButtonById_Show вызываю здесь, если пересчет документа завершился раньше, чем мы попали сюда и сгенерировали параметры вставки
 			//в противном случае вызываю SpecialPasteButtonById_Show в drawingDocument->OnEndRecalculate
 			//TODO пересмотреть проверку на CDrawingDocContent и CShape
-			if(window['AscCommon'].g_clipboardBase.endRecalcDocument || (this.oDocument.Parent && this.oDocument.Parent instanceof CShape) || (this.oDocument instanceof AscFormat.CDrawingDocContent))
-			{
+			if (window['AscCommon'].g_clipboardBase.endRecalcDocument || (this.oDocument.Parent &&
+				(this.oDocument.Parent instanceof CShape || this.oDocument.Parent instanceof CHeaderFooter)) ||
+				(this.oDocument instanceof AscFormat.CDrawingDocContent)) {
 				window['AscCommon'].g_clipboardBase.SpecialPasteButtonById_Show();
 			}
 		}
