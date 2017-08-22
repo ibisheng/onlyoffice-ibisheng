@@ -2317,7 +2317,7 @@ background-repeat: no-repeat;\
 		}
 	};
 	asc_docs_api.prototype._autoSave = function () {
-		if ((this.canUnlockDocument || this.autoSaveGap != 0) && !this.isViewMode) {
+		if ((this.canUnlockDocument || this.autoSaveGap != 0) && !this.isViewMode && this.canSave) {
 			var _curTime = new Date().getTime();
 			if (-1 === this.lastSaveTime) {
 				this.lastSaveTime = _curTime;

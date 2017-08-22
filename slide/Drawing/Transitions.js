@@ -2965,6 +2965,8 @@ function CDemonstrationManager(htmlpage)
 
     this.StartSlide = function(is_transition_use, is_first_play)
     {
+		oThis.HtmlPage.m_oApi.canSave = false;
+
         oThis.StopTransition();
 
         if (oThis.SlideNum == oThis.SlidesCount)
@@ -3155,6 +3157,8 @@ function CDemonstrationManager(htmlpage)
 
     this.End = function(isNoUseFullScreen)
     {
+		this.HtmlPage.m_oApi.canSave = true;
+
 		this.PointerRemove();
         if (this.waitReporterObject)
         {
