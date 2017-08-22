@@ -3167,11 +3167,15 @@ CParagraphRecalculateStateInfo.prototype.Reset = function(PrevInfo)
 	{
 		this.Comments = PrevInfo.Comments;
 		this.Fields = [];
-		for (var nIndex = 0, nCount = PrevInfo.Fields.length; nIndex < nCount; ++nIndex)
+
+		if (PrevInfo.Fields)
 		{
-			this.Fields[nIndex] = {
-				Field     : PrevInfo.Fields[nIndex].Field,
-				FieldCode : PrevInfo.Fields[nIndex].FieldCode
+			for (var nIndex = 0, nCount = PrevInfo.Fields.length; nIndex < nCount; ++nIndex)
+			{
+				this.Fields[nIndex] = {
+					Field     : PrevInfo.Fields[nIndex].Field,
+					FieldCode : PrevInfo.Fields[nIndex].FieldCode
+				}
 			}
 		}
 	}
