@@ -6765,7 +6765,7 @@ PasteProcessor.prototype =
         if(null != style)
         {
             res = new CDocumentBorder();
-            if("none" === style)
+            if("none" === style || "" === style)
                 res.Value = border_None;
             else
             {
