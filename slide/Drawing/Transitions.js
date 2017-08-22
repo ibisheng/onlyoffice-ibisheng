@@ -2704,6 +2704,8 @@ function CDemonstrationManager(htmlpage)
 
     this.PointerDiv = null;
 
+    this.isMouseDown = false;
+
     var oThis = this;
 
     this.CacheSlide = function(slide_num, slide_index)
@@ -3355,6 +3357,7 @@ function CDemonstrationManager(htmlpage)
 
     this.onMouseDown = function(e)
     {
+		oThis.isMouseDown = true;
         e.preventDefault();
         return false;
     }
@@ -3409,8 +3412,13 @@ function CDemonstrationManager(htmlpage)
 
     this.onMouseUp = function(e)
     {
+    	if (!oThis.isMouseDown)
+    		return;
+
+		oThis.isMouseDown = false;
+
 		if (oThis.PointerDiv && oThis.HtmlPage.m_oApi.isReporterMode)
-			{
+		{
 			AscCommon.stopEvent(e);
 			return false;
         }
