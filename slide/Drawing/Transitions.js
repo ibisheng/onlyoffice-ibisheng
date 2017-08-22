@@ -3409,8 +3409,8 @@ function CDemonstrationManager(htmlpage)
 
     this.onMouseUp = function(e)
     {
-		if (oThis.PointerDiv)
-        {
+		if (oThis.PointerDiv && oThis.HtmlPage.m_oApi.isReporterMode)
+			{
 			AscCommon.stopEvent(e);
 			return false;
         }
