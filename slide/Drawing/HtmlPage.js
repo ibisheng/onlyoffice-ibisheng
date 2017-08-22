@@ -694,8 +694,8 @@ function CEditorPage(api)
 			var _buttonsContent = "";
 			_buttonsContent += "<label class=\"block_elem_no_select\" id=\"dem_id_time\" style=\"color:#666666;text-shadow: none;white-space: nowrap;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; position:absolute; left:10px; bottom: 7px;\">00:00:00</label>";
 			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_play\" style=\"left: 60px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-play back_image_buttons\" id=\"dem_id_play_span\" style=\"width:100%;height:100%;\"></span></button>";
-			_buttonsContent += "<button class=\"btn-text-default\"     id=\"dem_id_reset\" style=\"left: 85px; bottom: 3px; \">Reset</button>";
-			_buttonsContent += "<button class=\"btn-text-default\"     id=\"dem_id_end\" style=\"right: 10px; bottom: 3px; \">End slideshow</button>";
+			_buttonsContent += ("<button class=\"btn-text-default\"     id=\"dem_id_reset\" style=\"left: 85px; bottom: 3px; \">" + this.reporterTranslates[0] + "</button>");
+			_buttonsContent += ("<button class=\"btn-text-default\"     id=\"dem_id_end\" style=\"right: 10px; bottom: 3px; \">" + this.reporterTranslates[2] + "</button>");
 
 			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_prev\"  style=\"left: 150px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-prev back_image_buttons\" style=\"width:100%;height:100%;\"></span></button>";
 			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_next\"  style=\"left: 170px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-next back_image_buttons\" style=\"width:100%;height:100%;\"></span></button>";
