@@ -996,7 +996,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 					}
 				}
 
-			}, excludeHiddenRows);
+			}, undefined, excludeHiddenRows);
 		}
 		return val;
 	};
@@ -1142,7 +1142,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				}
 			}
 
-		}, excludeHiddenRows);
+		}, undefined, excludeHiddenRows);
 
 		return [arr];
 	};
@@ -1262,7 +1262,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 					}
 				}
 
-			}, _exclude);
+			}, undefined, _exclude);
 		}
 		return _val;
 	};

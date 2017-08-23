@@ -2479,6 +2479,9 @@
 	SheetMemory.prototype.hasSize = function(index) {
 		return index + 1 <= this.count;
 	};
+	SheetMemory.prototype.getSize = function() {
+		return this.count;
+	};
 	SheetMemory.prototype.clone = function() {
 		var sheetMemory = new SheetMemory(this.structSize, this.maxIndex);
 		sheetMemory.data = this.data ? this.data.slice(0) : null;
@@ -2683,6 +2686,9 @@
 	};
 	Worksheet.prototype.getColDataNoEmpty = function(index) {
 		return this.cellsByCol[index];
+	};
+	Worksheet.prototype.getColDataLength = function() {
+		return this.cellsByCol.length;
 	};
 	Worksheet.prototype.getSnapshot = function(wb) {
 		var ws = new Worksheet(wb, this.index, this.Id);
@@ -4780,6 +4786,9 @@
 		}
 		return this.oSheetFormatPr.oAllRow;
 	};
+	Worksheet.prototype.getAllRowNoEmpty = function(){
+		return this.oSheetFormatPr.oAllRow;
+	};
 	Worksheet.prototype.getHyperlinkByCell = function(row, col){
 		var oHyperlink = this.hyperlinkManager.getByCell(row, col);
 		return oHyperlink ? oHyperlink.data : null;
@@ -5555,12 +5564,12 @@
 			sheetMemory.setUint32(this.nRow, g_nCellOffsetFormula, formulaSave);
 		}
 	};
-	Cell.prototype.loadContent = function(row, col) {
+	Cell.prototype.loadContent = function(row, col, opt_sheetMemory) {
 		var res = false;
 		this.clear();
 		this.nRow = row;
 		this.nCol = col;
-		var sheetMemory = this.ws.getColDataNoEmpty(this.nCol);
+		var sheetMemory = opt_sheetMemory ? opt_sheetMemory : this.ws.getColDataNoEmpty(this.nCol);
 		if (sheetMemory) {
 			if (sheetMemory.hasSize(this.nRow)) {
 				var flags = sheetMemory.getUint8(this.nRow, g_nCellOffsetFlag);
@@ -7021,45 +7030,89 @@
 			wb.loadCells.pop();
 		}
 	};
-	Range.prototype._foreachNoEmpty=function(action, excludeHiddenRows){
-		if(null != action)
-		{
-			var wb = this.worksheet.workbook;
-			var oRes;
+	Range.prototype._foreachNoEmpty = function(actionCell, actionRow, excludeHiddenRows) {
+		var oRes, i;
+		var wb = this.worksheet.workbook;
+		var oBBox = this.bbox, minR = Math.min(this.worksheet.getRowsCount(), oBBox.r2);
+		if (actionCell || actionRow) {
+			var colData;
+			var bExcludeHiddenRows = (this.worksheet.bExcludeHiddenRows || excludeHiddenRows);
+			var excludedCount = 0;
 			var tempCell = new Cell(this.worksheet);
-			wb.loadCells.push(tempCell);
-			var oBBox = this.bbox, minC = Math.min( this.worksheet.getColsCount(), oBBox.c2 ), minR = Math.min( this.worksheet.getRowsCount(), oBBox.r2 );
-			for(var i = oBBox.r1; i <= minR; i++){
-				if ((this.worksheet.bExcludeHiddenRows || excludeHiddenRows) && this.worksheet.getRowHidden(i)) {
+			var tempRow = new AscCommonExcel.Row(this.worksheet);
+			var allRow = this.worksheet.getAllRow();
+			var allRowHidden = allRow && allRow.getHidden();
+			var colDatasIndex = [];
+			var colDatas = [];
+			if (actionCell) {
+				var minColData = Math.min(this.worksheet.getColDataLength() - 1, oBBox.c2);
+				for (i = oBBox.c1; i <= minColData; i++) {
+					colData = this.worksheet.getColDataNoEmpty(i);
+					if (colData) {
+						colDatas.push(colData);
+						colDatasIndex.push(i);
+					}
+				}
+				wb.loadCells.push(tempCell);
+			}
+			for (i = oBBox.r1; i <= minR; i++) {
+				if (actionRow) {
+					if (tempRow.loadContent(i)) {
+						if (bExcludeHiddenRows && tempRow.getHidden()) {
+							excludedCount++;
+							continue;
+						}
+						oRes = actionRow(tempRow, excludedCount);
+						tempRow.saveContent(true);
+						if (null != oRes) {
+							wb.loadCells.pop();
+							return oRes;
+						}
+					} else if (bExcludeHiddenRows && allRowHidden) {
+						excludedCount++;
+						continue;
+					}
+				} else if (bExcludeHiddenRows && this.worksheet.getRowHidden(i)) {
+					excludedCount++;
 					continue;
 				}
-				for(var j = oBBox.c1; j <= minC; j++){
-					var targetCell = null;
-					for (var k = 0; k < wb.loadCells.length - 1; ++k) {
-						var elem = wb.loadCells[k];
-						if (elem.nRow == i && elem.nCol == j) {
-							targetCell = elem;
-							break;
+				for (var j = 0; j < colDatasIndex.length; j++) {
+					colData = colDatas[j];
+					var nCol = colDatasIndex[j];
+					if (colData.hasSize(i)) {
+						var targetCell = null;
+						for (var k = 0; k < wb.loadCells.length - 1; ++k) {
+							var elem = wb.loadCells[k];
+							if (elem.nRow == i && elem.nCol == nCol) {
+								targetCell = elem;
+								break;
+							}
 						}
-					}
-					if (null === targetCell) {
-						if (tempCell.loadContent(i, j)) {
-							oRes = action(tempCell, i, j, oBBox.r1, oBBox.c1);
-							tempCell.saveContent(true);
+						if (null === targetCell) {
+							if (tempCell.loadContent(i, nCol, colData)) {
+								oRes = actionCell(tempCell, i, nCol, oBBox.r1, oBBox.c1, excludedCount);
+								tempCell.saveContent(true);
+							}
+						} else {
+							oRes = actionCell(targetCell, i, nCol, oBBox.r1, oBBox.c1, excludedCount);
+						}
+						if (null != oRes) {
+							wb.loadCells.pop();
+							return oRes;
 						}
 					} else {
-						oRes = action(targetCell, i, j, oBBox.r1, oBBox.c1);
-					}
-					if (null != oRes) {
-						wb.loadCells.pop();
-						return oRes;
+						colDatas.splice(j, 1);
+						colDatasIndex.splice(j, 1);
+						j--;
 					}
 				}
 			}
-			wb.loadCells.pop();
+			if (actionCell) {
+				wb.loadCells.pop();
+			}
 		}
 	};
-	Range.prototype._foreachRow=function(actionRow, actionCell){
+	Range.prototype._foreachRow = function(actionRow, actionCell){
 		var oBBox = this.bbox;
 		if (null != actionRow) {
 			var tempRow = new AscCommonExcel.Row(this.worksheet);
@@ -7079,28 +7132,9 @@
 		}
 	};
 	Range.prototype._foreachRowNoEmpty = function(actionRow, actionCell) {
-		var oBBox = this.bbox;
-		var minR = Math.min(oBBox.r2, this.worksheet.getRowsCount());
-		if (null != actionRow) {
-			var tempRow = new AscCommonExcel.Row(this.worksheet);
-			for (var i = oBBox.r1; i <= minR; i++) {
-				if (tempRow.loadContent(i)) {
-					if (this.worksheet.bExcludeHiddenRows && tempRow.getHidden()) {
-						continue;
-					}
-					var oRes = actionRow(tempRow);
-					tempRow.saveContent(true);
-					if (null != oRes) {
-						return oRes;
-					}
-				}
-			}
-		}
-		if (null != actionCell) {
-			return this._foreachNoEmpty(actionCell);
-		}
+		return this._foreachNoEmpty(actionCell, actionRow);
 	};
-	Range.prototype._foreachCol=function(actionCol, actionCell){
+	Range.prototype._foreachCol = function(actionCol, actionCell){
 		var oBBox = this.bbox;
 		if(null != actionCol)
 		{

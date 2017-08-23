@@ -43,6 +43,7 @@
       var CellValueType = AscCommon.CellValueType;
       var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
       var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+      var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
       var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
       var Binary_CommonReader = AscCommon.Binary_CommonReader;
       var BinaryCommonWriter = AscCommon.BinaryCommonWriter;
@@ -3255,23 +3256,65 @@
             if(oThis.isCopyPaste ){
 				range = ws.getRange3(oThis.isCopyPaste.r1, oThis.isCopyPaste.c1, oThis.isCopyPaste.r2, oThis.isCopyPaste.c2);
 			} else {
-				range = ws.getRange3(oThis.isCopyPaste.r1, oThis.isCopyPaste.c1, oThis.isCopyPaste.r2, oThis.isCopyPaste.c2);
+				range = ws.getRange3(0, 0, gc_nMaxRow0, gc_nMaxCol0);
 			}
-			var hiddenCount = 0;
-			range._foreachRowNoEmpty(function(row) {
-				if (!(ws.bExcludeHiddenRows && oThis.isCopyPaste && row.getHidden())) {
-					if (false == row.isEmpty()) {
-						if (oThis.isCopyPaste && ws.bExcludeHiddenRows) {
-							//change index
-							this.bs.WriteItem(c_oSerWorksheetsTypes.Row, function() {oThis.WriteRow(row, -hiddenCount);});
-						} else {
-							this.bs.WriteItem(c_oSerWorksheetsTypes.Row, function() {oThis.WriteRow(row, 0);});
-						}
-					}
-				} else {
-					hiddenCount++;
+			var bIsTablePartContainActiveRange;
+			if (oThis.isCopyPaste) {
+				var api = window["Asc"]["editor"];
+				var ws = api.wb.getWorksheet();
+				bIsTablePartContainActiveRange = ws.model.autoFilters.isTablePartContainActiveRange(ws.model.selectionRange.getLast());
+			}
+
+			var nStartRow = -1;
+			var nStartCells = -1;
+            var curRow = -1;
+            var allRow = ws.getAllRowNoEmpty();
+			var tempRow = new AscCommonExcel.Row(ws);
+			if (allRow) {
+				tempRow.copyFrom(allRow);
+			}
+			range._foreachRowNoEmpty(function(row, excludedCount) {
+				if (-1 != nStartRow) {
+					oThis.bs.WriteItemWithLengthEnd(nStartCells);
+					oThis.bs.WriteItemEnd(nStartRow);
 				}
-			});
+				nStartRow = oThis.bs.WriteItemStart(c_oSerWorksheetsTypes.Row);
+				nStartCells = oThis.WriteRow(row, -excludedCount);
+				curRow = row.getIndex();
+			}, function(cell, nRow0, nCol0, nRowStart0, nColStart0, excludedCount) {
+				if (curRow != nRow0) {
+					if (-1 != nStartRow) {
+						oThis.bs.WriteItemWithLengthEnd(nStartCells);
+						oThis.bs.WriteItemEnd(nStartRow);
+					}
+					tempRow.setIndex(nRow0);
+					nStartRow = oThis.bs.WriteItemStart(c_oSerWorksheetsTypes.Row);
+					nStartCells = oThis.WriteRow(tempRow, -excludedCount);
+					curRow = nRow0;
+				}
+				//готовим ячейку к записи
+				var nXfsId;
+				var cellXfs = cell.xfs;
+				if (oThis.isCopyPaste && bIsTablePartContainActiveRange) {
+					var compiledXfs = cell.getCompiledStyle();
+					nXfsId = oThis.prepareXfs(compiledXfs);
+					cellXfs = compiledXfs;
+				} else {
+					nXfsId = oThis.prepareXfs(cell.xfs);
+				}
+
+				//сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
+				if (null != cellXfs || false == cell.isEmptyText()) {
+					oThis.bs.WriteItem(c_oSerRowTypes.Cell, function () {
+						oThis.WriteCell(cell, nXfsId, nRow0 - excludedCount);
+					});
+				}
+			}, (ws.bExcludeHiddenRows && oThis.isCopyPaste));
+
+			if (-1 != nStartRow) {
+				this.bs.WriteItemWithLengthEnd(nStartCells);
+				this.bs.WriteItemEnd(nStartRow);
+			}
 		};
       
         this.WriteRow = function(oRow, changeIndex)
@@ -3311,42 +3354,7 @@
 
             this.memory.WriteByte(c_oSerRowTypes.Cells);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
-            this.bs.WriteItemWithLength(function(){oThis.WriteCells(oRow);});
-        };
-        this.WriteCells = function (row) {
-            var oThis = this;
-
-            var bIsTablePartContainActiveRange;
-			if (oThis.isCopyPaste) {
-				var api = window["Asc"]["editor"];
-				var ws = api.wb.getWorksheet();
-				bIsTablePartContainActiveRange = ws.model.autoFilters.isTablePartContainActiveRange(ws.model.selectionRange.getLast());
-			}
-			var range;
-			if(oThis.isCopyPaste ){
-				range = row.ws.getRange3(row.getIndex(), oThis.isCopyPaste.c1, row.getIndex(), oThis.isCopyPaste.c2);
-			} else {
-				range = row.ws.getRange3(row.getIndex(), 0, row.getIndex(), gc_nMaxCol0);
-			}
-			range._foreachNoEmpty(function(cell) {
-				//готовим ячейку к записи
-				var nXfsId;
-				var cellXfs = cell.xfs;
-				if (oThis.isCopyPaste && bIsTablePartContainActiveRange) {
-					var compiledXfs = cell.getCompiledStyle();
-					nXfsId = oThis.prepareXfs(compiledXfs);
-					cellXfs = compiledXfs;
-				} else {
-					nXfsId = oThis.prepareXfs(cell.xfs);
-				}
-
-				//сохраняем как и Excel даже пустой стиль(нужно чтобы убрать стиль строки/колонки)
-				if (null != cellXfs || false == cell.isEmptyText()) {
-					this.bs.WriteItem(c_oSerRowTypes.Cell, function () {
-						oThis.WriteCell(cell, nXfsId, row.index);
-					});
-				}
-			});
+            return this.bs.WriteItemWithLengthStart();
         };
         this.prepareXfsStyles = function () {
             var styles = this.wb.CellStyles.CustomStyles;
