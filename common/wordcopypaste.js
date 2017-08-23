@@ -2402,11 +2402,11 @@ PasteProcessor.prototype =
 
 				if(pasteIntoParagraphPr)
 				{
-					paragraph.Set_Pr(pasteIntoParagraphPr);
+					paragraph.Set_Pr(pasteIntoParagraphPr.Copy());
 
 					if(paragraph.TextPr && pasteIntoParaRunPr)
 					{
-						paragraph.TextPr.Value = pasteIntoParaRunPr;
+						paragraph.TextPr.Value = pasteIntoParaRunPr.Copy();
 					}
 				}
 				this._specialPasteParagraphContentConvert(paragraph.Content, pasteIntoParaRunPr);
@@ -2481,7 +2481,7 @@ PasteProcessor.prototype =
 								//проверить, есть ли внутри изображение
 								if(pasteIntoParaRunPr && elem.Set_Pr)
 								{
-									elem.Set_Pr( pasteIntoParaRunPr );
+									elem.Set_Pr( pasteIntoParaRunPr.Copy() );
 								}
 
 								checkInsideDrawings(elem.Content);
