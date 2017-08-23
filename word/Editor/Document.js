@@ -16193,6 +16193,13 @@ CTrackRevisionsManager.prototype.Get_CurrentChange = function()
 };
 CTrackRevisionsManager.prototype.Clear_VisibleChanges = function()
 {
+	if (this.VisibleChanges.length > 0)
+	{
+		var oEditorApi = this.LogicDocument.Get_Api();
+		oEditorApi.sync_BeginCatchRevisionsChanges();
+		oEditorApi.sync_EndCatchRevisionsChanges();
+	}
+
     this.VisibleChanges = [];
 };
 CTrackRevisionsManager.prototype.Add_VisibleChange = function(Change)
