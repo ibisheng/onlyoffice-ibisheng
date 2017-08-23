@@ -2981,6 +2981,7 @@ function CDemonstrationManager(htmlpage)
 
                 //oThis.DemonstrationDivEndPresentation.onmousedown  = oThis.onMouseDownDemonstration;
                 //oThis.DemonstrationDivEndPresentation.onmousemove  = oThis.onMouseMoveDemonstration;
+				oThis.DivEndPresentation.onmousedown  = oThis.onMouseDown;
                 oThis.DivEndPresentation.onmouseup    = oThis.onMouseUp;
 
                 oThis.DivEndPresentation.onmousewheel = oThis.onMouseWhell;
@@ -3414,9 +3415,9 @@ function CDemonstrationManager(htmlpage)
         return false;
     }
 
-    this.onMouseUp = function(e)
+    this.onMouseUp = function(e, isAttack)
     {
-    	if (!oThis.isMouseDown)
+    	if (!oThis.isMouseDown && true !== isAttack)
     		return;
 
 		oThis.isMouseDown = false;

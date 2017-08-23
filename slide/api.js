@@ -6113,7 +6113,7 @@ background-repeat: no-repeat;\
 			}
 			else if (undefined !== _obj["mouseUp"])
 			{
-				_this.WordControl.DemonstrationManager.onMouseUp({});
+				_this.WordControl.DemonstrationManager.onMouseUp({}, true);
 			}
 			else if (undefined !== _obj["mouseWhell"])
 			{

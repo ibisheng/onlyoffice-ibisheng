@@ -2892,11 +2892,7 @@ function CEditorPage(api)
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
 
-				if (this.m_bIsRuler)
-				{
-					this.UpdateHorRulerBack(true);
-					this.UpdateVerRulerBack(true);
-				}
+				this.FullRulersUpdate();
 				return;
 			}
 		}
@@ -2907,26 +2903,10 @@ function CEditorPage(api)
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
 
-				if (this.m_bIsRuler)
-				{
-					this.UpdateHorRulerBack(true);
-					this.UpdateVerRulerBack(true);
-				}
+				this.FullRulersUpdate();
 				return;
 			}
 		}
-
-		this.m_bIsUpdateHorRuler = true;
-		this.m_bIsUpdateVerRuler = true;
-
-		if (this.m_bIsRuler)
-		{
-			this.UpdateHorRulerBack(true);
-			this.UpdateVerRulerBack(true);
-		}
-
-		this.m_oHorRuler.RepaintChecker.BlitAttack = true;
-		this.m_oVerRuler.RepaintChecker.BlitAttack = true;
 
 		this.Thumbnails.m_bIsUpdate = true;
 		this.CalculateDocumentSize();
@@ -2946,6 +2926,23 @@ function CEditorPage(api)
 
 		if (this.IsSupportNotes && this.m_oNotesApi)
 			this.m_oNotesApi.OnResize();
+
+		this.FullRulersUpdate();
+	};
+
+	this.FullRulersUpdate = function()
+	{
+		this.m_oHorRuler.RepaintChecker.BlitAttack = true;
+		this.m_oVerRuler.RepaintChecker.BlitAttack = true;
+
+		this.m_bIsUpdateHorRuler = true;
+		this.m_bIsUpdateVerRuler = true;
+
+		if (this.m_bIsRuler)
+		{
+			this.UpdateHorRulerBack(true);
+			this.UpdateVerRulerBack(true);
+		}
 	};
 
 	this.OnResizeReporter = function()
@@ -3013,6 +3010,8 @@ function CEditorPage(api)
 			{
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
+
+				this.FullRulersUpdate();
 				return;
 			}
 		}
@@ -3022,6 +3021,8 @@ function CEditorPage(api)
 			{
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
+
+				this.FullRulersUpdate();
 				return;
 			}
 		}
@@ -3046,6 +3047,8 @@ function CEditorPage(api)
 
 		if (this.IsSupportNotes && this.m_oNotesApi)
 			this.m_oNotesApi.OnResize();
+
+		this.FullRulersUpdate();
 	};
 
 	this.checkNeedRules     = function()
