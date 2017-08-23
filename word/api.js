@@ -7690,6 +7690,15 @@ background-repeat: no-repeat;\
 		return null;
 	};
 
+	asc_docs_api.prototype.asc_BeginViewModeInReview = function(isFinal)
+	{
+		this.WordControl.m_oLogicDocument.BeginViewModeInReview(isFinal);
+	};
+	asc_docs_api.prototype.asc_EndViewModeInReview = function()
+	{
+		this.WordControl.m_oLogicDocument.EndViewModeInReview();
+	};
+
 	// input
 	asc_docs_api.prototype.Begin_CompositeInput = function()
 	{
