@@ -1508,7 +1508,7 @@
 
     /**
      * Insert watermark on each page of document
-     * @param {?string} } [sText="WATERMARK"]
+     * @param {?string} [sText="WATERMARK"]
      * @param {?boolean} [bIsDiagonal=true]
      */
     ApiDocument.prototype.InsertWatermark = function(sText, bIsDiagonal){
