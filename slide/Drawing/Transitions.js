@@ -3197,6 +3197,8 @@ function CDemonstrationManager(htmlpage)
         this.DemonstrationDiv.removeChild(this.Canvas);
         this.Canvas = null;
 
+        var _oldSlideNum = this.SlideNum;
+
         this.SlideNum = -1;
         this.DemonstrationDiv = null;
         this.Mode = false;
@@ -3205,6 +3207,18 @@ function CDemonstrationManager(htmlpage)
         ctx1.setTransform(1, 0, 0, 1, 0, 0);
 
         this.HtmlPage.m_oApi.sync_endDemonstration();
+
+        if (true)
+		{
+			if (_oldSlideNum < 0)
+				_oldSlideNum = 0;
+			var _slidesCount = this.HtmlPage.m_oApi.getCountPages();
+			if (_oldSlideNum >= _slidesCount)
+			    _oldSlideNum = _slidesCount - 1;
+
+			if (0 <= _oldSlideNum)
+			    this.HtmlPage.GoToPage(_oldSlideNum);
+		}
     }
 
     this.NextSlide = function(isNoSendFormReporter)
