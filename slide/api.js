@@ -6018,11 +6018,13 @@ background-repeat: no-repeat;\
 				case "pause":
 				{
 					_this.WordControl.DemonstrationManager.Pause();
+					_this.sendEvent("asc_onDemonstrationStatus", "pause");
 					break;
 				}
 				case "play":
 				{
 					_this.WordControl.DemonstrationManager.Play();
+					_this.sendEvent("asc_onDemonstrationStatus", "play");
 					break;
 				}
 				case "resize":
