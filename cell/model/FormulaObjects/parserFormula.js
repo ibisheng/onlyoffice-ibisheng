@@ -441,6 +441,7 @@ var c_msPerDay = c_sPerDay * 1000;
   var rx_sFuncPref = /_xlfn\./i;
 	var cNumFormatFirstCell = -1;
 	var cNumFormatNone = -2;
+	var cNumFormatNull = -3;
 
 Date.prototype.excelNullDate1900 = Date.UTC( 1899, 11, 30, 0, 0, 0 );
 Date.prototype.excelNullDate1904 = Date.UTC( 1904, 0, 1, 0, 0, 0 );
@@ -652,7 +653,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 	/** @constructor */
 	function cBaseType(val) {
-		this.numFormat = null;
+		this.numFormat = cNumFormatNull;
 		this.value = val;
 	}
 
@@ -5130,7 +5131,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 		var elemArr = [], _tmp, numFormat = cNumFormatFirstCell, currentElement = null;
 		for (var i = 0; i < this.outStack.length; i++) {
 			currentElement = this.outStack[i];
-			if (currentElement.name == "(") {
+			if (currentElement.name === "(") {
 				continue;
 			}
 			if (currentElement.type === cElementType.operator || currentElement.type === cElementType.func) {
@@ -5145,7 +5146,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 						arg.unshift(elemArr.pop());
 					}
 					_tmp = currentElement.Calculate(arg, opt_bbox, opt_defName, this.ws);
-					if (null != _tmp.numFormat) {
+					if (cNumFormatNull !== _tmp.numFormat) {
 						numFormat = _tmp.numFormat;
 					} else if (0 > numFormat || cNumFormatNone === currentElement.numFormat) {
 						numFormat = currentElement.numFormat;
