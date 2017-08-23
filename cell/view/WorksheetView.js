@@ -9397,7 +9397,7 @@
 			{
 				var table = tables[0];
 				var styleInfo = table.TableStyleInfo;
-				var styleForCurTable = t.model.workbook.TableStyles.AllStyles[styleInfo.Name];
+				var styleForCurTable = styleInfo ? t.model.workbook.TableStyles.AllStyles[styleInfo.Name] : null;
 
 				if (activeCellsPasteFragment.containsRange(table.Ref))
 				{
@@ -9511,11 +9511,11 @@
 			}
 
 			var tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
-			if(tableDxf.blocalArea)
+			if(tableDxf && tableDxf.blocalArea)
 			{
 				pastedRangeProps.tableDxfLocal = tableDxf.dxf;
 			}
-			else
+			else if(tableDxf)
 			{
 				pastedRangeProps.tableDxf = tableDxf.dxf;
 			}
