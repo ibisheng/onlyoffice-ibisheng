@@ -6893,83 +6893,6 @@ CDocument.prototype.OnKeyDown = function(e)
         bUpdateSelection = false;
         bRetValue        = keydownresult_PreventAll;
     }
-    else if (e.KeyCode === 112 && true === e.ShiftKey)
-	{
-		if (true === e.CtrlKey)
-		{
-			this.BeginViewModeInReview(true);
-		}
-		else
-		{
-			this.Api.asc_AddContentControl(AscCommonWord.sdttype_InlineLevel);
-		}
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 113 && true === e.ShiftKey)
-	{
-		if (true === e.CtrlKey)
-		{
-			this.BeginViewModeInReview(false);
-		}
-		else
-		{
-			this.Api.asc_AddContentControl(AscCommonWord.sdttype_BlockLevel);
-		}
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 114 && true === e.ShiftKey)
-	{
-		if (true === e.CtrlKey)
-		{
-			this.EndViewModeInReview();
-		}
-		else
-		{
-			this.Api.asc_RemoveContentControl();
-		}
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 115 && true === e.ShiftKey)
-	{
-		this.Api.asc_RemoveContentControlWrapper();
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 116 && true === e.ShiftKey)
-	{
-		var oContentControlPr = new AscCommonWord.CContentControlPr();
-		oContentControlPr.put_Lock(AscCommonWord.sdtlock_Unlocked);
-		this.Api.asc_SetContentControlProperties(oContentControlPr);
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 117 && true === e.ShiftKey)
-	{
-		var oContentControlPr = new AscCommonWord.CContentControlPr();
-		oContentControlPr.put_Lock(AscCommonWord.sdtlock_ContentLocked);
-		this.Api.asc_SetContentControlProperties(oContentControlPr);
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 118 && true === e.ShiftKey)
-	{
-		var oContentControlPr = new AscCommonWord.CContentControlPr();
-		oContentControlPr.put_Lock(AscCommonWord.sdtlock_SdtLocked);
-		this.Api.asc_SetContentControlProperties(oContentControlPr);
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 119 && true === e.ShiftKey)
-	{
-		var oContentControlPr = new AscCommonWord.CContentControlPr();
-		oContentControlPr.put_Lock(AscCommonWord.sdtlock_SdtContentLocked);
-		this.Api.asc_SetContentControlProperties(oContentControlPr);
-		bRetValue = keydownresult_PreventAll;
-	}
-	else if (e.KeyCode === 120 && true === e.ShiftKey)
-	{
-		if (true !== e.CtrlKey)
-			this.Api.restrictions = Asc.c_oAscRestrictionType.OnlyForms;
-		else
-			this.Api.restrictions = Asc.c_oAscRestrictionType.None;
-		bRetValue = keydownresult_PreventAll;
-	}
 	else if (e.KeyCode == 121 && true === e.ShiftKey) // Shift + F10 - контекстное меню
     {
         var X_abs, Y_abs, oPosition, ConvertedPos;
@@ -9008,9 +8931,7 @@ CDocument.prototype.GetPrevElementEndInfo = function(CurElement)
     var PrevElement = CurElement.Get_DocumentPrev();
 
     if (null !== PrevElement && undefined !== PrevElement)
-    {
-        return PrevElement.Get_EndInfo();
-    }
+        return PrevElement.GetEndInfo();
     else
         return null;
 };
@@ -16193,6 +16114,13 @@ CTrackRevisionsManager.prototype.Get_CurrentChange = function()
 };
 CTrackRevisionsManager.prototype.Clear_VisibleChanges = function()
 {
+	if (this.VisibleChanges.length > 0)
+	{
+		var oEditorApi = this.LogicDocument.Get_Api();
+		oEditorApi.sync_BeginCatchRevisionsChanges();
+		oEditorApi.sync_EndCatchRevisionsChanges();
+	}
+
     this.VisibleChanges = [];
 };
 CTrackRevisionsManager.prototype.Add_VisibleChange = function(Change)

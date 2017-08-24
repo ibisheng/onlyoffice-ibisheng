@@ -694,8 +694,8 @@ function CEditorPage(api)
 			var _buttonsContent = "";
 			_buttonsContent += "<label class=\"block_elem_no_select\" id=\"dem_id_time\" style=\"color:#666666;text-shadow: none;white-space: nowrap;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; position:absolute; left:10px; bottom: 7px;\">00:00:00</label>";
 			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_play\" style=\"left: 60px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-play back_image_buttons\" id=\"dem_id_play_span\" style=\"width:100%;height:100%;\"></span></button>";
-			_buttonsContent += "<button class=\"btn-text-default\"     id=\"dem_id_reset\" style=\"left: 85px; bottom: 3px; \">Reset</button>";
-			_buttonsContent += "<button class=\"btn-text-default\"     id=\"dem_id_end\" style=\"right: 10px; bottom: 3px; \">End slideshow</button>";
+			_buttonsContent += ("<button class=\"btn-text-default\"     id=\"dem_id_reset\" style=\"left: 85px; bottom: 3px; \">" + this.reporterTranslates[0] + "</button>");
+			_buttonsContent += ("<button class=\"btn-text-default\"     id=\"dem_id_end\" style=\"right: 10px; bottom: 3px; \">" + this.reporterTranslates[2] + "</button>");
 
 			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_prev\"  style=\"left: 150px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-prev back_image_buttons\" style=\"width:100%;height:100%;\"></span></button>";
 			_buttonsContent += "<button class=\"btn-text-default-img\" id=\"dem_id_next\"  style=\"left: 170px; bottom: 3px; width: 20px; height: 20px;\"><span class=\"btn-next back_image_buttons\" style=\"width:100%;height:100%;\"></span></button>";
@@ -2420,9 +2420,6 @@ function CEditorPage(api)
 	{
 		oThis.m_oApi.checkLastWork();
 
-		if (oThis.m_oApi.isReporterMode)
-			AscCommon.stopEvent(e);
-
 		if (oThis.m_oApi.isLongAction())
 		{
 			e.preventDefault();
@@ -2895,11 +2892,7 @@ function CEditorPage(api)
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
 
-				if (this.m_bIsRuler)
-				{
-					this.UpdateHorRulerBack(true);
-					this.UpdateVerRulerBack(true);
-				}
+				this.FullRulersUpdate();
 				return;
 			}
 		}
@@ -2910,26 +2903,10 @@ function CEditorPage(api)
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
 
-				if (this.m_bIsRuler)
-				{
-					this.UpdateHorRulerBack(true);
-					this.UpdateVerRulerBack(true);
-				}
+				this.FullRulersUpdate();
 				return;
 			}
 		}
-
-		this.m_bIsUpdateHorRuler = true;
-		this.m_bIsUpdateVerRuler = true;
-
-		if (this.m_bIsRuler)
-		{
-			this.UpdateHorRulerBack(true);
-			this.UpdateVerRulerBack(true);
-		}
-
-		this.m_oHorRuler.RepaintChecker.BlitAttack = true;
-		this.m_oVerRuler.RepaintChecker.BlitAttack = true;
 
 		this.Thumbnails.m_bIsUpdate = true;
 		this.CalculateDocumentSize();
@@ -2949,6 +2926,23 @@ function CEditorPage(api)
 
 		if (this.IsSupportNotes && this.m_oNotesApi)
 			this.m_oNotesApi.OnResize();
+
+		this.FullRulersUpdate();
+	};
+
+	this.FullRulersUpdate = function()
+	{
+		this.m_oHorRuler.RepaintChecker.BlitAttack = true;
+		this.m_oVerRuler.RepaintChecker.BlitAttack = true;
+
+		this.m_bIsUpdateHorRuler = true;
+		this.m_bIsUpdateVerRuler = true;
+
+		if (this.m_bIsRuler)
+		{
+			this.UpdateHorRulerBack(true);
+			this.UpdateVerRulerBack(true);
+		}
 	};
 
 	this.OnResizeReporter = function()
@@ -3016,6 +3010,8 @@ function CEditorPage(api)
 			{
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
+
+				this.FullRulersUpdate();
 				return;
 			}
 		}
@@ -3025,6 +3021,8 @@ function CEditorPage(api)
 			{
 				this.m_oBoundsController.ClearNoAttack();
 				this.onTimerScroll_sync();
+
+				this.FullRulersUpdate();
 				return;
 			}
 		}
@@ -3049,6 +3047,8 @@ function CEditorPage(api)
 
 		if (this.IsSupportNotes && this.m_oNotesApi)
 			this.m_oNotesApi.OnResize();
+
+		this.FullRulersUpdate();
 	};
 
 	this.checkNeedRules     = function()

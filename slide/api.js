@@ -1953,7 +1953,7 @@ background-repeat: no-repeat;\
 		}
 	};
 	asc_docs_api.prototype._autoSave = function () {
-		if ((this.canUnlockDocument || this.autoSaveGap != 0) && !this.isViewMode) {
+		if ((this.canUnlockDocument || this.autoSaveGap != 0) && !this.isViewMode && this.canSave) {
 			var _curTime = new Date().getTime();
 			if (-1 === this.lastSaveTime) {
 				this.lastSaveTime = _curTime;
@@ -6034,11 +6034,13 @@ background-repeat: no-repeat;\
 				case "pause":
 				{
 					_this.WordControl.DemonstrationManager.Pause();
+					_this.sendEvent("asc_onDemonstrationStatus", "pause");
 					break;
 				}
 				case "play":
 				{
 					_this.WordControl.DemonstrationManager.Play();
+					_this.sendEvent("asc_onDemonstrationStatus", "play");
 					break;
 				}
 				case "resize":
@@ -6127,7 +6129,7 @@ background-repeat: no-repeat;\
 			}
 			else if (undefined !== _obj["mouseUp"])
 			{
-				_this.WordControl.DemonstrationManager.onMouseUp({});
+				_this.WordControl.DemonstrationManager.onMouseUp({}, true);
 			}
 			else if (undefined !== _obj["mouseWhell"])
 			{
@@ -7348,6 +7350,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_SetFastCollaborative']            = asc_docs_api.prototype.asc_SetFastCollaborative;
 	asc_docs_api.prototype['asc_isOffline']                       = asc_docs_api.prototype.asc_isOffline;
 	asc_docs_api.prototype['asc_getUrlType']                      = asc_docs_api.prototype.asc_getUrlType;
+	asc_docs_api.prototype['asc_getSessionToken']                 = asc_docs_api.prototype.asc_getSessionToken;
 	asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"] = asc_docs_api.prototype.asc_setInterfaceDrawImagePlaceShape;
 	asc_docs_api.prototype["asc_nativeInitBuilder"]               = asc_docs_api.prototype.asc_nativeInitBuilder;
 	asc_docs_api.prototype["asc_SetSilentMode"]                   = asc_docs_api.prototype.asc_SetSilentMode;

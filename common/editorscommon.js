@@ -51,7 +51,7 @@
 
 	var c_oAscFileType = Asc.c_oAscFileType;
 
-	if (typeof String.prototype.startsWith != 'function')
+	if (typeof String.prototype.startsWith !== 'function')
 	{
 		String.prototype.startsWith = function (str)
 		{
@@ -132,9 +132,9 @@
 		return false;
 	};
 
-	if (typeof require === "function" && !window["XRegExp"])
+	if (typeof require === 'function' && !window['XRegExp'])
 	{
-		window["XRegExp"] = require("xregexp");
+		window['XRegExp'] = require('xregexp');
 	}
 
 	var oZipImages = null;
@@ -142,6 +142,19 @@
 	var sUploadServiceLocalUrl = "../../../../upload";
 	var sUploadServiceLocalUrlOld = "../../../../uploadold";
 	var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
+
+	function getSockJs()
+	{
+		return window['SockJS'] || require('sockjs');
+	}
+	function getJSZipUtils()
+	{
+		return window['JSZipUtils'] || require('jsziputils');
+	}
+	function getJSZip()
+	{
+		return window['JSZip'] || require('jszip');
+	}
 
 	function getBaseUrl()
 	{
@@ -427,7 +440,7 @@
 		if (changesUrl)
 		{
 			oZipImages = {};
-			require('jsziputils').getBinaryContent(changesUrl, function (err, data)
+			getJSZipUtils().getBinaryContent(changesUrl, function (err, data)
 			{
 				if (err)
 				{
@@ -438,7 +451,7 @@
 				}
 
 				oResult.changes = [];
-				require('jszip').loadAsync(data).then(function (zipChanges)
+				getJSZip().loadAsync(data).then(function (zipChanges)
 				{
 					var relativePaths = [];
 					var promises = [];
@@ -3059,6 +3072,9 @@
 
 	//------------------------------------------------------------export---------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
+	window["AscCommon"].getSockJs = getSockJs;
+	window["AscCommon"].getJSZipUtils = getJSZipUtils;
+	window["AscCommon"].getJSZip = getJSZip;
 	window["AscCommon"].getBaseUrl = getBaseUrl;
 	window["AscCommon"].getEncodingParams = getEncodingParams;
 	window["AscCommon"].saveWithParts = saveWithParts;

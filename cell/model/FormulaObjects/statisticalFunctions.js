@@ -66,11 +66,11 @@
 		cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T,
 		cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM,
 		cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV,
-		cFORECAST, cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV,
-		cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
-		cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN,
-		cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
-		cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
+		cFORECAST, cFORECAST_ETS, cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV,
+		cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT,
+		cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN,
+		cMIN, cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST,
+		cNORMINV, cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
 		cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON,
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
 		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
@@ -3734,6 +3734,272 @@
 		}
 
 		return this.value = forecast(arg0, arr0, arr1);
+
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cFORECAST_ETS() {
+		this.name = "FORECAST.ETS";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cFORECAST_ETS.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_ETS.prototype.constructor = cFORECAST_ETS;
+	cFORECAST_ETS.prototype.argumentsMin = 3;
+	cFORECAST_ETS.prototype.argumentsMax = 6;
+	cFORECAST_ETS.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [null, cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cNumber(1);
+		argClone[4] = argClone[4] ? argClone[4].tocNumber() : new cNumber(1);
+		argClone[5] = argClone[5] ? argClone[5].tocNumber() : new cNumber(1);
+
+		var calcFunc = function(argArray){
+
+			var pTMat = argArray[0];
+			var pMatY = argArray[1];
+			var pMatX = argArray[2];
+			var nSmplInPrd = argArray[3];
+			var bDataCompletion = argArray[4];
+			var nAggregation = argArray[5];
+
+			if ( !pMatX || !pMatY ) {
+				return new cError(cErrorType.wrong_value_type);
+			}
+
+			var nCX = pMatX.length;
+			var nCY = pMatY.length;
+			var nRX = pMatX[0].length;
+			var nRY = pMatY[0].length;
+
+			if (nRX !== nRY || nCX !== nCY) {
+				return new cError(cErrorType.wrong_value_type);
+			}
+
+			if (Math.fmod(nSmplInPrd, 1.0) !== 0 || nSmplInPrd < 0.0) {
+				return new cError(cErrorType.wrong_value_type);
+			}
+
+			// maRange needs to be sorted by X
+			var mnCount = pMatX.length;
+			var maRange = [];
+			for ( var i = 0; i < mnCount; i++ ){
+				maRange.push( {X: pMatX[i][0].value, Y: pMatY[i][0].value } );
+			}
+
+			maRange.sort(function(a, b) {
+				return a.X - b.X;
+			});
+
+			if (pTMat) {
+				if (pTMat[0] < maRange[0].X) {
+					return new cError(cErrorType.wrong_value_type);
+				}
+			}
+
+			/*// Month intervals don't have exact stepsize, so first
+			// detect if month interval is used.
+			// Method: assume there is an month interval and verify.
+			// If month interval is used, replace maRange.X with month values
+			// for ease of calculations.
+
+			Date aNullDate = *( mpFormatter->GetNullDate() );
+			 Date aDate = aNullDate + static_cast< long >( maRange[ 0 ].X );
+			 mnMonthDay = aDate.GetDay();
+			 for ( SCSIZE i = 1; i < mnCount && mnMonthDay; i++ )
+			 {
+			 Date aDate1 = aNullDate + static_cast< long >( maRange[ i ].X );
+			 if ( aDate != aDate1 )
+			 {
+			 if ( aDate1.GetDay() != mnMonthDay )
+			 mnMonthDay = 0;
+			 }
+			 }
+
+			var aNullDate = ;
+			var mnMonthDay = 1;
+
+			 mfStepSize = ::std::numeric_limits<double>::max();
+			 if ( mnMonthDay )
+			 {
+			 for ( SCSIZE i = 0; i < mnCount; i++ )
+			 {
+			 aDate = aNullDate + static_cast< long >( maRange[ i ].X );
+			 maRange[ i ].X = aDate.GetYear() * 12 + aDate.GetMonth();
+			 }
+			 }*/
+
+			var mfStepSize = Number.MAX_VALUE;
+			for ( var i = 1; i < mnCount; i++ ) {
+
+
+
+				var fStep = maRange[ i ].X - maRange[ i - 1 ].X;
+				if ( fStep === 0.0 ) {
+					if (nAggregation === 0) {
+						return new cError(cErrorType.wrong_value_type);
+					}
+
+					var fTmp = maRange[i - 1].Y;
+					var nCounter = 1;
+					switch (nAggregation) {
+						case 1 : // AVERAGE (default)
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								maRange.splice(i, 1);
+								--mnCount;
+							}
+							break;
+						case 7 : // SUM
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								fTmp += maRange[i].Y;
+								maRange.splice(i, 1);
+								--mnCount;
+							}
+							maRange[i - 1].Y = fTmp;
+							break;
+
+						case 2 : // COUNT
+						case 3 : // COUNTA (same as COUNT as there are no non-numeric Y-values)
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								nCounter++;
+								maRange.splice(i, 1);
+								--mnCount;
+							}
+							maRange[i - 1].Y = nCounter;
+							break;
+
+						case 4 : // MAX
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								if (maRange[i].Y > fTmp) {
+									fTmp = maRange[i].Y;
+								}
+								maRange.splice(i, 1);
+								--mnCount;
+							}
+							maRange[i - 1].Y = fTmp;
+							break;
+
+						case 5 : // MEDIAN
+
+							var aTmp = [];
+							aTmp.push(maRange[i - 1].Y);
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								aTmp.push(maRange[i].Y);
+								nCounter++;
+								maRange.splice(i, 1);
+								--mnCount;
+							}
+
+							//sort( aTmp.begin(), aTmp.end() );
+
+							if (nCounter % 2) {
+								maRange[i - 1].Y = aTmp[nCounter / 2];
+							} else {
+								maRange[i - 1].Y = ( aTmp[nCounter / 2] + aTmp[nCounter / 2 - 1] ) / 2.0;
+							}
+
+							break;
+
+						case 6 : // MIN
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								if (maRange[i].Y < fTmp) {
+									fTmp = maRange[i].Y;
+								}
+								maRange.splice(i, 1);
+								--mnCount;
+							}
+							maRange[i - 1].Y = fTmp;
+							break;
+					}
+
+					if ( i < mnCount - 1 ){
+						fStep = maRange[ i ].X - maRange[ i - 1 ].X;
+					}else{
+						fStep = mfStepSize;
+					}
+				}
+
+				if ( fStep > 0 && fStep < mfStepSize ){
+					mfStepSize = fStep;
+				}
+
+			}
+
+			// step must be constant (or gap multiple of step)
+			/*var bHasGap = false;
+			for (var i = 1; i < mnCount && !bHasGap; i++) {
+				var fStep = maRange[i].X - maRange[i - 1].X;
+
+				if (fStep != mfStepSize) {
+					if (Math.fmod(fStep, mfStepSize) !== 0.0) {
+						return new cError(cErrorType.wrong_value_type);
+					}
+					bHasGap = true;
+				}
+			}*/
+
+
+			/*if ( bHasGap )
+			{
+				var nMissingXCount = 0;
+				var fOriginalCount = mnCount;
+				if ( mnMonthDay )
+					aDate = aNullDate + static_cast< long >( maRange[ 0 ].X );
+				for ( var i = 1; i < mnCount; i++ )
+				{
+					double fDist;
+					if ( mnMonthDay )
+					{
+						Date aDate1 = aNullDate + static_cast< long >( maRange[ i ].X );
+						fDist = 12 * ( aDate1.GetYear() - aDate.GetYear() ) +
+							( aDate1.GetMonth() - aDate.GetMonth() );
+						aDate = aDate1;
+					}
+					else
+						fDist = maRange[ i ].X - maRange[ i - 1 ].X;
+					if ( fDist > mfStepSize )
+					{
+						// gap, insert missing data points
+						var fYGap = ( maRange[ i ].Y + maRange[ i - 1 ].Y ) / 2.0;
+						for ( var fXGap = maRange[ i - 1].X + mfStepSize;  fXGap < maRange[ i ].X; fXGap += mfStepSize )
+						{
+							maRange.insert( maRange.begin() + i, DataPoint( fXGap, ( bDataCompletion ? fYGap : 0.0 ) ) );
+							i++;
+							mnCount++;
+							nMissingXCount++;
+							if ( static_cast< double >( nMissingXCount ) / fOriginalCount > 0.3 )
+							{
+								// maximum of 30% missing points exceeded
+								mnErrorValue = FormulaError::NoValue;
+								return false;
+							}
+						}
+					}
+				}
+			}
+
+			if ( rSmplInPrd != 1 )
+				mnSmplInPrd = rSmplInPrd;
+			else
+			{
+				mnSmplInPrd = CalcPeriodLen();
+				if ( mnSmplInPrd == 1 )
+					bEDS = true; // period length 1 means no periodic data: EDS suffices
+			}*/
+
+
+
+			return new cNumber(1);
+		};
+
+
+		return this.value = this._findArrayInNumberArguments(oArguments, calcFunc);
 
 	};
 

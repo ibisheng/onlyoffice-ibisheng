@@ -2739,7 +2739,7 @@ StyleManager.prototype =
 	_setAlignProperty : function(oItemWithXfs, val, prop, getFunc, setFunc)
 	{
 		var xfs = oItemWithXfs.xfs;
-		var oRes = {newVal: val, oldVal: xfs && xfs.align ? getFunc.call(xfs.align): null};
+		var oRes = {newVal: val, oldVal: xfs && xfs.align ? getFunc.call(xfs.align): getFunc.call(g_oDefaultFormat.Align)};
 		xfs = this._initXf(oItemWithXfs);
 		var xfsOperationCache = xfs;
 		var newXf = xfs.getOperationCache(prop, val);

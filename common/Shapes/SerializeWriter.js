@@ -3067,7 +3067,26 @@ function CBinaryFileWriter()
             //важно писать в начале
             oThis.WriteRecord1(4, image, oThis.WriteOleInfo);
         } else {
-            oThis.StartRecord(2);
+            var _type;
+            var bMedia = false, _fileMask;
+            if(image.nvPicPr && image.nvPicPr.nvPr && image.nvPicPr.nvPr.unimedia && image.nvPicPr.nvPr.unimedia.type !== null
+                && typeof image.nvPicPr.nvPr.unimedia.media === "string" && image.nvPicPr.nvPr.unimedia.media.length > 0){
+                _type = image.nvPicPr.nvPr.unimedia.type;
+                _fileMask = image.nvPicPr.nvPr.unimedia.media;
+                bMedia = true;
+            }
+            else{
+                _type = 2;
+            }
+            oThis.StartRecord(_type);
+            if(bMedia){
+                oThis.WriteRecord1(5, null, function(){
+                    oThis.WriteUChar(g_nodeAttributeStart);
+                    oThis._WriteString1(0, _fileMask);
+                    oThis.WriteUChar(g_nodeAttributeEnd);
+                });
+            }
+
         }
 
 
@@ -4971,12 +4990,31 @@ function CBinaryFileWriter()
             var _writer = this.BinaryFileWriter;
 
             var isOle = AscDFH.historyitem_type_OleObject == image.getObjectType();
+            var _type, _fileMask;
             if(isOle){
                 _writer.StartRecord(6);
                 //важно писать в начале
                 _writer.WriteRecord1(4, image, _writer.WriteOleInfo);
             } else {
-                _writer.StartRecord(2);
+                var _type;
+                var bMedia = false;
+                if(image.nvPicPr && image.nvPicPr.nvPr && image.nvPicPr.nvPr.unimedia && image.nvPicPr.nvPr.unimedia.type !== null
+                && typeof image.nvPicPr.nvPr.unimedia.media === "string" && image.nvPicPr.nvPr.unimedia.media.length > 0){
+                    _type = image.nvPicPr.nvPr.unimedia.type;
+                    _fileMask = image.nvPicPr.nvPr.unimedia.media;
+                    bMedia = true;
+                }
+                else{
+                    _type = 2;
+                }
+                _writer.StartRecord(_type);
+                if(bMedia){
+                    _writer.WriteRecord1(5, null, function(){
+                        _writer.WriteUChar(g_nodeAttributeStart);
+                        _writer._WriteString2(0, _fileMask);
+                        _writer.WriteUChar(g_nodeAttributeEnd);
+                    });
+                }
             }
             _writer.WriteRecord1(0, {locks: image.locks, objectType: image.getObjectType()}, _writer.WriteUniNvPr);
 

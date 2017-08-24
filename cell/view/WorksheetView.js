@@ -773,6 +773,7 @@
             t._updateVisibleColsCount();
             if (t.objectRender) {
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.ColumnResize, col: col});
+				t.objectRender.rebuildChartGraphicObjects([new asc_Range(col, 0, col, gc_nMaxRow0)]);
             }
         };
         this._isLockedAll(onChangeWidthCallback);
@@ -819,6 +820,7 @@
             t._updateVisibleRowsCount();
             if (t.objectRender) {
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
+				t.objectRender.rebuildChartGraphicObjects([new asc_Range(0, row, gc_nMaxCol0, row)]);
             }
         };
 
@@ -6785,8 +6787,8 @@
 
         cell_info.text = c.getValueForEdit();
 
-		cell_info.halign = AscCommonExcel.horizontalAlignToString(align.getAlignHorizontal());
-		cell_info.valign = AscCommonExcel.verticalAlignToString(align.getAlignVertical());
+		cell_info.halign = align.getAlignHorizontal();
+		cell_info.valign = align.getAlignVertical();
 
         var tablePartsOptions = selectionRange.isSingleRange() ?
           this.model.autoFilters.searchRangeInTableParts(selectionRange.getLast()) : -2;
@@ -6991,8 +6993,8 @@
 
             }
 
-            objectInfo.halign = AscCommonExcel.horizontalAlignToString(horAlign);
-            objectInfo.valign = AscCommonExcel.verticalAlignToString(vertAlign);
+            objectInfo.halign = horAlign;
+            objectInfo.valign = vertAlign;
             objectInfo.angle = angle;
 
             objectInfo.font = new asc_CFont();
@@ -9385,7 +9387,7 @@
 			{
 				var table = tables[0];
 				var styleInfo = table.TableStyleInfo;
-				var styleForCurTable = t.model.workbook.TableStyles.AllStyles[styleInfo.Name];
+				var styleForCurTable = styleInfo ? t.model.workbook.TableStyles.AllStyles[styleInfo.Name] : null;
 
 				if (activeCellsPasteFragment.containsRange(table.Ref))
 				{
@@ -9408,7 +9410,7 @@
 					totalsRowCount = table.TotalsRowCount;
 				}
 
-				var bbox = new Asc.Range(0, 0, table.Ref.c2 - table.Ref.c1, table.Ref.r2 - table.Ref.r1);
+				var bbox = new Asc.Range(table.Ref.c1, table.Ref.r1, table.Ref.c2, table.Ref.r2);
 				styleForCurTable.initStyle(val.sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
                 val._getCell(pasteRow, pasteCol, function(cell) {
                     if (cell)
@@ -9500,11 +9502,11 @@
 			}
 
 			var tableDxf = getTableDxf(pasteRow, pasteCol, newVal);
-			if(tableDxf.blocalArea)
+			if(tableDxf && tableDxf.blocalArea)
 			{
 				pastedRangeProps.tableDxfLocal = tableDxf.dxf;
 			}
-			else
+			else if(tableDxf)
 			{
 				pastedRangeProps.tableDxf = tableDxf.dxf;
 			}

@@ -798,9 +798,9 @@ CBlockLevelSdt.prototype.GetPrevElementEndInfo = function()
 {
 	return this.Parent.GetPrevElementEndInfo(this);
 };
-CBlockLevelSdt.prototype.Get_EndInfo = function()
+CBlockLevelSdt.prototype.GetEndInfo = function()
 {
-	return this.Content.Get_EndInfo();
+	return this.Content.GetEndInfo();
 };
 CBlockLevelSdt.prototype.Is_UseInDocument = function(Id)
 {

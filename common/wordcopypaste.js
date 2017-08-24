@@ -2279,8 +2279,9 @@ PasteProcessor.prototype =
 			//SpecialPasteButtonById_Show вызываю здесь, если пересчет документа завершился раньше, чем мы попали сюда и сгенерировали параметры вставки
 			//в противном случае вызываю SpecialPasteButtonById_Show в drawingDocument->OnEndRecalculate
 			//TODO пересмотреть проверку на CDrawingDocContent и CShape
-			if(window['AscCommon'].g_clipboardBase.endRecalcDocument || (this.oDocument.Parent && this.oDocument.Parent instanceof CShape) || (this.oDocument instanceof AscFormat.CDrawingDocContent))
-			{
+			if (window['AscCommon'].g_clipboardBase.endRecalcDocument || (this.oDocument.Parent &&
+				(this.oDocument.Parent instanceof CShape || this.oDocument.Parent instanceof CHeaderFooter)) ||
+				(this.oDocument instanceof AscFormat.CDrawingDocContent)) {
 				window['AscCommon'].g_clipboardBase.SpecialPasteButtonById_Show();
 			}
 		}
@@ -2401,11 +2402,11 @@ PasteProcessor.prototype =
 
 				if(pasteIntoParagraphPr)
 				{
-					paragraph.Set_Pr(pasteIntoParagraphPr);
+					paragraph.Set_Pr(pasteIntoParagraphPr.Copy());
 
 					if(paragraph.TextPr && pasteIntoParaRunPr)
 					{
-						paragraph.TextPr.Value = pasteIntoParaRunPr;
+						paragraph.TextPr.Value = pasteIntoParaRunPr.Copy();
 					}
 				}
 				this._specialPasteParagraphContentConvert(paragraph.Content, pasteIntoParaRunPr);
@@ -2480,7 +2481,7 @@ PasteProcessor.prototype =
 								//проверить, есть ли внутри изображение
 								if(pasteIntoParaRunPr && elem.Set_Pr)
 								{
-									elem.Set_Pr( pasteIntoParaRunPr );
+									elem.Set_Pr( pasteIntoParaRunPr.Copy() );
 								}
 
 								checkInsideDrawings(elem.Content);
@@ -6765,7 +6766,7 @@ PasteProcessor.prototype =
         if(null != style)
         {
             res = new CDocumentBorder();
-            if("none" === style)
+            if("none" === style || "" === style)
                 res.Value = border_None;
             else
             {

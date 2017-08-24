@@ -60,6 +60,8 @@
         this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
         this.kind = AscFormat.TYPE_KIND.NOTES;
         this.Id = AscCommon.g_oIdCounter.Get_NewId();
+
+        this.Lock = new AscCommon.CLock();
         AscCommon.g_oTableId.Add(this, this.Id);
 
 

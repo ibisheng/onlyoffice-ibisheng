@@ -6878,6 +6878,18 @@ $( function () {
 		ok( oParser.parse() );
 		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0154324 );
 
+		oParser = new parserFormula( 'CONVERT(1, "lbm", "kg")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.4535923 );
+
+		oParser = new parserFormula( 'CONVERT(1, "lbm", "mg")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(0) - 0, 453592 );
+
+		oParser = new parserFormula( 'CONVERT(1, "klbm", "mg")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#N/A" );
+
 	} );
 
     test( "Test: \"PRICE\"", function () {

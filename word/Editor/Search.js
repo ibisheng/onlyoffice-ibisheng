@@ -286,7 +286,7 @@ CDocument.prototype.Search_Select = function(Id)
     this.Document_UpdateSelectionState();
     this.Document_UpdateRulersState();
 };
-CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
+CDocument.prototype.Search_Replace = function(NewStr, bAll, Id, bInterfaceEvent)
 {
     var bResult = false;
 
@@ -340,13 +340,13 @@ CDocument.prototype.Search_Replace = function(NewStr, bAll, Id)
 
         bResult = true;
 
-        if ( true === bAll )
-            editor.sync_ReplaceAllCallback(AllCount, AllCount);
+		if (true === bAll && false !== bInterfaceEvent)
+			editor.sync_ReplaceAllCallback(AllCount, AllCount);
     }
     else
     {
-        if ( true === bAll )
-            editor.sync_ReplaceAllCallback(0, AllCount);
+		if (true === bAll && false !== bInterfaceEvent)
+			editor.sync_ReplaceAllCallback(0, AllCount);
     }
 
     this.Document_UpdateInterfaceState();

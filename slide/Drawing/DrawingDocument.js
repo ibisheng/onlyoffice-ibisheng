@@ -3879,7 +3879,7 @@ function CThumbnailsManager()
 		if (oThis.IsMouseDownTrack)
 		{
 			// это трек для перекидывания слайдов
-			if (oThis.IsMouseDownTrackSimple)
+			if (oThis.IsMouseDownTrackSimple && !oThis.m_oWordControl.m_oApi.isViewMode)
 			{
 				if (Math.abs(oThis.MouseDownTrackX - global_mouseEvent.X) > 10 || Math.abs(oThis.MouseDownTrackY - global_mouseEvent.Y) > 10)
 					oThis.IsMouseDownTrackSimple = false;
