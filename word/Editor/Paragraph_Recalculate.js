@@ -3158,8 +3158,8 @@ function CParagraphRecalculateStateAlign()
 
 function CParagraphRecalculateStateInfo()
 {
-    this.Comments = [];
-    this.Fields   = [];
+    this.Comments      = [];
+    this.ComplexFields = [];
 }
 CParagraphRecalculateStateInfo.prototype.Reset = function(PrevInfo)
 {
@@ -3207,26 +3207,26 @@ CParagraphRecalculateStateInfo.prototype.ProcessFieldChar = function(oFieldChar)
 
 	if (oFieldChar.IsBegin())
 	{
-		this.Fields.push(new CComplexFieldStatePos(oComplexField, true));
+		this.ComplexFields.push(new CComplexFieldStatePos(oComplexField, true));
 	}
 	else if (oFieldChar.IsSeparate())
 	{
-		for (var nIndex = 0, nCount = this.Fields.length; nIndex < nCount; ++nIndex)
+		for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
 		{
-			if (oComplexField === this.Fields[nIndex].Field)
+			if (oComplexField === this.ComplexFields[nIndex].Field)
 			{
-				this.Fields[nIndex].SetFieldCode(false);
+				this.ComplexFields[nIndex].SetFieldCode(false);
 				break;
 			}
 		}
 	}
 	else if (oFieldChar.IsEnd())
 	{
-		for (var nIndex = 0, nCount = this.Fields.length; nIndex < nCount; ++nIndex)
+		for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
 		{
-			if (oComplexField === this.Fields[nIndex].Field)
+			if (oComplexField === this.ComplexFields[nIndex].Field)
 			{
-				this.Fields.splice(nIndex, 1);
+				this.ComplexFields.splice(nIndex, 1);
 				break;
 			}
 		}
