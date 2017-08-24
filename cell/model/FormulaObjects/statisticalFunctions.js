@@ -3829,99 +3829,165 @@
 			 }
 			 }*/
 
+			var mfStepSize = Number.MAX_VALUE;
+			for ( var i = 1; i < mnCount; i++ ) {
 
-			/*for ( var i = 1; i < mnCount; i++ )
-			{
+
+
 				var fStep = maRange[ i ].X - maRange[ i - 1 ].X;
-				if ( fStep === 0.0 )
-				{
-					if ( nAggregation === 0 )
-					{
+				if ( fStep === 0.0 ) {
+					if (nAggregation === 0) {
 						return new cError(cErrorType.wrong_value_type);
 					}
 
-					var fTmp = maRange[ i - 1 ].Y;
+					var fTmp = maRange[i - 1].Y;
 					var nCounter = 1;
-					switch ( nAggregation )
-					{
+					switch (nAggregation) {
 						case 1 : // AVERAGE (default)
-							while ( i < mnCount && maRange[ i ].X === maRange[ i - 1 ].X )
-							{
-								maRange.erase( maRange.begin() + i );
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								maRange.splice(i, 1);
 								--mnCount;
 							}
 							break;
 						case 7 : // SUM
-							while ( i < mnCount && maRange[ i ].X === maRange[ i - 1 ].X )
-							{
-								fTmp += maRange[ i ].Y;
-								maRange.erase( maRange.begin() + i );
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								fTmp += maRange[i].Y;
+								maRange.splice(i, 1);
 								--mnCount;
 							}
-							maRange[ i - 1 ].Y = fTmp;
+							maRange[i - 1].Y = fTmp;
 							break;
 
 						case 2 : // COUNT
 						case 3 : // COUNTA (same as COUNT as there are no non-numeric Y-values)
-							while ( i < mnCount && maRange[ i ].X === maRange[ i - 1 ].X )
-							{
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
 								nCounter++;
-								maRange.erase( maRange.begin() + i );
+								maRange.splice(i, 1);
 								--mnCount;
 							}
-							maRange[ i - 1 ].Y = nCounter;
+							maRange[i - 1].Y = nCounter;
 							break;
 
 						case 4 : // MAX
-							while ( i < mnCount && maRange[ i ].X === maRange[ i - 1 ].X )
-							{
-								if ( maRange[ i ].Y > fTmp )
-									fTmp = maRange[ i ].Y;
-								maRange.erase( maRange.begin() + i );
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								if (maRange[i].Y > fTmp) {
+									fTmp = maRange[i].Y;
+								}
+								maRange.splice(i, 1);
 								--mnCount;
 							}
-							maRange[ i - 1 ].Y = fTmp;
+							maRange[i - 1].Y = fTmp;
 							break;
 
 						case 5 : // MEDIAN
-						{
-							std::vector< double > aTmp;
-							aTmp.push_back( maRange[ i - 1 ].Y );
-							while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
-							{
-								aTmp.push_back( maRange[ i ].Y );
+
+							var aTmp = [];
+							aTmp.push(maRange[i - 1].Y);
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								aTmp.push(maRange[i].Y);
 								nCounter++;
-								maRange.erase( maRange.begin() + i );
+								maRange.splice(i, 1);
 								--mnCount;
 							}
-							sort( aTmp.begin(), aTmp.end() );
 
-							if ( nCounter % 2 )
-								maRange[ i - 1 ].Y = aTmp[ nCounter / 2 ];
-							else
-								maRange[ i - 1 ].Y = ( aTmp[ nCounter / 2 ] + aTmp[ nCounter / 2 - 1 ] ) / 2.0;
-						}
+							//sort( aTmp.begin(), aTmp.end() );
+
+							if (nCounter % 2) {
+								maRange[i - 1].Y = aTmp[nCounter / 2];
+							} else {
+								maRange[i - 1].Y = ( aTmp[nCounter / 2] + aTmp[nCounter / 2 - 1] ) / 2.0;
+							}
+
 							break;
 
 						case 6 : // MIN
-							while ( i < mnCount && maRange[ i ].X === maRange[ i - 1 ].X )
-							{
-								if ( maRange[ i ].Y < fTmp )
-									fTmp = maRange[ i ].Y;
-								maRange.erase( maRange.begin() + i );
+							while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+								if (maRange[i].Y < fTmp) {
+									fTmp = maRange[i].Y;
+								}
+								maRange.splice(i, 1);
 								--mnCount;
 							}
-							maRange[ i - 1 ].Y = fTmp;
+							maRange[i - 1].Y = fTmp;
 							break;
 					}
-					if ( i < mnCount - 1 )
+
+					if ( i < mnCount - 1 ){
 						fStep = maRange[ i ].X - maRange[ i - 1 ].X;
-					else
+					}else{
 						fStep = mfStepSize;
+					}
 				}
-				if ( fStep > 0 && fStep < mfStepSize )
+
+				if ( fStep > 0 && fStep < mfStepSize ){
 					mfStepSize = fStep;
+				}
+
+			}
+
+			// step must be constant (or gap multiple of step)
+			/*var bHasGap = false;
+			for (var i = 1; i < mnCount && !bHasGap; i++) {
+				var fStep = maRange[i].X - maRange[i - 1].X;
+
+				if (fStep != mfStepSize) {
+					if (Math.fmod(fStep, mfStepSize) !== 0.0) {
+						return new cError(cErrorType.wrong_value_type);
+					}
+					bHasGap = true;
+				}
 			}*/
+
+
+			/*if ( bHasGap )
+			{
+				var nMissingXCount = 0;
+				var fOriginalCount = mnCount;
+				if ( mnMonthDay )
+					aDate = aNullDate + static_cast< long >( maRange[ 0 ].X );
+				for ( var i = 1; i < mnCount; i++ )
+				{
+					double fDist;
+					if ( mnMonthDay )
+					{
+						Date aDate1 = aNullDate + static_cast< long >( maRange[ i ].X );
+						fDist = 12 * ( aDate1.GetYear() - aDate.GetYear() ) +
+							( aDate1.GetMonth() - aDate.GetMonth() );
+						aDate = aDate1;
+					}
+					else
+						fDist = maRange[ i ].X - maRange[ i - 1 ].X;
+					if ( fDist > mfStepSize )
+					{
+						// gap, insert missing data points
+						var fYGap = ( maRange[ i ].Y + maRange[ i - 1 ].Y ) / 2.0;
+						for ( var fXGap = maRange[ i - 1].X + mfStepSize;  fXGap < maRange[ i ].X; fXGap += mfStepSize )
+						{
+							maRange.insert( maRange.begin() + i, DataPoint( fXGap, ( bDataCompletion ? fYGap : 0.0 ) ) );
+							i++;
+							mnCount++;
+							nMissingXCount++;
+							if ( static_cast< double >( nMissingXCount ) / fOriginalCount > 0.3 )
+							{
+								// maximum of 30% missing points exceeded
+								mnErrorValue = FormulaError::NoValue;
+								return false;
+							}
+						}
+					}
+				}
+			}
+
+			if ( rSmplInPrd != 1 )
+				mnSmplInPrd = rSmplInPrd;
+			else
+			{
+				mnSmplInPrd = CalcPeriodLen();
+				if ( mnSmplInPrd == 1 )
+					bEDS = true; // period length 1 means no periodic data: EDS suffices
+			}*/
+
+
 
 			return new cNumber(1);
 		};
