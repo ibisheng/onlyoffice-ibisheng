@@ -5177,11 +5177,12 @@ function BinaryPPTYLoader()
                 _object = this.ReadShape();
                 break;
             }
-            case 6:
-            case 2:
-            case 7:
+            case 2://pic
+            case 6://ole
+            case 7://video
+            case 8://audio
             {
-                _object = this.ReadPic(6 === _type);
+                _object = this.ReadPic(_type);
                 break;
             }
             case 3:
@@ -5377,8 +5378,9 @@ function BinaryPPTYLoader()
                             case 6:
                             case 2:
                             case 7:
+                            case 8:
                             {
-                                _object = this.ReadPic(6 === _type);
+                                _object = this.ReadPic(_type);
                                 if (!IsHiddenObj(_object) && _object.spPr && _object.spPr.xfrm)
                                 {
                                     shape.addToSpTree(shape.spTree.length,_object);
@@ -5499,8 +5501,9 @@ function BinaryPPTYLoader()
                             case 6:
                             case 2:
                             case 7:
+                            case 8:
                             {
-                                var _object = this.ReadPic(6 === _type);
+                                var _object = this.ReadPic(_type);
                                 if (!IsHiddenObj(_object))
                                 {
                                     shapes[shapes.length] = _object;
@@ -5560,10 +5563,11 @@ function BinaryPPTYLoader()
     }
 
 
-    this.ReadPic = function(isOle)
+    this.ReadPic = function(type)
     {
         var s = this.stream;
 
+        var isOle = (type === 6);
         var pic = isOle ? new AscFormat.COleObject(this.TempMainObject) : new AscFormat.CImageShape(this.TempMainObject);
 
         pic.setBDeleted(false);
@@ -5571,6 +5575,7 @@ function BinaryPPTYLoader()
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetULong() + 4;
 
+        var sMaskFileName;
         while (s.cur < _end_rec)
         {
             var _at = s.GetUChar();
@@ -5613,6 +5618,30 @@ function BinaryPPTYLoader()
                     }
                     break;
                 }
+                case 5:
+                {
+                    if(type === 7 || type === 8){//video or audio
+                        s.GetLong();
+                        s.GetUChar();//start attributes
+                        while(true)
+                        {
+                            var _at2 = s.GetUChar();
+                            if (_at2 == g_nodeAttributeEnd)
+                                break;
+                            switch (_at2) {
+                                case 0:
+                                {
+                                    sMaskFileName = s.GetString2();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else{
+                        s.SkipRecord();
+                    }
+                    break;
+                }
                 default:
                 {
                     this.stream.SkipRecord();
@@ -5621,6 +5650,15 @@ function BinaryPPTYLoader()
             }
         }
 
+        if(type === 7 || type === 8){//video or audio
+            if(typeof sMaskFileName === "string" && sMaskFileName.length > 0 &&
+                pic.nvPicPr && pic.nvPicPr.nvPr && pic.nvPicPr.nvPr.unimedia){
+                var oUniMedia = new AscFormat.UniMedia();
+                oUniMedia.type = type;
+                oUniMedia.media = sMaskFileName;
+                pic.nvPicPr.nvPr.setUniMedia(oUniMedia);
+            }
+        }
         s.Seek2(_end_rec);
         return pic;
     }
@@ -6994,6 +7032,13 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     nvPr.setPh(this.ReadPH());
+                    break;
+                }
+                case 1:
+                {
+                    nvPr.setUniMedia(new AscFormat.UniMedia());
+                    var _len = s.GetULong();
+                    s.Skip2(_len);
                     break;
                 }
                 default:
@@ -9018,8 +9063,10 @@ function CPres()
                     }
                     case 6:
                     case 2:
+                    case 7:
+                    case 8:
                     {
-                        GrObject = this.ReadPic(6 == _type);
+                        GrObject = this.ReadPic(_type);
                         break;
                     }
                     case 3:
@@ -9487,10 +9534,11 @@ function CPres()
             s.Seek2(_end_rec);
             return shape;
         }
-        this.ReadPic = function(isOle)
+        this.ReadPic = function(type)
         {
             var s = this.stream;
 
+            var isOle = (type === 6);
             var pic = isOle ? new AscFormat.COleObject() : new AscFormat.CImageShape();
             pic.setBDeleted(false);
             pic.setParent(this.TempMainObject == null ? this.ParaDrawing : null);
@@ -9498,6 +9546,7 @@ function CPres()
             var _rec_start = s.cur;
             var _end_rec = _rec_start + s.GetULong() + 4;
 
+            var sMaskFileName = "";
             while (s.cur < _end_rec)
             {
                 var _at = s.GetUChar();
@@ -9546,11 +9595,44 @@ function CPres()
                         }
                         break;
                     }
+                    case 5:
+                    {
+                        if(type === 7 || type === 8){//video or audio
+                            s.GetLong();
+                            s.GetUChar();//start attributes
+                            while(true){
+                                var _at2 = s.GetUChar();
+                                if (_at2 == g_nodeAttributeEnd)
+                                    break;
+                                switch (_at2) {
+                                    case 0:
+                                    {
+                                        sMaskFileName = s.GetString2();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else{
+                            s.SkipRecord();
+                        }
+                        break;
+                    }
                     default:
                     {
                         s.SkipRecord();
                         break;
                     }
+                }
+            }
+
+            if(type === 7 || type === 8){//video or audio
+                if(typeof sMaskFileName === "string" && sMaskFileName.length > 0 &&
+                    pic.nvPicPr && pic.nvPicPr.nvPr && pic.nvPicPr.nvPr.unimedia){
+                    var oUniMedia = new AscFormat.UniMedia();
+                    oUniMedia.type = type;
+                    oUniMedia.media = sMaskFileName;
+                    pic.nvPicPr.nvPr.setUniMedia(oUniMedia);
                 }
             }
 
@@ -9687,8 +9769,9 @@ function CPres()
                                 case 6:
                                 case 2:
                                 case 7:
+                                case 8:
                                 {
-                                    sp = this.ReadPic(6 == _type);
+                                    sp = this.ReadPic(_type);
                                     if(sp.spPr && sp.spPr.xfrm){
                                         sp.setGroup(shape);
                                         shape.addToSpTree(shape.spTree.length, sp);

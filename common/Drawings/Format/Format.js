@@ -148,6 +148,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
         drawingsChangesMap[AscDFH.historyitem_HF_SetHdr         ] = function (oClass, value){oClass.hdr    = value;};
         drawingsChangesMap[AscDFH.historyitem_HF_SetSldNum      ] = function (oClass, value){oClass.sldNum = value;};
         drawingsChangesMap[AscDFH.historyitem_UniNvPr_SetUniSpPr] = function (oClass, value){oClass.nvUniSpPr = value;};
+        drawingsChangesMap[AscDFH.historyitem_NvPr_SetUniMedia] = function (oClass, value){oClass.unimedia = value;};
 
     drawingContentChanges[AscDFH.historyitem_ClrMap_SetClr] = function(oClass){return oClass.color_map};
 
@@ -179,6 +180,7 @@ var asc_CShapeProperty = Asc.asc_CShapeProperty;
     AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetIsPhoto] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetUserDrawn] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetPh] = CChangesDrawingsObject;
+    AscDFH.changesFactory[AscDFH.historyitem_NvPr_SetUniMedia] = CChangesDrawingsObjectNoId;
     AscDFH.changesFactory[AscDFH.historyitem_Ph_SetHasCustomPrompt] = CChangesDrawingsBool;
     AscDFH.changesFactory[AscDFH.historyitem_Ph_SetIdx] = CChangesDrawingsString;
     AscDFH.changesFactory[AscDFH.historyitem_Ph_SetOrient] = CChangesDrawingsLong;
@@ -4689,11 +4691,54 @@ CNvPr.prototype =
     }
 };
 
+
+
+var AUDIO_CD = 0;
+var WAV_AUDIO_FILE = 1;
+var AUDIO_FILE = 2;
+var VIDEO_FILE = 3;
+var QUICK_TIME_FILE = 4;
+
+
+function UniMedia() {
+    this.type = null;
+    this.media = null;
+}
+    UniMedia.prototype.Write_ToBinary = function(w){
+        var bType = this.type !== null && this.type !== undefined;
+        var bMedia = typeof this.media === 'string';
+        var nFlags = 0;
+        bType && (nFlags |= 1);
+        bMedia && (nFlags |= 2);
+        w.WriteLong(nFlags);
+        bType && w.WriteLong(this.type);
+        bMedia && w.WriteString2(this.media);
+    };
+    UniMedia.prototype.Read_FromBinary = function(r){
+        var nFlags = r.GetLong();
+        if(nFlags & 1){
+            this.type = r.GetLong();
+        }
+        if(nFlags & 2){
+            this.media = r.GetString2();
+        }
+    };
+
+    UniMedia.prototype.createDuplicate = function(r){
+        var _ret = new UniMedia();
+        _ret.type = this.type;
+        _ret.media = this.media;
+        return _ret;
+    };
+
+    drawingConstructorsMap[AscDFH.historyitem_NvPr_SetUniMedia                 ] = UniMedia;
+
 function NvPr()
 {
     this.isPhoto = false;
     this.userDrawn = false;
     this.ph = null;
+    this.unimedia = null;
 
 
     this.Id = g_oIdCounter.Get_NewId();
@@ -4732,6 +4777,10 @@ NvPr.prototype =
         this.ph = ph;
     },
 
+    setUniMedia: function(pr){
+        History.Add(new CChangesDrawingsObjectNoId(this, AscDFH.historyitem_NvPr_SetUniMedia, this.unimedia, pr));
+        this.unimedia = pr;
+    },
 
     createDuplicate: function()
     {
@@ -10628,6 +10677,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].CorrectUniColor = CorrectUniColor;
     window['AscFormat'].deleteDrawingBase = deleteDrawingBase;
     window['AscFormat'].CNvUniSpPr = CNvUniSpPr;
+    window['AscFormat'].UniMedia = UniMedia;
 
 
     window['AscFormat'].builder_CreateShape = builder_CreateShape;
@@ -10775,6 +10825,14 @@ function CorrectUniColor(asc_color, unicolor, flag)
     window['AscFormat'].BULLET_TYPE_BULLET_CHAR = BULLET_TYPE_BULLET_CHAR;
     window['AscFormat'].BULLET_TYPE_BULLET_AUTONUM = BULLET_TYPE_BULLET_AUTONUM;
     window['AscFormat'].BULLET_TYPE_BULLET_BLIP = BULLET_TYPE_BULLET_BLIP;
+
+    window['AscFormat'].AUDIO_CD = AUDIO_CD;
+    window['AscFormat'].WAV_AUDIO_FILE = WAV_AUDIO_FILE;
+    window['AscFormat'].AUDIO_FILE = AUDIO_FILE;
+    window['AscFormat'].VIDEO_FILE = VIDEO_FILE;
+    window['AscFormat'].QUICK_TIME_FILE = QUICK_TIME_FILE;
+
+
 
     window['AscFormat'].DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
 })(window);
