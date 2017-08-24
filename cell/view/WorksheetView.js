@@ -773,6 +773,7 @@
             t._updateVisibleColsCount();
             if (t.objectRender) {
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.ColumnResize, col: col});
+				t.objectRender.rebuildChartGraphicObjects([new asc_Range(col, 0, col, gc_nMaxRow0)]);
             }
         };
         this._isLockedAll(onChangeWidthCallback);
@@ -819,6 +820,7 @@
             t._updateVisibleRowsCount();
             if (t.objectRender) {
                 t.objectRender.updateSizeDrawingObjects({target: c_oTargetType.RowResize, row: row});
+				t.objectRender.rebuildChartGraphicObjects([new asc_Range(0, row, gc_nMaxCol0, row)]);
             }
         };
 
@@ -9420,7 +9422,7 @@
 					totalsRowCount = table.TotalsRowCount;
 				}
 
-				var bbox = new Asc.Range(0, 0, table.Ref.c2 - table.Ref.c1, table.Ref.r2 - table.Ref.r1);
+				var bbox = new Asc.Range(table.Ref.c1, table.Ref.r1, table.Ref.c2, table.Ref.r2);
 				styleForCurTable.initStyle(val.sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
 				var cell = val._getCell(pasteRow, pasteCol);
 				if (cell)
