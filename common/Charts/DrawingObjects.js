@@ -2868,7 +2868,7 @@ function DrawingObjects() {
                                                     {
                                                         for(j = range.r1; j <= range.r2; ++j)
                                                         {
-                                                            cell = source_worksheet._getCell(j, k, function(cell) {
+                                                            source_worksheet._getCell(j, k, function(cell) {
                                                                 pt = cache.getPtByIndex(pt_index + j - range.r1);
                                                                 if(pt)
                                                                 {
@@ -2885,7 +2885,7 @@ function DrawingObjects() {
                                                     {
                                                         for(j = range.c1;  j <= range.c2; ++j)
                                                         {
-                                                            cell = source_worksheet._getCell(k, j, function(cell) {
+                                                            source_worksheet._getCell(k, j, function(cell) {
                                                                 pt = cache.getPtByIndex(pt_index + j - range.c1);
                                                                 if(pt)
                                                                 {
@@ -2903,7 +2903,7 @@ function DrawingObjects() {
                                                 {
                                                     for(j = range.c1;  j <= range.c2; ++j)
                                                     {
-                                                        cell = source_worksheet._getCell(range.r1, j, function(cell) {
+                                                        source_worksheet._getCell(range.r1, j, function(cell) {
                                                             pt = cache.getPtByIndex(pt_index);
                                                             if(pt)
                                                             {
@@ -2917,7 +2917,7 @@ function DrawingObjects() {
                                                 {
                                                     for(j = range.r1; j <= range.r2; ++j)
                                                     {
-                                                        cell = source_worksheet._getCell(j, range.c1, function(cell) {
+                                                        source_worksheet._getCell(j, range.c1, function(cell) {
                                                             pt = cache.getPtByIndex(pt_index);
                                                             if(pt)
                                                             {

@@ -2461,11 +2461,7 @@
 				var getElem = function(text, format, isAddSpace, isHyperLink)
 				{
 					var result = null;
-					var value = "";
-					if(null != cell)
-					{
-						value += text;
-					}
+					var value = text;
 					if(isAddSpace)
 					{
 						value += " ";
@@ -2548,7 +2544,7 @@
 				};
 				
 				var n = 0;
-				aContentExcel.foreach(function(cell){
+				aContentExcel._forEachCell(function(cell){
 					var isHyperlink = aContentExcel.getCell3(cell.nRow, cell.nCol).getHyperlink();
 
 					var multiText = cell.getValueMultiText();
@@ -2672,9 +2668,11 @@
 				var res = "";
 				var curRow = -1;
 				worksheet._forEachCell(function(cell) {
-					if (curRow !== cell.nRow && -1 !== curRow) {
+					if (curRow !== cell.nRow) {
+						if (-1 !== curRow) {
+							res += "\n";
+						}
 						curRow = cell.nRow;
-						res += "\n";
 					}
 					res += cell.getValue();
 					res += " ";

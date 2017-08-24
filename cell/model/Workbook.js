@@ -10585,7 +10585,7 @@
 		}
 		return hiddenSum;
 	};
-	HiddenManager.prototype._initHiddenSumRow = function(ws) {
+	HiddenManager.prototype._initHiddenSumRow = function() {
 		var hiddenSum = [];
 		if (this.ws) {
 			var sum = 0;
@@ -10593,7 +10593,7 @@
 				if (row.getHidden()) {
 					sum++;
 				}
-				hiddenSum[row] = sum;
+				hiddenSum[row.getIndex()] = sum;
 			});
 		}
 		return hiddenSum;
