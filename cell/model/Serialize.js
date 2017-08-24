@@ -1567,9 +1567,10 @@
         }
     }
     /** @constructor */
-    function BinarySharedStringsTableWriter(memory, oSharedStrings)
+    function BinarySharedStringsTableWriter(memory, wb, oSharedStrings)
     {
         this.memory = memory;
+		this.wb = wb;
         this.bs = new BinaryCommonWriter(this.memory);
         this.bsw = new BinaryStylesTableWriter(this.memory);
         this.oSharedStrings = oSharedStrings;
@@ -1582,43 +1583,28 @@
         {
             var oThis = this;
             var aSharedStrings = [];
-            for(var i in this.oSharedStrings.strings)
-            {
-                var item = this.oSharedStrings.strings[i];
-                if(null != item.t)
-                    aSharedStrings[item.t.id] = {t: item.t.val};
-                if(null != item.a)
-                {
-                    for(var j = 0, length2 = item.a.length; j < length2; ++j)
-                    {
-                        var oCurText = item.a[j];
-                        aSharedStrings[oCurText.id] = {a: oCurText.val};
-                    }
+			for (var i in this.oSharedStrings.strings) {
+				if (this.oSharedStrings.strings.hasOwnProperty(i)){
+					var from = i - 0;
+					var to = oSharedStrings.strings[i];
+					aSharedStrings[to] = this.wb.sharedStrings.get(from);
                 }
-            }
-            for(var i = 0, length = aSharedStrings.length; i < length; ++i)
-            {
-                var si = aSharedStrings[i];
-                if(null != si)
-                    this.bs.WriteItem(c_oSerSharedStringTypes.Si, function(){oThis.WriteSi(si);});
-            }
+			}
+			for (var i = 0; i < aSharedStrings.length; ++i) {
+				this.bs.WriteItem(c_oSerSharedStringTypes.Si, function(){oThis.WriteSi(aSharedStrings[i]);});
+			}
         };
         this.WriteSi = function(si)
         {
-            var oThis = this;
-            if(null != si.t)
-            {
-                this.memory.WriteByte(c_oSerSharedStringTypes.Text);
-                this.memory.WriteString2(si.t);
-            }
-            else if(null != si.a)
-            {
-                for(var i = 0, length = si.a.length; i < length; ++i)
-                {
-                    var run = si.a[i];
-                    this.bs.WriteItem(c_oSerSharedStringTypes.Run, function(){oThis.WriteRun(run);});
-                }
-            }
+			var oThis = this;
+			if (typeof si === 'string') {
+				this.memory.WriteByte(c_oSerSharedStringTypes.Text);
+				this.memory.WriteString2(si);
+			} else {
+				for (var i = 0, length = si.length; i < length; ++i) {
+					this.bs.WriteItem(c_oSerSharedStringTypes.Run, function() {oThis.WriteRun(si[i]);});
+				}
+			}
         };
         this.WriteRun = function(run)
         {
@@ -3260,9 +3246,7 @@
 			}
 			var bIsTablePartContainActiveRange;
 			if (oThis.isCopyPaste) {
-				var api = window["Asc"]["editor"];
-				var ws = api.wb.getWorksheet();
-				bIsTablePartContainActiveRange = ws.model.autoFilters.isTablePartContainActiveRange(ws.model.selectionRange.getLast());
+				bIsTablePartContainActiveRange = ws.autoFilters.isTablePartContainActiveRange(ws.selectionRange.getLast());
 			}
 
 			var nStartRow = -1;
@@ -3536,66 +3520,14 @@
 					var dValue = 0;
 					if(CellValueType.Error == nCellType || CellValueType.String == nCellType)
 					{
-						var sText = "";
-						var aText = null;
-						if(null != cell.text)
-							sText = cell.text;
-						else if(null != cell.multiText)
-						{
-							aText = cell.multiText;
-							for(var i = 0, length = aText.length; i < length; ++i)
-								sText += aText[i].text;
-						}
-						var item = this.oSharedStrings.strings[sText];
-						var bAddItem = false;
-						if(null == item)
-						{
-							item = {t: null, a: []};
-							bAddItem = true;
-						}
-						if(null == aText)
-						{
-							if(null == item.t)
-							{
+						var textIndex = cell.getTextIndex();
+						if (null !== textIndex) {
+							dValue = this.oSharedStrings.strings[textIndex];
+							if (undefined === dValue) {
 								dValue = this.oSharedStrings.index++;
-								item.t = {id: dValue, val: sText};
-							}
-							else
-								dValue = item.t.id;
-						}
-						else
-						{
-							var bFound = false;
-							for(var i = 0, length = item.a.length; i < length; ++i)
-							{
-								var oCurItem = item.a[i];
-								if(oCurItem.val.length == aText.length)
-								{
-									var bEqual = true;
-									for(var j = 0, length2 = aText.length; j < length2; ++j)
-									{
-										if(false == aText[j].isEqual(oCurItem.val[j]))
-										{
-											bEqual = false;
-											break;
-										}
-									}
-									if(bEqual)
-									{
-										bFound = true;
-										dValue = oCurItem.id;
-										break;
-									}
-								}
-							}
-							if(false == bFound)
-							{
-								dValue = this.oSharedStrings.index++;
-								item.a.push({id: dValue, val: aText});
+								this.oSharedStrings.strings[textIndex] = dValue;
 							}
 						}
-						if(bAddItem)
-							this.oSharedStrings.strings[sText] = item;
 					}
 					else
 					{
@@ -4240,7 +4172,7 @@
             if(!this.isCopyPaste)
                 this.WriteTable(c_oSerTableTypes.Other, new BinaryOtherTableWriter(this.Memory, this.wb));
             //Write SharedStrings
-            this.WriteReserved(new BinarySharedStringsTableWriter(this.Memory, oSharedStrings), nSharedStringsPos);
+            this.WriteReserved(new BinarySharedStringsTableWriter(this.Memory, this.wb, oSharedStrings), nSharedStringsPos);
             //Write Styles
             this.WriteReserved(new BinaryStylesTableWriter(this.Memory, this.wb, oBinaryWorksheetsTableWriter), nStylesTablePos);
             //Пишем количество таблиц

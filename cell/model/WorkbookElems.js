@@ -2693,7 +2693,8 @@ StyleManager.prototype =
 		var xfsOperationCache = xfs;
 		var newXf = xfs.getOperationCache(prop, hash);
 		if (newXf) {
-			xfs = oItemWithXfs.setStyleInternal(newXf);
+			oItemWithXfs.setStyleInternal(newXf);
+			xfs = newXf;
 		} else {
 			xfs = xfs.clone();
 			if (null != val) {

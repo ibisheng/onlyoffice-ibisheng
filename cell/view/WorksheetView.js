@@ -9717,7 +9717,6 @@
 						//arrFormula.push({range: range, val: "=" + assemb});
 					}
 				} else {
-					//todo
 					newVal.getLeftTopCellNoEmpty(function(cellFrom) {
 						if (cellFrom) {
 							var range;
@@ -9726,14 +9725,9 @@
 							} else {
 								range = firstRange;
 							}
-							range.getLeftTopCell(function(cellTo) {
-								if(cellTo) {
-									rangeStyle.cellValueData2 = {valueData: cellFrom.getValueData(), cell: cellTo.duplicate()};
-								}
-							});
+							rangeStyle.cellValueData2 = {valueData: cellFrom.getValueData(), row: range.bbox.r1, col: range.bbox.c1};
 						}
 					});
-
 				}
 				
 				if (!isOneMerge)//settings for text
@@ -9831,8 +9825,10 @@
 			arrFormula.push(rangeStyle.formula);
 		}
 		else if(rangeStyle.cellValueData2 && specialPasteProps.font && specialPasteProps.val)
-		{	
-			rangeStyle.cellValueData2.cell.setValueData(rangeStyle.cellValueData2.valueData);
+		{
+			t.model._getCell(rangeStyle.cellValueData2.row, rangeStyle.cellValueData2.col, function(cell){
+				cell.setValueData(rangeStyle.cellValueData2.valueData);
+			});
 		}
 		else if(rangeStyle.value2 && specialPasteProps.font && specialPasteProps.val)
 		{

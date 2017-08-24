@@ -3641,7 +3641,6 @@
 		var offset = {offsetRow: 0, offsetCol: count};
 		//renameDependencyNodes before move cells to store current location in history
 		var changedFormulas = this.renameDependencyNodes(offset, oActualRange);
-		this._updateFormulasParents(0, index + count, gc_nMaxRow0, gc_nMaxCol0, offset);
 		var redrawTablesArr = this.autoFilters.insertColumn( "insCells",  new Asc.Range(index, 0, index + count - 1, gc_nMaxRow0), c_oAscInsertOptions.InsertColumns );
 
 		this._updateFormulasParents(0, index + count, gc_nMaxRow0, gc_nMaxCol0, offset);
@@ -5543,19 +5542,11 @@
 				sheetMemory.setFloat64(this.nRow, g_nCellOffsetValue, this.number);
 			} else if (null != this.text) {
 				flagValue = 2;
-				if (null === this.textIndex) {
-					numberSave = wb.sharedStrings.addText(this.text);
-				} else {
-					numberSave = this.textIndex;
-				}
+				numberSave = this.getTextIndex();
 				sheetMemory.setUint32(this.nRow, g_nCellOffsetValue, numberSave);
 			} else if (null != this.multiText) {
 				flagValue = 3;
-				if (null === this.textIndex) {
-					numberSave = wb.sharedStrings.addMultiText(this.multiText);
-				} else {
-					numberSave = this.textIndex;
-				}
+				numberSave = this.getTextIndex();
 				sheetMemory.setUint32(this.nRow, g_nCellOffsetValue, numberSave);
 			}
 			var flags = g_nCellFlag_init | (this.type << 1) | (flagValue << 3);
@@ -6228,6 +6219,17 @@
 	Cell.prototype.getValueText = function() {
 		this._checkDirty();
 		return this.text;
+	};
+	Cell.prototype.getTextIndex = function() {
+		if (null === this.textIndex) {
+			var wb = this.ws.workbook;
+			if (null != this.text) {
+				this.textIndex = wb.sharedStrings.addText(this.text);
+			} else if (null != this.multiText) {
+				this.textIndex = wb.sharedStrings.addMultiText(this.multiText);
+			}
+		}
+		return this.textIndex;
 	};
 	Cell.prototype.getValueMultiText = function() {
 		this._checkDirty();
@@ -7118,7 +7120,7 @@
 			var tempRow = new AscCommonExcel.Row(this.worksheet);
 			for (var i = oBBox.r1; i <= oBBox.r2; i++) {
 				if (!tempRow.loadContent(i)) {
-					this._initRow(tempRow, i);
+					this.worksheet._initRow(tempRow, i);
 				}
 				if (this.worksheet.bExcludeHiddenRows && tempRow.getHidden()) {
 					continue;
