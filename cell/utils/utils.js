@@ -91,28 +91,6 @@
 			}
 			return ha;
 		}
-		function verticalAlignFromString(val) {
-			var va = null;
-			switch (val) {
-				case "bottom": va = Asc.c_oAscVAlign.Bottom;break;
-				case "center": va = Asc.c_oAscVAlign.Center;break;
-				case "distributed": va = Asc.c_oAscVAlign.Dist;break;
-				case "justify": va = Asc.c_oAscVAlign.Just;break;
-				case "top": va = Asc.c_oAscVAlign.Top;break;
-			}
-			return va;
-		}
-		function verticalAlignToString(val) {
-			var va = "none";
-			switch (val) {
-				case Asc.c_oAscVAlign.Bottom: va = "bottom";break;
-				case Asc.c_oAscVAlign.Center: va = "center";break;
-				case Asc.c_oAscVAlign.Dist: va = "distributed";break;
-				case Asc.c_oAscVAlign.Just: va = "justify";break;
-				case Asc.c_oAscVAlign.Top: va = "top";break;
-			}
-			return va;
-		}
 
 		function applyFunction(callback) {
 			if (kFunctionL === typeof callback) {
@@ -2355,8 +2333,6 @@
 		window["AscCommonExcel"].applyFunction = applyFunction;
 		window["AscCommonExcel"].horizontalAlignFromString = horizontalAlignFromString;
 		window["AscCommonExcel"].horizontalAlignToString = horizontalAlignToString;
-		window["AscCommonExcel"].verticalAlignFromString = verticalAlignFromString;
-		window["AscCommonExcel"].verticalAlignToString = verticalAlignToString;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;
 		window["Asc"].search = search;

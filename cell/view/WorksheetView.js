@@ -6800,7 +6800,7 @@
         cell_info.text = c.getValueForEdit();
 
 		cell_info.halign = AscCommonExcel.horizontalAlignToString(align.getAlignHorizontal());
-		cell_info.valign = AscCommonExcel.verticalAlignToString(align.getAlignVertical());
+		cell_info.valign = align.getAlignVertical();
 
         var tablePartsOptions = selectionRange.isSingleRange() ?
           this.model.autoFilters.searchRangeInTableParts(selectionRange.getLast()) : -2;
@@ -7006,7 +7006,7 @@
             }
 
             objectInfo.halign = AscCommonExcel.horizontalAlignToString(horAlign);
-            objectInfo.valign = AscCommonExcel.verticalAlignToString(vertAlign);
+            objectInfo.valign = vertAlign;
             objectInfo.angle = angle;
 
             objectInfo.font = new asc_CFont();
