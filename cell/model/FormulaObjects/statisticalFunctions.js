@@ -3825,20 +3825,21 @@
 			var aNullDate = ;
 			var mnMonthDay = 1;
 
-			 mfStepSize = ::std::numeric_limits<double>::max();
-			 if ( mnMonthDay )
-			 {
-			 for ( SCSIZE i = 0; i < mnCount; i++ )
-			 {
-			 aDate = aNullDate + static_cast< long >( maRange[ i ].X );
-			 maRange[ i ].X = aDate.GetYear() * 12 + aDate.GetMonth();
-			 }
+
 			 }*/
 
+
 			var mfStepSize = Number.MAX_VALUE;
+			if ( /*mnMonthDay*/true )
+			{
+				for ( var i = 0; i < mnCount; i++ )
+				{
+					var aDate = Date.prototype.getDateFromExcel(maRange[ i ].X);
+					maRange[ i ].X = aDate.getUTCFullYear() * 12 + aDate.getMonth();
+				}
+			}
+
 			for ( var i = 1; i < mnCount; i++ ) {
-
-
 
 				var fStep = maRange[ i ].X - maRange[ i - 1 ].X;
 				if ( fStep === 0.0 ) {
@@ -3932,7 +3933,7 @@
 			}
 
 			// step must be constant (or gap multiple of step)
-			/*var bHasGap = false;
+			var bHasGap = false;
 			for (var i = 1; i < mnCount && !bHasGap; i++) {
 				var fStep = maRange[i].X - maRange[i - 1].X;
 
@@ -3942,49 +3943,53 @@
 					}
 					bHasGap = true;
 				}
-			}*/
+			}
 
 
-			/*if ( bHasGap )
+			if ( bHasGap )
 			{
 				var nMissingXCount = 0;
 				var fOriginalCount = mnCount;
-				if ( mnMonthDay )
-					aDate = aNullDate + static_cast< long >( maRange[ 0 ].X );
+				if ( /*mnMonthDay*/true ){
+					aDate = Date.prototype.getDateFromExcel(maRange[ 0 ].X);
+				}
+
 				for ( var i = 1; i < mnCount; i++ )
 				{
-					double fDist;
-					if ( mnMonthDay )
+					var fDist;
+					if ( /*mnMonthDay*/true )
 					{
-						Date aDate1 = aNullDate + static_cast< long >( maRange[ i ].X );
-						fDist = 12 * ( aDate1.GetYear() - aDate.GetYear() ) +
-							( aDate1.GetMonth() - aDate.GetMonth() );
+						var aDate1 = Date.prototype.getDateFromExcel(maRange[ i ].X);
+						fDist = 12 * ( aDate1.getUTCFullYear() - aDate.getUTCFullYear() ) +
+							( aDate1.getMonth() - aDate.getMonth() );
 						aDate = aDate1;
 					}
-					else
+					else{
 						fDist = maRange[ i ].X - maRange[ i - 1 ].X;
+					}
+
 					if ( fDist > mfStepSize )
 					{
 						// gap, insert missing data points
 						var fYGap = ( maRange[ i ].Y + maRange[ i - 1 ].Y ) / 2.0;
 						for ( var fXGap = maRange[ i - 1].X + mfStepSize;  fXGap < maRange[ i ].X; fXGap += mfStepSize )
 						{
-							maRange.insert( maRange.begin() + i, DataPoint( fXGap, ( bDataCompletion ? fYGap : 0.0 ) ) );
+							var newAddElem = {X: fXGap, Y: ( bDataCompletion ? fYGap : 0.0 )};
+							maRange.splice( i, 1, newAddElem );
 							i++;
 							mnCount++;
 							nMissingXCount++;
-							if ( static_cast< double >( nMissingXCount ) / fOriginalCount > 0.3 )
+							if (  nMissingXCount  / fOriginalCount > 0.3 )
 							{
 								// maximum of 30% missing points exceeded
-								mnErrorValue = FormulaError::NoValue;
-								return false;
+								return new cError(cErrorType.wrong_value_type);
 							}
 						}
 					}
 				}
 			}
 
-			if ( rSmplInPrd != 1 )
+			/*if ( rSmplInPrd != 1 )
 				mnSmplInPrd = rSmplInPrd;
 			else
 			{
