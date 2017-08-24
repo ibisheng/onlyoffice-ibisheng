@@ -150,3 +150,17 @@ CComplexField.prototype.GetSeparateChar = function()
 {
 	return this.SeparateChar;
 };
+
+function CComplexFieldStatePos(oComplexField, isFieldCode)
+{
+	this.FieldCode    = undefined !== isFieldCode ? isFieldCode : true;
+	this.ComplexField = oComplexField ? oComplexField : null;
+}
+CComplexFieldStatePos.prototype.Copy = function()
+{
+	return new CComplexFieldStatePos(this.ComplexField, this.FieldCode);
+};
+CComplexFieldStatePos.prototype.SetFieldCode = function(isFieldCode)
+{
+	this.FieldCode = isFieldCode;
+};

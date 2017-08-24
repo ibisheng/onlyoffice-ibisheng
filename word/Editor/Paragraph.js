@@ -992,7 +992,7 @@ Paragraph.prototype.Check_MathPara = function(MathPos)
 
 	return true;
 };
-Paragraph.prototype.Get_EndInfo = function()
+Paragraph.prototype.GetEndInfo = function()
 {
 	var PagesCount = this.Pages.length;
 
@@ -1001,10 +1001,9 @@ Paragraph.prototype.Get_EndInfo = function()
 	else
 		return null;
 };
-Paragraph.prototype.Get_EndInfoByPage = function(CurPage)
+Paragraph.prototype.GetEndInfoByPage = function(CurPage)
 {
 	// Здесь может приходить отрицательное значение
-
 	if (CurPage < 0)
 		return this.Parent.GetPrevElementEndInfo(this);
 	else
@@ -1020,7 +1019,6 @@ Paragraph.prototype.Recalculate_PageEndInfo = function(PRSW, CurPage)
 
 	var StartLine  = this.Pages[CurPage].StartLine;
 	var EndLine    = this.Pages[CurPage].EndLine;
-	var LinesCount = this.Lines.length;
 
 	for (var CurLine = StartLine; CurLine <= EndLine; CurLine++)
 	{
@@ -1036,7 +1034,7 @@ Paragraph.prototype.Recalculate_PageEndInfo = function(PRSW, CurPage)
 		}
 	}
 
-	this.Pages[CurPage].EndInfo.Comments = PRSI.Comments;
+	this.Pages[CurPage].EndInfo.SetFromPRSI(PRSI);
 
 	if (PRSW)
 		this.Pages[CurPage].EndInfo.RunRecalcInfo = PRSW.RunRecalcInfoBreak;
@@ -1490,7 +1488,7 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 	var DrawMMFields       = (this.LogicDocument && true === this.LogicDocument.Is_HightlightMailMergeFields() ? true : false);
 	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && true !== LogicDocument.IsViewMode());
 
-	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.Get_EndInfoByPage(CurPage - 1), DrawSolvedComments);
+	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.GetEndInfoByPage(CurPage - 1), DrawSolvedComments);
 
 	var StartLine = _Page.StartLine;
 	var EndLine   = _Page.EndLine;
@@ -12423,26 +12421,31 @@ CDocumentBounds.prototype.Copy = function()
 
 function CParagraphPageEndInfo()
 {
-    this.Comments = []; // Массив незакрытых комментариев на данной странице (комментарии, которые были
-    // открыты до данной страницы и не закрыты на этой тут тоже присутствуют)
+    this.Comments      = []; // Массив незакрытых комментариев на данной странице
+	this.ComplexFields = []; // Массив незакрытых полей на данной странице
 
     this.RunRecalcInfo = null;
 }
-
-CParagraphPageEndInfo.prototype =
+CParagraphPageEndInfo.prototype.Copy = function()
 {
-    Copy : function()
-    {
-        var NewPageEndInfo = new CParagraphPageEndInfo();
+	var oInfo = new CParagraphPageEndInfo();
 
-        var CommentsCount = this.Comments.length;
-        for ( var Index = 0; Index < CommentsCount; Index++ )
-        {
-            NewPageEndInfo.Comments.push( this.Comments[Index] );
-        }
+	for (var nIndex = 0, nCount = this.Comments.length; nIndex < nCount; ++nIndex)
+	{
+		oInfo.Comments.push(this.Comments[nIndex]);
+	}
 
-        return NewPageEndInfo;
-    }
+	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		oInfo.ComplexFields.push(this.ComplexFields[nIndex].Copy());
+	}
+
+	return oInfo;
+};
+CParagraphPageEndInfo.prototype.SetFromPRSI = function(PRSI)
+{
+	this.Comments      = PRSI.Comments;
+	this.ComplexFields = PRSI.ComplexFields;
 };
 
 function CParaPos(Range, Line, Page, Pos)

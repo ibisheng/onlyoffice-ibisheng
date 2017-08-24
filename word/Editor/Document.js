@@ -9008,9 +9008,7 @@ CDocument.prototype.GetPrevElementEndInfo = function(CurElement)
     var PrevElement = CurElement.Get_DocumentPrev();
 
     if (null !== PrevElement && undefined !== PrevElement)
-    {
-        return PrevElement.Get_EndInfo();
-    }
+        return PrevElement.GetEndInfo();
     else
         return null;
 };

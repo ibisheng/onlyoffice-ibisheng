@@ -182,9 +182,9 @@ CTableCell.prototype =
         this.Metrics.X_content_end   = X_content_end;
     },
 
-    Get_EndInfo : function()
+	GetEndInfo : function()
     {
-        return this.Content.Get_EndInfo();
+        return this.Content.GetEndInfo();
     },
 
 	GetPrevElementEndInfo : function(CurElement)

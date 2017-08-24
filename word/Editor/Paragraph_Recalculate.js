@@ -3172,10 +3172,7 @@ CParagraphRecalculateStateInfo.prototype.Reset = function(PrevInfo)
 		{
 			for (var nIndex = 0, nCount = PrevInfo.Fields.length; nIndex < nCount; ++nIndex)
 			{
-				this.Fields[nIndex] = {
-					Field     : PrevInfo.Fields[nIndex].Field,
-					FieldCode : PrevInfo.Fields[nIndex].FieldCode
-				}
+				this.Fields[nIndex] = PrevInfo.Fields[nIndex].Copy();
 			}
 		}
 	}
@@ -3210,7 +3207,7 @@ CParagraphRecalculateStateInfo.prototype.ProcessFieldChar = function(oFieldChar)
 
 	if (oFieldChar.IsBegin())
 	{
-		this.Fields.push({Field : oComplexField, FieldCode : true});
+		this.Fields.push(new CComplexFieldStatePos(oComplexField, true));
 	}
 	else if (oFieldChar.IsSeparate())
 	{
@@ -3218,7 +3215,7 @@ CParagraphRecalculateStateInfo.prototype.ProcessFieldChar = function(oFieldChar)
 		{
 			if (oComplexField === this.Fields[nIndex].Field)
 			{
-				this.Fields[nIndex].FieldCode = false;
+				this.Fields[nIndex].SetFieldCode(false);
 				break;
 			}
 		}

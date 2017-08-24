@@ -2378,11 +2378,11 @@ CTable.prototype.GetAllParagraphs = function(Props, ParaArray)
 		}
 	}
 };
-CTable.prototype.Get_EndInfo = function()
+CTable.prototype.GetEndInfo = function()
 {
 	var RowsCount = this.Content.length;
 	if (RowsCount > 0)
-		return this.Content[RowsCount - 1].Get_EndInfo();
+		return this.Content[RowsCount - 1].GetEndInfo();
 
 	return null;
 };
@@ -2391,7 +2391,7 @@ CTable.prototype.GetPrevElementEndInfo = function(RowIndex)
 	if (0 === RowIndex)
 		return this.Parent.GetPrevElementEndInfo(this);
 	else
-		return this.Content[RowIndex - 1].Get_EndInfo();
+		return this.Content[RowIndex - 1].GetEndInfo();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Функции к которым идет обращение из родительского класса
