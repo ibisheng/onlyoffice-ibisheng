@@ -2949,12 +2949,11 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_setCellAlign = function(align) {
-    var ha = AscCommonExcel.horizontalAlignFromString(align);
     var ws = this.wb.getWorksheet();
     if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellAlign) {
-      ws.objectRender.controller.setCellAlign(ha);
+      ws.objectRender.controller.setCellAlign(align);
     } else {
-      this.wb.getWorksheet().setSelectionInfo("a", ha);
+      this.wb.getWorksheet().setSelectionInfo("a", align);
       this.wb.restoreFocus();
     }
   };

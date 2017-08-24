@@ -71,27 +71,6 @@
 
 		};
 
-		function horizontalAlignFromString(val) {
-			var ha = null;
-			switch (val) {
-				case "left": ha = AscCommon.align_Left;break;
-				case "right": ha = AscCommon.align_Right;break;
-				case "center": ha = AscCommon.align_Center;break;
-				case "justify": ha = AscCommon.align_Justify;break;
-			}
-			return ha;
-		}
-		function horizontalAlignToString(val) {
-			var ha = "none";
-			switch (val) {
-				case AscCommon.align_Left: ha = "left";break;
-				case AscCommon.align_Right: ha = "right";break;
-				case AscCommon.align_Center: ha = "center";break;
-				case AscCommon.align_Justify: ha = "justify";break;
-			}
-			return ha;
-		}
-
 		function applyFunction(callback) {
 			if (kFunctionL === typeof callback) {
 				callback.apply(null, Array.prototype.slice.call(arguments, 1));
@@ -2331,8 +2310,6 @@
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].recalcType = recalcType;
 		window["AscCommonExcel"].applyFunction = applyFunction;
-		window["AscCommonExcel"].horizontalAlignFromString = horizontalAlignFromString;
-		window["AscCommonExcel"].horizontalAlignToString = horizontalAlignToString;
 		window["Asc"].typeOf = typeOf;
 		window["Asc"].lastIndexOf = lastIndexOf;
 		window["Asc"].search = search;

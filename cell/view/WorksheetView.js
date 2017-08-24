@@ -6799,7 +6799,7 @@
 
         cell_info.text = c.getValueForEdit();
 
-		cell_info.halign = AscCommonExcel.horizontalAlignToString(align.getAlignHorizontal());
+		cell_info.halign = align.getAlignHorizontal();
 		cell_info.valign = align.getAlignVertical();
 
         var tablePartsOptions = selectionRange.isSingleRange() ?
@@ -7005,7 +7005,7 @@
 
             }
 
-            objectInfo.halign = AscCommonExcel.horizontalAlignToString(horAlign);
+            objectInfo.halign = horAlign;
             objectInfo.valign = vertAlign;
             objectInfo.angle = angle;
 
