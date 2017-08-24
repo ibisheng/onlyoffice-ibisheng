@@ -2704,6 +2704,8 @@ function CDemonstrationManager(htmlpage)
 
     this.PointerDiv = null;
 
+    this.isMouseDown = false;
+
     var oThis = this;
 
     this.CacheSlide = function(slide_num, slide_index)
@@ -2963,6 +2965,8 @@ function CDemonstrationManager(htmlpage)
 
     this.StartSlide = function(is_transition_use, is_first_play)
     {
+		oThis.HtmlPage.m_oApi.canSave = false;
+
         oThis.StopTransition();
 
         if (oThis.SlideNum == oThis.SlidesCount)
@@ -2977,6 +2981,7 @@ function CDemonstrationManager(htmlpage)
 
                 //oThis.DemonstrationDivEndPresentation.onmousedown  = oThis.onMouseDownDemonstration;
                 //oThis.DemonstrationDivEndPresentation.onmousemove  = oThis.onMouseMoveDemonstration;
+				oThis.DivEndPresentation.onmousedown  = oThis.onMouseDown;
                 oThis.DivEndPresentation.onmouseup    = oThis.onMouseUp;
 
                 oThis.DivEndPresentation.onmousewheel = oThis.onMouseWhell;
@@ -3153,6 +3158,8 @@ function CDemonstrationManager(htmlpage)
 
     this.End = function(isNoUseFullScreen)
     {
+		this.HtmlPage.m_oApi.canSave = true;
+
 		this.PointerRemove();
         if (this.waitReporterObject)
         {
@@ -3190,6 +3197,8 @@ function CDemonstrationManager(htmlpage)
         this.DemonstrationDiv.removeChild(this.Canvas);
         this.Canvas = null;
 
+        var _oldSlideNum = this.SlideNum;
+
         this.SlideNum = -1;
         this.DemonstrationDiv = null;
         this.Mode = false;
@@ -3198,6 +3207,18 @@ function CDemonstrationManager(htmlpage)
         ctx1.setTransform(1, 0, 0, 1, 0, 0);
 
         this.HtmlPage.m_oApi.sync_endDemonstration();
+
+        if (true)
+		{
+			if (_oldSlideNum < 0)
+				_oldSlideNum = 0;
+			var _slidesCount = this.HtmlPage.m_oApi.getCountPages();
+			if (_oldSlideNum >= _slidesCount)
+			    _oldSlideNum = _slidesCount - 1;
+
+			if (0 <= _oldSlideNum)
+			    this.HtmlPage.GoToPage(_oldSlideNum);
+		}
     }
 
     this.NextSlide = function(isNoSendFormReporter)
@@ -3355,6 +3376,7 @@ function CDemonstrationManager(htmlpage)
 
     this.onMouseDown = function(e)
     {
+		oThis.isMouseDown = true;
         e.preventDefault();
         return false;
     }
@@ -3407,10 +3429,15 @@ function CDemonstrationManager(htmlpage)
         return false;
     }
 
-    this.onMouseUp = function(e)
+    this.onMouseUp = function(e, isAttack)
     {
-		if (oThis.PointerDiv)
-        {
+    	if (!oThis.isMouseDown && true !== isAttack)
+    		return;
+
+		oThis.isMouseDown = false;
+
+		if (oThis.PointerDiv && oThis.HtmlPage.m_oApi.isReporterMode)
+		{
 			AscCommon.stopEvent(e);
 			return false;
         }

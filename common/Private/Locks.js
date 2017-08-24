@@ -809,8 +809,13 @@ if(typeof CPresentation !== "undefined")
 
 
         var cur_slide = this.Slides[this.CurPage];
-        var slide_id = cur_slide.deleteLock.Get_Id();
-
+        var slide_id;
+        if(this.FocusOnNotes && cur_slide.notes){
+            slide_id = cur_slide.notes.Get_Id();
+        }
+        else{
+            slide_id = cur_slide.deleteLock.Get_Id();
+        }
 
         AscCommon.CollaborativeEditing.OnStart_CheckLock();
 
