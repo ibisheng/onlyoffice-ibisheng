@@ -9420,7 +9420,7 @@
 					totalsRowCount = table.TotalsRowCount;
 				}
 
-				var bbox = new Asc.Range(0, 0, table.Ref.c2 - table.Ref.c1, table.Ref.r2 - table.Ref.r1);
+				var bbox = new Asc.Range(table.Ref.c1, table.Ref.r1, table.Ref.c2, table.Ref.r2);
 				styleForCurTable.initStyle(val.sheetMergedStyles, bbox, styleInfo, headerRowCount, totalsRowCount);
 				var cell = val._getCell(pasteRow, pasteCol);
 				if (cell)
