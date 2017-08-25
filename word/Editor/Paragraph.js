@@ -12775,11 +12775,14 @@ function CParagraphDrawStateHightlights()
     this.Comm     = new CParaDrawingRangeLines();
     this.Shd      = new CParaDrawingRangeLines();
     this.MMFields = new CParaDrawingRangeLines();
+    this.CFields  = new CParaDrawingRangeLines();
 
 	this.DrawComments       = true;
 	this.DrawSolvedComments = true;
 	this.Comments           = [];
 	this.CommentsFlag       = comments_NoComment;
+
+	this.ComplexFields = [];
 
     this.SearchCounter = 0;
 
@@ -12792,130 +12795,124 @@ function CParagraphDrawStateHightlights()
 
     this.Spaces = 0;
 }
-
-CParagraphDrawStateHightlights.prototype =
+CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
 {
-    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
-    {
-        this.Paragraph = Paragraph;
-        this.Graphics  = Graphics;
+	this.Paragraph = Paragraph;
+	this.Graphics  = Graphics;
 
-        this.DrawColl     = DrawColl;
-        this.DrawFind     = DrawFind;
-        this.DrawMMFields = DrawMMFields;
+	this.DrawColl     = DrawColl;
+	this.DrawFind     = DrawFind;
+	this.DrawMMFields = DrawMMFields;
 
-        this.CurPos = new CParagraphContentPos();
+	this.CurPos = new CParagraphContentPos();
 
-        this.SearchCounter = 0;
+	this.SearchCounter = 0;
 
-		this.DrawComments       = DrawComments;
-		this.DrawSolvedComments = DrawSolvedComments;
+	this.DrawComments       = DrawComments;
+	this.DrawSolvedComments = DrawSolvedComments;
 
-		if (null !== PageEndInfo)
-			this.Comments = PageEndInfo.Comments;
-		else
-			this.Comments = [];
+	if (null !== PageEndInfo)
+	{
+		this.Comments      = PageEndInfo.Comments;
+		this.ComplexFields = PageEndInfo.ComplexFields;
+	}
+	else
+	{
+		this.Comments      = [];
+		this.ComplexFields = [];
+	}
 
-        this.Check_CommentsFlag();
-    },
+	this.Check_CommentsFlag();
+};
+CParagraphDrawStateHightlights.prototype.Reset_Range = function(Page, Line, Range, X, Y0, Y1, SpacesCount)
+{
+	this.Page  = Page;
+	this.Line  = Line;
+	this.Range = Range;
 
-    Reset_Range : function(Page, Line, Range, X, Y0, Y1, SpacesCount)
-    {
-        this.Page  = Page;
-        this.Line  = Line;
-        this.Range = Range;
+	this.High.Clear();
+	this.Coll.Clear();
+	this.Find.Clear();
+	this.Comm.Clear();
 
-        this.High.Clear();
-        this.Coll.Clear();
-        this.Find.Clear();
-        this.Comm.Clear();
+	this.X  = X;
+	this.Y0 = Y0;
+	this.Y1 = Y1;
 
-        this.X  = X;
-        this.Y0 = Y0;
-        this.Y1 = Y1;
+	this.Spaces = SpacesCount;
+};
+CParagraphDrawStateHightlights.prototype.AddComment = function(Id)
+{
+	if (!this.DrawComments)
+		return;
 
-        this.Spaces = SpacesCount;
-    },
+	var oComment = AscCommon.g_oTableId.Get_ById(Id);
+	if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
+		return;
 
-	AddComment : function(Id)
-    {
-    	if (!this.DrawComments)
-    		return;
+	this.Comments.push(Id);
+	this.Check_CommentsFlag();
+};
+CParagraphDrawStateHightlights.prototype.RemoveComment = function(Id)
+{
+	if (!this.DrawComments)
+		return;
 
-    	var oComment = AscCommon.g_oTableId.Get_ById(Id);
-    	if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
-    		return;
+	var oComment = AscCommon.g_oTableId.Get_ById(Id);
+	if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
+		return;
 
-		this.Comments.push(Id);
-		this.Check_CommentsFlag();
-    },
-
-	RemoveComment : function(Id)
-    {
-		if (!this.DrawComments)
-			return;
-
-		var oComment = AscCommon.g_oTableId.Get_ById(Id);
-		if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
-			return;
-
-		for (var nIndex = 0, nCount = this.Comments.length; nIndex < nCount; ++nIndex)
+	for (var nIndex = 0, nCount = this.Comments.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Comments[nIndex] === Id)
 		{
-			if (this.Comments[nIndex] === Id)
-			{
-				this.Comments.splice(nIndex, 1);
-				break;
-			}
+			this.Comments.splice(nIndex, 1);
+			break;
 		}
+	}
 
-		this.Check_CommentsFlag();
-    },
+	this.Check_CommentsFlag();
+};
+CParagraphDrawStateHightlights.prototype.Check_CommentsFlag = function()
+{
+	// Проверяем флаг
+	var Para             = this.Paragraph;
+	var DocumentComments = Para.LogicDocument.Comments;
+	var CurComment       = DocumentComments.Get_CurrentId();
+	var CommLen          = this.Comments.length;
 
-    Check_CommentsFlag : function()
-    {
-        // Проверяем флаг
-        var Para = this.Paragraph;
-        var DocumentComments = Para.LogicDocument.Comments;
-        var CurComment = DocumentComments.Get_CurrentId();
-        var CommLen = this.Comments.length;
+	// Сначала проверим есть ли вообще комментарии
+	this.CommentsFlag = ( CommLen > 0 ? comments_NonActiveComment : comments_NoComment );
 
-        // Сначала проверим есть ли вообще комментарии
-        this.CommentsFlag = ( CommLen > 0 ? comments_NonActiveComment : comments_NoComment );
-
-        // Проверим является ли какой-либо комментарий активным
-        for ( var CurPos = 0; CurPos < CommLen; CurPos++ )
-        {
-            if ( CurComment === this.Comments[CurPos] )
-            {
-                this.CommentsFlag = comments_ActiveComment;
-                break
-            }
-        }
-    },
-
-    Save_Coll : function()
-    {
-        var Coll = this.Coll;
-        this.Coll = new CParaDrawingRangeLines();
-        return Coll;
-    },
-
-    Save_Comm : function()
-    {
-        var Comm = this.Comm;
-        this.Comm = new CParaDrawingRangeLines();
-        return Comm;
-    },
-
-    Load_Coll : function(Coll)
-    {
-        this.Coll = Coll;
-    },
-
-    Load_Comm : function(Comm)
-    {
-        this.Comm = Comm;
-    }
+	// Проверим является ли какой-либо комментарий активным
+	for (var CurPos = 0; CurPos < CommLen; CurPos++)
+	{
+		if (CurComment === this.Comments[CurPos])
+		{
+			this.CommentsFlag = comments_ActiveComment;
+			break
+		}
+	}
+};
+CParagraphDrawStateHightlights.prototype.Save_Coll = function()
+{
+	var Coll  = this.Coll;
+	this.Coll = new CParaDrawingRangeLines();
+	return Coll;
+};
+CParagraphDrawStateHightlights.prototype.Save_Comm = function()
+{
+	var Comm  = this.Comm;
+	this.Comm = new CParaDrawingRangeLines();
+	return Comm;
+};
+CParagraphDrawStateHightlights.prototype.Load_Coll = function(Coll)
+{
+	this.Coll = Coll;
+};
+CParagraphDrawStateHightlights.prototype.Load_Comm = function(Comm)
+{
+	this.Comm = Comm;
 };
 
 function CParagraphDrawStateElements()

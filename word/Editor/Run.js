@@ -4481,6 +4481,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
     var aFind     = PDSH.Find;
     var aComm     = PDSH.Comm;
     var aShd      = PDSH.Shd;
+    var aFields   = PDSH.MMFields;
 
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
@@ -4537,6 +4538,9 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
 
         if ( true === bDrawShd )
             aShd.Add( Y0, Y1, X, X + ItemWidthVisible, 0, ShdColor.r, ShdColor.g, ShdColor.b, undefined, oShd );
+
+		if (PDSH.IsComplexField() && !PDSH.IsComplexFieldCode())
+			PDSH.MMFields.Add(Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0);
 
         switch( ItemType )
         {
@@ -4608,6 +4612,11 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                 X += ItemWidthVisible;
                 break;
             }
+			case para_FieldChar:
+			{
+				PDSH.ProcessFieldChar(Item);
+				break;
+			}
         }
 
         for ( var SPos = 0; SPos < SearchMarksCount; SPos++)

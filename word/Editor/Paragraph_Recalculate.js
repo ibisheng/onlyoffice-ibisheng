@@ -3165,21 +3165,21 @@ CParagraphRecalculateStateInfo.prototype.Reset = function(PrevInfo)
 {
 	if (null !== PrevInfo && undefined !== PrevInfo)
 	{
-		this.Comments = PrevInfo.Comments;
-		this.Fields = [];
+		this.Comments      = PrevInfo.Comments;
+		this.ComplexFields = [];
 
-		if (PrevInfo.Fields)
+		if (PrevInfo.ComplexFields)
 		{
-			for (var nIndex = 0, nCount = PrevInfo.Fields.length; nIndex < nCount; ++nIndex)
+			for (var nIndex = 0, nCount = PrevInfo.ComplexFields.length; nIndex < nCount; ++nIndex)
 			{
-				this.Fields[nIndex] = PrevInfo.Fields[nIndex].Copy();
+				this.ComplexFields[nIndex] = PrevInfo.ComplexFields[nIndex].Copy();
 			}
 		}
 	}
 	else
 	{
-		this.Comments = [];
-		this.Fields   = [];
+		this.Comments      = [];
+		this.ComplexFields = [];
 	}
 };
 CParagraphRecalculateStateInfo.prototype.AddComment = function(Id)
@@ -3213,7 +3213,7 @@ CParagraphRecalculateStateInfo.prototype.ProcessFieldChar = function(oFieldChar)
 	{
 		for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
 		{
-			if (oComplexField === this.ComplexFields[nIndex].Field)
+			if (oComplexField === this.ComplexFields[nIndex].ComplexField)
 			{
 				this.ComplexFields[nIndex].SetFieldCode(false);
 				break;
@@ -3224,7 +3224,7 @@ CParagraphRecalculateStateInfo.prototype.ProcessFieldChar = function(oFieldChar)
 	{
 		for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
 		{
-			if (oComplexField === this.ComplexFields[nIndex].Field)
+			if (oComplexField === this.ComplexFields[nIndex].ComplexField)
 			{
 				this.ComplexFields.splice(nIndex, 1);
 				break;
@@ -3232,6 +3232,28 @@ CParagraphRecalculateStateInfo.prototype.ProcessFieldChar = function(oFieldChar)
 		}
 	}
 };
+CParagraphRecalculateStateInfo.prototype.IsComplexField = function()
+{
+	return (this.ComplexFields.length > 0 ? true : false);
+};
+CParagraphRecalculateStateInfo.prototype.IsComplexFieldCode = function()
+{
+	if (!this.IsComplexField())
+		return false;
+
+	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.ComplexFields[nIndex].IsFieldCode())
+			return true;
+	}
+
+	return false;
+};
+
+CParagraphDrawStateHightlights.prototype.ProcessFieldChar   = CParagraphRecalculateStateInfo.prototype.ProcessFieldChar;
+CParagraphDrawStateHightlights.prototype.IsComplexField     = CParagraphRecalculateStateInfo.prototype.IsComplexField;
+CParagraphDrawStateHightlights.prototype.IsComplexFieldCode = CParagraphRecalculateStateInfo.prototype.IsComplexFieldCode;
+
 
 function CParagraphRecalculateObject()
 {

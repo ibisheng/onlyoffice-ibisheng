@@ -164,3 +164,7 @@ CComplexFieldStatePos.prototype.SetFieldCode = function(isFieldCode)
 {
 	this.FieldCode = isFieldCode;
 };
+CComplexFieldStatePos.prototype.IsFieldCode = function()
+{
+	return this.FieldCode;
+};
