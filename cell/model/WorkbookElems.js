@@ -7385,12 +7385,28 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
-	/**
-	 * @constructor
-	 */
-	function CSharedStringsHash(simple, multi){
-		this.simple = simple;
-		this.multi = multi;
+	if (typeof Map === 'undefined') {
+		(function() {
+			var Map = function() {
+				this.storage = {};
+			};
+			Map.prototype = {
+				set: function(key, value) {
+					this.storage[key] = value;
+				},
+				get: function(key) {
+					return this.storage[key];
+				},
+				delete: function(key) {
+					delete this.storage[key];
+				},
+				has: function(key) {
+					return !!this.storage[key];
+				}
+			};
+
+			window.Map = Map;
+		})();
 	}
 	/**
 	 * @constructor
@@ -7471,7 +7487,6 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].g_oThemeColorsDefaultModsSpreadsheet = g_oThemeColorsDefaultModsSpreadsheet;
 	window['AscCommonExcel'].g_StyleCache = g_StyleCache;
 	window['AscCommonExcel'].map_themeExcel_to_themePresentation = map_themeExcel_to_themePresentation;
-	window['AscCommonExcel'].g_nRowFlag_hd = g_nRowFlag_hd;
 	window['AscCommonExcel'].g_nRowStructSize = g_nRowStructSize;
 	window['AscCommonExcel'].shiftGetBBox = shiftGetBBox;
 	window['AscCommonExcel'].getStringFromMultiText = getStringFromMultiText;
