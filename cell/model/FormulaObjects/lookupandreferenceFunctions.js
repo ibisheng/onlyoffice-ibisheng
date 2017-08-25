@@ -555,7 +555,7 @@
 	cLOOKUP.prototype.argumentsMin = 2;
 	cLOOKUP.prototype.argumentsMax = 3;
 	cLOOKUP.prototype.Calculate = function (arg) {
-		var arg0 = arg[0], arg1 = arg[1], arg2 = 2 === this.argumentsCurrent ? arg1 : arg[2], resC = -1, resR = -1;
+		var arg0 = arg[0], arg1 = arg[1], arg2 = 2 === this.argumentsCurrent ? arg1 : arg[2], resC = -1, resR = -1 ,t = this;
 
 		if (cElementType.error === arg0.type) {
 			return this.value = arg0;
@@ -620,7 +620,10 @@
 			}
 
 			var c = new CellAddress(BBox.r1 + resR, BBox.c1 + resC, 0);
-			return this.value = checkTypeCell(_arg2.getWS()._getCellNoEmpty(c.getRow0(), c.getCol0()));
+			_arg2.getWS()._getCellNoEmpty(c.getRow0(), c.getCol0(), function(cell){
+				t.value = checkTypeCell(cell);
+			});
+			return this.value;
 		} else {
 			if (cElementType.cellsRange3D === arg1.type && !arg1.isSingleSheet() ||
 				cElementType.cellsRange3D === arg2.type && !arg2.isSingleSheet()) {
@@ -1087,7 +1090,11 @@
 
 		r = this.bHor ? bb.r1 + number : res;
 		c = this.bHor ? res : bb.c1 + number;
-		return checkTypeCell(arg1.getWS()._getCellNoEmpty(r, c));
+		var resVal;
+		arg1.getWS()._getCellNoEmpty(r, c, function(cell) {
+			resVal = checkTypeCell(cell);
+		});
+		return resVal;
 	};
 	VHLOOKUPCache.prototype._get = function (range, valueForSearching, arg3Value) {
 		var res, _this = this, wsId = range.getWorksheet().getId(), sRangeName = wsId + g_cCharDelimiter +

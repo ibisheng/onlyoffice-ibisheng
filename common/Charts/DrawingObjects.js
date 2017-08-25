@@ -2868,12 +2868,13 @@ function DrawingObjects() {
                                                     {
                                                         for(j = range.r1; j <= range.r2; ++j)
                                                         {
-                                                            cell = source_worksheet._getCell(j, k);
-                                                            pt = cache.getPtByIndex(pt_index + j - range.r1);
-                                                            if(pt)
-                                                            {
-																fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);
-                                                            }
+                                                            source_worksheet._getCell(j, k, function(cell) {
+                                                                pt = cache.getPtByIndex(pt_index + j - range.r1);
+                                                                if(pt)
+                                                                {
+                                                                    fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);
+                                                                }
+                                                            });
                                                         }
                                                     }
                                                     pt_index += (range.r2 - range.r1 + 1);
@@ -2884,12 +2885,13 @@ function DrawingObjects() {
                                                     {
                                                         for(j = range.c1;  j <= range.c2; ++j)
                                                         {
-                                                            cell = source_worksheet._getCell(k, j);
-                                                            pt = cache.getPtByIndex(pt_index + j - range.c1);
-                                                            if(pt)
-                                                            {
-																fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);																
-                                                            }
+                                                            source_worksheet._getCell(k, j, function(cell) {
+                                                                pt = cache.getPtByIndex(pt_index + j - range.c1);
+                                                                if(pt)
+                                                                {
+                                                                    fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);
+                                                                }
+                                                            });
                                                         }
                                                     }
                                                     pt_index += (range.c2 - range.c1 + 1);
@@ -2901,26 +2903,28 @@ function DrawingObjects() {
                                                 {
                                                     for(j = range.c1;  j <= range.c2; ++j)
                                                     {
-                                                        cell = source_worksheet._getCell(range.r1, j);
-                                                        pt = cache.getPtByIndex(pt_index);
-                                                        if(pt)
-                                                        {
-															fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);														
-                                                        }
-                                                        ++pt_index;
+                                                        source_worksheet._getCell(range.r1, j, function(cell) {
+                                                            pt = cache.getPtByIndex(pt_index);
+                                                            if(pt)
+                                                            {
+                                                                fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);
+                                                            }
+                                                            ++pt_index;
+                                                        });
                                                     }
                                                 }
                                                 else
                                                 {
                                                     for(j = range.r1; j <= range.r2; ++j)
                                                     {
-                                                        cell = source_worksheet._getCell(j, range.c1);
-                                                        pt = cache.getPtByIndex(pt_index);
-                                                        if(pt)
-                                                        {
-															fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);	
-                                                        }
-                                                        ++pt_index;
+                                                        source_worksheet._getCell(j, range.c1, function(cell) {
+                                                            pt = cache.getPtByIndex(pt_index);
+                                                            if(pt)
+                                                            {
+                                                                fFillCell(cell, typeof pt.formatCode === "string" && pt.formatCode.length > 0 ? pt.formatCode : lit_format_code, pt.val);
+                                                            }
+                                                            ++pt_index;
+                                                        });
                                                     }
                                                 }
 

@@ -467,7 +467,7 @@ var UndoRedoDataTypes = new function() {
 	{
 		switch(nType)
 		{
-			case this.ValueMultiTextElem: return new AscCommonExcel.CCellValueMultiText();break;
+			case this.ValueMultiTextElem: return new AscCommonExcel.CMultiTextElem();break;
 			case this.CellValue:return new AscCommonExcel.CCellValue();break;
 			case this.CellValueData: return new UndoRedoData_CellValueData();break;
 			case this.CellData: return new UndoRedoData_CellData();break;
@@ -925,7 +925,7 @@ function UndoRedoData_RowProp(row){
 	this.Properties = g_oUndoRedoData_RowPropProperties;
 	if(null != row)
 	{
-		this.h = row.h;
+		this.h = row.getHeight();
 		this.hd = row.getHidden();
 		this.CustomHeight = row.getCustomHeight();
 	}
@@ -2971,84 +2971,86 @@ UndoRedoCell.prototype = {
 			oLockInfo["rangeOrObjectId"] = new Asc.Range(nCol, nRow, nCol, nRow);
 			this.wb.aCollaborativeChangeElements.push(oLockInfo);
 		}
-		var cell =  ws._getCell(nRow, nCol);
-		var Val;
-		if(bUndo)
-			Val = Data.oOldVal;
-		else
-			Val = Data.oNewVal;
-		if(AscCH.historyitem_Cell_Fontname == Type)
-			cell.setFontname(Val);
-		else if(AscCH.historyitem_Cell_Fontsize == Type)
-			cell.setFontsize(Val);
-		else if(AscCH.historyitem_Cell_Fontcolor == Type)
-			cell.setFontcolor(Val);
-		else if(AscCH.historyitem_Cell_Bold == Type)
-			cell.setBold(Val);
-		else if(AscCH.historyitem_Cell_Italic == Type)
-			cell.setItalic(Val);
-		else if(AscCH.historyitem_Cell_Underline == Type)
-			cell.setUnderline(Val);
-		else if(AscCH.historyitem_Cell_Strikeout == Type)
-			cell.setStrikeout(Val);
-		else if(AscCH.historyitem_Cell_FontAlign == Type)
-			cell.setFontAlign(Val);
-		else if(AscCH.historyitem_Cell_AlignVertical == Type)
-			cell.setAlignVertical(Val);
-		else if(AscCH.historyitem_Cell_AlignHorizontal == Type)
-			cell.setAlignHorizontal(Val);
-		else if(AscCH.historyitem_Cell_Fill == Type)
-			cell.setFill(Val);
-		else if(AscCH.historyitem_Cell_Border == Type)
-		{
-			if(null != Val)
-				cell.setBorder(Val.clone());
+		ws._getCell(nRow, nCol, function(cell) {
+			var Val;
+			if(bUndo)
+				Val = Data.oOldVal;
 			else
-				cell.setBorder(null);
-		}
-		else if(AscCH.historyitem_Cell_ShrinkToFit == Type)
-			cell.setFill(Val);
-		else if(AscCH.historyitem_Cell_Wrap == Type)
-			cell.setWrap(Val);
-		else if(AscCH.historyitem_Cell_Num == Type)
-			cell.setNum(Val);
-        else if(AscCH.historyitem_Cell_Angle == Type)
-            cell.setAngle(Val);
-        else if(AscCH.historyitem_Cell_ChangeArrayValueFormat == Type)
-		{
-			cell.oValue.multiText = [];
-			for(var i = 0, length = Val.length; i < length; ++i)
-				cell.oValue.multiText.push(Val[i].clone());
-		}
-		else if(AscCH.historyitem_Cell_ChangeValue === Type || AscCH.historyitem_Cell_ChangeValueUndo === Type)
-		{
-			if (bUndo || AscCH.historyitem_Cell_ChangeValueUndo !== Type) {
-				cell.setValueData(Val);
+				Val = Data.oNewVal;
+			if(AscCH.historyitem_Cell_Fontname == Type)
+				cell.setFontname(Val);
+			else if(AscCH.historyitem_Cell_Fontsize == Type)
+				cell.setFontsize(Val);
+			else if(AscCH.historyitem_Cell_Fontcolor == Type)
+				cell.setFontcolor(Val);
+			else if(AscCH.historyitem_Cell_Bold == Type)
+				cell.setBold(Val);
+			else if(AscCH.historyitem_Cell_Italic == Type)
+				cell.setItalic(Val);
+			else if(AscCH.historyitem_Cell_Underline == Type)
+				cell.setUnderline(Val);
+			else if(AscCH.historyitem_Cell_Strikeout == Type)
+				cell.setStrikeout(Val);
+			else if(AscCH.historyitem_Cell_FontAlign == Type)
+				cell.setFontAlign(Val);
+			else if(AscCH.historyitem_Cell_AlignVertical == Type)
+				cell.setAlignVertical(Val);
+			else if(AscCH.historyitem_Cell_AlignHorizontal == Type)
+				cell.setAlignHorizontal(Val);
+			else if(AscCH.historyitem_Cell_Fill == Type)
+				cell.setFill(Val);
+			else if(AscCH.historyitem_Cell_Border == Type)
+			{
+				if(null != Val)
+					cell.setBorder(Val.clone());
+				else
+					cell.setBorder(null);
 			}
-		}
-		else if(AscCH.historyitem_Cell_SetStyle == Type)
-		{
-            if(null != Val)
-                cell.setStyle(Val);
-			else
-				cell.setStyle(null);
-		}
-		else if(AscCH.historyitem_Cell_SetFont == Type)
-		{
-			cell.setFont(Val);
-		}
-		else if(AscCH.historyitem_Cell_SetQuotePrefix == Type)
-		{
-			cell.setQuotePrefix(Val);
-		}
-		else if(AscCH.historyitem_Cell_SetPivotButton == Type)
-		{
-			cell.setPivotButton(Val);
-		}
-		else if (AscCH.historyitem_Cell_Style == Type)
-		{
-			cell.setCellStyle(Val);
-		}
+			else if(AscCH.historyitem_Cell_ShrinkToFit == Type)
+				cell.setFill(Val);
+			else if(AscCH.historyitem_Cell_Wrap == Type)
+				cell.setWrap(Val);
+			else if(AscCH.historyitem_Cell_Num == Type)
+				cell.setNum(Val);
+			else if(AscCH.historyitem_Cell_Angle == Type)
+				cell.setAngle(Val);
+			else if(AscCH.historyitem_Cell_ChangeArrayValueFormat == Type)
+			{
+				var multiText = [];
+				for(var i = 0, length = Val.length; i < length; ++i)
+					multiText.push(Val[i].clone());
+				cell.setValueMultiTextInternal(multiText);
+			}
+			else if(AscCH.historyitem_Cell_ChangeValue === Type || AscCH.historyitem_Cell_ChangeValueUndo === Type)
+			{
+				if (bUndo || AscCH.historyitem_Cell_ChangeValueUndo !== Type) {
+					cell.setValueData(Val);
+				}
+			}
+			else if(AscCH.historyitem_Cell_SetStyle == Type)
+			{
+				if(null != Val)
+					cell.setStyle(Val);
+				else
+					cell.setStyle(null);
+			}
+			else if(AscCH.historyitem_Cell_SetFont == Type)
+			{
+				cell.setFont(Val);
+			}
+			else if(AscCH.historyitem_Cell_SetQuotePrefix == Type)
+			{
+				cell.setQuotePrefix(Val);
+			}
+			else if(AscCH.historyitem_Cell_SetPivotButton == Type)
+			{
+				cell.setPivotButton(Val);
+			}
+			else if (AscCH.historyitem_Cell_Style == Type)
+			{
+				cell.setCellStyle(Val);
+			}
+		});
 	},
 	forwardTransformationGet : function(Type, Data, nSheetId) {
 		if (AscCH.historyitem_Cell_ChangeValue === Type && Data.oNewVal && Data.oNewVal.formula) {
@@ -3086,7 +3088,7 @@ UndoRedoWoorksheet.prototype = {
 	UndoRedo : function(Type, Data, nSheetId, bUndo, opt_wb)
 	{
 		var wb = opt_wb ? opt_wb : this.wb;
-		var worksheetView, nRow, nCol, oLockInfo, cell, index, from, to, range, r1, c1, r2, c2, temp, i, length, data;
+		var worksheetView, nRow, nCol, oLockInfo, index, from, to, range, r1, c1, r2, c2, temp, i, length, data;
 		var bInsert, operType; // ToDo избавиться от этого
 		var ws = wb.getWorksheetById(nSheetId);
 		if(null == ws)
@@ -3110,12 +3112,14 @@ UndoRedoWoorksheet.prototype = {
 			{
 				var oValue = Data.oOldVal.value;
 				var oStyle = Data.oOldVal.style;
-				cell = ws._getCell(nRow, nCol);
-				cell.setValueData(oValue);
-				if(null != oStyle)
-					cell.setStyle(oStyle);
-				else
-					cell.setStyle(null);
+				ws._getCell(nRow, nCol, function(cell) {
+					cell.setValueData(oValue);
+					if(null != oStyle)
+						cell.setStyle(oStyle);
+					else
+						cell.setStyle(null);
+				});
+
 			}
 			else
 				ws._removeCell(nRow, nCol);
@@ -3156,11 +3160,12 @@ UndoRedoWoorksheet.prototype = {
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(0, index, gc_nMaxCol0, index);
 				wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
-			var row = ws._getRow(index);
-			if(bUndo)
-				row.setHeightProp(Data.oOldVal);
-			else
-				row.setHeightProp(Data.oNewVal);
+			ws._getRow(index, function(row){
+				if(bUndo)
+					row.setHeightProp(Data.oOldVal);
+				else
+					row.setHeightProp(Data.oNewVal);
+			});
 			
 			//нужно для того, чтобы грамотно выставлялись цвета в ф/т при ручном скрытии строк, затрагивающих ф/т(undo/redo)
 			//TODO для случая скрытия строк фильтром(undo), может два раза вызываться функция setColorStyleTable - пересмотреть
@@ -3425,27 +3430,6 @@ UndoRedoWoorksheet.prototype = {
 			else
 				ws.setHidden(Data.to);
 		}
-		else if(AscCH.historyitem_Worksheet_CreateRow == Type)
-		{
-			if(bUndo)
-				ws._removeRow(Data.elem);
-			else
-				ws._getRow(Data.elem);
-		}
-		else if(AscCH.historyitem_Worksheet_CreateCol == Type)
-		{
-			if(bUndo)
-				ws._removeCol(Data.elem);
-			else
-				ws._getCol(Data.elem);
-		}
-		else if(AscCH.historyitem_Worksheet_CreateCell == Type)
-		{
-			if(bUndo)
-				ws._removeCell(Data.nRow, Data.nCol);
-			else
-				ws._getCell(Data.nRow, Data.nCol);
-		}
         else if (AscCH.historyitem_Worksheet_SetDisplayGridlines === Type) {
 			ws.setDisplayGridlines(bUndo ? Data.from : Data.to);
 		} else if (AscCH.historyitem_Worksheet_SetDisplayHeadings === Type) {
@@ -3633,54 +3617,59 @@ UndoRedoRowCol.prototype = {
 			Val = Data.oOldVal;
 		else
 			Val = Data.oNewVal;
-		var row;
-		if(this.bRow)
-			row = ws._getRow(nIndex);
-		else
-			row = ws._getCol(nIndex);
-		if(AscCH.historyitem_RowCol_SetFont == Type)
-			row.setFont(Val);
-		else if(AscCH.historyitem_RowCol_Fontname == Type)
-			row.setFontname(Val);
-		else if(AscCH.historyitem_RowCol_Fontsize == Type)
-			row.setFontsize(Val);
-		else if(AscCH.historyitem_RowCol_Fontcolor == Type)
-			row.setFontcolor(Val);
-		else if(AscCH.historyitem_RowCol_Bold == Type)
-			row.setBold(Val);
-		else if(AscCH.historyitem_RowCol_Italic == Type)
-			row.setItalic(Val);
-		else if(AscCH.historyitem_RowCol_Underline == Type)
-			row.setUnderline(Val);
-		else if(AscCH.historyitem_RowCol_Strikeout == Type)
-			row.setStrikeout(Val);
-		else if(AscCH.historyitem_RowCol_FontAlign == Type)
-			row.setFontAlign(Val);
-		else if(AscCH.historyitem_RowCol_AlignVertical == Type)
-			row.setAlignVertical(Val);
-		else if(AscCH.historyitem_RowCol_AlignHorizontal == Type)
-			row.setAlignHorizontal(Val);
-		else if(AscCH.historyitem_RowCol_Fill == Type)
-			row.setFill(Val);
-		else if(AscCH.historyitem_RowCol_Border == Type)
-		{
-			if(null != Val)
-				row.setBorder(Val.clone());
-			else
-				row.setBorder(null);
+
+		function fAction(row) {
+			if(AscCH.historyitem_RowCol_SetFont == Type)
+				row.setFont(Val);
+			else if(AscCH.historyitem_RowCol_Fontname == Type)
+				row.setFontname(Val);
+			else if(AscCH.historyitem_RowCol_Fontsize == Type)
+				row.setFontsize(Val);
+			else if(AscCH.historyitem_RowCol_Fontcolor == Type)
+				row.setFontcolor(Val);
+			else if(AscCH.historyitem_RowCol_Bold == Type)
+				row.setBold(Val);
+			else if(AscCH.historyitem_RowCol_Italic == Type)
+				row.setItalic(Val);
+			else if(AscCH.historyitem_RowCol_Underline == Type)
+				row.setUnderline(Val);
+			else if(AscCH.historyitem_RowCol_Strikeout == Type)
+				row.setStrikeout(Val);
+			else if(AscCH.historyitem_RowCol_FontAlign == Type)
+				row.setFontAlign(Val);
+			else if(AscCH.historyitem_RowCol_AlignVertical == Type)
+				row.setAlignVertical(Val);
+			else if(AscCH.historyitem_RowCol_AlignHorizontal == Type)
+				row.setAlignHorizontal(Val);
+			else if(AscCH.historyitem_RowCol_Fill == Type)
+				row.setFill(Val);
+			else if(AscCH.historyitem_RowCol_Border == Type)
+			{
+				if(null != Val)
+					row.setBorder(Val.clone());
+				else
+					row.setBorder(null);
+			}
+			else if(AscCH.historyitem_RowCol_ShrinkToFit == Type)
+				row.setShrinkToFit(Val);
+			else if(AscCH.historyitem_RowCol_Wrap == Type)
+				row.setWrap(Val);
+			else if(AscCH.historyitem_RowCol_Num == Type)
+				row.setNum(Val);
+			else if(AscCH.historyitem_RowCol_Angle == Type)
+				row.setAngle(Val);
+			else if(AscCH.historyitem_RowCol_SetStyle == Type)
+				row.setStyle(Val);
+			else if (AscCH.historyitem_RowCol_SetCellStyle == Type)
+				row.setCellStyle(Val);
 		}
-		else if(AscCH.historyitem_RowCol_ShrinkToFit == Type)
-			row.setShrinkToFit(Val);
-		else if(AscCH.historyitem_RowCol_Wrap == Type)
-			row.setWrap(Val);
-		else if(AscCH.historyitem_RowCol_Num == Type)
-			row.setNum(Val);
-        else if(AscCH.historyitem_RowCol_Angle == Type)
-            row.setAngle(Val);
-		else if(AscCH.historyitem_RowCol_SetStyle == Type)
-            row.setStyle(Val);
-		else if (AscCH.historyitem_RowCol_SetCellStyle == Type)
-			row.setCellStyle(Val);
+
+		if (this.bRow) {
+			ws._getRow(nIndex, fAction);
+		} else {
+			var row = ws._getCol(nIndex);
+			fAction(row);
+		}
 	}
 };
 

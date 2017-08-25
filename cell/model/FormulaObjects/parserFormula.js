@@ -997,16 +997,17 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 					}
 				}
 
-			}, excludeHiddenRows);
+			}, undefined, excludeHiddenRows);
 		}
 		return val;
 	};
 	cArea.prototype.getValue2 = function (i, j) {
-		var res = this.index(i + 1, j + 1), r, cell;
+		var res = this.index(i + 1, j + 1), r;
 		if (!res) {
 			r = this.getRange();
-			cell = r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j);
-			res = checkTypeCell(cell);
+			r.worksheet._getCellNoEmpty(r.bbox.r1 + i, r.bbox.c1 + j, function(cell) {
+				res = checkTypeCell(cell);
+			});
 		}
 		return res;
 	};
@@ -1142,23 +1143,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				}
 			}
 
-		}, excludeHiddenRows);
+		}, undefined, excludeHiddenRows);
 
 		return [arr];
-	};
-	cArea.prototype.getRefMatrix = function () {
-		var t = this, arr = [], r = this.getRange();
-		r._foreach2(function (cell, i, j, r1, c1) {
-			if (!arr[i - r1]) {
-				arr[i - r1] = [];
-			}
-			if (cell) {
-				arr[i - r1][j - c1] = new cRef(cell.getName(), t.ws);
-			} else {
-				arr[i - r1][j - c1] = new cRef(t.ws._getCell(i, j).getName(), t.ws);
-			}
-		});
-		return arr;
 	};
 	cArea.prototype.index = function (r, c) {
 		var bbox = this.getBBox0();
@@ -1276,7 +1263,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 					}
 				}
 
-			}, _exclude);
+			}, undefined, _exclude);
 		}
 		return _val;
 	};
@@ -4194,6 +4181,7 @@ function parserFormula( formula, parent, _ws ) {
 	this.isTable = false;
 	this.isInDependencies = false;
 	this.parent = parent;
+	this._index = undefined;
 }
   parserFormula.prototype.getWs = function() {
     return this.ws;
@@ -4308,6 +4296,9 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
   oRes.isParsed = this.isParsed;
   return oRes;
 };
+	parserFormula.prototype.getParent = function() {
+		return this.parent;
+	};
 	parserFormula.prototype.getFormula = function() {
 		return this.Formula;
 	};
@@ -5767,6 +5758,12 @@ parserFormula.prototype.getElementByPos = function(pos) {
   }
   return null;
 };
+	parserFormula.prototype.getIndexNumber = function() {
+		return this._index;
+	};
+	parserFormula.prototype.setIndexNumber = function(val) {
+		this._index = val;
+	};
 
 function parseNum( str ) {
     if ( str.indexOf( "x" ) > -1 || str == "" || str.match( /\s+/ ) )//исключаем запись числа в 16-ричной форме из числа.

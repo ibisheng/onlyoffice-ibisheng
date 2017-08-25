@@ -2693,7 +2693,8 @@ StyleManager.prototype =
 		var xfsOperationCache = xfs;
 		var newXf = xfs.getOperationCache(prop, hash);
 		if (newXf) {
-			xfs = oItemWithXfs.xfs = newXf;
+			oItemWithXfs.setStyleInternal(newXf);
+			xfs = newXf;
 		} else {
 			xfs = xfs.clone();
 			if (null != val) {
@@ -2709,7 +2710,7 @@ StyleManager.prototype =
 
 			xfs = g_StyleCache.addXf(xfs);
 			xfsOperationCache.setOperationCache(prop, hash, xfs);
-			oItemWithXfs.xfs = xfs;
+			oItemWithXfs.setStyleInternal(xfs);
 		}
 		oRes.newVal = xfs ? getFunc.call(xfs) : null;
 		return oRes;
@@ -2722,7 +2723,7 @@ StyleManager.prototype =
 		var xfsOperationCache = xfs;
 		var newXf = xfs.getOperationCache(prop, val);
 		if (newXf) {
-			oItemWithXfs.xfs = newXf;
+			oItemWithXfs.setStyleInternal(newXf);
 		} else {
 			xfs = this._initXfFont(xfs);
 
@@ -2731,7 +2732,7 @@ StyleManager.prototype =
 
 			xfs = g_StyleCache.addXf(xfs);
 			xfsOperationCache.setOperationCache(prop, val, xfs);
-			oItemWithXfs.xfs = xfs;
+			oItemWithXfs.setStyleInternal(xfs);
 		}
 		return oRes;
 	},
@@ -2743,7 +2744,7 @@ StyleManager.prototype =
 		var xfsOperationCache = xfs;
 		var newXf = xfs.getOperationCache(prop, val);
 		if (newXf) {
-			oItemWithXfs.xfs = newXf;
+			oItemWithXfs.setStyleInternal(newXf);
 		} else {
 			xfs = this._initXfAlign(xfs);
 
@@ -2752,7 +2753,7 @@ StyleManager.prototype =
 
 			xfs = g_StyleCache.addXf(xfs);
 			xfsOperationCache.setOperationCache(prop, val, xfs);
-			oItemWithXfs.xfs = xfs;
+			oItemWithXfs.setStyleInternal(xfs);
 		}
 		return oRes;
 	}
@@ -2764,7 +2765,7 @@ StyleManager.prototype =
 		this.borders = {count: 0, vals: {}};
 		this.nums = {count: 0, vals: {}};
 		this.aligns = {count: 0, vals: {}};
-		this.xfs = {count: 0, vals: {}};
+		this.xfs = {list: [], vals: {}};
 	}
 
 	StyleCache.prototype.addFont = function(newFont) {
@@ -2802,12 +2803,23 @@ StyleManager.prototype =
 		}
 		return this._add(this.xfs, newXf);
 	};
+	StyleCache.prototype.getXf = function(index) {
+		return 1 <= index && index <= this.xfs.list.length ? this.xfs.list[index - 1] : null;
+	};
+	StyleCache.prototype.getXfCount = function() {
+		return this.xfs.list.length;
+	};
 	StyleCache.prototype._add = function(container, newVal) {
 		if (undefined === newVal.getIndexNumber()) {
 			var hash = newVal.getHash();
 			var res = container.vals[hash];
 			if (!res) {
-				newVal.setIndexNumber(container.count++);
+				if (container.list) {
+					//index starts with 1
+					newVal.setIndexNumber(container.list.push(newVal));
+				} else {
+					newVal.setIndexNumber(container.count++);
+				}
 				container.vals[hash] = newVal;
 				res = newVal;
 			}
@@ -3052,8 +3064,6 @@ Hyperlink.prototype = {
 	},
 	setVisited : function (bVisited) {
 		this.bVisited = bVisited;
-		if (this.Ref)
-			this.Ref.cleanCache();
 	},
 	getVisited : function () {
 		return this.bVisited;
@@ -3153,10 +3163,6 @@ Col.prototype =
 	{
 		return null == this.BestFit && null == this.hd && null == this.width && null == this.xfs && null == this.CustomWidth;
 	},
-	Remove : function()
-	{
-		this.ws._removeCol(this.index);
-	},
 	clone : function(oNewWs)
     {
         if(!oNewWs)
@@ -3225,6 +3231,10 @@ Col.prototype =
 				newVal = newVal.clone();
 			History.Add(AscCommonExcel.g_oUndoRedoCol, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
 		}
+	},
+	setStyleInternal : function(xfs)
+	{
+		this.xfs = xfs;
 	},
 	setCellStyle : function(val)
 	{
@@ -3386,57 +3396,80 @@ Col.prototype =
 		return this.hd;
 	}
 };
+
+var g_nRowOffsetFlag = 0;
+var g_nRowOffsetXf = g_nRowOffsetFlag + 1;
+var g_nRowOffsetHeight = g_nRowOffsetXf + 4;
+var g_nRowStructSize = g_nRowOffsetHeight + 2;
+
 var g_nRowFlag_empty = 0;
-var g_nRowFlag_hd = 1;
-var g_nRowFlag_CustomHeight = 2;
-var g_nRowFlag_CalcHeight = 4;
+var g_nRowFlag_init = 1;
+var g_nRowFlag_hd = 2;
+var g_nRowFlag_CustomHeight = 4;
+var g_nRowFlag_CalcHeight = 8;
+
+var g_nInt16InitVal = 1<<15;
+
 /**
  * @constructor
  */
 function Row(worksheet)
 {
 	this.ws = worksheet;
-	this.c = {};
 	this.index = null;
     this.xfs = null;
     this.h = null;
-	this.flags = g_nRowFlag_empty;
+	this.flags = g_nRowFlag_init;
+	this._hasChanged = false;
 }
 Row.prototype =
 {
-	getCells : function () {
-		return this.c;
-	},
-	create : function(row)
-	{
-		this.index = row - 1;
+	clear: function() {
+		this.index = null;
 		this.xfs = null;
+		this.h = null;
+		this.flags = g_nRowFlag_init;
+		this._hasChanged = false;
 	},
-	moveVer : function(nDif)
-	{
-		this.index += nDif;
+	saveContent: function(opt_inCaseOfChange) {
+		if (this.index >= 0 && (!opt_inCaseOfChange || this._hasChanged)) {
+			this._hasChanged = false;
+			var sheetMemory = this.ws.rowsData;
+			sheetMemory.checkSize(this.index);
+			var xfSave = this.xfs ? this.xfs.getIndexNumber() : 0;
+			var heightSave = null != this.h ? (this._prepareHeightToSave(this.h) | g_nInt16InitVal) : 0;
+			sheetMemory.setUint8(this.index, g_nRowOffsetFlag, this.flags);
+			sheetMemory.setUint32(this.index, g_nRowOffsetXf, xfSave);
+			sheetMemory.setUint16(this.index, g_nRowOffsetHeight, heightSave);
+		}
+	},
+	loadContent: function(index) {
+		var res = false;
+		this.clear();
+		this.index = index;
+		var sheetMemory = this.ws.rowsData;
+		if(sheetMemory.hasSize(this.index)){
+			this.flags = sheetMemory.getUint8(this.index, g_nRowOffsetFlag);
+			if (0 != (g_nRowFlag_init & this.flags)) {
+				this.xfs = g_StyleCache.getXf(sheetMemory.getUint32(this.index, g_nRowOffsetXf));
+				var heightSave = sheetMemory.getUint16(this.index, g_nRowOffsetHeight);
+				this.h = (0 != (heightSave & g_nInt16InitVal)) ? (heightSave & ~g_nInt16InitVal) / 100 : null;
+				res = true;
+			}
+		}
+		return res;
+	},
+	setChanged: function(val) {
+		this._hasChanged = val;
 	},
 	isEmpty : function()
 	{
-		if(!this.isEmptyProp())
-			return false;
-		var bEmptyCells = true;
-		for(var i in this.c)
-		{
-			bEmptyCells = false;
-			break;
-		}
-		if(false == bEmptyCells)
-			return false;
-		return true;
+		return this.isEmptyProp();
 	},
 	isEmptyProp : function()
 	{
-		return null == this.xfs && null == this.h && g_nRowFlag_empty == this.flags;
-	},
-	Remove : function()
-	{
-		this.ws._removeRow(this.index);
+		//todo
+		return null == this.xfs && null == this.h && g_nRowFlag_init == this.flags;
 	},
 	clone : function(oNewWs, renameParams)
 	{
@@ -3449,9 +3482,16 @@ Row.prototype =
 			oNewRow.xfs = this.xfs;
 		if(null != this.h)
 			oNewRow.h = this.h;
-		for(var i in this.c)
-			oNewRow.c[i] = this.c[i].clone(oNewWs, renameParams);
 		return oNewRow;
+	},
+	copyFrom : function(row)
+	{
+		this.flags = row.flags;
+		if(null != row.xfs)
+			this.xfs = row.xfs;
+		if(null != row.h)
+			this.h = row.h;
+		this._hasChanged = true;
 	},
 	getDefaultXfs : function()
 	{
@@ -3476,15 +3516,6 @@ Row.prototype =
 			this.setCustomHeight(prop.CustomHeight);
 		}
 	},
-	copyProperty : function(otherRow)
-	{
-		if(null != otherRow.xfs)
-			this.xfs = otherRow.xfs.clone();
-		else
-			this.xfs = null;
-		this.h = otherRow.h;
-		this.flags = otherRow.flags;
-	},
 	getStyle : function()
 	{
 		return this.xfs;
@@ -3498,21 +3529,16 @@ Row.prototype =
 	setStyle : function(xfs)
 	{
 		var oldVal = this.xfs;
-		var newVal = null;
-		this.xfs = null;
-		if(null != xfs)
-		{
-			this.xfs = xfs.clone();
-			newVal = xfs;
+		this.xfs = xfs;
+		this._hasChanged = true;
+		if (History.Is_On() && oldVal != this.xfs) {
+			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, this.xfs));
 		}
-		if(History.Is_On() && false == ((null == oldVal && null == newVal) || (null != oldVal && null != newVal && true == oldVal.isEqual(newVal))))
-		{
-			if(null != oldVal)
-				oldVal = oldVal.clone();
-			if(null != newVal)
-				newVal = newVal.clone();
-			History.Add(AscCommonExcel.g_oUndoRedoRow, AscCH.historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
-		}
+	},
+	setStyleInternal : function(xfs)
+	{
+		this.xfs = xfs;
+		this._hasChanged = true;
 	},
 	setCellStyle : function(val)
 	{
@@ -3671,6 +3697,7 @@ Row.prototype =
 		} else {
 			this.flags &= ~g_nRowFlag_hd;
 		}
+		this._hasChanged = true;
 		if (this.index >= 0) {
 			this.ws.hiddenManager.setDirty(true);
 		}
@@ -3684,6 +3711,7 @@ Row.prototype =
 		} else {
 			this.flags &= ~g_nRowFlag_CustomHeight;
 		}
+		this._hasChanged = true;
 	},
 	getCustomHeight: function() {
 		return 0 != (g_nRowFlag_CustomHeight & this.flags);
@@ -3694,23 +3722,79 @@ Row.prototype =
 		} else {
 			this.flags &= ~g_nRowFlag_CalcHeight;
 		}
+		this._hasChanged = true;
 	},
 	getCalcHeight: function() {
 		return 0 != (g_nRowFlag_CalcHeight & this.flags);
+	},
+	setIndex: function(val) {
+		this.index = val;
+	},
+	getIndex: function() {
+		return this.index;
+	},
+	setHeight: function(val) {
+		if (val < 0) {
+			val = 0;
+		} else if (val > Asc.c_oAscMaxRowHeight) {
+			val = Asc.c_oAscMaxRowHeight;
+		}
+		this.h = this._prepareHeight(val);
+		this._hasChanged = true;
+	},
+	getHeight: function() {
+		return this.h;
+	},
+	_prepareHeight: function(val) {
+		//remain 2 digits in fraction part
+		return this._prepareHeightToSave(val) / 100;
+	},
+	_prepareHeightToSave: function(val) {
+		return Math.round(val * 100);
 	}
 };
-var g_oCCellValueMultiTextProperties = {
+	function getStringFromMultiText(multiText) {
+		var sRes = "";
+		if (multiText) {
+			for (var i = 0, length = multiText.length; i < length; ++i) {
+				var elem = multiText[i];
+				if (null != elem.text && elem.format && elem.format.getSkip() == false) {
+					sRes += elem.text;
+				}
+			}
+		}
+		return sRes;
+	};
+	function isEqualMultiText(multiText1, multiText2) {
+		var sRes = "";
+		if (multiText1 && multiText2) {
+			if (multiText1.length === multiText2.length) {
+				for (var i = 0, length = multiText1.length; i < length; ++i) {
+					var elem1 = multiText1[i];
+					var elem2 = multiText2[i];
+					if (!elem1.isEqual(elem2)) {
+						return false;
+					}
+				}
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return multiText1 === multiText2;
+		}
+	};
+var g_oCMultiTextElemProperties = {
 		text: 0,
 		format: 1
 	};
-function CCellValueMultiText()
-{
-	this.Properties = g_oCCellValueMultiTextProperties;
+function CMultiTextElem() {
 	this.text = null;
 	this.format = null;
 }
-CCellValueMultiText.prototype = 
+CMultiTextElem.prototype =
 {
+	Properties : g_oCMultiTextElemProperties,
 	isEqual : function(val)
 	{
 		if(null == val)
@@ -3719,7 +3803,7 @@ CCellValueMultiText.prototype =
 	},
 	clone : function()
 	{
-		var oRes = new CCellValueMultiText();
+		var oRes = new CMultiTextElem();
 		if(null != this.text)
 			oRes.text = this.text;
 		if(null != this.format)
@@ -3751,36 +3835,31 @@ CCellValueMultiText.prototype =
 		}
 	}
 };
+
 var g_oCCellValueProperties = {
 		text: 0,
 		multiText: 1,
 		number: 2,
 		type: 3
 	};
-function CCellValue()
+
+function CCellValue(opt_cell)
 {
-	this.Properties = g_oCCellValueProperties;
-	
-	this.text = null;
-	this.multiText = null;
-	this.number = null;
-	this.type = CellValueType.Number;
-	//cache
-	this.textValue = null;
-	this.aTextValue2 = [];
-	this.textValueForEdit = null;
-	this.textValueForEdit2 = null;
+	if (opt_cell) {
+		this.text = opt_cell.text;
+		this.multiText = opt_cell.multiText;
+		this.number = opt_cell.number;
+		this.type = opt_cell.type;
+	} else {
+		this.text = null;
+		this.multiText = null;
+		this.number = null;
+		this.type = CellValueType.Number;
+	}
 }
 CCellValue.prototype = 
 {
-	isEmpty : function()
-	{
-		if(null != this.number || (null != this.text && "" != this.text))
-			return false;
-		if(null != this.multiText && "" != this.getStringFromMultiText())
-			return false;
-		return true;
-	},
+	Properties: g_oCCellValueProperties,
 	isEqual : function(val)
 	{
 		if(null == val)
@@ -3806,732 +3885,8 @@ CCellValue.prototype =
 		}
 		else if(null == this.multiText && null == val.multiText)
 			return true;
-		
+
 		return false;
-	},
-	clean : function()
-	{
-		this.text = null;
-		this.multiText = null;
-		this.number = null;
-		this.type = CellValueType.Number;
-		this.cleanCache();
-	},
-	clone : function()
-	{
-		var oRes = new CCellValue();
-		if(null != this.text)
-			oRes.text = this.text;
-		if(null != this.multiText)
-			oRes.multiText = this._cloneMultiText();
-		if(null != this.number)
-			oRes.number = this.number;
-		if(null != this.type)
-			oRes.type = this.type;
-		return oRes;
-	},
-	cleanCache : function()
-	{
-		this.textValue = null;
-		this.aTextValue2 = [];
-		this.textValueForEdit = null;
-		this.textValueForEdit2 = null;
-	},
-	getStringFromMultiText: function () {
-	    var sRes = "";
-	    if (null != this.multiText) {
-	        for (var i = 0, length = this.multiText.length; i < length; ++i) {
-	            var elem = this.multiText[i];
-	            if (null != elem.text)
-	                sRes += elem.text;
-	        }
-	    }
-	    return sRes;
-	},
-	makeSimpleText : function()
-	{
-		var bRes = false;
-		if(null != this.multiText)
-		{
-		    this.text = this.getStringFromMultiText();
-		    this.multiText = null;
-			bRes = true;
-		}
-		return bRes;
-	},
-	getValueWithoutFormat : function()
-	{
-		//применяем форматирование
-		var sResult = "";
-		if(null != this.number)
-		{
-			if(CellValueType.Bool === this.type)
-				sResult = this.number == 1 ? cBoolLocal.t : cBoolLocal.f;
-			else
-				sResult = this.number.toString();
-		}
-		else if(null != this.text)
-			sResult = this.text;
-		else if(null != this.multiText)
-		    sResult = this.getStringFromMultiText();
-		return sResult;
-	},
-	getNumberValue : function()
-	{
-		return this.number;
-	},
-	getValue : function(cell)
-	{
-		if(null == this.textValue)
-		{
-			this.getValue2(cell, gc_nMaxDigCountView, function(){return true;});
-			this.textValue = this._textArrayToString(this.aTextValue2[gc_nMaxDigCountView]);
-		}
-		return this.textValue;
-	},
-	_textArrayToString: function(aText) {
-		var res = '';
-		for (var i = 0, length = aText.length; i < length; ++i) {
-			var elem = aText[i];
-			if (elem.format && elem.format.getSkip() == false) {
-				res += elem.text;
-			}
-		}
-		return res;
-	},
-	getValueForEdit : function(cell)
-	{
-		if(null == this.textValueForEdit)
-		{
-			this.getValueForEdit2(cell);
-			this.textValueForEdit = "";
-			for(var i = 0, length = this.textValueForEdit2.length; i < length; ++i)
-				this.textValueForEdit += this.textValueForEdit2[i].text;
-		}
-//		if( CellValueType.Error == this.type ){
-//			return this._getValueTypeError(this.textValueForEdit);
-//		}
-		return this.textValueForEdit;
-	},
-	getValue2 : function(cell, dDigitsCount, fIsFitMeasurer)
-	{
-		var aRes = null;
-		if(null != this.aTextValue2[dDigitsCount])
-			aRes = this.aTextValue2[dDigitsCount];
-		if(null == aRes)
-		{
-			aRes = this._getValue2(cell, dDigitsCount, fIsFitMeasurer);
-			var formula = cell.getFormula();
-			if( formula ){
-				aRes[0].sFormula = formula;
-				aRes[0].sId = cell.getName();
-			}
-			
-			this.aTextValue2[dDigitsCount] = aRes;
-		}
-		return aRes;
-	},
-	getValueForExample : function(cell, dDigitsCount, fIsFitMeasurer, numFormat, cultureInfo)
-	{
-		var aText = this._getValue2(cell, dDigitsCount, fIsFitMeasurer, numFormat, cultureInfo);
-		return this._textArrayToString(aText);
-	},
-	_getValue2: function(cell, dDigitsCount, fIsFitMeasurer, opt_numFormat, opt_cultureInfo) {
-		var aRes = null;
-		var bNeedMeasure = true;
-		var sText = null;
-		var aText = null;
-		var isMultyText = false;
-		if (CellValueType.Number == this.type || CellValueType.String == this.type) {
-			if (null != this.text) {
-				sText = this.text;
-			} else if (null != this.multiText) {
-				aText = this.multiText;
-				isMultyText = true;
-			}
-
-			if (CellValueType.String == this.type) {
-				bNeedMeasure = false;
-			}
-			var oNumFormat;
-			if (opt_numFormat) {
-				oNumFormat = opt_numFormat;
-			} else {
-				var xfs = cell.getCompiledStyle();
-				if (null != xfs && null != xfs.num) {
-					oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
-				} else {
-					oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
-				}
-			}
-
-			if (false == oNumFormat.isGeneralFormat()) {
-				if (null != this.number) {
-					aText = oNumFormat.format(this.number, this.type, dDigitsCount, false, opt_cultureInfo);
-					isMultyText = false;
-					sText = null;
-				} else if (CellValueType.String == this.type) {
-					var oTextFormat = oNumFormat.getTextFormat();
-					if (null != oTextFormat && "@" != oTextFormat.formatString) {
-						if (null != this.text) {
-							aText = oNumFormat.format(this.text, this.type, dDigitsCount, false, opt_cultureInfo);
-							isMultyText = false;
-							sText = null;
-						} else if (null != this.multiText) {
-							var sSimpleString = this.getStringFromMultiText();
-							aText = oNumFormat.format(sSimpleString, this.type, dDigitsCount, false, opt_cultureInfo);
-							isMultyText = false;
-							sText = null;
-						}
-					}
-				}
-			} else if (CellValueType.Number == this.type && null != this.number) {
-				bNeedMeasure = false;
-				var bFindResult = false;
-				//варируем dDigitsCount чтобы результат влез в ячейку
-				var nTempDigCount = Math.ceil(dDigitsCount);
-				var sOriginText = this.number;
-				while (nTempDigCount >= 1) {
-					//Строим подходящий general format
-					var sGeneral = AscCommon.DecodeGeneralFormat(sOriginText, this.type, nTempDigCount);
-					if (null != sGeneral) {
-						oNumFormat = oNumFormatCache.get(sGeneral);
-					}
-
-					if (null != oNumFormat) {
-						sText = null;
-						isMultyText = false;
-						aText = oNumFormat.format(sOriginText, this.type, dDigitsCount, false, opt_cultureInfo);
-						if (true == oNumFormat.isTextFormat()) {
-							break;
-						} else {
-							aRes = this._getValue2Result(cell, sText, aText, isMultyText);
-							//Проверяем влезает ли текст
-							if (true == fIsFitMeasurer(aRes)) {
-								bFindResult = true;
-								break;
-							}
-							aRes = null;
-						}
-					}
-					nTempDigCount--;
-				}
-				if (false == bFindResult) {
-					aRes = null;
-					sText = null;
-					isMultyText = false;
-					var font = new AscCommonExcel.Font();
-					if (dDigitsCount > 1) {
-						font.setRepeat(true);
-						aText = [{text: "#", format: font}];
-					} else {
-						aText = [{text: "", format: font}];
-					}
-				}
-			}
-		} else if (CellValueType.Bool === this.type) {
-			if (null != this.number) {
-				sText = (0 != this.number) ? cBoolLocal.t : cBoolLocal.f;
-			}
-		} else if (CellValueType.Error === this.type) {
-			if (null != this.text) {
-				sText = this._getValueTypeError(this.text);
-			}
-		}
-		if (bNeedMeasure) {
-			aRes = this._getValue2Result(cell, sText, aText, isMultyText);
-			//Проверяем влезает ли текст
-			if (false == fIsFitMeasurer(aRes)) {
-				aRes = null;
-				sText = null;
-				isMultyText = false;
-				var font = new AscCommonExcel.Font();
-				font.setRepeat(true);
-				aText = [{text: "#", format: font}];
-			}
-		}
-		if (null == aRes) {
-			aRes = this._getValue2Result(cell, sText, aText, isMultyText);
-		}
-		return aRes;
-	},
-	getValueForEdit2: function (cell, cultureInfo)
-	{
-	    if (null == cultureInfo)
-	        cultureInfo = AscCommon.g_oDefaultCultureInfo;
-		if(null == this.textValueForEdit2)
-		{
-			//todo проблема точности. в excel у чисел только 15 значащих цифр у нас больше.
-			//применяем форматирование
-			var oValueText = null;
-			var oValueArray = null;
-			var xfs = cell.getCompiledStyle();
-			if(cell.formulaParsed)
-				oValueText = "="+cell.formulaParsed.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale,true);	// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
-			else
-			{
-				if(null != this.text || null != this.number)
-				{
-					if (CellValueType.Bool === this.type && null != this.number)
-						oValueText = (this.number == 1) ? cBoolLocal.t : cBoolLocal.f;
-					else
-					{
-						if(null != this.text)
-							oValueText = this.text;
-						if(CellValueType.Number === this.type || CellValueType.String === this.type)
-						{
-							var oNumFormat;
-							if(null != xfs && null != xfs.num)
-								oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
-							else
-								oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
-							if(CellValueType.String != this.type && null != oNumFormat && null != this.number)
-							{
-								var nValue = this.number;
-								var oTargetFormat = oNumFormat.getFormatByValue(nValue);
-								if(oTargetFormat)
-								{
-									if(1 == oTargetFormat.nPercent)
-									{
-										//prercent
-										oValueText = AscCommon.oGeneralEditFormatCache.format(nValue * 100) + "%";
-									}
-									else if(oTargetFormat.bDateTime)
-									{
-										//Если число не подходит под формат даты возвращаем само число
-										if(false == oTargetFormat.isInvalidDateValue(nValue))
-										{
-											var bDate = oTargetFormat.bDate;
-											var bTime = oTargetFormat.bTime;
-											if(false == bDate && nValue >= 1)
-												bDate = true;
-											if(false == bTime && Math.floor(nValue) != nValue)
-											    bTime = true;
-											var sDateFormat = "";
-											if (bDate) {
-												sDateFormat = AscCommon.getShortDateFormat(cultureInfo);
-											}
-                                            var sTimeFormat = 'h:mm:ss';
-                                            if (cultureInfo.AMDesignator.length > 0 && cultureInfo.PMDesignator.length > 0){
-                                                sTimeFormat += ' AM/PM';
-                                            }
-											if(bDate && bTime)
-											    oNumFormat = oNumFormatCache.get(sDateFormat + ' ' + sTimeFormat);
-											else if(bTime)
-												oNumFormat = oNumFormatCache.get(sTimeFormat);
-											else
-											    oNumFormat = oNumFormatCache.get(sDateFormat);
-											
-											var aFormatedValue = oNumFormat.format(nValue, CellValueType.Number, AscCommon.gc_nMaxDigCount);
-											oValueText = "";
-											for(var i = 0, length = aFormatedValue.length; i < length; ++i)
-												oValueText += aFormatedValue[i].text;
-										}
-										else
-											oValueText = AscCommon.oGeneralEditFormatCache.format(nValue);
-									}
-									else
-										oValueText = AscCommon.oGeneralEditFormatCache.format(nValue);
-								}
-							}
-						}
-					}
-				}
-				else if(this.multiText)
-					oValueArray = this.multiText;
-			}
-			if(null != xfs && true == xfs.QuotePrefix && CellValueType.String == this.type && false == cell.isFormula())
-			{
-				if(null != oValueText)
-					oValueText = "'" + oValueText;
-				else if(null != oValueArray)
-					oValueArray = [{text:"'"}].concat(oValueArray);
-			}
-			this.textValueForEdit2 = this._getValue2Result(cell, oValueText, oValueArray, true);
-		}
-		return this.textValueForEdit2;
-	},
-	_getValue2Result : function(cell, sText, aText, isMultyText)
-	{
-		var aResult = [];
-		if(null == sText && null == aText)
-			sText = "";
-		var color;
-		var cellfont;
-		var xfs = cell.getCompiledStyle();
-		if(null != xfs && null != xfs.font)
-			cellfont = xfs.font;
-		else
-			cellfont = g_oDefaultFormat.Font;
-		if(null != sText){
-			var oNewItem = new Fragment();
-			oNewItem.text = sText;
-			oNewItem.format = cellfont.clone();
-			color = oNewItem.format.getColor();
-			if(color instanceof ThemeColor)
-			{
-				//для посещенных гиперссылок
-				if(g_nColorHyperlink == color.theme && null == color.tint)
-				{
-					var hyperlink = cell.ws.hyperlinkManager.getByCell(cell.nRow, cell.nCol);
-					if(null != hyperlink && hyperlink.data.getVisited())
-					{
-						oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
-					}
-				}
-			}
-			oNewItem.format.setSkip(false);
-			oNewItem.format.setRepeat(false);
-			aResult.push(oNewItem);
-		} else if(null != aText){
-			for(var i = 0; i < aText.length; i++){
-				var oNewItem = new Fragment();
-				var oCurtext = aText[i];
-				if(null != oCurtext.text)
-				{
-					oNewItem.text = oCurtext.text;
-					var oCurFormat = new Font();
-					if (isMultyText) {
-						if (null != oCurtext.format) {
-							oCurFormat.assign(oCurtext.format);
-						} else {
-							oCurFormat.assign(cellfont);
-						}
-					} else {
-						oCurFormat.assign(cellfont);
-						if (null != oCurtext.format) {
-							oCurFormat.assignFromObject(oCurtext.format);
-						}
-					}
-					oNewItem.format = oCurFormat;
-					color = oNewItem.format.getColor();
-					if(color instanceof ThemeColor)
-					{
-						//для посещенных гиперссылок
-						if(g_nColorHyperlink == color.theme && null == color.tint)
-						{
-							var hyperlink = cell.ws.hyperlinkManager.getByCell(cell.nRow, cell.nCol);
-							if(null != hyperlink && hyperlink.data.getVisited())
-							{
-								oNewItem.format.setColor(g_oColorManager.getThemeColor(g_nColorHyperlinkVisited, null));
-							}
-						}
-					}
-					aResult.push(oNewItem);
-				}
-			}
-		}
-		return aResult;
-	},
-	setValue : function(cell, val)
-	{
-		this.clean();
-
-		function checkCellValueTypeError(sUpText){
-			switch (sUpText){
-				case cErrorLocal["nil"]:
-					return cErrorOrigin["nil"];
-					break;
-				case cErrorLocal["div"]:
-					return cErrorOrigin["div"];
-					break;
-				case cErrorLocal["value"]:
-					return cErrorOrigin["value"];
-					break;
-				case cErrorLocal["ref"]:
-					return cErrorOrigin["ref"];
-					break;
-				case cErrorLocal["name"]:
-				case cErrorLocal["name"].replace('\\', ''): // ToDo это неправильная правка для бага 32463 (нужно переделать parse формул)
-					return cErrorOrigin["name"];
-					break;
-				case cErrorLocal["num"]:
-					return cErrorOrigin["num"];
-					break;
-				case cErrorLocal["na"]:
-					return cErrorOrigin["na"];
-					break;
-				case cErrorLocal["getdata"]:
-					return cErrorOrigin["getdata"];
-					break;
-				case cErrorLocal["uf"]:
-					return cErrorOrigin["uf"];
-					break;
-			}
-			return false;
-		}
-
-		if("" == val)
-			return;
-		var oNumFormat;
-		var xfs = cell.getCompiledStyle();
-		if(null != xfs && null != xfs.num)
-			oNumFormat = oNumFormatCache.get(xfs.num.getFormat());
-		else
-			oNumFormat = oNumFormatCache.get(g_oDefaultFormat.Num.getFormat());
-		if(oNumFormat.isTextFormat())
-		{
-			this.type = CellValueType.String;
-			this.text = val;
-		}
-		else
-		{
-		    if (AscCommon.g_oFormatParser.isLocaleNumber(val))
-			{
-				this.type = CellValueType.Number;
-				this.number = AscCommon.g_oFormatParser.parseLocaleNumber(val);
-			}
-			else
-			{
-				var sUpText = val.toUpperCase();
-				if(cBoolLocal.t === sUpText || cBoolLocal.f === sUpText)
-				{
-					this.type = CellValueType.Bool;
-					this.number = (cBoolLocal.t === sUpText) ? 1 : 0;
-				}
-				else if(checkCellValueTypeError(sUpText))
-				{
-					this.type = CellValueType.Error;
-					this.text = checkCellValueTypeError(sUpText);
-				}
-				else
-				{
-					//распознаем формат
-					var res = AscCommon.g_oFormatParser.parse(val);
-					if(null != res)
-					{
-						//Сравниваем с текущим форматом, если типы совпадают - меняем только значение ячейки
-						var nFormatType = oNumFormat.getType();
-						if(!((c_oAscNumFormatType.Percent == nFormatType && res.bPercent) ||
-							(c_oAscNumFormatType.Currency == nFormatType && res.bCurrency) ||
-							(c_oAscNumFormatType.Date == nFormatType && res.bDate) ||
-							(c_oAscNumFormatType.Time == nFormatType && res.bTime)) && res.format != oNumFormat.sFormat)
-							cell.setNumFormat(res.format);
-						this.number = res.value;
-						this.type = CellValueType.Number;
-					}
-					else
-					{
-						this.type = CellValueType.String;
-						//проверяем QuotePrefix
-						if(val.length > 0 && "'" == val[0])
-						{
-							cell.setQuotePrefix(true);
-							val = val.substring(1);
-						}
-						this.text = val;
-					}
-				}
-			}
-		}
-    if (/(^(((http|https|ftp):\/\/)|(mailto:)|(www.)))|@/i.test(val)) {
-      // Удаляем концевые пробелы и переводы строки перед проверкой гиперссылок
-      val = val.replace(/\s+$/, '');
-      var typeHyp = AscCommon.getUrlType(val);
-      if (AscCommon.c_oAscUrlType.Invalid != typeHyp) {
-        val = AscCommon.prepareUrl(val, typeHyp);
-
-        var oNewHyperlink = new Hyperlink();
-        oNewHyperlink.Ref = cell.ws.getCell3(cell.nRow, cell.nCol);
-        oNewHyperlink.Hyperlink = val;
-        oNewHyperlink.Ref.setHyperlink(oNewHyperlink);
-      }
-    }
-	},
-	setValue2 : function(cell, aVal)
-	{
-		var sSimpleText = "";
-		for(var i = 0, length = aVal.length; i < length; ++i)
-			sSimpleText += aVal[i].text;
-		this.setValue(cell, sSimpleText);
-		var nRow = cell.nRow;
-		var nCol = cell.nCol;
-		if(CellValueType.String == this.type && null == cell.ws.hyperlinkManager.getByCell(nRow, nCol))
-		{
-			this.clean();
-			this.type = CellValueType.String;
-			//проверяем можно ли перевести массив в простую строку.
-			if(aVal.length > 0)
-			{
-				this.multiText = [];
-				for(var i = 0, length = aVal.length; i < length; i++){
-					var item = aVal[i];
-					var oNewElem = new CCellValueMultiText();
-					oNewElem.text = item.text;
-					if (null != item.format) {
-						oNewElem.format = new Font();
-						oNewElem.format.assign(item.format);
-					}
-					this.multiText.push(oNewElem);
-				}
-				this.minimizeMultiText(cell, true);
-			}
-			//обрабатываем QuotePrefix
-			if(null != this.text)
-			{
-				if(this.text.length > 0 && "'" == this.text[0])
-				{
-					cell.setQuotePrefix(true);
-					this.text = this.text.substring(1);
-				}
-			}
-			else if(null != this.multiText)
-			{
-				if(this.multiText.length > 0)
-				{
-					var oFirstItem = this.multiText[0];
-					if(null != oFirstItem.text && oFirstItem.text.length > 0 && "'" == oFirstItem.text[0])
-					{
-						cell.setQuotePrefix(true);
-						if(1 != oFirstItem.text.length)
-							oFirstItem.text = oFirstItem.text.substring(1);
-						else
-						{
-							this.multiText.shift();
-							if(0 == this.multiText.length)
-							{
-								this.multiText = null;
-								this.text = "";
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	_cloneMultiText : function()
-	{
-		var oRes = [];
-		for(var i = 0, length = this.multiText.length; i < length; ++i)
-			oRes.push(this.multiText[i].clone());
-		return oRes;
-	},
-	minimizeMultiText : function(cell, bSetCellFont)
-	{
-		var bRes = false;
-		if(null != this.multiText && this.multiText.length > 0)
-		{
-		    var cellFont = cell.getFont();
-		    var oIntersectFont = null;
-		    for (var i = 0, length = this.multiText.length; i < length; i++) {
-		        var elem = this.multiText[i];
-			    if (null != elem.format) {
-			        if (null == oIntersectFont)
-			            oIntersectFont = elem.format.clone();
-			        oIntersectFont.intersect(elem.format, cellFont);
-			    }
-			    else {
-			        oIntersectFont = cellFont;
-			        break;
-			    }
-			}
-
-			if(bSetCellFont)
-			{
-			    if (oIntersectFont.isEqual(g_oDefaultFormat.Font))
-					cell.setFont(null, false);
-				else
-					cell.setFont(oIntersectFont, false);
-			}
-			//если у всех элементов один формат, то сохраняем только текст
-			var bIsEqual = true;
-			for (var i = 0, length = this.multiText.length; i < length; i++)
-			{
-			    var elem = this.multiText[i];
-			    if (null != elem.format && false == oIntersectFont.isEqual(elem.format))
-				{
-					bIsEqual = false;
-					break;
-				}
-			}
-			if(bIsEqual)
-			{
-				this.makeSimpleText();
-				bRes = true;
-			}
-		}
-		return bRes;
-	},
-	_setFontProp : function(cell, fCheck, fAction)
-	{
-		var bRes = false;
-		if(null != this.multiText)
-		{
-			//проверяем поменяются ли свойства
-			var bChange = false;
-			for(var i = 0, length = this.multiText.length; i < length; ++i)
-			{
-			    var elem = this.multiText[i];
-			    if (null != elem.format && true == fCheck(elem.format))
-				{
-					bChange = true;
-					break;
-				}
-			}
-			if(bChange)
-			{
-				var backupObj = cell.getValueData();
-				for (var i = 0, length = this.multiText.length; i < length; ++i) {
-				    var elem = this.multiText[i];
-				    if (null != elem.format)
-				        fAction(elem.format)
-				}
-				//пробуем преобразовать в простую строку
-				if(this.minimizeMultiText(cell, false))
-				{
-					var DataNew = cell.getValueData();
-					History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow,cell.nCol, backupObj, DataNew));
-				}
-				else
-				{
-					var DataNew = this._cloneMultiText();
-					History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeArrayValueFormat, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow, cell.nCol, backupObj.value.multiText, DataNew));
-				}
-			}
-			bRes = true;
-		}
-		return bRes;
-	},
-	setFontname : function(cell, val)
-	{
-		return this._setFontProp(cell, function(format){return val != format.getName();}, function(format){format.setName(val);});
-	},
-	setFontsize : function(cell, val)
-	{
-		return this._setFontProp(cell, function(format){return val != format.getSize();}, function(format){format.setSize(val);});
-	},
-	setFontcolor : function(cell, val)
-	{
-		return this._setFontProp(cell, function(format){return val != format.getColor();}, function(format){format.setColor(val);});
-	},
-	setBold : function(cell, val)
-	{
-		return this._setFontProp(cell, function(format){return val != format.getBold();}, function(format){format.setBold(val);});
-	},
-	setItalic : function(cell, val)
-	{
-		return this._setFontProp(cell, function(format){return val != format.getItalic();}, function(format){format.setItalic(val);});
-	},
-	setUnderline : function(cell, val)
-	{
-		return this._setFontProp(cell, function(format){return val != format.getUnderline();}, function(format){format.setUnderline(val);});
-	},
-	setStrikeout : function(cell, val)
-	{
-		return this._setFontProp(cell, function(format){return val != format.getStrikeout();}, function(format){format.setStrikeout(val);});
-	},
-	setFontAlign : function(cell, val)
-	{
-		return this._setFontProp(cell, function(format){return val != format.getVerticalAlign();}, function(format){format.setVerticalAlign(val);});
-	},
-	setValueType : function(type)
-	{
-		if(CellValueType.String == type && null != this.number)
-		{
-			this.text = this.number.toString();
-			this.number = null;
-		}
-		this.type = type;
 	},
 	getType : function()
 	{
@@ -4560,38 +3915,6 @@ CCellValue.prototype =
 			case this.Properties.number: this.number = value;break;
 			case this.Properties.type: this.type = value;break;
 		}
-	},
-	_getValueTypeError : function (text){
-		switch (text){
-			case cErrorOrigin["nil"]:
-				return cErrorLocal["nil"];
-				break;
-			case cErrorOrigin["div"]:
-				return cErrorLocal["div"];
-				break;
-			case cErrorOrigin["value"]:
-				return cErrorLocal["value"];
-				break;
-			case cErrorOrigin["ref"]:
-				return cErrorLocal["ref"];
-				break;
-			case cErrorOrigin["name"]:
-				return cErrorLocal["name"].replace('\\', ''); // ToDo это неправильная правка для бага 32463 (нужно переделать parse формул)
-				break;
-			case cErrorOrigin["num"]:
-				return cErrorLocal["num"];
-				break;
-			case cErrorOrigin["na"]:
-				return cErrorLocal["na"];
-				break;
-			case cErrorOrigin["getdata"]:
-				return cErrorLocal["getdata"];
-				break;
-			case cErrorOrigin["uf"]:
-				return cErrorLocal["uf"];
-				break;
-	}
-		return cErrorLocal["nil"];
 	}
 };
 
@@ -7594,7 +6917,7 @@ DynamicFilter.prototype.init = function(range) {
 			var summ = 0;
 			var counter = 0;
 			
-			range._foreach2(function(cell){
+			range._foreachNoEmpty(function(cell){
 				var val = parseFloat(cell.getValueWithoutFormat());
 				
 				if(!isNaN(val))
@@ -7710,41 +7033,42 @@ ColorFilter.prototype.isHideValue = function(cell) {
 	if(this.dxf && this.dxf.fill && cell)
 	{
 		var filterColor = this.dxf.fill.bg;
-		cell = cell.getLeftTopCellNoEmpty();
-		
-		if(false === this.CellColor)//font color
-		{
-			if(cell && cell.oValue.multiText !== null)
+		cell.getLeftTopCellNoEmpty(function(cell) {
+			if(false === this.CellColor)//font color
 			{
-				for(var j = 0; j < cell.oValue.multiText.length; j++)
+				var multiText;
+				if(cell && (multiText = cell.getValueMultiText()) !== null)
 				{
-					var fontColor = cell.oValue.multiText[j].format ? cell.oValue.multiText[j].format.getColor() : null;
-					if(isEqualColors(filterColor,fontColor ))
+					for(var j = 0; j < multiText.length; j++)
+					{
+						var fontColor = multiText[j].format ? multiText[j].format.getColor() : null;
+						if(isEqualColors(filterColor,fontColor ))
+						{
+							res = false;
+							break;
+						}
+					}
+				}
+				else
+				{
+					var fontColor = cell && cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
+					if(isEqualColors(filterColor,fontColor))
 					{
 						res = false;
-						break;
 					}
 				}
 			}
 			else
 			{
-				var fontColor = cell && cell.xfs && cell.xfs.font ? cell.xfs.font.getColor() : null;
-				if(isEqualColors(filterColor,fontColor))
+				var color = cell ? cell.getStyle() : null;
+				var cellColor =  color !== null && color.fill && color.fill.bg ? color.fill.bg : null;
+
+				if(isEqualColors(filterColor, cellColor))
 				{
 					res = false;
 				}
 			}
-		}
-		else
-		{
-			var color = cell ? cell.getStyle() : null;
-			var cellColor =  color !== null && color.fill && color.fill.bg ? color.fill.bg : null;
-			
-			if(isEqualColors(filterColor, cellColor))
-			{
-				res = false;
-			}
-		}
+		});
 	}
 	
 	return res;
@@ -8061,6 +7385,97 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
+	if (typeof Map === 'undefined') {
+		(function() {
+			var Map = function() {
+				this.storage = {};
+			};
+			Map.prototype = {
+				set: function(key, value) {
+					this.storage[key] = value;
+				},
+				get: function(key) {
+					return this.storage[key];
+				},
+				delete: function(key) {
+					delete this.storage[key];
+				},
+				has: function(key) {
+					return !!this.storage[key];
+				}
+			};
+
+			window.Map = Map;
+		})();
+	}
+	/**
+	 * @constructor
+	 * @memberOf AscCommonExcel
+	 */
+	function CSharedStrings () {
+		this.all = [];
+		this.text = new Map();
+		//
+		this.multiText = [];
+		this.multiTextIndex = [];
+	}
+
+	CSharedStrings.prototype.addText = function(text) {
+		var index = this.text.get(text);
+		if (undefined === index) {
+			this.all.push(text);
+			index = this.all.length;
+			this.text.set(text, index);
+		}
+		return index;
+	};
+	CSharedStrings.prototype.addMultiText = function(multiText) {
+		var index;
+		for (var i = 0; i < this.multiText.length; ++i) {
+			if (AscCommonExcel.isEqualMultiText(multiText, this.multiText[i])) {
+				index = this.multiTextIndex[i];
+				break;
+			}
+		}
+		if (undefined === index) {
+			this.all.push(multiText);
+			index = this.all.length;
+			this.multiText.push(multiText);
+			this.multiTextIndex.push(index);
+		}
+		return index;
+	};
+	CSharedStrings.prototype.get = function(index) {
+		return 1 <= index && index <= this.all.length ? this.all[index - 1] : null;
+	};
+	CSharedStrings.prototype.getCount = function() {
+		return this.all.length;
+	};
+
+	/**
+	 * @constructor
+	 * @memberOf AscCommonExcel
+	 */
+	function CWorkbookFormulas () {
+		this.all = [];
+	}
+
+	CWorkbookFormulas.prototype.add = function(formula) {
+		var index = formula.getIndexNumber();
+		if (undefined === index) {
+			this.all.push(formula);
+			index = this.all.length;
+			formula.setIndexNumber(index);
+		}
+		return formula;
+	};
+	CWorkbookFormulas.prototype.get = function(index) {
+		return 1 <= index && index <= this.all.length ? this.all[index - 1] : null;
+	};
+	CWorkbookFormulas.prototype.getCount = function() {
+		return this.all.length;
+	};
+
 	//----------------------------------------------------------export----------------------------------------------------
 	var prot;
 	window['Asc'] = window['Asc'] || {};
@@ -8072,7 +7487,10 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].g_oThemeColorsDefaultModsSpreadsheet = g_oThemeColorsDefaultModsSpreadsheet;
 	window['AscCommonExcel'].g_StyleCache = g_StyleCache;
 	window['AscCommonExcel'].map_themeExcel_to_themePresentation = map_themeExcel_to_themePresentation;
+	window['AscCommonExcel'].g_nRowStructSize = g_nRowStructSize;
 	window['AscCommonExcel'].shiftGetBBox = shiftGetBBox;
+	window['AscCommonExcel'].getStringFromMultiText = getStringFromMultiText;
+	window['AscCommonExcel'].isEqualMultiText = isEqualMultiText;
 	window['AscCommonExcel'].RgbColor = RgbColor;
 	window['AscCommonExcel'].createRgbColor = createRgbColor;
 	window['AscCommonExcel'].ThemeColor = ThemeColor;
@@ -8093,10 +7511,12 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	window['AscCommonExcel'].SheetFormatPr = SheetFormatPr;
 	window['AscCommonExcel'].Col = Col;
 	window['AscCommonExcel'].Row = Row;
-	window['AscCommonExcel'].CCellValueMultiText = CCellValueMultiText;
+	window['AscCommonExcel'].CMultiTextElem = CMultiTextElem;
 	window['AscCommonExcel'].CCellValue = CCellValue;
 	window['AscCommonExcel'].RangeDataManagerElem = RangeDataManagerElem;
 	window['AscCommonExcel'].RangeDataManager = RangeDataManager;
+	window['AscCommonExcel'].CSharedStrings = CSharedStrings;
+	window['AscCommonExcel'].CWorkbookFormulas = CWorkbookFormulas;
 	window["Asc"]["sparklineGroup"] = window['AscCommonExcel'].sparklineGroup = sparklineGroup;
 	prot = sparklineGroup.prototype;
 	prot["asc_getId"] = prot.asc_getId;
