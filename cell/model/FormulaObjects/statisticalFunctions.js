@@ -3998,6 +3998,57 @@
 					bEDS = true; // period length 1 means no periodic data: EDS suffices
 			}*/
 
+			/*var GetForecast = function( fTarget, rForecast )
+			{
+				var cfMinABCResolution = 0.001;
+				var rForecast;
+
+				if ( fTarget <= maRange[ mnCount - 1 ].X )
+				{
+					var n = ( fTarget - maRange[ 0 ].X ) / mfStepSize;
+					var fInterpolate = Math.fmod( fTarget - maRange[ 0 ].X, mfStepSize );
+					rForecast = maRange[ n ].Y;
+
+					if ( fInterpolate >= cfMinABCResolution )
+					{
+						var fInterpolateFactor = fInterpolate / mfStepSize;
+						var fFc_1 = mpForecast[ n + 1 ];
+						rForecast = rForecast + fInterpolateFactor * ( fFc_1 - rForecast );
+					}
+				}
+				else
+				{
+					var n = ( fTarget - maRange[ mnCount - 1 ].X ) / mfStepSize;
+					var fInterpolate = Math.fmod( fTarget - maRange[ mnCount - 1 ].X, mfStepSize );
+
+					if ( bEDS )
+						rForecast = mpBase[ mnCount - 1 ] + n * mpTrend[ mnCount - 1 ];
+					else if ( bAdditive )
+						rForecast = mpBase[ mnCount - 1 ] + n * mpTrend[ mnCount - 1 ] +
+							mpPerIdx[ mnCount - 1 - mnSmplInPrd + ( n % mnSmplInPrd ) ];
+					else
+						rForecast = ( mpBase[ mnCount - 1 ] + n * mpTrend[ mnCount - 1 ] ) *
+							mpPerIdx[ mnCount - 1 - mnSmplInPrd + ( n % mnSmplInPrd ) ];
+
+					if ( fInterpolate >= cfMinABCResolution )
+					{
+						var fInterpolateFactor = fInterpolate / mfStepSize;
+						var fFc_1;
+						if ( bEDS )
+							fFc_1 = mpBase[ mnCount - 1 ] + ( n + 1 ) * mpTrend[ mnCount - 1 ];
+						else if ( bAdditive )
+							fFc_1 = mpBase[ mnCount - 1 ] + ( n + 1 ) * mpTrend[ mnCount - 1 ] +
+								mpPerIdx[ mnCount - 1 - mnSmplInPrd + ( ( n + 1 ) % mnSmplInPrd ) ];
+						else
+							fFc_1 = ( mpBase[ mnCount - 1 ] + ( n + 1 ) * mpTrend[ mnCount - 1 ] ) *
+								mpPerIdx[ mnCount - 1 - mnSmplInPrd + ( ( n + 1 ) % mnSmplInPrd ) ];
+						rForecast = rForecast + fInterpolateFactor * ( fFc_1 - rForecast );
+					}
+				}
+				return rForecast;
+			};
+
+			GetForecast( pTMat);*/
 
 
 			return new cNumber(1);
