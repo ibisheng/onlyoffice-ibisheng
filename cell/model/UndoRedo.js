@@ -925,7 +925,7 @@ function UndoRedoData_RowProp(row){
 	this.Properties = g_oUndoRedoData_RowPropProperties;
 	if(null != row)
 	{
-		this.h = row.h;
+		this.h = row.getHeight();
 		this.hd = row.getHidden();
 		this.CustomHeight = row.getCustomHeight();
 	}

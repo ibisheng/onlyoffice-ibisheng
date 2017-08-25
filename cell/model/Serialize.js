@@ -6244,7 +6244,7 @@
             else if ( c_oSerSheetFormatPrTypes.DefaultRowHeight == type )
             {
                 var oAllRow = oWorksheet.getAllRow();
-                oAllRow.h = this.stream.GetDoubleLE();
+                oAllRow.setHeight(this.stream.GetDoubleLE());
             }
             else if ( c_oSerSheetFormatPrTypes.CustomHeight == type )
             {

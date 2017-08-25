@@ -2550,9 +2550,9 @@
 					var multiText = cell.getValueMultiText();
 					if(multiText)
 					{
-						for(var m = 0; m < multiText.multiText.length; m++)
+						for(var m = 0; m < multiText.length; m++)
 						{
-							var curMultiText = multiText.multiText[m];
+							var curMultiText = multiText[m];
 							var format = curMultiText.format;
 
 							var elem = getElem(curMultiText.text, format);

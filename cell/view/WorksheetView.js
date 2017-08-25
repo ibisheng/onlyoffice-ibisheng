@@ -4148,7 +4148,7 @@
         }
         var t = this;
         var curRow = -1, skipRow = false;
-		this.model.getRange3(range.r1, range.c1, range.r2, range.c2)._foreachNoEmpty(function(cell, row, col) {
+		this.model.getRange3(range.r1, 0, range.r2, range.c2)._foreachNoEmpty(function(cell, row, col) {
             if (curRow !== row) {
                 curRow = row;
                 skipRow = t.height_1px > t.rows[row].height;
@@ -11196,7 +11196,7 @@
         if (!maxCount) {
             maxCount = Number.MAX_VALUE;
         }
-        var count = 0, isBreak, end = 0 < step ? this.model.getRowsCount() - 1 :
+        var count = 0, isBreak = false, end = 0 < step ? this.model.getRowsCount() - 1 :
           0, isEnd = true, colsCount = this.model.getColsCount(), range = new asc_Range(col, row, col, row);
         for (; row * step <= end && count < maxCount; row += step, isEnd = true, ++count) {
             for (col = range.c1; col <= range.c2; ++col) {
@@ -11207,6 +11207,7 @@
 					}
 				});
 				if (isBreak) {
+					isBreak = false;
 					break;
 				}
             }
@@ -11216,6 +11217,7 @@
 					isBreak = (null === cell || cell.isEmptyText());
 				});
 				if (isBreak) {
+					isBreak = false;
                     break;
                 }
                 isEnd = false;
@@ -11227,6 +11229,7 @@
 					isBreak = (null === cell || cell.isEmptyText());
 				});
 				if (isBreak) {
+					isBreak = false;
                     break;
                 }
                 isEnd = false;
@@ -11252,7 +11255,7 @@
         }
         var row, value, valueLowCase;
         for (row = range.r1; row <= range.r2; ++row) {
-			this.model._getCellNoEmpty(row, col, function(cell){
+			this.model._getCellNoEmpty(row, col, function(cell) {
 				if (cell) {
 					value = cell.getValue();
 					if (!AscCommon.isNumber(value)) {
@@ -13155,7 +13158,7 @@
 			var multiText = cell.getValueMultiText();
 			if (null !== multiText) {
 				for (var j = 0; j < multiText.length; j++) {
-					var fontColor = multiText.multiText[j].format ? multiText.multiText[j].format.getColor() : null;
+					var fontColor = multiText[j].format ? multiText[j].format.getColor() : null;
 					addFontColorsToArray(fontColor);
 				}
 			} else {

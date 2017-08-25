@@ -3743,7 +3743,7 @@ Row.prototype =
 		this._hasChanged = true;
 	},
 	getHeight: function() {
-		return this.index;
+		return this.h;
 	},
 	_prepareHeight: function(val) {
 		//remain 2 digits in fraction part

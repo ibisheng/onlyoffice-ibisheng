@@ -4033,7 +4033,7 @@
 			fProcessRow(isDefaultProp ? this.oSheetFormatPr.oAllRow : this.getAllRow());
 			this._forEachRow(fProcessRow);
 		} else {
-			var range = this.getRange3(0,0,0,0);
+			var range = this.getRange3(start,0,stop, 0);
 			if (isDefaultProp) {
 				range._foreachRowNoEmpty(fProcessRow);
 			} else {
@@ -10588,13 +10588,20 @@
 	HiddenManager.prototype._initHiddenSumRow = function() {
 		var hiddenSum = [];
 		if (this.ws) {
-			var sum = 0;
+			var i;
+			var hiddenFlags = [];
 			this.ws._forEachRow(function(row) {
 				if (row.getHidden()) {
+					hiddenFlags[row.getIndex()] = 1;
+				}
+			});
+			var sum = 0;
+			for (i = hiddenFlags.length - 1; i >= 0; --i) {
+				if (hiddenFlags[i] > 0) {
 					sum++;
 				}
-				hiddenSum[row.getIndex()] = sum;
-			});
+				hiddenSum[i] = sum;
+			}
 		}
 		return hiddenSum;
 	};
