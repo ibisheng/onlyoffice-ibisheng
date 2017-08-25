@@ -7067,7 +7067,9 @@
 						oRes = actionRow(tempRow, excludedCount);
 						tempRow.saveContent(true);
 						if (null != oRes) {
-							wb.loadCells.pop();
+							if (actionCell) {
+								wb.loadCells.pop();
+							}
 							return oRes;
 						}
 					} else if (bExcludeHiddenRows && allRowHidden) {
@@ -7099,7 +7101,9 @@
 							oRes = actionCell(targetCell, i, nCol, oBBox.r1, oBBox.c1, excludedCount);
 						}
 						if (null != oRes) {
-							wb.loadCells.pop();
+							if (actionCell) {
+								wb.loadCells.pop();
+							}
 							return oRes;
 						}
 					} else {
@@ -7133,8 +7137,8 @@
 			return this._foreachNoEmpty(actionCell);
 		}
 	};
-	Range.prototype._foreachRowNoEmpty = function(actionRow, actionCell) {
-		return this._foreachNoEmpty(actionCell, actionRow);
+	Range.prototype._foreachRowNoEmpty = function(actionRow, actionCell, excludeHiddenRows) {
+		return this._foreachNoEmpty(actionCell, actionRow, excludeHiddenRows);
 	};
 	Range.prototype._foreachCol = function(actionCol, actionCell){
 		var oBBox = this.bbox;
@@ -7275,12 +7279,6 @@
 	};
 	Range.prototype.getName=function(){
 		return this.bbox.getName();
-	};
-	Range.prototype.getLeftTopCell = function(fAction) {
-		return this.worksheet._getCell(this.bbox.r1, this.bbox.c1, fAction);
-	};
-	Range.prototype.getLeftTopCellNoEmpty = function(fAction) {
-		return this.worksheet._getCellNoEmpty(this.bbox.r1, this.bbox.c1, fAction);
 	};
 	Range.prototype.setValue=function(val,callback, isCopyPaste){
 		History.Create_NewPoint();
@@ -10050,11 +10048,7 @@
 								{
 									//копируем полностью
 									if(!oFromCell.formulaParsed){
-										var DataOld = oCopyCell.getValueData();
 										oCopyCell.setValueData(oFromCell.getValueData());
-										var DataNew = oCopyCell.getValueData();
-										if(false == DataOld.isEqual(DataNew))
-											History.Add(AscCommonExcel.g_oUndoRedoCell, AscCH.historyitem_Cell_ChangeValue, wsTo.getId(), new Asc.Range(oCopyCell.nCol, oCopyCell.nRow, oCopyCell.nCol, oCopyCell.nRow), new UndoRedoData_CellSimpleData(oCopyCell.nRow, oCopyCell.nCol, DataOld, DataNew));
 										//todo
 										// if(oCopyCell.isEmptyTextString())
 										// wsTo._getHyperlink().remove({r1: oCopyCell.nRow, c1: oCopyCell.nCol, r2: oCopyCell.nRow, c2: oCopyCell.nCol});
