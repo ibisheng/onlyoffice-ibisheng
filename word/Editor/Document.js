@@ -15489,7 +15489,7 @@ CDocument.prototype.AddField = function(nType, oPr)
 		oRun.Add_ToContent(1, oInstr);
 		oRun.Add_ToContent(2, oField.GetSeparateChar());
 		oRun.Add_ToContent(3, new ParaText("1"));
-		oRun.Add_ToContent(3, oField.GetEndChar());
+		oRun.Add_ToContent(4, oField.GetEndChar());
 		oParagraph.Add(oRun);
 		return true;
 	}

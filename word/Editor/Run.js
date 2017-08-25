@@ -4540,7 +4540,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             aShd.Add( Y0, Y1, X, X + ItemWidthVisible, 0, ShdColor.r, ShdColor.g, ShdColor.b, undefined, oShd );
 
 		if (PDSH.IsComplexField() && !PDSH.IsComplexFieldCode())
-			PDSH.MMFields.Add(Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0);
+			PDSH.CFields.Add(Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0);
 
         switch( ItemType )
         {
