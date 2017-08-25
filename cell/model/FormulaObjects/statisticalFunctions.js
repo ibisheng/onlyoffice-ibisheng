@@ -2676,6 +2676,8 @@
 			arg1 = arg1.cross(arguments[1]);
 		} else if (cElementType.array === arg1.type) {
 			arg1 = arg1.getElementRowCol(0, 0);
+		}else if(cElementType.cell === arg1.type || cElementType.cell3D === arg1.type){
+			arg1 = arg1.getValue();
 		}
 
 		/*arg1 = arg1.tocString();
