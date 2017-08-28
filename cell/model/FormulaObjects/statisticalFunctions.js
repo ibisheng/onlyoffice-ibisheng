@@ -3659,6 +3659,11 @@
 		function forecast(fx, y, x) {
 
 			var fSumDeltaXDeltaY = 0, fSumSqrDeltaX = 0, _x = 0, _y = 0, xLength = 0, i;
+
+			if(x.length !== y.length){
+				return new cError(cErrorType.not_available);
+			}
+
 			for (i = 0; i < x.length; i++) {
 
 				if (!( x[i] instanceof cNumber && y[i] instanceof cNumber )) {
