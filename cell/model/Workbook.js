@@ -2469,7 +2469,7 @@
 	SheetMemory.prototype.checkSize = function(index) {
 		if (index + 1 > this.count) {
 			var oldData = this.data;
-			this.count = Math.min(Math.max((2 * this.count) >> 0, index + 1), (this.maxIndex + 1));
+			this.count = Math.min(Math.max((1.5 * this.count) >> 0, index + 1), (this.maxIndex + 1));
 			this.data = new Uint8Array(this.count * this.structSize);
 			if (oldData) {
 				this.data.set(oldData);
@@ -3042,17 +3042,15 @@
 						if (!(oRuleElement instanceof AscCommonExcel.CColorScale)) {
 							break;
 						}
-						nc = 0;
 						min = Number.MAX_VALUE;
 						max = -Number.MAX_VALUE;
 						values = this._getValuesForConditionalFormatting(ranges, false);
 						for (cell = 0; cell < values.length; ++cell) {
 							value = values[cell];
-							if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
+							if (CellValueType.Number === value.type && !isNaN(tmp = parseFloat(value.v))) {
 								value.v = tmp;
 								min = Math.min(min, tmp);
 								max = Math.max(max, tmp);
-								++nc;
 							} else {
 								value.v = null;
 							}
@@ -3099,7 +3097,7 @@
 							o = oRule.bottom ? Number.MAX_VALUE : -Number.MAX_VALUE;
 							for (cell = 0; cell < values.length; ++cell) {
 								value = values[cell];
-								if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
+								if (CellValueType.Number === value.type && !isNaN(tmp = parseFloat(value.v))) {
 									++nc;
 									value.v = tmp;
 								} else {
@@ -3133,14 +3131,12 @@
 						nc = 0;
 						for (cell = 0; cell < values.length; ++cell) {
 							value = values[cell];
-							if (!value.c.isEmptyTextString(value.v)) {
+							if (CellValueType.Number === value.type && !isNaN(tmp = parseFloat(value.v))) {
 								++nc;
-								if (CellValueType.Number === value.c.getType() && !isNaN(tmp = parseFloat(value.v))) {
-									value.v = tmp;
-									sum += tmp;
-								} else {
-									value.v = null;
-								}
+								value.v = tmp;
+								sum += tmp;
+							} else {
+								value.v = null;
 							}
 						}
 
@@ -6933,11 +6929,11 @@
 		}
 	};
 
-	function CellAndValue(c, v) {
-		this.c = c;
+	function CellTypeAndValue(type, v) {
+		this.type = type;
 		this.v = v;
 	}
-	CellAndValue.prototype.valueOf = function() {
+	CellTypeAndValue.prototype.valueOf = function() {
 		return this.v;
 	};
 
@@ -7183,7 +7179,7 @@
 	Range.prototype._getValues = function (withEmpty) {
 		var res = [];
 		var fAction = function(c) {
-			res.push(new CellAndValue(c, c.getValueWithoutFormat()));
+			res.push(new CellTypeAndValue(c.getType(), c.getValueWithoutFormat()));
 		};
 		if (withEmpty) {
 			this._setProperty(null, null, fAction);
@@ -7196,7 +7192,7 @@
 		var v, arrRes = [], mapRes = {};
 		var fAction = function(c) {
 			v = c.getValueWithoutFormat();
-			arrRes.push(new CellAndValue(c, v));
+			arrRes.push(new CellTypeAndValue(c.getType(), v));
 			mapRes[v.toLowerCase()] = true;
 		};
 		if (withEmpty) {
@@ -8857,7 +8853,7 @@
 						return true;
 					if(!cell.isEmptyText())
 						return true;
-					aCellsToDelete.push(cell);
+					aCellsToDelete.push(cell.nRow, cell.nCol);
 				}
 			});
 			if(bError)
@@ -8879,8 +8875,8 @@
 			colIndex = canShiftRes.aColsToDelete[i].index;
 			this.worksheet._removeCols(colIndex, colIndex);
 		}
-		for(i = 0, length = canShiftRes.aCellsToDelete.length; i < length; ++i)
-			this.worksheet._removeCell(null, null, canShiftRes.aCellsToDelete[i]);
+		for(i = 0; i < canShiftRes.aCellsToDelete.length; i+=2)
+			this.worksheet._removeCell(canShiftRes.aCellsToDelete[i], canShiftRes.aCellsToDelete[i + 1]);
 
 		var oBBox = this.bbox;
 		var nWidth = oBBox.c2 - oBBox.c1 + 1;
@@ -8960,7 +8956,7 @@
 				if(null != row){
 					if(null != row.xfs && null != row.xfs.fill && null != row.xfs.fill.getRgbOrNull())
 						return true;
-					aRowsToDelete.push(row);
+					aRowsToDelete.push(row.index);
 				}
 			}, null,  function(cell){
 				if(null != cell){
@@ -8968,7 +8964,7 @@
 						return true;
 					if(!cell.isEmptyText())
 						return true;
-					aCellsToDelete.push(cell);
+					aCellsToDelete.push(cell.nRow, cell.nCol);
 				}
 			});
 			if(bError)
@@ -8987,11 +8983,11 @@
 		//удаляем крайние колонки и ячейки
 		var i, length, rowIndex;
 		for(i = 0, length = canShiftRes.aRowsToDelete.length; i < length; ++i){
-			rowIndex = canShiftRes.aRowsToDelete[i].index;
+			rowIndex = canShiftRes.aRowsToDelete[i];
 			this.worksheet._removeRows(rowIndex, rowIndex);
 		}
-		for(i = 0, length = canShiftRes.aCellsToDelete.length; i < length; ++i)
-			this.worksheet._removeCell(null, null, canShiftRes.aCellsToDelete[i]);
+		for(i = 0; i < canShiftRes.aCellsToDelete.length; i+=2)
+			this.worksheet._removeCell(canShiftRes.aCellsToDelete[i], canShiftRes.aCellsToDelete[i + 1]);
 
 		var oBBox = this.bbox;
 		var nHeight = oBBox.r2 - oBBox.r1 + 1;
@@ -9139,7 +9135,7 @@
 			// if(col.isEmpty())
 			// col.Remove();
 		},function(cell, nRow0, nCol0, nRowStart, nColStart){
-			oThis.worksheet._removeCell(nRow0, nCol0);
+			oThis.worksheet._removeCell(nRow0, nCol0, cell);
 		});
 
 		this.worksheet.workbook.dependencyFormulas.calcTree();
