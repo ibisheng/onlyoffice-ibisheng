@@ -488,24 +488,27 @@
 
 		if (window['IS_NATIVE_EDITOR'])
 		{
-			var result = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+			var stream = window["native"]["openFileCommand"](sFileUrl, changesUrl, Signature);
+ 
+            //получаем url к папке с файлом
+            var url;
+            var nIndex = sFileUrl.lastIndexOf("/");
+            url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
 
-			var url;
-			var nIndex = sFileUrl.lastIndexOf("/");
-			url = (-1 !== nIndex) ? sFileUrl.substring(0, nIndex + 1) : sFileUrl;
-			if (0 < result.length)
-			{
-				oResult.bSerFormat = Signature === result.substring(0, Signature.length);
-				oResult.data = result;
-				oResult.url = url;
-			}
-			else
-			{
-				bError = true;
-			}
-
-			bEndLoadFile = true;
-			onEndOpen();
+            if (stream) {
+                oResult.bSerFormat = checkStreamSignature(stream, Signature);
+ 
+                if (oResult.bSerFormat) {
+                    oResult.data = stream;
+                } else {
+                    oResult.data = stream;
+                }
+            } else {
+                bError = true;
+            }
+ 
+            bEndLoadFile = true;
+            onEndOpen();
 		}
 	}
 

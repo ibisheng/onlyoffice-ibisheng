@@ -630,6 +630,16 @@
         this.clearRect(0, 0, this.getWidth(), this.getHeight());
         return this;
     };
+ 
+    DrawingContext.prototype.AddClipRect = function () {
+ 
+        return this;
+    };
+ 
+    DrawingContext.prototype.RemoveClipRect = function (x, y, w, h) {
+ 
+        return this;
+    };
 
     DrawingContext.prototype.save = function () {
         this.nctx["PD_Save"]();
