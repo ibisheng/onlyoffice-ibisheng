@@ -2207,7 +2207,7 @@ Paragraph.prototype.Internal_Draw_5 = function(CurPage, pGraphics, Pr, BgColor)
 				}
 			}
             // Рисуем подчеркивание орфографии
-            if (this.LogicDocument && true === this.LogicDocument.Spelling.Use && !(pGraphics.IsThumbnail === true))
+            if (this.LogicDocument && true === this.LogicDocument.Spelling.Use && !(pGraphics.IsThumbnail === true || pGraphics.IsDemonstrationMode === true))
             {
                 pGraphics.p_color(255, 0, 0, 255);
                 var SpellingW = editor.WordControl.m_oDrawingDocument.GetMMPerDot(1);
