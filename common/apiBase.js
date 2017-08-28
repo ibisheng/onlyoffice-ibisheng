@@ -1290,7 +1290,7 @@
 		_elem.innerHTML = htmlText;
 		document.body.appendChild(_elem);
 		this.incrementCounterLongAction();
-		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem);
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem, undefined, undefined, true);
 		this.decrementCounterLongAction();
 
 		if (true)
