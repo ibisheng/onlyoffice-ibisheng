@@ -1290,7 +1290,9 @@
 		_elem.innerHTML = htmlText;
 		document.body.appendChild(_elem);
 		this.incrementCounterLongAction();
-		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem, undefined, undefined, true);
+		var b_old_save_format = AscCommon.g_clipboardBase.bSaveFormat;
+        AscCommon.g_clipboardBase.bSaveFormat = true;
+		this.asc_PasteData(AscCommon.c_oAscClipboardDataFormat.HtmlElement, _elem);
 		this.decrementCounterLongAction();
 
 		if (true)
@@ -1299,6 +1301,7 @@
             {
                 document.body.removeChild(_elem);
                 _elem = null;
+                AscCommon.g_clipboardBase.bSaveFormat = b_old_save_format;
             };
 			if(this.checkLongActionCallback(fCallback, null)){
                 fCallback();
@@ -1308,6 +1311,7 @@
 		{
 			document.body.removeChild(_elem);
 			_elem = null;
+            AscCommon.g_clipboardBase.bSaveFormat = b_old_save_format;
 		}
 	};
 
