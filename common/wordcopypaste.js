@@ -6047,8 +6047,10 @@ PasteProcessor.prototype =
 			
 			//заглушка для вставки в excel внутрь шейпа
 			var tempRpr;
-			if(this.pasteInExcel === true && this.oDocument && this.oDocument.Parent && this.oDocument.Parent.parent && this.oDocument.Parent.parent.getObjectType() === AscDFH.historyitem_type_Shape)
-			{
+			var bSaveExcelFormat = window['AscCommon'].g_clipboardBase.bSaveFormat;
+			if (this.pasteInExcel === true && !bSaveExcelFormat && this.oDocument && this.oDocument.Parent &&
+				this.oDocument.Parent.parent &&
+				this.oDocument.Parent.parent.getObjectType() === AscDFH.historyitem_type_Shape) {
 				tempRpr = new CTextPr();
 				tempRpr.Underline = rPr.Underline;
 				tempRpr.Bold = rPr.Bold;
