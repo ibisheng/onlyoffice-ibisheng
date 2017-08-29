@@ -118,6 +118,7 @@
 
 		//преобразуем аргумент поле
 		var isNumberField = field.tocNumber();
+		var isEmptyField = cElementType.empty === field.type;
 		if(cElementType.error === isNumberField.type){
 			field = field.getValue();
 		}else{
@@ -130,7 +131,7 @@
 			}
 		}
 
-		if(null === field){
+		if(!isEmptyField && null === field){
 			return new cError(cErrorType.wrong_value_type);
 		}
 
@@ -164,9 +165,16 @@
 			winElems[i - 1] = previousWinArray;
 		}
 
-		var needDataColumn = headersDataMap[field];
+
 		var resArr = [];
 		var usuallyAddElems = [];
+		var needDataColumn;
+		if(isEmptyField && headersConditionArr && headersConditionArr[0]){
+			needDataColumn = headersDataMap[headersConditionArr[0]];
+		}else{
+			needDataColumn = headersDataMap[field];
+		}
+
 		if(!needDataColumn){
 			return new cError(cErrorType.wrong_value_type);
 		}
@@ -210,6 +218,10 @@
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
+
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
 
 		argClone[1] = argClone[1].tocString();
 
@@ -259,7 +271,7 @@
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
 
-		argClone[1] = argClone[1].tocString();
+		argClone[1] = cElementType.empty === argClone[1].type ? argClone[1] : argClone[1].tocString();
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
@@ -300,7 +312,7 @@
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
 
-		argClone[1] = argClone[1].tocString();
+		argClone[1] = cElementType.empty === argClone[1].type ? argClone[1] : argClone[1].tocString();
 
 		var argError;
 		if (argError = this._checkErrorArg(argClone)) {
@@ -339,6 +351,10 @@
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
 
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
+
 		argClone[1] = argClone[1].tocString();
 
 		var argError;
@@ -374,6 +390,10 @@
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
+
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
 
 		argClone[1] = argClone[1].tocString();
 
@@ -412,6 +432,10 @@
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
 
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
+
 		argClone[1] = argClone[1].tocString();
 
 		var argError;
@@ -449,6 +473,10 @@
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
+
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
 
 		argClone[1] = argClone[1].tocString();
 
@@ -492,15 +520,19 @@
 	cDSTDEV.prototype.argumentsMax = 3;
 	cDSTDEV.prototype.Calculate = function (arg) {
 
-		 var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
-		 var argClone = oArguments.args;
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
+		var argClone = oArguments.args;
 
-		 argClone[1] = argClone[1].tocString();
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
 
-		 var argError;
-		 if (argError = this._checkErrorArg(argClone)) {
-			 return this.value = argError;
-		 }
+		argClone[1] = argClone[1].tocString();
+
+		var argError;
+		if (argError = this._checkErrorArg(argClone)) {
+			return this.value = argError;
+		}
 
 		var resArr = getNeedValuesFromDataBase(argClone[0], argClone[1], argClone[2]);
 		if(cElementType.error === resArr.type){
@@ -547,6 +579,10 @@
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
+
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
 
 		argClone[1] = argClone[1].tocString();
 
@@ -602,6 +638,10 @@
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
 
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
+
 		argClone[1] = argClone[1].tocString();
 
 		var argError;
@@ -642,6 +682,10 @@
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
+
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
 
 		argClone[1] = argClone[1].tocString();
 
@@ -702,6 +746,10 @@
 
 		var oArguments = this._prepareArguments(arg, arguments[1], true, [cElementType.array, null, cElementType.array]);
 		var argClone = oArguments.args;
+
+		if(cElementType.empty === argClone[1].type){
+			return new cError(cErrorType.wrong_value_type);
+		}
 
 		argClone[1] = argClone[1].tocString();
 
