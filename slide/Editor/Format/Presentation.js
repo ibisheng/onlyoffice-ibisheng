@@ -3386,7 +3386,19 @@ CPresentation.prototype =
             return;
         }
         if(!this.FocusOnNotes && oCurSlide.graphicObjects.selectedObjects.length === 0){
-            return;
+            var oTitle = oCurSlide.getMatchingShape(AscFormat.phType_title, null);
+            if(oTitle){
+                var oDocContent = oTitle.getDocContent();
+                if(oDocContent.Is_Empty()){
+                    oDocContent.Set_CurrentElement(0, false);
+                }
+                else{
+                    return;
+                }
+            }
+            else{
+                return;
+            }
         }
         if(this.FocusOnNotes && !oCurSlide.notesShape){
             return;
