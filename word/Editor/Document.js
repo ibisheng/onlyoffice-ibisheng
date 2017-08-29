@@ -1095,6 +1095,10 @@ function CDocumentFieldsManager()
     this.m_aFields = [];
 
     this.m_oMailMergeFields = {};
+
+
+    this.m_bNeedRegroupComplexFields = true;
+    this.m_aComplexFields            = [];
 }
 
 CDocumentFieldsManager.prototype.Register_Field = function(oField)
@@ -1230,6 +1234,22 @@ CDocumentFieldsManager.prototype.GetAllFieldsByType = function(nType)
 		}
 	}
 	return arrFields;
+};
+CDocumentFieldsManager.prototype.ResetComplexFields = function()
+{
+	this.m_aComplexFields = [];
+};
+CDocumentFieldsManager.prototype.RegisterComplexField = function(oComplexField)
+{
+	this.m_aComplexFields.push(oComplexField);
+};
+CDocumentFieldsManager.prototype.IsNeedRegroupComplexFields = function()
+{
+	return this.m_bNeedRegroupComplexFields;
+};
+CDocumentFieldsManager.prototype.SetNeedRegroupComplexFields = function(isNeed)
+{
+	this.m_bNeedRegroupComplexFields = isNeed;
 };
 
 var selected_None              = -1;
@@ -1878,6 +1898,8 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
             this.DrawingDocument.FirePaint();
         }
     }
+
+    this.RegroupComplexFields();
 
     // Обновляем позицию курсора
     this.NeedUpdateTarget = true;
@@ -15496,6 +15518,22 @@ CDocument.prototype.AddField = function(nType, oPr)
 
 	return false;
 };
+CDocument.prototype.RegroupComplexFields = function()
+{
+	if (!this.FieldsManager.IsNeedRegroupComplexFields())
+		return;
+
+	this.FieldsManager.SetNeedRegroupComplexFields(false);
+	this.FieldsManager.ResetComplexFields();
+
+	var oRegroupManager = new CComplexFieldsRegroupManager(this.FieldsManager);
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].RegroupComplexFields(oRegroupManager);
+	}
+};
+
 
 function TEST_ADDFIELD()
 {

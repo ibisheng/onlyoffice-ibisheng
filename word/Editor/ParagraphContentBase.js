@@ -2950,6 +2950,14 @@ CParagraphContentWithParagraphLikeContent.prototype.GetElementsCount = function(
 {
 	return this.Content.length;
 };
+CParagraphContentWithParagraphLikeContent.prototype.RegroupComplexFields = function(oRegroupManager)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex] && this.Content[nIndex].RegroupComplexFields)
+			this.Content[nIndex].RegroupComplexFields(oRegroupManager);
+	}
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Функции, которые должны быть реализованы в классах наследниках
 //----------------------------------------------------------------------------------------------------------------------

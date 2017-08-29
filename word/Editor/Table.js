@@ -12083,6 +12083,10 @@ CTable.prototype.GetAllContentControls = function(arrContentControls)
 		}
 	}
 };
+CTable.prototype.RegroupComplexFields = function(oRegroupManager)
+{
+	// TODO: Реализовать
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook
 //----------------------------------------------------------------------------------------------------------------------

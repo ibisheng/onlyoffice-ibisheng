@@ -45,6 +45,7 @@ function ParaFieldChar(Type, ComplexField)
 {
 	CRunElementBase.call(this);
 
+	this.Use          = true;
 	this.CharType     = undefined === Type ? fldchartype_Begin : Type;
 	this.ComplexField = ComplexField;
 }
@@ -69,9 +70,21 @@ ParaFieldChar.prototype.IsSeparate = function()
 {
 	return (this.CharType === fldchartype_Separate ? true : false);
 };
+ParaFieldChar.prototype.IsUse = function()
+{
+	return this.Use;
+};
+ParaFieldChar.prototype.SetUse = function(isUse)
+{
+	this.Use = isUse;
+};
 ParaFieldChar.prototype.GetComplexField = function()
 {
 	return this.ComplexField;
+};
+ParaFieldChar.prototype.SetComplexField = function(oComplexField)
+{
+	this.ComplexField = oComplexField;
 };
 ParaFieldChar.prototype.Write_ToBinary = function(Writer)
 {
@@ -150,6 +163,21 @@ CComplexField.prototype.GetSeparateChar = function()
 {
 	return this.SeparateChar;
 };
+CComplexField.prototype.SetBeginChar = function(oChar)
+{
+	this.BeginChar = oChar;
+	oChar.SetComplexField(this);
+};
+CComplexField.prototype.SetEndChar = function(oChar)
+{
+	this.EndChar = oChar;
+	oChar.SetComplexField(this);
+};
+CComplexField.prototype.SetSeparateChar = function(oChar)
+{
+	this.SeparateChar = oChar;
+	oChar.SetComplexField(this);
+};
 
 function CComplexFieldStatePos(oComplexField, isFieldCode)
 {
@@ -167,4 +195,57 @@ CComplexFieldStatePos.prototype.SetFieldCode = function(isFieldCode)
 CComplexFieldStatePos.prototype.IsFieldCode = function()
 {
 	return this.FieldCode;
+};
+
+/*
+ * Данный класс предназаначен для объединения символов начала/конца/разделения в
+ * общий класс CComplexField.
+ */
+function CComplexFieldsRegroupManager(oFieldsManager)
+{
+	this.FieldsManager = oFieldsManager;
+	this.BeginChar     = [];
+}
+CComplexFieldsRegroupManager.prototype.ProcessChar = function(oChar)
+{
+	if (!oChar || !(oChar instanceof ParaFieldChar))
+		return;
+
+	oChar.SetUse(true);
+	if (oChar.IsBegin())
+	{
+		var oComplexField = new CComplexField();
+		oComplexField.SetBeginChar(oChar);
+		this.BeginChar.push(oChar);
+	}
+	else if (oChar.IsSeparate())
+	{
+		if (this.BeginChar.length <= 0)
+		{
+			oChar.SetUse(false);
+		}
+		else
+		{
+			var oBeginChar    = this.BeginChar[this.BeginChar.length - 1];
+			var oComplexField = oBeginChar.GetComplexField();
+			oComplexField.SetSeparateChar(oChar);
+		}
+	}
+	else if (oChar.IsEnd())
+	{
+		if (this.BeginChar.length <= 0)
+		{
+			oChar.SetUse(false);
+		}
+		else
+		{
+			var oBeginChar = this.BeginChar[this.BeginChar.length - 1];
+			var oComplexField = oBeginChar.GetComplexField();
+			oComplexField.SetEndChar(oChar);
+
+			this.BeginChar.splice(this.BeginChar.length - 1, 1);
+			this.FieldsManager.RegisterComplexField(oComplexField);
+		}
+	}
+
 };

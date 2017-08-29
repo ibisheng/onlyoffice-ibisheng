@@ -12297,6 +12297,14 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 		return oContentControl;
 	}
 };
+Paragraph.prototype.RegroupComplexFields = function(oRegroupManager)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex] && this.Content[nIndex].RegroupComplexFields)
+			this.Content[nIndex].RegroupComplexFields(oRegroupManager);
+	}
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;

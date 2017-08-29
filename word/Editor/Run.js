@@ -9237,6 +9237,16 @@ ParaRun.prototype.GetAllContentControls = function(arrContentControls)
 		}
 	}
 };
+ParaRun.prototype.RegroupComplexFields = function(oRegroupManager)
+{
+	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+	{
+		var Item = this.Content[nPos];
+
+		if (para_FieldChar === Item.Type)
+			oRegroupManager.ProcessChar(Item);
+	}
+};
 
 function CParaRunStartState(Run)
 {
