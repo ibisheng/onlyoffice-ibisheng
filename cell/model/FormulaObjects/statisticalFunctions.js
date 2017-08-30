@@ -1452,14 +1452,6 @@
 		this.bEDS = ( rSmplInPrd == 0 );
 		this.bAdditive = /*( eETSType == etsAdd || eETSType == etsPIAdd || eETSType == etsStatAdd )*/true;
 
-
-
-		// maRange needs to be sorted by X
-		/*for ( SCSIZE i = 0; i < mnCount; i++ )
-		 maRange.push_back( DataPoint( rMatX->GetDouble( i ), rMatY->GetDouble( i ) ) );
-		 sort( maRange.begin(), maRange.end(), lcl_SortByX );*/
-
-
 		this.mnCount = rMatX.length;
 		var maRange = this.maRange;
 		for ( var i = 0; i < this.mnCount; i++ ){
@@ -1470,210 +1462,36 @@
 			return a.X - b.X;
 		});
 
-
-
-
-
-		/*if ( rTMat )
-		 {
-		 if ( eETSType != etsPIAdd && eETSType != etsPIMult )
-		 {
-		 if ( rTMat->GetDouble( 0 ) < maRange[ 0 ].X )
-		 {
-		 // target cannot be less than start of X-range
-		 mnErrorValue = FormulaError::IllegalFPOperation;
-		 return false;
-		 }
-		 }
-		 else
-		 {
-		 if ( rTMat->GetDouble( 0 ) < maRange[ mnCount - 1 ].X )
-		 {
-		 // target cannot be before end of X-range
-		 mnErrorValue = FormulaError::IllegalFPOperation;
-		 return false;
-		 }
-		 }
-		 }*/
-
-
-		if ( rTMat )
-		{
-			if ( eETSType != etsPIAdd && eETSType != etsPIMult )
-			{
-				if ( rTMat[0] < maRange[ 0 ].X )
-				{
-					return new cError(cErrorType.wrong_value_type);
+		if (rTMat) {
+			if (/*eETSType != etsPIAdd && eETSType != etsPIMult*/true) {
+				if (rTMat[0][0].getValue() < maRange[0].X) {
+					return new cError(cErrorType.not_numeric);
 				}
-			}
-			else
-			{
-				if ( rTMat[ 0 ] < maRange[ mnCount - 1 ].X )
-				{
+			} else {
+				if (rTMat[0] < maRange[this.mnCount - 1].X) {
 					return new cError(cErrorType.wrong_value_type);
 				}
 			}
 		}
-
-
-
-
-
-
-
-		// Month intervals don't have exact stepsize, so first
-		// detect if month interval is used.
-		// Method: assume there is an month interval and verify.
-		// If month interval is used, replace maRange.X with month values
-		// for ease of calculations.
-		/*Date aNullDate = *( mpFormatter->GetNullDate() );
-		Date aDate = aNullDate + static_cast< long >( maRange[ 0 ].X );
-		mnMonthDay = aDate.GetDay();
-		for ( SCSIZE i = 1; i < mnCount && mnMonthDay; i++ )
-		{
-			Date aDate1 = aNullDate + static_cast< long >( maRange[ i ].X );
-			if ( aDate != aDate1 )
-			{
-				if ( aDate1.GetDay() != mnMonthDay )
-					mnMonthDay = 0;
-			}
-		}*/
-
 
 		var aDate =  Date.prototype.getDateFromExcel(maRange[ 0 ].X);
 		this.mnMonthDay = aDate.getDate();
-		for ( var i = 1; i < this.mnCount && this.mnMonthDay; i++ )
-		{
-			var aDate1 = Date.prototype.getDateFromExcel( maRange[ i ].X );
-			if ( aDate != aDate1 )
-			{
-				if ( aDate1.getDate() != this.mnMonthDay )
+		for (var i = 1; i < this.mnCount && this.mnMonthDay; i++) {
+			var aDate1 = Date.prototype.getDateFromExcel(maRange[i].X);
+			if (aDate !== aDate1) {
+				if (aDate1.getDate() !== this.mnMonthDay) {
 					this.mnMonthDay = 0;
+				}
 			}
 		}
-
-
-
-
-
-		/*mfStepSize = ::std::numeric_limits<double>::max();
-		 if ( mnMonthDay )
-		 {
-		 for ( SCSIZE i = 0; i < mnCount; i++ )
-		 {
-		 aDate = aNullDate + static_cast< long >( maRange[ i ].X );
-		 maRange[ i ].X = aDate.GetYear() * 12 + aDate.GetMonth();
-		 }
-		 }*/
-
 
 		this.mfStepSize = Number.MAX_VALUE;
-		if ( /*mnMonthDay*/true )
-		{
-			for ( var i = 0; i < this.mnCount; i++ )
-			{
-				var aDate = Date.prototype.getDateFromExcel(maRange[ i ].X);
-				maRange[ i ].X = aDate.getUTCFullYear() * 12 + aDate.getMonth();
+		if (/*mnMonthDay*/true) {
+			for (var i = 0; i < this.mnCount; i++) {
+				var aDate = Date.prototype.getDateFromExcel(maRange[i].X);
+				maRange[i].X = aDate.getUTCFullYear() * 12 + aDate.getMonth();
 			}
 		}
-
-
-
-
-		/*for ( SCSIZE i = 1; i < mnCount; i++ )
-		 {
-		 double fStep = maRange[ i ].X - maRange[ i - 1 ].X;
-		 if ( fStep == 0.0 )
-		 {
-		 if ( nAggregation == 0 )
-		 {
-		 // identical X-values are not allowed
-		 mnErrorValue = FormulaError::NoValue;
-		 return false;
-		 }
-		 double fTmp = maRange[ i - 1 ].Y;
-		 SCSIZE nCounter = 1;
-		 switch ( nAggregation )
-		 {
-		 case 1 : // AVERAGE (default)
-		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
-		 {
-		 maRange.erase( maRange.begin() + i );
-		 --mnCount;
-		 }
-		 break;
-		 case 7 : // SUM
-		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
-		 {
-		 fTmp += maRange[ i ].Y;
-		 maRange.erase( maRange.begin() + i );
-		 --mnCount;
-		 }
-		 maRange[ i - 1 ].Y = fTmp;
-		 break;
-
-		 case 2 : // COUNT
-		 case 3 : // COUNTA (same as COUNT as there are no non-numeric Y-values)
-		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
-		 {
-		 nCounter++;
-		 maRange.erase( maRange.begin() + i );
-		 --mnCount;
-		 }
-		 maRange[ i - 1 ].Y = nCounter;
-		 break;
-
-		 case 4 : // MAX
-		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
-		 {
-		 if ( maRange[ i ].Y > fTmp )
-		 fTmp = maRange[ i ].Y;
-		 maRange.erase( maRange.begin() + i );
-		 --mnCount;
-		 }
-		 maRange[ i - 1 ].Y = fTmp;
-		 break;
-
-		 case 5 : // MEDIAN
-		 {
-		 std::vector< double > aTmp;
-		 aTmp.push_back( maRange[ i - 1 ].Y );
-		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
-		 {
-		 aTmp.push_back( maRange[ i ].Y );
-		 nCounter++;
-		 maRange.erase( maRange.begin() + i );
-		 --mnCount;
-		 }
-		 sort( aTmp.begin(), aTmp.end() );
-
-		 if ( nCounter % 2 )
-		 maRange[ i - 1 ].Y = aTmp[ nCounter / 2 ];
-		 else
-		 maRange[ i - 1 ].Y = ( aTmp[ nCounter / 2 ] + aTmp[ nCounter / 2 - 1 ] ) / 2.0;
-		 }
-		 break;
-
-		 case 6 : // MIN
-		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
-		 {
-		 if ( maRange[ i ].Y < fTmp )
-		 fTmp = maRange[ i ].Y;
-		 maRange.erase( maRange.begin() + i );
-		 --mnCount;
-		 }
-		 maRange[ i - 1 ].Y = fTmp;
-		 break;
-		 }
-		 if ( i < mnCount - 1 )
-		 fStep = maRange[ i ].X - maRange[ i - 1 ].X;
-		 else
-		 fStep = mfStepSize;
-		 }
-		 if ( fStep > 0 && fStep < mfStepSize )
-		 mfStepSize = fStep;
-		 }*/
-
 
 		for ( var i = 1; i < this.mnCount; i++ ) {
 
@@ -1765,30 +1583,7 @@
 			if ( fStep > 0 && fStep < this.mfStepSize ){
 				this.mfStepSize = fStep;
 			}
-
 		}
-
-
-
-
-		// step must be constant (or gap multiple of step)
-		/*bool bHasGap = false;
-		 for ( SCSIZE i = 1; i < mnCount && !bHasGap; i++ )
-		 {
-		 double fStep = maRange[ i ].X - maRange[ i - 1 ].X;
-
-		 if ( fStep != mfStepSize )
-		 {
-		 if ( fmod( fStep, mfStepSize ) != 0.0 )
-		 {
-		 // step not constant nor multiple of mfStepSize in case of gaps
-		 mnErrorValue = FormulaError::NoValue;
-		 return false;
-		 }
-		 bHasGap = true;
-		 }
-		 }*/
-
 
 		// step must be constant (or gap multiple of step)
 		var bHasGap = false;
@@ -1803,87 +1598,34 @@
 			}
 		}
 
-
-
-
-
-
-		// fill gaps with values depending on bDataCompletion
-		/*if ( bHasGap )
-		 {
-		 SCSIZE nMissingXCount = 0;
-		 double fOriginalCount = static_cast< double >( mnCount );
-		 if ( mnMonthDay )
-		 aDate = aNullDate + static_cast< long >( maRange[ 0 ].X );
-		 for ( SCSIZE i = 1; i < mnCount; i++ )
-		 {
-		 double fDist;
-		 if ( mnMonthDay )
-		 {
-		 Date aDate1 = aNullDate + static_cast< long >( maRange[ i ].X );
-		 fDist = 12 * ( aDate1.GetYear() - aDate.GetYear() ) +
-		 ( aDate1.GetMonth() - aDate.GetMonth() );
-		 aDate = aDate1;
-		 }
-		 else
-		 fDist = maRange[ i ].X - maRange[ i - 1 ].X;
-		 if ( fDist > mfStepSize )
-		 {
-		 // gap, insert missing data points
-		 double fYGap = ( maRange[ i ].Y + maRange[ i - 1 ].Y ) / 2.0;
-		 for ( double fXGap = maRange[ i - 1].X + mfStepSize;  fXGap < maRange[ i ].X; fXGap += mfStepSize )
-		 {
-		 maRange.insert( maRange.begin() + i, DataPoint( fXGap, ( bDataCompletion ? fYGap : 0.0 ) ) );
-		 i++;
-		 mnCount++;
-		 nMissingXCount++;
-		 if ( static_cast< double >( nMissingXCount ) / fOriginalCount > 0.3 )
-		 {
-		 // maximum of 30% missing points exceeded
-		 mnErrorValue = FormulaError::NoValue;
-		 return false;
-		 }
-		 }
-		 }
-		 }
-		 }*/
-
-
-		if ( bHasGap )
-		{
+		if (bHasGap) {
 			var nMissingXCount = 0;
 			var fOriginalCount = this.mnCount;
-			if ( /*mnMonthDay*/true ){
-				aDate = Date.prototype.getDateFromExcel(maRange[ 0 ].X);
+			if (/*mnMonthDay*/true) {
+				aDate = Date.prototype.getDateFromExcel(maRange[0].X);
 			}
 
-			for ( var i = 1; i < this.mnCount; i++ )
-			{
+			for (var i = 1; i < this.mnCount; i++) {
 				var fDist;
-				if ( /*mnMonthDay*/true )
-				{
-					var aDate1 = Date.prototype.getDateFromExcel(maRange[ i ].X);
+				if (/*mnMonthDay*/true) {
+					var aDate1 = Date.prototype.getDateFromExcel(maRange[i].X);
 					fDist = 12 * ( aDate1.getUTCFullYear() - aDate.getUTCFullYear() ) +
 						( aDate1.getMonth() - aDate.getMonth() );
 					aDate = aDate1;
-				}
-				else{
-					fDist = maRange[ i ].X - maRange[ i - 1 ].X;
+				} else {
+					fDist = maRange[i].X - maRange[i - 1].X;
 				}
 
-				if ( fDist > this.mfStepSize )
-				{
+				if (fDist > this.mfStepSize) {
 					// gap, insert missing data points
-					var fYGap = ( maRange[ i ].Y + maRange[ i - 1 ].Y ) / 2.0;
-					for ( var fXGap = maRange[ i - 1].X + this.mfStepSize;  fXGap < maRange[ i ].X; fXGap += this.mfStepSize )
-					{
+					var fYGap = ( maRange[i].Y + maRange[i - 1].Y ) / 2.0;
+					for (var fXGap = maRange[i - 1].X + this.mfStepSize; fXGap < maRange[i].X; fXGap += this.mfStepSize) {
 						var newAddElem = {X: fXGap, Y: ( bDataCompletion ? fYGap : 0.0 )};
-						maRange.splice( i, 1, newAddElem );
+						maRange.splice(i, 1, newAddElem);
 						i++;
 						this.mnCount++;
 						nMissingXCount++;
-						if (  nMissingXCount  / fOriginalCount > 0.3 )
-						{
+						if (nMissingXCount / fOriginalCount > 0.3) {
 							// maximum of 30% missing points exceeded
 							return new cError(cErrorType.wrong_value_type);
 						}
@@ -1892,19 +1634,18 @@
 			}
 		}
 
-
-
-		if ( rSmplInPrd != 1 )
+		if ( rSmplInPrd != 1 ){
 			this.mnSmplInPrd = rSmplInPrd;
-		else
-		{
+		}else {
 			this.mnSmplInPrd = this.CalcPeriodLen();
-			if ( this.mnSmplInPrd == 1 )
+			if ( this.mnSmplInPrd == 1 ){
 				this.bEDS = true; // period length 1 means no periodic data: EDS suffices
+			}
 		}
 
-		if ( !this.initData() )
+		if ( !this.initData() ){
 			return false;  // note: mnErrorValue is set in called function(s)
+		}
 
 		return true;
 	};
@@ -2421,12 +2162,12 @@
 				fMonthLength = 31.0;
 				break;
 			case  2 :
-				fMonthLength = ( aDate.IsLeapYear() ? 29.0 : 28.0 );
+				fMonthLength = ( aDate.isLeapYear() ? 29.0 : 28.0 );
 				break;
 			default :
 				fMonthLength = 30.0;
 		}
-		return ( 12.0 * nYear + nMonth + ( aDate.getDay() - this.mnMonthDay ) / fMonthLength );
+		return ( 12.0 * nYear + nMonth + ( aDate.getDate() - this.mnMonthDay ) / fMonthLength );
 	};
 
 
@@ -2450,7 +2191,7 @@
 		}
 		else
 		{
-			var n = parseInt(( fTarget - this.maRange[ this.mnCount - 1 ].X ) / this.mfStepSize);
+			var n = Math.round(( fTarget - this.maRange[ this.mnCount - 1 ].X ) / this.mfStepSize);
 			var fInterpolate = parseInt(Math.fmod( fTarget - this.maRange[ this.mnCount - 1 ].X, this.mfStepSize ));
 
 			if ( this.bEDS )
@@ -2523,31 +2264,31 @@
 				switch ( rTypeMat[j][i] )
 				{
 					case 1 : // alpha
-						rStatMat.push( mfAlpha, j, i );
+						rStatMat.push( this.mfAlpha, j, i );
 						break;
 					case 2 : // gamma
-						rStatMat.push( mfGamma, j, i );
+						rStatMat.push( this.mfGamma, j, i );
 						break;
 					case 3 : // beta
-						rStatMat.push( mfBeta, j, i );
+						rStatMat.push( this.mfBeta, j, i );
 						break;
 					case 4 : // MASE
-						rStatMat.push( mfMASE, j, i );
+						rStatMat.push( this.mfMASE, j, i );
 						break;
 					case 5 : // SMAPE
-						rStatMat.push( mfSMAPE, j, i );
+						rStatMat.push(this. mfSMAPE, j, i );
 						break;
 					case 6 : // MAE
-						rStatMat.push( mfMAE, j, i );
+						rStatMat.push( this.mfMAE, j, i );
 						break;
 					case 7 : // RMSE
-						rStatMat.push( mfRMSE, j, i );
+						rStatMat.push( this.mfRMSE, j, i );
 						break;
 					case 8 : // step size
-						rStatMat.push( mfStepSize, j, i );
+						rStatMat.push( this.mfStepSize, j, i );
 						break;
 					case 9 : // samples in period
-						rStatMat.push( mnSmplInPrd, j, i );
+						rStatMat.push( this.mnSmplInPrd, j, i );
 						break;
 				}
 			}
@@ -4966,11 +4707,12 @@
 
 
 		var aETSCalc = new ScETSForecastCalculation( pMatX.length );
-		if ( !aETSCalc.PreprocessDataRange( pMatX, pMatY, nSmplInPrd, bDataCompletion,
-				nAggregation))
-		{
+		var isError = aETSCalc.PreprocessDataRange( pMatX, pMatY, nSmplInPrd, bDataCompletion, nAggregation, pTMat);
+		if ( !isError) {
 			///*,( eETSType != etsStatAdd && eETSType != etsStatMult ? pTMat : nullptr ),eETSType )
 			return new cError(cErrorType.wrong_value_type);
+		}else if(isError && cElementType.error === isError.type){
+			return isError;
 		}
 
 
