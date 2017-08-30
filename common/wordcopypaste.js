@@ -4523,7 +4523,7 @@ PasteProcessor.prototype =
 	_convertTableFromExcel: function(aContentExcel)
 	{
 		var worksheet = aContentExcel.workbook.aWorksheets[0];
-		var rows = worksheet._getRows(), range;
+		var range;
 		var tempActiveRef = aContentExcel.activeRange;
 		var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(tempActiveRef);
 		var t = this;

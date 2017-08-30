@@ -2476,11 +2476,7 @@
 				var getElem = function(text, format, isAddSpace, isHyperLink)
 				{
 					var result = null;
-					var value = "";
-					if(null != cell)
-					{
-						value += text;
-					}
+					var value = text;
 					if(isAddSpace)
 					{
 						value += " ";
@@ -2563,60 +2559,41 @@
 				};
 				
 				var n = 0;
-				for(var i in aContentExcel.aGCells)
-				{
-					var row = aContentExcel.aGCells[i];
-					for(var j in row.c)
+				aContentExcel._forEachCell(function(cell){
+					var isHyperlink = aContentExcel.getCell3(cell.nRow, cell.nCol).getHyperlink();
+
+					var multiText = cell.getValueMultiText();
+					if(multiText)
 					{
-						var cell = row.c[j];
-						
-						var isHyperlink = aContentExcel.getCell3( i, j ).getHyperlink();
-						var isAddSpace = row.c[parseInt(j) + 1] || (!row.c[parseInt(j) + 1] && aContentExcel.aGCells[parseInt(i) + 1]) ? true : false;
-						
-						if(cell.oValue && cell.oValue.multiText)
+						for(var m = 0; m < multiText.length; m++)
 						{
-							for(var m = 0; m < cell.oValue.multiText.length; m++)
-							{
-								var curMultiText = cell.oValue.multiText[m];
-								var format = curMultiText.format;
-								
-								var elem = getElem(curMultiText.text, format);
-								if(null !== elem)
-								{
-									oCurPar.Internal_Content_Add(n, elem, false);
-									n++;
-								}
-							}
-							
-							if(isAddSpace)
-							{
-								elem = getElem("", null, true);
-								oCurPar.Internal_Content_Add(n, elem, false);
-								n++;
-							}
-							
-						}
-						else
-						{
-							var format = cell.xfs && cell.xfs.font ? cell.xfs.font : null;
-							
-							var elem = getElem(cell.getValue(), format, null, isHyperlink);
+							var curMultiText = multiText[m];
+							var format = curMultiText.format;
+
+							var elem = getElem(curMultiText.text, format);
 							if(null !== elem)
-							{	
+							{
 								oCurPar.Internal_Content_Add(n, elem, false);
 								n++;
-								
-								//add space
-								if(isAddSpace)
-								{
-									elem = getElem("", null, true);
-									oCurPar.Internal_Content_Add(n, elem, false);
-									n++;
-								}
 							}
 						}
 					}
-				}
+					else
+					{
+						var format = cell.xfs && cell.xfs.font ? cell.xfs.font : null;
+
+						var elem = getElem(cell.getValue(), format, null, isHyperlink);
+						if(null !== elem)
+						{
+							oCurPar.Internal_Content_Add(n, elem, false);
+							n++;
+						}
+					}
+					//add space
+					elem = getElem("", null, true);
+					oCurPar.Internal_Content_Add(n, elem, false);
+					n++;
+				});
 				
 				return oCurPar;
 			},
@@ -2704,25 +2681,17 @@
 			_getTextFromWorksheet: function(worksheet)
 			{
 				var res = "";
-				
-				for(var i in worksheet.aGCells)
-				{
-					var row = worksheet.aGCells[i];
-					
-					for(var j in row.c)
-					{
-						var cell = row.c[j];
-						if(null != cell)
-						{
-							res += cell.getValue();
+				var curRow = -1;
+				worksheet._forEachCell(function(cell) {
+					if (curRow !== cell.nRow) {
+						if (-1 !== curRow) {
+							res += "\n";
 						}
-						
-						res += " ";
+						curRow = cell.nRow;
 					}
-					
-					res += "\n";
-				}
-				
+					res += cell.getValue();
+					res += " ";
+				});
 				return res;
 			},
 			

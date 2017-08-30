@@ -805,7 +805,9 @@ CDocumentContentElementBase.prototype.GetAllComments = function(AllComments)
 CDocumentContentElementBase.prototype.GetAllMaths = function(AllMaths)
 {
 };
-
+CDocumentContentElementBase.prototype.RegroupComplexFields = function(oRegroupManager)
+{
+};
 //--------------------------------------------------------export--------------------------------------------------------
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CDocumentContentElementBase = CDocumentContentElementBase;

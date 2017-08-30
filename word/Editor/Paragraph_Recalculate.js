@@ -1201,7 +1201,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
         if (0 === CurLine)
         {
 			// Добавляем расстояние до параграфа (Pr.Spacing.Before)
-			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
 				BaseLineOffset += ParaPr.Spacing.Before;
 
             // Добавляем толщину границы параграфа (если граница задана)
@@ -1233,7 +1233,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 
         if ( 0 === CurLine )
         {
-			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -1288,7 +1288,7 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
             Top  = PRS.Y;
             Top2 = PRS.Y;
 
-			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS))
+			if (this.private_CheckNeedBeforeSpacing(CurPage, PRS, ParaPr))
             {
                 Top2    = Top + ParaPr.Spacing.Before;
                 Bottom2 = Top + ParaPr.Spacing.Before + this.Lines[0].Metrics.Ascent + this.Lines[0].Metrics.Descent;
@@ -2151,13 +2151,16 @@ Paragraph.prototype.private_RecalculateMoveLineToNextPage = function(CurLine, Cu
 	}
 };
 
-Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS)
+Paragraph.prototype.private_CheckNeedBeforeSpacing = function(CurPage, PRS, ParaPr)
 {
 	if (CurPage <= 0)
 		return true;
 
 	if (!this.Check_FirstPage(CurPage))
 		return false;
+
+	if (true === ParaPr.PageBreakBefore)
+		return true;
 
 	if (!(PRS.Parent instanceof CDocument))
 	{
@@ -3155,41 +3158,102 @@ function CParagraphRecalculateStateAlign()
 
 function CParagraphRecalculateStateInfo()
 {
-    this.Comments = [];
+    this.Comments      = [];
+    this.ComplexFields = [];
 }
-
-CParagraphRecalculateStateInfo.prototype =
+CParagraphRecalculateStateInfo.prototype.Reset = function(PrevInfo)
 {
-    Reset : function(PrevInfo)
-    {
-        if ( null !== PrevInfo && undefined !== PrevInfo )
-        {
-            this.Comments = PrevInfo.Comments;
-        }
-        else
-        {
-            this.Comments = [];
-        }
-    },
+	if (null !== PrevInfo && undefined !== PrevInfo)
+	{
+		this.Comments      = PrevInfo.Comments;
+		this.ComplexFields = [];
 
-	AddComment : function(Id)
-    {
-        this.Comments.push( Id );
-    },
-
-	RemoveComment : function(Id)
-    {
-        var CommentsLen = this.Comments.length;
-        for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
-        {
-            if ( this.Comments[CurPos] === Id )
-            {
-                this.Comments.splice( CurPos, 1 );
-                break;
-            }
-        }
-    }
+		if (PrevInfo.ComplexFields)
+		{
+			for (var nIndex = 0, nCount = PrevInfo.ComplexFields.length; nIndex < nCount; ++nIndex)
+			{
+				this.ComplexFields[nIndex] = PrevInfo.ComplexFields[nIndex].Copy();
+			}
+		}
+	}
+	else
+	{
+		this.Comments      = [];
+		this.ComplexFields = [];
+	}
 };
+CParagraphRecalculateStateInfo.prototype.AddComment = function(Id)
+{
+	this.Comments.push(Id);
+};
+CParagraphRecalculateStateInfo.prototype.RemoveComment = function(Id)
+{
+	var CommentsLen = this.Comments.length;
+	for (var CurPos = 0; CurPos < CommentsLen; CurPos++)
+	{
+		if (this.Comments[CurPos] === Id)
+		{
+			this.Comments.splice(CurPos, 1);
+			break;
+		}
+	}
+};
+CParagraphRecalculateStateInfo.prototype.ProcessFieldChar = function(oFieldChar)
+{
+	if (!oFieldChar)
+		return;
+
+	var oComplexField = oFieldChar.GetComplexField();
+
+	if (oFieldChar.IsBegin())
+	{
+		this.ComplexFields.push(new CComplexFieldStatePos(oComplexField, true));
+	}
+	else if (oFieldChar.IsSeparate())
+	{
+		for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+		{
+			if (oComplexField === this.ComplexFields[nIndex].ComplexField)
+			{
+				this.ComplexFields[nIndex].SetFieldCode(false);
+				break;
+			}
+		}
+	}
+	else if (oFieldChar.IsEnd())
+	{
+		for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+		{
+			if (oComplexField === this.ComplexFields[nIndex].ComplexField)
+			{
+				this.ComplexFields.splice(nIndex, 1);
+				break;
+			}
+		}
+	}
+};
+CParagraphRecalculateStateInfo.prototype.IsComplexField = function()
+{
+	return (this.ComplexFields.length > 0 ? true : false);
+};
+CParagraphRecalculateStateInfo.prototype.IsComplexFieldCode = function()
+{
+	if (!this.IsComplexField())
+		return false;
+
+	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.ComplexFields[nIndex].IsFieldCode())
+			return true;
+	}
+
+	return false;
+};
+
+CParagraphDrawStateHightlights.prototype.ProcessFieldChar   = CParagraphRecalculateStateInfo.prototype.ProcessFieldChar;
+CParagraphDrawStateHightlights.prototype.IsComplexField     = CParagraphRecalculateStateInfo.prototype.IsComplexField;
+CParagraphDrawStateHightlights.prototype.IsComplexFieldCode = CParagraphRecalculateStateInfo.prototype.IsComplexFieldCode;
+
 
 function CParagraphRecalculateObject()
 {

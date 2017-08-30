@@ -1095,6 +1095,10 @@ function CDocumentFieldsManager()
     this.m_aFields = [];
 
     this.m_oMailMergeFields = {};
+
+
+    this.m_bNeedRegroupComplexFields = true;
+    this.m_aComplexFields            = [];
 }
 
 CDocumentFieldsManager.prototype.Register_Field = function(oField)
@@ -1230,6 +1234,22 @@ CDocumentFieldsManager.prototype.GetAllFieldsByType = function(nType)
 		}
 	}
 	return arrFields;
+};
+CDocumentFieldsManager.prototype.ResetComplexFields = function()
+{
+	this.m_aComplexFields = [];
+};
+CDocumentFieldsManager.prototype.RegisterComplexField = function(oComplexField)
+{
+	this.m_aComplexFields.push(oComplexField);
+};
+CDocumentFieldsManager.prototype.IsNeedRegroupComplexFields = function()
+{
+	return this.m_bNeedRegroupComplexFields;
+};
+CDocumentFieldsManager.prototype.SetNeedRegroupComplexFields = function(isNeed)
+{
+	this.m_bNeedRegroupComplexFields = isNeed;
 };
 
 var selected_None              = -1;
@@ -1878,6 +1898,8 @@ CDocument.prototype.Recalculate = function(bOneParagraph, bRecalcContentLast, _R
             this.DrawingDocument.FirePaint();
         }
     }
+
+    this.RegroupComplexFields();
 
     // Обновляем позицию курсора
     this.NeedUpdateTarget = true;
@@ -8931,9 +8953,7 @@ CDocument.prototype.GetPrevElementEndInfo = function(CurElement)
     var PrevElement = CurElement.Get_DocumentPrev();
 
     if (null !== PrevElement && undefined !== PrevElement)
-    {
-        return PrevElement.Get_EndInfo();
-    }
+        return PrevElement.GetEndInfo();
     else
         return null;
 };
@@ -15475,6 +15495,54 @@ CDocument.prototype.IsViewModeInReview = function()
 {
 	return 0 !== this.ViewModeInReview.mode ? true : false;
 };
+CDocument.prototype.AddField = function(nType, oPr)
+{
+	if (fieldtype_PAGENUM === nType)
+	{
+		var oParagraph = this.GetCurrentParagraph();
+		if (!oParagraph)
+			return false;
+
+		var oField = new CComplexField();
+		var oRun   = new ParaRun();
+		var oInstr = new ParaInstrText(fieldtype_PAGENUM, oPr);
+
+		oRun.Add_ToContent(0, oField.GetBeginChar());
+		oRun.Add_ToContent(1, oInstr);
+		oRun.Add_ToContent(2, oField.GetSeparateChar());
+		oRun.Add_ToContent(3, new ParaText("1"));
+		oRun.Add_ToContent(4, oField.GetEndChar());
+		oParagraph.Add(oRun);
+		return true;
+	}
+
+	return false;
+};
+CDocument.prototype.RegroupComplexFields = function()
+{
+	if (!this.FieldsManager.IsNeedRegroupComplexFields())
+		return;
+
+	this.FieldsManager.SetNeedRegroupComplexFields(false);
+	this.FieldsManager.ResetComplexFields();
+
+	var oRegroupManager = new CComplexFieldsRegroupManager(this.FieldsManager);
+
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		this.Content[nIndex].RegroupComplexFields(oRegroupManager);
+	}
+};
+
+
+function TEST_ADDFIELD()
+{
+	var oDocument = editor.WordControl.m_oLogicDocument;
+
+	oDocument.Create_NewHistoryPoint();
+	oDocument.AddField(fieldtype_PAGENUM);
+	oDocument.Recalculate();
+}
 
 function CDocumentSelectionState()
 {
@@ -16084,6 +16152,13 @@ CTrackRevisionsManager.prototype.Get_CurrentChange = function()
 };
 CTrackRevisionsManager.prototype.Clear_VisibleChanges = function()
 {
+	if (this.VisibleChanges.length > 0)
+	{
+		var oEditorApi = this.LogicDocument.Get_Api();
+		oEditorApi.sync_BeginCatchRevisionsChanges();
+		oEditorApi.sync_EndCatchRevisionsChanges();
+	}
+
     this.VisibleChanges = [];
 };
 CTrackRevisionsManager.prototype.Add_VisibleChange = function(Change)

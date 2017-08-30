@@ -4191,6 +4191,36 @@ $( function () {
 		strictEqual( oParser.calculate().getValue().toFixed( 13 ) - 0, 10.6072530864198);
 	} );
 
+	test( "FORMULATEXT", function () {
+		wb.dependencyFormulas.unlockRecal();
+
+		ws.getRange2( "S101" ).setValue( "=TODAY()" );
+		ws.getRange2( "S102" ).setValue( "" );
+		ws.getRange2( "S103" ).setValue( "=1+1" );
+
+		oParser = new parserFormula( "FORMULATEXT(S101)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "=TODAY()" );
+
+		oParser = new parserFormula( "FORMULATEXT(S101:S102)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "=TODAY()" );
+
+		oParser = new parserFormula( "FORMULATEXT(S102)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#N/A" );
+
+		oParser = new parserFormula( "FORMULATEXT(S100:105)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#VALUE!" );
+
+		oParser = new parserFormula( "FORMULATEXT(S103)", "A1", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "=1+1" );
+
+		wb.dependencyFormulas.lockRecal();
+	} );
+
     test( "Test: \"FREQUENCY\"", function () {
 
         ws.getRange2( "A202" ).setValue( "79" );
@@ -6753,6 +6783,114 @@ $( function () {
         strictEqual( oParser.calculate().getValue(), couppcd( new Date(Date.UTC(2007,0,25)), new Date(Date.UTC(2008,10,15)), 2, 1 ) );
 
     } );
+
+	test( "Test: \"CONVERT\"", function () {
+
+		oParser = new parserFormula( 'CONVERT(68, "F", "C")', "A2", ws );
+		ok( oParser.parse(), 'CONVERT(68, "F", "C")' );
+		strictEqual( oParser.calculate().getValue(), 20, 'CONVERT(68, "F", "C")' );
+
+		oParser = new parserFormula( 'CONVERT(2.5, "ft", "sec")', "A2", ws );
+		ok( oParser.parse(), 'CONVERT(2.5, "ft", "sec")' );
+		strictEqual( oParser.calculate().getValue(), "#N/A", 'CONVERT(2.5, "ft", "sec")' );
+
+		oParser = new parserFormula( 'CONVERT(CONVERT(100,"ft","m"),"ft","m")', "A2", ws );
+		ok( oParser.parse(), 'CONVERT(CONVERT(100,"ft","m"),"ft","m")' );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 9.290304, 'CONVERT(CONVERT(100,"ft","m"),"ft","m")' );
+
+		oParser = new parserFormula( 'CONVERT(7,"bit","byte")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(3) - 0, 0.875 );
+
+		oParser = new parserFormula( 'CONVERT(7,"admkn","kn")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(14) - 0, 6.99999939524838 );
+
+		oParser = new parserFormula( 'CONVERT(7,"admkn","m/s")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 3.6011108 );
+
+		oParser = new parserFormula( 'CONVERT(7,"admkn","mph")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 8.0554554 );
+
+		oParser = new parserFormula( 'CONVERT(7,"m/h","m/sec")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0019444 );
+
+		oParser = new parserFormula( 'CONVERT(7,"m/hr","mph")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0043496 );
+
+		oParser = new parserFormula( 'CONVERT(7,"m","mi")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0043496 );
+
+		oParser = new parserFormula( 'CONVERT(7,"m","Pica")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 19842.5196850 );
+
+		oParser = new parserFormula( 'CONVERT(7,"m","pica")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 1653.5433071 );
+
+		oParser = new parserFormula( 'CONVERT(7,"Nmi","pica")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 3062362.2047251 );
+
+		oParser = new parserFormula( 'CONVERT(7,"yr","day")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 2556.75 );
+
+		oParser = new parserFormula( 'CONVERT(7,"yr","min")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 3681720 );
+
+		oParser = new parserFormula( 'CONVERT(7,"day","min")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 10080 );
+
+		oParser = new parserFormula( 'CONVERT(7,"hr","sec")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 25200 );
+
+		oParser = new parserFormula( 'CONVERT(7,"min","sec")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), 420 );
+
+		oParser = new parserFormula( 'CONVERT(7,"Pa","mmHg")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0525043 );
+
+		oParser = new parserFormula( 'CONVERT(7,"Pa","psi")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0010153 );
+
+		oParser = new parserFormula( 'CONVERT(7,"Pa","Torr")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0525045 );
+
+		oParser = new parserFormula( 'CONVERT(7,"g","sg")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0004797 );
+
+		oParser = new parserFormula( 'CONVERT(7,"g","lbm")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.0154324 );
+
+		oParser = new parserFormula( 'CONVERT(1, "lbm", "kg")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(7) - 0, 0.4535923 );
+
+		oParser = new parserFormula( 'CONVERT(1, "lbm", "mg")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue().toFixed(0) - 0, 453592 );
+
+		oParser = new parserFormula( 'CONVERT(1, "klbm", "mg")', "A2", ws );
+		ok( oParser.parse() );
+		strictEqual( oParser.calculate().getValue(), "#N/A" );
+
+	} );
 
     test( "Test: \"PRICE\"", function () {
 

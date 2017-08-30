@@ -3918,6 +3918,20 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
 
 ParaRun.prototype.Recalculate_PageEndInfo = function(PRSI, _CurLine, _CurRange)
 {
+	var CurLine  = _CurLine - this.StartLine;
+	var CurRange = ( 0 === CurLine ? _CurRange - this.StartRange : _CurRange );
+
+	var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
+	var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
+
+	for (var Pos = StartPos; Pos < EndPos; ++Pos)
+	{
+		var Item = this.Content[Pos];
+		if (para_FieldChar === Item.Type)
+		{
+			PRSI.ProcessFieldChar(Item);
+		}
+	}
 };
 
 ParaRun.prototype.private_RecalculateNumbering = function(PRS, Item, ParaPr, _X)
@@ -4425,6 +4439,13 @@ ParaRun.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
 
                 break;
             }
+			default:
+			{
+				if (Item.Get_WidthVisible())
+					RangeW.W += Item.Get_WidthVisible();
+
+				break;
+			}
         }
     }
 };
@@ -4460,6 +4481,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
     var aFind     = PDSH.Find;
     var aComm     = PDSH.Comm;
     var aShd      = PDSH.Shd;
+    var aFields   = PDSH.MMFields;
 
     var StartPos = this.protected_GetRangeStartPos(CurLine, CurRange);
     var EndPos   = this.protected_GetRangeEndPos(CurLine, CurRange);
@@ -4516,6 +4538,9 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
 
         if ( true === bDrawShd )
             aShd.Add( Y0, Y1, X, X + ItemWidthVisible, 0, ShdColor.r, ShdColor.g, ShdColor.b, undefined, oShd );
+
+		if (PDSH.IsComplexField() && !PDSH.IsComplexFieldCode())
+			PDSH.CFields.Add(Y0, Y1, X, X + ItemWidthVisible, 0, 0, 0, 0);
 
         switch( ItemType )
         {
@@ -4587,6 +4612,11 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
                 X += ItemWidthVisible;
                 break;
             }
+			case para_FieldChar:
+			{
+				PDSH.ProcessFieldChar(Item);
+				break;
+			}
         }
 
         for ( var SPos = 0; SPos < SearchMarksCount; SPos++)
@@ -9205,6 +9235,16 @@ ParaRun.prototype.GetAllContentControls = function(arrContentControls)
 		{
 			oItem.GetAllContentControls(arrContentControls);
 		}
+	}
+};
+ParaRun.prototype.RegroupComplexFields = function(oRegroupManager)
+{
+	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
+	{
+		var Item = this.Content[nPos];
+
+		if (para_FieldChar === Item.Type)
+			oRegroupManager.ProcessChar(Item);
 	}
 };
 

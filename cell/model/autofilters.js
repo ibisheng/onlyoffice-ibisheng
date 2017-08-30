@@ -2193,20 +2193,15 @@
 					{
 						var intersection = refTable.intersection(arnFrom);
 						//проходимся по всем ячейкам
-						var cell, cellTo;
 						var diffRow = arnTo.r1 - arnFrom.r1;
 						var diffCol = arnTo.c1 - arnFrom.c1;
-						for(var i = intersection.r1; i <= intersection.r2; i++)
-						{
-							for(var j = intersection.c1; j <= intersection.c2; j++)
-							{
-								cell = worksheet._getCell(i, j);
-								cellTo = worksheet._getCell(i + diffRow, j + diffCol);
-
-								var xfsFrom = cell.getCompiledStyle();
+						var tempRange = worksheet.getRange3(intersection.r1, intersection.c1, intersection.r2, intersection.c2);
+						tempRange._foreach(function(cellFrom){
+							var xfsFrom = cellFrom.getCompiledStyle();
+							worksheet._getCell(cellFrom.nRow + diffRow, cellFrom.nCol + diffCol, function(cellTo) {
 								cellTo.setStyle(xfsFrom);
-							}
-						}
+							});
+						});
 					}
 				}
 			},
@@ -2775,17 +2770,10 @@
 				{
 					return;
 				}
-				
-				for(var i = table.Ref.r1; i <= table.Ref.r2; i++)
-				{
-					for(var j = table.Ref.c1; j <= table.Ref.c2; j++)
-					{
-						var cell = this.worksheet._getCell(i, j);
-						
-						var xfsFrom = cell.getCompiledStyle();
-						cell.setStyle(xfsFrom);
-					}
-				}
+				var tempRange = this.worksheet.getRange3(table.Ref.r1, table.Ref.c1, table.Ref.r2, table.Ref.c2);
+				tempRange._foreach(function(cell){
+					cell.setStyle(cell.getCompiledStyle());
+				});
 			},
 			
 			_clearRange: function(range, isClearText)

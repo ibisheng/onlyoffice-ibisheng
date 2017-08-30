@@ -120,6 +120,7 @@ var editor;
     this.isImageChangeUrl = false;
     this.isShapeImageChangeUrl = false;
     this.isTextArtChangeUrl = false;
+    this.textureType = null;
 
 
 	  // Styles sizes
@@ -228,12 +229,13 @@ var editor;
 		if (null == value) {
 			var ws = this.wbModel.getActiveWs();
 			var activeCell = ws.selectionRange.activeCell;
-			var cell = ws._getCellNoEmpty(activeCell.row, activeCell.col);
-			if (cell) {
-				res = cell.getValueForExample(numFormat, cultureInfo);
-			} else {
-				res = '';
-			}
+			ws._getCellNoEmpty(activeCell.row, activeCell.col, function(cell) {
+              if (cell) {
+                res = cell.getValueForExample(numFormat, cultureInfo);
+              } else {
+                res = '';
+              }
+            });
 		} else {
 			res = numFormat.formatToChart(value, cultureInfo);
 		}
@@ -2720,13 +2722,15 @@ var editor;
     this.asc_addImage();
   };
 
-  spreadsheet_api.prototype.asc_changeShapeImageFromFile = function() {
+  spreadsheet_api.prototype.asc_changeShapeImageFromFile = function(type) {
     this.isShapeImageChangeUrl = true;
+    this.textureType = type;
     this.asc_addImage();
   };
 
-  spreadsheet_api.prototype.asc_changeArtImageFromFile = function() {
+  spreadsheet_api.prototype.asc_changeArtImageFromFile = function(type) {
     this.isTextArtChangeUrl = true;
+    this.textureType = type;
     this.asc_addImage();
   };
 
@@ -2946,23 +2950,21 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_setCellAlign = function(align) {
-    var ha = AscCommonExcel.horizontalAlignFromString(align);
     var ws = this.wb.getWorksheet();
     if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellAlign) {
-      ws.objectRender.controller.setCellAlign(ha);
+      ws.objectRender.controller.setCellAlign(align);
     } else {
-      this.wb.getWorksheet().setSelectionInfo("a", ha);
+      this.wb.getWorksheet().setSelectionInfo("a", align);
       this.wb.restoreFocus();
     }
   };
 
   spreadsheet_api.prototype.asc_setCellVertAlign = function(align) {
-    var va = AscCommonExcel.verticalAlignFromString(align);
     var ws = this.wb.getWorksheet();
     if (ws.objectRender.selectedGraphicObjectsExists() && ws.objectRender.controller.setCellVertAlign) {
-      ws.objectRender.controller.setCellVertAlign(va);
+      ws.objectRender.controller.setCellVertAlign(align);
     } else {
-      this.wb.getWorksheet().setSelectionInfo("va", va);
+      this.wb.getWorksheet().setSelectionInfo("va", align);
       this.wb.restoreFocus();
     }
   };

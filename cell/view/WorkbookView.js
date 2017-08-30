@@ -2816,11 +2816,23 @@
 
 		var addStyles = function(styles, type)
 		{
+			//None style
+			var options;
+			if(type === "default" && props && !bPivotTable){
+				options = new AscCommonExcel.formatTablePictures();
+				options.name = "None";
+				options.displayName = "None";
+				var emptyStyle = new window["Asc"].CTableStyle();
+				emptyStyle.pivot = false;
+				options.image = t.af_getSmallIconTable(canvas, emptyStyle, styleInfo, {w: originSizeW, h: originSizeH, row: row, col: col});
+				result.push(options);
+			}
+
 			for (var i in styles)
 			{
 				if ((bPivotTable && styles[i].pivot) || (!bPivotTable && styles[i].table))
 				{
-					var options = new AscCommonExcel.formatTablePictures();
+					options = new AscCommonExcel.formatTablePictures();
 					options.name = i;
 					options.displayName = styles[i].displayName;
 					options.type = type;

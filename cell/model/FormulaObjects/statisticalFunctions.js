@@ -66,11 +66,11 @@
 		cCHISQ_DIST_RT, cCHISQ_INV, cCHISQ_INV_RT, cCHITEST, cCHISQ_TEST, cCONFIDENCE, cCONFIDENCE_NORM, cCONFIDENCE_T,
 		cCORREL, cCOUNT, cCOUNTA, cCOUNTBLANK, cCOUNTIF, cCOUNTIFS, cCOVAR, cCOVARIANCE_P, cCOVARIANCE_S, cCRITBINOM,
 		cDEVSQ, cEXPON_DIST, cEXPONDIST, cF_DIST, cFDIST, cF_DIST_RT, cF_INV, cFINV, cF_INV_RT, cFISHER, cFISHERINV,
-		cFORECAST, cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV, cGAMMAINV,
-		cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT, cLARGE,
-		cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN, cMIN,
-		cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST, cNORMINV,
-		cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
+		cFORECAST, cFORECAST_ETS, cFORECAST_LINEAR, cFREQUENCY, cFTEST, cGAMMA, cGAMMA_DIST, cGAMMADIST, cGAMMA_INV,
+		cGAMMAINV, cGAMMALN, cGAMMALN_PRECISE, cGAUSS, cGEOMEAN, cGROWTH, cHARMEAN, cHYPGEOMDIST, cINTERCEPT, cKURT,
+		cLARGE, cLINEST, cLOGEST, cLOGINV, cLOGNORM_DIST, cLOGNORM_INV, cLOGNORMDIST, cMAX, cMAXA, cMAXIFS, cMEDIAN,
+		cMIN, cMINA, cMINIFS, cMODE, cMODE_MULT, cMODE_SNGL, cNEGBINOMDIST, cNEGBINOM_DIST, cNORMDIST, cNORM_DIST,
+		cNORMINV, cNORM_INV, cNORMSDIST, cNORM_S_DIST, cNORMSINV, cNORM_S_INV, cPEARSON, cPERCENTILE, cPERCENTILE_EXC,
 		cPERCENTILE_INC, cPERCENTRANK, cPERCENTRANK_EXC, cPERCENTRANK_INC, cPERMUT, cPERMUTATIONA, cPHI, cPOISSON,
 		cPOISSON_DIST, cPROB, cQUARTILE, cQUARTILE_EXC, cQUARTILE_INC, cRANK, cRANK_AVG, cRANK_EQ, cRSQ, cSKEW, cSKEW_P,
 		cSLOPE, cSMALL, cSTANDARDIZE, cSTDEV, cSTDEV_S, cSTDEVA, cSTDEVP, cSTDEV_P, cSTDEVPA, cSTEYX, cTDIST, cT_DIST,
@@ -1372,6 +1372,1192 @@
 	};
 
 
+
+
+	function ScETSForecastCalculation(nSize) {
+		//SvNumberFormatter* mpFormatter;
+		this.maRange = [];   // data (X, Y)
+		this.mpBase = [];                     // calculated base value array
+		this.mpTrend = [];                    // calculated trend factor array
+		this.mpPerIdx = [];                   // calculated periodical deviation array, not used with eds
+		this.mpForecast = [];                 // forecasted value array
+		this.mnSmplInPrd = 0;                 // samples per period
+		this.mfStepSize = 0;                  // increment of X in maRange
+		this.mfAlpha, this.mfBeta, this.mfGamma;    // constants to minimise the RMSE in the ES-equations
+		this.mnCount = nSize;                     // No of data points
+		this.mbInitialised;
+		this.mnMonthDay;                     // n-month X-interval, value is day of month
+		// accuracy indicators
+		this.mfMAE;                       // mean absolute error
+		this.mfMASE;                      // mean absolute scaled error
+		this.mfMSE;                       // mean squared error (variation)
+		this.mfRMSE;                      // root mean squared error (standard deviation)
+		this.mfSMAPE;                     // symmetric mean absolute error
+		//FormulaError mnErrorValue;
+		this.bAdditive;                     // true: additive method, false: multiplicative method
+		this.bEDS;                          // true: EDS, false: ETS
+
+		// constants used in determining best fit for alpha, beta, gamma
+		this.cfMinABCResolution = 0.001;  // minimum change of alpha, beta, gamma
+		this.cnScenarios = 1000;   // No. of scenarios to calculate for PI calculations
+
+		/*bool initData();
+		 bool prefillBaseData();
+		 bool prefillTrendData();
+		 bool prefillPerIdx();
+		 bool initCalc();
+		 void refill();
+		 SCSIZE CalcPeriodLen();
+		 void CalcAlphaBetaGamma();
+		 void CalcBetaGamma();
+		 void CalcGamma();
+		 void calcAccuracyIndicators();
+		 bool GetForecast( double fTarget, double& rForecast );
+		 double RandDev();
+		 double convertXtoMonths( double x );*/
+	}
+
+	/*ScETSForecastCalculation::ScETSForecastCalculation( nSize, pFormatter )
+	 : mpFormatter(pFormatter)
+	 , mpBase(nullptr)
+	 , mpTrend(nullptr)
+	 , mpPerIdx(nullptr)
+	 , mpForecast(nullptr)
+	 , mnSmplInPrd(0)
+	 , mfStepSize(0.0)
+	 , mfAlpha(0.0)
+	 , mfBeta(0.0)
+	 , mfGamma(0.0)
+	 , mnCount(nSize)
+	 , mbInitialised(false)
+	 , mnMonthDay(0)
+	 , mfMAE(0.0)
+	 , mfMASE(0.0)
+	 , mfMSE(0.0)
+	 , mfRMSE(0.0)
+	 , mfSMAPE(0.0)
+	 , mnErrorValue(FormulaError::NONE)
+	 , bAdditive(false)
+	 , bEDS(false)
+	 {
+	 maRange.reserve( mnCount );
+	 }*/
+
+	ScETSForecastCalculation.prototype = Object.create(ScETSForecastCalculation.prototype);
+	ScETSForecastCalculation.prototype.constructor = ScETSForecastCalculation;
+
+
+	ScETSForecastCalculation.prototype.PreprocessDataRange = function( rMatX, rMatY,  rSmplInPrd, bDataCompletion, nAggregation, rTMat, eETSType )
+	{
+		this.bEDS = ( rSmplInPrd == 0 );
+		this.bAdditive = /*( eETSType == etsAdd || eETSType == etsPIAdd || eETSType == etsStatAdd )*/true;
+
+
+
+		// maRange needs to be sorted by X
+		/*for ( SCSIZE i = 0; i < mnCount; i++ )
+		 maRange.push_back( DataPoint( rMatX->GetDouble( i ), rMatY->GetDouble( i ) ) );
+		 sort( maRange.begin(), maRange.end(), lcl_SortByX );*/
+
+
+		this.mnCount = rMatX.length;
+		var maRange = this.maRange;
+		for ( var i = 0; i < this.mnCount; i++ ){
+			maRange.push( {X: rMatX[i][0].value, Y: rMatY[i][0].value } );
+		}
+
+		maRange.sort(function(a, b) {
+			return a.X - b.X;
+		});
+
+
+
+
+
+		/*if ( rTMat )
+		 {
+		 if ( eETSType != etsPIAdd && eETSType != etsPIMult )
+		 {
+		 if ( rTMat->GetDouble( 0 ) < maRange[ 0 ].X )
+		 {
+		 // target cannot be less than start of X-range
+		 mnErrorValue = FormulaError::IllegalFPOperation;
+		 return false;
+		 }
+		 }
+		 else
+		 {
+		 if ( rTMat->GetDouble( 0 ) < maRange[ mnCount - 1 ].X )
+		 {
+		 // target cannot be before end of X-range
+		 mnErrorValue = FormulaError::IllegalFPOperation;
+		 return false;
+		 }
+		 }
+		 }*/
+
+
+		if ( rTMat )
+		{
+			if ( eETSType != etsPIAdd && eETSType != etsPIMult )
+			{
+				if ( rTMat[0] < maRange[ 0 ].X )
+				{
+					return new cError(cErrorType.wrong_value_type);
+				}
+			}
+			else
+			{
+				if ( rTMat[ 0 ] < maRange[ mnCount - 1 ].X )
+				{
+					return new cError(cErrorType.wrong_value_type);
+				}
+			}
+		}
+
+
+
+
+
+
+
+		// Month intervals don't have exact stepsize, so first
+		// detect if month interval is used.
+		// Method: assume there is an month interval and verify.
+		// If month interval is used, replace maRange.X with month values
+		// for ease of calculations.
+		/*Date aNullDate = *( mpFormatter->GetNullDate() );
+		Date aDate = aNullDate + static_cast< long >( maRange[ 0 ].X );
+		mnMonthDay = aDate.GetDay();
+		for ( SCSIZE i = 1; i < mnCount && mnMonthDay; i++ )
+		{
+			Date aDate1 = aNullDate + static_cast< long >( maRange[ i ].X );
+			if ( aDate != aDate1 )
+			{
+				if ( aDate1.GetDay() != mnMonthDay )
+					mnMonthDay = 0;
+			}
+		}*/
+
+
+		var aDate =  Date.prototype.getDateFromExcel(maRange[ 0 ].X);
+		this.mnMonthDay = aDate.getDate();
+		for ( var i = 1; i < this.mnCount && this.mnMonthDay; i++ )
+		{
+			var aDate1 = Date.prototype.getDateFromExcel( maRange[ i ].X );
+			if ( aDate != aDate1 )
+			{
+				if ( aDate1.getDate() != this.mnMonthDay )
+					this.mnMonthDay = 0;
+			}
+		}
+
+
+
+
+
+		/*mfStepSize = ::std::numeric_limits<double>::max();
+		 if ( mnMonthDay )
+		 {
+		 for ( SCSIZE i = 0; i < mnCount; i++ )
+		 {
+		 aDate = aNullDate + static_cast< long >( maRange[ i ].X );
+		 maRange[ i ].X = aDate.GetYear() * 12 + aDate.GetMonth();
+		 }
+		 }*/
+
+
+		this.mfStepSize = Number.MAX_VALUE;
+		if ( /*mnMonthDay*/true )
+		{
+			for ( var i = 0; i < this.mnCount; i++ )
+			{
+				var aDate = Date.prototype.getDateFromExcel(maRange[ i ].X);
+				maRange[ i ].X = aDate.getUTCFullYear() * 12 + aDate.getMonth();
+			}
+		}
+
+
+
+
+		/*for ( SCSIZE i = 1; i < mnCount; i++ )
+		 {
+		 double fStep = maRange[ i ].X - maRange[ i - 1 ].X;
+		 if ( fStep == 0.0 )
+		 {
+		 if ( nAggregation == 0 )
+		 {
+		 // identical X-values are not allowed
+		 mnErrorValue = FormulaError::NoValue;
+		 return false;
+		 }
+		 double fTmp = maRange[ i - 1 ].Y;
+		 SCSIZE nCounter = 1;
+		 switch ( nAggregation )
+		 {
+		 case 1 : // AVERAGE (default)
+		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
+		 {
+		 maRange.erase( maRange.begin() + i );
+		 --mnCount;
+		 }
+		 break;
+		 case 7 : // SUM
+		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
+		 {
+		 fTmp += maRange[ i ].Y;
+		 maRange.erase( maRange.begin() + i );
+		 --mnCount;
+		 }
+		 maRange[ i - 1 ].Y = fTmp;
+		 break;
+
+		 case 2 : // COUNT
+		 case 3 : // COUNTA (same as COUNT as there are no non-numeric Y-values)
+		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
+		 {
+		 nCounter++;
+		 maRange.erase( maRange.begin() + i );
+		 --mnCount;
+		 }
+		 maRange[ i - 1 ].Y = nCounter;
+		 break;
+
+		 case 4 : // MAX
+		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
+		 {
+		 if ( maRange[ i ].Y > fTmp )
+		 fTmp = maRange[ i ].Y;
+		 maRange.erase( maRange.begin() + i );
+		 --mnCount;
+		 }
+		 maRange[ i - 1 ].Y = fTmp;
+		 break;
+
+		 case 5 : // MEDIAN
+		 {
+		 std::vector< double > aTmp;
+		 aTmp.push_back( maRange[ i - 1 ].Y );
+		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
+		 {
+		 aTmp.push_back( maRange[ i ].Y );
+		 nCounter++;
+		 maRange.erase( maRange.begin() + i );
+		 --mnCount;
+		 }
+		 sort( aTmp.begin(), aTmp.end() );
+
+		 if ( nCounter % 2 )
+		 maRange[ i - 1 ].Y = aTmp[ nCounter / 2 ];
+		 else
+		 maRange[ i - 1 ].Y = ( aTmp[ nCounter / 2 ] + aTmp[ nCounter / 2 - 1 ] ) / 2.0;
+		 }
+		 break;
+
+		 case 6 : // MIN
+		 while ( i < mnCount && maRange[ i ].X == maRange[ i - 1 ].X )
+		 {
+		 if ( maRange[ i ].Y < fTmp )
+		 fTmp = maRange[ i ].Y;
+		 maRange.erase( maRange.begin() + i );
+		 --mnCount;
+		 }
+		 maRange[ i - 1 ].Y = fTmp;
+		 break;
+		 }
+		 if ( i < mnCount - 1 )
+		 fStep = maRange[ i ].X - maRange[ i - 1 ].X;
+		 else
+		 fStep = mfStepSize;
+		 }
+		 if ( fStep > 0 && fStep < mfStepSize )
+		 mfStepSize = fStep;
+		 }*/
+
+
+		for ( var i = 1; i < this.mnCount; i++ ) {
+
+			var fStep = maRange[ i ].X - maRange[ i - 1 ].X;
+			if ( fStep === 0.0 ) {
+				if (nAggregation === 0) {
+					return new cError(cErrorType.wrong_value_type);
+				}
+
+				var fTmp = maRange[i - 1].Y;
+				var nCounter = 1;
+				switch (nAggregation) {
+					case 1 : // AVERAGE (default)
+						while (i < this.mnCount && maRange[i].X === maRange[i - 1].X) {
+							maRange.splice(i, 1);
+							--this.mnCount;
+						}
+						break;
+					case 7 : // SUM
+						while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+							fTmp += maRange[i].Y;
+							maRange.splice(i, 1);
+							--this.mnCount;
+						}
+						maRange[i - 1].Y = fTmp;
+						break;
+
+					case 2 : // COUNT
+					case 3 : // COUNTA (same as COUNT as there are no non-numeric Y-values)
+						while (i < this.mnCount && maRange[i].X === maRange[i - 1].X) {
+							nCounter++;
+							maRange.splice(i, 1);
+							--this.mnCount;
+						}
+						maRange[i - 1].Y = nCounter;
+						break;
+
+					case 4 : // MAX
+						while (i < this.mnCount && maRange[i].X === maRange[i - 1].X) {
+							if (maRange[i].Y > fTmp) {
+								fTmp = maRange[i].Y;
+							}
+							maRange.splice(i, 1);
+							--this.mnCount;
+						}
+						maRange[i - 1].Y = fTmp;
+						break;
+
+					case 5 : // MEDIAN
+
+						var aTmp = [];
+						aTmp.push(maRange[i - 1].Y);
+						while (i < mnCount && maRange[i].X === maRange[i - 1].X) {
+							aTmp.push(maRange[i].Y);
+							nCounter++;
+							maRange.splice(i, 1);
+							--this.mnCount;
+						}
+
+						//sort( aTmp.begin(), aTmp.end() );
+
+						if (nCounter % 2) {
+							maRange[i - 1].Y = aTmp[nCounter / 2];
+						} else {
+							maRange[i - 1].Y = ( aTmp[nCounter / 2] + aTmp[nCounter / 2 - 1] ) / 2.0;
+						}
+
+						break;
+
+					case 6 : // MIN
+						while (i < this.mnCount && maRange[i].X === maRange[i - 1].X) {
+							if (maRange[i].Y < fTmp) {
+								fTmp = maRange[i].Y;
+							}
+							maRange.splice(i, 1);
+							--this.mnCount;
+						}
+						maRange[i - 1].Y = fTmp;
+						break;
+				}
+
+				if ( i < this.mnCount - 1 ){
+					fStep = maRange[ i ].X - maRange[ i - 1 ].X;
+				}else{
+					fStep = this.mfStepSize;
+				}
+			}
+
+			if ( fStep > 0 && fStep < this.mfStepSize ){
+				this.mfStepSize = fStep;
+			}
+
+		}
+
+
+
+
+		// step must be constant (or gap multiple of step)
+		/*bool bHasGap = false;
+		 for ( SCSIZE i = 1; i < mnCount && !bHasGap; i++ )
+		 {
+		 double fStep = maRange[ i ].X - maRange[ i - 1 ].X;
+
+		 if ( fStep != mfStepSize )
+		 {
+		 if ( fmod( fStep, mfStepSize ) != 0.0 )
+		 {
+		 // step not constant nor multiple of mfStepSize in case of gaps
+		 mnErrorValue = FormulaError::NoValue;
+		 return false;
+		 }
+		 bHasGap = true;
+		 }
+		 }*/
+
+
+		// step must be constant (or gap multiple of step)
+		var bHasGap = false;
+		for (var i = 1; i < this.mnCount && !bHasGap; i++) {
+			var fStep = maRange[i].X - maRange[i - 1].X;
+
+			if (fStep != this.mfStepSize) {
+				if (Math.fmod(fStep, this.mfStepSize) !== 0.0) {
+					return new cError(cErrorType.wrong_value_type);
+				}
+				bHasGap = true;
+			}
+		}
+
+
+
+
+
+
+		// fill gaps with values depending on bDataCompletion
+		/*if ( bHasGap )
+		 {
+		 SCSIZE nMissingXCount = 0;
+		 double fOriginalCount = static_cast< double >( mnCount );
+		 if ( mnMonthDay )
+		 aDate = aNullDate + static_cast< long >( maRange[ 0 ].X );
+		 for ( SCSIZE i = 1; i < mnCount; i++ )
+		 {
+		 double fDist;
+		 if ( mnMonthDay )
+		 {
+		 Date aDate1 = aNullDate + static_cast< long >( maRange[ i ].X );
+		 fDist = 12 * ( aDate1.GetYear() - aDate.GetYear() ) +
+		 ( aDate1.GetMonth() - aDate.GetMonth() );
+		 aDate = aDate1;
+		 }
+		 else
+		 fDist = maRange[ i ].X - maRange[ i - 1 ].X;
+		 if ( fDist > mfStepSize )
+		 {
+		 // gap, insert missing data points
+		 double fYGap = ( maRange[ i ].Y + maRange[ i - 1 ].Y ) / 2.0;
+		 for ( double fXGap = maRange[ i - 1].X + mfStepSize;  fXGap < maRange[ i ].X; fXGap += mfStepSize )
+		 {
+		 maRange.insert( maRange.begin() + i, DataPoint( fXGap, ( bDataCompletion ? fYGap : 0.0 ) ) );
+		 i++;
+		 mnCount++;
+		 nMissingXCount++;
+		 if ( static_cast< double >( nMissingXCount ) / fOriginalCount > 0.3 )
+		 {
+		 // maximum of 30% missing points exceeded
+		 mnErrorValue = FormulaError::NoValue;
+		 return false;
+		 }
+		 }
+		 }
+		 }
+		 }*/
+
+
+		if ( bHasGap )
+		{
+			var nMissingXCount = 0;
+			var fOriginalCount = this.mnCount;
+			if ( /*mnMonthDay*/true ){
+				aDate = Date.prototype.getDateFromExcel(maRange[ 0 ].X);
+			}
+
+			for ( var i = 1; i < this.mnCount; i++ )
+			{
+				var fDist;
+				if ( /*mnMonthDay*/true )
+				{
+					var aDate1 = Date.prototype.getDateFromExcel(maRange[ i ].X);
+					fDist = 12 * ( aDate1.getUTCFullYear() - aDate.getUTCFullYear() ) +
+						( aDate1.getMonth() - aDate.getMonth() );
+					aDate = aDate1;
+				}
+				else{
+					fDist = maRange[ i ].X - maRange[ i - 1 ].X;
+				}
+
+				if ( fDist > this.mfStepSize )
+				{
+					// gap, insert missing data points
+					var fYGap = ( maRange[ i ].Y + maRange[ i - 1 ].Y ) / 2.0;
+					for ( var fXGap = maRange[ i - 1].X + this.mfStepSize;  fXGap < maRange[ i ].X; fXGap += this.mfStepSize )
+					{
+						var newAddElem = {X: fXGap, Y: ( bDataCompletion ? fYGap : 0.0 )};
+						maRange.splice( i, 1, newAddElem );
+						i++;
+						this.mnCount++;
+						nMissingXCount++;
+						if (  nMissingXCount  / fOriginalCount > 0.3 )
+						{
+							// maximum of 30% missing points exceeded
+							return new cError(cErrorType.wrong_value_type);
+						}
+					}
+				}
+			}
+		}
+
+
+
+		if ( rSmplInPrd != 1 )
+			this.mnSmplInPrd = rSmplInPrd;
+		else
+		{
+			this.mnSmplInPrd = this.CalcPeriodLen();
+			if ( this.mnSmplInPrd == 1 )
+				this.bEDS = true; // period length 1 means no periodic data: EDS suffices
+		}
+
+		if ( !this.initData() )
+			return false;  // note: mnErrorValue is set in called function(s)
+
+		return true;
+	};
+
+
+	ScETSForecastCalculation.prototype.initData = function()
+	{
+		// give various vectors size and initial value
+		this.mpBase     = [];
+		this.mpBase.length = this.mnCount;
+		this.mpBase.fill(0);
+		this.mpTrend     = [];
+		this.mpTrend.length = this.mnCount;
+		this.mpTrend.fill(0);
+		if ( !this.bEDS ){
+			this.mpPerIdx     = [];
+			this.mpPerIdx.length = this.mnCount;
+			this.mpPerIdx.fill(0);
+		}
+
+		this.mpForecast     = [];
+		this.mpForecast.length = this.mnCount;
+		this.mpForecast.fill(0);
+		this.mpForecast[ 0 ] = this.maRange[ 0 ].Y;
+
+		if ( this.prefillTrendData() )
+		{
+			if ( this.prefillPerIdx() )
+			{
+				if ( this.prefillBaseData() )
+					return true;
+			}
+		}
+		return false;
+	};
+
+	ScETSForecastCalculation.prototype.prefillTrendData = function()
+	{
+		if ( this.bEDS )
+			this.mpTrend[ 0 ] = ( this.maRange[ this.mnCount - 1 ].Y - this.maRange[ 0 ].Y ) / ( this.mnCount - 1 );
+		else
+		{
+			// we need at least 2 periods in the data range
+			if ( this.mnCount < 2 * this.mnSmplInPrd )
+			{
+				return new cError(cErrorType.wrong_value_type);
+			}
+
+			var fSum = 0.0;
+			for ( var i = 0; i < this.mnSmplInPrd; i++ )
+				fSum += this.maRange[ i + this.mnSmplInPrd ].Y - this.maRange[ i ].Y;
+			var fTrend = fSum / ( this.mnSmplInPrd * this.mnSmplInPrd );
+
+			this.mpTrend[ 0 ] = fTrend;
+		}
+
+		return true;
+	};
+
+
+	ScETSForecastCalculation.prototype.prefillPerIdx2 = function()
+	{
+		/*if ( !this.bEDS )
+		 {
+		 // use as many complete periods as available
+		 if ( this.mnSmplInPrd == 0 )
+		 {
+		 // should never happen; if mnSmplInPrd equals 0, bEDS is true
+		 mnErrorValue = FormulaError::UnknownState;
+		 return false;
+		 }
+		 var nPeriods = this.mnCount / this.mnSmplInPrd;
+		 std::vector< double > aPeriodAverage( nPeriods, 0.0 );
+		 for ( SCSIZE i = 0; i < nPeriods ; i++ )
+		 {
+		 for ( SCSIZE j = 0; j < mnSmplInPrd; j++ )
+		 aPeriodAverage[ i ] += maRange[ i * mnSmplInPrd + j ].Y;
+		 aPeriodAverage[ i ] /= static_cast< double >( mnSmplInPrd );
+		 if ( aPeriodAverage[ i ] == 0.0 )
+		 {
+		 SAL_WARN( "sc.core", "prefillPerIdx(), average of 0 will cause divide by zero error, quitting calculation" );
+		 mnErrorValue = FormulaError::DivisionByZero;
+		 return false;
+		 }
+		 }
+
+		 for ( SCSIZE j = 0; j < mnSmplInPrd; j++ )
+		 {
+		 double fI = 0.0;
+		 for ( SCSIZE i = 0; i < nPeriods ; i++ )
+		 {
+		 // adjust average value for position within period
+		 if ( bAdditive )
+		 fI += ( maRange[ i * mnSmplInPrd + j ].Y -
+		 ( aPeriodAverage[ i ] + ( static_cast< double >( j ) - 0.5 * ( mnSmplInPrd - 1 ) ) *
+		 mpTrend[ 0 ] ) );
+		 else
+		 fI += ( maRange[ i * mnSmplInPrd + j ].Y /
+		 ( aPeriodAverage[ i ] + ( static_cast< double >( j ) - 0.5 * ( mnSmplInPrd - 1 ) ) *
+		 mpTrend[ 0 ] ) );
+		 }
+		 mpPerIdx[ j ] = fI / nPeriods;
+		 }
+		 }
+		 return true;*/
+	};
+
+	ScETSForecastCalculation.prototype.prefillPerIdx = function()
+	{
+		if ( !this.bEDS )
+		{
+			// use as many complete periods as available
+			if ( this.mnSmplInPrd == 0 )
+			{
+				// should never happen; if mnSmplInPrd equals 0, bEDS is true
+				//mnErrorValue = FormulaError::UnknownState;
+				return false;
+			}
+
+			var nPeriods = parseInt(this.mnCount / this.mnSmplInPrd);//scsize
+
+			var aPeriodAverage = [];
+			for ( var i = 0; i < nPeriods ; i++ )
+			{
+				aPeriodAverage[ i ] = 0;
+				for ( var j = 0; j < this.mnSmplInPrd; j++ )
+					aPeriodAverage[ i ] += this.maRange[ i * this.mnSmplInPrd + j ].Y;
+				aPeriodAverage[ i ] /= this.mnSmplInPrd;
+				if ( aPeriodAverage[ i ] == 0.0 )
+				{
+					//SAL_WARN( "sc.core", "prefillPerIdx(), average of 0 will cause divide by zero error, quitting calculation" );
+					//mnErrorValue = FormulaError::DivisionByZero;
+					return false;
+				}
+			}
+
+			for ( var j = 0; j < this.mnSmplInPrd; j++ )
+			{
+				var fI = 0.0;
+				for ( var i = 0; i < nPeriods ; i++ )
+				{
+					// adjust average value for position within period
+					if ( this.bAdditive )
+						fI += ( this.maRange[ i * this.mnSmplInPrd + j ].Y -
+						( aPeriodAverage[ i ] + ( j - 0.5 * ( this.mnSmplInPrd - 1 ) ) *
+						this.mpTrend[ 0 ] ) );
+					else
+						fI += ( this.maRange[ i * this.mnSmplInPrd + j ].Y /
+						( aPeriodAverage[ i ] + ( j - 0.5 * ( this.mnSmplInPrd - 1 ) ) *
+						this.mpTrend[ 0 ] ) );
+				}
+				this.mpPerIdx[ j ] = fI / nPeriods;
+			}
+		}
+		return true;
+	};
+
+
+	ScETSForecastCalculation.prototype.prefillBaseData = function()
+	{
+		if ( this.bEDS )
+			this.mpBase[ 0 ] = this.maRange[ 0 ].Y;
+		else
+			this.mpBase[ 0 ] = this.maRange[ 0 ].Y / this.mpPerIdx[ 0 ];
+		return true;
+	};
+
+	ScETSForecastCalculation.prototype.initCalc = function()
+	{
+		if ( !this.mbInitialised )
+		{
+			this.CalcAlphaBetaGamma();
+
+			this.mbInitialised = true;
+			this.calcAccuracyIndicators();
+		}
+		return true;
+	};
+
+
+	ScETSForecastCalculation.prototype.calcAccuracyIndicators = function()
+	{
+		var fSumAbsErr     = 0.0;
+		var fSumDivisor    = 0.0;
+		var fSumErrSq      = 0.0;
+		var fSumAbsPercErr = 0.0;
+
+		for ( var i = 1; i < this.mnCount; i++ )
+		{
+			var fError = this.mpForecast[ i ] - this.maRange[ i ].Y;
+			fSumAbsErr     += Math.abs( fError );
+			fSumErrSq      += fError * fError;
+			fSumAbsPercErr += Math.abs( fError ) / ( Math.abs( this.mpForecast[ i ] ) + Math.abs( this.maRange[ i ].Y ) );
+		}
+
+		for ( var i = 2; i < this.mnCount; i++ ){
+			fSumDivisor += Math.abs( this.maRange[ i ].Y - this.maRange[ i - 1 ].Y );
+		}
+
+		var nCalcCount = this.mnCount - 1;
+		this.mfMAE   = fSumAbsErr / nCalcCount;
+		this.mfMASE  = fSumAbsErr / ( nCalcCount * fSumDivisor / ( nCalcCount - 1 ) );
+		this.mfMSE   = fSumErrSq / nCalcCount;
+		this.mfRMSE  = Math.sqrt( this.mfMSE );
+		this.mfSMAPE = fSumAbsPercErr * 2.0 / nCalcCount;
+	};
+
+
+	ScETSForecastCalculation.prototype.CalcPeriodLen = function()
+	{
+		var nBestVal = this.mnCount;
+		var fBestME = Number.MAX_VALUE;
+		var maRange = this.maRange;
+
+		for ( var nPeriodLen = parseInt(this.mnCount / 2); nPeriodLen >= 1; nPeriodLen-- )
+		{
+			var fMeanError = 0.0;
+			var nPeriods = parseInt(this.mnCount / nPeriodLen);
+			var nStart = parseInt(this.mnCount - ( nPeriods * nPeriodLen ) + 1);
+			for ( var i = nStart; i < ( this.mnCount - nPeriodLen ); i++ )
+			{
+				fMeanError += Math.abs( ( maRange[ i ].Y - maRange[ i - 1 ].Y ) -
+					( maRange[ nPeriodLen + i ].Y - maRange[ nPeriodLen + i - 1 ].Y ) );
+			}
+			fMeanError /= ( nPeriods - 1 ) * nPeriodLen - 1 ;
+
+			if ( fMeanError <= fBestME || fMeanError == 0.0 )
+			{
+				nBestVal = nPeriodLen;
+				fBestME = fMeanError;
+			}
+		}
+		return nBestVal;
+	};
+
+
+	ScETSForecastCalculation.prototype.CalcAlphaBetaGamma = function()
+	{
+		var f0 = 0.0;
+		this.mfAlpha = f0;
+		if ( this.bEDS )
+		{
+			this.mfBeta = 0.0; // beta is not used with EDS
+			this.CalcGamma();
+		}
+		else
+			this.CalcBetaGamma();
+		this.refill();
+		var fE0 = this.mfMSE;
+
+		var f2 = 1.0;
+		this.mfAlpha = f2;
+		if ( this.bEDS )
+			this.CalcGamma();
+		else
+			this.CalcBetaGamma();
+		this.refill();
+		var fE2 = this.mfMSE;
+
+		var f1 = 0.5;
+		this.mfAlpha = f1;
+		if ( this.bEDS )
+			this.CalcGamma();
+		else
+			this.CalcBetaGamma();
+		this.refill();
+
+		if ( fE0 == this.mfMSE && this.mfMSE == fE2 )
+		{
+			this.mfAlpha = 0;
+			if ( this.bEDS )
+				this.CalcGamma();
+			else
+				this.CalcBetaGamma();
+			this.refill();
+			return;
+		}
+		while ( ( f2 - f1 ) > this.cfMinABCResolution )
+		{
+			if ( fE2 > fE0 )
+			{
+				f2 = f1;
+				fE2 = this.mfMSE;
+				f1 = ( f0 + f1 ) / 2;
+			}
+			else
+			{
+				f0 = f1;
+				fE0 = this.mfMSE;
+				f1 = ( f1 + f2 ) / 2;
+			}
+			this.mfAlpha = f1;
+			if ( this.bEDS )
+				this.CalcGamma();
+			else
+				this.CalcBetaGamma();
+			this.refill();
+		}
+		if ( fE2 > fE0 )
+		{
+			if ( fE0 < this.mfMSE )
+			{
+				this.mfAlpha = f0;
+				if ( this.bEDS )
+					this.CalcGamma();
+				else
+					this.CalcBetaGamma();
+				this.refill();
+			}
+		}
+		else
+		{
+			if ( fE2 < this.mfMSE )
+			{
+				this.mfAlpha = f2;
+				if ( this.bEDS )
+					this.CalcGamma();
+				else
+					this.CalcBetaGamma();
+				this.refill();
+			}
+		}
+		this.calcAccuracyIndicators();
+
+		return;
+	};
+
+
+	ScETSForecastCalculation.prototype.CalcBetaGamma = function()
+	{
+		var f0 = 0.0;
+		this.mfBeta = f0;
+		this.CalcGamma();
+		this.refill();
+		var fE0 = this.mfMSE;
+
+		var f2 = 1.0;
+		this.mfBeta = f2;
+		this.CalcGamma();
+		this.refill();
+		var fE2 = this.mfMSE;
+
+		var f1 = 0.5;
+		this.mfBeta = f1;
+		this.CalcGamma();
+		this.refill();
+
+		if ( fE0 == this.mfMSE && this.mfMSE == fE2 )
+		{
+			this.mfBeta = 0;
+			this.CalcGamma();
+			this.refill();
+			return;
+		}
+		while ( ( f2 - f1 ) > this.cfMinABCResolution )
+		{
+			if ( fE2 > fE0 )
+			{
+				f2 = f1;
+				fE2 =this. mfMSE;
+				f1 = ( f0 + f1 ) / 2;
+			}
+			else
+			{
+				f0 = f1;
+				fE0 = this.mfMSE;
+				f1 = ( f1 + f2 ) / 2;
+			}
+			this.mfBeta = f1;
+			this.CalcGamma();
+			this.refill();
+		}
+		if ( fE2 > fE0 )
+		{
+			if ( fE0 < this.mfMSE )
+			{
+				this.mfBeta = f0;
+				this.CalcGamma();
+				this.refill();
+			}
+		}
+		else
+		{
+			if ( fE2 < this.mfMSE )
+			{
+				this.mfBeta = f2;
+				this.CalcGamma();
+				this.refill();
+			}
+		}
+	};
+
+	ScETSForecastCalculation.prototype.CalcGamma = function()
+	{
+		var f0 = 0.0;
+		this.mfGamma = f0;
+		this.refill();
+		var fE0 = this.mfMSE;
+
+		var f2 = 1.0;
+		this.mfGamma = f2;
+		this.refill();
+		var fE2 = this.mfMSE;
+
+		var f1 = 0.5;
+		this.mfGamma = f1;
+		this.refill();
+
+		if ( fE0 == this.mfMSE && this.mfMSE == fE2 )
+		{
+			this.mfGamma = 0;
+			this.refill();
+			return;
+		}
+		while ( ( f2 - f1 ) > this.cfMinABCResolution )
+		{
+			if ( fE2 > fE0 )
+			{
+				f2 = f1;
+				fE2 = this.mfMSE;
+				f1 = ( f0 + f1 ) / 2;
+			}
+			else
+			{
+				f0 = f1;
+				fE0 = this.mfMSE;
+				f1 = ( f1 + f2 ) / 2;
+			}
+			this.mfGamma = f1;
+			this.refill();
+		}
+		if ( fE2 > fE0 )
+		{
+			if ( fE0 < this.mfMSE )
+			{
+				this.mfGamma = f0;
+				this.refill();
+			}
+		}
+		else
+		{
+			if ( fE2 < this.mfMSE )
+			{
+				this.mfGamma = f2;
+				this.refill();
+			}
+		}
+	};
+
+
+	ScETSForecastCalculation.prototype.refill = function()
+	{
+		// refill mpBase, mpTrend, mpPerIdx and mpForecast with values
+		// using the calculated mfAlpha, (mfBeta), mfGamma
+		// forecast 1 step ahead
+		for ( var i = 1; i < this.mnCount; i++ )
+		{
+			if ( this.bEDS )
+			{
+				this.mpBase[ i ] = this.mfAlpha * this.maRange[ i ].Y +
+					( 1 - this.mfAlpha ) * ( this.mpBase[ i - 1 ] + this.mpTrend[ i - 1 ] );
+				this.mpTrend[ i ] = this.mfGamma * ( this.mpBase[ i ] - this.mpBase[ i - 1 ] ) +
+					( 1 - this.mfGamma ) * this.mpTrend[ i - 1 ];
+				this.mpForecast[ i ] = this.mpBase[ i - 1 ] + this.mpTrend[ i - 1 ];
+			}
+			else
+			{
+				var nIdx;
+				if ( this.bAdditive )
+				{
+					nIdx = ( i > this.mnSmplInPrd ? i - this.mnSmplInPrd : i );
+					this.mpBase[ i ] = this.mfAlpha * ( this.maRange[ i ].Y - this.mpPerIdx[ nIdx ] ) +
+						( 1 - this.mfAlpha ) * ( this.mpBase[ i - 1 ] + this.mpTrend[ i - 1 ] );
+					this.mpPerIdx[ i ] = this.mfBeta * ( this.maRange[ i ].Y - this.mpBase[ i ] ) +
+						( 1 - this.mfBeta ) * this.mpPerIdx[ nIdx ];
+				}
+				else
+				{
+					nIdx = ( i >= this.mnSmplInPrd ? i - this.mnSmplInPrd : i );
+					this.mpBase[ i ] = this.mfAlpha * ( this.maRange[ i ].Y / this.mpPerIdx[ nIdx ] ) +
+						( 1 - this.mfAlpha ) * ( this.mpBase[ i - 1 ] + this.mpTrend[ i - 1 ] );
+					this.mpPerIdx[ i ] = this.mfBeta * ( this.maRange[ i ].Y / this.mpBase[ i ] ) +
+						( 1 - this.mfBeta ) * this.mpPerIdx[ this.nIdx ];
+				}
+				this.mpTrend[ i ] = this.mfGamma * ( this.mpBase[ i ] - this.mpBase[ i - 1 ] ) +
+					( 1 - this.mfGamma ) * this.mpTrend[ i - 1 ];
+
+				if ( this.bAdditive )
+					this.mpForecast[ i ] = this.mpBase[ i - 1 ] + this.mpTrend[ i - 1 ] + this.mpPerIdx[ nIdx ];
+				else
+					this.mpForecast[ i ] = ( this.mpBase[ i - 1 ] + this.mpTrend[ i - 1 ] ) * this.mpPerIdx[ nIdx ];
+			}
+		}
+		this.calcAccuracyIndicators();
+	};
+
+
+	ScETSForecastCalculation.prototype.convertXtoMonths = function( x )
+	{
+		//Date aNullDate = *( mpFormatter->GetNullDate() );
+		var aDate = Date.prototype.getDateFromExcel(x);
+		var nYear = aDate.getUTCFullYear();
+		var nMonth = aDate.getMonth();
+		var fMonthLength;
+		switch ( nMonth )
+		{
+			case  1 :
+			case  3 :
+			case  5 :
+			case  7 :
+			case  8 :
+			case 10 :
+			case 12 :
+				fMonthLength = 31.0;
+				break;
+			case  2 :
+				fMonthLength = ( aDate.IsLeapYear() ? 29.0 : 28.0 );
+				break;
+			default :
+				fMonthLength = 30.0;
+		}
+		return ( 12.0 * nYear + nMonth + ( aDate.getDay() - this.mnMonthDay ) / fMonthLength );
+	};
+
+
+	ScETSForecastCalculation.prototype.GetForecast = function( fTarget, rForecast )
+	{
+		if ( !this.initCalc() )
+			return false;
+
+		if ( fTarget <= this.maRange[ this.mnCount - 1 ].X )
+		{
+			var n = ( fTarget - this.maRange[ 0 ].X ) / this.mfStepSize;
+			var fInterpolate = Math.fmod( fTarget - this.maRange[ 0 ].X, this.mfStepSize );
+			rForecast = this.maRange[ n ].Y;
+
+			if ( fInterpolate >= this.cfMinABCResolution )
+			{
+				var fInterpolateFactor = fInterpolate / this.mfStepSize;
+				var fFc_1 = this.mpForecast[ n + 1 ];
+				rForecast = rForecast + fInterpolateFactor * ( fFc_1 - rForecast );
+			}
+		}
+		else
+		{
+			var n = parseInt(( fTarget - this.maRange[ this.mnCount - 1 ].X ) / this.mfStepSize);
+			var fInterpolate = parseInt(Math.fmod( fTarget - this.maRange[ this.mnCount - 1 ].X, this.mfStepSize ));
+
+			if ( this.bEDS )
+				rForecast = this.mpBase[ this.mnCount - 1 ] + n * this.mpTrend[ this.mnCount - 1 ];
+			else if ( this.bAdditive )
+				rForecast = this.mpBase[ this.mnCount - 1 ] + n * this.mpTrend[ this.mnCount - 1 ] +
+					this.mpPerIdx[ this.mnCount - 1 - this.mnSmplInPrd + ( n % this.mnSmplInPrd ) ];
+			else
+				rForecast = ( this.mpBase[ this.mnCount - 1 ] + n * this.mpTrend[ this.mnCount - 1 ] ) *
+					this.mpPerIdx[ this.mnCount - 1 - this.mnSmplInPrd + ( n % this.mnSmplInPrd ) ];
+
+			if ( fInterpolate >= this.cfMinABCResolution )
+			{
+				var fInterpolateFactor = fInterpolate / this.mfStepSize;
+				var fFc_1;
+				if ( this.bEDS )
+					fFc_1 = this.mpBase[ this.mnCount - 1 ] + ( n + 1 ) * this.mpTrend[ this.mnCount - 1 ];
+				else if ( this.bAdditive )
+					fFc_1 = this.mpBase[ this.mnCount - 1 ] + ( n + 1 ) * this.mpTrend[ this.mnCount - 1 ] +
+						this.mpPerIdx[ this.mnCount - 1 - this.mnSmplInPrd + ( ( n + 1 ) % this.mnSmplInPrd ) ];
+				else
+					fFc_1 = ( this.mpBase[ this.mnCount - 1 ] + ( n + 1 ) * this.mpTrend[ this.mnCount - 1 ] ) *
+						this.mpPerIdx[ this.mnCount - 1 - this.mnSmplInPrd + ( ( n + 1 ) % this.mnSmplInPrd ) ];
+				rForecast = rForecast + fInterpolateFactor * ( fFc_1 - rForecast );
+			}
+		}
+		return rForecast;
+	};
+
+	ScETSForecastCalculation.prototype.GetForecastRange = function( rTMat )
+	{
+		var nC = rTMat.length, nR = rTMat[0].length;
+
+		var rFcMat = [];
+
+		for ( var i = 0; i < nR; i++ )
+		{
+			for ( var j = 0; j < nC; j++ )
+			{
+				var fTarget;
+				if ( this.mnMonthDay )
+					fTarget = this.convertXtoMonths( rTMat[j][i].getValue() );
+				else
+					fTarget = rTMat[j][i].getValue();
+				var fForecast;
+				if ( fForecast = this.GetForecast( fTarget ) ){
+					if(!rFcMat[j]){
+						rFcMat[j] = [];
+					}
+					rFcMat[j][i] = fForecast;
+				}else{
+					return false;
+				}
+			}
+		}
+		return rFcMat;
+	};
+
+
+	ScETSForecastCalculation.prototype.GetStatisticValue = function( rTypeMat, rStatMat )
+	{
+		if ( !this.initCalc() )
+			return false;
+
+		var nC = rTypeMat.length, nR = rTypeMat[0].length;
+		for ( var i = 0; i < nR; i++ )
+		{
+			for ( var j = 0; j < nC; j++ )
+			{
+				switch ( rTypeMat[j][i] )
+				{
+					case 1 : // alpha
+						rStatMat.push( mfAlpha, j, i );
+						break;
+					case 2 : // gamma
+						rStatMat.push( mfGamma, j, i );
+						break;
+					case 3 : // beta
+						rStatMat.push( mfBeta, j, i );
+						break;
+					case 4 : // MASE
+						rStatMat.push( mfMASE, j, i );
+						break;
+					case 5 : // SMAPE
+						rStatMat.push( mfSMAPE, j, i );
+						break;
+					case 6 : // MAE
+						rStatMat.push( mfMAE, j, i );
+						break;
+					case 7 : // RMSE
+						rStatMat.push( mfRMSE, j, i );
+						break;
+					case 8 : // step size
+						rStatMat.push( mfStepSize, j, i );
+						break;
+					case 9 : // samples in period
+						rStatMat.push( mnSmplInPrd, j, i );
+						break;
+				}
+			}
+		}
+		return true;
+	};
+
+
+
+
 	/**
 	 * @constructor
 	 * @extends {AscCommonExcel.cBaseFunction}
@@ -1608,7 +2794,10 @@
 					var offset = cell.getOffset3(r.bbox.c1 + 1, r.bbox.r1 + 1);
 					r2.setOffset(offset);
 
-					var val = checkTypeCell(ws._getCellNoEmpty(r2.bbox.r1, r2.bbox.c1));
+					var val;
+					ws._getCellNoEmpty(r2.bbox.r1, r2.bbox.c1, function(cell) {
+						val = checkTypeCell(cell);
+					});
 
 					offset.offsetCol *= -1;
 					offset.offsetRow *= -1;
@@ -1622,7 +2811,10 @@
 			})
 		} else {
 			if (matching(arg0.getValue(), matchingInfo)) {
-				var val = checkTypeCell(ws._getCellNoEmpty(r.bbox.r1, r2.bbox.c1));
+				var val;
+				ws._getCellNoEmpty(r.bbox.r1, r2.bbox.c1, function(cell) {
+					val = checkTypeCell(cell);
+				});
 				if (cElementType.number === val.type) {
 					_sum += val.getValue();
 					_count++;
@@ -3736,6 +4928,56 @@
 
 		return this.value = forecast(arg0, arr0, arr1);
 
+	};
+
+	/**
+	 * @constructor
+	 * @extends {AscCommonExcel.cBaseFunction}
+	 */
+	function cFORECAST_ETS() {
+		this.name = "FORECAST.ETS";
+		this.value = null;
+		this.argumentsCurrent = 0;
+	}
+
+	cFORECAST_ETS.prototype = Object.create(cBaseFunction.prototype);
+	cFORECAST_ETS.prototype.constructor = cFORECAST_ETS;
+	cFORECAST_ETS.prototype.argumentsMin = 3;
+	cFORECAST_ETS.prototype.argumentsMax = 6;
+	cFORECAST_ETS.prototype.Calculate = function (arg) {
+
+		var oArguments = this._prepareArguments(arg, arguments[1], true, [null, cElementType.array, cElementType.array]);
+		var argClone = oArguments.args;
+
+		argClone[3] = argClone[3] ? argClone[3].tocNumber() : new cNumber(1);
+		argClone[4] = argClone[4] ? argClone[4].tocNumber() : new cNumber(1);
+		argClone[5] = argClone[5] ? argClone[5].tocNumber() : new cNumber(1);
+
+
+		argClone[0] = argClone[0].getMatrix();
+
+		var pTMat = argClone[0];
+		var pMatY = argClone[1];
+		var pMatX = argClone[2];
+		var nSmplInPrd = argClone[3];
+		var bDataCompletion = argClone[4];
+		var nAggregation = argClone[5];
+
+
+
+		var aETSCalc = new ScETSForecastCalculation( pMatX.length );
+		if ( !aETSCalc.PreprocessDataRange( pMatX, pMatY, nSmplInPrd, bDataCompletion,
+				nAggregation))
+		{
+			///*,( eETSType != etsStatAdd && eETSType != etsStatMult ? pTMat : nullptr ),eETSType )
+			return new cError(cErrorType.wrong_value_type);
+		}
+
+
+		var pFcMat = aETSCalc.GetForecastRange( pTMat);
+
+
+		return new cNumber(pFcMat[0][0]);
 	};
 
 	/**

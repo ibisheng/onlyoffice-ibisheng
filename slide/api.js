@@ -607,6 +607,7 @@
 		this.isImageChangeUrl      = false;
 		this.isShapeImageChangeUrl = false;
 		this.isSlideImageChangeUrl = false;
+		this.textureType = null;
 
 		this.isPasteFonts_Images = false;
 
@@ -3666,19 +3667,22 @@ background-repeat: no-repeat;\
 		this.isImageChangeUrl = true;
 		this.asc_addImage();
 	};
-	asc_docs_api.prototype.ChangeShapeImageFromFile = function()
+	asc_docs_api.prototype.ChangeShapeImageFromFile = function(type)
 	{
 		this.isShapeImageChangeUrl = true;
+		this.textureType = type;
 		this.asc_addImage();
 	};
-	asc_docs_api.prototype.ChangeSlideImageFromFile = function()
+	asc_docs_api.prototype.ChangeSlideImageFromFile = function(type)
 	{
 		this.isSlideImageChangeUrl = true;
+        this.textureType = type;
 		this.asc_addImage();
 	};
-	asc_docs_api.prototype.ChangeArtImageFromFile   = function()
+	asc_docs_api.prototype.ChangeArtImageFromFile   = function(type)
 	{
 		this.isTextArtChangeUrl = true;
+        this.textureType = type;
 		this.asc_addImage();
 	};
 
@@ -3828,8 +3832,12 @@ background-repeat: no-repeat;\
 			AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
 			AscShapeProp.fill.fill = new asc_CFillBlip();
 			AscShapeProp.fill.fill.asc_putUrl(src);
+			if(this.textureType !== null && this.textureType !== undefined){
+                AscShapeProp.fill.fill.asc_putType(this.textureType);
+			}
 			this.ShapeApply(AscShapeProp);
 			this.isShapeImageChangeUrl = false;
+			this.textureType = null;
 		}
 		else if (this.isSlideImageChangeUrl)
 		{
@@ -3838,8 +3846,12 @@ background-repeat: no-repeat;\
 			AscSlideProp.Background.type = c_oAscFill.FILL_TYPE_BLIP;
 			AscSlideProp.Background.fill = new asc_CFillBlip();
 			AscSlideProp.Background.fill.asc_putUrl(src);
+			if(this.textureType !== null && this.textureType !== undefined){
+                AscSlideProp.Background.fill.asc_putType(this.textureType);
+			}
 			this.SetSlideProps(AscSlideProp);
 			this.isSlideImageChangeUrl = false;
+			this.textureType = null;
 		}
 		else if (this.isImageChangeUrl)
 		{
@@ -3855,10 +3867,14 @@ background-repeat: no-repeat;\
 			oFill.type       = c_oAscFill.FILL_TYPE_BLIP;
 			oFill.fill       = new asc_CFillBlip();
 			oFill.fill.asc_putUrl(src);
+            if(this.textureType !== null && this.textureType !== undefined){
+				oFill.fill.asc_putType(this.textureType);
+            }
 			AscShapeProp.textArtProperties = new Asc.asc_TextArtProperties();
 			AscShapeProp.textArtProperties.asc_putFill(oFill);
 			this.ShapeApply(AscShapeProp);
 			this.isTextArtChangeUrl = false;
+			this.textureType = null;
 		}
 		else
 		{

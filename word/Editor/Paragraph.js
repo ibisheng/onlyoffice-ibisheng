@@ -992,7 +992,7 @@ Paragraph.prototype.Check_MathPara = function(MathPos)
 
 	return true;
 };
-Paragraph.prototype.Get_EndInfo = function()
+Paragraph.prototype.GetEndInfo = function()
 {
 	var PagesCount = this.Pages.length;
 
@@ -1001,10 +1001,9 @@ Paragraph.prototype.Get_EndInfo = function()
 	else
 		return null;
 };
-Paragraph.prototype.Get_EndInfoByPage = function(CurPage)
+Paragraph.prototype.GetEndInfoByPage = function(CurPage)
 {
 	// Здесь может приходить отрицательное значение
-
 	if (CurPage < 0)
 		return this.Parent.GetPrevElementEndInfo(this);
 	else
@@ -1020,7 +1019,6 @@ Paragraph.prototype.Recalculate_PageEndInfo = function(PRSW, CurPage)
 
 	var StartLine  = this.Pages[CurPage].StartLine;
 	var EndLine    = this.Pages[CurPage].EndLine;
-	var LinesCount = this.Lines.length;
 
 	for (var CurLine = StartLine; CurLine <= EndLine; CurLine++)
 	{
@@ -1036,7 +1034,7 @@ Paragraph.prototype.Recalculate_PageEndInfo = function(PRSW, CurPage)
 		}
 	}
 
-	this.Pages[CurPage].EndInfo.Comments = PRSI.Comments;
+	this.Pages[CurPage].EndInfo.SetFromPRSI(PRSI);
 
 	if (PRSW)
 		this.Pages[CurPage].EndInfo.RunRecalcInfo = PRSW.RunRecalcInfoBreak;
@@ -1490,7 +1488,7 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 	var DrawMMFields       = (this.LogicDocument && true === this.LogicDocument.Is_HightlightMailMergeFields() ? true : false);
 	var DrawSolvedComments = ( DocumentComments.IsUseSolved() && true !== LogicDocument.IsViewMode());
 
-	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.Get_EndInfoByPage(CurPage - 1), DrawSolvedComments);
+	PDSH.Reset(this, pGraphics, DrawColl, DrawFind, DrawComm, DrawMMFields, this.GetEndInfoByPage(CurPage - 1), DrawSolvedComments);
 
 	var StartLine = _Page.StartLine;
 	var EndLine   = _Page.EndLine;
@@ -1739,6 +1737,14 @@ Paragraph.prototype.Internal_Draw_3 = function(CurPage, pGraphics, Pr)
 			{
 				pGraphics.drawMailMergeField(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element);
 				Element = aMMFields.Get_Next();
+			}
+
+			var aCFields = PDSH.CFields;
+			var Element   = (pGraphics.RENDERER_PDF_FLAG === true ? null : aCFields.Get_Next());
+			while (null != Element)
+			{
+				pGraphics.drawMailMergeField(Element.x0, Element.y0, Element.x1 - Element.x0, Element.y1 - Element.y0, Element);
+				Element = aCFields.Get_Next();
 			}
 
 			//----------------------------------------------------------------------------------------------------------
@@ -10269,8 +10275,9 @@ Paragraph.prototype.Continue = function(NewParagraph)
 		var EndPos = this.Get_EndPos2(false);
 		var CurPos = this.Get_ParaContentPos(false, false);
 		this.Set_ParaContentPos(EndPos, true, -1, -1);
-		TextPr = this.Get_TextPr(this.Get_ParaContentPos(false, false));
+		TextPr = this.Get_TextPr(this.Get_ParaContentPos(false, false)).Copy();
 		this.Set_ParaContentPos(CurPos, false, -1, -1, false);
+		TextPr.HighLight = highlight_None;
 	}
 
 	// Копируем настройки параграфа
@@ -12290,6 +12297,14 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 		return oContentControl;
 	}
 };
+Paragraph.prototype.RegroupComplexFields = function(oRegroupManager)
+{
+	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Content[nIndex] && this.Content[nIndex].RegroupComplexFields)
+			this.Content[nIndex].RegroupComplexFields(oRegroupManager);
+	}
+};
 
 var pararecalc_0_All  = 0;
 var pararecalc_0_None = 1;
@@ -12422,26 +12437,31 @@ CDocumentBounds.prototype.Copy = function()
 
 function CParagraphPageEndInfo()
 {
-    this.Comments = []; // Массив незакрытых комментариев на данной странице (комментарии, которые были
-    // открыты до данной страницы и не закрыты на этой тут тоже присутствуют)
+    this.Comments      = []; // Массив незакрытых комментариев на данной странице
+	this.ComplexFields = []; // Массив незакрытых полей на данной странице
 
     this.RunRecalcInfo = null;
 }
-
-CParagraphPageEndInfo.prototype =
+CParagraphPageEndInfo.prototype.Copy = function()
 {
-    Copy : function()
-    {
-        var NewPageEndInfo = new CParagraphPageEndInfo();
+	var oInfo = new CParagraphPageEndInfo();
 
-        var CommentsCount = this.Comments.length;
-        for ( var Index = 0; Index < CommentsCount; Index++ )
-        {
-            NewPageEndInfo.Comments.push( this.Comments[Index] );
-        }
+	for (var nIndex = 0, nCount = this.Comments.length; nIndex < nCount; ++nIndex)
+	{
+		oInfo.Comments.push(this.Comments[nIndex]);
+	}
 
-        return NewPageEndInfo;
-    }
+	for (var nIndex = 0, nCount = this.ComplexFields.length; nIndex < nCount; ++nIndex)
+	{
+		oInfo.ComplexFields.push(this.ComplexFields[nIndex].Copy());
+	}
+
+	return oInfo;
+};
+CParagraphPageEndInfo.prototype.SetFromPRSI = function(PRSI)
+{
+	this.Comments      = PRSI.Comments;
+	this.ComplexFields = PRSI.ComplexFields;
 };
 
 function CParaPos(Range, Line, Page, Pos)
@@ -12771,11 +12791,14 @@ function CParagraphDrawStateHightlights()
     this.Comm     = new CParaDrawingRangeLines();
     this.Shd      = new CParaDrawingRangeLines();
     this.MMFields = new CParaDrawingRangeLines();
+    this.CFields  = new CParaDrawingRangeLines();
 
 	this.DrawComments       = true;
 	this.DrawSolvedComments = true;
 	this.Comments           = [];
 	this.CommentsFlag       = comments_NoComment;
+
+	this.ComplexFields = [];
 
     this.SearchCounter = 0;
 
@@ -12788,130 +12811,124 @@ function CParagraphDrawStateHightlights()
 
     this.Spaces = 0;
 }
-
-CParagraphDrawStateHightlights.prototype =
+CParagraphDrawStateHightlights.prototype.Reset = function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
 {
-    Reset : function(Paragraph, Graphics, DrawColl, DrawFind, DrawComments, DrawMMFields, PageEndInfo, DrawSolvedComments)
-    {
-        this.Paragraph = Paragraph;
-        this.Graphics  = Graphics;
+	this.Paragraph = Paragraph;
+	this.Graphics  = Graphics;
 
-        this.DrawColl     = DrawColl;
-        this.DrawFind     = DrawFind;
-        this.DrawMMFields = DrawMMFields;
+	this.DrawColl     = DrawColl;
+	this.DrawFind     = DrawFind;
+	this.DrawMMFields = DrawMMFields;
 
-        this.CurPos = new CParagraphContentPos();
+	this.CurPos = new CParagraphContentPos();
 
-        this.SearchCounter = 0;
+	this.SearchCounter = 0;
 
-		this.DrawComments       = DrawComments;
-		this.DrawSolvedComments = DrawSolvedComments;
+	this.DrawComments       = DrawComments;
+	this.DrawSolvedComments = DrawSolvedComments;
 
-		if (null !== PageEndInfo)
-			this.Comments = PageEndInfo.Comments;
-		else
-			this.Comments = [];
+	if (null !== PageEndInfo)
+	{
+		this.Comments      = PageEndInfo.Comments;
+		this.ComplexFields = PageEndInfo.ComplexFields;
+	}
+	else
+	{
+		this.Comments      = [];
+		this.ComplexFields = [];
+	}
 
-        this.Check_CommentsFlag();
-    },
+	this.Check_CommentsFlag();
+};
+CParagraphDrawStateHightlights.prototype.Reset_Range = function(Page, Line, Range, X, Y0, Y1, SpacesCount)
+{
+	this.Page  = Page;
+	this.Line  = Line;
+	this.Range = Range;
 
-    Reset_Range : function(Page, Line, Range, X, Y0, Y1, SpacesCount)
-    {
-        this.Page  = Page;
-        this.Line  = Line;
-        this.Range = Range;
+	this.High.Clear();
+	this.Coll.Clear();
+	this.Find.Clear();
+	this.Comm.Clear();
 
-        this.High.Clear();
-        this.Coll.Clear();
-        this.Find.Clear();
-        this.Comm.Clear();
+	this.X  = X;
+	this.Y0 = Y0;
+	this.Y1 = Y1;
 
-        this.X  = X;
-        this.Y0 = Y0;
-        this.Y1 = Y1;
+	this.Spaces = SpacesCount;
+};
+CParagraphDrawStateHightlights.prototype.AddComment = function(Id)
+{
+	if (!this.DrawComments)
+		return;
 
-        this.Spaces = SpacesCount;
-    },
+	var oComment = AscCommon.g_oTableId.Get_ById(Id);
+	if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
+		return;
 
-	AddComment : function(Id)
-    {
-    	if (!this.DrawComments)
-    		return;
+	this.Comments.push(Id);
+	this.Check_CommentsFlag();
+};
+CParagraphDrawStateHightlights.prototype.RemoveComment = function(Id)
+{
+	if (!this.DrawComments)
+		return;
 
-    	var oComment = AscCommon.g_oTableId.Get_ById(Id);
-    	if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
-    		return;
+	var oComment = AscCommon.g_oTableId.Get_ById(Id);
+	if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
+		return;
 
-		this.Comments.push(Id);
-		this.Check_CommentsFlag();
-    },
-
-	RemoveComment : function(Id)
-    {
-		if (!this.DrawComments)
-			return;
-
-		var oComment = AscCommon.g_oTableId.Get_ById(Id);
-		if (!oComment || (!this.DrawSolvedComments && oComment.IsSolved()))
-			return;
-
-		for (var nIndex = 0, nCount = this.Comments.length; nIndex < nCount; ++nIndex)
+	for (var nIndex = 0, nCount = this.Comments.length; nIndex < nCount; ++nIndex)
+	{
+		if (this.Comments[nIndex] === Id)
 		{
-			if (this.Comments[nIndex] === Id)
-			{
-				this.Comments.splice(nIndex, 1);
-				break;
-			}
+			this.Comments.splice(nIndex, 1);
+			break;
 		}
+	}
 
-		this.Check_CommentsFlag();
-    },
+	this.Check_CommentsFlag();
+};
+CParagraphDrawStateHightlights.prototype.Check_CommentsFlag = function()
+{
+	// Проверяем флаг
+	var Para             = this.Paragraph;
+	var DocumentComments = Para.LogicDocument.Comments;
+	var CurComment       = DocumentComments.Get_CurrentId();
+	var CommLen          = this.Comments.length;
 
-    Check_CommentsFlag : function()
-    {
-        // Проверяем флаг
-        var Para = this.Paragraph;
-        var DocumentComments = Para.LogicDocument.Comments;
-        var CurComment = DocumentComments.Get_CurrentId();
-        var CommLen = this.Comments.length;
+	// Сначала проверим есть ли вообще комментарии
+	this.CommentsFlag = ( CommLen > 0 ? comments_NonActiveComment : comments_NoComment );
 
-        // Сначала проверим есть ли вообще комментарии
-        this.CommentsFlag = ( CommLen > 0 ? comments_NonActiveComment : comments_NoComment );
-
-        // Проверим является ли какой-либо комментарий активным
-        for ( var CurPos = 0; CurPos < CommLen; CurPos++ )
-        {
-            if ( CurComment === this.Comments[CurPos] )
-            {
-                this.CommentsFlag = comments_ActiveComment;
-                break
-            }
-        }
-    },
-
-    Save_Coll : function()
-    {
-        var Coll = this.Coll;
-        this.Coll = new CParaDrawingRangeLines();
-        return Coll;
-    },
-
-    Save_Comm : function()
-    {
-        var Comm = this.Comm;
-        this.Comm = new CParaDrawingRangeLines();
-        return Comm;
-    },
-
-    Load_Coll : function(Coll)
-    {
-        this.Coll = Coll;
-    },
-
-    Load_Comm : function(Comm)
-    {
-        this.Comm = Comm;
-    }
+	// Проверим является ли какой-либо комментарий активным
+	for (var CurPos = 0; CurPos < CommLen; CurPos++)
+	{
+		if (CurComment === this.Comments[CurPos])
+		{
+			this.CommentsFlag = comments_ActiveComment;
+			break
+		}
+	}
+};
+CParagraphDrawStateHightlights.prototype.Save_Coll = function()
+{
+	var Coll  = this.Coll;
+	this.Coll = new CParaDrawingRangeLines();
+	return Coll;
+};
+CParagraphDrawStateHightlights.prototype.Save_Comm = function()
+{
+	var Comm  = this.Comm;
+	this.Comm = new CParaDrawingRangeLines();
+	return Comm;
+};
+CParagraphDrawStateHightlights.prototype.Load_Coll = function(Coll)
+{
+	this.Coll = Coll;
+};
+CParagraphDrawStateHightlights.prototype.Load_Comm = function(Comm)
+{
+	this.Comm = Comm;
 };
 
 function CParagraphDrawStateElements()

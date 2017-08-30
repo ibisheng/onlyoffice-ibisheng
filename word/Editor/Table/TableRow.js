@@ -160,22 +160,22 @@ CTableRow.prototype =
         this.Metrics.X_max = x_max;
     },
 
-    Get_EndInfo : function()
+	GetEndInfo : function()
     {
         var CellsCount = this.Content.length;
         if ( CellsCount > 0 )
-            return this.Content[CellsCount - 1].Get_EndInfo();
+            return this.Content[CellsCount - 1].GetEndInfo();
         else
             return null;
     },
 
 	GetPrevElementEndInfo : function(CellIndex)
-    {
-        if ( 0 === CellIndex )
-            return this.Table.GetPrevElementEndInfo( this.Index );
-        else
-            return this.Content[CellIndex - 1].Get_EndInfo();
-    },
+	{
+		if (0 === CellIndex)
+			return this.Table.GetPrevElementEndInfo(this.Index);
+		else
+			return this.Content[CellIndex - 1].GetEndInfo();
+	},
 
 	SaveRecalculateObject : function()
 	{

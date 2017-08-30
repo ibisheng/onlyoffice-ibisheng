@@ -8039,11 +8039,11 @@ CDocumentContent.prototype.GetSelectionAnchorPos = function()
 	var Pos = ( true === this.Selection.Use ? ( this.Selection.StartPos < this.Selection.EndPos ? this.Selection.StartPos : this.Selection.EndPos ) : this.CurPos.ContentPos );
 	return this.Content[Pos].GetSelectionAnchorPos();
 };
-CDocumentContent.prototype.Get_EndInfo = function()
+CDocumentContent.prototype.GetEndInfo = function()
 {
 	var ContentLen = this.Content.length;
 	if (ContentLen > 0)
-		return this.Content[ContentLen - 1].Get_EndInfo();
+		return this.Content[ContentLen - 1].GetEndInfo();
 	else
 		return null;
 };
@@ -8053,7 +8053,7 @@ CDocumentContent.prototype.GetPrevElementEndInfo = function(CurElement)
 
 	if (null !== PrevElement && undefined !== PrevElement)
 	{
-		return PrevElement.Get_EndInfo();
+		return PrevElement.GetEndInfo();
 	}
 	else
 	{

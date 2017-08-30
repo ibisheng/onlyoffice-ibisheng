@@ -640,7 +640,7 @@
  
         return this;
     };
-    
+
     DrawingContext.prototype.save = function () {
         this.nctx["PD_Save"]();
         return this;
