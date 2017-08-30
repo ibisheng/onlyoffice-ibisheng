@@ -5220,7 +5220,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 			}
 		} else if (cElementType.cellsRange3D === currentElement.type) {
 			bbox = currentElement.getBBox0();
-			if (!bbox.isAbsAll()) {
+			if (bbox && !bbox.isAbsAll()) {
 				cloneElem = currentElement.clone();
 				bbox = cloneElem.getBBox0();
 			}

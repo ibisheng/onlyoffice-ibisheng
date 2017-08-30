@@ -2358,6 +2358,9 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest, isIdle)
 	{
+		if (this.WordControl.m_oLogicDocument.IsViewModeInReview())
+			return false;
+
 		var res = false;
 		this.IsUserSave = !isAutoSave;
 		if (this.saveCheck())
@@ -8815,6 +8818,10 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_startEditCurrentOleObject"]             = asc_docs_api.prototype.asc_startEditCurrentOleObject;
 	asc_docs_api.prototype["asc_InputClearKeyboardElement"]             = asc_docs_api.prototype.asc_InputClearKeyboardElement;
 	asc_docs_api.prototype["asc_SpecialPaste"]                          = asc_docs_api.prototype.asc_SpecialPaste;
+
+
+	asc_docs_api.prototype['asc_BeginViewModeInReview']                 = asc_docs_api.prototype.asc_BeginViewModeInReview;
+	asc_docs_api.prototype['asc_EndViewModeInReview']                   = asc_docs_api.prototype.asc_EndViewModeInReview;
 
 	// mobile
 	asc_docs_api.prototype["asc_GetDefaultTableStyles"]             	= asc_docs_api.prototype.asc_GetDefaultTableStyles;

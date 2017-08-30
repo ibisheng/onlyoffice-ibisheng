@@ -110,6 +110,8 @@
 
 		this.showButtonIdParagraph = null;
 		this.endRecalcDocument = false;//для документов, закончен ли пересчет документа. нужно, чтобы грамотно рассчитать позицию иконки с/в
+
+		this.bSaveFormat = false; //для вставки, допустим, из плагина необходимо чтобы при добавлении текста в шейп сохранялось форматирование
 	}
 
 	CClipboardBase.prototype =
@@ -974,6 +976,7 @@
 		{
 			this.pasteStart = false;
 			this.specialPasteProps = null;
+			this.bSaveFormat = false;
 			//процесс специальной вставки заканчивается вместе с общей вставкой
 			if(this.specialPasteStart)
 			{

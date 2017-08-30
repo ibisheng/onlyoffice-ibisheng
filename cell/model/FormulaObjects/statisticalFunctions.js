@@ -3868,6 +3868,8 @@
 			arg1 = arg1.cross(arguments[1]);
 		} else if (cElementType.array === arg1.type) {
 			arg1 = arg1.getElementRowCol(0, 0);
+		}else if(cElementType.cell === arg1.type || cElementType.cell3D === arg1.type){
+			arg1 = arg1.getValue();
 		}
 
 		/*arg1 = arg1.tocString();
@@ -4849,6 +4851,11 @@
 		function forecast(fx, y, x) {
 
 			var fSumDeltaXDeltaY = 0, fSumSqrDeltaX = 0, _x = 0, _y = 0, xLength = 0, i;
+
+			if(x.length !== y.length){
+				return new cError(cErrorType.not_available);
+			}
+
 			for (i = 0; i < x.length; i++) {
 
 				if (!( x[i] instanceof cNumber && y[i] instanceof cNumber )) {

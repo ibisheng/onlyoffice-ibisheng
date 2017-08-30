@@ -405,11 +405,26 @@
 					{
 						if(ws.getCellEditMode() === true)
 						{
-							var text = data1.innerText;
-							if(text)
-							{
-								window["Asc"]["editor"].wb.cellEditor.pasteText(text);
-								window['AscCommon'].g_clipboardBase.Paste_Process_End();
+							//fragments = пока только для плагина вставка символов
+							var fragments;
+							if(window['AscCommon'].g_clipboardBase.bSaveFormat){
+								fragments = this.pasteProcessor._getFragmentsFromHtml(data1);
+							}
+							if(fragments){
+								var pasteFragments = fragments.fragments;
+								var newFonts = fragments.fonts;
+								ws._loadFonts(newFonts, function() {
+									window["Asc"]["editor"].wb.cellEditor.paste(pasteFragments);
+									window['AscCommon'].g_clipboardBase.Paste_Process_End();
+								});
+
+							}else{
+								var text = data1.innerText;
+								if(text)
+								{
+									window["Asc"]["editor"].wb.cellEditor.pasteText(text);
+									window['AscCommon'].g_clipboardBase.Paste_Process_End();
+								}
 							}
 						}
 						else
@@ -2823,6 +2838,84 @@
 				aResult.props.rowSpanSpCount = 0;
 				
 				return aResult;
+			},
+
+			_getFragmentsFromHtml: function(html){
+				//даная функция рассчитана только на вставку символа из плагина
+				//TODO для вставки полноценной html нужно писать обработку
+
+				var res = null;
+				if(html && html.children){
+					for(var i = 0; i < html.children.length; i++){
+
+						if(!res){
+							res = {fragments: [], fonts: {}};
+						}
+
+						var children = html.children[i];
+						var computedStyle = this._getComputedStyle(children);
+						var fragment = new AscCommonExcel.Fragment();
+						var format = new AscCommonExcel.Font();
+
+						if(computedStyle){
+							var bold = computedStyle.getPropertyValue("font-weight");
+							if("bold" === bold){
+								format.setBold(true);
+							}
+							/*var color = computedStyle.getPropertyValue("color");
+							 if(color){
+							 format.setColor(color);
+							 }*/
+							var italic = computedStyle.getPropertyValue("font-style");
+							if("italic" === italic){
+								format.setItalic(true);
+							}
+							var fontFamily = computedStyle.getPropertyValue("font-family");
+							if(fontFamily){
+								format.setName(fontFamily);
+								res.fonts[fontFamily] = 1;
+							}
+							/*var fontSize = computedStyle.getPropertyValue("font-size");
+							 if(fontSize){
+							 format.setSize(fontSize);
+							 }*/
+							var text_decoration = computedStyle.getPropertyValue("text-decoration");
+							if(text_decoration){
+								var underline, Strikeout;
+								if(-1 !== text_decoration.indexOf("underline")){
+									underline = true;
+								} else if(-1 !== text_decoration.indexOf("none")){
+									underline = false;
+								}
+								if(-1 !== text_decoration.indexOf("line-through")){
+									Strikeout = true;
+								}
+								if(underline){
+									format.setUnderline(true);
+								}
+								if(Strikeout){
+									format.setUnderline(true);
+								}
+							}
+						}
+
+						fragment.text = children.innerText;
+						fragment.format = format;
+
+						res.fragments.push(fragment);
+					}
+				}
+				return res;
+			},
+
+			_getComputedStyle : function(node){
+				var computedStyle = null;
+				if(null != node && Node.ELEMENT_NODE === node.nodeType)
+				{
+					var defaultView = node.ownerDocument.defaultView;
+					computedStyle = defaultView.getComputedStyle( node, null );
+				}
+				return computedStyle;
 			}
 		};
 		

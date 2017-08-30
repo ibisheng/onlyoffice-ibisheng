@@ -172,27 +172,27 @@ function EasySAXParser() {
 
 	// -----------------------------------------------------
 
-	var xharsQuot={constructor: false, hasOwnProperty: false, isPrototypeOf: false, propertyIsEnumerable: false, toLocaleString: false, toString: false, valueOf: false
-		, quot: '"'
-		, QUOT: '"'
-		, amp: '&'
-		, AMP: '&'
-		, nbsp: '\u00A0'
-		, apos: '\''
-		, lt: '<'
-		, LT: '<'
-		, gt: '>'
-		, GT: '>'
-		, copy: '\u00A9'
-		, laquo: '\u00AB'
-		, raquo: '\u00BB'
-		, reg: '\u00AE'
-		, deg: '\u00B0'
-		, plusmn: '\u00B1'
-		, sup2: '\u00B2'
-		, sup3: '\u00B3'
-		, micro: '\u00B5'
-		, para: '\u00B6'
+	var xharsQuot={'constructor': false, 'hasOwnProperty': false, 'isPrototypeOf': false, 'propertyIsEnumerable': false, 'toLocaleString': false, 'toString': false, 'valueOf': false
+		, 'quot': '"'
+		, 'QUOT': '"'
+		, 'amp': '&'
+		, 'AMP': '&'
+		, 'nbsp': '\u00A0'
+		, 'apos': '\''
+		, 'lt': '<'
+		, 'LT': '<'
+		, 'gt': '>'
+		, 'GT': '>'
+		, 'copy': '\u00A9'
+		, 'laquo': '\u00AB'
+		, 'raquo': '\u00BB'
+		, 'reg': '\u00AE'
+		, 'deg': '\u00B0'
+		, 'plusmn': '\u00B1'
+		, 'sup2': '\u00B2'
+		, 'sup3': '\u00B3'
+		, 'micro': '\u00B5'
+		, 'para': '\u00B6'
 	};
 
 
